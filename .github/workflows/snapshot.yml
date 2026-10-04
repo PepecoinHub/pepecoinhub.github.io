@@ -1,0 +1,69 @@
+name: Daily snapshot
+
+on:
+  schedule:
+    - cron: "17 3 * * *"          # every day at 03:17 UTC
+  workflow_dispatch:               # the "Run workflow" button
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "scripts/**"
+      - ".github/workflows/snapshot.yml"
+
+permissions:
+  contents: write                  # commit the new snapshot
+  pages: write                     # publish the site
+  id-token: write
+
+concurrency:
+  group: snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot-and-publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # A push only republishes the site; the scheduled and manual runs take a snapshot.
+      - name: Take snapshot
+        if: github.event_name != 'push'
+        run: python scripts/snapshot.py || (echo "retrying in 5 min" && sleep 300 && python scripts/snapshot.py)
+
+      - name: Build summary
+        run: |
+          if ls docs/data/snapshots/*.json >/dev/null 2>&1; then
+            python scripts/build_summary.py
+          else
+            echo "No snapshots yet, publishing the empty state."
+          fi
+
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data
+          if git diff --cached --quiet; then
+            echo "Nothing new to commit."
+          else
+            git commit -m "data: snapshot $(date -u +%F)"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
