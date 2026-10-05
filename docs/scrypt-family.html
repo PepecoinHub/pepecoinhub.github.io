@@ -25,11 +25,11 @@
   --ink: #15201b;
   --muted: #56645d;
   --rule: #d3ddd7;
-  --accent: #1d6a4b;
-  --accent-soft: #e2eee7;
+  --accent: #23753d;
+  --accent-soft: #e2efe4;
   --flag: #a8621a;
   --track: #e4e9e6;
-  --series: #1d7a55;
+  --series: #258343;
   --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --f-body: "Public Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -37,13 +37,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
-    --accent: #5fc394; --accent-soft: #19271f; --flag: #e3a35c; --track: #222b26; --series: #2f9f73;
+    --accent: #76c788; --accent-soft: #19281c; --flag: #e3a35c; --track: #222b26; --series: #419f5b;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
-  --accent: #5fc394; --accent-soft: #19271f; --flag: #e3a35c; --track: #222b26; --series: #2f9f73;
+  --accent: #76c788; --accent-soft: #19281c; --flag: #e3a35c; --track: #222b26; --series: #419f5b;
   color-scheme: dark;
 }
 
@@ -74,7 +74,7 @@ a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visib
 }
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink);
   font-family: var(--f-display); font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; }
-.brand img { width: 28px; height: 28px; object-fit: contain; }
+.brand img { width: 38px; height: 38px; object-fit: contain; }
 .site-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.92rem; }
 .site-nav a { color: var(--muted); text-decoration: none; padding-block: 4px; border-bottom: 2px solid transparent; }
 .site-nav a:hover { color: var(--ink); }
@@ -91,7 +91,7 @@ h3 { font-size: 1.1rem; line-height: 1.3; font-weight: 600; }
 p { margin: 0; }
 .lede { font-size: 1.15rem; max-width: 62ch; }
 .page-head { display: grid; gap: 18px; }
-.page-head .hero-logo { width: 64px; height: 64px; object-fit: contain; }
+.page-head .hero-logo { width: 96px; height: 96px; object-fit: contain; }
 section { display: grid; gap: 20px; }
 section > * { min-width: 0; }
 .note { color: var(--muted); font-size: 0.92rem; max-width: 68ch; }
@@ -200,13 +200,13 @@ q { quotes: "\201C" "\201D"; }
 </head>
 <body>
 <header class="site-head">
-  <a class="brand" href="./"><img src="logo.svg" alt="" width="28" height="28" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
+  <a class="brand" href="./"><img src="logo.svg" alt="" width="38" height="38" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
   <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="supply.html">Supply</a><a href="scrypt-family.html" aria-current="page">Scrypt family</a><a href="rich-list.html">Rich list</a></nav>
 </header>
 <main class="wrap">
 <article class="wrap-article">
 <header class="page-head">
-  <img class="hero-logo" src="logo.svg" alt="Pepecoin logo" width="64" height="64" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}">
+  <img class="hero-logo" src="logo.svg" alt="Pepecoin logo" width="96" height="96" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}">
   <p class="eyebrow">Scrypt merged mining · updated October 5, 2026</p>
   <h1>The Scrypt family: one miner, three coins</h1>
   <p class="lede">A Scrypt mining machine does its work once and gets paid by several blockchains at the same time. Litecoin started the family in 2011, Dogecoin joined in 2014, and Pepecoin joined in 2024. This is how it happened and what it gives miners and holders.</p>

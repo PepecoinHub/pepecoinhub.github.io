@@ -3,78 +3,86 @@
    the change matrix, movers and the holder table. Cards only where a chart
    or table needs its own surface. */
 
+/* Colors: one green family taken from the Pepecoin logo (OKLCH hue 150), muted. Tier ramp and the
+   single series were run through the dataviz palette validator in both themes. Up/down is green vs
+   purple so it survives red-green colour blindness. Neutrals match the fact pages. */
+
 :root {
   color-scheme: light;
-  --bg: #f6f6f2;
-  --surface: #fcfcfb;
-  --ink: #0b0b0b;
-  --ink-2: #52514e;
-  --muted: #6b6963;
-  --grid: #e1e0d9;
-  --line: #c3c2b7;
-  --ring: rgba(11, 11, 11, 0.10);
-  --accent: #256abf;
+  --bg: #f2f5f3;
+  --surface: #ffffff;
+  --ink: #15201b;
+  --ink-2: #3f4b44;
+  --muted: #56645d;
+  --grid: #e0e6e3;
+  --line: #bfcac4;
+  --ring: rgba(21, 32, 27, 0.10);
+  --accent: #23753d;
   --accent-ink: #ffffff;
-  --accent-wash: rgba(37, 106, 191, 0.10);
-  --s1: #2a78d6;
-  --t1: #0d366b;
-  --t2: #184f95;
-  --t3: #2a78d6;
-  --t4: #5598e7;
-  --t5: #86b6ef;
-  --rest: #c3c2b7;
-  --up: 42, 120, 214;      /* concentration up   (diverging blue) */
-  --down: 227, 73, 72;     /* concentration down (diverging red)  */
+  --accent-wash: rgba(35, 117, 61, 0.10);
+  --s1: #258343;
+  --t1: #165229;
+  --t2: #1f6f38;
+  --t3: #318c4c;
+  --t4: #56a76a;
+  --t5: #7fc08c;
+  --rest: #d5d9d6;
+  --up: 37, 131, 67;       /* concentration up   (diverging green)  */
+  --down: 121, 85, 160;    /* concentration down (diverging purple) */
   --warn-bg: #fab219;
   --warn-ink: #0b0b0b;
-  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0d0d0d;
-    --surface: #1a1a19;
-    --ink: #ffffff;
-    --ink-2: #c3c2b7;
-    --muted: #a3a199;
-    --grid: #2c2c2a;
-    --line: #383835;
+    --bg: #101512;
+    --surface: #161d19;
+    --ink: #e4ebe7;
+    --ink-2: #b6c1ba;
+    --muted: #9caaa3;
+    --grid: #202924;
+    --line: #2d3932;
     --ring: rgba(255, 255, 255, 0.10);
-    --accent: #6da7ec;
-    --accent-ink: #0b0b0b;
-    --accent-wash: rgba(109, 167, 236, 0.14);
-    --s1: #3987e5;
-    --t1: #cde2fb;
-    --t2: #9ec5f4;
-    --t3: #5598e7;
-    --t4: #2a78d6;
-    --t5: #184f95;
-    --rest: #4a4a46;
+    --accent: #76c788;
+    --accent-ink: #0b100d;
+    --accent-wash: rgba(118, 199, 136, 0.14);
+    --s1: #419f5b;
+    --t1: #b7e5bf;
+    --t2: #88ca95;
+    --t3: #59ae6e;
+    --t4: #398e51;
+    --t5: #286e3c;
+    --rest: #3a3e3b;
+    --up: 105, 194, 126;
+    --down: 187, 153, 227;
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0d0d0d;
-  --surface: #1a1a19;
-  --ink: #ffffff;
-  --ink-2: #c3c2b7;
-  --muted: #a3a199;
-  --grid: #2c2c2a;
-  --line: #383835;
+  --bg: #101512;
+  --surface: #161d19;
+  --ink: #e4ebe7;
+  --ink-2: #b6c1ba;
+  --muted: #9caaa3;
+  --grid: #202924;
+  --line: #2d3932;
   --ring: rgba(255, 255, 255, 0.10);
-  --accent: #6da7ec;
-  --accent-ink: #0b0b0b;
-  --accent-wash: rgba(109, 167, 236, 0.14);
-  --s1: #3987e5;
-  --t1: #cde2fb;
-  --t2: #9ec5f4;
-  --t3: #5598e7;
-  --t4: #2a78d6;
-  --t5: #184f95;
-  --rest: #4a4a46;
+  --accent: #76c788;
+  --accent-ink: #0b100d;
+  --accent-wash: rgba(118, 199, 136, 0.14);
+  --s1: #419f5b;
+  --t1: #b7e5bf;
+  --t2: #88ca95;
+  --t3: #59ae6e;
+  --t4: #398e51;
+  --t5: #286e3c;
+  --rest: #3a3e3b;
+  --up: 105, 194, 126;
+  --down: 187, 153, 227;
 }
 
 * { box-sizing: border-box; }

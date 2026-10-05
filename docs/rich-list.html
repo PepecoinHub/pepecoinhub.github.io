@@ -16,7 +16,7 @@
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Public+Sans:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Public+Sans:wght@400..700&display=swap">
 <link rel="stylesheet" href="style.css">
 <style>
 /* Shared site header and footer. Same structure as the fact pages, drawn with this page's own tokens
@@ -24,7 +24,7 @@
 body { padding-top: 0; }
 .pf-head { max-width: 1120px; margin: 0 auto 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; padding-block: 18px; border-bottom: 1px solid var(--line); }
 .pf-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-family: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; }
-.pf-brand img { width: 28px; height: 28px; object-fit: contain; }
+.pf-brand img { width: 38px; height: 38px; object-fit: contain; }
 .pf-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-family: "Public Sans", "Helvetica Neue", Arial, system-ui, sans-serif; font-size: 0.92rem; }
 .pf-nav a { color: var(--muted); text-decoration: none; padding-block: 4px; border-bottom: 2px solid transparent; }
 .pf-nav a:hover { color: var(--ink); }
@@ -32,12 +32,13 @@ body { padding-top: 0; }
 .pf-foot { max-width: 1120px; margin: 40px auto 0; border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 6px; font-size: 0.8125rem; color: var(--muted); }
 .pf-foot p { margin: 0; }
 .pf-foot strong { color: var(--ink); }
+#app h1 { font-family: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif; font-weight: 800; font-size: 1.9rem; letter-spacing: -0.02em; }
 </style>
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 </head>
 <body>
 <header class="pf-head">
-  <a class="pf-brand" href="./"><img src="logo.svg" alt="" width="28" height="28" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
+  <a class="pf-brand" href="./"><img src="logo.svg" alt="" width="38" height="38" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
   <nav class="pf-nav" aria-label="Pages"><a href="which-pepecoin.html">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="supply.html">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="rich-list.html" aria-current="page">Rich list</a></nav>
 </header>
 <div class="wrap" id="app">
