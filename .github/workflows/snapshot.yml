@@ -12,20 +12,19 @@ on:
       - ".github/workflows/snapshot.yml"
 
 permissions:
-  contents: write                  # commit the new snapshot
-  pages: write                     # publish the site
-  id-token: write
+  contents: read
 
 concurrency:
   group: snapshot
   cancel-in-progress: false
 
 jobs:
-  snapshot-and-publish:
+  # Job 1: collect the data. Does not need GitHub Pages, so history starts
+  # piling up even before Pages is switched on.
+  snapshot:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: write              # commit the new snapshot
     steps:
       - uses: actions/checkout@v4
 
@@ -33,10 +32,16 @@ jobs:
         with:
           python-version: "3.12"
 
-      # A push only republishes the site; the scheduled and manual runs take a snapshot.
+      # Scheduled and manual runs always take a snapshot. A push takes one only
+      # if there is none for today yet, so editing the site never overwrites it.
       - name: Take snapshot
-        if: github.event_name != 'push'
-        run: python scripts/snapshot.py || (echo "retrying in 5 min" && sleep 300 && python scripts/snapshot.py)
+        run: |
+          today="$(date -u +%F)"
+          if [ "${{ github.event_name }}" = "push" ] && [ -f "docs/data/snapshots/${today}.json" ]; then
+            echo "Today's snapshot already exists, not taking another one on a push."
+          else
+            python scripts/snapshot.py || { echo "First attempt failed, retrying in 5 minutes"; sleep 300; python scripts/snapshot.py; }
+          fi
 
       - name: Build summary
         run: |
@@ -58,6 +63,24 @@ jobs:
             git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
+
+  # Job 2: publish the site. Fails with "HttpError: Not Found" in configure-pages
+  # until Settings -> Pages -> Source is set to "GitHub Actions".
+  deploy:
+    needs: snapshot
+    if: ${{ !cancelled() }}        # still publish (old data or the empty state) if the snapshot failed
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}   # tip of the branch, includes the snapshot commit from job 1
 
       - uses: actions/configure-pages@v5
 

@@ -11,10 +11,10 @@ Koszt: 0 zł. Bez serwera, bazy i kluczy API. GitHub Actions pobiera dane raz dz
 
 ## Uruchomienie (ok. 10 minut)
 
-1. Załóż na GitHubie **publiczne** repozytorium (np. `pepecoin-holder-watch`) i wgraj do niego całą zawartość tego folderu. GitHub Pages dla prywatnych repozytoriów wymaga płatnego planu.
-2. W repozytorium: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+1. Załóż na GitHubie **publiczne** repozytorium (np. `pepecoin-holder-watch`) i wgraj do niego całą zawartość tego folderu **do głównego katalogu repo** (nie do podfolderu, bo GitHub szuka workflowu tylko w `.github/workflows/` w rootcie). GitHub Pages dla prywatnych repozytoriów wymaga płatnego planu.
+2. W repozytorium: **Settings → Pages → Build and deployment → Source: GitHub Actions**. Bez tego zadanie `deploy` kończy się błędem „HttpError: Not Found” w kroku `configure-pages`. Zbieranie danych działa i tak.
 3. Zakładka **Actions → Daily snapshot → Run workflow**. Pierwsze uruchomienie robi pierwszy snapshot i publikuje stronę.
-4. Adres strony pojawi się w logu kroku „deploy” i w Settings → Pages (zwykle `https://TWOJ-LOGIN.github.io/NAZWA-REPO/`).
+4. Adres strony pojawi się w logu zadania `deploy` i w Settings → Pages (zwykle `https://TWOJ-LOGIN.github.io/NAZWA-REPO/`).
 
 Od tego dnia workflow robi się sam o 03:17 UTC. Pierwsze zmiany widać następnego dnia, tygodniowe po tygodniu, roczne po roku.
 
@@ -42,7 +42,7 @@ Typy `exchange`, `pool`, `miner`, `burn` znikają w widoku „bez giełd i pooli
 | `scripts/snapshot.py` | Pobiera top 1250 adresów, podaż i wysokość bloku, sprawdza sensowność danych i zapisuje `docs/data/snapshots/RRRR-MM-DD.json`. Nic nie zapisze, jeśli dane wyglądają źle. |
 | `scripts/build_summary.py` | Liczy udziały, zmiany i ruchy z wszystkich snapshotów, zapisuje `docs/data/summary.json` i `docs/data/shares.csv`. |
 | `docs/` | Strona (HTML, CSS i JS, bez bibliotek zewnętrznych). |
-| `.github/workflows/snapshot.yml` | Codzienny przebieg: snapshot → podsumowanie → commit → publikacja. |
+| `.github/workflows/snapshot.yml` | Dwa zadania. `snapshot`: pobranie danych, podsumowanie, commit. `deploy`: publikacja strony. Dzięki temu historia zbiera się nawet przed włączeniem Pages. Push też robi snapshot, ale tylko jeśli na dziś jeszcze go nie ma. |
 
 ## Lokalnie
 
