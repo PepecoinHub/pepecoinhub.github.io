@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which Pepecoin is which? PEPE vs PEPECOIN vs PEP</title>
+<meta name="description" content="PEPE, PEPECOIN and Pepecoin (PEP) are three different crypto assets. Compare chain, launch allocation, supply and address format, with a source for every line.">
+<link rel="canonical" href="https://j8680739-dot.github.io/pepecoin-holder-watch/which-pepecoin.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Pepecoin facts">
+<meta property="og:title" content="Which Pepecoin is which? PEPE vs PEPECOIN vs PEP">
+<meta property="og:description" content="PEPE, PEPECOIN and Pepecoin (PEP) are three different crypto assets. Compare chain, launch allocation, supply and address format, with a source for every line.">
+<meta property="og:url" content="https://j8680739-dot.github.io/pepecoin-holder-watch/which-pepecoin.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one 880px column. Shared top nav, then page sections stacked with a 56px rhythm.
+   Tables and the chart are the only wide elements and scroll inside their own boxes. */
+:root {
+  --paper: #f2f5f3;
+  --panel: #ffffff;
+  --ink: #15201b;
+  --muted: #56645d;
+  --rule: #d3ddd7;
+  --accent: #1d6a4b;
+  --accent-soft: #e2eee7;
+  --flag: #a8621a;
+  --track: #e4e9e6;
+  --series: #1d7a55;
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Public Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
+    --accent: #5fc394; --accent-soft: #19271f; --flag: #e3a35c; --track: #222b26; --series: #2f9f73;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
+  --accent: #5fc394; --accent-soft: #19271f; --flag: #e3a35c; --track: #222b26; --series: #2f9f73;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-inline: 20px;
+  padding-block: 0 64px;
+}
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px;
+}
+
+/* Top bar */
+.site-head {
+  max-width: 880px; margin-inline: auto;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px;
+  padding-block: 18px; border-bottom: 1px solid var(--rule);
+}
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink);
+  font-family: var(--f-display); font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; }
+.brand img { width: 28px; height: 28px; object-fit: contain; }
+.site-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.92rem; }
+.site-nav a { color: var(--muted); text-decoration: none; padding-block: 4px; border-bottom: 2px solid transparent; }
+.site-nav a:hover { color: var(--ink); }
+.site-nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+
+.wrap { max-width: 880px; margin-inline: auto; display: grid; gap: 56px; padding-top: 44px; }
+.wrap > * { min-width: 0; }
+
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.03; font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.55rem; line-height: 1.2; font-weight: 600; }
+h3 { font-size: 1.1rem; line-height: 1.3; font-weight: 600; }
+p { margin: 0; }
+.lede { font-size: 1.15rem; max-width: 62ch; }
+.page-head { display: grid; gap: 18px; }
+.page-head .hero-logo { width: 64px; height: 64px; object-fit: contain; }
+section { display: grid; gap: 20px; }
+section > * { min-width: 0; }
+.note { color: var(--muted); font-size: 0.92rem; max-width: 68ch; }
+.prose { display: grid; gap: 16px; max-width: 68ch; }
+.prose ul, .prose ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+.src { font-size: 0.82rem; color: var(--muted); }
+code { font-family: var(--f-mono); font-size: 0.85rem; word-break: break-all; }
+
+/* Tables */
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--rule); }
+tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+thead th { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--ink); white-space: nowrap; }
+thead th.coin { font-family: var(--f-display); font-size: 1.2rem; font-weight: 800; letter-spacing: 0; text-transform: none; color: var(--ink); }
+thead th.coin small { display: block; font-family: var(--f-body); font-size: 0.8rem; font-weight: 400; color: var(--muted); }
+tbody th { font-family: var(--f-mono); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+tbody th.plain { font-family: var(--f-body); font-size: 0.95rem; letter-spacing: 0; text-transform: none; color: var(--ink); white-space: nowrap; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+col.hl { background: var(--accent-soft); }
+tr.hl td, tr.hl th { background: var(--accent-soft); }
+.same { display: inline-block; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 6px; margin-left: 8px; white-space: nowrap; }
+
+/* Definition list of facts */
+dl.facts { margin: 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); border-top: 1px solid var(--rule); }
+dl.facts dt, dl.facts dd { padding: 14px 0; border-bottom: 1px solid var(--rule); margin: 0; }
+dl.facts dt { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 18px; padding-right: 16px; }
+dl.facts dd { min-width: 0; }
+
+/* Stat row */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
+.stat { padding: 16px 16px 16px 0; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.stat .label { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.stat .value { font-size: 1.7rem; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
+.stat .sub { font-size: 0.86rem; color: var(--muted); }
+
+/* Link lists and page cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.cards.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
+.cards.two > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 20px; display: grid; gap: 8px; align-content: start; text-decoration: none; color: var(--ink); min-width: 0; }
+a.card:hover { border-color: var(--accent); }
+.card h3 { color: var(--accent); }
+.card p { font-size: 0.95rem; color: var(--muted); }
+.linkgroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 32px; }
+.linkgroup { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.linkgroup h3 { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.linkgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.linkgroup li { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 0.95rem; }
+.linkgroup li span { color: var(--muted); font-size: 0.82rem; text-align: right; }
+
+/* Sources */
+.sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+.sources h3 { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+.sources ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.92rem; }
+
+/* FAQ */
+.faq { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.faq details { border-bottom: 1px solid var(--rule); padding: 14px 0; }
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq details p { margin-top: 10px; max-width: 68ch; }
+
+footer.site-foot { max-width: 880px; margin: 56px auto 0; border-top: 2px solid var(--ink); padding-top: 18px; display: grid; gap: 8px; font-size: 0.9rem; color: var(--muted); }
+footer.site-foot strong { color: var(--ink); }
+
+@media (max-width: 560px) {
+  table.fit th, table.fit td { padding: 10px 10px; }
+  table.fit tbody th { width: 92px; }
+  table.fit .same { margin-left: 0; display: table; margin-top: 4px; }
+  dl.facts { grid-template-columns: 1fr; }
+  dl.facts dt { padding-bottom: 0; border-bottom: 0; }
+  dl.facts dd { padding-top: 4px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+.alloc { display: grid; gap: 8px; }
+.alloc-num { font-family: var(--f-mono); font-weight: 600; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.alloc-num.flag { color: var(--flag); }
+.alloc-num.zero { color: var(--accent); }
+.bar { height: 8px; background: var(--track); border-radius: 4px; overflow: hidden; max-width: 160px; }
+.bar span { display: block; height: 100%; background: var(--flag); }
+.bar-scale { font-family: var(--f-mono); font-size: 0.7rem; color: var(--muted); }
+.addr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.addr-card { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.prefix { font-family: var(--f-mono); font-size: 2rem; font-weight: 600; line-height: 1; }
+.prefix.pep { color: var(--accent); }
+.addr-row { display: grid; gap: 4px; min-width: 0; }
+.addr-row .who { font-weight: 700; font-size: 0.9rem; }
+.addr-line { display: flex; gap: 8px; align-items: flex-start; min-width: 0; }
+.addr-line code { min-width: 0; }
+.copy { flex: none; font: 600 0.75rem var(--f-body); color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 4px; padding: 3px 8px; cursor: pointer; }
+.copy:hover { border-color: var(--accent); }
+</style>
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+
+</head>
+<body>
+<header class="site-head">
+  <a class="brand" href="./"><img src="logo.svg" alt="" width="28" height="28" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
+  <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html" aria-current="page">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="supply.html">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="rich-list.html">Rich list</a></nav>
+</header>
+<main class="wrap">
+<header class="page-head">
+    <p class="eyebrow">Fact sheet · data as of October 5, 2026</p>
+    <h1>Which Pepecoin is which?</h1>
+    <p class="lede">Three different crypto assets go by some version of the name <strong>Pepecoin</strong>, and Kraken lists all three. Here is how they differ, with a source for every line.</p>
+  </header>
+
+  <section aria-labelledby="compare">
+    <h2 id="compare">Side by side</h2>
+    <div class="table-scroll" role="region" aria-labelledby="compare" tabindex="0">
+      <table style="min-width: 660px">
+        <colgroup><col><col><col><col class="hl"></colgroup>
+        <thead>
+          <tr>
+            <th scope="col">Ticker</th>
+            <th scope="col" class="coin">PEPE<small>Pepe</small></th>
+            <th scope="col" class="coin">PEPECOIN<small>PepeCoin / Memetic</small></th>
+            <th scope="col" class="coin">PEP<small>Pepecoin</small></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">What it is</th>
+            <td>ERC-20 token on Ethereum</td>
+            <td>ERC-20 token on Ethereum. Ran its own chain from 2016, bridged to Ethereum in 2023</td>
+            <td>Its own layer-1 blockchain, a fork of Dogecoin Core</td>
+          </tr>
+          <tr>
+            <th scope="row">Launched</th>
+            <td>April 2023</td>
+            <td>March 2016</td>
+            <td>January 30, 2024</td>
+          </tr>
+          <tr>
+            <th scope="row">Secured by</th>
+            <td>Ethereum validators (proof of stake)</td>
+            <td>Ethereum validators today. Originally X11 proof of work, then proof of stake</td>
+            <td>Scrypt proof of work, merge-mined with Litecoin and Dogecoin</td>
+          </tr>
+          <tr>
+            <th scope="row">Launch allocation</th>
+            <td>
+              <div class="alloc">
+                <span class="alloc-num flag">6.9%</span>
+                <div class="bar" role="img" aria-label="6.9 percent on a 0 to 10 percent scale"><span style="width:69%"></span></div>
+                <span>to a team multisig wallet; 93.1% to the liquidity pool</span>
+              </div>
+            </td>
+            <td>
+              <div class="alloc">
+                <span class="alloc-num flag">3.5%</span>
+                <div class="bar" role="img" aria-label="3.5 percent on a 0 to 10 percent scale"><span style="width:35%"></span></div>
+                <span>premine for a development fund, per the project's own 2016 repository</span>
+              </div>
+            </td>
+            <td>
+              <div class="alloc">
+                <span class="alloc-num zero">0%</span>
+                <div class="bar" role="img" aria-label="0 percent on a 0 to 10 percent scale"><span style="width:0%"></span></div>
+                <span>no premine, no pre-allocation, no ICO, no funding round</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Supply</th>
+            <td><span class="num">420.69 trillion</span>, fixed</td>
+            <td><span class="num">~107 million</span> circulating on Ethereum</td>
+            <td><span class="num">~104.8 billion</span>, plus 10,000 per block, no cap</td>
+          </tr>
+          <tr>
+            <th scope="row">Address</th>
+            <td>Starts with <code>0x</code></td>
+            <td>Starts with <code>0x</code></td>
+            <td>Starts with <code>P</code></td>
+          </tr>
+          <tr>
+            <th scope="row">On Kraken</th>
+            <td>Since 2023</td>
+            <td>Since February 18, 2026</td>
+            <td>Since February 11, 2026</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="bar-scale">Allocation bars share one scale, 0 to 10%.</p>
+  </section>
+
+  <section aria-labelledby="check">
+    <h2 id="check">Check an address in five seconds</h2>
+    <div class="addr-grid">
+      <div class="addr-card">
+        <span class="prefix pep">P…</span>
+        <p>Pepecoin (PEP). Native coin on its own chain, viewable on <a href="https://pepeplorer.com">pepeplorer.com</a> or <a href="https://pepeblocks.com">pepeblocks.com</a>.</p>
+      </div>
+      <div class="addr-card">
+        <span class="prefix">0x…</span>
+        <p>An Ethereum token. Match the contract:</p>
+        <div class="addr-row">
+          <span class="who">PEPE</span>
+          <div class="addr-line"><code id="c-pepe">0x6982508145454Ce325dDbE47a25d4ec3d2311933</code><button class="copy" type="button" data-target="c-pepe">Copy</button></div>
+        </div>
+        <div class="addr-row">
+          <span class="who">PEPECOIN</span>
+          <div class="addr-line"><code id="c-pepecoin">0xA9E8aCf069C58aEc8825542845Fd754e41a9489A</code><button class="copy" type="button" data-target="c-pepecoin">Copy</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="pep">
+    <h2 id="pep">Pepecoin (PEP) in numbers</h2>
+    <dl class="facts">
+      <dt>Genesis</dt>
+      <dd>Network live January 30, 2024. The genesis block embeds a <em>Wall Street Journal</em> headline dated January 22, 2024. <span class="src">MiCA white paper; chainparams.cpp</span></dd>
+
+      <dt>Allocation</dt>
+      <dd>None. Every PEP came from block rewards to miners. Pepecoin LLC holds no PEP. <span class="src">MiCA white paper, sections D.9 and G.5</span></dd>
+
+      <dt>Mining</dt>
+      <dd>Scrypt proof of work. Merged mining (AuxPoW) with Litecoin and Dogecoin since block <span class="num">42,000</span>, chain ID <span class="num">63</span>. <span class="src">chainparams.cpp</span></dd>
+
+      <dt>Blocks</dt>
+      <dd>About one every <span class="num">60</span> seconds, <span class="num">10,000</span> PEP each, no supply cap. <span class="src">MiCA white paper, section G.13</span></dd>
+
+      <dt>Difficulty</dt>
+      <dd><span class="num">40.6M</span> on October 5, 2026. Dogecoin ranged <span class="num">28.8M–47.5M</span> from September 28 to October 4. Both target 60-second blocks, so PEP runs on hashrate in the same range as Dogecoin's. <span class="src">Pepeplorer; CoinWarz</span></dd>
+
+      <dt>New coins per day</dt>
+      <dd><span class="num">14.4M PEP ≈ $1,300</span> to miners, next to <span class="num">14.4M DOGE ≈ $1.4M</span>. Merged mining adds PEP at no extra hardware or power cost. <span class="src">Block rewards × CoinMarketCap prices, October 5, 2026</span></dd>
+
+      <dt>Pools</dt>
+      <dd>Binance Pool, ViaBTC, F2Pool and EMCD offer PEP alongside LTC and DOGE. <span class="src">Pool announcements and pages, linked below</span></dd>
+
+      <dt>Supply</dt>
+      <dd><span class="num">~104.8 billion</span> PEP per the Pepeplorer explorer. Some aggregators still show ~102.9 billion. <span class="src">Pepeplorer; CoinMarketCap</span></dd>
+
+      <dt>Regulation</dt>
+      <dd>MiCA white paper for admission to trading on Kraken in the EU, notified April 7, 2026, published May 8, 2026. <span class="src">pepecoin.com/mica-whitepaper.xhtml</span></dd>
+
+      <dt>Code</dt>
+      <dd>MIT-licensed, public at <a href="https://github.com/pepecoinppc/pepecoin">github.com/pepecoinppc/pepecoin</a>.</dd>
+    </dl>
+  </section>
+
+  <section aria-labelledby="sources">
+    <h2 id="sources">Sources</h2>
+    <div class="sources">
+      <div>
+        <h3>PEP · Pepecoin</h3>
+        <ul>
+          <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA white paper</a></li>
+          <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp (AuxPoW, genesis)</a></li>
+          <li><a href="https://pepeplorer.com/network">Pepeplorer network stats</a></li>
+          <li><a href="https://blog.kraken.com/product/asset-listings/pep-is-available-for-trading">Kraken listing, Feb 2026</a></li>
+          <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC on PEP merged mining</a></li>
+          <li><a href="https://cryptonews.net/news/market/30268800/">Binance Pool adds PEP</a></li>
+          <li><a href="https://www.f2pool.com/coin/pepecoin">F2Pool PEP page</a></li>
+          <li><a href="https://emcd.io/articles/mining/how-to-mine-bellcoin-bell/">EMCD merged-mining coins</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>PEPECOIN · PepeCoin / Memetic</h3>
+        <ul>
+          <li><a href="https://github.com/memeticproject/memetic-core">2016 repository (3.5% premine)</a></li>
+          <li><a href="https://bitcointalk.org/index.php?topic=1391598.0">Bitcointalk announcement</a></li>
+          <li><a href="https://etherscan.io/token/0xa9e8acf069c58aec8825542845fd754e41a9489a">Etherscan token page</a></li>
+          <li><a href="https://blog.kraken.com/product/asset-listings/pepecoin-is-available-for-trading">Kraken listing, Feb 2026</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>PEPE · Pepe</h3>
+        <ul>
+          <li><a href="https://www.techopedia.com/definition/pepe-coin-pepe">Techopedia: launch tokenomics</a></li>
+          <li><a href="https://etherscan.io/token/0x6982508145454ce325ddbe47a25d4ec3d2311933">Etherscan token page</a></li>
+          <li><a href="https://www.sec.gov/Archives/edgar/data/2109686/000199937126007908/canarypepe-s1.htm">Canary PEPE ETF, Form S-1</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Dogecoin comparison</h3>
+        <ul>
+          <li><a href="https://www.coinwarz.com/dogecoin-difficulty">CoinWarz Dogecoin difficulty</a></li>
+          <li><a href="https://coinmarketcap.com/currencies/dogecoin/">CoinMarketCap DOGE</a></li>
+          <li><a href="https://coinmarketcap.com/currencies/pepecoin-org/">CoinMarketCap PEP</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+<script>
+document.querySelectorAll('.copy').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var el = document.getElementById(btn.dataset.target);
+    var text = el.textContent.trim();
+    function selectIt() {
+      var r = document.createRange(); r.selectNodeContents(el);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = 'Selected';
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { btn.textContent = 'Copied'; }, selectIt);
+    } else { selectIt(); }
+    setTimeout(function () { btn.textContent = 'Copy'; }, 1800);
+  });
+});
+</script>
+</main>
+<footer class="site-foot">
+  <p><strong>Community fact pages</strong>, compiled by a volunteer from the r/pepecoin community. Not an official Pepecoin publication.</p>
+  <p>Not investment advice. The compiler holds PEP. Prices and network figures change daily; each page gives its dates and sources.</p>
+</footer>
+</body>
+</html>

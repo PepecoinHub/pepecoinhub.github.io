@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pepecoin supply and inflation: no cap, falling rate</title>
+<meta name="description" content="Pepecoin (PEP) has no supply cap. It adds a fixed 5.26 billion coins a year, so inflation falls from about 5.0% today to 2.3% in 25 years. Chart, table and sources.">
+<link rel="canonical" href="https://j8680739-dot.github.io/pepecoin-holder-watch/supply.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Pepecoin facts">
+<meta property="og:title" content="Pepecoin supply and inflation: no cap, falling rate">
+<meta property="og:description" content="Pepecoin (PEP) has no supply cap. It adds a fixed 5.26 billion coins a year, so inflation falls from about 5.0% today to 2.3% in 25 years. Chart, table and sources.">
+<meta property="og:url" content="https://j8680739-dot.github.io/pepecoin-holder-watch/supply.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one 880px column. Shared top nav, then page sections stacked with a 56px rhythm.
+   Tables and the chart are the only wide elements and scroll inside their own boxes. */
+:root {
+  --paper: #f2f5f3;
+  --panel: #ffffff;
+  --ink: #15201b;
+  --muted: #56645d;
+  --rule: #d3ddd7;
+  --accent: #1d6a4b;
+  --accent-soft: #e2eee7;
+  --flag: #a8621a;
+  --track: #e4e9e6;
+  --series: #1d7a55;
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Public Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
+    --accent: #5fc394; --accent-soft: #19271f; --flag: #e3a35c; --track: #222b26; --series: #2f9f73;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
+  --accent: #5fc394; --accent-soft: #19271f; --flag: #e3a35c; --track: #222b26; --series: #2f9f73;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-inline: 20px;
+  padding-block: 0 64px;
+}
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px;
+}
+
+/* Top bar */
+.site-head {
+  max-width: 880px; margin-inline: auto;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px;
+  padding-block: 18px; border-bottom: 1px solid var(--rule);
+}
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink);
+  font-family: var(--f-display); font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; }
+.brand img { width: 28px; height: 28px; object-fit: contain; }
+.site-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.92rem; }
+.site-nav a { color: var(--muted); text-decoration: none; padding-block: 4px; border-bottom: 2px solid transparent; }
+.site-nav a:hover { color: var(--ink); }
+.site-nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+
+.wrap { max-width: 880px; margin-inline: auto; display: grid; gap: 56px; padding-top: 44px; }
+.wrap > * { min-width: 0; }
+
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.03; font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.55rem; line-height: 1.2; font-weight: 600; }
+h3 { font-size: 1.1rem; line-height: 1.3; font-weight: 600; }
+p { margin: 0; }
+.lede { font-size: 1.15rem; max-width: 62ch; }
+.page-head { display: grid; gap: 18px; }
+.page-head .hero-logo { width: 64px; height: 64px; object-fit: contain; }
+section { display: grid; gap: 20px; }
+section > * { min-width: 0; }
+.note { color: var(--muted); font-size: 0.92rem; max-width: 68ch; }
+.prose { display: grid; gap: 16px; max-width: 68ch; }
+.prose ul, .prose ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+.src { font-size: 0.82rem; color: var(--muted); }
+code { font-family: var(--f-mono); font-size: 0.85rem; word-break: break-all; }
+
+/* Tables */
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--rule); }
+tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+thead th { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--ink); white-space: nowrap; }
+thead th.coin { font-family: var(--f-display); font-size: 1.2rem; font-weight: 800; letter-spacing: 0; text-transform: none; color: var(--ink); }
+thead th.coin small { display: block; font-family: var(--f-body); font-size: 0.8rem; font-weight: 400; color: var(--muted); }
+tbody th { font-family: var(--f-mono); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+tbody th.plain { font-family: var(--f-body); font-size: 0.95rem; letter-spacing: 0; text-transform: none; color: var(--ink); white-space: nowrap; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+col.hl { background: var(--accent-soft); }
+tr.hl td, tr.hl th { background: var(--accent-soft); }
+.same { display: inline-block; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 6px; margin-left: 8px; white-space: nowrap; }
+
+/* Definition list of facts */
+dl.facts { margin: 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); border-top: 1px solid var(--rule); }
+dl.facts dt, dl.facts dd { padding: 14px 0; border-bottom: 1px solid var(--rule); margin: 0; }
+dl.facts dt { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 18px; padding-right: 16px; }
+dl.facts dd { min-width: 0; }
+
+/* Stat row */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
+.stat { padding: 16px 16px 16px 0; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.stat .label { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.stat .value { font-size: 1.7rem; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
+.stat .sub { font-size: 0.86rem; color: var(--muted); }
+
+/* Link lists and page cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.cards.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
+.cards.two > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 20px; display: grid; gap: 8px; align-content: start; text-decoration: none; color: var(--ink); min-width: 0; }
+a.card:hover { border-color: var(--accent); }
+.card h3 { color: var(--accent); }
+.card p { font-size: 0.95rem; color: var(--muted); }
+.linkgroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 32px; }
+.linkgroup { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.linkgroup h3 { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.linkgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.linkgroup li { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 0.95rem; }
+.linkgroup li span { color: var(--muted); font-size: 0.82rem; text-align: right; }
+
+/* Sources */
+.sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+.sources h3 { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+.sources ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.92rem; }
+
+/* FAQ */
+.faq { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.faq details { border-bottom: 1px solid var(--rule); padding: 14px 0; }
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq details p { margin-top: 10px; max-width: 68ch; }
+
+footer.site-foot { max-width: 880px; margin: 56px auto 0; border-top: 2px solid var(--ink); padding-top: 18px; display: grid; gap: 8px; font-size: 0.9rem; color: var(--muted); }
+footer.site-foot strong { color: var(--ink); }
+
+@media (max-width: 560px) {
+  table.fit th, table.fit td { padding: 10px 10px; }
+  table.fit tbody th { width: 92px; }
+  table.fit .same { margin-left: 0; display: table; margin-top: 4px; }
+  dl.facts { grid-template-columns: 1fr; }
+  dl.facts dt { padding-bottom: 0; border-bottom: 0; }
+  dl.facts dd { padding-top: 4px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+.chart { margin: 0; position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 16px 12px; display: grid; gap: 8px; }
+.chart-scroll { overflow-x: auto; }
+.chart svg { display: block; width: 100%; min-width: 620px; height: auto; font-family: var(--f-body); }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .bar { fill: var(--series); }
+.chart .line { fill: none; stroke: var(--series); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .dot { fill: var(--series); stroke: var(--panel); stroke-width: 2; }
+.chart .ref { stroke: var(--muted); stroke-width: 1; }
+.chart text { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.chart text.t { fill: var(--ink); font-weight: 600; font-size: 13px; }
+.chart text.v { fill: var(--ink); font-weight: 600; }
+.chart .hair { stroke: var(--muted); stroke-width: 1; display: none; pointer-events: none; }
+.chart .slot { fill: transparent; }
+.tip { position: absolute; z-index: 2; pointer-events: none; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 10px 12px; font-size: 0.85rem; display: grid; gap: 2px; min-width: 150px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+.tip-head { font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; }
+.tip strong { margin-right: 6px; font-variant-numeric: tabular-nums; }
+.tip span { color: var(--muted); }
+.table-view summary { cursor: pointer; font-weight: 600; padding-block: 6px; }
+.table-view .table-scroll { margin-top: 12px; }
+</style>
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does Pepecoin have a maximum supply?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pepecoin has no supply cap. Each block adds 10,000 new PEP, about once a minute, with no end date. Dogecoin uses the same rule."}}, {"@type": "Question", "name": "How many new Pepecoin are created each year?", "acceptedAnswer": {"@type": "Answer", "text": "About 5.26 billion PEP: 525,600 blocks a year at 10,000 PEP per block, assuming the 60-second block target holds."}}, {"@type": "Question", "name": "What is Pepecoin's inflation rate?", "acceptedAnswer": {"@type": "Answer", "text": "About 5.0% for the 12 months from October 2026. Because the yearly issue is fixed and the supply keeps growing, the rate falls every year, to about 3.3% after ten years and 2.3% in year 25."}}, {"@type": "Question", "name": "Is that the same as Dogecoin?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Dogecoin has issued a fixed 10,000 DOGE per one-minute block since 2015. Its supply is larger, about 156 billion, so its inflation rate today is lower, about 3.4%."}}, {"@type": "Question", "name": "Was any Pepecoin premined or set aside?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pepecoin's MiCA white paper states there was no premine, no pre-allocation and no ICO, and that Pepecoin LLC holds no PEP. All coins were issued to miners as block rewards."}}]}</script>
+</head>
+<body>
+<header class="site-head">
+  <a class="brand" href="./"><img src="logo.svg" alt="" width="28" height="28" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
+  <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="supply.html" aria-current="page">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="rich-list.html">Rich list</a></nav>
+</header>
+<main class="wrap">
+<header class="page-head">
+  <p class="eyebrow">Supply and inflation</p>
+  <h1>No cap, and less inflation every year</h1>
+  <p class="lede">Pepecoin has no maximum supply. Every block creates 10,000 new PEP, and that number never changes. Because the supply keeps growing while the yearly issue stays flat, the inflation rate falls every year. Dogecoin has worked the same way since 2015.</p>
+</header>
+
+<section aria-label="Key figures">
+  <div class="stats">
+    <div class="stat"><span class="label">New PEP per block</span><span class="value">10,000</span><span class="sub">fixed since block 600,000</span></div>
+    <div class="stat"><span class="label">New PEP per year</span><span class="value">5.26B</span><span class="sub">at 60-second blocks</span></div>
+    <div class="stat"><span class="label">Inflation, next 12 months</span><span class="value">5.0%</span><span class="sub">on a supply of 104.8B</span></div>
+    <div class="stat"><span class="label">Inflation in year 25</span><span class="value">2.3%</span><span class="sub">on a supply of 231B</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="chart-title">
+  <h2 id="chart-title">The same number of new coins, a smaller share each year</h2>
+  <p class="note">Projection for the 25 years from October 2026, assuming the 60-second block target holds. Each point covers the 12 months ending in October of that year.</p>
+  <figure class="chart" id="chart" tabindex="0" aria-describedby="chart-help">
+    <div class="chart-scroll">
+      <svg viewBox="0 0 760 420" role="img" aria-label="Two aligned charts for 2027 to 2051. New PEP per year is flat at 5.26 billion. The inflation rate falls from 5.0 percent to 2.3 percent.">
+<text class="t" x="52" y="16">New PEP per year</text>
+<line class="grid" x1="52" x2="732" y1="124.0" y2="124.0"/>
+<text x="44" y="128.0" text-anchor="end">0</text>
+<line class="grid" x1="52" x2="732" y1="94.0" y2="94.0"/>
+<text x="44" y="98.0" text-anchor="end">2B</text>
+<line class="grid" x1="52" x2="732" y1="64.0" y2="64.0"/>
+<text x="44" y="68.0" text-anchor="end">4B</text>
+<line class="grid" x1="52" x2="732" y1="34.0" y2="34.0"/>
+<text x="44" y="38.0" text-anchor="end">6B</text>
+<path class="bar" d="M57.6,124 V49.2 Q57.6,45.2 61.6,45.2 H69.6 Q73.6,45.2 73.6,49.2 V124 Z"/>
+<path class="bar" d="M84.8,124 V49.2 Q84.8,45.2 88.8,45.2 H96.8 Q100.8,45.2 100.8,49.2 V124 Z"/>
+<path class="bar" d="M112.0,124 V49.2 Q112.0,45.2 116.0,45.2 H124.0 Q128.0,45.2 128.0,49.2 V124 Z"/>
+<path class="bar" d="M139.2,124 V49.2 Q139.2,45.2 143.2,45.2 H151.2 Q155.2,45.2 155.2,49.2 V124 Z"/>
+<path class="bar" d="M166.4,124 V49.2 Q166.4,45.2 170.4,45.2 H178.4 Q182.4,45.2 182.4,49.2 V124 Z"/>
+<path class="bar" d="M193.6,124 V49.2 Q193.6,45.2 197.6,45.2 H205.6 Q209.6,45.2 209.6,49.2 V124 Z"/>
+<path class="bar" d="M220.8,124 V49.2 Q220.8,45.2 224.8,45.2 H232.8 Q236.8,45.2 236.8,49.2 V124 Z"/>
+<path class="bar" d="M248.0,124 V49.2 Q248.0,45.2 252.0,45.2 H260.0 Q264.0,45.2 264.0,49.2 V124 Z"/>
+<path class="bar" d="M275.2,124 V49.2 Q275.2,45.2 279.2,45.2 H287.2 Q291.2,45.2 291.2,49.2 V124 Z"/>
+<path class="bar" d="M302.4,124 V49.2 Q302.4,45.2 306.4,45.2 H314.4 Q318.4,45.2 318.4,49.2 V124 Z"/>
+<path class="bar" d="M329.6,124 V49.2 Q329.6,45.2 333.6,45.2 H341.6 Q345.6,45.2 345.6,49.2 V124 Z"/>
+<path class="bar" d="M356.8,124 V49.2 Q356.8,45.2 360.8,45.2 H368.8 Q372.8,45.2 372.8,49.2 V124 Z"/>
+<path class="bar" d="M384.0,124 V49.2 Q384.0,45.2 388.0,45.2 H396.0 Q400.0,45.2 400.0,49.2 V124 Z"/>
+<path class="bar" d="M411.2,124 V49.2 Q411.2,45.2 415.2,45.2 H423.2 Q427.2,45.2 427.2,49.2 V124 Z"/>
+<path class="bar" d="M438.4,124 V49.2 Q438.4,45.2 442.4,45.2 H450.4 Q454.4,45.2 454.4,49.2 V124 Z"/>
+<path class="bar" d="M465.6,124 V49.2 Q465.6,45.2 469.6,45.2 H477.6 Q481.6,45.2 481.6,49.2 V124 Z"/>
+<path class="bar" d="M492.8,124 V49.2 Q492.8,45.2 496.8,45.2 H504.8 Q508.8,45.2 508.8,49.2 V124 Z"/>
+<path class="bar" d="M520.0,124 V49.2 Q520.0,45.2 524.0,45.2 H532.0 Q536.0,45.2 536.0,49.2 V124 Z"/>
+<path class="bar" d="M547.2,124 V49.2 Q547.2,45.2 551.2,45.2 H559.2 Q563.2,45.2 563.2,49.2 V124 Z"/>
+<path class="bar" d="M574.4,124 V49.2 Q574.4,45.2 578.4,45.2 H586.4 Q590.4,45.2 590.4,49.2 V124 Z"/>
+<path class="bar" d="M601.6,124 V49.2 Q601.6,45.2 605.6,45.2 H613.6 Q617.6,45.2 617.6,49.2 V124 Z"/>
+<path class="bar" d="M628.8,124 V49.2 Q628.8,45.2 632.8,45.2 H640.8 Q644.8,45.2 644.8,49.2 V124 Z"/>
+<path class="bar" d="M656.0,124 V49.2 Q656.0,45.2 660.0,45.2 H668.0 Q672.0,45.2 672.0,49.2 V124 Z"/>
+<path class="bar" d="M683.2,124 V49.2 Q683.2,45.2 687.2,45.2 H695.2 Q699.2,45.2 699.2,49.2 V124 Z"/>
+<path class="bar" d="M710.4,124 V49.2 Q710.4,45.2 714.4,45.2 H722.4 Q726.4,45.2 726.4,49.2 V124 Z"/>
+<text class="v" x="732" y="16" text-anchor="end">5.26B every year</text>
+<text class="t" x="52" y="178">Inflation rate</text>
+<line class="grid" x1="52" x2="732" y1="356.0" y2="356.0"/>
+<text x="44" y="360.0" text-anchor="end">0%</text>
+<line class="grid" x1="52" x2="732" y1="302.7" y2="302.7"/>
+<text x="44" y="306.7" text-anchor="end">2%</text>
+<line class="grid" x1="52" x2="732" y1="249.3" y2="249.3"/>
+<text x="44" y="253.3" text-anchor="end">4%</text>
+<line class="grid" x1="52" x2="732" y1="196.0" y2="196.0"/>
+<text x="44" y="200.0" text-anchor="end">6%</text>
+<line class="ref" x1="52" x2="732" y1="266.3" y2="266.3"/>
+<text x="732" y="259.3" text-anchor="end">Dogecoin today: 3.4%</text>
+<polyline class="line" points="65.6,222.3 92.8,228.6 120.0,234.5 147.2,239.8 174.4,244.6 201.6,249.1 228.8,253.2 256.0,257.0 283.2,260.6 310.4,263.8 337.6,266.9 364.8,269.8 392.0,272.5 419.2,275.0 446.4,277.4 473.6,279.7 500.8,281.8 528.0,283.8 555.2,285.7 582.4,287.5 609.6,289.2 636.8,290.9 664.0,292.4 691.2,293.9 718.4,295.3"/>
+<circle class="dot" cx="65.6" cy="222.3" r="5"/>
+<circle class="dot" cx="718.4" cy="295.3" r="5"/>
+<text class="v" x="75.6" y="214.3">5.0% in the first year</text>
+<text class="v" x="718.4" y="317.3" text-anchor="end">2.3% in year 25</text>
+<text x="65.6" y="376" text-anchor="middle">2027</text>
+<text x="201.6" y="376" text-anchor="middle">2032</text>
+<text x="337.6" y="376" text-anchor="middle">2037</text>
+<text x="473.6" y="376" text-anchor="middle">2042</text>
+<text x="609.6" y="376" text-anchor="middle">2047</text>
+<text x="718.4" y="376" text-anchor="middle">2051</text>
+<line class="hair" x1="0" x2="0" y1="34" y2="356"/>
+<rect class="slot" data-cx="65.6" x="52.0" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="92.8" x="79.2" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="120.0" x="106.4" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="147.2" x="133.6" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="174.4" x="160.8" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="201.6" x="188.0" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="228.8" x="215.2" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="256.0" x="242.4" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="283.2" x="269.6" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="310.4" x="296.8" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="337.6" x="324.0" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="364.8" x="351.2" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="392.0" x="378.4" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="419.2" x="405.6" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="446.4" x="432.8" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="473.6" x="460.0" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="500.8" x="487.2" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="528.0" x="514.4" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="555.2" x="541.6" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="582.4" x="568.8" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="609.6" x="596.0" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="636.8" x="623.2" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="664.0" x="650.4" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="691.2" x="677.6" y="34" width="27.2" height="322"/>
+<rect class="slot" data-cx="718.4" x="704.8" y="34" width="27.2" height="322"/>
+</svg>
+    </div>
+    <div class="tip" id="tip" hidden></div>
+    <figcaption id="chart-help" class="src">Hover, tap, or use the left and right arrow keys to read each year. The full table is below.</figcaption>
+  </figure>
+  <details class="table-view">
+    <summary>Show every year as a table</summary>
+    <div class="table-scroll" role="region" aria-label="Projection table" tabindex="0">
+      <table style="min-width: 520px">
+        <thead><tr><th scope="col">12 months to</th><th scope="col" class="r">New PEP</th><th scope="col" class="r">Supply at end</th><th scope="col" class="r">Inflation</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Oct 2027</th><td class="r">5.26B</td><td class="r">110.1B</td><td class="r">5.01%</td></tr>
+          <tr><th scope="row">Oct 2028</th><td class="r">5.26B</td><td class="r">115.3B</td><td class="r">4.78%</td></tr>
+          <tr><th scope="row">Oct 2029</th><td class="r">5.26B</td><td class="r">120.6B</td><td class="r">4.56%</td></tr>
+          <tr><th scope="row">Oct 2030</th><td class="r">5.26B</td><td class="r">125.8B</td><td class="r">4.36%</td></tr>
+          <tr><th scope="row">Oct 2031</th><td class="r">5.26B</td><td class="r">131.1B</td><td class="r">4.18%</td></tr>
+          <tr><th scope="row">Oct 2032</th><td class="r">5.26B</td><td class="r">136.3B</td><td class="r">4.01%</td></tr>
+          <tr><th scope="row">Oct 2033</th><td class="r">5.26B</td><td class="r">141.6B</td><td class="r">3.85%</td></tr>
+          <tr><th scope="row">Oct 2034</th><td class="r">5.26B</td><td class="r">146.8B</td><td class="r">3.71%</td></tr>
+          <tr><th scope="row">Oct 2035</th><td class="r">5.26B</td><td class="r">152.1B</td><td class="r">3.58%</td></tr>
+          <tr><th scope="row">Oct 2036</th><td class="r">5.26B</td><td class="r">157.4B</td><td class="r">3.46%</td></tr>
+          <tr><th scope="row">Oct 2037</th><td class="r">5.26B</td><td class="r">162.6B</td><td class="r">3.34%</td></tr>
+          <tr><th scope="row">Oct 2038</th><td class="r">5.26B</td><td class="r">167.9B</td><td class="r">3.23%</td></tr>
+          <tr><th scope="row">Oct 2039</th><td class="r">5.26B</td><td class="r">173.1B</td><td class="r">3.13%</td></tr>
+          <tr><th scope="row">Oct 2040</th><td class="r">5.26B</td><td class="r">178.4B</td><td class="r">3.04%</td></tr>
+          <tr><th scope="row">Oct 2041</th><td class="r">5.26B</td><td class="r">183.6B</td><td class="r">2.95%</td></tr>
+          <tr><th scope="row">Oct 2042</th><td class="r">5.26B</td><td class="r">188.9B</td><td class="r">2.86%</td></tr>
+          <tr><th scope="row">Oct 2043</th><td class="r">5.26B</td><td class="r">194.2B</td><td class="r">2.78%</td></tr>
+          <tr><th scope="row">Oct 2044</th><td class="r">5.26B</td><td class="r">199.4B</td><td class="r">2.71%</td></tr>
+          <tr><th scope="row">Oct 2045</th><td class="r">5.26B</td><td class="r">204.7B</td><td class="r">2.64%</td></tr>
+          <tr><th scope="row">Oct 2046</th><td class="r">5.26B</td><td class="r">209.9B</td><td class="r">2.57%</td></tr>
+          <tr><th scope="row">Oct 2047</th><td class="r">5.26B</td><td class="r">215.2B</td><td class="r">2.50%</td></tr>
+          <tr><th scope="row">Oct 2048</th><td class="r">5.26B</td><td class="r">220.4B</td><td class="r">2.44%</td></tr>
+          <tr><th scope="row">Oct 2049</th><td class="r">5.26B</td><td class="r">225.7B</td><td class="r">2.38%</td></tr>
+          <tr><th scope="row">Oct 2050</th><td class="r">5.26B</td><td class="r">230.9B</td><td class="r">2.33%</td></tr>
+          <tr><th scope="row">Oct 2051</th><td class="r">5.26B</td><td class="r">236.2B</td><td class="r">2.28%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+</section>
+
+<section aria-labelledby="read">
+  <h2 id="read">How to read it</h2>
+  <div class="prose">
+    <p><strong>The yearly issue is flat.</strong> A year has 525,600 minutes. One block a minute at 10,000 PEP each makes 5.256 billion new PEP a year, this year and every year after.</p>
+    <p><strong>The inflation rate is that issue divided by the coins that already exist.</strong> Today that is 5.256 billion on 104.8 billion, or 5.0%. In ten years the supply is about 157 billion, so the same 5.256 billion is 3.3%. In year 25 it is 2.3%. The rate keeps falling and never reaches zero.</p>
+    <p><strong>Dogecoin is about ten years further along the same curve.</strong> It issues the same 5.256 billion coins a year on a supply of about 156 billion, which is 3.4% today. Pepecoin reaches that rate around 2036.</p>
+    <p><strong>What a fixed reward does.</strong> Miners keep earning new coins for every block, so network security does not depend on transaction fees alone. The trade-off is a supply that keeps growing, at a slower pace each year.</p>
+  </div>
+</section>
+
+<section aria-labelledby="early">
+  <h2 id="early">How the first 98 billion were issued</h2>
+  <p class="note">The block reward started at 500,000 PEP and halved every 100,000 blocks. From block 600,000 it has been fixed at 10,000 PEP. There was no premine and no allocation, so every coin in this table went to miners.</p>
+  <div class="table-scroll" role="region" aria-labelledby="early" tabindex="0">
+    <table style="min-width: 480px">
+      <thead><tr><th scope="col">Blocks</th><th scope="col" class="r">Reward per block</th><th scope="col" class="r">PEP issued</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">0 – 99,999</th><td class="r">500,000</td><td class="r">50.00B</td></tr>
+        <tr><th scope="row">100,000 – 199,999</th><td class="r">250,000</td><td class="r">25.00B</td></tr>
+        <tr><th scope="row">200,000 – 299,999</th><td class="r">125,000</td><td class="r">12.50B</td></tr>
+        <tr><th scope="row">300,000 – 399,999</th><td class="r">62,500</td><td class="r">6.25B</td></tr>
+        <tr><th scope="row">400,000 – 499,999</th><td class="r">31,250</td><td class="r">3.13B</td></tr>
+        <tr><th scope="row">500,000 – 599,999</th><td class="r">15,625</td><td class="r">1.56B</td></tr>
+        <tr class="hl"><th scope="row">600,000 onward</th><td class="r">10,000</td><td class="r">5.26B a year</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="src">The six early rows add up to 98.44 billion PEP. Adding 10,000 PEP for each block since then gives 104.81 billion at block 1,237,438, which matches the supply shown by the Pepeplorer explorer on October 5, 2026.</p>
+</section>
+
+<section aria-labelledby="assume">
+  <h2 id="assume">What the projection assumes</h2>
+  <div class="prose">
+    <ul>
+      <li>Blocks arrive every 60 seconds on average, the protocol target. Since launch they have averaged a little slower, which makes real issuance slightly lower than shown.</li>
+      <li>The starting supply is 104.8 billion PEP, as shown by Pepeplorer on October 5, 2026.</li>
+      <li>The block reward stays at 10,000 PEP. The rules are set by the Pepecoin Core software and could only change if the network adopted a new version.</li>
+    </ul>
+  </div>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">Common questions</h2>
+  <div class="faq">
+    <details><summary>Does Pepecoin have a maximum supply?</summary><p>No. Pepecoin has no supply cap. Each block adds 10,000 new PEP, about once a minute, with no end date. Dogecoin uses the same rule.</p></details>
+    <details><summary>How many new Pepecoin are created each year?</summary><p>About 5.26 billion PEP: 525,600 blocks a year at 10,000 PEP per block, assuming the 60-second block target holds.</p></details>
+    <details><summary>What is Pepecoin&#x27;s inflation rate?</summary><p>About 5.0% for the 12 months from October 2026. Because the yearly issue is fixed and the supply keeps growing, the rate falls every year, to about 3.3% after ten years and 2.3% in year 25.</p></details>
+    <details><summary>Is that the same as Dogecoin?</summary><p>Yes. Dogecoin has issued a fixed 10,000 DOGE per one-minute block since 2015. Its supply is larger, about 156 billion, so its inflation rate today is lower, about 3.4%.</p></details>
+    <details><summary>Was any Pepecoin premined or set aside?</summary><p>No. Pepecoin's MiCA white paper states there was no premine, no pre-allocation and no ICO, and that Pepecoin LLC holds no PEP. All coins were issued to miners as block rewards.</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">Sources</h2>
+  <div class="sources">
+    <div>
+      <h3>Pepecoin</h3>
+      <ul>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA white paper (sections D.4, D.9, G.13)</a></li>
+        <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp (halving interval, block time)</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC: PEP reward schedule</a></li>
+        <li><a href="https://pepeplorer.com/network">Pepeplorer: supply and block height</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Dogecoin</h3>
+      <ul>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/doc/FAQ.md">Dogecoin FAQ (fixed 10,000 DOGE reward)</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/dogecoin">CoinGecko: Dogecoin supply</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  var DATA = [{"year": 2027, "infl": 5.015, "supply": 110.06}, {"year": 2028, "infl": 4.776, "supply": 115.31}, {"year": 2029, "infl": 4.558, "supply": 120.57}, {"year": 2030, "infl": 4.359, "supply": 125.82}, {"year": 2031, "infl": 4.177, "supply": 131.08}, {"year": 2032, "infl": 4.01, "supply": 136.34}, {"year": 2033, "infl": 3.855, "supply": 141.59}, {"year": 2034, "infl": 3.712, "supply": 146.85}, {"year": 2035, "infl": 3.579, "supply": 152.1}, {"year": 2036, "infl": 3.456, "supply": 157.36}, {"year": 2037, "infl": 3.34, "supply": 162.62}, {"year": 2038, "infl": 3.232, "supply": 167.87}, {"year": 2039, "infl": 3.131, "supply": 173.13}, {"year": 2040, "infl": 3.036, "supply": 178.38}, {"year": 2041, "infl": 2.946, "supply": 183.64}, {"year": 2042, "infl": 2.862, "supply": 188.9}, {"year": 2043, "infl": 2.782, "supply": 194.15}, {"year": 2044, "infl": 2.707, "supply": 199.41}, {"year": 2045, "infl": 2.636, "supply": 204.66}, {"year": 2046, "infl": 2.568, "supply": 209.92}, {"year": 2047, "infl": 2.504, "supply": 215.18}, {"year": 2048, "infl": 2.443, "supply": 220.43}, {"year": 2049, "infl": 2.384, "supply": 225.69}, {"year": 2050, "infl": 2.329, "supply": 230.94}, {"year": 2051, "infl": 2.276, "supply": 236.2}];
+  var fig = document.getElementById('chart');
+  var tip = document.getElementById('tip');
+  var svg = fig.querySelector('svg');
+  var hair = svg.querySelector('.hair');
+  var slots = svg.querySelectorAll('.slot');
+  var idx = -1;
+
+  function row(label, value) {
+    var d = document.createElement('div');
+    var v = document.createElement('strong');
+    v.textContent = value;
+    var l = document.createElement('span');
+    l.textContent = label;
+    d.appendChild(v); d.appendChild(l);
+    return d;
+  }
+  function show(i) {
+    if (i < 0 || i >= DATA.length) return;
+    idx = i;
+    var d = DATA[i];
+    tip.textContent = '';
+    var h = document.createElement('div');
+    h.className = 'tip-head';
+    h.textContent = '12 months to October ' + d.year;
+    tip.appendChild(h);
+    tip.appendChild(row('inflation', d.infl.toFixed(2) + '%'));
+    tip.appendChild(row('new PEP', '5.26B'));
+    tip.appendChild(row('supply at end', d.supply.toFixed(1) + 'B'));
+    var r = slots[i].getBoundingClientRect();
+    var f = fig.getBoundingClientRect();
+    hair.setAttribute('x1', slots[i].dataset.cx);
+    hair.setAttribute('x2', slots[i].dataset.cx);
+    hair.style.display = 'block';
+    tip.hidden = false;
+    var left = r.left - f.left + r.width / 2;
+    var w = tip.offsetWidth;
+    left = Math.max(4, Math.min(f.width - w - 4, left + 12 > f.width - w - 4 ? left - w - 12 : left + 12));
+    tip.style.left = left + 'px';
+    tip.style.top = '36px';
+  }
+  function hide() { idx = -1; tip.hidden = true; hair.style.display = 'none'; }
+
+  Array.prototype.forEach.call(slots, function (s, i) {
+    s.addEventListener('pointerenter', function () { show(i); });
+    s.addEventListener('pointerdown', function () { show(i); });
+  });
+  svg.addEventListener('pointerleave', hide);
+  fig.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { show(Math.min(DATA.length - 1, idx + 1)); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { show(Math.max(0, idx < 0 ? 0 : idx - 1)); e.preventDefault(); }
+    else if (e.key === 'Escape') { hide(); }
+  });
+  fig.addEventListener('blur', hide);
+})();
+</script>
+
+</main>
+<footer class="site-foot">
+  <p><strong>Community fact pages</strong>, compiled by a volunteer from the r/pepecoin community. Not an official Pepecoin publication.</p>
+  <p>Not investment advice. The compiler holds PEP. Prices and network figures change daily; each page gives its dates and sources.</p>
+</footer>
+</body>
+</html>

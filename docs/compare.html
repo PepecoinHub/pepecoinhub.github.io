@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pepecoin vs Dogecoin: rules, supply, price and market cap</title>
+<meta name="description" content="Pepecoin (PEP) is a fork of Dogecoin with the same Scrypt mining, block time and block reward. Compare supply, inflation, price and market cap, with live prices.">
+<link rel="canonical" href="https://j8680739-dot.github.io/pepecoin-holder-watch/compare.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pepecoin facts">
+<meta property="og:title" content="Pepecoin vs Dogecoin: rules, supply, price and market cap">
+<meta property="og:description" content="Pepecoin (PEP) is a fork of Dogecoin with the same Scrypt mining, block time and block reward. Compare supply, inflation, price and market cap, with live prices.">
+<meta property="og:url" content="https://j8680739-dot.github.io/pepecoin-holder-watch/compare.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one 880px column. Shared top nav, then page sections stacked with a 56px rhythm.
+   Tables and the chart are the only wide elements and scroll inside their own boxes. */
+:root {
+  --paper: #f2f5f3;
+  --panel: #ffffff;
+  --ink: #15201b;
+  --muted: #56645d;
+  --rule: #d3ddd7;
+  --accent: #1d6a4b;
+  --accent-soft: #e2eee7;
+  --flag: #a8621a;
+  --track: #e4e9e6;
+  --series: #1d7a55;
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Public Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
+    --accent: #5fc394; --accent-soft: #19271f; --flag: #e3a35c; --track: #222b26; --series: #2f9f73;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
+  --accent: #5fc394; --accent-soft: #19271f; --flag: #e3a35c; --track: #222b26; --series: #2f9f73;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-inline: 20px;
+  padding-block: 0 64px;
+}
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px;
+}
+
+/* Top bar */
+.site-head {
+  max-width: 880px; margin-inline: auto;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px;
+  padding-block: 18px; border-bottom: 1px solid var(--rule);
+}
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink);
+  font-family: var(--f-display); font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; }
+.brand img { width: 28px; height: 28px; object-fit: contain; }
+.site-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.92rem; }
+.site-nav a { color: var(--muted); text-decoration: none; padding-block: 4px; border-bottom: 2px solid transparent; }
+.site-nav a:hover { color: var(--ink); }
+.site-nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+
+.wrap { max-width: 880px; margin-inline: auto; display: grid; gap: 56px; padding-top: 44px; }
+.wrap > * { min-width: 0; }
+
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.03; font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.55rem; line-height: 1.2; font-weight: 600; }
+h3 { font-size: 1.1rem; line-height: 1.3; font-weight: 600; }
+p { margin: 0; }
+.lede { font-size: 1.15rem; max-width: 62ch; }
+.page-head { display: grid; gap: 18px; }
+.page-head .hero-logo { width: 64px; height: 64px; object-fit: contain; }
+section { display: grid; gap: 20px; }
+section > * { min-width: 0; }
+.note { color: var(--muted); font-size: 0.92rem; max-width: 68ch; }
+.prose { display: grid; gap: 16px; max-width: 68ch; }
+.prose ul, .prose ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+.src { font-size: 0.82rem; color: var(--muted); }
+code { font-family: var(--f-mono); font-size: 0.85rem; word-break: break-all; }
+
+/* Tables */
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--rule); }
+tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+thead th { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--ink); white-space: nowrap; }
+thead th.coin { font-family: var(--f-display); font-size: 1.2rem; font-weight: 800; letter-spacing: 0; text-transform: none; color: var(--ink); }
+thead th.coin small { display: block; font-family: var(--f-body); font-size: 0.8rem; font-weight: 400; color: var(--muted); }
+tbody th { font-family: var(--f-mono); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+tbody th.plain { font-family: var(--f-body); font-size: 0.95rem; letter-spacing: 0; text-transform: none; color: var(--ink); white-space: nowrap; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+col.hl { background: var(--accent-soft); }
+tr.hl td, tr.hl th { background: var(--accent-soft); }
+.same { display: inline-block; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 6px; margin-left: 8px; white-space: nowrap; }
+
+/* Definition list of facts */
+dl.facts { margin: 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); border-top: 1px solid var(--rule); }
+dl.facts dt, dl.facts dd { padding: 14px 0; border-bottom: 1px solid var(--rule); margin: 0; }
+dl.facts dt { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 18px; padding-right: 16px; }
+dl.facts dd { min-width: 0; }
+
+/* Stat row */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
+.stat { padding: 16px 16px 16px 0; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.stat .label { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.stat .value { font-size: 1.7rem; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
+.stat .sub { font-size: 0.86rem; color: var(--muted); }
+
+/* Link lists and page cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.cards.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
+.cards.two > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 20px; display: grid; gap: 8px; align-content: start; text-decoration: none; color: var(--ink); min-width: 0; }
+a.card:hover { border-color: var(--accent); }
+.card h3 { color: var(--accent); }
+.card p { font-size: 0.95rem; color: var(--muted); }
+.linkgroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 32px; }
+.linkgroup { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.linkgroup h3 { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.linkgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.linkgroup li { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 0.95rem; }
+.linkgroup li span { color: var(--muted); font-size: 0.82rem; text-align: right; }
+
+/* Sources */
+.sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+.sources h3 { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+.sources ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.92rem; }
+
+/* FAQ */
+.faq { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.faq details { border-bottom: 1px solid var(--rule); padding: 14px 0; }
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq details p { margin-top: 10px; max-width: 68ch; }
+
+footer.site-foot { max-width: 880px; margin: 56px auto 0; border-top: 2px solid var(--ink); padding-top: 18px; display: grid; gap: 8px; font-size: 0.9rem; color: var(--muted); }
+footer.site-foot strong { color: var(--ink); }
+
+@media (max-width: 560px) {
+  table.fit th, table.fit td { padding: 10px 10px; }
+  table.fit tbody th { width: 92px; }
+  table.fit .same { margin-left: 0; display: table; margin-top: 4px; }
+  dl.facts { grid-template-columns: 1fr; }
+  dl.facts dt { padding-bottom: 0; border-bottom: 0; }
+  dl.facts dd { padding-top: 4px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+.calc { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 22px; display: grid; gap: 22px; }
+.calc > * { min-width: 0; }
+.controls { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: flex-end; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field label, .field-label { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+select { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 9px 12px; max-width: 100%; min-height: 44px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip, .seg button { font: 600 0.9rem var(--f-body); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 9px 14px; min-height: 44px; cursor: pointer; }
+.chip { border-radius: 999px; }
+.chip:hover, .seg button:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.seg { display: inline-flex; flex-wrap: wrap; }
+.seg button:first-child { border-radius: 6px 0 0 6px; }
+.seg button:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
+.seg button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.seg button:disabled { opacity: 0.45; cursor: not-allowed; }
+.result { display: grid; gap: 6px; border-top: 1px solid var(--rule); padding-top: 20px; }
+.result-line { font-size: 1.05rem; }
+.result-line span { font-weight: 700; }
+.result-value { font-size: clamp(2.4rem, 9vw, 3.8rem); font-weight: 700; line-height: 1.05; overflow-wrap: anywhere; }
+dl.math { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0 24px; border-top: 1px solid var(--rule); }
+dl.math div { padding: 12px 0; display: grid; gap: 2px; min-width: 0; }
+dl.math dt { font-size: 0.82rem; color: var(--muted); }
+dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+</style>
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+
+</head>
+<body>
+<header class="site-head">
+  <a class="brand" href="./"><img src="logo.svg" alt="" width="28" height="28" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
+  <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html">Which is which</a><a href="compare.html" aria-current="page">PEP and DOGE</a><a href="supply.html">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="rich-list.html">Rich list</a></nav>
+</header>
+<main class="wrap">
+<header class="page-head">
+  <p class="eyebrow">Pepecoin and Dogecoin</p>
+  <h1>The same rules, ten years apart</h1>
+  <p class="lede">Pepecoin is a fork of Dogecoin Core and keeps Dogecoin's monetary rules: the same algorithm, block time, block reward and open-ended supply. What differs is age, size and price.</p>
+</header>
+
+<section aria-labelledby="rules">
+  <h2 id="rules">Side by side</h2>
+  <div class="table-scroll" role="region" aria-labelledby="rules" tabindex="0">
+    <table class="fit">
+      <colgroup><col><col><col class="hl"></colgroup>
+      <thead>
+        <tr><th scope="col"></th><th scope="col" class="coin">Dogecoin<small>DOGE</small></th><th scope="col" class="coin">Pepecoin<small>PEP</small></th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Launched</th><td>December 2013</td><td>January 2024</td></tr>
+        <tr><th scope="row">Code</th><td>Based on Luckycoin and Litecoin</td><td>Fork of Dogecoin Core</td></tr>
+        <tr><th scope="row">Proof of work</th><td>Scrypt</td><td>Scrypt <span class="same">same</span></td></tr>
+        <tr><th scope="row">Block time</th><td>60 seconds</td><td>60 seconds <span class="same">same</span></td></tr>
+        <tr><th scope="row">Block reward</th><td>10,000 DOGE, fixed</td><td>10,000 PEP, fixed <span class="same">same</span></td></tr>
+        <tr><th scope="row">Early schedule</th><td>Halved every 100,000 blocks until block 600,000</td><td>Halved every 100,000 blocks until block 600,000 <span class="same">same</span></td></tr>
+        <tr><th scope="row">Supply cap</th><td>None</td><td>None <span class="same">same</span></td></tr>
+        <tr><th scope="row">New coins a year</th><td>About 5.26 billion</td><td>About 5.26 billion <span class="same">same</span></td></tr>
+        <tr><th scope="row">Merged mining</th><td>With Litecoin since block 371,337 (September 2014)</td><td>With Litecoin and Dogecoin since block 42,000 (2024)</td></tr>
+        <tr><th scope="row">Address starts with</th><td><code>D</code></td><td><code>P</code></td></tr>
+        <tr><th scope="row">Supply now</th><td><span id="doge-supply">156.2B</span></td><td><span id="pep-supply">104.8B</span></td></tr>
+        <tr><th scope="row">Inflation now</th><td><span id="doge-infl">3.4%</span> a year</td><td><span id="pep-infl">5.0%</span> a year</td></tr>
+        <tr><th scope="row">Price</th><td><span id="doge-price">$0.0943</span></td><td><span id="pep-price">$0.00009042</span></td></tr>
+        <tr><th scope="row">Market cap</th><td><span id="doge-mcap">$14.7B</span></td><td><span id="pep-mcap">$9.48M</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Both chains add the same 5.26 billion coins a year, so Pepecoin's supply follows Dogecoin's curve about ten years behind it. <a href="supply.html">See the supply and inflation chart.</a></p>
+</section>
+
+<section aria-labelledby="calc">
+  <h2 id="calc">PEP at another coin's market cap</h2>
+  <p class="note">Pick a coin. The calculator divides that coin's market cap by Pepecoin's supply. It is arithmetic for comparing sizes, not a forecast.</p>
+
+  <div class="calc">
+    <div class="controls">
+      <div class="field">
+        <label for="coin-select">Compare with</label>
+        <select id="coin-select"></select>
+      </div>
+      <div class="field">
+        <span class="field-label" id="quick-label">Quick picks</span>
+        <div class="chips" id="quick" role="group" aria-labelledby="quick-label"></div>
+      </div>
+      <div class="field">
+        <span class="field-label" id="mode-label">Market cap</span>
+        <div class="seg" role="group" aria-labelledby="mode-label">
+          <button type="button" id="mode-now" aria-pressed="true">Today</button>
+          <button type="button" id="mode-ath" aria-pressed="false">At its all-time high</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="result" aria-live="polite">
+      <p class="result-line">At <span id="r-name">Dogecoin</span>'s <span id="r-when">market cap today</span> (<span id="r-target">$14.7B</span>), one PEP would be</p>
+      <p class="result-value" id="r-price">$0.1406</p>
+      <p class="result-line"><span id="r-mult">1,555×</span> today's price of <span id="r-pep">$0.00009042</span>.</p>
+    </div>
+
+    <dl class="math">
+      <div><dt id="m-target-label">Dogecoin market cap today</dt><dd id="m-target">$14.74B</dd></div>
+      <div><dt>Pepecoin supply</dt><dd id="m-supply">104.8B PEP</dd></div>
+      <div><dt>Market cap ÷ supply</dt><dd id="m-price">$0.1406 per PEP</dd></div>
+    </dl>
+    <p class="note" id="ath-note" hidden>All-time-high mode multiplies the coin's highest price by its supply today. For coins that keep issuing, such as Dogecoin, the real market cap at the peak was lower, because fewer coins existed then.</p>
+  </div>
+</section>
+
+<section aria-labelledby="prices">
+  <h2 id="prices">Prices now and at the peak</h2>
+  <div class="table-scroll" role="region" aria-labelledby="prices" tabindex="0">
+    <table style="min-width: 560px">
+      <thead>
+        <tr><th scope="col">Coin</th><th scope="col" class="r">Price</th><th scope="col" class="r">Market cap</th><th scope="col" class="r">All-time high</th><th scope="col" class="r">Now vs high</th></tr>
+      </thead>
+      <tbody id="price-rows"></tbody>
+    </table>
+  </div>
+  <p class="src" id="status">Snapshot from CoinGecko, October 4–5, 2026.</p>
+  <noscript><p class="note">Live prices and the calculator need JavaScript. The table above shows the last saved snapshot.</p></noscript>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">Sources</h2>
+  <div class="sources">
+    <div>
+      <h3>Rules and code</h3>
+      <ul>
+        <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp</a></li>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/src/chainparams.cpp">Dogecoin chainparams.cpp</a></li>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/doc/FAQ.md">Dogecoin FAQ (reward schedule)</a></li>
+        <li><a href="https://github.com/pepecoinppc/pepecoin">Pepecoin README (differences from Dogecoin)</a></li>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">Pepecoin MiCA white paper</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Prices and supply</h3>
+      <ul>
+        <li><a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko: Pepecoin</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/dogecoin">CoinGecko: Dogecoin</a></li>
+        <li><a href="https://pepeplorer.com/network">Pepeplorer network stats</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  var PEP_ID = 'pepecoin-network';
+  var QUICK = ['dogecoin', 'litecoin', 'bitcoin', 'pepe'];
+  var ISSUANCE = 5256000000; // 525,600 blocks a year x 10,000 coins
+  var API = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&sparkline=false';
+  var CACHE_KEY = 'pf-prices-v1';
+  var TTL = 10 * 60 * 1000;
+
+  // Saved snapshot (CoinGecko, Oct 4-5, 2026). Shown first, replaced when live prices arrive.
+  var SNAP = [
+    { id: PEP_ID, symbol: 'pep', name: 'Pepecoin', current_price: 0.00009042, market_cap: 9283145, circulating_supply: 102668000000, total_supply: 104793000000, ath: 0.001824 },
+    { id: 'dogecoin', symbol: 'doge', name: 'Dogecoin', current_price: 0.09434, market_cap: 14736000000, circulating_supply: 156198000000, ath: 0.7316 },
+    { id: 'litecoin', symbol: 'ltc', name: 'Litecoin', current_price: 70.42, market_cap: 5470761331, circulating_supply: 77683000, ath: 410.26 },
+    { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', current_price: 85791.41, market_cap: 1723872933977, circulating_supply: 20094000, ath: 126080 },
+    { id: 'pepe', symbol: 'pepe', name: 'Pepe', current_price: 0.000004433, market_cap: 1864844512, circulating_supply: 420690000000000, ath: 0.00002803 }
+  ];
+
+  var coins = {};
+  var order = [];
+  var sel = 'dogecoin';
+  var mode = 'now';
+
+  function $(id) { return document.getElementById(id); }
+  function num(v) { return typeof v === 'number' && isFinite(v) ? v : null; }
+
+  function setCoins(list) {
+    coins = {}; order = [];
+    list.forEach(function (c) {
+      if (!c || !c.id || num(c.current_price) === null) return;
+      coins[c.id] = {
+        id: c.id,
+        symbol: String(c.symbol || '').toUpperCase(),
+        name: String(c.name || c.id),
+        price: c.current_price,
+        mcap: num(c.market_cap),
+        supply: num(c.circulating_supply),
+        total: num(c.total_supply),
+        ath: num(c.ath)
+      };
+      if (c.id !== PEP_ID) order.push(c.id);
+    });
+    if (!coins[sel]) sel = 'dogecoin';
+  }
+
+  function pepSupply() {
+    var p = coins[PEP_ID];
+    return p.total || p.supply;
+  }
+
+  function usd(v) {
+    if (v === null) return 'n/a';
+    if (v >= 1000) return '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    if (v >= 1) return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return '$' + v.toLocaleString('en-US', { maximumSignificantDigits: 4 });
+  }
+  function big(v, prefix) {
+    if (v === null) return 'n/a';
+    var units = [[1e12, 'T'], [1e9, 'B'], [1e6, 'M'], [1e3, 'K']];
+    for (var i = 0; i < units.length; i++) {
+      if (v >= units[i][0]) {
+        var n = v / units[i][0];
+        return (prefix || '') + n.toLocaleString('en-US', { maximumSignificantDigits: n >= 100 ? 4 : 3 }) + units[i][1];
+      }
+    }
+    return (prefix || '') + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
+  function mult(x) {
+    if (x >= 100) return x.toLocaleString('en-US', { maximumFractionDigits: 0 }) + '×';
+    if (x >= 10) return x.toLocaleString('en-US', { maximumFractionDigits: 1 }) + '×';
+    return x.toLocaleString('en-US', { maximumFractionDigits: 2 }) + '×';
+  }
+  function pct(x) { return (x * 100).toLocaleString('en-US', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + '%'; }
+
+  function targetCap(c) {
+    if (mode === 'ath') return c.ath !== null && c.supply !== null ? c.ath * c.supply : null;
+    return c.mcap;
+  }
+
+  function renderSide() {
+    var p = coins[PEP_ID], d = coins.dogecoin;
+    if (!p) return;
+    var ps = pepSupply();
+    $('pep-price').textContent = usd(p.price);
+    $('pep-mcap').textContent = big(p.price * ps, '$');
+    $('pep-supply').textContent = big(ps);
+    $('pep-infl').textContent = pct(ISSUANCE / ps);
+    if (d && d.supply) {
+      $('doge-price').textContent = usd(d.price);
+      $('doge-mcap').textContent = big(d.mcap, '$');
+      $('doge-supply').textContent = big(d.supply);
+      $('doge-infl').textContent = pct(ISSUANCE / d.supply);
+    }
+  }
+
+  function renderCalc() {
+    var p = coins[PEP_ID], c = coins[sel];
+    if (!p || !c) return;
+    var ps = pepSupply();
+    var cap = targetCap(c);
+    if (cap === null) { mode = 'now'; cap = c.mcap; }
+    var implied = cap / ps;
+    $('r-name').textContent = c.name;
+    $('r-when').textContent = mode === 'ath' ? 'all-time-high price and today\'s supply' : 'market cap today';
+    $('r-target').textContent = big(cap, '$');
+    $('r-price').textContent = usd(implied);
+    $('r-mult').textContent = mult(implied / p.price);
+    $('r-pep').textContent = usd(p.price);
+    $('m-target-label').textContent = c.name + (mode === 'ath' ? ' all-time-high price × supply today' : ' market cap today');
+    $('m-target').textContent = big(cap, '$');
+    $('m-supply').textContent = big(ps) + ' PEP';
+    $('m-price').textContent = usd(implied) + ' per PEP';
+    $('ath-note').hidden = mode !== 'ath';
+    $('mode-now').setAttribute('aria-pressed', String(mode === 'now'));
+    $('mode-ath').setAttribute('aria-pressed', String(mode === 'ath'));
+    $('mode-ath').disabled = c.ath === null;
+    $('coin-select').value = sel;
+    Array.prototype.forEach.call($('quick').children, function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.id === sel));
+    });
+  }
+
+  function cell(tr, text, cls) {
+    var td = document.createElement('td');
+    if (cls) td.className = cls;
+    td.textContent = text;
+    tr.appendChild(td);
+  }
+  function renderRows() {
+    var body = $('price-rows');
+    body.textContent = '';
+    var ids = [PEP_ID].concat(QUICK);
+    if (ids.indexOf(sel) === -1) ids.push(sel);
+    ids.forEach(function (id) {
+      var c = coins[id];
+      if (!c) return;
+      var tr = document.createElement('tr');
+      if (id === PEP_ID) tr.className = 'hl';
+      var th = document.createElement('th');
+      th.scope = 'row';
+      th.className = 'plain';
+      th.textContent = c.name + ' (' + c.symbol + ')';
+      tr.appendChild(th);
+      cell(tr, usd(c.price), 'r');
+      cell(tr, big(id === PEP_ID ? c.price * pepSupply() : c.mcap, '$'), 'r');
+      cell(tr, usd(c.ath), 'r');
+      cell(tr, !c.ath ? 'n/a' : c.price >= c.ath ? 'at its high' : '−' + pct(1 - c.price / c.ath), 'r');
+      body.appendChild(tr);
+    });
+  }
+
+  function renderControls() {
+    var s = $('coin-select');
+    s.textContent = '';
+    order.forEach(function (id) {
+      var o = document.createElement('option');
+      o.value = id;
+      o.textContent = coins[id].name + ' (' + coins[id].symbol + ')';
+      s.appendChild(o);
+    });
+    var q = $('quick');
+    q.textContent = '';
+    QUICK.forEach(function (id) {
+      if (!coins[id]) return;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.dataset.id = id;
+      b.textContent = coins[id].symbol;
+      b.addEventListener('click', function () { sel = id; renderCalc(); renderRows(); });
+      q.appendChild(b);
+    });
+  }
+
+  function renderAll() { renderControls(); renderSide(); renderCalc(); renderRows(); }
+
+  function status(text) { $('status').textContent = text; }
+
+  function readCache() {
+    try {
+      var raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      if (!o || !o.t || Date.now() - o.t > TTL || !Array.isArray(o.list)) return null;
+      return o;
+    } catch (e) { return null; }
+  }
+  function writeCache(list) {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), list: list })); } catch (e) { /* storage unavailable */ }
+  }
+  function slim(c) {
+    return { id: c.id, symbol: c.symbol, name: c.name, current_price: c.current_price, market_cap: c.market_cap,
+      circulating_supply: c.circulating_supply, total_supply: c.total_supply, ath: c.ath };
+  }
+  function goLive(list, t) {
+    var hasPep = list.some(function (c) { return c && c.id === PEP_ID && num(c.current_price) !== null; });
+    if (!hasPep) return false;
+    setCoins(list);
+    renderAll();
+    status('Live prices from CoinGecko, updated ' + new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '. All-time highs are CoinGecko figures.');
+    return true;
+  }
+  function getJSON(url) {
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+  function refresh() {
+    var cached = readCache();
+    if (cached && goLive(cached.list, cached.t)) return;
+    Promise.all([
+      getJSON(API + '&ids=' + PEP_ID),
+      getJSON(API + '&order=market_cap_desc&per_page=100&page=1')
+    ]).then(function (res) {
+      var list = res[0].concat(res[1]).map(slim);
+      if (goLive(list, Date.now())) writeCache(list);
+    }).catch(function () {
+      status('Showing the snapshot from October 4–5, 2026 (CoinGecko). Live prices could not be loaded just now.');
+    });
+  }
+
+  $('coin-select').addEventListener('change', function (e) { sel = e.target.value; renderCalc(); renderRows(); });
+  $('mode-now').addEventListener('click', function () { mode = 'now'; renderCalc(); });
+  $('mode-ath').addEventListener('click', function () { mode = 'ath'; renderCalc(); });
+
+  setCoins(SNAP);
+  renderAll();
+  refresh();
+})();
+</script>
+
+</main>
+<footer class="site-foot">
+  <p><strong>Community fact pages</strong>, compiled by a volunteer from the r/pepecoin community. Not an official Pepecoin publication.</p>
+  <p>Not investment advice. The compiler holds PEP. Prices and network figures change daily; each page gives its dates and sources.</p>
+</footer>
+</body>
+</html>
