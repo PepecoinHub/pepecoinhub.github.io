@@ -32,11 +32,8 @@
 .wrap-article > * { min-width: 0; }
 q { quotes: "\201C" "\201D"; }
 
-/* Coin badges: brand colour for LTC and DOGE, the frog for PEP, neutral for the rest */
-.glyph { display: inline-grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; font: 700 1.05rem var(--f-body); color: var(--ink); background: var(--track); }
-.glyph.ltc { background: #345D9D; color: #fff; }
-.glyph.doge { background: #C2A633; color: #241d05; }
-img.glyph { background: none; }
+/* Coin logos (docs/assets/coins), 40 px next to each coin's name */
+.glyph { flex: none; width: 40px; height: 40px; object-fit: contain; }
 
 /* "One hash, three blockchains": a miner node, a wire tree, and one card per chain.
    Each card has a five-minute strip with one square per block found. */
@@ -195,12 +192,12 @@ img.glyph { background: none; }
   <p class="note">The Scrypt chains that mining pools pay out most often. Bellscoin, Luckycoin and Junkcoin date from 2013 and came back to life in 2023 and 2024.</p>
   <ul class="family">
     <li class="coin">
-      <span class="glyph ltc" aria-hidden="true">Ł</span>
+      <img class="glyph" src="assets/coins/ltc.png" alt="" width="40" height="40">
       <div><h3>Litecoin<small>LTC</small></h3><span class="since">since Oct 2011</span></div>
       <p>The parent chain. Charlie Lee's Scrypt version of Bitcoin, with 2.5-minute blocks and an 84 million cap.</p>
     </li>
     <li class="coin">
-      <span class="glyph doge" aria-hidden="true">Ð</span>
+      <img class="glyph" src="assets/coins/doge.png" alt="" width="40" height="40">
       <div><h3>Dogecoin<small>DOGE</small></h3><span class="since">since Dec 2013</span></div>
       <p>Built on Luckycoin and Litecoin code. Merge-mined with Litecoin since September 2014.</p>
     </li>
@@ -210,27 +207,27 @@ img.glyph { background: none; }
       <p>A fork of Dogecoin Core with no premine. Merged mining from block 42,000.</p>
     </li>
     <li class="coin">
-      <span class="glyph" aria-hidden="true">B</span>
+      <img class="glyph" src="assets/coins/bells.png" alt="" width="40" height="40">
       <div><h3>Bellscoin<small>BELLS</small></h3><span class="since">since Nov 2013</span></div>
       <p>Billy Markus's Animal Crossing coin, launched days before Dogecoin. Revived in December 2023, merge-mined from block 144,000.</p>
     </li>
     <li class="coin">
-      <span class="glyph" aria-hidden="true">L</span>
+      <img class="glyph" src="assets/coins/lky.png" alt="" width="40" height="40">
       <div><h3>Luckycoin<small>LKY</small></h3><span class="since">since May 2013</span></div>
       <p>The Litecoin fork whose code Dogecoin was built on. Revived in 2024 on its original 2013 chain.</p>
     </li>
     <li class="coin">
-      <span class="glyph" aria-hidden="true">J</span>
+      <img class="glyph" src="assets/coins/jkc.png" alt="" width="40" height="40">
       <div><h3>Junkcoin<small>JKC</small></h3><span class="since">since May 2013</span></div>
       <p>One of the first meme coins, capped at 54 million. Its community restarted it in November 2024.</p>
     </li>
     <li class="coin">
-      <span class="glyph" aria-hidden="true">D</span>
+      <img class="glyph" src="assets/coins/dingo.png" alt="" width="40" height="40">
       <div><h3>Dingocoin<small>DINGO</small></h3><span class="since">since Apr 2021</span></div>
       <p>A fair-launch Dogecoin fork: one-minute blocks, a fixed 10,000-coin reward and no cap.</p>
     </li>
     <li class="coin">
-      <span class="glyph" aria-hidden="true">S</span>
+      <img class="glyph" src="assets/coins/shic.png" alt="" width="40" height="40">
       <div><h3>Shibacoin<small>SHIC</small></h3><span class="since">since Dec 2024</span></div>
       <p>A newer Dogecoin fork, merge-mined with Litecoin from block 24,000.</p>
     </li>
@@ -364,6 +361,7 @@ img.glyph { background: none; }
         <li><a href="https://www.viabtc.com/en/blog/what-is-junkcoin-jkc-how-to-mine-junkcoin-jkc-373">ViaBTC: Junkcoin</a></li>
         <li><a href="https://www.viabtc.com/en/blog/Beginner-what-is-dingocoin-how-to-mine-dingocoin-389?category=0">ViaBTC: Dingocoin</a></li>
         <li><a href="https://www.viabtc.com/en/blog/Mining-what-is-shibacoin-shic-how-to-mine-shibacoin-shic-412?category=0">ViaBTC: Shibacoin</a></li>
+        <li>Coin logos: each project's own wallet repository (<a href="https://github.com/Nintondo/bellscoinV3">Bellscoin</a>, <a href="https://github.com/LuckycoinFoundation/Luckycoin">Luckycoin</a>, <a href="https://github.com/Junkcoin-Foundation/junkcoin-core">Junkcoin</a>, <a href="https://github.com/dingocoincrypto/dingocoin">Dingocoin</a>, <a href="https://github.com/shibacoinppc/shibacoin">Shibacoin</a>); LTC from <a href="https://github.com/0xa3k5/web3icons">web3icons</a>, DOGE from <a href="https://github.com/trustwallet/assets">Trust Wallet assets</a></li>
       </ul>
     </div>
     <div>
