@@ -100,7 +100,7 @@ section > * { min-width: 0; }
 code { font-family: var(--f-mono); font-size: 0.98rem; word-break: break-all; }
 .lang-block[hidden] { display: none !important; }
 
-.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); }
 table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
 th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--rule); }
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
@@ -112,6 +112,23 @@ tbody th.plain { font-family: var(--f-body); font-size: 0.95rem; letter-spacing:
 td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
 col.hl { background: var(--accent-soft); }
 tr.hl td, tr.hl th { background: var(--accent-soft); }
+
+/* Three-coin compare: sticky row labels + PEP highlight while horizontally scrolling */
+.table-scroll table.compare-3 {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table-scroll table.compare-3 th[scope="col"]:first-child,
+.table-scroll table.compare-3 th[scope="row"] {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--panel);
+  box-shadow: 1px 0 0 var(--rule);
+}
+.table-scroll table.compare-3 thead th[scope="col"]:first-child { z-index: 3; }
+.table-scroll table.compare-3 tbody td:nth-child(2),
+.table-scroll table.compare-3 thead th:nth-child(2) { background: var(--accent-soft); }
 .same { display: inline-block; font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 6px; margin-left: 8px; white-space: nowrap; }
 
 dl.facts { margin: 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); border-top: 1px solid var(--rule); }
