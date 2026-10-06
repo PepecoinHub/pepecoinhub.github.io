@@ -188,3 +188,27 @@ footer.site-foot strong, footer.pf-foot strong { color: var(--ink); }
   .brand-wordmark { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+/* Home intro pitches (What is / Triple mineable) */
+.pitches { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+.pitch {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 28px 24px 24px;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+  align-content: start;
+  box-shadow: 0 1px 0 rgba(33,33,33,0.04);
+}
+.pitch .pitch-icon { width: 72px; height: 72px; object-fit: contain; }
+.pitch .pitch-icons { width: 110px; height: 92px; object-fit: contain; }
+.pitch h2 { margin: 0; font-size: 1.25rem; color: var(--ink); font-weight: 700; }
+.pitch p { margin: 0; font-size: 0.98rem; color: var(--muted); max-width: 36ch; line-height: 1.55; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
