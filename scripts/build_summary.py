@@ -7,7 +7,7 @@ Writes  docs/data/summary.json       (everything the page needs)
 
 Two views are computed for every number:
   all  every address as it appears on chain
-  ex   without addresses tagged as exchange / pool / miner / burn. Their balances
+  ex   without addresses tagged as exchange / pool / burn. Their balances
        are also taken out of the denominator, so the figure answers "how
        concentrated is the rest of the supply".
 """
@@ -25,7 +25,7 @@ SATS = 10**8
 TOPS = [10, 25, 50, 100, 400, 1000]
 TIERS = [(1, 10), (11, 50), (51, 100), (101, 400), (401, 1000)]
 PERIODS = [1, 7, 14, 30, 90, 180, 365]
-EXCLUDE_TYPES = {"exchange", "pool", "miner", "burn"}
+EXCLUDE_TYPES = {"exchange", "pool", "burn"}
 LIST_LEN = 10          # entries per churn list
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -57,12 +57,11 @@ def load_snapshots(directory):
 
 
 # ------------------------------------------------------------------------- one view
-def classify(addr, miner, labels):
+def classify(addr, labels):
+    """Only hand-kept tags from labels.json. The API's own miner flag is not shown."""
     lab = labels.get(addr)
     if lab:
         return lab.get("name"), lab.get("type", "other")
-    if miner:
-        return None, "miner"
     return None, None
 
 
@@ -70,8 +69,8 @@ def make_view(snap, labels, view):
     """Return (rows, denominator_sats). rows = [(addr, bal, name, type, last)]."""
     rows = []
     excluded = 0
-    for addr, bal, miner, last in snap["rows"]:
-        name, typ = classify(addr, miner, labels)
+    for addr, bal, _miner, last in snap["rows"]:
+        name, typ = classify(addr, labels)
         if view == "ex" and typ in EXCLUDE_TYPES:
             excluded += bal
             continue
@@ -208,8 +207,8 @@ def build(data_dir, out_path, csv_path):
     ex_rows, ex_denom, _ = cache[(latest["date"], "ex")]
     ex_rank = {r[0]: i + 1 for i, r in enumerate(ex_rows)}
     holders = []
-    for i, (addr, bal, miner, last) in enumerate(latest["rows"]):
-        name, typ = classify(addr, miner, labels)
+    for i, (addr, bal, _miner, last) in enumerate(latest["rows"]):
+        name, typ = classify(addr, labels)
         r_ex = ex_rank.get(addr)
         holders.append([
             i + 1, addr, pep(bal),

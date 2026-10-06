@@ -15,7 +15,7 @@
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
 <style>
 /* Layout: one 880px column. Shared top nav, then page sections stacked with a 56px rhythm.
    Tables and the chart are the only wide elements and scroll inside their own boxes. */
@@ -30,9 +30,9 @@
   --flag: #a8621a;
   --track: #e4e9e6;
   --series: #258343;
-  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
-  --f-body: "Public Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
-  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --f-display: "Ubuntu", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Ubuntu", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "Ubuntu Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -73,7 +73,7 @@ a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visib
   padding-block: 18px; border-bottom: 1px solid var(--rule);
 }
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink);
-  font-family: var(--f-display); font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; }
+  font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; letter-spacing: -0.01em; }
 .brand img { width: 38px; height: 38px; object-fit: contain; }
 .site-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.92rem; }
 .site-nav a { color: var(--muted); text-decoration: none; padding-block: 4px; border-bottom: 2px solid transparent; }
@@ -83,11 +83,11 @@ a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visib
 .wrap { max-width: 880px; margin-inline: auto; display: grid; gap: 56px; padding-top: 44px; }
 .wrap > * { min-width: 0; }
 
-.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
 h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
-h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.03; font-weight: 800; letter-spacing: -0.02em; }
-h2 { font-size: 1.55rem; line-height: 1.2; font-weight: 600; }
-h3 { font-size: 1.1rem; line-height: 1.3; font-weight: 600; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.05; font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: 1.55rem; line-height: 1.2; font-weight: 500; }
+h3 { font-size: 1.1rem; line-height: 1.3; font-weight: 500; }
 p { margin: 0; }
 .lede { font-size: 1.15rem; max-width: 62ch; }
 .page-head { display: grid; gap: 18px; }
@@ -97,35 +97,35 @@ section > * { min-width: 0; }
 .note { color: var(--muted); font-size: 0.92rem; max-width: 68ch; }
 .prose { display: grid; gap: 16px; max-width: 68ch; }
 .prose ul, .prose ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
-.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+.num { font-variant-numeric: tabular-nums; font-weight: 700; }
 .src { font-size: 0.82rem; color: var(--muted); }
-code { font-family: var(--f-mono); font-size: 0.85rem; word-break: break-all; }
+code { font-family: var(--f-mono); font-size: 0.98rem; word-break: break-all; }
 
 /* Tables */
 .table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
 table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
 th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--rule); }
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
-thead th { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--ink); white-space: nowrap; }
-thead th.coin { font-family: var(--f-display); font-size: 1.2rem; font-weight: 800; letter-spacing: 0; text-transform: none; color: var(--ink); }
+thead th { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--ink); white-space: nowrap; }
+thead th.coin { font-family: var(--f-display); font-size: 1.2rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink); }
 thead th.coin small { display: block; font-family: var(--f-body); font-size: 0.8rem; font-weight: 400; color: var(--muted); }
-tbody th { font-family: var(--f-mono); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+tbody th { font-family: var(--f-mono); font-weight: 600; font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 tbody th.plain { font-family: var(--f-body); font-size: 0.95rem; letter-spacing: 0; text-transform: none; color: var(--ink); white-space: nowrap; }
 td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
 col.hl { background: var(--accent-soft); }
 tr.hl td, tr.hl th { background: var(--accent-soft); }
-.same { display: inline-block; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 6px; margin-left: 8px; white-space: nowrap; }
+.same { display: inline-block; font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 6px; margin-left: 8px; white-space: nowrap; }
 
 /* Definition list of facts */
 dl.facts { margin: 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); border-top: 1px solid var(--rule); }
 dl.facts dt, dl.facts dd { padding: 14px 0; border-bottom: 1px solid var(--rule); margin: 0; }
-dl.facts dt { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 18px; padding-right: 16px; }
+dl.facts dt { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 18px; padding-right: 16px; }
 dl.facts dd { min-width: 0; }
 
 /* Stat row */
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
 .stat { padding: 16px 16px 16px 0; display: grid; gap: 4px; align-content: start; min-width: 0; }
-.stat .label { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.stat .label { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .stat .value { font-size: 1.7rem; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
 .stat .sub { font-size: 0.86rem; color: var(--muted); }
 
@@ -139,14 +139,14 @@ a.card:hover { border-color: var(--accent); }
 .card p { font-size: 0.95rem; color: var(--muted); }
 .linkgroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 32px; }
 .linkgroup { display: grid; gap: 10px; align-content: start; min-width: 0; }
-.linkgroup h3 { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.linkgroup h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 .linkgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
 .linkgroup li { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 0.95rem; }
 .linkgroup li span { color: var(--muted); font-size: 0.82rem; text-align: right; }
 
 /* Sources */
 .sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
-.sources h3 { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+.sources h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
 .sources ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.92rem; }
 
 /* FAQ */
@@ -171,31 +171,56 @@ footer.site-foot strong { color: var(--ink); }
 .wrap-article { display: grid; gap: 56px; min-width: 0; }
 .wrap-article > * { min-width: 0; }
 q { quotes: "\201C" "\201D"; }
-.flow { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 0; align-items: stretch; }
-.flow-src { background: var(--ink); color: var(--paper); border-radius: 6px 0 0 6px; padding: 24px; display: grid; gap: 6px; align-content: center; }
-.flow-src strong { font-family: var(--f-display); font-size: 1.5rem; line-height: 1.15; }
-.flow-kicker { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.75; }
-.flow-src span:last-child { font-size: 0.9rem; opacity: 0.85; }
-.flow-out { list-style: none; margin: 0; padding: 0; display: grid; border: 1px solid var(--rule); border-left: 0; border-radius: 0 6px 6px 0; background: var(--panel); }
-.flow-out li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; align-items: baseline; padding: 14px 18px 14px 34px; border-bottom: 1px solid var(--rule); position: relative; }
-.flow-out li:last-child { border-bottom: 0; }
-.flow-out li::before { content: ""; position: absolute; left: 0; top: 50%; width: 22px; border-top: 2px solid var(--muted); }
-.flow-out li.hl { background: var(--accent-soft); }
-.flow-out strong { font-size: 1.05rem; }
-.flow-out span { color: var(--muted); font-size: 0.9rem; }
+/* "One hash, three blockchains": a miner node, a wire tree, and one card per chain.
+   Each card has a five-minute strip with one square per block found, so block times read at a glance. */
+:root { --wire: #9aaba2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --wire: #4d5d55; } }
+:root[data-theme="dark"] { --wire: #4d5d55; }
+.fam { margin: 0; display: grid; justify-items: center; }
+.fam > * { min-width: 0; }
+.fam-src { display: flex; align-items: center; gap: 14px; padding: 12px 24px 12px 14px; background: var(--panel); border: 2px solid var(--accent); border-radius: 999px; }
+.fam-chip { width: 46px; height: 46px; flex: none; color: var(--accent); }
+.fam-src div { display: grid; line-height: 1.25; }
+.fam-src strong { font-size: 1.2rem; font-weight: 700; }
+.fam-src span { font-size: 0.9rem; color: var(--muted); }
+.fam-tree { position: relative; width: 100%; height: 36px; }
+.fam-tree::before { content: ""; position: absolute; left: 50%; top: 0; height: 18px; border-left: 2px solid var(--wire); }
+.fam-tree::after { content: ""; position: absolute; top: 18px; left: calc((100% - 32px) / 6); right: calc((100% - 32px) / 6); border-top: 2px solid var(--wire); }
+.fam-chains { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.fam-chain { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 16px 16px 14px; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.fam-chain::before { content: ""; position: absolute; left: 50%; top: -19px; height: 18px; border-left: 2px solid var(--wire); }
+.fam-chain.hl { border-color: var(--accent); background: var(--accent-soft); }
+.fam-chain h3 { font-size: 1.2rem; font-weight: 700; }
+.fam-role { font-size: 0.88rem; color: var(--muted); }
+.fam-time { position: relative; height: 20px; margin: 12px 0 2px; border-bottom: 2px solid var(--rule); }
+.fam-time i { position: absolute; bottom: 3px; width: 14px; height: 14px; border-radius: 3px; background: var(--muted); transform: translateX(-100%); }
+.fam-chain.hl .fam-time i { background: var(--series); }
+.fam-time-label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+.fam-pays { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule); font-size: 0.9rem; }
+.fam-more { margin-top: 14px; font-size: 0.9rem; color: var(--muted); text-align: center; max-width: 60ch; }
+.pull { margin: 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--accent); display: grid; gap: 8px; max-width: 68ch; }
+.pull p { font-size: 1.3rem; line-height: 1.4; font-weight: 500; }
+.pull footer { font-size: 0.9rem; color: var(--muted); }
 .timeline { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--rule); }
 .timeline li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 16px; padding: 11px 0; border-bottom: 1px solid var(--rule); }
 .timeline li.hl { background: var(--accent-soft); padding-inline: 10px; margin-inline: -10px; }
-.timeline .when { font-family: var(--f-mono); font-size: 0.85rem; font-weight: 600; color: var(--muted); padding-top: 2px; }
+.timeline .when { font-family: var(--f-mono); font-size: 0.98rem; font-weight: 600; color: var(--muted); padding-top: 2px; }
 @media (max-width: 620px) {
-  .flow { grid-template-columns: 1fr; }
-  .flow-src { border-radius: 6px 6px 0 0; }
-  .flow-out { border-left: 1px solid var(--rule); border-top: 0; border-radius: 0 0 6px 6px; }
+  .fam { justify-items: stretch; }
+  .fam-src { border-radius: 10px; }
+  .fam-tree { height: 18px; }
+  .fam-tree::before { left: 12px; height: 18px; }
+  .fam-tree::after { display: none; }
+  .fam-chains { grid-template-columns: minmax(0, 1fr); gap: 14px; padding-left: 30px; }
+  .fam-chain::before { left: -18px; top: 50%; width: 16px; height: 0; border-left: 0; border-top: 2px solid var(--wire); }
+  .fam-chain::after { content: ""; position: absolute; left: -18px; top: -15px; height: calc(100% + 15px); border-left: 2px solid var(--wire); }
+  .fam-chain:last-child::after { height: calc(50% + 16px); }
+  .fam-more { text-align: left; }
   .timeline li { grid-template-columns: 84px minmax(0, 1fr); }
 }
 </style>
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "The Scrypt family: one miner, three coins", "description": "How Litecoin, Dogecoin and Pepecoin share one Scrypt miner through merged mining.", "datePublished": "2026-10-05", "dateModified": "2026-10-05", "mainEntityOfPage": "https://pepecoinhub.github.io/scrypt-family.html", "author": {"@type": "Organization", "name": "Pepecoin facts (r/pepecoin community volunteers)"}, "publisher": {"@type": "Organization", "name": "Pepecoin facts"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "The Scrypt family: one miner, three coins", "description": "How Litecoin, Dogecoin and Pepecoin share one Scrypt miner through merged mining.", "datePublished": "2026-10-05", "dateModified": "2026-10-06", "mainEntityOfPage": "https://pepecoinhub.github.io/scrypt-family.html", "author": {"@type": "Organization", "name": "Pepecoin facts (r/pepecoin community volunteers)"}, "publisher": {"@type": "Organization", "name": "Pepecoin facts"}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is merged mining?", "acceptedAnswer": {"@type": "Answer", "text": "Merged mining, or Auxiliary Proof of Work (AuxPoW), lets a miner use one piece of proof-of-work to produce blocks on several blockchains that share a hashing algorithm. Each chain checks the work against its own rules and pays its own reward."}}, {"@type": "Question", "name": "Does merged mining reduce Litecoin or Dogecoin rewards?", "acceptedAnswer": {"@type": "Answer", "text": "No. The hashrate is not split between chains. A miner earns the same Litecoin and Dogecoin as before, and the merge-mined coins come on top."}}, {"@type": "Question", "name": "Which coins can be merge-mined with Litecoin?", "acceptedAnswer": {"@type": "Answer", "text": "Dogecoin and Pepecoin, plus smaller Scrypt chains such as Bellscoin, Luckycoin, Junkcoin and Dingocoin. The exact list depends on the mining pool."}}, {"@type": "Question", "name": "What hardware mines Pepecoin?", "acceptedAnswer": {"@type": "Answer", "text": "A Scrypt ASIC miner, the same machine used for Litecoin and Dogecoin, pointed at a pool that supports merged mining. ViaBTC names the Antminer L9 and the ElphaPex DG1 as examples."}}, {"@type": "Question", "name": "Is Pepecoin the same as PEPE?", "acceptedAnswer": {"@type": "Answer", "text": "No. PEPE is a token on Ethereum. Pepecoin (PEP) is a coin on its own proof-of-work blockchain. See Which Pepecoin is which?"}}, {"@type": "Question", "name": "Does Pepecoin have a supply cap?", "acceptedAnswer": {"@type": "Answer", "text": "No. Like Dogecoin, it adds a fixed 10,000 coins per block, so the inflation rate falls every year. See Supply and inflation."}}]}</script>
 </head>
 <body>
@@ -207,7 +232,7 @@ q { quotes: "\201C" "\201D"; }
 <article class="wrap-article">
 <header class="page-head">
   <img class="hero-logo" src="logo.svg" alt="Pepecoin logo" width="96" height="96" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}">
-  <p class="eyebrow">Scrypt merged mining · updated October 5, 2026</p>
+  <p class="eyebrow">Scrypt merged mining · updated October 6, 2026</p>
   <h1>The Scrypt family: one miner, three coins</h1>
   <p class="lede">A Scrypt mining machine does its work once and gets paid by several blockchains at the same time. Litecoin started the family in 2011, Dogecoin joined in 2014, and Pepecoin joined in 2024. This is how it happened and what it gives miners and holders.</p>
 </header>
@@ -225,21 +250,43 @@ q { quotes: "\201C" "\201D"; }
 </section>
 
 <section aria-labelledby="diagram">
-  <h2 id="diagram">One job, several rewards</h2>
-  <div class="flow">
-    <div class="flow-src">
-      <span class="flow-kicker">One Scrypt miner</span>
-      <strong>One proof of work</strong>
-      <span>one machine, one power bill</span>
+  <h2 id="diagram">One hash, three blockchains</h2>
+  <p class="note">A Scrypt machine does one thing: it computes hashes. With merged mining, every hash is checked against each chain's target at once. When it is good enough for a chain, that chain gets a new block and pays its own reward.</p>
+  <figure class="fam">
+    <div class="fam-src">
+      <svg class="fam-chip" viewBox="0 0 48 48" aria-hidden="true"><rect x="12" y="12" width="24" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="2.5"/><rect x="19" y="19" width="10" height="10" rx="1.5" fill="currentColor"/><path d="M18 5v6M24 5v6M30 5v6M18 37v6M24 37v6M30 37v6M5 18h6M5 24h6M5 30h6M37 18h6M37 24h6M37 30h6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <div><strong>One Scrypt hash</strong><span>same machine, same electricity</span></div>
     </div>
-    <ul class="flow-out">
-      <li><strong>Litecoin</strong><span>LTC · parent chain, since 2011</span></li>
-      <li><strong>Dogecoin</strong><span>DOGE · merge-mined since 2014</span></li>
-      <li class="hl"><strong>Pepecoin</strong><span>PEP · merge-mined since 2024</span></li>
-      <li><strong>and more</strong><span>Bellscoin, Luckycoin, Junkcoin, Dingocoin</span></li>
+    <div class="fam-tree" aria-hidden="true"></div>
+    <ul class="fam-chains">
+      <li class="fam-chain">
+        <h3>Litecoin</h3>
+        <span class="fam-role">LTC · parent chain, since 2011</span>
+        <div class="fam-time" role="img" aria-label="2 blocks in five minutes"><i style="left:50%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>blocks in 5 min</span><span>a block every 2.5 min</span></span>
+        <span class="fam-pays">Pays LTC</span>
+      </li>
+      <li class="fam-chain">
+        <h3>Dogecoin</h3>
+        <span class="fam-role">DOGE · merge-mined since 2014</span>
+        <div class="fam-time" role="img" aria-label="5 blocks in five minutes"><i style="left:20%"></i><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>blocks in 5 min</span><span>a block every minute</span></span>
+        <span class="fam-pays">Pays DOGE</span>
+      </li>
+      <li class="fam-chain hl">
+        <h3>Pepecoin</h3>
+        <span class="fam-role">PEP · merge-mined since 2024</span>
+        <div class="fam-time" role="img" aria-label="5 blocks in five minutes"><i style="left:20%"></i><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>blocks in 5 min</span><span>a block every minute</span></span>
+        <span class="fam-pays">Pays PEP</span>
+      </li>
     </ul>
-  </div>
-  <p class="note">Which coins a miner receives depends on the pool. Binance Pool, ViaBTC, F2Pool and EMCD all pay out PEP alongside LTC and DOGE.</p>
+    <figcaption class="fam-more">Many pools add smaller Scrypt chains too, such as Bellscoin, Luckycoin, Junkcoin and Dingocoin. Binance Pool, ViaBTC, F2Pool and EMCD all pay out PEP alongside LTC and DOGE.</figcaption>
+  </figure>
+  <blockquote class="pull">
+    <p>“Merging mining with dogecoin would make both litecoin/dogecoin almost impossible to 51%.”</p>
+    <footer>Charlie Lee on the Dogecoin subreddit, April 2014, as reported by <a href="https://www.coindesk.com/markets/2014/04/08/charlie-lee-proposes-merged-mining-of-litecoin-and-dogecoin">CoinDesk</a>. Pepecoin plugs into the same shared hashrate.</footer>
+  </blockquote>
 </section>
 
 <section aria-labelledby="scrypt">

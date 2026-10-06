@@ -15,7 +15,7 @@
       lede: 'How much of the PEP supply sits in the biggest wallets, and how that changes. One snapshot of the top 1000 addresses every day.',
       view_all: 'All addresses',
       view_ex: 'Without exchanges & pools',
-      view_ex_note: 'Addresses tagged as exchange, pool, miner or burn are taken out, and their balances are taken out of the supply too. Tags are a hand-kept list, so some exchange wallets may still be counted.',
+      view_ex_note: 'Addresses tagged as exchange, pool or burn are taken out, and their balances are taken out of the supply too. Tags are a hand-kept list, so some exchange wallets may still be counted.',
       snapshot: 'Snapshot',
       block: 'Block',
       supply: 'Circulating supply',
@@ -90,7 +90,7 @@
       lang_to: 'PL',
       err_title: 'No snapshot yet',
       err_body: 'The first snapshot is created by the scheduled run. Open the Actions tab of the repository and start “Daily snapshot” once.',
-      types: { exchange: 'exchange', pool: 'pool', miner: 'miner', burn: 'burn', project: 'project', other: 'tagged' },
+      types: { exchange: 'exchange', pool: 'pool', burn: 'burn', project: 'project', other: 'tagged' },
       of_supply: 'of supply',
       addrs: 'addresses'
     },
@@ -99,7 +99,7 @@
       lede: 'Ile podaży PEP leży w największych portfelach i jak się to zmienia. Codziennie jeden snapshot top 1000 adresów.',
       view_all: 'Wszystkie adresy',
       view_ex: 'Bez giełd i pooli',
-      view_ex_note: 'Adresy oznaczone jako giełda, pool, górnik lub burn są wyłączone, a ich salda odjęte też od podaży. Tagi to ręcznie prowadzona lista, więc część portfeli giełd może nadal być wliczona.',
+      view_ex_note: 'Adresy oznaczone jako giełda, pool lub burn są wyłączone, a ich salda odjęte też od podaży. Tagi to ręcznie prowadzona lista, więc część portfeli giełd może nadal być wliczona.',
       snapshot: 'Snapshot',
       block: 'Blok',
       supply: 'Podaż w obiegu',
@@ -174,7 +174,7 @@
       lang_to: 'EN',
       err_title: 'Brak pierwszego snapshotu',
       err_body: 'Pierwszy snapshot tworzy zaplanowane uruchomienie. Wejdź w zakładkę Actions w repozytorium i raz uruchom „Daily snapshot”.',
-      types: { exchange: 'giełda', pool: 'pool', miner: 'górnik', burn: 'burn', project: 'projekt', other: 'tag' },
+      types: { exchange: 'giełda', pool: 'pool', burn: 'burn', project: 'projekt', other: 'tag' },
       of_supply: 'podaży',
       addrs: 'adresów'
     }

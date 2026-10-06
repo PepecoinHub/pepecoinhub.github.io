@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pepecoin vs Dogecoin: rules, supply, price and market cap</title>
-<meta name="description" content="Pepecoin (PEP) is a fork of Dogecoin with the same Scrypt mining, block time and block reward. Compare supply, inflation, price and market cap, with live prices.">
+<meta name="description" content="Pepecoin (PEP) is a fork of Dogecoin with the same Scrypt mining, block time and block reward. Compare hashrate, supply, inflation, price and market cap, and see what your PEP would be worth at another coin's market cap.">
 <link rel="canonical" href="https://pepecoinhub.github.io/compare.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pepecoin facts">
 <meta property="og:title" content="Pepecoin vs Dogecoin: rules, supply, price and market cap">
-<meta property="og:description" content="Pepecoin (PEP) is a fork of Dogecoin with the same Scrypt mining, block time and block reward. Compare supply, inflation, price and market cap, with live prices.">
+<meta property="og:description" content="Pepecoin (PEP) is a fork of Dogecoin with the same Scrypt mining, block time and block reward. Compare hashrate, supply, inflation, price and market cap, and see what your PEP would be worth at another coin's market cap.">
 <meta property="og:url" content="https://pepecoinhub.github.io/compare.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
 <style>
 /* Layout: one 880px column. Shared top nav, then page sections stacked with a 56px rhythm.
    Tables and the chart are the only wide elements and scroll inside their own boxes. */
@@ -30,9 +30,9 @@
   --flag: #a8621a;
   --track: #e4e9e6;
   --series: #258343;
-  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
-  --f-body: "Public Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
-  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --f-display: "Ubuntu", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Ubuntu", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "Ubuntu Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -73,7 +73,7 @@ a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visib
   padding-block: 18px; border-bottom: 1px solid var(--rule);
 }
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink);
-  font-family: var(--f-display); font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; }
+  font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; letter-spacing: -0.01em; }
 .brand img { width: 38px; height: 38px; object-fit: contain; }
 .site-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.92rem; }
 .site-nav a { color: var(--muted); text-decoration: none; padding-block: 4px; border-bottom: 2px solid transparent; }
@@ -83,11 +83,11 @@ a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visib
 .wrap { max-width: 880px; margin-inline: auto; display: grid; gap: 56px; padding-top: 44px; }
 .wrap > * { min-width: 0; }
 
-.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
 h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
-h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.03; font-weight: 800; letter-spacing: -0.02em; }
-h2 { font-size: 1.55rem; line-height: 1.2; font-weight: 600; }
-h3 { font-size: 1.1rem; line-height: 1.3; font-weight: 600; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.05; font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: 1.55rem; line-height: 1.2; font-weight: 500; }
+h3 { font-size: 1.1rem; line-height: 1.3; font-weight: 500; }
 p { margin: 0; }
 .lede { font-size: 1.15rem; max-width: 62ch; }
 .page-head { display: grid; gap: 18px; }
@@ -97,35 +97,35 @@ section > * { min-width: 0; }
 .note { color: var(--muted); font-size: 0.92rem; max-width: 68ch; }
 .prose { display: grid; gap: 16px; max-width: 68ch; }
 .prose ul, .prose ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
-.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+.num { font-variant-numeric: tabular-nums; font-weight: 700; }
 .src { font-size: 0.82rem; color: var(--muted); }
-code { font-family: var(--f-mono); font-size: 0.85rem; word-break: break-all; }
+code { font-family: var(--f-mono); font-size: 0.98rem; word-break: break-all; }
 
 /* Tables */
 .table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
 table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
 th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--rule); }
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
-thead th { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--ink); white-space: nowrap; }
-thead th.coin { font-family: var(--f-display); font-size: 1.2rem; font-weight: 800; letter-spacing: 0; text-transform: none; color: var(--ink); }
+thead th { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--ink); white-space: nowrap; }
+thead th.coin { font-family: var(--f-display); font-size: 1.2rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink); }
 thead th.coin small { display: block; font-family: var(--f-body); font-size: 0.8rem; font-weight: 400; color: var(--muted); }
-tbody th { font-family: var(--f-mono); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+tbody th { font-family: var(--f-mono); font-weight: 600; font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 tbody th.plain { font-family: var(--f-body); font-size: 0.95rem; letter-spacing: 0; text-transform: none; color: var(--ink); white-space: nowrap; }
 td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
 col.hl { background: var(--accent-soft); }
 tr.hl td, tr.hl th { background: var(--accent-soft); }
-.same { display: inline-block; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 6px; margin-left: 8px; white-space: nowrap; }
+.same { display: inline-block; font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 6px; margin-left: 8px; white-space: nowrap; }
 
 /* Definition list of facts */
 dl.facts { margin: 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); border-top: 1px solid var(--rule); }
 dl.facts dt, dl.facts dd { padding: 14px 0; border-bottom: 1px solid var(--rule); margin: 0; }
-dl.facts dt { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 18px; padding-right: 16px; }
+dl.facts dt { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 18px; padding-right: 16px; }
 dl.facts dd { min-width: 0; }
 
 /* Stat row */
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
 .stat { padding: 16px 16px 16px 0; display: grid; gap: 4px; align-content: start; min-width: 0; }
-.stat .label { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.stat .label { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .stat .value { font-size: 1.7rem; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
 .stat .sub { font-size: 0.86rem; color: var(--muted); }
 
@@ -139,14 +139,14 @@ a.card:hover { border-color: var(--accent); }
 .card p { font-size: 0.95rem; color: var(--muted); }
 .linkgroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 32px; }
 .linkgroup { display: grid; gap: 10px; align-content: start; min-width: 0; }
-.linkgroup h3 { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.linkgroup h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 .linkgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
 .linkgroup li { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 0.95rem; }
 .linkgroup li span { color: var(--muted); font-size: 0.82rem; text-align: right; }
 
 /* Sources */
 .sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
-.sources h3 { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+.sources h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
 .sources ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.92rem; }
 
 /* FAQ */
@@ -172,7 +172,7 @@ footer.site-foot strong { color: var(--ink); }
 .calc > * { min-width: 0; }
 .controls { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: flex-end; }
 .field { display: grid; gap: 6px; min-width: 0; }
-.field label, .field-label { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.field label, .field-label { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 select { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 9px 12px; max-width: 100%; min-height: 44px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip, .seg button { font: 600 0.9rem var(--f-body); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 9px 14px; min-height: 44px; cursor: pointer; }
@@ -191,7 +191,59 @@ select { font: inherit; color: var(--ink); background: var(--paper); border: 1px
 dl.math { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0 24px; border-top: 1px solid var(--rule); }
 dl.math div { padding: 12px 0; display: grid; gap: 2px; min-width: 0; }
 dl.math dt { font-size: 0.82rem; color: var(--muted); }
-dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+/* Your PEP: the amount field leads the calculator */
+.amount-field { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; max-width: 460px; }
+.amount { display: flex; align-items: stretch; min-height: 54px; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; }
+.amount:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.amount input { flex: 1; width: 100%; min-width: 0; font: 700 1.4rem var(--f-body); color: var(--ink); background: transparent; border: 0; padding: 8px 14px; outline: none; font-variant-numeric: tabular-nums; }
+.amount input::placeholder { color: var(--muted); font-weight: 400; }
+.amount-unit { display: grid; place-items: center; padding: 0 16px; font-weight: 500; color: var(--muted); border-left: 1px solid var(--rule); }
+.field-hint { font-size: 0.88rem; color: var(--muted); min-height: 1.4em; }
+.field-hint.warn { color: var(--flag); }
+
+/* Every combination at once */
+.combo { display: grid; gap: 10px; border-top: 1px solid var(--rule); padding-top: 20px; }
+.combo-scroll { overflow-x: auto; }
+.combo table { font-size: 0.95rem; }
+.combo th, .combo td { padding: 10px 12px; vertical-align: middle; }
+.combo th:first-child { padding-left: 0; }
+.combo td { text-align: right; white-space: nowrap; }
+.combo td b { display: block; font-size: 1.08rem; font-variant-numeric: tabular-nums; }
+.combo td small, .combo th small { display: block; color: var(--muted); font-size: 0.8rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+.combo td.on { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.combo tr.self th, .combo tr.self td { color: var(--muted); }
+.combo tr.self td b { color: var(--ink); }
+
+/* Hashrate range plot: Dogecoin's weekly range as a band, Pepecoin as a dot on the same scale */
+:root { --range: #a3b0a9; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --range: #56645c; } }
+:root[data-theme="dark"] { --range: #56645c; }
+.hr { margin: 0; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 20px 14px; display: grid; gap: 14px; }
+.hr-plot { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); column-gap: 18px; row-gap: 10px; align-items: center; }
+.hr-name { display: grid; gap: 1px; line-height: 1.25; min-width: 0; }
+.hr-name strong { font-weight: 500; }
+.hr-name b { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.hr-name small { font-size: 0.8rem; color: var(--muted); }
+.hr-track { position: relative; height: 44px; border-left: 1px solid var(--rule); border-right: 1px solid var(--rule); }
+.hr-grid { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--rule); }
+.hr-band { position: absolute; top: 10px; bottom: 10px; background: var(--range); border-radius: 4px; }
+.hr-band.ghost { opacity: 0.35; }
+.hr-dot { position: absolute; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--series); box-shadow: 0 0 0 2px var(--panel); }
+.hr-axis { position: relative; height: 1.2em; font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.hr-axis span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.hr-axis span:first-child { transform: none; }
+.hr-axis span:last-child { transform: translateX(-100%); }
+.hr-axis-unit { justify-self: end; font-size: 0.8rem; color: var(--muted); }
+@media (max-width: 560px) {
+  .hr { padding: 16px 14px 12px; }
+  .hr-plot { grid-template-columns: minmax(0, 104px) minmax(0, 1fr); column-gap: 12px; }
+  .combo th, .combo td { padding: 10px 6px; }
+  .combo thead th { white-space: normal; }
+  .combo td small { display: none; }
+  .hr-axis-unit { font-size: 0.75rem; }
+}
 </style>
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 
@@ -226,6 +278,8 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-varia
         <tr><th scope="row">Supply cap</th><td>None</td><td>None <span class="same">same</span></td></tr>
         <tr><th scope="row">New coins a year</th><td>About 5.26 billion</td><td>About 5.26 billion <span class="same">same</span></td></tr>
         <tr><th scope="row">Merged mining</th><td>With Litecoin since block 371,337 (September 2014)</td><td>With Litecoin and Dogecoin since block 42,000 (2024)</td></tr>
+        <tr><th scope="row">Hashrate</th><td>About 2.1–3.4 PH/s<br><span class="src">Sept 28 – Oct 4, 2026</span></td><td>About 2.9 PH/s <span class="same">similar</span><br><span class="src">October 5, 2026</span></td></tr>
+        <tr><th scope="row">Paid to miners a day</th><td>14.4M DOGE ≈ <span id="doge-pay">$1.36M</span></td><td>14.4M PEP ≈ <span id="pep-pay">$1,302</span></td></tr>
         <tr><th scope="row">Address starts with</th><td><code>D</code></td><td><code>P</code></td></tr>
         <tr><th scope="row">Supply now</th><td><span id="doge-supply">156.2B</span></td><td><span id="pep-supply">104.8B</span></td></tr>
         <tr><th scope="row">Inflation now</th><td><span id="doge-infl">3.4%</span> a year</td><td><span id="pep-infl">5.0%</span> a year</td></tr>
@@ -237,11 +291,53 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-varia
   <p class="note">Both chains add the same 5.26 billion coins a year, so Pepecoin's supply follows Dogecoin's curve about ten years behind it. <a href="supply.html">See the supply and inflation chart.</a></p>
 </section>
 
+<section aria-labelledby="mining">
+  <h2 id="mining">Same hashrate, very different pay</h2>
+  <p class="note">Hashrate is the computing power mining a chain. Both chains aim for one block every 60 seconds, so hashrate works out to difficulty × 2<sup>32</sup> ÷ 60 seconds, and equal difficulty means equal hashrate.</p>
+  <figure class="hr">
+    <div class="hr-plot">
+      <span class="hr-name"><strong>Dogecoin</strong><b>2.1–3.4 PH/s</b><small>range, Sept 28 – Oct 4</small></span>
+      <div class="hr-track" role="img" aria-label="Dogecoin hashrate ranged from 2.1 to 3.4 petahashes per second">
+        <span class="hr-grid" style="left:25%"></span><span class="hr-grid" style="left:50%"></span><span class="hr-grid" style="left:75%"></span>
+        <span class="hr-band" style="left:51.5%;width:33.5%"></span>
+      </div>
+      <span class="hr-name"><strong>Pepecoin</strong><b>2.9 PH/s</b><small>October 5</small></span>
+      <div class="hr-track" role="img" aria-label="Pepecoin hashrate was 2.9 petahashes per second, inside Dogecoin's range">
+        <span class="hr-grid" style="left:25%"></span><span class="hr-grid" style="left:50%"></span><span class="hr-grid" style="left:75%"></span>
+        <span class="hr-band ghost" style="left:51.5%;width:33.5%"></span>
+        <span class="hr-dot" style="left:72.7%"></span>
+      </div>
+      <span class="hr-axis-unit" aria-hidden="true">PH/s</span>
+      <div class="hr-axis" aria-hidden="true"><span style="left:0">0</span><span style="left:25%">1</span><span style="left:50%">2</span><span style="left:75%">3</span><span style="left:100%">4</span></div>
+    </div>
+    <figcaption class="src">From mining difficulty: Pepecoin 40.6M on October 5, 2026 (Pepeplorer), Dogecoin 28.8M to 47.5M from September 28 to October 4, 2026 (CoinWarz). The faint band repeats Dogecoin's range on Pepecoin's row.</figcaption>
+  </figure>
+  <div class="stats">
+    <div class="stat"><span class="label">Hashrate</span><span class="value">About the same</span><span class="sub">PEP 2.9 PH/s, inside DOGE's 2.1–3.4 PH/s</span></div>
+    <div class="stat"><span class="label">Paid to miners a day</span><span class="value" id="pay-ratio">1,043× less</span><span class="sub">PEP <span id="pay-pep2">$1,302</span>, DOGE <span id="pay-doge2">$1.36M</span></span></div>
+    <div class="stat"><span class="label">Market cap</span><span class="value" id="mcap-ratio">1/1,555</span><span class="sub">of Dogecoin's</span></div>
+  </div>
+  <div class="prose">
+    <p><strong>How a small coin gets that much hashrate.</strong> Merged mining. The Scrypt machines that mine Pepecoin are already paid by Litecoin and Dogecoin, about <span id="pay-ltc-doge">$1.61M</span> a day in block rewards between them. Pools that add PEP to their merged mining pay it out on top, for the same work and the same electricity. <a href="scrypt-family.html">How merged mining works.</a></p>
+    <p><strong>What it means for security.</strong> Out-mining Pepecoin takes roughly as much Scrypt hardware as out-mining Dogecoin, far more than PEP's own block rewards could pay for.</p>
+    <p><strong>The catch.</strong> The hashrate is there because large pools include PEP in their merged mining. If they dropped it, Pepecoin's hashrate would fall with them. The live pool list is on <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>.</p>
+  </div>
+</section>
+
 <section aria-labelledby="calc">
-  <h2 id="calc">PEP at another coin's market cap</h2>
-  <p class="note">Pick a coin. The calculator divides that coin's market cap by Pepecoin's supply. It is arithmetic for comparing sizes, not a forecast.</p>
+  <h2 id="calc">Your PEP at another coin's market cap</h2>
+  <p class="note">Type how much PEP you hold, then pick a coin. The calculator divides that coin's market cap by Pepecoin's supply and multiplies by your amount. It is arithmetic for comparing sizes, not a forecast.</p>
 
   <div class="calc">
+    <div class="field amount-field">
+      <label for="pep-amount">Your PEP</label>
+      <div class="amount">
+        <input id="pep-amount" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="e.g. 13,000,000" aria-describedby="amount-hint">
+        <span class="amount-unit" aria-hidden="true">PEP</span>
+      </div>
+      <span class="field-hint" id="amount-hint">Leave it empty to see the value of one PEP.</span>
+    </div>
+
     <div class="controls">
       <div class="field">
         <label for="coin-select">Compare with</label>
@@ -261,17 +357,29 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-varia
     </div>
 
     <div class="result" aria-live="polite">
-      <p class="result-line">At <span id="r-name">Dogecoin</span>'s <span id="r-when">market cap today</span> (<span id="r-target">$14.7B</span>), one PEP would be</p>
-      <p class="result-value" id="r-price">$0.1406</p>
-      <p class="result-line"><span id="r-mult">1,555×</span> today's price of <span id="r-pep">$0.00009042</span>.</p>
+      <p class="result-line">At <span id="r-name">Dogecoin</span>'s <span id="r-when">market cap today</span> (<span id="r-target">$14.7B</span>), <span id="r-amount">one PEP</span> would be worth</p>
+      <p class="result-value" id="r-value">$0.1406</p>
+      <p class="result-line"><span id="r-mult">1,555×</span> today's value of <span id="r-now">$0.00009042</span>.</p>
     </div>
 
     <dl class="math">
       <div><dt id="m-target-label">Dogecoin market cap today</dt><dd id="m-target">$14.74B</dd></div>
       <div><dt>Pepecoin supply</dt><dd id="m-supply">104.8B PEP</dd></div>
       <div><dt>Market cap ÷ supply</dt><dd id="m-price">$0.1406 per PEP</dd></div>
+      <div id="m-qty-row" hidden><dt id="m-qty-label">× your PEP</dt><dd id="m-qty"></dd></div>
     </dl>
     <p class="note" id="ath-note" hidden>All-time-high mode multiplies the coin's highest price by its supply today. For coins that keep issuing, such as Dogecoin, the real market cap at the peak was lower, because fewer coins existed then.</p>
+
+    <div class="combo">
+      <h3 id="combo-h">One PEP at every market cap on this page</h3>
+      <div class="combo-scroll" role="region" aria-labelledby="combo-h" tabindex="0">
+        <table>
+          <thead><tr><th scope="col">At the market cap of</th><th scope="col" class="r">Today</th><th scope="col" class="r">At its all-time high</th></tr></thead>
+          <tbody id="combo-rows"></tbody>
+        </table>
+      </div>
+      <p class="src">The highlighted cell is the one picked above. All-time-high values use each coin's highest price × its supply today. The first row is PEP at its own price today and at its own all-time high.</p>
+    </div>
   </div>
 </section>
 
@@ -319,8 +427,11 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-varia
   var PEP_ID = 'pepecoin-network';
   var QUICK = ['dogecoin', 'litecoin', 'bitcoin', 'pepe'];
   var ISSUANCE = 5256000000; // 525,600 blocks a year x 10,000 coins
+  var PER_DAY = 14400000;    // 1,440 blocks a day x 10,000 coins, for DOGE and for PEP
+  var LTC_PER_DAY = 3600;    // 576 blocks a day x 6.25 LTC
   var API = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&sparkline=false';
   var CACHE_KEY = 'pf-prices-v1';
+  var AMOUNT_KEY = 'pf-pep-amount';
   var TTL = 10 * 60 * 1000;
 
   // Saved snapshot (CoinGecko, Oct 4-5, 2026). Shown first, replaced when live prices arrive.
@@ -336,6 +447,7 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-varia
   var order = [];
   var sel = 'dogecoin';
   var mode = 'now';
+  var amount = null; // PEP typed by the visitor; null means "one PEP"
 
   function $(id) { return document.getElementById(id); }
   function num(v) { return typeof v === 'number' && isFinite(v) ? v : null; }
@@ -363,6 +475,7 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-varia
     var p = coins[PEP_ID];
     return p.total || p.supply;
   }
+  function qty() { return amount === null ? 1 : amount; }
 
   function usd(v) {
     if (v === null) return 'n/a';
@@ -381,51 +494,95 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-varia
     }
     return (prefix || '') + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
   }
+  function money(v) { return v !== null && v >= 1e6 ? big(v, '$') : usd(v); }      // compact, for table cells
+  function moneyFull(v) { return v !== null && v >= 1e12 ? big(v, '$') : usd(v); } // whole dollars, for the result
   function mult(x) {
     if (x >= 100) return x.toLocaleString('en-US', { maximumFractionDigits: 0 }) + '×';
     if (x >= 10) return x.toLocaleString('en-US', { maximumFractionDigits: 1 }) + '×';
     return x.toLocaleString('en-US', { maximumFractionDigits: 2 }) + '×';
   }
   function pct(x) { return (x * 100).toLocaleString('en-US', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + '%'; }
+  function share(x) { return (x * 100).toLocaleString('en-US', { maximumSignificantDigits: 3 }) + '%'; }
+  function qtyText(v) { return v.toLocaleString('en-US', { maximumFractionDigits: 8 }); }
+  function amountText() { return amount === null ? 'one PEP' : qtyText(amount) + ' PEP'; }
 
-  function targetCap(c) {
-    if (mode === 'ath') return c.ath !== null && c.supply !== null ? c.ath * c.supply : null;
+  // Accepts 13000000, 13,000,000, 13 000 000, 13.000.000, 13000000.5, 13,5 (decimal comma), 13m, 13 mln, 1.5b.
+  function parseAmount(raw) {
+    var s = String(raw || '').toLowerCase().replace(/pep/g, '').replace(/[\s '_]/g, '');
+    if (!s) return null;
+    var mul = 1, m = s.match(/^(.*?)(k|mln|mld|bn|m|b)$/);
+    if (m) { s = m[1]; mul = { k: 1e3, m: 1e6, mln: 1e6, b: 1e9, bn: 1e9, mld: 1e9 }[m[2]]; }
+    var dot = s.lastIndexOf('.'), comma = s.lastIndexOf(',');
+    if (dot > -1 && comma > -1) s = dot > comma ? s.replace(/,/g, '') : s.replace(/\./g, '').replace(',', '.');
+    else if (comma > -1) s = /^\d{1,3}(,\d{3})+$/.test(s) ? s.replace(/,/g, '') : s.replace(',', '.');
+    else if (/^\d{1,3}(\.\d{3}){2,}$/.test(s)) s = s.replace(/\./g, '');
+    if (!/^(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
+    var v = parseFloat(s) * mul;
+    return isFinite(v) && v > 0 ? v : NaN;
+  }
+
+  function targetCap(c, m) {
+    if (m === 'ath') return c.ath !== null && c.supply !== null ? c.ath * c.supply : null;
     return c.mcap;
   }
 
   function renderSide() {
-    var p = coins[PEP_ID], d = coins.dogecoin;
+    var p = coins[PEP_ID], d = coins.dogecoin, l = coins.litecoin;
     if (!p) return;
     var ps = pepSupply();
     $('pep-price').textContent = usd(p.price);
     $('pep-mcap').textContent = big(p.price * ps, '$');
     $('pep-supply').textContent = big(ps);
     $('pep-infl').textContent = pct(ISSUANCE / ps);
+    $('pep-pay').textContent = money(PER_DAY * p.price);
+    $('pay-pep2').textContent = money(PER_DAY * p.price);
     if (d && d.supply) {
       $('doge-price').textContent = usd(d.price);
       $('doge-mcap').textContent = big(d.mcap, '$');
       $('doge-supply').textContent = big(d.supply);
       $('doge-infl').textContent = pct(ISSUANCE / d.supply);
+      $('doge-pay').textContent = money(PER_DAY * d.price);
+      $('pay-doge2').textContent = money(PER_DAY * d.price);
+      $('pay-ratio').textContent = mult(d.price / p.price) + ' less';
+      if (d.mcap) $('mcap-ratio').textContent = '1/' + Math.round(d.mcap / (p.price * ps)).toLocaleString('en-US');
+      if (l) $('pay-ltc-doge').textContent = big(PER_DAY * d.price + LTC_PER_DAY * l.price, '$');
+    }
+  }
+
+  function renderAmountHint() {
+    var hint = $('amount-hint');
+    var raw = $('pep-amount').value;
+    var v = parseAmount(raw);
+    hint.classList.toggle('warn', typeof v === 'number' && isNaN(v));
+    if (v === null) hint.textContent = 'Leave it empty to see the value of one PEP.';
+    else if (isNaN(v)) hint.textContent = 'Type a number, for example 13000000 or 13 000 000.';
+    else {
+      var ps = coins[PEP_ID] ? pepSupply() : null;
+      hint.textContent = qtyText(v) + ' PEP' + (ps ? (v > ps ? ', more than all the PEP that exist' : ', ' + share(v / ps) + ' of all PEP') : '');
     }
   }
 
   function renderCalc() {
     var p = coins[PEP_ID], c = coins[sel];
     if (!p || !c) return;
-    var ps = pepSupply();
-    var cap = targetCap(c);
+    var ps = pepSupply(), n = qty();
+    var cap = targetCap(c, mode);
     if (cap === null) { mode = 'now'; cap = c.mcap; }
     var implied = cap / ps;
     $('r-name').textContent = c.name;
     $('r-when').textContent = mode === 'ath' ? 'all-time-high price and today\'s supply' : 'market cap today';
     $('r-target').textContent = big(cap, '$');
-    $('r-price').textContent = usd(implied);
+    $('r-amount').textContent = amountText();
+    $('r-value').textContent = moneyFull(implied * n);
     $('r-mult').textContent = mult(implied / p.price);
-    $('r-pep').textContent = usd(p.price);
+    $('r-now').textContent = moneyFull(p.price * n);
     $('m-target-label').textContent = c.name + (mode === 'ath' ? ' all-time-high price × supply today' : ' market cap today');
     $('m-target').textContent = big(cap, '$');
     $('m-supply').textContent = big(ps) + ' PEP';
     $('m-price').textContent = usd(implied) + ' per PEP';
+    $('m-qty-row').hidden = amount === null;
+    $('m-qty-label').textContent = '× ' + amountText();
+    $('m-qty').textContent = moneyFull(implied * n);
     $('ath-note').hidden = mode !== 'ath';
     $('mode-now').setAttribute('aria-pressed', String(mode === 'now'));
     $('mode-ath').setAttribute('aria-pressed', String(mode === 'ath'));
@@ -433,6 +590,52 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-varia
     $('coin-select').value = sel;
     Array.prototype.forEach.call($('quick').children, function (b) {
       b.setAttribute('aria-pressed', String(b.dataset.id === sel));
+    });
+  }
+
+  function comboCell(tr, per, on) {
+    var td = document.createElement('td');
+    if (on) td.className = 'on';
+    if (per === null || !isFinite(per)) { td.textContent = 'n/a'; tr.appendChild(td); return; }
+    var b = document.createElement('b');
+    b.textContent = money(per * qty());
+    td.appendChild(b);
+    if (amount !== null) {
+      var s = document.createElement('small');
+      s.textContent = usd(per) + ' per PEP';
+      td.appendChild(s);
+    }
+    tr.appendChild(td);
+  }
+  function renderCombo() {
+    var p = coins[PEP_ID];
+    if (!p) return;
+    var ps = pepSupply();
+    $('combo-h').textContent = (amount === null ? 'One PEP' : qtyText(amount) + ' PEP') + ' at every market cap on this page';
+    var body = $('combo-rows');
+    body.textContent = '';
+    var ids = [PEP_ID].concat(QUICK);
+    if (ids.indexOf(sel) === -1) ids.push(sel);
+    ids.forEach(function (id) {
+      var c = coins[id];
+      if (!c) return;
+      var self = id === PEP_ID;
+      var tr = document.createElement('tr');
+      if (self) tr.className = 'self';
+      var th = document.createElement('th');
+      th.scope = 'row';
+      th.className = 'plain';
+      th.textContent = self ? 'Pepecoin itself' : c.name;
+      var small = document.createElement('small');
+      small.textContent = self ? 'PEP price, no change' : c.symbol;
+      th.appendChild(small);
+      tr.appendChild(th);
+      var now = self ? p.price : (c.mcap === null ? null : c.mcap / ps);
+      var athCap = targetCap(c, 'ath');
+      var ath = self ? p.ath : (athCap === null ? null : athCap / ps);
+      comboCell(tr, now, !self && id === sel && mode === 'now');
+      comboCell(tr, ath, !self && id === sel && mode === 'ath');
+      body.appendChild(tr);
     });
   }
 
@@ -465,6 +668,8 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-varia
     });
   }
 
+  function update() { renderCalc(); renderRows(); renderCombo(); }
+
   function renderControls() {
     var s = $('coin-select');
     s.textContent = '';
@@ -483,12 +688,12 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-varia
       b.className = 'chip';
       b.dataset.id = id;
       b.textContent = coins[id].symbol;
-      b.addEventListener('click', function () { sel = id; renderCalc(); renderRows(); });
+      b.addEventListener('click', function () { sel = id; update(); });
       q.appendChild(b);
     });
   }
 
-  function renderAll() { renderControls(); renderSide(); renderCalc(); renderRows(); }
+  function renderAll() { renderControls(); renderSide(); renderAmountHint(); update(); }
 
   function status(text) { $('status').textContent = text; }
 
@@ -536,9 +741,24 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-weight: 600; font-varia
     });
   }
 
-  $('coin-select').addEventListener('change', function (e) { sel = e.target.value; renderCalc(); renderRows(); });
-  $('mode-now').addEventListener('click', function () { mode = 'now'; renderCalc(); });
-  $('mode-ath').addEventListener('click', function () { mode = 'ath'; renderCalc(); });
+  var input = $('pep-amount');
+  function readAmount() {
+    var v = parseAmount(input.value);
+    amount = typeof v === 'number' && !isNaN(v) ? v : null;
+  }
+  try { var saved = localStorage.getItem(AMOUNT_KEY); if (saved) input.value = saved; } catch (e) { /* storage unavailable */ }
+  readAmount();
+  input.addEventListener('input', function () {
+    readAmount();
+    renderAmountHint();
+    update();
+    try { localStorage.setItem(AMOUNT_KEY, input.value); } catch (e) { /* storage unavailable */ }
+  });
+  input.addEventListener('blur', function () { if (amount !== null) input.value = qtyText(amount); });
+
+  $('coin-select').addEventListener('change', function (e) { sel = e.target.value; update(); });
+  $('mode-now').addEventListener('click', function () { mode = 'now'; update(); });
+  $('mode-ath').addEventListener('click', function () { mode = 'ath'; update(); });
 
   setCoins(SNAP);
   renderAll();

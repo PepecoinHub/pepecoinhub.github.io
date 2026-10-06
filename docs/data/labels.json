@@ -1,5 +1,5 @@
 {
-  "_readme": "Address tags. type is one of: exchange, pool, miner, burn, project, other. Types exchange, pool, miner and burn are hidden in the 'without exchanges and pools' view. Add a line, commit, and the next daily run picks it up (history is re-tagged too).",
+  "_readme": "Address tags. type is one of: exchange, pool, burn, project, other. Types exchange, pool and burn are hidden in the 'without exchanges and pools' view. Add a line, commit, and the next daily run picks it up (history is re-tagged too).",
   "PeU3PGXMGcFcteA4NjDcQsTiKQBdn7if84": { "name": "CoinEx", "type": "exchange" },
   "PnBFXec7tVQvndqktsVnkfJGwy63GFnwoo": { "name": "litecoinpool.org", "type": "pool" }
 }
