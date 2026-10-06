@@ -293,3 +293,6 @@ html:lang(zh) {
   display: inline-block; margin-left: 6px; padding: 0 5px; border: 1px solid var(--rule); border-radius: 4px;
   font: 600 0.68rem/1.5 var(--f-mono); letter-spacing: 0.06em; color: var(--muted); vertical-align: 0.2em;
 }
+.card.feature { background: var(--accent-soft); border-color: var(--accent); border-left-width: 4px; padding: 22px 24px; }
+.card.feature h3 { font-size: 1.3rem; }
+.card.feature p { color: var(--ink); }
