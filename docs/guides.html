@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="facts.css">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin facts", "item": "https://pepecoinhub.github.io/"}, {"@type": "ListItem", "position": 2, "name": "Guides", "item": "https://pepecoinhub.github.io/guides.html"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I verify PEP when withdrawing?", "acceptedAnswer": {"@type": "Answer", "text": "Pick Pepecoin (PEP) on the Pepecoin network. The address must start with P, not 0x. PEPE and PEPECOIN are Ethereum tokens on a different network."}}, {"@type": "Question", "name": "Are wrong-network sends recoverable?", "acceptedAnswer": {"@type": "Answer", "text": "Usually not. Match ticker, network and address format before sending. Check PEP on PepeBlocks or Pepeplorer."}}, {"@type": "Question", "name": "Where do I download Pepecoin Core safely?", "acceptedAnswer": {"@type": "Answer", "text": "From the official GitHub releases for pepecoinppc/pepecoin."}}]}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -66,6 +67,15 @@
       <h3>Network stats</h3>
       <p>Block height, supply, addresses and block time, day by day.</p>
     </a>
+  </div>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">Common questions</h2>
+  <div class="faq">
+    <details><summary>How do I verify PEP when withdrawing?</summary><p>Pick <strong>Pepecoin (PEP)</strong> on the Pepecoin network. The receiving address must start with <code>P</code>, not <code>0x</code>. PEPE and PEPECOIN are Ethereum tokens. See <a href="which-pepecoin.html">Which Pepecoin is which?</a> and <a href="buy.html">How to buy PEP</a>.</p></details>
+    <details><summary>Are wrong-network sends recoverable?</summary><p>Usually not. Always match ticker, network and address format before sending. Check PEP transfers on <a href="https://pepeblocks.com/">PepeBlocks</a> or <a href="https://pepeplorer.com/">Pepeplorer</a>.</p></details>
+    <details><summary>Where do I download Pepecoin Core safely?</summary><p>From the official <a href="https://github.com/pepecoinppc/pepecoin/releases">GitHub releases</a>. More in the <a href="wallets.html">wallets guide</a>.</p></details>
   </div>
 </section>
 </main>
