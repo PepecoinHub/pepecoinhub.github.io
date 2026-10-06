@@ -1,6 +1,6 @@
 # Validation of the reconstructed history
 
-History before the first live snapshot (5 Oct 2026) was rebuilt by replaying the Pepecoin blockchain block by block on a local Pepecoin Core v1.1.0 node (method in README). This file records how the result was checked. All times are UTC.
+> **Update (top 2000).** Reconstructed snapshots now list the top **2000** addresses. Weekly Mondays run from 2024-02-05 (first Monday on/after genesis) through 2025-08-25; daily files run from 2025-09-01 through 2026-10-04. Live snapshots stay as they are (1250 rows on 5–6 Oct 2026); from tomorrow `snapshot.py` also writes top 2000. Re-checked at live heights 1,237,541 and 1,238,910: the first 1250 rows of the new top-2000 cuts match the live files exactly (addresses, balances, `isMiner`, `lastSeen`, every top-N share 0.0000 pp apart). Chart groups still stop at top 1000; the holders table lists every address in the snapshot.
 
 ## Summary
 
