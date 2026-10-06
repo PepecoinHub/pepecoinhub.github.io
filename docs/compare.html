@@ -30,19 +30,6 @@
 .hr-band { position: absolute; top: 10px; bottom: 10px; background: var(--range); border-radius: 4px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --range: #56645c; } }
 :root[data-theme="dark"] { --range: #56645c; }
-/* Every combination at once */
-.combo { display: grid; gap: 10px; border-top: 1px solid var(--rule); padding-top: 20px; }
-.combo-scroll { overflow-x: auto; }
-.combo table { font-size: 0.95rem; }
-.combo th, .combo td { padding: 10px 12px; vertical-align: middle; }
-.combo th:first-child { padding-left: 0; }
-.combo td { text-align: right; white-space: nowrap; }
-.combo td b { display: block; font-size: 1.08rem; font-variant-numeric: tabular-nums; }
-.combo td small, .combo th small { display: block; color: var(--muted); font-size: 0.8rem; font-weight: 400; font-variant-numeric: tabular-nums; }
-.combo td.on { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
-.combo tr.self th, .combo tr.self td { color: var(--muted); }
-.combo tr.self td b { color: var(--ink); }
-
 /* Hashrate range plot: Dogecoin's weekly range as a band, Pepecoin as a dot on the same scale */
 :root { --range: #a3b0a9; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --range: #56645c; } }
@@ -66,45 +53,90 @@
 @media (max-width: 560px) {
   .hr { padding: 16px 14px 12px; }
   .hr-plot { grid-template-columns: minmax(0, 104px) minmax(0, 1fr); column-gap: 12px; }
-  .combo th, .combo td { padding: 10px 6px; }
-  .combo thead th { white-space: normal; }
-  .combo td small { display: none; }
   .hr-axis-unit { font-size: 0.75rem; }
 }
 
-/* Calculator controls (restored: these rules were lost when the shared stylesheet was introduced) */
-.calc { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 22px; display: grid; gap: 22px; }
+/* Calculator: inputs on the left, the answer on the right, every combination as cards below */
+.calc { background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 24px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 28px; box-shadow: 0 1px 0 rgba(33,33,33,0.04); }
 .calc > * { min-width: 0; }
-.controls { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: flex-end; }
-.field { display: grid; gap: 6px; min-width: 0; }
-.field label, .field-label { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-select { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 9px 12px; max-width: 100%; min-height: 44px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip, .seg button { font: 600 0.9rem var(--f-body); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 9px 14px; min-height: 44px; cursor: pointer; }
-.chip { border-radius: 999px; }
-.chip:hover, .seg button:hover { border-color: var(--accent); }
-.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
-.seg { display: inline-flex; flex-wrap: wrap; }
-.seg button:first-child { border-radius: 6px 0 0 6px; }
-.seg button:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
-.seg button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-.seg button:disabled { opacity: 0.45; cursor: not-allowed; }
-.result { display: grid; gap: 6px; border-top: 1px solid var(--rule); padding-top: 20px; }
-.result-line { font-size: 1.05rem; }
-.result-line span { font-weight: 700; }
-.result-value { font-size: clamp(2.4rem, 9vw, 3.8rem); font-weight: 700; line-height: 1.05; overflow-wrap: anywhere; }
-dl.math { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0 24px; border-top: 1px solid var(--rule); }
-dl.math div { padding: 12px 0; display: grid; gap: 2px; min-width: 0; }
-dl.math dt { font-size: 0.82rem; color: var(--muted); }
-dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.amount-field { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; max-width: 460px; }
-.amount { display: flex; align-items: stretch; min-height: 54px; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; }
+.calc-in { display: grid; gap: 22px; align-content: start; }
+.field { display: grid; gap: 8px; min-width: 0; }
+.field label, .field-label { display: flex; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.step { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-mid); font: 700 0.75rem var(--f-body); letter-spacing: 0; }
+.amount { display: flex; align-items: center; gap: 10px; min-height: 58px; padding-left: 12px; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
 .amount:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.amount input { flex: 1; width: 100%; min-width: 0; font: 700 1.4rem var(--f-body); color: var(--ink); background: transparent; border: 0; padding: 8px 14px; outline: none; font-variant-numeric: tabular-nums; }
+.amount img { width: 30px; height: 30px; flex: none; }
+.amount input { flex: 1; width: 100%; min-width: 0; font: 700 1.45rem var(--f-body); color: var(--ink); background: transparent; border: 0; padding: 8px 0; outline: none; font-variant-numeric: tabular-nums; }
 .amount input::placeholder { color: var(--muted); font-weight: 400; }
-.amount-unit { display: grid; place-items: center; padding: 0 16px; font-weight: 500; color: var(--muted); border-left: 1px solid var(--rule); }
+.amount-unit { align-self: stretch; display: grid; place-items: center; padding: 0 16px; font-weight: 500; color: var(--muted); border-left: 1px solid var(--rule); }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.preset { font: 500 0.85rem var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: 4px 12px; min-height: 32px; cursor: pointer; }
+.preset:hover { color: var(--ink); border-color: var(--accent); }
 .field-hint { font-size: 0.88rem; color: var(--muted); min-height: 1.4em; }
 .field-hint.warn { color: var(--flag); }
+.coins { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.coin-btn { display: grid; justify-items: center; gap: 3px; padding: 12px 6px 10px; min-width: 0; font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; cursor: pointer; }
+.coin-btn:hover { border-color: var(--accent); }
+.coin-btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.coin-btn b { font-size: 0.9rem; line-height: 1.2; }
+.coin-btn small { font-size: 0.74rem; line-height: 1.2; color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.glyph { display: inline-grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; font: 700 1rem var(--f-body); color: #fff; background: var(--muted); }
+.glyph.doge { background: #C2A633; color: #241d05; }
+.glyph.ltc { background: #345D9D; }
+.glyph.btc { background: #F7931A; color: #2b1700; }
+.glyph.pepe { background: #4F7F2A; }
+img.glyph { background: none; }
+.field .more-coins { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font: 400 0.88rem var(--f-body); letter-spacing: 0; text-transform: none; color: var(--muted); }
+select { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 8px 12px; max-width: 100%; min-height: 40px; }
+.seg { display: inline-flex; flex-wrap: wrap; }
+.seg button { font: 600 0.9rem var(--f-body); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 9px 14px; min-height: 44px; cursor: pointer; }
+.seg button:hover { border-color: var(--accent); }
+.seg button:first-child { border-radius: 10px 0 0 10px; }
+.seg button:last-child { border-radius: 0 10px 10px 0; margin-left: -1px; }
+.seg button[aria-pressed="true"] { position: relative; z-index: 1; background: var(--accent-soft); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); color: var(--ink); }
+.seg button:disabled { opacity: 0.45; cursor: not-allowed; }
+.calc-out { container-type: inline-size; align-self: start; display: grid; gap: 12px; padding: 22px; background: var(--accent-soft); border: 1px solid var(--rule); border-left: 4px solid var(--accent); border-radius: 12px; }
+.out-line { font-size: 1rem; color: var(--muted); }
+.out-line b { color: var(--ink); }
+.out-value { font-size: 2.6rem; font-size: clamp(2rem, 13cqi, 3.4rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.out-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 0.92rem; color: var(--muted); }
+.out-meta b { color: var(--ink); }
+.pill { display: inline-flex; align-items: center; padding: 3px 11px; border-radius: 999px; background: var(--panel); border: 1px solid var(--accent); color: var(--accent-mid); font-weight: 700; font-variant-numeric: tabular-nums; }
+.receipt { margin: 4px 0 0; padding-top: 12px; border-top: 1px solid var(--rule); display: grid; gap: 7px; font-size: 0.88rem; }
+.receipt div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.receipt dt { color: var(--muted); }
+.receipt dd { margin: 0; font-family: var(--f-mono); font-size: 1.05em; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+.out-note { font-size: 0.84rem; color: var(--muted); }
+.combo { display: grid; gap: 12px; }
+.combo h3 { font-weight: 700; }
+.combo-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr)); gap: 12px; }
+.combo-card { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 14px 12px 12px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; }
+.combo-card.self { background: var(--accent-soft); }
+.combo-head { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.combo-head .glyph { width: 28px; height: 28px; font-size: 0.85rem; }
+.combo-head span { display: grid; min-width: 0; line-height: 1.2; }
+.combo-head b { font-size: 0.98rem; }
+.combo-head small { font-size: 0.75rem; color: var(--muted); }
+.combo-val { display: grid; gap: 1px; width: 100%; padding: 8px 10px; text-align: left; font: inherit; color: var(--ink); background: var(--paper); border: 1px solid transparent; border-radius: 10px; }
+button.combo-val { cursor: pointer; }
+button.combo-val:hover { border-color: var(--accent); }
+.combo-val[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.combo-card.self .combo-val { background: var(--panel); }
+.combo-val > span { font-size: 0.75rem; color: var(--muted); }
+.combo-val b { font-size: 1.12rem; font-variant-numeric: tabular-nums; }
+.combo-val small { font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) {
+  .calc { grid-template-columns: minmax(0, 1fr); padding: 16px; gap: 22px; }
+  .calc-out { padding: 18px 16px; }
+}
+@media (max-width: 560px) {
+  .combo-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .combo-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .combo-head { grid-column: 1 / -1; }
+}
+@media (max-width: 380px) {
+  .coins { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 /* Price by age: Dogecoin and Pepecoin on one log scale, lined up by time since launch.
    The two line colours were checked as a pair in both themes (colour-blind separation and contrast). */
@@ -147,7 +179,6 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
   .seg { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
   .seg button { padding: 8px 10px; font-size: 0.84rem; line-height: 1.25; }
   .age-head { gap: 10px; }
-  .calc { padding: 16px; }
   .age { padding: 14px 12px 10px; }
   .age-plot text { font-size: 11px; }
 }
@@ -275,26 +306,31 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
   <p class="note">Type how much PEP you hold, then pick a coin. The calculator divides that coin's market cap by Pepecoin's supply and multiplies by your amount. It is arithmetic for comparing sizes, not a forecast.</p>
 
   <div class="calc">
-    <div class="field amount-field">
-      <label for="pep-amount">Your PEP</label>
-      <div class="amount">
-        <input id="pep-amount" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="e.g. 13,000,000" aria-describedby="amount-hint">
-        <span class="amount-unit" aria-hidden="true">PEP</span>
+    <div class="calc-in">
+      <div class="field">
+        <label for="pep-amount"><span class="step">1</span>Your PEP</label>
+        <div class="amount">
+          <img src="assets/brand/icon.svg" alt="" width="30" height="30">
+          <input id="pep-amount" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="e.g. 13,000,000" aria-describedby="amount-hint">
+          <span class="amount-unit" aria-hidden="true">PEP</span>
+        </div>
+        <div class="presets" role="group" aria-label="Example amounts">
+          <button type="button" class="preset" data-v="100000">100K</button>
+          <button type="button" class="preset" data-v="1000000">1M</button>
+          <button type="button" class="preset" data-v="10000000">10M</button>
+          <button type="button" class="preset" data-v="100000000">100M</button>
+        </div>
+        <span class="field-hint" id="amount-hint">Leave it empty to see the value of one PEP.</span>
       </div>
-      <span class="field-hint" id="amount-hint">Leave it empty to see the value of one PEP.</span>
-    </div>
 
-    <div class="controls">
       <div class="field">
-        <label for="coin-select">Compare with</label>
-        <select id="coin-select"></select>
+        <span class="field-label" id="quick-label"><span class="step">2</span>At the market cap of</span>
+        <div class="coins" id="quick" role="group" aria-labelledby="quick-label"></div>
+        <label class="more-coins"><span>or any top-100 coin</span><select id="coin-select"></select></label>
       </div>
+
       <div class="field">
-        <span class="field-label" id="quick-label">Quick picks</span>
-        <div class="chips" id="quick" role="group" aria-labelledby="quick-label"></div>
-      </div>
-      <div class="field">
-        <span class="field-label" id="mode-label">Market cap</span>
+        <span class="field-label" id="mode-label"><span class="step">3</span>Market cap</span>
         <div class="seg" role="group" aria-labelledby="mode-label">
           <button type="button" id="mode-now" aria-pressed="true">Today</button>
           <button type="button" id="mode-ath" aria-pressed="false">At its all-time high</button>
@@ -302,30 +338,24 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
       </div>
     </div>
 
-    <div class="result" aria-live="polite">
-      <p class="result-line">At <span id="r-name">Dogecoin</span>'s <span id="r-when">market cap today</span> (<span id="r-target">$14.7B</span>), <span id="r-amount">one PEP</span> would be worth</p>
-      <p class="result-value" id="r-value">$0.1406</p>
-      <p class="result-line"><span id="r-mult">1,555×</span> today's value of <span id="r-now">$0.00009042</span>.</p>
+    <div class="calc-out" aria-live="polite">
+      <p class="out-line"><b id="r-amount">One PEP</b> at <b id="r-name">Dogecoin</b>'s market cap <span id="r-when">today</span> would be worth</p>
+      <p class="out-value" id="r-value">$0.1406</p>
+      <p class="out-meta"><span class="pill" id="r-mult">▲ 1,555×</span><span>worth <b id="r-now">$0.00009042</b> today</span></p>
+      <dl class="receipt">
+        <div><dt id="m-target-label">Dogecoin market cap today</dt><dd id="m-target">$14.7B</dd></div>
+        <div><dt>÷ Pepecoin supply</dt><dd id="m-supply">104.8B PEP</dd></div>
+        <div><dt>= per PEP</dt><dd id="m-price">$0.1406</dd></div>
+        <div id="m-qty-row" hidden><dt>× your PEP</dt><dd id="m-qty"></dd></div>
+      </dl>
+      <p class="out-note" id="ath-note" hidden>All-time-high mode uses the coin's highest price × its supply today. For coins that keep issuing, such as Dogecoin, the real market cap at the peak was lower, because fewer coins existed then.</p>
     </div>
+  </div>
 
-    <dl class="math">
-      <div><dt id="m-target-label">Dogecoin market cap today</dt><dd id="m-target">$14.74B</dd></div>
-      <div><dt>Pepecoin supply</dt><dd id="m-supply">104.8B PEP</dd></div>
-      <div><dt>Market cap ÷ supply</dt><dd id="m-price">$0.1406 per PEP</dd></div>
-      <div id="m-qty-row" hidden><dt id="m-qty-label">× your PEP</dt><dd id="m-qty"></dd></div>
-    </dl>
-    <p class="note" id="ath-note" hidden>All-time-high mode multiplies the coin's highest price by its supply today. For coins that keep issuing, such as Dogecoin, the real market cap at the peak was lower, because fewer coins existed then.</p>
-
-    <div class="combo">
-      <h3 id="combo-h">One PEP at every market cap on this page</h3>
-      <div class="combo-scroll" role="region" aria-labelledby="combo-h" tabindex="0">
-        <table>
-          <thead><tr><th scope="col">At the market cap of</th><th scope="col" class="r">Today</th><th scope="col" class="r">At its all-time high</th></tr></thead>
-          <tbody id="combo-rows"></tbody>
-        </table>
-      </div>
-      <p class="src">The highlighted cell is the one picked above. All-time-high values use each coin's highest price × its supply today. The first row is PEP at its own price today and at its own all-time high.</p>
-    </div>
+  <div class="combo">
+    <h3 id="combo-h">One PEP at every market cap on this page</h3>
+    <ul class="combo-grid" id="combo-rows" aria-labelledby="combo-h"></ul>
+    <p class="src">Tap a value to show its math above. All-time-high values use each coin's highest price × its supply today. The first card is PEP at its own price today and at its own all-time high.</p>
   </div>
 </section>
 
@@ -413,7 +443,7 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
         total: num(c.total_supply),
         ath: num(c.ath)
       };
-      if (c.id !== PEP_ID) order.push(c.id);
+      if (c.id !== PEP_ID && order.indexOf(c.id) === -1) order.push(c.id);
     });
     if (!coins[sel]) sel = 'dogecoin';
   }
@@ -451,7 +481,6 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
   function pct(x) { return (x * 100).toLocaleString('en-US', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + '%'; }
   function share(x) { return (x * 100).toLocaleString('en-US', { maximumSignificantDigits: 3 }) + '%'; }
   function qtyText(v) { return v.toLocaleString('en-US', { maximumFractionDigits: 8 }); }
-  function amountText() { return amount === null ? 'one PEP' : qtyText(amount) + ' PEP'; }
 
   // Accepts 13000000, 13,000,000, 13 000 000, 13.000.000, 13000000.5, 13,5 (decimal comma), 13m, 13 mln, 1.5b.
   function parseAmount(raw) {
@@ -471,6 +500,24 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
   function targetCap(c, m) {
     if (m === 'ath') return c.ath !== null && c.supply !== null ? c.ath * c.supply : null;
     return c.mcap;
+  }
+
+  // Small coin badge: a letter on the coin's own colour; Pepecoin uses its frog icon.
+  var GLYPH = { dogecoin: ['Ð', 'doge'], litecoin: ['Ł', 'ltc'], bitcoin: ['₿', 'btc'], pepe: ['P', 'pepe'] };
+  function glyph(id, symbol) {
+    if (id === PEP_ID) {
+      var img = document.createElement('img');
+      img.className = 'glyph';
+      img.src = 'assets/brand/icon.svg';
+      img.alt = '';
+      return img;
+    }
+    var g = GLYPH[id] || [String(symbol || '?').charAt(0), 'other'];
+    var span = document.createElement('span');
+    span.className = 'glyph ' + g[1];
+    span.setAttribute('aria-hidden', 'true');
+    span.textContent = g[0];
+    return span;
   }
 
   function renderSide() {
@@ -516,73 +563,83 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
     var cap = targetCap(c, mode);
     if (cap === null) { mode = 'now'; cap = c.mcap; }
     var implied = cap / ps;
+    var x = implied / p.price;
+    $('r-amount').textContent = amount === null ? 'One PEP' : qtyText(amount) + ' PEP';
     $('r-name').textContent = c.name;
-    $('r-when').textContent = mode === 'ath' ? 'all-time-high price and today\'s supply' : 'market cap today';
-    $('r-target').textContent = big(cap, '$');
-    $('r-amount').textContent = amountText();
+    $('r-when').textContent = mode === 'ath' ? 'at its all-time high' : 'today';
     $('r-value').textContent = moneyFull(implied * n);
-    $('r-mult').textContent = mult(implied / p.price);
+    $('r-mult').textContent = (x >= 1 ? '▲ ' : '▼ ') + mult(x);
     $('r-now').textContent = moneyFull(p.price * n);
-    $('m-target-label').textContent = c.name + (mode === 'ath' ? ' all-time-high price × supply today' : ' market cap today');
+    $('m-target-label').textContent = c.name + ' market cap ' + (mode === 'ath' ? 'at its high' : 'today');
     $('m-target').textContent = big(cap, '$');
     $('m-supply').textContent = big(ps) + ' PEP';
-    $('m-price').textContent = usd(implied) + ' per PEP';
+    $('m-price').textContent = usd(implied);
     $('m-qty-row').hidden = amount === null;
-    $('m-qty-label').textContent = '× ' + amountText();
-    $('m-qty').textContent = moneyFull(implied * n);
+    $('m-qty').textContent = qtyText(n);
     $('ath-note').hidden = mode !== 'ath';
     $('mode-now').setAttribute('aria-pressed', String(mode === 'now'));
     $('mode-ath').setAttribute('aria-pressed', String(mode === 'ath'));
     $('mode-ath').disabled = c.ath === null;
-    $('coin-select').value = sel;
+    $('coin-select').value = QUICK.indexOf(sel) === -1 ? sel : '';
     Array.prototype.forEach.call($('quick').children, function (b) {
       b.setAttribute('aria-pressed', String(b.dataset.id === sel));
     });
   }
 
-  function comboCell(tr, per, on) {
-    var td = document.createElement('td');
-    if (on) td.className = 'on';
-    if (per === null || !isFinite(per)) { td.textContent = 'n/a'; tr.appendChild(td); return; }
-    var b = document.createElement('b');
-    b.textContent = money(per * qty());
-    td.appendChild(b);
-    if (amount !== null) {
-      var s = document.createElement('small');
-      s.textContent = usd(per) + ' per PEP';
-      td.appendChild(s);
+  function comboValue(label, per, on, id, m) {
+    var el = document.createElement(id ? 'button' : 'div');
+    el.className = 'combo-val';
+    if (id) {
+      el.type = 'button';
+      el.setAttribute('aria-pressed', String(on));
+      el.addEventListener('click', function () { sel = id; mode = m; update(); });
     }
-    tr.appendChild(td);
+    var l = document.createElement('span');
+    l.textContent = label;
+    el.appendChild(l);
+    var ok = per !== null && isFinite(per);
+    var b = document.createElement('b');
+    b.textContent = ok ? money(per * qty()) : 'n/a';
+    el.appendChild(b);
+    if (ok && amount !== null) {
+      var sm = document.createElement('small');
+      sm.textContent = usd(per) + ' per PEP';
+      el.appendChild(sm);
+    }
+    return el;
   }
   function renderCombo() {
     var p = coins[PEP_ID];
     if (!p) return;
     var ps = pepSupply();
     $('combo-h').textContent = (amount === null ? 'One PEP' : qtyText(amount) + ' PEP') + ' at every market cap on this page';
-    var body = $('combo-rows');
-    body.textContent = '';
+    var list = $('combo-rows');
+    list.textContent = '';
     var ids = [PEP_ID].concat(QUICK);
     if (ids.indexOf(sel) === -1) ids.push(sel);
     ids.forEach(function (id) {
       var c = coins[id];
       if (!c) return;
       var self = id === PEP_ID;
-      var tr = document.createElement('tr');
-      if (self) tr.className = 'self';
-      var th = document.createElement('th');
-      th.scope = 'row';
-      th.className = 'plain';
-      th.textContent = self ? 'Pepecoin itself' : c.name;
-      var small = document.createElement('small');
-      small.textContent = self ? 'PEP price, no change' : c.symbol;
-      th.appendChild(small);
-      tr.appendChild(th);
+      var li = document.createElement('li');
+      li.className = 'combo-card' + (self ? ' self' : '');
+      var head = document.createElement('div');
+      head.className = 'combo-head';
+      head.appendChild(glyph(id, c.symbol));
+      var t = document.createElement('span');
+      var nb = document.createElement('b');
+      nb.textContent = self ? 'Pepecoin' : c.name;
+      var ns = document.createElement('small');
+      ns.textContent = self ? 'its own price' : c.symbol;
+      t.appendChild(nb); t.appendChild(ns);
+      head.appendChild(t);
+      li.appendChild(head);
       var now = self ? p.price : (c.mcap === null ? null : c.mcap / ps);
       var athCap = targetCap(c, 'ath');
       var ath = self ? p.ath : (athCap === null ? null : athCap / ps);
-      comboCell(tr, now, !self && id === sel && mode === 'now');
-      comboCell(tr, ath, !self && id === sel && mode === 'ath');
-      body.appendChild(tr);
+      li.appendChild(comboValue('Today', now, id === sel && mode === 'now', self ? null : id, 'now'));
+      li.appendChild(comboValue('All-time high', ath, id === sel && mode === 'ath', self ? null : id, 'ath'));
+      list.appendChild(li);
     });
   }
 
@@ -620,6 +677,10 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
   function renderControls() {
     var s = $('coin-select');
     s.textContent = '';
+    var none = document.createElement('option');
+    none.value = '';
+    none.textContent = 'Choose a coin';
+    s.appendChild(none);
     order.forEach(function (id) {
       var o = document.createElement('option');
       o.value = id;
@@ -632,9 +693,14 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
       if (!coins[id]) return;
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'chip';
+      b.className = 'coin-btn';
       b.dataset.id = id;
-      b.textContent = coins[id].symbol;
+      b.appendChild(glyph(id, coins[id].symbol));
+      var sym = document.createElement('b');
+      sym.textContent = coins[id].symbol;
+      var nm = document.createElement('small');
+      nm.textContent = coins[id].name;
+      b.appendChild(sym); b.appendChild(nm);
       b.addEventListener('click', function () { sel = id; update(); });
       q.appendChild(b);
     });
@@ -699,11 +765,21 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
     readAmount();
     renderAmountHint();
     update();
-    try { localStorage.setItem(AMOUNT_KEY, input.value); } catch (e) { /* storage unavailable */ }
+    saveAmount();
   });
   input.addEventListener('blur', function () { if (amount !== null) input.value = qtyText(amount); });
 
-  $('coin-select').addEventListener('change', function (e) { sel = e.target.value; update(); });
+  function saveAmount() { try { localStorage.setItem(AMOUNT_KEY, input.value); } catch (e) { /* storage unavailable */ } }
+  Array.prototype.forEach.call(document.querySelectorAll('.preset'), function (b) {
+    b.addEventListener('click', function () {
+      input.value = qtyText(Number(b.dataset.v));
+      readAmount();
+      renderAmountHint();
+      update();
+      saveAmount();
+    });
+  });
+  $('coin-select').addEventListener('change', function (e) { if (e.target.value) { sel = e.target.value; update(); } });
   $('mode-now').addEventListener('click', function () { mode = 'now'; update(); });
   $('mode-ath').addEventListener('click', function () { mode = 'ath'; update(); });
 
