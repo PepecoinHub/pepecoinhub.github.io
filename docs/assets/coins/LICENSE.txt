@@ -1,6 +1,24 @@
-Coin logos in this folder (btc.png, doge.png, ltc.png, pepe.png) are 128 px PNG renders of the
-"background" token icons from web3icons (https://github.com/0xa3k5/web3icons), used under the MIT License below.
-The logos themselves are trademarks of their respective projects and are shown only to identify each coin.
+Coin logos in this folder. The logos are trademarks of their respective projects and are shown only to identify each coin.
+
+btc.png, ltc.png, pepe.png
+  128 px PNG renders of the "background" token icons from web3icons
+  (https://github.com/0xa3k5/web3icons), MIT License, reproduced at the end of this file.
+
+doge.png
+  The Dogecoin logo from Trust Wallet assets (https://github.com/trustwallet/assets,
+  blockchains/doge/info/logo.png), scaled to 128 px. MIT License, Copyright (c) 2019-2023 Trust Wallet;
+  same terms as the licence text at the end of this file.
+
+bells.png, lky.png, jkc.png, dingo.png, shic.png
+  The wallet icons from each project's own repository, scaled to 128 px. Each repository is
+  released under the MIT License (see the COPYING file in each repository):
+    bells.png  https://github.com/Nintondo/bellscoinV3            src/qt/res/icons/bitcoin.png
+    lky.png    https://github.com/LuckycoinFoundation/Luckycoin    src/qt/res/icons/luckycoin.png
+    jkc.png    https://github.com/Junkcoin-Foundation/junkcoin-core src/qt/res/icons/junkcoin.png
+    dingo.png  https://github.com/dingocoincrypto/dingocoin       src/qt/res/icons/bitcoin.png
+    shic.png   https://github.com/shibacoinppc/shibacoin          src/qt/res/icons/shibacoin.png
+
+web3icons licence:
 
 MIT License
 
