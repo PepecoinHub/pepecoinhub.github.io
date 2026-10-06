@@ -238,3 +238,11 @@ footer { display: flex; flex-wrap: wrap; gap: 6px 20px; color: var(--muted); fon
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* ---------- reconstructed history (rebuilt from the blockchain, not a live snapshot) ---------- */
+.matrix th.rc { text-decoration: underline dashed; text-underline-offset: 4px; }
+.matrix td.rc { outline: 1px dashed var(--muted); outline-offset: -3px; }
+.sw.rc-sw { background: transparent; outline: 1px dashed var(--muted); outline-offset: -1px; }
+.delta.rc { text-decoration: underline dashed var(--muted); text-underline-offset: 3px; }
+.rc-swatch { display: inline-block; width: 22px; height: 0; border-top: 2px dashed var(--s1); margin-right: 8px; vertical-align: middle; }
+.rc-text { font-style: italic; color: var(--muted); }

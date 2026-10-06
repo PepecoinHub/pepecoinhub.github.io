@@ -1,5 +1,15 @@
 {
   "_readme": "Address tags. type is one of: exchange, pool, burn, project, other. Types exchange, pool and burn are hidden in the 'without exchanges and pools' view. Add a line, commit, and the next daily run picks it up (history is re-tagged too).",
   "PeU3PGXMGcFcteA4NjDcQsTiKQBdn7if84": { "name": "CoinEx", "type": "exchange" },
-  "PnBFXec7tVQvndqktsVnkfJGwy63GFnwoo": { "name": "litecoinpool.org", "type": "pool" }
+  "PnBFXec7tVQvndqktsVnkfJGwy63GFnwoo": { "name": "litecoinpool.org", "type": "pool" },
+  "PqXDo4G31C2mysViyRHLmHtTaVdpKHxDBm": { "name": "XeggeX", "type": "exchange" },
+  "PnLf5cc7eWKjeLwMir1dCns2BrtbNPv7qT": { "name": "XeggeX", "type": "exchange" },
+  "PXwJ7a32FVHF5GWS7annH2tDf5zuAA38Bm": { "name": "NonKYC", "type": "exchange" },
+  "PdG6b29Nxw4o2FnJELF3kPk1oZF2VLXn3E": { "name": "NonKYC", "type": "exchange" },
+  "PsnJpNbgQDYrKxsvchXa7RdcC2h2YLVjt4": { "name": "NonKYC", "type": "exchange" },
+  "Pj6SBAPscGprF44NDDC75MkQiJYsBzz7kb": { "name": "NonKYC", "type": "exchange" },
+  "PhWiJ2UbgQno6zHE2N3vm8KowCih2Pp7Sa": { "name": "NonKYC", "type": "exchange" },
+  "Pq22asKx2sms6quyTLQtUxHC2FbFsrUZB2": { "name": "NonKYC", "type": "exchange" },
+  "PuXnYSgp2fecgy9SE6YQKwSbzHiAPwg62o": { "name": "NonKYC", "type": "exchange" },
+  "PoSAh8qdrsgfZe63Fe8PsmMqx18k4FiCCR": { "name": "NonKYC", "type": "exchange" }
 }

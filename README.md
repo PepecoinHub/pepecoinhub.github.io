@@ -3,7 +3,7 @@
 Co dzień zapisuje snapshot top ~1250 adresów Pepecoin (PEP) i pokazuje na stronie:
 
 - udział w podaży top 10 / 25 / 50 / 100 / 400 / 1000,
-- zmianę tego udziału po 1 dniu, tygodniu, 2 tygodniach, miesiącu, kwartale, pół roku i roku,
+- zmianę tego udziału po 1 dniu, tygodniu, 2 tygodniach, miesiącu, kwartale, pół roku, roku, 2 latach i od początku historii (okresy ustawia jedna lista `PERIODS` w `scripts/build_summary.py`; 5 lat to dopisanie `1825`),
 - wykres kołowy struktury (progi rankingu), wykres trendu, kto wszedł do top 1000 i kto wypadł, tabelę wszystkich portfeli,
 - drugi widok „bez giełd i pooli”.
 
@@ -16,7 +16,7 @@ Koszt: 0 zł. Bez serwera, bazy i kluczy API. GitHub Actions pobiera dane raz dz
 3. Zakładka **Actions → Daily snapshot → Run workflow**. Pierwsze uruchomienie robi pierwszy snapshot i publikuje stronę.
 4. Adres strony pojawi się w logu zadania `deploy` i w Settings → Pages (zwykle `https://TWOJ-LOGIN.github.io/NAZWA-REPO/`).
 
-Od tego dnia workflow robi się sam o 03:17 UTC. Pierwsze zmiany widać następnego dnia, tygodniowe po tygodniu, roczne po roku.
+Od tego dnia workflow robi się sam o 03:17 UTC. Historia sprzed pierwszego snapshotu jest już w repozytorium (odtworzona z blockchainu, patrz niżej), więc wszystkie okresy, łącznie z 1R, 2L i „Całość”, działają od razu.
 
 ## Sprawdź przy pierwszym uruchomieniu
 
@@ -33,14 +33,17 @@ Plik `docs/data/labels.json`. Dopisz linię i zrób commit, następny przebieg p
 "ADRES": { "name": "Nazwa", "type": "exchange" }
 ```
 
-Typy `exchange`, `pool`, `burn` znikają w widoku „bez giełd i pooli” (razem z saldami, które odejmuje się od podaży). Typy `project` i `other` tylko dodają etykietę. Na start są dwa wpisy: CoinEx i litecoinpool.org (z rich listy PepeBlocks). Flaga „miner” z API nie jest pokazywana ani brana pod uwagę: liczą się tylko ręczne tagi z tego pliku.
+Typy `exchange`, `pool`, `burn` znikają w widoku „bez giełd i pooli” (razem z saldami, które odejmuje się od podaży). Typy `project` i `other` tylko dodają etykietę. Wpisy: CoinEx i litecoinpool.org (z rich listy PepeBlocks) oraz XeggeX i NonKYC. Te dwie giełdy sprawdzono na łańcuchu (liczba transakcji, tysiące różnych wpłacających, konsolidacje adresów depozytowych, opróżnienie portfela XeggeX po upadku giełdy 3 lutego 2025); dodatkowe adresy tych giełd są tylko takie, które giełda wydała w jednej transakcji razem ze swoim portfelem (wspólne wejścia = ten sam właściciel klucza), oraz nowy portfel NonKYC od lipca 2025 (`PuXnYSgp…`: przejął cały stary portfel jedną transakcją i od tamtej pory zbiera wpłaty z ponad 1000 tych samych adresów depozytowych). Dowody są w `VALIDATION.md`. Flaga „miner” z API nie jest pokazywana ani brana pod uwagę: liczą się tylko ręczne tagi z tego pliku.
 
 ## Pliki
 
 | Plik | Co robi |
 |---|---|
 | `scripts/snapshot.py` | Pobiera top 1250 adresów, podaż i wysokość bloku, sprawdza sensowność danych i zapisuje `docs/data/snapshots/RRRR-MM-DD.json`. Nic nie zapisze, jeśli dane wyglądają źle. |
-| `scripts/build_summary.py` | Liczy udziały, zmiany i ruchy z wszystkich snapshotów, zapisuje `docs/data/summary.json` i `docs/data/shares.csv`. |
+| `scripts/build_summary.py` | Liczy udziały, zmiany i ruchy z wszystkich snapshotów (bieżących i odtworzonych), dokłada dzienne punkty z `reconstructed_daily.json`, zapisuje `docs/data/summary.json` i `docs/data/shares.csv` (kolumna `source`: `live`, `reconstructed`, `reconstructed-daily`). |
+| `scripts/build_reconstructed_daily.py` | Jednorazowo: z dziennych plików odtworzonych z blockchainu robi zwartą serię `docs/data/reconstructed_daily.json`. Uruchom ponownie po zmianie tagów giełd, jeśli chcesz mieć dzienną historię także w widoku „bez giełd i pooli”. |
+| `docs/data/snapshots/` | Snapshoty. Pliki z `"reconstructed": true` w `meta` są odtworzone z blockchainu, pozostałe pochodzą z codziennego pobrania. |
+| `VALIDATION.md` | Jak sprawdzono odtworzoną historię (porównanie z archiwalnymi rich listami i z API). |
 | `docs/` | Strona (HTML, CSS i JS, bez bibliotek zewnętrznych). |
 | `.github/workflows/snapshot.yml` | Dwa zadania. `snapshot`: pobranie danych, podsumowanie, commit. `deploy`: publikacja strony. Dzięki temu historia zbiera się nawet przed włączeniem Pages. Push też robi snapshot, ale tylko jeśli na dziś jeszcze go nie ma. |
 
@@ -52,12 +55,23 @@ python scripts/build_summary.py
 python -m http.server 8000 --directory docs   # http://localhost:8000
 ```
 
+## Historia sprzed pierwszego snapshotu (odtworzona z blockchainu)
+
+API podaje tylko aktualną rich listę, więc dni sprzed pierwszego snapshotu (5 października 2026) odtworzono inaczej: przeliczając cały blockchain Pepecoina od bloku genesis.
+
+- Na własnym pełnym węźle Pepecoin Core (v1.1.0, bez portfela i bez `txindex`) narzędzie do replayu czyta po kolei każdy blok przez lokalne RPC, prowadzi zbiór UTXO na dysku (SQLite) i salda wszystkich adresów, a na koniec każdego dnia UTC (stan tuż przed pierwszym blokiem z następnego dnia) zapisuje top 1250 w dokładnie tym samym formacie co `snapshot.py`.
+- Podaż to podaż z harmonogramu emisji na danej wysokości (tak samo liczy PepeBlocks; zgodność co do PEP na wysokościach 1 237 541 i 1 238 910). P2PK liczy się jako odpowiadający mu adres P2PKH; multisig i skrypty niestandardowe nie trafiają na listę (jak w eksploratorach). `lastSeen` to czas ostatniego bloku, w którym adres coś dostał albo wydał. `isMiner` = adres dostał wypłatę z coinbase w ostatnich 30 dniach (strona i tak tego nie używa).
+- Do repozytorium trafiły: snapshoty tygodniowe (poniedziałki) od 3.06.2024 do 29.09.2025, dzienne od 6.10.2025 do 4.10.2026, plus `reconstructed_daily.json` z dziennymi udziałami za cały okres od 3.06.2024. Pliki bieżących snapshotów nie były ruszane.
+- Na stronie odtworzone punkty są rysowane linią przerywaną i pustymi kropkami, z dopiskiem „odtworzone” w podpowiedzi, a kolumny tabeli zmian porównujące z odtworzonym snapshotem mają przerywaną ramkę.
+- Sprawdzenie: salda i sumy z archiwalnych kopii rich list PepeBlocks i PepecoinExplorer (Internet Archive) w momencie zrobienia kopii oraz bieżące snapshoty z 5 i 6 października 2026 przy tej samej wysokości bloku. Wyniki w `VALIDATION.md`.
+- Samego narzędzia do replayu nie ma w repozytorium (wymaga pełnego węzła, ok. 14 GB danych i kilku godzin). Działa poza repozytorium; zasada jest opisana wyżej. Nic nie trzeba przeliczać ponownie, codzienne snapshoty dalej robi `snapshot.py`.
+
 ## Ograniczenia, o których warto pamiętać
 
-- Historia zaczyna się od pierwszego snapshotu. API podaje tylko aktualną rich listę, więc wstecz nic nie odtworzymy.
+- Historia sprzed 5 października 2026 jest odtworzona z blockchainu (patrz wyżej): do 29.09.2025 snapshoty są co tydzień (dzienna jest tylko seria udziałów), a lista „kto się ruszył” dla dłuższych okresów porównuje z odtworzonym snapshotem.
 - Adres to nie człowiek. Giełdy i custodiany trzymają monety wielu osób, a lista tagów jest ręczna i niepełna.
 - Udziały liczone są względem podaży z dnia snapshotu.
-- Rozmiar: jeden snapshot to ok. 70 KB, czyli ok. 25 MB rocznie w repozytorium. To mało, git dodatkowo kompresuje podobne pliki.
+- Rozmiar: jeden snapshot to ok. 90 KB, czyli ok. 33 MB rocznie w repozytorium. Odtworzona historia dodała ok. 39,6 MB (434 snapshoty po ok. 90 KB plus seria dzienna ok. 0,2 MB). To mało (limit GitHub Pages to 1 GB), git dodatkowo kompresuje podobne pliki.
 - Cron GitHuba potrafi się spóźnić o kilkanaście minut, a w repozytorium bez aktywności zaplanowane workflowy bywają wyłączane po ok. 60 dniach (wystarczy włączyć z powrotem). Codzienne commity ze snapshotami zwykle to zapobiegają.
 - Jeśli GitHub ostrzeże o przestarzałych wersjach akcji (`actions/checkout@v4` itd.), podbij numery w `snapshot.yml`.
 
