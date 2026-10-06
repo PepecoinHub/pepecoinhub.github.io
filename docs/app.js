@@ -371,7 +371,7 @@
 
     return h('header', { class: 'top' },
       h('div', { class: 'top-row' },
-        h('div', { class: 'brand' }, h('h1', {}, t('title')), h('p', {}, t('lede'))),
+        h('div', { class: 'brand' }, h('h1', {}, t('title')), h('p', {}, t('lede')), h('p', { class: 'muted', style: 'max-width:62ch' }, t('labels_note'))),
         h('div', { class: 'tools' }, langBtn, themeBtn)),
       h('div', { class: 'top-row' }, seg, meta),
       state.view === 'ex' ? h('p', { class: 'small muted', style: 'margin:0;max-width:80ch' }, t('view_ex_note')) : null,
@@ -867,7 +867,7 @@
 
   function showEmpty() {
     app.replaceChildren(
-      h('header', { class: 'top' }, h('div', { class: 'brand' }, h('h1', {}, t('title')), h('p', {}, t('lede')))),
+      h('header', { class: 'top' }, h('div', { class: 'brand' }, h('h1', {}, t('title')), h('p', {}, t('lede')), h('p', { class: 'muted', style: 'max-width:62ch' }, t('labels_note')))),
       h('div', { class: 'panel' }, h('h2', {}, t('err_title')), h('p', {}, t('err_body'))));
   }
 
