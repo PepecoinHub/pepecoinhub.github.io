@@ -12,7 +12,7 @@
   const STR = {
     en: {
       title: 'Pepecoin Holder Watch',
-      lede: 'How much of the PEP supply sits in the biggest wallets, and how that changes. One snapshot of the top 1000 addresses every day.',
+      lede: 'How much of the PEP supply sits in the biggest wallets, and how that changes. One snapshot of the top ~2000 addresses every day; the charts focus on the top 1000.',
       view_all: 'All addresses',
       view_ex: 'Without exchanges & pools',
       view_ex_note: 'Addresses tagged as exchange, pool or burn are taken out, and their balances are taken out of the supply too. Tags are a hand-kept list, so some exchange wallets may still be counted.',
@@ -80,8 +80,8 @@
       col_now: 'Now',
       move_note: 'Counts near the #1000 cut-off are noisy: a wallet hovering around the threshold can flip in and out. Moves between two addresses of the same owner look like a buyer and a seller.',
       move_none: 'Nothing to show for this period yet.',
-      hold_h: 'Top 1000 holders',
-      hold_p: 'Balances at the latest snapshot. Click an address to open it in PepeBlocks.',
+      hold_h: 'Top holders',
+      hold_p: 'Balances at the latest snapshot (up to 2000 addresses). Click an address to open it in PepeBlocks.',
       search: 'Search address or tag',
       col_tag: 'Tag',
       col_last: 'Last seen',
@@ -108,7 +108,7 @@
     },
     pl: {
       title: 'Pepecoin Holder Watch',
-      lede: 'Ile podaży PEP leży w największych portfelach i jak się to zmienia. Codziennie jeden snapshot top 1000 adresów.',
+      lede: 'Ile podaży PEP leży w największych portfelach i jak się to zmienia. Codziennie jeden snapshot top ~2000 adresów; wykresy skupiają się na top 1000.',
       view_all: 'Wszystkie adresy',
       view_ex: 'Bez giełd i pooli',
       view_ex_note: 'Adresy oznaczone jako giełda, pool lub burn są wyłączone, a ich salda odjęte też od podaży. Tagi to ręcznie prowadzona lista, więc część portfeli giełd może nadal być wliczona.',
@@ -176,8 +176,8 @@
       col_now: 'Jest',
       move_note: 'Liczby wejść i wyjść przy progu #1000 mocno skaczą: portfel krążący wokół progu potrafi wpadać i wypadać. Przesunięcie między dwoma adresami tego samego właściciela wygląda jak kupujący i sprzedający.',
       move_none: 'Na razie nie ma nic do pokazania dla tego okresu.',
-      hold_h: 'Top 1000 portfeli',
-      hold_p: 'Salda z ostatniego snapshotu. Kliknij adres, żeby otworzyć go w PepeBlocks.',
+      hold_h: 'Top portfele',
+      hold_p: 'Salda z ostatniego snapshotu (do 2000 adresów). Kliknij adres, żeby otworzyć go w PepeBlocks.',
       search: 'Szukaj adresu lub tagu',
       col_tag: 'Tag',
       col_last: 'Ostatnia aktywność',
@@ -786,7 +786,7 @@
     const out = [];
     for (const r of S.holders) {
       const rank = ex ? r[7] : r[0];
-      if (rank == null || rank > 1000) continue;
+      if (rank == null) continue;
       const tag = r[4] || (r[5] ? STR[state.lang].types[r[5]] || r[5] : '');
       if (q && !(r[1].toLowerCase().includes(q) || tag.toLowerCase().includes(q))) continue;
       out.push({ rank, addr: r[1], pep: r[2], pct: ex ? r[8] : r[3], tag, type: r[5], last: r[6] });
