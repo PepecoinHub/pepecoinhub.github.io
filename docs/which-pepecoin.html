@@ -48,37 +48,44 @@
   <h2 id="compare" data-lang="en">Side by side</h2>
   <h2 data-lang="pl" hidden>Obok siebie</h2>
   <div class="table-scroll" role="region" aria-labelledby="compare" tabindex="0">
-    <table style="min-width: 720px">
-      <colgroup><col><col><col><col class="hl"></colgroup>
+    <table class="compare-3" style="min-width: 720px">
+      <colgroup><col><col class="hl"><col><col></colgroup>
       <thead>
         <tr>
           <th scope="col">Ticker</th>
+          <th scope="col" class="coin">PEP<small>Pepecoin</small></th>
           <th scope="col" class="coin">PEPE<small>Pepe</small></th>
           <th scope="col" class="coin">PEPECOIN<small>PepeCoin / Memetic</small></th>
-          <th scope="col" class="coin">PEP<small>Pepecoin</small></th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <th scope="row">What it is</th>
+          <td>Its own layer-1 blockchain, a fork of Dogecoin Core</td>
           <td>ERC-20 token on Ethereum</td>
           <td>ERC-20 token on Ethereum. Ran its own chain from 2016, bridged to Ethereum in 2023</td>
-          <td>Its own layer-1 blockchain, a fork of Dogecoin Core</td>
         </tr>
         <tr>
           <th scope="row">Launched</th>
+          <td>January 30, 2024</td>
           <td>April 2023</td>
           <td>March 2016</td>
-          <td>January 30, 2024</td>
         </tr>
         <tr>
           <th scope="row">Secured by</th>
+          <td>Scrypt proof of work, merge-mined with Litecoin and Dogecoin</td>
           <td>Ethereum validators (proof of stake)</td>
           <td>Ethereum validators today. Originally X11 proof of work, then proof of stake</td>
-          <td>Scrypt proof of work, merge-mined with Litecoin and Dogecoin</td>
         </tr>
         <tr>
           <th scope="row">Launch allocation</th>
+          <td>
+            <div class="alloc">
+              <span class="alloc-num zero">0%</span>
+              <div class="bar" role="img" aria-label="0 percent on a 0 to 10 percent scale"><span style="width:0%"></span></div>
+              <span>no premine, no pre-allocation, no ICO, no funding round</span>
+            </div>
+          </td>
           <td>
             <div class="alloc">
               <span class="alloc-num flag">6.9%</span>
@@ -93,37 +100,30 @@
               <span>premine for a development fund, per the project's own 2016 repository</span>
             </div>
           </td>
-          <td>
-            <div class="alloc">
-              <span class="alloc-num zero">0%</span>
-              <div class="bar" role="img" aria-label="0 percent on a 0 to 10 percent scale"><span style="width:0%"></span></div>
-              <span>no premine, no pre-allocation, no ICO, no funding round</span>
-            </div>
-          </td>
         </tr>
         <tr>
           <th scope="row">Protocol freeze</th>
+          <td><strong>No protocol blacklist.</strong> Like Bitcoin/Dogecoin UTXO coins, nobody can freeze an arbitrary address at the chain layer. An exchange or custodial wallet can still freeze balances <em>it</em> holds.</td>
           <td>Contract has blacklist/transfer rules. Deployer blacklisted one address early, then renounced ownership (owner = zero). New owner-only freezes via Ownable are disabled; that one address stays frozen.</td>
           <td>Separate ERC-20 — check that contract’s own admin status; do not assume it matches PEPE.</td>
-          <td><strong>No protocol blacklist.</strong> Like Bitcoin/Dogecoin UTXO coins, nobody can freeze an arbitrary address at the chain layer. An exchange or custodial wallet can still freeze balances <em>it</em> holds.</td>
         </tr>
         <tr>
           <th scope="row">Supply</th>
+          <td><span class="num">~104.8 billion</span>, plus 10,000 per block, no cap</td>
           <td><span class="num">420.69 trillion</span>, fixed</td>
           <td><span class="num">~107 million</span> circulating on Ethereum</td>
-          <td><span class="num">~104.8 billion</span>, plus 10,000 per block, no cap</td>
         </tr>
         <tr>
           <th scope="row">Address</th>
-          <td>Starts with <code>0x</code></td>
-          <td>Starts with <code>0x</code></td>
           <td>Starts with <code>P</code></td>
+          <td>Starts with <code>0x</code></td>
+          <td>Starts with <code>0x</code></td>
         </tr>
         <tr>
           <th scope="row">On Kraken</th>
+          <td>Since February 11, 2026</td>
           <td>Since 2023</td>
           <td>Since February 18, 2026</td>
-          <td>Since February 11, 2026</td>
         </tr>
       </tbody>
     </table>
