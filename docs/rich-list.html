@@ -13,11 +13,12 @@
 <meta property="og:url" content="https://pepecoinhub.github.io/rich-list.html">
 <meta name="twitter:card" content="summary">
 <meta name="color-scheme" content="light dark">
-<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="icon" href="assets/brand/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="facts.css">
 <style>
 /* Shared site header and footer. Same structure as the fact pages, drawn with this page's own tokens
    so it follows the theme button below. */
@@ -38,13 +39,14 @@ body { padding-top: 0; }
 </head>
 <body>
 <header class="pf-head">
-  <a class="pf-brand" href="./"><img src="logo.svg" alt="" width="38" height="38" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
+  <a class="pf-brand" href="./"><img src="assets/brand/icon.svg" alt="" width="38" height="38" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
   <nav class="pf-nav" aria-label="Pages"><a href="which-pepecoin.html">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="supply.html">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="rich-list.html" aria-current="page">Rich list</a></nav>
 </header>
 <div class="wrap" id="app">
   <noscript>
     <h1>Pepecoin Holder Watch</h1>
     <p>Daily snapshots of the top Pepecoin (PEP) wallets and how the share of supply held by the top 10, 25, 50, 100, 400 and 1000 addresses changes over time. This page needs JavaScript to draw its charts. The raw numbers are in <a href="data/shares.csv">shares.csv</a>.</p>
+    <p class="muted">Hand tags in <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/blob/main/docs/data/labels.json">labels.json</a> mark known exchanges and mining pools. The “without exchanges and pools” view hides those addresses and removes their balances from the denominator. An exchange deposit on-chain is not proof the coins were sold. Tags are community-maintained — not exhaustive.</p>
   </noscript>
   <p class="muted" id="boot">Loading the latest snapshot…</p>
 </div>

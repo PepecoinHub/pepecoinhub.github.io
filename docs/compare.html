@@ -12,197 +12,24 @@
 <meta property="og:description" content="Pepecoin (PEP) is a fork of Dogecoin with the same Scrypt mining, block time and block reward. Compare hashrate, supply, inflation, price and market cap, and see what your PEP would be worth at another coin's market cap.">
 <meta property="og:url" content="https://pepecoinhub.github.io/compare.html">
 <meta name="twitter:card" content="summary">
-<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="icon" href="assets/brand/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="facts.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+
 <style>
-/* Layout: one 880px column. Shared top nav, then page sections stacked with a 56px rhythm.
-   Tables and the chart are the only wide elements and scroll inside their own boxes. */
-:root {
-  --paper: #f2f5f3;
-  --panel: #ffffff;
-  --ink: #15201b;
-  --muted: #56645d;
-  --rule: #d3ddd7;
-  --accent: #23753d;
-  --accent-soft: #e2efe4;
-  --flag: #a8621a;
-  --track: #e4e9e6;
-  --series: #258343;
-  --f-display: "Ubuntu", "Segoe UI", system-ui, sans-serif;
-  --f-body: "Ubuntu", "Segoe UI", system-ui, sans-serif;
-  --f-mono: "Ubuntu Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
-    --accent: #76c788; --accent-soft: #19281c; --flag: #e3a35c; --track: #222b26; --series: #419f5b;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
-  --accent: #76c788; --accent-soft: #19281c; --flag: #e3a35c; --track: #222b26; --series: #419f5b;
-  color-scheme: dark;
-}
-
-* { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--f-body);
-  font-size: 16px;
-  line-height: 1.6;
-  padding-inline: 20px;
-  padding-block: 0 64px;
-}
-img { max-width: 100%; }
-[hidden] { display: none !important; }
-a { color: var(--accent); text-underline-offset: 3px; }
-a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
-  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px;
-}
-
-/* Top bar */
-.site-head {
-  max-width: 880px; margin-inline: auto;
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px;
-  padding-block: 18px; border-bottom: 1px solid var(--rule);
-}
-.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink);
-  font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; letter-spacing: -0.01em; }
-.brand img { width: 38px; height: 38px; object-fit: contain; }
-.site-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.92rem; }
-.site-nav a { color: var(--muted); text-decoration: none; padding-block: 4px; border-bottom: 2px solid transparent; }
-.site-nav a:hover { color: var(--ink); }
-.site-nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
-
-.wrap { max-width: 880px; margin-inline: auto; display: grid; gap: 56px; padding-top: 44px; }
-.wrap > * { min-width: 0; }
-
-.eyebrow { font-family: var(--f-mono); font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
-h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
-h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.05; font-weight: 700; letter-spacing: -0.02em; }
-h2 { font-size: 1.55rem; line-height: 1.2; font-weight: 500; }
-h3 { font-size: 1.1rem; line-height: 1.3; font-weight: 500; }
-p { margin: 0; }
-.lede { font-size: 1.15rem; max-width: 62ch; }
-.page-head { display: grid; gap: 18px; }
-.page-head .hero-logo { width: 96px; height: 96px; object-fit: contain; }
-section { display: grid; gap: 20px; }
-section > * { min-width: 0; }
-.note { color: var(--muted); font-size: 0.92rem; max-width: 68ch; }
-.prose { display: grid; gap: 16px; max-width: 68ch; }
-.prose ul, .prose ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
-.num { font-variant-numeric: tabular-nums; font-weight: 700; }
-.src { font-size: 0.82rem; color: var(--muted); }
-code { font-family: var(--f-mono); font-size: 0.98rem; word-break: break-all; }
-
-/* Tables */
-.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
-table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
-th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--rule); }
-tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
-thead th { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--ink); white-space: nowrap; }
-thead th.coin { font-family: var(--f-display); font-size: 1.2rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink); }
-thead th.coin small { display: block; font-family: var(--f-body); font-size: 0.8rem; font-weight: 400; color: var(--muted); }
-tbody th { font-family: var(--f-mono); font-weight: 600; font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-tbody th.plain { font-family: var(--f-body); font-size: 0.95rem; letter-spacing: 0; text-transform: none; color: var(--ink); white-space: nowrap; }
-td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
-col.hl { background: var(--accent-soft); }
-tr.hl td, tr.hl th { background: var(--accent-soft); }
-.same { display: inline-block; font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 6px; margin-left: 8px; white-space: nowrap; }
-
-/* Definition list of facts */
-dl.facts { margin: 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); border-top: 1px solid var(--rule); }
-dl.facts dt, dl.facts dd { padding: 14px 0; border-bottom: 1px solid var(--rule); margin: 0; }
-dl.facts dt { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 18px; padding-right: 16px; }
-dl.facts dd { min-width: 0; }
-
-/* Stat row */
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
-.stat { padding: 16px 16px 16px 0; display: grid; gap: 4px; align-content: start; min-width: 0; }
-.stat .label { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-.stat .value { font-size: 1.7rem; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
-.stat .sub { font-size: 0.86rem; color: var(--muted); }
-
-/* Link lists and page cards */
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-.cards.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
-.cards.two > :last-child:nth-child(odd) { grid-column: 1 / -1; }
-.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 20px; display: grid; gap: 8px; align-content: start; text-decoration: none; color: var(--ink); min-width: 0; }
-a.card:hover { border-color: var(--accent); }
-.card h3 { color: var(--accent); }
-.card p { font-size: 0.95rem; color: var(--muted); }
-.linkgroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 32px; }
-.linkgroup { display: grid; gap: 10px; align-content: start; min-width: 0; }
-.linkgroup h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-.linkgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
-.linkgroup li { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 0.95rem; }
-.linkgroup li span { color: var(--muted); font-size: 0.82rem; text-align: right; }
-
-/* Sources */
-.sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
-.sources h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
-.sources ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.92rem; }
-
-/* FAQ */
-.faq { display: grid; gap: 0; border-top: 1px solid var(--rule); }
-.faq details { border-bottom: 1px solid var(--rule); padding: 14px 0; }
-.faq summary { cursor: pointer; font-weight: 600; }
-.faq details p { margin-top: 10px; max-width: 68ch; }
-
-footer.site-foot { max-width: 880px; margin: 56px auto 0; border-top: 2px solid var(--ink); padding-top: 18px; display: grid; gap: 8px; font-size: 0.9rem; color: var(--muted); }
-footer.site-foot strong { color: var(--ink); }
-
-@media (max-width: 560px) {
-  table.fit th, table.fit td { padding: 10px 10px; }
-  table.fit tbody th { width: 92px; }
-  table.fit .same { margin-left: 0; display: table; margin-top: 4px; }
-  dl.facts { grid-template-columns: 1fr; }
-  dl.facts dt { padding-bottom: 0; border-bottom: 0; }
-  dl.facts dd { padding-top: 4px; }
-}
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
-
-.calc { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 22px; display: grid; gap: 22px; }
-.calc > * { min-width: 0; }
-.controls { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: flex-end; }
-.field { display: grid; gap: 6px; min-width: 0; }
-.field label, .field-label { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-select { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 9px 12px; max-width: 100%; min-height: 44px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip, .seg button { font: 600 0.9rem var(--f-body); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 9px 14px; min-height: 44px; cursor: pointer; }
-.chip { border-radius: 999px; }
-.chip:hover, .seg button:hover { border-color: var(--accent); }
-.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
-.seg { display: inline-flex; flex-wrap: wrap; }
-.seg button:first-child { border-radius: 6px 0 0 6px; }
-.seg button:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
-.seg button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-.seg button:disabled { opacity: 0.45; cursor: not-allowed; }
-.result { display: grid; gap: 6px; border-top: 1px solid var(--rule); padding-top: 20px; }
-.result-line { font-size: 1.05rem; }
-.result-line span { font-weight: 700; }
-.result-value { font-size: clamp(2.4rem, 9vw, 3.8rem); font-weight: 700; line-height: 1.05; overflow-wrap: anywhere; }
-dl.math { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0 24px; border-top: 1px solid var(--rule); }
-dl.math div { padding: 12px 0; display: grid; gap: 2px; min-width: 0; }
-dl.math dt { font-size: 0.82rem; color: var(--muted); }
-dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-
-/* Your PEP: the amount field leads the calculator */
-.amount-field { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; max-width: 460px; }
-.amount { display: flex; align-items: stretch; min-height: 54px; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; }
-.amount:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.amount input { flex: 1; width: 100%; min-width: 0; font: 700 1.4rem var(--f-body); color: var(--ink); background: transparent; border: 0; padding: 8px 14px; outline: none; font-variant-numeric: tabular-nums; }
-.amount input::placeholder { color: var(--muted); font-weight: 400; }
-.amount-unit { display: grid; place-items: center; padding: 0 16px; font-weight: 500; color: var(--muted); border-left: 1px solid var(--rule); }
-.field-hint { font-size: 0.88rem; color: var(--muted); min-height: 1.4em; }
-.field-hint.warn { color: var(--flag); }
-
+/* page-specific */
+:root { --range: #a3b0a9; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --range: #56645c; } }
+:root[data-theme="dark"] { --range: #56645c; }
+.hr-band { position: absolute; top: 10px; bottom: 10px; background: var(--range); border-radius: 4px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --range: #56645c; } }
+:root[data-theme="dark"] { --range: #56645c; }
 /* Every combination at once */
 .combo { display: grid; gap: 10px; border-top: 1px solid var(--rule); padding-top: 20px; }
 .combo-scroll { overflow-x: auto; }
@@ -245,15 +72,15 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
   .hr-axis-unit { font-size: 0.75rem; }
 }
 </style>
-<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
-
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
+
 <header class="site-head">
-  <a class="brand" href="./"><img src="logo.svg" alt="" width="38" height="38" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
+  <a class="brand" href="./"><img src="assets/brand/icon.svg" alt="" width="38" height="38" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
   <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html">Which is which</a><a href="compare.html" aria-current="page">PEP and DOGE</a><a href="supply.html">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="rich-list.html">Rich list</a></nav>
 </header>
-<main class="wrap">
+<main class="wrap" id="main">
 <header class="page-head">
   <p class="eyebrow">Pepecoin and Dogecoin</p>
   <h1>The same rules, ten years apart</h1>
@@ -278,7 +105,7 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
         <tr><th scope="row">Supply cap</th><td>None</td><td>None <span class="same">same</span></td></tr>
         <tr><th scope="row">New coins a year</th><td>About 5.26 billion</td><td>About 5.26 billion <span class="same">same</span></td></tr>
         <tr><th scope="row">Merged mining</th><td>With Litecoin since block 371,337 (September 2014)</td><td>With Litecoin and Dogecoin since block 42,000 (2024)</td></tr>
-        <tr><th scope="row">Hashrate</th><td>About 2.1–3.4 PH/s<br><span class="src">Sept 28 – Oct 4, 2026</span></td><td>About 2.9 PH/s <span class="same">similar</span><br><span class="src">October 5, 2026</span></td></tr>
+        <tr><th scope="row">Hashrate</th><td>About 2.1–3.4 PH/s<br><span class="src">Sept 28 – Oct 4, 2026</span></td><td>About 2.9 PH/s <span class="same">similar</span><br><span class="src">October 6, 2026</span></td></tr>
         <tr><th scope="row">Paid to miners a day</th><td>14.4M DOGE ≈ <span id="doge-pay">$1.36M</span></td><td>14.4M PEP ≈ <span id="pep-pay">$1,302</span></td></tr>
         <tr><th scope="row">Address starts with</th><td><code>D</code></td><td><code>P</code></td></tr>
         <tr><th scope="row">Supply now</th><td><span id="doge-supply">156.2B</span></td><td><span id="pep-supply">104.8B</span></td></tr>
@@ -310,7 +137,7 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
       <span class="hr-axis-unit" aria-hidden="true">PH/s</span>
       <div class="hr-axis" aria-hidden="true"><span style="left:0">0</span><span style="left:25%">1</span><span style="left:50%">2</span><span style="left:75%">3</span><span style="left:100%">4</span></div>
     </div>
-    <figcaption class="src">From mining difficulty: Pepecoin 40.6M on October 5, 2026 (Pepeplorer), Dogecoin 28.8M to 47.5M from September 28 to October 4, 2026 (CoinWarz). The faint band repeats Dogecoin's range on Pepecoin's row.</figcaption>
+    <figcaption class="src">From mining difficulty: Pepecoin 40.6M on October 6, 2026 (Pepeplorer), Dogecoin 28.8M to 47.5M from September 28 to October 6, 2026 (CoinWarz). The faint band repeats Dogecoin's range on Pepecoin's row.</figcaption>
   </figure>
   <div class="stats">
     <div class="stat"><span class="label">Hashrate</span><span class="value">About the same</span><span class="sub">PEP 2.9 PH/s, inside DOGE's 2.1–3.4 PH/s</span></div>
@@ -771,5 +598,6 @@ dl.math dd { margin: 0; font-family: var(--f-mono); font-size: 1.1em; font-weigh
   <p><strong>Community fact pages</strong>, compiled by a volunteer from the r/pepecoin community. Not an official Pepecoin publication.</p>
   <p>Not investment advice. The compiler holds PEP. Prices and network figures change daily; each page gives its dates and sources.</p>
 </footer>
+<script src="chrome.js" defer></script>
 </body>
 </html>

@@ -9,7 +9,7 @@
 
 :root {
   color-scheme: light;
-  --bg: #f2f5f3;
+  --bg: #f7f5ef;
   --surface: #ffffff;
   --ink: #15201b;
   --ink-2: #3f4b44;
@@ -17,19 +17,19 @@
   --grid: #e0e6e3;
   --line: #bfcac4;
   --ring: rgba(21, 32, 27, 0.10);
-  --accent: #23753d;
+  --accent: #269B4D;
   --accent-ink: #ffffff;
   --accent-wash: rgba(35, 117, 61, 0.10);
-  --s1: #258343;
-  --t1: #165229;
-  --t2: #1f6f38;
+  --s1: #269B4D;
+  --t1: #16532A;
+  --t2: #208241;
   --t3: #318c4c;
   --t4: #56a76a;
   --t5: #7fc08c;
   --rest: #d5d9d6;
   --up: 37, 131, 67;       /* concentration up   (diverging green)  */
   --down: 121, 85, 160;    /* concentration down (diverging purple) */
-  --warn-bg: #fab219;
+  --warn-bg: #F6BB60;
   --warn-ink: #0b0b0b;
   --font: "Ubuntu", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --mono: "Ubuntu Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;

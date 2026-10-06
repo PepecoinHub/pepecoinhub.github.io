@@ -12,160 +12,18 @@
 <meta property="og:description" content="Pepecoin (PEP) has no supply cap. It adds a fixed 5.26 billion coins a year, so inflation falls from about 5.0% today to 2.3% in 25 years. Chart, table and sources.">
 <meta property="og:url" content="https://pepecoinhub.github.io/supply.html">
 <meta name="twitter:card" content="summary">
-<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="icon" href="assets/brand/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="facts.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does Pepecoin have a maximum supply?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pepecoin has no supply cap. Each block adds 10,000 new PEP, about once a minute, with no end date. Dogecoin uses the same rule."}}, {"@type": "Question", "name": "How many new Pepecoin are created each year?", "acceptedAnswer": {"@type": "Answer", "text": "About 5.26 billion PEP: 525,600 blocks a year at 10,000 PEP per block, assuming the 60-second block target holds."}}, {"@type": "Question", "name": "What is Pepecoin's inflation rate?", "acceptedAnswer": {"@type": "Answer", "text": "About 5.0% for the 12 months from October 2026. Because the yearly issue is fixed and the supply keeps growing, the rate falls every year, to about 3.3% after ten years and 2.3% in year 25."}}, {"@type": "Question", "name": "Is that the same as Dogecoin?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Dogecoin has issued a fixed 10,000 DOGE per one-minute block since 2015. Its supply is larger, about 156 billion, so its inflation rate today is lower, about 3.4%."}}, {"@type": "Question", "name": "Was any Pepecoin premined or set aside?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pepecoin's MiCA white paper states there was no premine, no pre-allocation and no ICO, and that Pepecoin LLC holds no PEP. All coins were issued to miners as block rewards."}}]}</script>
 <style>
-/* Layout: one 880px column. Shared top nav, then page sections stacked with a 56px rhythm.
-   Tables and the chart are the only wide elements and scroll inside their own boxes. */
-:root {
-  --paper: #f2f5f3;
-  --panel: #ffffff;
-  --ink: #15201b;
-  --muted: #56645d;
-  --rule: #d3ddd7;
-  --accent: #23753d;
-  --accent-soft: #e2efe4;
-  --flag: #a8621a;
-  --track: #e4e9e6;
-  --series: #258343;
-  --f-display: "Ubuntu", "Segoe UI", system-ui, sans-serif;
-  --f-body: "Ubuntu", "Segoe UI", system-ui, sans-serif;
-  --f-mono: "Ubuntu Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
-    --accent: #76c788; --accent-soft: #19281c; --flag: #e3a35c; --track: #222b26; --series: #419f5b;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --paper: #101512; --panel: #161d19; --ink: #e4ebe7; --muted: #9caaa3; --rule: #27322c;
-  --accent: #76c788; --accent-soft: #19281c; --flag: #e3a35c; --track: #222b26; --series: #419f5b;
-  color-scheme: dark;
-}
-
-* { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--f-body);
-  font-size: 16px;
-  line-height: 1.6;
-  padding-inline: 20px;
-  padding-block: 0 64px;
-}
-img { max-width: 100%; }
-[hidden] { display: none !important; }
-a { color: var(--accent); text-underline-offset: 3px; }
-a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
-  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px;
-}
-
-/* Top bar */
-.site-head {
-  max-width: 880px; margin-inline: auto;
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px;
-  padding-block: 18px; border-bottom: 1px solid var(--rule);
-}
-.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink);
-  font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; letter-spacing: -0.01em; }
-.brand img { width: 38px; height: 38px; object-fit: contain; }
-.site-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.92rem; }
-.site-nav a { color: var(--muted); text-decoration: none; padding-block: 4px; border-bottom: 2px solid transparent; }
-.site-nav a:hover { color: var(--ink); }
-.site-nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
-
-.wrap { max-width: 880px; margin-inline: auto; display: grid; gap: 56px; padding-top: 44px; }
-.wrap > * { min-width: 0; }
-
-.eyebrow { font-family: var(--f-mono); font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
-h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
-h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.05; font-weight: 700; letter-spacing: -0.02em; }
-h2 { font-size: 1.55rem; line-height: 1.2; font-weight: 500; }
-h3 { font-size: 1.1rem; line-height: 1.3; font-weight: 500; }
-p { margin: 0; }
-.lede { font-size: 1.15rem; max-width: 62ch; }
-.page-head { display: grid; gap: 18px; }
-.page-head .hero-logo { width: 96px; height: 96px; object-fit: contain; }
-section { display: grid; gap: 20px; }
-section > * { min-width: 0; }
-.note { color: var(--muted); font-size: 0.92rem; max-width: 68ch; }
-.prose { display: grid; gap: 16px; max-width: 68ch; }
-.prose ul, .prose ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
-.num { font-variant-numeric: tabular-nums; font-weight: 700; }
-.src { font-size: 0.82rem; color: var(--muted); }
-code { font-family: var(--f-mono); font-size: 0.98rem; word-break: break-all; }
-
-/* Tables */
-.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
-table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
-th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--rule); }
-tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
-thead th { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--ink); white-space: nowrap; }
-thead th.coin { font-family: var(--f-display); font-size: 1.2rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink); }
-thead th.coin small { display: block; font-family: var(--f-body); font-size: 0.8rem; font-weight: 400; color: var(--muted); }
-tbody th { font-family: var(--f-mono); font-weight: 600; font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-tbody th.plain { font-family: var(--f-body); font-size: 0.95rem; letter-spacing: 0; text-transform: none; color: var(--ink); white-space: nowrap; }
-td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
-col.hl { background: var(--accent-soft); }
-tr.hl td, tr.hl th { background: var(--accent-soft); }
-.same { display: inline-block; font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 6px; margin-left: 8px; white-space: nowrap; }
-
-/* Definition list of facts */
-dl.facts { margin: 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); border-top: 1px solid var(--rule); }
-dl.facts dt, dl.facts dd { padding: 14px 0; border-bottom: 1px solid var(--rule); margin: 0; }
-dl.facts dt { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 18px; padding-right: 16px; }
-dl.facts dd { min-width: 0; }
-
-/* Stat row */
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
-.stat { padding: 16px 16px 16px 0; display: grid; gap: 4px; align-content: start; min-width: 0; }
-.stat .label { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-.stat .value { font-size: 1.7rem; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
-.stat .sub { font-size: 0.86rem; color: var(--muted); }
-
-/* Link lists and page cards */
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-.cards.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
-.cards.two > :last-child:nth-child(odd) { grid-column: 1 / -1; }
-.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 20px; display: grid; gap: 8px; align-content: start; text-decoration: none; color: var(--ink); min-width: 0; }
-a.card:hover { border-color: var(--accent); }
-.card h3 { color: var(--accent); }
-.card p { font-size: 0.95rem; color: var(--muted); }
-.linkgroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 32px; }
-.linkgroup { display: grid; gap: 10px; align-content: start; min-width: 0; }
-.linkgroup h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-.linkgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
-.linkgroup li { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 0.95rem; }
-.linkgroup li span { color: var(--muted); font-size: 0.82rem; text-align: right; }
-
-/* Sources */
-.sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
-.sources h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
-.sources ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.92rem; }
-
-/* FAQ */
-.faq { display: grid; gap: 0; border-top: 1px solid var(--rule); }
-.faq details { border-bottom: 1px solid var(--rule); padding: 14px 0; }
-.faq summary { cursor: pointer; font-weight: 600; }
-.faq details p { margin-top: 10px; max-width: 68ch; }
-
-footer.site-foot { max-width: 880px; margin: 56px auto 0; border-top: 2px solid var(--ink); padding-top: 18px; display: grid; gap: 8px; font-size: 0.9rem; color: var(--muted); }
-footer.site-foot strong { color: var(--ink); }
-
-@media (max-width: 560px) {
-  table.fit th, table.fit td { padding: 10px 10px; }
-  table.fit tbody th { width: 92px; }
-  table.fit .same { margin-left: 0; display: table; margin-top: 4px; }
-  dl.facts { grid-template-columns: 1fr; }
-  dl.facts dt { padding-bottom: 0; border-bottom: 0; }
-  dl.facts dd { padding-top: 4px; }
-}
+/* page-specific */
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 
 .chart { margin: 0; position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 16px 12px; display: grid; gap: 8px; }
@@ -189,15 +47,15 @@ footer.site-foot strong { color: var(--ink); }
 .table-view summary { cursor: pointer; font-weight: 600; padding-block: 6px; }
 .table-view .table-scroll { margin-top: 12px; }
 </style>
-<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does Pepecoin have a maximum supply?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pepecoin has no supply cap. Each block adds 10,000 new PEP, about once a minute, with no end date. Dogecoin uses the same rule."}}, {"@type": "Question", "name": "How many new Pepecoin are created each year?", "acceptedAnswer": {"@type": "Answer", "text": "About 5.26 billion PEP: 525,600 blocks a year at 10,000 PEP per block, assuming the 60-second block target holds."}}, {"@type": "Question", "name": "What is Pepecoin's inflation rate?", "acceptedAnswer": {"@type": "Answer", "text": "About 5.0% for the 12 months from October 2026. Because the yearly issue is fixed and the supply keeps growing, the rate falls every year, to about 3.3% after ten years and 2.3% in year 25."}}, {"@type": "Question", "name": "Is that the same as Dogecoin?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Dogecoin has issued a fixed 10,000 DOGE per one-minute block since 2015. Its supply is larger, about 156 billion, so its inflation rate today is lower, about 3.4%."}}, {"@type": "Question", "name": "Was any Pepecoin premined or set aside?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pepecoin's MiCA white paper states there was no premine, no pre-allocation and no ICO, and that Pepecoin LLC holds no PEP. All coins were issued to miners as block rewards."}}]}</script>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
+
 <header class="site-head">
-  <a class="brand" href="./"><img src="logo.svg" alt="" width="38" height="38" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
+  <a class="brand" href="./"><img src="assets/brand/icon.svg" alt="" width="38" height="38" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='logo.png'}else{this.remove()}"><span>Pepecoin facts</span></a>
   <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="supply.html" aria-current="page">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="rich-list.html">Rich list</a></nav>
 </header>
-<main class="wrap">
+<main class="wrap" id="main">
 <header class="page-head">
   <p class="eyebrow">Supply and inflation</p>
   <h1>No cap, and less inflation every year</h1>
@@ -371,7 +229,7 @@ footer.site-foot strong { color: var(--ink); }
       </tbody>
     </table>
   </div>
-  <p class="src">The six early rows add up to 98.44 billion PEP. Adding 10,000 PEP for each block since then gives 104.81 billion at block 1,237,438, which matches the supply shown by the Pepeplorer explorer on October 5, 2026.</p>
+  <p class="src">The six early rows add up to 98.44 billion PEP. Adding 10,000 PEP for each block since then gives 104.81 billion at block 1,237,438, which matches the supply shown by the Pepeplorer explorer on October 6, 2026.</p>
 </section>
 
 <section aria-labelledby="assume">
@@ -379,7 +237,7 @@ footer.site-foot strong { color: var(--ink); }
   <div class="prose">
     <ul>
       <li>Blocks arrive every 60 seconds on average, the protocol target. Since launch they have averaged a little slower, which makes real issuance slightly lower than shown.</li>
-      <li>The starting supply is 104.8 billion PEP, as shown by Pepeplorer on October 5, 2026.</li>
+      <li>The starting supply is 104.8 billion PEP, as shown by Pepeplorer on October 6, 2026.</li>
       <li>The block reward stays at 10,000 PEP. The rules are set by the Pepecoin Core software and could only change if the network adopted a new version.</li>
     </ul>
   </div>
@@ -484,5 +342,6 @@ footer.site-foot strong { color: var(--ink); }
   <p><strong>Community fact pages</strong>, compiled by a volunteer from the r/pepecoin community. Not an official Pepecoin publication.</p>
   <p>Not investment advice. The compiler holds PEP. Prices and network figures change daily; each page gives its dates and sources.</p>
 </footer>
+<script src="chrome.js" defer></script>
 </body>
 </html>
