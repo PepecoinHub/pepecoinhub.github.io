@@ -38,6 +38,9 @@ TIERS = [(1, 10), (11, 50), (51, 100), (101, 400), (401, 1000)]
 PERIODS = [1, 7, 14, 30, 90, 180, 365, 730, "all"]
 EXCLUDE_TYPES = {"exchange", "pool", "burn"}
 LIST_LEN = 10          # entries per churn list
+# "Who moved" and the holders table cover this many top addresses. Concentration
+# charts (TOPS / TIERS) still stop at 1000; snapshots store more as a buffer.
+TRACK = 1000
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -158,8 +161,8 @@ def pep(sats):
 
 
 def churn(cur_rows, ref_rows, labels):
-    cur = {r[0]: (i + 1, r[1]) for i, r in enumerate(cur_rows[:1000])}
-    ref = {r[0]: (i + 1, r[1]) for i, r in enumerate(ref_rows[:1000])}
+    cur = {r[0]: (i + 1, r[1]) for i, r in enumerate(cur_rows[:TRACK])}
+    ref = {r[0]: (i + 1, r[1]) for i, r in enumerate(ref_rows[:TRACK])}
     cur_all = {r[0]: (i + 1, r[1]) for i, r in enumerate(cur_rows)}
 
     def lab(a):
@@ -181,8 +184,8 @@ def churn(cur_rows, ref_rows, labels):
         } for a in exited[:LIST_LEN]],
         "gainers": [{"a": a, "d": pep(d), "b": pep(cur[a][1]), "r": cur[a][0], "l": lab(a)} for a, d in gain],
         "losers": [{"a": a, "d": pep(d), "b": pep(cur[a][1]), "r": cur[a][0], "l": lab(a)} for a, d in loss],
-        "cutoff_now": pep(cur_rows[999][1]) if len(cur_rows) >= 1000 else None,
-        "cutoff_ref": pep(ref_rows[999][1]) if len(ref_rows) >= 1000 else None,
+        "cutoff_now": pep(cur_rows[TRACK - 1][1]) if len(cur_rows) >= TRACK else None,
+        "cutoff_ref": pep(ref_rows[TRACK - 1][1]) if len(ref_rows) >= TRACK else None,
     }
 
 
@@ -261,7 +264,7 @@ def build(data_dir, out_path, csv_path):
             "tiers_pep": [None if t is None else pep(t) for t in cur_m["tiers_sats"]],
             "rest": cur_m["rest"],
             "rest_pep": None if cur_m["rest_sats"] is None else pep(cur_m["rest_sats"]),
-            "cutoff_pep": pep(cur_rows[999][1]) if len(cur_rows) >= 1000 else None,
+            "cutoff_pep": pep(cur_rows[TRACK - 1][1]) if len(cur_rows) >= TRACK else None,
             "history": history,
             "deltas": deltas,
             "churn": churns,
@@ -304,6 +307,7 @@ def build(data_dir, out_path, csv_path):
         "tops": TOPS,
         "tiers": [list(t) for t in TIERS],
         "periods": PERIODS,
+        "track": TRACK,
         "views": views,
         "holders": holders,
     }
