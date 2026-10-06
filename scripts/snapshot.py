@@ -11,7 +11,7 @@ response can never poison the history.
 
 Usage:
     python scripts/snapshot.py                 # normal daily run
-    python scripts/snapshot.py --rows 1250     # how many addresses to keep
+    python scripts/snapshot.py --rows 2000     # how many addresses to keep
     python scripts/snapshot.py --out-dir /tmp/x
 """
 import argparse
@@ -178,9 +178,10 @@ def write_snapshot(path, meta, rows):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    ap.add_argument("--rows", type=int, default=int(os.environ.get("PEPE_ROWS", "1250")),
-                    help="addresses to keep (default 1250: top 1000 plus a buffer for the ex-exchange view)")
-    ap.add_argument("--min-rows", type=int, default=1000)
+    ap.add_argument("--rows", type=int, default=int(os.environ.get("PEPE_ROWS", "2000")),
+                    help="addresses to keep (default 2000: top 1000 for the charts, plus a buffer "
+                         "so the without-exchanges view still has enough rows)")
+    ap.add_argument("--min-rows", type=int, default=int(os.environ.get("PEPE_MIN_ROWS", "1000")))
     ap.add_argument("--pause", type=float, default=1.5, help="seconds between pages")
     ap.add_argument("--out-dir", default=os.path.join(os.path.dirname(__file__), "..", "docs", "data", "snapshots"))
     ap.add_argument("--date", help="override snapshot date (YYYY-MM-DD, UTC); default today")
