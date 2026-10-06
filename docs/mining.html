@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to mine Pepecoin (PEP): Scrypt ASICs and merged-mining pools</title>
+<meta name="description" content="How Pepecoin (PEP) is mined: a Scrypt ASIC on a pool that merge-mines PEP with Litecoin and Dogecoin. Hardware examples, pools, the payout address and reward facts, with sources.">
+<link rel="canonical" href="https://pepecoinhub.github.io/mining.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Pepecoin facts">
+<meta property="og:title" content="How to mine Pepecoin (PEP): Scrypt ASICs and merged-mining pools">
+<meta property="og:description" content="How Pepecoin (PEP) is mined: a Scrypt ASIC on a pool that merge-mines PEP with Litecoin and Dogecoin. Hardware examples, pools, the payout address and reward facts, with sources.">
+<meta property="og:url" content="https://pepecoinhub.github.io/mining.html">
+<meta property="og:image" content="https://pepecoinhub.github.io/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin logo: facts, numbers and sources about PEP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.github.io/assets/og-image.png">
+<link rel="icon" href="assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="facts.css">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin facts", "item": "https://pepecoinhub.github.io/"}, {"@type": "ListItem", "position": 2, "name": "Guides", "item": "https://pepecoinhub.github.io/guides.html"}, {"@type": "ListItem", "position": 3, "name": "How to mine PEP", "item": "https://pepecoinhub.github.io/mining.html"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does merged mining lower my LTC or DOGE rewards?", "acceptedAnswer": {"@type": "Answer", "text": "No. The work is not split between chains. In the words of the pool ViaBTC, PEP is an additional reward from merged mining, requiring no extra hashrate."}}, {"@type": "Question", "name": "What hardware mines PEP?", "acceptedAnswer": {"@type": "Answer", "text": "A Scrypt ASIC miner, the same machine used for Litecoin and Dogecoin. ViaBTC names the Antminer L9 and the ElphaPex DG1 as examples."}}, {"@type": "Question", "name": "How much PEP does the network pay out?", "acceptedAnswer": {"@type": "Answer", "text": "Every block pays 10,000 PEP. At one block a minute that is about 14.4 million PEP a day, shared by everyone mining it. Blocks have averaged about 62.6 seconds over the past year, so the real figure is about 13.8 million."}}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <a class="brand" href="./"><img src="assets/brand/icon.svg" alt="" width="38" height="38"><span>Pepecoin facts</span></a>
+  <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="supply.html">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="network.html">Network</a><a href="rich-list.html">Rich list</a><a href="guides.html" aria-current="page">Guides</a></nav>
+</header>
+<main class="wrap" id="main">
+<header class="page-head">
+  <p class="eyebrow">Guide · updated October 6, 2026</p>
+  <h1>How to mine Pepecoin (PEP)</h1>
+  <p class="lede">PEP is mined with Scrypt, the same proof of work as Litecoin and Dogecoin. Most of it comes from merged mining: a machine on a Litecoin pool earns PEP on top of LTC and DOGE, for the same work.</p>
+</header>
+
+<section aria-label="Key facts">
+  <div class="stats">
+    <div class="stat"><span class="label">Algorithm</span><span class="value">Scrypt</span><span class="sub">same as LTC and DOGE</span></div>
+    <div class="stat"><span class="label">Block reward</span><span class="value">10,000 PEP</span><span class="sub">fixed since block 600,000</span></div>
+    <div class="stat"><span class="label">Block target</span><span class="value">60 s</span><span class="sub">62.6 s on average lately</span></div>
+    <div class="stat"><span class="label">Merged mining</span><span class="value">Block 42,000</span><span class="sub">with Litecoin and Dogecoin</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="steps">
+  <h2 id="steps">Step by step</h2>
+  <ol class="guide-steps">
+    <li><h3>Get a Scrypt ASIC</h3><p>Scrypt mining runs on specialised machines. ViaBTC names the Antminer L9 and the ElphaPex DG1 as examples.</p></li>
+    <li><h3>Join a pool that merge-mines PEP</h3><p>Pools that pay PEP alongside LTC and DOGE include <a href="https://www.viabtc.com/">ViaBTC</a>, <a href="https://www.f2pool.com/coin/pepecoin">F2Pool</a>, <a href="https://pool.binance.com/">Binance Pool</a>, <a href="https://emcd.io/">EMCD</a>, <a href="https://www.antpool.com/">AntPool</a>, <a href="https://www.litecoinpool.org/">litecoinpool.org</a>, <a href="https://www.mining-dutch.nl/pools/pepecoin.php?page=dashboard">Mining-Dutch</a>, KuPool. The live list is on <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>.</p></li>
+    <li><h3>Add a PEP payout address</h3><p>Set a receiving address that starts with <code>P</code> in the pool's settings. Each pool has its own payout settings and minimums. <a href="wallets.html">Get a PEP wallet.</a></p></li>
+    <li><h3>Point the miner at the pool</h3><p>Use the pool's Scrypt (Litecoin) connection address. The PEP reward then arrives with your LTC and DOGE.</p></li>
+  </ol>
+</section>
+
+<section aria-labelledby="expect">
+  <h2 id="expect">What to expect</h2>
+  <div class="prose">
+    <p><strong>Competition.</strong> Pepecoin's hashrate was about 2.9 PH/s in early October 2026, in the same range as Dogecoin's. <a href="compare.html#mining">Hashrate compared.</a></p>
+    <p><strong>Issuance.</strong> About 14.4 million PEP a day at the 60-second target, shared by all miners. <a href="network.html">Live block times.</a></p>
+    <p><strong>Profit.</strong> It depends on the PEP price, difficulty and your power cost. Calculators: <a href="https://whattomine.com/coins/418-pep-scrypt">WhatToMine</a>, <a href="https://www.hashrate.no/coins/PEP/calculator">hashrate.no</a>, <a href="https://www.asicminervalue.com/coins/pep-pepecoin">ASIC Miner Value</a>.</p>
+  </div>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">Common questions</h2>
+  <div class="faq">
+    <details><summary>Does merged mining lower my LTC or DOGE rewards?</summary><p>No. The work is not split between chains. In the words of the pool ViaBTC, PEP is an additional reward from merged mining, requiring no extra hashrate.</p></details>
+    <details><summary>What hardware mines PEP?</summary><p>A Scrypt ASIC miner, the same machine used for Litecoin and Dogecoin. ViaBTC names the Antminer L9 and the ElphaPex DG1 as examples.</p></details>
+    <details><summary>How much PEP does the network pay out?</summary><p>Every block pays 10,000 PEP. At one block a minute that is about 14.4 million PEP a day, shared by everyone mining it. Blocks have averaged about 62.6 seconds over the past year, so the real figure is about 13.8 million.</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="more">
+  <h2 id="more">More guides</h2>
+  <div class="cards">
+    <a class="card" href="buy.html">
+      <h3>How to buy PEP</h3>
+      <p>Where PEP trades and how to withdraw it to your own wallet.</p>
+    </a>
+    <a class="card" href="wallets.html">
+      <h3>Wallets for PEP</h3>
+      <p>Pepecoin Core, Tangem and the official Pepecoin Tangem card.</p>
+    </a>
+    <a class="card" href="mica.html">
+      <h3>Pepecoin and MiCA</h3>
+      <p>What the EU white paper is and what it doesn't mean.</p>
+    </a>
+    <a class="card" href="glossary.html">
+      <h3>Glossary</h3>
+      <p>AuxPoW, UTXO, hashrate and the other words that keep coming up.</p>
+    </a>
+    <a class="card" href="network.html">
+      <h3>Network stats</h3>
+      <p>Block height, supply, addresses and block time, day by day.</p>
+    </a>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">Sources</h2>
+  <div class="sources">
+    <div>
+      <h3>Mining</h3>
+      <ul>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC: how to mine PEP</a></li>
+        <li><a href="https://cryptonews.net/news/market/30268800/">Binance Pool adds PEP merged mining</a></li>
+        <li><a href="https://www.f2pool.com/coin/pepecoin">F2Pool: PEP</a></li>
+        <li><a href="https://miningpoolstats.stream/pepecoin">miningpoolstats: Pepecoin pools</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Rules</h3>
+      <ul>
+        <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp (AuxPoW at 42,000)</a></li>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">Pepecoin MiCA white paper (block reward)</a></li>
+        <li><a href="network.html">This site: network stats</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="site-foot">
+  <p><strong>Community fact pages</strong>, compiled by a volunteer from the r/pepecoin community. Not an official Pepecoin publication.</p>
+  <p>Not investment advice. The compiler holds PEP. Prices and network figures change daily; each page gives its dates and sources.</p>
+</footer>
+
+<script src="chrome.js" defer></script>
+</body>
+</html>

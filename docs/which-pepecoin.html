@@ -11,27 +11,25 @@
 <meta property="og:title" content="Which Pepecoin is which? PEPE vs PEPECOIN vs PEP">
 <meta property="og:description" content="PEPE, PEPECOIN and Pepecoin (PEP) are three different crypto assets. Compare chain vs token, freezes, public identity, supply and address format — with sources.">
 <meta property="og:url" content="https://pepecoinhub.github.io/which-pepecoin.html">
-<meta property="og:image" content="https://pepecoinhub.github.io/assets/brand/icon.svg">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://pepecoinhub.github.io/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin logo: facts, numbers and sources about PEP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.github.io/assets/og-image.png">
 <link rel="icon" href="assets/brand/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="facts.css">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-{"@type":"Question","name":"Is Pepecoin (PEP) the same as PEPE?","acceptedAnswer":{"@type":"Answer","text":"No. PEPE is an ERC-20 token on Ethereum. Pepecoin (PEP) is a native coin on its own Scrypt proof-of-work blockchain."}},
-{"@type":"Question","name":"Can someone freeze my PEP on the protocol?","acceptedAnswer":{"@type":"Answer","text":"The Pepecoin protocol has no admin blacklist. Like Bitcoin or Dogecoin, nobody can freeze an arbitrary address at the chain layer. An exchange or custodial wallet can still freeze balances it holds for you."}},
-{"@type":"Question","name":"Why might Kraken show geographic restrictions for PEP?","acceptedAnswer":{"@type":"Answer","text":"That is exchange policy and regulation (including MiCA in the EEA), not a feature of the Pepecoin blockchain."}}
-]}
-</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is Pepecoin (PEP) the same as PEPE?", "acceptedAnswer": {"@type": "Answer", "text": "No. PEPE is an ERC-20 token on Ethereum. Pepecoin (PEP) is a native coin on its own Scrypt proof-of-work blockchain."}}, {"@type": "Question", "name": "Which wallet do I need?", "acceptedAnswer": {"@type": "Answer", "text": "For PEP, a wallet that supports the Pepecoin network, such as the official Pepecoin Core or a Tangem card. PEPE and PEPECOIN are Ethereum tokens, so they live in Ethereum wallets such as MetaMask, which is built for Ethereum-type networks and does not list Pepecoin."}}, {"@type": "Question", "name": "Can someone freeze my PEP on the protocol?", "acceptedAnswer": {"@type": "Answer", "text": "The Pepecoin protocol has no admin blacklist. Like Bitcoin or Dogecoin, nobody can freeze an arbitrary address at the chain layer. An exchange or custodial wallet can still freeze balances it holds for you."}}, {"@type": "Question", "name": "Why might Kraken show geographic restrictions for PEP?", "acceptedAnswer": {"@type": "Answer", "text": "That is exchange policy and regulation (including MiCA in the EEA), not a feature of the Pepecoin blockchain."}}]}</script>
 </head>
 <body data-i18n="which">
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-head">
   <a class="brand" href="./"><img src="assets/brand/icon.svg" alt="" width="40" height="40"><span>Pepecoin facts</span></a>
-  <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html" aria-current="page">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="supply.html">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="rich-list.html">Rich list</a></nav>
+  <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html" aria-current="page">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="supply.html">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="network.html">Network</a><a href="rich-list.html">Rich list</a><a href="guides.html">Guides</a></nav>
 </header>
 <main class="wrap" id="main">
 
@@ -76,6 +74,18 @@
           <td>Scrypt proof of work, merge-mined with Litecoin and Dogecoin</td>
           <td>Ethereum validators (proof of stake)</td>
           <td>Ethereum validators today. Originally X11 proof of work, then proof of stake</td>
+        </tr>
+        <tr>
+          <th scope="row">Account model</th>
+          <td>UTXO, like Bitcoin and Dogecoin: coins sit in unspent outputs that only the key holder can spend</td>
+          <td>ERC-20: a balance recorded inside the token's smart contract on Ethereum</td>
+          <td>ERC-20: a balance recorded inside the token's smart contract on Ethereum</td>
+        </tr>
+        <tr>
+          <th scope="row">Fees paid in</th>
+          <td>PEP, to the miners of the Pepecoin chain</td>
+          <td>ETH, as Ethereum gas, even when only PEPE moves</td>
+          <td>ETH, as Ethereum gas, even when only PEPECOIN moves</td>
         </tr>
         <tr>
           <th scope="row">Launch allocation</th>
@@ -173,10 +183,12 @@
       <div class="addr-row">
         <span class="who">PEPE</span>
         <div class="addr-line"><code id="c-pepe">0x6982508145454Ce325dDbE47a25d4ec3d2311933</code><button class="copy" type="button" data-target="c-pepe">Copy</button></div>
+        <a class="src" href="https://etherscan.io/token/0x6982508145454ce325ddbe47a25d4ec3d2311933">PEPE on Etherscan</a>
       </div>
       <div class="addr-row">
         <span class="who">PEPECOIN</span>
         <div class="addr-line"><code id="c-pepecoin">0xA9E8aCf069C58aEc8825542845Fd754e41a9489A</code><button class="copy" type="button" data-target="c-pepecoin">Copy</button></div>
+        <a class="src" href="https://etherscan.io/token/0xa9e8acf069c58aec8825542845fd754e41a9489a">PEPECOIN on Etherscan</a>
       </div>
     </div>
   </div>
@@ -215,6 +227,11 @@
       <p data-lang="pl" hidden>Nie. PEPE to token ERC-20 na Ethereum. PEP to natywna moneta na własnym łańcuchu Scrypt PoW. Prefiks: <code>P…</code> vs <code>0x…</code>.</p>
     </details>
     <details>
+      <summary><span data-lang="en">Which wallet do I need?</span><span data-lang="pl" hidden>Jakiego portfela potrzebuję?</span></summary>
+      <p data-lang="en">For PEP, a wallet that supports the Pepecoin network: the official <a href="https://github.com/pepecoinppc/pepecoin/releases">Pepecoin Core</a>, a <a href="https://tangem.com/en/cryptocurrencies/pepecoin-network/">Tangem</a> card, or the others in our <a href="wallets.html">wallet guide</a>. PEPE and PEPECOIN are Ethereum tokens, so they live in Ethereum wallets such as MetaMask, which is built for Ethereum-type networks and does not list Pepecoin.</p>
+      <p data-lang="pl" hidden>Dla PEP portfel obsługujący sieć Pepecoin: oficjalny <a href="https://github.com/pepecoinppc/pepecoin/releases">Pepecoin Core</a>, karta <a href="https://tangem.com/en/cryptocurrencies/pepecoin-network/">Tangem</a> albo inne z naszego <a href="wallets.html">przewodnika po portfelach</a>. PEPE i PEPECOIN to tokeny Ethereum, więc trzyma się je w portfelach Ethereum, takich jak MetaMask, który obsługuje sieci typu Ethereum i nie ma na liście Pepecoin.</p>
+    </details>
+    <details>
       <summary><span data-lang="en">Can someone freeze my PEP on the protocol?</span><span data-lang="pl" hidden>Czy ktoś może zamrozić moje PEP w protokole?</span></summary>
       <p data-lang="en">No protocol admin blacklist. Custodians (exchanges, hosted wallets) can still freeze balances they hold. PEPE’s Ethereum contract is a different story — see “Who can freeze what” above.</p>
       <p data-lang="pl" hidden>Nie ma blacklisty w protokole. Giełda może zablokować depozyt u siebie. Token PEPE na Ethereum to osobna sprawa.</p>
@@ -247,6 +264,8 @@
         <li><a href="https://www.cryptotimes.io/2026/06/24/litecoin-summit-day-2-litvms-50m-bet-and-basicswapdexs-bold-vision/">Litecoin Summit recap (CryptoTimes)</a></li>
         <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC on PEP merged mining</a></li>
         <li><a href="https://peppool.space/mining">peppool.space mining pools</a></li>
+        <li><a href="https://github.com/pepecoinppc/pepecoin">Pepecoin Core (UTXO model, fees in PEP)</a></li>
+        <li><a href="https://tangem.com/en/cryptocurrencies/pepecoin-network/">Tangem: Pepecoin support</a></li>
       </ul>
     </div>
     <div>
@@ -264,6 +283,14 @@
         <li><a href="https://etherscan.io/token/0x6982508145454ce325ddbe47a25d4ec3d2311933">Etherscan token page</a></li>
         <li><a href="https://www.techopedia.com/definition/pepe-coin-pepe">Techopedia: launch tokenomics</a></li>
         <li><a href="https://www.sec.gov/Archives/edgar/data/2109686/000199937126007908/canarypepe-s1.htm">Canary PEPE ETF, Form S-1</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Ethereum tokens in general</h3>
+      <ul>
+        <li><a href="https://eips.ethereum.org/EIPS/eip-20">ERC-20 token standard (EIP-20)</a></li>
+        <li><a href="https://ethereum.org/en/developers/docs/gas/">ethereum.org: gas is paid in ETH</a></li>
+        <li><a href="https://docs.metamask.io/wallet/how-to/use-non-evm-networks/">MetaMask: supported non-EVM networks</a></li>
       </ul>
     </div>
   </div>

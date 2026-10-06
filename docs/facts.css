@@ -237,3 +237,27 @@ footer.site-foot strong, footer.pf-foot strong { color: var(--ink); }
   mix-blend-mode: normal;
   forced-color-adjust: none;
 }
+
+/* Guides: numbered steps, wallet cards, glossary terms */
+.guide-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: gstep; }
+.guide-steps li { counter-increment: gstep; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; padding: 16px 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; }
+.guide-steps li::before { content: counter(gstep); grid-row: span 2; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-mid); font-weight: 700; }
+.guide-steps h3 { font-weight: 700; }
+.guide-steps p { color: var(--muted); font-size: 0.97rem; max-width: 66ch; }
+.wallet-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 14px; }
+.wallet { display: grid; gap: 8px; align-content: start; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; min-width: 0; }
+.wallet.hl { border-color: var(--accent); background: var(--accent-soft); }
+.wallet h3 { font-weight: 700; font-size: 1.12rem; }
+.wallet .kind { font-family: var(--f-mono); font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.wallet p { font-size: 0.95rem; color: var(--muted); }
+.wallet .links { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.92rem; }
+dl.terms { margin: 0; display: grid; border-top: 1px solid var(--rule); }
+dl.terms dt { padding-top: 16px; font-weight: 700; font-size: 1.08rem; scroll-margin-top: 16px; }
+dl.terms dd { margin: 4px 0 0; padding-bottom: 16px; border-bottom: 1px solid var(--rule); max-width: 70ch; }
+dl.terms dd a { white-space: nowrap; }
+.az { display: flex; flex-wrap: wrap; gap: 6px; }
+.az a { padding: 4px 11px; border: 1px solid var(--rule); border-radius: 999px; background: var(--panel); font-size: 0.9rem; text-decoration: none; }
+.az a:hover { border-color: var(--accent); }
+@media (max-width: 560px) {
+  .guide-steps li { padding: 14px; column-gap: 12px; }
+}
