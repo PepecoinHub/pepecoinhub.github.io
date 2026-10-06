@@ -40,11 +40,12 @@ Typy `exchange`, `pool`, `burn` znikają w widoku „bez giełd i pooli” (raze
 | Plik | Co robi |
 |---|---|
 | `scripts/snapshot.py` | Pobiera top 2000 adresów, podaż i wysokość bloku, sprawdza sensowność danych i zapisuje `docs/data/snapshots/RRRR-MM-DD.json`. Nic nie zapisze, jeśli dane wyglądają źle. |
-| `scripts/build_summary.py` | Liczy udziały, zmiany i ruchy z wszystkich snapshotów (bieżących i odtworzonych), dokłada dzienne punkty z `reconstructed_daily.json`, zapisuje `docs/data/summary.json` i `docs/data/shares.csv` (kolumna `source`: `live`, `reconstructed`, `reconstructed-daily`). |
+| `scripts/build_summary.py` | Liczy udziały, zmiany i ruchy z wszystkich snapshotów (bieżących i odtworzonych), dokłada dzienne punkty z `reconstructed_daily.json`, zapisuje `docs/data/summary.json` i `docs/data/shares.csv` (kolumna `source`: `live`, `reconstructed`, `reconstructed-daily`). Do tego `docs/data/network.json` (wysokość bloku, podaż, adresy z saldem i czas dla każdego snapshotu) dla strony `network.html`. |
 | `scripts/build_reconstructed_daily.py` | Jednorazowo: z dziennych plików odtworzonych z blockchainu robi zwartą serię `docs/data/reconstructed_daily.json`. Uruchom ponownie po zmianie tagów giełd, jeśli chcesz mieć dzienną historię także w widoku „bez giełd i pooli”. |
 | `docs/data/snapshots/` | Snapshoty. Pliki z `"reconstructed": true` w `meta` są odtworzone z blockchainu, pozostałe pochodzą z codziennego pobrania. |
 | `VALIDATION.md` | Jak sprawdzono odtworzoną historię (porównanie z archiwalnymi rich listami i z API). |
 | `docs/` | Strona (HTML, CSS i JS, bez bibliotek zewnętrznych). |
+| `docs/pl/`, `es/`, `de/`, `fr/`, `tr/`, `it/`, `zh/` | Tłumaczenia pięciu stron: główna, Which is which, Jak kupić, Portfele, Słowniczek. Zmiana treści w angielskiej wersji tych stron musi trafić też do tłumaczeń. Strony wskazują swoje wersje językowe znacznikami `hreflang` w `<head>`, a przełącznik języków w nagłówku (`docs/chrome.js`) bierze adresy właśnie z nich. |
 | `.github/workflows/snapshot.yml` | Dwa zadania. `snapshot`: pobranie danych, podsumowanie, commit. `deploy`: publikacja strony. Dzięki temu historia zbiera się nawet przed włączeniem Pages. Push też robi snapshot, ale tylko jeśli na dziś jeszcze go nie ma. |
 
 ## Lokalnie

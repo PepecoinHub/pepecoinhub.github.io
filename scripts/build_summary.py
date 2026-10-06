@@ -205,6 +205,41 @@ def find_ref(snaps, dates, latest_date, days):
     return snaps[i]
 
 
+# --------------------------------------------------------------------------- network
+def snapshot_time(meta):
+    """Unix time of the snapshot's tip: the last block for chain-replay days, the fetch time for live ones."""
+    if meta.get("block_time"):
+        return int(meta["block_time"])
+    fetched = meta.get("fetched_at")
+    if not fetched:
+        return None
+    return int(dt.datetime.strptime(fetched, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc).timestamp())
+
+
+def write_network(snaps, path):
+    """docs/data/network.json for network.html: one row per snapshot,
+    [date, block height, supply in PEP, addresses with a balance, unix time].
+    Live snapshots count addresses from the rich-list total (holders_listed); the API's own
+    address count lags, and the chain replay counts the same thing as holders_listed."""
+    rows = []
+    for s in snaps:
+        m = s["meta"]
+        holders = m.get("holders_listed") or m.get("address_count")
+        t = snapshot_time(m)
+        if m.get("height") is None or t is None:
+            continue
+        rows.append([s["date"].isoformat(), int(m["height"]), round(s["supply"] / SATS), holders, t])
+    out = {
+        "schema": 1,
+        "generated_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "columns": ["date", "height", "supply_pep", "addresses_with_balance", "time"],
+        "rows": rows,
+    }
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(out, fh, separators=(",", ":"))
+    return len(rows)
+
+
 # ------------------------------------------------------------------------------ main
 def build(data_dir, out_path, csv_path):
     snaps = load_snapshots(os.path.join(data_dir, "snapshots"))
@@ -329,6 +364,12 @@ def build(data_dir, out_path, csv_path):
             e = ex_hist.get(d, {}).get("s", blank)
             source = "reconstructed-daily" if a.get("rc") == 2 else "reconstructed" if a.get("rc") else "live"
             w.writerow([d, pep(supply)] + ["" if v is None else v for v in a["s"] + e] + [source])
+
+    try:   # the network page is extra; never let it stop the summary
+        n = write_network(snaps, os.path.join(data_dir, "network.json"))
+        print(f"Built network.json with {n} row(s)")
+    except Exception as exc:  # noqa: BLE001
+        print(f"network.json skipped: {exc}", file=sys.stderr)
 
     size = os.path.getsize(out_path) / 1024
     print(f"Built {out_path} ({size:.0f} KB) from {len(snaps)} snapshot(s) "

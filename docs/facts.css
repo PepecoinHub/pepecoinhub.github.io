@@ -237,3 +237,59 @@ footer.site-foot strong, footer.pf-foot strong { color: var(--ink); }
   mix-blend-mode: normal;
   forced-color-adjust: none;
 }
+
+/* Guides: numbered steps, wallet cards, glossary terms */
+.guide-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: gstep; }
+.guide-steps li { counter-increment: gstep; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; padding: 16px 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; }
+.guide-steps li::before { content: counter(gstep); grid-row: span 2; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-mid); font-weight: 700; }
+.guide-steps h3 { font-weight: 700; }
+.guide-steps p { color: var(--muted); font-size: 0.97rem; max-width: 66ch; }
+.wallet-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 14px; }
+.wallet { display: grid; gap: 8px; align-content: start; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; min-width: 0; }
+.wallet.hl { border-color: var(--accent); background: var(--accent-soft); }
+.wallet h3 { font-weight: 700; font-size: 1.12rem; }
+.wallet .kind { font-family: var(--f-mono); font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.wallet p { font-size: 0.95rem; color: var(--muted); }
+.wallet .links { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.92rem; }
+dl.terms { margin: 0; display: grid; border-top: 1px solid var(--rule); }
+dl.terms dt { padding-top: 16px; font-weight: 700; font-size: 1.08rem; scroll-margin-top: 16px; }
+dl.terms dd { margin: 4px 0 0; padding-bottom: 16px; border-bottom: 1px solid var(--rule); max-width: 70ch; }
+dl.terms dd a { white-space: nowrap; }
+.az { display: flex; flex-wrap: wrap; gap: 6px; }
+.az a { padding: 4px 11px; border: 1px solid var(--rule); border-radius: 999px; background: var(--panel); font-size: 0.9rem; text-decoration: none; }
+.az a:hover { border-color: var(--accent); }
+@media (max-width: 560px) {
+  .guide-steps li { padding: 14px; column-gap: 12px; }
+}
+
+/* Language menu, translation hint, per-language type */
+.langmenu { position: relative; }
+.langmenu > summary { list-style: none; display: inline-flex; align-items: center; gap: 6px; user-select: none; }
+.langmenu > summary::-webkit-details-marker { display: none; }
+.langmenu ul {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 50; margin: 0; padding: 6px; list-style: none;
+  min-width: 160px; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+}
+.site-nav .langmenu a, .pf-nav .langmenu a {
+  display: block; padding: 7px 10px; border: 0; border-radius: 6px; color: var(--ink); white-space: nowrap; font-weight: 400;
+}
+.site-nav .langmenu a:hover, .pf-nav .langmenu a:hover { background: var(--accent-soft); }
+.site-nav .langmenu a[aria-current="true"], .pf-nav .langmenu a[aria-current="true"] { color: var(--accent); font-weight: 700; }
+.lang-hint {
+  max-width: 880px; margin: 14px auto 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px;
+  padding: 10px 8px 10px 14px; background: var(--accent-soft); border: 1px solid var(--rule); border-left: 3px solid var(--accent);
+  border-radius: 8px; font-size: 0.95rem;
+}
+.lang-hint a { font-weight: 600; }
+.lang-hint-x { margin-left: auto; background: none; border: 0; padding: 2px 8px; font-size: 1.35rem; line-height: 1; color: var(--muted); cursor: pointer; }
+.lang-hint-x:hover { color: var(--ink); }
+html:lang(zh) {
+  --f-display: "Ubuntu", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", sans-serif;
+  --f-body: "Ubuntu", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", sans-serif;
+  --f-mono: "Ubuntu Mono", ui-monospace, Menlo, Consolas, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", monospace;
+}
+.tag-en {
+  display: inline-block; margin-left: 6px; padding: 0 5px; border: 1px solid var(--rule); border-radius: 4px;
+  font: 600 0.68rem/1.5 var(--f-mono); letter-spacing: 0.06em; color: var(--muted); vertical-align: 0.2em;
+}
