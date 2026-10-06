@@ -11,5 +11,9 @@
   "PhWiJ2UbgQno6zHE2N3vm8KowCih2Pp7Sa": { "name": "NonKYC", "type": "exchange" },
   "Pq22asKx2sms6quyTLQtUxHC2FbFsrUZB2": { "name": "NonKYC", "type": "exchange" },
   "PuXnYSgp2fecgy9SE6YQKwSbzHiAPwg62o": { "name": "NonKYC", "type": "exchange" },
-  "PoSAh8qdrsgfZe63Fe8PsmMqx18k4FiCCR": { "name": "NonKYC", "type": "exchange" }
+  "PoSAh8qdrsgfZe63Fe8PsmMqx18k4FiCCR": { "name": "NonKYC", "type": "exchange" },
+  "PgRLcaCTEkXSguu6ZgzkuncHdCxADmPBXP": { "name": "Mining-Dutch", "type": "pool" },
+  "Pd4Ee73nvvymgiGKMouC1GYZpQCrgMmCjd": { "name": "ViaBTC", "type": "pool" },
+  "PjdviQbYuVu4RgX5N3SVebpcTHyuaZq8uj": { "name": "AntPool", "type": "pool" },
+  "PbwHwFpGaDYRejHKRqvsrmyKH1QWyMEzPD": { "name": "KuPool", "type": "pool" }
 }
