@@ -33,7 +33,7 @@ Plik `docs/data/labels.json`. Dopisz linię i zrób commit, następny przebieg p
 "ADRES": { "name": "Nazwa", "type": "exchange" }
 ```
 
-Typy `exchange`, `pool`, `miner`, `burn` znikają w widoku „bez giełd i pooli” (razem z saldami, które odejmuje się od podaży). Typy `project` i `other` tylko dodają etykietę. Na start są dwa wpisy: CoinEx i litecoinpool.org (z rich listy PepeBlocks). Adresy, które API samo oznacza jako górnika, są traktowane jako `miner`.
+Typy `exchange`, `pool`, `burn` znikają w widoku „bez giełd i pooli” (razem z saldami, które odejmuje się od podaży). Typy `project` i `other` tylko dodają etykietę. Na start są dwa wpisy: CoinEx i litecoinpool.org (z rich listy PepeBlocks). Flaga „miner” z API nie jest pokazywana ani brana pod uwagę: liczą się tylko ręczne tagi z tego pliku.
 
 ## Pliki
 
