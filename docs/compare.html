@@ -80,12 +80,8 @@
 .coin-btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .coin-btn b { font-size: 0.9rem; line-height: 1.2; }
 .coin-btn small { font-size: 0.74rem; line-height: 1.2; color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.glyph { display: inline-grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; font: 700 1rem var(--f-body); color: #fff; background: var(--muted); }
-.glyph.doge { background: #C2A633; color: #241d05; }
-.glyph.ltc { background: #345D9D; }
-.glyph.btc { background: #F7931A; color: #2b1700; }
-.glyph.pepe { background: #4F7F2A; }
-img.glyph { background: none; }
+.glyph { display: inline-grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; font: 700 1rem var(--f-body); color: var(--ink); background: var(--track); }
+img.glyph { background: none; object-fit: cover; }
 .field .more-coins { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font: 400 0.88rem var(--f-body); letter-spacing: 0; text-transform: none; color: var(--muted); }
 select { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 8px 12px; max-width: 100%; min-height: 40px; }
 .seg { display: inline-flex; flex-wrap: wrap; }
@@ -393,6 +389,7 @@ button.combo-val:hover { border-color: var(--accent); }
         <li><a href="https://www.coingecko.com/en/coins/dogecoin">CoinGecko: Dogecoin</a></li>
         <li><a href="https://pepeplorer.com/network">Pepeplorer network stats</a></li>
         <li><a href="https://defillama.com/docs/api">DefiLlama price API (price history chart)</a></li>
+        <li><a href="https://github.com/0xa3k5/web3icons">Coin logos: web3icons (MIT licence)</a></li>
       </ul>
     </div>
   </div>
@@ -502,21 +499,22 @@ button.combo-val:hover { border-color: var(--accent); }
     return c.mcap;
   }
 
-  // Small coin badge: a letter on the coin's own colour; Pepecoin uses its frog icon.
-  var GLYPH = { dogecoin: ['Ð', 'doge'], litecoin: ['Ł', 'ltc'], bitcoin: ['₿', 'btc'], pepe: ['P', 'pepe'] };
+  // Coin badge: the real logo for Pepecoin and the quick picks (assets/coins, from web3icons),
+  // the first letter of the symbol for any other coin.
+  var LOGO = { dogecoin: 'assets/coins/doge.png', litecoin: 'assets/coins/ltc.png', bitcoin: 'assets/coins/btc.png', pepe: 'assets/coins/pepe.png' };
+  LOGO[PEP_ID] = 'assets/brand/icon.svg';
   function glyph(id, symbol) {
-    if (id === PEP_ID) {
+    if (LOGO[id]) {
       var img = document.createElement('img');
       img.className = 'glyph';
-      img.src = 'assets/brand/icon.svg';
+      img.src = LOGO[id];
       img.alt = '';
       return img;
     }
-    var g = GLYPH[id] || [String(symbol || '?').charAt(0), 'other'];
     var span = document.createElement('span');
-    span.className = 'glyph ' + g[1];
+    span.className = 'glyph';
     span.setAttribute('aria-hidden', 'true');
-    span.textContent = g[0];
+    span.textContent = String(symbol || '?').charAt(0);
     return span;
   }
 
