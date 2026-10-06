@@ -212,3 +212,11 @@ footer.site-foot strong, footer.pf-foot strong { color: var(--ink); }
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
+
+/* Brand cluster glyphs are white — never invert/filter in dark theme */
+.pitch .pitch-icon,
+.pitch .pitch-icons {
+  filter: none !important;
+  mix-blend-mode: normal;
+  forced-color-adjust: none;
+}
