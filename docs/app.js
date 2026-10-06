@@ -23,12 +23,24 @@
       est: 'supply estimated',
       hist_one: 'First snapshot is in. Changes appear from tomorrow, and a 7-day comparison after a week.',
       hist_many: 'History: {n} daily snapshots since {date}. Longer periods fill in as the history grows.',
+      hist_rc: 'History: {live} live daily snapshots since {live_date}, plus {rc} snapshots and daily trend points reconstructed from the blockchain back to {date}.',
       conc_h: 'Concentration',
       conc_p: 'Share of the circulating supply held by the largest addresses, compared with the same time {period} ago.',
+      conc_p_all: 'Share of the circulating supply held by the largest addresses, compared with the earliest point in the history ({date}).',
       period: 'Period',
+      period_all: 'All',
+      period_all_words: 'the start of the history',
+      years: '{n} years',
       na_hist: 'needs {p} days of history, have {have}',
+      na_hist_all: 'needs at least two snapshots',
       vs_ref: 'vs {date}',
+      vs_ref_rc: 'vs {date} (reconstructed)',
+      rc_tag: 'reconstructed',
+      rc_note: 'Dashed line and hollow points: reconstructed by replaying the Pepecoin blockchain block by block, for the days before the live daily snapshots began on {date}.',
+      rc_cols: 'Dashed cells compare with a reconstructed snapshot.',
+      rc_ref: 'Compared with a reconstructed snapshot from {date}.',
       spark_all: '{n}-day trend',
+      spark_full: 'full history',
       spark_hover: '{date}',
       struct_h: 'Where the supply sits',
       struct_p: 'The top 1000 split into rank tiers. The grey slice is everything below rank 1000.',
@@ -40,9 +52,9 @@
       center: 'Top 1000',
       threshold: 'Entry to the top 1000 now takes {pep} PEP.',
       trend_h: 'Trend',
-      trend_p: 'Share of supply held by the top N addresses, one point per daily snapshot.',
+      trend_p: 'Share of supply held by the top N addresses, one point per day.',
       top_n: 'Top {n}',
-      range_30: '30D', range_90: '90D', range_180: '6M', range_365: '1Y', range_all: 'All',
+      range_30: '30D', range_90: '90D', range_180: '6M', range_365: '1Y', range_730: '2Y', range_all: 'All',
       trend_empty: 'The trend needs at least two daily snapshots in this range.',
       tip_holds: 'holds',
       tip_supply: 'Supply',
@@ -78,12 +90,12 @@
       no_match: 'No address matches that search.',
       notes_h: 'How to read this',
       notes: [
-        'History starts on the day the first snapshot was taken. The API only returns the current rich list, so earlier days cannot be rebuilt.',
+        'Live daily snapshots from the API start on 5 Oct 2026. Earlier history, back to June 2024, was reconstructed by replaying every block of the Pepecoin blockchain on a full node: weekly snapshots until September 2025, daily ones after that, and a daily trend series for the whole period. It is drawn dashed or hollow. Checks against archived explorer rich lists and the live API are in VALIDATION.md in the repository.',
         'An address is not a person. Exchanges, pools and custodians hold coins for many users. The view without exchanges and pools is a closer picture of everyone else, but the tags are incomplete.',
         'All shares are measured against the circulating supply on the day of the snapshot, so a growing supply alone lowers a share a little each day.',
         'Each day uses that day\'s top addresses, so the group changes as wallets climb or fall. The tables below show who moved.'
       ],
-      sources: 'Data: Pepecoin Service rich list, PepeBlocks supply.',
+      sources: 'Data: Pepecoin Service rich list, PepeBlocks supply; history before 5 Oct 2026 reconstructed from the Pepecoin blockchain.',
       csv: 'Download daily history (CSV)',
       nofa: 'Not financial advice.',
       theme: 'Theme', auto: 'Auto', light: 'Light', dark: 'Dark',
@@ -107,12 +119,24 @@
       est: 'podaż szacowana',
       hist_one: 'Pierwszy snapshot jest. Zmiany pojawią się od jutra, a porównanie 7-dniowe po tygodniu.',
       hist_many: 'Historia: {n} dziennych snapshotów od {date}. Dłuższe okresy uzupełnią się wraz z historią.',
+      hist_rc: 'Historia: {live} dziennych snapshotów na żywo od {live_date} oraz {rc} snapshotów i dzienne punkty trendu odtworzone z blockchainu od {date}.',
       conc_h: 'Koncentracja',
       conc_p: 'Udział największych adresów w podaży w obiegu, porównany z tym samym momentem {period} wcześniej.',
+      conc_p_all: 'Udział największych adresów w podaży w obiegu, porównany z najwcześniejszym punktem historii ({date}).',
       period: 'Okres',
+      period_all: 'Całość',
+      period_all_words: 'początek historii',
+      years: '{n} lat',
       na_hist: 'potrzeba {p} dni historii, jest {have}',
+      na_hist_all: 'potrzeba co najmniej dwóch snapshotów',
       vs_ref: 'vs {date}',
+      vs_ref_rc: 'vs {date} (odtworzone)',
+      rc_tag: 'odtworzone',
+      rc_note: 'Linia przerywana i puste punkty: dane odtworzone przez przeliczenie blockchainu Pepecoina blok po bloku, dla dni sprzed startu dziennych snapshotów na żywo ({date}).',
+      rc_cols: 'Komórki z przerywaną ramką porównują z odtworzonym snapshotem.',
+      rc_ref: 'Porównanie z odtworzonym snapshotem z {date}.',
       spark_all: 'trend {n} dni',
+      spark_full: 'cała historia',
       spark_hover: '{date}',
       struct_h: 'Gdzie leży podaż',
       struct_p: 'Top 1000 podzielone na progi rankingu. Szary kawałek to wszystko poniżej miejsca 1000.',
@@ -124,9 +148,9 @@
       center: 'Top 1000',
       threshold: 'Wejście do top 1000 wymaga teraz {pep} PEP.',
       trend_h: 'Trend',
-      trend_p: 'Udział w podaży top N adresów, jeden punkt na dzienny snapshot.',
+      trend_p: 'Udział w podaży top N adresów, jeden punkt na dzień.',
       top_n: 'Top {n}',
-      range_30: '30D', range_90: '90D', range_180: '6M', range_365: '1R', range_all: 'Całość',
+      range_30: '30D', range_90: '90D', range_180: '6M', range_365: '1R', range_730: '2L', range_all: 'Całość',
       trend_empty: 'Trend potrzebuje co najmniej dwóch dziennych snapshotów w tym zakresie.',
       tip_holds: 'trzyma',
       tip_supply: 'Podaż',
@@ -162,12 +186,12 @@
       no_match: 'Żaden adres nie pasuje do wyszukiwania.',
       notes_h: 'Jak to czytać',
       notes: [
-        'Historia zaczyna się w dniu pierwszego snapshotu. API zwraca tylko aktualną rich listę, więc wcześniejszych dni nie da się odtworzyć.',
+        'Dzienne snapshoty z API zaczynają się 5 paź 2026. Wcześniejsza historia, od czerwca 2024, została odtworzona przez przeliczenie każdego bloku blockchainu Pepecoina na pełnym węźle: snapshoty tygodniowe do września 2025, potem dzienne, oraz dzienna seria trendu za cały okres. Jest rysowana linią przerywaną lub pustymi punktami. Porównanie z archiwalnymi rich listami eksplorerów i z API na żywo jest w pliku VALIDATION.md w repozytorium.',
         'Adres to nie człowiek. Giełdy, pule i custodiany trzymają monety wielu użytkowników. Widok bez giełd i pooli lepiej oddaje resztę rynku, ale tagi są niekompletne.',
         'Wszystkie udziały liczone są względem podaży w obiegu z dnia snapshotu, więc samo rosnące podaż obniża udział o odrobinę każdego dnia.',
         'Każdy dzień bierze ówczesne top adresy, więc skład grupy się zmienia, gdy portfele awansują lub spadają. Tabele niżej pokazują, kto się ruszył.'
       ],
-      sources: 'Dane: rich lista Pepecoin Service, podaż z PepeBlocks.',
+      sources: 'Dane: rich lista Pepecoin Service, podaż z PepeBlocks; historia sprzed 5 paź 2026 odtworzona z blockchainu Pepecoina.',
       csv: 'Pobierz dzienną historię (CSV)',
       nofa: 'To nie jest porada inwestycyjna.',
       theme: 'Motyw', auto: 'Auto', light: 'Jasny', dark: 'Ciemny',
@@ -180,13 +204,15 @@
     }
   };
 
+  // Periods come from summary.json (build_summary.py PERIODS). Whole years without an
+  // entry here get a generic label (1825 -> 5Y / 5L), and "all" means the earliest snapshot.
   const PERIOD_LABEL = {
-    en: { 1: '1D', 7: '7D', 14: '2W', 30: '1M', 90: '3M', 180: '6M', 365: '1Y' },
-    pl: { 1: '1D', 7: '7D', 14: '2T', 30: '1M', 90: '3M', 180: '6M', 365: '1R' }
+    en: { 1: '1D', 7: '7D', 14: '2W', 30: '1M', 90: '3M', 180: '6M', 365: '1Y', 730: '2Y' },
+    pl: { 1: '1D', 7: '7D', 14: '2T', 30: '1M', 90: '3M', 180: '6M', 365: '1R', 730: '2L' }
   };
   const PERIOD_WORDS = {
-    en: { 1: 'a day', 7: 'a week', 14: 'two weeks', 30: 'a month', 90: 'a quarter', 180: 'half a year', 365: 'a year' },
-    pl: { 1: 'dobę', 7: 'tydzień', 14: 'dwa tygodnie', 30: 'miesiąc', 90: 'kwartał', 180: 'pół roku', 365: 'rok' }
+    en: { 1: 'a day', 7: 'a week', 14: 'two weeks', 30: 'a month', 90: 'a quarter', 180: 'half a year', 365: 'a year', 730: 'two years' },
+    pl: { 1: 'dobę', 7: 'tydzień', 14: 'dwa tygodnie', 30: 'miesiąc', 90: 'kwartał', 180: 'pół roku', 365: 'rok', 730: 'dwa lata' }
   };
 
   /* -------------------------------------------------------------------- state */
@@ -214,7 +240,21 @@
     if (typeof s === 'string' && vars) s = s.replace(/\{(\w+)\}/g, (_, n) => (vars[n] == null ? '' : vars[n]));
     return s;
   };
-  const periodLabel = (p) => PERIOD_LABEL[state.lang][p] || p + 'D';
+  const isAll = (p) => p === 'all';
+  function periodLabel(p) {
+    if (isAll(p)) return t('period_all');
+    if (PERIOD_LABEL[state.lang][p]) return PERIOD_LABEL[state.lang][p];
+    if (p % 365 === 0) return p / 365 + (state.lang === 'pl' ? 'L' : 'Y');
+    return p + 'D';
+  }
+  function periodWords(p) {
+    if (isAll(p)) return t('period_all_words');
+    if (PERIOD_WORDS[state.lang][p]) return PERIOD_WORDS[state.lang][p];
+    if (p % 365 === 0) return t('years', { n: p / 365 });
+    return p + (state.lang === 'pl' ? ' dni' : ' days');
+  }
+  const naHist = (p) => (isAll(p) ? t('na_hist_all') : t('na_hist', { p, have: spanDays() }));
+  const refTitle = (d) => t(d.rc ? 'vs_ref_rc' : 'vs_ref', { date: fmtDate(d.ref) });
 
   /* ----------------------------------------------------------------- dom utils */
   function setAttrs(el, attrs) {
@@ -323,9 +363,11 @@
       state.view === 'ex' ? h('span', {}, t('denominator') + ' ', h('b', {}, fmtCompact(V().denominator) + ' PEP')) : null,
       L.supply_source === 'estimate' ? h('span', { class: 'badge' }, t('est')) : null);
 
-    const histNote = S.snapshots < 2
-      ? t('hist_one')
-      : (S.snapshots < 366 ? t('hist_many', { n: fmtInt(S.snapshots), date: fmtDate(S.first_date) }) : null);
+    const histNote = S.reconstructed_snapshots && S.first_live_date
+      ? t('hist_rc', { live: fmtInt(S.live_snapshots), live_date: fmtDate(S.first_live_date), rc: fmtInt(S.reconstructed_snapshots), date: fmtDate(S.first_date) })
+      : S.snapshots < 2
+        ? t('hist_one')
+        : (S.snapshots < 366 ? t('hist_many', { n: fmtInt(S.snapshots), date: fmtDate(S.first_date) }) : null);
 
     return h('header', { class: 'top' },
       h('div', { class: 'top-row' },
@@ -341,9 +383,25 @@
     return h('div', { class: 'chips', role: 'group', 'aria-label': t('period') },
       S.periods.map((p) => h('button', {
         type: 'button', class: 'chip', 'data-key': 'period-' + p, 'aria-pressed': String(state.period === p),
-        title: PERIOD_WORDS[state.lang][p],
+        title: periodWords(p),
         onclick: () => { state.period = p; render(); }
       }, periodLabel(p))));
+  }
+
+  /* Split a line into solid (live) and dashed (reconstructed, or a gap of more than
+     3 days) segments. Returns [solidPath, dashedPath]. */
+  function splitPath(pts, fx, fy) {
+    let solid = '', dash = '', penS = null, penD = null;
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i];
+      const ax = fx(a, i - 1).toFixed(1) + ' ' + fy(a).toFixed(1), bx = fx(b, i).toFixed(1) + ' ' + fy(b).toFixed(1);
+      if (a.rc || b.rc || (a.t && b.t - a.t > 3 * DAY)) {
+        dash += (penD === ax ? '' : 'M' + ax) + 'L' + bx; penD = bx;
+      } else {
+        solid += (penS === ax ? '' : 'M' + ax) + 'L' + bx; penS = bx;
+      }
+    }
+    return [solid, dash];
   }
 
   /* ------------------------------------------------------------------ sparkline */
@@ -358,12 +416,14 @@
     const y = (v) => H - pad - ((v - lo) / (hi - lo)) * (H - 2 * pad);
     const d = pts.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p.v).toFixed(1)).join('');
     const area = d + `L${x(pts.length - 1).toFixed(1)} ${H}L${x(0).toFixed(1)} ${H}Z`;
+    const [solidD, dashD] = splitPath(pts, (p, i) => x(i), (p) => y(p.v));
     const dot = s('circle', { cx: x(pts.length - 1), cy: y(pts[pts.length - 1].v), r: 3.5, fill: 'var(--s1)', stroke: 'var(--surface)', 'stroke-width': 2 });
     const cursor = s('circle', { r: 3.5, fill: 'var(--s1)', stroke: 'var(--surface)', 'stroke-width': 2, visibility: 'hidden' });
     const hit = s('rect', { x: 0, y: 0, width: W, height: H, fill: 'transparent' });
     const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: 'img', 'aria-label': windowLabel },
       s('path', { d: area, fill: 'var(--s1)', 'fill-opacity': 0.12 }),
-      s('path', { d, fill: 'none', stroke: 'var(--s1)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
+      s('path', { d: solidD, fill: 'none', stroke: 'var(--s1)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
+      dashD ? s('path', { d: dashD, fill: 'none', stroke: 'var(--s1)', 'stroke-width': 1.5, 'stroke-dasharray': '3 3', 'stroke-opacity': 0.8 }) : null,
       dot, cursor, hit);
     const rest = foot.textContent;
     hit.addEventListener('pointermove', (e) => {
@@ -371,7 +431,7 @@
       const px = ((e.clientX - r.left) / r.width) * W;
       const i = Math.max(0, Math.min(pts.length - 1, Math.round(((px - pad) / (W - 2 * pad)) * (pts.length - 1))));
       cursor.setAttribute('cx', x(i)); cursor.setAttribute('cy', y(pts[i].v)); cursor.setAttribute('visibility', 'visible');
-      foot.textContent = fmtDate(pts[i].d) + ' · ' + fmtPct(pts[i].v);
+      foot.textContent = fmtDate(pts[i].d) + ' · ' + fmtPct(pts[i].v) + (pts[i].rc ? ' · ' + t('rc_tag') : '');
     });
     hit.addEventListener('pointerleave', () => { cursor.setAttribute('visibility', 'hidden'); foot.textContent = rest; });
     box.append(svg);
@@ -379,6 +439,7 @@
 
   /* --------------------------------------------------------------------- tiles */
   function histWindow(days) {
+    if (!isFinite(days)) return V().history;
     const cut = dateObj(S.latest.date).getTime() - days * DAY;
     return V().history.filter((e) => dateObj(e.d).getTime() >= cut);
   }
@@ -387,8 +448,9 @@
     const v = V();
     const p = state.period;
     const dl = v.deltas[String(p)];
-    const win = Math.max(p, 7);
+    const win = isAll(p) ? Infinity : Math.max(p, 7);
     const hist = histWindow(win);
+    const winText = win === Infinity ? t('spark_full') : t('spark_all', { n: win });
     const sparks = [];
 
     const tiles = S.tops.map((n, i) => {
@@ -396,18 +458,18 @@
       const pp = dl ? dl.pp[i] : null;
       let deltaEl;
       if (pp == null) {
-        deltaEl = h('div', { class: 'delta', title: t('na_hist', { p, have: spanDays() }) }, '— ', h('span', { class: 'muted' }, periodLabel(p)));
+        deltaEl = h('div', { class: 'delta', title: naHist(p) }, '— ', h('span', { class: 'muted' }, periodLabel(p)));
       } else {
         const arrow = pp > 0.004 ? '▲' : pp < -0.004 ? '▼' : '•';
         const col = pp > 0.004 ? 'rgb(var(--up))' : pp < -0.004 ? 'rgb(var(--down))' : 'var(--muted)';
-        deltaEl = h('div', { class: 'delta', title: t('vs_ref', { date: fmtDate(dl.ref) }) },
+        deltaEl = h('div', { class: 'delta' + (dl.rc ? ' rc' : ''), title: refTitle(dl) },
           h('span', { class: 'arrow', style: 'color:' + col, 'aria-hidden': 'true' }, arrow),
           fmtPP(pp) + ' pp ', h('span', { class: 'muted' }, periodLabel(p)));
       }
       const spark = h('div', { class: 'spark' });
-      const foot = h('div', { class: 'foot' }, t('spark_all', { n: win }));
-      const pts = hist.map((e) => ({ d: e.d, v: e.s[i] })).filter((q) => q.v != null);
-      sparks.push(() => sparkline(spark, pts, foot, t('top_n', { n }) + ', ' + t('spark_all', { n: win })));
+      const foot = h('div', { class: 'foot' }, winText);
+      const pts = hist.map((e) => ({ d: e.d, t: dateObj(e.d).getTime(), v: e.s[i], rc: !!e.rc })).filter((q) => q.v != null);
+      sparks.push(() => sparkline(spark, pts, foot, t('top_n', { n }) + ', ' + winText));
       return h('div', { class: 'tile' },
         h('div', { class: 'eyebrow' }, t('top_n', { n: fmtInt(n) })),
         h('div', { class: 'val' }, val == null ? '—' : [dec(2).format(val), h('small', {}, '%')]),
@@ -419,7 +481,9 @@
 
     return h('section', {},
       h('div', { class: 'sec-head' },
-        h('div', {}, h('h2', {}, t('conc_h')), h('p', {}, t('conc_p', { period: PERIOD_WORDS[state.lang][p] }))),
+        h('div', {}, h('h2', {}, t('conc_h')), h('p', {}, isAll(p)
+          ? t('conc_p_all', { date: fmtDate(dl ? dl.ref : S.first_date) })
+          : t('conc_p', { period: periodWords(p) }))),
         periodChips()),
       h('div', { class: 'tiles' }, tiles));
   }
@@ -522,7 +586,7 @@
 
   function trendPoints() {
     const idx = state.topIdx;
-    let pts = V().history.map((e) => ({ d: e.d, t: dateObj(e.d).getTime(), v: e.s[idx] })).filter((p) => p.v != null);
+    let pts = V().history.map((e) => ({ d: e.d, t: dateObj(e.d).getTime(), v: e.s[idx], rc: !!e.rc })).filter((p) => p.v != null);
     if (isFinite(state.range)) {
       const cut = dateObj(S.latest.date).getTime() - state.range * DAY;
       pts = pts.filter((p) => p.t >= cut);
@@ -543,7 +607,7 @@
     let lo = Math.min(...pts.map((p) => p.v)), hi = Math.max(...pts.map((p) => p.v));
     if (hi - lo < 0.02) { const mid = (hi + lo) / 2; lo = mid - 0.1; hi = mid + 0.1; }
     const pad = (hi - lo) * 0.12;
-    const { ticks, step } = niceTicks(lo - pad, hi + pad, 5);
+    const { ticks, step } = niceTicks(Math.max(0, lo - pad), Math.min(100, hi + pad), 5);
     const y0 = ticks[0], y1 = ticks[ticks.length - 1];
     const decimals = Math.min(3, Math.max(0, -Math.floor(Math.log10(step) + 1e-9)));
     const t0 = pts[0].t, t1 = pts[pts.length - 1].t;
@@ -559,6 +623,7 @@
 
     const path = pts.map((p, i) => (i ? 'L' : 'M') + x(p.t).toFixed(1) + ' ' + y(p.v).toFixed(1)).join('');
     const areaD = path + `L${x(t1).toFixed(1)} ${m.t + ph}L${x(t0).toFixed(1)} ${m.t + ph}Z`;
+    const [solidD, dashD] = splitPath(pts, (p) => x(p.t), (p) => y(p.v));
 
     const grid = s('g', { class: 'grid' }, ticks.map((v) => s('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v) })));
     const yAxis = s('g', { class: 'axis' }, ticks.map((v) => s('text', { x: m.l - 8, y: y(v) + 4, 'text-anchor': 'end' }, fmtPct(v, decimals))));
@@ -566,7 +631,10 @@
       s('line', { class: 'base', x1: m.l, x2: W - m.r, y1: m.t + ph, y2: m.t + ph }),
       xt.map((tm, i) => s('text', { x: x(tm), y: H - 8, 'text-anchor': i === 0 ? 'start' : i === nx - 1 ? 'end' : 'middle' }, fmtTick(tm))));
 
-    const dots = pts.length <= 45 ? pts.map((p) => s('circle', { cx: x(p.t), cy: y(p.v), r: 2.5, fill: 'var(--s1)' })) : [];
+    // live snapshots are filled dots, reconstructed ones hollow (dots only when there are few points)
+    const dots = pts.length <= 45 ? pts.map((p) => p.rc
+      ? s('circle', { cx: x(p.t), cy: y(p.v), r: 3, fill: 'var(--surface)', stroke: 'var(--s1)', 'stroke-width': 1.5 })
+      : s('circle', { cx: x(p.t), cy: y(p.v), r: 2.5, fill: 'var(--s1)' })) : [];
     const last = pts[pts.length - 1];
     const endDot = s('circle', { cx: x(last.t), cy: y(last.v), r: 4.5, fill: 'var(--s1)', stroke: 'var(--surface)', 'stroke-width': 2 });
 
@@ -578,7 +646,8 @@
     const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: 'img', 'aria-label': label + ', ' + fmtDate(pts[0].d) + ' – ' + fmtDate(last.d) },
       grid, yAxis, xAxis,
       s('path', { d: areaD, fill: 'var(--s1)', 'fill-opacity': 0.10 }),
-      s('path', { d: path, fill: 'none', stroke: 'var(--s1)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
+      s('path', { d: solidD, fill: 'none', stroke: 'var(--s1)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
+      dashD ? s('path', { class: 'rc-line', d: dashD, fill: 'none', stroke: 'var(--s1)', 'stroke-width': 1.75, 'stroke-dasharray': '5 4', 'stroke-opacity': 0.85 }) : null,
       dots, endDot, cross, cursor, hit);
     box.append(svg);
     const tip = makeTip(box);
@@ -593,8 +662,10 @@
       const cx = x(p.t), cy = y(p.v);
       cross.setAttribute('x1', cx); cross.setAttribute('x2', cx); cross.setAttribute('visibility', 'visible');
       cursor.setAttribute('cx', cx); cursor.setAttribute('cy', cy); cursor.setAttribute('visibility', 'visible');
+      cursor.setAttribute('fill', p.rc ? 'var(--surface)' : 'var(--s1)');
+      cursor.setAttribute('stroke', p.rc ? 'var(--s1)' : 'var(--surface)');
       const scale = r.width / W;
-      tip.show([h('b', {}, fmtDate(p.d)), line(t('top_n', { n: fmtInt(S.tops[state.topIdx]) }) + ' ' + t('tip_holds'), fmtPct(p.v))], cx * scale, cy * scale);
+      tip.show([h('b', {}, fmtDate(p.d) + (p.rc ? ' · ' + t('rc_tag') : '')), line(t('top_n', { n: fmtInt(S.tops[state.topIdx]) }) + ' ' + t('tip_holds'), fmtPct(p.v))], cx * scale, cy * scale);
     }
     hit.addEventListener('pointermove', at);
     hit.addEventListener('pointerdown', at);
@@ -608,7 +679,7 @@
         type: 'button', class: 'chip', 'data-key': 'top-' + i, 'aria-pressed': String(state.topIdx === i),
         onclick: () => { state.topIdx = i; render(); }
       }, t('top_n', { n: fmtInt(n) }))));
-    const ranges = [30, 90, 180, 365, Infinity];
+    const ranges = [30, 90, 180, 365, 730, Infinity];
     const rChips = h('div', { class: 'chips', role: 'group', 'aria-label': t('period') },
       ranges.map((r) => h('button', {
         type: 'button', class: 'chip', 'data-key': 'range-' + r, 'aria-pressed': String(state.range === r),
@@ -621,7 +692,7 @@
       const pts = trendPoints().slice().reverse();
       details.append(h('div', { class: 'scroll', style: 'max-height:260px;overflow:auto;margin-top:6px' }, h('table', {},
         h('thead', {}, h('tr', {}, h('th', {}, t('col_date')), h('th', {}, t('top_n', { n: fmtInt(S.tops[state.topIdx]) }) + ' ' + t('of_supply')))),
-        h('tbody', {}, pts.map((p) => h('tr', {}, h('td', {}, fmtDate(p.d)), h('td', {}, fmtPct(p.v, 3))))))));
+        h('tbody', {}, pts.map((p) => h('tr', {}, h('td', {}, fmtDate(p.d) + (p.rc ? ' (' + t('rc_tag') + ')' : '')), h('td', {}, fmtPct(p.v, 3))))))));
     });
 
     resizers.push(() => renderTrend(box));
@@ -631,7 +702,11 @@
       h('div', { class: 'sec-head' },
         h('div', {}, h('h2', {}, t('trend_h')), h('p', {}, t('trend_p'))),
         rChips),
-      h('div', { class: 'panel' }, nChips, h('div', { style: 'height:12px' }), box, details));
+      h('div', { class: 'panel' }, nChips, h('div', { style: 'height:12px' }), box,
+        V().history.some((e) => e.rc)
+          ? h('p', { class: 'small muted rc-note', style: 'margin:8px 0 0' }, h('span', { class: 'rc-swatch', 'aria-hidden': 'true' }), t('rc_note', { date: fmtDate(S.first_live_date || S.latest.date) }))
+          : null,
+        details));
   }
 
   /* ------------------------------------------------------------------- matrix */
@@ -645,18 +720,18 @@
 
     const head = h('tr', {}, h('th', {}, t('group')), cols.map((p) => {
       const d = v.deltas[String(p)];
-      return h('th', { title: d ? t('vs_ref', { date: fmtDate(d.ref) }) : t('na_hist', { p, have: spanDays() }) }, periodLabel(p));
+      return h('th', { class: d && d.rc ? 'rc' : null, title: d ? refTitle(d) : naHist(p) }, periodLabel(p));
     }));
 
     const body = S.tops.map((n, i) => h('tr', {}, h('td', {}, t('top_n', { n: fmtInt(n) })),
       cols.map((p, ci) => {
         const d = v.deltas[String(p)];
         const val = d ? d.pp[i] : null;
-        if (val == null) return h('td', { class: 'na', title: t('na_hist', { p, have: spanDays() }) }, '—');
+        if (val == null) return h('td', { class: 'na', title: naHist(p) }, '—');
         const a = 0.06 + 0.30 * Math.min(1, Math.abs(val) / colMax[ci]);
         const bg = Math.abs(val) < 0.005 ? '' : `background:rgba(var(${val > 0 ? '--up' : '--down'}),${a.toFixed(2)})`;
         const arrow = val > 0.004 ? '▲ ' : val < -0.004 ? '▼ ' : '';
-        return h('td', { style: bg }, arrow + fmtPP(val));
+        return h('td', { style: bg, class: d.rc ? 'rc' : null, title: refTitle(d) }, arrow + fmtPP(val));
       })));
 
     return h('section', {},
@@ -665,7 +740,9 @@
         h('div', { class: 'scroll' }, h('table', { class: 'matrix' }, h('thead', {}, head), h('tbody', {}, body))),
         h('div', { class: 'legend-line', style: 'margin-top:10px' },
           h('span', {}, h('span', { class: 'sw', style: 'background:rgba(var(--up),0.5)' }), '▲ ' + t('more')),
-          h('span', {}, h('span', { class: 'sw', style: 'background:rgba(var(--down),0.5)' }), '▼ ' + t('less')))));
+          h('span', {}, h('span', { class: 'sw', style: 'background:rgba(var(--down),0.5)' }), '▼ ' + t('less')),
+          cols.some((p) => v.deltas[String(p)] && v.deltas[String(p)].rc)
+            ? h('span', {}, h('span', { class: 'sw rc-sw' }), t('rc_cols')) : null)));
   }
 
   /* ------------------------------------------------------------------- movers */
@@ -679,7 +756,7 @@
     const head = h('div', { class: 'sec-head' },
       h('div', {}, h('h2', {}, t('move_h')), h('p', {}, t('move_note'))), periodChips());
     if (!c) {
-      return h('section', {}, head, h('div', { class: 'panel empty' }, t('na_hist', { p: state.period, have: spanDays() })));
+      return h('section', {}, head, h('div', { class: 'panel empty' }, naHist(state.period)));
     }
     const list = (title, cols, rows) => h('div', { class: 'panel' }, h('h3', {}, title),
       rows.length
@@ -692,7 +769,8 @@
         h('span', {}, t('entered') + ' ', h('b', {}, fmtInt(c.entered))),
         h('span', {}, t('exited') + ' ', h('b', {}, fmtInt(c.exited))),
         c.cutoff_now != null ? h('span', {}, t('threshold_now') + ' ', h('b', {}, fmtCompact(c.cutoff_now) + ' PEP'),
-          c.cutoff_ref != null ? ' (' + t('threshold_was') + ' ' + fmtCompact(c.cutoff_ref) + ')' : '') : null),
+          c.cutoff_ref != null ? ' (' + t('threshold_was') + ' ' + fmtCompact(c.cutoff_ref) + ')' : '') : null,
+        c.rc ? h('span', { class: 'rc-text' }, t('rc_ref', { date: fmtDate(c.ref) })) : null),
       h('div', { class: 'movers' },
         list(t('buyers'), ['col_addr', 'col_change', 'col_bal'], c.gainers.map((r) => h('tr', {}, addrCell(r.a, r.l), h('td', {}, signed(r.d)), h('td', {}, fmtCompact(r.b))))),
         list(t('sellers'), ['col_addr', 'col_change', 'col_bal'], c.losers.map((r) => h('tr', {}, addrCell(r.a, r.l), h('td', {}, signed(r.d)), h('td', {}, fmtCompact(r.b))))),

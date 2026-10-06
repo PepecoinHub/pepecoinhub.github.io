@@ -2,8 +2,16 @@
 """Turn the daily snapshots into the files the web page reads.
 
 Reads   docs/data/snapshots/*.json   and   docs/data/labels.json
+        docs/data/reconstructed_daily.json   (optional, daily shares rebuilt from the chain)
 Writes  docs/data/summary.json       (everything the page needs)
         docs/data/shares.csv         (daily share of supply held by top N, for download)
+
+Snapshots come in two kinds. Live ones are written every day by snapshot.py.
+Reconstructed ones (meta.reconstructed = true) were rebuilt by replaying the
+blockchain for the days before the live history began. Both are treated the
+same in the numbers; reconstructed points carry "rc" so the page can draw them
+differently. reconstructed_daily.json only adds trend points on days that have
+no snapshot file; it never overrides a snapshot.
 
 Two views are computed for every number:
   all  every address as it appears on chain
@@ -24,7 +32,10 @@ import sys
 SATS = 10**8
 TOPS = [10, 25, 50, 100, 400, 1000]
 TIERS = [(1, 10), (11, 50), (51, 100), (101, 400), (401, 1000)]
-PERIODS = [1, 7, 14, 30, 90, 180, 365]
+# Comparison periods for the tiles, the change table and "who moved": days back
+# from the latest snapshot, or "all" for the earliest snapshot there is.
+# For a 5-year column add 1825 before "all".
+PERIODS = [1, 7, 14, 30, 90, 180, 365, 730, "all"]
 EXCLUDE_TYPES = {"exchange", "pool", "burn"}
 LIST_LEN = 10          # entries per churn list
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -39,6 +50,41 @@ def load_labels(path):
     return {k: v for k, v in raw.items() if not k.startswith("_") and isinstance(v, dict)}
 
 
+def is_reconstructed(meta):
+    return bool(meta.get("reconstructed")) or meta.get("supply_source") == "chain-replay"
+
+
+def excluded_set(labels):
+    return sorted(a for a, v in labels.items() if v.get("type") in EXCLUDE_TYPES)
+
+
+def load_daily_series(path, labels):
+    """Optional daily points rebuilt from the chain: {date: {"supply", "all", "ex"}}.
+
+    The "ex" numbers depend on which addresses were tagged when the file was made,
+    so they are only used while labels.json still excludes exactly those addresses.
+    The "all" numbers do not depend on tags and are always used."""
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        raw = json.load(fh)
+    if raw.get("tops") != TOPS or [list(t) for t in TIERS] != raw.get("tiers"):
+        print(f"{os.path.basename(path)}: tops/tiers differ from this script, ignoring it", file=sys.stderr)
+        return {}
+    ex_ok = raw.get("excluded") == excluded_set(labels)
+    if not ex_ok:
+        print(f"{os.path.basename(path)}: exchange/pool tags changed since it was made, so its "
+              "'without exchanges' points are skipped (regenerate it to bring them back)", file=sys.stderr)
+    out = {}
+    for d, supply, s_all, t_all, r_all, s_ex, t_ex, r_ex in raw["days"]:
+        out[dt.date.fromisoformat(d)] = {
+            "supply": int(supply),
+            "all": {"shares": s_all, "tiers": t_all, "rest": r_all},
+            "ex": {"shares": s_ex, "tiers": t_ex, "rest": r_ex} if ex_ok else None,
+        }
+    return out
+
+
 def load_snapshots(directory):
     snaps = []
     for path in sorted(glob.glob(os.path.join(directory, "????-??-??.json"))):
@@ -51,6 +97,7 @@ def load_snapshots(directory):
             "meta": meta,
             "supply": int(meta["supply_sats"]),
             "rows": rows,
+            "rc": is_reconstructed(meta),
         })
     snaps.sort(key=lambda s: s["date"])
     return snaps
@@ -141,7 +188,10 @@ def churn(cur_rows, ref_rows, labels):
 
 # ----------------------------------------------------------------------- reference day
 def find_ref(snaps, dates, latest_date, days):
-    """Latest snapshot on or before (latest - days), provided it is not stale."""
+    """Latest snapshot on or before (latest - days), provided it is not stale.
+    days == "all" means the earliest snapshot."""
+    if days == "all":
+        return snaps[0] if snaps[0]["date"] < latest_date else None
     target = latest_date - dt.timedelta(days=days)
     i = bisect.bisect_right(dates, target) - 1
     if i < 0:
@@ -159,6 +209,7 @@ def build(data_dir, out_path, csv_path):
     if not snaps:
         print("No snapshots found, nothing to build.", file=sys.stderr)
         return 1
+    daily = load_daily_series(os.path.join(data_dir, "reconstructed_daily.json"), labels)
 
     dates = [s["date"] for s in snaps]
     latest = snaps[-1]
@@ -170,10 +221,20 @@ def build(data_dir, out_path, csv_path):
             rows, denom = make_view(s, labels, view)
             cache[(s["date"], view)] = (rows, denom, metrics(rows, denom))
 
-        history = []
+        # one point per snapshot, plus reconstructed daily points on days without one
+        points = {}
         for s in snaps:
             m = cache[(s["date"], view)][2]
-            history.append({"d": s["date"].isoformat(), "s": m["shares"], "t": m["tiers"], "r": m["rest"]})
+            e = {"d": s["date"].isoformat(), "s": m["shares"], "t": m["tiers"], "r": m["rest"]}
+            if s["rc"]:
+                e["rc"] = 1
+            points[s["date"]] = e
+        for d, day in daily.items():
+            if d in points or d > latest["date"] or day[view] is None:
+                continue
+            m = day[view]
+            points[d] = {"d": d.isoformat(), "s": m["shares"], "t": m["tiers"], "r": m["rest"], "rc": 2}
+        history = [points[d] for d in sorted(points)]
 
         cur_rows, cur_denom, cur_m = cache[(latest["date"], view)]
         deltas, churns = {}, {}
@@ -188,6 +249,9 @@ def build(data_dir, out_path, csv_path):
                   for a, b in zip(cur_m["shares"], ref_m["shares"])]
             deltas[str(p)] = {"ref": ref["date"].isoformat(), "pp": pp}
             churns[str(p)] = dict(churn(cur_rows, ref_rows, labels), ref=ref["date"].isoformat())
+            if ref["rc"]:
+                deltas[str(p)]["rc"] = 1
+                churns[str(p)]["rc"] = 1
 
         views[view] = {
             "denominator": pep(cur_denom),
@@ -218,6 +282,8 @@ def build(data_dir, out_path, csv_path):
         ])
 
     meta = latest["meta"]
+    live = [s for s in snaps if not s["rc"]]
+    all_dates = sorted({e["d"] for v in views.values() for e in v["history"]})
     summary = {
         "schema": 1,
         "generated_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -229,8 +295,12 @@ def build(data_dir, out_path, csv_path):
             "address_count": meta.get("address_count"),
             "rows": len(latest["rows"]),
         },
-        "first_date": snaps[0]["date"].isoformat(),
+        "first_date": all_dates[0],
         "snapshots": len(snaps),
+        "live_snapshots": len(live),
+        "first_live_date": live[0]["date"].isoformat() if live else None,
+        "reconstructed_snapshots": len(snaps) - len(live),
+        "reconstructed_daily": sum(1 for e in views["all"]["history"] if e.get("rc") == 2),
         "tops": TOPS,
         "tiers": [list(t) for t in TIERS],
         "periods": PERIODS,
@@ -243,14 +313,23 @@ def build(data_dir, out_path, csv_path):
 
     with open(csv_path, "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
-        w.writerow(["date", "supply_pep"] + [f"top{n}_pct_all" for n in TOPS] + [f"top{n}_pct_ex" for n in TOPS])
-        for i, s in enumerate(snaps):
-            a = views["all"]["history"][i]["s"]
-            e = views["ex"]["history"][i]["s"]
-            w.writerow([s["date"].isoformat(), pep(s["supply"])] + ["" if v is None else v for v in a + e])
+        w.writerow(["date", "supply_pep"] + [f"top{n}_pct_all" for n in TOPS] + [f"top{n}_pct_ex" for n in TOPS]
+                   + ["source"])
+        by_date = {s["date"].isoformat(): s for s in snaps}
+        ex_hist = {e["d"]: e for e in views["ex"]["history"]}
+        blank = [None] * len(TOPS)
+        for a in views["all"]["history"]:
+            d = a["d"]
+            snap = by_date.get(d)
+            supply = snap["supply"] if snap else daily[dt.date.fromisoformat(d)]["supply"]
+            e = ex_hist.get(d, {}).get("s", blank)
+            source = "reconstructed-daily" if a.get("rc") == 2 else "reconstructed" if a.get("rc") else "live"
+            w.writerow([d, pep(supply)] + ["" if v is None else v for v in a["s"] + e] + [source])
 
     size = os.path.getsize(out_path) / 1024
-    print(f"Built {out_path} ({size:.0f} KB) from {len(snaps)} snapshot(s), latest {latest['date']}")
+    print(f"Built {out_path} ({size:.0f} KB) from {len(snaps)} snapshot(s) "
+          f"({len(live)} live, {len(snaps) - len(live)} reconstructed) and "
+          f"{summary['reconstructed_daily']} reconstructed daily point(s), latest {latest['date']}")
     return 0
 
 
