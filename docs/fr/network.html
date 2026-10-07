@@ -68,18 +68,18 @@
 </header>
 <main class="wrap" id="main">
 <header class="page-head">
-  <p class="eyebrow">Réseau · données au <span id="s-date">Oct 6, 2026</span></p>
+  <p class="eyebrow">Réseau · données au <span id="s-date">6 oct. 2026</span></p>
   <h1>Le réseau Pepecoin, jour après jour</h1>
   <p class="lede">Un robot enregistre chaque jour la hauteur de bloc, l’offre et le nombre d’adresses qui détiennent des PEP. Voici ses chiffres, depuis février 2024.</p>
 </header>
 
 <section aria-label="Derniers chiffres">
   <div class="stats">
-    <div class="stat"><span class="label">Hauteur de bloc</span><span class="value" id="s-height">1,238,910</span><span class="sub">blocs depuis le 30 janvier 2024</span></div>
-    <div class="stat"><span class="label">Offre</span><span class="value" id="s-supply">104.83B</span><span class="sub">PEP, toutes les unités issues du minage</span></div>
-    <div class="stat"><span class="label">Adresses avec un solde</span><span class="value" id="s-addr">295,767</span><span class="sub">une adresse n’est pas une personne</span></div>
-    <div class="stat"><span class="label">Bloc moyen, 30 jours</span><span class="value" id="s-bt">62.6 s</span><span class="sub">objectif : 60 s</span></div>
-    <div class="stat"><span class="label">Nouveaux PEP par jour, 30 jours</span><span class="value" id="s-day">13.8M</span><span class="sub">14,4 M avec l’objectif de 60 s</span></div>
+    <div class="stat"><span class="label">Hauteur de bloc</span><span class="value" id="s-height">1 238 910</span><span class="sub">blocs depuis le 30 janvier 2024</span></div>
+    <div class="stat"><span class="label">Offre</span><span class="value" id="s-supply">104,83B</span><span class="sub">PEP, toutes les unités issues du minage</span></div>
+    <div class="stat"><span class="label">Adresses avec un solde</span><span class="value" id="s-addr">295 767</span><span class="sub">une adresse n’est pas une personne</span></div>
+    <div class="stat"><span class="label">Bloc moyen, 30 jours</span><span class="value" id="s-bt">62,6 s</span><span class="sub">objectif : 60 s</span></div>
+    <div class="stat"><span class="label">Nouveaux PEP par jour, 30 jours</span><span class="value" id="s-day">13,8M</span><span class="sub">14,4 M avec l’objectif de 60 s</span></div>
   </div>
   <p class="src" id="net-status"></p>
 </section>
@@ -248,7 +248,7 @@
       if (i < 0 || i >= n) { tip.hidden = true; return; }
       var b = data[i];
       tipAt(box, tip, (f.m.l + slot * (i + 0.5)) * box.clientWidth / f.W, y(b.perDay) * box.clientWidth / f.W,
-        '<span>' + monthName(b.m) + (b.m === thisMonth ? ' (en cours)' : '') + '</span><b>' + fmt(b.perDay) + '</b> blocs par jour · un toutes les <b>' + b.blockTime.toFixed(1) + ' s</b>');
+        '<span>' + monthName(b.m) + (b.m === thisMonth ? ' (en cours)' : '') + '</span><b>' + fmt(b.perDay) + '</b> blocs par jour · un toutes les <b>' + b.blockTime.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' s</b>');
     });
     svg.addEventListener('pointerleave', function () { tip.hidden = true; });
   }
@@ -259,7 +259,7 @@
     $('s-height').textContent = fmt(last[1]);
     $('s-supply').textContent = big(last[2]);
     $('s-addr').textContent = fmt(last[3]);
-    if (w) { $('s-bt').textContent = w.blockTime.toFixed(1) + ' s'; $('s-day').textContent = big(w.perDay); }
+    if (w) { $('s-bt').textContent = w.blockTime.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' s'; $('s-day').textContent = big(w.perDay); }
     var body = $('days'), recent = rows.slice(-15); body.textContent = '';
     for (var i = recent.length - 1; i > 0; i--) {
       var r = recent[i], tr = document.createElement('tr');

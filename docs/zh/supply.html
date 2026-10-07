@@ -82,8 +82,8 @@
   <div class="stats">
     <div class="stat"><span class="label">每个区块新增 PEP</span><span class="value">10,000</span><span class="sub">自区块 600,000 起固定</span></div>
     <div class="stat"><span class="label">每年新增 PEP</span><span class="value">5.26B</span><span class="sub">按 60 秒出块计算</span></div>
-    <div class="stat"><span class="label">通胀率，未来 12 个月</span><span class="value">5.0%</span><span class="sub">基于 104.8B 的供应量</span></div>
-    <div class="stat"><span class="label">第 25 年的通胀率</span><span class="value">2.3%</span><span class="sub">基于 231B 的供应量</span></div>
+    <div class="stat"><span class="label">通胀率，未来 12 个月</span><span class="value">5.0%</span><span class="sub">基于 1048 亿的供应量</span></div>
+    <div class="stat"><span class="label">第 25 年的通胀率</span><span class="value">2.3%</span><span class="sub">基于 2310 亿的供应量</span></div>
   </div>
 </section>
 
@@ -93,7 +93,7 @@
   <figure class="chart" id="chart" tabindex="0" aria-describedby="chart-help">
     <div class="chart-scroll">
       <svg viewBox="0 0 760 390" role="img" aria-label="2027 至 2051 年的两张对齐图表。总供应量从 1100 亿直线增长到 2360 亿 PEP，因为每年都新增同样的 52.6 亿枚 PEP。通胀率逐年下降，从 5.0% 降到 2.3%。">
-<text class="t" x="52" y="16">总供应量：每年新增 +5.26B PEP</text>
+<text class="t" x="52" y="16">总供应量：每年新增 +52.6 亿枚 PEP</text>
 <line class="grid" x1="52" x2="732" y1="124.0" y2="124.0"/>
 <text x="44" y="128.0" text-anchor="end">0</text>
 <line class="grid" x1="52" x2="732" y1="90.4" y2="90.4"/>
@@ -106,7 +106,7 @@
 <circle class="dot" cx="718.4" cy="44.6" r="5"/>
 <text class="v" x="75.6" y="78.0">110B</text>
 <text class="v" x="708.4" y="34.6" text-anchor="end">236B</text>
-<text class="t" x="52" y="174">通胀率：同样的 5.26B 占供应量的比例</text>
+<text class="t" x="52" y="174">通胀率：同样的 52.6 亿枚占供应量的比例</text>
 <line class="grid" x1="52" x2="732" y1="356.0" y2="356.0"/>
 <text x="44" y="360.0" text-anchor="end">0%</text>
 <line class="grid" x1="52" x2="732" y1="302.7" y2="302.7"/>
@@ -241,7 +241,7 @@
         <tr><th scope="row">300,000 – 399,999</th><td class="r">62,500</td><td class="r">6.25B</td></tr>
         <tr><th scope="row">400,000 – 499,999</th><td class="r">31,250</td><td class="r">3.13B</td></tr>
         <tr><th scope="row">500,000 – 599,999</th><td class="r">15,625</td><td class="r">1.56B</td></tr>
-        <tr class="hl"><th scope="row">600,000 及以后</th><td class="r">10,000</td><td class="r">每年 5.26B</td></tr>
+        <tr class="hl"><th scope="row">600,000 及以后</th><td class="r">10,000</td><td class="r">每年 52.6 亿</td></tr>
       </tbody>
     </table>
   </div>
@@ -322,9 +322,9 @@
     h.textContent = '截至 ' + d.year + '年10月的 12 个月';
     tip.appendChild(h);
     tip.appendChild(row('通胀率', d.infl.toFixed(2) + '%'));
-    tip.appendChild(row('新增 PEP', '5.26B'));
-    tip.appendChild(row('期初供应量', (d.supply - 5.256).toFixed(1) + 'B'));
-    tip.appendChild(row('期末供应量', d.supply.toFixed(1) + 'B'));
+    tip.appendChild(row('新增 PEP', '52.6 亿'));
+    tip.appendChild(row('期初供应量', Math.round((d.supply - 5.256) * 10) + ' 亿'));
+    tip.appendChild(row('期末供应量', Math.round(d.supply * 10) + ' 亿'));
     var r = slots[i].getBoundingClientRect();
     var f = fig.getBoundingClientRect();
     hair.setAttribute('x1', slots[i].dataset.cx);

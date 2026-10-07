@@ -172,12 +172,12 @@ button.combo-val:hover { border-color: var(--accent); }
 
     <div class="calc-out" aria-live="polite">
       <p class="out-line"><b id="r-amount">Bir PEP</b>, <b id="r-name">Dogecoin</b> piyasa değerinde <span id="r-when">bugün</span> şu kadar ederdi</p>
-      <p class="out-value" id="r-value">$0.1406</p>
-      <p class="out-meta"><span class="pill" id="r-mult">▲ 1,555×</span><span>bugün <b id="r-now">$0.00009042</b> değerinde</span></p>
+      <p class="out-value" id="r-value">$0,1406</p>
+      <p class="out-meta"><span class="pill" id="r-mult">▲ 1.555×</span><span>bugün <b id="r-now">$0,00009042</b> değerinde</span></p>
       <dl class="receipt">
-        <div><dt id="m-target-label">Dogecoin piyasa değeri bugün</dt><dd id="m-target">$14.7B</dd></div>
-        <div><dt>÷ Pepecoin arzı</dt><dd id="m-supply">104.8B PEP</dd></div>
-        <div><dt>= PEP başına</dt><dd id="m-price">$0.1406</dd></div>
+        <div><dt id="m-target-label">Dogecoin piyasa değeri bugün</dt><dd id="m-target">$14,7B</dd></div>
+        <div><dt>÷ Pepecoin arzı</dt><dd id="m-supply">104,8B PEP</dd></div>
+        <div><dt>= PEP başına</dt><dd id="m-price">$0,1406</dd></div>
         <div id="m-qty-row" hidden><dt>× PEP miktarınız</dt><dd id="m-qty"></dd></div>
       </dl>
       <p class="out-note" id="ath-note" hidden>Tüm zamanların en yükseği modu, coin'in en yüksek fiyatı × bugünkü arzını kullanır. Dogecoin gibi çıkarmaya devam eden coin'lerde zirvedeki gerçek piyasa değeri daha düşüktü, çünkü o zaman daha az coin vardı.</p>
@@ -208,7 +208,7 @@ button.combo-val:hover { border-color: var(--accent); }
 <section aria-labelledby="how">
   <h2 id="how">Rakamlar nasıl işler?</h2>
   <div class="prose">
-    <p><strong>Piyasa değeri fiyat × arzdır.</strong> Başka bir coin'in piyasa değerini var olan PEP sayısına, yaklaşık <span data-live="supply-b">104.8</span> milyara bölün; bir PEP'in o büyüklükte sahip olacağı fiyatı elde edersiniz. PEP'lerinizin değerini bulmak için bunu miktarınızla çarpın.</p>
+    <p><strong>Piyasa değeri fiyat × arzdır.</strong> Başka bir coin'in piyasa değerini var olan PEP sayısına, yaklaşık <span data-live="supply-b">104,8</span> milyara bölün; bir PEP'in o büyüklükte sahip olacağı fiyatı elde edersiniz. PEP'lerinizin değerini bulmak için bunu miktarınızla çarpın.</p>
     <p><strong>Bugün ya da zirvede.</strong> “Bugün” her coin'in güncel piyasa değerini kullanır. “Tüm zamanların en yükseğinde”, coin'in en yüksek fiyatı × bugünkü arzını kullanır. Dogecoin gibi çıkarmaya devam eden coin'lerde zirvedeki gerçek piyasa değeri daha düşüktü, çünkü o zaman daha az coin vardı.</p>
     <p><strong>Tahmin değildir.</strong> Piyasa değeri, piyasanın bugün bir coin için ödediği tutardır ve burada hiçbir şey Pepecoin'in başka bir coin'in büyüklüğüne ulaşacağını söylemez. PEP'in arzı da blok başına 10.000 PEP artar, bu yüzden aynı piyasa değeri zamanla PEP başına biraz daha düşük bir fiyat anlamına gelir. <a href="supply.html">Arz ve enflasyon.</a></p>
   </div>
@@ -349,8 +349,8 @@ button.combo-val:hover { border-color: var(--accent); }
     if (x >= 10) return x.toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + '×';
     return x.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) + '×';
   }
-  function pct(x) { return (x * 100).toLocaleString('tr-TR', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + '%'; }
-  function share(x) { return (x * 100).toLocaleString('tr-TR', { maximumSignificantDigits: 3 }) + '%'; }
+  function pct(x) { return '%' + (x * 100).toLocaleString('tr-TR', { maximumFractionDigits: 1, minimumFractionDigits: 1 }); }
+  function share(x) { return '%' + (x * 100).toLocaleString('tr-TR', { maximumSignificantDigits: 3 }); }
   function qtyText(v) { return v.toLocaleString('tr-TR', { maximumFractionDigits: 8 }); }
 
   // Accepts 13000000, 13,000,000, 13 000 000, 13.000.000, 13000000.5, 13,5 (decimal comma), 13m, 13 mln, 1.5b.
