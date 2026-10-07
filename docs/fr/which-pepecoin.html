@@ -33,7 +33,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="../facts.css">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Pepecoin (PEP) est-il la même chose que PEPE ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. PEPE est un jeton ERC-20 sur Ethereum. Pepecoin (PEP) est une cryptomonnaie native de sa propre blockchain à preuve de travail Scrypt."}}, {"@type": "Question", "name": "De quel portefeuille ai-je besoin ?", "acceptedAnswer": {"@type": "Answer", "text": "Pour le PEP, un portefeuille compatible avec le réseau Pepecoin, comme le Pepecoin Core officiel ou une carte Tangem. PEPE et PEPECOIN sont des jetons Ethereum : ils se conservent donc dans des portefeuilles Ethereum comme MetaMask, conçu pour les réseaux de type Ethereum et qui ne répertorie pas Pepecoin."}}, {"@type": "Question", "name": "Quelqu’un peut-il geler mes PEP au niveau du protocole ?", "acceptedAnswer": {"@type": "Answer", "text": "Le protocole Pepecoin n’a pas de liste noire d’administration. Comme pour Bitcoin ou Dogecoin, personne ne peut geler une adresse arbitraire au niveau de la chaîne. Une plateforme d’échange ou un portefeuille avec conservation par un tiers peut toutefois geler les soldes qu’il détient pour vous."}}, {"@type": "Question", "name": "Pourquoi Kraken peut-il afficher des restrictions géographiques pour le PEP ?", "acceptedAnswer": {"@type": "Answer", "text": "Cela relève de la politique de la plateforme d’échange et de la réglementation (dont MiCA dans l’EEE), et non d’une caractéristique de la blockchain Pepecoin."}}], "inLanguage": "fr"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Pepecoin (PEP) est-il la même chose que PEPE ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. PEPE est un jeton ERC-20 sur Ethereum. Pepecoin (PEP) est une cryptomonnaie native de sa propre blockchain à preuve de travail Scrypt."}}, {"@type": "Question", "name": "De quel portefeuille ai-je besoin ?", "acceptedAnswer": {"@type": "Answer", "text": "Pour le PEP, un portefeuille compatible avec le réseau Pepecoin, comme le Pepecoin Core officiel ou une carte Tangem. PEPE et PEPECOIN sont des jetons Ethereum : ils se conservent donc dans des portefeuilles Ethereum comme MetaMask, conçu pour les réseaux de type Ethereum et qui ne répertorie pas Pepecoin."}}, {"@type": "Question", "name": "Quelqu’un peut-il geler mes PEP au niveau du protocole ?", "acceptedAnswer": {"@type": "Answer", "text": "Le protocole Pepecoin n’a pas de liste noire d’administration. Comme pour Bitcoin ou Dogecoin, personne ne peut geler une adresse arbitraire au niveau de la chaîne. Une plateforme d’échange ou un portefeuille avec conservation par un tiers peut toutefois geler les soldes qu’il détient pour vous."}}, {"@type": "Question", "name": "Pourquoi Kraken peut-il afficher des restrictions géographiques pour le PEP ?", "acceptedAnswer": {"@type": "Answer", "text": "Cela relève de la politique de la plateforme d’échange et de la réglementation (dont MiCA dans l’EEE), et non d’une caractéristique de la blockchain Pepecoin."}}, {"@type": "Question", "name": "Comment vérifier le symbole lors d’un retrait ?", "acceptedAnswer": {"@type": "Answer", "text": "Choisissez Pepecoin (PEP) sur le réseau Pepecoin. Une adresse PEP commence par P. PEPE et PEPECOIN sont des jetons Ethereum ; leurs adresses commencent par 0x et appartiennent à un autre réseau."}}, {"@type": "Question", "name": "Et si j’envoie sur le mauvais réseau ?", "acceptedAnswer": {"@type": "Answer", "text": "Les envois sur le mauvais réseau sont généralement irréversibles. Le PEP sur la chaîne Pepecoin et le PEPE sur Ethereum ne sont pas interchangeables. Vérifiez que le symbole, le réseau et le format d’adresse correspondent avant d’envoyer. Vérifiez les transferts de PEP sur PepeBlocks ou Pepeplorer, et les jetons Ethereum sur Etherscan."}}, {"@type": "Question", "name": "Pourquoi CoinMarketCap peut-il afficher une offre différente de celle des explorateurs ?", "acceptedAnswer": {"@type": "Answer", "text": "Les explorateurs comme Pepeplorer affichent environ 104,8 milliards de PEP. Certains agrégateurs affichent encore environ 102,9 milliards. Privilégiez un explorateur en direct et daté."}}, {"@type": "Question", "name": "Une adresse du top des adresses correspond-elle à une seule personne ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Une adresse n’est pas une personne : les plateformes d’échange et les dépositaires détiennent les fonds de nombreux utilisateurs."}}], "inLanguage": "fr"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Aller au contenu</a>
@@ -125,7 +125,7 @@
         </tr>
         <tr>
           <th scope="row">Offre</th>
-          <td><span class="num">environ 104,8 milliards</span>, plus 10 000 par bloc, sans plafond</td>
+          <td><span class="num">environ <span data-live="supply-b">104,8</span> milliards</span>, plus 10 000 par bloc, sans plafond</td>
           <td><span class="num">420 690 milliards</span>, fixe</td>
           <td><span class="num">environ 107 millions</span> en circulation sur Ethereum</td>
         </tr>
@@ -202,7 +202,7 @@
     <dt>Pools (exemples)</dt>
     <dd>Entre autres : ViaBTC, AntPool, KuPool, Mining-Dutch, litecoinpool.org, Binance Pool, F2Pool, EMCD. Voir aussi les étiquettes de pools du <a href="../rich-list.html">top des adresses</a> et <a href="https://peppool.space/mining">peppool.space</a>. <span class="src">Transactions coinbase dans l’explorateur + tableaux de bord des pools</span></dd>
     <dt>Offre</dt>
-    <dd><span class="num">environ 104,8 milliards</span> de PEP selon des explorateurs comme Pepeplorer. Certains agrégateurs affichent encore environ 102,9 milliards — privilégiez un explorateur en direct et daté. <span class="src">Pepeplorer ; CoinMarketCap</span></dd>
+    <dd><span class="num">environ <span data-live="supply-b">104,8</span> milliards</span> de PEP selon des explorateurs comme Pepeplorer. Certains agrégateurs affichent encore environ 102,9 milliards — privilégiez un explorateur en direct et daté. <span class="src">Pepeplorer ; CoinMarketCap</span></dd>
     <dt>Kraken / MiCA</dt>
     <dd>Négociation du PEP sur Kraken à partir du <strong>11 février 2026</strong>. Livre blanc MiCA pour Pepecoin LLC (contexte de notification cité sur pepecoin.com : notifié le 7 avril 2026, publié le 8 mai 2026). La disponibilité géographique peut varier selon la région — cela relève de la politique de la plateforme d’échange et de la réglementation, pas d’une caractéristique de la chaîne. <span class="src">Blog de Kraken ; pepecoin.com/mica-whitepaper.xhtml</span></dd>
     <dt>Code</dt>
@@ -230,8 +230,20 @@
       <p>Cela relève de la politique de la plateforme d’échange et de la réglementation (dont MiCA dans l’EEE), et non d’une règle de consensus de Pepecoin.</p>
     </details>
     <details>
+      <summary>Comment vérifier le symbole lors d’un retrait ?</summary>
+      <p>Choisissez <strong>Pepecoin (PEP)</strong> sur le réseau <strong>Pepecoin</strong>. Une adresse PEP commence par <code>P</code>. PEPE et PEPECOIN sont des jetons Ethereum ; leurs adresses commencent par <code>0x</code> et appartiennent à un autre réseau. Voir la vérification d’adresse ci-dessus.</p>
+    </details>
+    <details>
       <summary>Et si j’envoie sur le mauvais réseau ?</summary>
-      <p>Le PEP sur la chaîne Pepecoin et le PEPE sur Ethereum ne sont pas interchangeables. Vérifiez toujours que le symbole, le réseau et le format d’adresse correspondent avant d’envoyer.</p>
+      <p>Les envois sur le mauvais réseau sont généralement irréversibles. Le PEP sur la chaîne Pepecoin et le PEPE sur Ethereum ne sont pas interchangeables. Vérifiez toujours que le symbole, le réseau et le format d’adresse correspondent avant d’envoyer. Vérifiez les transferts de PEP sur <a href="https://pepeblocks.com/">PepeBlocks</a> ou <a href="https://pepeplorer.com/">Pepeplorer</a> ; vérifiez les jetons Ethereum sur <a href="https://etherscan.io/">Etherscan</a>.</p>
+    </details>
+    <details>
+      <summary>Pourquoi CoinMarketCap peut-il afficher une offre différente de celle des explorateurs ?</summary>
+      <p>Les explorateurs comme Pepeplorer affichent <span class="num">environ <span data-live="supply-b">104,8</span> milliards</span> de PEP. Certains agrégateurs affichent encore <span class="num">environ 102,9 milliards</span> — privilégiez un explorateur en direct et daté. Voir « Pepecoin (PEP) en chiffres » ci-dessus.</p>
+    </details>
+    <details>
+      <summary>Une adresse du top des adresses correspond-elle à une seule personne ?</summary>
+      <p>Non. Une adresse n’est pas une personne : les plateformes d’échange et les dépositaires détiennent les fonds de nombreux utilisateurs. Voir les remarques du <a href="../rich-list.html">top des adresses</a>.</p>
     </details>
   </div>
 </section>
@@ -304,6 +316,7 @@ document.querySelectorAll('.copy').forEach(function (btn) {
   });
 });
 </script>
+<script src="../live.js" defer></script>
 <script src="../chrome.js" defer></script>
 </body>
 </html>

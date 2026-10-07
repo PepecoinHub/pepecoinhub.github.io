@@ -33,7 +33,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="../facts.css">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Pepecoin（PEP）就是 PEPE 吗？", "acceptedAnswer": {"@type": "Answer", "text": "不是。PEPE 是 Ethereum 上的 ERC-20 代币。Pepecoin（PEP）是运行在自有 Scrypt 工作量证明区块链上的原生币。"}}, {"@type": "Question", "name": "我需要什么钱包？", "acceptedAnswer": {"@type": "Answer", "text": "PEP 需要支持 Pepecoin 网络的钱包，例如官方的 Pepecoin Core 或 Tangem 卡。PEPE 和 PEPECOIN 是 Ethereum 代币，因此存放在 MetaMask 等 Ethereum 钱包中；MetaMask 专为 Ethereum 类网络打造，并未列出 Pepecoin。"}}, {"@type": "Question", "name": "有人能在协议层冻结我的 PEP 吗？", "acceptedAnswer": {"@type": "Answer", "text": "Pepecoin 协议没有管理员黑名单。与 Bitcoin 或 Dogecoin 一样，任何人都无法在链层冻结任意地址。交易所或托管钱包仍可冻结其代你持有的余额。"}}, {"@type": "Question", "name": "为什么 Kraken 可能对 PEP 显示地区限制？", "acceptedAnswer": {"@type": "Answer", "text": "这是交易所政策和监管（包括欧洲经济区的 MiCA）所致，而非 Pepecoin 区块链的特性。"}}], "inLanguage": "zh-Hans"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Pepecoin（PEP）就是 PEPE 吗？", "acceptedAnswer": {"@type": "Answer", "text": "不是。PEPE 是 Ethereum 上的 ERC-20 代币。Pepecoin（PEP）是运行在自有 Scrypt 工作量证明区块链上的原生币。"}}, {"@type": "Question", "name": "我需要什么钱包？", "acceptedAnswer": {"@type": "Answer", "text": "PEP 需要支持 Pepecoin 网络的钱包，例如官方的 Pepecoin Core 或 Tangem 卡。PEPE 和 PEPECOIN 是 Ethereum 代币，因此存放在 MetaMask 等 Ethereum 钱包中；MetaMask 专为 Ethereum 类网络打造，并未列出 Pepecoin。"}}, {"@type": "Question", "name": "有人能在协议层冻结我的 PEP 吗？", "acceptedAnswer": {"@type": "Answer", "text": "Pepecoin 协议没有管理员黑名单。与 Bitcoin 或 Dogecoin 一样，任何人都无法在链层冻结任意地址。交易所或托管钱包仍可冻结其代你持有的余额。"}}, {"@type": "Question", "name": "为什么 Kraken 可能对 PEP 显示地区限制？", "acceptedAnswer": {"@type": "Answer", "text": "这是交易所政策和监管（包括欧洲经济区的 MiCA）所致，而非 Pepecoin 区块链的特性。"}}, {"@type": "Question", "name": "提币时如何核对交易代码？", "acceptedAnswer": {"@type": "Answer", "text": "选择 Pepecoin 网络上的 Pepecoin（PEP）。PEP 地址以 P 开头。PEPE 和 PEPECOIN 是 Ethereum 代币，其地址以 0x 开头，属于另一个网络。"}}, {"@type": "Question", "name": "如果转错网络怎么办？", "acceptedAnswer": {"@type": "Answer", "text": "转错网络通常无法挽回。Pepecoin 链上的 PEP 与 Ethereum 上的 PEPE 不可互换。发送前请核对交易代码、网络和地址格式。PEP 转账可在 PepeBlocks 或 Pepeplorer 上查看，Ethereum 代币可在 Etherscan 上查看。"}}, {"@type": "Question", "name": "为什么 CoinMarketCap 显示的供应量可能与区块浏览器不同？", "acceptedAnswer": {"@type": "Answer", "text": "Pepeplorer 等区块浏览器显示约 1048 亿 PEP。部分聚合平台仍显示约 1029 亿。请优先参考注明日期的实时区块浏览器。"}}, {"@type": "Question", "name": "富豪榜上的一个地址就等于一个人吗？", "acceptedAnswer": {"@type": "Answer", "text": "不是。地址不等于个人：交易所和托管方为众多用户持有币。"}}], "inLanguage": "zh-Hans"}</script>
 </head>
 <body>
 <a class="skip" href="#main">跳到主要内容</a>
@@ -125,7 +125,7 @@
         </tr>
         <tr>
           <th scope="row">供应量</th>
-          <td><span class="num">约 1048 亿</span>，每个区块新增 10,000 枚，无上限</td>
+          <td><span class="num">约 <span data-live="supply-yi">1048</span> 亿</span>，每个区块新增 10,000 枚，无上限</td>
           <td><span class="num">420.69 万亿</span>，固定</td>
           <td><span class="num">约 1.07 亿</span>，在 Ethereum 上流通</td>
         </tr>
@@ -202,7 +202,7 @@
     <dt>矿池（示例）</dt>
     <dd>其中包括：ViaBTC、AntPool、KuPool、Mining-Dutch、litecoinpool.org、Binance Pool、F2Pool、EMCD。另见<a href="../rich-list.html">富豪榜</a>中的矿池标签以及 <a href="https://peppool.space/mining">peppool.space</a>。<span class="src">区块浏览器 coinbase + 矿池面板</span></dd>
     <dt>供应量</dt>
-    <dd>Pepeplorer 等区块浏览器显示为<span class="num">约 1048 亿</span> PEP。部分聚合平台仍显示约 1029 亿——请优先参考注明日期的实时区块浏览器。<span class="src">Pepeplorer；CoinMarketCap</span></dd>
+    <dd>Pepeplorer 等区块浏览器显示为<span class="num">约 <span data-live="supply-yi">1048</span> 亿</span> PEP。部分聚合平台仍显示约 1029 亿——请优先参考注明日期的实时区块浏览器。<span class="src">Pepeplorer；CoinMarketCap</span></dd>
     <dt>Kraken / MiCA</dt>
     <dd>PEP 自 <strong>2026年2月11日</strong>起在 Kraken 交易。Pepecoin LLC 的 MiCA 白皮书（pepecoin.com 上引用的通报信息：2026年4月7日通报，2026年5月8日发布）。可用性可能因地区而异——这是交易所政策和监管所致，并非链本身的特性。<span class="src">Kraken 博客；pepecoin.com/mica-whitepaper.xhtml</span></dd>
     <dt>源代码</dt>
@@ -230,8 +230,20 @@
       <p>这是交易所政策和监管（包括欧洲经济区的 MiCA）所致，而非 Pepecoin 的共识规则。</p>
     </details>
     <details>
+      <summary>提币时如何核对交易代码？</summary>
+      <p>选择 <strong>Pepecoin</strong> 网络上的 <strong>Pepecoin（PEP）</strong>。PEP 地址以 <code>P</code> 开头。PEPE 和 PEPECOIN 是 Ethereum 代币，其地址以 <code>0x</code> 开头，属于另一个网络。见上文的地址核对。</p>
+    </details>
+    <details>
       <summary>如果转错网络怎么办？</summary>
-      <p>Pepecoin 链上的 PEP 与 Ethereum 上的 PEPE 不可互换。发送前务必核对交易代码、网络和地址格式。</p>
+      <p>转错网络通常无法挽回。Pepecoin 链上的 PEP 与 Ethereum 上的 PEPE 不可互换。发送前务必核对交易代码、网络和地址格式。PEP 转账可在 <a href="https://pepeblocks.com/">PepeBlocks</a> 或 <a href="https://pepeplorer.com/">Pepeplorer</a> 上查看；Ethereum 代币可在 <a href="https://etherscan.io/">Etherscan</a> 上查看。</p>
+    </details>
+    <details>
+      <summary>为什么 CoinMarketCap 显示的供应量可能与区块浏览器不同？</summary>
+      <p>Pepeplorer 等区块浏览器显示为<span class="num">约 <span data-live="supply-yi">1048</span> 亿</span> PEP。部分聚合平台仍显示<span class="num">约 1029 亿</span>——请优先参考注明日期的实时区块浏览器。见上文“Pepecoin（PEP）数据一览”。</p>
+    </details>
+    <details>
+      <summary>富豪榜上的一个地址就等于一个人吗？</summary>
+      <p>不是。地址不等于个人：交易所和托管方为众多用户持有币。见<a href="../rich-list.html">富豪榜</a>中的说明。</p>
     </details>
   </div>
 </section>
@@ -304,6 +316,7 @@ document.querySelectorAll('.copy').forEach(function (btn) {
   });
 });
 </script>
+<script src="../live.js" defer></script>
 <script src="../chrome.js" defer></script>
 </body>
 </html>

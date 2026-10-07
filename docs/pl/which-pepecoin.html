@@ -125,7 +125,7 @@
         </tr>
         <tr>
           <th scope="row">Podaż</th>
-          <td><span class="num">ok. 104,8 mld</span>, plus 10 000 na blok, bez limitu</td>
+          <td><span class="num">ok. <span data-live="supply-b">104,8</span> mld</span>, plus 10 000 na blok, bez limitu</td>
           <td><span class="num">420,69 biliona</span>, stała</td>
           <td><span class="num">ok. 107 mln</span> w obiegu na Ethereum</td>
         </tr>
@@ -202,7 +202,7 @@
     <dt>Pule wydobywcze (przykłady)</dt>
     <dd>Między innymi: ViaBTC, AntPool, KuPool, Mining-Dutch, litecoinpool.org, Binance Pool, F2Pool, EMCD. Zobacz też tagi pul na <a href="../rich-list.html">liście najbogatszych adresów</a> i <a href="https://peppool.space/mining">peppool.space</a>. <span class="src">Transakcje coinbase w eksploratorze + panele pul</span></dd>
     <dt>Podaż</dt>
-    <dd><span class="num">ok. 104,8 mld</span> PEP według eksploratorów bloków, takich jak Pepeplorer. Niektóre agregatory wciąż pokazują ok. 102,9 mld — lepiej korzystaj z eksploratora z danymi na żywo i datą. <span class="src">Pepeplorer; CoinMarketCap</span></dd>
+    <dd><span class="num">ok. <span data-live="supply-b">104,8</span> mld</span> PEP według eksploratorów bloków, takich jak Pepeplorer. Niektóre agregatory wciąż pokazują ok. 102,9 mld — lepiej korzystaj z eksploratora z danymi na żywo i datą. <span class="src">Pepeplorer; CoinMarketCap</span></dd>
     <dt>Kraken / MiCA</dt>
     <dd>Handel PEP na Krakenie od <strong>11 lutego 2026</strong>. Biała księga MiCA dla Pepecoin LLC (kontekst zgłoszenia podany na pepecoin.com: zgłoszona 7 kwietnia 2026, opublikowana 8 maja 2026). Dostępność geograficzna może się różnić między regionami — to kwestia polityki giełdy i regulacji, a nie cecha łańcucha. <span class="src">Blog Krakena; pepecoin.com/mica-whitepaper.xhtml</span></dd>
     <dt>Kod</dt>
@@ -239,7 +239,7 @@
     </details>
     <details>
       <summary>Dlaczego CoinMarketCap może pokazywać inną podaż niż eksploratory?</summary>
-      <p>Eksploratory takie jak Pepeplorer pokazują ok. <span class="num">104,8 mld</span> PEP. Niektóre agregatory wciąż pokazują ok. <span class="num">102,9 mld</span> — lepiej korzystać z eksploratora z danymi na żywo i datą. Zobacz „Pepecoin (PEP) w liczbach” wyżej.</p>
+      <p>Eksploratory takie jak Pepeplorer pokazują ok. <span class="num"><span data-live="supply-b">104,8</span> mld</span> PEP. Niektóre agregatory wciąż pokazują ok. <span class="num">102,9 mld</span> — lepiej korzystać z eksploratora z danymi na żywo i datą. Zobacz „Pepecoin (PEP) w liczbach” wyżej.</p>
     </details>
     <details>
       <summary>Czy adres z listy najbogatszych to jedna osoba?</summary>
@@ -316,6 +316,7 @@ document.querySelectorAll('.copy').forEach(function (btn) {
   });
 });
 </script>
+<script src="../live.js" defer></script>
 <script src="../chrome.js" defer></script>
 </body>
 </html>
