@@ -301,3 +301,19 @@ html:lang(zh) {
   background: var(--accent-soft); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
 }
 .pledge::before { content: "✓"; flex: none; color: var(--accent); font-weight: 700; }
+
+/* Header brand: the official Pepecoin lockup (light/dark ink) plus "Hub" */
+.brand-hub-link { gap: 10px; }
+.brand-hub-link .lockup { width: auto; height: 38px; object-fit: contain; }
+.brand-hub-link .on-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .brand-hub-link .on-light { display: none; }
+  :root:not([data-theme="light"]) .brand-hub-link .on-dark { display: block; }
+}
+:root[data-theme="dark"] .brand-hub-link .on-light { display: none; }
+:root[data-theme="dark"] .brand-hub-link .on-dark { display: block; }
+.brand-hub-link .hub {
+  font: italic 700 1.2rem/1 var(--f-display); letter-spacing: 0.01em; color: #212121;
+  background: var(--gold); padding: 5px 10px 6px; border-radius: 8px; transform: translateY(1px);
+}
+@media (max-width: 380px) { .brand-hub-link .lockup { height: 32px; } .brand-hub-link .hub { font-size: 1.05rem; } }
