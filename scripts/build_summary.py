@@ -371,11 +371,52 @@ def build(data_dir, out_path, csv_path):
     except Exception as exc:  # noqa: BLE001
         print(f"network.json skipped: {exc}", file=sys.stderr)
 
+    try:   # same: the plain-HTML numbers on the rich list page are a bonus
+        write_rich_list_static(summary, os.path.join(data_dir, "..", "rich-list.html"))
+        print("Updated the plain-HTML summary in rich-list.html")
+    except Exception as exc:  # noqa: BLE001
+        print(f"rich-list.html summary skipped: {exc}", file=sys.stderr)
+
     size = os.path.getsize(out_path) / 1024
     print(f"Built {out_path} ({size:.0f} KB) from {len(snaps)} snapshot(s) "
           f"({len(live)} live, {len(snaps) - len(live)} reconstructed) and "
           f"{summary['reconstructed_daily']} reconstructed daily point(s), latest {latest['date']}")
     return 0
+
+
+RICH_LIST_START = "<!-- static-summary:start -->"
+RICH_LIST_END = "<!-- static-summary:end -->"
+
+
+def write_rich_list_static(summary, html_path):
+    """Put today's numbers into rich-list.html as plain HTML, for search engines and visitors
+    without JavaScript. app.js replaces this block with the charts, so the page looks the same."""
+    with open(html_path, encoding="utf-8") as fh:
+        page = fh.read()
+    a, b = page.find(RICH_LIST_START), page.find(RICH_LIST_END)
+    if a < 0 or b < a:
+        raise ValueError("static-summary markers not found")
+    latest = summary["latest"]
+    day = dt.date.fromisoformat(latest["date"])
+    when = f"{day:%b} {day.day}, {day.year}"
+    shares = summary["views"]["all"]["shares"]
+    parts = " · ".join(f"top {n:,}: {v:.2f}%" for n, v in zip(summary["tops"], shares) if v is not None)
+    block_at = f" (block {latest['height']:,})" if latest.get("height") else ""
+    block = (
+        f"{RICH_LIST_START}\n"
+        f'  <header class="page-head">\n'
+        f'    <p class="eyebrow">Rich list · snapshot of {when}</p>\n'
+        f"    <h1>Pepecoin Holder Watch</h1>\n"
+        f'    <p class="lede">How much of the PEP supply sits in the biggest wallets, and how that changes. '
+        f"One snapshot of the top ~2000 addresses every day; the charts focus on the top 1000.</p>\n"
+        f"  </header>\n"
+        f'  <p id="boot">Share of the circulating supply held by the largest addresses on {when}{block_at}: {parts}. '
+        f'Every day since February 2024: <a href="data/shares.csv">shares.csv</a>.</p>\n'
+        f"  {RICH_LIST_END}"
+    )
+    page = page[:a] + block + page[b + len(RICH_LIST_END):]
+    with open(html_path, "w", encoding="utf-8") as fh:
+        fh.write(page)
 
 
 def main():

@@ -27,6 +27,9 @@ jobs:
       contents: write              # commit the new snapshot
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0             # full history, so the sitemap can date each page by its last change
+          filter: blob:none          # but only the file contents of the current commit
 
       - uses: actions/setup-python@v5
         with:
@@ -51,11 +54,14 @@ jobs:
             echo "No snapshots yet, publishing the empty state."
           fi
 
+      - name: Date the sitemap
+        run: python scripts/build_sitemap.py || echo "sitemap dates not updated"
+
       - name: Commit data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data
+          git add docs/data docs/rich-list.html docs/sitemap.xml
           if git diff --cached --quiet; then
             echo "Nothing new to commit."
           else
