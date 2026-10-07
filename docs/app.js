@@ -12,6 +12,8 @@
   const STR = {
     en: {
       title: 'Pepecoin Holder Watch',
+      eyebrow: 'Rich list · snapshot of {date}',
+      eyebrow_plain: 'Rich list',
       lede: 'How much of the PEP supply sits in the biggest wallets, and how that changes. One snapshot of the top ~2000 addresses every day; the charts focus on the top 1000.',
       view_all: 'All addresses',
       view_ex: 'Without exchanges & pools',
@@ -99,7 +101,7 @@
       csv: 'Download daily history (CSV)',
       nofa: 'Not financial advice.',
       theme: 'Theme', auto: 'Auto', light: 'Light', dark: 'Dark',
-      lang_to: 'PL',
+      lang_to: 'Po polsku', lang_to_tag: 'pl',
       err_title: 'No snapshot yet',
       err_body: 'The first snapshot is created by the scheduled run. Open the Actions tab of the repository and start “Daily snapshot” once.',
       types: { exchange: 'exchange', pool: 'pool', burn: 'burn', project: 'project', other: 'tagged' },
@@ -108,6 +110,8 @@
     },
     pl: {
       title: 'Pepecoin Holder Watch',
+      eyebrow: 'Rich lista · snapshot z {date}',
+      eyebrow_plain: 'Rich lista',
       lede: 'Ile podaży PEP leży w największych portfelach i jak się to zmienia. Codziennie jeden snapshot top ~2000 adresów; wykresy skupiają się na top 1000.',
       view_all: 'Wszystkie adresy',
       view_ex: 'Bez giełd i pooli',
@@ -195,7 +199,7 @@
       csv: 'Pobierz dzienną historię (CSV)',
       nofa: 'To nie jest porada inwestycyjna.',
       theme: 'Motyw', auto: 'Auto', light: 'Jasny', dark: 'Ciemny',
-      lang_to: 'EN',
+      lang_to: 'In English', lang_to_tag: 'en',
       err_title: 'Brak pierwszego snapshotu',
       err_body: 'Pierwszy snapshot tworzy zaplanowane uruchomienie. Wejdź w zakładkę Actions w repozytorium i raz uruchom „Daily snapshot”.',
       types: { exchange: 'giełda', pool: 'pool', burn: 'burn', project: 'projekt', other: 'tag' },
@@ -327,6 +331,13 @@
   const line = (k, v) => h('div', {}, h('span', { class: 'k' }, k + ' '), h('b', {}, v));
 
   /* ------------------------------------------------------------------- header */
+  // Same title block as the other pages: eyebrow, full-width h1, lede.
+  const pageHead = (eyebrow) => h('header', { class: 'page-head' },
+    h('p', { class: 'eyebrow' }, eyebrow),
+    h('h1', {}, t('title')),
+    h('p', { class: 'lede' }, t('lede')),
+    h('p', { class: 'muted', style: 'max-width:62ch' }, t('labels_note')));
+
   function header() {
     const L = S.latest;
     const seg = h('div', { class: 'seg', role: 'group', 'aria-label': t('view_all') + ' / ' + t('view_ex') },
@@ -335,19 +346,8 @@
         onclick: () => { state.view = v; state.page = 0; render(); }
       }, t('view_' + v))));
 
-    const themeNow = document.documentElement.getAttribute('data-theme') || 'auto';
-    const themeBtn = h('button', {
-      type: 'button', class: 'iconbtn', 'data-key': 'theme', title: t('theme'),
-      onclick: () => {
-        const next = themeNow === 'auto' ? 'light' : themeNow === 'light' ? 'dark' : 'auto';
-        if (next === 'auto') document.documentElement.removeAttribute('data-theme');
-        else document.documentElement.setAttribute('data-theme', next);
-        store.set('phw-theme', next === 'auto' ? null : next);
-        render();
-      }
-    }, t('theme') + ': ' + t(themeNow));
     const langBtn = h('button', {
-      type: 'button', class: 'iconbtn', 'data-key': 'lang',
+      type: 'button', class: 'iconbtn', 'data-key': 'lang', lang: t('lang_to_tag'),
       onclick: () => {
         state.lang = state.lang === 'en' ? 'pl' : 'en';
         store.set('phw-lang', state.lang);
@@ -357,7 +357,6 @@
     }, t('lang_to'));
 
     const meta = h('div', { class: 'meta num' },
-      h('span', {}, t('snapshot') + ' ', h('b', {}, fmtDate(L.date))),
       L.height ? h('span', {}, t('block') + ' ', h('b', {}, fmtInt(L.height))) : null,
       h('span', {}, t('supply') + ' ', h('b', {}, fmtCompact(L.supply) + ' PEP')),
       state.view === 'ex' ? h('span', {}, t('denominator') + ' ', h('b', {}, fmtCompact(V().denominator) + ' PEP')) : null,
@@ -369,11 +368,9 @@
         ? t('hist_one')
         : (S.snapshots < 366 ? t('hist_many', { n: fmtInt(S.snapshots), date: fmtDate(S.first_date) }) : null);
 
-    return h('header', { class: 'top' },
-      h('div', { class: 'top-row' },
-        h('div', { class: 'brand' }, h('h1', {}, t('title')), h('p', {}, t('lede')), h('p', { class: 'muted', style: 'max-width:62ch' }, t('labels_note'))),
-        h('div', { class: 'tools' }, langBtn, themeBtn)),
-      h('div', { class: 'top-row' }, seg, meta),
+    return h('div', { class: 'top' },
+      pageHead(t('eyebrow', { date: fmtDate(L.date) })),
+      h('div', { class: 'top-row' }, h('div', { class: 'tools' }, seg, langBtn), meta),
       state.view === 'ex' ? h('p', { class: 'small muted', style: 'margin:0;max-width:80ch' }, t('view_ex_note')) : null,
       histNote ? h('div', { class: 'notice' }, histNote) : null);
   }
@@ -867,7 +864,7 @@
 
   function showEmpty() {
     app.replaceChildren(
-      h('header', { class: 'top' }, h('div', { class: 'brand' }, h('h1', {}, t('title')), h('p', {}, t('lede')), h('p', { class: 'muted', style: 'max-width:62ch' }, t('labels_note')))),
+      pageHead(t('eyebrow_plain')),
       h('div', { class: 'panel' }, h('h2', {}, t('err_title')), h('p', {}, t('err_body'))));
   }
 
