@@ -44,7 +44,7 @@ Typy `exchange`, `pool`, `burn` znikają w widoku „bez giełd i pooli” (raze
 | `scripts/build_reconstructed_daily.py` | Jednorazowo: z dziennych plików odtworzonych z blockchainu robi zwartą serię `docs/data/reconstructed_daily.json`. Uruchom ponownie po zmianie tagów giełd, jeśli chcesz mieć dzienną historię także w widoku „bez giełd i pooli”. |
 | `docs/data/snapshots/` | Snapshoty. Pliki z `"reconstructed": true` w `meta` są odtworzone z blockchainu, pozostałe pochodzą z codziennego pobrania. |
 | `VALIDATION.md` | Jak sprawdzono odtworzoną historię (porównanie z archiwalnymi rich listami i z API). |
-| `docs/` | Strona (HTML, CSS i JS, bez bibliotek zewnętrznych). |
+| `docs/` | Strona (HTML, CSS i JS, bez bibliotek zewnętrznych). Po zmianie `facts.css`, `chrome.js` lub `live.js` podbij `?v=` w linkach do nich na wszystkich stronach, inaczej przeglądarki mogą trzymać starą wersję. |
 | `docs/pl/`, `es/`, `de/`, `fr/`, `tr/`, `it/`, `zh/` | Tłumaczenia pięciu stron: główna, Which is which, Jak kupić, Portfele, Słowniczek. Zmiana treści w angielskiej wersji tych stron musi trafić też do tłumaczeń. Strony wskazują swoje wersje językowe znacznikami `hreflang` w `<head>`, a przełącznik języków w nagłówku (`docs/chrome.js`) bierze adresy właśnie z nich. |
 | `.github/workflows/snapshot.yml` | Dwa zadania. `snapshot`: pobranie danych, podsumowanie, commit. `deploy`: publikacja strony. Dzięki temu historia zbiera się nawet przed włączeniem Pages. Push też robi snapshot, ale tylko jeśli na dziś jeszcze go nie ma. |
 
