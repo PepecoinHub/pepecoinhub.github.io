@@ -296,3 +296,8 @@ html:lang(zh) {
 .card.feature { background: var(--accent-soft); border-color: var(--accent); border-left-width: 4px; padding: 22px 24px; }
 .card.feature h3 { font-size: 1.3rem; }
 .card.feature p { color: var(--ink); }
+.pledge {
+  display: flex; gap: 10px; align-items: baseline; max-width: 62ch; margin: 0; padding: 12px 16px;
+  background: var(--accent-soft); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+}
+.pledge::before { content: "✓"; flex: none; color: var(--accent); font-weight: 700; }
