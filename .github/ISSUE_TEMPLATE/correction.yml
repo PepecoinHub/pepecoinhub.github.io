@@ -1,0 +1,33 @@
+name: Report a correction
+description: Something on pepecoinhub.com is wrong or out of date. Please include a source.
+title: "Correction: "
+labels: ["correction"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The address of the page with the mistake.
+      placeholder: https://pepecoinhub.com/...
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What is wrong
+      description: Quote the sentence or number.
+    validations:
+      required: true
+  - type: textarea
+    id: correct
+    attributes:
+      label: What it should say
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: A link that shows the correct information (explorer, official site, exchange, filing).
+    validations:
+      required: true

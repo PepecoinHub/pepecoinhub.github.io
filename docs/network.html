@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="facts.css?v=20261007">
+<link rel="stylesheet" href="facts.css?v=20261007b">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/"}, {"@type": "ListItem", "position": 2, "name": "Network stats", "item": "https://pepecoinhub.com/network.html"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin network daily statistics", "description": "Daily Pepecoin (PEP) block height, coin supply, number of addresses with a balance and snapshot time, from February 2024, rebuilt from the blockchain before October 5, 2026 and recorded live after that.", "url": "https://pepecoinhub.com/network.html", "temporalCoverage": "2024-02-05/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (r/pepecoin community volunteers)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}]}</script>
@@ -47,6 +47,7 @@
 .stats { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 .stats .value { font-variant-numeric: normal; font-size: 1.55rem; }
 </style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -135,6 +136,7 @@
 <footer class="site-foot">
   <p><strong>Community fact pages</strong>, compiled by a volunteer from the r/pepecoin community. Not an official Pepecoin publication.</p>
   <p>Not investment advice. The compiler holds PEP. Prices and network figures change daily; each page gives its dates and sources.</p>
+  <p class="correction">Spotted a mistake? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Report a correction</a> (with a source) on GitHub.</p>
 </footer>
 <script>
 (function () {
@@ -263,6 +265,6 @@
   }).catch(function () { $('net-status').textContent = 'The daily data could not be loaded just now. The figures above are from October 6, 2026.'; });
 })();
 </script>
-<script src="chrome.js?v=20261007" defer></script>
+<script src="chrome.js?v=20261007b" defer></script>
 </body>
 </html>

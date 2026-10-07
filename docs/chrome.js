@@ -154,3 +154,10 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
   else mount();
 })();
+
+// "Report a correction" links: prefill the issue form with the page the reader is on.
+(function () {
+  document.querySelectorAll('a[data-correction]').forEach(function (a) {
+    a.href += '&page=' + encodeURIComponent(location.href.split('#')[0]);
+  });
+})();
