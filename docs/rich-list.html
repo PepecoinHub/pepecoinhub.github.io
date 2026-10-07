@@ -23,45 +23,40 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="facts.css?v=20261007b">
+<link rel="stylesheet" href="facts.css?v=20261007c">
 <style>
-/* Shared site header and footer. Same structure as the fact pages, drawn with this page's own tokens
-   so it follows the theme button below. */
-body { padding-top: 0; }
-.pf-head { max-width: 1120px; margin: 0 auto 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; padding-block: 18px; border-bottom: 1px solid var(--line); }
-.pf-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-family: "Ubuntu", "Segoe UI", system-ui, sans-serif; font-weight: 700; font-size: 1.15rem; letter-spacing: -0.01em; }
-.pf-brand img { width: 38px; height: 38px; object-fit: contain; }
-.pf-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-family: "Ubuntu", "Segoe UI", system-ui, sans-serif; font-size: 0.92rem; }
-.pf-nav a { color: var(--muted); text-decoration: none; padding-block: 4px; border-bottom: 2px solid transparent; }
-.pf-nav a:hover { color: var(--ink); }
-.pf-nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
-.pf-foot { max-width: 1120px; margin: 40px auto 0; border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 6px; font-size: 0.8125rem; color: var(--muted); }
-.pf-foot p { margin: 0; }
-.pf-foot strong { color: var(--ink); }
-#app h1 { font-family: "Ubuntu", "Segoe UI", system-ui, sans-serif; font-weight: 700; font-size: 1.9rem; letter-spacing: -0.02em; }
+/* This page loads the Holder Watch app styles (style.css) under the shared site styles (facts.css). */
+.page-head .eyebrow { font-weight: 400; }
+.page-head .lede, .page-head p { margin: 0; }
+.top { gap: 24px; }
 </style>
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin (PEP) rich list and supply concentration", "description": "Daily snapshots of the largest Pepecoin (PEP) addresses and the share of supply held by the top 10, 25, 50, 100, 400 and 1000 addresses, rebuilt from the blockchain back to February 2024 and recorded live every day since October 5, 2026.", "url": "https://pepecoinhub.com/rich-list.html", "temporalCoverage": "2024-02-05/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (r/pepecoin community volunteers)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://pepecoinhub.com/data/shares.csv"}, {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/summary.json"}]}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
-<header class="pf-head">
-  <a class="pf-brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
-  <nav class="pf-nav" aria-label="Pages"><a href="which-pepecoin.html">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="calculator.html">Calculator</a><a href="supply.html">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="network.html">Network</a><a href="rich-list.html" aria-current="page">Rich list</a><a href="guides.html">Guides</a></nav>
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="calculator.html">Calculator</a><a href="supply.html">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="network.html">Network</a><a href="rich-list.html" aria-current="page">Rich list</a><a href="guides.html">Guides</a></nav>
 </header>
 <div class="wrap" id="app">
   <noscript>
+    <header class="page-head">
+    <p class="eyebrow">Rich list</p>
     <h1>Pepecoin Holder Watch</h1>
-    <p>Daily snapshots of the top Pepecoin (PEP) wallets and how the share of supply held by the top 10, 25, 50, 100, 400 and 1000 addresses changes over time. This page needs JavaScript to draw its charts. The raw numbers are in <a href="data/shares.csv">shares.csv</a>.</p>
+    <p class="lede">Daily snapshots of the top Pepecoin (PEP) wallets and how the share of supply held by the top 10, 25, 50, 100, 400 and 1000 addresses changes over time. This page needs JavaScript to draw its charts. The raw numbers are in <a href="data/shares.csv">shares.csv</a>.</p>
+    </header>
     <p class="muted">Hand tags in <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/blob/main/docs/data/labels.json">labels.json</a> mark known exchanges and mining pools. The “without exchanges and pools” view hides those addresses and removes their balances from the denominator. An exchange deposit on-chain is not proof the coins were sold. Tags are community-maintained — not exhaustive.</p>
   </noscript>
   <p class="muted" id="boot">Loading the latest snapshot…</p>
 </div>
-<footer class="pf-foot">
+<footer class="site-foot">
   <p><strong>Community fact pages</strong>, compiled by a volunteer from the r/pepecoin community. Not an official Pepecoin publication.</p>
   <p>Not investment advice. The compiler holds PEP. An address is not a person: exchanges and custodians hold coins for many users.</p>
   <p class="correction">Spotted a mistake? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Report a correction</a> (with a source) on GitHub.</p>
+  <details class="support"><summary>Like this site? You can support its further development.</summary><p>Any amount, however small, helps. Thank you!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 <script src="app.js"></script>
+<script src="chrome.js?v=20261007c" defer></script>
 </body>
 </html>
