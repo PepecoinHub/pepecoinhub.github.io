@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scrypt 合并挖矿：Litecoin、Dogecoin 和 Pepecoin</title>
+<meta name="description" content="Litecoin、Dogecoin 和 Pepecoin 如何通过合并挖矿 (AuxPoW) 共用一台 Scrypt 矿机：从 Charlie Lee 2014年的提议到 Pepecoin 2024年上线。">
+<link rel="canonical" href="https://pepecoinhub.com/zh/scrypt-family.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/scrypt-family.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/scrypt-family.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/scrypt-family.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/scrypt-family.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/scrypt-family.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/scrypt-family.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/scrypt-family.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/scrypt-family.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/scrypt-family.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="Scrypt 合并挖矿：Litecoin、Dogecoin 和 Pepecoin">
+<meta property="og:description" content="Litecoin、Dogecoin 和 Pepecoin 如何通过合并挖矿 (AuxPoW) 共用一台 Scrypt 矿机：从 Charlie Lee 2014年的提议到 Pepecoin 2024年上线。">
+<meta property="og:url" content="https://pepecoinhub.com/zh/scrypt-family.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin 标志：关于 PEP 的事实、数据和来源">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../facts.css?v=20261007d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Scrypt 家族：一台矿机，三种币", "description": "Litecoin、Dogecoin 和 Pepecoin 如何通过合并挖矿共用一台 Scrypt 矿机。", "datePublished": "2026-10-05", "dateModified": "2026-10-06", "mainEntityOfPage": "https://pepecoinhub.com/scrypt-family.html", "author": {"@type": "Organization", "name": "Pepecoin Hub（r/pepecoin 社区志愿者）"}, "publisher": {"@type": "Organization", "name": "Pepecoin Hub"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "什么是合并挖矿？", "acceptedAnswer": {"@type": "Answer", "text": "合并挖矿 (merged mining)，即 Auxiliary Proof of Work (AuxPoW)，让矿工用同一份工作量证明，在多条使用相同哈希算法的区块链上产出区块。每条链按自己的规则验证工作，并支付自己的奖励。"}}, {"@type": "Question", "name": "合并挖矿会减少 Litecoin 或 Dogecoin 的奖励吗？", "acceptedAnswer": {"@type": "Answer", "text": "不会。算力不会在各条链之间分摊。矿工获得的 Litecoin 和 Dogecoin 与以前一样多，合并挖出的币是额外所得。"}}, {"@type": "Question", "name": "哪些币可以与 Litecoin 合并挖矿？", "acceptedAnswer": {"@type": "Answer", "text": "Dogecoin 和 Pepecoin，以及一些较小的 Scrypt 链：Bellscoin、Luckycoin、Junkcoin、Dingocoin 和 Shibacoin。具体名单取决于矿池。"}}, {"@type": "Question", "name": "用什么硬件挖 Pepecoin？", "acceptedAnswer": {"@type": "Answer", "text": "Scrypt ASIC 矿机，也就是挖 Litecoin 和 Dogecoin 的同一种机器，连接到支持合并挖矿的矿池。ViaBTC 举的例子是 Antminer L9 和 ElphaPex DG1。"}}, {"@type": "Question", "name": "Pepecoin 和 PEPE 是一回事吗？", "acceptedAnswer": {"@type": "Answer", "text": "不是。PEPE 是以太坊上的代币。Pepecoin (PEP) 是拥有自己工作量证明区块链的币。参见“如何区分各种 Pepecoin？”"}}, {"@type": "Question", "name": "Pepecoin 有供应上限吗？", "acceptedAnswer": {"@type": "Answer", "text": "没有。和 Dogecoin 一样，每个区块固定增加 10,000 枚币，因此通胀率逐年下降。参见“供应量与通胀”。"}}]}</script>
+<style>
+/* Scrypt family page. Sections sit inside <article>, so it repeats the .wrap spacing. */
+:root { --wire: #9aaba2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --wire: #4d5d55; } }
+:root[data-theme="dark"] { --wire: #4d5d55; }
+.wrap-article { display: grid; gap: 56px; min-width: 0; }
+.wrap-article > * { min-width: 0; }
+q { quotes: "\201C" "\201D"; }
+
+/* Coin logos (docs/assets/coins), 40 px next to each coin's name */
+.glyph { flex: none; width: 40px; height: 40px; object-fit: contain; }
+
+/* "一个哈希，三条区块链": a miner node, a wire tree, and one card per chain.
+   Each card has a five-minute strip with one square per block found. */
+.fam { margin: 0; display: grid; justify-items: center; }
+.fam > * { min-width: 0; }
+.fam-src { display: flex; align-items: center; gap: 14px; padding: 12px 24px 12px 14px; background: var(--panel); border: 2px solid var(--accent); border-radius: 999px; }
+.fam-chip { width: 46px; height: 46px; flex: none; color: var(--accent); }
+.fam-src div { display: grid; line-height: 1.25; }
+.fam-src strong { font-size: 1.2rem; font-weight: 700; }
+.fam-src span { font-size: 0.9rem; color: var(--muted); }
+.fam-tree { position: relative; width: 100%; height: 36px; }
+.fam-tree::before { content: ""; position: absolute; left: 50%; top: 0; height: 18px; border-left: 2px solid var(--wire); }
+.fam-tree::after { content: ""; position: absolute; top: 18px; left: calc((100% - 32px) / 6); right: calc((100% - 32px) / 6); border-top: 2px solid var(--wire); }
+.fam-chains { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.fam-chain { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 16px 14px; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.fam-chain::before { content: ""; position: absolute; left: 50%; top: -19px; height: 18px; border-left: 2px solid var(--wire); }
+.fam-chain.hl { border-color: var(--accent); background: var(--accent-soft); }
+.fam-chain h3 { font-size: 1.2rem; font-weight: 700; }
+.fam-role { font-size: 0.88rem; color: var(--muted); }
+.fam-time { position: relative; height: 20px; margin: 12px 0 2px; border-bottom: 2px solid var(--rule); }
+.fam-time i { position: absolute; bottom: 3px; width: 14px; height: 14px; border-radius: 3px; background: var(--muted); transform: translateX(-100%); }
+.fam-chain.hl .fam-time i { background: var(--series); }
+.fam-time-label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+.fam-pays { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule); font-size: 0.9rem; }
+.fam-more { margin-top: 14px; font-size: 0.9rem; color: var(--muted); text-align: center; max-width: 62ch; }
+.pull { margin: 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--accent); display: grid; gap: 8px; max-width: 68ch; }
+.pull p { font-size: 1.3rem; line-height: 1.4; font-weight: 500; }
+.pull footer { font-size: 0.9rem; color: var(--muted); }
+
+/* The whole family */
+.family { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+.coin { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 12px; align-items: center; align-content: start; padding: 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; min-width: 0; }
+.coin.hl { border-color: var(--accent); background: var(--accent-soft); }
+.coin h3 { font-size: 1.08rem; font-weight: 700; line-height: 1.25; }
+.coin h3 small { font-size: 0.8rem; font-weight: 500; color: var(--muted); margin-left: 4px; }
+.coin .since { display: block; font-family: var(--f-mono); font-size: 0.85rem; color: var(--muted); }
+.coin p { grid-column: 1 / -1; font-size: 0.92rem; color: var(--muted); }
+
+/* How it works: three numbered steps */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: step; }
+.steps li { counter-increment: step; display: grid; gap: 8px; align-content: start; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; min-width: 0; }
+.steps li::before { content: counter(step); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-mid); font-weight: 700; }
+.steps h3 { font-weight: 700; }
+.steps p { font-size: 0.95rem; color: var(--muted); }
+.aside-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.aside-row .callout { max-width: none; }
+.callout h3 { font-weight: 700; font-size: 1rem; }
+.callout p { font-size: 0.95rem; }
+
+/* How it happened: one rail, one card per milestone */
+.story { list-style: none; margin: 0; padding: 0; position: relative; display: grid; gap: 12px; }
+.story::before { content: ""; position: absolute; left: 7px; top: 10px; bottom: 10px; border-left: 2px solid var(--rule); }
+.story li { position: relative; display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 4px 16px; padding-left: 30px; align-items: start; }
+.story li::before { content: ""; position: absolute; left: 0; top: 14px; width: 12px; height: 12px; border-radius: 50%; background: var(--paper); border: 2px solid var(--wire); }
+.story li.hl::before { background: var(--accent); border-color: var(--accent); }
+.story .when { padding-top: 10px; font-family: var(--f-mono); font-size: 0.95rem; font-weight: 700; color: var(--muted); }
+.story .event { display: grid; gap: 4px; padding: 12px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; min-width: 0; }
+.story li.hl .event { background: var(--accent-soft); border-color: var(--accent); }
+.story h3 { font-weight: 700; font-size: 1.05rem; }
+.story p { font-size: 0.95rem; color: var(--muted); }
+.story p q { color: var(--ink); }
+
+/* Personal note: kept apart from the sourced article */
+.opinion { max-width: 68ch; gap: 14px; padding: 24px 26px; }
+.opinion h2 { font-size: 1.4rem; }
+.opinion p { max-width: 62ch; }
+
+@media (max-width: 720px) {
+  .steps { grid-template-columns: minmax(0, 1fr); }
+  .steps li { grid-template-columns: auto minmax(0, 1fr); column-gap: 14px; }
+  .steps li::before { grid-row: span 2; }
+  .story li { grid-template-columns: minmax(0, 1fr); }
+  .story .when { padding-top: 6px; }
+}
+@media (max-width: 620px) {
+  .fam { justify-items: stretch; }
+  .fam-src { border-radius: 10px; }
+  .fam-tree { height: 18px; }
+  .fam-tree::before { left: 12px; height: 18px; }
+  .fam-tree::after { display: none; }
+  .fam-chains { grid-template-columns: minmax(0, 1fr); gap: 14px; padding-left: 30px; }
+  .fam-chain::before { left: -18px; top: 50%; width: 16px; height: 0; border-left: 0; border-top: 2px solid var(--wire); }
+  .fam-chain::after { content: ""; position: absolute; left: -18px; top: -15px; height: calc(100% + 15px); border-left: 2px solid var(--wire); }
+  .fam-chain:last-child::after { height: calc(50% + 16px); }
+  .fam-more { text-align: left; }
+  .opinion { padding: 18px 16px; }
+}
+</style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要内容</a>
+
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="页面"><a href="which-pepecoin.html">如何区分</a><a href="compare.html">PEP 与 DOGE</a><a href="calculator.html">计算器</a><a href="supply.html">供应量</a><a href="scrypt-family.html" aria-current="page">Scrypt 家族</a><a href="network.html">网络</a><a href="rich-list.html">富豪榜</a><a href="guides.html">指南</a></nav>
+</header>
+<main class="wrap" id="main">
+<article class="wrap-article">
+<header class="page-head">
+<p class="eyebrow">Scrypt 合并挖矿 · 更新于 2026年10月6日</p>
+  <h1>Scrypt 家族：一台矿机，三种币</h1>
+  <p class="lede">一台 Scrypt 矿机只做一次工作，就能同时从多条区块链获得报酬。Litecoin 在 2011年开创了这个家族，Dogecoin 于 2014年加入，Pepecoin 于 2024年加入。下面讲述这一切是如何发生的，以及它给矿工和持币者带来了什么。</p>
+</header>
+
+<section aria-label="关键数据">
+  <div class="stats">
+    <div class="stat"><span class="label">一台矿机</span><span class="value">3 种币</span><span class="sub">一台 Scrypt 矿机同时产出 LTC、DOGE 和 PEP</span></div>
+    <div class="stat"><span class="label">额外电力</span><span class="value">无</span><span class="sub">每条链验证同一份工作</span></div>
+    <div class="stat"><span class="label">Dogecoin</span><span class="value">自 2014年</span><span class="sub">与 Litecoin 合并挖矿</span></div>
+    <div class="stat"><span class="label">Pepecoin</span><span class="value">自 2024年</span><span class="sub">自区块 42,000 起合并挖矿</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="diagram">
+  <h2 id="diagram">一个哈希，三条区块链</h2>
+  <p class="note">Scrypt 矿机只做一件事：计算哈希。在合并挖矿中，每个哈希都会同时与每条链的目标值比较。当它满足某条链的要求时，这条链就得到一个新区块并支付自己的奖励。</p>
+  <figure class="fam">
+    <div class="fam-src">
+      <svg class="fam-chip" viewBox="0 0 48 48" aria-hidden="true"><rect x="12" y="12" width="24" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="2.5"/><rect x="19" y="19" width="10" height="10" rx="1.5" fill="currentColor"/><path d="M18 5v6M24 5v6M30 5v6M18 37v6M24 37v6M30 37v6M5 18h6M5 24h6M5 30h6M37 18h6M37 24h6M37 30h6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <div><strong>一个 Scrypt 哈希</strong><span>同一台机器，同样的电力</span></div>
+    </div>
+    <div class="fam-tree" aria-hidden="true"></div>
+    <ul class="fam-chains">
+      <li class="fam-chain">
+        <h3>Litecoin</h3>
+        <span class="fam-role">LTC · 母链，始于 2011年</span>
+        <div class="fam-time" role="img" aria-label="五分钟 2 个区块"><i style="left:50%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>5 分钟内的区块</span><span>每 2.5 分钟一个区块</span></span>
+        <span class="fam-pays">支付 LTC</span>
+      </li>
+      <li class="fam-chain">
+        <h3>Dogecoin</h3>
+        <span class="fam-role">DOGE · 2014年起合并挖矿</span>
+        <div class="fam-time" role="img" aria-label="五分钟 5 个区块"><i style="left:20%"></i><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>5 分钟内的区块</span><span>每分钟一个区块</span></span>
+        <span class="fam-pays">支付 DOGE</span>
+      </li>
+      <li class="fam-chain hl">
+        <h3>Pepecoin</h3>
+        <span class="fam-role">PEP · 2024年起合并挖矿</span>
+        <div class="fam-time" role="img" aria-label="五分钟 5 个区块"><i style="left:20%"></i><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>5 分钟内的区块</span><span>每分钟一个区块</span></span>
+        <span class="fam-pays">支付 PEP</span>
+      </li>
+    </ul>
+    <figcaption class="fam-more">许多矿池还会加入较小的 Scrypt 链：Bellscoin、Luckycoin、Junkcoin、Dingocoin 和 Shibacoin，见<a href="#family">下文</a>。Binance Pool、ViaBTC、F2Pool 和 EMCD 都在支付 LTC 和 DOGE 的同时支付 PEP。</figcaption>
+  </figure>
+  <blockquote class="pull">
+    <p>“Merging mining with dogecoin would make both litecoin/dogecoin almost impossible to 51%.”</p>
+    <footer>Charlie Lee 于 2014年4月在 Dogecoin subreddit 上发言，据 <a href="https://www.coindesk.com/markets/2014/04/08/charlie-lee-proposes-merged-mining-of-litecoin-and-dogecoin">CoinDesk</a> 报道。Pepecoin 接入的正是这份共享算力。  <p class="correction">发现错误？请在 GitHub 上<a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>提交更正</a>（附来源）。</p>
+</footer>
+  </blockquote>
+</section>
+
+<section aria-labelledby="family">
+  <h2 id="family">完整家族</h2>
+  <p class="note">矿池最常支付的 Scrypt 链。Bellscoin、Luckycoin 和 Junkcoin 诞生于 2013年，并在 2023年和 2024年重获新生。</p>
+  <ul class="family">
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/ltc.png" alt="" width="40" height="40">
+      <div><h3>Litecoin<small>LTC</small></h3><span class="since">2011年10月起</span></div>
+      <p>母链。Charlie Lee 打造的 Scrypt 版 Bitcoin，2.5 分钟出块，上限 8400 万枚。</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/doge.png" alt="" width="40" height="40">
+      <div><h3>Dogecoin<small>DOGE</small></h3><span class="since">2013年12月起</span></div>
+      <p>基于 Luckycoin 和 Litecoin 代码构建。自 2014年9月起与 Litecoin 合并挖矿。</p>
+    </li>
+    <li class="coin hl">
+      <img class="glyph" src="../assets/brand/icon.svg" alt="" width="40" height="40">
+      <div><h3>Pepecoin<small>PEP</small></h3><span class="since">2024年1月起</span></div>
+      <p>无预挖的 Dogecoin Core 分叉。自区块 42,000 起合并挖矿。</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/bells.png" alt="" width="40" height="40">
+      <div><h3>Bellscoin<small>BELLS</small></h3><span class="since">2013年11月起</span></div>
+      <p>Billy Markus 的《动物森友会》主题币，比 Dogecoin 早几天发布。2023年12月复活，自区块 144,000 起合并挖矿。</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/lky.png" alt="" width="40" height="40">
+      <div><h3>Luckycoin<small>LKY</small></h3><span class="since">2013年5月起</span></div>
+      <p>Dogecoin 代码所基于的 Litecoin 分叉。2024年在其 2013年的原始链上复活。</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/jkc.png" alt="" width="40" height="40">
+      <div><h3>Junkcoin<small>JKC</small></h3><span class="since">2013年5月起</span></div>
+      <p>最早的 meme 币之一，上限 5400 万枚。社区于 2024年11月将其重启。</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/dingo.png" alt="" width="40" height="40">
+      <div><h3>Dingocoin<small>DINGO</small></h3><span class="since">2021年4月起</span></div>
+      <p>公平发行的 Dogecoin 分叉：一分钟出块，固定 10,000 枚奖励，没有上限。</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/shic.png" alt="" width="40" height="40">
+      <div><h3>Shibacoin<small>SHIC</small></h3><span class="since">2024年12月起</span></div>
+      <p>较新的 Dogecoin 分叉，自区块 24,000 起与 Litecoin 合并挖矿。</p>
+    </li>
+  </ul>
+  <p class="note">矿工能拿到其中哪些币取决于矿池。ViaBTC 的 Litecoin 矿池在 LTC 之外列出了全部七种：DOGE、BELLS、LKY、PEP、JKC、DINGO 和 SHIC。其他矿池的组合各不相同。</p>
+</section>
+
+<section aria-labelledby="how">
+  <h2 id="how">合并挖矿的原理</h2>
+  <p class="note">技术名称是 Auxiliary Proof of Work，简称 AuxPoW。每条链保留自己的账本、规则和奖励，只有工作是共享的。</p>
+  <ol class="steps">
+    <li><h3>构建一个区块</h3><p>矿工构建一个 Litecoin 区块，并在其中放入指向一个 Dogecoin 区块和一个 Pepecoin 区块的引用。</p></li>
+    <li><h3>只算一次哈希</h3><p>矿机只做一次 Scrypt 工作，使用同样的硬件和同样的电力。</p></li>
+    <li><h3>各链分别验证</h3><p>如果结果满足某条链的要求，这条链就接受它的区块并支付自己的奖励。每条链都能验证确实完成了真实的 Scrypt 工作。</p></li>
+  </ol>
+  <div class="aside-row">
+    <div class="callout">
+      <h3>没有任何分摊</h3>
+      <p>矿工获得的 LTC 和 DOGE 与以前一样多。用矿池 ViaBTC 的话说，PEP 是<q>an additional reward from merged mining, requiring no extra hashrate.</q></p>
+    </div>
+    <div class="callout gold">
+      <h3>为什么是 Scrypt 而不是 Bitcoin</h3>
+      <p>Scrypt 比 Bitcoin 的 SHA-256 需要更多内存。Bitcoin 矿机无法挖 Scrypt 币，Scrypt 矿机也无法挖 Bitcoin。</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="story">
+  <h2 id="story">发展历程</h2>
+  <ol class="story">
+    <li><span class="when">2009</span><div class="event"><h3>Scrypt 发布</h3><p>Colin Percival 为 Tarsnap 备份服务设计了这个哈希函数。</p></div></li>
+    <li><span class="when">2011年10月</span><div class="event"><h3>Litecoin</h3><p>前 Google 工程师 Charlie Lee 发布 Litecoin，采用 Scrypt、2.5 分钟出块、上限 8400 万枚。</p></div></li>
+    <li><span class="when">2013年12月</span><div class="event"><h3>Dogecoin</h3><p>Billy Markus 和 Jackson Palmer 基于 Luckycoin 和 Litecoin 代码构建它：同样是 Scrypt，一分钟出块。</p></div></li>
+    <li><span class="when">2014年4月</span><div class="event"><h3>Charlie Lee 的提议</h3><p>Dogecoin 的奖励快速减半，矿工流失，51% 攻击的成本越来越低。Lee 在 Dogecoin 的 subreddit 上提议让 Litecoin 矿工也来保护它。他写道：<q>Merge mining only affects mining and nothing else,</q> 联合创始人 Jackson Palmer 起初并不信服。</p></div></li>
+    <li><span class="when">2014年9月</span><div class="event"><h3>Dogecoin 同意</h3><p>开发者在 8 月写道：<q>Our hashrate has been on a decline,</q> 合并挖矿在区块 371,337 上线。Lee 说社区现在可以<q>focus on what dogecoin does best</q>。据 Litecoin Foundation 称，Billy Markus 后来表示这个决定拯救了 Dogecoin。</p></div></li>
+    <li><span class="when">2015</span><div class="event"><h3>每区块 10,000 DOGE</h3><p>Dogecoin 的奖励稳定在每个区块固定 10,000 枚，与 Litecoin 的合作从此延续至今。</p></div></li>
+    <li class="hl"><span class="when">2024年1月</span><div class="event"><h3>Pepecoin 上线</h3><p>规则相同的 Dogecoin Core 分叉，没有预挖、没有 ICO、没有团队分配。现存的每一枚 PEP 都是挖出来的。合并挖矿从区块 42,000 起内置。</p></div></li>
+    <li><span class="when">2024–25</span><div class="event"><h3>家族壮大</h3><p>新老 Scrypt 链在大型矿池加入 Litecoin 合并挖矿：Bellscoin、Luckycoin、Junkcoin、Dingocoin 和 Shibacoin。</p></div></li>
+    <li><span class="when">2025年10月</span><div class="event"><h3>Litecoin 和 Dogecoin 基金</h3><p>Canary 的 LTCC，美国首只 Litecoin 现货 ETF，在 Nasdaq 上市。一个月后，Grayscale 的 Dogecoin 现货基金 GDOG 在 NYSE Arca 跟进。</p></div></li>
+    <li class="hl"><span class="when">2026年2月</span><div class="event"><h3>Kraken 上线 Pepecoin</h3><p>PEP 在 Kraken 开始交易。</p></div></li>
+    <li><span class="when">2026年7月</span><div class="event"><h3>开发者谈合并挖矿</h3><p>Dogecoin 开发者 chromatic 指出，Dogecoin 的安全依赖于所有合并挖矿的 Scrypt 链，而不仅仅是 Litecoin。Billy Markus 补充道：<q>Doge is the most profitable scrypt coin to mine.</q></p></div></li>
+    <li class="hl"><span class="when">2026年10月</span><div class="event"><h3>如今的 Pepecoin</h3><p>10月6日挖矿难度为 4060 万，处于 Dogecoin 当周 2880 万至 4750 万的波动区间内。两者都以每分钟一个区块为目标，因此这意味着算力相近。一位 Pepecoin 联合创始人参加了在阿姆斯特丹举行的 Litecoin Summit 2026 合并挖矿专题讨论。</p></div></li>
+  </ol>
+</section>
+
+<section aria-labelledby="why">
+  <h2 id="why">给矿工和持币者带来什么</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>对矿工</h3>
+      <p>同一台机器、同样的电力，挖到更多的币。除了设置一个收款地址外无需额外配置，PEP 就会在 LTC 和 DOGE 之外额外到账。</p>
+    </div>
+    <div class="card">
+      <h3>对网络</h3>
+      <p>一条年轻的链从一开始就受到成熟链算力的保护，而不必从零开始吸引自己的矿工。</p>
+    </div>
+    <div class="card">
+      <h3>对持币者</h3>
+      <p>每个区块、每笔奖励和每个余额都记录在公开的区块链上。任何人都可以在区块浏览器中核查供应量、富豪榜和矿池。</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="note">
+  <div class="callout gold opinion">
+    <p class="eyebrow">观点 · 个人随笔</p>
+    <h2 id="note">我为什么在这里</h2>
+    <p>这个框以上的所有内容都可以通过区块浏览器或来源链接核实。这一部分不行，它只是我的个人信念。</p>
+    <p>我认为工作量证明的故事会回归。加密世界正淹没在一下午就能印出来的代币里。来钱快，钱一走，社区也就散了。Pepecoin 恰恰相反：没有人白拿过一枚币，大家都留了下来，而我玩得非常开心。</p>
+    <p>如果股市和加密货币才刚刚开始走到一起，我押注大型金融机构会去寻找像 Bitcoin 一样稳健的币，而 Litecoin 排在第一位。它的矿工十五年来一个区块接一个区块地维持着这条链，Litecoin 和 Dogecoin 的基金也已经在美国交易所交易。</p>
+    <p>这是我最喜欢的部分。Litecoin 表现好的时候，Scrypt 挖矿收益更高。收益更高会吸引更多矿工，而每一台矿机都能同时挖 Dogecoin 和 Pepecoin。矿工越多，关注我们的目光就越多。</p>
+    <p>所以，支持诚实的项目吧：公平发行 (fair launch)、工作量证明、Scrypt 家族。在充斥着 pump.fun 发币和明目张胆骗局的市场里，这是一股清流。加密货币本该有的样子：诚实。</p>
+    <p class="src">由整理这些页面的志愿者撰写。这是个人观点，不是预测，也不是投资建议。作者持有 PEP。</p>
+  </div>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">常见问题</h2>
+  <div class="faq">
+    <details><summary>什么是合并挖矿？</summary><p>合并挖矿 (merged mining)，即 Auxiliary Proof of Work (AuxPoW)，让矿工用同一份工作量证明，在多条使用相同哈希算法的区块链上产出区块。每条链按自己的规则验证工作，并支付自己的奖励。</p></details>
+    <details><summary>合并挖矿会减少 Litecoin 或 Dogecoin 的奖励吗？</summary><p>不会。算力不会在各条链之间分摊。矿工获得的 Litecoin 和 Dogecoin 与以前一样多，合并挖出的币是额外所得。</p></details>
+    <details><summary>哪些币可以与 Litecoin 合并挖矿？</summary><p>Dogecoin 和 Pepecoin，以及一些较小的 Scrypt 链：Bellscoin、Luckycoin、Junkcoin、Dingocoin 和 Shibacoin。具体名单取决于矿池。</p></details>
+    <details><summary>用什么硬件挖 Pepecoin？</summary><p>Scrypt ASIC 矿机，也就是挖 Litecoin 和 Dogecoin 的同一种机器，连接到支持合并挖矿的矿池。ViaBTC 举的例子是 Antminer L9 和 ElphaPex DG1。</p></details>
+    <details><summary>Pepecoin 和 PEPE 是一回事吗？</summary><p>不是。PEPE 是以太坊上的代币。Pepecoin (PEP) 是拥有自己工作量证明区块链的币。参见<a href="which-pepecoin.html">如何区分各种 Pepecoin？</a></p></details>
+    <details><summary>Pepecoin 有供应上限吗？</summary><p>没有。和 Dogecoin 一样，每个区块固定增加 10,000 枚币，因此通胀率逐年下降。参见<a href="supply.html">供应量与通胀</a>。</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">来源</h2>
+  <div class="sources">
+    <div>
+      <h3>历史</h3>
+      <ul>
+        <li><a href="https://www.coindesk.com/markets/2014/04/08/charlie-lee-proposes-merged-mining-of-litecoin-and-dogecoin">CoinDesk, April 2014: Charlie Lee proposes merged mining</a></li>
+        <li><a href="https://www.reddit.com/r/dogecoin/comments/22eprz/ltc_creator_charlie_lee_explains_his/">r/dogecoin, April 2014: Lee explains his proposal</a></li>
+        <li><a href="https://www.coindesk.com/markets/2014/08/04/dogecoin-to-allow-litecoin-merge-mining-in-network-security-bid">CoinDesk, August 2014: Dogecoin to allow merge mining</a></li>
+        <li><a href="https://www.coindesk.com/tech/2023/08/02/why-you-should-care-about-litecoin-its-the-backbone-of-dogecoin">CoinDesk, 2023: Litecoin is the backbone of Dogecoin</a></li>
+        <li><a href="https://litecoin.com/news/how-litecoin-and-dogecoin-created-one-of-the-most-robust-pow-networks">Litecoin Foundation: Litecoin and Dogecoin</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Litecoin">Wikipedia: Litecoin</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Dogecoin">Wikipedia: Dogecoin</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>代码与规则</h3>
+      <ul>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/src/chainparams.cpp">Dogecoin chainparams.cpp (AuxPoW at 371,337)</a></li>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/doc/FAQ.md">Dogecoin FAQ (fixed reward)</a></li>
+        <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp (AuxPoW at 42,000)</a></li>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">Pepecoin MiCA white paper</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>当今挖矿</h3>
+      <ul>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC: how to mine PEP</a></li>
+        <li><a href="https://cryptonews.net/news/market/30268800/">Binance Pool adds PEP merged mining</a></li>
+        <li><a href="https://emcd.io/articles/mining/how-to-mine-bellcoin-bell/">EMCD: Bellscoin and merge-mined Scrypt coins</a></li>
+        <li><a href="https://support.viabtc.com/hc/en-us/articles/11477430615439-LTC-Merged-Mining-Coins-Mining-Tutorial">ViaBTC: coins merge-mined with LTC</a></li>
+        <li><a href="https://www.f2pool.com/coin/pepecoin">F2Pool: PEP</a></li>
+        <li><a href="https://pepeplorer.com/network">Pepeplorer: PEP difficulty</a></li>
+        <li><a href="https://www.coinwarz.com/dogecoin-difficulty">CoinWarz: Dogecoin difficulty</a></li>
+        <li><a href="https://u.today/still-wrong-dogecoin-dev-clarifies-how-doge-merge-mining-works">U.Today, July 2026: developers on merge mining</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>家族其他成员</h3>
+      <ul>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-bellscoin-and-how-to-mine-bellscoin-345?category=0">ViaBTC: Bellscoin</a></li>
+        <li><a href="https://luckycoinfoundation.org/">Luckycoin Foundation</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-junkcoin-jkc-how-to-mine-junkcoin-jkc-373">ViaBTC: Junkcoin</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/Beginner-what-is-dingocoin-how-to-mine-dingocoin-389?category=0">ViaBTC: Dingocoin</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/Mining-what-is-shibacoin-shic-how-to-mine-shibacoin-shic-412?category=0">ViaBTC: Shibacoin</a></li>
+        <li>币种标志：来自各项目自己的钱包代码库（<a href="https://github.com/Nintondo/bellscoinV3">Bellscoin</a>、<a href="https://github.com/LuckycoinFoundation/Luckycoin">Luckycoin</a>、<a href="https://github.com/Junkcoin-Foundation/junkcoin-core">Junkcoin</a>、<a href="https://github.com/dingocoincrypto/dingocoin">Dingocoin</a>、<a href="https://github.com/shibacoinppc/shibacoin">Shibacoin</a>）；LTC 来自 <a href="https://github.com/0xa3k5/web3icons">web3icons</a>，DOGE 来自 <a href="https://github.com/trustwallet/assets">Trust Wallet assets</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>基金与大事</h3>
+      <ul>
+        <li><a href="https://litecoin.com/news/litecoin-spot-etf-approved">Litecoin Foundation: spot ETF (LTCC)</a></li>
+        <li><a href="https://www.nasdaq.com/press-release/grayscale-dogecoin-trust-etf-ticker-gdog-begins-trading-nyse-arca-first-dogecoin-etp">Grayscale: GDOG begins trading</a></li>
+        <li><a href="https://blog.kraken.com/product/asset-listings/pep-is-available-for-trading">Kraken: PEP listing</a></li>
+        <li><a href="https://news.bitcoin.com/pepecoin-co-founder-david-eichel-to-speak-on-merge-mining-panel-at-litecoin-summit-2026/">Litecoin Summit 2026 announcement</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</article>
+
+</main>
+<footer class="site-foot">
+  <p><strong>社区事实资料页</strong>，由 r/pepecoin 社区的一名志愿者整理。并非 Pepecoin 官方发布的内容。</p>
+  <p>不构成投资建议。整理者持有 PEP。价格和网络数据每天都在变化；每个页面都注明了日期和来源。</p>
+  <p class="correction">发现错误？请在 GitHub 上<a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>提交更正</a>（附来源）。</p>
+  <details class="support"><summary>喜欢这个网站？欢迎支持它的后续发展。</summary><p>金额不论多少，都是很大的帮助。谢谢！</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+</footer>
+<script src="../chrome.js?v=20261007d" defer></script>
+</body>
+</html>

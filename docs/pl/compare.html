@@ -8,6 +8,12 @@
 <link rel="canonical" href="https://pepecoinhub.com/pl/compare.html">
 <link rel="alternate" hreflang="en" href="https://pepecoinhub.com/compare.html">
 <link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/compare.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/compare.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/compare.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/compare.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/compare.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/compare.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/compare.html">
 <link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/compare.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pl_PL">
@@ -189,7 +195,7 @@
   <div class="stats">
     <div class="stat"><span class="label">Hashrate</span><span class="value">Mniej więcej to samo</span><span class="sub">PEP 2,9 PH/s, w zakresie DOGE 2,1–3,4 PH/s</span></div>
     <div class="stat"><span class="label">Zapłata minerom dziennie</span><span class="value" id="pay-ratio">1 043× mniej</span><span class="sub">PEP <span id="pay-pep2">$1,302</span>, DOGE <span id="pay-doge2">$1.36M</span></span></div>
-    <div class="stat"><span class="label">Market cap</span><span class="value" id="mcap-ratio">1/1,555</span><span class="sub">kapitalizacji Dogecoina</span></div>
+    <div class="stat"><span class="label">Kapitalizacja</span><span class="value" id="mcap-ratio">1/1,555</span><span class="sub">kapitalizacji Dogecoina</span></div>
   </div>
   <div class="prose">
     <p><strong>Jak mała moneta dostaje taki hashrate.</strong> Merge mining. Maszyny Scrypt kopiące Pepecoin już dostają zapłatę z Litecoina i Dogecoina — ok. <span id="pay-ltc-doge">$1.61M</span> dziennie w nagrodach bloków łącznie. Pule, które dodają PEP do merge mining, wypłacają go z góry za tę samą pracę i ten sam prąd. <a href="scrypt-family.html">Jak działa merge mining.</a></p>
@@ -260,7 +266,7 @@
   <h2 id="sources">Źródła</h2>
   <div class="sources">
     <div>
-      <h3>Rules and code</h3>
+      <h3>Zasady i kod</h3>
       <ul>
         <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp</a></li>
         <li><a href="https://github.com/dogecoin/dogecoin/blob/master/src/chainparams.cpp">Dogecoin chainparams.cpp</a></li>
@@ -270,13 +276,13 @@
       </ul>
     </div>
     <div>
-      <h3>Prices and supply</h3>
+      <h3>Ceny i podaż</h3>
       <ul>
         <li><a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko: Pepecoin</a></li>
         <li><a href="https://www.coingecko.com/en/coins/dogecoin">CoinGecko: Dogecoin</a></li>
         <li><a href="https://pepeplorer.com/network">Pepeplorer network stats</a></li>
         <li><a href="https://defillama.com/docs/api">DefiLlama price API (price history chart)</a></li>
-        <li>Coin logos: <a href="https://github.com/0xa3k5/web3icons">web3icons</a> and <a href="https://github.com/trustwallet/assets">Trust Wallet assets</a> (MIT licence)</li>
+        <li>Logo monet: <a href="https://github.com/0xa3k5/web3icons">web3icons</a> i <a href="https://github.com/trustwallet/assets">Trust Wallet assets</a> (licencja MIT)</li>
       </ul>
     </div>
   </div>
@@ -359,7 +365,7 @@
       $('doge-infl').textContent = pct(ISSUANCE / d.supply);
       $('doge-pay').textContent = money(PER_DAY * d.price);
       $('pay-doge2').textContent = money(PER_DAY * d.price);
-      $('pay-ratio').textContent = mult(d.price / p.price) + ' less';
+      $('pay-ratio').textContent = mult(d.price / p.price) + ' mniej';
       if (d.mcap) $('mcap-ratio').textContent = '1/' + Math.round(d.mcap / (p.price * ps)).toLocaleString('pl-PL');
       if (l) $('pay-ltc-doge').textContent = big(PER_DAY * d.price + LTC_PER_DAY * l.price, '$');
     }
@@ -428,7 +434,7 @@
   var LL = 'https://coins.llama.fi/';
   var CACHE_KEY = 'pf-age-v1';
   var TTL = 6 * 3600 * 1000;
-  var SNAP_DATE = 'October 6, 2026';
+  var SNAP_DATE = '6 października 2026';
   var SNAP = {
     doge: '16:0.0004051 46:0.001828 76:0.001249 106:0.0006927 136:0.000606 166:0.0004546 196:0.0003473 226:0.0002364 256:0.0001153 286:0.0002962 316:0.000255 346:0.0002219 376:0.0001805 406:0.0001406 436:0.0001411 466:0.0001433 496:0.0001084 526:0.0001162 556:0.0001672 586:0.0001849 616:0.0001555 646:0.0001241 676:0.00012 706:0.0001305 736:0.0001548 766:0.0001837 796:0.0002891 826:0.0002397 856:0.0002026 886:0.000222 916:0.0002634 946:0.000271 976:0.0002367 1006:0.0002306 1036:0.0002276 1066:0.0002209 1096:0.0002122 1126:0.0002255 1156:0.0002096 1186:0.0002187 1216:0.0004588 1246:0.0008222 1276:0.003218 1306:0.0025 1336:0.001787 1366:0.002196 1396:0.001062 1426:0.001097 1456:0.002142 1486:0.009576 1516:0.006858 1546:0.005956 1576:0.002747 1606:0.005425 1636:0.003434 1666:0.002292 1696:0.003399 1726:0.002495 1756:0.00573 1786:0.004285 1816:0.002241 1846:0.002363 1876:0.002043 1906:0.002077 1936:0.002019 1966:0.002583 1996:0.003045 2026:0.003321 2056:0.002847 2086:0.002681 2116:0.002584 2146:0.002699 2176:0.002547 2206:0.002077 2236:0.002403 2266:0.002844 2296:0.001769 2326:0.002061 2356:0.002545 2386:0.002475 2416:0.003056 2446:0.003528 2476:0.002836 2506:0.002592 2536:0.002779 2566:0.003225 2596:0.00865 2626:0.06945 2656:0.05883 2686:0.09408 2716:0.4889 2746:0.3131 2776:0.2071 2806:0.2655 2836:0.241 2866:0.2293 2896:0.2742 2926:0.1707 2956:0.1513 2986:0.1658 3016:0.1215 3046:0.1425 3076:0.1242 3106:0.08083 3136:0.07064 3166:0.0688 3196:0.06272 3226:0.06475 3256:0.1259 3286:0.1046 3316:0.07051 3346:0.09126 3376:0.07491 3406:0.09632 3436:0.07968 3466:0.07262 3496:0.06797 3526:0.07791 3556:0.06377 3586:0.0621 3616:0.06967 3646:0.08051 3676:0.091 3706:0.07881 3736:0.09795 3766:0.2199 3796:0.1475 3826:0.1691 3856:0.1228 3886:0.1343 3916:0.1098 3946:0.1097 3976:0.1419 4006:0.4307 4036:0.3238 4066:0.3628 4096:0.2395 4126:0.1726 4156:0.1786 4186:0.2449 4216:0.1539 4246:0.2713 4276:0.2215 4306:0.2653 4336:0.1953 4366:0.1617 4396:0.122 4426:0.1378 4456:0.101 4486:0.0952 4516:0.09952 4546:0.1088 4576:0.08711 4606:0.07235 4636:0.06956 4666:0.08363 4686:0.09584',
     pep: '60:0.00002488 68:0.00004722 76:0.00003637 84:0.00002165 92:0.0000203 100:0.00002141 108:0.00001019 116:0.00000648 130:0.00001491 138:0.0000077 146:0.00000608 154:0.00000659 162:0.00000515 170:0.00000386 178:0.00000268 186:0.000003 194:0.00000313 202:0.00000392 210:0.00000539 218:0.00000654 226:0.00000611 234:0.0000047 242:0.0000069 250:0.00001675 258:0.00002968 266:0.00005421 274:0.00003834 282:0.0000453 290:0.00005473 298:0.0002791 306:0.0002551 314:0.001004 316:0.001735 322:0.001278 330:0.001043 338:0.0008939 346:0.0003947 354:0.0006607 362:0.001029 370:0.0006224 380:0.0004227 388:0.0003755 396:0.0002958 404:0.000266 412:0.0002794 420:0.0003441 428:0.0002301 436:0.0001936 444:0.0002039 452:0.0002854 460:0.0002031 468:0.0001898 476:0.0002008 484:0.0002078 492:0.0002683 500:0.0002308 508:0.0001915 516:0.0002235 526:0.0002011 534:0.0002568 542:0.0004315 550:0.0006173 558:0.0006529 566:0.0005798 574:0.0004738 582:0.0003724 590:0.0003751 598:0.000401 606:0.0002933 616:0.0003081 624:0.000296 632:0.0002551 640:0.0002699 648:0.0003758 656:0.0003834 664:0.0003198 672:0.0002946 680:0.0002869 688:0.0002397 696:0.0002323 704:0.0002482 712:0.0002529 720:0.0002938 728:0.0002614 736:0.0002284 744:0.0003006 752:0.0002398 760:0.0002166 768:0.0002016 776:0.0001909 784:0.0001607 792:0.0001247 800:0.0001458 808:0.0001297 816:0.0001121 824:0.0001234 832:0.00013 840:0.0001209 848:0.0001323 856:0.0001229 864:0.0001171 872:0.0001068 880:0.00008369 888:0.00008892 896:0.0000658 904:0.00006749 912:0.00006753 920:0.00006052 928:0.00006699 936:0.000131 944:0.0001394 952:0.0001245 960:0.00008993 968:0.0001019 976:0.0000935 978:0.0000903'
@@ -491,8 +497,8 @@
   }
   function ageText(days) {
     var m = Math.round(days / 30.4375), y = Math.floor(m / 12), mo = m % 12, parts = [];
-    if (y) parts.push(y + (y === 1 ? ' rok' : ' lat'));
-    if (mo || !y) parts.push(mo + (mo === 1 ? ' month' : ' months'));
+    if (y) parts.push(y + (y === 1 ? ' rok' : (y % 10 >= 2 && y % 10 <= 4 && (y % 100 < 12 || y % 100 > 14)) ? ' lata' : ' lat'));
+    if (mo || !y) parts.push(mo + (mo === 1 ? ' miesiąc' : (mo >= 2 && mo <= 4 ? ' miesiące' : ' miesięcy')));
     return parts.join(' ');
   }
   function when(key, days, long) {
@@ -539,13 +545,13 @@
     if (mode === 'all') stepY = small ? 4 : 2; else stepY = small ? 1 : 0.5;
     for (t = 0; t <= years + 1e-6; t += stepY) {
       var tx = Math.round(x(t * 365.25)) + 0.5, label;
-      if (t === 0) label = 'launch';
-      else if (t < 1 || t % 1) label = Math.round(t * 12) + ' mo';
-      else label = t + (t === 1 ? ' yr' : ' yrs');
+      if (t === 0) label = 'start';
+      else if (t < 1 || t % 1) label = Math.round(t * 12) + ' mies.';
+      else label = t + (t === 1 ? ' rok' : (t % 10 >= 2 && t % 10 <= 4 && (t % 100 < 12 || t % 100 > 14)) ? ' lata' : ' lat');
       svg.appendChild(el('line', { 'class': 'grid', x1: tx, x2: tx, y1: m.t + ph, y2: m.t + ph + 5 }));
       svg.appendChild(el('text', { x: tx, y: m.t + ph + 20, 'text-anchor': t === 0 ? 'start' : 'middle' }, label));
     }
-    svg.appendChild(el('text', { x: W - m.r, y: H - 6, 'text-anchor': 'end' }, 'time since each coin launched'));
+    svg.appendChild(el('text', { x: W - m.r, y: H - 6, 'text-anchor': 'end' }, 'czas od startu każdej monety'));
 
     ['doge', 'pep'].forEach(function (key) {
       var s = series[key], d = '';
@@ -591,7 +597,7 @@
     geo.hair.setAttribute('visibility', 'visible');
     parts[0].setAttribute('x1', px); parts[0].setAttribute('x2', px);
     tip.textContent = '';
-    tip.appendChild(h('div', 'age-tip-head', ageText(cursor) + ' after launch'));
+    tip.appendChild(h('div', 'age-tip-head', ageText(cursor) + ' po starcie'));
     ['doge', 'pep'].forEach(function (key, n) {
       var p = at(data[key], cursor), dot = parts[n + 1];
       if (p == null) dot.setAttribute('visibility', 'hidden');
@@ -599,7 +605,7 @@
       var row = h('div', 'age-tip-row ' + key), who = h('span', '', NAME[key]);
       row.appendChild(h('i'));
       var tooOld = cursor > last(data[key])[0];
-      who.appendChild(h('small', '', p == null ? (tooOld ? 'not this old yet' : 'no price data yet') : when(key, cursor)));
+      who.appendChild(h('small', '', p == null ? (tooOld ? 'jeszcze nie jest tak stara' : 'brak jeszcze danych o cenie') : when(key, cursor)));
       row.appendChild(who);
       row.appendChild(h('b', p == null ? 'none' : '', p == null ? '–' : money(p)));
       tip.appendChild(row);
@@ -639,7 +645,7 @@
     var pep = last(data.pep), same = at(data.doge, pep[0]);
     function set(id, text) { var n = document.getElementById(id); if (n) n.textContent = text; }
     set('age-pep', money(pep[1]));
-    set('age-pep-sub', ageText(pep[0]) + ' after launch');
+    set('age-pep-sub', ageText(pep[0]) + ' po starcie');
     if (same) {
       set('age-doge', money(same));
       set('age-doge-sub', 'in ' + when('doge', pep[0], true));

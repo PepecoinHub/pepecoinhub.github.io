@@ -225,8 +225,18 @@
     set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { /* private mode */ } }
   };
 
+  // Pages whose shell is in a language the app has no strings for (es, de, fr, tr, it, zh...):
+  // run the app in English, keep the page's own <html lang>, and mark only the app as English.
+  const PAGE_LANG = (document.documentElement.lang || '').toLowerCase();
+  const FOREIGN_SHELL = !!PAGE_LANG && !/^(en|pl)\b/.test(PAGE_LANG);
+  const setLang = (l) => {
+    if (FOREIGN_SHELL) { var el = document.getElementById('app'); if (el) el.setAttribute('lang', l); }
+    else document.documentElement.lang = l;
+  };
+
   const state = {
     lang: (function () {
+      if (FOREIGN_SHELL) return 'en';
       var stored = store.get('phw-lang');
       if (stored === 'en' || stored === 'pl') return stored;
       var htmlLang = (document.documentElement.lang || '').toLowerCase();
@@ -253,7 +263,8 @@
 
   const app = document.getElementById('app');
   const t = (k, vars) => {
-    let s = STR[state.lang][k];
+    const pack = STR[state.lang] || STR.en;
+    let s = pack[k];
     if (s == null) s = STR.en[k];
     if (typeof s === 'string' && vars) s = s.replace(/\{(\w+)\}/g, (_, n) => (vars[n] == null ? '' : vars[n]));
     return s;
@@ -261,13 +272,14 @@
   const isAll = (p) => p === 'all';
   function periodLabel(p) {
     if (isAll(p)) return t('period_all');
-    if (PERIOD_LABEL[state.lang][p]) return PERIOD_LABEL[state.lang][p];
+    var labels = PERIOD_LABEL[state.lang] || PERIOD_LABEL.en;
+    if (labels[p]) return labels[p];
     if (p % 365 === 0) return p / 365 + (state.lang === 'pl' ? 'L' : 'Y');
     return p + 'D';
   }
   function periodWords(p) {
     if (isAll(p)) return t('period_all_words');
-    if (PERIOD_WORDS[state.lang][p]) return PERIOD_WORDS[state.lang][p];
+    if ((PERIOD_WORDS[state.lang] || PERIOD_WORDS.en)[p]) return (PERIOD_WORDS[state.lang] || PERIOD_WORDS.en)[p];
     if (p % 365 === 0) return t('years', { n: p / 365 });
     return p + (state.lang === 'pl' ? ' dni' : ' days');
   }
@@ -365,7 +377,7 @@
       onclick: () => {
         state.lang = state.lang === 'en' ? 'pl' : 'en';
         store.set('phw-lang', state.lang);
-        document.documentElement.lang = state.lang;
+        setLang(state.lang);
         render();
       }
     }, t('lang_to'));
@@ -798,7 +810,7 @@
     for (const r of S.holders) {
       const rank = ex ? r[7] : r[0];
       if (rank == null) continue;
-      const tag = r[4] || (r[5] ? STR[state.lang].types[r[5]] || r[5] : '');
+      const tag = r[4] || (r[5] ? (STR[state.lang] || STR.en).types[r[5]] || r[5] : '');
       if (q && !(r[1].toLowerCase().includes(q) || tag.toLowerCase().includes(q))) continue;
       out.push({ rank, addr: r[1], pep: r[2], pct: ex ? r[8] : r[3], tag, type: r[5], last: r[6] });
     }
@@ -882,7 +894,7 @@
       h('div', { class: 'panel' }, h('h2', {}, t('err_title')), h('p', {}, t('err_body'))));
   }
 
-  document.documentElement.lang = state.lang;
+  setLang(state.lang);
   fetch(dataUrl('summary.json'), { cache: 'no-cache' })
     .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then((data) => { S = data; lastW = app.clientWidth; render(); })

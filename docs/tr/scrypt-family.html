@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scrypt birleşik madencilik: Litecoin, Dogecoin ve Pepecoin</title>
+<meta name="description" content="Litecoin, Dogecoin ve Pepecoin'in birleşik madencilik (AuxPoW) sayesinde tek bir Scrypt madencisini nasıl paylaştığı: Charlie Lee'nin 2014'teki önerisinden Pepecoin'in 2024'teki çıkışına.">
+<link rel="canonical" href="https://pepecoinhub.com/tr/scrypt-family.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/scrypt-family.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/scrypt-family.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/scrypt-family.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/scrypt-family.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/scrypt-family.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/scrypt-family.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/scrypt-family.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/scrypt-family.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/scrypt-family.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="Scrypt birleşik madencilik: Litecoin, Dogecoin ve Pepecoin">
+<meta property="og:description" content="Litecoin, Dogecoin ve Pepecoin'in birleşik madencilik (AuxPoW) sayesinde tek bir Scrypt madencisini nasıl paylaştığı: Charlie Lee'nin 2014'teki önerisinden Pepecoin'in 2024'teki çıkışına.">
+<meta property="og:url" content="https://pepecoinhub.com/tr/scrypt-family.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin logosu: PEP hakkında gerçekler, sayılar ve kaynaklar">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../facts.css?v=20261007d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Scrypt ailesi: tek madenci, üç coin", "description": "Litecoin, Dogecoin ve Pepecoin'in birleşik madencilik sayesinde tek bir Scrypt madencisini nasıl paylaştığı.", "datePublished": "2026-10-05", "dateModified": "2026-10-06", "mainEntityOfPage": "https://pepecoinhub.com/scrypt-family.html", "author": {"@type": "Organization", "name": "Pepecoin Hub (r/pepecoin topluluğundan gönüllüler)"}, "publisher": {"@type": "Organization", "name": "Pepecoin Hub"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Birleşik madencilik nedir?", "acceptedAnswer": {"@type": "Answer", "text": "Birleşik madencilik (merged mining) ya da Auxiliary Proof of Work (AuxPoW), bir madencinin tek bir iş ispatıyla aynı hash algoritmasını paylaşan birkaç blokzincirde blok üretmesini sağlar. Her zincir işi kendi kurallarına göre doğrular ve kendi ödülünü öder."}}, {"@type": "Question", "name": "Birleşik madencilik Litecoin veya Dogecoin ödüllerini azaltır mı?", "acceptedAnswer": {"@type": "Answer", "text": "Hayır. Hash oranı zincirler arasında bölünmez. Madenci eskisi kadar Litecoin ve Dogecoin kazanır; birleşik madencilikle kazılan coin'ler bunun üstüne eklenir."}}, {"@type": "Question", "name": "Hangi coin'ler Litecoin ile birleşik madencilikle kazılabilir?", "acceptedAnswer": {"@type": "Answer", "text": "Dogecoin ve Pepecoin, ayrıca daha küçük Scrypt zincirleri: Bellscoin, Luckycoin, Junkcoin, Dingocoin ve Shibacoin. Tam liste mining pool'a göre değişir."}}, {"@type": "Question", "name": "Pepecoin hangi donanımla kazılır?", "acceptedAnswer": {"@type": "Answer", "text": "Litecoin ve Dogecoin için kullanılan cihazın aynısı olan, birleşik madenciliği destekleyen bir havuza bağlanmış bir Scrypt ASIC madencisiyle. ViaBTC örnek olarak Antminer L9 ve ElphaPex DG1'i gösteriyor."}}, {"@type": "Question", "name": "Pepecoin, PEPE ile aynı şey mi?", "acceptedAnswer": {"@type": "Answer", "text": "Hayır. PEPE, Ethereum üzerinde bir token'dır. Pepecoin (PEP) ise kendi iş ispatı blokzincirine sahip bir coin'dir. Bkz. Hangi Pepecoin hangisi?"}}, {"@type": "Question", "name": "Pepecoin'in arz üst sınırı var mı?", "acceptedAnswer": {"@type": "Answer", "text": "Hayır. Dogecoin gibi blok başına sabit 10.000 coin ekler, bu yüzden enflasyon oranı her yıl düşer. Bkz. Arz ve enflasyon."}}]}</script>
+<style>
+/* Scrypt family page. Sections sit inside <article>, so it repeats the .wrap spacing. */
+:root { --wire: #9aaba2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --wire: #4d5d55; } }
+:root[data-theme="dark"] { --wire: #4d5d55; }
+.wrap-article { display: grid; gap: 56px; min-width: 0; }
+.wrap-article > * { min-width: 0; }
+q { quotes: "\201C" "\201D"; }
+
+/* Coin logos (docs/assets/coins), 40 px next to each coin's name */
+.glyph { flex: none; width: 40px; height: 40px; object-fit: contain; }
+
+/* "Tek hash, üç blokzincir": a miner node, a wire tree, and one card per chain.
+   Each card has a five-minute strip with one square per block found. */
+.fam { margin: 0; display: grid; justify-items: center; }
+.fam > * { min-width: 0; }
+.fam-src { display: flex; align-items: center; gap: 14px; padding: 12px 24px 12px 14px; background: var(--panel); border: 2px solid var(--accent); border-radius: 999px; }
+.fam-chip { width: 46px; height: 46px; flex: none; color: var(--accent); }
+.fam-src div { display: grid; line-height: 1.25; }
+.fam-src strong { font-size: 1.2rem; font-weight: 700; }
+.fam-src span { font-size: 0.9rem; color: var(--muted); }
+.fam-tree { position: relative; width: 100%; height: 36px; }
+.fam-tree::before { content: ""; position: absolute; left: 50%; top: 0; height: 18px; border-left: 2px solid var(--wire); }
+.fam-tree::after { content: ""; position: absolute; top: 18px; left: calc((100% - 32px) / 6); right: calc((100% - 32px) / 6); border-top: 2px solid var(--wire); }
+.fam-chains { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.fam-chain { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 16px 14px; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.fam-chain::before { content: ""; position: absolute; left: 50%; top: -19px; height: 18px; border-left: 2px solid var(--wire); }
+.fam-chain.hl { border-color: var(--accent); background: var(--accent-soft); }
+.fam-chain h3 { font-size: 1.2rem; font-weight: 700; }
+.fam-role { font-size: 0.88rem; color: var(--muted); }
+.fam-time { position: relative; height: 20px; margin: 12px 0 2px; border-bottom: 2px solid var(--rule); }
+.fam-time i { position: absolute; bottom: 3px; width: 14px; height: 14px; border-radius: 3px; background: var(--muted); transform: translateX(-100%); }
+.fam-chain.hl .fam-time i { background: var(--series); }
+.fam-time-label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+.fam-pays { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule); font-size: 0.9rem; }
+.fam-more { margin-top: 14px; font-size: 0.9rem; color: var(--muted); text-align: center; max-width: 62ch; }
+.pull { margin: 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--accent); display: grid; gap: 8px; max-width: 68ch; }
+.pull p { font-size: 1.3rem; line-height: 1.4; font-weight: 500; }
+.pull footer { font-size: 0.9rem; color: var(--muted); }
+
+/* The whole family */
+.family { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+.coin { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 12px; align-items: center; align-content: start; padding: 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; min-width: 0; }
+.coin.hl { border-color: var(--accent); background: var(--accent-soft); }
+.coin h3 { font-size: 1.08rem; font-weight: 700; line-height: 1.25; }
+.coin h3 small { font-size: 0.8rem; font-weight: 500; color: var(--muted); margin-left: 4px; }
+.coin .since { display: block; font-family: var(--f-mono); font-size: 0.85rem; color: var(--muted); }
+.coin p { grid-column: 1 / -1; font-size: 0.92rem; color: var(--muted); }
+
+/* How it works: three numbered steps */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: step; }
+.steps li { counter-increment: step; display: grid; gap: 8px; align-content: start; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; min-width: 0; }
+.steps li::before { content: counter(step); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-mid); font-weight: 700; }
+.steps h3 { font-weight: 700; }
+.steps p { font-size: 0.95rem; color: var(--muted); }
+.aside-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.aside-row .callout { max-width: none; }
+.callout h3 { font-weight: 700; font-size: 1rem; }
+.callout p { font-size: 0.95rem; }
+
+/* How it happened: one rail, one card per milestone */
+.story { list-style: none; margin: 0; padding: 0; position: relative; display: grid; gap: 12px; }
+.story::before { content: ""; position: absolute; left: 7px; top: 10px; bottom: 10px; border-left: 2px solid var(--rule); }
+.story li { position: relative; display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 4px 16px; padding-left: 30px; align-items: start; }
+.story li::before { content: ""; position: absolute; left: 0; top: 14px; width: 12px; height: 12px; border-radius: 50%; background: var(--paper); border: 2px solid var(--wire); }
+.story li.hl::before { background: var(--accent); border-color: var(--accent); }
+.story .when { padding-top: 10px; font-family: var(--f-mono); font-size: 0.95rem; font-weight: 700; color: var(--muted); }
+.story .event { display: grid; gap: 4px; padding: 12px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; min-width: 0; }
+.story li.hl .event { background: var(--accent-soft); border-color: var(--accent); }
+.story h3 { font-weight: 700; font-size: 1.05rem; }
+.story p { font-size: 0.95rem; color: var(--muted); }
+.story p q { color: var(--ink); }
+
+/* Personal note: kept apart from the sourced article */
+.opinion { max-width: 68ch; gap: 14px; padding: 24px 26px; }
+.opinion h2 { font-size: 1.4rem; }
+.opinion p { max-width: 62ch; }
+
+@media (max-width: 720px) {
+  .steps { grid-template-columns: minmax(0, 1fr); }
+  .steps li { grid-template-columns: auto minmax(0, 1fr); column-gap: 14px; }
+  .steps li::before { grid-row: span 2; }
+  .story li { grid-template-columns: minmax(0, 1fr); }
+  .story .when { padding-top: 6px; }
+}
+@media (max-width: 620px) {
+  .fam { justify-items: stretch; }
+  .fam-src { border-radius: 10px; }
+  .fam-tree { height: 18px; }
+  .fam-tree::before { left: 12px; height: 18px; }
+  .fam-tree::after { display: none; }
+  .fam-chains { grid-template-columns: minmax(0, 1fr); gap: 14px; padding-left: 30px; }
+  .fam-chain::before { left: -18px; top: 50%; width: 16px; height: 0; border-left: 0; border-top: 2px solid var(--wire); }
+  .fam-chain::after { content: ""; position: absolute; left: -18px; top: -15px; height: calc(100% + 15px); border-left: 2px solid var(--wire); }
+  .fam-chain:last-child::after { height: calc(50% + 16px); }
+  .fam-more { text-align: left; }
+  .opinion { padding: 18px 16px; }
+}
+</style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Sayfalar"><a href="which-pepecoin.html">Hangisi hangisi</a><a href="compare.html">PEP ve DOGE</a><a href="calculator.html">Hesaplayıcı</a><a href="supply.html">Arz</a><a href="scrypt-family.html" aria-current="page">Scrypt ailesi</a><a href="network.html">Ağ</a><a href="rich-list.html">Zenginler listesi</a><a href="guides.html">Rehberler</a></nav>
+</header>
+<main class="wrap" id="main">
+<article class="wrap-article">
+<header class="page-head">
+<p class="eyebrow">Scrypt birleşik madencilik · güncellendi: 6 Ekim 2026</p>
+  <h1>Scrypt ailesi: tek madenci, üç coin</h1>
+  <p class="lede">Bir Scrypt madencilik cihazı işini bir kez yapar ve aynı anda birkaç blokzincirden ödeme alır. Aileyi 2011'de Litecoin başlattı, 2014'te Dogecoin, 2024'te de Pepecoin katıldı. Bunun nasıl olduğu ve madencilere ve coin sahiplerine ne kazandırdığı burada.</p>
+</header>
+
+<section aria-label="Temel bilgiler">
+  <div class="stats">
+    <div class="stat"><span class="label">Tek cihaz</span><span class="value">3 coin</span><span class="sub">Tek bir Scrypt madencisinden LTC, DOGE ve PEP</span></div>
+    <div class="stat"><span class="label">Ek elektrik</span><span class="value">Yok</span><span class="sub">her zincir aynı işi doğrular</span></div>
+    <div class="stat"><span class="label">Dogecoin</span><span class="value">2014'ten beri</span><span class="sub">Litecoin ile birleşik madencilik</span></div>
+    <div class="stat"><span class="label">Pepecoin</span><span class="value">2024'ten beri</span><span class="sub">42.000. bloktan itibaren birleşik madencilik</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="diagram">
+  <h2 id="diagram">Tek hash, üç blokzincir</h2>
+  <p class="note">Bir Scrypt cihazı tek bir şey yapar: hash hesaplar. Birleşik madencilikte her hash aynı anda her zincirin hedefiyle karşılaştırılır. Bir zincir için yeterince iyi olduğunda o zincir yeni bir blok alır ve kendi ödülünü öder.</p>
+  <figure class="fam">
+    <div class="fam-src">
+      <svg class="fam-chip" viewBox="0 0 48 48" aria-hidden="true"><rect x="12" y="12" width="24" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="2.5"/><rect x="19" y="19" width="10" height="10" rx="1.5" fill="currentColor"/><path d="M18 5v6M24 5v6M30 5v6M18 37v6M24 37v6M30 37v6M5 18h6M5 24h6M5 30h6M37 18h6M37 24h6M37 30h6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <div><strong>Tek bir Scrypt hash'i</strong><span>aynı cihaz, aynı elektrik</span></div>
+    </div>
+    <div class="fam-tree" aria-hidden="true"></div>
+    <ul class="fam-chains">
+      <li class="fam-chain">
+        <h3>Litecoin</h3>
+        <span class="fam-role">LTC · ana zincir, 2011'den beri</span>
+        <div class="fam-time" role="img" aria-label="Beş dakikada 2 blok"><i style="left:50%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>5 dakikada blok</span><span>2,5 dakikada bir blok</span></span>
+        <span class="fam-pays">LTC öder</span>
+      </li>
+      <li class="fam-chain">
+        <h3>Dogecoin</h3>
+        <span class="fam-role">DOGE · 2014'ten beri birleşik madencilik</span>
+        <div class="fam-time" role="img" aria-label="Beş dakikada 5 blok"><i style="left:20%"></i><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>5 dakikada blok</span><span>dakikada bir blok</span></span>
+        <span class="fam-pays">DOGE öder</span>
+      </li>
+      <li class="fam-chain hl">
+        <h3>Pepecoin</h3>
+        <span class="fam-role">PEP · 2024'ten beri birleşik madencilik</span>
+        <div class="fam-time" role="img" aria-label="Beş dakikada 5 blok"><i style="left:20%"></i><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>5 dakikada blok</span><span>dakikada bir blok</span></span>
+        <span class="fam-pays">PEP öder</span>
+      </li>
+    </ul>
+    <figcaption class="fam-more">Pek çok havuz daha küçük Scrypt zincirlerini de ekler: Bellscoin, Luckycoin, Junkcoin, Dingocoin ve Shibacoin; <a href="#family">aşağıda</a> listelenmiştir. Binance Pool, ViaBTC, F2Pool ve EMCD'nin hepsi LTC ve DOGE'nin yanında PEP de öder.</figcaption>
+  </figure>
+  <blockquote class="pull">
+    <p>“Merging mining with dogecoin would make both litecoin/dogecoin almost impossible to 51%.”</p>
+    <footer>Charlie Lee, Dogecoin subreddit'i, Nisan 2014; aktaran: <a href="https://www.coindesk.com/markets/2014/04/08/charlie-lee-proposes-merged-mining-of-litecoin-and-dogecoin">CoinDesk</a>. Pepecoin de aynı ortak hash oranına bağlanıyor.  <p class="correction">Bir hata mı gördünüz? GitHub'da (kaynakla birlikte) <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>düzeltme bildirin</a>.</p>
+</footer>
+  </blockquote>
+</section>
+
+<section aria-labelledby="family">
+  <h2 id="family">Ailenin tamamı</h2>
+  <p class="note">Mining pool'ların en sık ödediği Scrypt zincirleri. Bellscoin, Luckycoin ve Junkcoin 2013'ten kalmadır ve 2023 ile 2024'te yeniden hayata döndü.</p>
+  <ul class="family">
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/ltc.png" alt="" width="40" height="40">
+      <div><h3>Litecoin<small>LTC</small></h3><span class="since">Eki 2011'den beri</span></div>
+      <p>Ana zincir. Charlie Lee'nin Bitcoin'in Scrypt versiyonu; 2,5 dakikalık bloklar ve 84 milyonluk üst sınır.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/doge.png" alt="" width="40" height="40">
+      <div><h3>Dogecoin<small>DOGE</small></h3><span class="since">Ara 2013'ten beri</span></div>
+      <p>Luckycoin ve Litecoin kodu üzerine kuruldu. Eylül 2014'ten beri Litecoin ile birleşik madencilikle kazılıyor.</p>
+    </li>
+    <li class="coin hl">
+      <img class="glyph" src="../assets/brand/icon.svg" alt="" width="40" height="40">
+      <div><h3>Pepecoin<small>PEP</small></h3><span class="since">Oca 2024'ten beri</span></div>
+      <p>Ön madencilik olmadan Dogecoin Core'un bir fork'u. 42.000. bloktan itibaren birleşik madencilik.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/bells.png" alt="" width="40" height="40">
+      <div><h3>Bellscoin<small>BELLS</small></h3><span class="since">Kas 2013'ten beri</span></div>
+      <p>Billy Markus'un Dogecoin'den birkaç gün önce çıkan Animal Crossing coin'i. Aralık 2023'te yeniden canlandırıldı, 144.000. bloktan itibaren birleşik madencilikle kazılıyor.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/lky.png" alt="" width="40" height="40">
+      <div><h3>Luckycoin<small>LKY</small></h3><span class="since">May 2013'ten beri</span></div>
+      <p>Dogecoin'in kodunun üzerine kurulduğu Litecoin fork'u. 2024'te 2013'teki orijinal zinciri üzerinde yeniden canlandırıldı.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/jkc.png" alt="" width="40" height="40">
+      <div><h3>Junkcoin<small>JKC</small></h3><span class="since">May 2013'ten beri</span></div>
+      <p>İlk meme coin'lerden biri, 54 milyonla sınırlı. Topluluğu onu Kasım 2024'te yeniden başlattı.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/dingo.png" alt="" width="40" height="40">
+      <div><h3>Dingocoin<small>DINGO</small></h3><span class="since">Nis 2021'den beri</span></div>
+      <p>Fair launch ile çıkan bir Dogecoin fork'u: bir dakikalık bloklar, sabit 10.000 coin ödül ve üst sınır yok.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/shic.png" alt="" width="40" height="40">
+      <div><h3>Shibacoin<small>SHIC</small></h3><span class="since">Ara 2024'ten beri</span></div>
+      <p>Daha yeni bir Dogecoin fork'u; 24.000. bloktan itibaren Litecoin ile birleşik madencilikle kazılıyor.</p>
+    </li>
+  </ul>
+  <p class="note">Bir madencinin bunlardan hangilerini alacağı havuza bağlıdır. ViaBTC'nin Litecoin havuzu LTC'nin üstüne yedisini de listeler: DOGE, BELLS, LKY, PEP, JKC, DINGO ve SHIC. Diğer havuzlarda karışım farklıdır.</p>
+</section>
+
+<section aria-labelledby="how">
+  <h2 id="how">Birleşik madencilik nasıl çalışır?</h2>
+  <p class="note">Teknik adı Auxiliary Proof of Work, kısaca AuxPoW'dur. Her zincir kendi defterini, kendi kurallarını ve kendi ödülünü korur. Yalnızca iş paylaşılır.</p>
+  <ol class="steps">
+    <li><h3>Tek blok oluştur</h3><p>Madenci bir Litecoin bloğu oluşturur ve içine bir Dogecoin bloğuna ve bir Pepecoin bloğuna referans yerleştirir.</p></li>
+    <li><h3>Bir kez hash'le</h3><p>Cihaz, Scrypt işini aynı donanım ve aynı elektrikle tek bir kez yapar.</p></li>
+    <li><h3>Her zincir doğrular</h3><p>Sonuç bir zincir için yeterince iyiyse o zincir kendi bloğunu kabul eder ve kendi ödülünü öder. Her zincir gerçek Scrypt işi yapıldığını doğrulayabilir.</p></li>
+  </ol>
+  <div class="aside-row">
+    <div class="callout">
+      <h3>Hiçbir şey bölünmez</h3>
+      <p>Madenciler eskisi kadar LTC ve DOGE kazanır. ViaBTC havuzunun ifadesiyle PEP, <q>an additional reward from merged mining, requiring no extra hashrate.</q></p>
+    </div>
+    <div class="callout gold">
+      <h3>Neden Bitcoin değil de Scrypt?</h3>
+      <p>Scrypt, Bitcoin'in SHA-256'sından daha fazla bellek gerektirir. Bir Bitcoin madencisi Scrypt coin'lerini kazamaz, bir Scrypt madencisi de Bitcoin kazamaz.</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="story">
+  <h2 id="story">Nasıl oldu?</h2>
+  <ol class="story">
+    <li><span class="when">2009</span><div class="event"><h3>Scrypt yayımlanır</h3><p>Colin Percival, Tarsnap yedekleme hizmeti için bu hash fonksiyonunu tasarlar.</p></div></li>
+    <li><span class="when">Eki 2011</span><div class="event"><h3>Litecoin</h3><p>Eski bir Google mühendisi olan Charlie Lee, Litecoin'i Scrypt, 2,5 dakikalık bloklar ve 84 milyon coin üst sınırıyla yayımlar.</p></div></li>
+    <li><span class="when">Ara 2013</span><div class="event"><h3>Dogecoin</h3><p>Billy Markus ve Jackson Palmer onu Luckycoin ve Litecoin kodu üzerine kurar: yine Scrypt, bir dakikalık bloklarla.</p></div></li>
+    <li><span class="when">Nis 2014</span><div class="event"><h3>Charlie Lee'nin önerisi</h3><p>Dogecoin'in ödülleri hızla yarılanıyordu, madenciler ayrılıyordu ve %51 saldırısı ucuzluyordu. Lee, Dogecoin subreddit'inde Litecoin madencilerinin de Dogecoin'i korumasını önerir. <q>Merge mining only affects mining and nothing else,</q> diye yazar. Kurucu ortak Jackson Palmer başta ikna olmaz.</p></div></li>
+    <li><span class="when">Eyl 2014</span><div class="event"><h3>Dogecoin evet der</h3><p>Geliştiriciler ağustosta <q>Our hashrate has been on a decline,</q> diye yazar. Birleşik madencilik 371.337. blokta devreye girer. Lee'ye göre topluluk artık en iyi yaptığı şeye odaklanabilir: <q>focus on what dogecoin does best</q>. Litecoin Foundation'a göre Billy Markus daha sonra bu kararın Dogecoin'i kurtardığını söyledi.</p></div></li>
+    <li><span class="when">2015</span><div class="event"><h3>Blok başına 10.000 DOGE</h3><p>Dogecoin'in ödülü blok başına sabit 10.000 coin'e oturur ve Litecoin ile yapılan düzenleme o günden beri sürüyor.</p></div></li>
+    <li class="hl"><span class="when">Oca 2024</span><div class="event"><h3>Pepecoin doğar</h3><p>Aynı kurallara sahip, ön madencilik, ICO ve ekip tahsisi olmayan bir Dogecoin Core fork'u. Var olan her PEP kazıldı. Birleşik madencilik 42.000. bloktan itibaren yerleşik.</p></div></li>
+    <li><span class="when">2024–25</span><div class="event"><h3>Aile büyüyor</h3><p>Eski ve yeni Scrypt zincirleri büyük havuzlarda Litecoin birleşik madenciliğine katılır: Bellscoin, Luckycoin, Junkcoin, Dingocoin ve Shibacoin.</p></div></li>
+    <li><span class="when">Eki 2025</span><div class="event"><h3>Litecoin ve Dogecoin fonları</h3><p>Canary'nin ilk ABD spot Litecoin ETF'i LTCC, Nasdaq'ta listelenir. Grayscale'in spot Dogecoin fonu GDOG bir ay sonra NYSE Arca'da onu izler.</p></div></li>
+    <li class="hl"><span class="when">Şub 2026</span><div class="event"><h3>Kraken, Pepecoin'i listeler</h3><p>PEP, Kraken'da işlem görmeye başlar.</p></div></li>
+    <li><span class="when">Tem 2026</span><div class="event"><h3>Geliştiriciler birleşik madencilik üzerine</h3><p>Dogecoin geliştiricisi chromatic, Dogecoin'in güvenliğinin yalnızca Litecoin'e değil, birleşik madencilikle kazılan tüm Scrypt zincirlerine dayandığını belirtir. Billy Markus ekler: <q>Doge is the most profitable scrypt coin to mine.</q></p></div></li>
+    <li class="hl"><span class="when">Eki 2026</span><div class="event"><h3>Bugün Pepecoin</h3><p>6 Ekim'de 40,6 milyonluk madencilik zorluğu; Dogecoin'in o hafta geçtiği 28,8 ile 47,5 milyon aralığının içinde. İkisi de dakikada bir blok hedefliyor, yani bu benzer bir hash oranı anlamına geliyor. Bir Pepecoin kurucu ortağı, Amsterdam'daki Litecoin Summit 2026'da birleşik madencilik panelindeydi.</p></div></li>
+  </ol>
+</section>
+
+<section aria-labelledby="why">
+  <h2 id="why">Madencilere ve coin sahiplerine ne kazandırır?</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>Madenciler için</h3>
+      <p>Aynı cihaz ve aynı elektrikle daha fazla coin. PEP, bir ödeme adresi dışında ek kurulum gerektirmeden LTC ve DOGE'nin üstüne gelir.</p>
+    </div>
+    <div class="card">
+      <h3>Ağ için</h3>
+      <p>Genç bir zincir, kendi madencilerini sıfırdan çekmek zorunda kalmak yerine en başından yerleşik zincirlerin hash oranıyla korunur.</p>
+    </div>
+    <div class="card">
+      <h3>Coin sahipleri için</h3>
+      <p>Her blok, ödül ve bakiye herkese açık bir blokzincirdedir. Herkes arzı, zenginler listesini ve mining pool'ları bir explorer'da kontrol edebilir.</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="note">
+  <div class="callout gold opinion">
+    <p class="eyebrow">Görüş · kişisel bir not</p>
+    <h2 id="note">Neden buradayım?</h2>
+    <p>Bu kutunun üstündeki her şey bir blok explorer'ı veya kaynak bağlantısıyla doğrulanabilir. Bu kısım doğrulanamaz. Sadece inandığım şey.</p>
+    <p>Bence iş ispatı hikâyesi geri dönüyor. Kripto, bir öğleden sonrada basılan token'larla boğuluyor. Hızlı para; para başka yere gidince de geride topluluk kalmıyor. Pepecoin'de durum tam tersi: Kimseye tek bir coin bile hediye edilmedi, insanlar kalıyor ve ben çok keyif alıyorum.</p>
+    <p>Borsalar ve kripto daha yeni yeni iç içe geçmeye başlıyorsa, bence büyük finans dünyası Bitcoin kadar sağlam coin'ler aramaya çıkacak ve sırada ilk Litecoin var. Madencileri zinciri on beş yıldır blok blok ayakta tutuyor ve Litecoin ile Dogecoin fonları zaten ABD borsalarında işlem görüyor.</p>
+    <p>Ve en sevdiğim kısım şu: Litecoin iyi gittiğinde Scrypt madenciliği daha çok kazandırır. Daha iyi kazanç daha çok madenci getirir ve bu cihazların her biri aynı anda Dogecoin ve Pepecoin de kazabilir. Daha çok madenci, üzerimizde daha çok göz.</p>
+    <p>O yüzden dürüst olanları destekleyin: fair launch, iş ispatı, Scrypt fam. pump.fun lansmanları ve düpedüz dolandırıcılıklarla dolup taşan bir piyasada bu, temiz bir nefes. Kripto, olması gerektiği gibi. Dürüst.</p>
+    <p class="src">Bu sayfaları derleyen gönüllü tarafından yazıldı. Bir görüştür; tahmin veya yatırım tavsiyesi değildir. Yazar PEP sahibidir.</p>
+  </div>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">Sık sorulan sorular</h2>
+  <div class="faq">
+    <details><summary>Birleşik madencilik nedir?</summary><p>Birleşik madencilik (merged mining) ya da Auxiliary Proof of Work (AuxPoW), bir madencinin tek bir iş ispatıyla aynı hash algoritmasını paylaşan birkaç blokzincirde blok üretmesini sağlar. Her zincir işi kendi kurallarına göre doğrular ve kendi ödülünü öder.</p></details>
+    <details><summary>Birleşik madencilik Litecoin veya Dogecoin ödüllerini azaltır mı?</summary><p>Hayır. Hash oranı zincirler arasında bölünmez. Madenci eskisi kadar Litecoin ve Dogecoin kazanır; birleşik madencilikle kazılan coin'ler bunun üstüne eklenir.</p></details>
+    <details><summary>Hangi coin'ler Litecoin ile birleşik madencilikle kazılabilir?</summary><p>Dogecoin ve Pepecoin, ayrıca daha küçük Scrypt zincirleri: Bellscoin, Luckycoin, Junkcoin, Dingocoin ve Shibacoin. Tam liste mining pool'a göre değişir.</p></details>
+    <details><summary>Pepecoin hangi donanımla kazılır?</summary><p>Litecoin ve Dogecoin için kullanılan cihazın aynısı olan, birleşik madenciliği destekleyen bir havuza bağlanmış bir Scrypt ASIC madencisiyle. ViaBTC örnek olarak Antminer L9 ve ElphaPex DG1'i gösteriyor.</p></details>
+    <details><summary>Pepecoin, PEPE ile aynı şey mi?</summary><p>Hayır. PEPE, Ethereum üzerinde bir token'dır. Pepecoin (PEP) ise kendi iş ispatı blokzincirine sahip bir coin'dir. Bkz. <a href="which-pepecoin.html">Hangi Pepecoin hangisi?</a></p></details>
+    <details><summary>Pepecoin'in arz üst sınırı var mı?</summary><p>Hayır. Dogecoin gibi blok başına sabit 10.000 coin ekler, bu yüzden enflasyon oranı her yıl düşer. Bkz. <a href="supply.html">Arz ve enflasyon</a>.</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">Kaynaklar</h2>
+  <div class="sources">
+    <div>
+      <h3>Tarihçe</h3>
+      <ul>
+        <li><a href="https://www.coindesk.com/markets/2014/04/08/charlie-lee-proposes-merged-mining-of-litecoin-and-dogecoin">CoinDesk, April 2014: Charlie Lee proposes merged mining</a></li>
+        <li><a href="https://www.reddit.com/r/dogecoin/comments/22eprz/ltc_creator_charlie_lee_explains_his/">r/dogecoin, April 2014: Lee explains his proposal</a></li>
+        <li><a href="https://www.coindesk.com/markets/2014/08/04/dogecoin-to-allow-litecoin-merge-mining-in-network-security-bid">CoinDesk, August 2014: Dogecoin to allow merge mining</a></li>
+        <li><a href="https://www.coindesk.com/tech/2023/08/02/why-you-should-care-about-litecoin-its-the-backbone-of-dogecoin">CoinDesk, 2023: Litecoin is the backbone of Dogecoin</a></li>
+        <li><a href="https://litecoin.com/news/how-litecoin-and-dogecoin-created-one-of-the-most-robust-pow-networks">Litecoin Foundation: Litecoin and Dogecoin</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Litecoin">Wikipedia: Litecoin</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Dogecoin">Wikipedia: Dogecoin</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Kod ve kurallar</h3>
+      <ul>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/src/chainparams.cpp">Dogecoin chainparams.cpp (AuxPoW at 371,337)</a></li>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/doc/FAQ.md">Dogecoin FAQ (fixed reward)</a></li>
+        <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp (AuxPoW at 42,000)</a></li>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">Pepecoin MiCA white paper</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Bugün madencilik</h3>
+      <ul>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC: how to mine PEP</a></li>
+        <li><a href="https://cryptonews.net/news/market/30268800/">Binance Pool adds PEP merged mining</a></li>
+        <li><a href="https://emcd.io/articles/mining/how-to-mine-bellcoin-bell/">EMCD: Bellscoin and merge-mined Scrypt coins</a></li>
+        <li><a href="https://support.viabtc.com/hc/en-us/articles/11477430615439-LTC-Merged-Mining-Coins-Mining-Tutorial">ViaBTC: coins merge-mined with LTC</a></li>
+        <li><a href="https://www.f2pool.com/coin/pepecoin">F2Pool: PEP</a></li>
+        <li><a href="https://pepeplorer.com/network">Pepeplorer: PEP difficulty</a></li>
+        <li><a href="https://www.coinwarz.com/dogecoin-difficulty">CoinWarz: Dogecoin difficulty</a></li>
+        <li><a href="https://u.today/still-wrong-dogecoin-dev-clarifies-how-doge-merge-mining-works">U.Today, July 2026: developers on merge mining</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Ailenin geri kalanı</h3>
+      <ul>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-bellscoin-and-how-to-mine-bellscoin-345?category=0">ViaBTC: Bellscoin</a></li>
+        <li><a href="https://luckycoinfoundation.org/">Luckycoin Foundation</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-junkcoin-jkc-how-to-mine-junkcoin-jkc-373">ViaBTC: Junkcoin</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/Beginner-what-is-dingocoin-how-to-mine-dingocoin-389?category=0">ViaBTC: Dingocoin</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/Mining-what-is-shibacoin-shic-how-to-mine-shibacoin-shic-412?category=0">ViaBTC: Shibacoin</a></li>
+        <li>Coin logoları: her projenin kendi cüzdan deposu (<a href="https://github.com/Nintondo/bellscoinV3">Bellscoin</a>, <a href="https://github.com/LuckycoinFoundation/Luckycoin">Luckycoin</a>, <a href="https://github.com/Junkcoin-Foundation/junkcoin-core">Junkcoin</a>, <a href="https://github.com/dingocoincrypto/dingocoin">Dingocoin</a>, <a href="https://github.com/shibacoinppc/shibacoin">Shibacoin</a>); LTC <a href="https://github.com/0xa3k5/web3icons">web3icons</a>'tan, DOGE <a href="https://github.com/trustwallet/assets">Trust Wallet assets</a>'ten</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Fonlar ve etkinlikler</h3>
+      <ul>
+        <li><a href="https://litecoin.com/news/litecoin-spot-etf-approved">Litecoin Foundation: spot ETF (LTCC)</a></li>
+        <li><a href="https://www.nasdaq.com/press-release/grayscale-dogecoin-trust-etf-ticker-gdog-begins-trading-nyse-arca-first-dogecoin-etp">Grayscale: GDOG begins trading</a></li>
+        <li><a href="https://blog.kraken.com/product/asset-listings/pep-is-available-for-trading">Kraken: PEP listing</a></li>
+        <li><a href="https://news.bitcoin.com/pepecoin-co-founder-david-eichel-to-speak-on-merge-mining-panel-at-litecoin-summit-2026/">Litecoin Summit 2026 announcement</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</article>
+
+</main>
+<footer class="site-foot">
+  <p><strong>Topluluk bilgi sayfaları</strong>: r/pepecoin topluluğundan bir gönüllü tarafından hazırlanır. Pepecoin'in resmî yayını değildir.</p>
+  <p>Yatırım tavsiyesi değildir. Bu sayfaları hazırlayan kişinin elinde PEP var. Fiyatlar ve ağ verileri her gün değişir; her sayfada ilgili tarihler ve kaynaklar belirtilir.</p>
+  <p class="correction">Bir hata mı fark ettiniz? Kaynağını da ekleyerek GitHub üzerinden <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>düzeltme bildirin</a>.</p>
+  <details class="support"><summary>Bu siteyi beğendiyseniz gelişimine destek olabilirsiniz.</summary><p>Ne kadar küçük olursa olsun her katkı işe yarar. Teşekkürler!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+</footer>
+<script src="../chrome.js?v=20261007d" defer></script>
+</body>
+</html>

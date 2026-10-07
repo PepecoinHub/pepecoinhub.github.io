@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scrypt Merged Mining: Litecoin, Dogecoin und Pepecoin</title>
+<meta name="description" content="Wie sich Litecoin, Dogecoin und Pepecoin per Merged Mining (AuxPoW) einen Scrypt-Miner teilen – von Charlie Lees Vorschlag 2014 bis zum Start von Pepecoin 2024.">
+<link rel="canonical" href="https://pepecoinhub.com/de/scrypt-family.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/scrypt-family.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/scrypt-family.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/scrypt-family.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/scrypt-family.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/scrypt-family.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/scrypt-family.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/scrypt-family.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/scrypt-family.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/scrypt-family.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="de_DE">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="Scrypt Merged Mining: Litecoin, Dogecoin und Pepecoin">
+<meta property="og:description" content="Wie sich Litecoin, Dogecoin und Pepecoin per Merged Mining (AuxPoW) einen Scrypt-Miner teilen – von Charlie Lees Vorschlag 2014 bis zum Start von Pepecoin 2024.">
+<meta property="og:url" content="https://pepecoinhub.com/de/scrypt-family.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin-Logo: Fakten, Zahlen und Quellen zu PEP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../facts.css?v=20261007d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Die Scrypt-Familie: ein Miner, drei Coins", "description": "Wie sich Litecoin, Dogecoin und Pepecoin per Merged Mining einen Scrypt-Miner teilen.", "datePublished": "2026-10-05", "dateModified": "2026-10-06", "mainEntityOfPage": "https://pepecoinhub.com/scrypt-family.html", "author": {"@type": "Organization", "name": "Pepecoin Hub (Freiwillige aus der r/pepecoin-Community)"}, "publisher": {"@type": "Organization", "name": "Pepecoin Hub"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Was ist Merged Mining?", "acceptedAnswer": {"@type": "Answer", "text": "Merged Mining, auch Auxiliary Proof of Work (AuxPoW), erlaubt es einem Miner, mit ein und demselben Proof of Work Blöcke auf mehreren Blockchains zu erzeugen, die denselben Hash-Algorithmus nutzen. Jede Chain prüft die Arbeit nach ihren eigenen Regeln und zahlt ihre eigene Belohnung."}}, {"@type": "Question", "name": "Senkt Merged Mining die Belohnungen für Litecoin oder Dogecoin?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Hashrate wird nicht zwischen den Chains aufgeteilt. Ein Miner verdient so viele Litecoin und Dogecoin wie vorher, und die per Merged Mining geschürften Coins kommen obendrauf."}}, {"@type": "Question", "name": "Welche Coins lassen sich mit Litecoin per Merged Mining schürfen?", "acceptedAnswer": {"@type": "Answer", "text": "Dogecoin und Pepecoin sowie kleinere Scrypt-Chains: Bellscoin, Luckycoin, Junkcoin, Dingocoin und Shibacoin. Die genaue Liste hängt vom Mining-Pool ab."}}, {"@type": "Question", "name": "Mit welcher Hardware wird Pepecoin gemint?", "acceptedAnswer": {"@type": "Answer", "text": "Mit einem Scrypt-ASIC-Miner, derselben Maschine wie für Litecoin und Dogecoin, verbunden mit einem Pool, der Merged Mining unterstützt. ViaBTC nennt als Beispiele den Antminer L9 und den ElphaPex DG1."}}, {"@type": "Question", "name": "Ist Pepecoin dasselbe wie PEPE?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. PEPE ist ein Token auf Ethereum. Pepecoin (PEP) ist ein Coin auf einer eigenen Proof-of-Work-Blockchain. Siehe Welcher Pepecoin ist welcher?"}}, {"@type": "Question", "name": "Hat Pepecoin eine Obergrenze für die Coinmenge?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Wie Dogecoin kommen pro Block fest 10.000 Coins hinzu, daher sinkt die Inflationsrate jedes Jahr. Siehe Coinmenge und Inflation."}}]}</script>
+<style>
+/* Scrypt family page. Sections sit inside <article>, so it repeats the .wrap spacing. */
+:root { --wire: #9aaba2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --wire: #4d5d55; } }
+:root[data-theme="dark"] { --wire: #4d5d55; }
+.wrap-article { display: grid; gap: 56px; min-width: 0; }
+.wrap-article > * { min-width: 0; }
+q { quotes: "\201C" "\201D"; }
+
+/* Coin logos (docs/assets/coins), 40 px next to each coin's name */
+.glyph { flex: none; width: 40px; height: 40px; object-fit: contain; }
+
+/* "Ein Hash, drei Blockchains": a miner node, a wire tree, and one card per chain.
+   Each card has a five-minute strip with one square per block found. */
+.fam { margin: 0; display: grid; justify-items: center; }
+.fam > * { min-width: 0; }
+.fam-src { display: flex; align-items: center; gap: 14px; padding: 12px 24px 12px 14px; background: var(--panel); border: 2px solid var(--accent); border-radius: 999px; }
+.fam-chip { width: 46px; height: 46px; flex: none; color: var(--accent); }
+.fam-src div { display: grid; line-height: 1.25; }
+.fam-src strong { font-size: 1.2rem; font-weight: 700; }
+.fam-src span { font-size: 0.9rem; color: var(--muted); }
+.fam-tree { position: relative; width: 100%; height: 36px; }
+.fam-tree::before { content: ""; position: absolute; left: 50%; top: 0; height: 18px; border-left: 2px solid var(--wire); }
+.fam-tree::after { content: ""; position: absolute; top: 18px; left: calc((100% - 32px) / 6); right: calc((100% - 32px) / 6); border-top: 2px solid var(--wire); }
+.fam-chains { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.fam-chain { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 16px 14px; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.fam-chain::before { content: ""; position: absolute; left: 50%; top: -19px; height: 18px; border-left: 2px solid var(--wire); }
+.fam-chain.hl { border-color: var(--accent); background: var(--accent-soft); }
+.fam-chain h3 { font-size: 1.2rem; font-weight: 700; }
+.fam-role { font-size: 0.88rem; color: var(--muted); }
+.fam-time { position: relative; height: 20px; margin: 12px 0 2px; border-bottom: 2px solid var(--rule); }
+.fam-time i { position: absolute; bottom: 3px; width: 14px; height: 14px; border-radius: 3px; background: var(--muted); transform: translateX(-100%); }
+.fam-chain.hl .fam-time i { background: var(--series); }
+.fam-time-label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+.fam-pays { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule); font-size: 0.9rem; }
+.fam-more { margin-top: 14px; font-size: 0.9rem; color: var(--muted); text-align: center; max-width: 62ch; }
+.pull { margin: 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--accent); display: grid; gap: 8px; max-width: 68ch; }
+.pull p { font-size: 1.3rem; line-height: 1.4; font-weight: 500; }
+.pull footer { font-size: 0.9rem; color: var(--muted); }
+
+/* The whole family */
+.family { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+.coin { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 12px; align-items: center; align-content: start; padding: 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; min-width: 0; }
+.coin.hl { border-color: var(--accent); background: var(--accent-soft); }
+.coin h3 { font-size: 1.08rem; font-weight: 700; line-height: 1.25; }
+.coin h3 small { font-size: 0.8rem; font-weight: 500; color: var(--muted); margin-left: 4px; }
+.coin .since { display: block; font-family: var(--f-mono); font-size: 0.85rem; color: var(--muted); }
+.coin p { grid-column: 1 / -1; font-size: 0.92rem; color: var(--muted); }
+
+/* How it works: three numbered steps */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: step; }
+.steps li { counter-increment: step; display: grid; gap: 8px; align-content: start; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; min-width: 0; }
+.steps li::before { content: counter(step); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-mid); font-weight: 700; }
+.steps h3 { font-weight: 700; }
+.steps p { font-size: 0.95rem; color: var(--muted); }
+.aside-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.aside-row .callout { max-width: none; }
+.callout h3 { font-weight: 700; font-size: 1rem; }
+.callout p { font-size: 0.95rem; }
+
+/* How it happened: one rail, one card per milestone */
+.story { list-style: none; margin: 0; padding: 0; position: relative; display: grid; gap: 12px; }
+.story::before { content: ""; position: absolute; left: 7px; top: 10px; bottom: 10px; border-left: 2px solid var(--rule); }
+.story li { position: relative; display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 4px 16px; padding-left: 30px; align-items: start; }
+.story li::before { content: ""; position: absolute; left: 0; top: 14px; width: 12px; height: 12px; border-radius: 50%; background: var(--paper); border: 2px solid var(--wire); }
+.story li.hl::before { background: var(--accent); border-color: var(--accent); }
+.story .when { padding-top: 10px; font-family: var(--f-mono); font-size: 0.95rem; font-weight: 700; color: var(--muted); }
+.story .event { display: grid; gap: 4px; padding: 12px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; min-width: 0; }
+.story li.hl .event { background: var(--accent-soft); border-color: var(--accent); }
+.story h3 { font-weight: 700; font-size: 1.05rem; }
+.story p { font-size: 0.95rem; color: var(--muted); }
+.story p q { color: var(--ink); }
+
+/* Personal note: kept apart from the sourced article */
+.opinion { max-width: 68ch; gap: 14px; padding: 24px 26px; }
+.opinion h2 { font-size: 1.4rem; }
+.opinion p { max-width: 62ch; }
+
+@media (max-width: 720px) {
+  .steps { grid-template-columns: minmax(0, 1fr); }
+  .steps li { grid-template-columns: auto minmax(0, 1fr); column-gap: 14px; }
+  .steps li::before { grid-row: span 2; }
+  .story li { grid-template-columns: minmax(0, 1fr); }
+  .story .when { padding-top: 6px; }
+}
+@media (max-width: 620px) {
+  .fam { justify-items: stretch; }
+  .fam-src { border-radius: 10px; }
+  .fam-tree { height: 18px; }
+  .fam-tree::before { left: 12px; height: 18px; }
+  .fam-tree::after { display: none; }
+  .fam-chains { grid-template-columns: minmax(0, 1fr); gap: 14px; padding-left: 30px; }
+  .fam-chain::before { left: -18px; top: 50%; width: 16px; height: 0; border-left: 0; border-top: 2px solid var(--wire); }
+  .fam-chain::after { content: ""; position: absolute; left: -18px; top: -15px; height: calc(100% + 15px); border-left: 2px solid var(--wire); }
+  .fam-chain:last-child::after { height: calc(50% + 16px); }
+  .fam-more { text-align: left; }
+  .opinion { padding: 18px 16px; }
+}
+</style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Seiten"><a href="which-pepecoin.html">Was ist was</a><a href="compare.html">PEP und DOGE</a><a href="calculator.html">Rechner</a><a href="supply.html">Coinmenge</a><a href="scrypt-family.html" aria-current="page">Scrypt-Familie</a><a href="network.html">Netzwerk</a><a href="rich-list.html">Rich List</a><a href="guides.html">Ratgeber</a></nav>
+</header>
+<main class="wrap" id="main">
+<article class="wrap-article">
+<header class="page-head">
+<p class="eyebrow">Scrypt Merged Mining · aktualisiert am 6. Oktober 2026</p>
+  <h1>Die Scrypt-Familie: ein Miner, drei Coins</h1>
+  <p class="lede">Eine Scrypt-Mining-Maschine erledigt ihre Arbeit einmal und wird von mehreren Blockchains gleichzeitig bezahlt. Litecoin begründete die Familie 2011, Dogecoin kam 2014 dazu und Pepecoin 2024. So ist es dazu gekommen, und das bringt es Minern und Haltern.</p>
+</header>
+
+<section aria-label="Die wichtigsten Fakten">
+  <div class="stats">
+    <div class="stat"><span class="label">Eine Maschine</span><span class="value">3 Coins</span><span class="sub">LTC, DOGE und PEP aus einem Scrypt-Miner</span></div>
+    <div class="stat"><span class="label">Zusätzlicher Strom</span><span class="value">Keiner</span><span class="sub">jede Chain prüft dieselbe Arbeit</span></div>
+    <div class="stat"><span class="label">Dogecoin</span><span class="value">Seit 2014</span><span class="sub">per Merged Mining mit Litecoin</span></div>
+    <div class="stat"><span class="label">Pepecoin</span><span class="value">Seit 2024</span><span class="sub">Merged Mining ab Block 42.000</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="diagram">
+  <h2 id="diagram">Ein Hash, drei Blockchains</h2>
+  <p class="note">Eine Scrypt-Maschine tut nur eines: Sie berechnet Hashes. Beim Merged Mining wird jeder Hash gleichzeitig mit dem Ziel jeder Chain verglichen. Ist er für eine Chain gut genug, bekommt diese Chain einen neuen Block und zahlt ihre eigene Belohnung.</p>
+  <figure class="fam">
+    <div class="fam-src">
+      <svg class="fam-chip" viewBox="0 0 48 48" aria-hidden="true"><rect x="12" y="12" width="24" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="2.5"/><rect x="19" y="19" width="10" height="10" rx="1.5" fill="currentColor"/><path d="M18 5v6M24 5v6M30 5v6M18 37v6M24 37v6M30 37v6M5 18h6M5 24h6M5 30h6M37 18h6M37 24h6M37 30h6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <div><strong>Ein Scrypt-Hash</strong><span>gleiche Maschine, gleicher Strom</span></div>
+    </div>
+    <div class="fam-tree" aria-hidden="true"></div>
+    <ul class="fam-chains">
+      <li class="fam-chain">
+        <h3>Litecoin</h3>
+        <span class="fam-role">LTC · Mutter-Chain, seit 2011</span>
+        <div class="fam-time" role="img" aria-label="2 Blöcke in fünf Minuten"><i style="left:50%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>Blöcke in 5 Min.</span><span>ein Block alle 2,5 Min.</span></span>
+        <span class="fam-pays">Zahlt LTC</span>
+      </li>
+      <li class="fam-chain">
+        <h3>Dogecoin</h3>
+        <span class="fam-role">DOGE · Merged Mining seit 2014</span>
+        <div class="fam-time" role="img" aria-label="5 Blöcke in fünf Minuten"><i style="left:20%"></i><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>Blöcke in 5 Min.</span><span>ein Block pro Minute</span></span>
+        <span class="fam-pays">Zahlt DOGE</span>
+      </li>
+      <li class="fam-chain hl">
+        <h3>Pepecoin</h3>
+        <span class="fam-role">PEP · Merged Mining seit 2024</span>
+        <div class="fam-time" role="img" aria-label="5 Blöcke in fünf Minuten"><i style="left:20%"></i><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i><i style="left:100%"></i></div>
+        <span class="fam-time-label"><span>Blöcke in 5 Min.</span><span>ein Block pro Minute</span></span>
+        <span class="fam-pays">Zahlt PEP</span>
+      </li>
+    </ul>
+    <figcaption class="fam-more">Viele Pools nehmen auch kleinere Scrypt-Chains mit: Bellscoin, Luckycoin, Junkcoin, Dingocoin und Shibacoin, aufgeführt <a href="#family">weiter unten</a>. Binance Pool, ViaBTC, F2Pool und EMCD zahlen PEP zusätzlich zu LTC und DOGE aus.</figcaption>
+  </figure>
+  <blockquote class="pull">
+    <p>“Merging mining with dogecoin would make both litecoin/dogecoin almost impossible to 51%.”</p>
+    <footer>Charlie Lee im Dogecoin-Subreddit, April 2014, laut <a href="https://www.coindesk.com/markets/2014/04/08/charlie-lee-proposes-merged-mining-of-litecoin-and-dogecoin">CoinDesk</a>. Pepecoin hängt sich an dieselbe gemeinsame Hashrate.  <p class="correction">Fehler entdeckt? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Melde eine Korrektur</a> (mit Quelle) auf GitHub.</p>
+</footer>
+  </blockquote>
+</section>
+
+<section aria-labelledby="family">
+  <h2 id="family">Die ganze Familie</h2>
+  <p class="note">Die Scrypt-Chains, die Mining-Pools am häufigsten auszahlen. Bellscoin, Luckycoin und Junkcoin stammen aus 2013 und wurden 2023 und 2024 wiederbelebt.</p>
+  <ul class="family">
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/ltc.png" alt="" width="40" height="40">
+      <div><h3>Litecoin<small>LTC</small></h3><span class="since">seit Okt. 2011</span></div>
+      <p>Die Mutter-Chain. Charlie Lees Scrypt-Version von Bitcoin, mit 2,5-Minuten-Blöcken und einer Obergrenze von 84 Millionen.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/doge.png" alt="" width="40" height="40">
+      <div><h3>Dogecoin<small>DOGE</small></h3><span class="since">seit Dez. 2013</span></div>
+      <p>Basiert auf Code von Luckycoin und Litecoin. Seit September 2014 per Merged Mining mit Litecoin.</p>
+    </li>
+    <li class="coin hl">
+      <img class="glyph" src="../assets/brand/icon.svg" alt="" width="40" height="40">
+      <div><h3>Pepecoin<small>PEP</small></h3><span class="since">seit Jan. 2024</span></div>
+      <p>Ein Fork von Dogecoin Core ohne Premine. Merged Mining ab Block 42.000.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/bells.png" alt="" width="40" height="40">
+      <div><h3>Bellscoin<small>BELLS</small></h3><span class="since">seit Nov. 2013</span></div>
+      <p>Billy Markus' Animal-Crossing-Coin, wenige Tage vor Dogecoin gestartet. Im Dezember 2023 wiederbelebt, Merged Mining ab Block 144.000.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/lky.png" alt="" width="40" height="40">
+      <div><h3>Luckycoin<small>LKY</small></h3><span class="since">seit Mai 2013</span></div>
+      <p>Der Litecoin-Fork, auf dessen Code Dogecoin aufbaut. 2024 auf seiner ursprünglichen Chain von 2013 wiederbelebt.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/jkc.png" alt="" width="40" height="40">
+      <div><h3>Junkcoin<small>JKC</small></h3><span class="since">seit Mai 2013</span></div>
+      <p>Einer der ersten Meme-Coins, begrenzt auf 54 Millionen. Seine Community hat ihn im November 2024 neu gestartet.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/dingo.png" alt="" width="40" height="40">
+      <div><h3>Dingocoin<small>DINGO</small></h3><span class="since">seit Apr. 2021</span></div>
+      <p>Ein Dogecoin-Fork mit Fair Launch: Ein-Minuten-Blöcke, eine feste Belohnung von 10.000 Coins und keine Obergrenze.</p>
+    </li>
+    <li class="coin">
+      <img class="glyph" src="../assets/coins/shic.png" alt="" width="40" height="40">
+      <div><h3>Shibacoin<small>SHIC</small></h3><span class="since">seit Dez. 2024</span></div>
+      <p>Ein neuerer Dogecoin-Fork, ab Block 24.000 per Merged Mining mit Litecoin.</p>
+    </li>
+  </ul>
+  <p class="note">Welche davon ein Miner bekommt, hängt vom Pool ab. Der Litecoin-Pool von ViaBTC führt alle sieben zusätzlich zu LTC: DOGE, BELLS, LKY, PEP, JKC, DINGO und SHIC. Andere Pools haben eine andere Auswahl.</p>
+</section>
+
+<section aria-labelledby="how">
+  <h2 id="how">So funktioniert Merged Mining</h2>
+  <p class="note">Der Fachbegriff lautet Auxiliary Proof of Work, kurz AuxPoW. Jede Chain behält ihr eigenes Ledger, ihre eigenen Regeln und ihre eigene Belohnung. Geteilt wird nur die Arbeit.</p>
+  <ol class="steps">
+    <li><h3>Einen Block bauen</h3><p>Der Miner baut einen Litecoin-Block und packt einen Verweis auf einen Dogecoin-Block und einen Pepecoin-Block hinein.</p></li>
+    <li><h3>Einmal hashen</h3><p>Die Maschine erledigt die Scrypt-Arbeit ein einziges Mal, mit derselben Hardware und demselben Strom.</p></li>
+    <li><h3>Jede Chain prüft</h3><p>Ist das Ergebnis für eine Chain gut genug, akzeptiert diese Chain ihren Block und zahlt ihre eigene Belohnung. Jede kann prüfen, dass echte Scrypt-Arbeit geleistet wurde.</p></li>
+  </ol>
+  <div class="aside-row">
+    <div class="callout">
+      <h3>Nichts wird aufgeteilt</h3>
+      <p>Miner verdienen so viele LTC und DOGE wie vorher. In den Worten des Pools ViaBTC ist PEP <q>an additional reward from merged mining, requiring no extra hashrate.</q></p>
+    </div>
+    <div class="callout gold">
+      <h3>Warum Scrypt und nicht Bitcoin</h3>
+      <p>Scrypt braucht mehr Speicher als SHA-256 von Bitcoin. Ein Bitcoin-Miner kann keine Scrypt-Coins minen, und ein Scrypt-Miner kann kein Bitcoin minen.</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="story">
+  <h2 id="story">Wie es dazu kam</h2>
+  <ol class="story">
+    <li><span class="when">2009</span><div class="event"><h3>Scrypt wird veröffentlicht</h3><p>Colin Percival entwirft die Hash-Funktion für den Backup-Dienst Tarsnap.</p></div></li>
+    <li><span class="when">Okt. 2011</span><div class="event"><h3>Litecoin</h3><p>Charlie Lee, ein ehemaliger Google-Ingenieur, veröffentlicht Litecoin mit Scrypt, 2,5-Minuten-Blöcken und einer Obergrenze von 84 Millionen Coins.</p></div></li>
+    <li><span class="when">Dez. 2013</span><div class="event"><h3>Dogecoin</h3><p>Billy Markus und Jackson Palmer bauen ihn auf Code von Luckycoin und Litecoin: wieder Scrypt, mit Ein-Minuten-Blöcken.</p></div></li>
+    <li><span class="when">Apr. 2014</span><div class="event"><h3>Charlie Lees Vorschlag</h3><p>Die Belohnungen von Dogecoin halbierten sich schnell, Miner wanderten ab, und ein 51-%-Angriff wurde billiger. Im Dogecoin-Subreddit schlägt Lee vor, Litecoin-Miner auch Dogecoin absichern zu lassen. <q>Merge mining only affects mining and nothing else,</q> schreibt er. Mitgründer Jackson Palmer ist zunächst nicht überzeugt.</p></div></li>
+    <li><span class="when">Sept. 2014</span><div class="event"><h3>Dogecoin sagt ja</h3><p><q>Our hashrate has been on a decline,</q> schreiben die Entwickler im August. Merged Mining startet bei Block 371.337. Laut Lee kann sich die Community nun auf ihre Stärken konzentrieren: <q>focus on what dogecoin does best</q>. Laut der Litecoin Foundation sagte Billy Markus später, die Entscheidung habe Dogecoin gerettet.</p></div></li>
+    <li><span class="when">2015</span><div class="event"><h3>10.000 DOGE pro Block</h3><p>Die Belohnung von Dogecoin pendelt sich bei festen 10.000 Coins pro Block ein, und die Partnerschaft mit Litecoin besteht seitdem.</p></div></li>
+    <li class="hl"><span class="when">Jan. 2024</span><div class="event"><h3>Pepecoin startet</h3><p>Ein Fork von Dogecoin Core mit denselben Regeln, ohne Premine, ohne ICO und ohne Team-Zuteilung. Jeder existierende PEP wurde gemint. Merged Mining ist ab Block 42.000 eingebaut.</p></div></li>
+    <li><span class="when">2024–25</span><div class="event"><h3>Die Familie wächst</h3><p>Alte und neue Scrypt-Chains steigen bei den großen Pools ins Litecoin-Merged-Mining ein: Bellscoin, Luckycoin, Junkcoin, Dingocoin und Shibacoin.</p></div></li>
+    <li><span class="when">Okt. 2025</span><div class="event"><h3>Litecoin- und Dogecoin-Fonds</h3><p>Canarys LTCC, der erste US-Spot-ETF auf Litecoin, startet an der Nasdaq. Grayscales Spot-Dogecoin-Fonds GDOG folgt einen Monat später an der NYSE Arca.</p></div></li>
+    <li class="hl"><span class="when">Feb. 2026</span><div class="event"><h3>Kraken listet Pepecoin</h3><p>PEP wird auf Kraken handelbar.</p></div></li>
+    <li><span class="when">Juli 2026</span><div class="event"><h3>Entwickler über Merged Mining</h3><p>Dogecoin-Entwickler chromatic weist darauf hin, dass die Sicherheit von Dogecoin auf allen per Merged Mining geschürften Scrypt-Chains beruht, nicht auf Litecoin allein. Billy Markus ergänzt: <q>Doge is the most profitable scrypt coin to mine.</q></p></div></li>
+    <li class="hl"><span class="when">Okt. 2026</span><div class="event"><h3>Pepecoin heute</h3><p>Mining-Difficulty von 40,6 Millionen am 6. Oktober, innerhalb der Spanne von 28,8 bis 47,5 Millionen, die Dogecoin in jener Woche durchlief. Beide streben einen Block pro Minute an, das bedeutet also eine ähnliche Hashrate. Ein Pepecoin-Mitgründer saß auf dem Merged-Mining-Panel des Litecoin Summit 2026 in Amsterdam.</p></div></li>
+  </ol>
+</section>
+
+<section aria-labelledby="why">
+  <h2 id="why">Was es Minern und Haltern bringt</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>Für Miner</h3>
+      <p>Mehr Coins mit derselben Maschine und demselben Strom. PEP kommt zu LTC und DOGE hinzu, ohne weitere Einrichtung außer einer Auszahlungsadresse.</p>
+    </div>
+    <div class="card">
+      <h3>Für das Netzwerk</h3>
+      <p>Eine junge Chain wird von Anfang an durch die Hashrate etablierter Chains gesichert, statt ihre eigenen Miner bei null anwerben zu müssen.</p>
+    </div>
+    <div class="card">
+      <h3>Für Halter</h3>
+      <p>Jeder Block, jede Belohnung und jedes Guthaben liegt auf einer öffentlichen Blockchain. Jeder kann Coinmenge, Rich List und Mining-Pools in einem Explorer prüfen.</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="note">
+  <div class="callout gold opinion">
+    <p class="eyebrow">Meinung · eine persönliche Notiz</p>
+    <h2 id="note">Warum ich hier bin</h2>
+    <p>Alles oberhalb dieses Kastens lässt sich mit einem Block-Explorer oder einem Quellenlink überprüfen. Dieser Teil nicht. Er ist einfach das, woran ich glaube.</p>
+    <p>Ich glaube, die Proof-of-Work-Geschichte kommt zurück. Krypto ertrinkt in Token, die an einem Nachmittag gedruckt sind. Schnelles Geld, und keine Community mehr, sobald das Geld weiterzieht. Bei Pepecoin ist es umgekehrt: Niemand hat auch nur einen einzigen Coin geschenkt bekommen, die Leute bleiben, und ich habe eine richtig gute Zeit.</p>
+    <p>Wenn Börsen und Krypto gerade erst zusammenwachsen, wette ich darauf, dass die große Finanzwelt nach Coins sucht, die so solide sind wie Bitcoin – und Litecoin steht dabei ganz vorne. Seine Miner halten die Chain seit fünfzehn Jahren am Laufen, Block für Block, und Fonds auf Litecoin und Dogecoin werden bereits an US-Börsen gehandelt.</p>
+    <p>Und jetzt der Teil, der mir am besten gefällt. Läuft es für Litecoin gut, lohnt sich Scrypt-Mining mehr. Bessere Bezahlung lockt mehr Miner an, und jede dieser Maschinen kann gleichzeitig Dogecoin und Pepecoin minen. Mehr Miner, mehr Aufmerksamkeit für uns.</p>
+    <p>Also unterstützt die Ehrlichen: Fair Launch, Proof of Work, Scrypt fam. In einem Markt voller pump.fun-Launches und glatter Betrügereien ist das frische Luft. Krypto, wie es gedacht war. Ehrlich.</p>
+    <p class="src">Geschrieben von dem Freiwilligen, der diese Seiten zusammenstellt. Eine Meinung, keine Prognose und keine Anlageberatung. Der Autor hält PEP.</p>
+  </div>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">Häufige Fragen</h2>
+  <div class="faq">
+    <details><summary>Was ist Merged Mining?</summary><p>Merged Mining, auch Auxiliary Proof of Work (AuxPoW), erlaubt es einem Miner, mit ein und demselben Proof of Work Blöcke auf mehreren Blockchains zu erzeugen, die denselben Hash-Algorithmus nutzen. Jede Chain prüft die Arbeit nach ihren eigenen Regeln und zahlt ihre eigene Belohnung.</p></details>
+    <details><summary>Senkt Merged Mining die Belohnungen für Litecoin oder Dogecoin?</summary><p>Nein. Die Hashrate wird nicht zwischen den Chains aufgeteilt. Ein Miner verdient so viele Litecoin und Dogecoin wie vorher, und die per Merged Mining geschürften Coins kommen obendrauf.</p></details>
+    <details><summary>Welche Coins lassen sich mit Litecoin per Merged Mining schürfen?</summary><p>Dogecoin und Pepecoin sowie kleinere Scrypt-Chains: Bellscoin, Luckycoin, Junkcoin, Dingocoin und Shibacoin. Die genaue Liste hängt vom Mining-Pool ab.</p></details>
+    <details><summary>Mit welcher Hardware wird Pepecoin gemint?</summary><p>Mit einem Scrypt-ASIC-Miner, derselben Maschine wie für Litecoin und Dogecoin, verbunden mit einem Pool, der Merged Mining unterstützt. ViaBTC nennt als Beispiele den Antminer L9 und den ElphaPex DG1.</p></details>
+    <details><summary>Ist Pepecoin dasselbe wie PEPE?</summary><p>Nein. PEPE ist ein Token auf Ethereum. Pepecoin (PEP) ist ein Coin auf einer eigenen Proof-of-Work-Blockchain. Siehe <a href="which-pepecoin.html">Welcher Pepecoin ist welcher?</a></p></details>
+    <details><summary>Hat Pepecoin eine Obergrenze für die Coinmenge?</summary><p>Nein. Wie Dogecoin kommen pro Block fest 10.000 Coins hinzu, daher sinkt die Inflationsrate jedes Jahr. Siehe <a href="supply.html">Coinmenge und Inflation</a>.</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">Quellen</h2>
+  <div class="sources">
+    <div>
+      <h3>Geschichte</h3>
+      <ul>
+        <li><a href="https://www.coindesk.com/markets/2014/04/08/charlie-lee-proposes-merged-mining-of-litecoin-and-dogecoin">CoinDesk, April 2014: Charlie Lee proposes merged mining</a></li>
+        <li><a href="https://www.reddit.com/r/dogecoin/comments/22eprz/ltc_creator_charlie_lee_explains_his/">r/dogecoin, April 2014: Lee explains his proposal</a></li>
+        <li><a href="https://www.coindesk.com/markets/2014/08/04/dogecoin-to-allow-litecoin-merge-mining-in-network-security-bid">CoinDesk, August 2014: Dogecoin to allow merge mining</a></li>
+        <li><a href="https://www.coindesk.com/tech/2023/08/02/why-you-should-care-about-litecoin-its-the-backbone-of-dogecoin">CoinDesk, 2023: Litecoin is the backbone of Dogecoin</a></li>
+        <li><a href="https://litecoin.com/news/how-litecoin-and-dogecoin-created-one-of-the-most-robust-pow-networks">Litecoin Foundation: Litecoin and Dogecoin</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Litecoin">Wikipedia: Litecoin</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Dogecoin">Wikipedia: Dogecoin</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Code und Regeln</h3>
+      <ul>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/src/chainparams.cpp">Dogecoin chainparams.cpp (AuxPoW at 371,337)</a></li>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/doc/FAQ.md">Dogecoin FAQ (fixed reward)</a></li>
+        <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp (AuxPoW at 42,000)</a></li>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">Pepecoin MiCA white paper</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Mining heute</h3>
+      <ul>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC: how to mine PEP</a></li>
+        <li><a href="https://cryptonews.net/news/market/30268800/">Binance Pool adds PEP merged mining</a></li>
+        <li><a href="https://emcd.io/articles/mining/how-to-mine-bellcoin-bell/">EMCD: Bellscoin and merge-mined Scrypt coins</a></li>
+        <li><a href="https://support.viabtc.com/hc/en-us/articles/11477430615439-LTC-Merged-Mining-Coins-Mining-Tutorial">ViaBTC: coins merge-mined with LTC</a></li>
+        <li><a href="https://www.f2pool.com/coin/pepecoin">F2Pool: PEP</a></li>
+        <li><a href="https://pepeplorer.com/network">Pepeplorer: PEP difficulty</a></li>
+        <li><a href="https://www.coinwarz.com/dogecoin-difficulty">CoinWarz: Dogecoin difficulty</a></li>
+        <li><a href="https://u.today/still-wrong-dogecoin-dev-clarifies-how-doge-merge-mining-works">U.Today, July 2026: developers on merge mining</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Der Rest der Familie</h3>
+      <ul>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-bellscoin-and-how-to-mine-bellscoin-345?category=0">ViaBTC: Bellscoin</a></li>
+        <li><a href="https://luckycoinfoundation.org/">Luckycoin Foundation</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-junkcoin-jkc-how-to-mine-junkcoin-jkc-373">ViaBTC: Junkcoin</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/Beginner-what-is-dingocoin-how-to-mine-dingocoin-389?category=0">ViaBTC: Dingocoin</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/Mining-what-is-shibacoin-shic-how-to-mine-shibacoin-shic-412?category=0">ViaBTC: Shibacoin</a></li>
+        <li>Coin-Logos: aus dem Wallet-Repository des jeweiligen Projekts (<a href="https://github.com/Nintondo/bellscoinV3">Bellscoin</a>, <a href="https://github.com/LuckycoinFoundation/Luckycoin">Luckycoin</a>, <a href="https://github.com/Junkcoin-Foundation/junkcoin-core">Junkcoin</a>, <a href="https://github.com/dingocoincrypto/dingocoin">Dingocoin</a>, <a href="https://github.com/shibacoinppc/shibacoin">Shibacoin</a>); LTC von <a href="https://github.com/0xa3k5/web3icons">web3icons</a>, DOGE aus den <a href="https://github.com/trustwallet/assets">Trust Wallet assets</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Fonds und Ereignisse</h3>
+      <ul>
+        <li><a href="https://litecoin.com/news/litecoin-spot-etf-approved">Litecoin Foundation: spot ETF (LTCC)</a></li>
+        <li><a href="https://www.nasdaq.com/press-release/grayscale-dogecoin-trust-etf-ticker-gdog-begins-trading-nyse-arca-first-dogecoin-etp">Grayscale: GDOG begins trading</a></li>
+        <li><a href="https://blog.kraken.com/product/asset-listings/pep-is-available-for-trading">Kraken: PEP listing</a></li>
+        <li><a href="https://news.bitcoin.com/pepecoin-co-founder-david-eichel-to-speak-on-merge-mining-panel-at-litecoin-summit-2026/">Litecoin Summit 2026 announcement</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</article>
+
+</main>
+<footer class="site-foot">
+  <p><strong>Community-Faktenseiten</strong>, ehrenamtlich zusammengestellt von einem Mitglied der r/pepecoin-Community. Keine offizielle Pepecoin-Publikation.</p>
+  <p>Keine Anlageberatung. Wer diese Seiten zusammenstellt, besitzt selbst PEP. Kurse und Netzwerkdaten ändern sich täglich; jede Seite nennt ihren Stand und ihre Quellen.</p>
+  <p class="correction">Fehler entdeckt? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Korrektur auf GitHub melden</a> (bitte mit Quelle).</p>
+  <details class="support"><summary>Gefällt dir diese Seite? Du kannst ihre Weiterentwicklung unterstützen.</summary><p>Jeder noch so kleine Betrag hilft. Danke!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+</footer>
+<script src="../chrome.js?v=20261007d" defer></script>
+</body>
+</html>

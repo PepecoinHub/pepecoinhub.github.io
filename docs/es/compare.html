@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pepecoin frente a Dogecoin: reglas, suministro, precio y capitalización</title>
+<meta name="description" content="Pepecoin (PEP) es un fork de Dogecoin con la misma minería Scrypt, el mismo tiempo de bloque y la misma recompensa por bloque. Compara hashrate, suministro, inflación, precio y capitalización de mercado, y sus precios a la misma edad.">
+<link rel="canonical" href="https://pepecoinhub.com/es/compare.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/compare.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/compare.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/compare.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/compare.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/compare.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/compare.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/compare.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/compare.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/compare.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="Pepecoin frente a Dogecoin: reglas, suministro, precio y capitalización">
+<meta property="og:description" content="Pepecoin (PEP) es un fork de Dogecoin con la misma minería Scrypt, el mismo tiempo de bloque y la misma recompensa por bloque. Compara hashrate, suministro, inflación, precio y capitalización de mercado, y sus precios a la misma edad.">
+<meta property="og:url" content="https://pepecoinhub.com/es/compare.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Logotipo de Pepecoin: datos, cifras y fuentes sobre PEP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../facts.css?v=20261007d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/es/"}, {"@type": "ListItem", "position": 2, "name": "PEP y DOGE", "item": "https://pepecoinhub.com/es/compare.html"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Pepecoin es lo mismo que Dogecoin?", "acceptedAnswer": {"@type": "Answer", "text": "Pepecoin es un fork de Dogecoin Core y mantiene las reglas monetarias de Dogecoin: el mismo algoritmo, tiempo de bloque, recompensa por bloque y suministro sin límite. Lo que cambia es la edad, el tamaño y el precio."}}, {"@type": "Question", "name": "¿Tienen Pepecoin y Dogecoin un límite de suministro?", "acceptedAnswer": {"@type": "Answer", "text": "No. Ambas añaden una cantidad fija de 10.000 monedas por bloque de un minuto, unos 5260 millones al año, sin fecha de fin. El suministro de Pepecoin sigue la curva de Dogecoin con unos diez años de retraso."}}, {"@type": "Question", "name": "¿Por qué Pepecoin tiene un hashrate similar pero una paga para los mineros mucho menor?", "acceptedAnswer": {"@type": "Answer", "text": "Por la minería combinada. Las máquinas Scrypt que minan Pepecoin ya cobran de Litecoin y Dogecoin. Los pools que añaden PEP a su minería combinada lo pagan además, por el mismo trabajo y la misma electricidad."}}, {"@type": "Question", "name": "¿Qué muestra el gráfico de precios a la misma edad?", "acceptedAnswer": {"@type": "Answer", "text": "Alinea Dogecoin y Pepecoin según el tiempo transcurrido desde el lanzamiento de cada moneda, para poder comparar sus precios a la misma edad. No predice que Pepecoin vaya a repetir las subidas posteriores de Dogecoin."}}, {"@type": "Question", "name": "¿Las direcciones de Pepecoin empiezan por la misma letra que las de Dogecoin?", "acceptedAnswer": {"@type": "Answer", "text": "No. Las direcciones de Dogecoin empiezan por D; las de Pepecoin, por P."}}]}</script>
+
+<style>
+/* page-specific */
+:root { --range: #a3b0a9; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --range: #56645c; } }
+:root[data-theme="dark"] { --range: #56645c; }
+.hr-band { position: absolute; top: 10px; bottom: 10px; background: var(--range); border-radius: 4px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --range: #56645c; } }
+:root[data-theme="dark"] { --range: #56645c; }
+/* Hashrate range plot: Dogecoin's weekly range as a band, Pepecoin as a dot on the same scale */
+:root { --range: #a3b0a9; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --range: #56645c; } }
+:root[data-theme="dark"] { --range: #56645c; }
+.hr { margin: 0; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 20px 14px; display: grid; gap: 14px; }
+.hr-plot { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); column-gap: 18px; row-gap: 10px; align-items: center; }
+.hr-name { display: grid; gap: 1px; line-height: 1.25; min-width: 0; }
+.hr-name strong { font-weight: 500; }
+.hr-name b { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.hr-name small { font-size: 0.8rem; color: var(--muted); }
+.hr-track { position: relative; height: 44px; border-left: 1px solid var(--rule); border-right: 1px solid var(--rule); }
+.hr-grid { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--rule); }
+.hr-band { position: absolute; top: 10px; bottom: 10px; background: var(--range); border-radius: 4px; }
+.hr-band.ghost { opacity: 0.35; }
+.hr-dot { position: absolute; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--series); box-shadow: 0 0 0 2px var(--panel); }
+.hr-axis { position: relative; height: 1.2em; font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.hr-axis span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.hr-axis span:first-child { transform: none; }
+.hr-axis span:last-child { transform: translateX(-100%); }
+.hr-axis-unit { justify-self: end; font-size: 0.8rem; color: var(--muted); }
+@media (max-width: 560px) {
+  .hr { padding: 16px 14px 12px; }
+  .hr-plot { grid-template-columns: minmax(0, 104px) minmax(0, 1fr); column-gap: 12px; }
+  .hr-axis-unit { font-size: 0.75rem; }
+}
+
+.seg { display: inline-flex; flex-wrap: wrap; }
+.seg button { font: 600 0.9rem var(--f-body); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 9px 14px; min-height: 44px; cursor: pointer; }
+.seg button:hover { border-color: var(--accent); }
+.seg button:first-child { border-radius: 10px 0 0 10px; }
+.seg button:last-child { border-radius: 0 10px 10px 0; margin-left: -1px; }
+.seg button[aria-pressed="true"] { position: relative; z-index: 1; background: var(--accent-soft); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); color: var(--ink); }
+.seg button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Price by age: Dogecoin and Pepecoin on one log scale, lined up by time since launch.
+   The two line colours were checked as a pair in both themes (colour-blind separation and contrast). */
+:root { --c-pep: #1B6B36; --c-doge: #BF8A12; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --c-pep: #4fa866; --c-doge: #a75c00; } }
+:root[data-theme="dark"] { --c-pep: #4fa866; --c-doge: #a75c00; }
+.age { margin: 0; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 18px 12px; display: grid; gap: 12px; }
+.age > * { min-width: 0; }
+.age-head { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; }
+.age-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.9rem; }
+.age-legend li { display: inline-flex; align-items: center; gap: 7px; }
+.age-legend i { width: 18px; height: 3px; border-radius: 2px; }
+.age-legend .pep i, .age-tip .pep i { background: var(--c-pep); }
+.age-legend .doge i, .age-tip .doge i { background: var(--c-doge); }
+.age-plot { position: relative; touch-action: pan-y; cursor: crosshair; }
+.age-plot svg { display: block; width: 100%; height: auto; font-family: var(--f-body); }
+.age-plot .grid { stroke: var(--rule); stroke-width: 1; }
+.age-plot .base { stroke: var(--muted); stroke-width: 1; }
+.age-plot text { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.age-plot text.name { fill: var(--ink); font-weight: 700; font-size: 13px; paint-order: stroke; stroke: var(--panel); stroke-width: 4px; stroke-linejoin: round; }
+.age-plot .band { fill: var(--accent-soft); }
+.age-plot .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.age-plot .line.pep { stroke: var(--c-pep); }
+.age-plot .line.doge { stroke: var(--c-doge); }
+.age-plot .mark { stroke: var(--panel); stroke-width: 2; }
+.age-plot .mark.pep { fill: var(--c-pep); }
+.age-plot .mark.doge { fill: var(--c-doge); }
+.age-plot .hair { stroke: var(--muted); stroke-width: 1; }
+.age-tip { position: absolute; z-index: 2; pointer-events: none; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 10px 12px; font-size: 0.85rem; display: grid; gap: 5px; min-width: 200px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+.age-tip-head { font-size: 0.78rem; color: var(--muted); }
+.age-tip-row { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.age-tip-row i { width: 10px; height: 10px; border-radius: 2px; }
+.age-tip-row small { display: block; color: var(--muted); font-size: 0.76rem; }
+.age-tip-row b { font-variant-numeric: tabular-nums; }
+.age-tip-row b.none { font-weight: 400; color: var(--muted); }
+.age-table summary { cursor: pointer; font-weight: 600; padding-block: 6px; }
+.age-table .table-scroll { margin-top: 12px; }
+.age-table td small, .age-table th small { display: block; color: var(--muted); font-size: 0.8rem; font-weight: 400; }
+@media (max-width: 560px) {
+  .seg { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .seg button { padding: 8px 10px; font-size: 0.84rem; line-height: 1.25; }
+  .age-head { gap: 10px; }
+  .age { padding: 14px 12px 10px; }
+  .age-plot text { font-size: 11px; }
+}
+</style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Páginas"><a href="which-pepecoin.html">Cuál es cuál</a><a href="compare.html" aria-current="page">PEP y DOGE</a><a href="calculator.html">Calculadora</a><a href="supply.html">Suministro</a><a href="scrypt-family.html">Familia Scrypt</a><a href="network.html">Red</a><a href="rich-list.html">Direcciones más ricas</a><a href="guides.html">Guías</a></nav>
+</header>
+<main class="wrap" id="main">
+<header class="page-head">
+  <p class="eyebrow">Pepecoin y Dogecoin</p>
+  <h1>Las mismas reglas, con diez años de diferencia</h1>
+  <p class="lede">Pepecoin es un fork de Dogecoin Core y mantiene las reglas monetarias de Dogecoin: el mismo algoritmo, tiempo de bloque, recompensa por bloque y suministro sin límite. Lo que cambia es la edad, el tamaño y el precio.</p>
+</header>
+
+<section aria-labelledby="rules">
+  <h2 id="rules">Cara a cara</h2>
+  <div class="table-scroll" role="region" aria-labelledby="rules" tabindex="0">
+    <table class="fit">
+      <colgroup><col><col><col class="hl"></colgroup>
+      <thead>
+        <tr><th scope="col"></th><th scope="col" class="coin">Dogecoin<small>DOGE</small></th><th scope="col" class="coin">Pepecoin<small>PEP</small></th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Lanzamiento</th><td>Diciembre de 2013</td><td>Enero de 2024</td></tr>
+        <tr><th scope="row">Código</th><td>Basado en Luckycoin y Litecoin</td><td>Fork de Dogecoin Core</td></tr>
+        <tr><th scope="row">Prueba de trabajo</th><td>Scrypt</td><td>Scrypt <span class="igual">igual</span></td></tr>
+        <tr><th scope="row">Tiempo de bloque</th><td>60 segundos</td><td>60 segundos <span class="igual">igual</span></td></tr>
+        <tr><th scope="row">Recompensa por bloque</th><td>10.000 DOGE, fija</td><td>10.000 PEP, fija <span class="igual">igual</span></td></tr>
+        <tr><th scope="row">Calendario inicial</th><td>Se reducía a la mitad cada 100.000 bloques hasta el bloque 600.000</td><td>Se reducía a la mitad cada 100.000 bloques hasta el bloque 600.000 <span class="igual">igual</span></td></tr>
+        <tr><th scope="row">Límite de suministro</th><td>Ninguna</td><td>Ninguno <span class="igual">igual</span></td></tr>
+        <tr><th scope="row">Monedas nuevas al año</th><td>Unos 5260 millones</td><td>Unos 5260 millones <span class="igual">igual</span></td></tr>
+        <tr><th scope="row">Minería combinada</th><td>Con Litecoin desde el bloque 371.337 (septiembre de 2014)</td><td>Con Litecoin y Dogecoin desde el bloque 42.000 (2024)</td></tr>
+        <tr><th scope="row">Hashrate</th><td>Unos 2,1–3,4 PH/s<br><span class="src">28 sept – 4 oct 2026</span></td><td>Unos 2,9 PH/s <span class="igual">similar</span><br><span class="src">6 de octubre de 2026</span></td></tr>
+        <tr><th scope="row">Pagado a los mineros al día</th><td>14,4 M DOGE ≈ <span id="doge-pay">$1.36M</span></td><td>14,4 M PEP ≈ <span id="pep-pay">$1,302</span></td></tr>
+        <tr><th scope="row">La dirección empieza por</th><td><code>D</code></td><td><code>P</code></td></tr>
+        <tr><th scope="row">Suministro actual</th><td><span id="doge-supply">156.2B</span></td><td><span id="pep-supply">104.8B</span></td></tr>
+        <tr><th scope="row">Inflación actual</th><td><span id="doge-infl">3.4%</span> al año</td><td><span id="pep-infl">5.0%</span> al año</td></tr>
+        <tr><th scope="row">Precio</th><td><span id="doge-price">$0.0943</span></td><td><span id="pep-price">$0.00009042</span></td></tr>
+        <tr><th scope="row">Capitalización de mercado</th><td><span id="doge-mcap">$14.7B</span></td><td><span id="pep-mcap">$9.48M</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="src" id="status">Precios: instantánea de CoinGecko, 4–5 de octubre de 2026.</p>
+  <p class="note">Ambas cadenas añaden las mismas 5260 millones de monedas al año, así que el suministro de Pepecoin sigue la curva de Dogecoin con unos diez años de retraso. <a href="supply.html">Ver el gráfico de suministro e inflación.</a></p>
+</section>
+
+<section aria-labelledby="mining">
+  <h2 id="mining">El mismo hashrate, una paga muy distinta</h2>
+  <p class="note">El hashrate es la potencia de cálculo que mina una cadena. Ambas cadenas buscan un bloque cada 60 segundos, así que el hashrate equivale a dificultad × 2<sup>32</sup> ÷ 60 segundos, y a igual dificultad, igual hashrate.</p>
+  <figure class="hr">
+    <div class="hr-plot">
+      <span class="hr-name"><strong>Dogecoin</strong><b>2,1–3,4 PH/s</b><small>rango, 28 sept – 4 oct</small></span>
+      <div class="hr-track" role="img" aria-label="El hashrate de Dogecoin osciló entre 2,1 y 3,4 petahashes por segundo">
+        <span class="hr-grid" style="left:25%"></span><span class="hr-grid" style="left:50%"></span><span class="hr-grid" style="left:75%"></span>
+        <span class="hr-band" style="left:51.5%;width:33.5%"></span>
+      </div>
+      <span class="hr-name"><strong>Pepecoin</strong><b>2,9 PH/s</b><small>5 de octubre</small></span>
+      <div class="hr-track" role="img" aria-label="El hashrate de Pepecoin fue de 2,9 petahashes por segundo, dentro del rango de Dogecoin">
+        <span class="hr-grid" style="left:25%"></span><span class="hr-grid" style="left:50%"></span><span class="hr-grid" style="left:75%"></span>
+        <span class="hr-band ghost" style="left:51.5%;width:33.5%"></span>
+        <span class="hr-dot" style="left:72.7%"></span>
+      </div>
+      <span class="hr-axis-unit" aria-hidden="true">PH/s</span>
+      <div class="hr-axis" aria-hidden="true"><span style="left:0">0</span><span style="left:25%">1</span><span style="left:50%">2</span><span style="left:75%">3</span><span style="left:100%">4</span></div>
+    </div>
+    <figcaption class="src">Según la dificultad de minería: Pepecoin, 40,6 M el 6 de octubre de 2026 (Pepeplorer); Dogecoin, de 28,8 M a 47,5 M entre el 28 de septiembre y el 6 de octubre de 2026 (CoinWarz). La banda tenue repite el rango de Dogecoin en la fila de Pepecoin.</figcaption>
+  </figure>
+  <div class="stats">
+    <div class="stat"><span class="label">Hashrate</span><span class="value">Más o menos igual</span><span class="sub">PEP 2,9 PH/s, dentro de los 2,1–3,4 PH/s de DOGE</span></div>
+    <div class="stat"><span class="label">Pagado a los mineros al día</span><span class="value" id="pay-ratio">1.043× menos</span><span class="sub">PEP <span id="pay-pep2">$1,302</span>, DOGE <span id="pay-doge2">$1.36M</span></span></div>
+    <div class="stat"><span class="label">Capitalización de mercado</span><span class="value" id="mcap-ratio">1/1,555</span><span class="sub">de la de Dogecoin</span></div>
+  </div>
+  <div class="prose">
+    <p><strong>Cómo consigue una moneda pequeña tanto hashrate.</strong> Por la minería combinada. Las máquinas Scrypt que minan Pepecoin ya cobran de Litecoin y Dogecoin, unos <span id="pay-ltc-doge">$1.61M</span> al día en recompensas de bloque entre ambas. Los pools que añaden PEP a su minería combinada lo pagan además, por el mismo trabajo y la misma electricidad. <a href="scrypt-family.html">Cómo funciona la minería combinada.</a></p>
+    <p><strong>Qué significa para la seguridad.</strong> Superar en minería a Pepecoin requiere aproximadamente tanto hardware Scrypt como superar a Dogecoin, mucho más de lo que podrían pagar las propias recompensas de bloque de PEP.</p>
+    <p><strong>La pega.</strong> El hashrate está ahí porque grandes pools incluyen PEP en su minería combinada. Si lo dejaran, el hashrate de Pepecoin caería con ellos. La lista actualizada de pools está en <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>.</p>
+  </div>
+</section>
+
+<section aria-labelledby="history">
+  <h2 id="history">El precio a la misma edad</h2>
+  <p class="note">Dogecoin se lanzó en diciembre de 2013 y Pepecoin en enero de 2024. Este gráfico las alinea por edad: de izquierda a derecha, el tiempo desde el lanzamiento de cada moneda; de abajo arriba, el precio en dólares estadounidenses. Ambas cadenas emiten monedas con el mismo calendario, así que a la misma edad tienen aproximadamente el mismo número de monedas y sus precios se pueden comparar directamente.</p>
+  <figure class="age">
+    <div class="age-head">
+      <div class="seg" role="group" aria-label="Periodo">
+        <button type="button" id="age-all" aria-pressed="true">Toda la historia de Dogecoin</button>
+        <button type="button" id="age-zoom" aria-pressed="false">La vida de Pepecoin</button>
+      </div>
+      <ul class="age-legend" aria-label="Líneas">
+        <li class="doge"><i></i>Dogecoin</li>
+        <li class="pep"><i></i>Pepecoin</li>
+      </ul>
+    </div>
+    <div class="age-plot" id="age-plot" tabindex="0" role="img" aria-label="Gráfico de líneas de los precios de Dogecoin y Pepecoin según el tiempo transcurrido desde su lanzamiento, en una escala logarítmica en dólares. Las mismas cifras están en la tabla debajo del gráfico."></div>
+    <figcaption class="src" id="age-status">Historial de precios guardado hasta el 6 de octubre de 2026.</figcaption>
+    <noscript><p class="note">El gráfico necesita JavaScript. Las cifras de debajo son los valores guardados el 6 de octubre de 2026.</p></noscript>
+  </figure>
+  <div class="stats">
+    <div class="stat"><span class="label">Pepecoin ahora</span><span class="value" id="age-pep">$0.000090</span><span class="sub" id="age-pep-sub">2 años 8 meses después del lanzamiento</span></div>
+    <div class="stat"><span class="label">Dogecoin a esa edad</span><span class="value" id="age-doge">$0.00024</span><span class="sub" id="age-doge-sub">en agosto de 2016</span></div>
+    <div class="stat"><span class="label">Pepecoin frente a ella</span><span class="value" id="age-ratio">38%</span><span class="sub">del precio de Dogecoin a la misma edad</span></div>
+  </div>
+  <details class="age-table">
+    <summary>Mostrar las cifras en una tabla</summary>
+    <div class="table-scroll" role="region" aria-label="Precios por edad" tabindex="0">
+      <table style="min-width: 520px">
+        <thead><tr><th scope="col">Edad</th><th scope="col" class="r">Dogecoin</th><th scope="col" class="r">Pepecoin</th></tr></thead>
+        <tbody id="age-rows"></tbody>
+      </table>
+    </div>
+  </details>
+  <div class="prose">
+    <p><strong>Qué muestra el gráfico.</strong> Ambas monedas tuvieron su gran primera subida dentro del primer año y luego devolvieron la mayor parte. Dogecoin llegó a unos $0.0018 a principios de 2014, semanas después de su lanzamiento, y estaba cerca de $0.0001 en 2015. Pepecoin llegó a unos $0.0018 en diciembre de 2024, diez meses después de su lanzamiento, y ronda los $0.0001 desde la primavera de 2026.</p>
+    <p><strong>Qué no muestra.</strong> Las subidas posteriores de Dogecoin, en 2017 y 2021, tuvieron sus propias causas. Nada aquí dice que Pepecoin vaya a repetirlas. Los precios pasados de una moneda no son una previsión para otra.</p>
+    <p><strong>Sobre los datos.</strong> La línea de Pepecoin empieza en marzo de 2024, cuando comenzó el seguimiento de precios, así que faltan sus dos primeros meses. Cada línea se muestrea cada pocos días, lo que puede recortar un pico breve. Los máximos históricos exactos están en la <a href="calculator.html#prices">página de la calculadora</a>.</p>
+  </div>
+</section>
+
+<section aria-labelledby="calc-link">
+  <h2 id="calc-link">Tus PEP con la capitalización de otra moneda</h2>
+  <a class="card feature" href="calculator.html">
+    <h3>Abrir la calculadora de capitalización →</h3>
+    <p>Escribe cuántos PEP tienes y míralos con la capitalización de mercado de Dogecoin, Litecoin, Bitcoin, Pepe o cualquier moneda del top 100, hoy o en su máximo histórico. La página también muestra precios en directo y el máximo histórico de cada moneda.</p>
+  </a>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">Preguntas frecuentes</h2>
+  <div class="faq">
+    <details><summary>¿Pepecoin es lo mismo que Dogecoin?</summary><p>Pepecoin es un fork de Dogecoin Core y mantiene las reglas monetarias de Dogecoin: el mismo algoritmo, tiempo de bloque, recompensa por bloque y suministro sin límite. Lo que cambia es la edad, el tamaño y el precio.</p></details>
+    <details><summary>¿Tienen Pepecoin y Dogecoin un límite de suministro?</summary><p>No. Ambas añaden una cantidad fija de 10.000 monedas por bloque de un minuto, unos 5260 millones al año, sin fecha de fin. El suministro de Pepecoin sigue la curva de Dogecoin con unos diez años de retraso. <a href="supply.html">Ver el gráfico de suministro e inflación.</a></p></details>
+    <details><summary>¿Por qué Pepecoin tiene un hashrate similar pero una paga para los mineros mucho menor?</summary><p>Por la minería combinada. Las máquinas Scrypt que minan Pepecoin ya cobran de Litecoin y Dogecoin. Los pools que añaden PEP a su minería combinada lo pagan además, por el mismo trabajo y la misma electricidad. <a href="scrypt-family.html">Cómo funciona la minería combinada.</a></p></details>
+    <details><summary>¿Qué muestra el gráfico de precios a la misma edad?</summary><p>Alinea Dogecoin y Pepecoin según el tiempo transcurrido desde el lanzamiento de cada moneda, para poder comparar sus precios a la misma edad. No predice que Pepecoin vaya a repetir las subidas posteriores de Dogecoin. Los precios pasados de una moneda no son una previsión para otra.</p></details>
+    <details><summary>¿Las direcciones de Pepecoin empiezan por la misma letra que las de Dogecoin?</summary><p>No. Las direcciones de Dogecoin empiezan por <code>D</code>; las de Pepecoin, por <code>P</code>.</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">Fuentes</h2>
+  <div class="sources">
+    <div>
+      <h3>Reglas y código</h3>
+      <ul>
+        <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp</a></li>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/src/chainparams.cpp">Dogecoin chainparams.cpp</a></li>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/doc/FAQ.md">Dogecoin FAQ (reward schedule)</a></li>
+        <li><a href="https://github.com/pepecoinppc/pepecoin">Pepecoin README (differences from Dogecoin)</a></li>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">Pepecoin MiCA white paper</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Precios y suministro</h3>
+      <ul>
+        <li><a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko: Pepecoin</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/dogecoin">CoinGecko: Dogecoin</a></li>
+        <li><a href="https://pepeplorer.com/network">Pepeplorer network stats</a></li>
+        <li><a href="https://defillama.com/docs/api">DefiLlama price API (price history chart)</a></li>
+        <li>Logotipos de las monedas: <a href="https://github.com/0xa3k5/web3icons">web3icons</a> y <a href="https://github.com/trustwallet/assets">Trust Wallet assets</a> (licencia MIT)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  // Live figures for the side-by-side table and the mining stats. calculator.html reads and writes the same cached list.
+  var PEP_ID = 'pepecoin-network';
+  var ISSUANCE = 5256000000; // 525,600 blocks a year x 10,000 coins
+  var PER_DAY = 14400000;    // 1,440 blocks a day x 10,000 coins, for DOGE and for PEP
+  var LTC_PER_DAY = 3600;    // 576 blocks a day x 6.25 LTC
+  var API = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&sparkline=false';
+  var CACHE_KEY = 'pf-prices-v1';
+  var TTL = 10 * 60 * 1000;
+
+  // Saved snapshot (CoinGecko, Oct 4-5, 2026). Shown first, replaced when live prices arrive.
+  var SNAP = [
+    { id: PEP_ID, symbol: 'pep', name: 'Pepecoin', current_price: 0.00009042, market_cap: 9283145, circulating_supply: 102668000000, total_supply: 104793000000, ath: 0.001824 },
+    { id: 'dogecoin', symbol: 'doge', name: 'Dogecoin', current_price: 0.09434, market_cap: 14736000000, circulating_supply: 156198000000, ath: 0.7316 },
+    { id: 'litecoin', symbol: 'ltc', name: 'Litecoin', current_price: 70.42, market_cap: 5470761331, circulating_supply: 77683000, ath: 410.26 }
+  ];
+
+  var coins = {};
+
+  function $(id) { return document.getElementById(id); }
+  function num(v) { return typeof v === 'number' && isFinite(v) ? v : null; }
+
+  function setCoins(list) {
+    coins = {};
+    list.forEach(function (c) {
+      if (!c || !c.id || num(c.current_price) === null) return;
+      coins[c.id] = { price: c.current_price, mcap: num(c.market_cap), supply: num(c.circulating_supply), total: num(c.total_supply) };
+    });
+  }
+  function pepSupply() {
+    var p = coins[PEP_ID];
+    return p.total || p.supply;
+  }
+  function usd(v) {
+    if (v === null) return 'n/a';
+    if (v >= 1000) return '$' + v.toLocaleString('es-ES', { maximumFractionDigits: 0 });
+    if (v >= 1) return '$' + v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return '$' + v.toLocaleString('es-ES', { maximumSignificantDigits: 4 });
+  }
+  function big(v, prefix) {
+    if (v === null) return 'n/a';
+    var units = [[1e12, 'T'], [1e9, 'B'], [1e6, 'M'], [1e3, 'K']];
+    for (var i = 0; i < units.length; i++) {
+      if (v >= units[i][0]) {
+        var n = v / units[i][0];
+        return (prefix || '') + n.toLocaleString('es-ES', { maximumSignificantDigits: n >= 100 ? 4 : 3 }) + units[i][1];
+      }
+    }
+    return (prefix || '') + v.toLocaleString('es-ES', { maximumFractionDigits: 0 });
+  }
+  function money(v) { return v !== null && v >= 1e6 ? big(v, '$') : usd(v); }      // compact, for table cells
+  function mult(x) {
+    if (x >= 100) return x.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + '×';
+    if (x >= 10) return x.toLocaleString('es-ES', { maximumFractionDigits: 1 }) + '×';
+    return x.toLocaleString('es-ES', { maximumFractionDigits: 2 }) + '×';
+  }
+  function pct(x) { return (x * 100).toLocaleString('es-ES', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + '%'; }
+
+  function renderSide() {
+    var p = coins[PEP_ID], d = coins.dogecoin, l = coins.litecoin;
+    if (!p) return;
+    var ps = pepSupply();
+    $('pep-price').textContent = usd(p.price);
+    $('pep-mcap').textContent = big(p.price * ps, '$');
+    $('pep-supply').textContent = big(ps);
+    $('pep-infl').textContent = pct(ISSUANCE / ps);
+    $('pep-pay').textContent = money(PER_DAY * p.price);
+    $('pay-pep2').textContent = money(PER_DAY * p.price);
+    if (d && d.supply) {
+      $('doge-price').textContent = usd(d.price);
+      $('doge-mcap').textContent = big(d.mcap, '$');
+      $('doge-supply').textContent = big(d.supply);
+      $('doge-infl').textContent = pct(ISSUANCE / d.supply);
+      $('doge-pay').textContent = money(PER_DAY * d.price);
+      $('pay-doge2').textContent = money(PER_DAY * d.price);
+      $('pay-ratio').textContent = mult(d.price / p.price) + ' menos';
+      if (d.mcap) $('mcap-ratio').textContent = '1/' + Math.round(d.mcap / (p.price * ps)).toLocaleString('es-ES');
+      if (l) $('pay-ltc-doge').textContent = big(PER_DAY * d.price + LTC_PER_DAY * l.price, '$');
+    }
+  }
+
+  function status(text) { $('status').textContent = text; }
+
+  function readCache() {
+    try {
+      var raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      if (!o || !o.t || Date.now() - o.t > TTL || !Array.isArray(o.list)) return null;
+      return o;
+    } catch (e) { return null; }
+  }
+  function writeCache(list) {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), list: list })); } catch (e) { /* storage unavailable */ }
+  }
+  function slim(c) {
+    return { id: c.id, symbol: c.symbol, name: c.name, current_price: c.current_price, market_cap: c.market_cap,
+      circulating_supply: c.circulating_supply, total_supply: c.total_supply, ath: c.ath };
+  }
+  function goLive(list, t) {
+    var hasPep = list.some(function (c) { return c && c.id === PEP_ID && num(c.current_price) !== null; });
+    if (!hasPep) return false;
+    setCoins(list);
+    renderSide();
+    status('Precios: en directo de CoinGecko, actualizados a las ' + new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '.');
+    return true;
+  }
+  function getJSON(url) {
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+  function refresh() {
+    var cached = readCache();
+    if (cached && goLive(cached.list, cached.t)) return;
+    Promise.all([
+      getJSON(API + '&ids=' + PEP_ID),
+      getJSON(API + '&order=market_cap_desc&per_page=100&page=1')
+    ]).then(function (res) {
+      var list = res[0].concat(res[1]).map(slim);
+      if (goLive(list, Date.now())) writeCache(list);
+    }).catch(function () {
+      status('Precios: instantánea de CoinGecko, 4–5 de octubre de 2026. Ahora mismo no se han podido cargar los precios en directo.');
+    });
+  }
+
+  setCoins(SNAP);
+  renderSide();
+  refresh();
+})();
+</script>
+
+<script>
+/* Price by age. History comes from DefiLlama's free price API (CoinGecko data); a saved copy is the fallback. */
+(function () {
+  'use strict';
+  var DAY = 86400;
+  var ORIGIN = { doge: Date.UTC(2013, 11, 6) / 1000, pep: Date.UTC(2024, 0, 30) / 1000 };
+  var NAME = { doge: 'Dogecoin', pep: 'Pepecoin' };
+  var IDS = { doge: 'coingecko:dogecoin', pep: 'coingecko:pepecoin-network' };
+  var LL = 'https://coins.llama.fi/';
+  var CACHE_KEY = 'pf-age-v1';
+  var TTL = 6 * 3600 * 1000;
+  var SNAP_DATE = '6 de octubre de 2026';
+  var SNAP = {
+    doge: '16:0.0004051 46:0.001828 76:0.001249 106:0.0006927 136:0.000606 166:0.0004546 196:0.0003473 226:0.0002364 256:0.0001153 286:0.0002962 316:0.000255 346:0.0002219 376:0.0001805 406:0.0001406 436:0.0001411 466:0.0001433 496:0.0001084 526:0.0001162 556:0.0001672 586:0.0001849 616:0.0001555 646:0.0001241 676:0.00012 706:0.0001305 736:0.0001548 766:0.0001837 796:0.0002891 826:0.0002397 856:0.0002026 886:0.000222 916:0.0002634 946:0.000271 976:0.0002367 1006:0.0002306 1036:0.0002276 1066:0.0002209 1096:0.0002122 1126:0.0002255 1156:0.0002096 1186:0.0002187 1216:0.0004588 1246:0.0008222 1276:0.003218 1306:0.0025 1336:0.001787 1366:0.002196 1396:0.001062 1426:0.001097 1456:0.002142 1486:0.009576 1516:0.006858 1546:0.005956 1576:0.002747 1606:0.005425 1636:0.003434 1666:0.002292 1696:0.003399 1726:0.002495 1756:0.00573 1786:0.004285 1816:0.002241 1846:0.002363 1876:0.002043 1906:0.002077 1936:0.002019 1966:0.002583 1996:0.003045 2026:0.003321 2056:0.002847 2086:0.002681 2116:0.002584 2146:0.002699 2176:0.002547 2206:0.002077 2236:0.002403 2266:0.002844 2296:0.001769 2326:0.002061 2356:0.002545 2386:0.002475 2416:0.003056 2446:0.003528 2476:0.002836 2506:0.002592 2536:0.002779 2566:0.003225 2596:0.00865 2626:0.06945 2656:0.05883 2686:0.09408 2716:0.4889 2746:0.3131 2776:0.2071 2806:0.2655 2836:0.241 2866:0.2293 2896:0.2742 2926:0.1707 2956:0.1513 2986:0.1658 3016:0.1215 3046:0.1425 3076:0.1242 3106:0.08083 3136:0.07064 3166:0.0688 3196:0.06272 3226:0.06475 3256:0.1259 3286:0.1046 3316:0.07051 3346:0.09126 3376:0.07491 3406:0.09632 3436:0.07968 3466:0.07262 3496:0.06797 3526:0.07791 3556:0.06377 3586:0.0621 3616:0.06967 3646:0.08051 3676:0.091 3706:0.07881 3736:0.09795 3766:0.2199 3796:0.1475 3826:0.1691 3856:0.1228 3886:0.1343 3916:0.1098 3946:0.1097 3976:0.1419 4006:0.4307 4036:0.3238 4066:0.3628 4096:0.2395 4126:0.1726 4156:0.1786 4186:0.2449 4216:0.1539 4246:0.2713 4276:0.2215 4306:0.2653 4336:0.1953 4366:0.1617 4396:0.122 4426:0.1378 4456:0.101 4486:0.0952 4516:0.09952 4546:0.1088 4576:0.08711 4606:0.07235 4636:0.06956 4666:0.08363 4686:0.09584',
+    pep: '60:0.00002488 68:0.00004722 76:0.00003637 84:0.00002165 92:0.0000203 100:0.00002141 108:0.00001019 116:0.00000648 130:0.00001491 138:0.0000077 146:0.00000608 154:0.00000659 162:0.00000515 170:0.00000386 178:0.00000268 186:0.000003 194:0.00000313 202:0.00000392 210:0.00000539 218:0.00000654 226:0.00000611 234:0.0000047 242:0.0000069 250:0.00001675 258:0.00002968 266:0.00005421 274:0.00003834 282:0.0000453 290:0.00005473 298:0.0002791 306:0.0002551 314:0.001004 316:0.001735 322:0.001278 330:0.001043 338:0.0008939 346:0.0003947 354:0.0006607 362:0.001029 370:0.0006224 380:0.0004227 388:0.0003755 396:0.0002958 404:0.000266 412:0.0002794 420:0.0003441 428:0.0002301 436:0.0001936 444:0.0002039 452:0.0002854 460:0.0002031 468:0.0001898 476:0.0002008 484:0.0002078 492:0.0002683 500:0.0002308 508:0.0001915 516:0.0002235 526:0.0002011 534:0.0002568 542:0.0004315 550:0.0006173 558:0.0006529 566:0.0005798 574:0.0004738 582:0.0003724 590:0.0003751 598:0.000401 606:0.0002933 616:0.0003081 624:0.000296 632:0.0002551 640:0.0002699 648:0.0003758 656:0.0003834 664:0.0003198 672:0.0002946 680:0.0002869 688:0.0002397 696:0.0002323 704:0.0002482 712:0.0002529 720:0.0002938 728:0.0002614 736:0.0002284 744:0.0003006 752:0.0002398 760:0.0002166 768:0.0002016 776:0.0001909 784:0.0001607 792:0.0001247 800:0.0001458 808:0.0001297 816:0.0001121 824:0.0001234 832:0.00013 840:0.0001209 848:0.0001323 856:0.0001229 864:0.0001171 872:0.0001068 880:0.00008369 888:0.00008892 896:0.0000658 904:0.00006749 912:0.00006753 920:0.00006052 928:0.00006699 936:0.000131 944:0.0001394 952:0.0001245 960:0.00008993 968:0.0001019 976:0.0000935 978:0.0000903'
+  };
+  var SVG = 'http://www.w3.org/2000/svg';
+
+  var plot = document.getElementById('age-plot');
+  var status = document.getElementById('age-status');
+  var rows = document.getElementById('age-rows');
+  var btnAll = document.getElementById('age-all');
+  var btnZoom = document.getElementById('age-zoom');
+  if (!plot || !window.fetch) return;
+
+  function parse(s) {
+    return s.split(' ').map(function (x) { var a = x.split(':'); return [+a[0], +a[1]]; });
+  }
+  var data = { doge: parse(SNAP.doge), pep: parse(SNAP.pep) };
+  var step = { doge: 30, pep: 8 };
+  var live = null;          // time the live history was loaded, or null for the saved copy
+  var mode = 'all';
+  var geo = null;           // geometry of the last render
+  var cursor = null;        // age in days under the pointer, or null
+  var tip = document.createElement('div');
+  tip.className = 'age-tip';
+  tip.hidden = true;
+
+  function last(a) { return a[a.length - 1]; }
+  function el(name, attrs, text) {
+    var n = document.createElementNS(SVG, name), k;
+    for (k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function h(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  // Price at an age, interpolated on the log scale; null outside the series.
+  function at(series, age) {
+    if (!series.length || age < series[0][0] || age > last(series)[0]) return null;
+    for (var i = 1; i < series.length; i++) {
+      if (age <= series[i][0]) {
+        var a = series[i - 1], b = series[i], f = (age - a[0]) / (b[0] - a[0] || 1);
+        return Math.exp(Math.log(a[1]) * (1 - f) + Math.log(b[1]) * f);
+      }
+    }
+    return last(series)[1];
+  }
+  function money(p) {
+    if (p == null) return '';
+    if (p >= 1) return '$' + p.toFixed(2);
+    var d = Math.max(2, 1 - Math.floor(Math.log(p) / Math.LN10));
+    return '$' + p.toFixed(Math.min(d, 10));
+  }
+  function tickMoney(k) {
+    if (k >= 0) return '$' + Math.pow(10, k);
+    return '$0.' + new Array(-k).join('0') + '1';
+  }
+  function ageText(days) {
+    var m = Math.round(days / 30.4375), y = Math.floor(m / 12), mo = m % 12, parts = [];
+    if (y) parts.push(y + (y === 1 ? ' año' : ' años'));
+    if (mo || !y) parts.push(mo + (mo === 1 ? ' mes' : ' meses'));
+    return parts.join(' ');
+  }
+  function when(key, days, long) {
+    var d = new Date((ORIGIN[key] + days * DAY) * 1000);
+    try { return d.toLocaleDateString('es-ES', { month: long ? 'long' : 'short', year: 'numeric', timeZone: 'UTC' }); }
+    catch (e) { return d.getUTCFullYear() + ''; }
+  }
+
+  function render() {
+    var W = Math.max(280, Math.round(plot.clientWidth || 600));
+    var small = W < 520;
+    var H = small ? 300 : 360;
+    var m = { l: small ? 64 : 74, r: 14, t: 16, b: 44 };
+    var pepAge = last(data.pep)[0], dogeAge = last(data.doge)[0];
+    var xmax = mode === 'all' ? dogeAge : pepAge;
+    var series = {
+      doge: data.doge.filter(function (p) { return p[0] <= xmax; }),
+      pep: data.pep.filter(function (p) { return p[0] <= xmax; })
+    };
+    if (mode !== 'all') { var cut = at(data.doge, xmax); if (cut) series.doge.push([xmax, cut]); }
+    var lo = Infinity, hi = 0;
+    ['doge', 'pep'].forEach(function (k) {
+      series[k].forEach(function (p) { if (p[1] < lo) lo = p[1]; if (p[1] > hi) hi = p[1]; });
+    });
+    var k0 = Math.floor(Math.log(lo) / Math.LN10 + 1e-9), k1 = Math.ceil(Math.log(hi) / Math.LN10 - 1e-9);
+    if (k1 <= k0) k1 = k0 + 1;
+    var pw = W - m.l - m.r, ph = H - m.t - m.b;
+    function x(age) { return m.l + (age / xmax) * pw; }
+    function y(p) { return m.t + (k1 - Math.log(p) / Math.LN10) / (k1 - k0) * ph; }
+    geo = { W: W, H: H, m: m, pw: pw, ph: ph, xmax: xmax, x: x, y: y };
+
+    var svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, width: W, height: H, 'aria-hidden': 'true' });
+    var k, i;
+    // The years Pepecoin has existed, as a strip on Dogecoin's long axis
+    if (mode === 'all') {
+      svg.appendChild(el('rect', { 'class': 'band', x: x(0), y: m.t, width: x(pepAge) - x(0), height: ph }));
+    }
+    for (k = k0; k <= k1; k++) {
+      var gy = Math.round(y(Math.pow(10, k))) + 0.5;
+      svg.appendChild(el('line', { 'class': k === k0 ? 'base' : 'grid', x1: m.l, x2: W - m.r, y1: gy, y2: gy }));
+      svg.appendChild(el('text', { x: m.l - 8, y: gy + 4, 'text-anchor': 'end' }, tickMoney(k)));
+    }
+    var years = xmax / 365.25, stepY, t;
+    if (mode === 'all') stepY = small ? 4 : 2; else stepY = small ? 1 : 0.5;
+    for (t = 0; t <= years + 1e-6; t += stepY) {
+      var tx = Math.round(x(t * 365.25)) + 0.5, label;
+      if (t === 0) label = 'lanzamiento';
+      else if (t < 1 || t % 1) label = Math.round(t * 12) + ' m';
+      else label = t + (t === 1 ? ' año' : ' años');
+      svg.appendChild(el('line', { 'class': 'grid', x1: tx, x2: tx, y1: m.t + ph, y2: m.t + ph + 5 }));
+      svg.appendChild(el('text', { x: tx, y: m.t + ph + 20, 'text-anchor': t === 0 ? 'start' : 'middle' }, label));
+    }
+    svg.appendChild(el('text', { x: W - m.r, y: H - 6, 'text-anchor': 'end' }, 'tiempo desde el lanzamiento de cada moneda'));
+
+    ['doge', 'pep'].forEach(function (key) {
+      var s = series[key], d = '';
+      for (i = 0; i < s.length; i++) d += (i ? 'L' : 'M') + x(s[i][0]).toFixed(1) + ' ' + y(s[i][1]).toFixed(1);
+      svg.appendChild(el('path', { 'class': 'line ' + key, d: d }));
+    });
+    ['doge', 'pep'].forEach(function (key) {
+      var e = last(series[key]), ex = x(e[0]), ey = y(e[1]), tx2, ty, anchor;
+      svg.appendChild(el('circle', { 'class': 'mark ' + key, cx: ex.toFixed(1), cy: ey.toFixed(1), r: 4.5 }));
+      if (key === 'pep' && mode === 'all') { tx2 = ex + 9; ty = ey + 4; anchor = 'start'; }
+      else {
+        // Keep the name clear of its own line: above the line's local high for the series that ends higher, below the local low for the other.
+        var reach = ex - (small ? 74 : 88), top = Infinity, bottom = -Infinity;
+        series[key].forEach(function (p) {
+          var px = x(p[0]), py = y(p[1]);
+          if (px >= reach) { if (py < top) top = py; if (py > bottom) bottom = py; }
+        });
+        var other = last(series[key === 'doge' ? 'pep' : 'doge']);
+        var above = mode === 'all' || y(other[1]) > ey;
+        tx2 = ex - 8; anchor = 'end';
+        ty = above ? top - 9 : bottom + 19;
+      }
+      ty = Math.min(m.t + ph - 6, Math.max(m.t + 12, ty));
+      svg.appendChild(el('text', { 'class': 'name', x: tx2.toFixed(1), y: ty.toFixed(1), 'text-anchor': anchor }, NAME[key]));
+    });
+    var hair = el('g', { id: 'age-hair', visibility: 'hidden' });
+    hair.appendChild(el('line', { 'class': 'hair', y1: m.t, y2: m.t + ph, x1: 0, x2: 0 }));
+    hair.appendChild(el('circle', { 'class': 'mark doge', r: 4.5, cx: 0, cy: 0 }));
+    hair.appendChild(el('circle', { 'class': 'mark pep', r: 4.5, cx: 0, cy: 0 }));
+    svg.appendChild(hair);
+
+    plot.textContent = '';
+    plot.appendChild(svg);
+    plot.appendChild(tip);
+    geo.hair = hair;
+    if (cursor != null) show(Math.min(cursor, xmax));
+  }
+
+  function show(age) {
+    if (!geo) return;
+    cursor = Math.max(0, Math.min(geo.xmax, age));
+    var px = geo.x(cursor), parts = geo.hair.childNodes;
+    geo.hair.setAttribute('visibility', 'visible');
+    parts[0].setAttribute('x1', px); parts[0].setAttribute('x2', px);
+    tip.textContent = '';
+    tip.appendChild(h('div', 'age-tip-head', ageText(cursor) + ' después del lanzamiento'));
+    ['doge', 'pep'].forEach(function (key, n) {
+      var p = at(data[key], cursor), dot = parts[n + 1];
+      if (p == null) dot.setAttribute('visibility', 'hidden');
+      else { dot.setAttribute('visibility', 'inherit'); dot.setAttribute('cx', px); dot.setAttribute('cy', geo.y(p)); }
+      var row = h('div', 'age-tip-row ' + key), who = h('span', '', NAME[key]);
+      row.appendChild(h('i'));
+      var tooOld = cursor > last(data[key])[0];
+      who.appendChild(h('small', '', p == null ? (tooOld ? 'aún no tiene esta edad' : 'aún sin datos de precio') : when(key, cursor)));
+      row.appendChild(who);
+      row.appendChild(h('b', p == null ? 'none' : '', p == null ? '–' : money(p)));
+      tip.appendChild(row);
+    });
+    tip.hidden = false;
+    var tw = tip.offsetWidth || 210, left = px + 14;
+    if (left + tw > geo.W - 4) left = px - 14 - tw;
+    tip.style.left = Math.max(4, left) + 'px';
+    tip.style.top = (geo.m.t + 6) + 'px';
+  }
+  function hide() {
+    cursor = null;
+    tip.hidden = true;
+    if (geo && geo.hair) geo.hair.setAttribute('visibility', 'hidden');
+  }
+  function ageFromEvent(ev) {
+    var r = plot.getBoundingClientRect(), scale = geo.W / (r.width || geo.W);
+    return ((ev.clientX - r.left) * scale - geo.m.l) / geo.pw * geo.xmax;
+  }
+  plot.addEventListener('pointermove', function (ev) { if (geo) show(ageFromEvent(ev)); });
+  plot.addEventListener('pointerdown', function (ev) { if (geo) show(ageFromEvent(ev)); });
+  plot.addEventListener('pointerleave', function (ev) { if (ev.pointerType !== 'touch') hide(); });
+  plot.addEventListener('blur', hide);
+  plot.addEventListener('keydown', function (ev) {
+    if (!geo) return;
+    var jump = geo.xmax / 60, cur = cursor == null ? last(data.pep)[0] : cursor;
+    if (ev.key === 'ArrowRight') show(cur + jump);
+    else if (ev.key === 'ArrowLeft') show(cur - jump);
+    else if (ev.key === 'Home') show(0);
+    else if (ev.key === 'End') show(geo.xmax);
+    else if (ev.key === 'Escape') { hide(); return; }
+    else return;
+    ev.preventDefault();
+  });
+
+  function facts() {
+    var pep = last(data.pep), same = at(data.doge, pep[0]);
+    function set(id, text) { var n = document.getElementById(id); if (n) n.textContent = text; }
+    set('age-pep', money(pep[1]));
+    set('age-pep-sub', ageText(pep[0]) + ' después del lanzamiento');
+    if (same) {
+      set('age-doge', money(same));
+      set('age-doge-sub', 'in ' + when('doge', pep[0], true));
+      set('age-ratio', Math.round(pep[1] / same * 100) + '%');
+    }
+    var ages = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 7, 10, 12].map(function (v) { return { days: v * 365.25, label: ageText(v * 365.25) }; });
+    ages = ages.filter(function (a) { return a.days <= last(data.doge)[0] && Math.abs(a.days - pep[0]) > 45; });
+    ages.push({ days: pep[0], label: ageText(pep[0]), sub: 'Pepecoin hoy', now: true });
+    ages.sort(function (a, b) { return a.days - b.days; });
+    rows.textContent = '';
+    ages.forEach(function (a) {
+      var tr = document.createElement('tr'), th = h('th', '', a.label);
+      th.setAttribute('scope', 'row');
+      th.className = 'plain';
+      if (a.sub) th.appendChild(h('small', '', a.sub));
+      if (a.now) tr.className = 'hl';
+      tr.appendChild(th);
+      ['doge', 'pep'].forEach(function (key) {
+        var p = at(data[key], a.days), td = h('td', 'r', p == null ? '–' : money(p));
+        if (p != null) td.appendChild(h('small', '', when(key, a.days)));
+        tr.appendChild(td);
+      });
+      rows.appendChild(tr);
+    });
+    if (live) {
+      var hh = ('0' + live.getHours()).slice(-2) + ':' + ('0' + live.getMinutes()).slice(-2);
+      status.textContent = 'Historial de precios de la API de precios de DefiLlama (datos de CoinGecko): un punto cada ' + step.doge + ' días para Dogecoin y cada ' + step.pep + ' para Pepecoin, más el último precio. Cargado a las ' + hh + '. La franja sombreada es el tiempo que lleva existiendo Pepecoin.';
+    } else {
+      status.textContent = 'Historial de precios guardado hasta el ' + SNAP_DATE + ' (API de precios de DefiLlama, datos de CoinGecko). La franja sombreada es el tiempo que lleva existiendo Pepecoin.';
+    }
+  }
+
+  function setMode(next) {
+    mode = next;
+    btnAll.setAttribute('aria-pressed', String(mode === 'all'));
+    btnZoom.setAttribute('aria-pressed', String(mode !== 'all'));
+    hide();
+    render();
+  }
+  btnAll.addEventListener('click', function () { setMode('all'); });
+  btnZoom.addEventListener('click', function () { setMode('zoom'); });
+
+  var raf = 0, lastW = 0;
+  function onResize() {
+    if (raf) return;
+    raf = requestAnimationFrame(function () {
+      raf = 0;
+      var w = Math.round(plot.clientWidth);
+      if (w && w !== lastW) { lastW = w; render(); }
+    });
+  }
+  if (window.ResizeObserver) new ResizeObserver(onResize).observe(plot);
+  else window.addEventListener('resize', onResize);
+
+  // ---- live history ----
+  function clean(list) {
+    var out = [], prev = -1;
+    for (var i = 0; i < list.length; i++) {
+      var a = +list[i][0], p = +list[i][1];
+      if (!isFinite(a) || !isFinite(p) || p <= 0 || a <= prev) continue;
+      out.push([Math.round(a * 100) / 100, p]);
+      prev = a;
+    }
+    return out;
+  }
+  function chartUrl(key) {
+    var days = (Date.now() / 1000 - ORIGIN[key]) / DAY;
+    step[key] = Math.max(1, Math.ceil(days / 470));
+    return LL + 'chart/' + IDS[key] + '?start=' + Math.floor(ORIGIN[key]) + '&span=480&period=' + step[key] + 'd';
+  }
+  function getJSON(url) {
+    return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+  function toSeries(json, key) {
+    var c = json && json.coins && json.coins[IDS[key]];
+    if (!c || !Array.isArray(c.prices)) throw new Error('no ' + key + ' history');
+    var s = clean(c.prices.map(function (p) { return [(p.timestamp - ORIGIN[key]) / DAY, p.price]; }));
+    if (s.length < 40) throw new Error('short ' + key + ' history');
+    return s;
+  }
+  function addNow(series, json, key) {
+    var c = json && json.coins && json.coins[IDS[key]];
+    if (!c || !(c.price > 0) || !c.timestamp) return;
+    var age = (c.timestamp - ORIGIN[key]) / DAY;
+    if (age > last(series)[0] + 0.02) series.push([Math.round(age * 100) / 100, c.price]);
+  }
+  function use(d, s, t) {
+    data = d; step = s; live = new Date(t);
+    facts(); render();
+  }
+  function load() {
+    try {
+      var o = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      if (o && o.t && Date.now() - o.t < TTL && o.d && o.d.doge && o.d.pep && o.d.doge.length > 40 && o.d.pep.length > 40) {
+        use({ doge: clean(o.d.doge), pep: clean(o.d.pep) }, o.s || step, o.t);
+        return;
+      }
+    } catch (e) { /* storage unavailable or stale: fetch */ }
+    Promise.all([
+      getJSON(chartUrl('doge')),
+      getJSON(chartUrl('pep')),
+      getJSON(LL + 'prices/current/' + IDS.doge + ',' + IDS.pep).catch(function () { return null; })
+    ]).then(function (res) {
+      var d = { doge: toSeries(res[0], 'doge'), pep: toSeries(res[1], 'pep') };
+      addNow(d.doge, res[2], 'doge');
+      addNow(d.pep, res[2], 'pep');
+      var t = Date.now();
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: t, d: d, s: step })); } catch (e) { /* storage unavailable */ }
+      use(d, step, t);
+    }).catch(function () { /* keep the saved history */ });
+  }
+
+  facts();
+  render();
+  load();
+})();
+</script>
+
+</main>
+<footer class="site-foot">
+  <p><strong>Páginas comunitarias de datos</strong>, recopiladas por un voluntario de la comunidad r/pepecoin. No se trata de una publicación oficial de Pepecoin.</p>
+  <p>No es asesoramiento de inversión. Quien las recopila tiene PEP. Los precios y las cifras de la red cambian a diario; cada página indica sus fechas y fuentes.</p>
+  <p class="correction">¿Ves un error? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Informa de una corrección</a> (con una fuente) en GitHub.</p>
+  <details class="support"><summary>¿Te gusta este sitio? Puedes apoyar su desarrollo.</summary><p>Cualquier cantidad, por pequeña que sea, ayuda. ¡Gracias!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+</footer>
+<script src="../chrome.js?v=20261007d" defer></script>
+</body>
+</html>

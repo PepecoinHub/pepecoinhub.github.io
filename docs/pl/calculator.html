@@ -8,6 +8,12 @@
 <link rel="canonical" href="https://pepecoinhub.com/pl/calculator.html">
 <link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html">
 <link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/calculator.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/calculator.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/calculator.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/calculator.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/calculator.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/calculator.html">
 <link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/calculator.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pl_PL">
@@ -510,7 +516,7 @@ button.combo-val:hover { border-color: var(--accent); }
       cell(tr, usd(c.price), 'r');
       cell(tr, big(id === PEP_ID ? c.price * pepSupply() : c.mcap, '$'), 'r');
       cell(tr, usd(c.ath), 'r');
-      cell(tr, !c.ath ? 'n/a' : c.price >= c.ath ? 'at its high' : '−' + pct(1 - c.price / c.ath), 'r');
+      cell(tr, !c.ath ? 'n/a' : c.price >= c.ath ? 'na szczycie' : '−' + pct(1 - c.price / c.ath), 'r');
       body.appendChild(tr);
     });
   }

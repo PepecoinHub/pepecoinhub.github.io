@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>如何挖 Pepecoin (PEP)：Scrypt ASIC 矿机与合并挖矿矿池</title>
+<meta name="description" content="Pepecoin (PEP) 的挖矿方式：在与 Litecoin 和 Dogecoin 合并挖 PEP 的矿池中使用 Scrypt ASIC 矿机。附硬件示例、矿池、收款地址和奖励数据，均有来源。">
+<link rel="canonical" href="https://pepecoinhub.com/zh/mining.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mining.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mining.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mining.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mining.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mining.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mining.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mining.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mining.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mining.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="如何挖 Pepecoin (PEP)：Scrypt ASIC 矿机与合并挖矿矿池">
+<meta property="og:description" content="Pepecoin (PEP) 的挖矿方式：在与 Litecoin 和 Dogecoin 合并挖 PEP 的矿池中使用 Scrypt ASIC 矿机。附硬件示例、矿池、收款地址和奖励数据，均有来源。">
+<meta property="og:url" content="https://pepecoinhub.com/zh/mining.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin 标志：关于 PEP 的事实、数据和来源">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../facts.css?v=20261007d">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/zh/"}, {"@type": "ListItem", "position": 2, "name": "指南", "item": "https://pepecoinhub.com/zh/guides.html"}, {"@type": "ListItem", "position": 3, "name": "如何挖 PEP", "item": "https://pepecoinhub.com/zh/mining.html"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "合并挖矿会减少我的 LTC 或 DOGE 收益吗？", "acceptedAnswer": {"@type": "Answer", "text": "不会。算力不会在各条链之间分摊。据矿池 ViaBTC 的说法，PEP 是合并挖矿带来的额外奖励，不需要额外算力。"}}, {"@type": "Question", "name": "用什么硬件挖 PEP？", "acceptedAnswer": {"@type": "Answer", "text": "Scrypt ASIC 矿机，也就是挖 Litecoin 和 Dogecoin 的同一种机器。ViaBTC 举的例子是 Antminer L9 和 ElphaPex DG1。"}}, {"@type": "Question", "name": "网络每天发放多少 PEP？", "acceptedAnswer": {"@type": "Answer", "text": "每个区块奖励 10,000 PEP。按每分钟一个区块计算，每天约 1440 万 PEP，由所有挖矿者分享。过去一年平均出块时间约 62.6 秒，因此实际数字约为 1380 万。"}}]}</script>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要内容</a>
+
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="页面"><a href="which-pepecoin.html">如何区分</a><a href="compare.html">PEP 与 DOGE</a><a href="calculator.html">计算器</a><a href="supply.html">供应量</a><a href="scrypt-family.html">Scrypt 家族</a><a href="network.html">网络</a><a href="rich-list.html">富豪榜</a><a href="guides.html" aria-current="page">指南</a></nav>
+</header>
+<main class="wrap" id="main">
+<header class="page-head">
+  <p class="eyebrow">指南 · 更新于 2026年10月6日</p>
+  <h1>如何挖 Pepecoin (PEP)</h1>
+  <p class="lede">PEP 使用 Scrypt 挖矿，与 Litecoin 和 Dogecoin 采用相同的工作量证明。大部分 PEP 来自合并挖矿：Litecoin 矿池中的一台矿机，在获得 LTC 和 DOGE 的同时还能获得 PEP，所做的工作完全相同。</p>
+</header>
+
+<section aria-label="关键数据">
+  <div class="stats">
+    <div class="stat"><span class="label">算法</span><span class="value">Scrypt</span><span class="sub">与 LTC 和 DOGE 相同</span></div>
+    <div class="stat"><span class="label">区块奖励</span><span class="value">10,000 PEP</span><span class="sub">自区块 600,000 起固定</span></div>
+    <div class="stat"><span class="label">目标出块时间</span><span class="value">60 s</span><span class="sub">近期平均 62.6 秒</span></div>
+    <div class="stat"><span class="label">合并挖矿</span><span class="value">区块 42,000</span><span class="sub">与 Litecoin 和 Dogecoin</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="steps">
+  <h2 id="steps">分步操作</h2>
+  <ol class="guide-steps">
+    <li><h3>准备一台 Scrypt ASIC 矿机</h3><p>Scrypt 挖矿需要专用机器。ViaBTC 举的例子是 Antminer L9 和 ElphaPex DG1。</p></li>
+    <li><h3>加入支持合并挖 PEP 的矿池</h3><p>在支付 LTC 和 DOGE 的同时也支付 PEP 的矿池包括 <a href="https://www.viabtc.com/">ViaBTC</a>、<a href="https://www.f2pool.com/coin/pepecoin">F2Pool</a>、<a href="https://pool.binance.com/">Binance Pool</a>、<a href="https://emcd.io/">EMCD</a>、<a href="https://www.antpool.com/">AntPool</a>、<a href="https://www.litecoinpool.org/">litecoinpool.org</a>、<a href="https://www.mining-dutch.nl/pools/pepecoin.php?page=dashboard">Mining-Dutch</a> 和 KuPool。实时列表见 <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>。</p></li>
+    <li><h3>添加 PEP 收款地址</h3><p>在矿池设置中填写一个以 <code>P</code> 开头的收款地址。每个矿池都有自己的支付设置和最低支付额。<a href="wallets.html">获取 PEP 钱包。</a></p></li>
+    <li><h3>把矿机连接到矿池</h3><p>使用矿池的 Scrypt (Litecoin) 连接地址。之后 PEP 奖励会和你的 LTC、DOGE 一起到账。</p></li>
+  </ol>
+</section>
+
+<section aria-labelledby="expect">
+  <h2 id="expect">预期情况</h2>
+  <div class="prose">
+    <p><strong>竞争。</strong>2026年10月初，Pepecoin 的算力约为 2.9 PH/s，与 Dogecoin 处于同一区间。<a href="compare.html#mining">算力对比。</a></p>
+    <p><strong>发行量。</strong>按 60 秒目标计算，每天约 1440 万 PEP，由所有矿工分享。<a href="network.html">实时出块时间。</a></p>
+    <p><strong>收益。</strong>取决于 PEP 价格、难度和你的电费。计算器：<a href="https://whattomine.com/coins/418-pep-scrypt">WhatToMine</a>、<a href="https://www.hashrate.no/coins/PEP/calculator">hashrate.no</a>、<a href="https://www.asicminervalue.com/coins/pep-pepecoin">ASIC Miner Value</a>。</p>
+  </div>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">常见问题</h2>
+  <div class="faq">
+    <details><summary>合并挖矿会减少我的 LTC 或 DOGE 收益吗？</summary><p>不会。算力不会在各条链之间分摊。据矿池 ViaBTC 的说法，PEP 是合并挖矿带来的额外奖励，不需要额外算力。</p></details>
+    <details><summary>用什么硬件挖 PEP？</summary><p>Scrypt ASIC 矿机，也就是挖 Litecoin 和 Dogecoin 的同一种机器。ViaBTC 举的例子是 Antminer L9 和 ElphaPex DG1。</p></details>
+    <details><summary>网络每天发放多少 PEP？</summary><p>每个区块奖励 10,000 PEP。按每分钟一个区块计算，每天约 1440 万 PEP，由所有挖矿者分享。过去一年平均出块时间约 62.6 秒，因此实际数字约为 1380 万。</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="more">
+  <h2 id="more">更多指南</h2>
+  <div class="cards">
+    <a class="card" href="buy.html">
+      <h3>如何购买 PEP</h3>
+      <p>PEP 在哪里交易，以及如何提币到你自己的钱包。</p>
+    </a>
+    <a class="card" href="wallets.html">
+      <h3>PEP 钱包</h3>
+      <p>Pepecoin Core、Tangem，以及官方 Pepecoin Tangem 卡。</p>
+    </a>
+    <a class="card" href="mica.html">
+      <h3>Pepecoin 与 MiCA</h3>
+      <p>欧盟白皮书是什么，又不意味着什么。</p>
+    </a>
+    <a class="card" href="glossary.html">
+      <h3>术语表</h3>
+      <p>AuxPoW、UTXO、算力，以及其他反复出现的术语。</p>
+    </a>
+    <a class="card" href="network.html">
+      <h3>网络数据</h3>
+      <p>区块高度、供应量、地址数和出块时间，逐日记录。</p>
+    </a>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">来源</h2>
+  <div class="sources">
+    <div>
+      <h3>挖矿</h3>
+      <ul>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC: how to mine PEP</a></li>
+        <li><a href="https://cryptonews.net/news/market/30268800/">Binance Pool adds PEP merged mining</a></li>
+        <li><a href="https://www.f2pool.com/coin/pepecoin">F2Pool: PEP</a></li>
+        <li><a href="https://miningpoolstats.stream/pepecoin">miningpoolstats: Pepecoin pools</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>规则</h3>
+      <ul>
+        <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp (AuxPoW at 42,000)</a></li>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">Pepecoin MiCA white paper (block reward)</a></li>
+        <li><a href="network.html">本站：网络数据</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="site-foot">
+  <p><strong>社区事实资料页</strong>，由 r/pepecoin 社区的一名志愿者整理。并非 Pepecoin 官方发布的内容。</p>
+  <p>不构成投资建议。整理者持有 PEP。价格和网络数据每天都在变化；每个页面都注明了日期和来源。</p>
+  <p class="correction">发现错误？请在 GitHub 上<a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>提交更正</a>（附来源）。</p>
+  <details class="support"><summary>喜欢这个网站？欢迎支持它的后续发展。</summary><p>金额不论多少，都是很大的帮助。谢谢！</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+</footer>
+
+<script src="../chrome.js?v=20261007d" defer></script>
+</body>
+</html>

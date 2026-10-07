@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PEP 市值计算器：按 Dogecoin 或前 100 名任一币种的市值计算你的 Pepecoin</title>
+<meta name="description" content="输入你持有的 Pepecoin (PEP) 数量，看看按 Dogecoin、Litecoin、Bitcoin、Pepe 或前 100 名任一币种今天或历史最高时的市值计算值多少。CoinGecko 实时价格；这是算术，不是预测。">
+<link rel="canonical" href="https://pepecoinhub.com/zh/calculator.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/calculator.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/calculator.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/calculator.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/calculator.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/calculator.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/calculator.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="PEP 市值计算器：按 Dogecoin 或前 100 名任一币种的市值计算你的 Pepecoin">
+<meta property="og:description" content="输入你持有的 Pepecoin (PEP) 数量，看看按 Dogecoin、Litecoin、Bitcoin、Pepe 或前 100 名任一币种今天或历史最高时的市值计算值多少。CoinGecko 实时价格；这是算术，不是预测。">
+<meta property="og:url" content="https://pepecoinhub.com/zh/calculator.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin 标志：关于 PEP 的事实、数据和来源">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../facts.css?v=20261007d">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/zh/"}, {"@type": "ListItem", "position": 2, "name": "市值计算器", "item": "https://pepecoinhub.com/zh/calculator.html"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "价值是怎么计算的？", "acceptedAnswer": {"@type": "Answer", "text": "用另一种币的市值除以 Pepecoin 的供应量，得到一枚 PEP 在该规模下的价格，再乘以你的 PEP 数量就是价值。以保存的快照（CoinGecko，2026年10月4–5日）为例：Dogecoin 147 亿美元市值 ÷ 1048 亿 PEP ≈ 每枚 PEP 0.14 美元。"}}, {"@type": "Question", "name": "这是价格预测吗？", "acceptedAnswer": {"@type": "Answer", "text": "不是。它只是用算术比较规模。价格取决于需求，这里没有任何内容表明 Pepecoin 会达到另一种币的市值。"}}, {"@type": "Question", "name": "价格从哪里来？", "acceptedAnswer": {"@type": "Answer", "text": "来自 CoinGecko 的公开 API：Pepecoin 加上市值前 100 名的币种，在你的浏览器中加载，最多复用 10 分钟。如果无法加载，页面会显示 2026年10月4–5日保存的快照。"}}]}</script>
+<style>
+/* Calculator: inputs on the left, the answer on the right, every combination as cards below */
+.calc { background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 24px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 28px; box-shadow: 0 1px 0 rgba(33,33,33,0.04); }
+.calc > * { min-width: 0; }
+.calc-in { display: grid; gap: 22px; align-content: start; }
+.field { display: grid; gap: 8px; min-width: 0; }
+.field label, .field-label { display: flex; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.step { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-mid); font: 700 0.75rem var(--f-body); letter-spacing: 0; }
+.amount { display: flex; align-items: center; gap: 10px; min-height: 58px; padding-left: 12px; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
+.amount:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.amount img { width: 30px; height: 30px; flex: none; }
+.amount input { flex: 1; width: 100%; min-width: 0; font: 700 1.45rem var(--f-body); color: var(--ink); background: transparent; border: 0; padding: 8px 0; outline: none; font-variant-numeric: tabular-nums; }
+.amount input::placeholder { color: var(--muted); font-weight: 400; }
+.amount-unit { align-self: stretch; display: grid; place-items: center; padding: 0 16px; font-weight: 500; color: var(--muted); border-left: 1px solid var(--rule); }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.preset { font: 500 0.85rem var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: 4px 12px; min-height: 32px; cursor: pointer; }
+.preset:hover { color: var(--ink); border-color: var(--accent); }
+.field-hint { font-size: 0.88rem; color: var(--muted); min-height: 1.4em; }
+.field-hint.warn { color: var(--flag); }
+.coins { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.coin-btn { display: grid; justify-items: center; gap: 3px; padding: 12px 6px 10px; min-width: 0; font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; cursor: pointer; }
+.coin-btn:hover { border-color: var(--accent); }
+.coin-btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.coin-btn b { font-size: 0.9rem; line-height: 1.2; }
+.coin-btn small { font-size: 0.74rem; line-height: 1.2; color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.glyph { display: inline-grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; font: 700 1rem var(--f-body); color: var(--ink); background: var(--track); }
+img.glyph { background: none; object-fit: cover; }
+.field .more-coins { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font: 400 0.88rem var(--f-body); letter-spacing: 0; text-transform: none; color: var(--muted); }
+select { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 8px 12px; max-width: 100%; min-height: 40px; }
+.seg { display: inline-flex; flex-wrap: wrap; }
+.seg button { font: 600 0.9rem var(--f-body); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 9px 14px; min-height: 44px; cursor: pointer; }
+.seg button:hover { border-color: var(--accent); }
+.seg button:first-child { border-radius: 10px 0 0 10px; }
+.seg button:last-child { border-radius: 0 10px 10px 0; margin-left: -1px; }
+.seg button[aria-pressed="true"] { position: relative; z-index: 1; background: var(--accent-soft); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); color: var(--ink); }
+.seg button:disabled { opacity: 0.45; cursor: not-allowed; }
+.calc-out { container-type: inline-size; align-self: start; display: grid; gap: 12px; padding: 22px; background: var(--accent-soft); border: 1px solid var(--rule); border-left: 4px solid var(--accent); border-radius: 12px; }
+.out-line { font-size: 1rem; color: var(--muted); }
+.out-line b { color: var(--ink); }
+.out-value { font-size: 2.6rem; font-size: clamp(2rem, 13cqi, 3.4rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.out-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 0.92rem; color: var(--muted); }
+.out-meta b { color: var(--ink); }
+.pill { display: inline-flex; align-items: center; padding: 3px 11px; border-radius: 999px; background: var(--panel); border: 1px solid var(--accent); color: var(--accent-mid); font-weight: 700; font-variant-numeric: tabular-nums; }
+.receipt { margin: 4px 0 0; padding-top: 12px; border-top: 1px solid var(--rule); display: grid; gap: 7px; font-size: 0.88rem; }
+.receipt div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.receipt dt { color: var(--muted); }
+.receipt dd { margin: 0; font-family: var(--f-mono); font-size: 1.05em; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+.out-note { font-size: 0.84rem; color: var(--muted); }
+.combo { display: grid; gap: 12px; }
+.combo h3 { font-weight: 700; }
+.combo-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr)); gap: 12px; }
+.combo-card { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 14px 12px 12px; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; }
+.combo-card.self { background: var(--accent-soft); }
+.combo-head { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.combo-head .glyph { width: 28px; height: 28px; font-size: 0.85rem; }
+.combo-head span { display: grid; min-width: 0; line-height: 1.2; }
+.combo-head b { font-size: 0.98rem; }
+.combo-head small { font-size: 0.75rem; color: var(--muted); }
+.combo-val { display: grid; gap: 1px; width: 100%; padding: 8px 10px; text-align: left; font: inherit; color: var(--ink); background: var(--paper); border: 1px solid transparent; border-radius: 10px; }
+button.combo-val { cursor: pointer; }
+button.combo-val:hover { border-color: var(--accent); }
+.combo-val[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.combo-card.self .combo-val { background: var(--panel); }
+.combo-val > span { font-size: 0.75rem; color: var(--muted); }
+.combo-val b { font-size: 1.12rem; font-variant-numeric: tabular-nums; }
+.combo-val small { font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) {
+  .calc { grid-template-columns: minmax(0, 1fr); padding: 16px; gap: 22px; }
+  .calc-out { padding: 18px 16px; }
+}
+@media (max-width: 560px) {
+  .combo-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .combo-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .combo-head { grid-column: 1 / -1; }
+}
+@media (max-width: 380px) {
+  .coins { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .seg { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .seg button { padding: 8px 10px; font-size: 0.84rem; line-height: 1.25; }
+}
+</style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要内容</a>
+
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="页面"><a href="which-pepecoin.html">如何区分</a><a href="compare.html">PEP 与 DOGE</a><a href="calculator.html" aria-current="page">计算器</a><a href="supply.html">供应量</a><a href="scrypt-family.html">Scrypt 家族</a><a href="network.html">网络</a><a href="rich-list.html">富豪榜</a><a href="guides.html">指南</a></nav>
+</header>
+<main class="wrap" id="main">
+<header class="page-head">
+  <p class="eyebrow">计算器 · CoinGecko 实时价格</p>
+  <h1>按其他币的市值计算你的 PEP</h1>
+  <p class="lede">输入你持有的 PEP 数量并选择一种币。计算器用该币的市值除以 Pepecoin 的供应量，再乘以你的数量。这是用来比较规模的算术，不是预测。</p>
+</header>
+
+<section aria-labelledby="calc">
+  <h2 id="calc" class="visually-hidden">计算器</h2>
+
+  <div class="calc">
+    <div class="calc-in">
+      <div class="field">
+        <label for="pep-amount"><span class="step">1</span>你的 PEP</label>
+        <div class="amount">
+          <img src="../assets/brand/icon.svg" alt="" width="30" height="30">
+          <input id="pep-amount" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="e.g. 13,000,000" aria-describedby="amount-hint">
+          <span class="amount-unit" aria-hidden="true">PEP</span>
+        </div>
+        <div class="presets" role="group" aria-label="示例数量">
+          <button type="button" class="preset" data-v="100000">100K</button>
+          <button type="button" class="preset" data-v="1000000">1M</button>
+          <button type="button" class="preset" data-v="10000000">10M</button>
+          <button type="button" class="preset" data-v="100000000">100M</button>
+        </div>
+        <span class="field-hint" id="amount-hint">留空即可查看一枚 PEP 的价值。</span>
+      </div>
+
+      <div class="field">
+        <span class="field-label" id="quick-label"><span class="step">2</span>按以下币种的市值</span>
+        <div class="coins" id="quick" role="group" aria-labelledby="quick-label"></div>
+        <label class="more-coins"><span>或前 100 名任一币种</span><select id="coin-select"></select></label>
+      </div>
+
+      <div class="field">
+        <span class="field-label" id="mode-label"><span class="step">3</span>市值</span>
+        <div class="seg" role="group" aria-labelledby="mode-label">
+          <button type="button" id="mode-now" aria-pressed="true">今天</button>
+          <button type="button" id="mode-ath" aria-pressed="false">历史最高时</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-out" aria-live="polite">
+      <p class="out-line">按 <b id="r-name">Dogecoin</b> <span id="r-when">今天</span>的市值，<b id="r-amount">一枚 PEP</b> 将值</p>
+      <p class="out-value" id="r-value">$0.1406</p>
+      <p class="out-meta"><span class="pill" id="r-mult">▲ 1,555×</span><span>今天价值 <b id="r-now">$0.00009042</b></span></p>
+      <dl class="receipt">
+        <div><dt id="m-target-label">Dogecoin 今天的市值</dt><dd id="m-target">$14.7B</dd></div>
+        <div><dt>÷ Pepecoin 供应量</dt><dd id="m-supply">104.8B PEP</dd></div>
+        <div><dt>= 每枚 PEP</dt><dd id="m-price">$0.1406</dd></div>
+        <div id="m-qty-row" hidden><dt>× 你的 PEP</dt><dd id="m-qty"></dd></div>
+      </dl>
+      <p class="out-note" id="ath-note" hidden>历史最高模式使用该币的最高价格 × 其当前供应量。对于持续发行的币（如 Dogecoin），峰值时的真实市值更低，因为当时存在的币更少。</p>
+    </div>
+  </div>
+
+  <div class="combo">
+    <h3 id="combo-h">按本页每个市值计算的一枚 PEP</h3>
+    <ul class="combo-grid" id="combo-rows" aria-labelledby="combo-h"></ul>
+    <p class="src">点按某个数值，即可在上方查看其计算过程。历史最高数值使用各币的最高价格 × 其当前供应量。第一张卡片显示 PEP 按自身今天的价格和自身历史最高价计算的结果。</p>
+  </div>
+</section>
+
+<section aria-labelledby="prices">
+  <h2 id="prices">当前价格与峰值价格</h2>
+  <div class="table-scroll" role="region" aria-labelledby="prices" tabindex="0">
+    <table style="min-width: 560px">
+      <thead>
+        <tr><th scope="col">币种</th><th scope="col" class="r">价格</th><th scope="col" class="r">市值</th><th scope="col" class="r">历史最高价</th><th scope="col" class="r">当前 vs 最高</th></tr>
+      </thead>
+      <tbody id="price-rows"></tbody>
+    </table>
+  </div>
+  <p class="src" id="status">CoinGecko 快照，2026年10月4–5日。</p>
+  <noscript><p class="note">实时价格和计算器需要 JavaScript。上表显示最近一次保存的快照。</p></noscript>
+</section>
+
+<section aria-labelledby="how">
+  <h2 id="how">数字是怎么算的</h2>
+  <div class="prose">
+    <p><strong>市值 = 价格 × 供应量。</strong>用另一种币的市值除以现存 PEP 的数量（约 <span data-live="supply-b">104.8</span> 十亿枚），就得到一枚 PEP 在该规模下的价格。再乘以你的数量，就是你所持 PEP 的价值。</p>
+    <p><strong>今天还是峰值。</strong>“今天”使用各币当前的市值。“历史最高时”使用该币的最高价格 × 其当前供应量。对于持续发行的币（如 Dogecoin），峰值时的真实市值更低，因为当时存在的币更少。</p>
+    <p><strong>不是预测。</strong>市值是市场今天为一种币支付的价格，这里没有任何内容表明 Pepecoin 会达到另一种币的规模。此外，PEP 的供应量每个区块增加 10,000 枚，因此随着时间推移，同样的市值意味着每枚 PEP 的价格会略低。<a href="supply.html">供应量与通胀。</a></p>
+  </div>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">常见问题</h2>
+  <div class="faq">
+    <details open>
+      <summary>价值是怎么计算的？</summary>
+      <p>用另一种币的市值除以 Pepecoin 的供应量，得到一枚 PEP 在该规模下的价格，再乘以你的 PEP 数量就是价值。以保存的快照（CoinGecko，2026年10月4–5日）为例：Dogecoin 147 亿美元市值 ÷ 1048 亿 PEP ≈ 每枚 PEP 0.14 美元。</p>
+    </details>
+    <details>
+      <summary>这是价格预测吗？</summary>
+      <p>不是。它只是用算术比较规模。价格取决于需求，这里没有任何内容表明 Pepecoin 会达到另一种币的市值。</p>
+    </details>
+    <details>
+      <summary>价格从哪里来？</summary>
+      <p>来自 CoinGecko 的公开 API：Pepecoin 加上市值前 100 名的币种，在你的浏览器中加载，最多复用 10 分钟。如果无法加载，页面会显示 2026年10月4–5日保存的快照。</p>
+    </details>
+  </div>
+</section>
+
+<section aria-labelledby="more">
+  <h2 id="more">更多价格相关内容</h2>
+  <div class="cards">
+    <a class="card" href="compare.html">
+      <h3>Pepecoin 与 Dogecoin</h3>
+      <p>规则相同，相隔十年，并按币龄对齐两者的价格。</p>
+    </a>
+    <a class="card" href="supply.html">
+      <h3>供应量与通胀</h3>
+      <p>为什么 PEP 的数量持续增长，以及增长有多快。</p>
+    </a>
+    <a class="card" href="which-pepecoin.html">
+      <h3>如何区分各种 Pepecoin？</h3>
+      <p>PEP、PEPE 和 PEPECOIN 是三种不同的资产，价格也各不相同。</p>
+    </a>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">来源</h2>
+  <div class="sources">
+    <div>
+      <h3>价格与市值</h3>
+      <ul>
+        <li><a href="https://www.coingecko.com/">CoinGecko: coins by market cap</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko: Pepecoin</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/dogecoin">CoinGecko: Dogecoin</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Pepecoin 供应量</h3>
+      <ul>
+        <li><a href="https://pepeplorer.com/network">Pepeplorer network stats</a></li>
+        <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp (10,000 PEP a block)</a></li>
+        <li>币种标志：<a href="https://github.com/0xa3k5/web3icons">web3icons</a> 和 <a href="https://github.com/trustwallet/assets">Trust Wallet assets</a>（MIT 许可）</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  var PEP_ID = 'pepecoin-network';
+  var QUICK = ['dogecoin', 'litecoin', 'bitcoin', 'pepe'];
+  var API = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&sparkline=false';
+  var CACHE_KEY = 'pf-prices-v1';
+  var AMOUNT_KEY = 'pf-pep-amount';
+  var TTL = 10 * 60 * 1000;
+
+  // Saved snapshot (CoinGecko, Oct 4-5, 2026). Shown first, replaced when live prices arrive.
+  var SNAP = [
+    { id: PEP_ID, symbol: 'pep', name: 'Pepecoin', current_price: 0.00009042, market_cap: 9283145, circulating_supply: 102668000000, total_supply: 104793000000, ath: 0.001824 },
+    { id: 'dogecoin', symbol: 'doge', name: 'Dogecoin', current_price: 0.09434, market_cap: 14736000000, circulating_supply: 156198000000, ath: 0.7316 },
+    { id: 'litecoin', symbol: 'ltc', name: 'Litecoin', current_price: 70.42, market_cap: 5470761331, circulating_supply: 77683000, ath: 410.26 },
+    { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', current_price: 85791.41, market_cap: 1723872933977, circulating_supply: 20094000, ath: 126080 },
+    { id: 'pepe', symbol: 'pepe', name: 'Pepe', current_price: 0.000004433, market_cap: 1864844512, circulating_supply: 420690000000000, ath: 0.00002803 }
+  ];
+
+  var coins = {};
+  var order = [];
+  var sel = 'dogecoin';
+  var mode = 'now';
+  var amount = null; // PEP typed by the visitor; null means "one PEP"
+
+  function $(id) { return document.getElementById(id); }
+  function num(v) { return typeof v === 'number' && isFinite(v) ? v : null; }
+
+  function setCoins(list) {
+    coins = {}; order = [];
+    list.forEach(function (c) {
+      if (!c || !c.id || num(c.current_price) === null) return;
+      coins[c.id] = {
+        id: c.id,
+        symbol: String(c.symbol || '').toUpperCase(),
+        name: String(c.name || c.id),
+        price: c.current_price,
+        mcap: num(c.market_cap),
+        supply: num(c.circulating_supply),
+        total: num(c.total_supply),
+        ath: num(c.ath)
+      };
+      if (c.id !== PEP_ID && order.indexOf(c.id) === -1) order.push(c.id);
+    });
+    if (!coins[sel]) sel = 'dogecoin';
+  }
+
+  function pepSupply() {
+    var p = coins[PEP_ID];
+    return p.total || p.supply;
+  }
+  function qty() { return amount === null ? 1 : amount; }
+
+  function usd(v) {
+    if (v === null) return 'n/a';
+    if (v >= 1000) return '$' + v.toLocaleString('zh-CN', { maximumFractionDigits: 0 });
+    if (v >= 1) return '$' + v.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return '$' + v.toLocaleString('zh-CN', { maximumSignificantDigits: 4 });
+  }
+  function big(v, prefix) {
+    if (v === null) return 'n/a';
+    var units = [[1e12, 'T'], [1e9, 'B'], [1e6, 'M'], [1e3, 'K']];
+    for (var i = 0; i < units.length; i++) {
+      if (v >= units[i][0]) {
+        var n = v / units[i][0];
+        return (prefix || '') + n.toLocaleString('zh-CN', { maximumSignificantDigits: n >= 100 ? 4 : 3 }) + units[i][1];
+      }
+    }
+    return (prefix || '') + v.toLocaleString('zh-CN', { maximumFractionDigits: 0 });
+  }
+  function money(v) { return v !== null && v >= 1e6 ? big(v, '$') : usd(v); }      // compact, for table cells
+  function moneyFull(v) { return v !== null && v >= 1e12 ? big(v, '$') : usd(v); } // whole dollars, for the result
+  function mult(x) {
+    if (x >= 100) return x.toLocaleString('zh-CN', { maximumFractionDigits: 0 }) + '×';
+    if (x >= 10) return x.toLocaleString('zh-CN', { maximumFractionDigits: 1 }) + '×';
+    return x.toLocaleString('zh-CN', { maximumFractionDigits: 2 }) + '×';
+  }
+  function pct(x) { return (x * 100).toLocaleString('zh-CN', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + '%'; }
+  function share(x) { return (x * 100).toLocaleString('zh-CN', { maximumSignificantDigits: 3 }) + '%'; }
+  function qtyText(v) { return v.toLocaleString('zh-CN', { maximumFractionDigits: 8 }); }
+
+  // Accepts 13000000, 13,000,000, 13 000 000, 13.000.000, 13000000.5, 13,5 (decimal comma), 13m, 13 mln, 1.5b.
+  function parseAmount(raw) {
+    var s = String(raw || '').toLowerCase().replace(/pep/g, '').replace(/[\s '_]/g, '');
+    if (!s) return null;
+    var mul = 1, m = s.match(/^(.*?)(k|mln|mld|bn|m|b)$/);
+    if (m) { s = m[1]; mul = { k: 1e3, m: 1e6, mln: 1e6, b: 1e9, bn: 1e9, mld: 1e9 }[m[2]]; }
+    var dot = s.lastIndexOf('.'), comma = s.lastIndexOf(',');
+    if (dot > -1 && comma > -1) s = dot > comma ? s.replace(/,/g, '') : s.replace(/\./g, '').replace(',', '.');
+    else if (comma > -1) s = /^\d{1,3}(,\d{3})+$/.test(s) ? s.replace(/,/g, '') : s.replace(',', '.');
+    else if (/^\d{1,3}(\.\d{3}){2,}$/.test(s)) s = s.replace(/\./g, '');
+    if (!/^(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
+    var v = parseFloat(s) * mul;
+    return isFinite(v) && v > 0 ? v : NaN;
+  }
+
+  function targetCap(c, m) {
+    if (m === 'ath') return c.ath !== null && c.supply !== null ? c.ath * c.supply : null;
+    return c.mcap;
+  }
+
+  // Coin badge: the real logo for Pepecoin and the quick picks (assets/coins, from web3icons),
+  // the first letter of the symbol for any other coin.
+  var LOGO = { dogecoin: 'assets/coins/doge.png', litecoin: 'assets/coins/ltc.png', bitcoin: 'assets/coins/btc.png', pepe: 'assets/coins/pepe.png' };
+  LOGO[PEP_ID] = 'assets/brand/icon.svg';
+  function glyph(id, symbol) {
+    if (LOGO[id]) {
+      var img = document.createElement('img');
+      img.className = 'glyph';
+      img.src = LOGO[id];
+      img.alt = '';
+      return img;
+    }
+    var span = document.createElement('span');
+    span.className = 'glyph';
+    span.setAttribute('aria-hidden', 'true');
+    span.textContent = String(symbol || '?').charAt(0);
+    return span;
+  }
+
+  function renderAmountHint() {
+    var hint = $('amount-hint');
+    var raw = $('pep-amount').value;
+    var v = parseAmount(raw);
+    hint.classList.toggle('warn', typeof v === 'number' && isNaN(v));
+    if (v === null) hint.textContent = '留空即可查看一枚 PEP 的价值。';
+    else if (isNaN(v)) hint.textContent = '请输入数字，例如 13000000 或 13 000 000。';
+    else {
+      var ps = coins[PEP_ID] ? pepSupply() : null;
+      hint.textContent = qtyText(v) + ' PEP' + (ps ? (v > ps ? '，超过现存全部 PEP' : '，占全部 PEP 的 ' + share(v / ps)) : '');
+    }
+  }
+
+  function renderCalc() {
+    var p = coins[PEP_ID], c = coins[sel];
+    if (!p || !c) return;
+    var ps = pepSupply(), n = qty();
+    var cap = targetCap(c, mode);
+    if (cap === null) { mode = 'now'; cap = c.mcap; }
+    var implied = cap / ps;
+    var x = implied / p.price;
+    $('r-amount').textContent = amount === null ? '一枚 PEP' : qtyText(amount) + ' PEP';
+    $('r-name').textContent = c.name;
+    $('r-when').textContent = mode === 'ath' ? '历史最高时' : '今天';
+    $('r-value').textContent = moneyFull(implied * n);
+    $('r-mult').textContent = (x >= 1 ? '▲ ' : '▼ ') + mult(x);
+    $('r-now').textContent = moneyFull(p.price * n);
+    $('m-target-label').textContent = c.name + ' ' + (mode === 'ath' ? '最高时' : '今天') + '的市值';
+    $('m-target').textContent = big(cap, '$');
+    $('m-supply').textContent = big(ps) + ' PEP';
+    $('m-price').textContent = usd(implied);
+    $('m-qty-row').hidden = amount === null;
+    $('m-qty').textContent = qtyText(n);
+    $('ath-note').hidden = mode !== 'ath';
+    $('mode-now').setAttribute('aria-pressed', String(mode === 'now'));
+    $('mode-ath').setAttribute('aria-pressed', String(mode === 'ath'));
+    $('mode-ath').disabled = c.ath === null;
+    $('coin-select').value = QUICK.indexOf(sel) === -1 ? sel : '';
+    Array.prototype.forEach.call($('quick').children, function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.id === sel));
+    });
+  }
+
+  function comboValue(label, per, on, id, m) {
+    var el = document.createElement(id ? 'button' : 'div');
+    el.className = 'combo-val';
+    if (id) {
+      el.type = 'button';
+      el.setAttribute('aria-pressed', String(on));
+      el.addEventListener('click', function () { sel = id; mode = m; update(); });
+    }
+    var l = document.createElement('span');
+    l.textContent = label;
+    el.appendChild(l);
+    var ok = per !== null && isFinite(per);
+    var b = document.createElement('b');
+    b.textContent = ok ? money(per * qty()) : 'n/a';
+    el.appendChild(b);
+    if (ok && amount !== null) {
+      var sm = document.createElement('small');
+      sm.textContent = '每枚 PEP ' + usd(per);
+      el.appendChild(sm);
+    }
+    return el;
+  }
+  function renderCombo() {
+    var p = coins[PEP_ID];
+    if (!p) return;
+    var ps = pepSupply();
+    $('combo-h').textContent = (amount === null ? '一枚 PEP' : qtyText(amount) + ' PEP') + '：按本页每个市值计算';
+    var list = $('combo-rows');
+    list.textContent = '';
+    var ids = [PEP_ID].concat(QUICK);
+    if (ids.indexOf(sel) === -1) ids.push(sel);
+    ids.forEach(function (id) {
+      var c = coins[id];
+      if (!c) return;
+      var self = id === PEP_ID;
+      var li = document.createElement('li');
+      li.className = 'combo-card' + (self ? ' self' : '');
+      var head = document.createElement('div');
+      head.className = 'combo-head';
+      head.appendChild(glyph(id, c.symbol));
+      var t = document.createElement('span');
+      var nb = document.createElement('b');
+      nb.textContent = self ? 'Pepecoin' : c.name;
+      var ns = document.createElement('small');
+      ns.textContent = self ? '自身价格' : c.symbol;
+      t.appendChild(nb); t.appendChild(ns);
+      head.appendChild(t);
+      li.appendChild(head);
+      var now = self ? p.price : (c.mcap === null ? null : c.mcap / ps);
+      var athCap = targetCap(c, 'ath');
+      var ath = self ? p.ath : (athCap === null ? null : athCap / ps);
+      li.appendChild(comboValue('今天', now, id === sel && mode === 'now', self ? null : id, 'now'));
+      li.appendChild(comboValue('历史最高', ath, id === sel && mode === 'ath', self ? null : id, 'ath'));
+      list.appendChild(li);
+    });
+  }
+
+  function cell(tr, text, cls) {
+    var td = document.createElement('td');
+    if (cls) td.className = cls;
+    td.textContent = text;
+    tr.appendChild(td);
+  }
+  function renderRows() {
+    var body = $('price-rows');
+    body.textContent = '';
+    var ids = [PEP_ID].concat(QUICK);
+    if (ids.indexOf(sel) === -1) ids.push(sel);
+    ids.forEach(function (id) {
+      var c = coins[id];
+      if (!c) return;
+      var tr = document.createElement('tr');
+      if (id === PEP_ID) tr.className = 'hl';
+      var th = document.createElement('th');
+      th.scope = 'row';
+      th.className = 'plain';
+      th.textContent = c.name + ' (' + c.symbol + ')';
+      tr.appendChild(th);
+      cell(tr, usd(c.price), 'r');
+      cell(tr, big(id === PEP_ID ? c.price * pepSupply() : c.mcap, '$'), 'r');
+      cell(tr, usd(c.ath), 'r');
+      cell(tr, !c.ath ? 'n/a' : c.price >= c.ath ? '处于最高' : '−' + pct(1 - c.price / c.ath), 'r');
+      body.appendChild(tr);
+    });
+  }
+
+  function update() { renderCalc(); renderRows(); renderCombo(); }
+
+  function renderControls() {
+    var s = $('coin-select');
+    s.textContent = '';
+    var none = document.createElement('option');
+    none.value = '';
+    none.textContent = '选择币种';
+    s.appendChild(none);
+    order.forEach(function (id) {
+      var o = document.createElement('option');
+      o.value = id;
+      o.textContent = coins[id].name + ' (' + coins[id].symbol + ')';
+      s.appendChild(o);
+    });
+    var q = $('quick');
+    q.textContent = '';
+    QUICK.forEach(function (id) {
+      if (!coins[id]) return;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'coin-btn';
+      b.dataset.id = id;
+      b.appendChild(glyph(id, coins[id].symbol));
+      var sym = document.createElement('b');
+      sym.textContent = coins[id].symbol;
+      var nm = document.createElement('small');
+      nm.textContent = coins[id].name;
+      b.appendChild(sym); b.appendChild(nm);
+      b.addEventListener('click', function () { sel = id; update(); });
+      q.appendChild(b);
+    });
+  }
+
+  function renderAll() { renderControls(); renderAmountHint(); update(); }
+
+  function status(text) { $('status').textContent = text; }
+
+  function readCache() {
+    try {
+      var raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      if (!o || !o.t || Date.now() - o.t > TTL || !Array.isArray(o.list)) return null;
+      return o;
+    } catch (e) { return null; }
+  }
+  function writeCache(list) {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), list: list })); } catch (e) { /* storage unavailable */ }
+  }
+  function slim(c) {
+    return { id: c.id, symbol: c.symbol, name: c.name, current_price: c.current_price, market_cap: c.market_cap,
+      circulating_supply: c.circulating_supply, total_supply: c.total_supply, ath: c.ath };
+  }
+  function goLive(list, t) {
+    var hasPep = list.some(function (c) { return c && c.id === PEP_ID && num(c.current_price) !== null; });
+    if (!hasPep) return false;
+    setCoins(list);
+    renderAll();
+    status('CoinGecko 实时价格，更新于 ' + new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '。历史最高价为 CoinGecko 数据。');
+    return true;
+  }
+  function getJSON(url) {
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+  function refresh() {
+    var cached = readCache();
+    if (cached && goLive(cached.list, cached.t)) return;
+    Promise.all([
+      getJSON(API + '&ids=' + PEP_ID),
+      getJSON(API + '&order=market_cap_desc&per_page=100&page=1')
+    ]).then(function (res) {
+      var list = res[0].concat(res[1]).map(slim);
+      if (goLive(list, Date.now())) writeCache(list);
+    }).catch(function () {
+      status('正在显示 2026年10月4–5日的快照（CoinGecko）。暂时无法加载实时价格。');
+    });
+  }
+
+  var input = $('pep-amount');
+  function readAmount() {
+    var v = parseAmount(input.value);
+    amount = typeof v === 'number' && !isNaN(v) ? v : null;
+  }
+  try { var saved = localStorage.getItem(AMOUNT_KEY); if (saved) input.value = saved; } catch (e) { /* storage unavailable */ }
+  readAmount();
+  input.addEventListener('input', function () {
+    readAmount();
+    renderAmountHint();
+    update();
+    saveAmount();
+  });
+  input.addEventListener('blur', function () { if (amount !== null) input.value = qtyText(amount); });
+
+  function saveAmount() { try { localStorage.setItem(AMOUNT_KEY, input.value); } catch (e) { /* storage unavailable */ } }
+  Array.prototype.forEach.call(document.querySelectorAll('.preset'), function (b) {
+    b.addEventListener('click', function () {
+      input.value = qtyText(Number(b.dataset.v));
+      readAmount();
+      renderAmountHint();
+      update();
+      saveAmount();
+    });
+  });
+  $('coin-select').addEventListener('change', function (e) { if (e.target.value) { sel = e.target.value; update(); } });
+  $('mode-now').addEventListener('click', function () { mode = 'now'; update(); });
+  $('mode-ath').addEventListener('click', function () { mode = 'ath'; update(); });
+
+  setCoins(SNAP);
+  renderAll();
+  refresh();
+})();
+</script>
+
+</main>
+<footer class="site-foot">
+  <p><strong>社区事实资料页</strong>，由 r/pepecoin 社区的一名志愿者整理。并非 Pepecoin 官方发布的内容。</p>
+  <p>不构成投资建议。整理者持有 PEP。价格和网络数据每天都在变化；每个页面都注明了日期和来源。</p>
+  <p class="correction">发现错误？请在 GitHub 上<a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>提交更正</a>（附来源）。</p>
+  <details class="support"><summary>喜欢这个网站？欢迎支持它的后续发展。</summary><p>金额不论多少，都是很大的帮助。谢谢！</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+</footer>
+<script src="../live.js?v=20261007d" defer></script>
+<script src="../chrome.js?v=20261007d" defer></script>
+</body>
+</html>

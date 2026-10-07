@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pepecoin Holder Watch | PEP 富豪榜与集中度追踪</title>
+<meta name="description" content="Pepecoin (PEP) 最大钱包的每日快照：前 10、25、50、100、400 和 1,000 个地址持有多少供应量，以及它在数天、数月和数年间如何变化。">
+<link rel="canonical" href="https://pepecoinhub.com/zh/rich-list.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/rich-list.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/rich-list.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/rich-list.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/rich-list.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/rich-list.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/rich-list.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/rich-list.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/rich-list.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/rich-list.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="Pepecoin Holder Watch">
+<meta property="og:description" content="PEP 供应量有多集中？每日持币快照，历史可追溯到 2024年初。">
+<meta property="og:url" content="https://pepecoinhub.com/zh/rich-list.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin 标志：关于 PEP 的事实、数据和来源">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../style.css?v=20261007d">
+<link rel="stylesheet" href="../facts.css?v=20261007d">
+<style>
+/* This page loads the Holder Watch app styles (style.css) under the shared site styles (facts.css). */
+.page-head .eyebrow { font-weight: 400; }
+.page-head .lede, .page-head p { margin: 0; }
+.top { gap: 24px; }
+</style>
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin (PEP) 富豪榜与供应集中度", "description": "Pepecoin (PEP) 最大地址的每日快照，以及前 10、25、50、100、400 和 1,000 个地址所持供应量的占比；2024年2月以来的数据由区块链重建，自 2026年10月5日起每天实时记录。", "url": "https://pepecoinhub.com/rich-list.html", "temporalCoverage": "2024-02-05/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub（r/pepecoin 社区志愿者）"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://pepecoinhub.com/data/shares.csv"}, {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/summary.json"}]}</script>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="页面"><a href="which-pepecoin.html">如何区分</a><a href="compare.html">PEP 与 DOGE</a><a href="calculator.html">计算器</a><a href="supply.html">供应量</a><a href="scrypt-family.html">Scrypt 家族</a><a href="network.html">网络</a><a href="rich-list.html" aria-current="page">富豪榜</a><a href="guides.html">指南</a></nav>
+</header>
+<div class="wrap" id="app">
+  <!-- static-summary:start -->
+  <header class="page-head">
+    <p class="eyebrow">富豪榜 · 2026年10月7日快照</p>
+    <h1>Pepecoin Holder Watch</h1>
+    <p class="lede">PEP 供应量中有多少集中在最大的钱包里，以及它如何变化。每天对前约 2000 个地址做一次快照；图表聚焦前 1000 名。</p>
+  </header>
+  <p id="boot">2026年10月7日（区块 1,240,290）最大地址持有的流通供应量占比：前 10：15.67% · 前 25：23.03% · 前 50：30.35% · 前 100：38.71% · 前 400：59.33% · 前 1,000：73.98%。自 2024年2月以来的每日数据：<a href="../data/shares.csv">shares.csv</a>。</p>
+  <!-- static-summary:end -->
+  <noscript>
+    <p>本页需要 JavaScript 来绘制图表。原始数据见 <a href="../data/shares.csv">shares.csv</a>。</p>
+    <p class="muted"><a href="https://github.com/PepecoinHub/pepecoinhub.github.io/blob/main/docs/data/labels.json">labels.json</a> 中的人工标签标记了已知的交易所和矿池。“不含交易所和矿池”视图会隐藏这些地址，并从分母中去掉它们的余额。链上向交易所充币并不能证明这些币已被卖出。标签由社区维护，并不完整。</p>
+  </noscript>
+</div>
+<footer class="site-foot">
+  <p><strong>社区事实资料页</strong>，由 r/pepecoin 社区的一名志愿者整理。并非 Pepecoin 官方发布的内容。</p>
+  <p>不构成投资建议。整理者持有 PEP。价格和网络数据每天都在变化；每个页面都注明了日期和来源。</p>
+  <p class="correction">发现错误？请在 GitHub 上<a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>提交更正</a>（附来源）。</p>
+  <details class="support"><summary>喜欢这个网站？欢迎支持它的后续发展。</summary><p>金额不论多少，都是很大的帮助。谢谢！</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+</footer>
+<script src="../app.js?v=20261007e"></script>
+<script src="../chrome.js?v=20261007d" defer></script>
+</body>
+</html>

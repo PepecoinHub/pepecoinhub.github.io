@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coinmenge und Inflation von Pepecoin: keine Obergrenze, sinkende Rate</title>
+<meta name="description" content="Pepecoin (PEP) hat keine Obergrenze. Jedes Jahr kommen fest 5,26 Milliarden Coins hinzu, daher sinkt die Inflation von heute etwa 5,0 % auf 2,3 % in 25 Jahren. Diagramm, Tabelle und Quellen.">
+<link rel="canonical" href="https://pepecoinhub.com/de/supply.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/supply.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/supply.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/supply.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/supply.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/supply.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/supply.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/supply.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/supply.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/supply.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="de_DE">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="Coinmenge und Inflation von Pepecoin: keine Obergrenze, sinkende Rate">
+<meta property="og:description" content="Pepecoin (PEP) hat keine Obergrenze. Jedes Jahr kommen fest 5,26 Milliarden Coins hinzu, daher sinkt die Inflation von heute etwa 5,0 % auf 2,3 % in 25 Jahren. Diagramm, Tabelle und Quellen.">
+<meta property="og:url" content="https://pepecoinhub.com/de/supply.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin-Logo: Fakten, Zahlen und Quellen zu PEP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../facts.css?v=20261007d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Hat Pepecoin eine maximale Coinmenge?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Pepecoin hat keine Obergrenze. Jeder Block fügt 10.000 neue PEP hinzu, etwa einmal pro Minute, ohne Enddatum. Dogecoin folgt derselben Regel."}}, {"@type": "Question", "name": "Wie viele neue Pepecoin entstehen pro Jahr?", "acceptedAnswer": {"@type": "Answer", "text": "Etwa 5,26 Milliarden PEP: 525.600 Blöcke pro Jahr zu je 10.000 PEP, vorausgesetzt, das 60-Sekunden-Blockziel wird eingehalten."}}, {"@type": "Question", "name": "Wie hoch ist die Inflationsrate von Pepecoin?", "acceptedAnswer": {"@type": "Answer", "text": "Etwa 5,0 % für die 12 Monate ab Oktober 2026. Weil die jährliche Ausgabe fest ist und die Coinmenge weiter wächst, sinkt die Rate jedes Jahr: auf etwa 3,3 % nach zehn Jahren und 2,3 % im 25. Jahr."}}, {"@type": "Question", "name": "Ist das bei Dogecoin genauso?", "acceptedAnswer": {"@type": "Answer", "text": "Ja. Dogecoin gibt seit 2015 fest 10.000 DOGE pro Ein-Minuten-Block aus. Seine Coinmenge ist größer, etwa 156 Milliarden, daher ist seine Inflationsrate heute niedriger, etwa 3,4 %."}}, {"@type": "Question", "name": "Wurden Pepecoin vorab gemint oder zurückgelegt?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Laut dem MiCA-Whitepaper von Pepecoin gab es keinen Premine, keine Vorabzuteilung und kein ICO, und Pepecoin LLC hält keine PEP. Alle Coins gingen als Blockbelohnungen an Miner."}}]}</script>
+<style>
+/* page-specific */
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+.chart { margin: 0; position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 16px 12px; display: grid; gap: 8px; }
+.chart-scroll { overflow-x: auto; }
+.chart svg { display: block; width: 100%; min-width: 620px; height: auto; font-family: var(--f-body); }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .bar { fill: var(--series); }
+.chart .area { fill: var(--accent-soft); }
+.chart .line { fill: none; stroke: var(--series); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .dot { fill: var(--series); stroke: var(--panel); stroke-width: 2; }
+.chart .ref { stroke: var(--muted); stroke-width: 1; }
+.chart text { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.chart text.t { fill: var(--ink); font-weight: 600; font-size: 13px; }
+.chart text.v { fill: var(--ink); font-weight: 600; }
+.chart .hair { stroke: var(--muted); stroke-width: 1; display: none; pointer-events: none; }
+.chart .slot { fill: transparent; }
+.tip { position: absolute; z-index: 2; pointer-events: none; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 10px 12px; font-size: 0.85rem; display: grid; gap: 2px; min-width: 150px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+.tip-head { font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; }
+.tip strong { margin-right: 6px; font-variant-numeric: tabular-nums; }
+.tip span { color: var(--muted); }
+.table-view summary { cursor: pointer; font-weight: 600; padding-block: 6px; }
+.table-view .table-scroll { margin-top: 12px; }
+</style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Seiten"><a href="which-pepecoin.html">Was ist was</a><a href="compare.html">PEP und DOGE</a><a href="calculator.html">Rechner</a><a href="supply.html" aria-current="page">Coinmenge</a><a href="scrypt-family.html">Scrypt-Familie</a><a href="network.html">Netzwerk</a><a href="rich-list.html">Rich List</a><a href="guides.html">Ratgeber</a></nav>
+</header>
+<main class="wrap" id="main">
+<header class="page-head">
+  <p class="eyebrow">Coinmenge und Inflation</p>
+  <h1>Keine Obergrenze und jedes Jahr weniger Inflation</h1>
+  <p class="lede">Pepecoin hat keine maximale Coinmenge. Jeder Block erzeugt 10.000 neue PEP, und diese Zahl ändert sich nie. Weil die Coinmenge wächst, während die jährliche Ausgabe gleich bleibt, sinkt die Inflationsrate jedes Jahr. Dogecoin funktioniert seit 2015 genauso.</p>
+</header>
+
+<section aria-label="Die wichtigsten Zahlen">
+  <div class="stats">
+    <div class="stat"><span class="label">Neue PEP pro Block</span><span class="value">10,000</span><span class="sub">fest seit Block 600.000</span></div>
+    <div class="stat"><span class="label">Neue PEP pro Jahr</span><span class="value">5.26B</span><span class="sub">bei 60-Sekunden-Blöcken</span></div>
+    <div class="stat"><span class="label">Inflation, nächste 12 Monate</span><span class="value">5.0%</span><span class="sub">bei einer Coinmenge von 104.8B</span></div>
+    <div class="stat"><span class="label">Inflation im 25. Jahr</span><span class="value">2.3%</span><span class="sub">bei einer Coinmenge von 231B</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="chart-title">
+  <h2 id="chart-title">Gleich viele neue Coins, jedes Jahr ein kleinerer Anteil</h2>
+  <p class="note">Die Zahl neuer PEP pro Jahr schrumpft nicht. Sie bleibt bei 5,26 Milliarden – ein Diagramm nur dieser Zahl wären also 25 gleiche Balken. Was sich ändert, ist die Coinmenge, zu der diese Coins hinzukommen, sodass dieselben 5,26 Milliarden jedes Jahr ein kleinerer Anteil sind. Prognose für die 25 Jahre ab Oktober 2026, vorausgesetzt, das 60-Sekunden-Blockziel wird eingehalten. Jede Spalte umfasst die 12 Monate bis Oktober.</p>
+  <figure class="chart" id="chart" tabindex="0" aria-describedby="chart-help">
+    <div class="chart-scroll">
+      <svg viewBox="0 0 760 390" role="img" aria-label="Zwei aufeinander abgestimmte Diagramme für 2027 bis 2051. Die gesamte Coinmenge wächst geradlinig von 110 auf 236 Milliarden PEP, weil jedes Jahr dieselben 5,26 Milliarden neuen PEP hinzukommen. Die Inflationsrate sinkt jedes Jahr, von 5,0 auf 2,3 Prozent.">
+<text class="t" x="52" y="16">Gesamte Coinmenge: +5.26B neue PEP pro Jahr</text>
+<line class="grid" x1="52" x2="732" y1="124.0" y2="124.0"/>
+<text x="44" y="128.0" text-anchor="end">0</text>
+<line class="grid" x1="52" x2="732" y1="90.4" y2="90.4"/>
+<text x="44" y="94.4" text-anchor="end">100B</text>
+<line class="grid" x1="52" x2="732" y1="56.8" y2="56.8"/>
+<text x="44" y="60.8" text-anchor="end">200B</text>
+<path class="area" d="M65.6,124 L65.6,87.0 L92.8,85.3 L120.0,83.5 L147.2,81.7 L174.4,80.0 L201.6,78.2 L228.8,76.4 L256.0,74.7 L283.2,72.9 L310.4,71.1 L337.6,69.4 L364.8,67.6 L392.0,65.8 L419.2,64.1 L446.4,62.3 L473.6,60.5 L500.8,58.8 L528.0,57.0 L555.2,55.2 L582.4,53.5 L609.6,51.7 L636.8,49.9 L664.0,48.2 L691.2,46.4 L718.4,44.6 L718.4,124 Z"/>
+<polyline class="line" points="65.6,87.0 92.8,85.3 120.0,83.5 147.2,81.7 174.4,80.0 201.6,78.2 228.8,76.4 256.0,74.7 283.2,72.9 310.4,71.1 337.6,69.4 364.8,67.6 392.0,65.8 419.2,64.1 446.4,62.3 473.6,60.5 500.8,58.8 528.0,57.0 555.2,55.2 582.4,53.5 609.6,51.7 636.8,49.9 664.0,48.2 691.2,46.4 718.4,44.6"/>
+<circle class="dot" cx="65.6" cy="87.0" r="5"/>
+<circle class="dot" cx="718.4" cy="44.6" r="5"/>
+<text class="v" x="75.6" y="78.0">110B</text>
+<text class="v" x="708.4" y="34.6" text-anchor="end">236B</text>
+<text class="t" x="52" y="174">Inflationsrate: dieselben 5.26B als Anteil der Coinmenge</text>
+<line class="grid" x1="52" x2="732" y1="356.0" y2="356.0"/>
+<text x="44" y="360.0" text-anchor="end">0%</text>
+<line class="grid" x1="52" x2="732" y1="302.7" y2="302.7"/>
+<text x="44" y="306.7" text-anchor="end">2%</text>
+<line class="grid" x1="52" x2="732" y1="249.3" y2="249.3"/>
+<text x="44" y="253.3" text-anchor="end">4%</text>
+<line class="grid" x1="52" x2="732" y1="196.0" y2="196.0"/>
+<text x="44" y="200.0" text-anchor="end">6%</text>
+<path class="bar" d="M57.6,356 V226.3 Q57.6,222.3 61.6,222.3 H69.6 Q73.6,222.3 73.6,226.3 V356 Z"/>
+<path class="bar" d="M84.8,356 V232.6 Q84.8,228.6 88.8,228.6 H96.8 Q100.8,228.6 100.8,232.6 V356 Z"/>
+<path class="bar" d="M112.0,356 V238.5 Q112.0,234.5 116.0,234.5 H124.0 Q128.0,234.5 128.0,238.5 V356 Z"/>
+<path class="bar" d="M139.2,356 V243.8 Q139.2,239.8 143.2,239.8 H151.2 Q155.2,239.8 155.2,243.8 V356 Z"/>
+<path class="bar" d="M166.4,356 V248.6 Q166.4,244.6 170.4,244.6 H178.4 Q182.4,244.6 182.4,248.6 V356 Z"/>
+<path class="bar" d="M193.6,356 V253.1 Q193.6,249.1 197.6,249.1 H205.6 Q209.6,249.1 209.6,253.1 V356 Z"/>
+<path class="bar" d="M220.8,356 V257.2 Q220.8,253.2 224.8,253.2 H232.8 Q236.8,253.2 236.8,257.2 V356 Z"/>
+<path class="bar" d="M248.0,356 V261.0 Q248.0,257.0 252.0,257.0 H260.0 Q264.0,257.0 264.0,261.0 V356 Z"/>
+<path class="bar" d="M275.2,356 V264.6 Q275.2,260.6 279.2,260.6 H287.2 Q291.2,260.6 291.2,264.6 V356 Z"/>
+<path class="bar" d="M302.4,356 V267.8 Q302.4,263.8 306.4,263.8 H314.4 Q318.4,263.8 318.4,267.8 V356 Z"/>
+<path class="bar" d="M329.6,356 V270.9 Q329.6,266.9 333.6,266.9 H341.6 Q345.6,266.9 345.6,270.9 V356 Z"/>
+<path class="bar" d="M356.8,356 V273.8 Q356.8,269.8 360.8,269.8 H368.8 Q372.8,269.8 372.8,273.8 V356 Z"/>
+<path class="bar" d="M384.0,356 V276.5 Q384.0,272.5 388.0,272.5 H396.0 Q400.0,272.5 400.0,276.5 V356 Z"/>
+<path class="bar" d="M411.2,356 V279.0 Q411.2,275.0 415.2,275.0 H423.2 Q427.2,275.0 427.2,279.0 V356 Z"/>
+<path class="bar" d="M438.4,356 V281.4 Q438.4,277.4 442.4,277.4 H450.4 Q454.4,277.4 454.4,281.4 V356 Z"/>
+<path class="bar" d="M465.6,356 V283.7 Q465.6,279.7 469.6,279.7 H477.6 Q481.6,279.7 481.6,283.7 V356 Z"/>
+<path class="bar" d="M492.8,356 V285.8 Q492.8,281.8 496.8,281.8 H504.8 Q508.8,281.8 508.8,285.8 V356 Z"/>
+<path class="bar" d="M520.0,356 V287.8 Q520.0,283.8 524.0,283.8 H532.0 Q536.0,283.8 536.0,287.8 V356 Z"/>
+<path class="bar" d="M547.2,356 V289.7 Q547.2,285.7 551.2,285.7 H559.2 Q563.2,285.7 563.2,289.7 V356 Z"/>
+<path class="bar" d="M574.4,356 V291.5 Q574.4,287.5 578.4,287.5 H586.4 Q590.4,287.5 590.4,291.5 V356 Z"/>
+<path class="bar" d="M601.6,356 V293.2 Q601.6,289.2 605.6,289.2 H613.6 Q617.6,289.2 617.6,293.2 V356 Z"/>
+<path class="bar" d="M628.8,356 V294.9 Q628.8,290.9 632.8,290.9 H640.8 Q644.8,290.9 644.8,294.9 V356 Z"/>
+<path class="bar" d="M656.0,356 V296.4 Q656.0,292.4 660.0,292.4 H668.0 Q672.0,292.4 672.0,296.4 V356 Z"/>
+<path class="bar" d="M683.2,356 V297.9 Q683.2,293.9 687.2,293.9 H695.2 Q699.2,293.9 699.2,297.9 V356 Z"/>
+<path class="bar" d="M710.4,356 V299.3 Q710.4,295.3 714.4,295.3 H722.4 Q726.4,295.3 726.4,299.3 V356 Z"/>
+<line class="ref" x1="52" x2="732" y1="266.3" y2="266.3"/>
+<text x="732" y="259.3" text-anchor="end">Dogecoin heute: 3,4 %</text>
+<text class="v" x="57.6" y="214.3">5,0 % im ersten Jahr</text>
+<text class="v" x="726.4" y="287.3" text-anchor="end">2,3 % im 25. Jahr</text>
+<text x="65.6" y="376" text-anchor="middle">2027</text>
+<text x="201.6" y="376" text-anchor="middle">2032</text>
+<text x="337.6" y="376" text-anchor="middle">2037</text>
+<text x="473.6" y="376" text-anchor="middle">2042</text>
+<text x="609.6" y="376" text-anchor="middle">2047</text>
+<text x="718.4" y="376" text-anchor="middle">2051</text>
+<line class="hair" x1="0" x2="0" y1="40" y2="356"/>
+<rect class="slot" data-cx="65.6" x="52.0" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="92.8" x="79.2" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="120.0" x="106.4" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="147.2" x="133.6" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="174.4" x="160.8" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="201.6" x="188.0" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="228.8" x="215.2" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="256.0" x="242.4" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="283.2" x="269.6" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="310.4" x="296.8" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="337.6" x="324.0" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="364.8" x="351.2" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="392.0" x="378.4" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="419.2" x="405.6" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="446.4" x="432.8" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="473.6" x="460.0" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="500.8" x="487.2" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="528.0" x="514.4" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="555.2" x="541.6" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="582.4" x="568.8" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="609.6" x="596.0" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="636.8" x="623.2" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="664.0" x="650.4" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="691.2" x="677.6" y="40" width="27.2" height="316"/>
+<rect class="slot" data-cx="718.4" x="704.8" y="40" width="27.2" height="316"/>
+</svg>
+    </div>
+    <div class="tip" id="tip" hidden></div>
+    <figcaption id="chart-help" class="src">Fahre mit der Maus darüber, tippe oder nutze die Pfeiltasten links und rechts, um jedes Jahr abzulesen. Die vollständige Tabelle steht darunter.</figcaption>
+  </figure>
+  <details class="table-view">
+    <summary>Alle Jahre als Tabelle anzeigen</summary>
+    <div class="table-scroll" role="region" aria-label="Prognosetabelle" tabindex="0">
+      <table style="min-width: 520px">
+        <thead><tr><th scope="col">12 Monate bis</th><th scope="col" class="r">Neue PEP</th><th scope="col" class="r">Coinmenge am Ende</th><th scope="col" class="r">Inflation</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Okt. 2027</th><td class="r">5.26B</td><td class="r">110.1B</td><td class="r">5.01%</td></tr>
+          <tr><th scope="row">Okt. 2028</th><td class="r">5.26B</td><td class="r">115.3B</td><td class="r">4.78%</td></tr>
+          <tr><th scope="row">Okt. 2029</th><td class="r">5.26B</td><td class="r">120.6B</td><td class="r">4.56%</td></tr>
+          <tr><th scope="row">Okt. 2030</th><td class="r">5.26B</td><td class="r">125.8B</td><td class="r">4.36%</td></tr>
+          <tr><th scope="row">Okt. 2031</th><td class="r">5.26B</td><td class="r">131.1B</td><td class="r">4.18%</td></tr>
+          <tr><th scope="row">Okt. 2032</th><td class="r">5.26B</td><td class="r">136.3B</td><td class="r">4.01%</td></tr>
+          <tr><th scope="row">Okt. 2033</th><td class="r">5.26B</td><td class="r">141.6B</td><td class="r">3.85%</td></tr>
+          <tr><th scope="row">Okt. 2034</th><td class="r">5.26B</td><td class="r">146.8B</td><td class="r">3.71%</td></tr>
+          <tr><th scope="row">Okt. 2035</th><td class="r">5.26B</td><td class="r">152.1B</td><td class="r">3.58%</td></tr>
+          <tr><th scope="row">Okt. 2036</th><td class="r">5.26B</td><td class="r">157.4B</td><td class="r">3.46%</td></tr>
+          <tr><th scope="row">Okt. 2037</th><td class="r">5.26B</td><td class="r">162.6B</td><td class="r">3.34%</td></tr>
+          <tr><th scope="row">Okt. 2038</th><td class="r">5.26B</td><td class="r">167.9B</td><td class="r">3.23%</td></tr>
+          <tr><th scope="row">Okt. 2039</th><td class="r">5.26B</td><td class="r">173.1B</td><td class="r">3.13%</td></tr>
+          <tr><th scope="row">Okt. 2040</th><td class="r">5.26B</td><td class="r">178.4B</td><td class="r">3.04%</td></tr>
+          <tr><th scope="row">Okt. 2041</th><td class="r">5.26B</td><td class="r">183.6B</td><td class="r">2.95%</td></tr>
+          <tr><th scope="row">Okt. 2042</th><td class="r">5.26B</td><td class="r">188.9B</td><td class="r">2.86%</td></tr>
+          <tr><th scope="row">Okt. 2043</th><td class="r">5.26B</td><td class="r">194.2B</td><td class="r">2.78%</td></tr>
+          <tr><th scope="row">Okt. 2044</th><td class="r">5.26B</td><td class="r">199.4B</td><td class="r">2.71%</td></tr>
+          <tr><th scope="row">Okt. 2045</th><td class="r">5.26B</td><td class="r">204.7B</td><td class="r">2.64%</td></tr>
+          <tr><th scope="row">Okt. 2046</th><td class="r">5.26B</td><td class="r">209.9B</td><td class="r">2.57%</td></tr>
+          <tr><th scope="row">Okt. 2047</th><td class="r">5.26B</td><td class="r">215.2B</td><td class="r">2.50%</td></tr>
+          <tr><th scope="row">Okt. 2048</th><td class="r">5.26B</td><td class="r">220.4B</td><td class="r">2.44%</td></tr>
+          <tr><th scope="row">Okt. 2049</th><td class="r">5.26B</td><td class="r">225.7B</td><td class="r">2.38%</td></tr>
+          <tr><th scope="row">Okt. 2050</th><td class="r">5.26B</td><td class="r">230.9B</td><td class="r">2.33%</td></tr>
+          <tr><th scope="row">Okt. 2051</th><td class="r">5.26B</td><td class="r">236.2B</td><td class="r">2.28%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+</section>
+
+<section aria-labelledby="read">
+  <h2 id="read">So liest du es</h2>
+  <div class="prose">
+    <p><strong>Die jährliche Ausgabe ist konstant.</strong> Ein Jahr hat 525.600 Minuten. Ein Block pro Minute zu je 10.000 PEP ergibt 5,256 Milliarden neue PEP pro Jahr, dieses Jahr und jedes weitere.</p>
+    <p><strong>Die Inflationsrate ist diese Ausgabe geteilt durch die bereits existierenden Coins.</strong> Heute sind das 5,256 Milliarden auf 104,8 Milliarden, also 5,0 %. In zehn Jahren liegt die Coinmenge bei etwa 157 Milliarden, dieselben 5,256 Milliarden sind dann 3,3 %. Im 25. Jahr sind es 2,3 %. Die Rate sinkt weiter und erreicht nie null.</p>
+    <p><strong>Dogecoin ist auf derselben Kurve etwa zehn Jahre weiter.</strong> Es gibt dieselben 5,256 Milliarden Coins pro Jahr bei einer Coinmenge von etwa 156 Milliarden aus, das sind heute 3,4 %. Pepecoin erreicht diese Rate um 2036.</p>
+    <p><strong>Was eine feste Belohnung bewirkt.</strong> Miner verdienen weiterhin für jeden Block neue Coins, daher hängt die Netzwerksicherheit nicht allein von Transaktionsgebühren ab. Der Preis dafür ist eine Coinmenge, die weiter wächst – jedes Jahr etwas langsamer.</p>
+  </div>
+</section>
+
+<section aria-labelledby="early">
+  <h2 id="early">Wie die ersten 98 Milliarden ausgegeben wurden</h2>
+  <p class="note">Die Blockbelohnung begann bei 500.000 PEP und halbierte sich alle 100.000 Blöcke. Seit Block 600.000 liegt sie fest bei 10.000 PEP. Es gab keinen Premine und keine Zuteilung, jeder Coin in dieser Tabelle ging also an Miner.</p>
+  <div class="table-scroll" role="region" aria-labelledby="early" tabindex="0">
+    <table style="min-width: 480px">
+      <thead><tr><th scope="col">Blöcke</th><th scope="col" class="r">Belohnung pro Block</th><th scope="col" class="r">Ausgegebene PEP</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">0 – 99,999</th><td class="r">500,000</td><td class="r">50.00B</td></tr>
+        <tr><th scope="row">100,000 – 199,999</th><td class="r">250,000</td><td class="r">25.00B</td></tr>
+        <tr><th scope="row">200,000 – 299,999</th><td class="r">125,000</td><td class="r">12.50B</td></tr>
+        <tr><th scope="row">300,000 – 399,999</th><td class="r">62,500</td><td class="r">6.25B</td></tr>
+        <tr><th scope="row">400,000 – 499,999</th><td class="r">31,250</td><td class="r">3.13B</td></tr>
+        <tr><th scope="row">500,000 – 599,999</th><td class="r">15,625</td><td class="r">1.56B</td></tr>
+        <tr class="hl"><th scope="row">ab 600.000</th><td class="r">10,000</td><td class="r">5.26B pro Jahr</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="src">Die sechs frühen Zeilen ergeben zusammen 98,44 Milliarden PEP. Rechnet man 10.000 PEP für jeden Block seitdem hinzu, ergeben sich 104,81 Milliarden bei Block 1.237.438 – das entspricht der Coinmenge, die der Explorer Pepeplorer am 6. Oktober 2026 anzeigte.</p>
+</section>
+
+<section aria-labelledby="assume">
+  <h2 id="assume">Annahmen der Prognose</h2>
+  <div class="prose">
+    <ul>
+      <li>Blöcke kommen im Schnitt alle 60 Sekunden, dem Protokollziel. Seit dem Start waren sie im Schnitt etwas langsamer, die tatsächliche Ausgabe ist also etwas niedriger als dargestellt.</li>
+      <li>Die Ausgangsmenge beträgt 104,8 Milliarden PEP, wie von Pepeplorer am 6. Oktober 2026 angezeigt.</li>
+      <li>Die Blockbelohnung bleibt bei 10.000 PEP. Die Regeln legt die Software Pepecoin Core fest; sie könnten sich nur ändern, wenn das Netzwerk eine neue Version übernimmt.</li>
+    </ul>
+  </div>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">Häufige Fragen</h2>
+  <div class="faq">
+    <details><summary>Hat Pepecoin eine maximale Coinmenge?</summary><p>Nein. Pepecoin hat keine Obergrenze. Jeder Block fügt 10.000 neue PEP hinzu, etwa einmal pro Minute, ohne Enddatum. Dogecoin folgt derselben Regel.</p></details>
+    <details><summary>Wie viele neue Pepecoin entstehen pro Jahr?</summary><p>Etwa 5,26 Milliarden PEP: 525.600 Blöcke pro Jahr zu je 10.000 PEP, vorausgesetzt, das 60-Sekunden-Blockziel wird eingehalten.</p></details>
+    <details><summary>Wie hoch ist die Inflationsrate von Pepecoin?</summary><p>Etwa 5,0 % für die 12 Monate ab Oktober 2026. Weil die jährliche Ausgabe fest ist und die Coinmenge weiter wächst, sinkt die Rate jedes Jahr: auf etwa 3,3 % nach zehn Jahren und 2,3 % im 25. Jahr.</p></details>
+    <details><summary>Ist das bei Dogecoin genauso?</summary><p>Ja. Dogecoin gibt seit 2015 fest 10.000 DOGE pro Ein-Minuten-Block aus. Seine Coinmenge ist größer, etwa 156 Milliarden, daher ist seine Inflationsrate heute niedriger, etwa 3,4 %.</p></details>
+    <details><summary>Wurden Pepecoin vorab gemint oder zurückgelegt?</summary><p>Nein. Laut dem MiCA-Whitepaper von Pepecoin gab es keinen Premine, keine Vorabzuteilung und kein ICO, und Pepecoin LLC hält keine PEP. Alle Coins gingen als Blockbelohnungen an Miner.</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">Quellen</h2>
+  <div class="sources">
+    <div>
+      <h3>Pepecoin</h3>
+      <ul>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA white paper (sections D.4, D.9, G.13)</a></li>
+        <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp (halving interval, block time)</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC: PEP reward schedule</a></li>
+        <li><a href="https://pepeplorer.com/network">Pepeplorer: supply and block height</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Dogecoin</h3>
+      <ul>
+        <li><a href="https://github.com/dogecoin/dogecoin/blob/master/doc/FAQ.md">Dogecoin FAQ (fixed 10,000 DOGE reward)</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/dogecoin">CoinGecko: Dogecoin supply</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  var DATA = [{"year": 2027, "infl": 5.015, "supply": 110.06}, {"year": 2028, "infl": 4.776, "supply": 115.31}, {"year": 2029, "infl": 4.558, "supply": 120.57}, {"year": 2030, "infl": 4.359, "supply": 125.82}, {"year": 2031, "infl": 4.177, "supply": 131.08}, {"year": 2032, "infl": 4.01, "supply": 136.34}, {"year": 2033, "infl": 3.855, "supply": 141.59}, {"year": 2034, "infl": 3.712, "supply": 146.85}, {"year": 2035, "infl": 3.579, "supply": 152.1}, {"year": 2036, "infl": 3.456, "supply": 157.36}, {"year": 2037, "infl": 3.34, "supply": 162.62}, {"year": 2038, "infl": 3.232, "supply": 167.87}, {"year": 2039, "infl": 3.131, "supply": 173.13}, {"year": 2040, "infl": 3.036, "supply": 178.38}, {"year": 2041, "infl": 2.946, "supply": 183.64}, {"year": 2042, "infl": 2.862, "supply": 188.9}, {"year": 2043, "infl": 2.782, "supply": 194.15}, {"year": 2044, "infl": 2.707, "supply": 199.41}, {"year": 2045, "infl": 2.636, "supply": 204.66}, {"year": 2046, "infl": 2.568, "supply": 209.92}, {"year": 2047, "infl": 2.504, "supply": 215.18}, {"year": 2048, "infl": 2.443, "supply": 220.43}, {"year": 2049, "infl": 2.384, "supply": 225.69}, {"year": 2050, "infl": 2.329, "supply": 230.94}, {"year": 2051, "infl": 2.276, "supply": 236.2}];
+  var fig = document.getElementById('chart');
+  var tip = document.getElementById('tip');
+  var svg = fig.querySelector('svg');
+  var hair = svg.querySelector('.hair');
+  var slots = svg.querySelectorAll('.slot');
+  var idx = -1;
+
+  function row(label, value) {
+    var d = document.createElement('div');
+    var v = document.createElement('strong');
+    v.textContent = value;
+    var l = document.createElement('span');
+    l.textContent = label;
+    d.appendChild(v); d.appendChild(l);
+    return d;
+  }
+  function show(i) {
+    if (i < 0 || i >= DATA.length) return;
+    idx = i;
+    var d = DATA[i];
+    tip.textContent = '';
+    var h = document.createElement('div');
+    h.className = 'tip-head';
+    h.textContent = '12 Monate bis Oktober ' + d.year;
+    tip.appendChild(h);
+    tip.appendChild(row('Inflation', d.infl.toFixed(2) + '%'));
+    tip.appendChild(row('neue PEP', '5.26B'));
+    tip.appendChild(row('Coinmenge am Anfang', (d.supply - 5.256).toFixed(1) + 'B'));
+    tip.appendChild(row('Coinmenge am Ende', d.supply.toFixed(1) + 'B'));
+    var r = slots[i].getBoundingClientRect();
+    var f = fig.getBoundingClientRect();
+    hair.setAttribute('x1', slots[i].dataset.cx);
+    hair.setAttribute('x2', slots[i].dataset.cx);
+    hair.style.display = 'block';
+    tip.hidden = false;
+    var left = r.left - f.left + r.width / 2;
+    var w = tip.offsetWidth;
+    left = Math.max(4, Math.min(f.width - w - 4, left + 12 > f.width - w - 4 ? left - w - 12 : left + 12));
+    tip.style.left = left + 'px';
+    tip.style.top = '36px';
+  }
+  function hide() { idx = -1; tip.hidden = true; hair.style.display = 'none'; }
+
+  Array.prototype.forEach.call(slots, function (s, i) {
+    s.addEventListener('pointerenter', function () { show(i); });
+    s.addEventListener('pointerdown', function () { show(i); });
+  });
+  svg.addEventListener('pointerleave', hide);
+  fig.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { show(Math.min(DATA.length - 1, idx + 1)); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { show(Math.max(0, idx < 0 ? 0 : idx - 1)); e.preventDefault(); }
+    else if (e.key === 'Escape') { hide(); }
+  });
+  fig.addEventListener('blur', hide);
+})();
+</script>
+
+</main>
+<footer class="site-foot">
+  <p><strong>Community-Faktenseiten</strong>, ehrenamtlich zusammengestellt von einem Mitglied der r/pepecoin-Community. Keine offizielle Pepecoin-Publikation.</p>
+  <p>Keine Anlageberatung. Wer diese Seiten zusammenstellt, besitzt selbst PEP. Kurse und Netzwerkdaten ändern sich täglich; jede Seite nennt ihren Stand und ihre Quellen.</p>
+  <p class="correction">Fehler entdeckt? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Korrektur auf GitHub melden</a> (bitte mit Quelle).</p>
+  <details class="support"><summary>Gefällt dir diese Seite? Du kannst ihre Weiterentwicklung unterstützen.</summary><p>Jeder noch so kleine Betrag hilft. Danke!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+</footer>
+<script src="../chrome.js?v=20261007d" defer></script>
+</body>
+</html>

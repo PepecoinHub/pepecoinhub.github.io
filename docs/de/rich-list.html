@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pepecoin Holder Watch | PEP Rich List und Konzentrations-Tracker</title>
+<meta name="description" content="Tägliche Momentaufnahmen der größten Pepecoin-(PEP-)Wallets: welchen Anteil der Coinmenge die größten 10, 25, 50, 100, 400 und 1.000 Adressen halten und wie er sich über Tage, Monate und Jahre verändert.">
+<link rel="canonical" href="https://pepecoinhub.com/de/rich-list.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/rich-list.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/rich-list.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/rich-list.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/rich-list.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/rich-list.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/rich-list.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/rich-list.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/rich-list.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/rich-list.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="de_DE">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="Pepecoin Holder Watch">
+<meta property="og:description" content="Wie konzentriert ist die PEP-Coinmenge? Tägliche Holder-Momentaufnahmen mit Verlauf bis Anfang 2024.">
+<meta property="og:url" content="https://pepecoinhub.com/de/rich-list.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin-Logo: Fakten, Zahlen und Quellen zu PEP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../style.css?v=20261007d">
+<link rel="stylesheet" href="../facts.css?v=20261007d">
+<style>
+/* This page loads the Holder Watch app styles (style.css) under the shared site styles (facts.css). */
+.page-head .eyebrow { font-weight: 400; }
+.page-head .lede, .page-head p { margin: 0; }
+.top { gap: 24px; }
+</style>
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin (PEP) Rich List und Konzentration der Coinmenge", "description": "Tägliche Momentaufnahmen der größten Pepecoin-(PEP-)Adressen und des Anteils an der Coinmenge, den die größten 10, 25, 50, 100, 400 und 1.000 Adressen halten; bis Februar 2024 aus der Blockchain rekonstruiert und seit dem 5. Oktober 2026 täglich live erfasst.", "url": "https://pepecoinhub.com/rich-list.html", "temporalCoverage": "2024-02-05/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (Freiwillige aus der r/pepecoin-Community)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://pepecoinhub.com/data/shares.csv"}, {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/summary.json"}]}</script>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Seiten"><a href="which-pepecoin.html">Was ist was</a><a href="compare.html">PEP und DOGE</a><a href="calculator.html">Rechner</a><a href="supply.html">Coinmenge</a><a href="scrypt-family.html">Scrypt-Familie</a><a href="network.html">Netzwerk</a><a href="rich-list.html" aria-current="page">Rich List</a><a href="guides.html">Ratgeber</a></nav>
+</header>
+<div class="wrap" id="app">
+  <!-- static-summary:start -->
+  <header class="page-head">
+    <p class="eyebrow">Rich List · Momentaufnahme vom 7. Okt. 2026</p>
+    <h1>Pepecoin Holder Watch</h1>
+    <p class="lede">Wie viel der PEP-Coinmenge in den größten Wallets liegt und wie sich das verändert. Jeden Tag eine Momentaufnahme der größten ~2000 Adressen; die Diagramme konzentrieren sich auf die Top 1000.</p>
+  </header>
+  <p id="boot">Anteil der umlaufenden Coinmenge bei den größten Adressen am 7. Okt. 2026 (Block 1.240.290): Top 10: 15,67 % · Top 25: 23,03 % · Top 50: 30,35 % · Top 100: 38,71 % · Top 400: 59,33 % · Top 1.000: 73,98 %. Jeder Tag seit Februar 2024: <a href="../data/shares.csv">shares.csv</a>.</p>
+  <!-- static-summary:end -->
+  <noscript>
+    <p>Diese Seite braucht JavaScript, um ihre Diagramme zu zeichnen. Die Rohdaten stehen in <a href="../data/shares.csv">shares.csv</a>.</p>
+    <p class="muted">Manuelle Markierungen in <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/blob/main/docs/data/labels.json">labels.json</a> kennzeichnen bekannte Börsen und Mining-Pools. Die Ansicht „ohne Börsen und Pools“ blendet diese Adressen aus und nimmt ihre Guthaben aus dem Nenner. Eine Einzahlung auf eine Börse on-chain beweist nicht, dass die Coins verkauft wurden. Die Markierungen pflegt die Community – sie sind nicht vollständig.</p>
+  </noscript>
+</div>
+<footer class="site-foot">
+  <p><strong>Community-Faktenseiten</strong>, ehrenamtlich zusammengestellt von einem Mitglied der r/pepecoin-Community. Keine offizielle Pepecoin-Publikation.</p>
+  <p>Keine Anlageberatung. Wer diese Seiten zusammenstellt, besitzt selbst PEP. Kurse und Netzwerkdaten ändern sich täglich; jede Seite nennt ihren Stand und ihre Quellen.</p>
+  <p class="correction">Fehler entdeckt? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Korrektur auf GitHub melden</a> (bitte mit Quelle).</p>
+  <details class="support"><summary>Gefällt dir diese Seite? Du kannst ihre Weiterentwicklung unterstützen.</summary><p>Jeder noch so kleine Betrag hilft. Danke!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+</footer>
+<script src="../app.js?v=20261007e"></script>
+<script src="../chrome.js?v=20261007d" defer></script>
+</body>
+</html>
