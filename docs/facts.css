@@ -194,6 +194,17 @@ footer.site-foot, footer.pf-foot {
   display: grid; gap: 8px; font-size: 0.9rem; color: var(--muted);
 }
 footer.site-foot strong, footer.pf-foot strong { color: var(--ink); }
+/* Small, collapsed "support the site" note at the very end of the footer. */
+.support { font-size: 0.85rem; }
+.support summary { cursor: pointer; width: fit-content; color: var(--muted); }
+.support summary:hover { color: var(--ink); }
+.support p { margin: 8px 0 6px; }
+.support dl { margin: 0; display: grid; gap: 6px; }
+.support dl div { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; min-width: 0; }
+.support dt { min-width: 8.5em; color: var(--ink); font-weight: 500; }
+.support dd { margin: 0; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.support code { font-family: var(--f-mono); font-size: 0.82rem; overflow-wrap: anywhere; user-select: all; }
+.support .copy { flex: none; }
 
 @media (max-width: 560px) {
   table.fit th, table.fit td { padding: 10px 10px; }
