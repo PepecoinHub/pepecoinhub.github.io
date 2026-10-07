@@ -1,33 +1,34 @@
 <!doctype html>
-<html lang="en">
+<html lang="pl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pepecoin (PEP) network stats: block height, supply, addresses and block time</title>
-<meta name="description" content="Daily Pepecoin network numbers: block height, coin supply, addresses with a balance and the real average block time, charted since February 2024 and updated every day.">
-<link rel="canonical" href="https://pepecoinhub.com/network.html">
+<title>Statystyki sieci Pepecoin (PEP): wysokość bloku, podaż, adresy i czas bloku</title>
+<meta name="description" content="Codzienne liczby sieci Pepecoin: wysokość bloku, podaż monet, adresy z saldem i realny średni czas bloku — wykresy od lutego 2024, aktualizacja codziennie.">
+<link rel="canonical" href="https://pepecoinhub.com/pl/network.html">
 <link rel="alternate" hreflang="en" href="https://pepecoinhub.com/network.html">
 <link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/network.html">
 <link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/network.html">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="pl_PL">
 <meta property="og:site_name" content="Pepecoin Hub">
-<meta property="og:title" content="Pepecoin (PEP) network stats: block height, supply, addresses and block time">
-<meta property="og:description" content="Daily Pepecoin network numbers: block height, coin supply, addresses with a balance and the real average block time, charted since February 2024 and updated every day.">
-<meta property="og:url" content="https://pepecoinhub.com/network.html">
+<meta property="og:title" content="Statystyki sieci Pepecoin (PEP): wysokość bloku, podaż, adresy i czas bloku">
+<meta property="og:description" content="Codzienne liczby sieci Pepecoin: wysokość bloku, podaż monet, adresy z saldem i realny średni czas bloku — wykresy od lutego 2024, aktualizacja codziennie.">
+<meta property="og:url" content="https://pepecoinhub.com/pl/network.html">
 <meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Pepecoin logo: facts, numbers and sources about PEP">
+<meta property="og:image:alt" content="Logo Pepecoin: fakty, liczby i źródła o PEP">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
-<link rel="icon" href="assets/brand/icon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="facts.css?v=20261007d">
+<link rel="stylesheet" href="../facts.css?v=20261007d">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/"}, {"@type": "ListItem", "position": 2, "name": "Network stats", "item": "https://pepecoinhub.com/network.html"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin network daily statistics", "description": "Daily Pepecoin (PEP) block height, coin supply, number of addresses with a balance and snapshot time, from February 2024, rebuilt from the blockchain before October 5, 2026 and recorded live after that.", "url": "https://pepecoinhub.com/network.html", "temporalCoverage": "2024-02-05/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (r/pepecoin community volunteers)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/pl/"}, {"@type": "ListItem", "position": 2, "name": "Statystyki sieci", "item": "https://pepecoinhub.com/pl/network.html"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Codzienne statystyki sieci Pepecoin", "description": "Codzienna wysokość bloku Pepecoin (PEP), podaż, liczba adresów z saldem i czas snapshotu, od lutego 2024; przed 5 października 2026 odtworzone z blockchainu, potem zapisywane na żywo.", "url": "https://pepecoinhub.com/network.html", "temporalCoverage": "2024-02-05/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (r/pepecoin community volunteers)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}]}</script>
 <style>
 .chart { margin: 0; position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 16px 10px; display: grid; gap: 8px; }
 .chart h3 { font-weight: 700; font-size: 1rem; }
@@ -53,80 +54,80 @@
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
+<a class="skip" href="#main">Przejdź do treści</a>
 
 <header class="site-head">
-  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
-  <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html">Which is which</a><a href="compare.html">PEP and DOGE</a><a href="calculator.html">Calculator</a><a href="supply.html">Supply</a><a href="scrypt-family.html">Scrypt family</a><a href="network.html" aria-current="page">Network</a><a href="rich-list.html">Rich list</a><a href="guides.html">Guides</a></nav>
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Strony"><a href="which-pepecoin.html">Który jest który</a><a href="compare.html">PEP i DOGE</a><a href="calculator.html">Kalkulator</a><a href="supply.html">Podaż</a><a href="scrypt-family.html">Rodzina Scrypt</a><a href="network.html" aria-current="page">Sieć</a><a href="rich-list.html">Najbogatsze adresy</a><a href="guides.html">Poradniki</a></nav>
 </header>
 <main class="wrap" id="main">
 <header class="page-head">
-  <p class="eyebrow">Network · data as of <span id="s-date">Oct 6, 2026</span></p>
-  <h1>The Pepecoin network, day by day</h1>
-  <p class="lede">A robot records the block height, the supply and how many addresses hold PEP every day. These are its numbers, back to February 2024.</p>
+  <p class="eyebrow">Sieć · dane na <span id="s-date">Oct 6, 2026</span></p>
+  <h1>Sieć Pepecoin, dzień po dniu</h1>
+  <p class="lede">Robot codziennie zapisuje wysokość bloku, podaż i ile adresów trzyma PEP. To jego liczby, od lutego 2024.</p>
 </header>
 
-<section aria-label="Latest figures">
+<section aria-label="Najnowsze liczby">
   <div class="stats">
-    <div class="stat"><span class="label">Block height</span><span class="value" id="s-height">1,238,910</span><span class="sub">blocks since January 30, 2024</span></div>
-    <div class="stat"><span class="label">Supply</span><span class="value" id="s-supply">104.83B</span><span class="sub">PEP, every coin from mining</span></div>
-    <div class="stat"><span class="label">Addresses with a balance</span><span class="value" id="s-addr">295,767</span><span class="sub">an address is not a person</span></div>
-    <div class="stat"><span class="label">Average block, 30 days</span><span class="value" id="s-bt">62.6 s</span><span class="sub">target: 60 s</span></div>
-    <div class="stat"><span class="label">New PEP a day, 30 days</span><span class="value" id="s-day">13.8M</span><span class="sub">14.4M at the 60 s target</span></div>
+    <div class="stat"><span class="label">Wysokość bloku</span><span class="value" id="s-height">1,238,910</span><span class="sub">bloki od 30 stycznia 2024</span></div>
+    <div class="stat"><span class="label">Podaż</span><span class="value" id="s-supply">104.83B</span><span class="sub">PEP, każda moneta z mining</span></div>
+    <div class="stat"><span class="label">Adresy z saldem</span><span class="value" id="s-addr">295,767</span><span class="sub">adres to nie osoba</span></div>
+    <div class="stat"><span class="label">Średni blok, 30 dni</span><span class="value" id="s-bt">62.6 s</span><span class="sub">cel: 60 s</span></div>
+    <div class="stat"><span class="label">Nowe PEP dziennie, 30 dni</span><span class="value" id="s-day">13.8M</span><span class="sub">14,4M przy celu 60 s</span></div>
   </div>
   <p class="src" id="net-status"></p>
 </section>
 
 <section aria-labelledby="addr-h">
-  <h2 id="addr-h">Addresses holding PEP</h2>
-  <p class="note">Addresses with a balance above zero, one point a week until September 2025 and one a day since. Hover or tap the chart to read a date.</p>
+  <h2 id="addr-h">Adresy trzymające PEP</h2>
+  <p class="note">Adresy z saldem powyżej zera: jeden punkt tygodniowo do września 2025, potem codziennie. Najedź lub stuknij wykres, żeby odczytać datę.</p>
   <figure class="chart">
-    <div class="plot" id="addr-plot" role="img" aria-label="Line chart of Pepecoin addresses with a balance, rising from 344 in February 2024 to about 296,000 in October 2026."></div>
+    <div class="plot" id="addr-plot" role="img" aria-label="Wykres liniowy adresów Pepecoin z saldem: od 344 w lutym 2024 do ok. 296 000 w październiku 2026."></div>
     <div class="tip" id="addr-tip" hidden></div>
   </figure>
 </section>
 
 <section aria-labelledby="blocks-h">
-  <h2 id="blocks-h">Blocks per day, by month</h2>
-  <p class="note">Pepecoin aims for a block every 60 seconds, which is 1,440 a day. In March and April 2024, before merged mining started at block 42,000 in May, a block took 8 to 13 minutes on average. Since June 2024 the pace has stayed close to the target: one block every 62.6 seconds over the past year. The paler bar is the current month so far.</p>
+  <h2 id="blocks-h">Bloki dziennie, według miesiąca</h2>
+  <p class="note">Pepecoin celuje w blok co 60 sekund, czyli 1440 dziennie. W marcu i kwietniu 2024, zanim merge mining ruszył przy bloku 42 000 w maju, blok trwał średnio 8–13 minut. Od czerwca 2024 tempo trzyma się blisko celu: jeden blok co 62,6 s w ostatnim roku. Jaśniejszy słupek to bieżący miesiąc.</p>
   <figure class="chart">
-    <div class="plot" id="blocks-plot" role="img" aria-label="Column chart of average blocks per day for each month since February 2024, against the target of 1,440."></div>
+    <div class="plot" id="blocks-plot" role="img" aria-label="Wykres słupkowy średniej liczby bloków dziennie w każdym miesiącu od lutego 2024, względem celu 1440."></div>
     <div class="tip" id="blocks-tip" hidden></div>
   </figure>
 </section>
 
 <section aria-labelledby="days-h">
-  <h2 id="days-h">The last two weeks</h2>
+  <h2 id="days-h">Ostatnie dwa tygodnie</h2>
   <div class="table-scroll" role="region" aria-labelledby="days-h" tabindex="0">
     <table style="min-width: 560px">
-      <thead><tr><th scope="col">Day</th><th scope="col" class="r">Block height</th><th scope="col" class="r">Blocks a day</th><th scope="col" class="r">Supply (PEP)</th><th scope="col" class="r">Addresses with a balance</th></tr></thead>
+      <thead><tr><th scope="col">Dzień</th><th scope="col" class="r">Wysokość bloku</th><th scope="col" class="r">Bloki dziennie</th><th scope="col" class="r">Podaż (PEP)</th><th scope="col" class="r">Adresy z saldem</th></tr></thead>
       <tbody id="days"></tbody>
     </table>
   </div>
 </section>
 
 <section aria-labelledby="how">
-  <h2 id="how">Where the numbers come from</h2>
+  <h2 id="how">Skąd biorą się liczby</h2>
   <div class="prose">
-    <p><strong>Every day</strong> a GitHub Actions job asks the PepeBlocks explorer and the pepecoinservice.org API for the block height, the supply and the rich list, and saves the result in this site's repository.</p>
-    <p><strong>Before October 5, 2026</strong> the same figures were rebuilt by replaying the Pepecoin blockchain from its first block, one point a week until September 2025 and one a day after that.</p>
-    <p><strong>Block time</strong> is the time between two snapshots divided by the blocks found in between. <strong>Addresses</strong> are the ones holding more than zero PEP; one person can use many addresses, and exchanges hold coins for many people.</p>
+    <p><strong>Codziennie</strong> zadanie GitHub Actions pyta eksplorator PepeBlocks i API pepecoinservice.org o wysokość bloku, podaż i rich listę, a wynik zapisuje w repozytorium tej strony.</p>
+    <p><strong>Przed 5 października 2026</strong> te same liczby odtworzono, odtwarzając blockchain Pepecoin od pierwszego bloku: jeden punkt tygodniowo do września 2025, potem codziennie.</p>
+    <p><strong>Czas bloku</strong> to czas między dwoma snapshotami podzielony przez liczbę bloków między nimi. <strong>Adresy</strong> to te z saldem powyżej zera PEP; jedna osoba może mieć wiele adresów, a giełdy trzymają monety wielu osób.</p>
   </div>
 </section>
 
 <section aria-labelledby="sources">
-  <h2 id="sources">Sources</h2>
+  <h2 id="sources">Źródła</h2>
   <div class="sources">
     <div>
-      <h3>Data</h3>
+      <h3>Dane</h3>
       <ul>
         <li><a href="https://pepeblocks.com/">PepeBlocks explorer</a></li>
         <li><a href="https://pepeplorer.com/network">Pepeplorer network stats</a></li>
-        <li><a href="data/network.json">The daily data file (network.json)</a></li>
+        <li><a href="../data/network.json">Dzienny plik danych (network.json)</a></li>
       </ul>
     </div>
     <div>
-      <h3>How it is made</h3>
+      <h3>Jak to powstaje</h3>
       <ul>
         <li><a href="https://github.com/PepecoinHub/pepecoinhub.github.io/blob/main/scripts/snapshot.py">Snapshot script</a></li>
         <li><a href="https://github.com/PepecoinHub/pepecoinhub.github.io/blob/main/scripts/build_summary.py">Summary and network builder</a></li>
@@ -137,10 +138,10 @@
 </section>
 </main>
 <footer class="site-foot">
-  <p><strong>Community fact pages</strong>, compiled by a volunteer from the r/pepecoin community. Not an official Pepecoin publication.</p>
-  <p>Not investment advice. The compiler holds PEP. Prices and network figures change daily; each page gives its dates and sources.</p>
-  <p class="correction">Spotted a mistake? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Report a correction</a> (with a source) on GitHub.</p>
-  <details class="support"><summary>Like this site? You can support its further development.</summary><p>Any amount, however small, helps. Thank you!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+  <p><strong>Społecznościowe strony z faktami</strong>, przygotowane w ramach wolontariatu przez osobę ze społeczności r/pepecoin. Nie jest to oficjalna publikacja projektu Pepecoin.</p>
+  <p>To nie jest porada inwestycyjna. Osoba opracowująca te strony posiada PEP. Ceny i dane sieci zmieniają się codziennie; każda strona podaje swoje daty i źródła.</p>
+  <p class="correction">Widzisz błąd? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Zgłoś poprawkę</a> (ze źródłem) na GitHubie.</p>
+  <details class="support"><summary>Podoba Ci się ta strona? Możesz wesprzeć jej dalszy rozwój.</summary><p>Każda, nawet drobna kwota pomaga. Dziękuję!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 <script>
 (function () {
@@ -149,10 +150,10 @@
   var rows = null;
   function $(id) { return document.getElementById(id); }
   function el(n, a, t) { var e = document.createElementNS(SVG, n); for (var k in a) e.setAttribute(k, a[k]); if (t != null) e.textContent = t; return e; }
-  function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
-  function big(n) { return n >= 1e9 ? (n / 1e9).toLocaleString('en-US', { maximumFractionDigits: 2 }) + 'B' : n >= 1e6 ? (n / 1e6).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'M' : fmt(n); }
-  function day(s) { return new Date(s + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); }
-  function monthName(m) { return new Date(m + '-01T00:00:00Z').toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
+  function fmt(n) { return Math.round(n).toLocaleString('pl-PL'); }
+  function big(n) { return n >= 1e9 ? (n / 1e9).toLocaleString('pl-PL', { maximumFractionDigits: 2 }) + 'B' : n >= 1e6 ? (n / 1e6).toLocaleString('pl-PL', { maximumFractionDigits: 1 }) + 'M' : fmt(n); }
+  function day(s) { return new Date(s + 'T00:00:00Z').toLocaleDateString('pl-PL', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); }
+  function monthName(m) { return new Date(m + '-01T00:00:00Z').toLocaleDateString('pl-PL', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
   function niceMax(v, steps) { var raw = v / steps, p = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10)), n = raw / p; var s = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10; return s * p * steps; }
 
   // Average block time and issuance over the last `days` days
@@ -211,7 +212,7 @@
       var t = t0 + (px - f.m.l) / f.pw * (t1 - t0), best = 0;
       for (var i = 1; i < rows.length; i++) if (Math.abs(Date.parse(rows[i][0]) - t) < Math.abs(Date.parse(rows[best][0]) - t)) best = i;
       var r = rows[best], cx = x(Date.parse(r[0])); hair.setAttribute('x1', cx); hair.setAttribute('x2', cx); hair.setAttribute('visibility', 'visible');
-      tipAt(box, tip, cx * box.clientWidth / f.W, y(r[3]) * box.clientWidth / f.W, '<span>' + day(r[0]) + '</span><b>' + fmt(r[3]) + '</b> addresses with a balance');
+      tipAt(box, tip, cx * box.clientWidth / f.W, y(r[3]) * box.clientWidth / f.W, '<span>' + day(r[0]) + '</span><b>' + fmt(r[3]) + '</b> adresów z saldem');
     }
     svg.addEventListener('pointermove', function (e) { var b = svg.getBoundingClientRect(); show((e.clientX - b.left) * f.W / b.width); });
     svg.addEventListener('pointerleave', function () { tip.hidden = true; hair.setAttribute('visibility', 'hidden'); });
@@ -225,7 +226,7 @@
     var svg = el('svg', { viewBox: '0 0 ' + f.W + ' ' + f.H, width: f.W, height: f.H, 'aria-hidden': 'true' });
     [0, 400, 800, 1200, 1600].forEach(function (v, k) { var gy = Math.round(y(v)) + 0.5;
       svg.appendChild(el('line', { 'class': k ? 'grid' : 'base', x1: f.m.l, x2: f.W - f.m.r, y1: gy, y2: gy }));
-      svg.appendChild(el('text', { x: f.m.l - 8, y: gy + 4, 'text-anchor': 'end' }, v.toLocaleString('en-US'))); });
+      svg.appendChild(el('text', { x: f.m.l - 8, y: gy + 4, 'text-anchor': 'end' }, v.toLocaleString('pl-PL'))); });
     data.forEach(function (b, i) {
       var cx = f.m.l + slot * (i + 0.5), top = y(b.perDay), h = y(0) - top;
       svg.appendChild(el('rect', { 'class': 'col' + (b.m === thisMonth ? ' part' : ''), x: (cx - bw / 2).toFixed(1), y: top.toFixed(1), width: bw.toFixed(1), height: Math.max(0, h).toFixed(1), rx: Math.min(3, bw / 2) }));
@@ -234,14 +235,14 @@
     });
     var ry = Math.round(y(1440)) + 0.5;
     svg.appendChild(el('line', { 'class': 'ref', x1: f.m.l, x2: f.W - f.m.r, y1: ry, y2: ry }));
-    svg.appendChild(el('text', { x: f.m.l + 6, y: ry - 6 }, 'target: 1,440 a day'));
+    svg.appendChild(el('text', { x: f.m.l + 6, y: ry - 6 }, 'cel: 1 440 dziennie'));
     box.appendChild(svg); box.appendChild(tip);
     svg.addEventListener('pointermove', function (e) {
       var r = svg.getBoundingClientRect(), px = (e.clientX - r.left) * f.W / r.width, i = Math.floor((px - f.m.l) / slot);
       if (i < 0 || i >= n) { tip.hidden = true; return; }
       var b = data[i];
       tipAt(box, tip, (f.m.l + slot * (i + 0.5)) * box.clientWidth / f.W, y(b.perDay) * box.clientWidth / f.W,
-        '<span>' + monthName(b.m) + (b.m === thisMonth ? ' (so far)' : '') + '</span><b>' + fmt(b.perDay) + '</b> blocks a day · one every <b>' + b.blockTime.toFixed(1) + ' s</b>');
+        '<span>' + monthName(b.m) + (b.m === thisMonth ? ' (dotąd)' : '') + '</span><b>' + fmt(b.perDay) + '</b> bloków dziennie · jeden co <b>' + b.blockTime.toFixed(1) + ' s</b>');
     });
     svg.addEventListener('pointerleave', function () { tip.hidden = true; });
   }
@@ -263,12 +264,12 @@
   }
 
   function render() { if (!rows) return; drawAddresses(); drawBlocks(); }
-  fetch('data/network.json').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+  fetch('../data/network.json').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
     rows = d.rows; fill(); render();
     var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(render, 150); });
-  }).catch(function () { $('net-status').textContent = 'The daily data could not be loaded just now. The figures above are from October 6, 2026.'; });
+  }).catch(function () { $('net-status').textContent = 'Nie udało się wczytać dziennych danych. Liczby powyżej pochodzą z 6 października 2026.'; });
 })();
 </script>
-<script src="chrome.js?v=20261007d" defer></script>
+<script src="../chrome.js?v=20261007d" defer></script>
 </body>
 </html>

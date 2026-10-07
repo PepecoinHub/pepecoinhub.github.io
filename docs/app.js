@@ -226,7 +226,14 @@
   };
 
   const state = {
-    lang: store.get('phw-lang') || ((navigator.language || 'en').toLowerCase().startsWith('pl') ? 'pl' : 'en'),
+    lang: (function () {
+      var stored = store.get('phw-lang');
+      if (stored === 'en' || stored === 'pl') return stored;
+      var htmlLang = (document.documentElement.lang || '').toLowerCase();
+      if (htmlLang.indexOf('pl') === 0) return 'pl';
+      try { if ((location.pathname || '').indexOf('/pl/') === 0) return 'pl'; } catch (e) {}
+      return (navigator.language || 'en').toLowerCase().startsWith('pl') ? 'pl' : 'en';
+    })(),
     view: 'all',
     period: 7,
     range: 90,
@@ -234,6 +241,13 @@
     q: '',
     page: 0
   };
+  // Data files live next to app.js (site root), not next to /pl/rich-list.html.
+  const DATA_BASE = (function () {
+    var s = document.currentScript && document.currentScript.src;
+    try { return new URL('.', s || location.href).href; } catch (e) { return ''; }
+  })();
+  const dataUrl = (name) => DATA_BASE + 'data/' + name;
+
   let S = null;            // summary.json
   let resizers = [];       // chart redraw callbacks, rebuilt on every render
 
@@ -838,7 +852,7 @@
   function footer() {
     return h('footer', {},
       h('span', {}, t('sources')),
-      h('a', { href: 'data/shares.csv' }, t('csv')),
+      h('a', { href: dataUrl('shares.csv') }, t('csv')),
       h('span', {}, t('nofa')));
   }
 
@@ -869,7 +883,7 @@
   }
 
   document.documentElement.lang = state.lang;
-  fetch('data/summary.json', { cache: 'no-cache' })
+  fetch(dataUrl('summary.json'), { cache: 'no-cache' })
     .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then((data) => { S = data; lastW = app.clientWidth; render(); })
     .catch(showEmpty);
