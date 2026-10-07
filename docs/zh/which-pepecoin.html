@@ -125,7 +125,7 @@
         </tr>
         <tr>
           <th scope="row">供应量</th>
-          <td><span class="num">约 1048 亿</span>，每个区块新增 10,000 枚，无上限</td>
+          <td><span class="num">约 <span data-live="supply-yi">1048</span> 亿</span>，每个区块新增 10,000 枚，无上限</td>
           <td><span class="num">420.69 万亿</span>，固定</td>
           <td><span class="num">约 1.07 亿</span>，在 Ethereum 上流通</td>
         </tr>
@@ -202,7 +202,7 @@
     <dt>矿池（示例）</dt>
     <dd>其中包括：ViaBTC、AntPool、KuPool、Mining-Dutch、litecoinpool.org、Binance Pool、F2Pool、EMCD。另见<a href="../rich-list.html">富豪榜</a>中的矿池标签以及 <a href="https://peppool.space/mining">peppool.space</a>。<span class="src">区块浏览器 coinbase + 矿池面板</span></dd>
     <dt>供应量</dt>
-    <dd>Pepeplorer 等区块浏览器显示为<span class="num">约 1048 亿</span> PEP。部分聚合平台仍显示约 1029 亿——请优先参考注明日期的实时区块浏览器。<span class="src">Pepeplorer；CoinMarketCap</span></dd>
+    <dd>Pepeplorer 等区块浏览器显示为<span class="num">约 <span data-live="supply-yi">1048</span> 亿</span> PEP。部分聚合平台仍显示约 1029 亿——请优先参考注明日期的实时区块浏览器。<span class="src">Pepeplorer；CoinMarketCap</span></dd>
     <dt>Kraken / MiCA</dt>
     <dd>PEP 自 <strong>2026年2月11日</strong>起在 Kraken 交易。Pepecoin LLC 的 MiCA 白皮书（pepecoin.com 上引用的通报信息：2026年4月7日通报，2026年5月8日发布）。可用性可能因地区而异——这是交易所政策和监管所致，并非链本身的特性。<span class="src">Kraken 博客；pepecoin.com/mica-whitepaper.xhtml</span></dd>
     <dt>源代码</dt>
@@ -304,6 +304,7 @@ document.querySelectorAll('.copy').forEach(function (btn) {
   });
 });
 </script>
+<script src="../live.js" defer></script>
 <script src="../chrome.js" defer></script>
 </body>
 </html>

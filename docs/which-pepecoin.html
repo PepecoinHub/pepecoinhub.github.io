@@ -125,7 +125,7 @@
         </tr>
         <tr>
           <th scope="row">Supply</th>
-          <td><span class="num">~104.8 billion</span>, plus 10,000 per block, no cap</td>
+          <td><span class="num">~<span data-live="supply-b">104.8</span> billion</span>, plus 10,000 per block, no cap</td>
           <td><span class="num">420.69 trillion</span>, fixed</td>
           <td><span class="num">~107 million</span> circulating on Ethereum</td>
         </tr>
@@ -202,7 +202,7 @@
     <dt>Pools (examples)</dt>
     <dd>Among others: ViaBTC, AntPool, KuPool, Mining-Dutch, litecoinpool.org, Binance Pool, F2Pool, EMCD. See also <a href="rich-list.html">rich list</a> pool tags and <a href="https://peppool.space/mining">peppool.space</a>. <span class="src">Explorer coinbase + pool dashboards</span></dd>
     <dt>Supply</dt>
-    <dd><span class="num">~104.8 billion</span> PEP per explorers such as Pepeplorer. Some aggregators still show ~102.9 billion — prefer a live explorer with a date. <span class="src">Pepeplorer; CoinMarketCap</span></dd>
+    <dd><span class="num">~<span data-live="supply-b">104.8</span> billion</span> PEP per explorers such as Pepeplorer. Some aggregators still show ~102.9 billion — prefer a live explorer with a date. <span class="src">Pepeplorer; CoinMarketCap</span></dd>
     <dt>Kraken / MiCA</dt>
     <dd>PEP trading on Kraken from <strong>11 February 2026</strong>. MiCA white paper for Pepecoin LLC (notification context cited on pepecoin.com: notified April 7, 2026, published May 8, 2026). Geographic availability can differ by region — that is exchange policy and regulation, not a chain feature. <span class="src">Kraken blog; pepecoin.com/mica-whitepaper.xhtml</span></dd>
     <dt>Code</dt>
@@ -239,7 +239,7 @@
     </details>
     <details>
       <summary>Why might CoinMarketCap show a different supply than explorers?</summary>
-      <p>Explorers such as Pepeplorer show about <span class="num">104.8 billion</span> PEP. Some aggregators still show about <span class="num">102.9 billion</span> — prefer a live explorer with a date. See “Pepecoin (PEP) in numbers” above.</p>
+      <p>Explorers such as Pepeplorer show about <span class="num"><span data-live="supply-b">104.8</span> billion</span> PEP. Some aggregators still show about <span class="num">102.9 billion</span> — prefer a live explorer with a date. See “Pepecoin (PEP) in numbers” above.</p>
     </details>
     <details>
       <summary>Does a rich-list address equal one person?</summary>
@@ -316,6 +316,7 @@ document.querySelectorAll('.copy').forEach(function (btn) {
   });
 });
 </script>
+<script src="live.js" defer></script>
 <script src="chrome.js" defer></script>
 </body>
 </html>
