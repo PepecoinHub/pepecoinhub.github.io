@@ -147,10 +147,10 @@ button.combo-val:hover { border-color: var(--accent); }
           <span class="amount-unit" aria-hidden="true">PEP</span>
         </div>
         <div class="presets" role="group" aria-label="Przykładowe ilości">
-          <button type="button" class="preset" data-v="100000">100K</button>
-          <button type="button" class="preset" data-v="1000000">1M</button>
-          <button type="button" class="preset" data-v="10000000">10M</button>
-          <button type="button" class="preset" data-v="100000000">100M</button>
+          <button type="button" class="preset" data-v="100000">100 tys.</button>
+          <button type="button" class="preset" data-v="1000000">1 mln</button>
+          <button type="button" class="preset" data-v="10000000">10 mln</button>
+          <button type="button" class="preset" data-v="100000000">100 mln</button>
         </div>
         <span class="field-hint" id="amount-hint">Zostaw puste, żeby zobaczyć wartość jednego PEP.</span>
       </div>
@@ -175,8 +175,8 @@ button.combo-val:hover { border-color: var(--accent); }
       <p class="out-value" id="r-value">$0,1406</p>
       <p class="out-meta"><span class="pill" id="r-mult">▲ 1555×</span><span>warte <b id="r-now">$0,00009042</b> dziś</span></p>
       <dl class="receipt">
-        <div><dt id="m-target-label">Kapitalizacja Dogecoin dziś</dt><dd id="m-target">$14,7B</dd></div>
-        <div><dt>÷ podaż Pepecoin</dt><dd id="m-supply">104,8B PEP</dd></div>
+        <div><dt id="m-target-label">Kapitalizacja Dogecoin dziś</dt><dd id="m-target">$14,7 mld</dd></div>
+        <div><dt>÷ podaż Pepecoin</dt><dd id="m-supply">104,8 mld PEP</dd></div>
         <div><dt>= za PEP</dt><dd id="m-price">$0,1406</dd></div>
         <div id="m-qty-row" hidden><dt>× Twój PEP</dt><dd id="m-qty"></dd></div>
       </dl>
@@ -333,7 +333,7 @@ button.combo-val:hover { border-color: var(--accent); }
   }
   function big(v, prefix) {
     if (v === null) return 'n/a';
-    var units = [[1e12, 'T'], [1e9, 'B'], [1e6, 'M'], [1e3, 'K']];
+    var units = [[1e12, '\u00a0bln'], [1e9, '\u00a0mld'], [1e6, '\u00a0mln'], [1e3, '\u00a0tys.']];
     for (var i = 0; i < units.length; i++) {
       if (v >= units[i][0]) {
         var n = v / units[i][0];
@@ -375,8 +375,8 @@ button.combo-val:hover { border-color: var(--accent); }
 
   // Coin badge: the real logo for Pepecoin and the quick picks (assets/coins, from web3icons),
   // the first letter of the symbol for any other coin.
-  var LOGO = { dogecoin: 'assets/coins/doge.png', litecoin: 'assets/coins/ltc.png', bitcoin: 'assets/coins/btc.png', pepe: 'assets/coins/pepe.png' };
-  LOGO[PEP_ID] = 'assets/brand/icon.svg';
+  var LOGO = { dogecoin: '../assets/coins/doge.png', litecoin: '../assets/coins/ltc.png', bitcoin: '../assets/coins/btc.png', pepe: '../assets/coins/pepe.png' };
+  LOGO[PEP_ID] = '../assets/brand/icon.svg';
   function glyph(id, symbol) {
     if (LOGO[id]) {
       var img = document.createElement('img');

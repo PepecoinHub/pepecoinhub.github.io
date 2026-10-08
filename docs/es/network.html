@@ -75,11 +75,11 @@
 
 <section aria-label="Últimas cifras">
   <div class="stats">
-    <div class="stat"><span class="label">Altura de bloque</span><span class="value" id="s-height">1.238.910</span><span class="sub">bloques desde el 30 de enero de 2024</span></div>
-    <div class="stat"><span class="label">Suministro</span><span class="value" id="s-supply">104,83B</span><span class="sub">PEP, todas las monedas proceden de la minería</span></div>
-    <div class="stat"><span class="label">Direcciones con saldo</span><span class="value" id="s-addr">295.767</span><span class="sub">una dirección no es una persona</span></div>
+    <div class="stat"><span class="label">Altura de bloque</span><span class="value" id="s-height">1 238 910</span><span class="sub">bloques desde el 30 de enero de 2024</span></div>
+    <div class="stat"><span class="label">Suministro</span><span class="value" id="s-supply">104,83 mil M</span><span class="sub">PEP, todas las monedas proceden de la minería</span></div>
+    <div class="stat"><span class="label">Direcciones con saldo</span><span class="value" id="s-addr">295 767</span><span class="sub">una dirección no es una persona</span></div>
     <div class="stat"><span class="label">Bloque medio, 30 días</span><span class="value" id="s-bt">62,6 s</span><span class="sub">objetivo: 60 s</span></div>
-    <div class="stat"><span class="label">PEP nuevos al día, 30 días</span><span class="value" id="s-day">13,8M</span><span class="sub">14,4 M con el objetivo de 60 s</span></div>
+    <div class="stat"><span class="label">PEP nuevos al día, 30 días</span><span class="value" id="s-day">13,8 M</span><span class="sub">14,4 M con el objetivo de 60 s</span></div>
   </div>
   <p class="src" id="net-status"></p>
 </section>
@@ -88,14 +88,14 @@
   <h2 id="addr-h">Direcciones con PEP</h2>
   <p class="note">Direcciones con un saldo mayor que cero: un punto por semana hasta septiembre de 2025 y uno por día desde entonces. Pasa el cursor o toca el gráfico para ver una fecha.</p>
   <figure class="chart">
-    <div class="plot" id="addr-plot" role="img" aria-label="Gráfico de líneas de las direcciones de Pepecoin con saldo, que pasan de 344 en febrero de 2024 a unas 296.000 en octubre de 2026."></div>
+    <div class="plot" id="addr-plot" role="img" aria-label="Gráfico de líneas de las direcciones de Pepecoin con saldo, que pasan de 344 en febrero de 2024 a unas 296 000 en octubre de 2026."></div>
     <div class="tip" id="addr-tip" hidden></div>
   </figure>
 </section>
 
 <section aria-labelledby="blocks-h">
   <h2 id="blocks-h">Bloques por día, por mes</h2>
-  <p class="note">Pepecoin busca un bloque cada 60 segundos, es decir, 1440 al día. En marzo y abril de 2024, antes de que la minería combinada empezara en el bloque 42.000 en mayo, un bloque tardaba de media entre 8 y 13 minutos. Desde junio de 2024 el ritmo se ha mantenido cerca del objetivo: un bloque cada 62,6 segundos en el último año. La barra más clara es el mes en curso hasta hoy.</p>
+  <p class="note">Pepecoin busca un bloque cada 60 segundos, es decir, 1440 al día. En marzo y abril de 2024, antes de que la minería combinada empezara en el bloque 42 000 en mayo, un bloque tardaba de media entre 8 y 13 minutos. Desde junio de 2024 el ritmo se ha mantenido cerca del objetivo: un bloque cada 62,6 segundos en el último año. La barra más clara es el mes en curso hasta hoy.</p>
   <figure class="chart">
     <div class="plot" id="blocks-plot" role="img" aria-label="Gráfico de columnas de la media de bloques por día de cada mes desde febrero de 2024, frente al objetivo de 1440."></div>
     <div class="tip" id="blocks-tip" hidden></div>
@@ -152,12 +152,14 @@
 <script>
 (function () {
   'use strict';
+  // Spanish pages group thousands with a non-breaking space, like live.js and the other Spanish pages (es-ES Intl uses a dot).
+  function esNum(v, o) { return v.toLocaleString('es-ES', o).replace(/\./g, '\u00a0'); }
   var SVG = 'http://www.w3.org/2000/svg';
   var rows = null;
   function $(id) { return document.getElementById(id); }
   function el(n, a, t) { var e = document.createElementNS(SVG, n); for (var k in a) e.setAttribute(k, a[k]); if (t != null) e.textContent = t; return e; }
-  function fmt(n) { return Math.round(n).toLocaleString('es-ES'); }
-  function big(n) { return n >= 1e9 ? (n / 1e9).toLocaleString('es-ES', { maximumFractionDigits: 2 }) + 'B' : n >= 1e6 ? (n / 1e6).toLocaleString('es-ES', { maximumFractionDigits: 1 }) + 'M' : fmt(n); }
+  function fmt(n) { return esNum(Math.round(n)); }
+  function big(n) { return n >= 1e9 ? esNum((n / 1e9), { maximumFractionDigits: 2 }) + '\u00a0mil\u00a0M' : n >= 1e6 ? esNum((n / 1e6), { maximumFractionDigits: 1 }) + '\u00a0M' : fmt(n); }
   function day(s) { return new Date(s + 'T00:00:00Z').toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); }
   function monthName(m) { return new Date(m + '-01T00:00:00Z').toLocaleDateString('es-ES', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
   function niceMax(v, steps) { var raw = v / steps, p = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10)), n = raw / p; var s = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10; return s * p * steps; }
@@ -202,7 +204,7 @@
     var svg = el('svg', { viewBox: '0 0 ' + f.W + ' ' + f.H, width: f.W, height: f.H, 'aria-hidden': 'true' });
     for (var k = 0; k <= 3; k++) { var v = ymax * k / 3, gy = Math.round(y(v)) + 0.5;
       svg.appendChild(el('line', { 'class': k ? 'grid' : 'base', x1: f.m.l, x2: f.W - f.m.r, y1: gy, y2: gy }));
-      svg.appendChild(el('text', { x: f.m.l - 8, y: gy + 4, 'text-anchor': 'end' }, v >= 1000 ? (v / 1000) + 'K' : v)); }
+      svg.appendChild(el('text', { x: f.m.l - 8, y: gy + 4, 'text-anchor': 'end' }, v >= 1000 ? esNum((v / 1000)) + '\u00a0mil' : v)); }
     svg.appendChild(el('text', { x: f.m.l, y: f.H - 8, 'text-anchor': 'start' }, monthName(rows[0][0].slice(0, 7))));
     for (var yr = 2025; yr <= 2027; yr++) { var ty = Date.UTC(yr, 0, 1); if (ty < t0 || ty > t1) continue;
       svg.appendChild(el('text', { x: x(ty), y: f.H - 8, 'text-anchor': 'middle' }, yr)); }
@@ -232,7 +234,7 @@
     var svg = el('svg', { viewBox: '0 0 ' + f.W + ' ' + f.H, width: f.W, height: f.H, 'aria-hidden': 'true' });
     [0, 400, 800, 1200, 1600].forEach(function (v, k) { var gy = Math.round(y(v)) + 0.5;
       svg.appendChild(el('line', { 'class': k ? 'grid' : 'base', x1: f.m.l, x2: f.W - f.m.r, y1: gy, y2: gy }));
-      svg.appendChild(el('text', { x: f.m.l - 8, y: gy + 4, 'text-anchor': 'end' }, v.toLocaleString('es-ES'))); });
+      svg.appendChild(el('text', { x: f.m.l - 8, y: gy + 4, 'text-anchor': 'end' }, esNum(v))); });
     data.forEach(function (b, i) {
       var cx = f.m.l + slot * (i + 0.5), top = y(b.perDay), h = y(0) - top;
       svg.appendChild(el('rect', { 'class': 'col' + (b.m === thisMonth ? ' part' : ''), x: (cx - bw / 2).toFixed(1), y: top.toFixed(1), width: bw.toFixed(1), height: Math.max(0, h).toFixed(1), rx: Math.min(3, bw / 2) }));
@@ -248,7 +250,7 @@
       if (i < 0 || i >= n) { tip.hidden = true; return; }
       var b = data[i];
       tipAt(box, tip, (f.m.l + slot * (i + 0.5)) * box.clientWidth / f.W, y(b.perDay) * box.clientWidth / f.W,
-        '<span>' + monthName(b.m) + (b.m === thisMonth ? ' (hasta ahora)' : '') + '</span><b>' + fmt(b.perDay) + '</b> bloques al día · uno cada <b>' + b.blockTime.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' s</b>');
+        '<span>' + monthName(b.m) + (b.m === thisMonth ? ' (hasta ahora)' : '') + '</span><b>' + fmt(b.perDay) + '</b> bloques al día · uno cada <b>' + esNum(b.blockTime, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' s</b>');
     });
     svg.addEventListener('pointerleave', function () { tip.hidden = true; });
   }
@@ -259,7 +261,7 @@
     $('s-height').textContent = fmt(last[1]);
     $('s-supply').textContent = big(last[2]);
     $('s-addr').textContent = fmt(last[3]);
-    if (w) { $('s-bt').textContent = w.blockTime.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' s'; $('s-day').textContent = big(w.perDay); }
+    if (w) { $('s-bt').textContent = esNum(w.blockTime, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' s'; $('s-day').textContent = big(w.perDay); }
     var body = $('days'), recent = rows.slice(-15); body.textContent = '';
     for (var i = recent.length - 1; i > 0; i--) {
       var r = recent[i], tr = document.createElement('tr');

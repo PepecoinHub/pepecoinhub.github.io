@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Calculadora de capitalización de PEP: tus Pepecoin con la capitalización de Dogecoin o de cualquier moneda del top 100</title>
-<meta name="description" content="Escribe cuántos Pepecoin (PEP) tienes y descubre cuánto valdrían con la capitalización de mercado de Dogecoin, Litecoin, Bitcoin, Pepe o cualquier moneda del top 100, hoy o en su máximo histórico. Precios de CoinGecko en directo; aritmética, no una previsión.">
+<meta name="description" content="Escribe cuántos Pepecoin (PEP) tienes y descubre cuánto valdrían con la capitalización de mercado de Dogecoin, Litecoin, Bitcoin, Pepe o cualquier moneda del top 100, hoy o en su ATH. Precios de CoinGecko en directo; aritmética, no una previsión.">
 <link rel="canonical" href="https://pepecoinhub.com/es/calculator.html">
 <link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html">
 <link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html">
@@ -19,7 +19,7 @@
 <meta property="og:locale" content="es_ES">
 <meta property="og:site_name" content="Pepecoin Hub">
 <meta property="og:title" content="Calculadora de capitalización de PEP: tus Pepecoin con la capitalización de Dogecoin o de cualquier moneda del top 100">
-<meta property="og:description" content="Escribe cuántos Pepecoin (PEP) tienes y descubre cuánto valdrían con la capitalización de mercado de Dogecoin, Litecoin, Bitcoin, Pepe o cualquier moneda del top 100, hoy o en su máximo histórico. Precios de CoinGecko en directo; aritmética, no una previsión.">
+<meta property="og:description" content="Escribe cuántos Pepecoin (PEP) tienes y descubre cuánto valdrían con la capitalización de mercado de Dogecoin, Litecoin, Bitcoin, Pepe o cualquier moneda del top 100, hoy o en su ATH. Precios de CoinGecko en directo; aritmética, no una previsión.">
 <meta property="og:url" content="https://pepecoinhub.com/es/calculator.html">
 <meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -34,7 +34,7 @@
 <link rel="stylesheet" href="../facts.css?v=20261007d">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/es/"}, {"@type": "ListItem", "position": 2, "name": "Calculadora de capitalización", "item": "https://pepecoinhub.com/es/calculator.html"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Cómo se calcula el valor?", "acceptedAnswer": {"@type": "Answer", "text": "La capitalización de otra moneda dividida entre el suministro de Pepecoin da el precio que tendría un PEP a ese tamaño, y ese precio multiplicado por tus PEP es el valor. Con la instantánea guardada (CoinGecko, 4–5 de octubre de 2026): capitalización de Dogecoin de 14.700 millones de $ ÷ 104.800 millones de PEP ≈ 0,14 $ por PEP."}}, {"@type": "Question", "name": "¿Es una predicción de precio?", "acceptedAnswer": {"@type": "Answer", "text": "No. Compara tamaños con aritmética. Los precios dependen de la demanda, y nada aquí dice que Pepecoin vaya a alcanzar la capitalización de otra moneda."}}, {"@type": "Question", "name": "¿De dónde salen los precios?", "acceptedAnswer": {"@type": "Answer", "text": "De la API pública de CoinGecko: Pepecoin más las 100 principales monedas por capitalización, cargadas en tu navegador y reutilizadas hasta 10 minutos. Si no se pueden cargar, la página muestra una instantánea guardada del 4–5 de octubre de 2026."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Cómo se calcula el valor?", "acceptedAnswer": {"@type": "Answer", "text": "La capitalización de otra moneda dividida entre el suministro de Pepecoin da el precio que tendría un PEP a ese tamaño, y ese precio multiplicado por tus PEP es el valor. Con la instantánea guardada (CoinGecko, 4–5 de octubre de 2026): capitalización de Dogecoin de 14 700 millones de $ ÷ 104 800 millones de PEP ≈ 0,14 $ por PEP."}}, {"@type": "Question", "name": "¿Es una predicción de precio?", "acceptedAnswer": {"@type": "Answer", "text": "No. Compara tamaños con aritmética. Los precios dependen de la demanda, y nada aquí dice que Pepecoin vaya a alcanzar la capitalización de otra moneda."}}, {"@type": "Question", "name": "¿De dónde salen los precios?", "acceptedAnswer": {"@type": "Answer", "text": "De la API pública de CoinGecko: Pepecoin más las 100 principales monedas por capitalización, cargadas en tu navegador y reutilizadas hasta 10 minutos. Si no se pueden cargar, la página muestra una instantánea guardada del 4–5 de octubre de 2026."}}]}</script>
 <style>
 /* Calculator: inputs on the left, the answer on the right, every combination as cards below */
 .calc { background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 24px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 28px; box-shadow: 0 1px 0 rgba(33,33,33,0.04); }
@@ -147,10 +147,10 @@ button.combo-val:hover { border-color: var(--accent); }
           <span class="amount-unit" aria-hidden="true">PEP</span>
         </div>
         <div class="presets" role="group" aria-label="Cantidades de ejemplo">
-          <button type="button" class="preset" data-v="100000">100K</button>
-          <button type="button" class="preset" data-v="1000000">1M</button>
-          <button type="button" class="preset" data-v="10000000">10M</button>
-          <button type="button" class="preset" data-v="100000000">100M</button>
+          <button type="button" class="preset" data-v="100000">100 mil</button>
+          <button type="button" class="preset" data-v="1000000">1 M</button>
+          <button type="button" class="preset" data-v="10000000">10 M</button>
+          <button type="button" class="preset" data-v="100000000">100 M</button>
         </div>
         <span class="field-hint" id="amount-hint">Déjalo vacío para ver el valor de un PEP.</span>
       </div>
@@ -165,7 +165,7 @@ button.combo-val:hover { border-color: var(--accent); }
         <span class="field-label" id="mode-label"><span class="step">3</span>Capitalización de mercado</span>
         <div class="seg" role="group" aria-labelledby="mode-label">
           <button type="button" id="mode-now" aria-pressed="true">Hoy</button>
-          <button type="button" id="mode-ath" aria-pressed="false">En su máximo histórico</button>
+          <button type="button" id="mode-ath" aria-pressed="false">En su all-time high</button>
         </div>
       </div>
     </div>
@@ -175,19 +175,19 @@ button.combo-val:hover { border-color: var(--accent); }
       <p class="out-value" id="r-value">$0,1406</p>
       <p class="out-meta"><span class="pill" id="r-mult">▲ 1555×</span><span>vale <b id="r-now">$0,00009042</b> hoy</span></p>
       <dl class="receipt">
-        <div><dt id="m-target-label">Capitalización de Dogecoin hoy</dt><dd id="m-target">$14,7B</dd></div>
-        <div><dt>÷ suministro de Pepecoin</dt><dd id="m-supply">104,8B PEP</dd></div>
+        <div><dt id="m-target-label">Capitalización de Dogecoin hoy</dt><dd id="m-target">$14,7 mil M</dd></div>
+        <div><dt>÷ suministro de Pepecoin</dt><dd id="m-supply">104,8 mil M PEP</dd></div>
         <div><dt>= por PEP</dt><dd id="m-price">$0,1406</dd></div>
         <div id="m-qty-row" hidden><dt>× tus PEP</dt><dd id="m-qty"></dd></div>
       </dl>
-      <p class="out-note" id="ath-note" hidden>El modo de máximo histórico usa el precio más alto de la moneda × su suministro actual. En monedas que siguen emitiendo, como Dogecoin, la capitalización real en el pico era menor, porque entonces existían menos monedas.</p>
+      <p class="out-note" id="ath-note" hidden>El modo all-time high usa el precio más alto de la moneda × su suministro actual. En monedas que siguen emitiendo, como Dogecoin, la capitalización real en el pico era menor, porque entonces existían menos monedas.</p>
     </div>
   </div>
 
   <div class="combo">
     <h3 id="combo-h">Un PEP con cada capitalización de esta página</h3>
     <ul class="combo-grid" id="combo-rows" aria-labelledby="combo-h"></ul>
-    <p class="src">Toca un valor para ver su cálculo arriba. Los valores de máximo histórico usan el precio más alto de cada moneda × su suministro actual. La primera tarjeta es PEP a su propio precio actual y en su propio máximo histórico.</p>
+    <p class="src">Toca un valor para ver su cálculo arriba. Los valores ATH usan el precio más alto de cada moneda × su suministro actual. La primera tarjeta es PEP a su propio precio actual y en su propio ATH.</p>
   </div>
 </section>
 
@@ -196,7 +196,7 @@ button.combo-val:hover { border-color: var(--accent); }
   <div class="table-scroll" role="region" aria-labelledby="prices" tabindex="0">
     <table style="min-width: 560px">
       <thead>
-        <tr><th scope="col">Moneda</th><th scope="col" class="r">Precio</th><th scope="col" class="r">Capitalización de mercado</th><th scope="col" class="r">Máximo histórico</th><th scope="col" class="r">Ahora frente al máximo</th></tr>
+        <tr><th scope="col">Moneda</th><th scope="col" class="r">Precio</th><th scope="col" class="r">Capitalización de mercado</th><th scope="col" class="r">All-time high</th><th scope="col" class="r">Ahora frente al máximo</th></tr>
       </thead>
       <tbody id="price-rows"></tbody>
     </table>
@@ -209,8 +209,8 @@ button.combo-val:hover { border-color: var(--accent); }
   <h2 id="how">Cómo funcionan las cifras</h2>
   <div class="prose">
     <p><strong>La capitalización es precio × suministro.</strong> Divide la capitalización de otra moneda entre el número de PEP que existen, unos <span data-live="supply-m">104 800</span> millones, y obtendrás el precio que tendría un PEP a ese tamaño. Multiplícalo por tu cantidad para obtener el valor de tus PEP.</p>
-    <p><strong>Hoy o en el pico.</strong> «Hoy» usa la capitalización actual de cada moneda. «En su máximo histórico» usa el precio más alto de la moneda × su suministro actual. En monedas que siguen emitiendo, como Dogecoin, la capitalización real en el pico era menor, porque entonces existían menos monedas.</p>
-    <p><strong>No es una previsión.</strong> La capitalización es lo que el mercado paga hoy por una moneda, y nada aquí dice que Pepecoin vaya a alcanzar el tamaño de otra. Además, el suministro de PEP crece 10.000 PEP por bloque, así que la misma capitalización supone un precio por PEP algo menor con el tiempo. <a href="supply.html">Suministro e inflación.</a></p>
+    <p><strong>Hoy o en el pico.</strong> «Hoy» usa la capitalización actual de cada moneda. «En su all-time high» usa el precio más alto de la moneda × su suministro actual. En monedas que siguen emitiendo, como Dogecoin, la capitalización real en el pico era menor, porque entonces existían menos monedas.</p>
+    <p><strong>No es una previsión.</strong> La capitalización es lo que el mercado paga hoy por una moneda, y nada aquí dice que Pepecoin vaya a alcanzar el tamaño de otra. Además, el suministro de PEP crece 10 000 PEP por bloque, así que la misma capitalización supone un precio por PEP algo menor con el tiempo. <a href="supply.html">Suministro e inflación.</a></p>
   </div>
 </section>
 
@@ -219,7 +219,7 @@ button.combo-val:hover { border-color: var(--accent); }
   <div class="faq">
     <details open>
       <summary>¿Cómo se calcula el valor?</summary>
-      <p>La capitalización de otra moneda dividida entre el suministro de Pepecoin da el precio que tendría un PEP a ese tamaño, y ese precio multiplicado por tus PEP es el valor. Con la instantánea guardada (CoinGecko, 4–5 de octubre de 2026): capitalización de Dogecoin de 14.700 millones de $ ÷ 104.800 millones de PEP ≈ 0,14 $ por PEP.</p>
+      <p>La capitalización de otra moneda dividida entre el suministro de Pepecoin da el precio que tendría un PEP a ese tamaño, y ese precio multiplicado por tus PEP es el valor. Con la instantánea guardada (CoinGecko, 4–5 de octubre de 2026): capitalización de Dogecoin de 14 700 millones de $ ÷ 104 800 millones de PEP ≈ 0,14 $ por PEP.</p>
     </details>
     <details>
       <summary>¿Es una predicción de precio?</summary>
@@ -275,6 +275,8 @@ button.combo-val:hover { border-color: var(--accent); }
 <script>
 (function () {
   'use strict';
+  // Spanish pages group thousands with a non-breaking space, like live.js and the other Spanish pages (es-ES Intl uses a dot).
+  function esNum(v, o) { return v.toLocaleString('es-ES', o).replace(/\./g, '\u00a0'); }
   var PEP_ID = 'pepecoin-network';
   var QUICK = ['dogecoin', 'litecoin', 'bitcoin', 'pepe'];
   var API = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&sparkline=false';
@@ -327,31 +329,31 @@ button.combo-val:hover { border-color: var(--accent); }
 
   function usd(v) {
     if (v === null) return 'n/a';
-    if (v >= 1000) return '$' + v.toLocaleString('es-ES', { maximumFractionDigits: 0 });
-    if (v >= 1) return '$' + v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return '$' + v.toLocaleString('es-ES', { maximumSignificantDigits: 4 });
+    if (v >= 1000) return '$' + esNum(v, { maximumFractionDigits: 0 });
+    if (v >= 1) return '$' + esNum(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return '$' + esNum(v, { maximumSignificantDigits: 4 });
   }
   function big(v, prefix) {
     if (v === null) return 'n/a';
-    var units = [[1e12, 'T'], [1e9, 'B'], [1e6, 'M'], [1e3, 'K']];
+    var units = [[1e12, '\u00a0B'], [1e9, '\u00a0mil\u00a0M'], [1e6, '\u00a0M'], [1e3, '\u00a0mil']];
     for (var i = 0; i < units.length; i++) {
       if (v >= units[i][0]) {
         var n = v / units[i][0];
-        return (prefix || '') + n.toLocaleString('es-ES', { maximumSignificantDigits: n >= 100 ? 4 : 3 }) + units[i][1];
+        return (prefix || '') + esNum(n, { maximumSignificantDigits: n >= 100 ? 4 : 3 }) + units[i][1];
       }
     }
-    return (prefix || '') + v.toLocaleString('es-ES', { maximumFractionDigits: 0 });
+    return (prefix || '') + esNum(v, { maximumFractionDigits: 0 });
   }
   function money(v) { return v !== null && v >= 1e6 ? big(v, '$') : usd(v); }      // compact, for table cells
   function moneyFull(v) { return v !== null && v >= 1e12 ? big(v, '$') : usd(v); } // whole dollars, for the result
   function mult(x) {
-    if (x >= 100) return x.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + '×';
-    if (x >= 10) return x.toLocaleString('es-ES', { maximumFractionDigits: 1 }) + '×';
-    return x.toLocaleString('es-ES', { maximumFractionDigits: 2 }) + '×';
+    if (x >= 100) return esNum(x, { maximumFractionDigits: 0 }) + '×';
+    if (x >= 10) return esNum(x, { maximumFractionDigits: 1 }) + '×';
+    return esNum(x, { maximumFractionDigits: 2 }) + '×';
   }
-  function pct(x) { return (x * 100).toLocaleString('es-ES', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + '%'; }
-  function share(x) { return (x * 100).toLocaleString('es-ES', { maximumSignificantDigits: 3 }) + '%'; }
-  function qtyText(v) { return v.toLocaleString('es-ES', { maximumFractionDigits: 8 }); }
+  function pct(x) { return esNum((x * 100), { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + '%'; }
+  function share(x) { return esNum((x * 100), { maximumSignificantDigits: 3 }) + '%'; }
+  function qtyText(v) { return esNum(v, { maximumFractionDigits: 8 }); }
 
   // Accepts 13000000, 13,000,000, 13 000 000, 13.000.000, 13000000.5, 13,5 (decimal comma), 13m, 13 mln, 1.5b.
   function parseAmount(raw) {
@@ -375,8 +377,8 @@ button.combo-val:hover { border-color: var(--accent); }
 
   // Coin badge: the real logo for Pepecoin and the quick picks (assets/coins, from web3icons),
   // the first letter of the symbol for any other coin.
-  var LOGO = { dogecoin: 'assets/coins/doge.png', litecoin: 'assets/coins/ltc.png', bitcoin: 'assets/coins/btc.png', pepe: 'assets/coins/pepe.png' };
-  LOGO[PEP_ID] = 'assets/brand/icon.svg';
+  var LOGO = { dogecoin: '../assets/coins/doge.png', litecoin: '../assets/coins/ltc.png', bitcoin: '../assets/coins/btc.png', pepe: '../assets/coins/pepe.png' };
+  LOGO[PEP_ID] = '../assets/brand/icon.svg';
   function glyph(id, symbol) {
     if (LOGO[id]) {
       var img = document.createElement('img');
@@ -415,7 +417,7 @@ button.combo-val:hover { border-color: var(--accent); }
     var x = implied / p.price;
     $('r-amount').textContent = amount === null ? 'Un PEP' : qtyText(amount) + ' PEP';
     $('r-name').textContent = c.name;
-    $('r-when').textContent = mode === 'ath' ? 'en su máximo histórico' : 'hoy';
+    $('r-when').textContent = mode === 'ath' ? 'en su all-time high' : 'hoy';
     $('r-value').textContent = moneyFull(implied * n);
     $('r-mult').textContent = (x >= 1 ? '▲ ' : '▼ ') + mult(x);
     $('r-now').textContent = moneyFull(p.price * n);
@@ -487,7 +489,7 @@ button.combo-val:hover { border-color: var(--accent); }
       var athCap = targetCap(c, 'ath');
       var ath = self ? p.ath : (athCap === null ? null : athCap / ps);
       li.appendChild(comboValue('Hoy', now, id === sel && mode === 'now', self ? null : id, 'now'));
-      li.appendChild(comboValue('Máximo histórico', ath, id === sel && mode === 'ath', self ? null : id, 'ath'));
+      li.appendChild(comboValue('All-time high', ath, id === sel && mode === 'ath', self ? null : id, 'ath'));
       list.appendChild(li);
     });
   }
@@ -580,7 +582,7 @@ button.combo-val:hover { border-color: var(--accent); }
     if (!hasPep) return false;
     setCoins(list);
     renderAll();
-    status('Precios en directo de CoinGecko, actualizados a las ' + new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '. Los máximos históricos son cifras de CoinGecko.');
+    status('Precios en directo de CoinGecko, actualizados a las ' + new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '. Los valores ATH son cifras de CoinGecko.');
     return true;
   }
   function getJSON(url) {

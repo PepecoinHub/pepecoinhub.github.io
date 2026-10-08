@@ -76,10 +76,10 @@
 <section aria-label="Aktuelle Zahlen">
   <div class="stats">
     <div class="stat"><span class="label">Blockhöhe</span><span class="value" id="s-height">1.238.910</span><span class="sub">Blöcke seit dem 30. Januar 2024</span></div>
-    <div class="stat"><span class="label">Coinmenge</span><span class="value" id="s-supply">104,83B</span><span class="sub">PEP, jeder Coin aus dem Mining</span></div>
+    <div class="stat"><span class="label">Coinmenge</span><span class="value" id="s-supply">104,83 Mrd.</span><span class="sub">PEP, jeder Coin aus dem Mining</span></div>
     <div class="stat"><span class="label">Adressen mit Guthaben</span><span class="value" id="s-addr">295.767</span><span class="sub">eine Adresse ist keine Person</span></div>
     <div class="stat"><span class="label">Durchschnittlicher Block, 30 Tage</span><span class="value" id="s-bt">62,6 s</span><span class="sub">Ziel: 60 s</span></div>
-    <div class="stat"><span class="label">Neue PEP pro Tag, 30 Tage</span><span class="value" id="s-day">13,8M</span><span class="sub">14,4 Mio. beim 60-s-Ziel</span></div>
+    <div class="stat"><span class="label">Neue PEP pro Tag, 30 Tage</span><span class="value" id="s-day">13,8 Mio.</span><span class="sub">14,4 Mio. beim 60-s-Ziel</span></div>
   </div>
   <p class="src" id="net-status"></p>
 </section>
@@ -157,7 +157,7 @@
   function $(id) { return document.getElementById(id); }
   function el(n, a, t) { var e = document.createElementNS(SVG, n); for (var k in a) e.setAttribute(k, a[k]); if (t != null) e.textContent = t; return e; }
   function fmt(n) { return Math.round(n).toLocaleString('de-DE'); }
-  function big(n) { return n >= 1e9 ? (n / 1e9).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + 'B' : n >= 1e6 ? (n / 1e6).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + 'M' : fmt(n); }
+  function big(n) { return n >= 1e9 ? (n / 1e9).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + '\u00a0Mrd.' : n >= 1e6 ? (n / 1e6).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + '\u00a0Mio.' : fmt(n); }
   function day(s) { return new Date(s + 'T00:00:00Z').toLocaleDateString('de-DE', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); }
   function monthName(m) { return new Date(m + '-01T00:00:00Z').toLocaleDateString('de-DE', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
   function niceMax(v, steps) { var raw = v / steps, p = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10)), n = raw / p; var s = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10; return s * p * steps; }
@@ -202,7 +202,7 @@
     var svg = el('svg', { viewBox: '0 0 ' + f.W + ' ' + f.H, width: f.W, height: f.H, 'aria-hidden': 'true' });
     for (var k = 0; k <= 3; k++) { var v = ymax * k / 3, gy = Math.round(y(v)) + 0.5;
       svg.appendChild(el('line', { 'class': k ? 'grid' : 'base', x1: f.m.l, x2: f.W - f.m.r, y1: gy, y2: gy }));
-      svg.appendChild(el('text', { x: f.m.l - 8, y: gy + 4, 'text-anchor': 'end' }, v >= 1000 ? (v / 1000) + 'K' : v)); }
+      svg.appendChild(el('text', { x: f.m.l - 8, y: gy + 4, 'text-anchor': 'end' }, v >= 1000 ? (v / 1000).toLocaleString('de-DE') + '\u00a0Tsd.' : v)); }
     svg.appendChild(el('text', { x: f.m.l, y: f.H - 8, 'text-anchor': 'start' }, monthName(rows[0][0].slice(0, 7))));
     for (var yr = 2025; yr <= 2027; yr++) { var ty = Date.UTC(yr, 0, 1); if (ty < t0 || ty > t1) continue;
       svg.appendChild(el('text', { x: x(ty), y: f.H - 8, 'text-anchor': 'middle' }, yr)); }

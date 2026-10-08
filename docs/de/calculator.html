@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PEP-Marktkapitalisierungs-Rechner: deine Pepecoin bei der Marktkapitalisierung von Dogecoin oder eines Top-100-Coins</title>
-<meta name="description" content="Gib ein, wie viele Pepecoin (PEP) du hältst, und sieh, was sie bei der Marktkapitalisierung von Dogecoin, Litecoin, Bitcoin, Pepe oder einem beliebigen Top-100-Coin wert wären – heute oder zu dessen Allzeithoch. Live-Kurse von CoinGecko; Rechnen, keine Prognose.">
+<meta name="description" content="Gib ein, wie viele Pepecoin (PEP) du hältst, und sieh, was sie bei der Marktkapitalisierung von Dogecoin, Litecoin, Bitcoin, Pepe oder einem beliebigen Top-100-Coin wert wären – heute oder zu dessen ATH. Live-Kurse von CoinGecko; Rechnen, keine Prognose.">
 <link rel="canonical" href="https://pepecoinhub.com/de/calculator.html">
 <link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html">
 <link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html">
@@ -19,7 +19,7 @@
 <meta property="og:locale" content="de_DE">
 <meta property="og:site_name" content="Pepecoin Hub">
 <meta property="og:title" content="PEP-Marktkapitalisierungs-Rechner: deine Pepecoin bei der Marktkapitalisierung von Dogecoin oder eines Top-100-Coins">
-<meta property="og:description" content="Gib ein, wie viele Pepecoin (PEP) du hältst, und sieh, was sie bei der Marktkapitalisierung von Dogecoin, Litecoin, Bitcoin, Pepe oder einem beliebigen Top-100-Coin wert wären – heute oder zu dessen Allzeithoch. Live-Kurse von CoinGecko; Rechnen, keine Prognose.">
+<meta property="og:description" content="Gib ein, wie viele Pepecoin (PEP) du hältst, und sieh, was sie bei der Marktkapitalisierung von Dogecoin, Litecoin, Bitcoin, Pepe oder einem beliebigen Top-100-Coin wert wären – heute oder zu dessen ATH. Live-Kurse von CoinGecko; Rechnen, keine Prognose.">
 <meta property="og:url" content="https://pepecoinhub.com/de/calculator.html">
 <meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -147,10 +147,10 @@ button.combo-val:hover { border-color: var(--accent); }
           <span class="amount-unit" aria-hidden="true">PEP</span>
         </div>
         <div class="presets" role="group" aria-label="Beispielbeträge">
-          <button type="button" class="preset" data-v="100000">100K</button>
-          <button type="button" class="preset" data-v="1000000">1M</button>
-          <button type="button" class="preset" data-v="10000000">10M</button>
-          <button type="button" class="preset" data-v="100000000">100M</button>
+          <button type="button" class="preset" data-v="100000">100 Tsd.</button>
+          <button type="button" class="preset" data-v="1000000">1 Mio.</button>
+          <button type="button" class="preset" data-v="10000000">10 Mio.</button>
+          <button type="button" class="preset" data-v="100000000">100 Mio.</button>
         </div>
         <span class="field-hint" id="amount-hint">Leer lassen, um den Wert eines PEP zu sehen.</span>
       </div>
@@ -165,7 +165,7 @@ button.combo-val:hover { border-color: var(--accent); }
         <span class="field-label" id="mode-label"><span class="step">3</span>Marktkapitalisierung</span>
         <div class="seg" role="group" aria-labelledby="mode-label">
           <button type="button" id="mode-now" aria-pressed="true">Heute</button>
-          <button type="button" id="mode-ath" aria-pressed="false">Zum Allzeithoch</button>
+          <button type="button" id="mode-ath" aria-pressed="false">Zum All-time high</button>
         </div>
       </div>
     </div>
@@ -175,19 +175,19 @@ button.combo-val:hover { border-color: var(--accent); }
       <p class="out-value" id="r-value">$0,1406</p>
       <p class="out-meta"><span class="pill" id="r-mult">▲ 1.555×</span><span>heute <b id="r-now">$0,00009042</b> wert</span></p>
       <dl class="receipt">
-        <div><dt id="m-target-label">Marktkapitalisierung von Dogecoin heute</dt><dd id="m-target">$14,7B</dd></div>
-        <div><dt>÷ Coinmenge von Pepecoin</dt><dd id="m-supply">104,8B PEP</dd></div>
+        <div><dt id="m-target-label">Marktkapitalisierung von Dogecoin heute</dt><dd id="m-target">$14,7 Mrd.</dd></div>
+        <div><dt>÷ Coinmenge von Pepecoin</dt><dd id="m-supply">104,8 Mrd. PEP</dd></div>
         <div><dt>= pro PEP</dt><dd id="m-price">$0,1406</dd></div>
         <div id="m-qty-row" hidden><dt>× deine PEP</dt><dd id="m-qty"></dd></div>
       </dl>
-      <p class="out-note" id="ath-note" hidden>Der Allzeithoch-Modus nutzt den höchsten Kurs des Coins × seine heutige Coinmenge. Bei Coins, die weiter neu ausgegeben werden, etwa Dogecoin, war die tatsächliche Marktkapitalisierung am Hoch niedriger, weil damals weniger Coins existierten.</p>
+      <p class="out-note" id="ath-note" hidden>Der All-time-high-Modus nutzt den höchsten Kurs des Coins × seine heutige Coinmenge. Bei Coins, die weiter neu ausgegeben werden, etwa Dogecoin, war die tatsächliche Marktkapitalisierung am Hoch niedriger, weil damals weniger Coins existierten.</p>
     </div>
   </div>
 
   <div class="combo">
     <h3 id="combo-h">Ein PEP bei jeder Marktkapitalisierung auf dieser Seite</h3>
     <ul class="combo-grid" id="combo-rows" aria-labelledby="combo-h"></ul>
-    <p class="src">Tippe auf einen Wert, um oben die Rechnung zu sehen. Allzeithoch-Werte nutzen den höchsten Kurs jedes Coins × seine heutige Coinmenge. Die erste Karte zeigt PEP zum eigenen heutigen Kurs und zum eigenen Allzeithoch.</p>
+    <p class="src">Tippe auf einen Wert, um oben die Rechnung zu sehen. ATH-Werte nutzen den höchsten Kurs jedes Coins × seine heutige Coinmenge. Die erste Karte zeigt PEP zum eigenen heutigen Kurs und zum eigenen ATH.</p>
   </div>
 </section>
 
@@ -196,7 +196,7 @@ button.combo-val:hover { border-color: var(--accent); }
   <div class="table-scroll" role="region" aria-labelledby="prices" tabindex="0">
     <table style="min-width: 560px">
       <thead>
-        <tr><th scope="col">Coin</th><th scope="col" class="r">Kurs</th><th scope="col" class="r">Marktkapitalisierung</th><th scope="col" class="r">Allzeithoch</th><th scope="col" class="r">Jetzt vs. Hoch</th></tr>
+        <tr><th scope="col">Coin</th><th scope="col" class="r">Kurs</th><th scope="col" class="r">Marktkapitalisierung</th><th scope="col" class="r">All-time high</th><th scope="col" class="r">Jetzt vs. Hoch</th></tr>
       </thead>
       <tbody id="price-rows"></tbody>
     </table>
@@ -209,7 +209,7 @@ button.combo-val:hover { border-color: var(--accent); }
   <h2 id="how">Wie die Zahlen funktionieren</h2>
   <div class="prose">
     <p><strong>Marktkapitalisierung ist Kurs × Coinmenge.</strong> Teile die Marktkapitalisierung eines anderen Coins durch die Zahl der existierenden PEP, etwa <span data-live="supply-b">104,8</span> Milliarden, und du erhältst den Preis, den ein PEP bei dieser Größe hätte. Multipliziere ihn mit deinem Betrag, um den Wert deiner PEP zu erhalten.</p>
-    <p><strong>Heute oder am Hoch.</strong> „Heute“ nutzt die aktuelle Marktkapitalisierung jedes Coins. „Zum Allzeithoch“ nutzt den höchsten Kurs des Coins × seine heutige Coinmenge. Bei Coins, die weiter neu ausgegeben werden, etwa Dogecoin, war die tatsächliche Marktkapitalisierung am Hoch niedriger, weil damals weniger Coins existierten.</p>
+    <p><strong>Heute oder am Hoch.</strong> „Heute“ nutzt die aktuelle Marktkapitalisierung jedes Coins. „Zum All-time high“ nutzt den höchsten Kurs des Coins × seine heutige Coinmenge. Bei Coins, die weiter neu ausgegeben werden, etwa Dogecoin, war die tatsächliche Marktkapitalisierung am Hoch niedriger, weil damals weniger Coins existierten.</p>
     <p><strong>Keine Prognose.</strong> Die Marktkapitalisierung ist das, was der Markt heute für einen Coin bezahlt, und nichts hier besagt, dass Pepecoin die Größe eines anderen Coins erreicht. Außerdem wächst die Coinmenge von PEP um 10.000 PEP pro Block, dieselbe Marktkapitalisierung bedeutet mit der Zeit also einen etwas niedrigeren Preis pro PEP. <a href="supply.html">Coinmenge und Inflation.</a></p>
   </div>
 </section>
@@ -333,7 +333,7 @@ button.combo-val:hover { border-color: var(--accent); }
   }
   function big(v, prefix) {
     if (v === null) return 'n/a';
-    var units = [[1e12, 'T'], [1e9, 'B'], [1e6, 'M'], [1e3, 'K']];
+    var units = [[1e12, '\u00a0Bio.'], [1e9, '\u00a0Mrd.'], [1e6, '\u00a0Mio.'], [1e3, '\u00a0Tsd.']];
     for (var i = 0; i < units.length; i++) {
       if (v >= units[i][0]) {
         var n = v / units[i][0];
@@ -375,8 +375,8 @@ button.combo-val:hover { border-color: var(--accent); }
 
   // Coin badge: the real logo for Pepecoin and the quick picks (assets/coins, from web3icons),
   // the first letter of the symbol for any other coin.
-  var LOGO = { dogecoin: 'assets/coins/doge.png', litecoin: 'assets/coins/ltc.png', bitcoin: 'assets/coins/btc.png', pepe: 'assets/coins/pepe.png' };
-  LOGO[PEP_ID] = 'assets/brand/icon.svg';
+  var LOGO = { dogecoin: '../assets/coins/doge.png', litecoin: '../assets/coins/ltc.png', bitcoin: '../assets/coins/btc.png', pepe: '../assets/coins/pepe.png' };
+  LOGO[PEP_ID] = '../assets/brand/icon.svg';
   function glyph(id, symbol) {
     if (LOGO[id]) {
       var img = document.createElement('img');
@@ -415,7 +415,7 @@ button.combo-val:hover { border-color: var(--accent); }
     var x = implied / p.price;
     $('r-amount').textContent = amount === null ? 'Ein PEP' : qtyText(amount) + ' PEP';
     $('r-name').textContent = c.name;
-    $('r-when').textContent = mode === 'ath' ? 'zum Allzeithoch' : 'heute';
+    $('r-when').textContent = mode === 'ath' ? 'zum All-time high' : 'heute';
     $('r-value').textContent = moneyFull(implied * n);
     $('r-mult').textContent = (x >= 1 ? '▲ ' : '▼ ') + mult(x);
     $('r-now').textContent = moneyFull(p.price * n);
@@ -487,7 +487,7 @@ button.combo-val:hover { border-color: var(--accent); }
       var athCap = targetCap(c, 'ath');
       var ath = self ? p.ath : (athCap === null ? null : athCap / ps);
       li.appendChild(comboValue('Heute', now, id === sel && mode === 'now', self ? null : id, 'now'));
-      li.appendChild(comboValue('Allzeithoch', ath, id === sel && mode === 'ath', self ? null : id, 'ath'));
+      li.appendChild(comboValue('All-time high', ath, id === sel && mode === 'ath', self ? null : id, 'ath'));
       list.appendChild(li);
     });
   }
@@ -580,7 +580,7 @@ button.combo-val:hover { border-color: var(--accent); }
     if (!hasPep) return false;
     setCoins(list);
     renderAll();
-    status('Live-Kurse von CoinGecko, aktualisiert um ' + new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '. Allzeithochs nach Angaben von CoinGecko.');
+    status('Live-Kurse von CoinGecko, aktualisiert um ' + new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '. ATH-Werte nach Angaben von CoinGecko.');
     return true;
   }
   function getJSON(url) {

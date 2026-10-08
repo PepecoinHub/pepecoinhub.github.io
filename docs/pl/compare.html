@@ -158,12 +158,12 @@
         <tr><th scope="row">Nowe monety rocznie</th><td>Ok. 5,26 mld</td><td>Ok. 5,26 mld <span class="same">to samo</span></td></tr>
         <tr><th scope="row">Merge mining</th><td>Z Litecoinem od bloku 371 337 (wrzesień 2014)</td><td>Z Litecoinem i Dogecoinem od bloku 42 000 (2024)</td></tr>
         <tr><th scope="row">Hashrate</th><td>Ok. 2,1–3,4 PH/s<br><span class="src">28 wrz – 4 paź 2026</span></td><td>Ok. 2,9 PH/s <span class="same">podobnie</span><br><span class="src">6 października 2026</span></td></tr>
-        <tr><th scope="row">Zapłata minerom dziennie</th><td>14,4 mln DOGE ≈ <span id="doge-pay">$1,36M</span></td><td>14,4 mln PEP ≈ <span id="pep-pay">$1302</span></td></tr>
+        <tr><th scope="row">Zapłata minerom dziennie</th><td>14,4 mln DOGE ≈ <span id="doge-pay">$1,36 mln</span></td><td>14,4 mln PEP ≈ <span id="pep-pay">$1302</span></td></tr>
         <tr><th scope="row">Adres zaczyna się od</th><td><code>D</code></td><td><code>P</code></td></tr>
-        <tr><th scope="row">Podaż teraz</th><td><span id="doge-supply">156,2B</span></td><td><span id="pep-supply">104,8B</span></td></tr>
+        <tr><th scope="row">Podaż teraz</th><td><span id="doge-supply">156,2 mld</span></td><td><span id="pep-supply">104,8 mld</span></td></tr>
         <tr><th scope="row">Inflacja teraz</th><td><span id="doge-infl">3,4%</span> rocznie</td><td><span id="pep-infl">5,0%</span> rocznie</td></tr>
         <tr><th scope="row">Cena</th><td><span id="doge-price">$0,0943</span></td><td><span id="pep-price">$0,00009042</span></td></tr>
-        <tr><th scope="row">Kapitalizacja</th><td><span id="doge-mcap">$14,7B</span></td><td><span id="pep-mcap">$9,48M</span></td></tr>
+        <tr><th scope="row">Kapitalizacja</th><td><span id="doge-mcap">$14,7 mld</span></td><td><span id="pep-mcap">$9,48 mln</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -194,11 +194,11 @@
   </figure>
   <div class="stats">
     <div class="stat"><span class="label">Hashrate</span><span class="value">Mniej więcej to samo</span><span class="sub">PEP 2,9 PH/s, w zakresie DOGE 2,1–3,4 PH/s</span></div>
-    <div class="stat"><span class="label">Zapłata minerom dziennie</span><span class="value" id="pay-ratio">1043× mniej</span><span class="sub">PEP <span id="pay-pep2">$1302</span>, DOGE <span id="pay-doge2">$1,36M</span></span></div>
+    <div class="stat"><span class="label">Zapłata minerom dziennie</span><span class="value" id="pay-ratio">1043× mniej</span><span class="sub">PEP <span id="pay-pep2">$1302</span>, DOGE <span id="pay-doge2">$1,36 mln</span></span></div>
     <div class="stat"><span class="label">Kapitalizacja</span><span class="value" id="mcap-ratio">1/1555</span><span class="sub">kapitalizacji Dogecoina</span></div>
   </div>
   <div class="prose">
-    <p><strong>Jak mała moneta dostaje taki hashrate.</strong> Merge mining. Maszyny Scrypt kopiące Pepecoin już dostają zapłatę z Litecoina i Dogecoina — ok. <span id="pay-ltc-doge">$1,61M</span> dziennie w nagrodach bloków łącznie. Pule, które dodają PEP do merge mining, wypłacają go dodatkowo za tę samą pracę i ten sam prąd. <a href="scrypt-family.html">Jak działa merge mining.</a></p>
+    <p><strong>Jak mała moneta dostaje taki hashrate.</strong> Merge mining. Maszyny Scrypt kopiące Pepecoin już dostają zapłatę z Litecoina i Dogecoina — ok. <span id="pay-ltc-doge">$1,61 mln</span> dziennie w nagrodach bloków łącznie. Pule, które dodają PEP do merge mining, wypłacają go dodatkowo za tę samą pracę i ten sam prąd. <a href="scrypt-family.html">Jak działa merge mining.</a></p>
     <p><strong>Co to znaczy dla bezpieczeństwa.</strong> Prześcignięcie Pepecoin w mining wymaga mniej więcej tyle samo sprzętu Scrypt co Dogecoina — daleko więcej, niż mogłyby opłacić własne nagrody bloków PEP.</p>
     <p><strong>Haczyk.</strong> Hashrate jest, bo duże pule mają PEP w merge mining. Gdyby go wyrzuciły, hashrate Pepecoin spadłby razem z nimi. Lista pul na żywo: <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>.</p>
   </div>
@@ -331,7 +331,7 @@
   }
   function big(v, prefix) {
     if (v === null) return 'n/a';
-    var units = [[1e12, 'T'], [1e9, 'B'], [1e6, 'M'], [1e3, 'K']];
+    var units = [[1e12, '\u00a0bln'], [1e9, '\u00a0mld'], [1e6, '\u00a0mln'], [1e3, '\u00a0tys.']];
     for (var i = 0; i < units.length; i++) {
       if (v >= units[i][0]) {
         var n = v / units[i][0];
