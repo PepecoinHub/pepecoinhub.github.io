@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Game room · PEP Games</title>
+<meta name="description" content="Live game room · PEP Games.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<link rel="stylesheet" href="../facts.css?v=20261007e">
+<link rel="stylesheet" href="gry.css?v=20261007e">
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script src="js/config.js"></script>
+<script type="module" src="js/room.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <a class="brand brand-hub-link" href="../" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Pages"><a href="../which-pepecoin.html">Which is which</a><a href="../compare.html">PEP and DOGE</a><a href="../calculator.html">Calculator</a><a href="../supply.html">Supply</a><a href="../scrypt-family.html">Scrypt family</a><a href="../network.html">Network</a><a href="../rich-list.html">Rich list</a><a href="../guides.html">Guides</a><a href="./" aria-current="page">Games</a></nav>
+</header>
+<div class="g-sub"><nav class="g-nav" aria-label="Games">
+  <a href="./">Lobby</a><a href="ranking.html">Leaderboard</a><a href="host.html">Host</a>
+</nav><span class="g-me" aria-live="polite"></span></div>
+<main class="wrap" id="main">
+  <div id="joinbox" class="card join hidden"></div>
+  <div id="msgbox" class="card join hidden"></div>
+  <div class="room hidden" id="room">
+    <aside class="panel players" aria-label="Players">
+      <h3><span>Players</span> <span class="small muted" id="pcount"></span></h3>
+      <ul class="plist" id="plist"></ul>
+    </aside>
+    <section class="panel stage" aria-label="Board">
+      <div class="stage-top">
+        <div class="roundinfo" id="roundinfo"></div>
+        <div class="word" id="word" aria-live="polite"></div>
+        <div class="timer" id="timer"><svg viewBox="0 0 52 52" width="100%" height="100%"><circle cx="26" cy="26" r="22" fill="none" stroke="var(--grid)" stroke-width="5"/><circle id="timer-arc" cx="26" cy="26" r="22" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="0"/></svg><b id="timer-n">–</b></div>
+      </div>
+      <div class="canvas-wrap" id="cwrap"><canvas id="cv" width="1000" height="700" aria-label="Drawing board"></canvas><div class="overlay hidden" id="overlay"></div></div>
+      <div class="tools hidden" id="tools"></div>
+      <div class="hostpanel hidden" id="imgpanel"></div>
+      <div class="hostbar hidden" id="hostbar"></div>
+    </section>
+    <aside class="panel chat" aria-label="Chat">
+      <h3>Chat &amp; guesses</h3>
+      <div class="msgs" id="msgs" aria-live="polite"></div>
+      <form id="chatform" autocomplete="off"><input type="text" id="chatin" maxlength="120" placeholder="Type your guess…" aria-label="Message or guess"><button class="btn primary" id="chatsend" aria-label="Send">Send</button></form>
+    </aside>
+  </div>
+</main>
+
+<footer class="site-foot">
+  <p><strong>Community games</strong>, run by a volunteer from the r/pepecoin community. Free to play, just for fun. Not an official Pepecoin publication.</p>
+  <p><a href="rules.html">Rules</a> · <a href="privacy.html">Privacy</a> · <a href="ranking.html">Leaderboard &amp; Hall of Fame</a> · <a href="../">Pepecoin Hub</a></p>
+  <p class="correction">Found a bug or something unfair? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Report it</a> on GitHub.</p>
+</footer>
+<script src="../chrome.js?v=20261007e" defer></script>
+</body>
+</html>

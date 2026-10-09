@@ -1,0 +1,20 @@
+# OPCJONALNIE: .github/workflows/gry-keepalive.yml w repo PepecoinHub/pepecoinhub.github.io
+# Darmowy projekt Supabase usypia się po ~7 dniach bez ruchu. Ten workflow „puka” co 2 dni.
+# Wymaga dwóch sekretów repo (Settings → Secrets and variables → Actions):
+#   SUPABASE_URL = https://<ref>.supabase.co     SUPABASE_PUBLISHABLE_KEY = sb_publishable_...
+name: Gry — keepalive Supabase
+on:
+  schedule:
+    - cron: '17 6 */2 * *'
+  workflow_dispatch:
+permissions: {}
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping gry_lobby
+        env:
+          URL: ${{ secrets.SUPABASE_URL }}
+          KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          curl -fsS -X POST "$URL/rest/v1/rpc/gry_lobby" -H "apikey: $KEY" -H "Content-Type: application/json" -d '{}' > /dev/null
