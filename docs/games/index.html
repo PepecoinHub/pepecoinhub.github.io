@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PEP Games: live Draw &amp; Guess and Guess the Picture | Pepecoin Hub</title>
+<meta name="description" content="Live community game nights for Pepecoin: Draw &amp; Guess and Guess the Picture. Play as a guest or log in with Discord and climb the leaderboard.">
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<link rel="stylesheet" href="../facts.css?v=20261007e">
+<link rel="stylesheet" href="gry.css?v=20261007e">
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script src="js/config.js"></script>
+<script type="module" src="js/lobby.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <a class="brand brand-hub-link" href="../" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Pages"><a href="../which-pepecoin.html">Which is which</a><a href="../compare.html">PEP and DOGE</a><a href="../calculator.html">Calculator</a><a href="../supply.html">Supply</a><a href="../scrypt-family.html">Scrypt family</a><a href="../network.html">Network</a><a href="../rich-list.html">Rich list</a><a href="../guides.html">Guides</a><a href="./" aria-current="page">Games</a></nav>
+</header>
+<div class="g-sub"><nav class="g-nav" aria-label="Games">
+  <a href="./" aria-current="page">Lobby</a><a href="ranking.html">Leaderboard</a><a href="host.html">Host</a>
+</nav><span class="g-me" aria-live="polite"></span></div>
+<main class="wrap" id="main">
+  <section class="hero">
+    <div class="card" style="display:flex;flex-direction:column;justify-content:center">
+      <span class="pill" style="align-self:flex-start">PEP community · live</span>
+      <h1 style="margin-top:12px">Live games for the Pepecoin community</h1>
+      <p class="lead">Draw &amp; Guess is open any time: start a room, share the link and play. Every week the host runs a Guess the Picture night, and those games count for the season leaderboard.</p>
+      <div class="row"><a class="btn primary big" href="#play">Play now</a><a class="btn big" href="ranking.html">🏆 Leaderboard</a></div>
+    </div>
+    <div class="card frogcard" id="soon">
+      <img src="img/frog-captain.svg" alt="" width="150" height="195">
+      <div><div class="when">Coming soon</div><div class="title">Live rooms with friends</div>
+      <p class="small">Draw &amp; Guess, weekly Guess the Picture nights and two-player tables with an invite link.</p></div>
+    </div>
+    <div class="card sched" id="sched" aria-live="polite">
+      <div class="when" id="sched-when">Next game</div>
+      <div class="title" id="sched-title">Guess the Picture · Game Night</div>
+      <div class="small" id="sched-season" style="opacity:.9;margin:-2px 0 8px"></div>
+      <div class="countdown" id="countdown"></div>
+      <p class="small" id="sched-note" style="margin:14px 0 0;opacity:.9"></p>
+      <div id="sched-cta" style="margin-top:12px"></div>
+      <img class="frog" src="img/icon.svg" alt="">
+    </div>
+  </section>
+
+  <section class="grid2" id="play" style="margin-top:18px">
+    <div class="card" id="identity"></div>
+    <div class="card">
+      <h2>Open rooms</h2>
+      <div class="rooms" id="rooms"><p class="muted">Loading…</p></div>
+      <form class="row" id="codeform" style="margin-top:14px">
+        <input type="text" id="code" placeholder="Room code, e.g. PEP42" maxlength="5" style="flex:1;min-width:150px;text-transform:uppercase" aria-label="Room code">
+        <button class="btn">Join with code</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="card" id="newroom" style="margin-top:18px"></section>
+
+  <section class="card" id="tables" style="margin-top:18px">
+    <h2>♟️ Table games</h2>
+    <p class="small muted" style="margin-top:0">Chess, Checkers, Connect Four and Sea Battle for two players. Open a table, send the invite link, or sit down at an open table below. Everyone else can watch and chat. Or play against the bot (Easy, Medium, Hard). Just for fun: no ranking. Every move is checked by the server.</p>
+    <div class="rooms" id="tlist"><p class="muted">Loading…</p></div>
+    <div id="tcreate" style="margin-top:16px"></div>
+  </section>
+
+  <section class="modes" style="margin-top:18px">
+    <article class="card mode-card">
+      <div class="ill" aria-hidden="true"><svg viewBox="0 0 240 110" width="240" height="110"><rect x="20" y="10" width="200" height="90" rx="10" fill="#fff" stroke="#bfcac4"/><path d="M50 78c20-40 40-40 55-10s35 25 50-20" fill="none" stroke="#269B4D" stroke-width="6" stroke-linecap="round"/><circle cx="185" cy="40" r="14" fill="#F6BB60"/><path d="M168 92l40-40 8 8-40 40h-8z" fill="#16532A"/></svg></div>
+      <h3>✏️ Draw &amp; Guess <span class="badge guest" title="Just for fun: scores last only for the current game, no leaderboard">casual</span></h3>
+      <p class="muted small">Everyone takes turns drawing. The drawer gets a secret word (simple stuff: cat, pizza, rocket…) and the others type guesses in the chat. Faster guesses score more, and the drawer earns points for every correct guess. Letter hints appear as time runs out. Anyone can start a room.</p>
+    </article>
+    <article class="card mode-card">
+      <div class="ill" aria-hidden="true"><svg viewBox="0 0 240 110" width="240" height="110"><g transform="translate(70 8)"><rect x="0" y="0" width="16" height="16" fill="#e0e6e3"/><rect x="16" y="0" width="16" height="16" fill="#e0e6e3"/><rect x="32" y="0" width="16" height="16" fill="#7fc08c"/><rect x="48" y="0" width="16" height="16" fill="#7fc08c"/><rect x="64" y="0" width="16" height="16" fill="#7fc08c"/><rect x="80" y="0" width="16" height="16" fill="#7fc08c"/><rect x="96" y="0" width="16" height="16" fill="#e0e6e3"/><rect x="112" y="0" width="16" height="16" fill="#e0e6e3"/><rect x="0" y="16" width="16" height="16" fill="#e0e6e3"/><rect x="16" y="16" width="16" height="16" fill="#7fc08c"/><rect x="32" y="16" width="16" height="16" fill="#56a76a"/><rect x="48" y="16" width="16" height="16" fill="#56a76a"/><rect x="64" y="16" width="16" height="16" fill="#56a76a"/><rect x="80" y="16" width="16" height="16" fill="#56a76a"/><rect x="96" y="16" width="16" height="16" fill="#7fc08c"/><rect x="112" y="16" width="16" height="16" fill="#e0e6e3"/><rect x="0" y="32" width="16" height="16" fill="#7fc08c"/><rect x="16" y="32" width="16" height="16" fill="#56a76a"/><rect x="32" y="32" width="16" height="16" fill="#269B4D"/><rect x="48" y="32" width="16" height="16" fill="#269B4D"/><rect x="64" y="32" width="16" height="16" fill="#269B4D"/><rect x="80" y="32" width="16" height="16" fill="#269B4D"/><rect x="96" y="32" width="16" height="16" fill="#56a76a"/><rect x="112" y="32" width="16" height="16" fill="#7fc08c"/><rect x="0" y="48" width="16" height="16" fill="#7fc08c"/><rect x="16" y="48" width="16" height="16" fill="#56a76a"/><rect x="32" y="48" width="16" height="16" fill="#269B4D"/><rect x="48" y="48" width="16" height="16" fill="#16532A"/><rect x="64" y="48" width="16" height="16" fill="#16532A"/><rect x="80" y="48" width="16" height="16" fill="#269B4D"/><rect x="96" y="48" width="16" height="16" fill="#56a76a"/><rect x="112" y="48" width="16" height="16" fill="#7fc08c"/><rect x="0" y="64" width="16" height="16" fill="#7fc08c"/><rect x="16" y="64" width="16" height="16" fill="#56a76a"/><rect x="32" y="64" width="16" height="16" fill="#269B4D"/><rect x="48" y="64" width="16" height="16" fill="#269B4D"/><rect x="64" y="64" width="16" height="16" fill="#269B4D"/><rect x="80" y="64" width="16" height="16" fill="#269B4D"/><rect x="96" y="64" width="16" height="16" fill="#56a76a"/><rect x="112" y="64" width="16" height="16" fill="#7fc08c"/><rect x="0" y="80" width="16" height="16" fill="#e0e6e3"/><rect x="16" y="80" width="16" height="16" fill="#7fc08c"/><rect x="32" y="80" width="16" height="16" fill="#56a76a"/><rect x="48" y="80" width="16" height="16" fill="#56a76a"/><rect x="64" y="80" width="16" height="16" fill="#56a76a"/><rect x="80" y="80" width="16" height="16" fill="#56a76a"/><rect x="96" y="80" width="16" height="16" fill="#7fc08c"/><rect x="112" y="80" width="16" height="16" fill="#e0e6e3"/></g></svg></div>
+      <h3>🖼️ Guess the Picture <span class="badge ver" title="Ranked: counts for the season leaderboard">ranked</span></h3>
+      <p class="muted small">After a 3-2-1 countdown the host reveals a picture: first a few giant pixels, then sharper and sharper. First 3 correct guesses score 3 / 2 / 1 points; the round ends after the 3rd correct guess or 2 minutes. The host picks the pictures and answers. Weekly game night, counts for the season.</p>
+    </article>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <p><strong>Community games</strong>, run by a volunteer from the r/pepecoin community. Free to play, just for fun. Not an official Pepecoin publication.</p>
+  <p><a href="rules.html">Rules</a> · <a href="privacy.html">Privacy</a> · <a href="ranking.html">Leaderboard &amp; Hall of Fame</a> · <a href="../">Pepecoin Hub</a></p>
+  <p class="correction">Found a bug or something unfair? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Report it</a> on GitHub.</p>
+</footer>
+<script src="../chrome.js?v=20261007e" defer></script>
+</body>
+</html>
