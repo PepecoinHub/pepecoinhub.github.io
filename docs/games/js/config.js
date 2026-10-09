@@ -5,5 +5,6 @@
 window.PEP_GRY = {
   supabaseUrl: 'https://azbwciqfbsdpwubznncg.supabase.co',
   supabaseKey: 'sb_publishable_GRByiqlX6v67phR8xcM6VA_6eXXwTKX',
-  discord: false,    // switch to true once Discord login is set up in Supabase
+  reddit: false,     // Reddit has no ready-made Supabase provider yet; the button shows "soon" until this is true
+  discord: true,     // Discord login is set up in Supabase
 };

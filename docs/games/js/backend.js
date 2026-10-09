@@ -4,6 +4,7 @@ const qs = new URLSearchParams(location.search);
 const configured = !!(cfg.supabaseUrl && cfg.supabaseKey);
 export const TEST_BUILD = !!cfg.testBuild;
 export const DISCORD_ENABLED = cfg.discord !== false && !(TEST_BUILD && cfg.discord !== true);
+export const REDDIT_ENABLED = cfg.reddit === true;
 export const MODE = (cfg.backend === 'supabase' || qs.get('backend') === 'supabase') && configured ? 'supabase'
   : cfg.backend === 'local' || qs.get('backend') === 'local' || ['localhost', '127.0.0.1'].includes(location.hostname) ? 'local'
   : configured ? 'supabase' : 'none';
@@ -114,9 +115,11 @@ class SupaBackend {
     if (error) throw new Error(error.message);
     this.sess = data.session;
   }
-  async discord() {
+  async discord() { return this.oauth('discord'); }
+  async reddit() { return this.oauth('reddit'); }
+  async oauth(provider) {
     if (this.sess) await this.sb.auth.signOut();
-    const { error } = await this.sb.auth.signInWithOAuth({ provider: 'discord',
+    const { error } = await this.sb.auth.signInWithOAuth({ provider,
       options: { redirectTo: location.href.split('#')[0] } });
     if (error) throw new Error(error.message);
   }

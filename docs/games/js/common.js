@@ -1,4 +1,4 @@
-import { getBackend, MODE, TEST_BUILD, DISCORD_ENABLED } from './backend.js';
+import { getBackend, MODE, TEST_BUILD, DISCORD_ENABLED, REDDIT_ENABLED } from './backend.js';
 export { MODE, TEST_BUILD, DISCORD_ENABLED };
 
 try { const th = localStorage.getItem('phw-theme'); if (th === 'light' || th === 'dark') document.documentElement.setAttribute('data-theme', th); } catch {}
@@ -72,7 +72,9 @@ export async function paintMe(be) {
   const el = $('.g-me'); if (!el) return;
   const me = await meInfo(be);
   el.textContent = '';
-  if (me?.user_id) el.append(me.verified ? '✓ ' + (me.nick || me.discord_name) : 'guest: ' + (nickStore.get() || '—'));
+  el.classList.toggle('in', !!me?.user_id);
+  if (me?.user_id) el.append('Playing as ', h('b', {}, (me.verified ? '✓ ' : '') + (me.nick || me.discord_name || nickStore.get() || '—')), me.verified ? '' : ' (guest)');
+  else el.append('Not signed in · pick a nickname');
 }
 
 // Modal „Discord” w emulatorze (w produkcji jest prawdziwe przekierowanie do Discorda)
@@ -100,17 +102,18 @@ export async function identityCard(container, { onReady, cta = 'Play' } = {}) {
   const render = async () => {
     container.textContent = '';
     const me = await meInfo(be);
+    container.classList.add('identity'); container.classList.toggle('is-in', !!me?.user_id);
     const nickIn = h('input', { type: 'text', id: 'nick', maxlength: 20, placeholder: 'e.g. GreenFrog', autocomplete: 'nickname',
       value: (me?.verified && me?.nick) || nickStore.get() || (me?.discord_name ?? '') });
     const go = async (fn) => {
       const nick = nickIn.value.trim();
       if (!nick && !(me?.verified)) { nickIn.focus(); return toast('Enter a nickname', 'bad'); }
-      try { await fn(); nickStore.set(nick); await paintMe(be); onReady?.(nick); }
+      try { await fn(); nickStore.set(nick); await paintMe(be); await render(); onReady?.(nick); }
       catch (e) { toast(e.message, 'bad'); }
     };
     if (!me?.user_id) {
       container.append(
-        h('h2', {}, 'Who are you?'),
+        h('span', { class: 'id-step' }, 'Step 1'), h('h2', {}, 'Who are you?'),
         h('div', {}, h('label', { for: 'nick' }, 'Your nickname'), nickIn),
         h('div', { class: 'row', style: 'margin-top:12px' },
           h('button', { class: 'btn primary', id: 'btn-guest', onclick: () => go(() => be.guest()) }, `${cta} as guest`),
@@ -121,16 +124,20 @@ export async function identityCard(container, { onReady, cta = 'Play' } = {}) {
               nickStore.set(nickIn.value.trim()); await paintMe(be); onReady?.(nickIn.value.trim()); render();
             } catch (e) { toast(e.message, 'bad'); }
           } }, discordIcon(), 'Log in with Discord')
-          : h('button', { class: 'btn discord', id: 'btn-discord', disabled: true, title: 'Discord login coming soon', 'aria-describedby': 'discord-soon' }, discordIcon(), 'Discord login coming soon')),
+          : h('button', { class: 'btn discord', id: 'btn-discord', disabled: true, title: 'Discord login coming soon', 'aria-describedby': 'discord-soon' }, discordIcon(), 'Discord login coming soon'),
+          REDDIT_ENABLED ? h('button', { class: 'btn reddit', id: 'btn-reddit', onclick: async () => {
+            try { nickStore.set(nickIn.value.trim()); await be.reddit?.(); } catch (e) { toast(e.message, 'bad'); }
+          } }, redditIcon(), 'Log in with Reddit')
+          : h('button', { class: 'btn reddit', id: 'btn-reddit', disabled: true, title: 'Reddit login coming soon', 'aria-describedby': 'discord-soon' }, redditIcon(), 'Reddit login coming soon')),
         DISCORD_ENABLED ? h('p', { class: 'small muted', style: 'margin:12px 0 0' },
           h('b', {}, 'Guest:'), ' no sign-up, pick a nickname and play. ',
           h('b', {}, 'Discord:'), ' your nickname is reserved for you and you get the ', h('span', { class: 'badge ver' }, '✓ verified'), ' badge on the leaderboard. We never ask for your email or wallet.')
         : h('p', { class: 'small muted', id: 'discord-soon', style: 'margin:12px 0 0' },
           h('b', {}, 'Guest:'), ' no sign-up, pick a nickname and play. ',
-          h('b', {}, 'Discord login coming soon.'), ' We never ask for your email or wallet.'));
+          h('b', {}, 'Discord & Reddit login coming soon.'), ' We never ask for your email or wallet.'));
     } else {
       container.append(
-        h('h2', {}, 'Playing as'),
+        h('span', { class: 'id-step ok' }, '✓ Signed in'), h('h2', {}, 'Playing as ', h('span', { class: 'id-name' }, me.nick || me.discord_name || nickStore.get() || 'guest')),
         h('div', {}, h('label', { for: 'nick' }, me.verified ? 'Nickname (reserved for your Discord)' : 'Nickname'), nickIn),
         h('div', { class: 'row', style: 'margin:10px 0' }, badge(me.verified)),
         h('div', { class: 'row' },
@@ -140,6 +147,12 @@ export async function identityCard(container, { onReady, cta = 'Play' } = {}) {
   };
   await render();
   return render;
+}
+export function redditIcon() {
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', '18'); s.setAttribute('height', '18'); s.setAttribute('aria-hidden', 'true');
+  s.innerHTML = '<path fill="currentColor" d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm6.7 12.1a1.6 1.6 0 0 1 .9 1.4c0 .3-.1.6-.2.8.1.2.1.4.1.6 0 2.7-3.100 4.800-7 4.800s-7-2.100-7-4.800c0-.2 0-.4.1-.6a1.600 1.600 0 0 1 1.700-2.700 7.700 7.700 0 0 1 4.200-1.300l.8-3.800 2.700.6a1.200 1.200 0 1 1-.1.600l-2.100-.5-.6 3a7.700 7.700 0 0 1 4.100 1.300 1.600 1.600 0 0 1 1.400-.4ZM8.500 13.200a1.200 1.200 0 1 0 0 2.400 1.200 1.200 0 0 0 0-2.400Zm7 0a1.200 1.200 0 1 0 0 2.400 1.200 1.200 0 0 0 0-2.400Zm-.3 3.500a.4.4 0 0 0-.6 0 3.600 3.600 0 0 1-2.600.8 3.600 3.600 0 0 1-2.600-.8.400.4 0 0 0-.6.600 4.300 4.300 0 0 0 3.200 1.100 4.300 4.300 0 0 0 3.200-1.100.4.400 0 0 0 0-.6Z"/>';
+  return s;
 }
 export function discordIcon() {
   const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
