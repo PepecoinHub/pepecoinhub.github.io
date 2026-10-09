@@ -30,7 +30,9 @@ body { -webkit-font-smoothing: antialiased; }
 .g-nav { display: flex; gap: 4px; flex-wrap: wrap; }
 .g-nav a { text-decoration: none; color: var(--ink-2); padding: 7px 14px; border-radius: 999px; font-weight: 500; font-size: .95rem; border: 1px solid var(--grid); background: var(--panel); }
 .g-nav a[aria-current="page"], .g-nav a:hover { background: var(--accent-wash); color: var(--accent-deep); border-color: transparent; }
-.g-me { font-size: .85rem; color: var(--muted); white-space: nowrap; margin-left: auto; }
+.g-me { font-size: .9rem; color: var(--ink-2); margin-left: auto; padding: 6px 14px; border-radius: 999px; border: 1.5px dashed var(--muted); background: var(--panel); }
+.g-me.in { border: 1.5px solid var(--accent); background: var(--accent-wash); color: var(--accent-deep); }
+.g-me b { font-weight: 700; }
 
 /* cards & buttons */
 .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--grid); padding: 20px; }
@@ -179,7 +181,8 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
   .room { grid-template-columns: 1fr; gap: 10px; padding-top: 10px; }
   .chat { height: 46vh; }
   .g-nav a { padding: 6px 8px; font-size: .88rem; }
-  .g-brand small, .g-me, .g-nav a.home { display: none; }
+  .g-brand small, .g-nav a.home { display: none; }
+  .g-me { margin-left: 0; font-size: .85rem; }
   .g-brand span { white-space: nowrap; }
   .word { font-size: 1.15rem; letter-spacing: .22em; }
   .stage-top { padding: 8px 10px; gap: 8px; }
@@ -364,3 +367,16 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .g-prose { max-width: 68ch; margin: 0 auto 10px 0; }
 .g-prose h2 { margin: 22px 0 8px; }
 .g-prose ul { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
+
+/* identity ("Who are you?" / "Playing as") — the one thing a visitor must notice */
+.identity { border: 2px solid var(--accent); background: linear-gradient(160deg, var(--accent-wash), var(--surface) 70%); box-shadow: 0 0 0 5px var(--accent-wash), var(--shadow); }
+.identity h2 { font-size: 1.6rem; margin: 6px 0 12px; }
+.identity.is-in { border-style: solid; }
+.id-step { display: inline-block; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: var(--accent); color: var(--accent-ink); padding: 3px 10px; border-radius: 999px; }
+.id-step.ok { background: var(--accent-deep); }
+.id-name { color: var(--accent-deep); }
+.identity input[type=text] { font-size: 1.1rem; padding: 12px 14px; border: 2px solid var(--accent); }
+.identity .btn.primary { font-size: 1.05rem; padding: 12px 22px; }
+.btn.reddit { background: #FF4500; color: #fff; border-color: transparent; }
+.btn:disabled.discord, .btn:disabled.reddit { opacity: .55; }
+.empty-pic { display: block; width: 100%; max-width: 420px; height: auto; margin: 0 auto 12px; border-radius: var(--radius); }

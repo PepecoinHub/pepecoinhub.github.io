@@ -45,7 +45,7 @@ function tick() {
 function renderRooms() {
   const box = $('#rooms'); box.textContent = '';
   if (lobby?.error) { box.append(h('p', { class: 'muted' }, lobby.error)); return; }
-  if (!lobby?.rooms?.length) { box.append(h('div', { class: 'empty' }, h('img', { class: 'frog-s', src: 'img/frog-sleepy.svg', alt: '', width: 96, height: 124 }), h('p', { class: 'muted' }, 'No open rooms right now. Start your own Draw & Guess room below, or come back for the weekly Guess the Picture night.'))); return; }
+  if (!lobby?.rooms?.length) { box.append(h('div', { class: 'empty' }, h('img', { class: 'empty-pic', src: 'img/empty-playground.webp', alt: 'Three Pepe frogs playing in a sandbox', width: 640, height: 365, loading: 'lazy' }), h('p', { class: 'muted' }, 'No open rooms right now. Start your own Draw & Guess room below, or come back for the weekly Guess the Picture night.'))); return; }
   for (const r of lobby.rooms) box.append(h('div', { class: 'room-item' },
     h('div', { class: 'ico', 'aria-hidden': 'true' }, r.mode === 'kalambury' ? '✏️' : '🖼️'),
     h('div', { class: 'meta' }, h('b', {}, r.title), h('span', { class: 'small muted' }, `${MODE_LABEL[r.mode]} (${r.ranked ? 'ranked' : 'casual'}) · ${r.players}/${r.max_players} players · ${PHASE_LABEL[r.phase]} · code `, h('span', { class: 'mono' }, r.code))),
@@ -92,7 +92,7 @@ async function loadTables() {
   let list;
   try { list = await be.rpc('gry_tables_lobby'); } catch (e) { box.textContent = ''; box.append(h('p', { class: 'muted' }, e.message)); return; }
   box.textContent = '';
-  if (!list.length) { box.append(h('div', { class: 'empty' }, h('img', { class: 'frog-s', src: 'img/frog-sleepy.svg', alt: '', width: 96, height: 124 }), h('p', { class: 'muted' }, 'No open tables right now. Open one below and send the invite link to a friend.'))); return; }
+  if (!list.length) { box.append(h('div', { class: 'empty' }, h('img', { class: 'empty-pic', src: 'img/empty-swing.webp', alt: 'A sad Pepe sitting alone on a swing', width: 640, height: 445, loading: 'lazy' }), h('p', { class: 'muted' }, 'No open tables right now. Open one below and send the invite link to a friend.'))); return; }
   for (const t of list) {
     const [ico, name] = TGAME[t.game];
     const players = t.players || [];
