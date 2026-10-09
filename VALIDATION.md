@@ -1,5 +1,16 @@
 # Validation of the reconstructed history
 
+> **Update (genesis week).** Six daily reconstructed snapshots were added for 2024-01-30 … 2024-02-04, the days between the first mined block and the first weekly Monday (2024-02-05). The genesis block header is dated 2024-01-23 02:00 UTC, but its coinbase is unspendable and block 1 was mined on 2024-01-30 11:09:43 UTC, so there were no holders before 30 Jan; snapshots start on that day. Same replay tool, same top-2000 format and same cut (end of UTC day: state just before the first block with time ≥ next day 00:00 UTC). A fresh replay from genesis reproduced the committed 2024-02-05 file byte for byte and its `reconstructed_daily.json` row exactly. At every new snapshot: listed rows sum to `utxo_sats` (all holders are listed, ≤ 344), `utxo_sats` + 500,000 PEP (unspendable genesis) = `supply_sats`, `coinbase_claimed_sats` = `utxo_sats`, and the block after `height` has time ≥ the cut.
+>
+> | Date | Height | Holders | Supply (PEP) |
+> |---|---|---|---|
+> | 2024-01-30 | 858 | 61 | 429,500,000 |
+> | 2024-01-31 | 2,189 | 109 | 1,095,000,000 |
+> | 2024-02-01 | 3,509 | 225 | 1,755,000,000 |
+> | 2024-02-02 | 4,823 | 258 | 2,412,000,000 |
+> | 2024-02-03 | 6,165 | 259 | 3,083,000,000 |
+> | 2024-02-04 | 7,400 | 310 | 3,700,500,000 |
+
 > **Update (top 2000).** Reconstructed snapshots now list the top **2000** addresses. Weekly Mondays run from 2024-02-05 (first Monday on/after genesis) through 2025-08-25; daily files run from 2025-09-01 through 2026-10-04. Live snapshots stay as they are (1250 rows on 5–6 Oct 2026); from tomorrow `snapshot.py` also writes top 2000. Re-checked at live heights 1,237,541 and 1,238,910: the first 1250 rows of the new top-2000 cuts match the live files exactly (addresses, balances, `isMiner`, `lastSeen`, every top-N share 0.0000 pp apart). Chart groups still stop at top 1000; the holders table lists every address in the snapshot.
 
 ## Summary
