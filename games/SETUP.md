@@ -3,6 +3,7 @@
 Strona gier jest w `docs/games/` (czysty HTML/JS, bez bundlera). Bez serwera działa tylko „Play vs bot” (szachy, warcaby, „czwórki w rząd” i statki z botem, w przeglądarce). Pokoje na żywo, Draw & Guess, Guess the Picture i stoły dla dwóch osób potrzebują darmowego projektu w Supabase. Cała logika gry jest w funkcjach bazy (`games/supabase/schema.sql`), a przeglądarka tylko wysyła „zamiary” i pokazuje wynik.
 
 ## Zasady, które trzymamy
+- **Ukryta wersja:** strony gier są pod `pepecoinhub.com/games/`, ale bez linku w menu, bez wpisu w mapie strony, z `noindex` i `Disallow: /games/` w `robots.txt`. Wchodzą tylko osoby z linkiem. Gdy gry będą gotowe do ogłoszenia: dodaj link „Games” do menu (`<nav class="site-nav">` na wszystkich stronach, w każdym języku), wpisy w `sitemap.xml`, usuń `noindex` ze stron w `docs/games/` i `Disallow` z `robots.txt`.
 - **Nowy projekt produkcyjny** na koncie związanym z Pepecoinem (logowanie do Supabase przez GitHub PepecoinHub), region **Central EU (Frankfurt)**. Nie używaj projektu testowego z prototypu („pep-frog-lab”).
 - Do strony trafiają tylko dwa **publiczne** dane: adres projektu i klucz `sb_publishable_…`. Klucza `secret`/`service_role`, hasła do bazy ani tokenu zarządzania Supabase nie wklejamy nigdzie (ani do repo, ani do rozmowy).
 - Nagród w PEP i portfeli w grach **nie ma**. Nagrody wypłaca ręcznie host ze swojego portfela (patrz `docs/games/rules.html`).
