@@ -432,3 +432,7 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .qitem select { width: auto; flex: none; }
 .qitem .qthumb { flex: none; }
 .qitem .btn { flex: none; }
+/* chat stickers (img/stickers/manifest.json) */
+.msgs .sticker { display: inline-block; vertical-align: middle; }
+.msgs .sticker img { width: 96px; height: 96px; object-fit: contain; display: block; }
+@media (max-width: 560px) { .msgs .sticker img { width: 72px; height: 72px; } .sticker-btn { padding: 6px 8px; } }

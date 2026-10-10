@@ -1,0 +1,35 @@
+# PEP Games: keeps the free Supabase project awake (free projects pause after ~7 days without activity).
+# Every 5 days it makes one small read-only call (public lobby list) to the LIVE project.
+# Uses only the PUBLIC publishable key that is already in docs/games/js/config.js. No secrets.
+name: Games keepalive (Supabase)
+
+on:
+  schedule:
+    - cron: '17 6 */5 * *'        # 06:17 UTC on days 1, 6, 11, 16, 21, 26, 31 of the month
+  workflow_dispatch:               # the "Run workflow" button
+
+permissions: {}
+
+concurrency:
+  group: games-keepalive
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: https://azbwciqfbsdpwubznncg.supabase.co
+      SUPABASE_PUBLISHABLE_KEY: sb_publishable_GRByiqlX6v67phR8xcM6VA_6eXXwTKX
+    steps:
+      - name: Ping (read-only lobby list)
+        run: |
+          for i in 1 2 3; do
+            code=$(curl -sS -o /tmp/out.json -w '%{http_code}' --max-time 30 -X POST "$SUPABASE_URL/rest/v1/rpc/gry_lobby" \
+              -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -H "Content-Type: application/json" -d '{}') || code=000
+            echo "attempt $i: HTTP $code"
+            if [ "$code" = 200 ]; then exit 0; fi
+            sleep 20
+          done
+          echo "::error::Supabase did not answer with 200 (if the project is paused, restore it in the Supabase dashboard)"
+          exit 1

@@ -1,0 +1,4 @@
+{
+  "note": "Chat stickers. To add one: put the image here (webp/png/svg/gif, square, ≤ 150 KB), add an entry to the list, e.g. { \"id\": \"my-id\", \"file\": \"my-id.webp\", \"label\": \"Label\" }, and add the same id on the server: insert into games.stickers(id, label, sort) values ('my-id', 'Label', 10); Only ids that exist on the server can be sent. While the list is empty the sticker button is hidden.",
+  "stickers": []
+}
