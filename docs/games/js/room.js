@@ -1,4 +1,5 @@
 import { $, h, toast, getBackend, identityCard, badge, nickStore, backendBanner, paintMe } from './common.js';
+import { renderBody, attachPicker } from './emotes.js';
 
 const code = (new URLSearchParams(location.search).get('r') || '').toUpperCase();
 if (!/^[A-Z0-9]{5}$/.test(code)) location.replace('./');
@@ -279,7 +280,7 @@ function renderMsgs(list) {
   for (const m of list) {
     if (m.kind === 'system') box.append(h('p', { class: 'sys' }, m.body));
     else if (m.kind === 'correct') box.append(h('p', { class: 'sys ok' }, '🎉 ' + m.body));
-    else box.append(h('p', { class: m.scope === 'guessed' ? 'priv' : '' }, h('b', {}, m.nick + ': '), m.body));
+    else box.append(h('p', { class: m.scope === 'guessed' ? 'priv' : '' }, h('b', {}, m.nick + ': '), ...renderBody(m.body)));
     for (const n of notesAfter(m.id)) box.append(h('p', { class: 'close' }, n.text));
   }
   if (stick) box.scrollTop = box.scrollHeight;
@@ -306,6 +307,7 @@ function syncCooldownFromState() {
   const left = Number(S?.me?.cooldown_left || 0);
   if (cooldownSecs() > 0 && left > 0 && Date.now() + left * 1000 > sendReadyAt + 300) startCooldown(left);
 }
+attachPicker($('#chatform'), $('#chatin'), () => isRoomHost());
 $('#chatform').addEventListener('submit', async (e) => {
   e.preventDefault();
   const inp = $('#chatin'), text = inp.value.trim();

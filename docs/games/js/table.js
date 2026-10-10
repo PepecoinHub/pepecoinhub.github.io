@@ -1,6 +1,7 @@
 // Table games (Chess / Checkers / Connect Four). The server (Postgres) validates every move and sends the list of legal moves;
 // this page only draws the board, highlights what the server allows and sends the chosen move.
 import { $, h, toast, getBackend, identityCard, paintMe, backendBanner, nickStore, badge } from './common.js';
+import { renderBody, attachPicker } from './emotes.js';
 import { localTable } from './localtable.js';
 import * as E from './engines.js';
 
@@ -480,7 +481,7 @@ function addMsg(m) {
   const box = $('#msgs');
   if (box.querySelector(`[data-id="${m.id}"]`)) return;
   const stick = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
-  const el = m.kind === 'system' ? h('p', { class: 'sys', 'data-id': m.id }, m.body) : h('p', { 'data-id': m.id }, h('b', {}, m.nick + ': '), m.body);
+  const el = m.kind === 'system' ? h('p', { class: 'sys', 'data-id': m.id }, m.body) : h('p', { 'data-id': m.id }, h('b', {}, m.nick + ': '), ...renderBody(m.body));
   const after = [...box.children].find((x) => +x.dataset.id > m.id);   // kolejność wg id (realtime może wyprzedzić odświeżenie)
   after ? box.insertBefore(el, after) : box.append(el);
   if (stick) box.scrollTop = box.scrollHeight;
@@ -491,6 +492,7 @@ function renderSend() {
   if (left > 0) { btn.disabled = true; btn.textContent = `Send (${left})`; cdTimer = setTimeout(renderSend, 250); }
   else { btn.disabled = false; btn.textContent = 'Send'; }
 }
+if (!BOT) attachPicker($('#chatform'), $('#chatin'));
 $('#chatform').addEventListener('submit', async (e) => {
   e.preventDefault();
   const inp = $('#chatin'), text = inp.value.trim();
