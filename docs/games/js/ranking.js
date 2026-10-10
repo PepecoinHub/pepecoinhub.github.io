@@ -39,7 +39,7 @@ function seasonHead(se, d) {
       se?.phase === 'season' && viewingCurrent ? [h('b', { id: 'season-week' }, `Week ${se.week} of ${se.weeks}`), ' · ', cd]
         : se?.phase === 'break' ? [h('b', { id: 'season-week' }, `${se.break_name}: no ranked games`), ' · ', cd]
         : se?.phase === 'pre' ? [h('b', {}, 'Coming soon'), ' · ', cd] : null),
-    h('p', { class: 'small muted', style: 'margin:4px 0 0' }, `Ranked: weekly Guess the Picture nights (${se?.weeks || 10} per season). First 3 correct guesses score 3 / 2 / 1 points. After the season, the top 3 go to the Hall of Fame and the board starts again from zero.`));
+    h('p', { class: 'small muted', style: 'margin:4px 0 0' }, `Ranked: weekly Pepe Pictures nights (${se?.weeks || 10} per season). First 3 correct guesses score 3 / 2 / 1 points. After the season, the top 3 go to the Hall of Fame and the board starts again from zero.`));
 }
 async function render() {
   $$('.tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
@@ -59,10 +59,10 @@ async function render() {
         (s.top || []).map((t) => h('div', { class: 'row', style: 'justify-content:space-between' }, h('span', {}, medal(t.place), ' ', h('b', {}, t.nick), ' ', badge(t.verified)), h('span', { class: 'mono' }, t.points)))))));
     } else {
       const d = await be.rpc('gry_recent_games', { p_limit: 12 });
-      p.append(h('h2', {}, 'Recent games'), h('p', { class: 'small muted', style: 'margin-top:0' }, 'Guess the Picture nights only. Draw & Guess scores are not saved.'));
+      p.append(h('h2', {}, 'Recent games'), h('p', { class: 'small muted', style: 'margin-top:0' }, 'Pepe Pictures nights only. Draw & Guess scores are not saved.'));
       if (!d.length) p.append(h('div', { class: 'empty' }, h('img', { class: 'frog-s', src: 'img/frog-thinker.svg', alt: '', width: 96, height: 124 }), h('p', { class: 'muted' }, 'No games played yet.')));
       for (const g of d) p.append(h('div', { style: 'border-top:1px solid var(--grid);padding:10px 0' },
-        h('b', {}, g.title), h('span', { class: 'small muted' }, ' · ' + 'Guess the Picture' + (g.ranked ? ' (ranked' + (g.season ? ', ' + g.season : '') + ')' : ' (unranked)') + ' · ' + fmtLocal(new Date(g.finished_at))),
+        h('b', {}, g.title), h('span', { class: 'small muted' }, ' · ' + 'Pepe Pictures' + (g.ranked ? ' (ranked' + (g.season ? ', ' + g.season : '') + ')' : ' (unranked)') + ' · ' + fmtLocal(new Date(g.finished_at))),
         h('div', { class: 'small', style: 'margin-top:4px' }, (g.results || []).map((r) => h('span', { style: 'margin-right:14px;white-space:nowrap' }, medal(r.place), ' ', r.nick, r.verified ? ' ✓' : ' (guest)', ' ', h('span', { class: 'mono muted' }, r.points))))));
     }
   } catch (e) { p.append(h('p', { class: 'muted' }, e.message)); }

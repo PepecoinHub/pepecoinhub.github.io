@@ -1,0 +1,29 @@
+/* Home: click-to-play video. Nothing is loaded from YouTube until the visitor clicks play. */
+.video-section { max-width: 880px; margin-left: auto; margin-right: auto; }
+.video-card {
+  position: relative; aspect-ratio: 16 / 9; overflow: hidden; display: grid; place-items: center;
+  border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow);
+  background: var(--pond, none), var(--surface);
+}
+.video-card iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-card .video-bg { position: absolute; right: 4%; bottom: -8%; width: 34%; max-width: 260px; opacity: 0.9; pointer-events: none; }
+.video-play {
+  position: relative; display: inline-flex; align-items: center; gap: 16px; padding: 14px 24px 14px 16px;
+  border: 0; border-radius: 999px; cursor: pointer; font: inherit; color: var(--ink);
+  background: var(--surface); box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.45); text-align: left;
+}
+.video-play:hover { filter: brightness(1.04); }
+.video-play:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.video-play-icon {
+  display: grid; place-items: center; flex: none; width: 56px; height: 56px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 1.4rem; padding-left: 4px;
+}
+.video-play-text { display: grid; gap: 2px; font-weight: 700; font-size: 1.1rem; }
+.video-play-text small { font-weight: 400; font-size: 0.82rem; color: var(--muted); }
+.video-note { margin: 10px 2px 0; font-size: 0.88rem; color: var(--muted); }
+@media (max-width: 520px) {
+  .video-play { padding: 10px 18px 10px 10px; gap: 12px; }
+  .video-play-icon { width: 44px; height: 44px; }
+  .video-play-text { font-size: 1rem; }
+  .video-card .video-bg { opacity: 0.35; }
+}

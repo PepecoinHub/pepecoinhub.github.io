@@ -22,22 +22,22 @@ function renderLogin() {
 }
 async function renderPanel() {
   const box = $('#hostpanel'); box.textContent = '';
-  const mode = h('select', { id: 'mode' }, h('option', { value: 'obrazek', selected: true }, '🖼️ Guess the Picture (ranked)'), h('option', { value: 'kalambury' }, '✏️ Draw & Guess (casual)'));
-  const title = h('input', { type: 'text', id: 'title', value: 'Guess the Picture · Game Night', maxlength: 40 });
+  const mode = h('select', { id: 'mode' }, h('option', { value: 'obrazek', selected: true }, '🖼️ Pepe Pictures (ranked)'), h('option', { value: 'kalambury' }, '✏️ Draw & Guess (casual)'));
+  const title = h('input', { type: 'text', id: 'title', value: 'Pepe Pictures · Game Night', maxlength: 40 });
   const rounds = h('input', { type: 'number', id: 'rounds', value: 3, min: 1, max: 10, disabled: true });
   const secs = h('input', { type: 'number', id: 'secs', value: 120, min: 15, max: 120 });
-  mode.addEventListener('change', () => { title.value = mode.value === 'kalambury' ? 'PEP Draw & Guess' : 'Guess the Picture · Game Night'; secs.value = mode.value === 'kalambury' ? 80 : 120; secs.max = mode.value === 'kalambury' ? 180 : 120; rounds.disabled = mode.value !== 'kalambury'; });
+  mode.addEventListener('change', () => { title.value = mode.value === 'kalambury' ? 'PEP Draw & Guess' : 'Pepe Pictures · Game Night'; secs.value = mode.value === 'kalambury' ? 80 : 120; secs.max = mode.value === 'kalambury' ? 180 : 120; rounds.disabled = mode.value !== 'kalambury'; });
   const qTotal = h('select', { id: 'qtotal' }, [0, 5, 10, 15, 20].map((n) => h('option', { value: n, selected: n === 10 }, n ? n + ' questions' : 'Free play (no limit)')));
   const qScore = h('select', { id: 'qscore' }, h('option', { value: 3 }, 'Top 3 score: 3 / 2 / 1 points'), h('option', { value: 1 }, 'Winner only: 1 point'));
   const planBox = h('div', { class: 'grid2', id: 'planbox', style: 'margin-top:10px' }, h('div', {}, h('label', { for: 'qtotal' }, 'Questions tonight (changeable during the game)'), qTotal), h('div', {}, h('label', { for: 'qscore' }, 'Scoring'), qScore));
   mode.addEventListener('change', () => planBox.classList.toggle('hidden', mode.value !== 'obrazek'));
-  const evTitle = h('input', { type: 'text', id: 'evtitle', value: 'Friday Game Night · Guess the Picture', maxlength: 80 });
+  const evTitle = h('input', { type: 'text', id: 'evtitle', value: 'Friday Game Night · Pepe Pictures', maxlength: 80 });
   const evAt = h('input', { type: 'datetime-local', id: 'evat' });
   const evRoom = h('input', { type: 'text', id: 'evroom', maxlength: 5, placeholder: 'optional' });
   const lobby = await be.rpc('gry_lobby');
   box.append(
     h('div', { class: 'card', style: 'margin-top:16px' }, h('h2', {}, 'New room'),
-      h('p', { class: 'small muted', style: 'margin-top:0' }, 'Guess the Picture rooms count for the season leaderboard during the season weeks. Draw & Guess rooms can also be opened by anyone from the lobby (casual).'),
+      h('p', { class: 'small muted', style: 'margin-top:0' }, 'Pepe Pictures rooms count for the season leaderboard during the season weeks. Draw & Guess rooms can also be opened by anyone from the lobby (casual).'),
       h('div', { class: 'grid2' }, h('div', {}, h('label', { for: 'mode' }, 'Mode'), mode), h('div', {}, h('label', { for: 'title' }, 'Name'), title),
         h('div', {}, h('label', { for: 'rounds' }, 'Rounds (Draw & Guess: everyone draws once per round)'), rounds), h('div', {}, h('label', { for: 'secs' }, 'Seconds per turn / picture (pictures: max 120)'), secs)),
       planBox,

@@ -359,8 +359,8 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .frogcard .title { font-size: 1.5rem; font-weight: 700; margin: 4px 0 6px; }
 .frogcard p { margin: 0; color: var(--ink-2); }
 .no-server .frogcard { display: flex; }
-.no-server .sched, .no-server #play, .no-server #newroom, .no-server #tlist,
-.no-server #tcreate #nt-tc, .no-server #tcreate .topts label:has(#nt-private), .no-server #tcreate .topts label:has(#nt-spec), .no-server #tcreate > .row { display: none !important; }
+.no-server .sched, .no-server #play, .no-server #maingames, .no-server .maingames, .no-server #tlist, .no-server #tables > h3:first-of-type,
+.no-server #tcreate #nt-tc, .no-server #tcreate .topts label:has(#nt-private), .no-server #tcreate .topts label:has(#nt-spec), .no-server #tcreate .tplay-col:first-child { display: none !important; }
 
 /* rules and privacy pages */
 .wrap > .page-head { margin: 18px 0 22px; }
@@ -432,6 +432,61 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .qitem select { width: auto; flex: none; }
 .qitem .qthumb { flex: none; }
 .qitem .btn { flex: none; }
+
+/* lobby layout: login + leaderboard, countdown, two main games, mini-games table */
+.lobby-head { padding: 26px 0 8px; }
+.lobby-head h1 { margin: 0 0 6px; }
+.lobby-head .lead { margin: 0; font-size: 1.1rem; color: var(--ink-2); max-width: 60ch; }
+.top2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-top: 14px; align-items: start; }
+.top2 h2 { margin-top: 0; }
+#sched { margin-top: 18px; }
+.sched-host { margin-top: 14px; position: relative; z-index: 1; }
+.sched-form { margin-top: 10px; padding: 14px; border-radius: 12px; background: rgba(0,0,0,.22); color: #f7f5ef; }
+.sched-form label { color: #f7f5ef; }
+.sched .btn.sm { position: relative; z-index: 1; }
+.sect-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 26px 0 10px; }
+.sect-head h2 { margin: 0; }
+.maingames { margin-top: 0; align-items: start; }
+.mode-card h3 { margin: 4px 0 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.mode-card h4 { margin: 16px 0 8px; font-size: 1rem; }
+.how { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); font-size: .95rem; }
+.mode-card .ill.media { height: auto; aspect-ratio: 800 / 336; padding: 0; background: #f3ecd9; position: relative; }
+.mode-card .ill.media video, .mode-card .ill.media canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pixlabel { position: absolute; right: 10px; bottom: 8px; background: rgba(16,24,20,.78); color: #f7f5ef; padding: 2px 12px; border-radius: 999px; font: 700 1.1rem var(--mono); }
+.pixlabel.ok { background: var(--accent); color: var(--accent-ink); }
+.small-empty { display: flex; align-items: center; gap: 10px; justify-content: center; }
+.small-empty p { margin: 0; }
+#newroom { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--line); }
+#newroom h4 { margin-top: 0; }
+#tables { margin-top: 26px; }
+#tables h3 { margin: 18px 0 8px; }
+.tscroll { overflow-x: auto; }
+.gtable { width: 100%; border-collapse: collapse; }
+.gtable th { text-align: left; font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 8px 12px; border-bottom: 2px solid var(--grid); }
+.gtable td { padding: 10px 12px; border-bottom: 1px solid var(--grid); vertical-align: middle; }
+.gtable tbody tr:last-child td { border-bottom: 0; }
+.gtable td.act { text-align: right; white-space: nowrap; }
+.gtable td.num { text-align: right; }
+.gtable td.medal { width: 2.4em; font-size: 1.1rem; }
+.gtable.pick tr.pickrow { cursor: pointer; }
+.gtable.pick tr.pickrow:hover td { background: var(--accent-wash); }
+.gtable.pick tr.pickrow:has(input:checked) td { background: var(--accent-wash); }
+.gtable.pick tr.pickrow:has(input:checked) td:first-child { box-shadow: inset 4px 0 0 var(--accent); }
+.pickname { display: flex; align-items: center; gap: 8px; margin: 0; cursor: pointer; white-space: nowrap; }
+.pickname input { accent-color: var(--accent); }
+.tplay { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.tplay-col { padding: 14px; border: 1px solid var(--grid); border-radius: 12px; background: var(--surface-2); }
+.tplay-col .tgame-tc { margin-top: 8px; }
+.top5 td { padding: 8px 10px; }
+@media (max-width: 640px) {
+  .gtable.tables thead, .gtable.pick thead { display: none; }
+  .gtable.tables tr, .gtable.pick tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--grid); }
+  .gtable.tables td, .gtable.pick td { display: flex; gap: 8px; border: 0; padding: 3px 4px; }
+  .gtable.tables td[data-label]::before, .gtable.pick td[data-label]:not(:first-child)::before { content: attr(data-label) ": "; color: var(--muted); min-width: 5.5em; font-size: .85rem; }
+  .gtable.tables td.act { justify-content: flex-start; padding-top: 6px; }
+}
+.sched .small, .sched p { color: #f7f5ef; }
+.sched a { color: #f7f5ef; }
 /* chat stickers (img/stickers/manifest.json) */
 .msgs .sticker { display: inline-block; vertical-align: middle; }
 .msgs .sticker img { width: 96px; height: 96px; object-fit: contain; display: block; }
