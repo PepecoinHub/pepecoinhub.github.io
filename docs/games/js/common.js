@@ -102,7 +102,7 @@ export async function identityCard(container, { onReady, cta = 'Play' } = {}) {
   const render = async () => {
     container.textContent = '';
     const me = await meInfo(be);
-    container.classList.add('identity'); container.classList.toggle('is-in', !!me?.user_id);
+    if (container.classList.contains('card')) { container.classList.add('identity'); container.classList.toggle('is-in', !!me?.user_id); }
     const nickIn = h('input', { type: 'text', id: 'nick', maxlength: 20, placeholder: 'e.g. GreenFrog', autocomplete: 'nickname',
       value: (me?.verified && me?.nick) || nickStore.get() || (me?.discord_name ?? '') });
     const go = async (fn) => {
