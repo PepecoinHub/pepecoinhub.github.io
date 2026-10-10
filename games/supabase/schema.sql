@@ -2317,9 +2317,7 @@ create table if not exists games.stickers (
   sort int not null default 0
 );
 alter table games.stickers enable row level security;   -- brak polityk = brak bezpośredniego dostępu z API
-insert into games.stickers(id, label, sort) values
-  ('frog-chill', 'Chill frog', 1), ('frog-party', 'Party frog', 2), ('frog-winner', 'Winner frog', 3)
-on conflict (id) do nothing;
+-- lista jest pusta: Byl doda własne obrazki; wtedy: insert into games.stickers(id, label, sort) values ('id', 'Podpis', 10);
 alter table games.config add column if not exists sticker_cooldown_seconds int not null default 3;
 alter table games.players add column if not exists last_sticker_at timestamptz;
 alter table games.players add column if not exists img_need_at timestamptz;

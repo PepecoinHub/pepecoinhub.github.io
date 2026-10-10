@@ -1,8 +1,4 @@
 {
-  "note": "Chat stickers. To add one: put the image here (webp/png/svg/gif, square, ≤ 150 KB), add a line below, and add the same id on the server: insert into games.stickers(id, label, sort) values ('my-id', 'Label', 10); Only ids that exist on the server can be sent.",
-  "stickers": [
-    { "id": "frog-chill", "file": "frog-chill.svg", "label": "Chill frog" },
-    { "id": "frog-party", "file": "frog-party.svg", "label": "Party frog" },
-    { "id": "frog-winner", "file": "frog-winner.svg", "label": "Winner frog" }
-  ]
+  "note": "Chat stickers. To add one: put the image here (webp/png/svg/gif, square, ≤ 150 KB), add an entry to the list, e.g. { \"id\": \"my-id\", \"file\": \"my-id.webp\", \"label\": \"Label\" }, and add the same id on the server: insert into games.stickers(id, label, sort) values ('my-id', 'Label', 10); Only ids that exist on the server can be sent. While the list is empty the sticker button is hidden.",
+  "stickers": []
 }

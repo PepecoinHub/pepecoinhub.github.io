@@ -23,14 +23,14 @@ export function stickerEl(id) {
   return box;
 }
 
-// Adds a 🐸 button next to the chat box. send(id) must return a promise (the RPC call).
-export function attachStickerPicker(form, send) {
+// Adds a 🐸 button next to the chat box (only when the manifest lists at least one sticker). send(id) must return a promise.
+export async function attachStickerPicker(form, send) {
+  if (!(await loadStickers()).length) return;
   const btn = h('button', { type: 'button', class: 'btn emote-btn sticker-btn', 'aria-label': 'Stickers', 'aria-expanded': 'false', title: 'Stickers' }, '🐸');
   const pop = h('div', { class: 'emote-pop hidden', role: 'group', 'aria-label': 'Stickers' });
   const close = () => { pop.classList.add('hidden'); btn.setAttribute('aria-expanded', 'false'); };
   const fill = async () => {
     const all = await loadStickers(); pop.textContent = '';
-    if (!all.length) return pop.append(h('p', { class: 'small muted' }, 'No stickers yet.'));
     for (const s of all) pop.append(h('button', { type: 'button', class: 'emote-pick', title: s.label || s.id, 'aria-label': 'Send sticker: ' + (s.label || s.id),
       onclick: () => { close(); send(s.id); } }, h('img', { src: BASE + s.file, alt: '' })));
   };
