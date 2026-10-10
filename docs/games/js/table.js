@@ -2,6 +2,7 @@
 // this page only draws the board, highlights what the server allows and sends the chosen move.
 import { $, h, toast, getBackend, identityCard, paintMe, backendBanner, nickStore, badge } from './common.js';
 import { renderBody, attachPicker } from './emotes.js';
+import { stickerEl, attachStickerPicker } from './stickers.js';
 import { localTable } from './localtable.js';
 import * as E from './engines.js';
 
@@ -481,7 +482,7 @@ function addMsg(m) {
   const box = $('#msgs');
   if (box.querySelector(`[data-id="${m.id}"]`)) return;
   const stick = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
-  const el = m.kind === 'system' ? h('p', { class: 'sys', 'data-id': m.id }, m.body) : h('p', { 'data-id': m.id }, h('b', {}, m.nick + ': '), ...renderBody(m.body));
+  const el = m.kind === 'system' ? h('p', { class: 'sys', 'data-id': m.id }, m.body) : h('p', { 'data-id': m.id }, h('b', {}, m.nick + ': '), ...(m.kind === 'sticker' ? [stickerEl(m.body)] : renderBody(m.body)));
   const after = [...box.children].find((x) => +x.dataset.id > m.id);   // kolejność wg id (realtime może wyprzedzić odświeżenie)
   after ? box.insertBefore(el, after) : box.append(el);
   if (stick) box.scrollTop = box.scrollHeight;
@@ -493,6 +494,15 @@ function renderSend() {
   else { btn.disabled = false; btn.textContent = 'Send'; }
 }
 if (!BOT) attachPicker($('#chatform'), $('#chatin'));
+if (!BOT) attachStickerPicker($('#chatform'), async (id) => {
+  if (Date.now() < sendReadyAt) return renderSend();
+  try {
+    const r = await api.rpc('gry_table_sticker', { p_code: code, p_sticker: id });
+    if (r?.msg) addMsg(r.msg);
+    sendReadyAt = Date.now() + (S?.cooldown || 0) * 1000;
+  } catch (err) { const w = /wait (\d+)s/.exec(err.message || ''); if (w) sendReadyAt = Date.now() + +w[1] * 1000; toast(err.message, 'bad'); }
+  finally { renderSend(); }
+});
 $('#chatform').addEventListener('submit', async (e) => {
   e.preventDefault();
   const inp = $('#chatin'), text = inp.value.trim();

@@ -1,6 +1,8 @@
 import { $, h, toast, getBackend, identityCard, badge, nickStore, backendBanner, paintMe } from './common.js';
 import { renderBody, attachPicker, emoteImg } from './emotes.js';
+import { stickerEl, attachStickerPicker } from './stickers.js';
 import { loadQueue, saveQueue, shrink } from './queue.js';
+import { fitImage, pack, canChunk, makeSender, makeReceiver } from './imgchunks.js';
 
 const code = (new URLSearchParams(location.search).get('r') || '').toUpperCase();
 if (!/^[A-Z0-9]{5}$/.test(code)) location.replace('./');
@@ -70,6 +72,7 @@ function subscribeRoom() {
     if (event === 'kicked' && p.user_id === meId()) return message('You were removed from this room.');
     if (event === 'closed') return message('This room was closed.', 'Thanks for playing! 🐸');
     if (event === 'joined' && p.user_id !== meId()) resendForLateJoiner();
+    if (event === 'imgneed') { if (isImgHost() && p.tid === sender.tid) sender.want(p.miss || []); return; }
     if (p.v == null || p.v > seenVersion) fetchState();
   });
 }
@@ -111,10 +114,11 @@ function apply(s) {
 function onNewTurn(turnId) {
   curTurn = turnId; hintMarks = new Set(); strokes.clear();
   turnCh?.close(); turnCh = null; turnTopic = null;
-  blank();
+  blank(); recv.reset(); if (!isImgHost()) sender.stop();
   if (!turnId) return;
   turnTopic = (S.room.mode === 'kalambury' ? 'draw:' : 'img:') + code + ':' + turnId;
   turnCh = be.channel(turnTopic, onTurnMsg);
+  img.chOpenAt = Date.now();
   if (isImgHost()) startImageStages();
 }
 
@@ -323,6 +327,7 @@ function renderMsgs(list) {
   for (const m of list) {
     if (m.kind === 'system') box.append(h('p', { class: 'sys' }, m.body));
     else if (m.kind === 'correct') box.append(h('p', { class: 'sys ok' }, '🎉 ' + m.body));
+    else if (m.kind === 'sticker') box.append(h('p', { class: m.scope === 'guessed' ? 'priv' : '' }, h('b', {}, m.nick + ': '), stickerEl(m.body)));
     else box.append(h('p', { class: m.scope === 'guessed' ? 'priv' : '' }, h('b', {}, m.nick + ': '), ...renderBody(m.body)));
     for (const n of notesAfter(m.id)) box.append(h('p', { class: 'close' }, n.text));
   }
@@ -351,6 +356,12 @@ function syncCooldownFromState() {
   if (cooldownSecs() > 0 && left > 0 && Date.now() + left * 1000 > sendReadyAt + 300) startCooldown(left);
 }
 attachPicker($('#chatform'), $('#chatin'), () => isRoomHost());
+attachStickerPicker($('#chatform'), async (id) => {
+  if (Date.now() < sendReadyAt) return renderSend();
+  try { await be.rpc('gry_room_sticker', { p_code: code, p_sticker: id }); startCooldown(cooldownSecs()); }
+  catch (err) { const w = /wait (\d+)s/.exec(err.message || ''); if (w) startCooldown(Number(w[1])); toast(err.message, 'bad'); }
+  finally { renderSend(); }
+});
 $('#chatform').addEventListener('submit', async (e) => {
   e.preventDefault();
   const inp = $('#chatin'), text = inp.value.trim();
@@ -449,6 +460,7 @@ function flushStrokes(force) {
   turnCh?.send('d', { s: buf.splice(0) });
 }
 function onTurnMsg(event, p) {
+  const turnFor = curTurn;
   if (S?.room.mode === 'kalambury') {
     if (isDrawer()) return;
     if (event === 'd') for (const s of p.s) {
@@ -461,7 +473,10 @@ function onTurnMsg(event, p) {
     }
     else if (event === 'clear') { blank(); strokes.clear(); }
     else if (event === 'snap') { const im = new Image(); im.onload = () => ctx.drawImage(im, 0, 0, W, H); im.src = p.data; }
-  } else if (event === 'stage' && !isImgHost()) drawStage(p);
+  } else if (event === 'stage' && !isImgHost()) {
+    if (p.data) drawStage(p);
+    else if (p.key) recv.key(p, (url) => { if (curTurn === turnFor) drawStage({ i: p.i, n: p.n, data: url }); });
+  } else if (event === 'imgc' && !isImgHost()) recv.piece(p);
 }
 function resendForLateJoiner() {
   if (isDrawer()) { flushStrokes(true); setTimeout(() => turnCh?.send('snap', { data: cv.toDataURL('image/jpeg', 0.6) }), 300); }
@@ -475,7 +490,10 @@ const PRESETS = [
   { src: 'img/preset-candles.png', answer: 'candles / chart / candlestick' }, { src: 'img/preset-moon.png', answer: 'moon' },
 ];
 const LEVELS = [6, 9, 14, 22, 34, 56, 90];
-const img = { el: null, answer: '', stages: [], sent: -1, turn: null };
+const img = { el: null, answer: '', stages: [], sent: -1, turn: null, pack: null, fullUrl: null, chunksQueued: false, chOpenAt: 0 };
+// one piece per gap: ≈ 60 delivered messages/s at most (each broadcast counts once per player), 150 ms … 1.5 s
+const sender = makeSender((ev, p) => turnCh?.send(ev, p), () => Math.min(1500, Math.max(150, Math.round(1000 * ((S?.players?.length || 1) + 1) / 60))));
+const recv = makeReceiver((tid, miss) => be.rpc('gry_img_need', { p_code: code, p_tid: tid, p_missing: miss }));
 // ---------- plan wieczoru + kolejka obrazków (host) ----------
 // Mnożnik punktów: chipy ×1…×5 albo własna liczba (1–10)
 function multControl(value, onChange) {
@@ -587,12 +605,20 @@ function renderQueueList() {
 }
 function loadImg(src) { return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('Could not load the picture')); im.src = src; }); }
 async function prepareImage(src, answer) {
-  const im = await loadImg(src);
+  // full picture: the original if it is ≤ 1 MB, otherwise compressed to ≤ 1 MB (imgchunks.js); pixel stages are made from it
+  let full = null;
+  try { full = await fitImage(await (await fetch(src)).blob()); } catch {}
+  if (img.fullUrl) URL.revokeObjectURL(img.fullUrl);
+  img.fullUrl = full ? URL.createObjectURL(full) : null;
+  const im = await loadImg(img.fullUrl || src);
   const ratio = im.naturalHeight / im.naturalWidth;
   const mk = (w, type, q) => { const c = document.createElement('canvas'); c.width = w; c.height = Math.max(1, Math.round(w * ratio));
     const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.imageSmoothingQuality = 'high'; x.drawImage(im, 0, 0, c.width, c.height); return c.toDataURL(type, q); };
-  img.stages = LEVELS.map((w) => mk(w, 'image/png')).concat(mk(Math.min(900, im.naturalWidth), 'image/jpeg', 0.82));
-  img.el = im; img.answer = answer; img.sent = -1; img.turn = null;
+  img.pack = full && canChunk() ? await pack(full) : null;
+  // without WebCrypto (very old browser / non-https): old single-message picture (900 px JPEG, < 256 KB)
+  img.stages = LEVELS.map((w) => mk(w, 'image/png')).concat(img.pack ? 'chunked' : mk(Math.min(900, im.naturalWidth), 'image/jpeg', 0.82));
+  img.el = im; img.answer = answer; img.sent = -1; img.turn = null; img.chunksQueued = false;
+  sender.set(img.pack);
 }
 function startImageStages() { if (img.stages.length) { img.turn = curTurn; img.sent = -1; } }
 function stageNow() {
@@ -602,13 +628,21 @@ function stageNow() {
 }
 function imageHostLoop() {
   if (!img.stages.length || img.turn !== curTurn || S.room.phase !== 'turn') return;
+  // pieces of the (encrypted) full picture go out during the turn, after players had a moment to join the turn channel
+  if (img.pack && !img.chunksQueued && Date.now() - (img.chOpenAt || 0) > 1500) { img.chunksQueued = true; sender.all(); }
   const i = stageNow();
   if (i !== img.sent) sendStage(i);
 }
 function sendStage(i, resend) {
   if (!img.stages[i]) return;
   if (!resend) img.sent = i;
-  const p = { i, n: img.stages.length, data: img.stages[i] };
+  const n = img.stages.length;
+  if (img.stages[i] === 'chunked') {      // final picture: only the key (+ piece info); players already have the pieces
+    if (!img.chunksQueued) { img.chunksQueued = true; sender.all(); }
+    turnCh?.send('stage', { i, n, ...img.pack.meta, ...img.pack.key });
+    return drawStage({ i, n, data: img.fullUrl });
+  }
+  const p = { i, n, data: img.stages[i] };
   turnCh?.send('stage', p); drawStage(p);
 }
 function sendFinalImage() { if (img.stages.length && img.turn === curTurn) sendStage(img.stages.length - 1); }
