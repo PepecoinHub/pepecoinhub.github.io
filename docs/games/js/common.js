@@ -42,17 +42,18 @@ function warsawOffsetMin(date) {
   return (Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - date.getTime()) / 60000;
 }
 // najbliższy piątek 20:00 czasu polskiego (domyślny termin, gdy host nic nie ustawił)
-export function nextFriday20(now = new Date()) {
+export function nextWeekday20(wd = 'Fri', now = new Date()) {
   for (let i = 0; i < 8; i++) {
     const d = new Date(now.getTime() + i * 86400000);
     const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Warsaw', year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' }).formatToParts(d).map((x) => [x.type, x.value]));
-    if (p.weekday !== 'Fri') continue;
+    if (p.weekday !== wd) continue;
     const guess = new Date(Date.UTC(+p.year, +p.month - 1, +p.day, 20, 0));
     const t = new Date(guess.getTime() - warsawOffsetMin(guess) * 60000);
     if (t.getTime() + 3 * 3600000 > now.getTime()) return t;
   }
   return null;
 }
+export const nextFriday20 = (now = new Date()) => nextWeekday20('Fri', now);
 
 export function backendBanner(el) {
   if (MODE === 'supabase' && TEST_BUILD) el.prepend(h('div', { class: 'card small', style: 'margin:14px 0 0;padding:10px 14px;border-style:dashed' },
