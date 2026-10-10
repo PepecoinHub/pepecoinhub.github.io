@@ -110,6 +110,13 @@ create table if not exists games.rooms (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+-- Plan wieczoru Guess the Picture (host zmienia w trakcie): liczba pytań (null = wolna gra), punktacja, „ostatnie pytanie” z mnożnikiem
+alter table games.rooms add column if not exists question_total int check (question_total is null or question_total between 1 and 100);
+alter table games.rooms add column if not exists scorers int not null default 3 check (scorers in (1, 3));
+alter table games.rooms add column if not exists last_turn_no int;
+alter table games.rooms add column if not exists last_mult int not null default 1 check (last_mult between 1 and 10);
+create or replace function games.final_turn(a int, b int) returns int
+language sql immutable as $$ select case when a is null then b when b is null then a else least(a, b) end $$;
 
 create table if not exists games.secrets (             -- hasło bieżącej tury: NIGDY nie trafia do zgadujących
   room_code text primary key references games.rooms(code) on delete cascade,
@@ -451,6 +458,9 @@ declare r games.rooms; cur_seq bigint; nxt uuid;
 begin
   select * into r from games.rooms where code = p_code for update;
   if r.mode = 'obrazek' then
+    if games.final_turn(r.last_turn_no, r.question_total) is not null and r.turn_no >= games.final_turn(r.last_turn_no, r.question_total) then
+      perform games.finish(p_code); return;
+    end if;
     update games.rooms set phase = 'waiting', next_at = null where code = p_code;
     perform games.notify(p_code, 'state');
     return;
@@ -495,7 +505,9 @@ begin
   select answer into a from games.secrets where room_code = p_code;
   -- kalambury: 2,5 s odsłonięcia hasła + 4 s przerywnika „Next round”; obrazek: 5 s pełnego obrazka
   update games.rooms set phase = 'reveal', last_answer = a,
-         next_at = now() + case when mode = 'kalambury' then interval '6.5 seconds' else interval '5 seconds' end
+         next_at = now() + case when mode = 'kalambury' then interval '6.5 seconds'
+                                when games.final_turn(last_turn_no, question_total) is not null and turn_no >= games.final_turn(last_turn_no, question_total) then interval '9 seconds'
+                                else interval '5 seconds' end
    where code = p_code;
   delete from games.secrets where room_code = p_code;
   perform games.sys(p_code, coalesce(p_reason || ' ', '') || 'The word was: ' || coalesce(a, '?'));
@@ -645,14 +657,16 @@ begin
         'turn_ends_at', r.turn_ends_at, 'next_at', r.next_at, 'host_id', r.host_id, 'version', r.version,
         'match_id', r.match_id, 'creator_id', r.creator_id,
         'ranked', coalesce((select m.ranked from games.matches m where m.id = r.match_id), false),
-        'last_answer', case when r.phase in ('reveal','waiting','finished') then r.last_answer end),
+        'last_answer', case when r.phase in ('reveal','waiting','finished') then r.last_answer end,
+        'question_total', r.question_total, 'scorers', r.scorers, 'last_turn_no', r.last_turn_no, 'last_mult', r.last_mult,
+        'final_turn', games.final_turn(r.last_turn_no, r.question_total)),
     'next', case when r.phase = 'reveal' and r.mode = 'kalambury' then games.next_info(r.code) end,
     'mask', games.mask(r.code),
     'secret', sec,
     'podium', case when r.mode = 'obrazek' and r.phase in ('turn','reveal') then
         coalesce((select jsonb_agg(jsonb_build_object('place', g.place, 'nick', g.nick, 'user_id', g.user_id) order by g.place)
                   from games.guesses g where g.turn_id = r.turn_id), '[]'::jsonb) end,
-    'spots', case when r.mode = 'obrazek' then least((select picture_scorers from games.config where id = 1), 3) end,
+    'spots', case when r.mode = 'obrazek' then least((select picture_scorers from games.config where id = 1), r.scorers, 3) end,
     'cooldown', case when r.mode = 'kalambury' then greatest(coalesce((select dg_message_cooldown_seconds from games.config where id = 1), 0), 0) else 0 end,
     'me', jsonb_build_object('user_id', u, 'joined', me.user_id is not null and not me.kicked and me.left_at is null,
         'kicked', coalesce(me.kicked, false), 'is_host', coalesce(me.is_host, false) or (u = r.host_id),
@@ -782,7 +796,7 @@ begin
   end if;
   update games.players set score = 0, guessed_turn = null where room_code = r.code;
   delete from games.messages where room_code = r.code;
-  update games.rooms set match_id = mid, round_no = 1, turn_no = 0, last_answer = null, drawer_id = null,
+  update games.rooms set match_id = mid, round_no = 1, turn_no = 0, last_answer = null, drawer_id = null, last_turn_no = null,
          phase = case when mode = 'obrazek' then 'waiting' else phase end where code = r.code;
   perform games.sys(r.code, 'Game on: ' || r.title || '!');
   if r.mode = 'kalambury' then
@@ -824,11 +838,13 @@ create or replace function public.gry_guess(p_code text, p_text text) returns js
 language plpgsql security definer set search_path = '' as $$
 declare u uuid := auth.uid(); r games.rooms; me games.players; s games.secrets; txt text := trim(coalesce(p_text, ''));
         k text; is_guesser boolean; is_master boolean; pts int; rnk int; remaining float; v_scope text := 'all';
-        eligible int; done int; m jsonb; nsc int := (select picture_scorers from games.config where id = 1);
+        eligible int; done int; m jsonb; nsc int := (select picture_scorers from games.config where id = 1); mult int := 1;
         cd int := greatest(coalesce((select dg_message_cooldown_seconds from games.config where id = 1), 0), 0); wait_s int;
 begin
   select * into r from games.rooms where code = upper(p_code) for update;
   if not found then raise exception 'Room not found'; end if;
+  nsc := least(nsc, r.scorers);
+  if games.final_turn(r.last_turn_no, r.question_total) is not null and r.turn_no >= games.final_turn(r.last_turn_no, r.question_total) then mult := r.last_mult; end if;
   select * into me from games.players where room_code = r.code and user_id = u for update;
   if me.user_id is null or me.kicked or me.left_at is not null then raise exception 'You are not in this room'; end if;
   if txt = '' then return jsonb_build_object('ok', false); end if;
@@ -871,9 +887,9 @@ begin
       end if;
       insert into games.guesses(match_id, turn_id, user_id, nick, nick_key, verified, place)
       values (r.match_id, r.turn_id, u, me.nick, me.nick_key, me.verified, rnk);
-      pts := 4 - rnk;
+      pts := (case when nsc = 1 then 1 else 4 - rnk end) * mult;
       update games.players set score = score + pts, guessed_turn = r.turn_id where room_code = r.code and user_id = u;
-      perform games.sys(r.code, case rnk when 1 then '🥇 1st' when 2 then '🥈 2nd' else '🥉 3rd' end || ' guessed it! ' || me.nick || ' (+' || pts || ')', 'correct');
+      perform games.sys(r.code, case rnk when 1 then '🥇 1st' when 2 then '🥈 2nd' else '🥉 3rd' end || ' guessed it! ' || me.nick || ' (+' || pts || case when mult > 1 then ', ×' || mult else '' end || ')', 'correct');
       select count(*) filter (where p.guessed_turn = r.turn_id), count(*) into done, eligible
         from games.players p where p.room_code = r.code and games.active(p) and not p.is_host;
       if rnk >= least(nsc, 3) then
@@ -922,6 +938,42 @@ begin
     perform realtime.send(jsonb_build_object('code', r.code, 'private', true), 'msg', 'room:' || r.code, true);
   end if;
   return jsonb_build_object('ok', true);
+end $$;
+
+-- Host zmienia plan wieczoru w trakcie gry: liczba pytań (null/0 = wolna gra), punktacja (1 = tylko pierwszy, 3 = 3/2/1), mnożnik ostatniego pytania
+create or replace function public.gry_set_plan(p_code text, p_total int default null, p_scorers int default 3, p_last_mult int default null) returns void
+language plpgsql security definer set search_path = '' as $$
+declare u uuid := auth.uid(); r games.rooms;
+begin
+  select * into r from games.rooms where code = upper(p_code) for update;
+  if r.host_id is distinct from u then raise exception 'Only the host can change the plan'; end if;
+  if r.mode <> 'obrazek' then raise exception 'Only Guess the Picture rooms have a plan'; end if;
+  if p_total is not null and p_total <> 0 and (p_total < 1 or p_total > 100) then raise exception 'Questions: 1–100, or free play'; end if;
+  if p_scorers not in (1, 3) then raise exception 'Scoring: winner only or top 3'; end if;
+  if p_last_mult is not null and (p_last_mult < 1 or p_last_mult > 10) then raise exception 'Multiplier: 1–10'; end if;
+  update games.rooms set question_total = nullif(p_total, 0), scorers = p_scorers, last_mult = coalesce(p_last_mult, last_mult) where code = r.code;
+  perform games.notify(r.code, 'state');
+end $$;
+
+-- Czerwony przycisk „ostatnie pytanie”: kończy grę po bieżącym pytaniu (albo po następnym, jeśli żadne nie trwa), mnożnik punktów 1–10
+create or replace function public.gry_last_question(p_code text, p_mult int default null, p_cancel boolean default false) returns void
+language plpgsql security definer set search_path = '' as $$
+declare u uuid := auth.uid(); r games.rooms; m int;
+begin
+  select * into r from games.rooms where code = upper(p_code) for update;
+  if r.host_id is distinct from u then raise exception 'Only the host can do that'; end if;
+  if r.mode <> 'obrazek' then raise exception 'Only Guess the Picture rooms have a last question'; end if;
+  if r.phase not in ('turn','reveal','waiting') then raise exception 'The game is not running'; end if;
+  if p_cancel then
+    update games.rooms set last_turn_no = null where code = r.code;
+    perform games.sys(r.code, 'Last question cancelled.');
+  else
+    m := coalesce(p_mult, r.last_mult);
+    if m < 1 or m > 10 then raise exception 'Multiplier: 1–10'; end if;
+    update games.rooms set last_turn_no = case when r.phase = 'turn' then r.turn_no else r.turn_no + 1 end, last_mult = m where code = r.code;
+    perform games.sys(r.code, '⭐ Last question!' || case when m > 1 then ' Points ×' || m else '' end);
+  end if;
+  perform games.notify(r.code, 'state');
 end $$;
 
 create or replace function public.gry_tick(p_code text) returns bigint

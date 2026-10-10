@@ -18,6 +18,7 @@ Strona gier jest w `docs/games/` (czysty HTML/JS, bez bundlera). Bez serwera dzi
 6. **Project Settings → API Keys**: skopiuj Project URL i Publishable key do `docs/games/js/config.js` (`supabaseUrl`, `supabaseKey`) i zrób PR. Po zatwierdzeniu pokoje na żywo ruszą same.
 7. **Logowanie Discordem** (rezerwacja nicku, ranking, w przyszłości quiz z nagrodą): Discord Developer Portal → New Application → OAuth2 (Client ID, Secret, Redirect `https://<ref>.supabase.co/auth/v1/callback`) → w Supabase włącz providera Discord i wklej dane → w `config.js` ustaw `discord: true`.
 8. **Nie usypiaj projektu:** darmowy projekt usypia się po ok. 7 dniach bez ruchu. Plik `games/keepalive.workflow.yml` to gotowy workflow GitHub Actions (kopiuj do `.github/workflows/`, dodaj sekrety `SUPABASE_URL` i `SUPABASE_PUBLISHABLE_KEY`).
+9. **Aktualizacje bazy** (po wdrożeniu nowej wersji strony): uruchom raz w SQL Editor plik z `games/supabase/`. Teraz: `update_picture_plan.sql` (plan wieczoru Guess the Picture: liczba pytań, punktacja, „ostatnie pytanie” z mnożnikiem). Pliki są bezpieczne do powtórzenia i niczego nie kasują.
 
 ## Limity darmowego planu (Supabase Free)
 200 jednoczesnych połączeń, 100 wiadomości/s, 2 mln wiadomości/mies., 500 MB bazy, 5 GB transferu. Piątkowy wieczór gier dla 10–40 osób mieści się w limitach. Przy dużym ruchu: plan Pro (25 USD/mies.).

@@ -1,5 +1,6 @@
 import { $, h, toast, getBackend, identityCard, badge, nickStore, backendBanner, paintMe } from './common.js';
-import { renderBody, attachPicker } from './emotes.js';
+import { renderBody, attachPicker, emoteImg } from './emotes.js';
+import { loadQueue, saveQueue, shrink } from './queue.js';
 
 const code = (new URLSearchParams(location.search).get('r') || '').toUpperCase();
 if (!/^[A-Z0-9]{5}$/.test(code)) location.replace('./');
@@ -141,17 +142,25 @@ function renderPlayers() {
         } }, '✕') : null)));
   }
 }
+function lastBadge() {
+  const r = S.room;
+  if (r.mode !== 'obrazek') return null;
+  if (finalNow()) return h('span', { class: 'lastbadge' }, '⭐ LAST QUESTION' + (r.last_mult > 1 ? ' ×' + r.last_mult : ''));
+  if (r.final_turn != null && r.final_turn === r.turn_no + 1 && r.phase !== 'turn' && r.phase !== 'finished') return h('span', { class: 'lastbadge soon' }, '⭐ next is the last' + (r.last_mult > 1 ? ' ×' + r.last_mult : ''));
+  return null;
+}
 function renderTop() {
   const r = S.room, w = $('#word');
   $('#roundinfo').textContent = '';
   $('#roundinfo').append(...(r.mode === 'kalambury'
     ? [h('b', {}, `Round ${Math.max(1, r.round_no)}/${r.rounds}`), h('br'), `${r.title} · casual`]
-    : [h('b', {}, r.round_no ? `Picture #${r.round_no}` : 'Pictures'), h('br'), r.title + (r.match_id ? (r.ranked ? ' · ranked' : ' · unranked') : '')]));
+    : [h('b', {}, r.round_no ? `Picture #${r.round_no}${r.question_total ? ' of ' + r.question_total : ''}` : 'Pictures'),
+        lastBadge() || '', h('br'), r.title + (r.match_id ? (r.ranked ? ' · ranked' : ' · unranked') : '')]));
   w.className = 'word'; w.textContent = ''; w.removeAttribute('data-secret');
   const nLetters = (S.mask || '').replace(/[^_A-ZĄĆĘŁŃÓŚŹŻ0-9]/g, '').length;
   if (r.phase === 'turn' && S.secret) { w.classList.add('secret'); w.dataset.secret = '1'; w.append(h('small', {}, r.mode === 'kalambury' ? 'Your word to draw' : 'Answer (only you can see it)'), S.secret); }
   else if (r.phase === 'turn' && inCountdown()) { w.classList.add('plain'); w.append(h('small', {}, 'Get ready'), 'Picture incoming… 👀'); }
-  else if (r.phase === 'turn') w.append(h('small', {}, S.me.guessed ? (r.mode === 'obrazek' ? `You got it! (+${4 - ((S.podium || []).find((g) => g.user_id === meId())?.place || 3)})` : 'You got it! Waiting for the others') : `Guess the word (${nLetters} letter${nLetters === 1 ? '' : 's'})`), S.mask || '');
+  else if (r.phase === 'turn') w.append(h('small', {}, S.me.guessed ? (r.mode === 'obrazek' ? `You got it! (+${ptsFor((S.podium || []).find((g) => g.user_id === meId())?.place || 3)})` : 'You got it! Waiting for the others') : `Guess the word (${nLetters} letter${nLetters === 1 ? '' : 's'})`), S.mask || '');
   else if (r.phase === 'reveal') { w.classList.add('secret'); w.append(h('small', {}, r.mode === 'kalambury' ? 'The word was' : 'The answer was'), r.last_answer || ''); }
   else if (r.phase === 'waiting') { w.classList.add('plain'); w.append(h('small', {}, r.last_answer ? 'Last answer: ' + r.last_answer : ''), isImgHost() ? 'Pick a picture ↓' : 'Host is picking a picture…'); }
   else if (r.phase === 'finished') { w.classList.add('plain'); w.append('Game over 🏁'); }
@@ -195,7 +204,7 @@ function frogMedia() {
 function renderOverlay(force) {
   const o = $('#overlay'), r = S.room, view = overlayView();
   const sig = [view, r.turn_id, r.phase === 'lobby' ? S.players.length : '', r.phase === 'finished' ? JSON.stringify(S.results) : '',
-    JSON.stringify(S.next || null), r.last_answer, isRoomHost()].join('|');
+    JSON.stringify(S.next || null), r.last_answer, isRoomHost(), r.final_turn, r.last_mult, r.scorers, r.phase === 'reveal' ? JSON.stringify(S.podium || []) : ''].join('|');
   if (!force && sig === overlaySig) return;
   frogWasOn = !!frogVideo?.isConnected;
   overlaySig = sig; o.textContent = ''; o.className = 'overlay';
@@ -207,7 +216,7 @@ function renderOverlay(force) {
       isRoomHost() ? h('button', { class: 'btn primary big', onclick: start }, '▶ Start game') : h('p', { class: 'small', style: 'opacity:.85' }, `The ${modName()} starts the game.`)));
   } else if (view.startsWith('cd')) {
     o.classList.add('countdown-ov');
-    o.append(h('div', { class: 'cd-wrap' }, h('div', { class: 'cd-label' }, `Picture #${r.round_no} · get ready`),
+    o.append(h('div', { class: 'cd-wrap' }, h('div', { class: 'cd-label' }, finalNow() ? `⭐ LAST QUESTION${r.last_mult > 1 ? ' · points ×' + r.last_mult : ''}` : `Picture #${r.round_no}${r.question_total ? ' of ' + r.question_total : ''} · get ready`),
       h('div', { class: 'cd-num', role: 'timer', 'aria-live': 'assertive' }, view.slice(2)),
       h('div', { class: 'small', style: 'opacity:.85' }, 'Type your guess as soon as it shows up')));
   } else if (view === 'intermission') {
@@ -218,12 +227,13 @@ function renderOverlay(force) {
       h('div', { class: 'inter-sub' }, nx.final ? 'Final scores coming up…' : nx.user_id === meId() ? 'You\'re drawing next! ✏️' : nx.nick ? `${nx.nick} is drawing next` : 'Get ready…'),
       h('div', { class: 'small', style: 'opacity:.8;margin-top:6px' }, 'The word was ', h('b', {}, r.last_answer || '?'), ' · ', h('span', { id: 'nextin' }, ''))));
   } else if (view === 'reveal') {
-    o.append(h('div', {}, h('div', {}, r.mode === 'kalambury' ? 'The word was:' : 'The answer was:'), h('div', { class: 'ans' }, r.last_answer || '?')));
-    if (r.mode === 'obrazek') { o.classList.add('reveal-bar'); }
+    o.append(h('div', {}, h('div', {}, r.mode === 'kalambury' ? 'The word was:' : 'The answer was:'), h('div', { class: 'ans' }, r.last_answer || '?'),
+      r.mode === 'obrazek' ? winnersBlock() : null));
+    if (r.mode === 'obrazek') { o.classList.add('reveal-bar'); if (S.podium?.length) o.classList.add('party'); }
   } else if (view === 'waiting' && !isImgHost()) {
     o.classList.add('intermission-ov');
     o.append(h('div', { class: 'inter-card' }, frogMedia(), h('div', { class: 'inter-title' }, 'Next picture coming up'),
-      h('div', { class: 'inter-sub' }, 'The host is picking one…'),
+      h('div', { class: 'inter-sub' }, r.final_turn != null && r.final_turn === r.turn_no + 1 ? '⭐ The next question is the last one!' : 'The host is picking one…'),
       r.last_answer ? h('div', { class: 'small', style: 'opacity:.8;margin-top:6px' }, 'Last answer: ', h('b', {}, r.last_answer)) : null));
   } else if (view === 'waiting' && isImgHost()) {
     o.append(h('div', {}, h('div', { class: 'big' }, 'Pick a picture and an answer below ↓')));
@@ -236,10 +246,22 @@ function renderOverlay(force) {
   o.classList.toggle('hidden', !show);
   updateNextIn();
 }
+const MEDALS = { 1: '🥇', 2: '🥈', 3: '🥉' }, WIN_MEME = { 1: 'pep', 2: 'ready', 3: 'peek' };
+function winnersBlock() {
+  const r = S.room, pod = S.podium || [], last = finalNow();
+  const box = h('div', { class: 'winners' });
+  if (pod.length) {
+    box.append(h('div', { class: 'wlist' }, pod.map((g) => h('div', { class: 'win w' + g.place }, emoteImg(WIN_MEME[g.place] || 'pep', 'emote-big'),
+      h('b', {}, MEDALS[g.place] + ' ' + g.nick), h('span', { class: 'wpts' }, '+' + ptsFor(g.place))))));
+    box.append(h('div', { class: 'confetti', 'aria-hidden': 'true' }, ['🎉', '✨', '🎊', '⭐', '🎉', '✨', '🎊', '⭐'].map((c, i) => h('i', { style: `--i:${i}` }, c))));
+  } else box.append(h('div', { class: 'win' }, emoteImg('waiting', 'emote-big'), h('span', {}, 'Nobody got it this time 😅')));
+  if (last) box.append(h('div', { class: 'lastline' }, '⭐ That was the last question! Final results in ', h('span', { id: 'nextin' }, '')));
+  return box;
+}
 function updateNextIn() {
   const ni = $('#nextin'); if (!ni || !S?.room.next_at) return;
   const sec = Math.max(0, Math.ceil((Date.parse(S.room.next_at) - now()) / 1000));
-  ni.textContent = S.next?.final ? `results in ${sec}s` : `starting in ${sec}s`;
+  ni.textContent = S.next?.final || finalNow() ? `${sec}s…` : `starting in ${sec}s`;
 }
 // płynne przejścia zależne od czasu serwera (odliczanie, przerywnik) — sprawdzane co klatkę, renderowane tylko przy zmianie widoku
 function frame() {
@@ -252,6 +274,26 @@ function frame() {
 requestAnimationFrame(frame);
 async function start() { try { await be.rpc('gry_start', { p_code: code }); fetchState(); } catch (e) { toast(e.message, 'bad'); } }
 
+function lastQuestionControl(r) {
+  const flagged = r.last_turn_no != null;
+  const wrap = h('span', { class: 'lastctl' });
+  const send = async (cancel) => {
+    try { await be.rpc('gry_last_question', { p_code: code, p_mult: cancel ? null : lastMultSel, p_cancel: !!cancel }); lastPopOpen = false; fetchState(); }
+    catch (e) { toast(e.message, 'bad'); }
+  };
+  if (flagged) {
+    wrap.append(h('span', { class: 'lastbadge' }, '⭐ Last question set' + (r.last_mult > 1 ? ' ×' + r.last_mult : '')),
+      h('button', { class: 'btn sm', onclick: () => send(true) }, 'Undo'),
+      h('button', { class: 'btn sm', onclick: () => { lastMultSel = r.last_mult; lastPopOpen = !lastPopOpen; renderHostbar(); } }, '× Change points'));
+  } else wrap.append(h('button', { class: 'btn sm danger-solid', onclick: () => { lastPopOpen = !lastPopOpen; renderHostbar(); } }, '⭐ Last question'));
+  if (lastPopOpen) wrap.append(h('div', { class: 'lastpop' }, h('b', {}, flagged ? 'New points multiplier' : 'Make this the last question'),
+    h('p', { class: 'small muted', style: 'margin:4px 0 8px' }, flagged ? 'Applies to answers from now on.' : 'The game ends after the question being played now (or the next one if none is running), then everyone sees the final results. Points are multiplied:'),
+    multControl(lastMultSel, (m) => { lastMultSel = m; }),
+    h('div', { class: 'row', style: 'margin-top:10px' },
+      h('button', { class: 'btn danger-solid', onclick: () => send(false) }, flagged ? 'Save' : '⭐ Confirm last question'),
+      h('button', { class: 'btn', onclick: () => { lastPopOpen = false; renderHostbar(); } }, 'Close'))));
+  return wrap;
+}
 function renderHostbar() {
   const b = $('#hostbar'); b.textContent = '';
   const r = S.room, host = isRoomHost();
@@ -261,6 +303,7 @@ function renderHostbar() {
   b.append(h('span', { class: 'lbl' }, r.mode === 'kalambury' ? 'Moderator' : 'Host'));
   if (['lobby', 'finished'].includes(r.phase)) b.append(act('▶ Start', () => be.rpc('gry_start', { p_code: code }), 'btn sm primary'));
   if (r.phase === 'turn') b.append(act(r.mode === 'kalambury' ? '⏭ Skip turn' : '⏭ Reveal now', () => be.rpc('gry_skip', { p_code: code })));
+  if (r.mode === 'obrazek' && ['turn', 'reveal', 'waiting'].includes(r.phase)) b.append(lastQuestionControl(r));
   if (!['lobby', 'finished'].includes(r.phase)) b.append(act('🏁 End game', () => be.rpc('gry_finish', { p_code: code })));
   b.append(act('🔗 Copy link', async () => { await navigator.clipboard?.writeText(location.href.split('#')[0]); toast('Link copied'); }));
   b.append(act('Close room', async () => { if (confirm('Close the room for everyone?')) await be.rpc('gry_close_room', { p_code: code }); }, 'btn sm danger'));
@@ -433,40 +476,114 @@ const PRESETS = [
 ];
 const LEVELS = [6, 9, 14, 22, 34, 56, 90];
 const img = { el: null, answer: '', stages: [], sent: -1, turn: null };
-let pickIdx = 0, uploaded = null;
+// ---------- plan wieczoru + kolejka obrazków (host) ----------
+// Mnożnik punktów: chipy ×1…×5 albo własna liczba (1–10)
+function multControl(value, onChange) {
+  let v = value || 1;
+  const box = h('div', { class: 'multctl', role: 'group', 'aria-label': 'Points multiplier' });
+  const num = h('input', { type: 'number', min: 1, max: 10, value: v, 'aria-label': 'Custom multiplier', class: 'multnum' });
+  const paint = () => { box.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.m === v))); num.value = v; };
+  for (let m = 1; m <= 5; m++) box.append(h('button', { type: 'button', class: 'chip', 'data-m': m, onclick: () => { v = m; paint(); onChange(v); } }, '×' + m));
+  num.addEventListener('change', () => { v = Math.min(10, Math.max(1, Math.round(+num.value || 1))); paint(); onChange(v); });
+  box.append(h('span', { class: 'small muted' }, 'or'), num);
+  paint();
+  return box;
+}
+const finalNow = () => S?.room.final_turn != null && S.room.turn_no >= S.room.final_turn;
+const ptsFor = (place) => (S.room.scorers === 1 ? 1 : 4 - place) * (finalNow() ? S.room.last_mult : 1);
+const PLAN_TOTALS = [0, 5, 10, 15, 20];
+let queue = [], queueLoaded = false, shown = 0, lastMultSel = 2, lastPopOpen = false;
+const qUrl = (it) => it.url || (it.url = it.blob ? URL.createObjectURL(it.blob) : it.src);
+const qid = () => 'q' + Math.random().toString(36).slice(2, 9);
+async function persist() { await saveQueue(queue); }
+async function setPlan(patch) {
+  const r = S.room;
+  const total = 'total' in patch ? patch.total : (r.question_total || 0);
+  const scorers = 'scorers' in patch ? patch.scorers : r.scorers;
+  try { await be.rpc('gry_set_plan', { p_code: code, p_total: total, p_scorers: scorers, p_last_mult: patch.mult ?? null }); fetchState(); }
+  catch (e) { toast(e.message, 'bad'); }
+}
+async function showItem(it) {
+  if (!it.answer || it.answer.trim().length < 2) return toast('Type the answer for this picture first', 'bad');
+  try {
+    await prepareImage(qUrl(it), it.answer);
+    await be.rpc('gry_image_start', { p_code: code, p_answer: it.answer, p_seconds: it.secs });
+    queue = queue.filter((x) => x.id !== it.id); persist(); shown++;
+    p_render(true); fetchState();
+  } catch (e) { toast(e.message, 'bad'); }
+}
+function p_render(force) { const p = $('#imgpanel'); if (force) delete p.dataset.ready; renderImgPanel(); }
 function renderImgPanel() {
   const p = $('#imgpanel'), show = isImgHost() && ['waiting', 'reveal'].includes(S.room.phase);
   p.classList.toggle('hidden', !show);
   if (!show) { delete p.dataset.ready; return; }
-  if (p.dataset.ready) return;
+  if (!queueLoaded) {
+    queueLoaded = true;
+    loadQueue().then((items) => { queue = items.map((x) => ({ ...x })); if (!queue.length) queue = PRESETS.slice(0, 3).map((pr) => ({ id: qid(), kind: 'preset', src: pr.src, answer: pr.answer, secs: 120 })); p_render(true); });
+    return;
+  }
+  if (p.dataset.ready) { syncPlan(p); return; }
   p.dataset.ready = '1'; p.textContent = '';
-  const ans = h('input', { type: 'text', id: 'imgans', maxlength: 60, value: PRESETS[pickIdx]?.answer || '', placeholder: 'e.g. frog / pepe' });
-  const secs = h('select', { id: 'imgsecs' }, [30, 45, 60, 90, 120].map((s) => h('option', { value: s, selected: s === 120 }, s === 120 ? '2 min (max)' : s + ' s')));
-  const grid = h('div', { class: 'imgpick' });
-  const mark = () => grid.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-pressed', String(i === pickIdx)));
-  PRESETS.forEach((pr, i) => grid.append(h('button', { type: 'button', 'aria-label': 'Picture: ' + pr.answer, onclick: () => { pickIdx = i; uploaded = null; ans.value = pr.answer; mark(); } }, h('img', { src: pr.src, alt: '' }))));
-  const file = h('input', { type: 'file', accept: 'image/*', id: 'imgfile', class: 'small', onchange: (e) => {
-    const f = e.target.files[0]; if (!f) return;
-    if (f.size > 8e6) return toast('File too big (max 8 MB)', 'bad');
-    uploaded = URL.createObjectURL(f); pickIdx = -1; ans.value = ''; mark(); ans.focus(); toast('Picture loaded. Now type the answer');
+  const r = S.room;
+  // — plan —
+  const tot = h('select', { id: 'plan-total', 'aria-label': 'Number of questions' },
+    PLAN_TOTALS.map((n) => h('option', { value: n }, n ? n + ' questions' : 'Free play (no limit)')), h('option', { value: 'c' }, 'Custom…'));
+  const totNum = h('input', { type: 'number', min: 1, max: 100, id: 'plan-custom', class: 'hidden multnum', 'aria-label': 'Custom number of questions' });
+  tot.addEventListener('change', () => {
+    if (tot.value === 'c') { totNum.classList.remove('hidden'); totNum.value = r.question_total || 10; totNum.focus(); return; }
+    totNum.classList.add('hidden'); setPlan({ total: +tot.value });
+  });
+  totNum.addEventListener('change', () => setPlan({ total: Math.min(100, Math.max(1, Math.round(+totNum.value || 10))) }));
+  const sc = h('select', { id: 'plan-scorers', 'aria-label': 'Scoring' }, h('option', { value: 3 }, 'Top 3 score: 3 / 2 / 1 points'), h('option', { value: 1 }, 'Winner only: 1 point'));
+  sc.addEventListener('change', () => setPlan({ scorers: +sc.value }));
+  p.append(h('h3', {}, '⚙️ Plan'),
+    h('div', { class: 'row planrow' }, h('div', {}, h('label', { for: 'plan-total' }, 'Questions tonight'), h('div', { class: 'row' }, tot, totNum)),
+      h('div', {}, h('label', { for: 'plan-scorers' }, 'Scoring'), sc),
+      h('div', {}, h('label', {}, 'Final question points'), multControl(r.last_mult, (m) => setPlan({ mult: m })))),
+    h('p', { class: 'small muted', style: 'margin:6px 0 0' }, 'You can change this any time between pictures. The red “Last question” button below works at any moment, even while guests are guessing.'));
+  // — kolejka —
+  const list = h('div', { class: 'qlist', id: 'qlist' });
+  const file = h('input', { type: 'file', accept: 'image/*', multiple: true, id: 'imgfile', class: 'small', onchange: async (e) => {
+    const fs = [...e.target.files]; e.target.value = '';
+    for (const f of fs.slice(0, 40 - queue.length)) {
+      if (f.size > 12e6) { toast(f.name + ': file too big (max 12 MB)', 'bad'); continue; }
+      queue.push({ id: qid(), kind: 'file', blob: await shrink(f), answer: '', secs: 120 });
+    }
+    await persist(); renderQueueList(); toast('Added. Now type the answers 👇');
   } });
-  mark();
-  p.append(h('h3', {}, '🖼️ Next picture'), grid,
-    h('div', { class: 'row', style: 'margin-top:10px' }, h('label', { for: 'imgfile', style: 'margin:0' }, 'or upload your own:'), file),
-    h('div', { class: 'row', style: 'margin-top:10px;align-items:end' },
-      h('div', { style: 'flex:1;min-width:200px' }, h('label', { for: 'imgans' }, 'Answer (separate alternatives with "/")'), ans),
-      h('div', {}, h('label', { for: 'imgsecs' }, 'Time'), secs),
-      h('button', { class: 'btn primary', id: 'imgstart', onclick: async () => {
-        const src = uploaded || PRESETS[pickIdx]?.src;
-        if (!src) return toast('Pick a picture', 'bad');
-        try {
-          await prepareImage(src, ans.value);
-          await be.rpc('gry_image_start', { p_code: code, p_answer: ans.value, p_seconds: +secs.value });
-          pickIdx = (pickIdx + 1) % PRESETS.length; uploaded = null;
-          fetchState();
-        } catch (e) { toast(e.message, 'bad'); }
-      } }, '▶ Show (3-2-1)')),
-    h('p', { class: 'small muted', style: 'margin:8px 0 0' }, 'First 3 correct guesses score 3 / 2 / 1 points; the round ends after the 3rd correct guess or when time runs out (max 2 minutes). Everyone sees a 3-2-1 countdown first, then the picture appears for all players at the same moment. Players only receive pixelated versions (no peeking at the original in the browser). The full picture is sent after it is guessed or time runs out.'));
+  const presets = h('div', { class: 'imgpick' }, PRESETS.map((pr) => h('button', { type: 'button', 'aria-label': 'Add preset picture: ' + pr.answer,
+    onclick: async () => { queue.push({ id: qid(), kind: 'preset', src: pr.src, answer: pr.answer, secs: 120 }); await persist(); renderQueueList(); } }, h('img', { src: pr.src, alt: '' }))));
+  p.append(h('h3', { style: 'margin-top:16px' }, '🖼️ Picture queue'),
+    h('p', { class: 'small muted', style: 'margin:0 0 8px' }, 'Load pictures and answers ahead of time. They stay on this device. Show them in any order with ▶, or reorder with ↑ ↓.'), list,
+    h('div', { class: 'row', style: 'margin-top:10px' }, h('label', { for: 'imgfile', style: 'margin:0' }, '＋ Add your pictures:'), file),
+    h('details', { style: 'margin-top:8px' }, h('summary', { class: 'small' }, 'Add one of the ready-made pictures'), presets),
+    h('p', { class: 'small muted', style: 'margin:8px 0 0' }, 'Answers: separate alternatives with “/”. Players only get pixelated versions while guessing; the full picture appears after the round. Scoring and multiplier come from the plan above.'));
+  renderQueueList(); syncPlan(p);
+}
+function syncPlan(p) {
+  const r = S.room, t = $('#plan-total', p), n = $('#plan-custom', p), sc = $('#plan-scorers', p);
+  if (!t || document.activeElement === t || document.activeElement === n || document.activeElement === sc) return;
+  const v = r.question_total || 0;
+  if (PLAN_TOTALS.includes(v)) { t.value = String(v); n.classList.add('hidden'); } else { t.value = 'c'; n.classList.remove('hidden'); n.value = v; }
+  sc.value = String(r.scorers);
+}
+function renderQueueList() {
+  const list = $('#qlist'); if (!list) return; list.textContent = '';
+  if (!queue.length) { list.append(h('p', { class: 'muted small' }, 'The queue is empty. Add pictures below.')); return; }
+  queue.forEach((it, i) => {
+    const ans = h('input', { type: 'text', maxlength: 60, value: it.answer, placeholder: 'Answer, e.g. frog / pepe', 'aria-label': 'Answer for picture ' + (i + 1), class: it.answer ? '' : 'needs' });
+    ans.addEventListener('input', () => { it.answer = ans.value; ans.classList.toggle('needs', !ans.value.trim()); });
+    ans.addEventListener('change', persist);
+    const secs = h('select', { 'aria-label': 'Time for picture ' + (i + 1) }, [30, 45, 60, 90, 120].map((s2) => h('option', { value: s2, selected: s2 === it.secs }, s2 === 120 ? '2 min' : s2 + ' s')));
+    secs.addEventListener('change', () => { it.secs = +secs.value; persist(); });
+    const mv = (d) => { const j = i + d; if (j < 0 || j >= queue.length) return; [queue[i], queue[j]] = [queue[j], queue[i]]; persist(); renderQueueList(); };
+    list.append(h('div', { class: 'qitem' + (i === 0 ? ' next' : '') },
+      h('span', { class: 'qn' }, i === 0 ? 'Next' : '#' + (i + 1)), h('img', { src: qUrl(it), alt: '', class: 'qthumb' }), ans, secs,
+      h('button', { class: 'btn sm primary', title: 'Show this picture now', onclick: () => showItem(it) }, '▶ Show'),
+      h('button', { class: 'btn sm', title: 'Move up', 'aria-label': 'Move up', disabled: i === 0, onclick: () => mv(-1) }, '↑'),
+      h('button', { class: 'btn sm', title: 'Move down', 'aria-label': 'Move down', disabled: i === queue.length - 1, onclick: () => mv(1) }, '↓'),
+      h('button', { class: 'btn sm danger', title: 'Remove', 'aria-label': 'Remove', onclick: () => { queue.splice(i, 1); persist(); renderQueueList(); } }, '✕')));
+  });
 }
 function loadImg(src) { return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('Could not load the picture')); im.src = src; }); }
 async function prepareImage(src, answer) {

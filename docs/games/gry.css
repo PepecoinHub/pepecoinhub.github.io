@@ -395,3 +395,40 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .emote-pick:hover, .emote-pick:focus-visible { border-color: var(--accent); background: var(--accent-wash); }
 .emote-pick.host { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
 .emote-pick img { width: 100%; height: 100%; object-fit: contain; }
+
+/* plan, picture queue, last question, winners */
+.planrow { align-items: flex-end; gap: 16px; }
+.planrow > div { flex: 1 1 200px; }
+.multctl { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.chip { border: 1.5px solid var(--grid); background: var(--panel); border-radius: 999px; padding: 6px 12px; font-weight: 700; cursor: pointer; color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.multnum { width: 74px; }
+.qlist { display: grid; gap: 8px; }
+.qitem { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px; border: 1px solid var(--grid); border-radius: 12px; background: var(--surface); }
+.qitem.next { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-wash); }
+.qn { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); min-width: 3.2em; }
+.qthumb { width: 64px; height: 48px; object-fit: cover; border-radius: 8px; background: #fff; }
+.qitem input[type=text] { flex: 1 1 160px; min-width: 120px; }
+.qitem input.needs { border-color: var(--danger); }
+.btn.danger-solid { background: #c43d2f; color: #fff; border-color: transparent; font-weight: 700; }
+.btn.danger-solid:hover { filter: brightness(1.08); }
+.lastctl { position: relative; display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.lastpop { position: absolute; bottom: calc(100% + 8px); left: 0; z-index: 30; width: min(360px, 86vw); padding: 14px; background: var(--surface); border: 2px solid #c43d2f; border-radius: var(--radius); box-shadow: var(--shadow); }
+.lastbadge { display: inline-block; margin-left: 8px; padding: 2px 10px; border-radius: 999px; background: #c43d2f; color: #fff; font-size: .78rem; font-weight: 700; letter-spacing: .04em; animation: pulse 1.4s ease-in-out infinite; }
+.lastbadge.soon { background: var(--gold); color: #0b0b0b; animation: none; }
+@keyframes pulse { 50% { transform: scale(1.06); } }
+.winners { margin-top: 10px; position: relative; }
+.wlist { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.win { display: flex; align-items: center; gap: 8px; }
+.win .wpts { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 2px 10px; font-weight: 700; font-family: var(--mono); }
+.win.w1 .emote-big { width: 72px; height: 72px; animation: bounce .8s ease-in-out infinite alternate; }
+@keyframes bounce { to { transform: translateY(-8px) rotate(-4deg); } }
+.lastline { margin-top: 10px; font-weight: 700; color: var(--gold); }
+.confetti { position: absolute; inset: -30px 0 0; pointer-events: none; overflow: hidden; }
+.confetti i { position: absolute; top: -10px; left: calc(var(--i) * 12.5% + 3%); font-style: normal; font-size: 1.4rem; animation: fall 2.4s ease-in calc(var(--i) * .15s) infinite; }
+@keyframes fall { to { transform: translateY(170px) rotate(300deg); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .confetti i, .win.w1 .emote-big, .lastbadge { animation: none; } }
+.multctl input.multnum, .planrow input.multnum { width: 78px; flex: none; }
+.qitem select { width: auto; flex: none; }
+.qitem .qthumb { flex: none; }
+.qitem .btn { flex: none; }
