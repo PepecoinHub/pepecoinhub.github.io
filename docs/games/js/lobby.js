@@ -12,11 +12,30 @@ let lobby = null, offset = 0;
 const MODE_LABEL = { kalambury: 'Draw & Guess', obrazek: 'Pepe Pictures' };
 const TGAME = { chess: ['♟️', 'Chess'], checkers: ['⚫', 'Checkers'], connect4: ['🔴', 'Connect Four'], battleship: ['🚢', 'Sea Battle'] };
 const TDESC = {
-  chess: ['Classic chess with castling, en passant and promotion.', 'Game clock: bullet, blitz, rapid or your own'],
+  chess: ['Classic chess with castling, en passant and promotion.', 'Optional game clock'],
   checkers: ['English draughts on 8×8. Captures are mandatory.', 'Optional move timer'],
   connect4: ['Drop discs on a 7×6 grid and line up four.', 'Optional move timer'],
   battleship: ['Hide 5 ships on a 10×10 grid and sink the other fleet.', 'Optional no-touch rule'],
 };
+// small static previews of each board, drawn with the same colours as the real game boards
+function boardPreview(game) {
+  const g = h('span', { class: 'gprev gprev-' + game, 'aria-hidden': 'true' });
+  const cell = (cls, txt) => g.append(h('span', { class: cls }, txt || ''));
+  if (game === 'chess') {
+    const P = { 1: '♜', 6: '♚', 9: '♟', 18: '♞', 21: '♙', 28: '♔', 30: '♖' };
+    for (let i = 0; i < 36; i++) cell(((i % 6) + Math.floor(i / 6)) % 2 ? 'dk' : 'lt', P[i]);
+  } else if (game === 'checkers') {
+    const B = [1, 3, 5, 6, 8, 10], W = [25, 27, 29, 30, 32, 34];
+    for (let i = 0; i < 36; i++) { const dk = ((i % 6) + Math.floor(i / 6)) % 2; g.append(h('span', { class: dk ? 'dk' : 'lt' }, dk && (B.includes(i) || W.includes(i)) ? h('i', { class: B.includes(i) ? 'pb' : 'pw' }) : '')); }
+  } else if (game === 'connect4') {
+    const D = { 35: 'r', 36: 'y', 37: 'r', 38: 'y', 29: 'y', 30: 'r', 31: 'r', 23: 'r', 24: 'y', 17: 'r' };
+    for (let i = 0; i < 42; i++) g.append(h('span', { class: 'hole' }, D[i] ? h('i', { class: 'disc ' + D[i] }) : ''));
+  } else {
+    const SHIP = [8, 9, 10, 27, 33], HIT = [9, 33], MISS = [2, 15, 22, 31];
+    for (let i = 0; i < 36; i++) cell('sea' + (SHIP.includes(i) ? ' ship' : '') + (HIT.includes(i) ? ' hit' : '') + (MISS.includes(i) ? ' miss' : ''));
+  }
+  return g;
+}
 const PHASE_LABEL = { lobby: 'waiting to start', turn: 'in progress', reveal: 'in progress', waiting: 'in progress', finished: 'finished' };
 
 async function load() {
@@ -77,8 +96,7 @@ function renderNewRoom() {
   const title = h('input', { type: 'text', id: 'nr-title', maxlength: 40, placeholder: (nickStore.get() || 'Frog') + "'s room" });
   const rounds = h('select', { id: 'nr-rounds' }, [1, 2, 3, 4, 5].map((n) => h('option', { value: n, selected: n === 2 }, n + (n === 1 ? ' round' : ' rounds'))));
   const secs = h('select', { id: 'nr-secs' }, [[60, '60 s'], [80, '80 s'], [100, '100 s'], [120, '120 s']].map(([v, l]) => h('option', { value: v, selected: v === 80 }, l + ' per drawing')));
-  box.append(h('h4', {}, 'Start your own room'),
-    h('p', { class: 'small muted', style: 'margin:0 0 10px' }, 'No host code needed. You become the room moderator (start, restart, kick); if you leave, the next player takes over. Empty rooms close by themselves.'),
+  box.append(h('h4', {}, 'Start a room'),
     h('div', {}, h('label', { for: 'nr-title' }, 'Room name (optional)'), title),
     h('div', { class: 'row', style: 'gap:12px;align-items:end;margin-top:10px' }, h('div', {}, h('label', { for: 'nr-rounds' }, 'Rounds'), rounds), h('div', {}, h('label', { for: 'nr-secs' }, 'Time'), secs)),
     h('div', { class: 'row', style: 'margin-top:12px' },
@@ -168,14 +186,11 @@ async function loadTables() {
 function renderNewTable() {
   const box = $('#tcreate'); if (!box) return; box.textContent = '';
   const logged = !!be.session();
-  const pick = h('div', { class: 'tscroll' }, h('table', { class: 'gtable pick', role: 'radiogroup', 'aria-label': 'Game' },
-    h('thead', {}, h('tr', {}, ['Game', 'How it works', 'Options'].map((x) => h('th', { scope: 'col' }, x)))),
-    h('tbody', {}, Object.entries(TGAME).map(([k, [ico, name]], i) => {
-      const row = h('tr', { class: 'pickrow', onclick: (e) => { const r = row.querySelector('input'); if (!r.checked) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); } } },
-        h('td', { 'data-label': 'Game' }, h('label', { class: 'pickname' }, h('input', { type: 'radio', name: 'tgame', value: k, checked: i === 0 }), h('span', { 'aria-hidden': 'true' }, ico), h('b', {}, name))),
-        h('td', { 'data-label': 'How it works' }, TDESC[k][0]), h('td', { 'data-label': 'Options' }, TDESC[k][1]));
-      return row;
-    }))));
+  const pick = h('div', { class: 'gcards', role: 'radiogroup', 'aria-label': 'Game' }, Object.entries(TGAME).map(([k, [, name]], i) =>
+    h('label', { class: 'gcard' }, h('input', { type: 'radio', name: 'tgame', value: k, checked: i === 0 }),
+      h('span', { class: 'gcard-check', 'aria-hidden': 'true' }, '✓'),
+      boardPreview(k),
+      h('b', { class: 'gcard-name' }, name), h('span', { class: 'gcard-desc' }, TDESC[k][0]), h('span', { class: 'gcard-opt' }, TDESC[k][1]))));
   // tempo: szachy = zegar partii (presety + własny), warcaby / C4 = limit na ruch
   const TC = [['none', 'No clock'], ['1+0', 'Bullet 1+0'], ['2+1', 'Bullet 2+1'], ['3+2', 'Blitz 3+2'], ['5+0', 'Blitz 5+0'],
               ['10+0', 'Rapid 10+0'], ['15+10', 'Rapid 15+10'], ['custom', 'Custom']];
