@@ -216,9 +216,9 @@ function renderOverlay(force) {
   let show = true;
   if (view === 'lobby') {
     o.classList.add('lobby-ov');
-    o.append(h('div', {}, h('img', { class: 'torch-pic', src: 'img/emotes/torch.webp', alt: '', width: 84, height: 86 }), h('div', { class: 'big' }, `Waiting for the ${modName()} to start`),
+    o.append(h('div', {}, h('div', { class: 'big' }, 'Waiting for the host to start'),
       h('p', {}, `${S.players.length} in the room · invite friends: `, h('b', { class: 'mono' }, location.href.split('#')[0])),
-      isRoomHost() ? h('button', { class: 'btn primary big', onclick: start }, '▶ Start game') : h('p', { class: 'small', style: 'opacity:.85' }, `The ${modName()} starts the game.`)));
+      isRoomHost() ? h('button', { class: 'btn primary big', onclick: start }, '▶ Start game') : h('p', { class: 'small', style: 'opacity:.85' }, 'The host starts the game.')));
   } else if (view.startsWith('cd')) {
     o.classList.add('countdown-ov');
     o.append(h('div', { class: 'cd-wrap' }, h('div', { class: 'cd-label' }, finalNow() ? `LAST QUESTION${r.last_mult > 1 ? ' · points ×' + r.last_mult : ''}` : `Picture #${r.round_no}${r.question_total ? ' of ' + r.question_total : ''} · get ready`),
