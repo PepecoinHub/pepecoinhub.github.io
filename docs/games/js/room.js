@@ -2,6 +2,7 @@ import { $, h, toast, getBackend, identityCard, badge, nickStore, backendBanner,
 import { renderBody, attachPicker, emoteImg } from './emotes.js';
 import { stickerEl, attachStickerPicker } from './stickers.js';
 import { loadQueue, saveQueue, shrink } from './queue.js';
+import { parseCommand, HELP, openTip, startAirdrop, claimAirdrop, payoutDialog } from './tips.js';
 import { fitImage, pack, canChunk, makeSender, makeReceiver } from './imgchunks.js';
 
 const code = (new URLSearchParams(location.search).get('r') || '').toUpperCase();
@@ -104,7 +105,7 @@ function apply(s) {
   if (s.room.phase === 'finished' && prev?.room.phase !== 'finished') blank();
   if (s.room.mode === 'kalambury' && prev?.room.phase !== 'turn' && s.room.phase === 'turn' && isDrawer()) toast('Your turn! Draw: ' + s.secret, 'good');
   if (prev && prev.room.phase === 'turn' && s.room.phase === 'reveal' && isImgHost()) sendFinalImage();
-  renderPlayers(); renderTop(); renderOverlay(); renderTools(); renderHostbar(); renderImgPanel(); renderMsgs(s.messages);
+  renderPlayers(); renderTop(); renderOverlay(); renderTools(); renderHostbar(); renderImgPanel(); renderMsgs(s.messages); renderAirdrop();
   $('#cwrap').classList.toggle('can-draw', isDrawer());
   $('#cwrap').classList.toggle('pixel', s.room.mode === 'obrazek');
   const ci = $('#chatin');
@@ -130,6 +131,44 @@ function spotsLine() {
     pod.map((g) => h('span', { class: 'badge host', style: 'margin-right:6px' }, `${PLACE[g.place]} guessed it! ${g.nick}`)),
     r.phase === 'turn' ? (left ? `${left} spot${left === 1 ? '' : 's'} left` : 'All spots taken') : null);
 }
+// ---------- airdrop banner above the chat ----------
+let adDismissed = 0;
+function airdropBox() {
+  let b = $('#airdrop');
+  if (!b) { b = h('div', { id: 'airdrop', class: 'airdrop hidden', 'aria-live': 'polite' }); $('#msgs').before(b); }
+  return b;
+}
+function renderAirdrop() {
+  const b = airdropBox(), ad = S.airdrop;
+  if (!ad || ad.id === adDismissed) { b.classList.add('hidden'); b.dataset.sig = ''; return; }
+  const sig = [ad.id, ad.status, ad.nicks.length, ad.me_claimed, !!ad.payout].join('|');
+  b.classList.remove('hidden');
+  if (b.dataset.sig === sig) return airdropTick();
+  b.dataset.sig = sig; b.textContent = ''; b.classList.toggle('done', ad.status !== 'open');
+  const who = ad.nicks.length ? ad.nicks.join(', ') : 'nobody yet';
+  if (ad.status === 'open') {
+    b.append(h('div', { class: 'ad-top' }, h('b', {}, 'AIRDROP'), h('span', {}, `${ad.amount} PEP from ${ad.creator_nick}`), h('span', { class: 'ad-left mono', id: 'ad-left' }, '')),
+      h('div', { class: 'small' }, `${ad.nicks.length} joined: ${who}`),
+      h('div', { class: 'row', style: 'margin-top:6px' },
+        ad.mine ? h('span', { class: 'small' }, 'Your airdrop. When it ends you get the payout list.')
+          : ad.me_claimed ? h('span', { class: 'small' }, 'You are in. Your share arrives from ' + ad.creator_nick + '\'s wallet.')
+          : h('button', { class: 'btn primary sm', onclick: (e) => { e.target.disabled = true; claimAirdrop(be, code, fetchState).finally(() => { e.target.disabled = false; }); } }, 'Claim')),
+      h('div', { class: 'small muted', style: 'margin-top:4px' }, 'Paid by the starter from their own wallet. Discord players with a PEP address can claim.'));
+  } else {
+    const n = ad.nicks.length, share = n ? Math.floor((+ad.amount / n) * 1e8) / 1e8 : 0;
+    b.append(h('div', { class: 'ad-top' }, h('b', {}, 'AIRDROP ENDED'), h('span', {}, `${ad.amount} PEP from ${ad.creator_nick}`),
+        h('button', { class: 'ad-x', title: 'Hide', 'aria-label': 'Hide', onclick: () => { adDismissed = ad.id; renderAirdrop(); } }, '✕')),
+      h('div', { class: 'small' }, n ? `${n === 1 ? '1 player gets' : n + ' players get'} ${share} PEP each: ${who}` : 'Nobody claimed it.'),
+      ad.mine && n ? h('div', { class: 'row', style: 'margin-top:6px' }, h('button', { class: 'btn primary sm', onclick: () => payoutDialog(ad) }, 'Payout list')) : null);
+  }
+  airdropTick();
+}
+function airdropTick() {
+  const ad = S?.airdrop; if (!ad || ad.status !== 'open') return;
+  const left = Math.ceil((Date.parse(ad.ends_at) - now()) / 1000);
+  const el = $('#ad-left'); if (el) el.textContent = left > 0 ? left + ' s left' : 'ending…';
+  if (left <= -1) tick();
+}
 function renderPlayers() {
   const ul = $('#plist'); ul.textContent = '';
   $('#pcount').textContent = S.players.length;
@@ -140,6 +179,7 @@ function renderPlayers() {
       h('span', { class: 'nick' }, p.nick, ' ', badge(p.verified, p.is_host, true, S.room.mode === 'kalambury' ? 'mod' : 'host'),
         p.place ? h('span', { class: 'badge host podium', title: PLACE[p.place] + ' guessed it!' }, PLACE[p.place] + ' guessed it!') : null),
       h('span', { class: 'row', style: 'gap:4px;flex-wrap:nowrap' }, h('span', { class: 'score' }, p.score),
+        p.verified && p.user_id !== meId() ? h('button', { class: 'tipbtn', title: 'Tip ' + p.nick, 'aria-label': 'Tip ' + p.nick, onclick: () => openTip(be, code, p.nick) }, 'Tip') : null,
         isRoomHost() && p.user_id !== meId() ? h('button', { class: 'kick', title: 'Kick ' + p.nick, 'aria-label': 'Kick ' + p.nick, onclick: async () => {
           if (!confirm(`Kick ${p.nick} from the room?`)) return;
           try { await be.rpc('gry_kick', { p_code: code, p_user: p.user_id }); } catch (e) { toast(e.message, 'bad'); }
@@ -367,6 +407,14 @@ $('#chatform').addEventListener('submit', async (e) => {
   e.preventDefault();
   const inp = $('#chatin'), text = inp.value.trim();
   if (!text) return;
+  const cmd = parseCommand(text);
+  if (cmd) {
+    inp.value = '';
+    if (cmd.type === 'tip') openTip(be, code, cmd.nick, cmd.amount);
+    else if (cmd.type === 'airdrop') startAirdrop(be, code, cmd.amount, cmd.seconds).then(fetchState);
+    else { localNotes.push({ after: S.messages.at(-1)?.id || 0, text: HELP }); renderMsgs(S.messages); }
+    return;
+  }
   if (Date.now() < sendReadyAt) { renderSend(); return; }   // Enter też respektuje odliczanie; tekst zostaje w polu
   inp.value = '';
   const btn = $('#chatsend'); if (btn) btn.disabled = true;
@@ -406,6 +454,7 @@ function loop() {
   }
   if (isImgHost()) imageHostLoop();
   if (isDrawer()) flushStrokes();
+  airdropTick();
 }
 
 // ---------- rysowanie (kalambury) ----------

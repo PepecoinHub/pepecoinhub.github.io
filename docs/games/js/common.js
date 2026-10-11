@@ -140,7 +140,8 @@ export async function identityCard(container, { onReady, cta = 'Play' } = {}) {
       container.append(
         h('span', { class: 'id-step ok' }, '✓ Signed in'), h('h2', {}, 'Playing as ', h('span', { class: 'id-name' }, me.nick || me.discord_name || nickStore.get() || 'guest')),
         h('div', {}, h('label', { for: 'nick' }, me.verified ? 'Nickname (reserved for your Discord)' : 'Nickname'), nickIn),
-        h('div', { class: 'row', style: 'margin:10px 0' }, badge(me.verified)),
+        h('div', { class: 'row', style: 'margin:10px 0' }, badge(me.verified),
+          me.verified ? h('button', { type: 'button', class: 'btn sm', onclick: async () => (await import('./tips.js')).walletDialog(be) }, 'PEP address for tips') : null),
         h('div', { class: 'row' },
           h('button', { class: 'btn primary', id: 'btn-play', onclick: () => go(async () => {}) }, cta),
           h('button', { class: 'btn sm', onclick: async () => { await be.logout(); await paintMe(be); render(); } }, 'Log out / switch')));

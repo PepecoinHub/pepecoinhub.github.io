@@ -533,3 +533,22 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .gprev-battleship .miss::after { content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px; border-radius: 50%; background: #5f86a8; }
 @media (prefers-reduced-motion: reduce) { .gcard, .gcard-check { transition: none; } .gcard:hover { transform: none; } }
 @media (max-width: 520px) { .gcards { grid-template-columns: 1fr 1fr; gap: 10px; } .gcard { padding: 12px 8px; } .gprev { width: 84px; } .gprev-connect4 { width: 92px; } .gcard-desc { font-size: .8rem; } }
+
+/* tips and airdrops */
+.tipbtn { border: 1px solid var(--accent); background: transparent; color: var(--accent-deep); border-radius: 999px; font-size: .72rem; font-weight: 700; padding: 1px 8px; cursor: pointer; }
+.tipbtn:hover { background: var(--accent-wash); }
+.chathelp { margin: 0; padding: 0 12px 10px; font-size: .78rem; }
+.airdrop { margin: 8px 10px 4px; padding: 10px 12px; border-radius: 12px; border: 2px solid var(--gold); background: var(--gold-soft, #fbe9c8); color: var(--ink); }
+.airdrop.done { border-color: var(--grid); background: var(--surface-2); }
+.airdrop .ad-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.airdrop .ad-top b { letter-spacing: .06em; font-size: .8rem; }
+.airdrop .ad-left { margin-left: auto; font-weight: 700; }
+.airdrop .ad-x { margin-left: auto; border: 0; background: transparent; cursor: pointer; color: var(--muted); font-size: 1rem; }
+.tipdlg { max-width: 520px; width: calc(100% - 32px); border: 0; }
+.tipdlg::backdrop { background: rgba(0,0,0,.45); }
+.tiprow { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+.tipqr { flex: none; width: 150px; background: #fff; border-radius: 10px; padding: 4px; }
+.tipqr svg { width: 100%; height: auto; display: block; }
+.tipaddr, .payrow code { display: block; font-size: .82rem; overflow-wrap: anywhere; user-select: all; }
+.payout { display: grid; gap: 6px; max-height: 260px; overflow: auto; }
+.payrow { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 8px; background: var(--surface-2); }
