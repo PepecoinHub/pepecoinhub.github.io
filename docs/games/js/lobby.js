@@ -92,7 +92,7 @@ function renderNewRoom() {
       logged ? null : h('span', { class: 'small muted' }, 'Log in or pick a nickname at the top first.')));
 }
 renderNewRoom(); renderNewTable();
-await identityCard($('#identity'), { cta: 'Play', onReady: () => { renderNewRoom(); renderNewTable(); renderSchedHost(); toast('All set! Pick a game below 👇', 'good'); $('#maingames').scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
+await identityCard($('#identity'), { cta: 'Play', onReady: () => { renderNewRoom(); renderNewTable(); renderSchedHost(); toast('All set! Pick a game below', 'good'); $('#maingames').scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
 renderNewRoom(); renderNewTable();
 await Promise.all([load(), loadTables(), loadTopboard()]);
 renderSchedHost();

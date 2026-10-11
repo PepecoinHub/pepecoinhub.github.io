@@ -3,15 +3,22 @@
 import { h } from './common.js';
 
 export const EMOTES = [
-  { code: 'peek', label: 'Peeking', host: false },
-  { code: 'ready', label: 'Ready!', host: false },
-  { code: 'waiting', label: 'Waiting…', host: false },
-  { code: 'pep', label: 'PEP', host: false },
-  { code: 'serious', label: 'Time to be serious', host: true },
-  { code: 'hurry', label: 'Hurry up!', host: true },
-  { code: 'news', label: 'Breaking news', host: true },
-  { code: 'loading', label: 'Loading…', host: true },
-  { code: 'crowd', label: 'Everybody!', host: true },
+  { code: 'peek', label: 'Peeking' },
+  { code: 'ready', label: 'Ready!' },
+  { code: 'waiting', label: 'Waiting…' },
+  { code: 'pep', label: 'PEP' },
+  { code: 'cheer', label: 'Hooray!' },
+  { code: 'torch', label: 'Torch' },
+  { code: 'hug', label: 'Hello!' },
+  { code: 'chair', label: 'Sitting' },
+  { code: 'crayon', label: 'Drawing' },
+  { code: 'smoke', label: 'Chillin\'' },
+  { code: 'scream', label: 'Aaaah!' },
+  { code: 'serious', label: 'Time to be serious' },
+  { code: 'hurry', label: 'Hurry up!' },
+  { code: 'news', label: 'Breaking news' },
+  { code: 'loading', label: 'Loading…' },
+  { code: 'crowd', label: 'Everybody!' },
 ];
 const BY = Object.fromEntries(EMOTES.map((e) => [e.code, e]));
 const src = (c) => `img/emotes/${c}.webp`;
@@ -36,13 +43,10 @@ export function attachPicker(form, input, isHost = () => false) {
   const pop = h('div', { class: 'emote-pop hidden', role: 'group', 'aria-label': 'Emotes' });
   const fill = () => {
     pop.textContent = '';
-    const host = isHost();
     for (const e of EMOTES) {
-      if (e.host && !host) continue;
-      pop.append(h('button', { type: 'button', class: 'emote-pick' + (e.host ? ' host' : ''), title: e.label, 'aria-label': e.label,
+      pop.append(h('button', { type: 'button', class: 'emote-pick', title: e.label, 'aria-label': e.label,
         onclick: () => { input.value = (input.value + ' :' + e.code + ':').trim(); input.focus(); close(); } }, emoteImg(e.code, 'emote-big')));
     }
-    if (host) pop.append(h('p', { class: 'small muted' }, '👑 Gold-framed emotes are host-only.'));
   };
   const close = () => { pop.classList.add('hidden'); btn.setAttribute('aria-expanded', 'false'); };
   btn.addEventListener('click', () => {
