@@ -491,3 +491,9 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .msgs .sticker { display: inline-block; vertical-align: middle; }
 .msgs .sticker img { width: 96px; height: 96px; object-fit: contain; display: block; }
 @media (max-width: 560px) { .msgs .sticker img { width: 72px; height: 72px; } .sticker-btn { padding: 6px 8px; } }
+
+/* room waiting screen and game over pictures */
+.overlay.lobby-ov { background: linear-gradient(rgba(10, 16, 12, 0.45), rgba(10, 16, 12, 0.6)), #fff url(img/room-waiting.webp) center 35% / cover no-repeat; backdrop-filter: none; }
+@media (prefers-reduced-motion: reduce) { .overlay.lobby-ov { background-image: linear-gradient(rgba(10, 16, 12, 0.62), rgba(10, 16, 12, 0.72)), url(img/room-waiting-still.webp); } }
+.overlay.lobby-ov .big, .overlay.lobby-ov p { text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7); }
+.cheer-pic { display: block; margin: 0 auto 6px; width: 140px; height: auto; }

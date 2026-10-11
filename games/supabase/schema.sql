@@ -856,7 +856,7 @@ begin
   end if;
   -- limit ogólny (Guess the Picture bez zmian): 1 wiadomość / 0,6 s i max 10 na 10 s
   if me.last_msg_at is not null and me.last_msg_at > now() - interval '600 milliseconds' then
-    raise exception 'Slow down a little 🙂'; end if;
+    raise exception 'Slow down a little'; end if;
   if me.msg_window_start is null or me.msg_window_start < now() - interval '10 seconds' then
     update games.players set msg_window_start = now(), msg_window_count = 1, last_msg_at = now(), last_seen = now()
      where room_code = r.code and user_id = u;
@@ -872,10 +872,10 @@ begin
     is_master := (r.mode = 'kalambury' and r.drawer_id = u) or (r.mode = 'obrazek' and me.is_host);
     is_guesser := not is_master and me.guessed_turn is distinct from r.turn_id;
     if is_master and s.keys is not null and exists (select 1 from unnest(s.keys) x where position(x in k) > 0) then
-      raise exception 'Don''t give away the answer! 🤐';
+      raise exception 'Don''t give away the answer!';
     end if;
     if is_guesser and now() < r.turn_started_at then
-      raise exception 'Wait for the picture! 👀';
+      raise exception 'Wait for the picture!';
     end if;
     if is_guesser and k = any(s.keys) and r.mode = 'obrazek' then
       -- pierwsze 3 poprawne odpowiedzi = 3 / 2 / 1 pkt, bez mnożnika czasu. Wiersz pokoju jest zablokowany (for update),
@@ -889,7 +889,7 @@ begin
       values (r.match_id, r.turn_id, u, me.nick, me.nick_key, me.verified, rnk);
       pts := (case when nsc = 1 then 1 else 4 - rnk end) * mult;
       update games.players set score = score + pts, guessed_turn = r.turn_id where room_code = r.code and user_id = u;
-      perform games.sys(r.code, case rnk when 1 then '🥇 1st' when 2 then '🥈 2nd' else '🥉 3rd' end || ' guessed it! ' || me.nick || ' (+' || pts || case when mult > 1 then ', ×' || mult else '' end || ')', 'correct');
+      perform games.sys(r.code, case rnk when 1 then '1st' when 2 then '2nd' else '3rd' end || ' guessed it! ' || me.nick || ' (+' || pts || case when mult > 1 then ', ×' || mult else '' end || ')', 'correct');
       select count(*) filter (where p.guessed_turn = r.turn_id), count(*) into done, eligible
         from games.players p where p.room_code = r.code and games.active(p) and not p.is_host;
       if rnk >= least(nsc, 3) then
@@ -971,7 +971,7 @@ begin
     m := coalesce(p_mult, r.last_mult);
     if m < 1 or m > 10 then raise exception 'Multiplier: 1–10'; end if;
     update games.rooms set last_turn_no = case when r.phase = 'turn' then r.turn_no else r.turn_no + 1 end, last_mult = m where code = r.code;
-    perform games.sys(r.code, '⭐ Last question!' || case when m > 1 then ' Points ×' || m else '' end);
+    perform games.sys(r.code, 'Last question!' || case when m > 1 then ' Points ×' || m else '' end);
   end if;
   perform games.notify(r.code, 'state');
 end $$;
@@ -2348,12 +2348,12 @@ begin
   select * into me from games.players where room_code = r.code and user_id = u for update;
   if me.user_id is null or me.kicked or me.left_at is not null then raise exception 'You are not in this room'; end if;
   if r.phase = 'turn' and ((r.mode = 'kalambury' and r.drawer_id = u) or (r.mode = 'obrazek' and me.is_host)) then
-    raise exception 'No stickers during your turn 🤐'; end if;
+    raise exception 'No stickers during your turn'; end if;
   if scd > 0 and me.last_sticker_at is not null and me.last_sticker_at > now() - make_interval(secs => scd) then
     raise exception 'Slow down — wait %s', greatest(1, ceil(extract(epoch from me.last_sticker_at + make_interval(secs => scd) - now()))::int); end if;
   if r.mode = 'kalambury' and cd > 0 and me.last_msg_at is not null and me.last_msg_at > now() - make_interval(secs => cd) then
     raise exception 'Slow down — wait %s', greatest(1, ceil(extract(epoch from me.last_msg_at + make_interval(secs => cd) - now()))::int); end if;
-  if me.last_msg_at is not null and me.last_msg_at > now() - interval '600 milliseconds' then raise exception 'Slow down a little 🙂'; end if;
+  if me.last_msg_at is not null and me.last_msg_at > now() - interval '600 milliseconds' then raise exception 'Slow down a little'; end if;
   if me.msg_window_start is null or me.msg_window_start < now() - interval '10 seconds' then
     update games.players set msg_window_start = now(), msg_window_count = 1, last_msg_at = now(), last_sticker_at = now(), last_seen = now()
      where room_code = r.code and user_id = u;
@@ -2411,7 +2411,7 @@ begin
   if not found or r.mode <> 'obrazek' then raise exception 'Room not found'; end if;
   select * into me from games.players where room_code = r.code and user_id = u for update;
   if me.user_id is null or me.kicked or me.left_at is not null then raise exception 'You are not in this room'; end if;
-  if me.img_need_at is not null and me.img_need_at > now() - interval '2 seconds' then raise exception 'Slow down a little 🙂'; end if;
+  if me.img_need_at is not null and me.img_need_at > now() - interval '2 seconds' then raise exception 'Slow down a little'; end if;
   update games.players set img_need_at = now(), last_seen = now() where room_code = r.code and user_id = u;
   perform realtime.send(jsonb_build_object('code', r.code, 'tid', p_tid, 'miss', to_jsonb(miss)), 'imgneed', 'room:' || r.code, true);
 end $$;

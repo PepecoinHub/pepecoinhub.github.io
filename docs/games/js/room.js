@@ -70,7 +70,7 @@ function subscribeRoom() {
   roomCh = be.channel('room:' + code, (event, p) => {
     if (event === 'msg') { if (p.msg) addMsg(p.msg); else fetchState(); return; }
     if (event === 'kicked' && p.user_id === meId()) return message('You were removed from this room.');
-    if (event === 'closed') return message('This room was closed.', 'Thanks for playing! 🐸');
+    if (event === 'closed') return message('This room was closed.', 'Thanks for playing!');
     if (event === 'joined' && p.user_id !== meId()) resendForLateJoiner();
     if (event === 'imgneed') { if (isImgHost() && p.tid === sender.tid) sender.want(p.miss || []); return; }
     if (p.v == null || p.v > seenVersion) fetchState();
@@ -94,12 +94,12 @@ async function tick() {
 function apply(s) {
   if (!s) return;
   if (s.me.kicked) return message('You were removed from this room.');
-  if (s.room.status !== 'open') return message('This room was closed.', 'Thanks for playing! 🐸');
+  if (s.room.status !== 'open') return message('This room was closed.', 'Thanks for playing!');
   offset = Date.parse(s.now) - Date.now();
   const prev = S; S = s; seenVersion = s.room.version;
   syncCooldownFromState();
   if (prev && prev.room.host_id !== s.room.host_id && s.room.host_id === meId() && s.room.mode === 'kalambury')
-    toast('You are now the room moderator 🛡️ You can start, restart and kick.', 'good');
+    toast('You are now the room moderator. You can start, restart and kick.', 'good');
   if (s.room.turn_id !== curTurn) onNewTurn(s.room.turn_id);
   if (s.room.phase === 'finished' && prev?.room.phase !== 'finished') blank();
   if (s.room.mode === 'kalambury' && prev?.room.phase !== 'turn' && s.room.phase === 'turn' && isDrawer()) toast('Your turn! Draw: ' + s.secret, 'good');
@@ -108,7 +108,7 @@ function apply(s) {
   $('#cwrap').classList.toggle('can-draw', isDrawer());
   $('#cwrap').classList.toggle('pixel', s.room.mode === 'obrazek');
   const ci = $('#chatin');
-  ci.placeholder = isDrawer() ? 'Chat (no spoilers!)' : s.room.phase !== 'turn' ? 'Chat' : (s.me.guessed ? 'Chat with players who got it 🤫' : (isImgHost() ? 'Chat (you are the host)' : 'Type your guess…'));
+  ci.placeholder = isDrawer() ? 'Chat (no spoilers!)' : s.room.phase !== 'turn' ? 'Chat' : (s.me.guessed ? 'Chat with players who got it' : (isImgHost() ? 'Chat (you are the host)' : 'Type your guess…'));
 }
 
 function onNewTurn(turnId) {
@@ -122,7 +122,7 @@ function onNewTurn(turnId) {
   if (isImgHost()) startImageStages();
 }
 
-const PLACE = { 1: '🥇 1st', 2: '🥈 2nd', 3: '🥉 3rd' };
+const PLACE = { 1: '1st', 2: '2nd', 3: '3rd' };
 function spotsLine() {
   const r = S.room; if (r.mode !== 'obrazek' || !['turn', 'reveal'].includes(r.phase) || !S.spots) return null;
   const pod = S.podium || [], left = Math.max(0, S.spots - pod.length);
@@ -149,8 +149,8 @@ function renderPlayers() {
 function lastBadge() {
   const r = S.room;
   if (r.mode !== 'obrazek') return null;
-  if (finalNow()) return h('span', { class: 'lastbadge' }, '⭐ LAST QUESTION' + (r.last_mult > 1 ? ' ×' + r.last_mult : ''));
-  if (r.final_turn != null && r.final_turn === r.turn_no + 1 && r.phase !== 'turn' && r.phase !== 'finished') return h('span', { class: 'lastbadge soon' }, '⭐ next is the last' + (r.last_mult > 1 ? ' ×' + r.last_mult : ''));
+  if (finalNow()) return h('span', { class: 'lastbadge' }, 'LAST QUESTION' + (r.last_mult > 1 ? ' ×' + r.last_mult : ''));
+  if (r.final_turn != null && r.final_turn === r.turn_no + 1 && r.phase !== 'turn' && r.phase !== 'finished') return h('span', { class: 'lastbadge soon' }, 'Next is the last' + (r.last_mult > 1 ? ' ×' + r.last_mult : ''));
   return null;
 }
 function renderTop() {
@@ -163,11 +163,11 @@ function renderTop() {
   w.className = 'word'; w.textContent = ''; w.removeAttribute('data-secret');
   const nLetters = (S.mask || '').replace(/[^_A-ZĄĆĘŁŃÓŚŹŻ0-9]/g, '').length;
   if (r.phase === 'turn' && S.secret) { w.classList.add('secret'); w.dataset.secret = '1'; w.append(h('small', {}, r.mode === 'kalambury' ? 'Your word to draw' : 'Answer (only you can see it)'), S.secret); }
-  else if (r.phase === 'turn' && inCountdown()) { w.classList.add('plain'); w.append(h('small', {}, 'Get ready'), 'Picture incoming… 👀'); }
+  else if (r.phase === 'turn' && inCountdown()) { w.classList.add('plain'); w.append(h('small', {}, 'Get ready'), 'Picture incoming…'); }
   else if (r.phase === 'turn') w.append(h('small', {}, S.me.guessed ? (r.mode === 'obrazek' ? `You got it! (+${ptsFor((S.podium || []).find((g) => g.user_id === meId())?.place || 3)})` : 'You got it! Waiting for the others') : `Guess the word (${nLetters} letter${nLetters === 1 ? '' : 's'})`), S.mask || '');
   else if (r.phase === 'reveal') { w.classList.add('secret'); w.append(h('small', {}, r.mode === 'kalambury' ? 'The word was' : 'The answer was'), r.last_answer || ''); }
   else if (r.phase === 'waiting') { w.classList.add('plain'); w.append(h('small', {}, r.last_answer ? 'Last answer: ' + r.last_answer : ''), isImgHost() ? 'Pick a picture ↓' : 'Host is picking a picture…'); }
-  else if (r.phase === 'finished') { w.classList.add('plain'); w.append('Game over 🏁'); }
+  else if (r.phase === 'finished') { w.classList.add('plain'); w.append('Game over'); }
   else { w.classList.add('secret'); w.append(h('small', {}, 'Room code'), code); }
   const sl = spotsLine(); if (sl) w.append(sl);
 }
@@ -215,12 +215,13 @@ function renderOverlay(force) {
   frogVideo?.pause();
   let show = true;
   if (view === 'lobby') {
-    o.append(h('div', {}, h('div', { class: 'big' }, `Waiting for the ${modName()} to start`),
+    o.classList.add('lobby-ov');
+    o.append(h('div', {}, h('div', { class: 'big' }, 'Waiting for the host to start'),
       h('p', {}, `${S.players.length} in the room · invite friends: `, h('b', { class: 'mono' }, location.href.split('#')[0])),
-      isRoomHost() ? h('button', { class: 'btn primary big', onclick: start }, '▶ Start game') : h('p', { class: 'small', style: 'opacity:.85' }, `The ${modName()} starts the game.`)));
+      isRoomHost() ? h('button', { class: 'btn primary big', onclick: start }, '▶ Start game') : h('p', { class: 'small', style: 'opacity:.85' }, 'The host starts the game.')));
   } else if (view.startsWith('cd')) {
     o.classList.add('countdown-ov');
-    o.append(h('div', { class: 'cd-wrap' }, h('div', { class: 'cd-label' }, finalNow() ? `⭐ LAST QUESTION${r.last_mult > 1 ? ' · points ×' + r.last_mult : ''}` : `Picture #${r.round_no}${r.question_total ? ' of ' + r.question_total : ''} · get ready`),
+    o.append(h('div', { class: 'cd-wrap' }, h('div', { class: 'cd-label' }, finalNow() ? `LAST QUESTION${r.last_mult > 1 ? ' · points ×' + r.last_mult : ''}` : `Picture #${r.round_no}${r.question_total ? ' of ' + r.question_total : ''} · get ready`),
       h('div', { class: 'cd-num', role: 'timer', 'aria-live': 'assertive' }, view.slice(2)),
       h('div', { class: 'small', style: 'opacity:.85' }, 'Type your guess as soon as it shows up')));
   } else if (view === 'intermission') {
@@ -228,7 +229,7 @@ function renderOverlay(force) {
     o.classList.add('intermission-ov');
     o.append(h('div', { class: 'inter-card' }, frogMedia(),
       h('div', { class: 'inter-title' }, nx.final ? 'That\'s a wrap!' : (nx.round_no && nx.round_no !== r.round_no ? `Round ${nx.round_no} of ${nx.rounds}` : 'Next round')),
-      h('div', { class: 'inter-sub' }, nx.final ? 'Final scores coming up…' : nx.user_id === meId() ? 'You\'re drawing next! ✏️' : nx.nick ? `${nx.nick} is drawing next` : 'Get ready…'),
+      h('div', { class: 'inter-sub' }, nx.final ? 'Final scores coming up…' : nx.user_id === meId() ? 'You\'re drawing next!' : nx.nick ? `${nx.nick} is drawing next` : 'Get ready…'),
       h('div', { class: 'small', style: 'opacity:.8;margin-top:6px' }, 'The word was ', h('b', {}, r.last_answer || '?'), ' · ', h('span', { id: 'nextin' }, ''))));
   } else if (view === 'reveal') {
     o.append(h('div', {}, h('div', {}, r.mode === 'kalambury' ? 'The word was:' : 'The answer was:'), h('div', { class: 'ans' }, r.last_answer || '?'),
@@ -237,12 +238,12 @@ function renderOverlay(force) {
   } else if (view === 'waiting' && !isImgHost()) {
     o.classList.add('intermission-ov');
     o.append(h('div', { class: 'inter-card' }, frogMedia(), h('div', { class: 'inter-title' }, 'Next picture coming up'),
-      h('div', { class: 'inter-sub' }, r.final_turn != null && r.final_turn === r.turn_no + 1 ? '⭐ The next question is the last one!' : 'The host is picking one…'),
+      h('div', { class: 'inter-sub' }, r.final_turn != null && r.final_turn === r.turn_no + 1 ? 'The next question is the last one!' : 'The host is picking one…'),
       r.last_answer ? h('div', { class: 'small', style: 'opacity:.8;margin-top:6px' }, 'Last answer: ', h('b', {}, r.last_answer)) : null));
   } else if (view === 'waiting' && isImgHost()) {
     o.append(h('div', {}, h('div', { class: 'big' }, 'Pick a picture and an answer below ↓')));
   } else if (view === 'finished') {
-    o.append(h('div', {}, h('img', { class: 'frog-s', src: 'img/frog-winner.svg', alt: '', width: 84, height: 109 }), h('div', { class: 'big' }, '🏁 Game over!'),
+    o.append(h('div', {}, h('img', { class: 'cheer-pic', src: 'img/emotes/cheer.webp', alt: '', width: 140, height: 140 }), h('div', { class: 'big' }, 'Game over!'),
       h('table', {}, h('tbody', {}, (S.results || []).slice(0, 8).map((x) => h('tr', {}, h('td', {}, ({ 1: '🥇', 2: '🥈', 3: '🥉' })[x.place] || x.place + '.'), h('td', {}, x.nick, x.verified ? ' ✓' : ''), h('td', {}, x.points))))),
       h('div', { class: 'row', style: 'justify-content:center;margin-top:14px' }, r.mode === 'kalambury' ? h('span', { class: 'small', style: 'opacity:.85;align-self:center' }, 'Just for fun: scores reset with the next game') : h('a', { class: 'btn', href: 'ranking.html' }, '🏆 Leaderboard'),
         isRoomHost() ? h('button', { class: 'btn primary', onclick: start }, '↻ Play again') : null)));
@@ -259,7 +260,7 @@ function winnersBlock() {
       h('b', {}, MEDALS[g.place] + ' ' + g.nick), h('span', { class: 'wpts' }, '+' + ptsFor(g.place))))));
     box.append(h('div', { class: 'confetti', 'aria-hidden': 'true' }, ['🎉', '✨', '🎊', '⭐', '🎉', '✨', '🎊', '⭐'].map((c, i) => h('i', { style: `--i:${i}` }, c))));
   } else box.append(h('div', { class: 'win' }, emoteImg('waiting', 'emote-big'), h('span', {}, 'Nobody got it this time 😅')));
-  if (last) box.append(h('div', { class: 'lastline' }, '⭐ That was the last question! Final results in ', h('span', { id: 'nextin' }, '')));
+  if (last) box.append(h('div', { class: 'lastline' }, 'That was the last question! Final results in ', h('span', { id: 'nextin' }, '')));
   return box;
 }
 function updateNextIn() {
@@ -286,7 +287,7 @@ function lastQuestionControl(r) {
     catch (e) { toast(e.message, 'bad'); }
   };
   if (flagged) {
-    wrap.append(h('span', { class: 'lastbadge' }, '⭐ Last question set' + (r.last_mult > 1 ? ' ×' + r.last_mult : '')),
+    wrap.append(h('span', { class: 'lastbadge' }, 'Last question set' + (r.last_mult > 1 ? ' ×' + r.last_mult : '')),
       h('button', { class: 'btn sm', onclick: () => send(true) }, 'Undo'),
       h('button', { class: 'btn sm', onclick: () => { lastMultSel = r.last_mult; lastPopOpen = !lastPopOpen; renderHostbar(); } }, '× Change points'));
   } else wrap.append(h('button', { class: 'btn sm danger-solid', onclick: () => { lastPopOpen = !lastPopOpen; renderHostbar(); } }, '⭐ Last question'));
@@ -326,7 +327,7 @@ function renderMsgs(list) {
   for (const n of notesAfter(0)) box.append(h('p', { class: 'close' }, n.text));
   for (const m of list) {
     if (m.kind === 'system') box.append(h('p', { class: 'sys' }, m.body));
-    else if (m.kind === 'correct') box.append(h('p', { class: 'sys ok' }, '🎉 ' + m.body));
+    else if (m.kind === 'correct') box.append(h('p', { class: 'sys ok' }, m.body));
     else if (m.kind === 'sticker') box.append(h('p', { class: m.scope === 'guessed' ? 'priv' : '' }, h('b', {}, m.nick + ': '), stickerEl(m.body)));
     else box.append(h('p', { class: m.scope === 'guessed' ? 'priv' : '' }, h('b', {}, m.nick + ': '), ...renderBody(m.body)));
     for (const n of notesAfter(m.id)) box.append(h('p', { class: 'close' }, n.text));
@@ -373,7 +374,7 @@ $('#chatform').addEventListener('submit', async (e) => {
     const r = await be.rpc('gry_guess', { p_code: code, p_text: text });
     startCooldown(cooldownSecs());   // liczone od odpowiedzi serwera, więc nie wyprzedzi limitu po stronie serwera
     if (r?.correct) toast(`Nice! +${r.points} pts`, 'good');
-    else if (r?.close) { localNotes.push({ after: S.messages.at(-1)?.id || 0, text: `"${text}" is close! 🔥` }); renderMsgs(S.messages); }
+    else if (r?.close) { localNotes.push({ after: S.messages.at(-1)?.id || 0, text: `"${text}" is close!` }); renderMsgs(S.messages); }
   } catch (err) {
     const w = /wait (\d+)s/.exec(err.message || '');
     if (w) startCooldown(Number(w[1]));
@@ -567,7 +568,7 @@ function renderImgPanel() {
       if (f.size > 12e6) { toast(f.name + ': file too big (max 12 MB)', 'bad'); continue; }
       queue.push({ id: qid(), kind: 'file', blob: await shrink(f), answer: '', secs: 120 });
     }
-    await persist(); renderQueueList(); toast('Added. Now type the answers 👇');
+    await persist(); renderQueueList(); toast('Added. Now type the answers below');
   } });
   const presets = h('div', { class: 'imgpick' }, PRESETS.map((pr) => h('button', { type: 'button', 'aria-label': 'Add preset picture: ' + pr.answer,
     onclick: async () => { queue.push({ id: qid(), kind: 'preset', src: pr.src, answer: pr.answer, secs: 120 }); await persist(); renderQueueList(); } }, h('img', { src: pr.src, alt: '' }))));
