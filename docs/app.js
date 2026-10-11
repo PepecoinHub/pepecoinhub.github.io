@@ -11,6 +11,29 @@
   /* ------------------------------------------------------------------ strings */
   const STR = {
     en: {
+      my_h: 'My address',
+      my_p: 'Paste your PEP address to see where it stands in today\'s rich list.',
+      my_label: 'Your PEP address',
+      my_ph: 'P… (34 characters)',
+      my_go: 'Show',
+      my_forget: 'Forget',
+      my_bad: 'That does not look like a PEP address (it starts with P and has 34 characters).',
+      my_err: 'The rich-list file could not be loaded just now. Try again later.',
+      my_wait: 'Looking it up…',
+      my_rank: 'Rank',
+      my_rank_sub: 'of the top {n} listed today',
+      my_bal: 'Balance',
+      my_share: 'Share of supply',
+      my_top: 'Top {p} of addresses with a balance',
+      my_change: 'Since yesterday',
+      my_new: 'new in the top {n}',
+      my_same: 'no change',
+      my_nohist: 'no snapshot from yesterday',
+      my_next: '{pep} PEP more would put it in the top {n}.',
+      my_first: 'It is the largest address on the list.',
+      my_out: 'Not in today\'s top {n}. Getting in takes at least {pep} PEP.',
+      my_explorer: 'Exact balance and transactions on PepeBlocks',
+      my_privacy: 'Your address stays in this browser. It is saved only in your browser\'s local storage so it is still here next time, and it is never sent to us or anyone else: the page compares it with the daily rich-list file it has already downloaded. We do not collect it. Forget removes it. (Opening PepeBlocks shares it with that site.)',
       title: 'Pepecoin Holder Watch',
       eyebrow: 'Rich list · snapshot of {date}',
       eyebrow_plain: 'Rich list',
@@ -109,6 +132,29 @@
       addrs: 'addresses'
     },
     pl: {
+      my_h: 'Mój adres',
+      my_p: 'Wklej swój adres PEP, żeby zobaczyć, gdzie jest w dzisiejszej liście najbogatszych.',
+      my_label: 'Twój adres PEP',
+      my_ph: 'P… (34 znaki)',
+      my_go: 'Pokaż',
+      my_forget: 'Zapomnij',
+      my_bad: 'To nie wygląda na adres PEP (zaczyna się od P i ma 34 znaki).',
+      my_err: 'Nie udało się teraz wczytać pliku z listą. Spróbuj później.',
+      my_wait: 'Szukam…',
+      my_rank: 'Miejsce',
+      my_rank_sub: 'w dzisiejszym top {n}',
+      my_bal: 'Saldo',
+      my_share: 'Udział w podaży',
+      my_top: 'Top {p} adresów z saldem',
+      my_change: 'Od wczoraj',
+      my_new: 'nowy w top {n}',
+      my_same: 'bez zmian',
+      my_nohist: 'brak wczorajszego zrzutu',
+      my_next: 'Jeszcze {pep} PEP i adres będzie w top {n}.',
+      my_first: 'To największy adres na liście.',
+      my_out: 'Poza dzisiejszym top {n}. Wejście wymaga co najmniej {pep} PEP.',
+      my_explorer: 'Dokładne saldo i transakcje w PepeBlocks',
+      my_privacy: 'Twój adres zostaje w tej przeglądarce. Jest zapisany tylko w jej pamięci lokalnej, żeby był tu następnym razem, i nigdy nie trafia do nas ani do nikogo innego: strona porównuje go z dziennym plikiem listy, który już pobrała. Nie zbieramy go. „Zapomnij” go usuwa. (Otwarcie PepeBlocks udostępnia go tamtej stronie.)',
       title: 'Pepecoin Holder Watch',
       eyebrow: 'Rich lista · snapshot z {date}',
       eyebrow_plain: 'Rich lista',
@@ -843,11 +889,82 @@
   }
 
   /* ------------------------------------------------------------------- render */
+  /* ------------------------------------------------------------- my address */
+  // Everything happens in the browser: the address is compared with the daily snapshot file and kept only in localStorage.
+  const MY_KEY = 'phw-myaddr';
+  const my = { addr: store.get(MY_KEY) || '', draft: null, res: null, busy: false, box: null, started: false };
+  const snapCache = {};
+  const loadSnap = (date) => snapCache[date] || (snapCache[date] = fetch('data/snapshots/' + date + '.json', { cache: 'no-cache' })
+    .then((r) => (r.ok ? r.json() : null)).catch(() => null));
+  const isoMinus = (iso, d) => new Date(dateObj(iso).getTime() - d * DAY).toISOString().slice(0, 10);
+  const pepOf = (sats) => Number(BigInt(sats) / 1000000n) / 100;
+  const okAddr = (a) => /^P[1-9A-HJ-NP-Za-km-z]{33}$/.test(a);
+
+  async function myLookup(addr) {
+    const L = S.latest, cur = await loadSnap(L.date);
+    if (!cur || !cur.rows) return { error: t('my_err') };
+    const rows = cur.rows.map((r) => [r[0], pepOf(r[1])]).sort((a, b) => b[1] - a[1]);
+    const res = { addr, listed: rows.length, total: (cur.meta && (cur.meta.holders_listed || cur.meta.address_count)) || null, minBal: rows[rows.length - 1][1], supply: L.supply };
+    const i = rows.findIndex((r) => r[0] === addr);
+    if (i < 0) return res;
+    res.rank = i + 1; res.bal = rows[i][1];
+    const goals = [10, 25, 50, 100, 400, 1000].filter((n) => n < res.rank && n <= rows.length);
+    if (goals.length) { const n = goals[goals.length - 1]; res.goal = { n, pep: Math.max(0.01, rows[n - 1][1] - res.bal + 0.01) }; }
+    let prev = await loadSnap(isoMinus(L.date, 1));
+    if (!prev) prev = await loadSnap(isoMinus(L.date, 2));
+    if (prev && prev.rows) { const pr = prev.rows.find((r) => r[0] === addr); res.change = pr ? res.bal - pepOf(pr[1]) : 'new'; }
+    return res;
+  }
+  async function myRun(addr) {
+    if (!okAddr(addr)) { my.res = { error: t('my_bad') }; paintMy(); return; }
+    my.addr = addr; my.draft = null; store.set(MY_KEY, addr); my.busy = true; my.res = null; paintMy();
+    my.res = await myLookup(addr); my.busy = false; paintMy();
+  }
+  function myResult() {
+    const r = my.res;
+    if (my.busy) return h('p', { class: 'small muted' }, t('my_wait'));
+    if (!r) return null;
+    if (r.error) return h('p', { class: 'my-msg' }, r.error);
+    const link = h('p', { class: 'small' }, h('a', { href: EXPLORER + r.addr, rel: 'noopener' }, t('my_explorer')));
+    if (!r.rank) return h('div', {}, h('p', { class: 'my-msg' }, t('my_out', { n: fmtInt(r.listed), pep: fmtInt(Math.ceil(r.minBal)) })), link);
+    const signed = (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + fmtInt(Math.abs(v));
+    const ch = r.change === undefined ? t('my_nohist') : r.change === 'new' ? t('my_new', { n: fmtInt(r.listed) })
+      : Math.abs(r.change) < 0.005 ? t('my_same') : signed(r.change) + ' PEP';
+    const tile = (label, value, sub) => h('div', { class: 'stat' }, h('span', { class: 'label' }, label), h('span', { class: 'value num' }, value), sub ? h('span', { class: 'sub' }, sub) : null);
+    return h('div', {},
+      h('div', { class: 'stats my-stats' },
+        tile(t('my_rank'), '#' + fmtInt(r.rank), t('my_rank_sub', { n: fmtInt(r.listed) })),
+        tile(t('my_bal'), fmtInt(r.bal) + ' PEP', null),
+        tile(t('my_share'), fmtPct(r.bal / r.supply * 100, 4), r.total ? t('my_top', { p: fmtPct(r.rank / r.total * 100, 3) }) : null),
+        tile(t('my_change'), ch, null)),
+      h('p', { class: 'my-msg' }, r.goal ? t('my_next', { pep: fmtInt(Math.ceil(r.goal.pep)), n: fmtInt(r.goal.n) }) : r.rank === 1 ? t('my_first') : ''),
+      link);
+  }
+  function paintMy() {
+    const b = my.box; if (!b) return;
+    const inp = h('input', { type: 'text', id: 'my-addr', value: my.draft != null ? my.draft : my.addr, placeholder: t('my_ph'), autocomplete: 'off',
+      spellcheck: 'false', maxlength: '34', 'aria-label': t('my_label'), oninput: (e) => { my.draft = e.target.value; } });
+    b.replaceChildren(
+      h('h2', { id: 'my-h' }, t('my_h')),
+      h('p', { class: 'small muted', style: 'margin-top:0' }, t('my_p')),
+      h('form', { class: 'my-form', onsubmit: (e) => { e.preventDefault(); myRun(inp.value.trim()); } },
+        inp, h('button', { type: 'submit', class: 'btn main' }, t('my_go')),
+        my.addr ? h('button', { type: 'button', class: 'btn soft', onclick: () => { store.set(MY_KEY, null); my.addr = ''; my.draft = null; my.res = null; paintMy(); } }, t('my_forget')) : null),
+      myResult(),
+      h('p', { class: 'my-note' }, t('my_privacy')));
+  }
+  function myAddressSection() {
+    if (!my.box) my.box = h('section', { class: 'panel myaddr', 'aria-labelledby': 'my-h' });
+    paintMy();
+    if (!my.started && my.addr) { my.started = true; myRun(my.addr); }
+    return my.box;
+  }
+
   function render() {
     const active = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.key : null;
     const keepY = window.scrollY;
     resizers = [];
-    app.replaceChildren(header(), tilesSection(), structSection(), trendSection(), matrixSection(), moversSection(), holdersSection(), notesSection(), footer());
+    app.replaceChildren(header(), myAddressSection(), tilesSection(), structSection(), trendSection(), matrixSection(), moversSection(), holdersSection(), notesSection(), footer());
     document.title = t('title') + ' | PEP rich list and concentration tracker';
     if (active) { const el = app.querySelector('[data-key="' + active + '"]'); if (el) el.focus({ preventScroll: true }); }
     window.scrollTo(0, keepY);
