@@ -492,3 +492,15 @@ input, select, textarea { border-radius: 12px; }
 
 /* Footer in a soft box */
 footer.site-foot, footer.pf-foot { border-top: 0; background: var(--paper-2); border-radius: 22px; padding: 22px 24px; }
+
+/* Rich list: "My address" lookup (runs in the browser only) */
+.myaddr { margin: 18px 0 8px; }
+.myaddr h2 { margin: 0 0 4px; }
+.my-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 10px 0; }
+.my-form input { flex: 1 1 280px; min-width: 0; font: inherit; font-family: var(--f-mono); font-size: 0.95rem; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.my-form input:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.myaddr .my-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; border: 0; margin: 6px 0 0; font-size: 1rem; }
+.myaddr .my-stats .stat { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.my-msg { margin: 10px 0 4px; }
+.my-note { margin: 10px 0 0; font-size: 0.78rem; line-height: 1.45; color: var(--muted); }
+@media (max-width: 560px) { .myaddr .my-stats { grid-template-columns: 1fr 1fr; gap: 8px; } .myaddr .my-stats .value { font-size: 1.15rem; } }

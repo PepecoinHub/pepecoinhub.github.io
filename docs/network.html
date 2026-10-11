@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="facts.css?v=20261007e">
+<link rel="stylesheet" href="facts.css?v=20261012a">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/"}, {"@type": "ListItem", "position": 2, "name": "Network stats", "item": "https://pepecoinhub.com/network.html"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin network daily statistics", "description": "Daily Pepecoin (PEP) block height, coin supply, number of addresses with a balance and snapshot time, from February 2024, rebuilt from the blockchain before October 5, 2026 and recorded live after that.", "url": "https://pepecoinhub.com/network.html", "temporalCoverage": "2024-02-05/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (r/pepecoin community volunteers)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}]}</script>
@@ -72,6 +72,18 @@
     <div class="stat"><span class="label">New PEP a day, 30 days</span><span class="value" id="s-day">13.8M</span><span class="sub">14.4M at the 60 s target</span></div>
   </div>
   <p class="src" id="net-status"></p>
+</section>
+
+<section aria-labelledby="today-h" id="today">
+  <h2 id="today-h">Since yesterday</h2>
+  <p class="note" id="t-note">Compared with the previous daily snapshot.</p>
+  <div class="stats">
+    <div class="stat"><span class="label">Blocks found</span><span class="value" id="t-blocks">–</span><span class="sub" id="t-blocks-sub"></span></div>
+    <div class="stat"><span class="label">New PEP mined</span><span class="value" id="t-pep">–</span><span class="sub" id="t-pep-sub"></span></div>
+    <div class="stat"><span class="label">Addresses with a balance</span><span class="value" id="t-addr">–</span><span class="sub" id="t-addr-sub"></span></div>
+    <div class="stat"><span class="label">Average block</span><span class="value" id="t-bt">–</span><span class="sub" id="t-bt-sub">target: 60 s</span></div>
+  </div>
+  <p class="note">Which addresses gained or lost the most since yesterday: <a href="rich-list.html">see the movers on the rich list</a>.</p>
 </section>
 
 <section aria-labelledby="addr-h">
@@ -250,6 +262,19 @@
     $('s-supply').textContent = big(last[2]);
     $('s-addr').textContent = fmt(last[3]);
     if (w) { $('s-bt').textContent = w.blockTime.toFixed(1) + ' s'; $('s-day').textContent = big(w.perDay); }
+    var prev = rows[rows.length - 2];
+    if (prev) {
+      var dt = last[4] - prev[4], blocks = last[1] - prev[1], hrs = dt / 3600, dAddr = last[3] - prev[3];
+      var sign = function (n) { return (n > 0 ? '+' : n < 0 ? '\u2212' : '') + fmt(Math.abs(n)); };
+      $('t-note').textContent = 'Snapshot of ' + day(last[0]) + ' compared with ' + day(prev[0]) + ' (' + hrs.toFixed(1) + ' hours apart).';
+      $('t-blocks').textContent = fmt(blocks);
+      $('t-blocks-sub').textContent = 'about ' + fmt(blocks / hrs * 24) + ' per 24 h · target 1,440';
+      $('t-pep').textContent = big(last[2] - prev[2]);
+      $('t-pep-sub').textContent = 'PEP, from block rewards';
+      $('t-addr').textContent = sign(dAddr);
+      $('t-addr-sub').textContent = 'now ' + fmt(last[3]);
+      if (blocks > 0) $('t-bt').textContent = (dt / blocks).toFixed(1) + ' s';
+    }
     var body = $('days'), recent = rows.slice(-15); body.textContent = '';
     for (var i = recent.length - 1; i > 0; i--) {
       var r = recent[i], tr = document.createElement('tr');
@@ -266,6 +291,6 @@
   }).catch(function () { $('net-status').textContent = 'The daily data could not be loaded just now. The figures above are from October 6, 2026.'; });
 })();
 </script>
-<script src="chrome.js?v=20261007e" defer></script>
+<script src="chrome.js?v=20261012a" defer></script>
 </body>
 </html>
