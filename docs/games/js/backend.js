@@ -122,8 +122,9 @@ class SupaBackend {
   session() { return this.sess ? { user: { id: this.sess.user.id, is_anonymous: !!this.sess.user.is_anonymous } } : null; }
   async guest() {
     const captchaToken = cfg.turnstileSiteKey ? await (await import('./human.js')).humanToken(cfg.turnstileSiteKey) : undefined;
-    const { data, error } = await this.sb.auth.signInAnonymously(captchaToken ? { options: { captchaToken } } : undefined)
-      .catch((e) => { throw friendlyError(e); });
+    let res;
+    try { res = await this.sb.auth.signInAnonymously(captchaToken ? { options: { captchaToken } } : undefined); } catch (e) { throw friendlyError(e); }
+    const { data, error } = res;
     if (error) throw friendlyError(error);
     this.sess = data.session;
   }
@@ -131,15 +132,16 @@ class SupaBackend {
   async reddit() { return this.oauth('reddit'); }
   async oauth(provider) {
     if (this.sess) await this.sb.auth.signOut();
-    const { error } = await this.sb.auth.signInWithOAuth({ provider,
-      options: { redirectTo: location.href.split('#')[0] } }).catch((e) => { throw friendlyError(e); });
-    if (error) throw friendlyError(error);
+    let res;
+    try { res = await this.sb.auth.signInWithOAuth({ provider, options: { redirectTo: location.href.split('#')[0] } }); } catch (e) { throw friendlyError(e); }
+    if (res.error) throw friendlyError(res.error);
   }
   async logout() { await this.sb.auth.signOut(); this.sess = null; }
   async rpc(fn, args = {}) {
-    const { data, error } = await this.sb.rpc(fn, args).catch((e) => { throw friendlyError(e); });
-    if (error) throw friendlyError(error);
-    return data;
+    let res;   // the rpc builder is a thenable without .catch(), so a plain try/await
+    try { res = await this.sb.rpc(fn, args); } catch (e) { throw friendlyError(e); }
+    if (res.error) throw friendlyError(res.error);
+    return res.data;
   }
   channel(topic, onMsg, onJoin) {
     const ch = this.sb.channel(topic, { config: { private: true, broadcast: { self: false } } });
