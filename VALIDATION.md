@@ -148,7 +148,20 @@ Rule: an address is tagged only if it was spent **in the same transaction as the
 
 - `Prj6QbUQL9wSzk2Xxedms3jLqDVjTDs2Sm` (rank 2 today, 3.33 B PEP): received 2.31 B PEP from the XeggeX address *after* the shutdown (Feb–Mar 2025) and has sent only 66 PEP ever. It could be the operator's or a large user's wallet; receiving alone does not show who owns it.
 - `PryjXWHPDRQChb3sDZwUby3cTtNatfR1tE`: an exchange-like hot wallet (19,432 transactions) of an unknown operator, in the top 1250 since Feb 2025.
-- `PgRLcaCTEkXSguu6ZgzkuncHdCxADmPBXP`: labelled "Mining-Dutch" (a mining pool) by PepeBlocks in Oct 2024; 82,647 transactions. Not an exchange, so not in scope here.
+
+## 5. Pool tags
+
+`labels.json` also tags six mining-pool addresses (type `pool`); the "without exchanges and pools" view hides them together with the exchange tags. Mining-Dutch, ViaBTC, AntPool and KuPool were added in commit `cf3eb60` (2026-10-06).
+
+| Address | Pool | Why this address | Source that the pool mines PEP |
+|---|---|---|---|
+| `PnBFXec7tVQvndqktsVnkfJGwy63GFnwoo` | litecoinpool.org | labelled on the PepeBlocks rich list | none yet besides that label |
+| `PgRLcaCTEkXSguu6ZgzkuncHdCxADmPBXP` | Mining-Dutch | labelled "Mining-Dutch" by PepeBlocks (Oct 2024, 82,647 transactions), confirmed live | [Mining-Dutch Pepecoin pool](https://www.mining-dutch.nl/pools/pepecoin.php) (paid natively in PEP); listed on [MiningPoolStats](https://miningpoolstats.stream/pepecoin) |
+| `Pd4Ee73nvvymgiGKMouC1GYZpQCrgMmCjd` | ViaBTC | name as on peppool.space, receives coinbase outputs in recent blocks | [ViaBTC: how to mine PEP](https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0) |
+| `PjdviQbYuVu4RgX5N3SVebpcTHyuaZq8uj` | AntPool | name as on peppool.space, receives coinbase outputs in recent blocks | [Ultramining, 2024-12-06: AntPool launches joint mining of LTC with LKY, PEP and JKC](https://ultramining.com/news/en/antpool-launches-joint-mining-of-ltc-with-lky-pep-and-jkc/); listed on [MiningPoolStats](https://miningpoolstats.stream/pepecoin) |
+| `PbwHwFpGaDYRejHKRqvsrmyKH1QWyMEzPD` | KuPool | name as on peppool.space, receives coinbase outputs in recent blocks | [KuPool](https://www.kupool.com/) (PEP in its coin list) |
+
+The sources in the last column show that each pool mines PEP; which address belongs to which pool rests on the explorer labels and coinbase payouts in the third column.
 
 ## Reproducing
 

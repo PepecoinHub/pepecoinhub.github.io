@@ -399,6 +399,8 @@ def write_rich_list_static(summary, html_path):
     latest = summary["latest"]
     day = dt.date.fromisoformat(latest["date"])
     when = f"{day:%b} {day.day}, {day.year}"
+    first = dt.date.fromisoformat(summary["first_date"])
+    since = f"{first:%B} {first.day}, {first.year}"
     shares = summary["views"]["all"]["shares"]
     parts = " · ".join(f"top {n:,}: {v:.2f}%" for n, v in zip(summary["tops"], shares) if v is not None)
     block_at = f" (block {latest['height']:,})" if latest.get("height") else ""
@@ -411,7 +413,7 @@ def write_rich_list_static(summary, html_path):
         f"One snapshot of the top ~2000 addresses every day; the charts focus on the top 1000.</p>\n"
         f"  </header>\n"
         f'  <p id="boot">Share of the circulating supply held by the largest addresses on {when}{block_at}: {parts}. '
-        f'Every day since February 2024: <a href="data/shares.csv">shares.csv</a>.</p>\n'
+        f'Every day since {since}: <a href="data/shares.csv">shares.csv</a>.</p>\n'
         f"  {RICH_LIST_END}"
     )
     page = page[:a] + block + page[b + len(RICH_LIST_END):]
