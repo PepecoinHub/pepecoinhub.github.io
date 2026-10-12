@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <link rel="stylesheet" href="../facts.css?v=20261012a">
-<link rel="stylesheet" href="gry.css?v=20261012a">
+<link rel="stylesheet" href="gry.css?v=20261012d">
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <script src="js/config.js"></script>
 <script type="module" src="js/lobby.js"></script>
@@ -62,9 +62,7 @@
   <section class="modes maingames">
     <article class="card mode-card" id="game-dg">
       <div class="ill media">
-        <video id="demo-dg" autoplay muted loop playsinline preload="metadata" poster="img/art-expo-poster.webp" width="800" height="336" aria-label="A Pepe frog drawing at the Pepecoin Art Expo">
-          <source src="img/art-expo.webm" type="video/webm"><source src="img/art-expo.mp4" type="video/mp4">
-        </video>
+<picture><source srcset="img/draw-frog-still.webp" media="(prefers-reduced-motion: reduce)"><img id="demo-dg" class="ill-contain" src="img/draw-frog.webp" alt="A Pepe frog drawing a little Pepe with a pencil" width="399" height="337"></picture>
       </div>
       <h3>✏️ Draw &amp; Guess <span class="badge guest" title="Just for fun: scores last only for the current game, no leaderboard">casual</span></h3>
       <div id="newroom"></div>

@@ -132,10 +132,10 @@ export async function identityCard(container, { onReady, cta = 'Play' } = {}) {
           : h('button', { class: 'btn reddit', id: 'btn-reddit', disabled: true, title: 'Reddit login coming soon', 'aria-describedby': 'discord-soon' }, redditIcon(), 'Reddit login coming soon')),
         DISCORD_ENABLED ? h('p', { class: 'small muted', style: 'margin:12px 0 0' },
           h('b', {}, 'Guest:'), ' no sign-up, pick a nickname and play. ',
-          h('b', {}, 'Discord:'), ' your nickname is reserved for you and you get the ', h('span', { class: 'badge ver' }, '✓ verified'), ' badge on the leaderboard. We never ask for your email or wallet.')
+          h('b', {}, 'Discord:'), ' your nickname is reserved for you and you get the ', h('span', { class: 'badge ver' }, '✓ verified'), ' badge on the leaderboard. Discord shares your username and email with our login service (Supabase); we do not show or use the email. We never ask for a password or seed phrase, and playing needs no wallet.')
         : h('p', { class: 'small muted', id: 'discord-soon', style: 'margin:12px 0 0' },
           h('b', {}, 'Guest:'), ' no sign-up, pick a nickname and play. ',
-          h('b', {}, 'Discord & Reddit login coming soon.'), ' We never ask for your email or wallet.'));
+          h('b', {}, 'Discord & Reddit login coming soon.'), ' We never ask for a password or seed phrase, and playing needs no wallet.'));
     } else {
       container.append(
         h('span', { class: 'id-step ok' }, '✓ Signed in'), h('h2', {}, 'Playing as ', h('span', { class: 'id-name' }, me.nick || me.discord_name || nickStore.get() || 'guest')),

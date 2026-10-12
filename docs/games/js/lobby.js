@@ -116,7 +116,6 @@ await Promise.all([load(), loadTables(), loadTopboard()]);
 renderSchedHost();
 if (!$('#sched-host').children.length) $('#sched-host').dataset.ready = '';
 pixelDemo($('#pixdemo'), $('#pixlabel'));
-{ const v = $('#demo-dg'); if (v && matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.pause(); } }
 setInterval(tick, 1000);
 setInterval(load, 15000);
 setInterval(loadTopboard, 60000);
