@@ -128,7 +128,7 @@
           <th scope="row">Suministro</th>
           <td><span class="num">Unos <span data-live="supply-m">104 900</span> millones</span>, más 10 000 por bloque, sin límite máximo</td>
           <td><span class="num">420,69 billones</span>, fijo</td>
-          <td><span class="num">Unos 107 millones</span> en circulación en Ethereum</td>
+          <td><span class="num">Unos 107,6 millones</span> de suministro total en Ethereum (máximo 133,8 millones)</td>
         </tr>
         <tr>
           <th scope="row">Dirección</th>
@@ -139,7 +139,7 @@
         <tr>
           <th scope="row">En Kraken</th>
           <td>Desde el 11 de febrero de 2026</td>
-          <td>Desde 2023</td>
+          <td>Desde el 16 de mayo de 2023</td>
           <td>Desde el 18 de febrero de 2026</td>
         </tr>
       </tbody>
@@ -153,7 +153,7 @@
   <div class="callout">
     <p><strong>PEP (esta cadena):</strong> el protocolo no tiene ninguna clave de administrador capaz de poner tu dirección en una lista negra ni de frenar una transacción ya firmada. Es el mismo modelo de Bitcoin y Dogecoin. Eso <em>no</em> quiere decir que no puedas perder monedas: un envío a la red equivocada, el phishing o un custodio que congele un depósito siguen siendo posibles.</p>
     <p><strong>PEPE (token de Ethereum):</strong> el contrato verificado incluye lógica de lista negra. Por las fechas del lanzamiento, una dirección que había comprado una gran cantidad entró en la lista negra; después se renunció a la propiedad del contrato, así que los cambios posteriores en la lista negra que solo puede hacer el propietario (mediante Ownable) ya no funcionan. El saldo que ya estaba en la lista negra sigue bloqueado. Muchos otros ERC-20 conservan un propietario activo con funciones de pausa y lista negra: lee siempre el contrato.</p>
-    <p class="src">Fuentes: contrato de PEPE en Etherscan <code>0x6982508145454Ce325dDbE47a25d4ec3d2311933</code>; noticias de la época sobre la lista negra de 2023 y la transacción de renuncia; diseño UTXO de Pepecoin Core.</p>
+    <p class="src">Fuentes: <a href="https://etherscan.io/address/0x6982508145454ce325ddbe47a25d4ec3d2311933#code">contrato de PEPE en Etherscan</a> <code>0x6982508145454Ce325dDbE47a25d4ec3d2311933</code>; <a href="https://www.cointime.ai/news/pepe-tokens-blacklist-functionality-used-to-block-address-holding-8-million-in-tokens-87311">Cointime, 6 de mayo de 2023</a> (una dirección en la lista negra y después renuncia a la propiedad); <a href="https://www.fairyproof.com/doc/Pepe-Token-Audit-Report-082123.pdf">auditoría de Fairyproof, 21 de agosto de 2023</a> (el contrato tiene función de lista negra; el propietario es la dirección cero); diseño UTXO de Pepecoin Core.</p>
   </div>
 </section>
 
@@ -278,6 +278,7 @@
         <li><a href="https://github.com/memeticproject/memetic-core">Repositorio de 2016 (premine del 3,5 %)</a></li>
         <li><a href="https://bitcointalk.org/index.php?topic=1391598.0">Anuncio en Bitcointalk</a></li>
         <li><a href="https://etherscan.io/token/0xa9e8acf069c58aec8825542845fd754e41a9489a">Página del token en Etherscan</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/pepecoin">CoinGecko: suministro de PepeCoin (total 107,6 M, máximo 133,8 M), 12 de octubre de 2026</a></li>
         <li><a href="https://blog.kraken.com/product/asset-listings/pepecoin-is-available-for-trading">Listado en Kraken, febrero de 2026</a></li>
       </ul>
     </div>
@@ -285,6 +286,9 @@
       <h3>PEPE · Pepe</h3>
       <ul>
         <li><a href="https://etherscan.io/token/0x6982508145454ce325ddbe47a25d4ec3d2311933">Página del token en Etherscan</a></li>
+        <li><a href="https://blog.kraken.com/post/18691/trading-for-pepe-pepe-starts-now/">Kraken: empieza el trading de PEPE, 16 de mayo de 2023</a></li>
+        <li><a href="https://www.cointime.ai/news/pepe-tokens-blacklist-functionality-used-to-block-address-holding-8-million-in-tokens-87311">Cointime: una dirección en la lista negra, renuncia a la propiedad (6 de mayo de 2023)</a></li>
+        <li><a href="https://www.fairyproof.com/doc/Pepe-Token-Audit-Report-082123.pdf">Informe de auditoría de Fairyproof (21 de agosto de 2023)</a></li>
         <li><a href="https://www.techopedia.com/definition/pepe-coin-pepe">Techopedia: tokenomics del lanzamiento</a></li>
         <li><a href="https://www.sec.gov/Archives/edgar/data/2109686/000199937126007908/canarypepe-s1.htm">Canary PEPE ETF, Form S-1</a></li>
       </ul>

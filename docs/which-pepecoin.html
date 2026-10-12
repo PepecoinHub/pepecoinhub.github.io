@@ -128,7 +128,7 @@
           <th scope="row">Supply</th>
           <td><span class="num">~<span data-live="supply-b">104.9</span> billion</span>, plus 10,000 per block, no cap</td>
           <td><span class="num">420.69 trillion</span>, fixed</td>
-          <td><span class="num">~107 million</span> circulating on Ethereum</td>
+          <td><span class="num">~107.6 million</span> total supply on Ethereum (max 133.8 million)</td>
         </tr>
         <tr>
           <th scope="row">Address</th>
@@ -139,7 +139,7 @@
         <tr>
           <th scope="row">On Kraken</th>
           <td>Since February 11, 2026</td>
-          <td>Since 2023</td>
+          <td>Since May 16, 2023</td>
           <td>Since February 18, 2026</td>
         </tr>
       </tbody>
@@ -153,7 +153,7 @@
   <div class="callout">
     <p><strong>PEP (this chain):</strong> there is no admin key in the protocol that can blacklist your address or stop a signed spend. That is the same model as Bitcoin and Dogecoin. It does <em>not</em> mean you cannot lose coins — wrong network, phishing, or a custodian freezing a deposit still apply.</p>
     <p><strong>PEPE (Ethereum token):</strong> the verified contract includes blacklist logic. Around launch, one address that bought a large amount was blacklisted; ownership was then renounced, so further owner-only blacklist changes via Ownable no longer work. The already-blacklisted balance stays stuck. Many other ERC-20s keep an active owner with pause/blacklist — always read the contract.</p>
-    <p class="src">Sources: Etherscan PEPE contract <code>0x6982508145454Ce325dDbE47a25d4ec3d2311933</code>; contemporaneous reports of the 2023 blacklist and renounce transaction; Pepecoin Core UTXO design.</p>
+    <p class="src">Sources: <a href="https://etherscan.io/address/0x6982508145454ce325ddbe47a25d4ec3d2311933#code">PEPE contract on Etherscan</a> <code>0x6982508145454Ce325dDbE47a25d4ec3d2311933</code>; <a href="https://www.cointime.ai/news/pepe-tokens-blacklist-functionality-used-to-block-address-holding-8-million-in-tokens-87311">Cointime, May 6, 2023</a> (one address blacklisted, then ownership renounced); <a href="https://www.fairyproof.com/doc/Pepe-Token-Audit-Report-082123.pdf">Fairyproof audit, Aug 21, 2023</a> (blacklist function present, owner is the zero address); Pepecoin Core UTXO design.</p>
   </div>
 </section>
 
@@ -278,6 +278,7 @@
         <li><a href="https://github.com/memeticproject/memetic-core">2016 repository (3.5% premine)</a></li>
         <li><a href="https://bitcointalk.org/index.php?topic=1391598.0">Bitcointalk announcement</a></li>
         <li><a href="https://etherscan.io/token/0xa9e8acf069c58aec8825542845fd754e41a9489a">Etherscan token page</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/pepecoin">CoinGecko: PepeCoin supply (total 107.6M, max 133.8M), Oct 12, 2026</a></li>
         <li><a href="https://blog.kraken.com/product/asset-listings/pepecoin-is-available-for-trading">Kraken listing, Feb 2026</a></li>
       </ul>
     </div>
@@ -285,6 +286,9 @@
       <h3>PEPE · Pepe</h3>
       <ul>
         <li><a href="https://etherscan.io/token/0x6982508145454ce325ddbe47a25d4ec3d2311933">Etherscan token page</a></li>
+        <li><a href="https://blog.kraken.com/post/18691/trading-for-pepe-pepe-starts-now/">Kraken: trading for PEPE starts, May 16, 2023</a></li>
+        <li><a href="https://www.cointime.ai/news/pepe-tokens-blacklist-functionality-used-to-block-address-holding-8-million-in-tokens-87311">Cointime: one address blacklisted, ownership renounced (May 6, 2023)</a></li>
+        <li><a href="https://www.fairyproof.com/doc/Pepe-Token-Audit-Report-082123.pdf">Fairyproof audit report (Aug 21, 2023)</a></li>
         <li><a href="https://www.techopedia.com/definition/pepe-coin-pepe">Techopedia: launch tokenomics</a></li>
         <li><a href="https://www.sec.gov/Archives/edgar/data/2109686/000199937126007908/canarypepe-s1.htm">Canary PEPE ETF, Form S-1</a></li>
       </ul>
