@@ -115,7 +115,7 @@
       no_match: 'No address matches that search.',
       notes_h: 'How to read this',
       notes: [
-        'Live daily snapshots from the API start on 5 Oct 2026. Earlier history, back to June 2024, was reconstructed by replaying every block of the Pepecoin blockchain on a full node: weekly snapshots until September 2025, daily ones after that, and a daily trend series for the whole period. It is drawn dashed or hollow. Checks against archived explorer rich lists and the live API are in VALIDATION.md in the repository.',
+        'Live daily snapshots from the API start on 5 Oct 2026. Earlier history, back to the first mined block on 30 Jan 2024, was reconstructed by replaying every block of the Pepecoin blockchain on a full node: daily snapshots for the first week (30 Jan – 4 Feb 2024), weekly from 5 Feb 2024 until September 2025, daily ones after that, and a daily trend series for the whole period. It is drawn dashed or hollow. Checks against archived explorer rich lists and the live API are in VALIDATION.md in the repository.',
         'An address is not a person. Exchanges, pools and custodians hold coins for many users. The view without exchanges and pools is a closer picture of everyone else, but the tags are incomplete.',
         'All shares are measured against the circulating supply on the day of the snapshot, so a growing supply alone lowers a share a little each day.',
         'Each day uses that day\'s top addresses, so the group changes as wallets climb or fall. The tables below show who moved.'
@@ -236,7 +236,7 @@
       no_match: 'Żaden adres nie pasuje do wyszukiwania.',
       notes_h: 'Jak to czytać',
       notes: [
-        'Dzienne snapshoty z API zaczynają się 5 paź 2026. Wcześniejsza historia, od czerwca 2024, została odtworzona przez przeliczenie każdego bloku blockchainu Pepecoina na pełnym węźle: snapshoty tygodniowe do września 2025, potem dzienne, oraz dzienna seria trendu za cały okres. Jest rysowana linią przerywaną lub pustymi punktami. Porównanie z archiwalnymi rich listami eksplorerów i z API na żywo jest w pliku VALIDATION.md w repozytorium.',
+        'Dzienne snapshoty z API zaczynają się 5 paź 2026. Wcześniejsza historia, od pierwszego wykopanego bloku 30 sty 2024, została odtworzona przez przeliczenie każdego bloku blockchainu Pepecoina na pełnym węźle: snapshoty dzienne w pierwszym tygodniu (30 sty – 4 lut 2024), tygodniowe od 5 lut 2024 do września 2025, potem dzienne, oraz dzienna seria trendu za cały okres. Jest rysowana linią przerywaną lub pustymi punktami. Porównanie z archiwalnymi rich listami eksplorerów i z API na żywo jest w pliku VALIDATION.md w repozytorium.',
         'Adres to nie człowiek. Giełdy, pule i custodiany trzymają monety wielu użytkowników. Widok bez giełd i pooli lepiej oddaje resztę rynku, ale tagi są niekompletne.',
         'Wszystkie udziały liczone są względem podaży w obiegu z dnia snapshotu, więc samo rosnące podaż obniża udział o odrobinę każdego dnia.',
         'Każdy dzień bierze ówczesne top adresy, więc skład grupy się zmienia, gdy portfele awansują lub spadają. Tabele niżej pokazują, kto się ruszył.'

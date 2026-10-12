@@ -64,17 +64,17 @@ API podaje tylko aktualną rich listę, więc dni sprzed pierwszego snapshotu (5
 
 - Na własnym pełnym węźle Pepecoin Core (v1.1.0, bez portfela i bez `txindex`) narzędzie do replayu czyta po kolei każdy blok przez lokalne RPC, prowadzi zbiór UTXO na dysku (SQLite) i salda wszystkich adresów, a na koniec każdego dnia UTC (stan tuż przed pierwszym blokiem z następnego dnia) zapisuje top 2000 w dokładnie tym samym formacie co `snapshot.py`.
 - Podaż to podaż z harmonogramu emisji na danej wysokości (tak samo liczy PepeBlocks; zgodność co do PEP na wysokościach 1 237 541 i 1 238 910). P2PK liczy się jako odpowiadający mu adres P2PKH; multisig i skrypty niestandardowe nie trafiają na listę (jak w eksploratorach). `lastSeen` to czas ostatniego bloku, w którym adres coś dostał albo wydał. `isMiner` = adres dostał wypłatę z coinbase w ostatnich 30 dniach (strona i tak tego nie używa).
-- Do repozytorium trafiły: snapshoty tygodniowe (poniedziałki) od 5.02.2024 do 25.08.2025, dzienne od 1.09.2025 do 4.10.2026 (top 2000), plus `reconstructed_daily.json` z dziennymi udziałami za cały okres. Od 5.10.2026 nadal zbiera je `snapshot.py` (też top 2000). Pliki bieżących snapshotów nie były ruszane.
+- Do repozytorium trafiły: snapshoty dzienne od 30.01.2024 (pierwszy wykopany blok) do 4.02.2024, tygodniowe (poniedziałki) od 5.02.2024 do 25.08.2025, dzienne od 1.09.2025 do 4.10.2026 (top 2000), plus `reconstructed_daily.json` z dziennymi udziałami za cały okres. Od 5.10.2026 nadal zbiera je `snapshot.py` (też top 2000). Pliki bieżących snapshotów nie były ruszane.
 - Na stronie odtworzone punkty są rysowane linią przerywaną i pustymi kropkami, z dopiskiem „odtworzone” w podpowiedzi, a kolumny tabeli zmian porównujące z odtworzonym snapshotem mają przerywaną ramkę.
 - Sprawdzenie: salda i sumy z archiwalnych kopii rich list PepeBlocks i PepecoinExplorer (Internet Archive) w momencie zrobienia kopii oraz bieżące snapshoty z 5 i 6 października 2026 przy tej samej wysokości bloku. Wyniki w `VALIDATION.md`.
 - Samego narzędzia do replayu nie ma w repozytorium (wymaga pełnego węzła, ok. 14 GB danych i kilku godzin). Działa poza repozytorium; zasada jest opisana wyżej. Nic nie trzeba przeliczać ponownie, codzienne snapshoty dalej robi `snapshot.py`.
 
 ## Ograniczenia, o których warto pamiętać
 
-- Historia sprzed 5 października 2026 jest odtworzona z blockchainu (patrz wyżej): do końca sierpnia 2025 snapshoty są co tydzień, od 1 września 2025 codziennie (top 2000). Lista „kto się ruszył” dotyczy top 1000; tabela portfeli pokazuje wszystkie adresy ze snapshotu.
+- Historia sprzed 5 października 2026 jest odtworzona z blockchainu (patrz wyżej): od 30.01 do 4.02.2024 codziennie, potem do końca sierpnia 2025 co tydzień, od 1 września 2025 codziennie (top 2000). Lista „kto się ruszył” dotyczy top 1000; tabela portfeli pokazuje wszystkie adresy ze snapshotu.
 - Adres to nie człowiek. Giełdy i custodiany trzymają monety wielu osób, a lista tagów jest ręczna i niepełna.
 - Udziały liczone są względem podaży z dnia snapshotu.
-- Rozmiar: jeden snapshot to ok. 90 KB, czyli ok. 33 MB rocznie w repozytorium. Odtworzona historia dodała ok. 68 MB (481 snapshotów top 2000: tygodniowe od 5.02.2024 do 25.08.2025, dzienne od 1.09.2025 do 4.10.2026, plus seria dzienna ok. 0,2 MB). To mało (limit GitHub Pages to 1 GB), git dodatkowo kompresuje podobne pliki.
+- Rozmiar: jeden snapshot to ok. 90 KB, czyli ok. 33 MB rocznie w repozytorium. Odtworzona historia dodała ok. 68 MB (487 snapshotów top 2000: dzienne od 30.01 do 4.02.2024, tygodniowe od 5.02.2024 do 25.08.2025, dzienne od 1.09.2025 do 4.10.2026, plus seria dzienna ok. 0,2 MB). To mało (limit GitHub Pages to 1 GB), git dodatkowo kompresuje podobne pliki.
 - Cron GitHuba potrafi się spóźnić o kilkanaście minut, a w repozytorium bez aktywności zaplanowane workflowy bywają wyłączane po ok. 60 dniach (wystarczy włączyć z powrotem). Codzienne commity ze snapshotami zwykle to zapobiegają.
 - Jeśli GitHub ostrzeże o przestarzałych wersjach akcji (`actions/checkout@v4` itd.), podbij numery w `snapshot.yml`.
 
