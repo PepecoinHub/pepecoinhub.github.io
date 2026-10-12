@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <link rel="stylesheet" href="../facts.css?v=20261012a">
-<link rel="stylesheet" href="gry.css?v=20261012c">
+<link rel="stylesheet" href="gry.css?v=20261012d">
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
@@ -26,14 +26,14 @@
 </nav><span class="g-me" aria-live="polite"></span></div>
 <main class="wrap" id="main">
 <header class="page-head">
-  <p class="eyebrow">Games · updated October 9, 2026</p>
+  <p class="eyebrow">Games · updated October 12, 2026</p>
   <h1>Privacy notice</h1>
-  <p class="lede">We keep as little as possible. We never ask for your email or your wallet to play.</p>
+  <p class="lede">We keep as little as possible. We never ask for a password, a seed phrase or a wallet to play.</p>
 </header>
 <div class="prose g-prose">
 <h2>What is stored</h2>
 <ul>
-<li><strong>A nickname</strong> you choose, and a random guest account ID. If Discord login is switched on, your Discord user ID and name are stored too. We do not receive your email or password.</li>
+<li><strong>A nickname</strong> you choose, and a random guest account ID. If you log in with Discord, your Discord user ID, name and email address are stored by our login service (Supabase), because Discord shares them at login. We do not show the email or use it for anything. We never receive your password.</li>
 <li><strong>Game data:</strong> rooms and tables, moves, scores, results and chat messages. Old chat messages are deleted automatically after about a week. Closed tables are removed with their chat after about an hour.</li>
 <li><strong>A salted hash of your IP address</strong>, used only to limit how many rooms one network can open. It cannot be turned back into the address, and the raw address is not saved.</li>
 <li><strong>Leaderboard:</strong> your nickname and points from Pepe Pictures nights stay on the leaderboard and in the Hall of Fame.</li>
@@ -46,6 +46,7 @@
 <li><strong>GitHub Pages</strong> serves the pages.</li>
 <li><strong>Supabase</strong> runs the game database and live connection. The project is set up in the EU (Frankfurt).</li>
 <li><strong>Discord</strong> handles the login if you choose it.</li>
+<li><strong>Cloudflare Turnstile</strong> checks that a guest sign-in comes from a person and not a bot. It sees your IP address and basic browser signals for that check. Cloudflare says it does not use this data for advertising.</li>
 <li><strong>Google Fonts</strong> delivers the page font, which means Google sees your IP address when the page loads.</li>
 <li><strong>GoatCounter</strong> counts page views without cookies or personal profiles, the same as on the rest of Pepecoin Hub.</li>
 </ul>

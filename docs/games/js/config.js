@@ -7,4 +7,7 @@ window.PEP_GRY = {
   supabaseKey: 'sb_publishable_GRByiqlX6v67phR8xcM6VA_6eXXwTKX',
   reddit: false,     // Reddit has no ready-made Supabase provider yet; the button shows "soon" until this is true
   discord: true,     // Discord login is set up in Supabase
+  // PUBLIC Cloudflare Turnstile site key: guests pass a quick "not a bot" check before signing in.
+  // The matching SECRET key goes only into Supabase (Authentication > Attack Protection), never here.
+  turnstileSiteKey: '0x4AAAAAAFUZHXoXT2P6KI_s',
 };

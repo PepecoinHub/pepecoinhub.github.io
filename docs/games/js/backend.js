@@ -111,7 +111,8 @@ class SupaBackend {
   }
   session() { return this.sess ? { user: { id: this.sess.user.id, is_anonymous: !!this.sess.user.is_anonymous } } : null; }
   async guest() {
-    const { data, error } = await this.sb.auth.signInAnonymously();
+    const captchaToken = cfg.turnstileSiteKey ? await (await import('./human.js')).humanToken(cfg.turnstileSiteKey) : undefined;
+    const { data, error } = await this.sb.auth.signInAnonymously(captchaToken ? { options: { captchaToken } } : undefined);
     if (error) throw new Error(error.message);
     this.sess = data.session;
   }
