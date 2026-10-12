@@ -54,6 +54,8 @@
 .mn-a.on { border-style: solid; border-color: var(--accent); color: var(--ink); background: var(--accent-wash); }
 .mn-a.on img { filter: none; opacity: 1; }
 .mn-a b { display: block; font-size: .85rem; }
+.mn-cheat { display: flex; gap: 6px; margin-top: 6px; }
+.mn-cheat input { width: 150px; font: inherit; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--grid); background: var(--surface-2); color: var(--ink); }
 .mn-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
 .mn-foot { position: fixed; z-index: 40; animation: mnfoot 1.8s ease-in-out infinite; }
 .mn-foot button { appearance: none; border: 0; background: none; cursor: pointer; font-size: 54px; line-height: 1; filter: sepia(1) saturate(6) hue-rotate(-12deg) brightness(1.15) drop-shadow(0 0 12px #ffd25e); padding: 6px; }

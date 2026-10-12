@@ -33,7 +33,7 @@
   const ACH = [
     { id: 'gm', name: 'GM', img: 'peek', how: 'Pressed Start' },
     { id: 'block1', name: 'First block', img: 'pep', how: 'Mine your first block' },
-    { id: 'foot', name: 'Golden foot', img: 'hurry', how: 'Catch the golden foot' },
+    { id: 'foot', name: 'Zord Feet', img: 'hurry', how: 'Catch the golden foot' },
     { id: 'pool', name: 'Team player', img: 'hug', how: 'Join a mining pool' },
     { id: 'merged', name: 'Merge miner', img: 'crowd', how: 'Turn on merged mining' },
     { id: 'laptop', name: 'Bought the laptop', img: 'cheer', how: 'Buy the New Laptop' },
@@ -229,6 +229,8 @@
     { id: 'doge', ok: () => !!S.up.merged, run: () => { const g = baseRate() * 120; earn(g); return ['Your pool found a DOGE block', `Merged mining pays twice: +${fmt(g)} game PEP.`, 'hug']; } },
     { id: 'reddit', ok: () => true, run: () => { addBuff('reddit', '🔥 Front page ×1.5', 1.5, 60); return ['Your post hit the front page of r/pepecoin', 'New miners join the pool. ×1.5 for 60 seconds.', 'news']; } },
     { id: 'fud', ok: () => baseRate() > 0, run: () => { fud(); return null; } },
+    { id: 'pepelord', ok: () => baseRate() > 0, run: () => { addBuff('pepelord', '👑 Pepelord in chat ×5', 5, 60, 'gold'); return ['Pepelord joined the chat', 'The whole pond wakes up. Miners ×5 for 1 minute.', 'peek']; } },
+    { id: 'zomboid', ok: () => baseRate() > 0, run: () => { addBuff('zomboid', '🧟 Zomboid news ×0.7', 0.7, 20, 'bad'); return ['Project Zomboid announcement', 'Everyone stopped mining to read it. Miners ×0.7 for 20 seconds.', 'loading']; } },
   ];
   function showEvent(title, text, img, button) {
     const ev = $('event'); ev.innerHTML = `<img src="${E(img)}" alt=""><div><b></b><p></p></div>`;
@@ -247,6 +249,29 @@
     else if (roll < 0.95) { const g = base * 60; earn(g); toast(`${t} pumped ×10`, `You sold the top: +${fmt(g)} game PEP.`, E('cheer')); }
     else { const g = base * 600; earn(g); toast(`${t} MOONED 🚀`, `+${fmt(g)} game PEP. Lewis approves.`, E('torch')); }
   }
+
+  // ---------- TEST ONLY: cheat code "klapaucius" (×100 for 1 minute). Remove before the game is announced. ----------
+  const CHEAT = 'klapaucius';
+  function cheat(word) {
+    if (String(word).trim().toLowerCase() !== CHEAT || !S.started) return false;
+    addBuff('cheat', '🧪 klapaucius ×100', 100, 60, 'gold', 100); toast('Cheat on', 'Everything mines ×100 for 1 minute.', E('crayon')); paint(); return true;
+  }
+  let typed = '';
+  document.addEventListener('keydown', (ev) => {
+    if (ev.target.closest && ev.target.closest('input, textarea') || ev.key.length !== 1) return;
+    typed = (typed + ev.key.toLowerCase()).slice(-CHEAT.length);
+    if (typed === CHEAT) { typed = ''; cheat(CHEAT); }
+  });
+  let taps = [];
+  document.querySelector('.mn-pep img').addEventListener('click', () => {
+    taps = taps.filter((t) => now() - t < 2000).concat(now());
+    if (taps.length < 5) return; taps = [];
+    if (document.querySelector('.mn-cheat')) return;
+    const f = document.createElement('form'); f.className = 'mn-cheat';
+    f.innerHTML = '<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Code"><button class="btn sm" type="submit">OK</button>';
+    f.onsubmit = (e) => { e.preventDefault(); if (!cheat(f.querySelector('input').value)) toast('Nope', 'That is not the code.', E('serious')); f.remove(); };
+    document.querySelector('.mn-bank').append(f); f.querySelector('input').focus();
+  });
 
   // ---------- loop ----------
   let last = performance.now();
