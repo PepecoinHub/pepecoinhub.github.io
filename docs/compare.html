@@ -161,39 +161,6 @@
   <p class="note">Both chains add the same 10,000 coins a block. At the one-minute target (1,440 blocks a day) that is up to 14.4 million coins a day and about 5.26 billion a year, so Pepecoin's supply follows Dogecoin's curve about ten years behind it. Pepecoin's blocks have averaged about 62.6 seconds over the past year, which makes about 13.8 million PEP a day (<a href="network.html">network stats</a>). <a href="supply.html">See the supply and inflation chart.</a></p>
 </section>
 
-<section aria-labelledby="mining">
-  <h2 id="mining">Same hashrate, very different pay</h2>
-  <p class="note">Hashrate is the computing power mining a chain. Both chains aim for one block every 60 seconds, so hashrate works out to difficulty × 2<sup>32</sup> ÷ 60 seconds, and equal difficulty means equal hashrate.</p>
-  <figure class="hr">
-    <div class="hr-plot">
-      <span class="hr-name"><strong>Dogecoin</strong><b>2.1–3.4 PH/s</b><small>range, Sept 28 – Oct 4</small></span>
-      <div class="hr-track" role="img" aria-label="Dogecoin hashrate ranged from 2.1 to 3.4 petahashes per second">
-        <span class="hr-grid" style="left:25%"></span><span class="hr-grid" style="left:50%"></span><span class="hr-grid" style="left:75%"></span>
-        <span class="hr-band" style="left:51.5%;width:33.5%"></span>
-      </div>
-      <span class="hr-name"><strong>Pepecoin</strong><b>2.9 PH/s</b><small>October 5</small></span>
-      <div class="hr-track" role="img" aria-label="Pepecoin hashrate was 2.9 petahashes per second, inside Dogecoin's range">
-        <span class="hr-grid" style="left:25%"></span><span class="hr-grid" style="left:50%"></span><span class="hr-grid" style="left:75%"></span>
-        <span class="hr-band ghost" style="left:51.5%;width:33.5%"></span>
-        <span class="hr-dot" style="left:72.7%"></span>
-      </div>
-      <span class="hr-axis-unit" aria-hidden="true">PH/s</span>
-      <div class="hr-axis" aria-hidden="true"><span style="left:0">0</span><span style="left:25%">1</span><span style="left:50%">2</span><span style="left:75%">3</span><span style="left:100%">4</span></div>
-    </div>
-    <figcaption class="src">From mining difficulty: Pepecoin 40.6M on October 5, 2026 (<a href="https://pepeplorer.com/network">Pepeplorer</a>), Dogecoin 28.8M to 47.5M from September 28 to October 4, 2026 (<a href="https://www.coinwarz.com/dogecoin-difficulty">CoinWarz</a>). The faint band repeats Dogecoin's range on Pepecoin's row.</figcaption>
-  </figure>
-  <div class="stats">
-    <div class="stat"><span class="label">Hashrate</span><span class="value">About the same</span><span class="sub">PEP 2.9 PH/s, inside DOGE's 2.1–3.4 PH/s</span></div>
-    <div class="stat"><span class="label">Paid to miners a day</span><span class="value" id="pay-ratio">1,043× less</span><span class="sub">PEP <span id="pay-pep2">$1,302</span>, DOGE <span id="pay-doge2">$1.36M</span>, at the one-minute target</span></div>
-    <div class="stat"><span class="label">Market cap</span><span class="value" id="mcap-ratio">1/1,555</span><span class="sub">of Dogecoin's</span></div>
-  </div>
-  <div class="prose">
-    <p><strong>How a small coin gets that much hashrate.</strong> Merged mining. The Scrypt machines that mine Pepecoin are already paid by Litecoin and Dogecoin, about <span id="pay-ltc-doge">$1.61M</span> a day in block rewards between them. Pools that add PEP to their merged mining pay it out on top, for the same work and the same electricity. <a href="scrypt-family.html">How merged mining works.</a></p>
-    <p><strong>What it means for security.</strong> Out-mining Pepecoin takes roughly as much Scrypt hardware as out-mining Dogecoin, far more than PEP's own block rewards could pay for.</p>
-    <p><strong>The catch.</strong> The hashrate is there because large pools include PEP in their merged mining. If they dropped it, Pepecoin's hashrate would fall with them. The live pool list is on <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>.</p>
-  </div>
-</section>
-
 <section aria-labelledby="history">
   <h2 id="history">Price at the same age</h2>
   <p class="note">Dogecoin launched in December 2013 and Pepecoin in January 2024. This chart lines them up by age: left to right is time since each coin's launch, bottom to top is the price in US dollars. Both chains issue coins on the same schedule, so at the same age they have about the same number of coins, and their prices can be compared directly.</p>
@@ -230,6 +197,39 @@
     <p><strong>What the chart shows.</strong> Both coins had their big first run inside year one and then gave most of it back. Dogecoin reached about $0.0018 early in 2014, weeks after launch, and was near $0.0001 by 2015. Pepecoin reached about $0.0018 in December 2024, ten months after launch, and has been near $0.0001 since spring 2026.</p>
     <p><strong>What it does not show.</strong> Dogecoin's later rises, in 2017 and 2021, had their own causes. Nothing here says Pepecoin will repeat them. One coin's past prices are not a forecast for another.</p>
     <p><strong>About the data.</strong> Pepecoin's line starts in March 2024, when price tracking began, so its first two months are missing. Each line is sampled every few days, which can clip a short spike. Exact all-time highs are on the <a href="calculator.html#prices">calculator page</a>.</p>
+  </div>
+</section>
+
+<section aria-labelledby="mining">
+  <h2 id="mining">Same hashrate, very different pay</h2>
+  <p class="note">Hashrate is the computing power mining a chain. Both chains aim for one block every 60 seconds, so hashrate works out to difficulty × 2<sup>32</sup> ÷ 60 seconds, and equal difficulty means equal hashrate.</p>
+  <figure class="hr">
+    <div class="hr-plot">
+      <span class="hr-name"><strong>Dogecoin</strong><b>2.1–3.4 PH/s</b><small>range, Sept 28 – Oct 4</small></span>
+      <div class="hr-track" role="img" aria-label="Dogecoin hashrate ranged from 2.1 to 3.4 petahashes per second">
+        <span class="hr-grid" style="left:25%"></span><span class="hr-grid" style="left:50%"></span><span class="hr-grid" style="left:75%"></span>
+        <span class="hr-band" style="left:51.5%;width:33.5%"></span>
+      </div>
+      <span class="hr-name"><strong>Pepecoin</strong><b>2.9 PH/s</b><small>October 5</small></span>
+      <div class="hr-track" role="img" aria-label="Pepecoin hashrate was 2.9 petahashes per second, inside Dogecoin's range">
+        <span class="hr-grid" style="left:25%"></span><span class="hr-grid" style="left:50%"></span><span class="hr-grid" style="left:75%"></span>
+        <span class="hr-band ghost" style="left:51.5%;width:33.5%"></span>
+        <span class="hr-dot" style="left:72.7%"></span>
+      </div>
+      <span class="hr-axis-unit" aria-hidden="true">PH/s</span>
+      <div class="hr-axis" aria-hidden="true"><span style="left:0">0</span><span style="left:25%">1</span><span style="left:50%">2</span><span style="left:75%">3</span><span style="left:100%">4</span></div>
+    </div>
+    <figcaption class="src">From mining difficulty: Pepecoin 40.6M on October 5, 2026 (<a href="https://pepeplorer.com/network">Pepeplorer</a>), Dogecoin 28.8M to 47.5M from September 28 to October 4, 2026 (<a href="https://www.coinwarz.com/dogecoin-difficulty">CoinWarz</a>). The faint band repeats Dogecoin's range on Pepecoin's row.</figcaption>
+  </figure>
+  <div class="stats">
+    <div class="stat"><span class="label">Hashrate</span><span class="value">About the same</span><span class="sub">PEP 2.9 PH/s, inside DOGE's 2.1–3.4 PH/s</span></div>
+    <div class="stat"><span class="label">Paid to miners a day</span><span class="value" id="pay-ratio">1,043× less</span><span class="sub">PEP <span id="pay-pep2">$1,302</span>, DOGE <span id="pay-doge2">$1.36M</span>, at the one-minute target</span></div>
+    <div class="stat"><span class="label">Market cap</span><span class="value" id="mcap-ratio">1/1,555</span><span class="sub">of Dogecoin's</span></div>
+  </div>
+  <div class="prose">
+    <p><strong>How a small coin gets that much hashrate.</strong> Merged mining. The Scrypt machines that mine Pepecoin are already paid by Litecoin and Dogecoin, about <span id="pay-ltc-doge">$1.61M</span> a day in block rewards between them. Pools that add PEP to their merged mining pay it out on top, for the same work and the same electricity. <a href="scrypt-family.html">How merged mining works.</a></p>
+    <p><strong>What it means for security.</strong> Out-mining Pepecoin takes roughly as much Scrypt hardware as out-mining Dogecoin, far more than PEP's own block rewards could pay for.</p>
+    <p><strong>The catch.</strong> The hashrate is there because large pools include PEP in their merged mining. If they dropped it, Pepecoin's hashrate would fall with them. The live pool list is on <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>.</p>
   </div>
 </section>
 
