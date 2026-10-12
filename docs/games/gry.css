@@ -552,3 +552,9 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .offline-note { display: flex; align-items: center; gap: 14px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2, rgba(0,0,0,.04)); }
 .offline-note img { width: 76px; height: 76px; flex: none; object-fit: cover; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
 .offline-note p { margin: 0; font-size: .92rem; color: var(--ink-2, inherit); line-height: 1.45; }
+
+/* lobby: Pepe Miner card */
+.miner-promo { margin-top: 26px; display: flex; gap: 18px; align-items: center; }
+.miner-promo img { width: 96px; height: 96px; flex: none; filter: drop-shadow(0 8px 14px rgba(20, 60, 30, .3)); }
+.miner-promo h2 { margin: 0 0 6px; }
+@media (max-width: 520px) { .miner-promo { flex-direction: column; text-align: center; } }
