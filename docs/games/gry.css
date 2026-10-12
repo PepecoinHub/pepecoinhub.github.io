@@ -533,3 +533,7 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .gprev-battleship .miss::after { content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px; border-radius: 50%; background: #5f86a8; }
 @media (prefers-reduced-motion: reduce) { .gcard, .gcard-check { transition: none; } .gcard:hover { transform: none; } }
 @media (max-width: 520px) { .gcards { grid-template-columns: 1fr 1fr; gap: 10px; } .gcard { padding: 12px 8px; } .gprev { width: 84px; } .gprev-connect4 { width: 92px; } .gcard-desc { font-size: .8rem; } }
+
+/* Draw & Guess card picture: whole drawing visible on its paper colour */
+.mode-card .ill.media img.ill-contain { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; background: #f6f0df; }
+#game-dg .ill.media { background: #f6f0df; }
