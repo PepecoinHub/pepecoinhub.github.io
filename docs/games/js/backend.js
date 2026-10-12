@@ -9,6 +9,16 @@ export const MODE = (cfg.backend === 'supabase' || qs.get('backend') === 'supaba
   : cfg.backend === 'local' || qs.get('backend') === 'local' || ['localhost', '127.0.0.1'].includes(location.hostname) ? 'local'
   : configured ? 'supabase' : 'none';
 
+// Network failures (server down, no internet, blocked) come back as "TypeError: Failed to fetch" and similar.
+// They are turned into one plain message; err.offline lets the page show the "Pepe can't find the server" note.
+export const OFFLINE_MSG = 'The game server can\'t be reached right now. Check your internet connection and try again in a minute.';
+const NET_RE = /failed to fetch|networkerror|load failed|network request failed|fetch failed|err_network|timed? ?out/i;
+export function friendlyError(e) {
+  const m = (e && (e.message || e.error_description)) || String(e || '');
+  if (!NET_RE.test(m)) return e instanceof Error ? e : new Error(m);
+  const x = new Error(OFFLINE_MSG); x.offline = true; return x;
+}
+
 let instance;
 export async function getBackend() {
   if (instance) return instance;
@@ -112,8 +122,9 @@ class SupaBackend {
   session() { return this.sess ? { user: { id: this.sess.user.id, is_anonymous: !!this.sess.user.is_anonymous } } : null; }
   async guest() {
     const captchaToken = cfg.turnstileSiteKey ? await (await import('./human.js')).humanToken(cfg.turnstileSiteKey) : undefined;
-    const { data, error } = await this.sb.auth.signInAnonymously(captchaToken ? { options: { captchaToken } } : undefined);
-    if (error) throw new Error(error.message);
+    const { data, error } = await this.sb.auth.signInAnonymously(captchaToken ? { options: { captchaToken } } : undefined)
+      .catch((e) => { throw friendlyError(e); });
+    if (error) throw friendlyError(error);
     this.sess = data.session;
   }
   async discord() { return this.oauth('discord'); }
@@ -121,13 +132,13 @@ class SupaBackend {
   async oauth(provider) {
     if (this.sess) await this.sb.auth.signOut();
     const { error } = await this.sb.auth.signInWithOAuth({ provider,
-      options: { redirectTo: location.href.split('#')[0] } });
-    if (error) throw new Error(error.message);
+      options: { redirectTo: location.href.split('#')[0] } }).catch((e) => { throw friendlyError(e); });
+    if (error) throw friendlyError(error);
   }
   async logout() { await this.sb.auth.signOut(); this.sess = null; }
   async rpc(fn, args = {}) {
-    const { data, error } = await this.sb.rpc(fn, args);
-    if (error) throw new Error(error.message);
+    const { data, error } = await this.sb.rpc(fn, args).catch((e) => { throw friendlyError(e); });
+    if (error) throw friendlyError(error);
     return data;
   }
   channel(topic, onMsg, onJoin) {

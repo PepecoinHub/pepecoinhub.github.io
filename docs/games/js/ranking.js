@@ -1,4 +1,4 @@
-import { $, $$, h, getBackend, badge, backendBanner, paintMe, fmtLocal, fmtLeft } from './common.js';
+import { $, $$, h, errorNote, getBackend, badge, backendBanner, paintMe, fmtLocal, fmtLeft } from './common.js';
 const be = await getBackend();
 backendBanner($('#main')); paintMe(be);
 let showGuests = true, tab = new URLSearchParams(location.search).get('tab') || 'season';
@@ -65,7 +65,7 @@ async function render() {
         h('b', {}, g.title), h('span', { class: 'small muted' }, ' · ' + 'Pepe Pictures' + (g.ranked ? ' (ranked' + (g.season ? ', ' + g.season : '') + ')' : ' (unranked)') + ' · ' + fmtLocal(new Date(g.finished_at))),
         h('div', { class: 'small', style: 'margin-top:4px' }, (g.results || []).map((r) => h('span', { style: 'margin-right:14px;white-space:nowrap' }, medal(r.place), ' ', r.nick, r.verified ? ' ✓' : ' (guest)', ' ', h('span', { class: 'mono muted' }, r.points))))));
     }
-  } catch (e) { p.append(h('p', { class: 'muted' }, e.message)); }
+  } catch (e) { p.append(errorNote(e)); }
 }
 $$('.tabs button').forEach((b) => b.addEventListener('click', () => { tab = b.dataset.tab; render(); }));
 render();

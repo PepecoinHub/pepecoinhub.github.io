@@ -547,3 +547,8 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .ts-wrap.show { opacity: 1; pointer-events: auto; }
 .ts-card { background: var(--surface, #fff); color: inherit; border-radius: 14px; padding: 18px 20px; max-width: 360px; width: 100%; display: grid; gap: 12px; justify-items: center; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,.3); }
 .ts-card p { margin: 0; }
+
+/* server unreachable: Pepe with the magnifying glass + a plain message */
+.offline-note { display: flex; align-items: center; gap: 14px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2, rgba(0,0,0,.04)); }
+.offline-note img { width: 76px; height: 76px; flex: none; object-fit: cover; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
+.offline-note p { margin: 0; font-size: .92rem; color: var(--ink-2, inherit); line-height: 1.45; }

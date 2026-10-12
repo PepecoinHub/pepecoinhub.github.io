@@ -58,16 +58,22 @@ export async function pack(blob) {
 // Host: paced sender. Sends one piece every `gap()` ms (keeps the project under the Realtime messages/second limit:
 // every broadcast counts once per receiver). want() queues piece numbers (deduplicated).
 export function makeSender(send, gap) {
-  let pk = null, q = [], timer = null;
+  // each piece goes out at most MAX_SENDS times per picture, so repeated requests can't keep the host streaming forever
+  const MAX_SENDS = 12;
+  let pk = null, q = [], timer = null, sends = [];
   const pump = () => {
     timer = null; if (!pk || !q.length) return;
-    const i = q.shift(); send('imgc', { ...pk.meta, i, d: pk.parts[i] });
+    const i = q.shift(); sends[i] = (sends[i] || 0) + 1; send('imgc', { ...pk.meta, i, d: pk.parts[i] });
     if (q.length) timer = setTimeout(pump, gap());
   };
   return {
-    set(p) { pk = p; q = []; clearTimeout(timer); timer = null; },
+    set(p) { pk = p; q = []; sends = []; clearTimeout(timer); timer = null; },
     get tid() { return pk?.meta.tid || null; },
-    want(list) { if (!pk) return; for (const i of list) if (i >= 0 && i < pk.parts.length && !q.includes(i)) q.push(i); if (!timer) timer = setTimeout(pump, 0); },
+    want(list) {
+      if (!pk) return;
+      for (const i of list) if (i >= 0 && i < pk.parts.length && !q.includes(i) && (sends[i] || 0) < MAX_SENDS) q.push(i);
+      if (!timer && q.length) timer = setTimeout(pump, 0);
+    },
     all() { if (pk) this.want(pk.parts.map((_, i) => i)); },
     stop() { clearTimeout(timer); timer = null; q = []; },
   };

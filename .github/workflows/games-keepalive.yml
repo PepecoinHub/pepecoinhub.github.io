@@ -1,11 +1,12 @@
 # PEP Games: keeps the free Supabase project awake (free projects pause after ~7 days without activity).
-# Every 5 days it makes one small read-only call (public lobby list) to the LIVE project.
+# Every 3 days it makes one small call (the public lobby list, which also runs the routine cleanup
+# of old rooms) to the LIVE project.
 # Uses only the PUBLIC publishable key that is already in docs/games/js/config.js. No secrets.
 name: Games keepalive (Supabase)
 
 on:
   schedule:
-    - cron: '17 6 */5 * *'        # 06:17 UTC on days 1, 6, 11, 16, 21, 26, 31 of the month
+    - cron: '17 6 */3 * *'        # 06:17 UTC on days 1, 4, 7, … 31 of the month: never more than 3 days apart
   workflow_dispatch:               # the "Run workflow" button
 
 permissions: {}
@@ -22,7 +23,7 @@ jobs:
       SUPABASE_URL: https://azbwciqfbsdpwubznncg.supabase.co
       SUPABASE_PUBLISHABLE_KEY: sb_publishable_GRByiqlX6v67phR8xcM6VA_6eXXwTKX
     steps:
-      - name: Ping (read-only lobby list)
+      - name: Ping (public lobby list)
         run: |
           for i in 1 2 3; do
             code=$(curl -sS -o /tmp/out.json -w '%{http_code}' --max-time 30 -X POST "$SUPABASE_URL/rest/v1/rpc/gry_lobby" \

@@ -139,6 +139,12 @@ def fetch_supply(height):
         raw = http_get(SUPPLY_URL, tries=3).strip()
         pep = float(raw)
         if 50e9 < pep < 500e9:
+            # the reward is fixed, so the supply must sit close to the estimate from the block height
+            if height:
+                est = ANCHOR_SUPPLY_PEP + BLOCK_REWARD * (height - ANCHOR_HEIGHT)
+                if abs(pep - est) / est > 0.02:
+                    print(f"  supply {pep:,.0f} is more than 2% away from the estimate {est:,.0f}, using estimate", file=sys.stderr)
+                    return int(est * SATS), "estimate"
             return int(round(pep * SATS)), "pepeblocks"
         print(f"  supply {raw!r} outside plausible range, using estimate", file=sys.stderr)
     except Exception as err:
@@ -150,7 +156,7 @@ def fetch_supply(height):
 
 
 # ------------------------------------------------------------------------ validation
-def validate(rows, supply, min_rows):
+def validate(rows, supply, min_rows, height=None, prev_height=None):
     problems = []
     if len(rows) < min_rows:
         problems.append(f"only {len(rows)} rows, need at least {min_rows}")
@@ -161,7 +167,25 @@ def validate(rows, supply, min_rows):
         total = sum(r[1] for r in rows)
         if total > supply * 1.01:
             problems.append("listed balances exceed the supply")
+        # the top 1000 have held about 3/4 of the supply; a tiny share means wrong units or a partial list
+        top1000 = sum(r[1] for r in rows[:1000]) / supply
+        if top1000 < 0.35:
+            problems.append(f"top 1000 hold only {top1000:.1%} of supply, that looks wrong")
+    if height and prev_height and height < prev_height:
+        problems.append(f"block height {height} is lower than the previous snapshot's {prev_height} (stale data?)")
     return problems
+
+
+def previous_height(out_dir, today):
+    """Block height in the newest earlier snapshot, or None."""
+    try:
+        names = sorted(f for f in os.listdir(out_dir) if f.endswith(".json") and f[:10] < today)
+        if not names:
+            return None
+        with open(os.path.join(out_dir, names[-1]), encoding="utf-8") as fh:
+            return json.load(fh)["meta"].get("height")
+    except Exception:
+        return None
 
 
 # --------------------------------------------------------------------------- output
@@ -194,7 +218,7 @@ def main():
     height = fetch_height()
     supply, source = fetch_supply(height)
 
-    problems = validate(rows, supply, args.min_rows)
+    problems = validate(rows, supply, args.min_rows, height, previous_height(os.path.abspath(args.out_dir), today))
     if problems:
         print("Refusing to write snapshot:", *problems, sep="\n  - ", file=sys.stderr)
         return 1

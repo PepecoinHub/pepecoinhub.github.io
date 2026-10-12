@@ -118,15 +118,15 @@
         'Live daily snapshots from the API start on 5 Oct 2026. Earlier history, back to the first mined block on 30 Jan 2024, was reconstructed by replaying every block of the Pepecoin blockchain on a full node: daily snapshots for the first week (30 Jan – 4 Feb 2024), weekly from 5 Feb 2024 until September 2025, daily ones after that, and a daily trend series for the whole period. It is drawn dashed or hollow. Checks against archived explorer rich lists and the live API are in VALIDATION.md in the repository.',
         'An address is not a person. Exchanges, pools and custodians hold coins for many users. The view without exchanges and pools is a closer picture of everyone else, but the tags are incomplete.',
         'All shares are measured against the circulating supply on the day of the snapshot, so a growing supply alone lowers a share a little each day.',
-        'Each day uses that day\'s top addresses, so the group changes as wallets climb or fall. The tables below show who moved.'
+        'Each day uses that day\'s top addresses, so the group changes as wallets climb or fall. The tables above show who moved.'
       ],
       sources: 'Data: Pepecoin Service rich list, PepeBlocks supply; history before 5 Oct 2026 reconstructed from the Pepecoin blockchain.',
       csv: 'Download daily history (CSV)',
       nofa: 'Not financial advice.',
       theme: 'Theme', auto: 'Auto', light: 'Light', dark: 'Dark',
       lang_to: 'Po polsku', lang_to_tag: 'pl',
-      err_title: 'No snapshot yet',
-      err_body: 'The first snapshot is created by the scheduled run. Open the Actions tab of the repository and start “Daily snapshot” once.',
+      err_title: 'Data unavailable',
+      err_body: 'The rich-list data could not be loaded right now. Please try again in a few minutes.',
       types: { exchange: 'exchange', pool: 'pool', burn: 'burn', project: 'project', other: 'tagged' },
       of_supply: 'of supply',
       addrs: 'addresses'
@@ -239,15 +239,15 @@
         'Dzienne snapshoty z API zaczynają się 5 paź 2026. Wcześniejsza historia, od pierwszego wykopanego bloku 30 sty 2024, została odtworzona przez przeliczenie każdego bloku blockchainu Pepecoina na pełnym węźle: snapshoty dzienne w pierwszym tygodniu (30 sty – 4 lut 2024), tygodniowe od 5 lut 2024 do września 2025, potem dzienne, oraz dzienna seria trendu za cały okres. Jest rysowana linią przerywaną lub pustymi punktami. Porównanie z archiwalnymi rich listami eksplorerów i z API na żywo jest w pliku VALIDATION.md w repozytorium.',
         'Adres to nie człowiek. Giełdy, pule i custodiany trzymają monety wielu użytkowników. Widok bez giełd i pooli lepiej oddaje resztę rynku, ale tagi są niekompletne.',
         'Wszystkie udziały liczone są względem podaży w obiegu z dnia snapshotu, więc samo rosnące podaż obniża udział o odrobinę każdego dnia.',
-        'Każdy dzień bierze ówczesne top adresy, więc skład grupy się zmienia, gdy portfele awansują lub spadają. Tabele niżej pokazują, kto się ruszył.'
+        'Każdy dzień bierze ówczesne top adresy, więc skład grupy się zmienia, gdy portfele awansują lub spadają. Tabele wyżej pokazują, kto się ruszył.'
       ],
       sources: 'Dane: rich lista Pepecoin Service, podaż z PepeBlocks; historia sprzed 5 paź 2026 odtworzona z blockchainu Pepecoina.',
       csv: 'Pobierz dzienną historię (CSV)',
       nofa: 'To nie jest porada inwestycyjna.',
       theme: 'Motyw', auto: 'Auto', light: 'Jasny', dark: 'Ciemny',
       lang_to: 'In English', lang_to_tag: 'en',
-      err_title: 'Brak pierwszego snapshotu',
-      err_body: 'Pierwszy snapshot tworzy zaplanowane uruchomienie. Wejdź w zakładkę Actions w repozytorium i raz uruchom „Daily snapshot”.',
+      err_title: 'Dane chwilowo niedostępne',
+      err_body: 'Nie udało się teraz wczytać danych listy. Spróbuj ponownie za kilka minut.',
       types: { exchange: 'giełda', pool: 'pool', burn: 'burn', project: 'projekt', other: 'tag' },
       of_supply: 'podaży',
       addrs: 'adresów'
@@ -935,7 +935,7 @@
       h('div', { class: 'stats my-stats' },
         tile(t('my_rank'), '#' + fmtInt(r.rank), t('my_rank_sub', { n: fmtInt(r.listed) })),
         tile(t('my_bal'), fmtInt(r.bal) + ' PEP', null),
-        tile(t('my_share'), fmtPct(r.bal / r.supply * 100, 4), r.total ? t('my_top', { p: fmtPct(r.rank / r.total * 100, 3) }) : null),
+        tile(t('my_share'), fmtPct(r.bal / r.supply * 100, 4), r.total ? t('my_top', { p: r.rank / r.total * 100 < 0.001 ? '<' + fmtPct(0.001, 3) : fmtPct(r.rank / r.total * 100, 3) }) : null),
         tile(t('my_change'), ch, null)),
       h('p', { class: 'my-msg' }, r.goal ? t('my_next', { pep: fmtInt(Math.ceil(r.goal.pep)), n: fmtInt(r.goal.n) }) : r.rank === 1 ? t('my_first') : ''),
       link);

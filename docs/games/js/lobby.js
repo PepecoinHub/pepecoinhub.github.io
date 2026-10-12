@@ -1,4 +1,4 @@
-import { $, h, toast, getBackend, identityCard, paintMe, meInfo, badge, nextWeekday20, fmtLocal, fmtPoland, backendBanner, seasonLine, nickStore } from './common.js';
+import { $, h, toast, errorNote, getBackend, identityCard, paintMe, meInfo, badge, nextWeekday20, fmtLocal, fmtPoland, backendBanner, seasonLine, nickStore } from './common.js';
 import { pixelDemo } from './pixeldemo.js';
 
 const be = await getBackend();
@@ -46,7 +46,7 @@ const PHASE_LABEL = { lobby: 'waiting to start', turn: 'in progress', reveal: 'i
 
 async function load() {
   try { lobby = await be.rpc('gry_lobby'); offset = Date.parse(lobby.now) - Date.now(); }
-  catch (e) { lobby = { rooms: [], event: null, error: e.message }; }
+  catch (e) { lobby = { rooms: [], event: null, error: e }; }
   renderRooms(); tick();
 }
 function eventInfo() {
@@ -81,7 +81,7 @@ function roomRow(r) {
 }
 function renderRooms() {
   const dg = $('#rooms'), pp = $('#rooms-pp'); dg.textContent = ''; pp.textContent = '';
-  if (lobby?.error) { dg.append(h('p', { class: 'muted' }, lobby.error)); return; }
+  if (lobby?.error) { dg.append(errorNote(lobby.error)); return; }
   const rooms = lobby?.rooms || [];
   const d = rooms.filter((r) => r.mode === 'kalambury'), p = rooms.filter((r) => r.mode === 'obrazek');
   if (!d.length) dg.append(h('div', { class: 'empty' }, h('img', { class: 'empty-pic', src: 'img/empty-playground.webp', alt: 'Three Pepe frogs playing in a sandbox', width: 640, height: 365, loading: 'lazy' }), h('p', { class: 'muted' }, 'No open rooms right now. Start your own below.')));
@@ -131,7 +131,7 @@ setInterval(loadTables, 15000);
 async function loadTopboard() {
   const box = $('#topboard-body'); if (be.kind === 'none') return;
   let d;
-  try { d = await be.rpc('gry_ranking', { p_period: 'season' }); } catch (e) { box.textContent = ''; box.append(h('p', { class: 'muted' }, e.message)); return; }
+  try { d = await be.rpc('gry_ranking', { p_period: 'season' }); } catch (e) { box.textContent = ''; box.append(errorNote(e)); return; }
   box.textContent = '';
   const medal = (p) => ({ 1: '🥇', 2: '🥈', 3: '🥉' })[p] || p + '.';
   const rows = (d.rows || []).slice(0, 5);
@@ -168,7 +168,7 @@ async function renderSchedHost() {
 async function loadTables() {
   const box = $('#tlist');
   let list;
-  try { list = await be.rpc('gry_tables_lobby'); } catch (e) { box.textContent = ''; box.append(h('p', { class: 'muted' }, e.message)); return; }
+  try { list = await be.rpc('gry_tables_lobby'); } catch (e) { box.textContent = ''; box.append(errorNote(e)); return; }
   box.textContent = '';
   if (!list.length) { box.append(h('div', { class: 'empty' }, h('img', { class: 'empty-pic', src: 'img/empty-swing.webp', alt: 'A sad Pepe sitting alone on a swing', width: 640, height: 445, loading: 'lazy' }), h('p', { class: 'muted' }, 'No open tables right now. Open one below and send the invite link to a friend.'))); return; }
   box.append(h('div', { class: 'tscroll' }, h('table', { class: 'gtable tables' },

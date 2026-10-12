@@ -22,7 +22,9 @@ jobs:
   # Job 1: collect the data. Does not need GitHub Pages, so history starts
   # piling up even before Pages is switched on.
   snapshot:
+    if: github.ref == 'refs/heads/main'   # a manual run from another branch must not commit to it or publish it
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write              # commit the new snapshot
     steps:
@@ -57,6 +59,11 @@ jobs:
       - name: Date the sitemap
         run: python scripts/build_sitemap.py || echo "sitemap dates not updated"
 
+      # summary.json and network.json get a new "generated_at" on every build; if nothing else
+      # changed, keep the committed files so a push to main doesn't create an empty data commit
+      - name: Skip timestamp-only changes
+        run: python scripts/keep_timestamps.py
+
       - name: Commit data
         run: |
           git config user.name "github-actions[bot]"
@@ -66,16 +73,21 @@ jobs:
             echo "Nothing new to commit."
           else
             git commit -m "data: snapshot $(date -u +%F)"
-            git pull --rebase origin "${GITHUB_REF_NAME}"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
+            # a merge can land at the same moment: rebase and try again a few times
+            for i in 1 2 3; do
+              git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+              echo "push attempt $i failed, retrying"; sleep $((i * 10))
+            done
+            exit 1
           fi
 
   # Job 2: publish the site. Fails with "HttpError: Not Found" in configure-pages
   # until Settings -> Pages -> Source is set to "GitHub Actions".
   deploy:
     needs: snapshot
-    if: ${{ !cancelled() }}        # still publish (old data or the empty state) if the snapshot failed
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}   # still publish (old data) if the snapshot failed
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       pages: write
