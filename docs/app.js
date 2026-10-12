@@ -14,7 +14,7 @@
       my_h: 'My address',
       my_p: 'Paste your PEP address to see where it stands in today\'s rich list.',
       my_label: 'Your PEP address',
-      my_ph: 'P… (34 characters)',
+      my_ph: 'Paste your PEP address',
       my_go: 'Show',
       my_forget: 'Forget',
       my_bad: 'That does not look like a PEP address (it starts with P and has 34 characters).',
@@ -32,8 +32,8 @@
       my_next: '{pep} PEP more would put it in the top {n}.',
       my_first: 'It is the largest address on the list.',
       my_out: 'Not in today\'s top {n}. Getting in takes at least {pep} PEP.',
-      my_explorer: 'Exact balance and transactions on PepeBlocks',
-      my_privacy: 'Your address stays in this browser. It is saved only in your browser\'s local storage so it is still here next time, and it is never sent to us or anyone else: the page compares it with the daily rich-list file it has already downloaded. We do not collect it. Forget removes it. (Opening PepeBlocks shares it with that site.)',
+      my_explorer: 'Exact balance and transactions on PepeBlocks (this shares the address with that site)',
+      my_privacy: 'Your address stays in this browser (local storage) and is never sent to us or anyone else. We do not collect it. Forget removes it.',
       title: 'Pepecoin Holder Watch',
       eyebrow: 'Rich list · snapshot of {date}',
       eyebrow_plain: 'Rich list',
@@ -48,7 +48,7 @@
       est: 'supply estimated',
       hist_one: 'First snapshot is in. Changes appear from tomorrow, and a 7-day comparison after a week.',
       hist_many: 'History: {n} daily snapshots since {date}. Longer periods fill in as the history grows.',
-      hist_rc: 'History: {live} live daily snapshots since {live_date}, plus {rc} snapshots and daily trend points reconstructed from the blockchain back to {date}.',
+      hist_rc: 'Data from the very first block, {date}: reconstructed from the blockchain, with live daily snapshots since {live_date}.',
       conc_h: 'Concentration',
       conc_p: 'Share of the circulating supply held by the largest addresses, compared with the same time {period} ago.',
       conc_p_all: 'Share of the circulating supply held by the largest addresses, compared with the earliest point in the history ({date}).',
@@ -135,7 +135,7 @@
       my_h: 'Mój adres',
       my_p: 'Wklej swój adres PEP, żeby zobaczyć, gdzie jest w dzisiejszej liście najbogatszych.',
       my_label: 'Twój adres PEP',
-      my_ph: 'P… (34 znaki)',
+      my_ph: 'Wklej swój adres PEP',
       my_go: 'Pokaż',
       my_forget: 'Zapomnij',
       my_bad: 'To nie wygląda na adres PEP (zaczyna się od P i ma 34 znaki).',
@@ -153,8 +153,8 @@
       my_next: 'Jeszcze {pep} PEP i adres będzie w top {n}.',
       my_first: 'To największy adres na liście.',
       my_out: 'Poza dzisiejszym top {n}. Wejście wymaga co najmniej {pep} PEP.',
-      my_explorer: 'Dokładne saldo i transakcje w PepeBlocks',
-      my_privacy: 'Twój adres zostaje w tej przeglądarce. Jest zapisany tylko w jej pamięci lokalnej, żeby był tu następnym razem, i nigdy nie trafia do nas ani do nikogo innego: strona porównuje go z dziennym plikiem listy, który już pobrała. Nie zbieramy go. „Zapomnij” go usuwa. (Otwarcie PepeBlocks udostępnia go tamtej stronie.)',
+      my_explorer: 'Dokładne saldo i transakcje w PepeBlocks (to udostępnia adres tamtej stronie)',
+      my_privacy: 'Adres zostaje w tej przeglądarce (pamięć lokalna) i nigdy nie trafia do nas ani do nikogo innego. Nie zbieramy go. „Zapomnij” go usuwa.',
       title: 'Pepecoin Holder Watch',
       eyebrow: 'Rich lista · snapshot z {date}',
       eyebrow_plain: 'Rich lista',
@@ -169,7 +169,7 @@
       est: 'podaż szacowana',
       hist_one: 'Pierwszy snapshot jest. Zmiany pojawią się od jutra, a porównanie 7-dniowe po tygodniu.',
       hist_many: 'Historia: {n} dziennych snapshotów od {date}. Dłuższe okresy uzupełnią się wraz z historią.',
-      hist_rc: 'Historia: {live} dziennych snapshotów na żywo od {live_date} oraz {rc} snapshotów i dzienne punkty trendu odtworzone z blockchainu od {date}.',
+      hist_rc: 'Dane od samego początku, czyli od pierwszego bloku ({date}): odtworzone z blockchainu, a od {live_date} codzienne snapshoty na żywo.',
       conc_h: 'Koncentracja',
       conc_p: 'Udział największych adresów w podaży w obiegu, porównany z tym samym momentem {period} wcześniej.',
       conc_p_all: 'Udział największych adresów w podaży w obiegu, porównany z najwcześniejszym punktem historii ({date}).',
@@ -418,7 +418,7 @@
       pageHead(t('eyebrow', { date: fmtDate(L.date) })),
       h('div', { class: 'top-row' }, h('div', { class: 'tools' }, seg, langBtn), meta),
       state.view === 'ex' ? h('p', { class: 'small muted', style: 'margin:0;max-width:80ch' }, t('view_ex_note')) : null,
-      histNote ? h('div', { class: 'notice' }, histNote) : null);
+      histNote ? (S.reconstructed_snapshots && S.first_live_date ? h('p', { class: 'small muted hist-line' }, histNote) : h('div', { class: 'notice' }, histNote)) : null);
   }
 
   /* ------------------------------------------------------------ period chooser */
@@ -944,14 +944,14 @@
     const b = my.box; if (!b) return;
     const inp = h('input', { type: 'text', id: 'my-addr', value: my.draft != null ? my.draft : my.addr, placeholder: t('my_ph'), autocomplete: 'off',
       spellcheck: 'false', maxlength: '34', 'aria-label': t('my_label'), oninput: (e) => { my.draft = e.target.value; } });
-    b.replaceChildren(
-      h('h2', { id: 'my-h' }, t('my_h')),
-      h('p', { class: 'small muted', style: 'margin-top:0' }, t('my_p')),
+    // replaceChildren would print a null child as the text "null", so empty parts are dropped
+    b.replaceChildren(...[
       h('form', { class: 'my-form', onsubmit: (e) => { e.preventDefault(); myRun(inp.value.trim()); } },
+        h('h2', { id: 'my-h' }, t('my_h')),
         inp, h('button', { type: 'submit', class: 'btn main' }, t('my_go')),
         my.addr ? h('button', { type: 'button', class: 'btn soft', onclick: () => { store.set(MY_KEY, null); my.addr = ''; my.draft = null; my.res = null; paintMy(); } }, t('my_forget')) : null),
       myResult(),
-      h('p', { class: 'my-note' }, t('my_privacy')));
+      h('p', { class: 'my-note' }, t('my_privacy'))].filter(Boolean));
   }
   function myAddressSection() {
     if (!my.box) my.box = h('section', { class: 'panel myaddr', 'aria-labelledby': 'my-h' });
