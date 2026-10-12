@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pepecoin (PEP) network stats: block height, supply, addresses and block time</title>
-<meta name="description" content="Daily Pepecoin network numbers: block height, coin supply, addresses with a balance and the real average block time, charted since February 2024 and updated every day.">
+<meta name="description" content="Daily Pepecoin network numbers: block height, coin supply, addresses with a balance and the real average block time, charted since January 30, 2024 and updated every day.">
 <link rel="canonical" href="https://pepecoinhub.com/network.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pepecoin Hub">
 <meta property="og:title" content="Pepecoin (PEP) network stats: block height, supply, addresses and block time">
-<meta property="og:description" content="Daily Pepecoin network numbers: block height, coin supply, addresses with a balance and the real average block time, charted since February 2024 and updated every day.">
+<meta property="og:description" content="Daily Pepecoin network numbers: block height, coin supply, addresses with a balance and the real average block time, charted since January 30, 2024 and updated every day.">
 <meta property="og:url" content="https://pepecoinhub.com/network.html">
 <meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -21,10 +21,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="facts.css?v=20261012c">
+<link rel="stylesheet" href="facts.css?v=20261012d">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/"}, {"@type": "ListItem", "position": 2, "name": "Network stats", "item": "https://pepecoinhub.com/network.html"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin network daily statistics", "description": "Daily Pepecoin (PEP) block height, coin supply, number of addresses with a balance and snapshot time, from February 2024, rebuilt from the blockchain before October 5, 2026 and recorded live after that.", "url": "https://pepecoinhub.com/network.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (r/pepecoin community volunteers)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin network daily statistics", "description": "Daily Pepecoin (PEP) block height, coin supply, number of addresses with a balance and snapshot time, from January 30, 2024, rebuilt from the blockchain before October 5, 2026 and recorded live after that.", "url": "https://pepecoinhub.com/network.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (r/pepecoin community volunteers)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}]}</script>
 <style>
 .chart { margin: 0; position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 16px 10px; display: grid; gap: 8px; }
 .chart h3 { font-weight: 700; font-size: 1rem; }
@@ -60,7 +60,7 @@
 <header class="page-head">
   <p class="eyebrow">Network · data as of <span id="s-date">Oct 6, 2026</span></p>
   <h1>The Pepecoin network, day by day</h1>
-  <p class="lede">A robot records the block height, the supply and how many addresses hold PEP every day. These are its numbers, back to February 2024.</p>
+  <p class="lede">A robot records the block height, the supply and how many addresses hold PEP every day. These are its numbers, back to January 30, 2024, the day the first block was mined.</p>
 </header>
 
 <section aria-label="Latest figures">
@@ -69,7 +69,7 @@
     <div class="stat"><span class="label">Supply</span><span class="value" id="s-supply">104.83B</span><span class="sub">PEP, every coin from mining</span></div>
     <div class="stat"><span class="label">Addresses with a balance</span><span class="value" id="s-addr">295,767</span><span class="sub">an address is not a person</span></div>
     <div class="stat"><span class="label">Average block, 30 days</span><span class="value" id="s-bt">62.6 s</span><span class="sub">target: 60 s</span></div>
-    <div class="stat"><span class="label">New PEP a day, 30 days</span><span class="value" id="s-day">13.8M</span><span class="sub">14.4M at the 60 s target</span></div>
+    <div class="stat"><span class="label">New PEP a day, 30 days</span><span class="value" id="s-day">13.8M</span><span class="sub">up to 14.4M at the 60 s target</span></div>
   </div>
   <p class="src" id="net-status"></p>
 </section>
@@ -88,9 +88,9 @@
 
 <section aria-labelledby="addr-h">
   <h2 id="addr-h">Addresses holding PEP</h2>
-  <p class="note">Addresses with a balance above zero, one point a week until September 2025 and one a day since. Hover or tap the chart to read a date.</p>
+  <p class="note">Addresses with a balance above zero: one point a day for the first week, one a week from February 5, 2024 until September 2025, and one a day since. Hover or tap the chart to read a date.</p>
   <figure class="chart">
-    <div class="plot" id="addr-plot" role="img" aria-label="Line chart of Pepecoin addresses with a balance, rising from 344 in February 2024 to about 296,000 in October 2026."></div>
+    <div class="plot" id="addr-plot" role="img" aria-label="Line chart of Pepecoin addresses with a balance, rising from 61 on January 30, 2024 to about 296,000 in October 2026."></div>
     <div class="tip" id="addr-tip" hidden></div>
   </figure>
 </section>
@@ -99,7 +99,7 @@
   <h2 id="blocks-h">Blocks per day, by month</h2>
   <p class="note">Pepecoin aims for a block every 60 seconds, which is 1,440 a day. In March and April 2024, before merged mining started at block 42,000 in May, a block took 8 to 13 minutes on average. Since June 2024 the pace has stayed close to the target: one block every 62.6 seconds over the past year. The paler bar is the current month so far.</p>
   <figure class="chart">
-    <div class="plot" id="blocks-plot" role="img" aria-label="Column chart of average blocks per day for each month since February 2024, against the target of 1,440."></div>
+    <div class="plot" id="blocks-plot" role="img" aria-label="Column chart of average blocks per day for each month since January 2024, against the target of 1,440."></div>
     <div class="tip" id="blocks-tip" hidden></div>
   </figure>
 </section>
@@ -118,7 +118,7 @@
   <h2 id="how">Where the numbers come from</h2>
   <div class="prose">
     <p><strong>Every day</strong> a GitHub Actions job asks the PepeBlocks explorer and the pepecoinservice.org API for the block height, the supply and the rich list, and saves the result in this site's repository.</p>
-    <p><strong>Before October 5, 2026</strong> the same figures were rebuilt by replaying the Pepecoin blockchain from its first block, one point a week until September 2025 and one a day after that.</p>
+    <p><strong>Before October 5, 2026</strong> the same figures were rebuilt by replaying the Pepecoin blockchain from its first block: one point a day for the first week (January 30 to February 4, 2024), one a week until September 2025 and one a day after that.</p>
     <p><strong>Block time</strong> is the time between two snapshots divided by the blocks found in between. <strong>Addresses</strong> are the ones holding more than zero PEP; one person can use many addresses, and exchanges hold coins for many people.</p>
   </div>
 </section>
@@ -291,6 +291,6 @@
   }).catch(function () { $('net-status').textContent = 'The daily data could not be loaded just now. The figures above are from October 6, 2026.'; });
 })();
 </script>
-<script src="chrome.js?v=20261012c" defer></script>
+<script src="chrome.js?v=20261012d" defer></script>
 </body>
 </html>

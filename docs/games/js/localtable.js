@@ -26,10 +26,12 @@ export function localTable({ game, level, nick, noTouch = false }) {
   function sys(body) { T.msgs.push({ id: ++T.msgId, kind: 'system', nick: null, body, at: new Date().toISOString() }); if (T.msgs.length > 50) T.msgs.shift(); }
   const notify = () => { T.version++; save(); listener?.('state', { v: T.version }); };
   const seatNick = (seat) => (seat === T.human ? T.nick : botNick);
+  // English verb after the name: "You win" / "You fire", but "Bot Frog wins" / "Bot Frog fires"
+  const verb = (seat, v) => seatNick(seat) + ' ' + (seatNick(seat) === 'You' ? v : v + 's');
 
   function finish(result, reason) {
     T.status = 'finished'; T.result = result; T.reason = reason; T.legal = [];
-    sys(result === 'draw' ? `Draw (${reason})` : `${seatNick(result === 'p1' ? 1 : 2)} wins (${reason})`);
+    sys(result === 'draw' ? `Draw (${reason})` : `${verb(result === 'p1' ? 1 : 2, 'win')} (${reason})`);
   }
   function state() {
     const t = T, hs = t.human, joined = true;
@@ -121,7 +123,7 @@ export function localTable({ game, level, nick, noTouch = false }) {
           T.fleets[T.human] = E.seaParse(args.p_ships, noTouch);
           const x = T.pos.split('|'); x[0] = 'fire'; x[3] = '3'; T.pos = x.join('|');
           T.turn = 1; T.legal = E.seaLegal(T.pos, 1); T.move_at = new Date().toISOString();
-          sys(`All ships placed — ${seatNick(1)} fires first.`);
+          sys(`All ships placed — ${verb(1, 'fire')} first.`);
           notify(); setTimeout(botTurn, 0); return state();
         }
         case 'gry_table_resign':

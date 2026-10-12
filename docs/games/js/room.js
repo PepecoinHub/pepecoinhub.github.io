@@ -473,13 +473,20 @@ function onTurnMsg(event, p) {
       strokes.set(s.id, last);
     }
     else if (event === 'clear') { blank(); strokes.clear(); }
-    else if (event === 'snap') { const im = new Image(); im.onload = () => ctx.drawImage(im, 0, 0, W, H); im.src = p.data; }
+    // only an inline JPEG from the drawer's canvas, never an outside address (it would reveal viewers' IPs)
+    else if (event === 'snap' && typeof p.data === 'string' && p.data.startsWith('data:image/jpeg;base64,')) { const im = new Image(); im.onload = () => ctx.drawImage(im, 0, 0, W, H); im.src = p.data; }
   } else if (event === 'stage' && !isImgHost()) {
     if (p.data) drawStage(p);
     else if (p.key) recv.key(p, (url) => { if (curTurn === turnFor) drawStage({ i: p.i, n: p.n, data: url }); });
   } else if (event === 'imgc' && !isImgHost()) recv.piece(p);
 }
+// Someone joined: the drawer sends a snapshot of the canvas and the host re-sends the picture stage.
+// At most once every 5 s (one more at the end of the window), so a join/leave loop can't flood everyone.
+let resendAt = 0, resendTimer = null;
 function resendForLateJoiner() {
+  const wait = resendAt + 5000 - Date.now();
+  if (wait > 0) { if (!resendTimer) resendTimer = setTimeout(() => { resendTimer = null; resendForLateJoiner(); }, wait); return; }
+  resendAt = Date.now();
   if (isDrawer()) { flushStrokes(true); setTimeout(() => turnCh?.send('snap', { data: cv.toDataURL('image/jpeg', 0.6) }), 300); }
   if (isImgHost() && img.sent >= 0) setTimeout(() => sendStage(img.sent, true), 300);
 }

@@ -11,6 +11,7 @@
   --accent-deep: #16532A;
   --accent-mid: #208241;
   --accent-soft: #e3f1e4;
+  --link: #1b7337;   /* darker green for text links: 4.7:1 or better on paper and panels */
   --gold: #F6BB60;
   --gold-soft: #fbe9c8;
   --flag: #C07A4E;
@@ -31,7 +32,7 @@
   :root:not([data-theme="light"]) {
     /* Forest night by the pond: layered surfaces, warm cream text, a few fireflies */
     --paper: #0e1512; --paper-2: #131d18; --panel: #17231c; --ink: #efe6d6; --muted: #a3b2a6; --rule: #26362c;
-    --accent: #5cbf78; --accent-deep: #c9ecd0; --accent-mid: #7fd196; --accent-soft: #1c3324;
+    --accent: #5cbf78; --accent-deep: #c9ecd0; --accent-mid: #7fd196; --accent-soft: #1c3324; --link: #5cbf78;
     --gold: #F6BB60; --gold-soft: #2f2616; --flag: #e3a35c; --track: #1d2b23; --series: #7fd196;
     --shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 14px 34px -16px rgba(0, 0, 0, 0.75);
     --pond: radial-gradient(60% 120% at 92% 0%, rgba(92, 191, 120, 0.20), transparent 60%), radial-gradient(40% 60% at 10% 100%, rgba(246, 187, 96, 0.06), transparent 70%);
@@ -43,7 +44,7 @@
 }
 :root[data-theme="dark"] {
   --paper: #0e1512; --paper-2: #131d18; --panel: #17231c; --ink: #efe6d6; --muted: #a3b2a6; --rule: #26362c;
-  --accent: #5cbf78; --accent-deep: #c9ecd0; --accent-mid: #7fd196; --accent-soft: #1c3324;
+  --accent: #5cbf78; --accent-deep: #c9ecd0; --accent-mid: #7fd196; --accent-soft: #1c3324; --link: #5cbf78;
   --gold: #F6BB60; --gold-soft: #2f2616; --flag: #e3a35c; --track: #1d2b23; --series: #7fd196;
   --shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 14px 34px -16px rgba(0, 0, 0, 0.75);
   --pond: radial-gradient(60% 120% at 92% 0%, rgba(92, 191, 120, 0.20), transparent 60%), radial-gradient(40% 60% at 10% 100%, rgba(246, 187, 96, 0.06), transparent 70%);
@@ -67,7 +68,7 @@ body {
 }
 img { max-width: 100%; }
 [hidden] { display: none !important; }
-a { color: var(--accent); text-underline-offset: 3px; }
+a { color: var(--link, var(--accent)); text-underline-offset: 3px; }
 a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
   outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px;
 }
@@ -216,6 +217,7 @@ a.card:hover { border-color: var(--accent); }
 
 .sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
 .sources h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+.sources > div { padding: 16px 18px 18px; background: var(--panel); }
 .sources ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.92rem; }
 
 .faq { display: grid; gap: 0; border-top: 1px solid var(--rule); }
@@ -244,7 +246,7 @@ a.card:hover { border-color: var(--accent); }
 .addr-row .who { font-weight: 700; font-size: 0.9rem; }
 .addr-line { display: flex; gap: 8px; align-items: flex-start; min-width: 0; }
 .addr-line code { min-width: 0; }
-.copy { flex: none; font: 600 0.75rem var(--f-body); color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 4px; padding: 3px 8px; cursor: pointer; }
+.copy { flex: none; font: 600 0.75rem var(--f-body); color: var(--link, var(--accent)); background: transparent; border: 1px solid var(--rule); border-radius: 4px; padding: 3px 8px; cursor: pointer; }
 .copy:hover { border-color: var(--accent); }
 
 footer.site-foot, footer.pf-foot {
@@ -507,3 +509,14 @@ footer.site-foot, footer.pf-foot { border-top: 0; background: var(--paper-2); bo
 .hist-line { margin: 2px 0 0; max-width: 80ch; }
 .my-note { margin: 6px 0 0; font-size: 0.75rem; line-height: 1.45; color: var(--muted); }
 @media (max-width: 560px) { .myaddr .my-stats { grid-template-columns: 1fr 1fr; gap: 8px; } .myaddr .my-stats .value { font-size: 1.15rem; } }
+
+/* 404 page: Pepe with the magnifying glass is the zero */
+.nf { text-align: center; padding-block: 24px 48px; display: grid; justify-items: center; gap: 10px; }
+.nf-code { display: flex; align-items: center; justify-content: center; gap: clamp(6px, 2vw, 18px); margin: 0; font-size: clamp(96px, 22vw, 190px); line-height: 1; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
+.nf-code img { width: clamp(110px, 24vw, 210px); height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 50%; background: #fff; box-shadow: var(--shadow); border: 4px solid var(--accent); }
+.nf-title { margin: 6px 0 0; font-size: 1.6rem; font-weight: 700; color: var(--ink); }
+.nf-text { margin: 0; max-width: 46ch; color: var(--muted); }
+.nf-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 18px; margin: 14px 0 0; }
+.nf-btn { background: var(--link, var(--accent)); color: #fff; padding: 10px 18px; border-radius: 999px; text-decoration: none; font-weight: 600; }
+:root[data-theme="dark"] .nf-btn { color: #0e1512; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .nf-btn { color: #0e1512; } }

@@ -21,10 +21,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="facts.css?v=20261012c">
+<link rel="stylesheet" href="facts.css?v=20261012d">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/"}, {"@type": "ListItem", "position": 2, "name": "Guides", "item": "https://pepecoinhub.com/guides.html"}, {"@type": "ListItem", "position": 3, "name": "How to mine PEP", "item": "https://pepecoinhub.com/mining.html"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does merged mining lower my LTC or DOGE rewards?", "acceptedAnswer": {"@type": "Answer", "text": "No. The work is not split between chains. In the words of the pool ViaBTC, PEP is an additional reward from merged mining, requiring no extra hashrate."}}, {"@type": "Question", "name": "What hardware mines PEP?", "acceptedAnswer": {"@type": "Answer", "text": "A Scrypt ASIC miner, the same machine used for Litecoin and Dogecoin. ViaBTC names the Antminer L9 and the ElphaPex DG1 as examples."}}, {"@type": "Question", "name": "How much PEP does the network pay out?", "acceptedAnswer": {"@type": "Answer", "text": "Every block pays 10,000 PEP. At one block a minute that is about 14.4 million PEP a day, shared by everyone mining it. Blocks have averaged about 62.6 seconds over the past year, so the real figure is about 13.8 million."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does merged mining lower my LTC or DOGE rewards?", "acceptedAnswer": {"@type": "Answer", "text": "No. The work is not split between chains. In the words of the pool ViaBTC, PEP is an additional reward from merged mining, requiring no extra hashrate."}}, {"@type": "Question", "name": "What hardware mines PEP?", "acceptedAnswer": {"@type": "Answer", "text": "A Scrypt ASIC miner, the same machine used for Litecoin and Dogecoin. ViaBTC names the Antminer L9 and the ElphaPex DG1 as examples."}}, {"@type": "Question", "name": "How much PEP does the network pay out?", "acceptedAnswer": {"@type": "Answer", "text": "Every block pays 10,000 PEP. At the target of one block a minute that is up to 14.4 million PEP a day, shared by everyone mining it. Blocks have averaged about 62.6 seconds over the past year, so the real figure is about 13.8 million."}}]}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
@@ -36,7 +36,7 @@
 </header>
 <main class="wrap" id="main">
 <header class="page-head">
-  <p class="eyebrow">Guide · updated October 6, 2026</p>
+  <p class="eyebrow">Guide · updated October 12, 2026</p>
   <h1>How to mine Pepecoin (PEP)</h1>
   <p class="lede">PEP is mined with Scrypt, the same proof of work as Litecoin and Dogecoin. Most of it comes from merged mining: a machine on a Litecoin pool earns PEP on top of LTC and DOGE, for the same work.</p>
 </header>
@@ -54,7 +54,7 @@
   <h2 id="steps">Step by step</h2>
   <ol class="guide-steps">
     <li><h3>Get a Scrypt ASIC</h3><p>Scrypt mining runs on specialised machines. ViaBTC names the Antminer L9 and the ElphaPex DG1 as examples.</p></li>
-    <li><h3>Join a pool that merge-mines PEP</h3><p>Pools that pay PEP alongside LTC and DOGE include <a href="https://www.viabtc.com/">ViaBTC</a>, <a href="https://www.f2pool.com/coin/pepecoin">F2Pool</a>, <a href="https://pool.binance.com/">Binance Pool</a>, <a href="https://emcd.io/">EMCD</a>, <a href="https://www.antpool.com/">AntPool</a>, <a href="https://www.litecoinpool.org/">litecoinpool.org</a>, <a href="https://www.mining-dutch.nl/pools/pepecoin.php?page=dashboard">Mining-Dutch</a>, KuPool. The live list is on <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>.</p></li>
+    <li><h3>Join a pool that merge-mines PEP</h3><p>Pools that pay PEP alongside LTC and DOGE include <a href="https://www.viabtc.com/">ViaBTC</a>, <a href="https://www.f2pool.com/coin/pepecoin">F2Pool</a>, <a href="https://pool.binance.com/">Binance Pool</a>, <a href="https://emcd.io/pool/pepecoin/">EMCD</a>, <a href="https://www.antpool.com/">AntPool</a>, <a href="https://www.mining-dutch.nl/pools/pepecoin.php">Mining-Dutch</a>, <a href="https://www.kupool.com/">KuPool</a>. <a href="https://www.litecoinpool.org/help">litecoinpool.org</a> merge-mines PEP too, but pays its value as extra LTC and DOGE (a higher PPS ratio), not in PEP. The live list is on <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>.</p></li>
     <li><h3>Add a PEP payout address</h3><p>Set a receiving address that starts with <code>P</code> in the pool's settings. Each pool has its own payout settings and minimums. <a href="wallets.html">Get a PEP wallet.</a></p></li>
     <li><h3>Point the miner at the pool</h3><p>Use the pool's Scrypt (Litecoin) connection address. The PEP reward then arrives with your LTC and DOGE.</p></li>
   </ol>
@@ -64,7 +64,7 @@
   <h2 id="expect">What to expect</h2>
   <div class="prose">
     <p><strong>Competition.</strong> Pepecoin's hashrate was about 2.9 PH/s in early October 2026, in the same range as Dogecoin's. <a href="compare.html#mining">Hashrate compared.</a></p>
-    <p><strong>Issuance.</strong> About 14.4 million PEP a day at the 60-second target, shared by all miners. <a href="network.html">Live block times.</a></p>
+    <p><strong>Issuance.</strong> Up to 14.4 million PEP a day (1,440 blocks at the 60-second target), about 13.8 million at the actual average block time of 62.6 s, shared by all miners. <a href="network.html">Live block times.</a></p>
     <p><strong>Profit.</strong> It depends on the PEP price, difficulty and your power cost. Calculators: <a href="https://whattomine.com/coins/418-pep-scrypt">WhatToMine</a>, <a href="https://www.hashrate.no/coins/PEP/calculator">hashrate.no</a>, <a href="https://www.asicminervalue.com/coins/pep-pepecoin">ASIC Miner Value</a>.</p>
   </div>
 </section>
@@ -74,7 +74,7 @@
   <div class="faq">
     <details><summary>Does merged mining lower my LTC or DOGE rewards?</summary><p>No. The work is not split between chains. In the words of the pool ViaBTC, PEP is an additional reward from merged mining, requiring no extra hashrate.</p></details>
     <details><summary>What hardware mines PEP?</summary><p>A Scrypt ASIC miner, the same machine used for Litecoin and Dogecoin. ViaBTC names the Antminer L9 and the ElphaPex DG1 as examples.</p></details>
-    <details><summary>How much PEP does the network pay out?</summary><p>Every block pays 10,000 PEP. At one block a minute that is about 14.4 million PEP a day, shared by everyone mining it. Blocks have averaged about 62.6 seconds over the past year, so the real figure is about 13.8 million.</p></details>
+    <details><summary>How much PEP does the network pay out?</summary><p>Every block pays 10,000 PEP. At the target of one block a minute that is up to 14.4 million PEP a day, shared by everyone mining it. Blocks have averaged about 62.6 seconds over the past year, so the real figure is about 13.8 million.</p></details>
   </div>
 </section>
 
@@ -113,7 +113,12 @@
         <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC: how to mine PEP</a></li>
         <li><a href="https://cryptonews.net/news/market/30268800/">Binance Pool adds PEP merged mining</a></li>
         <li><a href="https://www.f2pool.com/coin/pepecoin">F2Pool: PEP</a></li>
-        <li><a href="https://miningpoolstats.stream/pepecoin">miningpoolstats: Pepecoin pools</a></li>
+        <li><a href="https://miningpoolstats.stream/pepecoin">miningpoolstats: Pepecoin pools (lists Mining-Dutch and AntPool)</a></li>
+        <li><a href="https://www.mining-dutch.nl/pools/pepecoin.php">Mining-Dutch: Pepecoin pool, paid natively in PEP</a></li>
+        <li><a href="https://ultramining.com/news/en/antpool-launches-joint-mining-of-ltc-with-lky-pep-and-jkc/">AntPool adds PEP to LTC merged mining, December 6, 2024 (Ultramining)</a></li>
+        <li><a href="https://www.kupool.com/">KuPool: PEP in its coin list</a></li>
+        <li><a href="https://emcd.io/pool/pepecoin/">EMCD: Pepecoin mining pool</a></li>
+        <li><a href="https://www.litecoinpool.org/help">litecoinpool.org help: merge-mined coins raise the LTC/DOGE PPS ratio</a></li>
       </ul>
     </div>
     <div>
@@ -134,6 +139,6 @@
   <details class="support"><summary>Like this site? You can support its further development.</summary><p>Any amount, however small, helps. Thank you!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 
-<script src="chrome.js?v=20261012c" defer></script>
+<script src="chrome.js?v=20261012d" defer></script>
 </body>
 </html>

@@ -126,7 +126,7 @@ function resultText() {
   if (t.result === 'draw') return `Draw (${t.reason})`;
   const win = playerBySeat(t.result === 'p1' ? 1 : 2);
   const mine = meSeat() && t.result === 'p' + meSeat();
-  return (mine ? 'You win! ' : '') + `${win?.nick || 'Winner'} wins (${t.reason})`;
+  return mine ? `You win! (${t.reason})` : `${win?.nick || 'Winner'} wins (${t.reason})`;
 }
 function renderStatus() {
   const t = S.table, el = $('#status'); el.textContent = '';

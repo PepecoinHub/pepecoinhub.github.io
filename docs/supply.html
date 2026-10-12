@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pepecoin supply and inflation: no cap, falling rate</title>
-<meta name="description" content="Pepecoin (PEP) has no supply cap. It adds a fixed 5.26 billion coins a year, so inflation falls from about 5.0% today to 2.3% in 25 years. Chart, table and sources.">
+<meta name="description" content="Pepecoin (PEP) has no supply cap. It adds a fixed 10,000 coins a block, up to about 5.26 billion a year at the one-minute target, so inflation falls from about 5.0% today to 2.3% in 25 years. Chart, table and sources.">
 <link rel="canonical" href="https://pepecoinhub.com/supply.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Pepecoin Hub">
 <meta property="og:title" content="Pepecoin supply and inflation: no cap, falling rate">
-<meta property="og:description" content="Pepecoin (PEP) has no supply cap. It adds a fixed 5.26 billion coins a year, so inflation falls from about 5.0% today to 2.3% in 25 years. Chart, table and sources.">
+<meta property="og:description" content="Pepecoin (PEP) has no supply cap. It adds a fixed 10,000 coins a block, up to about 5.26 billion a year at the one-minute target, so inflation falls from about 5.0% today to 2.3% in 25 years. Chart, table and sources.">
 <meta property="og:url" content="https://pepecoinhub.com/supply.html">
 <meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -21,12 +21,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="facts.css?v=20261012c">
+<link rel="stylesheet" href="facts.css?v=20261012d">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does Pepecoin have a maximum supply?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pepecoin has no supply cap. Each block adds 10,000 new PEP, about once a minute, with no end date. Dogecoin uses the same rule."}}, {"@type": "Question", "name": "How many new Pepecoin are created each year?", "acceptedAnswer": {"@type": "Answer", "text": "About 5.26 billion PEP: 525,600 blocks a year at 10,000 PEP per block, assuming the 60-second block target holds."}}, {"@type": "Question", "name": "What is Pepecoin's inflation rate?", "acceptedAnswer": {"@type": "Answer", "text": "About 5.0% for the 12 months from October 2026. Because the yearly issue is fixed and the supply keeps growing, the rate falls every year, to about 3.3% after ten years and 2.3% in year 25."}}, {"@type": "Question", "name": "Is that the same as Dogecoin?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Dogecoin has issued a fixed 10,000 DOGE per one-minute block since 2015. Its supply is larger, about 156 billion, so its inflation rate today is lower, about 3.4%."}}, {"@type": "Question", "name": "Was any Pepecoin premined or set aside?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pepecoin's MiCA white paper states there was no premine, no pre-allocation and no ICO, and that Pepecoin LLC holds no PEP. All coins were issued to miners as block rewards."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does Pepecoin have a maximum supply?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pepecoin has no supply cap. Each block adds 10,000 new PEP, about once a minute, with no end date. Dogecoin uses the same rule."}}, {"@type": "Question", "name": "How many new Pepecoin are created each year?", "acceptedAnswer": {"@type": "Answer", "text": "Up to about 5.26 billion PEP: 525,600 blocks a year at the 60-second target, 10,000 PEP each. Blocks have averaged about 62.6 seconds over the past year, which makes about 5.0 billion."}}, {"@type": "Question", "name": "What is Pepecoin's inflation rate?", "acceptedAnswer": {"@type": "Answer", "text": "About 5.0% for the 12 months from October 2026. Because the yearly issue is fixed and the supply keeps growing, the rate falls every year, to about 3.3% after ten years and 2.3% in year 25."}}, {"@type": "Question", "name": "Is that the same as Dogecoin?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Dogecoin has issued a fixed 10,000 DOGE per one-minute block since 2015. Its supply is larger, about 156 billion, so its inflation rate today is lower, about 3.4%."}}, {"@type": "Question", "name": "Was any Pepecoin premined or set aside?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pepecoin's MiCA white paper states there was no premine, no pre-allocation and no ICO, and that Pepecoin LLC holds no PEP. All coins were issued to miners as block rewards."}}]}</script>
 <style>
 /* page-specific */
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
@@ -71,15 +71,15 @@
 <section aria-label="Key figures">
   <div class="stats">
     <div class="stat"><span class="label">New PEP per block</span><span class="value">10,000</span><span class="sub">fixed since block 600,000</span></div>
-    <div class="stat"><span class="label">New PEP per year</span><span class="value">5.26B</span><span class="sub">at 60-second blocks</span></div>
-    <div class="stat"><span class="label">Inflation, next 12 months</span><span class="value">5.0%</span><span class="sub">on a supply of 104.8B</span></div>
+    <div class="stat"><span class="label">New PEP per year</span><span class="value">Up to 5.26B</span><span class="sub">at the 60 s target; about 5.0B at 62.6 s</span></div>
+    <div class="stat"><span class="label">Inflation, next 12 months</span><span class="value">5.0%</span><span class="sub">on a supply of <span data-live="supply-b">104.9</span>B</span></div>
     <div class="stat"><span class="label">Inflation in year 25</span><span class="value">2.3%</span><span class="sub">on a supply of 231B</span></div>
   </div>
 </section>
 
 <section aria-labelledby="chart-title">
   <h2 id="chart-title">The same number of new coins, a smaller share each year</h2>
-  <p class="note">New PEP per year does not shrink. It stays at 5.26 billion, so a chart of it alone is 25 identical bars. What changes is the supply those coins are added to, so the same 5.26 billion is a smaller share every year. Projection for the 25 years from October 2026, assuming the 60-second block target holds. Each column covers the 12 months ending in October.</p>
+  <p class="note">New PEP per year does not shrink. At the 60-second target it stays at 5.26 billion, so a chart of it alone is 25 identical bars. What changes is the supply those coins are added to, so the same 5.26 billion is a smaller share every year. Projection for the 25 years from October 2026, assuming the 60-second block target holds. Each column covers the 12 months ending in October.</p>
   <figure class="chart" id="chart" tabindex="0" aria-describedby="chart-help">
     <div class="chart-scroll">
       <svg viewBox="0 0 760 390" role="img" aria-label="Two aligned charts for 2027 to 2051. Total supply grows in a straight line from 110 billion to 236 billion PEP, because the same 5.26 billion new PEP are added every year. The inflation rate falls every year, from 5.0 percent to 2.3 percent.">
@@ -211,8 +211,8 @@
 <section aria-labelledby="read">
   <h2 id="read">How to read it</h2>
   <div class="prose">
-    <p><strong>The yearly issue is flat.</strong> A year has 525,600 minutes. One block a minute at 10,000 PEP each makes 5.256 billion new PEP a year, this year and every year after.</p>
-    <p><strong>The inflation rate is that issue divided by the coins that already exist.</strong> Today that is 5.256 billion on 104.8 billion, or 5.0%. In ten years the supply is about 157 billion, so the same 5.256 billion is 3.3%. In year 25 it is 2.3%. The rate keeps falling and never reaches zero.</p>
+    <p><strong>The yearly issue is flat.</strong> A year has 525,600 minutes. One block a minute at 10,000 PEP each makes 5.256 billion new PEP a year, this year and every year after. That is at the target: blocks have averaged about 62.6 seconds over the past year, which makes about 5.0 billion (<a href="network.html">network stats</a>).</p>
+    <p><strong>The inflation rate is that issue divided by the coins that already exist.</strong> Today that is 5.256 billion on <span data-live="supply-b">104.9</span> billion, or 5.0%. In ten years the supply is about 157 billion, so the same 5.256 billion is 3.3%. In year 25 it is 2.3%. The rate keeps falling and never reaches zero.</p>
     <p><strong>Dogecoin is about ten years further along the same curve.</strong> It issues the same 5.256 billion coins a year on a supply of about 156 billion, which is 3.4% today. Pepecoin reaches that rate around 2036.</p>
     <p><strong>What a fixed reward does.</strong> Miners keep earning new coins for every block, so network security does not depend on transaction fees alone. The trade-off is a supply that keeps growing, at a slower pace each year.</p>
   </div>
@@ -231,7 +231,7 @@
         <tr><th scope="row">300,000 – 399,999</th><td class="r">62,500</td><td class="r">6.25B</td></tr>
         <tr><th scope="row">400,000 – 499,999</th><td class="r">31,250</td><td class="r">3.13B</td></tr>
         <tr><th scope="row">500,000 – 599,999</th><td class="r">15,625</td><td class="r">1.56B</td></tr>
-        <tr class="hl"><th scope="row">600,000 onward</th><td class="r">10,000</td><td class="r">5.26B a year</td></tr>
+        <tr class="hl"><th scope="row">600,000 onward</th><td class="r">10,000</td><td class="r">up to 5.26B a year</td></tr>
       </tbody>
     </table>
   </div>
@@ -253,7 +253,7 @@
   <h2 id="faq">Common questions</h2>
   <div class="faq">
     <details><summary>Does Pepecoin have a maximum supply?</summary><p>No. Pepecoin has no supply cap. Each block adds 10,000 new PEP, about once a minute, with no end date. Dogecoin uses the same rule.</p></details>
-    <details><summary>How many new Pepecoin are created each year?</summary><p>About 5.26 billion PEP: 525,600 blocks a year at 10,000 PEP per block, assuming the 60-second block target holds.</p></details>
+    <details><summary>How many new Pepecoin are created each year?</summary><p>Up to about 5.26 billion PEP: 525,600 blocks a year at the 60-second target, 10,000 PEP each. Blocks have averaged about 62.6 seconds over the past year, which makes about 5.0 billion.</p></details>
     <details><summary>What is Pepecoin&#x27;s inflation rate?</summary><p>About 5.0% for the 12 months from October 2026. Because the yearly issue is fixed and the supply keeps growing, the rate falls every year, to about 3.3% after ten years and 2.3% in year 25.</p></details>
     <details><summary>Is that the same as Dogecoin?</summary><p>Yes. Dogecoin has issued a fixed 10,000 DOGE per one-minute block since 2015. Its supply is larger, about 156 billion, so its inflation rate today is lower, about 3.4%.</p></details>
     <details><summary>Was any Pepecoin premined or set aside?</summary><p>No. Pepecoin's MiCA white paper states there was no premine, no pre-allocation and no ICO, and that Pepecoin LLC holds no PEP. All coins were issued to miners as block rewards.</p></details>
@@ -350,6 +350,7 @@
   <p class="correction">Spotted a mistake? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Report a correction</a> (with a source) on GitHub.</p>
   <details class="support"><summary>Like this site? You can support its further development.</summary><p>Any amount, however small, helps. Thank you!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
-<script src="chrome.js?v=20261012c" defer></script>
+<script src="live.js?v=20261012d" defer></script>
+<script src="chrome.js?v=20261012d" defer></script>
 </body>
 </html>
