@@ -155,7 +155,7 @@ Rule: an address is tagged only if it was spent **in the same transaction as the
 
 | Address | Pool | Why this address | Source that the pool mines PEP |
 |---|---|---|---|
-| `PnBFXec7tVQvndqktsVnkfJGwy63GFnwoo` | litecoinpool.org | labelled on the PepeBlocks rich list | none yet besides that label |
+| `PnBFXec7tVQvndqktsVnkfJGwy63GFnwoo` | litecoinpool.org | labelled on the PepeBlocks rich list | [litecoinpool.org help](https://www.litecoinpool.org/help): the pool merge-mines extra Scrypt coins such as Pepecoin and pays their value as a higher LTC/DOGE PPS ratio, not in PEP |
 | `PgRLcaCTEkXSguu6ZgzkuncHdCxADmPBXP` | Mining-Dutch | labelled "Mining-Dutch" by PepeBlocks (Oct 2024, 82,647 transactions), confirmed live | [Mining-Dutch Pepecoin pool](https://www.mining-dutch.nl/pools/pepecoin.php) (paid natively in PEP); listed on [MiningPoolStats](https://miningpoolstats.stream/pepecoin) |
 | `Pd4Ee73nvvymgiGKMouC1GYZpQCrgMmCjd` | ViaBTC | name as on peppool.space, receives coinbase outputs in recent blocks | [ViaBTC: how to mine PEP](https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0) |
 | `PjdviQbYuVu4RgX5N3SVebpcTHyuaZq8uj` | AntPool | name as on peppool.space, receives coinbase outputs in recent blocks | [Ultramining, 2024-12-06: AntPool launches joint mining of LTC with LKY, PEP and JKC](https://ultramining.com/news/en/antpool-launches-joint-mining-of-ltc-with-lky-pep-and-jkc/); listed on [MiningPoolStats](https://miningpoolstats.stream/pepecoin) |
