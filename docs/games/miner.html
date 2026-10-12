@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="../facts.css?v=20261012d">
 <link rel="stylesheet" href="gry.css?v=20261013a">
-<link rel="stylesheet" href="miner.css?v=20261013a">
+<link rel="stylesheet" href="miner.css?v=20261013b">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
@@ -30,14 +30,21 @@
 
 <main class="wrap mn" id="main">
   <div class="mn-candles" aria-hidden="true"></div>
-  <section class="mn-left card">
+  <p class="mn-news" aria-live="off"><span class="mn-news-tag">PEP News</span><span id="news">Local frog opens an old laptop and hears the fan for the first time.</span></p>
+
+  <section class="mn-left card" aria-label="Your bank and the coin">
     <div class="mn-bank">
       <span class="mn-label">Game PEP</span>
       <span class="mn-pep"><img src="../assets/brand/icon-p.svg" alt="" width="34" height="34"><b id="pep">0</b></span>
       <span class="mn-rate"><b id="rate">0</b> game PEP / s · <b id="hash">0 H/s</b></span>
     </div>
     <div class="mn-buffs" id="buffs" aria-live="polite"></div>
-    <button class="mn-coin" id="coin" type="button" aria-label="Mine: click the frog coin"><img src="../assets/brand/pepe-coin.png" alt="" width="260" height="260" draggable="false"></button>
+    <div class="mn-stage" id="stage">
+      <div class="mn-scene" id="scene"></div>
+      <div class="mn-rain" id="rain" aria-hidden="true"></div>
+      <button class="mn-coin" id="coin" type="button" aria-label="Mine: click the frog coin"><img src="../assets/brand/pepe-coin.png" alt="" width="260" height="260" draggable="false"></button>
+      <p class="mn-found" id="found" hidden></p>
+    </div>
     <div class="mn-block">
       <div class="mn-block-top"><span>Block <b id="blockno">#1</b></span><span id="blockpct">0%</span></div>
       <div class="mn-bar"><i id="blockbar"></i></div>
@@ -50,18 +57,30 @@
     </div>
   </section>
 
-  <section class="mn-right">
-    <div class="card mn-shop">
+  <section class="card mn-mine" aria-labelledby="mine-h">
+    <div class="mn-head"><h2 id="mine-h">Your mine</h2><span class="mn-small" id="minecount"></span></div>
+    <div id="mine" class="mn-rows"><p class="mn-small">Buy your first miner in the shop. It will show up here.</p></div>
+  </section>
+
+  <section class="card mn-panel" aria-label="Shop, achievements, hard fork and stats">
+    <div class="mn-tabs" role="tablist">
+      <button type="button" role="tab" id="tab-shop" aria-controls="p-shop" aria-selected="true">Shop</button>
+      <button type="button" role="tab" id="tab-ach" aria-controls="p-ach" aria-selected="false" tabindex="-1">Achievements <span id="achcount"></span></button>
+      <button type="button" role="tab" id="tab-fork" aria-controls="p-fork" aria-selected="false" tabindex="-1">Hard fork</button>
+      <button type="button" role="tab" id="tab-stats" aria-controls="p-stats" aria-selected="false" tabindex="-1">Stats</button>
+    </div>
+    <div class="mn-tabpanel" id="p-shop" role="tabpanel" aria-labelledby="tab-shop">
       <h2>Upgrades</h2>
       <div class="mn-upgrades" id="upgrades"></div>
       <h2>Miners</h2>
       <div class="mn-machines" id="machines"></div>
     </div>
-    <div class="card mn-ach">
-      <div class="mn-ach-head"><h2>Achievements</h2><span class="mn-small" id="achcount"></span></div>
+    <div class="mn-tabpanel" id="p-ach" role="tabpanel" aria-labelledby="tab-ach" hidden>
       <div class="mn-ach-list" id="achs"></div>
       <div class="mn-tools"><button class="btn sm" id="share" type="button">📣 Share my mine</button><span class="mn-small">Saved in this browser only. Game PEP are points for fun, not real coins, and can't be withdrawn.</span></div>
     </div>
+    <div class="mn-tabpanel" id="p-fork" role="tabpanel" aria-labelledby="tab-fork" hidden></div>
+    <div class="mn-tabpanel" id="p-stats" role="tabpanel" aria-labelledby="tab-stats" hidden><dl class="mn-stats" id="stats"></dl></div>
   </section>
 
   <div class="mn-foot" id="foot" hidden><button type="button" aria-label="Golden foot: click for a bonus">🦶</button></div>
@@ -86,6 +105,7 @@
   <details class="support"><summary>Like this site? You can support its further development.</summary><p>Any amount, however small, helps. Thank you!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 <script src="../chrome.js?v=20261012d" defer></script>
-<script src="js/miner.js?v=20261013a"></script>
+<script src="js/miner-art.js?v=20261013b"></script>
+<script src="js/miner.js?v=20261013b"></script>
 </body>
 </html>

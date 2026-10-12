@@ -88,7 +88,7 @@
 
 <section aria-labelledby="addr-h">
   <h2 id="addr-h">Addresses holding PEP</h2>
-  <p class="note">Addresses with a balance above zero: one point a day for the first week, one a week from February 5, 2024 until September 2025, and one a day since. Hover or tap the chart to read a date.</p>
+  <p class="note">Addresses with a balance above zero, even a tiny amount below 0.001 PEP. The PepeBlocks explorer counts only addresses holding at least 0.001 PEP, so its number is lower. One point a day for the first week, one a week from February 5, 2024 until September 2025, and one a day since. Hover or tap the chart to read a date.</p>
   <figure class="chart">
     <div class="plot" id="addr-plot" role="img" aria-label="Line chart of Pepecoin addresses with a balance, rising from 61 on January 30, 2024 to about 296,000 in October 2026."></div>
     <div class="tip" id="addr-tip" hidden></div>
@@ -119,7 +119,7 @@
   <div class="prose">
     <p><strong>Every day</strong> a GitHub Actions job asks the PepeBlocks explorer and the pepecoinservice.org API for the block height, the supply and the rich list, and saves the result in this site's repository.</p>
     <p><strong>Before October 5, 2026</strong> the same figures were rebuilt by replaying the Pepecoin blockchain from its first block: one point a day for the first week (January 30 to February 4, 2024), one a week until September 2025 and one a day after that.</p>
-    <p><strong>Block time</strong> is the time between two snapshots divided by the blocks found in between. <strong>Addresses</strong> are the ones holding more than zero PEP; one person can use many addresses, and exchanges hold coins for many people.</p>
+    <p><strong>Block time</strong> is the time between two snapshots divided by the blocks found in between. <strong>Addresses</strong> are the ones holding more than zero PEP, including tiny leftovers below 0.001 PEP. PepeBlocks shows a lower number because it counts only addresses with at least 0.001 PEP. One person can use many addresses, and exchanges hold coins for many people.</p>
   </div>
 </section>
 
