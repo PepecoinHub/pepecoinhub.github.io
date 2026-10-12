@@ -20,13 +20,19 @@ const TDESC = {
 // small static previews of each board, drawn with the same colours as the real game boards
 function boardPreview(game) {
   const g = h('span', { class: 'gprev gprev-' + game, 'aria-hidden': 'true' });
-  const cell = (cls, txt) => g.append(h('span', { class: cls }, txt || ''));
+  const cell = (cls) => g.append(h('span', { class: cls }));
   if (game === 'chess') {
-    const P = { 1: '♜', 6: '♚', 9: '♟', 18: '♞', 21: '♙', 28: '♔', 30: '♖' };
-    for (let i = 0; i < 36; i++) cell(((i % 6) + Math.floor(i / 6)) % 2 ? 'dk' : 'lt', P[i]);
+    // full 8x8 board after 1.e4 e5 2.Nf3 Nc6 3.Bb5 (lower case = black, upper case = white)
+    const ROWS = ['r.bqkbnr', 'pppp.ppp', '..n.....', '.B..p...', '....P...', '.....N..', 'PPPP.PPP', 'RNBQK..R'];
+    const GLYPH = { k: '\u265A', q: '\u265B', r: '\u265C', b: '\u265D', n: '\u265E', p: '\u265F' };
+    ROWS.forEach((row, r) => [...row].forEach((c, f) => g.append(h('span', { class: (r + f) % 2 ? 'dk' : 'lt' },
+      c === '.' ? '' : h('i', { class: c === c.toUpperCase() ? 'pw' : 'pb' }, GLYPH[c.toLowerCase()] + '\uFE0E')))));
   } else if (game === 'checkers') {
-    const B = [1, 3, 5, 6, 8, 10], W = [25, 27, 29, 30, 32, 34];
-    for (let i = 0; i < 36; i++) { const dk = ((i % 6) + Math.floor(i / 6)) % 2; g.append(h('span', { class: dk ? 'dk' : 'lt' }, dk && (B.includes(i) || W.includes(i)) ? h('i', { class: B.includes(i) ? 'pb' : 'pw' }) : '')); }
+    // full 8x8 board, starting position: 12 pieces each on the dark squares of the first three rows
+    for (let i = 0; i < 64; i++) {
+      const r = Math.floor(i / 8), dk = ((i % 8) + r) % 2;
+      g.append(h('span', { class: dk ? 'dk' : 'lt' }, dk && r < 3 ? h('i', { class: 'pb' }) : dk && r > 4 ? h('i', { class: 'pw' }) : ''));
+    }
   } else if (game === 'connect4') {
     const D = { 35: 'r', 36: 'y', 37: 'r', 38: 'y', 29: 'y', 30: 'r', 31: 'r', 23: 'r', 24: 'y', 17: 'r' };
     for (let i = 0; i < 42; i++) g.append(h('span', { class: 'hole' }, D[i] ? h('i', { class: 'disc ' + D[i] }) : ''));

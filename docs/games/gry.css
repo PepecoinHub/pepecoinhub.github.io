@@ -513,17 +513,21 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .gcard-name { font-size: 1.1rem; margin-top: 6px; }
 .gcard-desc { font-size: .88rem; color: var(--ink-2); line-height: 1.4; }
 .gcard-opt { font-size: .78rem; color: var(--muted); margin-top: auto; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); }
-.gprev { display: grid; width: 108px; aspect-ratio: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 14px -6px rgba(0,0,0,.35); }
-.gprev-chess, .gprev-checkers, .gprev-battleship { grid-template-columns: repeat(6, 1fr); }
+.gprev { --pw: 124px; display: grid; width: var(--pw); aspect-ratio: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 14px -6px rgba(0,0,0,.35); }
+.gprev > span { min-width: 0; min-height: 0; }
+.gprev-chess, .gprev-checkers { grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); padding: 5px; border-radius: 8px; background: #2c4a35; }
+.gprev-battleship { grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); }
 .gprev-chess .lt, .gprev-checkers .lt { background: #eef0e2; }
 .gprev-chess .dk { background: #6f9e7b; }
 .gprev-checkers .dk { background: #3f7350; }
-.gprev-chess span { display: grid; place-items: center; font-size: 13px; line-height: 1; color: #1d2a22; }
-.gprev-checkers span { display: grid; place-items: center; }
-.gprev-checkers i { width: 72%; aspect-ratio: 1; border-radius: 50%; }
+.gprev-chess span, .gprev-checkers span { display: grid; place-items: center; }
+.gprev-chess i { font-style: normal; font-size: calc(var(--pw) / 10.5); line-height: 1; }
+.gprev-chess .pb { color: #18211b; }
+.gprev-chess .pw { color: #fff; text-shadow: -.6px 0 #18211b, .6px 0 #18211b, 0 -.6px #18211b, 0 .6px #18211b; }
+.gprev-checkers i { width: 76%; aspect-ratio: 1; border-radius: 50%; box-shadow: 0 1px 1px rgba(0,0,0,.35); }
 .gprev-checkers .pb { background: radial-gradient(circle at 35% 30%, #5a5a5a, #1c1c1c 70%); }
 .gprev-checkers .pw { background: radial-gradient(circle at 35% 30%, #fff, #d8d2c2 70%); }
-.gprev-connect4 { grid-template-columns: repeat(7, 1fr); aspect-ratio: 7 / 6; width: 120px; padding: 4px; gap: 2px; background: #2f63c8; }
+.gprev-connect4 { grid-template-columns: repeat(7, 1fr); aspect-ratio: 7 / 6; width: calc(var(--pw) * 7 / 6); padding: 4px; gap: 2px; background: #2f63c8; }
 .gprev-connect4 .hole { border-radius: 50%; background: #e9eef8; display: grid; place-items: center; overflow: hidden; }
 .gprev-connect4 .disc { width: 100%; height: 100%; }
 .gprev-battleship { gap: 1px; background: #9cc3e4; padding: 1px; }
@@ -532,7 +536,7 @@ table.rank tr.top1 td { background: color-mix(in srgb, var(--gold) 14%, transpar
 .gprev-battleship .hit::after { content: "×"; position: absolute; inset: 0; display: grid; place-items: center; color: #d63c2f; font-weight: 700; font-size: 14px; }
 .gprev-battleship .miss::after { content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px; border-radius: 50%; background: #5f86a8; }
 @media (prefers-reduced-motion: reduce) { .gcard, .gcard-check { transition: none; } .gcard:hover { transform: none; } }
-@media (max-width: 520px) { .gcards { grid-template-columns: 1fr 1fr; gap: 10px; } .gcard { padding: 12px 8px; } .gprev { width: 84px; } .gprev-connect4 { width: 92px; } .gcard-desc { font-size: .8rem; } }
+@media (max-width: 520px) { .gcards { grid-template-columns: 1fr 1fr; gap: 10px; } .gcard { padding: 12px 8px; } .gprev { --pw: 100px; } .gcard-desc { font-size: .8rem; } }
 
 /* Draw & Guess card picture: whole drawing visible on its paper colour */
 .mode-card .ill.media img.ill-contain { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; background: #f6f0df; }
