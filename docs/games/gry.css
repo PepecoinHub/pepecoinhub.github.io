@@ -663,3 +663,17 @@ details.lb #topboard-body { margin-top: 14px; }
 .host-wanted p { margin: 0 0 8px; color: var(--ink-2); }
 @media (max-width: 560px) { .host-wanted { grid-template-columns: 90px minmax(0, 1fr); gap: 12px; } .host-wanted img { width: 90px; } }
 .pp-grid:has(#sched[hidden]) { grid-template-columns: 1fr; }
+/* owner statistics page */
+.st .lobby-head { margin-bottom: 14px; }
+.st-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.st-tile { display: grid; gap: 2px; padding: 14px 16px; }
+.st-tile b { font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+.st-tile .st-p { font-size: 1.15rem; margin-top: 6px; }
+.st-l { font: 700 .75rem var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.st > #st-body > .card { margin-bottom: 18px; }
+.st-chart { display: flex; align-items: flex-end; gap: 4px; height: 220px; padding: 8px 0 22px; overflow-x: auto; }
+.st-bar { position: relative; flex: 1 0 18px; max-width: 42px; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.st-bar i { position: absolute; bottom: 0; width: 70%; background: var(--accent); border-radius: 4px 4px 0 0; }
+.st-bar i.pp { width: 40%; background: var(--accent-deep); }
+.st-bar span { position: absolute; bottom: -20px; font-size: .62rem; color: var(--muted); white-space: nowrap; transform: rotate(-35deg); transform-origin: top right; right: 50%; }
+.st-login { display: grid; gap: 12px; justify-items: start; max-width: 460px; }
