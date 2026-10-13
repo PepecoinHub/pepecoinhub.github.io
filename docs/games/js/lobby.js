@@ -247,7 +247,7 @@ function renderNewTable() {
   if (tmode === 'bot') {
     opts.append(h('span', { class: 'tgame-tc', role: 'radiogroup', 'aria-label': 'Bot difficulty' }, h('span', { class: 'small muted' }, 'Difficulty:'),
       [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard']].map(([v, l]) => h('label', { class: 'tc-opt' }, h('input', { type: 'radio', name: 'blevel', value: v, checked: v === 'medium' }), l))),
-      noTouchL ? h('div', { class: 'topts' }, noTouchL) : null,
+      noTouchL ? h('div', { class: 'topts' }, noTouchL) : '',
       h('div', { class: 'row', style: 'margin-top:12px' }, h('button', { class: 'btn primary big', id: 'bot-play', onclick: () => {
         const lv = box.querySelector('input[name=blevel]:checked').value;
         location.href = `table.html?bot=${game}&level=${lv}` + (game === 'battleship' && noTouch.checked ? '&notouch=1' : '');
