@@ -61,6 +61,7 @@ function tick() {
   $('#sched-season').textContent = seasonLine(lobby?.season, Date.now() + offset);
   const cd = $('#countdown'); cd.textContent = '';
   const cta = $('#sched-cta'); cta.textContent = '';
+  $('#hostwanted').hidden = !ev.fallback; $('#sched').hidden = ev.fallback;
   if (ev.fallback) {   // no night is scheduled yet: no countdown to a made-up date
     $('#sched-when').textContent = 'Next game · coming soon';
     $('#sched-note').textContent = 'The first nights are being planned. We announce every night on Reddit and Discord.';
@@ -93,7 +94,7 @@ function renderRooms() {
   $('#chip-rooms').textContent = d.length;
   if (!d.length) dg.append(h('div', { class: 'empty' }, h('img', { class: 'empty-pic', src: 'img/empty-playground.webp', alt: 'Three Pepe frogs playing in a sandbox', width: 640, height: 365, loading: 'lazy' }), h('p', { class: 'muted' }, 'No open rooms right now. Start your own below.')));
   else d.forEach((r) => dg.append(roomRow(r)));
-  if (!p.length) pp.append(h('div', { class: 'empty small-empty' }, h('img', { class: 'emote-big', src: 'img/emotes/waiting.webp', alt: '', width: 56, height: 56, loading: 'lazy' }), h('p', { class: 'muted' }, 'No live night right now. Check the green box.')));
+  if (!p.length) pp.append(h('div', { class: 'empty small-empty' }, h('img', { class: 'emote-big', src: 'img/emotes/waiting.webp', alt: '', width: 56, height: 56, loading: 'lazy' }), h('p', { class: 'muted' }, 'No live night right now.')));
   else p.forEach((r) => pp.append(roomRow(r)));
 }
 $('#codeform').addEventListener('submit', (e) => {
