@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
-<link rel="stylesheet" href="../facts.css?v=20261012d">
-<link rel="stylesheet" href="gry.css?v=20261013a">
+<link rel="stylesheet" href="../facts.css?v=20261013b">
+<link rel="stylesheet" href="gry.css?v=20261013b">
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
@@ -24,7 +24,7 @@
   <nav class="site-nav" aria-label="Pages"><a href="../which-pepecoin.html">Which is which</a><a href="../compare.html">PEP and DOGE</a><a href="../calculator.html">Calculator</a><a href="../supply.html">Supply</a><a href="../scrypt-family.html">Scrypt family</a><a href="../network.html">Network</a><a href="../rich-list.html">Rich list</a><a href="../guides.html">Guides</a><a href="./" aria-current="page">Games</a></nav>
 </header>
 <div class="g-sub"><nav class="g-nav" aria-label="Games">
-  <a href="./" >Lobby</a><a href="./#tables">Mini games</a><a href="miner.html">Pepe Miner</a><a href="ranking.html">Leaderboard</a><a href="host.html">Host</a>
+  <a class="g-chat" href="./#chat"><span class="dot" aria-hidden="true"></span>Chat</a><a href="./#game-dg">Draw &amp; Guess</a><a href="miner.html">Pepe Miner</a><a href="./#tables">Mini games</a><a href="./#pictures">Pepe Pictures</a><a href="ranking.html">Leaderboard</a>
 </nav><span class="g-me" aria-live="polite"></span></div>
 <main class="wrap" id="main">
 <header class="page-head">
@@ -37,12 +37,13 @@
 <ul>
 <li><strong>A nickname</strong> you choose, and a random guest account ID. If you log in with Discord, your Discord user ID, name and email address are stored by our login service (Supabase), because Discord shares them at login. We do not show the email or use it for anything. We never receive your password.</li>
 <li><strong>Game data:</strong> rooms and tables, moves, scores, results and chat messages. Old chat messages are deleted automatically after about a week. Rooms nobody uses any more are deleted with their players and chat after about an hour, and closed tables with their chat after about an hour too. Scores from Pepe Pictures nights are kept for the leaderboard.</li>
+<li><strong>Lobby chat:</strong> the messages you write there, with your nickname, are deleted automatically after 24 hours. To show how many people are online, the lobby sends a random ID made in your browser (not your IP address); it is deleted after 10 minutes.</li>
 <li><strong>A salted hash of your IP address</strong>, used only for limits: how many rooms and tables one network can open, and how many wrong host-code attempts it can make (those attempts are kept for one day). It cannot be turned back into the address, and the raw address is not saved.</li>
 <li><strong>Leaderboard:</strong> your nickname and points from Pepe Pictures nights stay on the leaderboard and in the Hall of Fame.</li>
 <li><strong>Prize addresses:</strong> if prizes are offered and you choose to give a PEP address, it is used only to send that prize.</li>
 </ul>
 <h2>What stays in your browser</h2>
-<p>Your nickname, theme choice, the guest sign-in token, the position of a game against the bot and your Pepe Miner progress are kept in your browser's local storage so the page remembers you. Games against the bot are never sent to a server. Clearing your site data removes all of this.</p>
+<p>Your nickname, theme choice, the guest sign-in token, the position of a game against the bot, your Pepe Miner progress and a random ID for the lobby's online counter are kept in your browser's local storage so the page remembers you. Games against the bot are never sent to a server. Clearing your site data removes all of this.</p>
 <h2>Who processes data</h2>
 <ul>
 <li><strong>GitHub Pages</strong> serves the pages.</li>
@@ -62,6 +63,6 @@
   <p class="correction">Found a bug or something unfair? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Report it</a> on GitHub.</p>
   <details class="support"><summary>Like this site? You can support its further development.</summary><p>Any amount, however small, helps. Thank you!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
-<script src="../chrome.js?v=20261012d" defer></script>
+<script src="../chrome.js?v=20261013b" defer></script>
 </body>
 </html>

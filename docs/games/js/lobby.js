@@ -1,5 +1,6 @@
 import { $, h, toast, errorNote, getBackend, identityCard, paintMe, meInfo, badge, nextWeekday20, fmtLocal, fmtPoland, backendBanner, seasonLine, nickStore } from './common.js';
 import { pixelDemo } from './pixeldemo.js';
+import { lobbyChat } from './lobbychat.js';
 
 const be = await getBackend();
 backendBanner($('#main'));
@@ -60,6 +61,11 @@ function tick() {
   $('#sched-season').textContent = seasonLine(lobby?.season, Date.now() + offset);
   const cd = $('#countdown'); cd.textContent = '';
   const cta = $('#sched-cta'); cta.textContent = '';
+  if (ev.fallback) {   // no night is scheduled yet: no countdown to a made-up date
+    $('#sched-when').textContent = 'Next game · coming soon';
+    $('#sched-note').textContent = 'The first nights are being planned. We announce every night on Reddit and Discord.';
+    return;
+  }
   if (diff > 0) {
     $('#sched-when').textContent = 'Next game · ' + fmtLocal(ev.at, { month: undefined, day: undefined, hour: undefined, minute: undefined });
     const s = Math.floor(diff / 1000);
@@ -84,9 +90,10 @@ function renderRooms() {
   if (lobby?.error) { dg.append(errorNote(lobby.error)); return; }
   const rooms = lobby?.rooms || [];
   const d = rooms.filter((r) => r.mode === 'kalambury'), p = rooms.filter((r) => r.mode === 'obrazek');
+  $('#chip-rooms').textContent = d.length;
   if (!d.length) dg.append(h('div', { class: 'empty' }, h('img', { class: 'empty-pic', src: 'img/empty-playground.webp', alt: 'Three Pepe frogs playing in a sandbox', width: 640, height: 365, loading: 'lazy' }), h('p', { class: 'muted' }, 'No open rooms right now. Start your own below.')));
   else d.forEach((r) => dg.append(roomRow(r)));
-  if (!p.length) pp.append(h('div', { class: 'empty small-empty' }, h('img', { class: 'emote-big', src: 'img/emotes/waiting.webp', alt: '', width: 56, height: 56, loading: 'lazy' }), h('p', { class: 'muted' }, 'No live night right now. Check the countdown above.')));
+  if (!p.length) pp.append(h('div', { class: 'empty small-empty' }, h('img', { class: 'emote-big', src: 'img/emotes/waiting.webp', alt: '', width: 56, height: 56, loading: 'lazy' }), h('p', { class: 'muted' }, 'No live night right now. Check the green box.')));
   else p.forEach((r) => pp.append(roomRow(r)));
 }
 $('#codeform').addEventListener('submit', (e) => {
@@ -113,10 +120,23 @@ function renderNewRoom() {
           location.href = 'room.html?r=' + c;
         } catch (err) { toast(err.message, 'bad'); e.target.disabled = false; }
       } }, 'Create room'),
-      logged ? null : h('span', { class: 'small muted' }, 'Log in or pick a nickname at the top first.')));
+      logged ? null : loginHint()));
 }
+// ---------- login box: the small "Not signed in · Log in" button at the top right opens it ----------
+function setLogin(open) {
+  $('#identity').hidden = !open; $('#gme').setAttribute('aria-expanded', String(open));
+  if (open) setTimeout(() => $('#identity #nick')?.focus(), 30);
+}
+function openLogin() { setLogin(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function loginHint() { return h('button', { type: 'button', class: 'linkbtn small', onclick: openLogin }, 'Log in or pick a nickname first'); }
+$('#gme').addEventListener('click', (e) => { e.stopPropagation(); setLogin($('#identity').hidden); });
+document.addEventListener('click', (e) => { if (!$('#identity').hidden && !e.target.closest('.g-login')) setLogin(false); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#identity').hidden) { setLogin(false); $('#gme').focus(); } });
+const chat = lobbyChat(be, { openLogin });
+minerYou();
+
 renderNewRoom(); renderNewTable();
-await identityCard($('#identity'), { cta: 'Play', onReady: () => { renderNewRoom(); renderNewTable(); renderSchedHost(); toast('All set! Pick a game below', 'good'); $('#maingames').scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
+await identityCard($('#identity'), { cta: 'Play', onReady: () => { setLogin(false); renderNewRoom(); renderNewTable(); renderSchedHost(); chat.refresh(); toast('All set! Pick a game below', 'good'); } });
 renderNewRoom(); renderNewTable();
 await Promise.all([load(), loadTables(), loadTopboard()]);
 renderSchedHost();
@@ -170,6 +190,7 @@ async function loadTables() {
   let list;
   try { list = await be.rpc('gry_tables_lobby'); } catch (e) { box.textContent = ''; box.append(errorNote(e)); return; }
   box.textContent = '';
+  $('#chip-tables').textContent = list.filter((t) => t.status !== 'finished').length;
   if (!list.length) { box.append(h('div', { class: 'empty' }, h('img', { class: 'empty-pic', src: 'img/empty-swing.webp', alt: 'A sad Pepe sitting alone on a swing', width: 640, height: 445, loading: 'lazy' }), h('p', { class: 'muted' }, 'No open tables right now. Open one below and send the invite link to a friend.'))); return; }
   box.append(h('div', { class: 'tscroll' }, h('table', { class: 'gtable tables' },
     h('thead', {}, h('tr', {}, ['Game', 'Host', 'Clock', 'Status', ''].map((x) => h('th', { scope: 'col' }, x)))),
@@ -243,7 +264,7 @@ function renderNewTable() {
     h('p', { class: 'small muted', style: 'margin:14px 0 8px' }, '3. Play'),
     h('div', { class: 'tplay' },
       h('div', { class: 'tplay-col' }, h('b', {}, '👥 With a friend or the community'),
-        h('div', { class: 'row', style: 'margin-top:8px' }, createBtn, logged ? null : h('span', { class: 'small muted' }, 'Log in or pick a nickname at the top first.')),
+        h('div', { class: 'row', style: 'margin-top:8px' }, createBtn, logged ? null : loginHint()),
         h('p', { class: 'small muted', style: 'margin:8px 0 0' }, 'You get an invite link to send. Public tables also show up in the list above.')),
       // vs bot: runs only in this browser (Web Worker), no account needed, nothing saved online
       h('div', { class: 'tplay-col botrow', id: 'botrow' }, h('b', {}, '🤖 Against a bot'),
@@ -255,4 +276,15 @@ function renderNewTable() {
         } }, 'Play vs bot')),
         h('p', { class: 'small muted', style: 'margin:8px 0 0' }, 'The bot plays in your browser: no account, nothing saved online.'))));
   renderTc();
+}
+
+// ---------- Pepe Miner card: show the player's own mine if this browser has a save ----------
+function minerYou() {
+  let st = null; try { st = JSON.parse(localStorage.getItem('pepminer-v1') || 'null'); } catch {}
+  if (!st?.started) return;
+  const all = st.allTime || st.total || 0, blocks = Math.floor(all / 10000);
+  const el = $('#miner-you');
+  el.textContent = `Your mine: ${blocks.toLocaleString('en-US')} blocks so far` + (st.forks ? `, ${st.forks} hard fork${st.forks > 1 ? 's' : ''}` : '') + '. Keep going!';
+  el.hidden = false;
+  $('#game-miner .btn').textContent = 'Continue mining';
 }
