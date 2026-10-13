@@ -10,6 +10,7 @@ if (be.kind === 'none') {   // no game server yet: only the offline "Play vs bot
 }
 paintMe(be);
 let lobby = null, offset = 0, canHost = false;
+let tmode = null, tgame = null;   // mini games: 'fren' | 'bot', and the picked game
 const MODE_LABEL = { kalambury: 'Draw & Guess', obrazek: 'Pepe Pictures' };
 const TGAME = { chess: ['♟️', 'Chess'], checkers: ['⚫', 'Checkers'], connect4: ['🔴', 'Connect Four'], battleship: ['🚢', 'Sea Battle'] };
 const TDESC = {
@@ -213,73 +214,78 @@ async function loadTables() {
           : canWatch ? h('a', { class: 'btn sm', href: 'table.html?t=' + t.code }, 'Watch') : h('span', { class: 'small muted' }, 'full')));
     })))));
 }
+// Start a game in three steps: 1. with a fren or vs the bot  2. pick a game  3. options, then Start game.
 function renderNewTable() {
   const box = $('#tcreate'); if (!box) return; box.textContent = '';
   const logged = !!be.session();
-  const pick = h('div', { class: 'gcards', role: 'radiogroup', 'aria-label': 'Game' }, Object.entries(TGAME).map(([k, [, name]], i) =>
-    h('label', { class: 'gcard' }, h('input', { type: 'radio', name: 'tgame', value: k, checked: i === 0 }),
+  const modeBtn = (m, ico, title, sub) => h('button', { type: 'button', class: 'tmode' + (tmode === m ? ' on' : '') + (m === 'fren' ? ' tmode-fren' : ''), 'aria-pressed': String(tmode === m),
+    onclick: () => { tmode = m; renderNewTable(); box.querySelector('.gcards')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } },
+    h('span', { class: 'tmode-ico', 'aria-hidden': 'true' }, ico), h('b', {}, title), h('span', { class: 'small muted' }, sub));
+  box.append(h('h3', {}, 'Start a game'),
+    h('p', { class: 'small muted', style: 'margin:0 0 8px' }, '1. Who do you want to play with?'),
+    h('div', { class: 'tmodes' },
+      modeBtn('fren', '👥', 'Play with a fren', 'Get an invite link to send'),
+      modeBtn('bot', '🤖', 'Play vs bot', 'Right here, no account needed')));
+  // 2. the games: clickable only after step 1
+  const pick = h('div', { class: 'gcards' + (tmode ? '' : ' off'), role: 'radiogroup', 'aria-label': 'Game' }, Object.entries(TGAME).map(([k, [, name]]) =>
+    h('label', { class: 'gcard' }, h('input', { type: 'radio', name: 'tgame', value: k, checked: tgame === k, disabled: !tmode,
+      onchange: () => { tgame = k; renderNewTable(); box.querySelector('#topts-box')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } }),
       h('span', { class: 'gcard-check', 'aria-hidden': 'true' }, '✓'),
       boardPreview(k),
       h('b', { class: 'gcard-name' }, name), h('span', { class: 'gcard-desc' }, TDESC[k][0]), h('span', { class: 'gcard-opt' }, TDESC[k][1]))));
-  // tempo: szachy = zegar partii (presety + własny), warcaby / C4 = limit na ruch
+  box.append(h('p', { class: 'small muted', style: 'margin:16px 0 8px' }, '2. Pick a game' + (tmode ? '' : ' (choose fren or bot first)')), pick);
+  if (!tmode || !tgame) return;
+
+  // 3. options for this game and mode
+  const game = tgame;
   const TC = [['none', 'No clock'], ['1+0', 'Bullet 1+0'], ['2+1', 'Bullet 2+1'], ['3+2', 'Blitz 3+2'], ['5+0', 'Blitz 5+0'],
               ['10+0', 'Rapid 10+0'], ['15+10', 'Rapid 15+10'], ['custom', 'Custom']];
   const MV = [['0', 'No limit'], ['30', '30s per move'], ['60', '60s per move']];
+  const opts = h('div', { class: 'topts-box', id: 'topts-box' }, h('p', { class: 'small muted', style: 'margin:0 0 8px' }, `3. Options: ${TGAME[game][1]} ${tmode === 'bot' ? 'vs the bot' : 'with a fren'}`));
+  const noTouch = h('input', { type: 'checkbox', id: 'nt-notouch' });
+  const noTouchL = game === 'battleship' ? h('label', {}, noTouch, 'No-touch rule (ships may not touch)') : null;
+  if (tmode === 'bot') {
+    opts.append(h('span', { class: 'tgame-tc', role: 'radiogroup', 'aria-label': 'Bot difficulty' }, h('span', { class: 'small muted' }, 'Difficulty:'),
+      [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard']].map(([v, l]) => h('label', { class: 'tc-opt' }, h('input', { type: 'radio', name: 'blevel', value: v, checked: v === 'medium' }), l))),
+      noTouchL ? h('div', { class: 'topts' }, noTouchL) : null,
+      h('div', { class: 'row', style: 'margin-top:12px' }, h('button', { class: 'btn primary big', id: 'bot-play', onclick: () => {
+        const lv = box.querySelector('input[name=blevel]:checked').value;
+        location.href = `table.html?bot=${game}&level=${lv}` + (game === 'battleship' && noTouch.checked ? '&notouch=1' : '');
+      } }, '▶ Start game')),
+      h('p', { class: 'small muted', style: 'margin:8px 0 0' }, 'The bot plays in your browser: no account, nothing saved online.'));
+    box.append(opts); return;
+  }
   const tcBox = h('div', { class: 'tgame-tc', id: 'nt-tc', role: 'radiogroup', 'aria-label': 'Time control' });
   const cMin = h('input', { type: 'number', id: 'tc-min', min: 1, max: 60, value: 7, 'aria-label': 'Minutes per player' });
   const cInc = h('input', { type: 'number', id: 'tc-inc', min: 0, max: 30, value: 3, 'aria-label': 'Increment in seconds' });
   const custom = h('span', { class: 'tc-custom hidden', id: 'tc-custom' }, cMin, 'min +', cInc, 's');
-  const renderTc = () => {
-    const game = box.querySelector('input[name=tgame]:checked')?.value || 'chess';
-    tcBox.textContent = '';
-    const opts = game === 'chess' ? TC : MV;
-    tcBox.append(h('span', { class: 'small muted' }, game === 'chess' ? 'Clock:' : 'Move timer:'),
-      ...opts.map(([v, label], i) => h('label', { class: 'tc-opt' }, h('input', { type: 'radio', name: 'tc', value: v, checked: i === 0,
-        onchange: () => custom.classList.toggle('hidden', v !== 'custom') }), label)));
-    if (game === 'chess') tcBox.append(custom);
-    custom.classList.add('hidden');
-    noTouchL.classList.toggle('hidden', game !== 'battleship');
-  };
+  const list = game === 'chess' ? TC : MV;
+  tcBox.append(h('span', { class: 'small muted' }, game === 'chess' ? 'Clock:' : 'Move timer:'),
+    ...list.map(([v, label], i) => h('label', { class: 'tc-opt' }, h('input', { type: 'radio', name: 'tc', value: v, checked: i === 0,
+      onchange: () => custom.classList.toggle('hidden', v !== 'custom') }), label)));
+  if (game === 'chess') tcBox.append(custom);
   const tcArgs = () => {
     const v = tcBox.querySelector('input[name=tc]:checked')?.value || 'none';
-    const game = box.querySelector('input[name=tgame]:checked').value;
     if (game !== 'chess') return { p_move_seconds: +v };
     if (v === 'none') return {};
     if (v === 'custom') return { p_minutes: Math.round(+cMin.value || 0), p_increment: Math.round(+cInc.value || 0) };
     const [m, i] = v.split('+'); return { p_minutes: +m, p_increment: +i };
   };
-  const noTouch = h('input', { type: 'checkbox', id: 'nt-notouch' });
-  const noTouchL = h('label', { class: 'hidden' }, noTouch, 'No-touch rule (ships may not touch)');
-  pick.addEventListener('change', renderTc);
   const priv = h('input', { type: 'checkbox', id: 'nt-private' });
   const spec = h('input', { type: 'checkbox', id: 'nt-spec', checked: true });
-  const createBtn = h('button', { class: 'btn primary', id: 'nt-create', disabled: !logged, onclick: async (e) => {
+  const createBtn = h('button', { class: 'btn primary big', id: 'nt-create', disabled: !logged, onclick: async (e) => {
     e.target.disabled = true;
     try {
-      const game = box.querySelector('input[name=tgame]:checked').value;
       const c = await be.rpc('gry_table_create', { p_game: game, p_nick: nickStore.get(), p_private: priv.checked, p_spectators: spec.checked, ...tcArgs(),
         ...(game === 'battleship' ? { p_no_touch: noTouch.checked } : {}) });
       location.href = 'table.html?t=' + c;
     } catch (err) { toast(err.message, 'bad'); e.target.disabled = false; }
-  } }, 'Create table');
-  box.append(h('h3', {}, 'Start a game'), h('p', { class: 'small muted', style: 'margin:0 0 8px' }, '1. Pick a game'), pick,
-    h('p', { class: 'small muted', style: 'margin:14px 0 0' }, '2. Choose options'), tcBox,
+  } }, '▶ Start game');
+  opts.append(tcBox,
     h('div', { class: 'topts' }, h('label', {}, priv, 'Private: invite link only (not listed here)'), h('label', {}, spec, 'Allow spectators'), noTouchL),
-    h('p', { class: 'small muted', style: 'margin:14px 0 8px' }, '3. Play'),
-    h('div', { class: 'tplay' },
-      h('div', { class: 'tplay-col' }, h('b', {}, '👥 With a friend or the community'),
-        h('div', { class: 'row', style: 'margin-top:8px' }, createBtn, logged ? null : loginHint()),
-        h('p', { class: 'small muted', style: 'margin:8px 0 0' }, 'You get an invite link to send. Public tables also show up in the list above.')),
-      // vs bot: runs only in this browser (Web Worker), no account needed, nothing saved online
-      h('div', { class: 'tplay-col botrow', id: 'botrow' }, h('b', {}, '🤖 Against a bot'),
-        h('span', { class: 'tgame-tc', role: 'radiogroup', 'aria-label': 'Bot difficulty' },
-          [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard']].map(([v, l]) => h('label', { class: 'tc-opt' }, h('input', { type: 'radio', name: 'blevel', value: v, checked: v === 'medium' }), l))),
-        h('div', { class: 'row', style: 'margin-top:8px' }, h('button', { class: 'btn', id: 'bot-play', onclick: () => {
-          const game = box.querySelector('input[name=tgame]:checked').value, lv = box.querySelector('input[name=blevel]:checked').value;
-          location.href = `table.html?bot=${game}&level=${lv}` + (game === 'battleship' && noTouch.checked ? '&notouch=1' : '');
-        } }, 'Play vs bot')),
-        h('p', { class: 'small muted', style: 'margin:8px 0 0' }, 'The bot plays in your browser: no account, nothing saved online.'))));
-  renderTc();
+    h('div', { class: 'row', style: 'margin-top:12px' }, createBtn, logged ? null : loginHint()),
+    h('p', { class: 'small muted', style: 'margin:8px 0 0' }, 'Next you get the invite link to send to your fren. Public tables also show up in the list above.'));
+  box.append(opts);
 }
 
 // ---------- Pepe Miner card: show the player's own mine if this browser has a save ----------
