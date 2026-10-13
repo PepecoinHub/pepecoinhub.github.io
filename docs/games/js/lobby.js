@@ -9,7 +9,7 @@ if (be.kind === 'none') {   // no game server yet: only the offline "Play vs bot
   $('.lobby-head .lead').textContent = 'Play Chess, Checkers, Connect Four and Sea Battle against a bot, right in your browser. Live rooms with friends, Draw & Guess and weekly Pepe Pictures nights are coming soon.';
 }
 paintMe(be);
-let lobby = null, offset = 0;
+let lobby = null, offset = 0, canHost = false;
 const MODE_LABEL = { kalambury: 'Draw & Guess', obrazek: 'Pepe Pictures' };
 const TGAME = { chess: ['♟️', 'Chess'], checkers: ['⚫', 'Checkers'], connect4: ['🔴', 'Connect Four'], battleship: ['🚢', 'Sea Battle'] };
 const TDESC = {
@@ -61,7 +61,9 @@ function tick() {
   $('#sched-season').textContent = seasonLine(lobby?.season, Date.now() + offset);
   const cd = $('#countdown'); cd.textContent = '';
   const cta = $('#sched-cta'); cta.textContent = '';
-  $('#hostwanted').hidden = !ev.fallback; $('#sched').hidden = ev.fallback;
+  // "Looking for a host" until a night is less than a week away; hosts always see the countdown box (it holds their date form)
+  const soon = !ev.fallback && diff < 7 * 864e5;
+  $('#hostwanted').hidden = soon; $('#sched').hidden = !soon && !canHost;
   if (ev.fallback) {   // no night is scheduled yet: no countdown to a made-up date
     $('#sched-when').textContent = 'Next game · coming soon';
     $('#sched-note').textContent = 'The first nights are being planned. We announce every night on Reddit and Discord.';
@@ -167,6 +169,7 @@ async function loadTopboard() {
 async function renderSchedHost() {
   const box = $('#sched-host'); box.textContent = '';
   let me = null; try { me = await meInfo(be); } catch {}
+  canHost = !!me?.can_host; tick();
   if (!me?.can_host) return;
   const ev = eventInfo();
   const local = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);

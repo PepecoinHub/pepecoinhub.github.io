@@ -144,7 +144,9 @@
   };
   // which stage a mine gets, by the most advanced machine owned
   const SCENE_FOR = { laptop: 'room', pc: 'room', rig: 'room', asic: 'garage', garage: 'garage', farm: 'farm', plant: 'swamp', dc: 'swamp', hydro: 'falls', moon: 'moon', pond: 'pond', mars: 'mars' };
-  const scene = (id) => `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">${SCENES[id] || SCENES.room}</svg>`;
+  // the first stage (room) is the owner's picture, the others are drawn above
+  const PICTURE_SCENES = { room: 'img/miner/scene-room.webp' };
+  const scene = (id) => PICTURE_SCENES[id] ? `<img src="${PICTURE_SCENES[id]}" alt="" class="scene-pic">` : `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">${SCENES[id] || SCENES.room}</svg>`;
 
   window.MINER_ART = { icon, scene, SCENE_FOR };
 })();
