@@ -463,6 +463,10 @@ input, select, textarea { border-radius: 12px; }
 /* "Not a pitch" as a warm note with the small frog */
 .pledge { align-items: center; background: var(--gold-soft); border: 1px dashed color-mix(in srgb, var(--gold) 70%, transparent); border-left-width: 1px; border-radius: 18px; }
 .pledge::before { content: ""; width: 36px; height: 36px; background: url(assets/brand/frog-circle.png) center / contain no-repeat; }
+/* "Games: coming soon" note in the home hero, with the owner's soon.jpg */
+.pledge.soon { gap: 14px; }
+.pledge.soon::before { content: none; }
+.pledge.soon img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; flex: none; }
 
 /* Start here: icons, and the first card made the big one */
 .cards a.card[href$="which-pepecoin.html"]::before, .cards a.card[href$="rich-list.html"]::before,

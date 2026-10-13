@@ -191,3 +191,27 @@
   .mn-coin { transition: none; }
 }
 .mn-strip svg:nth-child(n+4) * { animation: none !important; }
+
+/* prayer button */
+.mn-pray { appearance: none; display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid #f6bb60; background: color-mix(in srgb, #f6bb60 18%, var(--surface)); color: var(--ink); font: inherit; cursor: pointer; text-align: left; }
+.mn-pray img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex: none; background: var(--surface-2); }
+.mn-pray b { display: block; font-size: .9rem; }
+.mn-pray small { display: block; font-size: .76rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mn-pray:not(:disabled):hover { border-color: var(--accent); }
+.mn-pray:disabled { cursor: default; border-color: var(--grid); background: var(--surface-2); }
+.mn-pray:disabled img { filter: grayscale(.8); opacity: .7; }
+.mn-up .ui img { width: 34px; height: 34px; object-fit: cover; border-radius: 8px; }
+
+/* the wrong Pepe flying by */
+.mn-trap { position: fixed; left: 0; z-index: 41; }
+.mn-trap.fly { animation: mntrap 8s linear forwards; }
+.mn-trap.rtl.fly { animation-name: mntrapr; }
+.mn-trap button { appearance: none; border: 0; background: none; padding: 4px; cursor: pointer; }
+.mn-trap img { width: 76px; height: 76px; object-fit: contain; display: block; animation: mnbob 1.2s ease-in-out infinite; }
+@keyframes mntrap { from { transform: translateX(-110px); } to { transform: translateX(calc(100vw + 20px)); } }
+@keyframes mntrapr { from { transform: translateX(calc(100vw + 20px)) scaleX(-1); } to { transform: translateX(-110px) scaleX(-1); } }
+@keyframes mnbob { 50% { transform: translateY(-12px) rotate(6deg); } }
+.mn-foot button.pic { filter: drop-shadow(0 0 12px #ffd25e); }
+.mn-foot.muddy button.pic { filter: sepia(1) saturate(2.2) hue-rotate(-28deg) brightness(.55) drop-shadow(0 0 8px #6b4a2a); }
+.mn-foot button img { width: 76px; height: 76px; object-fit: contain; display: block; }
+@media (prefers-reduced-motion: reduce) { .mn-trap img { animation: none; } }
