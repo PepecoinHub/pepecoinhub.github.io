@@ -11,6 +11,12 @@
   const LEVEL_BONUS = 0.05;            // +5% production and clicks per fork point
   const E = (n) => `img/emotes/${n}.webp`;
 
+  // Pictures from the site owner (originals in img/miner-*.*, small copies in img/miner/).
+  const PICS = { hardfork: 'hardfork', block1: '1stblock', candle: 'greencandle', ads: 'ads', oneday: 'oneday', pray: 'pray', laptop: 'laptop',
+    trap: 'trap', wrongpep: 'wrongpep', h1: '1h', b1: '1b', h3: '3h', zord: 'zordfeet', k5: '5k' };
+  const picUrl = Object.fromEntries(Object.entries(PICS).map(([k, f]) => [k, `img/miner/${f}.webp`]));
+  const P = (key, emote) => picUrl[key] || E(emote);
+
   const MACHINES = [
     { id: 'laptop', name: 'Old laptop', plural: 'Old laptops', cost: 15, rate: 0.1, tip: 'In the first days you could still mine on an ordinary computer.',
       tiers: ['Fresh thermal paste', 'Laptop cooling pad', 'Undervolted CPU', 'Linux, finally', 'Lid closed, still mining', 'The laptop that refused to die'] },
@@ -47,7 +53,8 @@
     { id: 'pick2', ico: '🪙', name: 'Golden pickaxe', cost: 5e5, need: () => S.st.clicks >= 1000, desc: 'Clicks mine ×2. For true clickers.' },
     { id: 'merged', ico: '🐕', name: 'Merged mining LTC + DOGE', cost: 5e6, need: () => own('farm') >= 1, desc: 'The same hashes secure LTC, DOGE and PEP: miners ×2, DOGE blocks drop in.' },
     { id: 'hw', ico: '🔐', name: 'Hardware wallet', cost: 1e7, need: () => S.st.muddy >= 1, desc: 'Muddy feet can no longer rug you. Not your keys, not your coins.' },
-    { id: 'newlaptop', ico: '💻', name: 'New Laptop', cost: 4e7, egg: true, need: () => S.total >= 1e7, desc: 'A legend once traded 40 million PEP for a new laptop. Days later, a three-month run to the ATH began.' },
+    { id: 'ads', ico: '📣', pic: 'ads', name: 'Ads', cost: 1e6, need: () => S.total >= 2e5, desc: 'Your mine advertises everywhere. Miners ×1.1, with no time limit.' },
+    { id: 'newlaptop', ico: '💻', pic: 'laptop', name: 'New Laptop', cost: 4e7, egg: true, need: () => S.total >= 1e7, desc: 'A legend once traded 40 million PEP for a new laptop. Days later, a three-month run to the ATH began.' },
     { id: 'printer', ico: '🖨️', name: 'Tokenprinter.fun', cost: 5e8, need: () => S.up.merged && own('plant') >= 1, desc: 'Start printing PRC-20 tokens. Every 3 minutes a launch: most rug, some pump, a few moon.' },
     { id: 'pick3', ico: '💎', name: 'Diamond pickaxe', cost: 5e8, need: () => S.st.clicks >= 5000, desc: 'Clicks mine ×2 again. Your finger is legendary.' },
   ];
@@ -73,8 +80,8 @@
 
   // ---------- state ----------
   const fresh = () => ({ v: 2, pep: 0, total: 0, allTime: 0, own: {}, up: {}, ach: {}, relics: {}, prestige: 0, chips: 0, forks: 0,
-    started: false, playMs: 0, buyPlayMs: 0, lastSeen: Date.now(), buffs: [], nextFoot: 0, nextEvent: 0, nextLaunch: 0,
-    st: { clicks: 0, foot: 0, muddy: 0, held: 0, launches: 0, moons: 0, pepelord: 0, best: 0, fast: 0 } });
+    started: false, playMs: 0, buyPlayMs: 0, lastSeen: Date.now(), buffs: [], nextFoot: 0, nextEvent: 0, nextLaunch: 0, nextTrap: 0, prayAt: 0,
+    st: { clicks: 0, foot: 0, muddy: 0, held: 0, launches: 0, moons: 0, pepelord: 0, best: 0, fast: 0, candles: 0, returns: 0, traps: 0, prays: 0 } });
   let S = fresh();
   try {
     const raw = localStorage.getItem(KEY);
@@ -117,6 +124,7 @@
     let g = 1 + LEVEL_BONUS * S.prestige;
     if (S.up.pool) g *= 1.5;
     if (S.up.merged) g *= 2;
+    if (S.up.ads) g *= 1.1;
     if (S.up.newlaptop) g *= 1.05;
     return g;
   }
@@ -153,10 +161,12 @@
     { id: 'gm', name: 'GM', img: 'peek', how: 'Press Start', test: () => S.started },
     { id: 'click100', name: 'Finger warm-up', img: 'hurry', how: 'Click the coin 100 times', test: () => S.st.clicks >= 100 },
     { id: 'click1k', name: 'Click addict', img: 'scream', how: 'Click the coin 1,000 times', test: () => S.st.clicks >= 1000 },
+    { id: 'click5k', name: 'Five thousand clicks', img: 'hurry', pic: 'k5', how: 'Click the coin 5,000 times', test: () => S.st.clicks >= 5000 },
     { id: 'click10k', name: 'Carpal tunnel', img: 'smoke', how: 'Click the coin 10,000 times', test: () => S.st.clicks >= 10000 },
-    { id: 'block1', name: 'First block', img: 'pep', how: 'Mine your first block', test: () => S.allTime >= BLOCK },
+    { id: 'block1', name: 'First block', img: 'pep', pic: 'block1', how: 'Mine your first block', test: () => S.allTime >= BLOCK },
     { id: 'block100', name: 'Hundred blocks', img: 'cheer', how: 'Mine 100 blocks', test: () => S.allTime >= 100 * BLOCK },
     { id: 'block10k', name: 'Ten thousand blocks', img: 'crowd', how: 'Mine 10,000 blocks', test: () => S.allTime >= 1e4 * BLOCK },
+    { id: 'b1', name: 'Billion PEP club', img: 'cheer', pic: 'b1', how: 'Mine 1 billion game PEP in total', test: () => S.allTime >= 1e9 },
     { id: 'block1m', name: 'A million blocks', img: 'torch', how: 'Mine 1,000,000 blocks', test: () => S.allTime >= 1e6 * BLOCK },
     { id: 'rate1k', name: 'Kilo-frog', img: 'ready', how: 'Mine 1,000 game PEP per second', test: () => baseRate() >= 1e3 },
     { id: 'rate1m', name: 'Mega-frog', img: 'torch', how: 'Mine 1 million game PEP per second', test: () => baseRate() >= 1e6 },
@@ -169,28 +179,31 @@
     { id: 'tier10', name: 'Tinkerer', img: 'crayon', how: 'Buy 10 machine upgrades', test: () => tiersBought() >= 10 },
     { id: 'tier30', name: 'Engineer', img: 'ready', how: 'Buy 30 machine upgrades', test: () => tiersBought() >= 30 },
     { id: 'tierAll', name: 'Fully upgraded', img: 'torch', how: 'Buy every machine upgrade', test: () => tiersBought() >= TIER_UPS.length },
-    { id: 'foot', name: 'Zord Feet', img: 'hurry', how: 'Catch the golden foot', test: () => S.st.foot >= 1 },
+    { id: 'foot', name: 'Zord Feet', img: 'hurry', pic: 'zord', how: 'Catch the golden foot', test: () => S.st.foot >= 1 },
     { id: 'foot10', name: 'Foot chaser', img: 'hurry', how: 'Catch 10 golden feet', test: () => S.st.foot >= 10 },
     { id: 'foot50', name: 'Sole collector', img: 'cheer', how: 'Catch 50 golden feet', test: () => S.st.foot >= 50 },
     { id: 'muddy', name: 'Muddy feet', img: 'scream', how: 'Click a muddy foot', test: () => S.st.muddy >= 1 },
+    { id: 'candle', name: 'Green candle', img: 'cheer', pic: 'candle', how: 'Catch a green candle', test: () => S.st.candles >= 1 },
+    { id: 'wrongpep', name: 'Wrong Pepe fren', img: 'scream', pic: 'wrongpep', how: 'Click the wrong Pepe', test: () => S.st.traps >= 1 },
     { id: 'hold', name: 'Paper? Never.', img: 'serious', how: 'Hold through FUD', test: () => S.st.held >= 1 },
     { id: 'hold5', name: 'FUD-proof', img: 'serious', how: 'Hold through FUD 5 times', test: () => S.st.held >= 5 },
     { id: 'pepelord', name: 'Pepelord was here', img: 'peek', how: 'See Pepelord join the chat', test: () => S.st.pepelord >= 1 },
     { id: 'pool', name: 'Team player', img: 'hug', how: 'Join a mining pool', test: () => !!S.up.pool },
     { id: 'merged', name: 'Merge miner', img: 'crowd', how: 'Turn on merged mining', test: () => !!S.up.merged },
-    { id: 'laptop', name: 'Bought the laptop', img: 'cheer', how: 'Buy the New Laptop', test: () => !!S.up.newlaptop },
+    { id: 'laptop', name: 'Bought the laptop', img: 'cheer', pic: 'laptop', how: 'Buy the New Laptop', test: () => !!S.up.newlaptop },
     { id: 'lewis', name: 'Lewis approved', img: 'news', how: 'Buy Tokenprinter.fun', test: () => !!S.up.printer },
     { id: 'launch10', name: 'Serial launcher', img: 'news', how: 'Launch 10 tokens', test: () => S.st.launches >= 10 },
     { id: 'moon', name: 'To the moon', img: 'torch', how: 'Have one of your tokens moon', test: () => S.st.moons >= 1 },
     { id: 'hw', name: 'Not your keys...', img: 'serious', how: 'Buy the hardware wallet', test: () => !!S.up.hw },
     { id: 'pick3', name: 'Diamond pickaxe', img: 'cheer', how: 'Buy the Diamond pickaxe', test: () => !!S.up.pick3 },
-    { id: 'hands', name: 'Diamond hands', img: 'serious', how: 'Play for 1 hour', test: () => S.playMs >= 3600e3 },
-    { id: 'balls', name: 'Diamond balls', img: 'smoke', how: 'Play for 3 hours', test: () => S.playMs >= 3 * 3600e3 },
+    { id: 'hands', name: 'Diamond hands', img: 'serious', pic: 'h1', how: 'Play for 1 hour', test: () => S.playMs >= 3600e3 },
+    { id: 'balls', name: 'Diamond balls', img: 'smoke', pic: 'h3', how: 'Play for 3 hours', test: () => S.playMs >= 3 * 3600e3 },
     { id: 'day', name: 'Frog of the day', img: 'smoke', how: 'Play for 24 hours in total', test: () => S.playMs >= 24 * 3600e3 },
+    { id: 'oneday', name: 'One day later', img: 'smoke', pic: 'oneday', how: 'Come back to the game after closing it', test: () => S.st.returns >= 1 },
     { id: 'net1', name: '1% of the network', img: 'torch', how: 'Reach 1% of the real hashrate', test: () => net() >= 0.01 },
     { id: 'net10', name: '10% of the network', img: 'cheer', how: 'Reach 10% of the real hashrate', test: () => net() >= 0.1 },
     { id: 'net100', name: 'Bigger than the network', img: 'crayon', how: 'Out-hash the real Pepecoin network', test: () => net() >= 1 },
-    { id: 'fork1', name: 'Hard fork', img: 'waiting', how: 'Do your first hard fork', test: () => S.forks >= 1 },
+    { id: 'fork1', name: 'Hard fork', img: 'waiting', pic: 'hardfork', how: 'Do your first hard fork', test: () => S.forks >= 1 },
     { id: 'fork5', name: 'Fork collector', img: 'loading', how: 'Hard fork 5 times', test: () => S.forks >= 5 },
     { id: 'relic3', name: 'Relic hunter', img: 'chair', how: 'Own 3 relics', test: () => Object.keys(S.relics).length >= 3 },
     { id: 'relicAll', name: 'Keeper of relics', img: 'torch', how: 'Own every relic', test: () => Object.keys(S.relics).length >= RELICS.length },
@@ -201,10 +214,11 @@
   function checkAch() {
     if (!S.started) return;
     for (const a of ACH) if (!S.ach[a.id] && a.test()) {
-      S.ach[a.id] = now(); toast('Achievement: ' + a.name, a.how, E(a.img), 'ach');
+      S.ach[a.id] = now(); toast('Achievement: ' + a.name, a.how, achImg(a), 'ach');
       if (tab === 'ach') renderAch(); else achCount();
     }
   }
+  const achImg = (a) => (a.pic ? P(a.pic, a.img) : E(a.img));
   const achCount = () => { $('achcount').textContent = `${ACH.filter((a) => S.ach[a.id]).length}/${ACH.length}`; };
   function renderAch() {
     const box = $('achs'); box.textContent = '';
@@ -212,7 +226,7 @@
       const got = !!S.ach[a.id], hide = a.secret && !got;
       const d = document.createElement('div'); d.className = 'mn-a' + (got ? ' on' : '');
       d.innerHTML = '<img alt=""><span><b></b><small></small></span>';
-      d.querySelector('img').src = E(hide ? 'loading' : a.img);
+      d.querySelector('img').src = hide ? E('loading') : achImg(a);
       d.querySelector('b').textContent = hide ? '???' : a.name;
       d.querySelector('small').textContent = hide ? 'Hidden achievement' : a.how;
       box.append(d);
@@ -227,6 +241,7 @@
     const b = document.createElement('button'); b.type = 'button'; b.className = 'mn-up' + (u.egg ? ' egg' : '') + (u.machine ? ' tier' : ''); b.dataset.id = u.id;
     b.innerHTML = '<span class="ui"></span><span class="ut"><b></b><span class="d"></span><span class="cost">' + pIcon + ' </span></span>';
     if (u.machine) b.querySelector('.ui').innerHTML = ART.icon(u.machine, 34) + `<i>${ROMAN[u.tier]}</i>`;
+    else if (u.pic && picUrl[u.pic]) b.querySelector('.ui').innerHTML = `<img src="${picUrl[u.pic]}" alt="">`;
     else b.querySelector('.ui').textContent = u.ico;
     b.querySelector('b').textContent = u.name; b.querySelector('.d').textContent = u.desc;
     b.querySelector('.cost').append(fmt(u.cost)); b.disabled = S.pep < u.cost;
@@ -345,7 +360,7 @@
       ['Game PEP mined, this fork', fmt(S.total)], ['Game PEP mined, all time', fmt(S.allTime)], ['Blocks mined, all time', fmt(Math.floor(S.allTime / BLOCK))],
       ['Production now', `${fmt(rate())} game PEP/s`], ['Best production', `${fmt(S.st.best)} game PEP/s`], ['One click', `${fmt(clickValue())} game PEP`],
       ['Machines', totalOwned().toLocaleString('en-US')], ['Upgrades bought', `${Object.keys(S.up).length} of ${UPGRADES.length}`],
-      ['Coin clicks', S.st.clicks.toLocaleString('en-US')], ['Golden feet caught', String(S.st.foot)], ['Muddy feet clicked', String(S.st.muddy)],
+      ['Coin clicks', S.st.clicks.toLocaleString('en-US')], ['Golden feet caught', String(S.st.foot)], ['Muddy feet clicked', String(S.st.muddy)], ['Wrong Pepes clicked', String(S.st.traps)], ['Prayers', String(S.st.prays)],
       ['Tokens launched', String(S.st.launches)], ['Hard forks', String(S.forks)], ['Fork level', `${S.prestige} (+${Math.round(S.prestige * LEVEL_BONUS * 100)}%)`],
       ['Play time', fmtTime(S.playMs)],
     ];
@@ -469,7 +484,7 @@
     const c = $('coin'); c.classList.remove('hit'); void c.offsetWidth; c.classList.add('hit');
     paint();
   });
-  $('startbtn').addEventListener('click', () => { S.started = true; $('start').hidden = true; schedule(); checkAch(); save(); });
+  $('startbtn').addEventListener('click', () => { S.started = true; $('start').hidden = true; schedule(); checkAch(); renderPray(); save(); });
   $('share').addEventListener('click', async () => {
     const text = `I mine ${fmtHash(rate() * HS_PER_PEP)} in Pepe Miner 🐸⛏️ ${Math.floor(S.allTime / BLOCK).toLocaleString('en-US')} blocks${S.forks ? `, ${S.forks} hard forks` : ''} so far. Can you beat it?`;
     const url = 'https://pepecoinhub.com/games/miner.html';
@@ -517,7 +532,7 @@
   // ---------- random events ----------
   const EVENTS = [
     { id: 'whale', ok: () => true, run: () => { addBuff('whale', '🐋 Whale buys ×2', 2, 45); return ['A whale bought the dip', 'Everyone is excited. Miners ×2 for 45 seconds.', 'crowd']; } },
-    { id: 'candle', ok: () => true, run: () => { addBuff('candle', '🟢 Green candle: clicks ×10', 1, 20, '', 10); return ['Green candle', 'Clicks mine ×10 for 20 seconds. Go!', 'cheer']; } },
+    { id: 'candle', ok: () => true, run: () => { S.st.candles++; addBuff('candle', '🟢 Green candle: clicks ×10', 1, 20, '', 10); return ['Green candle', 'Clicks mine ×10 for 20 seconds. Go!', P('candle', 'cheer')]; } },
     { id: 'cat', ok: () => baseRate() > 0, run: () => { addBuff('cat', '🐈 Cable unplugged ×0.5', 0.5, 15, 'bad'); return ['The cat unplugged the garage', 'Half your miners are offline for 15 seconds.', 'scream']; } },
     { id: 'doge', ok: () => !!S.up.merged, run: () => { const g = baseRate() * 120; earn(g); return ['Your pool found a DOGE block', `Merged mining pays twice: +${fmt(g)} game PEP.`, 'hug']; } },
     { id: 'reddit', ok: () => true, run: () => { addBuff('reddit', '🔥 Front page ×1.5', 1.5, 60); return ['Your post hit the front page of r/pepecoin', 'New miners join the pool. ×1.5 for 60 seconds.', 'news']; } },
@@ -534,7 +549,7 @@
   }
   function showEvent(title, text, img, button) {
     const ev = $('event'); ev.innerHTML = '<img alt=""><div><b></b><p></p></div>';
-    ev.querySelector('img').src = E(img); ev.querySelector('b').textContent = title; ev.querySelector('p').textContent = text;
+    ev.querySelector('img').src = img.includes('/') ? img : E(img); ev.querySelector('b').textContent = title; ev.querySelector('p').textContent = text;
     if (button) ev.append(button);
     ev.hidden = false; clearTimeout(ev._t); ev._t = setTimeout(() => { ev.hidden = true; }, button ? 10000 : 6000);
   }
@@ -550,6 +565,44 @@
     else if (roll < 0.95) { const g = base * 60; earn(g); toast(`${t} pumped ×10`, `You sold the top: +${fmt(g)} game PEP.`, E('cheer')); }
     else { const g = base * 600; earn(g); S.st.moons++; toast(`${t} MOONED 🚀`, `+${fmt(g)} game PEP. Lewis approves.`, E('torch')); }
     checkAch();
+  }
+
+  // ---------- the wrong Pepe: flies across the screen, clicking it costs 25% of your game PEP ----------
+  function spawnTrap() {
+    const t = $('trap'), btn = t.querySelector('button');
+    t.querySelector('img').src = P('trap', 'smoke');
+    t.classList.toggle('rtl', Math.random() < 0.5);
+    t.style.top = rnd(16, 70) + 'vh';
+    t.hidden = false; t.classList.remove('fly');
+    if (reduced) t.style.left = rnd(8, 80) + 'vw'; else { t.style.left = ''; void t.offsetWidth; t.classList.add('fly'); }
+    clearTimeout(t._t); t._t = setTimeout(() => { t.hidden = true; }, 8000);
+    btn.onclick = () => {
+      clearTimeout(t._t); t.hidden = true;
+      const loss = S.pep * 0.25; S.pep -= loss; S.st.traps++;
+      toast('Wrong Pepe, fren!', `That one was a trap: −${fmt(loss)} game PEP (25% of your bank).`, P('wrongpep', 'scream'), 'bad');
+      checkAch(); paint(); save();
+    };
+  }
+
+  // ---------- prayer: ×4 for 45 seconds, once every 15 minutes ----------
+  const PRAY_CD = 15 * 60e3;
+  function renderPray() {
+    const b = $('pray'), img = $('prayimg'), left = (S.prayAt || 0) + PRAY_CD - now(), src = P('pray', 'peek');
+    if (img.getAttribute('src') !== src) img.src = src;
+    b.disabled = !S.started || left > 0;
+    $('praytxt').textContent = left > 0 ? `Again in ${Math.floor(left / 60000)}:${String(Math.floor(left % 60000 / 1000)).padStart(2, '0')}` : '×4 for 45 seconds';
+  }
+  $('pray').addEventListener('click', () => {
+    if (!S.started || (S.prayAt || 0) + PRAY_CD > now()) return;
+    S.prayAt = now(); S.st.prays++; addBuff('pray', '🙏 Prayer ×4', 4, 45, 'gold');
+    toast('Prayer heard', 'Everything mines ×4 for 45 seconds.', P('pray', 'peek')); renderPray(); paint(); save();
+  });
+
+  // the golden foot uses the owner's "Zord feet" picture once it is uploaded
+  function footPic() {
+    if (!picUrl.zord) return;
+    const btn = $('foot').querySelector('button');
+    btn.classList.add('pic'); btn.innerHTML = `<img src="${picUrl.zord}" alt="">`;
   }
 
   // ---------- news ticker ----------
@@ -588,6 +641,8 @@
     ['Golden foot spotted near the swamp. Witnesses describe it as "very shiny".', () => S.st.foot > 0],
     ['Muddy footprints found near the vault. Police baffled.', () => S.st.muddy > 0],
     ['Pepelord seen in chat again. Productivity soars.', () => S.st.pepelord > 0],
+    ['Someone clicked the wrong Pepe again. Check twice, fren.', () => S.st.traps > 0],
+    ['Frogs report that prayer works. Sample size: one frog.', () => S.st.prays > 0],
   ];
   const recentNews = [];
   function nextNews() {
@@ -607,9 +662,10 @@
       if (!document.hidden) S.playMs += dt * 1000;
       if (now() > S.nextFoot && $('foot').hidden) { spawnFoot(); S.nextFoot = now() + footGap(); }
       if (now() > S.nextEvent && $('event').hidden) { runEvent(); S.nextEvent = now() + rnd(120e3, 300e3); }
+      if (now() > S.nextTrap && $('trap').hidden && baseRate() > 0) { if (S.nextTrap) spawnTrap(); S.nextTrap = now() + rnd(240e3, 540e3); }
       if (S.up.printer && now() > S.nextLaunch) { launchToken(); S.nextLaunch = now() + (S.relics.rolodex ? 90e3 : 180e3); }
       rain(dt);
-      if ((slow += dt) >= 1) { slow = 0; S.st.best = Math.max(S.st.best, rate()); checkAch(); if (tab === 'stats') renderStats(); if (tab === 'fork') updateForkNumbers(); }
+      if ((slow += dt) >= 1) { slow = 0; S.st.best = Math.max(S.st.best, rate()); renderPray(); checkAch(); if (tab === 'stats') renderStats(); if (tab === 'fork') updateForkNumbers(); }
     }
     S.buffs = live();
     paint();
@@ -651,18 +707,20 @@
     $('start').hidden = true;
     const away = Math.min((S.relics.memory ? 24 : 8) * 3600e3, Date.now() - (S.lastSeen || Date.now()));
     const g = baseRate() * away / 1000;
+    if (away > 60e3) S.st.returns++;
     if (away > 60e3 && g > 0) { earn(g); setTimeout(() => toast('While you were away', `Your miners dug ${fmt(g)} game PEP.`, E('smoke')), 400); }
     schedule();
   }
   lastBlocks = Math.floor(S.total / BLOCK);
-  renderAll(); nextNews();
+  renderAll(); renderPray(); nextNews();
+  footPic();
   setInterval(loop, 100);
   setInterval(nextNews, 9000);
   setInterval(save, 5000);
   document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
   window.addEventListener('pagehide', save);
   if (/[?&]debug=1/.test(location.search)) window.__mn = {
-    S: () => S, set: (o) => { Object.assign(S, o); renderAll(); }, spawnFoot, runEvent, showEvent, fud, launchToken, hardFork, nextNews, setTab,
+    S: () => S, set: (o) => { Object.assign(S, o); renderAll(); }, spawnFoot, spawnTrap, runEvent, showEvent, fud, launchToken, hardFork, nextNews, setTab,
     buyUp: (id) => buyUp(UPGRADES.find((u) => u.id === id)), toast, E,
   };
 })();

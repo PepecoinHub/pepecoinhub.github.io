@@ -101,7 +101,7 @@
 .mn-buy .own { font-size: 1.5rem; font-weight: 700; color: var(--accent-deep); text-align: right; min-width: 2ch; }
 .mn-ach-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
 .mn-a { display: flex; gap: 8px; align-items: center; padding: 7px 9px; border-radius: 12px; border: 1px dashed var(--grid); font-size: .8rem; color: var(--muted); }
-.mn-a img { width: 30px; height: 30px; border-radius: 8px; filter: grayscale(1); opacity: .45; flex: none; }
+.mn-a img { width: 30px; height: 30px; border-radius: 8px; object-fit: cover; filter: grayscale(1); opacity: .45; flex: none; }
 .mn-a.on { border-style: solid; border-color: var(--accent); color: var(--ink); background: var(--accent-wash); }
 .mn-a.on img { filter: none; opacity: 1; }
 .mn-a b { display: block; font-size: .84rem; }
@@ -123,13 +123,13 @@
 .mn-foot.muddy button { filter: sepia(1) saturate(2.2) hue-rotate(-28deg) brightness(.55) drop-shadow(0 0 8px #6b4a2a); }
 @keyframes mnfoot { 0%, 100% { transform: translateY(0) rotate(-8deg); } 50% { transform: translateY(-12px) rotate(8deg); } }
 .mn-event { position: fixed; left: 50%; top: 132px; transform: translateX(-50%); z-index: 45; width: min(520px, calc(100vw - 32px)); background: var(--surface); border: 2px solid var(--accent); border-radius: 16px; box-shadow: var(--shadow); padding: 12px 16px; display: flex; gap: 12px; align-items: center; }
-.mn-event img { width: 52px; height: 52px; flex: none; }
+.mn-event img { width: 52px; height: 52px; object-fit: cover; flex: none; }
 .mn-event b { display: block; }
 .mn-event p { margin: 2px 0 0; font-size: .88rem; color: var(--ink-2); }
 .mn-event .btn { margin-left: auto; flex: none; }
 .mn-toasts { position: fixed; right: 16px; bottom: 16px; z-index: 50; display: grid; gap: 8px; width: min(330px, calc(100vw - 32px)); }
 .mn-toast { background: var(--surface); border: 1px solid var(--grid); border-left: 4px solid var(--accent); border-radius: 12px; box-shadow: var(--shadow); padding: 10px 12px; display: flex; gap: 10px; align-items: center; font-size: .88rem; animation: mnin .25s ease-out; }
-.mn-toast img { width: 40px; height: 40px; flex: none; }
+.mn-toast img { width: 40px; height: 40px; object-fit: cover; flex: none; }
 .mn-toast b { display: block; }
 .mn-toast.ach { border-left-color: #f6bb60; }
 .mn-toast.bad { border-left-color: var(--danger, #c9553f); }
@@ -191,3 +191,27 @@
   .mn-coin { transition: none; }
 }
 .mn-strip svg:nth-child(n+4) * { animation: none !important; }
+
+/* prayer button */
+.mn-pray { appearance: none; display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid #f6bb60; background: color-mix(in srgb, #f6bb60 18%, var(--surface)); color: var(--ink); font: inherit; cursor: pointer; text-align: left; }
+.mn-pray img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex: none; background: var(--surface-2); }
+.mn-pray b { display: block; font-size: .9rem; }
+.mn-pray small { display: block; font-size: .76rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mn-pray:not(:disabled):hover { border-color: var(--accent); }
+.mn-pray:disabled { cursor: default; border-color: var(--grid); background: var(--surface-2); }
+.mn-pray:disabled img { filter: grayscale(.8); opacity: .7; }
+.mn-up .ui img { width: 34px; height: 34px; object-fit: cover; border-radius: 8px; }
+
+/* the wrong Pepe flying by */
+.mn-trap { position: fixed; left: 0; z-index: 41; }
+.mn-trap.fly { animation: mntrap 8s linear forwards; }
+.mn-trap.rtl.fly { animation-name: mntrapr; }
+.mn-trap button { appearance: none; border: 0; background: none; padding: 4px; cursor: pointer; }
+.mn-trap img { width: 76px; height: 76px; object-fit: contain; display: block; animation: mnbob 1.2s ease-in-out infinite; }
+@keyframes mntrap { from { transform: translateX(-110px); } to { transform: translateX(calc(100vw + 20px)); } }
+@keyframes mntrapr { from { transform: translateX(calc(100vw + 20px)) scaleX(-1); } to { transform: translateX(-110px) scaleX(-1); } }
+@keyframes mnbob { 50% { transform: translateY(-12px) rotate(6deg); } }
+.mn-foot button.pic { filter: drop-shadow(0 0 12px #ffd25e); }
+.mn-foot.muddy button.pic { filter: sepia(1) saturate(2.2) hue-rotate(-28deg) brightness(.55) drop-shadow(0 0 8px #6b4a2a); }
+.mn-foot button img { width: 76px; height: 76px; object-fit: contain; display: block; }
+@media (prefers-reduced-motion: reduce) { .mn-trap img { animation: none; } }

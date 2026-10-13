@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="../facts.css?v=20261012d">
 <link rel="stylesheet" href="gry.css?v=20261013a">
-<link rel="stylesheet" href="miner.css?v=20261013b">
+<link rel="stylesheet" href="miner.css?v=20261013d">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
@@ -39,6 +39,7 @@
       <span class="mn-rate"><b id="rate">0</b> game PEP / s · <b id="hash">0 H/s</b></span>
     </div>
     <div class="mn-buffs" id="buffs" aria-live="polite"></div>
+    <button class="mn-pray" id="pray" type="button" disabled><img id="prayimg" alt=""><span><b>🙏 Pray</b><small id="praytxt">×4 for 45 seconds</small></span></button>
     <div class="mn-stage" id="stage">
       <div class="mn-scene" id="scene"></div>
       <div class="mn-rain" id="rain" aria-hidden="true"></div>
@@ -83,6 +84,7 @@
     <div class="mn-tabpanel" id="p-stats" role="tabpanel" aria-labelledby="tab-stats" hidden><dl class="mn-stats" id="stats"></dl></div>
   </section>
 
+  <div class="mn-trap" id="trap" hidden><button type="button" aria-label="A Pepe flying by"><img alt=""></button></div>
   <div class="mn-foot" id="foot" hidden><button type="button" aria-label="Golden foot: click for a bonus">🦶</button></div>
   <div class="mn-event" id="event" hidden></div>
   <div class="mn-toasts" id="toasts" aria-live="polite"></div>
@@ -105,7 +107,7 @@
   <details class="support"><summary>Like this site? You can support its further development.</summary><p>Any amount, however small, helps. Thank you!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 <script src="../chrome.js?v=20261012d" defer></script>
-<script src="js/miner-art.js?v=20261013b"></script>
-<script src="js/miner.js?v=20261013b"></script>
+<script src="js/miner-art.js?v=20261013d"></script>
+<script src="js/miner.js?v=20261013d"></script>
 </body>
 </html>
