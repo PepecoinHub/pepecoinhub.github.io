@@ -215,3 +215,5 @@
 .mn-foot.muddy button.pic { filter: sepia(1) saturate(2.2) hue-rotate(-28deg) brightness(.55) drop-shadow(0 0 8px #6b4a2a); }
 .mn-foot button img { width: 76px; height: 76px; object-fit: contain; display: block; }
 @media (prefers-reduced-motion: reduce) { .mn-trap img { animation: none; } }
+/* the site header stays at the top of the page here: a sticky bar gets in the way of the game */
+.miner-page .site-head { position: relative !important; top: 0; }
