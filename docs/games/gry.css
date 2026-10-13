@@ -677,3 +677,14 @@ details.lb #topboard-body { margin-top: 14px; }
 .st-bar i.pp { width: 40%; background: var(--accent-deep); }
 .st-bar span { position: absolute; bottom: -20px; font-size: .62rem; color: var(--muted); white-space: nowrap; transform: rotate(-35deg); transform-origin: top right; right: 50%; }
 .st-login { display: grid; gap: 12px; justify-items: start; max-width: 460px; }
+/* Start a game: 1. fren or bot  2. game  3. options */
+.tmodes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.tmode { appearance: none; font: inherit; color: var(--ink); text-align: left; cursor: pointer; display: grid; grid-template-columns: 44px 1fr; grid-template-rows: auto auto; column-gap: 12px;
+  padding: 14px 16px; border-radius: 16px; border: 2px solid var(--grid); background: var(--surface-2); }
+.tmode .tmode-ico { grid-row: 1 / span 2; font-size: 1.9rem; display: grid; place-items: center; }
+.tmode b { font-size: 1.05rem; }
+.tmode:hover { border-color: var(--accent); }
+.tmode.on { border-color: var(--accent); background: var(--accent-wash); box-shadow: 0 0 0 3px var(--accent-wash); }
+.gcards.off { opacity: .45; pointer-events: none; filter: grayscale(.6); }
+.topts-box { margin-top: 16px; padding: 16px; border-radius: 16px; border: 2px solid var(--accent); background: linear-gradient(160deg, var(--accent-wash), var(--surface) 70%); }
+.no-server .tmode-fren { display: none; }
