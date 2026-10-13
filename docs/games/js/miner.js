@@ -11,21 +11,11 @@
   const LEVEL_BONUS = 0.05;            // +5% production and clicks per fork point
   const E = (n) => `img/emotes/${n}.webp`;
 
-  // Pictures uploaded by the site owner as docs/games/img/miner-*.png|gif|webp|jpg. Until a file is found, an emote stands in.
-  const PICS = { hardfork: 'miner-hardfork', block1: 'miner-1stblock', candle: 'miner-green candle', ads: 'miner-ads', oneday: 'miner-oneday',
-    pray: 'miner-pray', laptop: 'miner-laptop', trap: 'miner-trap', wrongpep: 'miner-wrongpep', h1: 'miner-1h', b1: 'miner-1b pep',
-    h3: 'miner-3h', zord: 'miner-zord feet', k5: 'miner-5k' };
-  const EXTS = ['png', 'gif', 'webp', 'jpg', 'jpeg'];
-  const picUrl = {};
+  // Pictures from the site owner (originals in img/miner-*.*, small copies in img/miner/).
+  const PICS = { hardfork: 'hardfork', block1: '1stblock', candle: 'greencandle', ads: 'ads', oneday: 'oneday', pray: 'pray', laptop: 'laptop',
+    trap: 'trap', wrongpep: 'wrongpep', h1: '1h', b1: '1b', h3: '3h', zord: 'zordfeet', k5: '5k' };
+  const picUrl = Object.fromEntries(Object.entries(PICS).map(([k, f]) => [k, `img/miner/${f}.webp`]));
   const P = (key, emote) => picUrl[key] || E(emote);
-  let picTimer = 0;
-  function findPic(key, i = 0) {
-    if (i >= EXTS.length) return;
-    const url = `img/${encodeURIComponent(PICS[key])}.${EXTS[i]}`, im = new Image();
-    im.onload = () => { picUrl[key] = url; clearTimeout(picTimer); picTimer = setTimeout(() => { renderAll(); renderPray(); footPic(); }, 60); };
-    im.onerror = () => findPic(key, i + 1);
-    im.src = url;
-  }
 
   const MACHINES = [
     { id: 'laptop', name: 'Old laptop', plural: 'Old laptops', cost: 15, rate: 0.1, tip: 'In the first days you could still mine on an ordinary computer.',
@@ -723,7 +713,7 @@
   }
   lastBlocks = Math.floor(S.total / BLOCK);
   renderAll(); renderPray(); nextNews();
-  Object.keys(PICS).forEach((k) => findPic(k));
+  footPic();
   setInterval(loop, 100);
   setInterval(nextNews, 9000);
   setInterval(save, 5000);
