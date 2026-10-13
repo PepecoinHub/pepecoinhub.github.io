@@ -274,6 +274,25 @@
   else mount();
 })();
 
+// Our own page-view counter (games/supabase/update_page_stats.sql): the page and a random number that changes
+// every day, so one person counts once a day. No IP address, no cookie. Only on the live site.
+(function () {
+  if (location.hostname !== 'pepecoinhub.com' && location.hostname !== 'www.pepecoinhub.com') return;
+  var day = new Date().toISOString().slice(0, 10), id = '';
+  try {
+    var saved = JSON.parse(localStorage.getItem('phw-day-id') || 'null');
+    if (saved && saved.day === day) id = saved.id;
+    else { id = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now()); localStorage.setItem('phw-day-id', JSON.stringify({ day: day, id: id })); }
+  } catch (e) { id = String(Math.random()).slice(2) + Date.now(); }
+  try {
+    fetch('https://azbwciqfbsdpwubznncg.supabase.co/rest/v1/rpc/gry_pv', {
+      method: 'POST', keepalive: true,
+      headers: { 'Content-Type': 'application/json', apikey: 'sb_publishable_GRByiqlX6v67phR8xcM6VA_6eXXwTKX' },
+      body: JSON.stringify({ p_path: location.pathname, p_visitor: id })
+    }).catch(function () {});
+  } catch (e) {}
+})();
+
 // "Report a correction" links: prefill the issue form with the page the reader is on.
 (function () {
   document.querySelectorAll('a[data-correction]').forEach(function (a) {
