@@ -308,7 +308,7 @@
     let best = 'laptop'; for (const m of MACHINES) if (own(m.id)) best = m.id;
     const sc = ART.SCENE_FOR[best];
     if (sc !== sceneId) {
-      const el = $('scene'), first = !sceneId; sceneId = sc;
+      const el = $('scene'), first = !sceneId; sceneId = sc; $('stage').dataset.scene = sc;
       el.classList.add('swap');
       setTimeout(() => { el.innerHTML = ART.scene(sc); el.classList.remove('swap'); }, first ? 0 : 350);
     }
