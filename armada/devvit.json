@@ -1,0 +1,76 @@
+{
+  "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+  "name": "armada-game",
+  "post": {
+    "dir": "dist/client",
+    "entrypoints": {
+      "default": { "entry": "index.html", "height": "tall" }
+    }
+  },
+  "server": { "dir": "dist/server", "entry": "index.cjs" },
+  "permissions": { "redis": true, "realtime": true, "reddit": true },
+  "menu": {
+    "items": [
+      {
+        "label": "Start a new Armada game",
+        "description": "Posts a fresh hidden fleet for the community to sink",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/new-game"
+      }
+    ]
+  },
+  "triggers": { "onAppInstall": "/internal/on-app-install" },
+  "scheduler": {
+    "tasks": {
+      "daily-game": { "endpoint": "/internal/cron/daily", "cron": "0 15 * * *" }
+    }
+  },
+  "settings": {
+    "subreddit": {
+      "autoPost": {
+        "type": "boolean",
+        "label": "Post a new game every day (15:00 UTC)",
+        "helpText": "Turn off if you only want games started from the mod menu.",
+        "defaultValue": true
+      },
+      "theme": {
+        "type": "select",
+        "label": "Theme",
+        "options": [
+          { "label": "Classic navy", "value": "classic" },
+          { "label": "Pepe frogs", "value": "pepe" }
+        ],
+        "defaultValue": "classic"
+      },
+      "boardSize": {
+        "type": "select",
+        "label": "Board size",
+        "helpText": "Auto picks a size from your member count.",
+        "options": [
+          { "label": "Auto", "value": "auto" },
+          { "label": "8 x 8 (small)", "value": "8" },
+          { "label": "10 x 10", "value": "10" },
+          { "label": "12 x 12", "value": "12" },
+          { "label": "16 x 16 (huge)", "value": "16" }
+        ],
+        "defaultValue": "auto"
+      },
+      "sponsorNote": {
+        "type": "string",
+        "label": "Footer note (optional)",
+        "helpText": "One line shown under the board, for example a weekly prize announced by your mod team. Plain text, 280 characters."
+      },
+      "minAccountDays": {
+        "type": "number",
+        "label": "Minimum account age in days (0 = off)",
+        "helpText": "Accounts younger than this can watch but not fire. Useful if you attach prizes.",
+        "defaultValue": 0
+      }
+    }
+  },
+  "scripts": {
+    "dev": "npm run build",
+    "build": "npm run build"
+  }
+}

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Armada</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body class="theme-classic">
+<main id="app" aria-live="polite">
+  <header class="top">
+    <h1 id="title">Armada</h1>
+    <button id="expand" class="ghost" hidden>Full screen</button>
+  </header>
+  <p id="banner" class="banner" hidden></p>
+  <section class="stats" aria-label="Game stats">
+    <span><b id="st-shots">0</b> shots</span>
+    <span><b id="st-players">0</b> players</span>
+    <span><b id="st-left">0</b> ships left</span>
+  </section>
+  <div id="board" class="board" role="grid" aria-label="Sea grid"></div>
+  <section class="controls">
+    <div id="pips" class="pips" aria-label="Your shots"></div>
+    <button id="fire" class="fire" disabled>Pick a square</button>
+    <p id="timer" class="timer"></p>
+  </section>
+  <p id="msg" class="msg" role="status"></p>
+  <section class="fleet" aria-label="Fleet status"><div id="fleet"></div></section>
+  <section class="cols">
+    <div>
+      <h2>Top captains</h2>
+      <ol id="leaders" class="leaders"></ol>
+    </div>
+    <div>
+      <h2>Live</h2>
+      <ul id="feed" class="feed"></ul>
+    </div>
+  </section>
+  <p id="note" class="note"></p>
+</main>
+<script type="module" src="./main.ts"></script>
+</body>
+</html>
