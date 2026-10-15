@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Subreddit Wars</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body class="theme-classic">
+<main id="app">
+  <header class="top">
+    <h1 id="title">✊✋✌️ Subreddit Wars</h1>
+    <span id="season" class="season"></span>
+  </header>
+  <section id="news" class="news" hidden></section>
+  <section id="pick" class="pick" hidden>
+    <h2>Whose side are you on?</h2>
+    <p class="hint">Pick a subreddit to fight for. You can switch until your first throw of the week.</p>
+    <div id="chips" class="chips"></div>
+    <form id="teamform" class="teamform">
+      <label class="sr" for="teaminput">Subreddit name</label>
+      <input id="teaminput" type="text" placeholder="r/yoursubreddit" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="24">
+      <button type="submit">Join</button>
+    </form>
+  </section>
+  <section id="play" class="play" hidden>
+    <div class="who"><span id="myteam"></span><button id="changeteam" class="link" hidden>change</button></div>
+    <div class="modes" role="tablist" aria-label="Mode">
+      <button id="mode-team" class="mode on" role="tab" aria-selected="true">Team war</button>
+      <button id="mode-duel" class="mode" role="tab" aria-selected="false">Open a duel</button>
+    </div>
+    <p id="modehint" class="hint"></p>
+    <div id="moves" class="moves"></div>
+    <p id="left" class="left"></p>
+    <div id="result" class="result" hidden></div>
+  </section>
+  <p id="msg" class="msg" role="status"></p>
+  <nav class="tabs" role="tablist" aria-label="Boards">
+    <button class="tab on" data-tab="teams" role="tab">Teams</button>
+    <button class="tab" data-tab="duels" role="tab">Duels</button>
+    <button class="tab" data-tab="me" role="tab">Me</button>
+  </nav>
+  <section id="tab-teams" class="panel"></section>
+  <section id="tab-duels" class="panel" hidden></section>
+  <section id="tab-me" class="panel" hidden></section>
+  <ul id="ticker" class="ticker"></ul>
+  <p id="note" class="note"></p>
+</main>
+<script type="module" src="./main.ts"></script>
+</body>
+</html>

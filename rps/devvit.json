@@ -1,0 +1,59 @@
+{
+  "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+  "name": "rps-subwars",
+  "post": {
+    "dir": "dist/client",
+    "entrypoints": {
+      "default": { "entry": "index.html", "height": "tall" }
+    }
+  },
+  "server": { "dir": "dist/server", "entry": "index.cjs" },
+  "permissions": { "redis": true, "realtime": true, "reddit": true },
+  "menu": {
+    "items": [
+      {
+        "label": "Start a new Subreddit Wars post",
+        "description": "Posts a fresh arena (the stats carry over)",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/new-arena"
+      }
+    ]
+  },
+  "triggers": { "onAppInstall": "/internal/on-app-install" },
+  "scheduler": {
+    "tasks": {
+      "weekly-recap": { "endpoint": "/internal/cron/weekly-recap", "cron": "5 0 * * 1" }
+    }
+  },
+  "settings": {
+    "subreddit": {
+      "featuredTeams": {
+        "type": "string",
+        "label": "Suggested teams (comma separated subreddit names)",
+        "helpText": "Shown as one-tap choices. Players can still type any public, non-NSFW subreddit.",
+        "defaultValue": "pepecoin, gaming, memes, pcmasterrace, AskReddit, dogecoin"
+      },
+      "dailyThrows": {
+        "type": "number",
+        "label": "Throws per player per day",
+        "defaultValue": 5
+      },
+      "theme": {
+        "type": "select",
+        "label": "Theme",
+        "options": [
+          { "label": "Classic navy", "value": "classic" },
+          { "label": "Pepe frogs", "value": "pepe" }
+        ],
+        "defaultValue": "classic"
+      },
+      "sponsorNote": {
+        "type": "string",
+        "label": "Footer note (optional)",
+        "helpText": "One line under the arena, plain text, 280 characters."
+      }
+    }
+  },
+  "scripts": { "dev": "npm run build", "build": "npm run build" }
+}

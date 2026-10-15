@@ -5,3 +5,7 @@ __pycache__/
 armada/node_modules/
 armada/dist/
 armada/.devvit/
+
+rps/node_modules/
+rps/dist/
+rps/.devvit/
