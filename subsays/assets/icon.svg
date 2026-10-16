@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" font-family="Inter, 'Noto Sans', 'DejaVu Sans', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d1126"/><stop offset="1" stop-color="#232a66"/></linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.3" r="0.6"><stop offset="0" stop-color="#19c8b5" stop-opacity="0.35"/><stop offset="1" stop-color="#19c8b5" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#glow)"/>
+  <!-- speech bubble holding the board -->
+  <path d="M180 180 H844 a64 64 0 0 1 64 64 V700 a64 64 0 0 1 -64 64 H520 L360 900 V764 H180 a64 64 0 0 1 -64 -64 V244 a64 64 0 0 1 64 -64 Z" fill="#ffffff" fill-opacity="0.08" stroke="#19c8b5" stroke-width="14" stroke-linejoin="round"/>
+  <!-- three answers, most popular on top -->
+  <g>
+    <rect x="190" y="250" width="644" height="124" rx="40" fill="#0d1126" fill-opacity="0.7"/>
+    <rect x="190" y="250" width="560" height="124" rx="40" fill="#19c8b5" fill-opacity="0.55"/>
+    <circle cx="262" cy="312" r="40" fill="#19c8b5"/><text x="262" y="334" text-anchor="middle" font-size="60" font-weight="800" fill="#07201d">1</text>
+    <rect x="330" y="296" width="250" height="32" rx="16" fill="#ffffff"/>
+    <rect x="190" y="410" width="644" height="124" rx="40" fill="#0d1126" fill-opacity="0.7"/>
+    <rect x="190" y="410" width="400" height="124" rx="40" fill="#19c8b5" fill-opacity="0.4"/>
+    <circle cx="262" cy="472" r="40" fill="#19c8b5"/><text x="262" y="494" text-anchor="middle" font-size="60" font-weight="800" fill="#07201d">2</text>
+    <rect x="330" y="456" width="190" height="32" rx="16" fill="#ffffff"/>
+    <rect x="190" y="570" width="644" height="124" rx="40" fill="#0d1126" fill-opacity="0.7"/>
+    <circle cx="262" cy="632" r="40" fill="none" stroke="#19c8b5" stroke-width="10"/><text x="262" y="654" text-anchor="middle" font-size="60" font-weight="800" fill="#19c8b5">3</text>
+    <text x="360" y="654" font-size="64" font-weight="800" fill="#6f7bb5" letter-spacing="10">? ? ?</text>
+  </g>
+</svg>

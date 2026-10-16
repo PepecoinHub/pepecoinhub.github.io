@@ -4,11 +4,20 @@
   "post": {
     "dir": "dist/client",
     "entrypoints": {
-      "default": { "entry": "index.html", "height": "tall" }
+      "default": {
+        "entry": "index.html",
+        "height": "tall"
+      }
     }
   },
-  "server": { "dir": "dist/server", "entry": "index.cjs" },
-  "permissions": { "redis": true, "reddit": true },
+  "server": {
+    "dir": "dist/server",
+    "entry": "index.cjs"
+  },
+  "permissions": {
+    "redis": true,
+    "reddit": true
+  },
   "menu": {
     "items": [
       {
@@ -27,12 +36,22 @@
       }
     ]
   },
-  "forms": { "hideForm": "/internal/form/hide" },
-  "triggers": { "onAppInstall": "/internal/on-app-install" },
+  "forms": {
+    "hideForm": "/internal/form/hide"
+  },
+  "triggers": {
+    "onAppInstall": "/internal/on-app-install"
+  },
   "scheduler": {
     "tasks": {
-      "daily": { "endpoint": "/internal/cron/daily", "cron": "0 15 * * *" },
-      "weekly-recap": { "endpoint": "/internal/cron/weekly-recap", "cron": "5 0 * * 1" }
+      "daily": {
+        "endpoint": "/internal/cron/daily",
+        "cron": "0 15 * * *"
+      },
+      "weekly-recap": {
+        "endpoint": "/internal/cron/weekly-recap",
+        "cron": "5 0 * * 1"
+      }
     }
   },
   "settings": {
@@ -48,18 +67,54 @@
         "label": "Question category",
         "helpText": "Built-in questions fit this topic. Your own questions below always come first.",
         "options": [
-          { "label": "General", "value": "general" },
-          { "label": "Food", "value": "food" },
-          { "label": "Gaming", "value": "gaming" },
-          { "label": "Movies and TV", "value": "movies" },
-          { "label": "Music", "value": "music" },
-          { "label": "Sports", "value": "sports" },
-          { "label": "Travel", "value": "travel" },
-          { "label": "Tech", "value": "tech" },
-          { "label": "Crypto", "value": "crypto" },
-          { "label": "Fitness", "value": "fitness" },
-          { "label": "Pets", "value": "pets" },
-          { "label": "Memes", "value": "memes" }
+          {
+            "label": "General",
+            "value": "general"
+          },
+          {
+            "label": "Food",
+            "value": "food"
+          },
+          {
+            "label": "Gaming",
+            "value": "gaming"
+          },
+          {
+            "label": "Movies and TV",
+            "value": "movies"
+          },
+          {
+            "label": "Music",
+            "value": "music"
+          },
+          {
+            "label": "Sports",
+            "value": "sports"
+          },
+          {
+            "label": "Travel",
+            "value": "travel"
+          },
+          {
+            "label": "Tech",
+            "value": "tech"
+          },
+          {
+            "label": "Crypto",
+            "value": "crypto"
+          },
+          {
+            "label": "Fitness",
+            "value": "fitness"
+          },
+          {
+            "label": "Pets",
+            "value": "pets"
+          },
+          {
+            "label": "Memes",
+            "value": "memes"
+          }
         ],
         "defaultValue": "general"
       },
@@ -73,9 +128,18 @@
         "label": "Round length",
         "helpText": "How long people can answer, and then guess. Small subs do better with 48 or 72 hours.",
         "options": [
-          { "label": "24 hours (a new question every day)", "value": "24" },
-          { "label": "48 hours", "value": "48" },
-          { "label": "72 hours", "value": "72" }
+          {
+            "label": "24 hours (a new question every day)",
+            "value": "24"
+          },
+          {
+            "label": "48 hours",
+            "value": "48"
+          },
+          {
+            "label": "72 hours",
+            "value": "72"
+          }
         ],
         "defaultValue": "24"
       },
@@ -90,9 +154,18 @@
         "label": "Board size",
         "helpText": "Auto uses 5 answers, and 8 once 200 people have answered.",
         "options": [
-          { "label": "Auto", "value": "auto" },
-          { "label": "5 answers", "value": "5" },
-          { "label": "8 answers", "value": "8" }
+          {
+            "label": "Auto",
+            "value": "auto"
+          },
+          {
+            "label": "5 answers",
+            "value": "5"
+          },
+          {
+            "label": "8 answers",
+            "value": "8"
+          }
         ],
         "defaultValue": "auto"
       },
@@ -100,8 +173,14 @@
         "type": "select",
         "label": "Theme",
         "options": [
-          { "label": "Classic", "value": "classic" },
-          { "label": "Pepe frogs", "value": "pepe" }
+          {
+            "label": "Classic",
+            "value": "classic"
+          },
+          {
+            "label": "Pepe frogs",
+            "value": "pepe"
+          }
         ],
         "defaultValue": "classic"
       },
@@ -112,5 +191,11 @@
       }
     }
   },
-  "scripts": { "dev": "npm run build", "build": "npm run build" }
+  "scripts": {
+    "dev": "npm run build",
+    "build": "npm run build"
+  },
+  "marketingAssets": {
+    "icon": "assets/icon.png"
+  }
 }

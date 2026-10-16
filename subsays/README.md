@@ -96,3 +96,7 @@ Nie miałem dostępu do Reddita. Sprawdzone: typy zgodne z SDK 0.14.8, build, `d
 - Wynik jako komentarz od gracza jednym przyciskiem (wymaga zgody gracza przez `runAs: USER`).
 - Pytania zgłaszane i głosowane przez społeczność.
 - Ranking między subami (wymaga serwera).
+
+## Grafiki
+
+`assets/icon.png` (1024×1024, poniżej 500 KB) to ikona aplikacji ustawiona w `devvit.json` (`marketingAssets.icon`). `assets/banner.png` (1200×630) nadaje się do posta w r/Devvit i do udostępniania. Źródła są w SVG (`icon.svg`, `banner.svg`), więc łatwo je przerobić na własną szatę graficzną: po zmianie wyeksportuj PNG w tych samych wymiarach, a ikonę zmniejsz poniżej 500 KB.
