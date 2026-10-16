@@ -16,8 +16,8 @@ Runda trwa dwa okna po 24 godziny (długość ustawia moderator: 24, 48 albo 72 
 - **Scalanie:** wielkość liter, akcenty, przedimki (a/an/the), liczba mnoga i kolejność słów są ignorowane ("Sandwiches" = "a sandwich", "fries, french" = "French fries"). Literówki scala się tylko przy słowach od 6 liter i tylko przy tej samej pierwszej literze (tennis/tenis, ale nie mouse/house).
 - **Plansza:** odpowiedź wchodzi, gdy podały ją **co najmniej 3 różne osoby**. 5 odpowiedzi, a od 200 osób, które odpowiedziały, 8 (moderator może wymusić 5 lub 8). Poniżej 3 odpowiedzi spełniających próg albo poniżej minimalnej liczby osób (domyślnie 20) runda jest pomijana i aplikacja to mówi.
 - **Zgadywanie po jednej odpowiedzi:** wpisujesz jedną, od razu widzisz, czy jest na tablicy (trafiona odsłania swój rząd na właściwym miejscu), i dopiero potem wpisujesz następną. 3 próby; pudło zużywa próbę. Powtórzenie czegoś, co już sprawdziłeś (także innym zapisem), nic nie kosztuje. Cała tablica pokazuje się po ostatniej próbie.
-- **Punkty:** 5 za odpowiedź. Za zgadnięcie: tyle punktów, ile procent osób podało trafioną odpowiedź (62% = 62 pkt). Dwa zapisy tej samej odpowiedzi liczą się raz.
-- **Ranking:** tydzień (poniedziałek 00:00 UTC), seria dni z rzędu (🔥), poniedziałkowy komentarz z podium.
+- **Punkty:** **+10 za wysłanie 3 odpowiedzi.** **Bonus „crowd”:** każda z twoich odpowiedzi, która trafia na tablicę, daje połowę swojego procentu (odpowiedź podana przez 50% osób to +25). Bonus wypłaca się raz, gdy gracz wchodzi do gry po zamknięciu zbierania (nic ciężkiego nie dzieje się przy zamknięciu rundy), i dopisuje się do tygodnia, w którym gracz wszedł. **Za zgadnięcie:** tyle punktów, ile procent osób podało trafioną odpowiedź (62% = 62 pkt). Dwa zapisy tej samej odpowiedzi liczą się raz.
+- **Ranking:** top 20 tygodnia i top 20 wszech czasów, a jeśli gracza nie ma na liście, jego wiersz z miejscem i punktami pokazuje się pod spodem. Do tego seria dni z rzędu (🔥) i poniedziałkowy komentarz z podium. Zbieranie odpowiedzi jest otwarte dla wszystkich (bez limitu liczby ankietowanych): udział każdego to sedno gry, a procent liczy się z faktycznej liczby osób.
 - **Wynik do wklejenia** jak w Wordle: `🟩🟨⬜ 100 pts` (zielone: najpopularniejsza odpowiedź, żółte: odpowiedź z tablicy, szare: pudło). Przycisk kopiuje tekst do schowka.
 - **Komentarze aplikacji:** pod każdym nowym postem "jak grać" plus wczorajsza tablica (aplikacja próbuje go przypiąć, co działa tylko jeśli jest moderatorem), pod zakończoną rundą komentarz z tablicą końcową.
 
@@ -45,7 +45,7 @@ Node 22+.
 ```bash
 cd subsays
 npm install
-npm test             # 18 testów: scalanie odpowiedzi, pełna runda, wyścigi, serie, ukrywanie
+npm test             # 20 testów: scalanie odpowiedzi, pełna runda, wyścigi, serie, ukrywanie
 npm run typecheck
 SEED=1 npm run local # lokalnie, bez Reddita: http://localhost:5175/as/alice
 ```
@@ -74,14 +74,14 @@ Zasady i prywatność (potrzebne przy publikacji, bo aplikacja przechowuje nazwy
 | `src/shared/time.ts` | Tydzień ISO i doba w UTC. |
 | `src/server/rounds.ts` | Autorytatywna logika: runda, odpowiedzi, klastry, tablica, zgadywanie, punkty, serie, ukrywanie. Rozmawia z bazą przez mały interfejs `KV`, więc działa na Devvit Redis i w pamięci (testy). |
 | `src/server/index.ts` | Trasy Express, tworzenie postów i komentarzy, zadania cykliczne, menu moderatora. |
-| `src/client/` | Interfejs: intro, zgadywanie, odpowiadanie, tablica, ranking. |
+| `src/client/` | Interfejs: kroki 1 i 2 (zgadnij wczorajsze, odpowiedz na dzisiejsze), kafelki z wynikiem, zwijane karty, ranking, zakładka z zasadami. Zasady to wąski pasek pod tytułem, a nie osobny ekran. |
 | `tools/local.ts` | Symulator z botami i przesuwanym zegarem. |
 
 Tablica rundy jest zamrażana raz (`hSetNX`), więc wszyscy gracze widzą tę samą tablicę, a przy równoczesnych odpowiedziach ta sama odpowiedź ląduje w jednym klastrze (test: 30 osób naraz).
 
 ## Czego nie sprawdziłem
 
-Nie miałem dostępu do Reddita. Sprawdzone: typy zgodne z SDK 0.14.8, build, `devvit.json` względem schematu, testy logiki oraz cała ścieżka w przeglądarce na symulatorze (intro, zgadywanie z literówką, autouzupełnianie, blokada drugiej odpowiedzi, przesunięcie zegara, archiwum starego posta). Do obejrzenia przy pierwszym `playtest`:
+Nie miałem dostępu do Reddita. Sprawdzone: typy zgodne z SDK 0.14.8, build, `devvit.json` względem schematu, testy logiki oraz cała ścieżka w przeglądarce na symulatorze (zgadywanie z literówką, autouzupełnianie, blokada drugiej odpowiedzi, przesunięcie zegara, archiwum starego posta). Do obejrzenia przy pierwszym `playtest`:
 
 1. Czy konto aplikacji może przypiąć komentarz (`distinguish`); jeśli nie, komentarz jest zwykły.
 2. Kształt danych formularza "hide an answer" (kod przyjmuje `text` albo `values.text`).

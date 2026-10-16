@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { HOUR } from '../src/shared/time.js';
 import { pickQuestion } from '../src/shared/questions.js';
-import { dailyTick, finalBoard, getState, markIntroSeen, openRound, setPost, submitAnswers, submitGuess, suggest, usedQuestions } from '../src/server/rounds.js';
+import { dailyTick, finalBoard, getState, openRound, setPost, submitAnswers, submitGuess, suggest, usedQuestions } from '../src/server/rounds.js';
 import { FakeKV } from '../test/fake-kv.js';
 
 const kv = new FakeKV();
@@ -91,12 +91,6 @@ app.post('/api/guess', async (req, res) => {
   const { uid, name } = user(req);
   res.json(await submitGuess(kv, { uid, name, n: req.body?.n, guess: req.body?.guess, now: now(), sub: SUB }));
 });
-app.post('/api/intro', async (req, res) => {
-  const { uid } = user(req);
-  if (uid) await markIntroSeen(kv, uid);
-  res.json({ ok: true });
-});
-
 app.get(['/', '/index.html'], (_req, res) => {
   const html = readFileSync(resolve('dist/client/index.html'), 'utf8').replace('<head>', '<head><script>window.devvit={}</script>');
   res.type('html').send(html);

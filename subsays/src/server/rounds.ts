@@ -3,6 +3,7 @@
 import {
   type AnswerResponse,
   type ArchiveView,
+  type BonusNote,
   type BoardRow,
   type CollectView,
   type GuessEntry,
@@ -42,7 +43,8 @@ export interface KV {
 export const MIN_SUPPORT = 3; // an answer needs this many different people to reach the board
 export const NEEDED_ANSWERS = 3; // a player gives exactly this many different answers
 export const MAX_GUESSES = 3;
-export const PARTICIPATION_POINTS = 5;
+export const ANSWER_POINTS = 10;
+export const BONUS_SHARE = 0.5; // an answer that makes the board earns this share of its percentage
 const LOCK_STALE_MS = 4000;
 
 const R = (n: number) => `ss:r:${n}`;
@@ -61,6 +63,8 @@ const K = {
   cu: (n: number) => `${R(n)}:cu`, // `${id}:${uid}` -> 1, counts each person once per cluster
   hid: (n: number) => `${R(n)}:hid`, // hidden cluster ids
   g: (n: number) => `${R(n)}:g`, // uid -> guess result
+  ua: (n: number) => `${R(n)}:ua`, // uid -> cluster ids of the player's answers
+  sett: (n: number) => `${R(n)}:sett`, // uid -> crowd bonus already paid
 };
 
 // ---------- rounds ----------
@@ -169,9 +173,10 @@ export async function submitAnswers(kv: KV, i: AnswerInput): Promise<AnswerRespo
       if (await kv.hSetNX(K.cu(round.n), `${id}:${uid}`, '1')) await kv.hIncrBy(K.cn(round.n), id, 1);
       await kv.hIncrBy(K.cv(round.n), `${id}|${c.text}`, 1);
     }
+    await kv.hSet(K.ua(round.n), { [uid]: JSON.stringify(ids) });
     await kv.hSet(K.names, { [uid]: name });
-    await credit(kv, uid, PARTICIPATION_POINTS, now);
-    return { ok: true, accepted: NEEDED_ANSWERS, points: PARTICIPATION_POINTS, streak: await touch(kv, uid, now) };
+    await credit(kv, uid, ANSWER_POINTS, now);
+    return { ok: true, accepted: NEEDED_ANSWERS, points: ANSWER_POINTS, streak: await touch(kv, uid, now) };
   } finally {
     await kv.hDel(K.lock, [uid]);
   }
@@ -294,6 +299,33 @@ export async function submitGuess(kv: KV, i: GuessInput): Promise<GuessResponse>
   }
 }
 
+
+// ---------- crowd bonus ----------
+
+/**
+ * Pays, once per round, half the percentage of each of the player's answers that reached the board.
+ * It runs when the player opens the game, so nothing heavy happens when a round closes.
+ */
+async function settleBonuses(kv: KV, uid: string, now: number): Promise<BonusNote[]> {
+  const notes: BonusNote[] = [];
+  for (const r of await recentRounds(kv, 4)) {
+    const ph = phaseOf(r, now);
+    if (ph !== 'guess' && ph !== 'done') continue;
+    const raw = await kv.hGet(K.ua(r.n), uid);
+    if (!raw || (await kv.hGet(K.sett(r.n), uid))) continue;
+    const res = await frozenResult(kv, r, now);
+    if (!res || !(await kv.hSetNX(K.sett(r.n), uid, '1'))) continue;
+    if (res.void) continue;
+    const ids = JSON.parse(raw) as string[];
+    const hits = res.board.filter((e) => ids.includes(e.id)).map((e) => ({ text: e.text, pct: e.pct }));
+    if (!hits.length) continue;
+    const points = hits.reduce((sum, h) => sum + Math.round(h.pct * BONUS_SHARE), 0);
+    await credit(kv, uid, points, now);
+    notes.push({ n: r.n, points, hits });
+  }
+  return notes;
+}
+
 // ---------- points and streaks ----------
 
 async function credit(kv: KV, uid: string, points: number, now: number) {
@@ -405,8 +437,9 @@ export async function getState(kv: KV, o: StateOpts): Promise<State> {
     sponsorNote: o.sponsorNote,
     week,
     weekEndsAt: weekEnd(now),
-    weekly: await weeklyTop(kv, week, 10),
-    me: { loggedIn: !!uid, name: o.name, streak: 0, weekPoints: 0, seenIntro: false },
+    weekly: await weeklyTop(kv, week, 20),
+    allTime: await weeklyTop(kv, 'all', 20),
+    me: { loggedIn: !!uid, name: o.name, streak: 0, weekPoints: 0, allPoints: 0, bonus: [] },
     nextRoundAt: rounds[0] ? rounds[0].openAt + rounds[0].interval : undefined,
   };
 
@@ -461,18 +494,25 @@ export async function getState(kv: KV, o: StateOpts): Promise<State> {
   }
 
   if (uid) {
-    const [u, score, rank, card] = await Promise.all([
+    state.me.bonus = await settleBonuses(kv, uid, now);
+    const [u, score, rank, card, allScore, allRank, allCard] = await Promise.all([
       kv.hGetAll(K.user(uid)),
       kv.zScore(K.lb(week), uid),
       kv.zRank(K.lb(week), uid),
       kv.zCard(K.lb(week)),
+      kv.zScore(K.lb('all'), uid),
+      kv.zRank(K.lb('all'), uid),
+      kv.zCard(K.lb('all')),
     ]);
     const today = dayKey(now);
     const alive = u['lastDay'] === today || u['lastDay'] === dayKey(now - 24 * HOUR);
     state.me.streak = alive ? Number(u['streak'] ?? 0) : 0;
     state.me.weekPoints = score ?? 0;
     if (score !== undefined && rank !== undefined) state.me.weekRank = card - rank;
-    state.me.seenIntro = u['intro'] === '1';
+    state.me.allPoints = allScore ?? 0;
+    if (allScore !== undefined && allRank !== undefined) state.me.allRank = allCard - allRank;
+    state.weekly = await weeklyTop(kv, week, 20); // after the bonus, so the board is current
+    state.allTime = await weeklyTop(kv, 'all', 20);
   }
   return state;
 }

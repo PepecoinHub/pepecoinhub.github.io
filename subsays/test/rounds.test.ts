@@ -125,7 +125,12 @@ test('a round from first answer to final board', async () => {
   assert.deepEqual(after.weekly[0], { name: 'name_g1', points: 110 });
   assert.equal(after.me.weekPoints, 110);
   assert.equal(after.me.weekRank, 1);
-  assert.equal((await state(kv, 'u0')).me.weekPoints, 5);
+  // u0 answered Pepperoni (50%) and Mushrooms (40%): 10 for answering + half of each percentage as the crowd bonus.
+  const u0 = await state(kv, 'u0');
+  assert.equal(u0.me.weekPoints, 10 + 25 + 20);
+  assert.deepEqual(u0.me.bonus, [{ n: 1, points: 45, hits: [{ text: 'Pepperoni', pct: 50 }, { text: 'Mushrooms', pct: 40 }] }]);
+  assert.deepEqual((await state(kv, 'u0')).me.bonus, [], 'the bonus is paid once');
+  assert.equal((await state(kv, 'u0')).me.weekPoints, 55);
 
   assert.deepEqual(await guess(kv, 'late', 'pepperoni', 1, T0 + 2 * DAY + 1), { ok: false, error: 'closed' }, 'guessing ends after a second interval');
 });
@@ -267,4 +272,42 @@ test('a player who is not logged in can look but not play', async () => {
   assert.equal(s.collect?.answered, false);
   assert.deepEqual(await ans(kv, undefined, ['pizza', 'tacos', 'sushi']), { ok: false, error: 'login' });
   assert.deepEqual(await guess(kv, undefined, 'pizza'), { ok: false, error: 'login' });
+});
+
+test('answers that miss the board earn no bonus, and a skipped round pays nothing', async () => {
+  const kv = new FakeKV();
+  await newRound(kv);
+  await survey(kv);
+  const u17 = await state(kv, 'u17'); // only gave one-off answers
+  assert.deepEqual(u17.me.bonus, []);
+  assert.equal(u17.me.weekPoints, 10);
+  const kv2 = new FakeKV();
+  await newRound(kv2);
+  for (let u = 0; u < 3; u++) await ans(kv2, `u${u}`, ['pizza', 'tacos', 'sushi']);
+  assert.deepEqual((await state(kv2, 'u0')).me.bonus, []);
+  assert.equal((await state(kv2, 'u0')).me.weekPoints, 10);
+});
+
+test('standings show the top 20 and the player below if they are not in it', async () => {
+  const kv = new FakeKV();
+  await newRound(kv);
+  for (let u = 0; u < 25; u++) await ans3(kv, `p${String(u).padStart(2, '0')}`, ['pizza', 'tacos', 'sushi']);
+  // 25 players, each 10 points for answering; give the first five more by guessing.
+  const s = await state(kv, 'p24', T0 + 1000);
+  assert.equal(s.weekly.length, 20);
+  assert.equal(s.allTime.length, 20);
+  assert.ok(!s.weekly.some((r) => r.name === 'name_p24') || s.me.weekRank! <= 20);
+  assert.equal(s.me.weekPoints, 10);
+  assert.ok(s.me.weekRank! >= 1 && s.me.weekRank! <= 25);
+  assert.equal(s.me.allPoints, 10);
+  assert.equal(s.me.allRank, s.me.weekRank);
+  const next = await state(kv, 'visitor', T0 + 8 * DAY);
+  assert.equal(next.weekly.length, 0, 'the weekly board starts again');
+  assert.equal(next.allTime.length, 20, 'all time keeps everything');
+  assert.equal(next.me.weekPoints, 0);
+  assert.equal(next.me.allPoints, 0);
+  // A crowd bonus is paid when the player next opens the game, so it lands in that week.
+  const late = await state(kv, 'p00', T0 + 8 * DAY);
+  assert.equal(late.me.bonus[0]?.points, 150);
+  assert.equal(late.me.weekPoints, 150);
 });

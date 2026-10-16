@@ -13,6 +13,9 @@ export type GuessResult = {
 
 export type LeaderRow = { name: string; points: number };
 
+/** Points earned later because answers made the board. */
+export type BonusNote = { n: number; points: number; hits: { text: string; pct: number }[] };
+
 export type CollectView = {
   n: number;
   question: string;
@@ -53,13 +56,16 @@ export type State = {
   guess?: GuessView;
   archive?: ArchiveView; // the post's own round once it is over, or the latest finished one
   weekly: LeaderRow[];
+  allTime: LeaderRow[];
   me: {
     loggedIn: boolean;
     name?: string;
     streak: number;
     weekPoints: number;
     weekRank?: number;
-    seenIntro: boolean;
+    allPoints: number;
+    allRank?: number;
+    bonus: BonusNote[]; // crowd bonuses that were settled by this request
   };
   nextRoundAt?: number;
 };

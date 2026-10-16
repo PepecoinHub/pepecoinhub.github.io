@@ -13,7 +13,6 @@ import {
   lastOpenAt,
   latestPostId,
   loadRound,
-  markIntroSeen,
   openRound,
   setPost,
   submitAnswers,
@@ -111,11 +110,6 @@ app.post<object, GuessResponse | { error: string }, { n?: number; guess?: string
   }
 });
 
-app.post('/api/intro', async (_req, res) => {
-  if (context.userId) await markIntroSeen(kv, context.userId);
-  res.json({ ok: true });
-});
-
 // ---------- posts and comments ----------
 
 const sentence = (q: string) => q.replace(/\.$/, '');
@@ -124,9 +118,9 @@ function howToText(n: number, sub: string, last?: { n: number; q: string; board:
   const lines = [
     `**Sub Says #${n}: how to play**`,
     '',
-    `1. **Answer today's question** with 3 different answers. It takes 10 seconds.`,
+    `1. **Answer today's question** with 3 different answers. It takes 10 seconds and earns 10 points.`,
     `2. **Come back tomorrow** and guess what r/${sub} said, one guess at a time. Three tries.`,
-    `3. **Score what the crowd scored.** If 41% of people said "sandwiches" and you guessed it, you get 41 points. Answers need at least 3 people to make the board.`,
+    `3. **Score what the crowd scored.** If 41% of people said "sandwiches" and you guessed it, you get 41 points. Your own answers that reach the board earn a crowd bonus (half their percentage). Answers need at least 3 people to make the board.`,
     '',
     'Weekly standings are posted every Monday. Share your result below: 🟩 top answer, 🟨 on the board, ⬜ miss.',
   ];

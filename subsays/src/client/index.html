@@ -9,29 +9,26 @@
 <body class="theme-classic">
 <main id="app">
   <header class="top">
-    <div>
+    <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="var(--accent)"/><rect x="9" y="10" width="30" height="7" rx="3.5" fill="#fff"/><rect x="9" y="21" width="21" height="7" rx="3.5" fill="#fff" fill-opacity=".8"/><rect x="9" y="32" width="13" height="7" rx="3.5" fill="#fff" fill-opacity=".55"/></svg>
+    <div class="titles">
       <h1 id="title">Sub Says</h1>
       <p id="sub" class="subline"></p>
     </div>
-    <div class="chips">
-      <span id="streak" class="chip" hidden></span>
-      <button id="help" class="chip btn" aria-label="How to play">?</button>
-    </div>
+    <span id="streak" class="streak" hidden></span>
   </header>
 
-  <section id="intro" class="intro" hidden>
-    <div class="cards" id="introcards"></div>
-    <button id="introgo" class="primary">Let's play</button>
-  </section>
+  <button id="how" class="howbar" type="button"><span class="h">How to play</span><span class="s">1 question a day · 3 answers · guess the board</span><span class="go">›</span></button>
 
-  <section id="guess" class="block" hidden></section>
-  <section id="collect" class="block" hidden></section>
-  <section id="nothing" class="block" hidden></section>
+  <section id="stats" class="stats" hidden></section>
+  <section id="bonus"></section>
+  <section id="step1" class="card" hidden></section>
+  <section id="step2" class="card" hidden></section>
+  <section id="none" class="card" hidden></section>
 
   <nav class="tabs" role="tablist" aria-label="More">
-    <button class="tab on" data-tab="standings" role="tab">This week</button>
+    <button class="tab on" data-tab="standings" role="tab">Standings</button>
     <button class="tab" data-tab="board" role="tab">Last board</button>
-    <button class="tab" data-tab="how" role="tab">How to play</button>
+    <button class="tab" data-tab="how" id="tabhow" role="tab">How to play</button>
   </nav>
   <section id="tab-standings" class="panel"></section>
   <section id="tab-board" class="panel" hidden></section>
