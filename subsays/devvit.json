@@ -33,11 +33,19 @@
         "location": "subreddit",
         "forUserType": "moderator",
         "endpoint": "/internal/menu/hide"
+      },
+      {
+        "label": "Sub Says: reset everything (testing)",
+        "description": "Start again from zero with a fresh first round",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/reset"
       }
     ]
   },
   "forms": {
-    "hideForm": "/internal/form/hide"
+    "hideForm": "/internal/form/hide",
+    "resetForm": "/internal/form/reset"
   },
   "triggers": {
     "onAppInstall": "/internal/on-app-install"

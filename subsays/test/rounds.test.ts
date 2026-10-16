@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { dailyTick, finalBoard, getState, hideAnswer, openRound, setPost, submitAnswers, submitGuess, suggest } from '../src/server/rounds.js';
+import { cachedPrefix, withEpoch } from '../src/server/epoch.js';
 import { FakeKV } from './fake-kv.js';
 
 const DAY = 86_400_000;
@@ -348,4 +349,22 @@ test('testing mode lifts the one-try limits and lets a single tester build a boa
   const again = await g('yellow');
   assert.ok(again.ok && !again.done && again.result.guesses.length === 1, 'testing: a new attempt starts');
   assert.equal((await state(kv, 'me', T0 + DAY + 2000, undefined, T)).testMode, true);
+});
+
+test('a reset switches to an empty store and leaves the old data alone', async () => {
+  const raw = new FakeKV();
+  const prefix = cachedPrefix(async () => undefined, 1e12);
+  const kv = withEpoch(raw, prefix.get);
+  await openRound(kv, { q: 'Name a color.', now: T0, intervalMs: DAY, minPlayers: 1, cap: 'auto' });
+  for (let u = 0; u < 3; u++) await submitAnswers(kv, { uid: `u${u}`, name: `n${u}`, n: 1, answers: ['red', 'blue', 'green'], now: T0 + 1000 });
+  assert.equal((await getState(kv, { ...opts, uid: 'u0', now: T0 + 2000 })).weekly.length, 3);
+  assert.ok([...raw.hashes.keys()].every((k) => k.startsWith('ss:')), 'the default prefix leaves the keys as they were');
+
+  prefix.set('e2:');
+  const fresh = await getState(kv, { ...opts, uid: 'u0', now: T0 + 3000 });
+  assert.equal(fresh.weekly.length, 0);
+  assert.equal(fresh.collect, undefined);
+  assert.equal(await openRound(kv, { q: 'Name a pet.', now: T0 + 4000, intervalMs: DAY, minPlayers: 1, cap: 'auto' }), 1, 'round numbers start again');
+  assert.ok([...raw.hashes.keys()].some((k) => k.startsWith('e2:ss:')));
+  assert.ok((await submitAnswers(kv, { uid: 'u0', name: 'n0', n: 1, answers: ['cat', 'dog', 'fish'], now: T0 + 5000 })).ok, 'the same player can play the new round');
 });

@@ -41,7 +41,7 @@ W ustawieniach aplikacji w subie testowym włącz **Testing mode** i ustaw **Rou
 | Theme | Classic (lub Pepe frogs) |
 | Footer note | puste |
 
-Menu moderatora: **Sub Says: start a new round now** (nie częściej niż co 6 godzin) i **Sub Says: hide an answer** (usuwa odpowiedź z trwających rund: podpowiedzi, tablicy i punktacji).
+Menu moderatora: **Sub Says: start a new round now** (nie częściej niż co 6 godzin, w trybie testowym bez limitu), **Sub Says: reset everything (testing)** (wpisujesz RESET: czyści rundy, odpowiedzi i punkty, a stare dane zostają nieużywane pod innym prefiksem, i od razu zakłada nową pierwszą rundę) i **Sub Says: hide an answer** (usuwa odpowiedź z trwających rund: podpowiedzi, tablicy i punktacji).
 
 Biblioteka ma ok. 160 pytań: 28 ogólnych plus 10–14 w każdej kategorii, czyli około 40 dni na kategorię. Potem pytania wracają, zaczynając od używanego najdawniej. Własne pytania moderatora mają pierwszeństwo.
 

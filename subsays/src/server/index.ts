@@ -3,6 +3,7 @@ import { context, createServer, getServerPort, reddit, redis, settings } from '@
 import type { AnswerResponse, GuessResponse, State, SuggestResponse } from '../shared/api.js';
 import { type Category, CATEGORIES, pickQuestion } from '../shared/questions.js';
 import { HOUR, weekKey } from '../shared/time.js';
+import { cachedPrefix, withEpoch } from './epoch.js';
 import {
   type BoardCap,
   type KV,
@@ -22,7 +23,9 @@ import {
   weeklyTop,
 } from './rounds.js';
 
-const kv: KV = redis;
+const raw: KV = redis;
+const prefix = cachedPrefix(() => redis.get('ss:epoch'));
+const kv: KV = withEpoch(raw, prefix.get);
 
 const app = express();
 app.use(express.json());
@@ -198,6 +201,35 @@ app.post('/internal/menu/new-round', async (_req, res) => {
   } catch (e) {
     console.error('menu new-round failed', e);
     return res.json({ showToast: 'Could not create the round. Check the app logs.' });
+  }
+});
+
+app.post('/internal/menu/reset', (_req, res) => {
+  res.json({
+    showForm: {
+      name: 'resetForm',
+      form: {
+        title: 'Reset Sub Says',
+        description: 'Starts again from zero: rounds, answers, points and standings are cleared, and a new first round is posted. Old posts stay but stop working. Meant for testing.',
+        acceptLabel: 'Reset',
+        fields: [{ type: 'string', name: 'confirm', label: 'Type RESET to confirm', required: true }],
+      },
+    },
+  });
+});
+
+app.post<object, object, { confirm?: string; values?: { confirm?: string } }>('/internal/form/reset', async (req, res) => {
+  try {
+    const word = String(req.body?.confirm ?? req.body?.values?.confirm ?? '').trim().toUpperCase();
+    if (word !== 'RESET') return res.json({ showToast: 'Nothing was reset. Type RESET to confirm.' });
+    const fresh = `e${Date.now()}:`;
+    await redis.set('ss:epoch', fresh);
+    prefix.set(fresh);
+    const { post } = await startRound();
+    return res.json({ navigateTo: post.url, showToast: { text: 'Reset done. A new first round is live.', appearance: 'success' } });
+  } catch (e) {
+    console.error('reset failed', e);
+    return res.json({ showToast: 'Could not reset. Check the app logs.' });
   }
 });
 
