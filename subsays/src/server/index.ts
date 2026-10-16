@@ -17,7 +17,7 @@ import {
   openRound,
   setPost,
   submitAnswers,
-  submitGuesses,
+  submitGuess,
   suggest,
   usedQuestions,
   weeklyTop,
@@ -101,10 +101,10 @@ app.post<object, AnswerResponse | { error: string }, { n?: number; answers?: str
   }
 });
 
-app.post<object, GuessResponse | { error: string }, { n?: number; guesses?: string[] }>('/api/guess', async (req, res) => {
+app.post<object, GuessResponse | { error: string }, { n?: number; guess?: string }>('/api/guess', async (req, res) => {
   try {
     const { uid, name } = await me();
-    res.json(await submitGuesses(kv, { uid, name, n: req.body?.n, guesses: req.body?.guesses, now: Date.now(), sub: context.subredditName }));
+    res.json(await submitGuess(kv, { uid, name, n: req.body?.n, guess: req.body?.guess, now: Date.now(), sub: context.subredditName }));
   } catch (e) {
     console.error('guess failed', e);
     res.status(500).json({ error: 'guess failed' });
@@ -124,8 +124,8 @@ function howToText(n: number, sub: string, last?: { n: number; q: string; board:
   const lines = [
     `**Sub Says #${n}: how to play**`,
     '',
-    `1. **Answer today's question** (up to 3 answers). It takes 10 seconds.`,
-    `2. **Come back tomorrow** and guess what r/${sub} said. Three guesses.`,
+    `1. **Answer today's question** with 3 different answers. It takes 10 seconds.`,
+    `2. **Come back tomorrow** and guess what r/${sub} said, one guess at a time. Three tries.`,
     `3. **Score what the crowd scored.** If 41% of people said "sandwiches" and you guessed it, you get 41 points. Answers need at least 3 people to make the board.`,
     '',
     'Weekly standings are posted every Monday. Share your result below: 🟩 top answer, 🟨 on the board, ⬜ miss.',

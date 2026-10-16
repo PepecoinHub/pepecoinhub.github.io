@@ -5,6 +5,7 @@ import {
   type ArchiveView,
   type BoardRow,
   type CollectView,
+  type GuessEntry,
   type GuessMark,
   type GuessResponse,
   type GuessResult,
@@ -12,7 +13,7 @@ import {
   type State,
   shareText,
 } from '../shared/api.js';
-import { MAX_ANSWER_LEN, bestMatch, cleanAnswer, sameAnswer } from '../shared/text.js';
+import { MAX_ANSWER_LEN, bestMatch, cleanAnswer, keyOf, sameAnswer } from '../shared/text.js';
 import { HOUR, dayKey, weekEnd, weekKey } from '../shared/time.js';
 
 export interface KV {
@@ -39,7 +40,7 @@ export interface KV {
 }
 
 export const MIN_SUPPORT = 3; // an answer needs this many different people to reach the board
-export const MAX_ANSWERS = 3;
+export const NEEDED_ANSWERS = 3; // a player gives exactly this many different answers
 export const MAX_GUESSES = 3;
 export const PARTICIPATION_POINTS = 5;
 const LOCK_STALE_MS = 4000;
@@ -151,24 +152,26 @@ export async function submitAnswers(kv: KV, i: AnswerInput): Promise<AnswerRespo
       seen.add(c.key);
       cleaned.push(c);
     }
-    if (cleaned.length === MAX_ANSWERS) break;
   }
-  if (!cleaned.length) return { ok: false, error: 'invalid' };
+  if (cleaned.length < NEEDED_ANSWERS) return { ok: false, error: 'need3' };
+  cleaned.length = NEEDED_ANSWERS;
 
   if (!(await takeLock(kv, uid, now))) return { ok: false, error: 'busy' };
   try {
+    if (await kv.hGet(K.resp(round.n), uid)) return { ok: false, error: 'already' };
+    // Spelling variants of one answer must not count as three answers.
+    const ids = [];
+    for (const c of cleaned) ids.push(await assignCluster(kv, round.n, c.key));
+    if (new Set(ids).size < NEEDED_ANSWERS) return { ok: false, error: 'same' };
     if (!(await kv.hSetNX(K.resp(round.n), uid, '1'))) return { ok: false, error: 'already' };
-    const done = new Set<string>();
-    for (const c of cleaned) {
-      const id = await assignCluster(kv, round.n, c.key);
-      if (done.has(id)) continue; // two spellings of the same answer count once
-      done.add(id);
+    for (const [idx, c] of cleaned.entries()) {
+      const id = ids[idx]!;
       if (await kv.hSetNX(K.cu(round.n), `${id}:${uid}`, '1')) await kv.hIncrBy(K.cn(round.n), id, 1);
       await kv.hIncrBy(K.cv(round.n), `${id}|${c.text}`, 1);
     }
     await kv.hSet(K.names, { [uid]: name });
     await credit(kv, uid, PARTICIPATION_POINTS, now);
-    return { ok: true, accepted: done.size, points: PARTICIPATION_POINTS, streak: await touch(kv, uid, now) };
+    return { ok: true, accepted: NEEDED_ANSWERS, points: PARTICIPATION_POINTS, streak: await touch(kv, uid, now) };
   } finally {
     await kv.hDel(K.lock, [uid]);
   }
@@ -238,48 +241,53 @@ const publicBoard = (b: BoardEntry[]): BoardRow[] => b.map((e) => ({ text: e.tex
 
 // ---------- guessing ----------
 
-export type GuessInput = { uid?: string; name?: string; n: unknown; guesses: unknown; now: number; sub: string };
+type Saved = { guesses: GuessEntry[]; points: number; done: boolean };
 
-export async function submitGuesses(kv: KV, i: GuessInput): Promise<GuessResponse> {
+const parseSaved = (raw: string | undefined): Saved | undefined => (raw ? (JSON.parse(raw) as Saved) : undefined);
+
+export type GuessInput = { uid?: string; name?: string; n: unknown; guess: unknown; now: number; sub: string };
+
+/** One guess at a time: the player sees whether it is on the board before typing the next one. */
+export async function submitGuess(kv: KV, i: GuessInput): Promise<GuessResponse> {
   const { uid, name, now } = i;
   if (!uid || !name) return { ok: false, error: 'login' };
   const round = typeof i.n === 'number' ? await loadRound(kv, i.n) : undefined;
   if (!round || phaseOf(round, now) !== 'guess') return { ok: false, error: 'closed' };
-  if (!Array.isArray(i.guesses)) return { ok: false, error: 'invalid' };
   const result = await frozenResult(kv, round, now);
   if (!result || result.void) return { ok: false, error: 'void' };
-
-  const cleaned = [];
-  for (const raw of i.guesses.slice(0, 6)) {
-    const c = cleanAnswer(raw);
-    if (c) cleaned.push(c);
-    if (cleaned.length === MAX_GUESSES) break;
-  }
-  if (!cleaned.length) return { ok: false, error: 'invalid' };
+  const c = cleanAnswer(i.guess);
+  if (!c) return { ok: false, error: 'invalid' };
 
   if (!(await takeLock(kv, uid, now))) return { ok: false, error: 'busy' };
   try {
-    if (!(await kv.hSetNX(K.g(round.n), uid, 'pending'))) return { ok: false, error: 'already' };
-    const used = new Set<number>();
-    const guesses: GuessResult['guesses'] = cleaned.map((c) => {
-      const idx = result.board.findIndex((e) => e.keys.includes(c.key) || e.keys.some((k) => sameAnswer(c.key, k)));
-      if (idx < 0 || used.has(idx)) return { text: c.text, mark: 'miss' as GuessMark, points: 0 };
-      used.add(idx);
-      const e = result.board[idx]!;
-      return { text: c.text, mark: (idx === 0 ? 'top' : 'board') as GuessMark, points: e.pct, matched: e.text };
-    });
-    const points = guesses.reduce((s, g) => s + g.points, 0);
-    const mine: GuessResult = { guesses, points };
-    await kv.hSet(K.g(round.n), { [uid]: JSON.stringify(mine) });
+    const saved = parseSaved(await kv.hGet(K.g(round.n), uid)) ?? { guesses: [], points: 0, done: false };
+    if (saved.done) return { ok: false, error: 'already' };
+    // Typing the same thing again, or another spelling of an answer already found, costs nothing.
+    if (saved.guesses.some((g) => keyOf(g.text) === c.key)) return { ok: false, error: 'repeat' };
+    const idx = result.board.findIndex((e) => e.keys.includes(c.key) || e.keys.some((k) => sameAnswer(c.key, k)));
+    if (idx >= 0 && saved.guesses.some((g) => g.rank === idx)) return { ok: false, error: 'repeat' };
+
+    const entry: GuessEntry =
+      idx < 0
+        ? { text: c.text, mark: 'miss', points: 0 }
+        : { text: c.text, mark: idx === 0 ? 'top' : 'board', points: result.board[idx]!.pct, matched: result.board[idx]!.text, rank: idx };
+    saved.guesses.push(entry);
+    saved.points += entry.points;
+    saved.done = saved.guesses.length >= MAX_GUESSES;
+    await kv.hSet(K.g(round.n), { [uid]: JSON.stringify(saved) });
     await kv.hSet(K.names, { [uid]: name });
-    await credit(kv, uid, points, now);
+    await credit(kv, uid, entry.points, now);
     const streak = await touch(kv, uid, now);
+    const view: GuessResult = { guesses: saved.guesses, points: saved.points };
     return {
       ok: true,
-      result: mine,
-      board: publicBoard(result.board),
+      guess: entry,
+      result: view,
+      guessesLeft: MAX_GUESSES - saved.guesses.length,
+      done: saved.done,
+      board: saved.done ? publicBoard(result.board) : undefined,
+      shareText: saved.done ? shareText(i.sub, round.n, saved.points, saved.guesses.map((g) => g.mark)) : undefined,
       streak,
-      shareText: shareText(i.sub, round.n, points, guesses.map((g) => g.mark)),
     };
   } finally {
     await kv.hDel(K.lock, [uid]);
@@ -423,12 +431,16 @@ export async function getState(kv: KV, o: StateOpts): Promise<State> {
       voidReason: res?.void ? (res.reason === 'few' ? 'Not enough people answered yesterday, so there is no board this time.' : 'Answers were too scattered to build a board.') : undefined,
       boardSize: res && !res.void ? res.board.length : 0,
       respondents: res?.n ?? 0,
+      guessesLeft: MAX_GUESSES,
+      done: false,
     };
     if (uid && res && !res.void) {
-      const mine = await kv.hGet(K.g(guessRound.n), uid);
-      if (mine && mine !== 'pending') {
-        view.mine = JSON.parse(mine) as GuessResult;
-        view.board = publicBoard(res.board);
+      const mine = parseSaved(await kv.hGet(K.g(guessRound.n), uid));
+      if (mine) {
+        view.mine = { guesses: mine.guesses, points: mine.points };
+        view.guessesLeft = MAX_GUESSES - mine.guesses.length;
+        view.done = mine.done;
+        if (mine.done) view.board = publicBoard(res.board);
       }
     }
     state.guess = view;

@@ -16,7 +16,7 @@
 
 > **Subject:** Free daily game for r/{sub}, with 30 questions I wrote for your community
 >
-> Hi! I built Sub Says, a free survey-guessing game that runs entirely on Reddit. Every day your members answer one question ("Name something you'd bring to a picnic"), and the next day they guess what the sub said. Points go to whoever guesses what most people answered.
+> Hi! I built Sub Says, a free survey-guessing game that runs entirely on Reddit. Every day your members answer one question ("Name something you'd bring to a picnic"), and the next day they guess what the sub said, one answer at a time. Points go to whoever guesses what most people answered.
 >
 > It posts itself, needs no upkeep, has no ads, and no data leaves Reddit (it uses Reddit's own storage, no outside server). You pick the question category, can add your own questions, and can hide any answer from the mod menu.
 >

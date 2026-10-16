@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { HOUR } from '../src/shared/time.js';
 import { pickQuestion } from '../src/shared/questions.js';
-import { dailyTick, finalBoard, getState, markIntroSeen, openRound, setPost, submitAnswers, submitGuesses, suggest, usedQuestions } from '../src/server/rounds.js';
+import { dailyTick, finalBoard, getState, markIntroSeen, openRound, setPost, submitAnswers, submitGuess, suggest, usedQuestions } from '../src/server/rounds.js';
 import { FakeKV } from '../test/fake-kv.js';
 
 const kv = new FakeKV();
@@ -37,6 +37,7 @@ async function bots(n: number, count: number, at: number, pool: string[]) {
     // A skewed crowd: the first answers are much more popular.
     const pick = () => pool[Math.min(pool.length - 1, Math.floor(Math.pow(Math.random(), 2.2) * pool.length))]!;
     const answers = [...new Set([pick(), pick(), pick()])];
+    while (answers.length < 3) answers.push(`z${Math.floor(Math.random() * 1e4)}x`); // the game needs 3 different answers
     await submitAnswers(kv, { uid: `t2_bot${n}_${i}`, name: `bot${i}`, n, answers, now: at + i * 1000 });
   }
 }
@@ -88,7 +89,7 @@ app.post('/api/answer', async (req, res) => {
 });
 app.post('/api/guess', async (req, res) => {
   const { uid, name } = user(req);
-  res.json(await submitGuesses(kv, { uid, name, n: req.body?.n, guesses: req.body?.guesses, now: now(), sub: SUB }));
+  res.json(await submitGuess(kv, { uid, name, n: req.body?.n, guess: req.body?.guess, now: now(), sub: SUB }));
 });
 app.post('/api/intro', async (req, res) => {
   const { uid } = user(req);

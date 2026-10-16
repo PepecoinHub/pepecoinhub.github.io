@@ -10,12 +10,12 @@ let tab: 'standings' | 'board' | 'how' = 'standings';
 let busy = false;
 let introDismissed = false;
 let lastShare: string | undefined;
-const draft = { answers: ['', '', ''], guesses: ['', '', ''] };
+const draft = { answers: ['', '', ''], guess: '' };
 let lastSig = '';
 
 const STEPS: [string, string][] = [
-  ['One question a day', 'Everyone in the sub answers it. Name something you\'d bring to a picnic: type up to 3 answers.'],
-  ['Next day, guess the board', 'Yesterday\'s answers are hidden. Type 3 guesses and see what the sub said.'],
+  ['One question a day', 'Everyone in the sub answers it. Name something you\'d bring to a picnic: give 3 different answers.'],
+  ['Next day, guess the board', 'Yesterday\'s answers are hidden. Guess one answer at a time and see at once if the sub said it. You get 3 tries.'],
   ['Score what the crowd scored', 'If 41% of people said "sandwiches" and you guessed it, you get 41 points. Popular answers are worth more.'],
 ];
 
@@ -100,6 +100,20 @@ function rows(board: BoardRow[], hits: Set<string>, hiddenCount = 0): string {
   return `<div class="rows">${shown.join('')}${hidden.join('')}</div>`;
 }
 
+function partialRows(size: number, found: Map<number, { text: string; pct: number }>): string {
+  const max = Math.max(1, ...[...found.values()].map((f) => f.pct));
+  const out: string[] = [];
+  for (let i = 0; i < size; i++) {
+    const f = found.get(i);
+    out.push(
+      f
+        ? `<div class="row reveal hit ${i === 0 ? 'top' : ''}"><div class="bar" style="width:${Math.round((100 * f.pct) / max)}%"></div><div class="no">${i + 1}</div><div class="t">${esc(f.text)}</div><div class="p">${f.pct}</div></div>`
+        : `<div class="row hidden"><div class="no">${i + 1}</div><div class="t">· · · · ·</div><div class="p">??</div></div>`,
+    );
+  }
+  return `<div class="rows">${out.join('')}</div>`;
+}
+
 function renderGuess(g: GuessView | undefined) {
   const el = $('guess');
   el.hidden = !g;
@@ -108,24 +122,28 @@ function renderGuess(g: GuessView | undefined) {
     el.innerHTML = `<h2>Yesterday's question</h2><p class="q">${esc(g.question)}</p><p class="hint">${esc(g.voidReason ?? 'There is no board for this round.')} Try today's question!</p>`;
     return;
   }
-  if (g.mine && g.board) {
-    const matched = new Set(g.mine.guesses.map((x) => x.matched).filter((m): m is string => !!m));
-    const marks = g.mine.guesses.map((x) => x.mark);
-    const share = shareText(state.subreddit, g.n, g.mine.points, marks);
+  const mine = g.mine?.guesses ?? [];
+  const lines = mine
+    .map((x) => `<div class="guessline"><span>${esc(x.text)}${x.matched && x.matched.toLowerCase() !== x.text.toLowerCase() ? ` → ${esc(x.matched)}` : ''}</span><span class="m ${x.mark === 'top' ? 'top' : x.mark === 'board' ? 'ok' : 'no'}">${x.mark === 'miss' ? 'X' : '+' + x.points}</span></div>`)
+    .join('');
+  if (g.done && g.mine && g.board) {
+    const matched = new Set(mine.map((x) => x.matched).filter((m): m is string => !!m));
+    const share = shareText(state.subreddit, g.n, g.mine.points, mine.map((x) => x.mark));
     lastShare = share;
     el.innerHTML = `<h2>Sub Says #${g.n} · your result</h2><p class="q">${esc(g.question)}</p>
-      <div class="score">${g.mine.points} pts</div>
-      ${g.mine.guesses.map((x) => `<div class="guessline"><span>${esc(x.text)}${x.matched ? ` → ${esc(x.matched)}` : ''}</span><span class="m ${x.mark === 'top' ? 'top' : x.mark === 'board' ? 'ok' : 'no'}">${x.mark === 'miss' ? 'X' : '+' + x.points}</span></div>`).join('')}
+      <div class="score">${g.mine.points} pts</div>${lines}
       <h3>The board</h3>${rows(g.board, matched)}
       <div class="share"><pre id="sharetext">${esc(share)}</pre><button id="copy">Copy my score</button></div>`;
     return;
   }
-  const inputs = [0, 1, 2].map((i) => `<input data-g="${i}" type="text" maxlength="40" autocomplete="off" placeholder="Guess #${i + 1}" value="${esc(draft.guesses[i] ?? '')}">`).join('');
+  const found = new Map<number, { text: string; pct: number }>();
+  for (const x of mine) if (x.rank !== undefined && x.matched) found.set(x.rank, { text: x.matched, pct: x.points });
+  const tries = mine.length + 1;
   el.innerHTML = `<h2>Guess what r/${esc(state.subreddit)} said · #${g.n}</h2><p class="q">${esc(g.question)}</p>
-    <p class="hint">${g.respondents} people answered. The board has ${g.boardSize} answers. Closes in ${cd(g.closesAt)}.</p>
-    ${rows([], new Set(), g.boardSize)}
-    <div class="inputs">${inputs}</div>
-    <button id="sendguess" class="primary" ${busy ? 'disabled' : ''}>Reveal the board</button>`;
+    <p class="hint">${g.respondents} people answered. The board has ${g.boardSize} answers. You have ${g.guessesLeft} ${g.guessesLeft === 1 ? 'try' : 'tries'} left. Closes in ${cd(g.closesAt)}.</p>
+    ${partialRows(g.boardSize, found)}${lines}
+    <div class="inputs"><input data-g="0" type="text" maxlength="40" autocomplete="off" placeholder="Guess ${tries} of 3" value="${esc(draft.guess)}"></div>
+    <button id="sendguess" class="primary" ${busy ? 'disabled' : ''}>${state.me.loggedIn ? 'Check my guess' : 'Log in to play'}</button>`;
 }
 
 function renderCollect(s: State) {
@@ -138,11 +156,11 @@ function renderCollect(s: State) {
       <p class="hint">✅ Your answers are in. ${c.respondents} ${c.respondents === 1 ? 'person has' : 'people have'} answered so far. Come back in ${cd(c.closesAt)} to guess the board.</p>`;
     return;
   }
-  const inputs = [0, 1, 2].map((i) => `<input data-a="${i}" list="sugg" type="text" maxlength="40" autocomplete="off" placeholder="${i === 0 ? 'Your answer' : 'Another answer (optional)'}" value="${esc(draft.answers[i] ?? '')}">`).join('');
+  const inputs = [0, 1, 2].map((i) => `<input data-a="${i}" list="sugg" type="text" maxlength="40" autocomplete="off" placeholder="Answer ${i + 1} of 3" value="${esc(draft.answers[i] ?? '')}">`).join('');
   el.innerHTML = `<h2>Today's question · #${c.n}</h2><p class="q">${esc(c.question)}</p>
-    <p class="hint">Answer in a word or two, up to 3 answers. One try, no edits. ${c.respondents} answered so far.</p>
+    <p class="hint">Give 3 different answers, a word or two each. One try, no edits. ${c.respondents} answered so far.</p>
     <div class="inputs">${inputs}</div>
-    <button id="sendanswer" class="primary" ${busy ? 'disabled' : ''}>${s.me.loggedIn ? 'Send my answers' : 'Log in to answer'}</button>`;
+    <button id="sendanswer" class="primary" ${busy || (s.me.loggedIn && !answersReady()) ? 'disabled' : ''}>${s.me.loggedIn ? 'Send my 3 answers' : 'Log in to answer'}</button>`;
 }
 
 function standings(s: State): string {
@@ -163,15 +181,16 @@ function archive(a: ArchiveView | undefined): string {
 
 // ---------- actions ----------
 
+const answersReady = () => draft.answers.every((a) => a.trim().length >= 2);
+
 async function sendAnswers() {
   if (!state?.collect || busy) return;
   if (!state.me.loggedIn) return showLoginPrompt();
-  const answers = draft.answers.map((a) => a.trim()).filter(Boolean);
-  if (!answers.length) return say('Type at least one answer.', true);
+  if (!answersReady()) return say('Give 3 answers, at least 2 letters each.', true);
   busy = true;
   render();
   try {
-    const r = await api<AnswerResponse>('/api/answer', { n: state.collect.n, answers });
+    const r = await api<AnswerResponse>('/api/answer', { n: state.collect.n, answers: draft.answers.map((a) => a.trim()) });
     if (r.ok) {
       draft.answers = ['', '', ''];
       say(`Thanks! +${r.points} points.`);
@@ -187,18 +206,22 @@ async function sendAnswers() {
   }
 }
 
-async function sendGuesses() {
+async function sendGuess() {
   if (!state?.guess || busy) return;
   if (!state.me.loggedIn) return showLoginPrompt();
-  const guesses = draft.guesses.map((a) => a.trim()).filter(Boolean);
-  if (!guesses.length) return say('Type at least one guess.', true);
+  const guess = draft.guess.trim();
+  if (guess.length < 2) return say('Type your guess first.', true);
   busy = true;
   render();
+  let keepFocus = true;
   try {
-    const r = await api<GuessResponse>('/api/guess', { n: state.guess.n, guesses });
+    const r = await api<GuessResponse>('/api/guess', { n: state.guess.n, guess });
     if (r.ok) {
-      draft.guesses = ['', '', ''];
-      say(r.result.points > 0 ? `You scored ${r.result.points}!` : 'No luck this time. Come back tomorrow!');
+      draft.guess = '';
+      keepFocus = !r.done;
+      const g = r.guess;
+      say(g.mark === 'top' ? `Top answer! +${g.points}` : g.mark === 'board' ? `On the board! +${g.points}` : r.done ? 'Not on the board.' : 'Not on the board. Try again.', g.mark === 'miss');
+      if (r.done) say(`${r.result.points} points. Here is the board.`);
     } else {
       say(errorText(r.error, 'guess'), true);
     }
@@ -208,6 +231,7 @@ async function sendGuesses() {
   } finally {
     busy = false;
     await refresh(true);
+    if (keepFocus) document.querySelector<HTMLInputElement>('[data-g]')?.focus();
   }
 }
 
@@ -216,7 +240,10 @@ function errorText(e: string, kind: 'answer' | 'guess'): string {
     login: 'Log in to Reddit to play.',
     closed: 'This round has just closed.',
     already: kind === 'answer' ? 'You already answered this one.' : 'You already guessed this round.',
-    invalid: 'Those answers cannot be used. Use 2 to 40 characters, no links or bad words.',
+    invalid: kind === 'answer' ? 'Those answers cannot be used. Use 2 to 40 characters, no links or bad words.' : 'That guess cannot be used. Use 2 to 40 characters.',
+    need3: 'Give 3 different answers. Links and bad words do not count.',
+    same: 'Two of your answers mean the same thing. Give 3 different ones.',
+    repeat: 'You already tried that one. No try was used.',
     void: 'There is no board for this round.',
     busy: 'Easy there. Try again.',
   };
@@ -271,8 +298,10 @@ document.addEventListener('input', (e) => {
   if (t.dataset['a'] !== undefined) {
     draft.answers[Number(t.dataset['a'])] = t.value;
     onType(t);
+    const send = $<HTMLButtonElement>('sendanswer');
+    if (send && state?.me.loggedIn) send.disabled = busy || !answersReady();
   } else if (t.dataset['g'] !== undefined) {
-    draft.guesses[Number(t.dataset['g'])] = t.value;
+    draft.guess = t.value;
   }
 });
 
@@ -295,21 +324,23 @@ document.addEventListener('click', (e) => {
     return;
   }
   if (el.closest('#sendanswer')) return void sendAnswers();
-  if (el.closest('#sendguess')) return void sendGuesses();
+  if (el.closest('#sendguess')) return void sendGuess();
   if (el.closest('#copy')) return void copyShare();
 });
 
-// Enter moves to the next field, and sends from the last one.
+// Enter moves to the next answer field, and sends from the last one (or sends the single guess).
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Enter') return;
   const t = e.target as HTMLInputElement;
-  const group = t.dataset['a'] !== undefined ? 'a' : t.dataset['g'] !== undefined ? 'g' : undefined;
-  if (!group) return;
+  if (t.dataset['g'] !== undefined) {
+    e.preventDefault();
+    return void sendGuess();
+  }
+  if (t.dataset['a'] === undefined) return;
   e.preventDefault();
-  const i = Number(t.dataset[group]);
-  const next = document.querySelector<HTMLInputElement>(`[data-${group}="${i + 1}"]`);
+  const next = document.querySelector<HTMLInputElement>(`[data-a="${Number(t.dataset['a']) + 1}"]`);
   if (next) next.focus();
-  else void (group === 'a' ? sendAnswers() : sendGuesses());
+  else void sendAnswers();
 });
 
 setInterval(() => {

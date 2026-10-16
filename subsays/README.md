@@ -8,13 +8,14 @@ Runda trwa dwa okna po 24 godziny (długość ustawia moderator: 24, 48 albo 72 
 
 | Dzień | Co widzi gracz |
 |---|---|
-| 1 | tylko pytanie nr 1: wpisz do 3 odpowiedzi |
-| 2 | **zgadnij tablicę pytania 1** (3 zgadnięcia) i od razu **odpowiedz na pytanie 2** |
+| 1 | tylko pytanie nr 1: wpisz **3 różne odpowiedzi** |
+| 2 | **zgadnij tablicę pytania 1**, jedną odpowiedź naraz (3 próby), i od razu **odpowiedz na pytanie 2** |
 | 3 | zgadnij pytanie 2, odpowiedz na pytanie 3. I tak dalej |
 
-- **Odpowiedzi:** do 3 na osobę, jedno zgłoszenie na rundę, bez edycji. Cudze odpowiedzi nie są widoczne ani sortowane (autouzupełnianie podpowiada tylko pisownię alfabetycznie, bez liczników), żeby ludzie nie klikali tego, co już prowadzi.
+- **Odpowiedzi:** dokładnie 3 różne na osobę (przycisk jest nieaktywny, dopóki nie ma trzech; dwa zapisy tej samej odpowiedzi nie liczą się jako dwie), jedno zgłoszenie na rundę, bez edycji. Cudze odpowiedzi nie są widoczne ani sortowane (autouzupełnianie podpowiada tylko pisownię alfabetycznie, bez liczników), żeby ludzie nie klikali tego, co już prowadzi.
 - **Scalanie:** wielkość liter, akcenty, przedimki (a/an/the), liczba mnoga i kolejność słów są ignorowane ("Sandwiches" = "a sandwich", "fries, french" = "French fries"). Literówki scala się tylko przy słowach od 6 liter i tylko przy tej samej pierwszej literze (tennis/tenis, ale nie mouse/house).
 - **Plansza:** odpowiedź wchodzi, gdy podały ją **co najmniej 3 różne osoby**. 5 odpowiedzi, a od 200 osób, które odpowiedziały, 8 (moderator może wymusić 5 lub 8). Poniżej 3 odpowiedzi spełniających próg albo poniżej minimalnej liczby osób (domyślnie 20) runda jest pomijana i aplikacja to mówi.
+- **Zgadywanie po jednej odpowiedzi:** wpisujesz jedną, od razu widzisz, czy jest na tablicy (trafiona odsłania swój rząd na właściwym miejscu), i dopiero potem wpisujesz następną. 3 próby; pudło zużywa próbę. Powtórzenie czegoś, co już sprawdziłeś (także innym zapisem), nic nie kosztuje. Cała tablica pokazuje się po ostatniej próbie.
 - **Punkty:** 5 za odpowiedź. Za zgadnięcie: tyle punktów, ile procent osób podało trafioną odpowiedź (62% = 62 pkt). Dwa zapisy tej samej odpowiedzi liczą się raz.
 - **Ranking:** tydzień (poniedziałek 00:00 UTC), seria dni z rzędu (🔥), poniedziałkowy komentarz z podium.
 - **Wynik do wklejenia** jak w Wordle: `🟩🟨⬜ 100 pts` (zielone: najpopularniejsza odpowiedź, żółte: odpowiedź z tablicy, szare: pudło). Przycisk kopiuje tekst do schowka.
@@ -44,7 +45,7 @@ Node 22+.
 ```bash
 cd subsays
 npm install
-npm test             # 17 testów: scalanie odpowiedzi, pełna runda, wyścigi, serie, ukrywanie
+npm test             # 18 testów: scalanie odpowiedzi, pełna runda, wyścigi, serie, ukrywanie
 npm run typecheck
 SEED=1 npm run local # lokalnie, bez Reddita: http://localhost:5175/as/alice
 ```

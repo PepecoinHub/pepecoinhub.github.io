@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { dailyTick, finalBoard, getState, hideAnswer, openRound, setPost, submitAnswers, submitGuesses, suggest } from '../src/server/rounds.js';
+import { dailyTick, finalBoard, getState, hideAnswer, openRound, setPost, submitAnswers, submitGuess, suggest } from '../src/server/rounds.js';
 import { FakeKV } from './fake-kv.js';
 
 const DAY = 86_400_000;
@@ -9,9 +9,24 @@ const opts = { sub: 'test', theme: 'classic' as const, sponsorNote: '' };
 
 const newRound = (kv: FakeKV, now = T0, extra: Partial<Parameters<typeof openRound>[1]> = {}) =>
   openRound(kv, { q: 'Name a pizza topping.', now, intervalMs: DAY, minPlayers: 5, cap: 'auto', ...extra });
-const ans = (kv: FakeKV, uid: string | undefined, answers: unknown, n = 1, now = T0 + 1000) => submitAnswers(kv, { uid, name: uid ? `name_${uid}` : undefined, n, answers, now });
-const gs = (kv: FakeKV, uid: string | undefined, guesses: unknown, n = 1, now = T0 + DAY + 1000) =>
-  submitGuesses(kv, { uid, name: uid ? `name_${uid}` : undefined, n, guesses, now, sub: 'test' });
+let filler = 0;
+/** Pads to three answers with throwaway ones nobody else gives (short keys never fuzzy-merge). */
+const pad = (a: string[]) => {
+  const out = [...a];
+  while (out.length < 3) out.push(`z${++filler}x`);
+  return out;
+};
+const ans = (kv: FakeKV, uid: string | undefined, answers: unknown, n = 1, now = T0 + 1000) =>
+  submitAnswers(kv, { uid, name: uid ? `name_${uid}` : undefined, n, answers, now });
+const ans3 = (kv: FakeKV, uid: string | undefined, answers: string[], n = 1, now = T0 + 1000) => ans(kv, uid, pad(answers), n, now);
+const guess = (kv: FakeKV, uid: string | undefined, g: unknown, n = 1, now = T0 + DAY + 1000) =>
+  submitGuess(kv, { uid, name: uid ? `name_${uid}` : undefined, n, guess: g, now, sub: 'test' });
+/** Guesses one after another, like a player would, and returns the last response. */
+async function play(kv: FakeKV, uid: string, guesses: string[], n = 1, now = T0 + DAY + 1000) {
+  let last: Awaited<ReturnType<typeof guess>> | undefined;
+  for (const g of guesses) last = await guess(kv, uid, g, n, now);
+  return last!;
+}
 const state = (kv: FakeKV, uid?: string, now = T0 + DAY + 1000, postId?: string) => getState(kv, { ...opts, uid, name: uid ? `name_${uid}` : undefined, now, postId });
 
 /** 20 players: pepperoni 10, mushrooms 8, cheese 6, pineapple 4, olives 3, anchovies 2, plus three one-offs. */
@@ -31,7 +46,7 @@ async function survey(kv: FakeKV) {
   give('Spinach', [17]);
   give('Basil', [18]);
   give('Corn', [19]);
-  for (let u = 0; u < 20; u++) assert.ok((await ans(kv, `u${u}`, per[u]!.slice(0, 3))).ok, `u${u}`);
+  for (let u = 0; u < 20; u++) assert.ok((await ans3(kv, `u${u}`, per[u]!.slice(0, 3))).ok, `u${u}`);
 }
 
 test('a round from first answer to final board', async () => {
@@ -40,42 +55,70 @@ test('a round from first answer to final board', async () => {
   await survey(kv);
 
   // While collecting there is nothing to guess yet.
-  assert.deepEqual(await gs(kv, 'g1', ['pepperoni'], 1, T0 + 5000), { ok: false, error: 'closed' });
-  assert.deepEqual(await ans(kv, 'u0', ['Anything']), { ok: false, error: 'already' });
-  assert.deepEqual(await ans(kv, 'late', ['Pepperoni'], 1, T0 + DAY + 1), { ok: false, error: 'closed' }, 'collection ends after the interval');
-  assert.deepEqual(await ans(kv, 'x', ['fucking pizza']), { ok: false, error: 'invalid' });
-  assert.deepEqual(await ans(kv, undefined, ['pizza']), { ok: false, error: 'login' });
+  assert.deepEqual(await guess(kv, 'g1', 'pepperoni', 1, T0 + 5000), { ok: false, error: 'closed' });
+  assert.deepEqual(await ans3(kv, 'u0', ['Anything']), { ok: false, error: 'already' });
+  assert.deepEqual(await ans3(kv, 'late', ['Pepperoni'], 1, T0 + DAY + 1), { ok: false, error: 'closed' }, 'collection ends after the interval');
+  assert.deepEqual(await ans(kv, 'x', ['fucking pizza', 'tacos', 'sushi']), { ok: false, error: 'need3' }, 'a rejected answer leaves only two');
+  assert.deepEqual(await ans(kv, undefined, ['pizza', 'tacos', 'sushi']), { ok: false, error: 'login' });
 
   const archive = await finalBoard(kv, 1, T0 + 2 * DAY + 1);
   assert.deepEqual(archive?.board.map((b) => [b.text, b.count, b.pct]), [['Pepperoni', 10, 50], ['Mushrooms', 8, 40], ['Cheese', 6, 30], ['Pineapple', 4, 20], ['Olives', 3, 15]], 'anchovies (2 people) and one-offs stay off the board');
   assert.equal(archive?.respondents, 20);
 
-  // The board stays hidden until a player has guessed.
+  // The board stays hidden until the player has used all guesses.
   const before = await state(kv, 'g1');
   assert.equal(before.guess?.status, 'open');
   assert.equal(before.guess?.boardSize, 5);
+  assert.equal(before.guess?.guessesLeft, 3);
   assert.equal(before.guess?.board, undefined);
   assert.equal(before.collect, undefined, 'nothing is collecting once the only round moved on');
 
-  const r1 = await gs(kv, 'g1', ['pepperoni', 'Mushroom', 'pineapples']);
-  assert.ok(r1.ok);
-  if (r1.ok) {
-    assert.deepEqual(r1.result.guesses.map((g) => [g.mark, g.points]), [['top', 50], ['board', 40], ['board', 20]]);
-    assert.equal(r1.result.points, 110);
-    assert.equal(r1.board.length, 5);
-    assert.equal(r1.shareText, 'Sub Says #1 · r/test\n🟩🟨🟨 110 pts');
+  // One guess at a time: the answer comes back at once, the rest of the board stays hidden.
+  const first = await guess(kv, 'g1', 'pepperoni');
+  assert.ok(first.ok);
+  if (first.ok) {
+    assert.deepEqual([first.guess.mark, first.guess.points, first.guess.rank, first.done, first.guessesLeft], ['top', 50, 0, false, 2]);
+    assert.equal(first.board, undefined);
+    assert.equal(first.shareText, undefined);
   }
-  assert.deepEqual(await gs(kv, 'g1', ['olives']), { ok: false, error: 'already' });
+  const mid = await state(kv, 'g1');
+  assert.equal(mid.guess?.mine?.guesses.length, 1);
+  assert.equal(mid.guess?.mine?.points, 50);
+  assert.equal(mid.guess?.guessesLeft, 2);
+  assert.equal(mid.guess?.board, undefined, 'still hidden after one guess');
+  assert.equal(mid.guess?.done, false);
 
-  const r2 = await gs(kv, 'g2', ['anchovies', 'pepperoni', 'peperoni']);
-  assert.ok(r2.ok && r2.result.points === 50);
-  if (r2.ok) assert.deepEqual(r2.result.guesses.map((g) => g.mark), ['miss', 'top', 'miss'], 'two spellings of one answer score once');
-  const r3 = await gs(kv, 'g3', ['olive', 'Tenis', 'Cheeses']);
-  assert.ok(r3.ok && r3.result.points === 15 + 30);
+  assert.ok((await guess(kv, 'g1', 'Mushroom')).ok);
+  const last = await guess(kv, 'g1', 'pineapples');
+  assert.ok(last.ok);
+  if (last.ok) {
+    assert.deepEqual(last.result.guesses.map((g) => [g.mark, g.points]), [['top', 50], ['board', 40], ['board', 20]]);
+    assert.equal(last.result.points, 110);
+    assert.equal(last.done, true);
+    assert.equal(last.board?.length, 5, 'the whole board shows after the last guess');
+    assert.equal(last.shareText, 'Sub Says #1 · r/test\n🟩🟨🟨 110 pts');
+  }
+  assert.deepEqual(await guess(kv, 'g1', 'olives'), { ok: false, error: 'already' });
+
+  // A guess that repeats an earlier one, in any spelling, costs nothing. Misses cost a try.
+  assert.ok((await guess(kv, 'g2', 'anchovies')).ok);
+  assert.ok((await guess(kv, 'g2', 'pepperoni')).ok);
+  assert.deepEqual(await guess(kv, 'g2', 'peperoni'), { ok: false, error: 'repeat' });
+  assert.deepEqual(await guess(kv, 'g2', 'Anchovies'), { ok: false, error: 'repeat' });
+  assert.equal((await state(kv, 'g2')).guess?.guessesLeft, 1, 'repeats did not use a try');
+  assert.deepEqual(await guess(kv, 'g2', 'a'), { ok: false, error: 'invalid' });
+  assert.equal((await state(kv, 'g2')).guess?.guessesLeft, 1, 'neither did an unusable guess');
+  const g2 = await guess(kv, 'g2', 'olives');
+  assert.ok(g2.ok && g2.done && g2.result.points === 65);
+  if (g2.ok) assert.deepEqual(g2.result.guesses.map((g) => g.mark), ['miss', 'top', 'board']);
+
+  const g3 = await play(kv, 'g3', ['olive', 'Tenis', 'Cheeses']);
+  assert.ok(g3.ok && g3.done && g3.result.points === 15 + 30);
 
   const after = await state(kv, 'g1');
   assert.equal(after.guess?.mine?.points, 110);
-  assert.equal(after.guess?.board?.length, 5, 'the board shows once you have guessed');
+  assert.equal(after.guess?.done, true);
+  assert.equal(after.guess?.board?.length, 5);
   assert.equal((await state(kv, 'g9')).guess?.board, undefined);
 
   // Weekly points: guesses plus 5 for answering.
@@ -84,7 +127,22 @@ test('a round from first answer to final board', async () => {
   assert.equal(after.me.weekRank, 1);
   assert.equal((await state(kv, 'u0')).me.weekPoints, 5);
 
-  assert.deepEqual(await gs(kv, 'late', ['pepperoni'], 1, T0 + 2 * DAY + 1), { ok: false, error: 'closed' }, 'guessing ends after a second interval');
+  assert.deepEqual(await guess(kv, 'late', 'pepperoni', 1, T0 + 2 * DAY + 1), { ok: false, error: 'closed' }, 'guessing ends after a second interval');
+});
+
+test('a player must give three different answers', async () => {
+  const kv = new FakeKV();
+  await newRound(kv);
+  assert.deepEqual(await ans(kv, 'a', ['pizza']), { ok: false, error: 'need3' });
+  assert.deepEqual(await ans(kv, 'a', ['pizza', 'tacos']), { ok: false, error: 'need3' });
+  assert.deepEqual(await ans(kv, 'a', ['pizza', 'Pizzas', 'a pizza']), { ok: false, error: 'need3' }, 'three spellings of one answer');
+  assert.deepEqual(await ans(kv, 'a', ['pizza', 'tacos', 'x']), { ok: false, error: 'need3' }, 'one unusable answer');
+  assert.deepEqual(await ans(kv, 'a', 'pizza, tacos, sushi'), { ok: false, error: 'invalid' }, 'not a list');
+  assert.deepEqual(await ans(kv, 'a', ['pepperoni', 'peperoni', 'tacos']), { ok: false, error: 'same' }, 'a typo of the first answer');
+  const ok = await ans(kv, 'a', ['pizza', 'tacos', 'sushi']);
+  assert.ok(ok.ok && ok.accepted === 3, 'none of the failed tries used the one submission');
+  assert.deepEqual(await ans(kv, 'a', ['burgers', 'fries', 'salad']), { ok: false, error: 'already' });
+  assert.equal(await kv.hLen('ss:r:1:resp'), 1);
 });
 
 test('too few people: no board, and the player is told', async () => {
@@ -94,7 +152,7 @@ test('too few people: no board, and the player is told', async () => {
   const s = await state(kv, 'g1');
   assert.equal(s.guess?.status, 'void');
   assert.match(s.guess?.voidReason ?? '', /Not enough people/);
-  assert.deepEqual(await gs(kv, 'g1', ['pizza']), { ok: false, error: 'void' });
+  assert.deepEqual(await guess(kv, 'g1', 'pizza'), { ok: false, error: 'void' });
   assert.equal(s.archive, undefined);
   assert.equal((await state(kv, 'g1', T0 + 2 * DAY + 5)).archive?.status, 'void');
 });
@@ -102,7 +160,7 @@ test('too few people: no board, and the player is told', async () => {
 test('scattered answers: no board either', async () => {
   const kv = new FakeKV();
   await newRound(kv);
-  for (let u = 0; u < 10; u++) await ans(kv, `u${u}`, [`thing${'abcdefghij'[u]}one`, `item${'klmnopqrst'[u]}two`]);
+  for (let u = 0; u < 10; u++) await ans3(kv, `u${u}`, []);
   const s = await state(kv, 'g1');
   assert.equal(s.guess?.status, 'void');
   assert.match(s.guess?.voidReason ?? '', /too scattered/);
@@ -138,14 +196,14 @@ test('streaks count days in a row', async () => {
   await newRound(kv, T0);
   await newRound(kv, T0 + DAY);
   await newRound(kv, T0 + 3 * DAY);
-  const a = await ans(kv, 'u', ['pizza'], 1, T0 + 1000);
+  const a = await ans3(kv, 'u', ['pizza'], 1, T0 + 1000);
   assert.ok(a.ok && a.streak === 1);
-  const b = await ans(kv, 'u', ['pizza'], 2, T0 + DAY + 1000);
+  const b = await ans3(kv, 'u', ['pizza'], 2, T0 + DAY + 1000);
   assert.ok(b.ok && b.streak === 2);
   assert.equal((await state(kv, 'u', T0 + DAY + 2000)).me.streak, 2);
   assert.equal((await state(kv, 'u', T0 + 2 * DAY + 2000)).me.streak, 2, 'still alive the day after');
   assert.equal((await state(kv, 'u', T0 + 3 * DAY + 2000)).me.streak, 0, 'missed a day');
-  const c = await ans(kv, 'u', ['pizza'], 3, T0 + 3 * DAY + 1000);
+  const c = await ans3(kv, 'u', ['pizza'], 3, T0 + 3 * DAY + 1000);
   assert.ok(c.ok && c.streak === 1);
 });
 
@@ -207,5 +265,6 @@ test('a player who is not logged in can look but not play', async () => {
   const s = await state(kv, undefined, T0 + 1000);
   assert.equal(s.me.loggedIn, false);
   assert.equal(s.collect?.answered, false);
-  assert.deepEqual(await ans(kv, undefined, ['pizza']), { ok: false, error: 'login' });
+  assert.deepEqual(await ans(kv, undefined, ['pizza', 'tacos', 'sushi']), { ok: false, error: 'login' });
+  assert.deepEqual(await guess(kv, undefined, 'pizza'), { ok: false, error: 'login' });
 });

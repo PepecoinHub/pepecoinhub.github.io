@@ -4,8 +4,10 @@ export type BoardRow = { text: string; pct: number; count: number };
 
 export type GuessMark = 'top' | 'board' | 'miss'; // green | yellow | grey in the share card
 
+export type GuessEntry = { text: string; mark: GuessMark; points: number; matched?: string; rank?: number };
+
 export type GuessResult = {
-  guesses: { text: string; mark: GuessMark; points: number; matched?: string }[];
+  guesses: GuessEntry[];
   points: number;
 };
 
@@ -27,8 +29,10 @@ export type GuessView = {
   voidReason?: string;
   boardSize: number;
   respondents: number;
-  mine?: GuessResult;
-  board?: BoardRow[]; // only after the player has guessed
+  guessesLeft: number;
+  mine?: GuessResult; // the guesses made so far; matched rows are revealed one by one
+  done: boolean;
+  board?: BoardRow[]; // the whole board, only once all guesses are used
 };
 
 export type ArchiveView = {
@@ -62,11 +66,20 @@ export type State = {
 
 export type AnswerResponse =
   | { ok: true; accepted: number; points: number; streak: number }
-  | { ok: false; error: 'login' | 'closed' | 'already' | 'invalid' | 'busy' };
+  | { ok: false; error: 'login' | 'closed' | 'already' | 'invalid' | 'need3' | 'same' | 'busy' };
 
 export type GuessResponse =
-  | { ok: true; result: GuessResult; board: BoardRow[]; streak: number; shareText: string }
-  | { ok: false; error: 'login' | 'closed' | 'already' | 'invalid' | 'void' | 'busy' };
+  | {
+      ok: true;
+      guess: GuessEntry;
+      result: GuessResult;
+      guessesLeft: number;
+      done: boolean;
+      board?: BoardRow[]; // sent once the last guess is used
+      shareText?: string;
+      streak: number;
+    }
+  | { ok: false; error: 'login' | 'closed' | 'already' | 'invalid' | 'repeat' | 'void' | 'busy' };
 
 export type SuggestResponse = { suggestions: string[] };
 
