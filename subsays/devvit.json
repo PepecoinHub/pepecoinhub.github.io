@@ -123,25 +123,33 @@
         "label": "Your own questions (optional)",
         "helpText": "One per line, used before the built-in ones. Start each with 'Name ...' so people can answer in a word or two."
       },
-      "roundHours": {
+      "roundMinutes": {
         "type": "select",
         "label": "Round length",
-        "helpText": "How long people can answer, and then guess. Small subs do better with 48 or 72 hours.",
+        "helpText": "How long people can answer, and then guess. Small subs do better with 48 or 72 hours. The two short options are for testing only.",
         "options": [
           {
             "label": "24 hours (a new question every day)",
-            "value": "24"
+            "value": "1440"
           },
           {
             "label": "48 hours",
-            "value": "48"
+            "value": "2880"
           },
           {
             "label": "72 hours",
-            "value": "72"
+            "value": "4320"
+          },
+          {
+            "label": "1 hour (testing only)",
+            "value": "60"
+          },
+          {
+            "label": "10 minutes (testing only)",
+            "value": "10"
           }
         ],
-        "defaultValue": "24"
+        "defaultValue": "1440"
       },
       "minPlayers": {
         "type": "number",
@@ -188,6 +196,28 @@
         "type": "string",
         "label": "Footer note (optional)",
         "helpText": "One line under the game, plain text, 280 characters."
+      },
+      "crowdBonus": {
+        "type": "select",
+        "label": "Crowd bonus",
+        "helpText": "Off: points come from answering (20) and from guessing. Half: each of your answers that reaches the board also earns half its percentage. It rewards saying what most people say, so it is off by default.",
+        "options": [
+          {
+            "label": "Off",
+            "value": "off"
+          },
+          {
+            "label": "Half of the percentage",
+            "value": "half"
+          }
+        ],
+        "defaultValue": "off"
+      },
+      "testMode": {
+        "type": "boolean",
+        "label": "Testing mode (turn off for real use)",
+        "helpText": "Lets you answer and guess again and again, and lets one answer reach the board. Also lifts the limit on starting new rounds from the mod menu.",
+        "defaultValue": false
       }
     }
   },

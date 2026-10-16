@@ -2,6 +2,7 @@
 // users, and a clock you can move forward. No Reddit account needed.
 //   npm run local       then open http://localhost:5175/as/alice
 //   SEED=1 npm run local    starts with bots, one round to guess and one to answer
+//   TEST=1 lifts the one-try limits; BONUS=0.5 turns the crowd bonus on; MINUTES=10 shortens rounds
 //   http://localhost:5175/dev/advance?h=24   moves the clock and runs the daily job
 //   http://localhost:5175/post/1   views the game as an older post would show it
 import express from 'express';
@@ -20,13 +21,15 @@ const settings = {
   sponsorNote: process.env['NOTE'] ?? '',
   category: (process.env['CATEGORY'] ?? 'food') as 'food',
   min: Number(process.env['MIN'] ?? 5),
-  hours: Number(process.env['HOURS'] ?? 24),
+  minutes: Number(process.env['MINUTES'] ?? 1440),
+  test: process.env['TEST'] === '1',
+  bonus: Number(process.env['BONUS'] ?? 0),
 };
 const SUB = process.env['SUB'] ?? 'localsub';
 
 async function startRound(lastFinished?: number) {
   const pick = pickQuestion({ custom: [], category: settings.category, used: await usedQuestions(kv) });
-  const n = await openRound(kv, { q: pick.q, now: now(), intervalMs: settings.hours * HOUR, minPlayers: settings.min, cap: 'auto' });
+  const n = await openRound(kv, { q: pick.q, now: now(), intervalMs: settings.minutes * 60_000, minPlayers: settings.min, cap: 'auto', test: settings.test });
   await setPost(kv, n, `t3_local${n}`);
   if (lastFinished) await finalBoard(kv, lastFinished, now());
   return n;
@@ -44,11 +47,11 @@ async function bots(n: number, count: number, at: number, pool: string[]) {
 
 if (process.env['SEED']) {
   const t1 = now() - 26 * HOUR;
-  const n1 = await openRound(kv, { q: 'Name a pizza topping.', now: t1, intervalMs: settings.hours * HOUR, minPlayers: settings.min, cap: 'auto' });
+  const n1 = await openRound(kv, { q: 'Name a pizza topping.', now: t1, intervalMs: settings.minutes * 60_000, minPlayers: settings.min, cap: 'auto', test: settings.test });
   await setPost(kv, n1, `t3_local${n1}`);
   await bots(n1, 60, t1 + 1000, ['Pepperoni', 'Mushrooms', 'Cheese', 'Pineapple', 'Olives', 'Sausage', 'Onions', 'Bacon', 'Peppers', 'Anchovies', 'Spinach']);
   const t2 = now() - 2 * HOUR;
-  const n2 = await openRound(kv, { q: 'Name something you grill at a barbecue.', now: t2, intervalMs: settings.hours * HOUR, minPlayers: settings.min, cap: 'auto' });
+  const n2 = await openRound(kv, { q: 'Name something you grill at a barbecue.', now: t2, intervalMs: settings.minutes * 60_000, minPlayers: settings.min, cap: 'auto', test: settings.test });
   await setPost(kv, n2, `t3_local${n2}`);
   await bots(n2, 14, t2 + 1000, ['Burgers', 'Hot dogs', 'Steak', 'Corn', 'Sausages', 'Chicken', 'Ribs', 'Vegetables']);
 }
@@ -71,7 +74,7 @@ app.get('/post/:n', (req, res) => {
 });
 app.get('/dev/advance', async (req, res) => {
   offset += Number(req.query['h'] ?? 24) * HOUR;
-  const tick = await dailyTick(kv, now(), settings.hours * HOUR);
+  const tick = await dailyTick(kv, now(), settings.minutes * 60_000);
   let opened: number | undefined;
   if (tick.due) opened = await startRound(tick.finished[tick.finished.length - 1]);
   res.json({ clock: new Date(now()).toISOString(), finished: tick.finished, opened });
@@ -79,17 +82,17 @@ app.get('/dev/advance', async (req, res) => {
 
 app.get('/api/state', async (req, res) => {
   const { uid, name } = user(req);
-  res.json(await getState(kv, { uid, name, postId: cookie(req, 'p') ?? `t3_local${await latest()}`, now: now(), sub: SUB, theme: settings.theme, sponsorNote: settings.sponsorNote }));
+  res.json(await getState(kv, { uid, name, postId: cookie(req, 'p') ?? `t3_local${await latest()}`, now: now(), sub: SUB, theme: settings.theme, sponsorNote: settings.sponsorNote, testMode: settings.test, bonusShare: settings.bonus }));
 });
 const latest = async () => Number((await kv.hGet('ss:meta', 'count')) ?? 1);
 app.get('/api/suggest', async (req, res) => res.json({ suggestions: await suggest(kv, String(req.query['q'] ?? ''), now()) }));
 app.post('/api/answer', async (req, res) => {
   const { uid, name } = user(req);
-  res.json(await submitAnswers(kv, { uid, name, n: req.body?.n, answers: req.body?.answers, now: now() }));
+  res.json(await submitAnswers(kv, { uid, name, n: req.body?.n, answers: req.body?.answers, now: now(), testMode: settings.test }));
 });
 app.post('/api/guess', async (req, res) => {
   const { uid, name } = user(req);
-  res.json(await submitGuess(kv, { uid, name, n: req.body?.n, guess: req.body?.guess, now: now(), sub: SUB }));
+  res.json(await submitGuess(kv, { uid, name, n: req.body?.n, guess: req.body?.guess, now: now(), sub: SUB, testMode: settings.test }));
 });
 app.get(['/', '/index.html'], (_req, res) => {
   const html = readFileSync(resolve('dist/client/index.html'), 'utf8').replace('<head>', '<head><script>window.devvit={}</script>');

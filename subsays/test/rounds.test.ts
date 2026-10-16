@@ -27,7 +27,9 @@ async function play(kv: FakeKV, uid: string, guesses: string[], n = 1, now = T0 
   for (const g of guesses) last = await guess(kv, uid, g, n, now);
   return last!;
 }
-const state = (kv: FakeKV, uid?: string, now = T0 + DAY + 1000, postId?: string) => getState(kv, { ...opts, uid, name: uid ? `name_${uid}` : undefined, now, postId });
+const state = (kv: FakeKV, uid?: string, now = T0 + DAY + 1000, postId?: string, extra: { bonusShare?: number; testMode?: boolean } = {}) =>
+  getState(kv, { ...opts, uid, name: uid ? `name_${uid}` : undefined, now, postId, ...extra });
+const HALF = { bonusShare: 0.5 };
 
 /** 20 players: pepperoni 10, mushrooms 8, cheese 6, pineapple 4, olives 3, anchovies 2, plus three one-offs. */
 async function survey(kv: FakeKV) {
@@ -125,12 +127,12 @@ test('a round from first answer to final board', async () => {
   assert.deepEqual(after.weekly[0], { name: 'name_g1', points: 110 });
   assert.equal(after.me.weekPoints, 110);
   assert.equal(after.me.weekRank, 1);
-  // u0 answered Pepperoni (50%) and Mushrooms (40%): 10 for answering + half of each percentage as the crowd bonus.
-  const u0 = await state(kv, 'u0');
-  assert.equal(u0.me.weekPoints, 10 + 25 + 20);
+  // u0 answered Pepperoni (50%) and Mushrooms (40%): 20 for answering + half of each percentage as the crowd bonus.
+  const u0 = await state(kv, 'u0', undefined, undefined, HALF);
+  assert.equal(u0.me.weekPoints, 20 + 25 + 20);
   assert.deepEqual(u0.me.bonus, [{ n: 1, points: 45, hits: [{ text: 'Pepperoni', pct: 50 }, { text: 'Mushrooms', pct: 40 }] }]);
-  assert.deepEqual((await state(kv, 'u0')).me.bonus, [], 'the bonus is paid once');
-  assert.equal((await state(kv, 'u0')).me.weekPoints, 55);
+  assert.deepEqual((await state(kv, 'u0', undefined, undefined, HALF)).me.bonus, [], 'the bonus is paid once');
+  assert.equal((await state(kv, 'u0', undefined, undefined, HALF)).me.weekPoints, 65);
 
   assert.deepEqual(await guess(kv, 'late', 'pepperoni', 1, T0 + 2 * DAY + 1), { ok: false, error: 'closed' }, 'guessing ends after a second interval');
 });
@@ -278,14 +280,14 @@ test('answers that miss the board earn no bonus, and a skipped round pays nothin
   const kv = new FakeKV();
   await newRound(kv);
   await survey(kv);
-  const u17 = await state(kv, 'u17'); // only gave one-off answers
+  const u17 = await state(kv, 'u17', undefined, undefined, HALF); // only gave one-off answers
   assert.deepEqual(u17.me.bonus, []);
-  assert.equal(u17.me.weekPoints, 10);
+  assert.equal(u17.me.weekPoints, 20);
   const kv2 = new FakeKV();
   await newRound(kv2);
   for (let u = 0; u < 3; u++) await ans(kv2, `u${u}`, ['pizza', 'tacos', 'sushi']);
-  assert.deepEqual((await state(kv2, 'u0')).me.bonus, []);
-  assert.equal((await state(kv2, 'u0')).me.weekPoints, 10);
+  assert.deepEqual((await state(kv2, 'u0', undefined, undefined, HALF)).me.bonus, []);
+  assert.equal((await state(kv2, 'u0', undefined, undefined, HALF)).me.weekPoints, 20);
 });
 
 test('standings show the top 20 and the player below if they are not in it', async () => {
@@ -297,9 +299,9 @@ test('standings show the top 20 and the player below if they are not in it', asy
   assert.equal(s.weekly.length, 20);
   assert.equal(s.allTime.length, 20);
   assert.ok(!s.weekly.some((r) => r.name === 'name_p24') || s.me.weekRank! <= 20);
-  assert.equal(s.me.weekPoints, 10);
+  assert.equal(s.me.weekPoints, 20);
   assert.ok(s.me.weekRank! >= 1 && s.me.weekRank! <= 25);
-  assert.equal(s.me.allPoints, 10);
+  assert.equal(s.me.allPoints, 20);
   assert.equal(s.me.allRank, s.me.weekRank);
   const next = await state(kv, 'visitor', T0 + 8 * DAY);
   assert.equal(next.weekly.length, 0, 'the weekly board starts again');
@@ -307,7 +309,43 @@ test('standings show the top 20 and the player below if they are not in it', asy
   assert.equal(next.me.weekPoints, 0);
   assert.equal(next.me.allPoints, 0);
   // A crowd bonus is paid when the player next opens the game, so it lands in that week.
-  const late = await state(kv, 'p00', T0 + 8 * DAY);
+  const late = await state(kv, 'p00', T0 + 8 * DAY, undefined, HALF);
   assert.equal(late.me.bonus[0]?.points, 150);
   assert.equal(late.me.weekPoints, 150);
+});
+
+test('the crowd bonus is off unless the moderator turns it on', async () => {
+  const kv = new FakeKV();
+  await newRound(kv);
+  await survey(kv);
+  const u0 = await state(kv, 'u0');
+  assert.deepEqual(u0.me.bonus, []);
+  assert.equal(u0.me.weekPoints, 20, 'only the points for answering');
+  assert.equal(u0.bonusShare, 0);
+  assert.equal(u0.answerPoints, 20);
+  const later = await state(kv, 'u0', undefined, undefined, HALF);
+  assert.equal(later.me.bonus[0]?.points, 45, 'turning it on later still pays the rounds that were not settled');
+});
+
+test('testing mode lifts the one-try limits and lets a single tester build a board', async () => {
+  const kv = new FakeKV();
+  await openRound(kv, { q: 'Name a color.', now: T0, intervalMs: DAY, minPlayers: 1, cap: 'auto', test: true });
+  const T = { testMode: true };
+  const answer = (words: string[], now = T0 + 1000) => submitAnswers(kv, { uid: 'me', name: 'me', n: 1, answers: words, now, ...T });
+  assert.ok((await answer(['red', 'blue', 'green'])).ok);
+  assert.ok((await answer(['yellow', 'purple', 'orange'])).ok, 'answering again is allowed');
+  // Without testing mode the same player is stopped.
+  assert.deepEqual(await submitAnswers(kv, { uid: 'me', name: 'me', n: 1, answers: ['black', 'white', 'pink'], now: T0 + 2000 }), { ok: false, error: 'already' });
+
+  const board = await finalBoard(kv, 1, T0 + DAY + 1);
+  assert.equal(board?.board.length, 5, 'one tester is enough (six answers, the board holds five)');
+  assert.ok(board?.board.every((b) => b.pct === 100), 'but nothing is over 100%');
+
+  const g = (text: string) => submitGuess(kv, { uid: 'me', name: 'me', n: 1, guess: text, now: T0 + DAY + 1000, sub: 'test', ...T });
+  for (const t of ['red', 'blue', 'green']) assert.ok((await g(t)).ok);
+  const done = await submitGuess(kv, { uid: 'me', name: 'me', n: 1, guess: 'yellow', now: T0 + DAY + 1000, sub: 'test' });
+  assert.deepEqual(done, { ok: false, error: 'already' }, 'the limit is back when testing mode is off');
+  const again = await g('yellow');
+  assert.ok(again.ok && !again.done && again.result.guesses.length === 1, 'testing: a new attempt starts');
+  assert.equal((await state(kv, 'me', T0 + DAY + 2000, undefined, T)).testMode, true);
 });

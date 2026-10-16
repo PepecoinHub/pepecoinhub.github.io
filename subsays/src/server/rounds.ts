@@ -43,8 +43,7 @@ export interface KV {
 export const MIN_SUPPORT = 3; // an answer needs this many different people to reach the board
 export const NEEDED_ANSWERS = 3; // a player gives exactly this many different answers
 export const MAX_GUESSES = 3;
-export const ANSWER_POINTS = 10;
-export const BONUS_SHARE = 0.5; // an answer that makes the board earns this share of its percentage
+export const ANSWER_POINTS = 20;
 const LOCK_STALE_MS = 4000;
 
 const R = (n: number) => `ss:r:${n}`;
@@ -70,16 +69,16 @@ const K = {
 // ---------- rounds ----------
 
 export type BoardCap = 'auto' | '5' | '8';
-export type NewRound = { q: string; now: number; intervalMs: number; minPlayers: number; cap: BoardCap };
+export type NewRound = { q: string; now: number; intervalMs: number; minPlayers: number; cap: BoardCap; test?: boolean };
 
 type BoardEntry = { id: string; text: string; count: number; pct: number; keys: string[] };
 type Result = { void: true; reason: 'few' | 'thin'; n: number } | { void: false; n: number; board: BoardEntry[] };
-export type Round = { n: number; q: string; openAt: number; interval: number; min: number; cap: BoardCap; postId?: string };
+export type Round = { n: number; q: string; openAt: number; interval: number; min: number; cap: BoardCap; postId?: string; test: boolean };
 export type Phase = 'upcoming' | 'collect' | 'guess' | 'done';
 
 export async function openRound(kv: KV, r: NewRound): Promise<number> {
   const n = await kv.hIncrBy(K.meta, 'count', 1);
-  await kv.hSet(R(n), { q: r.q, openAt: String(r.now), interval: String(r.intervalMs), min: String(r.minPlayers), cap: r.cap });
+  await kv.hSet(R(n), { q: r.q, openAt: String(r.now), interval: String(r.intervalMs), min: String(r.minPlayers), cap: r.cap, test: r.test ? '1' : '0' });
   await kv.hSet(K.meta, { lastOpenAt: String(r.now) });
   await kv.hSet(K.used, { [r.q]: String(n) });
   return n;
@@ -101,7 +100,7 @@ export async function loadRound(kv: KV, n: number): Promise<Round | undefined> {
   if (n < 1) return undefined;
   const h = await kv.hGetAll(R(n));
   if (!h['q']) return undefined;
-  return { n, q: h['q'], openAt: Number(h['openAt']), interval: Number(h['interval']), min: Number(h['min']), cap: (h['cap'] as BoardCap) ?? 'auto', postId: h['postId'] };
+  return { n, q: h['q'], openAt: Number(h['openAt']), interval: Number(h['interval']), min: Number(h['min']), cap: (h['cap'] as BoardCap) ?? 'auto', postId: h['postId'], test: h['test'] === '1' };
 }
 
 export const phaseOf = (r: Round, now: number): Phase =>
@@ -139,7 +138,7 @@ async function assignCluster(kv: KV, n: number, key: string): Promise<string> {
   return (await kv.hGet(K.ck(n), key)) ?? fresh;
 }
 
-export type AnswerInput = { uid?: string; name?: string; n: unknown; answers: unknown; now: number };
+export type AnswerInput = { uid?: string; name?: string; n: unknown; answers: unknown; now: number; testMode?: boolean };
 
 export async function submitAnswers(kv: KV, i: AnswerInput): Promise<AnswerResponse> {
   const { uid, name, now } = i;
@@ -162,12 +161,12 @@ export async function submitAnswers(kv: KV, i: AnswerInput): Promise<AnswerRespo
 
   if (!(await takeLock(kv, uid, now))) return { ok: false, error: 'busy' };
   try {
-    if (await kv.hGet(K.resp(round.n), uid)) return { ok: false, error: 'already' };
+    if (!i.testMode && (await kv.hGet(K.resp(round.n), uid))) return { ok: false, error: 'already' };
     // Spelling variants of one answer must not count as three answers.
     const ids = [];
     for (const c of cleaned) ids.push(await assignCluster(kv, round.n, c.key));
     if (new Set(ids).size < NEEDED_ANSWERS) return { ok: false, error: 'same' };
-    if (!(await kv.hSetNX(K.resp(round.n), uid, '1'))) return { ok: false, error: 'already' };
+    if (!(await kv.hSetNX(K.resp(round.n), uid, '1')) && !i.testMode) return { ok: false, error: 'already' };
     for (const [idx, c] of cleaned.entries()) {
       const id = ids[idx]!;
       if (await kv.hSetNX(K.cu(round.n), `${id}:${uid}`, '1')) await kv.hIncrBy(K.cn(round.n), id, 1);
@@ -230,10 +229,10 @@ async function computeResult(kv: KV, r: Round): Promise<Result> {
   const cap = r.cap === '5' ? 5 : r.cap === '8' ? 8 : n >= 200 ? 8 : 5;
   const ranked = Object.entries(counts)
     .map(([id, c]) => ({ id, count: Number(c), text: display.get(id)?.text ?? '' }))
-    .filter((e) => e.count >= MIN_SUPPORT && e.text && !hidden[e.id])
+    .filter((e) => e.count >= (r.test ? 1 : MIN_SUPPORT) && e.text && !hidden[e.id])
     .sort((a, b) => b.count - a.count || a.text.localeCompare(b.text))
     .slice(0, cap);
-  if (ranked.length < 3) return { void: true, reason: 'thin', n };
+  if (ranked.length < (r.test ? 1 : 3)) return { void: true, reason: 'thin', n };
   const board: BoardEntry[] = ranked.map((e) => ({
     ...e,
     pct: Math.max(1, Math.round((100 * e.count) / n)),
@@ -250,7 +249,7 @@ type Saved = { guesses: GuessEntry[]; points: number; done: boolean };
 
 const parseSaved = (raw: string | undefined): Saved | undefined => (raw ? (JSON.parse(raw) as Saved) : undefined);
 
-export type GuessInput = { uid?: string; name?: string; n: unknown; guess: unknown; now: number; sub: string };
+export type GuessInput = { uid?: string; name?: string; n: unknown; guess: unknown; now: number; sub: string; testMode?: boolean };
 
 /** One guess at a time: the player sees whether it is on the board before typing the next one. */
 export async function submitGuess(kv: KV, i: GuessInput): Promise<GuessResponse> {
@@ -265,8 +264,9 @@ export async function submitGuess(kv: KV, i: GuessInput): Promise<GuessResponse>
 
   if (!(await takeLock(kv, uid, now))) return { ok: false, error: 'busy' };
   try {
-    const saved = parseSaved(await kv.hGet(K.g(round.n), uid)) ?? { guesses: [], points: 0, done: false };
-    if (saved.done) return { ok: false, error: 'already' };
+    let saved = parseSaved(await kv.hGet(K.g(round.n), uid)) ?? { guesses: [], points: 0, done: false };
+    if (saved.done && !i.testMode) return { ok: false, error: 'already' };
+    if (saved.done) saved = { guesses: [], points: 0, done: false }; // testing: start a fresh attempt
     // Typing the same thing again, or another spelling of an answer already found, costs nothing.
     if (saved.guesses.some((g) => keyOf(g.text) === c.key)) return { ok: false, error: 'repeat' };
     const idx = result.board.findIndex((e) => e.keys.includes(c.key) || e.keys.some((k) => sameAnswer(c.key, k)));
@@ -303,11 +303,12 @@ export async function submitGuess(kv: KV, i: GuessInput): Promise<GuessResponse>
 // ---------- crowd bonus ----------
 
 /**
- * Pays, once per round, half the percentage of each of the player's answers that reached the board.
+ * Optional: pays, once per round, a share of the percentage of each of the player's answers that reached the board.
  * It runs when the player opens the game, so nothing heavy happens when a round closes.
  */
-async function settleBonuses(kv: KV, uid: string, now: number): Promise<BonusNote[]> {
+async function settleBonuses(kv: KV, uid: string, now: number, share: number): Promise<BonusNote[]> {
   const notes: BonusNote[] = [];
+  if (share <= 0) return notes;
   for (const r of await recentRounds(kv, 4)) {
     const ph = phaseOf(r, now);
     if (ph !== 'guess' && ph !== 'done') continue;
@@ -319,7 +320,7 @@ async function settleBonuses(kv: KV, uid: string, now: number): Promise<BonusNot
     const ids = JSON.parse(raw) as string[];
     const hits = res.board.filter((e) => ids.includes(e.id)).map((e) => ({ text: e.text, pct: e.pct }));
     if (!hits.length) continue;
-    const points = hits.reduce((sum, h) => sum + Math.round(h.pct * BONUS_SHARE), 0);
+    const points = hits.reduce((sum, h) => sum + Math.round(h.pct * share), 0);
     await credit(kv, uid, points, now);
     notes.push({ n: r.n, points, hits });
   }
@@ -422,6 +423,8 @@ export type StateOpts = {
   sub: string;
   theme: 'classic' | 'pepe';
   sponsorNote: string;
+  testMode?: boolean;
+  bonusShare?: number;
 };
 
 export async function getState(kv: KV, o: StateOpts): Promise<State> {
@@ -439,6 +442,9 @@ export async function getState(kv: KV, o: StateOpts): Promise<State> {
     weekEndsAt: weekEnd(now),
     weekly: await weeklyTop(kv, week, 20),
     allTime: await weeklyTop(kv, 'all', 20),
+    testMode: !!o.testMode,
+    bonusShare: o.bonusShare ?? 0,
+    answerPoints: ANSWER_POINTS,
     me: { loggedIn: !!uid, name: o.name, streak: 0, weekPoints: 0, allPoints: 0, bonus: [] },
     nextRoundAt: rounds[0] ? rounds[0].openAt + rounds[0].interval : undefined,
   };
@@ -494,7 +500,7 @@ export async function getState(kv: KV, o: StateOpts): Promise<State> {
   }
 
   if (uid) {
-    state.me.bonus = await settleBonuses(kv, uid, now);
+    state.me.bonus = await settleBonuses(kv, uid, now, o.bonusShare ?? 0);
     const [u, score, rank, card, allScore, allRank, allCard] = await Promise.all([
       kv.hGetAll(K.user(uid)),
       kv.zScore(K.lb(week), uid),

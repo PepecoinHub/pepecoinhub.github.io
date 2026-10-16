@@ -16,10 +16,15 @@ Runda trwa dwa okna po 24 godziny (długość ustawia moderator: 24, 48 albo 72 
 - **Scalanie:** wielkość liter, akcenty, przedimki (a/an/the), liczba mnoga i kolejność słów są ignorowane ("Sandwiches" = "a sandwich", "fries, french" = "French fries"). Literówki scala się tylko przy słowach od 6 liter i tylko przy tej samej pierwszej literze (tennis/tenis, ale nie mouse/house).
 - **Plansza:** odpowiedź wchodzi, gdy podały ją **co najmniej 3 różne osoby**. 5 odpowiedzi, a od 200 osób, które odpowiedziały, 8 (moderator może wymusić 5 lub 8). Poniżej 3 odpowiedzi spełniających próg albo poniżej minimalnej liczby osób (domyślnie 20) runda jest pomijana i aplikacja to mówi.
 - **Zgadywanie po jednej odpowiedzi:** wpisujesz jedną, od razu widzisz, czy jest na tablicy (trafiona odsłania swój rząd na właściwym miejscu), i dopiero potem wpisujesz następną. 3 próby; pudło zużywa próbę. Powtórzenie czegoś, co już sprawdziłeś (także innym zapisem), nic nie kosztuje. Cała tablica pokazuje się po ostatniej próbie.
-- **Punkty:** **+10 za wysłanie 3 odpowiedzi.** **Bonus „crowd”:** każda z twoich odpowiedzi, która trafia na tablicę, daje połowę swojego procentu (odpowiedź podana przez 50% osób to +25). Bonus wypłaca się raz, gdy gracz wchodzi do gry po zamknięciu zbierania (nic ciężkiego nie dzieje się przy zamknięciu rundy), i dopisuje się do tygodnia, w którym gracz wszedł. **Za zgadnięcie:** tyle punktów, ile procent osób podało trafioną odpowiedź (62% = 62 pkt). Dwa zapisy tej samej odpowiedzi liczą się raz.
+- **Punkty:** **+20 za wysłanie 3 odpowiedzi.** **Za zgadnięcie:** tyle punktów, ile procent osób podało trafioną odpowiedź (62% = 62 pkt). Dwa zapisy tej samej odpowiedzi liczą się raz.
+- **Bonus „crowd” (domyślnie wyłączony):** opcja dla moderatora. Każda z twoich odpowiedzi, która trafia na tablicę, daje wtedy połowę swojego procentu. Jest wyłączony, bo nagradza mówienie tego, co powie większość, a nie tego, co się myśli: odpowiedzi stają się oczywiste, tablice nudne, a zgadywanie za proste, do tego łatwo o nakręcanie („wszyscy piszcie pepperoni”). Wypłaca się raz, gdy gracz wchodzi do gry po zamknięciu zbierania, i dopisuje do tygodnia, w którym wszedł.
 - **Ranking:** top 20 tygodnia i top 20 wszech czasów, a jeśli gracza nie ma na liście, jego wiersz z miejscem i punktami pokazuje się pod spodem. Do tego seria dni z rzędu (🔥) i poniedziałkowy komentarz z podium. Zbieranie odpowiedzi jest otwarte dla wszystkich (bez limitu liczby ankietowanych): udział każdego to sedno gry, a procent liczy się z faktycznej liczby osób.
 - **Wynik do wklejenia** jak w Wordle: `🟩🟨⬜ 100 pts` (zielone: najpopularniejsza odpowiedź, żółte: odpowiedź z tablicy, szare: pudło). Przycisk kopiuje tekst do schowka.
 - **Komentarze aplikacji:** pod każdym nowym postem "jak grać" plus wczorajsza tablica (aplikacja próbuje go przypiąć, co działa tylko jeśli jest moderatorem), pod zakończoną rundą komentarz z tablicą końcową.
+
+## Tryb testowy na Reddicie
+
+W ustawieniach aplikacji w subie testowym włącz **Testing mode** i ustaw **Round length** na „10 minutes (testing only)”. Wtedy możesz odpowiadać i zgadywać wiele razy (po zakończeniu pojawiają się przyciski „Answer again” i „Play again”), jedna osoba wystarczy do zbudowania tablicy, a menu moderatora „start a new round now” nie czeka 6 godzin. Obok tytułu świeci żółty znaczek TEST. Przed prawdziwym użyciem wyłącz Testing mode i wróć do 24 godzin.
 
 ## Ustawienia dla moderatora
 
@@ -28,7 +33,9 @@ Runda trwa dwa okna po 24 godziny (długość ustawia moderator: 24, 48 albo 72 
 | Post a new round automatically | tak |
 | Question category | General (do wyboru: Food, Gaming, Movies, Music, Sports, Travel, Tech, Crypto, Fitness, Pets, Memes) |
 | Your own questions | puste (jedno pytanie na linię, idą przed wbudowanymi) |
-| Round length | 24 h (lub 48, 72) |
+| Round length | 24 h (lub 48, 72; do testów też 1 godzina i 10 minut) |
+| Crowd bonus | Off (lub Half of the percentage) |
+| Testing mode | wyłączony: zdejmuje blokady jednej próby, jedna osoba wystarcza do tablicy, menu moderatora nie pilnuje 6 godzin odstępu |
 | People needed to make a board | 20 |
 | Board size | Auto |
 | Theme | Classic (lub Pepe frogs) |
@@ -45,12 +52,12 @@ Node 22+.
 ```bash
 cd subsays
 npm install
-npm test             # 20 testów: scalanie odpowiedzi, pełna runda, wyścigi, serie, ukrywanie
+npm test             # 22 testy: scalanie odpowiedzi, pełna runda, wyścigi, serie, ukrywanie
 npm run typecheck
 SEED=1 npm run local # lokalnie, bez Reddita: http://localhost:5175/as/alice
 ```
 
-W symulatorze: `/dev/advance?h=24` przesuwa zegar o dobę i uruchamia dzienne zadanie (nowa runda, zakończone rundy), `/post/1` pokazuje grę tak, jak widziałby ją stary post, `/as/bob` loguje innego gracza. Zmienne: `MIN`, `HOURS`, `CATEGORY`, `THEME`, `NOTE`, `SUB`.
+W symulatorze: `/dev/advance?h=24` przesuwa zegar o dobę i uruchamia dzienne zadanie (nowa runda, zakończone rundy), `/post/1` pokazuje grę tak, jak widziałby ją stary post, `/as/bob` loguje innego gracza. Zmienne: `MIN`, `MINUTES` (długość rundy), `TEST=1` (tryb testowy), `BONUS=0.5` (bonus crowd), `CATEGORY`, `THEME`, `NOTE`, `SUB`.
 
 Na Reddicie:
 

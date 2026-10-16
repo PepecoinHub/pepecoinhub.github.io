@@ -37,25 +37,30 @@ function first(v: unknown, fallback: string): string {
 }
 
 async function readSettings() {
-  const [autoPost, category, roundHours, minPlayers, boardSize, custom, theme, note] = await Promise.all([
+  const [autoPost, category, roundMinutes, minPlayers, boardSize, custom, theme, note, testMode, crowdBonus] = await Promise.all([
     settings.get<boolean>('autoPost'),
     settings.get('category'),
-    settings.get('roundHours'),
+    settings.get('roundMinutes'),
     settings.get<number>('minPlayers'),
     settings.get('boardSize'),
     settings.get<string>('customQuestions'),
     settings.get('theme'),
     settings.get<string>('sponsorNote'),
+    settings.get<boolean>('testMode'),
+    settings.get('crowdBonus'),
   ]);
   const cat = first(category, 'general');
-  const hours = Number(first(roundHours, '24'));
+  const minutes = Number(first(roundMinutes, '1440'));
+  const test = testMode === true;
   const min = Number(minPlayers);
   const cap = first(boardSize, 'auto');
   return {
     autoPost: autoPost !== false,
     category: ((CATEGORIES as readonly string[]).includes(cat) ? cat : 'general') as Category,
-    roundHours: [24, 48, 72].includes(hours) ? hours : 24,
-    minPlayers: Number.isFinite(min) && min >= 3 ? Math.min(500, Math.floor(min)) : 20,
+    roundMs: ([10, 60, 1440, 2880, 4320].includes(minutes) ? minutes : 1440) * 60_000,
+    test,
+    bonusShare: first(crowdBonus, 'off') === 'half' ? 0.5 : 0,
+    minPlayers: Number.isFinite(min) && min >= (test ? 1 : 3) ? Math.min(500, Math.floor(min)) : test ? 1 : 20,
     cap: (cap === '5' || cap === '8' ? cap : 'auto') as BoardCap,
     custom: (custom ?? '').split('\n').map((l) => l.trim()).filter((l) => l.length >= 8 && l.length <= 140).slice(0, 200),
     theme: first(theme, 'classic') === 'pepe' ? ('pepe' as const) : ('classic' as const),
@@ -74,7 +79,7 @@ async function me() {
 app.get<object, State | { error: string }>('/api/state', async (_req, res) => {
   try {
     const [{ uid, name }, s] = await Promise.all([me(), readSettings()]);
-    res.json(await getState(kv, { uid, name, postId: context.postId, now: Date.now(), sub: context.subredditName, theme: s.theme, sponsorNote: s.sponsorNote }));
+    res.json(await getState(kv, { uid, name, postId: context.postId, now: Date.now(), sub: context.subredditName, theme: s.theme, sponsorNote: s.sponsorNote, testMode: s.test, bonusShare: s.bonusShare }));
   } catch (e) {
     console.error('state failed', e);
     res.status(500).json({ error: 'state failed' });
@@ -93,7 +98,8 @@ app.get<object, SuggestResponse | { error: string }>('/api/suggest', async (req,
 app.post<object, AnswerResponse | { error: string }, { n?: number; answers?: string[] }>('/api/answer', async (req, res) => {
   try {
     const { uid, name } = await me();
-    res.json(await submitAnswers(kv, { uid, name, n: req.body?.n, answers: req.body?.answers, now: Date.now() }));
+    const s = await readSettings();
+    res.json(await submitAnswers(kv, { uid, name, n: req.body?.n, answers: req.body?.answers, now: Date.now(), testMode: s.test }));
   } catch (e) {
     console.error('answer failed', e);
     res.status(500).json({ error: 'answer failed' });
@@ -103,7 +109,8 @@ app.post<object, AnswerResponse | { error: string }, { n?: number; answers?: str
 app.post<object, GuessResponse | { error: string }, { n?: number; guess?: string }>('/api/guess', async (req, res) => {
   try {
     const { uid, name } = await me();
-    res.json(await submitGuess(kv, { uid, name, n: req.body?.n, guess: req.body?.guess, now: Date.now(), sub: context.subredditName }));
+    const s = await readSettings();
+    res.json(await submitGuess(kv, { uid, name, n: req.body?.n, guess: req.body?.guess, now: Date.now(), sub: context.subredditName, testMode: s.test }));
   } catch (e) {
     console.error('guess failed', e);
     res.status(500).json({ error: 'guess failed' });
@@ -118,9 +125,9 @@ function howToText(n: number, sub: string, last?: { n: number; q: string; board:
   const lines = [
     `**Sub Says #${n}: how to play**`,
     '',
-    `1. **Answer today's question** with 3 different answers. It takes 10 seconds and earns 10 points.`,
+    `1. **Answer today's question** with 3 different answers. It takes 10 seconds and earns 20 points.`,
     `2. **Come back tomorrow** and guess what r/${sub} said, one guess at a time. Three tries.`,
-    `3. **Score what the crowd scored.** If 41% of people said "sandwiches" and you guessed it, you get 41 points. Your own answers that reach the board earn a crowd bonus (half their percentage). Answers need at least 3 people to make the board.`,
+    `3. **Score what the crowd scored.** If 41% of people said "sandwiches" and you guessed it, you get 41 points. Answers need at least 3 people to make the board.`,
     '',
     'Weekly standings are posted every Monday. Share your result below: 🟩 top answer, 🟨 on the board, ⬜ miss.',
   ];
@@ -155,7 +162,7 @@ async function startRound(lastFinished?: number) {
   const s = await readSettings();
   const now = Date.now();
   const pick = pickQuestion({ custom: s.custom, category: s.category, used: await usedQuestions(kv) });
-  const n = await openRound(kv, { q: pick.q, now, intervalMs: s.roundHours * HOUR, minPlayers: s.minPlayers, cap: s.cap });
+  const n = await openRound(kv, { q: pick.q, now, intervalMs: s.roundMs, minPlayers: s.minPlayers, cap: s.cap, test: s.test });
   const sub = context.subredditName;
   const post = await reddit.submitCustomPost({
     subredditName: sub,
@@ -181,8 +188,9 @@ async function announceFinished(ns: number[]) {
 
 app.post('/internal/menu/new-round', async (_req, res) => {
   try {
+    const s = await readSettings();
     const opened = await lastOpenAt(kv);
-    if (opened && Date.now() - opened < 6 * HOUR) {
+    if (!s.test && opened && Date.now() - opened < 6 * HOUR) {
       return res.json({ showToast: 'A round started less than 6 hours ago. Give people time to play it.' });
     }
     const { post } = await startRound();
@@ -231,7 +239,7 @@ app.post('/internal/on-app-install', async (_req, res) => {
 app.post('/internal/cron/daily', async (_req, res) => {
   try {
     const s = await readSettings();
-    const tick = await dailyTick(kv, Date.now(), s.roundHours * HOUR);
+    const tick = await dailyTick(kv, Date.now(), s.roundMs);
     await announceFinished(tick.finished);
     if (tick.due && s.autoPost) await startRound(tick.finished[tick.finished.length - 1]);
   } catch (e) {

@@ -57,6 +57,9 @@ export type State = {
   archive?: ArchiveView; // the post's own round once it is over, or the latest finished one
   weekly: LeaderRow[];
   allTime: LeaderRow[];
+  testMode: boolean; // moderators can lift the one-try limits while testing
+  bonusShare: number; // 0 = no crowd bonus, 0.5 = half the percentage
+  answerPoints: number;
   me: {
     loggedIn: boolean;
     name?: string;
