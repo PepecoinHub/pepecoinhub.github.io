@@ -50,6 +50,7 @@ Typy `exchange`, `pool`, `burn` znikają w widoku „bez giełd i pooli” (raze
 | `docs/games/`, `games/` | Gry społeczności (Draw & Guess, Guess the Picture, stoły: szachy, warcaby, „czwórki w rząd”, statki, gra z botem). Strony w `docs/games/`; serwer (Supabase) opisuje `games/SETUP.md`, kod bazy jest w `games/supabase/`. Na razie ukryte (bez linku w menu, `noindex`). Bez wpisanych kluczy w `docs/games/js/config.js` działa tylko gra z botem. Żaby do gier generuje `scripts/make_games_frogs.py`. |
 | `armada/` | Aplikacja Reddit (Devvit): gra "Armada", cała społeczność subreddita kontra jedna ukryta flota. Osobny projekt Node, nie jest częścią strony. Opis w `armada/README.md`. |
 | `rps/` | Aplikacja Reddit (Devvit): "Subreddit Wars", kamień-papier-nożyce między drużynami-subredditami i pojedynki graczy. Bez serwera. Osobny projekt Node. Opis w `rps/README.md`. |
+| `subsays/` | Aplikacja Reddit (Devvit): "Sub Says", codzienna gra w zgadywanie, co odpowiedziała społeczność subreddita (jak w teleturnieju z ankietą). Bez serwera. Osobny projekt Node. Opis w `subsays/README.md`, szkice wiadomości do moderatorów w `subsays/OUTREACH.md`. |
 | `.github/workflows/snapshot.yml` | Dwa zadania. `snapshot`: pobranie danych, podsumowanie, commit. `deploy`: publikacja strony. Dzięki temu historia zbiera się nawet przed włączeniem Pages. Push też robi snapshot, ale tylko jeśli na dziś jeszcze go nie ma. |
 
 ## Lokalnie
