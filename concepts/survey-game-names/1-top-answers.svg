@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" font-family="Inter, 'Noto Sans', 'DejaVu Sans', Arial, sans-serif">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d1126"/><stop offset="1" stop-color="#1c2150"/></linearGradient>
+  <radialGradient id="glow" cx="0.5" cy="0.18" r="0.6"><stop offset="0" stop-color="#ffb020" stop-opacity="0.28"/><stop offset="1" stop-color="#ffb020" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1200" height="1200" fill="url(#bg)"/><rect width="1200" height="1200" fill="url(#glow)"/>
+<text x="600" y="190" text-anchor="middle" font-size="132" font-weight="800" fill="#ffffff" letter-spacing="-2">Top Answers</text>
+<rect x="520" y="222" width="160" height="8" rx="4" fill="#ffb020"/>
+<text x="600" y="290" text-anchor="middle" font-size="40" fill="#b9c3ee">Guess what the crowd said.</text>
+<rect x="90" y="345" width="1020" height="610" rx="40" fill="#ffffff" fill-opacity="0.06" stroke="#ffb020" stroke-opacity="0.55" stroke-width="3"/>
+<text x="600" y="418" text-anchor="middle" font-size="38" font-weight="600" fill="#ffffff">Name something you&#x27;d bring to a picnic</text>
+<rect x="130" y="460" width="940" height="80" rx="20" fill="#0d1126" fill-opacity="0.65"/>
+<rect x="130" y="460" width="642" height="80" rx="20" fill="#ffb020" fill-opacity="0.30"/>
+<circle cx="185" cy="500" r="26" fill="#ffb020"/><text x="185" y="512" text-anchor="middle" font-size="32" font-weight="800" fill="#101010">1</text>
+<text x="235" y="514" font-size="38" font-weight="600" fill="#ffffff">Sandwiches</text>
+<text x="1035" y="514" text-anchor="end" font-size="38" font-weight="800" fill="#ffb020">41</text>
+<rect x="130" y="558" width="940" height="80" rx="20" fill="#0d1126" fill-opacity="0.65"/>
+<rect x="130" y="558" width="376" height="80" rx="20" fill="#ffb020" fill-opacity="0.30"/>
+<circle cx="185" cy="598" r="26" fill="#ffb020"/><text x="185" y="610" text-anchor="middle" font-size="32" font-weight="800" fill="#101010">2</text>
+<text x="235" y="612" font-size="38" font-weight="600" fill="#ffffff">A blanket</text>
+<text x="1035" y="612" text-anchor="end" font-size="38" font-weight="800" fill="#ffb020">24</text>
+<rect x="130" y="656" width="940" height="80" rx="20" fill="#0d1126" fill-opacity="0.65"/>
+<rect x="130" y="656" width="266" height="80" rx="20" fill="#ffb020" fill-opacity="0.30"/>
+<circle cx="185" cy="696" r="26" fill="#ffb020"/><text x="185" y="708" text-anchor="middle" font-size="32" font-weight="800" fill="#101010">3</text>
+<text x="235" y="710" font-size="38" font-weight="600" fill="#ffffff">Lemonade</text>
+<text x="1035" y="710" text-anchor="end" font-size="38" font-weight="800" fill="#ffb020">17</text>
+<rect x="130" y="754" width="940" height="80" rx="20" fill="#0d1126" fill-opacity="0.65"/>
+<circle cx="185" cy="794" r="26" fill="none" stroke="#ffb020" stroke-width="3"/><text x="185" y="806" text-anchor="middle" font-size="32" font-weight="800" fill="#ffb020">4</text>
+<text x="235" y="806" font-size="38" font-weight="600" fill="#6f7bb5" letter-spacing="8">· · · · · ·</text>
+<text x="1035" y="808" text-anchor="end" font-size="38" font-weight="800" fill="#6f7bb5">??</text>
+<rect x="130" y="852" width="940" height="80" rx="20" fill="#0d1126" fill-opacity="0.65"/>
+<circle cx="185" cy="892" r="26" fill="none" stroke="#ffb020" stroke-width="3"/><text x="185" y="904" text-anchor="middle" font-size="32" font-weight="800" fill="#ffb020">5</text>
+<text x="235" y="904" font-size="38" font-weight="600" fill="#6f7bb5" letter-spacing="8">· · · · · ·</text>
+<text x="1035" y="906" text-anchor="end" font-size="38" font-weight="800" fill="#6f7bb5">??</text>
+<text x="130" y="1035" font-size="30" fill="#b9c3ee">Your score, spoiler free:</text>
+<rect x="480" y="1005" width="54" height="42" rx="9" fill="#3ecf6e"/>
+<rect x="546" y="1005" width="54" height="42" rx="9" fill="#f2c230"/>
+<rect x="612" y="1005" width="54" height="42" rx="9" fill="#4a5280"/>
+<text x="1070" y="1035" text-anchor="end" font-size="30" font-weight="700" fill="#ffffff">71 pts</text>
+<rect x="90" y="1085" width="1020" height="80" rx="40" fill="#ffb020"/>
+<text x="600" y="1138" text-anchor="middle" font-size="36" font-weight="800" fill="#101010">New question every day · only on Reddit</text>
+</svg>
