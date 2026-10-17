@@ -362,7 +362,7 @@ button.combo-val:hover { border-color: var(--accent); }
     var dot = s.lastIndexOf('.'), comma = s.lastIndexOf(',');
     if (dot > -1 && comma > -1) s = dot > comma ? s.replace(/,/g, '') : s.replace(/\./g, '').replace(',', '.');
     else if (comma > -1) s = /^\d{1,3}(,\d{3})+$/.test(s) ? s.replace(/,/g, '') : s.replace(',', '.');
-    else if (/^\d{1,3}(\.\d{3}){2,}$/.test(s)) s = s.replace(/\./g, '');
+    else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
     if (!/^(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
     var v = parseFloat(s) * mul;
     return isFinite(v) && v > 0 ? v : NaN;
