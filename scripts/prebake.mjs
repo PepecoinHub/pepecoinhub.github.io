@@ -24,13 +24,16 @@ const langOf = (html) => {
   const tag = (m ? m[1] : 'en').toLowerCase();
   return tag.startsWith('zh') ? 'zh' : tag.split('-')[0];
 };
+// optional: node scripts/prebake.mjs pl de   (only these languages; "en" is the root folder)
+const ONLY = process.argv.slice(2);
 function pages(name) {
   const out = [path.join(DOCS, name)];
   for (const d of fs.readdirSync(DOCS, { withFileTypes: true })) {
     const p = path.join(DOCS, d.name, name);
     if (d.isDirectory() && LOCALE[d.name] && fs.existsSync(p)) out.push(p);
   }
-  return out.filter((p) => fs.existsSync(p));
+  const lang = (p) => (path.dirname(p) === DOCS ? 'en' : path.basename(path.dirname(p)));
+  return out.filter((p) => fs.existsSync(p) && (!ONLY.length || ONLY.includes(lang(p))));
 }
 
 // ------------------------------------------------------------------ fake DOM, just enough for fill()
