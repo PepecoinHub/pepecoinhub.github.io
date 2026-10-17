@@ -56,6 +56,10 @@ jobs:
             echo "No snapshots yet, publishing the empty state."
           fi
 
+      # the plain-HTML numbers on the network and rich list pages, in every language
+      - name: Bake numbers into the pages
+        run: node scripts/prebake.mjs || echo "page numbers not updated"
+
       - name: Date the sitemap
         run: python scripts/build_sitemap.py || echo "sitemap dates not updated"
 
@@ -68,7 +72,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data docs/rich-list.html docs/sitemap.xml
+          git add docs/data docs/sitemap.xml $(ls docs/network.html docs/rich-list.html docs/*/network.html docs/*/rich-list.html 2>/dev/null)
           if git diff --cached --quiet; then
             echo "Nothing new to commit."
           else

@@ -679,7 +679,7 @@
   }
   setInterval(() => { if (active('rally') && !reduced) for (let i = 0; i < 2; i++) spawnCandle(); }, 400);
 
-  // ---------- TEST ONLY: cheat code "klapaucius" (×100 for 1 minute). Remove before the game is announced. ----------
+  // ---------- Easter egg: cheat code "klapaucius" (×100 for 1 minute). Type it, or tap the coin 5 times quickly. Kept on purpose. ----------
   const CHEAT = 'klapaucius';
   function cheat(word) {
     if (String(word).trim().toLowerCase() !== CHEAT || !S.started) return false;

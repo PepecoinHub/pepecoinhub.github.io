@@ -32,7 +32,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261013b">
+<link rel="stylesheet" href="../facts.css?v=20261017">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Pepecoin Hub", "url": "https://pepecoinhub.com/pl/", "description": "Fakty o Pepecoinie (PEP) zebrane przez społeczność.", "inLanguage": "pl"}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -42,16 +42,16 @@
 
 <header class="site-head">
   <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
-  <nav class="site-nav" aria-label="Strony"><a href="which-pepecoin.html">Który jest który</a><a href="../compare.html">PEP i DOGE</a><a href="../calculator.html">Kalkulator</a><a href="../supply.html">Podaż</a><a href="../scrypt-family.html">Rodzina Scrypt</a><a href="../network.html">Sieć</a><a href="../rich-list.html">Najbogatsze adresy</a><a href="../guides.html">Poradniki</a></nav>
+  <nav class="site-nav" aria-label="Strony"><a href="which-pepecoin.html">Który jest który</a><a href="compare.html">PEP i DOGE</a><a href="calculator.html">Kalkulator</a><a href="supply.html">Podaż</a><a href="scrypt-family.html">Rodzina Scrypt</a><a href="network.html">Sieć</a><a href="rich-list.html">Najbogatsze adresy</a><a href="guides.html">Poradniki</a></nav>
 </header>
 <main class="wrap" id="main">
 <header class="page-head home-hero">
   <div class="home-hero-copy">
     <p class="eyebrow">Strony z faktami od społeczności · aktualizacja: 12 października 2026</p>
-  <h1>Pepecoin w faktach i liczbach</h1>
-  <p class="lede">Pepecoin (PEP) to moneta z własnym blockchainem, oparta na proof of work (sieć zabezpiecza praca obliczeniowa górników). Kopie się ją razem z Litecoinem i Dogecoinem. Na tych stronach znajdziesz liczby wraz z informacją, skąd pochodzi każda z nich.</p>
+  <h1>Pepecoin (PEP) w faktach i liczbach</h1>
+  <p class="lede">Pepecoin (PEP) to moneta z własnym blockchainem, oparta na proof of work (sieć zabezpiecza praca obliczeniowa górników). <a href="mining.html">Kopie się ją razem z Litecoinem i Dogecoinem</a>. Na tych stronach znajdziesz liczby wraz z informacją, skąd pochodzi każda z nich.</p>
   <p class="pledge soon"><img src="../assets/new-games.webp" alt="" width="64" height="64"><span><strong>Nowość: PEP Games.</strong> Kalambury, Pepe Miner i czat dla społeczności. <a href="../games/">Zajrzyj →</a></span></p>
-  <p class="ctas"><a class="btn main" href="which-pepecoin.html">Który Pepecoin jest który?</a><a class="btn soft" href="buy.html">Jak kupić PEP</a></p>
+  <p class="ctas"><a class="btn main" href="which-pepecoin.html">Który Pepecoin jest który?</a><a class="btn soft" href="buy.html">Jak kupić PEP</a><a class="btn soft" href="mining.html">Jak kopać PEP</a></p>
   </div>
   <div class="home-hero-visual">
     <div class="home-hero-glow" aria-hidden="true"></div>
@@ -61,13 +61,24 @@
 
 <section aria-label="Kluczowe fakty">
   <div class="stats">
-    <div class="stat"><span class="label">Start</span><span class="value">30 sty 2024</span><span class="sub">własny blockchain warstwy 1</span><span class="src">Źródło: <a href="../network.html">dane sieci</a></span></div>
+    <div class="stat"><span class="label">Start</span><span class="value">30 sty 2024</span><span class="sub">własny blockchain warstwy 1</span><span class="src">Źródło: <a href="network.html">dane sieci</a></span></div>
     <div class="stat"><span class="label">Kopanie</span><span class="value">Scrypt PoW</span><span class="sub">kopany razem z LTC i DOGE</span><span class="src">Źródło: <a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp</a></span></div>
     <div class="stat"><span class="label">Przydział na starcie</span><span class="value">0%</span><span class="sub">bez premine, bez ICO</span><span class="src">Źródło: <a href="https://pepecoin.com/mica-whitepaper.xhtml">Biała księga MiCA</a> (D.9, G.5)</span></div>
     <div class="stat"><span class="label">Nagroda za blok</span><span class="value">10 000 PEP</span><span class="sub">mniej więcej co 60 sekund</span><span class="src">Źródło: <a href="https://pepecoin.com/mica-whitepaper.xhtml">Biała księga MiCA</a> (G.13)</span></div>
   </div>
 </section>
 
+
+<section class="pep-id" aria-labelledby="pep-id-h">
+  <h2 id="pep-id-h">PEP to nie PEPE</h2>
+  <p class="note">Pepecoin (PEP) działa na własnym blockchainie i jest kopany razem z Litecoinem i Dogecoinem (merged mining). To coś innego niż Pepe (PEPE), token na Ethereum z 2023 roku, i PepeCoin (PEPECOIN), projekt z 2016 roku, który w 2023 roku przeniósł się na Ethereum.</p>
+  <ul class="pep-id-list">
+    <li class="is-pep"><b>PEP</b><span>Pepecoin</span><span>własny blockchain proof of work</span></li>
+    <li><b>PEPE</b><span>Pepe</span><span>token ERC-20 na Ethereum</span></li>
+    <li><b>PEPECOIN</b><span>PepeCoin</span><span>token ERC-20 na Ethereum</span></li>
+  </ul>
+  <p class="pep-id-more"><a href="which-pepecoin.html">Jak je odróżnić →</a></p>
+</section>
 
 <section aria-labelledby="about-pep">
   <h2 id="about-pep" class="visually-hidden">O Pepecoinie</h2>
@@ -80,7 +91,7 @@
     <article class="pitch">
       <img class="pitch-icons" src="../assets/brand/triple-mine.png" width="110" height="102" alt="">
       <h2>Kopanie trzech monet naraz</h2>
-      <p>Litecoina, Dogecoina i Pepecoina można kopać jednocześnie, wykonując tę samą pracę Scrypt. Umożliwia to merged mining (AuxPoW): jedna praca obliczeniowa liczy się w kilku sieciach naraz.</p>
+      <p>Litecoina, Dogecoina i Pepecoina można kopać jednocześnie, wykonując tę samą pracę Scrypt. Umożliwia to merged mining (AuxPoW): jedna praca obliczeniowa liczy się w kilku sieciach naraz. <a href="mining.html">Jak kopać PEP →</a></p>
     </article>
   </div>
 </section>
@@ -92,28 +103,28 @@
       <h3>Który Pepecoin jest który?</h3>
       <p>PEPE, PEPECOIN i PEP to trzy różne aktywa. Tabela porównawcza i sposób na sprawdzenie adresu w pięć sekund.</p>
     </a>
-    <a class="card" href="../rich-list.html">
-      <h3>Najbogatsze adresy i monitoring posiadaczy <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="rich-list.html">
+      <h3>Najbogatsze adresy i monitoring posiadaczy</h3>
       <p>Jaką część podaży trzymają 10, 100 i 1 000 największych adresów i jak to się zmienia. Codziennie nowy zrzut danych.</p>
     </a>
-    <a class="card" href="../compare.html">
-      <h3>Pepecoin i Dogecoin <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="compare.html">
+      <h3>Pepecoin i Dogecoin</h3>
       <p>Te same reguły, dziesięć lat różnicy. Hashrate, podaż i ceny obu monet porównane w takim samym wieku sieci.</p>
     </a>
-    <a class="card" href="../supply.html">
-      <h3>Podaż i inflacja <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="supply.html">
+      <h3>Podaż i inflacja</h3>
       <p>Brak limitu podaży, co roku tyle samo nowych monet i stopa inflacji, która z każdym rokiem spada. Wykres obejmuje kolejne 25 lat.</p>
     </a>
-    <a class="card" href="../calculator.html">
-      <h3>Kalkulator kapitalizacji <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="calculator.html">
+      <h3>Kalkulator kapitalizacji</h3>
       <p>Ile byłyby warte Twoje PEP przy kapitalizacji Dogecoina, Bitcoina albo dowolnej monety z top 100 — dziś lub w jej historycznym szczycie (ATH). Z cenami na żywo.</p>
     </a>
-    <a class="card" href="../scrypt-family.html">
-      <h3>Rodzina Scrypt <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="scrypt-family.html">
+      <h3>Rodzina Scrypt</h3>
       <p>Jak Litecoin, Dogecoin i Pepecoin zaczęły korzystać z tego samego sprzętu do kopania — od propozycji Charliego Lee z 2014 roku do dziś.</p>
     </a>
-    <a class="card" href="../network.html">
-      <h3>Sieć dzień po dniu <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="network.html">
+      <h3>Sieć dzień po dniu</h3>
       <p>Wysokość bloku, podaż, liczba adresów z saldem PEP i rzeczywisty średni czas między blokami — na wykresach od 30 stycznia 2024.</p>
     </a>
   </div>
@@ -130,12 +141,12 @@
       <h3>Portfele dla PEP</h3>
       <p>Pepecoin Core, Tangem i oficjalna karta Pepecoin Tangem ze sklepu Pepecoin Shop.</p>
     </a>
-    <a class="card" href="../mining.html">
-      <h3>Jak kopać PEP <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="mining.html">
+      <h3>Jak kopać PEP</h3>
       <p>Koparki ASIC do Scrypt, mining poole obsługujące PEP w ramach merged mining i adres do wypłat.</p>
     </a>
-    <a class="card" href="../mica.html">
-      <h3>Pepecoin i MiCA <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="mica.html">
+      <h3>Pepecoin i MiCA</h3>
       <p>Czym jest unijna biała księga związana z notowaniem na Krakenie i czego nie oznacza.</p>
     </a>
     <a class="card" href="glossary.html">
@@ -222,6 +233,6 @@
   <p class="correction">Widzisz błąd? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Zgłoś poprawkę</a> (ze źródłem) na GitHubie.</p>
   <details class="support"><summary>Podoba Ci się ta strona? Możesz wesprzeć jej dalszy rozwój.</summary><p>Każda, nawet drobna kwota pomaga. Dziękuję!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
-<script src="../chrome.js?v=20261013b" defer></script>
+<script src="../chrome.js?v=20261017" defer></script>
 </body>
 </html>

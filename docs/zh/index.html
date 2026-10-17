@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261013b">
+<link rel="stylesheet" href="../facts.css?v=20261017">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Pepecoin Hub", "url": "https://pepecoinhub.com/zh/", "description": "Pepecoin（PEP）社区事实资料页。", "inLanguage": "zh-Hans"}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -41,16 +41,16 @@
 
 <header class="site-head">
   <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
-  <nav class="site-nav" aria-label="页面导航"><a href="which-pepecoin.html">如何区分</a><a href="../compare.html">PEP 与 DOGE</a><a href="../calculator.html">计算器</a><a href="../supply.html">供应量</a><a href="../scrypt-family.html">Scrypt 家族</a><a href="../network.html">网络</a><a href="../rich-list.html">富豪榜</a><a href="../guides.html">指南</a></nav>
+  <nav class="site-nav" aria-label="页面导航"><a href="which-pepecoin.html">如何区分</a><a href="compare.html">PEP 与 DOGE</a><a href="calculator.html">计算器</a><a href="supply.html">供应量</a><a href="scrypt-family.html">Scrypt 家族</a><a href="network.html">网络</a><a href="rich-list.html">富豪榜</a><a href="guides.html">指南</a></nav>
 </header>
 <main class="wrap" id="main">
 <header class="page-head home-hero">
   <div class="home-hero-copy">
     <p class="eyebrow">社区事实资料页 · 更新于 2026年10月12日</p>
-  <h1>Pepecoin：事实与数据</h1>
-  <p class="lede">Pepecoin（PEP）是一种工作量证明（proof of work）币，运行在独立的区块链上，与 Litecoin（莱特币）和 Dogecoin（狗狗币）一同挖矿。本站汇集了相关数据，并标明每个数字的来源。</p>
+  <h1>Pepecoin（PEP）：事实与数据</h1>
+  <p class="lede">Pepecoin（PEP）是一种工作量证明（proof of work）币，运行在独立的区块链上，<a href="mining.html">与 Litecoin（莱特币）和 Dogecoin（狗狗币）一同挖矿</a>。本站汇集了相关数据，并标明每个数字的来源。</p>
   <p class="pledge soon"><img src="../assets/new-games.webp" alt="" width="64" height="64"><span><strong>新上线：PEP Games。</strong> 你画我猜、Pepe Miner 和社区聊天室。 <a href="../games/">去看看 →</a></span></p>
-  <p class="ctas"><a class="btn main" href="which-pepecoin.html">如何区分三种 Pepecoin？</a><a class="btn soft" href="buy.html">如何购买 PEP</a></p>
+  <p class="ctas"><a class="btn main" href="which-pepecoin.html">如何区分三种 Pepecoin？</a><a class="btn soft" href="buy.html">如何购买 PEP</a><a class="btn soft" href="mining.html">如何挖 PEP</a></p>
   </div>
   <div class="home-hero-visual">
     <div class="home-hero-glow" aria-hidden="true"></div>
@@ -60,13 +60,24 @@
 
 <section aria-label="核心数据">
   <div class="stats">
-    <div class="stat"><span class="label">上线时间</span><span class="value">2024年1月30日</span><span class="sub">独立的 Layer 1 区块链</span><span class="src">来源：<a href="../network.html">网络数据</a></span></div>
+    <div class="stat"><span class="label">上线时间</span><span class="value">2024年1月30日</span><span class="sub">独立的 Layer 1 区块链</span><span class="src">来源：<a href="network.html">网络数据</a></span></div>
     <div class="stat"><span class="label">挖矿</span><span class="value">Scrypt PoW</span><span class="sub">与 LTC、DOGE 合并挖矿（merged mining）</span><span class="src">来源：<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp</a></span></div>
     <div class="stat"><span class="label">初始分配</span><span class="value">0%</span><span class="sub">无预挖（premine）、无 ICO</span><span class="src">来源：<a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA 白皮书</a>（D.9、G.5）</span></div>
     <div class="stat"><span class="label">区块奖励</span><span class="value">10,000 PEP</span><span class="sub">约每 60 秒出一个区块</span><span class="src">来源：<a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA 白皮书</a>（G.13）</span></div>
   </div>
 </section>
 
+
+<section class="pep-id" aria-labelledby="pep-id-h">
+  <h2 id="pep-id-h">PEP 不是 PEPE</h2>
+  <p class="note">Pepecoin（PEP）运行在自己的区块链上，与 Litecoin 和 Dogecoin 合并挖矿。它与 Pepe（PEPE）和 PepeCoin（PEPECOIN）都不是一回事：Pepe 是 2023年推出的 Ethereum（以太坊）代币；PepeCoin 是 2016年的项目，2023年迁移到了 Ethereum。</p>
+  <ul class="pep-id-list">
+    <li class="is-pep"><b>PEP</b><span>Pepecoin</span><span>独立的工作量证明区块链</span></li>
+    <li><b>PEPE</b><span>Pepe</span><span>Ethereum 上的 ERC-20 代币</span></li>
+    <li><b>PEPECOIN</b><span>PepeCoin</span><span>Ethereum 上的 ERC-20 代币</span></li>
+  </ul>
+  <p class="pep-id-more"><a href="which-pepecoin.html">如何区分它们 →</a></p>
+</section>
 
 <section aria-labelledby="about-pep">
   <h2 id="about-pep" class="visually-hidden">关于 Pepecoin</h2>
@@ -79,7 +90,7 @@
     <article class="pitch">
       <img class="pitch-icons" src="../assets/brand/triple-mine.png" width="110" height="102" alt="">
       <h2>三币同挖</h2>
-      <p>通过合并挖矿（AuxPoW），Litecoin、Dogecoin 和 Pepecoin 可以共用同一份 Scrypt 工作量，一起挖矿。</p>
+      <p>通过合并挖矿（AuxPoW），Litecoin、Dogecoin 和 Pepecoin 可以共用同一份 Scrypt 工作量，一起挖矿。 <a href="mining.html">如何挖 PEP →</a></p>
     </article>
   </div>
 </section>
@@ -91,28 +102,28 @@
       <h3>如何区分三种 Pepecoin？</h3>
       <p>PEPE、PEPECOIN 和 PEP 是三种不同的资产。附并排对照表，以及五秒就能完成的地址核对方法。</p>
     </a>
-    <a class="card" href="../rich-list.html">
-      <h3>富豪榜与大户动向 <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="rich-list.html">
+      <h3>富豪榜与大户动向</h3>
       <p>排名前 10、100 和 1,000 的地址各持有多少供应量，又是如何变化的。每天都有新的快照。</p>
     </a>
-    <a class="card" href="../compare.html">
-      <h3>Pepecoin 与 Dogecoin <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="compare.html">
+      <h3>Pepecoin 与 Dogecoin</h3>
       <p>规则相同，相隔十年。对比两者的算力（hashrate）、供应量，以及按上线时长对齐后的价格。</p>
     </a>
-    <a class="card" href="../supply.html">
-      <h3>供应量与通胀 <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="supply.html">
+      <h3>供应量与通胀</h3>
       <p>没有供应上限，每年新增的币数量相同，通胀率则逐年下降。图表展示未来 25 年的变化。</p>
     </a>
-    <a class="card" href="../calculator.html">
-      <h3>市值计算器 <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="calculator.html">
+      <h3>市值计算器</h3>
       <p>按 Dogecoin、Bitcoin（比特币）或任一前 100 名币种当前或历史最高点（ATH）时的市值，算出你的 PEP 值多少钱。价格实时更新。</p>
     </a>
-    <a class="card" href="../scrypt-family.html">
-      <h3>Scrypt 家族 <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="scrypt-family.html">
+      <h3>Scrypt 家族</h3>
       <p>Litecoin、Dogecoin 和 Pepecoin 是怎样共用同一批矿机的：从 Charlie Lee 2014年的提议讲到今天。</p>
     </a>
-    <a class="card" href="../network.html">
-      <h3>网络每日数据 <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="network.html">
+      <h3>网络每日数据</h3>
       <p>区块高度、供应量、持有 PEP 的地址数和实际平均出块时间，附 2024年1月30日以来的每日图表。</p>
     </a>
   </div>
@@ -129,12 +140,12 @@
       <h3>PEP 钱包</h3>
       <p>Pepecoin Core、Tangem，以及 Pepecoin Shop 官方出售的 Pepecoin Tangem 卡。</p>
     </a>
-    <a class="card" href="../mining.html">
-      <h3>如何挖 PEP <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="mining.html">
+      <h3>如何挖 PEP</h3>
       <p>Scrypt ASIC 矿机、支持 PEP 合并挖矿的矿池（mining pool），以及收款地址。</p>
     </a>
-    <a class="card" href="../mica.html">
-      <h3>Pepecoin 与 MiCA <span class="tag-en" lang="en">EN</span></h3>
+    <a class="card" href="mica.html">
+      <h3>Pepecoin 与 MiCA</h3>
       <p>Kraken 上线背后的欧盟白皮书：它是什么，不是什么。</p>
     </a>
     <a class="card" href="glossary.html">
@@ -221,6 +232,6 @@
   <p class="correction">发现错误？欢迎在 GitHub 上<a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>提交更正</a>（请附上来源）。</p>
   <details class="support"><summary>喜欢这个网站？欢迎支持它继续发展。</summary><p>无论金额多少，都是很大的帮助。谢谢！</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
-<script src="../chrome.js?v=20261013b" defer></script>
+<script src="../chrome.js?v=20261017" defer></script>
 </body>
 </html>
