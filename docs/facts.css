@@ -373,6 +373,18 @@ html:lang(zh) {
 }
 .pledge::before { content: "✓"; flex: none; color: var(--accent); font-weight: 700; }
 
+/* Home: PEP next to the two Ethereum tokens with similar names */
+.pep-id { gap: 12px; }
+.pep-id h2 { margin: 0; }
+.pep-id .note { margin: 0; }
+.pep-id-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.pep-id-list li { display: grid; gap: 2px; padding: 12px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.pep-id-list b { font-family: var(--f-mono); font-size: 1.15rem; letter-spacing: 0.03em; }
+.pep-id-list span:last-child { color: var(--muted); font-size: 0.9rem; }
+.pep-id-list .is-pep { background: var(--accent-soft); border-color: var(--accent); }
+.pep-id-list .is-pep b::after { content: " ✓"; color: var(--accent); }
+.pep-id-more { margin: 0; }
+
 /* Header brand: the official Pepecoin lockup (light/dark ink) plus "Hub" */
 .brand-hub-link { gap: 10px; }
 .brand-hub-link .lockup { width: auto; height: 38px; object-fit: contain; }

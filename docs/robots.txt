@@ -1,5 +1,10 @@
 User-agent: *
 Allow: /
-Disallow: /games/
+# Game rooms, tables, the host panel and the owner's stats are not for search results.
+# The lobby (/games/) and Pepe Miner can be found; the other game pages say noindex themselves.
+Disallow: /games/room.html
+Disallow: /games/table.html
+Disallow: /games/host.html
+Disallow: /games/stats.html
 
 Sitemap: https://pepecoinhub.com/sitemap.xml
