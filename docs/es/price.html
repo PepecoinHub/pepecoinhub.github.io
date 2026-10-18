@@ -76,33 +76,36 @@
 .chart-tip { position: absolute; top: 8px; display: grid; gap: 2px; padding: 8px 10px; font-size: 0.84rem; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .chart-msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 16px; color: var(--muted); }
 .chart-msg[hidden] { display: none; }
-.xbox { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; padding: 20px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
-.xbox > * { min-width: 0; }
-.xctl { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; }
+.xctl { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 18px 20px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
 .xhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .xhead .label, .xprice > span:first-child { font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .xhead b { font-size: 2.6rem; line-height: 1; color: var(--accent-mid); font-variant-numeric: tabular-nums; }
 #x-range { width: 100%; min-width: 0; margin: 0; accent-color: var(--accent); min-height: 32px; }
+.xrow { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
 .xpre { display: flex; flex-wrap: wrap; gap: 6px; }
 .xpre button { font: 600 0.88rem var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: 4px 12px; min-height: 34px; cursor: pointer; }
 .xpre button:hover { color: var(--ink); border-color: var(--accent); }
 .xpre button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
-.xprice { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
-.xin { display: flex; align-items: center; gap: 6px; padding: 0 12px; min-height: 48px; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
+.xprice { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; flex: 0 1 260px; min-width: 0; }
+.xin { display: flex; align-items: center; gap: 6px; padding: 0 12px; min-height: 44px; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
 .xin:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.xin input { flex: 1; width: 100%; min-width: 0; font: 700 1.2rem var(--f-body); color: var(--ink); background: transparent; border: 0; outline: none; }
+.xin input { flex: 1; width: 100%; min-width: 0; font: 700 1.1rem var(--f-body); color: var(--ink); background: transparent; border: 0; outline: none; }
 .xhint { font-size: 0.88rem; color: var(--muted); min-height: 1.4em; }
-.xcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; }
-.xcard { display: grid; gap: 10px; align-content: start; padding: 16px; border-radius: 12px; border: 1px solid var(--rule); border-top: 4px solid var(--accent); background: var(--accent-soft); }
+.xvs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+.xcard { display: grid; gap: 10px; align-content: start; min-width: 0; padding: 18px; border-radius: 14px; border: 1px solid var(--rule); border-top: 5px solid var(--accent); background: var(--accent-soft); }
 .xcard.pepe { border-top-color: var(--gold); background: var(--gold-soft); }
-.xcard dl { margin: 0; display: grid; gap: 8px; }
+.xcard h3 { font-size: 1.25rem; }
+.xcard h4 { margin: 6px 0 0; font-family: var(--f-mono); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.xcard dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .xcard dt { font-size: 0.8rem; color: var(--muted); }
 .xcard dd { margin: 0; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.xsum { font-size: 1.05rem; max-width: 72ch; padding: 14px 16px; border-left: 4px solid var(--accent); background: var(--panel); border-radius: 0 12px 12px 0; }
+.xrank { font-weight: 700; font-size: 1.05rem; }
+.xrank:empty, .xnote:empty { display: none; }
+.xnote { font-size: 0.98rem; }
 .ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.rung { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) minmax(6.5rem, auto); align-items: center; gap: 10px; font-size: 0.92rem; }
+.rung { display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr) minmax(5rem, auto); align-items: center; gap: 10px; font-size: 0.92rem; }
 .rung-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rung-bar { height: 14px; background: var(--track); border-radius: 7px; overflow: hidden; }
+.rung-bar { height: 12px; background: var(--panel); border-radius: 7px; overflow: hidden; }
 .rung-bar i { display: block; height: 100%; border-radius: 7px; background: var(--muted); opacity: 0.55; transition: width 0.25s ease; }
 .rung.coin .rung-bar i { background: var(--accent-mid); opacity: 0.45; }
 .rung.pep .rung-bar i { background: var(--accent); opacity: 1; }
@@ -110,7 +113,6 @@
 .rung.x { font-weight: 700; }
 .rung.x .rung-bar { box-shadow: inset 0 0 0 1px currentColor; }
 .rung-val { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
-@media (max-width: 760px) { .xbox { grid-template-columns: minmax(0, 1fr); padding: 16px; } }
 @media (max-width: 560px) {
   .rung { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; }
   .rung-bar { grid-column: 1 / -1; grid-row: 2; height: 10px; }
@@ -169,27 +171,37 @@
 </section>
 
 <section aria-labelledby="x100">
-  <h2 id="x100">¿Qué haría falta para un ×100?</h2>
-  <p class="note">«×100» significa un precio 100 veces mayor. La capitalización es precio × oferta, así que un ×100 necesita una capitalización 100 veces mayor. Mueve el control o escribe un precio para ver qué capitalización haría falta, junto a criptomonedas y empresas conocidas. Son cuentas hipotéticas, no una previsión.</p>
-  <div class="xbox">
-    <div class="xctl">
-      <div class="xhead"><span class="label" id="x-label">Multiplicador</span><b id="x-mult">×100</b></div>
-      <input type="range" id="x-range" min="0" max="400" step="1" value="200" aria-labelledby="x-label">
+  <h2 id="x100">Pepecoin ×100 frente a Pepe ×100</h2>
+  <div class="xctl">
+    <div class="xhead"><span class="label" id="x-label">Multiplicador</span><b id="x-mult">×100</b></div>
+    <input type="range" id="x-range" min="0" max="400" step="1" value="200" aria-labelledby="x-label">
+    <div class="xrow">
       <div class="xpre" role="group" aria-label="Multiplicadores de ejemplo">
         <button type="button" data-mult="2">×2</button><button type="button" data-mult="10">×10</button><button type="button" data-mult="100">×100</button><button type="button" data-mult="1000">×1000</button>
       </div>
       <label class="xprice"><span>o escribe un precio de PEP en dólares</span><span class="xin"><span aria-hidden="true">$</span><input id="x-target" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0.01" aria-describedby="x-target-hint"></span></label>
-      <span class="xhint" id="x-target-hint" aria-live="polite"></span>
     </div>
-    <div class="xcards">
-      <div class="xcard"><h3>Pepecoin (PEP)</h3><dl><div><dt>Precio con ese múltiplo</dt><dd id="x-pep-price">$0.008928</dd></div><div><dt>Capitalización necesaria</dt><dd id="x-pep-cap">$919M</dd></div></dl></div>
-      <div class="xcard pepe"><h3>Pepe (PEPE)</h3><dl><div><dt>Precio con ese múltiplo</dt><dd id="x-pepe-price">$0.0003875</dd></div><div><dt>Capitalización necesaria</dt><dd id="x-pepe-cap">$160B</dd></div></dl></div>
+    <span class="xhint" id="x-target-hint" aria-live="polite"></span>
+  </div>
+  <div class="xvs" aria-live="polite">
+    <div class="xcard">
+      <h3>Pepecoin (PEP)</h3>
+      <dl><div><dt>Precio con ese múltiplo</dt><dd id="x-pep-price">/bin/bash.008947</dd></div><div><dt>Capitalización necesaria</dt><dd id="x-pep-cap">21M</dd></div></dl>
+      <p class="xrank" id="x-pep-rank"></p>
+      <p class="xnote" id="x-pep-note"></p>
+      <h4 id="lad-pep-h">Junto a otras criptomonedas</h4>
+      <ol class="ladder" id="ladder-pep" aria-labelledby="lad-pep-h"></ol>
+    </div>
+    <div class="xcard pepe">
+      <h3>Pepe (PEPE)</h3>
+      <dl><div><dt>Precio con ese múltiplo</dt><dd id="x-pepe-price">/bin/bash.0003864</dd></div><div><dt>Capitalización necesaria</dt><dd id="x-pepe-cap">60B</dd></div></dl>
+      <p class="xrank" id="x-pepe-rank"></p>
+      <p class="xnote" id="x-pepe-note"></p>
+      <h4 id="lad-pepe-h">Junto a criptomonedas y empresas</h4>
+      <ol class="ladder" id="ladder-pepe" aria-labelledby="lad-pepe-h"></ol>
     </div>
   </div>
-  <p class="xsum" id="x-sum" aria-live="polite"></p>
-  <h3 id="ladder-h">Esa capitalización junto a criptomonedas y empresas</h3>
-  <ol class="ladder" id="ladder" aria-labelledby="ladder-h"></ol>
-  <p class="src">Capitalización de empresas: lista top 100 de TickerLeague, a 29 de abril – 1 de mayo de 2026, como puntos de referencia fijos (no en directo). Capitalización de criptomonedas: CoinGecko en directo, o CoinMarketCap del 18 de octubre de 2026 si no cargan los datos en directo. Las barras usan escala logarítmica: cada paso a la derecha es 10 veces más.</p>
+  <p class="src">Capitalización de empresas: lista top 100 de TickerLeague, 29 de abril – 1 de mayo de 2026 (fija, no en directo). Capitalización y puesto de las criptomonedas: CoinGecko en directo; si no carga, datos de CoinMarketCap del 18 de octubre de 2026, sin puestos.</p>
 </section>
 
 <section aria-labelledby="how">
@@ -197,7 +209,7 @@
   <div class="prose">
     <p><strong>De dónde sale el precio.</strong> De la API pública de CoinGecko, cargada en tu navegador y reutilizada hasta 10 minutos. PEP cotiza en pocos mercados y con poco volumen, así que el precio puede saltar con órdenes pequeñas y variar entre exchanges.</p>
     <p><strong>¿Por qué Pepe (PEPE)?</strong> PEPE es otro token, en Ethereum, con un nombre parecido y una capitalización mucho mayor. Mucha gente que busca uno encuentra el otro. La superposición muestra si se movieron juntos en el periodo elegido; que se movieran juntos en el pasado no dice nada del futuro. <a href="which-pepecoin.html">Cuál es cuál.</a></p>
-    <p><strong>Capitalización.</strong> Precio × el número de PEP que existen, unos <span data-live="supply-m">104 800</span> millones. La oferta de PEP crece 10 000 PEP por bloque, así que la misma capitalización significa con el tiempo un precio algo menor por PEP, y un ×100 en precio necesitaría más adelante algo más de ×100 en capitalización. <a href="supply.html">Oferta e inflación.</a></p>
+    <p><strong>Capitalización.</strong> Precio × el número de PEP que existen, unos <span data-live="supply-m">104 800</span> millones. La oferta de PEP crece 10 000 PEP por bloque, así que la misma capitalización significa con el tiempo un precio algo menor por PEP. <a href="supply.html">Oferta e inflación.</a></p>
   </div>
 </section>
 
@@ -248,7 +260,7 @@
   <details class="support"><summary>¿Te gusta este sitio? Puedes ayudar a que siga desarrollándose.</summary><p>Cualquier cantidad, por pequeña que sea, ayuda. ¡Gracias!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 <script src="../live.js?v=20261012d" defer></script>
-<script src="../price.js?v=20261018" defer></script>
+<script src="../price.js?v=20261018b" defer></script>
 <script src="../chrome.js?v=20261018" defer></script>
 </body>
 </html>

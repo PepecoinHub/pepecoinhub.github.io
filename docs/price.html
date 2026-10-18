@@ -76,33 +76,36 @@
 .chart-tip { position: absolute; top: 8px; display: grid; gap: 2px; padding: 8px 10px; font-size: 0.84rem; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .chart-msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 16px; color: var(--muted); }
 .chart-msg[hidden] { display: none; }
-.xbox { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; padding: 20px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
-.xbox > * { min-width: 0; }
-.xctl { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; }
+.xctl { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 18px 20px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
 .xhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .xhead .label, .xprice > span:first-child { font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .xhead b { font-size: 2.6rem; line-height: 1; color: var(--accent-mid); font-variant-numeric: tabular-nums; }
 #x-range { width: 100%; min-width: 0; margin: 0; accent-color: var(--accent); min-height: 32px; }
+.xrow { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
 .xpre { display: flex; flex-wrap: wrap; gap: 6px; }
 .xpre button { font: 600 0.88rem var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: 4px 12px; min-height: 34px; cursor: pointer; }
 .xpre button:hover { color: var(--ink); border-color: var(--accent); }
 .xpre button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
-.xprice { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
-.xin { display: flex; align-items: center; gap: 6px; padding: 0 12px; min-height: 48px; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
+.xprice { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; flex: 0 1 260px; min-width: 0; }
+.xin { display: flex; align-items: center; gap: 6px; padding: 0 12px; min-height: 44px; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
 .xin:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.xin input { flex: 1; width: 100%; min-width: 0; font: 700 1.2rem var(--f-body); color: var(--ink); background: transparent; border: 0; outline: none; }
+.xin input { flex: 1; width: 100%; min-width: 0; font: 700 1.1rem var(--f-body); color: var(--ink); background: transparent; border: 0; outline: none; }
 .xhint { font-size: 0.88rem; color: var(--muted); min-height: 1.4em; }
-.xcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; }
-.xcard { display: grid; gap: 10px; align-content: start; padding: 16px; border-radius: 12px; border: 1px solid var(--rule); border-top: 4px solid var(--accent); background: var(--accent-soft); }
+.xvs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+.xcard { display: grid; gap: 10px; align-content: start; min-width: 0; padding: 18px; border-radius: 14px; border: 1px solid var(--rule); border-top: 5px solid var(--accent); background: var(--accent-soft); }
 .xcard.pepe { border-top-color: var(--gold); background: var(--gold-soft); }
-.xcard dl { margin: 0; display: grid; gap: 8px; }
+.xcard h3 { font-size: 1.25rem; }
+.xcard h4 { margin: 6px 0 0; font-family: var(--f-mono); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.xcard dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .xcard dt { font-size: 0.8rem; color: var(--muted); }
 .xcard dd { margin: 0; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.xsum { font-size: 1.05rem; max-width: 72ch; padding: 14px 16px; border-left: 4px solid var(--accent); background: var(--panel); border-radius: 0 12px 12px 0; }
+.xrank { font-weight: 700; font-size: 1.05rem; }
+.xrank:empty, .xnote:empty { display: none; }
+.xnote { font-size: 0.98rem; }
 .ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.rung { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) minmax(6.5rem, auto); align-items: center; gap: 10px; font-size: 0.92rem; }
+.rung { display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr) minmax(5rem, auto); align-items: center; gap: 10px; font-size: 0.92rem; }
 .rung-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rung-bar { height: 14px; background: var(--track); border-radius: 7px; overflow: hidden; }
+.rung-bar { height: 12px; background: var(--panel); border-radius: 7px; overflow: hidden; }
 .rung-bar i { display: block; height: 100%; border-radius: 7px; background: var(--muted); opacity: 0.55; transition: width 0.25s ease; }
 .rung.coin .rung-bar i { background: var(--accent-mid); opacity: 0.45; }
 .rung.pep .rung-bar i { background: var(--accent); opacity: 1; }
@@ -110,7 +113,6 @@
 .rung.x { font-weight: 700; }
 .rung.x .rung-bar { box-shadow: inset 0 0 0 1px currentColor; }
 .rung-val { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
-@media (max-width: 760px) { .xbox { grid-template-columns: minmax(0, 1fr); padding: 16px; } }
 @media (max-width: 560px) {
   .rung { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; }
   .rung-bar { grid-column: 1 / -1; grid-row: 2; height: 10px; }
@@ -169,27 +171,37 @@
 </section>
 
 <section aria-labelledby="x100">
-  <h2 id="x100">What would ×100 take?</h2>
-  <p class="note">“×100” means a price 100 times higher. Market cap is price × supply, so a ×100 needs a market cap 100 times bigger. Move the slider or type a price to see the market cap it would take, next to coins and well-known companies. This is hypothetical math, not a forecast.</p>
-  <div class="xbox">
-    <div class="xctl">
-      <div class="xhead"><span class="label" id="x-label">Multiplier</span><b id="x-mult">×100</b></div>
-      <input type="range" id="x-range" min="0" max="400" step="1" value="200" aria-labelledby="x-label">
+  <h2 id="x100">Pepecoin ×100 vs Pepe ×100</h2>
+  <div class="xctl">
+    <div class="xhead"><span class="label" id="x-label">Multiplier</span><b id="x-mult">×100</b></div>
+    <input type="range" id="x-range" min="0" max="400" step="1" value="200" aria-labelledby="x-label">
+    <div class="xrow">
       <div class="xpre" role="group" aria-label="Example multipliers">
         <button type="button" data-mult="2">×2</button><button type="button" data-mult="10">×10</button><button type="button" data-mult="100">×100</button><button type="button" data-mult="1000">×1000</button>
       </div>
       <label class="xprice"><span>or type a PEP price in US dollars</span><span class="xin"><span aria-hidden="true">$</span><input id="x-target" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0.01" aria-describedby="x-target-hint"></span></label>
-      <span class="xhint" id="x-target-hint" aria-live="polite"></span>
     </div>
-    <div class="xcards">
-      <div class="xcard"><h3>Pepecoin (PEP)</h3><dl><div><dt>Price at that multiple</dt><dd id="x-pep-price">$0.008928</dd></div><div><dt>Market cap needed</dt><dd id="x-pep-cap">$919M</dd></div></dl></div>
-      <div class="xcard pepe"><h3>Pepe (PEPE)</h3><dl><div><dt>Price at that multiple</dt><dd id="x-pepe-price">$0.0003875</dd></div><div><dt>Market cap needed</dt><dd id="x-pepe-cap">$160B</dd></div></dl></div>
+    <span class="xhint" id="x-target-hint" aria-live="polite"></span>
+  </div>
+  <div class="xvs" aria-live="polite">
+    <div class="xcard">
+      <h3>Pepecoin (PEP)</h3>
+      <dl><div><dt>Price at that multiple</dt><dd id="x-pep-price">/bin/bash.008947</dd></div><div><dt>Market cap needed</dt><dd id="x-pep-cap">21M</dd></div></dl>
+      <p class="xrank" id="x-pep-rank"></p>
+      <p class="xnote" id="x-pep-note"></p>
+      <h4 id="lad-pep-h">Next to other coins</h4>
+      <ol class="ladder" id="ladder-pep" aria-labelledby="lad-pep-h"></ol>
+    </div>
+    <div class="xcard pepe">
+      <h3>Pepe (PEPE)</h3>
+      <dl><div><dt>Price at that multiple</dt><dd id="x-pepe-price">/bin/bash.0003864</dd></div><div><dt>Market cap needed</dt><dd id="x-pepe-cap">60B</dd></div></dl>
+      <p class="xrank" id="x-pepe-rank"></p>
+      <p class="xnote" id="x-pepe-note"></p>
+      <h4 id="lad-pepe-h">Next to coins and companies</h4>
+      <ol class="ladder" id="ladder-pepe" aria-labelledby="lad-pepe-h"></ol>
     </div>
   </div>
-  <p class="xsum" id="x-sum" aria-live="polite"></p>
-  <h3 id="ladder-h">That market cap next to coins and companies</h3>
-  <ol class="ladder" id="ladder" aria-labelledby="ladder-h"></ol>
-  <p class="src">Company market caps: TickerLeague's top-100 list, as of April 29 – May 1, 2026, used as fixed reference points (not live). Coin market caps: CoinGecko live, or CoinMarketCap on October 18, 2026 if live data can't be loaded. The bars use a log scale: each step to the right is 10 times more.</p>
+  <p class="src">Company market caps: TickerLeague's top-100 list, April 29 – May 1, 2026 (fixed, not live). Coin market caps and ranks: CoinGecko live; if it can't be loaded, CoinMarketCap figures from October 18, 2026, without ranks.</p>
 </section>
 
 <section aria-labelledby="how">
@@ -197,7 +209,7 @@
   <div class="prose">
     <p><strong>Where the price comes from.</strong> CoinGecko's public API, loaded in your browser and reused for up to 10 minutes. PEP trades on few markets with low volume, so the price can jump on small orders and can differ between exchanges.</p>
     <p><strong>Why Pepe (PEPE)?</strong> PEPE is a different token, on Ethereum, with a similar name and a much bigger market cap. Many people looking for one find the other. The overlay shows whether the two moved together in the period you pick; moving together in the past says nothing about the future. <a href="which-pepecoin.html">Which Pepecoin is which.</a></p>
-    <p><strong>Market cap.</strong> Price × the number of PEP that exist, about <span data-live="supply-b">104.8</span> billion. PEP's supply grows by 10,000 PEP a block, so the same market cap means a slightly lower price per PEP over time, and a ×100 in price would need a bit more than ×100 in market cap later on. <a href="supply.html">Supply and inflation.</a></p>
+    <p><strong>Market cap.</strong> Price × the number of PEP that exist, about <span data-live="supply-b">104.8</span> billion. PEP's supply grows by 10,000 PEP a block, so the same market cap means a slightly lower price per PEP over time. <a href="supply.html">Supply and inflation.</a></p>
   </div>
 </section>
 
@@ -248,7 +260,7 @@
   <details class="support"><summary>Like this site? You can support its further development.</summary><p>Any amount, however small, helps. Thank you!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 <script src="live.js?v=20261012d" defer></script>
-<script src="price.js?v=20261018" defer></script>
+<script src="price.js?v=20261018b" defer></script>
 <script src="chrome.js?v=20261018" defer></script>
 </body>
 </html>

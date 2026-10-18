@@ -12,11 +12,12 @@
       saved: 'Live prices could not be loaded just now. Showing saved figures from October 18, 2026 (CoinMarketCap).',
       loading: 'Loading the chart…',
       chartFail: 'The chart could not be loaded right now (CoinGecko limits free requests). Try again in a minute.',
-      ath: '{p} below the all-time high of {v} ({d})',
       corr: 'How closely PEP and PEPE moved together in this period: {r} (1 = in step, 0 = no link, −1 = opposite).',
       pepNow: 'Pepecoin today', pepX: 'Pepecoin ×{m}', pepeNow: 'Pepe today', pepeX: 'Pepe ×{m}',
       per: 'per PEP', perPepe: 'per PEPE',
-      sum: 'At ×{m}, Pepecoin would have a market cap of {pv}, about {pp} per PEP. That is about the size of {near}. Pepe at ×{m} would need {ev}, about the size of {nearE}.',
+      rank: '#{r} among all cryptos', rankOut: 'outside the top 250 cryptos',
+      small: 'Even at ×{m}, still smaller than Pepe is today ({v}).', big: '{x} times the size of Pepe today.',
+      above: 'Bigger than {list}.', like: 'About the size of {firm}.', and: ' and ',
       priceHint: 'That is ×{m} from today\'s price and a market cap of {v}.',
       priceBad: 'Type a price in US dollars, for example 0.01.',
       change: 'change' },
@@ -25,11 +26,12 @@
       saved: 'Nie udało się teraz pobrać cen na żywo. Pokazuję zapisane dane z 18 października 2026 (CoinMarketCap).',
       loading: 'Wczytuję wykres…',
       chartFail: 'Nie udało się teraz wczytać wykresu (CoinGecko ogranicza darmowe zapytania). Spróbuj za minutę.',
-      ath: '{p} poniżej all-time high {v} ({d})',
       corr: 'Jak mocno PEP i PEPE ruszały się razem w tym okresie: {r} (1 = razem, 0 = bez związku, −1 = odwrotnie).',
       pepNow: 'Pepecoin dziś', pepX: 'Pepecoin ×{m}', pepeNow: 'Pepe dziś', pepeX: 'Pepe ×{m}',
       per: 'za PEP', perPepe: 'za PEPE',
-      sum: 'Przy ×{m} Pepecoin miałby kapitalizację {pv}, czyli ok. {pp} za PEP. To mniej więcej tyle co {near}. Pepe przy ×{m} potrzebowałby {ev}, mniej więcej tyle co {nearE}.',
+      rank: '#{r} wśród wszystkich kryptowalut', rankOut: 'poza top 250 kryptowalut',
+      small: 'Nawet przy ×{m} nadal mniej niż Pepe ma dziś ({v}).', big: '{x} razy więcej niż Pepe dziś.',
+      above: 'Więcej niż {list}.', like: 'Mniej więcej tyle co {firm}.', and: ' i ',
       priceHint: 'To ×{m} od dzisiejszej ceny i kapitalizacja {v}.',
       priceBad: 'Wpisz cenę w dolarach, np. 0,01.',
       change: 'zmiana' },
@@ -38,11 +40,12 @@
       saved: 'No se pudieron cargar los precios en directo. Se muestran datos guardados del 18 de octubre de 2026 (CoinMarketCap).',
       loading: 'Cargando el gráfico…',
       chartFail: 'No se pudo cargar el gráfico ahora (CoinGecko limita las consultas gratuitas). Inténtalo de nuevo en un minuto.',
-      ath: '{p} por debajo del máximo histórico de {v} ({d})',
       corr: 'Cuánto se movieron juntos PEP y PEPE en este periodo: {r} (1 = a la par, 0 = sin relación, −1 = al revés).',
       pepNow: 'Pepecoin hoy', pepX: 'Pepecoin ×{m}', pepeNow: 'Pepe hoy', pepeX: 'Pepe ×{m}',
       per: 'por PEP', perPepe: 'por PEPE',
-      sum: 'Con ×{m}, Pepecoin tendría una capitalización de {pv}, unos {pp} por PEP. Es más o menos el tamaño de {near}. Pepe con ×{m} necesitaría {ev}, más o menos el tamaño de {nearE}.',
+      rank: 'n.º {r} entre todas las criptomonedas', rankOut: 'fuera del top 250 de criptomonedas',
+      small: 'Incluso con ×{m}, aún menos que Pepe hoy ({v}).', big: '{x} veces el tamaño de Pepe hoy.',
+      above: 'Más que {list}.', like: 'Más o menos como {firm}.', and: ' y ',
       priceHint: 'Son ×{m} desde el precio de hoy y una capitalización de {v}.',
       priceBad: 'Escribe un precio en dólares, por ejemplo 0,01.',
       change: 'cambio' },
@@ -51,11 +54,12 @@
       saved: 'Live-Kurse konnten gerade nicht geladen werden. Angezeigt werden gespeicherte Werte vom 18. Oktober 2026 (CoinMarketCap).',
       loading: 'Chart wird geladen…',
       chartFail: 'Der Chart konnte gerade nicht geladen werden (CoinGecko begrenzt kostenlose Abfragen). Bitte in einer Minute erneut versuchen.',
-      ath: '{p} unter dem Allzeithoch von {v} ({d})',
       corr: 'Wie stark sich PEP und PEPE in diesem Zeitraum gemeinsam bewegt haben: {r} (1 = im Gleichschritt, 0 = kein Zusammenhang, −1 = gegenläufig).',
       pepNow: 'Pepecoin heute', pepX: 'Pepecoin ×{m}', pepeNow: 'Pepe heute', pepeX: 'Pepe ×{m}',
       per: 'pro PEP', perPepe: 'pro PEPE',
-      sum: 'Bei ×{m} hätte Pepecoin eine Marktkapitalisierung von {pv}, etwa {pp} pro PEP. Das ist ungefähr so groß wie {near}. Pepe bräuchte bei ×{m} {ev}, ungefähr so groß wie {nearE}.',
+      rank: 'Platz {r} unter allen Kryptowährungen', rankOut: 'außerhalb der Top 250 Kryptowährungen',
+      small: 'Selbst bei ×{m} noch kleiner als Pepe heute ({v}).', big: '{x}-mal so groß wie Pepe heute.',
+      above: 'Größer als {list}.', like: 'Etwa so groß wie {firm}.', and: ' und ',
       priceHint: 'Das ist ×{m} vom heutigen Kurs und eine Marktkapitalisierung von {v}.',
       priceBad: 'Gib einen Preis in US-Dollar ein, zum Beispiel 0,01.',
       change: 'Veränderung' },
@@ -64,11 +68,12 @@
       saved: 'Les prix en direct n’ont pas pu être chargés. Affichage des chiffres enregistrés le 18 octobre 2026 (CoinMarketCap).',
       loading: 'Chargement du graphique…',
       chartFail: 'Le graphique n’a pas pu être chargé (CoinGecko limite les requêtes gratuites). Réessayez dans une minute.',
-      ath: '{p} sous le plus haut historique de {v} ({d})',
       corr: 'À quel point PEP et PEPE ont bougé ensemble sur cette période : {r} (1 = ensemble, 0 = aucun lien, −1 = à l’opposé).',
       pepNow: 'Pepecoin aujourd’hui', pepX: 'Pepecoin ×{m}', pepeNow: 'Pepe aujourd’hui', pepeX: 'Pepe ×{m}',
       per: 'par PEP', perPepe: 'par PEPE',
-      sum: 'À ×{m}, Pepecoin aurait une capitalisation de {pv}, soit environ {pp} par PEP. C’est à peu près la taille de {near}. Pepe à ×{m} aurait besoin de {ev}, à peu près la taille de {nearE}.',
+      rank: 'n° {r} parmi toutes les cryptos', rankOut: 'hors du top 250 des cryptos',
+      small: 'Même à ×{m}, toujours plus petit que Pepe aujourd’hui ({v}).', big: '{x} fois la taille de Pepe aujourd’hui.',
+      above: 'Plus gros que {list}.', like: 'À peu près la taille de {firm}.', and: ' et ',
       priceHint: 'Cela fait ×{m} par rapport au prix du jour et une capitalisation de {v}.',
       priceBad: 'Saisissez un prix en dollars, par exemple 0,01.',
       change: 'variation' },
@@ -77,11 +82,12 @@
       saved: 'Non è stato possibile caricare i prezzi in diretta. Mostro i dati salvati del 18 ottobre 2026 (CoinMarketCap).',
       loading: 'Caricamento del grafico…',
       chartFail: 'Al momento il grafico non si carica (CoinGecko limita le richieste gratuite). Riprova tra un minuto.',
-      ath: '{p} sotto il massimo storico di {v} ({d})',
       corr: 'Quanto PEP e PEPE si sono mossi insieme in questo periodo: {r} (1 = insieme, 0 = nessun legame, −1 = al contrario).',
       pepNow: 'Pepecoin oggi', pepX: 'Pepecoin ×{m}', pepeNow: 'Pepe oggi', pepeX: 'Pepe ×{m}',
       per: 'per PEP', perPepe: 'per PEPE',
-      sum: 'A ×{m} Pepecoin avrebbe una capitalizzazione di {pv}, circa {pp} per PEP. È più o meno la dimensione di {near}. Pepe a ×{m} avrebbe bisogno di {ev}, più o meno la dimensione di {nearE}.',
+      rank: 'n. {r} tra tutte le cripto', rankOut: 'fuori dalla top 250 delle cripto',
+      small: 'Anche a ×{m}, ancora meno di Pepe oggi ({v}).', big: '{x} volte Pepe di oggi.',
+      above: 'Più grande di {list}.', like: 'Più o meno come {firm}.', and: ' e ',
       priceHint: 'Sono ×{m} rispetto al prezzo di oggi e una capitalizzazione di {v}.',
       priceBad: 'Scrivi un prezzo in dollari, per esempio 0,01.',
       change: 'variazione' },
@@ -90,11 +96,12 @@
       saved: 'Canlı fiyatlar şu an yüklenemedi. 18 Ekim 2026 tarihli kayıtlı veriler gösteriliyor (CoinMarketCap).',
       loading: 'Grafik yükleniyor…',
       chartFail: 'Grafik şu an yüklenemedi (CoinGecko ücretsiz istekleri sınırlıyor). Bir dakika sonra tekrar deneyin.',
-      ath: 'Tüm zamanların en yükseği olan {v} değerinin {p} altında ({d})',
       corr: 'Bu dönemde PEP ve PEPE ne kadar birlikte hareket etti: {r} (1 = birlikte, 0 = ilişkisiz, −1 = ters yönde).',
       pepNow: 'Pepecoin bugün', pepX: 'Pepecoin ×{m}', pepeNow: 'Pepe bugün', pepeX: 'Pepe ×{m}',
       per: 'PEP başına', perPepe: 'PEPE başına',
-      sum: '×{m} ile Pepecoin\'in piyasa değeri {pv} olurdu, PEP başına yaklaşık {pp}. Bu kabaca {near} büyüklüğünde. Pepe\'nin ×{m} için {ev} değerine ulaşması gerekirdi, kabaca {nearE} büyüklüğünde.',
+      rank: 'tüm kripto paralar arasında #{r}', rankOut: 'ilk 250 kripto paranın dışında',
+      small: '×{m} ile bile bugünkü Pepe\'den küçük ({v}).', big: 'Bugünkü Pepe\'nin {x} katı.',
+      above: '{list} değerinden büyük.', like: 'Kabaca {firm} büyüklüğünde.', and: ' ve ',
       priceHint: 'Bu, bugünkü fiyattan ×{m} ve {v} piyasa değeri demek.',
       priceBad: 'Dolar cinsinden bir fiyat yazın, örneğin 0,01.',
       change: 'değişim' },
@@ -103,11 +110,12 @@
       saved: '暂时无法加载实时价格。显示 2026 年 10 月 18 日保存的数据（CoinMarketCap）。',
       loading: '正在加载图表…',
       chartFail: '暂时无法加载图表（CoinGecko 限制免费请求）。请一分钟后再试。',
-      ath: '比历史最高价 {v}（{d}）低 {p}',
       corr: '这段时间内 PEP 与 PEPE 同步波动的程度：{r}（1 = 同步，0 = 无关，−1 = 相反）。',
       pepNow: 'Pepecoin 当前', pepX: 'Pepecoin ×{m}', pepeNow: 'Pepe 当前', pepeX: 'Pepe ×{m}',
       per: '每枚 PEP', perPepe: '每枚 PEPE',
-      sum: '在 ×{m} 时，Pepecoin 的市值将为 {pv}，约合每枚 PEP {pp}，大致相当于 {near}。Pepe 要做到 ×{m}，需要 {ev}，大致相当于 {nearE}。',
+      rank: '在所有加密货币中排第 {r} 名', rankOut: '排在前 250 名加密货币之外',
+      small: '即使 ×{m}，仍小于 Pepe 当前市值（{v}）。', big: '是 Pepe 当前市值的 {x} 倍。',
+      above: '超过 {list}。', like: '大致相当于 {firm}。', and: '、',
       priceHint: '这相当于当前价格的 ×{m}，市值 {v}。',
       priceBad: '请输入以美元计的价格，例如 0.01。',
       change: '涨跌' }
@@ -118,16 +126,20 @@
 
   // Saved figures (CoinMarketCap, October 18, 2026), shown until live data arrives or if it never does.
   var SNAP = {
-    pep: { price: 0.00008928, mcap: 9188821, change: -0.24, ath: 0.001824, athDate: null, supply: 102921550000 },
-    pepe: { price: 0.000003875, mcap: 1603300414, change: -0.60 },
-    doge: 12136073370, ltc: 4508647249
+    pep: { price: 0.00008947, mcap: 9208350, change: 0.51, ath: 0.001824, athDate: null, supply: 102921550000 },
+    pepe: { price: 0.000003864, mcap: 1598623686, change: -1.05 },
+    coins: { bitcoin: 1627.6e9, ethereum: 288.21e9, binancecoin: 94.68e9, ripple: 80.30e9, solana: 60.02e9, tron: 31.57e9,
+      dogecoin: 13.33e9, chainlink: 8.78e9, cardano: 7.92e9, litecoin: 4.51e9, 'shiba-inu': 2.87e9, bonk: 252.2e6, floki: 217.5e6 }
   };
+  var NAMES = { bitcoin: 'Bitcoin', ethereum: 'Ethereum', binancecoin: 'BNB', ripple: 'XRP', solana: 'Solana', tron: 'TRON',
+    dogecoin: 'Dogecoin', chainlink: 'Chainlink', cardano: 'Cardano', litecoin: 'Litecoin', 'shiba-inu': 'Shiba Inu', bonk: 'Bonk', floki: 'FLOKI' };
+  // Coins drawn next to Pepecoin ×N (memecoins and older coins) and next to Pepe ×N (the biggest coins).
+  var NEAR_PEP = ['dogecoin', 'cardano', 'litecoin', 'shiba-inu', 'bonk', 'floki'];
+  var NEAR_PEPE = ['ethereum', 'binancecoin', 'ripple', 'solana', 'dogecoin'];
   // Companies: market caps from TickerLeague's top-100 list, as of April 29 – May 1, 2026. Fixed reference points, not live.
-  var FIRMS = [['Nvidia', 5.18e12], ['Apple', 3.98e12], ['Microsoft', 3.15e12], ['Walmart', 1.02e12], ['AMD', 522.87e9],
-    ['Intel', 424.38e9], ['Netflix', 388.53e9], ['Coca-Cola', 337.23e9], ['McDonald\'s', 207.84e9], ['Boeing', 181.88e9],
-    ['Disney', 179.77e9], ['Qualcomm', 160.21e9], ['Uber', 152.53e9]];
+  var FIRMS = [['Intel', 424.38e9], ['Netflix', 388.53e9], ['McDonald\'s', 207.84e9], ['Disney', 179.77e9], ['Uber', 152.53e9]];
 
-  var state = { pep: SNAP.pep, pepe: SNAP.pepe, doge: SNAP.doge, ltc: SNAP.ltc, mult: 100, days: 30, overlay: false, series: {} };
+  var state = { pep: SNAP.pep, pepe: SNAP.pepe, coins: SNAP.coins, top: null, mult: 100, days: 30, overlay: false, series: {} };
   function $(id) { return document.getElementById(id); }
   function fill(s, o) { return s.replace(/\{(\w+)\}/g, function (_, k) { return o[k]; }); }
   function num(v) { return typeof v === 'number' && isFinite(v) ? v : null; }
@@ -156,43 +168,23 @@
     ch.className = 'value ' + (p.change > 0 ? 'up' : p.change < 0 ? 'down' : '');
     $('s-mcap').textContent = usd(p.mcap);
     $('s-ath').textContent = usd(p.ath);
-    $('s-ath-sub').textContent = p.ath ? fill(t.ath, { p: pct((1 - p.price / p.ath) * 100), v: usd(p.ath), d: p.athDate ? day(p.athDate) : '' }).replace(/\s?[(（]\s*[)）]/, '') : '';
+    $('s-ath-sub').textContent = p.athDate ? day(p.athDate) : '';
     $('s-pepe').textContent = usd(state.pepe.price);
     $('s-pepe-sub').textContent = usd(state.pepe.mcap) + ' · ' + (state.pepe.change === null ? '' : pct(state.pepe.change, true) + ' 24h');
   }
 
-  // ---------- ladder (×N) ----------
-  function nearest(v) {
-    var all = ladderRows().filter(function (r) { return r.kind === 'firm' || r.kind === 'coin'; });
-    var best = all[0];
-    all.forEach(function (r) { if (Math.abs(Math.log(r.v / v)) < Math.abs(Math.log(best.v / v))) best = r; });
-    return best.name + ' (' + usd(best.v) + ')';
+  // ---------- ×N: Pepecoin among coins, Pepe among coins and companies ----------
+  // Rank among CoinGecko's top 250 by market cap, leaving out the coin itself. Only with live data.
+  function rank(v, self) {
+    if (!state.top) return '';
+    var caps = state.top.filter(function (c) { return c.id !== self; }).map(function (c) { return c.cap; });
+    if (v < Math.min.apply(null, caps)) return t.rankOut;
+    return fill(t.rank, { r: 1 + caps.filter(function (c) { return c > v; }).length });
   }
-  function ladderRows() {
-    var m = state.mult, rows = [
-      { name: t.pepNow, v: state.pep.mcap, kind: 'pep' },
-      { name: fill(t.pepX, { m: times(m) }), v: state.pep.mcap * m, kind: 'pep x' },
-      { name: t.pepeNow, v: state.pepe.mcap, kind: 'pepe' },
-      { name: fill(t.pepeX, { m: times(m) }), v: state.pepe.mcap * m, kind: 'pepe x' },
-      { name: 'Dogecoin', v: state.doge, kind: 'coin' },
-      { name: 'Litecoin', v: state.ltc, kind: 'coin' }
-    ];
-    FIRMS.forEach(function (f) { rows.push({ name: f[0], v: f[1], kind: 'firm' }); });
-    return rows;
-  }
-  function renderLadder() {
-    var m = state.mult, p = state.pep, e = state.pepe;
-    $('x-mult').textContent = '×' + times(m);
-    $('x-pep-price').textContent = usd(p.price * m);
-    $('x-pep-cap').textContent = usd(p.mcap * m);
-    $('x-pepe-price').textContent = usd(e.price * m);
-    $('x-pepe-cap').textContent = usd(e.mcap * m);
-    $('x-sum').textContent = fill(t.sum, { m: times(m), pv: usd(p.mcap * m), pp: usd(p.price * m), near: nearest(p.mcap * m), ev: usd(e.mcap * m), nearE: nearest(e.mcap * m) });
-    var rows = ladderRows().sort(function (a, b) { return b.v - a.v; });
-    var lo = 6, hi = 13; // $1M … $10T, log scale
-    var list = $('ladder');
+  function ladder(id, rows) {
+    var list = $(id), max = Math.max.apply(null, rows.map(function (r) { return r.v; }));
     list.textContent = '';
-    rows.forEach(function (r) {
+    rows.sort(function (a, b) { return b.v - a.v; }).forEach(function (r) {
       var li = document.createElement('li');
       li.className = 'rung ' + r.kind;
       var name = document.createElement('span');
@@ -201,7 +193,7 @@
       var bar = document.createElement('span');
       bar.className = 'rung-bar';
       var fillEl = document.createElement('i');
-      fillEl.style.width = Math.max(1, Math.min(100, (Math.log10(r.v) - lo) / (hi - lo) * 100)) + '%';
+      fillEl.style.width = Math.max(0.6, r.v / max * 100) + '%';
       bar.appendChild(fillEl);
       var val = document.createElement('span');
       val.className = 'rung-val';
@@ -209,6 +201,31 @@
       li.appendChild(name); li.appendChild(bar); li.appendChild(val);
       list.appendChild(li);
     });
+  }
+  function coinRows(ids) {
+    return ids.filter(function (id) { return state.coins[id]; }).map(function (id) { return { name: NAMES[id], v: state.coins[id], kind: 'coin' }; });
+  }
+  function joinList(a) { return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + t.and + a[a.length - 1]; }
+  function renderLadder() {
+    var m = state.mult, p = state.pep, e = state.pepe, pv = p.mcap * m, ev = e.mcap * m;
+    $('x-mult').textContent = '×' + times(m);
+    $('x-pep-price').textContent = usd(p.price * m);
+    $('x-pep-cap').textContent = usd(pv);
+    $('x-pep-rank').textContent = rank(pv, PEP);
+    $('x-pep-note').textContent = pv < e.mcap ? fill(t.small, { m: times(m), v: usd(e.mcap) })
+      : fill(t.big, { x: new Intl.NumberFormat(LOC, { maximumFractionDigits: 1 }).format(pv / e.mcap) });
+    $('x-pepe-price').textContent = usd(e.price * m);
+    $('x-pepe-cap').textContent = usd(ev);
+    $('x-pepe-rank').textContent = rank(ev, PEPE);
+    var below = NEAR_PEPE.concat(['tron', 'cardano']).filter(function (id) { return state.coins[id] && state.coins[id] < ev; })
+      .sort(function (a, b) { return state.coins[b] - state.coins[a]; }).slice(0, 3).map(function (id) { return NAMES[id]; });
+    var firm = FIRMS.reduce(function (best, f) { return Math.abs(Math.log(f[1] / ev)) < Math.abs(Math.log(best[1] / ev)) ? f : best; });
+    var close = Math.abs(Math.log(firm[1] / ev)) < Math.log(1.6);
+    $('x-pepe-note').textContent = (below.length ? fill(t.above, { list: joinList(below) }) + ' ' : '') + (close ? fill(t.like, { firm: firm[0] + ' (' + usd(firm[1]) + ')' }) : '');
+    ladder('ladder-pep', coinRows(NEAR_PEP).concat(
+      [{ name: fill(t.pepX, { m: times(m) }), v: pv, kind: 'pep x' }, { name: t.pepNow, v: p.mcap, kind: 'pep' }, { name: t.pepeNow, v: e.mcap, kind: 'pepe' }]));
+    ladder('ladder-pepe', coinRows(NEAR_PEPE).concat(FIRMS.map(function (f) { return { name: f[0], v: f[1], kind: 'firm' }; }),
+      [{ name: fill(t.pepeX, { m: times(m) }), v: ev, kind: 'pepe x' }, { name: t.pepeNow, v: e.mcap, kind: 'pepe' }]));
   }
   // The slider runs on a log scale: 0 → ×1, 100 → ×10, 200 → ×100, 300 → ×1000, 400 → ×10,000.
   function setMult(m, fromSlider) {
@@ -374,8 +391,18 @@
   }
 
   function loadMarkets() {
-    var key = 'pf-price-markets-v1', hit = cacheGet(key);
-    var p = hit ? Promise.resolve(hit.d) : getJSON(API + 'coins/markets?vs_currency=usd&ids=' + [PEP, PEPE, 'dogecoin', 'litecoin'].join(',')).then(function (d) { cacheSet(key, d); return d; });
+    var key = 'pf-price-markets-v2', hit = cacheGet(key);
+    var p = hit ? Promise.resolve(hit.d) : Promise.all([
+      getJSON(API + 'coins/markets?vs_currency=usd&ids=' + PEP),
+      getJSON(API + 'coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1')
+    ]).then(function (r) {
+      var d = r[0].concat(r[1]).map(function (c) {
+        return { id: c.id, current_price: c.current_price, market_cap: c.market_cap, total_supply: c.total_supply, circulating_supply: c.circulating_supply,
+          price_change_percentage_24h: c.price_change_percentage_24h, ath: c.ath, ath_date: c.ath_date };
+      });
+      cacheSet(key, d);
+      return d;
+    });
     p.then(function (list) {
       var by = {};
       list.forEach(function (c) { by[c.id] = c; });
@@ -385,8 +412,11 @@
       state.pep = { price: a.current_price, mcap: a.current_price * supply, change: num(a.price_change_percentage_24h), ath: num(a.ath), athDate: a.ath_date || SNAP.pep.athDate, supply: supply };
       var e = by[PEPE];
       if (e && num(e.current_price) !== null) state.pepe = { price: e.current_price, mcap: num(e.market_cap) || e.current_price * (num(e.circulating_supply) || 0), change: num(e.price_change_percentage_24h) };
-      if (by.dogecoin && num(by.dogecoin.market_cap)) state.doge = by.dogecoin.market_cap;
-      if (by.litecoin && num(by.litecoin.market_cap)) state.ltc = by.litecoin.market_cap;
+      var coins = {};
+      Object.keys(SNAP.coins).forEach(function (id) { coins[id] = by[id] && num(by[id].market_cap) ? by[id].market_cap : SNAP.coins[id]; });
+      state.coins = coins;
+      var top = list.slice(1).filter(function (c) { return num(c.market_cap); }).map(function (c) { return { id: c.id, cap: c.market_cap }; });
+      state.top = top.length > 100 ? top : null;
       renderStats(); renderLadder();
       $('status').textContent = fill(t.live, { t: new Date(hit ? hit.t : Date.now()).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) });
     }).catch(function () { $('status').textContent = t.saved; });
