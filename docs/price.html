@@ -38,6 +38,16 @@
 /* Price page: NFA banner, stat tiles, chart card, ×N tool and the market cap ladder */
 .nfa { max-width: none; background: var(--gold-soft); border-color: var(--gold); border-left-width: 6px; }
 .nfa-title { font-weight: 700; font-size: 1.12rem; }
+.notpepe { display: grid; gap: 12px; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.np-pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }
+.np-coin { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 12px; border-radius: 12px; background: var(--accent-soft); border: 1px solid var(--accent); }
+.np-coin.pepe { background: var(--gold-soft); border-color: var(--gold); }
+.np-coin img { grid-row: 1 / 3; width: 48px; height: 48px; border-radius: 50%; }
+.np-coin b { font-size: 1.05rem; }
+.np-coin span { font-size: 0.86rem; color: var(--muted); }
+.np-ne { font-size: 2.4rem; font-weight: 700; line-height: 1; color: var(--flag); }
+.np-text { max-width: 72ch; }
+@media (max-width: 560px) { .np-pair { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 6px; } .np-coin { width: 100%; } }
 .ptiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 12px; }
 .ptile { display: grid; gap: 4px; align-content: start; min-width: 0; padding: 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
 .ptile.main { background: var(--accent-soft); border-color: var(--accent); }
@@ -155,6 +165,16 @@
   <p class="nfa-title"><span aria-hidden="true">⚠️ </span>Not financial advice. Nothing here is a promise.</p>
   <p>This page shows prices and does arithmetic. It does not predict where PEP or PEPE will go, and nothing on it promises any return. Crypto prices can fall a long way, even to zero. The compiler of this site holds PEP. Do your own research and never put in money you can't afford to lose.</p>
 </div>
+
+<section class="notpepe" aria-labelledby="not-pepe">
+  <h2 id="not-pepe" class="visually-hidden">PEP is not PEPE</h2>
+  <div class="np-pair">
+    <div class="np-coin"><img src="assets/brand/icon.svg" alt="" width="48" height="48"><b>Pepecoin (PEP)</b><span>Own blockchain, proof of work, mined since 2024</span></div>
+    <span class="np-ne" aria-hidden="true">≠</span>
+    <div class="np-coin pepe"><img src="assets/coins/pepe.png" alt="" width="48" height="48"><b>Pepe (PEPE)</b><span>ERC-20 token on Ethereum, since 2023</span></div>
+  </div>
+  <p class="np-text">PEP and PEPE are not the same coin. This page is about Pepecoin (PEP); Pepe (PEPE) has its own price and appears here only for comparison. <a href="which-pepecoin.html">Which Pepecoin is which →</a></p>
+</section>
 
 <section aria-labelledby="now">
   <h2 id="now">Right now</h2>
