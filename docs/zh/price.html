@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pepecoin (PEP) 实时价格：可叠加 Pepe 的图表，以及 ×100 需要多大市值</title>
+<meta name="description" content="来自 CoinGecko 的 Pepecoin (PEP) 实时价格和图表，可选叠加 Pepe (PEPE)，并把 ×100 所需的市值与其他加密货币和知名公司对比。不构成投资建议。">
+<link rel="canonical" href="https://pepecoinhub.com/zh/price.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/price.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/price.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/price.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/price.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/price.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/price.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/price.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/price.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/price.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="Pepecoin (PEP) 实时价格：可叠加 Pepe 的图表，以及 ×100 需要多大市值">
+<meta property="og:description" content="来自 CoinGecko 的 Pepecoin (PEP) 实时价格和图表，可选叠加 Pepe (PEPE)，并把 ×100 所需的市值与其他加密货币和知名公司对比。不构成投资建议。">
+<meta property="og:url" content="https://pepecoinhub.com/zh/price.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin 标志：关于 PEP 的事实、数据和来源">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../facts.css?v=20261018c">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/zh/"}, {"@type": "ListItem", "position": 2, "name": "价格", "item": "https://pepecoinhub.com/zh/price.html"}]}</script>
+<style>
+/* Price page: NFA banner, stat tiles, chart card, ×N tool and the market cap ladder */
+.nfa { font-size: 0.86rem; color: var(--muted); }
+.notpepe { display: grid; gap: 12px; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.np-pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }
+.np-coin { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 12px; border-radius: 12px; background: var(--accent-soft); border: 1px solid var(--accent); }
+.np-coin.pepe { background: var(--gold-soft); border-color: var(--gold); }
+.np-coin img { grid-row: 1 / 3; width: 48px; height: 48px; border-radius: 50%; }
+.np-coin b { font-size: 1.05rem; }
+.np-coin span { font-size: 0.86rem; color: var(--muted); }
+.np-ne { font-size: 2.4rem; font-weight: 700; line-height: 1; color: var(--flag); }
+.np-text { max-width: 72ch; }
+@media (max-width: 560px) { .np-pair { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 6px; } .np-coin { width: 100%; } }
+.ptiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 12px; }
+.ptile { display: grid; gap: 4px; align-content: start; min-width: 0; padding: 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.ptile.main { background: var(--accent-soft); border-color: var(--accent); }
+.ptile .label { font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.ptile .value { font-size: 1.4rem; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ptile.main .value { font-size: 1.65rem; }
+.ptile .sub { font-size: 0.84rem; color: var(--muted); }
+.value.up { color: var(--accent-mid); }
+.value.down { color: var(--flag); }
+.chart-card { display: grid; gap: 12px; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.chart-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.pseg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
+.pseg button { font: 600 0.88rem var(--f-body); color: var(--muted); background: transparent; border: 0; border-radius: 9px; padding: 7px 12px; min-height: 36px; cursor: pointer; }
+.pseg button:hover { color: var(--ink); }
+.pseg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; padding: 6px 12px; min-height: 40px; border: 1px solid var(--rule); border-radius: 999px; background: var(--paper); }
+.toggle input { width: 18px; height: 18px; accent-color: var(--gold); }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; font-size: 0.9rem; }
+.k::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; background: var(--accent); }
+.k.pepe::before { background: var(--gold); }
+.chart-change { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chart-wrap { position: relative; min-height: 260px; }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .zero { stroke: var(--muted); stroke-dasharray: 3 4; }
+.chart .axis { fill: var(--muted); font: 11px var(--f-mono); }
+.chart .line { fill: none; stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+.chart .line.pep { stroke: var(--accent); }
+.chart .line.pepe { stroke: var(--gold); }
+.chart .fill-top { stop-color: var(--accent); stop-opacity: 0.28; }
+.chart .fill-bottom { stop-color: var(--accent); stop-opacity: 0; }
+.chart .cross { stroke: var(--muted); stroke-dasharray: 2 3; }
+.chart .dot { stroke: var(--panel); stroke-width: 2; }
+.chart .dot.pep { fill: var(--accent); }
+.chart .dot.pepe { fill: var(--gold); }
+.chart-tip { position: absolute; top: 8px; display: grid; gap: 2px; padding: 8px 10px; font-size: 0.84rem; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chart-msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 16px; color: var(--muted); }
+.chart-msg[hidden] { display: none; }
+.xctl { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 18px 20px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.xhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.xhead .label, .xprice > span:first-child { font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.xhead b { font-size: 2.6rem; line-height: 1; color: var(--accent-mid); font-variant-numeric: tabular-nums; }
+#x-range { width: 100%; min-width: 0; margin: 0; accent-color: var(--accent); min-height: 32px; }
+.xrow { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
+.xpre { display: flex; flex-wrap: wrap; gap: 6px; }
+.xpre button { font: 600 0.88rem var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: 4px 12px; min-height: 34px; cursor: pointer; }
+.xpre button:hover { color: var(--ink); border-color: var(--accent); }
+.xpre button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+.xprice { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; flex: 0 1 260px; min-width: 0; }
+.xin { display: flex; align-items: center; gap: 6px; padding: 0 12px; min-height: 44px; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
+.xin:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.xin input { flex: 1; width: 100%; min-width: 0; font: 700 1.1rem var(--f-body); color: var(--ink); background: transparent; border: 0; outline: none; }
+.xhint { font-size: 0.88rem; color: var(--muted); min-height: 1.4em; }
+.xvs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+.xcard { display: grid; gap: 10px; align-content: start; min-width: 0; padding: 18px; border-radius: 14px; border: 1px solid var(--rule); border-top: 5px solid var(--accent); background: var(--accent-soft); }
+.xcard.pepe { border-top-color: var(--gold); background: var(--gold-soft); }
+.xcard h3 { font-size: 1.25rem; }
+.xcard h4 { margin: 6px 0 0; font-family: var(--f-mono); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.xcard dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.xcard dt { font-size: 0.8rem; color: var(--muted); }
+.xcard dd { margin: 0; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.xrank { font-weight: 700; font-size: 1.05rem; }
+.xrank:empty, .xnote:empty { display: none; }
+.xnote { font-size: 0.98rem; }
+.ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.rung { display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr) minmax(5rem, auto); align-items: center; gap: 10px; font-size: 0.92rem; }
+.rung-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rung-bar { height: 12px; background: var(--panel); border-radius: 7px; overflow: hidden; }
+.rung-bar i { display: block; height: 100%; border-radius: 7px; background: var(--muted); opacity: 0.55; transition: width 0.25s ease; }
+.rung.coin .rung-bar i { background: var(--accent-mid); opacity: 0.45; }
+.rung.pep .rung-bar i { background: var(--accent); opacity: 1; }
+.rung.pepe .rung-bar i { background: var(--gold); opacity: 1; }
+.rung.x { font-weight: 700; }
+.rung.x .rung-bar { box-shadow: inset 0 0 0 1px currentColor; }
+.pow-lead { font-size: 1.15rem; font-weight: 700; max-width: 68ch; }
+.powlist { list-style: none; margin: 0; padding: 8px; display: grid; gap: 4px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.pow-row { display: grid; grid-template-columns: 1.6rem 28px minmax(0, 10rem) minmax(0, 1fr) minmax(4.5rem, auto); align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; }
+.pow-row.self { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.pow-n { font: 700 1rem var(--f-mono); color: var(--muted); text-align: center; }
+.pow-row.self .pow-n { color: var(--accent-mid); }
+.pow-logo { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--track); object-fit: cover; }
+.pow-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pow-name small { color: var(--muted); }
+.pow-bar { height: 12px; background: var(--track); border-radius: 6px; overflow: hidden; }
+.pow-bar i { display: block; height: 100%; border-radius: 6px; background: var(--muted); opacity: 0.5; }
+.pow-row.self .pow-bar i { background: var(--accent); opacity: 1; }
+.pow-cap { text-align: right; font-family: var(--f-mono); font-weight: 700; font-variant-numeric: tabular-nums; }
+.rung-val { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+@media (max-width: 560px) {
+  .rung { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; }
+  .rung-bar { grid-column: 1 / -1; grid-row: 2; height: 10px; }
+  .chart-card { padding: 12px; }
+  .pow-row { grid-template-columns: 1.4rem 28px minmax(0, 1fr) auto; gap: 4px 8px; }
+  .pow-bar { grid-column: 3 / -1; grid-row: 2; height: 8px; }
+  .chart-change { margin-left: 0; }
+}
+</style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要内容</a>
+
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="页面导航"><a href="which-pepecoin.html">PEP vs PEPE</a><a href="compare.html">PEP 与 DOGE</a><a href="calculator.html">计算器</a><a href="price.html" aria-current="page">价格</a><a href="price.html">价格</a><a href="supply.html">供应量</a><a href="scrypt-family.html">Scrypt 家族</a><a href="network.html">网络</a><a href="rich-list.html">富豪榜</a><a href="guides.html">指南</a></nav>
+</header>
+<main class="wrap" id="main">
+<header class="page-head">
+  <p class="eyebrow">价格 · 来自 CoinGecko 的实时数据</p>
+  <h1>Pepecoin (PEP) 价格</h1>
+  <p class="lede">PEP 的实时价格和图表，可在同一图表上叠加 Pepe (PEPE)，以及 ×100 意味着什么的简单算术。</p>
+  <p class="nfa" id="nfa" role="note"><span aria-hidden="true">⚠️ </span>NFA：本页仅供参考，不构成任何承诺或预测。</p>
+</header>
+
+<section class="notpepe" aria-labelledby="not-pepe">
+  <h2 id="not-pepe" class="visually-hidden">PEP 不是 PEPE</h2>
+  <div class="np-pair">
+    <div class="np-coin"><img src="../assets/brand/icon.svg" alt="" width="48" height="48"><b>Pepecoin (PEP)</b><span>独立区块链，工作量证明，自 2024 年开始挖矿</span></div>
+    <span class="np-ne" aria-hidden="true">≠</span>
+    <div class="np-coin pepe"><img src="../assets/coins/pepe.png" alt="" width="48" height="48"><b>Pepe (PEPE)</b><span>以太坊上的 ERC-20 代币，自 2023 年起</span></div>
+  </div>
+  <p class="np-text">PEP 和 PEPE 不是同一种币。本页介绍的是 Pepecoin (PEP)；Pepe (PEPE) 有自己的价格，这里仅作对比。 <a href="which-pepecoin.html">如何区分 →</a></p>
+</section>
+
+<section aria-labelledby="now">
+  <h2 id="now">当前</h2>
+  <div class="ptiles">
+    <div class="ptile main"><span class="label">PEP 价格</span><span class="value" id="s-price">$0.00008928</span><span class="sub">美元</span></div>
+    <div class="ptile"><span class="label">24 小时</span><span class="value" id="s-24h">−0.24%</span></div>
+    <div class="ptile"><span class="label">市值</span><span class="value" id="s-mcap">$9.19M</span></div>
+    <div class="ptile"><span class="label">历史最高价 (ATH)</span><span class="value" id="s-ath">$0.001824</span><span class="sub" id="s-ath-sub"></span></div>
+    <div class="ptile"><span class="label">Pepe (PEPE)，用于对比</span><span class="value" id="s-pepe">$0.000003875</span><span class="sub" id="s-pepe-sub">$1.6B</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="chart-title">
+  <h2 id="chart-title">价格图表</h2>
+  <div class="chart-card">
+    <div class="chart-bar">
+      <div class="pseg" role="group" aria-label="时间段">
+        <button type="button" data-days="1" aria-pressed="false">24 小时</button><button type="button" data-days="7" aria-pressed="false">7 天</button><button type="button" data-days="30" aria-pressed="true">30 天</button><button type="button" data-days="90" aria-pressed="false">90 天</button><button type="button" data-days="365" aria-pressed="false">1 年</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="overlay"><span>叠加 Pepe (PEPE)</span></label>
+    </div>
+    <div class="chart-legend"><span class="k pep">Pepecoin (PEP)</span><span class="k pepe" id="legend-pepe" hidden>Pepe (PEPE)</span><span class="chart-change" id="chart-change"></span></div>
+    <div class="chart-wrap"><div class="chart" id="chart"></div><div class="chart-tip" id="chart-tip" hidden></div><p class="chart-msg" id="chart-msg">正在加载图表…</p></div>
+    <p class="src" id="chart-corr"></p>
+    <p class="src">线条是以美元计的 PEP 价格。打开 Pepe 后，两条线都显示自所选时间段开始以来的涨跌幅（%），因为一枚 PEPE 远比一枚 PEP 便宜，两种价格放不进同一条坐标轴。将鼠标移到图表上或点按图表可查看精确数值。</p>
+  </div>
+  <p class="src" id="status">在实时价格加载前，显示 2026 年 10 月 18 日保存的数据（CoinMarketCap）。</p>
+  <noscript><p class="note">实时图表和 ×100 滑块需要 JavaScript。上面的数字来自 2026 年 10 月 18 日。</p></noscript>
+</section>
+
+<section aria-labelledby="x100">
+  <h2 id="x100">Pepecoin ×100 对比 Pepe ×100</h2>
+  <div class="xctl">
+    <div class="xhead"><span class="label" id="x-label">倍数</span><b id="x-mult">×100</b></div>
+    <input type="range" id="x-range" min="0" max="400" step="1" value="200" aria-labelledby="x-label">
+    <div class="xrow">
+      <div class="xpre" role="group" aria-label="示例倍数">
+        <button type="button" data-mult="2">×2</button><button type="button" data-mult="10">×10</button><button type="button" data-mult="100">×100</button><button type="button" data-mult="1000">×1000</button>
+      </div>
+      <label class="xprice"><span>或输入一个以美元计的 PEP 价格</span><span class="xin"><span aria-hidden="true">$</span><input id="x-target" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0.01" aria-describedby="x-target-hint"></span></label>
+    </div>
+    <span class="xhint" id="x-target-hint" aria-live="polite"></span>
+  </div>
+  <div class="xvs" aria-live="polite">
+    <div class="xcard">
+      <h3>Pepecoin (PEP)</h3>
+      <dl><div><dt>该倍数下的价格</dt><dd id="x-pep-price">/bin/bash.008947</dd></div><div><dt>所需市值</dt><dd id="x-pep-cap">21M</dd></div></dl>
+      <p class="xrank" id="x-pep-rank"></p>
+      <p class="xnote" id="x-pep-note"></p>
+      <h4 id="lad-pep-h">与其他加密货币对比</h4>
+      <ol class="ladder" id="ladder-pep" aria-labelledby="lad-pep-h"></ol>
+    </div>
+    <div class="xcard pepe">
+      <h3>Pepe (PEPE)</h3>
+      <dl><div><dt>该倍数下的价格</dt><dd id="x-pepe-price">/bin/bash.0003864</dd></div><div><dt>所需市值</dt><dd id="x-pepe-cap">60B</dd></div></dl>
+      <p class="xrank" id="x-pepe-rank"></p>
+      <p class="xnote" id="x-pepe-note"></p>
+      <h4 id="lad-pepe-h">与加密货币和公司对比</h4>
+      <ol class="ladder" id="ladder-pepe" aria-labelledby="lad-pepe-h"></ol>
+    </div>
+  </div>
+  <p class="src">公司市值：TickerLeague 前 100 名列表，2026 年 4 月 29 日至 5 月 1 日（固定数据，非实时）。加密货币市值和排名：CoinGecko 实时数据；如无法加载，则显示 2026 年 10 月 18 日的 CoinMarketCap 数据，不含排名。</p>
+</section>
+
+<section aria-labelledby="pow">
+  <h2 id="pow">工作量证明 (PoW) 模因币</h2>
+  <p class="pow-lead" id="pow-lead">按市值计算，Pepecoin 是仅次于 Dogecoin 的第二大工作量证明模因币。</p>
+  <ol class="powlist" id="pow-list">
+    <li class="pow-row" data-id="dogecoin" data-cap="13240000000"><span class="pow-n">1</span><img class="pow-logo" src="../assets/coins/doge.png" alt="" width="28" height="28"><span class="pow-name"><b>Dogecoin</b> <small>DOGE</small></span><span class="pow-bar"><i style="width: 85.4%"></i></span><span class="pow-cap">$13.2B</span></li>
+    <li class="pow-row self" data-id="pepecoin-network" data-cap="9170000"><span class="pow-n">2</span><img class="pow-logo" src="../assets/brand/icon.svg" alt="" width="28" height="28"><span class="pow-name"><b>Pepecoin</b> <small>PEP</small></span><span class="pow-bar"><i style="width: 32.7%"></i></span><span class="pow-cap">$9.17M</span></li>
+    <li class="pow-row" data-id="monacoin" data-cap="4460000"><span class="pow-n">3</span><span class="pow-logo" aria-hidden="true">M</span><span class="pow-name"><b>MonaCoin</b> <small>MONA</small></span><span class="pow-bar"><i style="width: 27.5%"></i></span><span class="pow-cap">$4.46M</span></li>
+    <li class="pow-row" data-id="bellscoin" data-cap="2580000"><span class="pow-n">4</span><img class="pow-logo" src="../assets/coins/bells.png" alt="" width="28" height="28"><span class="pow-name"><b>Bellscoin</b> <small>BELLS</small></span><span class="pow-bar"><i style="width: 23.5%"></i></span><span class="pow-cap">$2.58M</span></li>
+    <li class="pow-row" data-id="dingocoin" data-cap="2575000"><span class="pow-n">5</span><img class="pow-logo" src="../assets/coins/dingo.png" alt="" width="28" height="28"><span class="pow-name"><b>Dingocoin</b> <small>DINGO</small></span><span class="pow-bar"><i style="width: 23.5%"></i></span><span class="pow-cap">$2.58M</span></li>
+    <li class="pow-row" data-id="luckycoin" data-cap="1050000"><span class="pow-n">6</span><img class="pow-logo" src="../assets/coins/lky.png" alt="" width="28" height="28"><span class="pow-name"><b>Luckycoin</b> <small>LKY</small></span><span class="pow-bar"><i style="width: 17.0%"></i></span><span class="pow-cap">$1.05M</span></li>
+    <li class="pow-row" data-id="junkcoin" data-cap="162000"><span class="pow-n">7</span><img class="pow-logo" src="../assets/coins/jkc.png" alt="" width="28" height="28"><span class="pow-name"><b>Junkcoin</b> <small>JKC</small></span><span class="pow-bar"><i style="width: 3.5%"></i></span><span class="pow-cap">$162K</span></li>
+  </ol>
+  <p class="src">通过工作量证明挖矿的模因币。CoinMarketCap 的 PoW 列表包含 Dogecoin、Pepecoin、MonaCoin 和 Dingocoin；Bellscoin、Luckycoin 和 Junkcoin 与 Pepecoin 一样与 Litecoin 联合挖矿 (merged mining)，因此也列在这里。市值：CoinGecko 实时数据，或 2026 年 10 月 18 日的 CoinMarketCap 数据。</p>
+</section>
+
+<section aria-labelledby="how">
+  <h2 id="how">如何阅读本页</h2>
+  <div class="prose">
+    <p><strong>价格来源。</strong>CoinGecko 公共 API，在你的浏览器中加载，最多复用 10 分钟。PEP 只在少数市场交易、成交量低，因此小额订单也可能让价格跳动，各交易所的价格也可能不同。</p>
+    <p><strong>为什么是 Pepe (PEPE)？</strong>PEPE 是另一种代币，运行在以太坊上，名字相近，市值大得多。很多人找其中一个时会找到另一个。叠加显示两者在所选时间段内是否同步波动；过去同步并不代表未来。<a href="which-pepecoin.html">如何区分。</a></p>
+    <p><strong>市值。</strong>价格 × 现有 PEP 数量，约 <span data-live="supply-yi">1048</span> 亿枚。PEP 的供应量每个区块增加 10,000 枚，因此随着时间推移，同样的市值意味着每枚 PEP 的价格略低。<a href="supply.html">供应量与通胀。</a></p>
+  </div>
+</section>
+
+<section aria-labelledby="more">
+  <h2 id="more">更多关于价格</h2>
+  <div class="cards">
+    <a class="card" href="calculator.html">
+      <h3>市值计算器</h3>
+      <p>你的 PEP 在 Dogecoin、Litecoin 或任何前 100 名币种的市值下值多少。</p>
+    </a>
+    <a class="card" href="compare.html">
+      <h3>Pepecoin 与 Dogecoin</h3>
+      <p>相同的规则，相隔十年，两种价格按年龄对齐。</p>
+    </a>
+    <a class="card" href="which-pepecoin.html">
+      <h3>哪个 Pepecoin 是哪个？</h3>
+      <p>PEP、PEPE 和 PEPECOIN 是三种不同的资产，价格也各不相同。</p>
+    </a>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">来源</h2>
+  <div class="sources">
+    <div>
+      <h3>价格与图表</h3>
+      <ul>
+        <li><a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko：Pepecoin</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/pepe">CoinGecko：Pepe</a></li>
+        <li><a href="https://docs.coingecko.com/reference/introduction">CoinGecko 公共 API</a></li>
+        <li><a href="https://coinmarketcap.com/currencies/pepecoin-org/">CoinMarketCap：Pepecoin（2026 年 10 月 18 日保存的数据）</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>公司市值</h3>
+      <ul>
+        <li><a href="https://coinmarketcap.com/view/pow/">CoinMarketCap：PoW 币种</a></li>
+        <li><a href="https://tickerleague.com/financials/top/market-cap">TickerLeague：按市值排名的最大公司（2026 年 4 月 29 日至 5 月 1 日）</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="site-foot">
+  <p><strong>社区事实资料页</strong>，由 r/pepecoin 社区的一位志愿者整理，并非 Pepecoin 官方发布的内容。</p>
+  <p>本站内容不构成投资建议。整理者本人持有 PEP。价格和网络数据每天都在变化，每个页面都注明了日期和来源。</p>
+  <p class="correction">发现错误？欢迎在 GitHub 上<a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>提交更正</a>（请附上来源）。</p>
+  <details class="support"><summary>喜欢这个网站？欢迎支持它继续发展。</summary><p>无论金额多少，都是很大的帮助。谢谢！</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+</footer>
+<script src="../live.js?v=20261012d" defer></script>
+<script src="../price.js?v=20261018c" defer></script>
+<script src="../chrome.js?v=20261018c" defer></script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Guide du minage de Pepecoin (PEP) : ASIC, pools et minage fusionné</title>
+<title>Comment miner du Pepecoin (PEP) : pools, Antminer L7/L9, unMineable, minage fusionné</title>
 <meta name="description" content="Comment miner du Pepecoin (PEP) : un ASIC Scrypt sur un pool qui mine le PEP en minage fusionné avec Litecoin et Dogecoin. Pools, portefeuille de versement, récompenses, et pourquoi Pepe (PEPE) ne peut pas être miné. Avec sources.">
 <link rel="canonical" href="https://pepecoinhub.com/fr/mining.html">
 <link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mining.html">
@@ -18,7 +18,7 @@
 <meta property="og:type" content="article">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Pepecoin Hub">
-<meta property="og:title" content="Guide du minage de Pepecoin (PEP) : ASIC, pools et minage fusionné">
+<meta property="og:title" content="Comment miner du Pepecoin (PEP) : pools, Antminer L7/L9, unMineable, minage fusionné">
 <meta property="og:description" content="Comment miner du Pepecoin (PEP) : un ASIC Scrypt sur un pool qui mine le PEP en minage fusionné avec Litecoin et Dogecoin. Pools, portefeuille de versement, récompenses, et pourquoi Pepe (PEPE) ne peut pas être miné. Avec sources.">
 <meta property="og:url" content="https://pepecoinhub.com/fr/mining.html">
 <meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
@@ -31,10 +31,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261017">
+<link rel="stylesheet" href="../facts.css?v=20261018c">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/fr/"}, {"@type": "ListItem", "position": 2, "name": "Guides", "item": "https://pepecoinhub.com/fr/guides.html"}, {"@type": "ListItem", "position": 3, "name": "Comment miner du PEP", "item": "https://pepecoinhub.com/fr/mining.html"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Le minage fusionné réduit-il mes récompenses en LTC ou en DOGE ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Le travail n’est pas réparti entre les chaînes. Selon le pool ViaBTC, le PEP est une récompense supplémentaire issue du minage fusionné, qui ne demande aucun hashrate en plus."}}, {"@type": "Question", "name": "Quel matériel mine le PEP ?", "acceptedAnswer": {"@type": "Answer", "text": "Un mineur ASIC Scrypt, la même machine que pour Litecoin et Dogecoin. ViaBTC cite en exemple l’Antminer L9 et l’ElphaPex DG1."}}, {"@type": "Question", "name": "Peut-on miner du Pepe (PEPE) ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Pepe (PEPE) est un jeton ERC-20 sur Ethereum, et Ethereum fonctionne en proof of stake au lieu du minage depuis le 15 septembre 2022. La cryptomonnaie qui se mine est Pepecoin (PEP), sur sa propre blockchain."}}, {"@type": "Question", "name": "Quel portefeuille faut-il pour recevoir les gains de minage ?", "acceptedAnswer": {"@type": "Answer", "text": "N’importe quel portefeuille qui détient du Pepecoin (PEP) sur le réseau Pepecoin, comme Pepecoin Core ou une carte Tangem. Son adresse de réception commence par P. MetaMask est conçu pour les réseaux de type Ethereum et ne propose pas Pepecoin."}}, {"@type": "Question", "name": "Combien de PEP le réseau distribue-t-il ?", "acceptedAnswer": {"@type": "Answer", "text": "Chaque bloc rapporte 10 000 PEP. Avec l’objectif d’un bloc par minute, cela fait jusqu’à 14,4 millions de PEP par jour, partagés entre tous ceux qui le minent. Sur l’année écoulée, les blocs ont pris en moyenne environ 62,6 secondes, le chiffre réel est donc d’environ 13,8 millions."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Puis-je miner du Pepecoin avec un GPU ou un CPU ?", "acceptedAnswer": {"@type": "Answer", "text": "Pas sur le réseau Pepecoin lui-même, qui fonctionne avec des ASIC Scrypt. Vous pouvez quand même gagner du PEP avec un GPU ou un CPU sur unMineable : il mine d’autres cryptos et vous paie en Pepecoin (PEP). Choisissez PEP, pas PEPE, et une adresse qui commence par P."}}, {"@type": "Question", "name": "Quels pools de minage paient en Pepecoin ?", "acceptedAnswer": {"@type": "Answer", "text": "ViaBTC, F2Pool, Binance Pool, EMCD, AntPool, KuPool et Mining-Dutch paient en PEP. litecoinpool.org mine le PEP en merged mining mais en paie la valeur en LTC et DOGE supplémentaires. unMineable paie en PEP les mineurs GPU et CPU. La liste en direct est sur miningpoolstats."}}, {"@type": "Question", "name": "Le minage fusionné réduit-il mes récompenses en LTC ou en DOGE ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Le travail n’est pas réparti entre les chaînes. Selon le pool ViaBTC, le PEP est une récompense supplémentaire issue du minage fusionné, qui ne demande aucun hashrate en plus."}}, {"@type": "Question", "name": "Quel matériel mine le PEP ? Un Antminer L7 ou L9 convient-il ?", "acceptedAnswer": {"@type": "Answer", "text": "Un mineur ASIC Scrypt, la même machine que pour Litecoin et Dogecoin. ViaBTC cite en exemple l’Antminer L9 et l’ElphaPex DG1. Oui, un Antminer L7 ou L9 mine le PEP : branché sur un pool qui fait du minage fusionné de Pepecoin, il rapporte du PEP en plus du LTC et du DOGE."}}, {"@type": "Question", "name": "Peut-on miner du Pepe (PEPE) ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Pepe (PEPE) est un jeton ERC-20 sur Ethereum, et Ethereum fonctionne en proof of stake au lieu du minage depuis le 15 septembre 2022. La cryptomonnaie qui se mine est Pepecoin (PEP), sur sa propre blockchain."}}, {"@type": "Question", "name": "Quel portefeuille faut-il pour recevoir les gains de minage ?", "acceptedAnswer": {"@type": "Answer", "text": "N’importe quel portefeuille qui détient du Pepecoin (PEP) sur le réseau Pepecoin, comme Pepecoin Core ou une carte Tangem. Son adresse de réception commence par P. MetaMask est conçu pour les réseaux de type Ethereum et ne propose pas Pepecoin."}}, {"@type": "Question", "name": "Combien de PEP le réseau distribue-t-il ?", "acceptedAnswer": {"@type": "Answer", "text": "Chaque bloc rapporte 10 000 PEP. Avec l’objectif d’un bloc par minute, cela fait jusqu’à 14,4 millions de PEP par jour, partagés entre tous ceux qui le minent. Sur l’année écoulée, les blocs ont pris en moyenne environ 62,6 secondes, le chiffre réel est donc d’environ 13,8 millions."}}]}</script>
+<style>
+/* Mining page: pool table, merged-mining coin chips, miners' corner */
+.coin-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.coin-chips li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; background: var(--panel); border: 1px solid var(--rule); border-radius: 999px; font-weight: 600; }
+.coin-chips li.self { background: var(--accent-soft); border-color: var(--accent); }
+.coin-chips img { width: 28px; height: 28px; border-radius: 50%; }
+.coin-chips small { color: var(--muted); font-weight: 400; }
+.miners-love { display: grid; gap: 10px; padding: 22px; border-radius: 16px; background: var(--accent-soft); border: 1px solid var(--accent); border-left-width: 5px; }
+.miners-love h2 { margin: 0; }
+.miners-love .btn { justify-self: start; }
+</style>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
@@ -42,7 +53,7 @@
 
 <header class="site-head">
   <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
-  <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html">Ne pas confondre</a><a href="compare.html">PEP et DOGE</a><a href="calculator.html">Calculateur</a><a href="supply.html">Offre</a><a href="scrypt-family.html">Famille Scrypt</a><a href="network.html">Réseau</a><a href="rich-list.html">Plus grosses adresses</a><a href="guides.html" aria-current="page">Guides</a></nav>
+  <nav class="site-nav" aria-label="Pages"><a href="which-pepecoin.html">PEP vs PEPE</a><a href="compare.html">PEP et DOGE</a><a href="calculator.html">Calculateur</a><a href="price.html">Prix</a><a href="supply.html">Offre</a><a href="scrypt-family.html">Famille Scrypt</a><a href="network.html">Réseau</a><a href="rich-list.html">Plus grosses adresses</a><a href="guides.html" aria-current="page">Guides</a></nav>
 </header>
 <main class="wrap" id="main">
 <header class="page-head">
@@ -79,6 +90,51 @@
   </div>
 </section>
 
+<section aria-labelledby="pools">
+  <h2 id="pools">Pools de minage qui paient en Pepecoin</h2>
+  <p>Avec un ASIC Scrypt, chacun de ces pools ajoute du PEP à votre minage de Litecoin et Dogecoin. Avec un GPU ou un CPU, unMineable vous paie en PEP.</p>
+  <div class="table-scroll" role="region" aria-labelledby="pools" tabindex="0">
+    <table style="min-width: 520px">
+      <thead><tr><th scope="col">Pool</th><th scope="col">Matériel</th><th scope="col">Comment vous recevez du PEP</th></tr></thead>
+      <tbody>
+        <tr><th scope="row" class="plain"><a href="https://www.viabtc.com/">ViaBTC</a></th><td>ASIC Scrypt</td><td>Du PEP en plus du LTC et du DOGE</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://www.f2pool.com/coin/pepecoin">F2Pool</a></th><td>ASIC Scrypt</td><td>Du PEP en plus du LTC et du DOGE</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://pool.binance.com/">Binance Pool</a></th><td>ASIC Scrypt</td><td>Du PEP en plus du LTC et du DOGE</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://emcd.io/pool/pepecoin/">EMCD</a></th><td>ASIC Scrypt</td><td>Du PEP en plus du LTC et du DOGE</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://www.antpool.com/">AntPool</a></th><td>ASIC Scrypt</td><td>Du PEP en plus du LTC et du DOGE</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://www.kupool.com/">KuPool</a></th><td>ASIC Scrypt</td><td>Du PEP en plus du LTC et du DOGE</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://www.mining-dutch.nl/pools/pepecoin.php">Mining-Dutch</a></th><td>ASIC Scrypt</td><td>Du PEP directement (pool Pepecoin)</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://www.litecoinpool.org/help">litecoinpool.org</a></th><td>ASIC Scrypt</td><td>Sa valeur en LTC et DOGE supplémentaires, pas en PEP</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://unmineable.com/coins/PEP">unMineable</a></th><td>GPU ou CPU</td><td>Payé en PEP pour le minage d’autres cryptos</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="src">unMineable n’est pas du merged mining : votre GPU mine d’autres cryptos et le pool vous paie en Pepecoin. Sur unMineable, choisissez PEP sur le réseau Pepecoin, pas PEPE (ERC-20). Liste en direct des pools et de leur hashrate : <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>.</p>
+</section>
+
+<section aria-labelledby="merged-with">
+  <h2 id="merged-with">Miné avec</h2>
+  <ul class="coin-chips">
+    <li class="self"><img src="../assets/brand/icon.svg" alt="" width="28" height="28">Pepecoin <small>PEP</small></li>
+    <li><img src="../assets/coins/ltc.png" alt="" width="28" height="28">Litecoin <small>LTC</small></li>
+    <li><img src="../assets/coins/doge.png" alt="" width="28" height="28">Dogecoin <small>DOGE</small></li>
+    <li><img src="../assets/coins/bells.png" alt="" width="28" height="28">Bellscoin <small>BELLS</small></li>
+    <li><img src="../assets/coins/lky.png" alt="" width="28" height="28">Luckycoin <small>LKY</small></li>
+    <li><img src="../assets/coins/jkc.png" alt="" width="28" height="28">Junkcoin <small>JKC</small></li>
+    <li><img src="../assets/coins/dingo.png" alt="" width="28" height="28">Dingocoin <small>DINGO</small></li>
+    <li><img src="../assets/coins/shic.png" alt="" width="28" height="28">Shibacoin <small>SHIC</small></li>
+  </ul>
+  <p class="note">Pepecoin utilise l’AuxPoW (merged mining) sur Scrypt. Litecoin est la chaîne parente, et Dogecoin, Pepecoin et les autres cryptos ci-dessous acceptent le même travail. Chaque pool choisit lesquelles il paie ; le pool Litecoin de ViaBTC les paie toutes en plus du LTC. <a href="scrypt-family.html">Toute la famille Scrypt.</a></p>
+</section>
+
+<section class="miners-love" aria-labelledby="miners">
+  <h2 id="miners"><span aria-hidden="true">💚⛏️ </span>On aime les mineurs</h2>
+  <p>Ce sont les mineurs qui font tourner Pepecoin : chaque bloc et chaque PEP existant viennent de leur hashrate. Pepecoin n’a ni premine ni entreprise qui émet des pièces, seulement des mineurs.</p>
+  <p>Rejoignez le salon dédié aux mineurs sur le Discord de Pepecoin : conseils sur les pools, aide à la configuration et actualités.</p>
+  <a class="btn main" href="https://pepecoin.com/discord">Discord de Pepecoin →</a>
+  <p class="src">Hashrate, difficulté et pools en direct : <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats : Pepecoin</a> · <a href="network.html">Statistiques du réseau sur ce site</a></p>
+</section>
+
 <section aria-labelledby="expect">
   <h2 id="expect">À quoi s’attendre</h2>
   <div class="prose">
@@ -91,8 +147,10 @@
 <section aria-labelledby="faq">
   <h2 id="faq">Questions fréquentes</h2>
   <div class="faq">
+    <details><summary>Puis-je miner du Pepecoin avec un GPU ou un CPU ?</summary><p>Pas sur le réseau Pepecoin lui-même, qui fonctionne avec des ASIC Scrypt. Vous pouvez quand même gagner du PEP avec un GPU ou un CPU sur unMineable : il mine d’autres cryptos et vous paie en Pepecoin (PEP). Choisissez PEP, pas PEPE, et une adresse qui commence par P.</p></details>
+    <details><summary>Quels pools de minage paient en Pepecoin ?</summary><p>ViaBTC, F2Pool, Binance Pool, EMCD, AntPool, KuPool et Mining-Dutch paient en PEP. litecoinpool.org mine le PEP en merged mining mais en paie la valeur en LTC et DOGE supplémentaires. unMineable paie en PEP les mineurs GPU et CPU. La liste en direct est sur miningpoolstats.</p></details>
     <details><summary>Le minage fusionné réduit-il mes récompenses en LTC ou en DOGE ?</summary><p>Non. Le travail n’est pas réparti entre les chaînes. Selon le pool ViaBTC, le PEP est une récompense supplémentaire issue du minage fusionné, qui ne demande aucun hashrate en plus.</p></details>
-    <details><summary>Quel matériel mine le PEP ?</summary><p>Un mineur ASIC Scrypt, la même machine que pour Litecoin et Dogecoin. ViaBTC cite en exemple l’Antminer L9 et l’ElphaPex DG1.</p></details>
+    <details><summary>Quel matériel mine le PEP ? Un Antminer L7 ou L9 convient-il ?</summary><p>Un mineur ASIC Scrypt, la même machine que pour Litecoin et Dogecoin. ViaBTC cite en exemple l’Antminer L9 et l’ElphaPex DG1. Oui, un Antminer L7 ou L9 mine le PEP : branché sur un pool qui fait du minage fusionné de Pepecoin, il rapporte du PEP en plus du LTC et du DOGE.</p></details>
     <details><summary>Peut-on miner du Pepe (PEPE) ?</summary><p>Non. Pepe (PEPE) est un jeton ERC-20 sur Ethereum, et Ethereum fonctionne en proof of stake au lieu du minage depuis le 15 septembre 2022. La cryptomonnaie qui se mine est Pepecoin (PEP), sur sa propre blockchain.</p></details>
     <details><summary>Quel portefeuille faut-il pour recevoir les gains de minage ?</summary><p>N’importe quel portefeuille qui détient du Pepecoin (PEP) sur le réseau Pepecoin, comme Pepecoin Core ou une carte Tangem. Son adresse de réception commence par P. MetaMask est conçu pour les réseaux de type Ethereum et ne propose pas Pepecoin.</p></details>
     <details><summary>Combien de PEP le réseau distribue-t-il ?</summary><p>Chaque bloc rapporte 10 000 PEP. Avec l’objectif d’un bloc par minute, cela fait jusqu’à 14,4 millions de PEP par jour, partagés entre tous ceux qui le minent. Sur l’année écoulée, les blocs ont pris en moyenne environ 62,6 secondes, le chiffre réel est donc d’environ 13,8 millions.</p></details>
@@ -120,7 +178,7 @@
     </a>
     <a class="card" href="mica.html">
       <h3>Pepecoin et MiCA</h3>
-      <p>Ce qu’est le livre blanc européen, et ce qu’il ne signifie pas.</p>
+      <p>Ce qu’est le whitepaper européen, et ce qu’il ne signifie pas.</p>
     </a>
     <a class="card" href="glossary.html">
       <h3>Glossaire</h3>
@@ -154,7 +212,7 @@
       <h3>Règles</h3>
       <ul>
         <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp de Pepecoin (AuxPoW au bloc 42 000)</a></li>
-        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">Livre blanc MiCA de Pepecoin (récompense de bloc)</a></li>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">Whitepaper MiCA de Pepecoin (récompense de bloc)</a></li>
         <li><a href="network.html">Ce site : statistiques du réseau</a></li>
         <li><a href="https://ethereum.org/en/roadmap/merge/">ethereum.org : The Merge (proof of stake depuis le 15 septembre 2022)</a></li>
       </ul>
@@ -169,6 +227,6 @@
   <details class="support"><summary>Ce site vous plaît ? Vous pouvez soutenir son développement.</summary><p>Chaque contribution, même modeste, est la bienvenue. Merci !</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 
-<script src="../chrome.js?v=20261017" defer></script>
+<script src="../chrome.js?v=20261018c" defer></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pepecoin (PEP) 挖矿指南：ASIC 矿机、矿池与合并挖矿</title>
+<title>如何挖 Pepecoin (PEP)：矿池、Antminer L7/L9、unMineable 与合并挖矿</title>
 <meta name="description" content="如何挖 Pepecoin (PEP)：在与 Litecoin 和 Dogecoin 合并挖 PEP 的矿池中使用 Scrypt ASIC 矿机。介绍矿池、收款钱包、奖励，以及为什么 Pepe (PEPE) 无法挖矿。附来源。">
 <link rel="canonical" href="https://pepecoinhub.com/zh/mining.html">
 <link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mining.html">
@@ -18,7 +18,7 @@
 <meta property="og:type" content="article">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:site_name" content="Pepecoin Hub">
-<meta property="og:title" content="Pepecoin (PEP) 挖矿指南：ASIC 矿机、矿池与合并挖矿">
+<meta property="og:title" content="如何挖 Pepecoin (PEP)：矿池、Antminer L7/L9、unMineable 与合并挖矿">
 <meta property="og:description" content="如何挖 Pepecoin (PEP)：在与 Litecoin 和 Dogecoin 合并挖 PEP 的矿池中使用 Scrypt ASIC 矿机。介绍矿池、收款钱包、奖励，以及为什么 Pepe (PEPE) 无法挖矿。附来源。">
 <meta property="og:url" content="https://pepecoinhub.com/zh/mining.html">
 <meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
@@ -31,10 +31,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261017">
+<link rel="stylesheet" href="../facts.css?v=20261018c">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/zh/"}, {"@type": "ListItem", "position": 2, "name": "指南", "item": "https://pepecoinhub.com/zh/guides.html"}, {"@type": "ListItem", "position": 3, "name": "如何挖 PEP", "item": "https://pepecoinhub.com/zh/mining.html"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "合并挖矿会减少我的 LTC 或 DOGE 收益吗？", "acceptedAnswer": {"@type": "Answer", "text": "不会。算力不会在各条链之间分摊。据矿池 ViaBTC 的说法，PEP 是合并挖矿带来的额外奖励，不需要额外算力。"}}, {"@type": "Question", "name": "用什么硬件挖 PEP？", "acceptedAnswer": {"@type": "Answer", "text": "Scrypt ASIC 矿机，也就是挖 Litecoin 和 Dogecoin 的同一种机器。ViaBTC 举的例子是 Antminer L9 和 ElphaPex DG1。"}}, {"@type": "Question", "name": "可以挖 Pepe (PEPE) 吗？", "acceptedAnswer": {"@type": "Answer", "text": "不能。Pepe (PEPE) 是以太坊上的 ERC-20 代币，而以太坊自 2022年9月15日起已用权益证明取代了挖矿。真正通过挖矿产生的是运行在自己区块链上的 Pepecoin (PEP)。"}}, {"@type": "Question", "name": "挖矿收益要用什么钱包接收？", "acceptedAnswer": {"@type": "Answer", "text": "任何能在 Pepecoin 网络上存放 Pepecoin (PEP) 的钱包都可以，例如 Pepecoin Core 或 Tangem 卡。它的收款地址以 P 开头。MetaMask 是为以太坊类网络设计的，其网络列表里没有 Pepecoin。"}}, {"@type": "Question", "name": "网络每天发放多少 PEP？", "acceptedAnswer": {"@type": "Answer", "text": "每个区块奖励 10,000 PEP。按每分钟一个区块的目标计算，每天最多 1440 万 PEP，由所有挖矿者分享。过去一年平均出块时间约 62.6 秒，因此实际数字约为 1380 万。"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "可以用 GPU 或 CPU 挖 Pepecoin 吗？", "acceptedAnswer": {"@type": "Answer", "text": "不能直接在 Pepecoin 网络上挖，它由 Scrypt ASIC 矿机保护。但你可以通过 unMineable 用 GPU 或 CPU 赚取 PEP：它挖其他币，再以 Pepecoin (PEP) 支付给你。请选择 PEP 而不是 PEPE，并使用以 P 开头的地址。"}}, {"@type": "Question", "name": "哪些矿池支付 Pepecoin？", "acceptedAnswer": {"@type": "Answer", "text": "ViaBTC、F2Pool、Binance Pool、EMCD、AntPool、KuPool 和 Mining-Dutch 支付 PEP。litecoinpool.org 联合挖 PEP，但以额外的 LTC 和 DOGE 支付其价值。unMineable 向 GPU 和 CPU 矿工支付 PEP。实时列表见 miningpoolstats。"}}, {"@type": "Question", "name": "合并挖矿会减少我的 LTC 或 DOGE 收益吗？", "acceptedAnswer": {"@type": "Answer", "text": "不会。算力不会在各条链之间分摊。据矿池 ViaBTC 的说法，PEP 是合并挖矿带来的额外奖励，不需要额外算力。"}}, {"@type": "Question", "name": "用什么硬件挖 PEP？Antminer L7 或 L9 可以吗？", "acceptedAnswer": {"@type": "Answer", "text": "Scrypt ASIC 矿机，也就是挖 Litecoin 和 Dogecoin 的同一种机器。ViaBTC 举的例子是 Antminer L9 和 ElphaPex DG1。可以，Antminer L7 和 L9 都能挖 PEP：接入支持 Pepecoin 合并挖矿的矿池，就能在 LTC 和 DOGE 之外额外获得 PEP。"}}, {"@type": "Question", "name": "可以挖 Pepe (PEPE) 吗？", "acceptedAnswer": {"@type": "Answer", "text": "不能。Pepe (PEPE) 是以太坊上的 ERC-20 代币，而以太坊自 2022年9月15日起已用权益证明取代了挖矿。真正通过挖矿产生的是运行在自己区块链上的 Pepecoin (PEP)。"}}, {"@type": "Question", "name": "挖矿收益要用什么钱包接收？", "acceptedAnswer": {"@type": "Answer", "text": "任何能在 Pepecoin 网络上存放 Pepecoin (PEP) 的钱包都可以，例如 Pepecoin Core 或 Tangem 卡。它的收款地址以 P 开头。MetaMask 是为以太坊类网络设计的，其网络列表里没有 Pepecoin。"}}, {"@type": "Question", "name": "网络每天发放多少 PEP？", "acceptedAnswer": {"@type": "Answer", "text": "每个区块奖励 10,000 PEP。按每分钟一个区块的目标计算，每天最多 1440 万 PEP，由所有挖矿者分享。过去一年平均出块时间约 62.6 秒，因此实际数字约为 1380 万。"}}]}</script>
+<style>
+/* Mining page: pool table, merged-mining coin chips, miners' corner */
+.coin-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.coin-chips li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; background: var(--panel); border: 1px solid var(--rule); border-radius: 999px; font-weight: 600; }
+.coin-chips li.self { background: var(--accent-soft); border-color: var(--accent); }
+.coin-chips img { width: 28px; height: 28px; border-radius: 50%; }
+.coin-chips small { color: var(--muted); font-weight: 400; }
+.miners-love { display: grid; gap: 10px; padding: 22px; border-radius: 16px; background: var(--accent-soft); border: 1px solid var(--accent); border-left-width: 5px; }
+.miners-love h2 { margin: 0; }
+.miners-love .btn { justify-self: start; }
+</style>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
@@ -42,7 +53,7 @@
 
 <header class="site-head">
   <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
-  <nav class="site-nav" aria-label="页面导航"><a href="which-pepecoin.html">如何区分</a><a href="compare.html">PEP 与 DOGE</a><a href="calculator.html">计算器</a><a href="supply.html">供应量</a><a href="scrypt-family.html">Scrypt 家族</a><a href="network.html">网络</a><a href="rich-list.html">富豪榜</a><a href="guides.html" aria-current="page">指南</a></nav>
+  <nav class="site-nav" aria-label="页面导航"><a href="which-pepecoin.html">PEP vs PEPE</a><a href="compare.html">PEP 与 DOGE</a><a href="calculator.html">计算器</a><a href="price.html">价格</a><a href="supply.html">供应量</a><a href="scrypt-family.html">Scrypt 家族</a><a href="network.html">网络</a><a href="rich-list.html">富豪榜</a><a href="guides.html" aria-current="page">指南</a></nav>
 </header>
 <main class="wrap" id="main">
 <header class="page-head">
@@ -79,6 +90,51 @@
   </div>
 </section>
 
+<section aria-labelledby="pools">
+  <h2 id="pools">支付 Pepecoin 的矿池</h2>
+  <p>使用 Scrypt 矿机 (ASIC)，以下任一矿池都会在你挖 Litecoin 和 Dogecoin 时额外支付 PEP。使用 GPU 或 CPU，可通过 unMineable 获得 PEP。</p>
+  <div class="table-scroll" role="region" aria-labelledby="pools" tabindex="0">
+    <table style="min-width: 520px">
+      <thead><tr><th scope="col">矿池</th><th scope="col">硬件</th><th scope="col">PEP 如何到账</th></tr></thead>
+      <tbody>
+        <tr><th scope="row" class="plain"><a href="https://www.viabtc.com/">ViaBTC</a></th><td>Scrypt ASIC</td><td>在 LTC 和 DOGE 之外额外获得 PEP</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://www.f2pool.com/coin/pepecoin">F2Pool</a></th><td>Scrypt ASIC</td><td>在 LTC 和 DOGE 之外额外获得 PEP</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://pool.binance.com/">Binance Pool</a></th><td>Scrypt ASIC</td><td>在 LTC 和 DOGE 之外额外获得 PEP</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://emcd.io/pool/pepecoin/">EMCD</a></th><td>Scrypt ASIC</td><td>在 LTC 和 DOGE 之外额外获得 PEP</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://www.antpool.com/">AntPool</a></th><td>Scrypt ASIC</td><td>在 LTC 和 DOGE 之外额外获得 PEP</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://www.kupool.com/">KuPool</a></th><td>Scrypt ASIC</td><td>在 LTC 和 DOGE 之外额外获得 PEP</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://www.mining-dutch.nl/pools/pepecoin.php">Mining-Dutch</a></th><td>Scrypt ASIC</td><td>直接支付 PEP（Pepecoin 矿池）</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://www.litecoinpool.org/help">litecoinpool.org</a></th><td>Scrypt ASIC</td><td>以额外 LTC 和 DOGE 支付其价值，不支付 PEP</td></tr>
+        <tr><th scope="row" class="plain"><a href="https://unmineable.com/coins/PEP">unMineable</a></th><td>GPU 或 CPU</td><td>挖其他币，以 PEP 结算</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="src">unMineable 不是联合挖矿 (merged mining)：你的 GPU 挖的是其他币，矿池以 Pepecoin 支付。在 unMineable 上请选择 Pepecoin 网络上的 PEP，而不是 PEPE (ERC-20)。矿池及其算力的实时列表：<a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>。</p>
+</section>
+
+<section aria-labelledby="merged-with">
+  <h2 id="merged-with">与以下币种联合挖矿</h2>
+  <ul class="coin-chips">
+    <li class="self"><img src="../assets/brand/icon.svg" alt="" width="28" height="28">Pepecoin <small>PEP</small></li>
+    <li><img src="../assets/coins/ltc.png" alt="" width="28" height="28">Litecoin <small>LTC</small></li>
+    <li><img src="../assets/coins/doge.png" alt="" width="28" height="28">Dogecoin <small>DOGE</small></li>
+    <li><img src="../assets/coins/bells.png" alt="" width="28" height="28">Bellscoin <small>BELLS</small></li>
+    <li><img src="../assets/coins/lky.png" alt="" width="28" height="28">Luckycoin <small>LKY</small></li>
+    <li><img src="../assets/coins/jkc.png" alt="" width="28" height="28">Junkcoin <small>JKC</small></li>
+    <li><img src="../assets/coins/dingo.png" alt="" width="28" height="28">Dingocoin <small>DINGO</small></li>
+    <li><img src="../assets/coins/shic.png" alt="" width="28" height="28">Shibacoin <small>SHIC</small></li>
+  </ul>
+  <p class="note">Pepecoin 在 Scrypt 上使用 AuxPoW（联合挖矿，merged mining）。Litecoin 是父链，Dogecoin、Pepecoin 以及下列其他币种接受同一份工作量。每个矿池自行决定支付哪些币；ViaBTC 的 Litecoin 矿池在 LTC 之外全部支付。<a href="scrypt-family.html">整个 Scrypt 家族。</a></p>
+</section>
+
+<section class="miners-love" aria-labelledby="miners">
+  <h2 id="miners"><span aria-hidden="true">💚⛏️ </span>我们爱矿工</h2>
+  <p>是矿工让 Pepecoin 运转：每一个区块、每一枚现存的 PEP 都来自他们的算力。Pepecoin 没有预挖 (premine)，也没有发币的公司，只有矿工。</p>
+  <p>加入 Pepecoin Discord 上的矿工专属频道：矿池建议、设置帮助和最新消息。</p>
+  <a class="btn main" href="https://pepecoin.com/discord">Pepecoin Discord →</a>
+  <p class="src">实时算力、难度和矿池： <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats：Pepecoin</a> · <a href="network.html">本站网络数据</a></p>
+</section>
+
 <section aria-labelledby="expect">
   <h2 id="expect">预期情况</h2>
   <div class="prose">
@@ -91,8 +147,10 @@
 <section aria-labelledby="faq">
   <h2 id="faq">常见问题</h2>
   <div class="faq">
+    <details><summary>可以用 GPU 或 CPU 挖 Pepecoin 吗？</summary><p>不能直接在 Pepecoin 网络上挖，它由 Scrypt ASIC 矿机保护。但你可以通过 unMineable 用 GPU 或 CPU 赚取 PEP：它挖其他币，再以 Pepecoin (PEP) 支付给你。请选择 PEP 而不是 PEPE，并使用以 P 开头的地址。</p></details>
+    <details><summary>哪些矿池支付 Pepecoin？</summary><p>ViaBTC、F2Pool、Binance Pool、EMCD、AntPool、KuPool 和 Mining-Dutch 支付 PEP。litecoinpool.org 联合挖 PEP，但以额外的 LTC 和 DOGE 支付其价值。unMineable 向 GPU 和 CPU 矿工支付 PEP。实时列表见 miningpoolstats。</p></details>
     <details><summary>合并挖矿会减少我的 LTC 或 DOGE 收益吗？</summary><p>不会。算力不会在各条链之间分摊。据矿池 ViaBTC 的说法，PEP 是合并挖矿带来的额外奖励，不需要额外算力。</p></details>
-    <details><summary>用什么硬件挖 PEP？</summary><p>Scrypt ASIC 矿机，也就是挖 Litecoin 和 Dogecoin 的同一种机器。ViaBTC 举的例子是 Antminer L9 和 ElphaPex DG1。</p></details>
+    <details><summary>用什么硬件挖 PEP？Antminer L7 或 L9 可以吗？</summary><p>Scrypt ASIC 矿机，也就是挖 Litecoin 和 Dogecoin 的同一种机器。ViaBTC 举的例子是 Antminer L9 和 ElphaPex DG1。可以，Antminer L7 和 L9 都能挖 PEP：接入支持 Pepecoin 合并挖矿的矿池，就能在 LTC 和 DOGE 之外额外获得 PEP。</p></details>
     <details><summary>可以挖 Pepe (PEPE) 吗？</summary><p>不能。Pepe (PEPE) 是以太坊上的 ERC-20 代币，而以太坊自 2022年9月15日起已用权益证明取代了挖矿。真正通过挖矿产生的是运行在自己区块链上的 Pepecoin (PEP)。</p></details>
     <details><summary>挖矿收益要用什么钱包接收？</summary><p>任何能在 Pepecoin 网络上存放 Pepecoin (PEP) 的钱包都可以，例如 Pepecoin Core 或 Tangem 卡。它的收款地址以 P 开头。MetaMask 是为以太坊类网络设计的，其网络列表里没有 Pepecoin。</p></details>
     <details><summary>网络每天发放多少 PEP？</summary><p>每个区块奖励 10,000 PEP。按每分钟一个区块的目标计算，每天最多 1440 万 PEP，由所有挖矿者分享。过去一年平均出块时间约 62.6 秒，因此实际数字约为 1380 万。</p></details>
@@ -120,7 +178,7 @@
     </a>
     <a class="card" href="mica.html">
       <h3>Pepecoin 与 MiCA</h3>
-      <p>欧盟白皮书是什么，又不意味着什么。</p>
+      <p>欧盟 whitepaper 是什么，又不意味着什么。</p>
     </a>
     <a class="card" href="glossary.html">
       <h3>术语表</h3>
@@ -154,7 +212,7 @@
       <h3>规则</h3>
       <ul>
         <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp (AuxPoW at 42,000)</a></li>
-        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">Pepecoin MiCA white paper (block reward)</a></li>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">Pepecoin MiCA whitepaper (block reward)</a></li>
         <li><a href="network.html">本站：网络数据</a></li>
         <li><a href="https://ethereum.org/en/roadmap/merge/">ethereum.org: The Merge (proof of stake since September 15, 2022)</a></li>
       </ul>
@@ -169,6 +227,6 @@
   <details class="support"><summary>喜欢这个网站？欢迎支持它继续发展。</summary><p>无论金额多少，都是很大的帮助。谢谢！</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 
-<script src="../chrome.js?v=20261017" defer></script>
+<script src="../chrome.js?v=20261018c" defer></script>
 </body>
 </html>

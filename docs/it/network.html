@@ -30,7 +30,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261017">
+<link rel="stylesheet" href="../facts.css?v=20261018c">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/it/"}, {"@type": "ListItem", "position": 2, "name": "Statistiche della rete", "item": "https://pepecoinhub.com/it/network.html"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Statistiche giornaliere della rete Pepecoin", "description": "Altezza del blocco giornaliera di Pepecoin (PEP), offerta di monete, numero di indirizzi con saldo e ora dello snapshot, dal 30 gennaio 2024; ricostruiti dalla blockchain prima del 5 ottobre 2026 e registrati in tempo reale da allora.", "url": "https://pepecoinhub.com/it/network.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (volontari della community r/pepecoin)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}]}</script>
@@ -63,7 +63,7 @@
 
 <header class="site-head">
   <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
-  <nav class="site-nav" aria-label="Pagine"><a href="which-pepecoin.html">PEP, PEPE e PEPECOIN</a><a href="compare.html">PEP e DOGE</a><a href="calculator.html">Calcolatore</a><a href="supply.html">Offerta</a><a href="scrypt-family.html">Famiglia Scrypt</a><a href="network.html" aria-current="page">Rete</a><a href="rich-list.html">Rich list</a><a href="guides.html">Guide</a></nav>
+  <nav class="site-nav" aria-label="Pagine"><a href="which-pepecoin.html">PEP vs PEPE</a><a href="compare.html">PEP e DOGE</a><a href="calculator.html">Calcolatore</a><a href="price.html">Prezzo</a><a href="supply.html">Offerta</a><a href="scrypt-family.html">Famiglia Scrypt</a><a href="network.html" aria-current="page">Rete</a><a href="rich-list.html">Rich list</a><a href="guides.html">Guide</a></nav>
 </header>
 <main class="wrap" id="main">
 <header class="page-head">
@@ -129,6 +129,22 @@
     <p><strong>Ogni giorno</strong> un job di GitHub Actions chiede all’explorer PepeBlocks e all’API di pepecoinservice.org l’altezza del blocco, l’offerta e la rich list, e salva il risultato nel repository di questo sito.</p>
     <p><strong>Prima del 5 ottobre 2026</strong> gli stessi dati sono stati ricostruiti ripercorrendo la blockchain di Pepecoin dal primo blocco: un punto al giorno per la prima settimana (dal 30 gennaio al 4 febbraio 2024), uno a settimana fino a settembre 2025 e uno al giorno dopo.</p>
     <p>Il <strong>tempo di blocco</strong> è il tempo tra due snapshot diviso per i blocchi trovati nel mezzo. Gli <strong>indirizzi</strong> sono quelli che detengono più di zero PEP, compresi i piccoli residui sotto 0,001 PEP. PepeBlocks mostra un numero più basso perché conta solo gli indirizzi con almeno 0,001 PEP. Una persona può usare molti indirizzi, e gli exchange custodiscono monete per molte persone.</p>
+  </div>
+</section>
+
+<section aria-label="Block explorer di Pepecoin">
+  <h2>Block explorer di Pepecoin</h2>
+  <p class="note">Per cercare un singolo indirizzo, una transazione o un blocco, usa un block explorer. Questa pagina mostra solo i totali giornalieri.</p>
+  <div class="linkgroups" style="max-width:560px">
+    <div class="linkgroup">
+      <ul>
+        <li><a href="https://pepeblocks.com/">PepeBlocks</a><span>explorer, rich list</span></li>
+        <li><a href="https://pepeplorer.com/">Pepeplorer</a><span>explorer, statistiche di rete</span></li>
+        <li><a href="https://pepecoinexplorer.com/">PepecoinExplorer</a><span>explorer</span></li>
+        <li><a href="https://peppool.space/">Peppool</a><span>explorer</span></li>
+        <li><a href="https://pepecoinservice.org/">PepecoinService</a><span>explorer, dati di mercato, API</span></li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -300,6 +316,6 @@
   }).catch(function () { $('net-status').textContent = 'Al momento non è stato possibile caricare i dati giornalieri. I numeri sopra sono del ' + $('s-date').textContent + '.'; });
 })();
 </script>
-<script src="../chrome.js?v=20261017" defer></script>
+<script src="../chrome.js?v=20261018c" defer></script>
 </body>
 </html>
