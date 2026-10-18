@@ -48,6 +48,10 @@ jobs:
             python scripts/snapshot.py || { echo "First attempt failed, retrying in 5 minutes"; sleep 300; python scripts/snapshot.py; }
           fi
 
+      # network hashrate for the mining calculator; never fails the run
+      - name: Mining stats
+        run: python scripts/mining_stats.py || echo "mining stats not updated"
+
       - name: Build summary
         run: |
           if ls docs/data/snapshots/*.json >/dev/null 2>&1; then

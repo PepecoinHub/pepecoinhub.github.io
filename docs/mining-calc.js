@@ -40,6 +40,16 @@
   calc();
 
   var base = (document.currentScript && document.currentScript.src) || location.href;
+  // Network hashrate from the daily file (PepeBlocks getnetworkhashps); the visitor can still type their own.
+  fetch(new URL('data/mining.json', base).href)
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (m) {
+      var th = m.hashrate_hs / 1e12;
+      if (!(th > 0)) return;
+      if (!$('mc-net').value) { $('mc-net').value = String(Math.round(th * 10) / 10); $('mc-net-u').value = '1e12'; calc(); }
+      $('mc-src').textContent = ' · PepeBlocks, ' + m.date + ': ' + fmt(th / 1000, 2) + ' PH/s';
+    })
+    .catch(function () { /* the visitor types the hashrate in */ });
   fetch(new URL('data/network.json', base).href)
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(function (d) {
