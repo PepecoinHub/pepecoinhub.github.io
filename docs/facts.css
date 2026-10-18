@@ -216,27 +216,32 @@ a.card:hover { border-color: var(--accent); }
 .linkgroup::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: linear-gradient(90deg, var(--accent), var(--gold)); }
 .linkgroup h3 { display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); font-weight: 700; margin: 0; }
 .linkgroup h3::before { content: "\1F517"; display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 12px; background: var(--accent-soft); font-size: 1.05rem; letter-spacing: 0; }
-.linkgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.linkgroup ul { list-style: none; margin: 0 -8px; padding: 0; display: grid; gap: 2px; }
 .linkgroup li {
-  position: relative; display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px 10px; margin: 0 -10px;
-  border-radius: 12px; font-size: 0.95rem; transition: background 0.15s ease;
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: center;
+  padding: 9px 10px; border-radius: 14px; transition: background 0.15s ease;
 }
+.linkgroup li + li::before { content: ""; position: absolute; left: 10px; right: 10px; top: -1px; border-top: 1px dashed var(--rule); }
 .linkgroup li:hover, .linkgroup li:focus-within { background: var(--accent-soft); }
-.linkgroup li a { font-weight: 600; text-decoration: none; min-width: 0; overflow-wrap: break-word; }
-.linkgroup li a::after { content: " \2197"; font-weight: 400; opacity: 0.45; }
-.linkgroup li a::before { content: ""; position: absolute; inset: 0; border-radius: 12px; }
-.linkgroup li:hover a { text-decoration: underline; }
-.linkgroup li span {
-  flex: 0 1 auto; max-width: 50%; color: var(--muted); font-size: 0.76rem; text-align: right; line-height: 1.3;
-  padding: 3px 9px; border-radius: 10px; background: var(--paper-2, var(--paper)); border: 1px solid var(--rule);
+.linkgroup li:hover::before, .linkgroup li:hover + li::before { opacity: 0; }
+.linkgroup li a { grid-column: 1; font-weight: 650; font-size: 0.97rem; text-decoration: none; color: var(--ink); min-width: 0; overflow-wrap: break-word; }
+.linkgroup li a::before { content: ""; position: absolute; inset: 0; border-radius: 14px; }
+.linkgroup li a::after {
+  content: "\2197"; position: absolute; right: 10px; top: 50%; translate: 0 -50%; display: grid; place-items: center;
+  width: 28px; height: 28px; border-radius: 50%; font-size: 0.85rem; font-weight: 700;
+  color: var(--accent); background: var(--accent-soft); transition: background 0.15s, color 0.15s, transform 0.15s;
 }
+.linkgroup li:hover a::after, .linkgroup li a:focus-visible::after { background: var(--accent); color: var(--panel); transform: translate(2px, -2px); }
+.linkgroup li:hover a { color: var(--accent-deep); }
+.linkgroup li span { grid-column: 1; color: var(--muted); font-size: 0.8rem; line-height: 1.3; margin-top: 1px; padding-right: 34px; }
+.linkgroup li a { padding-right: 34px; }
+#links ~ .linkgroups .linkgroup:first-child { background: linear-gradient(160deg, var(--accent-soft), var(--panel) 65%); border-color: color-mix(in srgb, var(--accent) 40%, var(--rule)); }
 #links ~ .linkgroups .linkgroup:nth-child(1) h3::before { content: "\1F438"; }
 #links ~ .linkgroups .linkgroup:nth-child(2) h3::before { content: "\1F45B"; }
 #links ~ .linkgroups .linkgroup:nth-child(3) h3::before { content: "\1F4B1"; }
 #links ~ .linkgroups .linkgroup:nth-child(4) h3::before { content: "\1F504"; }
 #links ~ .linkgroups .linkgroup:nth-child(5) h3::before { content: "\1F50E"; }
 #links ~ .linkgroups .linkgroup:nth-child(6) h3::before { content: "\26CF\FE0F"; }
-@media (max-width: 430px) { .linkgroup li span { max-width: 48%; } }
 
 .sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
 .sources h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
@@ -573,6 +578,9 @@ footer.site-foot, footer.pf-foot { border-top: 0; background: var(--paper-2); bo
 .navbtn[aria-expanded="true"] svg { transform: rotate(180deg); }
 .navbtn:hover, .navbtn[aria-expanded="true"], .navgroup.current .navbtn { background: var(--accent-soft); }
 .navgroup.current .navbtn { color: var(--accent-deep); font-weight: 600; }
+.navgroup-start .navbtn { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); color: var(--accent-deep); font-weight: 700; }
+.navgroup-start .navbtn::before { content: "\1F680"; font-size: 0.9em; }
+.navgroup-start .navbtn:hover, .navgroup-start .navbtn[aria-expanded="true"] { background: color-mix(in srgb, var(--accent) 22%, var(--accent-soft)); }
 .navpanel {
   display: none; position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%); z-index: 60;
   min-width: 240px; padding: 8px; background: var(--panel); border: 1px solid var(--rule); border-radius: 18px;
@@ -606,6 +614,7 @@ footer.site-foot, footer.pf-foot { border-top: 0; background: var(--paper-2); bo
   .site-head.menu-open .site-nav.grouped { display: flex; }
   .navbtn { pointer-events: none; padding: 8px 4px 2px; font: 700 0.72rem var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: none !important; }
   .navbtn svg { display: none; }
+  .navgroup-start .navbtn { box-shadow: none; color: var(--accent-deep); }
   .navpanel { display: grid !important; position: static; transform: none; min-width: 0; padding: 0; border: 0; box-shadow: none; background: none; grid-template-columns: 1fr 1fr; gap: 6px; }
   .site-nav.grouped a { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 14px; background: var(--paper); font-weight: 600; color: var(--ink); white-space: normal; }
   .site-nav > a > .nav-ico { display: inline-grid; }

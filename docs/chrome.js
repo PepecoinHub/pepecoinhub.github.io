@@ -13,27 +13,27 @@
   ];
   var UI = {
     en: { copy: 'Copy', copied: 'Copied', theme: 'Theme', auto: 'Auto', light: 'Light', dark: 'Dark', sep: ': ', language: 'Language',
-      start: 'Start here', data: 'Data & charts', games: 'Games', menu: 'Menu', top: 'Back to top' },
+      start: 'Start here', mine: 'Mining', data: 'Data & charts', games: 'Games', menu: 'Menu', top: 'Back to top' },
     pl: { copy: 'Kopiuj', copied: 'Skopiowano', theme: 'Motyw', auto: 'Auto', light: 'Jasny', dark: 'Ciemny', sep: ': ', language: 'Język',
-      start: 'Na start', data: 'Dane i wykresy', games: 'Gry', menu: 'Menu', top: 'Do góry',
+      start: 'Na start', mine: 'Kopanie', data: 'Dane i wykresy', games: 'Gry', menu: 'Menu', top: 'Do góry',
       hint: 'Ta strona jest dostępna także po polsku.', go: 'Czytaj po polsku', close: 'Zamknij' },
     es: { copy: 'Copiar', copied: 'Copiado', theme: 'Tema', auto: 'Auto', light: 'Claro', dark: 'Oscuro', sep: ': ', language: 'Idioma',
-      start: 'Para empezar', data: 'Datos y gráficos', games: 'Juegos', menu: 'Menú', top: 'Volver arriba',
+      start: 'Para empezar', mine: 'Minería', data: 'Datos y gráficos', games: 'Juegos', menu: 'Menú', top: 'Volver arriba',
       hint: 'Esta página también está en español.', go: 'Leer en español', close: 'Cerrar' },
     de: { copy: 'Kopieren', copied: 'Kopiert', theme: 'Design', auto: 'Auto', light: 'Hell', dark: 'Dunkel', sep: ': ', language: 'Sprache',
-      start: 'Für den Einstieg', data: 'Daten & Charts', games: 'Spiele', menu: 'Menü', top: 'Nach oben',
+      start: 'Für den Einstieg', mine: 'Mining', data: 'Daten & Charts', games: 'Spiele', menu: 'Menü', top: 'Nach oben',
       hint: 'Diese Seite gibt es auch auf Deutsch.', go: 'Auf Deutsch lesen', close: 'Schließen' },
     fr: { copy: 'Copier', copied: 'Copié', theme: 'Thème', auto: 'Auto', light: 'Clair', dark: 'Sombre', sep: ' : ', language: 'Langue',
-      start: 'Pour commencer', data: 'Données et graphiques', games: 'Jeux', menu: 'Menu', top: 'Haut de page',
+      start: 'Pour commencer', mine: 'Minage', data: 'Données et graphiques', games: 'Jeux', menu: 'Menu', top: 'Haut de page',
       hint: 'Cette page existe aussi en français.', go: 'Lire en français', close: 'Fermer' },
     tr: { copy: 'Kopyala', copied: 'Kopyalandı', theme: 'Tema', auto: 'Otomatik', light: 'Açık', dark: 'Koyu', sep: ': ', language: 'Dil',
-      start: 'Başlangıç', data: 'Veriler ve grafikler', games: 'Oyunlar', menu: 'Menü', top: 'Başa dön',
+      start: 'Başlangıç', mine: 'Madencilik', data: 'Veriler ve grafikler', games: 'Oyunlar', menu: 'Menü', top: 'Başa dön',
       hint: 'Bu sayfa Türkçe olarak da mevcut.', go: 'Türkçe sürüme geç', close: 'Kapat' },
     it: { copy: 'Copia', copied: 'Copiato', theme: 'Tema', auto: 'Auto', light: 'Chiaro', dark: 'Scuro', sep: ': ', language: 'Lingua',
-      start: 'Per iniziare', data: 'Dati e grafici', games: 'Giochi', menu: 'Menu', top: 'Torna su',
+      start: 'Per iniziare', mine: 'Mining', data: 'Dati e grafici', games: 'Giochi', menu: 'Menu', top: 'Torna su',
       hint: 'Questa pagina è disponibile anche in italiano.', go: 'Leggi in italiano', close: 'Chiudi' },
     zh: { copy: '复制', copied: '已复制', theme: '主题', auto: '自动', light: '浅色', dark: '深色', sep: '：', language: '语言',
-      start: '入门', data: '数据与图表', games: '游戏', menu: '菜单', top: '返回顶部',
+      start: '入门', mine: '挖矿', data: '数据与图表', games: '游戏', menu: '菜单', top: '返回顶部',
       hint: '本页面也有简体中文版。', go: '阅读中文版', close: '关闭' }
   };
   function keyOf(tag) {
@@ -166,7 +166,7 @@
 
   // Header menu: the page links are grouped into "Start here" and "Data & charts" drop-downs,
   // with Guides and a highlighted Games button next to them. On a phone the menu opens from a ☰ button.
-  var GROUPS = { 'which-pepecoin': ['start', '🐸'], 'compare': ['start', '🐕'], 'scrypt-family': ['start', '⛓️'],
+  var GROUPS = { 'which-pepecoin': ['start', '🐸'], 'compare': ['start', '🐕'], 'scrypt-family': ['start', '⛓️'], 'mining': ['start', '⛏️'],
     'network': ['data', '📈'], 'rich-list': ['data', '🏆'], 'supply': ['data', '🪙'], 'calculator': ['data', '🧮'], 'price': ['data', '💹'], 'guides': ['', '📚'] };
   function groupNav(nav) {
     var head = nav.closest('.site-head');
@@ -183,6 +183,15 @@
       if (!panels[g[0]]) { panels[g[0]] = []; order.push(g[0]); }
       panels[g[0]].push(a);
     });
+    // Mining is not in the page HTML; it joins "Start here" as the fourth link.
+    if (panels.start && !panels.start.some(function (a) { return /mining\.html$/.test(a.getAttribute('href') || ''); })) {
+      var mine = document.createElement('a');
+      mine.href = (base || '') + 'mining.html';
+      mine.innerHTML = '<span class="nav-ico" aria-hidden="true">⛏️</span>';
+      mine.appendChild(document.createTextNode(t.mine));
+      if (/\/mining\.html$/.test(location.pathname)) mine.setAttribute('aria-current', 'page');
+      panels.start.push(mine);
+    }
     if (!games) {
       games = document.createElement('a');
       games.href = (base || '') + 'games/';
@@ -193,7 +202,7 @@
     var frag = document.createDocumentFragment(), groups = [];
     order.forEach(function (item) {
       if (typeof item !== 'string') { frag.appendChild(item); return; }
-      var wrap = document.createElement('div'); wrap.className = 'navgroup';
+      var wrap = document.createElement('div'); wrap.className = 'navgroup navgroup-' + item;
       var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'navbtn'; btn.setAttribute('aria-expanded', 'false');
       btn.innerHTML = '<span></span><svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
       btn.firstChild.textContent = t[item];
