@@ -48,6 +48,21 @@
 .laptop { margin: 18px 0 22px; padding: 20px 22px; border-radius: 22px; border: 1.5px solid var(--gold); background: linear-gradient(135deg, var(--gold-soft, #fff4dd), var(--panel) 70%); display: grid; gap: 10px; justify-items: start; }
 .laptop-h { font-weight: 800; font-size: 1.15rem; margin: 0; }
 .laptop p { margin: 0; }
+.mcalc { padding: 22px; border-radius: 22px; border: 1px solid var(--rule); background: var(--panel); box-shadow: var(--shadow); }
+.mcalc h2 { margin-top: 0; }
+.mcalc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 18px; margin: 14px 0; }
+.mcalc-grid label { display: grid; gap: 6px; font-weight: 600; font-size: 0.92rem; min-width: 0; }
+.mcalc-grid small { font-weight: 400; color: var(--muted); }
+.mcalc-in { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.mcalc-in input { flex: 1; min-width: 0; width: 100%; padding: 10px 12px; font: inherit; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); }
+.mcalc-in select { padding: 10px 8px; font: inherit; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); }
+.mcalc-presets { display: flex; flex-wrap: wrap; gap: 6px; align-self: end; }
+.mcalc-presets button { font: inherit; font-size: 0.82rem; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-deep); cursor: pointer; }
+.mcalc-out { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.mcalc-out div { padding: 12px; border-radius: 16px; background: var(--accent-soft); display: grid; gap: 2px; min-width: 0; }
+.mcalc-out span { font-size: 0.8rem; color: var(--muted); }
+.mcalc-out strong { font-size: 1.15rem; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .mcalc-out { grid-template-columns: 1fr; } }
 </style>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
@@ -129,6 +144,19 @@
     <li><img src="../assets/coins/shic.png" alt="" width="28" height="28">Shibacoin <small>SHIC</small></li>
   </ul>
   <p class="note">Pepecoin, Scrypt üzerinde AuxPoW (merged mining) kullanır. Litecoin ana zincirdir; Dogecoin, Pepecoin ve aşağıdaki diğer coinler aynı işi kabul eder. Hangisini ödeyeceğine her havuz kendisi karar verir; ViaBTC'nin Litecoin havuzu hepsini LTC'ye ek olarak öder. <a href="scrypt-family.html">Tüm Scrypt ailesi.</a></p>
+</section>
+
+<section class="mcalc" aria-labelledby="calc">
+  <h2 id="calc"><span aria-hidden="true">🧮 </span>Pepecoin madencilik hesaplayıcı</h2>
+  <p>Cihazınız ne kadar PEP ekler? Kendi hashrate'inizi ve ağın güncel hashrate'ini girin.</p>
+  <div class="mcalc-grid">
+    <label>Hashrate'iniz<span class="mcalc-in"><input id="mc-hash" type="number" min="0" step="any" inputmode="decimal" value="16"><select id="mc-hash-u" aria-label="Hashrate'iniz"><option value="1e6">MH/s</option><option value="1e9" selected>GH/s</option></select></span></label>
+    <div class="mcalc-presets"><button type="button" data-gh="16">Antminer L9</button><button type="button" data-gh="9.5">Antminer L7</button><button type="button" data-gh="11">ElphaPex DG1</button></div>
+    <label>Pepecoin ağ hashrate'i<span class="mcalc-in"><input id="mc-net" type="number" min="0" step="any" inputmode="decimal" placeholder="TH/s"><select id="mc-net-u" aria-label="Pepecoin ağ hashrate'i"><option value="1e12" selected>TH/s</option><option value="1e9">GH/s</option></select></span><small>Güncel değer: <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a></small></label>
+    <label>Havuz ücreti<span class="mcalc-in"><input id="mc-fee" type="number" min="0" max="99" step="any" inputmode="decimal" value="2"><b>%</b></span></label>
+  </div>
+  <div class="mcalc-out" aria-live="polite"><div><span>Günlük</span><strong id="mc-day">—</strong></div><div><span>7 günde</span><strong id="mc-week">—</strong></div><div><span>30 günde</span><strong id="mc-month">—</strong></div></div>
+  <p class="note">Bu bir tahmindir: ağ hashrate'indeki payınız × günde <span id="mc-bpd" data-bpd="1379">1.379</span> blok (son 30 günün ortalaması) × 10.000 PEP, eksi havuz ücreti. Gerçek ödemeler şansa, zorluğa ve havuzun ödeme yöntemine göre değişir. Birleşik madencilikte bu, LTC ve DOGE kazancınıza ek olarak gelir.</p>
 </section>
 
 <section class="miners-love" aria-labelledby="miners">
@@ -232,6 +260,7 @@
   <details class="support"><summary>Bu siteyi beğendiyseniz gelişimine destek olabilirsiniz.</summary><p>Ne kadar küçük olursa olsun her katkı işe yarar. Teşekkürler!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 
+<script src="../mining-calc.js?v=20261018" defer></script>
 <script src="../chrome.js?v=20261018e" defer></script>
 </body>
 </html>
