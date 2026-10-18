@@ -597,10 +597,18 @@ footer.site-foot, footer.pf-foot { border-top: 0; background: var(--paper-2); bo
 .site-nav a.nav-games[aria-current="page"] { background: var(--accent); color: #fff; }
 :root[data-theme="dark"] .site-nav a.nav-games, :root[data-theme="dark"] .head-games { color: #0e1512; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .site-nav a.nav-games, :root:not([data-theme="light"]) .head-games { color: #0e1512; } }
-.head-phone, .navburger { display: none; }
+.head-phone, .navburger, .head-start { display: none; }
+.head-start {
+  appearance: none; font: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+  padding: 8px 12px; border-radius: 999px; border: 0; background: var(--accent-soft); color: var(--accent-deep); box-shadow: inset 0 0 0 1.5px var(--accent);
+  align-items: center; gap: 4px;
+}
+.head-start b { font-weight: 700; }
 @media (max-width: 760px) {
   .site-head { position: relative; flex-wrap: nowrap; }
-  .head-phone { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .head-phone { display: flex; align-items: center; gap: 8px; margin-left: auto; flex: none; }
+  .site-head .brand-hub-link { flex: none; }
+  .head-start { display: inline-flex; }
   .head-games { padding: 8px 12px; font-size: 0.88rem; }
   .navburger {
     display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--rule);
@@ -657,5 +665,11 @@ body::before {
   .site-head .brand-hub-link .hub { font-size: 0.95rem; padding: 0 6px; }
   .head-phone { gap: 6px; }
   .head-games { font-size: 0; padding: 0; width: 42px; height: 42px; display: grid; place-items: center; }
+  .head-start { padding: 0 10px; height: 42px; font-size: 0.8rem; }
+  .site-head .brand-hub-link .lockup { height: 26px; }
+  .site-head .brand-hub-link .hub { font-size: 0.85rem; padding: 0 5px; }
+  .navburger { width: 40px; height: 40px; }
+  .head-phone .head-games { display: none; }
+  .site-nav.grouped > a.nav-games { display: flex; justify-content: center; background: var(--accent); color: #fff; }
   .head-games span { font-size: 1.1rem; }
 }

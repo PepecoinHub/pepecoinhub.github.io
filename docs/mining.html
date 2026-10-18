@@ -30,7 +30,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="facts.css?v=20261018c">
+<link rel="stylesheet" href="facts.css?v=20261018e">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/"}, {"@type": "ListItem", "position": 2, "name": "Guides", "item": "https://pepecoinhub.com/guides.html"}, {"@type": "ListItem", "position": 3, "name": "How to mine PEP", "item": "https://pepecoinhub.com/mining.html"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I mine Pepecoin with a GPU or CPU?", "acceptedAnswer": {"@type": "Answer", "text": "Not on the Pepecoin network itself, which runs on Scrypt ASICs. You can still earn PEP with a GPU or CPU on unMineable: it mines other coins and pays you in Pepecoin (PEP). Choose PEP, not PEPE, and use an address that starts with P."}}, {"@type": "Question", "name": "Which mining pools pay Pepecoin?", "acceptedAnswer": {"@type": "Answer", "text": "ViaBTC, F2Pool, Binance Pool, EMCD, AntPool, KuPool and Mining-Dutch pay PEP. litecoinpool.org merge-mines PEP but pays its value as extra LTC and DOGE. unMineable pays PEP to GPU and CPU miners. The live list is on miningpoolstats."}}, {"@type": "Question", "name": "Does merged mining lower my LTC or DOGE rewards?", "acceptedAnswer": {"@type": "Answer", "text": "No. The work is not split between chains. In the words of the pool ViaBTC, PEP is an additional reward from merged mining, requiring no extra hashrate."}}, {"@type": "Question", "name": "What hardware mines PEP? Can an Antminer L7 or L9 mine it?", "acceptedAnswer": {"@type": "Answer", "text": "A Scrypt ASIC miner, the same machine used for Litecoin and Dogecoin. ViaBTC names the Antminer L9 and the ElphaPex DG1 as examples. Yes, an Antminer L7 or L9 mines PEP: point it at a pool that merge-mines Pepecoin and it earns PEP on top of LTC and DOGE."}}, {"@type": "Question", "name": "Can I mine Pepe (PEPE)?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pepe (PEPE) is an ERC-20 token on Ethereum, and Ethereum has used proof of stake instead of mining since September 15, 2022. The coin that is mined is Pepecoin (PEP), on its own blockchain."}}, {"@type": "Question", "name": "Are “Pepe coin mining” apps real?", "acceptedAnswer": {"@type": "Answer", "text": "An app cannot mine Pepe (PEPE): it is an ERC-20 token on Ethereum, and Ethereum has had no mining since September 15, 2022. Pepecoin (PEP) is mined with Scrypt ASIC machines on mining pools, as in the steps above, against a network hashrate of about 2.9 PH/s. An app that pays out “Pepe” for mining on your phone is not mining a blockchain."}}, {"@type": "Question", "name": "Which wallet do I need for mining payouts?", "acceptedAnswer": {"@type": "Answer", "text": "Any wallet that holds Pepecoin (PEP) on the Pepecoin network, such as Pepecoin Core or a Tangem card. Its receiving address starts with P. MetaMask is built for Ethereum-type networks and does not list Pepecoin."}}, {"@type": "Question", "name": "How much PEP does the network pay out?", "acceptedAnswer": {"@type": "Answer", "text": "Every block pays 10,000 PEP. At the target of one block a minute that is up to 14.4 million PEP a day, shared by everyone mining it. Blocks have averaged about 62.6 seconds over the past year, so the real figure is about 13.8 million."}}]}</script>
@@ -44,6 +44,25 @@
 .miners-love { display: grid; gap: 10px; padding: 22px; border-radius: 16px; background: var(--accent-soft); border: 1px solid var(--accent); border-left-width: 5px; }
 .miners-love h2 { margin: 0; }
 .miners-love .btn { justify-self: start; }
+.laptop { margin: 18px 0 22px; padding: 20px 22px; border-radius: 22px; border: 1.5px solid var(--gold); background: linear-gradient(135deg, var(--gold-soft, #fff4dd), var(--panel) 70%); display: grid; gap: 10px; justify-items: start; }
+.laptop-h { font-weight: 800; font-size: 1.15rem; margin: 0; }
+.laptop p { margin: 0; }
+.mcalc { padding: 22px; border-radius: 22px; border: 1px solid var(--rule); background: var(--panel); box-shadow: var(--shadow); }
+.mcalc h2 { margin-top: 0; }
+.mcalc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 18px; margin: 14px 0; }
+.mcalc-grid label { display: grid; gap: 6px; font-weight: 600; font-size: 0.92rem; min-width: 0; }
+.mcalc-grid small { font-weight: 400; color: var(--muted); }
+.mcalc-in { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.mcalc-in input { flex: 1; min-width: 0; width: 100%; padding: 10px 12px; font: inherit; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); }
+.mcalc-in select { padding: 10px 8px; font: inherit; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); }
+.mcalc-presets { display: flex; flex-wrap: wrap; gap: 6px; align-self: end; }
+.mcalc-presets button { font: inherit; font-size: 0.82rem; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-deep); cursor: pointer; }
+.mcalc-out { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.mcalc-out div { padding: 12px; border-radius: 16px; background: var(--accent-soft); display: grid; gap: 2px; min-width: 0; }
+.mcalc-out span { font-size: 0.8rem; color: var(--muted); }
+.mcalc-out strong { font-size: 1.15rem; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .mcalc-out { grid-template-columns: 1fr; } }
+.minecall { margin: 0 0 14px; padding: 14px 18px; border-radius: 16px; border-left: 5px solid var(--accent); background: var(--accent-soft); font-size: 1.05rem; }
 </style>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
@@ -82,6 +101,7 @@
 
 <section aria-labelledby="pepe">
   <h2 id="pepe">PEP is mined, PEPE is not</h2>
+  <p class="minecall"><span aria-hidden="true">⛏️ </span><strong>PEP is the only Pepe coin with a real mining network</strong>: it is merge-mined with Litecoin and Dogecoin, at about 1.9 PH/s. The Pepe tokens on Ethereum (PEPE, PEPECOIN) are not mined at all.</p>
   <div class="prose">
     <p>Searching for “Pepe coin mining” brings up three different assets. Only <strong>Pepecoin (PEP)</strong> is mined: it has its own blockchain, secured by Scrypt proof of work.</p>
     <p><strong>Pepe (PEPE)</strong> and <strong>PepeCoin (PEPECOIN)</strong> are ERC-20 tokens on Ethereum. Ethereum replaced mining with proof of stake on September 15, 2022, so there is nothing to mine. An app or website that offers to “mine PEPE” is not mining it on any blockchain.</p>
@@ -92,6 +112,7 @@
 <section aria-labelledby="pools">
   <h2 id="pools">Mining pools that pay Pepecoin</h2>
   <p>With a Scrypt ASIC, any of these pools adds PEP to your Litecoin and Dogecoin mining. With a GPU or CPU, unMineable pays you in PEP.</p>
+  <div class="laptop"><p class="laptop-h">💻 Only have a laptop or a gaming PC? You can still earn PEP.</p><p>unMineable lets you mine with a CPU or GPU and pays out in Pepecoin. Download its miner, pick PEP on the Pepecoin network (not PEPE on Ethereum) and enter your PEP address. Expect small amounts: a laptop is no match for a Scrypt ASIC.</p><a class="btn main" href="https://unmineable.com/coins/PEP">Mine PEP on unMineable →</a></div>
   <div class="table-scroll" role="region" aria-labelledby="pools" tabindex="0">
     <table style="min-width: 520px">
       <thead><tr><th scope="col">Pool</th><th scope="col">Hardware</th><th scope="col">How you get PEP</th></tr></thead>
@@ -124,6 +145,19 @@
     <li><img src="assets/coins/shic.png" alt="" width="28" height="28">Shibacoin <small>SHIC</small></li>
   </ul>
   <p class="note">Pepecoin uses AuxPoW (merged mining) on Scrypt. Litecoin is the parent chain, and Dogecoin, Pepecoin and the other coins below accept the same work. A pool chooses which of them it pays; ViaBTC's Litecoin pool pays all of them on top of LTC. <a href="scrypt-family.html">The whole Scrypt family.</a></p>
+</section>
+
+<section class="mcalc" aria-labelledby="calc">
+  <h2 id="calc"><span aria-hidden="true">🧮 </span>Pepecoin mining calculator</h2>
+  <p>How much PEP does your miner add? Enter your hashrate and the current network hashrate.</p>
+  <div class="mcalc-grid">
+    <label>Your hashrate<span class="mcalc-in"><input id="mc-hash" type="number" min="0" step="any" inputmode="decimal" value="16"><select id="mc-hash-u" aria-label="Your hashrate"><option value="1e6">MH/s</option><option value="1e9" selected>GH/s</option></select></span></label>
+    <div class="mcalc-presets"><button type="button" data-gh="16">Antminer L9</button><button type="button" data-gh="9.5">Antminer L7</button><button type="button" data-gh="11">ElphaPex DG1</button></div>
+    <label>Pepecoin network hashrate<span class="mcalc-in"><input id="mc-net" type="number" min="0" step="any" inputmode="decimal" placeholder="TH/s"><select id="mc-net-u" aria-label="Pepecoin network hashrate"><option value="1e12" selected>TH/s</option><option value="1e9">GH/s</option></select></span><small>Current value: <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a><span id="mc-src"></span></small></label>
+    <label>Pool fee<span class="mcalc-in"><input id="mc-fee" type="number" min="0" max="99" step="any" inputmode="decimal" value="2"><b>%</b></span></label>
+  </div>
+  <div class="mcalc-out" aria-live="polite"><div><span>Per day</span><strong id="mc-day">—</strong></div><div><span>Per 7 days</span><strong id="mc-week">—</strong></div><div><span>Per 30 days</span><strong id="mc-month">—</strong></div></div>
+  <p class="note">An estimate: your share of the network hashrate × <span id="mc-bpd" data-bpd="1379">1,379</span> blocks a day (average of the last 30 days) × 10,000 PEP, minus the pool fee. Real payouts move with luck, difficulty and the pool's payout method. With merged mining this comes on top of your LTC and DOGE.</p>
 </section>
 
 <section class="miners-love" aria-labelledby="miners">
@@ -227,6 +261,7 @@
   <details class="support"><summary>Like this site? You can support its further development.</summary><p>Any amount, however small, helps. Thank you!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 
-<script src="chrome.js?v=20261018c" defer></script>
+<script src="mining-calc.js?v=20261018b" defer></script>
+<script src="chrome.js?v=20261018e" defer></script>
 </body>
 </html>

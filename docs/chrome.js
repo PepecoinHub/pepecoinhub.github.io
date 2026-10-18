@@ -13,27 +13,27 @@
   ];
   var UI = {
     en: { copy: 'Copy', copied: 'Copied', theme: 'Theme', auto: 'Auto', light: 'Light', dark: 'Dark', sep: ': ', language: 'Language',
-      start: 'Start here', mine: 'Mining', data: 'Data & charts', games: 'Games', menu: 'Menu', top: 'Back to top' },
+      start: 'Start here', startShort: 'Start', mine: 'Mining', data: 'Data & charts', games: 'Games', menu: 'Menu', top: 'Back to top' },
     pl: { copy: 'Kopiuj', copied: 'Skopiowano', theme: 'Motyw', auto: 'Auto', light: 'Jasny', dark: 'Ciemny', sep: ': ', language: 'Język',
-      start: 'Na start', mine: 'Kopanie', data: 'Dane i wykresy', games: 'Gry', menu: 'Menu', top: 'Do góry',
+      start: 'Na start', startShort: 'Start', mine: 'Kopanie', data: 'Dane i wykresy', games: 'Gry', menu: 'Menu', top: 'Do góry',
       hint: 'Ta strona jest dostępna także po polsku.', go: 'Czytaj po polsku', close: 'Zamknij' },
     es: { copy: 'Copiar', copied: 'Copiado', theme: 'Tema', auto: 'Auto', light: 'Claro', dark: 'Oscuro', sep: ': ', language: 'Idioma',
-      start: 'Para empezar', mine: 'Minería', data: 'Datos y gráficos', games: 'Juegos', menu: 'Menú', top: 'Volver arriba',
+      start: 'Para empezar', startShort: 'Empezar', mine: 'Minería', data: 'Datos y gráficos', games: 'Juegos', menu: 'Menú', top: 'Volver arriba',
       hint: 'Esta página también está en español.', go: 'Leer en español', close: 'Cerrar' },
     de: { copy: 'Kopieren', copied: 'Kopiert', theme: 'Design', auto: 'Auto', light: 'Hell', dark: 'Dunkel', sep: ': ', language: 'Sprache',
-      start: 'Für den Einstieg', mine: 'Mining', data: 'Daten & Charts', games: 'Spiele', menu: 'Menü', top: 'Nach oben',
+      start: 'Für den Einstieg', startShort: 'Start', mine: 'Mining', data: 'Daten & Charts', games: 'Spiele', menu: 'Menü', top: 'Nach oben',
       hint: 'Diese Seite gibt es auch auf Deutsch.', go: 'Auf Deutsch lesen', close: 'Schließen' },
     fr: { copy: 'Copier', copied: 'Copié', theme: 'Thème', auto: 'Auto', light: 'Clair', dark: 'Sombre', sep: ' : ', language: 'Langue',
-      start: 'Pour commencer', mine: 'Minage', data: 'Données et graphiques', games: 'Jeux', menu: 'Menu', top: 'Haut de page',
+      start: 'Pour commencer', startShort: 'Débuter', mine: 'Minage', data: 'Données et graphiques', games: 'Jeux', menu: 'Menu', top: 'Haut de page',
       hint: 'Cette page existe aussi en français.', go: 'Lire en français', close: 'Fermer' },
     tr: { copy: 'Kopyala', copied: 'Kopyalandı', theme: 'Tema', auto: 'Otomatik', light: 'Açık', dark: 'Koyu', sep: ': ', language: 'Dil',
-      start: 'Başlangıç', mine: 'Madencilik', data: 'Veriler ve grafikler', games: 'Oyunlar', menu: 'Menü', top: 'Başa dön',
+      start: 'Başlangıç', startShort: 'Başla', mine: 'Madencilik', data: 'Veriler ve grafikler', games: 'Oyunlar', menu: 'Menü', top: 'Başa dön',
       hint: 'Bu sayfa Türkçe olarak da mevcut.', go: 'Türkçe sürüme geç', close: 'Kapat' },
     it: { copy: 'Copia', copied: 'Copiato', theme: 'Tema', auto: 'Auto', light: 'Chiaro', dark: 'Scuro', sep: ': ', language: 'Lingua',
-      start: 'Per iniziare', mine: 'Mining', data: 'Dati e grafici', games: 'Giochi', menu: 'Menu', top: 'Torna su',
+      start: 'Per iniziare', startShort: 'Inizia', mine: 'Mining', data: 'Dati e grafici', games: 'Giochi', menu: 'Menu', top: 'Torna su',
       hint: 'Questa pagina è disponibile anche in italiano.', go: 'Leggi in italiano', close: 'Chiudi' },
     zh: { copy: '复制', copied: '已复制', theme: '主题', auto: '自动', light: '浅色', dark: '深色', sep: '：', language: '语言',
-      start: '入门', mine: '挖矿', data: '数据与图表', games: '游戏', menu: '菜单', top: '返回顶部',
+      start: '入门', startShort: '入门', mine: '挖矿', data: '数据与图表', games: '游戏', menu: '菜单', top: '返回顶部',
       hint: '本页面也有简体中文版。', go: '阅读中文版', close: '关闭' }
   };
   function keyOf(tag) {
@@ -225,7 +225,11 @@
     function setMenu(open) { head.classList.toggle('menu-open', open); burger.setAttribute('aria-expanded', String(open)); }
     burger.addEventListener('click', function () { setMenu(!head.classList.contains('menu-open')); });
     var tools = document.createElement('span'); tools.className = 'head-phone';
-    tools.appendChild(quick); tools.appendChild(burger);
+    // phone: "Start here" sits next to Games and opens the menu, where that group comes first
+    var qs = document.createElement('button'); qs.type = 'button'; qs.className = 'head-start';
+    qs.innerHTML = '<span aria-hidden="true">🚀</span> <b></b>'; qs.lastChild.textContent = t.startShort || t.start;
+    qs.addEventListener('click', function () { setMenu(!head.classList.contains('menu-open')); });
+    tools.appendChild(qs); tools.appendChild(quick); tools.appendChild(burger);
     head.insertBefore(tools, nav);
   }
 
