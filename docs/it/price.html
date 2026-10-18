@@ -112,11 +112,26 @@
 .rung.pepe .rung-bar i { background: var(--gold); opacity: 1; }
 .rung.x { font-weight: 700; }
 .rung.x .rung-bar { box-shadow: inset 0 0 0 1px currentColor; }
+.pow-lead { font-size: 1.15rem; font-weight: 700; max-width: 68ch; }
+.powlist { list-style: none; margin: 0; padding: 8px; display: grid; gap: 4px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.pow-row { display: grid; grid-template-columns: 1.6rem 28px minmax(0, 10rem) minmax(0, 1fr) minmax(4.5rem, auto); align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; }
+.pow-row.self { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.pow-n { font: 700 1rem var(--f-mono); color: var(--muted); text-align: center; }
+.pow-row.self .pow-n { color: var(--accent-mid); }
+.pow-logo { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--track); object-fit: cover; }
+.pow-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pow-name small { color: var(--muted); }
+.pow-bar { height: 12px; background: var(--track); border-radius: 6px; overflow: hidden; }
+.pow-bar i { display: block; height: 100%; border-radius: 6px; background: var(--muted); opacity: 0.5; }
+.pow-row.self .pow-bar i { background: var(--accent); opacity: 1; }
+.pow-cap { text-align: right; font-family: var(--f-mono); font-weight: 700; font-variant-numeric: tabular-nums; }
 .rung-val { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
 @media (max-width: 560px) {
   .rung { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; }
   .rung-bar { grid-column: 1 / -1; grid-row: 2; height: 10px; }
   .chart-card { padding: 12px; }
+  .pow-row { grid-template-columns: 1.4rem 28px minmax(0, 1fr) auto; gap: 4px 8px; }
+  .pow-bar { grid-column: 3 / -1; grid-row: 2; height: 8px; }
   .chart-change { margin-left: 0; }
 }
 </style>
@@ -204,6 +219,21 @@
   <p class="src">Capitalizzazione delle aziende: lista top 100 di TickerLeague, 29 aprile – 1° maggio 2026 (fissa, non in diretta). Capitalizzazione e posizione delle cripto: CoinGecko in diretta; se non si carica, dati CoinMarketCap del 18 ottobre 2026, senza posizione.</p>
 </section>
 
+<section aria-labelledby="pow">
+  <h2 id="pow">Memecoin proof of work</h2>
+  <p class="pow-lead" id="pow-lead">Pepecoin è la seconda memecoin proof of work per capitalizzazione, subito dopo Dogecoin.</p>
+  <ol class="powlist" id="pow-list">
+    <li class="pow-row" data-id="dogecoin" data-cap="13240000000"><span class="pow-n">1</span><img class="pow-logo" src="../assets/coins/doge.png" alt="" width="28" height="28"><span class="pow-name"><b>Dogecoin</b> <small>DOGE</small></span><span class="pow-bar"><i style="width: 85.4%"></i></span><span class="pow-cap">$13.2B</span></li>
+    <li class="pow-row self" data-id="pepecoin-network" data-cap="9170000"><span class="pow-n">2</span><img class="pow-logo" src="../assets/brand/icon.svg" alt="" width="28" height="28"><span class="pow-name"><b>Pepecoin</b> <small>PEP</small></span><span class="pow-bar"><i style="width: 32.7%"></i></span><span class="pow-cap">$9.17M</span></li>
+    <li class="pow-row" data-id="monacoin" data-cap="4460000"><span class="pow-n">3</span><span class="pow-logo" aria-hidden="true">M</span><span class="pow-name"><b>MonaCoin</b> <small>MONA</small></span><span class="pow-bar"><i style="width: 27.5%"></i></span><span class="pow-cap">$4.46M</span></li>
+    <li class="pow-row" data-id="bellscoin" data-cap="2580000"><span class="pow-n">4</span><img class="pow-logo" src="../assets/coins/bells.png" alt="" width="28" height="28"><span class="pow-name"><b>Bellscoin</b> <small>BELLS</small></span><span class="pow-bar"><i style="width: 23.5%"></i></span><span class="pow-cap">$2.58M</span></li>
+    <li class="pow-row" data-id="dingocoin" data-cap="2575000"><span class="pow-n">5</span><img class="pow-logo" src="../assets/coins/dingo.png" alt="" width="28" height="28"><span class="pow-name"><b>Dingocoin</b> <small>DINGO</small></span><span class="pow-bar"><i style="width: 23.5%"></i></span><span class="pow-cap">$2.58M</span></li>
+    <li class="pow-row" data-id="luckycoin" data-cap="1050000"><span class="pow-n">6</span><img class="pow-logo" src="../assets/coins/lky.png" alt="" width="28" height="28"><span class="pow-name"><b>Luckycoin</b> <small>LKY</small></span><span class="pow-bar"><i style="width: 17.0%"></i></span><span class="pow-cap">$1.05M</span></li>
+    <li class="pow-row" data-id="junkcoin" data-cap="162000"><span class="pow-n">7</span><img class="pow-logo" src="../assets/coins/jkc.png" alt="" width="28" height="28"><span class="pow-name"><b>Junkcoin</b> <small>JKC</small></span><span class="pow-bar"><i style="width: 3.5%"></i></span><span class="pow-cap">$162K</span></li>
+  </ol>
+  <p class="src">Memecoin minate con proof of work. La lista PoW di CoinMarketCap comprende Dogecoin, Pepecoin, MonaCoin e Dingocoin; Bellscoin, Luckycoin e Junkcoin sono minate in merged mining con Litecoin, come Pepecoin, quindi sono incluse qui. Capitalizzazione: CoinGecko in diretta, oppure CoinMarketCap del 18 ottobre 2026.</p>
+</section>
+
 <section aria-labelledby="how">
   <h2 id="how">Come leggere questa pagina</h2>
   <div class="prose">
@@ -246,6 +276,7 @@
     <div>
       <h3>Capitalizzazione delle aziende</h3>
       <ul>
+        <li><a href="https://coinmarketcap.com/view/pow/">CoinMarketCap: monete PoW</a></li>
         <li><a href="https://tickerleague.com/financials/top/market-cap">TickerLeague: maggiori aziende per capitalizzazione (29/04–1/05/2026)</a></li>
       </ul>
     </div>
@@ -260,7 +291,7 @@
   <details class="support"><summary>Ti piace questo sito? Puoi sostenerne lo sviluppo.</summary><p>Ogni contributo, anche piccolo, è utile. Grazie!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 <script src="../live.js?v=20261012d" defer></script>
-<script src="../price.js?v=20261018b" defer></script>
+<script src="../price.js?v=20261018c" defer></script>
 <script src="../chrome.js?v=20261018" defer></script>
 </body>
 </html>

@@ -8,6 +8,7 @@
 
   var T = {
     en: { loc: 'en-US',
+      powRank: 'Pepecoin is #{n} on this list right now.',
       live: 'Live from CoinGecko, updated {t}.',
       saved: 'Live prices could not be loaded just now. Showing saved figures from October 18, 2026 (CoinMarketCap).',
       loading: 'Loading the chart…',
@@ -22,6 +23,7 @@
       priceBad: 'Type a price in US dollars, for example 0.01.',
       change: 'change' },
     pl: { loc: 'pl-PL',
+      powRank: 'Pepecoin jest teraz na {n}. miejscu tej listy.',
       live: 'Na żywo z CoinGecko, aktualizacja {t}.',
       saved: 'Nie udało się teraz pobrać cen na żywo. Pokazuję zapisane dane z 18 października 2026 (CoinMarketCap).',
       loading: 'Wczytuję wykres…',
@@ -36,6 +38,7 @@
       priceBad: 'Wpisz cenę w dolarach, np. 0,01.',
       change: 'zmiana' },
     es: { loc: 'es-ES',
+      powRank: 'Pepecoin ocupa ahora el puesto {n} de esta lista.',
       live: 'En directo desde CoinGecko, actualizado a las {t}.',
       saved: 'No se pudieron cargar los precios en directo. Se muestran datos guardados del 18 de octubre de 2026 (CoinMarketCap).',
       loading: 'Cargando el gráfico…',
@@ -50,6 +53,7 @@
       priceBad: 'Escribe un precio en dólares, por ejemplo 0,01.',
       change: 'cambio' },
     de: { loc: 'de-DE',
+      powRank: 'Pepecoin steht gerade auf Platz {n} dieser Liste.',
       live: 'Live von CoinGecko, aktualisiert um {t}.',
       saved: 'Live-Kurse konnten gerade nicht geladen werden. Angezeigt werden gespeicherte Werte vom 18. Oktober 2026 (CoinMarketCap).',
       loading: 'Chart wird geladen…',
@@ -64,6 +68,7 @@
       priceBad: 'Gib einen Preis in US-Dollar ein, zum Beispiel 0,01.',
       change: 'Veränderung' },
     fr: { loc: 'fr-FR',
+      powRank: 'Pepecoin est actuellement n° {n} de cette liste.',
       live: 'En direct depuis CoinGecko, mis à jour à {t}.',
       saved: 'Les prix en direct n’ont pas pu être chargés. Affichage des chiffres enregistrés le 18 octobre 2026 (CoinMarketCap).',
       loading: 'Chargement du graphique…',
@@ -78,6 +83,7 @@
       priceBad: 'Saisissez un prix en dollars, par exemple 0,01.',
       change: 'variation' },
     it: { loc: 'it-IT',
+      powRank: 'Pepecoin è ora al {n}° posto di questa lista.',
       live: 'In diretta da CoinGecko, aggiornato alle {t}.',
       saved: 'Non è stato possibile caricare i prezzi in diretta. Mostro i dati salvati del 18 ottobre 2026 (CoinMarketCap).',
       loading: 'Caricamento del grafico…',
@@ -92,6 +98,7 @@
       priceBad: 'Scrivi un prezzo in dollari, per esempio 0,01.',
       change: 'variazione' },
     tr: { loc: 'tr-TR',
+      powRank: 'Pepecoin şu anda bu listede {n}. sırada.',
       live: 'CoinGecko\'dan canlı, güncelleme {t}.',
       saved: 'Canlı fiyatlar şu an yüklenemedi. 18 Ekim 2026 tarihli kayıtlı veriler gösteriliyor (CoinMarketCap).',
       loading: 'Grafik yükleniyor…',
@@ -106,6 +113,7 @@
       priceBad: 'Dolar cinsinden bir fiyat yazın, örneğin 0,01.',
       change: 'değişim' },
     zh: { loc: 'zh-CN',
+      powRank: 'Pepecoin 目前在此列表中排第 {n} 名。',
       live: '来自 CoinGecko 的实时数据，更新于 {t}。',
       saved: '暂时无法加载实时价格。显示 2026 年 10 月 18 日保存的数据（CoinMarketCap）。',
       loading: '正在加载图表…',
@@ -147,7 +155,7 @@
   function usd(v) {
     if (v === null) return '–';
     var o = { style: 'currency', currency: 'USD' };
-    if (v >= 1e6) { o.notation = 'compact'; o.maximumSignificantDigits = 3; }
+    if (v >= 1e5) { o.notation = 'compact'; o.maximumSignificantDigits = 3; }
     else if (v >= 1) { o.maximumFractionDigits = 2; }
     else { o.maximumSignificantDigits = 4; }
     return new Intl.NumberFormat(LOC, o).format(v);
@@ -390,14 +398,38 @@
     });
   }
 
+  // Proof-of-work memecoins, biggest first. Rows start from the saved figures in the HTML (data-cap).
+  var POW = ['dogecoin', 'monacoin', 'bellscoin', 'dingocoin', 'luckycoin', 'junkcoin'];
+  function renderPow(by) {
+    var list = $('pow-list');
+    if (!list) return;
+    var rows = Array.prototype.slice.call(list.children);
+    rows.forEach(function (li) {
+      var id = li.getAttribute('data-id'), c = by[id];
+      if (id === PEP) li.setAttribute('data-cap', state.pep.mcap);
+      else if (c && num(c.market_cap)) li.setAttribute('data-cap', c.market_cap);
+    });
+    rows.sort(function (a, b) { return b.getAttribute('data-cap') - a.getAttribute('data-cap'); });
+    var n = 0;
+    rows.forEach(function (li, i) {
+      var v = Number(li.getAttribute('data-cap'));
+      li.querySelector('.pow-n').textContent = String(i + 1);
+      li.querySelector('.pow-bar i').style.width = Math.max(1, Math.min(100, (Math.log10(v) - 5) / 6 * 100)) + '%';
+      li.querySelector('.pow-cap').textContent = usd(v);
+      if (li.getAttribute('data-id') === PEP) n = i + 1;
+      list.appendChild(li);
+    });
+    if (n && n !== 2) $('pow-lead').textContent = fill(t.powRank, { n: n });
+  }
+
   function loadMarkets() {
-    var key = 'pf-price-markets-v2', hit = cacheGet(key);
+    var key = 'pf-price-markets-v3', hit = cacheGet(key);
     var p = hit ? Promise.resolve(hit.d) : Promise.all([
-      getJSON(API + 'coins/markets?vs_currency=usd&ids=' + PEP),
+      getJSON(API + 'coins/markets?vs_currency=usd&ids=' + [PEP].concat(POW).join(',')),
       getJSON(API + 'coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1')
     ]).then(function (r) {
-      var d = r[0].concat(r[1]).map(function (c) {
-        return { id: c.id, current_price: c.current_price, market_cap: c.market_cap, total_supply: c.total_supply, circulating_supply: c.circulating_supply,
+      var d = r[0].concat(r[1].map(function (c) { c.top = true; return c; })).map(function (c) {
+        return { top: !!c.top, id: c.id, current_price: c.current_price, market_cap: c.market_cap, total_supply: c.total_supply, circulating_supply: c.circulating_supply,
           price_change_percentage_24h: c.price_change_percentage_24h, ath: c.ath, ath_date: c.ath_date };
       });
       cacheSet(key, d);
@@ -415,9 +447,9 @@
       var coins = {};
       Object.keys(SNAP.coins).forEach(function (id) { coins[id] = by[id] && num(by[id].market_cap) ? by[id].market_cap : SNAP.coins[id]; });
       state.coins = coins;
-      var top = list.slice(1).filter(function (c) { return num(c.market_cap); }).map(function (c) { return { id: c.id, cap: c.market_cap }; });
+      var top = list.filter(function (c) { return c.top; }).filter(function (c) { return num(c.market_cap); }).map(function (c) { return { id: c.id, cap: c.market_cap }; });
       state.top = top.length > 100 ? top : null;
-      renderStats(); renderLadder();
+      renderStats(); renderLadder(); renderPow(by);
       $('status').textContent = fill(t.live, { t: new Date(hit ? hit.t : Date.now()).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) });
     }).catch(function () { $('status').textContent = t.saved; });
   }
@@ -430,6 +462,7 @@
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawChart, 150); });
 
   renderStats();
+  renderPow({});
   wireLadder();
   setMult(100);
   loadMarkets();
