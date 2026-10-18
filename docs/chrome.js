@@ -167,7 +167,7 @@
   // Header menu: the page links are grouped into "Start here" and "Data & charts" drop-downs,
   // with Guides and a highlighted Games button next to them. On a phone the menu opens from a ☰ button.
   var GROUPS = { 'which-pepecoin': ['start', '🐸'], 'compare': ['start', '🐕'], 'scrypt-family': ['start', '⛓️'],
-    'network': ['data', '📈'], 'rich-list': ['data', '🏆'], 'supply': ['data', '🪙'], 'calculator': ['data', '🧮'], 'guides': ['', '📚'] };
+    'network': ['data', '📈'], 'rich-list': ['data', '🏆'], 'supply': ['data', '🪙'], 'calculator': ['data', '🧮'], 'price': ['data', '💹'], 'guides': ['', '📚'] };
   function groupNav(nav) {
     var head = nav.closest('.site-head');
     if (!head || nav.classList.contains('grouped')) return;

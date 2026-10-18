@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Precio de Pepecoin (PEP) en directo: gráfico con Pepe superpuesto y qué haría falta para un ×100</title>
+<meta name="description" content="Precio y gráfico de Pepecoin (PEP) en directo desde CoinGecko, con Pepe (PEPE) superpuesto si quieres, y la capitalización que necesitaría un ×100 frente a otras criptomonedas y empresas conocidas. No es asesoramiento financiero.">
+<link rel="canonical" href="https://pepecoinhub.com/es/price.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/price.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/price.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/price.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/price.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/price.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/price.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/price.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/price.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/price.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="Precio de Pepecoin (PEP) en directo: gráfico con Pepe superpuesto y qué haría falta para un ×100">
+<meta property="og:description" content="Precio y gráfico de Pepecoin (PEP) en directo desde CoinGecko, con Pepe (PEPE) superpuesto si quieres, y la capitalización que necesitaría un ×100 frente a otras criptomonedas y empresas conocidas. No es asesoramiento financiero.">
+<meta property="og:url" content="https://pepecoinhub.com/es/price.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Logotipo de Pepecoin: datos, cifras y fuentes sobre PEP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../facts.css?v=20261017">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/es/"}, {"@type": "ListItem", "position": 2, "name": "Precio", "item": "https://pepecoinhub.com/es/price.html"}]}</script>
+<style>
+/* Price page: NFA banner, stat tiles, chart card, ×N tool and the market cap ladder */
+.nfa { max-width: none; background: var(--gold-soft); border-color: var(--gold); border-left-width: 6px; }
+.nfa-title { font-weight: 700; font-size: 1.12rem; }
+.ptiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 12px; }
+.ptile { display: grid; gap: 4px; align-content: start; min-width: 0; padding: 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.ptile.main { background: var(--accent-soft); border-color: var(--accent); }
+.ptile .label { font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.ptile .value { font-size: 1.4rem; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ptile.main .value { font-size: 1.65rem; }
+.ptile .sub { font-size: 0.84rem; color: var(--muted); }
+.value.up { color: var(--accent-mid); }
+.value.down { color: var(--flag); }
+.chart-card { display: grid; gap: 12px; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.chart-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.pseg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
+.pseg button { font: 600 0.88rem var(--f-body); color: var(--muted); background: transparent; border: 0; border-radius: 9px; padding: 7px 12px; min-height: 36px; cursor: pointer; }
+.pseg button:hover { color: var(--ink); }
+.pseg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; padding: 6px 12px; min-height: 40px; border: 1px solid var(--rule); border-radius: 999px; background: var(--paper); }
+.toggle input { width: 18px; height: 18px; accent-color: var(--gold); }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; font-size: 0.9rem; }
+.k::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; background: var(--accent); }
+.k.pepe::before { background: var(--gold); }
+.chart-change { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chart-wrap { position: relative; min-height: 260px; }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .zero { stroke: var(--muted); stroke-dasharray: 3 4; }
+.chart .axis { fill: var(--muted); font: 11px var(--f-mono); }
+.chart .line { fill: none; stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+.chart .line.pep { stroke: var(--accent); }
+.chart .line.pepe { stroke: var(--gold); }
+.chart .fill-top { stop-color: var(--accent); stop-opacity: 0.28; }
+.chart .fill-bottom { stop-color: var(--accent); stop-opacity: 0; }
+.chart .cross { stroke: var(--muted); stroke-dasharray: 2 3; }
+.chart .dot { stroke: var(--panel); stroke-width: 2; }
+.chart .dot.pep { fill: var(--accent); }
+.chart .dot.pepe { fill: var(--gold); }
+.chart-tip { position: absolute; top: 8px; display: grid; gap: 2px; padding: 8px 10px; font-size: 0.84rem; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chart-msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 16px; color: var(--muted); }
+.chart-msg[hidden] { display: none; }
+.xbox { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; padding: 20px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.xbox > * { min-width: 0; }
+.xctl { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; }
+.xhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.xhead .label, .xprice > span:first-child { font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.xhead b { font-size: 2.6rem; line-height: 1; color: var(--accent-mid); font-variant-numeric: tabular-nums; }
+#x-range { width: 100%; min-width: 0; margin: 0; accent-color: var(--accent); min-height: 32px; }
+.xpre { display: flex; flex-wrap: wrap; gap: 6px; }
+.xpre button { font: 600 0.88rem var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: 4px 12px; min-height: 34px; cursor: pointer; }
+.xpre button:hover { color: var(--ink); border-color: var(--accent); }
+.xpre button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+.xprice { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.xin { display: flex; align-items: center; gap: 6px; padding: 0 12px; min-height: 48px; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
+.xin:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.xin input { flex: 1; width: 100%; min-width: 0; font: 700 1.2rem var(--f-body); color: var(--ink); background: transparent; border: 0; outline: none; }
+.xhint { font-size: 0.88rem; color: var(--muted); min-height: 1.4em; }
+.xcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; }
+.xcard { display: grid; gap: 10px; align-content: start; padding: 16px; border-radius: 12px; border: 1px solid var(--rule); border-top: 4px solid var(--accent); background: var(--accent-soft); }
+.xcard.pepe { border-top-color: var(--gold); background: var(--gold-soft); }
+.xcard dl { margin: 0; display: grid; gap: 8px; }
+.xcard dt { font-size: 0.8rem; color: var(--muted); }
+.xcard dd { margin: 0; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.xsum { font-size: 1.05rem; max-width: 72ch; padding: 14px 16px; border-left: 4px solid var(--accent); background: var(--panel); border-radius: 0 12px 12px 0; }
+.ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.rung { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) minmax(6.5rem, auto); align-items: center; gap: 10px; font-size: 0.92rem; }
+.rung-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rung-bar { height: 14px; background: var(--track); border-radius: 7px; overflow: hidden; }
+.rung-bar i { display: block; height: 100%; border-radius: 7px; background: var(--muted); opacity: 0.55; transition: width 0.25s ease; }
+.rung.coin .rung-bar i { background: var(--accent-mid); opacity: 0.45; }
+.rung.pep .rung-bar i { background: var(--accent); opacity: 1; }
+.rung.pepe .rung-bar i { background: var(--gold); opacity: 1; }
+.rung.x { font-weight: 700; }
+.rung.x .rung-bar { box-shadow: inset 0 0 0 1px currentColor; }
+.rung-val { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) { .xbox { grid-template-columns: minmax(0, 1fr); padding: 16px; } }
+@media (max-width: 560px) {
+  .rung { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; }
+  .rung-bar { grid-column: 1 / -1; grid-row: 2; height: 10px; }
+  .chart-card { padding: 12px; }
+  .chart-change { margin-left: 0; }
+}
+</style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Páginas"><a href="which-pepecoin.html">Cuál es cuál</a><a href="compare.html">PEP y DOGE</a><a href="calculator.html">Calculadora</a><a href="price.html" aria-current="page">Precio</a><a href="price.html">Precio</a><a href="supply.html">Suministro</a><a href="scrypt-family.html">Familia Scrypt</a><a href="network.html">Red</a><a href="rich-list.html">Mayores tenedores</a><a href="guides.html">Guías</a></nav>
+</header>
+<main class="wrap" id="main">
+<header class="page-head">
+  <p class="eyebrow">Precio · en directo desde CoinGecko</p>
+  <h1>Precio de Pepecoin (PEP)</h1>
+  <p class="lede">El precio y el gráfico de PEP en directo, Pepe (PEPE) en el mismo gráfico si lo quieres, y la aritmética simple de lo que significaría un ×100.</p>
+</header>
+
+<div class="callout gold nfa" id="nfa" role="note">
+  <p class="nfa-title"><span aria-hidden="true">⚠️ </span>No es asesoramiento financiero. Aquí no se promete nada.</p>
+  <p>Esta página muestra precios y hace cuentas. No predice hacia dónde irán PEP o PEPE, y nada de lo que hay en ella promete ninguna ganancia. Los precios de las criptomonedas pueden caer mucho, incluso a cero. El autor de este sitio tiene PEP. Investiga por tu cuenta y no inviertas nunca dinero que no puedas permitirte perder.</p>
+</div>
+
+<section aria-labelledby="now">
+  <h2 id="now">Ahora mismo</h2>
+  <div class="ptiles">
+    <div class="ptile main"><span class="label">Precio de PEP</span><span class="value" id="s-price">$0.00008928</span><span class="sub">dólares estadounidenses</span></div>
+    <div class="ptile"><span class="label">24 horas</span><span class="value" id="s-24h">−0.24%</span></div>
+    <div class="ptile"><span class="label">Capitalización</span><span class="value" id="s-mcap">$9.19M</span></div>
+    <div class="ptile"><span class="label">Máximo histórico (ATH)</span><span class="value" id="s-ath">$0.001824</span><span class="sub" id="s-ath-sub"></span></div>
+    <div class="ptile"><span class="label">Pepe (PEPE), para comparar</span><span class="value" id="s-pepe">$0.000003875</span><span class="sub" id="s-pepe-sub">$1.6B</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="chart-title">
+  <h2 id="chart-title">Gráfico de precio</h2>
+  <div class="chart-card">
+    <div class="chart-bar">
+      <div class="pseg" role="group" aria-label="Periodo">
+        <button type="button" data-days="1" aria-pressed="false">24 h</button><button type="button" data-days="7" aria-pressed="false">7 días</button><button type="button" data-days="30" aria-pressed="true">30 días</button><button type="button" data-days="90" aria-pressed="false">90 días</button><button type="button" data-days="365" aria-pressed="false">1 año</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="overlay"><span>Superponer Pepe (PEPE)</span></label>
+    </div>
+    <div class="chart-legend"><span class="k pep">Pepecoin (PEP)</span><span class="k pepe" id="legend-pepe" hidden>Pepe (PEPE)</span><span class="chart-change" id="chart-change"></span></div>
+    <div class="chart-wrap"><div class="chart" id="chart"></div><div class="chart-tip" id="chart-tip" hidden></div><p class="chart-msg" id="chart-msg">Cargando el gráfico…</p></div>
+    <p class="src" id="chart-corr"></p>
+    <p class="src">La línea es el precio de PEP en dólares. Con Pepe activado, las dos líneas muestran el cambio en % desde el inicio del periodo, porque un PEPE cuesta mucho menos que un PEP y los dos precios no cabrían en un mismo eje. Pasa el ratón o toca el gráfico para ver los valores exactos.</p>
+  </div>
+  <p class="src" id="status">Datos guardados del 18 de octubre de 2026 (CoinMarketCap) hasta que carguen los precios en directo.</p>
+  <noscript><p class="note">El gráfico en directo y el control ×100 necesitan JavaScript. Las cifras de arriba son del 18 de octubre de 2026.</p></noscript>
+</section>
+
+<section aria-labelledby="x100">
+  <h2 id="x100">¿Qué haría falta para un ×100?</h2>
+  <p class="note">«×100» significa un precio 100 veces mayor. La capitalización es precio × oferta, así que un ×100 necesita una capitalización 100 veces mayor. Mueve el control o escribe un precio para ver qué capitalización haría falta, junto a criptomonedas y empresas conocidas. Son cuentas hipotéticas, no una previsión.</p>
+  <div class="xbox">
+    <div class="xctl">
+      <div class="xhead"><span class="label" id="x-label">Multiplicador</span><b id="x-mult">×100</b></div>
+      <input type="range" id="x-range" min="0" max="400" step="1" value="200" aria-labelledby="x-label">
+      <div class="xpre" role="group" aria-label="Multiplicadores de ejemplo">
+        <button type="button" data-mult="2">×2</button><button type="button" data-mult="10">×10</button><button type="button" data-mult="100">×100</button><button type="button" data-mult="1000">×1000</button>
+      </div>
+      <label class="xprice"><span>o escribe un precio de PEP en dólares</span><span class="xin"><span aria-hidden="true">$</span><input id="x-target" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0.01" aria-describedby="x-target-hint"></span></label>
+      <span class="xhint" id="x-target-hint" aria-live="polite"></span>
+    </div>
+    <div class="xcards">
+      <div class="xcard"><h3>Pepecoin (PEP)</h3><dl><div><dt>Precio con ese múltiplo</dt><dd id="x-pep-price">$0.008928</dd></div><div><dt>Capitalización necesaria</dt><dd id="x-pep-cap">$919M</dd></div></dl></div>
+      <div class="xcard pepe"><h3>Pepe (PEPE)</h3><dl><div><dt>Precio con ese múltiplo</dt><dd id="x-pepe-price">$0.0003875</dd></div><div><dt>Capitalización necesaria</dt><dd id="x-pepe-cap">$160B</dd></div></dl></div>
+    </div>
+  </div>
+  <p class="xsum" id="x-sum" aria-live="polite"></p>
+  <h3 id="ladder-h">Esa capitalización junto a criptomonedas y empresas</h3>
+  <ol class="ladder" id="ladder" aria-labelledby="ladder-h"></ol>
+  <p class="src">Capitalización de empresas: lista top 100 de TickerLeague, a 29 de abril – 1 de mayo de 2026, como puntos de referencia fijos (no en directo). Capitalización de criptomonedas: CoinGecko en directo, o CoinMarketCap del 18 de octubre de 2026 si no cargan los datos en directo. Las barras usan escala logarítmica: cada paso a la derecha es 10 veces más.</p>
+</section>
+
+<section aria-labelledby="how">
+  <h2 id="how">Cómo leer esta página</h2>
+  <div class="prose">
+    <p><strong>De dónde sale el precio.</strong> De la API pública de CoinGecko, cargada en tu navegador y reutilizada hasta 10 minutos. PEP cotiza en pocos mercados y con poco volumen, así que el precio puede saltar con órdenes pequeñas y variar entre exchanges.</p>
+    <p><strong>¿Por qué Pepe (PEPE)?</strong> PEPE es otro token, en Ethereum, con un nombre parecido y una capitalización mucho mayor. Mucha gente que busca uno encuentra el otro. La superposición muestra si se movieron juntos en el periodo elegido; que se movieran juntos en el pasado no dice nada del futuro. <a href="which-pepecoin.html">Cuál es cuál.</a></p>
+    <p><strong>Capitalización.</strong> Precio × el número de PEP que existen, unos <span data-live="supply-m">104 800</span> millones. La oferta de PEP crece 10 000 PEP por bloque, así que la misma capitalización significa con el tiempo un precio algo menor por PEP, y un ×100 en precio necesitaría más adelante algo más de ×100 en capitalización. <a href="supply.html">Oferta e inflación.</a></p>
+  </div>
+</section>
+
+<section aria-labelledby="more">
+  <h2 id="more">Más sobre el precio</h2>
+  <div class="cards">
+    <a class="card" href="calculator.html">
+      <h3>Calculadora de capitalización</h3>
+      <p>Tus PEP con la capitalización de Dogecoin, Litecoin o cualquier moneda del top 100.</p>
+    </a>
+    <a class="card" href="compare.html">
+      <h3>Pepecoin y Dogecoin</h3>
+      <p>Las mismas reglas, con diez años de diferencia, y los dos precios alineados por edad.</p>
+    </a>
+    <a class="card" href="which-pepecoin.html">
+      <h3>¿Cuál Pepecoin es cuál?</h3>
+      <p>PEP, PEPE y PEPECOIN son tres activos distintos con tres precios distintos.</p>
+    </a>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">Fuentes</h2>
+  <div class="sources">
+    <div>
+      <h3>Precios y gráficos</h3>
+      <ul>
+        <li><a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko: Pepecoin</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/pepe">CoinGecko: Pepe</a></li>
+        <li><a href="https://docs.coingecko.com/reference/introduction">API pública de CoinGecko</a></li>
+        <li><a href="https://coinmarketcap.com/currencies/pepecoin-org/">CoinMarketCap: Pepecoin (datos guardados, 18/10/2026)</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Capitalización de empresas</h3>
+      <ul>
+        <li><a href="https://tickerleague.com/financials/top/market-cap">TickerLeague: mayores empresas por capitalización (29/04–1/05/2026)</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="site-foot">
+  <p><strong>Páginas de datos de la comunidad</strong>, elaboradas por un voluntario de r/pepecoin. No son una publicación oficial de Pepecoin.</p>
+  <p>Esto no es asesoramiento de inversión. Quien las elabora posee PEP. Los precios y los datos de la red cambian a diario; cada página indica sus fechas y sus fuentes.</p>
+  <p class="correction">¿Has visto un error? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Envía una corrección</a> (con su fuente) en GitHub.</p>
+  <details class="support"><summary>¿Te gusta este sitio? Puedes ayudar a que siga desarrollándose.</summary><p>Cualquier cantidad, por pequeña que sea, ayuda. ¡Gracias!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+</footer>
+<script src="../live.js?v=20261012d" defer></script>
+<script src="../price.js?v=20261018" defer></script>
+<script src="../chrome.js?v=20261018" defer></script>
+</body>
+</html>
