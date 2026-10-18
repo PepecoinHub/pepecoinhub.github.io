@@ -607,7 +607,7 @@ footer.site-foot, footer.pf-foot { border-top: 0; background: var(--paper-2); bo
 @media (max-width: 760px) {
   .site-head { position: relative; flex-wrap: nowrap; }
   .head-phone { display: flex; align-items: center; gap: 8px; margin-left: auto; flex: none; }
-  .site-head .brand-hub-link { flex: 0 1 auto; min-width: 0; }
+  .site-head .brand-hub-link { flex: none; }
   .head-start { display: inline-flex; }
   .head-games { padding: 8px 12px; font-size: 0.88rem; }
   .navburger {
@@ -665,6 +665,11 @@ body::before {
   .site-head .brand-hub-link .hub { font-size: 0.95rem; padding: 0 6px; }
   .head-phone { gap: 6px; }
   .head-games { font-size: 0; padding: 0; width: 42px; height: 42px; display: grid; place-items: center; }
-  .head-start { padding: 0 12px; height: 42px; font-size: 0.82rem; }
+  .head-start { padding: 0 10px; height: 42px; font-size: 0.8rem; }
+  .site-head .brand-hub-link .lockup { height: 26px; }
+  .site-head .brand-hub-link .hub { font-size: 0.85rem; padding: 0 5px; }
+  .navburger { width: 40px; height: 40px; }
+  .head-phone .head-games { display: none; }
+  .site-nav.grouped > a.nav-games { display: flex; justify-content: center; background: var(--accent); color: #fff; }
   .head-games span { font-size: 1.1rem; }
 }
