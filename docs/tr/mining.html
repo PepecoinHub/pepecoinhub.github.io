@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261018c">
+<link rel="stylesheet" href="../facts.css?v=20261018d">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/tr/"}, {"@type": "ListItem", "position": 2, "name": "Rehberler", "item": "https://pepecoinhub.com/tr/guides.html"}, {"@type": "ListItem", "position": 3, "name": "PEP nasıl kazılır?", "item": "https://pepecoinhub.com/tr/mining.html"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Pepecoin'i GPU ya da CPU ile kazabilir miyim?", "acceptedAnswer": {"@type": "Answer", "text": "Scrypt ASIC'lerle çalışan Pepecoin ağının kendisinde hayır. Yine de unMineable üzerinden GPU ya da CPU ile PEP kazanabilirsiniz: başka coinleri kazar ve size Pepecoin (PEP) öder. PEPE'yi değil PEP'i seçin ve P ile başlayan bir adres kullanın."}}, {"@type": "Question", "name": "Hangi madencilik havuzları Pepecoin öder?", "acceptedAnswer": {"@type": "Answer", "text": "ViaBTC, F2Pool, Binance Pool, EMCD, AntPool, KuPool ve Mining-Dutch PEP öder. litecoinpool.org PEP'i merged mining ile kazar ama değerini ek LTC ve DOGE olarak öder. unMineable, GPU ve CPU madencilerine PEP öder. Canlı liste miningpoolstats'ta."}}, {"@type": "Question", "name": "Birleşik madencilik LTC veya DOGE ödüllerimi azaltır mı?", "acceptedAnswer": {"@type": "Answer", "text": "Hayır. İş, zincirler arasında bölünmez. ViaBTC havuzuna göre PEP, ek hash oranı gerektirmeyen, birleşik madencilikten gelen ek bir ödüldür."}}, {"@type": "Question", "name": "PEP hangi donanımla kazılır? Antminer L7 veya L9 olur mu?", "acceptedAnswer": {"@type": "Answer", "text": "Litecoin ve Dogecoin için kullanılan cihazın aynısı olan bir Scrypt ASIC madencisiyle. ViaBTC örnek olarak Antminer L9 ve ElphaPex DG1'i gösteriyor. Evet, Antminer L7 ve L9 PEP kazar: Pepecoin'i birleşik kazan bir havuza bağlarsanız LTC ve DOGE'nin yanında PEP de kazanırsınız."}}, {"@type": "Question", "name": "Pepe'yi (PEPE) kazabilir miyim?", "acceptedAnswer": {"@type": "Answer", "text": "Hayır. Pepe (PEPE), Ethereum üzerinde bir ERC-20 token'ıdır ve Ethereum 15 Eylül 2022'den beri madencilik yerine hisse ispatı (proof of stake) kullanıyor. Kazılan coin, kendi blokzincirindeki Pepecoin'dir (PEP)."}}, {"@type": "Question", "name": "“Pepe coin madenciliği” uygulamaları gerçek mi?", "acceptedAnswer": {"@type": "Answer", "text": "Hiçbir uygulama Pepe (PEPE) kazamaz: PEPE, Ethereum üzerinde bir ERC-20 tokenidir ve Ethereum'da 15 Eylül 2022'den beri madencilik yoktur. Pepecoin (PEP) ise yukarıdaki adımlarda olduğu gibi madencilik havuzlarında çalışan Scrypt ASIC cihazlarıyla, yaklaşık 2,9 PH/s'lik bir ağ hash gücüne karşı kazılır. Telefonunuzda madencilik için “Pepe” ödeyen bir uygulama, herhangi bir blokzincirinde madencilik yapmıyordur."}}, {"@type": "Question", "name": "Madencilik ödemeleri için hangi cüzdan gerekir?", "acceptedAnswer": {"@type": "Answer", "text": "Pepecoin ağında Pepecoin (PEP) saklayan herhangi bir cüzdan; örneğin Pepecoin Core veya bir Tangem kartı. Bu cüzdanın alıcı adresi P ile başlar. MetaMask, Ethereum tipi ağlar için tasarlanmıştır ve Pepecoin'i listelemez."}}, {"@type": "Question", "name": "Ağ ne kadar PEP dağıtıyor?", "acceptedAnswer": {"@type": "Answer", "text": "Her blok 10.000 PEP öder. Dakikada bir blok hedefiyle bu, günde en fazla 14,4 milyon PEP eder ve bunu kazan herkes paylaşır. Geçen yıl bloklar ortalama yaklaşık 62,6 saniye sürdü, dolayısıyla gerçek rakam yaklaşık 13,8 milyon."}}]}</script>
@@ -45,6 +45,9 @@
 .miners-love { display: grid; gap: 10px; padding: 22px; border-radius: 16px; background: var(--accent-soft); border: 1px solid var(--accent); border-left-width: 5px; }
 .miners-love h2 { margin: 0; }
 .miners-love .btn { justify-self: start; }
+.laptop { margin: 18px 0 22px; padding: 20px 22px; border-radius: 22px; border: 1.5px solid var(--gold); background: linear-gradient(135deg, var(--gold-soft, #fff4dd), var(--panel) 70%); display: grid; gap: 10px; justify-items: start; }
+.laptop-h { font-weight: 800; font-size: 1.15rem; margin: 0; }
+.laptop p { margin: 0; }
 </style>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
@@ -93,6 +96,7 @@
 <section aria-labelledby="pools">
   <h2 id="pools">Pepecoin ödeyen madencilik havuzları</h2>
   <p>Bir Scrypt ASIC ile bu havuzların her biri Litecoin ve Dogecoin madenciliğine PEP ekler. GPU ya da CPU ile unMineable size PEP öder.</p>
+  <div class="laptop"><p class="laptop-h">💻 Sadece dizüstü ya da oyun bilgisayarınız mı var? Yine de PEP kazanabilirsiniz.</p><p>unMineable, CPU veya GPU ile kazmanıza izin verir ve ödemeyi Pepecoin olarak yapar. Madenci yazılımını indirin, Pepecoin ağında PEP'i seçin (Ethereum'daki PEPE'yi değil) ve PEP adresinizi girin. Küçük miktarlar bekleyin: bir dizüstü bilgisayar Scrypt ASIC ile yarışamaz.</p><a class="btn main" href="https://unmineable.com/coins/PEP">unMineable'da PEP kazın →</a></div>
   <div class="table-scroll" role="region" aria-labelledby="pools" tabindex="0">
     <table style="min-width: 520px">
       <thead><tr><th scope="col">Havuz</th><th scope="col">Donanım</th><th scope="col">PEP'i nasıl alırsınız</th></tr></thead>
@@ -228,6 +232,6 @@
   <details class="support"><summary>Bu siteyi beğendiyseniz gelişimine destek olabilirsiniz.</summary><p>Ne kadar küçük olursa olsun her katkı işe yarar. Teşekkürler!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 
-<script src="../chrome.js?v=20261018c" defer></script>
+<script src="../chrome.js?v=20261018d" defer></script>
 </body>
 </html>
