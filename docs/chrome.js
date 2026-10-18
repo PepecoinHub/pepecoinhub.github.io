@@ -244,8 +244,7 @@
     var l = document.createElement('div'); l.className = 'bg-coins'; l.setAttribute('aria-hidden', 'true');
     for (var i = 0; i < 12; i++) {
       var c = document.createElement('i'), s = 14 + Math.random() * 18;
-      c.textContent = 'P';
-      c.style.cssText = 'left:' + (Math.random() * 100).toFixed(1) + '%;width:' + s.toFixed(0) + 'px;height:' + s.toFixed(0) + 'px;font-size:' + (s * 0.6).toFixed(0) + 'px;'
+      c.style.cssText = 'left:' + (Math.random() * 100).toFixed(1) + '%;width:' + s.toFixed(0) + 'px;height:' + s.toFixed(0) + 'px;'
         + 'animation-duration:' + (28 + Math.random() * 24).toFixed(0) + 's;animation-delay:-' + (Math.random() * 50).toFixed(0) + 's';
       l.appendChild(c);
     }

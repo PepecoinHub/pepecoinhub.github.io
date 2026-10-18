@@ -208,12 +208,35 @@ dl.facts dd { min-width: 0; }
 a.card:hover { border-color: var(--accent); }
 .card h3 { color: var(--accent); }
 .card p { font-size: 0.95rem; color: var(--muted); }
-.linkgroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 32px; }
-.linkgroup { display: grid; gap: 10px; align-content: start; min-width: 0; }
-.linkgroup h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-.linkgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
-.linkgroup li { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 0.95rem; }
-.linkgroup li span { color: var(--muted); font-size: 0.82rem; text-align: right; }
+.linkgroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+.linkgroup {
+  display: grid; gap: 12px; align-content: start; min-width: 0; padding: 18px 18px 14px; position: relative; overflow: hidden;
+  background: var(--panel); border: 1px solid var(--rule); border-radius: 22px; box-shadow: var(--shadow);
+}
+.linkgroup::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: linear-gradient(90deg, var(--accent), var(--gold)); }
+.linkgroup h3 { display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); font-weight: 700; margin: 0; }
+.linkgroup h3::before { content: "\1F517"; display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 12px; background: var(--accent-soft); font-size: 1.05rem; letter-spacing: 0; }
+.linkgroup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.linkgroup li {
+  position: relative; display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px 10px; margin: 0 -10px;
+  border-radius: 12px; font-size: 0.95rem; transition: background 0.15s ease;
+}
+.linkgroup li:hover, .linkgroup li:focus-within { background: var(--accent-soft); }
+.linkgroup li a { font-weight: 600; text-decoration: none; min-width: 0; overflow-wrap: break-word; }
+.linkgroup li a::after { content: " \2197"; font-weight: 400; opacity: 0.45; }
+.linkgroup li a::before { content: ""; position: absolute; inset: 0; border-radius: 12px; }
+.linkgroup li:hover a { text-decoration: underline; }
+.linkgroup li span {
+  flex: 0 1 auto; max-width: 50%; color: var(--muted); font-size: 0.76rem; text-align: right; line-height: 1.3;
+  padding: 3px 9px; border-radius: 10px; background: var(--paper-2, var(--paper)); border: 1px solid var(--rule);
+}
+#links ~ .linkgroups .linkgroup:nth-child(1) h3::before { content: "\1F438"; }
+#links ~ .linkgroups .linkgroup:nth-child(2) h3::before { content: "\1F45B"; }
+#links ~ .linkgroups .linkgroup:nth-child(3) h3::before { content: "\1F4B1"; }
+#links ~ .linkgroups .linkgroup:nth-child(4) h3::before { content: "\1F504"; }
+#links ~ .linkgroups .linkgroup:nth-child(5) h3::before { content: "\1F50E"; }
+#links ~ .linkgroups .linkgroup:nth-child(6) h3::before { content: "\26CF\FE0F"; }
+@media (max-width: 430px) { .linkgroup li span { max-width: 48%; } }
 
 .sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
 .sources h3 { font-family: var(--f-mono); font-size: 0.86rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
@@ -615,8 +638,8 @@ body::before {
 @keyframes bgdrift { to { transform: translate(4%, 3%) scale(1.08) rotate(3deg); } }
 .bg-coins { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 .bg-coins i {
-  position: absolute; bottom: -40px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--paper);
-  font-style: normal; font-weight: 700; line-height: 1; opacity: 0.08; animation: bgrise linear infinite;
+  position: absolute; bottom: -40px; border-radius: 50%; background: url(assets/brand/coin-p.svg) center / contain no-repeat;
+  opacity: 0.1; animation: bgrise linear infinite;
 }
 @keyframes bgrise { to { transform: translateY(-115vh) rotate(180deg); } }
 @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
