@@ -36,8 +36,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/"}, {"@type": "ListItem", "position": 2, "name": "Price", "item": "https://pepecoinhub.com/price.html"}]}</script>
 <style>
 /* Price page: NFA banner, stat tiles, chart card, ×N tool and the market cap ladder */
-.nfa { max-width: none; background: var(--gold-soft); border-color: var(--gold); border-left-width: 6px; }
-.nfa-title { font-weight: 700; font-size: 1.12rem; }
+.nfa { font-size: 0.86rem; color: var(--muted); }
 .notpepe { display: grid; gap: 12px; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
 .np-pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }
 .np-coin { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 12px; border-radius: 12px; background: var(--accent-soft); border: 1px solid var(--accent); }
@@ -159,12 +158,8 @@
   <p class="eyebrow">Price · live from CoinGecko</p>
   <h1>Pepecoin (PEP) price</h1>
   <p class="lede">The live PEP price and chart, Pepe (PEPE) on the same chart if you want it, and the plain arithmetic of what a ×100 would mean.</p>
+  <p class="nfa" id="nfa" role="note"><span aria-hidden="true">⚠️ </span>NFA: this page is for information only. Nothing here is a promise or a forecast.</p>
 </header>
-
-<div class="callout gold nfa" id="nfa" role="note">
-  <p class="nfa-title"><span aria-hidden="true">⚠️ </span>Not financial advice. Nothing here is a promise.</p>
-  <p>This page shows prices and does arithmetic. It does not predict where PEP or PEPE will go, and nothing on it promises any return. Crypto prices can fall a long way, even to zero. The compiler of this site holds PEP. Do your own research and never put in money you can't afford to lose.</p>
-</div>
 
 <section class="notpepe" aria-labelledby="not-pepe">
   <h2 id="not-pepe" class="visually-hidden">PEP is not PEPE</h2>

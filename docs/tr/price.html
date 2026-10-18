@@ -36,8 +36,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/tr/"}, {"@type": "ListItem", "position": 2, "name": "Fiyat", "item": "https://pepecoinhub.com/tr/price.html"}]}</script>
 <style>
 /* Price page: NFA banner, stat tiles, chart card, ×N tool and the market cap ladder */
-.nfa { max-width: none; background: var(--gold-soft); border-color: var(--gold); border-left-width: 6px; }
-.nfa-title { font-weight: 700; font-size: 1.12rem; }
+.nfa { font-size: 0.86rem; color: var(--muted); }
 .notpepe { display: grid; gap: 12px; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
 .np-pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }
 .np-coin { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 12px; border-radius: 12px; background: var(--accent-soft); border: 1px solid var(--accent); }
@@ -159,12 +158,8 @@
   <p class="eyebrow">Fiyat · CoinGecko'dan canlı</p>
   <h1>Pepecoin (PEP) fiyatı</h1>
   <p class="lede">Canlı PEP fiyatı ve grafiği, istersen aynı grafikte Pepe (PEPE) ve ×100'ün ne anlama geleceğinin basit hesabı.</p>
+  <p class="nfa" id="nfa" role="note"><span aria-hidden="true">⚠️ </span>NFA: Bu sayfa yalnızca bilgi amaçlıdır. Buradaki hiçbir şey vaat ya da tahmin değildir.</p>
 </header>
-
-<div class="callout gold nfa" id="nfa" role="note">
-  <p class="nfa-title"><span aria-hidden="true">⚠️ </span>Yatırım tavsiyesi değildir. Burada hiçbir şey vaat edilmiyor.</p>
-  <p>Bu sayfa fiyatları gösterir ve hesap yapar. PEP'in ya da PEPE'nin nereye gideceğini tahmin etmez ve hiçbir kazanç vaat etmez. Kripto fiyatları çok düşebilir, sıfıra bile. Bu sitenin derleyicisi PEP tutuyor. Kendi araştırmanı yap ve kaybetmeyi göze alamayacağın parayı asla yatırma.</p>
-</div>
 
 <section class="notpepe" aria-labelledby="not-pepe">
   <h2 id="not-pepe" class="visually-hidden">PEP, PEPE değildir</h2>

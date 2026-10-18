@@ -36,8 +36,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/de/"}, {"@type": "ListItem", "position": 2, "name": "Kurs", "item": "https://pepecoinhub.com/de/price.html"}]}</script>
 <style>
 /* Price page: NFA banner, stat tiles, chart card, ×N tool and the market cap ladder */
-.nfa { max-width: none; background: var(--gold-soft); border-color: var(--gold); border-left-width: 6px; }
-.nfa-title { font-weight: 700; font-size: 1.12rem; }
+.nfa { font-size: 0.86rem; color: var(--muted); }
 .notpepe { display: grid; gap: 12px; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
 .np-pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }
 .np-coin { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 12px; border-radius: 12px; background: var(--accent-soft); border: 1px solid var(--accent); }
@@ -159,12 +158,8 @@
   <p class="eyebrow">Kurs · live von CoinGecko</p>
   <h1>Pepecoin (PEP) Kurs</h1>
   <p class="lede">Der aktuelle PEP-Kurs mit Chart, auf Wunsch Pepe (PEPE) im selben Chart, und die schlichte Rechnung, was ein ×100 bedeuten würde.</p>
+  <p class="nfa" id="nfa" role="note"><span aria-hidden="true">⚠️ </span>NFA: Diese Seite dient nur der Information. Nichts hier ist ein Versprechen oder eine Prognose.</p>
 </header>
-
-<div class="callout gold nfa" id="nfa" role="note">
-  <p class="nfa-title"><span aria-hidden="true">⚠️ </span>Keine Finanzberatung. Hier wird nichts versprochen.</p>
-  <p>Diese Seite zeigt Kurse und rechnet. Sie sagt nicht voraus, wohin PEP oder PEPE gehen, und nichts auf ihr verspricht irgendeine Rendite. Kryptokurse können stark fallen, sogar auf null. Der Verfasser dieser Seite hält PEP. Recherchiere selbst und investiere nie Geld, dessen Verlust du dir nicht leisten kannst.</p>
-</div>
 
 <section class="notpepe" aria-labelledby="not-pepe">
   <h2 id="not-pepe" class="visually-hidden">PEP ist nicht PEPE</h2>

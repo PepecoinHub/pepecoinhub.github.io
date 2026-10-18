@@ -36,8 +36,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/zh/"}, {"@type": "ListItem", "position": 2, "name": "价格", "item": "https://pepecoinhub.com/zh/price.html"}]}</script>
 <style>
 /* Price page: NFA banner, stat tiles, chart card, ×N tool and the market cap ladder */
-.nfa { max-width: none; background: var(--gold-soft); border-color: var(--gold); border-left-width: 6px; }
-.nfa-title { font-weight: 700; font-size: 1.12rem; }
+.nfa { font-size: 0.86rem; color: var(--muted); }
 .notpepe { display: grid; gap: 12px; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
 .np-pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }
 .np-coin { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 12px; border-radius: 12px; background: var(--accent-soft); border: 1px solid var(--accent); }
@@ -159,12 +158,8 @@
   <p class="eyebrow">价格 · 来自 CoinGecko 的实时数据</p>
   <h1>Pepecoin (PEP) 价格</h1>
   <p class="lede">PEP 的实时价格和图表，可在同一图表上叠加 Pepe (PEPE)，以及 ×100 意味着什么的简单算术。</p>
+  <p class="nfa" id="nfa" role="note"><span aria-hidden="true">⚠️ </span>NFA：本页仅供参考，不构成任何承诺或预测。</p>
 </header>
-
-<div class="callout gold nfa" id="nfa" role="note">
-  <p class="nfa-title"><span aria-hidden="true">⚠️ </span>不构成投资建议。这里不做任何承诺。</p>
-  <p>本页只展示价格并做算术，不预测 PEP 或 PEPE 的走势，也不承诺任何收益。加密货币价格可能大幅下跌，甚至归零。本站编者持有 PEP。请自行研究，切勿投入你承受不起损失的钱。</p>
-</div>
 
 <section class="notpepe" aria-labelledby="not-pepe">
   <h2 id="not-pepe" class="visually-hidden">PEP 不是 PEPE</h2>

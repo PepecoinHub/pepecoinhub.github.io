@@ -36,8 +36,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/es/"}, {"@type": "ListItem", "position": 2, "name": "Precio", "item": "https://pepecoinhub.com/es/price.html"}]}</script>
 <style>
 /* Price page: NFA banner, stat tiles, chart card, ×N tool and the market cap ladder */
-.nfa { max-width: none; background: var(--gold-soft); border-color: var(--gold); border-left-width: 6px; }
-.nfa-title { font-weight: 700; font-size: 1.12rem; }
+.nfa { font-size: 0.86rem; color: var(--muted); }
 .notpepe { display: grid; gap: 12px; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
 .np-pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }
 .np-coin { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 12px; border-radius: 12px; background: var(--accent-soft); border: 1px solid var(--accent); }
@@ -159,12 +158,8 @@
   <p class="eyebrow">Precio · en directo desde CoinGecko</p>
   <h1>Precio de Pepecoin (PEP)</h1>
   <p class="lede">El precio y el gráfico de PEP en directo, Pepe (PEPE) en el mismo gráfico si lo quieres, y la aritmética simple de lo que significaría un ×100.</p>
+  <p class="nfa" id="nfa" role="note"><span aria-hidden="true">⚠️ </span>NFA: esta página es solo informativa. Nada aquí es una promesa ni una previsión.</p>
 </header>
-
-<div class="callout gold nfa" id="nfa" role="note">
-  <p class="nfa-title"><span aria-hidden="true">⚠️ </span>No es asesoramiento financiero. Aquí no se promete nada.</p>
-  <p>Esta página muestra precios y hace cuentas. No predice hacia dónde irán PEP o PEPE, y nada de lo que hay en ella promete ninguna ganancia. Los precios de las criptomonedas pueden caer mucho, incluso a cero. El autor de este sitio tiene PEP. Investiga por tu cuenta y no inviertas nunca dinero que no puedas permitirte perder.</p>
-</div>
 
 <section class="notpepe" aria-labelledby="not-pepe">
   <h2 id="not-pepe" class="visually-hidden">PEP no es PEPE</h2>

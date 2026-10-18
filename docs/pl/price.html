@@ -36,8 +36,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/pl/"}, {"@type": "ListItem", "position": 2, "name": "Cena", "item": "https://pepecoinhub.com/pl/price.html"}]}</script>
 <style>
 /* Price page: NFA banner, stat tiles, chart card, ×N tool and the market cap ladder */
-.nfa { max-width: none; background: var(--gold-soft); border-color: var(--gold); border-left-width: 6px; }
-.nfa-title { font-weight: 700; font-size: 1.12rem; }
+.nfa { font-size: 0.86rem; color: var(--muted); }
 .notpepe { display: grid; gap: 12px; padding: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
 .np-pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; }
 .np-coin { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 12px; border-radius: 12px; background: var(--accent-soft); border: 1px solid var(--accent); }
@@ -159,12 +158,8 @@
   <p class="eyebrow">Cena · na żywo z CoinGecko</p>
   <h1>Cena Pepecoin (PEP)</h1>
   <p class="lede">Aktualna cena i wykres PEP, na życzenie także Pepe (PEPE) na tym samym wykresie, oraz zwykła arytmetyka tego, co oznaczałoby ×100.</p>
+  <p class="nfa" id="nfa" role="note"><span aria-hidden="true">⚠️ </span>NFA: strona czysto informacyjna. Nic tu nie jest obietnicą ani prognozą.</p>
 </header>
-
-<div class="callout gold nfa" id="nfa" role="note">
-  <p class="nfa-title"><span aria-hidden="true">⚠️ </span>To nie jest porada finansowa (NFA). Niczego tu nie obiecuję.</p>
-  <p>Ta strona pokazuje ceny i liczy. Nie przewiduje, dokąd pójdzie PEP ani PEPE, i nic na niej nie obiecuje żadnego zysku. Ceny kryptowalut mogą mocno spaść, nawet do zera. Autor strony ma PEP. Sprawdzaj sam i nigdy nie wkładaj pieniędzy, których nie możesz stracić.</p>
-</div>
 
 <section class="notpepe" aria-labelledby="not-pepe">
   <h2 id="not-pepe" class="visually-hidden">PEP to nie PEPE</h2>
