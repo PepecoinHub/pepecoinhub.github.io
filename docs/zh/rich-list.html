@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="../style.css?v=20261012d">
-<link rel="stylesheet" href="../facts.css?v=20261019a">
+<link rel="stylesheet" href="../facts.css?v=20261019f">
 <style>
 /* This page loads the Holder Watch app styles (style.css) under the shared site styles (facts.css). */
 .page-head .eyebrow { font-weight: 400; }
@@ -41,7 +41,7 @@
 .top { gap: 24px; }
 </style>
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin (PEP) 富豪榜与供应集中度", "description": "Pepecoin (PEP) 最大地址的每日快照，以及前 10、25、50、100、400 和 1,000 个地址所持供应量的占比；2024年1月30日以来的数据由区块链重建，自 2026年10月5日起每天实时记录。", "url": "https://pepecoinhub.com/zh/rich-list.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub（r/pepecoin 社区志愿者）"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://pepecoinhub.com/data/shares.csv"}, {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/summary.json"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin (PEP) 富豪榜与供应集中度", "description": "Pepecoin (PEP) 最大地址的每日快照，以及前 10、25、50、100、400 和 1,000 个地址所持供应量的占比；2024年1月30日以来的数据由区块链重建，自 2026年10月5日起每天实时记录。", "url": "https://pepecoinhub.com/zh/rich-list.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub（r/pepecoin 社区）"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://pepecoinhub.com/data/shares.csv"}, {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/summary.json"}]}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
@@ -57,6 +57,7 @@
     <p class="lede">PEP 供应量中有多少集中在最大的钱包里，以及它如何变化。每天对前约 2000 个地址做一次快照；图表聚焦前 1000 名。</p>
   </header>
   <p id="boot"><span data-v="date">2026年10月19日</span>（区块 <span data-v="height">1,256,760</span>）最大地址持有的流通供应量占比：前 10：<span data-v="top-10">16.60</span>% · 前 25：<span data-v="top-25">23.94</span>% · 前 50：<span data-v="top-50">31.03</span>% · 前 100：<span data-v="top-100">39.12</span>% · 前 400：<span data-v="top-400">59.40</span>% · 前 1,000：<span data-v="top-1000">74.08</span>%。自 2024年1月30日以来的每日数据：<a href="../data/shares.csv">shares.csv</a>。</p>
+  <p id="boot-change">与一周前、一个月前和一年前相比，前 10 名的占比分别变化了 <span data-v="d-7-10">+0.95</span>、<span data-v="d-30-10">+0.11</span>和<span data-v="d-365-10">-1.31</span> 个百分点，前 100 名分别变化了 <span data-v="d-7-100">+0.46</span>、<span data-v="d-30-100">-0.87</span>和<span data-v="d-365-100">-2.37</span> 个百分点。</p>
   <!-- static-summary:end -->
   <noscript>
     <p>本页需要 JavaScript 来绘制图表。原始数据见 <a href="../data/shares.csv">shares.csv</a>。</p>
@@ -64,12 +65,12 @@
   </noscript>
 </div>
 <footer class="site-foot">
-  <p><strong>社区事实资料页</strong>，由 r/pepecoin 社区的一位志愿者整理，并非 Pepecoin 官方发布的内容。</p>
+  <p><strong>社区事实资料页</strong>，由 r/pepecoin 社区里一个和你一样的普通人制作，并非 Pepecoin 官方发布的内容。</p>
   <p>本站内容不构成投资建议。整理者本人持有 PEP。一个地址不代表一个人：交易所和托管方会替很多用户持币。</p>
   <p class="correction">发现错误？欢迎在 GitHub 上<a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>提交更正</a>（请附上来源）。</p>
   <details class="support"><summary>喜欢这个网站？欢迎支持它继续发展。</summary><p>无论金额多少，都是很大的帮助。谢谢！</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 <script src="../app.js?v=20261017"></script>
-<script src="../chrome.js?v=20261019a" defer></script>
+<script src="../chrome.js?v=20261019e" defer></script>
 </body>
 </html>

@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="../style.css?v=20261012d">
-<link rel="stylesheet" href="../facts.css?v=20261019a">
+<link rel="stylesheet" href="../facts.css?v=20261019f">
 <style>
 /* This page loads the Holder Watch app styles (style.css) under the shared site styles (facts.css). */
 .page-head .eyebrow { font-weight: 400; }
@@ -41,7 +41,7 @@
 .top { gap: 24px; }
 </style>
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Lista de mayores tenedores de Pepecoin (PEP) y concentración del suministro", "description": "Instantáneas diarias de las mayores direcciones de Pepecoin (PEP) y de la parte del suministro que tienen las 10, 25, 50, 100, 400 y 1000 direcciones principales, reconstruidas a partir de la blockchain desde el 30 de enero de 2024 y registradas en directo cada día desde el 5 de octubre de 2026.", "url": "https://pepecoinhub.com/es/rich-list.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (voluntarios de la comunidad r/pepecoin)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://pepecoinhub.com/data/shares.csv"}, {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/summary.json"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Lista de mayores tenedores de Pepecoin (PEP) y concentración del suministro", "description": "Instantáneas diarias de las mayores direcciones de Pepecoin (PEP) y de la parte del suministro que tienen las 10, 25, 50, 100, 400 y 1000 direcciones principales, reconstruidas a partir de la blockchain desde el 30 de enero de 2024 y registradas en directo cada día desde el 5 de octubre de 2026.", "url": "https://pepecoinhub.com/es/rich-list.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (comunidad r/pepecoin)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://pepecoinhub.com/data/shares.csv"}, {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/summary.json"}]}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
@@ -57,6 +57,7 @@
     <p class="lede">Qué parte del suministro de PEP está en las billeteras más grandes, y cómo cambia. Una instantánea diaria de las ~2000 direcciones principales; los gráficos se centran en las 1000 primeras.</p>
   </header>
   <p id="boot">Parte del suministro en circulación en manos de las mayores direcciones el <span data-v="date">19 oct 2026</span> (bloque <span data-v="height">1.256.760</span>): top 10: <span data-v="top-10">16,60</span> % · top 25: <span data-v="top-25">23,94</span> % · top 50: <span data-v="top-50">31,03</span> % · top 100: <span data-v="top-100">39,12</span> % · top 400: <span data-v="top-400">59,40</span> % · top 1000: <span data-v="top-1000">74,08</span> %. Cada día desde el 30 de enero de 2024: <a href="../data/shares.csv">shares.csv</a>.</p>
+  <p id="boot-change">Frente a hace una semana, un mes y un año, la parte del top 10 cambió <span data-v="d-7-10">+0,95</span>, <span data-v="d-30-10">+0,11</span> y <span data-v="d-365-10">-1,31</span> y la del top 100, <span data-v="d-7-100">+0,46</span>, <span data-v="d-30-100">-0,87</span> y <span data-v="d-365-100">-2,37</span> puntos porcentuales.</p>
   <!-- static-summary:end -->
   <noscript>
     <p>Esta página necesita JavaScript para dibujar sus gráficos. Las cifras en bruto están en <a href="../data/shares.csv">shares.csv</a>.</p>
@@ -64,12 +65,12 @@
   </noscript>
 </div>
 <footer class="site-foot">
-  <p><strong>Páginas de datos de la comunidad</strong>, elaboradas por un voluntario de r/pepecoin. No son una publicación oficial de Pepecoin.</p>
+  <p><strong>Páginas de datos de la comunidad</strong>, hechas por un tipo normal de r/pepecoin, como tú. No son una publicación oficial de Pepecoin.</p>
   <p>Esto no es asesoramiento de inversión. Quien las elabora posee PEP. Una dirección no es una persona: los exchanges y los custodios guardan monedas de muchos usuarios.</p>
   <p class="correction">¿Has visto un error? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Envía una corrección</a> (con su fuente) en GitHub.</p>
   <details class="support"><summary>¿Te gusta este sitio? Puedes ayudar a que siga desarrollándose.</summary><p>Cualquier cantidad, por pequeña que sea, ayuda. ¡Gracias!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
 <script src="../app.js?v=20261017"></script>
-<script src="../chrome.js?v=20261019a" defer></script>
+<script src="../chrome.js?v=20261019e" defer></script>
 </body>
 </html>

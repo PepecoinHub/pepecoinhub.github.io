@@ -13,27 +13,27 @@
   ];
   var UI = {
     en: { copy: 'Copy', copied: 'Copied', theme: 'Theme', auto: 'Auto', light: 'Light', dark: 'Dark', sep: ': ', language: 'Language',
-      start: 'Start here', startShort: 'Start', mine: 'Mining', data: 'Data & charts', games: 'Games', menu: 'Menu', top: 'Back to top' },
+      start: 'Start here', startShort: 'Start', mine: 'Mining', data: 'Data & charts', games: 'Games', menu: 'Menu', top: 'Back to top', more: 'More' },
     pl: { copy: 'Kopiuj', copied: 'Skopiowano', theme: 'Motyw', auto: 'Auto', light: 'Jasny', dark: 'Ciemny', sep: ': ', language: 'Język',
-      start: 'Na start', startShort: 'Start', mine: 'Kopanie', data: 'Dane i wykresy', games: 'Gry', menu: 'Menu', top: 'Do góry',
+      start: 'Na start', startShort: 'Start', mine: 'Kopanie', data: 'Dane i wykresy', games: 'Gry', menu: 'Menu', top: 'Do góry', more: 'Więcej',
       hint: 'Ta strona jest dostępna także po polsku.', go: 'Czytaj po polsku', close: 'Zamknij' },
     es: { copy: 'Copiar', copied: 'Copiado', theme: 'Tema', auto: 'Auto', light: 'Claro', dark: 'Oscuro', sep: ': ', language: 'Idioma',
-      start: 'Para empezar', startShort: 'Empezar', mine: 'Minería', data: 'Datos y gráficos', games: 'Juegos', menu: 'Menú', top: 'Volver arriba',
+      start: 'Para empezar', startShort: 'Empezar', mine: 'Minería', data: 'Datos y gráficos', games: 'Juegos', menu: 'Menú', top: 'Volver arriba', more: 'Más',
       hint: 'Esta página también está en español.', go: 'Leer en español', close: 'Cerrar' },
     de: { copy: 'Kopieren', copied: 'Kopiert', theme: 'Design', auto: 'Auto', light: 'Hell', dark: 'Dunkel', sep: ': ', language: 'Sprache',
-      start: 'Für den Einstieg', startShort: 'Start', mine: 'Mining', data: 'Daten & Charts', games: 'Spiele', menu: 'Menü', top: 'Nach oben',
+      start: 'Für den Einstieg', startShort: 'Start', mine: 'Mining', data: 'Daten & Charts', games: 'Spiele', menu: 'Menü', top: 'Nach oben', more: 'Mehr',
       hint: 'Diese Seite gibt es auch auf Deutsch.', go: 'Auf Deutsch lesen', close: 'Schließen' },
     fr: { copy: 'Copier', copied: 'Copié', theme: 'Thème', auto: 'Auto', light: 'Clair', dark: 'Sombre', sep: ' : ', language: 'Langue',
-      start: 'Pour commencer', startShort: 'Débuter', mine: 'Minage', data: 'Données et graphiques', games: 'Jeux', menu: 'Menu', top: 'Haut de page',
+      start: 'Pour commencer', startShort: 'Débuter', mine: 'Minage', data: 'Données et graphiques', games: 'Jeux', menu: 'Menu', top: 'Haut de page', more: 'Plus',
       hint: 'Cette page existe aussi en français.', go: 'Lire en français', close: 'Fermer' },
     tr: { copy: 'Kopyala', copied: 'Kopyalandı', theme: 'Tema', auto: 'Otomatik', light: 'Açık', dark: 'Koyu', sep: ': ', language: 'Dil',
-      start: 'Başlangıç', startShort: 'Başla', mine: 'Madencilik', data: 'Veriler ve grafikler', games: 'Oyunlar', menu: 'Menü', top: 'Başa dön',
+      start: 'Başlangıç', startShort: 'Başla', mine: 'Madencilik', data: 'Veriler ve grafikler', games: 'Oyunlar', menu: 'Menü', top: 'Başa dön', more: 'Daha fazla',
       hint: 'Bu sayfa Türkçe olarak da mevcut.', go: 'Türkçe sürüme geç', close: 'Kapat' },
     it: { copy: 'Copia', copied: 'Copiato', theme: 'Tema', auto: 'Auto', light: 'Chiaro', dark: 'Scuro', sep: ': ', language: 'Lingua',
-      start: 'Per iniziare', startShort: 'Inizia', mine: 'Mining', data: 'Dati e grafici', games: 'Giochi', menu: 'Menu', top: 'Torna su',
+      start: 'Per iniziare', startShort: 'Inizia', mine: 'Mining', data: 'Dati e grafici', games: 'Giochi', menu: 'Menu', top: 'Torna su', more: 'Altro',
       hint: 'Questa pagina è disponibile anche in italiano.', go: 'Leggi in italiano', close: 'Chiudi' },
     zh: { copy: '复制', copied: '已复制', theme: '主题', auto: '自动', light: '浅色', dark: '深色', sep: '：', language: '语言',
-      start: '入门', startShort: '入门', mine: '挖矿', data: '数据与图表', games: '游戏', menu: '菜单', top: '返回顶部',
+      start: '入门', startShort: '入门', mine: '挖矿', data: '数据与图表', games: '游戏', menu: '菜单', top: '返回顶部', more: '更多',
       hint: '本页面也有简体中文版。', go: '阅读中文版', close: '关闭' }
   };
   function keyOf(tag) {
@@ -158,6 +158,9 @@
     box.appendChild(langMenu(alt));
     nav.appendChild(box);
     groupNav(nav);
+    footNav(nav);
+    linkHosts();
+    linkFold();
     backToTop();
     bgLayer();
     langHint(alt);
@@ -230,6 +233,85 @@
     head.insertBefore(tools, nav);
   }
 
+  // Footer: the logo with the "community fact pages" line and the community links, then every page of the site
+  // in three short columns (the same links as the header menu), then the small print.
+  var SOCIAL = [['Reddit', 'https://reddit.com/r/pepecoin'], ['Discord', 'https://pepecoin.com/discord'], ['Telegram', 'https://t.me/PepecoinGroup'],
+    ['X', 'https://x.com/PepecoinNetwork'], ['GitHub', 'https://github.com/PepecoinHub/pepecoinhub.github.io']];
+  function footNav(nav) {
+    var foot = document.querySelector('footer.site-foot');
+    if (!foot || foot.querySelector('.foot-top') || !nav.classList.contains('grouped')) return;
+    function label(a) {
+      var c = a.cloneNode(true);
+      c.querySelectorAll('.nav-ico, [aria-hidden="true"]').forEach(function (el) { el.remove(); });
+      return c.textContent.trim();
+    }
+    var top = document.createElement('div'); top.className = 'foot-top';
+    var brand = document.createElement('div'); brand.className = 'foot-brand';
+    var logo = document.querySelector('.site-head .brand-hub-link');
+    if (logo) { logo = logo.cloneNode(true); logo.classList.add('foot-logo'); brand.appendChild(logo); }
+    var intro = foot.querySelector(':scope > p');
+    if (intro) brand.appendChild(intro);
+    var soc = document.createElement('p'); soc.className = 'foot-social';
+    SOCIAL.forEach(function (x) { var a = document.createElement('a'); a.href = x[1]; a.textContent = x[0]; a.rel = 'noopener'; soc.appendChild(a); });
+    brand.appendChild(soc);
+    top.appendChild(brand);
+    var box = document.createElement('nav'); box.className = 'foot-nav'; box.setAttribute('aria-label', t.menu);
+    function col(title, links) {
+      if (!links.length) return;
+      var d = document.createElement('div'), h = document.createElement('p'); h.className = 'foot-h'; h.textContent = title; d.appendChild(h);
+      links.forEach(function (a) {
+        var c = document.createElement('a'); c.href = a.getAttribute('href'); c.textContent = label(a);
+        if (a.getAttribute('aria-current') === 'page') c.setAttribute('aria-current', 'page');
+        d.appendChild(c);
+      });
+      box.appendChild(d);
+    }
+    var q = function (sel) { return Array.prototype.slice.call(nav.querySelectorAll(sel)); };
+    col(t.start, q('.navgroup-start .navpanel a'));
+    col(t.data, q('.navgroup-data .navpanel a'));
+    col(t.more, q(':scope > a'));
+    top.appendChild(box);
+    var fine = document.createElement('div'); fine.className = 'foot-fine';
+    while (foot.firstChild) fine.appendChild(foot.firstChild);
+    foot.appendChild(top); foot.appendChild(fine);
+  }
+
+  // Link lists: show the real domain each link opens, so it can be checked before clicking.
+  function linkHosts() {
+    document.querySelectorAll('.linkgroup li > a[href^="http"]').forEach(function (a) {
+      if (a.parentNode.querySelector('.lg-host')) return;
+      var h = document.createElement('span'); h.className = 'lg-host'; h.textContent = a.hostname.replace(/^www\./, '');
+      a.insertAdjacentElement('afterend', h);
+    });
+  }
+
+  // Home page links: on a phone each group folds to its heading (with the number of links), except "Official".
+  function linkFold() {
+    var groups = Array.prototype.slice.call(document.querySelectorAll('#links ~ .linkgroups .linkgroup'));
+    if (!groups.length || !window.matchMedia) return;
+    var mq = matchMedia('(max-width: 640px)'), items = [];
+    groups.forEach(function (g, i) {
+      var h = g.querySelector('h3'), ul = g.querySelector('ul');
+      if (!h || !ul) return;
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'lg-toggle';
+      while (h.firstChild) b.appendChild(h.firstChild);
+      var n = document.createElement('span'); n.className = 'lg-count'; n.textContent = ul.children.length; b.appendChild(n);
+      h.appendChild(b);
+      ul.id = ul.id || 'lg-list-' + i; b.setAttribute('aria-controls', ul.id);
+      b.addEventListener('click', function () { if (mq.matches) set(g, b, g.classList.contains('lg-closed')); });
+      items.push([g, b, i]);
+    });
+    function set(g, b, open) { g.classList.toggle('lg-closed', !open); b.setAttribute('aria-expanded', String(open)); }
+    function apply() {
+      items.forEach(function (it) {
+        if (mq.matches) { it[1].disabled = false; set(it[0], it[1], it[2] === 0); }
+        else { it[1].disabled = true; it[0].classList.remove('lg-closed'); it[1].removeAttribute('aria-expanded'); }
+      });
+    }
+    apply();
+    if (mq.addEventListener) mq.addEventListener('change', apply); else if (mq.addListener) mq.addListener(apply);
+  }
+
   // A round "back to top" button once the reader has scrolled down a bit.
   function backToTop() {
     if (document.querySelector('.mn')) return; // Pepe Miner has its own corner toasts
@@ -247,15 +329,21 @@
   }
 
   // Background: soft drifting light everywhere (CSS), plus a few faint rising P coins on the home and games pages.
+  // The coins rise only in the empty side margins: anywhere else they slip in and out behind the cards and look
+  // like glitches, so narrow screens (phones, small laptops) get none.
   function bgLayer() {
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (!document.querySelector('.home-hero') && !/\/games\//.test(location.pathname)) return;
     if (document.querySelector('.mn')) return;
+    var main = document.getElementById('main');
+    var gutter = main ? Math.floor(main.getBoundingClientRect().left) : 0;
+    if (gutter < 64) return;
     var l = document.createElement('div'); l.className = 'bg-coins'; l.setAttribute('aria-hidden', 'true');
-    for (var i = 0; i < 12; i++) {
-      var c = document.createElement('i'), s = 14 + Math.random() * 18;
-      c.style.cssText = 'left:' + (Math.random() * 100).toFixed(1) + '%;width:' + s.toFixed(0) + 'px;height:' + s.toFixed(0) + 'px;'
-        + 'animation-duration:' + (28 + Math.random() * 24).toFixed(0) + 's;animation-delay:-' + (Math.random() * 50).toFixed(0) + 's';
+    for (var i = 0; i < 10; i++) {
+      var c = document.createElement('i'), s = Math.round(16 + Math.random() * Math.min(18, gutter - 48));
+      var x = Math.round(12 + Math.random() * (gutter - s - 24));
+      c.style.cssText = (i % 2 ? 'right:' : 'left:') + x + 'px;width:' + s + 'px;height:' + s + 'px;'
+        + 'animation-duration:' + (30 + Math.random() * 24).toFixed(0) + 's;animation-delay:-' + (Math.random() * 54).toFixed(0) + 's';
       l.appendChild(c);
     }
     document.body.insertBefore(l, document.body.firstChild);

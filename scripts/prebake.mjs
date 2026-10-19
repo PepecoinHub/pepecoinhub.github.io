@@ -111,6 +111,15 @@ function richList(file, S) {
     const x = S.views.all.shares[i];
     if (x != null) v['top-' + n] = x.toLocaleString(loc, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   });
+  // change of the top 10 / top 100 share over a week, a month and a year, in percentage points
+  for (const days of [7, 30, 365]) {
+    const d = S.views.all.deltas && S.views.all.deltas[days];
+    if (!d) continue;
+    [10, 100].forEach((n) => {
+      const x = d.pp[S.tops.indexOf(n)];
+      if (x != null) v[`d-${days}-${n}`] = x.toLocaleString(loc, { minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: 'exceptZero' });
+    });
+  }
   let block = html.slice(a, b);
   block = block.replace(/(<span data-v="([a-z0-9-]+)">)[^<]*(<\/span>)/g, (m, open, k, close) => (k in v ? open + esc(v[k]) + close : m));
   fs.writeFileSync(file, html.slice(0, a) + block + html.slice(b));
