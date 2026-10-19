@@ -781,3 +781,6 @@ footer.site-foot .correction a:hover { background: var(--accent); color: var(--p
   .foot-nav div:last-child:nth-child(odd) .foot-h { flex-basis: 100%; }
   .foot-nav a { padding-block: 3px; }
 }
+
+/* Home H1: the question, then the catchy answer that tells PEP apart from PEPE */
+.h1-sub { display: block; margin-top: 0.3em; font-size: 0.5em; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; color: var(--accent-deep); }
