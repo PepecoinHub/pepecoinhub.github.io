@@ -247,15 +247,21 @@
   }
 
   // Background: soft drifting light everywhere (CSS), plus a few faint rising P coins on the home and games pages.
+  // The coins rise only in the empty side margins: anywhere else they slip in and out behind the cards and look
+  // like glitches, so narrow screens (phones, small laptops) get none.
   function bgLayer() {
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (!document.querySelector('.home-hero') && !/\/games\//.test(location.pathname)) return;
     if (document.querySelector('.mn')) return;
+    var main = document.getElementById('main');
+    var gutter = main ? Math.floor(main.getBoundingClientRect().left) : 0;
+    if (gutter < 64) return;
     var l = document.createElement('div'); l.className = 'bg-coins'; l.setAttribute('aria-hidden', 'true');
-    for (var i = 0; i < 12; i++) {
-      var c = document.createElement('i'), s = 14 + Math.random() * 18;
-      c.style.cssText = 'left:' + (Math.random() * 100).toFixed(1) + '%;width:' + s.toFixed(0) + 'px;height:' + s.toFixed(0) + 'px;'
-        + 'animation-duration:' + (28 + Math.random() * 24).toFixed(0) + 's;animation-delay:-' + (Math.random() * 50).toFixed(0) + 's';
+    for (var i = 0; i < 10; i++) {
+      var c = document.createElement('i'), s = Math.round(16 + Math.random() * Math.min(18, gutter - 48));
+      var x = Math.round(12 + Math.random() * (gutter - s - 24));
+      c.style.cssText = (i % 2 ? 'right:' : 'left:') + x + 'px;width:' + s + 'px;height:' + s + 'px;'
+        + 'animation-duration:' + (30 + Math.random() * 24).toFixed(0) + 's;animation-delay:-' + (Math.random() * 54).toFixed(0) + 's';
       l.appendChild(c);
     }
     document.body.insertBefore(l, document.body.firstChild);

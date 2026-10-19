@@ -654,9 +654,15 @@ body::before {
 .bg-coins { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 .bg-coins i {
   position: absolute; bottom: -40px; border-radius: 50%; background: url(assets/brand/coin-p.svg) center / contain no-repeat;
-  opacity: 0.1; animation: bgrise linear infinite;
+  opacity: 0; animation: bgrise linear infinite;
 }
-@keyframes bgrise { to { transform: translateY(-115vh) rotate(180deg); } }
+/* A gentle sway instead of a half turn, so the P never ends up upside down; fade in and out at the ends */
+@keyframes bgrise {
+  0% { transform: translateY(0) rotate(-12deg); opacity: 0; }
+  12%, 85% { opacity: 0.12; }
+  50% { transform: translateY(-57vh) rotate(12deg); }
+  100% { transform: translateY(-115vh) rotate(-12deg); opacity: 0; }
+}
 @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
 @media (max-width: 430px) {
   .site-head .brand-hub-link .lockup { height: 30px; width: auto; }

@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261019a">
+<link rel="stylesheet" href="../facts.css?v=20261019b">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/fr/"}, {"@type": "ListItem", "position": 2, "name": "Prix", "item": "https://pepecoinhub.com/fr/price.html"}]}</script>
 <style>
@@ -62,6 +62,7 @@
 .pseg button { font: 600 0.88rem var(--f-body); color: var(--muted); background: transparent; border: 0; border-radius: 9px; padding: 7px 12px; min-height: 36px; cursor: pointer; }
 .pseg button:hover { color: var(--ink); }
 .pseg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+@media (max-width: 480px) { .pseg { display: flex; flex-wrap: nowrap; width: 100%; } .pseg button { flex: 1 1 auto; padding: 7px 4px; font-size: 0.82rem; white-space: nowrap; } }
 .toggle { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; padding: 6px 12px; min-height: 40px; border: 1px solid var(--rule); border-radius: 999px; background: var(--paper); }
 .toggle input { width: 18px; height: 18px; accent-color: var(--gold); }
 .chart-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; font-size: 0.9rem; }
@@ -107,7 +108,8 @@
 .xcard h4 { margin: 6px 0 0; font-family: var(--f-mono); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .xcard dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .xcard dt { font-size: 0.8rem; color: var(--muted); }
-.xcard dd { margin: 0; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.xcard dd { margin: 0; font-size: clamp(1.25rem, 3.2vw, 1.5rem); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+@media (max-width: 560px) { .xcard dl { grid-template-columns: 1fr; } }
 .xrank { font-weight: 700; font-size: 1.05rem; }
 .xrank:empty, .xnote:empty { display: none; }
 .xnote { font-size: 0.98rem; }
@@ -216,7 +218,7 @@
   <div class="xvs" aria-live="polite">
     <div class="xcard">
       <h3>Pepecoin (PEP)</h3>
-      <dl><div><dt>Prix à ce multiple</dt><dd id="x-pep-price">/bin/bash.008947</dd></div><div><dt>Capitalisation nécessaire</dt><dd id="x-pep-cap">21M</dd></div></dl>
+      <dl><div><dt>Prix à ce multiple</dt><dd id="x-pep-price">0,008947 $US</dd></div><div><dt>Capitalisation nécessaire</dt><dd id="x-pep-cap">921 M $US</dd></div></dl>
       <p class="xrank" id="x-pep-rank"></p>
       <p class="xnote" id="x-pep-note"></p>
       <h4 id="lad-pep-h">À côté d’autres cryptos</h4>
@@ -224,7 +226,7 @@
     </div>
     <div class="xcard pepe">
       <h3>Pepe (PEPE)</h3>
-      <dl><div><dt>Prix à ce multiple</dt><dd id="x-pepe-price">/bin/bash.0003864</dd></div><div><dt>Capitalisation nécessaire</dt><dd id="x-pepe-cap">60B</dd></div></dl>
+      <dl><div><dt>Prix à ce multiple</dt><dd id="x-pepe-price">0,0003864 $US</dd></div><div><dt>Capitalisation nécessaire</dt><dd id="x-pepe-cap">160 Md $US</dd></div></dl>
       <p class="xrank" id="x-pepe-rank"></p>
       <p class="xnote" id="x-pepe-note"></p>
       <h4 id="lad-pepe-h">À côté de cryptos et d’entreprises</h4>
@@ -307,6 +309,6 @@
 </footer>
 <script src="../live.js?v=20261012d" defer></script>
 <script src="../price.js?v=20261018c" defer></script>
-<script src="../chrome.js?v=20261019a" defer></script>
+<script src="../chrome.js?v=20261019b" defer></script>
 </body>
 </html>
