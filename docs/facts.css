@@ -677,3 +677,4 @@ body::before {
   .head-start { padding: 0 8px; height: 38px; }
   .head-games { width: 38px; height: 38px; }
 }
+@media (max-width: 340px) { .head-start b { display: none; } }
