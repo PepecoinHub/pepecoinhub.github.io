@@ -159,6 +159,7 @@
     nav.appendChild(box);
     groupNav(nav);
     footNav(nav);
+    linkHosts();
     linkFold();
     backToTop();
     bgLayer();
@@ -273,6 +274,15 @@
     var fine = document.createElement('div'); fine.className = 'foot-fine';
     while (foot.firstChild) fine.appendChild(foot.firstChild);
     foot.appendChild(top); foot.appendChild(fine);
+  }
+
+  // Link lists: show the real domain each link opens, so it can be checked before clicking.
+  function linkHosts() {
+    document.querySelectorAll('.linkgroup li > a[href^="http"]').forEach(function (a) {
+      if (a.parentNode.querySelector('.lg-host')) return;
+      var h = document.createElement('span'); h.className = 'lg-host'; h.textContent = a.hostname.replace(/^www\./, '');
+      a.insertAdjacentElement('afterend', h);
+    });
   }
 
   // Home page links: on a phone each group folds to its heading (with the number of links), except "Official".
