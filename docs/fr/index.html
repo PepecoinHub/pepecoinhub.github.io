@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261020a">
+<link rel="stylesheet" href="../facts.css?v=20261020b">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Pepecoin Hub", "url": "https://pepecoinhub.com/fr/", "description": "Pages d’information communautaires sur Pepecoin (PEP).", "inLanguage": "fr"}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -71,7 +71,7 @@
 </section>
 <section class="hpanel" id="panel-buy" aria-labelledby="buy-h" hidden>
   <h2 id="buy-h">Acheter du PEP en quatre étapes</h2>
-  <ol class="hsteps"><li><span class="hstep-n">Étape 1</span><h3>Choisir un marché</h3><p>Une plateforme ou un service de swap qui liste Pepecoin (PEP), pas PEPE.</p></li><li><span class="hstep-n">Étape 2</span><h3>Alimenter votre compte et acheter</h3><p>Déposez des USD, des EUR ou des USDT, puis achetez sur le marché PEP.</p></li><li><span class="hstep-n">Étape 3</span><h3>Retirer vers votre propre portefeuille</h3><p>Choisissez le réseau Pepecoin. Votre adresse commence par P.</p></li><li><span class="hstep-n">Étape 4</span><h3>Vérifier dans un explorateur de blocs</h3><p>Collez l’adresse dans PepeBlocks. Un nouveau bloc arrive environ chaque minute.</p></li></ol>
+  <ol class="hsteps"><li><span class="hstep-n">Étape 1</span><h3>Ouvrir un compte sur Kraken</h3><p>Achetez sur le marché <a href="https://www.kraken.com/prices/pepecoin-network">PEP/USD</a> ou PEP/EUR. PEP, c’est Pepecoin avec sa propre blockchain, pas PEPE.</p></li><li><span class="hstep-n">Étape 2</span><h3>Retirer vers votre propre portefeuille</h3><p>Après l’achat, envoyez vos PEP vers votre propre <a href="wallets.html">portefeuille</a> (l’adresse commence par P) et gardez-les en sécurité.</p></li><li><span class="hstep-n">Étape 3</span><h3>Une Tangem, si vous voulez</h3><p>Une carte matérielle qui garde les PEP hors ligne. Pepecoin vend sa propre édition Tangem dans sa <a href="https://shop.pepecoin.com/products/pepecoin-co-branded-tangem-wallet-2025-edition">boutique</a>.</p></li><li><span class="hstep-n">Étape 4</span><h3>HODL et passez dire bonjour</h3><p>Gardez sans stress et passez sur <a href="https://reddit.com/r/pepecoin">r/pepecoin</a> ou le <a href="https://pepecoin.com/discord">Discord</a>.</p></li></ol>
   <p class="pep-id-more">Toutes les plateformes, conseils de retrait et questions fréquentes : <a href="buy.html">Comment acheter du PEP →</a></p>
 </section>
 <section class="hpanel" id="panel-mine" aria-labelledby="mine-h" hidden>
@@ -82,8 +82,8 @@
 
 <section class="home-stats" aria-label="L’essentiel">
   <div class="stats">
-    <div class="stat"><span class="label">Prix</span><span class="value" data-v="home-price">0,0000895 $</span><span class="sub">24h: <span data-v="home-change">+0,51%</span></span><span class="src">Source : <a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko</a> · <a href="price.html">graphique</a></span></div>
-    <div class="stat"><span class="label">Capitalisation</span><span class="value" data-v="home-mcap">9,21 M $</span><span class="sub">à ×100 : <span data-v="home-x100">921 M $</span></span><span class="src">Simple calcul, pas une prévision. <a href="price.html#x100">Calculer ×N</a></span></div>
+    <div class="stat is-live"><span class="label">Prix</span><span class="value" data-v="home-price">0,0000895 $</span><span class="sub">24h: <span data-v="home-change">+0,51%</span></span><span class="src">Source : <a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko</a> · <a href="price.html">graphique</a></span></div>
+    <div class="stat"><span class="label">Capitalisation</span><span class="value" data-v="home-mcap">9,21 M $</span><span class="sub">à ×100 : <span data-v="home-x100">921 M $</span><span class="x100-rank" hidden>soit le rang #<span data-v="home-x100-rank">–</span> en crypto</span></span><span class="src">Simple calcul, pas une prévision. <a href="price.html#x100">Calculer ×N</a></span></div>
     <div class="stat"><span class="label">Hashrate</span><span class="value" data-v="home-hash">2,38 PH/s</span><span class="sub">Scrypt, 10 000 PEP par bloc</span><span class="src">Source : <a href="https://pepeblocks.com/">PepeBlocks</a>, <span data-v="home-hash-date">19 oct. 2026</span></span></div>
     <div class="stat"><span class="label">Allocation initiale</span><span class="value">0 %</span><span class="sub">ni premine, ni ICO</span><span class="src">Source : <a href="https://pepecoin.com/mica-whitepaper.xhtml">Whitepaper MiCA</a> (D.9, G.5)</span></div>
   </div>
@@ -246,7 +246,7 @@
   <p class="correction">Vous avez repéré une erreur ? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Signalez une correction</a> (avec une source) sur GitHub.</p>
   <details class="support"><summary>Ce site vous plaît ? Vous pouvez soutenir son développement.</summary><p>Chaque contribution, même modeste, est la bienvenue. Merci !</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
-<script src="../home.js?v=20261019a" defer></script>
+<script src="../home.js?v=20261020b" defer></script>
 <script src="../chrome.js?v=20261020a" defer></script>
 </body>
 </html>

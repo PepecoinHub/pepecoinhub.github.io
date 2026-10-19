@@ -146,15 +146,25 @@ async function priceNow() {
   const file = path.join(DOCS, 'data', 'price.json');
   let saved = null;
   try { saved = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { /* no saved price yet */ }
-  try {
-    const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=pepecoin-network', { signal: AbortSignal.timeout(15000) });
+  const get = async (q) => {
+    const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&' + q, { signal: AbortSignal.timeout(15000) });
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    const a = (await r.json())[0];
+    return r.json();
+  };
+  try {
+    const a = (await get('ids=pepecoin-network'))[0];
     if (!a || !(a.current_price > 0)) throw new Error('no PEP price');
+    // market caps of the top 250 coins, for "×100 would be #N in crypto"; keep yesterday's list if this fails
+    let caps = saved && saved.top_caps;
+    try {
+      const top = (await get('order=market_cap_desc&per_page=250&page=1')).filter((c) => c.id !== 'pepecoin-network' && c.market_cap > 0);
+      if (top.length > 100) caps = top.map((c) => Math.round(c.market_cap)).sort((x, y) => y - x);
+    } catch (e) { console.error('top 250 not fetched:', e.message); }
     const p = { schema: 1, date: new Date().toISOString().slice(0, 10), price_usd: a.current_price,
       change_24h: typeof a.price_change_percentage_24h === 'number' ? a.price_change_percentage_24h : null,
       supply: a.total_supply || a.circulating_supply || (saved && saved.supply), source: 'https://api.coingecko.com/api/v3/coins/markets' };
-    fs.writeFileSync(file, JSON.stringify(p, null, 1) + '\n');
+    if (caps) p.top_caps = caps;
+    fs.writeFileSync(file, JSON.stringify(p) + '\n');
     return p;
   } catch (e) {
     console.error('price not fetched, using the saved one:', e.message);
@@ -177,11 +187,17 @@ function home(file, S, mining, price) {
     if (price.supply > 0) {
       v['home-mcap'] = usd(price.price_usd * price.supply, loc);
       v['home-x100'] = usd(price.price_usd * price.supply * 100, loc);
+      const caps = price.top_caps || [];
+      if (caps.length > 100) {
+        const x = price.price_usd * price.supply * 100;
+        v['home-x100-rank'] = x < caps[caps.length - 1] ? caps.length + '+' : String(1 + caps.filter((c) => c > x).length);
+      }
     }
   }
   let n = 0;
   html = html.replace(/(<span\b[^>]*\bdata-v="(home-[a-z0-9-]+)"[^>]*>)[^<]*(<\/span>)/g, (m, open, k, close) => (k in v ? (n++, open + esc(v[k]) + close) : m));
   if (!n) throw new Error('no home-… spans found');
+  if ('home-x100-rank' in v) html = html.replace('<span class="x100-rank" hidden>', '<span class="x100-rank">');
   fs.writeFileSync(file, html);
 }
 

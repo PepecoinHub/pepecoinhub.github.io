@@ -7,6 +7,19 @@
   var lang = (document.documentElement.lang || 'en').toLowerCase();
   var LOC = LOCALE[lang.indexOf('zh') === 0 ? 'zh' : lang.split('-')[0]] || 'en-US';
 
+  var me = document.currentScript && document.currentScript.src;
+
+  // ---------- hero coin ----------
+  // The frog coin turns over to its P side now and then (CSS in facts.css); a still frog with reduced motion.
+  var frog = document.querySelector('.home-hero-frog');
+  if (frog && me && window.matchMedia && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var coin = document.createElement('div'), spin = document.createElement('div'), back = document.createElement('img'), edge = document.createElement('i');
+    coin.className = 'hero-coin'; spin.className = 'hero-coin-spin'; edge.className = 'hero-coin-edge';
+    back.className = 'hero-coin-back'; back.alt = ''; back.src = new URL('assets/brand/coin-p.svg', me).href;
+    frog.parentNode.insertBefore(coin, frog);
+    coin.appendChild(spin); spin.appendChild(edge); spin.appendChild(frog); spin.appendChild(back);
+  }
+
   // ---------- tabs ----------
   var bar = document.querySelector('.hero-tabs');
   var tabs = bar ? Array.prototype.slice.call(bar.querySelectorAll('a[data-panel]')) : [];
@@ -48,6 +61,7 @@
   }
 
   // ---------- live price tiles ----------
+  // Refreshed on load and every 10 minutes while the tab is open (CoinGecko's free API asks for no more).
   var API = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=pepecoin-network';
   var TTL = 10 * 60 * 1000;
   function usd(v) {
@@ -62,23 +76,42 @@
   function fresh(key) {
     try { var o = JSON.parse(localStorage.getItem(key) || 'null'); return o && Date.now() - o.t < TTL ? o.d : null; } catch (e) { return null; }
   }
+  var caps = null, last = null;
   function show(a) {
     if (!a || !(a.current_price > 0)) return;
+    last = a;
     var supply = a.total_supply || a.circulating_supply;
     set('home-price', usd(a.current_price));
     if (typeof a.price_change_percentage_24h === 'number') set('home-change', pct(a.price_change_percentage_24h));
-    if (supply > 0) { set('home-mcap', usd(a.current_price * supply)); set('home-x100', usd(a.current_price * supply * 100)); }
+    if (!(supply > 0)) return;
+    var x = a.current_price * supply * 100;
+    set('home-mcap', usd(a.current_price * supply)); set('home-x100', usd(x));
+    // where ×100 would rank among the top 250 coins (their market caps are saved daily in data/price.json)
+    var box = document.querySelector('.x100-rank');
+    if (box && caps && caps.length > 100) {
+      set('home-x100-rank', x < caps[caps.length - 1] ? caps.length + '+' : String(1 + caps.filter(function (c) { return c > x; }).length));
+      box.hidden = false;
+    }
+  }
+  function load() {
+    var cached = fresh('pf-price-markets-v3');   // the price page keeps a list of coins under this key; reuse it while it is fresh
+    cached = cached && cached.filter(function (c) { return c.id === 'pepecoin-network' && !c.top; })[0] || fresh('pf-home-v1');
+    if (cached) { show(cached); return; }
+    fetch(API).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (list) {
+      var a = list && list[0];
+      if (!a) return;
+      var d = { current_price: a.current_price, total_supply: a.total_supply, circulating_supply: a.circulating_supply, price_change_percentage_24h: a.price_change_percentage_24h };
+      try { localStorage.setItem('pf-home-v1', JSON.stringify({ t: Date.now(), d: d })); } catch (e) { /* storage unavailable */ }
+      show(d);
+    }).catch(function () { /* keep the figures already shown */ });
   }
   if (!document.querySelector('[data-v="home-price"]')) return;
-  // the price page keeps a list of coins under this key; reuse it while it is fresh
-  var cached = fresh('pf-price-markets-v3');
-  cached = cached && cached.filter(function (c) { return c.id === 'pepecoin-network' && !c.top; })[0] || fresh('pf-home-v1');
-  if (cached) { show(cached); return; }
-  fetch(API).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (list) {
-    var a = list && list[0];
-    if (!a) return;
-    var d = { current_price: a.current_price, total_supply: a.total_supply, circulating_supply: a.circulating_supply, price_change_percentage_24h: a.price_change_percentage_24h };
-    try { localStorage.setItem('pf-home-v1', JSON.stringify({ t: Date.now(), d: d })); } catch (e) { /* storage unavailable */ }
-    show(d);
-  }).catch(function () { /* keep the baked figures */ });
+  load();
+  if (me) {
+    fetch(new URL('data/price.json', me)).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.top_caps) { caps = j.top_caps; if (last) show(last); }
+    }).catch(function () { /* no ranking then */ });
+  }
+  setInterval(function () { if (!document.hidden) load(); }, TTL);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
 })();
