@@ -32,7 +32,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261019f">
+<link rel="stylesheet" href="../facts.css?v=20261020a">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Pepecoin Hub", "url": "https://pepecoinhub.com/pl/", "description": "Fakty o Pepecoinie (PEP) zebrane przez społeczność.", "inLanguage": "pl"}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -47,12 +47,12 @@
 <main class="wrap" id="main">
 <header class="page-head home-hero">
   <div class="home-hero-copy">
-    <p class="eyebrow">Strony z faktami od społeczności · <span class="eyebrow-date">aktualizacja: 12 października 2026</span></p>
+    <p class="eyebrow">Strony z faktami od społeczności · <span class="eyebrow-date">aktualizacja: <span data-v="home-date">19 października 2026</span></span></p>
   <h1>Czym jest Pepecoin (PEP)? <span class="h1-sub">To nie Pepe. Żaba z własnym blockchainem.</span></h1>
   <p class="lede">Pepecoin (PEP) to moneta z własnym blockchainem, oparta na proof of work (sieć zabezpiecza praca obliczeniowa górników). <a href="mining.html">Kopie się ją razem z Litecoinem i Dogecoinem</a>. Na tych stronach znajdziesz liczby wraz z informacją, skąd pochodzi każda z nich.</p>
   <p class="pledge honest"><span><strong>Uczciwie, bez ściemy.</strong> Każda liczba ma link do źródła. Nie ufaj mi na słowo, sprawdź sam. DYOR.</span></p>
   <p class="pledge soon"><img src="../assets/new-games.webp" alt="" width="64" height="64"><span><strong>Nowość: PEP Games.</strong> Kalambury, Pepe Miner i czat dla społeczności. <a href="../games/">Zajrzyj →</a></span></p>
-  <p class="ctas"><a class="btn main" href="which-pepecoin.html">PEP vs PEPE</a><a class="btn soft" href="buy.html">Jak kupić PEP</a><a class="btn soft" href="mining.html">Jak kopać PEP</a></p>
+  <p class="ctas hero-tabs"><a class="btn main" id="tab-pep" data-panel="panel-pep" href="which-pepecoin.html">PEP vs PEPE</a><a class="btn soft" id="tab-buy" data-panel="panel-buy" href="buy.html">Jak kupić PEP</a><a class="btn soft" id="tab-mine" data-panel="panel-mine" href="mining.html">Jak kopać PEP</a></p>
   </div>
   <div class="home-hero-visual">
     <div class="home-hero-glow" aria-hidden="true"></div>
@@ -60,17 +60,7 @@
   </div>
 </header>
 
-<section aria-label="Kluczowe fakty">
-  <div class="stats">
-    <div class="stat"><span class="label">Start</span><span class="value">30 sty 2024</span><span class="sub">własny blockchain warstwy 1</span><span class="src">Źródło: <a href="network.html">dane sieci</a></span></div>
-    <div class="stat"><span class="label">Kopanie</span><span class="value">Scrypt PoW</span><span class="sub">kopany razem z LTC i DOGE</span><span class="src">Źródło: <a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp</a></span></div>
-    <div class="stat"><span class="label">Przydział na starcie</span><span class="value">0%</span><span class="sub">bez premine, bez ICO</span><span class="src">Źródło: <a href="https://pepecoin.com/mica-whitepaper.xhtml">Whitepaper MiCA</a> (D.9, G.5)</span></div>
-    <div class="stat"><span class="label">Nagroda za blok</span><span class="value">10 000 PEP</span><span class="sub">mniej więcej co 60 sekund</span><span class="src">Źródło: <a href="https://pepecoin.com/mica-whitepaper.xhtml">Whitepaper MiCA</a> (G.13)</span></div>
-  </div>
-</section>
-
-
-<section class="pep-id" aria-labelledby="pep-id-h">
+<section class="pep-id hpanel" id="panel-pep" aria-labelledby="pep-id-h">
   <h2 id="pep-id-h">PEP to nie PEPE</h2>
   <p class="note">Pepecoin (PEP) działa na własnym blockchainie i jest kopany razem z Litecoinem i Dogecoinem (merged mining). To coś innego niż Pepe (PEPE), token na Ethereum z 2023 roku, i PepeCoin (PEPECOIN), projekt z 2016 roku, który w 2023 roku przeniósł się na Ethereum.</p>
   <ul class="pep-id-list">
@@ -79,6 +69,25 @@
     <li><b>PEPECOIN</b><span>PepeCoin</span><span>token ERC-20 na Ethereum</span></li>
   </ul>
   <p class="pep-id-more"><a href="which-pepecoin.html">Jak je odróżnić →</a></p>
+</section>
+<section class="hpanel" id="panel-buy" aria-labelledby="buy-h" hidden>
+  <h2 id="buy-h">Jak kupić PEP w 4 krokach</h2>
+  <ol class="hsteps"><li><span class="hstep-n">Krok 1</span><h3>Wybierz rynek</h3><p>Giełda albo kantor, który ma Pepecoin (PEP), a nie PEPE.</p></li><li><span class="hstep-n">Krok 2</span><h3>Zasil konto i kup</h3><p>Wpłać USD, EUR albo USDT i kup na rynku PEP.</p></li><li><span class="hstep-n">Krok 3</span><h3>Wypłać do własnego portfela</h3><p>Wybierz sieć Pepecoin. Twój adres zaczyna się na P.</p></li><li><span class="hstep-n">Krok 4</span><h3>Sprawdź w eksploratorze bloków</h3><p>Wklej adres w PepeBlocks. Nowy blok pojawia się mniej więcej co minutę.</p></li></ol>
+  <p class="pep-id-more">Wszystkie giełdy, wskazówki do wypłat i częste pytania: <a href="buy.html">Jak kupić PEP →</a></p>
+</section>
+<section class="hpanel" id="panel-mine" aria-labelledby="mine-h" hidden>
+  <h2 id="mine-h">Jak kopać PEP w 4 krokach</h2>
+  <ol class="hsteps"><li><span class="hstep-n">Krok 1</span><h3>Weź ASIC Scrypt</h3><p>Te same maszyny, które kopią Litecoina i Dogecoina, np. Antminer L9.</p></li><li><span class="hstep-n">Krok 2</span><h3>Dołącz do mining pool z merge mining PEP</h3><p>ViaBTC, F2Pool, Binance Pool i inne płacą PEP oprócz LTC i DOGE.</p></li><li><span class="hstep-n">Krok 3</span><h3>Dodaj adres wypłaty PEP</h3><p>Adres zaczynający się na P. Adres Ethereum (0x…) nie zadziała.</p></li><li><span class="hstep-n">Krok 4</span><h3>Skieruj minera na pulę</h3><p>Użyj adresu Scrypt puli. PEP przychodzi razem z LTC i DOGE.</p></li></ol>
+  <p class="pep-id-more">Mining poole, sprzęt, kopanie na laptopie i kalkulator zarobków: <a href="mining.html">Jak kopać PEP →</a></p>
+</section>
+
+<section class="home-stats" aria-label="Kluczowe fakty">
+  <div class="stats">
+    <div class="stat"><span class="label">Cena</span><span class="value" data-v="home-price">0,0000895 $</span><span class="sub">24h: <span data-v="home-change">+0,51%</span></span><span class="src">Źródło: <a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko</a> · <a href="price.html">wykres</a></span></div>
+    <div class="stat"><span class="label">Kapitalizacja</span><span class="value" data-v="home-mcap">9,21 mln $</span><span class="sub">przy ×100: <span data-v="home-x100">921 mln $</span></span><span class="src">Zwykła arytmetyka, nie prognoza. <a href="price.html#x100">Policz ×N</a></span></div>
+    <div class="stat"><span class="label">Hashrate</span><span class="value" data-v="home-hash">2,38 PH/s</span><span class="sub">Scrypt, 10 000 PEP za blok</span><span class="src">Źródło: <a href="https://pepeblocks.com/">PepeBlocks</a>, <span data-v="home-hash-date">19 paź 2026</span></span></div>
+    <div class="stat"><span class="label">Przydział na starcie</span><span class="value">0%</span><span class="sub">bez premine, bez ICO</span><span class="src">Źródło: <a href="https://pepecoin.com/mica-whitepaper.xhtml">Whitepaper MiCA</a> (D.9, G.5)</span></div>
+  </div>
 </section>
 
 <section aria-labelledby="about-pep">
@@ -238,6 +247,7 @@
   <p class="correction">Widzisz błąd? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Zgłoś poprawkę</a> (ze źródłem) na GitHubie.</p>
   <details class="support"><summary>Podoba Ci się ta strona? Możesz wesprzeć jej dalszy rozwój.</summary><p>Każda, nawet drobna kwota pomaga. Dziękuję!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
 </footer>
-<script src="../chrome.js?v=20261019e" defer></script>
+<script src="../home.js?v=20261019a" defer></script>
+<script src="../chrome.js?v=20261020a" defer></script>
 </body>
 </html>

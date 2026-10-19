@@ -6,6 +6,9 @@
 // and the real data/network.json, so every number is formatted exactly as the browser formats it.
 // rich-list.html (and */rich-list.html): <span data-v="…"> values between the static-summary
 // markers are filled from data/summary.json in the page's language. app.js redraws both pages.
+// index.html (and */index.html): the "updated" date, the PEP price tiles and the hashrate tile
+// (data-v="home-…"). The price is fetched from CoinGecko and kept in data/price.json, so a failed
+// fetch falls back to the last saved price; home.js updates the price tiles live in the browser.
 //
 // Run after build_summary.py: node scripts/prebake.mjs
 import fs from 'node:fs';
@@ -125,6 +128,63 @@ function richList(file, S) {
   fs.writeFileSync(file, html.slice(0, a) + block + html.slice(b));
 }
 
+// Same formatting as home.js: a plain "$" and three significant digits, so the figures fit the tiles.
+function usd(v, loc) {
+  const o = { style: 'currency', currency: 'USD', currencyDisplay: 'narrowSymbol' };
+  if (v >= 1e5) { o.notation = 'compact'; o.maximumSignificantDigits = 3; }
+  else if (v >= 1) o.maximumFractionDigits = 2;
+  else o.maximumSignificantDigits = 3;
+  return new Intl.NumberFormat(loc, o).format(v);
+}
+const pct = (v, loc) => new Intl.NumberFormat(loc, { maximumFractionDigits: Math.abs(v) < 10 ? 2 : 1, signDisplay: 'exceptZero' }).format(v) + '%';
+function hashrate(hs, loc) {
+  const u = [[1e18, 'EH/s'], [1e15, 'PH/s'], [1e12, 'TH/s'], [1e9, 'GH/s']].find(([d]) => hs >= d) || [1e6, 'MH/s'];
+  return (hs / u[0]).toLocaleString(loc, { maximumFractionDigits: 2 }) + ' ' + u[1];
+}
+
+async function priceNow() {
+  const file = path.join(DOCS, 'data', 'price.json');
+  let saved = null;
+  try { saved = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { /* no saved price yet */ }
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=pepecoin-network', { signal: AbortSignal.timeout(15000) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const a = (await r.json())[0];
+    if (!a || !(a.current_price > 0)) throw new Error('no PEP price');
+    const p = { schema: 1, date: new Date().toISOString().slice(0, 10), price_usd: a.current_price,
+      change_24h: typeof a.price_change_percentage_24h === 'number' ? a.price_change_percentage_24h : null,
+      supply: a.total_supply || a.circulating_supply || (saved && saved.supply), source: 'https://api.coingecko.com/api/v3/coins/markets' };
+    fs.writeFileSync(file, JSON.stringify(p, null, 1) + '\n');
+    return p;
+  } catch (e) {
+    console.error('price not fetched, using the saved one:', e.message);
+    return saved;
+  }
+}
+
+function home(file, S, mining, price) {
+  let html = fs.readFileSync(file, 'utf8');
+  const loc = LOCALE[langOf(html)] || 'en-US';
+  const day = (d, month) => new Date(d + 'T00:00:00Z').toLocaleDateString(loc, { month, day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  const v = { 'home-date': day(S.latest.date, 'long') };
+  if (mining && mining.hashrate_hs > 0) {
+    v['home-hash'] = hashrate(mining.hashrate_hs, loc);
+    v['home-hash-date'] = day(mining.date, 'short');
+  }
+  if (price && price.price_usd > 0) {
+    v['home-price'] = usd(price.price_usd, loc);
+    if (price.change_24h != null) v['home-change'] = pct(price.change_24h, loc);
+    if (price.supply > 0) {
+      v['home-mcap'] = usd(price.price_usd * price.supply, loc);
+      v['home-x100'] = usd(price.price_usd * price.supply * 100, loc);
+    }
+  }
+  let n = 0;
+  html = html.replace(/(<span\b[^>]*\bdata-v="(home-[a-z0-9-]+)"[^>]*>)[^<]*(<\/span>)/g, (m, open, k, close) => (k in v ? (n++, open + esc(v[k]) + close) : m));
+  if (!n) throw new Error('no home-… spans found');
+  fs.writeFileSync(file, html);
+}
+
 const net = JSON.parse(fs.readFileSync(path.join(DOCS, 'data', 'network.json'), 'utf8'));
 const sum = JSON.parse(fs.readFileSync(path.join(DOCS, 'data', 'summary.json'), 'utf8'));
 let failed = 0;
@@ -134,6 +194,13 @@ for (const f of pages('network.html')) {
 }
 for (const f of pages('rich-list.html')) {
   try { richList(f, sum); console.log('numbers baked into', path.relative(DOCS, f)); }
+  catch (e) { failed++; console.error(`${path.relative(DOCS, f)} skipped: ${e.message}`); }
+}
+let mining = null;
+try { mining = JSON.parse(fs.readFileSync(path.join(DOCS, 'data', 'mining.json'), 'utf8')); } catch (e) { console.error('no mining.json:', e.message); }
+const price = await priceNow();
+for (const f of pages('index.html')) {
+  try { home(f, sum, mining, price); console.log('numbers baked into', path.relative(DOCS, f)); }
   catch (e) { failed++; console.error(`${path.relative(DOCS, f)} skipped: ${e.message}`); }
 }
 // a page that could not be updated keeps yesterday's numbers; never fail the daily job for it

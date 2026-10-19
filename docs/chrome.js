@@ -328,25 +328,50 @@
     window.addEventListener('scroll', check, { passive: true }); check();
   }
 
-  // Background: soft drifting light everywhere (CSS), plus a few faint rising P coins on the home and games pages.
-  // The coins rise only in the empty side margins: anywhere else they slip in and out behind the cards and look
-  // like glitches, so narrow screens (phones, small laptops) get none.
+  // Background: soft drifting light everywhere (CSS), plus faint P coins drifting across the whole page on the
+  // home and games pages that dodge the mouse pointer. Only with a mouse (a phone has no pointer to dodge)
+  // and never with reduced motion. The loop pauses by itself in a background tab (requestAnimationFrame).
   function bgLayer() {
-    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     if (!document.querySelector('.home-hero') && !/\/games\//.test(location.pathname)) return;
     if (document.querySelector('.mn')) return;
-    var main = document.getElementById('main');
-    var gutter = main ? Math.floor(main.getBoundingClientRect().left) : 0;
-    if (gutter < 64) return;
     var l = document.createElement('div'); l.className = 'bg-coins'; l.setAttribute('aria-hidden', 'true');
-    for (var i = 0; i < 10; i++) {
-      var c = document.createElement('i'), s = Math.round(16 + Math.random() * Math.min(18, gutter - 48));
-      var x = Math.round(12 + Math.random() * (gutter - s - 24));
-      c.style.cssText = (i % 2 ? 'right:' : 'left:') + x + 'px;width:' + s + 'px;height:' + s + 'px;'
-        + 'animation-duration:' + (30 + Math.random() * 24).toFixed(0) + 's;animation-delay:-' + (Math.random() * 54).toFixed(0) + 's';
-      l.appendChild(c);
+    var W = window.innerWidth, H = window.innerHeight, coins = [];
+    var n = Math.max(8, Math.min(16, Math.round(W * H / 90000)));
+    for (var i = 0; i < n; i++) {
+      var c = { el: document.createElement('i'), s: Math.round(18 + Math.random() * 18), x: Math.random() * W, y: Math.random() * H,
+        vx: 0, vy: 0, rise: 8 + Math.random() * 12, sway: 10 + Math.random() * 16, w: 0.25 + Math.random() * 0.3, ph: Math.random() * 6.3 };
+      c.el.style.cssText = 'width:' + c.s + 'px;height:' + c.s + 'px;opacity:' + (0.09 + Math.random() * 0.07).toFixed(2);
+      l.appendChild(c.el); coins.push(c);
     }
     document.body.insertBefore(l, document.body.firstChild);
+
+    var mx = -1e4, my = -1e4, R = 150, last = 0;
+    window.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse') { mx = e.clientX; my = e.clientY; } }, { passive: true });
+    document.addEventListener('mouseout', function (e) { if (!e.relatedTarget) { mx = my = -1e4; } });
+    window.addEventListener('resize', function () { W = window.innerWidth; H = window.innerHeight; });
+    function frame(t) {
+      var dt = Math.min(0.05, last ? (t - last) / 1000 : 0), sec = t / 1000, damp = Math.exp(-2.2 * dt);
+      last = t;
+      coins.forEach(function (c) {
+        var r = c.s / 2, dx = c.x + r - mx, dy = c.y + r - my, d2 = dx * dx + dy * dy;
+        if (d2 < R * R) {   // the closer the pointer, the harder the push away from it
+          var d = Math.sqrt(d2) || 1, f = (1 - d / R) * 2600 * dt;
+          c.vx += dx / d * f; c.vy += dy / d * f;
+        }
+        c.vx *= damp; c.vy *= damp;
+        c.x += (c.vx + Math.cos(sec * c.w + c.ph) * c.sway * c.w) * dt;
+        c.y += (c.vy - c.rise) * dt;
+        if (c.y < -c.s - 10) { c.y = H + 10; c.x = Math.random() * (W - c.s); }
+        else if (c.y > H + 10) c.y = -c.s - 10;
+        if (c.x < -c.s - 10) c.x = W + 10; else if (c.x > W + 10) c.x = -c.s - 10;
+        var tilt = Math.sin(sec * c.w + c.ph) * 12 + Math.max(-30, Math.min(30, c.vx * 0.08));
+        c.el.style.transform = 'translate3d(' + c.x.toFixed(1) + 'px,' + c.y.toFixed(1) + 'px,0) rotate(' + tilt.toFixed(1) + 'deg)';
+      });
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
   }
 
   // Copy buttons for the donation addresses in the footer.
