@@ -232,16 +232,28 @@
     head.insertBefore(tools, nav);
   }
 
-  // Footer: every page of the site in three short columns (the same links as the header menu),
-  // so a reader who scrolled to the end doesn't have to go back up to find the next page.
+  // Footer: the logo with the "community fact pages" line and the community links, then every page of the site
+  // in three short columns (the same links as the header menu), then the small print.
+  var SOCIAL = [['Reddit', 'https://reddit.com/r/pepecoin'], ['Discord', 'https://pepecoin.com/discord'], ['Telegram', 'https://t.me/PepecoinGroup'],
+    ['X', 'https://x.com/PepecoinNetwork'], ['GitHub', 'https://github.com/PepecoinHub/pepecoinhub.github.io']];
   function footNav(nav) {
     var foot = document.querySelector('footer.site-foot');
-    if (!foot || foot.querySelector('.foot-nav') || !nav.classList.contains('grouped')) return;
+    if (!foot || foot.querySelector('.foot-top') || !nav.classList.contains('grouped')) return;
     function label(a) {
       var c = a.cloneNode(true);
       c.querySelectorAll('.nav-ico, [aria-hidden="true"]').forEach(function (el) { el.remove(); });
       return c.textContent.trim();
     }
+    var top = document.createElement('div'); top.className = 'foot-top';
+    var brand = document.createElement('div'); brand.className = 'foot-brand';
+    var logo = document.querySelector('.site-head .brand-hub-link');
+    if (logo) { logo = logo.cloneNode(true); logo.classList.add('foot-logo'); brand.appendChild(logo); }
+    var intro = foot.querySelector(':scope > p');
+    if (intro) brand.appendChild(intro);
+    var soc = document.createElement('p'); soc.className = 'foot-social';
+    SOCIAL.forEach(function (x) { var a = document.createElement('a'); a.href = x[1]; a.textContent = x[0]; a.rel = 'noopener'; soc.appendChild(a); });
+    brand.appendChild(soc);
+    top.appendChild(brand);
     var box = document.createElement('nav'); box.className = 'foot-nav'; box.setAttribute('aria-label', t.menu);
     function col(title, links) {
       if (!links.length) return;
@@ -257,7 +269,10 @@
     col(t.start, q('.navgroup-start .navpanel a'));
     col(t.data, q('.navgroup-data .navpanel a'));
     col(t.more, q(':scope > a'));
-    foot.insertBefore(box, foot.firstChild);
+    top.appendChild(box);
+    var fine = document.createElement('div'); fine.className = 'foot-fine';
+    while (foot.firstChild) fine.appendChild(foot.firstChild);
+    foot.appendChild(top); foot.appendChild(fine);
   }
 
   // Home page links: on a phone each group folds to its heading (with the number of links), except "Official".
