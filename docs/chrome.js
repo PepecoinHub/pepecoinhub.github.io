@@ -217,19 +217,16 @@
     frag.appendChild(games);
     nav.insertBefore(frag, nav.firstChild);
     nav.classList.add('grouped');
-    // phone: Games button and ☰ in the header bar, the menu opens below it
+    // phone: "Start" and Games in the header bar; Start opens the whole menu below it, "Start here" group first
     var quick = games.cloneNode(true); quick.className = 'nav-games head-games'; quick.removeAttribute('aria-current');
-    var burger = document.createElement('button'); burger.type = 'button'; burger.className = 'navburger';
-    burger.setAttribute('aria-label', t.menu); burger.setAttribute('aria-expanded', 'false');
-    burger.innerHTML = '<svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true"><path d="M1 1h18M1 7h18M1 13h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-    function setMenu(open) { head.classList.toggle('menu-open', open); burger.setAttribute('aria-expanded', String(open)); }
-    burger.addEventListener('click', function () { setMenu(!head.classList.contains('menu-open')); });
     var tools = document.createElement('span'); tools.className = 'head-phone';
-    // phone: "Start here" sits next to Games and opens the menu, where that group comes first
     var qs = document.createElement('button'); qs.type = 'button'; qs.className = 'head-start';
-    qs.innerHTML = '<span aria-hidden="true">🚀</span> <b></b>'; qs.lastChild.textContent = t.startShort || t.start;
+    qs.setAttribute('aria-expanded', 'false'); qs.setAttribute('aria-label', t.menu);
+    qs.innerHTML = '<span aria-hidden="true">🚀</span> <b></b><svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+    qs.querySelector('b').textContent = t.startShort || t.start;
+    function setMenu(open) { head.classList.toggle('menu-open', open); qs.setAttribute('aria-expanded', String(open)); }
     qs.addEventListener('click', function () { setMenu(!head.classList.contains('menu-open')); });
-    tools.appendChild(qs); tools.appendChild(quick); tools.appendChild(burger);
+    tools.appendChild(qs); tools.appendChild(quick);
     head.insertBefore(tools, nav);
   }
 
