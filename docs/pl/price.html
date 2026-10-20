@@ -86,21 +86,29 @@
 .chart-tip { position: absolute; top: 8px; display: grid; gap: 2px; padding: 8px 10px; font-size: 0.84rem; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .chart-msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 16px; color: var(--muted); }
 .chart-msg[hidden] { display: none; }
-.xctl { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 18px 20px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
-.xhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.xhead .label, .xprice > span:first-child { font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-.xhead b { font-size: 2.6rem; line-height: 1; color: var(--accent-mid); font-variant-numeric: tabular-nums; }
-#x-range { width: 100%; min-width: 0; margin: 0; accent-color: var(--accent); min-height: 32px; }
-.xrow { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
+.xctl { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px 18px; padding: 12px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; }
+.xhead { display: grid; gap: 2px; min-width: 4.6em; }
+.xhead .label, .xprice > span:first-child { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); line-height: 1.25; }
+.xhead b { font-size: 1.9rem; line-height: 1; color: var(--accent-mid); font-variant-numeric: tabular-nums; }
+#x-range { width: 100%; min-width: 0; margin: 0; accent-color: var(--accent); min-height: 28px; }
+.xrow { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; }
 .xpre { display: flex; flex-wrap: wrap; gap: 6px; }
-.xpre button { font: 600 0.88rem var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: 4px 12px; min-height: 34px; cursor: pointer; }
+.xpre button { font: 600 0.84rem var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: 3px 11px; min-height: 32px; cursor: pointer; }
 .xpre button:hover { color: var(--ink); border-color: var(--accent); }
 .xpre button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
-.xprice { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; flex: 0 1 260px; min-width: 0; }
-.xin { display: flex; align-items: center; gap: 6px; padding: 0 12px; min-height: 44px; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
+.xprice { display: flex; align-items: center; gap: 10px; flex: 0 1 300px; min-width: 0; }
+.xprice > span:first-child { max-width: 10em; }
+.xin { flex: 1; display: flex; align-items: center; gap: 6px; padding: 0 12px; min-height: 38px; min-width: 7em; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; }
 .xin:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.xin input { flex: 1; width: 100%; min-width: 0; font: 700 1.1rem var(--f-body); color: var(--ink); background: transparent; border: 0; outline: none; }
-.xhint { font-size: 0.88rem; color: var(--muted); min-height: 1.4em; }
+.xin input { flex: 1; width: 100%; min-width: 0; font: 700 1.02rem var(--f-body); color: var(--ink); background: transparent; border: 0; outline: none; }
+.xhint { grid-column: 1 / -1; font-size: 0.86rem; color: var(--muted); }
+.xhint:empty { display: none; }
+@media (max-width: 600px) { .xprice { flex: 1 1 100%; } .xprice > span:first-child { max-width: 50%; } }
+@media (min-width: 1000px) {
+  .xctl { grid-template-columns: auto minmax(220px, 1fr) auto auto; }
+  .xprice { width: 270px; }
+  .xrow { display: contents; }
+}
 .xvs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
 .xcard { display: grid; gap: 10px; align-content: start; min-width: 0; padding: 18px; border-radius: 14px; border: 1px solid var(--rule); border-top: 5px solid var(--accent); background: var(--accent-soft); }
 .xcard.pepe { border-top-color: var(--gold); background: var(--gold-soft); }
