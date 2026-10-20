@@ -241,6 +241,8 @@
     if (!fromSlider) $('x-range').value = String(Math.round(Math.log10(state.mult) * 100));
     document.querySelectorAll('[data-mult]').forEach(function (b) { b.setAttribute('aria-pressed', String(Number(b.dataset.mult) === state.mult)); });
     renderLadder();
+    // the section title follows the slider: "Pepecoin ×200 vs Pepe ×200"
+    document.querySelectorAll('.x-h').forEach(function (el) { el.textContent = $('x-mult').textContent; });
   }
   function nice(m) {
     var p = Math.pow(10, Math.floor(Math.log10(m))), steps = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10];
