@@ -2,7 +2,8 @@ name: Daily snapshot
 
 on:
   schedule:
-    - cron: "17 3 * * *"          # every day at 03:17 UTC
+    - cron: "17 3 * * *"          # every day at 03:17 UTC: the rich list snapshot
+    - cron: "41 * * * *"          # every hour: republish with fresh prices (no snapshot)
   workflow_dispatch:               # the "Run workflow" button
   push:
     branches: [main]
@@ -42,7 +43,9 @@ jobs:
       - name: Take snapshot
         run: |
           today="$(date -u +%F)"
-          if [ "${{ github.event_name }}" = "push" ] && [ -f "docs/data/snapshots/${today}.json" ]; then
+          if [ "${{ github.event.schedule }}" = "41 * * * *" ]; then
+            echo "Hourly price run, no snapshot."
+          elif [ "${{ github.event_name }}" = "push" ] && [ -f "docs/data/snapshots/${today}.json" ]; then
             echo "Today's snapshot already exists, not taking another one on a push."
           else
             python scripts/snapshot.py || { echo "First attempt failed, retrying in 5 minutes"; sleep 300; python scripts/snapshot.py; }
@@ -95,7 +98,7 @@ jobs:
     needs: snapshot
     if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}   # still publish (old data) if the snapshot failed
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     permissions:
       contents: read
       pages: write
@@ -109,6 +112,12 @@ jobs:
           ref: ${{ github.ref_name }}   # tip of the branch, includes the snapshot commit from job 1
 
       - uses: actions/configure-pages@v5
+
+      # PEP and PEPE prices for the price page, published with the site but not committed
+      - name: Fetch prices
+        timeout-minutes: 8
+        continue-on-error: true
+        run: python3 scripts/fetch_prices.py
 
       - uses: actions/upload-pages-artifact@v3
         with:
