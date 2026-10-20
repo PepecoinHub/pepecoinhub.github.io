@@ -371,6 +371,15 @@
     try { var o = JSON.parse(localStorage.getItem(key) || 'null'); return o && (stale || Date.now() - o.t < TTL) ? o : null; } catch (e) { return null; }
   }
   function cacheSet(key, data) { try { localStorage.setItem(key, JSON.stringify({ t: Date.now(), d: data })); } catch (e) { /* storage unavailable */ } }
+  // data/price-live.json: the same CoinGecko data, fetched by the site's robot every hour (scripts/fetch_prices.py).
+  // Read it first, so a visitor normally sends no request to CoinGecko at all.
+  var FILE_MAX_AGE = 3 * 60 * 60 * 1000;
+  var BASE = (function () { var s = document.currentScript && document.currentScript.src; try { return new URL('.', s || location.href).href; } catch (e) { return ''; } })();
+  var fileP = fetch(BASE + 'data/price-live.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (f) {
+    if (!f || !f.generated_at) return null;
+    f.t = Date.parse(f.generated_at);
+    return Date.now() - f.t < FILE_MAX_AGE ? f : null;
+  }).catch(function () { return null; });
   function getJSON(url) { return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); }
   // CoinGecko's free API allows only a few requests a minute, so one download serves several ranges:
   // 7 days is cut from the 30-day series (hourly points), 90 days from the 1-year series (daily points).
@@ -381,8 +390,15 @@
     return d.filter(function (p) { return p[0] >= from; });
   }
   function download(id, src) {
-    var key = 'pf-chart-' + id + '-' + src, hit = cacheGet(key);
     if (state.series['src' + id + src]) return Promise.resolve(state.series['src' + id + src]);
+    return fileP.then(function (f) {
+      var d = f && f.series && f.series[id] && f.series[id][String(src)];
+      if (d && d.length) { state.series['src' + id + src] = d; return d; }
+      return live(id, src);
+    });
+  }
+  function live(id, src) {
+    var key = 'pf-chart-' + id + '-' + src, hit = cacheGet(key);
     if (hit) { state.series['src' + id + src] = hit.d; return Promise.resolve(hit.d); }
     return getJSON(API + 'coins/' + id + '/market_chart?vs_currency=usd&days=' + src).then(function (j) {
       var d = (j.prices || []).filter(function (p) { return p && p[1] > 0; });
@@ -448,7 +464,11 @@
 
   function loadMarkets() {
     var key = 'pf-price-markets-v3', hit = cacheGet(key);
-    var p = hit ? Promise.resolve(hit.d) : Promise.all([
+    var p = fileP.then(function (f) {
+      if (f && f.markets && f.markets.length) { hit = { t: f.t }; return f.markets; }
+      return hit ? hit.d : fromApi();
+    });
+    function fromApi() { return Promise.all([
       getJSON(API + 'coins/markets?vs_currency=usd&ids=' + [PEP].concat(POW).join(',')),
       getJSON(API + 'coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1')
     ]).then(function (r) {
@@ -458,7 +478,7 @@
       });
       cacheSet(key, d);
       return d;
-    });
+    }); }
     p.then(function (list) {
       var by = {};
       list.forEach(function (c) { by[c.id] = c; });
