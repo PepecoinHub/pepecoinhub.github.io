@@ -1,125 +1,1325 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://pepecoinhub.com/</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/compare.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/calculator.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/price.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://pepecoinhub.com/supply.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/scrypt-family.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/network.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/rich-list.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/guides.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/buy.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/wallets.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/mining.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/mica.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/glossary.html</loc><lastmod>2026-10-19</lastmod></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url><loc>https://pepecoinhub.com/</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/which-pepecoin.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/compare.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/compare.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/calculator.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/calculator.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/price.html</loc><lastmod>2026-10-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/price.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/price.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/price.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/price.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/price.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/price.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/price.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/supply.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/supply.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/scrypt-family.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/scrypt-family.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/network.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/network.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/network.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/network.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/network.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/network.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/network.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/network.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/rich-list.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/rich-list.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/guides.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/guides.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/buy.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/buy.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/wallets.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/wallets.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/mining.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mining.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/mica.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mica.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/glossary.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/glossary.html"/>
+  </url>
   <url><loc>https://pepecoinhub.com/games/</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://pepecoinhub.com/games/miner.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/buy.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/wallets.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/glossary.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/compare.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/calculator.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/price.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/supply.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/scrypt-family.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/network.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/rich-list.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/guides.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/mining.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/pl/mica.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/buy.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/wallets.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/glossary.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/compare.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/calculator.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/price.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/supply.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/scrypt-family.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/network.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/rich-list.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/guides.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/mining.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/es/mica.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/buy.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/wallets.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/glossary.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/compare.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/calculator.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/price.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/supply.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/scrypt-family.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/network.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/rich-list.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/guides.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/mining.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/de/mica.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/buy.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/wallets.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/glossary.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/compare.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/calculator.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/price.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/supply.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/scrypt-family.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/network.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/rich-list.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/guides.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/mining.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/fr/mica.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/buy.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/wallets.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/glossary.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/compare.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/calculator.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/price.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/supply.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/scrypt-family.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/network.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/rich-list.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/guides.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/mining.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/tr/mica.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/buy.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/wallets.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/glossary.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/compare.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/calculator.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/price.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/supply.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/scrypt-family.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/network.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/rich-list.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/guides.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/mining.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/it/mica.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/buy.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/wallets.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/glossary.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/compare.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/calculator.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/price.html</loc><lastmod>2026-10-20</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/supply.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/scrypt-family.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/network.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/rich-list.html</loc><lastmod>2026-10-21</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/guides.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/mining.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://pepecoinhub.com/zh/mica.html</loc><lastmod>2026-10-19</lastmod></url>
+  <url><loc>https://pepecoinhub.com/pl/</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/which-pepecoin.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/buy.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/buy.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/wallets.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/wallets.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/glossary.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/glossary.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/compare.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/compare.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/calculator.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/calculator.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/price.html</loc><lastmod>2026-10-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/price.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/price.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/price.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/price.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/price.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/price.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/price.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/supply.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/supply.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/scrypt-family.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/scrypt-family.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/network.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/network.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/network.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/network.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/network.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/network.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/network.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/network.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/rich-list.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/rich-list.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/guides.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/guides.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/mining.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mining.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/pl/mica.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mica.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/which-pepecoin.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/buy.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/buy.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/wallets.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/wallets.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/glossary.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/glossary.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/compare.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/compare.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/calculator.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/calculator.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/price.html</loc><lastmod>2026-10-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/price.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/price.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/price.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/price.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/price.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/price.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/price.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/supply.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/supply.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/scrypt-family.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/scrypt-family.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/network.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/network.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/network.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/network.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/network.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/network.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/network.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/network.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/rich-list.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/rich-list.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/guides.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/guides.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/mining.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mining.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/es/mica.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mica.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/which-pepecoin.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/buy.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/buy.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/wallets.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/wallets.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/glossary.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/glossary.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/compare.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/compare.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/calculator.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/calculator.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/price.html</loc><lastmod>2026-10-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/price.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/price.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/price.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/price.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/price.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/price.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/price.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/supply.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/supply.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/scrypt-family.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/scrypt-family.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/network.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/network.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/network.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/network.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/network.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/network.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/network.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/network.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/rich-list.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/rich-list.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/guides.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/guides.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/mining.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mining.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/de/mica.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mica.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/which-pepecoin.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/buy.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/buy.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/wallets.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/wallets.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/glossary.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/glossary.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/compare.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/compare.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/calculator.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/calculator.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/price.html</loc><lastmod>2026-10-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/price.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/price.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/price.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/price.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/price.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/price.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/price.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/supply.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/supply.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/scrypt-family.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/scrypt-family.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/network.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/network.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/network.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/network.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/network.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/network.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/network.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/network.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/rich-list.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/rich-list.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/guides.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/guides.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/mining.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mining.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/fr/mica.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mica.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/which-pepecoin.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/buy.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/buy.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/wallets.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/wallets.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/glossary.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/glossary.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/compare.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/compare.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/calculator.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/calculator.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/price.html</loc><lastmod>2026-10-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/price.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/price.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/price.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/price.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/price.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/price.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/price.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/supply.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/supply.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/scrypt-family.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/scrypt-family.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/network.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/network.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/network.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/network.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/network.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/network.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/network.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/network.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/rich-list.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/rich-list.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/guides.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/guides.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/mining.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mining.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/tr/mica.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mica.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/which-pepecoin.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/buy.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/buy.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/wallets.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/wallets.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/glossary.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/glossary.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/compare.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/compare.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/calculator.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/calculator.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/price.html</loc><lastmod>2026-10-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/price.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/price.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/price.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/price.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/price.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/price.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/price.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/supply.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/supply.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/scrypt-family.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/scrypt-family.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/network.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/network.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/network.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/network.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/network.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/network.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/network.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/network.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/rich-list.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/rich-list.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/guides.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/guides.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/mining.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mining.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/it/mica.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mica.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/which-pepecoin.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/which-pepecoin.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/which-pepecoin.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/buy.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/buy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/buy.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/wallets.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/wallets.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/wallets.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/glossary.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/glossary.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/glossary.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/compare.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/compare.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/compare.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/calculator.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/calculator.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/calculator.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/price.html</loc><lastmod>2026-10-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/price.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/price.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/price.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/price.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/price.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/price.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/price.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/price.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/supply.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/supply.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/supply.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/scrypt-family.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/scrypt-family.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/scrypt-family.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/network.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/network.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/network.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/network.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/network.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/network.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/network.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/network.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/network.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/rich-list.html</loc><lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/rich-list.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/rich-list.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/guides.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/guides.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/guides.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/mining.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mining.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mining.html"/>
+  </url>
+  <url><loc>https://pepecoinhub.com/zh/mica.html</loc><lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pepecoinhub.com/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/mica.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/mica.html"/>
+  </url>
 </urlset>
