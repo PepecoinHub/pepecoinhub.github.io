@@ -102,6 +102,12 @@
     dots.addEventListener('animationend', function (e) {
       if (e.target.parentNode === dots.children[cur]) go((cur + 1) % items.length);
     });
+    // the whole note is a link to wherever the news shown leads (the dots and the link itself keep their own click)
+    rot.addEventListener('click', function (e) {
+      if (e.target.closest('a, button')) return;
+      var a = items[cur].querySelector('a[href]');
+      if (a) a.click();
+    });
     paint();
   }
 
