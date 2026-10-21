@@ -9,7 +9,7 @@
 // index.html (and */index.html): the "updated" date, the PEP price tiles and the hashrate tile
 // (data-v="home-…"). The price is fetched from CoinGecko and kept in data/price.json, so a failed
 // fetch falls back to the last saved price; home.js updates the price tiles live in the browser.
-// data/ticker.json: the share of all PEP held by the top 500 addresses, for the news strip (chrome.js).
+// data/ticker.json: the figures for the data strip under the header (chrome.js).
 //
 // Run after build_summary.py: node scripts/prebake.mjs
 import fs from 'node:fs';
@@ -220,17 +220,41 @@ for (const f of pages('index.html')) {
   try { home(f, sum, mining, price); console.log('numbers baked into', path.relative(DOCS, f)); }
   catch (e) { failed++; console.error(`${path.relative(DOCS, f)} skipped: ${e.message}`); }
 }
-// News strip: the top 500 share from the latest snapshot (rows are sorted by balance, largest first).
+// Data strip under the header (chrome.js): price and its 24h change, hashrate against a day ago, the top 10/50/400
+// shares and how many addresses are new in the top 2000 since the previous snapshot. Kept in data/ticker.json,
+// with the hashrate readings of the last two days (the change compares the average of the last 24 hours with the day before).
 try {
+  const file = path.join(DOCS, 'data', 'ticker.json');
+  let old = {};
+  try { old = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { /* first run */ }
+  const t = { schema: 2, updated: new Date().toISOString().slice(0, 16) + 'Z' };
+  if (price && price.price_usd > 0) t.price = { usd: price.price_usd, change_24h: price.change_24h };
+  const H = 3600e3, now = Date.now();
+  let samples = (old.hash_samples || []).filter((x) => now - Date.parse(x[0]) < 50 * H);
+  if (mining && mining.hashrate_hs > 0) {
+    const lastS = samples[samples.length - 1];
+    if (!lastS || lastS[1] !== mining.hashrate_hs) samples.push([new Date().toISOString().slice(0, 16) + 'Z', mining.hashrate_hs]);
+    // single readings swing by ±10% within hours, so compare the average of the last 24 hours with the 24 hours before
+    const avg = (from, to) => {
+      const v = samples.filter((x) => { const age = now - Date.parse(x[0]); return age >= from && age < to; }).map((x) => x[1]);
+      return v.length >= 2 ? v.reduce((a, b) => a + b, 0) / v.length : null;
+    };
+    const day = avg(0, 24 * H), before = avg(24 * H, 48 * H);
+    t.hashrate = { hs: mining.hashrate_hs, change_24h: day && before ? Math.round((day / before - 1) * 10000) / 100 : null };
+  }
+  t.hash_samples = samples;
+  const share = (n) => { const i = sum.tops.indexOf(n); return i < 0 ? null : sum.views.all.shares[i]; };
+  t.tops = { 10: share(10), 50: share(50), 400: share(400) };
+  t.snapshot = sum.latest.date;
   const dir = path.join(DOCS, 'data', 'snapshots');
-  const last = fs.readdirSync(dir).filter((f) => /^\d{4}-\d\d-\d\d\.json$/.test(f)).sort().pop();
-  const snap = JSON.parse(fs.readFileSync(path.join(dir, last), 'utf8'));
-  const supply = BigInt(snap.meta.supply_sats);
-  if (snap.rows.length < 500 || !(supply > 0n)) throw new Error('snapshot too small');
-  const held = snap.rows.slice(0, 500).reduce((a, r) => a + BigInt(r[1]), 0n);
-  const t = { schema: 1, date: snap.meta.date, top500_pct: Number(held * 1000000n / supply) / 10000 };
-  fs.writeFileSync(path.join(DOCS, 'data', 'ticker.json'), JSON.stringify(t) + '\n');
-  console.log('top 500 share for the news strip:', t.top500_pct + '%');
+  const [prev, last] = fs.readdirSync(dir).filter((f) => /^\d{4}-\d\d-\d\d\.json$/.test(f)).sort().slice(-2);
+  if (prev && last) {
+    const rows = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')).rows.map((r) => r[0]);
+    const before = new Set(rows(prev));
+    t.new_top2000 = rows(last).filter((a) => !before.has(a)).length;
+  }
+  fs.writeFileSync(file, JSON.stringify(t) + '\n');
+  console.log('data strip:', JSON.stringify({ ...t, hash_samples: samples.length }));
 } catch (e) { console.error('ticker.json not updated:', e.message); }
 // a page that could not be updated keeps yesterday's numbers; never fail the daily job for it
 process.exit(0);

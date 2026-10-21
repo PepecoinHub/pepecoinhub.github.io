@@ -383,8 +383,8 @@ dl.terms dd a { white-space: nowrap; }
 .lang-hint a { font-weight: 600; }
 .lang-hint-x { margin-left: auto; background: none; border: 0; padding: 2px 8px; font-size: 1.35rem; line-height: 1; color: var(--muted); cursor: pointer; }
 .lang-hint-x:hover { color: var(--ink); }
-/* ------------------------------------------------------------------ news strip under the header (built by chrome.js)
-   A thin pill with a "News" label and a slow line of links. Stops on hover/focus and with the pause button;
+/* ------------------------------------------------------------------ data strip under the header (built by chrome.js)
+   A thin pill with a "PEP today" label and a slow line of today's figures. Stops on hover/focus and with the pause button;
    with reduced motion it stands still and scrolls sideways by hand. */
 .news {
   max-width: 1080px; margin: 10px auto 0; display: flex; align-items: center; height: 40px; box-sizing: border-box;
@@ -417,17 +417,15 @@ dl.terms dd a { white-space: nowrap; }
   background: url(assets/brand/coin-p.svg) center / contain no-repeat;
 }
 .news-list a { display: inline-flex; align-items: center; gap: 9px; padding: 6px 2px; color: var(--ink); text-decoration: none; white-space: nowrap; }
-.news-list a:hover .news-text { color: var(--accent-deep); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+.news-list a:hover .news-k { color: var(--ink); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 60%, transparent); }
 .news-list a:focus-visible { outline-offset: -2px; }
-.news-tag {
-  font: 700 0.66rem/1 var(--f-mono); letter-spacing: 0.07em; text-transform: uppercase; padding: 4px 7px 3px; border-radius: 999px;
-  border: 1px solid transparent;
-}
-.news-tag-new { background: var(--accent-soft); color: var(--accent-deep); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
-.news-tag-data { background: var(--gold-soft); color: var(--ink); border-color: color-mix(in srgb, var(--gold) 55%, transparent); }
-.news-tag-community { color: var(--muted); border-color: var(--rule); }
-.news-pct { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent-deep); }
-.news-host { font: 0.78rem var(--f-mono); color: var(--muted); }
+.news-k { color: var(--muted); }
+.news-v { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.news-chg { font: 700 0.8rem var(--f-mono); font-variant-numeric: tabular-nums; padding: 2px 7px 1px; border-radius: 999px; }
+.news-chg.up { color: var(--accent-deep); background: var(--accent-soft); }
+.news-chg.down { color: color-mix(in srgb, var(--flag) 78%, var(--ink)); background: color-mix(in srgb, var(--flag) 13%, transparent); }
+.news-chg.flat { color: var(--muted); background: var(--track); }
+.news-note { font: 0.78rem var(--f-mono); color: var(--muted); }
 .news-btn {
   flex: none; display: grid; place-items: center; width: 30px; height: 30px; margin-right: 2px; padding: 0; border: 0; border-radius: 50%;
   background: none; color: var(--muted); cursor: pointer;
@@ -622,6 +620,30 @@ input, select, textarea { border-radius: 12px; }
 .pledge.soon { gap: 14px; }
 .pledge.soon::before { content: none; }
 .pledge.soon img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; flex: none; }
+/* The note turns into a small news carousel (home.js): the items share one grid cell, so the box keeps the height of
+   the longest one; the active dot fills up while an item is shown and the frog hops when the next one comes in. */
+.news-rot .rot-items { display: grid; min-width: 0; }
+.news-rot.rot-ready .rot-item {
+  grid-area: 1 / 1; align-self: center; opacity: 0; visibility: hidden; transform: translateY(9px); filter: blur(2px);
+  transition: opacity 0.4s, transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.4s, visibility 0s 0.55s;
+}
+.news-rot.rot-ready .rot-item.is-on { opacity: 1; visibility: visible; transform: none; filter: none; transition-delay: 0.14s, 0.14s, 0.14s, 0s; }
+.news-rot.rot-ready .rot-item.is-out { transform: translateY(-9px); }
+.rot-dots { grid-area: 2 / 1; display: flex; gap: 2px; margin: 4px 0 -6px -4px; }
+.rot-dot { display: grid; align-items: center; height: 20px; padding: 0 4px; border: 0; background: none; cursor: pointer; }
+.rot-dot i {
+  position: relative; display: block; width: 6px; height: 6px; border-radius: 999px; overflow: hidden;
+  background: color-mix(in srgb, var(--gold) 70%, transparent); transition: width 0.35s;
+}
+.rot-dot.on i { width: 28px; }
+.rot-dot i::after { content: ""; position: absolute; inset: 0; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+.rot-dot.on i::after { transform: scaleX(1); }
+.rot-auto .rot-dot.on i::after { animation: rot-fill 7s linear forwards; }
+.rot-auto:hover .rot-dot.on i::after, .rot-auto:focus-within .rot-dot.on i::after { animation-play-state: paused; }
+@keyframes rot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.news-rot img.hop { animation: rot-hop 0.6s ease; }
+@keyframes rot-hop { 35% { transform: translateY(-5px) rotate(-5deg); } 70% { transform: translateY(0) rotate(2deg); } }
+@media (prefers-reduced-motion: reduce) { .news-rot.rot-ready .rot-item { transition: none; transform: none; filter: none; } }
 
 /* Start here: icons, and the first card made the big one */
 .cards a.card[href$="which-pepecoin.html"]::before, .cards a.card[href$="rich-list.html"]::before,
