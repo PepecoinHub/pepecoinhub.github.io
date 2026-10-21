@@ -383,6 +383,69 @@ dl.terms dd a { white-space: nowrap; }
 .lang-hint a { font-weight: 600; }
 .lang-hint-x { margin-left: auto; background: none; border: 0; padding: 2px 8px; font-size: 1.35rem; line-height: 1; color: var(--muted); cursor: pointer; }
 .lang-hint-x:hover { color: var(--ink); }
+/* ------------------------------------------------------------------ data strip under the header (built by chrome.js)
+   A thin pill with a "PEP today" label and a slow line of today's figures. Stops on hover/focus and with the pause button;
+   with reduced motion it stands still and scrolls sideways by hand. */
+.news {
+  max-width: 1080px; margin: 10px auto 0; display: flex; align-items: center; height: 40px; box-sizing: border-box;
+  border: 1px solid var(--rule); border-radius: 999px; background: color-mix(in srgb, var(--panel) 72%, transparent);
+  font-size: 0.88rem; overflow: hidden;
+}
+.news-label {
+  flex: none; display: flex; align-items: center; gap: 9px; height: 100%; padding: 0 16px 0 18px; border-right: 1px solid var(--rule);
+  font: 700 0.72rem var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-deep);
+}
+.news-label i { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.news-label i::after {
+  content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 1.5px solid var(--accent); opacity: 0;
+  animation: news-ping 2.6s ease-out infinite;
+}
+@keyframes news-ping { 0% { transform: scale(0.4); opacity: 0.7; } 70%, 100% { transform: scale(1.4); opacity: 0; } }
+.news-view {
+  flex: 1; min-width: 0; height: 100%; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 36px), transparent);
+}
+.news-track { display: flex; width: max-content; height: 100%; animation: news-roll 60s linear infinite paused; }
+.news.run .news-track { animation-play-state: running; }
+.news.run:hover .news-track, .news.run:focus-within .news-track, .news.paused .news-track { animation-play-state: paused; }
+@keyframes news-roll { to { transform: translateX(-50%); } }
+.news-list { display: flex; align-items: center; margin: 0; padding: 0 0 0 18px; list-style: none; }
+.news-list li { display: flex; align-items: center; }
+.news-list li::after {
+  content: ""; width: 13px; height: 13px; margin: 0 22px; opacity: 0.5; flex: none;
+  background: url(assets/brand/coin-p.svg) center / contain no-repeat;
+}
+.news-list a { display: inline-flex; align-items: center; gap: 9px; padding: 6px 2px; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.news-list a:hover .news-k { color: var(--ink); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+.news-list a:focus-visible { outline-offset: -2px; }
+.news-k { color: var(--muted); }
+.news-v { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.news-chg { font: 700 0.8rem var(--f-mono); font-variant-numeric: tabular-nums; padding: 2px 7px 1px; border-radius: 999px; }
+.news-chg.up { color: var(--accent-deep); background: var(--accent-soft); }
+.news-chg.down { color: color-mix(in srgb, var(--flag) 78%, var(--ink)); background: color-mix(in srgb, var(--flag) 13%, transparent); }
+.news-chg.flat { color: var(--muted); background: var(--track); }
+.news-note { font: 0.78rem var(--f-mono); color: var(--muted); }
+.news-btn {
+  flex: none; display: grid; place-items: center; width: 30px; height: 30px; margin-right: 2px; padding: 0; border: 0; border-radius: 50%;
+  background: none; color: var(--muted); cursor: pointer;
+}
+.news-btn:last-child { margin-right: 5px; }
+.news-btn:hover { background: var(--accent-soft); color: var(--ink); }
+.news.still .news-view { overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); }
+.news.still .news-view::-webkit-scrollbar { display: none; }
+.news.still .news-list li:last-child::after { width: 0; margin-right: 36px; }
+@media (prefers-reduced-motion: reduce) { .news-track { animation: none; } .news-label i::after { animation: none; } }
+@media (max-width: 760px) {
+  .news { margin-top: 8px; height: 38px; font-size: 0.84rem; }
+  .news-label { padding: 0 12px 0 14px; }
+  .news-list { padding-left: 14px; }
+  .news-list li::after { margin: 0 16px; }
+}
+@media (max-width: 430px) {
+  .news-label { font-size: 0; gap: 0; padding: 0 12px 0 15px; }
+  .news-btn { width: 28px; height: 28px; margin-right: 0; }
+}
 html:lang(zh) {
   --f-display: "Ubuntu", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", sans-serif;
   --f-body: "Ubuntu", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", sans-serif;
@@ -557,6 +620,30 @@ input, select, textarea { border-radius: 12px; }
 .pledge.soon { gap: 14px; }
 .pledge.soon::before { content: none; }
 .pledge.soon img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; flex: none; }
+/* The note turns into a small news carousel (home.js): the items share one grid cell, so the box keeps the height of
+   the longest one; the active dot fills up while an item is shown and the frog hops when the next one comes in. */
+.news-rot .rot-items { display: grid; min-width: 0; }
+.news-rot.rot-ready .rot-item {
+  grid-area: 1 / 1; align-self: center; opacity: 0; visibility: hidden; transform: translateY(9px); filter: blur(2px);
+  transition: opacity 0.4s, transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.4s, visibility 0s 0.55s;
+}
+.news-rot.rot-ready .rot-item.is-on { opacity: 1; visibility: visible; transform: none; filter: none; transition-delay: 0.14s, 0.14s, 0.14s, 0s; }
+.news-rot.rot-ready .rot-item.is-out { transform: translateY(-9px); }
+.rot-dots { grid-area: 2 / 1; display: flex; gap: 2px; margin: 4px 0 -6px -4px; }
+.rot-dot { display: grid; align-items: center; height: 20px; padding: 0 4px; border: 0; background: none; cursor: pointer; }
+.rot-dot i {
+  position: relative; display: block; width: 6px; height: 6px; border-radius: 999px; overflow: hidden;
+  background: color-mix(in srgb, var(--gold) 70%, transparent); transition: width 0.35s;
+}
+.rot-dot.on i { width: 28px; }
+.rot-dot i::after { content: ""; position: absolute; inset: 0; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+.rot-dot.on i::after { transform: scaleX(1); }
+.rot-auto .rot-dot.on i::after { animation: rot-fill 7s linear forwards; }
+.rot-auto:hover .rot-dot.on i::after, .rot-auto:focus-within .rot-dot.on i::after { animation-play-state: paused; }
+@keyframes rot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.news-rot img.hop { animation: rot-hop 0.6s ease; }
+@keyframes rot-hop { 35% { transform: translateY(-5px) rotate(-5deg); } 70% { transform: translateY(0) rotate(2deg); } }
+@media (prefers-reduced-motion: reduce) { .news-rot.rot-ready .rot-item { transition: none; transform: none; filter: none; } }
 
 /* Start here: icons, and the first card made the big one */
 .cards a.card[href$="which-pepecoin.html"]::before, .cards a.card[href$="rich-list.html"]::before,
