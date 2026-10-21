@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261021a">
+<link rel="stylesheet" href="../facts.css?v=20261021b">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Pepecoin（PEP）就是 PEPE 吗？", "acceptedAnswer": {"@type": "Answer", "text": "不是。PEPE 是 Ethereum 上的 ERC-20 代币，而 Pepecoin（PEP）是运行在独立的 Scrypt 工作量证明区块链上的原生币。看地址开头就能区分：是 P… 还是 0x…。"}}, {"@type": "Question", "name": "PEPE 是基于以太坊的吗？PEP 有合约地址吗？", "acceptedAnswer": {"@type": "Answer", "text": "是的，Pepe（PEPE）是以太坊上的 ERC-20 代币，于 2023 年 4 月推出。PepeCoin（PEPECOIN）自 2023 年起也是以太坊上的 ERC-20 代币。Pepecoin（PEP）不在以太坊上：它是自己区块链的原生币，因此没有合约地址。PEP 地址以 P 开头。"}}, {"@type": "Question", "name": "我该用什么钱包？", "acceptedAnswer": {"@type": "Answer", "text": "存放 PEP 需要支持 Pepecoin 网络的钱包，比如官方的 Pepecoin Core、Tangem 卡，或本站钱包指南里的其他钱包。PEPE 和 PEPECOIN 是 Ethereum 代币，要放在 MetaMask 这类 Ethereum 钱包里。MetaMask 面向的是 Ethereum 类网络，并没有收录 Pepecoin。"}}, {"@type": "Question", "name": "Pepecoin（PEP）和 Rare Pepe 有关系吗？", "acceptedAnswer": {"@type": "Answer", "text": "没有。Rare Pepe 是自 2016 年起以 Counterparty 资产形式在比特币上发行的 Pepe 收藏卡。Pepecoin（PEP）是一种独立的币，运行在自己的 Scrypt 区块链上，于 2024 年启动。"}}, {"@type": "Question", "name": "有人能在协议层冻结我的 PEP 吗？", "acceptedAnswer": {"@type": "Answer", "text": "协议层没有管理员黑名单。不过，托管方（交易所、托管钱包）仍然可以冻结它们代管的余额。PEPE 的 Ethereum 合约则是另一回事，详见上文“谁能冻结什么”。"}}, {"@type": "Question", "name": "为什么 Kraken 可能显示地区限制？", "acceptedAnswer": {"@type": "Answer", "text": "这是交易所的政策和监管要求（包括欧洲经济区的 MiCA）所致，不是 Pepecoin 共识规则的一部分。"}}, {"@type": "Question", "name": "提币时怎样核对币种代码？", "acceptedAnswer": {"@type": "Answer", "text": "币种选择 Pepecoin（PEP），网络选择 Pepecoin。PEP 地址以 P 开头。PEPE 和 PEPECOIN 是 Ethereum 代币，地址以 0x 开头，属于另一个网络。参见上文的“五秒核对地址”。"}}, {"@type": "Question", "name": "如果转错网络怎么办？", "acceptedAnswer": {"@type": "Answer", "text": "发送到错误网络的转账通常无法撤销。Pepecoin 链上的 PEP 和 Ethereum 上的 PEPE 不能互换。转账前务必核对币种代码、网络和地址格式。PEP 的转账可以在 PepeBlocks 或 Pepeplorer 上查询，Ethereum 代币则可以在 Etherscan 上查询。"}}, {"@type": "Question", "name": "为什么 CoinMarketCap 显示的供应量可能与区块浏览器不同？", "acceptedAnswer": {"@type": "Answer", "text": "Pepeplorer 等区块浏览器显示的是约 1049 亿 PEP。数据聚合平台显示的数字可能更低：2026年10月4–5日，CoinGecko 列出的流通量约为 1027 亿。建议以实时区块浏览器的数据为准，并注明查询日期。参见上文的“Pepecoin（PEP）数据一览”。"}}, {"@type": "Question", "name": "富豪榜上的一个地址就等于一个人吗？", "acceptedAnswer": {"@type": "Answer", "text": "不是。一个地址不代表一个人：交易所和托管方会替很多用户持币。详见富豪榜页面中的说明。"}}], "inLanguage": "zh-Hans"}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -77,6 +77,12 @@
           <td>2016年3月</td>
         </tr>
         <tr>
+          <th scope="row">背后是谁</th>
+          <td>Pepecoin LLC，联合创始人公开具名（David Eichel），并自行发布了 MiCA whitepaper。<a href="#identity">详情</a></td>
+          <td>没有法律意义上的发行方，由身份未公开的匿名开发者创建（<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">LCX 为 PEPE 撰写的 MiCA whitepaper</a>，B.2 和 D.5）</td>
+          <td>暂无可核实的数据</td>
+        </tr>
+        <tr>
           <th scope="row">安全机制</th>
           <td>Scrypt 工作量证明，与 Litecoin（莱特币）和 Dogecoin（狗狗币）合并挖矿（merged mining）</td>
           <td>Ethereum 验证者（权益证明）</td>
@@ -99,6 +105,12 @@
           <td>PEP，付给 Pepecoin 链的矿工</td>
           <td>ETH，即 Ethereum 的 Gas 费；就算只转 PEPE，也得用 ETH 付费</td>
           <td>ETH，即 Ethereum 的 Gas 费；就算只转 PEPECOIN，也得用 ETH 付费</td>
+        </tr>
+        <tr>
+          <th scope="row">转账成本</th>
+          <td>建议手续费为每 kB 0.01 PEP，按 2026 年 10 月的价格不到 0.000001 美元（<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>）</td>
+          <td>取决于当时 Ethereum 的 Gas 价格，可在 <a href="https://etherscan.io/gastracker">Etherscan Gas Tracker</a> 查看</td>
+          <td>取决于当时 Ethereum 的 Gas 价格，可在 <a href="https://etherscan.io/gastracker">Etherscan Gas Tracker</a> 查看</td>
         </tr>
         <tr>
           <th scope="row">初始分配</th>
@@ -156,9 +168,9 @@
 
 <section aria-labelledby="freeze">
   <h2 id="freeze">谁能冻结什么</h2>
-  <div class="callout">
-    <p><strong>PEP（本链）：</strong>协议里不存在能拉黑你的地址、或拦下一笔已签名转账的管理员密钥，这一点和 Bitcoin、Dogecoin 相同。但这<em>不代表</em>你不会丢币：转错网络、网络钓鱼，或者托管方冻结你充入的币，这些风险依然存在。</p>
-    <p><strong>PEPE（Ethereum 代币）：</strong>已验证的合约中含有黑名单逻辑。上线前后，一个大额买入的地址被拉黑；随后合约所有权被放弃，此后所有者再也无法通过 Ownable 变更黑名单。已被拉黑地址里的余额依然被锁死。许多其他 ERC-20 代币仍有活跃的所有者，握有暂停和拉黑的权限，所以务必查看合约。</p>
+  <div class="callout freeze">
+    <p class="fz fz-pepe"><strong>PEPE（Ethereum 代币）：</strong>已验证的合约中含有黑名单逻辑。上线前后，一个大额买入的地址被拉黑；随后合约所有权被放弃，此后所有者再也无法通过 Ownable 变更黑名单。已被拉黑地址里的余额依然被锁死。许多其他 ERC-20 代币仍有活跃的所有者，握有暂停和拉黑的权限，所以务必查看合约。</p>
+    <p class="fz fz-pep"><strong>PEP（本链）：</strong>协议里不存在能拉黑你的地址、或拦下一笔已签名转账的管理员密钥，这一点和 Bitcoin、Dogecoin 相同。但这<em>不代表</em>你不会丢币：转错网络、网络钓鱼，或者托管方冻结你充入的币，这些风险依然存在。</p>
     <p class="src">来源：<a href="https://etherscan.io/address/0x6982508145454ce325ddbe47a25d4ec3d2311933#code">Etherscan 上的 PEPE 合约</a> <code>0x6982508145454Ce325dDbE47a25d4ec3d2311933</code>（<a href="https://etherscan.io/tx/0x91c9a6caf8e7b5419a7e597982a0cf9b4fc01413279ab840bb57a2e9c528f252">放弃所有权的交易</a>）；<a href="https://www.cointime.ai/news/pepe-tokens-blacklist-functionality-used-to-block-address-holding-8-million-in-tokens-87311">Cointime，2023年5月6日</a>（一个地址被拉黑，随后放弃合约所有权）；<a href="https://www.fairyproof.com/doc/Pepe-Token-Audit-Report-082123.pdf">Fairyproof 审计，2023年8月21日</a>（合约有黑名单功能，所有者为零地址）；Pepecoin Core 的 UTXO 设计。</p>
   </div>
 </section>
@@ -197,7 +209,7 @@
 
 <section aria-labelledby="pep">
   <h2 id="pep">Pepecoin（PEP）数据一览</h2>
-  <dl class="facts">
+  <dl class="facts facts-board">
     <dt>创世</dt>
     <dd>网络于 2024年1月30日上线。创世区块里嵌有一条 <em>Wall Street Journal</em> 的头条标题，日期为 2024年1月22日。<span class="src">MiCA whitepaper；chainparams.cpp</span></dd>
     <dt>分配</dt>
