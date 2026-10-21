@@ -9,6 +9,7 @@
 // index.html (and */index.html): the "updated" date, the PEP price tiles and the hashrate tile
 // (data-v="home-…"). The price is fetched from CoinGecko and kept in data/price.json, so a failed
 // fetch falls back to the last saved price; home.js updates the price tiles live in the browser.
+// data/ticker.json: the share of all PEP held by the top 500 addresses, for the news strip (chrome.js).
 //
 // Run after build_summary.py: node scripts/prebake.mjs
 import fs from 'node:fs';
@@ -219,5 +220,17 @@ for (const f of pages('index.html')) {
   try { home(f, sum, mining, price); console.log('numbers baked into', path.relative(DOCS, f)); }
   catch (e) { failed++; console.error(`${path.relative(DOCS, f)} skipped: ${e.message}`); }
 }
+// News strip: the top 500 share from the latest snapshot (rows are sorted by balance, largest first).
+try {
+  const dir = path.join(DOCS, 'data', 'snapshots');
+  const last = fs.readdirSync(dir).filter((f) => /^\d{4}-\d\d-\d\d\.json$/.test(f)).sort().pop();
+  const snap = JSON.parse(fs.readFileSync(path.join(dir, last), 'utf8'));
+  const supply = BigInt(snap.meta.supply_sats);
+  if (snap.rows.length < 500 || !(supply > 0n)) throw new Error('snapshot too small');
+  const held = snap.rows.slice(0, 500).reduce((a, r) => a + BigInt(r[1]), 0n);
+  const t = { schema: 1, date: snap.meta.date, top500_pct: Number(held * 1000000n / supply) / 10000 };
+  fs.writeFileSync(path.join(DOCS, 'data', 'ticker.json'), JSON.stringify(t) + '\n');
+  console.log('top 500 share for the news strip:', t.top500_pct + '%');
+} catch (e) { console.error('ticker.json not updated:', e.message); }
 // a page that could not be updated keeps yesterday's numbers; never fail the daily job for it
 process.exit(0);

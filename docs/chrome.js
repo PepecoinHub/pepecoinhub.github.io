@@ -36,6 +36,56 @@
       start: '入门', startShort: '入门', mine: '挖矿', data: '数据与图表', games: '游戏', menu: '菜单', top: '返回顶部', more: '更多',
       hint: '本页面也有简体中文版。', go: '阅读中文版', close: '关闭' }
   };
+  // News strip under the header: one line per item, the newest first. {pct} is the top 500 share from data/ticker.json
+  // (baked daily by scripts/prebake.mjs). Paths are relative to the language folder, or to the site root with '/'.
+  // Change NEWS_ID when an item is added, so the strip comes back for readers who hid it.
+  var NEWS_ID = '2026-10-21';
+  var NEWS = [
+    { tag: 'new', href: '/games/', key: 'games' },
+    { tag: 'data', href: 'rich-list.html', key: 'top' },
+    { tag: 'new', href: 'mining.html', key: 'mining' },
+    { tag: 'new', href: 'price.html', key: 'price' },
+    { tag: 'community', href: 'https://pepmarket.de/?lang=en', key: 'market' }
+  ];
+  var NEWS_T = {
+    en: { label: 'News', new: 'New', data: 'Data', community: 'Community', pause: 'Pause the news', play: 'Play the news', hide: 'Hide the news',
+      games: 'PEP Games: Draw & Guess, Pepe Miner and a lobby chat', top: 'The top 500 addresses hold {pct} of all PEP',
+      mining: 'Mining guide: pools, Antminer L7/L9 and merged mining', price: 'Live PEP price, and what a ×100 would take',
+      market: 'PEP Market: a place for artists from the PEP community' },
+    pl: { label: 'Nowości', new: 'Nowe', data: 'Dane', community: 'Społeczność', pause: 'Zatrzymaj pasek', play: 'Wznów pasek', hide: 'Ukryj pasek',
+      games: 'PEP Games: kalambury, Pepe Miner i czat dla społeczności', top: 'Top 500 adresów trzyma {pct} wszystkich PEP',
+      mining: 'Wszystko o miningu: poole, Antminer L7/L9 i merged mining', price: 'Cena PEP na żywo i co oznaczałoby ×100',
+      market: 'PEP Market: miejsce dla artystów ze społeczności PEP' },
+    es: { label: 'Novedades', new: 'Nuevo', data: 'Datos', community: 'Comunidad', pause: 'Pausar las novedades', play: 'Reanudar las novedades', hide: 'Ocultar las novedades',
+      games: 'PEP Games: Draw & Guess, Pepe Miner y un chat para la comunidad', top: 'Las 500 mayores direcciones tienen el {pct} de todos los PEP',
+      mining: 'Guía de minería: pools, Antminer L7/L9 y merged mining', price: 'Precio de PEP en directo y qué haría falta para un ×100',
+      market: 'PEP Market: un espacio para artistas de la comunidad PEP' },
+    de: { label: 'Neu', new: 'Neu', data: 'Daten', community: 'Community', pause: 'Laufband anhalten', play: 'Laufband fortsetzen', hide: 'Laufband ausblenden',
+      games: 'PEP Games: Draw & Guess, Pepe Miner und ein Chat für die Community', top: 'Die Top 500 Adressen halten {pct} aller PEP',
+      mining: 'Mining-Guide: Pools, Antminer L7/L9 und Merged Mining', price: 'PEP-Kurs live und was ein ×100 bräuchte',
+      market: 'PEP Market: ein Ort für Künstler aus der PEP-Community' },
+    fr: { label: 'Nouveautés', new: 'Nouveau', data: 'Données', community: 'Communauté', pause: 'Mettre le bandeau en pause', play: 'Relancer le bandeau', hide: 'Masquer le bandeau',
+      games: 'PEP Games : Draw & Guess, Pepe Miner et un chat pour la communauté', top: 'Les 500 plus grosses adresses détiennent {pct} de tous les PEP',
+      mining: 'Guide du minage : pools, Antminer L7/L9 et merged mining', price: 'Prix du PEP en direct, et ce qu’il faudrait pour un ×100',
+      market: 'PEP Market : un lieu pour les artistes de la communauté PEP' },
+    tr: { label: 'Yenilikler', new: 'Yeni', data: 'Veri', community: 'Topluluk', pause: 'Şeridi durdur', play: 'Şeridi oynat', hide: 'Şeridi gizle',
+      games: 'PEP Games: Draw & Guess, Pepe Miner ve topluluk sohbeti', top: 'İlk 500 adres tüm PEP’in {pct} kadarını tutuyor',
+      mining: 'Madencilik rehberi: havuzlar, Antminer L7/L9 ve merged mining', price: 'Canlı PEP fiyatı ve ×100 için ne gerekir',
+      market: 'PEP Market: PEP topluluğundan sanatçılar için bir yer' },
+    it: { label: 'Novità', new: 'Nuovo', data: 'Dati', community: 'Community', pause: 'Metti in pausa le novità', play: 'Riprendi le novità', hide: 'Nascondi le novità',
+      games: 'PEP Games: Draw & Guess, Pepe Miner e una chat per la community', top: 'I primi 500 indirizzi detengono il {pct} di tutti i PEP',
+      mining: 'Guida al mining: pool, Antminer L7/L9 e merged mining', price: 'Prezzo di PEP in diretta e cosa servirebbe per un ×100',
+      market: 'PEP Market: uno spazio per gli artisti della community PEP' },
+    zh: { label: '最新', new: '新', data: '数据', community: '社区', pause: '暂停滚动', play: '继续滚动', hide: '隐藏',
+      games: 'PEP Games：你画我猜、Pepe Miner 和社区聊天室', top: '前 500 个地址持有全部 PEP 的 {pct}',
+      mining: '挖矿指南：矿池、Antminer L7/L9 与合并挖矿', price: 'PEP 实时价格，以及 ×100 需要多大市值',
+      market: 'PEP Market：PEP 社区艺术家的空间' }
+  };
+  // the site root (where chrome.js lives), for links and data from any folder
+  var ROOT = (function () {
+    var s = document.currentScript || document.querySelector('script[src*="chrome.js"]');
+    try { return new URL('./', s.src).href; } catch (e) { return '/'; }
+  })();
   function keyOf(tag) {
     tag = (tag || 'en').toLowerCase();
     return tag.indexOf('zh') === 0 ? 'zh' : tag.split('-')[0];
@@ -164,6 +214,7 @@
     backToTop();
     bgLayer();
     langHint(alt);
+    newsStrip();
     supportCopy();
   }
 
@@ -372,6 +423,84 @@
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
+  }
+
+  // News strip right under the header: a slow, endless line of links. It stops while the pointer or keyboard
+  // focus is on it, has its own pause button, and with reduced motion it stands still and scrolls by hand.
+  // Hidden on the game screens themselves; a reader can hide it until the next item is added (NEWS_ID).
+  function newsStrip() {
+    var head = document.querySelector('.site-head');
+    if (!head || document.querySelector('.news') || document.querySelector('.mn')) return;
+    if (/\/games\/(room|table|host|miner)\.html$/.test(location.pathname)) return;
+    try { if (localStorage.getItem('phw-news-off') === NEWS_ID) return; } catch (e) {}
+    var n = NEWS_T[pageKey] || NEWS_T.en, lang = pageKey === 'en' ? '' : pageKey + '/';
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var bar = document.createElement('aside');
+    bar.className = 'news'; bar.setAttribute('aria-label', n.label);
+    bar.innerHTML = '<span class="news-label"><i aria-hidden="true"></i></span><div class="news-view"><div class="news-track"></div></div>';
+    bar.querySelector('.news-label').appendChild(document.createTextNode(n.label));
+    var track = bar.querySelector('.news-track');
+    function group() {
+      var ul = document.createElement('ul'); ul.className = 'news-list';
+      NEWS.forEach(function (it) {
+        var li = document.createElement('li'), a = document.createElement('a'), ext = /^https?:/.test(it.href);
+        a.href = ext ? it.href : ROOT + (it.href.charAt(0) === '/' ? it.href.slice(1) : lang + it.href);
+        if (ext) a.rel = 'noopener';
+        a.setAttribute('data-news', it.key);
+        var tag = document.createElement('span'); tag.className = 'news-tag news-tag-' + it.tag; tag.textContent = n[it.tag];
+        var txt = document.createElement('span'); txt.className = 'news-text';
+        var parts = n[it.key].split('{pct}');
+        txt.appendChild(document.createTextNode(parts[0]));
+        if (parts.length > 1) { var b = document.createElement('b'); b.className = 'news-pct'; b.textContent = '…'; txt.appendChild(b); txt.appendChild(document.createTextNode(parts[1])); }
+        a.appendChild(tag); a.appendChild(txt);
+        if (ext) { var h = document.createElement('span'); h.className = 'news-host'; h.textContent = a.hostname.replace(/^www\./, '') + ' ↗'; a.appendChild(h); }
+        li.appendChild(a); ul.appendChild(li);
+      });
+      return ul;
+    }
+    track.appendChild(group());
+    var btn = null;
+    if (!still) {   // a second copy follows the first, so the loop has no seam; screen readers and Tab skip it
+      var copy = group(); copy.setAttribute('aria-hidden', 'true');
+      copy.querySelectorAll('a').forEach(function (a) { a.tabIndex = -1; });
+      track.appendChild(copy);
+      btn = document.createElement('button'); btn.type = 'button'; btn.className = 'news-btn news-pause';
+      function paint() {
+        var p = bar.classList.contains('paused');
+        btn.setAttribute('aria-label', p ? n.play : n.pause); btn.title = btn.getAttribute('aria-label');
+        btn.innerHTML = p ? '<svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M3 1.8v8.4L10 6z" fill="currentColor"/></svg>'
+          : '<svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M3.2 2v8M8.8 2v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+      }
+      btn.addEventListener('click', function () { bar.classList.toggle('paused'); paint(); });
+      paint();
+      bar.appendChild(btn);
+    } else bar.classList.add('still');
+    var x = document.createElement('button'); x.type = 'button'; x.className = 'news-btn news-x';
+    x.setAttribute('aria-label', n.hide); x.title = n.hide;
+    x.innerHTML = '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    x.addEventListener('click', function () {
+      bar.remove();
+      try { localStorage.setItem('phw-news-off', NEWS_ID); } catch (e) {}
+    });
+    bar.appendChild(x);
+    head.insertAdjacentElement('afterend', bar);
+
+    // Start moving once the number is in (or not coming), at an even reading speed whatever the width.
+    var started = false;
+    function start() {
+      if (started || still) return; started = true;
+      var w = track.firstChild.getBoundingClientRect().width;
+      track.style.animationDuration = Math.max(20, Math.round(w / 38)) + 's';
+      bar.classList.add('run');
+    }
+    function dropTop() { track.querySelectorAll('[data-news="top"]').forEach(function (a) { a.parentNode.remove(); }); }
+    var timer = setTimeout(start, 2500);
+    fetch(ROOT + 'data/ticker.json').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+      if (!(d && d.top500_pct > 0)) throw new Error('no share');
+      var loc = (LANGS.filter(function (l) { return l.key === pageKey; })[0] || LANGS[0]).tag;
+      var v = new Intl.NumberFormat(loc, { style: 'percent', maximumFractionDigits: 1 }).format(d.top500_pct / 100);
+      track.querySelectorAll('.news-pct').forEach(function (b) { b.textContent = v; });
+    }).catch(dropTop).then(function () { clearTimeout(timer); start(); });
   }
 
   // Copy buttons for the donation addresses in the footer.
