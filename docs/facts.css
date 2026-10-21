@@ -899,3 +899,6 @@ footer.site-foot .correction a:hover { background: var(--accent); color: var(--p
 .linkgroups .linkgroup li { align-content: start; }
 @media (min-width: 641px) { .lg-toggle { flex: 0 1 auto; } }
 @media (max-width: 640px) { .linkgroups .linkgroup.lg-closed ul { display: none; } }
+/* Plain links to the other language versions of this page, so they are reachable without JavaScript. */
+.foot-langs a { color: var(--muted); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+.foot-langs a:hover { color: var(--accent-deep); text-decoration-color: currentColor; }
