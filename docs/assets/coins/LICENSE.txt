@@ -18,6 +18,13 @@ bells.png, lky.png, jkc.png, dingo.png, shic.png
     dingo.png  https://github.com/dingocoincrypto/dingocoin       src/qt/res/icons/bitcoin.png
     shic.png   https://github.com/shibacoinppc/shibacoin          src/qt/res/icons/shibacoin.png
 
+pep.png
+  The official Pepecoin (PEP) coin logo from assets/brand/pepe-coin.png, scaled to 128 px.
+
+pepecoin-2016.png
+  The PepeCoin (PEPECOIN) "Rare Pepe" coin logo, supplied by the site owner, scaled to 128 px
+  and cut to a circle.
+
 web3icons licence:
 
 MIT License

@@ -12,6 +12,7 @@ response can never poison the history.
 Usage:
     python scripts/snapshot.py                 # normal daily run
     python scripts/snapshot.py --rows 2000     # how many addresses to keep
+    python scripts/snapshot.py --floor 5000000 # also page on down to this balance, for the ranks
     python scripts/snapshot.py --out-dir /tmp/x
 """
 import argparse
@@ -37,6 +38,11 @@ ANCHOR_HEIGHT = 1_235_437
 ANCHOR_SUPPLY_PEP = 104_791_880_000
 
 MAX_PAGES = 200
+
+# The community's size ranks, smallest balance first (PEP). Every address at or above the
+# floor is counted into meta["ranks"], even when only the top --rows are kept in the file.
+RANKS = [("Dolphin", 5_000_000), ("Shark", 10_000_000), ("Whale", 50_000_000),
+         ("Blue Whale", 100_000_000), ("Poseidon", 250_000_000)]
 
 
 # --------------------------------------------------------------------------- http
@@ -70,8 +76,11 @@ def get_json(url):
 
 
 # ------------------------------------------------------------------------- fetchers
-def fetch_rows(target, pause):
-    """Return (rows, info). rows = [(address, balance_sats, is_miner, last_seen)] sorted desc."""
+def fetch_rows(target, pause, floor_sats=0):
+    """Return (rows, info). rows = [(address, balance_sats, is_miner, last_seen)] sorted desc.
+
+    Pages on past `target` rows until a page ends below `floor_sats`, so every address at or
+    above the floor is in the list. info["floor_reached"] says whether that happened."""
     ladder = []
     for lim in (target, 500, 250, 100, 50, 10):
         if lim <= target and lim not in ladder:
@@ -108,19 +117,35 @@ def fetch_rows(target, pause):
             seen.add(addr)
             rows.append((addr, bal, 1 if it.get("isMiner") else 0, int(it.get("lastSeen") or 0)))
 
+    def low():   # smallest balance fetched so far
+        return min((r[1] for r in rows), default=0)
+
     add(items)
     page = 2
-    while len(rows) < target and page <= min(total_pages, MAX_PAGES):
+    last_page = len(items) < eff or total_pages <= 1
+    while (len(rows) < target or (floor_sats and low() >= floor_sats)) and not last_page and page <= min(total_pages, MAX_PAGES):
         time.sleep(pause)
         data = get_json(f"{SERVICE}/api/v3/addresses?page={page}&limit={eff}")
         batch = data.get("addresses") or []
         if not batch:
             break
         add(batch)
+        last_page = page >= total_pages or len(batch) < eff
         page += 1
 
     rows.sort(key=lambda r: -r[1])
-    return rows[:target], info
+    info["floor_reached"] = bool(rows) and (low() < floor_sats or last_page)
+    return rows, info
+
+
+def count_ranks(rows):
+    """[[name, min_pep, addresses, balance_sats as str]] for RANKS, from the full fetched list."""
+    out = []
+    for i, (name, lo) in enumerate(RANKS):
+        hi = RANKS[i + 1][1] if i + 1 < len(RANKS) else None
+        sel = [b for _, b, _, _ in rows if b >= lo * SATS and (hi is None or b < hi * SATS)]
+        out.append([name, lo, len(sel), str(sum(sel))])
+    return out
 
 
 def fetch_height():
@@ -206,6 +231,8 @@ def main():
                     help="addresses to keep (default 2000: top 1000 for the charts, plus a buffer "
                          "so the without-exchanges view still has enough rows)")
     ap.add_argument("--min-rows", type=int, default=int(os.environ.get("PEPE_MIN_ROWS", "1000")))
+    ap.add_argument("--floor", type=int, default=int(os.environ.get("PEPE_RANK_FLOOR", str(RANKS[0][1]))),
+                    help="also fetch every address with at least this many PEP, for the size ranks (0 = off)")
     ap.add_argument("--pause", type=float, default=1.5, help="seconds between pages")
     ap.add_argument("--out-dir", default=os.path.join(os.path.dirname(__file__), "..", "docs", "data", "snapshots"))
     ap.add_argument("--date", help="override snapshot date (YYYY-MM-DD, UTC); default today")
@@ -214,7 +241,11 @@ def main():
     today = args.date or dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
     print(f"Snapshot {today}: fetching top {args.rows} from {SERVICE}")
 
-    rows, info = fetch_rows(args.rows, args.pause)
+    fetched, info = fetch_rows(args.rows, args.pause, args.floor * SATS)
+    ranks = count_ranks(fetched) if args.floor and info.get("floor_reached") else None
+    if args.floor and not ranks:
+        print(f"  ranks skipped: the list did not reach {args.floor:,} PEP", file=sys.stderr)
+    rows = fetched[:args.rows]
     height = fetch_height()
     supply, source = fetch_supply(height)
 
@@ -238,6 +269,8 @@ def main():
         "holders_listed": info.get("holders_listed"),
         "rows": len(rows),
     }
+    if ranks:
+        meta["ranks"] = ranks
     out_dir = os.path.abspath(args.out_dir)
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, f"{today}.json")
