@@ -24,6 +24,7 @@
   --gold: #f6c565; --gold-wash: #33290f; --receipt: #1b2a20; --mark: #5c4d0f; --night: #0a0f0b; color-scheme: dark; }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: 90px; }
 body {
   margin: 0; color: var(--ink); font: 17px/1.6 var(--f-body);
@@ -249,7 +250,7 @@ figure.meme.blue { background: var(--shirt-wash); } figure.meme.green { backgrou
 .steps > li > div { display: grid; gap: 4px; }
 .steps b.t { display: block; font-family: var(--f-display); font-size: 1.15rem; }
 .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.checks li { display: flex; gap: 12px; align-items: baseline; }
+.checks li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 12px; align-items: baseline; }
 .checks li::before { content: "✓"; flex: none; display: grid; place-items: center; width: 26px; height: 26px; border: 2.5px solid var(--line); border-radius: 7px; background: var(--frog); color: var(--on-frog); font-weight: 700; font-size: 0.9rem; transform: translateY(4px); }
 .checks.x li::before { content: "✗"; background: var(--lips); color: #fff; }
 
@@ -375,7 +376,8 @@ footer.foot a { color: #edf3e3; }
   section.block { padding-block: 42px; }
   .hero { padding-block: 30px 18px; gap: 26px; }
   .pagehead { padding-block: 30px 20px; grid-template-columns: minmax(0, 1fr) 96px; gap: 14px; align-items: start; }
-  .pagehead figure.meme figcaption { font-size: 0.95rem; }
+  .pagehead figure.meme figcaption, .head.pic figure figcaption { font-size: 0.82rem; line-height: 1.05; }
+  figure.meme { padding: 6px; }
   .head.pic, .head.pic.wide { grid-template-columns: minmax(0, 1fr) 96px; gap: 14px; }
   .head.pic figure figcaption { font-size: 0.95rem; }
   .receipts, .receipts.three { grid-template-columns: 1fr; max-width: 360px; margin-inline: auto; }

@@ -184,7 +184,7 @@
      with a faint grid, an area, the end point and a hover/tap readout. */
   function lineChart(box, series, opt) {
     opt = opt || {};
-    var W = 900, H = opt.height || 300, L = opt.left || 58, R = 16, T = 16, B = 34;
+    var W = Math.round(Math.min(900, Math.max(340, box.clientWidth || 900))), H = Math.round((opt.height || 300) * (W < 600 ? 0.62 + 0.38 * W / 600 : 1)), L = opt.left || 58, R = 16, T = 16, B = 34;
     var all = [];
     series.forEach(function (s) { all = all.concat(s.points); });
     if (!all.length) return;

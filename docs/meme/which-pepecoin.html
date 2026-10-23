@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en" data-base="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PEP vs PEPE vs PEPECOIN: which frog is which? | Pepecoin Hub, meme edition</title>
+<meta name="description" content="Pepecoin (PEP) has its own proof-of-work blockchain. Pepe (PEPE) and PepeCoin (PEPECOIN) are ERC-20 tokens on Ethereum. Side by side, with sources and memes.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=Gochi+Hand&display=swap">
+<link rel="stylesheet" href="meme.css?v=20261023a">
+<style>
+[hidden] { display: none !important; }
+code { font: 700 0.92em/1.3 var(--f-mono); background: var(--paper); border: 1.5px solid color-mix(in srgb, var(--line) 30%, transparent); border-radius: 6px; padding: 1px 5px; overflow-wrap: anywhere; }
+.alloc b { display: block; font: 800 1.5rem/1 var(--f-display); }
+.addr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.addr .panel { padding: 20px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.prefix { font: 800 2.6rem/1 var(--f-mono); }
+.addr .pepx .prefix { color: var(--frog-deep); }
+.addr .ethx .prefix { color: var(--lips); }
+.addr-row { display: grid; gap: 6px; min-width: 0; padding-top: 10px; border-top: 2px dashed color-mix(in srgb, var(--line) 30%, transparent); }
+.addr-line { display: flex; gap: 8px; align-items: flex-start; min-width: 0; }
+.addr-line code { min-width: 0; font-size: 0.8rem; }
+.copy { flex: none; font: 700 0.75rem var(--f-mono); padding: 5px 9px; border: 2px solid var(--line); border-radius: 8px; background: var(--gold); color: #142016; cursor: pointer; box-shadow: 2px 2px 0 var(--hard); }
+.facts { margin: 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); }
+.facts dt, .facts dd { margin: 0; padding: 14px 0; border-bottom: 2px dashed color-mix(in srgb, var(--line) 22%, transparent); }
+.facts dt { font: 700 0.75rem/1.6 var(--f-mono); text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); padding-right: 14px; }
+.facts dd .src { display: block; margin-top: 4px; }
+.facts dt:last-of-type, .facts dd:last-of-type { border-bottom: 0; }
+.factsbox { padding: 6px 22px; }
+.freeze { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.freeze .callout p { max-width: none; }
+.links { align-items: start; }
+.cmp tbody th[scope="row"] { white-space: normal; width: 120px; }
+@media (max-width: 560px) { .cmp tbody th[scope="row"] { width: 86px; min-width: 86px; font-size: 0.66rem; padding-inline: 8px; } .cmp thead th:first-child { width: 86px; min-width: 86px; padding-inline: 8px; } }
+@media (max-width: 760px) { .addr, .freeze { grid-template-columns: 1fr; } .facts { grid-template-columns: 1fr; } .facts dt { padding-bottom: 0; border-bottom: 0; } .facts dd { padding-top: 4px; } }
+</style>
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body data-page="which-pepecoin">
+<a class="skip" href="#main">Skip to content</a>
+<div class="ticker"></div>
+<header class="top" id="top"></header>
+<noscript><p class="in">Menu needs JavaScript. <a href="../which-pepecoin.html">Open the serious version of this page</a>.</p></noscript>
+
+<main id="main">
+  <div class="in pagehead">
+    <div>
+      <p class="kicker">Which Pepecoin is which? · data as of October 6, 2026</p>
+      <h1>Pepecoin vs Pepe: <mark>three frogs</mark>, one name.</h1>
+      <p class="lede"><b>Short answer:</b> Pepecoin (PEP) is a coin on its own proof-of-work blockchain, merge-mined with Litecoin and Dogecoin. Pepe (PEPE) and PepeCoin (PEPECOIN) are ERC-20 tokens on Ethereum. All three go by some version of the name <b>Pepecoin</b>, and Kraken lists all three. Below: a sourced comparison, freezes and public identity included. No hype.</p>
+      <div class="badges"><span class="sticker green">PEP: own chain</span><span class="sticker red">PEPE: Ethereum</span><span class="sticker blue">PEPECOIN: Ethereum</span></div>
+    </div>
+    <figure class="panel meme red"><img src="img/distracted.webp" alt="Distracted-boyfriend meme with Pepes in $PEP and $PEPE shirts" width="640" height="640"><figcaption>same name, different frog</figcaption></figure>
+  </div>
+
+  <section class="in" aria-labelledby="compare" style="padding-block:44px 30px">
+    <div class="head pic">
+      <div><p class="kicker">The big table</p><h2 id="compare">Side by side</h2><p class="muted">Scroll sideways on a phone. The PEP column is the green one.</p></div>
+      <figure class="panel meme blue"><img src="img/glasses.webp" alt="Pepe adjusting his glasses" width="420" height="411"><figcaption>let me check that ticker</figcaption></figure>
+    </div>
+    <div class="tablebox" role="region" aria-labelledby="compare" tabindex="0">
+      <table class="cmp" style="min-width:760px">
+        <thead><tr>
+          <th scope="col"><small>Ticker</small></th>
+          <th scope="col" class="pep"><img src="img/pep-logo.webp" alt="" width="40" height="40">PEP<small>Pepecoin · this site</small></th>
+          <th scope="col"><img src="img/pepe.png" alt="" width="40" height="40">PEPE<small>Pepe</small></th>
+          <th scope="col"><img src="img/pepecoin2016.webp" alt="" width="40" height="40">PEPECOIN<small>PepeCoin / Memetic</small></th>
+        </tr></thead>
+        <tbody>
+          <tr><th scope="row">What it is</th><td class="pep">Its own layer-1 blockchain, a fork of Dogecoin Core</td><td>ERC-20 token on Ethereum</td><td>ERC-20 token on Ethereum. Ran its own chain from 2016, bridged to Ethereum in 2023</td></tr>
+          <tr><th scope="row">Launched</th><td class="pep">January 30, 2024</td><td>April 2023</td><td>March 2016</td></tr>
+          <tr><th scope="row">Who's behind it</th><td class="pep">Pepecoin LLC, with a publicly named co-founder (David Eichel). It published its own MiCA whitepaper. <a href="#identity">More</a></td><td>No legal issuer. Created by anonymous developers whose identities are not publicly known (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">LCX MiCA whitepaper for PEPE</a>, B.2 and D.5)</td><td>No verified data</td></tr>
+          <tr><th scope="row">Secured by</th><td class="pep">Scrypt proof of work, merge-mined with Litecoin and Dogecoin</td><td>Ethereum validators (proof of stake)</td><td>Ethereum validators today. Originally X11 proof of work, then proof of stake</td></tr>
+          <tr><th scope="row">Can you mine it?</th><td class="pep"><span class="yes">Yes</span>, with a Scrypt ASIC on a pool that merge-mines PEP. <a href="mining.html">How to mine PEP</a></td><td><span class="no">No.</span> A token on Ethereum, which uses proof of stake, is not mined</td><td><span class="no">No</span>, not since it moved to Ethereum</td></tr>
+          <tr><th scope="row">Account model</th><td class="pep">UTXO, like Bitcoin and Dogecoin: coins sit in unspent outputs that only the key holder can spend</td><td>ERC-20: a balance recorded inside the token's smart contract on Ethereum</td><td>ERC-20: a balance recorded inside the token's smart contract on Ethereum</td></tr>
+          <tr><th scope="row">Fees paid in</th><td class="pep">PEP, to the miners of the Pepecoin chain</td><td>ETH, as Ethereum gas, even when only PEPE moves</td><td>ETH, as Ethereum gas, even when only PEPECOIN moves</td></tr>
+          <tr><th scope="row">Cost of a transfer</th><td class="pep">Recommended fee 0.01 PEP per kB, under $0.000001 at the October 2026 price (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td><td>Depends on the Ethereum gas price at the moment. See the <a href="https://etherscan.io/gastracker">Etherscan gas tracker</a></td><td>Depends on the Ethereum gas price at the moment. See the <a href="https://etherscan.io/gastracker">Etherscan gas tracker</a></td></tr>
+          <tr><th scope="row">Launch allocation</th>
+            <td class="pep alloc"><b class="up">0%</b><div class="meter" role="img" aria-label="0 percent on a 0 to 10 percent scale"><i style="width:0%"></i></div>no premine, no pre-allocation, no ICO, no funding round</td>
+            <td class="alloc"><b class="dn">6.9%</b><div class="meter" role="img" aria-label="6.9 percent on a 0 to 10 percent scale"><i style="width:69%"></i></div>to a team multisig wallet; 93.1% to the liquidity pool</td>
+            <td class="alloc"><b class="dn">3.5%</b><div class="meter" role="img" aria-label="3.5 percent on a 0 to 10 percent scale"><i style="width:35%"></i></div>premine for a development fund, per the project's own 2016 repository</td></tr>
+          <tr><th scope="row">Protocol freeze</th><td class="pep"><b>No protocol blacklist.</b> Like Bitcoin/Dogecoin UTXO coins, nobody can freeze an arbitrary address at the chain layer. An exchange or custodial wallet can still freeze balances <i>it</i> holds.</td><td>Contract has blacklist/transfer rules. Deployer blacklisted one address early, then renounced ownership (owner = zero). New owner-only freezes via Ownable are disabled; that one address stays frozen.</td><td>Separate ERC-20. Check that contract’s own admin status; do not assume it matches PEPE.</td></tr>
+          <tr><th scope="row">Supply</th><td class="pep"><b>~<span data-m="supply-b">104.9</span> billion</b>, plus 10,000 per block, no cap</td><td><b>420.69 trillion</b>, fixed</td><td><b>~107.6 million</b> total supply on Ethereum (max 133.8 million)</td></tr>
+          <tr><th scope="row">Address</th><td class="pep">Starts with <code>P</code></td><td>Starts with <code>0x</code></td><td>Starts with <code>0x</code></td></tr>
+          <tr><th scope="row">On Kraken</th><td class="pep">Since February 11, 2026</td><td>Since May 16, 2023</td><td>Since February 18, 2026</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:14px">Allocation bars share one scale, 0 to 10%.</p>
+  </section>
+
+  <section class="block in" aria-labelledby="freeze">
+    <div class="head pic">
+      <div><p class="kicker">Admin keys, anyone?</p><h2 id="freeze">Who can freeze what</h2></div>
+      <figure class="panel meme green"><img src="img/based.webp" alt="Pepe pointing at you" width="420" height="236" loading="lazy"><figcaption>no admin key, fren</figcaption></figure>
+    </div>
+    <div class="freeze">
+      <div class="panel callout red"><h3>PEPE (Ethereum token)</h3><p>The verified contract includes blacklist logic. Around launch, one address that bought a large amount was blacklisted; ownership was then renounced, so further owner-only blacklist changes via Ownable no longer work. The already-blacklisted balance stays stuck. Many other ERC-20s keep an active owner with pause/blacklist, so always read the contract.</p></div>
+      <div class="panel callout green"><h3>PEP (this chain)</h3><p>There is no admin key in the protocol that can blacklist your address or stop a signed spend. That is the same model as Bitcoin and Dogecoin. It does <i>not</i> mean you cannot lose coins: wrong network, phishing, or a custodian freezing a deposit still apply.</p></div>
+    </div>
+    <p class="src" style="margin-top:14px">Sources: <a href="https://etherscan.io/address/0x6982508145454ce325ddbe47a25d4ec3d2311933#code">PEPE contract on Etherscan</a> <code>0x6982508145454Ce325dDbE47a25d4ec3d2311933</code> (<a href="https://etherscan.io/tx/0x91c9a6caf8e7b5419a7e597982a0cf9b4fc01413279ab840bb57a2e9c528f252">renounce transaction</a>); <a href="https://www.cointime.ai/news/pepe-tokens-blacklist-functionality-used-to-block-address-holding-8-million-in-tokens-87311">Cointime, May 6, 2023</a> (one address blacklisted, then ownership renounced); <a href="https://www.fairyproof.com/doc/Pepe-Token-Audit-Report-082123.pdf">Fairyproof audit, Aug 21, 2023</a> (blacklist function present, owner is the zero address); Pepecoin Core UTXO design.</p>
+  </section>
+
+  <section class="block in" aria-labelledby="identity" style="padding-top:10px">
+    <div class="panel callout gold withpic">
+      <img src="img/mentioned.webp" alt="Pepe peeking out of a box labelled Pepecoin mentioned" width="640" height="393" loading="lazy">
+      <div>
+        <p class="kicker">Real names, real filings</p>
+        <h2 id="identity">Public identity (PEP project)</h2>
+        <p>Pepecoin LLC’s MiCA crypto-asset whitepaper (admission to trading) names the offeror’s management body. A Pepecoin co-founder also spoke on the merged-mining panel at <b>Litecoin Summit</b>, Amsterdam, <b>22–23 June 2026</b> (Dutch Blockchain Week). That is voluntary public identification and a regulatory filing, not involuntary exposure of private persons.</p>
+        <p class="src">Sources: <a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA whitepaper</a>; <a href="https://news.bitcoin.com/pepecoin-co-founder-david-eichel-to-speak-on-merge-mining-panel-at-litecoin-summit-2026/">Bitcoin.com announcement</a>; <a href="https://www.cryptotimes.io/2026/06/24/litecoin-summit-day-2-litvms-50m-bet-and-basicswapdexs-bold-vision/">CryptoTimes summit recap</a> (panel participants).</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block in" aria-labelledby="check">
+    <div class="head"><p class="kicker">Five-second test</p><h2 id="check">Check an address in five seconds</h2><p class="lede">The first letters tell you which chain you are on. Wrong network, wrong frog.</p></div>
+    <div class="addr">
+      <div class="panel pepx">
+        <span class="prefix">P…</span>
+        <p>Pepecoin (PEP). Native coin on its own chain. Check it on <a href="https://pepeplorer.com">pepeplorer.com</a> or <a href="https://pepeblocks.com">pepeblocks.com</a>. Sending PEP to an Ethereum <code>0x</code> address will not credit the token.</p>
+      </div>
+      <div class="panel ethx">
+        <span class="prefix">0x…</span>
+        <p>An Ethereum token. Match the contract:</p>
+        <div class="addr-row">
+          <b>PEPE</b>
+          <div class="addr-line"><code id="c-pepe">0x6982508145454Ce325dDbE47a25d4ec3d2311933</code><button class="copy" type="button" data-target="c-pepe">Copy</button></div>
+          <a class="src" href="https://etherscan.io/token/0x6982508145454ce325ddbe47a25d4ec3d2311933">PEPE on Etherscan</a>
+        </div>
+        <div class="addr-row">
+          <b>PEPECOIN</b>
+          <div class="addr-line"><code id="c-pepecoin">0xA9E8aCf069C58aEc8825542845Fd754e41a9489A</code><button class="copy" type="button" data-target="c-pepecoin">Copy</button></div>
+          <a class="src" href="https://etherscan.io/token/0xa9e8acf069c58aec8825542845fd754e41a9489a">PEPECOIN on Etherscan</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block in" aria-labelledby="pep">
+    <div class="head pic">
+      <div><p class="kicker">Just the PEP</p><h2 id="pep">Pepecoin (PEP) in numbers</h2><p class="muted">Each line names its source.</p></div>
+      <figure class="panel meme"><img src="img/empty-pool.webp" alt="Pepe standing alone in an empty swimming pool" width="640" height="439" loading="lazy"><figcaption>the PEP premine pool. Still empty.</figcaption></figure>
+    </div>
+    <div class="panel factsbox">
+      <dl class="facts">
+        <dt>Genesis</dt><dd>Network live January 30, 2024. The genesis block embeds a <i>Wall Street Journal</i> headline dated January 22, 2024. <span class="src">MiCA whitepaper; chainparams.cpp</span></dd>
+        <dt>Allocation</dt><dd>None. Every PEP came from block rewards to miners. Pepecoin LLC holds no PEP. <span class="src">MiCA whitepaper, sections D.9 and G.5</span></dd>
+        <dt>Mining</dt><dd>Scrypt proof of work. Merged mining (AuxPoW) with Litecoin and Dogecoin since block <b>42,000</b>, chain ID <b>63</b>. <span class="src">chainparams.cpp</span></dd>
+        <dt>Blocks</dt><dd>About one every <b>60</b> seconds, <b>10,000</b> PEP each, no supply cap. <span class="src">MiCA whitepaper, section G.13</span></dd>
+        <dt>Pools (examples)</dt><dd>Among others: <a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC</a>, <a href="https://ultramining.com/news/en/antpool-launches-joint-mining-of-ltc-with-lky-pep-and-jkc/">AntPool</a>, <a href="https://www.kupool.com/">KuPool</a>, <a href="https://www.mining-dutch.nl/pools/pepecoin.php">Mining-Dutch</a>, <a href="https://www.litecoinpool.org/help">litecoinpool.org</a>, <a href="https://cryptonews.net/news/market/30268800/">Binance Pool</a>, <a href="https://www.f2pool.com/coin/pepecoin">F2Pool</a>, <a href="https://emcd.io/pool/pepecoin/">EMCD</a>. Live list: <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>. See also <a href="rich-list.html">rich list</a> pool tags and <a href="https://peppool.space/mining">peppool.space</a>. <span class="src">Pool pages and announcements; miningpoolstats; explorer coinbase</span></dd>
+        <dt>Supply</dt><dd><b>~<span data-m="supply-b">104.9</span> billion</b> PEP per explorers such as Pepeplorer. Aggregators can list less: CoinGecko gave a circulating supply of ~102.7 billion on October 4–5, 2026. Prefer a live explorer with a date. <span class="src">Pepeplorer; CoinGecko, October 4–5, 2026</span></dd>
+        <dt>Kraken / MiCA</dt><dd>PEP trading on Kraken from <b>11 February 2026</b>. MiCA whitepaper for Pepecoin LLC (notification context cited on pepecoin.com: notified April 7, 2026, published May 8, 2026). Geographic availability can differ by region: that is exchange policy and regulation, not a chain feature. <span class="src">Kraken blog; pepecoin.com/mica-whitepaper.xhtml</span></dd>
+        <dt>Code</dt><dd>MIT-licensed, public at <a href="https://github.com/pepecoinppc/pepecoin">github.com/pepecoinppc/pepecoin</a>.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="block in" aria-labelledby="faq">
+    <div class="head"><p class="kicker">Frens keep asking</p><h2 id="faq">Common questions</h2></div>
+    <div class="faq">
+      <details class="panel" open><summary>Is Pepecoin (PEP) the same as PEPE?</summary><p>No. PEPE is an ERC-20 token on Ethereum. Pepecoin (PEP) is a native coin on its own Scrypt proof-of-work blockchain. Check the address prefix: <code>P…</code> vs <code>0x…</code>.</p></details>
+      <details class="panel"><summary>Is PEPE Ethereum based? Does PEP have a contract address?</summary><p>Yes, Pepe (PEPE) is an ERC-20 token on Ethereum, launched in April 2023. PepeCoin (PEPECOIN) has been an ERC-20 token on Ethereum since 2023 too. Pepecoin (PEP) is not on Ethereum: it is the native coin of its own blockchain, so it has no contract address. A PEP address starts with <code>P</code>.</p></details>
+      <details class="panel"><summary>Is Pepecoin (PEP) related to Rare Pepe?</summary><p>No. Rare Pepes are collectible Pepe trading cards issued since 2016 as Counterparty assets on Bitcoin. Pepecoin (PEP) is a separate coin on its own Scrypt blockchain, launched in 2024.</p></details>
+      <details class="panel"><summary>Which wallet do I need?</summary><p>For PEP, a wallet that supports the Pepecoin network: the official <a href="https://github.com/pepecoinppc/pepecoin/releases">Pepecoin Core</a>, a <a href="https://tangem.com/en/cryptocurrencies/pepecoin-network/">Tangem</a> card, or the others in our <a href="wallets.html">wallet guide</a>. PEPE and PEPECOIN are Ethereum tokens, so they live in Ethereum wallets such as MetaMask, which is built for Ethereum-type networks and does not list Pepecoin.</p></details>
+      <details class="panel"><summary>Can someone freeze my PEP on the protocol?</summary><p>No protocol admin blacklist. Custodians (exchanges, hosted wallets) can still freeze balances they hold. PEPE’s Ethereum contract is a different story: see “Who can freeze what” above.</p></details>
+      <details class="panel"><summary>Why might Kraken show geographic restrictions?</summary><p>Exchange policy and regulation (including MiCA in the EEA), not a Pepecoin consensus rule.</p></details>
+      <details class="panel"><summary>How do I verify the ticker when withdrawing?</summary><p>Pick <b>Pepecoin (PEP)</b> on the <b>Pepecoin</b> network. A PEP address starts with <code>P</code>. PEPE and PEPECOIN are Ethereum tokens; their addresses start with <code>0x</code> and live on a different network. See the address check above.</p></details>
+      <details class="panel"><summary>What if I send to the wrong network?</summary><p>Wrong-network sends are usually irreversible. PEP on the Pepecoin chain and PEPE on Ethereum are not interchangeable. Always match ticker, network, and address format before sending. Check PEP transfers on <a href="https://pepeblocks.com/">PepeBlocks</a> or <a href="https://pepeplorer.com/">Pepeplorer</a>; check Ethereum tokens on <a href="https://etherscan.io/">Etherscan</a>.</p></details>
+      <details class="panel"><summary>Why might CoinMarketCap show a different supply than explorers?</summary><p>Explorers such as Pepeplorer show about <b><span data-m="supply-b">104.9</span> billion</b> PEP. Aggregators can list less: CoinGecko gave a circulating supply of about 102.7 billion on October 4–5, 2026. Prefer a live explorer with a date. See “Pepecoin (PEP) in numbers” above.</p></details>
+      <details class="panel"><summary>Does a rich-list address equal one person?</summary><p>No. An address is not a person: exchanges and custodians hold coins for many users. See the <a href="rich-list.html">rich list</a> notes.</p></details>
+    </div>
+  </section>
+
+  <section class="block in" aria-labelledby="sources" style="padding-top:10px">
+    <div class="head"><p class="kicker">Receipts</p><h2 id="sources">Sources</h2></div>
+    <div class="links">
+      <div class="panel"><h3>PEP · Pepecoin</h3><ul>
+        <li><a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA whitepaper</a></li>
+        <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp (AuxPoW, genesis)</a></li>
+        <li><a href="https://pepeplorer.com/network">Pepeplorer network stats</a></li>
+        <li><a href="https://blog.kraken.com/product/asset-listings/pep-is-available-for-trading">Kraken listing, Feb 2026</a></li>
+        <li><a href="https://news.bitcoin.com/pepecoin-co-founder-david-eichel-to-speak-on-merge-mining-panel-at-litecoin-summit-2026/">Litecoin Summit (Bitcoin.com)</a></li>
+        <li><a href="https://www.cryptotimes.io/2026/06/24/litecoin-summit-day-2-litvms-50m-bet-and-basicswapdexs-bold-vision/">Litecoin Summit recap (CryptoTimes)</a></li>
+        <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC on PEP merged mining</a></li>
+        <li><a href="https://peppool.space/mining">peppool.space mining pools</a></li>
+        <li><a href="https://miningpoolstats.stream/pepecoin">miningpoolstats: Pepecoin pools</a></li>
+        <li><a href="https://www.mining-dutch.nl/pools/pepecoin.php">Mining-Dutch: Pepecoin pool, paid in PEP</a></li>
+        <li><a href="https://ultramining.com/news/en/antpool-launches-joint-mining-of-ltc-with-lky-pep-and-jkc/">AntPool adds PEP merged mining, Dec 2024 (Ultramining)</a></li>
+        <li><a href="https://www.kupool.com/">KuPool: coin list with PEP</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko: Pepecoin (supply snapshot, Oct 4–5, 2026)</a></li>
+        <li><a href="https://github.com/pepecoinppc/pepecoin">Pepecoin Core (UTXO model, fees in PEP)</a></li>
+        <li><a href="https://tangem.com/en/cryptocurrencies/pepecoin-network/">Tangem: Pepecoin support</a></li>
+      </ul></div>
+      <div class="panel"><h3>PEPECOIN · PepeCoin / Memetic</h3><ul>
+        <li><a href="https://github.com/memeticproject/memetic-core">2016 repository (3.5% premine)</a></li>
+        <li><a href="https://bitcointalk.org/index.php?topic=1391598.0">Bitcointalk announcement</a></li>
+        <li><a href="https://etherscan.io/token/0xa9e8acf069c58aec8825542845fd754e41a9489a">Etherscan token page</a></li>
+        <li><a href="https://www.coingecko.com/en/coins/pepecoin">CoinGecko: PepeCoin supply (total 107.6M, max 133.8M), Oct 12, 2026</a></li>
+        <li><a href="https://blog.kraken.com/product/asset-listings/pepecoin-is-available-for-trading">Kraken listing, Feb 2026</a></li>
+      </ul></div>
+      <div class="panel"><h3>PEPE · Pepe</h3><ul>
+        <li><a href="https://etherscan.io/token/0x6982508145454ce325ddbe47a25d4ec3d2311933">Etherscan token page</a></li>
+        <li><a href="https://blog.kraken.com/post/18691/trading-for-pepe-pepe-starts-now/">Kraken: trading for PEPE starts, May 16, 2023</a></li>
+        <li><a href="https://www.cointime.ai/news/pepe-tokens-blacklist-functionality-used-to-block-address-holding-8-million-in-tokens-87311">Cointime: one address blacklisted, ownership renounced (May 6, 2023)</a></li>
+        <li><a href="https://www.fairyproof.com/doc/Pepe-Token-Audit-Report-082123.pdf">Fairyproof audit report (Aug 21, 2023)</a></li>
+        <li><a href="https://www.techopedia.com/definition/pepe-coin-pepe">Techopedia: launch tokenomics</a></li>
+        <li><a href="https://www.sec.gov/Archives/edgar/data/2109686/000199937126007908/canarypepe-s1.htm">Canary PEPE ETF, Form S-1</a></li>
+      </ul></div>
+      <div class="panel"><h3>Ethereum tokens in general</h3><ul>
+        <li><a href="https://eips.ethereum.org/EIPS/eip-20">ERC-20 token standard (EIP-20)</a></li>
+        <li><a href="https://ethereum.org/en/developers/docs/gas/">ethereum.org: gas is paid in ETH</a></li>
+        <li><a href="https://docs.metamask.io/wallet/how-to/use-non-evm-networks/">MetaMask: supported non-EVM networks</a></li>
+      </ul></div>
+    </div>
+    <p class="note" style="margin-top:16px">“No protocol freeze” is not a guarantee against scams, wrong-network sends, or custodial freezes.</p>
+  </section>
+</main>
+
+<footer class="foot"></footer>
+<script src="meme.js?v=20261023a"></script>
+<script>
+(function () {
+  // copy buttons for the contract addresses
+  document.querySelectorAll('.copy').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var code = document.getElementById(b.getAttribute('data-target')), text = code.textContent;
+      var done = function () { b.textContent = 'Copied ✓'; setTimeout(function () { b.textContent = 'Copy'; }, 1600); };
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () { window.getSelection().selectAllChildren(code); });
+      else window.getSelection().selectAllChildren(code);
+    });
+  });
+  // live supply, in billions, from the daily network snapshot
+  Meme.json('network.json').then(function (n) {
+    var last = n.rows[n.rows.length - 1];
+    Meme.fill({ 'supply-b': (last[2] / 1e9).toFixed(1) });
+  }).catch(function () { /* keep the saved figure */ });
+})();
+</script>
+</body>
+</html>
