@@ -245,6 +245,7 @@
     document.addEventListener('click', function (e) { if (!nav.contains(e.target)) closeAll(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeAll(); setMenu(false); } });
     frag.appendChild(games);
+    frag.appendChild(memeLink());
     nav.insertBefore(frag, nav.firstChild);
     nav.classList.add('grouped');
     // phone: "Start" and Games in the header bar; Start opens the whole menu below it, "Start here" group first
@@ -258,6 +259,19 @@
     qs.addEventListener('click', function () { setMenu(!head.classList.contains('menu-open')); });
     tools.appendChild(qs); tools.appendChild(quick);
     head.insertBefore(tools, nav);
+  }
+
+  // The meme edition (English only, /meme/): the same page there when it has one, else its home page.
+  var MEME = ['index', 'which-pepecoin', 'compare', 'scrypt-family', 'mica', 'calculator', 'price', 'supply', 'network', 'rich-list', 'mining', 'buy', 'wallets', 'glossary'];
+  function memeLink() {
+    var m = location.pathname.match(/([a-z-]+)\.html$/), page = m ? m[1] : 'index';
+    var a = document.createElement('a');
+    a.className = 'nav-meme';
+    a.href = ROOT + 'meme/' + (page !== 'index' && MEME.indexOf(page) >= 0 ? page + '.html' : '');
+    a.title = 'The same facts, with memes (English)';
+    a.innerHTML = '<i aria-hidden="true"></i><span>Meme mode</span>';
+    a.addEventListener('click', function () { try { localStorage.setItem('hub-mode', 'meme'); } catch (e) {} });
+    return a;
   }
 
   // Footer: the logo with the "community fact pages" line and the community links, then every page of the site
