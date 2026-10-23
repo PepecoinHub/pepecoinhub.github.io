@@ -630,6 +630,12 @@ input, select, textarea { border-radius: 12px; }
 }
 .news-rot.rot-ready .rot-item.is-on { opacity: 1; visibility: visible; transform: none; filter: none; transition-delay: 0.14s, 0.14s, 0.14s, 0s; }
 .news-rot.rot-ready .rot-item.is-out { transform: translateY(-9px); }
+/* stepping by swipe, drag or arrow keys slides sideways in that direction */
+.news-rot.rot-ready { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.news-rot.rot-ready[data-dir="next"] .rot-item:not(.is-on) { transform: translateX(28px); }
+.news-rot.rot-ready[data-dir="next"] .rot-item.is-out { transform: translateX(-28px); }
+.news-rot.rot-ready[data-dir="prev"] .rot-item:not(.is-on) { transform: translateX(-28px); }
+.news-rot.rot-ready[data-dir="prev"] .rot-item.is-out { transform: translateX(28px); }
 .rot-dots { grid-area: 2 / 1; display: flex; gap: 2px; margin: 4px 0 -6px -4px; }
 .rot-dot { display: grid; align-items: center; height: 20px; padding: 0 4px; border: 0; background: none; cursor: pointer; }
 .rot-dot i {
