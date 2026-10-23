@@ -70,7 +70,12 @@ q { quotes: "\201C" "\201D"; }
 .fam-time { position: relative; height: 20px; margin: 12px 0 2px; border-bottom: 2px solid var(--rule); }
 .fam-time i { position: absolute; bottom: 3px; width: 14px; height: 14px; border-radius: 3px; background: var(--muted); transform: translateX(-100%); }
 .fam-chain.hl .fam-time i { background: var(--series); }
-.fam-time-label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+.fam-count { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin: 10px 0 0; }
+.fam-count b { font-size: 0.98rem; }
+.fam-count span { font-size: 0.85rem; color: var(--muted); }
+.fam-time { color: var(--rule); background: linear-gradient(currentColor, currentColor) 0 100% / 2px 8px no-repeat, linear-gradient(currentColor, currentColor) 20% 100% / 2px 8px no-repeat, linear-gradient(currentColor, currentColor) 40% 100% / 2px 8px no-repeat, linear-gradient(currentColor, currentColor) 60% 100% / 2px 8px no-repeat, linear-gradient(currentColor, currentColor) 80% 100% / 2px 8px no-repeat, linear-gradient(currentColor, currentColor) 100% 100% / 2px 8px no-repeat; }
+.fam-time { margin-inline: 7px; } .fam-time i { transform: translateX(-50%); }
+.fam-time-label { padding-inline: 2px; display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
 .fam-pays { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule); font-size: 0.9rem; }
 .fam-more { margin-top: 14px; font-size: 0.9rem; color: var(--muted); text-align: center; max-width: 62ch; }
 .pull { margin: 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--accent); display: grid; gap: 8px; max-width: 68ch; }
@@ -175,22 +180,25 @@ q { quotes: "\201C" "\201D"; }
       <li class="fam-chain">
         <h3>Litecoin</h3>
         <span class="fam-role">LTC · parent chain, since 2011</span>
+        <p class="fam-count"><b>2 blocks in 5 minutes</b><span>a block every 2.5 min</span></p>
         <div class="fam-time" role="img" aria-label="2 blocks in five minutes"><i style="left:50%"></i><i style="left:100%"></i></div>
-        <span class="fam-time-label"><span>blocks in 5 min</span><span>a block every 2.5 min</span></span>
+        <span class="fam-time-label"><span>0</span><span>5 min</span></span>
         <span class="fam-pays">Pays LTC</span>
       </li>
       <li class="fam-chain">
         <h3>Dogecoin</h3>
         <span class="fam-role">DOGE · merge-mined since 2014</span>
+        <p class="fam-count"><b>5 blocks in 5 minutes</b><span>a block every minute</span></p>
         <div class="fam-time" role="img" aria-label="5 blocks in five minutes"><i style="left:20%"></i><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i><i style="left:100%"></i></div>
-        <span class="fam-time-label"><span>blocks in 5 min</span><span>a block every minute</span></span>
+        <span class="fam-time-label"><span>0</span><span>5 min</span></span>
         <span class="fam-pays">Pays DOGE</span>
       </li>
       <li class="fam-chain hl">
         <h3>Pepecoin</h3>
         <span class="fam-role">PEP · merge-mined since 2024</span>
+        <p class="fam-count"><b>5 blocks in 5 minutes</b><span>a block every minute</span></p>
         <div class="fam-time" role="img" aria-label="5 blocks in five minutes"><i style="left:20%"></i><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i><i style="left:100%"></i></div>
-        <span class="fam-time-label"><span>blocks in 5 min</span><span>a block every minute</span></span>
+        <span class="fam-time-label"><span>0</span><span>5 min</span></span>
         <span class="fam-pays">Pays PEP</span>
       </li>
     </ul>
