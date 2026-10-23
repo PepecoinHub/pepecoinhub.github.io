@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en" data-base="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pepecoin (PEP) price: live chart and the ×N machine | Pepecoin Hub meme edition</title>
+<meta name="description" content="The live Pepecoin (PEP) price and chart, Pepe (PEPE) on the same chart if you want it, and the plain arithmetic of what a ×100 would mean. NFA.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=Gochi+Hand&display=swap">
+<link rel="stylesheet" href="meme.css?v=20261023a">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<style>
+[hidden] { display: none !important; }
+.notpepe { display: grid; gap: 12px; padding: 18px; }
+.np-pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 14px; }
+.np-coin { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 12px; border-radius: 14px; background: var(--frog-wash); border: 3px solid var(--line); }
+.np-coin.pepe { background: var(--lips-wash); }
+.np-coin img { grid-row: 1 / 3; width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--line); background: #fff; }
+.np-coin b { font: 800 1.1rem var(--f-display); }
+.np-coin span { font-size: 0.86rem; color: var(--muted); }
+.np-ne { font: 800 2.6rem/1 var(--f-display); color: var(--lips); }
+@media (max-width: 560px) { .np-pair { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 6px; } .np-coin { width: 100%; } }
+.nowrow { display: grid; grid-template-columns: minmax(0, 1fr) 210px; gap: 24px; align-items: start; }
+.tile.main { background: var(--frog-wash); }
+.nowrow .tiles { grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 14px; }
+.nowrow .tile .value { font-size: clamp(1.3rem, 2vw, 1.6rem); }
+.value.up { color: var(--frog-deep); } .value.down { color: var(--lips); }
+.chart-card { display: grid; gap: 12px; padding: 18px; }
+.chart-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.pseg { display: flex; flex-wrap: wrap; gap: 6px; }
+.pseg button { font: 700 0.85rem/1 var(--f-mono); padding: 9px 12px; border: 2.5px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); cursor: pointer; box-shadow: 2px 2px 0 var(--hard); }
+.pseg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font: 800 0.92rem var(--f-display); cursor: pointer; padding: 7px 12px; border: 2.5px solid var(--line); border-radius: 12px; background: var(--lips-wash); box-shadow: 2px 2px 0 var(--hard); }
+.toggle input { width: 18px; height: 18px; accent-color: var(--lips); }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; font: 700 0.85rem var(--f-mono); }
+.k::before { content: ""; display: inline-block; width: 18px; height: 4px; border-radius: 2px; margin-right: 6px; vertical-align: middle; background: var(--frog-deep); }
+.k.pepe::before { background: var(--lips); }
+.chart-change { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chart-wrap { position: relative; min-height: 260px; }
+.pchart svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.pchart .grid { stroke: var(--line); stroke-opacity: 0.16; stroke-width: 1; }
+.pchart .zero { stroke: var(--muted); stroke-dasharray: 3 4; }
+.pchart .axis { fill: var(--muted); font: 700 11px var(--f-mono); }
+.pchart .line { fill: none; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.pchart .line.pep { stroke: var(--frog-deep); }
+.pchart .line.pepe { stroke: var(--lips); }
+.pchart .fill-top { stop-color: var(--frog); stop-opacity: 0.3; }
+.pchart .fill-bottom { stop-color: var(--frog); stop-opacity: 0; }
+.pchart .cross { stroke: var(--line); stroke-dasharray: 2 3; }
+.pchart .dot { stroke: var(--line); stroke-width: 2.5; }
+.pchart .dot.pep { fill: var(--gold); }
+.pchart .dot.pepe { fill: var(--lips); }
+.chart-tip { position: absolute; top: 8px; display: grid; gap: 2px; padding: 7px 10px; font: 700 0.8rem/1.35 var(--f-mono); background: var(--card); border: 2.5px solid var(--line); border-radius: 10px; box-shadow: 3px 3px 0 var(--hard); pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chart-msg { position: absolute; inset: auto 0 18px; text-align: center; padding: 0 16px; color: var(--muted); font-weight: 700; }
+.load-frog { position: absolute; left: 50%; top: 24px; transform: translateX(-50%); width: 140px; border: 3px solid var(--line); border-radius: 12px; }
+.chart-msg[hidden] + picture { display: none; }
+.xctl { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px 18px; padding: 14px 18px; }
+.xhead { display: grid; gap: 2px; min-width: 4.8em; }
+.xhead .label, .xprice > span:first-child { font: 700 0.7rem/1.25 var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.xhead b { font: 800 2rem/1 var(--f-display); color: var(--frog-deep); font-variant-numeric: tabular-nums; }
+#x-range { width: 100%; min-width: 0; margin: 0; accent-color: var(--frog); min-height: 28px; }
+.xrow { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 14px; }
+.xpre { display: flex; flex-wrap: wrap; gap: 8px; }
+.xpre button { font: 700 0.85rem/1 var(--f-mono); padding: 9px 12px; border: 2.5px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); cursor: pointer; box-shadow: 2px 2px 0 var(--hard); }
+.xpre button[aria-pressed="true"] { background: var(--gold); color: #142016; }
+.xprice { display: flex; align-items: center; gap: 10px; flex: 0 1 310px; min-width: 0; }
+.xprice > span:first-child { max-width: 10em; }
+.xin { flex: 1; display: flex; align-items: center; gap: 6px; padding: 0 12px; min-height: 42px; min-width: 7em; background: var(--paper); border: 2.5px solid var(--line); border-radius: 12px; }
+.xin:focus-within { outline: 3px solid var(--shirt); outline-offset: 2px; }
+.xin input { flex: 1; width: 100%; min-width: 0; font: 800 1.05rem var(--f-display); color: var(--ink); background: transparent; border: 0; outline: none; }
+.xhint { grid-column: 1 / -1; font-size: 0.88rem; color: var(--muted); }
+.xhint:empty { display: none; }
+@media (max-width: 600px) { .xprice { flex: 1 1 100%; } .xprice > span:first-child { max-width: 50%; } }
+@media (min-width: 1000px) { .xctl { grid-template-columns: auto minmax(220px, 1fr) auto auto; } .xprice { width: 280px; } .xrow { display: contents; } }
+.xvs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 22px; margin-top: 22px; }
+.xcard { display: grid; gap: 10px; align-content: start; min-width: 0; padding: 18px; background: var(--frog-wash); }
+.xcard.pepe { background: var(--lips-wash); }
+.xcard h4 { margin: 6px 0 0; font: 700 0.75rem/1.3 var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.xcard dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.xcard dt { font-size: 0.8rem; color: var(--muted); }
+.xcard dd { margin: 0; font: 800 clamp(1.25rem, 3.2vw, 1.6rem)/1.1 var(--f-display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+@media (max-width: 560px) { .xcard dl { grid-template-columns: 1fr; } }
+.xrank { font-weight: 700; font-size: 1.05rem; }
+.xrank:empty, .xnote:empty { display: none; }
+.ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.rung { display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr) minmax(5rem, auto); align-items: center; gap: 10px; font-size: 0.92rem; }
+.rung-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rung-bar { height: 12px; background: var(--card); border: 1.5px solid var(--line); border-radius: 7px; overflow: hidden; }
+.rung-bar i { display: block; height: 100%; background: var(--muted); opacity: 0.5; transition: width 0.25s ease; }
+.rung.coin .rung-bar i { background: var(--frog); opacity: 0.55; }
+.rung.pep .rung-bar i { background: var(--frog-deep); opacity: 1; }
+.rung.pepe .rung-bar i { background: var(--lips); opacity: 1; }
+.rung.x { font-weight: 700; }
+.rung-val { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.pow-lead { font: 800 1.2rem/1.3 var(--f-display); max-width: 68ch; }
+.powlist { list-style: none; margin: 0; padding: 10px; display: grid; gap: 4px; }
+.pow-row { display: grid; grid-template-columns: 1.6rem 30px minmax(0, 10rem) minmax(0, 1fr) minmax(4.5rem, auto); align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; }
+.pow-row.self { background: var(--frog-wash); box-shadow: inset 0 0 0 2.5px var(--line); }
+.pow-n { font: 700 1rem var(--f-mono); color: var(--muted); text-align: center; }
+.pow-row.self .pow-n { color: var(--frog-deep); }
+.pow-logo { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: var(--frog-wash); border: 2px solid var(--line); object-fit: cover; }
+img.pow-logo { background: #fff; }
+.pow-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pow-name small { color: var(--muted); }
+.pow-bar { height: 12px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 6px; overflow: hidden; }
+.pow-bar i { display: block; height: 100%; background: var(--muted); opacity: 0.5; }
+.pow-row.self .pow-bar i { background: var(--frog-deep); opacity: 1; }
+.pow-cap { text-align: right; font-family: var(--f-mono); font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) { .nowrow { grid-template-columns: minmax(0, 1fr) 130px; } }
+@media (max-width: 560px) {
+  .nowrow { grid-template-columns: 1fr; } .nowrow figure.meme { max-width: 200px; justify-self: center; }
+  .rung { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; }
+  .rung-bar { grid-column: 1 / -1; grid-row: 2; height: 10px; }
+  .chart-card { padding: 12px; }
+  .pow-row { grid-template-columns: 1.4rem 28px minmax(0, 1fr) auto; gap: 4px 8px; }
+  .pow-bar { grid-column: 3 / -1; grid-row: 2; height: 8px; }
+  .chart-change { margin-left: 0; }
+  .load-frog { width: 110px; }
+}
+</style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body data-page="price">
+<a class="skip" href="#main">Skip to content</a>
+<div class="ticker"></div>
+<header class="top" id="top"></header>
+<noscript><p class="in">Menu needs JavaScript. <a href="../price.html">Open the serious page</a>.</p></noscript>
+
+<main id="main">
+<div class="in pagehead">
+  <div>
+    <p class="kicker">Price · live from CoinGecko</p>
+    <h1>Pepecoin (PEP) price. <mark>Stare at the candles.</mark></h1>
+    <p class="lede">The live PEP price and chart, Pepe (PEPE) on the same chart if you want it, and the plain arithmetic of what a ×100 would mean.</p>
+    <p class="sticker red" id="nfa" role="note" style="justify-self:start;white-space:normal">⚠️ NFA: information only. Nothing here is a promise or a forecast.</p>
+  </div>
+  <figure class="panel meme blue"><img src="img/charts.webp" alt="Pepe in front of a wall of trading charts" width="640" height="432"><figcaption>me after drawing 47 lines</figcaption></figure>
+</div>
+
+<section class="in" aria-labelledby="not-pepe">
+  <h2 id="not-pepe" class="skip">PEP is not PEPE</h2>
+  <div class="panel notpepe">
+    <div class="np-pair">
+      <div class="np-coin"><img src="img/pep-logo.webp" alt="" width="48" height="48"><b>Pepecoin (PEP)</b><span>Own blockchain, proof of work, mined since 2024</span></div>
+      <span class="np-ne" aria-hidden="true">≠</span>
+      <div class="np-coin pepe"><img src="img/pepe.png" alt="" width="48" height="48"><b>Pepe (PEPE)</b><span>ERC-20 token on Ethereum, since 2023</span></div>
+    </div>
+    <p>PEP and PEPE are not the same coin. This page is about Pepecoin (PEP); Pepe (PEPE) has its own price and appears here only for comparison. <a href="which-pepecoin.html">Which frog is which →</a></p>
+  </div>
+</section>
+
+<section class="block in" aria-labelledby="now">
+  <div class="nowrow">
+    <div style="display:grid;gap:18px;min-width:0">
+      <div class="head" style="margin:0"><p class="kicker">Right now</p><h2 id="now">The numbers, today</h2></div>
+      <div class="tiles">
+        <div class="panel tile main"><span class="label">PEP price</span><span class="value" id="s-price">$0.00008928</span><span class="sub">US dollars</span></div>
+        <div class="panel tile"><span class="label">24 hours</span><span class="value" id="s-24h">−0.24%</span></div>
+        <div class="panel tile"><span class="label">Market cap</span><span class="value" id="s-mcap">$9.19M</span></div>
+        <div class="panel tile"><span class="label">All-time high</span><span class="value" id="s-ath">$0.001824</span><span class="sub" id="s-ath-sub"></span></div>
+        <div class="panel tile"><span class="label">Pepe (PEPE), for comparison</span><span class="value" id="s-pepe">$0.000003875</span><span class="sub" id="s-pepe-sub">$1.6B</span></div>
+      </div>
+    </div>
+    <figure class="panel meme red"><img src="img/casino.webp" alt="Crying Pepe under a sign: no crying in the casino" width="640" height="422"><figcaption>red 24h? rules are rules</figcaption></figure>
+  </div>
+</section>
+
+<section class="in" aria-labelledby="chart-title">
+  <div class="head pic">
+    <div><p class="kicker">Up only? Up and down.</p><h2 id="chart-title">Price chart</h2></div>
+    <figure class="panel meme"><img src="img/so-over.webp" alt="Pepes in a wormhole: we're so back, it's so over" width="640" height="640" loading="lazy"><figcaption>every chart, ever</figcaption></figure>
+  </div>
+  <div class="panel chart-card">
+    <div class="chart-bar">
+      <div class="pseg" role="group" aria-label="Period">
+        <button type="button" data-days="1" aria-pressed="false">24h</button><button type="button" data-days="7" aria-pressed="false">7 days</button><button type="button" data-days="30" aria-pressed="true">30 days</button><button type="button" data-days="90" aria-pressed="false">90 days</button><button type="button" data-days="365" aria-pressed="false">1 year</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="overlay"><span>Overlay Pepe (PEPE)</span></label>
+    </div>
+    <div class="chart-legend"><span class="k pep">Pepecoin (PEP)</span><span class="k pepe" id="legend-pepe" hidden>Pepe (PEPE)</span><span class="chart-change" id="chart-change"></span></div>
+    <div class="chart-wrap"><div class="chart pchart" id="chart"></div><div class="chart-tip" id="chart-tip" hidden></div><p class="chart-msg" id="chart-msg">Loading the chart…</p><picture id="chart-frog"><source srcset="img/pep-loading-still.webp" media="(prefers-reduced-motion: reduce)"><img class="load-frog" src="img/pep-loading.webp" alt="" width="260" height="260"></picture></div>
+    <p class="src" id="chart-corr"></p>
+    <p class="src">The line is the PEP price in US dollars. With Pepe switched on, both lines show the % change from the start of the period, because one PEPE costs far less than one PEP and the two prices would not fit on one axis. Hover or tap the chart for exact values.</p>
+  </div>
+  <p class="src" id="status" style="margin-top:12px">Saved figures from October 18, 2026 (CoinMarketCap) until live prices load.</p>
+  <noscript><p class="note">The live chart and the ×100 slider need JavaScript. The figures above are from October 18, 2026.</p></noscript>
+</section>
+
+<section class="block in" aria-labelledby="x100">
+  <div class="head pic">
+    <div><p class="kicker">The ×N machine · arithmetic, not a forecast</p><h2 id="x100">Pepecoin <span class="x-h">×100</span> vs Pepe <span class="x-h">×100</span></h2><p class="muted">Pick a multiple. The page shows what price and market cap that would take, next to coins and companies. Wen ×N? The frog doesn’t know.</p></div>
+    <figure class="panel meme gold"><picture><source srcset="img/alarm-still.webp" media="(prefers-reduced-motion: reduce)"><img src="img/alarm.webp" alt="Pepe screaming at an alarm clock" width="300" height="219" loading="lazy"></picture><figcaption>waking up to check the price</figcaption></figure>
+  </div>
+  <div class="panel xctl">
+    <div class="xhead"><span class="label" id="x-label">Multiplier</span><b id="x-mult">×100</b></div>
+    <input type="range" id="x-range" min="0" max="400" step="1" value="200" aria-labelledby="x-label">
+    <div class="xrow">
+      <div class="xpre" role="group" aria-label="Example multipliers">
+        <button type="button" data-mult="2">×2</button><button type="button" data-mult="10">×10</button><button type="button" data-mult="100">×100</button><button type="button" data-mult="1000">×1000</button>
+      </div>
+      <label class="xprice"><span>or type a PEP price in US dollars</span><span class="xin"><span aria-hidden="true">$</span><input id="x-target" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0.01" aria-describedby="x-target-hint"></span></label>
+    </div>
+    <span class="xhint" id="x-target-hint" aria-live="polite"></span>
+  </div>
+  <div class="xvs" aria-live="polite">
+    <div class="panel xcard">
+      <h3>Pepecoin (PEP)</h3>
+      <dl><div><dt>Price at that multiple</dt><dd id="x-pep-price">$0.008947</dd></div><div><dt>Market cap needed</dt><dd id="x-pep-cap">$921M</dd></div></dl>
+      <p class="xrank" id="x-pep-rank"></p>
+      <p class="xnote" id="x-pep-note"></p>
+      <h4 id="lad-pep-h">Next to other coins</h4>
+      <ol class="ladder" id="ladder-pep" aria-labelledby="lad-pep-h"></ol>
+    </div>
+    <div class="panel xcard pepe">
+      <h3>Pepe (PEPE)</h3>
+      <dl><div><dt>Price at that multiple</dt><dd id="x-pepe-price">$0.0003864</dd></div><div><dt>Market cap needed</dt><dd id="x-pepe-cap">$160B</dd></div></dl>
+      <p class="xrank" id="x-pepe-rank"></p>
+      <p class="xnote" id="x-pepe-note"></p>
+      <h4 id="lad-pepe-h">Next to coins and companies</h4>
+      <ol class="ladder" id="ladder-pepe" aria-labelledby="lad-pepe-h"></ol>
+    </div>
+  </div>
+  <p class="src" style="margin-top:12px">Company market caps: TickerLeague’s top-100 list, April 29 – May 1, 2026 (fixed, not live). Coin market caps and ranks: CoinGecko live; if it can’t be loaded, CoinMarketCap figures from October 18, 2026, without ranks.</p>
+</section>
+
+<section class="block in" aria-labelledby="pow" style="padding-top:20px">
+  <div class="head"><p class="kicker">Mined memecoins only</p><h2 id="pow">Proof-of-work memecoins</h2></div>
+  <p class="pow-lead" id="pow-lead" style="margin-bottom:16px">Pepecoin is the second-largest proof-of-work memecoin by market cap, after Dogecoin.</p>
+  <ol class="panel powlist" id="pow-list">
+    <li class="pow-row" data-id="dogecoin" data-cap="13240000000"><span class="pow-n">1</span><img class="pow-logo" src="img/doge.png" alt="" width="30" height="30"><span class="pow-name"><b>Dogecoin</b> <small>DOGE</small></span><span class="pow-bar"><i style="width: 85.4%"></i></span><span class="pow-cap">$13.2B</span></li>
+    <li class="pow-row self" data-id="pepecoin-network" data-cap="9170000"><span class="pow-n">2</span><img class="pow-logo" src="img/pep-logo.webp" alt="" width="30" height="30"><span class="pow-name"><b>Pepecoin</b> <small>PEP</small></span><span class="pow-bar"><i style="width: 32.7%"></i></span><span class="pow-cap">$9.17M</span></li>
+    <li class="pow-row" data-id="monacoin" data-cap="4460000"><span class="pow-n">3</span><span class="pow-logo" aria-hidden="true">M</span><span class="pow-name"><b>MonaCoin</b> <small>MONA</small></span><span class="pow-bar"><i style="width: 27.5%"></i></span><span class="pow-cap">$4.46M</span></li>
+    <li class="pow-row" data-id="bellscoin" data-cap="2580000"><span class="pow-n">4</span><img class="pow-logo" src="../assets/coins/bells.png" alt="" width="30" height="30"><span class="pow-name"><b>Bellscoin</b> <small>BELLS</small></span><span class="pow-bar"><i style="width: 23.5%"></i></span><span class="pow-cap">$2.58M</span></li>
+    <li class="pow-row" data-id="dingocoin" data-cap="2575000"><span class="pow-n">5</span><img class="pow-logo" src="../assets/coins/dingo.png" alt="" width="30" height="30"><span class="pow-name"><b>Dingocoin</b> <small>DINGO</small></span><span class="pow-bar"><i style="width: 23.5%"></i></span><span class="pow-cap">$2.58M</span></li>
+    <li class="pow-row" data-id="luckycoin" data-cap="1050000"><span class="pow-n">6</span><img class="pow-logo" src="../assets/coins/lky.png" alt="" width="30" height="30"><span class="pow-name"><b>Luckycoin</b> <small>LKY</small></span><span class="pow-bar"><i style="width: 17.0%"></i></span><span class="pow-cap">$1.05M</span></li>
+    <li class="pow-row" data-id="junkcoin" data-cap="162000"><span class="pow-n">7</span><img class="pow-logo" src="../assets/coins/jkc.png" alt="" width="30" height="30"><span class="pow-name"><b>Junkcoin</b> <small>JKC</small></span><span class="pow-bar"><i style="width: 3.5%"></i></span><span class="pow-cap">$162K</span></li>
+  </ol>
+  <p class="src" style="margin-top:12px">Memecoins mined with proof of work. CoinMarketCap’s PoW list includes Dogecoin, Pepecoin, MonaCoin and Dingocoin; Bellscoin, Luckycoin and Junkcoin are merged-mined with Litecoin like Pepecoin, so they are added here. Market caps: CoinGecko live, or CoinMarketCap on October 18, 2026.</p>
+</section>
+
+<section class="block in" aria-labelledby="how" style="padding-top:20px">
+  <div class="head"><p class="kicker">Read this before you ape</p><h2 id="how">How to read this page</h2></div>
+  <div class="panel prose" style="padding:24px;max-width:none">
+    <p><strong>Where the price comes from.</strong> CoinGecko’s public API, loaded in your browser and reused for up to 10 minutes. PEP trades on few markets with low volume, so the price can jump on small orders and can differ between exchanges.</p>
+    <p><strong>Why Pepe (PEPE)?</strong> PEPE is a different token, on Ethereum, with a similar name and a much bigger market cap. Many people looking for one find the other. The overlay shows whether the two moved together in the period you pick; moving together in the past says nothing about the future. <a href="which-pepecoin.html">Which frog is which.</a></p>
+    <p><strong>Market cap.</strong> Price × the number of PEP that exist, about <span data-live="supply-b">104.8</span> billion. PEP’s supply grows by 10,000 PEP a block, so the same market cap means a slightly lower price per PEP over time. <a href="supply.html">Supply and inflation.</a></p>
+  </div>
+</section>
+
+<section class="block in" aria-labelledby="more" style="padding-top:20px">
+  <div class="head"><p class="kicker">Keep hopping</p><h2 id="more">More about the price</h2></div>
+  <div class="explore">
+    <a class="panel ex" href="calculator.html"><img src="img/p-eyes-still.webp" alt="" width="84" height="84" loading="lazy"><div><h3>What-if machine</h3><p>Your PEP at Dogecoin’s, Litecoin’s or any top-100 coin’s market cap.</p><span class="go">Run the numbers →</span></div></a>
+    <a class="panel ex" href="compare.html"><img src="img/pepe-doge.webp" alt="" width="84" height="84" loading="lazy"><div><h3>PEP &amp; DOGE</h3><p>The same rules, ten years apart, and the two prices lined up by age.</p><span class="go">Meet the bros →</span></div></a>
+    <a class="panel ex" href="which-pepecoin.html"><img src="img/glasses.webp" alt="" width="84" height="84" loading="lazy"><div><h3>Which frog is which?</h3><p>PEP, PEPE and PEPECOIN are three different assets with three different prices.</p><span class="go">Check the ticker →</span></div></a>
+  </div>
+</section>
+
+<section class="block in" aria-labelledby="sources" style="padding-top:20px">
+  <div class="head"><h2 id="sources">Sources</h2></div>
+  <div class="links">
+    <div class="panel"><h3>Prices and charts</h3><ul>
+      <li><a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko: Pepecoin</a></li>
+      <li><a href="https://www.coingecko.com/en/coins/pepe">CoinGecko: Pepe</a></li>
+      <li><a href="https://docs.coingecko.com/reference/introduction">CoinGecko public API</a></li>
+      <li><a href="https://coinmarketcap.com/currencies/pepecoin-org/">CoinMarketCap: Pepecoin</a><span>saved figures, Oct 18, 2026</span></li>
+    </ul></div>
+    <div class="panel"><h3>Market cap lists</h3><ul>
+      <li><a href="https://coinmarketcap.com/view/pow/">CoinMarketCap: PoW coins</a></li>
+      <li><a href="https://tickerleague.com/financials/top/market-cap">TickerLeague: top companies by market cap</a><span>Apr 29 – May 1, 2026</span></li>
+    </ul></div>
+  </div>
+</section>
+</main>
+
+<footer class="foot"></footer>
+<script src="meme.js?v=20261023a"></script>
+<script src="../live.js?v=20261012d" defer></script>
+<script src="../price.js?v=20261020c" defer></script>
+<script>
+// the loading frog only while the chart is loading; if loading fails, the message stays without the spinner
+(function () {
+  var m = document.getElementById('chart-msg'), f = document.getElementById('chart-frog');
+  if (!m || !f) return;
+  var sync = function () { f.hidden = m.hidden || !/Loading/i.test(m.textContent); };
+  new MutationObserver(sync).observe(m, { attributes: true, childList: true, characterData: true, subtree: true });
+  sync();
+})();
+</script>
+</body>
+</html>

@@ -60,6 +60,57 @@
     select(tabs[0]);
   }
 
+  // ---------- news next to the frog ----------
+  // The note in the hero shows one piece of news at a time and moves on to the next every few seconds: the active dot
+  // fills up like a progress bar and its end turns the page. It stops while the pointer or focus is on it; the dots
+  // switch by hand. With reduced motion nothing moves by itself. Without JavaScript only the first item shows.
+  var rot = document.querySelector('.news-rot');
+  var items = rot ? Array.prototype.slice.call(rot.querySelectorAll('.rot-item')) : [];
+  if (items.length > 1) {
+    var cur = 0, auto = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var dots = document.createElement('span'), frogImg = rot.querySelector('img');
+    dots.className = 'rot-dots';
+    items.forEach(function (it, i) {
+      it.hidden = false;
+      it.classList.toggle('is-on', i === 0);
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'rot-dot'; b.setAttribute('aria-label', (i + 1) + ' / ' + items.length);
+      b.innerHTML = '<i></i>';
+      b.addEventListener('click', function () { go(i); });
+      dots.appendChild(b);
+    });
+    rot.querySelector('.rot-items').appendChild(dots);
+    rot.classList.add('rot-ready');
+    if (auto) rot.classList.add('rot-auto');
+    function paint() {
+      Array.prototype.forEach.call(dots.children, function (b, i) {
+        b.classList.toggle('on', i === cur);
+        if (i === cur) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+      });
+    }
+    function go(i) {
+      if (i === cur) return;
+      var out = items[cur];
+      out.classList.remove('is-on'); out.classList.add('is-out');
+      setTimeout(function () { out.classList.remove('is-out'); }, 600);
+      cur = i;
+      items[cur].classList.add('is-on');
+      if (frogImg && auto) { frogImg.classList.remove('hop'); void frogImg.offsetWidth; frogImg.classList.add('hop'); }
+      paint();
+    }
+    // the fill animation of the active dot runs for the reading time; when it ends, the next item comes in
+    dots.addEventListener('animationend', function (e) {
+      if (e.target.parentNode === dots.children[cur]) go((cur + 1) % items.length);
+    });
+    // the whole note is a link to wherever the news shown leads (the dots and the link itself keep their own click)
+    rot.addEventListener('click', function (e) {
+      if (e.target.closest('a, button')) return;
+      var a = items[cur].querySelector('a[href]');
+      if (a) a.click();
+    });
+    paint();
+  }
+
   // ---------- live price tiles ----------
   // Refreshed on load and every 10 minutes while the tab is open (CoinGecko's free API asks for no more).
   var API = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=pepecoin-network';

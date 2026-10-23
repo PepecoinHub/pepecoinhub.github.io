@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261021a">
+<link rel="stylesheet" href="../facts.css?v=20261023b">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Pepecoin (PEP), est-ce la même chose que PEPE ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. PEPE est un jeton ERC-20 sur Ethereum, alors que Pepecoin (PEP) est une cryptomonnaie native, avec sa propre blockchain Scrypt en proof of work. Regardez le début de l’adresse : P… ou 0x…."}}, {"@type": "Question", "name": "PEPE est-il basé sur Ethereum ? PEP a-t-il une adresse de contrat ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui, Pepe (PEPE) est un jeton ERC-20 sur Ethereum, lancé en avril 2023. PepeCoin (PEPECOIN) est lui aussi un jeton ERC-20 sur Ethereum depuis 2023. Pepecoin (PEP) n’est pas sur Ethereum : c’est la cryptomonnaie native de sa propre blockchain, donc il n’a pas d’adresse de contrat. Une adresse PEP commence par P."}}, {"@type": "Question", "name": "Quel portefeuille me faut-il ?", "acceptedAnswer": {"@type": "Answer", "text": "Pour le PEP, un portefeuille compatible avec le réseau Pepecoin : le Pepecoin Core officiel, une carte Tangem ou les autres portefeuilles de notre guide des portefeuilles. PEPE et PEPECOIN sont des jetons Ethereum, donc à garder dans des portefeuilles Ethereum comme MetaMask, qui est conçu pour les réseaux de type Ethereum et ne propose pas Pepecoin."}}, {"@type": "Question", "name": "Pepecoin (PEP) a-t-il un lien avec Rare Pepe ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Les Rare Pepe sont des cartes à collectionner Pepe émises depuis 2016 comme actifs Counterparty sur Bitcoin. Pepecoin (PEP) est une cryptomonnaie distincte, sur sa propre blockchain Scrypt, lancée en 2024."}}, {"@type": "Question", "name": "Quelqu’un peut-il geler mes PEP au niveau du protocole ?", "acceptedAnswer": {"@type": "Answer", "text": "Non : le protocole n’a pas de liste noire gérée par un administrateur. Les services custodial (plateformes d’échange, portefeuilles hébergés) peuvent en revanche geler les soldes qu’ils détiennent. Le contrat Ethereum de PEPE, lui, est un cas à part : voir « Qui peut geler quoi » plus haut."}}, {"@type": "Question", "name": "Pourquoi Kraken affiche-t-il parfois des restrictions géographiques ?", "acceptedAnswer": {"@type": "Answer", "text": "Cela tient à la politique de la plateforme et à la réglementation (dont MiCA dans l’EEE), et non à une règle de consensus de Pepecoin."}}, {"@type": "Question", "name": "Comment vérifier le ticker lors d’un retrait ?", "acceptedAnswer": {"@type": "Answer", "text": "Le ticker est le code court d’une crypto, comme PEP ou PEPE. Choisissez Pepecoin (PEP) sur le réseau Pepecoin. Une adresse PEP commence par P. PEPE et PEPECOIN sont des jetons Ethereum : leurs adresses commencent par 0x et se trouvent sur un autre réseau. Voir la vérification d’adresse plus haut."}}, {"@type": "Question", "name": "Et si j’envoie sur le mauvais réseau ?", "acceptedAnswer": {"@type": "Answer", "text": "Un envoi sur le mauvais réseau est le plus souvent irréversible. Le PEP de la blockchain Pepecoin et le PEPE d’Ethereum ne sont pas interchangeables. Vérifiez toujours que le ticker, le réseau et le format d’adresse correspondent avant d’envoyer. Pour suivre un transfert de PEP, utilisez PepeBlocks ou Pepeplorer ; pour les jetons Ethereum, Etherscan."}}, {"@type": "Question", "name": "Pourquoi CoinMarketCap affiche-t-il parfois une offre différente de celle des explorateurs ?", "acceptedAnswer": {"@type": "Answer", "text": "Des explorateurs comme Pepeplorer affichent environ 104,9 milliards de PEP. Les agrégateurs peuvent afficher moins : CoinGecko indiquait une offre en circulation d’environ 102,7 milliards les 4 et 5 octobre 2026. Mieux vaut consulter un explorateur en direct, avec sa date. Voir « Pepecoin (PEP) en chiffres » plus haut."}}, {"@type": "Question", "name": "Une grosse adresse, est-ce une seule personne ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Une adresse n’est pas une personne : les plateformes d’échange et autres services custodial détiennent les fonds de nombreux utilisateurs. Voir les remarques du classement des plus grosses adresses."}}], "inLanguage": "fr"}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -58,9 +58,9 @@
       <thead>
         <tr>
           <th scope="col">Ticker</th>
-          <th scope="col" class="coin">PEP<small>Pepecoin</small></th>
-          <th scope="col" class="coin">PEPE<small>Pepe</small></th>
-          <th scope="col" class="coin">PEPECOIN<small>PepeCoin / Memetic</small></th>
+          <th scope="col" class="coin"><img class="coin-logo" src="../assets/coins/pep.png" alt="" width="40" height="40">PEP<small>Pepecoin</small></th>
+          <th scope="col" class="coin"><img class="coin-logo" src="../assets/coins/pepe.png" alt="" width="40" height="40">PEPE<small>Pepe</small></th>
+          <th scope="col" class="coin"><img class="coin-logo" src="../assets/coins/pepecoin-2016.png" alt="" width="40" height="40">PEPECOIN<small>PepeCoin / Memetic</small></th>
         </tr>
       </thead>
       <tbody>
@@ -75,6 +75,12 @@
           <td>30 janvier 2024</td>
           <td>avril 2023</td>
           <td>mars 2016</td>
+        </tr>
+        <tr>
+          <th scope="row">Qui est derrière</th>
+          <td>Pepecoin LLC, avec un cofondateur connu publiquement (David Eichel). Elle a publié son propre whitepaper MiCA. <a href="#identity">En savoir plus</a></td>
+          <td>Aucun émetteur juridique. Créé par des développeurs anonymes dont l’identité n’est pas connue publiquement (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">whitepaper MiCA de LCX pour PEPE</a>, B.2 et D.5)</td>
+          <td>Pas de données vérifiées</td>
         </tr>
         <tr>
           <th scope="row">Sécurisé par</th>
@@ -99,6 +105,12 @@
           <td>PEP, versés aux mineurs de la blockchain Pepecoin</td>
           <td>ETH, sous forme de « gas » Ethereum (les frais du réseau), même quand on ne déplace que du PEPE</td>
           <td>ETH, sous forme de « gas » Ethereum, même quand on ne déplace que du PEPECOIN</td>
+        </tr>
+        <tr>
+          <th scope="row">Coût d’un transfert</th>
+          <td>Frais recommandés de 0,01 PEP par ko, moins de 0,000001 $ au cours d’octobre 2026 (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td>
+          <td>Dépend du prix du gas sur Ethereum au moment du transfert. Voir le <a href="https://etherscan.io/gastracker">gas tracker d’Etherscan</a></td>
+          <td>Dépend du prix du gas sur Ethereum au moment du transfert. Voir le <a href="https://etherscan.io/gastracker">gas tracker d’Etherscan</a></td>
         </tr>
         <tr>
           <th scope="row">Allocation initiale</th>
@@ -156,9 +168,9 @@
 
 <section aria-labelledby="freeze">
   <h2 id="freeze">Qui peut geler quoi</h2>
-  <div class="callout">
-    <p><strong>PEP (cette blockchain) :</strong> le protocole ne comporte aucune clé d’administration capable de mettre votre adresse sur liste noire ou de bloquer une transaction que vous avez signée. C’est le même modèle que Bitcoin et Dogecoin. Cela ne veut <em>pas</em> dire que vous ne pouvez pas perdre vos fonds : un envoi sur le mauvais réseau, l’hameçonnage ou un dépôt gelé par un service custodial restent possibles.</p>
-    <p><strong>PEPE (jeton Ethereum) :</strong> le contrat vérifié contient une logique de liste noire. Au moment du lancement, une adresse qui avait acheté une grosse quantité a été mise sur liste noire ; la propriété du contrat a ensuite été abandonnée, si bien que le propriétaire ne peut plus modifier la liste noire via Ownable. Le solde déjà placé sur liste noire reste bloqué. Beaucoup d’autres jetons ERC-20 gardent un propriétaire actif, capable de mettre en pause ou de bloquer des adresses : lisez toujours le contrat.</p>
+  <div class="callout freeze">
+    <p class="fz fz-pepe"><strong>PEPE (jeton Ethereum) :</strong> le contrat vérifié contient une logique de liste noire. Au moment du lancement, une adresse qui avait acheté une grosse quantité a été mise sur liste noire ; la propriété du contrat a ensuite été abandonnée, si bien que le propriétaire ne peut plus modifier la liste noire via Ownable. Le solde déjà placé sur liste noire reste bloqué. Beaucoup d’autres jetons ERC-20 gardent un propriétaire actif, capable de mettre en pause ou de bloquer des adresses : lisez toujours le contrat.</p>
+    <p class="fz fz-pep"><strong>PEP (cette blockchain) :</strong> le protocole ne comporte aucune clé d’administration capable de mettre votre adresse sur liste noire ou de bloquer une transaction que vous avez signée. C’est le même modèle que Bitcoin et Dogecoin. Cela ne veut <em>pas</em> dire que vous ne pouvez pas perdre vos fonds : un envoi sur le mauvais réseau, l’hameçonnage ou un dépôt gelé par un service custodial restent possibles.</p>
     <p class="src">Sources : <a href="https://etherscan.io/address/0x6982508145454ce325ddbe47a25d4ec3d2311933#code">contrat PEPE sur Etherscan</a> <code>0x6982508145454Ce325dDbE47a25d4ec3d2311933</code> (<a href="https://etherscan.io/tx/0x91c9a6caf8e7b5419a7e597982a0cf9b4fc01413279ab840bb57a2e9c528f252">transaction d’abandon de la propriété</a>) ; <a href="https://www.cointime.ai/news/pepe-tokens-blacklist-functionality-used-to-block-address-holding-8-million-in-tokens-87311">Cointime, 6 mai 2023</a> (une adresse mise sur liste noire, puis abandon de la propriété) ; <a href="https://www.fairyproof.com/doc/Pepe-Token-Audit-Report-082123.pdf">audit Fairyproof, 21 août 2023</a> (fonction de liste noire présente, le propriétaire est l’adresse zéro) ; conception UTXO de Pepecoin Core.</p>
   </div>
 </section>
@@ -197,7 +209,7 @@
 
 <section aria-labelledby="pep">
   <h2 id="pep">Pepecoin (PEP) en chiffres</h2>
-  <dl class="facts">
+  <dl class="facts facts-board">
     <dt>Genèse</dt>
     <dd>Réseau lancé le 30 janvier 2024. Le bloc de genèse intègre un titre du <em>Wall Street Journal</em> daté du 22 janvier 2024. <span class="src">Whitepaper MiCA ; chainparams.cpp</span></dd>
     <dt>Allocation initiale</dt>
@@ -338,6 +350,6 @@ document.querySelectorAll('.copy').forEach(function (btn) {
 });
 </script>
 <script src="../live.js?v=20261012d" defer></script>
-<script src="../chrome.js?v=20261020a" defer></script>
+<script src="../chrome.js?v=20261021n" defer></script>
 </body>
 </html>

@@ -36,6 +36,32 @@
       start: '入门', startShort: '入门', mine: '挖矿', data: '数据与图表', games: '游戏', menu: '菜单', top: '返回顶部', more: '更多',
       hint: '本页面也有简体中文版。', go: '阅读中文版', close: '关闭' }
   };
+  // Data strip under the header: today's figures from data/ticker.json (baked by scripts/prebake.mjs: price hourly,
+  // the rest daily). Change STRIP_ID when the strip changes, so it comes back for readers who hid it.
+  var STRIP_ID = '2026-10-21b';
+  var STRIP_T = {
+    en: { label: 'PEP today', price: 'PEP price', d24: '24h', hash: 'Hashrate', yday: 'vs yesterday', tops: 'Top 10 / 50 / 400 addresses hold', supply: 'of supply',
+      fresh: 'New addresses in the top 2000', since: 'since yesterday', pause: 'Pause', play: 'Play', hide: 'Hide this strip' },
+    pl: { label: 'PEP dziś', price: 'Cena PEP', d24: '24h', hash: 'Hashrate', yday: 'od wczoraj', tops: 'Top 10 / 50 / 400 adresów trzyma', supply: 'podaży',
+      fresh: 'Nowe adresy w top 2000', since: 'od wczoraj', pause: 'Zatrzymaj', play: 'Wznów', hide: 'Ukryj pasek' },
+    es: { label: 'PEP hoy', price: 'Precio de PEP', d24: '24h', hash: 'Hashrate', yday: 'vs. ayer', tops: 'Las 10 / 50 / 400 mayores direcciones tienen', supply: 'del suministro',
+      fresh: 'Direcciones nuevas en el top 2000', since: 'desde ayer', pause: 'Pausar', play: 'Reanudar', hide: 'Ocultar esta barra' },
+    de: { label: 'PEP heute', price: 'PEP-Kurs', d24: '24h', hash: 'Hashrate', yday: 'ggü. gestern', tops: 'Top 10 / 50 / 400 Adressen halten', supply: 'der Coinmenge',
+      fresh: 'Neue Adressen in den Top 2000', since: 'seit gestern', pause: 'Anhalten', play: 'Fortsetzen', hide: 'Leiste ausblenden' },
+    fr: { label: 'PEP aujourd’hui', price: 'Prix du PEP', d24: '24 h', hash: 'Hashrate', yday: 'vs hier', tops: 'Les 10 / 50 / 400 plus grosses adresses détiennent', supply: 'de l’offre',
+      fresh: 'Nouvelles adresses dans le top 2000', since: 'depuis hier', pause: 'Pause', play: 'Lecture', hide: 'Masquer ce bandeau' },
+    tr: { label: 'Bugün PEP', price: 'PEP fiyatı', d24: '24s', hash: 'Hashrate', yday: 'düne göre', tops: 'İlk 10 / 50 / 400 adresin arzdaki payı', supply: '',
+      fresh: 'İlk 2000’e giren yeni adresler', since: 'dünden beri', pause: 'Durdur', play: 'Oynat', hide: 'Şeridi gizle' },
+    it: { label: 'PEP oggi', price: 'Prezzo di PEP', d24: '24h', hash: 'Hashrate', yday: 'rispetto a ieri', tops: 'I primi 10 / 50 / 400 indirizzi detengono', supply: 'dell’offerta',
+      fresh: 'Nuovi indirizzi nella top 2000', since: 'da ieri', pause: 'Pausa', play: 'Riprendi', hide: 'Nascondi questa barra' },
+    zh: { label: 'PEP 今日', price: 'PEP 价格', d24: '24 小时', hash: '算力', yday: '较昨日', tops: '前 10 / 50 / 400 个地址持有', supply: '的供应',
+      fresh: '新进前 2000 的地址', since: '较昨日', pause: '暂停', play: '继续', hide: '隐藏' }
+  };
+  // the site root (where chrome.js lives), for links and data from any folder
+  var ROOT = (function () {
+    var s = document.currentScript || document.querySelector('script[src*="chrome.js"]');
+    try { return new URL('./', s.src).href; } catch (e) { return '/'; }
+  })();
   function keyOf(tag) {
     tag = (tag || 'en').toLowerCase();
     return tag.indexOf('zh') === 0 ? 'zh' : tag.split('-')[0];
@@ -164,6 +190,7 @@
     backToTop();
     bgLayer();
     langHint(alt);
+    dataStrip();
     supportCopy();
   }
 
@@ -372,6 +399,86 @@
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
+  }
+
+  // Data strip right under the header: a slow, endless line of today's figures, each a link to its page. It stops
+  // while the pointer or keyboard focus is on it and has its own pause button; with reduced motion it stands still
+  // and scrolls sideways by hand. Hidden on the game screens; a reader can hide it until STRIP_ID changes.
+  function dataStrip() {
+    var head = document.querySelector('.site-head');
+    if (!head || document.querySelector('.news') || document.querySelector('.mn')) return;
+    if (/\/games\/(room|table|host|miner)\.html$/.test(location.pathname)) return;
+    try { if (localStorage.getItem('phw-strip-off') === STRIP_ID) return; } catch (e) {}
+    var n = STRIP_T[pageKey] || STRIP_T.en, lang = pageKey === 'en' ? '' : pageKey + '/';
+    var loc = (LANGS.filter(function (l) { return l.key === pageKey; })[0] || LANGS[0]).tag;
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var bar = document.createElement('aside');
+    bar.className = 'news'; bar.setAttribute('aria-label', n.label);
+    bar.innerHTML = '<span class="news-label"><i aria-hidden="true"></i></span><div class="news-view"><div class="news-track"></div></div>';
+    bar.querySelector('.news-label').appendChild(document.createTextNode(n.label));
+    var track = bar.querySelector('.news-track');
+    head.insertAdjacentElement('afterend', bar);
+
+    function pct(v, d) { return new Intl.NumberFormat(loc, { style: 'percent', maximumFractionDigits: d == null ? 1 : d, signDisplay: d == null ? 'auto' : 'exceptZero' }).format(v / 100); }
+    function usd(v) { return new Intl.NumberFormat(loc, { style: 'currency', currency: 'USD', currencyDisplay: 'narrowSymbol', maximumSignificantDigits: 3 }).format(v); }
+    function hashrate(hs) {
+      var u = [[1e18, 'EH/s'], [1e15, 'PH/s'], [1e12, 'TH/s']].filter(function (x) { return hs >= x[0]; })[0] || [1e9, 'GH/s'];
+      return (hs / u[0]).toLocaleString(loc, { maximumFractionDigits: 2 }) + ' ' + u[1];
+    }
+    // one item: name, value, then an optional change (▲ green / ▼ warm) and a small note
+    function item(href, key, value, change, note) {
+      var li = document.createElement('li'), a = document.createElement('a');
+      a.href = ROOT + lang + href;
+      var k = document.createElement('span'); k.className = 'news-k'; k.textContent = key;
+      var v = document.createElement('b'); v.className = 'news-v'; v.textContent = value;
+      a.appendChild(k); a.appendChild(v);
+      if (change != null && isFinite(change)) {
+        var c = document.createElement('span'); c.className = 'news-chg ' + (change > 0 ? 'up' : change < 0 ? 'down' : 'flat');
+        c.textContent = (change > 0 ? '▲ ' : change < 0 ? '▼ ' : '') + pct(Math.abs(change), 2).replace(/^[+-]/, '');
+        a.appendChild(c);
+      }
+      if (note) { var s = document.createElement('span'); s.className = 'news-note'; s.textContent = note; a.appendChild(s); }
+      li.appendChild(a);
+      return li;
+    }
+    function build(d) {
+      var ul = document.createElement('ul'); ul.className = 'news-list';
+      if (d.price && d.price.usd > 0) ul.appendChild(item('price.html', n.price, usd(d.price.usd), d.price.change_24h, n.d24));
+      if (d.hashrate && d.hashrate.hs > 0) ul.appendChild(item('mining.html', n.hash, hashrate(d.hashrate.hs), d.hashrate.change_24h, d.hashrate.change_24h != null ? n.yday : ''));
+      if (d.tops && d.tops[10] != null) ul.appendChild(item('rich-list.html', n.tops, [10, 50, 400].map(function (k) { return pct(d.tops[k]); }).join(' / '), null, n.supply));
+      if (d.new_top2000 != null) ul.appendChild(item('rich-list.html', n.fresh, d.new_top2000.toLocaleString(loc), null, n.since));
+      return ul;
+    }
+    fetch(ROOT + 'data/ticker.json').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+      var ul = build(d || {});
+      if (!ul.children.length) throw new Error('no figures');
+      track.appendChild(ul);
+      if (still) { bar.classList.add('still'); return; }
+      // a second copy follows the first, so the loop has no seam; screen readers and Tab skip it
+      var copy = build(d); copy.setAttribute('aria-hidden', 'true');
+      copy.querySelectorAll('a').forEach(function (a) { a.tabIndex = -1; });
+      track.appendChild(copy);
+      track.style.animationDuration = Math.max(18, Math.round(ul.getBoundingClientRect().width / 38)) + 's';
+      var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'news-btn news-pause';
+      function paint() {
+        var p = bar.classList.contains('paused');
+        btn.setAttribute('aria-label', p ? n.play : n.pause); btn.title = btn.getAttribute('aria-label');
+        btn.innerHTML = p ? '<svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M3 1.8v8.4L10 6z" fill="currentColor"/></svg>'
+          : '<svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M3.2 2v8M8.8 2v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+      }
+      btn.addEventListener('click', function () { bar.classList.toggle('paused'); paint(); });
+      paint();
+      bar.insertBefore(btn, x);
+      bar.classList.add('run');
+    }).catch(function () { bar.remove(); });
+    var x = document.createElement('button'); x.type = 'button'; x.className = 'news-btn news-x';
+    x.setAttribute('aria-label', n.hide); x.title = n.hide;
+    x.innerHTML = '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    x.addEventListener('click', function () {
+      bar.remove();
+      try { localStorage.setItem('phw-strip-off', STRIP_ID); } catch (e) {}
+    });
+    bar.appendChild(x);
   }
 
   // Copy buttons for the donation addresses in the footer.

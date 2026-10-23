@@ -165,6 +165,7 @@ th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-botto
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 thead th { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--ink); white-space: nowrap; }
 thead th.coin { font-family: var(--f-display); font-size: 1.2rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink); }
+thead th.coin .coin-logo { display: block; width: 40px; height: 40px; margin-bottom: 8px; border-radius: 50%; }
 thead th.coin small { display: block; font-family: var(--f-body); font-size: 0.8rem; font-weight: 400; color: var(--muted); }
 tbody th { font-family: var(--f-mono); font-weight: 600; font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 tbody th.plain { font-family: var(--f-body); font-size: 0.95rem; letter-spacing: 0; text-transform: none; color: var(--ink); white-space: nowrap; }
@@ -383,6 +384,69 @@ dl.terms dd a { white-space: nowrap; }
 .lang-hint a { font-weight: 600; }
 .lang-hint-x { margin-left: auto; background: none; border: 0; padding: 2px 8px; font-size: 1.35rem; line-height: 1; color: var(--muted); cursor: pointer; }
 .lang-hint-x:hover { color: var(--ink); }
+/* ------------------------------------------------------------------ data strip under the header (built by chrome.js)
+   A thin pill with a "PEP today" label and a slow line of today's figures. Stops on hover/focus and with the pause button;
+   with reduced motion it stands still and scrolls sideways by hand. */
+.news {
+  max-width: 1080px; margin: 10px auto 0; display: flex; align-items: center; height: 40px; box-sizing: border-box;
+  border: 1px solid var(--rule); border-radius: 999px; background: color-mix(in srgb, var(--panel) 72%, transparent);
+  font-size: 0.88rem; overflow: hidden;
+}
+.news-label {
+  flex: none; display: flex; align-items: center; gap: 9px; height: 100%; padding: 0 16px 0 18px; border-right: 1px solid var(--rule);
+  font: 700 0.72rem var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-deep);
+}
+.news-label i { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.news-label i::after {
+  content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 1.5px solid var(--accent); opacity: 0;
+  animation: news-ping 2.6s ease-out infinite;
+}
+@keyframes news-ping { 0% { transform: scale(0.4); opacity: 0.7; } 70%, 100% { transform: scale(1.4); opacity: 0; } }
+.news-view {
+  flex: 1; min-width: 0; height: 100%; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 36px), transparent);
+}
+.news-track { display: flex; width: max-content; height: 100%; animation: news-roll 60s linear infinite paused; }
+.news.run .news-track { animation-play-state: running; }
+.news.run:hover .news-track, .news.run:focus-within .news-track, .news.paused .news-track { animation-play-state: paused; }
+@keyframes news-roll { to { transform: translateX(-50%); } }
+.news-list { display: flex; align-items: center; margin: 0; padding: 0 0 0 18px; list-style: none; }
+.news-list li { display: flex; align-items: center; }
+.news-list li::after {
+  content: ""; width: 13px; height: 13px; margin: 0 22px; opacity: 0.5; flex: none;
+  background: url(assets/brand/coin-p.svg) center / contain no-repeat;
+}
+.news-list a { display: inline-flex; align-items: center; gap: 9px; padding: 6px 2px; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.news-list a:hover .news-k { color: var(--ink); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+.news-list a:focus-visible { outline-offset: -2px; }
+.news-k { color: var(--muted); }
+.news-v { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.news-chg { font: 700 0.8rem var(--f-mono); font-variant-numeric: tabular-nums; padding: 2px 7px 1px; border-radius: 999px; }
+.news-chg.up { color: var(--accent-deep); background: var(--accent-soft); }
+.news-chg.down { color: color-mix(in srgb, var(--flag) 78%, var(--ink)); background: color-mix(in srgb, var(--flag) 13%, transparent); }
+.news-chg.flat { color: var(--muted); background: var(--track); }
+.news-note { font: 0.78rem var(--f-mono); color: var(--muted); }
+.news-btn {
+  flex: none; display: grid; place-items: center; width: 30px; height: 30px; margin-right: 2px; padding: 0; border: 0; border-radius: 50%;
+  background: none; color: var(--muted); cursor: pointer;
+}
+.news-btn:last-child { margin-right: 5px; }
+.news-btn:hover { background: var(--accent-soft); color: var(--ink); }
+.news.still .news-view { overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); }
+.news.still .news-view::-webkit-scrollbar { display: none; }
+.news.still .news-list li:last-child::after { width: 0; margin-right: 36px; }
+@media (prefers-reduced-motion: reduce) { .news-track { animation: none; } .news-label i::after { animation: none; } }
+@media (max-width: 760px) {
+  .news { margin-top: 8px; height: 38px; font-size: 0.84rem; }
+  .news-label { padding: 0 12px 0 14px; }
+  .news-list { padding-left: 14px; }
+  .news-list li::after { margin: 0 16px; }
+}
+@media (max-width: 430px) {
+  .news-label { font-size: 0; gap: 0; padding: 0 12px 0 15px; }
+  .news-btn { width: 28px; height: 28px; margin-right: 0; }
+}
 html:lang(zh) {
   --f-display: "Ubuntu", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", sans-serif;
   --f-body: "Ubuntu", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", sans-serif;
@@ -557,6 +621,30 @@ input, select, textarea { border-radius: 12px; }
 .pledge.soon { gap: 14px; }
 .pledge.soon::before { content: none; }
 .pledge.soon img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; flex: none; }
+/* The note turns into a small news carousel (home.js): the items share one grid cell, so the box keeps the height of
+   the longest one; the active dot fills up while an item is shown and the frog hops when the next one comes in. */
+.news-rot .rot-items { display: grid; min-width: 0; }
+.news-rot.rot-ready .rot-item {
+  grid-area: 1 / 1; align-self: center; opacity: 0; visibility: hidden; transform: translateY(9px); filter: blur(2px);
+  transition: opacity 0.4s, transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.4s, visibility 0s 0.55s;
+}
+.news-rot.rot-ready .rot-item.is-on { opacity: 1; visibility: visible; transform: none; filter: none; transition-delay: 0.14s, 0.14s, 0.14s, 0s; }
+.news-rot.rot-ready .rot-item.is-out { transform: translateY(-9px); }
+.rot-dots { grid-area: 2 / 1; display: flex; gap: 2px; margin: 4px 0 -6px -4px; }
+.rot-dot { display: grid; align-items: center; height: 20px; padding: 0 4px; border: 0; background: none; cursor: pointer; }
+.rot-dot i {
+  position: relative; display: block; width: 6px; height: 6px; border-radius: 999px; overflow: hidden;
+  background: color-mix(in srgb, var(--gold) 70%, transparent); transition: width 0.35s;
+}
+.rot-dot.on i { width: 28px; }
+.rot-dot i::after { content: ""; position: absolute; inset: 0; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+.rot-dot.on i::after { transform: scaleX(1); }
+.rot-auto .rot-dot.on i::after { animation: rot-fill 4s linear forwards; }
+.rot-auto:hover .rot-dot.on i::after, .rot-auto:focus-within .rot-dot.on i::after { animation-play-state: paused; }
+@keyframes rot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.news-rot img.hop { animation: rot-hop 0.6s ease; }
+@keyframes rot-hop { 35% { transform: translateY(-5px) rotate(-5deg); } 70% { transform: translateY(0) rotate(2deg); } }
+@media (prefers-reduced-motion: reduce) { .news-rot.rot-ready .rot-item { transition: none; transform: none; filter: none; } }
 
 /* Start here: icons, and the first card made the big one */
 .cards a.card[href$="which-pepecoin.html"]::before, .cards a.card[href$="rich-list.html"]::before,
@@ -899,6 +987,85 @@ footer.site-foot .correction a:hover { background: var(--accent); color: var(--p
 .linkgroups .linkgroup li { align-content: start; }
 @media (min-width: 641px) { .lg-toggle { flex: 0 1 auto; } }
 @media (max-width: 640px) { .linkgroups .linkgroup.lg-closed ul { display: none; } }
+
+/* Home, compact: on a laptop the whole hero (with the news note) fits on the first screen and the two pitches
+   start right under it, before the four key figures. */
+.wrap:has(> .home-hero) { padding-top: 26px; gap: 40px; }
+@media (min-width: 721px) {
+  .home-hero { padding: 30px 40px 32px; grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.75fr); gap: 20px 32px; }
+  .home-hero-copy { gap: 12px; }
+  .home-hero h1 { font-size: clamp(2rem, 3.4vw, 2.7rem); }
+  .home-hero .h1-sub { font-size: 0.58em; margin-top: 0.25em; }
+  .home-hero .lede { font-size: 1.02rem; line-height: 1.55; }
+  .home-hero .pledge { padding: 9px 14px; font-size: 0.93rem; line-height: 1.45; max-width: none; }
+  .home-hero .pledge::before { width: 30px; height: 30px; }
+  .home-hero .pledge.soon img { width: 52px; height: 52px; border-radius: 10px; }
+  .home-hero .hero-tabs .btn { padding: 9px 16px; font-size: 0.95rem; }
+  .home-hero .hero-coin, .home-hero-frog { width: min(210px, 100%); }
+  .hpanel { margin-top: -14px; }
+  /* the pitches as two low rows: icon on the left, text on the right */
+  .pitch { grid-template-columns: auto 1fr; column-gap: 20px; row-gap: 6px; justify-items: start; text-align: left; padding: 20px 24px; align-items: center; }
+  .pitch .pitch-icon, .pitch .pitch-icons { grid-row: span 2; width: 64px; height: 64px; }
+  .pitch .pitch-icons { width: 72px; height: 68px; }
+  .pitch h2 { font-size: 1.15rem; }
+  .pitch p { max-width: none; font-size: 0.94rem; }
+}
+
+/* Which Pepecoin: "Who can freeze what" as two stacked notes, the Ethereum token first, PEP below it */
+.callout.freeze { background: none; border: 0; padding: 0; gap: 10px; max-width: 78ch; }
+.callout.freeze .fz { padding: 16px 20px; border-radius: 16px; border: 1px solid var(--rule); border-left-width: 4px; }
+.callout.freeze .fz-pepe { background: var(--gold-soft); border-left-color: var(--gold); }
+.callout.freeze .fz-pep { background: var(--accent-soft); border-left-color: var(--accent); }
+.callout.freeze .src { padding: 2px 4px 0; }
+
+/* Which Pepecoin: "in numbers" as one framed board, like the key figures on the home page */
+dl.facts.facts-board {
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--rule)); border-radius: 22px; overflow: hidden;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, var(--panel)), var(--panel) 220px);
+  box-shadow: 0 22px 44px -30px color-mix(in srgb, var(--accent) 70%, transparent);
+  grid-template-columns: 190px minmax(0, 1fr);
+}
+dl.facts.facts-board dt, dl.facts.facts-board dd { padding: 16px 0; border-bottom: 1px solid color-mix(in srgb, var(--rule) 80%, transparent); }
+dl.facts.facts-board dt { padding-left: 24px; padding-top: 19px; color: var(--accent-deep); font-weight: 700; }
+dl.facts.facts-board dt::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 10px; border-radius: 50%; background: var(--accent); vertical-align: 2px; }
+dl.facts.facts-board dd { padding-right: 24px; line-height: 1.6; }
+dl.facts.facts-board dd .src { display: block; margin-top: 4px; font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.02em; }
+dl.facts.facts-board dd .src::before { content: "↳ "; color: var(--accent); }
+dl.facts.facts-board dt:last-of-type, dl.facts.facts-board dd:last-of-type { border-bottom: 0; }
+@media (max-width: 640px) {
+  dl.facts.facts-board { grid-template-columns: 1fr; }
+  dl.facts.facts-board dt { padding: 16px 18px 0; border-bottom: 0; }
+  dl.facts.facts-board dd { padding: 6px 18px 16px; }
+}
+
+/* Questions: one panel, numbered rows, a round +/− on the right; the open one gets an accent line */
+.faq { counter-reset: faq; gap: 0; border: 1px solid var(--rule); border-radius: 20px; overflow: hidden; background: var(--panel); box-shadow: var(--shadow); }
+.faq details { counter-increment: faq; padding: 0; border-bottom: 1px solid var(--rule); transition: background 0.2s; }
+.faq details:last-child { border-bottom: 0; }
+.faq summary {
+  list-style: none; display: grid; grid-template-columns: 2.4em minmax(0, 1fr) 28px; align-items: center; gap: 12px;
+  padding: 16px 20px; font-weight: 600; line-height: 1.4;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::before { content: counter(faq, decimal-leading-zero); font: 700 0.8rem var(--f-mono); letter-spacing: 0.04em; color: var(--muted); }
+.faq summary::after {
+  content: "+"; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--rule); color: var(--accent-deep); font: 500 1.1rem/1 var(--f-body); transition: transform 0.25s, background 0.2s;
+}
+.faq summary:hover::after { border-color: var(--accent); }
+.faq details[open] { background: color-mix(in srgb, var(--accent) 7%, var(--panel)); box-shadow: inset 3px 0 0 var(--accent); }
+.faq details[open] summary::before { color: var(--accent-deep); }
+.faq details[open] summary::after { content: "−"; background: var(--accent); border-color: var(--accent); color: var(--paper); }
+.faq details > :not(summary) { margin: -4px 20px 18px calc(20px + 2.4em + 12px); max-width: 68ch; }
+@media (max-width: 640px) {
+  .faq summary { grid-template-columns: 1.9em minmax(0, 1fr) 26px; gap: 8px; padding: 14px 14px; }
+  .faq details > :not(summary) { margin: -4px 14px 16px 14px; }
+}
+
+/* The news note: the whole box opens the news shown (home.js); it stops while the pointer is on it */
+.news-rot.rot-ready { cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+.news-rot.rot-ready:hover { border-color: var(--gold); border-style: solid; }
+.news-rot.rot-ready:hover .rot-item.is-on a { text-decoration-thickness: 2px; }
 /* Plain links to the other language versions of this page, so they are reachable without JavaScript. */
 .foot-langs a { color: var(--muted); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; }
 .foot-langs a:hover { color: var(--accent-deep); text-decoration-color: currentColor; }
