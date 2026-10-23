@@ -76,7 +76,7 @@
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'rot-dot'; b.setAttribute('aria-label', (i + 1) + ' / ' + items.length);
       b.innerHTML = '<i></i>';
-      b.addEventListener('click', function () { go(i); });
+      b.addEventListener('click', function () { rot.setAttribute('data-dir', i > cur ? 'next' : 'prev'); go(i); });
       dots.appendChild(b);
     });
     rot.querySelector('.rot-items').appendChild(dots);
@@ -100,9 +100,28 @@
     }
     // the fill animation of the active dot runs for the reading time; when it ends, the next item comes in
     dots.addEventListener('animationend', function (e) {
-      if (e.target.parentNode === dots.children[cur]) go((cur + 1) % items.length);
+      if (e.target.parentNode === dots.children[cur]) { rot.removeAttribute('data-dir'); go((cur + 1) % items.length); }
     });
     // the whole note is a link to wherever the news shown leads (the dots and the link itself keep their own click)
+    // a sideways swipe (phones) or drag (mouse) and the left/right arrow keys step to the next or previous news
+    var sx = null, sy = 0, swiped = false;
+    function step(d) { rot.setAttribute('data-dir', d > 0 ? 'next' : 'prev'); go((cur + d + items.length) % items.length); }
+    function start(x, y) { sx = x; sy = y; swiped = false; }
+    function end(x, y) {
+      if (sx === null) return;
+      var dx = x - sx, dy = y - sy; sx = null;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) { swiped = true; step(dx < 0 ? 1 : -1); }
+    }
+    rot.addEventListener('touchstart', function (e) { var t = e.changedTouches[0]; start(t.clientX, t.clientY); }, { passive: true });
+    rot.addEventListener('touchend', function (e) { var t = e.changedTouches[0]; end(t.clientX, t.clientY); });
+    rot.addEventListener('touchcancel', function () { sx = null; });
+    rot.addEventListener('mousedown', function (e) { if (!e.button) start(e.clientX, e.clientY); });
+    rot.addEventListener('mouseup', function (e) { end(e.clientX, e.clientY); });
+    // a swipe that ends on a link must not open it
+    rot.addEventListener('click', function (e) { if (swiped) { swiped = false; e.preventDefault(); e.stopPropagation(); } }, true);
+    rot.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); step(e.key === 'ArrowRight' ? 1 : -1); }
+    });
     rot.addEventListener('click', function (e) {
       if (e.target.closest('a, button')) return;
       var a = items[cur].querySelector('a[href]');
