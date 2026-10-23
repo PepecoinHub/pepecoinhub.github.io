@@ -287,7 +287,7 @@
     qs.querySelector('b').textContent = t.startShort || t.start;
     function setMenu(open) { head.classList.toggle('menu-open', open); qs.setAttribute('aria-expanded', String(open)); }
     qs.addEventListener('click', function () { setMenu(!head.classList.contains('menu-open')); });
-    tools.appendChild(qs); tools.appendChild(quick);
+    tools.appendChild(memeLink()); tools.appendChild(qs); tools.appendChild(quick);
     head.insertBefore(tools, nav);
   }
 
