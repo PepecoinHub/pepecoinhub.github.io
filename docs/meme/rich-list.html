@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en" data-base="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pepecoin (PEP) rich list: whale watch | Pepecoin Hub, meme edition</title>
+<meta name="description" content="Who holds the PEP: the community's sea-creature ranks, the share of supply held by the top 10, 100 and 1,000 addresses, and the top holders, from a daily snapshot.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=Gochi+Hand&display=swap">
+<link rel="stylesheet" href="meme.css?v=20261023a">
+<style>
+[hidden] { display: none !important; }
+.viewsw { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tiles.tops { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.tile .delta { font: 700 0.8rem/1.3 var(--f-mono); }
+.stack { display: flex; height: 64px; border: 3px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 6px 6px 0 var(--hard); }
+.stack i { display: grid; place-items: center; font: 700 0.8rem/1 var(--f-mono); color: #fff; border-right: 3px solid var(--line); min-width: 0; overflow: hidden; white-space: nowrap; }
+.stack i:last-child { border-right: 0; color: var(--ink); background: var(--paper); }
+.legend { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 22px; margin: 22px 0 0; list-style: none; padding: 0; }
+.legend li { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 0.95rem; padding: 6px 0; border-bottom: 1.5px dashed color-mix(in srgb, var(--line) 30%, transparent); }
+.legend s { width: 16px; height: 16px; border: 2px solid var(--line); border-radius: 4px; display: block; }
+.legend em { font: 700 0.85rem var(--f-mono); font-style: normal; font-variant-numeric: tabular-nums; }
+.ctrl { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; margin-bottom: 16px; }
+.ctrl > div { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ctrl .lbl { font: 700 0.72rem var(--f-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-right: 4px; }
+.holders td, .holders th { white-space: nowrap; }
+.holders td.addr a { font: 700 0.86rem var(--f-mono); }
+.holders .tag { display: inline-block; font: 700 0.7rem/1.6 var(--f-mono); text-transform: uppercase; letter-spacing: 0.04em; padding: 0 7px; border: 2px solid var(--line); border-radius: 6px; background: var(--gold-wash); }
+.holders .tag.pool { background: var(--shirt-wash); }
+.holders tr.tagged > * { background: color-mix(in srgb, var(--gold-wash) 55%, transparent); }
+.morebar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 16px; }
+.notes { display: grid; gap: 10px; padding-left: 20px; max-width: 80ch; }
+@media (max-width: 1060px) { .tiles.tops { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 860px) { .legend { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .tiles.tops { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stack i { font-size: 0; } .stack { height: 48px; } }
+</style>
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body data-page="rich-list">
+<a class="skip" href="#main">Skip to content</a>
+<div class="ticker"></div>
+<header class="top" id="top"></header>
+<noscript><p class="in">Menu needs JavaScript. <a href="../rich-list.html">Open the serious page</a>.</p></noscript>
+
+<main id="main">
+<div class="in pagehead">
+    <div>
+      <p class="kicker">Holder watch · snapshot of <span data-m="date">Oct 22, 2026</span> · block <span data-m="height">1,260,910</span></p>
+      <h1>Who holds the PEP? <mark>Whale watch</mark>.</h1>
+      <p class="lede">How much of the <span data-m="supply">105.05B</span> PEP sits in the biggest addresses, and how that changes. One snapshot of the top ~2,000 addresses every day; <span data-m="addrs">289,337</span> addresses hold PEP.</p>
+      <p class="small muted">An address is not a person. Exchanges, pools and custodians hold coins for many users.</p>
+    </div>
+    <figure class="panel meme"><img src="img/detective.webp" alt="Pepe in a hat and sunglasses hiding behind a green candle" width="417" height="420"><figcaption>watching the whales</figcaption></figure>
+  </div>
+
+  <div class="in loading" id="boot"><picture><source srcset="img/pep-loading-still.webp" media="(prefers-reduced-motion: reduce)"><img src="img/pep-loading.webp" alt="" width="260" height="260"></picture><p class="hand">$PEP loading…</p></div>
+
+  <div id="app" hidden>
+  <section class="in" aria-labelledby="rk-h" style="padding-bottom:30px">
+    <div class="head pic">
+      <div><p class="kicker">Community ranks</p><h2 id="rk-h">Sea-creature ranks</h2><p class="muted" id="rk-p">Every address holding at least 5M PEP, sorted into the community’s size ranks. An address is not a person: exchanges and pools are counted too.</p></div>
+      <figure class="panel meme blue"><img src="img/shrimp.webp" alt="Pepe dressed as a shrimp" width="420" height="420"><figcaption>me checking which rank I am</figcaption></figure>
+    </div>
+    <div class="panel ranksbox" id="ranks"></div>
+    <p class="note" id="rk-note" style="margin-top:14px"></p>
+  </section>
+
+  <section class="block in" aria-labelledby="cc-h" style="padding-top:30px">
+    <div class="head pic">
+      <div><p class="kicker">Diamond hands, measured</p><h2 id="cc-h">Concentration</h2><p class="muted" id="cc-p">Share of the circulating supply held by the largest addresses.</p></div>
+      <figure class="panel meme green"><img src="img/diamond.webp" alt="Pepe holding a diamond" width="379" height="420" loading="lazy"><figcaption>top 10, every week</figcaption></figure>
+    </div>
+    <div class="ctrl">
+      <div role="group" aria-label="Which addresses"><span class="lbl">View</span><button class="chip" type="button" data-view="all" aria-pressed="true">All addresses</button><button class="chip" type="button" data-view="ex" aria-pressed="false">Without exchanges &amp; pools</button></div>
+      <div role="group" aria-label="Compared with"><span class="lbl">vs</span><button class="chip" type="button" data-per="1" aria-pressed="false">1 day</button><button class="chip" type="button" data-per="7" aria-pressed="true">7 days</button><button class="chip" type="button" data-per="30" aria-pressed="false">30 days</button><button class="chip" type="button" data-per="365" aria-pressed="false">1 year</button></div>
+    </div>
+    <p class="note" id="ex-note" hidden style="margin-bottom:14px">Addresses tagged as exchange, pool or burn are taken out, and their balances are taken out of the supply too. Tags are a hand-kept list, so some exchange wallets may still be counted.</p>
+    <div class="tiles tops" id="tiles"></div>
+    <p class="note" style="margin-top:12px">Change in percentage points. ▲ means the group holds more of the supply than before.</p>
+  </section>
+
+  <section class="block in" aria-labelledby="ws-h" style="padding-top:20px">
+    <div class="head pic">
+      <div><p class="kicker">Stacks on stacks</p><h2 id="ws-h">Where the supply sits</h2><p class="muted">The top 1,000 split into rank tiers. The pale slice is everything below rank 1,000. <span id="thr"></span></p></div>
+      <figure class="panel meme"><img src="img/pancake.webp" alt="Pepe with a stack of pancakes on his head" width="420" height="420" loading="lazy"><figcaption>supply stacks</figcaption></figure>
+    </div>
+    <div class="stack" id="stack" role="img"></div>
+    <ul class="legend" id="legend"></ul>
+  </section>
+
+  <section class="block in" aria-labelledby="tr-h" style="padding-top:20px">
+    <div class="head"><p class="kicker">Up only? Down only? Sideways mostly.</p><h2 id="tr-h">Trend</h2><p class="muted">Share of supply held by the top N addresses, one point per day. Before October 5, 2026 the points are reconstructed from the blockchain.</p></div>
+    <div class="ctrl">
+      <div role="group" aria-label="Group"><span class="lbl">Top</span><button class="chip" type="button" data-top="0" aria-pressed="false">10</button><button class="chip" type="button" data-top="3" aria-pressed="true">100</button><button class="chip" type="button" data-top="5" aria-pressed="false">1,000</button></div>
+      <div role="group" aria-label="Range"><span class="lbl">Range</span><button class="chip" type="button" data-range="90" aria-pressed="false">90D</button><button class="chip" type="button" data-range="365" aria-pressed="true">1Y</button><button class="chip" type="button" data-range="0" aria-pressed="false">All</button></div>
+    </div>
+    <div class="panel chart" id="trend"></div>
+  </section>
+
+  <section class="block in" aria-labelledby="ho-h" style="padding-top:20px">
+    <div class="head pic">
+      <div><p class="kicker">The list</p><h2 id="ho-h">Top holders</h2><p class="muted">Balances at the latest snapshot. Click an address to open it on PepeBlocks. Tags mark known exchanges and pools.</p></div>
+      <figure class="panel meme red"><img src="img/whisper.webp" alt="Pepe whispering into another Pepe's ear" width="420" height="420" loading="lazy"><figcaption>psst, an address is not a person</figcaption></figure>
+    </div>
+    <div class="tablebox">
+      <table class="holders">
+        <thead><tr><th scope="col" class="r"><small>Rank</small></th><th scope="col"><small>Address</small></th><th scope="col" class="r"><small>PEP</small></th><th scope="col" class="r"><small>% of supply</small></th><th scope="col"><small>Tag</small></th></tr></thead>
+        <tbody id="hold"></tbody>
+      </table>
+    </div>
+    <div class="morebar"><button class="btn" type="button" id="more">Show more</button><span class="muted small" id="shown"></span></div>
+  </section>
+
+  <section class="block in" aria-labelledby="nt-h" style="padding-top:20px">
+    <div class="panel callout gold">
+      <h2 id="nt-h" style="font-size:1.6rem">How to read this</h2>
+      <ul class="notes">
+        <li>Live daily snapshots from the API start on 5 Oct 2026. Earlier history, back to the first mined block on 30 Jan 2024, was reconstructed by replaying every block of the Pepecoin blockchain on a full node.</li>
+        <li>An address is not a person. Exchanges, pools and custodians hold coins for many users. The view without exchanges and pools is a closer picture of everyone else, but the tags are incomplete.</li>
+        <li>All shares are measured against the circulating supply on the day of the snapshot, so a growing supply alone lowers a share a little each day.</li>
+        <li>Each day uses that day’s top addresses, so the group changes as wallets climb or fall.</li>
+      </ul>
+      <p class="src">Data: Pepecoin Service rich list, PepeBlocks supply; history before 5 Oct 2026 reconstructed from the Pepecoin blockchain. <a href="../data/shares.csv">Download daily history (CSV)</a> · <a href="../rich-list.html">Full rich list with movers, serious mode</a></p>
+    </div>
+  </section>
+  </div>
+</main>
+
+<footer class="foot"></footer>
+<script src="meme.js?v=20261023a"></script>
+<script>
+(function () {
+  var M = window.Meme, f = M.fmt;
+  var S, st = { view: 'all', per: '7', top: 3, range: 365, shown: innerWidth < 560 ? 25 : 100 };
+  var STEP = st.shown;
+  var TIER_COL = ['#1f5c28', '#2f7d34', '#4f9f45', '#2c5ac4', '#6f8fe0'];
+  var RANKS = [['Poseidon', 250e6, null], ['Blue Whale', 100e6, 250e6], ['Whale', 50e6, 100e6], ['Shark', 10e6, 50e6], ['Dolphin', 5e6, 10e6]];
+  var RANGE = { 'Poseidon': '250M+', 'Blue Whale': '100M – 250M', 'Whale': '50M – 100M', 'Shark': '10M – 50M', 'Dolphin': '5M – 10M' };
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var V = function () { return S.views[st.view]; };
+  var slug = function (n) { return n.toLowerCase().replace(/ /g, '-'); };
+
+  function ranks() {
+    var R = S.ranks, rows, rest, exact = !!(R && R.rows && R.rows.length);
+    if (exact) {
+      rows = R.rows.map(function (r) { return { name: r.name, n: f.int(r.addresses), share: r.share }; });
+      rest = 'Fancy Fish to Plankton together · ' + f.pct(R.rest_share) + ' of supply';
+      $('rk-note').textContent = 'Counted on the ' + f.date(S.latest.date) + ' snapshot over every address down to 5M PEP.';
+    } else {
+      // no rank counts in this snapshot yet: count them from the listed top addresses
+      var H = S.holders, low = H[H.length - 1][2], held = 0;
+      rows = RANKS.map(function (r) {
+        var sel = H.filter(function (h) { return h[2] >= r[1] && (r[2] == null || h[2] < r[2]); });
+        var sum = sel.reduce(function (a, h) { return a + h[2]; }, 0); held += sum;
+        var partial = low > r[1];
+        return { name: r[0], n: f.int(sel.length) + (partial ? '+' : ''), share: sum / S.latest.supply * 100, plus: partial };
+      });
+      rest = 'Fancy Fish to Plankton together · up to ' + f.pct(100 - held / S.latest.supply * 100) + ' of supply';
+      $('rk-note').textContent = 'Counted on the ' + f.date(S.latest.date) + ' snapshot. The list only goes down to ' + f.compact(low) + ' PEP, the smallest listed balance, so Dolphins below that are not counted yet (“+”) and the last line is an upper bound.';
+    }
+    $('ranks').innerHTML = rows.map(function (r) {
+      return '<div class="rk"><img src="img/ranks/' + slug(r.name) + '.webp" alt="" width="44" height="44"><div><b>' + r.name + '</b><span class="rr">' + RANGE[r.name] + ' PEP</span><span class="rn">' + r.n + ' addresses</span><span class="rs">' + f.pct(r.share) + (r.plus ? '+' : '') + ' of supply</span></div></div>';
+    }).join('') + '<div class="rk rest"><div class="rki">' + ['fancy-fish', 'octopus', 'crab', 'shrimp', 'plankton'].map(function (n) { return '<img src="img/ranks/' + n + '.webp" alt="" width="30" height="30">'; }).join('') + '</div><div><b>Everyone under 5M PEP</b><span class="rn">' + rest.split(' · ')[0] + '</span><span class="rs">' + rest.split(' · ')[1] + '</span></div></div>';
+  }
+
+  function tiles() {
+    var v = V(), dl = v.deltas[st.per];
+    $('cc-p').textContent = 'Share of the circulating supply held by the largest addresses' + (st.view === 'ex' ? ', without tagged exchanges and pools' : '') + (dl ? ', compared with ' + f.date(dl.ref) + '.' : '.');
+    $('tiles').innerHTML = S.tops.map(function (n, i) {
+      var pp = dl ? dl.pp[i] : null, d;
+      if (pp == null) d = '<span class="delta muted">—</span>';
+      else d = '<span class="delta ' + (pp > 0.004 ? 'up' : pp < -0.004 ? 'dn' : 'muted') + '">' + (pp > 0.004 ? '▲ +' : pp < -0.004 ? '▼ −' : '• ') + f.dec(Math.abs(pp), 2) + ' pp</span>';
+      return '<div class="panel tile"><span class="label">Top ' + f.int(n) + '</span><span class="value">' + f.pct(v.shares[i]) + '</span>' + d + '</div>';
+    }).join('');
+    $('ex-note').hidden = st.view !== 'ex';
+  }
+
+  function stack() {
+    var v = V(), parts = S.tiers.map(function (t, i) { return ['#' + f.int(t[0]) + '–' + f.int(t[1]), v.tiers[i], v.tiers_pep[i], TIER_COL[i]]; });
+    parts.push(['Below #1,000', v.rest, v.rest_pep, null]);
+    $('stack').innerHTML = parts.map(function (p) { return '<i style="flex:' + p[1] + (p[3] ? ';background:' + p[3] : '') + '">' + f.dec(p[1], 1) + '%</i>'; }).join('');
+    $('stack').setAttribute('aria-label', 'Supply by rank: ' + parts.map(function (p) { return p[0] + ' ' + f.pct(p[1]); }).join(', '));
+    $('legend').innerHTML = parts.map(function (p) { return '<li><s style="background:' + (p[3] || 'var(--paper)') + '"></s><span>' + p[0] + '</span><em>' + f.compact(p[2]) + ' · ' + f.pct(p[1]) + '</em></li>'; }).join('');
+    $('thr').textContent = v.cutoff_pep ? 'Entry to the top 1,000 now takes ' + f.compact(v.cutoff_pep) + ' PEP.' : '';
+  }
+
+  function trend() {
+    var h = V().history, i = st.top, end = new Date(S.latest.date + 'T12:00:00Z').getTime();
+    var pts = h.filter(function (e) { return e.s[i] != null && (!st.range || new Date(e.d + 'T12:00:00Z').getTime() >= end - st.range * 864e5); })
+      .map(function (e) { return [new Date(e.d + 'T12:00:00Z').getTime(), e.s[i], e.rc]; });
+    var n = S.tops[i];
+    M.lineChart($('trend'), [{ points: pts }], {
+      yfmt: function (v) { return v.toFixed(v < 10 ? 1 : 0) + '%'; },
+      xfmt: function (t) { return new Date(t).toLocaleDateString('en-US', { month: 'short', year: st.range && st.range <= 90 ? undefined : '2-digit', day: st.range && st.range <= 90 ? 'numeric' : undefined, timeZone: 'UTC' }); },
+      tipfmt: function (p) { return f.date(p[0]) + '<br>Top ' + f.int(n) + ': ' + f.pct(p[1]) + (p[2] ? '<br><small>reconstructed</small>' : ''); },
+      label: 'Share of supply held by the top ' + n + ' addresses, ' + (st.range ? 'last ' + st.range + ' days' : 'since January 30, 2024') + ': from ' + f.pct(pts[0][1]) + ' to ' + f.pct(pts[pts.length - 1][1])
+    });
+  }
+
+  function holders() {
+    var H = S.holders, rows = H.slice(0, st.shown).map(function (h) {
+      var a = esc(h[1]), short = a.slice(0, 8) + '…' + a.slice(-6), tag = h[4] ? '<span class="tag ' + esc(h[5] || '') + '">' + esc(h[4]) + ' · ' + esc(h[5] || 'tagged') + '</span>' : '';
+      return '<tr' + (h[4] ? ' class="tagged"' : '') + '><td class="r">' + h[0] + '</td><td class="addr"><a href="https://pepeblocks.com/address/' + a + '" title="' + a + '">' + short + '</a></td><td class="r">' + f.int(h[2]) + '</td><td class="r">' + f.dec(h[3], 3) + '%</td><td>' + tag + '</td></tr>';
+    });
+    $('hold').innerHTML = rows.join('');
+    $('shown').textContent = 'Showing ' + f.int(Math.min(st.shown, H.length)) + ' of ' + f.int(H.length) + ' listed addresses.';
+    $('more').hidden = st.shown >= H.length;
+  }
+
+  function press(sel, attr, val) { document.querySelectorAll(sel).forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute(attr) === String(val))); }); }
+  function bind(sel, attr, key, fn) {
+    document.querySelectorAll(sel).forEach(function (b) {
+      b.addEventListener('click', function () { var v = b.getAttribute(attr); st[key] = key === 'view' || key === 'per' ? v : +v; press(sel, attr, v); fn(); });
+    });
+  }
+
+  M.json('summary.json').then(function (d) {
+    S = d;
+    M.fill({ date: f.date(S.latest.date), height: f.int(S.latest.height), supply: f.compact(S.latest.supply), addrs: f.int(S.latest.address_count) });
+    $('boot').hidden = true; $('app').hidden = false;
+    ranks(); tiles(); stack(); trend(); holders();
+    bind('[data-view]', 'data-view', 'view', function () { tiles(); stack(); trend(); });
+    bind('[data-per]', 'data-per', 'per', tiles);
+    bind('[data-top]', 'data-top', 'top', trend);
+    bind('[data-range]', 'data-range', 'range', trend);
+    $('more').addEventListener('click', function () { st.shown += STEP; holders(); });
+    var w = 0; window.addEventListener('resize', function () { if (Math.abs(innerWidth - w) > 40) { w = innerWidth; trend(); } });
+  }).catch(function () {
+    $('boot').innerHTML = '<img src="img/so-over.webp" alt="" width="200" height="200" style="width:200px"><p class="hand">It’s so over: the rich-list data could not be loaded right now. Try again in a few minutes, or open the <a href="../rich-list.html">serious rich list</a>.</p>';
+  });
+})();
+</script>
+</body>
+</html>

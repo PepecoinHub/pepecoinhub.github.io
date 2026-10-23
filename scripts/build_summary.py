@@ -321,6 +321,16 @@ def build(data_dir, out_path, csv_path):
 
     meta = latest["meta"]
     live = [s for s in snaps if not s["rc"]]
+    ranks = None
+    if meta.get("ranks"):   # community size ranks, counted by snapshot.py over every address down to the floor
+        counted = [(name, lo, n, int(b)) for name, lo, n, b in meta["ranks"]]
+        held = sum(b for *_, b in counted)
+        ranks = {
+            "floor": counted[0][1],
+            "rows": [{"name": name, "min": lo, "addresses": n, "pep": pep(b),
+                      "share": round(b / latest["supply"] * 100, 2)} for name, lo, n, b in reversed(counted)],
+            "rest_share": round((latest["supply"] - held) / latest["supply"] * 100, 2),
+        }
     all_dates = sorted({e["d"] for v in views.values() for e in v["history"]})
     summary = {
         "schema": 1,
@@ -344,6 +354,7 @@ def build(data_dir, out_path, csv_path):
         "periods": PERIODS,
         "track": TRACK,
         "views": views,
+        "ranks": ranks,
         "holders": holders,
     }
     os.makedirs(os.path.dirname(out_path), exist_ok=True)

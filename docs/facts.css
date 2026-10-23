@@ -165,6 +165,7 @@ th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-botto
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 thead th { font-family: var(--f-mono); font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--ink); white-space: nowrap; }
 thead th.coin { font-family: var(--f-display); font-size: 1.2rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink); }
+thead th.coin .coin-logo { display: block; width: 40px; height: 40px; margin-bottom: 8px; border-radius: 50%; }
 thead th.coin small { display: block; font-family: var(--f-body); font-size: 0.8rem; font-weight: 400; color: var(--muted); }
 tbody th { font-family: var(--f-mono); font-weight: 600; font-size: 0.83rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 tbody th.plain { font-family: var(--f-body); font-size: 0.95rem; letter-spacing: 0; text-transform: none; color: var(--ink); white-space: nowrap; }
