@@ -129,11 +129,19 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .nav-panel small { display: block; font-size: 0.8rem; color: var(--muted); line-height: 1.25; }
 .nav > a.games { background: var(--shirt); color: var(--on-shirt); border-color: var(--line); }
 .mode-link {
-  flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; height: 42px; border: 2.5px solid var(--line); border-radius: 12px;
-  background: var(--card); color: var(--ink); font: 800 0.88rem/1 var(--f-display); text-decoration: none; box-shadow: 3px 3px 0 var(--hard); white-space: nowrap;
+  position: relative; flex: none; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; align-items: center; padding: 3px; height: 42px;
+  border: 2.5px solid var(--line); border-radius: 999px; background: var(--card); color: var(--muted); text-decoration: none; box-shadow: 3px 3px 0 var(--hard);
 }
-.mode-link i { width: 26px; height: 13px; border-radius: 999px; border: 2px solid var(--line); background: #2c5ac4; }
-.mode-link:hover { background: var(--shirt-wash); }
+.mode-link::before {
+  content: ""; position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; background: #d04a32;
+  border: 2px solid var(--line); transform: translateX(100%); transition: transform 0.2s ease, background 0.2s ease;
+}
+.mode-link span { position: relative; z-index: 1; padding: 0 12px; text-align: center; font: 800 0.86rem/1 var(--f-display); white-space: nowrap; transition: color 0.2s; }
+.mode-link .mt-b { color: #fff; }
+.mode-link:hover::before { transform: translateX(90%); }
+.mode-link.to-a::before { transform: none; background: #2c5ac4; }
+.mode-link.to-a .mt-a { color: #fff; } .mode-link.to-a .mt-b { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .mode-link::before, .mode-link span { transition: none; } }
 .themebtn { flex: none; width: 42px; height: 42px; border: 2.5px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font-size: 1.1rem; cursor: pointer; box-shadow: 3px 3px 0 var(--hard); }
 .themebtn .tl { display: none; }
 .menubtn { display: none; }
@@ -342,7 +350,6 @@ footer.foot a { color: #edf3e3; }
 /* ---------- responsive ---------- */
 @media (max-width: 1060px) {
   .nav-btn, .nav > a { padding: 9px 9px; font-size: 0.9rem; }
-  .mode-link span { display: none; }
   .receipts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .explore { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ranksbox { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -350,7 +357,6 @@ footer.foot a { color: #edf3e3; }
 @media (max-width: 860px) {
   .menubtn { display: inline-grid; place-items: center; order: 3; height: 42px; padding: 0 14px; border: 2.5px solid var(--line); border-radius: 12px; background: var(--frog); color: var(--on-frog); font: 800 0.95rem var(--f-display); box-shadow: 3px 3px 0 var(--hard); cursor: pointer; }
   .mode-link { order: 2; margin-left: auto; }
-  .mode-link span { display: inline; }
   .nav { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 40; margin: 0; flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; background: var(--card); border: 3px solid var(--line); border-radius: 18px; box-shadow: 6px 6px 0 var(--hard); max-height: calc(100vh - 140px); overflow-y: auto; }
   .top.open .nav { display: flex; }
   .nav-btn { pointer-events: none; padding: 4px 4px 0; border: 0 !important; background: none !important; box-shadow: none !important; color: var(--muted) !important; font: 700 0.72rem/1 var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; }
@@ -402,14 +408,12 @@ footer.foot a { color: #edf3e3; }
   .logo .hub { display: none; }
   .logo img { height: 26px; }
   .bar { gap: 8px; }
-  .mode-link { height: 38px; padding: 0 9px; font-size: 0.8rem; }
-  .mode-link i { width: 20px; height: 11px; }
+  .mode-link { height: 38px; } .mode-link span { padding: 0 8px; font-size: 0.78rem; }
   .menubtn { height: 38px; padding: 0 11px; font-size: 0.88rem; }
   .panel { box-shadow: 4px 4px 0 var(--hard); }
 }
 @media (max-width: 380px) {
   .logo img { height: 21px; }
-  .mode-link span { display: none; }
   .menubtn { padding: 0 9px; font-size: 0.82rem; }
   .nav-panel { grid-template-columns: 1fr; }
 }

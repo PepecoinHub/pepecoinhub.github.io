@@ -293,16 +293,29 @@
 
   // The meme edition (English only, /meme/): the same page there when it has one, else its home page.
   var MEME = ['index', 'which-pepecoin', 'compare', 'scrypt-family', 'mica', 'calculator', 'price', 'supply', 'network', 'rich-list', 'mining', 'buy', 'wallets', 'glossary'];
+  var MODE = { en: ['Serious', 'Meme', 'Switch to the meme edition (English)'], pl: ['Serio', 'Meme', 'Przełącz na wersję meme (po angielsku)'],
+    es: ['Serio', 'Meme', 'Cambiar a la versión meme (en inglés)'], de: ['Seriös', 'Meme', 'Zur Meme-Version wechseln (Englisch)'],
+    fr: ['Sérieux', 'Meme', 'Passer à la version meme (en anglais)'], tr: ['Ciddi', 'Meme', 'Meme sürümüne geç (İngilizce)'],
+    it: ['Serio', 'Meme', 'Passa alla versione meme (in inglese)'], zh: ['正经', '表情包', '切换到表情包版（英文）'] };
+  // A two-sided switch: the knob sits on "Serious" here; a click slides it to "Meme" and opens the meme edition.
   function memeLink() {
-    var m = location.pathname.match(/([a-z-]+)\.html$/), page = m ? m[1] : 'index';
+    var m = location.pathname.match(/([a-z-]+)\.html$/), page = m ? m[1] : 'index', L = MODE[pageKey] || MODE.en;
     var a = document.createElement('a');
-    a.className = 'nav-meme';
+    a.className = 'mode-toggle';
     a.href = ROOT + 'meme/' + (page !== 'index' && MEME.indexOf(page) >= 0 ? page + '.html' : '');
-    a.title = 'The same facts, with memes (English)';
-    a.innerHTML = '<i aria-hidden="true"></i><span>Meme mode</span>';
-    a.addEventListener('click', function () { try { localStorage.setItem('hub-mode', 'meme'); } catch (e) {} });
+    a.title = L[2];
+    a.setAttribute('aria-label', L[2]);
+    a.innerHTML = '<span class="mt-a"></span><span class="mt-b"></span>';
+    a.firstChild.textContent = L[0]; a.lastChild.textContent = L[1];
+    a.addEventListener('click', function (e) {
+      try { localStorage.setItem('hub-mode', 'meme'); } catch (err) {}
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+      e.preventDefault(); a.classList.add('to-b');
+      setTimeout(function () { location.href = a.href; }, 220);
+    });
     return a;
   }
+
 
   // Footer: the logo with the "community fact pages" line and the community links, then every page of the site
   // in three short columns (the same links as the header menu), then the small print.

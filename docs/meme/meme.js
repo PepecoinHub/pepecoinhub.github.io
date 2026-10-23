@@ -133,8 +133,14 @@
     var tb = el('button', { type: 'button', class: 'themebtn', id: 'themebtn', 'aria-label': 'Switch light or dark' });
     nav.appendChild(tb);
     bar.appendChild(nav);
-    var ml = el('a', { class: 'mode-link', href: serious, title: 'Same facts, no memes' }, '<i aria-hidden="true"></i><span>Serious mode</span>');
-    ml.addEventListener('click', function () { try { localStorage.setItem('hub-mode', 'serious'); } catch (e) {} });
+    // Serious | Meme switch: the knob sits on Meme here and slides to Serious on click
+    var ml = el('a', { class: 'mode-link', href: serious, title: 'Switch to serious mode: same facts, no memes', 'aria-label': 'Switch to serious mode' }, '<span class="mt-a">Serious</span><span class="mt-b">Meme</span>');
+    ml.addEventListener('click', function (e) {
+      try { localStorage.setItem('hub-mode', 'serious'); } catch (err) {}
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      e.preventDefault(); ml.classList.add('to-a');
+      setTimeout(function () { location.href = ml.href; }, 220);
+    });
     bar.appendChild(ml);
     var mb = el('button', { type: 'button', class: 'menubtn', 'aria-expanded': 'false', 'aria-controls': 'nav' }, 'Menu');
     mb.addEventListener('click', function () { var o = !top.classList.contains('open'); top.classList.toggle('open', o); mb.setAttribute('aria-expanded', String(o)); });
