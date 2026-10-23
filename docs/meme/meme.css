@@ -57,6 +57,8 @@ mark { background: linear-gradient(100deg, transparent 2%, var(--mark) 4%, var(-
 .note { font-size: 0.9rem; color: var(--muted); max-width: 78ch; }
 .src { font: 400 0.8rem/1.5 var(--f-mono); color: var(--muted); }
 
+code { font: 400 0.92em var(--f-mono); background: var(--frog-wash); border: 1.5px solid color-mix(in srgb, var(--line) 30%, transparent); border-radius: 6px; padding: 1px 6px; overflow-wrap: anywhere; }
+
 /* ---------- panels, stickers, buttons ---------- */
 .panel { background: var(--card); border: 3px solid var(--line); border-radius: 18px; box-shadow: 6px 6px 0 var(--hard); }
 .sticker {
@@ -282,7 +284,7 @@ details.more[open] summary { margin-bottom: 12px; }
 .chart { padding: 18px 18px 10px; position: relative; }
 .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
 .chart text { font: 700 11px var(--f-mono); fill: var(--muted); }
-.chart .tip { position: absolute; pointer-events: none; background: var(--card); border: 2.5px solid var(--line); border-radius: 10px; padding: 6px 9px; font: 700 0.8rem/1.35 var(--f-mono); box-shadow: 3px 3px 0 var(--hard); white-space: nowrap; transform: translate(-50%, -110%); }
+.chart .lc-tip { position: absolute; pointer-events: none; background: var(--card); border: 2.5px solid var(--line); border-radius: 10px; padding: 6px 9px; font: 700 0.8rem/1.35 var(--f-mono); box-shadow: 3px 3px 0 var(--hard); white-space: nowrap; transform: translate(-50%, -110%); }
 .loading { display: grid; justify-items: center; gap: 8px; padding: 30px 10px; text-align: center; }
 .loading img { width: 140px; border: 3px solid var(--line); border-radius: 12px; }
 
@@ -294,7 +296,7 @@ details.more[open] summary { margin-bottom: 12px; }
 .faq details p + p { margin-top: 10px; }
 
 /* ---------- link lists ---------- */
-.links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+.links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; align-items: start; }
 .links .panel { padding: 16px 18px; display: grid; gap: 8px; align-content: start; }
 .links ul { list-style: none; padding: 0; display: grid; gap: 6px; }
 .links li a { font-weight: 700; }
@@ -392,6 +394,7 @@ footer.foot a { color: #edf3e3; }
   .ranksbox { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 14px; gap: 10px 12px; } .rk.rest { grid-template-columns: 1fr; } .rk .rs { font-size: 1rem; }
   th, td { padding: 10px 11px; }
   .cmp td { min-width: 180px; }
+  .cmp tbody th { white-space: normal; width: 90px; min-width: 84px; max-width: 92px; font-size: 0.68rem; }
   .footmeme { grid-template-columns: 84px minmax(0, 1fr); } .footmeme img { width: 84px; }
   .footcols { grid-template-columns: 1fr 1fr; }
   .footfine .exit { margin-left: 0; }

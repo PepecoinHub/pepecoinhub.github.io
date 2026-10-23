@@ -219,7 +219,7 @@
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
     if (opt.label) { svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', opt.label); }
     svg.innerHTML = g;
-    var tip = box.querySelector('.tip') || box.appendChild(el('div', { class: 'tip', hidden: '' }));
+    var tip = box.querySelector('.lc-tip') || box.appendChild(el('div', { class: 'tip lc-tip', hidden: '' }));
     var cur = svg.querySelector('.cur'), main = series[0].points;
     function move(ev) {
       var r = svg.getBoundingClientRect(), px = (ev.clientX - r.left) / r.width * W;
