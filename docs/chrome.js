@@ -156,6 +156,35 @@
     head.insertAdjacentElement('afterend', bar);
   }
 
+  // Home page only, once: red pill for the meme edition, blue pill to stay here. Remembered after a choice.
+  var PILL = {
+    en: ['Choose your frog.', 'Same facts either way.', 'Meme mode', 'Serious'],
+    pl: ['Wybierz swoją żabę.', 'Te same fakty w obu wersjach.', 'Wersja meme', 'Poważna'],
+    es: ['Elige tu rana.', 'Los mismos datos en ambas.', 'Modo meme', 'En serio'],
+    de: ['Wähle deinen Frosch.', 'Dieselben Fakten in beiden.', 'Meme-Modus', 'Seriös'],
+    fr: ['Choisis ta grenouille.', 'Les mêmes faits des deux côtés.', 'Mode meme', 'Sérieux'],
+    tr: ['Kurbağanı seç.', 'İkisinde de aynı bilgiler.', 'Meme modu', 'Ciddi'],
+    it: ['Scegli la tua rana.', 'Gli stessi fatti in entrambe.', 'Modalità meme', 'Seria'],
+    zh: ['选择你的青蛙。', '两种版本，事实相同。', '表情包版', '正经版']
+  };
+  function pillBar() {
+    var head = document.querySelector('.site-head');
+    if (!head || !document.querySelector('.home-hero')) return;
+    try { if (localStorage.getItem('hub-pill')) return; } catch (e) {}
+    var L = PILL[pageKey] || PILL.en;
+    var bar = document.createElement('div');
+    bar.className = 'pill-bar';
+    bar.innerHTML = '<p><b></b> <span></span></p><div class="pill-bar-btns"><a class="pb-red" href="' + ROOT + 'meme/"><i aria-hidden="true"></i><span></span></a><button type="button" class="pb-blue"><i aria-hidden="true"></i><span></span></button></div>';
+    bar.querySelector('p b').textContent = L[0];
+    bar.querySelector('p span').textContent = L[1];
+    bar.querySelector('.pb-red span').textContent = L[2] + (pageKey === 'en' ? '' : ' (EN)');
+    bar.querySelector('.pb-blue span').textContent = L[3];
+    function pick(v) { try { localStorage.setItem('hub-pill', v); localStorage.setItem('hub-mode', v); } catch (e) {} }
+    bar.querySelector('.pb-red').addEventListener('click', function () { pick('meme'); });
+    bar.querySelector('.pb-blue').addEventListener('click', function () { pick('serious'); bar.remove(); });
+    head.insertAdjacentElement('afterend', bar);
+  }
+
   function mount() {
     var nav = document.querySelector('.site-nav, .pf-nav');
     if (!nav || nav.querySelector('[data-chrome]')) return;
@@ -190,6 +219,7 @@
     backToTop();
     bgLayer();
     langHint(alt);
+    pillBar();
     dataStrip();
     supportCopy();
   }
