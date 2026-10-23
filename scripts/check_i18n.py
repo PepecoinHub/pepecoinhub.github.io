@@ -39,6 +39,7 @@ class Page(HTMLParser):
         if tag == "meta" and a.get("property") == "og:url":
             self.ogurl = a.get("content")
         skip = tag == "link" and a.get("rel") not in ("stylesheet", "icon")   # canonical, alternate, preconnect
+        skip = skip or (tag == "a" and "hreflang" in a)   # footer links to the other language versions
         for k in ("href", "src"):
             if a.get(k) and not skip and not (tag == "script" and k == "src"):
                 self.links.append(a[k])
