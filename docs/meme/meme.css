@@ -48,7 +48,8 @@ ul, ol { margin: 0; }
 .small { font-size: 0.9rem; }
 .hand { font-family: var(--f-hand); font-size: 1.35rem; line-height: 1.2; }
 .num, td, .tnum { font-variant-numeric: tabular-nums; }
-mark { background: linear-gradient(100deg, transparent 2%, var(--mark) 4%, var(--mark) 96%, transparent 98%) no-repeat 0 72% / 100% 46%; color: inherit; padding-inline: 2px; }
+mark { background: none; color: var(--frog-deep); padding: 0; }
+
 .up { color: var(--frog-deep); } .dn { color: var(--lips); }
 .yes { color: var(--frog-deep); font-weight: 700; } .no { color: var(--lips); font-weight: 700; }
 .prose { display: grid; gap: 14px; max-width: 68ch; }

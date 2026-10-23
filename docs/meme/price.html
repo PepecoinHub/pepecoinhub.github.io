@@ -181,7 +181,7 @@ img.pow-logo { background: #fff; }
       <label class="toggle"><input type="checkbox" id="overlay"><span>Overlay Pepe (PEPE)</span></label>
     </div>
     <div class="chart-legend"><span class="k pep">Pepecoin (PEP)</span><span class="k pepe" id="legend-pepe" hidden>Pepe (PEPE)</span><span class="chart-change" id="chart-change"></span></div>
-    <div class="chart-wrap"><div class="chart pchart" id="chart"></div><div class="chart-tip" id="chart-tip" hidden></div><p class="chart-msg" id="chart-msg">Loading the chart…</p><picture><source srcset="img/pep-loading-still.webp" media="(prefers-reduced-motion: reduce)"><img class="load-frog" src="img/pep-loading.webp" alt="" width="260" height="260"></picture></div>
+    <div class="chart-wrap"><div class="chart pchart" id="chart"></div><div class="chart-tip" id="chart-tip" hidden></div><p class="chart-msg" id="chart-msg">Loading the chart…</p><picture id="chart-frog"><source srcset="img/pep-loading-still.webp" media="(prefers-reduced-motion: reduce)"><img class="load-frog" src="img/pep-loading.webp" alt="" width="260" height="260"></picture></div>
     <p class="src" id="chart-corr"></p>
     <p class="src">The line is the PEP price in US dollars. With Pepe switched on, both lines show the % change from the start of the period, because one PEPE costs far less than one PEP and the two prices would not fit on one axis. Hover or tap the chart for exact values.</p>
   </div>
@@ -280,5 +280,15 @@ img.pow-logo { background: #fff; }
 <script src="meme.js?v=20261023a"></script>
 <script src="../live.js?v=20261012d" defer></script>
 <script src="../price.js?v=20261020c" defer></script>
+<script>
+// the loading frog only while the chart is loading; if loading fails, the message stays without the spinner
+(function () {
+  var m = document.getElementById('chart-msg'), f = document.getElementById('chart-frog');
+  if (!m || !f) return;
+  var sync = function () { f.hidden = m.hidden || !/Loading/i.test(m.textContent); };
+  new MutationObserver(sync).observe(m, { attributes: true, childList: true, characterData: true, subtree: true });
+  sync();
+})();
+</script>
 </body>
 </html>
