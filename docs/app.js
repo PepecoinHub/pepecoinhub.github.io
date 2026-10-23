@@ -49,13 +49,6 @@
       hist_one: 'First snapshot is in. Changes appear from tomorrow, and a 7-day comparison after a week.',
       hist_many: 'History: {n} daily snapshots since {date}. Longer periods fill in as the history grows.',
       hist_rc: 'Data from the very first block, {date}: reconstructed from the blockchain, with live daily snapshots since {live_date}.',
-      ranks_h: 'Sea-creature ranks',
-      ranks_p: 'Every address holding at least {floor} PEP on {date}, sorted into the community\'s size ranks. An address is not a person: exchanges and pools are counted too.',
-      ranks_n: '{n} addresses',
-      ranks_n1: '1 address',
-      ranks_share: '{p}% of supply',
-      ranks_rest: 'Everyone under {floor} PEP',
-      ranks_rest_sub: 'Fancy Fish, Octopus, Crab, Shrimp and Plankton together',
       conc_h: 'Concentration',
       conc_p: 'Share of the circulating supply held by the largest addresses, compared with the same time {period} ago.',
       conc_p_all: 'Share of the circulating supply held by the largest addresses, compared with the earliest point in the history ({date}).',
@@ -177,13 +170,6 @@
       hist_one: 'Pierwszy snapshot jest. Zmiany pojawią się od jutra, a porównanie 7-dniowe po tygodniu.',
       hist_many: 'Historia: {n} dziennych snapshotów od {date}. Dłuższe okresy uzupełnią się wraz z historią.',
       hist_rc: 'Dane od samego początku, czyli od pierwszego bloku ({date}): odtworzone z blockchainu, a od {live_date} codzienne snapshoty na żywo.',
-      ranks_h: 'Rangi morskich stworzeń',
-      ranks_p: 'Każdy adres z co najmniej {floor} PEP na dzień {date}, przypisany do rang społeczności. Adres to nie osoba: liczą się też giełdy i poole.',
-      ranks_n: '{n} adresów',
-      ranks_n1: '1 adres',
-      ranks_share: '{p}% podaży',
-      ranks_rest: 'Wszyscy poniżej {floor} PEP',
-      ranks_rest_sub: 'Fancy Fish, Octopus, Crab, Shrimp i Plankton razem',
       conc_h: 'Koncentracja',
       conc_p: 'Udział największych adresów w podaży w obiegu, porównany z tym samym momentem {period} wcześniej.',
       conc_p_all: 'Udział największych adresów w podaży w obiegu, porównany z najwcześniejszym punktem historii ({date}).',
@@ -569,31 +555,6 @@
           : t('conc_p', { period: periodWords(p) }))),
         periodChips()),
       h('div', { class: 'tiles' }, tiles));
-  }
-
-  /* ------------------------------------------------------------ sea-creature ranks */
-  const RANK_RANGE = { 'Poseidon': '250M+', 'Blue Whale': '100M – 250M', 'Whale': '50M – 100M', 'Shark': '10M – 50M', 'Dolphin': '5M – 10M' };
-  const rankIcon = (name, cls) => h('img', { class: cls || 'rank-ico', src: DATA_BASE + 'assets/ranks/' + name.toLowerCase().replace(/ /g, '-') + '.webp', alt: '', width: 44, height: 44, loading: 'lazy' });
-
-  function ranksSection() {
-    const R = S.ranks;
-    if (!R || !R.rows || !R.rows.length) return null;
-    const floor = fmtCompact(R.floor);
-    const cards = R.rows.map((r) => h('div', { class: 'rank' },
-      rankIcon(r.name),
-      h('div', { class: 'rank-txt' },
-        h('div', { class: 'rank-name' }, r.name, h('span', { class: 'rank-range' }, (RANK_RANGE[r.name] || '') + ' PEP')),
-        h('div', { class: 'rank-n' }, r.addresses === 1 ? t('ranks_n1') : t('ranks_n', { n: fmtInt(r.addresses) })),
-        h('div', { class: 'rank-share' }, t('ranks_share', { p: dec(2).format(r.share) })))));
-    const rest = h('div', { class: 'rank rank-rest' },
-      h('div', { class: 'rank-icos' }, ['Fancy Fish', 'Octopus', 'Crab', 'Shrimp', 'Plankton'].map((n) => rankIcon(n, 'rank-ico sm'))),
-      h('div', { class: 'rank-txt' },
-        h('div', { class: 'rank-name' }, t('ranks_rest', { floor })),
-        h('div', { class: 'rank-n' }, t('ranks_rest_sub')),
-        h('div', { class: 'rank-share' }, t('ranks_share', { p: dec(2).format(R.rest_share) }))));
-    return h('section', {},
-      h('div', { class: 'sec-head' }, h('div', {}, h('h2', {}, t('ranks_h')), h('p', {}, t('ranks_p', { floor, date: fmtDate(S.latest.date) })))),
-      h('div', { class: 'ranks' }, cards, rest));
   }
 
   /* --------------------------------------------------------------- structure now */
@@ -1029,7 +990,7 @@
     const active = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.key : null;
     const keepY = window.scrollY;
     resizers = [];
-    app.replaceChildren(...[header(), ranksSection(), myAddressSection(), tilesSection(), structSection(), trendSection(), matrixSection(), moversSection(), holdersSection(), notesSection(), footer()].filter(Boolean));
+    app.replaceChildren(...[header(), myAddressSection(), tilesSection(), structSection(), trendSection(), matrixSection(), moversSection(), holdersSection(), notesSection(), footer()].filter(Boolean));
     document.title = t('title') + ' | PEP rich list and concentration tracker';
     if (active) { const el = app.querySelector('[data-key="' + active + '"]'); if (el) el.focus({ preventScroll: true }); }
     window.scrollTo(0, keepY);
