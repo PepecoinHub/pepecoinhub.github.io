@@ -1073,10 +1073,10 @@ dl.facts.facts-board dt:last-of-type, dl.facts.facts-board dd:last-of-type { bor
 /* Header: Serious | Meme switch. The knob sits on the current mode and slides over on click (chrome.js). */
 .site-nav a.mode-toggle {
   position: relative; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; align-items: center; flex: none;
-  padding: 3px; border-radius: 999px; background: var(--paper-2); border: 1.5px solid var(--rule); text-decoration: none; color: var(--muted);
+  padding: 3px !important; border-radius: 999px; background: var(--paper-2); border: 1.5px solid var(--rule); text-decoration: none; color: var(--muted);
 }
-.site-nav a.mode-toggle::before {
-  content: ""; position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px;
+.site-nav a.mode-toggle::before, .head-phone .mode-toggle::before {
+  content: ""; box-sizing: border-box; position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px;
   background: #2c5ac4; box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.35); transition: transform 0.2s ease, background 0.2s ease;
 }
 .site-nav a.mode-toggle span { position: relative; z-index: 1; padding: 3px 11px; text-align: center; font-size: 0.85rem; font-weight: 700; line-height: 1.4; white-space: nowrap; transition: color 0.2s; }
@@ -1095,7 +1095,7 @@ dl.facts.facts-board dt:last-of-type, dl.facts.facts-board dd:last-of-type { bor
   :is(:lang(en), :lang(pl), :lang(zh)) .site-nav a.mode-toggle span { font-size: 0.85rem; width: auto; height: auto; padding: 3px 11px; }
   :is(:lang(en), :lang(pl), :lang(zh)) .site-nav a.mode-toggle .mt-b { background: none; }
 }
-@media (max-width: 760px) { .site-nav.grouped a.mode-toggle { align-self: stretch; padding: 4px; background: var(--paper-2); } .site-nav.grouped a.mode-toggle span { padding: 6px 10px; font-size: 0.92rem; } }
+@media (max-width: 760px) { .site-nav.grouped a.mode-toggle { display: none; } }
 @media (prefers-reduced-motion: reduce) { .site-nav a.mode-toggle::before, .site-nav a.mode-toggle span { transition: none; } }
 @media (min-width: 761px) {
   /* room for the meme pill without wrapping the header */
@@ -1121,3 +1121,35 @@ dl.facts.facts-board dt:last-of-type, dl.facts.facts-board dd:last-of-type { bor
 .pill-bar .pb-red i { background: #d04a32; } .pill-bar .pb-red:hover { border-color: #d04a32; }
 .pill-bar .pb-blue i { background: #2c5ac4; } .pill-bar .pb-blue:hover { border-color: #2c5ac4; }
 @media (max-width: 560px) { .pill-bar { padding: 12px 14px; } .pill-bar-btns a, .pill-bar-btns button { padding: 8px 10px; font-size: 0.86rem; } .pill-bar-btns { width: 100%; } .pill-bar-btns > * { flex: 1; justify-content: center; } }
+
+/* phones: a compact switch in the header bar too, so the mode is always visible */
+.head-phone .mode-toggle {
+  position: relative; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; align-items: center; flex: none;
+  padding: 3px; height: 42px; border-radius: 999px; background: var(--paper-2); border: 1.5px solid var(--rule); text-decoration: none;
+}
+.head-phone .mode-toggle::before { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; background: #2c5ac4; transition: transform 0.2s ease, background 0.2s ease; }
+.head-phone .mode-toggle span { position: relative; z-index: 1; width: 22px; height: 22px; font-size: 0; }
+.head-phone .mode-toggle .mt-b { background: radial-gradient(circle, #d04a32 0 5px, transparent 5.5px); }
+.head-phone .mode-toggle.to-b::before { transform: translateX(100%); background: #d04a32; }
+@media (max-width: 430px) { .head-phone .mode-toggle { height: 42px; } .head-phone .mode-toggle span { width: 18px; } }
+@media (max-width: 380px) { .head-phone .mode-toggle { height: 38px; } .head-phone .mode-toggle span { width: 15px; } }
+@media (max-width: 430px) { :is(:lang(es), :lang(fr)) .head-start b { display: none; } }
+/* make room for the phone switch */
+@media (max-width: 430px) {
+  .site-head .brand-hub-link .lockup { height: 22px; }
+  .head-phone { gap: 5px; }
+  .head-phone .mode-toggle { height: 38px; } .head-phone .mode-toggle span { width: 15px; height: 18px; }
+  .head-phone .mode-toggle .mt-b { background: radial-gradient(circle, #d04a32 0 4px, transparent 4.5px); }
+}
+@media (max-width: 380px) {
+  .site-head .brand-hub-link .lockup { height: 19px; }
+  .site-head .brand-hub-link .hub { font-size: 0.78rem; padding: 0 4px; }
+  .head-phone .mode-toggle { height: 34px; } .head-phone .mode-toggle span { width: 13px; }
+  .head-phone { gap: 4px; }
+}
+/* the phone switch as a small horizontal toggle */
+.head-phone .mode-toggle { height: 28px !important; padding: 3px !important; align-self: center; }
+.head-phone .mode-toggle span { width: 19px !important; height: 20px !important; }
+.head-phone .mode-toggle::before { border-radius: 999px; }
+@media (max-width: 380px) { .head-phone .mode-toggle { height: 26px !important; } .head-phone .mode-toggle span { width: 17px !important; height: 18px !important; } }
+@media (max-width: 430px) { .head-phone { gap: 4px; } .head-start { padding: 0 8px; } }
