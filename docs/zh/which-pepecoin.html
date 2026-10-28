@@ -65,54 +65,6 @@
       </thead>
       <tbody>
         <tr>
-          <th scope="row">类型</th>
-          <td>独立的 Layer 1 区块链，由 Dogecoin Core 分叉而来</td>
-          <td>Ethereum（以太坊）上的 ERC-20 代币</td>
-          <td>Ethereum 上的 ERC-20 代币。2016年起运行自己的链，2023年桥接到 Ethereum</td>
-        </tr>
-        <tr>
-          <th scope="row">上线时间</th>
-          <td>2024年1月30日</td>
-          <td>2023年4月</td>
-          <td>2016年3月</td>
-        </tr>
-        <tr>
-          <th scope="row">背后是谁</th>
-          <td>Pepecoin LLC，联合创始人公开具名（David Eichel），并自行发布了 MiCA whitepaper。<a href="#identity">详情</a></td>
-          <td>没有法律意义上的发行方，由身份未公开的匿名开发者创建（<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">LCX 为 PEPE 撰写的 MiCA whitepaper</a>，B.2 和 D.5）</td>
-          <td>暂无可核实的数据</td>
-        </tr>
-        <tr>
-          <th scope="row">安全机制</th>
-          <td>Scrypt 工作量证明，与 Litecoin（莱特币）和 Dogecoin（狗狗币）合并挖矿（merged mining）</td>
-          <td>Ethereum 验证者（权益证明）</td>
-          <td>目前由 Ethereum 验证者保障。最初采用 X11 工作量证明，后来改为权益证明</td>
-        </tr>
-        <tr>
-          <th scope="row">能挖矿吗？</th>
-          <td>可以：在支持 PEP 合并挖矿的矿池上使用 Scrypt ASIC 矿机。<a href="mining.html">如何挖 PEP</a></td>
-          <td>不能。它是 Ethereum 上的代币，而 Ethereum 采用权益证明，代币不是挖出来的</td>
-          <td>不能，自迁移到 Ethereum 后就不能挖了</td>
-        </tr>
-        <tr>
-          <th scope="row">记账模型</th>
-          <td>UTXO 模型，与 Bitcoin（比特币）和 Dogecoin 相同：币以未花费输出的形式存在，只有持有密钥的人才能花费</td>
-          <td>ERC-20：余额记录在 Ethereum 上该代币的智能合约里</td>
-          <td>ERC-20：余额记录在 Ethereum 上该代币的智能合约里</td>
-        </tr>
-        <tr>
-          <th scope="row">手续费币种</th>
-          <td>PEP，付给 Pepecoin 链的矿工</td>
-          <td>ETH，即 Ethereum 的 Gas 费；就算只转 PEPE，也得用 ETH 付费</td>
-          <td>ETH，即 Ethereum 的 Gas 费；就算只转 PEPECOIN，也得用 ETH 付费</td>
-        </tr>
-        <tr>
-          <th scope="row">转账成本</th>
-          <td>建议手续费为每 kB 0.01 PEP，按 2026 年 10 月的价格不到 0.000001 美元（<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>）</td>
-          <td>取决于当时 Ethereum 的 Gas 价格，可在 <a href="https://etherscan.io/gastracker">Etherscan Gas Tracker</a> 查看</td>
-          <td>取决于当时 Ethereum 的 Gas 价格，可在 <a href="https://etherscan.io/gastracker">Etherscan Gas Tracker</a> 查看</td>
-        </tr>
-        <tr>
           <th scope="row">初始分配</th>
           <td>
             <div class="alloc">
@@ -137,22 +89,70 @@
           </td>
         </tr>
         <tr>
+          <th scope="row">地址</th>
+          <td>以 <code>P</code> 开头</td>
+          <td>以 <code>0x</code> 开头</td>
+          <td>以 <code>0x</code> 开头</td>
+        </tr>
+        <tr>
+          <th scope="row">转账成本</th>
+          <td>建议手续费为每 kB 0.01 PEP，按 2026 年 10 月的价格不到 0.000001 美元（<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>）</td>
+          <td>取决于当时 Ethereum 的 Gas 价格，可在 <a href="https://etherscan.io/gastracker">Etherscan Gas Tracker</a> 查看</td>
+          <td>取决于当时 Ethereum 的 Gas 价格，可在 <a href="https://etherscan.io/gastracker">Etherscan Gas Tracker</a> 查看</td>
+        </tr>
+        <tr>
           <th scope="row">协议层冻结</th>
           <td><strong>协议层没有黑名单。</strong>和 Bitcoin、Dogecoin 这类 UTXO 币一样，没有人能在链上冻结任意地址。不过，交易所或托管钱包（custodial wallet）仍然可以冻结<em>它们自己</em>代管的余额。</td>
           <td>合约带有黑名单和转账限制规则。部署者早期拉黑了一个地址，随后放弃了合约所有权（owner 变为零地址）。此后，通过 Ownable 由所有者发起的新冻结已被禁用，但那个地址依然处于冻结状态。</td>
           <td>这是另一个独立的 ERC-20 合约，请自行查看它的管理权限状态，不要假定和 PEPE 一样。</td>
         </tr>
         <tr>
+          <th scope="row">类型</th>
+          <td>独立的 Layer 1 区块链，由 Dogecoin Core 分叉而来</td>
+          <td>Ethereum（以太坊）上的 ERC-20 代币</td>
+          <td>Ethereum 上的 ERC-20 代币。2016年起运行自己的链，2023年桥接到 Ethereum</td>
+        </tr>
+        <tr>
+          <th scope="row">安全机制</th>
+          <td>Scrypt 工作量证明，与 Litecoin（莱特币）和 Dogecoin（狗狗币）合并挖矿（merged mining）</td>
+          <td>Ethereum 验证者（权益证明）</td>
+          <td>目前由 Ethereum 验证者保障。最初采用 X11 工作量证明，后来改为权益证明</td>
+        </tr>
+        <tr>
+          <th scope="row">能挖矿吗？</th>
+          <td>可以：在支持 PEP 合并挖矿的矿池上使用 Scrypt ASIC 矿机。<a href="mining.html">如何挖 PEP</a></td>
+          <td>不能。它是 Ethereum 上的代币，而 Ethereum 采用权益证明，代币不是挖出来的</td>
+          <td>不能，自迁移到 Ethereum 后就不能挖了</td>
+        </tr>
+        <tr>
+          <th scope="row">手续费币种</th>
+          <td>PEP，付给 Pepecoin 链的矿工</td>
+          <td>ETH，即 Ethereum 的 Gas 费；就算只转 PEPE，也得用 ETH 付费</td>
+          <td>ETH，即 Ethereum 的 Gas 费；就算只转 PEPECOIN，也得用 ETH 付费</td>
+        </tr>
+        <tr>
+          <th scope="row">记账模型</th>
+          <td>UTXO 模型，与 Bitcoin（比特币）和 Dogecoin 相同：币以未花费输出的形式存在，只有持有密钥的人才能花费</td>
+          <td>ERC-20：余额记录在 Ethereum 上该代币的智能合约里</td>
+          <td>ERC-20：余额记录在 Ethereum 上该代币的智能合约里</td>
+        </tr>
+        <tr>
+          <th scope="row">背后是谁</th>
+          <td>Pepecoin LLC，一家注册公司，自行发布了 MiCA whitepaper。<a href="#identity">详情</a></td>
+          <td>没有法律意义上的发行方，由身份未公开的匿名开发者创建（<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">LCX 为 PEPE 撰写的 MiCA whitepaper</a>，B.2 和 D.5）</td>
+          <td>暂无可核实的数据</td>
+        </tr>
+        <tr>
+          <th scope="row">上线时间</th>
+          <td>2024年1月30日</td>
+          <td>2023年4月</td>
+          <td>2016年3月</td>
+        </tr>
+        <tr>
           <th scope="row">供应量</th>
           <td><span class="num">约 <span data-live="supply-yi">1049</span> 亿</span>，另外每个区块新增 10,000 枚，没有上限</td>
           <td><span class="num">420.69 万亿</span>，总量固定</td>
           <td><span class="num">约 1.076 亿</span>，Ethereum 上的总供应量（上限约 1.338 亿）</td>
-        </tr>
-        <tr>
-          <th scope="row">地址</th>
-          <td>以 <code>P</code> 开头</td>
-          <td>以 <code>0x</code> 开头</td>
-          <td>以 <code>0x</code> 开头</td>
         </tr>
         <tr>
           <th scope="row">Kraken 上线</th>
@@ -179,7 +179,7 @@
   <h2 id="identity">公开身份（PEP 项目）</h2>
   <div class="prose">
     <p>Pepecoin LLC 的 MiCA 加密资产 whitepaper（用于申请获准交易）写明了要约人的管理机构。一位 Pepecoin 联合创始人还在 <strong>Litecoin Summit</strong>（阿姆斯特丹，<strong>2026年6月22日至23日</strong>，Dutch Blockchain Week）的合并挖矿圆桌讨论中发言。这属于自愿公开身份和监管备案，并不是在违背当事人意愿的情况下曝光私人个体。</p>
-    <p class="src">来源：<a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA whitepaper</a>；<a href="https://news.bitcoin.com/pepecoin-co-founder-david-eichel-to-speak-on-merge-mining-panel-at-litecoin-summit-2026/">Bitcoin.com 公告</a>；<a href="https://www.cryptotimes.io/2026/06/24/litecoin-summit-day-2-litvms-50m-bet-and-basicswapdexs-bold-vision/">CryptoTimes 峰会回顾</a>（圆桌讨论的参与者）。</p>
+    <p class="src">来源：<a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA whitepaper</a>；<a href="https://www.cryptotimes.io/2026/06/24/litecoin-summit-day-2-litvms-50m-bet-and-basicswapdexs-bold-vision/">CryptoTimes 峰会回顾</a>（圆桌讨论的参与者）。</p>
   </div>
 </section>
 
@@ -279,7 +279,6 @@
         <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp（AuxPoW、创世区块）</a></li>
         <li><a href="https://pepeplorer.com/network">Pepeplorer 网络统计</a></li>
         <li><a href="https://blog.kraken.com/product/asset-listings/pep-is-available-for-trading">Kraken 上线公告，2026年2月</a></li>
-        <li><a href="https://news.bitcoin.com/pepecoin-co-founder-david-eichel-to-speak-on-merge-mining-panel-at-litecoin-summit-2026/">Litecoin Summit（Bitcoin.com）</a></li>
         <li><a href="https://www.cryptotimes.io/2026/06/24/litecoin-summit-day-2-litvms-50m-bet-and-basicswapdexs-bold-vision/">Litecoin Summit 回顾（CryptoTimes）</a></li>
         <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC 关于 PEP 合并挖矿的介绍</a></li>
         <li><a href="https://peppool.space/mining">peppool.space 矿池列表</a></li>

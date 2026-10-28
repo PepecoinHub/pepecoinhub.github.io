@@ -65,54 +65,6 @@
       </thead>
       <tbody>
         <tr>
-          <th scope="row">What it is</th>
-          <td>Its own layer-1 blockchain, a fork of Dogecoin Core</td>
-          <td>ERC-20 token on Ethereum</td>
-          <td>ERC-20 token on Ethereum. Ran its own chain from 2016, bridged to Ethereum in 2023</td>
-        </tr>
-        <tr>
-          <th scope="row">Launched</th>
-          <td>January 30, 2024</td>
-          <td>April 2023</td>
-          <td>March 2016</td>
-        </tr>
-        <tr>
-          <th scope="row">Who's behind it</th>
-          <td>Pepecoin LLC, with a publicly named co-founder (David Eichel). It published its own MiCA whitepaper. <a href="#identity">More</a></td>
-          <td>No legal issuer. Created by anonymous developers whose identities are not publicly known (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">LCX MiCA whitepaper for PEPE</a>, B.2 and D.5)</td>
-          <td>No verified data</td>
-        </tr>
-        <tr>
-          <th scope="row">Secured by</th>
-          <td>Scrypt proof of work, merge-mined with Litecoin and Dogecoin</td>
-          <td>Ethereum validators (proof of stake)</td>
-          <td>Ethereum validators today. Originally X11 proof of work, then proof of stake</td>
-        </tr>
-        <tr>
-          <th scope="row">Can you mine it?</th>
-          <td>Yes, with a Scrypt ASIC on a pool that merge-mines PEP. <a href="mining.html">How to mine PEP</a></td>
-          <td>No. A token on Ethereum, which uses proof of stake, is not mined</td>
-          <td>No, not since it moved to Ethereum</td>
-        </tr>
-        <tr>
-          <th scope="row">Account model</th>
-          <td>UTXO, like Bitcoin and Dogecoin: coins sit in unspent outputs that only the key holder can spend</td>
-          <td>ERC-20: a balance recorded inside the token's smart contract on Ethereum</td>
-          <td>ERC-20: a balance recorded inside the token's smart contract on Ethereum</td>
-        </tr>
-        <tr>
-          <th scope="row">Fees paid in</th>
-          <td>PEP, to the miners of the Pepecoin chain</td>
-          <td>ETH, as Ethereum gas, even when only PEPE moves</td>
-          <td>ETH, as Ethereum gas, even when only PEPECOIN moves</td>
-        </tr>
-        <tr>
-          <th scope="row">Cost of a transfer</th>
-          <td>Recommended fee 0.01 PEP per kB, under $0.000001 at the October 2026 price (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td>
-          <td>Depends on the Ethereum gas price at the moment. See the <a href="https://etherscan.io/gastracker">Etherscan gas tracker</a></td>
-          <td>Depends on the Ethereum gas price at the moment. See the <a href="https://etherscan.io/gastracker">Etherscan gas tracker</a></td>
-        </tr>
-        <tr>
           <th scope="row">Launch allocation</th>
           <td>
             <div class="alloc">
@@ -137,22 +89,70 @@
           </td>
         </tr>
         <tr>
+          <th scope="row">Address</th>
+          <td>Starts with <code>P</code></td>
+          <td>Starts with <code>0x</code></td>
+          <td>Starts with <code>0x</code></td>
+        </tr>
+        <tr>
+          <th scope="row">Cost of a transfer</th>
+          <td>Recommended fee 0.01 PEP per kB, under $0.000001 at the October 2026 price (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td>
+          <td>Depends on the Ethereum gas price at the moment. See the <a href="https://etherscan.io/gastracker">Etherscan gas tracker</a></td>
+          <td>Depends on the Ethereum gas price at the moment. See the <a href="https://etherscan.io/gastracker">Etherscan gas tracker</a></td>
+        </tr>
+        <tr>
           <th scope="row">Protocol freeze</th>
           <td><strong>No protocol blacklist.</strong> Like Bitcoin/Dogecoin UTXO coins, nobody can freeze an arbitrary address at the chain layer. An exchange or custodial wallet can still freeze balances <em>it</em> holds.</td>
           <td>Contract has blacklist/transfer rules. Deployer blacklisted one address early, then renounced ownership (owner = zero). New owner-only freezes via Ownable are disabled; that one address stays frozen.</td>
           <td>Separate ERC-20 — check that contract’s own admin status; do not assume it matches PEPE.</td>
         </tr>
         <tr>
+          <th scope="row">What it is</th>
+          <td>Its own layer-1 blockchain, a fork of Dogecoin Core</td>
+          <td>ERC-20 token on Ethereum</td>
+          <td>ERC-20 token on Ethereum. Ran its own chain from 2016, bridged to Ethereum in 2023</td>
+        </tr>
+        <tr>
+          <th scope="row">Secured by</th>
+          <td>Scrypt proof of work, merge-mined with Litecoin and Dogecoin</td>
+          <td>Ethereum validators (proof of stake)</td>
+          <td>Ethereum validators today. Originally X11 proof of work, then proof of stake</td>
+        </tr>
+        <tr>
+          <th scope="row">Can you mine it?</th>
+          <td>Yes, with a Scrypt ASIC on a pool that merge-mines PEP. <a href="mining.html">How to mine PEP</a></td>
+          <td>No. A token on Ethereum, which uses proof of stake, is not mined</td>
+          <td>No, not since it moved to Ethereum</td>
+        </tr>
+        <tr>
+          <th scope="row">Fees paid in</th>
+          <td>PEP, to the miners of the Pepecoin chain</td>
+          <td>ETH, as Ethereum gas, even when only PEPE moves</td>
+          <td>ETH, as Ethereum gas, even when only PEPECOIN moves</td>
+        </tr>
+        <tr>
+          <th scope="row">Account model</th>
+          <td>UTXO, like Bitcoin and Dogecoin: coins sit in unspent outputs that only the key holder can spend</td>
+          <td>ERC-20: a balance recorded inside the token's smart contract on Ethereum</td>
+          <td>ERC-20: a balance recorded inside the token's smart contract on Ethereum</td>
+        </tr>
+        <tr>
+          <th scope="row">Who's behind it</th>
+          <td>Pepecoin LLC, a registered company that published its own MiCA whitepaper. <a href="#identity">More</a></td>
+          <td>No legal issuer. Created by anonymous developers whose identities are not publicly known (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">LCX MiCA whitepaper for PEPE</a>, B.2 and D.5)</td>
+          <td>No verified data</td>
+        </tr>
+        <tr>
+          <th scope="row">Launched</th>
+          <td>January 30, 2024</td>
+          <td>April 2023</td>
+          <td>March 2016</td>
+        </tr>
+        <tr>
           <th scope="row">Supply</th>
           <td><span class="num">~<span data-live="supply-b">104.9</span> billion</span>, plus 10,000 per block, no cap</td>
           <td><span class="num">420.69 trillion</span>, fixed</td>
           <td><span class="num">~107.6 million</span> total supply on Ethereum (max 133.8 million)</td>
-        </tr>
-        <tr>
-          <th scope="row">Address</th>
-          <td>Starts with <code>P</code></td>
-          <td>Starts with <code>0x</code></td>
-          <td>Starts with <code>0x</code></td>
         </tr>
         <tr>
           <th scope="row">On Kraken</th>
@@ -179,7 +179,7 @@
   <h2 id="identity">Public identity (PEP project)</h2>
   <div class="prose">
     <p>Pepecoin LLC’s MiCA crypto-asset whitepaper (admission to trading) names the offeror’s management body. A Pepecoin co-founder also spoke on the merged-mining panel at <strong>Litecoin Summit</strong>, Amsterdam, <strong>22–23 June 2026</strong> (Dutch Blockchain Week). That is voluntary public identification and a regulatory filing — not involuntary exposure of private persons.</p>
-    <p class="src">Sources: <a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA whitepaper</a>; <a href="https://news.bitcoin.com/pepecoin-co-founder-david-eichel-to-speak-on-merge-mining-panel-at-litecoin-summit-2026/">Bitcoin.com announcement</a>; <a href="https://www.cryptotimes.io/2026/06/24/litecoin-summit-day-2-litvms-50m-bet-and-basicswapdexs-bold-vision/">CryptoTimes summit recap</a> (panel participants).</p>
+    <p class="src">Sources: <a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA whitepaper</a>; <a href="https://www.cryptotimes.io/2026/06/24/litecoin-summit-day-2-litvms-50m-bet-and-basicswapdexs-bold-vision/">CryptoTimes summit recap</a> (panel participants).</p>
   </div>
 </section>
 
@@ -279,7 +279,6 @@
         <li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp (AuxPoW, genesis)</a></li>
         <li><a href="https://pepeplorer.com/network">Pepeplorer network stats</a></li>
         <li><a href="https://blog.kraken.com/product/asset-listings/pep-is-available-for-trading">Kraken listing, Feb 2026</a></li>
-        <li><a href="https://news.bitcoin.com/pepecoin-co-founder-david-eichel-to-speak-on-merge-mining-panel-at-litecoin-summit-2026/">Litecoin Summit (Bitcoin.com)</a></li>
         <li><a href="https://www.cryptotimes.io/2026/06/24/litecoin-summit-day-2-litvms-50m-bet-and-basicswapdexs-bold-vision/">Litecoin Summit recap (CryptoTimes)</a></li>
         <li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369?category=0">ViaBTC on PEP merged mining</a></li>
         <li><a href="https://peppool.space/mining">peppool.space mining pools</a></li>
