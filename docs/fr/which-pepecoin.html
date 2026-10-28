@@ -65,54 +65,6 @@
       </thead>
       <tbody>
         <tr>
-          <th scope="row">Nature</th>
-          <td>Sa propre blockchain de couche 1, un fork de Dogecoin Core</td>
-          <td>Jeton ERC-20 sur Ethereum</td>
-          <td>Jeton ERC-20 sur Ethereum. A eu sa propre blockchain dès 2016, puis a migré vers Ethereum en 2023 via un bridge (pont entre blockchains)</td>
-        </tr>
-        <tr>
-          <th scope="row">Lancement</th>
-          <td>30 janvier 2024</td>
-          <td>avril 2023</td>
-          <td>mars 2016</td>
-        </tr>
-        <tr>
-          <th scope="row">Qui est derrière</th>
-          <td>Pepecoin LLC, avec un cofondateur connu publiquement (David Eichel). Elle a publié son propre whitepaper MiCA. <a href="#identity">En savoir plus</a></td>
-          <td>Aucun émetteur juridique. Créé par des développeurs anonymes dont l’identité n’est pas connue publiquement (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">whitepaper MiCA de LCX pour PEPE</a>, B.2 et D.5)</td>
-          <td>Pas de données vérifiées</td>
-        </tr>
-        <tr>
-          <th scope="row">Sécurisé par</th>
-          <td>Proof of work Scrypt, en merged mining avec Litecoin et Dogecoin (un même travail de calcul valable sur les trois blockchains)</td>
-          <td>Validateurs Ethereum (proof of stake)</td>
-          <td>Validateurs Ethereum aujourd’hui. À l’origine en proof of work X11, puis en proof of stake</td>
-        </tr>
-        <tr>
-          <th scope="row">Peut-on le miner ?</th>
-          <td>Oui, avec un ASIC Scrypt, sur un pool de minage qui mine le PEP en merged mining. <a href="mining.html">Comment miner du PEP</a></td>
-          <td>Non. Un jeton sur Ethereum, qui fonctionne en proof of stake, ne se mine pas</td>
-          <td>Non, plus depuis son passage sur Ethereum</td>
-        </tr>
-        <tr>
-          <th scope="row">Modèle de compte</th>
-          <td>UTXO, comme Bitcoin et Dogecoin : les fonds prennent la forme de sorties non dépensées, que seul le détenteur de la clé peut dépenser</td>
-          <td>ERC-20 : un solde enregistré dans le smart contract (programme déployé sur la blockchain) du jeton, sur Ethereum</td>
-          <td>ERC-20 : un solde enregistré dans le smart contract du jeton, sur Ethereum</td>
-        </tr>
-        <tr>
-          <th scope="row">Frais réglés en</th>
-          <td>PEP, versés aux mineurs de la blockchain Pepecoin</td>
-          <td>ETH, sous forme de « gas » Ethereum (les frais du réseau), même quand on ne déplace que du PEPE</td>
-          <td>ETH, sous forme de « gas » Ethereum, même quand on ne déplace que du PEPECOIN</td>
-        </tr>
-        <tr>
-          <th scope="row">Coût d’un transfert</th>
-          <td>Frais recommandés de 0,01 PEP par ko, moins de 0,000001 $ au cours d’octobre 2026 (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td>
-          <td>Dépend du prix du gas sur Ethereum au moment du transfert. Voir le <a href="https://etherscan.io/gastracker">gas tracker d’Etherscan</a></td>
-          <td>Dépend du prix du gas sur Ethereum au moment du transfert. Voir le <a href="https://etherscan.io/gastracker">gas tracker d’Etherscan</a></td>
-        </tr>
-        <tr>
           <th scope="row">Allocation initiale</th>
           <td>
             <div class="alloc">
@@ -137,22 +89,70 @@
           </td>
         </tr>
         <tr>
+          <th scope="row">Adresse</th>
+          <td>Commence par <code>P</code></td>
+          <td>Commence par <code>0x</code></td>
+          <td>Commence par <code>0x</code></td>
+        </tr>
+        <tr>
+          <th scope="row">Coût d’un transfert</th>
+          <td>Frais recommandés de 0,01 PEP par ko, moins de 0,000001 $ au cours d’octobre 2026 (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td>
+          <td>Dépend du prix du gas sur Ethereum au moment du transfert. Voir le <a href="https://etherscan.io/gastracker">gas tracker d’Etherscan</a></td>
+          <td>Dépend du prix du gas sur Ethereum au moment du transfert. Voir le <a href="https://etherscan.io/gastracker">gas tracker d’Etherscan</a></td>
+        </tr>
+        <tr>
           <th scope="row">Gel au niveau du protocole</th>
           <td><strong>Aucune liste noire dans le protocole.</strong> Comme sur Bitcoin ou Dogecoin (cryptomonnaies UTXO), personne ne peut geler une adresse de son choix au niveau de la blockchain. Les plateformes d’échange et les portefeuilles custodial (dont un tiers détient les clés) peuvent en revanche geler les soldes qu’<em>ils</em> détiennent.</td>
           <td>Le contrat contient des règles de liste noire et de transfert. Le déployeur a mis une adresse sur liste noire dès le début, puis a renoncé à la propriété du contrat (propriétaire = adresse zéro). Plus aucun nouveau gel réservé au propriétaire via Ownable n’est possible ; cette adresse reste gelée.</td>
           <td>Un autre ERC-20, indépendant : vérifiez l’état d’administration propre à ce contrat, sans supposer qu’il est identique à celui de PEPE.</td>
         </tr>
         <tr>
+          <th scope="row">Nature</th>
+          <td>Sa propre blockchain de couche 1, un fork de Dogecoin Core</td>
+          <td>Jeton ERC-20 sur Ethereum</td>
+          <td>Jeton ERC-20 sur Ethereum. A eu sa propre blockchain dès 2016, puis a migré vers Ethereum en 2023 via un bridge (pont entre blockchains)</td>
+        </tr>
+        <tr>
+          <th scope="row">Sécurisé par</th>
+          <td>Proof of work Scrypt, en merged mining avec Litecoin et Dogecoin (un même travail de calcul valable sur les trois blockchains)</td>
+          <td>Validateurs Ethereum (proof of stake)</td>
+          <td>Validateurs Ethereum aujourd’hui. À l’origine en proof of work X11, puis en proof of stake</td>
+        </tr>
+        <tr>
+          <th scope="row">Peut-on le miner ?</th>
+          <td>Oui, avec un ASIC Scrypt, sur un pool de minage qui mine le PEP en merged mining. <a href="mining.html">Comment miner du PEP</a></td>
+          <td>Non. Un jeton sur Ethereum, qui fonctionne en proof of stake, ne se mine pas</td>
+          <td>Non, plus depuis son passage sur Ethereum</td>
+        </tr>
+        <tr>
+          <th scope="row">Frais réglés en</th>
+          <td>PEP, versés aux mineurs de la blockchain Pepecoin</td>
+          <td>ETH, sous forme de « gas » Ethereum (les frais du réseau), même quand on ne déplace que du PEPE</td>
+          <td>ETH, sous forme de « gas » Ethereum, même quand on ne déplace que du PEPECOIN</td>
+        </tr>
+        <tr>
+          <th scope="row">Modèle de compte</th>
+          <td>UTXO, comme Bitcoin et Dogecoin : les fonds prennent la forme de sorties non dépensées, que seul le détenteur de la clé peut dépenser</td>
+          <td>ERC-20 : un solde enregistré dans le smart contract (programme déployé sur la blockchain) du jeton, sur Ethereum</td>
+          <td>ERC-20 : un solde enregistré dans le smart contract du jeton, sur Ethereum</td>
+        </tr>
+        <tr>
+          <th scope="row">Qui est derrière</th>
+          <td>Pepecoin LLC, une société enregistrée qui a publié son propre whitepaper MiCA. <a href="#identity">En savoir plus</a></td>
+          <td>Aucun émetteur juridique. Créé par des développeurs anonymes dont l’identité n’est pas connue publiquement (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">whitepaper MiCA de LCX pour PEPE</a>, B.2 et D.5)</td>
+          <td>Pas de données vérifiées</td>
+        </tr>
+        <tr>
+          <th scope="row">Lancement</th>
+          <td>30 janvier 2024</td>
+          <td>avril 2023</td>
+          <td>mars 2016</td>
+        </tr>
+        <tr>
           <th scope="row">Offre</th>
           <td><span class="num">environ <span data-live="supply-b">104,9</span> milliards</span>, auxquels s’ajoutent 10 000 par bloc, sans plafond</td>
           <td><span class="num">420 690 milliards</span>, quantité fixe</td>
           <td><span class="num">environ 107,6 millions</span> d’offre totale sur Ethereum (maximum 133,8 millions)</td>
-        </tr>
-        <tr>
-          <th scope="row">Adresse</th>
-          <td>Commence par <code>P</code></td>
-          <td>Commence par <code>0x</code></td>
-          <td>Commence par <code>0x</code></td>
         </tr>
         <tr>
           <th scope="row">Sur Kraken</th>

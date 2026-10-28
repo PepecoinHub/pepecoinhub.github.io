@@ -65,54 +65,6 @@
       </thead>
       <tbody>
         <tr>
-          <th scope="row">Czym jest</th>
-          <td>Własny blockchain warstwy 1, fork Dogecoin Core</td>
-          <td>Token ERC-20 na Ethereum</td>
-          <td>Token ERC-20 na Ethereum. Od 2016 roku działał na własnym blockchainie, a w 2023 roku został przeniesiony na Ethereum przez bridge (most między sieciami)</td>
-        </tr>
-        <tr>
-          <th scope="row">Start</th>
-          <td>30 stycznia 2024</td>
-          <td>Kwiecień 2023</td>
-          <td>Marzec 2016</td>
-        </tr>
-        <tr>
-          <th scope="row">Kto za tym stoi</th>
-          <td>Pepecoin LLC i znany z nazwiska współzałożyciel (David Eichel). Firma opublikowała własny whitepaper MiCA. <a href="#identity">Więcej</a></td>
-          <td>Brak prawnego wydawcy. Stworzyli go anonimowi developerzy, których tożsamość nie jest publicznie znana (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">whitepaper MiCA giełdy LCX dla PEPE</a>, B.2 i D.5)</td>
-          <td>Brak sprawdzonych danych</td>
-        </tr>
-        <tr>
-          <th scope="row">Zabezpieczenie</th>
-          <td>Proof of work na algorytmie Scrypt, kopanie razem z Litecoinem i Dogecoinem (merged mining)</td>
-          <td>Walidatorzy Ethereum (proof of stake)</td>
-          <td>Obecnie walidatorzy Ethereum. Początkowo proof of work (X11), potem proof of stake</td>
-        </tr>
-        <tr>
-          <th scope="row">Czy można go kopać?</th>
-          <td>Tak, koparką ASIC do Scrypt w mining poolu, który kopie PEP w ramach merged mining. <a href="mining.html">Jak kopać PEP</a></td>
-          <td>Nie. Token na Ethereum, które używa proof of stake, nie jest kopany</td>
-          <td>Nie, od czasu przeniesienia na Ethereum</td>
-        </tr>
-        <tr>
-          <th scope="row">Model zapisu środków</th>
-          <td>UTXO, jak w Bitcoinie i Dogecoinie: monety leżą w niewydanych wyjściach transakcji, które może wydać tylko posiadacz klucza</td>
-          <td>ERC-20: saldo zapisane w smart kontrakcie tokena na Ethereum</td>
-          <td>ERC-20: saldo zapisane w smart kontrakcie tokena na Ethereum</td>
-        </tr>
-        <tr>
-          <th scope="row">Opłaty płacone w</th>
-          <td>PEP, dla górników sieci Pepecoin</td>
-          <td>ETH, jako gas (opłata sieciowa Ethereum), nawet gdy przesyłasz wyłącznie PEPE</td>
-          <td>ETH, jako gas, nawet gdy przesyłasz wyłącznie PEPECOIN</td>
-        </tr>
-        <tr>
-          <th scope="row">Koszt przelewu</th>
-          <td>Zalecana opłata to 0,01 PEP za kB, czyli poniżej 0,000001 $ przy cenie z października 2026 (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td>
-          <td>Zależy od bieżącej ceny gazu na Ethereum. Sprawdzisz ją w <a href="https://etherscan.io/gastracker">gas trackerze Etherscan</a></td>
-          <td>Zależy od bieżącej ceny gazu na Ethereum. Sprawdzisz ją w <a href="https://etherscan.io/gastracker">gas trackerze Etherscan</a></td>
-        </tr>
-        <tr>
           <th scope="row">Przydział na starcie</th>
           <td>
             <div class="alloc">
@@ -137,22 +89,70 @@
           </td>
         </tr>
         <tr>
+          <th scope="row">Adres</th>
+          <td>Zaczyna się od <code>P</code></td>
+          <td>Zaczyna się od <code>0x</code></td>
+          <td>Zaczyna się od <code>0x</code></td>
+        </tr>
+        <tr>
+          <th scope="row">Koszt przelewu</th>
+          <td>Zalecana opłata to 0,01 PEP za kB, czyli poniżej 0,000001 $ przy cenie z października 2026 (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td>
+          <td>Zależy od bieżącej ceny gazu na Ethereum. Sprawdzisz ją w <a href="https://etherscan.io/gastracker">gas trackerze Etherscan</a></td>
+          <td>Zależy od bieżącej ceny gazu na Ethereum. Sprawdzisz ją w <a href="https://etherscan.io/gastracker">gas trackerze Etherscan</a></td>
+        </tr>
+        <tr>
           <th scope="row">Zamrażanie na poziomie protokołu</th>
           <td><strong>Brak czarnej listy (blacklist) w protokole.</strong> Tak jak w monetach UTXO, takich jak Bitcoin czy Dogecoin, nikt nie może zamrozić dowolnego adresu na poziomie blockchainu. Giełda albo portfel custodial (taki, w którym klucze trzyma ktoś inny) nadal może zamrozić środki, które trzyma <em>u siebie</em>.</td>
           <td>Kontrakt zawiera reguły czarnej listy i ograniczeń transferów. Twórca kontraktu wpisał na początku jeden adres na czarną listę, po czym zrzekł się własności (właściciel ustawiony na zero). Nowe blokady, które mógł nakładać tylko właściciel (przez Ownable), są wyłączone; ten jeden adres pozostaje zamrożony.</td>
           <td>Osobny token ERC-20 — status uprawnień admina sprawdź w jego własnym kontrakcie i nie zakładaj, że jest taki sam jak w PEPE.</td>
         </tr>
         <tr>
+          <th scope="row">Czym jest</th>
+          <td>Własny blockchain warstwy 1, fork Dogecoin Core</td>
+          <td>Token ERC-20 na Ethereum</td>
+          <td>Token ERC-20 na Ethereum. Od 2016 roku działał na własnym blockchainie, a w 2023 roku został przeniesiony na Ethereum przez bridge (most między sieciami)</td>
+        </tr>
+        <tr>
+          <th scope="row">Zabezpieczenie</th>
+          <td>Proof of work na algorytmie Scrypt, kopanie razem z Litecoinem i Dogecoinem (merged mining)</td>
+          <td>Walidatorzy Ethereum (proof of stake)</td>
+          <td>Obecnie walidatorzy Ethereum. Początkowo proof of work (X11), potem proof of stake</td>
+        </tr>
+        <tr>
+          <th scope="row">Czy można go kopać?</th>
+          <td>Tak, koparką ASIC do Scrypt w mining poolu, który kopie PEP w ramach merged mining. <a href="mining.html">Jak kopać PEP</a></td>
+          <td>Nie. Token na Ethereum, które używa proof of stake, nie jest kopany</td>
+          <td>Nie, od czasu przeniesienia na Ethereum</td>
+        </tr>
+        <tr>
+          <th scope="row">Opłaty płacone w</th>
+          <td>PEP, dla górników sieci Pepecoin</td>
+          <td>ETH, jako gas (opłata sieciowa Ethereum), nawet gdy przesyłasz wyłącznie PEPE</td>
+          <td>ETH, jako gas, nawet gdy przesyłasz wyłącznie PEPECOIN</td>
+        </tr>
+        <tr>
+          <th scope="row">Model zapisu środków</th>
+          <td>UTXO, jak w Bitcoinie i Dogecoinie: monety leżą w niewydanych wyjściach transakcji, które może wydać tylko posiadacz klucza</td>
+          <td>ERC-20: saldo zapisane w smart kontrakcie tokena na Ethereum</td>
+          <td>ERC-20: saldo zapisane w smart kontrakcie tokena na Ethereum</td>
+        </tr>
+        <tr>
+          <th scope="row">Kto za tym stoi</th>
+          <td>Pepecoin LLC, zarejestrowana firma, która opublikowała własny whitepaper MiCA. <a href="#identity">Więcej</a></td>
+          <td>Brak prawnego wydawcy. Stworzyli go anonimowi developerzy, których tożsamość nie jest publicznie znana (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">whitepaper MiCA giełdy LCX dla PEPE</a>, B.2 i D.5)</td>
+          <td>Brak sprawdzonych danych</td>
+        </tr>
+        <tr>
+          <th scope="row">Start</th>
+          <td>30 stycznia 2024</td>
+          <td>Kwiecień 2023</td>
+          <td>Marzec 2016</td>
+        </tr>
+        <tr>
           <th scope="row">Podaż</th>
           <td><span class="num">ok. <span data-live="supply-b">104,9</span> mld</span>, z każdym blokiem przybywa 10 000, bez limitu</td>
           <td><span class="num">420,69 biliona</span>, stała</td>
           <td><span class="num">ok. 107,6 mln</span> podaży łącznej na Ethereum (maks. 133,8 mln)</td>
-        </tr>
-        <tr>
-          <th scope="row">Adres</th>
-          <td>Zaczyna się od <code>P</code></td>
-          <td>Zaczyna się od <code>0x</code></td>
-          <td>Zaczyna się od <code>0x</code></td>
         </tr>
         <tr>
           <th scope="row">Na Krakenie</th>

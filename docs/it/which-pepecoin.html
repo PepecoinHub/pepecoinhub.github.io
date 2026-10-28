@@ -65,54 +65,6 @@
       </thead>
       <tbody>
         <tr>
-          <th scope="row">Che cos’è</th>
-          <td>Una blockchain layer 1 indipendente, fork di Dogecoin Core</td>
-          <td>Token ERC-20 su Ethereum</td>
-          <td>Token ERC-20 su Ethereum. Dal 2016 ha avuto una blockchain propria, poi nel 2023 è stato portato su Ethereum con un bridge (ponte tra due blockchain)</td>
-        </tr>
-        <tr>
-          <th scope="row">Lancio</th>
-          <td>30 gennaio 2024</td>
-          <td>aprile 2023</td>
-          <td>marzo 2016</td>
-        </tr>
-        <tr>
-          <th scope="row">Chi c’è dietro</th>
-          <td>Pepecoin LLC, con un cofondatore noto pubblicamente (David Eichel). Ha pubblicato un proprio whitepaper MiCA. <a href="#identity">Di più</a></td>
-          <td>Nessun emittente legale. Creato da sviluppatori anonimi la cui identità non è nota pubblicamente (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">whitepaper MiCA di LCX per PEPE</a>, B.2 e D.5)</td>
-          <td>Nessun dato verificato</td>
-        </tr>
-        <tr>
-          <th scope="row">Sicurezza della rete</th>
-          <td>Proof of work con algoritmo Scrypt; si mina insieme a Litecoin e Dogecoin (merged mining)</td>
-          <td>Validatori di Ethereum (proof of stake)</td>
-          <td>Oggi i validatori di Ethereum. All’inizio proof of work con algoritmo X11, poi proof of stake</td>
-        </tr>
-        <tr>
-          <th scope="row">Si può minare?</th>
-          <td>Sì, con un ASIC per Scrypt su un pool che mina PEP in merged mining. <a href="mining.html">Come minare PEP</a></td>
-          <td>No. È un token su Ethereum, che usa il proof of stake: non si mina</td>
-          <td>No, non più da quando è passato su Ethereum</td>
-        </tr>
-        <tr>
-          <th scope="row">Gestione dei saldi</th>
-          <td>UTXO, come in Bitcoin e Dogecoin: le monete stanno in output non spesi, che può spendere solo chi possiede la chiave</td>
-          <td>ERC-20: il saldo è registrato nello smart contract del token, su Ethereum</td>
-          <td>ERC-20: il saldo è registrato nello smart contract del token, su Ethereum</td>
-        </tr>
-        <tr>
-          <th scope="row">Commissioni pagate in</th>
-          <td>PEP, ai miner della blockchain di Pepecoin</td>
-          <td>ETH, come gas di Ethereum, anche quando a muoversi è solo PEPE</td>
-          <td>ETH, come gas di Ethereum, anche quando a muoversi è solo PEPECOIN</td>
-        </tr>
-        <tr>
-          <th scope="row">Costo di un trasferimento</th>
-          <td>Commissione consigliata di 0,01 PEP per kB, meno di 0,000001 $ al prezzo di ottobre 2026 (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td>
-          <td>Dipende dal prezzo del gas su Ethereum in quel momento. Vedi il <a href="https://etherscan.io/gastracker">gas tracker di Etherscan</a></td>
-          <td>Dipende dal prezzo del gas su Ethereum in quel momento. Vedi il <a href="https://etherscan.io/gastracker">gas tracker di Etherscan</a></td>
-        </tr>
-        <tr>
           <th scope="row">Allocazione al lancio</th>
           <td>
             <div class="alloc">
@@ -137,22 +89,70 @@
           </td>
         </tr>
         <tr>
+          <th scope="row">Indirizzo</th>
+          <td>Inizia con <code>P</code></td>
+          <td>Inizia con <code>0x</code></td>
+          <td>Inizia con <code>0x</code></td>
+        </tr>
+        <tr>
+          <th scope="row">Costo di un trasferimento</th>
+          <td>Commissione consigliata di 0,01 PEP per kB, meno di 0,000001 $ al prezzo di ottobre 2026 (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td>
+          <td>Dipende dal prezzo del gas su Ethereum in quel momento. Vedi il <a href="https://etherscan.io/gastracker">gas tracker di Etherscan</a></td>
+          <td>Dipende dal prezzo del gas su Ethereum in quel momento. Vedi il <a href="https://etherscan.io/gastracker">gas tracker di Etherscan</a></td>
+        </tr>
+        <tr>
           <th scope="row">Congelamento a livello di protocollo</th>
           <td><strong>Nessuna blacklist nel protocollo.</strong> Come nelle monete UTXO tipo Bitcoin e Dogecoin, nessuno può congelare un indirizzo a piacimento a livello di blockchain. Un exchange o un wallet custodial (gestito da terzi) può comunque congelare i saldi che tiene <em>in custodia</em>.</td>
           <td>Il contratto prevede regole di blacklist e di trasferimento. All’inizio chi ha pubblicato il contratto (il deployer) ha messo in blacklist un indirizzo, poi ha rinunciato alla proprietà del contratto (owner = zero). I nuovi congelamenti riservati all’owner tramite Ownable non sono più possibili; quell’unico indirizzo resta congelato.</td>
           <td>Un ERC-20 a parte: controlla chi amministra quel contratto, senza dare per scontato che funzioni come PEPE.</td>
         </tr>
         <tr>
+          <th scope="row">Che cos’è</th>
+          <td>Una blockchain layer 1 indipendente, fork di Dogecoin Core</td>
+          <td>Token ERC-20 su Ethereum</td>
+          <td>Token ERC-20 su Ethereum. Dal 2016 ha avuto una blockchain propria, poi nel 2023 è stato portato su Ethereum con un bridge (ponte tra due blockchain)</td>
+        </tr>
+        <tr>
+          <th scope="row">Sicurezza della rete</th>
+          <td>Proof of work con algoritmo Scrypt; si mina insieme a Litecoin e Dogecoin (merged mining)</td>
+          <td>Validatori di Ethereum (proof of stake)</td>
+          <td>Oggi i validatori di Ethereum. All’inizio proof of work con algoritmo X11, poi proof of stake</td>
+        </tr>
+        <tr>
+          <th scope="row">Si può minare?</th>
+          <td>Sì, con un ASIC per Scrypt su un pool che mina PEP in merged mining. <a href="mining.html">Come minare PEP</a></td>
+          <td>No. È un token su Ethereum, che usa il proof of stake: non si mina</td>
+          <td>No, non più da quando è passato su Ethereum</td>
+        </tr>
+        <tr>
+          <th scope="row">Commissioni pagate in</th>
+          <td>PEP, ai miner della blockchain di Pepecoin</td>
+          <td>ETH, come gas di Ethereum, anche quando a muoversi è solo PEPE</td>
+          <td>ETH, come gas di Ethereum, anche quando a muoversi è solo PEPECOIN</td>
+        </tr>
+        <tr>
+          <th scope="row">Gestione dei saldi</th>
+          <td>UTXO, come in Bitcoin e Dogecoin: le monete stanno in output non spesi, che può spendere solo chi possiede la chiave</td>
+          <td>ERC-20: il saldo è registrato nello smart contract del token, su Ethereum</td>
+          <td>ERC-20: il saldo è registrato nello smart contract del token, su Ethereum</td>
+        </tr>
+        <tr>
+          <th scope="row">Chi c’è dietro</th>
+          <td>Pepecoin LLC, una società registrata che ha pubblicato un proprio whitepaper MiCA. <a href="#identity">Di più</a></td>
+          <td>Nessun emittente legale. Creato da sviluppatori anonimi la cui identità non è nota pubblicamente (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">whitepaper MiCA di LCX per PEPE</a>, B.2 e D.5)</td>
+          <td>Nessun dato verificato</td>
+        </tr>
+        <tr>
+          <th scope="row">Lancio</th>
+          <td>30 gennaio 2024</td>
+          <td>aprile 2023</td>
+          <td>marzo 2016</td>
+        </tr>
+        <tr>
           <th scope="row">Offerta</th>
           <td><span class="num">Circa <span data-live="supply-b">104,9</span> miliardi</span>, più 10.000 a ogni blocco, senza tetto massimo</td>
           <td><span class="num">420.690 miliardi</span>, fissa</td>
           <td><span class="num">Circa 107,6 milioni</span> di offerta totale su Ethereum (massimo 133,8 milioni)</td>
-        </tr>
-        <tr>
-          <th scope="row">Indirizzo</th>
-          <td>Inizia con <code>P</code></td>
-          <td>Inizia con <code>0x</code></td>
-          <td>Inizia con <code>0x</code></td>
         </tr>
         <tr>
           <th scope="row">Su Kraken</th>

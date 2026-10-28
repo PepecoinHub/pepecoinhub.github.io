@@ -65,54 +65,6 @@
       </thead>
       <tbody>
         <tr>
-          <th scope="row">Nedir?</th>
-          <td>Kendine ait katman 1 blok zinciri; Dogecoin Core'un bir çatalı (fork)</td>
-          <td>Ethereum üzerinde bir ERC-20 tokeni</td>
-          <td>Ethereum üzerinde bir ERC-20 tokeni. 2016'dan itibaren kendi zinciri vardı, 2023'te köprüyle Ethereum'a taşındı</td>
-        </tr>
-        <tr>
-          <th scope="row">Lansman</th>
-          <td>30 Ocak 2024</td>
-          <td>Nisan 2023</td>
-          <td>Mart 2016</td>
-        </tr>
-        <tr>
-          <th scope="row">Arkasında kim var</th>
-          <td>Pepecoin LLC ve adı herkesçe bilinen bir kurucu ortak (David Eichel). Kendi MiCA whitepaper'ını yayımladı. <a href="#identity">Daha fazla</a></td>
-          <td>Yasal bir ihraççı yok. Kimlikleri kamuya açık olmayan anonim geliştiriciler tarafından oluşturuldu (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">LCX'in PEPE için MiCA whitepaper'ı</a>, B.2 ve D.5)</td>
-          <td>Doğrulanmış veri yok</td>
-        </tr>
-        <tr>
-          <th scope="row">Güvenliği sağlayan</th>
-          <td>Scrypt proof of work; Litecoin ve Dogecoin ile merged mining</td>
-          <td>Ethereum doğrulayıcıları (proof of stake)</td>
-          <td>Bugün Ethereum doğrulayıcıları. İlk başta X11 proof of work, sonra proof of stake</td>
-        </tr>
-        <tr>
-          <th scope="row">Kazılabilir mi?</th>
-          <td>Evet, PEP'i merged mining ile kazan bir pool'da Scrypt ASIC cihazıyla. <a href="mining.html">PEP nasıl kazılır?</a></td>
-          <td>Hayır. Proof of stake kullanan Ethereum üzerindeki bir token kazılmaz</td>
-          <td>Hayır, Ethereum'a taşındığından beri kazılamıyor</td>
-        </tr>
-        <tr>
-          <th scope="row">Hesap modeli</th>
-          <td>Bitcoin ve Dogecoin'deki gibi UTXO: coinler harcanmamış çıktılarda tutulur ve bunları yalnızca anahtarın sahibi harcayabilir</td>
-          <td>ERC-20: bakiye, tokenin Ethereum'daki akıllı sözleşmesinde kayıtlıdır</td>
-          <td>ERC-20: bakiye, tokenin Ethereum'daki akıllı sözleşmesinde kayıtlıdır</td>
-        </tr>
-        <tr>
-          <th scope="row">İşlem ücreti</th>
-          <td>PEP ile ödenir, Pepecoin zincirinin madencilerine gider</td>
-          <td>ETH (Ethereum gas ücreti); yalnızca PEPE transfer edilse bile</td>
-          <td>ETH (Ethereum gas ücreti); yalnızca PEPECOIN transfer edilse bile</td>
-        </tr>
-        <tr>
-          <th scope="row">Transfer maliyeti</th>
-          <td>Önerilen ücret kB başına 0,01 PEP; Ekim 2026 fiyatıyla 0,000001 $'ın altında (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td>
-          <td>O anki Ethereum gas fiyatına bağlı. <a href="https://etherscan.io/gastracker">Etherscan gas tracker</a>'dan bakabilirsin</td>
-          <td>O anki Ethereum gas fiyatına bağlı. <a href="https://etherscan.io/gastracker">Etherscan gas tracker</a>'dan bakabilirsin</td>
-        </tr>
-        <tr>
           <th scope="row">Lansmanda ayrılan pay</th>
           <td>
             <div class="alloc">
@@ -137,22 +89,70 @@
           </td>
         </tr>
         <tr>
+          <th scope="row">Adres</th>
+          <td><code>P</code> ile başlar</td>
+          <td><code>0x</code> ile başlar</td>
+          <td><code>0x</code> ile başlar</td>
+        </tr>
+        <tr>
+          <th scope="row">Transfer maliyeti</th>
+          <td>Önerilen ücret kB başına 0,01 PEP; Ekim 2026 fiyatıyla 0,000001 $'ın altında (<a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/policy/policy.h">Pepecoin Core</a>)</td>
+          <td>O anki Ethereum gas fiyatına bağlı. <a href="https://etherscan.io/gastracker">Etherscan gas tracker</a>'dan bakabilirsin</td>
+          <td>O anki Ethereum gas fiyatına bağlı. <a href="https://etherscan.io/gastracker">Etherscan gas tracker</a>'dan bakabilirsin</td>
+        </tr>
+        <tr>
           <th scope="row">Protokol düzeyinde dondurma</th>
           <td><strong>Protokolde kara liste yok.</strong> Bitcoin ve Dogecoin gibi UTXO tabanlı coinlerde olduğu gibi, kimse zincir düzeyinde herhangi bir adresi donduramaz. Yine de bir borsa veya custodial wallet (anahtarları sizin adınıza başkasının tuttuğu cüzdan), <em>kendi</em> elinde tuttuğu bakiyeleri dondurabilir.</td>
           <td>Sözleşmede kara liste ve transfer kuralları var. Sözleşmeyi yayımlayan (deployer) taraf ilk dönemde bir adresi kara listeye aldı, ardından sahiplikten feragat etti (owner = sıfır). Ownable üzerinden yalnızca sahibin yapabildiği yeni dondurmalar artık mümkün değil; ancak o tek adres dondurulmuş olarak kalıyor.</td>
           <td>Ayrı bir ERC-20 tokeni. Bu sözleşmedeki yönetici yetkilerini ayrıca kontrol edin; PEPE'ninkiyle aynı olduğunu varsaymayın.</td>
         </tr>
         <tr>
+          <th scope="row">Nedir?</th>
+          <td>Kendine ait katman 1 blok zinciri; Dogecoin Core'un bir çatalı (fork)</td>
+          <td>Ethereum üzerinde bir ERC-20 tokeni</td>
+          <td>Ethereum üzerinde bir ERC-20 tokeni. 2016'dan itibaren kendi zinciri vardı, 2023'te köprüyle Ethereum'a taşındı</td>
+        </tr>
+        <tr>
+          <th scope="row">Güvenliği sağlayan</th>
+          <td>Scrypt proof of work; Litecoin ve Dogecoin ile merged mining</td>
+          <td>Ethereum doğrulayıcıları (proof of stake)</td>
+          <td>Bugün Ethereum doğrulayıcıları. İlk başta X11 proof of work, sonra proof of stake</td>
+        </tr>
+        <tr>
+          <th scope="row">Kazılabilir mi?</th>
+          <td>Evet, PEP'i merged mining ile kazan bir pool'da Scrypt ASIC cihazıyla. <a href="mining.html">PEP nasıl kazılır?</a></td>
+          <td>Hayır. Proof of stake kullanan Ethereum üzerindeki bir token kazılmaz</td>
+          <td>Hayır, Ethereum'a taşındığından beri kazılamıyor</td>
+        </tr>
+        <tr>
+          <th scope="row">İşlem ücreti</th>
+          <td>PEP ile ödenir, Pepecoin zincirinin madencilerine gider</td>
+          <td>ETH (Ethereum gas ücreti); yalnızca PEPE transfer edilse bile</td>
+          <td>ETH (Ethereum gas ücreti); yalnızca PEPECOIN transfer edilse bile</td>
+        </tr>
+        <tr>
+          <th scope="row">Hesap modeli</th>
+          <td>Bitcoin ve Dogecoin'deki gibi UTXO: coinler harcanmamış çıktılarda tutulur ve bunları yalnızca anahtarın sahibi harcayabilir</td>
+          <td>ERC-20: bakiye, tokenin Ethereum'daki akıllı sözleşmesinde kayıtlıdır</td>
+          <td>ERC-20: bakiye, tokenin Ethereum'daki akıllı sözleşmesinde kayıtlıdır</td>
+        </tr>
+        <tr>
+          <th scope="row">Arkasında kim var</th>
+          <td>Pepecoin LLC; kendi MiCA whitepaper'ını yayımlamış kayıtlı bir şirket. <a href="#identity">Daha fazla</a></td>
+          <td>Yasal bir ihraççı yok. Kimlikleri kamuya açık olmayan anonim geliştiriciler tarafından oluşturuldu (<a href="https://wp.lcx.com/wp-content/uploads/PEPE-MiCA-Whitepaper-v-1.1.docx.pdf">LCX'in PEPE için MiCA whitepaper'ı</a>, B.2 ve D.5)</td>
+          <td>Doğrulanmış veri yok</td>
+        </tr>
+        <tr>
+          <th scope="row">Lansman</th>
+          <td>30 Ocak 2024</td>
+          <td>Nisan 2023</td>
+          <td>Mart 2016</td>
+        </tr>
+        <tr>
           <th scope="row">Arz</th>
           <td><span class="num">yaklaşık <span data-live="supply-b">104,9</span> milyar</span>; her blokta 10.000 PEP eklenir, üst sınır yok</td>
           <td><span class="num">420,69 trilyon</span>, sabit</td>
           <td><span class="num">yaklaşık 107,6 milyon</span>, Ethereum'da toplam arz (en fazla 133,8 milyon)</td>
-        </tr>
-        <tr>
-          <th scope="row">Adres</th>
-          <td><code>P</code> ile başlar</td>
-          <td><code>0x</code> ile başlar</td>
-          <td><code>0x</code> ile başlar</td>
         </tr>
         <tr>
           <th scope="row">Kraken'de</th>
