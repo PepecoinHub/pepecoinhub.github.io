@@ -10,6 +10,7 @@
 
   var T = {
     en: { loc: 'en-US', names: { bitcoin: 'Bitcoin', litecoin: 'Litecoin', dogecoin: 'Dogecoin', 'pepecoin-network': 'Pepecoin' },
+      sBtc: 'Bitcoin season', sAlt: 'Altcoin season', sNone: 'Neither season', sBeat: '{n} of {of} beat Bitcoin',
       allUp: 'All 4 up today', allDown: 'All 4 down today', some: '{n} of 4 up today', avg: 'on average',
       d7: '7d', d30: '30d', today: 'today', none: 'Nothing', vs: 'vs {c}',
       change: 'Change', high: 'High', low: 'Low', loading: 'Loading the chart…',
@@ -18,6 +19,7 @@
       fng: ['Extreme fear', 'Fear', 'Neutral', 'Greed', 'Extreme greed'],
       dvol: ['Calm', 'Normal', 'High', 'Very high'], vol: 'Volume 24h {v}', dom: 'BTC' },
     pl: { loc: 'pl-PL', names: { bitcoin: 'Bitcoin', litecoin: 'Litecoin', dogecoin: 'Dogecoin', 'pepecoin-network': 'Pepecoin' },
+      sBtc: 'Sezon Bitcoina', sAlt: 'Sezon altcoinów', sNone: 'Żaden sezon', sBeat: '{n} z {of} lepiej niż Bitcoin',
       allUp: 'Dziś wszystkie 4 w górę', allDown: 'Dziś wszystkie 4 w dół', some: 'Dziś {n} z 4 w górę', avg: 'średnio',
       d7: '7 dni', d30: '30 dni', today: 'dziś', none: 'Nic', vs: 'vs {c}',
       change: 'Zmiana', high: 'Najwyżej', low: 'Najniżej', loading: 'Wczytuję wykres…',
@@ -26,6 +28,7 @@
       fng: ['Skrajny strach', 'Strach', 'Neutralnie', 'Chciwość', 'Skrajna chciwość'],
       dvol: ['Spokojnie', 'Normalnie', 'Wysoka', 'Bardzo wysoka'], vol: 'Obrót 24 h {v}', dom: 'BTC' },
     es: { loc: 'es-ES', names: { bitcoin: 'Bitcoin', litecoin: 'Litecoin', dogecoin: 'Dogecoin', 'pepecoin-network': 'Pepecoin' },
+      sBtc: 'Temporada de Bitcoin', sAlt: 'Temporada de altcoins', sNone: 'Ninguna temporada', sBeat: '{n} de {of} superan a Bitcoin',
       allUp: 'Las 4 suben hoy', allDown: 'Las 4 bajan hoy', some: 'Hoy suben {n} de 4', avg: 'de media',
       d7: '7 d', d30: '30 d', today: 'hoy', none: 'Nada', vs: 'vs {c}',
       change: 'Cambio', high: 'Máximo', low: 'Mínimo', loading: 'Cargando el gráfico…',
@@ -34,6 +37,7 @@
       fng: ['Miedo extremo', 'Miedo', 'Neutral', 'Codicia', 'Codicia extrema'],
       dvol: ['Calma', 'Normal', 'Alta', 'Muy alta'], vol: 'Volumen 24 h {v}', dom: 'BTC' },
     de: { loc: 'de-DE', names: { bitcoin: 'Bitcoin', litecoin: 'Litecoin', dogecoin: 'Dogecoin', 'pepecoin-network': 'Pepecoin' },
+      sBtc: 'Bitcoin-Saison', sAlt: 'Altcoin-Saison', sNone: 'Keine Saison', sBeat: '{n} von {of} besser als Bitcoin',
       allUp: 'Heute alle 4 im Plus', allDown: 'Heute alle 4 im Minus', some: 'Heute {n} von 4 im Plus', avg: 'im Schnitt',
       d7: '7 T', d30: '30 T', today: 'heute', none: 'Nichts', vs: 'vs {c}',
       change: 'Veränderung', high: 'Hoch', low: 'Tief', loading: 'Chart wird geladen…',
@@ -42,6 +46,7 @@
       fng: ['Extreme Angst', 'Angst', 'Neutral', 'Gier', 'Extreme Gier'],
       dvol: ['Ruhig', 'Normal', 'Hoch', 'Sehr hoch'], vol: 'Volumen 24 h {v}', dom: 'BTC' },
     fr: { loc: 'fr-FR', names: { bitcoin: 'Bitcoin', litecoin: 'Litecoin', dogecoin: 'Dogecoin', 'pepecoin-network': 'Pepecoin' },
+      sBtc: 'Saison du Bitcoin', sAlt: 'Saison des altcoins', sNone: 'Aucune saison', sBeat: '{n} sur {of} font mieux que le Bitcoin',
       allUp: 'Les 4 en hausse aujourd’hui', allDown: 'Les 4 en baisse aujourd’hui', some: '{n} sur 4 en hausse aujourd’hui', avg: 'en moyenne',
       d7: '7 j', d30: '30 j', today: 'aujourd’hui', none: 'Rien', vs: 'vs {c}',
       change: 'Variation', high: 'Plus haut', low: 'Plus bas', loading: 'Chargement du graphique…',
@@ -50,6 +55,7 @@
       fng: ['Peur extrême', 'Peur', 'Neutre', 'Avidité', 'Avidité extrême'],
       dvol: ['Calme', 'Normale', 'Élevée', 'Très élevée'], vol: 'Volume 24 h {v}', dom: 'BTC' },
     tr: { loc: 'tr-TR', names: { bitcoin: 'Bitcoin', litecoin: 'Litecoin', dogecoin: 'Dogecoin', 'pepecoin-network': 'Pepecoin' },
+      sBtc: 'Bitcoin sezonu', sAlt: 'Altcoin sezonu', sNone: 'Sezon yok', sBeat: '{of} coinden {n} tanesi Bitcoin’i geçti',
       allUp: 'Bugün 4’ü de yükselişte', allDown: 'Bugün 4’ü de düşüşte', some: 'Bugün 4 coinden {n} tanesi yükselişte', avg: 'ortalama',
       d7: '7 g', d30: '30 g', today: 'bugün', none: 'Hiçbiri', vs: 'vs {c}',
       change: 'Değişim', high: 'En yüksek', low: 'En düşük', loading: 'Grafik yükleniyor…',
@@ -58,6 +64,7 @@
       fng: ['Aşırı korku', 'Korku', 'Nötr', 'Açgözlülük', 'Aşırı açgözlülük'],
       dvol: ['Sakin', 'Normal', 'Yüksek', 'Çok yüksek'], vol: '24 saatlik hacim {v}', dom: 'BTC' },
     it: { loc: 'it-IT', names: { bitcoin: 'Bitcoin', litecoin: 'Litecoin', dogecoin: 'Dogecoin', 'pepecoin-network': 'Pepecoin' },
+      sBtc: 'Stagione di Bitcoin', sAlt: 'Stagione delle altcoin', sNone: 'Nessuna stagione', sBeat: '{n} su {of} meglio di Bitcoin',
       allUp: 'Oggi tutte e 4 in rialzo', allDown: 'Oggi tutte e 4 in calo', some: 'Oggi {n} su 4 in rialzo', avg: 'in media',
       d7: '7 g', d30: '30 g', today: 'oggi', none: 'Nessuna', vs: 'vs {c}',
       change: 'Variazione', high: 'Massimo', low: 'Minimo', loading: 'Caricamento del grafico…',
@@ -66,6 +73,7 @@
       fng: ['Paura estrema', 'Paura', 'Neutrale', 'Avidità', 'Avidità estrema'],
       dvol: ['Calma', 'Normale', 'Alta', 'Molto alta'], vol: 'Volume 24 h {v}', dom: 'BTC' },
     zh: { loc: 'zh-CN', names: { bitcoin: '比特币', litecoin: '莱特币', dogecoin: '狗狗币', 'pepecoin-network': 'Pepecoin' },
+      sBtc: '比特币季节', sAlt: '山寨币季节', sNone: '两者皆非', sBeat: '{of} 个中有 {n} 个跑赢比特币',
       allUp: '今天 4 个全部上涨', allDown: '今天 4 个全部下跌', some: '今天 4 个中有 {n} 个上涨', avg: '平均',
       d7: '7 天', d30: '30 天', today: '今天', none: '不比较', vs: '对比 {c}',
       change: '涨跌', high: '最高', low: '最低', loading: '正在加载图表…',
@@ -359,6 +367,18 @@
     tile.querySelector('.mk-dom').innerHTML = '<small>' + t.dom + '</small>' + new Intl.NumberFormat(L, { maximumFractionDigits: 0 }).format(d.btc) + '%';
   }
 
+  // ---- Altcoin Season Index (scripts/fetch_market.py counts it; no browser fallback, it needs 100 coins) ----
+  function renderSeason(d) {
+    var box = $('mk-season');
+    if (!d || d.value == null) return;
+    var v = d.value, label = v >= 75 ? t.sAlt : v <= 25 ? t.sBtc : t.sNone;
+    box.querySelector('.mk-season-val').textContent = v + ' · ' + label;
+    box.querySelector('.mk-season-val').className = 'mk-season-val ' + (v >= 75 ? 'alt' : v <= 25 ? 'btc' : '');
+    box.querySelector('.mk-season-knob').style.left = v + '%';
+    box.querySelector('.mk-season-bar').title = fill(t.sBeat, { n: d.beat, of: d.of });
+    box.hidden = false;
+  }
+
   // ---- wiring ----
   document.querySelectorAll('.mk-card').forEach(function (card) {
     card.addEventListener('click', function () {
@@ -387,6 +407,7 @@
     });
   });
   chart();
+  fileP.then(function (f) { renderSeason(f && f.season); });
   part('fng', liveFng).then(renderFng);
   part('dvol', liveDvol).then(renderDvol);
   part('stable', liveStable).then(renderStable);

@@ -10,6 +10,8 @@ anything missing here.
   alternative.me  Fear & Greed index, last 31 days
   DefiLlama     total stablecoin supply (USD-pegged), last 31 days
   Deribit       Bitcoin implied volatility index (DVOL), last 31 days
+  CoinGecko     Altcoin Season Index: how many of the top 50 coins (no stablecoins, wrapped or
+                staked tokens) beat Bitcoin over 30 days; 75+ is altcoin season, 25 or less Bitcoin season
 """
 import datetime as dt
 import json
@@ -75,6 +77,43 @@ def coingecko(out):
         }
 
 
+# stablecoins, gold tokens and wrapped, staked or bridged copies of other coins don't count
+SKIP_SYMBOLS = {"usdt", "usdc", "dai", "usde", "usds", "fdusd", "tusd", "pyusd", "usd1", "usdd", "usdp", "gusd", "frax",
+                "rlusd", "usdtb", "usd0", "susde", "susds", "bfusd", "usdf", "usdg", "xaut", "paxg", "buidl", "usyc", "ustb"}
+SKIP_WORDS = ("wrapped", "staked", "bridged", "restaked", "liquid staking", "usd")
+
+
+def season_index(rows):
+    """The Altcoin Season Index from coins/markets rows (price_change_percentage_30d_in_currency), or None."""
+    btc = next((c for c in rows if c["id"] == "bitcoin"), None)
+    if not btc or btc.get("price_change_percentage_30d_in_currency") is None:
+        return None
+    alts = []
+    for c in rows:
+        name, sym, ch = (c.get("name") or "").lower(), (c.get("symbol") or "").lower(), c.get("price_change_percentage_30d_in_currency")
+        if c["id"] == "bitcoin" or ch is None or sym in SKIP_SYMBOLS or any(w in name for w in SKIP_WORDS):
+            continue
+        if sym.endswith("btc") or sym.startswith(("st", "w", "cb")) and sym[1:] in ("eth", "btc", "steth", "sol") or sym in ("weeth", "wsteth", "reth", "cbeth", "meth", "jitosol", "msol", "bnsol"):
+            continue
+        if 0.97 < (c.get("current_price") or 0) < 1.03 and abs(ch) < 3:
+            continue   # an unlisted dollar stablecoin
+        alts.append(ch)
+        if len(alts) == 50:
+            break
+    if len(alts) < 40:
+        return None
+    beat = sum(1 for ch in alts if ch > btc["price_change_percentage_30d_in_currency"])
+    return {"value": round(100 * beat / len(alts)), "beat": beat, "of": len(alts), "btc30": btc["price_change_percentage_30d_in_currency"]}
+
+
+def altseason(out):
+    time.sleep(3)
+    j = get(CG + "coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&price_change_percentage=30d")
+    s = season_index(j or [])
+    if s:
+        out["season"] = s
+
+
 def fear_greed(out):
     j = get("https://api.alternative.me/fng/?limit=31", (0, 10))
     rows = (j or {}).get("data") or []
@@ -104,12 +143,12 @@ def dvol(out):
 def main():
     out = {"generated_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "coins": None, "series": {}}
     time.sleep(20)   # fetch_prices.py just used up part of the CoinGecko minute
-    for step in (coingecko, fear_greed, stablecoins, dvol):
+    for step in (coingecko, altseason, fear_greed, stablecoins, dvol):
         try:
             step(out)
         except Exception as exc:  # noqa: BLE001 - one source failing must not lose the others
             print(f"{step.__name__}: {exc}", file=sys.stderr)
-    have = [k for k in ("coins", "global", "fng", "stable", "dvol") if out.get(k)]
+    have = [k for k in ("coins", "global", "season", "fng", "stable", "dvol") if out.get(k)]
     print(f"market-live.json: {', '.join(have) or 'nothing'}; charts {sum(len(v) for v in out['series'].values())}/8")
     if not have:
         return 0   # publish without the file, the page asks the APIs itself

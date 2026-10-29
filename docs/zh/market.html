@@ -34,7 +34,7 @@
 <link rel="stylesheet" href="../facts.css?v=20261029a">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/zh/"}, {"@type": "ListItem", "position": 2, "name": "今日行情", "item": "https://pepecoinhub.com/zh/market.html"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "为什么是这四个币？", "acceptedAnswer": {"@type": "Answer", "text": "莱特币和狗狗币通过 Scrypt 联合挖矿 (merged mining) 与 Pepecoin 一起开采，同一批矿机同时保护这三条链（Scrypt 家族）。比特币是最大的币，通常决定整个市场的方向。"}}, {"@type": "Question", "name": "什么是恐惧与贪婪指数？", "acceptedAnswer": {"@type": "Answer", "text": "alternative.me 每天给出的 0 到 100 分数，依据比特币的波动率、成交量、社交媒体、市占率和搜索趋势计算。低为恐惧，高为贪婪。它描述情绪，不预测价格。"}}, {"@type": "Question", "name": "什么是 DVOL？", "acceptedAnswer": {"@type": "Answer", "text": "Deribit 的比特币波动率指数：期权市场预期比特币在未来 30 天的波动幅度，以年化百分比表示。数值越高，预期波动越大。"}}, {"@type": "Question", "name": "为什么稳定币重要？", "acceptedAnswer": {"@type": "Answer", "text": "USDT、USDC 等稳定币是区块链上的美元。供应增加通常意味着更多资金准备买入加密货币；减少则意味着资金在流出。"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "为什么是这四个币？", "acceptedAnswer": {"@type": "Answer", "text": "莱特币和狗狗币通过 Scrypt 联合挖矿 (merged mining) 与 Pepecoin 一起开采，同一批矿机同时保护这三条链（Scrypt 家族）。比特币是最大的币，通常决定整个市场的方向。"}}, {"@type": "Question", "name": "什么是山寨币季节指数？", "acceptedAnswer": {"@type": "Answer", "text": "市值前 50 的币中，过去 30 天有多少跑赢比特币。75 及以上为山寨币季节，25 及以下为比特币季节。稳定币和包装 (wrapped) 代币不计入。"}}, {"@type": "Question", "name": "什么是恐惧与贪婪指数？", "acceptedAnswer": {"@type": "Answer", "text": "alternative.me 每天给出的 0 到 100 分数，依据比特币的波动率、成交量、社交媒体、市占率和搜索趋势计算。低为恐惧，高为贪婪。它描述情绪，不预测价格。"}}, {"@type": "Question", "name": "什么是 DVOL？", "acceptedAnswer": {"@type": "Answer", "text": "Deribit 的比特币波动率指数：期权市场预期比特币在未来 30 天的波动幅度，以年化百分比表示。数值越高，预期波动越大。"}}, {"@type": "Question", "name": "为什么稳定币重要？", "acceptedAnswer": {"@type": "Answer", "text": "USDT、USDC 等稳定币是区块链上的美元。供应增加通常意味着更多资金准备买入加密货币；减少则意味着资金在流出。"}}]}</script>
 <link rel="stylesheet" href="../market.css?v=20261029a">
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
@@ -55,7 +55,15 @@
 
 <section class="mk" aria-labelledby="mk-h">
   <h2 id="mk-h" class="visually-hidden">今日四个币</h2>
-  <p class="mk-mood" id="mk-mood" aria-live="polite" hidden><span class="mk-dots"></span><span class="mk-mood-text"></span><span class="mk-mood-avg"></span></p>
+  <div class="mk-top">
+    <p class="mk-mood" id="mk-mood" aria-live="polite" hidden><span class="mk-dots"></span><span class="mk-mood-text"></span><span class="mk-mood-avg"></span></p>
+    <div class="mk-season" id="mk-season" hidden>
+      <div class="mk-season-head"><span class="mk-season-title">山寨币季节指数</span><b class="mk-season-val"></b></div>
+      <div class="mk-season-bar"><i class="mk-season-knob"></i></div>
+      <div class="mk-season-ends"><span>比特币季节</span><span>山寨币季节</span></div>
+      <p class="mk-season-what">市值前 50 的币中，过去 30 天有多少跑赢比特币。75 及以上为山寨币季节，25 及以下为比特币季节。稳定币和包装 (wrapped) 代币不计入。</p>
+    </div>
+  </div>
   <div class="mk-cards">
     <button type="button" class="mk-card" data-coin="bitcoin" aria-pressed="false"><span class="mk-name"><b>BTC</b>比特币</span><img src="../assets/coins/btc.png" alt="" width="40" height="40"><span class="mk-price">—</span><span class="mk-row"><span class="mk-ch">—</span><span class="mk-7d"></span></span><span class="mk-sp"></span></button>
     <button type="button" class="mk-card" data-coin="litecoin" aria-pressed="false"><span class="mk-name"><b>LTC</b>莱特币</span><img src="../assets/coins/ltc.png" alt="" width="40" height="40"><span class="mk-price">—</span><span class="mk-row"><span class="mk-ch">—</span><span class="mk-7d"></span></span><span class="mk-sp"></span></button>
@@ -88,6 +96,7 @@
   <h2 id="faq">常见问题</h2>
   <div class="faq">
     <details><summary>为什么是这四个币？</summary><p>莱特币和狗狗币通过 Scrypt 联合挖矿 (merged mining) 与 Pepecoin 一起开采，同一批矿机同时保护这三条链（<a href="scrypt-family.html">Scrypt 家族</a>）。比特币是最大的币，通常决定整个市场的方向。</p></details>
+    <details><summary>什么是山寨币季节指数？</summary><p>市值前 50 的币中，过去 30 天有多少跑赢比特币。75 及以上为山寨币季节，25 及以下为比特币季节。稳定币和包装 (wrapped) 代币不计入。</p></details>
     <details><summary>什么是恐惧与贪婪指数？</summary><p>alternative.me 每天给出的 0 到 100 分数，依据比特币的波动率、成交量、社交媒体、市占率和搜索趋势计算。低为恐惧，高为贪婪。它描述情绪，不预测价格。</p></details>
     <details><summary>什么是 DVOL？</summary><p>Deribit 的比特币波动率指数：期权市场预期比特币在未来 30 天的波动幅度，以年化百分比表示。数值越高，预期波动越大。</p></details>
     <details><summary>为什么稳定币重要？</summary><p>USDT、USDC 等稳定币是区块链上的美元。供应增加通常意味着更多资金准备买入加密货币；减少则意味着资金在流出。</p></details>
