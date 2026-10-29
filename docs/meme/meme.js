@@ -178,6 +178,33 @@
       '</div>';
   }
 
+  /* ------------------------------------------------------------ Professor Pepe
+     A community AI chat run by someone else. We load only their page in an iframe,
+     and only after the visitor opens it: no third-party script on our pages. */
+  var PROF = 'https://professor-pepe-agent.onrender.com/';
+  var pb = el('button', { type: 'button', class: 'prof-btn', 'aria-expanded': 'false', 'aria-controls': 'prof' },
+    '<img src="img/brain.webp" alt="" width="44" height="44"><span>Ask Professor Pepe</span>');
+  var pp = el('div', { class: 'prof', id: 'prof', role: 'dialog', 'aria-label': 'Professor Pepe chat', hidden: '' });
+  pp.innerHTML = '<div class="prof-head"><img src="img/brain.webp" alt="" width="36" height="36"><div><b>Professor Pepe</b>' +
+    '<small>An AI chat by the community, not by Pepecoin Hub. It can be wrong. NFA.</small></div>' +
+    '<a class="prof-new" href="' + PROF + '" target="_blank" rel="noopener" title="Open in a new tab" aria-label="Open in a new tab">↗</a>' +
+    '<button type="button" class="prof-x" aria-label="Close">×</button></div>' +
+    '<div class="prof-body"><p class="prof-wait hand">Waking up the professor, fren…</p></div>';
+  function prof(open) {
+    pp.hidden = !open; pb.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('prof-on', open);
+    if (open && !pp.querySelector('iframe')) {
+      var f = el('iframe', { src: PROF, title: 'Professor Pepe chat', allow: 'clipboard-write', referrerpolicy: 'no-referrer' });
+      f.addEventListener('load', function () { pp.classList.add('ready'); });
+      pp.querySelector('.prof-body').appendChild(f);
+    }
+    (open ? pp.querySelector('.prof-x') : pb).focus();
+  }
+  pb.addEventListener('click', function () { prof(pp.hidden); });
+  pp.querySelector('.prof-x').addEventListener('click', function () { prof(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !pp.hidden) prof(false); });
+  document.body.appendChild(pp); document.body.appendChild(pb);
+
   // fill <span data-m="key"> with values, shared by pages
   function fill(map) {
     document.querySelectorAll('[data-m]').forEach(function (e) {
