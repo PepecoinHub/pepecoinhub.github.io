@@ -189,31 +189,17 @@
     var nav = document.querySelector('.site-nav, .pf-nav');
     if (!nav || nav.querySelector('[data-chrome]')) return;
     var alt = alternates();
-    var box = document.createElement('span');
-    box.className = 'head-controls';
-    box.setAttribute('data-chrome', '1');
-    var themeBtn = document.createElement('button');
-    themeBtn.type = 'button';
-    themeBtn.className = 'iconbtn';
-    themeBtn.setAttribute('data-chrome', 'theme');
-    function paintTheme() {
-      themeBtn.textContent = t.theme + t.sep + t[themeNow()];
-      themeBtn.title = t.theme;
+    var head = nav.closest('.site-head');
+    if (head) buildHead(head, nav, alt);
+    else {
+      var box = document.createElement('span');
+      box.className = 'head-controls';
+      box.setAttribute('data-chrome', '1');
+      box.appendChild(themeButton());
+      box.appendChild(langMenu(alt));
+      nav.appendChild(box);
     }
-    themeBtn.addEventListener('click', function () {
-      var th = themeNow();
-      var next = th === 'auto' ? 'light' : th === 'light' ? 'dark' : 'auto';
-      if (next === 'auto') document.documentElement.removeAttribute('data-theme');
-      else document.documentElement.setAttribute('data-theme', next);
-      try { if (next === 'auto') localStorage.removeItem('phw-theme'); else localStorage.setItem('phw-theme', next); } catch (e) {}
-      paintTheme();
-    });
-    paintTheme();
-    box.appendChild(themeBtn);
-    box.appendChild(langMenu(alt));
-    nav.appendChild(box);
-    groupNav(nav);
-    footNav(nav);
+    footNav();
     linkHosts();
     linkFold();
     backToTop();
@@ -224,83 +210,202 @@
     supportCopy();
   }
 
-  // Header menu: the page links are grouped into "Start here" and "Data & charts" drop-downs,
-  // with Guides and a highlighted Games button next to them. On a phone the menu opens from a ☰ button.
-  var GROUPS = { 'which-pepecoin': ['start', '🐸'], 'compare': ['start', '🐕'], 'scrypt-family': ['start', '⛓️'], 'mining': ['start', '⛏️'],
-    'network': ['data', '📈'], 'rich-list': ['data', '🏆'], 'supply': ['data', '🪙'], 'calculator': ['data', '🧮'], 'price': ['data', '💹'], 'guides': ['', '📚'] };
-  function groupNav(nav) {
-    var head = nav.closest('.site-head');
-    if (!head || nav.classList.contains('grouped')) return;
-    var links = Array.prototype.slice.call(nav.children).filter(function (el) { return el.tagName === 'A'; });
-    var games = null, base = null, panels = {}, order = [];
-    links.forEach(function (a) {
-      var href = a.getAttribute('href') || '', m = href.match(/([a-z-]+)\.html$/), key = m ? m[1] : '';
-      if (key === 'guides' && base === null) base = href.replace(/guides\.html$/, '');
-      if (/games\/?$|^\.\/$/.test(href)) { games = a; return; }
-      var g = GROUPS[key];
-      if (g) a.insertAdjacentHTML('afterbegin', '<span class="nav-ico" aria-hidden="true">' + g[1] + '</span>');
-      if (!g || !g[0]) { order.push(a); return; }
-      if (!panels[g[0]]) { panels[g[0]] = []; order.push(g[0]); }
-      panels[g[0]].push(a);
-    });
-    // Mining is not in the page HTML; it joins "Start here" as the fourth link.
-    if (panels.start && !panels.start.some(function (a) { return /mining\.html$/.test(a.getAttribute('href') || ''); })) {
-      var mine = document.createElement('a');
-      mine.href = (base || '') + 'mining.html';
-      mine.innerHTML = '<span class="nav-ico" aria-hidden="true">⛏️</span>';
-      mine.appendChild(document.createTextNode(t.mine));
-      if (/\/mining\.html$/.test(location.pathname)) mine.setAttribute('aria-current', 'page');
-      panels.start.push(mine);
+  // Day / night: one emoji button. It shows the moon by day and the sun at night; the choice is remembered.
+  function darkNow() {
+    var th = themeNow();
+    return th === 'dark' || (th === 'auto' && !!window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+  function themeButton() {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'theme-emoji';
+    b.setAttribute('data-chrome', 'theme');
+    function paint() {
+      var dark = darkNow();
+      b.textContent = dark ? '☀️' : '🌙';
+      b.title = t.theme + t.sep + (dark ? t.light : t.dark);
+      b.setAttribute('aria-label', b.title);
     }
-    // The market page joins "Data & charts", and the links directory sits next to Guides; neither is in the page HTML.
-    function extra(file, ico, text) {
+    b.addEventListener('click', function () {
+      var next = darkNow() ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('phw-theme', next); } catch (e) {}
+      b.classList.remove('spin'); void b.offsetWidth; b.classList.add('spin');
+      paint();
+    });
+    if (window.matchMedia) {
+      var mq = matchMedia('(prefers-color-scheme: dark)');
+      if (mq.addEventListener) mq.addEventListener('change', paint);
+    }
+    paint();
+    return b;
+  }
+
+  // Every page of the site, in four groups: understand PEP, get it, its numbers, the community.
+  // The header menu and the footer are both built from this list. [file, icon, label, short line] per language.
+  var MENU_H = {
+    en: ['Understand PEP', 'Buy, store, mine', 'Numbers & charts', 'Community'],
+    pl: ['Poznaj PEP', 'Kup, przechowuj, kop', 'Liczby i wykresy', 'Społeczność'],
+    es: ['Conoce PEP', 'Comprar, guardar, minar', 'Datos y gráficos', 'Comunidad'],
+    de: ['PEP verstehen', 'Kaufen, aufbewahren, minen', 'Daten & Charts', 'Community'],
+    fr: ['Comprendre PEP', 'Acheter, garder, miner', 'Données et graphiques', 'Communauté'],
+    tr: ['PEP’i tanı', 'Al, sakla, kaz', 'Veriler ve grafikler', 'Topluluk'],
+    it: ['Conosci PEP', 'Compra, custodisci, mina', 'Dati e grafici', 'Community'],
+    zh: ['了解 PEP', '购买、存放、挖矿', '数据与图表', '社区']
+  };
+  var MENU = [
+    [ // understand
+      ['which-pepecoin', { en: ['PEP vs PEPE', 'Which frog is which'], pl: ['PEP vs PEPE', 'Która żaba jest która'], es: ['PEP vs PEPE', 'Qué rana es cuál'],
+        de: ['PEP vs PEPE', 'Welcher Frosch welcher ist'], fr: ['PEP vs PEPE', 'Quelle grenouille est laquelle'], tr: ['PEP vs PEPE', 'Hangi kurbağa hangisi'],
+        it: ['PEP vs PEPE', 'Quale rana è quale'], zh: ['PEP vs PEPE', '分清是哪只青蛙'] }],
+      ['compare', { en: ['PEP and DOGE', 'Side by side with Dogecoin'], pl: ['PEP i DOGE', 'Obok Dogecoina, punkt po punkcie'], es: ['PEP y DOGE', 'Frente a Dogecoin, punto por punto'],
+        de: ['PEP und DOGE', 'Neben Dogecoin, Punkt für Punkt'], fr: ['PEP et DOGE', 'Face à Dogecoin, point par point'], tr: ['PEP ve DOGE', 'Dogecoin ile yan yana'],
+        it: ['PEP e DOGE', 'Accanto a Dogecoin, punto per punto'], zh: ['PEP 与 DOGE', '与狗狗币逐项对比'] }],
+      ['scrypt-family', { en: ['Scrypt family', 'Merged mining with LTC and DOGE'], pl: ['Rodzina Scrypt', 'Merged mining z LTC i DOGE'], es: ['Familia Scrypt', 'Merged mining con LTC y DOGE'],
+        de: ['Scrypt-Familie', 'Merged Mining mit LTC und DOGE'], fr: ['Famille Scrypt', 'Merged mining avec LTC et DOGE'], tr: ['Scrypt ailesi', 'LTC ve DOGE ile merged mining'],
+        it: ['Famiglia Scrypt', 'Merged mining con LTC e DOGE'], zh: ['Scrypt 家族', '与 LTC、DOGE 合并挖矿'] }],
+      ['mica', { en: ['MiCA whitepaper', 'The EU document, explained'], pl: ['Whitepaper MiCA', 'Dokument UE po ludzku'], es: ['Whitepaper MiCA', 'El documento de la UE, explicado'],
+        de: ['MiCA-Whitepaper', 'Das EU-Dokument erklärt'], fr: ['Whitepaper MiCA', 'Le document de l’UE expliqué'], tr: ['MiCA whitepaper', 'AB belgesi, açıklamalı'],
+        it: ['Whitepaper MiCA', 'Il documento UE spiegato'], zh: ['MiCA whitepaper', '欧盟文件解读'] }],
+      ['glossary', { en: ['Glossary', 'AuxPoW, UTXO, halving in plain words'], pl: ['Słowniczek', 'AuxPoW, UTXO, halving prostymi słowami'], es: ['Glosario', 'AuxPoW, UTXO, halving en palabras simples'],
+        de: ['Glossar', 'AuxPoW, UTXO, Halving einfach erklärt'], fr: ['Glossaire', 'AuxPoW, UTXO, halving en mots simples'], tr: ['Sözlük', 'AuxPoW, UTXO, halving sade dille'],
+        it: ['Glossario', 'AuxPoW, UTXO, halving in parole semplici'], zh: ['术语表', '用大白话讲 AuxPoW、UTXO、减半'] }]
+    ],
+    [ // get it
+      ['buy', { en: ['How to buy PEP', 'Exchanges and withdrawing'], pl: ['Jak kupić PEP', 'Giełdy i wypłata na portfel'], es: ['Cómo comprar PEP', 'Exchanges y retiro a tu billetera'],
+        de: ['PEP kaufen', 'Börsen und Auszahlung'], fr: ['Acheter du PEP', 'Plateformes et retrait'], tr: ['PEP nasıl alınır', 'Borsalar ve çekim'],
+        it: ['Come comprare PEP', 'Exchange e prelievo'], zh: ['如何购买 PEP', '交易所与提币'] }],
+      ['wallets', { en: ['Wallets', 'Core, Tangem, paper'], pl: ['Portfele', 'Core, Tangem, papierowy'], es: ['Billeteras', 'Core, Tangem, de papel'],
+        de: ['Wallets', 'Core, Tangem, Paper Wallet'], fr: ['Portefeuilles', 'Core, Tangem, papier'], tr: ['Cüzdanlar', 'Core, Tangem, kâğıt'],
+        it: ['Wallet', 'Core, Tangem, di carta'], zh: ['钱包', 'Core、Tangem、纸钱包'] }],
+      ['mining', { en: ['Mining', 'Pools, Antminer, unMineable'], pl: ['Kopanie', 'Poole, Antminer, unMineable'], es: ['Minería', 'Pools, Antminer, unMineable'],
+        de: ['Mining', 'Pools, Antminer, unMineable'], fr: ['Minage', 'Pools, Antminer, unMineable'], tr: ['Madencilik', 'Havuzlar, Antminer, unMineable'],
+        it: ['Mining', 'Pool, Antminer, unMineable'], zh: ['挖矿', '矿池、Antminer、unMineable'] }],
+      ['guides', { en: ['Guides', 'All guides in one place'], pl: ['Poradniki', 'Wszystkie poradniki w jednym miejscu'], es: ['Guías', 'Todas las guías en un lugar'],
+        de: ['Ratgeber', 'Alle Ratgeber auf einen Blick'], fr: ['Guides', 'Tous les guides au même endroit'], tr: ['Rehberler', 'Tüm rehberler tek yerde'],
+        it: ['Guide', 'Tutte le guide in un posto'], zh: ['指南', '所有指南一览'] }]
+    ],
+    [ // numbers
+      ['price', { en: ['Price', 'Live chart, Pepe overlay, ×100'], pl: ['Cena', 'Wykres na żywo, nakładka Pepe, ×100'], es: ['Precio', 'Gráfico en vivo, Pepe superpuesto, ×100'],
+        de: ['Kurs', 'Live-Chart, Pepe-Overlay, ×100'], fr: ['Prix', 'Graphique en direct, Pepe superposé, ×100'], tr: ['Fiyat', 'Canlı grafik, Pepe katmanı, ×100'],
+        it: ['Prezzo', 'Grafico live, Pepe sovrapposto, ×100'], zh: ['价格', '实时图表、Pepe 叠加、×100'] }],
+      ['market', { en: ['Market today', 'BTC, LTC, DOGE and PEP today'], pl: ['Rynek dziś', 'BTC, LTC, DOGE i PEP dziś'], es: ['Mercado hoy', 'BTC, LTC, DOGE y PEP hoy'],
+        de: ['Markt heute', 'BTC, LTC, DOGE und PEP heute'], fr: ['Marché du jour', 'BTC, LTC, DOGE et PEP aujourd’hui'], tr: ['Bugün piyasa', 'Bugün BTC, LTC, DOGE ve PEP'],
+        it: ['Mercato oggi', 'BTC, LTC, DOGE e PEP oggi'], zh: ['今日行情', '今日 BTC、LTC、DOGE 与 PEP'] }],
+      ['network', { en: ['Network', 'Hashrate, blocks, explorers'], pl: ['Sieć', 'Hashrate, bloki, eksploratory'], es: ['Red', 'Hashrate, bloques, exploradores'],
+        de: ['Netzwerk', 'Hashrate, Blöcke, Explorer'], fr: ['Réseau', 'Hashrate, blocs, explorateurs'], tr: ['Ağ', 'Hashrate, bloklar, explorer’lar'],
+        it: ['Rete', 'Hashrate, blocchi, explorer'], zh: ['网络', '算力、区块、区块浏览器'] }],
+      ['supply', { en: ['Supply', 'No max supply, falling inflation'], pl: ['Podaż', 'Bez limitu, malejąca inflacja'], es: ['Suministro', 'Sin límite, inflación decreciente'],
+        de: ['Coinmenge', 'Keine Obergrenze, sinkende Inflation'], fr: ['Offre', 'Pas de plafond, inflation en baisse'], tr: ['Arz', 'Üst sınır yok, düşen enflasyon'],
+        it: ['Offerta', 'Nessun tetto, inflazione in calo'], zh: ['供应量', '无上限，通胀递减'] }],
+      ['rich-list', { en: ['Rich list', 'Biggest holders and their share'], pl: ['Najbogatsze adresy', 'Najwięksi posiadacze i ich udział'], es: ['Mayores tenedores', 'Quién tiene más y qué porcentaje'],
+        de: ['Rich List', 'Größte Holder und ihr Anteil'], fr: ['Plus grosses adresses', 'Plus gros détenteurs et leur part'], tr: ['Zenginler listesi', 'En büyük sahipler ve payları'],
+        it: ['Rich list', 'Maggiori holder e la loro quota'], zh: ['富豪榜', '最大持有者及其占比'] }],
+      ['calculator', { en: ['Calculator', 'Your PEP at DOGE’s market cap'], pl: ['Kalkulator', 'Twój PEP przy kapitalizacji DOGE'], es: ['Calculadora', 'Tus PEP con la capitalización de DOGE'],
+        de: ['Rechner', 'Deine PEP bei DOGEs Marktkapitalisierung'], fr: ['Calculateur', 'Tes PEP à la capitalisation de DOGE'], tr: ['Hesaplayıcı', 'PEP’lerin DOGE piyasa değerinde'],
+        it: ['Calcolatore', 'I tuoi PEP alla capitalizzazione di DOGE'], zh: ['计算器', '按 DOGE 市值算你的 PEP'] }]
+    ],
+    [ // community
+      ['games/', { en: ['PEP Games', 'Charades, Pepe Miner, chat'], pl: ['PEP Games', 'Kalambury, Pepe Miner, czat'], es: ['PEP Games', 'Charadas, Pepe Miner, chat'],
+        de: ['PEP Games', 'Scharade, Pepe Miner, Chat'], fr: ['PEP Games', 'Charades, Pepe Miner, chat'], tr: ['PEP Games', 'Sessiz sinema, Pepe Miner, sohbet'],
+        it: ['PEP Games', 'Sciarade, Pepe Miner, chat'], zh: ['PEP Games', '猜词、Pepe Miner、聊天'] }],
+      ['links', { en: ['Links', 'Official and community sites'], pl: ['Linki', 'Oficjalne i od społeczności'], es: ['Enlaces', 'Oficiales y de la comunidad'],
+        de: ['Links', 'Offizielle und Community-Seiten'], fr: ['Liens', 'Officiels et communautaires'], tr: ['Bağlantılar', 'Resmî ve topluluk siteleri'],
+        it: ['Link', 'Ufficiali e della community'], zh: ['链接', '官方与社区网站'] }],
+      ['meme/', { en: ['Meme edition', 'Same facts, with memes'], pl: ['Wersja meme', 'Te same fakty z memami (EN)'], es: ['Versión meme', 'Los mismos datos con memes (EN)'],
+        de: ['Meme-Version', 'Dieselben Fakten mit Memes (EN)'], fr: ['Version meme', 'Les mêmes faits avec des memes (EN)'], tr: ['Meme sürümü', 'Aynı bilgiler, memelerle (EN)'],
+        it: ['Versione meme', 'Gli stessi fatti con i meme (EN)'], zh: ['表情包版', '同样的事实，配上表情包（英文）'] }]
+    ]
+  ];
+  // menu link for a page: games and the meme edition are in English at the site root, the rest in this page's language
+  function menuLinks() {
+    var base = ROOT + (pageKey === 'en' ? '' : pageKey + '/'), here = location.pathname.replace(/index\.html$/, '');
+    return MENU.map(function (group) {
+      return group.map(function (it) {
+        var key = it[0].replace(/\/$/, ''), words = it[1][pageKey] || it[1].en;
+        var href = /\/$/.test(it[0]) ? ROOT + it[0] : base + it[0] + '.html';
+        var path = new URL(href, location.href).pathname, cur = /\/$/.test(it[0]) ? here.indexOf(path) === 0 : here === path;
+        return { key: key, href: href, label: words[0], line: words[1], current: cur };
+      });
+    });
+  }
+
+  // Header: the logo, the Serious | Meme switch, then day / night, language and one Menu button.
+  // The menu opens a single panel with every page in four groups; on a phone it fills the screen below the header.
+  function buildHead(head, nav, alt) {
+    var H = MENU_H[pageKey] || MENU_H.en, groups = menuLinks(), uid = 'site-menu';
+    head.classList.add('head-v2');
+    var logo = head.querySelector('.brand-hub-link, .brand');
+    var mode = memeLink();
+    if (logo) logo.insertAdjacentElement('afterend', mode); else head.insertBefore(mode, head.firstChild);
+    nav.setAttribute('data-chrome', '1');
+    nav.classList.add('built');
+    var keep = Array.prototype.slice.call(nav.children);
+    keep.forEach(function (el) { el.remove(); });
+
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'menu-btn';
+    btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', uid);
+    btn.innerHTML = '<span class="menu-bars" aria-hidden="true"><i></i><i></i><i></i></span><b></b>';
+    btn.querySelector('b').textContent = t.menu;
+
+    var panel = document.createElement('div');
+    panel.className = 'mega'; panel.id = uid; panel.hidden = true;
+    var cols = document.createElement('div'); cols.className = 'mega-cols';
+    groups.forEach(function (links, gi) {
+      var col = document.createElement('section'); col.className = 'mega-col';
+      var h = document.createElement('p'); h.className = 'mega-h';
+      h.innerHTML = '<span class="mega-n"></span><span></span>';
+      h.firstChild.textContent = '0' + (gi + 1); h.lastChild.textContent = H[gi];
+      col.appendChild(h);
+      links.forEach(function (l) {
+        var a = document.createElement('a');
+        a.className = 'mega-a'; a.href = l.href; a.setAttribute('data-p', l.key);
+        if (l.key === 'games' || l.key === 'meme') a.hreflang = 'en';
+        if (l.current) a.setAttribute('aria-current', 'page');
+        a.innerHTML = '<i class="mega-i" aria-hidden="true"></i><span><b></b><small></small></span>';
+        a.querySelector('b').textContent = l.label; a.querySelector('small').textContent = l.line;
+        col.appendChild(a);
+      });
+      if (gi === groups.length - 1) {
+        var soc = document.createElement('p'); soc.className = 'mega-social';
+        SOCIAL.slice(0, 4).forEach(function (x) { var s = document.createElement('a'); s.href = x[1]; s.rel = 'noopener'; s.textContent = x[0]; soc.appendChild(s); });
+        col.appendChild(soc);
+      }
+      cols.appendChild(col);
+    });
+    panel.appendChild(cols);
+    // phone: the languages as one row at the bottom of the menu
+    var langs = document.createElement('p'); langs.className = 'mega-langs';
+    var lh = document.createElement('span'); lh.textContent = t.language; langs.appendChild(lh);
+    LANGS.forEach(function (l) {
       var a = document.createElement('a');
-      a.href = (base || '') + file;
-      a.innerHTML = '<span class="nav-ico" aria-hidden="true">' + ico + '</span>';
-      a.appendChild(document.createTextNode(text));
-      if (location.pathname.slice(-file.length - 1) === '/' + file) a.setAttribute('aria-current', 'page');
-      return a;
-    }
-    if (panels.data && base !== null) panels.data.push(extra('market.html', '🌐', t.market));
-    var gi = order.findIndex(function (it) { return typeof it !== 'string' && /guides\.html$/.test(it.getAttribute('href') || ''); });
-    if (gi >= 0) order.splice(gi + 1, 0, extra('links.html', '🔗', t.links));
-    if (!games) {
-      games = document.createElement('a');
-      games.href = (base || '') + 'games/';
-      games.textContent = t.games;
-    }
-    games.classList.add('nav-games');
-    games.insertAdjacentHTML('afterbegin', '<span aria-hidden="true">🎮 </span>');
-    var frag = document.createDocumentFragment(), groups = [];
-    order.forEach(function (item) {
-      if (typeof item !== 'string') { frag.appendChild(item); return; }
-      var wrap = document.createElement('div'); wrap.className = 'navgroup navgroup-' + item;
-      var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'navbtn'; btn.setAttribute('aria-expanded', 'false');
-      btn.innerHTML = '<span></span><svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
-      btn.firstChild.textContent = t[item];
-      var panel = document.createElement('div'); panel.className = 'navpanel';
-      panels[item].forEach(function (a) { panel.appendChild(a); if (a.getAttribute('aria-current') === 'page') wrap.classList.add('current'); });
-      btn.addEventListener('click', function (e) { e.stopPropagation(); var open = btn.getAttribute('aria-expanded') !== 'true'; closeAll(); btn.setAttribute('aria-expanded', String(open)); });
-      wrap.appendChild(btn); wrap.appendChild(panel); frag.appendChild(wrap); groups.push(btn);
+      a.href = alt[l.key] || (l.key === pageKey ? location.pathname : l.home);
+      a.lang = l.tag; a.hreflang = l.tag; a.textContent = l.short; a.title = l.name;
+      if (l.key === pageKey) a.setAttribute('aria-current', 'true');
+      langs.appendChild(a);
     });
-    function closeAll() { groups.forEach(function (b) { b.setAttribute('aria-expanded', 'false'); }); }
-    document.addEventListener('click', function (e) { if (!nav.contains(e.target)) closeAll(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeAll(); setMenu(false); } });
-    frag.appendChild(games);
-    frag.appendChild(memeLink());
-    nav.insertBefore(frag, nav.firstChild);
-    nav.classList.add('grouped');
-    // phone: "Start" and Games in the header bar; Start opens the whole menu below it, "Start here" group first
-    var quick = games.cloneNode(true); quick.className = 'nav-games head-games'; quick.removeAttribute('aria-current');
-    var tools = document.createElement('span'); tools.className = 'head-phone';
-    var qs = document.createElement('button'); qs.type = 'button'; qs.className = 'head-start';
-    qs.setAttribute('aria-expanded', 'false'); qs.setAttribute('aria-label', t.menu);
-    qs.innerHTML = '<span aria-hidden="true">🚀</span> <b></b><svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
-    qs.querySelector('b').textContent = t.startShort || t.start;
-    function setMenu(open) { head.classList.toggle('menu-open', open); qs.setAttribute('aria-expanded', String(open)); }
-    qs.addEventListener('click', function () { setMenu(!head.classList.contains('menu-open')); });
-    tools.appendChild(memeLink()); tools.appendChild(qs); tools.appendChild(quick);
-    head.insertBefore(tools, nav);
+    panel.appendChild(langs);
+
+    nav.appendChild(themeButton());
+    nav.appendChild(langMenu(alt));
+    nav.appendChild(btn);
+    head.appendChild(panel);
+
+    function set(open) {
+      panel.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+      head.classList.toggle('menu-open', open);
+      document.documentElement.classList.toggle('menu-lock', open);
+    }
+    btn.addEventListener('click', function (e) { e.stopPropagation(); set(panel.hidden); });
+    document.addEventListener('click', function (e) { if (!panel.hidden && !head.contains(e.target)) set(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) { set(false); btn.focus(); } });
+
+    // no bar at the top of the page; once the page scrolls, a soft frosted strip behind the header
+    var stuck = false;
+    function onScroll() { var s = window.scrollY > 8; if (s !== stuck) { stuck = s; head.classList.toggle('stuck', s); } }
+    window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
   }
 
   // The meme edition (English only, /meme/): the same page there when it has one, else its home page.
@@ -330,17 +435,12 @@
 
 
   // Footer: the logo with the "community fact pages" line and the community links, then every page of the site
-  // in three short columns (the same links as the header menu), then the small print.
+  // in the same four groups as the header menu, then the small print.
   var SOCIAL = [['Reddit', 'https://reddit.com/r/pepecoin'], ['Discord', 'https://pepecoin.com/discord'], ['Telegram', 'https://t.me/PepecoinGroup'],
     ['X', 'https://x.com/PepecoinNetwork'], ['GitHub', 'https://github.com/PepecoinHub/pepecoinhub.github.io']];
-  function footNav(nav) {
+  function footNav() {
     var foot = document.querySelector('footer.site-foot');
-    if (!foot || foot.querySelector('.foot-top') || !nav.classList.contains('grouped')) return;
-    function label(a) {
-      var c = a.cloneNode(true);
-      c.querySelectorAll('.nav-ico, [aria-hidden="true"]').forEach(function (el) { el.remove(); });
-      return c.textContent.trim();
-    }
+    if (!foot || foot.querySelector('.foot-top') || !document.querySelector('.site-head.head-v2')) return;
     var top = document.createElement('div'); top.className = 'foot-top';
     var brand = document.createElement('div'); brand.className = 'foot-brand';
     var logo = document.querySelector('.site-head .brand-hub-link');
@@ -352,20 +452,16 @@
     brand.appendChild(soc);
     top.appendChild(brand);
     var box = document.createElement('nav'); box.className = 'foot-nav'; box.setAttribute('aria-label', t.menu);
-    function col(title, links) {
-      if (!links.length) return;
-      var d = document.createElement('div'), h = document.createElement('p'); h.className = 'foot-h'; h.textContent = title; d.appendChild(h);
-      links.forEach(function (a) {
-        var c = document.createElement('a'); c.href = a.getAttribute('href'); c.textContent = label(a);
-        if (a.getAttribute('aria-current') === 'page') c.setAttribute('aria-current', 'page');
+    var H = MENU_H[pageKey] || MENU_H.en;
+    menuLinks().forEach(function (links, gi) {
+      var d = document.createElement('div'), h = document.createElement('p'); h.className = 'foot-h'; h.textContent = H[gi]; d.appendChild(h);
+      links.forEach(function (l) {
+        var c = document.createElement('a'); c.href = l.href; c.textContent = l.label;
+        if (l.current) c.setAttribute('aria-current', 'page');
         d.appendChild(c);
       });
       box.appendChild(d);
-    }
-    var q = function (sel) { return Array.prototype.slice.call(nav.querySelectorAll(sel)); };
-    col(t.start, q('.navgroup-start .navpanel a'));
-    col(t.data, q('.navgroup-data .navpanel a'));
-    col(t.more, q(':scope > a'));
+    });
     top.appendChild(box);
     var fine = document.createElement('div'); fine.className = 'foot-fine';
     while (foot.firstChild) fine.appendChild(foot.firstChild);
