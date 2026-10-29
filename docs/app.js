@@ -113,6 +113,9 @@
       page_of: 'Page {a} of {b}',
       prev: 'Previous', next: 'Next',
       no_match: 'No address matches that search.',
+      conf_likely: 'Likely: from a community source or the on-chain pattern, not confirmed by the owner.',
+      conf_unverified: 'Unverified: a lead only. Shown, but still counted as a normal holder.',
+      conf_legend: '? likely tag (community source or on-chain pattern) · ?? unverified lead, still counted.',
       notes_h: 'How to read this',
       notes: [
         'Live daily snapshots from the API start on 5 Oct 2026. Earlier history, back to the first mined block on 30 Jan 2024, was reconstructed by replaying every block of the Pepecoin blockchain on a full node: daily snapshots for the first week (30 Jan – 4 Feb 2024), weekly from 5 Feb 2024 until September 2025, daily ones after that, and a daily trend series for the whole period. It is drawn dashed or hollow. Checks against archived explorer rich lists and the live API are in VALIDATION.md in the repository.',
@@ -234,6 +237,9 @@
       page_of: 'Strona {a} z {b}',
       prev: 'Wstecz', next: 'Dalej',
       no_match: 'Żaden adres nie pasuje do wyszukiwania.',
+      conf_likely: 'Prawdopodobne: ze źródła w community albo ze wzorca na łańcuchu, nie potwierdzone przez właściciela.',
+      conf_unverified: 'Niezweryfikowane: tylko trop. Widoczne, ale adres liczy się jak zwykły posiadacz.',
+      conf_legend: '? prawdopodobny tag (źródło z community albo wzorzec na łańcuchu) · ?? niezweryfikowany trop, nadal liczony.',
       notes_h: 'Jak to czytać',
       notes: [
         'Dzienne snapshoty z API zaczynają się 5 paź 2026. Wcześniejsza historia, od pierwszego wykopanego bloku 30 sty 2024, została odtworzona przez przeliczenie każdego bloku blockchainu Pepecoina na pełnym węźle: snapshoty dzienne w pierwszym tygodniu (30 sty – 4 lut 2024), tygodniowe od 5 lut 2024 do września 2025, potem dzienne, oraz dzienna seria trendu za cały okres. Jest rysowana linią przerywaną lub pustymi punktami. Porównanie z archiwalnymi rich listami eksplorerów i z API na żywo jest w pliku VALIDATION.md w repozytorium.',
@@ -858,10 +864,19 @@
       if (rank == null) continue;
       const tag = r[4] || (r[5] ? (STR[state.lang] || STR.en).types[r[5]] || r[5] : '');
       if (q && !(r[1].toLowerCase().includes(q) || tag.toLowerCase().includes(q))) continue;
-      out.push({ rank, addr: r[1], pep: r[2], pct: ex ? r[8] : r[3], tag, type: r[5], last: r[6] });
+      out.push({ rank, addr: r[1], pep: r[2], pct: ex ? r[8] : r[3], tag, type: r[5], last: r[6], conf: r[9] });
     }
     out.sort((a, b) => a.rank - b.rank);
     return out;
+  }
+
+  // Tags with conf "likely" get "?", "unverified" get "??" and a dashed outline; the tooltip says why.
+  function tagChip(r) {
+    const mark = r.conf === 'likely' ? ' ?' : r.conf === 'unverified' ? ' ??' : '';
+    return h('span', {
+      class: 'tag' + (r.conf ? ' tag-' + r.conf : ''), style: 'margin-left:0',
+      title: r.conf ? t('conf_' + r.conf) : null
+    }, r.tag + mark);
   }
 
   function holdersSection() {
@@ -877,7 +892,7 @@
       tbody.replaceChildren(...slice.map((r) => h('tr', {},
         h('td', {}, fmtInt(r.rank)),
         h('td', {}, h('a', { class: 'mono', href: EXPLORER + r.addr, target: '_blank', rel: 'noopener' }, r.addr)),
-        h('td', {}, r.tag ? h('span', { class: 'tag', style: 'margin-left:0' }, r.tag) : ''),
+        h('td', {}, r.tag ? tagChip(r) : ''),
         h('td', {}, fmtInt(r.pep)),
         h('td', {}, fmtPct(r.pct, 3)),
         h('td', {}, fmtEpoch(r.last)))));
@@ -899,7 +914,8 @@
         h('div', { class: 'scroll', style: 'margin-top:8px' }, h('table', { class: 'holders' },
           h('thead', {}, h('tr', {}, h('th', {}, '#'), h('th', {}, t('col_addr')), h('th', {}, t('col_tag')), h('th', {}, t('col_bal')), h('th', {}, t('col_pct')), h('th', {}, t('col_last')))),
           tbody)),
-        note));
+        note,
+        h('p', { class: 'small muted', style: 'margin:8px 0 0' }, t('conf_legend'))));
   }
 
   /* -------------------------------------------------------------------- notes */

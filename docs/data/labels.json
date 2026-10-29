@@ -1,5 +1,5 @@
 {
-  "_readme": "Address tags. type is one of: exchange, pool, burn, project, other. Types exchange, pool and burn are hidden in the 'without exchanges and pools' view. Add a line, commit, and the next daily run picks it up (history is re-tagged too).",
+  "_readme": "Address tags. type is one of: exchange, pool, burn, project, other. Types exchange, pool and burn are hidden in the 'without exchanges and pools' view. Optional conf: likely (from a community source or on-chain pattern, still counted as exchange/pool) or unverified (shown only; use type other so it is not excluded). Optional src: where the tag comes from. Add a line, commit, and the next daily run picks it up (history is re-tagged too).",
   "PeU3PGXMGcFcteA4NjDcQsTiKQBdn7if84": { "name": "CoinEx", "type": "exchange" },
   "PnBFXec7tVQvndqktsVnkfJGwy63GFnwoo": { "name": "litecoinpool.org", "type": "pool" },
   "PqXDo4G31C2mysViyRHLmHtTaVdpKHxDBm": { "name": "XeggeX", "type": "exchange" },
@@ -15,5 +15,12 @@
   "PgRLcaCTEkXSguu6ZgzkuncHdCxADmPBXP": { "name": "Mining-Dutch", "type": "pool" },
   "Pd4Ee73nvvymgiGKMouC1GYZpQCrgMmCjd": { "name": "ViaBTC", "type": "pool" },
   "PjdviQbYuVu4RgX5N3SVebpcTHyuaZq8uj": { "name": "AntPool", "type": "pool" },
-  "PbwHwFpGaDYRejHKRqvsrmyKH1QWyMEzPD": { "name": "KuPool", "type": "pool" }
+  "PbwHwFpGaDYRejHKRqvsrmyKH1QWyMEzPD": { "name": "KuPool", "type": "pool" },
+  "PnGBaeDAm3EraCdNnNvcTawaJY7EHunbbB": { "name": "Kraken", "type": "exchange", "conf": "likely", "src": "community member who transacted with it (2026-10); hot-wallet pattern, first tx 2025-12-08" },
+  "PryjXWHPDRQChb3sDZwUby3cTtNatfR1tE": { "name": "Kraken", "type": "exchange", "conf": "likely", "src": "community member who transacted with it (2026-10); hot-wallet pattern, but first tx 2025-02-13, a year before the Kraken listing" },
+  "PqQWP6GTPe7C8KViuHc7Rb9nQaeuN1jcfq": { "name": "Kraken", "type": "exchange", "conf": "likely", "src": "community member who transacted with it (2026-10); funds came from CoinEx and were swept to PrPH..., like a deposit address" },
+  "PsHArZKD6oodN47QW5oqaTXTw27jEdDyiW": { "name": "Mining pool", "type": "pool", "conf": "likely", "src": "on-chain: block rewards to this address about every 3 minutes (~1/4 of blocks), pays out; pool name unknown" },
+  "PmAKzVn2hqR6a2whuzkD7jLV4Q5ALSctSK": { "name": "Mining", "type": "other", "conf": "likely", "src": "on-chain: receives block rewards directly; may be a small pool or a solo miner, so it stays counted" },
+  "PrPHseqo1RCHQnHreVvZc4JB1d6w6qeZto": { "name": "Kraken", "type": "other", "conf": "unverified", "src": "first tx 2026-02-10 (Kraken listing 2026-02-11); receives from the Kraken addresses above; could be Kraken cold storage or a big buyer" },
+  "PZyEypUeE54QS227Jk8p8qjCH4SHhULHKA": { "name": "Kraken", "type": "other", "conf": "unverified", "src": "first tx 2026-02-10; moves coins back and forth with PnGB...; could be Kraken or a trader" }
 }

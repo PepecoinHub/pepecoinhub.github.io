@@ -317,6 +317,7 @@ def build(data_dir, out_path, csv_path):
             round(bal / latest["supply"] * 100, 5),
             name, typ, last or None,
             r_ex, None if r_ex is None else round(bal / ex_denom * 100, 5),
+            (labels.get(addr) or {}).get("conf"),
         ])
 
     meta = latest["meta"]
