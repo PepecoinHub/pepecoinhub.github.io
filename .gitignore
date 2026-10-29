@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 *.tmp
 docs/data/price-live.json
+docs/data/market-live.json

@@ -119,6 +119,12 @@ jobs:
         continue-on-error: true
         run: python3 scripts/fetch_prices.py
 
+      # BTC, LTC, DOGE and PEP plus the market backdrop for the market page, published but not committed
+      - name: Fetch market
+        timeout-minutes: 6
+        continue-on-error: true
+        run: python3 scripts/fetch_market.py
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs
