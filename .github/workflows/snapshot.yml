@@ -20,9 +20,13 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate:
+    uses: ./.github/workflows/checks.yml
+
   # Job 1: collect the data. Does not need GitHub Pages, so history starts
   # piling up even before Pages is switched on.
   snapshot:
+    needs: validate
     if: github.ref == 'refs/heads/main'   # a manual run from another branch must not commit to it or publish it
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -95,8 +99,8 @@ jobs:
   # Job 2: publish the site. Fails with "HttpError: Not Found" in configure-pages
   # until Settings -> Pages -> Source is set to "GitHub Actions".
   deploy:
-    needs: snapshot
-    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}   # still publish (old data) if the snapshot failed
+    needs: [snapshot, validate]
+    if: ${{ !cancelled() && needs.validate.result == 'success' && github.ref == 'refs/heads/main' }}   # still publish (old data) if the snapshot failed
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:

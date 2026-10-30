@@ -157,7 +157,7 @@ section.block { padding-block: 60px; }
 .pagehead .meme { width: 100%; }
 figure.meme { margin: 0; padding: 10px; background: var(--gold-wash); transform: rotate(2.5deg); }
 figure.meme.l { transform: rotate(-2.5deg); }
-figure.meme img { display: block; width: 100%; border: 3px solid var(--line); border-radius: 10px; background: #fff; }
+figure.meme img { display: block; width: 100%; height: auto; border: 3px solid var(--line); border-radius: 10px; background: #fff; }
 figure.meme figcaption { font: 400 1.15rem/1.15 var(--f-hand); text-align: center; margin-top: 8px; }
 figure.meme.blue { background: var(--shirt-wash); } figure.meme.green { background: var(--frog-wash); } figure.meme.red { background: var(--lips-wash); }
 
@@ -167,7 +167,7 @@ figure.meme.blue { background: var(--shirt-wash); } figure.meme.green { backgrou
 .strip { width: 100%; display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); gap: 16px; align-items: start; }
 .strip > figure { margin: 0; min-width: 0; }
 .comic { position: relative; padding: 16px; display: grid; gap: 12px; background: var(--shirt-wash); }
-.comic img { display: block; width: 100%; border: 3px solid var(--line); border-radius: 10px; background: #fff; }
+.comic img { display: block; width: 100%; height: auto; border: 3px solid var(--line); border-radius: 10px; background: #fff; }
 .strip .p1 { transform: rotate(-2deg); padding: 10px; background: var(--gold-wash); }
 .strip .p2 { transform: rotate(1.5deg); margin-top: 40px; }
 .bubble {
@@ -348,6 +348,22 @@ footer.foot a { color: #edf3e3; }
 .rulepics figure { margin: 0; }
 
 /* ---------- responsive ---------- */
+/* Small captioned frames, matching the original meme edition. */
+.pond-notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; }
+.pond-note { display: grid; grid-template-columns: minmax(0, 1fr) 140px; gap: 22px; align-items: center; }
+.pond-note > div { display: grid; gap: 12px; min-width: 0; }
+.pond-note .meme { width: 100%; }
+.pond-break { display: grid; grid-template-columns: 130px minmax(0, 540px); gap: 30px; align-items: center; justify-content: center; padding-block: 32px 60px; }
+.pond-break > div { display: grid; gap: 14px; }
+.pond-break .btn { justify-self: start; }
+@media (max-width: 860px) {
+  .pond-notes { grid-template-columns: 1fr; gap: 30px; }
+}
+@media (max-width: 560px) {
+  .pond-note { grid-template-columns: minmax(0, 1fr) 100px; gap: 18px; }
+  .pond-break { grid-template-columns: 96px minmax(0, 1fr); gap: 20px; }
+}
+
 @media (max-width: 1060px) {
   .nav-btn, .nav > a { padding: 9px 9px; font-size: 0.9rem; }
   .receipts { grid-template-columns: repeat(2, minmax(0, 1fr)); }

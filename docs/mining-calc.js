@@ -20,8 +20,10 @@
   function calc() {
     var mine = num('mc-hash') * parseFloat($('mc-hash-u').value);
     var net = num('mc-net') * parseFloat($('mc-net-u').value);
-    var fee = num('mc-fee'); if (!(fee >= 0 && fee < 100)) fee = 0;
-    var ok = mine > 0 && net > 0 && mine < net;
+    var fee = num('mc-fee');
+    var feeOK = fee >= 0 && fee < 100;
+    $('mc-fee').setAttribute('aria-invalid', String(!feeOK));
+    var ok = mine > 0 && net > 0 && mine < net && feeOK;
     var day = ok ? mine / net * bpd * REWARD * (1 - fee / 100) : NaN;
     [['mc-day', 1], ['mc-week', 7], ['mc-month', 30]].forEach(function (r) {
       var v = day * r[1];
