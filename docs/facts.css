@@ -1244,6 +1244,7 @@ body.pk-page { padding: 0; }
 .pk-points li:first-child { border-top: 0; }
 .pk-points li::before { content: counter(pk, decimal-leading-zero); position: absolute; left: 0; top: 15px; font: 700 0.82rem var(--f-mono); color: var(--accent-mid); }
 .pk-points b { color: var(--ink); }
+.pk-points .pk-src { margin-top: 4px; }
 .pk-naming { margin: 14px 0 0; padding: 10px 14px; border-left: 3px solid var(--gold); background: var(--gold-soft); border-radius: 0 10px 10px 0; font-size: 0.95rem; color: var(--ink); }
 :root[data-theme="dark"] .pk-naming { background: color-mix(in srgb, var(--gold) 14%, transparent); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pk-naming { background: color-mix(in srgb, var(--gold) 14%, transparent); } }
