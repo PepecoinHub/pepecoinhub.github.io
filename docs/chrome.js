@@ -624,7 +624,7 @@
       // where the figures come from, and the day of the snapshot behind the hashrate and rich list numbers
       if (ul.children.length) {
         var day = d.snapshot ? new Date(d.snapshot + 'T00:00:00Z').toLocaleDateString(loc, { month: 'short', day: 'numeric', timeZone: 'UTC' }) : '';
-        ul.appendChild(item('press.html#data', n.src, 'CoinGecko · PepeBlocks', null, day ? n.snap + ' ' + day : ''));
+        ul.appendChild(item('press.html#today', n.src, 'CoinGecko · PepeBlocks', null, day ? n.snap + ' ' + day : ''));
       }
       return ul;
     }
