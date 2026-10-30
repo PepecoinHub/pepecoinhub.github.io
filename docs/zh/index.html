@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261030b">
+<link rel="stylesheet" href="../facts.css?v=20261030p">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Pepecoin Hub", "url": "https://pepecoinhub.com/zh/", "description": "Pepecoin（PEP）社区事实资料页。", "inLanguage": "zh-Hans"}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -57,15 +57,20 @@
     <div class="home-hero-glow" aria-hidden="true"></div>
     <img class="home-hero-frog" src="../assets/brand/pepe-coin.png" alt="Pepecoin 标志" width="280" height="280">
   </div>
+  <aside class="pep-glance" aria-labelledby="glance-h">
+    <h2 id="glance-h">PEP 速览</h2>
+    <dl><div><dt>代码</dt><dd>PEP</dd></div><div><dt>区块链</dt><dd>独立链，Dogecoin Core 的分叉</dd></div><div><dt>挖矿</dt><dd>Scrypt 工作量证明，与 LTC、DOGE 合并挖矿</dd></div><div><dt>启动</dt><dd>2024 年 1 月 30 日</dd></div><div><dt>供应量</dt><dd><span data-v="home-supply">1051.58亿</span> PEP，每个区块 +10,000，无上限</dd></div></dl>
+    <p class="pep-glance-src">来源: <a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA whitepaper</a> (D.8, H.4, G.13), <a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp</a> · <a href="press.html">媒体资料&nbsp;→</a></p>
+  </aside>
 </header>
 
 <section class="pep-id hpanel" id="panel-pep" aria-labelledby="pep-id-h">
-  <h2 id="pep-id-h">PEP 不是 PEPE</h2>
-  <p class="note">Pepecoin（PEP）运行在自己的区块链上，与 Litecoin 和 Dogecoin 合并挖矿。它与 Pepe（PEPE）和 PepeCoin（PEPECOIN）都不是一回事：Pepe 是 2023年推出的 Ethereum（以太坊）代币；PepeCoin 是 2016年的项目，2023年迁移到了 Ethereum。</p>
+  <h2 id="pep-id-h">在找“Pepe coin”？</h2>
+  <p class="note">三种不同的资产名字几乎一样。本站介绍的 Pepecoin (PEP) 运行在自己的区块链上；另外两个是 Ethereum 上的代币。购买前请核对代码和地址。</p>
   <ul class="pep-id-list">
-    <li class="is-pep"><b>PEP</b><span>Pepecoin</span><span>独立的工作量证明区块链</span></li>
-    <li><b>PEPE</b><span>Pepe</span><span>Ethereum 上的 ERC-20 代币</span></li>
-    <li><b>PEPECOIN</b><span>PepeCoin</span><span>Ethereum 上的 ERC-20 代币</span></li>
+    <li class="is-pep"><a href="which-pepecoin.html"><b>PEP</b><span>Pepecoin</span><span>独立的工作量证明区块链，始于 2024 年</span><span class="pep-id-addr">地址以 P 开头</span></a></li>
+    <li><a href="which-pepecoin.html"><b>PEPE</b><span>Pepe</span><span>Ethereum 上的 ERC-20 代币，始于 2023 年</span><span class="pep-id-addr">地址以 0x 开头</span></a></li>
+    <li><a href="which-pepecoin.html"><b>PEPECOIN</b><span>PepeCoin</span><span>2016 年的项目，2023 年起为 Ethereum 代币</span><span class="pep-id-addr">地址以 0x 开头</span></a></li>
   </ul>
   <p class="pep-id-more"><a href="which-pepecoin.html">如何区分它们&nbsp;→</a></p>
 </section>
@@ -99,7 +104,7 @@
 <section class="home-stats" aria-label="核心数据">
   <div class="stats">
     <div class="stat is-live"><span class="label">价格</span><span class="value" data-v="home-price">$0.0000858</span><span class="sub">24h: <span data-v="home-change">+4.3%</span></span><span class="src">来源：<a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko</a> · <a href="price.html">走势图</a></span></div>
-    <div class="stat"><span class="label">市值</span><span class="value" data-v="home-mcap">$881万</span><span class="sub">涨 100 倍时：<span data-v="home-x100">$8.81亿</span><span class="x100-rank">在加密货币中排第 <span data-v="home-x100-rank">78</span> 名</span></span><span class="src">只是算术，不是预测。<a href="price.html#x100">算算 ×N</a></span></div>
+    <div class="stat"><span class="label">市值</span><span class="value" data-v="home-mcap">$881万</span><span class="sub">涨 100 倍时：<span data-v="home-x100">$8.81亿</span><span class="x100-rank">在加密货币中排第 <span data-v="home-x100-rank">78</span> 名</span></span><span class="src">价格 × 供应量。 只是算术，不是预测。<a href="price.html#x100">算算 ×N</a></span></div>
     <div class="stat"><span class="label">全网算力</span><span class="value" data-v="home-hash">1.9 PH/s</span><span class="sub">Scrypt，每个区块 10,000 PEP</span><span class="src">来源：<a href="https://pepeblocks.com/">PepeBlocks</a>，<span data-v="home-hash-date">2026年10月30日</span></span></div>
     <div class="stat"><span class="label">初始分配</span><span class="value">0%</span><span class="sub">无预挖（premine）、无 ICO</span><span class="src">来源：<a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA whitepaper</a>（D.9、G.5）</span></div>
   </div>
@@ -250,7 +255,7 @@
   <p class="foot-langs">语言：<a href="/" hreflang="en" lang="en">English</a>&nbsp;· <a href="/pl/" hreflang="pl" lang="pl">Polski</a>&nbsp;· <a href="/es/" hreflang="es" lang="es">Español</a>&nbsp;· <a href="/de/" hreflang="de" lang="de">Deutsch</a>&nbsp;· <a href="/fr/" hreflang="fr" lang="fr">Français</a>&nbsp;· <a href="/tr/" hreflang="tr" lang="tr">Türkçe</a>&nbsp;· <a href="/it/" hreflang="it" lang="it">Italiano</a></p>
 </footer>
 <script src="../prices.js?v=20261030fix1" defer></script>
-<script src="../home.js?v=20261030fix1" defer></script>
-<script src="../chrome.js?v=20261030fix1" defer></script>
+<script src="../home.js?v=20261030p" defer></script>
+<script src="../chrome.js?v=20261030p" defer></script>
 </body>
 </html>

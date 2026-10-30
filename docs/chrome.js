@@ -41,21 +41,21 @@
   var STRIP_ID = '2026-10-21b';
   var STRIP_T = {
     en: { label: 'PEP today', price: 'PEP price', d24: '24h', hash: 'Hashrate', yday: 'vs yesterday', tops: 'Top 10 / 50 / 400 addresses hold', supply: 'of supply',
-      fresh: 'New addresses in the top 2000', since: 'since yesterday', pause: 'Pause', play: 'Play', hide: 'Hide this strip' },
+      fresh: 'New addresses in the top 2000', since: 'since yesterday', pause: 'Pause', play: 'Play', hide: 'Hide this strip', src: 'Sources', snap: 'snapshot' },
     pl: { label: 'PEP dziś', price: 'Cena PEP', d24: '24h', hash: 'Hashrate', yday: 'od wczoraj', tops: 'Top 10 / 50 / 400 adresów trzyma', supply: 'podaży',
-      fresh: 'Nowe adresy w top 2000', since: 'od wczoraj', pause: 'Zatrzymaj', play: 'Wznów', hide: 'Ukryj pasek' },
+      fresh: 'Nowe adresy w top 2000', since: 'od wczoraj', pause: 'Zatrzymaj', play: 'Wznów', hide: 'Ukryj pasek', src: 'Źródła', snap: 'snapshot' },
     es: { label: 'PEP hoy', price: 'Precio de PEP', d24: '24h', hash: 'Hashrate', yday: 'vs. ayer', tops: 'Las 10 / 50 / 400 mayores direcciones tienen', supply: 'del suministro',
-      fresh: 'Direcciones nuevas en el top 2000', since: 'desde ayer', pause: 'Pausar', play: 'Reanudar', hide: 'Ocultar esta barra' },
+      fresh: 'Direcciones nuevas en el top 2000', since: 'desde ayer', pause: 'Pausar', play: 'Reanudar', hide: 'Ocultar esta barra', src: 'Fuentes', snap: 'instantánea' },
     de: { label: 'PEP heute', price: 'PEP-Kurs', d24: '24h', hash: 'Hashrate', yday: 'ggü. gestern', tops: 'Top 10 / 50 / 400 Adressen halten', supply: 'der Coinmenge',
-      fresh: 'Neue Adressen in den Top 2000', since: 'seit gestern', pause: 'Anhalten', play: 'Fortsetzen', hide: 'Leiste ausblenden' },
+      fresh: 'Neue Adressen in den Top 2000', since: 'seit gestern', pause: 'Anhalten', play: 'Fortsetzen', hide: 'Leiste ausblenden', src: 'Quellen', snap: 'Snapshot' },
     fr: { label: 'PEP aujourd’hui', price: 'Prix du PEP', d24: '24 h', hash: 'Hashrate', yday: 'vs hier', tops: 'Les 10 / 50 / 400 plus grosses adresses détiennent', supply: 'de l’offre',
-      fresh: 'Nouvelles adresses dans le top 2000', since: 'depuis hier', pause: 'Pause', play: 'Lecture', hide: 'Masquer ce bandeau' },
+      fresh: 'Nouvelles adresses dans le top 2000', since: 'depuis hier', pause: 'Pause', play: 'Lecture', hide: 'Masquer ce bandeau', src: 'Sources', snap: 'instantané' },
     tr: { label: 'Bugün PEP', price: 'PEP fiyatı', d24: '24s', hash: 'Hashrate', yday: 'düne göre', tops: 'İlk 10 / 50 / 400 adresin arzdaki payı', supply: '',
-      fresh: 'İlk 2000’e giren yeni adresler', since: 'dünden beri', pause: 'Durdur', play: 'Oynat', hide: 'Şeridi gizle' },
+      fresh: 'İlk 2000’e giren yeni adresler', since: 'dünden beri', pause: 'Durdur', play: 'Oynat', hide: 'Şeridi gizle', src: 'Kaynaklar', snap: 'anlık görüntü' },
     it: { label: 'PEP oggi', price: 'Prezzo di PEP', d24: '24h', hash: 'Hashrate', yday: 'rispetto a ieri', tops: 'I primi 10 / 50 / 400 indirizzi detengono', supply: 'dell’offerta',
-      fresh: 'Nuovi indirizzi nella top 2000', since: 'da ieri', pause: 'Pausa', play: 'Riprendi', hide: 'Nascondi questa barra' },
+      fresh: 'Nuovi indirizzi nella top 2000', since: 'da ieri', pause: 'Pausa', play: 'Riprendi', hide: 'Nascondi questa barra', src: 'Fonti', snap: 'snapshot' },
     zh: { label: 'PEP 今日', price: 'PEP 价格', d24: '24 小时', hash: '算力', yday: '较昨日', tops: '前 10 / 50 / 400 个地址持有', supply: '的供应',
-      fresh: '新进前 2000 的地址', since: '较昨日', pause: '暂停', play: '继续', hide: '隐藏' }
+      fresh: '新进前 2000 的地址', since: '较昨日', pause: '暂停', play: '继续', hide: '隐藏', src: '数据来源', snap: '快照' }
   };
   // the site root (where chrome.js lives), for links and data from any folder
   var ROOT = (function () {
@@ -208,6 +208,7 @@
     pillBar();
     dataStrip();
     supportCopy();
+    pageCopy();
   }
 
   // Day / night: one emoji button. It shows the moon by day and the sun at night; the choice is remembered.
@@ -312,6 +313,9 @@
       ['links', { en: ['Links', 'Official and community sites'], pl: ['Linki', 'Oficjalne i od społeczności'], es: ['Enlaces', 'Oficiales y de la comunidad'],
         de: ['Links', 'Offizielle und Community-Seiten'], fr: ['Liens', 'Officiels et communautaires'], tr: ['Bağlantılar', 'Resmî ve topluluk siteleri'],
         it: ['Link', 'Ufficiali e della community'], zh: ['链接', '官方与社区网站'] }],
+      ['press', { en: ['For media', 'Facts, sources, logo'], pl: ['Dla mediów', 'Fakty, źródła, logo'], es: ['Para medios', 'Datos, fuentes, logo'],
+        de: ['Für Medien', 'Fakten, Quellen, Logo'], fr: ['Pour les médias', 'Faits, sources, logo'], tr: ['Basın için', 'Bilgiler, kaynaklar, logo'],
+        it: ['Per i media', 'Fatti, fonti, logo'], zh: ['媒体资料', '事实、来源、标志'] }],
       ['meme/', { en: ['Meme edition', 'Same facts, with memes'], pl: ['Wersja meme', 'Te same fakty z memami (EN)'], es: ['Versión meme', 'Los mismos datos con memes (EN)'],
         de: ['Meme-Version', 'Dieselben Fakten mit Memes (EN)'], fr: ['Version meme', 'Les mêmes faits avec des memes (EN)'], tr: ['Meme sürümü', 'Aynı bilgiler, memelerle (EN)'],
         it: ['Versione meme', 'Gli stessi fatti con i meme (EN)'], zh: ['表情包版', '同样的事实，配上表情包（英文）'] }]
@@ -617,6 +621,11 @@
       if (d.hashrate && d.hashrate.hs > 0) ul.appendChild(item('mining.html', n.hash, hashrate(d.hashrate.hs), d.hashrate.change_24h, d.hashrate.change_24h != null ? n.yday : ''));
       if (d.tops && d.tops[10] != null) ul.appendChild(item('rich-list.html', n.tops, [10, 50, 400].map(function (k) { return pct(d.tops[k]); }).join(' / '), null, n.supply));
       if (d.new_top2000 != null) ul.appendChild(item('rich-list.html', n.fresh, d.new_top2000.toLocaleString(loc), null, n.since));
+      // where the figures come from, and the day of the snapshot behind the hashrate and rich list numbers
+      if (ul.children.length) {
+        var day = d.snapshot ? new Date(d.snapshot + 'T00:00:00Z').toLocaleDateString(loc, { month: 'short', day: 'numeric', timeZone: 'UTC' }) : '';
+        ul.appendChild(item('press.html#data', n.src, 'CoinGecko · PepeBlocks', null, day ? n.snap + ' ' + day : ''));
+      }
       return ul;
     }
     fetch(ROOT + 'data/ticker.json').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
@@ -651,6 +660,20 @@
       try { localStorage.setItem('phw-strip-off', STRIP_ID); } catch (e) {}
     });
     bar.appendChild(x);
+  }
+
+  // Copy buttons in the page (data-copy="id of the text to copy"), e.g. the descriptions on the media page.
+  function pageCopy() {
+    document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+      var el = document.getElementById(btn.getAttribute('data-copy'));
+      if (!el) return;
+      btn.addEventListener('click', function () {
+        var done = function () { btn.textContent = t.copied; setTimeout(function () { btn.textContent = t.copy; }, 1600); };
+        var pick = function () { var r = document.createRange(); r.selectNodeContents(el); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(el.textContent.trim()).then(done, pick);
+        else pick();
+      });
+    });
   }
 
   // Copy buttons for the donation addresses in the footer.
