@@ -1197,6 +1197,7 @@ body.pk-page { padding: 0; }
 .pk-bar-in { max-width: 860px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .pk-brand { display: flex; align-items: center; }
 .pk-brand .lockup { height: 32px; width: auto; }
+.pk-brand .hub { font-size: 1rem; padding: 4px 8px 5px; }
 .pk-brand .on-dark { display: none; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .pk-brand .on-light { display: none; }
@@ -1218,6 +1219,7 @@ body.pk-page { padding: 0; }
 @media (max-width: 520px) {
   .pk-bar-in { padding: 8px 14px; }
   .pk-brand .lockup { height: 26px; }
+  .pk-brand .hub { font-size: 0.85rem; padding: 2px 6px 3px; }
   .pk-back { width: 36px; padding: 0; justify-content: center; }
   .pk-back span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 }
