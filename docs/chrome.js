@@ -608,13 +608,20 @@
     }
     function build(d) {
       var ul = document.createElement('ul'); ul.className = 'news-list';
-      if (d.price && d.price.usd > 0) ul.appendChild(item('price.html', n.price, usd(d.price.usd), d.price.change_24h, n.d24));
+      if (d.price && d.price.usd > 0) {
+        var priceItem = item('price.html', n.price, usd(d.price.usd), d.price.change_24h, n.d24);
+        var stamp = document.createElement('small');
+        stamp.textContent = ' · ' + window.PepPrices.describe(d.price, loc);
+        priceItem.appendChild(stamp); ul.appendChild(priceItem);
+      }
       if (d.hashrate && d.hashrate.hs > 0) ul.appendChild(item('mining.html', n.hash, hashrate(d.hashrate.hs), d.hashrate.change_24h, d.hashrate.change_24h != null ? n.yday : ''));
       if (d.tops && d.tops[10] != null) ul.appendChild(item('rich-list.html', n.tops, [10, 50, 400].map(function (k) { return pct(d.tops[k]); }).join(' / '), null, n.supply));
       if (d.new_top2000 != null) ul.appendChild(item('rich-list.html', n.fresh, d.new_top2000.toLocaleString(loc), null, n.since));
       return ul;
     }
     fetch(ROOT + 'data/ticker.json').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
+      return window.PepPrices.quote().then(function (q) { d.price = q; return d; }, function () { d.price = null; return d; });
+    }).then(function (d) {
       var ul = build(d || {});
       if (!ul.children.length) throw new Error('no figures');
       track.appendChild(ul);

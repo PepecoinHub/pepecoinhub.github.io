@@ -237,8 +237,9 @@
   }
   // The slider runs on a log scale: 0 → ×1, 100 → ×10, 200 → ×100, 300 → ×1000, 400 → ×10,000.
   function setMult(m, fromSlider) {
-    state.mult = Math.max(1, Math.min(10000, m));
-    if (!fromSlider) $('x-range').value = String(Math.round(Math.log10(state.mult) * 100));
+    state.mult = m;
+    // The slider has a fixed range; typed target prices may go beyond it.
+    if (!fromSlider) $('x-range').value = String(Math.max(0, Math.min(400, Math.round(Math.log10(state.mult) * 100))));
     document.querySelectorAll('[data-mult]').forEach(function (b) { b.setAttribute('aria-pressed', String(Number(b.dataset.mult) === state.mult)); });
     renderLadder();
     // the section title follows the slider: "Pepecoin ×200 vs Pepe ×200"
@@ -256,10 +257,10 @@
       b.addEventListener('click', function () { setMult(Number(b.dataset.mult)); $('x-target').value = ''; $('x-target-hint').textContent = ''; });
     });
     $('x-target').addEventListener('input', function (ev) {
-      var v = parseFloat(String(ev.target.value).replace(/[$\s]/g, '').replace(',', '.'));
+      var v = Number(String(ev.target.value).replace(/[$\s]/g, '').replace(',', '.'));
       var hint = $('x-target-hint');
       if (!ev.target.value) { hint.textContent = ''; return; }
-      if (!(v > 0)) { hint.textContent = t.priceBad; return; }
+      if (!(v > 0) || !isFinite(v) || !isFinite(v / state.pep.price) || !isFinite(v * state.pep.supply)) { hint.textContent = t.priceBad; return; }
       var m = v / state.pep.price;
       hint.textContent = fill(t.priceHint, { m: times(m), v: usd(v * (state.pep.mcap / state.pep.price)) });
       setMult(m);
@@ -375,13 +376,7 @@
   function cacheSet(key, data) { try { localStorage.setItem(key, JSON.stringify({ t: Date.now(), d: data })); } catch (e) { /* storage unavailable */ } }
   // data/price-live.json: the same CoinGecko data, fetched by the site's robot every hour (scripts/fetch_prices.py).
   // Read it first, so a visitor normally sends no request to CoinGecko at all.
-  var FILE_MAX_AGE = 3 * 60 * 60 * 1000;
-  var BASE = (function () { var s = document.currentScript && document.currentScript.src; try { return new URL('.', s || location.href).href; } catch (e) { return ''; } })();
-  var fileP = fetch(BASE + 'data/price-live.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (f) {
-    if (!f || !f.generated_at) return null;
-    f.t = Date.parse(f.generated_at);
-    return Date.now() - f.t < FILE_MAX_AGE ? f : null;
-  }).catch(function () { return null; });
+  var fileP = window.PepPrices.file;
   function getJSON(url) { return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); }
   // CoinGecko's free API allows only a few requests a minute, so one download serves several ranges:
   // 7 days is cut from the 30-day series (hourly points), 90 days from the 1-year series (daily points).
@@ -441,7 +436,6 @@
   }
 
   // Proof-of-work memecoins, biggest first. Rows start from the saved figures in the HTML (data-cap).
-  var POW = ['dogecoin', 'monacoin', 'bellscoin', 'dingocoin', 'luckycoin', 'junkcoin'];
   function renderPow(by) {
     var list = $('pow-list');
     if (!list) return;
@@ -465,22 +459,8 @@
   }
 
   function loadMarkets() {
-    var key = 'pf-price-markets-v3', hit = cacheGet(key);
-    var p = fileP.then(function (f) {
-      if (f && f.markets && f.markets.length) { hit = { t: f.t }; return f.markets; }
-      return hit ? hit.d : fromApi();
-    });
-    function fromApi() { return Promise.all([
-      getJSON(API + 'coins/markets?vs_currency=usd&ids=' + [PEP].concat(POW).join(',')),
-      getJSON(API + 'coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1')
-    ]).then(function (r) {
-      var d = r[0].concat(r[1].map(function (c) { c.top = true; return c; })).map(function (c) {
-        return { top: !!c.top, id: c.id, current_price: c.current_price, market_cap: c.market_cap, total_supply: c.total_supply, circulating_supply: c.circulating_supply,
-          price_change_percentage_24h: c.price_change_percentage_24h, ath: c.ath, ath_date: c.ath_date };
-      });
-      cacheSet(key, d);
-      return d;
-    }); }
+    var hit;
+    var p = window.PepPrices.markets().then(function (result) { hit = result; return result.d; });
     p.then(function (list) {
       var by = {};
       list.forEach(function (c) { by[c.id] = c; });
@@ -496,8 +476,17 @@
       var top = list.filter(function (c) { return c.top; }).filter(function (c) { return num(c.market_cap); }).map(function (c) { return { id: c.id, cap: c.market_cap }; });
       state.top = top.length > 100 ? top : null;
       renderStats(); renderLadder(); renderPow(by);
+      if ($('x-target').value) $('x-target').dispatchEvent(new Event('input'));
       $('status').textContent = fill(t.live, { t: new Date(hit ? hit.t : Date.now()).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) });
-    }).catch(function () { $('status').textContent = t.saved; });
+    }).catch(function () {
+      return window.PepPrices.quote().then(function (q) {
+        state.pep.price = q.usd; state.pep.change = q.change_24h;
+        if (q.supply > 0) { state.pep.supply = q.supply; state.pep.mcap = q.usd * q.supply; }
+        renderStats(); renderLadder(); renderPow({});
+        if ($('x-target').value) $('x-target').dispatchEvent(new Event('input'));
+        $('status').textContent = window.PepPrices.describe(q, LOC);
+      }, function () { $('status').textContent = t.saved; });
+    });
   }
 
   document.querySelectorAll('[data-days]').forEach(function (b) {
