@@ -30,7 +30,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261030p">
+<link rel="stylesheet" href="../facts.css?v=20261030q">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/pl/"}, {"@type": "ListItem", "position": 2, "name": "Statystyki sieci", "item": "https://pepecoinhub.com/pl/network.html"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Codzienne statystyki sieci Pepecoin", "description": "Codzienna wysokość bloku Pepecoin (PEP), podaż, liczba adresów z saldem i czas snapshotu, od 30 stycznia 2024; przed 5 października 2026 odtworzone z blockchainu, potem zapisywane na żywo.", "url": "https://pepecoinhub.com/pl/network.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (społeczność r/pepecoin)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}], "inLanguage": "pl", "license": "https://creativecommons.org/licenses/by/4.0/"}</script>
@@ -97,7 +97,7 @@
 
 <section aria-labelledby="addr-h">
   <h2 id="addr-h">Adresy trzymające PEP</h2>
-  <p class="note">Adresy z saldem powyżej zera, nawet z drobną kwotą poniżej 0,001 PEP. Eksplorator PepeBlocks liczy tylko adresy z co najmniej 0,001 PEP, więc jego liczba jest niższa. Jeden punkt dziennie przez pierwszy tydzień, jeden tygodniowo od 5 lutego 2024 do września 2025, potem codziennie. Najedź lub stuknij wykres, żeby odczytać datę.</p>
+  <p class="note">Adresy z saldem powyżej zera, nawet z drobną kwotą poniżej 0,001 PEP. Eksplorator PepeBlocks liczy tylko adresy z co najmniej 0,001 PEP, więc jego liczba jest niższa. Jeden punkt dziennie przez pierwszy tydzień, jeden tygodniowo od 5 lutego 2024 do 25 sierpnia 2025, a od 1 września 2025 codziennie. Najedź lub stuknij wykres, żeby odczytać datę.</p>
   <figure class="chart">
     <div class="plot" id="addr-plot" role="img" aria-label="Wykres liniowy adresów Pepecoin z saldem: od 61 w dniu 30 stycznia 2024 do ok. 296 000 w październiku 2026."></div>
     <div class="tip" id="addr-tip" hidden></div>
@@ -127,7 +127,7 @@
   <h2 id="how">Skąd biorą się liczby</h2>
   <div class="prose">
     <p><strong>Codziennie</strong> zadanie GitHub Actions pyta eksplorator PepeBlocks i API pepecoinservice.org o wysokość bloku, podaż i rich listę, a wynik zapisuje w repozytorium tej strony.</p>
-    <p><strong>Przed 5 października 2026</strong> te same liczby odtworzono, odtwarzając blockchain Pepecoin od pierwszego bloku: jeden punkt dziennie przez pierwszy tydzień (od 30 stycznia do 4 lutego 2024), jeden tygodniowo do września 2025, potem codziennie.</p>
+    <p><strong>Przed 5 października 2026</strong> te same liczby odtworzono, odtwarzając blockchain Pepecoin od pierwszego bloku: jeden punkt dziennie przez pierwszy tydzień (od 30 stycznia do 4 lutego 2024), jeden tygodniowo do 25 sierpnia 2025, a od 1 września 2025 codziennie.</p>
     <p><strong>Czas bloku</strong> to czas między dwoma snapshotami podzielony przez liczbę bloków między nimi. <strong>Adresy</strong> to te z saldem powyżej zera PEP, łącznie z drobnymi resztkami poniżej 0,001 PEP. PepeBlocks pokazuje niższą liczbę, bo liczy tylko adresy z co najmniej 0,001 PEP. Jedna osoba może mieć wiele adresów, a giełdy trzymają monety wielu osób.</p>
   </div>
 </section>
@@ -318,6 +318,6 @@
 })();
 </script>
 <script src="../prices.js?v=20261030fix1" defer></script>
-<script src="../chrome.js?v=20261030p" defer></script>
+<script src="../chrome.js?v=20261030q" defer></script>
 </body>
 </html>

@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261030p">
+<link rel="stylesheet" href="../facts.css?v=20261030q">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/fr/"}, {"@type": "ListItem", "position": 2, "name": "Statistiques du réseau", "item": "https://pepecoinhub.com/fr/network.html"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Statistiques quotidiennes du réseau Pepecoin", "description": "Hauteur de bloc quotidienne de Pepecoin (PEP), offre, nombre d’adresses avec un solde et heure de l’instantané, depuis le 30 janvier 2024 ; reconstitués à partir de la blockchain avant le 5 octobre 2026 et enregistrés en direct depuis.", "url": "https://pepecoinhub.com/fr/network.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (communauté r/pepecoin)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}], "license": "https://creativecommons.org/licenses/by/4.0/"}</script>
@@ -97,7 +97,7 @@
 </section>
 <section aria-labelledby="addr-h">
   <h2 id="addr-h">Adresses détenant des PEP</h2>
-  <p class="note">Adresses avec un solde supérieur à zéro, même infime, en dessous de 0,001 PEP. L’explorateur PepeBlocks ne compte que les adresses qui détiennent au moins 0,001 PEP, son chiffre est donc plus bas. Un point par jour la première semaine, un par semaine du 5 février 2024 jusqu’en septembre 2025, puis un par jour. Survolez ou touchez le graphique pour lire une date.</p>
+  <p class="note">Adresses avec un solde supérieur à zéro, même infime, en dessous de 0,001 PEP. L’explorateur PepeBlocks ne compte que les adresses qui détiennent au moins 0,001 PEP, son chiffre est donc plus bas. Un point par jour la première semaine, un par semaine du 5 février 2024 au 25 août 2025, puis un par jour depuis le 1er septembre 2025. Survolez ou touchez le graphique pour lire une date.</p>
   <figure class="chart">
     <div class="plot" id="addr-plot" role="img" aria-label="Graphique linéaire des adresses Pepecoin avec un solde, passant de 61 le 30 janvier 2024 à environ 296 000 en octobre 2026."></div>
     <div class="tip" id="addr-tip" hidden></div>
@@ -127,7 +127,7 @@
   <h2 id="how">D’où viennent les chiffres</h2>
   <div class="prose">
     <p><strong>Chaque jour</strong>, une tâche GitHub Actions interroge l’explorateur PepeBlocks et l’API de pepecoinservice.org pour obtenir la hauteur de bloc, l’offre et le top des adresses, puis enregistre le résultat dans le dépôt de ce site.</p>
-    <p><strong>Avant le 5 octobre 2026</strong>, les mêmes chiffres ont été reconstitués en rejouant la blockchain Pepecoin depuis son premier bloc : un point par jour la première semaine (du 30 janvier au 4 février 2024), un par semaine jusqu’en septembre 2025, puis un par jour.</p>
+    <p><strong>Avant le 5 octobre 2026</strong>, les mêmes chiffres ont été reconstitués en rejouant la blockchain Pepecoin depuis son premier bloc : un point par jour la première semaine (du 30 janvier au 4 février 2024), un par semaine jusqu’au 25 août 2025, puis un par jour à partir du 1er septembre 2025.</p>
     <p>Le <strong>temps de bloc</strong> est le temps écoulé entre deux instantanés divisé par le nombre de blocs trouvés entre les deux. Les <strong>adresses</strong> sont celles qui détiennent plus de zéro PEP, y compris les infimes restes inférieurs à 0,001 PEP. PepeBlocks affiche un chiffre plus bas, car il ne compte que les adresses détenant au moins 0,001 PEP. Une personne peut utiliser de nombreuses adresses, et les plateformes d’échange détiennent des unités pour de nombreuses personnes.</p>
   </div>
 </section>
@@ -318,6 +318,6 @@
 })();
 </script>
 <script src="../prices.js?v=20261030fix1" defer></script>
-<script src="../chrome.js?v=20261030p" defer></script>
+<script src="../chrome.js?v=20261030q" defer></script>
 </body>
 </html>

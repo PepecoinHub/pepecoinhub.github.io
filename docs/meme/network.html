@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=Gochi+Hand&display=swap">
-<link rel="stylesheet" href="meme.css?v=20261030memes2">
+<link rel="stylesheet" href="meme.css?v=20261030p">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <style>
 [hidden] { display: none !important; }
@@ -82,7 +82,7 @@
 
 <section class="block in" aria-labelledby="addr-h" style="padding-top:10px">
   <div class="head"><p class="kicker">Number go up (addresses, not price)</p><h2 id="addr-h">Addresses holding PEP</h2>
-  <p class="muted">Addresses with a balance above zero, even a tiny amount below 0.001 PEP. The PepeBlocks explorer counts only addresses holding at least 0.001 PEP, so its number is lower. One point a day for the first week, one a week from February 5, 2024 until September 2025, and one a day since. Hover or tap the chart to read a date.</p></div>
+  <p class="muted">Addresses with a balance above zero, even a tiny amount below 0.001 PEP. The PepeBlocks explorer counts only addresses holding at least 0.001 PEP, so its number is lower. One point a day for the first week, one a week from February 5, 2024 to August 25, 2025, and one a day since September 1, 2025. Hover or tap the chart to read a date.</p></div>
   <figure class="panel nchart">
     <div class="plot" id="addr-plot" role="img" aria-label="Line chart of Pepecoin addresses with a balance, rising from 61 on January 30, 2024 to about 296,000 in October 2026."></div>
     <div class="tip" id="addr-tip" hidden></div>
@@ -117,7 +117,7 @@
     <div style="display:grid;gap:12px">
       <h2 id="how">Where the numbers come from</h2>
       <p><strong>Every day</strong> a GitHub Actions job asks the PepeBlocks explorer and the pepecoinservice.org API for the block height, the supply and the rich list, and saves the result in this site’s repository.</p>
-      <p><strong>Before October 5, 2026</strong> the same figures were rebuilt by replaying the Pepecoin blockchain from its first block: one point a day for the first week (January 30 to February 4, 2024), one a week until September 2025 and one a day after that.</p>
+      <p><strong>Before October 5, 2026</strong> the same figures were rebuilt by replaying the Pepecoin blockchain from its first block: one point a day for the first week (January 30 to February 4, 2024), one a week until August 25, 2025 and one a day from September 1, 2025.</p>
       <p><strong>Block time</strong> is the time between two snapshots divided by the blocks found in between. <strong>Addresses</strong> are the ones holding more than zero PEP, including tiny leftovers below 0.001 PEP. PepeBlocks shows a lower number because it counts only addresses with at least 0.001 PEP. One person can use many addresses, and exchanges hold coins for many people.</p>
     </div>
   </div>
@@ -154,7 +154,7 @@
 </main>
 
 <footer class="foot"></footer>
-<script src="meme.js?v=20261023t"></script>
+<script src="meme.js?v=20261030p"></script>
 <script>
 (function () {
   'use strict';

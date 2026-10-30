@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261030p">
+<link rel="stylesheet" href="../facts.css?v=20261030q">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/de/"}, {"@type": "ListItem", "position": 2, "name": "Netzwerkstatistiken", "item": "https://pepecoinhub.com/de/network.html"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Tägliche Statistiken zum Pepecoin-Netzwerk", "description": "Tägliche Blockhöhe von Pepecoin (PEP), Coinmenge, Zahl der Adressen mit Guthaben und Zeitpunkt der Momentaufnahme, ab dem 30. Januar 2024; vor dem 5. Oktober 2026 aus der Blockchain rekonstruiert, seitdem live erfasst.", "url": "https://pepecoinhub.com/de/network.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (r/pepecoin-Community)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}], "license": "https://creativecommons.org/licenses/by/4.0/"}</script>
@@ -98,7 +98,7 @@
 
 <section aria-labelledby="addr-h">
   <h2 id="addr-h">Adressen mit PEP</h2>
-  <p class="note">Adressen mit einem Guthaben über null, auch mit einem winzigen Betrag unter 0,001 PEP. Der Explorer PepeBlocks zählt nur Adressen mit mindestens 0,001 PEP, daher ist seine Zahl niedriger. In der ersten Woche ein Punkt pro Tag, vom 5. Februar 2024 bis September 2025 einer pro Woche und seitdem einer pro Tag. Fahre mit der Maus über das Diagramm oder tippe darauf, um ein Datum abzulesen.</p>
+  <p class="note">Adressen mit einem Guthaben über null, auch mit einem winzigen Betrag unter 0,001 PEP. Der Explorer PepeBlocks zählt nur Adressen mit mindestens 0,001 PEP, daher ist seine Zahl niedriger. In der ersten Woche ein Punkt pro Tag, vom 5. Februar 2024 bis 25. August 2025 einer pro Woche und seit 1. September 2025 einer pro Tag. Fahre mit der Maus über das Diagramm oder tippe darauf, um ein Datum abzulesen.</p>
   <figure class="chart">
     <div class="plot" id="addr-plot" role="img" aria-label="Liniendiagramm der Pepecoin-Adressen mit Guthaben, von 61 am 30. Januar 2024 auf etwa 296.000 im Oktober 2026."></div>
     <div class="tip" id="addr-tip" hidden></div>
@@ -128,7 +128,7 @@
   <h2 id="how">Woher die Zahlen kommen</h2>
   <div class="prose">
     <p><strong>Jeden Tag</strong> fragt ein GitHub-Actions-Job beim Explorer PepeBlocks und bei der API von pepecoinservice.org Blockhöhe, Coinmenge und Rich List ab und speichert das Ergebnis im Repository dieser Website.</p>
-    <p><strong>Vor dem 5. Oktober 2026</strong> wurden dieselben Zahlen rekonstruiert, indem die Pepecoin-Blockchain ab dem ersten Block nachgespielt wurde: in der ersten Woche (30. Januar bis 4. Februar 2024) ein Punkt pro Tag, bis September 2025 einer pro Woche und danach einer pro Tag.</p>
+    <p><strong>Vor dem 5. Oktober 2026</strong> wurden dieselben Zahlen rekonstruiert, indem die Pepecoin-Blockchain ab dem ersten Block nachgespielt wurde: in der ersten Woche (30. Januar bis 4. Februar 2024) ein Punkt pro Tag, bis 25. August 2025 einer pro Woche und ab 1. September 2025 einer pro Tag.</p>
     <p>Die <strong>Blockzeit</strong> ist die Zeit zwischen zwei Momentaufnahmen geteilt durch die dazwischen gefundenen Blöcke. <strong>Adressen</strong> sind die, die mehr als null PEP halten, auch winzige Restbeträge unter 0,001 PEP. PepeBlocks zeigt eine niedrigere Zahl, weil es nur Adressen mit mindestens 0,001 PEP zählt. Eine Person kann viele Adressen nutzen, und Börsen verwahren Coins für viele Menschen.</p>
   </div>
 </section>
@@ -319,6 +319,6 @@
 })();
 </script>
 <script src="../prices.js?v=20261030fix1" defer></script>
-<script src="../chrome.js?v=20261030p" defer></script>
+<script src="../chrome.js?v=20261030q" defer></script>
 </body>
 </html>

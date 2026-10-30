@@ -1163,14 +1163,21 @@ html { overflow-x: clip; }
 }
 
 /* Home: "PEP at a glance" under the coin (on a phone after the hero text), and the three linked asset cards */
-.pep-glance { grid-column: 2; align-self: start; background: var(--panel); border: 1px solid var(--rule); border-top: 3px solid var(--accent); border-radius: 14px; padding: 12px 16px 10px; box-shadow: var(--shadow); min-width: 0; }
-.pep-glance h2 { margin: 0 0 6px; font-size: 0.82rem; font-family: var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.pep-glance {
+  grid-column: 2; align-self: start; min-width: 0; padding: 14px 18px 12px; border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--rule));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, var(--panel)), var(--panel) 120px);
+  box-shadow: 0 22px 44px -30px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.pep-glance h2 { margin: 0 0 4px; font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
 .pep-glance dl { margin: 0; display: grid; }
-.pep-glance dl > div { display: grid; grid-template-columns: 6.6em 1fr; gap: 8px; padding: 5px 0; border-top: 1px solid var(--rule); font-size: 0.86rem; line-height: 1.35; }
+.pep-glance dl > div { display: grid; grid-template-columns: 7.4em 1fr; gap: 10px; padding: 6px 0; border-top: 1px solid color-mix(in srgb, var(--rule) 80%, transparent); font-size: 0.86rem; line-height: 1.4; }
 .pep-glance dl > div:first-child { border-top: 0; }
-.pep-glance dt { color: var(--muted); }
-.pep-glance dd { margin: 0; font-weight: 500; min-width: 0; }
-.pep-glance-src { margin: 6px 0 0; padding-top: 6px; border-top: 1px solid var(--rule); font-size: 0.76rem; color: var(--muted); line-height: 1.45; }
+.pep-glance dt { color: var(--accent-deep); font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; padding-top: 2px; white-space: nowrap; }
+.pep-glance dt::before { content: ""; display: inline-block; width: 5px; height: 5px; margin-right: 7px; border-radius: 50%; background: var(--accent); vertical-align: 2px; }
+.pep-glance dd { margin: 0; min-width: 0; }
+.pep-glance-src { margin: 4px 0 0; padding-top: 7px; border-top: 1px solid color-mix(in srgb, var(--rule) 80%, transparent); font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); line-height: 1.5; }
+.pep-glance-src::before { content: "↳ "; color: var(--accent); }
 @media (min-width: 721px) {
   .home-hero { grid-template-rows: auto 1fr; }
   .home-hero-copy { grid-row: 1 / span 2; }
