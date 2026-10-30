@@ -30,7 +30,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261030b">
+<link rel="stylesheet" href="../facts.css?v=20261030q">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/it/"}, {"@type": "ListItem", "position": 2, "name": "Statistiche della rete", "item": "https://pepecoinhub.com/it/network.html"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Statistiche giornaliere della rete Pepecoin", "description": "Altezza del blocco giornaliera di Pepecoin (PEP), offerta di monete, numero di indirizzi con saldo e ora dello snapshot, dal 30 gennaio 2024; ricostruiti dalla blockchain prima del 5 ottobre 2026 e registrati in tempo reale da allora.", "url": "https://pepecoinhub.com/it/network.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (community r/pepecoin)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}], "license": "https://creativecommons.org/licenses/by/4.0/"}</script>
@@ -97,7 +97,7 @@
 
 <section aria-labelledby="addr-h">
   <h2 id="addr-h">Indirizzi che detengono PEP</h2>
-  <p class="note">Indirizzi con saldo superiore a zero, anche un importo minimo inferiore a 0,001 PEP. L’explorer PepeBlocks conta solo gli indirizzi che detengono almeno 0,001 PEP, quindi il suo numero è più basso. Un punto al giorno per la prima settimana, uno a settimana dal 5 febbraio 2024 fino a settembre 2025 e uno al giorno da allora. Passa il mouse o tocca il grafico per leggere una data.</p>
+  <p class="note">Indirizzi con saldo superiore a zero, anche un importo minimo inferiore a 0,001 PEP. L’explorer PepeBlocks conta solo gli indirizzi che detengono almeno 0,001 PEP, quindi il suo numero è più basso. Un punto al giorno per la prima settimana, uno a settimana dal 5 febbraio 2024 al 25 agosto 2025 e uno al giorno dal 1° settembre 2025. Passa il mouse o tocca il grafico per leggere una data.</p>
   <figure class="chart">
     <div class="plot" id="addr-plot" role="img" aria-label="Grafico a linee degli indirizzi Pepecoin con saldo, saliti da 61 il 30 gennaio 2024 a circa 296.000 a ottobre 2026."></div>
     <div class="tip" id="addr-tip" hidden></div>
@@ -127,7 +127,7 @@
   <h2 id="how">Da dove vengono i numeri</h2>
   <div class="prose">
     <p><strong>Ogni giorno</strong> un job di GitHub Actions chiede all’explorer PepeBlocks e all’API di pepecoinservice.org l’altezza del blocco, l’offerta e la rich list, e salva il risultato nel repository di questo sito.</p>
-    <p><strong>Prima del 5 ottobre 2026</strong> gli stessi dati sono stati ricostruiti ripercorrendo la blockchain di Pepecoin dal primo blocco: un punto al giorno per la prima settimana (dal 30 gennaio al 4 febbraio 2024), uno a settimana fino a settembre 2025 e uno al giorno dopo.</p>
+    <p><strong>Prima del 5 ottobre 2026</strong> gli stessi dati sono stati ricostruiti ripercorrendo la blockchain di Pepecoin dal primo blocco: un punto al giorno per la prima settimana (dal 30 gennaio al 4 febbraio 2024), uno a settimana fino al 25 agosto 2025 e uno al giorno dal 1° settembre 2025.</p>
     <p>Il <strong>tempo di blocco</strong> è il tempo tra due snapshot diviso per i blocchi trovati nel mezzo. Gli <strong>indirizzi</strong> sono quelli che detengono più di zero PEP, compresi i piccoli residui sotto 0,001 PEP. PepeBlocks mostra un numero più basso perché conta solo gli indirizzi con almeno 0,001 PEP. Una persona può usare molti indirizzi, e gli exchange custodiscono monete per molte persone.</p>
   </div>
 </section>
@@ -318,6 +318,6 @@
 })();
 </script>
 <script src="../prices.js?v=20261030fix1" defer></script>
-<script src="../chrome.js?v=20261030fix1" defer></script>
+<script src="../chrome.js?v=20261030q" defer></script>
 </body>
 </html>

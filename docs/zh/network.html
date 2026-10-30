@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261030b">
+<link rel="stylesheet" href="../facts.css?v=20261030q">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/zh/"}, {"@type": "ListItem", "position": 2, "name": "网络数据", "item": "https://pepecoinhub.com/zh/network.html"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin 网络每日统计", "description": "Pepecoin (PEP) 每日区块高度、币供应量、有余额的地址数和快照时间，始于 2024年1月30日；2026年10月5日之前的数据由区块链重建，此后为实时记录。", "url": "https://pepecoinhub.com/zh/network.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub（r/pepecoin 社区）"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}], "license": "https://creativecommons.org/licenses/by/4.0/"}</script>
@@ -98,7 +98,7 @@
 
 <section aria-labelledby="addr-h">
   <h2 id="addr-h">持有 PEP 的地址</h2>
-  <p class="note">余额大于零的地址，哪怕余额不足 0.001 PEP 也计算在内。PepeBlocks 浏览器只统计持有至少 0.001 PEP 的地址，因此它的数字更低。第一周每天一个数据点，2024年2月5日至 2025年9月每周一个，此后每天一个。悬停或点按图表可查看日期。</p>
+  <p class="note">余额大于零的地址，哪怕余额不足 0.001 PEP 也计算在内。PepeBlocks 浏览器只统计持有至少 0.001 PEP 的地址，因此它的数字更低。第一周每天一个数据点，2024年2月5日至 2025年8月25日每周一个，2025年9月1日起每天一个。悬停或点按图表可查看日期。</p>
   <figure class="chart">
     <div class="plot" id="addr-plot" role="img" aria-label="有余额的 Pepecoin 地址数折线图，从 2024年1月30日的 61 个增长到 2026年10月的约 296,000 个。"></div>
     <div class="tip" id="addr-tip" hidden></div>
@@ -128,7 +128,7 @@
   <h2 id="how">数据从哪里来</h2>
   <div class="prose">
     <p><strong>每天</strong>一个 GitHub Actions 任务向 PepeBlocks 浏览器和 pepecoinservice.org API 查询区块高度、供应量和富豪榜，并把结果保存到本站的代码库中。</p>
-    <p><strong>2026年10月5日之前</strong>的数据是通过从第一个区块开始重放 Pepecoin 区块链重建的：第一周（2024年1月30日至2月4日）每天一个数据点，之后到 2025年9月每周一个，再之后每天一个。</p>
+    <p><strong>2026年10月5日之前</strong>的数据是通过从第一个区块开始重放 Pepecoin 区块链重建的：第一周（2024年1月30日至2月4日）每天一个数据点，之后到 2025年8月25日每周一个，2025年9月1日起每天一个。</p>
     <p><strong>出块时间</strong>是两次快照之间的时间除以期间找到的区块数。<strong>地址</strong>指持有超过零 PEP 的地址，包括余额不足 0.001 PEP 的零头。PepeBlocks 显示的数字更低，因为它只统计至少持有 0.001 PEP 的地址。一个人可以使用很多地址，交易所也会替很多人保管币。</p>
   </div>
 </section>
@@ -319,6 +319,6 @@
 })();
 </script>
 <script src="../prices.js?v=20261030fix1" defer></script>
-<script src="../chrome.js?v=20261030fix1" defer></script>
+<script src="../chrome.js?v=20261030q" defer></script>
 </body>
 </html>

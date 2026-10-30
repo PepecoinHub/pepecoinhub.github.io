@@ -9,6 +9,7 @@
 // index.html (and */index.html): the "updated" date, the PEP price tiles and the hashrate tile
 // (data-v="home-…"). The price is fetched from CoinGecko and kept in data/price.json, so a failed
 // fetch falls back to the last saved price; home.js updates the price tiles live in the browser.
+// press.html (and */press.html): today's figures for journalists (data-v="press-…"), each with its date.
 // data/ticker.json: the figures for the data strip under the header (chrome.js).
 //
 // Run after build_summary.py: node scripts/prebake.mjs
@@ -178,6 +179,7 @@ function home(file, S, mining, price) {
   const loc = LOCALE[langOf(html)] || 'en-US';
   const day = (d, month) => new Date(d + 'T00:00:00Z').toLocaleDateString(loc, { month, day: 'numeric', year: 'numeric', timeZone: 'UTC' });
   const v = { 'home-date': day(S.latest.date, 'long') };
+  if (S.latest.supply > 0) v['home-supply'] = bigPep(S.latest.supply, loc);
   if (mining && mining.hashrate_hs > 0) {
     v['home-hash'] = hashrate(mining.hashrate_hs, loc);
     v['home-hash-date'] = day(mining.date, 'short');
@@ -202,6 +204,32 @@ function home(file, S, mining, price) {
   fs.writeFileSync(file, html);
 }
 
+// 105158190000 -> "105.16B" / "105,16 mld" (the locale's own short form)
+const bigPep = (v, loc) => new Intl.NumberFormat(loc, { notation: 'compact', maximumFractionDigits: 2 }).format(v);
+
+function press(file, S, N, mining, price) {
+  let html = fs.readFileSync(file, 'utf8');
+  const loc = LOCALE[langOf(html)] || 'en-US';
+  const day = (d) => new Date(d + 'T00:00:00Z').toLocaleDateString(loc, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  const last = N.rows[N.rows.length - 1], col = (k) => last[N.columns.indexOf(k)];
+  const v = { 'press-snap-date': day(S.latest.date) };
+  if (S.latest.supply > 0) v['press-supply'] = bigPep(S.latest.supply, loc);
+  if (S.latest.height) v['press-height'] = Number(S.latest.height).toLocaleString(loc);
+  if (col('addresses_with_balance')) v['press-addr'] = Number(col('addresses_with_balance')).toLocaleString(loc);
+  const i10 = S.tops.indexOf(10);
+  if (i10 >= 0 && S.views.all.shares[i10] != null) v['press-top10'] = S.views.all.shares[i10].toLocaleString(loc, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+  if (mining && mining.hashrate_hs > 0) { v['press-hash'] = hashrate(mining.hashrate_hs, loc); v['press-hash-date'] = day(mining.date); }
+  if (price && price.price_usd > 0) {
+    v['press-price'] = usd(price.price_usd, loc);
+    v['press-price-date'] = day(price.date);
+    if (price.supply > 0) v['press-mcap'] = usd(price.price_usd * price.supply, loc);
+  }
+  let n = 0;
+  html = html.replace(/(<span\b[^>]*\bdata-v="(press-[a-z0-9-]+)"[^>]*>)[^<]*(<\/span>)/g, (m, open, k, close) => (k in v ? (n++, open + esc(v[k]) + close) : m));
+  if (!n) throw new Error('no press-… spans found');
+  fs.writeFileSync(file, html);
+}
+
 const net = JSON.parse(fs.readFileSync(path.join(DOCS, 'data', 'network.json'), 'utf8'));
 const sum = JSON.parse(fs.readFileSync(path.join(DOCS, 'data', 'summary.json'), 'utf8'));
 let failed = 0;
@@ -218,6 +246,10 @@ try { mining = JSON.parse(fs.readFileSync(path.join(DOCS, 'data', 'mining.json')
 const price = await priceNow();
 for (const f of pages('index.html')) {
   try { home(f, sum, mining, price); console.log('numbers baked into', path.relative(DOCS, f)); }
+  catch (e) { failed++; console.error(`${path.relative(DOCS, f)} skipped: ${e.message}`); }
+}
+for (const f of pages('press.html')) {
+  try { press(f, sum, net, mining, price); console.log('numbers baked into', path.relative(DOCS, f)); }
   catch (e) { failed++; console.error(`${path.relative(DOCS, f)} skipped: ${e.message}`); }
 }
 // Data strip under the header (chrome.js): price and its 24h change, hashrate against a day ago, the top 10/50/400

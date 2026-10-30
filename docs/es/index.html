@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261030b">
+<link rel="stylesheet" href="../facts.css?v=20261030q">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Pepecoin Hub", "url": "https://pepecoinhub.com/es/", "description": "Páginas de datos de la comunidad sobre Pepecoin (PEP).", "inLanguage": "es"}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -57,15 +57,20 @@
     <div class="home-hero-glow" aria-hidden="true"></div>
     <img class="home-hero-frog" src="../assets/brand/pepe-coin.png" alt="Logotipo de Pepecoin" width="280" height="280">
   </div>
+  <aside class="pep-glance" aria-labelledby="glance-h">
+    <h2 id="glance-h">PEP en breve</h2>
+    <dl><div><dt>Símbolo</dt><dd>PEP</dd></div><div><dt>Blockchain</dt><dd>propia, un fork de Dogecoin Core</dd></div><div><dt>Minería</dt><dd>proof of work Scrypt, con LTC y DOGE</dd></div><div><dt>Lanzamiento</dt><dd>30 de enero de 2024</dd></div><div><dt>Suministro</dt><dd><span data-v="home-supply">105,16 mil M</span> PEP, +10.000 por bloque, sin límite</dd></div></dl>
+    <p class="pep-glance-src">Fuentes: <a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA whitepaper</a> (D.8, H.4, G.13), <a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp</a> · <a href="press.html">Datos para medios&nbsp;→</a></p>
+  </aside>
 </header>
 
 <section class="pep-id hpanel" id="panel-pep" aria-labelledby="pep-id-h">
-  <h2 id="pep-id-h">PEP no es PEPE</h2>
-  <p class="note">Pepecoin (PEP) funciona con su propia blockchain y se mina en merged mining con Litecoin y Dogecoin. Es distinto de Pepe (PEPE), el token de Ethereum de 2023, y de PepeCoin (PEPECOIN), el proyecto de 2016 que se trasladó a Ethereum en 2023.</p>
+  <h2 id="pep-id-h">¿Buscas “Pepe coin”?</h2>
+  <p class="note">Tres activos distintos tienen casi el mismo nombre. Pepecoin (PEP), del que trata este sitio, funciona con su propia blockchain; los otros dos son tokens en Ethereum. Comprueba el símbolo y la dirección antes de comprar.</p>
   <ul class="pep-id-list">
-    <li class="is-pep"><b>PEP</b><span>Pepecoin</span><span>su propia blockchain de proof of work</span></li>
-    <li><b>PEPE</b><span>Pepe</span><span>token ERC-20 en Ethereum</span></li>
-    <li><b>PEPECOIN</b><span>PepeCoin</span><span>token ERC-20 en Ethereum</span></li>
+    <li class="is-pep"><a href="which-pepecoin.html"><b>PEP</b><span>Pepecoin</span><span>blockchain propia de proof of work, desde 2024</span><span class="pep-id-addr">la dirección empieza por P</span></a></li>
+    <li><a href="which-pepecoin.html"><b>PEPE</b><span>Pepe</span><span>token ERC-20 en Ethereum, desde 2023</span><span class="pep-id-addr">la dirección empieza por 0x</span></a></li>
+    <li><a href="which-pepecoin.html"><b>PEPECOIN</b><span>PepeCoin</span><span>proyecto de 2016, token en Ethereum desde 2023</span><span class="pep-id-addr">la dirección empieza por 0x</span></a></li>
   </ul>
   <p class="pep-id-more"><a href="which-pepecoin.html">Cómo distinguirlos&nbsp;→</a></p>
 </section>
@@ -99,7 +104,7 @@
 <section class="home-stats" aria-label="Datos clave">
   <div class="stats">
     <div class="stat is-live"><span class="label">Precio</span><span class="value" data-v="home-price">0,0000858 $</span><span class="sub">24h: <span data-v="home-change">+4,3%</span></span><span class="src">Fuente: <a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko</a> · <a href="price.html">gráfico</a></span></div>
-    <div class="stat"><span class="label">Capitalización</span><span class="value" data-v="home-mcap">8,81 M $</span><span class="sub">con ×100: <span data-v="home-x100">881 M $</span><span class="x100-rank">puesto #<span data-v="home-x100-rank">78</span> entre las criptos</span></span><span class="src">Pura aritmética, no una previsión. <a href="price.html#x100">Calcula ×N</a></span></div>
+    <div class="stat"><span class="label">Capitalización</span><span class="value" data-v="home-mcap">8,81 M$</span><span class="sub">con ×100: <span data-v="home-x100">881 M$</span><span class="x100-rank">puesto #<span data-v="home-x100-rank">78</span> entre las criptos</span></span><span class="src">Precio × suministro. Pura aritmética, no una previsión. <a href="price.html#x100">Calcula ×N</a></span></div>
     <div class="stat"><span class="label">Hashrate</span><span class="value" data-v="home-hash">1,9 PH/s</span><span class="sub">Scrypt, 10 000 PEP por bloque</span><span class="src">Fuente: <a href="https://pepeblocks.com/">PepeBlocks</a>, <span data-v="home-hash-date">30 oct 2026</span></span></div>
     <div class="stat"><span class="label">Asignación inicial</span><span class="value">0 %</span><span class="sub">sin premine ni ICO</span><span class="src">Fuente: <a href="https://pepecoin.com/mica-whitepaper.xhtml">Whitepaper MiCA</a> (D.9, G.5)</span></div>
   </div>
@@ -250,7 +255,7 @@
   <p class="foot-langs">Idioma: <a href="/" hreflang="en" lang="en">English</a>&nbsp;· <a href="/pl/" hreflang="pl" lang="pl">Polski</a>&nbsp;· <a href="/de/" hreflang="de" lang="de">Deutsch</a>&nbsp;· <a href="/fr/" hreflang="fr" lang="fr">Français</a>&nbsp;· <a href="/tr/" hreflang="tr" lang="tr">Türkçe</a>&nbsp;· <a href="/it/" hreflang="it" lang="it">Italiano</a>&nbsp;· <a href="/zh/" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></p>
 </footer>
 <script src="../prices.js?v=20261030fix1" defer></script>
-<script src="../home.js?v=20261030fix1" defer></script>
-<script src="../chrome.js?v=20261030fix1" defer></script>
+<script src="../home.js?v=20261030p" defer></script>
+<script src="../chrome.js?v=20261030q" defer></script>
 </body>
 </html>

@@ -32,7 +32,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261030b">
+<link rel="stylesheet" href="../facts.css?v=20261030q">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Pepecoin Hub", "url": "https://pepecoinhub.com/pl/", "description": "Fakty o Pepecoinie (PEP) zebrane przez społeczność.", "inLanguage": "pl"}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -58,15 +58,20 @@
     <div class="home-hero-glow" aria-hidden="true"></div>
     <img class="home-hero-frog" src="../assets/brand/pepe-coin.png" alt="Logo Pepecoin" width="280" height="280">
   </div>
+  <aside class="pep-glance" aria-labelledby="glance-h">
+    <h2 id="glance-h">PEP w skrócie</h2>
+    <dl><div><dt>Symbol</dt><dd>PEP</dd></div><div><dt>Blockchain</dt><dd>własny, fork Dogecoin Core</dd></div><div><dt>Kopanie</dt><dd>proof of work Scrypt, razem z LTC i DOGE</dd></div><div><dt>Start</dt><dd>30 stycznia 2024</dd></div><div><dt>Podaż</dt><dd><span data-v="home-supply">105,16 mld</span> PEP, +10 000 na blok, bez limitu</dd></div></dl>
+    <p class="pep-glance-src">Źródła: <a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA whitepaper</a> (D.8, H.4, G.13), <a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">chainparams.cpp</a> · <a href="press.html">Fakty dla mediów&nbsp;→</a></p>
+  </aside>
 </header>
 
 <section class="pep-id hpanel" id="panel-pep" aria-labelledby="pep-id-h">
-  <h2 id="pep-id-h">PEP to nie PEPE</h2>
-  <p class="note">Pepecoin (PEP) działa na własnym blockchainie i jest kopany razem z Litecoinem i Dogecoinem (merged mining). To coś innego niż Pepe (PEPE), token na Ethereum z 2023 roku, i PepeCoin (PEPECOIN), projekt z 2016 roku, który w 2023 roku przeniósł się na Ethereum.</p>
+  <h2 id="pep-id-h">Szukasz „Pepe coin”?</h2>
+  <p class="note">Trzy różne aktywa mają prawie tę samą nazwę. Pepecoin (PEP), o którym jest ta strona, działa na własnym blockchainie, a pozostałe dwa to tokeny na Ethereum. Zanim kupisz, sprawdź symbol i adres.</p>
   <ul class="pep-id-list">
-    <li class="is-pep"><b>PEP</b><span>Pepecoin</span><span>własny blockchain proof of work</span></li>
-    <li><b>PEPE</b><span>Pepe</span><span>token ERC-20 na Ethereum</span></li>
-    <li><b>PEPECOIN</b><span>PepeCoin</span><span>token ERC-20 na Ethereum</span></li>
+    <li class="is-pep"><a href="which-pepecoin.html"><b>PEP</b><span>Pepecoin</span><span>własny blockchain proof of work, od 2024</span><span class="pep-id-addr">adres zaczyna się od P</span></a></li>
+    <li><a href="which-pepecoin.html"><b>PEPE</b><span>Pepe</span><span>token ERC-20 na Ethereum, od 2023</span><span class="pep-id-addr">adres zaczyna się od 0x</span></a></li>
+    <li><a href="which-pepecoin.html"><b>PEPECOIN</b><span>PepeCoin</span><span>projekt z 2016, od 2023 token na Ethereum</span><span class="pep-id-addr">adres zaczyna się od 0x</span></a></li>
   </ul>
   <p class="pep-id-more"><a href="which-pepecoin.html">Jak je odróżnić&nbsp;→</a></p>
 </section>
@@ -100,7 +105,7 @@
 <section class="home-stats" aria-label="Kluczowe fakty">
   <div class="stats">
     <div class="stat is-live"><span class="label">Cena</span><span class="value" data-v="home-price">0,0000858 $</span><span class="sub">24h: <span data-v="home-change">+4,3%</span></span><span class="src">Źródło: <a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko</a> · <a href="price.html">wykres</a></span></div>
-    <div class="stat"><span class="label">Kapitalizacja</span><span class="value" data-v="home-mcap">8,81 mln $</span><span class="sub">przy ×100: <span data-v="home-x100">881 mln $</span><span class="x100-rank">czyli miejsce #<span data-v="home-x100-rank">78</span> w krypto</span></span><span class="src">Zwykła arytmetyka, nie prognoza. <a href="price.html#x100">Policz ×N</a></span></div>
+    <div class="stat"><span class="label">Kapitalizacja</span><span class="value" data-v="home-mcap">8,81 mln $</span><span class="sub">przy ×100: <span data-v="home-x100">881 mln $</span><span class="x100-rank">czyli miejsce #<span data-v="home-x100-rank">78</span> w krypto</span></span><span class="src">Cena × podaż. Zwykła arytmetyka, nie prognoza. <a href="price.html#x100">Policz ×N</a></span></div>
     <div class="stat"><span class="label">Hashrate</span><span class="value" data-v="home-hash">1,9 PH/s</span><span class="sub">Scrypt, 10 000 PEP za blok</span><span class="src">Źródło: <a href="https://pepeblocks.com/">PepeBlocks</a>, <span data-v="home-hash-date">30 paź 2026</span></span></div>
     <div class="stat"><span class="label">Przydział na starcie</span><span class="value">0%</span><span class="sub">bez premine, bez ICO</span><span class="src">Źródło: <a href="https://pepecoin.com/mica-whitepaper.xhtml">Whitepaper MiCA</a> (D.9, G.5)</span></div>
   </div>
@@ -251,7 +256,7 @@
   <p class="foot-langs">Język: <a href="/" hreflang="en" lang="en">English</a>&nbsp;· <a href="/es/" hreflang="es" lang="es">Español</a>&nbsp;· <a href="/de/" hreflang="de" lang="de">Deutsch</a>&nbsp;· <a href="/fr/" hreflang="fr" lang="fr">Français</a>&nbsp;· <a href="/tr/" hreflang="tr" lang="tr">Türkçe</a>&nbsp;· <a href="/it/" hreflang="it" lang="it">Italiano</a>&nbsp;· <a href="/zh/" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></p>
 </footer>
 <script src="../prices.js?v=20261030fix1" defer></script>
-<script src="../home.js?v=20261030fix1" defer></script>
-<script src="../chrome.js?v=20261030fix1" defer></script>
+<script src="../home.js?v=20261030p" defer></script>
+<script src="../chrome.js?v=20261030q" defer></script>
 </body>
 </html>

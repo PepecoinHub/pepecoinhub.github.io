@@ -10,28 +10,36 @@
 
 
   /* ------------------------------------------------------------------ pages */
+  // the same four groups as the serious site's menu (chrome.js MENU); community pages live on the serious site
   var NAV = [
-    ['Start here', [
+    ['Understand PEP', [
       ['which-pepecoin', 'Which frog is which?', 'PEP vs PEPE vs PEPECOIN', 'glasses'],
+      ['compare', 'PEP & DOGE', 'Same rules, ten years apart', 'pepe-doge'],
+      ['scrypt-family', 'Scrypt family', 'One miner, three coins', 'peaky'],
+      ['mica', 'MiCA whitepaper', 'The EU paperwork', 'serious'],
+      ['glossary', 'Glossary', 'Fren-to-English', 'brain']
+    ]],
+    ['Buy, store, mine', [
       ['buy', 'How to buy PEP', 'Without buying the wrong frog', 'wrongpep'],
       ['wallets', 'Wallets', 'Where your PEP lives', 'zipper'],
       ['mining', 'Mining', 'Dig PEP with a Scrypt rig', 'pickaxe']
     ]],
-    ['Numbers', [
+    ['Numbers & charts', [
       ['price', 'Price', 'Live chart and the ×N machine', 'charts'],
       ['calculator', 'What-if machine', 'Your PEP at DOGE’s size', 'p-eyes-still'],
       ['rich-list', 'Whale watch', 'Who holds the PEP', 'detective'],
       ['network', 'Network', 'Blocks, supply, addresses', 'night-shift'],
       ['supply', 'Supply', 'No cap, falling inflation', 'farmer']
     ]],
-    ['Deep dives', [
-      ['compare', 'PEP & DOGE', 'Same rules, ten years apart', 'pepe-doge'],
-      ['scrypt-family', 'Scrypt family', 'One miner, three coins', 'peaky'],
-      ['mica', 'MiCA whitepaper', 'The EU paperwork', 'serious'],
-      ['glossary', 'Glossary', 'Fren-to-English', 'brain']
+    ['Community', [
+      ['@games/', 'PEP Games', 'Charades, Pepe Miner, chat', 'pond-playground'],
+      ['@links.html', 'Links', 'Official and community sites', 'fren-chain'],
+      ['@press.html', 'For media', 'Facts, sources, logo', 'newspaper-still'],
+      ['@', 'Serious edition', 'Same facts, no memes', 'serious']
     ]]
   ];
-  var href = function (p) { return p === 'index' ? './' : p + '.html'; };
+  // '@page' is a page of the serious site, the rest are meme pages
+  var href = function (p) { return p.charAt(0) === '@' ? (p === '@' ? serious : BASE + p.slice(1)) : p === 'index' ? './' : p + '.html'; };
   var serious = BASE + (PAGE === 'index' ? '' : PAGE + '.html');
 
   function el(tag, attrs, html) {
@@ -111,28 +119,21 @@
   if (top) {
     var bar = el('div', { class: 'in bar' });
     bar.innerHTML = '<a class="logo" href="./" aria-label="Pepecoin Hub, meme edition, home"><img class="on-light" src="img/pepecoin-lockup-light.svg" alt="" width="134" height="32"><img class="on-dark" src="img/pepecoin-lockup-dark.svg" alt="" width="134" height="32"><span class="hub">Hub</span></a>';
-    var nav = el('nav', { class: 'nav', id: 'nav', 'aria-label': 'Pages' });
+    // one Menu button opens every page in four columns (a full-width sheet on a phone), as on the serious site
+    var nav = el('nav', { class: 'nav', id: 'nav', 'aria-label': 'Pages', hidden: '' });
+    var cols = el('div', { class: 'mega' });
     NAV.forEach(function (g, gi) {
-      var wrap = el('div', { class: 'nav-group' });
-      var btn = el('button', { type: 'button', class: 'nav-btn', 'aria-expanded': 'false', 'aria-controls': 'np' + gi }, g[0] + ' ' + chev);
-      var panel = el('div', { class: 'nav-panel', id: 'np' + gi });
+      var col = el('section', { class: 'mega-col' }, '<p class="mega-h"><span>0' + (gi + 1) + '</span>' + g[0] + '</p>');
       g[1].forEach(function (p) {
         var a = el('a', { href: href(p[0]) }, '<img src="img/' + p[3] + '.webp" alt="" width="40" height="40" loading="lazy"><span><b>' + p[1] + '</b><small>' + p[2] + '</small></span>');
-        if (p[0] === PAGE) { a.setAttribute('aria-current', 'page'); wrap.classList.add('current'); }
-        panel.appendChild(a);
+        if (p[0] === PAGE) a.setAttribute('aria-current', 'page');
+        if (p[0] === '@games/') a.className = 'games';
+        col.appendChild(a);
       });
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var open = btn.getAttribute('aria-expanded') !== 'true';
-        nav.querySelectorAll('.nav-btn').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
-        btn.setAttribute('aria-expanded', String(open));
-      });
-      wrap.appendChild(btn); wrap.appendChild(panel); nav.appendChild(wrap);
+      cols.appendChild(col);
     });
-    nav.appendChild(el('a', { class: 'games', href: BASE + 'games/' }, 'Games'));
+    nav.appendChild(cols);
     var tb = el('button', { type: 'button', class: 'themebtn', id: 'themebtn', 'aria-label': 'Switch light or dark' });
-    nav.appendChild(tb);
-    bar.appendChild(nav);
     // Serious | Meme switch: the knob sits on Meme here and slides to Serious on click
     var ml = el('a', { class: 'mode-link', href: serious, title: 'Switch to serious mode: same facts, no memes', 'aria-label': 'Switch to serious mode' }, '<span class="mt-a">Serious</span><span class="mt-b">Meme</span>');
     ml.addEventListener('click', function (e) {
@@ -142,18 +143,23 @@
       setTimeout(function () { location.href = ml.href; }, 220);
     });
     bar.appendChild(ml);
-    var mb = el('button', { type: 'button', class: 'menubtn', 'aria-expanded': 'false', 'aria-controls': 'nav' }, 'Menu');
-    mb.addEventListener('click', function () { var o = !top.classList.contains('open'); top.classList.toggle('open', o); mb.setAttribute('aria-expanded', String(o)); });
+    bar.appendChild(tb);
+    var mb = el('button', { type: 'button', class: 'menubtn', 'aria-expanded': 'false', 'aria-controls': 'nav' }, '<span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>Menu');
+    var setOpen = function (o) {
+      if (o) nav.style.setProperty('--menu-top', Math.round(top.getBoundingClientRect().bottom + 6) + 'px');
+      nav.hidden = !o; top.classList.toggle('open', o); mb.setAttribute('aria-expanded', String(o));
+      root.classList.toggle('menu-lock', o);
+    };
+    mb.addEventListener('click', function (e) { e.stopPropagation(); setOpen(nav.hidden); });
     bar.appendChild(mb);
+    bar.appendChild(nav);
     top.appendChild(bar);
-    document.addEventListener('click', function (e) {
-      if (!nav.contains(e.target)) nav.querySelectorAll('.nav-btn').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key !== 'Escape') return;
-      nav.querySelectorAll('.nav-btn').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
-      top.classList.remove('open'); mb.setAttribute('aria-expanded', 'false');
-    });
+    document.addEventListener('click', function (e) { if (!nav.hidden && !top.contains(e.target)) setOpen(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !nav.hidden) { setOpen(false); mb.focus(); } });
+    // no line under the header at the top of the page; it comes back once the page scrolls
+    var stuck = false;
+    var onScroll = function () { var s = window.scrollY > 8; if (s !== stuck) { stuck = s; top.classList.toggle('stuck', s); } };
+    window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
     // theme: system by default, the same choice as the serious site
     var isDark = function () { var t = root.getAttribute('data-theme'); return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; };

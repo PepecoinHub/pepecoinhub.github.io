@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261030b">
+<link rel="stylesheet" href="../facts.css?v=20261030q">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/tr/"}, {"@type": "ListItem", "position": 2, "name": "Ağ istatistikleri", "item": "https://pepecoinhub.com/tr/network.html"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "Pepecoin ağı günlük istatistikleri", "description": "30 Ocak 2024'ten itibaren günlük Pepecoin (PEP) blok yüksekliği, coin arzı, bakiyesi olan adres sayısı ve anlık görüntü zamanı; 5 Ekim 2026'dan önce blokzincirden yeniden oluşturuldu, o tarihten sonra canlı kaydediliyor.", "url": "https://pepecoinhub.com/tr/network.html", "temporalCoverage": "2024-01-30/..", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Pepecoin Hub (r/pepecoin topluluğu)"}, "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://pepecoinhub.com/data/network.json"}], "license": "https://creativecommons.org/licenses/by/4.0/"}</script>
@@ -98,7 +98,7 @@
 
 <section aria-labelledby="addr-h">
   <h2 id="addr-h">PEP tutan adresler</h2>
-  <p class="note">Bakiyesi sıfırın üzerinde olan adresler; 0,001 PEP'in altındaki çok küçük miktarlar da dâhil. PepeBlocks explorer'ı yalnızca en az 0,001 PEP tutan adresleri saydığı için onun rakamı daha düşüktür. İlk hafta günde bir nokta, 5 Şubat 2024'ten Eylül 2025'e kadar haftada bir, o tarihten beri günde bir. Bir tarihi okumak için grafiğin üzerine gelin veya dokunun.</p>
+  <p class="note">Bakiyesi sıfırın üzerinde olan adresler; 0,001 PEP'in altındaki çok küçük miktarlar da dâhil. PepeBlocks explorer'ı yalnızca en az 0,001 PEP tutan adresleri saydığı için onun rakamı daha düşüktür. İlk hafta günde bir nokta, 5 Şubat 2024'ten 25 Ağustos 2025'e kadar haftada bir, 1 Eylül 2025'ten beri günde bir. Bir tarihi okumak için grafiğin üzerine gelin veya dokunun.</p>
   <figure class="chart">
     <div class="plot" id="addr-plot" role="img" aria-label="Bakiyesi olan Pepecoin adreslerinin çizgi grafiği; 30 Ocak 2024'teki 61'den Ekim 2026'da yaklaşık 296.000'e yükseliyor."></div>
     <div class="tip" id="addr-tip" hidden></div>
@@ -128,7 +128,7 @@
   <h2 id="how">Rakamlar nereden geliyor?</h2>
   <div class="prose">
     <p><strong>Her gün</strong> bir GitHub Actions görevi PepeBlocks explorer'ından ve pepecoinservice.org API'sinden blok yüksekliğini, arzı ve zenginler listesini ister ve sonucu bu sitenin deposuna kaydeder.</p>
-    <p><strong>5 Ekim 2026'dan önce</strong> aynı rakamlar Pepecoin blokzinciri ilk bloğundan itibaren yeniden oynatılarak oluşturuldu: ilk hafta (30 Ocak – 4 Şubat 2024) günde bir nokta, Eylül 2025'e kadar haftada bir, sonrasında günde bir.</p>
+    <p><strong>5 Ekim 2026'dan önce</strong> aynı rakamlar Pepecoin blokzinciri ilk bloğundan itibaren yeniden oynatılarak oluşturuldu: ilk hafta (30 Ocak – 4 Şubat 2024) günde bir nokta, 25 Ağustos 2025'e kadar haftada bir, 1 Eylül 2025'ten itibaren günde bir.</p>
     <p><strong>Blok süresi</strong>, iki anlık görüntü arasındaki sürenin aradaki bulunan blok sayısına bölünmesidir. <strong>Adresler</strong>, sıfırdan fazla PEP tutanlardır; 0,001 PEP'in altındaki çok küçük kalıntılar da buna dâhildir. PepeBlocks daha düşük bir rakam gösterir, çünkü yalnızca en az 0,001 PEP tutan adresleri sayar. Bir kişi birçok adres kullanabilir ve borsalar birçok kişi adına coin tutar.</p>
   </div>
 </section>
@@ -319,6 +319,6 @@
 })();
 </script>
 <script src="../prices.js?v=20261030fix1" defer></script>
-<script src="../chrome.js?v=20261030fix1" defer></script>
+<script src="../chrome.js?v=20261030q" defer></script>
 </body>
 </html>
