@@ -575,14 +575,15 @@ input, select, textarea { border-radius: 12px; }
 @media (prefers-reduced-motion: reduce) { .home-stats .is-live .label::before { animation: none; } }
 @media (max-width: 900px) { .home-stats .stats { grid-template-columns: 1fr 1fr; } }
 /* Home hero coin (home.js): the frog side flips to the P side and back, like a coin turning in the light.
-   Two flat faces a few pixels apart plus a thin edge, so the turn has some thickness. */
-.hero-coin { position: relative; width: min(280px, 100%); aspect-ratio: 1; perspective: 1000px; filter: var(--glow) drop-shadow(0 18px 30px rgba(16, 40, 20, 0.30)); }
+   Two faces --t apart, the rim between them made of stacked discs, plus a side band for the moment it stands edge-on. */
+.hero-coin { --t: 5px; --rim: #1f7c3e; position: relative; width: min(280px, 100%); aspect-ratio: 1; perspective: 1000px; filter: var(--glow) drop-shadow(0 18px 30px rgba(16, 40, 20, 0.30)); }
 .hero-coin-spin { position: absolute; inset: 0; transform-style: preserve-3d; animation: coinflip 9s cubic-bezier(0.6, 0, 0.4, 1) infinite; }
-.hero-coin-spin > img { position: absolute; inset: 0; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: translateZ(5px); filter: none; }
-.hero-coin-spin > .hero-coin-back { transform: rotateY(180deg) translateZ(5px); border-radius: 50%; }
-.hero-coin-edge { position: absolute; top: 2%; bottom: 2%; left: 50%; width: 10px; margin-left: -5px; border-radius: 5px; background: linear-gradient(90deg, #14612f, #2a9a52 45%, #14612f); transform: rotateY(90deg); }
+.hero-coin-spin > img { position: absolute; inset: 0; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: translateZ(var(--t)); filter: none; }
+.hero-coin-spin > .hero-coin-back { transform: rotateY(180deg) translateZ(var(--t)); border-radius: 50%; }
+.hero-coin-edge { position: absolute; inset: 0.4%; border-radius: 50%; background: var(--rim); transform: translateZ(calc(var(--f) * (var(--t) - 0.5px))); }
+.hero-coin-side { position: absolute; top: 0.4%; bottom: 0.4%; left: 50%; width: calc(2 * var(--t)); margin-left: calc(-1 * var(--t)); border-radius: 2px; background: linear-gradient(90deg, var(--rim), #2b9550 50%, var(--rim)); transform: rotateY(90deg); }
 @keyframes coinflip { 0%, 38% { transform: rotateY(0deg); } 50%, 88% { transform: rotateY(180deg); } 100% { transform: rotateY(360deg); } }
-@media (max-width: 720px) { .hero-coin { width: min(116px, 32vw); } .hero-coin-spin > img { transform: translateZ(2px); } .hero-coin-spin > .hero-coin-back { transform: rotateY(180deg) translateZ(2px); } .hero-coin-edge { width: 4px; margin-left: -2px; } }
+@media (max-width: 720px) { .hero-coin { --t: 2px; width: min(116px, 32vw); } }
 .hero-tabs [role="tab"][aria-selected="true"] { cursor: default; }
 .hero-tabs [role="tab"][aria-selected="true"]:hover { filter: none; }
 .hpanel { gap: 12px; margin-top: -22px; }
