@@ -1312,3 +1312,18 @@ body.pk-page { padding: 0; }
 @media (max-width: 1000px) { .pk-frog { --s: 54px; right: 6px; } .pk-frog-say { max-width: 96px; font-size: 0.68rem; } }
 @media (max-width: 560px) { .pk { padding-right: 52px; } .pk-frog { --s: 42px; right: 4px; } .pk-frog.quiet .pk-frog-say { opacity: 0; transform: translateX(8px); pointer-events: none; } .pk-frog-say { max-width: 88px; padding: 5px 7px; } }
 @media (prefers-reduced-motion: reduce) { .pk-frog img { transition: none; } }
+
+/* Press kit: official logo files (assets/brand/official), shown on the background each one is made for */
+.pk-logos { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.pk-logos a { display: grid; grid-template-rows: auto 1fr; height: 100%; border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; background: var(--panel); color: var(--ink); text-decoration: none; transition: border-color 0.15s; }
+.pk-logos a:hover { border-color: var(--accent); }
+.pk-logo-art { display: flex; align-items: center; justify-content: center; height: 110px; padding: 14px; background: #fff; overflow: hidden; box-sizing: border-box; }
+.pk-logo-art.is-dark { background: #1b1f1c; }
+.pk-logo-art img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.pk-logo-art.is-dark { padding: 0; }
+.pk-logo-art.is-dark img { max-width: none; max-height: none; width: 125%; }
+.pk-logo-art.is-dark img[src*="wordmark"] { width: 100%; }
+.pk-logo-cap { display: flex; justify-content: space-between; gap: 8px; padding: 9px 12px; border-top: 1px solid var(--rule); font-size: 0.82rem; }
+.pk-logo-cap b { font: 700 0.72rem var(--f-mono); color: var(--accent-mid); padding-top: 2px; }
+.pk-logos a:hover .pk-logo-cap span { color: var(--link); }
+@media (max-width: 760px) { .pk-logos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
