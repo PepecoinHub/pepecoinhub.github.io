@@ -452,3 +452,8 @@ footer.foot a { color: #edf3e3; }
 .foot .support dd { margin: 0; min-width: 0; }
 .foot .support code { font-size: .86rem; overflow-wrap: anywhere; user-select: all; }
 @media (max-width: 480px) { .foot .support dl > div { grid-template-columns: 1fr; gap: 4px; } }
+/* GIF strips (art: Lily in Pyjamas) */
+.gifs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 200px)); gap: 18px; justify-content: center; align-items: start; }
+.gifs figure.meme:nth-child(even) { transform: rotate(-2deg); }
+.gif-cred { text-align: center; margin: 14px auto 0; }
+@media (max-width: 430px) { .gifs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
