@@ -757,3 +757,93 @@ footer.foot a { color: #edf3e3; }
 .pondos .show-desk { flex: none; align-self: stretch; width: 12px; margin: 4px -2px 4px 2px; padding: 0; border: 1px solid var(--chrome-lo); background: color-mix(in srgb, var(--chrome) 70%, var(--sel)); cursor: pointer; }
 .pondos .show-desk:hover, .pondos .show-desk[aria-pressed="true"] { background: var(--sel); }
 .pondos main:empty, .pondos main:not(:has(.win-host:not(.is-min):not(.is-closed))) { min-height: calc(100vh - 120px); }
+
+/* ================================================================ PondOS 98
+   Classic 98-style chrome: silver faces, two-pixel bevels, gradient title bars (pond green,
+   not navy), tiny bold chrome text. Later rules here override the softer chrome above. */
+:root.pondos {
+  --chrome: #c3c3bd; --chrome-hi: #ffffff; --chrome-lo: #808080; --chrome-dk: #0a0a0a; --chrome-face: #dfdfdf;
+  --title: #0c4a24; --title-2: #3f9c5c; --title-off: #7f7f7f; --title-off-2: #b8b8b8; --pane: #ffffff; --sel: #0c5a2c;
+  --f-chrome: Tahoma, Verdana, "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) {
+  --chrome: #3c403c; --chrome-hi: #6a706a; --chrome-lo: #1c1e1c; --chrome-dk: #000; --chrome-face: #4a4f4a; --pane: #17211a;
+  --title: #1f7a40; --title-2: #4fb36d; --title-off: #3a3a3a; --title-off-2: #5a5a5a; --sel: #2f8a4c; } }
+:root.pondos[data-theme="dark"] {
+  --chrome: #3c403c; --chrome-hi: #6a706a; --chrome-lo: #1c1e1c; --chrome-dk: #000; --chrome-face: #4a4f4a; --pane: #17211a;
+  --title: #1f7a40; --title-2: #4fb36d; --title-off: #3a3a3a; --title-off-2: #5a5a5a; --sel: #2f8a4c; }
+.pondos .win, .os-dlg .win, .pondos .startmenu, .pondos .start, .pondos .task, .pondos .win-ctl button, .os-dlg .win-ctl button,
+.pondos .btn, .os-dlg .btn, .pondos .sm-btn, .pondos .chip, .ctx, .pondos .sm-sub, .wm-list, .app-btn {
+  border: 0 !important; border-radius: 0 !important;
+  box-shadow: inset -1px -1px 0 var(--chrome-dk), inset 1px 1px 0 var(--chrome-face), inset -2px -2px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-hi) !important;
+}
+.pondos .start[aria-expanded="true"], .pondos .task[aria-pressed="true"], .pondos .btn:active, .os-dlg .btn:active, .pondos .win-ctl button:active, .app-btn:active, .app-btn[aria-pressed="true"] {
+  box-shadow: inset -1px -1px 0 var(--chrome-hi), inset 1px 1px 0 var(--chrome-dk), inset -2px -2px 0 var(--chrome-face), inset 2px 2px 0 var(--chrome-lo) !important;
+  background: repeating-conic-gradient(var(--chrome) 0 25%, var(--chrome-hi) 0 50%) 0 0 / 2px 2px;
+}
+.pondos .win, .os-dlg .win { padding: 3px; }
+.pondos .win, .os-dlg .win { box-shadow: inset -1px -1px 0 var(--chrome-dk), inset 1px 1px 0 var(--chrome-face), inset -2px -2px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-hi), 3px 4px 0 rgba(0, 0, 0, 0.25) !important; }
+.pondos .win-bar, .os-dlg .win-bar { height: 22px; padding: 0 2px 0 4px; font: 700 12px/1 var(--f-chrome); background: linear-gradient(90deg, var(--title-off), var(--title-off-2)); color: #d4d4d4; }
+.pondos .win.active > .win-bar, .os-dlg .win.active > .win-bar { background: linear-gradient(90deg, var(--title), var(--title-2)); color: #fff; }
+.pondos .win-ctl button, .os-dlg .win-ctl button { width: 16px; height: 14px; color: #000; background: var(--chrome); }
+.pondos .win-ctl .w-x, .os-dlg .win-ctl .w-x { background: var(--chrome); color: #000; }
+.pondos .win-ctl svg, .os-dlg .win-ctl svg { width: 8px; height: 8px; }
+.pondos .win-body, .os-dlg .dlg-body { box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi) !important; border: 0; }
+.win-menu, .win-status, .pondos .tray, .sm-item, .sm-list, .ctx, .wm-list, .pondos .task, .pondos .start, .dlg-btns .btn, .pondos .btn { font-family: var(--f-chrome); }
+.win-menu { font-size: 12px; }
+.win-status { font-size: 11px; }
+.win-status span { border: 0; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
+.pondos .btn, .os-dlg .btn { background: var(--chrome); color: var(--ink); font: 400 12px/1.2 var(--f-chrome); padding: 6px 14px; min-width: 75px; justify-content: center; }
+:root.pondos:not([data-theme="dark"]) .pondos .btn { color: #000; }
+.pondos .btn.go, .os-dlg .btn.go { outline: 1px dotted var(--chrome-dk); outline-offset: -5px; }
+.pondos header.top { background: var(--chrome); border-top: 1px solid var(--chrome-face); box-shadow: inset 0 1px 0 var(--chrome-hi); }
+.pondos .bar { height: 40px; }
+.pondos header.top { height: 40px; }
+.pondos body { padding-bottom: 40px; }
+.pondos .start { height: 30px; font: 700 13px/1 var(--f-chrome); color: #000; }
+:root.pondos[data-theme="dark"] .pondos .start, :root.pondos[data-theme="dark"] .pondos .task { color: var(--ink); }
+.pondos .task { height: 30px; font: 400 12px/1 var(--f-chrome); }
+.pondos .tray { height: 30px; border: 0; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); font: 400 11px/1 var(--f-chrome); }
+.win-host.is-max { inset: 0 0 40px 0; }
+.balloon { bottom: 50px; }
+.pondos .nav.startmenu { bottom: calc(100% + 1px); }
+.sm-band { background: linear-gradient(0deg, var(--title), var(--title-2)); }
+.sm-band span::after { content: " 98"; color: #fff; }
+.pondos .sm-item { font: 400 12px/1.2 var(--f-chrome); padding: 5px 8px; }
+.pondos .sm-item img { width: 24px; height: 24px; }
+.sm-list b { font: 700 12px/1.15 var(--f-chrome); } .sm-list small { font-size: 11px; }
+.icons span { font-family: var(--f-chrome); font-size: 11px; }
+.icons a.sel span, .icons button.sel span { background: var(--sel); text-shadow: none; outline: 1px dotted #fff; }
+.icons a.sel img, .icons button.sel img { filter: sepia(1) hue-rotate(70deg) saturate(2) brightness(0.8); }
+.icons li { touch-action: none; }
+.icons .dragging { opacity: 0.7; position: relative; z-index: 3; }
+
+/* ---------- floating app windows (games, bin) ---------- */
+.app-win { position: fixed; z-index: 75; left: 50%; top: 60px; transform: translateX(-50%); width: min(520px, calc(100vw - 16px)); }
+.app-win .win { padding: 3px; }
+.app-win .app-body { padding: 8px; display: grid; gap: 8px; background: var(--chrome); }
+.app-win canvas { display: block; width: 100%; height: auto; background: #071009; image-rendering: pixelated; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); touch-action: none; }
+.app-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font: 400 12px/1.3 var(--f-chrome); color: var(--ink); }
+.app-row .grow { flex: 1; }
+.app-btn { padding: 8px 14px; background: var(--chrome); color: #000; font: 700 13px/1 var(--f-chrome); cursor: pointer; user-select: none; touch-action: none; }
+.touch-pad { display: none; }
+@media (hover: none), (pointer: coarse) { .touch-pad { display: flex; } }
+.bin-list { list-style: none; margin: 0; padding: 4px; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); font: 400 12px/1.4 var(--f-chrome); color: var(--ink); }
+.bin-list li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 3px 4px; cursor: default; }
+.bin-list li:hover, .bin-list li.sel { background: var(--sel); color: #fff; }
+.bin-list small { opacity: 0.75; }
+.bin-tip { font: 400 12px/1.4 var(--f-chrome); color: var(--ink); min-height: 2.8em; }
+
+/* ---------- full-screen moments ---------- */
+.safe-off { position: fixed; inset: 0; z-index: 130; display: grid; place-items: center; background: #000; color: #f0a030; font: 700 clamp(1.2rem, 3.6vw, 2.2rem)/1.3 var(--f-pixel); text-align: center; padding: 20px; cursor: pointer; }
+.safe-off small { display: block; margin-top: 18px; font: 400 0.8rem var(--f-mono); color: #777; }
+.coin-rain { position: fixed; top: -80px; z-index: 125; width: 56px; height: 56px; pointer-events: none; animation: rain 2.6s linear forwards; }
+@keyframes rain { to { transform: translateY(110vh) rotate(540deg); } }
+/* desktop icons flow in columns, like a real desktop */
+@media (min-width: 1101px) {
+  .desk { width: auto; overflow: visible; bottom: 48px; }
+  .desk .icons { height: 100%; grid-auto-flow: column; grid-template-rows: repeat(auto-fill, 74px); grid-auto-columns: 92px; gap: 2px 4px; }
+  .pondos main { padding-left: 214px; }
+  .pondos footer.foot { padding-left: 214px; }
+}
+.icons img { width: 36px; height: 36px; }
