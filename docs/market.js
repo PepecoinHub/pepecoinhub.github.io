@@ -117,16 +117,7 @@
     return Date.now() - f.t < FILE_MAX_AGE ? f : null;
   }).catch(function () { return null; });
 
-  function liveCoins() {
-    return getJSON(CG + 'coins/markets?vs_currency=usd&ids=' + COINS.join(',') + '&sparkline=true&price_change_percentage=24h,7d').then(function (j) {
-      var o = {};
-      j.forEach(function (c) {
-        o[c.id] = { price: c.current_price, ch24: c.price_change_percentage_24h_in_currency != null ? c.price_change_percentage_24h_in_currency : c.price_change_percentage_24h,
-          ch7: c.price_change_percentage_7d_in_currency, spark: ((c.sparkline_in_7d || {}).price || []).filter(function (p, i) { return i % 2 === 0; }) };
-      });
-      return o;
-    });
-  }
+
   function liveGlobal() {
     return getJSON(CG + 'global').then(function (j) {
       var d = j.data;
@@ -190,7 +181,7 @@
       ch.textContent = arrow(c.ch24) + pct(c.ch24);
       ch.className = 'mk-ch ' + dir(c.ch24);
       card.querySelector('.mk-7d').textContent = t.d7 + ' ' + pct(c.ch7);
-      spark(card.querySelector('.mk-sp'), c.spark, dir(c.ch7));
+      spark(card.querySelector('.mk-sp'), (c.spark || []), dir(c.ch7));
       if (c.ch24 != null) { n++; sum += c.ch24; if (c.ch24 > 0) up++; }
     });
     if (!n) return;
@@ -398,14 +389,17 @@
   $('mk-cmp').addEventListener('change', function () { state.cmp = this.value; chart(); });
   fillCompare();
 
-  part('coins', liveCoins).then(function (c) {
-    if (!c) return;
-    state.coins = c; renderCards(c);
-    fileP.then(function (f) {
-      var when = f ? new Date(f.t) : new Date();
-      $('mk-updated').textContent = fill(t.live, { t: new Intl.DateTimeFormat(L, { hour: '2-digit', minute: '2-digit' }).format(when) });
+  function refreshQuotes() { return Promise.all([part('coins', function () { return Promise.resolve({}); }), window.PepPrices.markets()]).then(function (r) {
+    var c = r[0] || {}, snapshot = r[1];
+    snapshot.d.forEach(function (x) {
+      if (COINS.indexOf(x.id) < 0) return;
+      c[x.id] = Object.assign({}, c[x.id] || {}, { price: x.current_price, ch24: x.price_change_percentage_24h });
     });
-  });
+    state.coins = c; renderCards(c);
+    $('mk-updated').textContent = window.PepPrices.describe(snapshot, L);
+  }).catch(function () { /* The generated snapshot stays visible. */ }); }
+  window.PepPrices.subscribe(refreshQuotes);
+
   chart();
   fileP.then(function (f) { renderSeason(f && f.season); });
   part('fng', liveFng).then(renderFng);

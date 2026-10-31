@@ -146,32 +146,20 @@ function hashrate(hs, loc) {
 
 async function priceNow() {
   const file = path.join(DOCS, 'data', 'price.json');
-  let saved = null;
-  try { saved = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { /* no saved price yet */ }
-  const get = async (q) => {
-    const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&' + q, { signal: AbortSignal.timeout(15000) });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.json();
-  };
-  try {
-    const a = (await get('ids=pepecoin-network'))[0];
-    if (!a || !(a.current_price > 0)) throw new Error('no PEP price');
-    // market caps of the top 250 coins, for "×100 would be #N in crypto"; keep yesterday's list if this fails
-    let caps = saved && saved.top_caps;
-    try {
-      const top = (await get('order=market_cap_desc&per_page=250&page=1')).filter((c) => c.id !== 'pepecoin-network' && c.market_cap > 0);
-      if (top.length > 100) caps = top.map((c) => Math.round(c.market_cap)).sort((x, y) => y - x);
-    } catch (e) { console.error('top 250 not fetched:', e.message); }
-    const p = { schema: 1, date: new Date().toISOString().slice(0, 10), price_usd: a.current_price,
-      change_24h: typeof a.price_change_percentage_24h === 'number' ? a.price_change_percentage_24h : null,
-      supply: a.total_supply || a.circulating_supply || (saved && saved.supply), source: 'https://api.coingecko.com/api/v3/coins/markets' };
-    if (caps) p.top_caps = caps;
-    fs.writeFileSync(file, JSON.stringify(p) + '\n');
-    return p;
-  } catch (e) {
-    console.error('price not fetched, using the saved one:', e.message);
-    return saved;
+  const saved = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const row = net.rows[net.rows.length - 1];
+  saved.supply = row[net.columns.indexOf('supply_pep')];
+  saved.supply_source = 'https://pepeblocks.com/';
+  saved.supply_time = new Date(row[net.columns.indexOf('time')] * 1000).toISOString();
+  saved.market_cap = saved.price_usd * saved.supply;
+  fs.writeFileSync(file, JSON.stringify(saved) + '\n');
+  const quotesFile = path.join(DOCS, 'data', 'market-prices.json');
+  if (fs.existsSync(quotesFile)) {
+    const quotes = JSON.parse(fs.readFileSync(quotesFile, 'utf8'));
+    quotes.pep_supply = { value: saved.supply, time: saved.supply_time, source: saved.supply_source };
+    fs.writeFileSync(quotesFile, JSON.stringify(quotes) + '\n');
   }
+  return saved;
 }
 
 function home(file, S, mining, price) {
@@ -244,6 +232,41 @@ for (const f of pages('rich-list.html')) {
 let mining = null;
 try { mining = JSON.parse(fs.readFileSync(path.join(DOCS, 'data', 'mining.json'), 'utf8')); } catch (e) { console.error('no mining.json:', e.message); }
 const price = await priceNow();
+
+// Update text fallbacks everywhere, not just the home page. Historical examples without
+// data-live/data-m remain historical. No network requests are made by this generator.
+let markets = [];
+try { markets = JSON.parse(fs.readFileSync(path.join(DOCS, 'data/market-prices.json'), 'utf8')).markets; } catch (e) { /* first run */ }
+function bakeFacts(file) {
+  let html = fs.readFileSync(file, 'utf8');
+  const lang = langOf(html), loc = LOCALE[lang] || 'en-US', row = net.rows[net.rows.length - 1];
+  const col = (key) => row[net.columns.indexOf(key)];
+  const fmt = (v, digits) => new Intl.NumberFormat(loc, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(v);
+  const values = { 'supply-b': fmt(col('supply_pep') / 1e9, 1), 'supply-m': fmt(Math.round(col('supply_pep') / 1e8) * 100, 0),
+    'supply-yi': String(Math.round(col('supply_pep') / 1e8)), inflation: fmt(Math.round(5256000000 / col('supply_pep') * 100), 0),
+    addresses: fmt(col('addresses_with_balance'), 0), height: fmt(col('height'), 0), year: String(new Date(col('time') * 1000).getUTCFullYear()) };
+  html = html.replace(/(<span\b[^>]*\bdata-live="([a-z-]+)"[^>]*>)[^<]*(<\/span>)/g, (m, open, key, close) => key in values ? open + esc(values[key]) + close : m);
+  if (file.includes(path.sep + 'meme' + path.sep)) {
+    const m = { supply: bigPep(col('supply_pep'), 'en-US'), 'supply-b': values['supply-b'], height: values.height,
+      addrs: fmt(col('addresses_with_balance'), 0), price: usd(price.price_usd, loc), chg: pct(price.change_24h || 0, loc),
+      mcap: usd(price.price_usd * price.supply, loc), x100: usd(price.price_usd * price.supply * 100, loc),
+      rank: String(1 + (price.top_caps || []).filter((c) => c > price.price_usd * price.supply * 100).length),
+      tdate: new Date(price.updated_at || price.date).toLocaleString(loc),
+      hash: mining && hashrate(mining.hashrate_hs, loc), hdate: mining && mining.date };
+    html = html.replace(/(<span\b[^>]*\bdata-m="([a-z0-9-]+)"[^>]*>)[^<]*(<\/span>)/g, (match, open, key, close) => m[key] != null ? open + esc(m[key]) + close : match);
+    html = html.replace(/(<div\b[^>]*\bdata-m="(price|mcap|x100|hash)"[^>]*>)[^<]*(<\/div>)/g, (match, open, key, close) => m[key] != null ? open + esc(m[key]) + close : match);
+  }
+  if (['calculator.html', 'compare.html'].includes(path.basename(file)) && markets.length) {
+    const snapshot = markets.filter((c) => ['pepecoin-network', 'dogecoin', 'bitcoin', 'litecoin', 'pepe'].includes(c.id)).map((c) => c.id === 'pepecoin-network' ? { ...c, total_supply: price.supply, market_cap: price.price_usd * price.supply } : c);
+    html = html.replace(/var SNAP = \[[\s\S]*?\n  \];/, 'var SNAP = ' + JSON.stringify(snapshot) + ';');
+    const status = new Date(price.updated_at || price.date).toLocaleString(loc) + ' · CoinGecko';
+    html = html.replace(/(<p\b[^>]*\bid="status"[^>]*>)[^<]*(<\/p>)/, '$1' + esc(status) + '$2');
+  }
+  fs.writeFileSync(file, html);
+}
+for (const file of fs.readdirSync(DOCS, { recursive: true }).filter((f) => f.endsWith('.html'))) {
+  try { bakeFacts(path.join(DOCS, file)); } catch (e) { failed++; console.error(file + ': ' + e.message); }
+}
 for (const f of pages('index.html')) {
   try { home(f, sum, mining, price); console.log('numbers baked into', path.relative(DOCS, f)); }
   catch (e) { failed++; console.error(`${path.relative(DOCS, f)} skipped: ${e.message}`); }
@@ -260,19 +283,19 @@ try {
   let old = {};
   try { old = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { /* first run */ }
   const t = { schema: 2, updated: new Date().toISOString().slice(0, 16) + 'Z' };
-  if (price && price.price_usd > 0) t.price = { usd: price.price_usd, change_24h: price.change_24h };
+  if (price && price.price_usd > 0) t.price = { usd: price.price_usd, change_24h: price.change_24h, time: price.updated_at || price.date };
   const H = 3600e3, now = Date.now();
   let samples = (old.hash_samples || []).filter((x) => now - Date.parse(x[0]) < 50 * H);
   if (mining && mining.hashrate_hs > 0) {
     const lastS = samples[samples.length - 1];
-    if (!lastS || lastS[1] !== mining.hashrate_hs) samples.push([new Date().toISOString().slice(0, 16) + 'Z', mining.hashrate_hs]);
+    if (!lastS || lastS[1] !== mining.hashrate_hs) samples.push([mining.updated_at || mining.date + 'T00:00:00Z', mining.hashrate_hs]);
     // single readings swing by ±10% within hours, so compare the average of the last 24 hours with the 24 hours before
     const avg = (from, to) => {
       const v = samples.filter((x) => { const age = now - Date.parse(x[0]); return age >= from && age < to; }).map((x) => x[1]);
       return v.length >= 2 ? v.reduce((a, b) => a + b, 0) / v.length : null;
     };
     const day = avg(0, 24 * H), before = avg(24 * H, 48 * H);
-    t.hashrate = { hs: mining.hashrate_hs, change_24h: day && before ? Math.round((day / before - 1) * 10000) / 100 : null };
+    t.hashrate = { hs: mining.hashrate_hs, time: mining.updated_at || mining.date, change_24h: day && before ? Math.round((day / before - 1) * 10000) / 100 : null };
   }
   t.hash_samples = samples;
   const share = (n) => { const i = sum.tops.indexOf(n); return i < 0 ? null : sum.views.all.shares[i]; };
@@ -287,6 +310,6 @@ try {
   }
   fs.writeFileSync(file, JSON.stringify(t) + '\n');
   console.log('data strip:', JSON.stringify({ ...t, hash_samples: samples.length }));
-} catch (e) { console.error('ticker.json not updated:', e.message); }
-// a page that could not be updated keeps yesterday's numbers; never fail the daily job for it
-process.exit(0);
+} catch (e) { failed++; console.error('ticker.json not updated:', e.message); }
+// A broken generator must be visible in Actions, not silently publish mixed snapshots.
+process.exitCode = failed ? 1 : 0;

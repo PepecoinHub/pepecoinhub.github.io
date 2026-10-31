@@ -67,9 +67,16 @@ jobs:
             echo "No snapshots yet, publishing the empty state."
           fi
 
-      # the plain-HTML numbers on the home, network and rich list pages, in every language
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Shared market quotes
+        run: python scripts/fetch_quotes.py
+
+      # The same saved quotes feed both editions and every generated HTML fallback.
       - name: Bake numbers into the pages
-        run: node scripts/prebake.mjs || echo "page numbers not updated"
+        run: node scripts/prebake.mjs
 
       - name: Date the sitemap
         run: python scripts/build_sitemap.py || echo "sitemap dates not updated"
@@ -83,7 +90,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data docs/sitemap.xml $(ls docs/index.html docs/network.html docs/rich-list.html docs/*/index.html docs/*/network.html docs/*/rich-list.html 2>/dev/null)
+          git add docs/data docs/sitemap.xml ':(glob)docs/**/*.html'
+          git diff --exit-code -- docs
           if git diff --cached --quiet; then
             echo "Nothing new to commit."
           else

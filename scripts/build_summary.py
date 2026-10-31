@@ -340,7 +340,7 @@ def build(data_dir, out_path, csv_path):
             "height": meta.get("height"),
             "supply": pep(latest["supply"]),
             "supply_source": meta.get("supply_source"),
-            "address_count": meta.get("address_count"),
+            "address_count": meta.get("holders_listed") or meta.get("address_count"),
             "rows": len(latest["rows"]),
         },
         "first_date": all_dates[0],

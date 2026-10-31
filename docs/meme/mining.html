@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=Gochi+Hand&display=swap">
-<link rel="stylesheet" href="meme.css?v=20261030p">
+<link rel="stylesheet" href="meme.css?v=20261031data1">
 <style>
 .coin-chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
 .coin-chips li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border: 2.5px solid var(--line); border-radius: 999px; background: var(--card); font-weight: 700; box-shadow: 3px 3px 0 var(--hard); }
@@ -80,7 +80,7 @@
       <div>
         <p class="kicker">Mined, not minted</p>
         <h2 id="pepe" style="font-size:clamp(1.5rem,3.4vw,2.2rem)">PEP is mined, PEPE is not</h2>
-        <p><b>PEP is the only Pepe coin with a real mining network</b>: it is merge-mined with Litecoin and Dogecoin, at about <span data-m="hash">2.11 PH/s</span> (<span data-m="hdate">PepeBlocks, Oct 23, 2026</span>). The Pepe tokens on Ethereum (PEPE, PEPECOIN) are not mined at all.</p>
+        <p><b>PEP is the only Pepe coin with a real mining network</b>: it is merge-mined with Litecoin and Dogecoin, at about <span data-m="hash">1.9 PH/s</span> (<span data-m="hdate">2026-10-30</span>). The Pepe tokens on Ethereum (PEPE, PEPECOIN) are not mined at all.</p>
         <p>Pepe (PEPE) and PepeCoin (PEPECOIN) are ERC-20 tokens on Ethereum. Ethereum replaced mining with proof of stake on September 15, 2022, so there is nothing to mine. An app or website that offers to “mine PEPE” is not mining it on any blockchain.</p>
         <p>Before you set a payout address, check the ticker and the network: PEP on the Pepecoin network, an address that starts with <b>P</b>. <a href="which-pepecoin.html">PEP, PEPE and PEPECOIN side by side.</a></p>
       </div>
@@ -183,7 +183,7 @@
       <details class="panel"><summary>Can I mine Pepe (PEPE)?</summary><p>No. Pepe (PEPE) is an ERC-20 token on Ethereum, and Ethereum has used proof of stake instead of mining since September 15, 2022. The coin that is mined is Pepecoin (PEP), on its own blockchain.</p></details>
       <details class="panel"><summary>Are “Pepe coin mining” apps real?</summary><p>An app cannot mine Pepe (PEPE): it is an ERC-20 token on Ethereum, and Ethereum has had no mining since September 15, 2022. Pepecoin (PEP) is mined with Scrypt ASIC machines on mining pools, as in the steps above. An app that pays out “Pepe” for mining on your phone is not mining a blockchain.</p></details>
       <details class="panel"><summary>Which wallet do I need for mining payouts?</summary><p>Any wallet that holds Pepecoin (PEP) on the Pepecoin network, such as Pepecoin Core or a Tangem card. Its receiving address starts with P. MetaMask is built for Ethereum-type networks and does not list Pepecoin.</p></details>
-      <details class="panel"><summary>How much PEP does the network pay out?</summary><p>Every block pays 10,000 PEP. At the target of one block a minute that is up to 14.4 million PEP a day, shared by everyone mining it. Blocks have averaged about 62.6 seconds over the past year, so the real figure is about 13.8 million.</p></details>
+      <details class="panel"><summary>How much PEP does the network pay out?</summary><p>Every block pays 10,000 PEP. At the target of one block a minute that is about 14.4 million PEP a day, shared by everyone mining it. Blocks have averaged about 62.6 seconds over the past year, so the real figure is about 13.8 million.</p></details>
     </div>
   </section>
 
@@ -212,7 +212,8 @@
 </main>
 
 <footer class="foot"></footer>
-<script src="meme.js?v=20261030p"></script>
+<script src="../prices.js?v=20261031data1"></script>
+<script src="meme.js?v=20261031data1"></script>
 <script>
 (function () {
   // same arithmetic as the serious page (mining-calc.js): share of the network hashrate x blocks a day x 10,000 PEP, minus the pool fee

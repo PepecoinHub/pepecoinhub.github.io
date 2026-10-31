@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=Gochi+Hand&display=swap">
-<link rel="stylesheet" href="meme.css?v=20261030p">
+<link rel="stylesheet" href="meme.css?v=20261031data1">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
@@ -73,7 +73,7 @@
           <div><dt>Chain</dt><dd>Its own layer-1, a fork of Dogecoin Core</dd></div>
           <div><dt>Born</dt><dd>January 30, 2024</dd></div>
           <div><dt>Mineable</dt><dd><span class="yes">Yes.</span> Scrypt, merge-mined with LTC and DOGE</dd></div>
-          <div><dt>Supply</dt><dd>~<span data-m="supply">105.05B</span>, plus 10,000 per block</dd></div>
+          <div><dt>Supply</dt><dd>~<span data-m="supply">105.16B</span>, plus 10,000 per block</dd></div>
           <div><dt>Address</dt><dd>Starts with <b>P</b></dd></div>
         </dl>
         <footer>Contract address: none. It’s a coin.</footer>
@@ -119,19 +119,19 @@
     <div class="receipts">
       <div class="receipt">
         <div class="rh">Price · PEP/USD</div>
-        <div class="big num" data-m="price">$0.0000849</div>
-        <div class="ln"><span>24h</span><span data-m="chg">+1.08%</span></div>
+        <div class="big num" data-m="price">$0.0000913</div>
+        <div class="ln"><span>24h</span><span data-m="chg">+6.41%</span></div>
         <div class="sep"></div>
         <div class="ln"><span>Source</span><span><a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko</a></span></div>
-        <div class="ln"><span>Updated</span><span data-m="tdate">Oct 23, 2026</span></div>
+        <div class="ln"><span>Updated</span><span data-m="tdate">10/31/2026, 1:46:53 AM</span></div>
         <div class="bars" aria-hidden="true"></div>
         <div class="thx">Thank you for DYOR</div>
       </div>
       <div class="receipt">
         <div class="rh">Market cap</div>
-        <div class="big num" data-m="mcap">$8.72M</div>
-        <div class="ln"><span>×100</span><span data-m="x100">$872M</span></div>
-        <div class="ln"><span>Rank at ×100</span><span>#<span data-m="rank">82</span></span></div>
+        <div class="big num" data-m="mcap">$9.6M</div>
+        <div class="ln"><span>×100</span><span data-m="x100">$960M</span></div>
+        <div class="ln"><span>Rank at ×100</span><span>#<span data-m="rank">76</span></span></div>
         <div class="sep"></div>
         <div class="ln"><span>Source</span><span><a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko</a></span></div>
         <div class="ln"><span>Note</span><span>math, not a forecast</span></div>
@@ -140,12 +140,12 @@
       </div>
       <div class="receipt">
         <div class="rh">Hashrate</div>
-        <div class="big num" data-m="hash">2.11 PH/s</div>
+        <div class="big num" data-m="hash">1.9 PH/s</div>
         <div class="ln"><span>Algorithm</span><span>Scrypt</span></div>
         <div class="ln"><span>Reward</span><span>10,000 PEP/block</span></div>
         <div class="sep"></div>
         <div class="ln"><span>Source</span><span><a href="https://pepeblocks.com/">PepeBlocks</a></span></div>
-        <div class="ln"><span>Updated</span><span data-m="tdate">Oct 23, 2026</span></div>
+        <div class="ln"><span>Updated</span><span data-m="hdate">2026-10-30</span></div>
         <div class="bars" aria-hidden="true"></div>
         <div class="thx">Thank you, miners</div>
       </div>
@@ -284,10 +284,12 @@
     </div>
     <p class="note" style="margin-top:16px">The full list, with Biconomy, Ourbit, swaps, card purchase and all five explorers, is on the <a href="../#links">serious home page</a>.</p>
   </section>
+<p class="note in" data-supply-note>PEP valuation = price × issued supply from the dated chain snapshot. Aggregators may use a different supply figure. Prices share one hourly snapshot across this site.</p>
 </main>
 
 <footer class="foot"></footer>
-<script src="meme.js?v=20261030p"></script>
+<script src="../prices.js?v=20261031data1"></script>
+<script src="meme.js?v=20261031data1"></script>
 <script>
 (function () {
   var M = window.Meme, f = M.fmt;
@@ -301,14 +303,15 @@
     if (p.tagName === 'BUTTON') box.hidden = true;
   });
   // live numbers from the serious site's data files
-  Promise.all([M.json('ticker.json'), M.json('price.json'), M.json('network.json')]).then(function (r) {
+  function refreshQuotes() { return Promise.all([M.json('ticker.json'), window.PepPrices.quote(), M.json('network.json')]).then(function (r) {
     var t = r[0], p = r[1], n = r[2], last = n.rows[n.rows.length - 1];
-    var price = t.price ? t.price.usd : p.price_usd, chg = t.price ? t.price.change_24h : p.change_24h;
-    var mcap = price * p.supply, x = mcap * 100, caps = p.top_caps || [];
+    var price = p.usd, chg = p.change_24h;
+    var mcap = price * p.supply, x = mcap * 100, caps = p.caps || [];
     var rank = caps.length ? (x < caps[caps.length - 1] ? caps.length + '+' : String(1 + caps.filter(function (c) { return c > x; }).length)) : '—';
     M.fill({ price: f.usd(price), chg: (chg > 0 ? '+' : chg < 0 ? '−' : '') + f.pct(Math.abs(chg)), mcap: f.usd(mcap), x100: f.usd(x), rank: rank,
-      hash: f.hash(t.hashrate && t.hashrate.hs), tdate: f.date(t.updated), supply: f.compact(last[2]) });
-  }).catch(function () { /* keep the saved figures */ });
+      hash: f.hash(t.hashrate && t.hashrate.hs), tdate: window.PepPrices.describe(p, 'en-US'), hdate: f.date((t.hashrate && t.hashrate.time) || t.updated), supply: f.compact(last[2]) });
+  }).catch(function () { /* keep the saved figures */ }); }
+  window.PepPrices.subscribe(refreshQuotes);
 })();
 </script>
 </body>

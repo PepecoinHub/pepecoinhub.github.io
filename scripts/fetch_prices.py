@@ -52,12 +52,12 @@ def main():
             if j and j.get("prices"):
                 out["series"].setdefault(coin, {})[str(days)] = thin(j["prices"])
             time.sleep(3)
-    own = get("coins/markets?vs_currency=usd&ids=" + ",".join([PEP] + POW))
-    time.sleep(3)
-    top = get("coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1")
-    if own and top:
-        out["markets"] = [dict({k: c.get(k) for k in KEEP}, top=False) for c in own] + \
-                         [dict({k: c.get(k) for k in KEEP}, top=True) for c in top]
+    # Quotes are fetched once, before HTML generation, by fetch_quotes.py.
+    try:
+        with open(os.path.join(os.path.dirname(OUT), 'market-prices.json'), encoding='utf-8') as fh:
+            out['markets'] = json.load(fh)['markets']
+    except (OSError, ValueError, KeyError):
+        pass
     got = sum(len(v) for v in out["series"].values())
     print(f"price-live.json: {got}/6 charts, markets {'yes' if out['markets'] else 'no'}")
     if not got and not out["markets"]:
