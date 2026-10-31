@@ -1,0 +1,41 @@
+/* Optional home-page presentation; the shared navigation and meme edition keep their layout. */
+.home-focus .pill-bar { display: none; }
+.home-focus .lang-hint { max-width: 1064px; margin: 10px auto 0; padding: 2px 24px; background: transparent; border: 0; font-size: .82rem; }
+.home-focus .wrap:has(> .home-hero) { padding-top: 20px; gap: 30px; }
+.home-focus .home-hero { padding: 36px 40px; gap: 16px 40px; border-radius: 26px; background: linear-gradient(120deg, var(--panel), color-mix(in srgb, var(--accent-soft) 65%, var(--panel))); }
+.home-focus .home-hero-copy { gap: 18px; align-content: center; }
+.home-focus .home-hero h1 { font-size: clamp(2rem, 3.9vw, 3.25rem); line-height: 1.06; letter-spacing: -.035em; }
+.home-focus .home-hero .h1-sub { margin-top: 12px; font-size: .51em; line-height: 1.25; letter-spacing: -.015em; color: var(--accent-deep); }
+.home-focus .home-hero .lede { max-width: 57ch; font-size: 1.04rem; line-height: 1.65; }
+.home-focus .home-hero .eyebrow { font-size: .68rem; letter-spacing: .05em; }
+.home-focus .home-hero .hero-coin, .home-focus .home-hero-frog { width: 150px; }
+.home-focus .home-hero-visual { align-self: center; }
+.home-focus .pep-glance { padding: 16px 18px; border-radius: 16px; background: color-mix(in srgb, var(--panel) 55%, transparent); }
+.home-focus .pep-glance dl { font-size: .81rem; }
+.home-focus .pep-glance dt { font-size: .64rem; }
+.home-evidence { display: grid; gap: 10px; }
+.home-focus .home-evidence .pledge { padding: 0; border: 0; background: transparent; font-size: .83rem; line-height: 1.55; color: var(--muted); }
+.home-focus .home-evidence .pledge::before { display: none; }
+.home-media-link { width: fit-content; font-size: .88rem; font-weight: 700; color: var(--accent-deep); text-underline-offset: 4px; }
+.home-focus .hero-tabs { gap: 8px; }
+.home-focus .hero-tabs .btn { font-size: .86rem; padding: 10px 13px; }
+.home-focus .home-stats { padding: 16px; background: var(--panel); border-color: var(--rule); }
+.home-focus .home-stats .stat { background: transparent; box-shadow: none; }
+.home-focus .home-stats .stat .value { font-size: clamp(1.5rem, 2.6vw, 2rem); letter-spacing: -.03em; }
+.home-focus .home-stats [data-supply-note] { max-width: 100%; font-size: .72rem; margin: 10px 6px 0; }
+.home-focus .pitches { gap: 16px; }
+.home-focus .pitch { padding: 22px; border-radius: 18px; }
+.home-focus .wrap > .news-rot { margin: 0; max-width: none; font-size: .88rem; }
+@media (max-width: 720px) {
+  .home-focus .wrap:has(> .home-hero) { padding-top: 14px; gap: 24px; }
+  .home-focus .home-hero { padding: 26px 22px; gap: 22px; }
+  .home-focus .home-hero-copy { grid-row: auto; gap: 16px; }
+  .home-focus .home-hero h1 { font-size: clamp(1.85rem, 7.5vw, 2.5rem); }
+  .home-focus .home-hero .h1-sub { font-size: .59em; }
+  .home-focus .home-hero .lede { font-size: .95rem; line-height: 1.6; }
+  .home-focus .home-hero-visual { display: none; }
+  .home-focus .pep-glance { width: 100%; box-sizing: border-box; }
+  .home-focus .hero-tabs .btn { font-size: .8rem; padding: 9px 11px; }
+  .home-focus .home-stats { padding: 10px; }
+  .home-focus .home-stats .stat .value { font-size: clamp(1.1rem, 5vw, 1.5rem); }
+}
