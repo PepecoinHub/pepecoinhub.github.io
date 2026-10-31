@@ -69,7 +69,7 @@
       if (x >= 1e6) return '$' + (x / 1e6).toFixed(2) + 'M';
       if (x >= 1e4) return '$' + Math.round(x).toLocaleString('en-US');
       if (x >= 1) return '$' + x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      return '$' + x;
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumSignificantDigits: 3 }).format(x);
     },
     hash: function (hs) {
       if (hs == null) return '—';
@@ -97,10 +97,11 @@
   var ticker = document.querySelector('.ticker');
   if (ticker) {
     ticker.setAttribute('aria-label', 'Key numbers');
-    Promise.all([json('ticker.json'), json('network.json').catch(function () { return null; })]).then(function (r) {
+    function refreshTicker() { return Promise.all([json('ticker.json'), json('network.json').catch(function () { return null; }), window.PepPrices.quote().catch(function () { return null; })]).then(function (r) {
       var t = r[0], n = r[1], last = n && n.rows && n.rows[n.rows.length - 1];
       var items = [];
-      if (t.price) items.push(['PEP', fmt.usd(t.price.usd) + ' <span class="' + (t.price.change_24h < 0 ? 'dn">▼ ' : 'up">▲ ') + fmt.pct(Math.abs(t.price.change_24h)) + '</span>']);
+      t.price = r[2];
+      if (t.price) items.push(['PEP', fmt.usd(t.price.usd) + ' <span class="' + (t.price.change_24h < 0 ? 'dn">▼ ' : 'up">▲ ') + fmt.pct(Math.abs(t.price.change_24h)) + '</span><small> ' + window.PepPrices.describe(t.price, 'en-US') + '</small>']);
       if (t.hashrate) items.push(['HASHRATE', fmt.hash(t.hashrate.hs)]);
       if (last) {
         items.push(['BLOCK', fmt.int(last[1])]);
@@ -111,7 +112,8 @@
       items.push(['PREMINE', '0%'], ['REWARD', '10,000 PEP / block'], ['WEN MOON', 'NFA, fren']);
       var ul = items.map(function (i) { return '<li><b>' + i[0] + '</b>' + i[1] + '</li>'; }).join('');
       ticker.innerHTML = '<div class="ticker-track"><ul>' + ul + '</ul><ul aria-hidden="true">' + ul + '</ul></div>';
-    }).catch(function () { ticker.hidden = true; });
+    }).catch(function () { ticker.hidden = true; }); }
+    window.PepPrices.subscribe(refreshTicker);
   }
 
   /* ---------------------------------------------------------------- header */
@@ -183,6 +185,9 @@
       '<div class="footfine"><span>Memes are the community’s. Facts are everyone’s. The compiler holds PEP.</span><a class="exit" href="#top"><img src="img/exit.webp" alt="" width="46" height="52" loading="lazy">Back to the top</a></div>' +
       '</div>';
   }
+
+  // Same voluntary support section and receiving addresses as the serious footer.
+  if (foot) foot.querySelector('.footfine').insertAdjacentHTML('beforebegin', "<details class=\"support\"><summary>Like this site? You can support its further development.</summary><p>Any amount, however small, helps. Thank you!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>");
 
   // fill <span data-m="key"> with values, shared by pages
   function fill(map) {

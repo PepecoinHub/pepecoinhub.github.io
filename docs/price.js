@@ -477,7 +477,7 @@
       state.top = top.length > 100 ? top : null;
       renderStats(); renderLadder(); renderPow(by);
       if ($('x-target').value) $('x-target').dispatchEvent(new Event('input'));
-      $('status').textContent = fill(t.live, { t: new Date(hit ? hit.t : Date.now()).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) });
+      $('status').textContent = window.PepPrices.describe(hit, LOC);
     }).catch(function () {
       return window.PepPrices.quote().then(function (q) {
         state.pep.price = q.usd; state.pep.change = q.change_24h;
@@ -500,6 +500,6 @@
   renderPow({});
   wireLadder();
   setMult(100);
-  loadMarkets();
+  window.PepPrices.subscribe(loadMarkets);
   loadChart();
 })();

@@ -614,6 +614,7 @@
       var ul = document.createElement('ul'); ul.className = 'news-list';
       if (d.price && d.price.usd > 0) {
         var priceItem = item('price.html', n.price, usd(d.price.usd), d.price.change_24h, n.d24);
+        priceItem.setAttribute('data-ticker-price', '');
         var stamp = document.createElement('small');
         stamp.textContent = ' · ' + window.PepPrices.describe(d.price, loc);
         priceItem.appendChild(stamp); ul.appendChild(priceItem);
@@ -628,6 +629,16 @@
       }
       return ul;
     }
+    window.PepPrices.subscribe(function () {
+      window.PepPrices.quote().then(function (q) {
+        track.querySelectorAll('[data-ticker-price]').forEach(function (old) {
+          var next = item('price.html', n.price, usd(q.usd), q.change_24h, n.d24);
+          next.setAttribute('data-ticker-price', '');
+          var stamp = document.createElement('small'); stamp.textContent = ' · ' + window.PepPrices.describe(q, loc);
+          next.appendChild(stamp); old.replaceWith(next);
+        });
+      }).catch(function () {});
+    });
     fetch(ROOT + 'data/ticker.json').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
       return window.PepPrices.quote().then(function (q) { d.price = q; return d; }, function () { d.price = null; return d; });
     }).then(function (d) {

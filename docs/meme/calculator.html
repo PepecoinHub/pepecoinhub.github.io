@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=Gochi+Hand&display=swap">
-<link rel="stylesheet" href="meme.css?v=20261030p">
+<link rel="stylesheet" href="meme.css?v=20261031data1">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <style>
 [hidden] { display: none !important; }
@@ -177,7 +177,7 @@ th.plain { font: 700 0.95rem var(--f-body); text-transform: none; letter-spacing
       <tbody id="price-rows"></tbody>
     </table>
   </div>
-  <p class="src" id="status" style="margin-top:12px">Snapshot from CoinGecko, October 4–5, 2026.</p>
+  <p class="src" id="status" style="margin-top:12px">10/31/2026, 1:00:00 AM · CoinGecko</p>
   <noscript><p class="note">Live prices and the calculator need JavaScript. The table above shows the last saved snapshot.</p></noscript>
 </section>
 
@@ -187,7 +187,7 @@ th.plain { font: 700 0.95rem var(--f-body); text-transform: none; letter-spacing
     <figure class="panel meme blue"><img src="img/math.webp" alt="Pepe thinking in front of math formulas" width="420" height="420" loading="lazy"><figcaption>it’s just division, fren</figcaption></figure>
   </div>
   <div class="panel prose" style="padding:24px;max-width:none">
-    <p><strong>Market cap is price × supply.</strong> Divide another coin’s market cap by the number of PEP that exist, about <span data-live="supply-b">104.8</span> billion, and you get the price one PEP would have at that size. Multiply it by your amount for the value of your PEP.</p>
+    <p><strong>Market cap is price × supply.</strong> Divide another coin’s market cap by the number of PEP that exist, about <span data-live="supply-b">105.2</span> billion, and you get the price one PEP would have at that size. Multiply it by your amount for the value of your PEP.</p>
     <p><strong>Today or at the peak.</strong> “Today” uses each coin’s current market cap. “At its all-time high” uses the coin’s highest price × its supply today. For coins that keep issuing, such as Dogecoin, the real market cap at the peak was lower, because fewer coins existed then.</p>
     <p><strong>Not a forecast.</strong> A market cap is what the market pays for a coin today, and nothing here says Pepecoin will reach another coin’s size. PEP’s supply also grows by 10,000 PEP a block, so the same market cap means a slightly lower price per PEP over time. <a href="supply.html">Supply and inflation.</a></p>
   </div>
@@ -210,7 +210,7 @@ th.plain { font: 700 0.95rem var(--f-body); text-transform: none; letter-spacing
     </details>
     <details class="panel">
       <summary>Where do the prices come from?</summary>
-      <p>From CoinGecko’s public API: Pepecoin plus the top 100 coins by market cap, loaded in your browser and reused for up to 10 minutes. If they can’t be loaded, the page shows a saved snapshot from October 4–5, 2026.</p>
+      <p>Prices come from CoinGecko and are published as one shared hourly snapshot for every page. PEP supply comes from the dated chain snapshot. If an update fails, the last saved values keep their original measurement time.</p>
     </details>
   </div>
 </section>
@@ -239,29 +239,23 @@ th.plain { font: 700 0.95rem var(--f-body); text-transform: none; letter-spacing
     </ul></div>
   </div>
 </section>
+<p class="note in" data-supply-note>PEP valuation = price × issued supply from the dated chain snapshot. Aggregators may use a different supply figure. Prices share one hourly snapshot across this site.</p>
 </main>
 
 <footer class="foot"></footer>
-<script src="meme.js?v=20261030p"></script>
+<script src="../prices.js?v=20261031data1"></script>
+<script src="meme.js?v=20261031data1"></script>
 <script src="../live.js?v=20261012d" defer></script>
 <script>
 (function () {
   'use strict';
   var PEP_ID = 'pepecoin-network';
   var QUICK = ['dogecoin', 'litecoin', 'bitcoin', 'pepe'];
-  var API = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&sparkline=false';
-  var CACHE_KEY = 'pf-prices-v1';
   var AMOUNT_KEY = 'pf-pep-amount';
   var TTL = 10 * 60 * 1000;
 
   // Saved snapshot (CoinGecko, Oct 4-5, 2026). Shown first, replaced when live prices arrive.
-  var SNAP = [
-    { id: PEP_ID, symbol: 'pep', name: 'Pepecoin', current_price: 0.00009042, market_cap: 9283145, circulating_supply: 102668000000, total_supply: 104793000000, ath: 0.001824 },
-    { id: 'dogecoin', symbol: 'doge', name: 'Dogecoin', current_price: 0.09434, market_cap: 14736000000, circulating_supply: 156198000000, ath: 0.7316 },
-    { id: 'litecoin', symbol: 'ltc', name: 'Litecoin', current_price: 70.42, market_cap: 5470761331, circulating_supply: 77683000, ath: 410.26 },
-    { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', current_price: 85791.41, market_cap: 1723872933977, circulating_supply: 20094000, ath: 126080 },
-    { id: 'pepe', symbol: 'pepe', name: 'Pepe', current_price: 0.000004433, market_cap: 1864844512, circulating_supply: 420690000000000, ath: 0.00002803 }
-  ];
+  var SNAP = [{"id":"bitcoin","symbol":"btc","name":"Bitcoin","current_price":77324,"market_cap":1554636637903,"total_supply":20105365,"circulating_supply":20105365,"price_change_percentage_24h":0.52546,"ath":126080,"ath_date":"2025-10-06T10:57:42.000Z","last_updated":"2026-10-31T00:46:53.000Z","top":true},{"id":"dogecoin","symbol":"doge","name":"Dogecoin","current_price":0.076305,"market_cap":11945083461,"total_supply":156546232860.16907,"circulating_supply":156543692860.16907,"price_change_percentage_24h":3.46705,"ath":0.731578,"ath_date":"2021-05-07T21:08:23.000Z","last_updated":"2026-10-31T00:46:53.000Z","top":true},{"id":"litecoin","symbol":"ltc","name":"Litecoin","current_price":55.83,"market_cap":4342385595,"total_supply":77776517.37806574,"circulating_supply":77774011.12125915,"price_change_percentage_24h":3.81664,"ath":410.26,"ath_date":"2021-05-09T19:13:07.000Z","last_updated":"2026-10-31T00:46:53.000Z","top":true},{"id":"pepe","symbol":"pepe","name":"Pepe","current_price":0.00000498,"market_cap":2095805736,"total_supply":420690000000000,"circulating_supply":420690000000000,"price_change_percentage_24h":9.606,"ath":0.00002803,"ath_date":"2024-12-09T08:30:35.000Z","last_updated":"2026-10-31T00:46:53.000Z","top":true},{"id":"pepecoin-network","symbol":"pep","name":"Pepecoin","current_price":0.00009128,"market_cap":9598839.5832,"total_supply":105158190000,"circulating_supply":102667860000,"price_change_percentage_24h":6.40655,"ath":0.00182409,"ath_date":"2024-12-09T08:15:46.000Z","last_updated":"2026-10-31T00:46:53.000Z","top":false}];
 
   var coins = {};
   var order = [];
@@ -531,18 +525,6 @@ th.plain { font: 700 0.95rem var(--f-body); text-transform: none; letter-spacing
 
   function status(text) { $('status').textContent = text; }
 
-  function readCache() {
-    try {
-      var raw = localStorage.getItem(CACHE_KEY);
-      if (!raw) return null;
-      var o = JSON.parse(raw);
-      if (!o || !o.t || Date.now() - o.t > TTL || !Array.isArray(o.list)) return null;
-      return o;
-    } catch (e) { return null; }
-  }
-  function writeCache(list) {
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), list: list })); } catch (e) { /* storage unavailable */ }
-  }
   function slim(c) {
     return { id: c.id, symbol: c.symbol, name: c.name, current_price: c.current_price, market_cap: c.market_cap,
       circulating_supply: c.circulating_supply, total_supply: c.total_supply, ath: c.ath };
@@ -555,24 +537,13 @@ th.plain { font: 700 0.95rem var(--f-body); text-transform: none; letter-spacing
     status('Live prices from CoinGecko, updated ' + new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '. All-time highs are CoinGecko figures.');
     return true;
   }
-  function getJSON(url) {
-    return fetch(url).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    });
-  }
   function refresh() {
-    var cached = readCache();
-    if (cached && goLive(cached.list, cached.t)) return;
-    Promise.all([
-      getJSON(API + '&ids=' + PEP_ID),
-      getJSON(API + '&order=market_cap_desc&per_page=100&page=1')
-    ]).then(function (res) {
-      var list = res[0].concat(res[1]).map(slim);
-      if (goLive(list, Date.now())) writeCache(list);
-    }).catch(function () {
-      status('Showing the snapshot from October 4–5, 2026 (CoinGecko). Live prices could not be loaded just now.');
-    });
+    window.PepPrices.markets().then(function (result) {
+      var partial = result.d.length < 2;
+      var list = partial ? SNAP.filter(function (c) { return c.id !== PEP_ID; }).concat(result.d) : result.d;
+      goLive(list, result.t);
+      status(window.PepPrices.describe(result, document.documentElement.lang || 'en') + (partial ? ' Comparison assets: archived snapshot.' : ''));
+    }).catch(function () { /* Keep the explicitly dated HTML snapshot. */ });
   }
 
   var input = $('pep-amount');
@@ -606,7 +577,7 @@ th.plain { font: 700 0.95rem var(--f-body); text-transform: none; letter-spacing
 
   setCoins(SNAP);
   renderAll();
-  refresh();
+  document.addEventListener('DOMContentLoaded', function () { window.PepPrices.subscribe(refresh); });
 })();
 </script>
 </body>

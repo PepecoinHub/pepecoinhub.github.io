@@ -5,6 +5,21 @@
   var lang = (root.lang || 'en').slice(0, 2);
   var COPIED = { en: 'Copied', pl: 'Skopiowano', es: 'Copiado', de: 'Kopiert', fr: 'Copié', tr: 'Kopyalandı', it: 'Copiato', zh: '已复制' };
 
+  function refreshQuotes() {
+    window.PepPrices.quote().then(function (q) {
+      var loc = root.lang || 'en', money = function (v) { return new Intl.NumberFormat(loc, {
+        style: 'currency', currency: 'USD', currencyDisplay: 'narrowSymbol',
+        notation: v >= 1e5 ? 'compact' : 'standard', maximumSignificantDigits: 3
+      }).format(v); };
+      var values = { 'press-price': money(q.usd), 'press-mcap': money(q.usd * q.supply),
+        'press-price-date': window.PepPrices.describe(q, loc) };
+      document.querySelectorAll('[data-v]').forEach(function (el) {
+        var key = el.getAttribute('data-v'); if (key in values) el.textContent = values[key];
+      });
+    }).catch(function () { /* The dated generated snapshot remains visible. */ });
+  }
+  window.PepPrices.subscribe(refreshQuotes);
+
   // Day / night: the moon by day, the sun at night; remembered like on the rest of the site.
   function dark() {
     var th = root.getAttribute('data-theme');

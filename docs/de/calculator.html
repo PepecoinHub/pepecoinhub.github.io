@@ -31,10 +31,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="../facts.css?v=20261030s">
+<link rel="stylesheet" href="../facts.css?v=20261031data1">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/de/"}, {"@type": "ListItem", "position": 2, "name": "Marktkapitalisierungs-Rechner", "item": "https://pepecoinhub.com/de/calculator.html"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Wie wird der Wert berechnet?", "acceptedAnswer": {"@type": "Answer", "text": "Die Marktkapitalisierung eines anderen Coins geteilt durch die Coinmenge von Pepecoin ergibt den Preis, den ein PEP bei dieser Größe hätte, und dieser Preis mal deine PEP ist der Wert. Mit der gespeicherten Momentaufnahme (CoinGecko, 4.–5. Oktober 2026): Marktkapitalisierung von Dogecoin 14,7 Mrd. $ ÷ 104,8 Mrd. PEP ≈ 0,14 $ pro PEP."}}, {"@type": "Question", "name": "Ist das eine Kursprognose?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Es vergleicht Größen per Rechnung. Kurse hängen von der Nachfrage ab, und nichts hier besagt, dass Pepecoin die Marktkapitalisierung eines anderen Coins erreicht."}}, {"@type": "Question", "name": "Woher kommen die Kurse?", "acceptedAnswer": {"@type": "Answer", "text": "Aus der öffentlichen API von CoinGecko: Pepecoin plus die 100 größten Coins nach Marktkapitalisierung, in deinem Browser geladen und bis zu 10 Minuten wiederverwendet. Können sie nicht geladen werden, zeigt die Seite eine gespeicherte Momentaufnahme vom 4.–5. Oktober 2026."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Wie wird der Wert berechnet?", "acceptedAnswer": {"@type": "Answer", "text": "Die Marktkapitalisierung eines anderen Coins geteilt durch die Coinmenge von Pepecoin ergibt den Preis, den ein PEP bei dieser Größe hätte, und dieser Preis mal deine PEP ist der Wert. Mit der gespeicherten Momentaufnahme (CoinGecko, 4.–5. Oktober 2026): Marktkapitalisierung von Dogecoin 14,7 Mrd. $ ÷ 104,8 Mrd. PEP ≈ 0,14 $ pro PEP."}}, {"@type": "Question", "name": "Ist das eine Kursprognose?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Es vergleicht Größen per Rechnung. Kurse hängen von der Nachfrage ab, und nichts hier besagt, dass Pepecoin die Marktkapitalisierung eines anderen Coins erreicht."}}, {"@type": "Question", "name": "Woher kommen die Kurse?", "acceptedAnswer": {"@type": "Answer", "text": "Die Kurse stammen von CoinGecko. Alle Seiten verwenden denselben stündlichen Snapshot. Die PEP-Menge stammt aus dem datierten Blockchain-Snapshot. Bei einem Fehler bleiben die gespeicherten Werte mit ihrer ursprünglichen Messzeit erhalten."}}]}</script>
 <style>
 /* Calculator: inputs on the left, the answer on the right, every combination as cards below */
 .calc { background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 24px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 28px; box-shadow: 0 1px 0 rgba(33,33,33,0.04); }
@@ -201,14 +201,14 @@ button.combo-val:hover { border-color: var(--accent); }
       <tbody id="price-rows"></tbody>
     </table>
   </div>
-  <p class="src" id="status">Momentaufnahme von CoinGecko, 4.–5. Oktober 2026.</p>
+  <p class="src" id="status">31.10.2026, 01:00:00 · CoinGecko</p>
   <noscript><p class="note">Live-Kurse und der Rechner brauchen JavaScript. Die Tabelle oben zeigt die zuletzt gespeicherte Momentaufnahme.</p></noscript>
 </section>
 
 <section aria-labelledby="how">
   <h2 id="how">Wie die Zahlen funktionieren</h2>
   <div class="prose">
-    <p><strong>Marktkapitalisierung ist Kurs × Coinmenge.</strong> Teile die Marktkapitalisierung eines anderen Coins durch die Zahl der existierenden PEP, etwa <span data-live="supply-b">104,8</span> Milliarden, und du erhältst den Preis, den ein PEP bei dieser Größe hätte. Multipliziere ihn mit deinem Betrag, um den Wert deiner PEP zu erhalten.</p>
+    <p><strong>Marktkapitalisierung ist Kurs × Coinmenge.</strong> Teile die Marktkapitalisierung eines anderen Coins durch die Zahl der existierenden PEP, etwa <span data-live="supply-b">105,2</span> Milliarden, und du erhältst den Preis, den ein PEP bei dieser Größe hätte. Multipliziere ihn mit deinem Betrag, um den Wert deiner PEP zu erhalten.</p>
     <p><strong>Heute oder am Hoch.</strong> „Heute“ nutzt die aktuelle Marktkapitalisierung jedes Coins. „Zum All-time high“ nutzt den höchsten Kurs des Coins × seine heutige Coinmenge. Bei Coins, die weiter neu ausgegeben werden, etwa Dogecoin, war die tatsächliche Marktkapitalisierung am Hoch niedriger, weil damals weniger Coins existierten.</p>
     <p><strong>Keine Prognose.</strong> Die Marktkapitalisierung ist das, was der Markt heute für einen Coin bezahlt, und nichts hier besagt, dass Pepecoin die Größe eines anderen Coins erreicht. Außerdem wächst die Coinmenge von PEP um 10.000 PEP pro Block, dieselbe Marktkapitalisierung bedeutet mit der Zeit also einen etwas niedrigeren Preis pro PEP. <a href="supply.html">Coinmenge und Inflation.</a></p>
   </div>
@@ -227,7 +227,7 @@ button.combo-val:hover { border-color: var(--accent); }
     </details>
     <details>
       <summary>Woher kommen die Kurse?</summary>
-      <p>Aus der öffentlichen API von CoinGecko: Pepecoin plus die 100 größten Coins nach Marktkapitalisierung, in deinem Browser geladen und bis zu 10 Minuten wiederverwendet. Können sie nicht geladen werden, zeigt die Seite eine gespeicherte Momentaufnahme vom 4.–5. Oktober 2026.</p>
+      <p>Die Kurse stammen von CoinGecko. Alle Seiten verwenden denselben stündlichen Snapshot. Die PEP-Menge stammt aus dem datierten Blockchain-Snapshot. Bei einem Fehler bleiben die gespeicherten Werte mit ihrer ursprünglichen Messzeit erhalten.</p>
     </details>
   </div>
 </section>
@@ -277,19 +277,11 @@ button.combo-val:hover { border-color: var(--accent); }
   'use strict';
   var PEP_ID = 'pepecoin-network';
   var QUICK = ['dogecoin', 'litecoin', 'bitcoin', 'pepe'];
-  var API = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&sparkline=false';
-  var CACHE_KEY = 'pf-prices-v1';
   var AMOUNT_KEY = 'pf-pep-amount';
   var TTL = 10 * 60 * 1000;
 
   // Saved snapshot (CoinGecko, Oct 4-5, 2026). Shown first, replaced when live prices arrive.
-  var SNAP = [
-    { id: PEP_ID, symbol: 'pep', name: 'Pepecoin', current_price: 0.00009042, market_cap: 9283145, circulating_supply: 102668000000, total_supply: 104793000000, ath: 0.001824 },
-    { id: 'dogecoin', symbol: 'doge', name: 'Dogecoin', current_price: 0.09434, market_cap: 14736000000, circulating_supply: 156198000000, ath: 0.7316 },
-    { id: 'litecoin', symbol: 'ltc', name: 'Litecoin', current_price: 70.42, market_cap: 5470761331, circulating_supply: 77683000, ath: 410.26 },
-    { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', current_price: 85791.41, market_cap: 1723872933977, circulating_supply: 20094000, ath: 126080 },
-    { id: 'pepe', symbol: 'pepe', name: 'Pepe', current_price: 0.000004433, market_cap: 1864844512, circulating_supply: 420690000000000, ath: 0.00002803 }
-  ];
+  var SNAP = [{"id":"bitcoin","symbol":"btc","name":"Bitcoin","current_price":77324,"market_cap":1554636637903,"total_supply":20105365,"circulating_supply":20105365,"price_change_percentage_24h":0.52546,"ath":126080,"ath_date":"2025-10-06T10:57:42.000Z","last_updated":"2026-10-31T00:46:53.000Z","top":true},{"id":"dogecoin","symbol":"doge","name":"Dogecoin","current_price":0.076305,"market_cap":11945083461,"total_supply":156546232860.16907,"circulating_supply":156543692860.16907,"price_change_percentage_24h":3.46705,"ath":0.731578,"ath_date":"2021-05-07T21:08:23.000Z","last_updated":"2026-10-31T00:46:53.000Z","top":true},{"id":"litecoin","symbol":"ltc","name":"Litecoin","current_price":55.83,"market_cap":4342385595,"total_supply":77776517.37806574,"circulating_supply":77774011.12125915,"price_change_percentage_24h":3.81664,"ath":410.26,"ath_date":"2021-05-09T19:13:07.000Z","last_updated":"2026-10-31T00:46:53.000Z","top":true},{"id":"pepe","symbol":"pepe","name":"Pepe","current_price":0.00000498,"market_cap":2095805736,"total_supply":420690000000000,"circulating_supply":420690000000000,"price_change_percentage_24h":9.606,"ath":0.00002803,"ath_date":"2024-12-09T08:30:35.000Z","last_updated":"2026-10-31T00:46:53.000Z","top":true},{"id":"pepecoin-network","symbol":"pep","name":"Pepecoin","current_price":0.00009128,"market_cap":9598839.5832,"total_supply":105158190000,"circulating_supply":102667860000,"price_change_percentage_24h":6.40655,"ath":0.00182409,"ath_date":"2024-12-09T08:15:46.000Z","last_updated":"2026-10-31T00:46:53.000Z","top":false}];
 
   var coins = {};
   var order = [];
@@ -559,18 +551,6 @@ button.combo-val:hover { border-color: var(--accent); }
 
   function status(text) { $('status').textContent = text; }
 
-  function readCache() {
-    try {
-      var raw = localStorage.getItem(CACHE_KEY);
-      if (!raw) return null;
-      var o = JSON.parse(raw);
-      if (!o || !o.t || Date.now() - o.t > TTL || !Array.isArray(o.list)) return null;
-      return o;
-    } catch (e) { return null; }
-  }
-  function writeCache(list) {
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), list: list })); } catch (e) { /* storage unavailable */ }
-  }
   function slim(c) {
     return { id: c.id, symbol: c.symbol, name: c.name, current_price: c.current_price, market_cap: c.market_cap,
       circulating_supply: c.circulating_supply, total_supply: c.total_supply, ath: c.ath };
@@ -583,24 +563,13 @@ button.combo-val:hover { border-color: var(--accent); }
     status('Live-Kurse von CoinGecko, aktualisiert um ' + new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '. ATH-Werte nach Angaben von CoinGecko.');
     return true;
   }
-  function getJSON(url) {
-    return fetch(url).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    });
-  }
   function refresh() {
-    var cached = readCache();
-    if (cached && goLive(cached.list, cached.t)) return;
-    Promise.all([
-      getJSON(API + '&ids=' + PEP_ID),
-      getJSON(API + '&order=market_cap_desc&per_page=100&page=1')
-    ]).then(function (res) {
-      var list = res[0].concat(res[1]).map(slim);
-      if (goLive(list, Date.now())) writeCache(list);
-    }).catch(function () {
-      status('Angezeigt wird die Momentaufnahme vom 4.–5. Oktober 2026 (CoinGecko). Live-Kurse konnten gerade nicht geladen werden.');
-    });
+    window.PepPrices.markets().then(function (result) {
+      var partial = result.d.length < 2;
+      var list = partial ? SNAP.filter(function (c) { return c.id !== PEP_ID; }).concat(result.d) : result.d;
+      goLive(list, result.t);
+      status(window.PepPrices.describe(result, document.documentElement.lang || 'en') + (partial ? ' Vergleichswerte: Archivdaten.' : ''));
+    }).catch(function () { /* Keep the explicitly dated HTML snapshot. */ });
   }
 
   var input = $('pep-amount');
@@ -634,10 +603,11 @@ button.combo-val:hover { border-color: var(--accent); }
 
   setCoins(SNAP);
   renderAll();
-  refresh();
+  document.addEventListener('DOMContentLoaded', function () { window.PepPrices.subscribe(refresh); });
 })();
 </script>
 
+<p class="src" data-supply-note>PEP-Bewertung = Preis × ausgegebene Menge aus dem datierten Blockchain-Snapshot. Aggregatoren können andere Mengen verwenden. Alle Seiten verwenden denselben stündlich aktualisierten Kursstand.</p>
 </main>
 <footer class="site-foot">
   <p><strong>Community-Faktenseiten</strong>, gemacht von einem ganz normalen Typen aus r/pepecoin, so wie du. Keine offizielle Pepecoin-Publikation.</p>
@@ -647,7 +617,7 @@ button.combo-val:hover { border-color: var(--accent); }
   <p class="foot-langs">Sprache: <a href="/calculator.html" hreflang="en" lang="en">English</a>&nbsp;· <a href="/pl/calculator.html" hreflang="pl" lang="pl">Polski</a>&nbsp;· <a href="/es/calculator.html" hreflang="es" lang="es">Español</a>&nbsp;· <a href="/fr/calculator.html" hreflang="fr" lang="fr">Français</a>&nbsp;· <a href="/tr/calculator.html" hreflang="tr" lang="tr">Türkçe</a>&nbsp;· <a href="/it/calculator.html" hreflang="it" lang="it">Italiano</a>&nbsp;· <a href="/zh/calculator.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></p>
 </footer>
 <script src="../live.js?v=20261012d" defer></script>
-<script src="../prices.js?v=20261030fix1" defer></script>
-<script src="../chrome.js?v=20261030r" defer></script>
+<script src="../prices.js?v=20261031data1" defer></script>
+<script src="../chrome.js?v=20261031data1" defer></script>
 </body>
 </html>
