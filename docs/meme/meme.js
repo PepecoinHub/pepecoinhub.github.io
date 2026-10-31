@@ -38,6 +38,15 @@
       ['@', 'Serious edition', 'Same facts, no memes', 'serious']
     ]]
   ];
+  // PondOS "app" name and icon for each meme page
+  var APP = {
+    index: ['Desktop', 'pep-logo'], 'which-pepecoin': ['WhichFrog.app', 'glasses'], compare: ['PepVsDoge.app', 'pepe-doge'],
+    'scrypt-family': ['ScryptFamily.app', 'peaky'], mica: ['MiCA.pdf', 'serious'], glossary: ['Glossary.dic', 'brain'],
+    buy: ['BuyPEP.app', 'wrongpep'], wallets: ['Wallets.app', 'zipper'], mining: ['Miner.app', 'pickaxe'],
+    price: ['Price.app', 'charts'], calculator: ['WhatIf.app', 'p-eyes-still'], 'rich-list': ['WhaleWatch.app', 'detective'],
+    network: ['Network.app', 'night-shift'], supply: ['Supply.app', 'farmer']
+  };
+  var DESK = { '@games/': 'PEP Games', '@links.html': 'Links', '@press.html': 'Press kit' };
   // '@page' is a page of the serious site, the rest are meme pages
   var href = function (p) { return p.charAt(0) === '@' ? (p === '@' ? serious : BASE + p.slice(1)) : p === 'index' ? './' : p + '.html'; };
   var serious = BASE + (PAGE === 'index' ? '' : PAGE + '.html');
@@ -120,7 +129,11 @@
   var top = document.querySelector('header.top');
   if (top) {
     var bar = el('div', { class: 'in bar' });
-    bar.innerHTML = '<a class="logo" href="./" aria-label="Pepecoin Hub, meme edition, home"><img class="on-light" src="img/pepecoin-lockup-light.svg" alt="" width="134" height="32"><img class="on-dark" src="img/pepecoin-lockup-dark.svg" alt="" width="134" height="32"><span class="hub">Hub</span></a>';
+    // PondOS system bar: Hop launcher, name, current app, tray (price, clock), Serious|Meme, theme
+    var app = APP[PAGE] || ['Desktop', 'pep-logo'];
+    bar.innerHTML = '<button type="button" class="hop" aria-expanded="false" aria-controls="nav"><img src="img/pep-logo.webp" alt="" width="30" height="30"><span>Hop</span></button>' +
+      '<a class="os-brand" href="./" aria-label="PondOS, the Pepecoin Hub meme edition. Desktop">Pond<b>OS</b></a>' +
+      '<span class="os-app"><img src="img/' + app[1] + '.webp" alt="" width="22" height="22"><span>' + app[0] + '</span></span>';
     // one Menu button opens every page in four columns (a full-width sheet on a phone), as on the serious site
     var nav = el('nav', { class: 'nav', id: 'nav', 'aria-label': 'Pages', hidden: '' });
     var cols = el('div', { class: 'mega' });
@@ -134,7 +147,13 @@
       });
       cols.appendChild(col);
     });
+    nav.appendChild(el('div', { class: 'hop-head' }, '<img src="img/pep-logo.webp" alt="" width="44" height="44"><div><b>PondOS 1.0 “Lilypad”</b><small>Pepecoin Hub, meme edition. Every number has a receipt.</small></div>'));
     nav.appendChild(cols);
+    var hf = el('div', { class: 'hop-foot' }, '<a href="' + serious + '">Same page, serious mode</a>');
+    var sd = el('button', { type: 'button', class: 'shutdown' }, '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 2v7M5.6 5a6.5 6.5 0 1 0 8.8 0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>Shut down');
+    sd.addEventListener('click', function () { setOpen(false); shutDown(); });
+    hf.appendChild(sd);
+    nav.appendChild(hf);
     var tb = el('button', { type: 'button', class: 'themebtn', id: 'themebtn', 'aria-label': 'Switch light or dark' });
     // Serious | Meme switch: the knob sits on Meme here and slides to Serious on click
     var ml = el('a', { class: 'mode-link', href: serious, title: 'Switch to serious mode: same facts, no memes', 'aria-label': 'Switch to serious mode' }, '<span class="mt-a">Serious</span><span class="mt-b">Meme</span>');
@@ -144,16 +163,17 @@
       e.preventDefault(); ml.classList.add('to-a');
       setTimeout(function () { location.href = ml.href; }, 220);
     });
+    var tray = el('div', { class: 'tray' }, '<span class="tray-price" hidden></span><time class="tray-clock"></time>');
+    bar.appendChild(tray);
     bar.appendChild(ml);
     bar.appendChild(tb);
-    var mb = el('button', { type: 'button', class: 'menubtn', 'aria-expanded': 'false', 'aria-controls': 'nav' }, '<span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>Menu');
+    var mb = bar.querySelector('.hop');
     var setOpen = function (o) {
       if (o) nav.style.setProperty('--menu-top', Math.round(top.getBoundingClientRect().bottom + 6) + 'px');
       nav.hidden = !o; top.classList.toggle('open', o); mb.setAttribute('aria-expanded', String(o));
       root.classList.toggle('menu-lock', o);
     };
     mb.addEventListener('click', function (e) { e.stopPropagation(); setOpen(nav.hidden); });
-    bar.appendChild(mb);
     bar.appendChild(nav);
     top.appendChild(bar);
     document.addEventListener('click', function (e) { if (!nav.hidden && !top.contains(e.target)) setOpen(false); });
@@ -252,6 +272,203 @@
     svg.onpointermove = move; svg.onpointerdown = move;
     svg.onpointerleave = function () { cur.setAttribute('visibility', 'hidden'); tip.hidden = true; };
   }
+
+  /* ================================================================ PondOS
+     The meme edition dressed as the frog's own operating system. Each block of a page becomes a
+     window with a title bar; the home page gets desktop icons; a short boot screen plays once per
+     visit. Everything here is decoration: the content and the numbers stay exactly as written. */
+  var REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ICO = {
+    min: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 12h10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>',
+    max: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>',
+    x: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>'
+  };
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  // a small modal window; buttons: [{label, go, href, fn}]
+  function osDialog(title, html, buttons) {
+    var d = el('dialog', { class: 'os-dlg', 'aria-label': title });
+    d.innerHTML = '<div class="win active"><div class="win-bar"><img src="img/pep-logo.webp" alt="" width="22" height="22"><span class="win-t">' + esc(title) + '</span></div><div class="dlg-body">' + html + '</div><div class="dlg-btns"></div></div>';
+    var row = d.querySelector('.dlg-btns');
+    buttons.forEach(function (b) {
+      var x = b.href ? el('a', { class: 'btn' + (b.go ? ' go' : ''), href: b.href }, b.label) : el('button', { type: 'button', class: 'btn' + (b.go ? ' go' : '') }, b.label);
+      x.addEventListener('click', function () { if (b.fn) b.fn(); if (!b.href) d.close(); });
+      row.appendChild(x);
+    });
+    d.addEventListener('click', function (e) { if (e.target === d) d.close(); });
+    d.addEventListener('close', function () { d.remove(); });
+    document.body.appendChild(d);
+    if (d.showModal) d.showModal(); else d.setAttribute('open', '');
+    var first = row.querySelector('.go') || row.firstChild; if (first) first.focus();
+    return d;
+  }
+
+  function shutDown() {
+    osDialog('Shut down PondOS?', '<h3>You can’t shut down a blockchain, fren.</h3><p>Close this tab whenever you like. The Pepecoin network keeps aiming for one block every 60 seconds, with or without you. That is rather the point.</p>',
+      [{ label: 'Keep hopping', go: true }, { label: 'Serious mode', href: serious }]);
+  }
+
+  var CLOSE = [
+    ['Facts can’t be closed.', 'They can only be minimized. The chain keeps them either way.'],
+    ['This window is load-bearing.', 'Close it and the receipts above it fall onto the receipts below it.'],
+    ['Are you sure, fren?', 'Closing a window doesn’t change the blockchain. After enough confirmations, nothing does.'],
+    ['Permission denied.', 'Only the frog can close this window, and the frog is still reading it.']
+  ];
+  var closeN = Math.floor(Math.random() * CLOSE.length);
+
+  // ---------- windows ----------
+  function slug(t) {
+    return t.toLowerCase().replace(/[’'"“”?!.,:()]/g, '').replace(/&/g, 'and').replace(/×/g, 'x').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').split('-').slice(0, 4).join('-') || 'untitled';
+  }
+  function winName(host, body) {
+    if (body.classList.contains('pagehead') || body.classList.contains('hero')) return 'README.txt';
+    if (body.classList.contains('chooser')) return 'choose-your-frog.exe';
+    if (body.classList.contains('loading')) return 'loading.exe';
+    var h = body.querySelector('h2, h3'), t = h ? h.textContent.trim() : '';
+    if (body.querySelector('.gifs')) return 'gallery.gif';
+    if (host.id === 'sources' || /^(sources|receipts)/i.test(t)) return 'receipts.log';
+    if (/questions|faq/i.test(t) || host.id === 'faq') return slug(t) + '.faq';
+    var ext = body.querySelector('table') ? '.csv' : body.querySelector('.chart, .pchart, .chart-card') ? '.chart' : '.txt';
+    return slug(t) + ext;
+  }
+  var wins = [];
+  function windowize(host) {
+    var body = el('div', { class: 'win-body' });
+    Array.prototype.slice.call(host.classList).forEach(function (c) { if (c !== 'in') body.classList.add(c); });
+    while (host.firstChild) body.appendChild(host.firstChild);
+    host.className = 'in win-host';
+    host.removeAttribute('style');
+    var name = winName(host, body), icon = (APP[PAGE] || ['', 'pep-logo'])[1];
+    var win = el('div', { class: 'win' });
+    var bar = el('div', { class: 'win-bar' }, '<img src="img/' + icon + '.webp" alt="" width="22" height="22" loading="lazy"><span class="win-t">' + esc(name) + '</span>' +
+      '<span class="win-ctl"><button type="button" class="w-min" aria-expanded="true" title="Minimize">' + ICO.min + '<span class="sr">Minimize ' + esc(name) + '</span></button>' +
+      '<button type="button" class="w-max" aria-pressed="false" title="Maximize">' + ICO.max + '<span class="sr">Maximize ' + esc(name) + '</span></button>' +
+      '<button type="button" class="w-x" title="Close">' + ICO.x + '<span class="sr">Close ' + esc(name) + '</span></button></span>');
+    win.appendChild(bar); win.appendChild(body); host.appendChild(win);
+    var minBtn = bar.querySelector('.w-min'), maxBtn = bar.querySelector('.w-max');
+    var setMin = function (m) { win.classList.toggle('min', m); body.hidden = m; minBtn.setAttribute('aria-expanded', String(!m)); };
+    minBtn.addEventListener('click', function () { setMin(!win.classList.contains('min')); });
+    maxBtn.addEventListener('click', function () { var m = !host.classList.contains('is-max'); host.classList.toggle('is-max', m); maxBtn.setAttribute('aria-pressed', String(m)); });
+    bar.addEventListener('dblclick', function (e) { if (!e.target.closest('button')) setMin(!win.classList.contains('min')); });
+    bar.querySelector('.w-x').addEventListener('click', function () {
+      var c = CLOSE[closeN++ % CLOSE.length];
+      osDialog('Close ' + name + '?', '<h3>' + c[0] + '</h3><p>' + c[1] + '</p>',
+        [{ label: 'Minimize instead', go: true, fn: function () { setMin(true); } }, { label: 'Keep it open' }]);
+    });
+    wins.push(win);
+  }
+  var mainEl = document.querySelector('main');
+  if (mainEl) {
+    // blocks are direct children of <main>, or one level down inside a wrapper such as the rich list's #app
+    Array.prototype.slice.call(mainEl.querySelectorAll(':scope > section.in, :scope > div.in, :scope > div:not(.in) > section.in')).forEach(windowize);
+    root.classList.add('pondos');
+  }
+  // the window most in view gets the coloured title bar
+  var activeWin = null;
+  function pickActive() {
+    var y = window.innerHeight * 0.38, best = null;
+    wins.forEach(function (w) { if (!w.offsetParent) return; var r = w.getBoundingClientRect(); if (r.top <= y && r.bottom >= y) best = w; });
+    if (!best) wins.some(function (w) { if (!w.offsetParent) return false; var r = w.getBoundingClientRect(); if (r.top > 0 && r.top < window.innerHeight) { best = w; return true; } return false; });
+    if (best !== activeWin) { if (activeWin) activeWin.classList.remove('active'); if (best) best.classList.add('active'); activeWin = best; }
+  }
+  var pickQueued = false;
+  window.addEventListener('scroll', function () { if (!pickQueued) { pickQueued = true; requestAnimationFrame(function () { pickQueued = false; pickActive(); }); } }, { passive: true });
+  window.addEventListener('resize', pickActive);
+  setTimeout(pickActive, 50);
+
+  // ---------- desktop icons (home only) ----------
+  if (PAGE === 'index' && mainEl) {
+    var desk = el('section', { class: 'in desk', 'aria-label': 'Desktop' });
+    var items = '';
+    NAV.forEach(function (g) {
+      g[1].forEach(function (p) {
+        var name = APP[p[0]] ? APP[p[0]][0] : DESK[p[0]];
+        if (!name) return;
+        var dot = name.lastIndexOf('.'), label = dot > 0 ? name.slice(0, dot) + '<small>' + name.slice(dot) + '</small>' : name;
+        items += '<li><a href="' + href(p[0]) + '"><img src="img/' + p[3] + '.webp" alt="" width="56" height="56"><span>' + label + '</span></a></li>';
+      });
+    });
+    items += '<li><button type="button" class="not-pep"><svg viewBox="0 0 56 56" width="56" height="56" aria-hidden="true"><path d="M4 14a4 4 0 0 1 4-4h13l5 6h22a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z" fill="var(--gold)" stroke="var(--line)" stroke-width="3" stroke-linejoin="round"/><text x="28" y="40" text-anchor="middle" font-family="Space Mono, monospace" font-weight="700" font-size="15" fill="#142016">0x</text></svg><span>Not PEP</span></button></li>';
+    desk.innerHTML = '<p class="desk-h">Desktop <span>double-click not required</span></p><ul class="icons">' + items + '</ul>';
+    var chooserEl = document.getElementById('chooser');
+    mainEl.insertBefore(desk, chooserEl ? chooserEl.nextSibling : mainEl.firstChild);
+    desk.querySelector('.not-pep').addEventListener('click', function () {
+      osDialog('Not PEP (0x)', '<h3>Same name, different frogs.</h3><p>Nothing in this folder is trash. These are other assets that share the name, and none of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p>',
+        [{ label: 'Full side-by-side →', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }]);
+    });
+  }
+
+  // ---------- tray: price and clock ----------
+  var clock = document.querySelector('.tray-clock');
+  if (clock) {
+    var tick = function () { var d = new Date(); clock.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); clock.setAttribute('datetime', d.toISOString()); };
+    tick(); setInterval(tick, 20000);
+  }
+  var trayPrice = document.querySelector('.tray-price');
+  if (trayPrice && window.PepPrices) window.PepPrices.subscribe(function () {
+    return window.PepPrices.quote().then(function (q) {
+      if (!q || q.usd == null) return;
+      trayPrice.innerHTML = 'PEP ' + fmt.usd(q.usd) + (q.change_24h == null ? '' : ' <span class="' + (q.change_24h < 0 ? 'dn">▼' : 'up">▲') + '</span>');
+      trayPrice.title = 'PEP price, ' + window.PepPrices.describe(q, 'en-US');
+      trayPrice.hidden = false;
+    }).catch(function () {});
+  });
+
+  // ---------- boot screen, once per visit ----------
+  var booted = '1';
+  try { booted = sessionStorage.getItem('pondos-boot'); sessionStorage.setItem('pondos-boot', '1'); } catch (e) {}
+  if (!booted && !REDUCE) {
+    var boot = el('div', { class: 'boot', 'aria-hidden': 'true' });
+    boot.innerHTML = '<div class="win active boot-win"><div class="win-bar"><img src="img/pep-logo.webp" alt="" width="22" height="22"><span class="win-t">boot.log</span></div>' +
+      '<div class="boot-body"><img class="boot-coin" src="img/coin-spin.webp" alt="" width="120" height="120"><p class="boot-name">Pond<b>OS</b> 1.0 <span>“Lilypad”</span></p>' +
+      '<ol class="boot-log"></ol><div class="boot-bar"><i></i></div><p class="boot-skip">tap or press any key to skip</p></div></div>';
+    document.body.appendChild(boot);
+    root.classList.add('booting');
+    var log = boot.querySelector('.boot-log'), timers = [], done = false;
+    var finish = function () {
+      if (done) return; done = true;
+      timers.forEach(clearTimeout);
+      boot.classList.add('out'); root.classList.remove('booting');
+      setTimeout(function () { boot.remove(); }, 400);
+      document.removeEventListener('keydown', finish); boot.removeEventListener('pointerdown', finish);
+    };
+    document.addEventListener('keydown', finish); boot.addEventListener('pointerdown', finish);
+    var lines = [
+      ['Mounting /pond', 'ok'],
+      ['Loading memes', 'ok'],
+      ['Loading receipts', 'ok, one per number'],
+      ['Checking ticker: PEP ≠ PEPE', 'ok'],
+      ['Scrypt engine, shared with LTC + DOGE', 'ok'],
+      ['Price, hourly snapshot', function () { return window.PepPrices ? window.PepPrices.quote().then(function (q) { return fmt.usd(q.usd); }) : Promise.reject(); }],
+      ['Blocks, daily snapshot', function () { return json('network.json').then(function (n) { return '#' + fmt.int(n.rows[n.rows.length - 1][1]); }); }],
+      ['Seed phrase requests', 'never. Whoever asks is a scammer'],
+      ['Starting desktop', '…']
+    ];
+    boot.querySelector('.boot-bar i').style.transitionDuration = (lines.length * 0.23 + 0.2) + 's';
+    requestAnimationFrame(function () { requestAnimationFrame(function () { boot.classList.add('go'); }); });
+    lines.forEach(function (l, i) {
+      timers.push(setTimeout(function () {
+        var li = el('li', null, '<span class="k">' + l[0] + '</span><span class="dots"></span><span class="v">' + (typeof l[1] === 'string' ? l[1] : '…') + '</span>');
+        log.appendChild(li);
+        if (typeof l[1] === 'function') {
+          var v = li.querySelector('.v');
+          Promise.race([l[1](), new Promise(function (r, j) { setTimeout(j, 700); })]).then(function (t) { v.textContent = t; }, function () { v.textContent = 'later'; });
+        }
+      }, 120 + i * 230));
+    });
+    timers.push(setTimeout(finish, 120 + lines.length * 230 + 650));
+  }
+
+  // ---------- one friendly system notice per visit ----------
+  var noticed = '1';
+  try { noticed = sessionStorage.getItem('pondos-notice'); sessionStorage.setItem('pondos-notice', '1'); } catch (e) {}
+  if (!noticed && mainEl) setTimeout(function () {
+    var t = el('div', { class: 'toast', role: 'status' }, '<img src="img/gif-085-still.webp" alt="" width="56" height="56"><div><b>Security update installed</b><span>Nobody legit will ask for your seed phrase. Not support, not admins, not frogs.</span></div><button type="button" aria-label="Dismiss">' + ICO.x + '</button>');
+    document.body.appendChild(t);
+    var bye = function () { t.classList.add('out'); setTimeout(function () { t.remove(); }, 300); };
+    t.querySelector('button').addEventListener('click', bye);
+    setTimeout(bye, 14000);
+  }, 4500);
 
   window.Meme = { json: json, fmt: fmt, fill: fill, lineChart: lineChart, base: BASE, data: DATA, page: PAGE };
 })();
