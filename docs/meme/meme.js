@@ -164,6 +164,7 @@
     });
     var gl = el('div', { class: 'sm-list' });
     [['PEP Pong', 'PEP vs PEPE, first to 7', 'pep-logo', function () { pong(); }], ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
+      ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
       ['Paper hands', 'The recycle bin, sort of', 'wrongpep', function () { paperHands(); }]].forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="img/' + g[2] + '.webp" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
@@ -554,10 +555,10 @@
     var DESKTOP = [
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
-      ['#pong', 'PEP Pong', 'pep-logo'], ['#fud', 'FUD Invaders', 'gif-008-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'],
+      ['#pong', 'PEP Pong', 'pep-logo'], ['#fud', 'FUD Invaders', 'gif-008-still'], ['#snake', 'PEP Snake', 'gif-027-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'],
       [BASE + 'games/', 'PEP Games', 'pond-playground'], [serious, 'Serious mode', 'serious'], ['#bin', 'Paper hands', 'gif-040-still']
     ];
-    var ACT = { '#pong': pong, '#fud': invaders, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -612,10 +613,11 @@
     return window.PepPrices.quote().then(function (q) {
       if (!q || q.usd == null) return;
       trayPrice.innerHTML = 'PEP ' + fmt.usd(q.usd) + (q.change_24h == null ? '' : ' <span class="' + (q.change_24h < 0 ? 'dn">▼' : 'up">▲') + fmt.pct(Math.abs(q.change_24h)) + '</span>');
-      trayPrice.title = 'PEP price, ' + window.PepPrices.describe(q, 'en-US');
+      trayPrice.title = 'PEP price, ' + window.PepPrices.describe(q, 'en-US') + '. Click for the Laptop Index.';
       trayPrice.hidden = false;
     }).catch(function () {});
   });
+  if (trayPrice) { trayPrice.setAttribute('role', 'button'); trayPrice.setAttribute('tabindex', '0'); trayPrice.addEventListener('click', function () { laptop(); }); trayPrice.addEventListener('keydown', function (e) { if (e.key === 'Enter') laptop(); }); }
   if (trayHash) json('ticker.json').then(function (t) { if (t.hashrate) { trayHash.textContent = fmt.hash(t.hashrate.hs); trayHash.title = 'Network hashrate'; trayHash.hidden = false; } }).catch(function () {});
 
   // ---------- right-click on the desktop ----------
@@ -630,7 +632,7 @@
     [['Arrange windows', arrangeAll], ['Refresh', function () { location.reload(); }], null,
       [dark ? 'Wallpaper: day hills' : 'Wallpaper: night mountains', function () { if (themeBtn) themeBtn.click(); }],
       ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
-      null, ['New game: PEP Pong', pong], ['New game: FUD Invaders', invaders], null, ['Properties…', aboutOS]].forEach(function (it) {
+      null, ['New game: PEP Pong', pong], ['New game: FUD Invaders', invaders], ['New game: PEP Snake', snake], null, ['Properties…', aboutOS]].forEach(function (it) {
       if (!it) { ctx.appendChild(el('hr')); return; }
       var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
       b.addEventListener('click', function () { closeCtx(); it[1](); });
@@ -853,6 +855,93 @@
     }, 520);
   }
 
+  // ---------- PEP Snake: eat blocks, grow, don't fork yourself ----------
+  function snake() {
+    openApp('snake', 'PEP Snake - eat blocks, not your tail', 'pep-logo', function (A) {
+      A.body.innerHTML = '<canvas width="480" height="360" aria-label="PEP Snake. Steer with the arrow keys or by swiping."></canvas>' +
+        '<div class="app-row"><span class="grow sn-msg">Arrows, WASD or swipe to steer. Click to start.</span><span class="sn-hi"></span></div>' +
+        '<div class="app-row touch-pad"><button type="button" class="app-btn" data-k="left">◀</button><button type="button" class="app-btn" data-k="up">▲</button><button type="button" class="app-btn" data-k="down">▼</button><button type="button" class="app-btn" data-k="right">▶</button></div>';
+      var cv = A.body.querySelector('canvas'), c = cv.getContext('2d'), msg = A.body.querySelector('.sn-msg'), hiEl = A.body.querySelector('.sn-hi');
+      var CS = 24, CW = 20, CH = 15, face = new Image(); face.src = 'img/pep-logo.webp';
+      var s = null, dir, next, food, timer = null, tickMs;
+      var DIRS = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] };
+      var EAT = ['Block found. +10,000 PEP (on paper).', 'Another block. The chain grows, so do you.', 'Mined. Not minted.', 'One block every ~60 seconds. You are faster.'];
+      var showHi = function () { hiEl.textContent = 'Best: ' + hiScore('pondos-snake') + ' blocks'; };
+      showHi();
+      var place = function () { do { food = [Math.floor(Math.random() * CW), Math.floor(Math.random() * CH)]; } while (s.some(function (p) { return p[0] === food[0] && p[1] === food[1]; })); };
+      var turn = function (k) { var d = DIRS[k]; if (!d || !s) return; if (d[0] === -dir[0] && d[1] === -dir[1]) return; next = d; };
+      var draw = function () {
+        c.fillStyle = '#071009'; c.fillRect(0, 0, 480, 360);
+        c.strokeStyle = 'rgba(120,200,140,0.06)';
+        for (var x = 0; x <= CW; x++) { c.beginPath(); c.moveTo(x * CS, 0); c.lineTo(x * CS, 360); c.stroke(); }
+        for (var y = 0; y <= CH; y++) { c.beginPath(); c.moveTo(0, y * CS); c.lineTo(480, y * CS); c.stroke(); }
+        if (!s) {
+          c.fillStyle = '#7fd196'; c.font = 'bold 22px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+          c.fillText('PEP SNAKE', 240, 150); c.font = '13px Tahoma, sans-serif'; c.fillStyle = '#cfe8d4';
+          c.fillText('Eat blocks. Each one is worth 10,000 PEP, on paper.', 240, 182); c.fillText('Click to start', 240, 206); return;
+        }
+        drawCoin(c, food[0] * CS + CS / 2, food[1] * CS + CS / 2, 9);
+        for (var i = s.length - 1; i > 0; i--) { c.fillStyle = i % 2 ? '#3f9c5c' : '#4fb36d'; c.fillRect(s[i][0] * CS + 2, s[i][1] * CS + 2, CS - 4, CS - 4); }
+        var h = s[0];
+        if (face.complete && face.naturalWidth) c.drawImage(face, h[0] * CS - 2, h[1] * CS - 2, CS + 4, CS + 4); else drawCoin(c, h[0] * CS + CS / 2, h[1] * CS + CS / 2, 11);
+        c.fillStyle = '#7fd196'; c.font = '12px Tahoma, sans-serif'; c.textAlign = 'left'; c.textBaseline = 'top';
+        c.fillText('Blocks ' + (s.length - 3) + '   PEP on paper ' + fmt.int((s.length - 3) * 10000), 6, 4);
+      };
+      var over = function (why) {
+        clearInterval(timer); timer = null;
+        var blocks = s.length - 3; hiScore('pondos-snake', blocks); showHi();
+        msg.textContent = why + ' Blocks mined: ' + blocks + ' (' + fmt.int(blocks * 10000) + ' PEP, on paper). Click to play again.';
+        s = null; setTimeout(draw, 900);
+      };
+      var tick = function () {
+        dir = next;
+        var h = [s[0][0] + dir[0], s[0][1] + dir[1]];
+        if (h[0] < 0 || h[1] < 0 || h[0] >= CW || h[1] >= CH) return over('Hit the edge of the pond.');
+        if (s.some(function (p) { return p[0] === h[0] && p[1] === h[1]; })) return over('Ate your own tail. That is a fork.');
+        s.unshift(h);
+        if (h[0] === food[0] && h[1] === food[1]) {
+          place(); msg.textContent = EAT[Math.floor(Math.random() * EAT.length)];
+          if (tickMs > 70) { tickMs -= 4; clearInterval(timer); timer = setInterval(tick, tickMs); }
+        } else s.pop();
+        draw();
+      };
+      var start = function () { if (timer) return; s = [[8, 7], [7, 7], [6, 7]]; dir = next = [1, 0]; place(); tickMs = 140; msg.textContent = 'Go, fren. Blocks are coins.'; draw(); timer = setInterval(tick, tickMs); };
+      cv.addEventListener('pointerdown', function (e) {
+        if (!timer) { start(); return; }
+        var sx = e.clientX, sy = e.clientY;
+        var up = function (ev) { cv.removeEventListener('pointerup', up); var dx = ev.clientX - sx, dy = ev.clientY - sy; if (Math.abs(dx) + Math.abs(dy) < 18) return; turn(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up')); };
+        cv.addEventListener('pointerup', up);
+      });
+      A.body.querySelectorAll('[data-k]').forEach(function (b) { b.addEventListener('pointerdown', function () { if (!timer) start(); turn(b.getAttribute('data-k')); }); });
+      var K = function (k) { return function (d) { if (d) { if (!timer) start(); turn(k); } }; };
+      var unkey = gameKeys(A, { ArrowLeft: K('left'), ArrowRight: K('right'), ArrowUp: K('up'), ArrowDown: K('down'), a: K('left'), d: K('right'), w: K('up'), s: K('down') });
+      face.onload = draw; draw();
+      A.stop = function () { clearInterval(timer); unkey(); };
+    }, 520);
+  }
+
+  // ---------- the Legendary Laptop ----------
+  // A community legend: 40 million PEP once bought a laptop, shortly before PEP's all-time high.
+  // The window prices that laptop with today's PEP price and with the all-time high (CoinGecko).
+  function laptop() {
+    openApp('laptop', 'LaptopIndex.exe - the Legendary Laptop', 'gif-012-still', function (A) {
+      var LAP = 40000000;
+      A.body.innerHTML = '<div class="lap"><div class="lap-art" aria-hidden="true">💻</div><div><p class="lap-k">1 Legendary Laptop = 40,000,000 PEP</p>' +
+        '<table class="lap-t"><tr><th>Today</th><td class="lap-now">…</td></tr><tr><th>At the all-time high <small class="lap-athd"></small></th><td class="lap-ath">…</td></tr><tr><th>Laptop’s best day vs today</th><td class="lap-x">…</td></tr></table>' +
+        '<p class="lap-story">As the pond tells it: a fren once paid 40 million PEP for a laptop. Not long after, PEP climbed to its all-time high, and that laptop became the most expensive laptop in the pond. The legend ends with paper hands and a lot of feelings. We hope the laptop is doing fine.</p>' +
+        '<p class="lap-src">Prices: CoinGecko, hourly snapshot and all-time high. A legend, not financial advice. Laptops are not an investment either.</p></div></div>';
+      var q = window.PepPrices ? window.PepPrices.quote() : Promise.reject();
+      Promise.all([q.catch(function () { return null; }), json('market-prices.json').catch(function () { return null; })]).then(function (r) {
+        var now = r[0] && r[0].usd, mk = r[1] && (r[1].markets || []).filter(function (m) { return m.id === 'pepecoin-network'; })[0];
+        var ath = mk && mk.ath;
+        A.body.querySelector('.lap-now').textContent = now ? fmt.usd(now * LAP) : '—';
+        A.body.querySelector('.lap-ath').textContent = ath ? fmt.usd(ath * LAP) : '—';
+        if (mk && mk.ath_date) A.body.querySelector('.lap-athd').textContent = '(' + fmt.date(mk.ath_date) + ')';
+        A.body.querySelector('.lap-x').textContent = now && ath ? (ath / now).toFixed(1) + '× pricier' : '—';
+      });
+    }, 460);
+  }
+
   // ---------- Paper hands (the recycle bin) ----------
   function paperHands() {
     openApp('bin', 'Paper hands', 'wrongpep', function (A) {
@@ -862,12 +951,13 @@
         ['📈', 'wen_moon_prediction.xls', '1 KB', 'Corrupted. The frog does not do price predictions.'],
         ['🐸', 'PEPE_not_PEP.lnk', '1 KB', 'Shortcut to the wrong frog. PEP has its own chain; PEPE is an ERC-20 token.'],
         ['📸', 'screenshot_of_someone_elses_gains.png', '3 MB', 'Not your keys, not your coins, not your screenshot.'],
+        ['💻', 'legendary_laptop_receipt.pdf', '40M PEP', 'Receipt for one laptop, paid in PEP. Double-click to see what it costs today.'],
         ['🧻', 'paper_hands.exe', '∞ KB', 'Runs automatically during every dip.']
       ];
       A.body.innerHTML = '<ul class="bin-list">' + FILES.map(function (f, i) { return '<li data-i="' + i + '"><span aria-hidden="true">' + f[0] + '</span><span>' + f[1] + '</span><small>' + f[2] + '</small></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">Click a file to see what is inside.</p><div class="app-row"><span class="grow">' + FILES.length + ' object(s)</span><button type="button" class="app-btn bin-empty">Empty Paper hands</button></div>';
       var tip = A.body.querySelector('.bin-tip');
-      A.body.querySelectorAll('.bin-list li').forEach(function (li) { li.addEventListener('click', function () { A.body.querySelectorAll('.bin-list li').forEach(function (x) { x.classList.toggle('sel', x === li); }); tip.textContent = FILES[+li.getAttribute('data-i')][3]; }); });
+      A.body.querySelectorAll('.bin-list li').forEach(function (li) { li.addEventListener('click', function () { A.body.querySelectorAll('.bin-list li').forEach(function (x) { x.classList.toggle('sel', x === li); }); tip.textContent = FILES[+li.getAttribute('data-i')][3]; }); li.addEventListener('dblclick', function () { if (/laptop/.test(li.textContent)) laptop(); }); });
       A.body.querySelector('.bin-empty').addEventListener('click', function () { tip.textContent = 'Cannot empty Paper hands: the files already sold themselves. Diamond hands are in another folder.'; });
     }, 420);
   }
@@ -888,6 +978,7 @@
     typed = (typed + e.key.toLowerCase()).slice(-12);
     if (/wen$/.test(typed)) { typed = ''; osDialog('wen.exe', '<div class="dlg-row"><img src="img/gif-064.webp" alt="" width="96" height="70"><div><h3>wen.exe has performed a legal operation.</h3><p>No price predictions are installed on this system. For arithmetic, open WhatIf.exe.</p></div></div>', [{ label: 'OK', go: true }, { label: 'Open WhatIf.exe', href: 'calculator.html' }], 'gif-064-still'); }
     else if (/seed$/.test(typed)) { typed = ''; osDialog('Security Center', '<div class="dlg-row"><img src="img/gif-085.webp" alt="" width="96" height="96"><div><h3>Seed phrase? Never here.</h3><p>PondOS will never ask for it. Not support, not admins, not frogs. If anything asks you to type it, close it.</p></div></div>', [{ label: 'Understood', go: true }], 'gif-085-still'); }
+    else if (/laptop$/.test(typed)) { typed = ''; laptop(); }
     else if (/moon$/.test(typed)) { typed = ''; coinRain(8); balloon('Moon not found', 'The frog checked. There is no moon in chainparams.cpp.', 'gif-084-still'); }
   });
   var startClicks = 0, startT = null, startBtn = document.querySelector('.start');
