@@ -36,8 +36,9 @@
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Pepecoin Hub", "url": "https://pepecoinhub.com/pl/", "description": "Fakty o Pepecoinie (PEP) zebrane przez społeczność.", "inLanguage": "pl"}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<link rel="stylesheet" href="../home-focus.css?v=20261031a">
 </head>
-<body>
+<body class="home-focus">
 <a class="skip" href="#main">Przejdź do treści</a>
 
 <header class="site-head">
@@ -47,11 +48,11 @@
 <main class="wrap" id="main">
 <header class="page-head home-hero">
   <div class="home-hero-copy">
-    <p class="eyebrow">Strony z faktami od społeczności · <span class="eyebrow-date">aktualizacja: <span data-v="home-date">31 października 2026</span></span></p>
+    <p class="eyebrow">Strony z faktami od społeczności · <span class="eyebrow-date">snapshot łańcucha <span data-v="home-date">31 października 2026</span></span></p>
   <h1>Czym jest Pepecoin (PEP)? <span class="h1-sub">To nie Pepe. Żaba z własnym blockchainem.</span></h1>
   <p class="lede">Pepecoin (PEP) to moneta z własnym blockchainem, oparta na proof of work (sieć zabezpiecza praca obliczeniowa górników). <a href="mining.html">Kopie się ją razem z Litecoinem i Dogecoinem</a>. Na tych stronach znajdziesz liczby wraz z informacją, skąd pochodzi każda z nich.</p>
-  <p class="pledge honest"><span><strong>Uczciwie, bez ściemy.</strong> Każda liczba ma link do źródła. Nie ufaj mi na słowo, sprawdź sam. DYOR.</span></p>
-  <p class="pledge soon news-rot"><img src="../assets/new-games.webp" alt="" width="64" height="64"><span class="rot-items"><span class="rot-item"><strong>Nowość: wersja meme.</strong> Te same fakty z memami i paragonami (po angielsku). <a href="../meme/" hreflang="en">Weź czerwoną pigułkę →</a></span><span class="rot-item" hidden><strong>Nowość: PEP Games.</strong> Kalambury, Pepe Miner i czat dla społeczności. <a href="../games/">Zajrzyj →</a></span><span class="rot-item" hidden><strong>Nowość: wszystko o miningu.</strong> Poole, Antminer L7/L9, unMineable i merged mining w jednym miejscu. <a href="mining.html">Czytaj →</a></span><span class="rot-item" hidden><strong>Polecamy: PEP Market.</strong> Sztuka, rękodzieło i twórczość społeczności. Kupujesz i sprzedajesz za Pepecoin (PEP). <a href="https://pepmarket.de/?lang=en" rel="noopener">pepmarket.de ↗</a></span><span class="rot-item" hidden><strong>Nowość: cena PEP na żywo.</strong> Wykres z nakładką Pepe i to, co oznaczałoby ×100. <a href="price.html">Zobacz →</a></span></span></p>
+  <div class="home-evidence"><p class="pledge honest"><span><strong>Zacznij od faktów.</strong> Sprawdź źródła i daty pomiarów, porównaj dane.</span></p><a class="home-media-link" href="press.html">Fakty dla mediów&nbsp;→</a></div>
+  
   <p class="ctas hero-tabs"><a class="btn main" id="tab-pep" data-panel="panel-pep" href="which-pepecoin.html">PEP vs PEPE</a><a class="btn soft" id="tab-buy" data-panel="panel-buy" href="buy.html">Jak kupić PEP</a><a class="btn soft" id="tab-mine" data-panel="panel-mine" href="mining.html">Jak kopać PEP</a></p>
   </div>
   <div class="home-hero-visual">
@@ -86,6 +87,15 @@
   <p class="pep-id-more">Mining poole, sprzęt, kopanie na laptopie i kalkulator zarobków: <a href="mining.html">Jak kopać PEP&nbsp;→</a></p>
 </section>
 
+<section class="home-stats" aria-label="Kluczowe fakty">
+  <div class="stats">
+    <div class="stat is-live"><span class="label">Cena</span><span class="value" data-v="home-price">0,0000886 $</span><span class="sub">24h: <span data-v="home-change">-3,85%</span></span><span class="src">Źródło: <a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko</a> · <a href="price.html">wykres</a></span></div>
+    <div class="stat"><span class="label">Kapitalizacja</span><span class="value" data-v="home-mcap">9,32 mln $</span><span class="sub">przy ×100: <span data-v="home-x100">932 mln $</span><span class="x100-rank">czyli miejsce #<span data-v="home-x100-rank">76</span> w krypto</span></span><span class="src">Cena × podaż. Zwykła arytmetyka, nie prognoza. <a href="price.html#x100">Policz ×N</a></span></div>
+    <div class="stat"><span class="label">Hashrate</span><span class="value" data-v="home-hash">2,55 PH/s</span><span class="sub">Scrypt, 10 000 PEP za blok</span><span class="src">Źródło: <a href="https://pepeblocks.com/">PepeBlocks</a>, <span data-v="home-hash-date">31 paź 2026</span></span></div>
+    <div class="stat"><span class="label">Przydział na starcie</span><span class="value">0%</span><span class="sub">bez premine, bez ICO</span><span class="src">Źródło: <a href="https://pepecoin.com/mica-whitepaper.xhtml">Whitepaper MiCA</a> (D.9, G.5)</span></div>
+  </div>
+<p class="src" data-supply-note>Wycena PEP = cena × wyemitowana podaż z datowanego snapshotu łańcucha. Agregatory mogą używać innej podaży. Cała strona korzysta ze wspólnego zestawu cen, odświeżanego co godzinę.</p>
+</section>
 <section aria-labelledby="about-pep">
   <h2 id="about-pep" class="visually-hidden">O Pepecoinie</h2>
   <div class="pitches">
@@ -102,16 +112,9 @@
   </div>
 </section>
 
-<section class="home-stats" aria-label="Kluczowe fakty">
-  <div class="stats">
-    <div class="stat is-live"><span class="label">Cena</span><span class="value" data-v="home-price">0,0000886 $</span><span class="sub">24h: <span data-v="home-change">+1,05%</span></span><span class="src">Źródło: <a href="https://www.coingecko.com/en/coins/pepecoin-network">CoinGecko</a> · <a href="price.html">wykres</a></span></div>
-    <div class="stat"><span class="label">Kapitalizacja</span><span class="value" data-v="home-mcap">9,32 mln $</span><span class="sub">przy ×100: <span data-v="home-x100">932 mln $</span><span class="x100-rank">czyli miejsce #<span data-v="home-x100-rank">76</span> w krypto</span></span><span class="src">Cena × podaż. Zwykła arytmetyka, nie prognoza. <a href="price.html#x100">Policz ×N</a></span></div>
-    <div class="stat"><span class="label">Hashrate</span><span class="value" data-v="home-hash">2,55 PH/s</span><span class="sub">Scrypt, 10 000 PEP za blok</span><span class="src">Źródło: <a href="https://pepeblocks.com/">PepeBlocks</a>, <span data-v="home-hash-date">31 paź 2026</span></span></div>
-    <div class="stat"><span class="label">Przydział na starcie</span><span class="value">0%</span><span class="sub">bez premine, bez ICO</span><span class="src">Źródło: <a href="https://pepecoin.com/mica-whitepaper.xhtml">Whitepaper MiCA</a> (D.9, G.5)</span></div>
-  </div>
-<p class="src" data-supply-note>Wycena PEP = cena × wyemitowana podaż z datowanego snapshotu łańcucha. Agregatory mogą używać innej podaży. Cała strona korzysta ze wspólnego zestawu cen, odświeżanego co godzinę.</p>
-</section>
 
+
+<p class="pledge soon news-rot"><img src="../assets/new-games.webp" alt="" width="64" height="64"><span class="rot-items"><span class="rot-item"><strong>Nowość: wersja meme.</strong> Te same fakty z memami i paragonami (po angielsku). <a href="../meme/" hreflang="en">Weź czerwoną pigułkę →</a></span><span class="rot-item" hidden><strong>Nowość: PEP Games.</strong> Kalambury, Pepe Miner i czat dla społeczności. <a href="../games/">Zajrzyj →</a></span><span class="rot-item" hidden><strong>Nowość: wszystko o miningu.</strong> Poole, Antminer L7/L9, unMineable i merged mining w jednym miejscu. <a href="mining.html">Czytaj →</a></span><span class="rot-item" hidden><strong>Polecamy: PEP Market.</strong> Sztuka, rękodzieło i twórczość społeczności. Kupujesz i sprzedajesz za Pepecoin (PEP). <a href="https://pepmarket.de/?lang=en" rel="noopener">pepmarket.de ↗</a></span><span class="rot-item" hidden><strong>Nowość: cena PEP na żywo.</strong> Wykres z nakładką Pepe i to, co oznaczałoby ×100. <a href="price.html">Zobacz →</a></span></span></p>
 <section aria-labelledby="pages">
   <h2 id="pages">Zacznij tutaj</h2>
   <div class="cards two">
