@@ -457,3 +457,8 @@ footer.foot a { color: #edf3e3; }
 .gifs figure.meme:nth-child(even) { transform: rotate(-2deg); }
 .gif-cred { text-align: center; margin: 14px auto 0; }
 @media (max-width: 430px) { .gifs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
+.xp-banner { display: none; margin: 0 0 28px; }
+.xp-banner img { display: block; width: 100%; height: auto; border: 3px solid var(--line); border-radius: 14px; }
+.xp-banner figcaption { font: 400 1.15rem/1.2 var(--f-hand); text-align: center; margin-top: 8px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .xp-banner { display: block; } }
+:root[data-theme="dark"] .xp-banner { display: block; }
