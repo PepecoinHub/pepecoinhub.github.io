@@ -19,7 +19,7 @@ function setup(snapshot, saved) {
       throw Error('offline');
     }
   });
-  return { prices: window.PepPrices, calls, tick() { now += 61000; timers[0](); } };
+  return { prices: window.PepPrices, calls, tick(ms = 301000) { now += ms; timers[0](); } };
 }
 function snapshot(time = new Date().toISOString()) {
   return { generated_at: time, pep_supply: { value: 110, time }, markets: [
@@ -69,4 +69,13 @@ test('every current-quote consumer loads the shared helper before its script', (
       assert.ok(scripts.indexOf('prices.js')>=0 && scripts.indexOf('prices.js')<scripts.indexOf(consumer),name+': '+consumer);
     }
   }
+});
+
+test('an open page marks an ageing snapshot as saved without changing its measurement time', async () => {
+  const f=snapshot(), env=setup(f), seen=[];
+  env.prices.subscribe(result=>seen.push({saved:result.saved,time:result.t}));
+  await new Promise(resolve=>setImmediate(resolve));
+  env.tick(3*3600000+301000); await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(seen.length,2); assert.equal(seen[0].saved,false); assert.equal(seen[1].saved,true);
+  assert.equal(seen[0].time,seen[1].time);
 });

@@ -3,7 +3,7 @@
 (function () {
   'use strict';
   var base = new URL('.', document.currentScript.src).href;
-  var TTL = 60000, pending, requested = 0, listeners = [], version;
+  var TTL = 5 * 60000, pending, requested = 0, listeners = [], version;
   function json(url) {
     return fetch(url, { cache: 'no-cache', signal: AbortSignal.timeout(15000) }).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -32,8 +32,9 @@
         }
       }
       pep.top = false;
-      return { d: Object.keys(by).map(function (id) { return by[id]; }), t: Date.parse(pep.last_updated || f.generated_at), version: f.generated_at + ':' + (pep.supply_time || ''),
-        saved: Date.now() - Date.parse(pep.last_updated || f.generated_at) > 3 * 3600000 };
+      var measured = Date.parse(pep.last_updated || f.generated_at), saved = Date.now() - measured > 3 * 3600000;
+      return { d: Object.keys(by).map(function (id) { return by[id]; }), t: measured,
+        version: f.generated_at + ':' + (pep.supply_time || '') + ':' + saved, saved: saved };
     }).catch(function () {
       return json(base + 'data/price.json').then(function (p) {
         if (!(p.price_usd > 0)) throw new Error('no saved PEP quote');
