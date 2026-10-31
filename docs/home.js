@@ -13,17 +13,11 @@
   // The frog coin turns over to its P side now and then (CSS in facts.css); a still frog with reduced motion.
   var frog = document.querySelector('.home-hero-frog');
   if (frog && me && window.matchMedia && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    var coin = document.createElement('div'), spin = document.createElement('div'), back = document.createElement('img'), side = document.createElement('i');
-    coin.className = 'hero-coin'; spin.className = 'hero-coin-spin'; side.className = 'hero-coin-side';
+    var coin = document.createElement('div'), spin = document.createElement('div'), back = document.createElement('img');
+    coin.className = 'hero-coin'; spin.className = 'hero-coin-spin';
     back.className = 'hero-coin-back'; back.alt = ''; back.src = new URL('assets/brand/coin-p.svg', me).href;
     frog.parentNode.insertBefore(coin, frog);
-    coin.appendChild(spin); spin.appendChild(side);
-    // The rim: thin discs stacked between the two faces, so a tilted coin shows a solid edge, not a gap or a flat bar.
-    for (var i = 0; i < 9; i++) {
-      var disc = document.createElement('i');
-      disc.className = 'hero-coin-edge'; disc.style.setProperty('--f', String(i / 4 - 1));
-      spin.appendChild(disc);
-    }
+    coin.appendChild(spin);
     spin.appendChild(frog); spin.appendChild(back);
   }
 
@@ -177,7 +171,5 @@
   if (!priceEl) return;
   stamp.style.display = 'block';
   priceEl.parentNode.appendChild(stamp);
-  load();
-  setInterval(function () { if (!document.hidden) load(); }, TTL);
-  document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
+  window.PepPrices.subscribe(load);
 })();

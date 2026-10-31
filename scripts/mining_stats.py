@@ -36,6 +36,7 @@ def main():
     data = {
         "schema": 1,
         "date": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d"),
+        "updated_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "hashrate_hs": round(hashrate),
         "difficulty": difficulty,
         "source": BASE + "/api/getnetworkhashps",
