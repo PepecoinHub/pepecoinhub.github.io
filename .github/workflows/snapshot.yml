@@ -83,14 +83,16 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data docs/sitemap.xml $(ls docs/index.html docs/network.html docs/rich-list.html docs/*/index.html docs/*/network.html docs/*/rich-list.html 2>/dev/null)
+          git add docs/data docs/sitemap.xml $(ls docs/index.html docs/network.html docs/rich-list.html docs/press.html docs/*/index.html docs/*/network.html docs/*/rich-list.html docs/*/press.html 2>/dev/null)
+          # anything else a script touched must not block the rebase below
+          git diff --quiet || { echo "Not committed (left out of git add):"; git diff --stat; }
           if git diff --cached --quiet; then
             echo "Nothing new to commit."
           else
             git commit -m "data: snapshot $(date -u +%F)"
             # a merge can land at the same moment: rebase and try again a few times
             for i in 1 2 3; do
-              git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
               echo "push attempt $i failed, retrying"; sleep $((i * 10))
             done
             exit 1
