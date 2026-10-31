@@ -134,28 +134,45 @@
     var bar = el('div', { class: 'bar' });
     bar.innerHTML = '<button type="button" class="start" aria-expanded="false" aria-controls="nav"><img src="img/pep-logo.webp" alt="" width="22" height="22"><span>Start</span></button><div class="tasks" role="group" aria-label="Windows on this page"></div>';
     var nav = el('nav', { class: 'nav startmenu', id: 'nav', 'aria-label': 'Start menu', hidden: '' });
-    var cols = el('div', { class: 'mega' });
-    NAV.forEach(function (g) {
-      var col = el('section', { class: 'mega-col' }, '<p class="mega-h">' + g[0] + '</p>');
-      g[1].forEach(function (p) {
-        var a = el('a', { href: href(p[0]) }, '<img src="img/' + p[3] + '.webp" alt="" width="28" height="28" loading="lazy"><span><b>' + p[1] + '</b><small>' + p[2] + '</small></span>');
-        if (p[0] === PAGE) a.setAttribute('aria-current', 'page');
-        col.appendChild(a);
-      });
-      cols.appendChild(col);
-    });
+    // Start shows a short list; each group opens to the side (or below, on a phone)
+    var GICON = ['glasses', 'pickaxe', 'charts', 'pond-playground'];
     var smMain = el('div', { class: 'sm-main' });
-    smMain.appendChild(el('a', { class: 'sm-home', href: './' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>My Pond</b><small>The meme edition’s desktop</small></span>'));
-    smMain.appendChild(cols);
-    smMain.appendChild(el('div', { class: 'sm-windows' }, '<p class="mega-h">Windows on this page</p><ul></ul>'));
-    var smFoot = el('div', { class: 'sm-foot' });
-    var arrange = el('button', { type: 'button', class: 'sm-btn' }, 'Arrange windows');
-    var sd = el('button', { type: 'button', class: 'sm-btn' }, '<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M10 2v7M5.6 5a6.5 6.5 0 1 0 8.8 0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>Shut down…');
+    var arrow = '<i class="sm-arr" aria-hidden="true">▸</i>';
+    var subGroup = function (label, icon, inner, cls) {
+      var g = el('div', { class: 'sm-group' + (cls ? ' ' + cls : '') });
+      var b = el('button', { type: 'button', class: 'sm-item', 'aria-expanded': 'false' }, '<img src="img/' + icon + '.webp" alt="" width="28" height="28"><span>' + label + '</span>' + arrow);
+      var sub = el('div', { class: 'sm-sub', hidden: '' }); sub.appendChild(inner);
+      var open = function (o) {
+        if (o) smMain.querySelectorAll('.sm-group').forEach(function (x) { if (x !== g) { x.querySelector('.sm-sub').hidden = true; x.querySelector('.sm-item').setAttribute('aria-expanded', 'false'); } });
+        sub.hidden = !o; b.setAttribute('aria-expanded', String(o));
+      };
+      b.addEventListener('click', function (e) { e.stopPropagation(); open(sub.hidden); });
+      g.addEventListener('mouseenter', function () { if (matchMedia('(hover: hover) and (min-width: 761px)').matches) open(true); });
+      g.appendChild(b); g.appendChild(sub);
+      return g;
+    };
+    smMain.appendChild(el('a', { class: 'sm-item', href: './' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>My Pond</b></span>'));
+    smMain.appendChild(el('hr'));
+    NAV.forEach(function (g, gi) {
+      var list = el('div', { class: 'sm-list' });
+      g[1].forEach(function (p) {
+        var a = el('a', { href: href(p[0]) }, '<img src="img/' + p[3] + '.webp" alt="" width="24" height="24" loading="lazy"><span><b>' + p[1] + '</b><small>' + p[2] + '</small></span>');
+        if (p[0] === PAGE) a.setAttribute('aria-current', 'page');
+        list.appendChild(a);
+      });
+      smMain.appendChild(subGroup(g[0], GICON[gi], list));
+    });
+    smMain.appendChild(el('hr'));
+    var winsUl = el('ul', { class: 'sm-wins' });
+    smMain.appendChild(subGroup('Windows on this page', 'gif-045-still', winsUl, 'sm-windows'));
+    var arrange = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">▦</span><span>Arrange windows</span>');
+    var sd = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">⏻</span><span>Shut down…</span>');
     arrange.addEventListener('click', function () { setOpen(false); arrangeAll(); });
     sd.addEventListener('click', function () { setOpen(false); shutDown(); });
-    smFoot.appendChild(el('a', { class: 'sm-btn', href: serious }, 'Serious mode'));
-    smFoot.appendChild(arrange); smFoot.appendChild(sd);
-    smMain.appendChild(smFoot);
+    smMain.appendChild(el('a', { class: 'sm-item', href: serious }, '<img src="img/serious.webp" alt="" width="28" height="28"><span>Serious mode</span>'));
+    smMain.appendChild(arrange);
+    smMain.appendChild(el('hr'));
+    smMain.appendChild(sd);
     nav.appendChild(el('div', { class: 'sm-band', 'aria-hidden': 'true' }, '<span>Pond<b>OS</b> 1.0</span>'));
     nav.appendChild(smMain);
 
@@ -176,6 +193,7 @@
     bar.appendChild(tray);
     var mb = bar.querySelector('.start');
     setOpen = function (o) {
+      if (!o) nav.querySelectorAll('.sm-sub').forEach(function (x) { x.hidden = true; x.previousSibling.setAttribute('aria-expanded', 'false'); });
       nav.hidden = !o; top.classList.toggle('open', o); mb.setAttribute('aria-expanded', String(o));
       root.classList.toggle('menu-lock', o);
     };
@@ -306,11 +324,11 @@
     return d;
   }
   function shutDown() {
-    osDialog('Shut Down PondOS', '<div class="dlg-row"><img src="img/pep-logo.webp" alt="" width="40" height="40"><div><h3>You can’t shut down a blockchain, fren.</h3><p>Close this tab whenever you like. The Pepecoin network keeps aiming for one block every 60 seconds, with or without you. That is rather the point.</p></div></div>',
+    osDialog('Shut Down PondOS', '<div class="dlg-row"><img src="img/gif-071.webp" alt="" width="96" height="79"><div><h3>You can’t shut down a blockchain, fren.</h3><p>Close this tab whenever you like. The Pepecoin network keeps aiming for one block every 60 seconds, with or without you. That is rather the point.</p></div></div>',
       [{ label: 'Keep hopping', go: true }, { label: 'Serious mode', href: serious }]);
   }
   function aboutOS() {
-    osDialog('About PondOS', '<div class="dlg-row"><img src="img/coin-spin.webp" alt="" width="64" height="64"><div><h3>PondOS 1.0 “Lilypad”</h3><p>The meme edition of Pepecoin Hub. Drag windows by their title bars, double-click a title to maximize. Memory: 100% memes, 100% receipts.</p><p class="src">Animated Pepes by <a href="https://klipy.com/profile/lilyinpyjamas/">Lily in Pyjamas</a>. Not financial advice.</p></div></div>', [{ label: 'OK', go: true }]);
+    osDialog('About PondOS', '<div class="dlg-row"><img src="img/gif-045.webp" alt="" width="96" height="48"><div><h3>PondOS 1.0 “Lilypad”</h3><p>The meme edition of Pepecoin Hub. Drag windows by their title bars, double-click a title to maximize. Memory: 100% memes, 100% receipts.</p><p class="src">Animated Pepes by <a href="https://klipy.com/profile/lilyinpyjamas/">Lily in Pyjamas</a>. Not financial advice.</p></div></div>', [{ label: 'OK', go: true }]);
   }
 
   // ---------- window titles ----------
@@ -345,7 +363,7 @@
   // ---------- windows ----------
   var wins = [], zTop = 20, activeW = null, maxW = null, closedHint = false;
   var tasks = document.querySelector('.tasks');
-  var winList = document.querySelector('.sm-windows ul');
+  var winList = document.querySelector('.sm-wins');
   function inView(W) { var r = W.host.getBoundingClientRect(); return r.bottom > 40 && r.top < window.innerHeight - 60; }
   function focusW(W) {
     if (!W) return;
@@ -453,7 +471,7 @@
     W.maxBtn.addEventListener('click', function () { toggleMax(W); });
     bar.querySelector('.w-x').addEventListener('click', function () {
       setState(W, 'closed');
-      if (!closedHint) { closedHint = true; balloon('Window closed', 'Closed windows wait in Start ▸ Windows on this page. Nothing on the chain was harmed.', 'pep-logo'); }
+      if (!closedHint) { closedHint = true; balloon('Window closed', 'Closed windows wait in Start ▸ Windows on this page. Nothing on the chain was harmed.', 'gif-040'); }
     });
     bar.addEventListener('dblclick', function (e) { if (!e.target.closest('button')) toggleMax(W); });
     win.addEventListener('pointerdown', function () { if (activeW !== W) focusW(W); });
@@ -506,6 +524,19 @@
     }).catch(function () {});
     var first = null; wins.forEach(function (w) { if (!first && !w.host.closest('[hidden]')) first = w; });
     focusW(first);
+    // "Show desktop" at the end of the tray: minimizes every window to see the wallpaper, a second click brings them back
+    var trayEl = document.querySelector('.tray');
+    if (trayEl) {
+      var peek = el('button', { type: 'button', class: 'show-desk', title: 'Show desktop', 'aria-pressed': 'false' }, '<span class="sr">Show desktop</span>');
+      var hiddenByPeek = [];
+      peek.addEventListener('click', function () {
+        if (hiddenByPeek.length) { hiddenByPeek.forEach(function (w) { if (w.state === 'min') setState(w, 'open'); }); hiddenByPeek = []; peek.setAttribute('aria-pressed', 'false'); return; }
+        wins.forEach(function (w) { if (w.state === 'open' && !w.host.closest('[hidden]')) { hiddenByPeek.push(w); setState(w, 'min'); } });
+        peek.setAttribute('aria-pressed', 'true');
+        window.scrollTo(0, 0);
+      });
+      trayEl.parentNode.appendChild(peek);
+    }
   }
 
   // ---------- desktop icons ----------
@@ -542,6 +573,71 @@
     }).catch(function () {});
   });
   if (trayHash) json('ticker.json').then(function (t) { if (t.hashrate) { trayHash.textContent = fmt.hash(t.hashrate.hs); trayHash.title = 'Network hashrate'; trayHash.hidden = false; } }).catch(function () {});
+
+  // ---------- right-click on the desktop ----------
+  // only on the wallpaper itself; inside windows the browser's own menu stays
+  var ctx = null;
+  function closeCtx() { if (ctx) { ctx.remove(); ctx = null; } }
+  document.addEventListener('contextmenu', function (e) {
+    if (!mainEl || e.target.closest('.win, .desk a, .desk button, header.top, dialog, a, button, input')) return;
+    e.preventDefault(); closeCtx(); closeMenus();
+    var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    ctx = el('div', { class: 'ctx', role: 'menu' });
+    [['Arrange windows', arrangeAll], ['Refresh', function () { location.reload(); }], null,
+      [dark ? 'Wallpaper: day hills' : 'Wallpaper: night mountains', function () { if (themeBtn) themeBtn.click(); }],
+      ['Screensaver preview', function () { saver(true); }], null, ['Properties…', aboutOS]].forEach(function (it) {
+      if (!it) { ctx.appendChild(el('hr')); return; }
+      var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
+      b.addEventListener('click', function () { closeCtx(); it[1](); });
+      ctx.appendChild(b);
+    });
+    document.body.appendChild(ctx);
+    var w = ctx.offsetWidth, h = ctx.offsetHeight;
+    ctx.style.left = Math.min(e.clientX, window.innerWidth - w - 4) + 'px';
+    ctx.style.top = Math.min(e.clientY, window.innerHeight - h - 50) + 'px';
+    ctx.querySelector('button').focus();
+  });
+  document.addEventListener('click', closeCtx);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeCtx(); });
+  window.addEventListener('scroll', closeCtx, { passive: true });
+
+  // ---------- the clock opens a small date window with chain facts ----------
+  if (clock) {
+    clock.setAttribute('tabindex', '0'); clock.setAttribute('role', 'button'); clock.setAttribute('title', 'Date and time');
+    var openClock = function () {
+      var now = new Date(), born = Date.UTC(2024, 0, 30), days = Math.floor((now - born) / 86400000);
+      osDialog('Date and Time Properties', '<div class="dlg-row"><img src="img/gif-075.webp" alt="" width="96" height="68"><div><h3>' + now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</h3>' +
+        '<p>Your clock says ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '. The Pepecoin chain keeps its own time: it aims for one block every 60 seconds.</p>' +
+        '<p>Pepecoin launched on January 30, 2024, <b>' + fmt.int(days) + ' days</b> ago.</p><p class="src">Launch date: <a href="https://pepecoin.com/mica-whitepaper.xhtml">MiCA whitepaper</a></p></div></div>', [{ label: 'OK', go: true }]);
+    };
+    clock.addEventListener('click', openClock);
+    clock.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openClock(); } });
+  }
+
+  // ---------- screensaver: after two idle minutes a PEP coin bounces around ----------
+  var saverEl = null, idleT = null;
+  function saver(force) {
+    if (saverEl || (!force && (REDUCE || document.hidden || maxW || document.querySelector('dialog[open]')))) return;
+    saverEl = el('div', { class: 'saver', 'aria-hidden': 'true' }, '<img class="sv-coin" src="img/coin-spin.webp" alt="" width="120" height="120"><p>PondOS is resting. Move the mouse, fren.</p>');
+    document.body.appendChild(saverEl);
+    var coin = saverEl.querySelector('.sv-coin'), x = 40, y = 40, dx = 2.2, dy = 1.7, raf;
+    var step = function () {
+      var W = window.innerWidth - 120, H = window.innerHeight - 120;
+      x += dx; y += dy;
+      if (x < 0 || x > W) { dx = -dx; x = Math.max(0, Math.min(x, W)); }
+      if (y < 0 || y > H) { dy = -dy; y = Math.max(0, Math.min(y, H)); }
+      coin.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    var wake = function () { cancelAnimationFrame(raf); if (saverEl) { saverEl.remove(); saverEl = null; } ['pointermove', 'pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (t) { window.removeEventListener(t, wake, true); }); };
+    setTimeout(function () { ['pointermove', 'pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (t) { window.addEventListener(t, wake, true); }); }, 400);
+  }
+  if (mainEl && !REDUCE && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    var poke = function () { clearTimeout(idleT); idleT = setTimeout(saver, 120000); };
+    ['pointermove', 'pointerdown', 'keydown', 'wheel', 'scroll'].forEach(function (t) { window.addEventListener(t, poke, { passive: true }); });
+    poke();
+  }
 
   // ---------- balloon notices ----------
   function balloon(title, text, icon) {
