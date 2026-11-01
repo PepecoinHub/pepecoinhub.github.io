@@ -926,3 +926,6 @@ footer.foot a { color: #edf3e3; }
 .pondos .win-launch .btn { min-width: 0; padding: 5px 9px; gap: 6px; }
 .win-launch .btn img { width: 16px; height: 16px; border-radius: 3px; object-fit: cover; }
 .pondos .win-launch p { flex-basis: 100%; }
+.tv-screen { position: relative; aspect-ratio: 16 / 9; background: #000; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); }
+.tv-screen iframe { position: absolute; inset: 2px; width: calc(100% - 4px); height: calc(100% - 4px); border: 0; }
+.icons img[src$="pond-tv.webp"] { object-fit: contain; background: none; box-shadow: none; border: 0; }

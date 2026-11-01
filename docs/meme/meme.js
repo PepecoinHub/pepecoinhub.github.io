@@ -588,9 +588,9 @@
     var DESKTOP = [
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
-      ['#games', 'Games', 'gif-061-still'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Paper hands', 'gif-040-still']
+      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Paper hands', 'gif-040-still']
     ];
-    var ACT = { '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -1085,6 +1085,14 @@
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/" title="PEP Games"></iframe><div class="app-row"><span class="grow">Charades, Pepe Miner and the lobby chat.</span><a class="app-btn" href="' + BASE + 'games/" target="_blank" rel="noopener">Open in a new tab</a></div>';
     }, 1100);
     A.host.style.top = '12px';
+  }
+
+  // ---------- Pond TV: a small video player window (YouTube, no-cookie embed, loads only when opened) ----------
+  function pondTV() {
+    var A = openApp('tv', 'Pond Media Player - Pepecoin', 'pond-tv', function (A) {
+      A.body.innerHTML = '<div class="tv-screen"><iframe src="https://www.youtube-nocookie.com/embed/HnfR7KgQqRA?rel=0&modestbranding=1" title="Pepecoin video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
+        '<div class="app-row"><span class="grow">Now playing: Pepecoin</span><a class="app-btn" href="https://youtu.be/HnfR7KgQqRA" target="_blank" rel="noopener">Open on YouTube</a></div>';
+    }, 640);
   }
 
   // ---------- Tip jar: the same receiving addresses as the footer ----------
