@@ -867,3 +867,12 @@ footer.foot a { color: #edf3e3; }
 .tip-list code { font-size: 11px; overflow-wrap: anywhere; user-select: all; background: none; border: 0; padding: 0; }
 .tip-list .app-btn { padding: 5px 10px; font-weight: 400; }
 @media (max-width: 480px) { .tip-list li { grid-template-columns: minmax(0, 1fr) auto; } .tip-list li span { grid-column: 1 / -1; font-weight: 700; } .tip { grid-template-columns: 80px minmax(0, 1fr); } .tip img { width: 80px; height: auto; } }
+/* windows use the whole desktop width, from the icons to the right edge */
+.pondos main { max-width: none; grid-template-columns: minmax(0, 1fr); }
+.pondos footer.foot { max-width: none; }
+@media (min-width: 1101px) { .pondos main, .pondos footer.foot { padding-right: 24px; } }
+.folder { list-style: none; margin: 0; padding: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); }
+.folder button { width: 100%; display: grid; justify-items: center; gap: 4px; padding: 6px 2px; border: 1px dotted transparent; background: none; color: var(--ink); font: 400 12px/1.2 var(--f-chrome); cursor: pointer; }
+.folder button img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+.folder button.sel span, .folder button:focus-visible span { background: var(--sel); color: #fff; }
+.app-frame { display: block; width: 100%; height: min(72vh, 760px); border: 0; background: #fff; box-shadow: inset 1px 1px 0 var(--chrome-lo); }

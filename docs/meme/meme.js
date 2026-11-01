@@ -170,7 +170,9 @@
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
     });
-    gl.appendChild(el('a', { href: BASE + 'games/' }, '<img src="img/pond-playground.webp" alt="" width="24" height="24" loading="lazy"><span><b>PEP Games online</b><small>Charades, Pepe Miner, lobby chat</small></span>'));
+    var onl = el('a', { href: BASE + 'games/' }, '<img src="img/pond-playground.webp" alt="" width="24" height="24" loading="lazy"><span><b>PEP Games online</b><small>Charades, Pepe Miner, lobby chat</small></span>');
+    onl.addEventListener('click', function (e) { if (window.innerWidth >= 760) { e.preventDefault(); setOpen(false); pepGamesOnline(); } });
+    gl.appendChild(onl);
     smMain.appendChild(subGroup('Games', 'gif-061-still', gl));
     smMain.appendChild(el('hr'));
     var winsUl = el('ul', { class: 'sm-wins' });
@@ -451,7 +453,7 @@
     // the window's icon is its first picture, so the taskbar buttons are told apart at a glance
     var pic = body.querySelector('img:not([src$=".svg"])');
     var iconSrc = opts.icon ? 'img/' + opts.icon + '.webp' : body.classList.contains('hero') ? 'img/pep-logo.webp' : pic ? pic.getAttribute('src') : 'img/' + (APP[PAGE] || ['', 'pep-logo'])[1] + '.webp';
-    if (opts.wide || body.classList.contains('hero') || body.classList.contains('pagehead') || body.querySelector(WIDE)) host.classList.add('wide');
+    host.classList.add('wide'); // every window takes the full width: the pages' inner layouts need it
     var win = el('div', { class: 'win' });
     var bar = el('div', { class: 'win-bar' }, '<img src="' + iconSrc + '" alt="" width="16" height="16" loading="lazy"><span class="win-t">' + esc(title) + '</span>' +
       '<span class="win-ctl"><button type="button" class="w-min" title="Minimize">' + ICO.min + '<span class="sr">Minimize ' + esc(title) + '</span></button>' +
@@ -558,10 +560,9 @@
     var DESKTOP = [
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
-      ['#pong', 'PEP Pong', 'pep-logo'], ['#fud', 'FUD Invaders', 'gif-008-still'], ['#snake', 'PEP Snake', 'gif-027-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'],
-      [BASE + 'games/', 'PEP Games', 'pond-playground'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Paper hands', 'gif-040-still']
+      ['#games', 'Games', 'gif-061-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Paper hands', 'gif-040-still']
     ];
-    var ACT = { '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -943,6 +944,30 @@
         A.body.querySelector('.lap-x').textContent = now && ath ? (ath / now).toFixed(1) + '× pricier' : '—';
       });
     }, 460);
+  }
+
+  // ---------- Games folder ----------
+  function gamesFolder() {
+    openApp('games', 'C:\\Pond\\Games', 'gif-061-still', function (A) {
+      var G = [['PEP Pong', 'pep-logo', pong], ['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
+        ['PEP Games online', 'pond-playground', function () { pepGamesOnline(); }]];
+      A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { return '<li><button type="button" data-i="' + i + '"><img src="img/' + g[1] + '.webp" alt="" width="40" height="40"><span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
+        '<p class="bin-tip">Double-click a game. PEP Games online (Charades, Pepe Miner, lobby chat) opens in its own window.</p>';
+      A.body.querySelectorAll('.folder button').forEach(function (b) {
+        var go = function () { G[+b.getAttribute('data-i')][2](); };
+        b.addEventListener('dblclick', go);
+        b.addEventListener('click', function () { if (!matchMedia('(hover: hover) and (pointer: fine)').matches) go(); else { A.body.querySelectorAll('.folder .sel').forEach(function (x) { x.classList.remove('sel'); }); b.classList.add('sel'); } });
+        b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+      });
+    }, 460);
+  }
+  // the online games site inside a big window; on a phone it simply opens the page
+  function pepGamesOnline() {
+    if (window.innerWidth < 760) { location.href = BASE + 'games/'; return; }
+    var A = openApp('online', 'PEP Games online', 'pond-playground', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/" title="PEP Games"></iframe><div class="app-row"><span class="grow">Charades, Pepe Miner and the lobby chat.</span><a class="app-btn" href="' + BASE + 'games/" target="_blank" rel="noopener">Open in a new tab</a></div>';
+    }, 1100);
+    A.host.style.top = '12px';
   }
 
   // ---------- Tip jar: the same receiving addresses as the footer ----------
