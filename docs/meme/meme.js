@@ -634,6 +634,8 @@
     });
     var fin = document.querySelector('footer.foot > div');
     if (fin) windowize(fin, { title: 'About Pepecoin Hub', icon: 'pep-logo', wide: true });
+    // one program opens one window: the "About Pepecoin Hub" window waits on the taskbar until it is clicked
+    wins.forEach(function (w) { if (w.host.closest('footer') && w.state === 'open') { w.state = 'min'; w.host.classList.add('is-min'); } });
     // a hidden wrapper (the rich list before its data arrives, the frog chooser) hides its taskbar buttons too
     new MutationObserver(function () { wins.forEach(sync); }).observe(mainEl, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
     wins.forEach(sync);
@@ -756,6 +758,18 @@
   // only on the wallpaper itself; inside windows the browser's own menu stays
   var ctx = null;
   function closeCtx() { if (ctx) { ctx.remove(); ctx = null; } }
+  // a click on the empty wallpaper minimizes the open windows (with a mouse; on a touch screen a tap
+  // next to a window while scrolling would hide it by accident). The taskbar brings them back.
+  var wallTipShown = false;
+  document.addEventListener('click', function (e) {
+    if (!mainEl || e.button || !matchMedia('(hover: hover) and (pointer: fine)').matches || window.innerWidth < 761) return;
+    if (e.target.closest('.win, .desk, header.top, dialog, a, button, input, select, textarea, label, .ctx, .balloon, .boot, .os-dlg, .saver, .safe-off, [role=menu]')) return;
+    var sel = window.getSelection && String(window.getSelection()); if (sel) return;
+    var open = wins.filter(function (w) { return w.state === 'open' && !w.host.closest('[hidden]'); });
+    if (!open.length) return;
+    open.forEach(function (w) { setState(w, 'min'); });
+    if (!wallTipShown) { wallTipShown = true; balloon('Windows minimized', 'You clicked the wallpaper. Your windows wait on the taskbar: click one to bring it back.', 'pep-logo'); }
+  });
   document.addEventListener('contextmenu', function (e) {
     if (!mainEl || e.target.closest('.win, .desk a, .desk button, header.top, dialog, a, button, input')) return;
     e.preventDefault(); closeCtx(); closeMenus();
@@ -1384,8 +1398,8 @@
   // ---------- PEP Pager: a 2000s LCD pager pinned to the desktop, scrolling the live numbers ----------
   function pager() {
     var desk = document.querySelector('.desk');
-    if (!desk || document.querySelector('.pager')) return;
-    var pg = el('a', { class: 'pager', href: 'price.html', title: 'PEP Pager: live numbers. Click for the price page.' },
+    if (!desk || document.querySelector('.pep-pager')) return;
+    var pg = el('a', { class: 'pep-pager', href: 'price.html', title: 'PEP Pager: live numbers. Click for the price page.' },
       '<span class="pager-brand">PEP-PAGER 2000</span><span class="pager-lcd"><span class="pager-run"></span></span><span class="pager-led" aria-hidden="true"></span>');
     desk.insertBefore(pg, desk.firstChild);
     var run = pg.querySelector('.pager-run');
@@ -1621,7 +1635,9 @@
   // ---------- boot screen, once per visit ----------
   var booted = '1';
   try { booted = sessionStorage.getItem('pondos-boot'); sessionStorage.setItem('pondos-boot', '1'); } catch (e) {}
-  if (!booted && !REDUCE && mainEl) {
+  // search engine crawlers get the page straight away, without the boot screen in front of it
+  var BOT = /bot|crawl|spider|slurp|lighthouse|inspectiontool/i.test(navigator.userAgent || '');
+  if (!booted && !REDUCE && !BOT && mainEl) {
     var boot = el('div', { class: 'boot', 'aria-hidden': 'true' });
     boot.innerHTML = '<div class="boot-in"><img class="boot-coin" src="img/pep-loading.webp" alt="" width="180" height="180"><p class="boot-name">Pond<b>OS</b> <span>98 Second Frog Edition</span></p>' +
       '<ol class="boot-log"></ol><div class="boot-bar"><i></i></div><p class="boot-skip">click or press any key to skip</p></div>';
