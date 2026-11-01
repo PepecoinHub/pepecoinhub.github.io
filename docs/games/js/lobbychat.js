@@ -1,5 +1,7 @@
-// Lobby chat + "online" counter. It asks the server every few seconds (no realtime channel), so it also works
-// for visitors who are not signed in. Reading and writing are open to everyone: without a sign-in a nickname goes
+// Lobby chat + "online" counter. The database rings a doorbell on the Realtime channel "lobby-chat" when a message
+// is written or hidden (supabase/update_lobby_realtime.sql); the chat then asks once for what is new. Without the
+// doorbell (not connected yet, or the SQL not run) it falls back to asking every few seconds. Works for visitors
+// who are not signed in. Reading and writing are open to everyone: without a sign-in a nickname goes
 // with each message (the server limits it per network); a guest or Discord sign-in keeps the same name.
 // Text and our own emotes only: the server rejects links, and the page never shows pictures from players.
 import { $, h, toast, nickStore } from './common.js';
@@ -19,6 +21,21 @@ export function lobbyChat(be, { openLogin }) {
   let last = 0, mod = false, timer = 0, busy = false, again = false, first = true, readyAt = 0, mutedUntil = null;
   const phone = matchMedia('(max-width: 900px)');
   const watching = () => !document.hidden && (!phone.matches || panel.classList.contains('open'));
+  // the doorbell: while it is connected, the chat only asks every 60 s (the "online" counter needs one call within 90 s)
+  let live = false, ringT = 0, want = 0, force = false;
+  // a burst of rings makes one call, spread over a second so not every open chat asks at the same moment
+  const ring = (id) => {
+    if (id) want = Math.max(want, id); else force = true;
+    if (!ringT) ringT = setTimeout(() => { ringT = 0; if (force || want > last) { force = false; poll(); } }, 300 + Math.random() * 700);
+  };
+  if (be.kind === 'supabase') {
+    try {
+      be.channel('lobby-chat', (ev, p) => {
+        if (ev === 'new') ring(Number(p && p.id) || 0);
+        else if (ev === 'hidden') ring();   // hidden messages come back in the "hidden" list of the next call
+      }, () => { live = true; ring(); }, (st) => { if (st !== 'SUBSCRIBED') live = false; });
+    } catch (e) { live = false; }
+  }
 
   const hhmm = (at) => new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   function line(m) {
@@ -78,7 +95,7 @@ export function lobbyChat(be, { openLogin }) {
       if (first) { box.textContent = ''; box.append(h('p', { class: 'muted small cempty' }, 'The chat can\'t be reached right now. Trying again…')); }
     } finally {
       busy = false;
-      if (again) { again = false; poll(); } else timer = setTimeout(poll, watching() ? 4000 : 25000);
+      if (again) { again = false; poll(); } else timer = setTimeout(poll, live ? 60000 : watching() ? 4000 : 25000);
     }
   }
 

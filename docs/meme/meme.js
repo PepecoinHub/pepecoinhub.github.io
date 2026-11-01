@@ -691,7 +691,7 @@
     var DESKTOP = [
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
-      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#logon', 'Log On', 'gif-085-still'], ['#shop', 'Shop', 'shop-bag'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Recycle Bin', 'recycle-bin']
+      ['#games', 'Games', 'games-folder'], ['#tv', 'Pond TV', 'pond-tv'], ['#logon', 'Log On', 'gif-085-still'], ['#shop', 'Shop', 'shop-bag'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Recycle Bin', 'recycle-bin']
     ];
     var ACT = { '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
@@ -1231,7 +1231,7 @@
 
   // ---------- Games folder ----------
   function gamesFolder() {
-    openApp('games', 'C:\\Pond\\Games', 'gif-061-still', function (A) {
+    openApp('games', 'C:\\Pond\\Games', 'games-folder', function (A) {
       var G = [['PEP Pong', 'pep-logo', pong], ['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
         ['High Scores', 'gif-061-still', function () { highScores(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
@@ -1433,6 +1433,12 @@
   // ---------- PEP-TV Ads: a folder of fake late-night infomercials, played in a TV window ----------
   // Every claim in them is a fact from this site; the "offers" are jokes, and every ad says so.
   var ADS = [
+    { file: 'host_wanted.mpg', title: 'Wanted: a frog to run game night', ch: 'CH 1 · PEPE PICTURES PRIME TIME', icon: 'unclesam', scenes: [
+      '<p class="ad-kick">Always the one who organises the group chat?</p><h3 class="ad-big">WANTED:<br>a frog to run<br><em>game night!</em></h3>',
+      '<img class="ad-pic" src="../games/img/host-wanted.webp" alt=""><p class="ad-sub">Pepe Pictures is our weekly quiz night. A picture starts as a few giant pixels and gets sharper. The first three correct guesses score 3, 2 and 1 points.</p>',
+      '<p class="ad-kick">The job, in full:</p><p class="ad-sub">• set the date of the night<br>• pick the pictures<br>• start the rounds<br>• keep the chat friendly<br>• crown the winner of the night</p><h3 class="ad-big">Eternal <em>pond fame!</em></h3>',
+      '<p class="ad-fine">Volunteer job. Pay: zero PEP and a lot of “gg”. All in the chat: no voice, no camera. Real frogs only, no bots.</p><a class="ad-cta" href="https://discord.gg/pepecoin" target="_blank" rel="noopener">Apply on the Pepecoin Discord →</a>'
+    ] },
     { file: 'better_frog.mpg', title: 'There has to be a better frog!', ch: 'CH 42 · THE FROG SHOPPING HOUR', icon: 'wrongpep', scenes: [
       '<p class="ad-kick">Are you tired of frogs that turn out to be tokens?</p><h3 class="ad-big">There has to be<br>a <em>better frog!</em></h3>',
       '<div class="ad-ba"><figure class="ad-before"><b>Before</b><img src="img/wrongpep.webp" alt=""><figcaption>“I bought a frog on Ethereum by mistake.”</figcaption></figure><figure class="ad-after"><b>After</b><img src="img/pep-logo.webp" alt=""><figcaption>Pepecoin (PEP). The frog with its own blockchain!</figcaption></figure></div>',
@@ -1560,6 +1566,24 @@
       return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error((j && j.message) || 'The chat cannot be reached right now'); return j; });
     });
   }
+  // The chat doorbell (Supabase Realtime, private channel "lobby-chat"): the database rings it when a message is
+  // written or hidden, so an open LAN Party asks once instead of every 4 seconds. Listening only, as an anonymous
+  // visitor; the Supabase script is loaded the first time the chat opens. If anything fails, the chat keeps polling.
+  var bellSb = null;
+  function lobbyBell(onRing, onState) {
+    var ch = null, gone = false;
+    var load = window.supabase ? Promise.resolve() : new Promise(function (res, rej) {
+      var sc = document.createElement('script'); sc.src = BASE + 'games/vendor/supabase-2.117.3.js'; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc);
+    });
+    load.then(function () {
+      if (gone) return;
+      if (!bellSb) bellSb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'pondos-bell' } });
+      ch = bellSb.channel('lobby-chat', { config: { private: true } });
+      ch.on('broadcast', { event: '*' }, function (m) { onRing(m.event, m.payload); });
+      ch.subscribe(function (st) { onState(st === 'SUBSCRIBED'); });
+    }).catch(function () { onState(false); });
+    return function () { gone = true; onState(false); if (ch && bellSb) bellSb.removeChannel(ch); ch = null; };
+  }
   function chatBody(t) {
     return esc(t).replace(/:([a-z]{3,10}):/g, function (m, c) { return EMO.indexOf(' ' + c + ' ') >= 0 ? '<img class="emo-img" src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="24" height="24">' : m; });
   }
@@ -1577,7 +1601,7 @@
         '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + BASE + 'games/img/emotes/pep.webp" alt="" width="22" height="22"></button><input name="n" class="lan-nick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname" hidden><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
         '<p class="hs-note lan-note"></p>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input[name=t]'), note = A.body.querySelector('.lan-note');
-      var last = 0, seen = {}, timer = 0, alive = true, first = true;
+      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false;
       var pop = A.body.querySelector('.emo-pop'), eb = A.body.querySelector('.emo-btn');
       eb.addEventListener('click', function () { pop.hidden = !pop.hidden; eb.setAttribute('aria-expanded', String(!pop.hidden)); });
       pop.addEventListener('click', function (e) {
@@ -1620,8 +1644,15 @@
           if (!log.children.length) log.innerHTML = '<p class="bin-tip">No messages in the last 24 hours. Say gm!</p>';
           if (atBottom || r.messages && r.messages.length) log.scrollTop = log.scrollHeight;
         }, function (err) { if (first) log.innerHTML = '<p class="bin-tip">' + esc(err.message) + '. Trying again…</p>'; })
-          .then(function () { if (alive) timer = setTimeout(poll, document.hidden ? 25000 : 4000); });
+          .then(function () { if (alive) timer = setTimeout(poll, live ? 60000 : document.hidden ? 25000 : 4000); });
       };
+      // a burst of rings makes one call, spread over a second so not every open chat asks at the same moment
+      var ring = function (id) {
+        if (id) want = Math.max(want, id); else force = true;
+        if (!ringT) ringT = setTimeout(function () { ringT = 0; if (alive && (force || want > last)) { force = false; poll(); } }, 300 + Math.random() * 700);
+      };
+      var stopBell = lobbyBell(function (ev, p) { ring(ev === 'new' ? Number(p && p.id) || 0 : 0); },
+        function (ok) { var was = live; live = ok; if (ok && !was) ring(); else if (!ok && was && alive) poll(); });
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         var t = inp.value.trim(); if (!t) return;
@@ -1639,7 +1670,7 @@
         }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
       });
       paintNote(); poll();
-      A.stop = function () { alive = false; clearTimeout(timer); };
+      A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); stopBell(); };
     }, 480);
     return A;
   }

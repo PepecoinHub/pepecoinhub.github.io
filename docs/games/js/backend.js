@@ -143,12 +143,12 @@ class SupaBackend {
     if (res.error) throw friendlyError(res.error);
     return res.data;
   }
-  channel(topic, onMsg, onJoin) {
+  channel(topic, onMsg, onJoin, onState) {
     const ch = this.sb.channel(topic, { config: { private: true, broadcast: { self: false } } });
     ch.on('broadcast', { event: '*' }, (m) => onMsg(m.event, m.payload));
     (async () => {
       await this.sb.realtime.setAuth();
-      ch.subscribe((status, err) => { if (status === 'CHANNEL_ERROR') console.warn('[rt]', topic, err); if (status === 'SUBSCRIBED') onJoin?.(); });
+      ch.subscribe((status, err) => { if (status === 'CHANNEL_ERROR') console.warn('[rt]', topic, err); if (status === 'SUBSCRIBED') onJoin?.(); onState?.(status); });
     })();
     return { send: (event, payload) => ch.send({ type: 'broadcast', event, payload }), close: () => this.sb.removeChannel(ch) };
   }
