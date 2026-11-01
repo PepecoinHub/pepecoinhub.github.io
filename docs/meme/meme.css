@@ -910,7 +910,7 @@ footer.foot a { color: #edf3e3; }
 /* inside windows the side picture no longer pushes the heading to the bottom */
 .pondos .head.pic, .pondos .win-body.pagehead { align-items: center; }
 /* "Show desktop": the icons appear on every page; on a phone the button is easier to spot */
-.pondos.desk-view body .desk { display: block !important; }
+.pondos.desk-view body .desk, .pondos.desk-empty body .desk { display: block !important; }
 .pondos.desk-view main > .note { display: none; }
 @media (max-width: 760px) { .pondos .show-desk { width: 16px; } }
 /* keep each wallpaper's Pepe in view when a narrow screen crops the picture */
