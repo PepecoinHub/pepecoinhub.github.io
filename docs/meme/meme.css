@@ -1074,3 +1074,9 @@ footer.foot a { color: #edf3e3; }
 
 .lan-form .lan-nick { flex: 0 1 110px; }
 .pane > .sec.off img { display: none; }   /* pictures in the hidden sections of a book window load when the section opens */
+
+/* folder file names: wrap inside their own column instead of running into the next one */
+.folder { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); }
+.folder button span { max-width: 100%; overflow-wrap: anywhere; word-break: break-word; text-align: center; hyphens: auto; }
+/* the last desktop icon row keeps its label clear of the taskbar */
+@media (min-width: 1101px) { .desk .icons { padding-bottom: 6px; } .desk .pep-pager ~ .icons { height: calc(100% - 70px); } }

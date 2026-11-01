@@ -691,7 +691,7 @@
     var DESKTOP = [
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
-      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#logon', 'Log On', 'gif-085-still'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Recycle Bin', 'recycle-bin'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#shop', 'Shop', 'shop-bag']
+      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#logon', 'Log On', 'gif-085-still'], ['#shop', 'Shop', 'shop-bag'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Recycle Bin', 'recycle-bin']
     ];
     var ACT = { '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
@@ -1444,6 +1444,18 @@
       '<h3 class="ad-big">Only<br><em>40,000,000 PEP!</em></h3><p class="ad-sub">A fren once paid that for one laptop. The pond has never forgotten.</p>',
       '<p class="ad-kick">What would it cost today?</p><h3 class="ad-big"><em class="ad-lap">…</em></h3><p class="ad-sub">40M PEP × today’s hourly price snapshot.</p>',
       '<p class="ad-fine">Laptop not included. Not an offer. Not financial advice.</p><button type="button" class="ad-cta ad-lapbtn">Open the Laptop Index →</button>'
+    ] },
+    { file: 'frog_doctor.mpg', title: 'Ask the Frog Doctor', ch: 'CH 0x · THE TICKER CLINIC', icon: 'pepe-search', scenes: [
+      '<p class="ad-kick">Does your wallet say PEPE when you meant PEP?</p><h3 class="ad-big">You may suffer from<br><em>Ticker Confusion!</em></h3>',
+      '<p class="ad-kick">Symptoms include:</p><p class="ad-sub">• an address that starts with 0x<br>• a frog that lives on Ethereum<br>• “it said Pepe, so I clicked buy”</p><img class="ad-pic" src="img/pepe-search.webp" alt="">',
+      '<h3 class="ad-big">Ask the<br><em>Frog Doctor!</em></h3><p class="ad-sub">PEP has its own chain, and its addresses start with a capital P. PEPE is an ERC-20 token. PEPECOIN (2016) is another project again.</p>',
+      '<p class="ad-fine">Side effects of reading the comparison may include checking the ticker twice. Not medical advice. Not financial advice either.</p><a class="ad-cta" href="which-pepecoin.html">See the side-by-side →</a>'
+    ] },
+    { file: 'sixty_second_frog.mpg', title: 'The 60-Second Frog', ch: 'CH 60 · BLOCKS AROUND THE CLOCK', icon: 'alarm-still', scenes: [
+      '<p class="ad-kick">Tired of waiting ten minutes for the next block?</p><h3 class="ad-big">Meet the<br><em>60-Second Frog!</em></h3>',
+      '<img class="ad-pic" src="img/alarm.webp" alt=""><p class="ad-sub">Pepecoin aims for one new block about every 60 seconds. Bitcoin aims for one every ten minutes.</p>',
+      '<h3 class="ad-big">Same pace<br>as <em>Dogecoin!</em></h3><p class="ad-sub">Both chains target a 60-second block, and both can be merge-mined with Litecoin.</p>',
+      '<p class="ad-fine">Block times vary: “about 60 seconds” is the target, not a promise. Frog not included.</p><a class="ad-cta" href="network.html">Watch the live network →</a>'
     ] }
   ];
   function adPlayer(i) {
