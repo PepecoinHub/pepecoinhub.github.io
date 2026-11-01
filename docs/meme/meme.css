@@ -899,3 +899,19 @@ footer.foot a { color: #edf3e3; }
 .prof-btns .app-btn { padding: 5px 9px; font-weight: 400; font-size: 12px; }
 .pondos .balloon { right: 110px; }
 @media (max-width: 760px) { .prof-me img { width: 56px; } .pondos .balloon { right: 74px; } .prof { right: 8px; } }
+/* ---------- LAN Party chat ---------- */
+.lan-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #3ddc6a; box-shadow: 0 0 0 0 rgba(61, 220, 106, 0.7); animation: lanpulse 2s ease-out infinite; vertical-align: 0; }
+@keyframes lanpulse { 70%, 100% { box-shadow: 0 0 0 7px rgba(61, 220, 106, 0); } }
+.lan-log { height: min(52vh, 420px); overflow-y: auto; padding: 6px 8px; background: var(--pane); color: var(--ink); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); font: 400 13px/1.45 var(--f-chrome); }
+.lan-msg { padding: 2px 0; overflow-wrap: anywhere; }
+.lan-t { color: var(--muted); font-size: 11px; }
+.emo-img { width: 24px; height: 24px; vertical-align: middle; }
+.lan-form input { flex: 1; min-width: 0; padding: 6px 8px; font: 400 13px var(--f-chrome); border: 0; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); background: var(--pane); color: var(--ink); }
+.lan-note a { color: inherit; }
+.pondos .tray-lan { display: inline-flex; align-items: center; gap: 5px; padding: 0 6px; height: 22px; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+.pondos .tray-lan[hidden] { display: none; }
+.icons a { position: relative; }
+.icon-badge { position: absolute; top: 2px; right: 14px; display: inline-flex; align-items: center; gap: 3px; padding: 1px 5px; border-radius: 9px; background: #0b3a1c; color: #fff; font: 700 10px/1.3 var(--f-chrome); text-shadow: none; }
+.icon-badge[hidden] { display: none; }
+.prof-frame { height: min(calc(100vh - 220px), 620px); }
+@media (prefers-reduced-motion: reduce) { .lan-dot { animation: none; } }
