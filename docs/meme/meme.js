@@ -402,12 +402,17 @@
     W.host.classList.toggle('is-min', s === 'min');
     W.host.classList.toggle('is-closed', s === 'closed');
     sync(W);
-    deskEmpty();
+    deskEmpty(W);
     if (s === 'open') { focusW(W); reveal(W); } else if (W === activeW) { W.win.classList.remove('active'); W.task.setAttribute('aria-pressed', 'false'); activeW = null; nextActive(); }
   }
   // with every window minimized or closed the desktop icons show, on every page and on a phone too
-  function deskEmpty() {
-    var any = false; wins.forEach(function (w) { if (w.state === 'open' && !w.host.closest('[hidden]')) any = true; });
+  function deskEmpty(W) {
+    // the "About Pepecoin Hub" window at the bottom: when a phone closes the page's own windows, it is tucked
+    // into the taskbar as well, so the icons are not stuck behind it (opened again by hand, it stays open)
+    var main = false, foot = null;
+    wins.forEach(function (w) { if (w.host.closest('footer')) foot = w; else if (w.state === 'open' && !w.host.closest('[hidden]')) main = true; });
+    if (!main && W && W !== foot && foot && foot.state === 'open' && window.innerWidth < 760) { setState(foot, 'min'); return; }
+    var any = main || !!(foot && foot.state === 'open');
     if (!any && !root.classList.contains('desk-empty') && window.innerWidth < 760) window.scrollTo(0, 0);
     root.classList.toggle('desk-empty', !any);
   }
