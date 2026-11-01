@@ -1,9 +1,9 @@
 // PEP Games opened from the meme edition (PondOS) wears Windows-98-style chrome.
 // 1. Inside a PondOS app window (an iframe, or ?embed=1): the site header, game navigation and footer
 //    are hidden, so the page looks like an app. ?only=dg or ?only=tables shows just that part of the lobby.
-// 2. Opened as a full page from PondOS (?os=98, or ?login=1&back=/meme/...; phones and the Discord sign-in):
-//    the same 98 look on the PondOS wallpaper, with a title bar that leads back to PondOS. The return path
-//    is kept for this tab while the visitor moves between PEP Games pages, and dropped on the way back.
+// 2. As a full page (phones, the Discord sign-in, a shared room link): the same 98 look on the PondOS
+//    wallpaper, with a title bar and a taskbar button that lead back to PondOS. ?back=/meme/... sets where
+//    "back" goes; it is kept for this tab and dropped on the way back (default: the PondOS desktop).
 (function () {
   var r = document.documentElement, q = location.search, K = 'pondos-back';
   var framed = false; try { framed = window.self !== window.top; } catch (e) { framed = true; }
@@ -14,16 +14,10 @@
     var m = /[?&]only=(dg|tables)(&|$)/.exec(q); if (m) r.classList.add('only-' + m[1]);
     return;
   }
+  // PEP Games is reached only through PondOS now, so every full page wears the 98 look
   var p = new URLSearchParams(q), back = okPath(p.get('back'));
-  if (p.get('os') === '98' || back) {
-    back = back || '/meme/';
-    ss(function (s) { s.setItem(K, back); });
-  } else {
-    // stay in 98 mode only while moving between PEP Games pages in this tab
-    var ref = ''; try { ref = new URL(document.referrer).pathname; } catch (e) {}
-    back = /^\/games\//.test(ref) ? okPath(ss(function (s) { return s.getItem(K); })) : null;
-    if (!back) { ss(function (s) { s.removeItem(K); }); return; }
-  }
+  if (back) ss(function (s) { s.setItem(K, back); });
+  else back = okPath(ss(function (s) { return s.getItem(K); })) || '/meme/';
   r.classList.add('embed', 'os98');
   if (p.get('login') === '1') r.classList.add('os-login');
   var leave = function () { ss(function (s) { s.removeItem(K); }); };

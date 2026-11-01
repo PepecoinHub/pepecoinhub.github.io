@@ -307,9 +307,6 @@
         it: ['Calcolatore', 'I tuoi PEP alla capitalizzazione di DOGE'], zh: ['计算器', '按 DOGE 市值算你的 PEP'] }]
     ],
     [ // community
-      ['games/', { en: ['PEP Games', 'Charades, Pepe Miner, chat'], pl: ['PEP Games', 'Kalambury, Pepe Miner, czat'], es: ['PEP Games', 'Charadas, Pepe Miner, chat'],
-        de: ['PEP Games', 'Scharade, Pepe Miner, Chat'], fr: ['PEP Games', 'Charades, Pepe Miner, chat'], tr: ['PEP Games', 'Sessiz sinema, Pepe Miner, sohbet'],
-        it: ['PEP Games', 'Sciarade, Pepe Miner, chat'], zh: ['PEP Games', '猜词、Pepe Miner、聊天'] }],
       ['links', { en: ['Links', 'Official and community sites'], pl: ['Linki', 'Oficjalne i od społeczności'], es: ['Enlaces', 'Oficiales y de la comunidad'],
         de: ['Links', 'Offizielle und Community-Seiten'], fr: ['Liens', 'Officiels et communautaires'], tr: ['Bağlantılar', 'Resmî ve topluluk siteleri'],
         it: ['Link', 'Ufficiali e della community'], zh: ['链接', '官方与社区网站'] }],

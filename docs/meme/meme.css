@@ -467,7 +467,9 @@ footer.foot a { color: #edf3e3; }
 :root.pondos {
   --desk: #2d6a50; --desk-2: #275c46; --chrome: #e6e3d4; --chrome-hi: #ffffff; --chrome-lo: #9a9c8e; --chrome-dk: #2b2f28;
   --title: #23573a; --title-2: #3a7a50; --title-off: #8f9d92; --title-ink: #ffffff; --pane: #fbfaf3; --sel: #2f6b45;
-  --hard: transparent !important; --f-pixel: "Pixelify Sans", "Space Mono", monospace;
+  --hard: transparent !important;
+  /* one readable typeface for every heading and caption in PondOS (no pixel or handwriting fonts) */
+  --f-pixel: var(--f-body); --f-display: var(--f-body); --f-hand: var(--f-body);
   scroll-padding: 16px 0 64px;
 }
 @media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) {
@@ -995,3 +997,9 @@ footer.foot a { color: #edf3e3; }
 .tabpane { padding: 6px; display: grid; gap: 6px; box-shadow: inset -1px -1px 0 var(--chrome-dk), inset 1px 1px 0 var(--chrome-hi), inset -2px -2px 0 var(--chrome-lo); }
 .tab-extra[hidden] { display: none; }
 .tab-extra a { color: inherit; }
+
+/* headings, kickers and captions share the body typeface */
+.pondos .kicker { font-family: var(--f-body); letter-spacing: 0.04em; }
+.pondos .hand { font-weight: 700; }
+.pondos h1, .pondos h2, .pondos h3 { letter-spacing: -0.01em; }
+.pondos .footcols p.h, .pondos .mega-h, .pondos .cap, .pondos .tcard dt, .pondos .glance h2, .pondos .glance dt, .pondos .ex .go { font-family: var(--f-body); letter-spacing: 0.04em; }
