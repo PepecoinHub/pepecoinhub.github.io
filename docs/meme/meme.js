@@ -1224,7 +1224,9 @@
     var A = openApp('miner', 'Pepe Miner', 'pickaxe', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/miner.html?embed=1" title="Pepe Miner"></iframe>';
     }, 1000);
-    A.host.style.top = '16px'; A.host.style.setProperty('--app-top', '16px');
+    // the miner opens full screen (above the taskbar). Its progress is saved in this browser every few seconds
+    // and when the window closes, so closing or minimizing never resets it.
+    A.host.classList.add('app-full');
   }
 
   // ---------- Games folder ----------

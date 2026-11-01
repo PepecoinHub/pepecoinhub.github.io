@@ -719,6 +719,33 @@
   setInterval(save, 5000);
   document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
   window.addEventListener('pagehide', save);
+
+  // ---------- cloud save: a player signed in with Discord keeps one copy of the mine on the server ----------
+  // (games/supabase/update_miner_cloud.sql). On start the better of the two saves wins (more all-time game PEP);
+  // after that the mine is sent every minute and when the page is hidden.
+  let cloud = null, sentAll = -1;
+  const push = () => {
+    if (!cloud || !S.started || S.allTime === sentAll) return;
+    save(); sentAll = S.allTime;
+    cloud.rpc('gry_miner_save', { p_data: S, p_all: S.allTime }).catch(() => { sentAll = -1; });
+  };
+  if (window.PEP_GRY) import('./backend.js').then((m) => m.getBackend()).then(async (be) => {
+    const sess = be.kind === 'supabase' && be.session();
+    if (!sess || sess.user.is_anonymous) return;
+    const r = await be.rpc('gry_miner_load');
+    cloud = be;
+    const theirs = r && r.data, mine = S.allTime || 0;
+    if (theirs && (r.all_time || 0) > mine + 1) {
+      let once = false; try { once = sessionStorage.getItem('pepminer-cloud') === '1'; sessionStorage.setItem('pepminer-cloud', '1'); } catch (e) {}
+      // the online mine is further along: it becomes this browser's save and the page starts again with it
+      if (!once) { S = Object.assign(fresh(), theirs); S.st = Object.assign(fresh().st, theirs.st || {}); save(); location.reload(); return; }
+    }
+    if (S.started && mine > (r && r.all_time || 0)) push();
+    let hi = false; try { hi = sessionStorage.getItem('pepminer-cloud-hi') === '1'; sessionStorage.setItem('pepminer-cloud-hi', '1'); } catch (e) {}
+    if (!hi) toast('Cloud save on', 'Signed in with Discord: your mine is saved online too, so it opens on your other devices.', E('pep'));
+    setInterval(push, 60000);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) push(); });
+  }).catch(() => {});
   if (/[?&]debug=1/.test(location.search)) window.__mn = {
     S: () => S, set: (o) => { Object.assign(S, o); renderAll(); }, spawnFoot, spawnTrap, runEvent, showEvent, fud, launchToken, hardFork, nextNews, setTab,
     buyUp: (id) => buyUp(UPGRADES.find((u) => u.id === id)), toast, E,

@@ -1109,3 +1109,8 @@ footer.foot a { color: #edf3e3; }
 @media (max-width: 760px) {
   .app-win { max-height: calc(100vh - var(--app-top, 50px) - 48px - var(--sab)); max-height: calc(100dvh - var(--app-top, 50px) - 48px - var(--sab)); overflow-y: auto; overscroll-behavior: contain; }
 }
+/* a full-screen app window (Pepe Miner): the whole screen above the taskbar */
+.app-win.app-full { left: 0 !important; top: 0 !important; transform: none !important; width: 100vw !important; height: calc(100vh - 40px - var(--sab)); height: calc(100dvh - 40px - var(--sab)); max-height: none; overflow: hidden; }
+.app-win.app-full > .win { height: 100%; display: flex; flex-direction: column; }
+.app-win.app-full .app-body { flex: 1; min-height: 0; padding: 0; }
+.app-win.app-full .app-frame { height: 100%; }
