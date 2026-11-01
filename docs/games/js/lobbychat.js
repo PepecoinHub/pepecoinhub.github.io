@@ -45,7 +45,7 @@ export function lobbyChat(be, { openLogin }) {
   form.prepend(nickIn);
   function paintInput() {
     const signed = !!be.session(), muted = mutedUntil && Date.parse(mutedUntil) > Date.now();
-    nickIn.hidden = signed;
+    nickIn.hidden = signed && (nickStore.get() || '').length >= 2;   // signed in on a new device with no saved nickname: ask for one
     input.readOnly = muted;
     send.disabled = muted || Date.now() < readyAt;
     input.placeholder = muted ? `You are muted until ${hhmm(mutedUntil)}` : 'Say gm…';
@@ -87,7 +87,7 @@ export function lobbyChat(be, { openLogin }) {
     const text = input.value.trim();
     if (!text || Date.now() < readyAt) return;
     let nick = nickStore.get() || '';
-    if (!be.session()) {
+    if (!nickIn.hidden) {
       nick = nickIn.value.trim();
       if (nick.length < 2) { toast('Pick a nickname first (2 to 20 letters or digits)', 'bad'); nickIn.focus(); return; }
       nickStore.set(nick);

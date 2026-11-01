@@ -1580,7 +1580,10 @@
       var paintNote = function () {
         var s = anySession();
         // no sign-in needed to write: without one, a nickname goes with each message (limits are per network)
-        nickIn.hidden = !!s;
+        // signed in but no nickname saved in this browser (e.g. a Discord sign-in on a new phone): ask for one too;
+        // a verified player's reserved name still wins on the server
+        var saved = ''; try { saved = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
+        nickIn.hidden = !!s && saved.length >= 2;
         note.innerHTML = s ? 'Signed in on PEP Games. Text and our emotes only, no links. Be nice, frens.' : 'Pick a nickname and say gm, no sign-in needed. <a href="#" class="lan-login">Log on with Discord</a> to keep your name and get the ✓. No links, be nice.';
         var l = note.querySelector('.lan-login'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); logOn(); });
       };
@@ -1607,7 +1610,7 @@
         e.preventDefault();
         var t = inp.value.trim(); if (!t) return;
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (err) {}
-        if (!anySession()) {
+        if (!nickIn.hidden) {
           nick = nickIn.value.trim();
           if (nick.length < 2) { note.textContent = 'Pick a nickname first (2 to 20 letters or digits).'; nickIn.focus(); return; }
           try { localStorage.setItem('pepgry-nick', nick); } catch (err) {}
