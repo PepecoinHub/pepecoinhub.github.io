@@ -847,7 +847,7 @@
     document.body.appendChild(host);
     var A = { id: id, host: host, body: host.querySelector('.app-body'), stop: null };
     var n = Object.keys(apps).length;
-    host.style.top = (50 + n * 28) + 'px';
+    host.style.top = (50 + n * 28) + 'px'; host.style.setProperty('--app-top', (50 + n * 28) + 'px');
     if (window.innerWidth > 760) { host.style.left = Math.max(8, (window.innerWidth - host.offsetWidth) / 2 + n * 28) + 'px'; host.style.transform = 'none'; }
     A.close = function () { if (A.stop) A.stop(); if (A.taskBtn) A.taskBtn.remove(); host.remove(); delete apps[id]; if (activeApp === A) activeApp = null; };
     host.querySelector('.w-x').addEventListener('click', A.close);
@@ -1185,7 +1185,7 @@
       A.body.querySelectorAll('[role=tab]').forEach(function (b) { b.addEventListener('click', function () { pick(+b.getAttribute('data-t')); }); });
       pick(0);
     }, width || 860);
-    A.host.style.top = '12px';
+    A.host.style.top = '12px'; A.host.style.setProperty('--app-top', '12px');
     return A;
   }
   // a PEP Games page opened as a full page (phones, new tab): it keeps the 98 look and leads back here
@@ -1224,7 +1224,7 @@
     var A = openApp('miner', 'Pepe Miner', 'pickaxe', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/miner.html?embed=1" title="Pepe Miner"></iframe>';
     }, 1000);
-    A.host.style.top = '16px';
+    A.host.style.top = '16px'; A.host.style.setProperty('--app-top', '16px');
   }
 
   // ---------- Games folder ----------
@@ -1251,7 +1251,7 @@
     var A = openApp('online', 'PEP Games online', 'pond-playground', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/" title="PEP Games"></iframe><div class="app-row"><span class="grow">Charades, Pepe Miner and the lobby chat.</span><a class="app-btn" href="' + osPage('') + '" target="_blank" rel="noopener">Open in a new tab</a></div>';
     }, 1100);
-    A.host.style.top = '12px';
+    A.host.style.top = '12px'; A.host.style.setProperty('--app-top', '12px');
   }
 
   // ---------- Pond TV: a small video player window (YouTube, no-cookie embed, loads only when opened) ----------
