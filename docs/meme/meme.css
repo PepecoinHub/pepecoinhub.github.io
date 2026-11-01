@@ -598,7 +598,7 @@ footer.foot a { color: #edf3e3; }
 .sm-band b { color: #f2b544; }
 .sm-main { min-width: 0; overflow-y: auto; padding: 6px 6px 4px; display: grid; gap: 8px; align-content: start; }
 .pondos .startmenu .mega { grid-template-columns: 1fr 1fr; gap: 4px 10px; }
-.pondos .startmenu .mega-h, .sm-windows .mega-h { margin: 4px 0 2px; padding: 0 6px 4px; border-bottom: 1px solid var(--chrome-lo); font: 700 0.66rem/1 var(--f-mono); color: var(--muted); }
+.pondos .startmenu .mega-h, .sm-windows .mega-h { margin: 4px 0 2px; padding: 0 6px 4px; border-bottom: 1px solid var(--chrome-lo); font: 700 0.66rem/1 var(--f-chrome); color: var(--muted); }
 .pondos .startmenu .mega a, .sm-home { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: center; padding: 4px 6px; border: 0; border-radius: 0; color: var(--ink); text-decoration: none; }
 .pondos .startmenu .mega a:hover, .sm-home:hover, .pondos .startmenu .mega a:focus-visible { background: var(--sel); color: #fff; }
 .pondos .startmenu .mega a:hover small, .sm-home:hover small { color: rgba(255, 255, 255, 0.8); }
@@ -654,8 +654,8 @@ footer.foot a { color: #edf3e3; }
 .boot-coin { width: 110px; height: 110px; }
 .boot-name { font: 700 2.2rem/1 var(--f-pixel); color: #fff; }
 .boot-name b { color: #f2b544; }
-.boot-name span { font: 400 1rem var(--f-mono); color: #9fbfa6; }
-.boot-log { width: 100%; min-height: 15em; list-style: none; margin: 4px 0 0; padding: 0; font: 400 0.78rem/1.65 var(--f-mono); }
+.boot-name span { font: 400 1.25rem var(--f-term); color: #9fbfa6; }
+.boot-log { width: 100%; min-height: 15em; list-style: none; margin: 4px 0 0; padding: 0; font: 400 1.05rem/1.4 var(--f-term); }
 .boot-log li { display: flex; gap: 8px; align-items: baseline; }
 .boot-log .k { flex: none; max-width: 62%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .boot-log .dots { flex: 1; min-width: 12px; border-bottom: 1px dotted #4d6b55; }
@@ -663,7 +663,7 @@ footer.foot a { color: #edf3e3; }
 .boot-bar { width: 220px; height: 14px; padding: 2px; border: 1px solid #4d6b55; }
 .boot-bar i { display: block; height: 100%; width: 0; background: repeating-linear-gradient(90deg, #6cc35c 0 10px, transparent 10px 13px); transition: width 2s steps(16, end); }
 .boot.go .boot-bar i { width: 100%; }
-.boot-skip { font: 400 0.74rem var(--f-mono); color: #7a947f; }
+.boot-skip { font: 400 1rem var(--f-term); color: #7a947f; }
 
 /* ---------- smaller screens ---------- */
 @media (max-width: 1100px) {
@@ -754,7 +754,7 @@ footer.foot a { color: #edf3e3; }
 /* ---------- screensaver ---------- */
 .saver { position: fixed; inset: 0; z-index: 120; background: radial-gradient(ellipse at 50% 120%, #123222, #040806 70%); overflow: hidden; cursor: none; }
 .saver .sv-coin { position: absolute; left: 0; top: 0; width: 120px; height: 120px; }
-.saver p { position: absolute; left: 0; right: 0; bottom: 24px; text-align: center; font: 400 0.8rem var(--f-mono); color: #5f7d66; }
+.saver p { position: absolute; left: 0; right: 0; bottom: 24px; text-align: center; font: 400 1.05rem var(--f-term); color: #5f7d66; }
 .dlg-row > img { max-width: 110px; height: auto; }
 .pondos .show-desk { flex: none; align-self: stretch; width: 12px; margin: 4px -2px 4px 2px; padding: 0; border: 1px solid var(--chrome-lo); background: color-mix(in srgb, var(--chrome) 70%, var(--sel)); cursor: pointer; }
 .pondos .show-desk:hover, .pondos .show-desk[aria-pressed="true"] { background: var(--sel); }
@@ -766,7 +766,8 @@ footer.foot a { color: #edf3e3; }
 :root.pondos {
   --chrome: #c3c3bd; --chrome-hi: #ffffff; --chrome-lo: #808080; --chrome-dk: #0a0a0a; --chrome-face: #dfdfdf;
   --title: #0c4a24; --title-2: #3f9c5c; --title-off: #7f7f7f; --title-off-2: #b8b8b8; --pane: #ffffff; --sel: #0c5a2c;
-  --f-chrome: Tahoma, Verdana, "Segoe UI", system-ui, sans-serif;
+  --f-chrome: "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Verdana, "Segoe UI", system-ui, sans-serif;
+  --f-term: "VT323", "Lucida Console", "Courier New", monospace;
 }
 @media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) {
   --chrome: #3c403c; --chrome-hi: #6a706a; --chrome-lo: #1c1e1c; --chrome-dk: #000; --chrome-face: #4a4f4a; --pane: #17211a;
@@ -838,7 +839,7 @@ footer.foot a { color: #edf3e3; }
 
 /* ---------- full-screen moments ---------- */
 .safe-off { position: fixed; inset: 0; z-index: 130; display: grid; place-items: center; background: #000; color: #f0a030; font: 700 clamp(1.2rem, 3.6vw, 2.2rem)/1.3 var(--f-pixel); text-align: center; padding: 20px; cursor: pointer; }
-.safe-off small { display: block; margin-top: 18px; font: 400 0.8rem var(--f-mono); color: #777; }
+.safe-off small { display: block; margin-top: 18px; font: 400 1.05rem var(--f-term); color: #777; }
 .coin-rain { position: fixed; top: -80px; z-index: 125; width: 56px; height: 56px; pointer-events: none; animation: rain 2.6s linear forwards; }
 @keyframes rain { to { transform: translateY(110vh) rotate(540deg); } }
 /* desktop icons flow in columns, like a real desktop */
