@@ -171,7 +171,7 @@
       ['High Scores', 'FUD Invaders and PEP Snake, top 10', 'gif-061-still', function () { highScores(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
       ['All games…', 'Chess, Checkers, Connect Four, Sea Battle, Pepe Miner', 'pond-playground', function () { gamesFolder(); }],
-      ['Paper hands', 'The recycle bin, sort of', 'wrongpep', function () { paperHands(); }]].forEach(function (g) {
+      ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', function () { paperHands(); }]].forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="img/' + g[2] + '.webp" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
@@ -685,7 +685,7 @@
     var DESKTOP = [
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
-      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#logon', 'Log On', 'gif-085-still'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Paper hands', 'gif-040-still']
+      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#logon', 'Log On', 'gif-085-still'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Recycle Bin', 'recycle-bin']
     ];
     var ACT = { '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
@@ -1300,9 +1300,9 @@
     }, 560);
   }
 
-  // ---------- Paper hands (the recycle bin) ----------
+  // ---------- Recycle Bin: the paper-hands files and a note with the easter egg codes ----------
   function paperHands() {
-    openApp('bin', 'Paper hands', 'wrongpep', function (A) {
+    openApp('bin', 'Recycle Bin', 'recycle-bin', function (A) {
       var FILES = [
         ['📄', 'sold_at_the_bottom.txt', '2 KB', 'Opened 400 times. Still says the same thing.'],
         ['🔑', 'seed_phrase_for_support.txt', '0 KB', 'Empty. Good. Nobody legit asks for a seed phrase, so you never wrote one here.'],
@@ -1310,14 +1310,53 @@
         ['🐸', 'PEPE_not_PEP.lnk', '1 KB', 'Shortcut to the wrong frog. PEP has its own chain; PEPE is an ERC-20 token.'],
         ['📸', 'screenshot_of_someone_elses_gains.png', '3 MB', 'Not your keys, not your coins, not your screenshot.'],
         ['💻', 'legendary_laptop_receipt.pdf', '40M PEP', 'Receipt for one laptop, paid in PEP. Double-click to see what it costs today.'],
-        ['🧻', 'paper_hands.exe', '∞ KB', 'Runs automatically during every dip.']
+        ['🧻', 'paper_hands.exe', '∞ KB', 'Runs automatically during every dip.'],
+        ['📝', 'notes.txt', '1 KB', 'A crumpled note. Somebody wrote down secrets. Double-click (or tap) to read it.', notes]
       ];
       A.body.innerHTML = '<ul class="bin-list">' + FILES.map(function (f, i) { return '<li data-i="' + i + '"><span aria-hidden="true">' + f[0] + '</span><span>' + f[1] + '</span><small>' + f[2] + '</small></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">Click a file to see what is inside.</p><div class="app-row"><span class="grow">' + FILES.length + ' object(s)</span><button type="button" class="app-btn bin-empty">Empty Paper hands</button></div>';
+        '<p class="bin-tip">Click a file to see what is inside.</p><div class="app-row"><span class="grow">' + FILES.length + ' object(s)</span><button type="button" class="app-btn bin-empty">Empty Recycle Bin</button></div>';
       var tip = A.body.querySelector('.bin-tip');
-      A.body.querySelectorAll('.bin-list li').forEach(function (li) { li.addEventListener('click', function () { A.body.querySelectorAll('.bin-list li').forEach(function (x) { x.classList.toggle('sel', x === li); }); tip.textContent = FILES[+li.getAttribute('data-i')][3]; }); li.addEventListener('dblclick', function () { if (/laptop/.test(li.textContent)) laptop(); }); });
-      A.body.querySelector('.bin-empty').addEventListener('click', function () { tip.textContent = 'Cannot empty Paper hands: the files already sold themselves. Diamond hands are in another folder.'; });
+      A.body.querySelectorAll('.bin-list li').forEach(function (li) {
+        var f = FILES[+li.getAttribute('data-i')];
+        li.addEventListener('click', function () { var was = li.classList.contains('sel'); A.body.querySelectorAll('.bin-list li').forEach(function (x) { x.classList.toggle('sel', x === li); }); tip.textContent = f[3]; if (f[4] && (was || !matchMedia('(hover: hover) and (pointer: fine)').matches)) f[4](); });
+        li.addEventListener('dblclick', function () { if (f[4]) f[4](); });
+      });
+      A.body.querySelector('.bin-empty').addEventListener('click', function () { tip.textContent = 'Cannot empty the Recycle Bin: the paper hands already sold themselves. Diamond hands are in another folder.'; });
     }, 420);
+  }
+
+  // notes.txt in the Recycle Bin: every easter egg, written down by a frog who keeps forgetting them
+  function notes() {
+    var L = [
+      'NOTES.TXT - do NOT share (ok maybe with frens)',
+      '',
+      'keyboard, anywhere on the desktop:',
+      '  type  wen      -> ask the eternal question',
+      '  type  seed     -> security lesson',
+      '  type  moon     -> look for the moon',
+      '  type  laptop   -> the legendary 40M PEP laptop',
+      '  type  tip      -> the tip jar',
+      '  up up down down left right left right B A',
+      '',
+      'mouse / finger:',
+      '  click Start 7 times, fast',
+      '  click the PEP price in the tray (bottom right)',
+      '  click the clock',
+      '  right-click the wallpaper',
+      '  Start > Shut down > Touch grass',
+      '  do nothing for 2 minutes',
+      '  green bar at the very right = show desktop',
+      '',
+      'games folder: Pong, FUD Invaders, PEP Snake.',
+      'high score or it did not happen.',
+      '',
+      'P.S. nobody legit ever asks for your seed phrase.'
+    ];
+    var A = openApp('notes', 'notes.txt - Notepad', 'recycle-bin', function (A) {
+      A.body.innerHTML = '<div class="win-menu notepad-menu"><span>File</span><span>Edit</span><span>Search</span><span>Help</span></div><pre class="notepad"></pre>';
+      A.body.querySelector('.notepad').textContent = L.join('\n');
+    }, 460);
+    return A;
   }
 
   // ---------- easter eggs ----------

@@ -1004,3 +1004,9 @@ footer.foot a { color: #edf3e3; }
 .pondos .hand { font-weight: 700; }
 .pondos h1, .pondos h2, .pondos h3 { letter-spacing: -0.01em; }
 .pondos .footcols p.h, .pondos .mega-h, .pondos .cap, .pondos .tcard dt, .pondos .glance h2, .pondos .glance dt, .pondos .ex .go { font-family: var(--f-body); letter-spacing: 0.04em; }
+
+/* Recycle Bin icon and notes.txt (Notepad) */
+.icons img[src$="recycle-bin.webp"] { object-fit: contain; background: none; box-shadow: none; border: 0; border-radius: 0; }
+.notepad-menu { display: flex; gap: 14px; padding: 2px 6px; font: 400 12px/1.6 var(--f-chrome); }
+.notepad { margin: 0; padding: 8px 10px; max-height: min(60vh, 460px); overflow: auto; white-space: pre-wrap; background: #fff; color: #000; font: 400 17px/1.25 var(--f-term);
+  box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
