@@ -840,17 +840,27 @@
      Floating windows for the mini games and the Paper hands bin, plus the easter eggs. */
   var apps = {}, appZ = 200, activeApp = null;
   function openApp(id, title, icon, build, width) {
-    if (apps[id]) { focusApp(apps[id]); return apps[id]; }
+    if (apps[id]) { if (apps[id].host.classList.contains('is-min')) apps[id].restore(); else focusApp(apps[id]); return apps[id]; }
     var host = el('div', { class: 'app-win', role: 'dialog', 'aria-label': title });
     if (width) host.style.width = 'min(' + width + 'px, calc(100vw - 16px))';
-    host.innerHTML = '<div class="win active"><div class="win-bar"><img src="' + ico(icon) + '" alt="" width="16" height="16"><span class="win-t">' + esc(title) + '</span><span class="win-ctl"><button type="button" class="w-x" title="Close">' + ICO.x + '<span class="sr">Close ' + esc(title) + '</span></button></span></div><div class="app-body"></div></div>';
+    host.innerHTML = '<div class="win active"><div class="win-bar"><img src="' + ico(icon) + '" alt="" width="16" height="16"><span class="win-t">' + esc(title) + '</span><span class="win-ctl"><button type="button" class="w-min" title="Minimize">' + ICO.min + '<span class="sr">Minimize ' + esc(title) + '</span></button><button type="button" class="w-x" title="Close">' + ICO.x + '<span class="sr">Close ' + esc(title) + '</span></button></span></div><div class="app-body"></div></div>';
     document.body.appendChild(host);
     var A = { id: id, host: host, body: host.querySelector('.app-body'), stop: null };
     var n = Object.keys(apps).length;
     host.style.top = (50 + n * 28) + 'px';
     if (window.innerWidth > 760) { host.style.left = Math.max(8, (window.innerWidth - host.offsetWidth) / 2 + n * 28) + 'px'; host.style.transform = 'none'; }
-    A.close = function () { if (A.stop) A.stop(); host.remove(); delete apps[id]; if (activeApp === A) activeApp = null; };
+    A.close = function () { if (A.stop) A.stop(); if (A.taskBtn) A.taskBtn.remove(); host.remove(); delete apps[id]; if (activeApp === A) activeApp = null; };
     host.querySelector('.w-x').addEventListener('click', A.close);
+    // minimize: the window hides and waits as a button on the taskbar (also on a phone); the game keeps its state
+    A.restore = function () { host.classList.remove('is-min'); if (A.taskBtn) { A.taskBtn.remove(); A.taskBtn = null; } focusApp(A); };
+    host.querySelector('.w-min').addEventListener('click', function () {
+      host.classList.add('is-min'); if (activeApp === A) activeApp = null;
+      if (tasks && !A.taskBtn) {
+        A.taskBtn = el('button', { type: 'button', class: 'task app-task', title: title }, '<img src="' + ico(icon) + '" alt="" width="16" height="16"><span>' + esc(title) + '</span>');
+        A.taskBtn.addEventListener('click', A.restore);
+        tasks.appendChild(A.taskBtn);
+      }
+    });
     host.addEventListener('pointerdown', function () { focusApp(A); });
     // drag by the title bar
     var bar = host.querySelector('.win-bar');
@@ -1583,6 +1593,10 @@
         // signed in but no nickname saved in this browser (e.g. a Discord sign-in on a new phone): ask for one too;
         // a verified player's reserved name still wins on the server
         var saved = ''; try { saved = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
+        if (s && saved.length < 2) {   // a Discord sign-in: start from the Discord name, without emoji and symbols the chat does not take
+          var me = whoAmI(), dn = me && me.discord ? String(me.name || '').replace(/[^A-Za-z0-9ĄĆĘŁŃÓŚŹŻąćęłńóśźż _.\-]/g, '').replace(/\s+/g, ' ').trim().slice(0, 20).trim() : '';
+          if (dn.length >= 2) { saved = dn; nickIn.value = dn; try { localStorage.setItem('pepgry-nick', dn); } catch (e) {} }
+        }
         nickIn.hidden = !!s && saved.length >= 2;
         note.innerHTML = s ? 'Signed in on PEP Games. Text and our emotes only, no links. Be nice, frens.' : 'Pick a nickname and say gm, no sign-in needed. <a href="#" class="lan-login">Log on with Discord</a> to keep your name and get the ✓. No links, be nice.';
         var l = note.querySelector('.lan-login'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); logOn(); });
@@ -1618,8 +1632,9 @@
         var b = form.querySelector('[type=submit]'); b.disabled = true;
         chatRpc('gry_lobby_say', { p_text: t, p_nick: nick }).then(function (r) {
           if (r && r.error) note.textContent = r.error; else { inp.value = ''; paintNote(); }
+          if (r && r.error && /nickname/i.test(r.error)) { nickIn.hidden = false; nickIn.focus(); }
           poll();
-        }, function (err) { note.textContent = err.message; }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
+        }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
       });
       paintNote(); poll();
       A.stop = function () { alive = false; clearTimeout(timer); };

@@ -1080,3 +1080,12 @@ footer.foot a { color: #edf3e3; }
 .folder button span { max-width: 100%; overflow-wrap: anywhere; word-break: break-word; text-align: center; hyphens: auto; }
 /* the last desktop icon row keeps its label clear of the taskbar */
 @media (min-width: 1101px) { .desk .icons { padding-bottom: 6px; } .desk .pep-pager ~ .icons { height: calc(100% - 70px); } }
+
+/* minimized app windows (games, LAN Party, players): hidden, with a button on the taskbar, phones included */
+.app-win.is-min { display: none !important; }
+@media (max-width: 760px) {
+  .tasks:has(.app-task) { display: flex; flex: 0 0 auto; overflow: visible; }
+  .tasks .task:not(.app-task) { display: none; }
+  .tasks .app-task { flex: 0 0 40px; }
+  .bar:has(.app-task) .tray-clock { display: none; }
+}
