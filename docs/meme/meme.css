@@ -470,14 +470,15 @@ footer.foot a { color: #edf3e3; }
   --hard: transparent !important;
   /* one readable typeface for every heading and caption in PondOS (no pixel or handwriting fonts) */
   --f-pixel: var(--f-body); --f-display: var(--f-body); --f-hand: var(--f-body);
+  --lips: #9a3a26;   /* red numbers stay readable on the grey 98 panels */
   scroll-padding: 16px 0 64px;
 }
 @media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) {
   --desk: #0d1a13; --desk-2: #0a140f; --chrome: #2a302b; --chrome-hi: #4a544c; --chrome-lo: #121613; --chrome-dk: #000000;
-  --title: #3d8a57; --title-2: #2d6b43; --title-off: #3b453e; --pane: #17211a; --sel: #3d8a57; } }
+  --title: #3d8a57; --title-2: #2d6b43; --title-off: #3b453e; --pane: #17211a; --sel: #3d8a57; --lips: #f2906f; } }
 :root.pondos[data-theme="dark"] {
   --desk: #0d1a13; --desk-2: #0a140f; --chrome: #2a302b; --chrome-hi: #4a544c; --chrome-lo: #121613; --chrome-dk: #000000;
-  --title: #3d8a57; --title-2: #2d6b43; --title-off: #3b453e; --pane: #17211a; --sel: #3d8a57; }
+  --title: #3d8a57; --title-2: #2d6b43; --title-off: #3b453e; --pane: #17211a; --sel: #3d8a57; --lips: #f2906f; }
 /* wallpaper: Pepe behind the green hill by day, Pepe over the mountains at night */
 :root.pondos { background: var(--desk); --wall: url("img/wall-day.webp"); }
 @media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) { --wall: url("img/wall-night.webp"); } }
@@ -1010,3 +1011,10 @@ footer.foot a { color: #edf3e3; }
 .notepad-menu { display: flex; gap: 14px; padding: 2px 6px; font: 400 12px/1.6 var(--f-chrome); }
 .notepad { margin: 0; padding: 8px 10px; max-height: min(60vh, 460px); overflow: auto; white-space: pre-wrap; background: #fff; color: #000; font: 400 17px/1.25 var(--f-term);
   box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
+/* sea-creature ranks: in PondOS the box is a 98 panel (light or dark with the theme), so the text follows the theme */
+.pondos .ranksbox { color: var(--ink); }
+.pondos .rk .rr { color: var(--muted); font-family: var(--f-body); }
+.pondos .rk .rn { color: var(--ink); }
+.pondos .rk .rs { color: var(--frog-deep); }
+.pondos .rk.rest { border-top-color: var(--chrome-lo); }
+.pondos .cmp thead th.pep small { color: var(--muted); opacity: 1; }
