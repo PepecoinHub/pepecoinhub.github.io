@@ -1089,3 +1089,23 @@ footer.foot a { color: #edf3e3; }
   .tasks .app-task { flex: 0 0 40px; }
   .bar:has(.app-task) .tray-clock { display: none; }
 }
+
+/* iPhone "Add to Home Screen" (and any screen with a home bar): the taskbar grows by the safe area instead of
+   being squeezed by it, and everything that sits on top of the taskbar moves up with it */
+:root.pondos { --sab: env(safe-area-inset-bottom, 0px); }
+.pondos header.top { height: calc(40px + var(--sab)) !important; }
+.pondos body { padding-bottom: calc(40px + var(--sab)) !important; }
+.balloon { bottom: calc(50px + var(--sab)); }
+@media (max-width: 760px) {
+  .pondos .nav.startmenu { bottom: calc(44px + var(--sab)) !important; max-height: calc(100vh - 60px - var(--sab)); }
+}
+/* bigger window buttons for fingers */
+@media (pointer: coarse) {
+  .pondos .win-ctl button, .os-dlg .win-ctl button { width: 34px; height: 28px; }
+  .pondos .win-ctl { gap: 4px; }
+  .pondos .win-bar, .os-dlg .win-bar { min-height: 34px; }
+}
+/* phones: a game or app window ends above the taskbar and scrolls inside, so its bottom and the taskbar stay reachable */
+@media (max-width: 760px) {
+  .app-win { max-height: calc(100vh - var(--app-top, 50px) - 48px - var(--sab)); max-height: calc(100dvh - var(--app-top, 50px) - 48px - var(--sab)); overflow-y: auto; overscroll-behavior: contain; }
+}
