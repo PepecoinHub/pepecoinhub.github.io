@@ -758,6 +758,18 @@
   // only on the wallpaper itself; inside windows the browser's own menu stays
   var ctx = null;
   function closeCtx() { if (ctx) { ctx.remove(); ctx = null; } }
+  // a click on the empty wallpaper minimizes the open windows (with a mouse; on a touch screen a tap
+  // next to a window while scrolling would hide it by accident). The taskbar brings them back.
+  var wallTipShown = false;
+  document.addEventListener('click', function (e) {
+    if (!mainEl || e.button || !matchMedia('(hover: hover) and (pointer: fine)').matches || window.innerWidth < 761) return;
+    if (e.target.closest('.win, .desk, header.top, dialog, a, button, input, select, textarea, label, .ctx, .balloon, .boot, .os-dlg, .saver, .safe-off, [role=menu]')) return;
+    var sel = window.getSelection && String(window.getSelection()); if (sel) return;
+    var open = wins.filter(function (w) { return w.state === 'open' && !w.host.closest('[hidden]'); });
+    if (!open.length) return;
+    open.forEach(function (w) { setState(w, 'min'); });
+    if (!wallTipShown) { wallTipShown = true; balloon('Windows minimized', 'You clicked the wallpaper. Your windows wait on the taskbar: click one to bring it back.', 'pep-logo'); }
+  });
   document.addEventListener('contextmenu', function (e) {
     if (!mainEl || e.target.closest('.win, .desk a, .desk button, header.top, dialog, a, button, input')) return;
     e.preventDefault(); closeCtx(); closeMenus();
@@ -1386,8 +1398,8 @@
   // ---------- PEP Pager: a 2000s LCD pager pinned to the desktop, scrolling the live numbers ----------
   function pager() {
     var desk = document.querySelector('.desk');
-    if (!desk || document.querySelector('.pager')) return;
-    var pg = el('a', { class: 'pager', href: 'price.html', title: 'PEP Pager: live numbers. Click for the price page.' },
+    if (!desk || document.querySelector('.pep-pager')) return;
+    var pg = el('a', { class: 'pep-pager', href: 'price.html', title: 'PEP Pager: live numbers. Click for the price page.' },
       '<span class="pager-brand">PEP-PAGER 2000</span><span class="pager-lcd"><span class="pager-run"></span></span><span class="pager-led" aria-hidden="true"></span>');
     desk.insertBefore(pg, desk.firstChild);
     var run = pg.querySelector('.pager-run');
