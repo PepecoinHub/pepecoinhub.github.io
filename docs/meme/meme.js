@@ -198,6 +198,11 @@
     var lanItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/gif-080-still.webp" alt="" width="28" height="28"><span>LAN Party chat</span>');
     lanItem.addEventListener('click', function () { setOpen(false); lanParty(); });
     smMain.appendChild(lanItem);
+    [['Frog Mail', 'frog-mail', function () { frogMail(); }], ['AddressCheck.exe', 'pepe-search', function () { addressCheck(); }]].forEach(function (x) {
+      var it = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico(x[1]) + '" alt="" width="28" height="28"><span>' + x[0] + (x[0] === 'Frog Mail' ? ' <b class="mail-new sm-new" hidden>1 new</b>' : '') + '</span>');
+      it.addEventListener('click', function () { setOpen(false); x[2](); });
+      smMain.appendChild(it);
+    });
     var themeItem = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">🌓</span><span>Day / night mode</span>');
     themeItem.addEventListener('click', function () { setOpen(false); if (themeBtn) themeBtn.click(); });
     smMain.appendChild(themeItem);
@@ -691,9 +696,9 @@
     var DESKTOP = [
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
-      ['#games', 'Games', 'games-folder'], ['#tv', 'Pond TV', 'pond-tv'], ['#logon', 'Log On', 'gif-085-still'], ['#shop', 'Shop', 'shop-bag'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Recycle Bin', 'recycle-bin']
+      ['#games', 'Games', 'games-folder'], ['#tv', 'Pond TV', 'pond-tv'], ['#addr', 'AddressCheck.exe', 'pepe-search'], ['#logon', 'Log On', 'gif-085-still'], ['#shop', 'Shop', 'shop-bag'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Recycle Bin', 'recycle-bin']
     ];
-    var ACT = { '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -1262,11 +1267,49 @@
   }
 
   // ---------- Pond TV: a small video player window (YouTube, no-cookie embed, loads only when opened) ----------
+  // Pond TV: a CRT set with channel buttons. CH 1 is the Pepecoin film; the next channels are the latest videos of the
+  // official channel youtube.com/@pepecoin (data/youtube.json, refreshed by the hourly build); the last one is PEP-TV Ads.
+  var TV_FIRST = { id: 'HnfR7KgQqRA', title: 'Pepecoin' };
   function pondTV() {
-    var A = openApp('tv', 'Pond Media Player - Pepecoin', 'pond-tv', function (A) {
-      A.body.innerHTML = '<div class="tv-screen"><iframe src="https://www.youtube-nocookie.com/embed/HnfR7KgQqRA?rel=0&modestbranding=1" title="Pepecoin video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
-        '<div class="app-row"><span class="grow">Now playing: Pepecoin</span><a class="app-btn" href="https://youtu.be/HnfR7KgQqRA" target="_blank" rel="noopener">Open on YouTube</a></div>';
-    }, 640);
+    var A = openApp('tv', 'Pond TV', 'pond-tv', function (A) {
+      A.body.innerHTML = '<div class="crt"><div class="crt-face"><div class="crt-glass"><div class="crt-pic"></div><div class="crt-snow" hidden></div><div class="crt-osd" aria-hidden="true"></div></div>' +
+        '<div class="crt-panel"><div class="crt-led" aria-live="polite">CH 01</div>' +
+        '<button type="button" class="crt-btn crt-up" aria-label="Next channel">CH ▲</button><button type="button" class="crt-btn crt-dn" aria-label="Previous channel">CH ▼</button>' +
+        '<div class="crt-grill" aria-hidden="true"></div><span class="crt-brand" aria-hidden="true">FROGTRON</span></div></div>' +
+        '<div class="crt-feet" aria-hidden="true"><i></i><i></i></div></div>' +
+        '<div class="app-row"><span class="grow crt-now">Now playing: Pepecoin</span><a class="app-btn crt-yt" target="_blank" rel="noopener">Open on YouTube</a><a class="app-btn" href="https://www.youtube.com/@pepecoin" target="_blank" rel="noopener">@pepecoin</a></div>';
+      var pic = A.body.querySelector('.crt-pic'), snow = A.body.querySelector('.crt-snow'), osd = A.body.querySelector('.crt-osd'), led = A.body.querySelector('.crt-led'),
+        now = A.body.querySelector('.crt-now'), yt = A.body.querySelector('.crt-yt'), cur = 0, t = 0;
+      var CH = [TV_FIRST], ADS_CH = { ads: true, title: 'PEP-TV Ads' };
+      var list = function () { return CH.concat([ADS_CH]); };
+      var tune = function (k) {
+        var L = list(); cur = (k + L.length) % L.length; var c = L[cur], n = ('0' + (cur + 1)).slice(-2);
+        led.textContent = 'CH ' + n; osd.textContent = 'CH ' + n;
+        clearTimeout(t); snow.hidden = REDUCE; pic.innerHTML = '';
+        t = setTimeout(function () {
+          snow.hidden = true;
+          if (c.ads) {
+            pic.innerHTML = '<div class="crt-card"><b>PEP-TV Ads</b><span>Late-night infomercials, recovered from an old VHS.</span><button type="button" class="app-btn">Open the tape folder</button></div>';
+            pic.querySelector('button').addEventListener('click', adsFolder);
+            now.textContent = 'CH ' + n + ' · PEP-TV Ads'; yt.hidden = true;
+          } else {
+            pic.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + c.id + '?rel=0&modestbranding=1" title="' + esc(c.title) + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+            now.textContent = 'CH ' + n + ' · ' + c.title + (c.published ? ' (' + c.published + ')' : '');
+            yt.hidden = false; yt.href = 'https://youtu.be/' + c.id;
+          }
+          osd.classList.remove('show'); void osd.offsetWidth; osd.classList.add('show');
+        }, REDUCE ? 0 : 450);
+      };
+      A.body.querySelector('.crt-up').addEventListener('click', function () { tune(cur + 1); });
+      A.body.querySelector('.crt-dn').addEventListener('click', function () { tune(cur - 1); });
+      tune(0);
+      fetch(DATA + 'youtube.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+        var v = d && d.videos || [];
+        CH = [TV_FIRST].concat(v.filter(function (x) { return x && /^[A-Za-z0-9_-]{11}$/.test(x.id) && x.id !== TV_FIRST.id; }).map(function (x) { return { id: x.id, title: String(x.title || 'Pepecoin'), published: x.published }; }));
+      }).catch(function () {});
+      A.stop = function () { clearTimeout(t); };
+    }, 760);
+    return A;
   }
 
   // ---------- Log On: the PEP Games sign-in (Discord or a guest nickname), shared by chat and high scores ----------
@@ -1334,6 +1377,89 @@
         });
       });
     }, 560);
+  }
+
+  // ---------- AddressCheck.exe: is this really a PEP address? Format and checksum only, in this browser ----------
+  // PEP: version byte 56 (starts with P) for normal addresses, 22 (starts with 9 or A) for script/multisig addresses.
+  // Checked against the addresses of the daily rich list snapshot.
+  var B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+  function b58decode(s) {
+    var n = BigInt(0), i;
+    for (i = 0; i < s.length; i++) { var k = B58.indexOf(s[i]); if (k < 0) return null; n = n * BigInt(58) + BigInt(k); }
+    var bytes = [];
+    while (n > BigInt(0)) { bytes.unshift(Number(n % BigInt(256))); n = n / BigInt(256); }
+    for (i = 0; i < s.length && s[i] === '1'; i++) bytes.unshift(0);
+    return new Uint8Array(bytes);
+  }
+  function addrVerdict(a) {
+    if (!a) return Promise.resolve(null);
+    if (/^0x[0-9a-fA-F]{40}$/.test(a)) return Promise.resolve(['bad', 'This is an Ethereum-style 0x address. Not PEP.', 'PEPE and other ERC-20 tokens use these. Sending PEP here is impossible, and sending an Ethereum token to a PEP address loses it.']);
+    if (/^(bc1|ltc1|tb1)[0-9a-z]{8,87}$/i.test(a)) return Promise.resolve(['bad', 'This is a ' + (/^ltc1/i.test(a) ? 'Litecoin' : 'Bitcoin') + ' SegWit address. Not PEP.', 'PEP addresses start with P.']);
+    if (a.length < 26 || a.length > 36) return Promise.resolve(['bad', 'Wrong length for a PEP address.', 'A PEP address is 34 characters long and starts with P. Check that you copied all of it.']);
+    var b = b58decode(a);
+    if (!b) return Promise.resolve(['bad', 'This contains characters a PEP address never has.', 'Addresses use no 0 (zero), O, I or l. Copy and paste the address instead of typing it.']);
+    if (b.length !== 25 || !(window.crypto && crypto.subtle)) return Promise.resolve(['bad', 'This is not a valid address.', 'The length after decoding is wrong. Check that you copied all of it.']);
+    var body = b.slice(0, 21);
+    return crypto.subtle.digest('SHA-256', body).then(function (h) { return crypto.subtle.digest('SHA-256', h); }).then(function (h2) {
+      var c = new Uint8Array(h2), ok = c[0] === b[21] && c[1] === b[22] && c[2] === b[23] && c[3] === b[24];
+      if (!ok) return ['bad', 'Checksum failed: one or more characters are wrong.', 'This is how a typo or a changed character shows up. Do not send anything to it. Copy the address again from the wallet.'];
+      var v = b[0];
+      if (v === 56) return ['ok', 'Valid PEP address.', 'Format and checksum are correct (version 56, starts with P). This says nothing about who owns it: check the first and last characters with the person you are paying.'];
+      if (v === 22) return ['warn', 'Valid script (multisig) address format.', 'PEP uses this format (starting with 9 or A) for script addresses, and so does Dogecoin. Make sure the person meant PEP.'];
+      if (v === 30) return ['bad', 'This is a Dogecoin address (starts with D). Not PEP.', 'Same family of coins, different chain. Send DOGE here, not PEP.'];
+      if (v === 48 || v === 50) return ['bad', 'This is a Litecoin address. Not PEP.', 'PEP addresses start with P.'];
+      if (v === 0 || v === 5) return ['bad', 'This is a Bitcoin address. Not PEP.', 'PEP addresses start with P.'];
+      return ['bad', 'Valid checksum, but not a PEP address (version ' + v + ').', 'PEP addresses start with P.'];
+    });
+  }
+  function addressCheck() {
+    openApp('addr', 'AddressCheck.exe', 'pepe-search', function (A) {
+      A.body.innerHTML = '<p class="bin-tip">Paste an address before you send PEP to it. AddressCheck checks the format and the checksum, right here in your browser.</p>' +
+        '<form class="app-row ac-form"><input class="ac-in" name="a" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Address to check" placeholder="P…"><button type="submit" class="app-btn">Check</button></form>' +
+        '<div class="ac-out" role="status" aria-live="polite"></div>' +
+        '<p class="bin-tip">It cannot see balances or owners. Big amount? Send a small test first.</p>';
+      var f = A.body.querySelector('.ac-form'), inp = f.querySelector('.ac-in'), out = A.body.querySelector('.ac-out');
+      var run = function () {
+        var a = inp.value.replace(/\s+/g, '');
+        addrVerdict(a).then(function (r) {
+          if (!r) { out.innerHTML = ''; return; }
+          out.innerHTML = '<div class="sc-verdict sc-' + r[0] + '"><b>' + (r[0] === 'ok' ? '✓ ' : r[0] === 'warn' ? '! ' : '✗ ') + r[1] + '</b><p>' + r[2] + '</p>' +
+            (r[0] === 'ok' ? '<p class="ac-more"><a href="' + BASE + 'rich-list.html#addr=' + a + '">Is it on the rich list? Check its rank →</a></p>' : '') + '</div>';
+        });
+      };
+      f.addEventListener('submit', function (e) { e.preventDefault(); run(); });
+      inp.addEventListener('input', function () { if (inp.value.replace(/\s+/g, '').length >= 26) run(); else out.innerHTML = ''; });
+    }, 520);
+  }
+
+  // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
+  var MAIL_ISSUE = 1, MAIL_KEY = 'pondos-mail-read';
+  function mailRead() { try { return +(localStorage.getItem(MAIL_KEY) || -1) >= MAIL_ISSUE; } catch (e) { return false; } }
+  function paintMail() {
+    var unread = !mailRead();
+    document.querySelectorAll('.tray-mail').forEach(function (b) { b.classList.toggle('has-mail', unread); b.title = unread ? 'Frog Mail: 1 unread, a new Pond Gazette' : 'Frog Mail'; b.setAttribute('aria-label', b.title); });
+    document.querySelectorAll('.mail-new').forEach(function (e) { e.hidden = !unread; });
+  }
+  function frogMail() {
+    try { localStorage.setItem(MAIL_KEY, String(MAIL_ISSUE)); } catch (e) {}
+    paintMail();
+    openApp('mail', 'Frog Mail - Inbox', 'frog-mail', function (A) {
+      A.body.innerHTML = '<div class="mail"><ul class="mail-list"><li><button type="button" class="on"><b>The Pond Gazette #1</b><small>Hello world!</small></button></li></ul>' +
+        '<article class="gazette"><header><p class="gz-top"><span>Issue #1</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
+        '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
+        '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
+        '<p><b>Got an idea, a wish or a bug?</b> Tell us in the LAN Party chat. Every message is read, and the best ideas get built.</p>' +
+        '<button type="button" class="app-btn gz-lan">Open the LAN Party chat →</button></section>' +
+        '<section class="gz-lead"><p class="gz-kick">Classifieds</p><h4>HELP WANTED: a frog to run game night</h4>' +
+        '<div class="gz-frame ptv"><div class="ptv-top"><span class="ptv-live">LIVE</span><b>PEP-TV</b><span class="ptv-ch">CH 1 · PEPE PICTURES PRIME TIME</span></div><div class="ptv-stage"><div class="ptv-scene on"><h3 class="ad-big">WANTED:<br>a frog to run<br><em>game night!</em></h3></div></div></div>' +
+        '<p>Pepe Pictures, the weekly quiz night, needs a host: set the date, pick the pictures, start the rounds and crown the winner. All in the chat.</p>' +
+        '<button type="button" class="app-btn gz-tv">More on PEP-TV →</button></section>' +
+        '<section class="gz-soon"><p class="gz-kick">Coming in the weekly issues</p><ul><li><b>The week in numbers:</b> price, hashrate, new blocks and supply, with sources.</li><li><b>Pond Picks:</b> the best posts and memes, picked by the community.</li><li><b>Game night winners</b> and the best Pepe Miner runs.</li></ul></section>' +
+        '<p class="gz-foot">When a new issue lands, the flag on the mailbox goes up.</p></article></div>';
+      A.body.querySelector('.gz-lan').addEventListener('click', function () { lanParty(); });
+      A.body.querySelector('.gz-tv').addEventListener('click', function () { adPlayer(0); });
+    }, 720);
   }
 
   // ---------- Recycle Bin: the paper-hands files and a note with the easter egg codes ----------
@@ -1689,6 +1815,12 @@
       var tl = el('button', { type: 'button', class: 'tray-lan lan-badge', hidden: '', title: 'LAN Party chat' }, '<span class="lan-dot" aria-hidden="true"></span><span class="lan-n"></span><span class="sr"> online, open the chat</span>');
       tl.addEventListener('click', lanParty);
       trayEl2.insertBefore(tl, trayEl2.firstChild);
+      var mb = el('button', { type: 'button', class: 'tray-mail', title: 'Frog Mail', 'aria-label': 'Frog Mail' },
+        '<svg viewBox="0 0 24 20" width="22" height="18" aria-hidden="true"><path class="mb-post" d="M11 13h2v7h-2z"/><path class="mb-box" d="M3 6a5 5 0 0 1 10 0v7H3zM8 1h8a5 5 0 0 1 5 5v7H13V6a5 5 0 0 0-5-5z"/><path class="mb-flag" d="M18 3h1v7h-1zM19 3h4l-1.5 1.5L23 6h-4z"/></svg><span class="mail-new mail-badge" hidden>1</span>');
+      mb.addEventListener('click', frogMail);
+      trayEl2.insertBefore(mb, trayEl2.firstChild);
+      paintMail();
+      if (!mailRead()) setTimeout(function () { if (!mailRead()) balloon('You\u2019ve got frog mail!', 'The Pond Gazette #1 is in your mailbox. Click the mailbox in the corner.', 'frog-mail'); }, 17000);
     }
   }
 

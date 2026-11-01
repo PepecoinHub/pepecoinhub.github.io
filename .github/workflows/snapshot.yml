@@ -59,6 +59,11 @@ jobs:
       - name: Mining stats
         run: python scripts/mining_stats.py || echo "mining stats not updated"
 
+      # latest videos of youtube.com/@pepecoin for Pond TV (meme edition), once a day; never fails the run
+      - name: YouTube channel
+        if: github.event.schedule != '41 * * * *'   # once a day is plenty (not on the hourly price runs)
+        run: python scripts/fetch_youtube.py || echo "youtube list not updated"
+
       - name: Build summary
         run: |
           if ls docs/data/snapshots/*.json >/dev/null 2>&1; then
