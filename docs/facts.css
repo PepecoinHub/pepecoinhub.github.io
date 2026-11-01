@@ -574,17 +574,6 @@ input, select, textarea { border-radius: 12px; }
 @keyframes livepulse { 70%, 100% { box-shadow: 0 0 0 7px transparent; } }
 @media (prefers-reduced-motion: reduce) { .home-stats .is-live .label::before { animation: none; } }
 @media (max-width: 900px) { .home-stats .stats { grid-template-columns: 1fr 1fr; } }
-/* A flat turn avoids browser artefacts from filtered preserve-3d layers.
-   Switch faces only at the narrow edge; the halo is a separate, stationary circle. */
-.hero-coin { position: relative; width: min(280px, 100%); aspect-ratio: 1; }
-.hero-coin::before { content: ""; position: absolute; inset: -18%; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 24%, transparent), transparent 70%); pointer-events: none; }
-.hero-coin-spin { position: absolute; inset: 0; border-radius: 50%; background: #269b4d; animation: coinflip 9s cubic-bezier(0.6, 0, 0.4, 1) infinite; }
-.hero-coin-spin > img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; filter: none; animation: coinfront 9s steps(1, end) infinite; }
-.hero-coin-spin > .hero-coin-back { animation-name: coinback; }
-@keyframes coinflip { 0%, 38%, 50%, 88%, 100% { transform: scaleX(1); } 44%, 94% { transform: scaleX(0.035); } }
-@keyframes coinfront { 0%, 94%, 100% { opacity: 1; } 44% { opacity: 0; } }
-@keyframes coinback { 0%, 94%, 100% { opacity: 0; } 44% { opacity: 1; } }
-@media (max-width: 720px) { .hero-coin { width: min(116px, 32vw); } }
 .hero-tabs [role="tab"][aria-selected="true"] { cursor: default; }
 .hero-tabs [role="tab"][aria-selected="true"]:hover { filter: none; }
 .hpanel { gap: 12px; margin-top: -22px; }

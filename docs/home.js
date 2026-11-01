@@ -10,15 +10,14 @@
   var me = document.currentScript && document.currentScript.src;
 
   // ---------- hero coin ----------
-  // The frog coin turns over to its P side now and then (CSS in facts.css); a still frog with reduced motion.
+  // The still logo loads first; after the page has loaded it is swapped for the spinning coin
+  // (an animated WebP, about 0.5 MB). With reduced motion the still logo stays.
   var frog = document.querySelector('.home-hero-frog');
   if (frog && me && window.matchMedia && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    var coin = document.createElement('div'), spin = document.createElement('div'), back = document.createElement('img');
-    coin.className = 'hero-coin'; spin.className = 'hero-coin-spin';
-    back.className = 'hero-coin-back'; back.alt = ''; back.src = new URL('assets/brand/coin-p.svg', me).href;
-    frog.parentNode.insertBefore(coin, frog);
-    coin.appendChild(spin);
-    spin.appendChild(frog); spin.appendChild(back);
+    var spinImg = new Image();
+    spinImg.onload = function () { frog.src = spinImg.src; };
+    var loadSpin = function () { spinImg.src = new URL('assets/brand/pepe-coin-spin.webp', me).href; };
+    if (document.readyState === 'complete') loadSpin(); else window.addEventListener('load', loadSpin);
   }
 
   // ---------- tabs ----------
