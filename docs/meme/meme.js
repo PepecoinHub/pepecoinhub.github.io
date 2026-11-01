@@ -1196,7 +1196,12 @@
   function boardGame(key, name) {
     var G = BASE + 'games/';
     var bot = function (lv) { return G + 'table.html?bot=' + key + '&level=' + lv + '&embed=1'; };
-    if (window.innerWidth < 760) { location.href = osPage('table.html?bot=' + key + '&level=medium'); return; }
+    if (window.innerWidth < 760) {   // a phone: the same two choices, each opens as a full page
+      osDialog(name, '<p>Play the bot right here, or play online with a fren: open a table and send them the invite link, or sit down at an open one (needs a log on, Discord or guest).</p>',
+        [{ label: 'Online with frens', go: true, href: osPage('?only=tables&tmode=fren&tgame=' + key + '#tables') },
+         { label: 'vs the bot', href: osPage('table.html?bot=' + key + '&level=medium') }, { label: 'Cancel' }], 'pond-playground');
+      return;
+    }
     tabbedGame('bg-' + key, name, 'pond-playground', [
       ['vs the bot', bot('medium'), function (row, go) {
         row.innerHTML = '<span class="grow">Difficulty</span>' + ['easy', 'medium', 'hard'].map(function (l) { return '<button type="button" class="app-btn" data-l="' + l + '" aria-pressed="' + (l === 'medium') + '">' + l.charAt(0).toUpperCase() + l.slice(1) + '</button>'; }).join('');
@@ -1238,7 +1243,7 @@
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
         ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Miner', 'pickaxe', minerApp], ['PEP Games lobby', 'pond-playground', function () { pepGamesOnline(); }]];
       A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="' + ico(g[1]) + '" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle play against the bot. Draw &amp; Guess needs other players: open a room or join one with a code.</p>';
+        '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or play online with a fren (send them the invite link). Draw &amp; Guess needs other players: open a room or join one with a code. The PEP Games lobby has it all, plus the chat.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { G[+b.getAttribute('data-i')][2](); };
         b.addEventListener('dblclick', go);
