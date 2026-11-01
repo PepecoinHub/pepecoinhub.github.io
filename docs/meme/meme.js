@@ -634,6 +634,8 @@
     });
     var fin = document.querySelector('footer.foot > div');
     if (fin) windowize(fin, { title: 'About Pepecoin Hub', icon: 'pep-logo', wide: true });
+    // one program opens one window: the "About Pepecoin Hub" window waits on the taskbar until it is clicked
+    wins.forEach(function (w) { if (w.host.closest('footer') && w.state === 'open') { w.state = 'min'; w.host.classList.add('is-min'); } });
     // a hidden wrapper (the rich list before its data arrives, the frog chooser) hides its taskbar buttons too
     new MutationObserver(function () { wins.forEach(sync); }).observe(mainEl, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
     wins.forEach(sync);
