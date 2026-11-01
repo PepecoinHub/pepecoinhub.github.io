@@ -1433,11 +1433,11 @@
   // ---------- PEP-TV Ads: a folder of fake late-night infomercials, played in a TV window ----------
   // Every claim in them is a fact from this site; the "offers" are jokes, and every ad says so.
   var ADS = [
-    { file: 'frog_wants_a_mic.mpg', title: 'Wanted: one frog with a microphone', ch: 'CH 1 · PEPE PICTURES PRIME TIME', icon: 'stop', scenes: [
-      '<p class="ad-kick">Do you narrate your own life in a game-show voice?</p><h3 class="ad-big">WANTED:<br>one frog with<br><em>a microphone!</em></h3>',
+    { file: 'host_wanted.mpg', title: 'Wanted: a frog to run game night', ch: 'CH 1 · PEPE PICTURES PRIME TIME', icon: 'unclesam', scenes: [
+      '<p class="ad-kick">Always the one who organises the group chat?</p><h3 class="ad-big">WANTED:<br>a frog to run<br><em>game night!</em></h3>',
       '<img class="ad-pic" src="../games/img/host-wanted.webp" alt=""><p class="ad-sub">Pepe Pictures is our weekly quiz night. A picture starts as a few giant pixels and gets sharper. The first three correct guesses score 3, 2 and 1 points.</p>',
-      '<p class="ad-kick">The job, in full:</p><p class="ad-sub">• pick the pictures<br>• press the big Start button<br>• keep the chat friendly<br>• crown the winner of the night</p><h3 class="ad-big">Eternal <em>pond fame!</em></h3>',
-      '<p class="ad-fine">Volunteer job. Pay: zero PEP and a lot of “gg”. Microphone optional. Real frogs only, no bots.</p><a class="ad-cta" href="https://discord.gg/pepecoin" target="_blank" rel="noopener">Apply on the Pepecoin Discord →</a>'
+      '<p class="ad-kick">The job, in full:</p><p class="ad-sub">• set the date of the night<br>• pick the pictures<br>• start the rounds<br>• keep the chat friendly<br>• crown the winner of the night</p><h3 class="ad-big">Eternal <em>pond fame!</em></h3>',
+      '<p class="ad-fine">Volunteer job. Pay: zero PEP and a lot of “gg”. All in the chat: no voice, no camera. Real frogs only, no bots.</p><a class="ad-cta" href="https://discord.gg/pepecoin" target="_blank" rel="noopener">Apply on the Pepecoin Discord →</a>'
     ] },
     { file: 'better_frog.mpg', title: 'There has to be a better frog!', ch: 'CH 42 · THE FROG SHOPPING HOUR', icon: 'wrongpep', scenes: [
       '<p class="ad-kick">Are you tired of frogs that turn out to be tokens?</p><h3 class="ad-big">There has to be<br>a <em>better frog!</em></h3>',
