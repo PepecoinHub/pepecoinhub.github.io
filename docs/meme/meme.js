@@ -190,9 +190,6 @@
     var lanItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/gif-080-still.webp" alt="" width="28" height="28"><span>LAN Party chat</span>');
     lanItem.addEventListener('click', function () { setOpen(false); lanParty(); });
     smMain.appendChild(lanItem);
-    var profItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/gif-048-still.webp" alt="" width="28" height="28"><span>Professor Pepe</span>');
-    profItem.addEventListener('click', function () { setOpen(false); professor(true); });
-    smMain.appendChild(profItem);
     smMain.appendChild(arrange);
     smMain.appendChild(el('hr'));
     smMain.appendChild(sd);
@@ -645,7 +642,7 @@
     ctx = el('div', { class: 'ctx', role: 'menu' });
     [['Arrange windows', arrangeAll], ['Refresh', function () { location.reload(); }], null,
       [dark ? 'Wallpaper: day hills' : 'Wallpaper: night mountains', function () { if (themeBtn) themeBtn.click(); }],
-      ['Screensaver preview', function () { saver(true); }], ['Call Professor Pepe', function () { professor(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
+      ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
       null, ['New game: PEP Pong', pong], ['New game: FUD Invaders', invaders], ['New game: PEP Snake', snake], null, ['Properties…', aboutOS]].forEach(function (it) {
       if (!it) { ctx.appendChild(el('hr')); return; }
       var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
@@ -1229,68 +1226,6 @@
       trayEl2.insertBefore(tl, trayEl2.firstChild);
     }
   }
-
-  // ---------- Professor Pepe, the AI chat (run by the community, loaded only in a window) ----------
-  // Their page goes in an iframe from their domain: it cannot read this page, and no script of theirs runs here.
-  var PROF_URL = 'https://professor-pepe-agent.onrender.com/';
-  function profChat() {
-    var A = openApp('profchat', 'Professor Pepe - community AI chat', 'gif-048-still', function (A) {
-      A.body.innerHTML = '<p class="bin-tip prof-wait">Waking up the professor, fren… (a free server can take up to a minute)</p>' +
-        '<iframe class="app-frame prof-frame" src="' + PROF_URL + '" title="Professor Pepe chat" allow="clipboard-write" referrerpolicy="no-referrer"></iframe>' +
-        '<p class="hs-note">A community AI run by someone else, not by Pepecoin Hub. It can be wrong. Never share a seed phrase or a password with any chat. Not financial advice.</p>';
-      A.body.querySelector('iframe').addEventListener('load', function () { var w = A.body.querySelector('.prof-wait'); if (w) w.remove(); });
-    }, 460);
-    if (window.innerWidth > 760) { A.host.style.left = Math.max(8, window.innerWidth - A.host.offsetWidth - 16) + 'px'; A.host.style.top = Math.max(8, window.innerHeight - A.host.offsetHeight - 160) + 'px'; }
-  }
-
-  // ---------- Professor Pepe, the desk assistant ----------
-  // Sits in the bottom-right corner. Click him for a tip about the page you are on; he never gives price
-  // predictions and can be sent away (and called back from Start or the desktop's right-click menu).
-  var PROF_TIPS = {
-    _: ['It looks like you are reading about a frog. Would you like a receipt with that?', 'Every number on this site links to its source. I checked. Twice. I am a professor.',
-      'Tip: right-click the desktop. Frogs hide things there.', 'Nobody legit will ever ask for your seed phrase. Not even a professor.', 'Double-click the title of any window to make it big.'],
-    index: ['PEP is a coin with its own blockchain. PEPE is a token on Ethereum. My lecture ends there.', 'Try the Games folder. Studies show FUD Invaders lowers FUD by 100%.'],
-    'which-pepecoin': ['Check the ticker AND the network. Two checks, zero burgers.', 'A PEP address starts with P. An Ethereum address starts with 0x. Exam question, write it down.'],
-    price: ['It looks like you are staring at candles. Would you like arithmetic instead? Try WhatIf.exe.', 'I do not do price predictions. I do do peer review.', 'Click the price in the taskbar for the Laptop Index. A tragedy in one table.'],
-    calculator: ['×100 is arithmetic, not a promise. Please do not quote me on the moon.', 'Market cap = price × supply. That is the whole trick.'],
-    mining: ['PEP is merge-mined with Litecoin and Dogecoin: one Scrypt machine, several coins.', 'Each block pays 10,000 PEP. Blocks aim for one every 60 seconds.'],
-    'rich-list': ['An address is not a person. Exchanges hold coins for many users.', 'Whales are measured, not judged. Mostly.'],
-    supply: ['No hard cap, fixed reward: inflation falls every year as the supply grows.', '10,000 PEP per block, about 1,440 blocks a day. Show your work.'],
-    wallets: ['Not your keys, not your coins. Write the seed on paper, keep it offline, tell nobody.', 'Ethereum wallets do not hold PEP. PEP has its own chain.'],
-    buy: ['Before you buy: ticker PEP, network Pepecoin. Then breathe.', 'Withdraw to a wallet you control. Exchanges are not piggy banks.'],
-    network: ['The robot takes one snapshot a day. It never sleeps. I am jealous.'],
-    glossary: ['UTXO: unspent transaction output. Fren-to-English: the coins you can still spend.'],
-    mica: ['MiCA is EU paperwork. A whitepaper notified to a regulator is not an approval.'],
-    compare: ['PEP and DOGE share the rules. The difference is mostly age and size.'],
-    'scrypt-family': ['Litecoin 2011, Dogecoin 2013, Pepecoin 2024. One family, one algorithm.']
-  };
-  var profOff = false; try { profOff = localStorage.getItem('pondos-prof') === 'off'; } catch (e) {}
-  var prof = null;
-  function professor(show) {
-    if (show === false) { if (prof) { prof.remove(); prof = null; } try { localStorage.setItem('pondos-prof', 'off'); } catch (e) {} return; }
-    if (show === true) { try { localStorage.removeItem('pondos-prof'); } catch (e) {} }
-    if (prof || !mainEl) return;
-    prof = el('div', { class: 'prof' });
-    prof.innerHTML = '<div class="prof-bubble" role="status" hidden><p></p><div class="prof-btns"><button type="button" class="app-btn prof-ask">Ask the professor (AI chat)</button><button type="button" class="app-btn prof-more">Another tip</button><button type="button" class="app-btn prof-bye">Go away, professor</button></div></div>' +
-      '<button type="button" class="prof-me" aria-label="Professor Pepe: show a tip"><img src="img/gif-048-still.webp" alt="" width="84" height="62"></button>';
-    document.body.appendChild(prof);
-    var bub = prof.querySelector('.prof-bubble'), p = bub.querySelector('p'), img = prof.querySelector('img'), last = -1;
-    var pool = (PROF_TIPS[PAGE] || []).concat(PROF_TIPS._);
-    var say = function (t) {
-      if (!t) { var i; do { i = Math.floor(Math.random() * pool.length); } while (i === last && pool.length > 1); last = i; t = pool[i]; }
-      p.textContent = t; bub.hidden = false; if (!REDUCE) img.src = 'img/gif-048.webp';
-    };
-    prof.querySelector('.prof-me').addEventListener('click', function () { if (bub.hidden) say(); else { bub.hidden = true; img.src = 'img/gif-048-still.webp'; } });
-    prof.querySelector('.prof-more').addEventListener('click', function () { say(); });
-    prof.querySelector('.prof-ask').addEventListener('click', function () { bub.hidden = true; img.src = 'img/gif-048-still.webp'; profChat(); });
-    prof.querySelector('.prof-bye').addEventListener('click', function () {
-      p.textContent = 'Fine. I will be in Start ▸ Professor Pepe if you need peer review.';
-      setTimeout(function () { professor(false); }, 1600);
-    });
-    var greeted = '1'; try { greeted = sessionStorage.getItem('pondos-prof-hi'); sessionStorage.setItem('pondos-prof-hi', '1'); } catch (e) {}
-    if (!greeted) setTimeout(function () { if (prof && bub.hidden) say((PROF_TIPS[PAGE] || PROF_TIPS._)[0]); }, 9000);
-  }
-  if (!profOff && mainEl) professor();
 
   // ---------- balloon notices ----------
   function balloon(title, text, icon) {
