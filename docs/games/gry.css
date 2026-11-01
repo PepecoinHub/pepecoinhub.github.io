@@ -632,6 +632,8 @@ details.lb #topboard-body { margin-top: 14px; }
 .cmod button:hover { opacity: 1; }
 .chat-form { display: flex; gap: 6px; align-items: center; }
 .chat-form input { flex: 1; min-width: 0; }
+.chat-form:has(.chat-nick:not([hidden])) { flex-wrap: wrap; }
+.chat-form .chat-nick { flex: 1 1 100%; }
 .chat-rules { margin: 0; font-size: .74rem; color: var(--muted); }
 .chat-fab { display: none; }
 

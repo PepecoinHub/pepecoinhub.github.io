@@ -1,5 +1,6 @@
 // Lobby chat + "online" counter. It asks the server every few seconds (no realtime channel), so it also works
-// for visitors who are not signed in. Reading is open to everyone; writing needs a nickname (guest) or Discord.
+// for visitors who are not signed in. Reading and writing are open to everyone: without a sign-in a nickname goes
+// with each message (the server limits it per network); a guest or Discord sign-in keeps the same name.
 // Text and our own emotes only: the server rejects links, and the page never shows pictures from players.
 import { $, h, toast, nickStore } from './common.js';
 import { renderBody, attachPicker } from './emotes.js';
@@ -28,7 +29,7 @@ export function lobbyChat(be, { openLogin }) {
     if (mod) row.append(h('span', { class: 'cmod' },
       h('button', { type: 'button', title: 'Hide this message', 'aria-label': 'Hide this message', onclick: () => act('gry_lobby_hide', { p_id: m.id }, 'Message hidden') }, '🗑'),
       h('button', { type: 'button', title: 'Mute this player for 24 hours', 'aria-label': 'Mute ' + m.nick + ' for 24 hours',
-        onclick: () => { if (confirm(`Mute ${m.nick} in the lobby chat for 24 hours? Their messages from today are hidden too.`)) act('gry_lobby_mute', { p_user: m.user_id, p_hours: 24 }, m.nick + ' is muted for 24 hours'); } }, '🔇')));
+        onclick: () => { if (confirm(`Mute ${m.nick} in the lobby chat for 24 hours? Their messages from today are hidden too.`)) act('gry_lobby_mute_msg', { p_id: m.id, p_hours: 24 }, m.nick + ' is muted for 24 hours'); } }, '🔇')));
     return row;
   }
   async function act(fn, args, ok) {
@@ -39,12 +40,16 @@ export function lobbyChat(be, { openLogin }) {
     document.querySelectorAll('.online-n').forEach((el) => { el.textContent = n; });
     document.querySelectorAll('.g-online, .chip-online, .chat-online').forEach((el) => { el.hidden = false; });
   }
+  // without a sign-in, a small nickname box sits in front of the message box
+  const nickIn = h('input', { type: 'text', class: 'chat-nick', maxlength: 20, placeholder: 'Nickname', 'aria-label': 'Nickname', autocomplete: 'nickname', value: nickStore.get() });
+  form.prepend(nickIn);
   function paintInput() {
     const signed = !!be.session(), muted = mutedUntil && Date.parse(mutedUntil) > Date.now();
-    input.readOnly = !signed || muted;
+    nickIn.hidden = signed;
+    input.readOnly = muted;
     send.disabled = muted || Date.now() < readyAt;
-    input.placeholder = !signed ? 'Pick a nickname to chat' : muted ? `You are muted until ${hhmm(mutedUntil)}` : 'Say gm…';
-    send.textContent = signed ? 'Send' : 'Log in';
+    input.placeholder = muted ? `You are muted until ${hhmm(mutedUntil)}` : 'Say gm…';
+    send.textContent = 'Send';
   }
   async function poll() {
     clearTimeout(timer);
@@ -79,12 +84,17 @@ export function lobbyChat(be, { openLogin }) {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!be.session()) return needLogin();
     const text = input.value.trim();
     if (!text || Date.now() < readyAt) return;
+    let nick = nickStore.get() || '';
+    if (!be.session()) {
+      nick = nickIn.value.trim();
+      if (nick.length < 2) { toast('Pick a nickname first (2 to 20 letters or digits)', 'bad'); nickIn.focus(); return; }
+      nickStore.set(nick);
+    }
     send.disabled = true;
     try {
-      const r = await be.rpc('gry_lobby_say', { p_text: text, p_nick: nickStore.get() || '' });
+      const r = await be.rpc('gry_lobby_say', { p_text: text, p_nick: nick });
       if (r?.error) { toast(r.error, 'bad'); input.value = ''; }
       else { input.value = ''; readyAt = Date.now() + 3000; setTimeout(paintInput, 3100); }
       poll();
@@ -94,7 +104,6 @@ export function lobbyChat(be, { openLogin }) {
       toast(err.message, 'bad');
     } finally { paintInput(); }
   });
-  input.addEventListener('focus', () => { if (!be.session()) needLogin(); });
   attachPicker(form, input);
 
   // phone: the chat opens as a panel from the round button (or the "Chat" link in the games menu)
@@ -103,7 +112,6 @@ export function lobbyChat(be, { openLogin }) {
     document.body.classList.toggle('chat-open', open && phone.matches);
     if (open) { box.scrollTop = box.scrollHeight; poll(); }
   };
-  function needLogin() { if (phone.matches) setOpen(false); openLogin(); }
   fab.addEventListener('click', () => setOpen(!panel.classList.contains('open')));
   panel.querySelector('.chat-x').addEventListener('click', () => setOpen(false));
   document.querySelectorAll('.g-chat').forEach((a) => a.addEventListener('click', (e) => { if (phone.matches) { e.preventDefault(); setOpen(true); } }));
