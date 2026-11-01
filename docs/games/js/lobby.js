@@ -1,6 +1,6 @@
 import { $, h, toast, errorNote, getBackend, identityCard, paintMe, meInfo, badge, nextWeekday20, fmtLocal, fmtPoland, backendBanner, seasonLine, nickStore } from './common.js';
 import { pixelDemo } from './pixeldemo.js';
-import { lobbyChat } from './lobbychat.js?v=20261101open';
+import { lobbyChat } from './lobbychat.js?v=20261101nick';
 
 const be = await getBackend();
 backendBanner($('#main'));
