@@ -133,6 +133,7 @@ function renderNewRoom() {
 }
 // ---------- login box: the small "Not signed in · Log in" button at the top right opens it ----------
 function setLogin(open) {
+  if (!open && document.documentElement.classList.contains('os-login')) return;   // the PondOS log-on dialog stays open
   $('#identity').hidden = !open; $('#gme').setAttribute('aria-expanded', String(open));
   if (open) setTimeout(() => $('#identity #nick')?.focus(), 30);
 }
@@ -149,7 +150,7 @@ renderNewRoom(); renderNewTable();
 // a session exists the visitor goes back to the page they came from (only paths on this site are accepted).
 const qs = new URLSearchParams(location.search);
 const back = /^\/[A-Za-z0-9/_.\-]*(\?[A-Za-z0-9=&_.\-%]*)?(#[A-Za-z0-9_\-]*)?$/.test(qs.get('back') || '') && !(qs.get('back') || '').startsWith('//') ? qs.get('back') : null;
-const goBack = () => { if (back) location.replace(back + (back.includes('?') ? '&' : '?') + 'signedin=1'); };
+const goBack = () => { if (back) window.PondOS?.leave(); if (back) location.replace(back + (back.includes('?') ? '&' : '?') + 'signedin=1'); };
 await identityCard($('#identity'), { cta: 'Play', onReady: () => { if (back) return goBack(); setLogin(false); renderNewRoom(); renderNewTable(); renderSchedHost(); chat.refresh(); toast('All set! Pick a game below', 'good'); } });
 if (qs.get('login') === '1') { if (back && be.session() && !be.session().user.is_anonymous) goBack(); else openLogin(); }
 renderNewRoom(); renderNewTable();
