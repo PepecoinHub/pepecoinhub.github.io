@@ -402,7 +402,14 @@
     W.host.classList.toggle('is-min', s === 'min');
     W.host.classList.toggle('is-closed', s === 'closed');
     sync(W);
+    deskEmpty();
     if (s === 'open') { focusW(W); reveal(W); } else if (W === activeW) { W.win.classList.remove('active'); W.task.setAttribute('aria-pressed', 'false'); activeW = null; nextActive(); }
+  }
+  // with every window minimized or closed the desktop icons show, on every page and on a phone too
+  function deskEmpty() {
+    var any = false; wins.forEach(function (w) { if (w.state === 'open' && !w.host.closest('[hidden]')) any = true; });
+    if (!any && !root.classList.contains('desk-empty') && window.innerWidth < 760) window.scrollTo(0, 0);
+    root.classList.toggle('desk-empty', !any);
   }
   function toggleMax(W) {
     var m = !W.host.classList.contains('is-max');
