@@ -732,3 +732,63 @@ html.embed #newroom { background: #fff !important; box-shadow: inset 1px 1px 0 v
 html.embed .chat-fab { display: none !important; }
 html.only-dg .ill.media { max-height: 160px; overflow: hidden; }
 html.only-dg .ill.media img { max-height: 160px; width: auto; margin: 0 auto; display: block; }
+
+/* ---------- PondOS full page (?os=98, phones and the Discord sign-in): 98 window on the PondOS wallpaper ---------- */
+html.os98 body { background: #0c5a2c url(/meme/img/wall-day.webp) center / cover fixed no-repeat !important; min-height: 100vh; padding-bottom: 44px !important; }
+html.os98 main.wrap { max-width: 1180px; margin: 0 auto 12px !important; background: var(--w-face);
+  box-shadow: inset -1px -1px 0 var(--w-dk), inset 1px 1px 0 var(--w-lite), inset -2px -2px 0 var(--w-lo), inset 2px 2px 0 var(--w-hi); }
+html.os98 .g-sub { max-width: 1180px; margin: 0 auto !important; flex-wrap: wrap; justify-content: space-between; }
+html.os98 .g-nav { display: flex !important; gap: 2px; }
+html.os98 .g-nav a { border-radius: 0 !important; border: 0 !important; background: var(--w-face) !important; color: #111 !important; font-size: 13px; padding: 4px 10px; font-weight: 400;
+  box-shadow: inset -1px -1px 0 var(--w-dk), inset 1px 1px 0 var(--w-hi), inset -2px -2px 0 var(--w-lo) !important; }
+html.os98 .g-nav a[aria-current="page"] { box-shadow: inset 1px 1px 0 var(--w-dk), inset -1px -1px 0 var(--w-hi) !important; font-weight: 700; }
+.os-bar { display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 3px 0 6px; color: #fff; font: 700 13px Tahoma, Verdana, sans-serif;
+  background: linear-gradient(90deg, #23573a, #3a7a50); max-width: 1180px; margin: 8px auto 0; }
+.os-bar .os-t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.os-bar .os-x { width: 22px; height: 20px; display: grid; place-items: center; text-decoration: none; color: #111 !important; background: var(--w-face); font: 700 15px/1 Tahoma, sans-serif;
+  box-shadow: inset -1px -1px 0 var(--w-dk), inset 1px 1px 0 var(--w-hi), inset -2px -2px 0 var(--w-lo); }
+.os-task { position: fixed; left: 0; right: 0; bottom: 0; height: 36px; z-index: 80; display: flex; align-items: center; padding: 0 4px; background: var(--w-face); box-shadow: inset 0 1px 0 var(--w-lite), inset 0 2px 0 var(--w-hi); }
+.os-start { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; text-decoration: none; color: #111 !important; font: 13px Tahoma, Verdana, sans-serif; background: var(--w-face);
+  box-shadow: inset -1px -1px 0 var(--w-dk), inset 1px 1px 0 var(--w-hi), inset -2px -2px 0 var(--w-lo), inset 2px 2px 0 var(--w-lite); }
+html.os98 .back-top, html.os98 .to-top { display: none !important; }
+
+/* the log-on dialog: only the sign-in box, as a 98 dialog in the middle of the wallpaper */
+html.os-login main.wrap, html.os-login .g-nav, html.os-login #gme, html.os-login .os-task { display: none !important; }
+html.os-login .g-sub { min-height: 100vh; display: grid !important; place-items: center; padding: 16px !important; background: none !important; margin: 0 !important; max-width: none; }
+html.os-login .g-login { margin: 0; width: min(440px, 100%); padding: 3px; background: var(--w-face);
+  box-shadow: inset -1px -1px 0 var(--w-dk), inset 1px 1px 0 var(--w-lite), inset -2px -2px 0 var(--w-lo), inset 2px 2px 0 var(--w-hi), 4px 6px 20px rgba(0,0,0,.35); }
+html.os-login .g-login .os-bar { margin: 0; max-width: none; }
+html.os-login .identity-pop { position: static; width: auto; box-shadow: none !important; padding: 14px 14px 12px; }
+html.os-login .identity-pop::before { content: ""; float: left; width: 48px; height: 48px; margin: 0 12px 6px 0; background: url(/meme/img/pep-logo.webp) center / contain no-repeat; }
+html.os-login .identity-pop h2 { font-size: 15px; margin: 4px 0 12px; }
+html.os-login .identity-pop .row { clear: both; }
+html.os-login body { padding-bottom: 0 !important; }
+
+/* 98 look for the small things the lobby shows in both modes */
+html.embed .toast { border-radius: 0; background: #ffffe1 !important; color: #111 !important; font: 13px Tahoma, Verdana, sans-serif; border: 1px solid #111; box-shadow: 2px 2px 0 rgba(0,0,0,.35); }
+html.embed .toast.bad { background: #fff !important; border-color: #a00; color: #a00 !important; }
+html.embed .g-me { border-radius: 0 !important; border: 0 !important; background: var(--w-face) !important; color: #111 !important; font-size: 13px;
+  box-shadow: inset -1px -1px 0 var(--w-dk), inset 1px 1px 0 var(--w-hi), inset -2px -2px 0 var(--w-lo) !important; }
+html.embed .identity-pop.identity { box-shadow: inset -1px -1px 0 var(--w-dk), inset 1px 1px 0 var(--w-lite), inset -2px -2px 0 var(--w-lo), inset 2px 2px 0 var(--w-hi), 3px 3px 0 rgba(0,0,0,.3) !important; }
+html.embed .btn.discord { color: #111 !important; }
+html.embed .btn.discord svg { color: #5865f2; }
+html.embed .badge, html.embed .chip-online, html.embed .lobby-chips span, html.embed .chip { border-radius: 0 !important; }
+html.embed .badge.ver { background: #0c5a2c !important; color: #fff !important; }
+html.embed .backend-banner, html.embed .note, html.embed .warn { border-radius: 0 !important; }
+html.embed .news, html.embed .bg-coins, html.embed .lang-hint, html.embed .pill-bar { display: none !important; }
+html.embed body :where(h1, h2, h3, h4, p, li, label, span, b, a, button, input, select, textarea, small, td, th, summary) { font-family: Tahoma, Verdana, "Segoe UI", sans-serif !important; }
+html.os-login .identity-pop, html.os-login .identity-pop p { font-size: 13px; }
+html.os-login .identity-pop label { font-size: 12px; color: #111; }
+html.embed input:focus, html.embed select:focus, html.embed textarea:focus { outline: 1px dotted #111 !important; outline-offset: -4px; }
+html.embed .totop { display: none !important; }
+html.embed :is(.gprev, .gcard-opt, .pixlabel, .chat-warn, .players li, .seats li, li.drawing, .board, .sea-grid, .page-head, .id-step, .ranking button, .tabs button, .lb-tabs button, .mn-news, .mn-news-tag, .mn-pray, .mn-stage, .mn-bar, .mn-tabs, .mn-tabs button, .mn-row, .mn-buy, .mn-ico) { border-radius: 0 !important; }
+html.embed .chat-warn { background: #fff !important; color: #111 !important; border: 1px solid #808080 !important; }
+html.embed .page-head { background: none !important; box-shadow: none !important; border: 0 !important; padding-left: 0; padding-right: 0; }
+html.embed a:not(.btn):not(.os-x):not(.os-start):not(.g-nav a), html.embed .linkbtn { color: #0c3d8c !important; }
+/* tabs (leaderboard, Pepe Miner) as 98 property-sheet tabs; the "Step 1" tag as a plain label */
+html.embed [role=tablist] { gap: 0 !important; border-bottom: 1px solid var(--w-hi); background: none !important; box-shadow: none !important; padding: 0 !important; }
+html.embed [role=tab] { background: var(--w-face) !important; color: #111 !important; border: 0 !important; border-radius: 0 !important; font: 13px Tahoma, Verdana, sans-serif !important; padding: 5px 12px !important; margin: 0 -1px 0 0;
+  box-shadow: inset 1px 1px 0 var(--w-hi), inset -1px 0 0 var(--w-dk), inset -2px 0 0 var(--w-lo) !important; }
+html.embed [role=tab][aria-selected=true] { font-weight: 700 !important; position: relative; top: 1px; padding-top: 7px !important; }
+html.embed .id-step { background: none !important; color: #444 !important; padding: 0 !important; border-radius: 0 !important; letter-spacing: 0; }
+html.embed .room-row, html.embed .rooms > *, html.embed .mn-row, html.embed .mn-buy { box-shadow: none; }

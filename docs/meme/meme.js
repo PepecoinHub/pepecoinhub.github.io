@@ -48,7 +48,7 @@
   };
 
   // '@page' is a page of the serious site, the rest are meme pages
-  var href = function (p) { return p.charAt(0) === '@' ? (p === '@' ? serious : BASE + p.slice(1)) : p === 'index' ? './' : p + '.html'; };
+  var href = function (p) { return p.charAt(0) === '@' ? (p === '@' ? serious : p === '@games/' ? osPage('') : BASE + p.slice(1)) : p === 'index' ? './' : p + '.html'; };
   var serious = BASE + (PAGE === 'index' ? '' : PAGE + '.html');
 
   function el(tag, attrs, html) {
@@ -176,7 +176,7 @@
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
     });
-    var onl = el('a', { href: BASE + 'games/' }, '<img src="img/pond-playground.webp" alt="" width="24" height="24" loading="lazy"><span><b>PEP Games online</b><small>Charades, Pepe Miner, lobby chat</small></span>');
+    var onl = el('a', { href: osPage('') }, '<img src="img/pond-playground.webp" alt="" width="24" height="24" loading="lazy"><span><b>PEP Games online</b><small>Charades, Pepe Miner, lobby chat</small></span>');
     onl.addEventListener('click', function (e) { if (window.innerWidth >= 760) { e.preventDefault(); setOpen(false); pepGamesOnline(); } });
     gl.appendChild(onl);
     smMain.appendChild(subGroup('Games', 'gif-061-still', gl));
@@ -1147,10 +1147,15 @@
     A.host.style.top = '12px';
     return A;
   }
+  // a PEP Games page opened as a full page (phones, new tab): it keeps the 98 look and leads back here
+  function osPage(path) {
+    var h = path.indexOf('#'), hash = h >= 0 ? path.slice(h) : ''; path = h >= 0 ? path.slice(0, h) : path;
+    return BASE + 'games/' + path + (path.indexOf('?') >= 0 ? '&' : '?') + 'os=98&back=' + encodeURIComponent(location.pathname) + hash;
+  }
   function boardGame(key, name) {
     var G = BASE + 'games/';
     var bot = function (lv) { return G + 'table.html?bot=' + key + '&level=' + lv + '&embed=1'; };
-    if (window.innerWidth < 760) { location.href = bot('medium').replace('&embed=1', ''); return; }
+    if (window.innerWidth < 760) { location.href = osPage('table.html?bot=' + key + '&level=medium'); return; }
     tabbedGame('bg-' + key, name, 'pond-playground', [
       ['vs the bot', bot('medium'), function (row, go) {
         row.innerHTML = '<span class="grow">Difficulty</span>' + ['easy', 'medium', 'hard'].map(function (l) { return '<button type="button" class="app-btn" data-l="' + l + '" aria-pressed="' + (l === 'medium') + '">' + l.charAt(0).toUpperCase() + l.slice(1) + '</button>'; }).join('');
@@ -1165,7 +1170,7 @@
   // Draw & Guess (charades with other players): the PEP Games lobby opens on its rooms, inside a window
   function drawGuess() {
     var G = BASE + 'games/';
-    if (window.innerWidth < 760) { location.href = G + '#game-dg'; return; }
+    if (window.innerWidth < 760) { location.href = osPage('#game-dg'); return; }
     tabbedGame('dg', 'Draw & Guess - PEP charades', 'gif-061-still', [
       ['LAN Party: rooms', G + '?embed=1&only=dg#game-dg', function (row) {
         row.innerHTML = '<span class="grow">Start a room and share the link with frens (up to 12 players), join an open room, or type a room code. Needs a <a href="#" class="tab-logon">log on</a> (Discord or guest).</span>';
@@ -1201,9 +1206,9 @@
   }
   // the online games site inside a big window; on a phone it simply opens the page
   function pepGamesOnline() {
-    if (window.innerWidth < 760) { location.href = BASE + 'games/'; return; }
+    if (window.innerWidth < 760) { location.href = osPage(''); return; }
     var A = openApp('online', 'PEP Games online', 'pond-playground', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/" title="PEP Games"></iframe><div class="app-row"><span class="grow">Charades, Pepe Miner and the lobby chat.</span><a class="app-btn" href="' + BASE + 'games/" target="_blank" rel="noopener">Open in a new tab</a></div>';
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/" title="PEP Games"></iframe><div class="app-row"><span class="grow">Charades, Pepe Miner and the lobby chat.</span><a class="app-btn" href="' + osPage('') + '" target="_blank" rel="noopener">Open in a new tab</a></div>';
     }, 1100);
     A.host.style.top = '12px';
   }
@@ -1493,5 +1498,12 @@
     timers.push(setTimeout(finish, 120 + lines.length * 230 + 650));
   }
 
+  // links to PEP Games in the page text open the Games folder (a phone gets the 98-style games page)
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href="../games/"]');
+    if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+    e.preventDefault();
+    if (window.innerWidth < 760) location.href = osPage(''); else gamesFolder();
+  });
   window.Meme = { json: json, fmt: fmt, fill: fill, lineChart: lineChart, base: BASE, data: DATA, page: PAGE };
 })();
