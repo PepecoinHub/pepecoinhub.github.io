@@ -982,7 +982,9 @@
   function myAddressSection() {
     if (!my.box) my.box = h('section', { class: 'panel myaddr', 'aria-labelledby': 'my-h' });
     paintMy();
-    if (!my.started && my.addr) { my.started = true; myRun(my.addr); }
+    // AddressCheck in the meme edition links here with #addr=P… (a hash, so the address is not sent to any server)
+    if (!my.started) { const m = /[#&]addr=(P[1-9A-HJ-NP-Za-km-z]{33})(&|$)/.exec(location.hash); if (m) my.addr = m[1]; }
+    if (!my.started && my.addr) { my.started = true; myRun(my.addr); if (/addr=/.test(location.hash)) setTimeout(() => my.box && my.box.scrollIntoView({ block: 'start' }), 300); }
     return my.box;
   }
 

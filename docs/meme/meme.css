@@ -1115,11 +1115,9 @@ footer.foot a { color: #edf3e3; }
 .app-win.app-full .app-body { flex: 1; min-height: 0; padding: 0; }
 .app-win.app-full .app-frame { height: 100%; }
 
-/* ---------- ScamCheck.exe and AddressCheck.exe ---------- */
-.sc-in, .ac-in { width: 100%; box-sizing: border-box; padding: 6px 8px; background: #fff; color: #000; border: 0; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); font: 400 13px/1.4 var(--f-chrome); resize: vertical; }
+/* ---------- AddressCheck.exe ---------- */
+.ac-in { width: 100%; box-sizing: border-box; padding: 6px 8px; background: #fff; color: #000; border: 0; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); font: 400 13px/1.4 var(--f-chrome); resize: vertical; }
 .ac-form .ac-in { flex: 1; min-width: 0; width: auto; font-family: ui-monospace, Consolas, monospace; }
-.sc-bar { height: 18px; margin: 8px 0; padding: 2px; background: #fff; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
-.sc-bar i { display: block; height: 100%; width: 0; background: repeating-linear-gradient(90deg, #000080 0 10px, transparent 10px 12px); }
 .sc-verdict { margin: 8px 0; padding: 10px 12px; border: 2px solid; font: 400 13px/1.45 var(--f-chrome); color: #000; }
 .sc-verdict > b { display: block; margin-bottom: 4px; font-size: 14px; }
 .sc-verdict ul { margin: 6px 0 0; padding-left: 18px; }
@@ -1129,7 +1127,7 @@ footer.foot a { color: #edf3e3; }
 .sc-ok { background: #e3f5e1; border-color: #2e7d32; } .sc-ok > b { color: #1b5e20; }
 
 /* ---------- Frog Mail and the Pond Gazette ---------- */
-.pondos .tray-mail { display: inline-flex; align-items: center; height: 22px; padding: 0 3px; border: 0; background: none; cursor: pointer; }
+.pondos .tray-mail { position: relative; display: inline-flex; align-items: center; height: 22px; padding: 0 3px; border: 0; background: none; cursor: pointer; }
 .tray-mail svg { overflow: visible; }
 .tray-mail .mb-box { fill: #2e8a3a; stroke: #111; stroke-width: 1; }
 .tray-mail .mb-post { fill: #7a5430; }
@@ -1186,3 +1184,8 @@ footer.foot a { color: #edf3e3; }
   .crt-panel { grid-template-columns: 1fr 1fr 1fr; align-items: center; }
   .crt-grill, .crt-brand { display: none; }
 }
+
+.mail-badge { position: absolute; top: -5px; right: -5px; min-width: 15px; height: 15px; padding: 0 3px; box-sizing: border-box; border-radius: 8px; background: #d61f1f; color: #fff; font: 700 10px/15px var(--f-chrome); text-align: center; box-shadow: 0 0 0 1.5px #fff; }
+.sm-new { margin-left: 4px; padding: 1px 5px; border-radius: 7px; background: #d61f1f; color: #fff; font-size: 10px; }
+.ac-more { margin-top: 6px; font-size: 12px; }
+.gazette section + section { margin-top: 16px; padding-top: 8px; border-top: 1px solid #1b1b1b; }
