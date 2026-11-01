@@ -1,8 +1,8 @@
 {
  "schema": 1,
  "date": "2026-11-01",
- "updated_at": "2026-11-01T17:49:28Z",
- "hashrate_hs": 2229757067042856,
- "difficulty": 30859548.41730051,
+ "updated_at": "2026-11-01T17:59:19Z",
+ "hashrate_hs": 2209914770242751,
+ "difficulty": 37535429.9012322,
  "source": "https://pepeblocks.com/api/getnetworkhashps"
 }
