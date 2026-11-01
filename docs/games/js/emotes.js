@@ -19,6 +19,15 @@ export const EMOTES = [
   { code: 'news', label: 'Breaking news' },
   { code: 'loading', label: 'Loading…' },
   { code: 'crowd', label: 'Everybody!' },
+  // GIFs by Lily in Pyjamas (klipy.com/profile/lilyinpyjamas)
+  { code: 'gmfren', label: 'gm fren' },
+  { code: 'heart', label: 'Love it' },
+  { code: 'shh', label: 'Shh, seed phrase stays secret' },
+  { code: 'wen', label: 'Wen?' },
+  { code: 'facts', label: 'Facts' },
+  { code: 'hmm', label: 'Hmm…' },
+  { code: 'sleepy', label: 'Sleepy' },
+  { code: 'bigbrain', label: 'Big brain' },
 ];
 const BY = Object.fromEntries(EMOTES.map((e) => [e.code, e]));
 const src = (c) => `img/emotes/${c}.webp`;

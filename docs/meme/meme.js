@@ -152,6 +152,9 @@
       return g;
     };
     smMain.appendChild(el('a', { class: 'sm-item', href: './' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>My Pond</b></span>'));
+    var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="img/gif-085-still.webp" alt="" width="28" height="28"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
+    meItem.addEventListener('click', function () { setOpen(false); logOn(); });
+    smMain.appendChild(meItem);
     smMain.appendChild(el('hr'));
     NAV.forEach(function (g, gi) {
       var list = el('div', { class: 'sm-list' });
@@ -166,6 +169,7 @@
     [['PEP Pong', 'PEP vs PEPE, first to 7', 'pep-logo', function () { pong(); }], ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
       ['High Scores', 'FUD Invaders and PEP Snake, top 10', 'gif-061-still', function () { highScores(); }],
+      ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
       ['All games…', 'Chess, Checkers, Connect Four, Sea Battle, Pepe Miner', 'pond-playground', function () { gamesFolder(); }],
       ['Paper hands', 'The recycle bin, sort of', 'wrongpep', function () { paperHands(); }]].forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="img/' + g[2] + '.webp" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
@@ -429,7 +433,7 @@
     var MENUS = [
       ['File', [['Minimize', function () { setState(W, 'min'); }], ['Close', function () { setState(W, 'closed'); }]]],
       ['View', [['Maximize / restore', function () { toggleMax(W); }], ['Arrange all windows', arrangeAll], ['Light or dark mode', function () { if (themeBtn) themeBtn.click(); }]]],
-      ['Receipts', [['Open the sources', function () { var r = receipts(); if (r) setState(r, 'open'); }], ['Report a mistake', 'https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml']]],
+      ['Receipts', [['Open the sources', function () { if (book && (book.reveal('#sources') || book.reveal('#src'))) return; var r = receipts(); if (r) setState(r, 'open'); }], ['Report a mistake', 'https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml']]],
       ['Help', [['Which frog is which?', 'which-pepecoin.html'], ['Glossary (Fren-to-English)', 'glossary.html'], ['About PondOS', aboutOS]]]
     ];
     MENUS.forEach(function (m) {
@@ -471,7 +475,7 @@
     var W = { host: host, win: win, bar: bar, body: body, title: title, x: 0, y: 0, state: 'open' };
     if (opts.menu) win.appendChild(menuBar(W));
     win.appendChild(body);
-    if (opts.status) { W.status = el('div', { class: 'win-status' }, '<span>' + opts.status + '</span><span class="st-r"></span>'); win.appendChild(W.status); }
+    if (opts.status != null) { W.status = el('div', { class: 'win-status' }, '<span>' + opts.status + '</span><span class="st-r"></span>'); win.appendChild(W.status); }
     host.appendChild(win);
     W.maxBtn = bar.querySelector('.w-max');
     var short = title.split(' - ')[0];
@@ -527,11 +531,92 @@
     });
   }
 
+  // ---------- content pages as one "book" window ----------
+  var book = null;
+  function secName(panel, i) {
+    if (panel.classList.contains('pagehead')) return 'Overview';
+    if (panel.classList.contains('pond-break')) return 'Touch grass';
+    if (panel.querySelector('.gifs')) return 'Gallery';
+    var lb = panel.getAttribute('aria-labelledby'), le = lb && document.getElementById(lb);
+    var h = le && le.textContent.trim() ? le : panel.querySelector('h2, h3');
+    var t = h ? h.textContent.replace(/\s+/g, ' ').trim() : (panel.getAttribute('aria-label') || 'Section ' + (i + 1));
+    return t.length > 42 ? t.slice(0, 40) + '…' : t;
+  }
+  function buildBook(blocks) {
+    var host = el('section', { class: 'in book' });
+    mainEl.insertBefore(host, blocks[0]);
+    var toc = el('nav', { class: 'toc', 'aria-label': 'Sections of this page' }), pane = el('div', { class: 'pane' });
+    var pager = el('div', { class: 'pager' }, '<button type="button" class="btn pg-prev"></button><span class="pg-n"></span><button type="button" class="btn pg-next"></button>');
+    var appIcon = 'img/' + (APP[PAGE] || ['', 'pep-logo'])[1] + '.webp';
+    var W = null;
+    var secs = blocks.map(function (n, i) {
+      var panel = el('div', { class: 'sec' });
+      Array.prototype.slice.call(n.classList).forEach(function (c) { if (c !== 'in') panel.classList.add(c); });
+      ['id', 'aria-labelledby', 'aria-label'].forEach(function (a) { if (n.getAttribute(a)) panel.setAttribute(a, n.getAttribute(a)); });
+      panel.setAttribute('role', 'region');
+      while (n.firstChild) panel.appendChild(n.firstChild);
+      n.remove();
+      pane.appendChild(panel);
+      var pic = panel.querySelector('img:not([src$=".svg"])');
+      var name = secName(panel, i);
+      var b = el('button', { type: 'button', class: 'toc-i', 'aria-current': 'false' }, '<img src="' + (i === 0 || !pic ? appIcon : pic.getAttribute('src')) + '" alt="" width="20" height="20" loading="lazy"><span>' + esc(name) + '</span>');
+      b.addEventListener('click', function () { show(i, true); });
+      toc.appendChild(b);
+      return { panel: panel, b: b, name: name };
+    });
+    host.appendChild(toc); host.appendChild(pane); host.appendChild(pager);
+    var cur = -1;
+    function show(i, user) {
+      if (i < 0 || i >= secs.length) return;
+      cur = i;
+      secs.forEach(function (s, k) {
+        var on = k === i;
+        s.panel.classList.toggle('off', !on);
+        if (on) s.panel.removeAttribute('inert'); else s.panel.setAttribute('inert', '');
+        s.b.setAttribute('aria-current', on ? 'true' : 'false');
+      });
+      var prev = pager.querySelector('.pg-prev'), next = pager.querySelector('.pg-next');
+      prev.disabled = i === 0; next.disabled = i === secs.length - 1;
+      prev.textContent = i > 0 ? '◀ ' + secs[i - 1].name : '◀ Back';
+      next.textContent = i < secs.length - 1 ? secs[i + 1].name + ' ▶' : 'Next ▶';
+      pager.querySelector('.pg-n').textContent = (i + 1) + ' / ' + secs.length;
+      if (W && W.status) W.status.querySelector('span').textContent = secs[i].name + ' (' + (i + 1) + ' of ' + secs.length + ')';
+      if (user) {
+        var id = secs[i].panel.id;
+        try { history.replaceState(null, '', id ? '#' + id : location.pathname + location.search); } catch (e) {}
+        var r = host.getBoundingClientRect();
+        if (r.top < 0 || r.top > window.innerHeight * 0.5) host.scrollIntoView({ block: 'start', behavior: REDUCE ? 'auto' : 'smooth' });
+      }
+    }
+    pager.querySelector('.pg-prev').addEventListener('click', function () { show(cur - 1, true); });
+    pager.querySelector('.pg-next').addEventListener('click', function () { show(cur + 1, true); });
+    // links to #something inside a hidden section open that section first
+    var reveal = function (hash) {
+      var t = hash && hash.length > 1 && document.getElementById(decodeURIComponent(hash.slice(1)));
+      if (!t) return false;
+      for (var k = 0; k < secs.length; k++) if (secs[k].panel.contains(t)) { show(k, false); setTimeout(function () { t.scrollIntoView({ block: 'start' }); }, 30); return true; }
+      return false;
+    };
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (a && a.getAttribute('href').length > 1 && reveal(a.getAttribute('href'))) e.preventDefault();
+    });
+    window.addEventListener('hashchange', function () { reveal(location.hash); });
+    var h1 = secs[0].panel.querySelector('h1');
+    W = windowize(host, { menu: true, status: '', wide: true, title: (APP[PAGE] || ['PEP.exe'])[0] + ' - ' + (h1 ? h1.textContent.replace(/\s+/g, ' ').trim().split(/[.?:!]/)[0] : 'Pepecoin'), icon: (APP[PAGE] || ['', 'pep-logo'])[1] });
+    book = { show: show, reveal: reveal, secs: secs };
+    if (!reveal(location.hash)) show(0, false);
+  }
+
   var mainEl = document.querySelector('main');
   if (mainEl) {
     root.classList.add('pondos');
     // blocks are direct children of <main>, or one level down inside a wrapper such as the rich list's #app
-    Array.prototype.slice.call(mainEl.querySelectorAll(':scope > section.in, :scope > div.in, :scope > aside.in, :scope > div:not(.in) > section.in')).forEach(function (n) {
+    var blocks = Array.prototype.slice.call(mainEl.querySelectorAll(':scope > section.in, :scope > div.in, :scope > aside.in, :scope > div:not(.in) > section.in'));
+    if (PAGE !== 'index' && blocks.length > 2) {
+      // a content page is one program window: a contents list on the left, one section at a time on the right
+      buildBook(blocks.filter(function (n) { return !n.classList.contains('loading'); }));
+    } else blocks.forEach(function (n) {
       var lead = n.classList.contains('hero') || n.classList.contains('pagehead');
       windowize(n, lead ? { menu: true, status: 'Every number keeps its receipt.' } : null);
     });
@@ -588,9 +673,9 @@
     var DESKTOP = [
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
-      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Paper hands', 'gif-040-still']
+      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#logon', 'Log On', 'gif-085-still'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Paper hands', 'gif-040-still']
     ];
-    var ACT = { '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -1009,9 +1094,10 @@
     box.innerHTML = (s && s.discord ? '<span class="grow">Send <b>' + fmt.int(score) + '</b> to the High Scores as your Discord name <span class="hs-ok" title="Verified with Discord">✓</span></span>'
       : '<label class="grow">Nickname <input name="nick" maxlength="20" autocomplete="nickname" value="' + esc(nick) + '" placeholder="2-20 letters"></label>') +
       '<button type="submit" class="app-btn">Submit score</button><button type="button" class="app-btn hs-see">High Scores</button>' +
-      (s && s.discord ? '' : '<span class="hs-note">Sign in with Discord on PEP Games to get a ✓ next to your name.</span>');
+      (s && s.discord ? '' : '<span class="hs-note"><a href="#" class="hs-logon">Log on with Discord</a> to get a ✓ next to your name.</span>');
     A.body.appendChild(box);
     box.querySelector('.hs-see').addEventListener('click', function () { highScores(game); });
+    var hl = box.querySelector('.hs-logon'); if (hl) hl.addEventListener('click', function (e) { e.preventDefault(); logOn(); });
     box.addEventListener('submit', function (e) {
       e.preventDefault();
       var inp = box.querySelector('input[name=nick]'), n = inp ? inp.value.trim() : '';
@@ -1043,15 +1129,50 @@
   }
 
   // ---------- board games and Pepe Miner from PEP Games, as app windows ----------
+  // a game window with two tabs: play the bot here, or "LAN Party" (open a table and invite a fren, or join one)
+  function tabbedGame(id, title, icon, tabs, width) {
+    var A = openApp(id, title, icon, function (A) {
+      A.body.innerHTML = '<div class="tabs98" role="tablist">' + tabs.map(function (t, i) { return '<button type="button" role="tab" data-t="' + i + '" aria-selected="' + (i === 0) + '">' + t[0] + '</button>'; }).join('') + '</div>' +
+        '<div class="tabpane"><div class="app-row tab-extra"></div><iframe class="app-frame" title="' + esc(title) + '"></iframe></div>';
+      var fr = A.body.querySelector('iframe'), extra = A.body.querySelector('.tab-extra');
+      var pick = function (i) {
+        A.body.querySelectorAll('[role=tab]').forEach(function (b) { b.setAttribute('aria-selected', String(+b.getAttribute('data-t') === i)); });
+        var t = tabs[i]; extra.innerHTML = ''; extra.hidden = !t[2];
+        if (t[2]) t[2](extra, function (u) { fr.src = u; });
+        fr.src = typeof t[1] === 'function' ? t[1]() : t[1];
+      };
+      A.body.querySelectorAll('[role=tab]').forEach(function (b) { b.addEventListener('click', function () { pick(+b.getAttribute('data-t')); }); });
+      pick(0);
+    }, width || 860);
+    A.host.style.top = '12px';
+    return A;
+  }
   function boardGame(key, name) {
-    var A = openApp('bg-' + key, name + ' - vs the bot', 'pond-playground', function (A) {
-      var src = function (lv) { return BASE + 'games/table.html?bot=' + key + '&level=' + lv + '&embed=1'; };
-      A.body.innerHTML = '<div class="app-row"><span class="grow">Difficulty</span>' + ['easy', 'medium', 'hard'].map(function (l) { return '<button type="button" class="app-btn" data-l="' + l + '" aria-pressed="' + (l === 'medium') + '">' + l.charAt(0).toUpperCase() + l.slice(1) + '</button>'; }).join('') + '</div>' +
-        '<iframe class="app-frame" src="' + src('medium') + '" title="' + name + '"></iframe>';
-      var fr = A.body.querySelector('iframe');
-      A.body.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { A.body.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); fr.src = src(b.getAttribute('data-l')); }); });
-    }, 820);
-    A.host.style.top = '16px';
+    var G = BASE + 'games/';
+    var bot = function (lv) { return G + 'table.html?bot=' + key + '&level=' + lv + '&embed=1'; };
+    if (window.innerWidth < 760) { location.href = bot('medium').replace('&embed=1', ''); return; }
+    tabbedGame('bg-' + key, name, 'pond-playground', [
+      ['vs the bot', bot('medium'), function (row, go) {
+        row.innerHTML = '<span class="grow">Difficulty</span>' + ['easy', 'medium', 'hard'].map(function (l) { return '<button type="button" class="app-btn" data-l="' + l + '" aria-pressed="' + (l === 'medium') + '">' + l.charAt(0).toUpperCase() + l.slice(1) + '</button>'; }).join('');
+        row.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { row.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); go(bot(b.getAttribute('data-l'))); }); });
+      }],
+      ['LAN Party: play with frens', G + '?embed=1&only=tables&tmode=fren&tgame=' + key + '#tables', function (row) {
+        row.innerHTML = '<span class="grow">Open a table and send the invite link to a fren, or sit down at an open table. Needs a <a href="#" class="tab-logon">log on</a> (Discord or guest).</span>';
+        row.querySelector('.tab-logon').addEventListener('click', function (e) { e.preventDefault(); logOn(); });
+      }]
+    ], 860);
+  }
+  // Draw & Guess (charades with other players): the PEP Games lobby opens on its rooms, inside a window
+  function drawGuess() {
+    var G = BASE + 'games/';
+    if (window.innerWidth < 760) { location.href = G + '#game-dg'; return; }
+    tabbedGame('dg', 'Draw & Guess - PEP charades', 'gif-061-still', [
+      ['LAN Party: rooms', G + '?embed=1&only=dg#game-dg', function (row) {
+        row.innerHTML = '<span class="grow">Start a room and share the link with frens (up to 12 players), join an open room, or type a room code. Needs a <a href="#" class="tab-logon">log on</a> (Discord or guest).</span>';
+        row.querySelector('.tab-logon').addEventListener('click', function (e) { e.preventDefault(); logOn(); });
+      }],
+      ['How to play', G + 'rules.html?embed=1', null]
+    ], 980);
   }
   function minerApp() {
     var A = openApp('miner', 'Pepe Miner', 'pickaxe', function (A) {
@@ -1067,9 +1188,9 @@
         ['High Scores', 'gif-061-still', function () { highScores(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
-        ['Pepe Miner', 'pickaxe', minerApp], ['PEP Games online', 'pond-playground', function () { pepGamesOnline(); }]];
+        ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Miner', 'pickaxe', minerApp], ['PEP Games lobby', 'pond-playground', function () { pepGamesOnline(); }]];
       A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="img/' + g[1] + '.webp" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle play against the bot. Draw &amp; Guess and the lobby chat live in PEP Games online.</p>';
+        '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle play against the bot. Draw &amp; Guess needs other players: open a room or join one with a code.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { G[+b.getAttribute('data-i')][2](); };
         b.addEventListener('dblclick', go);
@@ -1093,6 +1214,54 @@
       A.body.innerHTML = '<div class="tv-screen"><iframe src="https://www.youtube-nocookie.com/embed/HnfR7KgQqRA?rel=0&modestbranding=1" title="Pepecoin video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
         '<div class="app-row"><span class="grow">Now playing: Pepecoin</span><a class="app-btn" href="https://youtu.be/HnfR7KgQqRA" target="_blank" rel="noopener">Open on YouTube</a></div>';
     }, 640);
+  }
+
+  // ---------- Log On: the PEP Games sign-in (Discord or a guest nickname), shared by chat and high scores ----------
+  // Discord does not allow its login page inside a frame, so signing in happens on the PEP Games page,
+  // which sends the visitor straight back here afterwards.
+  function whoAmI() {
+    var s = anySession(); if (!s || !s.user) return null;
+    var ids = s.user.identities || [], d = ids.filter(function (i) { return i.provider === 'discord'; })[0], m = s.user.user_metadata || {};
+    var name = d ? ((d.identity_data && (d.identity_data.custom_claims && d.identity_data.custom_claims.global_name || d.identity_data.full_name || d.identity_data.name)) || m.full_name || m.name) : null;
+    var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
+    return { discord: !!d, name: name || nick || 'guest' };
+  }
+  function signInHref() { return BASE + 'games/?login=1&back=' + encodeURIComponent(location.pathname + location.search.replace(/[?&]signedin=1/, '')); }
+  function logOn() {
+    openApp('logon', 'Log On to the Pond', 'gif-085-still', function (A) {
+      var paint = function () {
+        var me = whoAmI();
+        A.body.innerHTML = '<div class="tip"><img src="img/' + (me ? 'gif-045' : 'gif-085') + '.webp" alt="" width="96" height="96"><div>' +
+          (me ? '<b>Signed in as ' + esc(me.name) + (me.discord ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : ' (guest)') + '</b><p>' + (me.discord ? 'Your Discord name shows with a ✓ in LAN Party and on the High Scores.' : 'Guests can chat and submit scores. Log in with Discord to get the ✓ verified badge.') + '</p>'
+            : '<b>Who goes there, fren?</b><p>Sign in once and use it everywhere: LAN Party chat, High Scores, Draw &amp; Guess and the other PEP Games.</p>') +
+          '</div></div>' +
+          '<div class="app-row">' + (me && me.discord ? '' : '<a class="app-btn logon-discord" href="' + signInHref() + '">' + (me ? 'Log in with Discord' : 'Log in with Discord or as a guest') + '</a>') +
+          (me ? '<button type="button" class="app-btn logon-out">Log off</button>' : '') + '</div>' +
+          '<p class="hs-note">You sign in on the PEP Games page and come straight back here. Discord shares your username and email with our login service (Supabase); the site does not show or use the email. PondOS never asks for a seed phrase or a password.</p>';
+        var out = A.body.querySelector('.logon-out');
+        if (out) out.addEventListener('click', function () {
+          try { Object.keys(localStorage).forEach(function (k) { if (/^sb-azbwciqfbsdpwubznncg-auth-token/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
+          paintLogon(); paint();
+        });
+      };
+      paint();
+    }, 440);
+  }
+  function paintLogon() {
+    var me = whoAmI();
+    document.querySelectorAll('.logon-name').forEach(function (e) { e.textContent = me ? me.name : 'Log on…'; });
+    document.querySelectorAll('.logon-ok').forEach(function (e) { e.hidden = !(me && me.discord); });
+  }
+  if (mainEl) {
+    var tLog = el('button', { type: 'button', class: 'tray-logon', title: 'Log On to the Pond' }, '<span aria-hidden="true">👤</span><span class="sr">Log on</span>');
+    tLog.addEventListener('click', logOn);
+    var trayEl3 = document.querySelector('.tray'); if (trayEl3) trayEl3.insertBefore(tLog, trayEl3.firstChild);
+    paintLogon();
+    if (/[?&]signedin=1/.test(location.search)) {
+      try { history.replaceState(null, '', location.pathname + location.search.replace(/[?&]signedin=1/, '').replace(/^&/, '?') + location.hash); } catch (e) {}
+      var me0 = whoAmI();
+      if (me0) setTimeout(function () { balloon('Welcome to the pond, ' + me0.name, me0.discord ? 'Signed in with Discord ✓. LAN Party and High Scores now use your name.' : 'Signed in as a guest. You can chat and submit scores.', 'gif-045-still'); }, 900);
+    }
   }
 
   // ---------- Tip jar: the same receiving addresses as the footer ----------
@@ -1173,7 +1342,7 @@
   // ---------- LAN Party: the PEP Games lobby chat in a window ----------
   // Same chat as PEP Games (Supabase gry_lobby_chat / gry_lobby_say). Reading is open to everyone; writing
   // needs a PEP Games sign-in (Discord, or a guest nickname), which lives in this browser's storage.
-  var EMO = ' chair cheer crayon crowd hug hurry loading news peek pep ready scream serious smoke torch waiting ';
+  var EMO = ' gmfren heart shh wen facts hmm sleepy bigbrain peek ready waiting pep cheer torch hug chair crayon smoke scream serious hurry news loading crowd ';
   function anySession() {
     try { var s = JSON.parse(localStorage.getItem('sb-azbwciqfbsdpwubznncg-auth-token') || 'null'); if (s && s.access_token && s.expires_at * 1000 > Date.now() + 30000) return s; } catch (e) {}
     return null;
@@ -1202,15 +1371,25 @@
     var A = openApp('lan', 'LAN Party - #pond chat', 'gif-080-still', function (A) {
       A.body.innerHTML = '<div class="app-row"><span class="grow"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online in the pond</span></div>' +
         '<div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
-        '<form class="app-row lan-form"><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
+        '<div class="emo-pop" hidden role="group" aria-label="Emotes">' + EMO.trim().split(' ').map(function (c) { return '<button type="button" data-e="' + c + '" title=":' + c + ':"><img src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="32" height="32" loading="lazy"></button>'; }).join('') + '</div>' +
+        '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + BASE + 'games/img/emotes/pep.webp" alt="" width="22" height="22"></button><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
         '<p class="hs-note lan-note"></p>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input'), note = A.body.querySelector('.lan-note');
       var last = 0, seen = {}, timer = 0, alive = true, first = true;
+      var pop = A.body.querySelector('.emo-pop'), eb = A.body.querySelector('.emo-btn');
+      eb.addEventListener('click', function () { pop.hidden = !pop.hidden; eb.setAttribute('aria-expanded', String(!pop.hidden)); });
+      pop.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-e]'); if (!b || inp.disabled) return;
+        var v = inp.value, at = inp.selectionStart == null ? v.length : inp.selectionStart, code = ':' + b.getAttribute('data-e') + ':';
+        var pre = v.slice(0, at), post = v.slice(at);
+        inp.value = (pre && !/\s$/.test(pre) ? pre + ' ' : pre) + code + ' ' + post.replace(/^\s+/, '');
+        pop.hidden = true; eb.setAttribute('aria-expanded', 'false'); inp.focus();
+      });
       var paintNote = function () {
         var s = anySession();
-        note.innerHTML = s ? 'Signed in on PEP Games. Text and our emotes only, no links. Be nice, frens.' : 'Reading is open to everyone. To write, <a href="#" class="lan-login">sign in on PEP Games</a> (Discord, or a guest nickname), then come back.';
-        inp.disabled = !s; form.querySelector('button').disabled = !s;
-        var l = note.querySelector('.lan-login'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); pepGamesOnline(); });
+        note.innerHTML = s ? 'Signed in on PEP Games. Text and our emotes only, no links. Be nice, frens.' : 'Reading is open to everyone. To write, <a href="#" class="lan-login">log on</a> (Discord, or a guest nickname).';
+        inp.disabled = !s; form.querySelector('[type=submit]').disabled = !s; eb.disabled = !s;
+        var l = note.querySelector('.lan-login'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); logOn(); });
       };
       var poll = function () {
         clearTimeout(timer);
@@ -1234,7 +1413,7 @@
         e.preventDefault();
         var t = inp.value.trim(); if (!t) return;
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (err) {}
-        var b = form.querySelector('button'); b.disabled = true;
+        var b = form.querySelector('[type=submit]'); b.disabled = true;
         chatRpc('gry_lobby_say', { p_text: t, p_nick: nick }).then(function (r) {
           if (r && r.error) note.textContent = r.error; else inp.value = '';
           poll();

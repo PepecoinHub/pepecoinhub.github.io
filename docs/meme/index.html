@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=Gochi+Hand&family=Pixelify+Sans:wght@500;700&display=swap">
-<link rel="stylesheet" href="meme.css?v=20261101tv">
+<link rel="stylesheet" href="meme.css?v=20261101w98g">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
@@ -21,13 +21,6 @@
 <noscript><p class="in">Menu needs JavaScript. <a href="../">Open the serious site</a>.</p></noscript>
 
 <main id="main">
-  <section class="in chooser" id="chooser" aria-labelledby="ch-h" hidden>
-    <div class="panel choose">
-      <button class="pill red" type="button" data-pill="meme"><span class="dot" aria-hidden="true"></span><b>Red pill</b><span>Meme mode. You are here. Every number keeps its receipt.</span></button>
-      <figure><img src="img/pills.webp" alt="Pepe holding out a red pill and a blue pill, reflected in his glasses" width="640" height="402"><figcaption><b id="ch-h">Choose your frog.</b>Same facts either way.</figcaption></figure>
-      <a class="pill blue" href="../" data-pill="serious"><span class="dot" aria-hidden="true"></span><b>Blue pill</b><span>Serious mode. Clean fact pages in 8 languages, no memes.</span></a>
-    </div>
-  </section>
 
   <div class="in hero">
     <div class="hero-copy">
@@ -292,19 +285,10 @@
 
 <footer class="foot"></footer>
 <script src="../prices.js?v=20261031data1"></script>
-<script src="meme.js?v=20261101tv"></script>
+<script src="meme.js?v=20261101w98h"></script>
 <script>
 (function () {
   var M = window.Meme, f = M.fmt;
-  // red pill or blue pill, asked once
-  var box = document.getElementById('chooser'), chosen = null;
-  try { chosen = localStorage.getItem('hub-pill'); } catch (e) {}
-  box.hidden = !!chosen;
-  box.addEventListener('click', function (e) {
-    var p = e.target.closest('[data-pill]'); if (!p) return;
-    try { localStorage.setItem('hub-pill', p.getAttribute('data-pill')); localStorage.setItem('hub-mode', p.getAttribute('data-pill')); } catch (err) {}
-    if (p.tagName === 'BUTTON') box.hidden = true;
-  });
   // live numbers from the serious site's data files
   function refreshQuotes() { return Promise.all([M.json('ticker.json'), window.PepPrices.quote(), M.json('network.json')]).then(function (r) {
     var t = r[0], p = r[1], n = r[2], last = n.rows[n.rows.length - 1];

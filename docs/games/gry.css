@@ -690,6 +690,45 @@ details.lb #topboard-body { margin-top: 14px; }
 .no-server .tmode-fren { display: none; }
 
 /* ?embed=1 (an app window in PondOS): only the game, no site chrome */
-html.embed .site-head, html.embed .g-sub, html.embed .site-foot, html.embed .skip, html.embed .head-phone, html.embed .to-top, html.embed .back-top { display: none !important; }
+html.embed .site-head, html.embed .g-nav, html.embed .site-foot, html.embed .skip, html.embed .head-phone, html.embed .to-top, html.embed .back-top { display: none !important; }
 html.embed body { padding-top: 0 !important; }
 html.embed main.wrap { margin-top: 0; padding-top: 10px; }
+
+/* ---------- PondOS app window: Windows-98-style chrome ---------- */
+html.embed { --w-face: #c3c3bd; --w-hi: #fff; --w-lo: #808080; --w-dk: #0a0a0a; --w-lite: #dfdfdf; --w-sel: #0c5a2c; color-scheme: light; }
+html.embed body { background: var(--w-face) !important; color: #111 !important; font-family: Tahoma, Verdana, "Segoe UI", sans-serif !important; font-size: 14px; }
+html.embed body::before, html.embed body::after { display: none !important; }
+html.embed main.wrap { max-width: none; padding: 8px !important; }
+html.embed .card, html.embed .panel, html.embed .mode-card, html.embed .lobby-chat, html.embed .identity-pop, html.embed .topts-box, html.embed .gcard, html.embed .tmode, html.embed details.card {
+  background: var(--w-face) !important; color: #111 !important; border: 0 !important; border-radius: 0 !important;
+  box-shadow: inset -1px -1px 0 var(--w-dk), inset 1px 1px 0 var(--w-lite), inset -2px -2px 0 var(--w-lo), inset 2px 2px 0 var(--w-hi) !important;
+}
+html.embed .btn, html.embed button.btn, html.embed a.btn {
+  background: var(--w-face) !important; color: #111 !important; border: 0 !important; border-radius: 0 !important; font-family: inherit !important; font-weight: 400;
+  box-shadow: inset -1px -1px 0 var(--w-dk), inset 1px 1px 0 var(--w-lite), inset -2px -2px 0 var(--w-lo), inset 2px 2px 0 var(--w-hi) !important;
+}
+html.embed .btn.primary { font-weight: 700; outline: 1px dotted #111; outline-offset: -5px; }
+html.embed .btn:active { box-shadow: inset 1px 1px 0 var(--w-dk), inset -1px -1px 0 var(--w-hi), inset 2px 2px 0 var(--w-lo) !important; }
+html.embed input, html.embed select, html.embed textarea {
+  background: #fff !important; color: #111 !important; border: 0 !important; border-radius: 0 !important;
+  box-shadow: inset 1px 1px 0 var(--w-lo), inset 2px 2px 0 var(--w-dk), inset -1px -1px 0 var(--w-hi) !important;
+}
+html.embed h1, html.embed h2, html.embed h3, html.embed h4 { color: #111 !important; font-family: inherit !important; }
+html.embed .muted, html.embed .small.muted { color: #444 !important; }
+html.embed a { color: #0c3d8c; }
+html.embed .badge { border-radius: 0 !important; }
+html.embed .tmode.on, html.embed .gcard:has(input:checked) { background: var(--w-sel) !important; color: #fff !important; }
+html.embed .lobby-hero { display: none; }
+/* only one part of the lobby */
+html.only-dg .lobby-main > :not(.mg), html.only-dg #game-miner, html.only-dg .lobby-grid > :not(.lobby-main) { display: none !important; }
+html.only-tables .lobby-main > :not(#tables), html.only-tables .lobby-grid > :not(.lobby-main) { display: none !important; }
+html.only-dg .lobby-grid, html.only-tables .lobby-grid { display: block !important; }
+html.only-dg .maingames { display: block !important; }
+html.embed .g-sub { justify-content: flex-end; background: var(--w-face) !important; border: 0 !important; padding: 4px 8px !important; position: static !important; }
+html.embed .mg { background: none !important; border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; }
+html.embed .mg .sect-head, html.embed .mg .sect-head h2, html.embed .mg .sect-head label { color: #111 !important; }
+html.embed #newroom, html.embed .ill, html.embed .ill img, html.embed .g-me, html.embed .room-row, html.embed .rooms > * { border-radius: 0 !important; }
+html.embed #newroom { background: #fff !important; box-shadow: inset 1px 1px 0 var(--w-lo), inset 2px 2px 0 var(--w-dk), inset -1px -1px 0 var(--w-hi); }
+html.embed .chat-fab { display: none !important; }
+html.only-dg .ill.media { max-height: 160px; overflow: hidden; }
+html.only-dg .ill.media img { max-height: 160px; width: auto; margin: 0 auto; display: block; }

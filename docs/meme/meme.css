@@ -929,3 +929,69 @@ footer.foot a { color: #edf3e3; }
 .tv-screen { position: relative; aspect-ratio: 16 / 9; background: #000; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); }
 .tv-screen iframe { position: absolute; inset: 2px; width: calc(100% - 4px); height: calc(100% - 4px); border: 0; }
 .icons img[src$="pond-tv.webp"] { object-fit: contain; background: none; box-shadow: none; border: 0; }
+
+/* ================================================================ book window (content pages)
+   A contents list on the left, one section at a time on the right, Back / Next underneath. */
+.pondos .win-body.book.book { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 8px; padding: 6px; background: var(--chrome); box-shadow: none !important; }
+.toc { align-self: start; position: sticky; top: 8px; display: grid; gap: 1px; padding: 4px; max-height: calc(100vh - 90px); overflow-y: auto; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
+.toc-i { display: flex; align-items: center; gap: 8px; width: 100%; padding: 5px 6px; border: 1px dotted transparent; background: none; color: var(--ink); font: 400 12px/1.25 var(--f-chrome); text-align: left; cursor: pointer; }
+.toc-i img { flex: none; width: 20px; height: 20px; border-radius: 3px; object-fit: cover; }
+.toc-i:hover { background: color-mix(in srgb, var(--sel) 15%, transparent); }
+.toc-i[aria-current="true"] { background: var(--sel); color: #fff; font-weight: 700; }
+.toc-i:focus-visible { outline: none; border-color: currentColor; }
+.pane { position: relative; overflow: hidden; min-width: 0; min-height: 300px; padding: clamp(16px, 2.4vw, 28px); background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
+.pane > .sec { min-width: 0; padding: 0 !important; margin: 0; max-width: none; }
+.pane > .sec.off { position: absolute; top: clamp(16px, 2.4vw, 28px); left: clamp(16px, 2.4vw, 28px); right: clamp(16px, 2.4vw, 28px); visibility: hidden; pointer-events: none; }
+.pager { grid-column: 2; display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 400 12px var(--f-chrome); color: var(--ink); }
+.pondos .pager .btn { max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.pondos .pager .btn:disabled { color: var(--chrome-lo); cursor: default; }
+@media (max-width: 760px) {
+  .pondos .win-body.book.book { grid-template-columns: minmax(0, 1fr); padding: 4px; }
+  .toc { position: sticky; top: 0; z-index: 3; display: flex; gap: 2px; overflow-x: auto; max-height: none; scrollbar-width: thin; }
+  .toc-i { flex: none; width: auto; max-width: 70vw; white-space: nowrap; }
+  .pager { grid-column: 1; }
+  .pane { padding: 14px 12px; }
+  .pane > .sec.off { top: 14px; left: 12px; right: 12px; }
+}
+
+/* ================================================================ 98 look inside windows
+   Panels become raised grey boxes or white sunken fields, no rounded comic corners. */
+.pondos .pane .panel, .pondos .win-body .panel, .pondos .receipt, .pondos .glance, .pondos .tile, .pondos .tcard, .pondos .callout, .pondos .ex, .pondos .faq details, .pondos details.panel {
+  border: 0 !important; border-radius: 0 !important; background: var(--chrome) !important; color: var(--ink);
+  box-shadow: inset -1px -1px 0 var(--chrome-dk), inset 1px 1px 0 var(--chrome-face), inset -2px -2px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-hi) !important;
+}
+:root.pondos:not([data-theme="dark"]) .pondos .panel, :root.pondos:not([data-theme="dark"]) .pondos .receipt { color: #111; }
+.pondos .receipt, .pondos .glance, .pondos .tablebox, .pondos .links .panel ul, .pondos figure.meme img, .pondos .comic img {
+  border-radius: 0 !important;
+}
+.pondos .tablebox, .pondos table { border: 0 !important; border-radius: 0 !important; background: var(--pane) !important; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi) !important; }
+.pondos th { background: var(--chrome) !important; color: var(--ink) !important; font-family: var(--f-chrome) !important; box-shadow: inset -1px -1px 0 var(--chrome-lo), inset 1px 1px 0 var(--chrome-hi); }
+.pondos figure.meme { background: var(--chrome) !important; padding: 4px !important; border-radius: 0 !important; box-shadow: inset -1px -1px 0 var(--chrome-dk), inset 1px 1px 0 var(--chrome-face), inset -2px -2px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-hi) !important; border: 0 !important; }
+.pondos figure.meme figcaption { font-size: 0.95rem; }
+.pondos .tcard header { border-radius: 0; }
+.pondos .tcard.pep header { background: linear-gradient(90deg, var(--title), var(--title-2)) !important; color: #fff; }
+.pondos input:not([type=checkbox]):not([type=radio]), .pondos select, .pondos textarea {
+  border: 0 !important; border-radius: 0 !important; background: var(--pane) !important; color: var(--ink) !important;
+  box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi) !important;
+}
+.pondos .sticker { border-radius: 0 !important; }
+.pondos .bubble { border-radius: 0; }
+.pondos main > .loading { display: none; }
+.emo-pop { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 4px; padding: 6px; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); }
+.emo-pop[hidden] { display: none; }
+.emo-pop button { padding: 2px; border: 1px solid transparent; background: none; cursor: pointer; }
+.emo-pop button:hover, .emo-pop button:focus-visible { border-color: var(--sel); background: color-mix(in srgb, var(--sel) 15%, transparent); outline: none; }
+.emo-pop img { display: block; width: 32px; height: 32px; }
+.lan-form .emo-btn { padding: 4px 8px; font-size: 16px; }
+.pondos .tray-logon { display: inline-flex; align-items: center; height: 22px; padding: 0 5px; border: 0; background: none; color: inherit; font-size: 14px; cursor: pointer; }
+.logon-discord { text-decoration: none; }
+.sm-me b { font-weight: 700; }
+.lan-form .emo-btn { padding: 2px 6px; } .lan-form .emo-btn img { display: block; width: 22px; height: 22px; }
+/* 98 tab control */
+.tabs98 { display: flex; gap: 0; padding: 0 4px; margin-bottom: -2px; position: relative; z-index: 1; }
+.tabs98 [role=tab] { padding: 5px 12px 4px; border: 0; background: var(--chrome); color: var(--ink); font: 400 12px var(--f-chrome); cursor: pointer;
+  box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px 0 0 var(--chrome-dk), inset -2px 0 0 var(--chrome-lo); margin-top: 3px; }
+.tabs98 [role=tab][aria-selected="true"] { margin-top: 0; padding-bottom: 7px; font-weight: 700; }
+.tabpane { padding: 6px; display: grid; gap: 6px; box-shadow: inset -1px -1px 0 var(--chrome-dk), inset 1px 1px 0 var(--chrome-hi), inset -2px -2px 0 var(--chrome-lo); }
+.tab-extra[hidden] { display: none; }
+.tab-extra a { color: inherit; }

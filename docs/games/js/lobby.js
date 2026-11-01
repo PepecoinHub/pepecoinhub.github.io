@@ -11,6 +11,11 @@ if (be.kind === 'none') {   // no game server yet: only the offline "Play vs bot
 paintMe(be);
 let lobby = null, offset = 0, canHost = false;
 let tmode = null, tgame = null;   // mini games: 'fren' | 'bot', and the picked game
+{ // PondOS can open the lobby with a game and "play with a fren" already picked
+  const q = new URLSearchParams(location.search);
+  if (['fren', 'bot'].includes(q.get('tmode'))) tmode = q.get('tmode');
+  if (['chess', 'checkers', 'connect4', 'battleship'].includes(q.get('tgame'))) tgame = q.get('tgame');
+}
 const MODE_LABEL = { kalambury: 'Draw & Guess', obrazek: 'Pepe Pictures' };
 const TGAME = { chess: ['♟️', 'Chess'], checkers: ['⚫', 'Checkers'], connect4: ['🔴', 'Connect Four'], battleship: ['🚢', 'Sea Battle'] };
 const TDESC = {
@@ -140,7 +145,13 @@ const chat = lobbyChat(be, { openLogin });
 minerYou();
 
 renderNewRoom(); renderNewTable();
-await identityCard($('#identity'), { cta: 'Play', onReady: () => { setLogin(false); renderNewRoom(); renderNewTable(); renderSchedHost(); chat.refresh(); toast('All set! Pick a game below', 'good'); } });
+// ?login=1&back=/meme/... : sign-in requested from the meme edition (PondOS). The login box opens, and once
+// a session exists the visitor goes back to the page they came from (only paths on this site are accepted).
+const qs = new URLSearchParams(location.search);
+const back = /^\/[A-Za-z0-9/_.\-]*(\?[A-Za-z0-9=&_.\-%]*)?(#[A-Za-z0-9_\-]*)?$/.test(qs.get('back') || '') && !(qs.get('back') || '').startsWith('//') ? qs.get('back') : null;
+const goBack = () => { if (back) location.replace(back + (back.includes('?') ? '&' : '?') + 'signedin=1'); };
+await identityCard($('#identity'), { cta: 'Play', onReady: () => { if (back) return goBack(); setLogin(false); renderNewRoom(); renderNewTable(); renderSchedHost(); chat.refresh(); toast('All set! Pick a game below', 'good'); } });
+if (qs.get('login') === '1') { if (back && be.session() && !be.session().user.is_anonymous) goBack(); else openLogin(); }
 renderNewRoom(); renderNewTable();
 await Promise.all([load(), loadTables(), loadTopboard()]);
 renderSchedHost();
