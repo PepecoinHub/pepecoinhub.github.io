@@ -1510,7 +1510,7 @@
   try { booted = sessionStorage.getItem('pondos-boot'); sessionStorage.setItem('pondos-boot', '1'); } catch (e) {}
   if (!booted && !REDUCE && mainEl) {
     var boot = el('div', { class: 'boot', 'aria-hidden': 'true' });
-    boot.innerHTML = '<div class="boot-in"><img class="boot-coin" src="img/coin-spin.webp" alt="" width="120" height="120"><p class="boot-name">Pond<b>OS</b> <span>98 Second Frog Edition</span></p>' +
+    boot.innerHTML = '<div class="boot-in"><img class="boot-coin" src="img/pep-loading.webp" alt="" width="180" height="180"><p class="boot-name">Pond<b>OS</b> <span>98 Second Frog Edition</span></p>' +
       '<ol class="boot-log"></ol><div class="boot-bar"><i></i></div><p class="boot-skip">click or press any key to skip</p></div>';
     document.body.appendChild(boot);
     root.classList.add('booting');
