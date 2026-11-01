@@ -190,6 +190,9 @@
     var lanItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/gif-080-still.webp" alt="" width="28" height="28"><span>LAN Party chat</span>');
     lanItem.addEventListener('click', function () { setOpen(false); lanParty(); });
     smMain.appendChild(lanItem);
+    var themeItem = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">🌓</span><span>Day / night mode</span>');
+    themeItem.addEventListener('click', function () { setOpen(false); if (themeBtn) themeBtn.click(); });
+    smMain.appendChild(themeItem);
     smMain.appendChild(arrange);
     smMain.appendChild(el('hr'));
     smMain.appendChild(sd);

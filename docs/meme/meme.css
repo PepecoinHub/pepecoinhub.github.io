@@ -914,3 +914,10 @@ footer.foot a { color: #edf3e3; }
 :root.pondos { --wall-pos: 28% 50%; }
 @media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) { --wall-pos: 88% 30%; } }
 :root.pondos[data-theme="dark"] { --wall-pos: 88% 30%; }
+/* phone: the Start menu opens just above the taskbar (the 98 rule above pushed it off screen) */
+@media (max-width: 760px) {
+  .pondos .nav.startmenu { position: fixed; top: auto !important; bottom: 44px !important; left: 4px; right: 4px; width: auto; max-height: calc(100vh - 60px); max-height: calc(100dvh - 60px); }
+  .pondos .tray .themebtn { font-size: 1.15rem; width: 32px; }
+}
+@media (max-width: 760px) and (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) { --wall-pos: 96% 12%; } }
+@media (max-width: 760px) { :root.pondos[data-theme="dark"] { --wall-pos: 96% 12%; } }
