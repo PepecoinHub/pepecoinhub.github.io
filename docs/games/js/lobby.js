@@ -11,6 +11,11 @@ if (be.kind === 'none') {   // no game server yet: only the offline "Play vs bot
 paintMe(be);
 let lobby = null, offset = 0, canHost = false;
 let tmode = null, tgame = null;   // mini games: 'fren' | 'bot', and the picked game
+{ // PondOS can open the lobby with a game and "play with a fren" already picked
+  const q = new URLSearchParams(location.search);
+  if (['fren', 'bot'].includes(q.get('tmode'))) tmode = q.get('tmode');
+  if (['chess', 'checkers', 'connect4', 'battleship'].includes(q.get('tgame'))) tgame = q.get('tgame');
+}
 const MODE_LABEL = { kalambury: 'Draw & Guess', obrazek: 'Pepe Pictures' };
 const TGAME = { chess: ['♟️', 'Chess'], checkers: ['⚫', 'Checkers'], connect4: ['🔴', 'Connect Four'], battleship: ['🚢', 'Sea Battle'] };
 const TDESC = {

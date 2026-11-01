@@ -1129,23 +1129,50 @@
   }
 
   // ---------- board games and Pepe Miner from PEP Games, as app windows ----------
+  // a game window with two tabs: play the bot here, or "LAN Party" (open a table and invite a fren, or join one)
+  function tabbedGame(id, title, icon, tabs, width) {
+    var A = openApp(id, title, icon, function (A) {
+      A.body.innerHTML = '<div class="tabs98" role="tablist">' + tabs.map(function (t, i) { return '<button type="button" role="tab" data-t="' + i + '" aria-selected="' + (i === 0) + '">' + t[0] + '</button>'; }).join('') + '</div>' +
+        '<div class="tabpane"><div class="app-row tab-extra"></div><iframe class="app-frame" title="' + esc(title) + '"></iframe></div>';
+      var fr = A.body.querySelector('iframe'), extra = A.body.querySelector('.tab-extra');
+      var pick = function (i) {
+        A.body.querySelectorAll('[role=tab]').forEach(function (b) { b.setAttribute('aria-selected', String(+b.getAttribute('data-t') === i)); });
+        var t = tabs[i]; extra.innerHTML = ''; extra.hidden = !t[2];
+        if (t[2]) t[2](extra, function (u) { fr.src = u; });
+        fr.src = typeof t[1] === 'function' ? t[1]() : t[1];
+      };
+      A.body.querySelectorAll('[role=tab]').forEach(function (b) { b.addEventListener('click', function () { pick(+b.getAttribute('data-t')); }); });
+      pick(0);
+    }, width || 860);
+    A.host.style.top = '12px';
+    return A;
+  }
   function boardGame(key, name) {
-    var A = openApp('bg-' + key, name + ' - vs the bot', 'pond-playground', function (A) {
-      var src = function (lv) { return BASE + 'games/table.html?bot=' + key + '&level=' + lv + '&embed=1'; };
-      A.body.innerHTML = '<div class="app-row"><span class="grow">Difficulty</span>' + ['easy', 'medium', 'hard'].map(function (l) { return '<button type="button" class="app-btn" data-l="' + l + '" aria-pressed="' + (l === 'medium') + '">' + l.charAt(0).toUpperCase() + l.slice(1) + '</button>'; }).join('') + '</div>' +
-        '<iframe class="app-frame" src="' + src('medium') + '" title="' + name + '"></iframe>';
-      var fr = A.body.querySelector('iframe');
-      A.body.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { A.body.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); fr.src = src(b.getAttribute('data-l')); }); });
-    }, 820);
-    A.host.style.top = '16px';
+    var G = BASE + 'games/';
+    var bot = function (lv) { return G + 'table.html?bot=' + key + '&level=' + lv + '&embed=1'; };
+    if (window.innerWidth < 760) { location.href = bot('medium').replace('&embed=1', ''); return; }
+    tabbedGame('bg-' + key, name, 'pond-playground', [
+      ['vs the bot', bot('medium'), function (row, go) {
+        row.innerHTML = '<span class="grow">Difficulty</span>' + ['easy', 'medium', 'hard'].map(function (l) { return '<button type="button" class="app-btn" data-l="' + l + '" aria-pressed="' + (l === 'medium') + '">' + l.charAt(0).toUpperCase() + l.slice(1) + '</button>'; }).join('');
+        row.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { row.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); go(bot(b.getAttribute('data-l'))); }); });
+      }],
+      ['LAN Party: play with frens', G + '?embed=1&only=tables&tmode=fren&tgame=' + key + '#tables', function (row) {
+        row.innerHTML = '<span class="grow">Open a table and send the invite link to a fren, or sit down at an open table. Needs a <a href="#" class="tab-logon">log on</a> (Discord or guest).</span>';
+        row.querySelector('.tab-logon').addEventListener('click', function (e) { e.preventDefault(); logOn(); });
+      }]
+    ], 860);
   }
   // Draw & Guess (charades with other players): the PEP Games lobby opens on its rooms, inside a window
   function drawGuess() {
-    if (window.innerWidth < 760) { location.href = BASE + 'games/#game-dg'; return; }
-    var A = openApp('dg', 'Draw & Guess - PEP charades', 'gif-061-still', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/?embed=1#game-dg" title="Draw and Guess"></iframe>';
-    }, 1000);
-    A.host.style.top = '16px';
+    var G = BASE + 'games/';
+    if (window.innerWidth < 760) { location.href = G + '#game-dg'; return; }
+    tabbedGame('dg', 'Draw & Guess - PEP charades', 'gif-061-still', [
+      ['LAN Party: rooms', G + '?embed=1&only=dg#game-dg', function (row) {
+        row.innerHTML = '<span class="grow">Start a room and share the link with frens (up to 12 players), join an open room, or type a room code. Needs a <a href="#" class="tab-logon">log on</a> (Discord or guest).</span>';
+        row.querySelector('.tab-logon').addEventListener('click', function (e) { e.preventDefault(); logOn(); });
+      }],
+      ['How to play', G + 'rules.html?embed=1', null]
+    ], 980);
   }
   function minerApp() {
     var A = openApp('miner', 'Pepe Miner', 'pickaxe', function (A) {
@@ -1315,7 +1342,7 @@
   // ---------- LAN Party: the PEP Games lobby chat in a window ----------
   // Same chat as PEP Games (Supabase gry_lobby_chat / gry_lobby_say). Reading is open to everyone; writing
   // needs a PEP Games sign-in (Discord, or a guest nickname), which lives in this browser's storage.
-  var EMO = ' chair cheer crayon crowd hug hurry loading news peek pep ready scream serious smoke torch waiting ';
+  var EMO = ' gmfren heart shh wen facts hmm sleepy bigbrain peek ready waiting pep cheer torch hug chair crayon smoke scream serious hurry news loading crowd ';
   function anySession() {
     try { var s = JSON.parse(localStorage.getItem('sb-azbwciqfbsdpwubznncg-auth-token') || 'null'); if (s && s.access_token && s.expires_at * 1000 > Date.now() + 30000) return s; } catch (e) {}
     return null;
@@ -1345,7 +1372,7 @@
       A.body.innerHTML = '<div class="app-row"><span class="grow"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online in the pond</span></div>' +
         '<div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
         '<div class="emo-pop" hidden role="group" aria-label="Emotes">' + EMO.trim().split(' ').map(function (c) { return '<button type="button" data-e="' + c + '" title=":' + c + ':"><img src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="32" height="32" loading="lazy"></button>'; }).join('') + '</div>' +
-        '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes">😀</button><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
+        '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + BASE + 'games/img/emotes/pep.webp" alt="" width="22" height="22"></button><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
         '<p class="hs-note lan-note"></p>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input'), note = A.body.querySelector('.lan-note');
       var last = 0, seen = {}, timer = 0, alive = true, first = true;
