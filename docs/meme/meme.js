@@ -545,7 +545,25 @@
       var b = 'Block ' + fmt.int(n.rows[n.rows.length - 1][1]);
       wins.forEach(function (W) { if (W.status) W.status.querySelector('.st-r').textContent = b; });
     }).catch(function () {});
-    var first = null; wins.forEach(function (w) { if (!first && !w.host.closest('[hidden]')) first = w; });
+    // the meme home starts like a fresh desktop: only the welcome window is open, the rest wait on the
+    // taskbar and in a "Open more" row inside the welcome window, to be explored one by one
+    if (PAGE === 'index') {
+      var hero = null;
+      wins.forEach(function (w) { if (w.body.classList.contains('hero')) hero = w; });
+      if (hero) {
+        var row = el('div', { class: 'win-launch' }, '<p>Explore the pond, open a window:</p>');
+        wins.forEach(function (w) {
+          if (w === hero || w.body.classList.contains('chooser')) return;
+          w.state = 'min'; w.host.classList.add('is-min'); sync(w);
+          var b = el('button', { type: 'button', class: 'btn' }, '<img src="' + w.task.querySelector('img').getAttribute('src') + '" alt="" width="16" height="16"> ' + esc(w.title.split(' - ')[0]));
+          b.addEventListener('click', function () { setState(w, 'open'); });
+          row.appendChild(b);
+        });
+        var ctas = hero.body.querySelector('.ctas');
+        if (ctas) ctas.parentNode.insertBefore(row, ctas.nextSibling); else hero.win.insertBefore(row, hero.status || null);
+      }
+    }
+    var first = null; wins.forEach(function (w) { if (!first && w.state === 'open' && !w.host.closest('[hidden]')) first = w; });
     focusW(first);
     // "Show desktop" at the end of the tray: minimizes every window to see the wallpaper, a second click brings them back
     var trayEl = document.querySelector('.tray');
