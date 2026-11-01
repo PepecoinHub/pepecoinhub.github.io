@@ -914,3 +914,18 @@ footer.foot a { color: #edf3e3; }
 :root.pondos { --wall-pos: 28% 50%; }
 @media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) { --wall-pos: 88% 30%; } }
 :root.pondos[data-theme="dark"] { --wall-pos: 88% 30%; }
+/* phone: the Start menu opens just above the taskbar (the 98 rule above pushed it off screen) */
+@media (max-width: 760px) {
+  .pondos .nav.startmenu { position: fixed; top: auto !important; bottom: 44px !important; left: 4px; right: 4px; width: auto; max-height: calc(100vh - 60px); max-height: calc(100dvh - 60px); }
+  .pondos .tray .themebtn { font-size: 1.15rem; width: 32px; }
+}
+@media (max-width: 760px) and (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) { --wall-pos: 96% 12%; } }
+@media (max-width: 760px) { :root.pondos[data-theme="dark"] { --wall-pos: 96% 12%; } }
+.win-launch { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px; background: var(--chrome); box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px -1px 0 var(--chrome-lo); font: 400 12px/1.3 var(--f-chrome); color: var(--ink); }
+.win-launch p { margin: 0 4px 0 0; font-weight: 700; }
+.pondos .win-launch .btn { min-width: 0; padding: 5px 9px; gap: 6px; }
+.win-launch .btn img { width: 16px; height: 16px; border-radius: 3px; object-fit: cover; }
+.pondos .win-launch p { flex-basis: 100%; }
+.tv-screen { position: relative; aspect-ratio: 16 / 9; background: #000; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); }
+.tv-screen iframe { position: absolute; inset: 2px; width: calc(100% - 4px); height: calc(100% - 4px); border: 0; }
+.icons img[src$="pond-tv.webp"] { object-fit: contain; background: none; box-shadow: none; border: 0; }
