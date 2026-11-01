@@ -688,3 +688,8 @@ details.lb #topboard-body { margin-top: 14px; }
 .gcards.off { opacity: .45; pointer-events: none; filter: grayscale(.6); }
 .topts-box { margin-top: 16px; padding: 16px; border-radius: 16px; border: 2px solid var(--accent); background: linear-gradient(160deg, var(--accent-wash), var(--surface) 70%); }
 .no-server .tmode-fren { display: none; }
+
+/* ?embed=1 (an app window in PondOS): only the game, no site chrome */
+html.embed .site-head, html.embed .g-sub, html.embed .site-foot, html.embed .skip, html.embed .head-phone, html.embed .to-top, html.embed .back-top { display: none !important; }
+html.embed body { padding-top: 0 !important; }
+html.embed main.wrap { margin-top: 0; padding-top: 10px; }

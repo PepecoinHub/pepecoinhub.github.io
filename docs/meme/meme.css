@@ -875,4 +875,27 @@ footer.foot a { color: #edf3e3; }
 .folder button { width: 100%; display: grid; justify-items: center; gap: 4px; padding: 6px 2px; border: 1px dotted transparent; background: none; color: var(--ink); font: 400 12px/1.2 var(--f-chrome); cursor: pointer; }
 .folder button img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
 .folder button.sel span, .folder button:focus-visible span { background: var(--sel); color: #fff; }
-.app-frame { display: block; width: 100%; height: min(72vh, 760px); border: 0; background: #fff; box-shadow: inset 1px 1px 0 var(--chrome-lo); }
+.app-frame { display: block; width: 100%; height: min(calc(100vh - 150px), 900px); border: 0; background: #fff; box-shadow: inset 1px 1px 0 var(--chrome-lo); }
+/* ---------- high scores ---------- */
+.hs-submit { flex-wrap: wrap; padding-top: 4px; border-top: 1px solid var(--chrome-lo); }
+.hs-submit input { margin-left: 6px; padding: 4px 6px; width: 150px; font: 400 12px var(--f-chrome); border: 0; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); background: var(--pane); color: var(--ink); }
+.hs-note { flex-basis: 100%; font-size: 11px; color: var(--muted); }
+.hs-err { flex-basis: 100%; color: #b3261e; font-size: 12px; }
+.hs-ok { display: inline-grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; background: #2f8a4c; color: #fff; font-size: 10px; font-weight: 700; vertical-align: 1px; }
+.hs-tabs .app-btn[aria-pressed="true"] { box-shadow: inset -1px -1px 0 var(--chrome-hi), inset 1px 1px 0 var(--chrome-dk), inset -2px -2px 0 var(--chrome-face), inset 2px 2px 0 var(--chrome-lo) !important; }
+.hs-list li { grid-template-columns: 26px minmax(0, 1fr) auto; }
+.folder .emo { display: grid; place-items: center; width: 40px; height: 40px; font-style: normal; font-size: 30px; line-height: 1; }
+.app-row .app-btn[aria-pressed="true"] { box-shadow: inset -1px -1px 0 var(--chrome-hi), inset 1px 1px 0 var(--chrome-dk), inset -2px -2px 0 var(--chrome-face), inset 2px 2px 0 var(--chrome-lo) !important; }
+
+/* ---------- Professor Pepe ---------- */
+.prof { position: fixed; right: 12px; bottom: 50px; z-index: 82; display: grid; justify-items: end; gap: 6px; pointer-events: none; }
+.prof > * { pointer-events: auto; }
+.prof-me { padding: 0; border: 0; background: none; cursor: pointer; filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.35)); }
+.prof-me img { display: block; width: 84px; height: auto; border-radius: 8px; border: 2px solid #0a0a0a; transition: transform 0.15s; }
+.prof-me:hover img { transform: rotate(-4deg) translateY(-2px); }
+.prof-bubble { position: relative; width: min(300px, calc(100vw - 30px)); padding: 10px 12px; background: #fffbe0; color: #142016; border: 1px solid #0a0a0a; border-radius: 8px; font: 400 13px/1.45 var(--f-chrome); box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3); }
+.prof-bubble::after { content: ""; position: absolute; right: 30px; bottom: -8px; width: 14px; height: 14px; background: #fffbe0; border-right: 1px solid #0a0a0a; border-bottom: 1px solid #0a0a0a; transform: rotate(45deg); }
+.prof-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.prof-btns .app-btn { padding: 5px 9px; font-weight: 400; font-size: 12px; }
+.pondos .balloon { right: 110px; }
+@media (max-width: 760px) { .prof-me img { width: 56px; } .pondos .balloon { right: 74px; } .prof { right: 8px; } }
