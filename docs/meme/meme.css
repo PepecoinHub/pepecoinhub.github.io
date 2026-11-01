@@ -6,7 +6,7 @@
   --frog: #4f9f45; --frog-deep: #1f5c28; --frog-wash: #d9eecd; --on-frog: #ffffff;
   --shirt: #2c5ac4; --shirt-wash: #dde6fb; --on-shirt: #ffffff; --lips: #b3503a; --lips-wash: #f7e0d7;
   --gold: #f2b544; --gold-wash: #fcefd1; --receipt: #fffdf4; --mark: #ffe066; --night: #222222;
-  --f-display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --f-display: "Figtree", "Segoe UI", system-ui, sans-serif;
   --f-body: "Figtree", "Segoe UI", system-ui, sans-serif;
   --f-mono: "Space Mono", ui-monospace, Menlo, monospace;
   --f-hand: "Gochi Hand", "Comic Sans MS", cursive;
@@ -1073,3 +1073,4 @@ footer.foot a { color: #edf3e3; }
 @media (prefers-reduced-motion: reduce) { .ptv-run { animation: none; padding-left: 10px; } .ptv-live { animation: none; } .ptv-scene { transition: none; } }
 
 .lan-form .lan-nick { flex: 0 1 110px; }
+.pane > .sec.off img { display: none; }   /* pictures in the hidden sections of a book window load when the section opens */

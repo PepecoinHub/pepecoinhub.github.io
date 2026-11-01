@@ -9,8 +9,8 @@
 <link rel="icon" href="img/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=VT323&display=swap">
-<link rel="stylesheet" href="meme.css?v=20261101wall2">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=VT323&display=swap">
+<link rel="stylesheet" href="meme.css?v=20261101lite">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <style>
 [hidden] { display: none !important; }
@@ -137,16 +137,16 @@ img.pow-logo { background: #fff; }
     <p class="lede">The live PEP price and chart, Pepe (PEPE) on the same chart if you want it, and the plain arithmetic of what a ×100 would mean.</p>
     <p class="sticker red" id="nfa" role="note" style="justify-self:start;white-space:normal">⚠️ NFA: information only. Nothing here is a promise or a forecast.</p>
   </div>
-  <figure class="panel meme blue"><img src="img/charts.webp" alt="Pepe in front of a wall of trading charts" width="640" height="432"><figcaption>me after drawing 47 lines</figcaption></figure>
+  <figure class="panel meme blue"><img src="img/charts.webp" alt="Pepe in front of a wall of trading charts" width="640" height="432" loading="lazy"><figcaption>me after drawing 47 lines</figcaption></figure>
 </div>
 
 <section class="in" aria-labelledby="not-pepe">
   <h2 id="not-pepe" class="skip">PEP is not PEPE</h2>
   <div class="panel notpepe">
     <div class="np-pair">
-      <div class="np-coin"><img src="img/pep-logo.webp" alt="" width="48" height="48"><b>Pepecoin (PEP)</b><span>Own blockchain, proof of work, mined since 2024</span></div>
+      <div class="np-coin"><img src="img/pep-logo.webp" alt="" width="48" height="48" loading="lazy"><b>Pepecoin (PEP)</b><span>Own blockchain, proof of work, mined since 2024</span></div>
       <span class="np-ne" aria-hidden="true">≠</span>
-      <div class="np-coin pepe"><img src="img/pepe.png" alt="" width="48" height="48"><b>Pepe (PEPE)</b><span>ERC-20 token on Ethereum, since 2023</span></div>
+      <div class="np-coin pepe"><img src="img/pepe.png" alt="" width="48" height="48" loading="lazy"><b>Pepe (PEPE)</b><span>ERC-20 token on Ethereum, since 2023</span></div>
     </div>
     <p>PEP and PEPE are not the same coin. This page is about Pepecoin (PEP); Pepe (PEPE) has its own price and appears here only for comparison. <a href="which-pepecoin.html">Which frog is which →</a></p>
   </div>
@@ -181,7 +181,7 @@ img.pow-logo { background: #fff; }
       <label class="toggle"><input type="checkbox" id="overlay"><span>Overlay Pepe (PEPE)</span></label>
     </div>
     <div class="chart-legend"><span class="k pep">Pepecoin (PEP)</span><span class="k pepe" id="legend-pepe" hidden>Pepe (PEPE)</span><span class="chart-change" id="chart-change"></span></div>
-    <div class="chart-wrap"><div class="chart pchart" id="chart"></div><div class="chart-tip" id="chart-tip" hidden></div><p class="chart-msg" id="chart-msg">Loading the chart…</p><picture id="chart-frog"><source srcset="img/pep-loading-still.webp" media="(prefers-reduced-motion: reduce)"><img class="load-frog" src="img/pep-loading.webp" alt="" width="260" height="260"></picture></div>
+    <div class="chart-wrap"><div class="chart pchart" id="chart"></div><div class="chart-tip" id="chart-tip" hidden></div><p class="chart-msg" id="chart-msg">Loading the chart…</p><picture id="chart-frog"><source srcset="img/pep-loading-still.webp" media="(prefers-reduced-motion: reduce)"><img class="load-frog" src="img/pep-loading.webp" alt="" width="260" height="260" loading="lazy"></picture></div>
     <p class="src" id="chart-corr"></p>
     <p class="src">The line is the PEP price in US dollars. With Pepe switched on, both lines show the % change from the start of the period, because one PEPE costs far less than one PEP and the two prices would not fit on one axis. Hover or tap the chart for exact values.</p>
   </div>
@@ -230,13 +230,13 @@ img.pow-logo { background: #fff; }
   <div class="head"><p class="kicker">Mined memecoins only</p><h2 id="pow">Proof-of-work memecoins</h2></div>
   <p class="pow-lead" id="pow-lead" style="margin-bottom:16px">Pepecoin is the second-largest proof-of-work memecoin by market cap, after Dogecoin.</p>
   <ol class="panel powlist" id="pow-list">
-    <li class="pow-row" data-id="dogecoin" data-cap="13240000000"><span class="pow-n">1</span><img class="pow-logo" src="img/doge.png" alt="" width="30" height="30"><span class="pow-name"><b>Dogecoin</b> <small>DOGE</small></span><span class="pow-bar"><i style="width: 85.4%"></i></span><span class="pow-cap">$13.2B</span></li>
-    <li class="pow-row self" data-id="pepecoin-network" data-cap="9170000"><span class="pow-n">2</span><img class="pow-logo" src="img/pep-logo.webp" alt="" width="30" height="30"><span class="pow-name"><b>Pepecoin</b> <small>PEP</small></span><span class="pow-bar"><i style="width: 32.7%"></i></span><span class="pow-cap">$9.17M</span></li>
+    <li class="pow-row" data-id="dogecoin" data-cap="13240000000"><span class="pow-n">1</span><img class="pow-logo" src="img/doge.png" alt="" width="30" height="30" loading="lazy"><span class="pow-name"><b>Dogecoin</b> <small>DOGE</small></span><span class="pow-bar"><i style="width: 85.4%"></i></span><span class="pow-cap">$13.2B</span></li>
+    <li class="pow-row self" data-id="pepecoin-network" data-cap="9170000"><span class="pow-n">2</span><img class="pow-logo" src="img/pep-logo.webp" alt="" width="30" height="30" loading="lazy"><span class="pow-name"><b>Pepecoin</b> <small>PEP</small></span><span class="pow-bar"><i style="width: 32.7%"></i></span><span class="pow-cap">$9.17M</span></li>
     <li class="pow-row" data-id="monacoin" data-cap="4460000"><span class="pow-n">3</span><span class="pow-logo" aria-hidden="true">M</span><span class="pow-name"><b>MonaCoin</b> <small>MONA</small></span><span class="pow-bar"><i style="width: 27.5%"></i></span><span class="pow-cap">$4.46M</span></li>
-    <li class="pow-row" data-id="bellscoin" data-cap="2580000"><span class="pow-n">4</span><img class="pow-logo" src="../assets/coins/bells.png" alt="" width="30" height="30"><span class="pow-name"><b>Bellscoin</b> <small>BELLS</small></span><span class="pow-bar"><i style="width: 23.5%"></i></span><span class="pow-cap">$2.58M</span></li>
-    <li class="pow-row" data-id="dingocoin" data-cap="2575000"><span class="pow-n">5</span><img class="pow-logo" src="../assets/coins/dingo.png" alt="" width="30" height="30"><span class="pow-name"><b>Dingocoin</b> <small>DINGO</small></span><span class="pow-bar"><i style="width: 23.5%"></i></span><span class="pow-cap">$2.58M</span></li>
-    <li class="pow-row" data-id="luckycoin" data-cap="1050000"><span class="pow-n">6</span><img class="pow-logo" src="../assets/coins/lky.png" alt="" width="30" height="30"><span class="pow-name"><b>Luckycoin</b> <small>LKY</small></span><span class="pow-bar"><i style="width: 17.0%"></i></span><span class="pow-cap">$1.05M</span></li>
-    <li class="pow-row" data-id="junkcoin" data-cap="162000"><span class="pow-n">7</span><img class="pow-logo" src="../assets/coins/jkc.png" alt="" width="30" height="30"><span class="pow-name"><b>Junkcoin</b> <small>JKC</small></span><span class="pow-bar"><i style="width: 3.5%"></i></span><span class="pow-cap">$162K</span></li>
+    <li class="pow-row" data-id="bellscoin" data-cap="2580000"><span class="pow-n">4</span><img class="pow-logo" src="../assets/coins/bells.png" alt="" width="30" height="30" loading="lazy"><span class="pow-name"><b>Bellscoin</b> <small>BELLS</small></span><span class="pow-bar"><i style="width: 23.5%"></i></span><span class="pow-cap">$2.58M</span></li>
+    <li class="pow-row" data-id="dingocoin" data-cap="2575000"><span class="pow-n">5</span><img class="pow-logo" src="../assets/coins/dingo.png" alt="" width="30" height="30" loading="lazy"><span class="pow-name"><b>Dingocoin</b> <small>DINGO</small></span><span class="pow-bar"><i style="width: 23.5%"></i></span><span class="pow-cap">$2.58M</span></li>
+    <li class="pow-row" data-id="luckycoin" data-cap="1050000"><span class="pow-n">6</span><img class="pow-logo" src="../assets/coins/lky.png" alt="" width="30" height="30" loading="lazy"><span class="pow-name"><b>Luckycoin</b> <small>LKY</small></span><span class="pow-bar"><i style="width: 17.0%"></i></span><span class="pow-cap">$1.05M</span></li>
+    <li class="pow-row" data-id="junkcoin" data-cap="162000"><span class="pow-n">7</span><img class="pow-logo" src="../assets/coins/jkc.png" alt="" width="30" height="30" loading="lazy"><span class="pow-name"><b>Junkcoin</b> <small>JKC</small></span><span class="pow-bar"><i style="width: 3.5%"></i></span><span class="pow-cap">$162K</span></li>
   </ol>
   <p class="src" style="margin-top:12px">Memecoins mined with proof of work. CoinMarketCap’s PoW list includes Dogecoin, Pepecoin, MonaCoin and Dingocoin; Bellscoin, Luckycoin and Junkcoin are merged-mined with Litecoin like Pepecoin, so they are added here. Market caps: CoinGecko live, or CoinMarketCap on October 18, 2026.</p>
 </section>
@@ -283,7 +283,7 @@ img.pow-logo { background: #fff; }
 
 <footer class="foot"></footer>
 <script src="../prices.js?v=20261031data1"></script>
-<script src="meme.js?v=20261101wall2"></script>
+<script src="meme.js?v=20261101lite"></script>
 <script src="../live.js?v=20261012d" defer></script>
 <script src="../price.js?v=20261031data1" defer></script>
 <script>
