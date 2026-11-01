@@ -1621,7 +1621,9 @@
   // ---------- boot screen, once per visit ----------
   var booted = '1';
   try { booted = sessionStorage.getItem('pondos-boot'); sessionStorage.setItem('pondos-boot', '1'); } catch (e) {}
-  if (!booted && !REDUCE && mainEl) {
+  // search engine crawlers get the page straight away, without the boot screen in front of it
+  var BOT = /bot|crawl|spider|slurp|lighthouse|inspectiontool/i.test(navigator.userAgent || '');
+  if (!booted && !REDUCE && !BOT && mainEl) {
     var boot = el('div', { class: 'boot', 'aria-hidden': 'true' });
     boot.innerHTML = '<div class="boot-in"><img class="boot-coin" src="img/pep-loading.webp" alt="" width="180" height="180"><p class="boot-name">Pond<b>OS</b> <span>98 Second Frog Edition</span></p>' +
       '<ol class="boot-log"></ol><div class="boot-bar"><i></i></div><p class="boot-skip">click or press any key to skip</p></div>';
