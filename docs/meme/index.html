@@ -48,7 +48,8 @@
       </aside>
     </div>
     <div class="strip">
-      <figure class="panel comic p1"><picture><source srcset="img/gif-015-big-still.webp" media="(prefers-reduced-motion: reduce)"><img src="img/gif-015-big.webp" alt="Pepe waving good morning, with a big GM" width="400" height="400"></picture><figcaption class="cap">GIF: Lily in Pyjamas</figcaption></figure>
+      <figure class="panel comic p1"><picture id="gm-pic"><source srcset="img/gm-015-still.webp" media="(prefers-reduced-motion: reduce)"><img alt="Pepe saying good morning" width="300" height="300"></picture><noscript><img src="img/gm-015.webp" alt="Pepe waving good morning, with a big GM" width="300" height="300"></noscript><figcaption class="cap">GIF: Lily in Pyjamas</figcaption></figure>
+      <script>/* a different good-morning Pepe on every visit; only the chosen one is downloaded */(function(){var G=[['015','Pepe waving good morning, with a big GM',300,300],['019','Pepe popping out of a hole: hello!',320,241],['041','Pepe waving hello',320,213],['073','Pepe saying henlo through a glass',320,225],['033','Pepe pointing at himself: is for me?',320,321]],k=0;try{k=(+localStorage.getItem('gm-last')+1+Math.floor(Math.random()*(G.length-1)))%G.length;localStorage.setItem('gm-last',k)}catch(e){k=Math.floor(Math.random()*G.length)}var g=G[k],p=document.getElementById('gm-pic'),i=p.querySelector('img');p.querySelector('source').srcset='img/gm-'+g[0]+'-still.webp';i.alt=g[1];i.width=g[2];i.height=g[3];i.src='img/gm-'+g[0]+'.webp'})();</script>
       <figure class="panel comic p2">
         <p class="bubble">Every number here has a source. I checked, fren.</p>
         <img src="img/pepe-search.webp" alt="Pepe looking through a magnifying glass" width="250" height="218">
