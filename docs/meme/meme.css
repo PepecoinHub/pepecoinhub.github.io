@@ -481,7 +481,7 @@ footer.foot a { color: #edf3e3; }
 @media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) { --wall: url("img/wall-night.webp"); } }
 :root.pondos[data-theme="dark"] { --wall: url("img/wall-night.webp"); }
 .pondos body { font-size: 15px; padding-bottom: 46px; min-height: 100vh; background: transparent; }
-.pondos body::after { content: ""; position: fixed; inset: 0; z-index: -1; background: var(--wall) center / cover no-repeat, var(--desk); }
+.pondos body::after { content: ""; position: fixed; inset: 0; z-index: -1; background: var(--wall) var(--wall-pos, center) / cover no-repeat, var(--desk); }
 .pondos .ticker, .pondos body::before { display: none; }
 .pondos.has-max body, .pondos.booting body { overflow: hidden; }
 
@@ -906,3 +906,11 @@ footer.foot a { color: #edf3e3; }
 @media (prefers-reduced-motion: reduce) { .lan-dot { animation: none; } }
 /* inside windows the side picture no longer pushes the heading to the bottom */
 .pondos .head.pic, .pondos .win-body.pagehead { align-items: center; }
+/* "Show desktop": the icons appear on every page; on a phone the button is easier to spot */
+.pondos.desk-view body .desk { display: block !important; }
+.pondos.desk-view main > .note { display: none; }
+@media (max-width: 760px) { .pondos .show-desk { width: 16px; } }
+/* keep each wallpaper's Pepe in view when a narrow screen crops the picture */
+:root.pondos { --wall-pos: 28% 50%; }
+@media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) { --wall-pos: 88% 30%; } }
+:root.pondos[data-theme="dark"] { --wall-pos: 88% 30%; }

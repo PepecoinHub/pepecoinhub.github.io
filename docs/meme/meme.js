@@ -550,10 +550,12 @@
       var peek = el('button', { type: 'button', class: 'show-desk', title: 'Show desktop', 'aria-pressed': 'false' }, '<span class="sr">Show desktop</span>');
       var hiddenByPeek = [];
       peek.addEventListener('click', function () {
-        if (hiddenByPeek.length) { hiddenByPeek.forEach(function (w) { if (w.state === 'min') setState(w, 'open'); }); hiddenByPeek = []; peek.setAttribute('aria-pressed', 'false'); return; }
+        if (hiddenByPeek.length) { hiddenByPeek.forEach(function (w) { if (w.state === 'min') setState(w, 'open'); }); hiddenByPeek = []; peek.setAttribute('aria-pressed', 'false'); root.classList.remove('desk-view'); return; }
         wins.forEach(function (w) { if (w.state === 'open' && !w.host.closest('[hidden]')) { hiddenByPeek.push(w); setState(w, 'min'); } });
         peek.setAttribute('aria-pressed', 'true');
+        root.classList.add('desk-view');   // the desktop icons show on every page, also on a phone
         window.scrollTo(0, 0);
+        if (window.innerWidth < 760) balloon('Desktop', 'Your windows are minimized. Tap the green bar again to bring them back.', 'pep-logo');
       });
       trayEl.parentNode.appendChild(peek);
     }
