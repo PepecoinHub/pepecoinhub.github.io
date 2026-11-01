@@ -470,14 +470,15 @@ footer.foot a { color: #edf3e3; }
   --hard: transparent !important;
   /* one readable typeface for every heading and caption in PondOS (no pixel or handwriting fonts) */
   --f-pixel: var(--f-body); --f-display: var(--f-body); --f-hand: var(--f-body);
+  --lips: #9a3a26;   /* red numbers stay readable on the grey 98 panels */
   scroll-padding: 16px 0 64px;
 }
 @media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) {
   --desk: #0d1a13; --desk-2: #0a140f; --chrome: #2a302b; --chrome-hi: #4a544c; --chrome-lo: #121613; --chrome-dk: #000000;
-  --title: #3d8a57; --title-2: #2d6b43; --title-off: #3b453e; --pane: #17211a; --sel: #3d8a57; } }
+  --title: #3d8a57; --title-2: #2d6b43; --title-off: #3b453e; --pane: #17211a; --sel: #3d8a57; --lips: #f2906f; } }
 :root.pondos[data-theme="dark"] {
   --desk: #0d1a13; --desk-2: #0a140f; --chrome: #2a302b; --chrome-hi: #4a544c; --chrome-lo: #121613; --chrome-dk: #000000;
-  --title: #3d8a57; --title-2: #2d6b43; --title-off: #3b453e; --pane: #17211a; --sel: #3d8a57; }
+  --title: #3d8a57; --title-2: #2d6b43; --title-off: #3b453e; --pane: #17211a; --sel: #3d8a57; --lips: #f2906f; }
 /* wallpaper: Pepe behind the green hill by day, Pepe over the mountains at night */
 :root.pondos { background: var(--desk); --wall: url("img/wall-day.webp"); }
 @media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) { --wall: url("img/wall-night.webp"); } }
@@ -648,10 +649,10 @@ footer.foot a { color: #edf3e3; }
 @keyframes toastin { from { opacity: 0; transform: translateY(10px); } }
 
 /* ---------- boot ---------- */
-.boot { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 16px; background: #0b140f; color: #d9ecd9; transition: opacity 0.35s; }
+.boot { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 16px; background: #000; color: #d9ecd9; transition: opacity 0.35s; }
 .boot.out { opacity: 0; pointer-events: none; }
 .boot-in { width: min(520px, 100%); display: grid; justify-items: center; gap: 12px; }
-.boot-coin { width: 110px; height: 110px; }
+.boot-coin { width: 180px; height: 180px; border-radius: 12px; }
 .boot-name { font: 700 2.2rem/1 var(--f-pixel); color: #fff; }
 .boot-name b { color: #f2b544; }
 .boot-name span { font: 400 1.25rem var(--f-term); color: #9fbfa6; }
@@ -1010,3 +1011,63 @@ footer.foot a { color: #edf3e3; }
 .notepad-menu { display: flex; gap: 14px; padding: 2px 6px; font: 400 12px/1.6 var(--f-chrome); }
 .notepad { margin: 0; padding: 8px 10px; max-height: min(60vh, 460px); overflow: auto; white-space: pre-wrap; background: #fff; color: #000; font: 400 17px/1.25 var(--f-term);
   box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
+/* sea-creature ranks: in PondOS the box is a 98 panel (light or dark with the theme), so the text follows the theme */
+.pondos .ranksbox { color: var(--ink); }
+.pondos .rk .rr { color: var(--muted); font-family: var(--f-body); }
+.pondos .rk .rn { color: var(--ink); }
+.pondos .rk .rs { color: var(--frog-deep); }
+.pondos .rk.rest { border-top-color: var(--chrome-lo); }
+.pondos .cmp thead th.pep small { color: var(--muted); opacity: 1; }
+
+/* ---------- PEP Pager: a 2000s LCD pager pinned to the desktop ---------- */
+.pager { display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 7px 9px 7px 10px; margin: 0 0 10px; border-radius: 14px 14px 18px 18px;
+  background: linear-gradient(180deg, #3b3f44, #1c1e21 60%, #111214); box-shadow: inset 0 1px 0 rgba(255,255,255,.25), inset 0 -2px 0 rgba(0,0,0,.6), 0 4px 10px rgba(0,0,0,.45); color: #cfd3d6; }
+.pager-brand { flex: none; writing-mode: vertical-rl; transform: rotate(180deg); font: 700 8px/1 var(--f-chrome); letter-spacing: .12em; color: #9aa0a6; }
+.pager-lcd { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; padding: 5px 8px; border-radius: 4px; background: linear-gradient(180deg, #b6c79a, #9fb382); color: #17200f;
+  box-shadow: inset 2px 2px 0 rgba(0,0,0,.35), inset -1px -1px 0 rgba(255,255,255,.35); font: 400 22px/1 var(--f-term); text-shadow: 1px 1px 0 rgba(0,0,0,.12);
+  background-image: linear-gradient(180deg, #b6c79a, #9fb382), repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,.04) 2px 3px); background-blend-mode: multiply; }
+.pager-run { display: inline-block; animation: pager-scroll 40s linear infinite; }
+.pager:hover .pager-run { animation-play-state: paused; }
+@keyframes pager-scroll { to { transform: translateX(-50%); } }
+.pager-led { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #3cff6a; box-shadow: 0 0 6px #3cff6a; animation: pager-led 1.6s steps(1) infinite; }
+@keyframes pager-led { 50% { opacity: .25; } }
+@media (min-width: 1101px) {
+  .desk .pager { width: 188px; margin: 0 0 8px; }
+  .desk .pager-lcd { font-size: 19px; }
+  .desk .pager ~ .icons { height: calc(100% - 62px); }
+}
+@media (max-width: 1100px) { .desk .pager { max-width: 520px; } }
+@media (prefers-reduced-motion: reduce) { .pager-run { animation: none; } .pager-led { animation: none; } }
+.icons img[src$="shop-bag.webp"], .icons img[src$="pep-tv-ads.webp"] { object-fit: contain; background: none; box-shadow: none; border: 0; border-radius: 0; }
+
+/* ---------- PEP-TV Ads: late-night infomercials in a TV window ---------- */
+.ptv { position: relative; overflow: hidden; background: #1438a8; color: #fff; font-family: Impact, "Arial Narrow Bold", "Arial Black", sans-serif; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); }
+.ptv::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.45)); }
+.ptv-top { display: flex; align-items: center; gap: 10px; padding: 6px 10px; background: #000; font: 400 15px/1 var(--f-term); letter-spacing: .06em; }
+.ptv-top b { font: 400 18px/1 var(--f-term); }
+.ptv-live { background: #d41f1f; color: #fff; padding: 2px 8px; animation: pager-led 1.2s steps(1) infinite; }
+.ptv-ch { color: #9fe08a; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ptv-stage { position: relative; height: clamp(300px, 46vh, 380px); }
+.ptv-scene { position: absolute; inset: 0; padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 10px; opacity: 0; transform: scale(1.04); transition: opacity .35s, transform .5s; }
+.ptv-scene.on { opacity: 1; transform: none; }
+.ad-kick { margin: 0; color: #ffd400; font-size: clamp(15px, 2.4vw, 20px); text-transform: uppercase; letter-spacing: .02em; }
+.ad-big { margin: 0; font: 400 clamp(34px, 6.4vw, 60px)/.95 Impact, "Arial Narrow Bold", "Arial Black", sans-serif; text-transform: uppercase; letter-spacing: .01em; text-shadow: 3px 3px 0 #000; color: #fff; }
+.ad-big em { font-style: normal; color: #ffd400; }
+.ad-sub { margin: 0; max-width: 34em; font: 600 15px/1.35 var(--f-body); text-shadow: 1px 1px 0 #000; }
+.ad-fine { margin: 0; font: 400 13px/1.35 var(--f-body); color: #dfe6ff; }
+.ad-pic { max-height: 130px; width: auto; border: 3px solid #fff; box-shadow: 4px 4px 0 #000; background: #fff; }
+.ad-cta { display: inline-block; padding: 10px 16px; background: #d41f1f; color: #fff !important; text-decoration: none; text-transform: uppercase; font: 400 18px/1 Impact, "Arial Black", sans-serif; border: 3px solid #fff; box-shadow: 4px 4px 0 #000; cursor: pointer; }
+.ad-ba { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+.ad-ba figure { margin: 0; position: relative; padding: 26px 10px 10px; border: 3px solid #fff; box-shadow: 4px 4px 0 #000; display: grid; justify-items: center; gap: 8px; }
+.ad-ba b { position: absolute; left: -3px; top: -3px; padding: 3px 10px; font: 400 16px/1 Impact, "Arial Black", sans-serif; text-transform: uppercase; }
+.ad-before { background: #444; filter: grayscale(1); } .ad-before b { background: #222; }
+.ad-after { background: #fff4c8; color: #111; } .ad-after b { background: #2f8c48; color: #fff; }
+.ad-ba img { width: 90px; height: 90px; object-fit: contain; }
+.ad-ba figcaption { font: 600 13px/1.3 var(--f-body); text-align: center; }
+.ad-after figcaption { color: #1d6b3a; font: 400 17px/1.05 Impact, "Arial Black", sans-serif; text-transform: uppercase; }
+.ptv-crawl { display: flex; align-items: center; overflow: hidden; white-space: nowrap; background: #fff; color: #111; border-top: 3px solid #ffd400; font: 400 15px/1 Impact, "Arial Black", sans-serif; }
+.ptv-crawl b { flex: none; background: #d41f1f; color: #fff; padding: 7px 10px; font-weight: 400; z-index: 1; }
+.ptv-run { display: inline-block; padding: 7px 0 7px 12px; animation: pager-scroll 45s linear infinite; text-transform: uppercase; }
+.ptv-nfa { font: 400 11px var(--f-chrome); color: var(--muted); }
+@media (max-width: 760px) { .ad-ba img { width: 64px; height: 64px; } .ptv-nfa { display: none; } }
+@media (prefers-reduced-motion: reduce) { .ptv-run { animation: none; padding-left: 10px; } .ptv-live { animation: none; } .ptv-scene { transition: none; } }

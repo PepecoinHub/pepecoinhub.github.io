@@ -685,15 +685,16 @@
     var DESKTOP = [
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
-      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#logon', 'Log On', 'gif-085-still'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Recycle Bin', 'recycle-bin']
+      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#logon', 'Log On', 'gif-085-still'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Recycle Bin', 'recycle-bin'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#shop', 'Shop', 'shop-bag']
     ];
-    var ACT = { '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
     var desk = el('nav', { class: 'desk', 'aria-label': 'Desktop' });
     desk.innerHTML = '<ul class="icons">' + DESKTOP.map(function (d) { return '<li><a href="' + d[0] + '" data-id="' + esc(d[1]) + '"><img src="img/' + d[2] + '.webp" alt="" width="40" height="40"><span>' + d[1] + '</span></a></li>'; }).join('') + '</ul>';
     document.body.insertBefore(desk, mainEl);
+    setTimeout(pager, 0);
     var lanIcon = desk.querySelector('a[href="#lan"]');
     if (lanIcon) lanIcon.insertAdjacentHTML('beforeend', '<span class="lan-badge icon-badge" hidden><span class="lan-dot" aria-hidden="true"></span><span class="lan-n"></span></span>');
     var FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -1359,6 +1360,109 @@
     return A;
   }
 
+
+  // ---------- Shop: the official Pepecoin shop, in a new tab ----------
+  var SHOP = 'https://shop.pepecoin.com/';
+
+  // ---------- live numbers, shared by the PEP Pager and the PEP-TV crawl ----------
+  function liveFacts() {
+    var items = [];
+    var q = window.PepPrices ? window.PepPrices.quote().catch(function () { return null; }) : Promise.resolve(null);
+    return Promise.all([q, json('ticker.json').catch(function () { return null; }), json('network.json').catch(function () { return null; })]).then(function (r) {
+      var pq = r[0], t = r[1], n = r[2];
+      var price = pq && pq.usd != null ? pq : (t && t.price);
+      if (price && price.usd != null) items.push(['PEP', fmt.usd(price.usd) + (price.change_24h == null ? '' : ' ' + (price.change_24h < 0 ? '▼' : '▲') + fmt.pct(Math.abs(price.change_24h)))]);
+      if (t && t.hashrate) items.push(['HASHRATE', fmt.hash(t.hashrate.hs)]);
+      var last = n && n.rows && n.rows[n.rows.length - 1];
+      if (last) { items.push(['BLOCK', fmt.int(last[1])]); items.push(['SUPPLY', fmt.compact(last[2]) + ' PEP']); }
+      if (t && t.tops && t.tops['10'] != null) items.push(['TOP 10', fmt.pct(t.tops['10']) + ' of supply']);
+      items.push(['NFA', 'the frog is not a financial advisor']);
+      return items;
+    });
+  }
+
+  // ---------- PEP Pager: a 2000s LCD pager pinned to the desktop, scrolling the live numbers ----------
+  function pager() {
+    var desk = document.querySelector('.desk');
+    if (!desk || document.querySelector('.pager')) return;
+    var pg = el('a', { class: 'pager', href: 'price.html', title: 'PEP Pager: live numbers. Click for the price page.' },
+      '<span class="pager-brand">PEP-PAGER 2000</span><span class="pager-lcd"><span class="pager-run"></span></span><span class="pager-led" aria-hidden="true"></span>');
+    desk.insertBefore(pg, desk.firstChild);
+    var run = pg.querySelector('.pager-run');
+    var paint = function () {
+      liveFacts().then(function (items) {
+        var txt = items.map(function (i) { return i[0] + ' ' + i[1]; }).join('   ·   ') + '   ·   ';
+        run.textContent = txt + txt;
+        run.style.animationDuration = Math.max(14, txt.length / 4) + 's';
+        pg.setAttribute('aria-label', 'PEP Pager. ' + items.map(function (i) { return i[0] + ' ' + i[1]; }).join('. '));
+      });
+    };
+    paint(); setInterval(paint, 5 * 60000);
+  }
+
+  // ---------- PEP-TV Ads: a folder of fake late-night infomercials, played in a TV window ----------
+  // Every claim in them is a fact from this site; the "offers" are jokes, and every ad says so.
+  var ADS = [
+    { file: 'better_frog.mpg', title: 'There has to be a better frog!', ch: 'CH 42 · THE FROG SHOPPING HOUR', icon: 'wrongpep', scenes: [
+      '<p class="ad-kick">Are you tired of frogs that turn out to be tokens?</p><h3 class="ad-big">There has to be<br>a <em>better frog!</em></h3>',
+      '<div class="ad-ba"><figure class="ad-before"><b>Before</b><img src="img/wrongpep.webp" alt=""><figcaption>“I bought a frog on Ethereum by mistake.”</figcaption></figure><figure class="ad-after"><b>After</b><img src="img/pep-logo.webp" alt=""><figcaption>Pepecoin (PEP). The frog with its own blockchain!</figcaption></figure></div>',
+      '<p class="ad-kick">Not a token. Not on Ethereum.</p><h3 class="ad-big">Its own chain.<br><em>0% premine!</em></h3><p class="ad-sub">Proof-of-work. Mined, not minted. Merge-mined with Litecoin and Dogecoin.</p>',
+      '<h3 class="ad-big">Operators are<br><em>NOT</em> standing by.</h3><p class="ad-sub">Read the guide. Check the ticker. Then decide for yourself.</p><a class="ad-cta" href="buy.html">How to get PEP →</a>'
+    ] },
+    { file: 'but_wait_theres_more.mpg', title: 'But wait, there’s more!', ch: 'CH 7 · MINER’S MIDNIGHT MARKET', icon: 'pickaxe', scenes: [
+      '<p class="ad-kick">Already mining Litecoin or Dogecoin?</p><h3 class="ad-big">Your Scrypt rig<br>is <em>bored.</em></h3>',
+      '<h3 class="ad-big">But wait,<br><em>there’s more!</em></h3><p class="ad-sub">Pepecoin uses the same Scrypt algorithm and can be merge-mined alongside them.</p>',
+      '<h3 class="ad-big">One hash.<br><em>Three chains.*</em></h3><img class="ad-pic" src="img/triple-mine.png" alt="">',
+      '<p class="ad-fine">*Only on pools that merge-mine PEP. Electricity, hardware and patience not included.</p><a class="ad-cta" href="mining.html">See the mining guide →</a>'
+    ] },
+    { file: 'seed_phrase_hotline.mpg', title: 'The Seed Phrase Hotline', ch: 'CH 911 · PUBLIC SERVICE FROG', icon: 'gif-085-still', scenes: [
+      '<p class="ad-kick">Got a seed phrase?</p><h3 class="ad-big">Call now!<br><em>0-800-NOBODY</em></h3>',
+      '<h3 class="ad-big"><em>Just kidding.</em></h3><p class="ad-sub">Nobody legit will ever ask for it. Not support, not admins, not frogs.</p>',
+      '<img class="ad-pic" src="img/gif-085.webp" alt=""><p class="ad-sub">“Support” in your DMs? That is a scammer, fren.</p>',
+      '<h3 class="ad-big">Keep it <em>offline.</em></h3><p class="ad-sub">This has been a public service frog.</p><a class="ad-cta" href="wallets.html">Wallet safety →</a>'
+    ] },
+    { file: 'legendary_laptop.mpg', title: 'The Legendary Laptop', ch: 'CH 40M · LEGENDS AT LATE NIGHT', icon: 'laptop', scenes: [
+      '<p class="ad-kick">As the pond tells it…</p><h3 class="ad-big">The Legendary<br><em>Laptop!</em></h3><img class="ad-pic" src="img/laptop.webp" alt="">',
+      '<h3 class="ad-big">Only<br><em>40,000,000 PEP!</em></h3><p class="ad-sub">A fren once paid that for one laptop. The pond has never forgotten.</p>',
+      '<p class="ad-kick">What would it cost today?</p><h3 class="ad-big"><em class="ad-lap">…</em></h3><p class="ad-sub">40M PEP × today’s hourly price snapshot.</p>',
+      '<p class="ad-fine">Laptop not included. Not an offer. Not financial advice.</p><button type="button" class="ad-cta ad-lapbtn">Open the Laptop Index →</button>'
+    ] }
+  ];
+  function adPlayer(i) {
+    var ad = ADS[i];
+    var A = openApp('ad-' + i, ad.file + ' - Pond Media Player', 'pond-tv', function (A) {
+      A.body.innerHTML = '<div class="ptv"><div class="ptv-top"><span class="ptv-live">LIVE</span><b>PEP-TV</b><span class="ptv-ch">' + ad.ch + '</span></div>' +
+        '<div class="ptv-stage">' + ad.scenes.map(function (h, k) { return '<div class="ptv-scene' + (k ? '' : ' on') + '">' + h + '</div>'; }).join('') + '</div>' +
+        '<div class="ptv-crawl"><b>PEP NOW</b><span class="ptv-run"></span></div></div>' +
+        '<div class="app-row"><button type="button" class="app-btn ptv-prev">◀◀</button><button type="button" class="app-btn ptv-play" aria-pressed="true">❚❚</button><button type="button" class="app-btn ptv-next">▶▶</button><span class="grow ptv-pos"></span><span class="ptv-nfa">Not a real offer. Not financial advice.</span></div>';
+      var sc = A.body.querySelectorAll('.ptv-scene'), cur = 0, playing = true, t = null, pos = A.body.querySelector('.ptv-pos');
+      var show = function (k) { cur = (k + sc.length) % sc.length; sc.forEach(function (x, j) { x.classList.toggle('on', j === cur); }); pos.textContent = 'Scene ' + (cur + 1) + ' of ' + sc.length; };
+      var loop = function () { clearTimeout(t); if (playing && document.body.contains(A.host)) t = setTimeout(function () { show(cur + 1); loop(); }, REDUCE ? 6000 : 3800); };
+      show(0); loop();
+      A.body.querySelector('.ptv-next').addEventListener('click', function () { show(cur + 1); loop(); });
+      A.body.querySelector('.ptv-prev').addEventListener('click', function () { show(cur - 1); loop(); });
+      var pb = A.body.querySelector('.ptv-play');
+      pb.addEventListener('click', function () { playing = !playing; pb.setAttribute('aria-pressed', String(playing)); pb.textContent = playing ? '❚❚' : '▶'; loop(); });
+      var lap = A.body.querySelector('.ad-lap');
+      if (lap && window.PepPrices) window.PepPrices.quote().then(function (q) { if (q && q.usd != null) lap.textContent = fmt.usd(40e6 * q.usd); }).catch(function () {});
+      var lb = A.body.querySelector('.ad-lapbtn'); if (lb) lb.addEventListener('click', function () { laptop(); });
+      liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
+    }, 720);
+    return A;
+  }
+  function adsFolder() {
+    openApp('ads', 'C:\\Pond\\PEP-TV Ads', 'pep-tv-ads', function (A) {
+      A.body.innerHTML = '<ul class="folder">' + ADS.map(function (ad, i) { return '<li><button type="button" data-i="' + i + '"><img src="img/' + ad.icon + '.webp" alt="" width="40" height="40"><span>' + ad.file + '</span></button></li>'; }).join('') + '</ul>' +
+        '<p class="bin-tip">Late-night PEP-TV infomercials, recovered from an old VHS. Double-click one to play. The facts are real; the offers are not.</p>';
+      A.body.querySelectorAll('.folder button').forEach(function (b) {
+        var go = function () { adPlayer(+b.getAttribute('data-i')); };
+        b.addEventListener('dblclick', go);
+        b.addEventListener('click', function () { if (!matchMedia('(hover: hover) and (pointer: fine)').matches) go(); else { A.body.querySelectorAll('.folder .sel').forEach(function (x) { x.classList.remove('sel'); }); b.classList.add('sel'); } });
+        b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+      });
+    }, 520);
+  }
+
   // ---------- easter eggs ----------
   function coinRain(n) {
     if (REDUCE) return;
@@ -1510,7 +1614,7 @@
   try { booted = sessionStorage.getItem('pondos-boot'); sessionStorage.setItem('pondos-boot', '1'); } catch (e) {}
   if (!booted && !REDUCE && mainEl) {
     var boot = el('div', { class: 'boot', 'aria-hidden': 'true' });
-    boot.innerHTML = '<div class="boot-in"><img class="boot-coin" src="img/coin-spin.webp" alt="" width="120" height="120"><p class="boot-name">Pond<b>OS</b> <span>98 Second Frog Edition</span></p>' +
+    boot.innerHTML = '<div class="boot-in"><img class="boot-coin" src="img/pep-loading.webp" alt="" width="180" height="180"><p class="boot-name">Pond<b>OS</b> <span>98 Second Frog Edition</span></p>' +
       '<ol class="boot-log"></ol><div class="boot-bar"><i></i></div><p class="boot-skip">click or press any key to skip</p></div>';
     document.body.appendChild(boot);
     root.classList.add('booting');
