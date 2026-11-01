@@ -180,6 +180,9 @@
     arrange.addEventListener('click', function () { setOpen(false); arrangeAll(); });
     sd.addEventListener('click', function () { setOpen(false); shutDown(); });
     smMain.appendChild(el('a', { class: 'sm-item', href: serious }, '<img src="img/serious.webp" alt="" width="28" height="28"><span>Serious mode</span>'));
+    var tipItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/gif-045-still.webp" alt="" width="28" height="28"><span>Tip jar</span>');
+    tipItem.addEventListener('click', function () { setOpen(false); tipJar(); });
+    smMain.appendChild(tipItem);
     smMain.appendChild(arrange);
     smMain.appendChild(el('hr'));
     smMain.appendChild(sd);
@@ -556,9 +559,9 @@
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
       ['#pong', 'PEP Pong', 'pep-logo'], ['#fud', 'FUD Invaders', 'gif-008-still'], ['#snake', 'PEP Snake', 'gif-027-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'],
-      [BASE + 'games/', 'PEP Games', 'pond-playground'], [serious, 'Serious mode', 'serious'], ['#bin', 'Paper hands', 'gif-040-still']
+      [BASE + 'games/', 'PEP Games', 'pond-playground'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Paper hands', 'gif-040-still']
     ];
-    var ACT = { '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -942,6 +945,25 @@
     }, 460);
   }
 
+  // ---------- Tip jar: the same receiving addresses as the footer ----------
+  function tipJar() {
+    openApp('tip', 'Tip jar.exe', 'gif-045-still', function (A) {
+      var ADDR = [['Pepecoin (PEP)', 'PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t'], ['Litecoin (LTC)', 'ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j'], ['Dogecoin (DOGE)', 'DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v'], ['Bitcoin (BTC)', 'bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p']];
+      A.body.innerHTML = '<div class="tip"><img src="img/gif-045.webp" alt="" width="120" height="60"><div><b>Like this site? You can support its further development.</b><p>Any amount, however small, helps. Thank you!</p></div></div>' +
+        '<ul class="tip-list">' + ADDR.map(function (a) { return '<li><span>' + a[0] + '</span><code>' + a[1] + '</code><button type="button" class="app-btn" data-a="' + a[1] + '">Copy</button></li>'; }).join('') + '</ul>' +
+        '<p class="bin-tip tip-msg">Tips go one way only. This site never asks for a seed phrase or a password.</p>';
+      var m = A.body.querySelector('.tip-msg');
+      A.body.querySelectorAll('[data-a]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var t = b.getAttribute('data-a');
+          var ok = function () { m.textContent = 'Copied. The frog thanks you. Double-check the first and last characters after pasting.'; };
+          if (navigator.clipboard) navigator.clipboard.writeText(t).then(ok, function () { m.textContent = 'Copy blocked by the browser. Select the address and copy it by hand.'; });
+          else m.textContent = 'Select the address and copy it by hand.';
+        });
+      });
+    }, 560);
+  }
+
   // ---------- Paper hands (the recycle bin) ----------
   function paperHands() {
     openApp('bin', 'Paper hands', 'wrongpep', function (A) {
@@ -978,6 +1000,7 @@
     typed = (typed + e.key.toLowerCase()).slice(-12);
     if (/wen$/.test(typed)) { typed = ''; osDialog('wen.exe', '<div class="dlg-row"><img src="img/gif-064.webp" alt="" width="96" height="70"><div><h3>wen.exe has performed a legal operation.</h3><p>No price predictions are installed on this system. For arithmetic, open WhatIf.exe.</p></div></div>', [{ label: 'OK', go: true }, { label: 'Open WhatIf.exe', href: 'calculator.html' }], 'gif-064-still'); }
     else if (/seed$/.test(typed)) { typed = ''; osDialog('Security Center', '<div class="dlg-row"><img src="img/gif-085.webp" alt="" width="96" height="96"><div><h3>Seed phrase? Never here.</h3><p>PondOS will never ask for it. Not support, not admins, not frogs. If anything asks you to type it, close it.</p></div></div>', [{ label: 'Understood', go: true }], 'gif-085-still'); }
+    else if (/tip$/.test(typed)) { typed = ''; tipJar(); }
     else if (/laptop$/.test(typed)) { typed = ''; laptop(); }
     else if (/moon$/.test(typed)) { typed = ''; coinRain(8); balloon('Moon not found', 'The frog checked. There is no moon in chainparams.cpp.', 'gif-084-still'); }
   });
