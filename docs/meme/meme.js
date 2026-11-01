@@ -1532,9 +1532,9 @@
       A.body.innerHTML = '<div class="app-row"><span class="grow"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online in the pond</span></div>' +
         '<div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
         '<div class="emo-pop" hidden role="group" aria-label="Emotes">' + EMO.trim().split(' ').map(function (c) { return '<button type="button" data-e="' + c + '" title=":' + c + ':"><img src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="32" height="32" loading="lazy"></button>'; }).join('') + '</div>' +
-        '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + BASE + 'games/img/emotes/pep.webp" alt="" width="22" height="22"></button><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
+        '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + BASE + 'games/img/emotes/pep.webp" alt="" width="22" height="22"></button><input name="n" class="lan-nick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname" hidden><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
         '<p class="hs-note lan-note"></p>';
-      var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input'), note = A.body.querySelector('.lan-note');
+      var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input[name=t]'), note = A.body.querySelector('.lan-note');
       var last = 0, seen = {}, timer = 0, alive = true, first = true;
       var pop = A.body.querySelector('.emo-pop'), eb = A.body.querySelector('.emo-btn');
       eb.addEventListener('click', function () { pop.hidden = !pop.hidden; eb.setAttribute('aria-expanded', String(!pop.hidden)); });
@@ -1545,10 +1545,13 @@
         inp.value = (pre && !/\s$/.test(pre) ? pre + ' ' : pre) + code + ' ' + post.replace(/^\s+/, '');
         pop.hidden = true; eb.setAttribute('aria-expanded', 'false'); inp.focus();
       });
+      var nickIn = form.querySelector('.lan-nick');
+      try { nickIn.value = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
       var paintNote = function () {
         var s = anySession();
-        note.innerHTML = s ? 'Signed in on PEP Games. Text and our emotes only, no links. Be nice, frens.' : 'Reading is open to everyone. To write, <a href="#" class="lan-login">log on</a> (Discord, or a guest nickname).';
-        inp.disabled = !s; form.querySelector('[type=submit]').disabled = !s; eb.disabled = !s;
+        // no sign-in needed to write: without one, a nickname goes with each message (limits are per network)
+        nickIn.hidden = !!s;
+        note.innerHTML = s ? 'Signed in on PEP Games. Text and our emotes only, no links. Be nice, frens.' : 'Pick a nickname and say gm, no sign-in needed. <a href="#" class="lan-login">Log on with Discord</a> to keep your name and get the ✓. No links, be nice.';
         var l = note.querySelector('.lan-login'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); logOn(); });
       };
       var poll = function () {
@@ -1562,6 +1565,7 @@
           (r.messages || []).forEach(function (m) {
             if (seen[m.id]) return;
             var row = el('div', { class: 'lan-msg' }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> <b>' + esc(m.nick) + '</b>' + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
+            var tipEl = log.querySelector('.bin-tip'); if (tipEl) tipEl.remove();
             seen[m.id] = row; log.appendChild(row); last = Math.max(last, m.id);
           });
           if (!log.children.length) log.innerHTML = '<p class="bin-tip">No messages in the last 24 hours. Say gm!</p>';
@@ -1573,9 +1577,14 @@
         e.preventDefault();
         var t = inp.value.trim(); if (!t) return;
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (err) {}
+        if (!anySession()) {
+          nick = nickIn.value.trim();
+          if (nick.length < 2) { note.textContent = 'Pick a nickname first (2 to 20 letters or digits).'; nickIn.focus(); return; }
+          try { localStorage.setItem('pepgry-nick', nick); } catch (err) {}
+        }
         var b = form.querySelector('[type=submit]'); b.disabled = true;
         chatRpc('gry_lobby_say', { p_text: t, p_nick: nick }).then(function (r) {
-          if (r && r.error) note.textContent = r.error; else inp.value = '';
+          if (r && r.error) note.textContent = r.error; else { inp.value = ''; paintNote(); }
           poll();
         }, function (err) { note.textContent = err.message; }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
       });

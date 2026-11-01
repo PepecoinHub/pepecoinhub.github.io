@@ -1071,3 +1071,5 @@ footer.foot a { color: #edf3e3; }
 .ptv-nfa { font: 400 11px var(--f-chrome); color: var(--muted); }
 @media (max-width: 760px) { .ad-ba img { width: 64px; height: 64px; } .ptv-nfa { display: none; } }
 @media (prefers-reduced-motion: reduce) { .ptv-run { animation: none; padding-left: 10px; } .ptv-live { animation: none; } .ptv-scene { transition: none; } }
+
+.lan-form .lan-nick { flex: 0 1 110px; }
