@@ -1189,3 +1189,9 @@ footer.foot a { color: #edf3e3; }
 .sm-new { margin-left: 4px; padding: 1px 5px; border-radius: 7px; background: #d61f1f; color: #fff; font-size: 10px; }
 .ac-more { margin-top: 6px; font-size: 12px; }
 .gazette section + section { margin-top: 16px; padding-top: 8px; border-top: 1px solid #1b1b1b; }
+/* a phone on its side: the set must fit the short screen */
+@media (max-height: 520px) and (min-width: 561px) {
+  .crt-face { padding: 8px; gap: 8px; }
+  .crt-glass { aspect-ratio: auto; height: calc(100vh - 190px); height: calc(100dvh - 190px); }
+  .crt-grill { height: 30px; }
+}
