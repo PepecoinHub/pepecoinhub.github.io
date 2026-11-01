@@ -152,6 +152,9 @@
       return g;
     };
     smMain.appendChild(el('a', { class: 'sm-item', href: './' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>My Pond</b></span>'));
+    var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="img/gif-085-still.webp" alt="" width="28" height="28"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
+    meItem.addEventListener('click', function () { setOpen(false); logOn(); });
+    smMain.appendChild(meItem);
     smMain.appendChild(el('hr'));
     NAV.forEach(function (g, gi) {
       var list = el('div', { class: 'sm-list' });
@@ -670,9 +673,9 @@
     var DESKTOP = [
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
-      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Paper hands', 'gif-040-still']
+      ['#games', 'Games', 'gif-061-still'], ['#tv', 'Pond TV', 'pond-tv'], ['#logon', 'Log On', 'gif-085-still'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Paper hands', 'gif-040-still']
     ];
-    var ACT = { '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -1091,9 +1094,10 @@
     box.innerHTML = (s && s.discord ? '<span class="grow">Send <b>' + fmt.int(score) + '</b> to the High Scores as your Discord name <span class="hs-ok" title="Verified with Discord">✓</span></span>'
       : '<label class="grow">Nickname <input name="nick" maxlength="20" autocomplete="nickname" value="' + esc(nick) + '" placeholder="2-20 letters"></label>') +
       '<button type="submit" class="app-btn">Submit score</button><button type="button" class="app-btn hs-see">High Scores</button>' +
-      (s && s.discord ? '' : '<span class="hs-note">Sign in with Discord on PEP Games to get a ✓ next to your name.</span>');
+      (s && s.discord ? '' : '<span class="hs-note"><a href="#" class="hs-logon">Log on with Discord</a> to get a ✓ next to your name.</span>');
     A.body.appendChild(box);
     box.querySelector('.hs-see').addEventListener('click', function () { highScores(game); });
+    var hl = box.querySelector('.hs-logon'); if (hl) hl.addEventListener('click', function (e) { e.preventDefault(); logOn(); });
     box.addEventListener('submit', function (e) {
       e.preventDefault();
       var inp = box.querySelector('input[name=nick]'), n = inp ? inp.value.trim() : '';
@@ -1183,6 +1187,54 @@
       A.body.innerHTML = '<div class="tv-screen"><iframe src="https://www.youtube-nocookie.com/embed/HnfR7KgQqRA?rel=0&modestbranding=1" title="Pepecoin video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
         '<div class="app-row"><span class="grow">Now playing: Pepecoin</span><a class="app-btn" href="https://youtu.be/HnfR7KgQqRA" target="_blank" rel="noopener">Open on YouTube</a></div>';
     }, 640);
+  }
+
+  // ---------- Log On: the PEP Games sign-in (Discord or a guest nickname), shared by chat and high scores ----------
+  // Discord does not allow its login page inside a frame, so signing in happens on the PEP Games page,
+  // which sends the visitor straight back here afterwards.
+  function whoAmI() {
+    var s = anySession(); if (!s || !s.user) return null;
+    var ids = s.user.identities || [], d = ids.filter(function (i) { return i.provider === 'discord'; })[0], m = s.user.user_metadata || {};
+    var name = d ? ((d.identity_data && (d.identity_data.custom_claims && d.identity_data.custom_claims.global_name || d.identity_data.full_name || d.identity_data.name)) || m.full_name || m.name) : null;
+    var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
+    return { discord: !!d, name: name || nick || 'guest' };
+  }
+  function signInHref() { return BASE + 'games/?login=1&back=' + encodeURIComponent(location.pathname + location.search.replace(/[?&]signedin=1/, '')); }
+  function logOn() {
+    openApp('logon', 'Log On to the Pond', 'gif-085-still', function (A) {
+      var paint = function () {
+        var me = whoAmI();
+        A.body.innerHTML = '<div class="tip"><img src="img/' + (me ? 'gif-045' : 'gif-085') + '.webp" alt="" width="96" height="96"><div>' +
+          (me ? '<b>Signed in as ' + esc(me.name) + (me.discord ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : ' (guest)') + '</b><p>' + (me.discord ? 'Your Discord name shows with a ✓ in LAN Party and on the High Scores.' : 'Guests can chat and submit scores. Log in with Discord to get the ✓ verified badge.') + '</p>'
+            : '<b>Who goes there, fren?</b><p>Sign in once and use it everywhere: LAN Party chat, High Scores, Draw &amp; Guess and the other PEP Games.</p>') +
+          '</div></div>' +
+          '<div class="app-row">' + (me && me.discord ? '' : '<a class="app-btn logon-discord" href="' + signInHref() + '">' + (me ? 'Log in with Discord' : 'Log in with Discord or as a guest') + '</a>') +
+          (me ? '<button type="button" class="app-btn logon-out">Log off</button>' : '') + '</div>' +
+          '<p class="hs-note">You sign in on the PEP Games page and come straight back here. Discord shares your username and email with our login service (Supabase); the site does not show or use the email. PondOS never asks for a seed phrase or a password.</p>';
+        var out = A.body.querySelector('.logon-out');
+        if (out) out.addEventListener('click', function () {
+          try { Object.keys(localStorage).forEach(function (k) { if (/^sb-azbwciqfbsdpwubznncg-auth-token/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
+          paintLogon(); paint();
+        });
+      };
+      paint();
+    }, 440);
+  }
+  function paintLogon() {
+    var me = whoAmI();
+    document.querySelectorAll('.logon-name').forEach(function (e) { e.textContent = me ? me.name : 'Log on…'; });
+    document.querySelectorAll('.logon-ok').forEach(function (e) { e.hidden = !(me && me.discord); });
+  }
+  if (mainEl) {
+    var tLog = el('button', { type: 'button', class: 'tray-logon', title: 'Log On to the Pond' }, '<span aria-hidden="true">👤</span><span class="sr">Log on</span>');
+    tLog.addEventListener('click', logOn);
+    var trayEl3 = document.querySelector('.tray'); if (trayEl3) trayEl3.insertBefore(tLog, trayEl3.firstChild);
+    paintLogon();
+    if (/[?&]signedin=1/.test(location.search)) {
+      try { history.replaceState(null, '', location.pathname + location.search.replace(/[?&]signedin=1/, '').replace(/^&/, '?') + location.hash); } catch (e) {}
+      var me0 = whoAmI();
+      if (me0) setTimeout(function () { balloon('Welcome to the pond, ' + me0.name, me0.discord ? 'Signed in with Discord ✓. LAN Party and High Scores now use your name.' : 'Signed in as a guest. You can chat and submit scores.', 'gif-045-still'); }, 900);
+    }
   }
 
   // ---------- Tip jar: the same receiving addresses as the footer ----------
@@ -1308,9 +1360,9 @@
       });
       var paintNote = function () {
         var s = anySession();
-        note.innerHTML = s ? 'Signed in on PEP Games. Text and our emotes only, no links. Be nice, frens.' : 'Reading is open to everyone. To write, <a href="#" class="lan-login">sign in on PEP Games</a> (Discord, or a guest nickname), then come back.';
+        note.innerHTML = s ? 'Signed in on PEP Games. Text and our emotes only, no links. Be nice, frens.' : 'Reading is open to everyone. To write, <a href="#" class="lan-login">log on</a> (Discord, or a guest nickname).';
         inp.disabled = !s; form.querySelector('[type=submit]').disabled = !s; eb.disabled = !s;
-        var l = note.querySelector('.lan-login'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); pepGamesOnline(); });
+        var l = note.querySelector('.lan-login'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); logOn(); });
       };
       var poll = function () {
         clearTimeout(timer);

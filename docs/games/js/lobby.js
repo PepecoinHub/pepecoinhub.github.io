@@ -140,7 +140,13 @@ const chat = lobbyChat(be, { openLogin });
 minerYou();
 
 renderNewRoom(); renderNewTable();
-await identityCard($('#identity'), { cta: 'Play', onReady: () => { setLogin(false); renderNewRoom(); renderNewTable(); renderSchedHost(); chat.refresh(); toast('All set! Pick a game below', 'good'); } });
+// ?login=1&back=/meme/... : sign-in requested from the meme edition (PondOS). The login box opens, and once
+// a session exists the visitor goes back to the page they came from (only paths on this site are accepted).
+const qs = new URLSearchParams(location.search);
+const back = /^\/[A-Za-z0-9/_.\-]*(\?[A-Za-z0-9=&_.\-%]*)?(#[A-Za-z0-9_\-]*)?$/.test(qs.get('back') || '') && !(qs.get('back') || '').startsWith('//') ? qs.get('back') : null;
+const goBack = () => { if (back) location.replace(back + (back.includes('?') ? '&' : '?') + 'signedin=1'); };
+await identityCard($('#identity'), { cta: 'Play', onReady: () => { if (back) return goBack(); setLogin(false); renderNewRoom(); renderNewTable(); renderSchedHost(); chat.refresh(); toast('All set! Pick a game below', 'good'); } });
+if (qs.get('login') === '1') { if (back && be.session() && !be.session().user.is_anonymous) goBack(); else openLogin(); }
 renderNewRoom(); renderNewTable();
 await Promise.all([load(), loadTables(), loadTopboard()]);
 renderSchedHost();
