@@ -9,8 +9,8 @@
 <link rel="icon" href="img/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=VT323&display=swap">
-<link rel="stylesheet" href="meme.css?v=20261101wall2">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=VT323&display=swap">
+<link rel="stylesheet" href="meme.css?v=20261101lite">
 <script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
 <style>
 [hidden] { display: none !important; }
@@ -103,7 +103,7 @@ th.plain { font: 700 0.95rem var(--f-body); text-transform: none; letter-spacing
     <h1>The <mark>What&#8209;If</mark> Machine</h1>
     <p class="lede">Type how much PEP you hold and pick a coin. The machine divides that coin’s market cap by Pepecoin’s supply and multiplies by your amount. Arithmetic for comparing sizes, not a forecast. The frog has no crystal ball.</p>
   </div>
-  <figure class="panel meme"><picture><source srcset="img/p-eyes-still.webp" media="(prefers-reduced-motion: reduce)"><img src="img/p-eyes.webp" alt="Pepe with spinning P coins for eyes" width="300" height="265"></picture><figcaption>me doing ×100 math</figcaption></figure>
+  <figure class="panel meme"><picture><source srcset="img/p-eyes-still.webp" media="(prefers-reduced-motion: reduce)"><img src="img/p-eyes.webp" alt="Pepe with spinning P coins for eyes" width="300" height="265" loading="lazy"></picture><figcaption>me doing ×100 math</figcaption></figure>
 </div>
 
 <section class="in" aria-labelledby="calc">
@@ -113,7 +113,7 @@ th.plain { font: 700 0.95rem var(--f-body); text-transform: none; letter-spacing
       <div class="field">
         <label for="pep-amount"><span class="step">1</span>Your PEP</label>
         <div class="amount">
-          <img src="img/pep-logo.webp" alt="" width="30" height="30">
+          <img src="img/pep-logo.webp" alt="" width="30" height="30" loading="lazy">
           <input id="pep-amount" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="e.g. 13,000,000" aria-describedby="amount-hint">
           <span class="amount-unit" aria-hidden="true">PEP</span>
         </div>
@@ -153,7 +153,7 @@ th.plain { font: 700 0.95rem var(--f-body); text-transform: none; letter-spacing
         <div id="m-qty-row" hidden><dt>× your PEP</dt><dd id="m-qty"></dd></div>
       </dl>
       <p class="out-note" id="ath-note" hidden>All-time-high mode uses the coin’s highest price × its supply today. For coins that keep issuing, such as Dogecoin, the real market cap at the peak was lower, because fewer coins existed then.</p>
-      <div class="nocomment"><img src="img/stop.webp" alt="Pepe raising a hand at a microphone" width="420" height="374"><p><span class="hand">Price prediction? No comment.</span><br>Nothing here says PEP will reach another coin’s size.</p></div>
+      <div class="nocomment"><img src="img/stop.webp" alt="Pepe raising a hand at a microphone" width="420" height="374" loading="lazy"><p><span class="hand">Price prediction? No comment.</span><br>Nothing here says PEP will reach another coin’s size.</p></div>
     </div>
   </div>
 
@@ -243,7 +243,7 @@ th.plain { font: 700 0.95rem var(--f-body); text-transform: none; letter-spacing
 
 <footer class="foot"></footer>
 <script src="../prices.js?v=20261031data1"></script>
-<script src="meme.js?v=20261101wall2"></script>
+<script src="meme.js?v=20261101lite"></script>
 <script src="../live.js?v=20261012d" defer></script>
 <script>
 (function () {

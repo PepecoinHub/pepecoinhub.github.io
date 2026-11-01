@@ -61,6 +61,10 @@
 
   /* ---------------------------------------------------------------- helpers */
   var cache = {};
+  // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
+  // made by scripts/make_meme_icons.py, instead of the full animated pictures
+  function ico(n) { return 'img/ico/' + n + '.webp'; }
+  function icoFrom(src) { var m = /^img\/([\w-]+)\.webp$/.exec(src || ''); return m ? ico(m[1]) : src; }
   function json(name) {
     if (!cache[name]) cache[name] = fetch(DATA + name, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(name + ' ' + r.status); return r.json(); });
     return cache[name];
@@ -140,7 +144,7 @@
     var arrow = '<i class="sm-arr" aria-hidden="true">▸</i>';
     var subGroup = function (label, icon, inner, cls) {
       var g = el('div', { class: 'sm-group' + (cls ? ' ' + cls : '') });
-      var b = el('button', { type: 'button', class: 'sm-item', 'aria-expanded': 'false' }, '<img src="img/' + icon + '.webp" alt="" width="28" height="28"><span>' + label + '</span>' + arrow);
+      var b = el('button', { type: 'button', class: 'sm-item', 'aria-expanded': 'false' }, '<img src="' + ico(icon) + '" alt="" width="28" height="28"><span>' + label + '</span>' + arrow);
       var sub = el('div', { class: 'sm-sub', hidden: '' }); sub.appendChild(inner);
       var open = function (o) {
         if (o) smMain.querySelectorAll('.sm-group').forEach(function (x) { if (x !== g) { x.querySelector('.sm-sub').hidden = true; x.querySelector('.sm-item').setAttribute('aria-expanded', 'false'); } });
@@ -159,7 +163,7 @@
     NAV.forEach(function (g, gi) {
       var list = el('div', { class: 'sm-list' });
       g[1].forEach(function (p) {
-        var a = el('a', { href: href(p[0]) }, '<img src="img/' + p[3] + '.webp" alt="" width="24" height="24" loading="lazy"><span><b>' + p[1] + '</b><small>' + p[2] + '</small></span>');
+        var a = el('a', { href: href(p[0]) }, '<img src="' + ico(p[3]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + p[1] + '</b><small>' + p[2] + '</small></span>');
         if (p[0] === PAGE) a.setAttribute('aria-current', 'page');
         list.appendChild(a);
       });
@@ -172,7 +176,7 @@
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
       ['All games…', 'Chess, Checkers, Connect Four, Sea Battle, Pepe Miner', 'pond-playground', function () { gamesFolder(); }],
       ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', function () { paperHands(); }]].forEach(function (g) {
-      var b = el('a', { href: '#', role: 'button' }, '<img src="img/' + g[2] + '.webp" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
+      var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
     });
@@ -335,7 +339,7 @@
   // a modal dialog in the same window chrome; buttons: [{label, go, href, fn}]
   function osDialog(title, html, buttons, icon) {
     var d = el('dialog', { class: 'os-dlg', 'aria-label': title });
-    d.innerHTML = '<div class="win active"><div class="win-bar"><img src="img/' + (icon || 'pep-logo') + '.webp" alt="" width="16" height="16"><span class="win-t">' + esc(title) + '</span><span class="win-ctl"><button type="button" class="w-x" title="Close">' + ICO.x + '<span class="sr">Close</span></button></span></div><div class="dlg-body">' + html + '</div><div class="dlg-btns"></div></div>';
+    d.innerHTML = '<div class="win active"><div class="win-bar"><img src="' + ico(icon || 'pep-logo') + '" alt="" width="16" height="16"><span class="win-t">' + esc(title) + '</span><span class="win-ctl"><button type="button" class="w-x" title="Close">' + ICO.x + '<span class="sr">Close</span></button></span></div><div class="dlg-body">' + html + '</div><div class="dlg-btns"></div></div>';
     var row = d.querySelector('.dlg-btns');
     buttons.forEach(function (b) {
       var x = b.href ? el('a', { class: 'btn' + (b.go ? ' go' : ''), href: b.href }, b.label) : el('button', { type: 'button', class: 'btn' + (b.go ? ' go' : '') }, b.label);
@@ -476,7 +480,7 @@
     var title = opts.title || winTitle(host, body);
     // the window's icon is its first picture, so the taskbar buttons are told apart at a glance
     var pic = body.querySelector('img:not([src$=".svg"])');
-    var iconSrc = opts.icon ? 'img/' + opts.icon + '.webp' : body.classList.contains('hero') ? 'img/pep-logo.webp' : pic ? pic.getAttribute('src') : 'img/' + (APP[PAGE] || ['', 'pep-logo'])[1] + '.webp';
+    var iconSrc = opts.icon ? ico(opts.icon) : body.classList.contains('hero') ? 'img/pep-logo.webp' : pic ? icoFrom(pic.getAttribute('src')) : ico((APP[PAGE] || ['', 'pep-logo'])[1]);
     host.classList.add('wide'); // every window takes the full width: the pages' inner layouts need it
     var win = el('div', { class: 'win' });
     var bar = el('div', { class: 'win-bar' }, '<img src="' + iconSrc + '" alt="" width="16" height="16" loading="lazy"><span class="win-t">' + esc(title) + '</span>' +
@@ -559,7 +563,7 @@
     mainEl.insertBefore(host, blocks[0]);
     var toc = el('nav', { class: 'toc', 'aria-label': 'Sections of this page' }), pane = el('div', { class: 'pane' });
     var pager = el('div', { class: 'pager' }, '<button type="button" class="btn pg-prev"></button><span class="pg-n"></span><button type="button" class="btn pg-next"></button>');
-    var appIcon = 'img/' + (APP[PAGE] || ['', 'pep-logo'])[1] + '.webp';
+    var appIcon = ico((APP[PAGE] || ['', 'pep-logo'])[1]);
     var W = null;
     var secs = blocks.map(function (n, i) {
       var panel = el('div', { class: 'sec' });
@@ -694,7 +698,7 @@
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
     var desk = el('nav', { class: 'desk', 'aria-label': 'Desktop' });
-    desk.innerHTML = '<ul class="icons">' + DESKTOP.map(function (d) { return '<li><a href="' + d[0] + '" data-id="' + esc(d[1]) + '"><img src="img/' + d[2] + '.webp" alt="" width="40" height="40"><span>' + d[1] + '</span></a></li>'; }).join('') + '</ul>';
+    desk.innerHTML = '<ul class="icons">' + DESKTOP.map(function (d) { return '<li><a href="' + d[0] + '" data-id="' + esc(d[1]) + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></a></li>'; }).join('') + '</ul>';
     document.body.insertBefore(desk, mainEl);
     setTimeout(pager, 0);
     var lanIcon = desk.querySelector('a[href="#lan"]');
@@ -839,7 +843,7 @@
     if (apps[id]) { focusApp(apps[id]); return apps[id]; }
     var host = el('div', { class: 'app-win', role: 'dialog', 'aria-label': title });
     if (width) host.style.width = 'min(' + width + 'px, calc(100vw - 16px))';
-    host.innerHTML = '<div class="win active"><div class="win-bar"><img src="img/' + icon + '.webp" alt="" width="16" height="16"><span class="win-t">' + esc(title) + '</span><span class="win-ctl"><button type="button" class="w-x" title="Close">' + ICO.x + '<span class="sr">Close ' + esc(title) + '</span></button></span></div><div class="app-body"></div></div>';
+    host.innerHTML = '<div class="win active"><div class="win-bar"><img src="' + ico(icon) + '" alt="" width="16" height="16"><span class="win-t">' + esc(title) + '</span><span class="win-ctl"><button type="button" class="w-x" title="Close">' + ICO.x + '<span class="sr">Close ' + esc(title) + '</span></button></span></div><div class="app-body"></div></div>';
     document.body.appendChild(host);
     var A = { id: id, host: host, body: host.querySelector('.app-body'), stop: null };
     var n = Object.keys(apps).length;
@@ -1221,7 +1225,7 @@
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
         ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Miner', 'pickaxe', minerApp], ['PEP Games lobby', 'pond-playground', function () { pepGamesOnline(); }]];
-      A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="img/' + g[1] + '.webp" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
+      A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="' + ico(g[1]) + '" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle play against the bot. Draw &amp; Guess needs other players: open a room or join one with a code.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { G[+b.getAttribute('data-i')][2](); };
@@ -1466,7 +1470,7 @@
   }
   function adsFolder() {
     openApp('ads', 'C:\\Pond\\PEP-TV Ads', 'pep-tv-ads', function (A) {
-      A.body.innerHTML = '<ul class="folder">' + ADS.map(function (ad, i) { return '<li><button type="button" data-i="' + i + '"><img src="img/' + ad.icon + '.webp" alt="" width="40" height="40"><span>' + ad.file + '</span></button></li>'; }).join('') + '</ul>' +
+      A.body.innerHTML = '<ul class="folder">' + ADS.map(function (ad, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(ad.icon) + '" alt="" width="40" height="40"><span>' + ad.file + '</span></button></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">Late-night PEP-TV infomercials, recovered from an old VHS. Double-click one to play. The facts are real; the offers are not.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { adPlayer(+b.getAttribute('data-i')); };
@@ -1622,7 +1626,7 @@
 
   // ---------- balloon notices ----------
   function balloon(title, text, icon) {
-    var t = el('div', { class: 'balloon', role: 'status' }, '<img src="img/' + icon + '.webp" alt="" width="40" height="40"><div><b>' + title + '</b><span>' + text + '</span></div><button type="button" aria-label="Dismiss">' + ICO.x + '</button>');
+    var t = el('div', { class: 'balloon', role: 'status' }, '<img src="' + ico(icon) + '" alt="" width="40" height="40"><div><b>' + title + '</b><span>' + text + '</span></div><button type="button" aria-label="Dismiss">' + ICO.x + '</button>');
     document.body.appendChild(t);
     var bye = function () { t.classList.add('out'); setTimeout(function () { t.remove(); }, 300); };
     t.querySelector('button').addEventListener('click', bye);

@@ -9,8 +9,8 @@
 <link rel="icon" href="img/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=VT323&display=swap">
-<link rel="stylesheet" href="meme.css?v=20261101wall2">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=VT323&display=swap">
+<link rel="stylesheet" href="meme.css?v=20261101lite">
 <style>
 .coin-chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
 .coin-chips li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border: 2.5px solid var(--line); border-radius: 999px; background: var(--card); font-weight: 700; box-shadow: 3px 3px 0 var(--hard); }
@@ -119,14 +119,14 @@
   <section class="block in" aria-labelledby="merged-with" style="padding-top:20px">
     <div class="head"><p class="kicker">One hash, many payouts</p><h2 id="merged-with">Merge-mined together with</h2></div>
     <ul class="coin-chips">
-      <li class="self"><img src="img/pep-logo.webp" alt="" width="28" height="28">Pepecoin <small>PEP</small></li>
-      <li><img src="img/ltc.png" alt="" width="28" height="28">Litecoin <small>LTC</small></li>
-      <li><img src="img/doge.png" alt="" width="28" height="28">Dogecoin <small>DOGE</small></li>
-      <li><img src="img/coins/bells.webp" alt="" width="28" height="28">Bellscoin <small>BELLS</small></li>
-      <li><img src="img/coins/lky.webp" alt="" width="28" height="28">Luckycoin <small>LKY</small></li>
-      <li><img src="img/coins/jkc.webp" alt="" width="28" height="28">Junkcoin <small>JKC</small></li>
-      <li><img src="img/coins/dingo.webp" alt="" width="28" height="28">Dingocoin <small>DINGO</small></li>
-      <li><img src="img/coins/shic.webp" alt="" width="28" height="28">Shibacoin <small>SHIC</small></li>
+      <li class="self"><img src="img/pep-logo.webp" alt="" width="28" height="28" loading="lazy">Pepecoin <small>PEP</small></li>
+      <li><img src="img/ltc.png" alt="" width="28" height="28" loading="lazy">Litecoin <small>LTC</small></li>
+      <li><img src="img/doge.png" alt="" width="28" height="28" loading="lazy">Dogecoin <small>DOGE</small></li>
+      <li><img src="img/coins/bells.webp" alt="" width="28" height="28" loading="lazy">Bellscoin <small>BELLS</small></li>
+      <li><img src="img/coins/lky.webp" alt="" width="28" height="28" loading="lazy">Luckycoin <small>LKY</small></li>
+      <li><img src="img/coins/jkc.webp" alt="" width="28" height="28" loading="lazy">Junkcoin <small>JKC</small></li>
+      <li><img src="img/coins/dingo.webp" alt="" width="28" height="28" loading="lazy">Dingocoin <small>DINGO</small></li>
+      <li><img src="img/coins/shic.webp" alt="" width="28" height="28" loading="lazy">Shibacoin <small>SHIC</small></li>
     </ul>
     <p class="note" style="margin-top:16px">Pepecoin uses AuxPoW (merged mining) on Scrypt. Litecoin is the parent chain, and Dogecoin, Pepecoin and the other coins above accept the same work. A pool chooses which of them it pays; ViaBTC’s Litecoin pool pays all of them on top of LTC. <a href="scrypt-family.html">The whole Scrypt family.</a></p>
   </section>
@@ -213,7 +213,7 @@
 
 <footer class="foot"></footer>
 <script src="../prices.js?v=20261031data1"></script>
-<script src="meme.js?v=20261101wall2"></script>
+<script src="meme.js?v=20261101lite"></script>
 <script>
 (function () {
   // same arithmetic as the serious page (mining-calc.js): share of the network hashrate x blocks a day x 10,000 PEP, minus the pool fee

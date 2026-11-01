@@ -9,8 +9,8 @@
 <link rel="icon" href="img/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=VT323&display=swap">
-<link rel="stylesheet" href="meme.css?v=20261101wall2">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=VT323&display=swap">
+<link rel="stylesheet" href="meme.css?v=20261101lite">
 <style>
 [hidden] { display: none !important; }
 .viewsw { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -54,16 +54,16 @@
       <p class="lede">How much of the <span data-m="supply">105.19B</span> PEP sits in the biggest addresses, and how that changes. One snapshot of the top ~2,000 addresses every day; <span data-m="addrs">297,198</span> addresses hold PEP.</p>
       <p class="small muted">An address is not a person. Exchanges, pools and custodians hold coins for many users.</p>
     </div>
-    <figure class="panel meme"><img src="img/detective.webp" alt="Pepe in a hat and sunglasses hiding behind a green candle" width="417" height="420"><figcaption>watching the whales</figcaption></figure>
+    <figure class="panel meme"><img src="img/detective.webp" alt="Pepe in a hat and sunglasses hiding behind a green candle" width="417" height="420" loading="lazy"><figcaption>watching the whales</figcaption></figure>
   </div>
 
-  <div class="in loading" id="boot"><picture><source srcset="img/pep-loading-still.webp" media="(prefers-reduced-motion: reduce)"><img src="img/pep-loading.webp" alt="" width="260" height="260"></picture><p class="hand">$PEP loading…</p></div>
+  <div class="in loading" id="boot"><picture><source srcset="img/pep-loading-still.webp" media="(prefers-reduced-motion: reduce)"><img src="img/pep-loading.webp" alt="" width="260" height="260" loading="lazy"></picture><p class="hand">$PEP loading…</p></div>
 
   <div id="app" hidden>
   <section class="in" aria-labelledby="rk-h" style="padding-bottom:30px">
     <div class="head pic">
       <div><p class="kicker">Community ranks</p><h2 id="rk-h">Sea-creature ranks</h2><p class="muted" id="rk-p">Every address holding at least 5M PEP, sorted into the community’s size ranks. An address is not a person: exchanges and pools are counted too.</p></div>
-      <figure class="panel meme blue"><img src="img/shrimp.webp" alt="Pepe dressed as a shrimp" width="420" height="420"><figcaption>me checking which rank I am</figcaption></figure>
+      <figure class="panel meme blue"><img src="img/shrimp.webp" alt="Pepe dressed as a shrimp" width="420" height="420" loading="lazy"><figcaption>me checking which rank I am</figcaption></figure>
     </div>
     <div class="panel ranksbox" id="ranks"></div>
     <p class="note" id="rk-note" style="margin-top:14px"></p>
@@ -132,7 +132,7 @@
 
 <footer class="foot"></footer>
 <script src="../prices.js?v=20261031data1"></script>
-<script src="meme.js?v=20261101wall2"></script>
+<script src="meme.js?v=20261101lite"></script>
 <script>
 (function () {
   var M = window.Meme, f = M.fmt;
@@ -165,8 +165,8 @@
       $('rk-note').textContent = 'Counted on the ' + f.date(S.latest.date) + ' snapshot. The list only goes down to ' + f.compact(low) + ' PEP, the smallest listed balance, so Dolphins below that are not counted yet (“+”) and the last line is an upper bound.';
     }
     $('ranks').innerHTML = rows.map(function (r) {
-      return '<div class="rk"><img src="img/ranks/' + slug(r.name) + '.webp" alt="" width="44" height="44"><div><b>' + r.name + '</b><span class="rr">' + RANGE[r.name] + ' PEP</span><span class="rn">' + r.n + ' addresses</span><span class="rs">' + f.pct(r.share) + (r.plus ? '+' : '') + ' of supply</span></div></div>';
-    }).join('') + '<div class="rk rest"><div class="rki">' + ['fancy-fish', 'octopus', 'crab', 'shrimp', 'plankton'].map(function (n) { return '<img src="img/ranks/' + n + '.webp" alt="" width="30" height="30">'; }).join('') + '</div><div><b>Everyone under 5M PEP</b><span class="rn">' + rest.split(' · ')[0] + '</span><span class="rs">' + rest.split(' · ')[1] + '</span></div></div>';
+      return '<div class="rk"><img src="img/ranks/' + slug(r.name) + '.webp" alt="" width="44" height="44" loading="lazy"><div><b>' + r.name + '</b><span class="rr">' + RANGE[r.name] + ' PEP</span><span class="rn">' + r.n + ' addresses</span><span class="rs">' + f.pct(r.share) + (r.plus ? '+' : '') + ' of supply</span></div></div>';
+    }).join('') + '<div class="rk rest"><div class="rki">' + ['fancy-fish', 'octopus', 'crab', 'shrimp', 'plankton'].map(function (n) { return '<img src="img/ranks/' + n + '.webp" alt="" width="30" height="30" loading="lazy">'; }).join('') + '</div><div><b>Everyone under 5M PEP</b><span class="rn">' + rest.split(' · ')[0] + '</span><span class="rs">' + rest.split(' · ')[1] + '</span></div></div>';
   }
 
   function tiles() {
@@ -232,7 +232,7 @@
     $('more').addEventListener('click', function () { st.shown += STEP; holders(); });
     var w = 0; window.addEventListener('resize', function () { if (Math.abs(innerWidth - w) > 40) { w = innerWidth; trend(); } });
   }).catch(function () {
-    $('boot').innerHTML = '<img src="img/so-over.webp" alt="" width="200" height="200" style="width:200px"><p class="hand">It’s so over: the rich-list data could not be loaded right now. Try again in a few minutes, or open the <a href="../rich-list.html">serious rich list</a>.</p>';
+    $('boot').innerHTML = '<img src="img/so-over.webp" alt="" width="200" height="200" style="width:200px" loading="lazy"><p class="hand">It’s so over: the rich-list data could not be loaded right now. Try again in a few minutes, or open the <a href="../rich-list.html">serious rich list</a>.</p>';
   });
 })();
 </script>
