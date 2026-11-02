@@ -70,20 +70,20 @@ def rpc(name, args):
     return json.loads(raw or b"null")
 
 
-def candidates(band):
+def candidates(band, cls):
+    """Places of one kind (a Wikidata class) at one level of fame. Small queries: one class at a time."""
     lo, hi = band
-    values = " ".join("wd:" + q for q in CLASSES)
     q = f"""
 SELECT ?item ?itemLabel ?coord ?image ?countryLabel ?iso ?continentLabel ?article WHERE {{
-  VALUES ?class {{ {values} }}
-  ?item wdt:P31 ?class; wdt:P625 ?coord; wdt:P18 ?image; wdt:P17 ?country; wikibase:sitelinks ?sl.
+  ?item wdt:P31 wd:{cls}; wikibase:sitelinks ?sl.
   FILTER(?sl >= {lo} && ?sl <= {hi})
+  ?item wdt:P625 ?coord; wdt:P18 ?image; wdt:P17 ?country.
   ?country wdt:P297 ?iso; wdt:P30 ?continent.
   OPTIONAL {{ ?article schema:about ?item; schema:isPartOf <https://en.wikipedia.org/> }}
   SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-}} LIMIT 6000"""
+}} LIMIT 400"""
     raw = http("https://query.wikidata.org/sparql?format=json&query=" + urllib.parse.quote(q),
-               headers={"Accept": "application/sparql-results+json"}, timeout=90)
+               headers={"Accept": "application/sparql-results+json"}, timeout=70)
     rows = json.loads(raw)["results"]["bindings"]
     out = {}
     for r in rows:
@@ -185,29 +185,34 @@ def main():
     if not dry:
         st = rpc("gry_wp_robot_status", {"p_token": token})
         need = min(MAX_NEW_PER_RUN, max(0, TARGET_READY - st["pending"] - st["approved_waiting"]))
-        print("queue:", st, "-> new:", need)
-    added, tries, pools = 0, 0, {}
-    while added < need and tries < 40:
+        print("queue:", st, "-> new:", need, flush=True)
+    added, tries, pools, wd_fail, t0 = 0, 0, {}, 0, time.time()
+    skips = {"licence or size": 0, "error": 0}
+    while added < need and tries < 150 and wd_fail < 6 and time.time() - t0 < 12 * 60:
         tries += 1
-        band = rng.choice(BANDS)
-        if band not in pools:
+        key = (rng.choice(BANDS), rng.choice(list(CLASSES)))
+        if key not in pools:
             try:
-                pools[band] = candidates(band)
-                print(f"band {band}: {len(pools[band])} places")
+                pools[key] = candidates(*key)
+                print(f"{CLASSES[key[1]]}, fame {key[0][0]}+: {len(pools[key])} places", flush=True)
             except Exception as e:
-                print("wikidata:", e)
-                time.sleep(5)
+                wd_fail += 1
+                pools[key] = []
+                print(f"wikidata query failed ({type(e).__name__}), {wd_fail}/6", flush=True)
+                time.sleep(3)
                 continue
-        if not pools[band]:
+        if not pools[key]:
             continue
-        c = pools[band].pop(rng.randrange(len(pools[band])))
+        c = pools[key].pop(rng.randrange(len(pools[key])))
         try:
             info = commons_info(c["image"])
             if not info:
+                skips["licence or size"] += 1
                 continue
             webp, pose = compose(http(info["thumb"]), rng)
         except Exception as e:
-            print("skipped a place:", type(e).__name__)
+            skips["error"] += 1
+            print("skipped a place:", type(e).__name__, flush=True)
             continue
         c.update({k: info[k] for k in ("license", "credit", "source_url")})
         c.pop("image")
@@ -217,13 +222,18 @@ def main():
             (pathlib.Path(dry) / f"{c['qid']}.json").write_text(json.dumps(c, indent=1))
             res = {"id": "dry"}
         else:
-            res = rpc("gry_wp_robot_add", {"p_token": token, "p": c, "p_image": "data:image/webp;base64," + base64.b64encode(webp).decode()})
+            try:
+                res = rpc("gry_wp_robot_add", {"p_token": token, "p": c, "p_image": "data:image/webp;base64," + base64.b64encode(webp).decode()})
+            except Exception as e:
+                skips["error"] += 1
+                print("the queue refused a puzzle:", getattr(e, "code", type(e).__name__), flush=True)
+                continue
         if res and res.get("duplicate"):
             continue
         added += 1
-        print(f"added puzzle {added} ({pose}, {len(webp) // 1024} KB)")   # no place, no Q-id: Actions logs are public
+        print(f"added puzzle {added} ({pose}, {len(webp) // 1024} KB)", flush=True)   # no place, no Q-id: Actions logs are public
         time.sleep(1)
-    print(f"done: {added} new")
+    print(f"done: {added} new after {tries} tries, skipped: {skips}", flush=True)
     return 0
 
 

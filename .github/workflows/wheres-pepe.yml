@@ -29,4 +29,4 @@ jobs:
       - name: Prepare puzzles
         env:
           WP_ROBOT_TOKEN: ${{ secrets.WP_ROBOT_TOKEN }}
-        run: python scripts/wheres_pepe.py
+        run: python -u scripts/wheres_pepe.py
