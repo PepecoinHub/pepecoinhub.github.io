@@ -1267,7 +1267,7 @@
   }
   function yeetApp() {
     var A = openApp('yeet', 'YEET THE PEP', 'yeet', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/yeet.html?embed=1" title="YEET THE PEP"></iframe>';
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/yeet.html?embed=1" title="YEET THE PEP" allow="web-share; clipboard-write; fullscreen"></iframe>';
     }, 1000);
     A.host.classList.add('app-full');
   }

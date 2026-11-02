@@ -21,7 +21,7 @@ const storage = { get(k) { try { return Number(localStorage.getItem(k)) || 0; } 
 const bestKey = () => account ? `yeet-best-v1:${account.user_id}` : 'yeet-guest-v1';
 const pendingKey = () => account ? `yeet-pending-v1:${account.user_id}` : '';
 const metres = n => (n / 10).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-const jokes = ['Your shift at the burger place starts at 9.', 'NASA has several questions.', 'Gravity remains undefeated.', 'Wen moon? Not today.', 'Your helmet has filed a complaint.', 'Flight control was on a lunch break.'];
+const jokes = ['NASA has several questions.', 'Gravity remains undefeated.', 'Wen moon? Not today.', 'Your helmet has filed a complaint.', 'Flight control was on a lunch break.'];
 function status(s) { $('#status').textContent = s; }
 function tone(hz, length = .09, type = 'square', volume = .025) {
   if (!soundOn) return;
@@ -70,7 +70,7 @@ function pause(force) {
 }
 function finish() {
   phase = 'ended'; const n = ++finishNumber, value = score(state), uid = account?.user_id;
-  const old = Math.max(storage.get(bestKey()), cloudBest), record = value > old;
+  const old = Math.max(storage.get(bestKey()), cloudBest), record = value > old; lastBest = record;
   if (record) storage.set(bestKey(), value);
   $('#result').hidden = false; $('#result-title').textContent = record ? 'NEW PERSONAL BEST!' : 'Earth: 1. Pepe: 0.';
   $('#result-score').textContent = `${metres(value)} m`; $('#result-joke').textContent = jokes[Math.floor(value / 17) % jokes.length];
@@ -316,5 +316,34 @@ let loginTab = false;
 window.addEventListener('focus', () => { if (loginTab) { loginTab = false; location.reload(); } });
 $('#login').onclick = async () => { if (framed) { loginTab = true; pause(true); window.open('yeet.html', '_blank', 'noopener'); status('Log in with Discord in the new tab, then come back here.'); return; } if (!backend || backend.kind !== 'supabase') { status('Discord sign-in is unavailable here. You can still play as a guest.'); return; } pause(true); try { await backend.discord(); } catch { status('Discord sign-in could not open. Please try again.'); } };
 $('#logout').onclick = async () => { try { await backend.logout(); await identity(); } catch { status('Could not log out. Please try again.'); } };
-$('#share').onclick = async () => { try { await navigator.clipboard.writeText(`YEET THE PEP: ${metres(score(state))} m. ${$('#result-joke').textContent}\nhttps://pepecoinhub.com/games/yeet.html`); status('Flight report copied. Your group chat has been warned.'); } catch { status('Could not copy. Your distance is shown in the flight report.'); } };
+// Share: a picture of the result (no joke on it), plus a short line of text.
+// Phones get the system share sheet (Discord, X, WhatsApp…); computers save the picture and copy the text.
+// No link in the text: X refuses links to this site, the address is on the picture instead.
+function card(value, best) {
+  const c = document.createElement('canvas'); c.width = 1200; c.height = 630; const x = c.getContext('2d');
+  x.imageSmoothingEnabled = false;
+  if (background.complete && background.naturalWidth) x.drawImage(background, 0, -40, 1200, 710); else { x.fillStyle = '#3184b6'; x.fillRect(0, 0, 1200, 630); }
+  x.fillStyle = '#081c42d9'; x.fillRect(60, 70, 700, 430);
+  x.strokeStyle = '#d7ecdc'; x.lineWidth = 6; x.strokeRect(60, 70, 700, 430);
+  x.fillStyle = '#ffdf72'; x.font = '900 64px Impact, "Arial Black", sans-serif'; x.textAlign = 'left'; x.fillText('YEET THE PEP', 100, 160);
+  x.fillStyle = '#c2dcdf'; x.font = 'bold 26px "Courier New", monospace'; x.fillText(best ? 'NEW PERSONAL BEST!' : 'FLIGHT REPORT', 104, 215);
+  x.fillStyle = '#fff'; x.font = 'bold 120px "Courier New", monospace'; x.fillText(`${metres(value)} m`, 96, 360);
+  x.fillStyle = '#e5f2bb'; x.font = 'bold 30px "Courier New", monospace'; x.fillText('Can you yeet Pepe further?', 104, 440);
+  if (frog.complete && frog.naturalWidth) { x.save(); x.translate(960, 330); x.rotate(-.25); x.drawImage(frog, -200, -100, 400, 200); x.restore(); }
+  x.fillStyle = '#0e3335e6'; x.fillRect(0, 560, 1200, 70);
+  x.fillStyle = '#f2edce'; x.font = 'bold 30px "Courier New", monospace'; x.textAlign = 'center'; x.fillText('pepecoinhub.com · PondOS · Games', 600, 606);
+  return new Promise(res => c.toBlob(res, 'image/png'));
+}
+let lastBest = false;
+$('#share').onclick = async () => {
+  const value = score(state), text = `I yeeted Pepe ${metres(value)} m in YEET THE PEP 🐸🚀 Can you beat it?`;
+  let blob = null; try { blob = await card(value, lastBest); } catch {}
+  const file = blob && new File([blob], `yeet-the-pep-${Math.round(value / 10)}m.png`, { type: 'image/png' });
+  try {
+    if (file && navigator.canShare && navigator.canShare({ files: [file] }) && matchMedia('(pointer: coarse)').matches) { await navigator.share({ files: [file], text }); status('Shared. Fly safe, fren.'); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  if (file) { const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
+  try { await navigator.clipboard.writeText(text); status(file ? 'Picture saved and text copied: paste both in Discord or on X.' : 'Text copied.'); }
+  catch { status(file ? 'Picture saved. Add it to your post on Discord or X.' : 'Could not share here. Your distance is in the flight report.'); }
+};
 showBest(); hud(); initOnline(); requestAnimationFrame(frame);
