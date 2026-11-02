@@ -1446,53 +1446,56 @@
   var WP_README = [
     "WHERE'S PEPE? - README.TXT",
     '',
-    'Pepe went travelling again. Every day he sends one photo from',
-    'somewhere in the world. Find the place on the map.',
+    'Pepe is travelling. Every day he sends one photo.',
+    'Find the place on the map!',
     '',
-    'HOW TO PLAY',
-    '  1. Log on (Discord or guest) and press Start.',
-    '  2. You see the photo. Put a pin on the map where you think it is.',
-    '  3. Press GUESS! You get one guess a day.',
+    '== HOW TO PLAY ==',
+    '1. Log On (Discord or guest).',
+    '2. Press Start. The photo shows up and the clock starts.',
+    '3. Click the map where you think Pepe is.',
+    '4. Press GUESS!  One guess a day.',
     '',
-    'TIME: 2 minutes',
-    '  0:00 - 1:00   photo only               up to 5000 points',
-    '  1:00 - 1:30   + the continent           up to 4000 points',
-    '  1:30 - 2:00   + the flag of the country up to 3000 points',
-    '  2:00          time is up: the pin counts where it stands',
-    '               (no pin = 0 points)',
-    '  The clock runs on the server. Closing the window does not stop it.',
+    '== TIME: 2 MINUTES ==',
+    '0:00 - 1:00   photo only            max 5000 points',
+    '1:00 - 1:30   + continent           max 4000 points',
+    '1:30 - 2:00   + country flag        max 3000 points',
+    '2:00          time is up (no pin = 0 points)',
     '',
-    'POINTS',
-    '  Within 10 km of the spot: the full points of your time slot.',
-    '  Further away: fewer points with every kilometre.',
+    '== POINTS ==',
+    'Within 10 km: full points.',
+    'Further away: fewer points.',
+    'Left the tab? 1st time a warning, then -1000 each time.',
     '',
-    'NO TAB HOPPING',
-    '  Leaving the tab during a guess: the first time is a warning,',
-    '  every next time costs 1000 points.',
+    '== NEW PEPE ==',
+    'Every day at 00:00 UTC.',
     '',
-    'NEW PEPE',
-    '  A new photo every day at 00:00 UTC. Started at 23:59? Your guess',
-    '  still counts for the photo you got.',
+    '== RANKING ==',
+    'Today and the last 7 days. Discord players only.',
+    'Play every day to grow your streak.',
     '',
-    'RANKING',
-    '  Today and the last 7 days. Players logged on with Discord only',
-    '  (guest accounts are free to make, so they play just for fun).',
-    '  Play every day to grow your streak.',
+    '== FREE PEP ==',
+    '1 PEP for every 50 points.',
     '',
-    'PEP REWARDS (Discord players)',
-    '  After your guess you may leave a PEP address.',
-    '  1 PEP for every 50 points, up to 100 PEP a day and 500 PEP a week.',
-    '  The host pays all open rewards once a week from the host\'s own',
-    '  wallet and posts the transaction. This site never holds coins and',
-    '  never asks for a seed phrase or a password.',
-    '  One address per player. Rewards can be paused or changed, and',
-    '  rewards of accounts that cheat are not paid.',
+    '             a day     a week    starts',
+    'Discord      100 PEP   500 PEP   day 1',
+    'Guest         50 PEP   200 PEP   day 3 of your streak',
     '',
-    'THE PHOTOS',
-    '  Free-licence photos from Wikimedia Commons (public domain, CC0,',
-    '  CC BY or CC BY-SA), lightly cropped, with Pepe added. The author,',
-    '  the licence and a link to the original are shown after your guess.',
-    '  Map data: OpenStreetMap contributors.',
+    '- Guests: one reward per internet connection a day.',
+    '- One PEP address per player.',
+    '- The game has a weekly PEP budget. When it is gone,',
+    '  rewards come back next week.',
+    '- Paid once a week by the host, from the host\'s own wallet.',
+    '- Super fast top scores (over 4700 in under 5 seconds)',
+    '  are checked by hand before they are paid.',
+    '- Cheating (extra accounts, shared answers) = no reward.',
+    '',
+    'We never ask for a seed phrase or a password.',
+    'You only ever leave an address.',
+    '',
+    '== PHOTOS ==',
+    'Free photos from Wikimedia Commons, with Pepe added.',
+    'You see the author and the licence after your guess.',
+    'Map: OpenStreetMap.',
     '',
     'gl hf, fren'
   ];
@@ -1581,8 +1584,8 @@
           '<p>Pepe sent a new photo. Where is he? You have <b>2 minutes</b> and <b>one guess</b>. The faster, the more points: 5000 in the first minute, then the continent and the flag show up and the maximum drops.</p>' +
           '<p class="wp-small">Leaving the tab during the guess: one warning, then −1000 each time.</p>' +
           (T.signed_in ? '<div class="app-row"><button type="button" class="app-btn wp-start go">▶ Start</button><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
-              (T.verified ? '' : '<p class="wp-small">Playing as a guest (' + esc(me ? me.name : 'guest') + '). <a href="#" class="wp-logon">Log on with Discord</a> for the ranking and PEP rewards.</p>')
-            : '<div class="app-row"><button type="button" class="app-btn wp-logon go">Log on to play</button><button type="button" class="app-btn wp-readme">README.TXT</button></div><p class="wp-small">Discord or a guest nickname. Ranking and PEP rewards are for Discord players.</p>') +
+              (T.verified ? '' : '<p class="wp-small">Playing as a guest (' + esc(me ? me.name : 'guest') + '). <a href="#" class="wp-logon">Log on with Discord</a> for the ranking and bigger PEP rewards.</p>')
+            : '<div class="app-row"><button type="button" class="app-btn wp-logon go">Log on to play</button><button type="button" class="app-btn wp-readme">README.TXT</button></div><p class="wp-small">Discord or a guest nickname. Everyone can earn PEP; Discord players get more and enter the ranking.</p>') +
           '<div class="wp-board"></div></div></div>';
         var s = main.querySelector('.wp-start'); if (s) s.addEventListener('click', start);
         main.querySelectorAll('.wp-logon').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); });
@@ -1688,17 +1691,29 @@
         board(main.querySelector('.wp-board'));
       };
       var reward = function (box, r) {
-        var rw = T && T.rewards;
-        if (!rw) return;
+        if (r.claim) return rewardBox(box, r, null);
+        // the reward rules for this player (Discord or guest), then the form
+        wpRpc('gry_wp_rewards').then(function (rw) { rewardBox(box, r, rw); }, function () {
+          var rw = T && T.rewards; if (rw) rewardBox(box, r, Object.assign({ verified: T.verified, streak: T.streak, guest_streak: 3, discord_max_day: rw.max_day, budget_left: 1 }, rw));
+        });
+      };
+      var rewardBox = function (box, r, rw) {
         if (r.claim) {
           box.innerHTML = '<div class="wp-claim"><b>🎁 ' + r.claim.pep + ' PEP</b> ' + (r.claim.status === 'paid' ? 'paid ✓ <a href="https://pepeblocks.com/tx/' + esc(r.claim.txid) + '" target="_blank" rel="noopener">see the transaction</a>' : r.claim.status === 'held' ? 'on hold: the host is checking it' : 'waiting for the weekly payout') + '</div>';
           return;
         }
         if (!rw.open) { box.innerHTML = '<p class="wp-small">PEP rewards are paused right now.</p>'; return; }
         var pep = Math.min(rw.max_day, Math.floor((r.points || 0) / 50) * rw.per_50);
-        if (!T.verified) { box.innerHTML = '<p class="wp-small">🎁 Discord players get up to ' + rw.max_day + ' PEP for a guess like this. <a href="#" class="wp-logon">Log on with Discord</a>.</p>'; box.querySelector('.wp-logon').addEventListener('click', function (e) { e.preventDefault(); logOn(); }); return; }
         if (pep <= 0) { box.innerHTML = '<p class="wp-small">No PEP reward this time: it starts at 50 points.</p>'; return; }
-        box.innerHTML = '<form class="wp-claim"><b>🎁 Your reward: up to ' + pep + ' PEP</b><span class="wp-small">Paid once a week by the host from the host\'s own wallet. Leave only an address: never a seed phrase or a password.</span>' +
+        if (rw.budget_left <= 0) { box.innerHTML = '<p class="wp-small">🎁 This week\'s PEP budget is used up. More next week!</p>'; return; }
+        var discordLink = ' <a href="#" class="wp-logon">Log on with Discord</a>';
+        var wire = function () { var l = box.querySelector('.wp-logon'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); };
+        if (!rw.verified && rw.streak < rw.guest_streak) {
+          box.innerHTML = '<p class="wp-claim wp-small">🎁 Guest rewards start on <b>day ' + rw.guest_streak + ' of your streak</b> (you are on day ' + rw.streak + '). Come back tomorrow! Or' + discordLink + ' for up to ' + rw.discord_max_day + ' PEP from day one.</p>';
+          wire(); return;
+        }
+        box.innerHTML = '<form class="wp-claim"><b>🎁 Your reward: up to ' + pep + ' PEP</b><span class="wp-small">' + (rw.verified ? '' : 'Guest reward: one per network a day.' + discordLink + ' for up to ' + rw.discord_max_day + ' PEP. ') +
+          'Paid once a week by the host from the host\'s own wallet. Leave only an address: never a seed phrase or a password.</span>' +
           '<span class="app-row"><input class="ac-in wp-addr" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Your PEP address" placeholder="Your PEP address (P…)"><button type="submit" class="app-btn">Claim</button></span></form>';
         var f = box.querySelector('form'), inp = f.querySelector('.wp-addr');
         try { inp.value = localStorage.getItem('pondos-wp-addr') || ''; } catch (e) {}
@@ -1783,10 +1798,22 @@
           var total = Object.keys(sum).reduce(function (t, k) { return t + sum[k]; }, 0);
           var st = d.settings;
           body.innerHTML = '<h4 class="wp-h">Open rewards: ' + open.length + ' claims, ' + Object.keys(sum).length + ' addresses, ' + total.toLocaleString('en-US') + ' PEP</h4>' +
-            '<ol class="wp-claims">' + d.claims.map(function (c) { return '<li data-id="' + c.id + '"><span>' + esc(c.nick) + ' · #' + c.num + ' · ' + c.points + ' pts · <b>' + c.pep + ' PEP</b><br><code>' + esc(c.address) + '</code>' + (c.other_players_on_address ? ' <b class="bad">⚠ address used by ' + c.other_players_on_address + ' other player(s)</b>' : '') + '</span><button type="button" class="app-btn" data-hold="' + (c.status === 'held' ? 0 : 1) + '">' + (c.status === 'held' ? 'Release' : 'Hold') + '</button></li>'; }).join('') + '</ol>' +
+            '<p class="wp-small">Budget left this week: <b>' + Number(d.budget_left).toLocaleString('en-US') + ' PEP</b>. ⚠ marks are worth a look before you pay; Hold keeps a reward out of the payout.</p>' +
+            '<ol class="wp-claims">' + d.claims.map(function (c) {
+              var fl = [];
+              if (!c.verified) fl.push('guest');
+              if (c.other_players_on_address) fl.push('⚠ address used by ' + c.other_players_on_address + ' other player(s)');
+              if (c.accounts_on_network > 1) fl.push('⚠ ' + c.accounts_on_network + ' accounts on one network');
+              if (c.secs != null && c.secs < 5 && c.points > 4700) fl.push('⚠ ' + c.points + ' pts in ' + c.secs + ' s');
+              return '<li data-id="' + c.id + '"><span>' + esc(c.nick) + (c.verified ? ' ✓' : '') + ' · #' + c.num + ' · ' + c.points + ' pts · <b>' + c.pep + ' PEP</b><br><code>' + esc(c.address) + '</code>' + (fl.length ? '<br><b class="bad">' + fl.join(' · ') + '</b>' : '') + '</span><button type="button" class="app-btn" data-hold="' + (c.status === 'held' ? 0 : 1) + '">' + (c.status === 'held' ? 'Release' : 'Hold') + '</button></li>'; }).join('') + '</ol>' +
             (open.length ? '<p class="wp-small">1. Send from your own wallet: in Pepecoin Core, the Send tab, one recipient per address (Add Recipient), the amounts from the list. Or in the console: <code>sendmany ""</code> followed by the list. 2. Check the total before you confirm. 3. Paste the transaction id here and mark the rewards as paid.</p>' +
               '<textarea class="sc-in wp-many" rows="3" readonly></textarea><div class="app-row"><button type="button" class="app-btn wp-copymany">Copy the list</button><input class="ac-in wp-txid" type="text" spellcheck="false" placeholder="Transaction id (64 characters)" aria-label="Transaction id"><button type="button" class="app-btn wp-paid">Mark as paid</button></div>' : '<p class="wp-small">Nothing to pay right now.</p>') +
-            '<h4 class="wp-h">Settings</h4><form class="app-row wp-set"><label>PEP per 50 pts <input class="ac-in" name="a" type="number" step="0.01" min="0" value="' + st.per_50 + '"></label><label>Max a day <input class="ac-in" name="b" type="number" min="0" value="' + st.max_day + '"></label><label>Max a week <input class="ac-in" name="c" type="number" min="0" value="' + st.max_week + '"></label><label><input type="checkbox" name="d"' + (st.open ? ' checked' : '') + '> Rewards on</label><button type="submit" class="app-btn">Save</button></form>' +
+            '<h4 class="wp-h">Settings</h4><form class="app-row wp-set"><label>PEP per 50 pts <input class="ac-in" name="a" type="number" step="0.01" min="0" value="' + st.per_50 + '"></label>' +
+              '<label>Discord: max a day <input class="ac-in" name="b" type="number" min="0" value="' + st.max_day + '"></label><label>a week <input class="ac-in" name="c" type="number" min="0" value="' + st.max_week + '"></label>' +
+              '<label>Guests: max a day <input class="ac-in" name="e" type="number" min="0" value="' + st.guest_max_day + '"></label><label>a week <input class="ac-in" name="f" type="number" min="0" value="' + st.guest_max_week + '"></label>' +
+              '<label>from streak day <input class="ac-in" name="g" type="number" min="1" max="30" value="' + st.guest_streak + '"></label>' +
+              '<label>Budget for all, a week <input class="ac-in" name="h" type="number" min="0" value="' + st.week_budget + '"></label>' +
+              '<label><input type="checkbox" name="d"' + (st.open ? ' checked' : '') + '> Rewards on</label><button type="submit" class="app-btn">Save</button></form>' +
             (d.paid.length ? '<h4 class="wp-h">Last payouts</h4><ul class="wp-paidlist">' + d.paid.map(function (p) { return '<li>' + new Date(p.at).toLocaleDateString() + ' · ' + p.n + ' claims · ' + p.pep + ' PEP · <a href="https://pepeblocks.com/tx/' + esc(p.txid) + '" target="_blank" rel="noopener">' + esc(p.txid.slice(0, 12)) + '…</a></li>'; }).join('') + '</ul>' : '');
           var many = body.querySelector('.wp-many');
           if (many) {
@@ -1802,7 +1829,7 @@
           });
           body.querySelector('.wp-set').addEventListener('submit', function (e) {
             e.preventDefault(); var f = e.target;
-            wpRpc('gry_wp_host_settings', { p_per_50: +f.a.value, p_max_day: +f.b.value, p_max_week: +f.c.value, p_open: f.d.checked }).then(function () { say('Saved.'); }, function (err) { say(err.message, true); });
+            wpRpc('gry_wp_host_settings2', { p: { per_50: +f.a.value, max_day: +f.b.value, max_week: +f.c.value, open: f.d.checked, guest_max_day: +f.e.value, guest_max_week: +f.f.value, guest_streak: +f.g.value, week_budget: +f.h.value } }).then(function () { say('Saved.'); }, function (err) { say(err.message, true); });
           });
         }, function (e) { body.innerHTML = '<p class="wp-small">' + esc(e.message) + '</p>'; });
       };
@@ -1843,7 +1870,7 @@
         '<section class="gz-wp"><p class="gz-kick">Extra! Extra!</p><h4>Pepe packs his backpack: Where\'s Pepe? starts soon</h4>' +
         '<div class="gz-wpbox"><img src="img/wp-pepe.webp" alt="Pepe the traveller with a backpack and a camera" width="110" height="183"><div>' +
         '<p>Every day Pepe sends one photo from somewhere in the world. You get 2 minutes and one pin on the map. The closer you get, the more points: up to 5000 a day.</p>' +
-        '<p><b>And free PEP!</b> Players logged on with Discord earn 1 PEP for every 50 points, up to 100 PEP a day, paid by the host every week.</p>' +
+        '<p><b>And free PEP for everyone!</b> 1 PEP for every 50 points, paid by the host every week. Discord players get up to 100 PEP a day, guests up to 50.</p>' +
         '<p class="gz-count"></p></div></div>' +
         '<div class="app-row"><button type="button" class="app-btn gz-wpgo">Open Where\'s Pepe? →</button><button type="button" class="app-btn gz-wpad">Watch the PEP-TV ad</button></div></section>' +
         '<section class="gz-lead"><p class="gz-kick">Classifieds</p><h4>HELP WANTED: a frog to run game night</h4>' +
@@ -1970,7 +1997,7 @@
       '<img class="ad-pic" src="img/wp-pepe.webp" alt=""><p class="ad-sub">Every day he sends one photo from somewhere in the world. Find him on the map!</p>',
       '<h3 class="ad-big">2 minutes.<br>1 pin.<br><em>5000 points!</em></h3><p class="ad-sub">The faster and the closer, the better. Hints show up as the clock runs down.</p>',
       '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big"><em>FREE PEP!*</em></h3><p class="ad-sub ad-launch"></p>',
-      '<p class="ad-fine">*1 PEP per 50 points, up to 100 PEP a day, for players logged on with Discord. Paid weekly by the host. No purchase, no seed phrase, no catch.</p><button type="button" class="ad-cta ad-wpbtn">Open Where\'s Pepe? →</button>'
+      '<p class="ad-fine">*1 PEP per 50 points: up to 100 PEP a day with Discord, up to 50 as a guest (from day 3 of a streak). Weekly budget, paid weekly by the host. No purchase, no seed phrase, no catch.</p><button type="button" class="ad-cta ad-wpbtn">Open Where\'s Pepe? →</button>'
     ] },
     { file: 'host_wanted.mpg', title: 'Wanted: a frog to run game night', ch: 'CH 1 · PEPE PICTURES PRIME TIME', icon: 'unclesam', scenes: [
       '<p class="ad-kick">Always the one who organises the group chat?</p><h3 class="ad-big">WANTED:<br>a frog to run<br><em>game night!</em></h3>',
