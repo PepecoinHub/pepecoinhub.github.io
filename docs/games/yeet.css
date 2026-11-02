@@ -6,3 +6,7 @@
 .angle-buttons{display:flex;align-items:center;gap:7px}.angle-buttons button{padding:0;width:26px;height:25px;flex:none;font-size:17px}.angle-buttons input{min-width:0;flex:1}.angle{width:180px}.angle label b{font-size:15px;color:#103d7c}
 @media(max-width:800px){.window[aria-label]{display:flex;flex-direction:column}.window[aria-label]>.titlebar{order:1}.window[aria-label]>.menubar{order:2}.window[aria-label]>.game-layout{display:contents}.playfield{order:3;width:100%}.controls{order:4}.records{order:5}.statusbar{order:6;margin-top:5px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+/* inside a PondOS window (iframe or ?embed=1): the window already has a title bar */
+.embed body{background:#c3c5c7}.embed .site-bar,.embed .desktop-label,.embed footer,.embed .under-game,.embed .window[aria-label]>.titlebar{display:none!important}
+.embed .desktop{max-width:none;padding:0}.embed .window[aria-label]{box-shadow:none;border:0;padding:2px}
+@media(min-width:801px){.embed .playfield{aspect-ratio:auto;height:min(calc((100vw - 230px) * 9 / 16),calc(100vh - 150px))}.embed canvas{object-fit:contain;background:#2487cb}}

@@ -1,4 +1,4 @@
-import { launch, step, flap, score, obstacles, STEP } from './yeet-engine.mjs';
+import { launch, step, flap, score, obstacles, newSeed, STEP } from './yeet-engine.mjs?v=20261102b';
 import { getBackend } from './backend.js';
 
 const $ = s => document.querySelector(s), canvas = $('#game'), ctx = canvas.getContext('2d', { alpha: false });
@@ -8,7 +8,12 @@ const background = new Image(), frog = new Image(), frogFlap = new Image();
 background.src = 'img/yeet/landscape.webp'; frog.src = 'img/yeet/pilot.webp'; frogFlap.src = 'img/yeet/pilot-flap.webp';
 let state = null, phase = 'intro', charging = false, chargeStarted = 0, power = 0, camera = 0, paused = false;
 let previous = 0, accumulator = 0, soundOn = false, audio = null, trail = [], finishNumber = 0;
-let zoom = 1, visualDt = 1 / 60, particles = [], aiming = false;
+let zoom = 1, visualDt = 1 / 60, particles = [], aiming = false, seed = newSeed();
+// the flight plays 1.75x faster than real time: the same physics, shorter rounds
+const SPEED = 1.75;
+// inside a PondOS window: no site bar, no own title bar (the window has one)
+const framed = (() => { try { return window.self !== window.top; } catch { return true; } })();
+if (framed || /[?&]embed=1(&|$)/.test(location.search)) document.documentElement.classList.add('embed');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let backend = null, account = null, cloudBest = 0, identityEpoch = 0, boardBusy = false, lastBoard = 0;
 const storage = { get(k) { try { return Number(localStorage.getItem(k)) || 0; } catch { return 0; } },
@@ -33,7 +38,7 @@ function hud() {
   $('#flight-status').textContent = paused ? 'PAUSED' : phase === 'flying' ? `ALT ${Math.round(state.y)} m · ${Math.round(state.vx)} m/s` : phase === 'ended' ? 'BACK ON EARTH' : 'READY FOR TAKEOFF';
 }
 function reset() {
-  finishNumber++; state = null; phase = 'ready'; charging = false; paused = false; accumulator = 0; camera = 0; zoom = 1; trail = []; particles = [];
+  finishNumber++; state = null; phase = 'ready'; seed = newSeed(); charging = false; paused = false; accumulator = 0; camera = 0; zoom = 1; trail = []; particles = [];
   $('#announcement').hidden = true; $('#result').hidden = true; $('#paused').hidden = true; $('#speech').textContent = '';
   $('#action').textContent = 'HOLD TO CHARGE'; $('#action').classList.remove('flying'); $('#action').disabled = false; $('#angle').disabled = false;
   $('#power').style.width = '0%'; $('#power-label').textContent = 'READY'; $('#pause').disabled = false;
@@ -51,7 +56,7 @@ function beginCharge() {
 }
 function release() {
   if (!charging || paused) return;
-  charging = false; state = launch(power, Number($('#angle').value)); phase = 'flying'; trail = []; accumulator = 0;
+  charging = false; state = launch(power, Number($('#angle').value), seed); phase = 'flying'; trail = []; accumulator = 0;
   $('#action').textContent = 'PANIC FLAP [3]'; $('#action').classList.add('flying'); $('#angle').disabled = true;
   $('#power-label').textContent = `${Math.round(power * 100)}%`; tone(180, .22, 'sawtooth', .04);
   $('#angle-down').disabled = true; $('#angle-up').disabled = true;
@@ -154,6 +159,19 @@ function prop(o, t) {
     ctx.save(); ctx.translate(0, -63); ctx.rotate(-.3); rect(-30, -30, 60, 60, '#24354a'); rect(-25, -25, 50, 50, '#b7ccd2');
     ctx.rotate(t * 9); for (let i = 0; i < 4; i++) { ctx.rotate(Math.PI / 2); rect(-5, -22, 13, 21, '#456275'); } rect(-6, -6, 12, 12, '#e8eecb'); ctx.restore();
     for (let i = 0; i < 3; i++) rect(-20 + i * 18, -105 - (t * 40 + i * 11) % 50, 3, 15, '#e6f9e680'); text('HOPIUM', 0, 18, 10, '#f3f2c1');
+  } else if (o.type === 'sellwall') {
+    // a red candle from the chart, growing out of the ground
+    const top = -(o.h * SCALE + 20);
+    rect(-2, top - 22, 4, 24, '#5a1218'); rect(-15, top, 30, -top, '#5a1218'); rect(-12, top + 3, 24, -top - 3, '#e0414c'); rect(-12, top + 3, 5, -top - 3, '#f27a80');
+    for (let yy = top + 14; yy < -6; yy += 16) rect(-12, yy, 24, 2, '#b72a35');
+    rect(-2, -4, 4, 8, '#5a1218');
+    text('SELL', 0, top - 30, 10, '#ffd3d3'); text('WALL', 0, top - 19, 10, '#ffd3d3'); text(`${o.h} m`, 0, 18, 9, '#f5c9c9');
+  } else if (o.type === 'pump') {
+    // a green candle pad: land on it to get pumped
+    rect(-2, -34, 4, 12, '#14451d'); rect(-17, -24, 34, 26, '#14451d'); rect(-14, -21, 28, 21, '#3fc25a'); rect(-14, -21, 6, 21, '#8be69a');
+    const lift = (t * 40) % 24;
+    for (const dx of [-9, 9]) { ctx.globalAlpha = 1 - lift / 24; rect(dx - 5, -46 - lift, 10, 3, '#b7ff9e'); rect(dx - 3, -49 - lift, 6, 3, '#b7ff9e'); rect(dx - 1, -52 - lift, 2, 3, '#b7ff9e'); ctx.globalAlpha = 1; }
+    text('PUMP', 0, 18, 11, '#c9ffb4');
   } else if (o.type === 'mud') {
     rect(-43, -2, 86, 7, '#56402b'); rect(-35, -1, 70, 4, '#876440'); rect(-18, 0, 10, 2, '#baa174'); text('BAD DECISIONS', 0, 20, 9, '#eddfb6');
   } else {
@@ -186,7 +204,7 @@ function scenery(t) {
   rect(0, GROUND, visibleW, 14, '#568b2b'); rect(0, GROUND + 2, visibleW, 3, '#c1d742'); rect(0, GROUND + 14, visibleW, (H - GROUND) / zoom, '#65492e');
   const offset = Math.floor(camera % 48);
   for (let i = -1; i < visibleW / 48 + 2; i++) { const x = i * 48 - offset; rect(x, GROUND - 5, 3, 7, '#95bf38'); rect(x + 17, GROUND - 3, 2, 4, '#d2df51'); rect(x + 8, GROUND + 23, 17, 8, '#93683d'); rect(x + 30, GROUND + 52, 10, 7, '#b89860'); }
-  for (const o of obstacles(Math.max(0, (camera - 260) / SCALE), (camera + visibleW) / SCALE)) prop(o, t);
+  for (const o of obstacles(Math.max(0, (camera - 260) / SCALE), (camera + visibleW) / SCALE, state ? state.seed : seed)) prop(o, t);
   catapult();
   const marker = Math.floor(Math.max(0, camera) / (100 * SCALE)) * 100;
   for (let m = marker; m < marker + visibleW / SCALE + 200; m += 100) { const x = 160 + m * SCALE - camera; rect(x, GROUND + 26, 2, 17, '#ccb88e'); text(`${m} m`, x, GROUND + 60, 10, '#ead9ae'); }
@@ -197,7 +215,7 @@ function burst(x, y, color, count = 16) {
 }
 function aimingGuide(t) {
   if (phase !== 'ready') return;
-  const angle = Number($('#angle').value), preview = launch(charging ? power : .65, angle);
+  const angle = Number($('#angle').value), preview = launch(charging ? power : .65, angle, seed);
   ctx.save();
   ctx.strokeStyle = '#fff4b5'; ctx.lineWidth = 3;
   const a = angle * Math.PI / 180;
@@ -244,11 +262,11 @@ function updateFlight() {
   const id = `${state.event}:${state.eventAt}`;
   if (id !== seenEvent) {
     seenEvent = id;
-    if (['trampoline', 'bounce', 'mud', 'cart'].includes(state.event)) burst(state.x, state.y, state.event === 'mud' ? '#805b34' : '#f8e395');
+    if (['trampoline', 'bounce', 'mud', 'cart', 'sellwall', 'pump'].includes(state.event)) burst(state.x, state.y, { mud: '#805b34', sellwall: '#e0414c', pump: '#7dff8f' }[state.event] || '#f8e395');
     if (state.event === 'flap') burst(state.x, state.y, '#efffc7', 13);
-    const messages = { trampoline: 'BOING. ALL ACCORDING TO PLAN.', fan: 'HOPIUM LEVELS: CRITICAL.', cart: 'MUCH BOOST. VERY AVIATION.', mud: 'THIS WAS NOT IN THE BROCHURE.', bounce: 'CONTROLLED LANDING. SORT OF.', flap: 'PANIC IS A VALID STRATEGY.' };
+    const messages = { trampoline: 'BOING. ALL ACCORDING TO PLAN.', fan: 'HOPIUM LEVELS: CRITICAL.', cart: 'MUCH BOOST. VERY AVIATION.', mud: 'THIS WAS NOT IN THE BROCHURE.', bounce: 'CONTROLLED LANDING. SORT OF.', flap: 'PANIC IS A VALID STRATEGY.', sellwall: 'REJECTED BY THE SELL WALL. FLAP!', pump: 'PUMP IT! +1 PANIC FLAP.' };
     $('#speech').textContent = messages[state.event] || '';
-    if (messages[state.event]) tone(state.event === 'mud' ? 95 : 330, .12, 'triangle', .05);
+    if (messages[state.event]) tone({ mud: 95, sellwall: 70, pump: 660 }[state.event] || 330, .12, 'triangle', .05);
   }
   if (state.time - state.eventAt > 1.7) $('#speech').textContent = '';
   if (state.ended) finish();
@@ -257,7 +275,7 @@ function frame(now) {
   const elapsed = previous ? Math.min((now - previous) / 1000, .1) : 0; previous = now;
   visualDt = elapsed || 1 / 60;
   if (charging && !paused) { power = .08 + .92 * (1 - Math.cos((now - chargeStarted) / 850 * Math.PI)) / 2; $('#power').style.width = `${power * 100}%`; $('#power-label').textContent = `${Math.round(power * 100)}%`; }
-  if (phase === 'flying' && !paused) { accumulator += elapsed; while (accumulator >= STEP && phase === 'flying') { updateFlight(); accumulator -= STEP; } hud(); if (phase === 'flying') { $('#action').textContent = `PANIC FLAP [${state.flaps}]`; $('#action').disabled = state.flaps === 0; } }
+  if (phase === 'flying' && !paused) { accumulator += elapsed * SPEED; while (accumulator >= STEP && phase === 'flying') { updateFlight(); accumulator -= STEP; } hud(); if (phase === 'flying') { $('#action').textContent = `PANIC FLAP [${state.flaps}]`; $('#action').disabled = state.flaps === 0; } }
   if (!paused) draw(now / 1000);
   requestAnimationFrame(frame);
 }
@@ -293,7 +311,10 @@ $('#help-close').onclick = () => { $('#help').hidden = true; $('#help-button').f
 $('#fullscreen').onclick = async () => { try { if (document.fullscreenElement) await document.exitFullscreen(); else await $('.window').requestFullscreen(); } catch { status('Fullscreen unavailable here. Try opening the game in a new tab.'); } };
 $('#scores-button').onclick = () => { loadBoard(); $('.records').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
 $('#refresh').onclick = () => { if (Date.now() - lastBoard < 10000) { $('#ranking-status').textContent = 'Scores were just refreshed. Try again in a few seconds.'; return; } loadBoard(true); };
-$('#login').onclick = async () => { if (!backend || backend.kind !== 'supabase') { status('Discord sign-in is unavailable here. You can still play as a guest.'); return; } pause(true); try { await backend.discord(); } catch { status('Discord sign-in could not open. Please try again.'); } };
+let loginTab = false;
+// Discord does not open inside a window frame: sign in in a new tab, then come back here
+window.addEventListener('focus', () => { if (loginTab) { loginTab = false; location.reload(); } });
+$('#login').onclick = async () => { if (framed) { loginTab = true; pause(true); window.open('yeet.html', '_blank', 'noopener'); status('Log in with Discord in the new tab, then come back here.'); return; } if (!backend || backend.kind !== 'supabase') { status('Discord sign-in is unavailable here. You can still play as a guest.'); return; } pause(true); try { await backend.discord(); } catch { status('Discord sign-in could not open. Please try again.'); } };
 $('#logout').onclick = async () => { try { await backend.logout(); await identity(); } catch { status('Could not log out. Please try again.'); } };
 $('#share').onclick = async () => { try { await navigator.clipboard.writeText(`YEET THE PEP: ${metres(score(state))} m. ${$('#result-joke').textContent}\nhttps://pepecoinhub.com/games/yeet.html`); status('Flight report copied. Your group chat has been warned.'); } catch { status('Could not copy. Your distance is shown in the flight report.'); } };
 showBest(); hud(); initOnline(); requestAnimationFrame(frame);

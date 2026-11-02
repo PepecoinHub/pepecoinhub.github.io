@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { launch, step, flap, score, obstacles, STEP } from '../docs/games/js/yeet-engine.mjs';
+import { launch, step, flap, score, obstacles, layout, STEP } from '../docs/games/js/yeet-engine.mjs';
 
 function run(power, angle, flaps = []) {
   const s = launch(power, angle); let i = 0;
@@ -53,4 +53,32 @@ test('frame budgets can advance the same simulation at different display rates',
     while (!s.ended) { acc += 1 / fps; while (acc >= STEP && !s.ended) { step(s); acc -= STEP; } } return s;
   }
   assert.equal(score(simulate(30)), score(simulate(144)));
+});
+test('the same spots get different things each round, and a seed always gives the same layout', () => {
+  const a = layout(11).map(o => o.type).join(), b = layout(12).map(o => o.type).join();
+  assert.notEqual(a, b); assert.equal(layout(11).map(o => o.type).join(), a);
+  const xs = new Set(); for (let s = 1; s < 40; s++) for (const o of layout(s)) xs.add(o.x);
+  assert.ok(xs.size <= 75, 'only the fixed spots are used');
+  for (let s = 1; s < 200; s++) { const L = layout(s); assert.ok(L[0]?.type !== 'sellwall' || L[0].id > 0);
+    for (let i = 1; i < L.length; i++) assert.ok(!(L[i].type === 'sellwall' && L[i - 1].type === 'sellwall' && L[i].id - L[i - 1].id < 2)); }
+});
+function seedWith(type) { for (let s = 1; s < 500; s++) { const o = layout(s).find(o => o.type === type); if (o) return [s, o]; } }
+test('a sell wall stops a low frog, and a high frog flies over it', () => {
+  const [seed, w] = seedWith('sellwall');
+  const low = launch(.5, 40, seed); low.x = w.x - 1.6; low.y = w.h - 3; low.vx = 40; low.vy = 0; step(low);
+  assert.equal(low.event, 'sellwall'); assert.equal(low.vx, 0); assert.ok(low.x < w.x);
+  for (let i = 0; i < 3000 && !low.ended; i++) step(low);
+  assert.ok(low.ended && low.x < w.x, 'it slides down and the round ends at the wall');
+  const high = launch(.5, 40, seed); high.x = w.x - 1.6; high.y = w.h + 2; high.vx = 40; high.vy = 0; step(high);
+  assert.notEqual(high.event, 'sellwall'); assert.ok(high.x > w.x - 1.5);
+});
+test('a pump launches the frog and gives one flap back', () => {
+  const [seed, p] = seedWith('pump');
+  const s = launch(.5, 40, seed); s.x = p.x; s.y = 1; s.vx = 10; s.vy = -5; s.flaps = 1; step(s);
+  assert.equal(s.event, 'pump'); assert.ok(s.vy >= 39); assert.equal(s.flaps, 2);
+});
+test('random seeds still give bounded scores', () => {
+  for (let seed = 1; seed < 120; seed++) { const s = launch(1, 42, seed);
+    while (!s.ended) { if (s.y < 6 && s.vy < 0) flap(s); step(s); }
+    assert.ok(score(s) <= 60000 && score(s) <= Math.ceil(s.time * 1000) + 100); }
 });
