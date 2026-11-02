@@ -317,7 +317,7 @@ window.addEventListener('focus', () => { if (loginTab) { loginTab = false; locat
 $('#login').onclick = async () => { if (framed) { loginTab = true; pause(true); window.open('yeet.html', '_blank', 'noopener'); status('Log in with Discord in the new tab, then come back here.'); return; } if (!backend || backend.kind !== 'supabase') { status('Discord sign-in is unavailable here. You can still play as a guest.'); return; } pause(true); try { await backend.discord(); } catch { status('Discord sign-in could not open. Please try again.'); } };
 $('#logout').onclick = async () => { try { await backend.logout(); await identity(); } catch { status('Could not log out. Please try again.'); } };
 // Share: a picture of the result (no joke on it), plus a short line of text.
-// Phones get the system share sheet (Discord, X, WhatsApp…); computers save the picture and copy the text.
+// Phones get the system share sheet (Discord, X, WhatsApp…); computers copy the picture to the clipboard.
 // No link in the text: X refuses links to this site, the address is on the picture instead.
 function card(value, best) {
   const c = document.createElement('canvas'); c.width = 1200; c.height = 630; const x = c.getContext('2d');
@@ -342,8 +342,12 @@ $('#share').onclick = async () => {
   try {
     if (file && navigator.canShare && navigator.canShare({ files: [file] }) && matchMedia('(pointer: coarse)').matches) { await navigator.share({ files: [file], text }); status('Shared. Fly safe, fren.'); return; }
   } catch (e) { if (e && e.name === 'AbortError') return; }
-  if (file) { const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
-  try { await navigator.clipboard.writeText(text); status(file ? 'Picture saved and text copied: paste both in Discord or on X.' : 'Text copied.'); }
-  catch { status(file ? 'Picture saved. Add it to your post on Discord or X.' : 'Could not share here. Your distance is in the flight report.'); }
+  // computers: the picture goes to the clipboard (paste it with Ctrl+V); saving a file is only the last resort
+  if (blob && window.ClipboardItem && navigator.clipboard?.write) {
+    try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); status('Picture copied! Paste it (Ctrl+V) in Discord or on X.'); return; } catch {}
+  }
+  try { await navigator.clipboard.writeText(text); status('Text copied. Paste it in Discord or on X.'); return; } catch {}
+  if (file) { const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); status('Picture saved. Add it to your post on Discord or X.'); }
+  else status('Could not share here. Your distance is in the flight report.');
 };
 showBest(); hud(); initOnline(); requestAnimationFrame(frame);

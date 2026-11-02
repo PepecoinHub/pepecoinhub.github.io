@@ -39,3 +39,18 @@
   .home-focus .home-stats { padding: 10px; }
   .home-focus .home-stats .stat .value { font-size: clamp(1.1rem, 5vw, 1.5rem); }
 }
+/* "the other side": a small PondOS window that leads to the meme edition */
+.other-side{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:24px;align-items:center;margin:28px 0;padding:18px;border:2px dashed var(--line,#c9d3cc);border-radius:18px}
+.os-door{display:block;text-decoration:none;color:#fff;background:#c3c5c7;border:3px solid;border-color:#fff #333 #333 #fff;box-shadow:6px 6px 0 #0003;transform:rotate(-2deg);transition:transform .2s}
+.os-door:hover,.os-door:focus-visible{transform:rotate(0) scale(1.03)}
+.os-bar{display:flex;align-items:center;gap:6px;padding:4px 6px;background:linear-gradient(90deg,#1b5e2a,#3b9a4f);font:700 12px/1.2 Tahoma,Verdana,sans-serif}
+.os-bar img{flex:none}.os-bar i{display:inline-block;width:13px;height:12px;margin-left:auto;background:#c3c5c7;border:1px solid;border-color:#fff #333 #333 #fff}.os-bar i+i{margin-left:2px}
+.os-screen{position:relative;display:block;aspect-ratio:16/10;margin:3px;background:url(meme/img/wall-day.webp) center/cover;overflow:hidden}
+.os-icons{position:absolute;left:8px;top:8px;display:grid;gap:6px}.os-icons img{width:30px;height:30px;image-rendering:pixelated;filter:drop-shadow(1px 1px 0 #0006)}
+.os-task{position:absolute;left:0;right:0;bottom:0;height:20px;background:#c3c5c7;border-top:2px solid #fff;padding:2px 4px}
+.os-task b{display:inline-block;padding:0 6px;font:700 11px/14px Tahoma,sans-serif;color:#111;border:1px solid;border-color:#fff #333 #333 #fff}
+.os-kick{margin:0;font-weight:700;color:#2a8a3a;text-transform:uppercase;letter-spacing:.06em;font-size:.8rem}
+.other-side h2{margin:.2em 0 .3em}.other-side p{margin:0 0 .8em}
+@media (max-width:640px){.other-side{grid-template-columns:1fr}.os-door{max-width:320px;margin:0 auto}}
+@media (prefers-reduced-motion:reduce){.os-door{transform:none;transition:none}}
+.other-side .os-go{display:inline-block;padding:9px 16px;background:#2a8a3a;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;box-shadow:0 3px 0 #1b5e2a}.other-side .os-go:hover{background:#237a32}
