@@ -721,6 +721,7 @@
     var openIcon = function (a) { var h = a.getAttribute('href'); if (ACT[h]) ACT[h](); else location.href = a.href; };
     desk.querySelectorAll('.icons a').forEach(function (a) {
       var id = a.getAttribute('data-id'), p = iconPos[id];
+      if (p && (Math.abs(p[0]) > 300 || Math.abs(p[1]) > 1200)) { delete iconPos[id]; p = null; }
       if (p && FINE && window.innerWidth > 1100) a.style.transform = 'translate(' + p[0] + 'px,' + p[1] + 'px)';
       var moved = false;
       a.addEventListener('click', function (e) {
@@ -732,22 +733,32 @@
       a.addEventListener('dblclick', function (e) { e.preventDefault(); openIcon(a); });
       a.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); openIcon(a); } });
       if (!FINE) return;
+      // no native link/image dragging: it would steal the pointer (a ghost picture, then the icon stops following)
+      a.setAttribute('draggable', 'false'); a.querySelector('img').setAttribute('draggable', 'false');
+      a.addEventListener('dragstart', function (e) { e.preventDefault(); });
       a.addEventListener('pointerdown', function (e) {
         if (e.button !== 0 || window.innerWidth <= 1100) return;
+        e.preventDefault();   // no text selection while dragging
         var sx = e.clientX, sy = e.clientY, base = iconPos[id] || [0, 0], cur = base;
+        // icons stay on the desktop strip: the big window covers the rest, and an icon under it could not be grabbed again
+        var r0 = a.getBoundingClientRect(), x0 = r0.left - base[0], y0 = r0.top - base[1], dr = desk.getBoundingClientRect();
+        var left = dr.left, right = Math.max(dr.left, dr.right - r0.width), top = Math.max(0, dr.top);
+        var bottom = Math.min(window.innerHeight - 44, dr.bottom) - r0.height;   // and above the taskbar
+        try { a.setPointerCapture(e.pointerId); } catch (err) {}
         var mv = function (ev) {
           var dx = ev.clientX - sx, dy = ev.clientY - sy;
           if (!moved && Math.abs(dx) + Math.abs(dy) < 6) return;
           moved = true; a.classList.add('dragging');
-          cur = [Math.max(-10, Math.min(base[0] + dx, window.innerWidth - 120)), base[1] + dy];
+          cur = [Math.round(Math.max(left - x0, Math.min(base[0] + dx, right - x0))),
+            Math.round(Math.max(top - y0, Math.min(base[1] + dy, bottom - y0)))];
           a.style.transform = 'translate(' + cur[0] + 'px,' + cur[1] + 'px)';
         };
         var up = function () {
-          window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up);
+          a.removeEventListener('pointermove', mv); a.removeEventListener('pointerup', up); a.removeEventListener('pointercancel', up);
           a.classList.remove('dragging');
-          if (moved) { iconPos[id] = cur; try { localStorage.setItem('pondos-icons2', JSON.stringify(iconPos)); } catch (err) {} }
+          if (moved) { iconPos[id] = cur; try { localStorage.setItem('pondos-icons2', JSON.stringify(iconPos)); } catch (err) {} a.focus({ preventScroll: true }); }
         };
-        window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+        a.addEventListener('pointermove', mv); a.addEventListener('pointerup', up); a.addEventListener('pointercancel', up);
       });
     });
     document.addEventListener('click', function (e) { if (!e.target.closest('.desk')) desk.querySelectorAll('.sel').forEach(function (x) { x.classList.remove('sel'); }); });
@@ -856,7 +867,7 @@
     if (apps[id]) { if (apps[id].host.classList.contains('is-min')) apps[id].restore(); else focusApp(apps[id]); return apps[id]; }
     var host = el('div', { class: 'app-win', role: 'dialog', 'aria-label': title });
     if (width) host.style.width = 'min(' + width + 'px, calc(100vw - 16px))';
-    host.innerHTML = '<div class="win active"><div class="win-bar"><img src="' + ico(icon) + '" alt="" width="16" height="16"><span class="win-t">' + esc(title) + '</span><span class="win-ctl"><button type="button" class="w-min" title="Minimize">' + ICO.min + '<span class="sr">Minimize ' + esc(title) + '</span></button><button type="button" class="w-x" title="Close">' + ICO.x + '<span class="sr">Close ' + esc(title) + '</span></button></span></div><div class="app-body"></div></div>';
+    host.innerHTML = '<div class="win active"><div class="win-bar"><img src="' + ico(icon) + '" alt="" width="16" height="16"><span class="win-t">' + esc(title) + '</span><span class="win-ctl"><button type="button" class="w-min" title="Minimize">' + ICO.min + '<span class="sr">Minimize ' + esc(title) + '</span></button><button type="button" class="w-full" title="Full screen">' + ICO.max + '<span class="sr">Full screen ' + esc(title) + '</span></button><button type="button" class="w-x" title="Close">' + ICO.x + '<span class="sr">Close ' + esc(title) + '</span></button></span></div><div class="app-body"></div></div>';
     document.body.appendChild(host);
     var A = { id: id, host: host, body: host.querySelector('.app-body'), stop: null };
     var n = Object.keys(apps).length;
@@ -864,6 +875,18 @@
     if (window.innerWidth > 760) { host.style.left = Math.max(8, (window.innerWidth - host.offsetWidth) / 2 + n * 28) + 'px'; host.style.transform = 'none'; }
     A.close = function () { if (A.stop) A.stop(); if (A.taskBtn) A.taskBtn.remove(); host.remove(); delete apps[id]; if (activeApp === A) activeApp = null; };
     host.querySelector('.w-x').addEventListener('click', A.close);
+    // full screen: a small window grows to fill the desktop (above the taskbar); a window that is already that big
+    // (Pepe Miner, YEET THE PEP) goes to the browser's real full screen. The same button, or a double click
+    // on the title bar, brings it back.
+    A.full = function () {
+      var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      if (fsEl === host) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+      if (host.classList.contains('is-max')) { host.classList.remove('is-max'); window.dispatchEvent(new Event('resize')); return; }
+      if (!host.classList.contains('app-full')) { host.classList.add('is-max'); window.dispatchEvent(new Event('resize')); focusApp(A); return; }
+      var go = host.requestFullscreen || host.webkitRequestFullscreen;
+      if (go) { try { var pr = go.call(host); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {} }
+    };
+    host.querySelector('.w-full').addEventListener('click', A.full);
     // minimize: the window hides and waits as a button on the taskbar (also on a phone); the game keeps its state
     A.restore = function () { host.classList.remove('is-min'); if (A.taskBtn) { A.taskBtn.remove(); A.taskBtn = null; } focusApp(A); };
     host.querySelector('.w-min').addEventListener('click', function () {
@@ -877,8 +900,9 @@
     host.addEventListener('pointerdown', function () { focusApp(A); });
     // drag by the title bar
     var bar = host.querySelector('.win-bar');
+    bar.addEventListener('dblclick', function (e) { if (!e.target.closest('button')) A.full(); });
     bar.addEventListener('pointerdown', function (e) {
-      if (e.button !== 0 || e.target.closest('button')) return;
+      if (e.button !== 0 || e.target.closest('button') || host.classList.contains('is-max') || host.classList.contains('app-full')) return;
       e.preventDefault();
       var r = host.getBoundingClientRect(), sx = e.clientX - r.left, sy = e.clientY - r.top;
       host.style.transform = 'none'; host.style.left = r.left + 'px';
