@@ -173,6 +173,7 @@
     [['PEP Pong', 'PEP vs PEPE, first to 7', 'pep-logo', function () { pong(); }], ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
       ['YEET THE PEP', 'A frog, a catapult, no flight plan', 'yeet', function () { yeetApp(); }],
+      ['POND WARS', 'Frog teams, grenades, one island', 'pondwars', function () { pondWarsApp(); }],
       ['High Scores', 'FUD Invaders and PEP Snake, top 10', 'gif-061-still', function () { highScores(); }],
       ["Where's Pepe?", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
@@ -1271,6 +1272,12 @@
     }, 1000);
     A.host.classList.add('app-full');
   }
+  function pondWarsApp() {
+    var A = openApp('pondwars', 'POND WARS', 'pondwars', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars.html?embed=1" title="POND WARS"></iframe>';
+    }, 1000);
+    A.host.classList.add('app-full');
+  }
   function minerApp() {
     var A = openApp('miner', 'Pepe Miner', 'pickaxe', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/miner.html?embed=1" title="Pepe Miner"></iframe>';
@@ -1284,7 +1291,7 @@
   function gamesFolder() {
     openApp('games', 'C:\\Pond\\Games', 'games-folder', function (A) {
       var G = [['PEP Pong', 'pep-logo', pong], ['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
-        ['YEET THE PEP', 'yeet', function () { yeetApp(); }],
+        ['YEET THE PEP', 'yeet', function () { yeetApp(); }], ['POND WARS', 'pondwars', function () { pondWarsApp(); }],
         ['High Scores', 'gif-061-still', function () { highScores(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
@@ -2078,6 +2085,12 @@
   // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
   // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
   var ADS = [
+    { file: 'pond_wars.mpg', added: '2026-11-03', title: 'POND WARS', ch: 'CH 99 · LIVE FROM THE ISLAND', icon: 'pondwars', scenes: [
+      '<p class="ad-kick">Breaking news from the pond…</p><h3 class="ad-big">The frogs have<br><em>GRENADES.</em></h3>',
+      '<h3 class="ad-big">Team <em>PEP</em><br>vs Team FUD.</h3><p class="ad-sub">One island. Your turn: walk, hop, aim, hold, let go. Then duck.</p>',
+      '<p class="ad-kick">Today\'s menu:</p><p class="ad-sub">💣 Lily Grenade: bounces, 3 seconds<br>🚀 Hopium Rocket: watch the wind<br>🕯️ Red Candle Drop: once a game, straight from the chart</p><h3 class="ad-big">The ground <em>breaks!</em></h3>',
+      '<p class="ad-fine">Against the CPU or a friend on the same device. No PEP prizes, no seed phrase, only frogs in the water.</p><button type="button" class="ad-cta ad-pwbtn">Start a war →</button>'
+    ] },
     { file: 'yeet_the_pep.mpg', added: '2026-11-02', title: 'YEET THE PEP', ch: 'CH 404 · THE UNOFFICIAL SPACE PROGRAM', icon: 'yeet', scenes: [
       '<p class="ad-kick">Pepe wanted to go to the moon.</p><h3 class="ad-big">Nobody gave him<br>a <em>rocket.</em></h3>',
       '<h3 class="ad-big">So we gave him<br>a <em>catapult!</em></h3><img class="ad-pic" src="../games/img/yeet/pilot.webp" alt="">',
@@ -2167,6 +2180,7 @@
       var lb = A.body.querySelector('.ad-lapbtn'); if (lb) lb.addEventListener('click', function () { laptop(); });
       var wb = A.body.querySelector('.ad-wpbtn'); if (wb) wb.addEventListener('click', function () { wheresPepe(); });
       var yb = A.body.querySelector('.ad-yeetbtn'); if (yb) yb.addEventListener('click', function () { yeetApp(); });
+      var pwb = A.body.querySelector('.ad-pwbtn'); if (pwb) pwb.addEventListener('click', function () { pondWarsApp(); });
       var wl = A.body.querySelector('.ad-launch'); if (wl) { wl.innerHTML = launchText(); var wlt = setInterval(function () { if (!document.body.contains(wl)) clearInterval(wlt); else wl.innerHTML = launchText(); }, 1000); }
       liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
     }, 720);

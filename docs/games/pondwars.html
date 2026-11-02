@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin"><title>POND WARS: frog artillery | Pepecoin Hub</title>
+<meta name="description" content="Turn-based frog artillery: two teams of frogs, a destructible island, grenades, rockets and red candles. Play against the CPU or a friend on one device.">
+<link rel="canonical" href="https://pepecoinhub.com/games/pondwars.html"><link rel="icon" href="../meme/img/ico/pondwars.webp">
+<link rel="stylesheet" href="pondwars.css?v=20261103a"><script type="module" src="js/pondwars.mjs?v=20261103a"></script>
+</head><body>
+<header class="pw-site"><a href="../meme/">← Pepecoin Hub</a><b>POND WARS</b><a href="index.html">More games</a></header>
+<main class="pw">
+  <div class="pw-bar">
+    <div class="pw-team t0"><b>PEP</b><span class="pw-hp" id="hp0"></span></div>
+    <div class="pw-mid"><span id="turn">Ready</span><span class="pw-timer" id="timer">30</span><span class="pw-wind" id="wind" title="Wind: pushes rockets">WIND <span class="wt"><i></i></span></span></div>
+    <div class="pw-team t1"><span class="pw-hp" id="hp1"></span><b id="name1">FUD</b></div>
+  </div>
+  <div class="pw-stage">
+    <canvas id="pw" width="1200" height="600" tabindex="0" aria-label="POND WARS battlefield. Aim with the mouse or a finger, hold to charge, let go to throw.">Your browser needs Canvas to play.</canvas>
+    <div class="pw-menu" id="menu">
+      <h1>POND WARS</h1>
+      <p>Two frog teams. One island. Way too many grenades.</p>
+      <div class="pw-pick"><span>Play against</span><button type="button" data-mode="cpu" aria-pressed="true">CPU</button><button type="button" data-mode="duo" aria-pressed="false">A friend (one device)</button></div>
+      <div class="pw-pick" id="levels"><span>CPU level</span><button type="button" data-level="0" aria-pressed="false">Easy</button><button type="button" data-level="1" aria-pressed="true">Normal</button><button type="button" data-level="2" aria-pressed="false">Hard</button></div>
+      <div class="pw-pick"><span>Frogs a team</span><button type="button" data-n="2" aria-pressed="false">2</button><button type="button" data-n="3" aria-pressed="true">3</button><button type="button" data-n="4" aria-pressed="false">4</button></div>
+      <button type="button" class="pw-go" id="go">START THE WAR →</button>
+      <p class="pw-small">Aim at a spot: mouse or finger. Hold to charge, let go to throw. ← → walk, ↑ or HOP jumps.</p>
+    </div>
+    <div class="pw-over" id="over" hidden><h2 id="over-title"></h2><p id="over-text"></p><button type="button" class="pw-go" id="again">Play again</button><button type="button" id="tomenu">Menu</button></div>
+  </div>
+  <div class="pw-controls">
+    <div class="pw-weapons" role="group" aria-label="Weapon">
+      <button type="button" data-w="grenade" aria-pressed="true" title="Bounces, goes off after 3 seconds (key 1)">💣 Grenade</button>
+      <button type="button" data-w="rocket" aria-pressed="false" title="Goes off on impact, the wind pushes it (key 2)">🚀 Rocket</button>
+      <button type="button" data-w="candles" aria-pressed="false" title="Three red candles fall from the sky where you tap. Once a game (key 3)">🕯️ Candles <b id="ammo">×1</b></button>
+    </div>
+    <div class="pw-move"><button type="button" id="left" aria-label="Walk left">◀</button><button type="button" id="hop">HOP</button><button type="button" id="right" aria-label="Walk right">▶</button></div>
+    <div class="pw-power"><span>POWER</span><div><i id="power"></i></div></div>
+    <button type="button" class="pw-fire" id="fire">HOLD TO THROW</button>
+    <button type="button" id="skip" title="End the turn without throwing">Skip</button>
+  </div>
+  <p class="pw-rotate">📱↻ Turn your phone sideways for bigger frogs.</p>
+  <p class="pw-status" id="status" role="status" aria-live="polite">Pick a mode and start.</p>
+</main>
+</body></html>
