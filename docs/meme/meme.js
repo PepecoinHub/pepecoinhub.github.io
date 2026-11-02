@@ -170,7 +170,7 @@
       smMain.appendChild(subGroup(g[0], GICON[gi], list));
     });
     var gl = el('div', { class: 'sm-list' });
-    [['PEP Pong', 'PEP vs PEPE, first to 7', 'pep-logo', function () { pong(); }], ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
+    [['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
       ['YEET THE PEP', 'A frog, a catapult, no flight plan', 'yeet', function () { yeetApp(); }],
       ['High Scores', 'FUD Invaders and PEP Snake, top 10', 'gif-061-still', function () { highScores(); }],
@@ -704,7 +704,7 @@
       ['Pond', [['./', 'My Pond', 'pep-logo'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], ['#shop', 'Shop', 'shop-bag'],
         ['#tip', 'Tip jar.exe', 'gif-045-still'], [serious, 'Serious mode', 'serious'], ['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
-    var ACT = { '#wp': wpFolder, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#wp': wpFolder, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -713,7 +713,6 @@
       return '<div class="icon-group"><p class="icon-group-name">' + g[0] + '</p><ul class="icons">' + g[1].map(function (d) { return '<li><a href="' + d[0] + '" data-id="' + esc(d[1]) + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></a></li>'; }).join('') + '</ul></div>';
     }).join('') + '</div>';
     document.body.insertBefore(desk, mainEl);
-    setTimeout(pager, 0);
     var lanIcon = desk.querySelector('a[href="#lan"]');
     if (lanIcon) lanIcon.insertAdjacentHTML('beforeend', '<span class="lan-badge icon-badge" hidden><span class="lan-dot" aria-hidden="true"></span><span class="lan-n"></span></span>');
     var FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -806,7 +805,7 @@
     [['Arrange windows', arrangeAll], ['Refresh', function () { location.reload(); }], null,
       [dark ? 'Wallpaper: day hills' : 'Wallpaper: night mountains', function () { if (themeBtn) themeBtn.click(); }],
       ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons2'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
-      null, ['New game: PEP Pong', pong], ['New game: FUD Invaders', invaders], ['New game: PEP Snake', snake], null, ['Properties…', aboutOS]].forEach(function (it) {
+      null, ['New game: FUD Invaders', invaders], ['New game: PEP Snake', snake], null, ['Properties…', aboutOS]].forEach(function (it) {
       if (!it) { ctx.appendChild(el('hr')); return; }
       var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
       b.addEventListener('click', function () { closeCtx(); it[1](); });
@@ -933,71 +932,18 @@
     c.fillStyle = '#fff'; c.font = 'bold ' + Math.round(r * 1.3) + 'px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('P', x, y + 1);
   }
 
-  // ---------- PEP Pong: PEP vs PEPE (CPU) ----------
-  function pong() {
-    openApp('pong', 'PEP Pong - PEP vs PEPE (ERC-20)', 'pep-logo', function (A) {
-      A.body.innerHTML = '<canvas width="480" height="300" aria-label="PEP Pong. Move your paddle with the mouse, a finger, or the arrow keys."></canvas>' +
-        '<div class="app-row"><span class="grow pg-msg">Click or press Space to serve. First to 7.</span><span class="pg-hi"></span></div>' +
-        '<div class="app-row touch-pad"><button type="button" class="app-btn" data-k="up">▲ Up</button><button type="button" class="app-btn" data-k="down">▼ Down</button><button type="button" class="app-btn" data-k="serve">Serve</button></div>';
-      var cv = A.body.querySelector('canvas'), c = cv.getContext('2d'), msg = A.body.querySelector('.pg-msg'), hiEl = A.body.querySelector('.pg-hi');
-      var W = 480, H = 300, PH = 56, me = { y: H / 2 - PH / 2, s: 0 }, cpu = { y: H / 2 - PH / 2, s: 0 }, ball = null, keys = { up: 0, down: 0 }, over = false, raf;
-      var WINS = ['Own chain, own point.', 'Mined, not minted.', 'Merge-mined that one.', 'Receipts say: point PEP.'];
-      var LOSE = ['PEPE got lucky. Gas fees not included.', 'Wrong frog scored. Check the ticker.', 'Point PEPE. Still not a blockchain.'];
-      var showHi = function () { hiEl.textContent = 'Best win margin: ' + hiScore('pondos-pong'); };
-      showHi();
-      var serve = function () { if (over) { me.s = cpu.s = 0; over = false; } if (ball) return; var d = Math.random() < 0.5 ? -1 : 1; ball = { x: W / 2, y: H / 2, vx: 3.6 * d, vy: (Math.random() * 2 - 1) * 2.4 }; msg.textContent = 'PEP ' + me.s + ' : ' + cpu.s + ' PEPE'; };
-      cv.addEventListener('pointerdown', serve);
-      cv.addEventListener('pointermove', function (e) { var r = cv.getBoundingClientRect(); me.y = Math.min(Math.max((e.clientY - r.top) / r.height * H - PH / 2, 0), H - PH); });
-      A.body.querySelectorAll('[data-k]').forEach(function (b) {
-        var k = b.getAttribute('data-k');
-        if (k === 'serve') b.addEventListener('click', serve);
-        else { b.addEventListener('pointerdown', function () { keys[k] = 1; }); ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) { b.addEventListener(t, function () { keys[k] = 0; }); }); }
-      });
-      var unkey = gameKeys(A, { ArrowUp: function (d) { keys.up = d; }, ArrowDown: function (d) { keys.down = d; }, w: function (d) { keys.up = d; }, s: function (d) { keys.down = d; }, ' ': function (d) { if (d) serve(); } });
-      var point = function (mine) {
-        if (mine) me.s++; else cpu.s++;
-        ball = null;
-        if (me.s >= 7 || cpu.s >= 7) {
-          over = true;
-          if (me.s > cpu.s) { hiScore('pondos-pong', me.s - cpu.s); showHi(); msg.textContent = 'PEP wins ' + me.s + ':' + cpu.s + '. Merge-mined victory. Space for a rematch.'; }
-          else msg.textContent = 'PEPE wins ' + cpu.s + ':' + me.s + '. It is still a token. Space for a rematch.';
-        } else msg.textContent = (mine ? WINS : LOSE)[Math.floor(Math.random() * (mine ? WINS : LOSE).length)] + '  PEP ' + me.s + ' : ' + cpu.s + ' PEPE';
-      };
-      var frame = function () {
-        if (keys.up) me.y = Math.max(0, me.y - 5); if (keys.down) me.y = Math.min(H - PH, me.y + 5);
-        if (ball) {
-          var target = ball.y - PH / 2 + (ball.vx > 0 ? 0 : (H / 2 - ball.y) * 0.5);
-          cpu.y += Math.max(-3.3, Math.min(3.3, target - cpu.y)); cpu.y = Math.max(0, Math.min(H - PH, cpu.y));
-          ball.x += ball.vx; ball.y += ball.vy;
-          if (ball.y < 8 || ball.y > H - 8) { ball.vy = -ball.vy; ball.y = Math.max(8, Math.min(H - 8, ball.y)); }
-          if (ball.x < 28 && ball.x > 14 && ball.vx < 0 && ball.y > me.y - 6 && ball.y < me.y + PH + 6) { ball.vx = -ball.vx * 1.06; ball.vy += (ball.y - (me.y + PH / 2)) * 0.09; }
-          if (ball.x > W - 28 && ball.x < W - 14 && ball.vx > 0 && ball.y > cpu.y - 6 && ball.y < cpu.y + PH + 6) { ball.vx = -ball.vx * 1.04; ball.vy += (ball.y - (cpu.y + PH / 2)) * 0.07; }
-          if (ball.x < -10) point(false); else if (ball && ball.x > W + 10) point(true);
-        }
-        c.fillStyle = '#071009'; c.fillRect(0, 0, W, H);
-        c.strokeStyle = '#1f4a2c'; c.setLineDash([6, 8]); c.beginPath(); c.moveTo(W / 2, 0); c.lineTo(W / 2, H); c.stroke(); c.setLineDash([]);
-        c.fillStyle = '#7fd196'; c.font = 'bold 26px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'top';
-        c.fillText(me.s, W / 2 - 40, 10); c.fillStyle = '#e9a19a'; c.fillText(cpu.s, W / 2 + 40, 10);
-        c.font = '11px Tahoma, sans-serif'; c.fillStyle = '#7fd196'; c.fillText('PEP', 40, H - 18); c.fillStyle = '#e9a19a'; c.fillText('PEPE (CPU)', W - 50, H - 18);
-        c.fillStyle = '#4fb36d'; c.fillRect(14, me.y, 9, PH); c.fillStyle = '#d9726a'; c.fillRect(W - 23, cpu.y, 9, PH);
-        if (ball) drawCoin(c, ball.x, ball.y, 8);
-        raf = requestAnimationFrame(frame);
-      };
-      raf = requestAnimationFrame(frame);
-      A.stop = function () { cancelAnimationFrame(raf); unkey(); };
-    }, 520);
-  }
-
   // ---------- FUD Invaders: receipts versus FUD ----------
   function invaders() {
     openApp('fud', 'FUD Invaders - receipts vs FUD', 'gif-008-still', function (A) {
       A.body.innerHTML = '<canvas width="480" height="360" aria-label="FUD Invaders. Move with the arrow keys and fire receipts with Space."></canvas>' +
-        '<div class="app-row"><span class="grow fd-msg">Arrows or A/D to move, Space to fire receipts. Click to start.</span><span class="fd-hi"></span></div>' +
+        '<div class="app-row"><span class="grow fd-msg">Arrows or A/D to move, Space to fire receipts. Click to start.</span><button type="button" class="app-btn fd-again" hidden>▶ Play again</button><span class="fd-hi"></span></div>' +
         '<div class="app-row touch-pad"><button type="button" class="app-btn" data-k="left">◀</button><button type="button" class="app-btn" data-k="right">▶</button><button type="button" class="app-btn" data-k="fire">Fire receipt</button></div>';
       var cv = A.body.querySelector('canvas'), c = cv.getContext('2d'), msg = A.body.querySelector('.fd-msg'), hiEl = A.body.querySelector('.fd-hi');
       var W = 480, H = 360, WORDS = ['FUD', 'SCAM', 'RUG', 'DM ME', 'SEED?', '100x!!', 'FAKE', 'PUMP'];
       var ship = new Image(); ship.src = 'img/pep-logo.webp';
-      var st, keys = { left: 0, right: 0 }, raf, running = false;
+      var st, keys = { left: 0, right: 0 }, raf, running = false, overAt = 0, againB = A.body.querySelector('.fd-again');
+      // after a game over a stray tap or a held Space must not wipe the score form: only Space (after a moment) or Play again restarts
+      var canRestart = function (how) { return !overAt || (how === 'again') || (how === 'space' && Date.now() - overAt > 900); };
       var showHi = function () { hiEl.textContent = 'High score: ' + hiScore('pondos-fud'); };
       showHi();
       var wave = function (n) {
@@ -1006,17 +952,18 @@
         return { al: al, dir: 1, speed: 0.45 + n * 0.18, shots: [], bombs: [], cool: 0 };
       };
       var t0 = 0;
-      var reset = function () { st = { x: W / 2, lives: 3, score: 0, n: 0 }; Object.assign(st, wave(0)); running = true; t0 = Date.now(); var o = A.body.querySelector('.hs-submit'); if (o) o.remove(); msg.textContent = 'Wave 1. Receipts beat FUD.'; };
-      var fire = function () { if (!running) { reset(); return; } if (st.cool > 0 || st.shots.length > 2) return; st.shots.push({ x: st.x, y: H - 40 }); st.cool = 16; };
-      cv.addEventListener('pointerdown', function (e) { if (!running) { reset(); return; } fire(); });
+      var reset = function () { overAt = 0; againB.hidden = true; st = { x: W / 2, lives: 3, score: 0, n: 0 }; Object.assign(st, wave(0)); running = true; t0 = Date.now(); var o = A.body.querySelector('.hs-submit'); if (o) o.remove(); msg.textContent = 'Wave 1. Receipts beat FUD.'; };
+      var fire = function (how) { if (!running) { if (canRestart(how)) reset(); return; } if (st.cool > 0 || st.shots.length > 2) return; st.shots.push({ x: st.x, y: H - 40 }); st.cool = 16; };
+      cv.addEventListener('pointerdown', function (e) { if (!running) { if (canRestart('tap')) reset(); return; } fire(); });
+      againB.addEventListener('click', function () { reset(); });
       cv.addEventListener('pointermove', function (e) { if (!running || e.pointerType === 'mouse' && !e.buttons) { if (running && e.pointerType === 'mouse') { var r0 = cv.getBoundingClientRect(); st.x = Math.min(Math.max((e.clientX - r0.left) / r0.width * W, 20), W - 20); } return; } var r = cv.getBoundingClientRect(); st.x = Math.min(Math.max((e.clientX - r.left) / r.width * W, 20), W - 20); });
       A.body.querySelectorAll('[data-k]').forEach(function (b) {
         var k = b.getAttribute('data-k');
-        if (k === 'fire') b.addEventListener('pointerdown', fire);
+        if (k === 'fire') b.addEventListener('pointerdown', function () { fire('tap'); });
         else { b.addEventListener('pointerdown', function () { keys[k] = 1; }); ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) { b.addEventListener(t, function () { keys[k] = 0; }); }); }
       });
-      var unkey = gameKeys(A, { ArrowLeft: function (d) { keys.left = d; }, ArrowRight: function (d) { keys.right = d; }, a: function (d) { keys.left = d; }, d: function (d) { keys.right = d; }, ' ': function (d) { if (d) fire(); } });
-      var end = function (text) { running = false; hiScore('pondos-fud', st.score); showHi(); msg.textContent = text + ' Score ' + st.score + '. Click to play again.'; offerSubmit(A, 'fud', st.score, Date.now() - t0); };
+      var unkey = gameKeys(A, { ArrowLeft: function (d) { keys.left = d; }, ArrowRight: function (d) { keys.right = d; }, a: function (d) { keys.left = d; }, d: function (d) { keys.right = d; }, ' ': function (d) { if (d) fire('space'); } });
+      var end = function (text) { running = false; overAt = Date.now(); againB.hidden = false; hiScore('pondos-fud', st.score); showHi(); msg.textContent = text + ' Score ' + st.score + '. Space or Play again for a new game.'; offerSubmit(A, 'fud', st.score, Date.now() - t0); };
       var frame = function () {
         c.fillStyle = '#071009'; c.fillRect(0, 0, W, H);
         for (var i = 0; i < 40; i++) { c.fillStyle = 'rgba(180,230,190,' + (0.15 + (i % 3) * 0.1) + ')'; c.fillRect((i * 97) % W, (i * 53) % (H - 60), 2, 2); }
@@ -1057,11 +1004,13 @@
   function snake() {
     openApp('snake', 'PEP Snake - eat blocks, not your tail', 'pep-logo', function (A) {
       A.body.innerHTML = '<canvas width="480" height="360" aria-label="PEP Snake. Steer with the arrow keys or by swiping."></canvas>' +
-        '<div class="app-row"><span class="grow sn-msg">Arrows, WASD or swipe to steer. Click to start.</span><span class="sn-hi"></span></div>' +
+        '<div class="app-row"><span class="grow sn-msg">Arrows, WASD or swipe to steer. Click to start.</span><button type="button" class="app-btn sn-again" hidden>▶ Play again</button><span class="sn-hi"></span></div>' +
         '<div class="app-row touch-pad"><button type="button" class="app-btn" data-k="left">◀</button><button type="button" class="app-btn" data-k="up">▲</button><button type="button" class="app-btn" data-k="down">▼</button><button type="button" class="app-btn" data-k="right">▶</button></div>';
       var cv = A.body.querySelector('canvas'), c = cv.getContext('2d'), msg = A.body.querySelector('.sn-msg'), hiEl = A.body.querySelector('.sn-hi');
       var CS = 24, CW = 20, CH = 15, face = new Image(); face.src = 'img/pep-logo.webp';
-      var s = null, dir, next, food, timer = null, tickMs;
+      var s = null, dir, next, food, timer = null, tickMs, overAt = 0, againB = A.body.querySelector('.sn-again');
+      // after a game over only Space (after a moment) or Play again starts a new game, so the score form stays put
+      var mayStart = function (how) { return !overAt || how === 'again' || (how === 'space' && Date.now() - overAt > 900); };
       var DIRS = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] };
       var EAT = ['Block found. +10,000 PEP (on paper).', 'Another block. The chain grows, so do you.', 'Mined. Not minted.', 'One block every ~60 seconds. You are faster.'];
       var showHi = function () { hiEl.textContent = 'Best: ' + hiScore('pondos-snake') + ' blocks'; };
@@ -1088,7 +1037,8 @@
       var over = function (why) {
         clearInterval(timer); timer = null;
         var blocks = s.length - 3; hiScore('pondos-snake', blocks); showHi(); offerSubmit(A, 'snake', blocks, Date.now() - t0);
-        msg.textContent = why + ' Blocks mined: ' + blocks + ' (' + fmt.int(blocks * 10000) + ' PEP, on paper). Click to play again.';
+        overAt = Date.now(); againB.hidden = false;
+        msg.textContent = why + ' Blocks mined: ' + blocks + ' (' + fmt.int(blocks * 10000) + ' PEP, on paper). Space or Play again for a new game.';
         s = null; setTimeout(draw, 900);
       };
       var tick = function () {
@@ -1104,16 +1054,17 @@
         draw();
       };
       var t0 = 0;
-      var start = function () { if (timer) return; t0 = Date.now(); var o = A.body.querySelector('.hs-submit'); if (o) o.remove(); s = [[8, 7], [7, 7], [6, 7]]; dir = next = [1, 0]; place(); tickMs = 140; msg.textContent = 'Go, fren. Blocks are coins.'; draw(); timer = setInterval(tick, tickMs); };
+      var start = function (how) { if (timer || !mayStart(how)) return false; overAt = 0; againB.hidden = true; t0 = Date.now(); var o = A.body.querySelector('.hs-submit'); if (o) o.remove(); s = [[8, 7], [7, 7], [6, 7]]; dir = next = [1, 0]; place(); tickMs = 140; msg.textContent = 'Go, fren. Blocks are coins.'; draw(); timer = setInterval(tick, tickMs); return true; };
+      againB.addEventListener('click', function () { start('again'); });
       cv.addEventListener('pointerdown', function (e) {
-        if (!timer) { start(); return; }
+        if (!timer) { start('tap'); return; }
         var sx = e.clientX, sy = e.clientY;
         var up = function (ev) { cv.removeEventListener('pointerup', up); var dx = ev.clientX - sx, dy = ev.clientY - sy; if (Math.abs(dx) + Math.abs(dy) < 18) return; turn(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up')); };
         cv.addEventListener('pointerup', up);
       });
-      A.body.querySelectorAll('[data-k]').forEach(function (b) { b.addEventListener('pointerdown', function () { if (!timer) start(); turn(b.getAttribute('data-k')); }); });
-      var K = function (k) { return function (d) { if (d) { if (!timer) start(); turn(k); } }; };
-      var unkey = gameKeys(A, { ArrowLeft: K('left'), ArrowRight: K('right'), ArrowUp: K('up'), ArrowDown: K('down'), a: K('left'), d: K('right'), w: K('up'), s: K('down') });
+      A.body.querySelectorAll('[data-k]').forEach(function (b) { b.addEventListener('pointerdown', function () { if (!timer && !start('tap')) return; turn(b.getAttribute('data-k')); }); });
+      var K = function (k) { return function (d) { if (d) { if (!timer && !start('key')) return; turn(k); } }; };
+      var unkey = gameKeys(A, { ArrowLeft: K('left'), ArrowRight: K('right'), ArrowUp: K('up'), ArrowDown: K('down'), a: K('left'), d: K('right'), w: K('up'), s: K('down'), ' ': function (d) { if (d && !timer) start('space'); } });
       face.onload = draw; draw();
       A.stop = function () { clearInterval(timer); unkey(); };
     }, 520);
@@ -1283,7 +1234,7 @@
   // ---------- Games folder ----------
   function gamesFolder() {
     openApp('games', 'C:\\Pond\\Games', 'games-folder', function (A) {
-      var G = [['PEP Pong', 'pep-logo', pong], ['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
+      var G = [['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
         ['YEET THE PEP', 'yeet', function () { yeetApp(); }],
         ['High Scores', 'gif-061-still', function () { highScores(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
@@ -2021,7 +1972,7 @@
       '  do nothing for 2 minutes',
       '  green bar at the very right = show desktop',
       '',
-      'games folder: Pong, FUD Invaders, PEP Snake.',
+      'games folder: FUD Invaders, PEP Snake, YEET THE PEP.',
       'high score or it did not happen.',
       '',
       'P.S. nobody legit ever asks for your seed phrase.'
@@ -2037,7 +1988,7 @@
   // ---------- Shop: the official Pepecoin shop, in a new tab ----------
   var SHOP = 'https://shop.pepecoin.com/';
 
-  // ---------- live numbers, shared by the PEP Pager and the PEP-TV crawl ----------
+  // ---------- live numbers, for the PEP-TV crawl ----------
   function liveFacts() {
     var items = [];
     var q = window.PepPrices ? window.PepPrices.quote().catch(function () { return null; }) : Promise.resolve(null);
@@ -2052,25 +2003,6 @@
       items.push(['NFA', 'the frog is not a financial advisor']);
       return items;
     });
-  }
-
-  // ---------- PEP Pager: a 2000s LCD pager pinned to the desktop, scrolling the live numbers ----------
-  function pager() {
-    var desk = document.querySelector('.desk');
-    if (!desk || document.querySelector('.pep-pager')) return;
-    var pg = el('a', { class: 'pep-pager', href: 'price.html', title: 'PEP Pager: live numbers. Click for the price page.' },
-      '<span class="pager-brand">PEP-PAGER 2000</span><span class="pager-lcd"><span class="pager-run"></span></span><span class="pager-led" aria-hidden="true"></span>');
-    desk.insertBefore(pg, desk.firstChild);
-    var run = pg.querySelector('.pager-run');
-    var paint = function () {
-      liveFacts().then(function (items) {
-        var txt = items.map(function (i) { return i[0] + ' ' + i[1]; }).join('   ·   ') + '   ·   ';
-        run.textContent = txt + txt;
-        run.style.animationDuration = Math.max(14, txt.length / 4) + 's';
-        pg.setAttribute('aria-label', 'PEP Pager. ' + items.map(function (i) { return i[0] + ' ' + i[1]; }).join('. '));
-      });
-    };
-    paint(); setInterval(paint, 5 * 60000);
   }
 
   // ---------- PEP-TV Ads: a folder of fake late-night infomercials, played in a TV window ----------
