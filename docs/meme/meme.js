@@ -1663,11 +1663,11 @@
           '<p class="wp-place">Pepe was at <b>' + esc(a.title || '?') + '</b>, ' + esc(a.country || '') + ' ' + flagOf(a.country_code) + (a.wiki_url ? ' · <a href="' + esc(a.wiki_url) + '" target="_blank" rel="noopener">Wikipedia</a>' : '') + '</p>' +
           '<div class="wp-map"></div>' +
           '<p class="wp-small">Photo: ' + esc(a.credit || '') + ', <a href="' + esc(a.source_url || '#') + '" target="_blank" rel="noopener">' + esc(a.license || 'licence') + '</a>, cropped, Pepe added.' + (r.leaves ? ' Tab left ' + r.leaves + '×.' : '') + '</p>' +
-          '<div class="app-row"><button type="button" class="app-btn wp-copy">Copy result</button><a class="app-btn wp-x" target="_blank" rel="noopener">Post on X</a><span class="grow"></span><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
+          '<div class="app-row"><button type="button" class="app-btn wp-copy">Copy result</button><button type="button" class="app-btn wp-x" disabled title="Coming soon: X does not take links to this site yet">Post on X (soon)</button><span class="grow"></span><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
           '<div class="wp-reward"></div><div class="wp-board"></div></div></div>';
         main.querySelector('.wp-readme').addEventListener('click', wpReadme); wireHost();
         var txt = shareText(r);
-        main.querySelector('.wp-x').href = 'https://x.com/intent/post?text=' + encodeURIComponent(txt);
+        // "Post on X" waits until X accepts links to pepecoinhub.com; then make it a link to https://x.com/intent/post?text=…
         main.querySelector('.wp-copy').addEventListener('click', function () {
           var ok = function () { say('Copied. Paste it on Discord or X.'); };
           if (navigator.clipboard) navigator.clipboard.writeText(txt).then(ok, function () { say('Copy blocked by the browser.', true); }); else say('Copy blocked by the browser.', true);
