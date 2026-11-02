@@ -655,8 +655,8 @@
       var b = 'Block ' + fmt.int(n.rows[n.rows.length - 1][1]);
       wins.forEach(function (W) { if (W.status) W.status.querySelector('.st-r').textContent = b; });
     }).catch(function () {});
-    // the meme home starts like a fresh desktop: only the welcome window is open, the rest wait on the
-    // taskbar and in a "Open more" row inside the welcome window, to be explored one by one
+    // the meme home starts like a fresh desktop: only the welcome window is open; the rest are closed
+    // (no taskbar clutter) and wait in the "Explore the pond" row inside the welcome window
     if (PAGE === 'index') {
       var hero = null;
       wins.forEach(function (w) { if (w.body.classList.contains('hero')) hero = w; });
@@ -664,7 +664,7 @@
         var row = el('div', { class: 'win-launch' }, '<p>Explore the pond, open a window:</p>');
         wins.forEach(function (w) {
           if (w === hero || w.body.classList.contains('chooser')) return;
-          w.state = 'min'; w.host.classList.add('is-min'); sync(w);
+          w.host.classList.remove('is-min'); w.state = 'closed'; w.host.classList.add('is-closed'); sync(w);
           var b = el('button', { type: 'button', class: 'btn' }, '<img src="' + w.task.querySelector('img').getAttribute('src') + '" alt="" width="16" height="16"> ' + esc(w.title.split(' - ')[0]));
           b.addEventListener('click', function () { setState(w, 'open'); });
           row.appendChild(b);
@@ -707,7 +707,7 @@
     ];
     var ACT = { '#wp': wpFolder, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
-        [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
+        [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
     ACT['#nerds'] = function () {
       openApp('nerds', 'C:\\Pond\\Nerds only', 'nerds-folder', function (A) {

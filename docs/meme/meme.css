@@ -1312,3 +1312,5 @@ footer.foot a { color: #edf3e3; }
 .pondos.desk-view body .desk-corner, .pondos.desk-empty body .desk-corner { display: block !important; }
 /* screensaver: a random meme frog bouncing off the edges */
 .saver .sv-frog { position: absolute; left: 0; top: 0; width: 200px; height: auto; border: 3px solid #fff; box-shadow: 4px 4px 0 #0008; will-change: transform; }
+/* on the other pages the bin waits behind the open window, like the rest of the desktop */
+.pondos body:not([data-page="index"]) .desk-corner { z-index: 1; }
