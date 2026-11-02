@@ -16,7 +16,7 @@
   if (frog && me && window.matchMedia && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     var spinImg = new Image();
     spinImg.onload = function () { frog.src = spinImg.src; };
-    var loadSpin = function () { spinImg.src = new URL('assets/brand/pepe-coin-spin.webp', me).href; };
+    var loadSpin = function () { spinImg.src = new URL('assets/brand/pepe-coin-spin.webp?v=2', me).href; };
     if (document.readyState === 'complete') loadSpin(); else window.addEventListener('load', loadSpin);
   }
 
