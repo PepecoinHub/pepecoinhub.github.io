@@ -172,6 +172,7 @@
     var gl = el('div', { class: 'sm-list' });
     [['PEP Pong', 'PEP vs PEPE, first to 7', 'pep-logo', function () { pong(); }], ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
+      ['YEET THE PEP', 'A frog, a catapult, no flight plan', 'pep-logo', function () { location.href = BASE + 'games/yeet.html'; }],
       ['High Scores', 'FUD Invaders and PEP Snake, top 10', 'gif-061-still', function () { highScores(); }],
       ["Where's Pepe?", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
@@ -1253,6 +1254,7 @@
   function gamesFolder() {
     openApp('games', 'C:\\Pond\\Games', 'games-folder', function (A) {
       var G = [['PEP Pong', 'pep-logo', pong], ['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
+        ['YEET THE PEP', 'pep-logo', function () { location.href = BASE + 'games/yeet.html'; }],
         ['High Scores', 'gif-061-still', function () { highScores(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
