@@ -2046,7 +2046,7 @@
       '<p class="ad-kick">Pepe wanted to go to the moon.</p><h3 class="ad-big">Nobody gave him<br>a <em>rocket.</em></h3>',
       '<h3 class="ad-big">So we gave him<br>a <em>catapult!</em></h3><img class="ad-pic" src="../games/img/yeet/pilot.webp" alt="">',
       '<p class="ad-kick">Hold to charge. Release to yeet. Three panic flaps.</p><h3 class="ad-big"><em>PUMP</em> candles launch you.<br>The <em>SELL WALL</em> stops you.</h3><p class="ad-sub">The track changes every round.</p>',
-      '<p class="ad-fine">Helmet included. Aerospace qualifications not included. No PEP prizes: just the Hall of Fren top 10 for Discord players.</p><button type="button" class="ad-cta ad-yeetbtn">Play YEET THE PEP →</button>'
+      '<p class="ad-fine">Helmet included. Aerospace qualifications not included. No PEP prizes: just the Hall of Fren top 10.</p><button type="button" class="ad-cta ad-yeetbtn">Play YEET THE PEP →</button>'
     ] },
     { file: 'wheres_pepe.mpg', title: "Where's Pepe? Starts soon!", ch: 'CH 5000 · THE POND TRAVEL CHANNEL', icon: 'wheres-pepe', scenes: [
       '<p class="ad-kick">Pepe packed a backpack, a map and a camera…</p><h3 class="ad-big">…and now he is<br><em>LOST!</em></h3>',

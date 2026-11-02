@@ -38,6 +38,7 @@ function hud() {
   $('#flight-status').textContent = paused ? 'PAUSED' : phase === 'flying' ? `ALT ${Math.round(state.y)} m · ${Math.round(state.vx)} m/s` : phase === 'ended' ? 'BACK ON EARTH' : 'READY FOR TAKEOFF';
 }
 function reset() {
+  $('#guest-save').hidden = true;
   finishNumber++; state = null; phase = 'ready'; seed = newSeed(); charging = false; paused = false; accumulator = 0; camera = 0; zoom = 1; trail = []; particles = [];
   $('#announcement').hidden = true; $('#result').hidden = true; $('#paused').hidden = true; $('#speech').textContent = '';
   $('#action').textContent = 'HOLD TO CHARGE'; $('#action').classList.remove('flying'); $('#action').disabled = false; $('#angle').disabled = false;
@@ -74,7 +75,8 @@ function finish() {
   if (record) storage.set(bestKey(), value);
   $('#result').hidden = false; $('#result-title').textContent = record ? 'NEW PERSONAL BEST!' : 'Earth: 1. Pepe: 0.';
   $('#result-score').textContent = `${metres(value)} m`; $('#result-joke').textContent = jokes[Math.floor(value / 17) % jokes.length];
-  $('#save-status').textContent = account ? 'Checking your flight report…' : 'Browser record saved. Log in with Discord for cloud records and top 10.';
+  $('#save-status').textContent = account ? 'Checking your flight report…' : (record ? 'New browser record! ' : '') + 'Add it to the Hall of Fren as a guest, or log in with Discord for the frog badge.';
+  guestForm(value, Math.ceil(state.time * 1000), n);
   $('#action').textContent = 'HOLD TO TRY AGAIN'; $('#action').classList.remove('flying'); $('#angle').disabled = false;
   $('#action').disabled = false;
   $('#angle-down').disabled = false; $('#angle-up').disabled = false;
@@ -100,14 +102,43 @@ async function saveRecord(value, ms, uid, round) {
       ? 'Online records are being prepared. Your record is safe on this device.' : 'Could not sync. Your record stays on this device; Refresh scores retries it.';
   }
 }
+// guests: a nickname and one click put the flight in the Hall of Fren (shown in grey; Discord pilots get the frog)
+function guestForm(value, ms, round) {
+  const f = $('#guest-save'); f.hidden = !!account || !(value > 0) || !backend || backend.kind !== 'supabase';
+  if (f.hidden) return;
+  let nick = ''; try { nick = localStorage.getItem('yeet-nick') || localStorage.getItem('pondos-nick') || ''; } catch {}
+  $('#guest-nick').value = nick; $('#guest-send').disabled = false; $('#guest-send').textContent = 'Add to Hall of Fren';
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const n = $('#guest-nick').value.trim();
+    if (n.length < 2) { $('#guest-nick').focus(); return; }
+    try { localStorage.setItem('yeet-nick', n); } catch {}
+    $('#guest-send').disabled = true; $('#guest-send').textContent = 'Sending…';
+    try {
+      const r = await backend.rpc('gry_yeet_guest_submit', { p_nick: n, p_score: value, p_ms: ms, p_version: 1 });
+      if (round !== finishNumber) return;
+      f.hidden = true;
+      $('#save-status').textContent = r.saved ? `In the Hall of Fren as ${n}: ${metres(r.best)} m.` : `${n} already has a longer flight: ${metres(r.best)} m.`;
+      if (r.top) renderBoard(r.top);
+    } catch (err) {
+      if (round !== finishNumber) return;
+      $('#guest-send').disabled = false; $('#guest-send').textContent = 'Add to Hall of Fren';
+      $('#save-status').textContent = missingMigration(err) ? 'Guest records are being prepared. Your record is safe on this device.' : (err?.message || 'Could not send. Try again in a moment.');
+    }
+  };
+}
 function renderBoard(rows) {
   const list = $('#leaderboard'); list.replaceChildren();
   if (!rows?.length) { const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'No flights recorded yet. Be the first fren.'; list.append(li); return; }
   rows.slice(0, 10).forEach((r, i) => {
     const li = document.createElement('li');
-    for (const [tag, text] of [['span', String(i + 1).padStart(2, '0')], ['span', r.nick], ['b', `${metres(r.score)} m`]]) {
-      const node = document.createElement(tag); node.textContent = text; if (tag === 'span') node.title = text; li.append(node);
-    } list.append(li);
+    const num = document.createElement('span'); num.textContent = String(i + 1).padStart(2, '0');
+    const who = document.createElement('span'); who.title = r.nick;
+    // Discord pilots: bold with a frog; guests: grey (rows from before the guest update have no flag: Discord)
+    if (r.verified === false) { who.className = 'who-guest'; who.textContent = r.nick; }
+    else { who.className = 'who-ok'; const fr = document.createElement('img'); fr.src = '../meme/img/pep-logo.webp'; fr.alt = ''; fr.width = 12; fr.height = 12; who.append(fr, document.createTextNode(' ' + r.nick)); }
+    const sc = document.createElement('b'); sc.textContent = `${metres(r.score)} m`;
+    li.append(num, who, sc); list.append(li);
   });
 }
 async function loadBoard(force = false) {
@@ -117,7 +148,7 @@ async function loadBoard(force = false) {
     const r = await backend.rpc('gry_yeet_state');
     if (epoch !== identityEpoch) return;
     lastBoard = Date.now(); cloudBest = account ? r.best || 0 : 0; renderBoard(r.top); showBest();
-    $('#ranking-status').textContent = 'Discord pilots · best distance per player';
+    $('#ranking-status').textContent = 'Best distance per pilot · Discord and guests';
     const pending = account && storage.get(pendingKey());
     if (pending > cloudBest) await saveRecord(pending, storage.get(`${pendingKey()}:ms`), account.user_id, finishNumber);
   } catch (e) {

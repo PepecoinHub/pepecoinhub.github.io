@@ -10,3 +10,11 @@
 .embed body{background:#c3c5c7}.embed .site-bar,.embed .desktop-label,.embed footer,.embed .under-game,.embed .window[aria-label]>.titlebar{display:none!important}
 .embed .desktop{max-width:none;padding:0}.embed .window[aria-label]{box-shadow:none;border:0;padding:2px}
 @media(min-width:801px){.embed .playfield{aspect-ratio:auto;height:min(calc((100vw - 230px) * 9 / 16),calc(100vh - 150px))}.embed canvas{object-fit:contain;background:#2487cb}}
+.guest-save{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:0 0 10px;font:11px 'Courier New',monospace}
+.guest-save input{width:150px;padding:5px 6px;border:2px inset #fff;font:12px 'Courier New',monospace}
+.guest-save button{font:bold 10px 'Courier New',monospace;background:#b8de69}
+.records li .who-ok{font-weight:bold;color:#173d1c}.records li .who-ok img{vertical-align:-1px}
+.records li .who-guest{color:#7c847f;font-weight:normal}
+.records li:first-child .who-guest{color:#6a756d}
+.records-foot .who-ok{font-weight:bold}.records-foot .who-guest{color:#7c847f}
+@media(max-width:480px){.guest-save input{width:110px}}
