@@ -753,7 +753,7 @@ footer.foot a { color: #edf3e3; }
 .tray-clock:hover { text-decoration: underline; }
 
 /* ---------- screensaver ---------- */
-.saver { position: fixed; inset: 0; z-index: 120; background: radial-gradient(ellipse at 50% 120%, #123222, #040806 70%); overflow: hidden; cursor: none; }
+.saver { position: fixed; inset: 0; z-index: 99990; background: #000; overflow: hidden; cursor: none; }
 .saver .sv-coin { position: absolute; left: 0; top: 0; width: 120px; height: 120px; }
 .saver p { position: absolute; left: 0; right: 0; bottom: 24px; text-align: center; font: 400 1.05rem var(--f-term); color: #5f7d66; }
 .dlg-row > img { max-width: 110px; height: auto; }
@@ -851,8 +851,8 @@ footer.foot a { color: #edf3e3; }
   .desk .icon-group { width: 92px; display: flex; flex-direction: column; }
   .desk .icons { display: flex; flex-direction: column; gap: 2px; }
   .desk .icons li { height: 72px; }
-  .pondos main { padding-left: 306px; }
-  .pondos footer.foot { padding-left: 306px; }
+  .pondos main { padding-left: 212px; }
+  .pondos footer.foot { padding-left: 212px; }
 }
 .icons img { width: 36px; height: 36px; }
 .lap { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; padding: 6px; background: var(--pane); color: var(--ink); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); font: 400 13px/1.45 var(--f-chrome); }
@@ -1307,3 +1307,8 @@ footer.foot a { color: #edf3e3; }
 .who-legend { margin: 4px 0 0; font-size: 11px; color: #4a5357; }
 .who-legend a { color: inherit; }
 .wp-top10 li span .who, .hs-list .who { float: none; }
+/* the Recycle Bin lives in the bottom-right corner of the desktop, above the clock */
+@media (min-width: 1101px) { .desk-corner { position: fixed; z-index: 70; right: 10px; bottom: 50px; width: 92px; height: auto; margin: 0; padding: 0; list-style: none; } }
+.pondos.desk-view body .desk-corner, .pondos.desk-empty body .desk-corner { display: block !important; }
+/* screensaver: a random meme frog bouncing off the edges */
+.saver .sv-frog { position: absolute; left: 0; top: 0; width: 200px; height: auto; border: 3px solid #fff; box-shadow: 4px 4px 0 #0008; will-change: transform; }

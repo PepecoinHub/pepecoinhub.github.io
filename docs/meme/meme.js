@@ -695,30 +695,45 @@
   // ---------- desktop icons ----------
   // with a mouse: click selects, double-click opens, drag moves (remembered); on touch a tap opens
   if (mainEl) {
-    // three groups, one column each on a wide screen (anchored at the bottom, by the Start button)
+    // two groups, one column each on a wide screen (anchored at the bottom, by the Start button);
+    // the numbers and tools live in the "Nerds only" folder, and the Recycle Bin sits in the bottom-right corner
+    var NERDS = [['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'], ['calculator.html', 'What-if machine', 'p-eyes-still'],
+      ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'], ['#addr', 'AddressCheck.exe', 'pepe-search'], ['#notpep', 'Not PEP (0x)', 'wrongpep']];
     var DESKTOP = [
       ['Play', [['#wp', "Where's Pepe?", 'wp-folder'], ['#games', 'Games', 'games-folder'], ['#lan', 'LAN Party', 'gif-080-still'],
         ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#logon', 'Log On', 'gif-085-still']]],
-      ['PEP facts', [['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'], ['calculator.html', 'What-if machine', 'p-eyes-still'],
-        ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'], ['#addr', 'AddressCheck.exe', 'pepe-search']]],
-      ['Pond', [['./', 'My Pond', 'pep-logo'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], ['#shop', 'Shop', 'shop-bag'],
+      ['Pond', [['./', 'My Pond', 'pep-logo'], ['#nerds', 'Nerds only', 'nerds-folder'], ['#shop', 'Shop', 'shop-bag'],
         ['#tip', 'Tip jar.exe', 'gif-045-still'], [serious, 'Serious mode', 'serious'], ['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
     var ACT = { '#wp': wpFolder, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
+    ACT['#nerds'] = function () {
+      openApp('nerds', 'C:\\Pond\\Nerds only', 'nerds-folder', function (A) {
+        A.body.innerHTML = '<ul class="folder">' + NERDS.map(function (d, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></button></li>'; }).join('') + '</ul>' +
+          '<p class="bin-tip">Charts, whales, math and receipts. Glasses recommended, pocket protector optional.</p>';
+        A.body.querySelectorAll('.folder button').forEach(function (b) {
+          var d = NERDS[+b.getAttribute('data-i')], go = function () { if (ACT[d[0]]) ACT[d[0]](); else location.href = d[0]; };
+          b.addEventListener('dblclick', go);
+          b.addEventListener('click', function () { if (!matchMedia('(hover: hover) and (pointer: fine)').matches) go(); else { A.body.querySelectorAll('.folder .sel').forEach(function (x) { x.classList.remove('sel'); }); b.classList.add('sel'); } });
+          b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+        });
+      }, 520);
+    };
     var desk = el('nav', { class: 'desk', 'aria-label': 'Desktop' });
     desk.innerHTML = '<div class="icon-groups">' + DESKTOP.map(function (g) {
-      return '<div class="icon-group"><p class="icon-group-name">' + g[0] + '</p><ul class="icons">' + g[1].map(function (d) { return '<li><a href="' + d[0] + '" data-id="' + esc(d[1]) + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></a></li>'; }).join('') + '</ul></div>';
+      return '<div class="icon-group"><p class="icon-group-name">' + g[0] + '</p><ul class="icons">' + g[1].map(function (d) { return '<li' + (d[0] === '#bin' ? ' class="bin-li"' : '') + '><a href="' + d[0] + '" data-id="' + esc(d[1]) + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></a></li>'; }).join('') + '</ul></div>';
     }).join('') + '</div>';
     document.body.insertBefore(desk, mainEl);
+    // on a wide screen the Recycle Bin leaves its group for the bottom-right corner, above the clock
+    if (window.innerWidth > 1100) { var binLi = desk.querySelector('.bin-li'); if (binLi) { var corner = el('ul', { class: 'icons desk-corner', 'aria-label': 'Recycle Bin' }); corner.appendChild(binLi); document.body.appendChild(corner); } }
     var lanIcon = desk.querySelector('a[href="#lan"]');
     if (lanIcon) lanIcon.insertAdjacentHTML('beforeend', '<span class="lan-badge icon-badge" hidden><span class="lan-dot" aria-hidden="true"></span><span class="lan-n"></span></span>');
     var FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
-    var iconPos = {}; try { iconPos = JSON.parse(localStorage.getItem('pondos-icons2') || '{}'); } catch (e) {}
+    var iconPos = {}; try { iconPos = JSON.parse(localStorage.getItem('pondos-icons3') || '{}'); } catch (e) {}
     var openIcon = function (a) { var h = a.getAttribute('href'); if (ACT[h]) ACT[h](); else location.href = a.href; };
-    desk.querySelectorAll('.icons a').forEach(function (a) {
+    document.querySelectorAll('.desk .icons a, .desk-corner a').forEach(function (a) {
       var id = a.getAttribute('data-id'), p = iconPos[id];
       if (p && (Math.abs(p[0]) > 300 || Math.abs(p[1]) > 1200)) { delete iconPos[id]; p = null; }
       if (p && FINE && window.innerWidth > 1100) a.style.transform = 'translate(' + p[0] + 'px,' + p[1] + 'px)';
@@ -727,7 +742,7 @@
         e.preventDefault();
         if (moved) { moved = false; return; }
         if (!FINE) { openIcon(a); return; }
-        desk.querySelectorAll('.sel').forEach(function (x) { x.classList.remove('sel'); }); a.classList.add('sel');
+        document.querySelectorAll('.desk .sel, .desk-corner .sel').forEach(function (x) { x.classList.remove('sel'); }); a.classList.add('sel');
       });
       a.addEventListener('dblclick', function (e) { e.preventDefault(); openIcon(a); });
       a.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); openIcon(a); } });
@@ -736,7 +751,7 @@
       a.setAttribute('draggable', 'false'); a.querySelector('img').setAttribute('draggable', 'false');
       a.addEventListener('dragstart', function (e) { e.preventDefault(); });
       a.addEventListener('pointerdown', function (e) {
-        if (e.button !== 0 || window.innerWidth <= 1100) return;
+        if (e.button !== 0 || window.innerWidth <= 1100 || a.parentNode.classList.contains('bin-li')) return;
         e.preventDefault();   // no text selection while dragging
         var sx = e.clientX, sy = e.clientY, base = iconPos[id] || [0, 0], cur = base;
         // icons stay on the desktop strip: the big window covers the rest, and an icon under it could not be grabbed again
@@ -755,12 +770,12 @@
         var up = function () {
           a.removeEventListener('pointermove', mv); a.removeEventListener('pointerup', up); a.removeEventListener('pointercancel', up);
           a.classList.remove('dragging');
-          if (moved) { iconPos[id] = cur; try { localStorage.setItem('pondos-icons2', JSON.stringify(iconPos)); } catch (err) {} a.focus({ preventScroll: true }); }
+          if (moved) { iconPos[id] = cur; try { localStorage.setItem('pondos-icons3', JSON.stringify(iconPos)); } catch (err) {} a.focus({ preventScroll: true }); }
         };
         a.addEventListener('pointermove', mv); a.addEventListener('pointerup', up); a.addEventListener('pointercancel', up);
       });
     });
-    document.addEventListener('click', function (e) { if (!e.target.closest('.desk')) desk.querySelectorAll('.sel').forEach(function (x) { x.classList.remove('sel'); }); });
+    document.addEventListener('click', function (e) { if (!e.target.closest('.desk, .desk-corner')) document.querySelectorAll('.desk .sel, .desk-corner .sel').forEach(function (x) { x.classList.remove('sel'); }); });
   }
 
   // ---------- tray: price, hashrate, clock ----------
@@ -804,7 +819,7 @@
     ctx = el('div', { class: 'ctx', role: 'menu' });
     [['Arrange windows', arrangeAll], ['Refresh', function () { location.reload(); }], null,
       [dark ? 'Wallpaper: day hills' : 'Wallpaper: night mountains', function () { if (themeBtn) themeBtn.click(); }],
-      ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons2'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
+      ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons3'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
       null, ['New game: FUD Invaders', invaders], ['New game: PEP Snake', snake], null, ['Properties…', aboutOS]].forEach(function (it) {
       if (!it) { ctx.appendChild(el('hr')); return; }
       var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
@@ -838,11 +853,14 @@
   var saverEl = null, idleT = null;
   function saver(force) {
     if (saverEl || (!force && (REDUCE || document.hidden || maxW || document.querySelector('dialog[open]')))) return;
-    saverEl = el('div', { class: 'saver', 'aria-hidden': 'true' }, '<img class="sv-coin" src="img/coin-spin.webp" alt="" width="120" height="120"><p>PondOS is resting. Move the mouse, fren.</p>');
+    // a random frog from the meme collection bounces around, like the old DVD logo
+    var FROGS = ['big-eyes', 'believe', 'chonk', 'cowboy', 'detective', 'diamond', 'gibup', 'farmer', 'born-to-fren', 'brain', 'gif-034-still', 'gif-071-still', 'gif-045-still', 'gif-085-still'];
+    var pick = FROGS[Math.floor(Math.random() * FROGS.length)];
+    saverEl = el('div', { class: 'saver', 'aria-hidden': 'true' }, '<img class="sv-frog" src="img/' + pick + '.webp" alt=""><p>PondOS is resting. Move the mouse, fren.</p>');
     document.body.appendChild(saverEl);
-    var coin = saverEl.querySelector('.sv-coin'), x = 40, y = 40, dx = 2.2, dy = 1.7, raf;
+    var coin = saverEl.querySelector('.sv-frog'), x = 40, y = 40, dx = 2.2, dy = 1.7, raf;
     var step = function () {
-      var W = window.innerWidth - 120, H = window.innerHeight - 120;
+      var W = window.innerWidth - coin.offsetWidth, H = window.innerHeight - coin.offsetHeight;
       x += dx; y += dy;
       if (x < 0 || x > W) { dx = -dx; x = Math.max(0, Math.min(x, W)); }
       if (y < 0 || y > H) { dy = -dy; y = Math.max(0, Math.min(y, H)); }
