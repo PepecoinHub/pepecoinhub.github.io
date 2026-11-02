@@ -173,6 +173,7 @@
     [['PEP Pong', 'PEP vs PEPE, first to 7', 'pep-logo', function () { pong(); }], ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
       ['High Scores', 'FUD Invaders and PEP Snake, top 10', 'gif-061-still', function () { highScores(); }],
+      ["Where's Pepe?", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
       ['All games…', 'Chess, Checkers, Connect Four, Sea Battle, Pepe Miner', 'pond-playground', function () { gamesFolder(); }],
       ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', function () { paperHands(); }]].forEach(function (g) {
@@ -696,9 +697,9 @@
     var DESKTOP = [
       ['./', 'My Pond', 'pep-logo'], ['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'],
       ['calculator.html', 'What-if machine', 'p-eyes-still'], ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'],
-      ['#games', 'Games', 'games-folder'], ['#tv', 'Pond TV', 'pond-tv'], ['#addr', 'AddressCheck.exe', 'pepe-search'], ['#logon', 'Log On', 'gif-085-still'], ['#shop', 'Shop', 'shop-bag'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Recycle Bin', 'recycle-bin']
+      ['#games', 'Games', 'games-folder'], ['#wp', "Where's Pepe?", 'wp-folder'], ['#tv', 'Pond TV', 'pond-tv'], ['#addr', 'AddressCheck.exe', 'pepe-search'], ['#logon', 'Log On', 'gif-085-still'], ['#shop', 'Shop', 'shop-bag'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#lan', 'LAN Party', 'gif-080-still'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], [serious, 'Serious mode', 'serious'], ['#tip', 'Tip jar.exe', 'gif-045-still'], ['#bin', 'Recycle Bin', 'recycle-bin']
     ];
-    var ACT = { '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#wp': wpFolder, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#pong': pong, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -1113,11 +1114,12 @@
   // Public URL and publishable key, the same ones PEP Games uses in games/js/config.js. The data is
   // protected by the database functions (rate limits, plausibility checks), not by hiding these.
   var SB_URL = 'https://azbwciqfbsdpwubznncg.supabase.co', SB_KEY = 'sb_publishable_GRByiqlX6v67phR8xcM6VA_6eXXwTKX';
+  var SB_STORE = 'sb-azbwciqfbsdpwubznncg-auth-token';   // where the PEP Games sign-in keeps its session
   var GAME_NAME = { fud: 'FUD Invaders', snake: 'PEP Snake' };
   // a PEP Games sign-in (Discord) lives in this browser's storage; a valid one makes the score "verified"
   function sbSession() {
     try {
-      var s = JSON.parse(localStorage.getItem('sb-azbwciqfbsdpwubznncg-auth-token') || 'null');
+      var s = JSON.parse(localStorage.getItem(SB_STORE) || 'null');
       if (s && s.access_token && s.expires_at * 1000 > Date.now() + 30000 && !(s.user && s.user.is_anonymous)) {
         var ids = (s.user && s.user.identities) || [];
         return { token: s.access_token, discord: ids.some(function (i) { return i.provider === 'discord'; }) };
@@ -1432,6 +1434,379 @@
     }, 520);
   }
 
+  // ---------- Where's Pepe? A daily guess-the-place game (games/supabase/update_wheres_pepe.sql) ----------
+  // The server holds the answers, starts the clock, hands out the picture and the hints, and scores the guess.
+  // The page only shows them. The map is Leaflet (games/vendor) with OpenStreetMap tiles.
+  var WP_README = [
+    "WHERE'S PEPE? - README.TXT",
+    '',
+    'Pepe went travelling again. Every day he sends one photo from',
+    'somewhere in the world. Find the place on the map.',
+    '',
+    'HOW TO PLAY',
+    '  1. Log on (Discord or guest) and press Start.',
+    '  2. You see the photo. Put a pin on the map where you think it is.',
+    '  3. Press GUESS! You get one guess a day.',
+    '',
+    'TIME: 2 minutes',
+    '  0:00 - 1:00   photo only               up to 5000 points',
+    '  1:00 - 1:30   + the continent           up to 4000 points',
+    '  1:30 - 2:00   + the flag of the country up to 3000 points',
+    '  2:00          time is up: the pin counts where it stands',
+    '               (no pin = 0 points)',
+    '  The clock runs on the server. Closing the window does not stop it.',
+    '',
+    'POINTS',
+    '  Within 10 km of the spot: the full points of your time slot.',
+    '  Further away: fewer points with every kilometre.',
+    '',
+    'NO TAB HOPPING',
+    '  Leaving the tab during a guess: the first time is a warning,',
+    '  every next time costs 1000 points.',
+    '',
+    'NEW PEPE',
+    '  A new photo every day at 00:00 UTC. Started at 23:59? Your guess',
+    '  still counts for the photo you got.',
+    '',
+    'RANKING',
+    '  Today and the last 7 days. Players logged on with Discord only',
+    '  (guest accounts are free to make, so they play just for fun).',
+    '  Play every day to grow your streak.',
+    '',
+    'PEP REWARDS (Discord players)',
+    '  After your guess you may leave a PEP address.',
+    '  1 PEP for every 50 points, up to 100 PEP a day and 500 PEP a week.',
+    '  The host pays all open rewards once a week from the host\'s own',
+    '  wallet and posts the transaction. This site never holds coins and',
+    '  never asks for a seed phrase or a password.',
+    '  One address per player. Rewards can be paused or changed, and',
+    '  rewards of accounts that cheat are not paid.',
+    '',
+    'THE PHOTOS',
+    '  Free-licence photos from Wikimedia Commons (public domain, CC0,',
+    '  CC BY or CC BY-SA), lightly cropped, with Pepe added. The author,',
+    '  the licence and a link to the original are shown after your guess.',
+    '  Map data: OpenStreetMap contributors.',
+    '',
+    'gl hf, fren'
+  ];
+  function wpReadme() {
+    openApp('wp-readme', 'README.TXT - Notepad', 'wp-folder', function (A) {
+      A.body.innerHTML = '<div class="win-menu notepad-menu"><span>File</span><span>Edit</span><span>Search</span><span>Help</span></div><pre class="notepad"></pre>';
+      A.body.querySelector('.notepad').textContent = WP_README.join('\n');
+    }, 560);
+  }
+  function wpFolder() {
+    openApp('wp-folder', "C:\\Pond\\Where's Pepe", 'wp-folder', function (A) {
+      var F = [['WheresPepe.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme]];
+      A.body.innerHTML = '<ul class="folder">' + F.map(function (f, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(f[1]) + '" alt="" width="40" height="40"><span>' + f[0] + '</span></button></li>'; }).join('') + '</ul>' +
+        '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then double-click WheresPepe.exe.</p>';
+      A.body.querySelectorAll('.folder button').forEach(function (b) {
+        var go = function () { F[+b.getAttribute('data-i')][2](); };
+        b.addEventListener('dblclick', go);
+        b.addEventListener('click', function () { if (!matchMedia('(hover: hover) and (pointer: fine)').matches) go(); else { A.body.querySelectorAll('.folder .sel').forEach(function (x) { x.classList.remove('sel'); }); b.classList.add('sel'); } });
+        b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+      });
+    }, 440);
+  }
+  // a signed-in session that is still valid; an expired one is refreshed once (the PEP Games pages do the same)
+  var wpRefreshing = null;
+  function freshSession() {
+    var s = anySession(); if (s) return Promise.resolve(s);
+    var raw = null; try { raw = JSON.parse(localStorage.getItem(SB_STORE) || 'null'); } catch (e) {}
+    if (!raw || !raw.refresh_token) return Promise.resolve(null);
+    if (!wpRefreshing) wpRefreshing = fetch(SB_URL + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: raw.refresh_token }) })
+      .then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+        wpRefreshing = null;
+        if (!j || !j.access_token) return null;
+        var s2 = Object.assign({}, raw, j); if (!s2.expires_at && j.expires_in) s2.expires_at = Math.floor(Date.now() / 1000) + j.expires_in;
+        try { localStorage.setItem(SB_STORE, JSON.stringify(s2)); } catch (e) {}
+        return s2;
+      }, function () { wpRefreshing = null; return null; });
+    return wpRefreshing;
+  }
+  function wpRpc(name, args) { return freshSession().then(function () { return chatRpc(name, args || {}); }); }
+  var leafletReady = null;
+  function loadLeaflet() {
+    if (window.L && window.L.map) return Promise.resolve();
+    if (!leafletReady) leafletReady = new Promise(function (res, rej) {
+      var dir = BASE + 'games/vendor/leaflet-1.9.4/';
+      var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = dir + 'leaflet.css'; document.head.appendChild(css);
+      var sc = document.createElement('script'); sc.src = dir + 'leaflet.js'; sc.onload = res; sc.onerror = function () { leafletReady = null; rej(new Error('The map could not be loaded')); }; document.head.appendChild(sc);
+    });
+    return leafletReady;
+  }
+  function flagOf(cc) { return /^[A-Z]{2}$/.test(cc || '') ? String.fromCodePoint(127397 + cc.charCodeAt(0), 127397 + cc.charCodeAt(1)) : ''; }
+  function fmtKm(k) { return k == null ? '–' : k < 10 ? k.toFixed(1) + ' km' : Math.round(k).toLocaleString('en-US') + ' km'; }
+  function wheresPepe() {
+    var A = openApp('wp', "Where's Pepe?", 'wheres-pepe', function (A) {
+      A.body.innerHTML = '<div class="wp"><div class="wp-top"><b class="wp-title">Where\'s Pepe?</b><span class="wp-streak" hidden></span><span class="grow"></span><span class="wp-clock" aria-live="polite"></span></div>' +
+        '<div class="wp-main"><p class="bin-tip">Packing the backpack…</p></div><p class="wp-msg" role="status" aria-live="polite"></p></div>';
+      var main = A.body.querySelector('.wp-main'), msg = A.body.querySelector('.wp-msg'), clock = A.body.querySelector('.wp-clock'), streakEl = A.body.querySelector('.wp-streak');
+      var T = null, play = null, map = null, pin = null, tick = 0, offset = 0, hintAt = {}, leaveT = 0, warned = false, alive = true, sending = false;
+      var say = function (t, bad) { msg.textContent = t || ''; msg.classList.toggle('bad', !!bad); };
+      var nextIn = function () { if (!T) return ''; var ms = Date.parse(T.next_at) - (Date.now() + offset); if (ms < 0) ms = 0; var h = Math.floor(ms / 3600000), m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60; return h + ':' + ('0' + m).slice(-2) + ':' + ('0' + s).slice(-2); };
+      var stopTick = function () { clearInterval(tick); tick = 0; };
+      var countdownOnly = function () { stopTick(); clock.textContent = 'Next Pepe in ' + nextIn(); tick = setInterval(function () { clock.textContent = 'Next Pepe in ' + nextIn(); }, 1000); };
+      var paintStreak = function () { if (T && T.streak > 0) { streakEl.hidden = false; streakEl.textContent = '🔥 Streak: ' + T.streak + (T.streak === 1 ? ' day' : ' days'); } else streakEl.hidden = true; };
+
+      var load = function () {
+        say('');
+        return wpRpc('gry_wp_today').then(function (t) {
+          T = t; offset = Date.parse(t.now) - Date.now(); paintStreak();
+          if (!t.live) return closed();
+          if (t.mine && t.mine.done) return result(t.mine);
+          if (t.mine && !t.mine.done) return start();      // came back to a running guess: the clock kept going
+          intro();
+        }, function (e) { main.innerHTML = '<p class="bin-tip">' + esc(e.message) + '</p>'; });
+      };
+      var hostBtn = function () { return T && T.is_host ? '<button type="button" class="app-btn wp-host">Host tools</button>' : ''; };
+      var wireHost = function () { var b = main.querySelector('.wp-host'); if (b) b.addEventListener('click', hostTools); };
+      var closed = function () {
+        countdownOnly();
+        main.innerHTML = '<div class="wp-intro"><img src="img/wp-pepe.webp" alt="" width="180" height="300"><div><h3>Pepe is still packing.</h3><p>No photo today yet. Come back soon!</p>' +
+          '<div class="app-row"><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div><div class="wp-board"></div></div></div>';
+        main.querySelector('.wp-readme').addEventListener('click', wpReadme); wireHost(); board(main.querySelector('.wp-board'));
+      };
+      var intro = function () {
+        countdownOnly();
+        var me = whoAmI();
+        main.innerHTML = '<div class="wp-intro"><img src="img/wp-pepe.webp" alt="" width="180" height="300"><div><h3>Where\'s Pepe? #' + T.num + '</h3>' +
+          '<p>Pepe sent a new photo. Where is he? You have <b>2 minutes</b> and <b>one guess</b>. The faster, the more points: 5000 in the first minute, then the continent and the flag show up and the maximum drops.</p>' +
+          '<p class="wp-small">Leaving the tab during the guess: one warning, then −1000 each time.</p>' +
+          (T.signed_in ? '<div class="app-row"><button type="button" class="app-btn wp-start go">▶ Start</button><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
+              (T.verified ? '' : '<p class="wp-small">Playing as a guest (' + esc(me ? me.name : 'guest') + '). <a href="#" class="wp-logon">Log on with Discord</a> for the ranking and PEP rewards.</p>')
+            : '<div class="app-row"><button type="button" class="app-btn wp-logon go">Log on to play</button><button type="button" class="app-btn wp-readme">README.TXT</button></div><p class="wp-small">Discord or a guest nickname. Ranking and PEP rewards are for Discord players.</p>') +
+          '<div class="wp-board"></div></div></div>';
+        var s = main.querySelector('.wp-start'); if (s) s.addEventListener('click', start);
+        main.querySelectorAll('.wp-logon').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); });
+        main.querySelector('.wp-readme').addEventListener('click', wpReadme); wireHost();
+        board(main.querySelector('.wp-board'));
+      };
+      var start = function () {
+        say('Opening the photo…');
+        var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
+        Promise.all([wpRpc('gry_wp_start', { p_nick: nick }), loadLeaflet()]).then(function (r) {
+          play = r[0]; offset = Date.parse(play.now) - Date.now();
+          if (play.done) return result(play);
+          say(''); playing();
+        }, function (e) { say(e.message, true); });
+      };
+      var elapsed = function () { return (Date.now() + offset - Date.parse(play.started_at)) / 1000; };
+      var makeMap = function (box) {
+        if (map) { map.remove(); map = null; }
+        map = L.map(box, { worldCopyJump: true, minZoom: 1, zoomControl: true, attributionControl: true }).setView([25, 10], 1);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(map);
+        setTimeout(function () { if (map) map.invalidateSize(); }, 60);
+        return map;
+      };
+      var playing = function () {
+        stopTick();
+        main.innerHTML = '<div class="wp-play"><div class="wp-photo"><img alt="Today\'s photo: Pepe somewhere in the world" src="' + play.image + '"><button type="button" class="wp-zoom" aria-label="Show the photo bigger">⤢</button></div>' +
+          '<div class="wp-side"><div class="wp-hints"><span class="wp-max"></span><span class="wp-h1">🌍 Continent at 1:00</span><span class="wp-h2">🏳️ Flag at 1:30</span></div>' +
+          '<div class="wp-map" aria-label="World map: click to put your pin"></div>' +
+          '<div class="app-row"><span class="grow wp-pinmsg">Click the map to put your pin.</span><button type="button" class="app-btn wp-guess go" disabled>GUESS!</button></div></div></div>';
+        var m = makeMap(main.querySelector('.wp-map')), gb = main.querySelector('.wp-guess'), pm = main.querySelector('.wp-pinmsg');
+        pin = null;
+        m.on('click', function (e) {
+          var ll = e.latlng.wrap();
+          if (!pin) pin = L.marker(ll).addTo(m); else pin.setLatLng(ll);
+          gb.disabled = false; pm.textContent = 'Pin at ' + ll.lat.toFixed(2) + ', ' + ll.lng.toFixed(2) + '. Move it, or guess.';
+        });
+        gb.addEventListener('click', function () { guess(false); });
+        var ph = main.querySelector('.wp-photo');
+        main.querySelector('.wp-zoom').addEventListener('click', function () { ph.classList.toggle('big'); setTimeout(function () { m.invalidateSize(); }, 60); });
+        main.querySelector('.wp-photo img').addEventListener('click', function () { ph.classList.toggle('big'); setTimeout(function () { m.invalidateSize(); }, 60); });
+        hintAt = {}; paintHints(play);
+        var maxEl = main.querySelector('.wp-max');
+        var step = function () {
+          var el = elapsed(), left = Math.max(0, 120 - el);
+          clock.textContent = '⏱ ' + Math.floor(left / 60) + ':' + ('0' + Math.floor(left % 60)).slice(-2);
+          clock.classList.toggle('low', left <= 15);
+          maxEl.textContent = 'Max ' + (el < 60 ? 5000 : el < 90 ? 4000 : 3000) + ' pts';
+          if (el >= 60 && !hintAt[60]) { hintAt[60] = 1; wpRpc('gry_wp_hint').then(paintHints, function () {}); }
+          if (el >= 90 && !hintAt[90]) { hintAt[90] = 1; wpRpc('gry_wp_hint').then(paintHints, function () {}); }
+          if (left <= 0) { stopTick(); guess(true); }
+        };
+        step(); tick = setInterval(step, 250);
+      };
+      var paintHints = function (h) {
+        if (!main.querySelector('.wp-hints')) return;
+        if (h.continent) main.querySelector('.wp-h1').innerHTML = '🌍 <b>' + esc(h.continent) + '</b>';
+        if (h.country_code) main.querySelector('.wp-h2').innerHTML = '<span class="wp-flag">' + flagOf(h.country_code) + '</span> <b>flag</b>';
+      };
+      var guess = function (timeUp) {
+        if (sending || !play) return; sending = true; stopTick();
+        var ll = pin ? pin.getLatLng() : null;
+        say(timeUp ? 'Time is up!' : 'Checking…');
+        wpRpc('gry_wp_guess', ll ? { p_lat: ll.lat, p_lon: ll.lng } : { p_lat: null, p_lon: null }).then(function (r) {
+          sending = false; play = null; r.image = r.image || (main.querySelector('.wp-photo img') || {}).src; say('');
+          return wpRpc('gry_wp_today').then(function (t) { T = t; paintStreak(); result(r); }, function () { result(r); });
+        }, function (e) { sending = false; say(e.message, true); if (timeUp) setTimeout(load, 12000); });
+      };
+      var shareText = function (r) {
+        return "🐸 Where's Pepe #" + r.num + ' · ' + (r.g_lat == null ? '📍 no guess' : '📍 ' + fmtKm(r.km)) + ' · ' + (r.points || 0).toLocaleString('en-US') + '/5000' +
+          (T && T.streak > 1 ? ' · 🔥' + T.streak : '') + '\nhttps://pepecoinhub.com/meme/';
+      };
+      var result = function (r) {
+        countdownOnly();
+        var a = r.answer || {};
+        var img = r.image ? '<div class="wp-photo"><img alt="" src="' + r.image + '"></div>' : '';
+        main.innerHTML = '<div class="wp-play wp-done">' + (img || '<div class="wp-photo wp-nophoto"></div>') +
+          '<div class="wp-side"><div class="wp-score"><b class="wp-pts">' + (r.points || 0).toLocaleString('en-US') + '</b><span>/ 5000 points</span><span class="wp-km">' + (r.g_lat == null ? 'No guess' : fmtKm(r.km) + ' away') + '</span></div>' +
+          '<p class="wp-place">Pepe was at <b>' + esc(a.title || '?') + '</b>, ' + esc(a.country || '') + ' ' + flagOf(a.country_code) + (a.wiki_url ? ' · <a href="' + esc(a.wiki_url) + '" target="_blank" rel="noopener">Wikipedia</a>' : '') + '</p>' +
+          '<div class="wp-map"></div>' +
+          '<p class="wp-small">Photo: ' + esc(a.credit || '') + ', <a href="' + esc(a.source_url || '#') + '" target="_blank" rel="noopener">' + esc(a.license || 'licence') + '</a>, cropped, Pepe added.' + (r.leaves ? ' Tab left ' + r.leaves + '×.' : '') + '</p>' +
+          '<div class="app-row"><button type="button" class="app-btn wp-copy">Copy result</button><a class="app-btn wp-x" target="_blank" rel="noopener">Post on X</a><span class="grow"></span><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
+          '<div class="wp-reward"></div><div class="wp-board"></div></div></div>';
+        main.querySelector('.wp-readme').addEventListener('click', wpReadme); wireHost();
+        var txt = shareText(r);
+        main.querySelector('.wp-x').href = 'https://x.com/intent/post?text=' + encodeURIComponent(txt);
+        main.querySelector('.wp-copy').addEventListener('click', function () {
+          var ok = function () { say('Copied. Paste it on Discord or X.'); };
+          if (navigator.clipboard) navigator.clipboard.writeText(txt).then(ok, function () { say('Copy blocked by the browser.', true); }); else say('Copy blocked by the browser.', true);
+        });
+        loadLeaflet().then(function () {
+          var m = makeMap(main.querySelector('.wp-map'));
+          if (a.lat == null) return;
+          var real = L.latLng(a.lat, a.lon);
+          L.marker(real, { title: 'Pepe was here' }).addTo(m).bindTooltip('🐸 Pepe was here', { permanent: true, direction: 'top', offset: [0, -30] });
+          if (r.g_lat != null) {
+            var g = L.latLng(r.g_lat, r.g_lon);
+            L.circleMarker(g, { radius: 7, color: '#b3261e', fillColor: '#ff5a4e', fillOpacity: 1 }).addTo(m).bindTooltip('Your pin', { direction: 'bottom' });
+            L.polyline([g, real], { color: '#b3261e', weight: 2, dashArray: '6 6' }).addTo(m);
+            m.fitBounds(L.latLngBounds([g, real]).pad(0.3), { maxZoom: 9 });
+          } else m.setView(real, 5);
+        }, function (e) { say(e.message, true); });
+        reward(main.querySelector('.wp-reward'), r);
+        board(main.querySelector('.wp-board'));
+      };
+      var reward = function (box, r) {
+        var rw = T && T.rewards;
+        if (!rw) return;
+        if (r.claim) {
+          box.innerHTML = '<div class="wp-claim"><b>🎁 ' + r.claim.pep + ' PEP</b> ' + (r.claim.status === 'paid' ? 'paid ✓ <a href="https://pepeblocks.com/tx/' + esc(r.claim.txid) + '" target="_blank" rel="noopener">see the transaction</a>' : r.claim.status === 'held' ? 'on hold: the host is checking it' : 'waiting for the weekly payout') + '</div>';
+          return;
+        }
+        if (!rw.open) { box.innerHTML = '<p class="wp-small">PEP rewards are paused right now.</p>'; return; }
+        var pep = Math.min(rw.max_day, Math.floor((r.points || 0) / 50) * rw.per_50);
+        if (!T.verified) { box.innerHTML = '<p class="wp-small">🎁 Discord players get up to ' + rw.max_day + ' PEP for a guess like this. <a href="#" class="wp-logon">Log on with Discord</a>.</p>'; box.querySelector('.wp-logon').addEventListener('click', function (e) { e.preventDefault(); logOn(); }); return; }
+        if (pep <= 0) { box.innerHTML = '<p class="wp-small">No PEP reward this time: it starts at 50 points.</p>'; return; }
+        box.innerHTML = '<form class="wp-claim"><b>🎁 Your reward: up to ' + pep + ' PEP</b><span class="wp-small">Paid once a week by the host from the host\'s own wallet. Leave only an address: never a seed phrase or a password.</span>' +
+          '<span class="app-row"><input class="ac-in wp-addr" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Your PEP address" placeholder="Your PEP address (P…)"><button type="submit" class="app-btn">Claim</button></span></form>';
+        var f = box.querySelector('form'), inp = f.querySelector('.wp-addr');
+        try { inp.value = localStorage.getItem('pondos-wp-addr') || ''; } catch (e) {}
+        f.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var ad = inp.value.replace(/\s+/g, '');
+          addrVerdict(ad).then(function (v) {
+            if (!v || v[0] !== 'ok') { say(v ? v[1] : 'Paste your PEP address first.', true); return; }
+            try { localStorage.setItem('pondos-wp-addr', ad); } catch (err) {}
+            wpRpc('gry_wp_claim', { p_address: ad }).then(function (c) {
+              r.claim = { pep: c.pep, status: 'open' }; reward(box, r); say('Claimed. It goes out with the weekly payout.');
+            }, function (err) { say(err.message, true); });
+          });
+        });
+      };
+      var board = function (box) {
+        if (!box) return;
+        box.innerHTML = '<div class="tabs98 wp-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-s="day">Today</button><button type="button" role="tab" aria-selected="false" data-s="week">7 days</button></div><ol class="wp-top10"><li class="wp-small">Loading…</li></ol>';
+        var ol = box.querySelector('ol');
+        var show = function (s) {
+          box.querySelectorAll('[data-s]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-s') === s)); });
+          wpRpc('gry_wp_top', { p_scope: s }).then(function (rows) {
+            ol.innerHTML = rows.length ? rows.map(function (x) { return '<li><span>' + esc(x.nick) + ' <span class="hs-ok" title="Verified with Discord">✓</span></span><b>' + Number(x.points).toLocaleString('en-US') + '</b></li>'; }).join('')
+              : '<li class="wp-small">Nobody yet. Be the first!</li>';
+          }, function () { ol.innerHTML = '<li class="wp-small">The ranking could not be loaded.</li>'; });
+        };
+        box.querySelectorAll('[data-s]').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-s')); }); });
+        show('day');
+      };
+      // leaving the tab during a guess (a short blink under 2 s, like a notification, does not count)
+      var onVis = function () {
+        if (!play || play.done) return;
+        if (document.hidden) { clearTimeout(leaveT); leaveT = setTimeout(function () { leaveT = -1; wpRpc('gry_wp_leave').then(function (x) { play.leaves = x.leaves; }, function () {}); }, 2000); }
+        else {
+          if (leaveT === -1) { say(play.leaves <= 1 && !warned ? '👀 Pepe saw you leave! Next time it costs 1000 points.' : '👀 You left the tab: −1000 points.', true); warned = true; }
+          clearTimeout(leaveT); leaveT = 0;
+        }
+      };
+      document.addEventListener('visibilitychange', onVis);
+      A.stop = function () { alive = false; stopTick(); clearTimeout(leaveT); document.removeEventListener('visibilitychange', onVis); if (map) { map.remove(); map = null; } };
+      load();
+    }, 1100);
+    if (window.innerWidth > 760) { A.host.style.top = '12px'; A.host.style.setProperty('--app-top', '12px'); }
+    return A;
+  }
+  // Host tools: approve the robot's puzzles before they go live, and pay the PEP rewards
+  function hostTools() {
+    openApp('wp-host', "Where's Pepe - Host tools", 'wheres-pepe', function (A) {
+      A.body.innerHTML = '<div class="tabs98" role="tablist"><button type="button" role="tab" aria-selected="true" data-t="q">Photo queue</button><button type="button" role="tab" aria-selected="false" data-t="p">Payouts</button></div><div class="wp-hostbody"></div><p class="wp-msg" role="status"></p>';
+      var body = A.body.querySelector('.wp-hostbody'), msg = A.body.querySelector('.wp-msg');
+      var say = function (t, bad) { msg.textContent = t || ''; msg.classList.toggle('bad', !!bad); };
+      var queue = function () {
+        body.innerHTML = '<p class="wp-small">Loading…</p>';
+        wpRpc('gry_wp_host_queue').then(function (rows) {
+          if (!rows.length) { body.innerHTML = '<p class="wp-small">The queue is empty. The robot adds new photos every morning (05:23 UTC).</p>'; return; }
+          body.innerHTML = '<p class="wp-small">Approved photos go live one per day, oldest approval first. Only you can see this list.</p><ul class="wp-queue">' + rows.map(function (q) {
+            return '<li data-id="' + q.id + '"><button type="button" class="wp-thumb" aria-label="Show the photo">🖼️ Show photo</button><div><b>' + esc(q.title) + '</b>, ' + esc(q.country) + ' · ' + esc(q.continent) +
+              '<br><span class="wp-small">' + (q.status === 'pending' ? '⏳ waiting for you' : q.day ? '📅 live on ' + q.day : '✓ approved, waiting for its day') + ' · <a href="https://www.openstreetmap.org/?mlat=' + q.lat + '&mlon=' + q.lon + '#map=12/' + q.lat + '/' + q.lon + '" target="_blank" rel="noopener">map</a>' +
+              (q.wiki_url ? ' · <a href="' + esc(q.wiki_url) + '" target="_blank" rel="noopener">wiki</a>' : '') + ' · <a href="' + esc(q.source_url) + '" target="_blank" rel="noopener">' + esc(q.license) + '</a></span></div>' +
+              (q.day ? '' : '<span class="wp-dec">' + (q.status === 'pending' ? '<button type="button" class="app-btn" data-ok="1">✓ Approve</button>' : '') + '<button type="button" class="app-btn" data-ok="0">✗ Reject</button></span>') + '<div class="wp-qimg"></div></li>';
+          }).join('') + '</ul>';
+          body.querySelectorAll('.wp-queue li').forEach(function (li) {
+            var id = +li.getAttribute('data-id');
+            li.querySelector('.wp-thumb').addEventListener('click', function () {
+              var box = li.querySelector('.wp-qimg'); if (box.innerHTML) { box.innerHTML = ''; return; }
+              box.textContent = 'Loading…';
+              wpRpc('gry_wp_host_image', { p_id: id }).then(function (src) { box.innerHTML = src ? '<img alt="" src="' + src + '">' : 'No picture.'; }, function (e) { box.textContent = e.message; });
+            });
+            li.querySelectorAll('[data-ok]').forEach(function (b) {
+              b.addEventListener('click', function () {
+                wpRpc('gry_wp_host_decide', { p_id: id, p_ok: b.getAttribute('data-ok') === '1' }).then(function () { say(b.getAttribute('data-ok') === '1' ? 'Approved.' : 'Rejected: the robot will find another one.'); queue(); }, function (e) { say(e.message, true); });
+              });
+            });
+          });
+        }, function (e) { body.innerHTML = '<p class="wp-small">' + esc(e.message) + '</p>'; });
+      };
+      var payouts = function () {
+        body.innerHTML = '<p class="wp-small">Loading…</p>';
+        wpRpc('gry_wp_host_claims').then(function (d) {
+          var open = d.claims.filter(function (c) { return c.status === 'open'; }), sum = {};
+          open.forEach(function (c) { sum[c.address] = Math.round(((sum[c.address] || 0) + Number(c.pep)) * 100) / 100; });
+          var total = Object.keys(sum).reduce(function (t, k) { return t + sum[k]; }, 0);
+          var st = d.settings;
+          body.innerHTML = '<h4 class="wp-h">Open rewards: ' + open.length + ' claims, ' + Object.keys(sum).length + ' addresses, ' + total.toLocaleString('en-US') + ' PEP</h4>' +
+            '<ol class="wp-claims">' + d.claims.map(function (c) { return '<li data-id="' + c.id + '"><span>' + esc(c.nick) + ' · #' + c.num + ' · ' + c.points + ' pts · <b>' + c.pep + ' PEP</b><br><code>' + esc(c.address) + '</code>' + (c.other_players_on_address ? ' <b class="bad">⚠ address used by ' + c.other_players_on_address + ' other player(s)</b>' : '') + '</span><button type="button" class="app-btn" data-hold="' + (c.status === 'held' ? 0 : 1) + '">' + (c.status === 'held' ? 'Release' : 'Hold') + '</button></li>'; }).join('') + '</ol>' +
+            (open.length ? '<p class="wp-small">1. Send from your own wallet: in Pepecoin Core, the Send tab, one recipient per address (Add Recipient), the amounts from the list. Or in the console: <code>sendmany ""</code> followed by the list. 2. Check the total before you confirm. 3. Paste the transaction id here and mark the rewards as paid.</p>' +
+              '<textarea class="sc-in wp-many" rows="3" readonly></textarea><div class="app-row"><button type="button" class="app-btn wp-copymany">Copy the list</button><input class="ac-in wp-txid" type="text" spellcheck="false" placeholder="Transaction id (64 characters)" aria-label="Transaction id"><button type="button" class="app-btn wp-paid">Mark as paid</button></div>' : '<p class="wp-small">Nothing to pay right now.</p>') +
+            '<h4 class="wp-h">Settings</h4><form class="app-row wp-set"><label>PEP per 50 pts <input class="ac-in" name="a" type="number" step="0.01" min="0" value="' + st.per_50 + '"></label><label>Max a day <input class="ac-in" name="b" type="number" min="0" value="' + st.max_day + '"></label><label>Max a week <input class="ac-in" name="c" type="number" min="0" value="' + st.max_week + '"></label><label><input type="checkbox" name="d"' + (st.open ? ' checked' : '') + '> Rewards on</label><button type="submit" class="app-btn">Save</button></form>' +
+            (d.paid.length ? '<h4 class="wp-h">Last payouts</h4><ul class="wp-paidlist">' + d.paid.map(function (p) { return '<li>' + new Date(p.at).toLocaleDateString() + ' · ' + p.n + ' claims · ' + p.pep + ' PEP · <a href="https://pepeblocks.com/tx/' + esc(p.txid) + '" target="_blank" rel="noopener">' + esc(p.txid.slice(0, 12)) + '…</a></li>'; }).join('') + '</ul>' : '');
+          var many = body.querySelector('.wp-many');
+          if (many) {
+            many.value = JSON.stringify(sum);
+            body.querySelector('.wp-copymany').addEventListener('click', function () { many.select(); if (navigator.clipboard) navigator.clipboard.writeText(many.value).then(function () { say('Copied.'); }, function () { say('Select the text and copy it.', true); }); });
+            body.querySelector('.wp-paid').addEventListener('click', function () {
+              var tx = body.querySelector('.wp-txid').value.trim();
+              wpRpc('gry_wp_host_paid', { p_ids: open.map(function (c) { return c.id; }), p_txid: tx }).then(function (n) { say(n + ' claims marked as paid.'); payouts(); }, function (e) { say(e.message, true); });
+            });
+          }
+          body.querySelectorAll('[data-hold]').forEach(function (b) {
+            b.addEventListener('click', function () { wpRpc('gry_wp_host_hold', { p_id: +b.closest('li').getAttribute('data-id'), p_hold: b.getAttribute('data-hold') === '1' }).then(payouts, function (e) { say(e.message, true); }); });
+          });
+          body.querySelector('.wp-set').addEventListener('submit', function (e) {
+            e.preventDefault(); var f = e.target;
+            wpRpc('gry_wp_host_settings', { p_per_50: +f.a.value, p_max_day: +f.b.value, p_max_week: +f.c.value, p_open: f.d.checked }).then(function () { say('Saved.'); }, function (err) { say(err.message, true); });
+          });
+        }, function (e) { body.innerHTML = '<p class="wp-small">' + esc(e.message) + '</p>'; });
+      };
+      A.body.querySelectorAll('[data-t]').forEach(function (b) {
+        b.addEventListener('click', function () { A.body.querySelectorAll('[data-t]').forEach(function (x) { x.setAttribute('aria-selected', String(x === b)); }); say(''); if (b.getAttribute('data-t') === 'q') queue(); else payouts(); });
+      });
+      queue();
+    }, 820);
+  }
+
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
   var MAIL_ISSUE = 1, MAIL_KEY = 'pondos-mail-read';
   function mailRead() { try { return +(localStorage.getItem(MAIL_KEY) || -1) >= MAIL_ISSUE; } catch (e) { return false; } }
@@ -1683,7 +2058,7 @@
   // needs a PEP Games sign-in (Discord, or a guest nickname), which lives in this browser's storage.
   var EMO = ' gmfren heart shh wen facts hmm sleepy bigbrain peek ready waiting pep cheer torch hug chair crayon smoke scream serious hurry news loading crowd ';
   function anySession() {
-    try { var s = JSON.parse(localStorage.getItem('sb-azbwciqfbsdpwubznncg-auth-token') || 'null'); if (s && s.access_token && s.expires_at * 1000 > Date.now() + 30000) return s; } catch (e) {}
+    try { var s = JSON.parse(localStorage.getItem(SB_STORE) || 'null'); if (s && s.access_token && s.expires_at * 1000 > Date.now() + 30000) return s; } catch (e) {}
     return null;
   }
   function visitorId() {
