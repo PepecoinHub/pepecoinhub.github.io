@@ -1308,3 +1308,7 @@ footer.foot a { color: #edf3e3; }
 .wp-done > .wp-side { grid-area: side; }
 .wp-done > .wp-board { grid-area: board; min-width: 0; }
 @media (max-width: 760px) { .wp-done { grid-template-areas: "photo" "side" "board"; } }
+/* new PEP-TV ads: a red badge on the desktop icon, a red dot on the ad in the folder */
+.icons a .ads-new, .icons a.sel .ads-new, .icons a:hover .ads-new { top: 0; right: 18px; background: #d61f1f !important; color: #fff; outline: 0 !important; padding: 0 3px; }
+.ads-folder button { position: relative; }
+.ads-folder button.is-new::after { content: ''; position: absolute; top: 2px; right: 50%; margin-right: -26px; width: 12px; height: 12px; border-radius: 50%; background: #d61f1f; box-shadow: 0 0 0 1.5px #fff; }

@@ -2075,7 +2075,15 @@
 
   // ---------- PEP-TV Ads: a folder of fake late-night infomercials, played in a TV window ----------
   // Every claim in them is a fact from this site; the "offers" are jokes, and every ad says so.
+  // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
+  // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
   var ADS = [
+    { file: 'yeet_the_pep.mpg', added: '2026-11-02', title: 'YEET THE PEP', ch: 'CH 404 · THE UNOFFICIAL SPACE PROGRAM', icon: 'yeet', scenes: [
+      '<p class="ad-kick">Pepe wanted to go to the moon.</p><h3 class="ad-big">Nobody gave him<br>a <em>rocket.</em></h3>',
+      '<h3 class="ad-big">So we gave him<br>a <em>catapult!</em></h3><img class="ad-pic" src="../games/img/yeet/pilot.webp" alt="">',
+      '<p class="ad-kick">Hold to charge. Release to yeet. Three panic flaps.</p><h3 class="ad-big"><em>PUMP</em> candles launch you.<br>The <em>SELL WALL</em> stops you.</h3><p class="ad-sub">The track changes every round.</p>',
+      '<p class="ad-fine">Helmet included. Aerospace qualifications not included. No PEP prizes: just the Hall of Fren top 10 for Discord players.</p><button type="button" class="ad-cta ad-yeetbtn">Play YEET THE PEP →</button>'
+    ] },
     { file: 'wheres_pepe.mpg', title: "Where's Pepe? Starts soon!", ch: 'CH 5000 · THE POND TRAVEL CHANNEL', icon: 'wheres-pepe', scenes: [
       '<p class="ad-kick">Pepe packed a backpack, a map and a camera…</p><h3 class="ad-big">…and now he is<br><em>LOST!</em></h3>',
       '<img class="ad-pic" src="img/wp-pepe.webp" alt=""><p class="ad-sub">Every day he sends one photo from somewhere in the world. Find him on the map!</p>',
@@ -2126,8 +2134,21 @@
       '<p class="ad-fine">Block times vary: “about 60 seconds” is the target, not a promise. Frog not included.</p><a class="ad-cta" href="network.html">Watch the live network →</a>'
     ] }
   ];
+  var adSeen = function () { try { return JSON.parse(localStorage.getItem('pondos-ads-seen') || '[]'); } catch (e) { return []; } };
+  var adNew = function (ad) { return !!ad.added && Date.now() - Date.parse(ad.added + 'T00:00:00Z') < 21 * 864e5 && adSeen().indexOf(ad.file) < 0; };
+  function adBadges() {
+    var n = ADS.filter(adNew).length;
+    document.querySelectorAll('.icons a[href="#ads"]').forEach(function (a) {
+      var b = a.querySelector('.ads-new');
+      if (!b) { b = el('span', { class: 'ads-new mail-badge', title: 'New ads' }); a.appendChild(b); }
+      b.textContent = n; b.hidden = !n;
+    });
+    document.querySelectorAll('.ads-folder button[data-i]').forEach(function (b) { b.classList.toggle('is-new', adNew(ADS[+b.getAttribute('data-i')])); });
+  }
+  setTimeout(adBadges, 0);
   function adPlayer(i) {
     var ad = ADS[i];
+    if (adNew(ad)) { try { localStorage.setItem('pondos-ads-seen', JSON.stringify(adSeen().concat(ad.file).slice(-50))); } catch (e) {} adBadges(); }
     var A = openApp('ad-' + i, ad.file + ' - Pond Media Player', 'pond-tv', function (A) {
       A.body.innerHTML = '<div class="ptv"><div class="ptv-top"><span class="ptv-live">LIVE</span><b>PEP-TV</b><span class="ptv-ch">' + ad.ch + '</span></div>' +
         '<div class="ptv-stage">' + ad.scenes.map(function (h, k) { return '<div class="ptv-scene' + (k ? '' : ' on') + '">' + h + '</div>'; }).join('') + '</div>' +
@@ -2145,6 +2166,7 @@
       if (lap && window.PepPrices) window.PepPrices.quote().then(function (q) { if (q && q.usd != null) lap.textContent = fmt.usd(40e6 * q.usd); }).catch(function () {});
       var lb = A.body.querySelector('.ad-lapbtn'); if (lb) lb.addEventListener('click', function () { laptop(); });
       var wb = A.body.querySelector('.ad-wpbtn'); if (wb) wb.addEventListener('click', function () { wheresPepe(); });
+      var yb = A.body.querySelector('.ad-yeetbtn'); if (yb) yb.addEventListener('click', function () { yeetApp(); });
       var wl = A.body.querySelector('.ad-launch'); if (wl) { wl.innerHTML = launchText(); var wlt = setInterval(function () { if (!document.body.contains(wl)) clearInterval(wlt); else wl.innerHTML = launchText(); }, 1000); }
       liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
     }, 720);
@@ -2152,8 +2174,9 @@
   }
   function adsFolder() {
     openApp('ads', 'C:\\Pond\\PEP-TV Ads', 'pep-tv-ads', function (A) {
-      A.body.innerHTML = '<ul class="folder">' + ADS.map(function (ad, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(ad.icon) + '" alt="" width="40" height="40"><span>' + ad.file + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">Late-night PEP-TV infomercials, recovered from an old VHS. Double-click one to play. The facts are real; the offers are not.</p>';
+      A.body.innerHTML = '<ul class="folder ads-folder">' + ADS.map(function (ad, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(ad.icon) + '" alt="" width="40" height="40"><span>' + ad.file + '</span></button></li>'; }).join('') + '</ul>' +
+        '<p class="bin-tip">Late-night PEP-TV infomercials, recovered from an old VHS. Double-click one to play. The facts are real; the offers are not. A red dot marks a new one.</p>';
+      adBadges();
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { adPlayer(+b.getAttribute('data-i')); };
         b.addEventListener('dblclick', go);
