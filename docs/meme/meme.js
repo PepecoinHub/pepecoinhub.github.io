@@ -1142,16 +1142,24 @@
       }, function (err) { btn.disabled = false; btn.textContent = 'Submit score'; box.querySelector('.hs-err') ? box.querySelector('.hs-err').textContent = err.message : box.appendChild(el('span', { class: 'hs-err' }, esc(err.message))); });
     });
   }
+  // names in score tables: Discord players in bold with a small frog, guests in grey (to make logging on worth it)
+  function who(nick, verified) {
+    return verified ? '<b class="who who-ok" title="Discord player"><img src="img/pep-logo.webp" alt="" width="14" height="14">' + esc(nick) + '</b>'
+      : '<span class="who who-guest" title="Guest">' + esc(nick) + '</span>';
+  }
+  function whoLegend() { return '<p class="who-legend"><b class="who who-ok"><img src="img/pep-logo.webp" alt="" width="14" height="14">Bold</b> = Discord player · <span class="who-guest">grey</span> = guest. <a href="#" class="who-logon">Log on with Discord</a> to get the frog.</p>'; }
+  function wireLegend(box) { var a = box.querySelector('.who-logon'); if (a) a.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); }
   function highScores(game) {
     var A = openApp('hs', 'High Scores', 'gif-061-still', function (A) {
       A.body.innerHTML = '<div class="app-row hs-tabs" role="tablist"><button type="button" class="app-btn" data-g="fud" role="tab">FUD Invaders</button><button type="button" class="app-btn" data-g="snake" role="tab">PEP Snake</button></div>' +
-        '<ol class="bin-list hs-list"><li>Loading…</li></ol><p class="bin-tip">Top 10, best score per player. <span class="hs-ok">✓</span> = signed in with Discord on PEP Games. Scores run in your browser, so the server checks them for plausibility and rate.</p>';
+        '<ol class="bin-list hs-list"><li>Loading…</li></ol>' + whoLegend() + '<p class="bin-tip">Top 10, best score per player. Scores run in your browser, so the server checks them for plausibility and rate.</p>';
+      wireLegend(A.body);
       A.load = function (g) {
         A.game = g;
         A.body.querySelectorAll('[data-g]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-g') === g)); });
         var ol = A.body.querySelector('.hs-list'); ol.innerHTML = '<li>Loading…</li>';
         rpc('gry_arcade_top', { p_game: g }).then(function (rows) {
-          ol.innerHTML = rows && rows.length ? rows.map(function (r, i) { return '<li><span>' + (i + 1) + '.</span><span>' + esc(r.nick) + (r.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + '</span><small>' + fmt.int(r.score) + (g === 'snake' ? ' blocks' : '') + '</small></li>'; }).join('')
+          ol.innerHTML = rows && rows.length ? rows.map(function (r, i) { return '<li><span>' + (i + 1) + '.</span><span>' + who(r.nick, r.verified) + '</span><small>' + fmt.int(r.score) + (g === 'snake' ? ' blocks' : '') + '</small></li>'; }).join('')
             : '<li><span></span><span>No scores yet. Be the first frog.</span><small></small></li>';
         }, function (err) { ol.innerHTML = '<li><span></span><span>' + esc(err.message) + '</span><small></small></li>'; });
       };
@@ -1463,7 +1471,8 @@
     'Play every day to grow your streak (the fire badge).',
     '',
     '== RANKING ==',
-    'Today and the last 7 days, Discord players only.',
+    'Today and the last 7 days, everyone. Discord players: bold with a frog.',
+    'Guests: grey, one per network.',
     'Under it: how many frens played today.',
     '',
     '== PEP FAUCET (free PEP) ==',
@@ -1601,7 +1610,7 @@
           '<p>Pepe sent a new photo. Where is he? You have <b>2 minutes</b> and <b>one guess</b>. The faster, the more points: 5000 in the first minute, then the continent and the flag show up and the maximum drops.</p>' +
           '<p class="wp-small">Leaving the tab during the guess: one warning, then −1000 each time.</p>' +
           (T.signed_in ? '<div class="app-row"><button type="button" class="app-btn wp-start go">▶ Start</button><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
-              (T.verified ? '' : '<p class="wp-small">Playing as a guest (' + esc(me ? me.name : 'guest') + '). <a href="#" class="wp-logon">Log on with Discord</a> for the ranking and bigger PEP rewards.</p>')
+              (T.verified ? '' : '<p class="wp-small">Playing as a guest (' + esc(me ? me.name : 'guest') + '). <a href="#" class="wp-logon">Log on with Discord</a> for a bold name with a frog in the ranking and bigger PEP rewards.</p>')
             : '<div class="app-row"><button type="button" class="app-btn wp-start go">▶ Start</button><button type="button" class="app-btn wp-readme">README.TXT</button></div><p class="wp-small">No account needed: Start makes a guest player for you (after a quick bot check). Or <a href="#" class="wp-logon">log on with Discord</a> for the ranking and bigger PEP rewards.</p>') +
           '<div class="wp-board"></div></div></div>';
         var s = main.querySelector('.wp-start'); if (s) s.addEventListener('click', start);
@@ -1762,12 +1771,13 @@
       };
       var board = function (box) {
         if (!box) return;
-        box.innerHTML = '<div class="tabs98 wp-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-s="day">Today</button><button type="button" role="tab" aria-selected="false" data-s="week">7 days</button></div><ol class="wp-top10"><li class="wp-small">Loading…</li></ol>';
+        box.innerHTML = '<div class="tabs98 wp-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-s="day">Today</button><button type="button" role="tab" aria-selected="false" data-s="week">7 days</button></div><ol class="wp-top10"><li class="wp-small">Loading…</li></ol>' + whoLegend();
+        wireLegend(box);
         var ol = box.querySelector('ol');
         var show = function (s) {
           box.querySelectorAll('[data-s]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-s') === s)); });
           wpRpc('gry_wp_top', { p_scope: s }).then(function (rows) {
-            ol.innerHTML = rows.length ? rows.map(function (x) { return '<li><span>' + esc(x.nick) + ' <span class="hs-ok" title="Verified with Discord">✓</span></span><b>' + Number(x.points).toLocaleString('en-US') + '</b></li>'; }).join('')
+            ol.innerHTML = rows.length ? rows.map(function (x) { return '<li><span>' + who(x.nick, x.verified !== false) + '</span><b>' + Number(x.points).toLocaleString('en-US') + '</b></li>'; }).join('')
               : '<li class="wp-small">Nobody yet. Be the first!</li>';
           }, function () { ol.innerHTML = '<li class="wp-small">The ranking could not be loaded.</li>'; });
         };
@@ -1775,7 +1785,7 @@
         show('day');
         var cnt = document.createElement('p'); cnt.className = 'wp-small wp-count'; box.appendChild(cnt);
         wpRpc('gry_wp_count').then(function (c) {
-          if (c && c.players) cnt.textContent = '🐸 ' + c.players + (c.players === 1 ? ' player' : ' players') + ' today (' + c.discord + ' on Discord, the ranking shows Discord players)';
+          if (c && c.players) cnt.textContent = '🐸 ' + c.players + (c.players === 1 ? ' player' : ' players') + ' today (' + c.discord + ' on Discord)';
         }, function () {});
       };
       // leaving the tab during a guess (a short blink under 2 s, like a notification, does not count)
