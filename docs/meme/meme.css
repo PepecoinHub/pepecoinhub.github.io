@@ -1274,3 +1274,4 @@ footer.foot a { color: #edf3e3; }
 .gz-count { font: 400 14px/1.4 var(--f-chrome); padding: 4px 8px; background: #1b1b1b; color: #39ff6a; display: inline-block; }
 .gz-count b { color: #fff; }
 @media (max-width: 480px) { .gz-wpbox { grid-template-columns: 80px minmax(0, 1fr); } .gz-wpbox img { width: 80px; } }
+.app-btn:disabled { opacity: .5; cursor: not-allowed; }
