@@ -16,7 +16,7 @@ The migration was applied to the connected production project on 2026-11-02. A p
 - One row per Discord account. It is retained even outside the top 10; deleting the auth account cascades to the record.
 - One leaderboard/personal-best RPC on entry and identity changes; refresh button is throttled to 10 seconds and automatic opens use a 60-second cache. One write for an improved personal record, with a server-side per-account 10-second cooldown. Successful submissions return the top 10 in the same response.
 - Failed writes queue the best record locally under that account; Refresh scores retries. Guest records are not silently credited to a later Discord login. Different users on a shared browser have separate local records.
-- Artwork is approximately 194 KB total. Fonts are system fonts, audio is synthesized. The existing locally hosted Supabase SDK is the largest shared script; no external game engine is downloaded.
+- Artwork is approximately 243 KB total, including both flight poses. Fonts are system fonts, audio is synthesized. The existing locally hosted Supabase SDK is the largest shared script; no external game engine is downloaded.
 
 ## Casual competition, not payouts
 
