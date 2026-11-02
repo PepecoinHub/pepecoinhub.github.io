@@ -1,0 +1,32 @@
+name: Where's Pepe robot
+
+# Prepares puzzles for the Where's Pepe? game in PondOS, a week ahead (scripts/wheres_pepe.py).
+# Needs the secret WP_ROBOT_TOKEN (made once in Supabase with: select games.wp_new_robot_token();).
+# The log never names a place: Actions logs of a public repository are public.
+on:
+  schedule:
+    - cron: "23 5 * * *"           # every day at 05:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wheres-pepe
+  cancel-in-progress: false
+
+jobs:
+  puzzles:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet pillow==11.3.0
+      - name: Prepare puzzles
+        env:
+          WP_ROBOT_TOKEN: ${{ secrets.WP_ROBOT_TOKEN }}
+        run: python scripts/wheres_pepe.py
