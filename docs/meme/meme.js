@@ -1534,6 +1534,25 @@
       }, function () { wpRefreshing = null; return null; });
     return wpRefreshing;
   }
+  // a guest player made right here (the same Supabase guest sign-in as PEP Games, with the same bot check)
+  var TS_KEY = '0x4AAAAAAFUZHXoXT2P6KI_s';   // the public Turnstile site key from games/js/config.js
+  function guestSignIn() {
+    return import(new URL(BASE + 'games/js/human.js', location.href).href).then(function (m) { return m.humanToken(TS_KEY); }).then(function (tok) {
+      return fetch(SB_URL + '/auth/v1/signup', { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: {}, gotrue_meta_security: { captcha_token: tok } }) });
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (!r.ok || !j.access_token) throw new Error((j && (j.msg || j.message || j.error_description)) || 'Could not make a guest player. Try again, or log on with Discord.');
+        if (!j.expires_at && j.expires_in) j.expires_at = Math.floor(Date.now() / 1000) + j.expires_in;
+        try {
+          localStorage.setItem(SB_STORE, JSON.stringify(j));
+          if (!(localStorage.getItem('pepgry-nick') || '').trim()) localStorage.setItem('pepgry-nick', 'Frog' + (1000 + Math.floor(Math.random() * 9000)));
+        } catch (e) {}
+        paintLogon();
+        return j;
+      });
+    });
+  }
   function wpRpc(name, args) { return freshSession().then(function () { return chatRpc(name, args || {}); }); }
   var leafletReady = null;
   function loadLeaflet() {
@@ -1585,7 +1604,7 @@
           '<p class="wp-small">Leaving the tab during the guess: one warning, then −1000 each time.</p>' +
           (T.signed_in ? '<div class="app-row"><button type="button" class="app-btn wp-start go">▶ Start</button><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
               (T.verified ? '' : '<p class="wp-small">Playing as a guest (' + esc(me ? me.name : 'guest') + '). <a href="#" class="wp-logon">Log on with Discord</a> for the ranking and bigger PEP rewards.</p>')
-            : '<div class="app-row"><button type="button" class="app-btn wp-logon go">Log on to play</button><button type="button" class="app-btn wp-readme">README.TXT</button></div><p class="wp-small">Discord or a guest nickname. Everyone can earn PEP; Discord players get more and enter the ranking.</p>') +
+            : '<div class="app-row"><button type="button" class="app-btn wp-start go">▶ Start</button><button type="button" class="app-btn wp-readme">README.TXT</button></div><p class="wp-small">No account needed: Start makes a guest player for you (after a quick bot check). Or <a href="#" class="wp-logon">log on with Discord</a> for the ranking and bigger PEP rewards.</p>') +
           '<div class="wp-board"></div></div></div>';
         var s = main.querySelector('.wp-start'); if (s) s.addEventListener('click', start);
         main.querySelectorAll('.wp-logon').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); });
@@ -1595,7 +1614,11 @@
       var start = function () {
         say('Opening the photo…');
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
-        Promise.all([wpRpc('gry_wp_start', { p_nick: nick }), loadLeaflet()]).then(function (r) {
+        freshSession().then(function (sess) {
+          if (sess) return sess;
+          say('Making you a guest player…');
+          return guestSignIn().then(function (s2) { try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {} return s2; });
+        }).then(function () { return Promise.all([wpRpc('gry_wp_start', { p_nick: nick }), loadLeaflet()]); }).then(function (r) {
           play = r[0]; offset = Date.parse(play.now) - Date.now();
           if (play.done) return result(play);
           say(''); playing();
@@ -1698,6 +1721,14 @@
         });
       };
       var rewardBox = function (box, r, rw) {
+        box.className = 'wp-reward wp-faucet';
+        var title = '<p class="wp-ftitle">🎁 PEP Faucet <a href="#" class="wp-frules">rules</a></p>';
+        var inner = document.createElement('div'); inner.className = 'wp-fbody';
+        box.innerHTML = title; box.appendChild(inner);
+        box.querySelector('.wp-frules').addEventListener('click', function (e) { e.preventDefault(); wpReadme(); });
+        rewardInner(inner, r, rw, box);
+      };
+      var rewardInner = function (box, r, rw, outer) {
         if (r.claim) {
           box.innerHTML = '<div class="wp-claim"><b>🎁 ' + r.claim.pep + ' PEP</b> ' + (r.claim.status === 'paid' ? 'paid ✓ <a href="https://pepeblocks.com/tx/' + esc(r.claim.txid) + '" target="_blank" rel="noopener">see the transaction</a>' : r.claim.status === 'held' ? 'on hold: the host is checking it' : 'waiting for the weekly payout') + '</div>';
           return;
@@ -1709,11 +1740,12 @@
         var discordLink = ' <a href="#" class="wp-logon">Log on with Discord</a>';
         var wire = function () { var l = box.querySelector('.wp-logon'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); };
         if (!rw.verified && rw.streak < rw.guest_streak) {
-          box.innerHTML = '<p class="wp-claim wp-small">🎁 Guest rewards start on <b>day ' + rw.guest_streak + ' of your streak</b> (you are on day ' + rw.streak + '). Come back tomorrow! Or' + discordLink + ' for up to ' + rw.discord_max_day + ' PEP from day one.</p>';
+          box.innerHTML = '<p class="wp-small" style="margin:0">Guest rewards start on <b>day ' + rw.guest_streak + ' of your streak</b> (you are on day ' + rw.streak + '). Come back tomorrow! Or' + discordLink + ' for up to ' + rw.discord_max_day + ' PEP from day one.</p>';
           wire(); return;
         }
         box.innerHTML = '<form class="wp-claim"><b>🎁 Your reward: up to ' + pep + ' PEP</b><span class="wp-small">' + (rw.verified ? '' : 'Guest reward: one per network a day.' + discordLink + ' for up to ' + rw.discord_max_day + ' PEP. ') +
-          'Paid once a week by the host from the host\'s own wallet. Leave only an address: never a seed phrase or a password.</span>' +
+          'Paid once a week by the host from the host\'s own wallet. Leave only an address: never a seed phrase or a password.' +
+          (rw.budget_left > 0 ? ' Left in this week\'s budget: ' + Math.floor(rw.budget_left).toLocaleString('en-US') + ' PEP.' : '') + '</span>' +
           '<span class="app-row"><input class="ac-in wp-addr" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Your PEP address" placeholder="Your PEP address (P…)"><button type="submit" class="app-btn">Claim</button></span></form>';
         var f = box.querySelector('form'), inp = f.querySelector('.wp-addr');
         try { inp.value = localStorage.getItem('pondos-wp-addr') || ''; } catch (e) {}
@@ -1724,7 +1756,7 @@
             if (!v || v[0] !== 'ok') { say(v ? v[1] : 'Paste your PEP address first.', true); return; }
             try { localStorage.setItem('pondos-wp-addr', ad); } catch (err) {}
             wpRpc('gry_wp_claim', { p_address: ad }).then(function (c) {
-              r.claim = { pep: c.pep, status: 'open' }; reward(box, r); say('Claimed. It goes out with the weekly payout.');
+              r.claim = { pep: c.pep, status: 'open' }; reward(outer, r); say('Claimed. It goes out with the weekly payout.');
             }, function (err) { say(err.message, true); });
           });
         });
@@ -1742,6 +1774,10 @@
         };
         box.querySelectorAll('[data-s]').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-s')); }); });
         show('day');
+        var cnt = document.createElement('p'); cnt.className = 'wp-small wp-count'; box.appendChild(cnt);
+        wpRpc('gry_wp_count').then(function (c) {
+          if (c && c.players) cnt.textContent = '🐸 ' + c.players + (c.players === 1 ? ' player' : ' players') + ' today (' + c.discord + ' on Discord, the ranking shows Discord players)';
+        }, function () {});
       };
       // leaving the tab during a guess (a short blink under 2 s, like a notification, does not count)
       var onVis = function () {
