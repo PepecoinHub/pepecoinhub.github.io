@@ -1121,6 +1121,8 @@
   // protected by the database functions (rate limits, plausibility checks), not by hiding these.
   var SB_URL = 'https://azbwciqfbsdpwubznncg.supabase.co', SB_KEY = 'sb_publishable_GRByiqlX6v67phR8xcM6VA_6eXXwTKX';
   var SB_STORE = 'sb-azbwciqfbsdpwubznncg-auth-token';   // where the PEP Games sign-in keeps its session
+  // 2 Nov 2026: Where's Pepe briefly saved an automatic "Frog1234" as the chat nickname, so the chat stopped asking for one
+  try { var autoNick = localStorage.getItem('pepgry-nick') || ''; if (/^Frog\d{4}$/.test(autoNick)) { localStorage.setItem('pondos-wp-nick', autoNick); localStorage.removeItem('pepgry-nick'); } } catch (e) {}
   var GAME_NAME = { fud: 'FUD Invaders', snake: 'PEP Snake' };
   // a PEP Games sign-in (Discord) lives in this browser's storage; a valid one makes the score "verified"
   function sbSession() {
@@ -1558,7 +1560,8 @@
         if (!j.expires_at && j.expires_in) j.expires_at = Math.floor(Date.now() / 1000) + j.expires_in;
         try {
           localStorage.setItem(SB_STORE, JSON.stringify(j));
-          if (!(localStorage.getItem('pepgry-nick') || '').trim()) localStorage.setItem('pepgry-nick', 'Frog' + (1000 + Math.floor(Math.random() * 9000)));
+          // a name for Where's Pepe only; the chat keeps asking guests to pick their own nickname
+          if (!(localStorage.getItem('pondos-wp-nick') || '').trim()) localStorage.setItem('pondos-wp-nick', 'Frog' + (1000 + Math.floor(Math.random() * 9000)));
         } catch (e) {}
         paintLogon();
         return j;
@@ -1625,11 +1628,12 @@
       };
       var start = function () {
         say('Opening the photo…');
-        var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
+        var myNick = function () { try { return localStorage.getItem('pepgry-nick') || localStorage.getItem('pondos-wp-nick') || ''; } catch (e) { return ''; } };
+        var nick = myNick();
         freshSession().then(function (sess) {
           if (sess) return sess;
           say('Making you a guest player…');
-          return guestSignIn().then(function (s2) { try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {} return s2; });
+          return guestSignIn().then(function (s2) { nick = myNick(); return s2; });
         }).then(function () { return Promise.all([wpRpc('gry_wp_start', { p_nick: nick }), loadLeaflet()]); }).then(function (r) {
           play = r[0]; offset = Date.parse(play.now) - Date.now();
           if (play.done) return result(play);

@@ -33,7 +33,8 @@ export const badge = (verified, isHost, short = false, hostLabel = 'host') => [
   verified ? h('span', { class: 'badge ver', title: 'Verified via Discord' }, short ? '✓' : '✓ verified') : h('span', { class: 'badge guest', title: 'Guest: nickname is not reserved' }, 'guest'),
   isHost ? h('span', { class: 'badge host', title: hostLabel === 'mod' ? 'Room moderator: can start, restart and kick' : 'Event host' }, hostLabel) : null,
 ];
-export const nickStore = { get: () => localStorage.getItem('pepgry-nick') || '', set: (n) => localStorage.setItem('pepgry-nick', n) };
+// an automatic "Frog1234" (saved for a short while by Where's Pepe in PondOS) is not a nickname the player chose
+export const nickStore = { get: () => { const n = localStorage.getItem('pepgry-nick') || ''; return /^Frog\d{4}$/.test(n) ? '' : n; }, set: (n) => localStorage.setItem('pepgry-nick', n) };
 
 // Daty po angielsku w czasie lokalnym gracza (gracze są z różnych stref); fmtPoland = czas polski (Europe/Warsaw)
 export function fmtLocal(d, opts = {}) {
