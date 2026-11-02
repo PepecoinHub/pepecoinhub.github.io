@@ -845,10 +845,14 @@ footer.foot a { color: #edf3e3; }
 @keyframes rain { to { transform: translateY(110vh) rotate(540deg); } }
 /* desktop icons flow in columns, like a real desktop */
 @media (min-width: 1101px) {
-  .desk { width: auto; overflow: visible; bottom: 48px; }
-  .desk .icons { height: 100%; grid-auto-flow: column; grid-template-rows: repeat(auto-fill, 74px); grid-auto-columns: 92px; gap: 2px 4px; }
-  .pondos main { padding-left: 214px; }
-  .pondos footer.foot { padding-left: 214px; }
+  .desk { width: auto; overflow: visible; bottom: 48px; display: flex; flex-direction: column; }
+  /* the groups stand on the taskbar: the bottom of the wallpaper (the hill) is darker than the sky */
+  .desk .icon-groups { flex: 1; min-height: 0; display: flex; gap: 4px; align-items: flex-end; }
+  .desk .icon-group { width: 92px; display: flex; flex-direction: column; }
+  .desk .icons { display: flex; flex-direction: column; gap: 2px; }
+  .desk .icons li { height: 72px; }
+  .pondos main { padding-left: 306px; }
+  .pondos footer.foot { padding-left: 306px; }
 }
 .icons img { width: 36px; height: 36px; }
 .lap { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; padding: 6px; background: var(--pane); color: var(--ink); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); font: 400 13px/1.45 var(--f-chrome); }
@@ -1034,7 +1038,7 @@ footer.foot a { color: #edf3e3; }
 @media (min-width: 1101px) {
   .desk .pep-pager { width: 188px; margin: 0 0 8px; }
   .desk .pager-lcd { font-size: 19px; }
-  .desk .pep-pager ~ .icons { height: calc(100% - 62px); }
+  /* (the icon groups sit under the pager) */
 }
 @media (max-width: 1100px) { .desk .pep-pager { max-width: 520px; } }
 @media (prefers-reduced-motion: reduce) { .pager-run { animation: none; } .pager-led { animation: none; } }
@@ -1257,3 +1261,16 @@ footer.foot a { color: #edf3e3; }
   .wp-play:not(.wp-done) .wp-side > .app-row { position: sticky; bottom: 0; z-index: 500; padding: 6px 0; background: var(--chrome); }
   .wp-queue li { grid-template-columns: 1fr; }
 }
+
+/* icon group names: small labels like a desktop toolbar caption */
+.icon-group-name { margin: 0 0 4px; padding: 1px 6px; align-self: flex-start; background: rgba(0, 0, 0, .45); color: #fff; font: 700 10px/1.4 var(--f-chrome); letter-spacing: .08em; text-transform: uppercase; border-radius: 2px; }
+@media (max-width: 1100px) {
+  .icon-groups { display: grid; gap: 10px; }
+  .icon-group-name { margin-bottom: 2px; }
+}
+.gz-wpbox { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; align-items: start; }
+.gz-wpbox img { width: 110px; height: auto; }
+.gz-wpbox p { margin: 0 0 6px; }
+.gz-count { font: 400 14px/1.4 var(--f-chrome); padding: 4px 8px; background: #1b1b1b; color: #39ff6a; display: inline-block; }
+.gz-count b { color: #fff; }
+@media (max-width: 480px) { .gz-wpbox { grid-template-columns: 80px minmax(0, 1fr); } .gz-wpbox img { width: 80px; } }
