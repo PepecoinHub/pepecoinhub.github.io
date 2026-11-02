@@ -699,18 +699,22 @@
     // the numbers and tools live in the "Nerds only" folder, and the Recycle Bin sits in the bottom-right corner
     var NERDS = [['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'], ['calculator.html', 'What-if machine', 'p-eyes-still'],
       ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'], ['#addr', 'AddressCheck.exe', 'pepe-search'], ['#notpep', 'Not PEP (0x)', 'wrongpep']];
+    // wide screens: from the top-left corner, Log On alone, a gap, then the games in two columns;
+    // the rest of the pond in a small group lower down, NERDS ONLY on its own by the Start button, the bin far right
     var DESKTOP = [
-      ['Play', [['#wp', "Where's Pepe?", 'wp-folder'], ['#games', 'Games', 'games-folder'], ['#lan', 'LAN Party', 'gif-080-still'],
-        ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#logon', 'Log On', 'gif-085-still']]],
-      ['Pond', [['./', 'My Pond', 'pep-logo'], ['#nerds', 'Nerds only', 'nerds-folder'], ['#shop', 'Shop', 'shop-bag'],
-        ['#tip', 'Tip jar.exe', 'gif-045-still'], [serious, 'Serious mode', 'serious'], ['#bin', 'Recycle Bin', 'recycle-bin']]]
+      ['logon', [['#logon', 'Log On', 'gif-085-still']]],
+      ['play', [['#wp', "Where's Pepe?", 'wp-folder'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
+        ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads']]],
+      ['pond', [['./', 'My Pond', 'pep-logo'], ['#shop', 'Shop', 'shop-bag'], ['#tip', 'Tip jar.exe', 'gif-045-still'], [serious, 'Serious mode', 'serious']]],
+      ['nerds', [['#nerds', 'NERDS ONLY', 'nerds-folder']]],
+      ['bin', [['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
     var ACT = { '#wp': wpFolder, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
     ACT['#nerds'] = function () {
-      openApp('nerds', 'C:\\Pond\\Nerds only', 'nerds-folder', function (A) {
+      openApp('nerds', 'C:\\Pond\\NERDS ONLY', 'nerds-folder', function (A) {
         A.body.innerHTML = '<ul class="folder">' + NERDS.map(function (d, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></button></li>'; }).join('') + '</ul>' +
           '<p class="bin-tip">Charts, whales, math and receipts. Glasses recommended, pocket protector optional.</p>';
         A.body.querySelectorAll('.folder button').forEach(function (b) {
@@ -723,7 +727,7 @@
     };
     var desk = el('nav', { class: 'desk', 'aria-label': 'Desktop' });
     desk.innerHTML = '<div class="icon-groups">' + DESKTOP.map(function (g) {
-      return '<div class="icon-group"><p class="icon-group-name">' + g[0] + '</p><ul class="icons">' + g[1].map(function (d) { return '<li' + (d[0] === '#bin' ? ' class="bin-li"' : '') + '><a href="' + d[0] + '" data-id="' + esc(d[1]) + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></a></li>'; }).join('') + '</ul></div>';
+      return '<div class="icon-group g-' + g[0] + '"><ul class="icons">' + g[1].map(function (d) { return '<li' + (d[0] === '#bin' ? ' class="bin-li"' : '') + '><a href="' + d[0] + '" data-id="' + esc(d[1]) + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></a></li>'; }).join('') + '</ul></div>';
     }).join('') + '</div>';
     document.body.insertBefore(desk, mainEl);
     // on a wide screen the Recycle Bin leaves its group for the bottom-right corner, above the clock
@@ -731,7 +735,7 @@
     var lanIcon = desk.querySelector('a[href="#lan"]');
     if (lanIcon) lanIcon.insertAdjacentHTML('beforeend', '<span class="lan-badge icon-badge" hidden><span class="lan-dot" aria-hidden="true"></span><span class="lan-n"></span></span>');
     var FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
-    var iconPos = {}; try { iconPos = JSON.parse(localStorage.getItem('pondos-icons3') || '{}'); } catch (e) {}
+    var iconPos = {}; try { iconPos = JSON.parse(localStorage.getItem('pondos-icons4') || '{}'); } catch (e) {}
     var openIcon = function (a) { var h = a.getAttribute('href'); if (ACT[h]) ACT[h](); else location.href = a.href; };
     document.querySelectorAll('.desk .icons a, .desk-corner a').forEach(function (a) {
       var id = a.getAttribute('data-id'), p = iconPos[id];
@@ -770,7 +774,7 @@
         var up = function () {
           a.removeEventListener('pointermove', mv); a.removeEventListener('pointerup', up); a.removeEventListener('pointercancel', up);
           a.classList.remove('dragging');
-          if (moved) { iconPos[id] = cur; try { localStorage.setItem('pondos-icons3', JSON.stringify(iconPos)); } catch (err) {} a.focus({ preventScroll: true }); }
+          if (moved) { iconPos[id] = cur; try { localStorage.setItem('pondos-icons4', JSON.stringify(iconPos)); } catch (err) {} a.focus({ preventScroll: true }); }
         };
         a.addEventListener('pointermove', mv); a.addEventListener('pointerup', up); a.addEventListener('pointercancel', up);
       });
@@ -819,7 +823,7 @@
     ctx = el('div', { class: 'ctx', role: 'menu' });
     [['Arrange windows', arrangeAll], ['Refresh', function () { location.reload(); }], null,
       [dark ? 'Wallpaper: day hills' : 'Wallpaper: night mountains', function () { if (themeBtn) themeBtn.click(); }],
-      ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons3'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
+      ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons4'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
       null, ['New game: FUD Invaders', invaders], ['New game: PEP Snake', snake], null, ['Properties…', aboutOS]].forEach(function (it) {
       if (!it) { ctx.appendChild(el('hr')); return; }
       var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
