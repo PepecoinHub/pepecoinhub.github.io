@@ -1302,3 +1302,9 @@ footer.foot a { color: #edf3e3; }
 .icons a { user-select: none; -webkit-user-select: none; -webkit-user-drag: none; touch-action: manipulation; }
 .icons a img { -webkit-user-drag: none; pointer-events: none; }
 .icons a.dragging { z-index: 5; opacity: .85; }
+/* Where's Pepe result: the top 10 sits under the photo (left), the faucet stays on the right */
+.wp-done { grid-template-areas: "photo side" "board side"; }
+.wp-done > .wp-photo { grid-area: photo; }
+.wp-done > .wp-side { grid-area: side; }
+.wp-done > .wp-board { grid-area: board; min-width: 0; }
+@media (max-width: 760px) { .wp-done { grid-template-areas: "photo" "side" "board"; } }

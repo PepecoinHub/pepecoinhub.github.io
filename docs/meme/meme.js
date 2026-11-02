@@ -1738,7 +1738,7 @@
           '<div class="wp-map"></div>' +
           '<p class="wp-small">Photo: ' + esc(a.credit || '') + ', <a href="' + esc(a.source_url || '#') + '" target="_blank" rel="noopener">' + esc(a.license || 'licence') + '</a>, cropped, Pepe added.' + (r.leaves ? ' Tab left ' + r.leaves + '×.' : '') + '</p>' +
           '<div class="app-row"><button type="button" class="app-btn wp-copy">Copy result</button><button type="button" class="app-btn wp-x" disabled title="Coming soon: X does not take links to this site yet">Post on X (soon)</button><span class="grow"></span><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
-          '<div class="wp-reward"></div><div class="wp-board"></div></div></div>';
+          '<div class="wp-reward"></div></div><div class="wp-board"></div></div>';
         main.querySelector('.wp-readme').addEventListener('click', wpReadme); wireHost();
         var txt = shareText(r);
         // "Post on X" waits until X accepts links to pepecoinhub.com; then make it a link to https://x.com/intent/post?text=…
