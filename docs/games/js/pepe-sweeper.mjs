@@ -5,6 +5,7 @@ const board = $('#board'), counter = $('#left-counter'), clock = $('#time-counte
 const status = $('#status'), mood = $('#mood'), face = $('#reset');
 const result = $('#result'), bestEl = $('#best');
 const coin = '../assets/coins/pepe.png';
+const flagIcon = 'img/sweeper-flag.svg';
 let level = 'easy', game, buttons = [], seconds = 0, paused = false, flagMode = false;
 let holdTimer = null, longPressed = -1;
 
@@ -27,6 +28,8 @@ function newRound(next = level) {
   $('#dig-mode').setAttribute('aria-pressed', 'true'); $('#flag-mode').setAttribute('aria-pressed', 'false');
   document.querySelectorAll('[data-level]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.level === level)));
   board.style.setProperty('--cols', game.cols); board.style.setProperty('--rows', game.rows);
+  document.querySelector('.game-window').style.setProperty('--window-width', (game.cols * 26 + 54) + 'px');
+  closeMenu();
   board.setAttribute('aria-label', `${LEVELS[level].name}: ${game.cols} by ${game.rows}, ${game.mines} traps`);
   $('#board-info').textContent = `${game.cols} × ${game.rows} · ${game.mines} PEPE traps`;
   $('#board-scroll').scrollLeft = 0;
@@ -46,12 +49,14 @@ function render() {
   clock.textContent = String(Math.min(999, seconds)).padStart(3, '0');
   for (let i = 0; i < buttons.length; i++) {
     const tile = buttons[i], cell = game.cells[i], lost = game.status === 'lost';
-    const mine = cell.mine && (cell.open || (lost && !cell.flag));
+    const mine = cell.mine && cell.exploded;
     const wrong = lost && cell.flag && !cell.mine;
     tile.className = `tile${cell.open ? ' open' : ''}${cell.flag ? ' flagged' : ''}${mine ? ' mine' : ''}${cell.exploded ? ' exploded' : ''}${wrong ? ' wrong' : ''}${cell.open && !cell.mine && cell.nearby ? ' n' + cell.nearby : ''}`;
     tile.replaceChildren();
     if (mine) {
       const img = document.createElement('img'); img.src = coin; img.alt = ''; tile.append(img);
+    } else if (cell.flag) {
+      const img = document.createElement('img'); img.src = flagIcon; img.alt = ''; tile.append(img);
     } else if (cell.open && cell.nearby) tile.textContent = String(cell.nearby);
     const state = wrong ? 'wrong flag' : cell.flag ? 'flagged' : mine ? 'PEPE Ethereum trap' : cell.open ? (cell.nearby ? `${cell.nearby} nearby traps` : 'empty') : 'covered';
     tile.setAttribute('aria-label', `Row ${Math.floor(i / game.cols) + 1}, column ${i % game.cols + 1}, ${state}`);
@@ -121,11 +126,14 @@ board.addEventListener('keydown', event => {
   const shift = {ArrowLeft:-1,ArrowRight:1,ArrowUp:-game.cols,ArrowDown:game.cols}[event.key];
   if (shift !== undefined) { event.preventDefault(); const next = index + shift; if (next >= 0 && next < buttons.length && (Math.abs(shift) !== 1 || Math.floor(index / game.cols) === Math.floor(next / game.cols))) buttons[next].focus(); }
 });
+function closeMenu() { $('#game-menu').hidden = true; $('#menu-level').setAttribute('aria-expanded', 'false'); }
 document.querySelectorAll('[data-level]').forEach(button => button.addEventListener('click', () => newRound(button.dataset.level)));
 $('#reset').addEventListener('click', () => newRound()); $('#again').addEventListener('click', () => newRound());
 $('#menu-new').addEventListener('click', () => newRound());
-$('#menu-level').addEventListener('click', () => document.querySelector('[data-level][aria-pressed=true]').focus());
-$('#menu-help').addEventListener('click', () => $('#help-box').focus());
+$('#menu-level').addEventListener('click', () => { const open = $('#game-menu').hidden; $('#game-menu').hidden = !open; $('#menu-level').setAttribute('aria-expanded', String(open)); });
+$('#menu-help').addEventListener('click', () => { const open = $('#help-box').hidden; $('#help-box').hidden = !open; $('#menu-help').setAttribute('aria-expanded', String(open)); closeMenu(); });
+document.addEventListener('click', event => { if (!event.target.closest('.menubar')) closeMenu(); });
+document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
 $('#dig-mode').addEventListener('click', () => setMode(false)); $('#flag-mode').addEventListener('click', () => setMode(true));
 window.addEventListener('keydown', event => { if (event.key === 'F2') { event.preventDefault(); newRound(); } });
 window.addEventListener('message', event => { if (event.origin === location.origin && event.source === parent && event.data === 'pepe-sweeper-pause') paused = true; });
