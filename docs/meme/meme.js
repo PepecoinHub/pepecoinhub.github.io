@@ -1551,7 +1551,7 @@
   })();
 
   // ---------- About me: who builds the pond, the support addresses (same as the footer) and a small task ----------
-  var SHARE_TEXT = 'Pepecoin $PEP: a frog with its own proof-of-work blockchain. No premine, no token on someone else\'s chain. Have a look 🐸';
+  var SHARE_TEXT = 'Pepecoin $PEP: a frog with its own proof-of-work blockchain. No premine, no token on someone else\'s chain. 🐸 #Pepecoin';
   function aboutMe() {
     openApp('about', 'About me.txt', 'night-shift', function (A) {
       var ADDR = [['Pepecoin (PEP)', 'PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t'], ['Litecoin (LTC)', 'ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j'], ['Dogecoin (DOGE)', 'DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v'], ['Bitcoin (BTC)', 'bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p']];
@@ -1563,9 +1563,9 @@
         '<p class="bin-tip tip-msg">Tips go one way only. This site never asks for a seed phrase or a password.</p>' +
         '<div class="tip about-task"><img src="img/unclesam.webp" alt="Pepe pointing at you" width="96" height="96"><div>' +
         '<p>Answered <b>"no"</b> to any of those? Then you have a task: post about Pepecoin on X or Reddit, or tell a friend. <b>Today. Now.</b></p>' +
-        '<div class="app-row"><a class="app-btn go" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(SHARE_TEXT) + '&url=' + encodeURIComponent(url) + '">Post on X</a>' +
+        '<div class="app-row"><a class="app-btn go" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(SHARE_TEXT) + '">Post on X</a>' +
         '<a class="app-btn" target="_blank" rel="noopener" href="https://www.reddit.com/submit?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent('Pepecoin $PEP: a frog with its own PoW chain') + '">Reddit</a>' +
-        '<button type="button" class="app-btn about-mail">✏️ Write me a letter</button></div></div></div>';
+        '<button type="button" class="app-btn about-mail">✏️ Write to me</button></div></div></div>';
       var m = A.body.querySelector('.tip-msg');
       A.body.querySelector('.about-mail').addEventListener('click', function () { frogMail('write'); });
       A.body.querySelectorAll('[data-a]').forEach(function (b) {
@@ -1902,7 +1902,9 @@
       };
       var shareText = function (r) {
         // the last line says, without the word "faucet", that good guesses pay a little PEP
-        return "🐸 Where's Pepe #" + r.num + ' · ' + (r.g_lat == null ? '📍 no guess' : '📍 ' + fmtKm(r.km)) + ' · ' + (r.points || 0).toLocaleString('en-US') + '/5000' +
+        var pts = r.points || 0, bar = '';
+        for (var q = 0; q < 5; q++) { var left = pts - q * 1000; bar += left >= 1000 ? '🟩' : left >= 500 ? '🟨' : '⬜'; }
+        return "🐸 Where's Pepe #" + r.num + ' ' + bar + '\n' + (r.g_lat == null ? '📍 no guess' : '📍 ' + fmtKm(r.km)) + ' · ' + pts.toLocaleString('en-US') + '/5000' +
           (T && T.streak > 1 ? ' · 🔥' + T.streak : '') + '\n🎁 Find the frog, get some free PEP in your pocket\nhttps://pepecoinhub.com/meme/';
       };
       var result = function (r) {
@@ -1914,11 +1916,13 @@
           '<p class="wp-place">Pepe was at <b>' + esc(a.title || '?') + '</b>, ' + esc(a.country || '') + ' ' + flagOf(a.country_code) + (a.wiki_url ? ' · <a href="' + esc(a.wiki_url) + '" target="_blank" rel="noopener">Wikipedia</a>' : '') + '</p>' +
           '<div class="wp-map"></div>' +
           '<p class="wp-small">Photo: ' + esc(a.credit || '') + ', <a href="' + esc(a.source_url || '#') + '" target="_blank" rel="noopener">' + esc(a.license || 'licence') + '</a>, cropped, Pepe added.' + (r.leaves ? ' Tab left ' + r.leaves + '×.' : '') + '</p>' +
-          '<div class="app-row"><button type="button" class="app-btn wp-copy">Copy result</button><button type="button" class="app-btn wp-x" disabled title="Coming soon: X does not take links to this site yet">Post on X (soon)</button><span class="grow"></span><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
+          '<div class="app-row">' + (navigator.share ? '<button type="button" class="app-btn go wp-share">Share…</button>' : '') + '<button type="button" class="app-btn wp-copy">Copy result</button><button type="button" class="app-btn wp-x" disabled title="Coming soon: X does not take links to this site yet">Post on X (soon)</button><span class="grow"></span><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
           '<div class="wp-reward"></div></div><div class="wp-board"></div></div>';
         main.querySelector('.wp-readme').addEventListener('click', wpReadme); wireHost();
         var txt = shareText(r);
         // "Post on X" waits until X accepts links to pepecoinhub.com; then make it a link to https://x.com/intent/post?text=…
+        var shb = main.querySelector('.wp-share');
+        if (shb) shb.addEventListener('click', function () { navigator.share({ text: txt }).catch(function () {}); });
         main.querySelector('.wp-copy').addEventListener('click', function () {
           var ok = function () { say('Copied. Paste it on Discord or X.'); };
           if (navigator.clipboard) navigator.clipboard.writeText(txt).then(ok, function () { say('Copy blocked by the browser.', true); }); else say('Copy blocked by the browser.', true);
@@ -2103,7 +2107,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 2, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 3, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Where's Pepe? opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -2132,9 +2136,10 @@
     paintMail();
     var A = openApp('mail', 'Frog Mail - Inbox', 'frog-mail', function (A) {
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
-        '<li><button type="button" data-v="write"><b>✏️ Write a letter</b><small>Ideas, bugs, wishes: straight to the builder</small></button></li>' +
-        '<li><button type="button" data-v="gz"><b>The Pond Gazette #2</b><small>Extra! Where\'s Pepe? is coming</small></button></li>' +
-        '<li class="ml-owner" hidden><button type="button" data-v="box"><b>📥 Letters to you <span class="ml-n"></span></b><small>Only you can see these</small></button></li>' +
+        '<li><button type="button" data-v="write"><b>✏️ Letters to the Editor</b><small>Ideas, bugs, wishes, notices</small></button></li>' +
+        '<li><button type="button" data-v="gz"><b>The Pond Gazette #3</b><small>Yo dawg, an internet in your internet</small></button></li>' +
+        '<li><button type="button" data-v="gz2"><b>The Pond Gazette #2</b><small>Archive: Where\'s Pepe? is coming</small></button></li>' +
+        '<li class="ml-owner" hidden><button type="button" data-v="box"><b>📥 Editor\'s desk <span class="ml-n"></span></b><small>Only you can see these</small></button></li>' +
         '</ul><div class="mail-pane"></div></div>';
       var pane = A.body.querySelector('.mail-pane'), ct = 0;
       var stopClock = function () { clearInterval(ct); ct = 0; };
@@ -2148,11 +2153,12 @@
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
         if (v === 'write') return writeLetter(pane);
         if (v === 'box') return letterInbox(pane, paintOwner);
-        pane.innerHTML = '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        var issue = v === 'gz2' ? 2 : 3;
+        pane.innerHTML = issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
-        '<p><b>Got an idea, a wish or a bug?</b> Write a letter right here in Frog Mail. It goes straight to the frog who builds this pond, every letter is read, and the best ideas get built.</p>' +
+        '<p><b>Got an idea, a wish or a bug?</b> Write a letter right here in Frog Mail. It goes straight to the editor, every letter is read, and the best ideas get built.</p>' +
         '<div class="app-row"><button type="button" class="app-btn go gz-write">✏️ Write a letter</button><button type="button" class="app-btn gz-lan">Or say it in LAN Party →</button></div></section>' +
         '<section class="gz-wp"><p class="gz-kick">Extra! Extra!</p><h4>Pepe packs his backpack: Where\'s Pepe? starts soon</h4>' +
         '<div class="gz-wpbox"><img src="img/wp-pepe.webp" alt="Pepe the explorer with binoculars" width="110" height="104"><div>' +
@@ -2165,15 +2171,46 @@
         '<p>Pepe Pictures, the weekly quiz night, needs a host: set the date, pick the pictures, start the rounds and crown the winner. All in the chat.</p>' +
         '<button type="button" class="app-btn gz-tv">More on PEP-TV →</button></section>' +
         '<section class="gz-soon"><p class="gz-kick">Coming in the weekly issues</p><ul><li><b>The week in numbers:</b> price, hashrate, new blocks and supply, with sources.</li><li><b>Pond Picks:</b> the best posts and memes, picked by the community.</li><li><b>Game night winners</b> and the best Pepe Miner runs.</li></ul></section>' +
-        '<p class="gz-foot">When a new issue lands, the flag on the mailbox goes up.</p></article>';
-        pane.querySelector('.gz-write').addEventListener('click', function () { show('write'); });
-        pane.querySelector('.gz-lan').addEventListener('click', function () { lanParty(); });
-        pane.querySelector('.gz-wpgo').addEventListener('click', wheresPepe);
-        pane.querySelector('.gz-wpad').addEventListener('click', function () { adPlayer(0); });
-        pane.querySelector('.gz-tv').addEventListener('click', function () { adPlayer(1); });
+        '<p class="gz-foot">When a new issue lands, the flag on the mailbox goes up.</p></article>' : '<article class="gazette"><header><p class="gz-top"><span>Issue #3</span><span>Price: 0 PEP</span><span>Weekly</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+          '<section><p class="gz-kick">Front page</p><h4>Yo dawg, we put an internet in your internet</h4>' +
+          '<div class="gz-wpbox"><img src="img/laptop.webp" alt="Pepe at a laptop" width="120" height="96"><div>' +
+          '<p>The pond is growing up. Not one more crypto dashboard you check once and forget: a small internet inside the internet, a place you actually want to come back to.</p>' +
+          '<p><b>Every day:</b> a new Where\'s Pepe? photo and free PEP for good guesses, games with a Leaders board, the LAN Party chat. <b>Every week:</b> a fresh Gazette with your letters and notices. <b>Every time:</b> weird facts and PEP-TV.</p></div></div>' +
+          '<p>You read it, you play it, and from now on you shape it.</p></section>' +
+          '<section class="gz-wp"><p class="gz-kick">Extra! Extra!</p><h4>Where\'s Pepe? is open for everyone</h4>' +
+          '<div class="gz-wpbox"><img src="img/wp-pepe.webp" alt="Pepe the explorer with binoculars" width="110" height="104"><div>' +
+          '<p>One photo a day, 2 minutes, one pin on the map. Up to 5000 points, and 1 PEP for every 50 points, paid weekly. Call it the pond faucet: you just have to know your geography.</p>' +
+          '<p class="gz-count"></p></div></div>' +
+          '<div class="app-row"><button type="button" class="app-btn go gz-wpgo">Play today\'s photo →</button></div></section>' +
+          '<section class="gz-letters"><p class="gz-kick">New column</p><h4>Letters to the Editor</h4>' +
+          '<p>Our editor-in-chief is fully licensed (the licence is a sticky note on the monitor) and reads every single letter. Ideas, bugs, wishes, complaints about the frogs: send it in.</p>' +
+          '<p>Tick <b>“OK to print”</b> and the best letters land right here in the next issue.</p>' +
+          '<button type="button" class="app-btn go gz-write">✏️ Write to the Editor</button></section>' +
+          '<section class="gz-board"><p class="gz-kick">Notice board</p><ul class="gz-notes">' +
+          '<li><b>📌 The editor is listening.</b> Frog Mail → Letters to the Editor. Up to 3 letters a day.</li>' +
+          '<li class="gz-tvnote"></li>' +
+          '<li><b>📌 HELP WANTED:</b> a frog to run game night (Pepe Pictures). <a href="#" class="gz-tv">Details on PEP-TV</a></li>' +
+          '<li><b>📌 Your notice here.</b> Selling a meme, looking for a chess rival, starting a Pepe club? Send it as a letter, tick “OK to print”.</li>' +
+          '</ul></section>' +
+          '<section class="gz-facts"><p class="gz-kick">Did you know?</p><ul>' +
+          '<li>PEP has its own blockchain. There was no premine: every coin in existence came from mining.</li>' +
+          '<li>Since block 600,000 every block pays a fixed 10,000 PEP. No more halvings.</li>' +
+          '<li>The Pond Gazette has exactly one editor and zero fact-checkers. The facts above came with receipts anyway.</li></ul></section>' +
+          '<p class="gz-foot">When a new issue lands, the flag on the mailbox goes up.</p></article>';
+        var on = function (sel, fn) { var x = pane.querySelector(sel); if (x) x.addEventListener('click', function (e) { e.preventDefault(); fn(); }); };
+        on('.gz-write', function () { show('write'); });
+        on('.gz-lan', function () { lanParty(); });
+        on('.gz-wpgo', wheresPepe);
+        on('.gz-wpad', function () { adPlayer(Math.max(0, adByFile('wheres_pepe.mpg'))); });
+        on('.gz-tv', function () { adPlayer(Math.max(0, adByFile('host_wanted.mpg'))); });
+        var tvn = pane.querySelector('.gz-tvnote');
+        if (tvn) {
+          var ai = adByFile('internet_in_your_internet.mpg');
+          tvn.innerHTML = ai >= 0 ? '<b>📌 New on PEP-TV:</b> “An internet in your internet”. <a href="#" class="gz-newad">Watch the ad</a>' : '<b>📌 Tomorrow on PEP-TV:</b> a new ad about where the pond is heading. Stay tuned.';
+          on('.gz-newad', function () { adPlayer(ai); });
+        }
         var cnt = pane.querySelector('.gz-count');
-        var paintCount = function () { cnt.innerHTML = launchText(); };
-        paintCount(); ct = setInterval(paintCount, 1000);
+        if (cnt) { var paintCount = function () { cnt.innerHTML = launchText(); }; paintCount(); ct = setInterval(paintCount, 1000); }
       };
       A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-v')); }); });
       A.show = show;
@@ -2185,12 +2222,13 @@
   }
   function writeLetter(pane) {
     var me = whoAmI(), nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
-    pane.innerHTML = '<form class="letter"><p class="lt-head"><b>To:</b> the frog who builds this pond<br><b>From:</b> ' +
+    pane.innerHTML = '<form class="letter"><p class="lt-head"><b>To:</b> The Editor-in-chief, The Pond Gazette<br><b>From:</b> ' +
       (me && me.discord ? esc(me.name) + ' <span class="hs-ok" title="Verified with Discord">✓</span>'
         : '<input class="ac-in lt-name" maxlength="40" placeholder="Your nickname (optional)" value="' + esc(nick) + '">') + '</p>' +
-      '<textarea class="ac-in lt-body" rows="7" maxlength="1500" placeholder="What should I fix, change or add? A bug, an idea, a game you want, anything."></textarea>' +
+      '<textarea class="ac-in lt-body" rows="7" maxlength="1500" placeholder="Dear Editor, … An idea, a bug, a game you want, a notice for the board, anything."></textarea>' +
+      '<label class="lt-print"><input type="checkbox" class="lt-ok"> OK to print my letter (and name) in the Gazette</label>' +
       '<div class="app-row"><button type="submit" class="app-btn go lt-send">✉️ Send</button><span class="lt-left hs-note"></span></div>' +
-      '<p class="hs-note lt-msg">' + (me ? 'Only the builder reads letters. Up to 3 a day.' : 'Sending takes a quick log on: one click as a guest (after a short bot check) or with Discord. Only the builder reads letters. Up to 3 a day.') + '</p></form>';
+      '<p class="hs-note lt-msg">' + (me ? 'Only the editor reads letters. Up to 3 a day.' : 'Sending takes a quick log on: one click as a guest (after a short bot check) or with Discord. Only the editor reads letters. Up to 3 a day.') + '</p></form>';
     var f = pane.querySelector('form'), body = f.querySelector('.lt-body'), left = f.querySelector('.lt-left'), msg = f.querySelector('.lt-msg'), btn = f.querySelector('.lt-send');
     var count = function () { left.textContent = (1500 - body.value.length) + ' left'; };
     var hint = msg.textContent;
@@ -2201,9 +2239,9 @@
       if (text.length < 2) { msg.textContent = 'Write a few words first.'; msg.classList.add('err'); body.focus(); return; }
       btn.disabled = true; msg.classList.remove('err'); msg.textContent = 'Sending…';
       freshSession().then(function (s) { return s || (msg.textContent = 'Quick bot check…', guestSignIn()); })
-        .then(function () { return chatRpc('gry_letter_send', { p_body: text, p_name: nm ? nm.value.trim() : '', p_page: location.pathname }); })
+        .then(function () { return chatRpc('gry_letter_send', { p_body: text, p_name: nm ? nm.value.trim() : '', p_page: location.pathname, p_print: !!f.querySelector('.lt-ok').checked }); })
         .then(function () {
-          pane.innerHTML = '<div class="tip lt-done"><img src="img/gif-045.webp" alt="" width="96" height="96"><div><b>Letter sent! 🐸</b><p>It landed in the builder\'s mailbox. Thanks for helping make the pond better.</p><button type="button" class="app-btn lt-again">Write another</button></div></div>';
+          pane.innerHTML = '<div class="tip lt-done"><img src="img/gif-045.webp" alt="" width="96" height="96"><div><b>Letter sent! 🐸</b><p>It landed on the editor\'s desk. If you ticked “OK to print”, watch the next issue of the Gazette.</p><button type="button" class="app-btn lt-again">Write another</button></div></div>';
           pane.querySelector('.lt-again').addEventListener('click', function () { writeLetter(pane); });
         }, function (err) { btn.disabled = false; msg.textContent = err.message || 'The mailbox cannot be reached right now. Try again in a minute.'; msg.classList.add('err'); });
     });
@@ -2218,7 +2256,7 @@
       pane.innerHTML = '<div class="letters">' + box.letters.map(function (l) {
         return '<details class="lt-item' + (l.read ? '' : ' new') + '" data-id="' + l.id + '"><summary><b>' + (l.discord ? esc(l.name) + ' <span class="hs-ok" title="Discord">✓</span>' : esc(l.name) + ' <small>(guest)</small>') + '</b>' +
           '<small>' + esc(new Date(l.at).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</small>' +
-          '<span class="lt-peek">' + esc(l.body.slice(0, 70)) + '</span></summary>' +
+          (l.print ? '<span class="lt-tag">🖨 OK to print</span>' : '') + '<span class="lt-peek">' + esc(l.body.slice(0, 70)) + '</span></summary>' +
           '<p class="lt-text">' + esc(l.body) + '</p><p class="hs-note">' + (l.page ? 'Sent from ' + esc(l.page) : '') + '</p>' +
           '<div class="app-row"><button type="button" class="app-btn lt-del">🗑 Delete</button></div></details>';
       }).join('') + '</div>';
@@ -2325,6 +2363,12 @@
   // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
   // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
   var ADS = [
+    { file: 'internet_in_your_internet.mpg', added: '2026-11-04', from: '2026-11-04T00:00:00+01:00', title: 'An internet in your internet', ch: 'CH 1 · POND PRIME TIME', icon: 'laptop', scenes: [
+      '<p class="ad-kick">47 tabs open. 46 of them are bad news.</p><h3 class="ad-big">What if the pond<br>was <em>the internet?</em></h3>',
+      '<img class="ad-pic" src="img/laptop.webp" alt=""><h3 class="ad-big">Yo dawg, we put an <em>internet</em><br>in your internet.</h3>',
+      '<p class="ad-kick">Games. Weird facts. A daily faucet. A chat. A notice board.</p><h3 class="ad-big">One pond.<br>Come back <em>every day.</em></h3><p class="ad-sub">A new Where\'s Pepe? photo at 00:00 UTC, free PEP for good guesses, the Gazette every week.</p>',
+      '<p class="ad-fine">Got an idea for the pond? Write to the editor. The best letters get printed.</p><button type="button" class="ad-cta ad-mailbtn">Write to the Editor →</button>'
+    ] },
     { file: 'at_mention.mpg', added: '2026-11-03', title: '@mentions in the chat', ch: 'CH 2 · POND TALK RADIO', icon: 'gif-080-still', scenes: [
       '<p class="ad-kick">Your fren is in the LAN Party chat…</p><h3 class="ad-big">…but you are<br><em>not looking!</em></h3>',
       '<h3 class="ad-big">Now they can<br><em>@mention</em> you.</h3><p class="ad-sub">Type @ and pick a verified fren. They get a highlight, a ping and a pop-up if they allowed it.</p>',
@@ -2394,6 +2438,8 @@
     ] }
   ];
   var adSeen = function () { try { return JSON.parse(localStorage.getItem('pondos-ads-seen') || '[]'); } catch (e) { return []; } };
+  ADS = ADS.filter(function (ad) { return !ad.from || Date.now() >= Date.parse(ad.from); });
+  function adByFile(f) { for (var k = 0; k < ADS.length; k++) if (ADS[k].file === f) return k; return -1; }
   var adNew = function (ad) { return !!ad.added && Date.now() - Date.parse(ad.added + 'T00:00:00Z') < 21 * 864e5 && adSeen().indexOf(ad.file) < 0; };
   function adBadges() {
     var n = ADS.filter(adNew).length;
@@ -2438,6 +2484,7 @@
       var wb = A.body.querySelector('.ad-wpbtn'); if (wb) wb.addEventListener('click', function () { wheresPepe(); });
       var yb = A.body.querySelector('.ad-yeetbtn'); if (yb) yb.addEventListener('click', function () { yeetApp(); });
       var lnb = A.body.querySelector('.ad-lanbtn'); if (lnb) lnb.addEventListener('click', function () { lanParty(); });
+      var mlb = A.body.querySelector('.ad-mailbtn'); if (mlb) mlb.addEventListener('click', function () { frogMail('write'); });
       var sb = A.body.querySelector('.ad-sweepbtn'); if (sb) sb.addEventListener('click', function () { pepeSweeperApp(); });
       var wl = A.body.querySelector('.ad-launch'); if (wl) { wl.innerHTML = launchText(); var wlt = setInterval(function () { if (!document.body.contains(wl)) clearInterval(wlt); else wl.innerHTML = launchText(); }, 1000); }
       liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
