@@ -1361,10 +1361,11 @@ footer.foot a { color: #edf3e3; }
 .find-list b { display: block; font-size: 13px; }
 .find-list small { display: block; font-size: 11px; opacity: .8; }
 .saver .sv-frog.cut { border: 0; box-shadow: none; width: 220px; filter: drop-shadow(0 6px 12px rgba(0,0,0,.6)); }
-.app-win.app-full.pepesweeper-window { width: 100% !important; box-sizing: border-box; }
 /* @mentions in the LAN Party chat */
 .lan-msg.lan-me { background: #ffe9a0; color: #1d1d1d; border-left: 3px solid #e0a800; padding-left: 5px; }
 .mention-pop { position: absolute; left: 0; bottom: calc(100% + 3px); z-index: 40; min-width: 180px; display: grid; padding: 3px; background: var(--chrome); color: var(--ink); border: 2px solid; border-color: var(--chrome-hi) var(--chrome-dk) var(--chrome-dk) var(--chrome-hi); box-shadow: 2px 2px 0 #0004; }
 .mention-opt { text-align: left; background: none; border: 0; padding: 5px 8px; font: 700 12px var(--f-chrome); color: inherit; cursor: pointer; }
 .mention-opt.on, .mention-opt:hover { background: #1f5a3c; color: #fff; }
 .lan-ment { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.app-win .sweep-frame { height: 560px; }
+.app-win.is-max .sweep-frame { height: calc(100dvh - 120px) !important; }
