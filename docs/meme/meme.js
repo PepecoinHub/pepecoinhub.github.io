@@ -1563,7 +1563,7 @@
         '<p class="bin-tip tip-msg">Tips go one way only. This site never asks for a seed phrase or a password.</p>' +
         '<div class="tip about-task"><img src="img/unclesam.webp" alt="Pepe pointing at you" width="96" height="96"><div>' +
         '<p>Answered <b>"no"</b> to any of those? Then you have a task: post about Pepecoin on X or Reddit, or tell a friend. <b>Today. Now.</b></p>' +
-        '<div class="app-row"><a class="app-btn go" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(SHARE_TEXT) + '">Post on X</a>' +
+        '<div class="app-row"><button type="button" class="app-btn" disabled title="Coming soon">Post on X (soon)</button>' +
         '<a class="app-btn" target="_blank" rel="noopener" href="https://www.reddit.com/submit?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent('Pepecoin $PEP: a frog with its own PoW chain') + '">Reddit</a>' +
         '<button type="button" class="app-btn about-mail">✏️ Write to me</button></div></div></div>';
       var m = A.body.querySelector('.tip-msg');
@@ -2206,7 +2206,7 @@
         var tvn = pane.querySelector('.gz-tvnote');
         if (tvn) {
           var ai = adByFile('internet_in_your_internet.mpg');
-          tvn.innerHTML = ai >= 0 ? '<b>📌 New on PEP-TV:</b> “An internet in your internet”. <a href="#" class="gz-newad">Watch the ad</a>' : '<b>📌 Tomorrow on PEP-TV:</b> a new ad about where the pond is heading. Stay tuned.';
+          tvn.innerHTML = ai >= 0 ? '<b>📌 New on PEP-TV:</b> “An internet in your internet”. <a href="#" class="gz-newad">Watch the ad</a>' : '<b>📌 ' + (function () { var at = new Date(Date.parse('2026-11-04T20:00:00+01:00')); return (at.toDateString() === new Date().toDateString() ? 'Today' : 'Tomorrow') + ' at ' + at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); })() + ' on PEP-TV:</b> a new ad about where the pond is heading. Stay tuned.';
           on('.gz-newad', function () { adPlayer(ai); });
         }
         var cnt = pane.querySelector('.gz-count');
@@ -2363,7 +2363,7 @@
   // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
   // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
   var ADS = [
-    { file: 'internet_in_your_internet.mpg', added: '2026-11-04', from: '2026-11-04T00:00:00+01:00', title: 'An internet in your internet', ch: 'CH 1 · POND PRIME TIME', icon: 'laptop', scenes: [
+    { file: 'internet_in_your_internet.mpg', added: '2026-11-04', from: '2026-11-04T20:00:00+01:00', title: 'An internet in your internet', ch: 'CH 1 · POND PRIME TIME', icon: 'laptop', scenes: [
       '<p class="ad-kick">47 tabs open. 46 of them are bad news.</p><h3 class="ad-big">What if the pond<br>was <em>the internet?</em></h3>',
       '<img class="ad-pic" src="img/laptop.webp" alt=""><h3 class="ad-big">Yo dawg, we put an <em>internet</em><br>in your internet.</h3>',
       '<p class="ad-kick">Games. Weird facts. A daily faucet. A chat. A notice board.</p><h3 class="ad-big">One pond.<br>Come back <em>every day.</em></h3><p class="ad-sub">A new Where\'s Pepe? photo at 00:00 UTC, free PEP for good guesses, the Gazette every week.</p>',
