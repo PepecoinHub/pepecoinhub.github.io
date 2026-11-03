@@ -1,5 +1,5 @@
 /* Optional home-page presentation; the shared navigation and meme edition keep their layout. */
-.home-focus .pill-bar { display: none; }
+
 .home-focus .lang-hint { max-width: 1064px; margin: 10px auto 0; padding: 2px 24px; background: transparent; border: 0; font-size: .82rem; }
 .home-focus .wrap:has(> .home-hero) { padding-top: 20px; gap: 30px; }
 .home-focus .home-hero { padding: 36px 40px; gap: 16px 40px; border-radius: 26px; background: linear-gradient(120deg, var(--panel), color-mix(in srgb, var(--accent-soft) 65%, var(--panel))); }

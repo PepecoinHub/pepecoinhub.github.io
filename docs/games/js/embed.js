@@ -7,6 +7,9 @@
 (function () {
   var r = document.documentElement, q = location.search, K = 'pondos-back';
   var framed = false; try { framed = window.self !== window.top; } catch (e) { framed = true; }
+  // the games live in the meme edition: a plain visit to /games/ (no PondOS window, no parameters, no sign-in
+  // return in the address) goes to the PondOS desktop, where the Games folder opens them
+  if (!framed && !q && !location.hash && /\/games\/(index\.html)?$/.test(location.pathname)) { location.replace('/meme/'); return; }
   var okPath = function (p) { return typeof p === 'string' && /^\/meme\/[A-Za-z0-9/_.\-]*(\?[A-Za-z0-9=&_.\-%]*)?(#[A-Za-z0-9_\-]*)?$/.test(p) ? p : null; };
   var ss = function (fn) { try { return fn(window.sessionStorage); } catch (e) { return null; } };
   if (framed || /[?&]embed=1(&|$)/.test(q)) {
