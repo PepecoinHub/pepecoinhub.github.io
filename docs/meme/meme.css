@@ -1358,3 +1358,4 @@ footer.foot a { color: #edf3e3; }
 .find-list img { flex: none; width: 28px; height: 28px; object-fit: contain; }
 .find-list b { display: block; font-size: 13px; }
 .find-list small { display: block; font-size: 11px; opacity: .8; }
+.app-win.app-full.pondwars-window { width: 100% !important; box-sizing: border-box; }
