@@ -8,7 +8,7 @@ input,select{font:12px Tahoma,sans-serif;color:#eee4c5;background:#162d29;border
 #arsenal-open{background:#465d47;color:#f4e3ac;border-color:#899876 #142b21 #142b21 #899876;min-height:38px}
 .pw-arsenal{position:fixed;z-index:1000;width:min(430px,calc(100vw - 16px));padding:5px;background:#263e35;border:3px ridge #b5a264;box-shadow:8px 10px 0 #07191b99}
 .arsenal-title{display:flex;align-items:center;gap:10px;padding:6px;color:#f1db91;font:bold 15px Georgia}.arsenal-title span{font:9px monospace;margin-left:auto;color:#bbc8af}.arsenal-title button{padding:2px 8px;background:#536b51;color:#fff3cf}
-.pw-arsenal .pw-weapons{grid-template-columns:repeat(4,minmax(0,1fr));margin:0;width:100%}.pw-arsenal .pw-weapons button{min-height:90px;font-size:10px}.pw-arsenal .pw-weapons img{width:42px;height:42px}
+.pw-arsenal .pw-weapons{grid-template-columns:repeat(5,minmax(0,1fr));margin:0;width:100%}.pw-arsenal .pw-weapons button{min-height:90px;font-size:10px}.pw-arsenal .pw-weapons img{width:42px;height:42px}
 .pw-site{background:#142729;border-bottom:1px solid #607266;color:#b0bdac;font:11px monospace}
 .pw{margin:20px auto;padding:10px;background:repeating-linear-gradient(135deg,#293b37 0 3px,#2b3e39 3px 6px);border:3px ridge #7c8d72;box-shadow:0 12px 40px #0009;max-width:1320px}
 .embed .pw{margin:0;border:0}.embed body{background:#253a34}

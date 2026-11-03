@@ -1,5 +1,5 @@
 // POND WARS: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, WEAPONS, newGame, startTurn, step, fire, walk, hop, backflip, canMove, MAPS, makeTerrain, skip, cpuPlan, me, aliveOf, projectileOrigin, safeDirection, retreatDirection } from './pondwars-engine.mjs?v=20261104w';
+import { W, H, WATER, STEP, G, WEAPONS, newGame, startTurn, step, fire, walk, hop, backflip, canMove, MAPS, makeTerrain, skip, cpuPlan, me, aliveOf, projectileOrigin, safeDirection, retreatDirection } from './pondwars-engine.mjs?v=20261104moves';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
@@ -32,17 +32,19 @@ const gctx = ground.getContext('2d'), gimg = gctx.createImageData(W, H);
 const descriptions={
 rocket:'WIND AFFECTED · IMPACT DETONATION',bat:'CLOSE RANGE · HUGE KNOCKBACK',grenade:'3 SECOND FUSE · BOUNCES',
 cluster:'3 SECOND FUSE · 5 FRAGMENTS',revolver:'TWO AIMED SHOTS · STRAIGHT TRAJECTORY',
-mine:'ARMS AFTER 1s · PROXIMITY TRIGGER',dynamite:'PLACE AT YOUR FEET · 5 SECOND FUSE',bow:'FAST ARROW · GENTLE ARC',gold:'ONE PER MATCH · FIVE EXPLODING TOES'};
+mine:'ARMS AFTER 1s · PROXIMITY TRIGGER',drill:'BORES 150 PX INTO THE GROUND · THEN BOOM',candles:'CLICK THE MAP · THREE RED CANDLES FALL',
+rope:'CLICK WHERE TO HOOK · A/D SWING · W/S SHORTER/LONGER · SPACE LETS GO',jetpack:'W FLY UP · A/D SIDEWAYS · 3.5s FUEL',teleport:'CLICK A SPOT ON THE MAP',dynamite:'PLACE AT YOUR FEET · 5 SECOND FUSE',bow:'FAST ARROW · GENTLE ARC',gold:'ONE PER MATCH · FIVE EXPLODING TOES'};
 let soundOn=false,audio;
 function beep(hz,d=.12){if(!soundOn)return;try{audio ||= new (window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});const o=audio.createOscillator(),v=audio.createGain();o.type='sawtooth';o.frequency.setValueAtTime(hz,audio.currentTime);o.frequency.exponentialRampToValueAtTime(20,audio.currentTime+d);v.gain.setValueAtTime(.035,audio.currentTime);v.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.connect(v);v.connect(audio.destination);o.start();o.stop(audio.currentTime+d);}catch{}}
 const TEAM = [{ name: 'PEP', band: '#2f7de1', text: '#cfe6ff' }, { name: 'FUD', band: '#e23b3b', text: '#ffd4d4' }];
 const playerArt=PLAYERS.map(p=>{const img=new Image();img.src=p.src;return img;});
 const teamPlayers=[[0,1,2,3],[4,5,6,0]];
-const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite'].map(w=>{const img=new Image();img.src='img/pondwars/'+w+'.svg';return[w,img];}));
+const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite','drill','candles','rope','jetpack','teleport'].map(w=>{const img=new Image();img.src='img/pondwars/'+w+'.svg';return[w,img];}));
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let g = null, opts = { mode: 'cpu', level: 1, n: 3, map:'island', mapSeed:20261103 }, seed = 0;
-let aim = -Math.PI / 4, aimX = W / 2, charging = false, chargeAt = 0, power = 0, held = { l: 0, r: 0 };
+let aimY = 300, parts = [], aim = -Math.PI / 4, aimX = W / 2, charging = false, chargeAt = 0, power = 0, held = { l: 0, r: 0 };
 let paused=false, hudTime=0;
+held.u = 0;
 let acc = 0, last = 0, cpu = null, shake = 0, splashes = [];
 
 function status(t) { $('#status').textContent = t; }
@@ -109,8 +111,26 @@ function frog(f, t) {
   ctx.fillStyle = TEAM[f.team].text; ctx.fillText(label, f.x, f.y - 70);
   if (turn) { ctx.fillStyle = '#ffd400'; ctx.beginPath(); ctx.moveTo(f.x - 6, f.y - 96 + bob * 2); ctx.lineTo(f.x + 6, f.y - 96 + bob * 2); ctx.lineTo(f.x, f.y - 87 + bob * 2); ctx.fill(); }
 }
+// ---------- effects: flying dirt and smoke after a blast, sparkles for the teleport ----------
+function debris(x, y, r) {
+  if (reduce) return;
+  for (let i = 0; i < Math.min(26, 8 + r / 2); i++) { const a = -Math.PI * Math.random(), v = 120 + Math.random() * 260;
+    parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 60, g: 1, life: .9 + Math.random() * .6, t: 0, s: 2 + Math.random() * 3, c: Math.random() < .3 ? '#6fae4c' : Math.random() < .5 ? '#7a4e33' : '#5c3a26' }); }
+  for (let i = 0; i < 6; i++) parts.push({ x: x + (Math.random() - .5) * r, y: y + (Math.random() - .5) * r * .6, vx: (Math.random() - .5) * 30, vy: -20 - Math.random() * 30, g: 0, life: 1.4, t: 0, s: r * .35 + Math.random() * 8, c: 'smoke' });
+}
+function sparkle(x, y) { if (reduce) return; for (let i = 0; i < 18; i++) { const a = Math.random() * 7, v = 40 + Math.random() * 120; parts.push({ x, y: y - 25, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: 0, life: .7, t: 0, s: 2.5, c: '#bdf3ff' }); } }
+function drawParts(dt) {
+  parts = parts.filter(p => (p.t += dt) < p.life);
+  for (const p of parts) {
+    p.vy += p.g * G * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+    const k = 1 - p.t / p.life;
+    if (p.c === 'smoke') { ctx.fillStyle = `rgba(70,70,70,${.35 * k})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.s * (1.4 - k * .4), 0, 7); ctx.fill(); }
+    else { ctx.globalAlpha = Math.min(1, k * 1.5); ctx.fillStyle = p.c; ctx.fillRect(p.x - p.s / 2, p.y - p.s / 2, p.s, p.s); ctx.globalAlpha = 1; }
+  }
+}
 function shot(s) {
   ctx.save(); ctx.translate(s.x, s.y);
+  if(s.type==='drill'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle='#708454';ctx.fillRect(-10,-4,14,8);ctx.fillStyle='#a8b4ba';ctx.beginPath();ctx.moveTo(4,-5);ctx.lineTo(13,0);ctx.lineTo(4,5);ctx.fill();ctx.restore();return;}
   if(s.type==='dynamite'){ctx.drawImage(weaponArt.dynamite,-10,-18,20,25);ctx.fillStyle='#fff3ba';ctx.font='bold 12px monospace';ctx.fillText(Math.max(1,Math.ceil(5-s.t)),0,-22);}
   else if (WEAPONS[s.type].fuse) {
     ctx.fillStyle = ['gold','toe'].includes(s.type)?'#ffd257':s.type==='cluster'?'#c95d36':'#436d32'; if(['gold','toe'].includes(s.type)){ctx.rotate(s.t*5);ctx.fillRect(-5,-9,8,15);for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(-5+i*3,-9,2.5,0,7);ctx.fill();}} ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, 7); ctx.fill(); ctx.fillStyle = '#8fd27d'; ctx.fillRect(-1, -7, 3, 3);
@@ -139,7 +159,12 @@ function draw(t) {
   for (const f of g.frogs) if (f.alive) frog(f, t);
     else if (f.gone === 'ko') { ctx.fillStyle = '#9aa3a8'; ctx.fillRect(f.x - 6, f.y - 14, 12, 14); ctx.beginPath(); ctx.arc(f.x, f.y - 14, 6, Math.PI, 0); ctx.fill(); ctx.fillStyle = '#555'; ctx.font = 'bold 7px Tahoma'; ctx.textAlign = 'center'; ctx.fillText('RIP', f.x, f.y - 7); }
   for(const m of g.mines) {ctx.drawImage(weaponArt.mine,m.x-10,m.y-13,20,20);if(m.t>1){ctx.fillStyle=Math.sin(t*8)>0?'#ff6b45':'#602d28';ctx.fillRect(m.x-2,m.y-12,4,3);}}
+  // rope and jetpack flame of the frog whose turn it is
+  for (const f of g.frogs) if (f.alive && f.rope) { ctx.strokeStyle = '#d8b878'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(f.x, f.y - 30); ctx.lineTo(f.rope.x, f.rope.y); ctx.stroke(); ctx.fillStyle = '#a8b4ba'; ctx.beginPath(); ctx.arc(f.rope.x, f.rope.y, 3.5, 0, 7); ctx.fill(); }
+  for (const f of g.frogs) if (f.alive && f.jet) { ctx.fillStyle = '#c95d36'; ctx.fillRect(f.x - f.face * 12 - 4, f.y - 40, 8, 22); if (g.ctl && (g.ctl.y < 0 || g.ctl.x) && g.frogs[g.current] === f) { ctx.fillStyle = Math.random() < .5 ? '#ffc05b' : '#fff1b8'; ctx.beginPath(); ctx.moveTo(f.x - f.face * 12 - 4, f.y - 18); ctx.lineTo(f.x - f.face * 12 + 4, f.y - 18); ctx.lineTo(f.x - f.face * 12, f.y - 4 + Math.random() * 8); ctx.fill(); }
+    ctx.fillStyle = '#000a'; ctx.fillRect(f.x - 16, f.y - 76, 32, 4); ctx.fillStyle = '#ffc05b'; ctx.fillRect(f.x - 16, f.y - 76, 32 * Math.max(0, f.jet.fuel) / 3.5, 4); }
   for (const s of g.shots) shot(s);
+  drawParts(1 / 60);
   for (const b of g.booms) {
     const k = b.t / .5;
     for(let i=0;i<12;i++){const a=i*Math.PI/6,r=b.r*(.6+k*2);ctx.fillStyle=i%2?'#e8b85c':'#674b3e';ctx.fillRect(b.x+Math.cos(a)*r,b.y+Math.sin(a)*r+35*k*k,4*(1-k),4*(1-k));}
@@ -154,7 +179,10 @@ function draw(t) {
   // aim: a crosshair for the frog whose turn it is (not shown for the CPU before it decides)
   if (g.phase === 'aim' && (!isCpu(g.team) || cpu?.aiming)) {
     const f = me(g);
-    if (g.weapon === 'candles') {
+    if (g.weapon === 'teleport') {
+      ctx.strokeStyle = '#9fe3ff'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.arc(aimX, aimY - 25, 16, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = '#9fe3ff'; ctx.font = 'bold 11px Tahoma'; ctx.textAlign = 'center'; ctx.fillText('TELEPORT HERE', aimX, aimY - 48);
+    } else if (g.weapon === 'candles') {
       ctx.strokeStyle = '#e0414c'; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.moveTo(aimX, 0); ctx.lineTo(aimX, WATER); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle = '#e0414c'; ctx.font = 'bold 12px Tahoma'; ctx.fillText('CANDLES DROP HERE', aimX, 18);
     } else {
@@ -196,8 +224,8 @@ function hud() {
     b.querySelector('small').textContent=Number.isFinite(count)?'× '+count:w==='revolver'?(2-g.pistolShots)+' SHOTS':'UNLIMITED';
   });
   $('#weapon-name').textContent=WEAPONS[g.weapon].name;
-  $('#weapon-detail').textContent=(descriptions[g.weapon]||'')+' · MAX '+WEAPONS[g.weapon].damage+' HP'+(g.weapon==='cluster'||g.weapon==='gold'?' + FRAGMENTS':'');
-  $('#fire').textContent=g.weapon==='bat'?'SWING THE BAT':g.weapon==='revolver'?'FIRE · '+(2-g.pistolShots)+' LEFT':'HOLD TO FIRE';
+  $('#weapon-detail').textContent=(descriptions[g.weapon]||'')+(WEAPONS[g.weapon].utility?' · TURN GOES ON':' · MAX '+WEAPONS[g.weapon].damage+' HP'+(g.weapon==='cluster'||g.weapon==='gold'?' + FRAGMENTS':''));
+  const fu=me(g);$('#fire').textContent=g.weapon==='rope'?(fu.rope?'LET GO':'FIRE THE ROPE'):g.weapon==='jetpack'?(fu.jet?'JETPACK OFF':'START JETPACK'):g.weapon==='teleport'?'TAP THE MAP':g.weapon==='bat'?'SWING THE BAT':g.weapon==='revolver'?'FIRE · '+(2-g.pistolShots)+' LEFT':'HOLD TO FIRE';
   $('#angle-read').textContent=Math.round(-aim*180/Math.PI)+'°';
 }
 
@@ -206,7 +234,12 @@ function events() {
   for (const e of g.events) {
     if (e.type === 'turn') { closeArsenal();keys.clear();charging=false;held.l=held.r=0;$('#power').style.width='0%'; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x; status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
     if (e.type === 'fire') {closeArsenal();keys.clear();held.l=held.r=0;clearCharge();status(g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
-    if (e.type === 'boom') {shake=9;beep(65,.35);}
+    if (e.type === 'boom') {shake=9;beep(65,.35);if(e.r)debris(e.x,e.y,e.r);}
+    if (e.type === 'rope') {beep(520,.06);status('Hooked! A/D swing · W/S shorter/longer · Space lets go. Your turn goes on.');}
+    if (e.type === 'unrope') status('Let go of the rope.');
+    if (e.type === 'jet') {beep(180,.2);status('Jetpack on: W flies up, A/D sideways. Your turn goes on.');}
+    if (e.type === 'teleport') {beep(880,.1);sparkle(e.from.x,e.from.y);sparkle(e.to.x,e.to.y);status('Teleported! Your turn goes on.');}
+    if (e.type === 'miss') status(g.weapon==='rope'?'Nothing to hook there. Aim at the ground or a cliff.':'No room there. Pick another spot.');
     if (e.type === 'splash' || e.type === 'plop') splashes.push({ x: e.x ?? W / 2, t: 0 });
     if (e.type === 'ko') status(`${e.name} is out of the war.`);
     if (e.type === 'timeout') status('Too slow! The turn goes to the other team.');
@@ -260,6 +293,8 @@ function frame(now) {
     acc += dt;
     while (acc >= STEP) {
       if (movementAllowed()) { if (held.l) walk(g, -1); if (held.r) walk(g, 1); }
+      const cf = g.frogs[g.current];
+      g.ctl = movementAllowed() && (cf.rope || cf.jet) ? { x: (held.r ? 1 : 0) - (held.l ? 1 : 0), y: (keys.has('KeyS') || keys.has('ArrowDown') ? 1 : 0) - (keys.has('KeyW') || keys.has('ArrowUp') || held.u ? 1 : 0) } : { x: 0, y: 0 };
       step(g); acc -= STEP;
       for (const r of g.dirty) paintGround(...r); g.dirty.length = 0;
       events();
@@ -279,7 +314,7 @@ const movementAllowed=()=>!paused&&g&&!isCpu(g.team)&&canMove(g)&&$('#menu').hid
 const keys=new Set();
 const arsenal=document.createElement('div');
 arsenal.className='pw-arsenal';arsenal.hidden=true;arsenal.setAttribute('role','dialog');arsenal.setAttribute('aria-label','Choose a weapon');
-arsenal.innerHTML='<div class="arsenal-title">ARSENAL <span>1–9 · ESC TO CLOSE</span><button type="button" aria-label="Close weapon selection">×</button></div><div class="pw-weapons">'+$('#weapon-options').innerHTML+'</div>';
+arsenal.innerHTML='<div class="arsenal-title">ARSENAL <span>1–0 · C R J T · ESC TO CLOSE</span><button type="button" aria-label="Close weapon selection">×</button></div><div class="pw-weapons">'+$('#weapon-options').innerHTML+'</div>';
 document.body.append(arsenal);
 function clearCharge(){charging=false;power=0;$('#power').style.width='0%';}
 function closeArsenal(focus=false){arsenal.hidden=true;if(focus)cv.focus({preventScroll:true});}
@@ -296,15 +331,16 @@ arsenal.querySelector('.arsenal-title button').onclick=()=>closeArsenal(true);
 cv.addEventListener('contextmenu',e=>{e.preventDefault();openArsenal(e.clientX,e.clientY);});
 arsenal.addEventListener('contextmenu',e=>{e.preventDefault();closeArsenal(true);});
 document.addEventListener('pointerdown',e=>{if(!arsenal.hidden&&!arsenal.contains(e.target)&&e.button===0){closeArsenal(true);e.preventDefault();e.stopPropagation();}},true);
-function jump(){if(!movementAllowed()||!arsenal.hidden)return;clearCharge();if(me(g).ground)hop(g);else backflip(g);}
+function jump(){if(!movementAllowed()||!arsenal.hidden)return;clearCharge();const f=me(g);if(f.rope){f.rope=null;status('Let go of the rope.');return;}if(f.jet)return;if(f.ground)hop(g);else backflip(g);}
 function toWorld(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * VW / r.width - OX, (e.clientY - r.top) * H / r.height]; }
-function aimAt(e) { if (!mine()) return; const [x, y] = toWorld(e), f = me(g); aimX = Math.max(30, Math.min(W - 30, x)); aim = Math.atan2(y - (f.y - 32), x - f.x); f.face = x >= f.x ? 1 : -1; }
+function aimAt(e) { if (!mine()) return; const [x, y] = toWorld(e), f = me(g); aimX = Math.max(30, Math.min(W - 30, x)); aimY = y; aim = Math.atan2(y - (f.y - 32), x - f.x); f.face = x >= f.x ? 1 : -1; }
 function beginCharge() { if (!mine() || charging || !arsenal.hidden) return; charging = true; chargeAt = performance.now(); power = 0; }
 function release(cancelShort) {
   if (!charging) return;
   charging = false; const held = performance.now() - chargeAt; $('#power').style.width = '0%';
+  if (mine() && WEAPONS[g.weapon].utility) { fire(g, aim, 1, aimX, aimY); hud(); return; }   // rope, jetpack, teleport: a tap is enough
   if (cancelShort && held < 180) return;   // a short tap only aims
-  if (mine()) fire(g, aim, Math.max(.08, Math.min(1,held/1300)), aimX);
+  if (mine()) fire(g, aim, Math.max(.08, Math.min(1,held/1300)), aimX, aimY);
 }
 cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || charging) aimAt(e); });
 cv.addEventListener('pointerdown', e => { if (e.button) return; e.preventDefault(); cv.focus({ preventScroll: true }); cv.setPointerCapture(e.pointerId); aimAt(e); beginCharge(); });
@@ -318,6 +354,9 @@ for (const [id, k] of [['#left', 'l'], ['#right', 'r']]) {
 }
 $('#arsenal-open').onclick=e=>{const r=e.target.getBoundingClientRect();openArsenal(r.left,r.top-250);};
 $('#hop').addEventListener('click', jump);
+// on a phone: hold HOP to fly up with the jetpack
+$('#hop').addEventListener('pointerdown', () => { if (g && me(g).jet) held.u = 1; });
+for (const t of ['pointerup', 'pointercancel', 'pointerleave']) $('#hop').addEventListener(t, () => { held.u = 0; });
 $('#skip').addEventListener('click', () => { if (mine()) { skip(g); status('Turn skipped.'); } });
 document.querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', () => { if (mine() && !g.pistolShots && g.ammo[g.team][b.dataset.w]!==0) {clearCharge();g.weapon = b.dataset.w;closeArsenal(true);hud();} }));
 document.addEventListener('keydown', e => {
@@ -328,9 +367,9 @@ document.addEventListener('keydown', e => {
   if(['ArrowLeft','ArrowRight','KeyA','KeyD'].includes(k)){
     e.preventDefault();if(movementAllowed()&&arsenal.hidden){keys.add(k);held.l=keys.has('ArrowLeft')||keys.has('KeyA');held.r=keys.has('ArrowRight')||keys.has('KeyD');}
   }else if(['ArrowUp','ArrowDown','KeyW','KeyS'].includes(k)){
-    e.preventDefault();if(mine()&&arsenal.hidden)aim+=(['ArrowUp','KeyW'].includes(k)?-1:1)*.05*(me(g).face||1);
-  }else if(/^Digit[1-9]$/.test(k)&&mine()){
-    const w=['rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite'][Number(k.slice(-1))-1];
+    e.preventDefault();if(mine()&&(me(g).rope||me(g).jet)){keys.add(k);return;}if(mine()&&arsenal.hidden)aim+=(['ArrowUp','KeyW'].includes(k)?-1:1)*.05*(me(g).face||1);
+  }else if((/^Digit[0-9]$/.test(k)||['KeyC','KeyR','KeyJ','KeyT'].includes(k))&&mine()){
+    const w={KeyC:'candles',KeyR:'rope',KeyJ:'jetpack',KeyT:'teleport'}[k]||['drill','rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite'][Number(k.slice(-1))];
     if(!g.pistolShots&&g.ammo[g.team][w]!==0){clearCharge();g.weapon=w;closeArsenal(true);hud();}
   }
 },true);
