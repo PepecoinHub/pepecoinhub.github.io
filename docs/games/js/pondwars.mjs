@@ -1,5 +1,5 @@
 // POND WARS: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, WEAPONS, newGame, startTurn, step, fire, walk, hop, backflip, canMove, MAPS, makeTerrain, skip, cpuPlan, me, aliveOf, projectileOrigin, safeDirection, retreatDirection } from './pondwars-engine.mjs?v=20261103c';
+import { W, H, WATER, STEP, WEAPONS, newGame, startTurn, step, fire, walk, hop, backflip, canMove, MAPS, makeTerrain, skip, cpuPlan, me, aliveOf, projectileOrigin, safeDirection, retreatDirection } from './pondwars-engine.mjs?v=20261104w';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
@@ -8,6 +8,25 @@ const framed = (() => { try { return window.self !== window.top; } catch { retur
 if (framed || /[?&]embed=1(&|$)/.test(location.search)) document.documentElement.classList.add('embed');
 
 const cv = $('#pw'), ctx = cv.getContext('2d');
+// The battlefield is always W×H. On a wide screen the canvas gets wider instead of leaving empty bands at the sides:
+// the sky, hills and water simply go on to the left and right (OX = world units added on each side).
+let VW = W, OX = 0;
+function fitStage() {
+  const stage = cv.parentElement, main = stage.closest('.pw') || document.body, head = document.querySelector('.pw-site');
+  const w = (stage.parentElement || main).clientWidth;
+  stage.style.width = ''; stage.style.height = '';
+  const other = main.getBoundingClientRect().height - stage.getBoundingClientRect().height + (head && head.offsetParent ? head.offsetHeight : 0);
+  let h = Math.floor(innerHeight - other - 12);
+  if (!(h > 150) || h >= w / 2 || innerWidth < innerHeight) { VW = W; OX = 0; if (cv.width !== W) cv.width = W; return; }
+  VW = Math.min(Math.round(W * 1.7), Math.round(H * w / h)); OX = (VW - W) / 2;
+  if (cv.width !== VW) cv.width = VW;
+  stage.style.width = Math.round(h * VW / H) + 'px'; stage.style.height = h + 'px'; stage.style.aspectRatio = 'auto';
+  const extra = document.documentElement.scrollHeight - innerHeight;   // margins we did not count: shrink once more
+  if (extra > 0 && h - extra > 150) { h -= extra; VW = Math.min(Math.round(W * 1.7), Math.round(H * w / h)); OX = (VW - W) / 2; if (cv.width !== VW) cv.width = VW; stage.style.width = Math.round(h * VW / H) + 'px'; stage.style.height = h + 'px'; }
+}
+addEventListener('resize', () => requestAnimationFrame(fitStage));
+if ('ResizeObserver' in window) { let ro = 0; new ResizeObserver(() => { cancelAnimationFrame(ro); ro = requestAnimationFrame(fitStage); }).observe(document.body); }
+requestAnimationFrame(fitStage);
 const ground = document.createElement('canvas'); ground.width = W; ground.height = H;
 const gctx = ground.getContext('2d'), gimg = gctx.createImageData(W, H);
 const descriptions={
@@ -47,21 +66,23 @@ function paintGround(x0 = 0, y0 = 0, x1 = W - 1, y1 = H - 1) {
 
 // ---------- drawing ----------
 function sky(t) {
-  const sk=ctx.createLinearGradient(0,0,0,H);sk.addColorStop(0,'#193d68');sk.addColorStop(.5,'#628d9f');sk.addColorStop(1,'#ecc99c');ctx.fillStyle=sk;ctx.fillRect(0,0,W,H);
+  const XL = -OX, XR = W + OX;
+  const sk=ctx.createLinearGradient(0,0,0,H);sk.addColorStop(0,'#193d68');sk.addColorStop(.5,'#628d9f');sk.addColorStop(1,'#ecc99c');ctx.fillStyle=sk;ctx.fillRect(XL,0,XR-XL,H);
   ctx.fillStyle='#fce8b7';ctx.beginPath();ctx.arc(970,105,44,0,7);ctx.fill();
-  for(let layer=0;layer<3;layer++){ctx.fillStyle=['#567789','#496d72','#355c5f'][layer];ctx.beginPath();ctx.moveTo(0,H);
-    for(let x=0;x<=W;x+=10)ctx.lineTo(x,260+layer*65+Math.sin(x*.009+layer*2)*50+Math.sin(x*.023)*19);
-    ctx.lineTo(W,H);ctx.fill();}
+  for(let layer=0;layer<3;layer++){ctx.fillStyle=['#567789','#496d72','#355c5f'][layer];ctx.beginPath();ctx.moveTo(XL,H);
+    for(let x=Math.floor(XL/10)*10;x<=XR+10;x+=10)ctx.lineTo(x,260+layer*65+Math.sin(x*.009+layer*2)*50+Math.sin(x*.023)*19);
+    ctx.lineTo(XR,H);ctx.fill();}
   ctx.fillStyle='#fff1cd33';
-  for(let i=0;i<6;i++){const x=(i*233+t*3)%(W+200)-100,y=45+i%3*42;ctx.beginPath();ctx.ellipse(x,y,65,11,0,0,7);ctx.ellipse(x+23,y-9,35,15,0,0,7);ctx.fill();}
+  for(let i=0;i<6+Math.ceil(OX/200)*2;i++){const x=XL+(i*233+t*3)%(XR-XL+200)-100,y=45+i%3*42;ctx.beginPath();ctx.ellipse(x,y,65,11,0,0,7);ctx.ellipse(x+23,y-9,35,15,0,0,7);ctx.fill();}
   // Distant, slightly ruined frog castle.
   ctx.fillStyle='#365761';for(const [x,y,h] of [[180,252,85],[222,264,65],[258,240,95]]){ctx.fillRect(x,y,25,h);for(let k=0;k<3;k++)ctx.fillRect(x+k*10,y-9,5,10);ctx.fillStyle='#edc78a';ctx.fillRect(x+10,y+18,5,9);ctx.fillStyle='#365761';}
 }
 function water(t) {
-  ctx.fillStyle = '#2b7fb8cc'; ctx.beginPath(); ctx.moveTo(0, H);
-  for (let x = 0; x <= W; x += 10) ctx.lineTo(x, WATER + Math.sin(x * .03 + t * (reduce ? 0 : 2)) * 3);
-  ctx.lineTo(W, H); ctx.fill();
-  ctx.fillStyle = '#ffffff55'; for (let x = 20; x < W; x += 90) ctx.fillRect(x + Math.sin(t + x) * 6, WATER + 12, 26, 2);
+  const XL = -OX, XR = W + OX;
+  ctx.fillStyle = '#2b7fb8cc'; ctx.beginPath(); ctx.moveTo(XL, H);
+  for (let x = Math.floor(XL / 10) * 10; x <= XR + 10; x += 10) ctx.lineTo(x, WATER + Math.sin(x * .03 + t * (reduce ? 0 : 2)) * 3);
+  ctx.lineTo(XR, H); ctx.fill();
+  ctx.fillStyle = '#ffffff55'; for (let x = Math.floor(XL / 90) * 90 + 20; x < XR; x += 90) ctx.fillRect(x + Math.sin(t + x) * 6, WATER + 12, 26, 2);
   ctx.fillStyle = '#3fae5a'; for (const x of [70, 1090, 1150]) { ctx.beginPath(); ctx.ellipse(x, WATER + 4, 16, 5, 0, .3, 6.0); ctx.fill(); }
 }
 function frog(f, t) {
@@ -104,6 +125,7 @@ function shot(s) {
 }
 function draw(t) {
   ctx.save();
+  ctx.translate(OX, 0);
   if (shake > 0 && !reduce) ctx.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake);
   sky(t);
   ctx.drawImage(ground, 0, 0);
@@ -275,7 +297,7 @@ cv.addEventListener('contextmenu',e=>{e.preventDefault();openArsenal(e.clientX,e
 arsenal.addEventListener('contextmenu',e=>{e.preventDefault();closeArsenal(true);});
 document.addEventListener('pointerdown',e=>{if(!arsenal.hidden&&!arsenal.contains(e.target)&&e.button===0){closeArsenal(true);e.preventDefault();e.stopPropagation();}},true);
 function jump(){if(!movementAllowed()||!arsenal.hidden)return;clearCharge();if(me(g).ground)hop(g);else backflip(g);}
-function toWorld(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]; }
+function toWorld(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * VW / r.width - OX, (e.clientY - r.top) * H / r.height]; }
 function aimAt(e) { if (!mine()) return; const [x, y] = toWorld(e), f = me(g); aimX = Math.max(30, Math.min(W - 30, x)); aim = Math.atan2(y - (f.y - 32), x - f.x); f.face = x >= f.x ? 1 : -1; }
 function beginCharge() { if (!mine() || charging || !arsenal.hidden) return; charging = true; chargeAt = performance.now(); power = 0; }
 function release(cancelShort) {
