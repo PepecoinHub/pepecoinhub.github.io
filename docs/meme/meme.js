@@ -1283,8 +1283,11 @@
         }
         A.body.innerHTML = '<div class="app-row bg-row">' + back + '<span class="grow bg-msg">Making your table…</span></div><div class="bg-stage"></div>';
         A.body.querySelector('.bg-back').addEventListener('click', choose);
+        // no nickname first: a Discord player keeps the name on their profile (sending a nickname would rename it);
+        // only a guest, whom the server asks for one, gets the nickname saved in this browser
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || localStorage.getItem('pondos-wp-nick') || ''; } catch (e) {}
-        wpRpc('gry_table_create', { p_game: key, p_nick: nick || 'Frog', p_private: true, p_spectators: true }).then(function (code) {
+        var make = function (n) { return wpRpc('gry_table_create', { p_game: key, p_nick: n, p_private: true, p_spectators: true }); };
+        make('').catch(function (err) { if (/nickname/i.test(err.message || '')) return make(nick || 'Frog'); throw err; }).then(function (code) {
           var link = 'https://pepecoinhub.com/games/table.html?t=' + encodeURIComponent(code);
           if (!phone) big(true);
           A.body.querySelector('.bg-msg').innerHTML = '<b>Send this link to your fren:</b>';
