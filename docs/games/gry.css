@@ -805,3 +805,10 @@ html.embed.is-bot .g-sub { display: none !important; }
 html.embed .board-wrap { padding: 8px; }
 html.embed .table-room .stage-top { padding-block: 6px; }
 html.embed .g-sub { padding: 2px 8px !important; min-height: 0; }
+
+/* @mentions in the lobby chat */
+.cmsg-me { background: color-mix(in srgb, #ffcc37 26%, transparent); border-left: 3px solid #e0a800; padding-left: 5px; border-radius: 4px; }
+.mention-pop { position: absolute; left: 0; bottom: calc(100% + 4px); z-index: 30; min-width: 180px; max-width: 100%; display: grid; padding: 4px; background: var(--surface); color: var(--ink); border: 1px solid var(--grid); border-radius: 8px; box-shadow: 0 6px 18px #0003; }
+.mention-opt { text-align: left; background: none; border: 0; border-radius: 5px; padding: 6px 8px; font: inherit; font-weight: 600; color: inherit; cursor: pointer; }
+.mention-opt.on, .mention-opt:hover { background: var(--accent-wash); }
+.chat-mention-btn { background: none; border: 1px solid var(--grid); border-radius: 999px; padding: 1px 8px; font: inherit; font-size: .75rem; color: inherit; cursor: pointer; }

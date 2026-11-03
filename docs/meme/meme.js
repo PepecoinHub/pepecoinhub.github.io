@@ -2177,6 +2177,12 @@
   // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
   // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
   var ADS = [
+    { file: 'at_mention.mpg', added: '2026-11-03', title: '@mentions in the chat', ch: 'CH 2 · POND TALK RADIO', icon: 'gif-080-still', scenes: [
+      '<p class="ad-kick">Your fren is in the LAN Party chat…</p><h3 class="ad-big">…but you are<br><em>not looking!</em></h3>',
+      '<h3 class="ad-big">Now they can<br><em>@mention</em> you.</h3><p class="ad-sub">Type @ and pick a verified fren. They get a highlight, a ping and a pop-up if they allowed it.</p>',
+      '<p class="ad-kick">Away from the pond?</p><h3 class="ad-big">The mention <em>waits</em><br>for you.</h3><p class="ad-sub">For 24 hours. Too many pings? One click turns them off.</p>',
+      '<p class="ad-fine">Verified (Discord) players only. Guests can still read and say gm.</p><button type="button" class="ad-cta ad-lanbtn">Open the LAN Party →</button>'
+    ] },
     { file: 'pepe_sweeper.mpg', added: '2026-11-03', title: 'PEPE SWEEPER', ch: 'CH 9 · POND SAFETY HOUR', icon: 'pepesweeper', scenes: [
       '<p class="ad-kick">Are you sure that frog is the right frog?</p><h3 class="ad-big">The <em>WRONG PEPE</em><br>is hiding in the pond!</h3>',
       '<img class="ad-pic" src="../assets/coins/pepe.png" alt=""><p class="ad-sub">PEPE on Ethereum sneaked under the lily pads. The numbers tell you how many are close.</p>',
@@ -2283,6 +2289,7 @@
       var lb = A.body.querySelector('.ad-lapbtn'); if (lb) lb.addEventListener('click', function () { laptop(); });
       var wb = A.body.querySelector('.ad-wpbtn'); if (wb) wb.addEventListener('click', function () { wheresPepe(); });
       var yb = A.body.querySelector('.ad-yeetbtn'); if (yb) yb.addEventListener('click', function () { yeetApp(); });
+      var lnb = A.body.querySelector('.ad-lanbtn'); if (lnb) lnb.addEventListener('click', function () { lanParty(); });
       var sb = A.body.querySelector('.ad-sweepbtn'); if (sb) sb.addEventListener('click', function () { pepeSweeperApp(); });
       var wl = A.body.querySelector('.ad-launch'); if (wl) { wl.innerHTML = launchText(); var wlt = setInterval(function () { if (!document.body.contains(wl)) clearInterval(wlt); else wl.innerHTML = launchText(); }, 1000); }
       liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
@@ -2379,6 +2386,16 @@
   function chatBody(t) {
     return esc(t).replace(/:([a-z]{3,10}):/g, function (m, c) { return EMO.indexOf(' ' + c + ' ') >= 0 ? '<img class="emo-img" src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="24" height="24">' : m; });
   }
+  // @mentions (games/js/mentions.js, loaded when needed): verified (Discord) players only, the server decides
+  var mentionsJs = null;
+  function loadMentions() {
+    if (window.PepMentions) return Promise.resolve(window.PepMentions);
+    if (!mentionsJs) mentionsJs = new Promise(function (res, rej) {
+      var sc = document.createElement('script'); sc.src = BASE + 'games/js/mentions.js?v=20261103m'; sc.onload = function () { res(window.PepMentions); }; sc.onerror = rej; document.head.appendChild(sc);
+    });
+    return mentionsJs;
+  }
+  function verifiedHere() { var me = whoAmI(); return !!(me && me.discord); }
   var onlineN = null;
   function paintOnline(n) {
     onlineN = n;
@@ -2391,7 +2408,7 @@
         '<div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
         '<div class="emo-pop" hidden role="group" aria-label="Emotes">' + EMO.trim().split(' ').map(function (c) { return '<button type="button" data-e="' + c + '" title=":' + c + ':"><img src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="32" height="32" loading="lazy"></button>'; }).join('') + '</div>' +
         '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + BASE + 'games/img/emotes/pep.webp" alt="" width="22" height="22"></button><input name="n" class="lan-nick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname" hidden><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
-        '<p class="hs-note lan-note"></p>';
+        '<p class="hs-note lan-note"></p><p class="hs-note lan-ment" hidden><button type="button" class="app-btn lan-ment-btn"></button> <span></span></p>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input[name=t]'), note = A.body.querySelector('.lan-note');
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false;
       var pop = A.body.querySelector('.emo-pop'), eb = A.body.querySelector('.emo-btn');
@@ -2405,6 +2422,28 @@
       });
       var nickIn = form.querySelector('.lan-nick');
       try { nickIn.value = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
+      // @mentions: highlight messages for me, suggest names after "@", ring on new ones, a switch to turn them off
+      var PM = null, me = { verified: false }, mrow = A.body.querySelector('.lan-ment'), mbtn = mrow.querySelector('button');
+      var forMe = function (m) { var s = anySession(); return !!(PM && me.verified && !me.optout && !(s && s.user && s.user.id === m.user_id) && PM.mentionsMe(m.body, me.nick)); };
+      var seenMentions = function () { if (alive && !document.hidden) chatRpc('gry_mentions_seen', { p_upto: null }).catch(function () {}); };
+      var paintMent = function () {
+        mrow.hidden = !me.verified;
+        mbtn.textContent = me.optout ? '🔕 Mentions off' : '🔔 Mentions on';
+        mrow.querySelector('span').textContent = me.optout ? 'Nobody can @mention you.' : 'Type @ to mention a verified fren. You get a ping when someone mentions you.';
+        Object.keys(seen).forEach(function (id) { if (seen[id]._m) seen[id].classList.toggle('lan-me', forMe(seen[id]._m)); });
+      };
+      mbtn.addEventListener('click', function () {
+        chatRpc('gry_mention_optout', { p_off: !me.optout }).then(function (v) { me.optout = !!v; if (!v && PM) PM.askNotify(); paintMent(); }, function (err) { note.textContent = err.message; });
+      });
+      if (verifiedHere()) loadMentions().then(function (pm) {
+        PM = pm;
+        PM.attach(inp, function (q) { return me.verified ? chatRpc('gry_mention_names', { p_q: q }) : []; });
+        return chatRpc('gry_my_mentions');
+      }).then(function (r) {
+        if (!alive || !r) return;
+        me = r; paintMent();
+        if (r.items && r.items.length) seenMentions();
+      }).catch(function () {});
       var paintNote = function () {
         var s = anySession();
         // no sign-in needed to write: without one, a nickname goes with each message (limits are per network)
@@ -2424,6 +2463,7 @@
         chatRpc('gry_lobby_chat', { p_after: last, p_visitor: visitorId() }).then(function (r) {
           if (!alive) return;
           paintOnline(r.online);
+          var initial = first;
           if (first) { log.innerHTML = ''; first = false; }
           (r.hidden || []).forEach(function (id) { if (seen[id]) { seen[id].remove(); delete seen[id]; } });
           var atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 60;
@@ -2431,6 +2471,7 @@
             if (seen[m.id]) return;
             var row = el('div', { class: 'lan-msg' }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> <b>' + esc(m.nick) + '</b>' + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
             var tipEl = log.querySelector('.bin-tip'); if (tipEl) tipEl.remove();
+            row._m = m; if (forMe(m)) { row.classList.add('lan-me'); if (!initial) { PM.ring(m.nick, m.body, function () { A.restore ? A.restore() : null; }); seenMentions(); } }
             seen[m.id] = row; log.appendChild(row); last = Math.max(last, m.id);
           });
           if (!log.children.length) log.innerHTML = '<p class="bin-tip">No messages in the last 24 hours. Say gm!</p>';
@@ -2470,6 +2511,18 @@
   if (mainEl) {
     var pingOnline = function () { chatRpc('gry_lobby_chat', { p_after: 2147483647, p_visitor: visitorId() }).then(function (r) { paintOnline(r.online); }, function () {}); };
     setTimeout(pingOnline, 1500);
+    // mentions waiting for me (verified players): a balloon that opens the LAN Party
+    setTimeout(function () {
+      if (!verifiedHere() || apps.lan) return;
+      chatRpc('gry_my_mentions').then(function (r) {
+        var it = (r && r.items) || []; if (!it.length || apps.lan) return;
+        var lastM = it[it.length - 1];
+        var b = balloon(it.length === 1 ? esc(lastM.from) + ' mentioned you' : 'You were mentioned ' + it.length + '\u00d7',
+          esc(String(lastM.body).slice(0, 90)) + '<br><u>Open the LAN Party chat</u>', 'gif-080-still');
+        b.style.cursor = 'pointer';
+        b.addEventListener('click', function (e) { if (!e.target.closest('button')) { lanParty(); b.remove(); } });
+      }, function () {});
+    }, 6000);
     setInterval(function () { if (!document.hidden && !apps.lan) pingOnline(); }, 45000);
     var trayEl2 = document.querySelector('.tray');
     if (trayEl2) {
@@ -2492,6 +2545,7 @@
     var bye = function () { t.classList.add('out'); setTimeout(function () { t.remove(); }, 300); };
     t.querySelector('button').addEventListener('click', bye);
     setTimeout(bye, 12000);
+    return t;
   }
   var noticed = '1';
   try { noticed = sessionStorage.getItem('pondos-notice'); sessionStorage.setItem('pondos-notice', '1'); } catch (e) {}
