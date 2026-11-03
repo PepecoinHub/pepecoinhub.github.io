@@ -1,5 +1,8 @@
 // POND WARS engine: turn-based frog artillery on a destructible island. No DOM here (tests run it in Node).
 // Units are pixels and seconds; the world is W x H; the pond starts at WATER (anything below it drowns).
+// Movement and projectile ideas (bounce off the real slope, wind that drifts between turns, step-up walking,
+// slide after a knockback, speed caps, rope / jetpack / teleport / drill) are inspired by Squeak & Destroy
+// (MIT, Los Polos Amigos Kft.); the code here is our own.
 export const W = 1200, H = 600, WATER = 560, STEP = 1 / 60, G = 520;
 export const MAPS={
 island:{name:'Pond Island',max:4,recommended:3},
@@ -8,6 +11,7 @@ peaks:{name:'Croak Canyon',max:3,recommended:3},
 small:{name:'Last Lily',max:2,recommended:2}
 };
 export const TURN_TIME=30, RETREAT_TIME=3, MOVE_BUDGET=160;
+export const WIND_ACC=230, STEP_UP=6, STEP_DOWN=6, ROPE_MAX=330, JET_FUEL=3.5;
 export const canMove=g=>g.phase==='aim'||(g.phase==='fire'&&g.retreat>0);
 export const WEAPONS = {
   grenade: { name: 'Frag Grenade', short: 'Grenade', radius: 30, damage: 46, fuse: 3, wind: false, ammo: Infinity, power: 520 },
@@ -22,6 +26,11 @@ export const WEAPONS = {
   mine:{name:'Land Mine',short:'Mine',radius:40,damage:50,ammo:3,power:1},
   dynamite:{name:'Dynamite',short:'Dynamite',radius:48,damage:70,ammo:2,power:1,fuse:5},
   candles: { name: 'Red Candle Drop', short: 'Candles', radius: 21, damage: 26, wind: false, ammo: 1 },
+  drill: { name:'Drill Shell', short:'Drill', radius:34, damage:44, ammo:2, power:560, gravity:.3 },
+  // utilities: they do not end the turn
+  rope: { name:'Grapple Rope', short:'Rope', radius:0, damage:0, ammo:5, power:1, utility:true },
+  jetpack: { name:'Jetpack', short:'Jetpack', radius:0, damage:0, ammo:2, power:1, utility:true },
+  teleport: { name:'Teleport', short:'Teleport', radius:0, damage:0, ammo:2, power:1, utility:true },
 };
 const NAMES = [['Hopper', 'Lily', 'Ribbit', 'Pad'], ['Croak', 'Bog', 'Toady', 'Murk']];
 
@@ -65,6 +74,13 @@ export function carve(mask, cx, cy, r) {
   for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if ((x - cx) ** 2 + (y - cy) ** 2 <= r * r) mask[y * W + x] = 0;
   return [x0, y0, x1, y1];
 }
+// the outward surface normal around (x, y): points away from the solid ground nearby
+export function normalAt(mask, x, y, r = 5) {
+  let sx = 0, sy = 0;
+  for (let oy = -r; oy <= r; oy++) for (let ox = -r; ox <= r; ox++) if (ox * ox + oy * oy <= r * r && solid(mask, x + ox, y + oy)) { sx -= ox; sy -= oy; }
+  const d = Math.hypot(sx, sy);
+  return d ? { x: sx / d, y: sy / d } : { x: 0, y: -1 };
+}
 function surfaceBelow(mask, x, y) { for (let yy = Math.max(0, Math.floor(y)); yy < H; yy++) if (solid(mask, x, yy)) return yy; return H; }
 
 // ---------- a new match ----------
@@ -88,14 +104,18 @@ export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1,
     frogs.push({ id: i, team, name: NAMES[team][Math.floor(i / 2)], x, y, vx: 0, vy: 0, hp: 100, alive: true, ground: true, face: x < W / 2 ? 1 : -1, fallFrom: y, gone: '' });
   }
   return { seed, map, perTeam, mask, mines:[], retreat:0, movement:MOVE_BUDGET, frogs, shots: [], booms: [], texts: [], dirty: [], cpu, level, turn: 0, team: 0, next: [0, 0], current: 0,
-    wind: 0, weapon: 'grenade', ammo: [0, 1].map(() => ({candles:1,cluster:4,gold:1,mine:3,dynamite:2})), pistolShots:0, phase: 'aim', timer: TURN_TIME, settle: 0, winner: null, rand: r, events: [] };
+    wind: 0, weapon: 'grenade', ammo: [0, 1].map(() => ({candles:1,cluster:4,gold:1,mine:3,dynamite:2,drill:2,rope:5,jetpack:2,teleport:2})), ctl:{x:0,y:0}, pistolShots:0, phase: 'aim', timer: TURN_TIME, settle: 0, winner: null, rand: r, events: [] };
 }
 export function aliveOf(g, team) { return g.frogs.filter(f => f.alive && f.team === team); }
 export function startTurn(g) {
   const team = g.turn % 2, list = aliveOf(g, team);
   g.team = team; g.current = list[g.next[team] % list.length].id; g.next[team]++;
   g.pistolShots = 0;g.retreat=0;g.movement=MOVE_BUDGET;
-  g.wind = Math.round((g.rand() * 2 - 1) * 10) / 10; g.phase = 'aim'; g.timer = TURN_TIME; g.weapon = 'grenade'; g.settle = 0;
+  // the wind drifts from turn to turn instead of jumping around (first turn: random)
+  g.wind = g.turn === 0 ? Math.round((g.rand() * 2 - 1) * 10) / 10 : Math.max(-1, Math.min(1, Math.round((g.wind + (g.rand() - .5) * .8) * 10) / 10));
+  for (const f of g.frogs) { f.rope = null; f.jet = null; }
+  g.ctl = { x: 0, y: 0 };
+  g.phase = 'aim'; g.timer = TURN_TIME; g.weapon = 'grenade'; g.settle = 0;
   g.events.push({ type: 'turn' });
 }
 export const me = g => g.frogs[g.current];
@@ -125,8 +145,16 @@ export function walk(g, dir) {
   f.face = dir;
   const nx = f.x + dir;
   if (nx < 2 || nx > W - 3) return false;
-  for (let up = 0; up <= 3; up++) if (!solid(g.mask, nx, f.y - up) && !solid(g.mask, nx, f.y - up - 10)) { g.movement--;f.x = nx; f.y -= up; if (!solid(g.mask, f.x, f.y + 1)) { f.ground = false; f.fallFrom = f.y; } return true; }
+  for (let up = 0; up <= STEP_UP; up++) if (!solid(g.mask, nx, f.y - up) && !solid(g.mask, nx, f.y - up - 10) && !solid(g.mask, nx, f.y - up - 30)) {
+    g.movement--; f.x = nx; f.y -= up; settleFeet(g, f); return true;
+  }
   return false;
+}
+// after a step: walk down a gentle slope instead of falling off every pixel
+function settleFeet(g, f) {
+  if (solid(g.mask, f.x, f.y + 1)) return;
+  for (let d = 1; d <= STEP_DOWN; d++) if (solid(g.mask, f.x, f.y + d + 1)) { f.y += d; return; }
+  f.ground = false; f.fallFrom = f.y;
 }
 export function hop(g) {
   const f = me(g); if (!canMove(g) || !f.alive || !f.ground || g.movement<60) return false;
@@ -141,9 +169,11 @@ export function backflip(g) {
   g.events.push({type:'hop'});return true;
 }
 // angle in radians (0 = right, -PI/2 = up), power 0..1; for candles, tx is the x where they fall
-export function fire(g, angle, power, tx) {
+export function fire(g, angle, power, tx, ty) {
   const f = me(g), w = WEAPONS[g.weapon];
   if (g.phase !== 'aim' || !f.alive || !w || !Number.isFinite(angle) || !Number.isFinite(power)) return false;
+  if (w.utility) return useUtility(g, f, angle, tx, ty);
+  f.rope = null; f.jet = null;
   if (g.pistolShots && g.weapon !== 'revolver') return false;
   if (Number.isFinite(w.ammo) && g.weapon !== 'candles') {
     if (!(g.ammo[g.team][g.weapon] > 0)) return false;
@@ -177,6 +207,53 @@ export function fire(g, angle, power, tx) {
   }
   g.phase = 'fire'; g.events.push({ type: 'fire', weapon: g.weapon }); return true;
 }
+// ---------- utilities: rope, jetpack, teleport (the turn goes on) ----------
+function useUtility(g, f, angle, tx, ty) {
+  const kind = g.weapon, left = g.ammo[g.team][kind];
+  if (kind === 'rope' && f.rope) { f.rope = null; g.events.push({ type: 'unrope' }); return true; }
+  if (kind === 'jetpack' && f.jet) { f.jet = null; return true; }
+  if (!(left > 0)) return false;
+  if (kind === 'rope') {
+    const ox = f.x, oy = f.y - 30, dx = Math.cos(angle), dy = Math.sin(angle);
+    for (let d = 14; d <= ROPE_MAX; d += 3) {
+      const x = ox + dx * d, y = oy + dy * d;
+      if (x < 0 || x >= W || y < 0 || y >= WATER) break;
+      if (solid(g.mask, x, y)) {
+        g.ammo[g.team].rope--; f.jet = null;
+        f.rope = { x, y, len: Math.max(26, d - 2), t: 0 };
+        f.ground = false; f.fallFrom = f.y; f.vy = Math.min(f.vy, -40);
+        g.events.push({ type: 'rope', x, y }); return true;
+      }
+    }
+    g.events.push({ type: 'miss' }); return false;
+  }
+  if (kind === 'jetpack') {
+    g.ammo[g.team].jetpack--; f.rope = null; f.jet = { fuel: JET_FUEL };
+    g.events.push({ type: 'jet' }); return true;
+  }
+  if (kind === 'teleport') {
+    if (!Number.isFinite(tx) || !Number.isFinite(ty)) return false;
+    const spot = clearSpot(g, tx, ty);
+    if (!spot) { g.events.push({ type: 'miss' }); return false; }
+    g.ammo[g.team].teleport--;
+    g.events.push({ type: 'teleport', from: { x: f.x, y: f.y }, to: spot });
+    f.x = spot.x; f.y = spot.y; f.vx = 0; f.vy = 0; f.rope = null; f.jet = null; f.ground = true; f.fallFrom = f.y;
+    return true;
+  }
+  return false;
+}
+// the nearest place around (x, y) where a whole frog can stand on the ground (not over the water)
+function clearSpot(g, x, y) {
+  const body = (px, py) => [-8, 0, 8].every(ox => [-4, -20, -36, -50].every(oy => !solid(g.mask, px + ox, py + oy)));
+  for (let r = 0; r <= 120; r += 6) for (let i = 0; i < (r ? 16 : 1); i++) {
+    const a = i * Math.PI / 8, px = Math.round(x + Math.cos(a) * r), py = Math.round(y + Math.sin(a) * r);
+    if (px <= 20 || px >= W - 20 || py <= 60 || solid(g.mask, px, py)) continue;
+    const gy = surfaceBelow(g.mask, px, py);
+    if (gy >= WATER - 5) continue;
+    if (body(px, gy - 1)) return { x: px, y: gy - 1 };
+  }
+  return null;
+}
 export function skip(g) { if (g.phase === 'aim') { g.phase = 'settle'; g.settle = .4; } }
 
 // ---------- simulation ----------
@@ -185,15 +262,20 @@ export function stepShot(g, s, mask = g.mask, frogs = g.frogs) {
   s.t += STEP;
   if(!s.ownerClear){const owner=frogs.find(f=>f.id===s.owner);if(!owner||Math.abs(s.x-owner.x)>15||s.y<owner.y-58||s.y>owner.y+2)s.ownerClear=true;}
   s.vy += G * (w.gravity ?? 1) * STEP;
-  if (w.wind) s.vx += g.wind * 140 * STEP;
+  if (w.wind) s.vx += g.wind * WIND_ACC * STEP;
   const nx = s.x + s.vx * STEP, ny = s.y + s.vy * STEP;
+  if (s.type === 'drill') return stepDrill(g, s, mask, frogs, nx, ny);
   if (w.fuse) {
     if (solid(mask, nx, ny)) {
-      const hitX = solid(mask, nx, s.y), hitY = solid(mask, s.x, ny);
-      if (hitX || !hitY) s.vx = -s.vx * .5;
-      if (hitY || !hitX) s.vy = -s.vy * .42;
-      s.vx *= .9;
-      if (Math.abs(s.vy) < 25 && solid(mask, s.x, s.y + 2)) s.vy = 0;
+      // bounce off the real slope: reflect the velocity about the surface normal,
+      // lose some speed along the normal and a little along the ground
+      const n = normalAt(mask, nx, ny, 5), vn = s.vx * n.x + s.vy * n.y;
+      if (vn < 0) {
+        const tx = s.vx - vn * n.x, ty = s.vy - vn * n.y;
+        s.vx = tx * .82 - vn * .45 * n.x; s.vy = ty * .82 - vn * .45 * n.y;
+      }
+      if (Math.hypot(s.vx, s.vy) < 28 && solid(mask, s.x, s.y + 2)) { s.vx *= .5; s.vy = 0; }
+      if (solid(mask, s.x, s.y)) { s.x += n.x; s.y += n.y; }
     } else { s.x = nx; s.y = ny; }
     if (s.t >= w.fuse) return 'boom';
   } else {
@@ -209,6 +291,20 @@ export function stepShot(g, s, mask = g.mask, frogs = g.frogs) {
   if (s.x < -200 || s.x > W + 200 || s.y > H + 50 || s.t > 12 || (s.type==='revolver' && s.y < -200)) return 'gone';
   return '';
 }
+// drill shell: flies with light gravity; on the first bite into the ground it bores straight on,
+// carving a tunnel, and goes off after 150 px or when it comes out the other side
+function stepDrill(g, s, mask, frogs, nx, ny) {
+  if (s.bore === undefined) {
+    if (frogs.some(f => f.alive && (f.id !== s.owner || s.ownerClear) && Math.abs(f.x - nx) < 15 && ny > f.y - 58 && ny < f.y + 2)) { s.x = nx; s.y = ny; return 'boom'; }
+    if (solid(mask, nx, ny)) { const sp = Math.hypot(s.vx, s.vy) || 1; s.dx = s.vx / sp; s.dy = s.vy / sp; s.bore = 0; s.x = nx; s.y = ny; }
+    else { s.x = nx; s.y = ny; if (s.y > WATER + 6) return 'splash'; if (s.x < -200 || s.x > W + 200 || s.t > 12) return 'gone'; return ''; }
+  }
+  const sp = 300 * STEP;
+  s.x += s.dx * sp; s.y += s.dy * sp; s.vx = s.dx * 300; s.vy = s.dy * 300; s.bore += sp;
+  if (mask === g.mask) g.dirty.push(carve(mask, s.x, s.y, 9)); else carve(mask, s.x, s.y, 9);
+  if (s.bore >= 150 || (s.bore > 12 && !solid(mask, s.x + s.dx * 10, s.y + s.dy * 10)) || s.y > WATER || s.x < 0 || s.x >= W || s.y < 0) return 'boom';
+  return '';
+}
 export function explode(g, x, y, type) {
   const w = WEAPONS[type];
   if(type==='revolver'||type==='bow'){
@@ -218,7 +314,7 @@ export function explode(g, x, y, type) {
   }
   g.dirty.push(carve(g.mask, x, y, w.radius));
   g.booms.push({ x, y, r: w.radius, t: 0 });
-  g.events.push({ type: 'boom' });
+  g.events.push({ type: 'boom', x, y, r: w.radius });
   for (const f of g.frogs) {
     if (!f.alive) continue;
     const dx = f.x - x, dy = (f.y - 11) - y, d = Math.hypot(dx, dy), reach = w.radius * 1.7;
@@ -233,12 +329,60 @@ function hurt(g, f, dmg) {
   if (dmg <= 0 || !f.alive) return;
   f.hp = Math.max(0, f.hp - dmg); g.texts.push({ x: f.x, y: f.y - 30, text: '-' + dmg, t: 0, team: f.team });
 }
+// a frog on the ground with speed left over (knocked back): slides along the surface, losing speed
+function slide(g, f) {
+  const dir = Math.sign(f.vx), n = Math.max(1, Math.round(Math.abs(f.vx) * STEP));
+  for (let i = 0; i < n; i++) {
+    const nx = f.x + dir;
+    if (nx < 2 || nx > W - 3) { f.vx = 0; return; }
+    let moved = false;
+    for (let up = 0; up <= STEP_UP; up++) if (!solid(g.mask, nx, f.y - up) && !solid(g.mask, nx, f.y - up - 10) && !solid(g.mask, nx, f.y - up - 30)) { f.x = nx; f.y -= up; moved = true; break; }
+    if (!moved) { f.vx = 0; return; }
+    if (!solid(g.mask, f.x, f.y + 1)) {
+      let d = 1; while (d <= STEP_DOWN && !solid(g.mask, f.x, f.y + d + 1)) d++;
+      if (d > STEP_DOWN) { f.ground = false; f.fallFrom = f.y; f.vy = 0; return; }
+      f.y += d;
+    }
+  }
+  f.vx *= .86; if (Math.abs(f.vx) < 12) f.vx = 0;
+}
 function stepFrog(g, f) {
   if (!f.alive) return;
   if(Number.isFinite(f.hopAge))f.hopAge+=STEP;
   if(f.flipT!==null&&f.flipT!==undefined)f.flipT+=STEP;
-  if (f.ground) { if (!solid(g.mask, f.x, f.y + 1)) { f.ground = false; f.fallFrom = f.y; } else return; }
-  f.vy += G * STEP; f.vx *= .995;
+  const active = g.frogs[g.current] === f && g.phase === 'aim', ctl = g.ctl || { x: 0, y: 0 };
+  // jetpack: up = lift (beats gravity), left/right = sideways thrust; fuel only burns while thrusting
+  if (f.jet) {
+    const up = active && ctl.y < 0, side = active ? ctl.x : 0;
+    if (up || side) {
+      if (up) { f.vy -= 980 * STEP; f.ground = false; }
+      f.vx += side * 520 * STEP;
+      f.vy = Math.max(-260, f.vy); f.vx = Math.max(-240, Math.min(240, f.vx));
+      f.jet.fuel -= STEP; f.fallFrom = f.y;
+      if (side) f.face = side > 0 ? 1 : -1;
+      if (f.jet.fuel <= 0) f.jet = null;
+    }
+  }
+  if (f.ground) {
+    if (!solid(g.mask, f.x, f.y + 1)) { f.ground = false; f.fallFrom = f.y; }
+    else if (Math.abs(f.vx) > 12) { slide(g, f); if (f.ground) return; }
+    else { f.vx = 0; return; }
+  }
+  f.vy += G * STEP; f.vx *= f.jet ? .99 : .995;
+  // rope: pump left/right along the swing, shorten (up) or lengthen (down) the rope
+  if (f.rope) {
+    const r = f.rope, dx = f.x - r.x, dy = f.y - 30 - r.y, d = Math.hypot(dx, dy) || 1;
+    if (active) {
+      let tx = -dy / d, ty = dx / d; if (tx < 0) { tx = -tx; ty = -ty; }
+      f.vx += tx * ctl.x * 330 * STEP; f.vy += ty * ctl.x * 330 * STEP;
+      r.len = Math.max(26, Math.min(ROPE_MAX, r.len + ctl.y * 150 * STEP));
+      if (ctl.x) f.face = ctl.x > 0 ? 1 : -1;
+    }
+    r.t += STEP; f.fallFrom = Math.min(f.fallFrom, f.y);
+  }
+  // speed caps: a huge blast cannot throw a frog through a wall in one step
+  const sp = Math.hypot(f.vx, f.vy); if (sp > 700) { f.vx *= 700 / sp; f.vy *= 700 / sp; }
+  if (f.vy > 560) f.vy = 560;
   const parts=Math.max(1,Math.ceil(Math.hypot(f.vx*STEP,f.vy*STEP)/3));
   for(let part=0;part<parts&&!f.ground;part++){
   let nx=f.x+f.vx*STEP/parts,ny=f.y+f.vy*STEP/parts;
@@ -249,10 +393,25 @@ function stepFrog(g, f) {
     f.x = nx; f.y = y; f.ground = true;f.flipT=null;f.hopAge=Infinity;
     const drop = f.y - f.fallFrom;
     if (drop > 90) hurt(g, f, Math.min(40, Math.round((drop - 90) / 4)));
-    f.vx = 0; f.vy = 0;
+    // a knocked-back frog keeps part of its speed and slides; a hop or a fall just stops
+    f.vx = Math.abs(f.vx) > 150 ? f.vx * .45 : 0; f.vy = 0; f.rope = null;
   } else if (f.vy<0 && solid(g.mask,nx,ny-55)) {
     f.x=nx;f.vy=0;
   } else { f.x = nx; f.y = ny; }
+  }
+  // the rope holds: never further than its length from the anchor; the anchor can be blown away
+  if (f.rope && f.alive) {
+    const r = f.rope;
+    if (!solid(g.mask, r.x, r.y) && !solid(g.mask, r.x, r.y - 2) && !solid(g.mask, r.x + 2, r.y) && !solid(g.mask, r.x - 2, r.y)) f.rope = null;
+    else {
+      const dx = f.x - r.x, dy = f.y - 30 - r.y, d = Math.hypot(dx, dy) || 1;
+      if (d > r.len) {
+        const px = r.x + dx / d * r.len, py = r.y + dy / d * r.len + 30;
+        if (!solid(g.mask, px, py - 14) && !solid(g.mask, px, py - 40)) { f.x = px; f.y = py; }
+        const vr = (f.vx * dx + f.vy * dy) / d;
+        if (vr > 0) { f.vx -= vr * dx / d; f.vy -= vr * dy / d; }
+      }
+    }
   }
   if (f.y > WATER) { f.alive = false; f.hp = 0; f.gone = 'splash'; g.events.push({ type: 'splash', x: f.x }); g.texts.push({ x: f.x, y: WATER - 20, text: 'SPLASH!', t: 0, team: f.team }); }
   else if (f.x < -40 || f.x > W + 40) { f.alive = false; f.hp = 0; f.gone = 'away'; }
@@ -278,6 +437,7 @@ export function step(g) {
       explode(g, s.x, s.y, s.type); g.shots.splice(g.shots.indexOf(s), 1); }
     else if (r) { g.shots.splice(g.shots.indexOf(s), 1); if (r === 'splash') g.events.push({ type: 'plop', x: s.x }); }
   }
+  if (g.phase !== 'aim') for (const f of g.frogs) { f.rope = null; f.jet = null; }
   for (const f of g.frogs) stepFrog(g, f);
   for (const f of g.frogs) if (f.alive && f.hp <= 0 && f.ground) { f.alive = false; f.gone = 'ko'; g.events.push({ type: 'ko', name: f.name }); }
   g.booms = g.booms.filter(b => (b.t += STEP) < .5);

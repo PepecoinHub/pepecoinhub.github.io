@@ -5,8 +5,8 @@
 <meta name="referrer" content="strict-origin-when-cross-origin"><title>POND WARS: frog artillery | Pepecoin Hub</title>
 <meta name="description" content="Turn-based frog artillery: custom teams, four destructible maps, nine weapons and exploding golden toes. Play against the CPU or a friend on one device.">
 <meta name="robots" content="noindex, nofollow"><link rel="canonical" href="https://pepecoinhub.com/games/pondwars.html"><link rel="icon" href="img/pondwars/gold.svg">
-<link rel="stylesheet" href="pondwars.css?v=20261103c"><script type="module" src="js/pondwars.mjs?v=20261104w"></script>
-<link rel="stylesheet" href="pondwars-polish.css"></head><body>
+<link rel="stylesheet" href="pondwars.css?v=20261103c"><script type="module" src="js/pondwars.mjs?v=20261104moves"></script>
+<link rel="stylesheet" href="pondwars-polish.css?v=20261104moves"></head><body>
 <header class="pw-site"><a href="../meme/">← Pepecoin Hub</a><b>POND WARS</b><a href="index.html">More games</a></header>
 <main class="pw">
   <div class="pw-chrome"><span>POND WARS <small> / FREN SOFTWARE · 2000</small></span><div><button id="sound">Sound: off</button><button id="pause">Pause</button><button id="restart">New match</button></div></div><div class="pw-bar">
@@ -43,7 +43,12 @@
 <button type="button" data-w="bow" aria-pressed="false" title="Longbow · key 6"><span class="weapon-key">6</span><img src="img/pondwars/bow.svg" alt=""><span>Longbow</span><small>UNLIMITED</small></button>
 <button type="button" data-w="gold" aria-pressed="false" title="Golden Foot · key 7"><span class="weapon-key">7</span><img src="img/pondwars/gold.svg" alt=""><span>Golden Foot</span><small>× 1</small></button>
 <button type="button" data-w="mine" aria-pressed="false" title="Land Mine · key 8"><span class="weapon-key">8</span><img src="img/pondwars/mine.svg" alt=""><span>Land Mine</span><small>× 3</small></button>
-<button type="button" data-w="dynamite" aria-pressed="false" title="Dynamite · key 9"><span class="weapon-key">9</span><img src="img/pondwars/dynamite.svg" alt=""><span>Dynamite</span><small>× 2</small></button></template><button type="button" id="arsenal-open" title="Pick a weapon (or right click the battlefield)">Arsenal · right click</button>
+<button type="button" data-w="dynamite" aria-pressed="false" title="Dynamite · key 9"><span class="weapon-key">9</span><img src="img/pondwars/dynamite.svg" alt=""><span>Dynamite</span><small>× 2</small></button>
+<button type="button" data-w="drill" aria-pressed="false" title="Drill Shell · key 0"><span class="weapon-key">0</span><img src="img/pondwars/drill.svg" alt=""><span>Drill</span><small>× 2</small></button>
+<button type="button" data-w="candles" aria-pressed="false" title="Red Candle Drop · key C"><span class="weapon-key">C</span><img src="img/pondwars/candles.svg" alt=""><span>Candles</span><small>× 1</small></button>
+<button type="button" data-w="rope" aria-pressed="false" title="Grapple Rope · key R (does not end the turn)"><span class="weapon-key">R</span><img src="img/pondwars/rope.svg" alt=""><span>Rope</span><small>× 5</small></button>
+<button type="button" data-w="jetpack" aria-pressed="false" title="Jetpack · key J (does not end the turn)"><span class="weapon-key">J</span><img src="img/pondwars/jetpack.svg" alt=""><span>Jetpack</span><small>× 2</small></button>
+<button type="button" data-w="teleport" aria-pressed="false" title="Teleport · key T (does not end the turn)"><span class="weapon-key">T</span><img src="img/pondwars/teleport.svg" alt=""><span>Teleport</span><small>× 2</small></button></template><button type="button" id="arsenal-open" title="Pick a weapon (or right click the battlefield)">Arsenal · right click</button>
     <div class="weapon-readout"><b id="weapon-name">Frag Grenade</b><small id="weapon-detail">3 SECOND FUSE · BOUNCES</small></div><div class="pw-move"><button type="button" id="left" aria-label="Walk left">◀</button><button type="button" id="hop">HOP</button><button type="button" id="right" aria-label="Walk right">▶</button></div>
     <div class="pw-power"><span>POWER<br><b id="angle-read">45°</b> · <span id="movement">MOVE 160</span></span><div><i id="power"></i></div></div>
     <button type="button" class="pw-fire" id="fire">HOLD TO THROW</button>

@@ -166,3 +166,88 @@ test('CPU against CPU always finishes with a winner', () => {
     assert.ok(turns < 80);
   }
 });
+
+// ---------- physics and movement (rope, jetpack, teleport, drill, slopes, slide, wind) ----------
+import { normalAt, ROPE_MAX, JET_FUEL, stepShot, carve } from '../docs/games/js/pondwars-engine.mjs';
+function slopeGame(){   // ground rising to the right: y = 450 - (x-300)/2 for x > 300
+  const g=newGame({seed:3,perTeam:2,cpu:[false,false]});g.mask.fill(0);
+  for(let x=0;x<W;x++){const top=x<300?450:Math.max(250,450-Math.round((x-300)/2));for(let y=top;y<H;y++)g.mask[y*W+x]=1;}
+  g.frogs.forEach((f,i)=>Object.assign(f,{x:i===0?200:900+i*40,y:449,ground:true,face:1}));
+  g.frogs.forEach(f=>{if(f.x>300){let y=0;while(!solid(g.mask,f.x,y+1))y++;f.y=y;}});
+  startTurn(g);return g;
+}
+test('walking climbs a 1:2 slope up and comes back down it without falling',()=>{
+  const g=slopeGame(),f=me(g);
+  for(let i=0;i<150;i++)walk(g,1);
+  assert.ok(f.x>330,'walked up the slope, x='+f.x);assert.ok(f.ground,'still on the ground going up');
+  for(let i=0;i<60;i++)walk(g,-1);
+  assert.ok(f.ground,'still on the ground going down');
+});
+test('the surface normal points out of the ground (up on flat ground, up-left on a rising slope)',()=>{
+  const g=slopeGame();
+  const flat=normalAt(g.mask,100,450),slope=normalAt(g.mask,500,350);
+  assert.ok(flat.y<-.95,'flat '+JSON.stringify(flat));
+  assert.ok(slope.y<-.6&&slope.x<-.2,'slope '+JSON.stringify(slope));
+});
+test('a grenade dropped on a slope bounces downhill (to the left)',()=>{
+  const g=slopeGame(),s={type:'grenade',x:500,y:300,vx:0,vy:200,t:0,owner:99,ownerClear:true};
+  let minX=500;for(let i=0;i<120;i++){stepShot(g,s);minX=Math.min(minX,s.x);}
+  assert.ok(minX<490,'rolled/bounced downhill, x='+minX);
+});
+test('the wind drifts between turns instead of jumping, and pushes rockets harder than before',()=>{
+  const g=flatGame(300);let prev=g.wind,maxJump=0;
+  for(let i=0;i<30;i++){g.turn++;startTurn(g);maxJump=Math.max(maxJump,Math.abs(g.wind-prev));prev=g.wind;assert.ok(Math.abs(g.wind)<=1);}
+  assert.ok(maxJump<=.41,'wind jump '+maxJump);
+  const a=flatGame(300);a.wind=1;a.weapon='rocket';fire(a,-Math.PI/2,.6);
+  const b=flatGame(300);b.wind=0;b.weapon='rocket';fire(b,-Math.PI/2,.6);
+  for(let i=0;i<40;i++){stepShot(a,a.shots[0]);stepShot(b,b.shots[0]);}
+  assert.ok(a.shots[0].x-b.shots[0].x>20,'wind moved the rocket');
+});
+test('the rope grabs the ceiling, holds the frog at its length, and lets it swing with left/right',()=>{
+  const g=flatGame(400),f=me(g);
+  for(let y=200;y<215;y++)g.mask.fill(1,y*W+100,y*W+400);   // a ledge above
+  g.weapon='rope';assert.equal(fire(g,-Math.PI/2,1),true);
+  assert.ok(f.rope,'attached');assert.equal(g.phase,'aim','the rope does not end the turn');assert.equal(g.ammo[g.team].rope,4);
+  for(let i=0;i<60;i++)step(g);
+  const d=Math.hypot(f.x-f.rope.x,f.y-30-f.rope.y);assert.ok(d<=f.rope.len+1,'within rope length');
+  const x0=f.x;g.ctl={x:1,y:-1};for(let i=0;i<90;i++)step(g);
+  assert.ok(f.rope&&f.x>x0+5,'swung right: '+x0+' -> '+f.x);
+  g.weapon='rope';fire(g,0,1);assert.equal(f.rope,null,'second use lets go');
+});
+test('the rope misses empty sky without using ammo',()=>{
+  const g=flatGame(400);g.weapon='rope';assert.equal(fire(g,-Math.PI/2,1),false);assert.equal(g.ammo[g.team].rope,5);
+});
+test('the jetpack lifts the frog while fuel lasts, then it falls back',()=>{
+  const g=flatGame(400),f=me(g),y0=f.y;g.weapon='jetpack';assert.equal(fire(g,0,1),true);
+  g.ctl={x:0,y:-1};for(let i=0;i<60;i++)step(g);
+  assert.ok(f.y<y0-40,'flew up: '+f.y);assert.ok(f.jet.fuel<JET_FUEL);
+  for(let i=0;i<400;i++)step(g);
+  assert.equal(f.jet,null,'fuel ran out');assert.ok(f.ground,'landed');
+});
+test('teleport moves the frog to a clear spot near the target, never into the ground',()=>{
+  const g=flatGame(400),f=me(g);g.weapon='teleport';
+  assert.equal(fire(g,0,1,700,470),true,'target inside the ground is moved up to a clear spot');
+  assert.ok(Math.abs(f.x-700)<130&&!solid(g.mask,f.x,f.y-20),'clear at '+f.x+','+f.y);
+  assert.equal(g.phase,'aim');assert.equal(g.ammo[g.team].teleport,1);
+});
+test('the drill bores a tunnel into a hill and then explodes',()=>{
+  const g=flatGame(600);g.weapon='drill';const f=me(g);
+  assert.equal(fire(g,Math.PI/4,.5),true);
+  let bored=false;for(let i=0;i<300&&g.shots.length;i++){step(g);if(g.shots[0]?.bore>0)bored=true;}
+  assert.ok(bored,'started boring');assert.equal(g.shots.length,0,'went off');
+  assert.ok(!solid(g.mask,f.x+60,470)||!solid(g.mask,f.x+80,490)||!solid(g.mask,f.x+100,500),'a tunnel was carved');
+});
+test('a frog knocked sideways slides along the ground and stops',()=>{
+  const g=flatGame(400),t=g.frogs[1];t.vx=400;t.ground=true;const x0=t.x;
+  for(let i=0;i<120;i++)step(g);
+  assert.ok(t.x>x0+5,'slid '+(t.x-x0));assert.equal(t.vx,0);assert.ok(t.ground);
+});
+test('a frog flying very fast is slowed to the speed cap',()=>{
+  const g=flatGame(400),t=g.frogs[1];t.vx=3000;t.vy=-3000;t.ground=false;step(g);
+  assert.ok(Math.hypot(t.vx,t.vy)<=701);
+});
+test('teleport puts the frog on the ground (no fall), never above the water',()=>{
+  const g=flatGame(400),f=me(g);g.weapon='teleport';
+  assert.equal(fire(g,0,1,600,200),true);assert.equal(f.y,449);assert.ok(f.ground);
+  for(let i=0;i<60;i++)step(g);assert.equal(f.hp,100,'no fall damage');
+});

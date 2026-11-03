@@ -37,3 +37,19 @@ CPU players evaluate bazooka, grenade, cluster, golden foot, bow and revolver tr
 Run `node --test tests/pondwars.test.mjs` and `python scripts/check_site.py`. All 20 tests pass. Additional release regressions cover impact hits at 40/60/100/200 pixels, hand-height muzzle placement and shooter collision, side-wall landings, locked CPU revolver follow-up and safe retreat. The first revolver projectile also consumes turn time; charge strength uses elapsed input time rather than the last rendered frame. Pointer cancellation clears charging; resume clears the paused status. Real iOS and Android hardware remains to be checked.
 
 Review images: [character setup](pondwars-release-menu.jpg) and [eight-character match](pondwars-release-game.jpg). The PR contains no database migration or deployment step.
+
+## Movement and new tools (November 2026)
+
+Physics and movement ideas come from Squeak & Destroy (MIT, Los Polos Amigos Kft.); the code and the art are our own.
+
+- Grenades and fragments bounce off the real slope (surface normal), losing speed along it.
+- Wind is stronger for rockets and drifts a little from turn to turn instead of jumping.
+- Frogs climb steps up to 6 px, walk down slopes without falling, slide after a knockback and have a speed cap.
+
+| Tool | Stock | Detail |
+| --- | ---: | --- |
+| Drill Shell (key 0) | 2 | Bores 150 px into the ground, then explodes (44) |
+| Red Candle Drop (C) | 1 | Three candles fall where you click |
+| Grapple Rope (R) | 5 | Click to hook; A/D swing, W/S shorter/longer, Space lets go. Turn goes on |
+| Jetpack (J) | 2 | W flies up, A/D sideways, 3.5 s of fuel. Turn goes on |
+| Teleport (T) | 2 | Click a spot; the frog lands on the ground there. Turn goes on |
