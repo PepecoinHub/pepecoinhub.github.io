@@ -5,7 +5,7 @@ const be = await getBackend();
 paintMe(be);
 const box = $('#st-body');
 const fmt = (n) => Number(n || 0).toLocaleString('en-US');
-const dayLabel = (d) => new Date(d + 'T12:00:00').toLocaleDateString([], { day: 'numeric', month: 'short' });
+const dayLabel = (d) => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
 
 function loginBox(msg) {
   box.textContent = '';

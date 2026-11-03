@@ -1559,7 +1559,7 @@
       .then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
         if (!j || !(j.frogs > 0)) return;
         var n = String(j.frogs); while (n.length < 6) n = '0' + n;
-        var since = j.since ? new Date(j.since + 'T12:00:00').toLocaleDateString([], { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+        var since = j.since ? new Date(j.since + 'T12:00:00').toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
         var b = el('button', { type: 'button', class: 'hitc', title: 'Visitor counter: ' + j.frogs + ' frogs so far' },
           '<span class="hitc-d">' + n.split('').map(function (c) { return '<i>' + c + '</i>'; }).join('') + '</span><span class="hitc-l">frogs visited</span>');
         b.addEventListener('click', function () {
@@ -2140,7 +2140,7 @@
     var ms = WP_LAUNCH - Date.now();
     if (ms <= 0) return '🟢 <b>It\'s live!</b> A new Pepe every day at 00:00 UTC.';
     var d = Math.floor(ms / 86400000), h = Math.floor(ms / 3600000) % 24, m = Math.floor(ms / 60000) % 60, sec = Math.floor(ms / 1000) % 60;
-    var at = new Date(WP_LAUNCH).toLocaleString([], { weekday: 'long', hour: '2-digit', minute: '2-digit' });
+    var at = new Date(WP_LAUNCH).toLocaleString('en-US', { weekday: 'long', hour: '2-digit', minute: '2-digit' });
     return '⏳ Starts in <b class="gz-clock">' + (d ? d + 'd ' : '') + h + 'h ' + ('0' + m).slice(-2) + 'm ' + ('0' + sec).slice(-2) + 's</b> (' + at + ' your time)';
   }
   function mailRead() { try { return +(localStorage.getItem(MAIL_KEY) || -1) >= MAIL_ISSUE; } catch (e) { return false; } }
@@ -2282,7 +2282,7 @@
       if (!box.letters.length) { pane.innerHTML = '<div class="letters"><p class="hs-note">No letters yet. When someone writes, the flag on the mailbox goes up.</p></div>'; return; }
       pane.innerHTML = '<div class="letters">' + box.letters.map(function (l) {
         return '<details class="lt-item' + (l.read ? '' : ' new') + '" data-id="' + l.id + '"><summary><b>' + (l.discord ? esc(l.name) + ' <span class="hs-ok" title="Discord">✓</span>' : esc(l.name) + ' <small>(guest)</small>') + '</b>' +
-          '<small>' + esc(new Date(l.at).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</small>' +
+          '<small>' + esc(new Date(l.at).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</small>' +
           (l.print ? '<span class="lt-tag">🖨 OK to print</span>' : '') + '<span class="lt-peek">' + esc(l.body.slice(0, 70)) + '</span></summary>' +
           '<p class="lt-text">' + esc(l.body) + '</p><p class="hs-note">' + (l.page ? 'Sent from ' + esc(l.page) : '') + '</p>' +
           '<div class="app-row"><button type="button" class="app-btn lt-del">🗑 Delete</button></div></details>';
