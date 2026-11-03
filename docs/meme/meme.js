@@ -175,7 +175,7 @@
     [['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
       ['YEET THE PEP', 'A frog, a catapult, no flight plan', 'yeet', function () { yeetApp(); }],
-      ['PEPE SWEEPER 98', 'Flag the wrong Pepe', 'pepesweeper', function () { pepeSweeperApp(); }],
+      ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', function () { pepeSweeperApp(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Where's Pepe?", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
@@ -1324,8 +1324,8 @@
     A.host.classList.add('app-full');
   }
   function pepeSweeperApp() {
-    var A = openApp('pepesweeper', 'PEPE SWEEPER 98', 'pepesweeper', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepe-sweeper.html?embed=1" title="PEPE SWEEPER 98"></iframe>';
+    var A = openApp('pepesweeper', 'PEPE SWEEPER', 'pepesweeper', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepe-sweeper.html?embed=1" title="PEPE SWEEPER"></iframe>';
       A.host.querySelector('.w-min').addEventListener('click', function () {
         A.body.querySelector('iframe').contentWindow.postMessage('pepe-sweeper-pause', location.origin);
       });
@@ -1350,7 +1350,7 @@
       ["Where's Pepe?", 'Daily photo hunt on the map', 'wheres-pepe', 'game geo guess map photo travel daily faucet free pep reward points', function () { wheresPepe(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', 'scores high score top ranking leaderboard best winners', function () { highScores(); }],
       ['YEET THE PEP', 'Catapult a frog, three panic flaps', 'yeet', 'game catapult launch fly distance arcade', function () { yeetApp(); }],
-      ['PEPE SWEEPER 98', 'Flag the wrong Pepe', 'pepesweeper', 'game minesweeper saper flags pepe eth arcade', function () { pepeSweeperApp(); }],
+      ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', 'game minesweeper saper flags lily pads wrong pepe eth arcade', function () { pepeSweeperApp(); }],
       ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', 'game arcade shooter invaders fud', invaders],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', 'game arcade snake blocks', snake],
       ['Pepe Miner', 'Click, mine, upgrade', 'pickaxe', 'game miner idle clicker mine blocks', minerApp],
@@ -1407,7 +1407,7 @@
     openApp('games', 'C:\\Pond\\Games', 'games-folder', function (A) {
       var G = [['🏆 LEADERS', 'leaders', function () { highScores(); }], ['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
         ['YEET THE PEP', 'yeet', function () { yeetApp(); }],
-        ['PEPE SWEEPER 98', 'pepesweeper', function () { pepeSweeperApp(); }],
+        ['PEPE SWEEPER', 'pepesweeper', function () { pepeSweeperApp(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
         ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];
@@ -2177,6 +2177,12 @@
   // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
   // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
   var ADS = [
+    { file: 'pepe_sweeper.mpg', added: '2026-11-03', title: 'PEPE SWEEPER', ch: 'CH 9 · POND SAFETY HOUR', icon: 'pepesweeper', scenes: [
+      '<p class="ad-kick">Are you sure that frog is the right frog?</p><h3 class="ad-big">The <em>WRONG PEPE</em><br>is hiding in the pond!</h3>',
+      '<img class="ad-pic" src="../assets/coins/pepe.png" alt=""><p class="ad-sub">PEPE on Ethereum sneaked under the lily pads. The numbers tell you how many are close.</p>',
+      '<h3 class="ad-big">Plant a <em>flag</em>.<br>Clear the pond.</h3><p class="ad-sub">Three levels: Tadpole, Pond Regular, Diamond Hands. Beat your best time.</p>',
+      '<p class="ad-fine">No PEP prizes. Just you, the lily pads and your nerves.</p><button type="button" class="ad-cta ad-sweepbtn">Play PEPE SWEEPER →</button>'
+    ] },
     { file: 'yeet_the_pep.mpg', added: '2026-11-02', title: 'YEET THE PEP', ch: 'CH 404 · THE UNOFFICIAL SPACE PROGRAM', icon: 'yeet', scenes: [
       '<p class="ad-kick">Pepe wanted to go to the moon.</p><h3 class="ad-big">Nobody gave him<br>a <em>rocket.</em></h3>',
       '<h3 class="ad-big">So we gave him<br>a <em>catapult!</em></h3><img class="ad-pic" src="../games/img/yeet/pilot.webp" alt="">',
@@ -2277,6 +2283,7 @@
       var lb = A.body.querySelector('.ad-lapbtn'); if (lb) lb.addEventListener('click', function () { laptop(); });
       var wb = A.body.querySelector('.ad-wpbtn'); if (wb) wb.addEventListener('click', function () { wheresPepe(); });
       var yb = A.body.querySelector('.ad-yeetbtn'); if (yb) yb.addEventListener('click', function () { yeetApp(); });
+      var sb = A.body.querySelector('.ad-sweepbtn'); if (sb) sb.addEventListener('click', function () { pepeSweeperApp(); });
       var wl = A.body.querySelector('.ad-launch'); if (wl) { wl.innerHTML = launchText(); var wlt = setInterval(function () { if (!document.body.contains(wl)) clearInterval(wlt); else wl.innerHTML = launchText(); }, 1000); }
       liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
     }, 720);

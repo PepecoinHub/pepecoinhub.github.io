@@ -3,35 +3,31 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>PEPE SWEEPER 98 | Pepecoin Hub</title>
-<meta name="description" content="A retro frog Minesweeper game. Dodge PEPE on Ethereum, flag every trap and beat your best time on three difficulty levels.">
+<title>PEPE SWEEPER: find the safe lily pads | Pepecoin Hub</title>
+<meta name="description" content="A frog minesweeper game. The wrong Pepe (PEPE on Ethereum) hides under the lily pads: flag every one and beat your best time on three levels.">
 <link rel="canonical" href="https://pepecoinhub.com/games/pepe-sweeper.html">
-<link rel="icon" href="img/sweeper-flag.svg"><link rel="stylesheet" href="pepe-sweeper.css">
-<script type="module" src="js/pepe-sweeper.mjs"></script></head>
+<link rel="icon" href="img/sweeper-flag.svg"><link rel="stylesheet" href="pepe-sweeper.css?v=20261103b">
+<script type="module" src="js/pepe-sweeper.mjs?v=20261103b"></script></head>
 <body>
-<header class="site-links"><a href="../meme/">← PondOS</a><span>PEPECOIN HUB · ARCADE</span><a href="index.html">More games →</a></header>
-<main class="desk">
+<header class="site-links"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · ARCADE</span><a href="index.html">More games →</a></header>
+<main class="pond">
   <div class="game-window">
-    <div class="titlebar"><div class="title"><img src="img/sweeper-flag.svg" alt=""><strong>Pepe Sweeper</strong></div><div class="window-glyphs" aria-hidden="true"><i>_</i><i>□</i><i>×</i></div></div>
-    <div class="window-body">
-      <div class="menubar"><button type="button" id="menu-level" aria-expanded="false" aria-controls="game-menu"><u>G</u>ame</button><button type="button" id="menu-help" aria-expanded="false" aria-controls="help-box"><u>H</u>elp</button>
-        <div id="game-menu" class="game-menu" hidden>
-          <button type="button" id="menu-new">New <span>F2</span></button><hr>
-          <button type="button" data-level="easy" aria-pressed="true">Beginner <small>9 × 9 · 10</small></button>
-          <button type="button" data-level="medium" aria-pressed="false">Intermediate <small>16 × 16 · 40</small></button>
-          <button type="button" data-level="hard" aria-pressed="false">Expert <small>30 × 16 · 99</small></button>
-        </div>
-      </div>
-      <div class="game-shell">
-        <div class="score-bar"><div class="digit-box" aria-label="Traps remaining"><small>PEPES LEFT</small><strong id="left-counter">010</strong></div><div class="face-group"><button type="button" id="reset" class="face" aria-label="New game" title="New game (F2)"><span class="face-eyes">• •</span><span class="face-mouth">ᴗ</span></button><span id="mood">GOOD LUCK, FREN</span></div><div class="digit-box" aria-label="Elapsed time"><small>TIME</small><strong id="time-counter">000</strong></div></div>
-        <div id="board-scroll" class="board-scroll"><div id="board" class="board" role="grid" aria-label="Minesweeper board"></div></div>
-        <div class="board-footer"><span id="board-info">9 × 9 · 10 PEPE traps</span><span id="best">BEST: --:--</span></div>
-      </div>
-      <div class="touchbar"><button type="button" id="dig-mode" aria-pressed="true">DIG TILE</button><button type="button" id="flag-mode" aria-pressed="false">PLACE FLAG</button><span>On a phone, tap a tile to use the selected tool.</span></div>
-      <div id="result" class="result" hidden><b id="result-title"></b><span id="result-copy"></span><button type="button" id="again">TRY AGAIN</button></div>
-      <div class="help" id="help-box" tabindex="-1" hidden><p><b>How to play:</b> Click to reveal. Right click to mark a mine with a red flag. Click a revealed number to clear its neighbors after placing the right number of flags. On a phone, use DIG / PLACE FLAG or hold a tile. Your first click and its neighbors are safe. PEPE ETH appears only on the mine you hit.</p></div>
+    <div class="titlebar"><img src="img/sweeper-flag.svg" alt=""><strong>PEPE SWEEPER</strong><span>find the safe lily pads</span></div>
+    <div class="toolbar" role="group" aria-label="Level">
+      <button type="button" data-level="easy" aria-pressed="true">Tadpole <small>9×9 · 10</small></button>
+      <button type="button" data-level="medium" aria-pressed="false">Pond Regular <small>16×14 · 35</small></button>
+      <button type="button" data-level="hard" aria-pressed="false">Diamond Hands <small>24×16 · 75</small></button>
+      <button type="button" id="menu-help" class="help-btn" aria-expanded="false" aria-controls="help-box">How to play</button>
     </div>
-    <div class="statusbar"><span id="status" role="status" aria-live="polite">READY. PICK A TILE.</span><span>PEPE (ETH) = TRAP · PEP = HOME</span></div>
+    <div class="help" id="help-box" tabindex="-1" hidden><p><b>How to play:</b> click a lily pad to look under it. A number tells you how many wrong Pepes hide on the pads around it. Right click (or F) plants a flag where you think one hides. Click a number when it has that many flags around it to open the rest. On a phone, switch between DIG and FLAG, or hold a pad to flag it. Your first click is always safe. Your best times stay in this browser.</p></div>
+    <div class="game-shell">
+      <div class="score-bar"><div class="lcd" aria-label="Wrong Pepes left"><small>LEFT</small><strong id="left-counter">010</strong></div><button type="button" id="reset" class="face" aria-label="New game" title="New game (F2)"><img id="face-img" src="img/emotes/pep.webp" alt=""></button><div class="lcd" aria-label="Elapsed time"><small>TIME</small><strong id="time-counter">000</strong></div></div>
+      <div id="board-scroll" class="board-scroll"><div id="board" class="board" role="grid" aria-label="Lily pad board"></div></div>
+      <div class="board-footer"><span id="board-info">9 × 9 · 10 wrong Pepes</span><span id="mood">GOOD LUCK, FREN</span><span id="best">BEST: --:--</span></div>
+    </div>
+    <div class="touchbar"><button type="button" id="dig-mode" aria-pressed="true">DIG</button><button type="button" id="flag-mode" aria-pressed="false">FLAG</button></div>
+    <div id="result" class="result" hidden><b id="result-title"></b><span id="result-copy"></span><button type="button" id="again">PLAY AGAIN</button></div>
+    <div class="statusbar"><span id="status" role="status" aria-live="polite">READY. PICK A LILY PAD.</span><span class="legend">PEPE (ETH) = wrong Pepe · PEP = home</span></div>
   </div>
 </main>
 </body></html>

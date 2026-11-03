@@ -1,7 +1,7 @@
 export const LEVELS = Object.freeze({
-  easy: { name: 'New Frog', cols: 9, rows: 9, mines: 10 },
-  medium: { name: 'Pond Regular', cols: 16, rows: 16, mines: 40 },
-  hard: { name: 'Diamond Hands', cols: 30, rows: 16, mines: 99 }
+  easy: { name: 'Tadpole', cols: 9, rows: 9, mines: 10 },
+  medium: { name: 'Pond Regular', cols: 16, rows: 14, mines: 35 },
+  hard: { name: 'Diamond Hands', cols: 24, rows: 16, mines: 75 }
 });
 
 export function neighbors(g, index) {

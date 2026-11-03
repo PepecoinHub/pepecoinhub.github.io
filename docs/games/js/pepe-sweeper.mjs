@@ -2,7 +2,9 @@ import { LEVELS, newGame, reveal, toggleFlag, chord } from './pepe-sweeper-engin
 
 const $ = selector => document.querySelector(selector);
 const board = $('#board'), counter = $('#left-counter'), clock = $('#time-counter');
-const status = $('#status'), mood = $('#mood'), face = $('#reset');
+const status = $('#status'), mood = $('#mood'), face = $('#reset'), faceImg = $('#face-img');
+const FACES = { ready: 'img/emotes/pep.webp', scared: 'img/emotes/peek.webp', won: 'img/emotes/cheer.webp', lost: 'img/emotes/wen.webp' };
+const setFace = k => { if (!faceImg.src.endsWith(FACES[k])) faceImg.src = FACES[k]; };
 const result = $('#result'), bestEl = $('#best');
 const coin = '../assets/coins/pepe.png';
 const flagIcon = 'img/sweeper-flag.svg';
@@ -20,7 +22,7 @@ function setMode(flag) {
   flagMode = flag;
   $('#dig-mode').setAttribute('aria-pressed', String(!flag));
   $('#flag-mode').setAttribute('aria-pressed', String(flag));
-  status.textContent = flag ? 'FLAG MODE. MARK THE WRONG PEPE.' : 'DIG MODE. FIND THE SAFE TILES.';
+  status.textContent = flag ? 'FLAG MODE. MARK THE WRONG PEPE.' : 'DIG MODE. FIND THE SAFE LILY PADS.';
 }
 function newRound(next = level) {
   level = next; game = newGame(level); seconds = 0; paused = false; flagMode = false;
@@ -28,10 +30,9 @@ function newRound(next = level) {
   $('#dig-mode').setAttribute('aria-pressed', 'true'); $('#flag-mode').setAttribute('aria-pressed', 'false');
   document.querySelectorAll('[data-level]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.level === level)));
   board.style.setProperty('--cols', game.cols); board.style.setProperty('--rows', game.rows);
-  document.querySelector('.game-window').style.setProperty('--window-width', (game.cols * 26 + 54) + 'px');
-  closeMenu();
-  board.setAttribute('aria-label', `${LEVELS[level].name}: ${game.cols} by ${game.rows}, ${game.mines} traps`);
-  $('#board-info').textContent = `${game.cols} × ${game.rows} · ${game.mines} PEPE traps`;
+  document.querySelector('.game-window').style.setProperty('--window-width', Math.max(560, game.cols * 27 + 56) + 'px');
+  board.setAttribute('aria-label', `${LEVELS[level].name}: ${game.cols} by ${game.rows}, ${game.mines} wrong Pepes`);
+  $('#board-info').textContent = `${game.cols} × ${game.rows} · ${game.mines} wrong Pepes`;
   $('#board-scroll').scrollLeft = 0;
   buttons = game.cells.map((_, i) => {
     const tile = document.createElement('button');
@@ -40,8 +41,8 @@ function newRound(next = level) {
     return tile;
   });
   board.replaceChildren(...buttons);
-  result.hidden = true; mood.textContent = 'GOOD LUCK, FREN'; face.className = 'face'; face.querySelector('.face-mouth').textContent = 'ᴗ';
-  status.textContent = 'READY. PICK A TILE.'; showBest(); render();
+  result.hidden = true; mood.textContent = 'GOOD LUCK, FREN'; setFace('ready');
+  status.textContent = 'READY. PICK A LILY PAD.'; showBest(); render();
 }
 
 function render() {
@@ -58,7 +59,7 @@ function render() {
     } else if (cell.flag) {
       const img = document.createElement('img'); img.src = flagIcon; img.alt = ''; tile.append(img);
     } else if (cell.open && cell.nearby) tile.textContent = String(cell.nearby);
-    const state = wrong ? 'wrong flag' : cell.flag ? 'flagged' : mine ? 'PEPE Ethereum trap' : cell.open ? (cell.nearby ? `${cell.nearby} nearby traps` : 'empty') : 'covered';
+    const state = wrong ? 'wrong flag' : cell.flag ? 'flagged' : mine ? 'wrong Pepe (PEPE on Ethereum)' : cell.open ? (cell.nearby ? `${cell.nearby} nearby traps` : 'empty') : 'covered';
     tile.setAttribute('aria-label', `Row ${Math.floor(i / game.cols) + 1}, column ${i % game.cols + 1}, ${state}`);
     tile.setAttribute('aria-disabled', String(game.status === 'won' || game.status === 'lost'));
   }
@@ -72,17 +73,17 @@ function afterMove(previous) {
       try { localStorage.setItem(bestKey(), String(seconds)); } catch {}
       showBest();
     }
-    face.className = 'face win'; face.querySelector('.face-mouth').textContent = '◡';
+    setFace('won');
     mood.textContent = 'POND LEGEND';
     $('#result-title').textContent = 'THE POND IS SAFE!';
-    $('#result-copy').textContent = `${seconds}s. Every impostor spotted. The frens may sleep tonight.`;
-    status.textContent = 'VICTORY. ALL SAFE TILES CLEARED.'; result.hidden = false;
+    $('#result-copy').textContent = `${seconds}s. Every wrong Pepe spotted. The frens may sleep tonight.`;
+    status.textContent = 'VICTORY. ALL SAFE LILY PADS CLEARED.'; result.hidden = false;
   } else if (game.status === 'lost' && previous !== 'lost') {
-    face.className = 'face dead'; face.querySelector('.face-mouth').textContent = '×';
+    setFace('lost');
     mood.textContent = 'WRONG PEPE!';
-    $('#result-title').textContent = 'RUGGED BY PEPE ETH';
-    $('#result-copy').textContent = 'The wrong frog was hiding in that tile. Try again, fren.';
-    status.textContent = 'GAME OVER. THAT WAS PEPE (ETH).'; result.hidden = false;
+    $('#result-title').textContent = 'WRONG PEPE!';
+    $('#result-copy').textContent = 'That one was PEPE on Ethereum, not PEP. Try again, fren.';
+    status.textContent = 'GAME OVER. WRONG PEPE.'; result.hidden = false;
   }
 }
 
@@ -112,13 +113,13 @@ board.addEventListener('dblclick', event => {
 board.addEventListener('pointerdown', event => {
   const tile = event.target.closest('.tile'); if (!tile || event.button !== 0) return;
   longPressed = -1;
-  if (game.status === 'ready' || game.status === 'playing') face.classList.add('scared');
+  if (game.status === 'ready' || game.status === 'playing') setFace('scared');
   if (event.pointerType !== 'touch') return;
   const index = Number(tile.dataset.index);
   clearTimeout(holdTimer);
   holdTimer = setTimeout(() => { longPressed = index; act(index, true); navigator.vibrate?.(12); }, 520);
 });
-for (const type of ['pointerup', 'pointercancel', 'pointerleave']) board.addEventListener(type, () => { clearTimeout(holdTimer); face.classList.remove('scared'); });
+for (const type of ['pointerup', 'pointercancel', 'pointerleave']) board.addEventListener(type, () => { clearTimeout(holdTimer); if (game.status === 'ready' || game.status === 'playing') setFace('ready'); });
 board.addEventListener('keydown', event => {
   const tile = event.target.closest('.tile'); if (!tile) return;
   const index = Number(tile.dataset.index);
@@ -126,14 +127,9 @@ board.addEventListener('keydown', event => {
   const shift = {ArrowLeft:-1,ArrowRight:1,ArrowUp:-game.cols,ArrowDown:game.cols}[event.key];
   if (shift !== undefined) { event.preventDefault(); const next = index + shift; if (next >= 0 && next < buttons.length && (Math.abs(shift) !== 1 || Math.floor(index / game.cols) === Math.floor(next / game.cols))) buttons[next].focus(); }
 });
-function closeMenu() { $('#game-menu').hidden = true; $('#menu-level').setAttribute('aria-expanded', 'false'); }
 document.querySelectorAll('[data-level]').forEach(button => button.addEventListener('click', () => newRound(button.dataset.level)));
 $('#reset').addEventListener('click', () => newRound()); $('#again').addEventListener('click', () => newRound());
-$('#menu-new').addEventListener('click', () => newRound());
-$('#menu-level').addEventListener('click', () => { const open = $('#game-menu').hidden; $('#game-menu').hidden = !open; $('#menu-level').setAttribute('aria-expanded', String(open)); });
-$('#menu-help').addEventListener('click', () => { const open = $('#help-box').hidden; $('#help-box').hidden = !open; $('#menu-help').setAttribute('aria-expanded', String(open)); closeMenu(); });
-document.addEventListener('click', event => { if (!event.target.closest('.menubar')) closeMenu(); });
-document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
+$('#menu-help').addEventListener('click', () => { const open = $('#help-box').hidden; $('#help-box').hidden = !open; $('#menu-help').setAttribute('aria-expanded', String(open)); });
 $('#dig-mode').addEventListener('click', () => setMode(false)); $('#flag-mode').addEventListener('click', () => setMode(true));
 window.addEventListener('keydown', event => { if (event.key === 'F2') { event.preventDefault(); newRound(); } });
 window.addEventListener('message', event => { if (event.origin === location.origin && event.source === parent && event.data === 'pepe-sweeper-pause') paused = true; });
