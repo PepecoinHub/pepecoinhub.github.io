@@ -827,7 +827,7 @@
     [['Arrange windows', arrangeAll], ['Refresh', function () { location.reload(); }], null,
       [dark ? 'Wallpaper: day hills' : 'Wallpaper: night mountains', function () { if (themeBtn) themeBtn.click(); }],
       ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons4'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
-      null, ['New game: FUD Invaders', invaders], ['New game: PEP Snake', snake], null, ['Properties…', aboutOS]].forEach(function (it) {
+      null, ["Where's Pepe? (today's photo)", function () { wheresPepe(); }], ['New game: PEPE SWEEPER', function () { pepeSweeperApp(); }], ['New game: YEET THE PEP', function () { yeetApp(); }], ['New game: FUD Invaders', invaders], ['New game: PEP Snake', snake], null, ['LEADERS', function () { highScores(); }], ['Properties…', aboutOS]].forEach(function (it) {
       if (!it) { ctx.appendChild(el('hr')); return; }
       var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
       b.addEventListener('click', function () { closeCtx(); it[1](); });
@@ -1805,8 +1805,8 @@
       var makeMap = function (box) {
         if (map) { map.remove(); map = null; }
         map = L.map(box, { worldCopyJump: true, minZoom: 1, zoomControl: true, attributionControl: true }).setView([25, 10], 1);
-        // CARTO Voyager: labels in English (falls back to the local name only where no English name exists)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 18, subdomains: 'abcd', attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>' }).addTo(map);
+        // OpenStreetMap's own tiles (place names in the local language). CARTO's free tiles now need an API key.
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(map);
         setTimeout(function () { if (map) map.invalidateSize(); }, 60);
         return map;
       };
@@ -2153,7 +2153,10 @@
       '  do nothing for 2 minutes',
       '  green bar at the very right = show desktop',
       '',
-      'games folder: FUD Invaders, PEP Snake, YEET THE PEP.',
+      'games folder: FUD Invaders, PEP Snake, YEET THE PEP,',
+      '  PEPE SWEEPER, Pepe Miner, chess and frens.',
+      'Where\'s Pepe? = a new photo every day (and free PEP).',
+      'LEADERS = every top 10 in one place.',
       'high score or it did not happen.',
       '',
       'P.S. nobody legit ever asks for your seed phrase.'
@@ -2209,7 +2212,7 @@
       '<p class="ad-kick">Hold to charge. Release to yeet. Three panic flaps.</p><h3 class="ad-big"><em>PUMP</em> candles launch you.<br>The <em>SELL WALL</em> stops you.</h3><p class="ad-sub">The track changes every round.</p>',
       '<p class="ad-fine">Helmet included. Aerospace qualifications not included. No PEP prizes: just the Hall of Fren top 10.</p><button type="button" class="ad-cta ad-yeetbtn">Play YEET THE PEP →</button>'
     ] },
-    { file: 'wheres_pepe.mpg', title: "Where's Pepe? Starts soon!", ch: 'CH 5000 · THE POND TRAVEL CHANNEL', icon: 'wheres-pepe', scenes: [
+    { file: 'wheres_pepe.mpg', title: "Where's Pepe? A new photo every day", ch: 'CH 5000 · THE POND TRAVEL CHANNEL', icon: 'wheres-pepe', scenes: [
       '<p class="ad-kick">Pepe packed a backpack, a map and a camera…</p><h3 class="ad-big">…and now he is<br><em>LOST!</em></h3>',
       '<img class="ad-pic" src="img/wp-pepe.webp" alt=""><p class="ad-sub">Every day he sends one photo from somewhere in the world. Find him on the map!</p>',
       '<h3 class="ad-big">2 minutes.<br>1 pin.<br><em>5000 points!</em></h3><p class="ad-sub">The faster and the closer, the better. Hints show up as the clock runs down.</p>',
