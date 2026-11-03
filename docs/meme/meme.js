@@ -1246,7 +1246,9 @@
   function boardGame(key, name) {
     var G = BASE + 'games/', phone = window.innerWidth < 760;
     var A = openApp('bg-' + key, name, 'pond-playground', function (A) {
+      var big = function (on) { A.host.classList.toggle('app-full', !!on); };
       var choose = function () {
+        big(false);
         A.body.innerHTML = '<div class="bg-pick"><p>How do you want to play ' + esc(name) + '?</p>' +
           '<button type="button" class="bg-big" data-m="bot"><span aria-hidden="true">🤖</span><b>vs the bot</b><small>Right now, no account</small></button>' +
           '<button type="button" class="bg-big" data-m="fren"><span aria-hidden="true">👥</span><b>with a fren</b><small>Get a link to send them</small></button></div>';
@@ -1263,7 +1265,7 @@
         A.body.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { lv = b.getAttribute('data-l'); A.body.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); }); });
         A.body.querySelector('.bg-start').addEventListener('click', function () {
           if (phone) { location.href = osPage('table.html?bot=' + key + '&level=' + lv); return; }
-          A.body.querySelector('.bg-stage').innerHTML = frame(G + 'table.html?bot=' + key + '&level=' + lv + '&embed=1');
+          big(true); A.body.querySelector('.bg-stage').innerHTML = frame(G + 'table.html?bot=' + key + '&level=' + lv + '&embed=1');
         });
       };
       var fren = function () {
@@ -1278,6 +1280,7 @@
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || localStorage.getItem('pondos-wp-nick') || ''; } catch (e) {}
         wpRpc('gry_table_create', { p_game: key, p_nick: nick || 'Frog', p_private: true, p_spectators: true }).then(function (code) {
           var link = 'https://pepecoinhub.com/games/table.html?t=' + encodeURIComponent(code);
+          if (!phone) big(true);
           A.body.querySelector('.bg-msg').innerHTML = '<b>Send this link to your fren:</b>';
           A.body.querySelector('.bg-stage').innerHTML = '<div class="app-row bg-link"><input class="ac-in" readonly value="' + esc(link) + '" aria-label="Invite link"><button type="button" class="app-btn go bg-copy">Copy link</button></div>' +
             '<p class="bin-tip">The game starts when your fren opens the link. The board and the chat are below.</p>' + (phone ? '<a class="app-btn" href="' + osPage('table.html?t=' + encodeURIComponent(code)) + '">Open the table</a>' : frame(G + 'table.html?t=' + encodeURIComponent(code) + '&embed=1'));
@@ -1290,8 +1293,7 @@
         }, function (err) { A.body.querySelector('.bg-msg').textContent = err.message || 'Could not make a table. Try again.'; });
       };
       choose();
-    }, 860);
-    A.host.classList.add('app-full');
+    }, 500);
   }
   // Draw & Guess (charades with other players): the PEP Games lobby opens on its rooms, inside a window
   function drawGuess() {

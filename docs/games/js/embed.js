@@ -14,6 +14,7 @@
   var ss = function (fn) { try { return fn(window.sessionStorage); } catch (e) { return null; } };
   if (framed || /[?&]embed=1(&|$)/.test(q)) {
     r.classList.add('embed');
+    if (/[?&]bot=/.test(q)) r.classList.add('is-bot');   // a bot game needs no sign-in bar
     r.setAttribute('data-theme', 'light');   // the 98 panels are light grey, so the page keeps light text colours under them
     var m = /[?&]only=(dg|tables)(&|$)/.exec(q); if (m) r.classList.add('only-' + m[1]);
     return;

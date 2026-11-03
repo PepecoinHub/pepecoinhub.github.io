@@ -798,3 +798,10 @@ html.embed .room-row, html.embed .rooms > *, html.embed .mn-row, html.embed .mn-
 html.embed .tgame-tc label.tc-opt { background: #fff !important; color: #111 !important; border-radius: 0 !important; box-shadow: inset 1px 1px 0 var(--w-lo), inset -1px -1px 0 var(--w-hi) !important; }
 html.embed .tgame-tc label.tc-opt:has(input:checked) { background: var(--w-sel) !important; color: #fff !important; }
 html.embed .topts label, html.embed .tgame-tc, html.embed .topts-box p { color: #111 !important; }
+/* inside a PondOS window the whole board fits the window height, not only its width */
+html.embed .board { width: min(100%, 560px, calc(100vh - 165px)); }
+html.embed .board.connect4 { width: min(100%, 560px, calc((100vh - 165px) * 7 / 6)); }
+html.embed.is-bot .g-sub { display: none !important; }
+html.embed .board-wrap { padding: 8px; }
+html.embed .table-room .stage-top { padding-block: 6px; }
+html.embed .g-sub { padding: 2px 8px !important; min-height: 0; }
