@@ -984,22 +984,6 @@ dl.facts.facts-board dt:last-of-type, dl.facts.facts-board dd:last-of-type { bor
 .foot-langs a:hover { color: var(--accent-deep); text-decoration-color: currentColor; }
 
 
-/* Home: one-time choice between this site and the meme edition (chrome.js) */
-.pill-bar {
-  max-width: 1080px; margin: 14px auto 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px;
-  padding: 10px 12px 10px 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 18px; box-shadow: var(--shadow);
-}
-.pill-bar p { margin: 0; }
-.pill-bar p span { color: var(--muted); }
-.pill-bar-btns { display: flex; flex-wrap: wrap; gap: 8px; }
-.pill-bar-btns a, .pill-bar-btns button {
-  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; font: 600 0.92rem var(--f-body);
-  color: var(--ink); background: var(--paper); border: 1.5px solid var(--rule); text-decoration: none; cursor: pointer; white-space: nowrap;
-}
-.pill-bar-btns i { width: 22px; height: 11px; border-radius: 999px; flex: none; box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18); }
-.pill-bar .pb-red i { background: #d04a32; } .pill-bar .pb-red:hover { border-color: #d04a32; }
-.pill-bar .pb-blue i { background: #2c5ac4; } .pill-bar .pb-blue:hover { border-color: #2c5ac4; }
-@media (max-width: 560px) { .pill-bar { padding: 12px 14px; } .pill-bar-btns a, .pill-bar-btns button { padding: 8px 10px; font-size: 0.86rem; } .pill-bar-btns { width: 100%; } .pill-bar-btns > * { flex: 1; justify-content: center; } }
 
 
 /* Links page: the safety note under the directory */
@@ -1316,3 +1300,5 @@ body.pk-page { padding: 0; }
 .pk-logo-cap b { font: 700 0.72rem var(--f-mono); color: var(--accent-mid); padding-top: 2px; }
 .pk-logos a:hover .pk-logo-cap span { color: var(--link); }
 @media (max-width: 760px) { .pk-logos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* a little air between the hero (with the green "PEP at a glance" box) and "Looking for Pepe coin?" */
+.home-hero + .pep-id { margin-top: 22px; }
