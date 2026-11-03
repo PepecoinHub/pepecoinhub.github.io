@@ -12,6 +12,15 @@ let level = 'easy', game, buttons = [], seconds = 0, paused = false, flagMode = 
 let holdTimer = null, longPressed = -1;
 
 if (new URLSearchParams(location.search).has('embed')) document.body.classList.add('embed');
+// inside PondOS: tell the window how big the game is, so the window fits the board instead of the whole screen
+const embedded = document.body.classList.contains('embed') && parent !== window;
+let wantW = 560;
+function postSize() {
+  if (!embedded) return;
+  const pond = document.querySelector('.pond');
+  parent.postMessage({ type: 'pepe-sweeper-size', w: wantW + 12, h: Math.ceil(pond.getBoundingClientRect().height) }, location.origin);
+}
+if (embedded && 'ResizeObserver' in window) new ResizeObserver(postSize).observe(document.querySelector('.pond'));
 
 function bestKey() { return `pep-sweeper-best-${level}`; }
 function getBest() {
@@ -30,7 +39,8 @@ function newRound(next = level) {
   $('#dig-mode').setAttribute('aria-pressed', 'true'); $('#flag-mode').setAttribute('aria-pressed', 'false');
   document.querySelectorAll('[data-level]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.level === level)));
   board.style.setProperty('--cols', game.cols); board.style.setProperty('--rows', game.rows);
-  document.querySelector('.game-window').style.setProperty('--window-width', Math.max(560, game.cols * 27 + 56) + 'px');
+  wantW = Math.max(560, game.cols * 27 + 56);
+  document.querySelector('.game-window').style.setProperty('--window-width', wantW + 'px');
   board.setAttribute('aria-label', `${LEVELS[level].name}: ${game.cols} by ${game.rows}, ${game.mines} wrong Pepes`);
   $('#board-info').textContent = `${game.cols} × ${game.rows} · ${game.mines} wrong Pepes`;
   $('#board-scroll').scrollLeft = 0;
@@ -42,7 +52,7 @@ function newRound(next = level) {
   });
   board.replaceChildren(...buttons);
   result.hidden = true; mood.textContent = 'GOOD LUCK, FREN'; setFace('ready');
-  status.textContent = 'READY. PICK A LILY PAD.'; showBest(); render();
+  status.textContent = 'READY. PICK A LILY PAD.'; showBest(); render(); postSize();
 }
 
 function render() {

@@ -24,5 +24,5 @@ button{font:inherit;cursor:pointer;color:inherit}button:focus-visible{outline:2p
 .touchbar{display:none;gap:6px;margin:7px 8px 0}.touchbar button{flex:1;padding:8px}
 .result{margin:7px 8px 0;border:1px solid var(--lo);border-radius:4px;background:#fff8d9;padding:7px 9px;font-size:12px;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}.result b{font-size:13px}.result span{flex:1 1 200px}
 .statusbar{display:flex;justify-content:space-between;gap:10px;font-size:10px;padding:6px 10px;margin-top:8px;border-top:1px solid var(--lo);color:#3d473a}
-body.embed{background:var(--chrome)}body.embed .site-links,body.embed .titlebar{display:none}body.embed .pond{padding:6px}body.embed .game-window{box-shadow:none;border:0}
-@media(pointer:coarse),(max-width:600px){.touchbar{display:flex}.site-links span,.statusbar .legend{display:none}.pond{padding-top:8px}.toolbar small{display:none}}
+body.embed{background:var(--chrome);min-height:0}body.embed .site-links,body.embed .titlebar{display:none}body.embed .pond{padding:6px}body.embed .game-window{box-shadow:none;border:0}
+@media(pointer:coarse),(max-width:420px){.touchbar{display:flex}.site-links span,.statusbar .legend{display:none}.pond{padding-top:8px}.toolbar small{display:none}}

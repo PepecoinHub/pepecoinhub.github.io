@@ -1324,13 +1324,27 @@
     A.host.classList.add('app-full');
   }
   function pepeSweeperApp() {
+    // a normal window that fits the board (the game reports its size), not a full-screen one
     var A = openApp('pepesweeper', 'PEPE SWEEPER', 'pepesweeper', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepe-sweeper.html?embed=1" title="PEPE SWEEPER"></iframe>';
+      A.body.innerHTML = '<iframe class="app-frame sweep-frame" src="' + BASE + 'games/pepe-sweeper.html?embed=1" title="PEPE SWEEPER"></iframe>';
+      A.body.style.padding = '0';
+      var fr = A.body.querySelector('iframe'), lastW = 0;
+      var onSize = function (e) {
+        if (e.source !== fr.contentWindow || !e.data || e.data.type !== 'pepe-sweeper-size') return;
+        fr.style.height = Math.max(200, e.data.h) + 'px';
+        if (e.data.w !== lastW) {
+          lastW = e.data.w;
+          A.host.style.width = 'min(' + (e.data.w + 10) + 'px, calc(100vw - 16px))';
+          if (window.innerWidth > 760) { A.host.style.left = Math.max(8, (window.innerWidth - A.host.offsetWidth) / 2) + 'px'; A.host.style.transform = 'none'; }
+        }
+      };
+      window.addEventListener('message', onSize);
+      A.stop = function () { window.removeEventListener('message', onSize); };
       A.host.querySelector('.w-min').addEventListener('click', function () {
-        A.body.querySelector('iframe').contentWindow.postMessage('pepe-sweeper-pause', location.origin);
+        fr.contentWindow.postMessage('pepe-sweeper-pause', location.origin);
       });
-    }, 1050);
-    A.host.classList.add('app-full', 'pepesweeper-window');
+    }, 590);
+    return A;
   }
   function minerApp() {
     var A = openApp('miner', 'Pepe Miner', 'pickaxe', function (A) {
