@@ -1805,8 +1805,8 @@
       var makeMap = function (box) {
         if (map) { map.remove(); map = null; }
         map = L.map(box, { worldCopyJump: true, minZoom: 1, zoomControl: true, attributionControl: true }).setView([25, 10], 1);
-        // CARTO Voyager: labels in English (falls back to the local name only where no English name exists)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 18, subdomains: 'abcd', attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>' }).addTo(map);
+        // OpenStreetMap's own tiles (place names in the local language). CARTO's free tiles now need an API key.
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(map);
         setTimeout(function () { if (map) map.invalidateSize(); }, 60);
         return map;
       };
