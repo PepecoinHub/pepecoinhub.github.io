@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin"><title>POND WARS: frog artillery | Pepecoin Hub</title>
+<meta name="description" content="Turn-based frog artillery: custom teams, four destructible maps, nine weapons and exploding golden toes. Play against the CPU or a friend on one device.">
+<meta name="robots" content="noindex, nofollow"><link rel="canonical" href="https://pepecoinhub.com/games/pondwars.html"><link rel="icon" href="img/pondwars/gold.svg">
+<link rel="stylesheet" href="pondwars.css?v=20261103c"><script type="module" src="js/pondwars.mjs?v=20261103c"></script>
+<link rel="stylesheet" href="pondwars-polish.css"></head><body>
+<header class="pw-site"><a href="../meme/">← Pepecoin Hub</a><b>POND WARS</b><a href="index.html">More games</a></header>
+<main class="pw">
+  <div class="pw-chrome"><span>POND WARS <small> / FREN SOFTWARE · 2000</small></span><div><button id="sound">Sound: off</button><button id="pause">Pause</button><button id="restart">New match</button></div></div><div class="pw-bar">
+    <div class="pw-team t0"><b id="name0">PEP</b><span class="pw-hp" id="hp0"></span></div>
+    <div class="pw-mid"><span id="turn">Ready</span><span class="pw-timer" id="timer">30</span><span class="pw-wind" id="wind" title="Wind: pushes rockets">WIND <span class="wt"><i></i></span></span></div>
+    <div class="pw-team t1"><span class="pw-hp" id="hp1"></span><b id="name1">FUD</b></div>
+  </div>
+  <div class="pw-stage">
+    <canvas id="pw" width="1200" height="600" tabindex="0" aria-label="POND WARS. A/D or left/right arrows move. Space jumps, double Space backflips. Right click selects weapons. Hold left click to fire. W/S or up/down arrows adjust aim.">Your browser needs Canvas to play.</canvas>
+    <div class="pw-menu" id="menu">
+      <span class="menu-kicker">FREN SOFTWARE PRESENTS</span><h1>POND<br><em>WARS</em></h1><span class="menu-tag">SPECIAL FOOT EDITION · 2000</span>
+      <p>Small frogs. Big grudges. Questionable footwear.</p>
+      <div class="team-setup">
+        <fieldset><legend>TEAM 1</legend><label>Team name <input id="team0" maxlength="18" value="PEP"></label><div class="color-pick" data-team="0" role="group" aria-label="Team 1 color"></div></fieldset>
+        <fieldset><legend>TEAM 2 / CPU</legend><label>Team name <input id="team1" maxlength="18" value="FUD"></label><div class="color-pick" data-team="1" role="group" aria-label="Team 2 color"></div></fieldset>
+      </div>
+      <div class="player-setup"><fieldset><legend>TEAM 1 · CHARACTERS</legend><div id="players0"></div></fieldset><fieldset><legend>TEAM 2 · CHARACTERS</legend><div id="players1"></div></fieldset></div>
+      <div class="map-setup"><canvas id="map-preview" width="300" height="150" aria-label="Selected map preview"></canvas><div><label for="map-choice">BATTLEFIELD</label><select id="map-choice"><option value="island">Pond Island · large island</option><option value="twin">Split Decision · two islands</option><option value="peaks">Croak Canyon · mountains</option><option value="small">Last Lily · small arena</option></select><button type="button" id="roll-map">Random map</button><button type="button" id="reroll-map">New terrain</button><p id="map-info"></p></div></div>
+      <div class="pw-pick"><span>Play against</span><button type="button" data-mode="cpu" aria-pressed="true">CPU</button><button type="button" data-mode="duo" aria-pressed="false">A friend (one device)</button></div>
+      <div class="pw-pick" id="levels"><span>CPU level</span><button type="button" data-level="0" aria-pressed="false">Easy</button><button type="button" data-level="1" aria-pressed="true">Normal</button><button type="button" data-level="2" aria-pressed="false">Hard</button></div>
+      <div class="pw-pick"><span>Frogs per team</span><button type="button" data-n="2" aria-pressed="false">2</button><button type="button" data-n="3" aria-pressed="true">3</button><button type="button" data-n="4" aria-pressed="false">4</button></div>
+      <p class="match-rules">100 HP / frog · 30s turns · limited movement · 3s retreat after firing</p><button type="button" class="pw-go" id="go">START THE WAR →</button>
+      <p class="pw-small">A/D or ← → move · W/S or ↑ ↓ aim<br>SPACE jumps · SPACE ×2 backflips<br>RIGHT CLICK: arsenal · HOLD LEFT CLICK: fire</p>
+    </div>
+    <div class="pw-over" id="over" hidden><h2 id="over-title"></h2><p id="over-text"></p><button type="button" class="pw-go" id="again">Play again</button><button type="button" id="tomenu">Menu</button></div>
+  </div>
+  <div class="pw-controls">
+    <template id="weapon-options">
+<button type="button" data-w="rocket" aria-pressed="false" title="Bazooka · key 1"><span class="weapon-key">1</span><img src="img/pondwars/rocket.svg" alt=""><span>Bazooka</span><small>UNLIMITED</small></button>
+<button type="button" data-w="bat" aria-pressed="false" title="Baseball Bat · key 2"><span class="weapon-key">2</span><img src="img/pondwars/bat.svg" alt=""><span>Baseball Bat</span><small>UNLIMITED</small></button>
+<button type="button" data-w="grenade" aria-pressed="true" title="Grenade · key 3"><span class="weapon-key">3</span><img src="img/pondwars/grenade.svg" alt=""><span>Grenade</span><small>UNLIMITED</small></button>
+<button type="button" data-w="cluster" aria-pressed="false" title="Cluster · key 4"><span class="weapon-key">4</span><img src="img/pondwars/cluster.svg" alt=""><span>Cluster</span><small>× 4</small></button>
+<button type="button" data-w="revolver" aria-pressed="false" title="Revolver · key 5"><span class="weapon-key">5</span><img src="img/pondwars/revolver.svg" alt=""><span>Revolver</span><small>UNLIMITED</small></button>
+<button type="button" data-w="bow" aria-pressed="false" title="Longbow · key 6"><span class="weapon-key">6</span><img src="img/pondwars/bow.svg" alt=""><span>Longbow</span><small>UNLIMITED</small></button>
+<button type="button" data-w="gold" aria-pressed="false" title="Golden Foot · key 7"><span class="weapon-key">7</span><img src="img/pondwars/gold.svg" alt=""><span>Golden Foot</span><small>× 1</small></button>
+<button type="button" data-w="mine" aria-pressed="false" title="Land Mine · key 8"><span class="weapon-key">8</span><img src="img/pondwars/mine.svg" alt=""><span>Land Mine</span><small>× 3</small></button>
+<button type="button" data-w="dynamite" aria-pressed="false" title="Dynamite · key 9"><span class="weapon-key">9</span><img src="img/pondwars/dynamite.svg" alt=""><span>Dynamite</span><small>× 2</small></button></template><button type="button" id="arsenal-open" title="Pick a weapon (or right click the battlefield)">Arsenal · right click</button>
+    <div class="weapon-readout"><b id="weapon-name">Frag Grenade</b><small id="weapon-detail">3 SECOND FUSE · BOUNCES</small></div><div class="pw-move"><button type="button" id="left" aria-label="Walk left">◀</button><button type="button" id="hop">HOP</button><button type="button" id="right" aria-label="Walk right">▶</button></div>
+    <div class="pw-power"><span>POWER<br><b id="angle-read">45°</b> · <span id="movement">MOVE 160</span></span><div><i id="power"></i></div></div>
+    <button type="button" class="pw-fire" id="fire">HOLD TO THROW</button>
+    <button type="button" id="skip" title="End the turn without throwing">Skip</button>
+  </div>
+  <p class="pw-rotate">Turn your phone sideways for bigger frogs.</p>
+  <p class="pw-status" id="status" role="status" aria-live="polite">A/D or ← → move · W/S or ↑ ↓ aim · Space: jump · Space ×2: backflip · Right click: arsenal · Hold left click: fire</p>
+</main>
+</body></html>

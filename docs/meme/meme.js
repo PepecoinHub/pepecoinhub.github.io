@@ -7,6 +7,16 @@
   var BASE = root.getAttribute('data-base') || '../';          // the serious site
   var DATA = root.getAttribute('data-data') || BASE + 'data/'; // its data files
   var PAGE = document.body.getAttribute('data-page') || 'index';
+  // Games in testing: hidden for everyone except a browser that opened /meme/?beta=pondwars once
+  // (?beta=off hides them again). The game page itself is not linked anywhere and not indexed.
+  var BETA = (function () {
+    try {
+      var q = new URLSearchParams(location.search).get('beta');
+      if (q === 'pondwars') localStorage.setItem('pondos-beta', 'pondwars');
+      if (q === 'off') localStorage.removeItem('pondos-beta');
+      return localStorage.getItem('pondos-beta') === 'pondwars';
+    } catch (e) { return false; }
+  })();
 
 
   /* ------------------------------------------------------------------ pages */
@@ -62,7 +72,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { return n === 'pepesweeper' ? '../games/img/sweeper-flag.svg' : 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; return 'img/ico/' + n + '.webp'; }
   function icoFrom(src) { var m = /^img\/([\w-]+)\.webp$/.exec(src || ''); return m ? ico(m[1]) : src; }
   function json(name) {
     if (!cache[name]) cache[name] = fetch(DATA + name, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(name + ' ' + r.status); return r.json(); });
@@ -180,7 +190,7 @@
       ["Where's Pepe?", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
       ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }],
-      ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', function () { paperHands(); }]].forEach(function (g) {
+      ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', function () { paperHands(); }]].concat(BETA ? [['POND WARS (beta)', 'Testing: only you can see this', 'pondwars', function () { pondWarsApp(); }]] : []).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
@@ -1325,6 +1335,15 @@
     }, 1000);
     A.host.classList.add('app-full');
   }
+  function pondWarsApp() {
+    var A = openApp('pondwars', 'POND WARS · Special Foot Edition', 'pondwars', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars.html?embed=1" title="POND WARS"></iframe>';
+      A.host.querySelector('.w-min').addEventListener('click', function () {
+        A.body.querySelector('iframe').contentWindow.postMessage('pondwars-pause', location.origin);
+      });
+    }, 1200);
+    A.host.classList.add('app-full', 'pondwars-window');
+  }
   function pepeSweeperApp() {
     // a normal window that fits the board (the game reports its size), not a full-screen one
     var A = openApp('pepesweeper', 'PEPE SWEEPER', 'pepesweeper', function (A) {
@@ -1427,7 +1446,7 @@
         ['PEPE SWEEPER', 'pepesweeper', function () { pepeSweeperApp(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
-        ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];
+        ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]].concat(BETA ? [['POND WARS (beta)', 'pondwars', function () { pondWarsApp(); }]] : []);
       A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="' + ico(g[1]) + '" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or get a link for a fren. Draw &amp; Guess: open a room for frens or join one with a code. 🏆 LEADERS has every top 10.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
