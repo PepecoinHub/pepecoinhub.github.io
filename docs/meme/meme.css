@@ -1408,7 +1408,14 @@ footer.foot a { color: #edf3e3; }
 .hitc-d i { display: block; width: 11px; font: 700 15px/18px ui-monospace, Consolas, "Courier New", monospace; font-style: normal; color: #39ff14; text-align: center; background: #111; text-shadow: 0 0 4px rgba(57, 255, 20, .6); }
 .hitc-l { font: 400 10px/1 var(--f-chrome); color: #000; }
 .pondos body[data-page="index"] .hitc, .pondos.desk-view body .hitc, .pondos.desk-empty body .hitc { display: flex; }
-@media (min-width: 761px) { .hitc { position: fixed; z-index: 60; } }
+/* computer: the counter lives in the taskbar tray instead of WEN MOON; phone: at the top of the page */
+.pondos .tray .hitc.hitc-tray { display: inline-flex; position: static; flex-direction: row; align-items: center; gap: 4px; padding: 0 6px; background: none; box-shadow: none; color: inherit; }
+.tray .hitc-tray .hitc-d { padding: 1px; }
+.tray .hitc-tray .hitc-d i { width: 8px; font-size: 11px; line-height: 13px; }
+.tray .hitc-tray .hitc-l { color: inherit; font-size: 11px; }
+.pondos .tray:has(.hitc-tray) .tray-moon { display: none; }
+@media (min-width: 761px) { .pondos body .hitc.hitc-page { display: none; } }
+@media (max-width: 760px) { .pondos .tray .hitc.hitc-tray { display: none; } }
 @media (prefers-reduced-motion: no-preference) { .hitc:hover .hitc-d i { color: #7dff63; } }
 
 /* Letters to the Editor + Gazette #3 */
