@@ -4,7 +4,7 @@
 -- Jeśli Supabase pokaże „Potential issues detected”, wybierz „Run and enable RLS”.
 --
 --  • list może wysłać każdy zalogowany: przez Discorda albo jako gość (jedno kliknięcie + test „nie jestem botem”)
---  • limity: max 3 listy dziennie na osobę, max 40 listów na godzinę na całą stronę, długość 3–1500 znaków
+--  • limity: max 3 listy dziennie na osobę, max 40 listów na godzinę na całą stronę, długość 2–1500 znaków
 --  • listy czyta WYŁĄCZNIE właściciel (games.owners); nikt inny nie ma do nich dostępu, nawet hosty
 --  • licznik: suma osób z wszystkich dni (te same dane co statystyki, bez IP i bez ciasteczek)
 
