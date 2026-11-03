@@ -350,7 +350,7 @@ export function cpuPlan(g) {
       if(r.score>best.score)best={score:r.score,weapon:'dynamite',angle:0,power:1};
     }
   }
-  const wobble=[.22,.1,.025][g.level]??.1,pw=[.15,.07,.02][g.level]??.07;
+  const wobble=[.35,.17,.03][g.level]??.17,pw=[.25,.12,.03][g.level]??.12;   // how far the CPU misses: easy, normal, hard
   if(!['bat','dynamite','mine'].includes(best.weapon)){
     best.angle+=(g.rand()*2-1)*wobble;
     best.power=Math.max(.1,Math.min(1,best.power+(g.rand()*2-1)*pw));
