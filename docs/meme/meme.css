@@ -1058,6 +1058,8 @@ footer.foot a { color: #edf3e3; }
 .ptv-crawl b { flex: none; background: #d41f1f; color: #fff; padding: 7px 10px; font-weight: 400; z-index: 1; }
 .ptv-run { display: inline-block; padding: 7px 0 7px 12px; animation: pager-scroll 45s linear infinite; text-transform: uppercase; }
 .ptv-nfa { font: 400 11px var(--f-chrome); color: var(--muted); }
+.ptv-ads { margin-top: 6px; }
+.ptv-adpos { text-align: center; color: var(--muted); }
 @media (max-width: 760px) { .ad-ba img { width: 64px; height: 64px; } .ptv-nfa { display: none; } }
 @media (prefers-reduced-motion: reduce) { .ptv-run { animation: none; padding-left: 10px; } .ptv-live { animation: none; } .ptv-scene { transition: none; } }
 

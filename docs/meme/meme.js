@@ -1779,7 +1779,8 @@
       var makeMap = function (box) {
         if (map) { map.remove(); map = null; }
         map = L.map(box, { worldCopyJump: true, minZoom: 1, zoomControl: true, attributionControl: true }).setView([25, 10], 1);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(map);
+        // CARTO Voyager: labels in English (falls back to the local name only where no English name exists)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 18, subdomains: 'abcd', attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>' }).addTo(map);
         setTimeout(function () { if (map) map.invalidateSize(); }, 60);
         return map;
       };
@@ -2239,13 +2240,24 @@
       A.body.innerHTML = '<div class="ptv"><div class="ptv-top"><span class="ptv-live">LIVE</span><b>PEP-TV</b><span class="ptv-ch">' + ad.ch + '</span></div>' +
         '<div class="ptv-stage">' + ad.scenes.map(function (h, k) { return '<div class="ptv-scene' + (k ? '' : ' on') + '">' + h + '</div>'; }).join('') + '</div>' +
         '<div class="ptv-crawl"><b>PEP NOW</b><span class="ptv-run"></span></div></div>' +
-        '<div class="app-row"><button type="button" class="app-btn ptv-prev">◀◀</button><button type="button" class="app-btn ptv-play" aria-pressed="true">❚❚</button><button type="button" class="app-btn ptv-next">▶▶</button><span class="grow ptv-pos"></span><span class="ptv-nfa">Not a real offer. Not financial advice.</span></div>';
+        '<div class="app-row"><button type="button" class="app-btn ptv-prev">◀◀</button><button type="button" class="app-btn ptv-play" aria-pressed="true">❚❚</button><button type="button" class="app-btn ptv-next">▶▶</button><span class="grow ptv-pos"></span><span class="ptv-nfa">Not a real offer. Not financial advice.</span></div>' +
+        '<div class="app-row ptv-ads"><button type="button" class="app-btn ptv-ad-prev" title="Previous ad">⏮ Previous ad</button><span class="grow ptv-adpos">Ad ' + (i + 1) + ' of ' + ADS.length + '</span><button type="button" class="app-btn ptv-ad-next" title="Next ad">Next ad ⏭</button></div>';
       var sc = A.body.querySelectorAll('.ptv-scene'), cur = 0, playing = true, t = null, pos = A.body.querySelector('.ptv-pos');
       var show = function (k) { cur = (k + sc.length) % sc.length; sc.forEach(function (x, j) { x.classList.toggle('on', j === cur); }); pos.textContent = 'Scene ' + (cur + 1) + ' of ' + sc.length; };
       var loop = function () { clearTimeout(t); if (playing && document.body.contains(A.host)) t = setTimeout(function () { show(cur + 1); loop(); }, REDUCE ? 6000 : 3800); };
       show(0); loop();
       A.body.querySelector('.ptv-next').addEventListener('click', function () { show(cur + 1); loop(); });
       A.body.querySelector('.ptv-prev').addEventListener('click', function () { show(cur - 1); loop(); });
+      // another ad: this window closes and the other one opens in the same spot (and stays full screen if this one was)
+      var swap = function (d) {
+        var j = (i + d + ADS.length) % ADS.length, st = A.host.style, max = A.host.classList.contains('is-max');
+        var keep = { top: st.top, left: st.left, transform: st.transform, at: st.getPropertyValue('--app-top') };
+        A.close();
+        var B = adPlayer(j);
+        if (B && B.host) { B.host.style.top = keep.top; B.host.style.left = keep.left; B.host.style.transform = keep.transform; if (keep.at) B.host.style.setProperty('--app-top', keep.at); if (max) B.host.classList.add('is-max'); }
+      };
+      A.body.querySelector('.ptv-ad-prev').addEventListener('click', function () { swap(-1); });
+      A.body.querySelector('.ptv-ad-next').addEventListener('click', function () { swap(1); });
       var pb = A.body.querySelector('.ptv-play');
       pb.addEventListener('click', function () { playing = !playing; pb.setAttribute('aria-pressed', String(playing)); pb.textContent = playing ? '❚❚' : '▶'; loop(); });
       var lap = A.body.querySelector('.ad-lap');
