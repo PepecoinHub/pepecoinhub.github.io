@@ -1,5 +1,6 @@
 // POND WARS: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, WEAPONS, newGame, startTurn, step, fire, walk, hop, backflip, canMove, MAPS, makeTerrain, skip, cpuPlan, me, aliveOf } from './pondwars-engine.mjs?v=20261103b';
+import { W, H, WATER, STEP, WEAPONS, newGame, startTurn, step, fire, walk, hop, backflip, canMove, MAPS, makeTerrain, skip, cpuPlan, me, aliveOf, projectileOrigin, safeDirection, retreatDirection } from './pondwars-engine.mjs?v=20261103c';
+import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
 const $ = s => document.querySelector(s);
@@ -16,7 +17,8 @@ mine:'ARMS AFTER 1s · PROXIMITY TRIGGER',dynamite:'PLACE AT YOUR FEET · 5 SECO
 let soundOn=false,audio;
 function beep(hz,d=.12){if(!soundOn)return;try{audio ||= new (window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});const o=audio.createOscillator(),v=audio.createGain();o.type='sawtooth';o.frequency.setValueAtTime(hz,audio.currentTime);o.frequency.exponentialRampToValueAtTime(20,audio.currentTime+d);v.gain.setValueAtTime(.035,audio.currentTime);v.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.connect(v);v.connect(audio.destination);o.start();o.stop(audio.currentTime+d);}catch{}}
 const TEAM = [{ name: 'PEP', band: '#2f7de1', text: '#cfe6ff' }, { name: 'FUD', band: '#e23b3b', text: '#ffd4d4' }];
-const pepeSprite=new Image();pepeSprite.src='../meme/img/wp-pepe.webp';
+const playerArt=PLAYERS.map(p=>{const img=new Image();img.src=p.src;return img;});
+const teamPlayers=[[0,1,2,3],[4,5,6,0]];
 const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite'].map(w=>{const img=new Image();img.src='img/pondwars/'+w+'.svg';return[w,img];}));
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let g = null, opts = { mode: 'cpu', level: 1, n: 3, map:'island', mapSeed:20261103 }, seed = 0;
@@ -70,8 +72,13 @@ function frog(f, t) {
   ctx.translate(0,-29+bob);
   if(!reduce && f.flipT!==null && f.flipT!==undefined && !f.ground)ctx.rotate(-f.hopFace*Math.PI*2*Math.min(1,f.flipT/.7));
   else if(!reduce && turn && f.ground && (held.l||held.r))ctx.rotate(Math.sin(t*18)*.055);
-  ctx.scale(s,1);
-  if(pepeSprite.naturalWidth)ctx.drawImage(pepeSprite,-33,-36,66,66);
+  const choice=teamPlayers[f.team][Math.floor(f.id/2)]??0,person=PLAYERS[choice],art=playerArt[choice];
+  ctx.scale(s*person.face,1);
+  if(art.naturalWidth){
+    const [sx,sy,sw,sh]=person.rect||[0,0,art.naturalWidth,art.naturalHeight],height=64,width=Math.min(64,height*sw/sh);
+    ctx.drawImage(art,sx,sy,sw,sh,-width/2,-35,width,height);
+  }
+  ctx.scale(person.face,1);
   if(turn && weaponArt[g.weapon]?.naturalWidth)ctx.drawImage(weaponArt[g.weapon],10,-6,29,29);
   ctx.restore();
   // name and health
@@ -129,12 +136,12 @@ function draw(t) {
       ctx.strokeStyle = '#e0414c'; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.moveTo(aimX, 0); ctx.lineTo(aimX, WATER); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle = '#e0414c'; ctx.font = 'bold 12px Tahoma'; ctx.fillText('CANDLES DROP HERE', aimX, 18);
     } else {
-      const cx = f.x + Math.cos(aim) * 52, cy = f.y - 8 + Math.sin(aim) * 52;
+      const cx = f.x + Math.cos(aim) * 52, cy = f.y - 32 + Math.sin(aim) * 52;
       ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, 7, 0, 7); ctx.moveTo(cx - 11, cy); ctx.lineTo(cx + 11, cy); ctx.moveTo(cx, cy - 11); ctx.lineTo(cx, cy + 11); ctx.stroke();
       if (charging || cpu?.charging) {
         const p = cpu?.charging ? cpu.p : power;
         ctx.fillStyle = `hsl(${120 - p * 120} 90% 50%)`;
-        for (let i = 1; i <= 10; i++) if (i / 10 <= p) { ctx.beginPath(); ctx.arc(f.x + Math.cos(aim) * (12 + i * 4), f.y - 8 + Math.sin(aim) * (12 + i * 4), 1.5 + i * .25, 0, 7); ctx.fill(); }
+        for (let i = 1; i <= 10; i++) if (i / 10 <= p) { ctx.beginPath(); ctx.arc(f.x + Math.cos(aim) * (12 + i * 4), f.y - 32 + Math.sin(aim) * (12 + i * 4), 1.5 + i * .25, 0, 7); ctx.fill(); }
       }
     }
   }
@@ -186,11 +193,21 @@ function events() {
   g.events.length = 0;
 }
 function cpuTick(dt) {
-  if (!isCpu(g.team) || g.phase !== 'aim') return;
-  if (!cpu) cpu = { wait: .9, plan: null };
+  if(!isCpu(g.team))return;
+  if(g.phase==='fire'&&g.retreat>0){const dir=retreatDirection(g);if(dir)for(let i=0;i<Math.max(1,Math.round(dt/STEP));i++)walk(g,dir);return;}
+  if(g.phase!=='aim')return;
+  if (!cpu) cpu = { wait: .65, plan: null,move:0 };
   cpu.wait -= dt;
   if (cpu.wait > 0) return;
-  if (!cpu.plan) { cpu.plan = cpuPlan(g); g.weapon = cpu.plan.weapon; cpu.aiming = true; cpu.from = aim; cpu.t = 0; cpu.wait = 0; return; }
+  if(!cpu.plan&&cpu.move<.8&&g.movement>80){
+    const f=me(g),target=aliveOf(g,1-g.team).sort((a,b)=>Math.abs(a.x-f.x)-Math.abs(b.x-f.x))[0];
+    const danger=g.mines.some(m=>Math.hypot(m.x-f.x,m.y-f.y)<85);
+    const dir=danger?retreatDirection(g):target&&Math.abs(target.x-f.x)>200?safeDirection(g,target.x>f.x?1:-1):0;
+    cpu.move+=dt;
+    if(dir){for(let i=0;i<Math.max(1,Math.round(dt/STEP));i++)walk(g,dir);return;}
+  }
+  if(cpu.plan&&cpu.shotNumber!==g.pistolShots){cpu.plan=null;cpu.t=0;}
+  if (!cpu.plan) { cpu.plan = cpuPlan(g);cpu.shotNumber=g.pistolShots; g.weapon = cpu.plan.weapon; cpu.aiming = true; cpu.from = aim; cpu.t = 0; cpu.wait = 0; return; }
   cpu.t += dt;
   const k = Math.min(1, cpu.t / .7);
   if (g.weapon === 'candles') aimX = me(g).x + (cpu.plan.tx - me(g).x) * k;
@@ -259,17 +276,17 @@ arsenal.addEventListener('contextmenu',e=>{e.preventDefault();closeArsenal(true)
 document.addEventListener('pointerdown',e=>{if(!arsenal.hidden&&!arsenal.contains(e.target)&&e.button===0){closeArsenal(true);e.preventDefault();e.stopPropagation();}},true);
 function jump(){if(!movementAllowed()||!arsenal.hidden)return;clearCharge();if(me(g).ground)hop(g);else backflip(g);}
 function toWorld(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]; }
-function aimAt(e) { if (!mine()) return; const [x, y] = toWorld(e), f = me(g); aimX = Math.max(30, Math.min(W - 30, x)); aim = Math.atan2(y - (f.y - 8), x - f.x); f.face = x >= f.x ? 1 : -1; }
+function aimAt(e) { if (!mine()) return; const [x, y] = toWorld(e), f = me(g); aimX = Math.max(30, Math.min(W - 30, x)); aim = Math.atan2(y - (f.y - 32), x - f.x); f.face = x >= f.x ? 1 : -1; }
 function beginCharge() { if (!mine() || charging || !arsenal.hidden) return; charging = true; chargeAt = performance.now(); power = 0; }
 function release(cancelShort) {
   if (!charging) return;
   charging = false; const held = performance.now() - chargeAt; $('#power').style.width = '0%';
   if (cancelShort && held < 180) return;   // a short tap only aims
-  if (mine()) fire(g, aim, Math.max(.08, power), aimX);
+  if (mine()) fire(g, aim, Math.max(.08, Math.min(1,held/1300)), aimX);
 }
 cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || charging) aimAt(e); });
 cv.addEventListener('pointerdown', e => { if (e.button) return; e.preventDefault(); cv.focus({ preventScroll: true }); cv.setPointerCapture(e.pointerId); aimAt(e); beginCharge(); });
-cv.addEventListener('pointerup', () => release(true)); cv.addEventListener('pointercancel', () => { charging = false; });
+cv.addEventListener('pointerup', () => release(true)); cv.addEventListener('pointercancel', clearCharge);cv.addEventListener('lostpointercapture',()=>{if(charging)clearCharge();});
 const fb = $('#fire');
 bindHold(fb,beginCharge,()=>release(false),()=>{charging=false;$('#power').style.width='0%';});
 for (const [id, k] of [['#left', 'l'], ['#right', 'r']]) {
@@ -300,7 +317,7 @@ function pauseGame(){closeArsenal();keys.clear(); if(!g || ['menu','over'].inclu
 window.addEventListener('blur',pauseGame);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame();});
 window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===parent&&e.data==='pondwars-pause')pauseGame();});
-$('#pause').onclick=()=>{if(paused){paused=false;last=performance.now();acc=0;$('#pause').textContent='Pause';cv.focus();}else pauseGame();};
+$('#pause').onclick=()=>{if(paused){paused=false;last=performance.now();acc=0;$('#pause').textContent='Pause';status(isCpu(g.team)?'CPU is planning its move…':g.retreat>0?'RETREAT · Find cover!':'Your turn · Aim, move or select a weapon.');cv.focus();}else pauseGame();};
 $('#sound').onclick=()=>{soundOn=!soundOn;$('#sound').textContent='Sound: '+(soundOn?'on':'off');if(soundOn)beep(440);};
 $('#restart').onclick=()=>{pauseGame();$('#menu').hidden=false;};
 
@@ -309,10 +326,30 @@ $('#restart').onclick=()=>{pauseGame();$('#menu').hidden=false;};
 function pick(sel, key, parse) {
   document.querySelectorAll(sel).forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll(sel).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-    opts[key] = parse(b.dataset[key]); $('#levels').hidden = opts.mode !== 'cpu';
+    opts[key] = parse(b.dataset[key]); $('#levels').hidden = opts.mode !== 'cpu';paintPlayers();
   }));
 }
 const COLORS=[{name:'Blue',hex:'#4f9ef0'},{name:'Red',hex:'#ef6c63'},{name:'Green',hex:'#70c963'},{name:'Yellow',hex:'#edcf54'},{name:'Purple',hex:'#bc92e9'},{name:'Orange',hex:'#ef9a4f'}],teamColors=[0,1];
+function portrait(canvas,index){
+  const img=playerArt[index],p=PLAYERS[index],c=canvas.getContext('2d');c.clearRect(0,0,48,52);
+  if(!img.naturalWidth)return;
+  const [sx,sy,sw,sh]=p.rect||[0,0,img.naturalWidth,img.naturalHeight],h=48,w=Math.min(46,h*sw/sh);
+  c.imageSmoothingEnabled=sw>50;c.drawImage(img,sx,sy,sw,sh,(48-w)/2,52-h,w,h);
+}
+function paintPlayers(){
+  for(const team of [0,1]){
+    const box=$('#players'+team);box.replaceChildren();
+    for(let slot=0;slot<opts.n;slot++){
+      const row=document.createElement('label');row.className='player-row';
+      const thumb=document.createElement('canvas');thumb.width=48;thumb.height=52;thumb.setAttribute('aria-hidden','true');portrait(thumb,teamPlayers[team][slot]);
+      const caption=document.createElement('span');caption.textContent='Frog '+(slot+1);
+      const select=document.createElement('select');select.setAttribute('aria-label','Team '+(team+1)+' frog '+(slot+1)+' character');
+      PLAYERS.forEach((p,i)=>{const option=document.createElement('option');option.value=i;option.textContent=p.name;select.append(option);});select.value=teamPlayers[team][slot];
+      select.onchange=()=>{teamPlayers[team][slot]=Number(select.value);portrait(thumb,Number(select.value));};
+      row.append(thumb,caption,select);box.append(row);
+    }
+  }
+}
 function paintColors(){
   document.querySelectorAll('.color-pick').forEach(box=>{
     const team=Number(box.dataset.team);box.replaceChildren();
@@ -326,6 +363,7 @@ function mapPreview(recommend=false){
   const c=$('#map-preview').getContext('2d'),mask=makeTerrain(opts.mapSeed,opts.map);c.fillStyle='#264c68';c.fillRect(0,0,300,150);
   c.fillStyle='#9fc15d';for(let y=0;y<H;y+=4)for(let x=0;x<W;x+=4)if(mask[y*W+x])c.fillRect(x/4,y/4,1,1);
   c.fillStyle='#4b9ab1';c.fillRect(0,WATER/4,300,(H-WATER)/4);
+  paintPlayers();
 }
 $('#map-choice').onchange=e=>{opts.map=e.target.value;opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview(true);};
 $('#reroll-map').onclick=()=>{opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview();};
@@ -338,3 +376,5 @@ $('#tomenu').addEventListener('click', () => { $('#over').hidden = true; $('#men
 // a quiet island behind the menu
 g = newGame({ seed: 20261103, perTeam: 3 }); paintGround(); g.phase = 'menu';
 requestAnimationFrame(frame);
+$('#go').disabled=true;$('#go').textContent='LOADING THE CREW…';
+Promise.all(playerArt.map(img=>img.decode().catch(()=>null))).then(()=>{paintPlayers();$('#go').disabled=false;$('#go').textContent='START THE WAR →';});

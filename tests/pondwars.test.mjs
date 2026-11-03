@@ -1,11 +1,46 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { WEAPONS, explode, backflip, MAPS, STEP, canMove } from '../docs/games/js/pondwars-engine.mjs';
+import { WEAPONS, explode, backflip, MAPS, STEP, canMove, H, projectileOrigin, retreatDirection } from '../docs/games/js/pondwars-engine.mjs';
 import { newGame, startTurn, step, fire, walk, hop, cpuPlan, me, solid, makeTerrain, aliveOf, W, WATER } from '../docs/games/js/pondwars-engine.mjs';
 
 test('the island is the same for the same seed, and different for another', () => {
   const a = makeTerrain(5), b = makeTerrain(5), c = makeTerrain(6);
   assert.deepEqual(a, b); assert.notDeepEqual(a, c);
+});
+function flatGame(distance=60){
+  const g=newGame({seed:3,perTeam:2,cpu:[false,false]});g.mask.fill(0);
+  for(let y=450;y<H;y++)g.mask.fill(1,y*W,(y+1)*W);
+  g.frogs.forEach((f,i)=>Object.assign(f,{x:i===0?200:i===1?200+distance:900+(i-2)*100,y:449,ground:true,face:1}));
+  startTurn(g);return g;
+}
+test('all impact weapons hit nearby enemies immediately, without a global immunity window',()=>{
+  for(const type of ['revolver','bow','rocket'])for(const distance of [40,60,100,200]){
+    const g=flatGame(distance);g.weapon=type;assert.equal(fire(g,0,1),true);
+    for(let i=0;i<90;i++)step(g);
+    assert.ok(g.frogs[1].hp<100,type+' must hit at '+distance);
+  }
+});
+test('projectile and aim start at hand height and do not immediately collide with the shooter',()=>{
+  const g=flatGame(200),f=me(g),origin=projectileOrigin(f,0);
+  assert.equal(origin.y,f.y-32);assert.equal(origin.x,f.x+18);
+  g.weapon='revolver';fire(g,0,1);for(let i=0;i<30;i++)step(g);
+  assert.equal(f.hp,100);assert.equal(g.frogs[1].hp,75);
+});
+test('a falling frog slides down a side wall and eventually lands instead of locking the turn',()=>{
+  const g=flatGame(200),f=me(g);Object.assign(f,{x:300,y:280,ground:false,vx:120,vy:40,fallFrom:280});
+  for(let y=100;y<450;y++)for(let x=302;x<330;x++)g.mask[y*W+x]=1;
+  for(let i=0;i<360;i++)step(g);
+  assert.ok(f.ground||!f.alive);assert.ok(Number.isFinite(f.x)&&Number.isFinite(f.y));
+});
+test('CPU finishes the revolver second shot with the locked weapon and can choose a close range bat',()=>{
+  const g=flatGame(50);g.pistolShots=1;g.weapon='revolver';assert.equal(cpuPlan(g).weapon,'revolver');
+  const h=flatGame(40);for(const type of ['gold','cluster','dynamite'])h.ammo[0][type]=0;
+  const p=cpuPlan(h);assert.ok(['bat','revolver','bow','rocket','grenade'].includes(p.weapon));
+  assert.ok(Number.isFinite(p.angle)&&Number.isFinite(p.power));
+});
+test('CPU retreat chooses an escape away from a placed charge on safe ground',()=>{
+  const g=flatGame(200),f=me(g);g.shots.push({type:'dynamite',x:f.x+20,y:f.y});
+  assert.equal(retreatDirection(g),-1);
 });
 test('all maps spawn safe spaced frogs and enforce their capacity',()=>{
   for(const map of Object.keys(MAPS))for(let seed=0;seed<25;seed++){

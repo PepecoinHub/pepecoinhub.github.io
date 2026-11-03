@@ -99,6 +99,25 @@ export function startTurn(g) {
   g.events.push({ type: 'turn' });
 }
 export const me = g => g.frogs[g.current];
+export function projectileOrigin(f, angle) {
+  return {x:f.x+Math.cos(angle)*18,y:f.y-32+Math.sin(angle)*18};
+}
+export function makeProjectile(f, type, angle, power) {
+  const speed=(type==='revolver'?1:Math.max(.08,Math.min(1,power)))*WEAPONS[type].power;
+  return {type,...projectileOrigin(f,angle),vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,t:0,owner:f.id,ownerClear:false};
+}
+export function safeDirection(g, dir) {
+  const f=me(g),x=f.x+dir*24;
+  if(x<20||x>W-20)return 0;
+  const floor=surfaceBelow(g.mask,x,f.y-4);
+  return floor<WATER-15&&floor-f.y<65&&!solid(g.mask,f.x+dir*8,f.y-30)?dir:0;
+}
+export function retreatDirection(g) {
+  const f=me(g),hazards=[...g.shots,...g.mines,...aliveOf(g,1-f.team)];
+  const near=hazards.sort((a,b)=>Math.hypot(a.x-f.x,a.y-f.y)-Math.hypot(b.x-f.x,b.y-f.y))[0];
+  const dir=near?(f.x<near.x?-1:1):-f.face;
+  return safeDirection(g,dir)||safeDirection(g,-dir);
+}
 
 // ---------- actions of the frog whose turn it is ----------
 export function walk(g, dir) {
@@ -153,7 +172,7 @@ export function fire(g, angle, power, tx) {
     for (let i = -1; i <= 1; i++) g.shots.push({ type: 'candles', x: x + i * 34, y: -30 - Math.abs(i) * 40, vx: 0, vy: 60, t: 0 });
   } else {
     const p = (g.weapon==='revolver'?1:Math.max(.08, Math.min(1, power))) * w.power;
-    g.shots.push({ type: g.weapon, x: f.x + Math.cos(angle) * 12, y: f.y - 8 + Math.sin(angle) * 12, vx: Math.cos(angle) * p, vy: Math.sin(angle) * p, t: 0 });
+    g.shots.push(makeProjectile(f,g.weapon,angle,power));
     f.face = Math.cos(angle) >= 0 ? 1 : -1;
   }
   g.phase = 'fire'; g.events.push({ type: 'fire', weapon: g.weapon }); return true;
@@ -164,6 +183,7 @@ export function skip(g) { if (g.phase === 'aim') { g.phase = 'settle'; g.settle 
 export function stepShot(g, s, mask = g.mask, frogs = g.frogs) {
   const w = WEAPONS[s.type];
   s.t += STEP;
+  if(!s.ownerClear){const owner=frogs.find(f=>f.id===s.owner);if(!owner||Math.abs(s.x-owner.x)>15||s.y<owner.y-58||s.y>owner.y+2)s.ownerClear=true;}
   s.vy += G * (w.gravity ?? 1) * STEP;
   if (w.wind) s.vx += g.wind * 140 * STEP;
   const nx = s.x + s.vx * STEP, ny = s.y + s.vy * STEP;
@@ -181,7 +201,7 @@ export function stepShot(g, s, mask = g.mask, frogs = g.frogs) {
     const n = Math.max(1, Math.ceil(Math.hypot(nx - s.x, ny - s.y) / 3));
     for (let i = 1; i <= n; i++) {
       const x = s.x + (nx - s.x) * i / n, y = s.y + (ny - s.y) * i / n;
-      if (solid(mask, x, y) || (s.t > .12 && frogs.some(f => f.alive && Math.abs(f.x - x) < 15 && y > f.y - 58 && y < f.y + 2))) { s.x = x; s.y = y; return 'boom'; }
+      if (solid(mask, x, y) || frogs.some(f => f.alive && (f.id!==s.owner||s.ownerClear) && Math.abs(f.x - x) < 15 && y > f.y - 58 && y < f.y + 2)) { s.x = x; s.y = y; return 'boom'; }
     }
     s.x = nx; s.y = ny;
   }
@@ -219,7 +239,10 @@ function stepFrog(g, f) {
   if(f.flipT!==null&&f.flipT!==undefined)f.flipT+=STEP;
   if (f.ground) { if (!solid(g.mask, f.x, f.y + 1)) { f.ground = false; f.fallFrom = f.y; } else return; }
   f.vy += G * STEP; f.vx *= .995;
-  const nx = f.x + f.vx * STEP, ny = f.y + f.vy * STEP;
+  const parts=Math.max(1,Math.ceil(Math.hypot(f.vx*STEP,f.vy*STEP)/3));
+  for(let part=0;part<parts&&!f.ground;part++){
+  let nx=f.x+f.vx*STEP/parts,ny=f.y+f.vy*STEP/parts;
+  if(solid(g.mask,nx,f.y-14)||solid(g.mask,nx,f.y-40)){nx=f.x;f.vx*=-.25;}
   if (f.vy > 0 && solid(g.mask, nx, ny)) {
     // land on top of the ground
     let y = Math.floor(ny); while (y > 0 && solid(g.mask, nx, y)) y--;
@@ -227,9 +250,10 @@ function stepFrog(g, f) {
     const drop = f.y - f.fallFrom;
     if (drop > 90) hurt(g, f, Math.min(40, Math.round((drop - 90) / 4)));
     f.vx = 0; f.vy = 0;
-  } else if (solid(g.mask, nx, ny - 10) || solid(g.mask, nx, ny)) {
-    f.vx = -f.vx * .3; if (f.vy < 0) f.vy = 0;
+  } else if (f.vy<0 && solid(g.mask,nx,ny-55)) {
+    f.x=nx;f.vy=0;
   } else { f.x = nx; f.y = ny; }
+  }
   if (f.y > WATER) { f.alive = false; f.hp = 0; f.gone = 'splash'; g.events.push({ type: 'splash', x: f.x }); g.texts.push({ x: f.x, y: WATER - 20, text: 'SPLASH!', t: 0, team: f.team }); }
   else if (f.x < -40 || f.x > W + 40) { f.alive = false; f.hp = 0; f.gone = 'away'; }
 }
@@ -263,6 +287,7 @@ export function step(g) {
     if (!me(g).alive) { g.phase = 'settle'; g.settle = .6; }
     else if (g.timer <= 0) { g.phase = 'settle'; g.settle = .3; g.events.push({ type: 'timeout' }); }
   } else if (g.phase === 'fire') {
+    if(g.weapon==='revolver'&&g.pistolShots===1)g.timer=Math.max(0,g.timer-STEP);
     g.retreat=Math.max(0,g.retreat-STEP);
     if (!g.shots.length && g.retreat<=0) {
       if(g.weapon==='revolver' && g.pistolShots===1 && me(g).alive && me(g).hp>0) { g.phase='aim';g.timer=Math.max(0,g.timer); }
@@ -281,39 +306,54 @@ export function step(g) {
 
 // ---------- the CPU player: tries many throws in its head and picks a good one ----------
 function simulate(g, type, angle, power, target) {
-  const f = me(g), w = WEAPONS[type], p = power * w.power;
-  const s = { type, x: f.x + Math.cos(angle) * 12, y: f.y - 8 + Math.sin(angle) * 12, vx: Math.cos(angle) * p, vy: Math.sin(angle) * p, t: 0 };
-  const others = g.frogs.filter(o => o.alive && o.id !== f.id);
-  for (let i = 0; i < 600; i++) {
-    const r = stepShot(g, s, g.mask, others);
-    if (r === 'boom') break;
-    if (r) return { score: -1e9 };
-  }
-  const reach = w.radius * 1.7;
-  let score = 0;
-  for (const o of g.frogs) {
-    if (!o.alive) continue;
-    const d = Math.hypot(o.x - s.x, o.y - 11 - s.y);
-    if (d < reach) score += (o.team === f.team ? -1.6 : 1) * (1 - d / reach) * 100;
-  }
-  if (score === 0) score = -Math.hypot(target.x - s.x, target.y - s.y) / 10;
-  return { score, x: s.x, y: s.y };
-}
-export function cpuPlan(g) {
-  const f = me(g), enemies = aliveOf(g, 1 - f.team);
-  let best = { score: -1e9, weapon: 'grenade', angle: -Math.PI / 2, power: .5 };
-  for (const t of enemies) {
-    for (const type of ['rocket', 'grenade']) {
-      for (let a = -175; a <= -5; a += 5) {
-        for (let p = .25; p <= 1.001; p += .05) {
-          const r = simulate(g, type, a * Math.PI / 180, p, t);
-          if (r.score > best.score) best = { score: r.score, weapon: type, angle: a * Math.PI / 180, power: p };
-        }
-      }
+  const f=me(g),w=WEAPONS[type],s=makeProjectile(f,type,angle,power);
+  if(type==='mine'||type==='dynamite')Object.assign(s,{x:f.x+f.face*20,y:f.y-3,vx:0,vy:0});
+  for(let i=0;i<720;i++){const end=stepShot(g,s);if(end==='boom')break;if(end)return {score:-1e9};}
+  let score=0;
+  for(const o of g.frogs){
+    if(!o.alive)continue;
+    if(type==='revolver'||type==='bow'){
+      if(Math.abs(o.x-s.x)<18&&s.y>o.y-61&&s.y<o.y+5)score+=(o.team===f.team?-1.8:1)*w.damage;
+    }else{
+      const retreat=(type==='dynamite'||type==='mine')&&o.id===f.id?retreatDirection(g)*70:0;
+      const d=Math.hypot(o.x+retreat-s.x,o.y-11-s.y),reach=w.radius*1.7;
+      if(d<reach)score+=(o.team===f.team?-1.8:1)*w.damage*(.35+.65*(1-d/reach))*(w.children?1.35:1);
     }
   }
-  // levels: 0 = easy (big misses), 1 = normal, 2 = hard
-  const wobble = [.3, .12, .04][g.level] ?? .12, pw = [.2, .08, .03][g.level] ?? .08;
-  best.angle += (g.rand() * 2 - 1) * wobble; best.power = Math.max(.1, Math.min(1, best.power + (g.rand() * 2 - 1) * pw));
+  if(!score)score=-Math.hypot(target.x-s.x,target.y-s.y)/10;
+  return {score};
+}
+export function cpuPlan(g) {
+  const f=me(g),enemies=aliveOf(g,1-f.team);
+  const target=enemies.slice().sort((a,b)=>Math.hypot(a.x-f.x,a.y-f.y)-Math.hypot(b.x-f.x,b.y-f.y))[0];
+  let best={score:-1e9,weapon:'grenade',angle:-Math.PI/2,power:.5};
+  if(!target)return best;
+  const available=type=>!Number.isFinite(WEAPONS[type].ammo)||g.ammo[f.team][type]>0;
+  for(const type of g.pistolShots?['revolver']:['rocket','grenade','cluster','gold','bow','revolver']){
+    if(!available(type))continue;
+    const powers=type==='revolver'?[1]:[.25,.4,.55,.7,.85,1];
+    for(let degrees=-175;degrees<=-5;degrees+=g.level===2?5:10)for(const power of powers){
+      const angle=degrees*Math.PI/180,r=simulate(g,type,angle,power,target);
+      if(r.score>best.score)best={score:r.score,weapon:type,angle,power};
+    }
+    if(type==='bow'||type==='revolver'){
+      const angle=Math.atan2(target.y-30-(f.y-32),target.x-f.x),r=simulate(g,type,angle,1,target);
+      if(r.score>best.score)best={score:r.score,weapon:type,angle,power:1};
+    }
+  }
+  if(!g.pistolShots&&Math.hypot(target.x-f.x,target.y-f.y)<65){
+    const dir=target.x>f.x?1:-1;
+    const friends=aliveOf(g,f.team).some(o=>o.id!==f.id&&(o.x-f.x)*dir>=0&&Math.hypot(o.x-f.x,o.y-f.y)<65);
+    if(!friends&&best.score<40)best={score:40,weapon:'bat',angle:dir===1?0:-Math.PI,power:1};
+    if(retreatDirection(g)&&available('dynamite')){
+      const r=simulate(g,'dynamite',0,1,target);
+      if(r.score>best.score)best={score:r.score,weapon:'dynamite',angle:0,power:1};
+    }
+  }
+  const wobble=[.22,.1,.025][g.level]??.1,pw=[.15,.07,.02][g.level]??.07;
+  if(!['bat','dynamite','mine'].includes(best.weapon)){
+    best.angle+=(g.rand()*2-1)*wobble;
+    best.power=Math.max(.1,Math.min(1,best.power+(g.rand()*2-1)*pw));
+  }
   return best;
 }

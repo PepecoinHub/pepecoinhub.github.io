@@ -37,12 +37,54 @@ export function lobbyChat(be, { openLogin }) {
     } catch (e) { live = false; }
   }
 
+  // @mentions (games/js/mentions.js): only for verified (Discord) players; the server makes the real mentions
+  const PM = window.PepMentions;
+  let me = { verified: false, nick: null, optout: false }, unseen = false, seenT = 0;
+  const forMe = (m) => PM && me.verified && !me.optout && m.user_id !== be.session()?.user?.id && PM.mentionsMe(m.body, me.nick);
+  const markSeen = () => {
+    if (!unseen || !watching()) return;
+    clearTimeout(seenT); seenT = setTimeout(() => { unseen = false; be.rpc('gry_mentions_seen', { p_upto: null }).catch(() => {}); }, 1500);
+  };
+  const mentionBtn = h('button', { type: 'button', class: 'chat-mention-btn', hidden: true, onclick: async () => {
+    try {
+      me.optout = await be.rpc('gry_mention_optout', { p_off: !me.optout });
+      if (!me.optout) PM.askNotify();
+      toast(me.optout ? 'Mentions off: nobody can @mention you now' : 'Mentions on: you get a ping when someone @mentions you', 'good');
+    } catch (e) { toast(e.message, 'bad'); }
+    paintMention();
+  } });
+  panel.querySelector('.chat-rules')?.append(' ', mentionBtn);
+  function paintMention() {
+    mentionBtn.hidden = !me.verified;
+    mentionBtn.textContent = me.optout ? '🔕 Mentions off' : '🔔 Mentions on';
+    mentionBtn.title = me.optout ? 'Turn @mentions of you back on' : 'Verified players can @mention you. Click to turn it off.';
+    msgs.forEach((el) => { if (el._m) el.classList.toggle('cmsg-me', !!forMe(el._m)); });
+  }
+  async function loadMe() {
+    if (!PM || be.kind !== 'supabase' || !be.session() || be.session().user?.is_anonymous) { me = { verified: false }; paintMention(); return; }
+    try {
+      const r = await be.rpc('gry_my_mentions');
+      me = r || { verified: false };
+      const items = (r && r.items) || [];
+      if (items.length) {
+        unseen = true;
+        const last = items[items.length - 1];
+        toast(items.length === 1 ? `${last.from} mentioned you in the chat` : `You were mentioned ${items.length}× in the chat (last: ${last.from})`, 'good');
+        markSeen();
+      }
+    } catch { me = { verified: false }; }
+    paintMention();
+  }
+  if (PM) PM.attach(input, (q) => (me.verified ? be.rpc('gry_mention_names', { p_q: q }) : []));
+
   const hhmm = (at) => new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   function line(m) {
     const row = h('div', { class: 'cmsg', 'data-id': m.id },
       h('span', { class: 'ct' }, hhmm(m.at)),
       h('b', { class: 'cn' }, m.nick), m.verified ? h('span', { class: 'cv', title: 'Verified with Discord' }, '✓') : '', ': ',
       h('span', { class: 'cb' }, ...renderBody(m.body)));
+    row._m = m;
+    if (forMe(m)) row.classList.add('cmsg-me');
     if (mod) row.append(h('span', { class: 'cmod' },
       h('button', { type: 'button', title: 'Hide this message', 'aria-label': 'Hide this message', onclick: () => act('gry_lobby_hide', { p_id: m.id }, 'Message hidden') }, '🗑'),
       h('button', { type: 'button', title: 'Mute this player for 24 hours', 'aria-label': 'Mute ' + m.nick + ' for 24 hours',
@@ -84,13 +126,14 @@ export function lobbyChat(be, { openLogin }) {
       for (const m of r.messages || []) {
         if (msgs.has(m.id)) continue;
         const el = line(m); msgs.set(m.id, el); box.append(el); last = Math.max(last, m.id);
+        if (!first && forMe(m)) { unseen = true; PM.ring(m.nick, m.body, () => setOpen(true)); }
       }
       while (msgs.size > 120) { const [id, el] = msgs.entries().next().value; el.remove(); msgs.delete(id); }
       if (msgs.size) box.querySelector('.cempty')?.remove();
       else if (!box.querySelector('.cempty')) box.append(h('p', { class: 'muted small cempty' }, 'No messages in the last 24 hours. Say gm!'));
       if (first || atBottom) box.scrollTop = box.scrollHeight;
       first = false;
-      paintInput();
+      paintInput(); markSeen();
     } catch (e) {
       if (first) { box.textContent = ''; box.append(h('p', { class: 'muted small cempty' }, 'The chat can\'t be reached right now. Trying again…')); }
     } finally {
@@ -127,15 +170,16 @@ export function lobbyChat(be, { openLogin }) {
   const setOpen = (open) => {
     panel.classList.toggle('open', open); fab.setAttribute('aria-expanded', String(open));
     document.body.classList.toggle('chat-open', open && phone.matches);
-    if (open) { box.scrollTop = box.scrollHeight; poll(); }
+    if (open) { box.scrollTop = box.scrollHeight; poll(); markSeen(); }
   };
   fab.addEventListener('click', () => setOpen(!panel.classList.contains('open')));
   panel.querySelector('.chat-x').addEventListener('click', () => setOpen(false));
   document.querySelectorAll('.g-chat').forEach((a) => a.addEventListener('click', (e) => { if (phone.matches) { e.preventDefault(); setOpen(true); } }));
   if (location.hash === '#chat' && phone.matches) setOpen(true);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { poll(); markSeen(); } });
 
   paintInput();
   poll();
-  return { refresh() { paintInput(); reload(); } };
+  loadMe();
+  return { refresh() { paintInput(); reload(); loadMe(); } };
 }

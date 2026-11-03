@@ -1,6 +1,6 @@
 # POND WARS: Special Foot Edition
 
-Turn-based, local frog artillery in the visual style of a 2000-era game. The game reuses the existing `docs/meme/img/wp-pepe.webp` character art. Open `docs/games/pondwars.html` directly or launch it as a window from the PondOS Start menu or Games folder.
+Turn-based, local frog artillery in the visual style of a 2000-era game. Choose a character separately for every frog: seven user-supplied Pepe designs plus the existing Traveler. Five source cutouts are preserved with image compression; Farmer and Blue Briefs were prepared as a transparent two-cell sheet using the built-in image generator, with the brief: preserve the supplied faces, clothing and poses, remove the background and ground shadow, no text or extra objects. Final assets live in `docs/games/img/pondwars/players/`; frame bounds are declared in `pondwars-players.mjs`. Open `docs/games/pondwars.html` directly or launch it as a window from the PondOS Start menu or Games folder.
 
 ## Setup
 
@@ -30,10 +30,10 @@ Turn-based, local frog artillery in the visual style of a 2000-era game. The gam
 | Land mine | 50 | 3 | Arms after one second, persists between turns |
 | Dynamite | 70 | 2 | Five-second fuse |
 
-CPU players currently choose bazookas and grenades. There is no account, saved score or payout for this game.
+CPU players evaluate bazooka, grenade, cluster, golden foot, bow and revolver trajectories, with bat and dynamite considered at close range. They move toward distant targets when terrain permits and retreat after the final shot. Mines remain a player-selectable weapon. Easy/Normal/Hard vary aim error and search resolution. There is no account, saved score or payout for this game.
 
 ## Verification and review
 
-Run `node --test tests/pondwars.test.mjs` and `python scripts/check_site.py`. Tests cover seeded layouts and capacity on all four maps, nine weapon mechanics, ammunition for both teams, timers, movement, mine persistence, hits, knockback, and a completed CPU match. Browser preview has been checked on laptop and in responsive layouts; real iOS and Android hardware remains to be checked.
+Run `node --test tests/pondwars.test.mjs` and `python scripts/check_site.py`. All 20 tests pass. Additional release regressions cover impact hits at 40/60/100/200 pixels, hand-height muzzle placement and shooter collision, side-wall landings, locked CPU revolver follow-up and safe retreat. The first revolver projectile also consumes turn time; charge strength uses elapsed input time rather than the last rendered frame. Pointer cancellation clears charging; resume clears the paused status. Real iOS and Android hardware remains to be checked.
 
-Review images: [team setup](pondwars-team-menu.jpg) and [Split Decision map](pondwars-two-islands.jpg). The PR contains no database migration or deployment step.
+Review images: [character setup](pondwars-release-menu.jpg) and [eight-character match](pondwars-release-game.jpg). The PR contains no database migration or deployment step.
