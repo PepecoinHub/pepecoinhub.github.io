@@ -860,9 +860,10 @@
   function saver(force) {
     if (saverEl || (!force && (REDUCE || document.hidden || maxW || document.querySelector('dialog[open]')))) return;
     // a random frog from the meme collection bounces around, like the old DVD logo
-    var FROGS = ['big-eyes', 'believe', 'chonk', 'cowboy', 'detective', 'diamond', 'gibup', 'farmer', 'born-to-fren', 'brain', 'gif-034-still', 'gif-071-still', 'gif-045-still', 'gif-085-still'];
+    var FROGS = ['big-eyes', 'believe', 'chonk', 'cowboy', 'detective', 'diamond', 'gibup', 'farmer', 'born-to-fren', 'brain', 'gif-034-still', 'gif-071-still', 'gif-045-still', 'gif-085-still',
+      'chars/balloons', 'chars/juicebox', 'chars/brb', 'chars/chonky', 'chars/comfy', 'chars/explorer', 'chars/backpack'];
     var pick = FROGS[Math.floor(Math.random() * FROGS.length)];
-    saverEl = el('div', { class: 'saver', 'aria-hidden': 'true' }, '<img class="sv-frog" src="img/' + pick + '.webp" alt=""><p>PondOS is resting. Move the mouse, fren.</p>');
+    saverEl = el('div', { class: 'saver', 'aria-hidden': 'true' }, '<img class="sv-frog' + (pick.indexOf('chars/') === 0 ? ' cut' : '') + '" src="img/' + pick + '.webp" alt=""><p>PondOS is resting. Move the mouse, fren.</p>');
     document.body.appendChild(saverEl);
     var coin = saverEl.querySelector('.sv-frog'), x = 40, y = 40, dx = 2.2, dy = 1.7, raf;
     var step = function () {
@@ -1282,8 +1283,11 @@
         }
         A.body.innerHTML = '<div class="app-row bg-row">' + back + '<span class="grow bg-msg">Making your table…</span></div><div class="bg-stage"></div>';
         A.body.querySelector('.bg-back').addEventListener('click', choose);
+        // no nickname first: a Discord player keeps the name on their profile (sending a nickname would rename it);
+        // only a guest, whom the server asks for one, gets the nickname saved in this browser
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || localStorage.getItem('pondos-wp-nick') || ''; } catch (e) {}
-        wpRpc('gry_table_create', { p_game: key, p_nick: nick || 'Frog', p_private: true, p_spectators: true }).then(function (code) {
+        var make = function (n) { return wpRpc('gry_table_create', { p_game: key, p_nick: n, p_private: true, p_spectators: true }); };
+        make('').catch(function (err) { if (/nickname/i.test(err.message || '')) return make(nick || 'Frog'); throw err; }).then(function (code) {
           var link = 'https://pepecoinhub.com/games/table.html?t=' + encodeURIComponent(code);
           if (!phone) big(true);
           A.body.querySelector('.bg-msg').innerHTML = '<b>Send this link to your fren:</b>';
@@ -1738,14 +1742,14 @@
       var wireHost = function () { var b = main.querySelector('.wp-host'); if (b) b.addEventListener('click', hostTools); };
       var closed = function () {
         countdownOnly();
-        main.innerHTML = '<div class="wp-intro"><img src="img/wp-pepe.webp" alt="" width="180" height="300"><div><h3>Pepe is still packing.</h3><p>No photo today yet. Come back soon!</p>' +
+        main.innerHTML = '<div class="wp-intro"><img src="img/wp-pepe.webp" alt="Pepe the explorer with binoculars" width="180" height="169"><div><h3>Pepe is still packing.</h3><p>No photo today yet. Come back soon!</p>' +
           '<div class="app-row"><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div><div class="wp-board"></div></div></div>';
         main.querySelector('.wp-readme').addEventListener('click', wpReadme); wireHost(); board(main.querySelector('.wp-board'));
       };
       var intro = function () {
         countdownOnly();
         var me = whoAmI();
-        main.innerHTML = '<div class="wp-intro"><img src="img/wp-pepe.webp" alt="" width="180" height="300"><div><h3>Where\'s Pepe? #' + T.num + '</h3>' +
+        main.innerHTML = '<div class="wp-intro"><img src="img/wp-pepe.webp" alt="Pepe the explorer with binoculars" width="180" height="169"><div><h3>Where\'s Pepe? #' + T.num + '</h3>' +
           '<p>Pepe sent a new photo. Where is he? You have <b>2 minutes</b> and <b>one guess</b>. The faster, the more points: 5000 in the first minute, then the continent and the flag show up and the maximum drops.</p>' +
           '<p class="wp-small">Leaving the tab during the guess: one warning, then −1000 each time.</p>' +
           (T.signed_in ? '<div class="app-row"><button type="button" class="app-btn wp-start go">▶ Start</button><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
@@ -2053,7 +2057,7 @@
         '<p><b>Got an idea, a wish or a bug?</b> Tell us in the LAN Party chat. Every message is read, and the best ideas get built.</p>' +
         '<button type="button" class="app-btn gz-lan">Open the LAN Party chat →</button></section>' +
         '<section class="gz-wp"><p class="gz-kick">Extra! Extra!</p><h4>Pepe packs his backpack: Where\'s Pepe? starts soon</h4>' +
-        '<div class="gz-wpbox"><img src="img/wp-pepe.webp" alt="Pepe the traveller with a backpack and a camera" width="110" height="183"><div>' +
+        '<div class="gz-wpbox"><img src="img/wp-pepe.webp" alt="Pepe the explorer with binoculars" width="110" height="104"><div>' +
         '<p>Every day Pepe sends one photo from somewhere in the world. You get 2 minutes and one pin on the map. The closer you get, the more points: up to 5000 a day.</p>' +
         '<p><b>And free PEP for everyone!</b> 1 PEP for every 50 points, paid by the host every week. Discord players get up to 100 PEP a day, guests up to 50.</p>' +
         '<p class="gz-count"></p></div></div>' +
@@ -2307,7 +2311,7 @@
   // ---------- LAN Party: the PEP Games lobby chat in a window ----------
   // Same chat as PEP Games (Supabase gry_lobby_chat / gry_lobby_say). Reading is open to everyone; writing
   // needs a PEP Games sign-in (Discord, or a guest nickname), which lives in this browser's storage.
-  var EMO = ' gmfren heart shh wen facts hmm sleepy bigbrain peek ready waiting pep cheer torch hug chair crayon smoke scream serious hurry news loading crowd ';
+  var EMO = ' gmfren heart shh wen facts hmm sleepy bigbrain balloons juicebox brb chonky comfy explorer backpack peek ready waiting pep cheer torch hug chair crayon smoke scream serious hurry news loading crowd ';
   function anySession() {
     try { var s = JSON.parse(localStorage.getItem(SB_STORE) || 'null'); if (s && s.access_token && s.expires_at * 1000 > Date.now() + 30000) return s; } catch (e) {}
     return null;
