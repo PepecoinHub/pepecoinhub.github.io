@@ -15,7 +15,9 @@
   var frog = document.querySelector('.home-hero-frog');
   if (frog && me && window.matchMedia && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     var spinImg = new Image();
-    spinImg.onload = function () { frog.src = spinImg.src; };
+    // the spinning coin gets no CSS drop-shadow: browsers redraw the shadow only around the part of each frame
+    // that changed, which showed a darker box when the coin turned edge-on. The glow behind it stays (.home-hero-glow).
+    spinImg.onload = function () { frog.classList.add('is-spinning'); frog.src = spinImg.src; };
     var loadSpin = function () { spinImg.src = new URL('assets/brand/pepe-coin-spin.webp?v=2', me).href; };
     if (document.readyState === 'complete') loadSpin(); else window.addEventListener('load', loadSpin);
   }
