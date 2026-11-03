@@ -32,7 +32,6 @@
       ['supply', 'Supply', 'No cap, falling inflation', 'farmer']
     ]],
     ['Community', [
-      ['@games/', 'PEP Games', 'Charades, Pepe Miner, chat', 'pond-playground'],
       ['@links.html', 'Links', 'Official and community sites', 'fren-chain'],
       ['@press.html', 'For media', 'Facts, sources, logo', 'newspaper-still'],
       ['@', 'Serious edition', 'Same facts, no memes', 'serious']
@@ -159,6 +158,9 @@
     var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="img/gif-085-still.webp" alt="" width="28" height="28"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
     meItem.addEventListener('click', function () { setOpen(false); logOn(); });
     smMain.appendChild(meItem);
+    var findItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('search') + '" alt="" width="28" height="28"><span><b>Find…</b> <small>games, pages, tools</small></span>');
+    findItem.addEventListener('click', function () { setOpen(false); finder(); });
+    smMain.appendChild(findItem);
     smMain.appendChild(el('hr'));
     NAV.forEach(function (g, gi) {
       var list = el('div', { class: 'sm-list' });
@@ -173,18 +175,15 @@
     [['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
       ['YEET THE PEP', 'A frog, a catapult, no flight plan', 'yeet', function () { yeetApp(); }],
-      ['High Scores', 'FUD Invaders and PEP Snake, top 10', 'gif-061-still', function () { highScores(); }],
+      ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Where's Pepe?", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
-      ['All games…', 'Chess, Checkers, Connect Four, Sea Battle, Pepe Miner', 'pond-playground', function () { gamesFolder(); }],
+      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }],
       ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', function () { paperHands(); }]].forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
     });
-    var onl = el('a', { href: osPage('') }, '<img src="img/pond-playground.webp" alt="" width="24" height="24" loading="lazy"><span><b>PEP Games online</b><small>Charades, Pepe Miner, lobby chat</small></span>');
-    onl.addEventListener('click', function (e) { if (window.innerWidth >= 760) { e.preventDefault(); setOpen(false); pepGamesOnline(); } });
-    gl.appendChild(onl);
     smMain.appendChild(subGroup('Games', 'gif-061-still', gl));
     smMain.appendChild(el('hr'));
     var winsUl = el('ul', { class: 'sm-wins' });
@@ -692,6 +691,7 @@
     }
   }
 
+  var DESK_ACT = {};   // the desktop icon actions, also used by Find
   // ---------- desktop icons ----------
   // with a mouse: click selects, double-click opens, drag moves (remembered); on touch a tap opens
   if (mainEl) {
@@ -702,7 +702,7 @@
     // wide screens: from the top-left corner, Log On alone, a gap, then the games in two columns;
     // the rest of the pond in a small group lower down, NERDS ONLY on its own by the Start button, the bin far right
     var DESKTOP = [
-      ['logon', [['#logon', 'Log On', 'gif-085-still']]],
+      ['logon', [['#logon', 'Log On', 'gif-085-still'], ['#find', 'Find', 'search']]],
       ['play', [['#wp', "Where's Pepe?", 'wp-folder'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
         ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads']]],
       ['pond', [['./', 'My Pond', 'pep-logo'], ['#shop', 'Shop', 'shop-bag'], ['#tip', 'Tip jar.exe', 'gif-045-still'], [serious, 'Serious mode', 'serious']]],
@@ -725,6 +725,8 @@
         });
       }, 520);
     };
+    ACT['#find'] = function () { finder(); };
+    DESK_ACT = ACT;
     var desk = el('nav', { class: 'desk', 'aria-label': 'Desktop' });
     desk.innerHTML = '<div class="icon-groups">' + DESKTOP.map(function (g) {
       return '<div class="icon-group g-' + g[0] + '"><ul class="icons">' + g[1].map(function (d) { return '<li' + (d[0] === '#bin' ? ' class="bin-li"' : '') + '><a href="' + d[0] + '" data-id="' + esc(d[1]) + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></a></li>'; }).join('') + '</ul></div>';
@@ -1147,7 +1149,7 @@
     var box = el('form', { class: 'app-row hs-submit' });
     box.innerHTML = (s && s.discord ? '<span class="grow">Send <b>' + fmt.int(score) + '</b> to the High Scores as your Discord name <span class="hs-ok" title="Verified with Discord">✓</span></span>'
       : '<label class="grow">Nickname <input name="nick" maxlength="20" autocomplete="nickname" value="' + esc(nick) + '" placeholder="2-20 letters"></label>') +
-      '<button type="submit" class="app-btn">Submit score</button><button type="button" class="app-btn hs-see">High Scores</button>' +
+      '<button type="submit" class="app-btn">Submit score</button><button type="button" class="app-btn hs-see">🏆 LEADERS</button>' +
       (s && s.discord ? '' : '<span class="hs-note"><a href="#" class="hs-logon">Log on with Discord</a> to get a ✓ next to your name.</span>');
     A.body.appendChild(box);
     box.querySelector('.hs-see').addEventListener('click', function () { highScores(game); });
@@ -1158,7 +1160,7 @@
       if (inp) { if (n.length < 2) { inp.focus(); return; } try { localStorage.setItem('pondos-nick', n); } catch (err) {} }
       var btn = box.querySelector('[type=submit]'); btn.disabled = true; btn.textContent = 'Sending…';
       rpc('gry_arcade_submit', { p_game: game, p_nick: n, p_score: score, p_ms: Math.round(ms) }).then(function (r) {
-        box.innerHTML = '<span class="grow">Saved as <b>' + esc(r.nick) + '</b>' + (r.verified ? ' <span class="hs-ok">✓</span>' : '') + '. Place #' + r.place + ' in ' + GAME_NAME[game] + '.</span><button type="button" class="app-btn hs-see">High Scores</button>';
+        box.innerHTML = '<span class="grow">Saved as <b>' + esc(r.nick) + '</b>' + (r.verified ? ' <span class="hs-ok">✓</span>' : '') + '. Place #' + r.place + ' in ' + GAME_NAME[game] + '.</span><button type="button" class="app-btn hs-see">🏆 LEADERS</button>';
         box.querySelector('.hs-see').addEventListener('click', function () { highScores(game); });
         if (apps.hs) apps.hs.load(game);
       }, function (err) { btn.disabled = false; btn.textContent = 'Submit score'; box.querySelector('.hs-err') ? box.querySelector('.hs-err').textContent = err.message : box.appendChild(el('span', { class: 'hs-err' }, esc(err.message))); });
@@ -1171,22 +1173,51 @@
   }
   function whoLegend() { return '<p class="who-legend"><b class="who who-ok"><img src="img/pep-logo.webp" alt="" width="14" height="14">Bold</b> = Discord player · <span class="who-guest">grey</span> = guest. <a href="#" class="who-logon">Log on with Discord</a> to get the frog.</p>'; }
   function wireLegend(box) { var a = box.querySelector('.who-logon'); if (a) a.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); }
+  // LEADERS: every top 10 in one window (FUD Invaders, PEP Snake, YEET THE PEP, Where's Pepe? today and 7 days, Pepe Miner)
+  var LEAD = [['fud', 'FUD Invaders'], ['snake', 'PEP Snake'], ['yeet', 'YEET THE PEP'], ['wp', "Where's Pepe?"], ['miner', 'Pepe Miner']];
+  var LEAD_TIP = {
+    fud: 'Best score per player. Scores run in your browser, so the server checks them for plausibility and rate.',
+    snake: 'Best score per player, in blocks. The server checks every score against the length of the game.',
+    yeet: 'Best flight per pilot. Guests add a flight with a nickname after landing.',
+    wp: 'Points from the daily photo hunts. Guests count once per network.',
+    miner: 'Blocks mined (10,000 game PEP each), from the cloud saves of Discord players. A guest’s mine stays in their browser.'
+  };
   function highScores(game) {
-    var A = openApp('hs', 'High Scores', 'gif-061-still', function (A) {
-      A.body.innerHTML = '<div class="app-row hs-tabs" role="tablist"><button type="button" class="app-btn" data-g="fud" role="tab">FUD Invaders</button><button type="button" class="app-btn" data-g="snake" role="tab">PEP Snake</button></div>' +
-        '<ol class="bin-list hs-list"><li>Loading…</li></ol>' + whoLegend() + '<p class="bin-tip">Top 10, best score per player. Scores run in your browser, so the server checks them for plausibility and rate.</p>';
+    var A = openApp('hs', 'LEADERS - top 10', 'leaders', function (A) {
+      A.body.innerHTML = '<div class="lead-head"><img src="' + ico('leaders') + '" alt="" width="40" height="40"><div><b>LEADERS</b><span>The best frogs in the pond</span></div></div>' +
+        '<div class="app-row hs-tabs" role="tablist">' + LEAD.map(function (g) { return '<button type="button" class="app-btn" data-g="' + g[0] + '" role="tab">' + g[1] + '</button>'; }).join('') + '</div>' +
+        '<div class="lead-lists"></div>' + whoLegend() + '<p class="bin-tip lead-tip"></p>';
       wireLegend(A.body);
+      var row = function (r, i, sc) { return '<li><span>' + (i + 1) + '.</span><span>' + who(r.nick, r.verified !== false) + '</span><small>' + sc + '</small></li>'; };
+      var empty = '<li><span></span><span>No scores yet. Be the first frog.</span><small></small></li>';
+      var fail = function (ol) { return function (err) { ol.innerHTML = '<li><span></span><span>' + (/function|PGRST/.test(err.message) ? 'Coming soon.' : esc(err.message)) + '</span><small></small></li>'; }; };
+      var list = function (title) { return (title ? '<p class="lead-sub">' + title + '</p>' : '') + '<ol class="bin-list hs-list"><li>Loading…</li></ol>'; };
       A.load = function (g) {
         A.game = g;
         A.body.querySelectorAll('[data-g]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-g') === g)); });
-        var ol = A.body.querySelector('.hs-list'); ol.innerHTML = '<li>Loading…</li>';
-        rpc('gry_arcade_top', { p_game: g }).then(function (rows) {
-          ol.innerHTML = rows && rows.length ? rows.map(function (r, i) { return '<li><span>' + (i + 1) + '.</span><span>' + who(r.nick, r.verified) + '</span><small>' + fmt.int(r.score) + (g === 'snake' ? ' blocks' : '') + '</small></li>'; }).join('')
-            : '<li><span></span><span>No scores yet. Be the first frog.</span><small></small></li>';
-        }, function (err) { ol.innerHTML = '<li><span></span><span>' + esc(err.message) + '</span><small></small></li>'; });
+        A.body.querySelector('.lead-tip').textContent = LEAD_TIP[g];
+        var box = A.body.querySelector('.lead-lists');
+        box.className = 'lead-lists' + (g === 'wp' ? ' two' : '');
+        box.innerHTML = g === 'wp' ? '<div>' + list('Today') + '</div><div>' + list('Last 7 days') + '</div>' : list('');
+        var ols = box.querySelectorAll('ol');
+        if (g === 'fud' || g === 'snake') rpc('gry_arcade_top', { p_game: g }).then(function (rows) {
+          ols[0].innerHTML = rows && rows.length ? rows.map(function (r, i) { return row(r, i, fmt.int(r.score) + (g === 'snake' ? ' blocks' : '')); }).join('') : empty;
+        }, fail(ols[0]));
+        else if (g === 'yeet') rpc('gry_yeet_state', {}).then(function (r) {
+          var rows = (r && r.top) || [];
+          ols[0].innerHTML = rows.length ? rows.map(function (x, i) { return row(x, i, (x.score / 10).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' m'); }).join('') : empty;
+        }, fail(ols[0]));
+        else if (g === 'wp') ['day', 'week'].forEach(function (sc, k) {
+          rpc('gry_wp_top', { p_scope: sc }).then(function (rows) {
+            ols[k].innerHTML = rows && rows.length ? rows.map(function (x, i) { return row(x, i, Number(x.points).toLocaleString('en-US') + ' pts'); }).join('') : empty;
+          }, fail(ols[k]));
+        });
+        else rpc('gry_miner_top', {}).then(function (rows) {
+          ols[0].innerHTML = rows && rows.length ? rows.map(function (x, i) { return row(x, i, fmt.int(x.score) + ' blocks'); }).join('') : empty;
+        }, fail(ols[0]));
       };
       A.body.querySelectorAll('[data-g]').forEach(function (b) { b.addEventListener('click', function () { A.load(b.getAttribute('data-g')); }); });
-    }, 400);
+    }, 560);
     A.load(game || A.game || 'fud');
   }
 
@@ -1214,25 +1245,60 @@
     var h = path.indexOf('#'), hash = h >= 0 ? path.slice(h) : ''; path = h >= 0 ? path.slice(0, h) : path;
     return BASE + 'games/' + path + (path.indexOf('?') >= 0 ? '&' : '?') + 'os=98&back=' + encodeURIComponent(location.pathname) + hash;
   }
+  // Chess, Checkers, Connect Four, Sea Battle: first "vs the bot" or "with a fren".
+  // Bot: difficulty, Start, then the board. Fren: one click makes a private table and shows the invite link to copy;
+  // the board (with its chat) waits below until the fren opens the link.
   function boardGame(key, name) {
-    var G = BASE + 'games/';
-    var bot = function (lv) { return G + 'table.html?bot=' + key + '&level=' + lv + '&embed=1'; };
-    if (window.innerWidth < 760) {   // a phone: the same two choices, each opens as a full page
-      osDialog(name, '<p>Play the bot right here, or play online with a fren: open a table and send them the invite link, or sit down at an open one (needs a log on, Discord or guest).</p>',
-        [{ label: 'Online with frens', go: true, href: osPage('?only=tables&tmode=fren&tgame=' + key + '#tables') },
-         { label: 'vs the bot', href: osPage('table.html?bot=' + key + '&level=medium') }, { label: 'Cancel' }], 'pond-playground');
-      return;
-    }
-    tabbedGame('bg-' + key, name, 'pond-playground', [
-      ['vs the bot', bot('medium'), function (row, go) {
-        row.innerHTML = '<span class="grow">Difficulty</span>' + ['easy', 'medium', 'hard'].map(function (l) { return '<button type="button" class="app-btn" data-l="' + l + '" aria-pressed="' + (l === 'medium') + '">' + l.charAt(0).toUpperCase() + l.slice(1) + '</button>'; }).join('');
-        row.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { row.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); go(bot(b.getAttribute('data-l'))); }); });
-      }],
-      ['LAN Party: play with frens', G + '?embed=1&only=tables&tmode=fren&tgame=' + key + '#tables', function (row) {
-        row.innerHTML = '<span class="grow">Open a table and send the invite link to a fren, or sit down at an open table. Needs a <a href="#" class="tab-logon">log on</a> (Discord or guest).</span>';
-        row.querySelector('.tab-logon').addEventListener('click', function (e) { e.preventDefault(); logOn(); });
-      }]
-    ], 860);
+    var G = BASE + 'games/', phone = window.innerWidth < 760;
+    var A = openApp('bg-' + key, name, 'pond-playground', function (A) {
+      var big = function (on) { A.host.classList.toggle('app-full', !!on); };
+      var choose = function () {
+        big(false);
+        A.body.innerHTML = '<div class="bg-pick"><p>How do you want to play ' + esc(name) + '?</p>' +
+          '<button type="button" class="bg-big" data-m="bot"><span aria-hidden="true">🤖</span><b>vs the bot</b><small>Right now, no account</small></button>' +
+          '<button type="button" class="bg-big" data-m="fren"><span aria-hidden="true">👥</span><b>with a fren</b><small>Get a link to send them</small></button></div>';
+        A.body.querySelector('[data-m=bot]').addEventListener('click', bot);
+        A.body.querySelector('[data-m=fren]').addEventListener('click', fren);
+      };
+      var back = '<button type="button" class="app-btn bg-back">◀ Back</button>';
+      var frame = function (url) { return phone ? '' : '<iframe class="app-frame bg-frame" src="' + url + '" title="' + esc(name) + '"></iframe>'; };
+      var bot = function () {
+        A.body.innerHTML = '<div class="app-row bg-row">' + back + '<span class="grow">Difficulty</span>' + ['easy', 'medium', 'hard'].map(function (l) { return '<button type="button" class="app-btn" data-l="' + l + '" aria-pressed="' + (l === 'medium') + '">' + l.charAt(0).toUpperCase() + l.slice(1) + '</button>'; }).join('') +
+          '<button type="button" class="app-btn go bg-start">▶ Start</button></div><div class="bg-stage"><p class="bin-tip">Pick a difficulty and press Start.</p></div>';
+        var lv = 'medium';
+        A.body.querySelector('.bg-back').addEventListener('click', choose);
+        A.body.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { lv = b.getAttribute('data-l'); A.body.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); }); });
+        A.body.querySelector('.bg-start').addEventListener('click', function () {
+          if (phone) { location.href = osPage('table.html?bot=' + key + '&level=' + lv); return; }
+          big(true); A.body.querySelector('.bg-stage').innerHTML = frame(G + 'table.html?bot=' + key + '&level=' + lv + '&embed=1');
+        });
+      };
+      var fren = function () {
+        if (!anySession()) {
+          A.body.innerHTML = '<div class="app-row bg-row">' + back + '</div><div class="bg-pick"><p>To play with a fren, log on first: as a guest (one click) or with Discord.</p><button type="button" class="app-btn go bg-logon">Log on</button></div>';
+          A.body.querySelector('.bg-back').addEventListener('click', choose);
+          A.body.querySelector('.bg-logon').addEventListener('click', function () { logOn(); });
+          return;
+        }
+        A.body.innerHTML = '<div class="app-row bg-row">' + back + '<span class="grow bg-msg">Making your table…</span></div><div class="bg-stage"></div>';
+        A.body.querySelector('.bg-back').addEventListener('click', choose);
+        var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || localStorage.getItem('pondos-wp-nick') || ''; } catch (e) {}
+        wpRpc('gry_table_create', { p_game: key, p_nick: nick || 'Frog', p_private: true, p_spectators: true }).then(function (code) {
+          var link = 'https://pepecoinhub.com/games/table.html?t=' + encodeURIComponent(code);
+          if (!phone) big(true);
+          A.body.querySelector('.bg-msg').innerHTML = '<b>Send this link to your fren:</b>';
+          A.body.querySelector('.bg-stage').innerHTML = '<div class="app-row bg-link"><input class="ac-in" readonly value="' + esc(link) + '" aria-label="Invite link"><button type="button" class="app-btn go bg-copy">Copy link</button></div>' +
+            '<p class="bin-tip">The game starts when your fren opens the link. The board and the chat are below.</p>' + (phone ? '<a class="app-btn" href="' + osPage('table.html?t=' + encodeURIComponent(code)) + '">Open the table</a>' : frame(G + 'table.html?t=' + encodeURIComponent(code) + '&embed=1'));
+          var inp = A.body.querySelector('.bg-link input');
+          A.body.querySelector('.bg-copy').addEventListener('click', function () {
+            inp.select();
+            var ok = function () { A.body.querySelector('.bg-copy').textContent = 'Copied ✓'; };
+            if (navigator.clipboard) navigator.clipboard.writeText(link).then(ok, function () { try { document.execCommand('copy'); ok(); } catch (e) {} }); else { try { document.execCommand('copy'); ok(); } catch (e) {} }
+          });
+        }, function (err) { A.body.querySelector('.bg-msg').textContent = err.message || 'Could not make a table. Try again.'; });
+      };
+      choose();
+    }, 500);
   }
   // Draw & Guess (charades with other players): the PEP Games lobby opens on its rooms, inside a window
   function drawGuess() {
@@ -1262,16 +1328,75 @@
   }
 
   // ---------- Games folder ----------
+  // ---------- Find: type a word, get the games, pages and tools that match ----------
+  function findIndex() {
+    var act = function (k) { return function () { if (DESK_ACT[k]) DESK_ACT[k](); }; };
+    var page = function (p) { return function () { location.href = href(p); }; };
+    var L = [
+      ["Where's Pepe?", 'Daily photo hunt on the map', 'wheres-pepe', 'game geo guess map photo travel daily faucet free pep reward points', function () { wheresPepe(); }],
+      ['LEADERS', 'Every top 10 in one place', 'leaders', 'scores high score top ranking leaderboard best winners', function () { highScores(); }],
+      ['YEET THE PEP', 'Catapult a frog, three panic flaps', 'yeet', 'game catapult launch fly distance arcade', function () { yeetApp(); }],
+      ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', 'game arcade shooter invaders fud', invaders],
+      ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', 'game arcade snake blocks', snake],
+      ['Pepe Miner', 'Click, mine, upgrade', 'pickaxe', 'game miner idle clicker mine blocks', minerApp],
+      ['Chess', 'vs the bot or with a fren', 'pond-playground', 'game board chess bot friend multiplayer', function () { boardGame('chess', 'Chess'); }],
+      ['Checkers', 'vs the bot or with a fren', 'pond-playground', 'game board checkers draughts warcaby bot friend', function () { boardGame('checkers', 'Checkers'); }],
+      ['Connect Four', 'vs the bot or with a fren', 'pond-playground', 'game board connect four 4 bot friend', function () { boardGame('connect4', 'Connect Four'); }],
+      ['Sea Battle', 'vs the bot or with a fren', 'pond-playground', 'game board battleship ships sea bot friend statki', function () { boardGame('battleship', 'Sea Battle'); }],
+      ['Draw & Guess', 'Charades with frens', 'gif-061-still', 'game draw guess charades kalambury multiplayer room', drawGuess],
+      ['Pepe Pictures', 'Weekly quiz night: host wanted', 'unclesam', 'game quiz pictures host night', pepePictures],
+      ['Games folder', 'All the games', 'games-folder', 'games play folder', gamesFolder],
+      ['LAN Party', 'The lobby chat', 'gif-080-still', 'chat talk frens online lobby messages', lanParty],
+      ['Pond TV', 'Videos from the Pepecoin channel', 'pond-tv', 'tv video youtube channel watch', pondTV],
+      ['PEP-TV Ads', 'Fake late-night infomercials', 'pep-tv-ads', 'ads tv commercials videos funny', adsFolder],
+      ['NERDS ONLY', 'Charts, whales, math and receipts', 'nerds-folder', 'nerds folder tools data facts', act('#nerds')],
+      ['AddressCheck.exe', 'Is this a real PEP address?', 'pepe-search', 'address check scam verify checksum wallet', addressCheck],
+      ['Not PEP (0x)', 'PEPE and PEPECOIN are not PEP', 'wrongpep', 'pepe pepecoin ethereum erc20 token wrong scam', act('#notpep')],
+      ['Frog Mail', 'The Pond Gazette', 'frog-mail', 'mail news gazette newsletter', frogMail],
+      ['Shop', 'Official Pepecoin shop', 'shop-bag', 'shop merch buy store', act('#shop')],
+      ['Tip jar.exe', 'Support this site', 'gif-045-still', 'tip donate support', tipJar],
+      ['Log On', 'Guest or Discord', 'gif-085-still', 'log on login sign in account discord guest', logOn],
+      ['LaptopIndex.exe', 'The Legendary Laptop', 'gif-012-still', 'laptop legend 40 million ath', laptop],
+      ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', 'bin trash recycle paper hands', paperHands]
+    ].map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
+    NAV.forEach(function (g) { g[1].forEach(function (p) { L.push({ name: p[1], desc: p[2], icon: p[3], kw: 'page ' + g[0] + ' ' + p[0].replace(/[@\/-]/g, ' '), go: page(p[0]) }); }); });
+    ADS.forEach(function (ad, i) { L.push({ name: ad.file, desc: 'PEP-TV ad: ' + ad.title, icon: ad.icon, kw: 'ad ads tv video ' + ad.title, go: function () { adPlayer(i); } }); });
+    return L;
+  }
+  function finder(q0) {
+    var A = openApp('find', 'Find: games, pages and tools', 'search', function (A) {
+      A.body.innerHTML = '<form class="app-row find-form" role="search"><img src="' + ico('search') + '" alt="" width="28" height="28"><input class="ac-in find-in" type="search" placeholder="Type a word: chess, price, faucet, whales…" aria-label="Find" autocomplete="off" spellcheck="false"><button type="submit" class="app-btn">Find</button></form>' +
+        '<ul class="find-list" role="listbox" aria-label="Results"></ul><p class="bin-tip find-tip"></p>';
+      var IDX = findIndex(), inp = A.body.querySelector('.find-in'), ul = A.body.querySelector('.find-list'), tip = A.body.querySelector('.find-tip'), hits = [];
+      var norm = function (t) { return String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); };
+      var run = function () {
+        var words = norm(inp.value).split(/\s+/).filter(Boolean);
+        hits = words.length ? IDX.filter(function (x) { var hay = norm(x.name + ' ' + x.desc + ' ' + x.kw); return words.every(function (w) { return hay.indexOf(w) >= 0; }); })
+          .sort(function (a, b) { var w = words[0]; return (norm(b.name).indexOf(w) === 0) - (norm(a.name).indexOf(w) === 0); }).slice(0, 14)
+          : IDX.slice(0, 8);
+        ul.innerHTML = hits.map(function (x, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(x.icon) + '" alt="" width="28" height="28"><span><b>' + esc(x.name) + '</b><small>' + esc(x.desc) + '</small></span></button></li>'; }).join('');
+        tip.textContent = words.length ? (hits.length ? hits.length + (hits.length === 1 ? ' match' : ' matches') + '. Enter opens the first one.' : 'Nothing found. Try another word: game, chat, price, mining, wallet…') : 'Popular right now. Type to find anything in the pond.';
+      };
+      var open = function (x) { if (x) x.go(); };
+      ul.addEventListener('click', function (e) { var b = e.target.closest('[data-i]'); if (b) open(hits[+b.getAttribute('data-i')]); });
+      A.body.querySelector('.find-form').addEventListener('submit', function (e) { e.preventDefault(); open(hits[0]); });
+      inp.addEventListener('input', run);
+      A.run = function (q) { if (q != null) inp.value = q; run(); setTimeout(function () { inp.focus(); }, 30); };
+    }, 460);
+    A.run(q0);
+  }
+
+  // Pepe Pictures (the weekly quiz night) has no host yet: its icon plays the "host wanted" ad
+  function pepePictures() { for (var k = 0; k < ADS.length; k++) if (ADS[k].file === 'host_wanted.mpg') { adPlayer(k); return; } }
   function gamesFolder() {
     openApp('games', 'C:\\Pond\\Games', 'games-folder', function (A) {
-      var G = [['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
+      var G = [['🏆 LEADERS', 'leaders', function () { highScores(); }], ['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
         ['YEET THE PEP', 'yeet', function () { yeetApp(); }],
-        ['High Scores', 'gif-061-still', function () { highScores(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
-        ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Miner', 'pickaxe', minerApp], ['PEP Games lobby', 'pond-playground', function () { pepGamesOnline(); }]];
+        ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];
       A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="' + ico(g[1]) + '" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or play online with a fren (send them the invite link). Draw &amp; Guess needs other players: open a room or join one with a code. The PEP Games lobby has it all, plus the chat.</p>';
+        '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or get a link for a fren. Draw &amp; Guess: open a room for frens or join one with a code. 🏆 LEADERS has every top 10.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { G[+b.getAttribute('data-i')][2](); };
         b.addEventListener('dblclick', go);
@@ -1279,14 +1404,6 @@
         b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
       });
     }, 520);
-  }
-  // the online games site inside a big window; on a phone it simply opens the page
-  function pepGamesOnline() {
-    if (window.innerWidth < 760) { location.href = osPage(''); return; }
-    var A = openApp('online', 'PEP Games online', 'pond-playground', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/" title="PEP Games"></iframe><div class="app-row"><span class="grow">Charades, Pepe Miner and the lobby chat.</span><a class="app-btn" href="' + osPage('') + '" target="_blank" rel="noopener">Open in a new tab</a></div>';
-    }, 1100);
-    A.host.style.top = '12px'; A.host.style.setProperty('--app-top', '12px');
   }
 
   // ---------- Pond TV: a small video player window (YouTube, no-cookie embed, loads only when opened) ----------

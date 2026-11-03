@@ -794,3 +794,14 @@ html.embed [role=tab] { background: var(--w-face) !important; color: #111 !impor
 html.embed [role=tab][aria-selected=true] { font-weight: 700 !important; position: relative; top: 1px; padding-top: 7px !important; }
 html.embed .id-step { background: none !important; color: #444 !important; padding: 0 !important; border-radius: 0 !important; letter-spacing: 0; }
 html.embed .room-row, html.embed .rooms > *, html.embed .mn-row, html.embed .mn-buy { box-shadow: none; }
+/* PondOS (98 look): the option pills and checkboxes read black on white, the picked one white on green */
+html.embed .tgame-tc label.tc-opt { background: #fff !important; color: #111 !important; border-radius: 0 !important; box-shadow: inset 1px 1px 0 var(--w-lo), inset -1px -1px 0 var(--w-hi) !important; }
+html.embed .tgame-tc label.tc-opt:has(input:checked) { background: var(--w-sel) !important; color: #fff !important; }
+html.embed .topts label, html.embed .tgame-tc, html.embed .topts-box p { color: #111 !important; }
+/* inside a PondOS window the whole board fits the window height, not only its width */
+html.embed .board { width: min(100%, 560px, calc(100vh - 165px)); }
+html.embed .board.connect4 { width: min(100%, 560px, calc((100vh - 165px) * 7 / 6)); }
+html.embed.is-bot .g-sub { display: none !important; }
+html.embed .board-wrap { padding: 8px; }
+html.embed .table-room .stage-top { padding-block: 6px; }
+html.embed .g-sub { padding: 2px 8px !important; min-height: 0; }

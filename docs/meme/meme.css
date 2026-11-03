@@ -1328,3 +1328,33 @@ footer.foot a { color: #edf3e3; }
 }
 /* labels stay readable on the bright sky */
 .desk .icons a span, .desk-corner a span { text-shadow: 0 0 3px #000, 1px 1px 2px #000, 0 0 6px rgba(0,0,0,.6); }
+/* LEADERS window */
+.lead-head { display: flex; align-items: center; gap: 10px; padding: 6px 8px; background: linear-gradient(90deg, #fff1b8, #fffbe8); border: 1px solid #c9a227; }
+.lead-head b { display: block; font: 900 22px/1 "Arial Black", Impact, var(--f-chrome); letter-spacing: .06em; color: #7a5200; }
+.lead-head span { font-size: 12px; color: #5b4a1e; }
+.hs-tabs { flex-wrap: wrap; }
+.lead-lists.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lead-sub { margin: 0 0 2px; font-weight: 700; font-size: 12px; }
+@media (max-width: 560px) { .lead-lists.two { grid-template-columns: 1fr; } }
+/* board games: pick "vs the bot" or "with a fren" first */
+.bg-pick { display: flex; flex-wrap: wrap; align-items: center; align-content: center; justify-content: center; gap: 14px; padding: 18px 12px; text-align: center; }
+.bg-pick > p { flex-basis: 100%; margin: 0 0 4px; font-weight: 700; font-size: 16px; }
+.bg-big { display: grid; justify-items: center; gap: 4px; width: 190px; padding: 14px 10px; background: var(--chrome); color: var(--ink); border: 0; box-shadow: inset -1px -1px 0 var(--chrome-dk), inset 1px 1px 0 var(--chrome-hi), inset -2px -2px 0 var(--chrome-lo); cursor: pointer; font: inherit; }
+.bg-big:active { box-shadow: inset 1px 1px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
+.bg-big span { font-size: 40px; line-height: 1; }
+.bg-big b { font-size: 16px; }
+.bg-big small { font-size: 12px; opacity: .8; }
+.bg-row { flex-wrap: wrap; align-items: center; }
+.bg-stage { display: grid; gap: 6px; min-height: 0; }
+.bg-link .ac-in { flex: 1; min-width: 0; font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+.app-win.app-full .bg-stage .app-frame { height: calc(100dvh - 150px); }
+.app-win.app-full .bg-stage .bin-tip { margin: 0; }
+/* Find window */
+.find-form { align-items: center; }
+.find-form .find-in { flex: 1; min-width: 0; font-size: 15px; padding: 6px 8px; }
+.find-list { list-style: none; margin: 0; padding: 4px; max-height: min(52vh, 420px); overflow: auto; background: #fff; color: #000; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
+.find-list button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 5px 6px; background: none; border: 0; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.find-list button:hover, .find-list button:focus-visible { background: var(--sel, #0c5a2c); color: #fff; outline: none; }
+.find-list img { flex: none; width: 28px; height: 28px; object-fit: contain; }
+.find-list b { display: block; font-size: 13px; }
+.find-list small { display: block; font-size: 11px; opacity: .8; }
