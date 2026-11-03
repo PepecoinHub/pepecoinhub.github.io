@@ -62,7 +62,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { return n === 'pepesweeper' ? '../games/img/sweeper-flag.svg' : 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; return 'img/ico/' + n + '.webp'; }
   function icoFrom(src) { var m = /^img\/([\w-]+)\.webp$/.exec(src || ''); return m ? ico(m[1]) : src; }
   function json(name) {
     if (!cache[name]) cache[name] = fetch(DATA + name, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(name + ' ' + r.status); return r.json(); });
@@ -175,6 +175,7 @@
     [['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
       ['YEET THE PEP', 'A frog, a catapult, no flight plan', 'yeet', function () { yeetApp(); }],
+      ['POND WARS', 'Nine weapons. One very expensive foot.', 'pondwars', function () { pondWarsApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', function () { pepeSweeperApp(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Where's Pepe?", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
@@ -1323,6 +1324,15 @@
     }, 1000);
     A.host.classList.add('app-full');
   }
+  function pondWarsApp() {
+    var A = openApp('pondwars', 'POND WARS · Special Foot Edition', 'pondwars', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars.html?embed=1" title="POND WARS"></iframe>';
+      A.host.querySelector('.w-min').addEventListener('click', function () {
+        A.body.querySelector('iframe').contentWindow.postMessage('pondwars-pause', location.origin);
+      });
+    }, 1200);
+    A.host.classList.add('app-full', 'pondwars-window');
+  }
   function pepeSweeperApp() {
     // a normal window that fits the board (the game reports its size), not a full-screen one
     var A = openApp('pepesweeper', 'PEPE SWEEPER', 'pepesweeper', function (A) {
@@ -1422,6 +1432,7 @@
     openApp('games', 'C:\\Pond\\Games', 'games-folder', function (A) {
       var G = [['🏆 LEADERS', 'leaders', function () { highScores(); }], ['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
         ['YEET THE PEP', 'yeet', function () { yeetApp(); }],
+        ['POND WARS', 'pondwars', function () { pondWarsApp(); }],
         ['PEPE SWEEPER', 'pepesweeper', function () { pepeSweeperApp(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
