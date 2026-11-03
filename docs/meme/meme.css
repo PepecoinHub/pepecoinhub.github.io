@@ -1361,3 +1361,4 @@ footer.foot a { color: #edf3e3; }
 .find-list b { display: block; font-size: 13px; }
 .find-list small { display: block; font-size: 11px; opacity: .8; }
 .saver .sv-frog.cut { border: 0; box-shadow: none; width: 220px; filter: drop-shadow(0 6px 12px rgba(0,0,0,.6)); }
+.app-win.app-full.pepesweeper-window { width: 100% !important; box-sizing: border-box; }
