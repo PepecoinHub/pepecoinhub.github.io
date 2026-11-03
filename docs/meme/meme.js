@@ -194,9 +194,6 @@
     arrange.addEventListener('click', function () { setOpen(false); arrangeAll(); });
     sd.addEventListener('click', function () { setOpen(false); shutDown(); });
     smMain.appendChild(el('a', { class: 'sm-item', href: serious }, '<img src="img/serious.webp" alt="" width="28" height="28"><span>Serious mode</span>'));
-    var tipItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/gif-045-still.webp" alt="" width="28" height="28"><span>Tip jar</span>');
-    tipItem.addEventListener('click', function () { setOpen(false); tipJar(); });
-    smMain.appendChild(tipItem);
     var lanItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/gif-080-still.webp" alt="" width="28" height="28"><span>LAN Party chat</span>');
     lanItem.addEventListener('click', function () { setOpen(false); lanParty(); });
     smMain.appendChild(lanItem);
@@ -210,6 +207,9 @@
     smMain.appendChild(themeItem);
     smMain.appendChild(arrange);
     smMain.appendChild(el('hr'));
+    var aboutItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('night-shift') + '" alt="" width="28" height="28"><span>About me</span>');
+    aboutItem.addEventListener('click', function () { setOpen(false); aboutMe(); });
+    smMain.appendChild(aboutItem);
     smMain.appendChild(sd);
     nav.appendChild(el('div', { class: 'sm-band', 'aria-hidden': 'true' }, '<span>Pond<b>OS</b> 1.0</span>'));
     nav.appendChild(smMain);
@@ -706,11 +706,11 @@
       ['logon', [['#logon', 'Log On', 'gif-085-still'], ['#find', 'Find', 'search']]],
       ['play', [['#wp', "Where's Pepe?", 'wp-folder'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
         ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads']]],
-      ['pond', [['./', 'My Pond', 'pep-logo'], ['#shop', 'Shop', 'shop-bag'], ['#tip', 'Tip jar.exe', 'gif-045-still'], [serious, 'Serious mode', 'serious']]],
+      ['pond', [['./', 'My Pond', 'pep-logo'], ['#shop', 'Shop', 'shop-bag'], ['#mail', 'Write a letter', 'frog-mail'], [serious, 'Serious mode', 'serious']]],
       ['nerds', [['#nerds', 'NERDS ONLY', 'nerds-folder']]],
       ['bin', [['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
-    var ACT = { '#wp': wpFolder, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': tipJar, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#wp': wpFolder, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -1383,7 +1383,8 @@
       ['Not PEP (0x)', 'PEPE and PEPECOIN are not PEP', 'wrongpep', 'pepe pepecoin ethereum erc20 token wrong scam', act('#notpep')],
       ['Frog Mail', 'The Pond Gazette', 'frog-mail', 'mail news gazette newsletter', frogMail],
       ['Shop', 'Official Pepecoin shop', 'shop-bag', 'shop merch buy store', act('#shop')],
-      ['Tip jar.exe', 'Support this site', 'gif-045-still', 'tip donate support', tipJar],
+      ['About me', 'Who builds this pond (and how to support it)', 'night-shift', 'about me byl author tip donate support', aboutMe],
+      ['Write a letter', 'Send an idea, a wish or a bug to the builder', 'frog-mail', 'write letter feedback contact message bug idea mail', function () { frogMail('write'); }],
       ['Log On', 'Guest or Discord', 'gif-085-still', 'log on login sign in account discord guest', logOn],
       ['LaptopIndex.exe', 'The Legendary Laptop', 'gif-012-still', 'laptop legend 40 million ath', laptop],
       ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', 'bin trash recycle paper hands', paperHands]
@@ -1530,14 +1531,43 @@
     }
   }
 
-  // ---------- Tip jar: the same receiving addresses as the footer ----------
-  function tipJar() {
-    openApp('tip', 'Tip jar.exe', 'gif-045-still', function (A) {
+  // ---------- counter.exe: a tiny 90s visitor counter. One number from the server (people counted once a day,
+  // no cookie, no IP; the same data as the owner's statistics). Hidden if the server does not answer.
+  if (mainEl) (function () {
+    fetch(SB_URL + '/rest/v1/rpc/gry_counter', { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: '{}' })
+      .then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+        if (!j || !(j.frogs > 0)) return;
+        var n = String(j.frogs); while (n.length < 6) n = '0' + n;
+        var since = j.since ? new Date(j.since + 'T12:00:00').toLocaleDateString([], { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+        var b = el('button', { type: 'button', class: 'hitc', title: 'Visitor counter: ' + j.frogs + ' frogs so far' },
+          '<span class="hitc-d">' + n.split('').map(function (c) { return '<i>' + c + '</i>'; }).join('') + '</span><span class="hitc-l">frogs visited</span>');
+        b.addEventListener('click', function () {
+          osDialog('counter.exe', '<div class="dlg-row"><img src="img/peek.webp" alt="" width="96" height="96"><div><h3>' + fmt.int(j.frogs) + ' frogs and counting</h3>' +
+            '<p>Every visitor counts once a day' + (since ? ', since ' + esc(since) : '') + '. No cookies, no IP address, no tracking pixels: just a frog with a tally sheet.</p>' +
+            '<p>Best viewed in 800×600. Sign the guestbook in <b>Frog Mail</b>.</p></div></div>', [{ label: 'Write a letter', fn: function () { frogMail('write'); } }, { label: 'OK' }], 'pep-logo');
+        });
+        document.body.appendChild(b);
+      }, function () {});
+  })();
+
+  // ---------- About me: who builds the pond, the support addresses (same as the footer) and a small task ----------
+  var SHARE_TEXT = 'Pepecoin $PEP: a frog with its own proof-of-work blockchain. No premine, no token on someone else\'s chain. Have a look 🐸';
+  function aboutMe() {
+    openApp('about', 'About me.txt', 'night-shift', function (A) {
       var ADDR = [['Pepecoin (PEP)', 'PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t'], ['Litecoin (LTC)', 'ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j'], ['Dogecoin (DOGE)', 'DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v'], ['Bitcoin (BTC)', 'bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p']];
-      A.body.innerHTML = '<div class="tip"><img src="img/gif-045.webp" alt="" width="120" height="60"><div><b>Like this site? You can support its further development.</b><p>Any amount, however small, helps. Thank you!</p></div></div>' +
+      var url = 'https://pepecoinhub.com/meme/';
+      A.body.innerHTML = '<div class="tip about"><img src="img/night-shift.webp" alt="Pepe at the computer late at night" width="120" height="84"><div><b>Byl.</b>' +
+        '<p>Just a regular anon from the internet with way too much free time and years of shitposting experience.</p><p>That\'s the whole bio. Nothing interesting here…</p></div></div>' +
+        '<p class="about-q">Like what you see? The site, the work, the effort? Got too much money and no idea what to do with it? <b>Good lord.</b> Then you can support me:</p>' +
         '<ul class="tip-list">' + ADDR.map(function (a) { return '<li><span>' + a[0] + '</span><code>' + a[1] + '</code><button type="button" class="app-btn" data-a="' + a[1] + '">Copy</button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip tip-msg">Tips go one way only. This site never asks for a seed phrase or a password.</p>';
+        '<p class="bin-tip tip-msg">Tips go one way only. This site never asks for a seed phrase or a password.</p>' +
+        '<div class="tip about-task"><img src="img/unclesam.webp" alt="Pepe pointing at you" width="96" height="96"><div>' +
+        '<p>Answered <b>"no"</b> to any of those? Then you have a task: post about Pepecoin on X or Reddit, or tell a friend. <b>Today. Now.</b></p>' +
+        '<div class="app-row"><a class="app-btn go" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(SHARE_TEXT) + '&url=' + encodeURIComponent(url) + '">Post on X</a>' +
+        '<a class="app-btn" target="_blank" rel="noopener" href="https://www.reddit.com/submit?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent('Pepecoin $PEP: a frog with its own PoW chain') + '">Reddit</a>' +
+        '<button type="button" class="app-btn about-mail">✏️ Write me a letter</button></div></div></div>';
       var m = A.body.querySelector('.tip-msg');
+      A.body.querySelector('.about-mail').addEventListener('click', function () { frogMail('write'); });
       A.body.querySelectorAll('[data-a]').forEach(function (b) {
         b.addEventListener('click', function () {
           var t = b.getAttribute('data-a');
@@ -1546,8 +1576,9 @@
           else m.textContent = 'Select the address and copy it by hand.';
         });
       });
-    }, 560);
+    }, 580);
   }
+  var tipJar = aboutMe;   // old links and the "tip" easter egg open About me now
 
   // ---------- AddressCheck.exe: is this really a PEP address? Format and checksum only, in this browser ----------
   // PEP: version byte 56 (starts with P) for normal addresses, 22 (starts with 9 or A) for script/multisig addresses.
@@ -2083,21 +2114,46 @@
   }
   function mailRead() { try { return +(localStorage.getItem(MAIL_KEY) || -1) >= MAIL_ISSUE; } catch (e) { return false; } }
   function paintMail() {
-    var unread = !mailRead();
-    document.querySelectorAll('.tray-mail').forEach(function (b) { b.classList.toggle('has-mail', unread); b.title = unread ? 'Frog Mail: 1 unread, a new Pond Gazette' : 'Frog Mail'; b.setAttribute('aria-label', b.title); });
-    document.querySelectorAll('.mail-new').forEach(function (e) { e.hidden = !unread; });
+    var gz = !mailRead() ? 1 : 0, lt = (letterBox && letterBox.unread) || 0, n = gz + lt;
+    var t = lt ? 'Frog Mail: ' + lt + (lt === 1 ? ' new letter' : ' new letters') + ' for you' : gz ? 'Frog Mail: 1 unread, a new Pond Gazette' : 'Frog Mail';
+    document.querySelectorAll('.tray-mail').forEach(function (b) { b.classList.toggle('has-mail', n > 0); b.title = t; b.setAttribute('aria-label', b.title); });
+    document.querySelectorAll('.mail-new').forEach(function (e) { e.hidden = !n; e.textContent = n + ' new'; });
   }
-  function frogMail() {
+  // Letters from visitors to the site owner. Anyone can write (guests after one quick bot check),
+  // only the owner's Discord account can read them (games.owners on the server).
+  var letterBox = null;   // the owner's last inbox answer, or null for everyone else
+  function checkLetters() {
+    var s = sbSession(); if (!s || !s.discord) { letterBox = null; return Promise.resolve(null); }
+    return rpc('gry_letters', { p_limit: 200 }).then(function (j) { letterBox = j && j.letters ? j : null; paintMail(); return letterBox; }, function () { return null; });
+  }
+  if (mainEl) setTimeout(checkLetters, 1500);
+  function frogMail(view) {
     try { localStorage.setItem(MAIL_KEY, String(MAIL_ISSUE)); } catch (e) {}
     paintMail();
-    openApp('mail', 'Frog Mail - Inbox', 'frog-mail', function (A) {
-      A.body.innerHTML = '<div class="mail"><ul class="mail-list"><li><button type="button" class="on"><b>The Pond Gazette #2</b><small>Extra! Where\'s Pepe? is coming</small></button></li></ul>' +
-        '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+    var A = openApp('mail', 'Frog Mail - Inbox', 'frog-mail', function (A) {
+      A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
+        '<li><button type="button" data-v="write"><b>✏️ Write a letter</b><small>Ideas, bugs, wishes: straight to the builder</small></button></li>' +
+        '<li><button type="button" data-v="gz"><b>The Pond Gazette #2</b><small>Extra! Where\'s Pepe? is coming</small></button></li>' +
+        '<li class="ml-owner" hidden><button type="button" data-v="box"><b>📥 Letters to you <span class="ml-n"></span></b><small>Only you can see these</small></button></li>' +
+        '</ul><div class="mail-pane"></div></div>';
+      var pane = A.body.querySelector('.mail-pane'), ct = 0;
+      var stopClock = function () { clearInterval(ct); ct = 0; };
+      A.stop = stopClock;
+      var paintOwner = function () {
+        var li = A.body.querySelector('.ml-owner'); li.hidden = !letterBox;
+        if (letterBox) A.body.querySelector('.ml-n').textContent = letterBox.unread ? '(' + letterBox.unread + ' new)' : '';
+      };
+      var show = function (v) {
+        stopClock();
+        A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
+        if (v === 'write') return writeLetter(pane);
+        if (v === 'box') return letterInbox(pane, paintOwner);
+        pane.innerHTML = '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
-        '<p><b>Got an idea, a wish or a bug?</b> Tell us in the LAN Party chat. Every message is read, and the best ideas get built.</p>' +
-        '<button type="button" class="app-btn gz-lan">Open the LAN Party chat →</button></section>' +
+        '<p><b>Got an idea, a wish or a bug?</b> Write a letter right here in Frog Mail. It goes straight to the frog who builds this pond, every letter is read, and the best ideas get built.</p>' +
+        '<div class="app-row"><button type="button" class="app-btn go gz-write">✏️ Write a letter</button><button type="button" class="app-btn gz-lan">Or say it in LAN Party →</button></div></section>' +
         '<section class="gz-wp"><p class="gz-kick">Extra! Extra!</p><h4>Pepe packs his backpack: Where\'s Pepe? starts soon</h4>' +
         '<div class="gz-wpbox"><img src="img/wp-pepe.webp" alt="Pepe the explorer with binoculars" width="110" height="104"><div>' +
         '<p>Every day Pepe sends one photo from somewhere in the world. You get 2 minutes and one pin on the map. The closer you get, the more points: up to 5000 a day.</p>' +
@@ -2109,16 +2165,76 @@
         '<p>Pepe Pictures, the weekly quiz night, needs a host: set the date, pick the pictures, start the rounds and crown the winner. All in the chat.</p>' +
         '<button type="button" class="app-btn gz-tv">More on PEP-TV →</button></section>' +
         '<section class="gz-soon"><p class="gz-kick">Coming in the weekly issues</p><ul><li><b>The week in numbers:</b> price, hashrate, new blocks and supply, with sources.</li><li><b>Pond Picks:</b> the best posts and memes, picked by the community.</li><li><b>Game night winners</b> and the best Pepe Miner runs.</li></ul></section>' +
-        '<p class="gz-foot">When a new issue lands, the flag on the mailbox goes up.</p></article></div>';
-      A.body.querySelector('.gz-lan').addEventListener('click', function () { lanParty(); });
-      A.body.querySelector('.gz-wpgo').addEventListener('click', wheresPepe);
-      A.body.querySelector('.gz-wpad').addEventListener('click', function () { adPlayer(0); });
-      var cnt = A.body.querySelector('.gz-count'), ct = 0;
-      var paintCount = function () { cnt.innerHTML = launchText(); };
-      paintCount(); ct = setInterval(paintCount, 1000);
-      A.stop = function () { clearInterval(ct); };
-      A.body.querySelector('.gz-tv').addEventListener('click', function () { adPlayer(1); });
-    }, 720);
+        '<p class="gz-foot">When a new issue lands, the flag on the mailbox goes up.</p></article>';
+        pane.querySelector('.gz-write').addEventListener('click', function () { show('write'); });
+        pane.querySelector('.gz-lan').addEventListener('click', function () { lanParty(); });
+        pane.querySelector('.gz-wpgo').addEventListener('click', wheresPepe);
+        pane.querySelector('.gz-wpad').addEventListener('click', function () { adPlayer(0); });
+        pane.querySelector('.gz-tv').addEventListener('click', function () { adPlayer(1); });
+        var cnt = pane.querySelector('.gz-count');
+        var paintCount = function () { cnt.innerHTML = launchText(); };
+        paintCount(); ct = setInterval(paintCount, 1000);
+      };
+      A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-v')); }); });
+      A.show = show;
+      paintOwner();
+      checkLetters().then(paintOwner);
+      show('gz');
+    }, 760);
+    if (view && A && A.show) A.show(view);
+  }
+  function writeLetter(pane) {
+    var me = whoAmI(), nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
+    pane.innerHTML = '<form class="letter"><p class="lt-head"><b>To:</b> the frog who builds this pond<br><b>From:</b> ' +
+      (me && me.discord ? esc(me.name) + ' <span class="hs-ok" title="Verified with Discord">✓</span>'
+        : '<input class="ac-in lt-name" maxlength="40" placeholder="Your nickname (optional)" value="' + esc(nick) + '">') + '</p>' +
+      '<textarea class="ac-in lt-body" rows="7" maxlength="1500" placeholder="What should I fix, change or add? A bug, an idea, a game you want, anything."></textarea>' +
+      '<div class="app-row"><button type="submit" class="app-btn go lt-send">✉️ Send</button><span class="lt-left hs-note"></span></div>' +
+      '<p class="hs-note lt-msg">' + (me ? 'Only the builder reads letters. Up to 3 a day.' : 'Sending takes a quick log on: one click as a guest (after a short bot check) or with Discord. Only the builder reads letters. Up to 3 a day.') + '</p></form>';
+    var f = pane.querySelector('form'), body = f.querySelector('.lt-body'), left = f.querySelector('.lt-left'), msg = f.querySelector('.lt-msg'), btn = f.querySelector('.lt-send');
+    var count = function () { left.textContent = (1500 - body.value.length) + ' left'; };
+    var hint = msg.textContent;
+    body.addEventListener('input', function () { count(); if (msg.classList.contains('err')) { msg.classList.remove('err'); msg.textContent = hint; } }); count();
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var text = body.value.trim(), nm = f.querySelector('.lt-name');
+      if (text.length < 2) { msg.textContent = 'Write a few words first.'; msg.classList.add('err'); body.focus(); return; }
+      btn.disabled = true; msg.classList.remove('err'); msg.textContent = 'Sending…';
+      freshSession().then(function (s) { return s || (msg.textContent = 'Quick bot check…', guestSignIn()); })
+        .then(function () { return chatRpc('gry_letter_send', { p_body: text, p_name: nm ? nm.value.trim() : '', p_page: location.pathname }); })
+        .then(function () {
+          pane.innerHTML = '<div class="tip lt-done"><img src="img/gif-045.webp" alt="" width="96" height="96"><div><b>Letter sent! 🐸</b><p>It landed in the builder\'s mailbox. Thanks for helping make the pond better.</p><button type="button" class="app-btn lt-again">Write another</button></div></div>';
+          pane.querySelector('.lt-again').addEventListener('click', function () { writeLetter(pane); });
+        }, function (err) { btn.disabled = false; msg.textContent = err.message || 'The mailbox cannot be reached right now. Try again in a minute.'; msg.classList.add('err'); });
+    });
+    setTimeout(function () { body.focus(); }, 50);
+  }
+  function letterInbox(pane, after) {
+    pane.innerHTML = '<p class="hs-note">Opening the mailbox…</p>';
+    checkLetters().then(function (box) {
+      if (after) after();
+      if (!box) { pane.innerHTML = '<p class="hs-note">Only the site owner can open this mailbox.</p>'; return; }
+      if (!box.letters.length) { pane.innerHTML = '<div class="letters"><p class="hs-note">No letters yet. When someone writes, the flag on the mailbox goes up.</p></div>'; return; }
+      pane.innerHTML = '<div class="letters">' + box.letters.map(function (l) {
+        return '<details class="lt-item' + (l.read ? '' : ' new') + '" data-id="' + l.id + '"><summary><b>' + (l.discord ? esc(l.name) + ' <span class="hs-ok" title="Discord">✓</span>' : esc(l.name) + ' <small>(guest)</small>') + '</b>' +
+          '<small>' + esc(new Date(l.at).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</small>' +
+          '<span class="lt-peek">' + esc(l.body.slice(0, 70)) + '</span></summary>' +
+          '<p class="lt-text">' + esc(l.body) + '</p><p class="hs-note">' + (l.page ? 'Sent from ' + esc(l.page) : '') + '</p>' +
+          '<div class="app-row"><button type="button" class="app-btn lt-del">🗑 Delete</button></div></details>';
+      }).join('') + '</div>';
+      pane.querySelectorAll('.lt-item').forEach(function (d) {
+        var id = +d.getAttribute('data-id');
+        d.addEventListener('toggle', function () {
+          if (!d.open || !d.classList.contains('new')) return;
+          d.classList.remove('new');
+          rpc('gry_letter_mark', { p_id: id }).then(function () { if (letterBox && letterBox.unread) letterBox.unread--; paintMail(); if (after) after(); }, function () {});
+        });
+        d.querySelector('.lt-del').addEventListener('click', function () {
+          if (!confirm('Delete this letter for good?')) return;
+          rpc('gry_letter_mark', { p_id: id, p_delete: true }).then(function () { d.remove(); }, function (e) { alert(e.message); });
+        });
+      });
+    });
   }
 
   // ---------- Recycle Bin: the paper-hands files and a note with the easter egg codes ----------
@@ -2156,7 +2272,7 @@
       '  type  seed     -> security lesson',
       '  type  moon     -> look for the moon',
       '  type  laptop   -> the legendary 40M PEP laptop',
-      '  type  tip      -> the tip jar',
+      '  type  tip      -> about me (and the tip addresses)',
       '  up up down down left right left right B A',
       '',
       'mouse / finger:',
@@ -2358,7 +2474,7 @@
     typed = (typed + e.key.toLowerCase()).slice(-12);
     if (/wen$/.test(typed)) { typed = ''; osDialog('wen.exe', '<div class="dlg-row"><img src="img/gif-064.webp" alt="" width="96" height="70"><div><h3>wen.exe has performed a legal operation.</h3><p>No price predictions are installed on this system. For arithmetic, open WhatIf.exe.</p></div></div>', [{ label: 'OK', go: true }, { label: 'Open WhatIf.exe', href: 'calculator.html' }], 'gif-064-still'); }
     else if (/seed$/.test(typed)) { typed = ''; osDialog('Security Center', '<div class="dlg-row"><img src="img/gif-085.webp" alt="" width="96" height="96"><div><h3>Seed phrase? Never here.</h3><p>PondOS will never ask for it. Not support, not admins, not frogs. If anything asks you to type it, close it.</p></div></div>', [{ label: 'Understood', go: true }], 'gif-085-still'); }
-    else if (/tip$/.test(typed)) { typed = ''; tipJar(); }
+    else if (/tip$/.test(typed)) { typed = ''; aboutMe(); }
     else if (/laptop$/.test(typed)) { typed = ''; laptop(); }
     else if (/moon$/.test(typed)) { typed = ''; coinRain(8); balloon('Moon not found', 'The frog checked. There is no moon in chainparams.cpp.', 'gif-084-still'); }
   });

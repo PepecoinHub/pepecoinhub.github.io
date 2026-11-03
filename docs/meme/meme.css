@@ -1369,3 +1369,43 @@ footer.foot a { color: #edf3e3; }
 .lan-ment { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .app-win .sweep-frame { height: 560px; }
 .app-win.is-max .sweep-frame { height: calc(100dvh - 120px) !important; }
+
+/* Frog Mail: write a letter / the owner's letters */
+.mail-pane { min-width: 0; }
+.letter { display: grid; gap: 8px; padding: 12px; background: #fff; color: #000; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); font: 400 13px/1.4 var(--f-chrome); }
+.letter .lt-head { margin: 0; display: grid; gap: 4px; }
+.letter .lt-name { max-width: 260px; }
+.letter .lt-body { min-height: 140px; }
+.letter .app-row { display: flex; gap: 8px; align-items: center; }
+.letter .lt-left { flex: 1; text-align: right; }
+.hs-note.err { color: #b00000; font-weight: 700; }
+.lt-done { padding: 12px; background: #fff; color: #000; }
+.letters { display: grid; gap: 4px; max-height: 62vh; overflow: auto; padding: 6px; background: #fff; color: #000; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); font: 400 13px/1.4 var(--f-chrome); }
+.lt-item { border-bottom: 1px solid #ddd; padding: 4px 2px; }
+.lt-item summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; cursor: pointer; list-style: none; }
+.lt-item summary::-webkit-details-marker { display: none; }
+.lt-item.new summary b::before { content: '● '; color: #d61f1f; }
+.lt-item .lt-peek { grid-column: 1 / -1; color: #555; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lt-item[open] .lt-peek { display: none; }
+.lt-item .lt-text { margin: 6px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.gazette .app-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* About me */
+.about b:first-child { font-size: 18px; }
+.about p { margin: 4px 0; }
+.about-q { margin: 10px 0 6px; font: 400 13px/1.45 var(--f-chrome); color: var(--ink); }
+.about-task { margin-top: 10px; padding: 8px; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); grid-template-columns: 96px minmax(0, 1fr); }
+.about-task p { margin: 0 0 8px; }
+.about-task .app-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.about-task a.app-btn { text-decoration: none; display: inline-flex; align-items: center; }
+@media (max-width: 480px) { .about-task { grid-template-columns: 64px minmax(0, 1fr); } .about-task img { width: 64px; height: auto; } }
+
+/* counter.exe: the little LED visitor counter on the desktop */
+.hitc { display: none; position: absolute; z-index: 2; top: 14px; right: 12px; flex-direction: column; align-items: center; gap: 3px; padding: 4px 5px 3px; border: 0; background: #c0c0c0; cursor: pointer;
+  box-shadow: inset -1px -1px 0 #404040, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080; }
+.hitc-d { display: flex; gap: 1px; padding: 2px; background: #000; box-shadow: inset 1px 1px 0 #404040; }
+.hitc-d i { display: block; width: 11px; font: 700 15px/18px ui-monospace, Consolas, "Courier New", monospace; font-style: normal; color: #39ff14; text-align: center; background: #111; text-shadow: 0 0 4px rgba(57, 255, 20, .6); }
+.hitc-l { font: 400 10px/1 var(--f-chrome); color: #000; }
+.pondos body[data-page="index"] .hitc, .pondos.desk-view body .hitc, .pondos.desk-empty body .hitc { display: flex; }
+@media (min-width: 761px) { .hitc { position: fixed; z-index: 60; } }
+@media (prefers-reduced-motion: no-preference) { .hitc:hover .hitc-d i { color: #7dff63; } }
