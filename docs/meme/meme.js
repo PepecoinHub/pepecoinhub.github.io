@@ -158,6 +158,13 @@
       var open = function (o) {
         if (o) smMain.querySelectorAll('.sm-group').forEach(function (x) { if (x !== g) { x.querySelector('.sm-sub').hidden = true; x.querySelector('.sm-item').setAttribute('aria-expanded', 'false'); } });
         sub.hidden = !o; b.setAttribute('aria-expanded', String(o));
+        // computer: the list opens DOWN from its row; only if it would run under the taskbar is it lifted just enough
+        sub.style.top = ''; sub.style.bottom = '';
+        if (o && matchMedia('(min-width: 761px)').matches) {
+          sub.style.top = '-4px'; sub.style.bottom = 'auto';
+          var r = sub.getBoundingClientRect(), room = innerHeight - 46 - r.bottom;
+          if (room < 0) sub.style.top = Math.max(-4 + room, 8 - b.getBoundingClientRect().top) + 'px';
+        }
       };
       b.addEventListener('click', function (e) { e.stopPropagation(); open(sub.hidden); });
       g.addEventListener('mouseenter', function () { if (matchMedia('(hover: hover) and (min-width: 761px)').matches) open(true); });
@@ -189,8 +196,7 @@
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Where's Pepe?", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
-      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }],
-      ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', function () { paperHands(); }]].concat(BETA ? [['POND WARS (beta)', 'Testing: only you can see this', 'pondwars', function () { pondWarsApp(); }]] : []).forEach(function (g) {
+      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat(BETA ? [['POND WARS (beta)', 'Testing: only you can see this', 'pondwars', function () { pondWarsApp(); }]] : []).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
