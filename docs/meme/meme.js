@@ -912,6 +912,8 @@
       if (go) { try { var pr = go.call(host); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {} }
     };
     host.querySelector('.w-full').addEventListener('click', A.full);
+    // dragging the corner (CSS resize) gives the window a fixed height: then its content fills it
+    if (window.ResizeObserver) new ResizeObserver(function () { host.classList.toggle('is-sized', !!host.style.height && !host.classList.contains('is-max')); }).observe(host);
     // minimize: the window hides and waits as a button on the taskbar (also on a phone); the game keeps its state
     A.restore = function () { host.classList.remove('is-min'); if (A.taskBtn) { A.taskBtn.remove(); A.taskBtn = null; } focusApp(A); };
     host.querySelector('.w-min').addEventListener('click', function () {
