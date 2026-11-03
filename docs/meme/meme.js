@@ -1805,8 +1805,23 @@
       var makeMap = function (box) {
         if (map) { map.remove(); map = null; }
         map = L.map(box, { worldCopyJump: true, minZoom: 1, zoomControl: true, attributionControl: true }).setView([25, 10], 1);
-        // OpenStreetMap's own tiles (place names in the local language). CARTO's free tiles now need an API key.
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(map);
+        // Esri World Street Map: place names in English, no key (note the {y}/{x} order). If its tiles fail to load
+        // (several errors before any tile arrives, or nothing after 8 s), the map switches to OpenStreetMap's own
+        // tiles (local place names). CARTO's free tiles needed an API key, so they are gone.
+        var osm = function () {
+          return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' });
+        };
+        var esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 18, attribution: 'Tiles © <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a> · Sources: Esri, HERE, Garmin, USGS, © OpenStreetMap contributors and the GIS user community' });
+        var loaded = 0, failed = 0, switched = false, m0 = map;
+        var fallback = function () {
+          if (switched || map !== m0) return; switched = true;
+          m0.removeLayer(esri); osm().addTo(m0);
+        };
+        esri.on('tileload', function () { loaded++; });
+        esri.on('tileerror', function () { failed++; if (!loaded && failed >= 3) fallback(); });
+        setTimeout(function () { if (!loaded) fallback(); }, 8000);
+        esri.addTo(map);
         setTimeout(function () { if (map) map.invalidateSize(); }, 60);
         return map;
       };
