@@ -28,6 +28,14 @@ export const EMOTES = [
   { code: 'hmm', label: 'Hmm…' },
   { code: 'sleepy', label: 'Sleepy' },
   { code: 'bigbrain', label: 'Big brain' },
+  // the PEP frog crew
+  { code: 'balloons', label: 'Up, up and away' },
+  { code: 'juicebox', label: 'Juice box' },
+  { code: 'brb', label: 'brb' },
+  { code: 'chonky', label: 'Chonky' },
+  { code: 'comfy', label: 'Comfy' },
+  { code: 'explorer', label: 'Exploring' },
+  { code: 'backpack', label: 'On my way' },
 ];
 const BY = Object.fromEntries(EMOTES.map((e) => [e.code, e]));
 const src = (c) => `img/emotes/${c}.webp`;

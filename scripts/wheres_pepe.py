@@ -44,7 +44,11 @@ CLASSES = {
 BANDS = [(120, 100000), (60, 119), (30, 59)]   # sitelinks: famous / known / harder; one band is drawn at random
 
 # pose file -> which way Pepe faces ("left" means he stands on the right side, looking into the picture)
-FACES = {"camera-left": "left"}
+FACES = {"juicebox": "left", "brb": "left", "chonky": "left", "comfy": "left", "explorer": "left", "backpack": "left"}
+# poses cut off at the chest: they stand on the bottom edge of the photo, without a shadow
+BUSTS = {"explorer"}
+# the balloons take most of that picture: it gets more height, so Pepe himself is not tiny
+TALL = {"balloons": (0.66, 0.78), "explorer": (0.42, 0.5)}
 
 FREE_LICENCE = re.compile(r"^(cc0|public domain|pd|cc by(-sa)? \d\.\d|cc by(-sa)?( \d\.\d)?)", re.I)
 
@@ -199,16 +203,19 @@ def compose(photo_bytes, rng):
 
     pose_file = rng.choice(sorted(POSES.glob("*.png")))
     pose = Image.open(pose_file).convert("RGBA")
-    ph = int(H * rng.uniform(0.38, 0.46))
+    lo, hi = TALL.get(pose_file.stem, (0.38, 0.46))
+    ph = int(H * rng.uniform(lo, hi))
     pose = pose.resize((round(pose.width * ph / pose.height), ph), Image.LANCZOS)
     right = FACES.get(pose_file.stem) == "left"
     margin = int(W * 0.03)
     x = W - pose.width - margin if right else margin
-    y = H - pose.height - int(H * 0.02)
+    bust = pose_file.stem in BUSTS
+    y = H - pose.height if bust else H - pose.height - int(H * 0.02)
     # a soft shadow under his feet
     sh = Image.new("RGBA", im.size, (0, 0, 0, 0))
     ImageDraw.Draw(sh).ellipse((x + pose.width * 0.12, y + ph * 0.93, x + pose.width * 0.88, y + ph * 1.02), fill=(0, 0, 0, 90))
-    im = Image.alpha_composite(im, sh.filter(ImageFilter.GaussianBlur(8)))
+    if not bust:
+        im = Image.alpha_composite(im, sh.filter(ImageFilter.GaussianBlur(8)))
     im.alpha_composite(pose, (x, y))
     out = im.convert("RGB")
     for q in (78, 70, 62, 55):
