@@ -1328,3 +1328,23 @@ footer.foot a { color: #edf3e3; }
 }
 /* labels stay readable on the bright sky */
 .desk .icons a span, .desk-corner a span { text-shadow: 0 0 3px #000, 1px 1px 2px #000, 0 0 6px rgba(0,0,0,.6); }
+/* LEADERS window */
+.lead-head { display: flex; align-items: center; gap: 10px; padding: 6px 8px; background: linear-gradient(90deg, #fff1b8, #fffbe8); border: 1px solid #c9a227; }
+.lead-head b { display: block; font: 900 22px/1 "Arial Black", Impact, var(--f-chrome); letter-spacing: .06em; color: #7a5200; }
+.lead-head span { font-size: 12px; color: #5b4a1e; }
+.hs-tabs { flex-wrap: wrap; }
+.lead-lists.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lead-sub { margin: 0 0 2px; font-weight: 700; font-size: 12px; }
+@media (max-width: 560px) { .lead-lists.two { grid-template-columns: 1fr; } }
+/* board games: pick "vs the bot" or "with a fren" first */
+.bg-pick { display: flex; flex-wrap: wrap; align-items: center; align-content: center; justify-content: center; gap: 14px; padding: 24px 12px; min-height: 50vh; text-align: center; }
+.bg-pick > p { flex-basis: 100%; margin: 0 0 4px; font-weight: 700; font-size: 16px; }
+.bg-big { display: grid; justify-items: center; gap: 4px; width: 210px; padding: 18px 12px; background: var(--chrome); color: var(--ink); border: 0; box-shadow: inset -1px -1px 0 var(--chrome-dk), inset 1px 1px 0 var(--chrome-hi), inset -2px -2px 0 var(--chrome-lo); cursor: pointer; font: inherit; }
+.bg-big:active { box-shadow: inset 1px 1px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
+.bg-big span { font-size: 40px; line-height: 1; }
+.bg-big b { font-size: 16px; }
+.bg-big small { font-size: 12px; opacity: .8; }
+.bg-row { flex-wrap: wrap; align-items: center; }
+.bg-stage { display: grid; gap: 6px; min-height: 0; }
+.bg-link .ac-in { flex: 1; min-width: 0; font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+.app-win.app-full .bg-stage .app-frame { height: calc(100dvh - 190px); }
