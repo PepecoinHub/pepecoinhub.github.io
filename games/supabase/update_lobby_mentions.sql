@@ -25,10 +25,17 @@ alter table games.mention_optout enable row level security;
 -- "@Big Frog" is Big Frog and not also "Big".
 create or replace function games.lobby_mentions_after_insert() returns trigger
 language plpgsql security definer set search_path = '' as $$
-declare rest text; p record; n int := 0; recent int;
+declare rest text; p record; n int := 0; recent int; d jsonb;
 begin
-  if not new.verified or position('@' in new.body) = 0 then return new; end if;
-  if games.discord_identity(new.user_id) is null then return new; end if;
+  if not new.verified then return new; end if;
+  d := games.discord_identity(new.user_id);
+  if d is null then return new; end if;
+  -- a Discord player who only chats (never joined a room) gets the chat nickname reserved here,
+  -- so others can @mention them (the chat already checked the name is free)
+  insert into games.profiles(user_id, nick, nick_key, discord_id, discord_name)
+  values (new.user_id, new.nick, games.nick_key(new.nick), d->>'id', d->>'name')
+  on conflict do nothing;
+  if position('@' in new.body) = 0 then return new; end if;
   select count(*) into recent from games.lobby_mentions where from_user = new.user_id and created_at > now() - interval '10 minutes';
   if recent >= 15 then return new; end if;
   rest := lower(new.body);
@@ -52,6 +59,7 @@ begin
 end $$;
 
 drop trigger if exists lobby_mentions_ai on games.lobby_chat;
+-- (trigger is created again just below)
 create trigger lobby_mentions_ai after insert on games.lobby_chat
   for each row execute function games.lobby_mentions_after_insert();
 
@@ -114,3 +122,14 @@ revoke all on function public.gry_my_mentions(), public.gry_mentions_seen(bigint
   public.gry_mention_names(text) from public, anon;
 grant execute on function public.gry_my_mentions(), public.gry_mentions_seen(bigint), public.gry_mention_optout(boolean),
   public.gry_mention_names(text) to authenticated;
+
+-- Discord players who wrote in the chat in the last 24 hours but never joined a room: reserve their latest chat
+-- nickname now, so they can be mentioned right away.
+insert into games.profiles(user_id, nick, nick_key, discord_id, discord_name)
+select distinct on (c.user_id) c.user_id, c.nick, games.nick_key(c.nick), x.d->>'id', x.d->>'name'
+  from games.lobby_chat c
+  cross join lateral (select games.discord_identity(c.user_id) d) x
+ where c.verified and x.d is not null
+   and not exists (select 1 from games.profiles pr where pr.user_id = c.user_id)
+ order by c.user_id, c.id desc
+on conflict do nothing;
