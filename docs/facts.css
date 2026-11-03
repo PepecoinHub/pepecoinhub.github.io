@@ -1302,3 +1302,7 @@ body.pk-page { padding: 0; }
 @media (max-width: 760px) { .pk-logos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* a little air between the hero (with the green "PEP at a glance" box) and "Looking for Pepe coin?" */
 .home-hero + .pep-id { margin-top: 22px; }
+
+/* the spinning hero coin: no filter on the animated image (see home.js); a soft static glow sits behind it instead */
+.home-hero-frog.is-spinning { filter: none !important; }
+.home-hero-visual:has(.is-spinning) .home-hero-glow { width: 86%; height: 86%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent) 0, transparent 68%); filter: none; }
