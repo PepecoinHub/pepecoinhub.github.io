@@ -1349,3 +1349,12 @@ footer.foot a { color: #edf3e3; }
 .bg-link .ac-in { flex: 1; min-width: 0; font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
 .app-win.app-full .bg-stage .app-frame { height: calc(100dvh - 150px); }
 .app-win.app-full .bg-stage .bin-tip { margin: 0; }
+/* Find window */
+.find-form { align-items: center; }
+.find-form .find-in { flex: 1; min-width: 0; font-size: 15px; padding: 6px 8px; }
+.find-list { list-style: none; margin: 0; padding: 4px; max-height: min(52vh, 420px); overflow: auto; background: #fff; color: #000; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
+.find-list button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 5px 6px; background: none; border: 0; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.find-list button:hover, .find-list button:focus-visible { background: var(--sel, #0c5a2c); color: #fff; outline: none; }
+.find-list img { flex: none; width: 28px; height: 28px; object-fit: contain; }
+.find-list b { display: block; font-size: 13px; }
+.find-list small { display: block; font-size: 11px; opacity: .8; }

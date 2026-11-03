@@ -32,7 +32,6 @@
       ['supply', 'Supply', 'No cap, falling inflation', 'farmer']
     ]],
     ['Community', [
-      ['@games/', 'PEP Games', 'Charades, Pepe Miner, chat', 'pond-playground'],
       ['@links.html', 'Links', 'Official and community sites', 'fren-chain'],
       ['@press.html', 'For media', 'Facts, sources, logo', 'newspaper-still'],
       ['@', 'Serious edition', 'Same facts, no memes', 'serious']
@@ -159,6 +158,9 @@
     var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="img/gif-085-still.webp" alt="" width="28" height="28"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
     meItem.addEventListener('click', function () { setOpen(false); logOn(); });
     smMain.appendChild(meItem);
+    var findItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('search') + '" alt="" width="28" height="28"><span><b>Find…</b> <small>games, pages, tools</small></span>');
+    findItem.addEventListener('click', function () { setOpen(false); finder(); });
+    smMain.appendChild(findItem);
     smMain.appendChild(el('hr'));
     NAV.forEach(function (g, gi) {
       var list = el('div', { class: 'sm-list' });
@@ -689,6 +691,7 @@
     }
   }
 
+  var DESK_ACT = {};   // the desktop icon actions, also used by Find
   // ---------- desktop icons ----------
   // with a mouse: click selects, double-click opens, drag moves (remembered); on touch a tap opens
   if (mainEl) {
@@ -699,7 +702,7 @@
     // wide screens: from the top-left corner, Log On alone, a gap, then the games in two columns;
     // the rest of the pond in a small group lower down, NERDS ONLY on its own by the Start button, the bin far right
     var DESKTOP = [
-      ['logon', [['#logon', 'Log On', 'gif-085-still']]],
+      ['logon', [['#logon', 'Log On', 'gif-085-still'], ['#find', 'Find', 'search']]],
       ['play', [['#wp', "Where's Pepe?", 'wp-folder'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
         ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads']]],
       ['pond', [['./', 'My Pond', 'pep-logo'], ['#shop', 'Shop', 'shop-bag'], ['#tip', 'Tip jar.exe', 'gif-045-still'], [serious, 'Serious mode', 'serious']]],
@@ -722,6 +725,8 @@
         });
       }, 520);
     };
+    ACT['#find'] = function () { finder(); };
+    DESK_ACT = ACT;
     var desk = el('nav', { class: 'desk', 'aria-label': 'Desktop' });
     desk.innerHTML = '<div class="icon-groups">' + DESKTOP.map(function (g) {
       return '<div class="icon-group g-' + g[0] + '"><ul class="icons">' + g[1].map(function (d) { return '<li' + (d[0] === '#bin' ? ' class="bin-li"' : '') + '><a href="' + d[0] + '" data-id="' + esc(d[1]) + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></a></li>'; }).join('') + '</ul></div>';
@@ -1323,6 +1328,64 @@
   }
 
   // ---------- Games folder ----------
+  // ---------- Find: type a word, get the games, pages and tools that match ----------
+  function findIndex() {
+    var act = function (k) { return function () { if (DESK_ACT[k]) DESK_ACT[k](); }; };
+    var page = function (p) { return function () { location.href = href(p); }; };
+    var L = [
+      ["Where's Pepe?", 'Daily photo hunt on the map', 'wheres-pepe', 'game geo guess map photo travel daily faucet free pep reward points', function () { wheresPepe(); }],
+      ['LEADERS', 'Every top 10 in one place', 'leaders', 'scores high score top ranking leaderboard best winners', function () { highScores(); }],
+      ['YEET THE PEP', 'Catapult a frog, three panic flaps', 'yeet', 'game catapult launch fly distance arcade', function () { yeetApp(); }],
+      ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', 'game arcade shooter invaders fud', invaders],
+      ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', 'game arcade snake blocks', snake],
+      ['Pepe Miner', 'Click, mine, upgrade', 'pickaxe', 'game miner idle clicker mine blocks', minerApp],
+      ['Chess', 'vs the bot or with a fren', 'pond-playground', 'game board chess bot friend multiplayer', function () { boardGame('chess', 'Chess'); }],
+      ['Checkers', 'vs the bot or with a fren', 'pond-playground', 'game board checkers draughts warcaby bot friend', function () { boardGame('checkers', 'Checkers'); }],
+      ['Connect Four', 'vs the bot or with a fren', 'pond-playground', 'game board connect four 4 bot friend', function () { boardGame('connect4', 'Connect Four'); }],
+      ['Sea Battle', 'vs the bot or with a fren', 'pond-playground', 'game board battleship ships sea bot friend statki', function () { boardGame('battleship', 'Sea Battle'); }],
+      ['Draw & Guess', 'Charades with frens', 'gif-061-still', 'game draw guess charades kalambury multiplayer room', drawGuess],
+      ['Pepe Pictures', 'Weekly quiz night: host wanted', 'unclesam', 'game quiz pictures host night', pepePictures],
+      ['Games folder', 'All the games', 'games-folder', 'games play folder', gamesFolder],
+      ['LAN Party', 'The lobby chat', 'gif-080-still', 'chat talk frens online lobby messages', lanParty],
+      ['Pond TV', 'Videos from the Pepecoin channel', 'pond-tv', 'tv video youtube channel watch', pondTV],
+      ['PEP-TV Ads', 'Fake late-night infomercials', 'pep-tv-ads', 'ads tv commercials videos funny', adsFolder],
+      ['NERDS ONLY', 'Charts, whales, math and receipts', 'nerds-folder', 'nerds folder tools data facts', act('#nerds')],
+      ['AddressCheck.exe', 'Is this a real PEP address?', 'pepe-search', 'address check scam verify checksum wallet', addressCheck],
+      ['Not PEP (0x)', 'PEPE and PEPECOIN are not PEP', 'wrongpep', 'pepe pepecoin ethereum erc20 token wrong scam', act('#notpep')],
+      ['Frog Mail', 'The Pond Gazette', 'frog-mail', 'mail news gazette newsletter', frogMail],
+      ['Shop', 'Official Pepecoin shop', 'shop-bag', 'shop merch buy store', act('#shop')],
+      ['Tip jar.exe', 'Support this site', 'gif-045-still', 'tip donate support', tipJar],
+      ['Log On', 'Guest or Discord', 'gif-085-still', 'log on login sign in account discord guest', logOn],
+      ['LaptopIndex.exe', 'The Legendary Laptop', 'gif-012-still', 'laptop legend 40 million ath', laptop],
+      ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', 'bin trash recycle paper hands', paperHands]
+    ].map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
+    NAV.forEach(function (g) { g[1].forEach(function (p) { L.push({ name: p[1], desc: p[2], icon: p[3], kw: 'page ' + g[0] + ' ' + p[0].replace(/[@\/-]/g, ' '), go: page(p[0]) }); }); });
+    ADS.forEach(function (ad, i) { L.push({ name: ad.file, desc: 'PEP-TV ad: ' + ad.title, icon: ad.icon, kw: 'ad ads tv video ' + ad.title, go: function () { adPlayer(i); } }); });
+    return L;
+  }
+  function finder(q0) {
+    var A = openApp('find', 'Find: games, pages and tools', 'search', function (A) {
+      A.body.innerHTML = '<form class="app-row find-form" role="search"><img src="' + ico('search') + '" alt="" width="28" height="28"><input class="ac-in find-in" type="search" placeholder="Type a word: chess, price, faucet, whales…" aria-label="Find" autocomplete="off" spellcheck="false"><button type="submit" class="app-btn">Find</button></form>' +
+        '<ul class="find-list" role="listbox" aria-label="Results"></ul><p class="bin-tip find-tip"></p>';
+      var IDX = findIndex(), inp = A.body.querySelector('.find-in'), ul = A.body.querySelector('.find-list'), tip = A.body.querySelector('.find-tip'), hits = [];
+      var norm = function (t) { return String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); };
+      var run = function () {
+        var words = norm(inp.value).split(/\s+/).filter(Boolean);
+        hits = words.length ? IDX.filter(function (x) { var hay = norm(x.name + ' ' + x.desc + ' ' + x.kw); return words.every(function (w) { return hay.indexOf(w) >= 0; }); })
+          .sort(function (a, b) { var w = words[0]; return (norm(b.name).indexOf(w) === 0) - (norm(a.name).indexOf(w) === 0); }).slice(0, 14)
+          : IDX.slice(0, 8);
+        ul.innerHTML = hits.map(function (x, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(x.icon) + '" alt="" width="28" height="28"><span><b>' + esc(x.name) + '</b><small>' + esc(x.desc) + '</small></span></button></li>'; }).join('');
+        tip.textContent = words.length ? (hits.length ? hits.length + (hits.length === 1 ? ' match' : ' matches') + '. Enter opens the first one.' : 'Nothing found. Try another word: game, chat, price, mining, wallet…') : 'Popular right now. Type to find anything in the pond.';
+      };
+      var open = function (x) { if (x) x.go(); };
+      ul.addEventListener('click', function (e) { var b = e.target.closest('[data-i]'); if (b) open(hits[+b.getAttribute('data-i')]); });
+      A.body.querySelector('.find-form').addEventListener('submit', function (e) { e.preventDefault(); open(hits[0]); });
+      inp.addEventListener('input', run);
+      A.run = function (q) { if (q != null) inp.value = q; run(); setTimeout(function () { inp.focus(); }, 30); };
+    }, 460);
+    A.run(q0);
+  }
+
   // Pepe Pictures (the weekly quiz night) has no host yet: its icon plays the "host wanted" ad
   function pepePictures() { for (var k = 0; k < ADS.length; k++) if (ADS[k].file === 'host_wanted.mpg') { adPlayer(k); return; } }
   function gamesFolder() {
