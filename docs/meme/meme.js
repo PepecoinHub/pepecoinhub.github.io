@@ -1504,7 +1504,7 @@
     '',
     '             a day     a week    starts',
     'Discord      100 PEP   500 PEP   day 1',
-    'Guest         50 PEP   200 PEP   day 3 of your streak',
+    'Guest         50 PEP   200 PEP   day 2 of your streak',
     '',
     '- Guests: one reward per internet connection a day.',
     '- Guest streaks live in your browser: play on the same',
@@ -1707,8 +1707,9 @@
         }, function (e) { sending = false; say(e.message, true); if (timeUp) setTimeout(load, 12000); });
       };
       var shareText = function (r) {
+        // the last line says, without the word "faucet", that good guesses pay a little PEP
         return "🐸 Where's Pepe #" + r.num + ' · ' + (r.g_lat == null ? '📍 no guess' : '📍 ' + fmtKm(r.km)) + ' · ' + (r.points || 0).toLocaleString('en-US') + '/5000' +
-          (T && T.streak > 1 ? ' · 🔥' + T.streak : '') + '\nhttps://pepecoinhub.com/meme/';
+          (T && T.streak > 1 ? ' · 🔥' + T.streak : '') + '\n🎁 Find the frog, get some free PEP in your pocket\nhttps://pepecoinhub.com/meme/';
       };
       var result = function (r) {
         countdownOnly();
@@ -2046,14 +2047,14 @@
       '<p class="ad-kick">Pepe wanted to go to the moon.</p><h3 class="ad-big">Nobody gave him<br>a <em>rocket.</em></h3>',
       '<h3 class="ad-big">So we gave him<br>a <em>catapult!</em></h3><img class="ad-pic" src="../games/img/yeet/pilot.webp" alt="">',
       '<p class="ad-kick">Hold to charge. Release to yeet. Three panic flaps.</p><h3 class="ad-big"><em>PUMP</em> candles launch you.<br>The <em>SELL WALL</em> stops you.</h3><p class="ad-sub">The track changes every round.</p>',
-      '<p class="ad-fine">Helmet included. Aerospace qualifications not included. No PEP prizes: just the Hall of Fren top 10 for Discord players.</p><button type="button" class="ad-cta ad-yeetbtn">Play YEET THE PEP →</button>'
+      '<p class="ad-fine">Helmet included. Aerospace qualifications not included. No PEP prizes: just the Hall of Fren top 10.</p><button type="button" class="ad-cta ad-yeetbtn">Play YEET THE PEP →</button>'
     ] },
     { file: 'wheres_pepe.mpg', title: "Where's Pepe? Starts soon!", ch: 'CH 5000 · THE POND TRAVEL CHANNEL', icon: 'wheres-pepe', scenes: [
       '<p class="ad-kick">Pepe packed a backpack, a map and a camera…</p><h3 class="ad-big">…and now he is<br><em>LOST!</em></h3>',
       '<img class="ad-pic" src="img/wp-pepe.webp" alt=""><p class="ad-sub">Every day he sends one photo from somewhere in the world. Find him on the map!</p>',
       '<h3 class="ad-big">2 minutes.<br>1 pin.<br><em>5000 points!</em></h3><p class="ad-sub">The faster and the closer, the better. Hints show up as the clock runs down.</p>',
       '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big"><em>FREE PEP!*</em></h3><p class="ad-sub ad-launch"></p>',
-      '<p class="ad-fine">*1 PEP per 50 points: up to 100 PEP a day with Discord, up to 50 as a guest (from day 3 of a streak). Weekly budget, paid weekly by the host. No purchase, no seed phrase, no catch.</p><button type="button" class="ad-cta ad-wpbtn">Open Where\'s Pepe? →</button>'
+      '<p class="ad-fine">*1 PEP per 50 points: up to 100 PEP a day with Discord, up to 50 as a guest (from day 2 of a streak). Weekly budget, paid weekly by the host. No purchase, no seed phrase, no catch.</p><button type="button" class="ad-cta ad-wpbtn">Open Where\'s Pepe? →</button>'
     ] },
     { file: 'host_wanted.mpg', title: 'Wanted: a frog to run game night', ch: 'CH 1 · PEPE PICTURES PRIME TIME', icon: 'unclesam', scenes: [
       '<p class="ad-kick">Always the one who organises the group chat?</p><h3 class="ad-big">WANTED:<br>a frog to run<br><em>game night!</em></h3>',

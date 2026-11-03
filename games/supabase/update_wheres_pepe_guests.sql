@@ -7,7 +7,7 @@ alter table games.wp_claims add column if not exists ip_hash text;
 create index if not exists wp_plays_ip on games.wp_plays (puzzle_id, ip_hash);
 alter table games.config add column if not exists wp_guest_max_day int not null default 50;
 alter table games.config add column if not exists wp_guest_max_week int not null default 200;
-alter table games.config add column if not exists wp_guest_streak int not null default 3;
+alter table games.config add column if not exists wp_guest_streak int not null default 2;
 alter table games.config add column if not exists wp_week_budget numeric(14, 2) not null default 5000;
 
 create or replace function games.wp_play_ip() returns trigger
