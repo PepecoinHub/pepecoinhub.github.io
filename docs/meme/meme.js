@@ -931,6 +931,14 @@
     // dragging the corner (CSS resize) gives the window a fixed height: then its content fills it
     if (window.ResizeObserver) new ResizeObserver(function () { host.classList.toggle('is-sized', !!host.style.height && !host.classList.contains('is-max')); }).observe(host);
     // minimize: the window hides and waits as a button on the taskbar (also on a phone); the game keeps its state
+    // games: a minimized window (however it got minimized) pauses; it goes on when it comes back.
+    // An app sets A.pause / A.resume; iframes get a 'pause' message (see pauseFrames).
+    new MutationObserver(function () {
+      var min = host.classList.contains('is-min');
+      if (min === !!A._minPaused) return;
+      A._minPaused = min;
+      if (min) { if (A.pause) A.pause(); pauseFrames(host); } else if (A.resume && !document.hidden) A.resume();
+    }).observe(host, { attributes: true, attributeFilter: ['class'] });
     A.restore = function () { host.classList.remove('is-min'); if (A.taskBtn) { A.taskBtn.remove(); A.taskBtn = null; } focusApp(A); };
     host.querySelector('.w-min').addEventListener('click', function () {
       host.classList.add('is-min'); if (activeApp === A) activeApp = null;
@@ -977,6 +985,36 @@
   }
 
   // ---------- FUD Invaders: receipts versus FUD ----------
+  // an embedded game (Miner, YEET, Sweeper, POND WARS…) is told to pause; each one already listens for its own message
+  function pauseFrames(host) {
+    host.querySelectorAll('iframe').forEach(function (f) {
+      try { ['pondwars-pause', 'pepe-sweeper-pause', 'pause'].forEach(function (m) { f.contentWindow.postMessage(m, location.origin); }); } catch (e) {}
+    });
+  }
+  // a hidden tab pauses every game; when the tab comes back, the ones that are not minimized go on
+  document.addEventListener('visibilitychange', function () {
+    Object.keys(apps).forEach(function (k) {
+      var A = apps[k]; if (!A) return;
+      if (document.hidden) { if (A.pause) A.pause(); }
+      else if (A.resume && !A.host.classList.contains('is-min')) A.resume();
+    });
+  });
+  // ---------- "Today in the pond": the daily Where's Pepe right on the first screen (home page only) ----------
+  if (mainEl && PAGE === 'index') (function () {
+    var ctas = document.querySelector('.ctas'); if (!ctas) return;
+    var card = el('div', { class: 'today-pond', role: 'region', 'aria-label': 'Today in the pond' },
+      '<img src="img/wp-pepe.webp" alt="" width="64" height="60"><div><b>Today in the pond: Where\u2019s Pepe?</b>' +
+      '<span class="tp-line">A new photo every day. Find Pepe on the map in 2 minutes and get some free PEP.</span><span class="tp-stats"></span></div>' +
+      '<button type="button" class="btn go tp-play">Play today\u2019s photo \u2192</button>');
+    ctas.parentNode.insertBefore(card, ctas.nextSibling);
+    card.querySelector('.tp-play').addEventListener('click', function () { wheresPepe(); });
+    var stats = card.querySelector('.tp-stats'), bits = [];
+    var paint = function () { stats.textContent = bits.filter(Boolean).join(' \u00b7 '); };
+    setTimeout(function () {   // after the rest of this file has set up the Supabase address
+      rpc('gry_wp_count').then(function (c) { if (c && c.players) { bits[0] = '\ud83d\udc38 ' + c.players + (c.players === 1 ? ' player' : ' players') + ' today'; paint(); } }, function () {});
+      rpc('gry_wp_top', { p_scope: 'day' }).then(function (rows) { if (rows && rows[0]) { bits[1] = '\ud83c\udfc6 ' + rows[0].nick + ' leads with ' + Number(rows[0].points).toLocaleString('en-US'); paint(); } }, function () {});
+    }, 0);
+  })();
   function invaders() {
     openApp('fud', 'FUD Invaders - receipts vs FUD', 'gif-008-still', function (A) {
       A.body.innerHTML = '<canvas width="480" height="360" aria-label="FUD Invaders. Move with the arrow keys and fire receipts with Space."></canvas>' +
@@ -1040,7 +1078,9 @@
         raf = requestAnimationFrame(frame);
       };
       raf = requestAnimationFrame(frame);
-      A.stop = function () { cancelAnimationFrame(raf); unkey(); };
+      A.stop = function () { cancelAnimationFrame(raf); raf = 0; unkey(); };
+      A.pause = function () { cancelAnimationFrame(raf); raf = 0; keys.left = keys.right = 0; };
+      A.resume = function () { if (!raf) raf = requestAnimationFrame(frame); };
     }, 520);
   }
 
@@ -1111,6 +1151,9 @@
       var unkey = gameKeys(A, { ArrowLeft: K('left'), ArrowRight: K('right'), ArrowUp: K('up'), ArrowDown: K('down'), a: K('left'), d: K('right'), w: K('up'), s: K('down'), ' ': function (d) { if (d && !timer) start('space'); } });
       face.onload = draw; draw();
       A.stop = function () { clearInterval(timer); unkey(); };
+      var held = false;
+      A.pause = function () { if (timer) { clearInterval(timer); timer = null; held = true; msg.textContent = 'Paused. The snake waits for you.'; } };
+      A.resume = function () { if (held && s) { held = false; timer = setInterval(tick, tickMs); msg.textContent = 'Back in the pond!'; } };
     }, 520);
   }
 

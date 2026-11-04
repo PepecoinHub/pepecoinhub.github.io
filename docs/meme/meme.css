@@ -1444,3 +1444,14 @@ footer.foot a { color: #edf3e3; }
 .app-win.is-max .gazette, .app-win.is-sized .gazette, .app-win.is-max .letters, .app-win.is-sized .letters,
 .app-win.is-max .wp-hostbody, .app-win.is-sized .wp-hostbody { max-height: none; }
 .app-win.is-max .mail > .gazette, .app-win.is-sized .mail > .gazette, .app-win.is-max .mail-pane > .gazette, .app-win.is-sized .mail-pane > .gazette { flex: 1; height: 100%; min-height: 0; }
+
+/* "Today in the pond": the daily Where's Pepe on the home page */
+.today-pond { display: flex; align-items: center; gap: 12px; margin: 16px 0 4px; padding: 10px 12px; background: color-mix(in srgb, #ffcc37 18%, var(--chrome, #e6e3d4)); border: 2px solid; border-color: var(--chrome-hi, #fff) var(--chrome-dk, #2b2f28) var(--chrome-dk, #2b2f28) var(--chrome-hi, #fff); color: var(--ink); max-width: 720px; }
+.today-pond img { flex: none; width: 64px; height: auto; }
+.today-pond > div { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.today-pond b { font-size: 1rem; }
+.today-pond .tp-line { font-size: .86rem; }
+.today-pond .tp-stats { font-size: .8rem; color: var(--muted); }
+.today-pond .tp-stats:empty { display: none; }
+.today-pond .tp-play { flex: none; white-space: nowrap; }
+@media (max-width: 560px) { .today-pond { flex-wrap: wrap; } .today-pond .tp-play { width: 100%; text-align: center; } }
