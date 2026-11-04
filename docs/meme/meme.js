@@ -1935,9 +1935,8 @@
       };
       var shareText = function (r) {
         // the last line says, without the word "faucet", that good guesses pay a little PEP
-        var pts = r.points || 0, bar = '';
-        for (var q = 0; q < 5; q++) { var left = pts - q * 1000; bar += left >= 1000 ? '🟩' : left >= 500 ? '🟨' : '⬜'; }
-        return "🐸 Where's Pepe #" + r.num + ' ' + bar + '\n' + (r.g_lat == null ? '📍 no guess' : '📍 ' + fmtKm(r.km)) + ' · ' + pts.toLocaleString('en-US') + '/5000' +
+        var pts = r.points || 0;
+        return "🐸 Where's Pepe #" + r.num + '\n' + (r.g_lat == null ? '📍 no guess' : '📍 ' + fmtKm(r.km)) + ' · ' + pts.toLocaleString('en-US') + '/5000' +
           (T && T.streak > 1 ? ' · 🔥' + T.streak : '') + '\n🎁 Find the frog, get some free PEP in your pocket\nhttps://pepecoinhub.com/meme/';
       };
       var result = function (r) {
