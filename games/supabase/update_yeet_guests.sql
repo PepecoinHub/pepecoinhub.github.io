@@ -34,7 +34,7 @@ declare v text := btrim(regexp_replace(coalesce(p_nick, ''), '\s+', ' ', 'g')); 
 begin
 if p_version is distinct from 1 then raise exception 'Refresh the game before submitting'; end if;
 if p_score is null or p_score < 1 or p_score > 60000 then raise exception 'Invalid flight distance'; end if;
-if p_ms is null or p_ms < 1000 or p_ms > 90500 then raise exception 'Invalid flight duration'; end if;
+if p_ms is null or p_ms < 1000 or p_ms > 240500 then raise exception 'Invalid flight duration'; end if;
 if p_score::bigint > p_ms::bigint + 100 then raise exception 'That distance does not match the flight time'; end if;
 if char_length(v) < 2 or char_length(v) > 20 or v !~ '^[A-Za-z0-9 _.\-]+$' then raise exception 'Nickname: 2 to 20 letters, digits, spaces, _ . -'; end if;
 if games.is_profane(v) then raise exception 'Pick a different nickname'; end if;
