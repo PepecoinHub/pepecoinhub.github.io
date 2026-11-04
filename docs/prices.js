@@ -10,9 +10,14 @@
       return r.json();
     });
   }
-  var file = json(base + 'data/price-live.json').then(function (f) {
-    return f && Date.now() - Date.parse(f.generated_at) < 3 * 3600000 ? f : null;
-  }).catch(function () { return null; }); // charts only
+  // the chart file (about 40 KB) is only fetched when a chart asks for it (PepPrices.file), not on every page
+  var fileP = null;
+  function chartFile() {
+    if (!fileP) fileP = json(base + 'data/price-live.json').then(function (f) {
+      return f && Date.now() - Date.parse(f.generated_at) < 3 * 3600000 ? f : null;
+    }).catch(function () { return null; }); // charts only
+    return fileP;
+  }
   function markets() {
     if (pending && Date.now() - requested < TTL) return pending;
     requested = Date.now();
@@ -76,5 +81,6 @@
   }
   setInterval(refresh, TTL);
   document.addEventListener('visibilitychange', refresh);
-  window.PepPrices = { file: file, markets: markets, quote: quote, describe: describe, subscribe: subscribe };
+  window.PepPrices = { markets: markets, quote: quote, describe: describe, subscribe: subscribe };
+  Object.defineProperty(window.PepPrices, 'file', { get: chartFile, enumerable: true });
 })();

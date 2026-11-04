@@ -332,6 +332,8 @@ document.addEventListener('keydown', e => {
 document.addEventListener('keyup', e => { if (e.code === 'Space') { if (charging) e.preventDefault(); release(); } });
 window.addEventListener('blur', () => { if (charging) { charging = false; $('#action').textContent = 'HOLD TO CHARGE'; } pause(true); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) { charging = false; pause(true); } });
+// PondOS: a minimized window pauses the flight
+window.addEventListener('message', (e) => { if (e.origin === location.origin && e.source === parent && e.data === 'pause') { charging = false; pause(true); } });
 $('#angle').oninput = () => { $('#angle-value').textContent = `${$('#angle').value}°`; };
 $('#angle-down').onclick = () => setAngle(Number($('#angle').value) - 5);
 $('#angle-up').onclick = () => setAngle(Number($('#angle').value) + 5);
