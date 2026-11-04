@@ -3,7 +3,8 @@
 // every round has a seed, and the seed decides the layout. Same seed, same layout, same flight.
 export const VERSION = 1;
 export const STEP = 1 / 120;
-export const MAX_TIME = 90;
+// A safety limit, applied only after ground contact. Never end a flight mid-air.
+export const MAX_TIME = 180;
 export const MAX_DISTANCE = 6000;
 export const DEFAULT_SEED = 1;
 const SPOTS = 75;
@@ -43,7 +44,7 @@ export function launch(power, angle, seed = DEFAULT_SEED) {
   const a = Math.max(20, Math.min(65, Number(angle) || 40)) * Math.PI / 180;
   const speed = 36 + p * 28;
   return { x: 0, y: 12, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, seed: (Number(seed) >>> 0) || DEFAULT_SEED,
-    time: 0, flaps: 3, lastFlap: -1, bounces: 0, ended: false, used: new Set(), event: 'launch', eventAt: 0 };
+    time: 0, flaps: 3, lastFlap: -1, bounces: 0, ended: false, endReason: '', used: new Set(), event: 'launch', eventAt: 0 };
 }
 function event(s, name) { s.event = name; s.eventAt = s.time; }
 export function flap(s) {
@@ -87,8 +88,10 @@ export function step(s) {
     if (s.vy < -7 && s.vx > 4) { s.vy = -s.vy * .42; s.vx *= .78; s.bounces++; event(s, 'bounce'); }
     else { s.vy = 0; s.vx = Math.max(0, s.vx - 17 * STEP); }
   }
-  if ((s.y <= .02 && s.vx < 1.5) || s.time >= MAX_TIME || s.x >= MAX_DISTANCE) {
-    s.x = Math.min(s.x, MAX_DISTANCE); s.ended = true;
+  if (s.x >= MAX_DISTANCE) {
+    s.x = MAX_DISTANCE; s.ended = true; s.endReason = 'course';
+  } else if (s.y <= .02 && (s.vx < 1.5 || s.time >= MAX_TIME)) {
+    s.ended = true; s.endReason = s.time >= MAX_TIME ? 'time' : 'landed';
   }
   return s;
 }

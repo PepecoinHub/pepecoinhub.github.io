@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { launch, step, flap, score, obstacles, layout, STEP } from '../docs/games/js/yeet-engine.mjs';
+import { launch, step, flap, score, obstacles, layout, STEP, MAX_TIME, MAX_DISTANCE } from '../docs/games/js/yeet-engine.mjs';
 
 function run(power, angle, flaps = []) {
   const s = launch(power, angle); let i = 0;
-  while (!s.ended && i < 11000) {
+  while (!s.ended && i < 26000) {
     if (flaps.includes(i)) flap(s);
     step(s); i++;
     assert.ok(Number.isFinite(s.x) && Number.isFinite(s.y) && s.y >= 0);
@@ -81,4 +81,22 @@ test('random seeds still give bounded scores', () => {
   for (let seed = 1; seed < 120; seed++) { const s = launch(1, 42, seed);
     while (!s.ended) { if (s.y < 6 && s.vy < 0) flap(s); step(s); }
     assert.ok(score(s) <= 60000 && score(s) <= Math.ceil(s.time * 1000) + 100); }
+});
+test('the 90-second mark cannot interrupt a frog still in the air', () => {
+  const s = launch(1, 42, 863);
+  while (s.time < 90 && !s.ended) { if (s.vy < 0 && s.y < 40) flap(s); step(s); }
+  assert.ok(s.y > 20 && s.x > 4000 && s.x < 4200);
+  assert.equal(s.ended, false);
+  while (!s.ended) { if (s.vy < 0 && s.y < 40) flap(s); step(s); }
+  assert.ok(s.x > 4200);
+  assert.ok(['landed', 'course', 'time'].includes(s.endReason));
+});
+test('the safety timer waits for contact with the ground; 6000 m clears the course', () => {
+  const s = launch(1, 42); s.time = MAX_TIME; s.x = 4200; s.y = 30; s.vx = 0; s.vy = -1;
+  step(s); assert.equal(s.ended, false);
+  s.y = .01; s.vy = -1; step(s);
+  assert.equal(s.ended, true); assert.equal(s.endReason, 'time');
+  const finish = launch(1, 42); finish.x = MAX_DISTANCE - .1; finish.y = 30; finish.vx = 50;
+  step(finish);
+  assert.equal(finish.endReason, 'course'); assert.equal(score(finish), 60000);
 });
