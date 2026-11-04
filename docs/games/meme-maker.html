@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noindex"><title>PEP MEME LAB | Pepecoin Hub</title>
+<link rel="icon" href="../meme/img/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="meme-maker.css?v=20261104a">
+<script type="module" src="js/meme-maker.mjs?v=20261104a"></script>
+</head><body>
+<header class="site-links"><a href="../meme/">← PONDOS</a><span>C:\POND\PROGRAMS\MEMELAB.EXE</span><a href="../meme/">BACK TO THE POND ↗</a></header>
+<main class="shell">
+  <div class="titlebar"><span class="app-icon">P</span><strong>PEP MEME LAB</strong><span class="title-extra">— creativity.exe is responding</span><span class="title-btn" aria-hidden="true">▭</span><span class="title-btn" aria-hidden="true">×</span></div>
+  <div class="menubar"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>H</u>elp</span><span class="menubar-end">FREN SOFTWARE · BUILD 2000</span></div>
+  <div class="intro"><div class="intro-icon">P</div><div><span class="eyebrow">NO GRAPHIC DESIGN DEGREE REQUIRED</span><h1>PEP MEME LAB<span class="ver">98</span></h1><p>Pick a frog. Type a thought. Become a danger to the group chat.</p></div><div class="intro-badge">100%<br>LOCAL<br><small>0% UPLOADS</small></div></div>
+  <div class="workspace">
+    <aside class="library pane" aria-label="Pepe pictures"><div class="pane-title"><span>01</span> CHOOSE YOUR FROG <i>▾</i></div><div id="templates" class="template-list"></div><p class="library-foot">6 certified reactions<br><small>More questionable decisions soon.</small></p></aside>
+    <section class="preview pane" aria-label="Live meme preview"><div class="pane-title"><span>02</span> LIVE PREVIEW <i>● READY</i></div><div class="preview-space"><div class="canvas-stack"><div class="canvas-hint">DRAG THE WORDS TO MOVE THEM</div><canvas id="meme" width="900" height="900" aria-label="Meme preview with a Pepe image, your captions and the PepecoinHub.com/meme credit">Meme preview requires Canvas.</canvas><div class="canvas-bottom"><span>PEP MEME LAB / PRINT PREVIEW</span><span id="dimensions">900 × 900 PX</span></div></div></div></section>
+    <aside class="editor pane" aria-label="Meme controls"><div class="pane-title"><span>03</span> MAKE IT WEIRD <i>▾</i></div>
+      <div class="editor-body">
+        <div class="section-label">THE CAPTIONS <small>DRAG IN PREVIEW TO REPOSITION</small></div>
+        <label for="top-text">TOP LINE</label><textarea id="top-text" rows="2" maxlength="90" spellcheck="true"></textarea>
+        <label for="bottom-text">BOTTOM LINE</label><textarea id="bottom-text" rows="2" maxlength="90" spellcheck="true"></textarea>
+        <div class="row"><button type="button" id="idea" class="sub-btn">↻ Random bad idea</button><button type="button" id="reset" class="sub-btn">Reset</button></div>
+        <div class="divider"></div>
+        <div class="section-label">MAKE IT LOOK OFFICIAL</div>
+        <fieldset class="styles"><legend>MEME STYLE</legend><label><input type="radio" name="style" value="classic" checked><span>CLASSIC<br><small>all caps, no chill</small></span></label><label><input type="radio" name="style" value="notice"><span>WINDOWS 98<br><small>serious error</small></span></label><label><input type="radio" name="style" value="tabloid"><span>POND TIMES<br><small>breaking nonsense</small></span></label></fieldset>
+        <label for="stamp">STICKER</label><select id="stamp"><option value="none">No sticker</option><option value="dyor">DYOR APPROVED</option><option value="premine">0% PREMINE</option><option value="receipts">RECEIPTS INSIDE</option><option value="copium">COPIUM FREE</option></select>
+        <label for="font-size">TEXT SIZE <output id="size-value">72</output></label><input id="font-size" type="range" min="44" max="98" value="72" aria-label="Text size">
+        <div class="divider"></div>
+        <div class="section-label">SAVE TO YOUR MACHINE</div>
+        <button type="button" id="download" class="download" disabled>↓ DOWNLOAD PNG</button>
+        <p class="export-note">Every exported image includes <b>PepecoinHub.com/meme</b> along the bottom. No account, upload or wallet required.</p>
+        <p id="status" class="status" role="status" aria-live="polite">Loading the frog…</p>
+      </div>
+    </aside>
+  </div>
+  <footer class="statusbar"><span><i class="status-dot"></i> READY TO MAKE INTERNET HISTORY</span><span>PEPE IS STORED LOCALLY · PNG EXPORT</span></footer>
+</main>
+</body></html>
