@@ -79,6 +79,17 @@
     return cache[name];
   }
   var nf = function (o) { return new Intl.NumberFormat('en-US', o); };
+  // Pepe Miner block counts get huge (it is an idle game): the same short units as in the game (K, M, B … Dc),
+  // and past Dc a plain exponent, so a top-10 line never turns into a 30-digit number
+  var MINER_UNITS = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+  function minerBlocks(n) {
+    n = Number(n);
+    if (!isFinite(n)) return '—';
+    if (n < 1e6) return Math.floor(n).toLocaleString('en-US');
+    if (n >= 1e36) return n.toExponential(2).replace('e+', 'e');
+    var i = Math.min(MINER_UNITS.length - 1, Math.floor(Math.log10(n * (1 + 1e-12)) / 3));
+    return (n / Math.pow(10, 3 * i)).toFixed(2) + ' ' + MINER_UNITS[i];
+  }
   var fmt = {
     int: function (v) { return v == null ? '—' : nf({ maximumFractionDigits: 0 }).format(v); },
     dec: function (v, d) { return v == null ? '—' : nf({ minimumFractionDigits: d, maximumFractionDigits: d }).format(v); },
@@ -1276,7 +1287,7 @@
           }, fail(ols[k]));
         });
         else rpc('gry_miner_top', {}).then(function (rows) {
-          ols[0].innerHTML = rows && rows.length ? rows.map(function (x, i) { return row(x, i, fmt.int(x.score) + ' blocks'); }).join('') : empty;
+          ols[0].innerHTML = rows && rows.length ? rows.map(function (x, i) { return row(x, i, minerBlocks(x.score) + ' blocks'); }).join('') : empty;
         }, fail(ols[0]));
       };
       A.body.querySelectorAll('[data-g]').forEach(function (b) { b.addEventListener('click', function () { A.load(b.getAttribute('data-g')); }); });

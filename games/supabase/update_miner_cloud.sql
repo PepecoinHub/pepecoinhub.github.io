@@ -31,7 +31,8 @@ begin
   select updated_at into prev from games.miner_saves where user_id = u;
   if prev is not null and prev > now() - interval '20 seconds' then return jsonb_build_object('saved', false); end if;
   insert into games.miner_saves(user_id, data, all_time, updated_at)
-  values (u, p_data, greatest(coalesce(p_all, 0), 0), now())
+  -- a total that is negative, NaN or Infinity counts as 0 (the game never sends those; NaN >= 0 is true in PostgreSQL)
+  values (u, p_data, case when p_all >= 0 and p_all < 'Infinity'::double precision then p_all else 0 end, now())
   on conflict (user_id) do update set data = excluded.data, all_time = excluded.all_time, updated_at = now();
   return jsonb_build_object('saved', true);
 end $$;
