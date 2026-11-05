@@ -1576,14 +1576,14 @@
   var passportCache = null; // { userId, state, catalog, opts }
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261105avatar1'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106avatar2'}));
     }
   }
   // one read: the server snapshot, plus two static files from this site (labels and avatar parts)
   function passportLoad(session) {
     return Promise.all([
       rpc('gry_passport_state', {}),
-      fetch('passport-catalog.json?v=20261105avatar1').then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
+      fetch('passport-catalog.json?v=20261106avatar2').then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
       avatarOptions().catch(function () { return null; })
     ]).then(function (r) {
       if (r[0] && r[0].signed_in) passportCache = { userId: session.userId, state: r[0], catalog: r[1], opts: r[2] };
@@ -1826,7 +1826,7 @@
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261105avatar1').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261106avatar2').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -2888,16 +2888,17 @@
   // Every claim in them is a fact from this site; the "offers" are jokes, and every ad says so.
   // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
   // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
-  // a Fren from the Avatar Maker's own layers, for the ads (same paint order as avatar-options.json)
-  function adFren(m, e, h, o) {
-    return '<span class="ad-fren" aria-hidden="true">' + ['bg_pond', 'base_frog', o, m, e, h].map(function (id) { return '<img src="avatar-assets/layers/' + id + '.svg" alt="">'; }).join('') + '</span>';
+  // a Fren from the Avatar Maker's own layers, for the ads (same paint order as avatar-options.json:
+  // layers_order [bg, base, clothing, mouth, eyes, hat, accessory]). Only non-unlock (base) ids here.
+  function adFren(c, m, e, h, a) {
+    return '<span class="ad-fren" aria-hidden="true">' + ['bg_pond', 'base_frog', c, m, e, h, a].map(function (id) { return '<img src="avatar-assets/layers/' + id + '.svg" alt="">'; }).join('') + '</span>';
   }
   var ADS = [
     { file: 'create_your_fren.mpg', added: '2026-11-05', title: 'Create Your Fren', ch: 'CH 64 · POND MAKEOVER HOUR', icon: 'fresh-fren', scenes: [
       '<p class="ad-kick">Is your Fren Passport photo just a logo?</p><h3 class="ad-big">Your pond needs<br>a <em>face!</em></h3>',
-      '<div class="ad-ba"><figure class="ad-before"><b>Before</b><img src="img/pep-logo.webp" alt=""><figcaption>“My Passport photo was a logo.”</figcaption></figure><figure class="ad-after"><b>After</b>' + adFren('mouth_grin', 'eyes_shades', 'hat_crown', 'outfit_purple_hoodie') + '<figcaption>A Fren in a paper crown!</figcaption></figure></div>',
-      '<p class="ad-kick">4 mouths. 6 eyes and glasses. 5 hats. 5 outfits.</p><h3 class="ad-big"><em>600</em> looks.<br>Zero PEP.</h3><div class="ad-frens">' + adFren('mouth_tongue', 'eyes_3d', 'hat_pep_cap', 'outfit_white_pep') + adFren('mouth_open', 'eyes_round', 'hat_bucket', 'outfit_orange_vest') + adFren('mouth_smile', 'eyes_sleepy', 'hat_beanie', 'outfit_black_hoodie') + '</div><p class="ad-sub">Every part is free. Hit Randomize until it feels like you.</p>',
-      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Save it once.<br>Get <em>Fresh Fren!</em></h3><p class="ad-sub">Your first saved look unlocks the Fresh Fren achievement in your Fren Passport. One per frog.</p><p class="ad-fine">Log on with Discord to save; guests can try every look. No NFTs, no XP, no rarity, no purchase. It\'s just a hat.</p><button type="button" class="ad-cta ad-frenbtn">Create Your Fren →</button>'
+      '<div class="ad-ba"><figure class="ad-before"><b>Before</b><img src="img/pep-logo.webp" alt=""><figcaption>“My Passport photo was a logo.”</figcaption></figure><figure class="ad-after"><b>After</b>' + adFren('clothing_purple_hoodie', 'mouth_grin', 'eyes_shades', 'hat_crown', 'accessory_chain') + '<figcaption>A Fren in a paper crown!</figcaption></figure></div>',
+      '<p class="ad-kick">3 backgrounds. 5 shirts. 6 mouths. 6 eyes and glasses. 6 hats. 3 extras.</p><h3 class="ad-big"><em>9,720</em> looks.<br>Zero PEP.</h3><div class="ad-frens">' + adFren('clothing_white_pep', 'mouth_tongue', 'eyes_3d', 'hat_pep_cap', 'accessory_scarf') + adFren('clothing_orange_vest', 'mouth_open', 'eyes_round', 'hat_bucket', 'accessory_none') + adFren('clothing_black_hoodie', 'mouth_smile', 'eyes_sleepy', 'hat_beanie', 'accessory_chain') + '</div><p class="ad-sub">Every part is free. Hit Randomize until it feels like you.</p>',
+      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Save it once.<br>Get <em>Fresh Fren!</em></h3><p class="ad-sub">Your first saved look unlocks the Fresh Fren achievement in your Fren Passport. One per frog.</p><p class="ad-fine">Log on with Discord to save; guests can try every look. No NFTs, no rarity, no purchase, no spendable points. It\'s just a hat.</p><button type="button" class="ad-cta ad-frenbtn">Create Your Fren →</button>'
     ] },
     { file: 'frogageddon.mpg', added: '2026-11-05', title: 'FROGAGEDDON: frog artillery', ch: 'CH 2000 · FREN SOFTWARE LATE NIGHT', icon: 'pondwars', scenes: [
       '<img class="ad-hero" src="../games/img/pondwars/title.jpg" alt=""><p class="ad-kick">Small frogs. Big grudges. Questionable footwear.</p><h3 class="ad-big">FROG<em>AGEDDON</em><br>is here!</h3>',

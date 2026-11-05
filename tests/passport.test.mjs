@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [25, 12, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [37, 12, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -64,10 +64,13 @@ test('Certified Fren earned record appears once instead of a locked duplicate', 
   assert.doesNotMatch(sql, /'certified_fren'[\s\S]{0,200}'earned_at', null/);
 });
 
-// ---------- Fren Avatar Maker (static checks; tests/passport-avatar-sql.test.mjs runs the SQL for real) ----------
+// ---------- Fren Avatar Maker v2 (static checks; tests/passport-avatar-sql.test.mjs runs the SQL for real) ----------
 const avatarSql = file('games/supabase/update_fren_avatar.sql');
 const manifest = JSON.parse(file('docs/meme/avatar-options.json'));
-const SLOTS = ['mouth', 'eyes', 'hat', 'outfit'];
+// v2 saveable slots (columns), in save-RPC order. 'base' is a constant implied layer, not a slot.
+const SLOTS = ['bg', 'clothing', 'mouth', 'eyes', 'hat', 'accessory'];
+// Only options without an 'unlock' key are offered and saveable this stage.
+const baseIds = k => manifest.options[k].filter(o => !o.unlock).map(o => o.id);
 
 test('Fresh Fren is live only together with its server award path', () => {
   const avatar = catalog.achievements.find(x => x.id === 'first_avatar');
@@ -85,54 +88,68 @@ test('Fresh Fren is live only together with its server award path', () => {
   assert.match(firstBranch.split(/\n  else\n/)[1], /insert into games\.passport_badges/, 'award sits in the first-save branch');
 });
 
-test('avatar manifest: 22 aligned 64x64 layers, 600 looks, valid defaults', () => {
+test('avatar manifest v2: 512 canvas layers, 9720 offered looks, valid defaults', () => {
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [4, 6, 5, 5]);
-  assert.equal(SLOTS.reduce((n, k) => n * manifest.options[k].length, 1), 600);
+  assert.equal(manifest.schema_version, 2);
+  // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [4, 6, 6, 6, 8, 5]);
+  // the only looks a player can actually compose and save are built from the non-unlock (base) ids
+  assert.deepEqual(SLOTS.map(k => baseIds(k).length), [3, 5, 6, 6, 6, 3]);
+  assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 9720, 'offered looks');
   assert.equal(new Set(ids).size, ids.length);
-  assert.deepEqual(manifest.layers_order, ['bg', 'base', 'outfit', 'mouth', 'eyes', 'hat']);
+  assert.deepEqual(manifest.layers_order, ['bg', 'base', 'clothing', 'mouth', 'eyes', 'hat', 'accessory']);
+  assert.equal(manifest.defaults.base, 'base_frog');
   for (const k of SLOTS) {
-    assert.ok(manifest.options[k].some(o => o.id === manifest.defaults[k]), 'default ' + k);
+    // the default must be a non-unlock option so a fresh Fren is always valid
+    assert.ok(baseIds(k).includes(manifest.defaults[k]), 'default ' + k);
     for (const o of manifest.options[k]) { assert.match(o.id, new RegExp('^' + k + '_[a-z0-9_]+$')); assert.ok(o.label); }
   }
-  const files = [manifest.paths.bg, manifest.paths.base, ...ids.map(id => manifest.paths.layer_template.replace('{id}', id))];
-  assert.equal(files.length, 22);
+  // one SVG per option id, plus the implied base layer; bg_none doubles as manifest.paths.bg
+  const files = [...new Set([manifest.paths.base, ...ids.map(id => manifest.paths.layer_template.replace('{id}', id))])];
+  assert.equal(files.length, 36, '35 option layers + base_frog');
+  assert.equal(manifest.paths.bg.split('/').pop(), 'bg_none.svg');
   assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/layers/', import.meta.url)).filter(f => f.endsWith('.svg')).sort(),
     files.map(f => f.split('/').pop()).sort(), 'no unused or missing layer files');
   for (const f of files) {
     const svg = file('docs/meme/' + f);
-    assert.match(svg, /<svg[^>]*viewBox="0 0 64 64"/, f);
-    assert.match(svg, /width="64" height="64"/, f);
+    assert.match(svg, /<svg[^>]*viewBox="0 0 512 512"/, f);
+    assert.match(svg, /width="512" height="512"/, f);
     assert.doesNotMatch(svg, /<script|<image|href=|on[a-z]+=/i, f + ' is plain vector art');
   }
 });
 
-test('avatar save RPC: Discord identity, exact allowlists, no user or badge argument, locked-down grants', () => {
+test('avatar save RPC v2: Discord identity, non-unlock allowlists, no user or badge argument, locked-down grants', () => {
   const fn = avatarSql.split('create or replace function public.gry_passport_avatar_save')[1].split('$$;')[0];
-  assert.match(fn, /^\(\s*p_mouth text, p_eyes text, p_hat text, p_outfit text\)/);
+  assert.match(fn, /^\(\s*\n?\s*p_bg text, p_clothing text, p_mouth text, p_eyes text, p_hat text, p_accessory text\)/);
   assert.match(fn, /security definer set search_path = ''/);
   assert.match(fn, /u uuid := auth\.uid\(\)/);
   assert.match(fn, /games\.discord_identity\(u\) is null/);
+  // the server allowlist equals the manifest NON-UNLOCK ids per slot, in manifest order
   for (const k of SLOTS) {
     const list = fn.match(new RegExp('p_' + k + ' is null or p_' + k + ' not in \\(([^)]*)\\)'));
     assert.ok(list, k + ' allowlist');
-    assert.deepEqual([...list[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]), manifest.options[k].map(o => o.id), k);
+    assert.deepEqual([...list[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]), baseIds(k), k);
   }
+  // reserved/unlock ids must NOT appear in any allowlist (they stay unsaveable this stage)
+  const reserved = SLOTS.flatMap(k => manifest.options[k].filter(o => o.unlock).map(o => o.id));
+  assert.ok(reserved.length >= 6, 'manifest should still carry reserved ids');
+  for (const id of reserved) assert.doesNotMatch(fn, new RegExp("'" + id + "'"), id + ' is reserved and must not be allowlisted');
+  const sixText = /\(text, text, text, text, text, text\)/;
   assert.match(avatarSql, /revoke all on games\.passport_avatars from public, anon, authenticated/);
   assert.match(avatarSql, /alter table games\.passport_avatars enable row level security/);
-  assert.match(avatarSql, /revoke all on function public\.gry_passport_avatar_save\(text, text, text, text\) from public, anon, authenticated/);
-  assert.match(avatarSql, /grant execute on function public\.gry_passport_avatar_save\(text, text, text, text\) to authenticated;/);
+  assert.match(avatarSql, new RegExp('revoke all on function public\\.gry_passport_avatar_save' + sixText.source + ' from public, anon, authenticated'));
+  assert.match(avatarSql, new RegExp('grant execute on function public\\.gry_passport_avatar_save' + sixText.source + ' to authenticated;'));
   assert.equal([...avatarSql.matchAll(/\bas \$\$/g)].length, [...avatarSql.matchAll(/^\$\$;/gm)].length);
   // the Passport read path carries the saved look
   assert.match(avatarSql, /'avatar', look,/);
 });
 
-test('Avatar Maker client: one save RPC with four IDs, nothing kept in localStorage', () => {
+test('Avatar Maker client: one save RPC with six v2 IDs, nothing kept in localStorage', () => {
   const maker = pond.split('// ---------- Create Your Fren: the Avatar Maker')[1].split('// Only cosmetic, low-stakes discoveries')[0];
   assert.ok(maker, 'Avatar Maker block missing');
   const calls = [...maker.matchAll(/rpc\('([a-z_]+)'/g)].map(x => x[1]);
   assert.deepEqual(calls, ['gry_passport_avatar_save']);
-  assert.match(maker, /rpc\('gry_passport_avatar_save', \{ p_mouth: sent\.mouth, p_eyes: sent\.eyes, p_hat: sent\.hat, p_outfit: sent\.outfit \}\)/);
+  assert.match(maker, /rpc\('gry_passport_avatar_save', \{ p_bg: sent\.bg, p_clothing: sent\.clothing, p_mouth: sent\.mouth, p_eyes: sent\.eyes, p_hat: sent\.hat, p_accessory: sent\.accessory \}\)/);
   assert.doesNotMatch(maker, /localStorage|sessionStorage/);
   assert.match(maker, /openApp\('avatar', 'Create Your Fren - Avatar Maker'/);
   // the balloon only follows a server answer that minted the badge

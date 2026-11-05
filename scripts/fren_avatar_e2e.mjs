@@ -134,14 +134,14 @@ const closeBalloons = page => page.evaluate(() => document.querySelectorAll('.ba
 async function openPassport(page) {
   await page.click('.start');
   await page.getByRole('button', { name: /Fren Passport/ }).click();
-  await page.waitForSelector('.app-win[aria-label="Fren Passport - Properties"] .passport-identity, .app-win[aria-label="Fren Passport - Properties"] .passport-note');
+  await page.waitForSelector('.app-win[aria-label="Fren Passport - Properties"] .pp-book, .app-win[aria-label="Fren Passport - Properties"] .passport-note');
 }
 const maker = '.app-win[aria-label="Create Your Fren - Avatar Maker"]';
 const pick = (page, slot, id) => page.click(`${maker} input[name="fa-${slot}"][value="${id}"] + .fa-thumb`);
 const lookOnPage = page => page.evaluate(sel => Object.fromEntries([...document.querySelectorAll(sel + ' input:checked')].map(i => [i.name.slice(3), i.value])), maker);
 const previewSrcs = page => page.evaluate(sel => [...document.querySelectorAll(sel + ' .fa-frame img')].map(i => i.getAttribute('src')), maker);
 const statusText = page => page.textContent(maker + ' .fa-state');
-const dbRow = async i => (await db.query('select mouth, eyes, hat, outfit from games.passport_avatars where user_id = $1', [uid(i)])).rows[0] || null;
+const dbRow = async i => (await db.query('select bg, clothing, mouth, eyes, hat, accessory from games.passport_avatars where user_id = $1', [uid(i)])).rows[0] || null;
 const dbBadges = async i => (await db.query("select count(*)::int n from games.passport_badges where user_id = $1 and badge_id = 'first_avatar'", [uid(i)])).rows[0].n;
 
 let failures = 0;
@@ -156,19 +156,21 @@ try {
     await openPassport(page);
     const P = '.app-win[aria-label="Fren Passport - Properties"]';
     assert.equal(passportCalls().length, 1); assert.equal(passportCalls()[0].fn, 'gry_passport_state');
-    assert.equal(await page.textContent(P + ' .passport-make'), 'Create your Fren');
-    assert.equal(await page.getAttribute(P + ' .passport-face > img', 'src'), 'img/pep-logo.webp');
-    assert.match(await page.textContent(P + ' .passport-identity strong'), /PondTester/);
-    const fresh = await page.locator(P + ' .passport-entry', { hasText: 'Fresh Fren' }).textContent();
-    assert.match(fresh, /\[Locked\] Fresh Fren/); assert.doesNotMatch(fresh, /Coming later/);
+    assert.equal(await page.textContent(P + ' .pp-make'), 'Create your Fren');
+    assert.equal(await page.getAttribute(P + ' .pp-photo > img', 'src'), 'img/pep-logo.webp');
+    assert.match(await page.textContent(P + ' .pp-idcard dd'), /PondTester/);
+    const fresh = await page.locator(P + ' .pp-stamp', { hasText: 'Fresh Fren' }).textContent();
+    assert.match(fresh, /Locked/);
+    assert.match(await page.textContent(P + ' .pp-mythic-name'), /BALI/);
     await shot(page, '01-passport-no-avatar-dark');
   });
   await step('Maker opens from the Passport with defaults, no extra request', async () => {
-    await page.click('.passport-make');
+    await page.click('.pp-make');
     await page.waitForSelector(maker + ' .fa');
     assert.equal(passportCalls().length, 1);
-    assert.deepEqual(await lookOnPage(page), { mouth: 'mouth_smile', eyes: 'eyes_classic', hat: 'hat_none', outfit: 'outfit_blue' });
-    assert.equal(await page.locator(maker + ' .fa-opt').count(), 20);
+    assert.deepEqual(await lookOnPage(page), { bg: 'bg_none', clothing: 'clothing_blue', mouth: 'mouth_smile', eyes: 'eyes_classic', hat: 'hat_none', accessory: 'accessory_none' });
+    // non-unlock options offered per slot: bg 3, clothing 5, mouth 6, eyes 6, hat 6, accessory 3 = 29
+    assert.equal(await page.locator(maker + ' .fa-opt').count(), 29);
     assert.equal(await statusText(page), 'Not saved yet.');
     const w = await page.evaluate(sel => document.querySelector(sel).getBoundingClientRect().width, maker);
     assert.ok(w >= 680 && w <= 740, 'window width ' + w);
@@ -178,15 +180,17 @@ try {
   });
   await step('Picking parts and Randomize change only the preview (no API traffic)', async () => {
     const before = passportCalls().length;
+    await pick(page, 'bg', 'bg_pond'); await pick(page, 'clothing', 'clothing_purple_hoodie');
     await pick(page, 'mouth', 'mouth_grin'); await pick(page, 'eyes', 'eyes_shades');
-    await pick(page, 'hat', 'hat_crown'); await pick(page, 'outfit', 'outfit_purple_hoodie');
+    await pick(page, 'hat', 'hat_crown'); await pick(page, 'accessory', 'accessory_chain');
     assert.deepEqual((await previewSrcs(page)).map(s => s.split('/').pop()),
-      ['bg_pond.svg', 'base_frog.svg', 'outfit_purple_hoodie.svg', 'mouth_grin.svg', 'eyes_shades.svg', 'hat_crown.svg']);
+      ['bg_pond.svg', 'base_frog.svg', 'clothing_purple_hoodie.svg', 'mouth_grin.svg', 'eyes_shades.svg', 'hat_crown.svg', 'accessory_chain.svg']);
     assert.equal(await statusText(page), 'Unsaved changes');
     for (let i = 0; i < 12; i++) await page.click(maker + ' .fa-random');
     assert.equal(passportCalls().length, before, 'no RPC while choosing');
+    await pick(page, 'bg', 'bg_pond'); await pick(page, 'clothing', 'clothing_purple_hoodie');
     await pick(page, 'mouth', 'mouth_grin'); await pick(page, 'eyes', 'eyes_shades');
-    await pick(page, 'hat', 'hat_crown'); await pick(page, 'outfit', 'outfit_purple_hoodie');
+    await pick(page, 'hat', 'hat_crown'); await pick(page, 'accessory', 'accessory_chain');
     assert.equal(await dbRow(1), null);
     await shot(page, '03-maker-unsaved-dark');
   });
@@ -197,7 +201,7 @@ try {
     await page.keyboard.press('ArrowRight');
     assert.equal((await lookOnPage(page)).hat, 'hat_crown');
     await page.keyboard.press('Tab');
-    assert.equal(await page.evaluate(() => document.activeElement.name), 'fa-outfit');
+    assert.equal(await page.evaluate(() => document.activeElement.name), 'fa-accessory');
     assert.equal(await page.evaluate(() => getComputedStyle(document.activeElement.closest('.fa-opt')).outlineStyle), 'dotted');
   });
   await step('Save Look: one write, server confirms, Fresh Fren once, balloon', async () => {
@@ -206,8 +210,8 @@ try {
     await page.waitForFunction(sel => /Saved in your Fren Passport/.test(document.querySelector(sel + ' .fa-state').textContent), maker);
     const after = passportCalls().slice(before);
     assert.deepEqual(after.map(c => c.fn), ['gry_passport_avatar_save']);
-    assert.deepEqual(after[0].body, { p_mouth: 'mouth_grin', p_eyes: 'eyes_shades', p_hat: 'hat_crown', p_outfit: 'outfit_purple_hoodie' });
-    assert.deepEqual(await dbRow(1), { mouth: 'mouth_grin', eyes: 'eyes_shades', hat: 'hat_crown', outfit: 'outfit_purple_hoodie' });
+    assert.deepEqual(after[0].body, { p_bg: 'bg_pond', p_clothing: 'clothing_purple_hoodie', p_mouth: 'mouth_grin', p_eyes: 'eyes_shades', p_hat: 'hat_crown', p_accessory: 'accessory_chain' });
+    assert.deepEqual(await dbRow(1), { bg: 'bg_pond', clothing: 'clothing_purple_hoodie', mouth: 'mouth_grin', eyes: 'eyes_shades', hat: 'hat_crown', accessory: 'accessory_chain' });
     assert.equal(await dbBadges(1), 1);
     await page.waitForSelector('.balloon:has-text("Fresh Fren")');
     assert.equal(await page.isDisabled(maker + ' .fa-save'), true);
@@ -220,16 +224,15 @@ try {
     await page.waitForSelector(maker, { state: 'detached' });
     const P = '.app-win[aria-label="Fren Passport - Properties"]';
     assert.equal(passportCalls().length, before, 'no read after the save response');
-    assert.deepEqual(await page.evaluate(sel => [...document.querySelectorAll(sel + ' .passport-face img')].map(i => i.getAttribute('src').split('/').pop()), P),
-      ['bg_pond.svg', 'base_frog.svg', 'outfit_purple_hoodie.svg', 'mouth_grin.svg', 'eyes_shades.svg', 'hat_crown.svg']);
-    assert.equal(await page.textContent(P + ' .passport-make'), 'Edit your Fren');
-    const fresh = await page.locator(P + ' .passport-entry', { hasText: 'Fresh Fren' }).textContent();
-    assert.doesNotMatch(fresh, /Locked/); assert.match(fresh, /Nov \d+, 2026/);
-    assert.match(await page.textContent(P + ' .passport-stats'), /2 \/ 25\s*Badges/);
+    assert.deepEqual(await page.evaluate(sel => [...document.querySelectorAll(sel + ' .pp-photo .fa-stack img')].map(i => i.getAttribute('src').split('/').pop()), P),
+      ['bg_pond.svg', 'base_frog.svg', 'clothing_purple_hoodie.svg', 'mouth_grin.svg', 'eyes_shades.svg', 'hat_crown.svg', 'accessory_chain.svg']);
+    assert.equal(await page.textContent(P + ' .pp-make'), 'Edit your Fren');
+    const fresh = await page.locator(P + ' .pp-stamp', { hasText: 'Fresh Fren' }).textContent();
+    assert.doesNotMatch(fresh, /Locked/);
     await shot(page, '05-passport-with-avatar-dark');
   });
   await step('Unsaved changes ask Save / Discard / Cancel; too-fast save is an error, not success', async () => {
-    await page.click('.passport-make');
+    await page.click('.pp-make');
     await page.waitForSelector(maker + ' .fa');
     assert.equal(await statusText(page), 'Saved in your Fren Passport.');
     await pick(page, 'eyes', 'eyes_3d');
@@ -269,10 +272,10 @@ try {
     await page.waitForSelector(maker, { state: 'detached' });
     assert.equal((await dbRow(1)).hat, 'hat_crown');
     const P = '.app-win[aria-label="Fren Passport - Properties"]';
-    assert.ok((await page.getAttribute(P + ' .passport-face img[data-layer="hat"]', 'src')).endsWith('hat_crown.svg'));
+    assert.ok((await page.getAttribute(P + ' .pp-photo .fa-stack img[data-layer="hat"]', 'src')).endsWith('hat_crown.svg'));
   });
   await step('Missing migration: clear message, nothing claimed', async () => {
-    await page.click('.passport-make'); await page.waitForSelector(maker + ' .fa');
+    await page.click('.pp-make'); await page.waitForSelector(maker + ' .fa');
     await page.waitForTimeout(3200);
     await pick(page, 'mouth', 'mouth_tongue');
     failMode = 'missing';
@@ -290,12 +293,12 @@ try {
     const { page, errors, ctx } = await newPage({ user: 1, name: 'PondTester', theme: 'light' });
     await openPassport(page);
     const P = '.app-win[aria-label="Fren Passport - Properties"]';
-    assert.deepEqual(await page.evaluate(sel => [...document.querySelectorAll(sel + ' .passport-face img')].map(i => i.getAttribute('src').split('/').pop()), P),
-      ['bg_pond.svg', 'base_frog.svg', 'outfit_purple_hoodie.svg', 'mouth_grin.svg', 'eyes_3d.svg', 'hat_crown.svg']);
-    assert.doesNotMatch(await page.locator(P + ' .passport-entry', { hasText: 'Fresh Fren' }).textContent(), /Locked/);
+    assert.deepEqual(await page.evaluate(sel => [...document.querySelectorAll(sel + ' .pp-photo .fa-stack img')].map(i => i.getAttribute('src').split('/').pop()), P),
+      ['bg_pond.svg', 'base_frog.svg', 'clothing_purple_hoodie.svg', 'mouth_grin.svg', 'eyes_3d.svg', 'hat_crown.svg', 'accessory_chain.svg']);
+    assert.doesNotMatch(await page.locator(P + ' .pp-stamp', { hasText: 'Fresh Fren' }).textContent(), /Locked/);
     await shot(page, '08-passport-second-device-light');
-    await page.click('.passport-make'); await page.waitForSelector(maker + ' .fa');
-    assert.deepEqual(await lookOnPage(page), { mouth: 'mouth_grin', eyes: 'eyes_3d', hat: 'hat_crown', outfit: 'outfit_purple_hoodie' });
+    await page.click('.pp-make'); await page.waitForSelector(maker + ' .fa');
+    assert.deepEqual(await lookOnPage(page), { bg: 'bg_pond', clothing: 'clothing_purple_hoodie', mouth: 'mouth_grin', eyes: 'eyes_3d', hat: 'hat_crown', accessory: 'accessory_chain' });
     await shot(page, '09-maker-light');
     assert.deepEqual(errors, []);
     await ctx.close();
@@ -305,8 +308,8 @@ try {
   await step('Second user sees their own empty Passport', async () => {
     const { page, ctx } = await newPage({ user: 2, name: 'SecondFren' });
     await openPassport(page);
-    assert.equal(await page.textContent('.passport-make'), 'Create your Fren');
-    assert.match(await page.locator('.passport-entry', { hasText: 'Fresh Fren' }).textContent(), /Locked/);
+    assert.equal(await page.textContent('.pp-make'), 'Create your Fren');
+    assert.match(await page.locator('.pp-stamp', { hasText: 'Fresh Fren' }).textContent(), /Locked/);
     await ctx.close();
   });
 
@@ -335,7 +338,7 @@ try {
     const { page, errors, ctx } = await newPage({ user: 1, name: 'PondTester', mobile: true, reduced: true });
     await openPassport(page);
     await shot(page, '11-phone-passport');
-    await page.tap('.passport-make'); await page.waitForSelector(maker + ' .fa');
+    await page.tap('.pp-make'); await page.waitForSelector(maker + ' .fa');
     const m = await page.evaluate(sel => {
       const w = document.querySelector(sel), side = w.querySelector('.fa-side').getBoundingClientRect(), parts = w.querySelector('.fa-parts').getBoundingClientRect();
       const opts = [...w.querySelectorAll('.fa-opt')].map(o => o.getBoundingClientRect());
@@ -349,8 +352,8 @@ try {
     assert.ok(m.stacked, 'preview above choices'); assert.ok(m.minOpt >= 44, 'option size ' + m.minOpt); assert.ok(m.minBtn >= 44, 'button ' + m.minBtn);
     assert.ok(m.right <= m.vw, 'options inside the screen');
     await shot(page, '12-phone-maker-top');
-    await page.tap(`${maker} input[name="fa-outfit"][value="outfit_orange_vest"] + .fa-thumb`);
-    assert.equal((await lookOnPage(page)).outfit, 'outfit_orange_vest');
+    await page.tap(`${maker} input[name="fa-clothing"][value="clothing_orange_vest"] + .fa-thumb`);
+    assert.equal((await lookOnPage(page)).clothing, 'clothing_orange_vest');
     await page.evaluate(sel => { const w = document.querySelector(sel); w.scrollTop = w.scrollHeight; }, maker);
     await shot(page, '13-phone-maker-bottom');
     await page.setViewportSize({ width: 320, height: 640 });
