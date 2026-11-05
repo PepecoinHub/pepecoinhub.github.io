@@ -196,7 +196,7 @@
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Where's Pepe?", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
-      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat(BETA ? [['POND WARS (beta)', 'Testing: only you can see this', 'pondwars', function () { pondWarsApp(); }]] : []).forEach(function (g) {
+      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['POND WARS (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
@@ -1385,8 +1385,8 @@
     A.host.classList.add('app-full');
   }
   function pondWarsApp() {
-    var A = openApp('pondwars', 'POND WARS · Special Foot Edition', 'pondwars', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars.html?embed=1" title="POND WARS"></iframe>';
+    var A = openApp('pondwars', 'POND WARS · BETA', 'pondwars', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars-beta.html?embed=1" title="POND WARS"></iframe>';
       A.host.querySelector('.w-min').addEventListener('click', function () {
         A.body.querySelector('iframe').contentWindow.postMessage('pondwars-pause', location.origin);
       });
@@ -1495,7 +1495,7 @@
         ['PEPE SWEEPER', 'pepesweeper', function () { pepeSweeperApp(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
-        ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]].concat(BETA ? [['POND WARS (beta)', 'pondwars', function () { pondWarsApp(); }]] : []);
+        ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];
       A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="' + ico(g[1]) + '" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or get a link for a fren. Draw &amp; Guess: open a room for frens or join one with a code. 🏆 LEADERS has every top 10.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
