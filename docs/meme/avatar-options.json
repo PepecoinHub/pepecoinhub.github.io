@@ -1,112 +1,87 @@
 {
-  "schema_version": 1,
-  "coordinate_system": "64x64 pixels, same aligned transparent canvas for every layer",
+  "schema_version": 2,
+  "coordinate_system": "512x512 shared SVG canvas; every layer uses viewBox 0 0 512 512, transparent per layer, identical head/eye/mouth/shoulder geometry so parts stack with no per-part offsets",
+  "geometry": {
+    "head_center_x": 256,
+    "crown_top_y": 72,
+    "eye_line_y": 215,
+    "eye_left_x": 205,
+    "eye_right_x": 307,
+    "mouth_center_y": 300,
+    "chin_y": 362,
+    "neck_y": [360, 404],
+    "shoulder_line_y": 404,
+    "shoulders_x": [96, 416]
+  },
   "layers_order": [
     "bg",
     "base",
-    "outfit",
+    "clothing",
     "mouth",
     "eyes",
-    "hat"
+    "hat",
+    "accessory"
   ],
   "defaults": {
+    "bg": "bg_none",
+    "base": "base_frog",
+    "clothing": "clothing_blue",
     "mouth": "mouth_smile",
     "eyes": "eyes_classic",
     "hat": "hat_none",
-    "outfit": "outfit_blue"
+    "accessory": "accessory_none"
   },
+  "unlock_note": "The 'unlock' key on an option reserves it for a FUTURE server-verified activity achievement (Scout/Miner/Detective/Moon/Gamer Fren). Unlock logic is NOT implemented in this stage; options without an 'unlock' key are base/default and always available.",
   "options": {
+    "bg": [
+      { "id": "bg_none", "label": "None" },
+      { "id": "bg_pond", "label": "Pond" },
+      { "id": "bg_solid_green", "label": "Studio green" },
+      { "id": "bg_sunset", "label": "Sunset", "unlock": "moon_fren" }
+    ],
     "mouth": [
-      {
-        "id": "mouth_smile",
-        "label": "Classic smile"
-      },
-      {
-        "id": "mouth_grin",
-        "label": "Grin"
-      },
-      {
-        "id": "mouth_open",
-        "label": "Laugh"
-      },
-      {
-        "id": "mouth_tongue",
-        "label": "Tongue out"
-      }
+      { "id": "mouth_smile", "label": "Classic smile" },
+      { "id": "mouth_grin", "label": "Grin" },
+      { "id": "mouth_open", "label": "Laugh" },
+      { "id": "mouth_tongue", "label": "Tongue out" },
+      { "id": "mouth_flat", "label": "Neutral" },
+      { "id": "mouth_smirk", "label": "Smirk" }
     ],
     "eyes": [
-      {
-        "id": "eyes_classic",
-        "label": "Classic"
-      },
-      {
-        "id": "eyes_sleepy",
-        "label": "Sleepy"
-      },
-      {
-        "id": "eyes_wide",
-        "label": "Wide"
-      },
-      {
-        "id": "eyes_shades",
-        "label": "Pixel shades"
-      },
-      {
-        "id": "eyes_round",
-        "label": "Round glasses"
-      },
-      {
-        "id": "eyes_3d",
-        "label": "3D glasses"
-      }
+      { "id": "eyes_classic", "label": "Classic" },
+      { "id": "eyes_sleepy", "label": "Sleepy" },
+      { "id": "eyes_wide", "label": "Wide eyes" },
+      { "id": "eyes_shades", "label": "Shades" },
+      { "id": "eyes_round", "label": "Round glasses" },
+      { "id": "eyes_3d", "label": "3D glasses" }
     ],
     "hat": [
-      {
-        "id": "hat_none",
-        "label": "No hat"
-      },
-      {
-        "id": "hat_pep_cap",
-        "label": "PEP cap"
-      },
-      {
-        "id": "hat_beanie",
-        "label": "Beanie"
-      },
-      {
-        "id": "hat_bucket",
-        "label": "Bucket hat"
-      },
-      {
-        "id": "hat_crown",
-        "label": "Paper crown"
-      }
+      { "id": "hat_none", "label": "None" },
+      { "id": "hat_pep_cap", "label": "PEP cap" },
+      { "id": "hat_beanie", "label": "Beanie" },
+      { "id": "hat_bucket", "label": "Bucket hat" },
+      { "id": "hat_crown", "label": "Paper crown" },
+      { "id": "hat_hardhat", "label": "Hard hat", "unlock": "miner_fren" },
+      { "id": "hat_detective", "label": "Detective hat", "unlock": "detective_fren" }
     ],
-    "outfit": [
-      {
-        "id": "outfit_blue",
-        "label": "Blue shirt"
-      },
-      {
-        "id": "outfit_purple_hoodie",
-        "label": "Purple hoodie"
-      },
-      {
-        "id": "outfit_black_hoodie",
-        "label": "Black hoodie"
-      },
-      {
-        "id": "outfit_white_pep",
-        "label": "White PEP shirt"
-      },
-      {
-        "id": "outfit_orange_vest",
-        "label": "Orange vest"
-      }
+    "clothing": [
+      { "id": "clothing_blue", "label": "Blue shirt" },
+      { "id": "clothing_purple_hoodie", "label": "Purple hoodie" },
+      { "id": "clothing_black_hoodie", "label": "Black hoodie" },
+      { "id": "clothing_white_pep", "label": "White PEP tee" },
+      { "id": "clothing_orange_vest", "label": "Orange vest" },
+      { "id": "clothing_suit", "label": "Detective suit", "unlock": "detective_fren" }
+    ],
+    "accessory": [
+      { "id": "accessory_none", "label": "None" },
+      { "id": "accessory_chain", "label": "Gold chain" },
+      { "id": "accessory_scarf", "label": "Scarf" },
+      { "id": "accessory_pin", "label": "PEP pin", "unlock": "scout_fren" },
+      { "id": "accessory_headphones", "label": "Headphones", "unlock": "gamer_fren" }
     ]
   },
   "paths": {
-    "bg": "avatar-assets/layers/bg_pond.svg",
+    "bg": "avatar-assets/layers/bg_none.svg",
     "base": "avatar-assets/layers/base_frog.svg",
     "layer_template": "avatar-assets/layers/{id}.svg"
   }
