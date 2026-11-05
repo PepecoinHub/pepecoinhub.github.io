@@ -117,4 +117,80 @@ The first successful save inserts \`games.passport_badges(user_id,badge_id='firs
 
 ## What is explicitly not being built
 
-PepeGochi pet mechanics, purchases, XP, rarities, public Discord identities, an avatar social feed, premium accessories, and crypto rewards.
+PepeGochi pet mechanics, purchases, public Discord identities, an avatar social feed, premium accessories, and crypto rewards. (XP / leveling and achievement "stamps" ARE now part of the Fren Passport direction — see the v2 notes below.)
+
+---
+
+# v2 handoff (2026-11-05) — hand-drawn art, Passport-as-a-book, first achievement
+
+This supersedes the 64×64 pixel-art direction above. The pixel-art pack is
+**rejected**. Keep this section as the source of truth for the avatar + Passport
+look going forward.
+
+## Approved visual direction (from `pepe_avatar_handoff_v2_for_claude.zip`)
+- **Character:** classic hand-drawn / MS-Paint Pepe, NOT a pixel-art sprite and
+  NOT a generic green frog. Muted olive-green skin, brown-pink classic Pepe
+  mouth, large white eyes with black pupils and a small highlight, heavy slightly
+  uneven black outlines, flat fills, no gloss / neon / plastic / over-smoothing.
+- **Canvas:** one shared coordinate system, 512×512 SVG, transparent per-layer,
+  same head proportions / eye line / mouth position / shoulder framing in every
+  part so layers overlap cleanly. No per-part CSS nudging to fix misalignment.
+- **Layer paint order:** background → base (head+neck+body/shirt base) → clothing
+  → mouth → eyes/glasses → headwear → accessory. Headwear must cover the top of
+  the head; clothing must sit on the neck/shoulders; use a cover/mask layer where
+  a hat or hood needs to hide part of the base.
+- **Reference portraits** (detective, astronaut, king, gamer, hard-hat, beanie+
+  deal-with-it) are **style references, not production layers** — do not cut them
+  apart. Rebuild everything as original modular SVG.
+- **Maker window:** keep the approved `Create Your Fren` layout — big live preview
+  on the left (with optional portrait background + "used in your Fren Passport"
+  note), option rows on the right (eyes, mouth, headwear, clothing, accessory),
+  Randomize / Save Look / Use in Passport at the bottom. Classic PondOS buttons
+  and thumbnails. Instant preview, no Supabase calls while choosing.
+
+## Fren Passport look — approved concept (the "passport book" mockup)
+- The Passport should read like an **open passport / booklet from the Windows
+  98/2000 era**: slightly angular, textured, retro. Left page = identity (photo =
+  the player's avatar, Fren ID, nickname, member-since, status, PEP stamp). Right
+  page = an **Achievement Stamps** grid where earned stamps get "stamped in".
+- A **"My Fren Journey"** side panel may show a level + XP bar, days-with-Pepe,
+  counts (achievements / items / games / secrets) and a "Next Milestone" card.
+- **Icons must look like late-90s system / retro-computer icons** (duck, pickaxe,
+  trophy, gamepad, magnifier, folder…), NOT soft candy / mobile-game icons.
+- **Mythic BALI stamp.** The last, special stamp slot at the bottom is reserved
+  for a mythic stamp that reads exactly:
+  `BALI` / `$0.01 - BALI`. It is awarded to **everyone** when Pepecoin reaches
+  $0.01 USD. Until then it shows as a reserved/locked special slot. (Price trigger
+  is a future, server-verified condition — do not fake it client-side.)
+- Status of this concept: **layout + vibe approved; exact icons, final element
+  sizes, the full stamp/achievement set and final avatar assets are NOT final**
+  and still need dedicated work. Push icons toward a more genuinely Windows look.
+
+## First achievement = creating your avatar (CONFIRMED by user)
+- **Creating and saving your first custom Fren avatar is the first achievement.**
+  `first_avatar` / **Fresh Fren** / "Create and save your first custom Fren
+  avatar." It is granted exactly once, server-side, on the first valid Save Look
+  (never via localStorage, JS tampering or a forged browser message). Keep the
+  catalog entry `planned` until the secure save is shipped and tested, then flip
+  to `live`. (Already implemented server-side in `update_fren_avatar.sql`; this
+  note records that it is the intended first achievement.)
+
+## Achievement / stamp / XP design (direction, implement later)
+Goal: fun for people who love the 2000s era, without fake rewards, without things
+a script can farm in half a second. Guidance:
+- **Avoid trivially-scriptable "find the hidden PEP on a page" collectibles** as
+  real rewards — a bot finds them instantly. Keep such easter eggs cosmetic only
+  (the three existing casual secrets stay casual), not a path to anything scarce.
+- **Prefer time / consistency / genuine-activity achievements**, server-verified:
+  streaks (e.g. `7 Day Fren`, `Certified Fren` = log in on 100 distinct days),
+  per-game activity stamps mapped to the planned set — `Scout Fren` (14-day Pepe
+  Guesser streak), `Miner Fren` (mining milestones), `Detective Fren` (Where's
+  Pepe activity), `Moon Fren` (YEET milestones), `Gamer Fren` (LAN Party activity),
+  plus `Pepe Guesser`, `Game Night`, `Collector`, `Community Fren`, `Curious Fren`.
+- **XP / levels:** keep as a light, cosmetic "Fren Journey" progress bar derived
+  from achievements already earned (no grind currency, no pay-to-win, no trading).
+  It is a flavour meter, not a reward token. If it stops being fun, it can be
+  dropped — treat it as optional polish, not core.
+- Everything stays **free**, no NFT, no rarity odds, no PEP spending, no real-money
+  rewards; all award conditions must be **server-verified** before a stamp is
+  marked earned. Locked/planned stamps never count as collected.
