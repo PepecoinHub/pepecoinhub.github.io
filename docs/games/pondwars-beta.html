@@ -5,8 +5,8 @@
 <meta name="referrer" content="strict-origin-when-cross-origin"><title>FROGAGEDDON BETA: frog artillery | Pepecoin Hub</title>
 <meta name="description" content="Turn-based frog artillery: custom teams, four destructible maps, nine weapons and exploding golden toes. Play against the CPU or a friend on one device.">
 <meta name="robots" content="noindex, nofollow"><link rel="canonical" href="https://pepecoinhub.com/games/pondwars.html"><link rel="icon" href="img/pondwars/gold.svg">
-<link rel="stylesheet" href="pondwars.css?v=20261103c"><script type="module" src="js/pondwars-beta.mjs?v=20261105a"></script>
-<link rel="stylesheet" href="pondwars-polish.css?v=20261104moves"><link rel="stylesheet" href="pondwars-beta.css?v=20261105a"></head><body>
+<link rel="stylesheet" href="pondwars.css?v=20261103c"><script type="module" src="js/pondwars-beta.mjs?v=20261105c"></script>
+<link rel="stylesheet" href="pondwars-polish.css?v=20261104moves"><link rel="stylesheet" href="pondwars-beta.css?v=20261105c"></head><body>
 <header class="pw-site"><a href="../meme/">← Pepecoin Hub</a><b>FROGAGEDDON</b><a href="index.html">More games</a></header>
 <main class="pw">
   <div class="pw-chrome"><span>FROGAGEDDON BETA <small> / FREN SOFTWARE · 2000</small></span><div><button id="sound">Sound: off</button><button id="pause">Pause</button><button id="restart">New match</button></div></div><div class="pw-bar">
@@ -50,9 +50,23 @@
       <div class="pw-pick" id="levels"><span>CPU level</span><button type="button" data-level="0" aria-pressed="false">Easy</button><button type="button" data-level="1" aria-pressed="true">Normal</button><button type="button" data-level="2" aria-pressed="false">Hard</button></div>
       <div class="pw-pick"><span>Frogs per team</span><button type="button" data-n="2" aria-pressed="false">2</button><button type="button" data-n="3" aria-pressed="true">3</button><button type="button" data-n="4" aria-pressed="false">4</button></div>
       <p class="match-rules">100 HP / frog · 30s turns · limited movement · 3s retreat after firing</p><button type="button" class="pw-go" id="go">START THE WAR →</button>
-      <p class="pw-small">A/D or ← → move · W/S or ↑ ↓ aim<br>SPACE jumps · SPACE ×2 backflips<br>RIGHT CLICK: arsenal · HOLD LEFT CLICK / ENTER: fire</p>
+      <p class="pw-small keys-hint">A/D or ← → move · W/S or ↑ ↓ aim<br>SPACE jumps · SPACE ×2 backflips<br>RIGHT CLICK: arsenal · HOLD LEFT CLICK / ENTER: fire</p>
+      <p class="pw-small touch-hint">TAP OR DRAG ON THE MAP: aim · HOLD FIRE: charge, let go to shoot<br>◀ ▶ walk · ↑ jump · ↑ ×2 backflip · ▲ weapon button: arsenal</p>
     </div>
     <div class="pw-over" id="over" hidden><h2 id="over-title"></h2><p id="over-text"></p><button type="button" class="pw-go" id="again">Play again</button><button type="button" id="tomenu">Menu</button></div>
+  </div>
+  <div class="pw-title" id="title" role="dialog" aria-modal="true" aria-label="FROGAGEDDON title screen. Press any key to continue." tabindex="-1">
+    <div class="title-art"><img id="title-art" src="img/pondwars/title.jpg" alt=""></div>
+    <div class="title-embers" id="title-embers" aria-hidden="true"></div>
+    <div class="title-text">
+      <span class="title-kicker">FREN SOFTWARE PRESENTS</span>
+      <h2 class="title-logo" data-text="FROGAGEDDON">FROGAGEDDON</h2>
+      <span class="title-sub">BETA FIELD TEST · 2000</span>
+      <span class="title-press"><span class="keys-hint">PRESS ANY KEY TO CONTINUE</span><span class="touch-hint">TAP TO CONTINUE</span></span>
+    </div>
+    <div class="title-flash" aria-hidden="true"></div>
+    <div class="title-scan" aria-hidden="true"></div>
+    <span class="title-copy">© 2000 FREN SOFTWARE · ALL FROGS RESERVED</span>
   </div>
   <p class="pw-rotate">Turn your phone sideways for bigger frogs.</p>
   <p class="pw-status" id="status" role="status" aria-live="polite">A/D or ← → move · W/S or ↑ ↓ aim · Space: jump · Space ×2: backflip · Right click: arsenal · Hold left click: fire</p>
