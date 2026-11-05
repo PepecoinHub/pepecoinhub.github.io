@@ -1,6 +1,6 @@
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261105c';
-import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261105c';
+import { W, H, WATER, STEP, G, WEAPONS, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261106a';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261106a';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
@@ -33,6 +33,12 @@ rope:'CLICK WHERE TO HOOK · A/D SWING · W/S SHORTER/LONGER · SPACE LETS GO',j
 let soundOn=false,audio;
 function beep(hz,d=.12){if(!soundOn)return;try{audio ||= new (window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});const o=audio.createOscillator(),v=audio.createGain();o.type='sawtooth';o.frequency.setValueAtTime(hz,audio.currentTime);o.frequency.exponentialRampToValueAtTime(20,audio.currentTime+d);v.gain.setValueAtTime(.035,audio.currentTime);v.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.connect(v);v.connect(audio.destination);o.start();o.stop(audio.currentTime+d);}catch{}}
 const TEAM = [{ name: 'PEP', band: '#2f7de1', text: '#cfe6ff' }, { name: 'FUD', band: '#e23b3b', text: '#ffd4d4' }];
+// ---- team-colour helpers (parse #rgb/#rrggbb, mix toward a target, pick readable text) ----
+function hexRGB(h){const s=String(h).replace('#','');const x=s.length===3?s.split('').map(c=>c+c).join(''):s.padEnd(6,'0').slice(0,6);return [parseInt(x.slice(0,2),16)||0,parseInt(x.slice(2,4),16)||0,parseInt(x.slice(4,6),16)||0];}
+function mix(a,b,t){const A=hexRGB(a),B=hexRGB(b);return [0,1,2].map(i=>Math.round(A[i]+(B[i]-A[i])*t));}
+function rgba(c,al){return `rgba(${c[0]},${c[1]},${c[2]},${al})`;}
+// Readable text on a given background colour (white on dark, near-black on light).
+function readable(h){const [r,gr,b]=hexRGB(h);return (r*0.299+gr*0.587+b*0.114)>150?'#1a1205':'#fff0cc';}
 const playerArt=PLAYERS.map(p=>{const img=new Image();img.src=p.src;return img;});
 const teamPlayers=[[0,1,2,3],[4,5,6,0]];
 const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite','drill','candles','rope','jetpack','teleport'].map(w=>{const img=new Image();img.src='img/pondwars/'+w+'.svg';return[w,img];}));
@@ -95,7 +101,30 @@ function frog(f, t) {
   const turn = g.current === f.id && g.phase === 'aim' && f.alive;
   ctx.save(); ctx.translate(f.x, f.y);
   const bob = turn && !reduce ? Math.sin(t * 6) * 1 : 0, s = f.face;
-  ctx.fillStyle=TEAM[f.team].band;ctx.beginPath();ctx.ellipse(0,2,20,4,0,0,7);ctx.fill();
+  const band = TEAM[f.team].band, dark = rgba(mix(band, '#000000', .55), 1);
+  const mk = 1 + (ui - 1) * .6;               // markers grow a little on small/phone screens
+  // ---- team platform disc under the frog's feet: a bold, high-contrast team marker ----
+  // Colour tells teams apart; the SHAPE differs per team too, so colour-blind players and
+  // players who pick two similar custom colours can still read PEP (team 0) vs FUD (team 1).
+  ctx.save();
+  ctx.translate(0, 2); ctx.scale(mk, mk);
+  ctx.lineWidth = 2.5;
+  if (f.team === 0) {                          // PEP: solid filled disc, single light ring
+    ctx.fillStyle = rgba(hexRGB(band), .9); ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(0, 0, 24, 9, 0, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = dark; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.ellipse(0, 0, 24, 9, 0, 0, 7); ctx.stroke();
+  } else {                                     // FUD: open double ring (hollow centre), dark+team rings
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(0, 0, 25, 10, 0, 0, 7); ctx.stroke();
+    ctx.fillStyle = rgba(hexRGB(band), .9); ctx.lineWidth = 4; ctx.strokeStyle = rgba(hexRGB(band), 1);
+    ctx.beginPath(); ctx.ellipse(0, 0, 22, 8, 0, 0, 7); ctx.stroke();
+    ctx.strokeStyle = dark; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(0, 0, 15, 5.5, 0, 0, 7); ctx.stroke();
+  }
+  // team initial baked into the marker: a colour-independent shape cue (P vs F)
+  ctx.font = 'bold 9px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#fff'; ctx.lineWidth = 3; ctx.strokeStyle = dark;
+  ctx.strokeText(TEAM[f.team].name[0], 0, 0); ctx.fillText(TEAM[f.team].name[0], 0, 0);
+  ctx.textBaseline = 'alphabetic';
+  ctx.restore();
   ctx.translate(0,-29+bob);
   if(!reduce && f.flipT!==null && f.flipT!==undefined && !f.ground)ctx.rotate(-f.hopFace*Math.PI*2*Math.min(1,f.flipT/.7));
   else if(!reduce && turn && f.ground && (held.l||held.r))ctx.rotate(Math.sin(t*18)*.055);
@@ -103,15 +132,38 @@ function frog(f, t) {
   ctx.scale(s*person.face,1);
   if(art.naturalWidth){
     const [sx,sy,sw,sh]=person.rect||[0,0,art.naturalWidth,art.naturalHeight],height=64,width=Math.min(64,height*sw/sh);
+    // team-colour glow hugging the sprite, so the team still reads when the under-foot disc
+    // is hidden by terrain. The halo pulses on a frog's turn unless reduced-motion is on.
+    const glow = turn && !reduce ? 7 + Math.sin(t * 5) * 3 : 5;
+    ctx.save(); ctx.shadowColor = band; ctx.shadowBlur = glow;
+    ctx.drawImage(art,sx,sy,sw,sh,-width/2,-35,width,height);
+    ctx.drawImage(art,sx,sy,sw,sh,-width/2,-35,width,height); // second pass deepens the outline
+    ctx.restore();
     ctx.drawImage(art,sx,sy,sw,sh,-width/2,-35,width,height);
   }
   ctx.scale(person.face,1);
   if(turn && weaponArt[g.weapon]?.naturalWidth)ctx.drawImage(weaponArt[g.weapon],10,-6,29,29);
   ctx.restore();
+  // team pennant flag above the frog: a second team-colour cue near the label, readable even
+  // when the under-foot disc is occluded. It waves on a frog's turn unless reduced-motion is on.
+  const flagW = 15 * mk, flagH = 10 * mk, poleTop = f.y - 82 - 13 * mk, poleBot = f.y - 82 + 3;
+  const wave = turn && !reduce ? Math.sin(t * 5) * 2.2 : 0;
+  ctx.strokeStyle = '#2b2410'; ctx.lineWidth = 1.5 * mk;
+  ctx.beginPath(); ctx.moveTo(f.x, poleBot); ctx.lineTo(f.x, poleTop); ctx.stroke();
+  ctx.fillStyle = band; ctx.strokeStyle = dark; ctx.lineWidth = 1 * mk;
+  ctx.beginPath(); ctx.moveTo(f.x, poleTop);
+  ctx.lineTo(f.x + flagW, poleTop + flagH / 2 + wave);
+  ctx.lineTo(f.x, poleTop + flagH);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
   // name and health
   ctx.font = 'bold 12px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center';
   const label = f.name + ' ' + f.hp;
-  ctx.fillStyle = '#000c'; ctx.fillRect(f.x - ctx.measureText(label).width / 2 - 3, f.y - 82, ctx.measureText(label).width + 6, 15);
+  const bw = ctx.measureText(label).width;
+  // label box tinted with the team colour (dark base so text stays high-contrast) + team outline
+  ctx.fillStyle = rgba(mix(band, '#0c0b08', .62), .85);
+  ctx.fillRect(f.x - bw / 2 - 3, f.y - 82, bw + 6, 15);
+  ctx.strokeStyle = rgba(hexRGB(band), 1); ctx.lineWidth = 1.5;
+  ctx.strokeRect(f.x - bw / 2 - 3, f.y - 82, bw + 6, 15);
   ctx.fillStyle = TEAM[f.team].text; ctx.fillText(label, f.x, f.y - 70);
   if (turn) { ctx.fillStyle = '#ffd400'; ctx.beginPath(); ctx.moveTo(f.x - 6, f.y - 96 + bob * 2); ctx.lineTo(f.x + 6, f.y - 96 + bob * 2); ctx.lineTo(f.x, f.y - 87 + bob * 2); ctx.fill(); }
 }

@@ -25,6 +25,18 @@ The beta entry is in PondOS Start > Games only. It is not placed on the desktop,
 - A frog at 0 HP pops when it lands: weapon `frog` (crater radius 20, reach 75, max 15 HP). A neighbour 58 px away takes about 7 HP and a shove. Chain reactions are possible. The gravestone sits at the bottom of the crater.
 - Hit frogs move: the blast always has at least a 25% sideways part (a hit from straight above still moves the frog), and shells hand over part of their speed (14%, capped at 80 px/s). Arrows and revolver bullets now shove too. Measured on flat ground: a direct bazooka hit moves the frog about 88 px, a grenade from above about 62 px, an arrow about 51 px.
 
+## Clearer on-field team distinction (2026-11-06, player feedback)
+
+Players said they could not tell which frog belonged to which team: both teams share the blue-shirt Pepe sprites and the only on-field cue was a thin colour ellipse "shadow" plus a black name box. Team membership is now obvious at a glance and robust for colour-blind players, since every cue combines colour with shape/position (no reliance on hue alone):
+
+- **Team platform disc** under each frog replaces the thin ellipse: a bold, more opaque team-colour disc with a white + dark outline ring so it reads against both green terrain and violet rock.
+- **Per-team shape cue, constant regardless of chosen colour:** PEP (team 0) gets a solid filled disc, FUD (team 1) gets an open double ring, and each marker bakes in the team initial (P / F). Two teams stay distinct even if a player picks two similar custom colours (e.g. Blue vs Purple).
+- **Sprite glow + pennant flag:** a team-colour glow hugs the drawn Pepe and a small team-colour pennant flies above the frog near the name label, so the team still reads when the under-foot disc is occluded by terrain.
+- **Team-tinted name/HP label box** instead of solid black `#000c`: a dark, team-tinted fill with a team-colour outline, keeping the light label text high-contrast and readable.
+- **Scales on small screens:** markers, pennant and label grow with the existing `ui` scale factor, the same way the crosshair and power meter do.
+- **Reduced-motion fallback:** the glow pulse and pennant wave only animate when `prefers-reduced-motion` is off; otherwise they render static.
+- No gameplay/physics change and no change to team numbering (team stays 0=PEP, 1=FUD). Cache-bust tag bumped to `v=20261106a` across `pondwars-beta.mjs`, `pondwars-beta-net.mjs` and `pondwars-beta.html`.
+
 ## Online groundwork
 
 `js/pondwars-beta-net.mjs` (no DOM, runs in Node):
