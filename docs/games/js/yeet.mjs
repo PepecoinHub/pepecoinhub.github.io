@@ -1,4 +1,4 @@
-import { launch, step, flap, score, obstacles, newSeed, STEP } from './yeet-engine.mjs?v=20261104air';
+import { launch, step, flap, score, obstacles, newSeed, STEP } from './yeet-engine.mjs?v=20261105moon';
 import { getBackend } from './backend.js';
 
 const $ = s => document.querySelector(s), canvas = $('#game'), ctx = canvas.getContext('2d', { alpha: false });
@@ -35,7 +35,7 @@ function showBest() { $('#best').replaceChildren(document.createTextNode(metres(
 function hud() {
   $('#distance').replaceChildren(document.createTextNode(metres(score(state))), Object.assign(document.createElement('span'), { textContent: ' m' }));
   $('#flaps').textContent = Array.from({ length: 3 }, (_, i) => i < (state?.flaps ?? 3) ? '◆' : '◇').join(' ');
-  $('#flight-status').textContent = paused ? 'PAUSED' : phase === 'flying' ? `ALT ${Math.round(state.y)} m · ${Math.round(state.vx)} m/s` : phase === 'ended' ? (state?.endReason === 'course' ? 'COURSE CLEARED' : 'BACK ON EARTH') : 'READY FOR TAKEOFF';
+  $('#flight-status').textContent = paused ? 'PAUSED' : phase === 'flying' ? `ALT ${Math.round(state.y)} m · ${Math.round(state.vx)} m/s` : phase === 'ended' ? (state?.endReason === 'course' ? 'TO THE MOON' : 'BACK ON EARTH') : 'READY FOR TAKEOFF';
 }
 function reset() {
   $('#guest-save').hidden = true;
@@ -73,8 +73,13 @@ function finish() {
   phase = 'ended'; const n = ++finishNumber, value = score(state), uid = account?.user_id;
   const old = Math.max(storage.get(bestKey()), cloudBest), record = value > old; lastBest = record;
   if (record) storage.set(bestKey(), value);
-  $('#result').hidden = false; $('#result-title').textContent = state.endReason === 'course' ? 'COURSE CLEARED!' : record ? 'NEW PERSONAL BEST!' : 'Earth: 1. Pepe: 0.';
-  $('#result-score').textContent = `${metres(value)} m`; $('#result-joke').textContent = jokes[Math.floor(value / 17) % jokes.length];
+  const reachedMoon = state.endReason === 'course';
+  if (reachedMoon) storage.set('pepegachi-moon-rock-v1', 1);
+  $('#moon-reward').hidden = !reachedMoon;
+  $('#result').classList.toggle('moon-result', reachedMoon);
+  $('#result').hidden = false;
+  $('#result-title').textContent = reachedMoon ? 'TO THE MOON!' : record ? 'NEW PERSONAL BEST!' : 'Earth: 1. Pepe: 0.';
+  $('#result-score').textContent = `${metres(value)} m`; $('#result-joke').textContent = reachedMoon ? 'One small hop for Pepe. One giant leap for frogkind.' : jokes[Math.floor(value / 17) % jokes.length];
   $('#save-status').textContent = account ? 'Checking your flight report…' : (record ? 'New browser record! ' : '') + 'Add it to the Hall of Fren as a guest, or log in with Discord for the frog badge.';
   guestForm(value, Math.ceil(state.time * 1000), n);
   $('#action').textContent = 'HOLD TO TRY AGAIN'; $('#action').classList.remove('flying'); $('#angle').disabled = false;

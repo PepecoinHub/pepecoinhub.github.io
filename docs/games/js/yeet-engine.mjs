@@ -4,7 +4,7 @@
 export const VERSION = 1;
 export const STEP = 1 / 120;
 // A safety limit, applied only after ground contact. Never end a flight mid-air.
-export const MAX_TIME = 180;
+export const MAX_TIME = 300;
 export const MAX_DISTANCE = 6000;
 export const DEFAULT_SEED = 1;
 const SPOTS = 75;

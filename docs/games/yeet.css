@@ -18,3 +18,25 @@
 .records li:first-child .who-guest{color:#6a756d}
 .records-foot .who-ok{font-weight:bold}.records-foot .who-guest{color:#7c847f}
 @media(max-width:480px){.guest-save input{width:110px}}
+
+.result.moon-result {
+  top: 50%;
+  transform: translateY(-50%);
+  max-height: calc(100% - 12px);
+  overflow-y: auto;
+  background: #151a3a;
+  color: #fff4cf;
+  border-color: #b4aee0;
+}
+.moon-result #result-score { color: #f8d477; }
+.moon-result .save-status { color: #d8dfef; }
+#moon-reward {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  text-align: left;
+  font: bold 11px Tahoma, sans-serif;
+}
+#moon-reward small { display: block; color: #dedaf7; font-weight: normal; }
