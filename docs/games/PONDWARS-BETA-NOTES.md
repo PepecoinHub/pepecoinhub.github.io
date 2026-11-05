@@ -19,6 +19,12 @@ The beta entry is in PondOS Start > Games only. It is not placed on the desktop,
 - ↑ reacts on touch-down, so the double tap for a backflip is reliable. Bigger touch targets, safe-area padding for the iPhone notch, a short "TAP TO AIM · HOLD FIRE TO SHOOT" hint at the start of each turn. The arsenal button shows the weapon in hand.
 - The power meter is larger: 14 beads (was 10 small dots) with empty outlines showing the full length, a percentage above the frog, and a pulse at full power. On small screens the crosshair and meter scale up to 2× so they stay readable.
 
+## Title screen, frog pop, knockback
+
+- Title screen before the menu: picture `img/pondwars/title.jpg` with a slow zoom, white flash, logo slam with screen shake, shine sweep, typed subtitle, embers, scanlines, blinking PRESS ANY KEY / TAP TO CONTINUE. Click (not pointerdown) dismisses it, so the tap cannot land on the menu below. Reduced motion shows it still. Without the picture a painted fireball stays behind the logo.
+- A frog at 0 HP pops when it lands: weapon `frog` (crater radius 20, reach 75, max 15 HP). A neighbour 58 px away takes about 7 HP and a shove. Chain reactions are possible. The gravestone sits at the bottom of the crater.
+- Hit frogs move: the blast always has at least a 25% sideways part (a hit from straight above still moves the frog), and shells hand over part of their speed (14%, capped at 80 px/s). Arrows and revolver bullets now shove too. Measured on flat ground: a direct bazooka hit moves the frog about 88 px, a grenade from above about 62 px, an arrow about 51 px.
+
 ## Online groundwork
 
 `js/pondwars-beta-net.mjs` (no DOM, runs in Node):
