@@ -1,3 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" shape-rendering="crispEdges" aria-hidden="true">
-<path d="M18 30h17v-2h-17z" fill="#c3e7b0" stroke="#17221b" stroke-width="1.1" stroke-linejoin="miter"/><path d="M36 30h15v-2H36z" fill="#c3e7b0" stroke="#17221b" stroke-width="1.1" stroke-linejoin="miter"/><rect x="19" y="29" width="15" height="2" fill="#253424"/><rect x="37" y="29" width="13" height="2" fill="#253424"/><path d="M19 27h15v-2H19m18 2h13v-2H37z" fill="#447d40" />
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: eye line y=215; LEFT eye center x=205, RIGHT x=307. Sleepy: half-closed heavy lids. -->
+<ellipse cx="205" cy="215" rx="44" ry="40" fill="#f7faec" stroke="#16210f" stroke-width="7"/>
+<ellipse cx="307" cy="215" rx="44" ry="40" fill="#f7faec" stroke="#16210f" stroke-width="7"/>
+<!-- heavy droopy lids covering top half -->
+<path d="M161 215 Q205 196 249 215 Q249 184 205 182 Q161 184 161 215 Z" fill="#83a04a" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
+<path d="M263 215 Q307 196 351 215 Q351 184 307 182 Q263 184 263 215 Z" fill="#83a04a" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
+<!-- small lower pupils peeking -->
+<circle cx="205" cy="228" r="12" fill="#13200f"/>
+<circle cx="307" cy="228" r="12" fill="#13200f"/>
+<circle cx="201" cy="224" r="3.5" fill="#ffffff"/>
+<circle cx="303" cy="224" r="3.5" fill="#ffffff"/>
 </svg>

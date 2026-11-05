@@ -1,3 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" shape-rendering="crispEdges" aria-hidden="true">
-<path d="M17 29h4v-4h4v-3h8v3h3v5h2v4h-3v2H22v-2h-5z" fill="#f8fbec" stroke="#14241d" stroke-width="1.3" stroke-linejoin="miter"/><path d="M31 29h3v-4h4v-2h8v2h4v4h3v5h-4v2H37v-3h-5z" fill="#f8fbec" stroke="#14241d" stroke-width="1.3" stroke-linejoin="miter"/><path d="M18 26h17v11H18z" fill="#bbd9ec" stroke="#242421" stroke-width="1.5" stroke-linejoin="miter"/><path d="M37 26h17v11H37z" fill="#eab5af" stroke="#242421" stroke-width="1.5" stroke-linejoin="miter"/><rect x="35" y="28" width="2" height="3" fill="#303027"/><rect x="20" y="28" width="7" height="2" fill="#dbeafa"/><rect x="39" y="28" width="7" height="2" fill="#f6d0c7"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: eye line y=215; LEFT eye center x=205, RIGHT x=307. Classic red/cyan 3D paper glasses. -->
+<!-- eye whites under lenses -->
+<ellipse cx="205" cy="215" rx="40" ry="38" fill="#f7faec" stroke="#16210f" stroke-width="6"/>
+<ellipse cx="307" cy="215" rx="40" ry="38" fill="#f7faec" stroke="#16210f" stroke-width="6"/>
+<circle cx="205" cy="214" r="12" fill="#13200f"/>
+<circle cx="307" cy="214" r="12" fill="#13200f"/>
+<!-- cardboard frame -->
+<rect x="150" y="190" width="212" height="54" rx="6" fill="none" stroke="#16210f" stroke-width="7"/>
+<!-- red left lens -->
+<rect x="156" y="196" width="92" height="42" rx="5" fill="#d8402f" opacity="0.72"/>
+<!-- cyan right lens -->
+<rect x="264" y="196" width="92" height="42" rx="5" fill="#2fb7d8" opacity="0.72"/>
+<!-- bridge -->
+<rect x="248" y="200" width="16" height="10" fill="#16210f"/>
 </svg>

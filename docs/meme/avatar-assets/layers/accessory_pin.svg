@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: shoulder line y=404. Small PEP enamel pin on left chest. -->
+<circle cx="180" cy="452" r="22" fill="#2f8f46" stroke="#16210f" stroke-width="6"/>
+<text x="180" y="460" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="20" fill="#f2f4ee">P</text>
+<!-- highlight -->
+<circle cx="172" cy="444" r="4" fill="#9fe0b2"/>
+</svg>

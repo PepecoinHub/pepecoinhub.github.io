@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: full-canvas flat sunset bands, painted FIRST. No gradients, flat color bands. -->
+<rect x="0" y="0" width="512" height="512" fill="#f6b25a"/>
+<rect x="0" y="0" width="512" height="150" fill="#e86a6a"/>
+<rect x="0" y="150" width="512" height="90" fill="#f08a52"/>
+<rect x="0" y="360" width="512" height="152" fill="#8a4a6a"/>
+<!-- sun disc -->
+<circle cx="256" cy="300" r="70" fill="#fbe08a"/>
+</svg>

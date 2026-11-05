@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: mouth center y=300, span x=176..336. Lopsided smug smirk. -->
+<path d="M180 306 Q244 320 312 286 Q332 280 338 294" fill="none" stroke="#6b3d22" stroke-width="9" stroke-linecap="round"/>
+<!-- small pink lip at the raised corner -->
+<path d="M252 312 Q288 310 316 294 Q290 320 252 318 Z" fill="#d98c86"/>
+</svg>

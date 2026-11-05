@@ -1,3 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" shape-rendering="crispEdges" aria-hidden="true">
-<path d="M17 29h4v-4h4v-3h8v3h3v5h2v4h-3v2H22v-2h-5z" fill="#f8fbec" stroke="#14241d" stroke-width="1.3" stroke-linejoin="miter"/><path d="M31 29h3v-4h4v-2h8v2h4v4h3v5h-4v2H37v-3h-5z" fill="#f8fbec" stroke="#14241d" stroke-width="1.3" stroke-linejoin="miter"/><ellipse cx="30" cy="31" rx="3.4" ry="4" fill="#152321" /><ellipse cx="44" cy="31" rx="3.4" ry="4" fill="#152321" /><ellipse cx="28" cy="30" rx="9" ry="9" fill="none" stroke="#aeb5b1" stroke-width="1.5"/><ellipse cx="44" cy="30" rx="9" ry="9" fill="none" stroke="#aeb5b1" stroke-width="1.5"/><rect x="36" y="28" width="2" height="2" fill="#b2c6c8"/><rect x="17" y="28" width="3" height="2" fill="#bdc8c3"/><rect x="53" y="27" width="3" height="2" fill="#b3bfbb"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: eye line y=215; LEFT eye center x=205, RIGHT x=307. Round glasses over classic eyes. -->
+<!-- eye whites + pupils under the lenses -->
+<ellipse cx="205" cy="215" rx="40" ry="38" fill="#f7faec" stroke="#16210f" stroke-width="6"/>
+<ellipse cx="307" cy="215" rx="40" ry="38" fill="#f7faec" stroke="#16210f" stroke-width="6"/>
+<circle cx="211" cy="212" r="13" fill="#13200f"/>
+<circle cx="313" cy="212" r="13" fill="#13200f"/>
+<circle cx="207" cy="207" r="4" fill="#ffffff"/>
+<circle cx="309" cy="207" r="4" fill="#ffffff"/>
+<!-- round wire frames -->
+<circle cx="205" cy="215" r="46" fill="none" stroke="#2a2a2a" stroke-width="7"/>
+<circle cx="307" cy="215" r="46" fill="none" stroke="#2a2a2a" stroke-width="7"/>
+<!-- bridge -->
+<path d="M251 212 Q256 206 261 212" fill="none" stroke="#2a2a2a" stroke-width="7" stroke-linecap="round"/>
 </svg>

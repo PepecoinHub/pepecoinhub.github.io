@@ -1,3 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" shape-rendering="crispEdges" aria-hidden="true">
-<path d="M17 29h4v-4h4v-3h8v3h3v5h2v4h-3v2H22v-2h-5z" fill="#f8fbec" stroke="#14241d" stroke-width="1.3" stroke-linejoin="miter"/><path d="M31 29h3v-4h4v-2h8v2h4v4h3v5h-4v2H37v-3h-5z" fill="#f8fbec" stroke="#14241d" stroke-width="1.3" stroke-linejoin="miter"/><ellipse cx="30" cy="31" rx="3.7" ry="4.5" fill="#101917" /><ellipse cx="44" cy="31" rx="4" ry="4.5" fill="#101917" /><rect x="28" y="27" width="2" height="2" fill="#ffffff"/><rect x="42" y="27" width="2" height="2" fill="#ffffff"/><path d="M17 25h8v-3h8v2h-8v2h-8m17-1h5v-3h8v2h-8v2h-5z" fill="#377c34" />
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: eye line y=215; LEFT eye center x=205, RIGHT x=307; eye half-w~44 half-h~40. Outline #16210f. -->
+<!-- left eye white -->
+<ellipse cx="205" cy="215" rx="44" ry="40" fill="#f7faec" stroke="#16210f" stroke-width="7"/>
+<!-- right eye white -->
+<ellipse cx="307" cy="215" rx="44" ry="40" fill="#f7faec" stroke="#16210f" stroke-width="7"/>
+<!-- pupils look slightly outward/up (classic Pepe) -->
+<circle cx="214" cy="210" r="15" fill="#13200f"/>
+<circle cx="316" cy="210" r="15" fill="#13200f"/>
+<!-- white highlights -->
+<circle cx="208" cy="204" r="4.5" fill="#ffffff"/>
+<circle cx="310" cy="204" r="4.5" fill="#ffffff"/>
+<!-- upper eyelid folds -->
+<path d="M163 196 Q205 172 248 194" fill="none" stroke="#16210f" stroke-width="6" stroke-linecap="round"/>
+<path d="M264 194 Q307 172 350 196" fill="none" stroke="#16210f" stroke-width="6" stroke-linecap="round"/>
 </svg>

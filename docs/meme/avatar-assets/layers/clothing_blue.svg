@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: shoulder line y=404, shoulders x=96..416, neckline around x=214..298. Blue crew shirt. -->
+<path d="M256 396 Q150 404 110 456 Q90 480 88 512 L424 512 Q422 480 402 456 Q362 404 256 396 Z" fill="#3d6fb0" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
+<!-- collar neckline -->
+<path d="M214 400 Q256 430 298 400 Q256 418 214 400 Z" fill="#2b5287" stroke="#16210f" stroke-width="6" stroke-linejoin="round"/>
+<!-- shoulder seams -->
+<path d="M150 428 Q130 452 118 480" fill="none" stroke="#2b5287" stroke-width="6" stroke-linecap="round"/>
+<path d="M362 428 Q382 452 394 480" fill="none" stroke="#2b5287" stroke-width="6" stroke-linecap="round"/>
+</svg>

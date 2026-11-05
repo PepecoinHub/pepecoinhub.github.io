@@ -1,3 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" shape-rendering="crispEdges" aria-hidden="true">
-<path d="M19 23l4-12h22l5 12z" fill="#7fa568" stroke="#293828" stroke-width="1.3" stroke-linejoin="miter"/><path d="M14 23h42v5H14z" fill="#9fc282" stroke="#293828" stroke-width="1.2" stroke-linejoin="miter"/><path d="M25 17h20v3H25z" fill="#47683c" /><rect x="34" y="18" width="4" height="1" fill="#e9d7a5"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: crown y~72. Bucket hat: dome + wide downward brim covering top of head. -->
+<!-- dome -->
+<path d="M156 148 Q156 60 256 56 Q356 60 356 148 Q300 130 256 130 Q212 130 156 148 Z" fill="#6f8f57" stroke="#16210f" stroke-width="8" stroke-linejoin="round"/>
+<!-- brim ring -->
+<path d="M120 148 Q256 124 392 148 Q400 176 360 194 Q256 170 152 194 Q112 176 120 148 Z" fill="#5c7a47" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
+<!-- band stitch -->
+<path d="M156 146 Q256 128 356 146" fill="none" stroke="#4a6539" stroke-width="6"/>
 </svg>

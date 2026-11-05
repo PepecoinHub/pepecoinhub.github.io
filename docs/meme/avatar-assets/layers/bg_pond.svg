@@ -1,3 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" shape-rendering="crispEdges" aria-hidden="true">
-<rect width="64" height="64" fill="#7eb7dc"/><path d="M0 31h8v-4h5v4h13v-7h7v5h9v-3h6v8h16v30H0z" fill="#5b8a69" /><path d="M0 46h18v-3h17v3h29v18H0z" fill="#38657c" /><rect x="5" y="9" width="14" height="3" fill="#eff5ee"/><rect x="8" y="6" width="8" height="3" fill="#eff5ee"/><rect x="39" y="13" width="17" height="3" fill="#eff5ee"/><rect x="42" y="10" width="10" height="3" fill="#eff5ee"/><path d="M0 55h14v2H0m18-7h17v2H18m25 7h21v2H43" fill="#70b5c2" /><rect x="3" y="57" width="5" height="4" fill="#539a60"/><rect x="57" y="55" width="3" height="7" fill="#539a60"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: full-canvas background, painted FIRST. Flat hand-drawn pond + sky, no gradients. -->
+<rect x="0" y="0" width="512" height="512" fill="#bfe0ef"/>
+<!-- distant hills -->
+<path d="M0 300 Q128 250 256 292 Q384 332 512 288 L512 340 L0 340 Z" fill="#9ccf86"/>
+<!-- pond water lower half -->
+<rect x="0" y="332" width="512" height="180" fill="#5aa6c9"/>
+<!-- water ripples -->
+<path d="M40 390 Q80 380 120 390" fill="none" stroke="#7cc0dd" stroke-width="6" stroke-linecap="round"/>
+<path d="M360 420 Q400 410 440 420" fill="none" stroke="#7cc0dd" stroke-width="6" stroke-linecap="round"/>
+<!-- lily pad -->
+<path d="M96 460 a34 18 0 1 0 68 0 a34 18 0 1 0 -68 0 Z" fill="#4f9a4a"/>
+<path d="M130 452 L130 468" stroke="#bfe0ef" stroke-width="6"/>
+<!-- sun -->
+<circle cx="430" cy="80" r="34" fill="#f6e27a"/>
 </svg>

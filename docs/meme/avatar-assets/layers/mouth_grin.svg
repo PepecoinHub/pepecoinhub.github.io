@@ -1,3 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" shape-rendering="crispEdges" aria-hidden="true">
-<path d="M23 38h22v2h3v5h-4v3H26v-3h-4v-5z" fill="#aa4d40" stroke="#2f271d" stroke-width="1.4" stroke-linejoin="miter"/><rect x="26" y="40" width="18" height="3" fill="#f3eee0"/><rect x="26" y="44" width="18" height="2" fill="#dd8065"/><rect x="32" y="40" width="1" height="3" fill="#3c3730"/><rect x="38" y="40" width="1" height="3" fill="#3c3730"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: mouth center y=300, span x=176..336. Big smug grin showing lip. -->
+<path d="M176 288 Q256 300 336 288 Q312 348 256 352 Q200 348 176 288 Z" fill="#6b3d22" stroke="#6b3d22" stroke-width="6" stroke-linejoin="round"/>
+<!-- inner mouth pink -->
+<path d="M196 300 Q256 308 316 300 Q296 338 256 340 Q216 338 196 300 Z" fill="#d98c86"/>
+<!-- top lip line -->
+<path d="M176 288 Q256 300 336 288" fill="none" stroke="#5a3119" stroke-width="7" stroke-linecap="round"/>
 </svg>
