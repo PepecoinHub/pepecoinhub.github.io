@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="crispEdges" aria-label="Fresh Fren achievement">
+  <rect x="2" y="2" width="28" height="28" fill="#bdbdb5" stroke="#20261e" stroke-width="2"/>
+  <rect x="5" y="5" width="22" height="22" fill="#7192b4" stroke="#f4f2d9" stroke-width="1"/>
+  <path d="M9 13h3v-3h11v3h3v8h-3v3H12v-3H9z" fill="#51ac45" stroke="#193022" stroke-width="1"/>
+  <path d="M12 14h4v-3h4v3h4v4h-3v-2h-4v2h-3v-2h-2z" fill="#f3f7e4"/>
+  <rect x="15" y="15" width="2" height="3" fill="#14201b"/>
+  <rect x="21" y="15" width="2" height="3" fill="#14201b"/>
+  <path d="M13 20h10v2H13z" fill="#bf7550" stroke="#30241e" stroke-width="1"/>
+  <path d="M23 7h3v10h-3z" fill="#eac151" stroke="#342d20" stroke-width="1" transform="rotate(35 24 11)"/>
+  <path d="M25 21h2v2h2v2h-2v2h-2v-2h-2v-2h2z" fill="#fcde77" stroke="#5b4a16" stroke-width=".4"/>
+</svg>

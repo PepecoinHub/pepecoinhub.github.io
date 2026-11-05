@@ -1,0 +1,326 @@
+{
+  "version": 1,
+  "achievements": [
+    {
+      "id": "first_fren",
+      "title": "First Fren",
+      "description": "Sign in with Discord and start your pond history.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "first_avatar",
+      "title": "Fresh Fren",
+      "description": "Create and save your first custom Fren avatar.",
+      "category": "avatar",
+      "status": "planned"
+    },
+    {
+      "id": "moonwalker",
+      "title": "Moonwalker",
+      "description": "Record a 6000 m flight in YEET THE PEP. Moon Rock is a separate future reward.",
+      "category": "yeet",
+      "status": "live"
+    },
+    {
+      "id": "certified_fren",
+      "title": "Certified Fren",
+      "description": "Care for your PepeGochi on 100 distinct days.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "pond_pioneer",
+      "title": "Pond Pioneer",
+      "description": "Be among the earliest registered frens.",
+      "category": "community",
+      "status": "planned"
+    },
+    {
+      "id": "old_frog",
+      "title": "Old Frog",
+      "description": "Reach a full year since joining the pond.",
+      "category": "community",
+      "status": "planned"
+    },
+    {
+      "id": "one_month_fren",
+      "title": "One Month Fren",
+      "description": "Reach your first month in the pond.",
+      "category": "community",
+      "status": "planned"
+    },
+    {
+      "id": "first_hatch",
+      "title": "First Hatch",
+      "description": "Adopt your first PepeGochi.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "little_fren",
+      "title": "Little Fren",
+      "description": "Help PepeGochi reach its first evolution.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "grown_fren",
+      "title": "Grown Fren",
+      "description": "Help PepeGochi reach its adult stage.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "good_parent",
+      "title": "Good Parent",
+      "description": "Provide care on 30 distinct days.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "perfect_parent",
+      "title": "Perfect Parent",
+      "description": "Complete a full month of good care.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "interior_designer",
+      "title": "Interior Designer",
+      "description": "Place 10 decorations in your PepeGochi room.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "lunar_decorator",
+      "title": "Lunar Decorator",
+      "description": "Decorate PepeGochi's room with moon-themed collectibles.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "nasa_is_hiring",
+      "title": "NASA Is Hiring",
+      "description": "Reach 6000 m in YEET three separate times.",
+      "category": "yeet",
+      "status": "planned"
+    },
+    {
+      "id": "no_panic",
+      "title": "No Panic",
+      "description": "Finish YEET without using any panic flaps.",
+      "category": "yeet",
+      "status": "planned"
+    },
+    {
+      "id": "frog_detective",
+      "title": "Frog Detective",
+      "description": "Find Pepe in ten different daily photo hunts.",
+      "category": "where_pepe",
+      "status": "planned"
+    },
+    {
+      "id": "arcade_hopper",
+      "title": "Arcade Hopper",
+      "description": "Try five different PondOS games.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "game_collector",
+      "title": "Game Collector",
+      "description": "Complete challenges in five PondOS games.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "secret_starter",
+      "title": "Secret Starter",
+      "description": "Find your first PondOS secret.",
+      "category": "secrets",
+      "status": "planned"
+    },
+    {
+      "id": "treasure_hunter",
+      "title": "Treasure Hunter",
+      "description": "Discover ten different secrets.",
+      "category": "secrets",
+      "status": "planned"
+    },
+    {
+      "id": "the_secret_pond",
+      "title": "The Secret Pond",
+      "description": "Finish the six-part mystery hidden across the pond.",
+      "category": "secrets",
+      "status": "planned"
+    },
+    {
+      "id": "frog_mail_reader",
+      "title": "Frog Mail Reader",
+      "description": "Find a mysterious message in Frog Mail.",
+      "category": "exploration",
+      "status": "planned"
+    },
+    {
+      "id": "trophy_shelf",
+      "title": "Trophy Shelf",
+      "description": "Display five different collectibles in your room.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "hundred_year_fren",
+      "title": "Hundred Day Fren",
+      "description": "Reach 100 days as a registered Fren.",
+      "category": "community",
+      "status": "planned"
+    }
+  ],
+  "secrets": [
+    {
+      "id": "lost_floppy",
+      "title": "The Lost Floppy",
+      "hint": "A backup from 1998 is gathering dust.",
+      "status": "live"
+    },
+    {
+      "id": "wrong_frog",
+      "title": "The Wrong Frog",
+      "hint": "A very suspicious shortcut is hiding in plain sight.",
+      "status": "live"
+    },
+    {
+      "id": "notes_reader",
+      "title": "The Forgotten Notes",
+      "hint": "Sometimes frogs write their secrets down.",
+      "status": "live"
+    },
+    {
+      "id": "bsod_fren",
+      "title": "Blue Screen of Fren",
+      "hint": "Something is wrong with this computer.",
+      "status": "planned"
+    },
+    {
+      "id": "midnight_fren",
+      "title": "Midnight Fren",
+      "hint": "The screensaver knows more than it says.",
+      "status": "planned"
+    },
+    {
+      "id": "paper_crown",
+      "title": "Paper Crown",
+      "hint": "You might find this in the trash.",
+      "status": "planned"
+    },
+    {
+      "id": "pond_map_1",
+      "title": "Map Fragment I",
+      "hint": "One of six pieces of an old pond map.",
+      "status": "planned"
+    },
+    {
+      "id": "pond_map_2",
+      "title": "Map Fragment II",
+      "hint": "One of six pieces of an old pond map.",
+      "status": "planned"
+    },
+    {
+      "id": "pond_map_3",
+      "title": "Map Fragment III",
+      "hint": "One of six pieces of an old pond map.",
+      "status": "planned"
+    },
+    {
+      "id": "pond_map_4",
+      "title": "Map Fragment IV",
+      "hint": "One of six pieces of an old pond map.",
+      "status": "planned"
+    },
+    {
+      "id": "pond_map_5",
+      "title": "Map Fragment V",
+      "hint": "One of six pieces of an old pond map.",
+      "status": "planned"
+    },
+    {
+      "id": "pond_map_6",
+      "title": "Map Fragment VI",
+      "hint": "One of six pieces of an old pond map.",
+      "status": "planned"
+    }
+  ],
+  "items": [
+    {
+      "id": "moon_rock",
+      "title": "Moon Rock",
+      "description": "A souvenir from a real 6000 m YEET flight.",
+      "status": "planned"
+    },
+    {
+      "id": "golden_fly",
+      "title": "Golden Fly",
+      "description": "A very fancy snack.",
+      "status": "planned"
+    },
+    {
+      "id": "rubber_duck",
+      "title": "Rubber Duck",
+      "description": "Bath time company for PepeGochi.",
+      "status": "planned"
+    },
+    {
+      "id": "tiny_computer",
+      "title": "Tiny Computer",
+      "description": "A computer for a computer frog.",
+      "status": "planned"
+    },
+    {
+      "id": "old_floppy",
+      "title": "Old Floppy",
+      "description": "An old disk with a mysterious history.",
+      "status": "planned"
+    },
+    {
+      "id": "paper_crown_item",
+      "title": "Paper Crown",
+      "description": "A crown made for a king of frogs.",
+      "status": "planned"
+    },
+    {
+      "id": "frog_tv",
+      "title": "Frog TV",
+      "description": "Tiny frog programming.",
+      "status": "planned"
+    },
+    {
+      "id": "moonlight_room",
+      "title": "Moonlight Room",
+      "description": "A special room inspired by the Moon.",
+      "status": "planned"
+    }
+  ],
+  "titles": [
+    {
+      "id": "pond_explorer",
+      "title": "Pond Explorer",
+      "status": "planned"
+    },
+    {
+      "id": "certified_fren_title",
+      "title": "Certified Fren",
+      "status": "planned"
+    },
+    {
+      "id": "moonwalker_title",
+      "title": "Moonwalker",
+      "status": "planned"
+    },
+    {
+      "id": "pond_pioneer_title",
+      "title": "Pond Pioneer",
+      "status": "planned"
+    }
+  ]
+}

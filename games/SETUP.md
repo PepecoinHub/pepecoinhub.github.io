@@ -40,3 +40,35 @@ Prototyp ma emulator serwera (PGlite) i testy (logika, silniki botów, przegląd
 
 ## Co dalej (nie w tym PR)
 Quiz dnia z nagrodą (logowanie Discordem, jeden adres PEP na konto, limit dzienny, zbiorcza wypłata ręcznie z portfela hosta) oraz Frog Tycoon (osobna gałąź, z fikcyjnymi nazwami zamiast prawdziwych giełd).
+
+## Fren Passport (draft PR #184, not yet enabled)
+
+The first iteration of the long-term player Passport runs inside PondOS 98 and
+reuses the existing Discord login in the **PH-games** Supabase project. It shows
+the actual Supabase account creation date, the YEET personal best, and a collection
+of achievements, hidden easter eggs and future inventory.
+
+**Installation order, after code review:**
+1. Review the SQL in `games/supabase/update_fren_passport.sql`.
+2. Apply it once in the PH-games Supabase SQL editor. It creates the private
+   `games.passport_*` tables, read-only `public.gry_passport_state()` and
+   low-stakes `public.gry_passport_discover(text)`.
+3. Run `node --test tests/passport.test.mjs` and `python scripts/check_site.py`.
+4. Merge the PR only after testing Discord login, guest refusal, secret discovery
+   on desktop/mobile, and a second opening of the same secret.
+
+The publicly served `docs/meme/passport-catalog.json` contains **labels and hints**,
+not reward authorization. The only browser-claimable secrets are `lost_floppy`,
+`wrong_frog` and `notes_reader`. They are harmless stamps, and a technically
+skilled visitor can discover their IDs from the client. Do not use this claim API
+for monetary, scarce, premium, competitive or Discord role rewards.
+
+**YEET Moon Rock:** the current YEET submission RPC checks plausibility, but does
+not authoritatively replay a flight. A displayed `Moonwalker` badge is not yet
+proof of a server-verified Moon Rock item. No moon-rock inventory item is awarded
+by this migration. Future PepeGochi care-day/100-day awards also need their own
+server-verified actions. Never grant these through a client-provided badge ID.
+
+The Passport currently performs one Supabase RPC on opening and one small claim
+request for each newly discovered secret. Artwork and the achievement catalog
+are static assets on GitHub Pages. Don't poll the whole profile each second.

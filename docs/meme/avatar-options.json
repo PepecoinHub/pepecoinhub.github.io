@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "64x64 pixels, same aligned transparent canvas for every layer",
+  "layers_order": [
+    "bg",
+    "base",
+    "outfit",
+    "mouth",
+    "eyes",
+    "hat"
+  ],
+  "defaults": {
+    "mouth": "mouth_smile",
+    "eyes": "eyes_classic",
+    "hat": "hat_none",
+    "outfit": "outfit_blue"
+  },
+  "options": {
+    "mouth": [
+      {
+        "id": "mouth_smile",
+        "label": "Classic smile"
+      },
+      {
+        "id": "mouth_grin",
+        "label": "Grin"
+      },
+      {
+        "id": "mouth_open",
+        "label": "Laugh"
+      },
+      {
+        "id": "mouth_tongue",
+        "label": "Tongue out"
+      }
+    ],
+    "eyes": [
+      {
+        "id": "eyes_classic",
+        "label": "Classic"
+      },
+      {
+        "id": "eyes_sleepy",
+        "label": "Sleepy"
+      },
+      {
+        "id": "eyes_wide",
+        "label": "Wide"
+      },
+      {
+        "id": "eyes_shades",
+        "label": "Pixel shades"
+      },
+      {
+        "id": "eyes_round",
+        "label": "Round glasses"
+      },
+      {
+        "id": "eyes_3d",
+        "label": "3D glasses"
+      }
+    ],
+    "hat": [
+      {
+        "id": "hat_none",
+        "label": "No hat"
+      },
+      {
+        "id": "hat_pep_cap",
+        "label": "PEP cap"
+      },
+      {
+        "id": "hat_beanie",
+        "label": "Beanie"
+      },
+      {
+        "id": "hat_bucket",
+        "label": "Bucket hat"
+      },
+      {
+        "id": "hat_crown",
+        "label": "Paper crown"
+      }
+    ],
+    "outfit": [
+      {
+        "id": "outfit_blue",
+        "label": "Blue shirt"
+      },
+      {
+        "id": "outfit_purple_hoodie",
+        "label": "Purple hoodie"
+      },
+      {
+        "id": "outfit_black_hoodie",
+        "label": "Black hoodie"
+      },
+      {
+        "id": "outfit_white_pep",
+        "label": "White PEP shirt"
+      },
+      {
+        "id": "outfit_orange_vest",
+        "label": "Orange vest"
+      }
+    ]
+  },
+  "paths": {
+    "bg": "avatar-assets/layers/bg_pond.svg",
+    "base": "avatar-assets/layers/base_frog.svg",
+    "layer_template": "avatar-assets/layers/{id}.svg"
+  }
+}
