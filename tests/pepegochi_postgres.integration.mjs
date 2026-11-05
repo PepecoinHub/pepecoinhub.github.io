@@ -2,7 +2,7 @@
 // Does not touch the production Supabase project.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 const file = p => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 let PGlite;
 try { ({ PGlite } = await import('@electric-sql/pglite')); } catch {}
@@ -34,8 +34,13 @@ test('live Postgres: migration, fractional needs, isolation and 100-day Passport
     const petSQL = file('games/supabase/update_pepegochi_v1.sql');
     await exec(petSQL);
     await exec(petSQL); // repeatable migration
-    await exec(file('games/supabase/update_fren_passport.sql'));
-    await exec(file('games/supabase/update_pepegochi_passport_bridge.sql'));
+    // Passport lives in PR #184. Test the bridge only in a checkout
+    // containing BOTH PR branches, not in this standalone backend branch.
+    const passportPresent = existsSync(new URL('../games/supabase/update_fren_passport.sql', import.meta.url));
+    if (passportPresent) {
+      await exec(file('games/supabase/update_fren_passport.sql'));
+      await exec(file('games/supabase/update_pepegochi_passport_bridge.sql'));
+    }
 
     await identity(bob);
     await assert.rejects(() => db.query('select public.gry_pepegochi_state()'), /Discord/);
@@ -69,12 +74,14 @@ test('live Postgres: migration, fractional needs, isolation and 100-day Passport
     await exec("update games.pepegochi_pets set care_days=99,last_care_day_utc=(now() at time zone 'utc')::date-1,last_action_at=now()-interval '2 hours',actions_today=0 where user_id='"+alice+"'");
     const hundred = (await one("select public.gry_pepegochi_action('play') as s")).s;
     assert.equal(hundred.care_days,100);
-    const passport = (await one("select public.gry_passport_state() as s")).s;
-    const certified = passport.achievements.filter(x=>x.id==='certified_fren');
-    assert.equal(certified.length,1);
-    assert.ok(certified[0].earned_at);
-    await exec(file('games/supabase/update_pepegochi_passport_bridge.sql'));
-    const count = (await one("select count(*)::int as n from games.passport_badges where user_id='"+alice+"' and badge_id='certified_fren'")).n;
-    assert.equal(count,1);
+    if (passportPresent) {
+      const passport = (await one("select public.gry_passport_state() as s")).s;
+      const certified = passport.achievements.filter(x=>x.id==='certified_fren');
+      assert.equal(certified.length,1);
+      assert.ok(certified[0].earned_at);
+      await exec(file('games/supabase/update_pepegochi_passport_bridge.sql'));
+      const count = (await one("select count(*)::int as n from games.passport_badges where user_id='"+alice+"' and badge_id='certified_fren'")).n;
+      assert.equal(count,1);
+    }
   } finally { await db.close(); }
 });
