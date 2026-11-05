@@ -79,3 +79,19 @@ test('handoff explains server-owned data and migration order', () => {
   assert.match(contract, /Passport bridge/);
   assert.match(contract, /No cron, realtime/i);
 });
+
+test('fractional need decay is persisted and rounded only for the UI', () => {
+  for (const col of ['hunger', 'hygiene', 'mood', 'energy']) {
+    assert.match(base, new RegExp(col + String.raw` numeric\\(7,4\\) not null default`));
+    assert.match(base, new RegExp(String.raw`alter column ` + col + String.raw` type numeric\\(7,4\\)`));
+  }
+  assert.match(base, /h := greatest\(0::numeric, p\.hunger - elapsed_hours \* 20 \/ 24\)/);
+  assert.match(base, /e := greatest\(0::numeric, p\.energy - elapsed_hours \* 10 \/ 24\)/);
+  assert.match(base, /h := floor\(greatest\(0::numeric, p\.hunger - elapsed_hours \* 20 \/ 24\)\)::integer/);
+  assert.doesNotMatch(base, /h := \(fresh #>>/);
+  const energyAfter2h = 75 - 2 * 10 / 24;
+  const energyAfter4h = energyAfter2h - 2 * 10 / 24;
+  assert.ok(energyAfter2h > 74 && energyAfter2h < 75);
+  assert.ok(energyAfter4h > 73 && energyAfter4h < 74);
+  assert.equal(Math.floor(energyAfter4h), 73);
+});
