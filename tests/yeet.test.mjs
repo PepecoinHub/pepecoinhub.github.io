@@ -99,4 +99,5 @@ test('the safety timer waits for contact with the ground; 6000 m clears the cour
   const finish = launch(1, 42); finish.x = MAX_DISTANCE - .1; finish.y = 30; finish.vx = 50;
   step(finish);
   assert.equal(finish.endReason, 'course'); assert.equal(score(finish), 60000);
+  assert.equal(score({ x: 5999.99 }), 59999);
 });

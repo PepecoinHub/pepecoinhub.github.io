@@ -40,3 +40,13 @@
   font: bold 11px Tahoma, sans-serif;
 }
 #moon-reward small { display: block; color: #dedaf7; font-weight: normal; }
+
+#moon-landing-art {
+  display: block;
+  width: auto;
+  height: min(25vh, 180px);
+  max-width: 100%;
+  object-fit: contain;
+  margin: 8px auto;
+  border: 2px solid #b4aee0;
+}

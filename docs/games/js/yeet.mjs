@@ -1,4 +1,4 @@
-import { launch, step, flap, score, obstacles, newSeed, STEP } from './yeet-engine.mjs?v=20261105moon';
+import { launch, step, flap, score, obstacles, newSeed, STEP } from './yeet-engine.mjs?v=20261105landing';
 import { getBackend } from './backend.js';
 
 const $ = s => document.querySelector(s), canvas = $('#game'), ctx = canvas.getContext('2d', { alpha: false });
@@ -74,19 +74,26 @@ function finish() {
   const old = Math.max(storage.get(bestKey()), cloudBest), record = value > old; lastBest = record;
   if (record) storage.set(bestKey(), value);
   const reachedMoon = state.endReason === 'course';
-  if (reachedMoon) storage.set('pepegachi-moon-rock-v1', 1);
+  if (reachedMoon) {
+    storage.set('pepegachi-moon-rock-v1', 1);
+    const earnedKey = uid ? `pepegachi-moon-rock-earned-at-v1:${uid}` : 'pepegachi-moon-rock-earned-at-v1';
+    if (!storage.get(earnedKey)) storage.set(earnedKey, Date.now());
+  }
+  const moonArt = $('#moon-landing-art');
+  if (reachedMoon && !moonArt.hasAttribute('src')) moonArt.src = 'img/yeet/moon-landing.jpg';
+  moonArt.hidden = !reachedMoon;
   $('#moon-reward').hidden = !reachedMoon;
   $('#result').classList.toggle('moon-result', reachedMoon);
   $('#result').hidden = false;
   $('#result-title').textContent = reachedMoon ? 'TO THE MOON!' : record ? 'NEW PERSONAL BEST!' : 'Earth: 1. Pepe: 0.';
-  $('#result-score').textContent = `${metres(value)} m`; $('#result-joke').textContent = reachedMoon ? 'One small hop for Pepe. One giant leap for frogkind.' : jokes[Math.floor(value / 17) % jokes.length];
+  $('#result-score').textContent = `${metres(value)} m`; $('#result-joke').textContent = reachedMoon ? 'You made it, fren! Congrats. Here’s a piece of moon rock. Better hang on to it. It’ll come in handy someday.' : jokes[Math.floor(value / 17) % jokes.length];
   $('#save-status').textContent = account ? 'Checking your flight report…' : (record ? 'New browser record! ' : '') + 'Add it to the Hall of Fren as a guest, or log in with Discord for the frog badge.';
   guestForm(value, Math.ceil(state.time * 1000), n);
   $('#action').textContent = 'HOLD TO TRY AGAIN'; $('#action').classList.remove('flying'); $('#angle').disabled = false;
   $('#action').disabled = false;
   $('#angle-down').disabled = false; $('#angle-up').disabled = false;
   $('#speech').textContent = ''; showBest(); hud(); tone(record ? 740 : 130, .25, 'triangle', .05);
-  if (uid && record && value > cloudBest) {
+  if (uid && (record || reachedMoon) && value > cloudBest) {
     const pending = Math.max(value, storage.get(pendingKey())); storage.set(pendingKey(), pending);
     try { localStorage.setItem(`${pendingKey()}:ms`, String(Math.ceil(state.time * 1000))); } catch {}
     saveRecord(pending, Math.ceil(state.time * 1000), uid, n);
