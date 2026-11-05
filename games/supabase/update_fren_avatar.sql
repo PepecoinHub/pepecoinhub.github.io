@@ -1,25 +1,78 @@
--- Fren Avatar Maker v1: one saved Fren look per Discord player, and the
+-- Fren Avatar Maker v2: one saved Fren look per Discord player, and the
 -- Fresh Fren achievement (first_avatar) for the first look the server saves.
 -- DRAFT. Apply to PH-games only after review, after update_fren_passport.sql.
 -- Safe to run twice. It awards nothing by itself.
 --
+-- v2 schema (Stage D): the avatar is a stack of 512x512 SVG layers described in
+-- docs/meme/avatar-options.json (schema_version 2). layers_order is
+-- [bg, base, clothing, mouth, eyes, hat, accessory]. 'base' (defaults.base =
+-- 'base_frog') is a single implied constant layer painted between bg and
+-- clothing; it is NOT a saved column. The saveable slots (columns) are:
+-- bg, clothing, mouth, eyes, hat, accessory.
+--
+-- v1 -> v2 column changes versus the previous draft of this file:
+--   * schema_version default+check bumped from 1 to 2.
+--   * outfit column RENAMED to clothing (regex '^clothing_[a-z0-9_]{1,40}$').
+--   * bg column ADDED (regex '^bg_[a-z0-9_]{1,40}$').
+--   * accessory column ADDED (regex '^accessory_[a-z0-9_]{1,40}$').
+--   * mouth/eyes/hat columns kept as-is.
+-- This stage targets a FRESH apply (create table if not exists with the v2
+-- columns below). The live v1 table is NOT migrated by this file. To migrate an
+-- existing v1 games.passport_avatars in place, run (reviewed, outside this
+-- draft) something like:
+--     alter table games.passport_avatars
+--       rename column outfit to clothing;
+--     alter table games.passport_avatars
+--       drop constraint if exists passport_avatars_outfit_check,
+--       add constraint passport_avatars_clothing_check
+--         check (clothing ~ '^clothing_[a-z0-9_]{1,40}$'),
+--       add column bg text not null default 'bg_none'
+--         check (bg ~ '^bg_[a-z0-9_]{1,40}$'),
+--       add column accessory text not null default 'accessory_none'
+--         check (accessory ~ '^accessory_[a-z0-9_]{1,40}$'),
+--       alter column schema_version set default 2,
+--       drop constraint if exists passport_avatars_schema_version_check,
+--       add constraint passport_avatars_schema_version_check
+--         check (schema_version = 2);
+--   plus backfilling existing rows' bg/accessory and remapping any legacy
+--   'outfit_*' ids to 'clothing_*'. Do this only after review; this file does
+--   not touch the live table.
+--
 -- Trust boundary:
---   * The browser only sends four option IDs. No user ID, badge ID or image.
+--   * The browser only sends six option IDs. No user ID, badge ID or image.
 --   * auth.uid() plus a real Discord identity decide whose row is written.
---   * Option IDs must match the fixed lists below exactly. They mirror
---     docs/meme/avatar-options.json (tests/passport-avatar.test.mjs checks this).
+--   * Option IDs must match the fixed lists below exactly. They mirror the
+--     NON-UNLOCK (base) options in docs/meme/avatar-options.json
+--     (tests/passport-avatar-sql.test.mjs checks this).
 --   * first_avatar is inserted only by the first save, in the same transaction
 --     as the avatar row, so a failed save never leaves a badge behind.
 --   * A save can be rejected (too fast, daily budget). Errors are never success.
+--
+-- INTERIM RESERVED-ID RULE (Stage D):
+--   Some manifest options carry an 'unlock' key: they are reserved for a FUTURE
+--   server-verified activity achievement and are NOT yet saveable. The unlock
+--   achievements do not exist yet, so the allowlists below deliberately OMIT
+--   every unlock-gated id, and the save RPC rejects them with 'Unknown avatar
+--   option' (errcode 22023) exactly like an unknown id. Reserved ids are valid
+--   manifest ids but not saveable until a future achievement grants them; this
+--   keeps the "cannot be gained by tampering" guarantee. The reserved ids are:
+--     hat_hardhat        (unlock miner_fren)
+--     hat_detective      (unlock detective_fren)
+--     clothing_suit      (unlock detective_fren)
+--     bg_sunset          (unlock moon_fren)
+--     accessory_pin      (unlock scout_fren)
+--     accessory_headphones (unlock gamer_fren)
 begin;
 
 create table if not exists games.passport_avatars (
   user_id uuid primary key references auth.users(id) on delete cascade,
-  schema_version smallint not null default 1 check (schema_version = 1),
+  schema_version smallint not null default 2 check (schema_version = 2),
+  bg text not null check (bg ~ '^bg_[a-z0-9_]{1,40}$'),
+  clothing text not null check (clothing ~ '^clothing_[a-z0-9_]{1,40}$'),
   mouth text not null check (mouth ~ '^mouth_[a-z0-9_]{1,40}$'),
   eyes text not null check (eyes ~ '^eyes_[a-z0-9_]{1,40}$'),
   hat text not null check (hat ~ '^hat_[a-z0-9_]{1,40}$'),
-  outfit text not null check (outfit ~ '^outfit_[a-z0-9_]{1,40}$'),
+  accessory text not null check (accessory ~ '^accessory_[a-z0-9_]{1,40}$'),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   -- save budget, never sent to the browser
@@ -32,7 +85,7 @@ alter table games.passport_avatars enable row level security;
 revoke all on games.passport_avatars from public, anon, authenticated;
 
 create or replace function public.gry_passport_avatar_save(
-  p_mouth text, p_eyes text, p_hat text, p_outfit text)
+  p_bg text, p_clothing text, p_mouth text, p_eyes text, p_hat text, p_accessory text)
 returns jsonb language plpgsql volatile security definer set search_path = '' as $$
 declare
   u uuid := auth.uid();
@@ -48,17 +101,24 @@ begin
   if u is null or games.discord_identity(u) is null then
     raise exception 'Log on with Discord to save your Fren' using errcode = '42501';
   end if;
-  if p_mouth is null or p_mouth not in ('mouth_smile', 'mouth_grin', 'mouth_open', 'mouth_tongue')
+  -- Exact per-slot allowlists, in manifest order, NON-UNLOCK (base) ids ONLY.
+  -- Unlock-gated ids (bg_sunset, clothing_suit, hat_hardhat, hat_detective,
+  -- accessory_pin, accessory_headphones) are intentionally absent and so are
+  -- rejected here, just like any unknown id. See the INTERIM RESERVED-ID RULE
+  -- comment at the top of this file.
+  if p_bg is null or p_bg not in ('bg_none', 'bg_pond', 'bg_solid_green')
+     or p_clothing is null or p_clothing not in ('clothing_blue', 'clothing_purple_hoodie', 'clothing_black_hoodie', 'clothing_white_pep', 'clothing_orange_vest')
+     or p_mouth is null or p_mouth not in ('mouth_smile', 'mouth_grin', 'mouth_open', 'mouth_tongue', 'mouth_flat', 'mouth_smirk')
      or p_eyes is null or p_eyes not in ('eyes_classic', 'eyes_sleepy', 'eyes_wide', 'eyes_shades', 'eyes_round', 'eyes_3d')
-     or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown')
-     or p_outfit is null or p_outfit not in ('outfit_blue', 'outfit_purple_hoodie', 'outfit_black_hoodie', 'outfit_white_pep', 'outfit_orange_vest') then
+     or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_astronaut')
+     or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_chain', 'accessory_scarf') then
     raise exception 'Unknown avatar option' using errcode = '22023';
   end if;
 
   -- First save. A concurrent first save of the same player waits on the
   -- primary key here, then takes the update path below.
-  insert into games.passport_avatars (user_id, mouth, eyes, hat, outfit)
-  values (u, p_mouth, p_eyes, p_hat, p_outfit)
+  insert into games.passport_avatars (user_id, bg, clothing, mouth, eyes, hat, accessory)
+  values (u, p_bg, p_clothing, p_mouth, p_eyes, p_hat, p_accessory)
   on conflict (user_id) do nothing
   returning * into saved;
   first_save := found;
@@ -66,8 +126,8 @@ begin
   if not first_save then
     -- One save at a time per player.
     select * into saved from games.passport_avatars a where a.user_id = u for update;
-    changed := (saved.mouth, saved.eyes, saved.hat, saved.outfit)
-               is distinct from (p_mouth, p_eyes, p_hat, p_outfit);
+    changed := (saved.bg, saved.clothing, saved.mouth, saved.eyes, saved.hat, saved.accessory)
+               is distinct from (p_bg, p_clothing, p_mouth, p_eyes, p_hat, p_accessory);
     -- Saving the same look again (a double click, a retry) is a no-op success.
     if changed then
       if saved.updated_at > now() - cooldown then
@@ -77,7 +137,7 @@ begin
         raise exception 'Daily save limit reached. Your Fren can change again tomorrow (UTC).' using errcode = 'P0001';
       end if;
       update games.passport_avatars a
-         set mouth = p_mouth, eyes = p_eyes, hat = p_hat, outfit = p_outfit,
+         set bg = p_bg, clothing = p_clothing, mouth = p_mouth, eyes = p_eyes, hat = p_hat, accessory = p_accessory,
              updated_at = now(),
              budget_used = case when a.budget_day = today then a.budget_used + 1 else 1 end,
              budget_day = today
@@ -99,7 +159,8 @@ begin
   return jsonb_build_object(
     'avatar', jsonb_build_object(
       'schema_version', saved.schema_version,
-      'mouth', saved.mouth, 'eyes', saved.eyes, 'hat', saved.hat, 'outfit', saved.outfit),
+      'bg', saved.bg, 'clothing', saved.clothing,
+      'mouth', saved.mouth, 'eyes', saved.eyes, 'hat', saved.hat, 'accessory', saved.accessory),
     'updated_at', saved.updated_at,
     'first_save', first_save,
     'changed', changed,
@@ -109,12 +170,13 @@ begin
 end
 $$;
 
-revoke all on function public.gry_passport_avatar_save(text, text, text, text) from public, anon, authenticated;
-grant execute on function public.gry_passport_avatar_save(text, text, text, text) to authenticated;
+revoke all on function public.gry_passport_avatar_save(text, text, text, text, text, text) from public, anon, authenticated;
+grant execute on function public.gry_passport_avatar_save(text, text, text, text, text, text) to authenticated;
 
 -- Passport read path: the same snapshot as update_fren_passport.sql, plus
--- avatar {schema_version, mouth, eyes, hat, outfit} or null. Keep the two in
--- sync; this file is the newer definition.
+-- avatar {schema_version, bg, clothing, mouth, eyes, hat, accessory} or null.
+-- base ('base_frog') is a constant implied layer and is omitted here to match
+-- the manifest note. Keep the two files in sync; this file is the newer one.
 create or replace function public.gry_passport_state()
 returns jsonb language plpgsql stable security definer set search_path = '' as $$
 declare
@@ -168,7 +230,8 @@ begin
     from games.passport_items i where i.user_id = u;
 
   select jsonb_build_object('schema_version', a.schema_version,
-           'mouth', a.mouth, 'eyes', a.eyes, 'hat', a.hat, 'outfit', a.outfit)
+           'bg', a.bg, 'clothing', a.clothing,
+           'mouth', a.mouth, 'eyes', a.eyes, 'hat', a.hat, 'accessory', a.accessory)
     into look
     from games.passport_avatars a where a.user_id = u;
 
