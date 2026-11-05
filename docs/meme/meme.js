@@ -1719,13 +1719,16 @@
   }
 
   // ---------- Create Your Fren: the Avatar Maker of the Fren Passport ----------
-  // The player's own pixel Fren, stacked from aligned 64×64 layers in avatar-assets/layers/ (listed in
-  // avatar-options.json). Picking parts and Randomize only change this preview, with no server traffic.
-  // Save Look is the one write (gry_passport_avatar_save): only its answer counts as saved, and the
-  // server alone awards Fresh Fren (first_avatar) for the first look it saves.
-  var AV_SLOTS = [['mouth', 'Mouth'], ['eyes', 'Eyes & glasses'], ['hat', 'Hat'], ['outfit', 'Outfit']];
-  // the part of the 64×64 picture each thumbnail zooms in on: [x, y, size]
-  var AV_CROP = { mouth: [18, 28, 32], eyes: [13, 10, 44], hat: [10, 2, 46], outfit: [8, 17, 48] };
+  // The player's own hand-drawn Fren, stacked from aligned 512×512 vector layers in avatar-assets/layers/
+  // (listed in avatar-options.json, schema_version 2). Every layer shares one 0 0 512 512 canvas with the
+  // same head/eye/mouth/shoulder geometry, so the parts stack with no per-part offsets. The editable slots
+  // are bg, clothing, mouth, eyes, hat and accessory; base (defaults.base) is an implied constant layer that
+  // is always painted between bg and clothing and is never a choice. Options carrying an 'unlock' key are
+  // reserved for a future server-verified achievement, so they are hidden here and rejected by the save RPC.
+  // Picking parts and Randomize only change this preview, with no server traffic. Save Look is the one write
+  // (gry_passport_avatar_save, six ids bg/clothing/mouth/eyes/hat/accessory): only its answer counts as saved,
+  // and the server alone awards Fresh Fren (first_avatar) for the first look it saves.
+  var AV_SLOTS = [['bg', 'Background'], ['clothing', 'Clothing'], ['mouth', 'Mouth'], ['eyes', 'Eyes & glasses'], ['hat', 'Hat'], ['accessory', 'Accessory']];
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
@@ -1734,6 +1737,9 @@
     }
     return avOpts;
   }
+  // the offerable (selectable) options for a slot: everything without an 'unlock' key. Reserved/unlock-gated
+  // parts are never offered here and are rejected server-side, so a browser cannot pick or save them.
+  function avatarPicks(o, k) { return (o.options[k] || []).filter(function (p) { return !p.unlock; }); }
   // a clean copy of a look, or null unless every slot holds a known part
   function avatarLook(o, x) {
     if (!o || !o.options || !x || typeof x !== 'object') return null;
@@ -1746,7 +1752,11 @@
     return look;
   }
   function avatarSame(a, b) { return !!a && !!b && AV_SLOTS.every(function (s) { return a[s[0]] === b[s[0]]; }); }
-  function avatarSrc(o, layer, look) { return o.paths[layer] || o.paths.layer_template.replace('{id}', look[layer]); }
+  // base is the one constant layer (defaults.base); every editable layer resolves to its chosen id
+  function avatarSrc(o, layer, look) {
+    if (layer === 'base') return o.paths.base || o.paths.layer_template.replace('{id}', o.defaults.base);
+    return o.paths.layer_template.replace('{id}', look[layer]);
+  }
   function avatarStack(o, look, label) {
     var s = el('span', label ? { class: 'fa-stack', role: 'img', 'aria-label': label } : { class: 'fa-stack', 'aria-hidden': 'true' });
     o.layers_order.forEach(function (layer) { s.appendChild(el('img', { src: avatarSrc(o, layer, look), alt: '', 'data-layer': layer, draggable: 'false' })); });
@@ -1781,17 +1791,17 @@
         side.appendChild(who); side.appendChild(said); wrap.appendChild(side);
         var parts = el('div', { class: 'fa-parts' }), thumbs = [];
         AV_SLOTS.forEach(function (slot) {
-          var k = slot[0], c = AV_CROP[k];
+          var k = slot[0];
           var fs = el('fieldset', { class: 'fa-group' }), lg = el('legend'), row = el('div', { class: 'fa-opts' });
           lg.textContent = slot[1]; fs.appendChild(lg);
-          o.options[k].forEach(function (p) {
+          // only non-unlock options are offered; reserved parts are hidden and rejected server-side
+          avatarPicks(o, k).forEach(function (p) {
             var lab = el('label', { class: 'fa-opt' }), inp = el('input', { type: 'radio', name: 'fa-' + k, value: p.id });
             inp.checked = look[k] === p.id;
             inp.addEventListener('change', function () { if (inp.checked) { look[k] = p.id; msg = ''; paint(); } });
-            // the thumbnail shows the current look with this part swapped in, zoomed on the part
+            // the thumbnail is the whole hand-drawn portrait with this one part swapped in (no pixel crop)
             var mine = {}; mine[k] = p.id;
             var t = el('span', { class: 'fa-thumb' }), st = avatarStack(o, Object.assign({}, look, mine));
-            st.style.width = st.style.height = 6400 / c[2] + '%'; st.style.left = -100 * c[0] / c[2] + '%'; st.style.top = -100 * c[1] / c[2] + '%';
             t.appendChild(st); thumbs.push({ k: k, stack: st });
             var name = el('span', { class: 'fa-lab' }); name.textContent = p.label;
             lab.appendChild(inp); lab.appendChild(t); lab.appendChild(name); row.appendChild(lab);
@@ -1840,7 +1850,7 @@
           if (pending || !signed) return Promise.reject(new Error('not now'));
           var sent = Object.assign({}, look);
           pending = true; msg = ''; saveB.textContent = 'Saving…'; status();
-          return rpc('gry_passport_avatar_save', { p_mouth: sent.mouth, p_eyes: sent.eyes, p_hat: sent.hat, p_outfit: sent.outfit }).then(function (r) {
+          return rpc('gry_passport_avatar_save', { p_bg: sent.bg, p_clothing: sent.clothing, p_mouth: sent.mouth, p_eyes: sent.eyes, p_hat: sent.hat, p_accessory: sent.accessory }).then(function (r) {
             var conf = r && avatarLook(o, r.avatar);
             if (!conf) throw new Error('The server did not confirm the save.');
             pending = false; saveB.textContent = 'Save Look';
@@ -1872,7 +1882,7 @@
           var next;
           do {
             next = {};
-            AV_SLOTS.forEach(function (s) { var l = o.options[s[0]]; next[s[0]] = l[Math.floor(Math.random() * l.length)].id; });
+            AV_SLOTS.forEach(function (s) { var l = avatarPicks(o, s[0]); next[s[0]] = l[Math.floor(Math.random() * l.length)].id; });
           } while (avatarSame(next, look));
           look = next; msg = ''; paint();
         });
