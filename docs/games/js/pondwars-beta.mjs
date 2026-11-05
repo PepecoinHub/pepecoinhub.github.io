@@ -1,6 +1,6 @@
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261105b';
-import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261105b';
+import { W, H, WATER, STEP, G, WEAPONS, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261105c';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261105c';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
@@ -121,6 +121,13 @@ function debris(x, y, r) {
   for (let i = 0; i < Math.min(26, 8 + r / 2); i++) { const a = -Math.PI * Math.random(), v = 120 + Math.random() * 260;
     parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 60, g: 1, life: .9 + Math.random() * .6, t: 0, s: 2 + Math.random() * 3, c: Math.random() < .3 ? '#6fae4c' : Math.random() < .5 ? '#7a4e33' : '#5c3a26' }); }
   for (let i = 0; i < 6; i++) parts.push({ x: x + (Math.random() - .5) * r, y: y + (Math.random() - .5) * r * .6, vx: (Math.random() - .5) * 30, vy: -20 - Math.random() * 30, g: 0, life: 1.4, t: 0, s: r * .35 + Math.random() * 8, c: 'smoke' });
+}
+// a frog at 0 HP pops: green bits and a little smoke on top of the normal blast debris
+function frogPop(x, y) {
+  shake = Math.max(shake, 7); beep(110, .3);
+  if (reduce) return;
+  for (let i = 0; i < 22; i++) { const a = -Math.PI * Math.random(), v = 90 + Math.random() * 230;
+    parts.push({ x, y: y - 20, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 80, g: 1, life: .8 + Math.random() * .7, t: 0, s: 3 + Math.random() * 3, c: ['#5fbf4a', '#3e8d34', '#9be37a', '#2f7de1'][i % 4] }); }
 }
 function sparkle(x, y) { if (reduce) return; for (let i = 0; i < 18; i++) { const a = Math.random() * 7, v = 40 + Math.random() * 120; parts.push({ x, y: y - 25, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: 0, life: .7, t: 0, s: 2.5, c: '#bdf3ff' }); } }
 function drawParts(dt) {
@@ -276,7 +283,7 @@ function events() {
     if (e.type === 'teleport') {beep(880,.1);sparkle(e.from.x,e.from.y);sparkle(e.to.x,e.to.y);status('Teleported! Your turn goes on.');}
     if (e.type === 'miss') status(g.weapon==='rope'?'Nothing to hook there. Aim at the ground or a cliff.':'No room there. Pick another spot.');
     if (e.type === 'splash' || e.type === 'plop') splashes.push({ x: e.x ?? W / 2, t: 0 });
-    if (e.type === 'ko') status(`${e.name} is out of the war.`);
+    if (e.type === 'ko') { status(`${e.name} popped and is out of the war.`); if (e.x !== undefined) frogPop(e.x, e.y); }
     if (e.type === 'timeout') status('Too slow! The turn goes to the other team.');
     if (e.type === 'over') over();
   }
@@ -574,6 +581,29 @@ function menuButton() {
 }
 const netParam = new URLSearchParams(location.search).get('net');
 if ((netParam === 'host' || netParam === 'join') && 'BroadcastChannel' in window) setupNet(netParam === 'host');
+
+// ---------- title screen: any key, click or tap continues to the menu ----------
+const title = $('#title'), titleArt = $('#title-art');
+const noArt = () => title.classList.add('no-art');   // without the picture a painted fireball stays behind the logo
+titleArt.addEventListener('error', noArt);
+if (titleArt.complete && !titleArt.naturalWidth) noArt();
+if (!reduce) for (let i = 0; i < 18; i++) {
+  const e = document.createElement('i');
+  e.style.left = (3 + Math.random() * 94) + '%';
+  e.style.setProperty('--d', (4 + Math.random() * 5).toFixed(2) + 's');
+  e.style.setProperty('--w', (Math.random() * 6).toFixed(2) + 's');
+  e.style.setProperty('--x', Math.round((Math.random() - .5) * 160) + 'px');
+  $('#title-embers').append(e);
+}
+function leaveTitle(e) {
+  if (title.hidden || title.classList.contains('leaving')) return;
+  e?.preventDefault(); e?.stopImmediatePropagation();
+  title.classList.add('leaving'); beep(70, .5);
+  setTimeout(() => { title.hidden = true; ($('#go').disabled ? $('#menu') : $('#go')).focus?.({ preventScroll: true }); }, reduce ? 0 : 450);
+}
+title.addEventListener('click', leaveTitle);   // click, not pointerdown: the tap must not land on the menu below
+window.addEventListener('keydown', e => { if (!title.hidden && !['Shift', 'Control', 'Alt', 'Meta', 'Tab'].includes(e.key)) leaveTitle(e); }, true);
+title.focus({ preventScroll: true });
 
 // a quiet island behind the menu
 g = newGame({ seed: 20261103, perTeam: 3 }); paintGround(); g.phase = 'menu';

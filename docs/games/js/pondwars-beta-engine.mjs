@@ -26,6 +26,8 @@ export const WEAPONS = {
   mine:{name:'Land Mine',short:'Mine',radius:40,damage:50,ammo:3,power:1},
   dynamite:{name:'Dynamite',short:'Dynamite',radius:48,damage:70,ammo:2,power:1,fuse:5},
   candles: { name: 'Red Candle Drop', short: 'Candles', radius: 21, damage: 26, wind: false, ammo: 1 },
+  // a frog at 0 HP pops: a small crater, but the blast reaches its neighbours (a few HP and a shove)
+  frog: { name:'Frog Blast', radius:20, reach:75, damage:15 },
   drill: { name:'Drill Shell', short:'Drill', radius:34, damage:44, ammo:2, power:560, gravity:.3 },
   // utilities: they do not end the turn
   rope: { name:'Grapple Rope', short:'Rope', radius:0, damage:0, ammo:5, power:1, utility:true },
@@ -308,26 +310,32 @@ function stepDrill(g, s, mask, frogs, nx, ny) {
   if (s.bore >= 150 || (s.bore > 12 && !solid(mask, s.x + s.dx * 10, s.y + s.dy * 10)) || s.y > WATER || s.x < 0 || s.x >= W || s.y < 0) return 'boom';
   return '';
 }
-export function explode(g, x, y, type) {
+// vx, vy: the speed of the shell that exploded. A hit frog takes part of that momentum and gets moved.
+export function explode(g, x, y, type, vx = 0, vy = 0) {
   const w = WEAPONS[type];
   if(type==='revolver'||type==='bow'){
     const target=g.frogs.filter(f=>f.alive&&Math.abs(f.x-x)<18&&y>f.y-61&&y<f.y+5).sort((a,b)=>Math.hypot(a.x-x,a.y-28-y)-Math.hypot(b.x-x,b.y-28-y))[0];
-    if(target)hurt(g,target,w.damage);
+    if(target){hurt(g,target,w.damage);const dir=Math.sign(vx)||(target.x>=x?1:-1);knock(g,target,dir*(type==='bow'?140:110),-100);}
     g.dirty.push(carve(g.mask,x,y,w.radius));g.booms.push({x,y,r:5,t:0});g.events.push({type:'boom'});return;
   }
   g.dirty.push(carve(g.mask, x, y, w.radius));
   g.booms.push({ x, y, r: w.radius, t: 0 });
   g.events.push({ type: 'boom', x, y, r: w.radius });
+  const reach = w.reach ?? w.radius * 1.7, carry = Math.max(-80, Math.min(80, vx * .14));
   for (const f of g.frogs) {
     if (!f.alive) continue;
-    const dx = f.x - x, dy = (f.y - 11) - y, d = Math.hypot(dx, dy), reach = w.radius * 1.7;
+    const dx = f.x - x, dy = (f.y - 11) - y, d = Math.hypot(dx, dy);
     if (d > reach) continue;
     const k = 1 - d / reach, dmg = Math.round(w.damage * (.35 + .65 * k));
     hurt(g, f, dmg);
-    const push = 260 * k + 60, nx = d ? dx / d : 0;
-    f.vx += nx * push; f.vy -= 150 * k + 90; f.ground = false; f.fallFrom = f.y;
+    // Away from the blast, at least a little sideways (a hit from straight above still moves the frog),
+    // plus the shell's own momentum: a rocket from the left shoves the frog to the right.
+    const push = 260 * k + 60, away = Math.abs(dx) > 3 ? Math.sign(dx) : Math.sign(vx) || (f.x >= x ? 1 : -1);
+    const side = d && Math.abs(dx / d) > .25 ? dx / d : away * .25;
+    knock(g, f, side * push + carry * k, -(150 * k + 90));
   }
 }
+function knock(g, f, vx, vy) { f.vx += vx; f.vy += vy; f.ground = false; f.fallFrom = f.y; }
 function hurt(g, f, dmg) {
   if (dmg <= 0 || !f.alive) return;
   f.hp = Math.max(0, f.hp - dmg); g.texts.push({ x: f.x, y: f.y - 30, text: '-' + dmg, t: 0, team: f.team });
@@ -437,12 +445,19 @@ export function step(g) {
         const type=s.type==='gold'?'toe':'shard';
         for(let i=0;i<5;i++){const a=-Math.PI+(i+.5)*Math.PI/5;g.shots.push({type,x:s.x,y:s.y-5,vx:Math.cos(a)*(160+g.rand()*100),vy:Math.sin(a)*240-60,t:0});}
       }
-      explode(g, s.x, s.y, s.type); g.shots.splice(g.shots.indexOf(s), 1); }
+      explode(g, s.x, s.y, s.type, s.vx, s.vy); g.shots.splice(g.shots.indexOf(s), 1); }
     else if (r) { g.shots.splice(g.shots.indexOf(s), 1); if (r === 'splash') g.events.push({ type: 'plop', x: s.x }); }
   }
   if (g.phase !== 'aim') for (const f of g.frogs) { f.rope = null; f.jet = null; }
   for (const f of g.frogs) stepFrog(g, f);
-  for (const f of g.frogs) if (f.alive && f.hp <= 0 && f.ground) { f.alive = false; f.gone = 'ko'; g.events.push({ type: 'ko', name: f.name }); }
+  // A frog at 0 HP pops once it lands. Neighbours can drop to 0 too and pop when they land: chain reactions are allowed.
+  for (const f of g.frogs) if (f.alive && f.hp <= 0 && f.ground) {
+    f.alive = false; f.gone = 'ko'; g.events.push({ type: 'ko', name: f.name, x: f.x, y: f.y });
+    g.texts.push({ x: f.x, y: f.y - 50, text: 'KABOOM!', t: 0, team: f.team });
+    explode(g, f.x, f.y - 12, 'frog');
+    const below = surfaceBelow(g.mask, f.x, f.y);   // the gravestone sits at the bottom of the new crater
+    if (below >= WATER) f.gone = 'boom'; else f.y = below - 1;
+  }
   g.booms = g.booms.filter(b => (b.t += STEP) < .5);
   g.texts = g.texts.filter(t => (t.t += STEP) < 1.4);
   if (g.phase === 'aim') {
