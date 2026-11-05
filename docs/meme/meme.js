@@ -1591,6 +1591,49 @@
     });
   }
   function passportMine() { var s = sbSession(); return s && s.discord && passportCache && passportCache.userId === s.userId ? passportCache : null; }
+
+  // ---------- Fren Passport stamp icons (inline retro SVG) ----------
+  // Small late-90s system-icon-style glyphs drawn on a 32x32 grid with hard pixels and bevels
+  // (shape-rendering crispEdges, flat fills, no gradients/gloss), so they match the PondOS chrome.
+  // These are pure cosmetics keyed by catalog id/category. A locked stamp shows a '?' placeholder
+  // instead; the server state alone decides earned vs locked (see A.render below).
+  var PP_ICONS = {
+    // Fresh Fren reuses its committed badge art; the rest are generated from category below.
+    first_fren: '<rect x="6" y="6" width="20" height="20" fill="#7192b4" stroke="#20261e" stroke-width="2"/><path d="M11 20h10v2H11zM13 13h2v3h-2zM17 13h2v3h-2z" fill="#f3f7e4"/>',
+    moonwalker: '<circle cx="16" cy="16" r="10" fill="#d9d2a6" stroke="#20261e" stroke-width="2"/><circle cx="12" cy="13" r="2" fill="#9b9468"/><circle cx="20" cy="18" r="2.4" fill="#9b9468"/>',
+    certified_fren: '<rect x="6" y="5" width="20" height="16" fill="#e7e2c2" stroke="#20261e" stroke-width="2"/><path d="M9 9h14v2H9zM9 13h10v2H9z" fill="#51ac45"/><path d="M19 20l-2 6 3-2 3 2-2-6z" fill="#c43b2e" stroke="#20261e"/>',
+    seven_day_fren: '<rect x="5" y="7" width="22" height="18" fill="#e7e2c2" stroke="#20261e" stroke-width="2"/><rect x="5" y="7" width="22" height="5" fill="#c43b2e"/><path d="M9 15h3v3H9zM14 15h3v3h-3zM19 15h3v3h-3z" fill="#51ac45"/>',
+    community_fren: '<circle cx="11" cy="13" r="4" fill="#51ac45" stroke="#20261e"/><circle cx="21" cy="13" r="4" fill="#7192b4" stroke="#20261e"/><path d="M5 26c0-5 12-5 12 0zM15 26c0-5 12-5 12 0z" fill="#9b9468" stroke="#20261e"/>',
+    curious_fren: '<path d="M11 10h10v4l-3 3v3h-4v-3l-3-3z" fill="#eac151" stroke="#20261e" stroke-width="2"/><rect x="14" y="23" width="4" height="3" fill="#20261e"/>',
+    pepe_guesser: '<circle cx="14" cy="14" r="7" fill="none" stroke="#20261e" stroke-width="3"/><circle cx="14" cy="14" r="4" fill="#51ac45"/><path d="M19 19l6 6" stroke="#20261e" stroke-width="3"/>',
+    scout_fren: '<path d="M16 5l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#eac151" stroke="#20261e" stroke-width="2"/>',
+    miner_fren: '<path d="M8 20l6-6 2 2-6 6z" fill="#9b9468" stroke="#20261e"/><path d="M14 8l4 2 4 4 2 4-3 3-4-2-4-4-2-4z" fill="#8a7a3a" stroke="#20261e" stroke-width="2"/>',
+    detective_fren: '<ellipse cx="16" cy="11" rx="10" ry="3" fill="#20261e"/><rect x="9" y="7" width="14" height="5" rx="2" fill="#3a4a2a" stroke="#20261e"/><circle cx="16" cy="20" r="6" fill="none" stroke="#20261e" stroke-width="3"/>',
+    moon_fren: '<path d="M20 6a10 10 0 1 0 0 20 8 8 0 0 1 0-20z" fill="#d9d2a6" stroke="#20261e" stroke-width="2"/><path d="M8 7l1 3 3 1-3 1-1 3-1-3-3-1 3-1z" fill="#eac151"/>',
+    gamer_fren: '<rect x="4" y="12" width="24" height="10" rx="4" fill="#9b9468" stroke="#20261e" stroke-width="2"/><rect x="8" y="15" width="2" height="4" fill="#20261e"/><rect x="7" y="16" width="4" height="2" fill="#20261e"/><circle cx="21" cy="16" r="1.6" fill="#c43b2e"/><circle cx="24" cy="18" r="1.6" fill="#51ac45"/>',
+    game_night: '<rect x="7" y="8" width="18" height="12" fill="#3a4a2a" stroke="#20261e" stroke-width="2"/><rect x="10" y="11" width="12" height="6" fill="#51ac45"/><rect x="13" y="20" width="6" height="4" fill="#9b9468" stroke="#20261e"/>',
+    collector: '<rect x="6" y="10" width="20" height="14" fill="#8a7a3a" stroke="#20261e" stroke-width="2"/><path d="M6 10l10-4 10 4" fill="none" stroke="#20261e" stroke-width="2"/><rect x="10" y="14" width="4" height="6" fill="#eac151"/><rect x="18" y="14" width="4" height="6" fill="#7192b4"/>',
+    bali: '<path d="M16 4l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#eac151" stroke="#c43b2e" stroke-width="2"/><circle cx="16" cy="15" r="3" fill="#c43b2e"/>'
+  };
+  // category fallback glyph so any new catalog id still renders a sensible retro stamp
+  var PP_ICON_CAT = {
+    community: 'community_fren', avatar: 'first_fren', yeet: 'moon_fren', where_pepe: 'pepe_guesser',
+    arcade: 'gamer_fren', pepegachi: 'collector', secrets: 'curious_fren', exploration: 'curious_fren', mythic: 'bali'
+  };
+  function ppStampGlyph(id, category) {
+    var key = PP_ICONS[id] ? id : (PP_ICON_CAT[category] || 'first_fren');
+    return PP_ICONS[key];
+  }
+  // Build the stamp inner markup: earned uses the category/id glyph, locked shows a retro '?' slot.
+  function ppStampSvg(id, category, earned, mythic) {
+    var inner = earned ? ppStampGlyph(id, category)
+      : '<rect x="7" y="6" width="18" height="20" fill="#cfcabf" stroke="#20261e" stroke-width="2"/>'
+        + '<path d="M12 12a4 4 0 1 1 6 3c-1 1-2 1-2 3h-2c0-3 3-3 3-5a2 2 0 0 0-3-1zM15 21h2v2h-2z" fill="#6b6454"/>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="crispEdges" aria-hidden="true">'
+      + (mythic ? '<rect x="1" y="1" width="30" height="30" fill="none" stroke="#c43b2e" stroke-width="2" stroke-dasharray="3 2"/>' : '')
+      + inner + '</svg>';
+  }
+
   function frenPassport(fromCache) {
     var A = openApp('passport', 'Fren Passport - Properties', 'pep-logo', function (A) {
       passportCss();
@@ -1609,11 +1652,16 @@
           box.appendChild(row);
         }
       }
+      // The Passport is drawn as an open booklet inside the existing PondOS window chrome:
+      // a left identity page (the saved v2 avatar as the "photo", Fren ID / nickname / member-since /
+      // Discord status / PEP stamp) and a right Achievement Stamps page. Every catalog achievement is
+      // rendered; a stamp counts as earned ONLY when the server state lists it with a non-null earned_at.
+      // Locked and planned stamps are never counted. The mythic BALI slot is always locked here; it is a
+      // future server-verified condition and is never awarded or priced on the client.
       A.render = function () {
         var d = passportMine(), box = A.body.querySelector('.passport');
         if (!d || !box) return;
         var state=d.state, catalog=d.catalog;
-        var best = Number(state.yeet_best) || 0;
         var earnedBadges = Array.isArray(state.achievements) ? state.achievements : [];
         var discovered = Array.isArray(state.secrets) ? state.secrets : [];
         var owned = Array.isArray(state.items) ? state.items : [];
@@ -1621,83 +1669,129 @@
         var badges = catalog && Array.isArray(catalog.achievements) ? catalog.achievements : earnedBadges;
         var secrets = catalog && Array.isArray(catalog.secrets) ? catalog.secrets : discovered;
         var items = catalog && Array.isArray(catalog.items) ? catalog.items : owned;
-        var achievementsCount=earnedBadges.filter(function(b){return !!b.earned_at;}).length;
+        // honest earned test: present in server state with a real earned_at timestamp
+        var earnedOf = function(id){ var e=find(earnedBadges,id); return e && e.earned_at ? e : null; };
+        // the mythic BALI stamp is reserved for everyone; it is never earned on the client
+        var MYTHIC_ID = 'bali';
+        var regular = badges.filter(function(x){ return x.id!==MYTHIC_ID && (x.tier!=='mythic'); });
+        var mythic = find(badges, MYTHIC_ID) || {id:MYTHIC_ID,title:'BALI'};
+        var earnedCount = regular.filter(function(x){ return !!earnedOf(x.id); }).length;
+        var secretsCount = discovered.filter(function(s){ return !!s.discovered_at; }).length;
+        var itemsCount = owned.length;
         function piece(tag,cls,value) { var n=el(tag,{class:cls}); n.textContent=value; return n; }
+        function svgSpan(cls,markup){ var n=el('span',{class:cls,'aria-hidden':'true'}); n.innerHTML=markup; return n; }
         box.replaceChildren();
-        var identity=el('div',{class:'passport-identity'});
-        // the saved Fren (only what the server returned), or the site logo until there is one
+
+        var book = el('div', {class:'pp-book'});
+
+        // ----- LEFT PAGE: identity -----
+        var left = el('section', {class:'pp-page pp-left','aria-label':'Fren identity'});
+        left.appendChild(piece('p','pp-page-head','Fren Passport'));
         var look = d.opts && avatarLook(d.opts, state.avatar);
-        var face = el('div', {class:'passport-face'});
-        if (look) face.appendChild(avatarStack(d.opts, look, 'Your Fren: ' + avatarSay(d.opts, look)));
-        else face.appendChild(el('img',{src:'img/pep-logo.webp',alt:'PepecoinHub frog emblem',width:'64',height:'64'}));
-        identity.appendChild(face);
-        var who=el('div');
-        who.appendChild(piece('strong','',state.nickname || 'Discord fren'));
-        who.appendChild(piece('p','passport-muted','Member since '+(state.member_since ? fmt.date(state.member_since) : 'unknown')));
-        who.appendChild(piece('span','passport-muted','Discord verified · A little history of your pond'));
+        var photo = el('div', {class:'pp-photo'});
+        if (look) photo.appendChild(avatarStack(d.opts, look, 'Your Fren: ' + avatarSay(d.opts, look)));
+        else photo.appendChild(el('img',{src:'img/pep-logo.webp',alt:'PepecoinHub frog emblem',width:'64',height:'64'}));
+        photo.appendChild(svgSpan('pp-pep-stamp','<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" shape-rendering="crispEdges" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#c43b2e" stroke-width="2"/><circle cx="20" cy="20" r="13" fill="none" stroke="#c43b2e" stroke-width="1"/><text x="20" y="25" text-anchor="middle" font-family="Tahoma,sans-serif" font-size="13" font-weight="bold" fill="#c43b2e">PEP</text></svg>'));
+        left.appendChild(photo);
+        var idcard = el('dl', {class:'pp-idcard'});
+        function idrow(k,v){ idcard.appendChild(piece('dt','',k)); idcard.appendChild(piece('dd','',v)); }
+        idrow('Fren', state.nickname || 'Discord fren');
+        idrow('Fren ID', state.fren_id || state.user_tag || (d.userId ? ('#'+String(d.userId).slice(0,8)) : '—'));
+        idrow('Member since', state.member_since ? fmt.date(state.member_since) : 'unknown');
+        idrow('Status', 'Discord verified');
+        left.appendChild(idcard);
         if (d.opts) {
-          var make = el('button', {type:'button',class:'app-btn passport-make'});
+          var make = el('button', {type:'button',class:'app-btn pp-make'});
           make.textContent = look ? 'Edit your Fren' : 'Create your Fren';
           make.addEventListener('click', function () { avatarMaker(); });
-          who.appendChild(make);
+          left.appendChild(make);
         }
-        identity.appendChild(who); box.appendChild(identity);
-        var stats=el('div',{class:'passport-stats'});
+
+        // ----- My Fren Journey (cosmetic) -----
+        // XP/level is FLAVOUR ONLY, derived purely from earned achievements. It is not a currency,
+        // cannot be bought, spent, traded or ground; no PEP is involved. Formula (documented on purpose):
+        //   xp    = earnedCount * 100            (100 cosmetic points per earned stamp)
+        //   level = floor(sqrt(xp / 100)) + 1    (so each new stamp nudges a gentle progress bar)
+        // The bar below only shows progress toward the next whole level; it unlocks nothing.
+        var xp = earnedCount * 100;
+        var level = Math.floor(Math.sqrt(xp / 100)) + 1;
+        var intoLevel = xp - ((level - 1) * (level - 1) * 100);
+        var span = (level * level * 100) - ((level - 1) * (level - 1) * 100);
+        var pct = span > 0 ? Math.max(0, Math.min(100, Math.round(intoLevel / span * 100))) : 0;
+        var days = state.member_since ? Math.max(0, Math.floor((Date.now() - new Date(state.member_since).getTime()) / 86400000)) : null;
+        var journey = el('div', {class:'pp-journey'});
+        journey.appendChild(piece('p','pp-page-head','My Fren Journey'));
+        var lvlrow = el('div', {class:'pp-level'});
+        lvlrow.appendChild(piece('strong','','Level '+level));
+        lvlrow.appendChild(piece('span','pp-muted',intoLevel+' / '+span+' XP (cosmetic)'));
+        journey.appendChild(lvlrow);
+        var bar = el('div', {class:'pp-xp','role':'progressbar','aria-valuemin':'0','aria-valuemax':'100','aria-valuenow':String(pct),'aria-label':'Cosmetic XP progress'});
+        var fill = el('span', {class:'pp-xp-fill'}); fill.style.width = pct + '%'; bar.appendChild(fill);
+        journey.appendChild(bar);
+        var jstats = el('div', {class:'pp-jstats'});
         [
-          ['YEET record',best?(best/10).toLocaleString('en-US',{maximumFractionDigits:1})+' m':'—'],
-          ['Badges',String(achievementsCount)+(catalog?' / '+badges.length:'')],
-          ['Secrets',String(discovered.length)+(catalog?' / '+secrets.length:'')],
-          ['Care days',state.care_days==null?'Soon':String(state.care_days)],
-          ['Items',String(owned.length)]
-        ].forEach(function(v) {
-          var d=el('div',{class:'passport-stat'});
-          d.appendChild(piece('strong','',v[1]));d.appendChild(piece('span','',v[0]));stats.appendChild(d);
+          ['Days with Pepe', days==null?'—':String(days)],
+          ['Stamps', earnedCount+' / '+regular.length],
+          ['Secrets', secretsCount+' / '+secrets.length],
+          ['Items', String(itemsCount)]
+        ].forEach(function(v){
+          var c=el('div',{class:'pp-jstat'}); c.appendChild(piece('strong','',v[1])); c.appendChild(piece('span','pp-muted',v[0])); jstats.appendChild(c);
         });
-        box.appendChild(stats);
-        var tabs=el('div',{class:'passport-tabs',role:'tablist','aria-label':'Passport sections'});
-        var panel=el('div',{class:'passport-panel',role:'tabpanel'});
-        var sections=[
-          {name:'Achievements',entries:badges.map(function(x){
-            var earned=find(earnedBadges,x.id);
-            return {title:x.title||x.id,detail:x.description||'PepecoinHub achievement',icon:x.icon,
-              date:earned&&earned.earned_at, status:x.status, locked:!(earned&&earned.earned_at), secret:false};
-          })},
-          {name:'Secrets',entries:secrets.map(function(x){
-            var earned=find(discovered,x.id),locked=!earned;
-            return {title:locked?'???':(x.title||x.id),
-              detail:locked?(x.status==='live'?(x.hint||'Explore PondOS to find this.'):'A mystery for the future.'):'Discovered '+fmt.date(earned.discovered_at),
-              date:earned&&earned.discovered_at,status:x.status,locked:locked,secret:true};
-          })},
-          {name:'Inventory',entries:items.map(function(x){
-            var found=find(owned,x.id),locked=!found;
-            return {title:x.title||x.id,detail:found?'Quantity: '+found.quantity:(x.description||'Not collected yet.'),
-              date:found&&found.earned_at,status:x.status,locked:locked,secret:false};
-          })}
-        ];
-        function selectTab(i) {
-          A.tab = i;
-          tabs.querySelectorAll('button').forEach(function(b,j){b.setAttribute('aria-selected',String(i===j));b.tabIndex=i===j?0:-1;});
-          panel.replaceChildren();
-          var group=sections[i], grid=el('div',{class:'passport-grid'});
-          group.entries.forEach(function(v) {
-            var tile=el('div',{class:'passport-entry'+(v.locked?' locked':'')});
-            if(v.icon&&/^avatar-assets\/[\w-]+\.svg$/.test(v.icon))tile.appendChild(el('img',{class:'passport-badge',src:v.icon,alt:'',width:'32',height:'32'}));
-            tile.appendChild(piece('b','',v.locked?'[Locked] '+v.title:v.title));
-            tile.appendChild(piece('small','',v.detail));
-            if(v.locked&&v.status==='planned')tile.appendChild(piece('small','passport-coming','Coming later'));
-            else if(v.date&&!v.secret)tile.appendChild(piece('small','',fmt.date(v.date)));
-            grid.appendChild(tile);
-          });
-          if(!group.entries.length)panel.appendChild(piece('p','passport-muted','Nothing in this section yet.'));
-          else panel.appendChild(grid);
-          if(i===1)panel.appendChild(piece('p','passport-muted','Three PondOS mysteries can be found now. The others will be released gradually.'));
-          if(i===2)panel.appendChild(piece('p','passport-muted','Moon Rock is not yet a server-verified inventory item. Your YEET souvenir stays in the game until a secure award path is ready.'));
+        journey.appendChild(jstats);
+        // Next Milestone: the first unearned, non-mythic catalog stamp
+        var next = regular.filter(function(x){ return !earnedOf(x.id); })[0];
+        var milestone = el('div', {class:'pp-milestone'});
+        milestone.appendChild(piece('p','pp-mile-head','Next Milestone'));
+        if (next) {
+          milestone.appendChild(svgSpan('pp-mile-icon', ppStampSvg(next.id, next.category, false, false)));
+          var mtxt = el('div');
+          mtxt.appendChild(piece('strong','',next.title||next.id));
+          mtxt.appendChild(piece('small','pp-muted',next.description||'A future server-verified stamp.'));
+          milestone.appendChild(mtxt);
+        } else {
+          milestone.appendChild(piece('p','pp-muted','Every stamp collected. Legend.'));
         }
-        sections.forEach(function(section,i){
-          var b=el('button',{type:'button',class:'app-btn',role:'tab','aria-selected':String(i===0)});
-          b.textContent=section.name;b.addEventListener('click',function(){selectTab(i);});tabs.appendChild(b);
+        journey.appendChild(milestone);
+        left.appendChild(journey);
+        book.appendChild(left);
+
+        // ----- RIGHT PAGE: Achievement Stamps -----
+        var right = el('section', {class:'pp-page pp-right','aria-label':'Achievement stamps'});
+        var rhead = el('div', {class:'pp-stamps-head'});
+        rhead.appendChild(piece('p','pp-page-head','Achievement Stamps'));
+        rhead.appendChild(piece('span','pp-muted',earnedCount+' of '+regular.length+' collected'));
+        right.appendChild(rhead);
+        var grid = el('div', {class:'pp-stamp-grid'});
+        regular.forEach(function(x){
+          var earned = earnedOf(x.id);
+          var cell = el('div', {class:'pp-stamp'+(earned?' is-earned':' is-locked')});
+          // Fresh Fren can reuse its committed SVG badge; others use an inline retro glyph.
+          if (earned && x.id==='first_avatar' && x.icon && /^avatar-assets\/[\w-]+\.svg$/.test(x.icon)) {
+            cell.appendChild(el('img',{class:'pp-stamp-icon',src:x.icon,alt:'',width:'32',height:'32'}));
+          } else {
+            cell.appendChild(svgSpan('pp-stamp-icon', ppStampSvg(x.id, x.category, !!earned, false)));
+          }
+          cell.appendChild(piece('b','pp-stamp-name', earned ? (x.title||x.id) : (x.status==='live' ? (x.title||x.id) : '?')));
+          cell.appendChild(piece('small','pp-stamp-sub', earned ? fmt.date(earned.earned_at) : 'Locked'));
+          cell.setAttribute('title', (x.title||x.id) + (earned ? ' - earned '+fmt.date(earned.earned_at) : (x.description ? ' - '+x.description : ' - locked')));
+          grid.appendChild(cell);
         });
-        box.appendChild(tabs);box.appendChild(panel);selectTab(A.tab||0);
+        right.appendChild(grid);
+
+        // ----- BOTTOM: reserved MYTHIC BALI slot (locked for everyone, no client award, no price fetch) -----
+        var baliEarned = false; // never earned client-side; future server-verified condition only
+        var bali = el('div', {class:'pp-mythic is-locked', title:'Reserved mythic stamp - awarded by the server when Pepecoin reaches $0.01 USD'});
+        bali.appendChild(svgSpan('pp-mythic-icon', ppStampSvg(MYTHIC_ID, 'mythic', baliEarned, true)));
+        var bwrap = el('div', {class:'pp-mythic-text'});
+        bwrap.appendChild(piece('b','pp-mythic-name','BALI'));
+        bwrap.appendChild(piece('span','pp-mythic-sub','$0.01 - BALI'));
+        bwrap.appendChild(piece('small','pp-muted','Reserved for every fren when Pepecoin reaches $0.01 USD. Locked until then.'));
+        bali.appendChild(bwrap);
+        bali.appendChild(piece('span','pp-mythic-lock','Locked'));
+        right.appendChild(bali);
+        book.appendChild(right);
+
+        box.appendChild(book);
       };
       var session = sbSession();
       if (!session || !session.discord) {

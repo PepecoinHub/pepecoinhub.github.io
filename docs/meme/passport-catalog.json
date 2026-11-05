@@ -26,7 +26,84 @@
     {
       "id": "certified_fren",
       "title": "Certified Fren",
-      "description": "Care for your PepeGochi on 100 distinct days.",
+      "description": "Log on to the pond on 100 distinct days. Server verified.",
+      "category": "community",
+      "status": "planned"
+    },
+    {
+      "id": "seven_day_fren",
+      "title": "7 Day Fren",
+      "description": "Visit the pond on seven days in a row. Server verified.",
+      "category": "community",
+      "status": "planned"
+    },
+    {
+      "id": "community_fren",
+      "title": "Community Fren",
+      "description": "Say hello in LAN Party chat on five distinct days. Server verified.",
+      "category": "community",
+      "status": "planned"
+    },
+    {
+      "id": "curious_fren",
+      "title": "Curious Fren",
+      "description": "Open five different PondOS apps. Server verified.",
+      "category": "exploration",
+      "status": "planned"
+    },
+    {
+      "id": "pepe_guesser",
+      "title": "Pepe Guesser",
+      "description": "Find Pepe in the daily Where's Pepe hunt. Server verified.",
+      "category": "where_pepe",
+      "status": "planned"
+    },
+    {
+      "id": "scout_fren",
+      "title": "Scout Fren",
+      "description": "Keep a 14 day Where's Pepe guessing streak. Server verified.",
+      "category": "where_pepe",
+      "status": "planned"
+    },
+    {
+      "id": "miner_fren",
+      "title": "Miner Fren",
+      "description": "Put in the hours in the mining game. Server verified.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "detective_fren",
+      "title": "Detective Fren",
+      "description": "Crack a PondOS mystery case. Server verified.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "moon_fren",
+      "title": "Moon Fren",
+      "description": "Reach the moon in YEET THE PEP. Server verified.",
+      "category": "yeet",
+      "status": "planned"
+    },
+    {
+      "id": "gamer_fren",
+      "title": "Gamer Fren",
+      "description": "Play across the PondOS arcade. Server verified.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "game_night",
+      "title": "Game Night",
+      "description": "Join a live LAN Party game night. Server verified.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "collector",
+      "title": "Collector",
+      "description": "Gather a shelf of PondOS collectibles. Server verified.",
       "category": "pepegachi",
       "status": "planned"
     },
@@ -175,6 +252,14 @@
       "title": "Hundred Day Fren",
       "description": "Reach 100 days as a registered Fren.",
       "category": "community",
+      "status": "planned"
+    },
+    {
+      "id": "bali",
+      "title": "BALI",
+      "description": "$0.01 - BALI. A mythic stamp for every fren when Pepecoin reaches $0.01 USD. Server verified; reserved until then.",
+      "category": "mythic",
+      "tier": "mythic",
       "status": "planned"
     }
   ],

@@ -1,33 +1,86 @@
-/* Fren Passport: PondOS 98 window content only. */
+/* Fren Passport: PondOS 98 window content only. Rendered as an open passport booklet
+   inside the existing window chrome (green title bar, graphite panes, grey bevels). */
 .passport { font: 12px/1.45 var(--f-chrome), Tahoma, sans-serif; color: var(--ink); min-width: 0; }
 .passport h3 { font: bold 15px var(--f-chrome),Tahoma,sans-serif; margin: 0 0 5px; }
-.passport-identity { display: flex; gap: 10px; align-items: center; padding: 8px; border: 1px solid var(--chrome-lo); background: var(--pane); }
-.passport-face { flex: none; display: grid; place-items: center; width: 96px; height: 96px; background: var(--chrome); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
-.passport-face > img { width: 64px; height: 64px; object-fit: cover; image-rendering: pixelated; }
-.passport-face .fa-stack { width: 92px; height: 92px; }
-.passport-identity strong { display: block; font-size: 16px; overflow-wrap: anywhere; }
-.passport-make { display: block; margin-top: 6px; padding: 6px 12px; font-size: 12px; }
-.passport-muted { color: var(--muted); margin: 3px 0; }
-.passport-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-.passport-stat { padding: 9px 5px; text-align: center; border: 1px solid var(--chrome-lo); background: var(--pane); }
-.passport-stat strong { display: block; font: bold 21px/1.2 var(--f-chrome),Tahoma,sans-serif; color: var(--ink); }
-.passport-stat span { display: block; font-size: 11px; }
-.passport-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
-.passport-tabs button[aria-selected="true"] { font-weight: 700; background: var(--pane); }
-.passport-panel { min-height: 136px; padding: 10px; border: 1px solid var(--chrome-lo); background: var(--pane); overflow-wrap: anywhere; }
-.passport-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
-.passport-entry { padding: 8px; border: 1px solid var(--chrome-lo); background: var(--chrome); }
-.passport-entry b { display: block; }
-.passport-entry small { display: block; color: var(--muted); }
-.passport-entry.locked { opacity: .74; }
-.passport-badge { float: right; width: 32px; height: 32px; margin: 0 0 4px 6px; image-rendering: pixelated; }
-.passport-entry.locked .passport-badge { filter: grayscale(1); }
-.passport-coming { font-style: italic; margin-top: 5px; }
-.passport-grid { max-height: min(44vh, 350px); overflow: auto; align-content: start; }
-.passport-entry b { font-weight: 700; }
-.passport-note { margin: 0; }
-.passport-note { padding: 9px; border: 1px dotted var(--chrome-lo); }
-@media(max-width:400px) { .passport-stats { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+.passport-muted, .pp-muted { color: var(--muted); margin: 2px 0; }
+.passport-note { margin: 0; padding: 9px; border: 1px dotted var(--chrome-lo); }
+
+/* the open booklet: two squared retro pages with a spine between them */
+.pp-book { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 0; background: var(--pane);
+  border: 2px solid var(--chrome-dk); box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px -1px 0 var(--chrome-lo); }
+.pp-page { padding: 10px; min-width: 0; }
+.pp-left { border-right: 2px solid var(--chrome-dk); box-shadow: inset -3px 0 0 var(--chrome-lo), inset -5px 0 0 var(--chrome-hi);
+  background: linear-gradient(90deg, var(--pane) 0%, var(--pane) 86%, var(--chrome) 100%); }
+.pp-right { background: var(--pane); }
+.pp-page-head { margin: 0 0 6px; font: bold 13px var(--f-chrome),Tahoma,sans-serif; letter-spacing: .5px; text-transform: uppercase;
+  border-bottom: 1px solid var(--chrome-lo); padding-bottom: 3px; }
+
+/* LEFT PAGE: avatar photo + identity card + PEP stamp */
+.pp-photo { position: relative; width: 112px; height: 112px; margin: 0 auto 8px; display: grid; place-items: center; background: var(--chrome);
+  box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
+.pp-photo > img { width: 72px; height: 72px; object-fit: cover; image-rendering: pixelated; }
+.pp-photo .fa-stack { width: 104px; height: 104px; }
+.pp-pep-stamp { position: absolute; right: -6px; bottom: -6px; transform: rotate(-12deg); opacity: .9; pointer-events: none; }
+.pp-idcard { display: grid; grid-template-columns: auto 1fr; gap: 1px 8px; margin: 0 0 8px; padding: 6px 7px;
+  border: 1px solid var(--chrome-lo); background: var(--chrome); box-shadow: inset 1px 1px 0 var(--chrome-hi); }
+.pp-idcard dt { color: var(--muted); font-size: 11px; }
+.pp-idcard dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.pp-make { display: block; width: 100%; padding: 6px 10px; font-size: 12px; }
+
+/* My Fren Journey panel (cosmetic) */
+.pp-journey { margin-top: 10px; padding-top: 6px; border-top: 1px solid var(--chrome-lo); }
+.pp-level { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
+.pp-level strong { font: bold 13px var(--f-chrome),Tahoma,sans-serif; }
+.pp-level span { font-size: 10.5px; }
+.pp-xp { height: 14px; margin: 4px 0 8px; background: var(--chrome); border: 1px solid var(--chrome-dk);
+  box-shadow: inset 1px 1px 0 var(--chrome-lo); overflow: hidden; }
+.pp-xp-fill { display: block; height: 100%; background: repeating-linear-gradient(90deg, #51ac45 0 7px, #46983b 7px 8px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
+.pp-jstats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 5px; }
+.pp-jstat { padding: 5px 4px; text-align: center; border: 1px solid var(--chrome-lo); background: var(--chrome); }
+.pp-jstat strong { display: block; font: bold 16px/1.1 var(--f-chrome),Tahoma,sans-serif; }
+.pp-jstat span { display: block; font-size: 10px; }
+.pp-milestone { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; align-items: center; margin-top: 8px; padding: 6px 7px;
+  border: 1px dashed var(--chrome-lo); background: var(--chrome); }
+.pp-mile-head { grid-column: 1 / -1; margin: 0; font-weight: 700; font-size: 11px; text-transform: uppercase; color: var(--muted); }
+.pp-mile-icon { display: grid; place-items: center; }
+.pp-milestone strong { font-weight: 700; }
+.pp-milestone small { display: block; }
+
+/* RIGHT PAGE: Achievement Stamps grid */
+.pp-stamps-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.pp-stamp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px;
+  max-height: min(42vh, 330px); overflow: auto; align-content: start; padding: 2px; }
+.pp-stamp { display: grid; justify-items: center; gap: 2px; padding: 6px 4px; text-align: center; background: var(--chrome);
+  border: 1px solid var(--chrome-lo); box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px -1px 0 var(--chrome-lo); }
+.pp-stamp-icon { display: block; width: 32px; height: 32px; image-rendering: pixelated; }
+.pp-stamp-name { font-weight: 700; font-size: 10.5px; line-height: 1.1; overflow-wrap: anywhere; }
+.pp-stamp-sub { display: block; font-size: 9.5px; color: var(--muted); }
+/* earned stamps read as "stamped in"; locked are greyed and dashed */
+.pp-stamp.is-earned { background: var(--pane); box-shadow: inset 0 0 0 2px #c43b2e33, inset 1px 1px 0 var(--chrome-hi); }
+.pp-stamp.is-earned .pp-stamp-sub { color: #9a3a2e; font-weight: 700; }
+.pp-stamp.is-locked { opacity: .72; border-style: dashed; }
+.pp-stamp.is-locked .pp-stamp-icon { filter: grayscale(1); }
+
+/* reserved mythic BALI slot at the bottom (locked for everyone) */
+.pp-mythic { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; margin-top: 8px; padding: 8px 10px;
+  background: var(--chrome); border: 2px dashed #c43b2e; box-shadow: inset 1px 1px 0 var(--chrome-hi); }
+.pp-mythic.is-locked { opacity: .85; }
+.pp-mythic.is-locked .pp-mythic-icon { filter: grayscale(.4); }
+.pp-mythic-icon { display: grid; place-items: center; }
+.pp-mythic-name { display: block; font: bold 16px var(--f-chrome),Tahoma,sans-serif; letter-spacing: 2px; color: #c43b2e; }
+.pp-mythic-sub { display: block; font-weight: 700; font-size: 12px; }
+.pp-mythic-lock { align-self: center; padding: 2px 7px; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--muted);
+  border: 1px solid var(--chrome-lo); background: var(--pane); }
+
+/* phone: stack the booklet into a single scrolling column */
+@media (max-width: 600px) {
+  .pp-book { grid-template-columns: minmax(0, 1fr); }
+  .pp-left { border-right: 0; border-bottom: 2px solid var(--chrome-dk); box-shadow: none; background: var(--pane); }
+  .pp-stamp-grid { max-height: none; }
+  .pp-mythic { grid-template-columns: auto 1fr; }
+  .pp-mythic-lock { grid-column: 2; justify-self: start; }
+}
 
 /* Create Your Fren (Avatar Maker). Every Fren is stacked from aligned 512×512 hand-drawn vector layers. */
 .fa-stack { position: relative; display: block; overflow: hidden; aspect-ratio: 1; }
