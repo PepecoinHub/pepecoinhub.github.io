@@ -95,4 +95,8 @@ export function step(s) {
   }
   return s;
 }
-export const score = s => Math.round(Math.max(0, Math.min(MAX_DISTANCE, s?.x || 0)) * 10);
+export const score = s => {
+  const rounded = Math.round(Math.max(0, s?.x || 0) * 10);
+  // Reserve the exact maximum for an actual finish, even if a near miss rounds up.
+  return s?.endReason === 'course' ? MAX_DISTANCE * 10 : Math.min(rounded, MAX_DISTANCE * 10 - 1);
+};
