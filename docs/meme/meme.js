@@ -175,6 +175,9 @@
     var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="img/gif-085-still.webp" alt="" width="28" height="28"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
     meItem.addEventListener('click', function () { setOpen(false); logOn(); });
     smMain.appendChild(meItem);
+    var passportItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>Fren Passport</b><small>My achievements and secrets</small></span>');
+    passportItem.addEventListener('click', function () { setOpen(false); frenPassport(); });
+    smMain.appendChild(passportItem);
     var findItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('search') + '" alt="" width="28" height="28"><span><b>Find…</b> <small>games, pages, tools</small></span>');
     findItem.addEventListener('click', function () { setOpen(false); finder(); });
     smMain.appendChild(findItem);
@@ -1564,6 +1567,94 @@
     return { discord: !!d, name: name || nick || 'guest' };
   }
   function signInHref() { return BASE + 'games/?login=1&back=' + encodeURIComponent(location.pathname + location.search.replace(/[?&]signedin=1/, '')); }
+  // Fren Passport: one Discord identity across PondOS and the games.
+  // All collectible data comes from a read-only, identity-checked Supabase RPC.
+  function frenPassport() {
+    var A = openApp('passport', 'Fren Passport - Properties', 'pep-logo', function (A) {
+      if (!document.getElementById('fren-passport-css')) {
+        var sheet = el('link', { id: 'fren-passport-css', rel: 'stylesheet', href: 'passport.css?v=20261105a' });
+        document.head.appendChild(sheet);
+      }
+      A.body.innerHTML = '<div class="passport"><p class="passport-muted" role="status">Loading your passport…</p></div>';
+      function notice(message, needsLogin) {
+        var box = A.body.querySelector('.passport');
+        box.replaceChildren();
+        var p = el('p', { class: 'passport-note', role: 'status' }); p.textContent = message; box.appendChild(p);
+        if (needsLogin) { var b = el('button', { type: 'button', class: 'app-btn' }); b.textContent = 'Log on with Discord'; b.addEventListener('click', logOn); box.appendChild(b); }
+      }
+      if (!sbSession() || !sbSession().discord) {
+        notice('Log on with Discord to open your Fren Passport. Guest scores do not create a permanent passport.', true);
+        return;
+      }
+      rpc('gry_passport_state', {}).then(function (state) {
+        if (!state || !state.signed_in) { notice('Your Discord session expired. Please log on again.', true); return; }
+        var box = A.body.querySelector('.passport'); if (!box) return;
+        var created = state.member_since ? fmt.date(state.member_since) : 'Unknown';
+        var best = Number(state.yeet_best) || 0;
+        var badgeList = Array.isArray(state.achievements) ? state.achievements : [];
+        var secrets = Array.isArray(state.secrets) ? state.secrets : [];
+        var items = Array.isArray(state.items) ? state.items : [];
+        function piece(tag, cls, txt) {
+          var n = el(tag, { class: cls }); n.textContent = txt; return n;
+        }
+        box.replaceChildren();
+        var id = el('div', { class: 'passport-identity' });
+        id.appendChild(el('img', { src: 'img/pep-logo.webp', alt: 'PepeGochiHub icon', width: '54', height: '54' }));
+        var who = el('div');
+        who.appendChild(piece('strong', '', state.nickname || 'Discord fren'));
+        who.appendChild(piece('p', 'passport-muted', 'Member since ' + created));
+        who.appendChild(piece('span', 'passport-muted', 'Discord verified · Your pond history'));
+        id.appendChild(who); box.appendChild(id);
+        var stats = el('div', { class: 'passport-stats' });
+        [['YEET record', best ? (best / 10).toLocaleString('en-US', {maximumFractionDigits:1}) + ' m' : '—'],
+         ['Achievements', String(state.achievements_earned || 0)],
+         ['Secrets', String(secrets.length)],
+         ['Care days', state.care_days == null ? 'Soon' : String(state.care_days)],
+         ['Items', String(items.length)]].forEach(function (v) {
+          var d = el('div', { class: 'passport-stat' });
+          d.appendChild(piece('strong', '', v[1])); d.appendChild(piece('span', '', v[0])); stats.appendChild(d);
+        });
+        box.appendChild(stats);
+        var tabs = el('div', { class: 'passport-tabs', role: 'tablist', 'aria-label': 'Passport sections' });
+        var panel = el('div', { class: 'passport-panel', role: 'tabpanel' });
+        var sections = [
+          {name:'Achievements',entries:badgeList.map(function(b) {return {name:b.title||b.id,description:b.description||'',locked:!b.earned_at,when:b.earned_at?fmt.date(b.earned_at):''};})},
+          {name:'Secrets',entries:secrets.map(function(v) {return {name:v.id,description:'Discovered '+fmt.date(v.discovered_at),locked:false};})},
+          {name:'Inventory',entries:items.map(function(v) {return {name:v.id,description:'Quantity: '+v.quantity,locked:false};})}
+        ];
+        function selectTab(i) {
+          tabs.querySelectorAll('button').forEach(function(b, j) { b.setAttribute('aria-selected', String(j===i)); b.tabIndex=j===i?0:-1; });
+          panel.replaceChildren();
+          var group = sections[i];
+          if (!group.entries.length) {
+            panel.appendChild(piece('p','passport-muted',i===1?'No secrets recorded yet. Some secrets are hiding around the pond.':i===2?'No collectibles yet. Your inventory will grow with PepeGochi and other games.':'No achievements yet.'));
+          } else {
+            var grid = el('div', {class:'passport-grid'});
+            group.entries.forEach(function(v) {
+              var tile = el('div', {class:'passport-entry'+(v.locked?' locked':'')});
+              tile.appendChild(piece('b','',v.locked?'[Locked] '+v.name:v.name));
+              tile.appendChild(piece('small','',v.locked?(v.description||'Not unlocked yet'):((v.description||'')+(v.when?' · '+v.when:''))));
+              grid.appendChild(tile);
+            });
+            panel.appendChild(grid);
+          }
+          if (i===1) panel.appendChild(piece('p','passport-muted','More easter eggs will arrive over time. No fake discoveries are counted.'));
+          if (i===2) panel.appendChild(piece('p','passport-muted','Moon Rock must be awarded by the server. A browser-only YEET souvenir does not count as verified inventory.'));
+        }
+        sections.forEach(function(g, i) {
+          var b=el('button',{type:'button',class:'app-btn',role:'tab','aria-selected':String(i===0)});
+          b.textContent=g.name;b.addEventListener('click',function(){selectTab(i);});tabs.appendChild(b);
+        });
+        box.appendChild(tabs);box.appendChild(panel);selectTab(0);
+      }, function (err) {
+        notice(/PGRST202|could not find the function|does not exist/i.test(err.message||'')
+          ? 'Fren Passport is ready, but its database update is not installed yet.'
+          : 'Could not load your profile. Please try again later.', false);
+      });
+    }, 610);
+    return A;
+  }
+
   function logOn() {
     openApp('logon', 'Log On to the Pond', 'gif-085-still', function (A) {
       var paint = function () {
