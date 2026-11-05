@@ -3,3 +3,24 @@ html,body{height:100%;overflow:hidden}.pw-site,.pw-rotate,.pw-status{display:non
 @media(pointer:coarse){.pw-controls .pw-move{display:flex;gap:3px;margin-left:auto}.pw-controls .pw-move button{min-width:44px;min-height:44px;padding:5px}.pw-controls #fire{display:block;min-height:44px;min-width:88px;padding:5px 8px;font-size:11px;letter-spacing:0}.pw-controls #arsenal-open{min-height:44px}.pw-controls #skip{display:none}.weapon-readout{display:none}}
 @media(max-width:550px){.pw-team b{font-size:12px;max-width:65px}.pw-hp{gap:1px}.pw-hp i{height:5px}.pw-mid{gap:4px}.pw-wind{display:none}#turn{font-size:10px;max-width:105px}.pw-chrome small{display:none}.pw-controls{left:4px;right:4px;gap:3px}.pw-chrome button{padding:4px 6px}.pw-controls #arsenal-open{font-size:10px;padding:4px 7px}}
 #menu.pw-menu{left:50%;transform:translate(-50%,-50%)}.pw-stage{background:linear-gradient(#193d68 75%,#287aaf)}
+/* Touch: a held finger must not select text or open the iOS copy/paste bubble. Only the name fields allow it. */
+html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%}
+.pw,.pw-arsenal{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pw input,.pw select{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+.pw canvas,.pw button,.pw img{-webkit-tap-highlight-color:transparent}
+/* The FIRE button fills up while it is held, so the thumb on it can feel the charge too. */
+.pw-controls #fire{background:linear-gradient(90deg,#ff6a2b 0 calc(var(--charge,0)*100%),transparent 0),linear-gradient(#f3d271,#bd8c37)}
+/* iPhone landscape: keep the controls clear of the notch and the home bar */
+.pw{padding-left:max(4px,env(safe-area-inset-left));padding-right:max(4px,env(safe-area-inset-right));padding-bottom:max(4px,env(safe-area-inset-bottom))}
+@media(pointer:coarse){
+  .pw-controls{bottom:max(7px,env(safe-area-inset-bottom))}
+  .pw-controls .pw-move{gap:6px}
+  .pw-controls .pw-move button{min-width:54px;min-height:54px;font-size:18px}
+  .pw-controls #fire{min-height:58px;min-width:124px;font-size:12px;touch-action:none}
+  .pw-controls #left,.pw-controls #right,.pw-controls #hop{touch-action:none}
+  .pw-controls #arsenal-open{min-height:54px;max-width:132px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pw-arsenal .pw-weapons button{height:64px;min-height:64px}
+}
+@media(pointer:coarse) and (orientation:portrait){.pw .pw-rotate{display:block;flex:none;margin:4px 0 0;padding:4px 8px;font-size:12px;text-align:center;background:#fff7d6;border:1px solid #c9a227}}
+@media(pointer:coarse) and (max-height:420px){.pw-chrome{min-height:24px}.pw-bar{min-height:32px;padding:2px 8px}.pw-timer{font-size:19px}}
+.touch-hint{display:none}@media(pointer:coarse){.touch-hint{display:block}.keys-hint{display:none}}

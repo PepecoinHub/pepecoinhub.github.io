@@ -36,7 +36,9 @@ const NAMES = [['Hopper', 'Lily', 'Ribbit', 'Pad'], ['Croak', 'Bog', 'Toady', 'M
 
 export function rng(seed) {   // mulberry32
   let a = seed >>> 0;
-  return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const next = () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  next.state = () => a;   // rng(next.state()) continues the same sequence (used to save and resume a match online)
+  return next;
 }
 
 // ---------- terrain: 1 = ground ----------

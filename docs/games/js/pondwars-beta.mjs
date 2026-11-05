@@ -1,5 +1,6 @@
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, newGame, startTurn, step, fire, walk, hop, backflip, canMove, MAPS, makeTerrain, skip, cpuPlan, me, aliveOf, projectileOrigin, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261105a';
+import { W, H, WATER, STEP, G, WEAPONS, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261105b';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261105b';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
@@ -11,10 +12,13 @@ const cv = $('#pw'), ctx = cv.getContext('2d');
 // The battlefield is always W×H. On a wide screen the canvas gets wider instead of leaving empty bands at the sides:
 // the sky, hills and water simply go on to the left and right (OX = world units added on each side).
 let VW = W, OX = 0;
+// ui: how much to enlarge the crosshair and power meter, so they stay readable when a phone shrinks the battlefield
+let ui = 1;
 function fitStage() {
   const r=cv.parentElement.getBoundingClientRect();
   VW=Math.max(W,Math.round(H*r.width/Math.max(1,r.height)));OX=(VW-W)/2;
   if(cv.width!==VW)cv.width=VW;
+  const shown=Math.min(r.width/VW,r.height/H)||1;ui=Math.max(1,Math.min(2,.9/shown));
 }
 addEventListener('resize', () => requestAnimationFrame(fitStage));
 if ('ResizeObserver' in window) { let ro = 0; new ResizeObserver(() => { cancelAnimationFrame(ro); ro = requestAnimationFrame(fitStage); }).observe(document.body); }
@@ -40,9 +44,15 @@ const previousPose=new WeakMap();
 function pose(o){const p=previousPose.get(o);const a=Math.min(1,acc/STEP);return p?{...o,x:p.x+(o.x-p.x)*a,y:p.y+(o.y-p.y)*a}:o;}
 held.u = 0;
 let acc = 0, last = 0, cpu = null, shake = 0, splashes = [];
+// pending: the player's actions (jump, fire, weapon, skip) waiting for the next simulation step.
+// Everything the player does goes through applyInput, the same path an online match replays.
+let pending = [], net = null, remoteP = 0;
+const touchUI = matchMedia('(pointer: coarse)');
 
 function status(t) { $('#status').textContent = t; }
 const isCpu = team => opts.mode === 'cpu' && team === 1;
+const isOnline = team => !!net && team !== net.team;
+const remoteTurn = () => !!net && !net.drives();
 
 // ---------- the ground picture, redrawn only where it changes ----------
 function paintGround(x0 = 0, y0 = 0, x1 = W - 1, y1 = H - 1) {
@@ -180,16 +190,43 @@ function draw(t) {
       ctx.strokeStyle = '#e0414c'; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.moveTo(aimX, 0); ctx.lineTo(aimX, WATER); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle = '#e0414c'; ctx.font = 'bold 12px Tahoma'; ctx.fillText('CANDLES DROP HERE', aimX, 18);
     } else {
-      const cx = f.x + Math.cos(aim) * 52, cy = f.y - 32 + Math.sin(aim) * 52;
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, 7, 0, 7); ctx.moveTo(cx - 11, cy); ctx.lineTo(cx + 11, cy); ctx.moveTo(cx, cy - 11); ctx.lineTo(cx, cy + 11); ctx.stroke();
-      if (charging || cpu?.charging) {
-        const p = cpu?.charging ? cpu.p : power;
-        ctx.fillStyle = `hsl(${120 - p * 120} 90% 50%)`;
-        for (let i = 1; i <= 10; i++) if (i / 10 <= p) { ctx.beginPath(); ctx.arc(f.x + Math.cos(aim) * (12 + i * 4), f.y - 32 + Math.sin(aim) * (12 + i * 4), 1.5 + i * .25, 0, 7); ctx.fill(); }
-      }
+      const s = ui, ox = f.x, oy = f.y - 32, dx = Math.cos(aim), dy = Math.sin(aim);
+      const cx = ox + dx * 52 * s, cy = oy + dy * 52 * s;
+      ctx.strokeStyle = '#000a'; ctx.lineWidth = 4 * s; ctx.beginPath(); ctx.arc(cx, cy, 7 * s, 0, 7); ctx.stroke();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2 * s; ctx.beginPath(); ctx.arc(cx, cy, 7 * s, 0, 7); ctx.moveTo(cx - 11 * s, cy); ctx.lineTo(cx + 11 * s, cy); ctx.moveTo(cx, cy - 11 * s); ctx.lineTo(cx, cy + 11 * s); ctx.stroke();
+      const p = charging ? power : cpu?.charging ? cpu.p : remoteP;
+      if (charging || cpu?.charging || remoteP > 0) powerMeter(ox, oy, dx, dy, p, s, t);
     }
   }
+  // first seconds of a turn on a phone: how the controls work
+  if (touchUI.matches && mine() && g.timer > TURN_TIME - 5 && !charging) {
+    const text = 'TAP TO AIM · HOLD FIRE TO SHOOT', size = Math.round(13 * ui);
+    ctx.font = `bold ${size}px Tahoma, Verdana, sans-serif`; ctx.textAlign = 'center';
+    const w = ctx.measureText(text).width + size;
+    ctx.globalAlpha = Math.min(1, g.timer - (TURN_TIME - 5)); ctx.fillStyle = '#000b'; ctx.fillRect(W / 2 - w / 2, 8, w, size * 1.8);
+    ctx.fillStyle = '#ffe680'; ctx.fillText(text, W / 2, 8 + size * 1.3); ctx.globalAlpha = 1;
+  }
   ctx.restore();
+}
+// The charge: a row of beads growing out of the frog along the aim, green to red, with the percentage above.
+// Empty beads stay as outlines, so the full length is visible from the first moment.
+function powerMeter(ox, oy, dx, dy, p, s, t) {
+  const n = 14;
+  for (let i = 1; i <= n; i++) {
+    const d = (14 + i * 8) * s, r = (2.2 + i * .5) * s, x = ox + dx * d, y = oy + dy * d, on = i / n <= p + 1e-6;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 7);
+    if (on) { ctx.fillStyle = `hsl(${120 - (i / n) * 120} 95% 52%)`; ctx.fill(); ctx.strokeStyle = '#0008'; ctx.lineWidth = 1.5 * s; ctx.stroke(); }
+    else { ctx.strokeStyle = '#ffffff66'; ctx.lineWidth = 1.5 * s; ctx.stroke(); }
+  }
+  if (p >= 1 && !reduce) {   // full power: the last bead pulses
+    const d = (14 + n * 8) * s, k = (Math.sin(t * 14) + 1) / 2;
+    ctx.strokeStyle = `rgba(255,80,40,${.4 + k * .5})`; ctx.lineWidth = 3 * s;
+    ctx.beginPath(); ctx.arc(ox + dx * d, oy + dy * d, (2.2 + n * .5 + 4 + k * 4) * s, 0, 7); ctx.stroke();
+  }
+  const size = Math.round(15 * s), label = Math.round(p * 100) + '%';
+  ctx.font = `bold ${size}px Tahoma, Verdana, sans-serif`; ctx.textAlign = 'center';
+  ctx.lineWidth = 4 * s; ctx.strokeStyle = '#000c'; ctx.strokeText(label, ox, oy - 62 - 8 * s);
+  ctx.fillStyle = `hsl(${120 - p * 120} 95% 60%)`; ctx.fillText(label, ox, oy - 62 - 8 * s);
 }
 
 // ---------- the bar above the field ----------
@@ -198,7 +235,7 @@ function hud() {
     const box = $('#hp' + t); box.replaceChildren();
     for (const f of g.frogs.filter(f => f.team === t)) { const i = document.createElement('i'); i.style.width = Math.max(2, f.hp * (innerWidth < 760 ? .22 : .5)) + 'px'; i.title = f.name + ': ' + f.hp;i.style.background=TEAM[t].band; if (!f.alive) i.className = 'dead'; box.append(i); }
   }
-  for(const t of [0,1]){$('#name'+t).textContent=TEAM[t].name+(t===1&&isCpu(1)?' (CPU)':'');$('#name'+t).style.color=TEAM[t].band;}
+  for(const t of [0,1]){$('#name'+t).textContent=TEAM[t].name+(t===1&&isCpu(1)?' (CPU)':isOnline(t)?' (ONLINE)':'');$('#name'+t).style.color=TEAM[t].band;}
   const f = me(g);
   $('#turn').textContent = g.phase === 'over' ? 'Game over' : `${f.name} (${TEAM[g.team].name})`;
   $('#turn').className = 't' + g.team;
@@ -207,7 +244,7 @@ function hud() {
   $('#timer').classList.toggle('low', g.phase === 'aim' && g.timer < 6);
   const wi = $('#wind i'); wi.style.width = Math.abs(g.wind) * 50 + '%'; wi.style.marginLeft = g.wind < 0 ? (50 - Math.abs(g.wind) * 50) + '%' : '50%';
   $('#wind').title = 'Wind ' + (g.wind < 0 ? '← ' : g.wind > 0 ? '→ ' : '') + Math.abs(g.wind * 10) + ': it pushes rockets';
-  const mine = !paused && g.phase === 'aim' && !isCpu(g.team);
+  const mine = !paused && g.phase === 'aim' && !isCpu(g.team) && !remoteTurn();
   document.querySelectorAll('.pw-controls button').forEach(b => { b.disabled = !mine; });
   for(const id of ['#left','#right','#hop'])$(id).disabled=!movementAllowed();
   $('#movement').textContent='MOVE '+Math.floor(g.movement);
@@ -219,15 +256,19 @@ function hud() {
   });
   $('#weapon-name').textContent=WEAPONS[g.weapon].name;
   $('#weapon-detail').textContent=(descriptions[g.weapon]||'')+(WEAPONS[g.weapon].utility?' · TURN GOES ON':' · MAX '+WEAPONS[g.weapon].damage+' HP'+(g.weapon==='cluster'||g.weapon==='gold'?' + FRAGMENTS':''));
-  const fu=me(g);$('#fire').textContent=g.weapon==='rope'?(fu.rope?'LET GO':'FIRE THE ROPE'):g.weapon==='jetpack'?(fu.jet?'JETPACK OFF':'START JETPACK'):g.weapon==='teleport'?'TAP THE MAP':g.weapon==='bat'?'SWING THE BAT':g.weapon==='revolver'?'FIRE · '+(2-g.pistolShots)+' LEFT':'HOLD TO FIRE';
+  // The FIRE button only shows on touch screens: tap the map to aim or pick a spot, then press here.
+  const fu=me(g);$('#fire').textContent=g.weapon==='rope'?(fu.rope?'LET GO':'FIRE THE ROPE'):g.weapon==='jetpack'?(fu.jet?'JETPACK OFF':'START JETPACK'):g.weapon==='teleport'?'TELEPORT HERE':g.weapon==='candles'?'DROP CANDLES':g.weapon==='bat'?'SWING THE BAT':g.weapon==='revolver'?'FIRE · '+(2-g.pistolShots)+' LEFT':'HOLD TO FIRE';
+  // phones hide the weapon readout, so the arsenal button names the weapon in hand
+  $('#arsenal-open').textContent=touchUI.matches?'▲ '+(WEAPONS[g.weapon].short||'Arsenal'):'Arsenal';
   $('#angle-read').textContent=Math.round(-aim*180/Math.PI)+'°';
 }
 
 // ---------- turns, events, CPU ----------
 function events() {
   for (const e of g.events) {
-    if (e.type === 'turn') { closeArsenal();keys.clear();charging=false;held.l=held.r=0;$('#power').style.width='0%'; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x; status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
-    if (e.type === 'fire') {closeArsenal();keys.clear();held.l=held.r=0;clearCharge();status(g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
+    if (e.type === 'turn') { closeArsenal();keys.clear();clearCharge();pending=[];remoteP=0;aimPointer=null;held.l=held.r=held.u=0; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x;
+      status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : isOnline(g.team) ? `${f.name} (${TEAM[g.team].name}) is playing on the other device…` : touchUI.matches ? `${f.name}: tap the map to aim · hold FIRE to shoot · ◀ ▶ walk · ↑ jump, twice for a backflip` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
+    if (e.type === 'fire') {closeArsenal();keys.clear();held.l=held.r=0;clearCharge();remoteP=0;status(g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
     if (e.type === 'boom') {shake=9;beep(65,.35);if(e.r)debris(e.x,e.y,e.r);}
     if (e.type === 'rope') {beep(520,.06);status('Hooked! A/D swing · W/S shorter/longer · Space lets go. Your turn goes on.');}
     if (e.type === 'unrope') status('Let go of the rope.');
@@ -270,29 +311,62 @@ function over() {
   $('#over-title').textContent = w === -1 ? 'Nobody won. The pond won.' : `${TEAM[w].name} WINS!`;
   $('#over-text').textContent = w>=0 ? TEAM[w].name+' claim the pond. Rematch?' : 'Everybody ended up in the water.';
   $('#over').hidden = false; status('Game over.');
+  $('#again').disabled = !!net && !net.host; $('#again').textContent = net && !net.host ? 'The host starts the rematch' : 'Play again';
 }
 
 // ---------- start ----------
+// What both devices need to build the same match. Names, colors and characters are only looks.
+function menuSetup() {
+  return { seed: opts.mapSeed, map: opts.map, perTeam: opts.n,
+    names: [0, 1].map(t => $('#team' + t).value.trim().slice(0, 18) || (t ? 'FUD' : 'PEP')),
+    colors: [...teamColors], players: teamPlayers.map(list => list.slice()) };
+}
+// A setup may come from the other device, so every value is checked before use.
+function applyLooks(s) {
+  for (const t of [0, 1]) {
+    const name = typeof s.names?.[t] === 'string' ? s.names[t].trim().slice(0, 18) : '';
+    TEAM[t].name = name || (t ? 'FUD' : 'PEP');
+    const c = s.colors?.[t];
+    if (Number.isInteger(c) && c >= 0 && c < COLORS.length) teamColors[t] = c;
+    s.players?.[t]?.slice?.(0, teamPlayers[t].length).forEach((p, i) => { if (Number.isInteger(p) && p >= 0 && p < PLAYERS.length) teamPlayers[t][i] = p; });
+  }
+  if (teamColors[0] === teamColors[1]) teamColors[1] = (teamColors[0] + 1) % COLORS.length;
+  for (const t of [0, 1]) { TEAM[t].band = COLORS[teamColors[t]].hex; TEAM[t].text = '#fff0cc'; }
+}
 function start() {
-  seed = opts.mapSeed;
-  for(const t of [0,1]){TEAM[t].name=$('#team'+t).value.trim().slice(0,18)||(t?'FUD':'PEP');TEAM[t].band=COLORS[teamColors[t]].hex;TEAM[t].text='#fff0cc';}
-  g = newGame({ seed, map:opts.map, perTeam: opts.n, cpu: [false, opts.mode === 'cpu'], level: opts.level });
-  paused=false;$('#pause').textContent='Pause';acc=0;charging=false;held.l=held.r=0;paintGround(); startTurn(g); events();hud();
+  const setup = menuSetup();
+  if (net) { net.begin(setup); if (!net.g) menuButton(); return; }   // online: starts when the other tab is there
+  seed = setup.seed; applyLooks(setup);
+  g = newGame({ seed, map: setup.map, perTeam: setup.perTeam, cpu: [false, opts.mode === 'cpu'], level: opts.level });
+  startTurn(g); launch();
+}
+function launch() {
+  paused=false;$('#pause').textContent='Pause';acc=0;pending=[];remoteP=0;clearCharge();held.l=held.r=held.u=0;paintGround();events();hud();
   $('#menu').hidden = true; $('#over').hidden = true; cv.focus({ preventScroll: true });
+}
+// One step of this device's input: held keys and buttons as bits, plus the queued actions.
+function localInput() {
+  if(mine()&&arsenal.hidden&&!me(g).rope&&!me(g).jet){const dir=(keys.has("KeyS")||keys.has("ArrowDown")?1:0)-(keys.has("KeyW")||keys.has("ArrowUp")?1:0);aim+=dir*1.5*STEP*(me(g).face||1);}
+  if (!movementAllowed()) return { m: 0, a: pending.splice(0) };
+  const up = keys.has('KeyW') || keys.has('ArrowUp') || held.u, down = keys.has('KeyS') || keys.has('ArrowDown');
+  return { m: (held.l ? KEY.L : 0) | (held.r ? KEY.R : 0) | (up ? KEY.U : 0) | (down ? KEY.D : 0), a: pending.splice(0) };
 }
 function frame(now) {
   const dt = last ? Math.min(.1, (now - last) / 1000) : 0; last = now;
   visualDt=paused?0:dt;
   if (g && !paused && !['over','menu'].includes(g.phase)) {
-    if (charging) { power = Math.min(1, (now - chargeAt) / 1300); $('#power').style.width = power * 100 + '%'; }
+    if (charging) { power = Math.min(1, (now - chargeAt) / 1300); $('#power').style.width = power * 100 + '%'; fb.style.setProperty('--charge', power.toFixed(3)); }
     acc += dt;
     while (acc >= STEP) {
       for(const o of [...g.frogs,...g.shots])previousPose.set(o,{x:o.x,y:o.y});
-      if(mine()&&arsenal.hidden&&!me(g).rope&&!me(g).jet){const dir=(keys.has("KeyS")||keys.has("ArrowDown")?1:0)-(keys.has("KeyW")||keys.has("ArrowUp")?1:0);aim+=dir*1.5*STEP*(me(g).face||1);}
-      if (movementAllowed()) { if (held.l) walk(g, -1); if (held.r) walk(g, 1); }
-      const cf = g.frogs[g.current];
-      g.ctl = movementAllowed() && (cf.rope || cf.jet) ? { x: (held.r ? 1 : 0) - (held.l ? 1 : 0), y: (keys.has('KeyS') || keys.has('ArrowDown') ? 1 : 0) - (keys.has('KeyW') || keys.has('ArrowUp') || held.u ? 1 : 0) } : { x: 0, y: 0 };
-      step(g); acc -= STEP;
+      if (!net) applyInput(g, localInput());
+      else if (net.drives()) { net.view = [aim, aimX, aimY, charging ? power : 0]; net.advance(localInput()); }
+      else {
+        // the other device's turn: replay its steps; catch up when they arrive in a bunch
+        const lag = net.backlog();
+        if (!net.pump(lag > 12 ? lag - 6 : 1)) acc = STEP;
+      }
+      acc -= STEP;
       for (const r of g.dirty) paintGround(...r); g.dirty.length = 0;
       events();
       if (g.phase === 'over') break;
@@ -306,8 +380,8 @@ function frame(now) {
 }
 
 // ---------- controls ----------
-const mine = () => !paused && g && g.phase === 'aim' && !isCpu(g.team);
-const movementAllowed=()=>!paused&&g&&!isCpu(g.team)&&canMove(g)&&$('#menu').hidden;
+const mine = () => !paused && g && g.phase === 'aim' && !isCpu(g.team) && !remoteTurn();
+const movementAllowed=()=>!paused&&g&&!isCpu(g.team)&&!remoteTurn()&&canMove(g)&&$('#menu').hidden;
 const keys=new Set();
 const arsenal=document.createElement('div');
 arsenal.className='pw-arsenal';arsenal.hidden=true;arsenal.setAttribute('role','dialog');arsenal.setAttribute('aria-label','Choose a weapon');
@@ -315,7 +389,7 @@ arsenal.innerHTML='<div class="arsenal-title">ARSENAL <span>1–0 · C R J T · 
 document.body.append(arsenal);
 for(const b of arsenal.querySelectorAll('[data-w]'))b.setAttribute('aria-label',WEAPONS[b.dataset.w].name);
 arsenal.addEventListener('focusin',e=>{const b=e.target.closest('[data-w]');if(b)arsenal.querySelector('.arsenal-title span').textContent=WEAPONS[b.dataset.w].name;});
-function clearCharge(){charging=false;power=0;$('#power').style.width='0%';}
+function clearCharge(){charging=false;power=0;$('#power').style.width='0%';$('#fire').style.setProperty('--charge','0');}
 function closeArsenal(focus=false){arsenal.hidden=true;if(focus)cv.focus({preventScroll:true});}
 function openArsenal(x,y){
   if(!mine())return;
@@ -328,37 +402,68 @@ function openArsenal(x,y){
 }
 arsenal.addEventListener('pointerover',e=>{const b=e.target.closest('[data-w]');if(b)arsenal.querySelector('.arsenal-title span').textContent=WEAPONS[b.dataset.w].name;});
 arsenal.querySelector('.arsenal-title button').onclick=()=>closeArsenal(true);
-cv.addEventListener('contextmenu',e=>{e.preventDefault();openArsenal(e.clientX,e.clientY);});
+// Which kind of pointer was used last: a long press with a finger must not open the arsenal or a browser menu.
+let lastPointer = 'mouse', aimPointer = null;
+document.addEventListener('pointerdown', e => { lastPointer = e.pointerType || 'mouse'; }, true);
+cv.addEventListener('contextmenu',e=>{e.preventDefault();if(lastPointer==='mouse')openArsenal(e.clientX,e.clientY);});
 arsenal.addEventListener('contextmenu',e=>{e.preventDefault();closeArsenal(true);});
 document.addEventListener('pointerdown',e=>{if(!arsenal.hidden&&!arsenal.contains(e.target)&&e.button===0){closeArsenal(true);e.preventDefault();e.stopPropagation();}},true);
-function jump(){if(!movementAllowed()||!arsenal.hidden)return;clearCharge();const f=me(g);if(f.rope){f.rope=null;status('Let go of the rope.');return;}if(f.jet)return;if(f.ground)hop(g);else backflip(g);}
+// iPhone: holding a finger down selects text and shows the copy/paste bubble. Only the name fields may select text.
+const typing = t => (t?.nodeType === 1 ? t : t?.parentElement)?.closest?.('input,textarea,select');
+document.addEventListener('selectstart', e => { if (!typing(e.target)) e.preventDefault(); });
+document.addEventListener('contextmenu', e => { if (lastPointer !== 'mouse' && !typing(e.target)) e.preventDefault(); });
+const unselect = () => { const s = getSelection?.(); if (s && s.rangeCount && !typing(s.anchorNode)) s.removeAllRanges(); };
+// The battlefield and the hold buttons run on pointer events. Cancelling touchstart stops the long-press
+// loupe, the callout and double-tap zoom on iOS; pointer events still arrive.
+for (const el of [cv, $('#fire'), $('#left'), $('#right'), $('#hop')]) el.addEventListener('touchstart', e => { if (e.cancelable) e.preventDefault(); unselect(); }, { passive: false });
+function jump(){if(!movementAllowed()||!arsenal.hidden)return;clearCharge();pending.push({t:'jump'});}
 function toWorld(e) { const r = cv.getBoundingClientRect(); const scale=Math.min(r.width/VW,r.height/H),padX=(r.width-VW*scale)/2,padY=(r.height-H*scale)/2; return [(e.clientX-r.left-padX)/scale-OX,(e.clientY-r.top-padY)/scale]; }
-function aimAt(e) { if (!mine()) return; const [x, y] = toWorld(e), f = me(g); aimX = Math.max(30, Math.min(W - 30, x)); aimY = y; aim = Math.atan2(y - (f.y - 32), x - f.x); f.face = x >= f.x ? 1 : -1; }
+function aimAt(e) {
+  if (!mine()) return;
+  const [x, y] = toWorld(e), f = me(g), d = x >= f.x ? 1 : -1;
+  aimX = Math.max(30, Math.min(W - 30, x)); aimY = y; aim = Math.atan2(y - (f.y - 32), x - f.x);
+  pending = pending.filter(a => a.t !== 'face');
+  if (f.face !== d) pending.push({ t: 'face', d });
+}
 function beginCharge() { if (!mine() || charging || !arsenal.hidden) return; charging = true; chargeAt = performance.now(); power = 0; }
 function release(cancelShort) {
   if (!charging) return;
-  charging = false; const held = performance.now() - chargeAt; $('#power').style.width = '0%';
-  if (mine() && WEAPONS[g.weapon].utility) { fire(g, aim, 1, aimX, aimY); hud(); return; }   // rope, jetpack, teleport: a tap is enough
-  if (cancelShort && held < 180) return;   // a short tap only aims
-  if (mine()) fire(g, aim, Math.max(.08, Math.min(1,held/1300)), aimX, aimY);
+  const heldFor = performance.now() - chargeAt; clearCharge();
+  if (!mine()) return;
+  if (WEAPONS[g.weapon].utility) { pending.push({ t: 'fire', a: aim, p: 1, x: aimX, y: aimY }); return; }   // rope, jetpack, teleport: a tap is enough
+  if (cancelShort && heldFor < 180) return;   // a short click only aims
+  pending.push({ t: 'fire', a: aim, p: Math.max(.08, Math.min(1, heldFor / 1300)), x: aimX, y: aimY });
 }
-cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || charging) aimAt(e); });
-cv.addEventListener('pointerdown', e => { if (e.button) return; e.preventDefault(); cv.focus({ preventScroll: true }); cv.setPointerCapture(e.pointerId); aimAt(e); beginCharge(); });
-cv.addEventListener('pointerup', () => release(true)); cv.addEventListener('pointercancel', clearCharge);cv.addEventListener('lostpointercapture',()=>{if(charging)clearCharge();});
+// Mouse: move to aim, hold the left button to charge, let go to fire.
+// Touch and pen: tap or drag on the battlefield only aims; the FIRE button charges and fires.
+// One thumb can hold FIRE while the other finger keeps adjusting the aim.
+cv.addEventListener('pointerdown', e => {
+  if (e.button) return; e.preventDefault(); unselect(); cv.focus({ preventScroll: true });
+  if (e.pointerType === 'mouse') { cv.setPointerCapture(e.pointerId); aimAt(e); beginCharge(); return; }
+  if (aimPointer !== null) return;
+  aimPointer = e.pointerId; try { cv.setPointerCapture(e.pointerId); } catch {} aimAt(e);
+});
+cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || e.pointerId === aimPointer) aimAt(e); });
+cv.addEventListener('pointerup', e => { if (e.pointerId === aimPointer) aimPointer = null; else if (e.pointerType === 'mouse') release(true); });
+cv.addEventListener('pointercancel', e => { if (e.pointerId === aimPointer) aimPointer = null; else if (e.pointerType === 'mouse') clearCharge(); });
+cv.addEventListener('lostpointercapture', e => { if (e.pointerId === aimPointer) aimPointer = null; else if (e.pointerType === 'mouse' && charging) clearCharge(); });
 const fb = $('#fire');
-bindHold(fb,beginCharge,()=>release(false),()=>{charging=false;$('#power').style.width='0%';});
+bindHold(fb,beginCharge,()=>release(false),clearCharge);
 for (const [id, k] of [['#left', 'l'], ['#right', 'r']]) {
   const b = $(id);
   b.addEventListener('pointerdown', e => { e.preventDefault(); b.setPointerCapture(e.pointerId); held[k] = 1; });
   for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(t, () => { held[k] = 0; });
 }
 $('#arsenal-open').onclick=e=>{const r=e.target.getBoundingClientRect();openArsenal(r.left,r.top-250);};
-$('#hop').addEventListener('click', jump);
-// on a phone: hold HOP to fly up with the jetpack
-$('#hop').addEventListener('pointerdown', () => { if (g && me(g).jet) held.u = 1; });
-for (const t of ['pointerup', 'pointercancel', 'pointerleave']) $('#hop').addEventListener(t, () => { held.u = 0; });
-$('#skip').addEventListener('click', () => { if (mine()) { skip(g); status('Turn skipped.'); } });
-document.querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', () => { if (mine() && !g.pistolShots && g.ammo[g.team][b.dataset.w]!==0) {clearCharge();g.weapon = b.dataset.w;closeArsenal(true);hud();} }));
+// ↑ reacts on touch-down (a quick second tap is the backflip); hold it to fly up with the jetpack.
+// A keyboard "click" on the focused button (detail 0) still jumps.
+const hopButton = $('#hop');
+hopButton.addEventListener('pointerdown', e => { if (e.button) return; e.preventDefault(); try { hopButton.setPointerCapture(e.pointerId); } catch {} if (g && me(g).jet) held.u = 1; else jump(); });
+hopButton.addEventListener('click', e => { if (e.detail === 0) jump(); });
+for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) hopButton.addEventListener(t, () => { held.u = 0; });
+$('#skip').addEventListener('click', () => { if (mine()) { pending.push({ t: 'skip' }); status('Turn skipped.'); } });
+function chooseWeapon(w) { if (mine() && !g.pistolShots && g.ammo[g.team][w] !== 0) { clearCharge(); pending.push({ t: 'weapon', w }); closeArsenal(true); } }
+document.querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', () => chooseWeapon(b.dataset.w)));
 document.addEventListener('keydown', e => {
   if(e.code==='Escape'){closeArsenal(true);return;}
   if (!g || e.target.closest('input,textarea,select') || !$('#menu').hidden || !$('#over').hidden) return;
@@ -371,11 +476,12 @@ document.addEventListener('keydown', e => {
     e.preventDefault();if(mine()&&arsenal.hidden)keys.add(k);
   }else if((/^Digit[0-9]$/.test(k)||['KeyC','KeyR','KeyJ','KeyT'].includes(k))&&mine()){
     const w={KeyC:'candles',KeyR:'rope',KeyJ:'jetpack',KeyT:'teleport'}[k]||['drill','rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite'][Number(k.slice(-1))];
-    if(!g.pistolShots&&g.ammo[g.team][w]!==0){clearCharge();g.weapon=w;closeArsenal(true);hud();}
+    chooseWeapon(w);
   }
 },true);
 document.addEventListener('keyup',e=>{if(e.code==='Enter'){e.preventDefault();release(false);}keys.delete(e.code);if(['ArrowLeft','ArrowRight','KeyA','KeyD'].includes(e.code)){held.l=keys.has('ArrowLeft')||keys.has('KeyA');held.r=keys.has('ArrowRight')||keys.has('KeyD');}if(e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();}},true);
-function pauseGame(){closeArsenal();keys.clear(); if(!g || ['menu','over'].includes(g.phase))return;paused=true;held.l=held.r=0;clearCharge();$('#pause').textContent='Resume';status('PAUSED · The pond can wait.');hud();}
+// Online the other device keeps playing, so leaving the tab only lets go of the controls.
+function pauseGame(){closeArsenal();keys.clear();held.l=held.r=held.u=0;aimPointer=null; if(net){clearCharge();return;} if(!g || ['menu','over'].includes(g.phase))return;paused=true;pending=[];clearCharge();$('#pause').textContent='Resume';status('PAUSED · The pond can wait.');hud();}
 window.addEventListener('blur',pauseGame);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame();});
 window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===parent&&e.data==='pondwars-pause')pauseGame();});
@@ -435,8 +541,42 @@ pick('[data-mode]', 'mode', String); pick('[data-level]', 'level', Number); pick
 $('#go').addEventListener('click', start); $('#again').addEventListener('click', start);
 $('#tomenu').addEventListener('click', () => { $('#over').hidden = true; $('#menu').hidden = false; });
 
+// ---------- online test between two tabs (groundwork for real online play) ----------
+// pondwars-beta.html?net=host in one tab, pondwars-beta.html?net=join in another tab of the same browser.
+// Optional &room=name keeps several test pairs apart. Nothing leaves the device: the tabs talk over BroadcastChannel.
+function setupNet(host) {
+  const room = (new URLSearchParams(location.search).get('room') || 'test').replace(/[^\w-]/g, '').slice(0, 32) || 'test';
+  net = new NetMatch(tabTransport(room), { host });
+  opts.mode = 'net';
+  document.querySelector('[data-mode]').closest('.pw-pick').hidden = true; $('#levels').hidden = true;
+  for (const id of ['#pause', '#restart']) $(id).disabled = true;
+  net.onstart = (game, setup) => { g = game; applyLooks(setup); launch(); };
+  net.onrestore = () => { status('Back in sync with the other tab.'); if (g.phase === 'over') over(); };
+  net.onview = v => {
+    if (net.drives() || !v.every(Number.isFinite)) return;
+    aim = v[0]; aimX = Math.max(30, Math.min(W - 30, v[1])); aimY = v[2]; remoteP = Math.max(0, Math.min(1, v[3]));
+  };
+  net.onpeer = menuButton;
+  net.onproblem = m => { status(m); console.warn('FROGAGEDDON online:', m); };
+  if (!host) {
+    // the guest plays the host's setup, so its own menu only waits
+    for (const s of ['.team-setup', '.player-setup', '.map-setup', '.pw-pick', '.match-rules']) document.querySelectorAll('#menu ' + s).forEach(el => { el.hidden = true; });
+    net.join(); const ping = setInterval(() => { if (net.g) clearInterval(ping); else net.join(); }, 1000);
+  }
+}
+let crewReady = false;
+function menuButton() {
+  const go = $('#go');
+  if (!crewReady) { go.disabled = true; go.textContent = 'LOADING THE CREW…'; return; }
+  if (net && !net.host) { go.disabled = true; go.textContent = 'WAITING FOR THE HOST TAB…'; return; }
+  if (net && !net.peer) { go.disabled = !!net.waiting; go.textContent = net.waiting ? 'WAITING FOR THE ?net=join TAB…' : 'START ONLINE TEST →'; return; }
+  go.disabled = false; go.textContent = net ? 'START ONLINE TEST →' : 'START THE WAR →';
+}
+const netParam = new URLSearchParams(location.search).get('net');
+if ((netParam === 'host' || netParam === 'join') && 'BroadcastChannel' in window) setupNet(netParam === 'host');
+
 // a quiet island behind the menu
 g = newGame({ seed: 20261103, perTeam: 3 }); paintGround(); g.phase = 'menu';
 requestAnimationFrame(frame);
-$('#go').disabled=true;$('#go').textContent='LOADING THE CREW…';
-Promise.all(playerArt.map(img=>img.decode().catch(()=>null))).then(()=>{paintPlayers();$('#go').disabled=false;$('#go').textContent='START THE WAR →';});
+menuButton();
+Promise.all(playerArt.map(img=>img.decode().catch(()=>null))).then(()=>{paintPlayers();crewReady=true;menuButton();});

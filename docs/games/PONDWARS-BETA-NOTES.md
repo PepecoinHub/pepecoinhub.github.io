@@ -11,6 +11,25 @@ The beta entry is in PondOS Start > Games only. It is not placed on the desktop,
 - Compact 4-column arsenal with accessible weapon names; desktop controls are small overlays. Touch controls retain 44px targets.
 - Warm layered cartoon terrain, with distinct violet rock on Croak Canyon.
 
+## Touch controls (2026-11-05, player feedback from iPhone)
+
+- Tapping or dragging on the battlefield only aims. It never fires. The FIRE button charges while held and fires on release, and the button fills up with the charge. One thumb can hold FIRE while another finger keeps aiming.
+- Teleport and candles: tap the spot, then press TELEPORT HERE / DROP CANDLES.
+- A held finger no longer selects text or opens the iOS copy/paste bubble (`user-select`/`-webkit-touch-callout` off outside the name fields, `touchstart` cancelled on the battlefield and the hold buttons). A long press no longer opens the arsenal or the Android context menu.
+- ↑ reacts on touch-down, so the double tap for a backflip is reliable. Bigger touch targets, safe-area padding for the iPhone notch, a short "TAP TO AIM · HOLD FIRE TO SHOOT" hint at the start of each turn. The arsenal button shows the weapon in hand.
+- The power meter is larger: 14 beads (was 10 small dots) with empty outlines showing the full length, a percentage above the frog, and a pulse at full power. On small screens the crosshair and meter scale up to 2× so they stay readable.
+
+## Online groundwork
+
+`js/pondwars-beta-net.mjs` (no DOM, runs in Node):
+
+- Every player action goes through `applyInput(g, {m, a})`: held keys as bits plus discrete actions (jump, face, weapon, fire, skip). Local play, the two-tab test and a future online mode use the same path.
+- `NetMatch`: the team whose turn it is drives the clock and streams its inputs in batches of 6 steps (10 messages/s). The other client replays them. At each turn change the client that just played sends a full snapshot (terrain as run lengths, a few KB). The other client adopts it on a mismatch before taking control, so floating-point differences between browsers cannot pile up.
+- Inputs and snapshots from the peer are validated before they touch the game.
+- Two-tab test, nothing leaves the device: open `pondwars-beta.html?net=host` and `pondwars-beta.html?net=join` in two tabs of the same browser (optional `&room=name`).
+
+Not done yet: a real network transport (a Supabase Realtime channel only needs `send` and `onmessage`; the page CSP must then allow the Supabase `wss:` origin), rooms/invites, reconnecting after a dropped connection, and a turn timeout for a peer who disappears. The peer is trusted for its own turns, so ranked play would need server-side checks.
+
 ## Reference review
 
 [Squeak & Destroy](https://github.com/lospolosadwords-dev/squeak-and-destroy) is a complete Canvas/JavaScript game, MIT licensed. Its surface collisions, movement feedback and compact artillery interaction are relevant. Existing Pond Wars movement already drew inspiration from it.
