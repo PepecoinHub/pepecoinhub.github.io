@@ -82,8 +82,8 @@ test('handoff explains server-owned data and migration order', () => {
 
 test('fractional need decay is persisted and rounded only for the UI', () => {
   for (const col of ['hunger', 'hygiene', 'mood', 'energy']) {
-    assert.match(base, new RegExp(col + String.raw` numeric\\(7,4\\) not null default`));
-    assert.match(base, new RegExp(String.raw`alter column ` + col + String.raw` type numeric\\(7,4\\)`));
+    assert.match(base, new RegExp(col + String.raw` numeric\(7,4\) not null default`));
+    assert.match(base, new RegExp(String.raw`alter column ` + col + String.raw` type numeric\(7,4\)`));
   }
   assert.match(base, /h := greatest\(0::numeric, p\.hunger - elapsed_hours \* 20 \/ 24\)/);
   assert.match(base, /e := greatest\(0::numeric, p\.energy - elapsed_hours \* 10 \/ 24\)/);
