@@ -16,6 +16,10 @@
 .passport-entry { padding: 8px; border: 1px solid var(--chrome-lo); background: var(--chrome); }
 .passport-entry b { display: block; }
 .passport-entry small { display: block; color: var(--muted); }
-.passport-entry.locked { opacity: .67; }
+.passport-entry.locked { opacity: .74; }
+.passport-coming { font-style: italic; margin-top: 5px; }
+.passport-grid { max-height: min(44vh, 350px); overflow: auto; align-content: start; }
+.passport-entry b { font-weight: 700; }
+.passport-note { margin: 0; }
 .passport-note { padding: 9px; border: 1px dotted var(--chrome-lo); }
 @media(max-width:400px) { .passport-stats { grid-template-columns: repeat(2,minmax(0,1fr)); } }
