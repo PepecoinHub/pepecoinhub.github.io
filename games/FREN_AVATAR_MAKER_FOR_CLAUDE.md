@@ -2,6 +2,7 @@
 
 **Scope:** Fren Passport only. PepeGochi is a separate future game.  
 **Status:** specification + proposed artwork, NOT integrated or deployed.  
+**Update 2026-11-05:** implemented on branch \`claude/fren-avatar-maker\` (stacked on PR #184): Avatar Maker window, Passport portrait, draft migration \`games/supabase/update_fren_avatar.sql\`, SQL and browser tests. The migration has not been run on Supabase and nothing is merged or deployed.  
 **Base:** [draft Passport PR #184](https://github.com/PepecoinHub/pepecoinhub.github.io/pull/184) on branch \`codex/fren-passport-foundation\`.  
 **Human visual reference:** actual PepecoinHub screenshots in the project conversation. Follow the existing site, not standalone mockup desktop art.
 
