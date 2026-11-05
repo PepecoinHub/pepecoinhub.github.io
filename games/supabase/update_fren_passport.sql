@@ -113,4 +113,43 @@ $$;
 
 revoke all on function public.gry_passport_state() from public, anon, authenticated;
 grant execute on function public.gry_passport_state() to authenticated;
+
+-- Casual PondOS easter eggs. Only these small, cosmetic discoveries can be
+-- claimed from the browser. Server-verifiable accomplishments (YEET, 100 care
+-- days, limited badges and valuable inventory) must be awarded by their own
+-- validated game code, never by this RPC.
+create or replace function public.gry_passport_discover(p_secret text)
+returns jsonb language plpgsql security definer set search_path = '' as $
+declare
+  u uuid := auth.uid();
+  d jsonb;
+  new_discovery timestamptz;
+  existing_discovery timestamptz;
+begin
+  if u is null then raise exception 'Log on with Discord to save secrets'; end if;
+  d := games.discord_identity(u);
+  if d is null then raise exception 'Log on with Discord to save secrets'; end if;
+  if p_secret is null or p_secret not in ('lost_floppy', 'wrong_frog', 'notes_reader') then
+    raise exception 'Unknown discovery';
+  end if;
+
+  insert into games.passport_secrets(user_id, secret_id)
+  values (u, p_secret)
+  on conflict (user_id, secret_id) do nothing
+  returning discovered_at into new_discovery;
+
+  select s.discovered_at into existing_discovery
+    from games.passport_secrets s
+   where s.user_id = u and s.secret_id = p_secret;
+
+  return jsonb_build_object(
+    'id', p_secret,
+    'new', new_discovery is not null,
+    'discovered_at', existing_discovery
+  );
+end
+$;
+revoke all on function public.gry_passport_discover(text) from public, anon, authenticated;
+grant execute on function public.gry_passport_discover(text) to authenticated;
+
 commit;
