@@ -1,4 +1,4 @@
-"""Where's Pepe? robot: prepares daily puzzles for the PondOS game, a week ahead.
+"""Pepe Guesser robot: prepares daily puzzles for the PondOS game, a week ahead.
 
 For each new puzzle it
   1. picks a well-known, "point-like" place from Wikidata (a bridge, tower, castle, square, waterfall…; no walls,

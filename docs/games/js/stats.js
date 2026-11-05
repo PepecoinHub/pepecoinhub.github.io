@@ -47,7 +47,7 @@ async function load(days = 30) {
   community(days);
 }
 
-// Do people come back? Counted from Where's Pepe players (one row per player per daily photo), plus letters and chat.
+// Do people come back? Counted from Pepe Guesser players (one row per player per daily photo), plus letters and chat.
 async function community(days) {
   let c;
   try { c = await be.rpc('gry_community', { p_days: days }); }
@@ -63,10 +63,10 @@ async function community(days) {
   box.append(h('section', { class: 'card' }, h('h2', {}, 'Coming back'),
     h('div', { class: 'st-tiles' }, tiles.map(([l, v, sub]) => h('div', { class: 'card st-tile' }, h('span', { class: 'st-l' }, l), h('b', {}, v), h('span', { class: 'small muted' }, sub)))),
     h('div', { class: 'tscroll' }, h('table', { class: 'gtable' },
-      h('thead', {}, h('tr', {}, h('th', {}, "Where's Pepe day"), h('th', { class: 'num' }, 'Players'), h('th', { class: 'num' }, 'New'), h('th', { class: 'num' }, 'Returning'), h('th', { class: 'num' }, 'Discord'), h('th', { class: 'num' }, 'Played next day'))),
+      h('thead', {}, h('tr', {}, h('th', {}, "Pepe Guesser day"), h('th', { class: 'num' }, 'Players'), h('th', { class: 'num' }, 'New'), h('th', { class: 'num' }, 'Returning'), h('th', { class: 'num' }, 'Discord'), h('th', { class: 'num' }, 'Played next day'))),
       h('tbody', {}, rows.slice().reverse().map((r) => h('tr', {}, h('td', {}, dayLabel(r.day)), h('td', { class: 'num' }, fmt(r.players)), h('td', { class: 'num' }, fmt(r.new)),
         h('td', { class: 'num' }, fmt(r.players - r.new)), h('td', { class: 'num' }, fmt(r.discord)),
         h('td', { class: 'num' }, r.back_next_day == null ? '…' : `${fmt(r.back_next_day)} (${pct(r.back_next_day, r.players)})`)))))),
-    h('p', { class: 'small muted' }, `${fmt(c.players_total)} different players so far. "New" = their first Where's Pepe day. The number to watch: "Came back the next day". If it grows, people want this place; if it stays low, fix the daily game before adding more. A guest who clears the browser counts as a new player.`)));
+    h('p', { class: 'small muted' }, `${fmt(c.players_total)} different players so far. "New" = their first Pepe Guesser day. The number to watch: "Came back the next day". If it grows, people want this place; if it stays low, fix the daily game before adding more. A guest who clears the browser counts as a new player.`)));
 }
 load();
