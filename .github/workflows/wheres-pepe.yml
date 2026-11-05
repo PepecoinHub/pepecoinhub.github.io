@@ -1,6 +1,6 @@
-name: Where's Pepe robot
+name: Pepe Guesser robot
 
-# Prepares puzzles for the Where's Pepe? game in PondOS, a week ahead (scripts/wheres_pepe.py).
+# Prepares puzzles for the Pepe Guesser game in PondOS, a week ahead (scripts/wheres_pepe.py).
 # Needs the secret WP_ROBOT_TOKEN (made once in Supabase with: select games.wp_new_robot_token();).
 # The log never names a place: Actions logs of a public repository are public.
 on:

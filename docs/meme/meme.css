@@ -1190,7 +1190,7 @@ footer.foot a { color: #edf3e3; }
   .crt-grill { height: 30px; }
 }
 
-/* ---------- Where's Pepe? ---------- */
+/* ---------- Pepe Guesser ---------- */
 .wp { display: grid; gap: 8px; font: 400 13px/1.45 var(--f-chrome); color: var(--ink); }
 .wp-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .wp-title { font-size: 15px; }
@@ -1292,7 +1292,7 @@ footer.foot a { color: #edf3e3; }
 .icons a { user-select: none; -webkit-user-select: none; -webkit-user-drag: none; touch-action: manipulation; }
 .icons a img { -webkit-user-drag: none; pointer-events: none; }
 .icons a.dragging { z-index: 5; opacity: .85; }
-/* Where's Pepe result: the top 10 sits under the photo (left), the faucet stays on the right */
+/* Pepe Guesser result: the top 10 sits under the photo (left), the faucet stays on the right */
 .wp-done { grid-template-areas: "photo side" "board side"; }
 .wp-done > .wp-photo { grid-area: photo; }
 .wp-done > .wp-side { grid-area: side; }
@@ -1429,6 +1429,27 @@ footer.foot a { color: #edf3e3; }
 .gz-notes li:nth-child(even) { transform: rotate(.4deg); }
 .gz-notes li:empty { display: none; }
 .gz-facts ul { margin: 0; padding-left: 18px; }
+/* Issue #4: breaking news banner, a Reddit clipping, a printed letter */
+.gz-flash { margin: 0 0 6px; padding: 4px 8px; background: #b3121b; color: #fff; font: 700 13px/1.2 var(--f-chrome); text-transform: uppercase; letter-spacing: .12em; text-align: center; animation: gz-blink 1.2s steps(2, start) infinite; }
+@keyframes gz-blink { 50% { background: #1b1b1b; } }
+@media (prefers-reduced-motion: reduce) { .gz-flash { animation: none; } }
+.gz-breaking h4 { font-size: 24px; color: #8a1c1c; }
+.gz-reddit { margin: 0 0 10px; padding: 8px 10px; background: #1a1a1b; color: #d7dadc; border-radius: 6px; font: 400 13px/1.4 system-ui, sans-serif; transform: rotate(-.6deg); box-shadow: 2px 3px 0 rgba(0, 0, 0, .25); }
+.gz-rd-top { margin: 0; font-size: 11px; color: #818384; }
+.gz-rd-top b { color: #d7dadc; }
+.gz-rd-title { margin: 2px 0 6px; font-weight: 700; font-size: 15px; }
+.gz-rd-shot { margin: 0 0 6px; padding: 6px 8px; background: #3a3d3a; border: 2px solid #4caf50; font: 400 13px/1.4 var(--f-chrome); color: #fff; }
+.gz-rd-shot span { color: #39ff6a; font-size: 18px; }
+.gz-reddit figcaption { font-size: 12px; }
+.gz-quote { margin: 0 0 8px; padding: 8px 12px; background: #fffbe0; border-left: 4px solid #8a1c1c; font-size: 17px; }
+.gz-quote p { margin: 0; font-style: italic; }
+.gz-quote cite { display: block; margin-top: 4px; font: 400 12px/1.2 var(--f-chrome); font-style: normal; }
+.gz-hero { display: block; width: 100%; max-height: 180px; object-fit: cover; margin: 0 0 8px; border: 1px solid #1b1b1b; filter: sepia(.15); }
+.gz-ask { padding: 6px 8px; background: #fffbe0; border: 1px dashed #b9a24a; }
+.gz-fine { margin: 6px 0 0; font-size: 11px; font-style: italic; }
+.gz-breaking > p, .gz-letters > p, .gz-market > p, .gz-cover > p, .gz-soon > p { margin: 0 0 8px; }
+.gazette p.gz-count { display: block; width: fit-content; }
+.gazette p.gz-count:empty { display: none; }
 
 /* Resizable windows (mouse only): drag the bottom-right corner. A maximized or resized window lets its content
    fill it, instead of keeping the fixed-height boxes (newspaper, letters, chat log) from the small window. */
@@ -1448,7 +1469,7 @@ footer.foot a { color: #edf3e3; }
 .app-win.is-max .wp-hostbody, .app-win.is-sized .wp-hostbody { max-height: none; }
 .app-win.is-max .mail > .gazette, .app-win.is-sized .mail > .gazette, .app-win.is-max .mail-pane > .gazette, .app-win.is-sized .mail-pane > .gazette { flex: 1; height: 100%; min-height: 0; }
 
-/* "Today in the pond": the daily Where's Pepe on the home page */
+/* "Today in the pond": the daily Pepe Guesser on the home page */
 .today-pond { display: flex; align-items: center; gap: 12px; margin: 16px 0 4px; padding: 10px 12px; background: color-mix(in srgb, #ffcc37 18%, var(--chrome, #e6e3d4)); border: 2px solid; border-color: var(--chrome-hi, #fff) var(--chrome-dk, #2b2f28) var(--chrome-dk, #2b2f28) var(--chrome-hi, #fff); color: var(--ink); max-width: 720px; }
 .today-pond img { flex: none; width: 64px; height: auto; }
 .today-pond > div { flex: 1; min-width: 0; display: grid; gap: 2px; }

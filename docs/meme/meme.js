@@ -205,7 +205,7 @@
       ['YEET THE PEP', 'A frog, a catapult, no flight plan', 'yeet', function () { yeetApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', function () { pepeSweeperApp(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
-      ["Where's Pepe?", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
+      ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
       ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
@@ -731,7 +731,7 @@
     // the rest of the pond in a small group lower down, NERDS ONLY on its own by the Start button, the bin far right
     var DESKTOP = [
       ['logon', [['#logon', 'Log On', 'gif-085-still'], ['#find', 'Find', 'search']]],
-      ['play', [['#wp', "Where's Pepe?", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
+      ['play', [['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
         ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads']]],
       ['pond', [['./', 'My Pond', 'pep-logo'], ['#shop', 'Shop', 'shop-bag'], ['#mail', 'Write a letter', 'frog-mail']]],
       ['nerds', [['#nerds', 'NERDS ONLY', 'nerds-folder']]],
@@ -854,7 +854,7 @@
     [['Arrange windows', arrangeAll], ['Refresh', function () { location.reload(); }], null,
       [dark ? 'Wallpaper: day hills' : 'Wallpaper: night mountains', function () { if (themeBtn) themeBtn.click(); }],
       ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons4'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
-      null, ["Where's Pepe? (today's photo)", function () { wheresPepe(); }], ['New game: PEPE SWEEPER', function () { pepeSweeperApp(); }], ['New game: YEET THE PEP', function () { yeetApp(); }], ['New game: FUD Invaders', invaders], ['New game: PEP Snake', snake], null, ['LEADERS', function () { highScores(); }], ['Properties…', aboutOS]].forEach(function (it) {
+      null, ["Pepe Guesser (today's photo)", function () { wheresPepe(); }], ['FROGAGEDDON (beta)', function () { pondWarsApp(); }], ['YEET THE PEP', function () { yeetApp(); }], ['Pepe Miner', function () { minerApp(); }], null, ['LEADERS', function () { highScores(); }], ['Properties…', aboutOS]].forEach(function (it) {
       if (!it) { ctx.appendChild(el('hr')); return; }
       var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
       b.addEventListener('click', function () { closeCtx(); it[1](); });
@@ -1010,7 +1010,7 @@
       else if (A.resume && !A.host.classList.contains('is-min')) A.resume();
     });
   });
-  // ---------- "Today in the pond": the daily Where's Pepe right on the first screen (home page only) ----------
+  // ---------- "Today in the pond": the daily Pepe Guesser right on the first screen (home page only) ----------
   if (mainEl && PAGE === 'index') (function () {
     var ctas = document.querySelector('.ctas'); if (!ctas) return;
     var card = el('div', { class: 'today-pond', role: 'region', 'aria-label': 'Today in the pond' },
@@ -1195,7 +1195,7 @@
   // protected by the database functions (rate limits, plausibility checks), not by hiding these.
   var SB_URL = 'https://azbwciqfbsdpwubznncg.supabase.co', SB_KEY = 'sb_publishable_GRByiqlX6v67phR8xcM6VA_6eXXwTKX';
   var SB_STORE = 'sb-azbwciqfbsdpwubznncg-auth-token';   // where the PEP Games sign-in keeps its session
-  // 2 Nov 2026: Where's Pepe briefly saved an automatic "Frog1234" as the chat nickname, so the chat stopped asking for one
+  // 2 Nov 2026: Pepe Guesser briefly saved an automatic "Frog1234" as the chat nickname, so the chat stopped asking for one
   try { var autoNick = localStorage.getItem('pepgry-nick') || ''; if (/^Frog\d{4}$/.test(autoNick)) { localStorage.setItem('pondos-wp-nick', autoNick); localStorage.removeItem('pepgry-nick'); } } catch (e) {}
   var GAME_NAME = { fud: 'FUD Invaders', snake: 'PEP Snake' };
   // a PEP Games sign-in (Discord) lives in this browser's storage; a valid one makes the score "verified"
@@ -1247,8 +1247,8 @@
   }
   function whoLegend() { return '<p class="who-legend"><b class="who who-ok"><img src="img/pep-logo.webp" alt="" width="14" height="14">Bold</b> = Discord player · <span class="who-guest">grey</span> = guest. <a href="#" class="who-logon">Log on with Discord</a> to get the frog.</p>'; }
   function wireLegend(box) { var a = box.querySelector('.who-logon'); if (a) a.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); }
-  // LEADERS: every top 10 in one window (FUD Invaders, PEP Snake, YEET THE PEP, Where's Pepe? today and 7 days, Pepe Miner)
-  var LEAD = [['fud', 'FUD Invaders'], ['snake', 'PEP Snake'], ['yeet', 'YEET THE PEP'], ['wp', "Where's Pepe?"], ['miner', 'Pepe Miner']];
+  // LEADERS: every top 10 in one window (FUD Invaders, PEP Snake, YEET THE PEP, Pepe Guesser today and 7 days, Pepe Miner)
+  var LEAD = [['fud', 'FUD Invaders'], ['snake', 'PEP Snake'], ['yeet', 'YEET THE PEP'], ['wp', "Pepe Guesser"], ['miner', 'Pepe Miner']];
   var LEAD_TIP = {
     fud: 'Best score per player. Scores run in your browser, so the server checks them for plausibility and rate.',
     snake: 'Best score per player, in blocks. The server checks every score against the length of the game.',
@@ -1442,7 +1442,7 @@
     var act = function (k) { return function () { if (DESK_ACT[k]) DESK_ACT[k](); }; };
     var page = function (p) { return function () { location.href = href(p); }; };
     var L = [
-      ["Where's Pepe?", 'Daily photo hunt on the map', 'wheres-pepe', 'game geo guess map photo travel daily faucet free pep reward points', function () { wheresPepe(); }],
+      ["Pepe Guesser", 'Daily photo hunt on the map', 'wheres-pepe', 'game geo guess guesser where map photo travel daily faucet free pep reward points', function () { wheresPepe(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', 'scores high score top ranking leaderboard best winners', function () { highScores(); }],
       ['YEET THE PEP', 'Catapult a frog, three panic flaps', 'yeet', 'game catapult launch fly distance arcade', function () { yeetApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', 'game minesweeper saper flags lily pads wrong pepe eth arcade', function () { pepeSweeperApp(); }],
@@ -1720,11 +1720,11 @@
     }, 520);
   }
 
-  // ---------- Where's Pepe? A daily guess-the-place game (games/supabase/update_wheres_pepe.sql) ----------
+  // ---------- Pepe Guesser: a daily guess-the-place game (games/supabase/update_wheres_pepe.sql) ----------
   // The server holds the answers, starts the clock, hands out the picture and the hints, and scores the guess.
   // The page only shows them. The map is Leaflet (games/vendor) with OpenStreetMap tiles.
   var WP_README = [
-    "WHERE'S PEPE? - README.TXT",
+    "PEPE GUESSER - README.TXT",
     '',
     'A daily guessing game. Pepe is travelling the world and',
     'every day he sends ONE photo from somewhere. Your job:',
@@ -1799,7 +1799,7 @@
     }, 560);
   }
   function wpFolder() {
-    openApp('wp-folder', "C:\\Pond\\Where's Pepe", 'wp-folder', function (A) {
+    openApp('wp-folder', "C:\\Pond\\Pepe Guesser", 'wp-folder', function (A) {
       var F = [['WheresPepe.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme]];
       A.body.innerHTML = '<ul class="folder">' + F.map(function (f, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(f[1]) + '" alt="" width="40" height="40"><span>' + f[0] + '</span></button></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then double-click WheresPepe.exe.</p>';
@@ -1839,7 +1839,7 @@
         if (!j.expires_at && j.expires_in) j.expires_at = Math.floor(Date.now() / 1000) + j.expires_in;
         try {
           localStorage.setItem(SB_STORE, JSON.stringify(j));
-          // a name for Where's Pepe only; the chat keeps asking guests to pick their own nickname
+          // a name for Pepe Guesser only; the chat keeps asking guests to pick their own nickname
           if (!(localStorage.getItem('pondos-wp-nick') || '').trim()) localStorage.setItem('pondos-wp-nick', 'Frog' + (1000 + Math.floor(Math.random() * 9000)));
         } catch (e) {}
         paintLogon();
@@ -1861,8 +1861,8 @@
   function flagOf(cc) { return /^[A-Z]{2}$/.test(cc || '') ? String.fromCodePoint(127397 + cc.charCodeAt(0), 127397 + cc.charCodeAt(1)) : ''; }
   function fmtKm(k) { return k == null ? '–' : k < 10 ? k.toFixed(1) + ' km' : Math.round(k).toLocaleString('en-US') + ' km'; }
   function wheresPepe() {
-    var A = openApp('wp', "Where's Pepe?", 'wheres-pepe', function (A) {
-      A.body.innerHTML = '<div class="wp"><div class="wp-top"><b class="wp-title">Where\'s Pepe?</b><span class="wp-streak" hidden></span><span class="grow"></span><span class="wp-clock" aria-live="polite"></span></div>' +
+    var A = openApp('wp', "Pepe Guesser", 'wheres-pepe', function (A) {
+      A.body.innerHTML = '<div class="wp"><div class="wp-top"><b class="wp-title">Pepe Guesser</b><span class="wp-streak" hidden></span><span class="grow"></span><span class="wp-clock" aria-live="polite"></span></div>' +
         '<div class="wp-main"><p class="bin-tip">Packing the backpack…</p></div><p class="wp-msg" role="status" aria-live="polite"></p></div>';
       var main = A.body.querySelector('.wp-main'), msg = A.body.querySelector('.wp-msg'), clock = A.body.querySelector('.wp-clock'), streakEl = A.body.querySelector('.wp-streak');
       var T = null, play = null, map = null, pin = null, tick = 0, offset = 0, hintAt = {}, leaveT = 0, warned = false, alive = true, sending = false;
@@ -1893,7 +1893,7 @@
       var intro = function () {
         countdownOnly();
         var me = whoAmI();
-        main.innerHTML = '<div class="wp-intro"><img src="img/wp-pepe.webp" alt="Pepe the explorer with binoculars" width="180" height="169"><div><h3>Where\'s Pepe? #' + T.num + '</h3>' +
+        main.innerHTML = '<div class="wp-intro"><img src="img/wp-pepe.webp" alt="Pepe the explorer with binoculars" width="180" height="169"><div><h3>Pepe Guesser #' + T.num + '</h3>' +
           '<p>Pepe sent a new photo. Where is he? You have <b>2 minutes</b> and <b>one guess</b>. The faster, the more points: 5000 in the first minute, then the continent and the flag show up and the maximum drops.</p>' +
           '<p class="wp-small">Leaving the tab during the guess: one warning, then −1000 each time.</p>' +
           (T.signed_in ? '<div class="app-row"><button type="button" class="app-btn wp-start go">▶ Start</button><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
@@ -1990,7 +1990,7 @@
       var shareText = function (r) {
         // the last line says, without the word "faucet", that good guesses pay a little PEP
         var pts = r.points || 0;
-        return "🐸 Where's Pepe #" + r.num + '\n' + (r.g_lat == null ? '📍 no guess' : '📍 ' + fmtKm(r.km)) + ' · ' + pts.toLocaleString('en-US') + '/5000' +
+        return "🐸 Pepe Guesser #" + r.num + '\n' + (r.g_lat == null ? '📍 no guess' : '📍 ' + fmtKm(r.km)) + ' · ' + pts.toLocaleString('en-US') + '/5000' +
           (T && T.streak > 1 ? ' · 🔥' + T.streak : '') + '\n🎁 Find the frog, get some free PEP in your pocket\nhttps://pepecoinhub.com/meme/';
       };
       var result = function (r) {
@@ -2113,7 +2113,7 @@
   }
   // Host tools: approve the robot's puzzles before they go live, and pay the PEP rewards
   function hostTools() {
-    openApp('wp-host', "Where's Pepe - Host tools", 'wheres-pepe', function (A) {
+    openApp('wp-host', "Pepe Guesser - Host tools", 'wheres-pepe', function (A) {
       A.body.innerHTML = '<div class="tabs98" role="tablist"><button type="button" role="tab" aria-selected="true" data-t="q">Photo queue</button><button type="button" role="tab" aria-selected="false" data-t="p">Payouts</button></div><div class="wp-hostbody"></div><p class="wp-msg" role="status"></p>';
       var body = A.body.querySelector('.wp-hostbody'), msg = A.body.querySelector('.wp-msg');
       var say = function (t, bad) { msg.textContent = t || ''; msg.classList.toggle('bad', !!bad); };
@@ -2193,8 +2193,8 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 3, MAIL_KEY = 'pondos-mail-read';
-  var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Where's Pepe? opens for everyone (the Gazette and the PEP-TV ad count down to it)
+  var MAIL_ISSUE = 4, MAIL_KEY = 'pondos-mail-read';
+  var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
     if (ms <= 0) return '🟢 <b>It\'s live!</b> A new Pepe every day at 00:00 UTC.';
@@ -2217,14 +2217,48 @@
     return rpc('gry_letters', { p_limit: 200 }).then(function (j) { letterBox = j && j.letters ? j : null; paintMail(); return letterBox; }, function () { return null; });
   }
   if (mainEl) setTimeout(checkLetters, 1500);
+  // Issue #4 (5 Nov 2026): the third issue this week, hence "Almost weekly"
+  function gazette4() {
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #4</span><span>Price: 0 PEP</span><span>Almost weekly*</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking"><p class="gz-flash">🚨 Breaking news 🚨</p><h4>LEAKED: the right answer to Pepe Guesser!</h4>' +
+      '<figure class="gz-reddit"><p class="gz-rd-top"><b>r/pepecoin</b> · u/drivingyou17</p><p class="gz-rd-title">I like this game! 🐸👍</p>' +
+      '<p class="gz-rd-shot">Pepe was at <b>Statue of Liberty</b>, United States 🇺🇸<br><span>4,539</span> / 5000 points · 155 km away</p>' +
+      '<figcaption>“Nice daily challenge before going to sleep 😴💤”</figcaption></figure>' +
+      '<p>A player posted their result on r/pepecoin, answer and all. The pond did what ponds do: everybody came to look. The result is a new record, <b>32 players in one day</b>, and the count can still go up.</p>' +
+      '<p class="gz-count gz-live"></p>' +
+      '<p>Our investigative desk has looked into the leak and calls it harmless: at 00:00 UTC Pepe packs his backpack and goes somewhere new. Keep posting your scores, we love it.</p>' +
+      '<p><b>PS: the game has a new name.</b> Where\'s Pepe? is now <b>Pepe Guesser</b>. Same photo, same map, same free PEP.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-wpgo">Play today\'s Pepe Guesser →</button></div></section>' +
+      '<section class="gz-letters"><p class="gz-kick">Letters to the Editor</p><h4>The first honest confessions</h4>' +
+      '<p>The mailbox has started to fill with letters from poor, addicted players. We print the first one with permission and without edits:</p>' +
+      '<blockquote class="gz-quote"><p>“Im a lemom and I have a pepeminer addiction”</p><cite>Lemon 🍋 Ᵽ <span class="hs-ok" title="Verified with Discord">✓</span>, 4 Nov</cite></blockquote>' +
+      '<p><i>The Editor replies:</i> Dear Lemon, the first step is admitting it. The second step is the next pickaxe upgrade. Stay strong.</p>' +
+      '<p>Hooked too? Write in, tick <b>“OK to print”</b> and your confession could be in the next issue.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-write">✏️ Confess to the Editor</button><button type="button" class="app-btn gz-miner">Open Pepe Miner (no cure included)</button></div></section>' +
+      '<section class="gz-market"><p class="gz-kick">Markets</p><h4>The price dips as CoinEx sells. Good.</h4>' +
+      '<p>PEP slipped after CoinEx started selling. The editor\'s view: let them sell. Once they are done, it gets easier for us to grow.</p>' +
+      '<p class="gz-count gz-price"></p>' +
+      '<p class="gz-fine">Not financial advice. The frog does not know wen moon.</p></section>' +
+      '<section class="gz-cover"><p class="gz-kick">Cover story</p><h4>FROGAGEDDON: Zord\'s foot, explosions and plot twists</h4>' +
+      '<img class="gz-hero" src="../games/img/pondwars/title.jpg" alt="FROGAGEDDON title screen" loading="lazy">' +
+      '<p>Turn-based frog artillery on a pond you can blow to pieces. Four maps (Pond Island, Split Decision, Croak Canyon and Last Lily), nine weapons and one very famous foot.</p>' +
+      '<p>The star of the show is Zord\'s <b>Golden Foot</b>: throw it, wait three seconds and it bursts into five exploding golden toes. Add bazookas, land mines, a grapple rope, a jetpack and a teleport, and no match ends the way it started.</p>' +
+      '<p>Play the CPU or a fren on one device, with a mouse or the new touch controls.</p>' +
+      '<p class="gz-ask"><b>Test it and tell us: do you want online mode?</b> Write to the Editor or say it in LAN Party. Your answers decide what we build next.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-frog">Play FROGAGEDDON →</button><button type="button" class="app-btn gz-online">✉️ I want online mode!</button><button type="button" class="app-btn gz-lan">Tell LAN Party</button><button type="button" class="app-btn gz-frogad">Watch the PEP-TV ad</button></div></section>' +
+      '<section class="gz-soon"><p class="gz-kick">Coming up</p><h4>More big changes are on the way</h4>' +
+      '<p>This was just the warm-up. Big changes are coming to the pond soon. Keep an eye on the flag on the mailbox.</p></section>' +
+      '<p class="gz-foot">*Almost weekly: this is the third issue this week. We are still working on the “weekly” part.</p></article>';
+  }
   function frogMail(view) {
     try { localStorage.setItem(MAIL_KEY, String(MAIL_ISSUE)); } catch (e) {}
     paintMail();
     var A = openApp('mail', 'Frog Mail - Inbox', 'frog-mail', function (A) {
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
         '<li><button type="button" data-v="write"><b>✏️ Letters to the Editor</b><small>Ideas, bugs, wishes, notices</small></button></li>' +
-        '<li><button type="button" data-v="gz"><b>The Pond Gazette #3</b><small>Yo dawg, an internet in your internet</small></button></li>' +
-        '<li><button type="button" data-v="gz2"><b>The Pond Gazette #2</b><small>Archive: Where\'s Pepe? is coming</small></button></li>' +
+        '<li><button type="button" data-v="gz"><b>The Pond Gazette #4</b><small>🚨 Breaking: the Pepe Guesser leak</small></button></li>' +
+        '<li><button type="button" data-v="gz3"><b>The Pond Gazette #3</b><small>Archive: an internet in your internet</small></button></li>' +
+        '<li><button type="button" data-v="gz2"><b>The Pond Gazette #2</b><small>Archive: Pepe Guesser is coming</small></button></li>' +
         '<li class="ml-owner" hidden><button type="button" data-v="box"><b>📥 Editor\'s desk <span class="ml-n"></span></b><small>Only you can see these</small></button></li>' +
         '</ul><div class="mail-pane"></div></div>';
       var pane = A.body.querySelector('.mail-pane'), ct = 0;
@@ -2239,19 +2273,19 @@
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
         if (v === 'write') return writeLetter(pane);
         if (v === 'box') return letterInbox(pane, paintOwner);
-        var issue = v === 'gz2' ? 2 : 3;
-        pane.innerHTML = issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : 4;
+        pane.innerHTML = issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
         '<p><b>Got an idea, a wish or a bug?</b> Write a letter right here in Frog Mail. It goes straight to the editor, every letter is read, and the best ideas get built.</p>' +
         '<div class="app-row"><button type="button" class="app-btn go gz-write">✏️ Write a letter</button><button type="button" class="app-btn gz-lan">Or say it in LAN Party →</button></div></section>' +
-        '<section class="gz-wp"><p class="gz-kick">Extra! Extra!</p><h4>Pepe packs his backpack: Where\'s Pepe? starts soon</h4>' +
+        '<section class="gz-wp"><p class="gz-kick">Extra! Extra!</p><h4>Pepe packs his backpack: Pepe Guesser starts soon</h4>' +
         '<div class="gz-wpbox"><img src="img/wp-pepe.webp" alt="Pepe the explorer with binoculars" width="110" height="104"><div>' +
         '<p>Every day Pepe sends one photo from somewhere in the world. You get 2 minutes and one pin on the map. The closer you get, the more points: up to 5000 a day.</p>' +
         '<p><b>And free PEP for everyone!</b> 1 PEP for every 50 points, paid by the host every week. Discord players get up to 100 PEP a day, guests up to 50.</p>' +
         '<p class="gz-count"></p></div></div>' +
-        '<div class="app-row"><button type="button" class="app-btn gz-wpgo">Open Where\'s Pepe? →</button><button type="button" class="app-btn gz-wpad">Watch the PEP-TV ad</button></div></section>' +
+        '<div class="app-row"><button type="button" class="app-btn gz-wpgo">Open Pepe Guesser →</button><button type="button" class="app-btn gz-wpad">Watch the PEP-TV ad</button></div></section>' +
         '<section class="gz-lead"><p class="gz-kick">Classifieds</p><h4>HELP WANTED: a frog to run game night</h4>' +
         '<div class="gz-frame ptv"><div class="ptv-top"><span class="ptv-live">LIVE</span><b>PEP-TV</b><span class="ptv-ch">CH 1 · PEPE PICTURES PRIME TIME</span></div><div class="ptv-stage"><div class="ptv-scene on"><h3 class="ad-big">WANTED:<br>a frog to run<br><em>game night!</em></h3></div></div></div>' +
         '<p>Pepe Pictures, the weekly quiz night, needs a host: set the date, pick the pictures, start the rounds and crown the winner. All in the chat.</p>' +
@@ -2261,9 +2295,9 @@
           '<section><p class="gz-kick">Front page</p><h4>Yo dawg, we put an internet in your internet</h4>' +
           '<div class="gz-wpbox"><img src="img/laptop.webp" alt="Pepe at a laptop" width="120" height="96"><div>' +
           '<p>The pond is growing up. Not one more crypto dashboard you check once and forget: a small internet inside the internet, a place you actually want to come back to.</p>' +
-          '<p><b>Every day:</b> a new Where\'s Pepe? photo and free PEP for good guesses, games with a Leaders board, the LAN Party chat. <b>Every week:</b> a fresh Gazette with your letters and notices. <b>Every time:</b> weird facts and PEP-TV.</p></div></div>' +
+          '<p><b>Every day:</b> a new Pepe Guesser photo and free PEP for good guesses, games with a Leaders board, the LAN Party chat. <b>Every week:</b> a fresh Gazette with your letters and notices. <b>Every time:</b> weird facts and PEP-TV.</p></div></div>' +
           '<p>You read it, you play it, and from now on you shape it.</p></section>' +
-          '<section class="gz-wp"><p class="gz-kick">Extra! Extra!</p><h4>Where\'s Pepe? is open for everyone</h4>' +
+          '<section class="gz-wp"><p class="gz-kick">Extra! Extra!</p><h4>Pepe Guesser is open for everyone</h4>' +
           '<div class="gz-wpbox"><img src="img/wp-pepe.webp" alt="Pepe the explorer with binoculars" width="110" height="104"><div>' +
           '<p>One photo a day, 2 minutes, one pin on the map. Up to 5000 points, and 1 PEP for every 50 points, paid weekly. Call it the pond faucet: you just have to know your geography.</p>' +
           '<p class="gz-count"></p></div></div>' +
@@ -2287,7 +2321,7 @@
         on('.gz-write', function () { show('write'); });
         on('.gz-lan', function () { lanParty(); });
         on('.gz-wpgo', wheresPepe);
-        on('.gz-wpad', function () { adPlayer(Math.max(0, adByFile('wheres_pepe.mpg'))); });
+        on('.gz-wpad', function () { adPlayer(Math.max(0, adByFile('pepe_guesser.mpg'))); });
         on('.gz-tv', function () { adPlayer(Math.max(0, adByFile('host_wanted.mpg'))); });
         var tvn = pane.querySelector('.gz-tvnote');
         if (tvn) {
@@ -2295,7 +2329,24 @@
           tvn.innerHTML = ai >= 0 ? '<b>📌 New on PEP-TV:</b> “An internet in your internet”. <a href="#" class="gz-newad">Watch the ad</a>' : '<b>📌 ' + (function () { var at = new Date(Date.parse('2026-11-04T20:00:00+01:00')); return (at.toDateString() === new Date().toDateString() ? 'Today' : 'Tomorrow') + ' at ' + at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); })() + ' on PEP-TV:</b> a new ad about where the pond is heading. Stay tuned.';
           on('.gz-newad', function () { adPlayer(ai); });
         }
-        var cnt = pane.querySelector('.gz-count');
+        on('.gz-frog', pondWarsApp);
+        on('.gz-frogad', function () { adPlayer(Math.max(0, adByFile('frogageddon.mpg'))); });
+        on('.gz-miner', minerApp);
+        on('.gz-online', function () {
+          show('write');
+          var lb = pane.querySelector('.lt-body'); if (lb) { lb.value = 'Dear Editor, I want FROGAGEDDON online! '; lb.dispatchEvent(new Event('input')); lb.focus(); }
+        });
+        var live = pane.querySelector('.gz-live');   // today's real Pepe Guesser count, next to the record
+        if (live) rpc('gry_wp_count').then(function (c) { if (c && c.players) live.innerHTML = 'Today so far: <b>' + fmt.int(c.players) + (c.players === 1 ? ' player' : ' players') + '</b> 🐸'; else live.remove(); }, function () { live.remove(); });
+        var gp = pane.querySelector('.gz-price');   // the live PEP price, same source as the tray
+        if (gp) {
+          if (!window.PepPrices) gp.remove();
+          else window.PepPrices.quote().then(function (q) {
+            if (!q || q.usd == null) { gp.remove(); return; }
+            gp.innerHTML = 'PEP now: <b>' + fmt.usd(q.usd) + '</b>' + (q.change_24h == null ? '' : ' (' + (q.change_24h < 0 ? '▼ ' : '▲ ') + fmt.pct(Math.abs(q.change_24h)) + ' in 24 h)');
+          }, function () { gp.remove(); });
+        }
+        var cnt = pane.querySelector('.gz-count:not(.gz-live):not(.gz-price)');
         if (cnt) { var paintCount = function () { cnt.innerHTML = launchText(); }; paintCount(); ct = setInterval(paintCount, 1000); }
       };
       A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-v')); }); });
@@ -2410,7 +2461,7 @@
       '',
       'games folder: FUD Invaders, PEP Snake, YEET THE PEP,',
       '  PEPE SWEEPER, Pepe Miner, chess and frens.',
-      'Where\'s Pepe? = a new photo every day (and free PEP).',
+      'Pepe Guesser = a new photo every day (and free PEP).',
       'LEADERS = every top 10 in one place.',
       'high score or it did not happen.',
       '',
@@ -2458,7 +2509,7 @@
     { file: 'internet_in_your_internet.mpg', added: '2026-11-04', from: '2026-11-04T20:00:00+01:00', title: 'An internet in your internet', ch: 'CH 1 · POND PRIME TIME', icon: 'laptop', scenes: [
       '<p class="ad-kick">47 tabs open. 46 of them are bad news.</p><h3 class="ad-big">What if the pond<br>was <em>the internet?</em></h3>',
       '<img class="ad-pic" src="img/laptop.webp" alt=""><h3 class="ad-big">Yo dawg, we put an <em>internet</em><br>in your internet.</h3>',
-      '<p class="ad-kick">Games. Weird facts. A daily faucet. A chat. A notice board.</p><h3 class="ad-big">One pond.<br>Come back <em>every day.</em></h3><p class="ad-sub">A new Where\'s Pepe? photo at 00:00 UTC, free PEP for good guesses, the Gazette every week.</p>',
+      '<p class="ad-kick">Games. Weird facts. A daily faucet. A chat. A notice board.</p><h3 class="ad-big">One pond.<br>Come back <em>every day.</em></h3><p class="ad-sub">A new Pepe Guesser photo at 00:00 UTC, free PEP for good guesses, the Gazette every week.</p>',
       '<p class="ad-fine">Got an idea for the pond? Write to the editor. The best letters get printed.</p><button type="button" class="ad-cta ad-mailbtn">Write to the Editor →</button>'
     ] },
     { file: 'at_mention.mpg', added: '2026-11-03', title: '@mentions in the chat', ch: 'CH 2 · POND TALK RADIO', icon: 'gif-080-still', scenes: [
@@ -2479,12 +2530,12 @@
       '<p class="ad-kick">Hold to charge. Release to yeet. Three panic flaps.</p><h3 class="ad-big"><em>PUMP</em> candles launch you.<br>The <em>SELL WALL</em> stops you.</h3><p class="ad-sub">The track changes every round.</p>',
       '<p class="ad-fine">Helmet included. Aerospace qualifications not included. No PEP prizes: just the Hall of Fren top 10.</p><button type="button" class="ad-cta ad-yeetbtn">Play YEET THE PEP →</button>'
     ] },
-    { file: 'wheres_pepe.mpg', title: "Where's Pepe? A new photo every day", ch: 'CH 5000 · THE POND TRAVEL CHANNEL', icon: 'wheres-pepe', scenes: [
+    { file: 'pepe_guesser.mpg', title: "Pepe Guesser: a new photo every day", ch: 'CH 5000 · THE POND TRAVEL CHANNEL', icon: 'wheres-pepe', scenes: [
       '<p class="ad-kick">Pepe packed a backpack, a map and a camera…</p><h3 class="ad-big">…and now he is<br><em>LOST!</em></h3>',
       '<img class="ad-pic" src="img/wp-pepe.webp" alt=""><p class="ad-sub">Every day he sends one photo from somewhere in the world. Find him on the map!</p>',
       '<h3 class="ad-big">2 minutes.<br>1 pin.<br><em>5000 points!</em></h3><p class="ad-sub">The faster and the closer, the better. Hints show up as the clock runs down.</p>',
       '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big"><em>FREE PEP!*</em></h3><p class="ad-sub ad-launch"></p>',
-      '<p class="ad-fine">*1 PEP per 50 points: up to 100 PEP a day with Discord, up to 50 as a guest (from day 2 of a streak). Weekly budget, paid weekly by the host. No purchase, no seed phrase, no catch.</p><button type="button" class="ad-cta ad-wpbtn">Open Where\'s Pepe? →</button>'
+      '<p class="ad-fine">*1 PEP per 50 points: up to 100 PEP a day with Discord, up to 50 as a guest (from day 2 of a streak). Weekly budget, paid weekly by the host. No purchase, no seed phrase, no catch.</p><button type="button" class="ad-cta ad-wpbtn">Open Pepe Guesser →</button>'
     ] },
     { file: 'host_wanted.mpg', title: 'Wanted: a frog to run game night', ch: 'CH 1 · PEPE PICTURES PRIME TIME', icon: 'unclesam', scenes: [
       '<p class="ad-kick">Always the one who organises the group chat?</p><h3 class="ad-big">WANTED:<br>a frog to run<br><em>game night!</em></h3>',
@@ -2822,7 +2873,7 @@
       mb.addEventListener('click', frogMail);
       trayEl2.insertBefore(mb, trayEl2.firstChild);
       paintMail();
-      if (!mailRead()) setTimeout(function () { if (!mailRead()) balloon('You\u2019ve got frog mail!', 'Extra edition: The Pond Gazette #2 is in your mailbox. Click the mailbox in the corner.', 'frog-mail'); }, 17000);
+      if (!mailRead()) setTimeout(function () { if (!mailRead()) balloon('You\u2019ve got frog mail!', 'Breaking news: The Pond Gazette #4 is in your mailbox. Click the mailbox in the corner.', 'frog-mail'); }, 17000);
     }
   }
 
