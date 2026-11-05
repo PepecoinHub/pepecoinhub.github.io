@@ -22,10 +22,10 @@ create table if not exists games.pepegochi_pets (
 
   -- Persisted snapshot from the last *accepted* action; read-only calls
   -- derive the current needs without writing.
-  hunger integer not null default 75 check (hunger between 0 and 100),
-  hygiene integer not null default 80 check (hygiene between 0 and 100),
-  mood integer not null default 80 check (mood between 0 and 100),
-  energy integer not null default 75 check (energy between 0 and 100),
+  hunger numeric(7,4) not null default 75 check (hunger between 0 and 100),
+  hygiene numeric(7,4) not null default 80 check (hygiene between 0 and 100),
+  mood numeric(7,4) not null default 80 check (mood between 0 and 100),
+  energy numeric(7,4) not null default 75 check (energy between 0 and 100),
 
   care_days integer not null default 0 check (care_days between 0 and 20000),
   last_care_day_utc date,
@@ -39,6 +39,13 @@ create table if not exists games.pepegochi_pets (
   last_play_at timestamptz,
   last_rest_at timestamptz
 );
+
+-- Repeatable column upgrade (also supports an older integer-only staging schema).
+alter table games.pepegochi_pets
+  alter column hunger type numeric(7,4) using hunger::numeric(7,4),
+  alter column hygiene type numeric(7,4) using hygiene::numeric(7,4),
+  alter column mood type numeric(7,4) using mood::numeric(7,4),
+  alter column energy type numeric(7,4) using energy::numeric(7,4);
 
 -- The 'games' schema is not exposed by the site's Supabase Data API.
 -- Even if this changes, no client gets direct table permissions.
@@ -64,10 +71,10 @@ begin
   -- Stop calculating after 30 days; needs can never fall below zero.
   elapsed_hours := greatest(0::numeric,
      least(720::numeric, extract(epoch from (p_asof - p.updated_at)) / 3600));
-  h := greatest(0, p.hunger - floor(elapsed_hours * 20 / 24)::integer);
-  c := greatest(0, p.hygiene - floor(elapsed_hours * 15 / 24)::integer);
-  m := greatest(0, p.mood - floor(elapsed_hours * 18 / 24)::integer);
-  e := greatest(0, p.energy - floor(elapsed_hours * 10 / 24)::integer);
+  h := floor(greatest(0::numeric, p.hunger - elapsed_hours * 20 / 24))::integer;
+  c := floor(greatest(0::numeric, p.hygiene - elapsed_hours * 15 / 24))::integer;
+  m := floor(greatest(0::numeric, p.mood - elapsed_hours * 18 / 24))::integer;
+  e := floor(greatest(0::numeric, p.energy - elapsed_hours * 10 / 24))::integer;
 
   stage := case when p.care_days >= 7 then 'adult'
                 when p.care_days >= 2 then 'froglet'
@@ -197,11 +204,11 @@ declare
   p games.pepegochi_pets%rowtype;
   t timestamptz;
   day_utc date;
-  fresh jsonb;
-  h integer;
-  c integer;
-  m integer;
-  e integer;
+  elapsed_hours numeric;
+  h numeric;
+  c numeric;
+  m numeric;
+  e numeric;
   today_count integer;
   new_care_day boolean;
   next_care_days integer;
@@ -244,11 +251,13 @@ begin
     raise exception 'That action is cooling down' using errcode = 'P0001';
   end if;
 
-  fresh := games.pepegochi_snapshot(p, t);
-  h := (fresh #>> '{needs,hunger}')::integer;
-  c := (fresh #>> '{needs,hygiene}')::integer;
-  m := (fresh #>> '{needs,mood}')::integer;
-  e := (fresh #>> '{needs,energy}')::integer;
+  -- Persist fractional needs. Only the UI response is rounded to integers.
+  elapsed_hours := greatest(0::numeric,
+    least(720::numeric, extract(epoch from (t - p.updated_at)) / 3600));
+  h := greatest(0::numeric, p.hunger - elapsed_hours * 20 / 24);
+  c := greatest(0::numeric, p.hygiene - elapsed_hours * 15 / 24);
+  m := greatest(0::numeric, p.mood - elapsed_hours * 18 / 24);
+  e := greatest(0::numeric, p.energy - elapsed_hours * 10 / 24);
 
   if p_action = 'feed' then
     h := least(100, h + 35);
