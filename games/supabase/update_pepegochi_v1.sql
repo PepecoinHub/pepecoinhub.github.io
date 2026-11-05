@@ -131,7 +131,7 @@ revoke all on function games.pepegochi_milestone_hook(uuid, integer)
 -- Read-only: no writes, even when the pet has been away for months.
 create or replace function public.gry_pepegochi_state()
 returns jsonb
-language plpgsql stable security definer set search_path = ''
+language plpgsql volatile security definer set search_path = ''
 as $$
 declare
   u uuid := auth.uid();
