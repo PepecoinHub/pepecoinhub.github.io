@@ -1057,13 +1057,18 @@ footer.foot a { color: #edf3e3; }
 .ad-ba img { width: 90px; height: 90px; object-fit: contain; }
 .ad-ba figcaption { font: 600 13px/1.3 var(--f-body); text-align: center; }
 .ad-after figcaption { color: #1d6b3a; font: 400 17px/1.05 Impact, "Arial Black", sans-serif; text-transform: uppercase; }
+/* create_your_fren.mpg: Frens stacked from the Avatar Maker's own 64×64 layers */
+.ad-fren { position: relative; display: inline-block; flex: none; width: 92px; height: 92px; border: 3px solid #fff; box-shadow: 4px 4px 0 #000; background: #7eb7dc; }
+.ptv .ad-fren img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; border: 0; box-shadow: none; image-rendering: pixelated; }
+.ad-ba .ad-fren { width: 90px; height: 90px; border: 0; box-shadow: none; }
+.ad-frens { display: flex; flex-wrap: wrap; gap: 14px; }
 .ptv-crawl { display: flex; align-items: center; overflow: hidden; white-space: nowrap; background: #fff; color: #111; border-top: 3px solid #ffd400; font: 400 15px/1 Impact, "Arial Black", sans-serif; }
 .ptv-crawl b { flex: none; background: #d41f1f; color: #fff; padding: 7px 10px; font-weight: 400; z-index: 1; }
 .ptv-run { display: inline-block; padding: 7px 0 7px 12px; animation: pager-scroll 45s linear infinite; text-transform: uppercase; }
 .ptv-nfa { font: 400 11px var(--f-chrome); color: var(--muted); }
 .ptv-ads { margin-top: 6px; }
 .ptv-adpos { text-align: center; color: var(--muted); }
-@media (max-width: 760px) { .ad-ba img { width: 64px; height: 64px; } .ptv-nfa { display: none; } }
+@media (max-width: 760px) { .ad-ba img { width: 64px; height: 64px; } .ptv-nfa { display: none; } .ad-ba .ad-fren { width: 64px; height: 64px; } .ad-fren { width: 64px; height: 64px; } }
 @media (prefers-reduced-motion: reduce) { .ptv-run { animation: none; padding-left: 10px; } .ptv-live { animation: none; } .ptv-scene { transition: none; } }
 
 .lan-form .lan-nick { flex: 0 1 110px; }

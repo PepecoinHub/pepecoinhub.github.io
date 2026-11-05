@@ -72,3 +72,37 @@ server-verified actions. Never grant these through a client-provided badge ID.
 The Passport currently performs one Supabase RPC on opening and one small claim
 request for each newly discovered secret. Artwork and the achievement catalog
 are static assets on GitHub Pages. Don't poll the whole profile each second.
+
+### Fren Avatar Maker and Fresh Fren (draft, not yet enabled)
+
+`Create Your Fren - Avatar Maker` opens from the Passport (`Create your Fren` /
+`Edit your Fren`), from Find… and from the `create_your_fren.mpg` PEP-TV ad. It
+stacks the 22 committed layers in `docs/meme/avatar-assets/layers/` as listed in
+`docs/meme/avatar-options.json` (4 × 6 × 5 × 5 = 600 looks, all free).
+
+**Installation order, after review (and after `update_fren_passport.sql`):**
+1. Apply `games/supabase/update_fren_avatar.sql` once in PH-games. It creates the
+   private `games.passport_avatars` table, `public.gry_passport_avatar_save(text,
+   text, text, text)` and a newer `public.gry_passport_state()` that adds
+   `avatar`. It is safe to run twice and awards nothing by itself.
+2. Only then merge the frontend. Before the migration the maker still works as
+   a preview, but Save Look reports `Saving is waiting for its database update`.
+3. If an option is ever added to `avatar-options.json`, add the same ID to the
+   allowlist in the save RPC in a new migration. The tests compare the lists.
+
+**Trust rules:** the browser sends only four option IDs. The server takes the
+player from `auth.uid()`, requires a real Discord identity, checks each slot
+against an exact allowlist, and writes one row per player. The first save
+inserts `first_avatar` into `games.passport_badges` in the same transaction
+(`on conflict do nothing`), so Fresh Fren is minted once and a failed save
+leaves nothing behind. Saving the same look again is a no-op success; a
+different look within 3 seconds or past 40 saves per UTC day is an error. Picking
+parts and Randomize never call Supabase: one read when the Passport opens, one
+write per Save Look.
+
+**Tests:** `node --test tests/passport.test.mjs` runs the static checks.
+`tests/passport-avatar-sql.test.mjs` runs the migrations on a real, disposable
+PostgreSQL (15 or newer) when `PASSPORT_PG_URL` and `PASSPORT_PG_MODULE` (path to
+node-postgres) are set: grants, anonymous/non-Discord rejection, ID injection,
+isolation between players, one badge under concurrent first saves, rollback,
+cooldown and the daily limit. Never point it at Supabase.

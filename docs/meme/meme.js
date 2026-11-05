@@ -72,7 +72,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; return 'img/ico/' + n + '.webp'; }
   function icoFrom(src) { var m = /^img\/([\w-]+)\.webp$/.exec(src || ''); return m ? ico(m[1]) : src; }
   function json(name) {
     if (!cache[name]) cache[name] = fetch(DATA + name, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(name + ' ' + r.status); return r.json(); });
@@ -175,7 +175,7 @@
     var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="img/gif-085-still.webp" alt="" width="28" height="28"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
     meItem.addEventListener('click', function () { setOpen(false); logOn(); });
     smMain.appendChild(meItem);
-    var passportItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>Fren Passport</b><small>My achievements and secrets</small></span>');
+    var passportItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>Fren Passport</b><small>My Fren, achievements and secrets</small></span>');
     passportItem.addEventListener('click', function () { setOpen(false); frenPassport(); });
     smMain.appendChild(passportItem);
     var findItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('search') + '" alt="" width="28" height="28"><span><b>Find…</b> <small>games, pages, tools</small></span>');
@@ -1459,6 +1459,8 @@
       ['About me', 'Who builds this pond (and how to support it)', 'night-shift', 'about me byl author tip donate support', aboutMe],
       ['Write a letter', 'Send an idea, a wish or a bug to the builder', 'frog-mail', 'write letter feedback contact message bug idea mail', function () { frogMail('write'); }],
       ['Log On', 'Guest or Discord', 'gif-085-still', 'log on login sign in account discord guest', logOn],
+      ['Fren Passport', 'Your Fren, achievements and secrets', 'pep-logo', 'passport profile achievements badges secrets items account', function () { frenPassport(); }],
+      ['Create Your Fren', 'Avatar Maker for your Fren Passport', 'fresh-fren', 'avatar maker profile picture face hat outfit glasses look character fresh fren', function () { avatarMaker(); }],
       ['LaptopIndex.exe', 'The Legendary Laptop', 'gif-012-still', 'laptop legend 40 million ath', laptop],
       ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', 'bin trash recycle paper hands', paperHands]
     ].map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
@@ -1569,11 +1571,29 @@
   function signInHref() { return BASE + 'games/?login=1&back=' + encodeURIComponent(location.pathname + location.search.replace(/[?&]signedin=1/, '')); }
   // Fren Passport: all durable player data comes from the server. The catalog
   // contains labels and hints only; it never awards anything.
-  function frenPassport() {
+  // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
+  // look and refresh the Passport after a save without asking the server again.
+  var passportCache = null; // { userId, state, catalog, opts }
+  function passportCss() {
+    if (!document.getElementById('fren-passport-css')) {
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261105avatar1'}));
+    }
+  }
+  // one read: the server snapshot, plus two static files from this site (labels and avatar parts)
+  function passportLoad(session) {
+    return Promise.all([
+      rpc('gry_passport_state', {}),
+      fetch('passport-catalog.json?v=20261105avatar1').then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
+      avatarOptions().catch(function () { return null; })
+    ]).then(function (r) {
+      if (r[0] && r[0].signed_in) passportCache = { userId: session.userId, state: r[0], catalog: r[1], opts: r[2] };
+      return r[0];
+    });
+  }
+  function passportMine() { var s = sbSession(); return s && s.discord && passportCache && passportCache.userId === s.userId ? passportCache : null; }
+  function frenPassport(fromCache) {
     var A = openApp('passport', 'Fren Passport - Properties', 'pep-logo', function (A) {
-      if (!document.getElementById('fren-passport-css')) {
-        document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261105b'}));
-      }
+      passportCss();
       A.body.innerHTML = '<div class="passport"><p class="passport-muted" role="status">Loading your Fren Passport…</p></div>';
       function notice(message, needsLogin) {
         var box = A.body.querySelector('.passport');
@@ -1581,22 +1601,18 @@
         box.replaceChildren();
         var p = el('p', {class:'passport-note',role:'status'}); p.textContent = message; box.appendChild(p);
         if (needsLogin) {
+          var row = el('div', {class:'app-row'});
           var b = el('button', {type:'button',class:'app-btn'}); b.textContent = 'Log on with Discord';
-          b.addEventListener('click', logOn); box.appendChild(b);
+          b.addEventListener('click', logOn); row.appendChild(b);
+          var t = el('button', {type:'button',class:'app-btn'}); t.textContent = 'Try the Avatar Maker';
+          t.addEventListener('click', function () { avatarMaker(); }); row.appendChild(t);
+          box.appendChild(row);
         }
       }
-      var session = sbSession();
-      if (!session || !session.discord) {
-        notice('Log on with Discord to see your private passport. Guest scores do not create a permanent collection.', true);
-        return;
-      }
-      Promise.all([
-        rpc('gry_passport_state', {}),
-        fetch('passport-catalog.json?v=20261105a').then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; })
-      ]).then(function (results) {
-        var state=results[0], catalog=results[1];
-        if (!state || !state.signed_in) { notice('Your Discord session expired. Please log on again.', true); return; }
-        var box = A.body.querySelector('.passport'); if (!box) return;
+      A.render = function () {
+        var d = passportMine(), box = A.body.querySelector('.passport');
+        if (!d || !box) return;
+        var state=d.state, catalog=d.catalog;
         var best = Number(state.yeet_best) || 0;
         var earnedBadges = Array.isArray(state.achievements) ? state.achievements : [];
         var discovered = Array.isArray(state.secrets) ? state.secrets : [];
@@ -1609,11 +1625,22 @@
         function piece(tag,cls,value) { var n=el(tag,{class:cls}); n.textContent=value; return n; }
         box.replaceChildren();
         var identity=el('div',{class:'passport-identity'});
-        identity.appendChild(el('img',{src:'img/pep-logo.webp',alt:'PepecoinHub frog emblem',width:'54',height:'54'}));
+        // the saved Fren (only what the server returned), or the site logo until there is one
+        var look = d.opts && avatarLook(d.opts, state.avatar);
+        var face = el('div', {class:'passport-face'});
+        if (look) face.appendChild(avatarStack(d.opts, look, 'Your Fren: ' + avatarSay(d.opts, look)));
+        else face.appendChild(el('img',{src:'img/pep-logo.webp',alt:'PepecoinHub frog emblem',width:'64',height:'64'}));
+        identity.appendChild(face);
         var who=el('div');
         who.appendChild(piece('strong','',state.nickname || 'Discord fren'));
         who.appendChild(piece('p','passport-muted','Member since '+(state.member_since ? fmt.date(state.member_since) : 'unknown')));
         who.appendChild(piece('span','passport-muted','Discord verified · A little history of your pond'));
+        if (d.opts) {
+          var make = el('button', {type:'button',class:'app-btn passport-make'});
+          make.textContent = look ? 'Edit your Fren' : 'Create your Fren';
+          make.addEventListener('click', function () { avatarMaker(); });
+          who.appendChild(make);
+        }
         identity.appendChild(who); box.appendChild(identity);
         var stats=el('div',{class:'passport-stats'});
         [
@@ -1632,7 +1659,7 @@
         var sections=[
           {name:'Achievements',entries:badges.map(function(x){
             var earned=find(earnedBadges,x.id);
-            return {title:x.title||x.id,detail:x.description||'PepecoinHub achievement',
+            return {title:x.title||x.id,detail:x.description||'PepecoinHub achievement',icon:x.icon,
               date:earned&&earned.earned_at, status:x.status, locked:!(earned&&earned.earned_at), secret:false};
           })},
           {name:'Secrets',entries:secrets.map(function(x){
@@ -1648,11 +1675,13 @@
           })}
         ];
         function selectTab(i) {
+          A.tab = i;
           tabs.querySelectorAll('button').forEach(function(b,j){b.setAttribute('aria-selected',String(i===j));b.tabIndex=i===j?0:-1;});
           panel.replaceChildren();
           var group=sections[i], grid=el('div',{class:'passport-grid'});
           group.entries.forEach(function(v) {
             var tile=el('div',{class:'passport-entry'+(v.locked?' locked':'')});
+            if(v.icon&&/^avatar-assets\/[\w-]+\.svg$/.test(v.icon))tile.appendChild(el('img',{class:'passport-badge',src:v.icon,alt:'',width:'32',height:'32'}));
             tile.appendChild(piece('b','',v.locked?'[Locked] '+v.title:v.title));
             tile.appendChild(piece('small','',v.detail));
             if(v.locked&&v.status==='planned')tile.appendChild(piece('small','passport-coming','Coming later'));
@@ -1668,7 +1697,18 @@
           var b=el('button',{type:'button',class:'app-btn',role:'tab','aria-selected':String(i===0)});
           b.textContent=section.name;b.addEventListener('click',function(){selectTab(i);});tabs.appendChild(b);
         });
-        box.appendChild(tabs);box.appendChild(panel);selectTab(0);
+        box.appendChild(tabs);box.appendChild(panel);selectTab(A.tab||0);
+      };
+      var session = sbSession();
+      if (!session || !session.discord) {
+        notice('Log on with Discord to see your private passport. Guest scores do not create a permanent collection.', true);
+        return;
+      }
+      // back from the Avatar Maker: the snapshot it just updated is enough
+      if (fromCache === true && passportMine()) { A.render(); return; }
+      passportLoad(session).then(function (state) {
+        if (!state || !state.signed_in) { notice('Your Discord session expired. Please log on again.', true); return; }
+        A.render();
       }).catch(function(err){
         notice(/PGRST202|could not find the function|does not exist/i.test(err.message||'')
           ? 'Fren Passport is waiting for its database update.'
@@ -1676,6 +1716,180 @@
       });
     }, 610);
     return A;
+  }
+
+  // ---------- Create Your Fren: the Avatar Maker of the Fren Passport ----------
+  // The player's own pixel Fren, stacked from aligned 64×64 layers in avatar-assets/layers/ (listed in
+  // avatar-options.json). Picking parts and Randomize only change this preview, with no server traffic.
+  // Save Look is the one write (gry_passport_avatar_save): only its answer counts as saved, and the
+  // server alone awards Fresh Fren (first_avatar) for the first look it saves.
+  var AV_SLOTS = [['mouth', 'Mouth'], ['eyes', 'Eyes & glasses'], ['hat', 'Hat'], ['outfit', 'Outfit']];
+  // the part of the 64×64 picture each thumbnail zooms in on: [x, y, size]
+  var AV_CROP = { mouth: [18, 28, 32], eyes: [13, 10, 44], hat: [10, 2, 46], outfit: [8, 17, 48] };
+  var avOpts = null;
+  function avatarOptions() {
+    if (!avOpts) {
+      avOpts = fetch('avatar-options.json?v=20261105avatar1').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts.catch(function () { avOpts = null; });
+    }
+    return avOpts;
+  }
+  // a clean copy of a look, or null unless every slot holds a known part
+  function avatarLook(o, x) {
+    if (!o || !o.options || !x || typeof x !== 'object') return null;
+    var look = {};
+    for (var i = 0; i < AV_SLOTS.length; i++) {
+      var k = AV_SLOTS[i][0], id = x[k];
+      if (!(o.options[k] || []).some(function (p) { return p.id === id; })) return null;
+      look[k] = id;
+    }
+    return look;
+  }
+  function avatarSame(a, b) { return !!a && !!b && AV_SLOTS.every(function (s) { return a[s[0]] === b[s[0]]; }); }
+  function avatarSrc(o, layer, look) { return o.paths[layer] || o.paths.layer_template.replace('{id}', look[layer]); }
+  function avatarStack(o, look, label) {
+    var s = el('span', label ? { class: 'fa-stack', role: 'img', 'aria-label': label } : { class: 'fa-stack', 'aria-hidden': 'true' });
+    o.layers_order.forEach(function (layer) { s.appendChild(el('img', { src: avatarSrc(o, layer, look), alt: '', 'data-layer': layer, draggable: 'false' })); });
+    return s;
+  }
+  function avatarSay(o, look) {
+    return AV_SLOTS.map(function (s) { var p = o.options[s[0]].filter(function (x) { return x.id === look[s[0]]; })[0]; return p ? p.label : look[s[0]]; }).join(', ');
+  }
+  function avatarMaker() {
+    return openApp('avatar', 'Create Your Fren - Avatar Maker', 'pep-logo', function (A) {
+      passportCss();
+      A.body.innerHTML = '<div class="fa-load"><p class="passport-muted" role="status">Loading the Avatar Maker…</p></div>';
+      var session = sbSession(), signed = !!(session && session.discord && session.userId);
+      // opened from the Passport: its snapshot already has the saved look; otherwise read it once
+      Promise.all([avatarOptions(), signed && !passportMine() ? passportLoad(session).catch(function () { return null; }) : null]).then(function (r) {
+        if (signed && r[1] && !r[1].signed_in) signed = false;
+        build(r[0], signed);
+      }, function () {
+        var box = A.body.querySelector('.fa-load');
+        if (box) box.innerHTML = '<p class="passport-note" role="status">Could not load the Fren parts. Please try again later.</p>';
+      });
+      function build(o, signed) {
+        var d = signed ? passportMine() : null;
+        var saved = d ? avatarLook(o, d.state.avatar) : null;
+        var start = saved || avatarLook(o, o.defaults);
+        var look = Object.assign({}, start), pending = false, msg = '';
+        var wrap = el('div', { class: 'fa' }), side = el('div', { class: 'fa-side' }), frame = el('div', { class: 'fa-frame' });
+        var big = avatarStack(o, look, 'Preview');
+        frame.appendChild(big); side.appendChild(frame);
+        var who = el('p', { class: 'fa-who' }); who.textContent = d && d.state.nickname ? d.state.nickname : signed ? 'Discord fren' : 'Guest preview';
+        var said = el('p', { class: 'fa-state', role: 'status' });
+        side.appendChild(who); side.appendChild(said); wrap.appendChild(side);
+        var parts = el('div', { class: 'fa-parts' }), thumbs = [];
+        AV_SLOTS.forEach(function (slot) {
+          var k = slot[0], c = AV_CROP[k];
+          var fs = el('fieldset', { class: 'fa-group' }), lg = el('legend'), row = el('div', { class: 'fa-opts' });
+          lg.textContent = slot[1]; fs.appendChild(lg);
+          o.options[k].forEach(function (p) {
+            var lab = el('label', { class: 'fa-opt' }), inp = el('input', { type: 'radio', name: 'fa-' + k, value: p.id });
+            inp.checked = look[k] === p.id;
+            inp.addEventListener('change', function () { if (inp.checked) { look[k] = p.id; msg = ''; paint(); } });
+            // the thumbnail shows the current look with this part swapped in, zoomed on the part
+            var mine = {}; mine[k] = p.id;
+            var t = el('span', { class: 'fa-thumb' }), st = avatarStack(o, Object.assign({}, look, mine));
+            st.style.width = st.style.height = 6400 / c[2] + '%'; st.style.left = -100 * c[0] / c[2] + '%'; st.style.top = -100 * c[1] / c[2] + '%';
+            t.appendChild(st); thumbs.push({ k: k, stack: st });
+            var name = el('span', { class: 'fa-lab' }); name.textContent = p.label;
+            lab.appendChild(inp); lab.appendChild(t); lab.appendChild(name); row.appendChild(lab);
+          });
+          fs.appendChild(row); parts.appendChild(fs);
+        });
+        wrap.appendChild(parts);
+        var bar = el('div', { class: 'app-row fa-actions' });
+        var rnd = el('button', { type: 'button', class: 'app-btn fa-random' }); rnd.textContent = 'Randomize';
+        var saveB = el('button', { type: 'button', class: 'app-btn fa-save' }); saveB.textContent = signed ? 'Save Look' : 'Log on to save';
+        var useB = el('button', { type: 'button', class: 'app-btn fa-use' }); useB.textContent = 'Use in Passport';
+        bar.appendChild(rnd); bar.appendChild(el('span', { class: 'grow' })); bar.appendChild(saveB); bar.appendChild(useB);
+        var note = el('p', { class: 'fa-note' });
+        note.textContent = signed ? 'Every part is free. Changes stay on this screen until you press Save Look.'
+          : 'Every part is free. Try any look as a guest; log on with Discord to save it to your Fren Passport.';
+        A.body.replaceChildren(wrap, bar, note);
+        var setSrc = function (img, src) { if (img.getAttribute('src') !== src) img.setAttribute('src', src); };
+        function paint() {
+          big.querySelectorAll('img').forEach(function (img) { setSrc(img, avatarSrc(o, img.getAttribute('data-layer'), look)); });
+          big.setAttribute('aria-label', 'Preview: ' + avatarSay(o, look));
+          thumbs.forEach(function (t) {
+            t.stack.querySelectorAll('img').forEach(function (img) { var L = img.getAttribute('data-layer'); if (L !== t.k) setSrc(img, avatarSrc(o, L, look)); });
+          });
+          parts.querySelectorAll('input').forEach(function (inp) { inp.checked = look[inp.name.slice(3)] === inp.value; });
+          status();
+        }
+        function status() {
+          var dirty = !avatarSame(look, saved);
+          said.textContent = pending ? 'Saving…' : msg ? msg : !signed ? 'Preview only. Log on with Discord to save.'
+            : !saved ? (avatarSame(look, start) ? 'Not saved yet.' : 'Unsaved changes') : dirty ? 'Unsaved changes' : 'Saved in your Fren Passport.';
+          said.classList.toggle('is-dirty', !pending && (!!msg || said.textContent === 'Unsaved changes'));
+          saveB.disabled = pending || (signed && !!saved && !dirty);
+          useB.disabled = !signed || pending;
+          rnd.disabled = pending;
+        }
+        function failText(err) {
+          var m = (err && err.message) || '';
+          if (/PGRST202|could not find the function|does not exist/i.test(m)) return 'Saving is waiting for its database update. Your look was not saved.';
+          if (/Log on with Discord|JWT/i.test(m)) return 'Your Discord session expired. Log on again to save.';
+          if (/^(Saving too fast|Daily save limit)/.test(m)) return m;
+          if (/Unknown avatar option/.test(m)) return 'One of those parts is not available. Reload the page and try again.';
+          return 'Could not save. Check your connection and try again. Your look was not saved.';
+        }
+        // Save Look: one RPC; the look counts as saved only when the server confirms it
+        function save() {
+          if (pending || !signed) return Promise.reject(new Error('not now'));
+          var sent = Object.assign({}, look);
+          pending = true; msg = ''; saveB.textContent = 'Saving…'; status();
+          return rpc('gry_passport_avatar_save', { p_mouth: sent.mouth, p_eyes: sent.eyes, p_hat: sent.hat, p_outfit: sent.outfit }).then(function (r) {
+            var conf = r && avatarLook(o, r.avatar);
+            if (!conf) throw new Error('The server did not confirm the save.');
+            pending = false; saveB.textContent = 'Save Look';
+            saved = conf;
+            if (avatarSame(look, sent)) look = Object.assign({}, conf);
+            var pc = passportMine();
+            if (pc) {
+              pc.state.avatar = Object.assign({ schema_version: r.avatar.schema_version }, conf);
+              if (r.badge && r.badge.earned_at) {
+                var list = Array.isArray(pc.state.achievements) ? pc.state.achievements : (pc.state.achievements = []);
+                var hit = list.filter(function (b) { return b.id === 'first_avatar'; })[0];
+                if (hit) hit.earned_at = r.badge.earned_at; else list.push({ id: 'first_avatar', title: 'Fresh Fren', earned_at: r.badge.earned_at });
+              }
+              if (apps.passport && apps.passport.render) apps.passport.render();
+            }
+            paint();
+            // the Save button is disabled now; keep keyboard users in the window
+            if (!document.activeElement || document.activeElement === document.body) useB.focus();
+            if (r.badge && r.badge.new) balloon('Fresh Fren unlocked!', 'You saved your first Fren. The achievement is in your Fren Passport now.', 'fresh-fren');
+            return conf;
+          }, function (err) {
+            pending = false; saveB.textContent = 'Save Look';
+            msg = failText(err); status();
+            throw err;
+          });
+        }
+        function toPassport() { A.close(); frenPassport(true); }
+        rnd.addEventListener('click', function () {
+          var next;
+          do {
+            next = {};
+            AV_SLOTS.forEach(function (s) { var l = o.options[s[0]]; next[s[0]] = l[Math.floor(Math.random() * l.length)].id; });
+          } while (avatarSame(next, look));
+          look = next; msg = ''; paint();
+        });
+        saveB.addEventListener('click', function () { if (!signed) logOn(); else save().catch(function () {}); });
+        useB.addEventListener('click', function () {
+          if (!signed || pending) return;
+          if (saved && avatarSame(look, saved)) { toPassport(); return; }
+          osDialog('Create Your Fren', '<div class="dlg-row"><div class="fa-dlg-face">' + avatarStack(o, look).outerHTML + '</div><div><h3>Save this look first?</h3><p>' +
+            (saved ? 'Your Fren Passport shows the last look you saved.' : 'You have not saved a Fren yet, so your Passport still shows the logo.') + '</p></div></div>', [
+            { label: 'Save', go: true, fn: function () { save().then(toPassport, function () {}); } },
+            { label: 'Discard', fn: function () { look = Object.assign({}, saved || start); msg = ''; paint(); toPassport(); } },
+            { label: 'Cancel' }
+          ], 'pep-logo');
+        });
+        paint();
+      }
+    }, 720);
   }
 
   // Only cosmetic, low-stakes discoveries are claimable by a browser.
@@ -2570,7 +2784,17 @@
   // Every claim in them is a fact from this site; the "offers" are jokes, and every ad says so.
   // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
   // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
+  // a Fren from the Avatar Maker's own layers, for the ads (same paint order as avatar-options.json)
+  function adFren(m, e, h, o) {
+    return '<span class="ad-fren" aria-hidden="true">' + ['bg_pond', 'base_frog', o, m, e, h].map(function (id) { return '<img src="avatar-assets/layers/' + id + '.svg" alt="">'; }).join('') + '</span>';
+  }
   var ADS = [
+    { file: 'create_your_fren.mpg', added: '2026-11-05', title: 'Create Your Fren', ch: 'CH 64 · POND MAKEOVER HOUR', icon: 'fresh-fren', scenes: [
+      '<p class="ad-kick">Is your Fren Passport photo just a logo?</p><h3 class="ad-big">Your pond needs<br>a <em>face!</em></h3>',
+      '<div class="ad-ba"><figure class="ad-before"><b>Before</b><img src="img/pep-logo.webp" alt=""><figcaption>“My Passport photo was a logo.”</figcaption></figure><figure class="ad-after"><b>After</b>' + adFren('mouth_grin', 'eyes_shades', 'hat_crown', 'outfit_purple_hoodie') + '<figcaption>A Fren in a paper crown!</figcaption></figure></div>',
+      '<p class="ad-kick">4 mouths. 6 eyes and glasses. 5 hats. 5 outfits.</p><h3 class="ad-big"><em>600</em> looks.<br>Zero PEP.</h3><div class="ad-frens">' + adFren('mouth_tongue', 'eyes_3d', 'hat_pep_cap', 'outfit_white_pep') + adFren('mouth_open', 'eyes_round', 'hat_bucket', 'outfit_orange_vest') + adFren('mouth_smile', 'eyes_sleepy', 'hat_beanie', 'outfit_black_hoodie') + '</div><p class="ad-sub">Every part is free. Hit Randomize until it feels like you.</p>',
+      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Save it once.<br>Get <em>Fresh Fren!</em></h3><p class="ad-sub">Your first saved look unlocks the Fresh Fren achievement in your Fren Passport. One per frog.</p><p class="ad-fine">Log on with Discord to save; guests can try every look. No NFTs, no XP, no rarity, no purchase. It\'s just a hat.</p><button type="button" class="ad-cta ad-frenbtn">Create Your Fren →</button>'
+    ] },
     { file: 'frogageddon.mpg', added: '2026-11-05', title: 'FROGAGEDDON: frog artillery', ch: 'CH 2000 · FREN SOFTWARE LATE NIGHT', icon: 'pondwars', scenes: [
       '<img class="ad-hero" src="../games/img/pondwars/title.jpg" alt=""><p class="ad-kick">Small frogs. Big grudges. Questionable footwear.</p><h3 class="ad-big">FROG<em>AGEDDON</em><br>is here!</h3>',
       '<p class="ad-kick">Turn-based frog artillery on a destructible pond.</p><h3 class="ad-big">Nine weapons.<br><em>Exploding toes.</em></h3><p class="ad-sub">Bazooka, grenades, land mines, a grapple rope and a jetpack. Pick your team, pick your map, then flatten the other frogs.</p>',
@@ -2701,6 +2925,7 @@
       var mlb = A.body.querySelector('.ad-mailbtn'); if (mlb) mlb.addEventListener('click', function () { frogMail('write'); });
       var sb = A.body.querySelector('.ad-sweepbtn'); if (sb) sb.addEventListener('click', function () { pepeSweeperApp(); });
       var fb2 = A.body.querySelector('.ad-frogbtn'); if (fb2) fb2.addEventListener('click', function () { pondWarsApp(); });
+      var frb = A.body.querySelector('.ad-frenbtn'); if (frb) frb.addEventListener('click', function () { avatarMaker(); });
       var wl = A.body.querySelector('.ad-launch'); if (wl) { wl.innerHTML = launchText(); var wlt = setInterval(function () { if (!document.body.contains(wl)) clearInterval(wlt); else wl.innerHTML = launchText(); }, 1000); }
       liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
     }, 720);

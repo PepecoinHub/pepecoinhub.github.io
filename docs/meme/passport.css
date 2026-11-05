@@ -2,8 +2,11 @@
 .passport { font: 12px/1.45 var(--f-chrome), Tahoma, sans-serif; color: var(--ink); min-width: 0; }
 .passport h3 { font: bold 15px var(--f-chrome),Tahoma,sans-serif; margin: 0 0 5px; }
 .passport-identity { display: flex; gap: 10px; align-items: center; padding: 8px; border: 1px solid var(--chrome-lo); background: var(--pane); }
-.passport-identity img { width: 54px; height: 54px; object-fit: cover; image-rendering: pixelated; }
+.passport-face { flex: none; display: grid; place-items: center; width: 96px; height: 96px; background: var(--chrome); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
+.passport-face > img { width: 64px; height: 64px; object-fit: cover; image-rendering: pixelated; }
+.passport-face .fa-stack { width: 92px; height: 92px; }
 .passport-identity strong { display: block; font-size: 16px; overflow-wrap: anywhere; }
+.passport-make { display: block; margin-top: 6px; padding: 6px 12px; font-size: 12px; }
 .passport-muted { color: var(--muted); margin: 3px 0; }
 .passport-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
 .passport-stat { padding: 9px 5px; text-align: center; border: 1px solid var(--chrome-lo); background: var(--pane); }
@@ -17,9 +20,50 @@
 .passport-entry b { display: block; }
 .passport-entry small { display: block; color: var(--muted); }
 .passport-entry.locked { opacity: .74; }
+.passport-badge { float: right; width: 32px; height: 32px; margin: 0 0 4px 6px; image-rendering: pixelated; }
+.passport-entry.locked .passport-badge { filter: grayscale(1); }
 .passport-coming { font-style: italic; margin-top: 5px; }
 .passport-grid { max-height: min(44vh, 350px); overflow: auto; align-content: start; }
 .passport-entry b { font-weight: 700; }
 .passport-note { margin: 0; }
 .passport-note { padding: 9px; border: 1px dotted var(--chrome-lo); }
 @media(max-width:400px) { .passport-stats { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+
+/* Create Your Fren (Avatar Maker). Every Fren is stacked from aligned 64×64 layers. */
+.fa-stack { position: relative; display: block; overflow: hidden; }
+.fa-stack img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; margin: 0; border-radius: 0; image-rendering: pixelated; pointer-events: none; user-select: none; }
+.fa, .fa-note, .fa-load { font: 12px/1.35 var(--f-chrome), Tahoma, sans-serif; color: var(--ink); }
+.fa { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 10px; align-items: start; min-width: 0; }
+.fa-side { display: grid; gap: 6px; justify-items: center; text-align: center; min-width: 0; }
+.fa-frame { padding: 4px; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
+.fa-frame .fa-stack { width: 192px; height: 192px; }
+.fa-who { margin: 0; font-weight: 700; font-size: 13px; overflow-wrap: anywhere; }
+.fa-state { margin: 0; min-height: 2.7em; color: var(--muted); }
+.fa-state.is-dirty { color: var(--ink); font-weight: 700; }
+.fa-parts { display: grid; gap: 6px; min-width: 0; }
+.fa-group { min-width: 0; margin: 0; padding: 2px 6px 6px; border: 1px solid var(--chrome-lo); box-shadow: 1px 1px 0 var(--chrome-hi), inset 1px 1px 0 var(--chrome-hi); }
+.fa-group legend { padding: 0 3px; font-weight: 700; }
+.fa-opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(66px, 1fr)); gap: 4px; }
+.fa-opt { position: relative; display: grid; justify-items: center; align-content: start; gap: 3px; padding: 5px 2px 4px; background: var(--chrome); cursor: pointer; text-align: center; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  box-shadow: inset -1px -1px 0 var(--chrome-dk), inset 1px 1px 0 var(--chrome-face), inset -2px -2px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-hi); }
+.fa-opt input { position: absolute; top: 0; left: 0; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.fa-opt:has(input:checked) { background: var(--pane); box-shadow: inset -1px -1px 0 var(--chrome-hi), inset 1px 1px 0 var(--chrome-dk), inset -2px -2px 0 var(--chrome-face), inset 2px 2px 0 var(--chrome-lo); }
+.fa-opt:has(input:focus-visible) { outline: 1px dotted var(--ink); outline-offset: -5px; }
+.fa-thumb { position: relative; display: block; width: 100%; max-width: 52px; aspect-ratio: 1; overflow: hidden; background: #7eb7dc; box-shadow: 0 0 0 1px var(--chrome-lo); }
+.fa-thumb .fa-stack { position: absolute; }
+.fa-lab { display: flex; align-items: center; justify-content: center; min-height: 2.4em; font-size: 11px; line-height: 1.15; overflow-wrap: anywhere; }
+.fa-opt:has(input:checked) .fa-lab { font-weight: 700; }
+.fa-actions .app-btn { min-height: 32px; }
+.fa-note { margin: 0; color: var(--muted); font-size: 11px; }
+.fa-dlg-face { padding: 3px; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
+.fa-dlg-face .fa-stack { width: 96px; height: 96px; }
+@media (max-width: 600px) {
+  .fa { grid-template-columns: minmax(0, 1fr); }
+  .fa-state { min-height: 0; }
+  .fa-opts { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); }
+  .fa-opt { padding: 4px 2px 3px; }
+  .fa-lab { font-size: 10.5px; }
+  .fa-actions { position: sticky; bottom: 0; z-index: 1; padding: 6px 0; background: var(--chrome); }
+  .fa-actions .grow { display: none; }
+  .fa-actions .app-btn { flex: 1 1 auto; min-height: 44px; }
+}
