@@ -2255,18 +2255,19 @@
     paintMail();
     var A = openApp('mail', 'Frog Mail - Inbox', 'frog-mail', function (A) {
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
-        '<li><button type="button" data-v="write"><b>✏️ Letters to the Editor</b><small>Ideas, bugs, wishes, notices</small></button></li>' +
-        '<li><button type="button" data-v="gz"><b>The Pond Gazette #4</b><small>🚨 Breaking: the Pepe Guesser leak</small></button></li>' +
-        '<li><button type="button" data-v="gz3"><b>The Pond Gazette #3</b><small>Archive: an internet in your internet</small></button></li>' +
-        '<li><button type="button" data-v="gz2"><b>The Pond Gazette #2</b><small>Archive: Pepe Guesser is coming</small></button></li>' +
-        '<li class="ml-owner" hidden><button type="button" data-v="box"><b>📥 Editor\'s desk <span class="ml-n"></span></b><small>Only you can see these</small></button></li>' +
+        // one compact row of tabs: the letter form, then the Gazette issues by number (newest first)
+        '<li><button type="button" data-v="write" title="Ideas, bugs, wishes, notices">✏️ Letter to the Editor</button></li>' +
+        '<li><button type="button" data-v="gz" title="The Pond Gazette #4: the Pepe Guesser leak" aria-label="The Pond Gazette #4">📰 #4</button></li>' +
+        '<li><button type="button" data-v="gz3" title="The Pond Gazette #3 (archive): an internet in your internet" aria-label="The Pond Gazette #3">#3</button></li>' +
+        '<li><button type="button" data-v="gz2" title="The Pond Gazette #2 (archive): Pepe Guesser is coming" aria-label="The Pond Gazette #2">#2</button></li>' +
+        '<li class="ml-owner" hidden><button type="button" data-v="box" title="Editor\'s desk: only you can see these" aria-label="Editor\'s desk">📥 <span class="ml-n"></span></button></li>' +
         '</ul><div class="mail-pane"></div></div>';
       var pane = A.body.querySelector('.mail-pane'), ct = 0;
       var stopClock = function () { clearInterval(ct); ct = 0; };
       A.stop = stopClock;
       var paintOwner = function () {
         var li = A.body.querySelector('.ml-owner'); li.hidden = !letterBox;
-        if (letterBox) A.body.querySelector('.ml-n').textContent = letterBox.unread ? '(' + letterBox.unread + ' new)' : '';
+        if (letterBox) A.body.querySelector('.ml-n').textContent = letterBox.unread ? letterBox.unread + ' new' : '';
       };
       var show = function (v) {
         stopClock();
