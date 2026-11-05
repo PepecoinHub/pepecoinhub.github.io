@@ -160,11 +160,14 @@ function frog(f, t) {
   const label = f.name + ' ' + f.hp;
   const bw = ctx.measureText(label).width;
   // label box tinted with the team colour (dark base so text stays high-contrast) + team outline
-  ctx.fillStyle = rgba(mix(band, '#0c0b08', .62), .85);
+  const boxRGB = mix(band, '#0c0b08', .62);
+  const boxHex = '#' + boxRGB.map(c => c.toString(16).padStart(2, '0')).join('');
+  ctx.fillStyle = rgba(boxRGB, .85);
   ctx.fillRect(f.x - bw / 2 - 3, f.y - 82, bw + 6, 15);
   ctx.strokeStyle = rgba(hexRGB(band), 1); ctx.lineWidth = 1.5;
   ctx.strokeRect(f.x - bw / 2 - 3, f.y - 82, bw + 6, 15);
-  ctx.fillStyle = TEAM[f.team].text; ctx.fillText(label, f.x, f.y - 70);
+  // pick label text contrast against the actual (dark) box colour instead of a fixed shade
+  ctx.fillStyle = readable(boxHex); ctx.fillText(label, f.x, f.y - 70);
   if (turn) { ctx.fillStyle = '#ffd400'; ctx.beginPath(); ctx.moveTo(f.x - 6, f.y - 96 + bob * 2); ctx.lineTo(f.x + 6, f.y - 96 + bob * 2); ctx.lineTo(f.x, f.y - 87 + bob * 2); ctx.fill(); }
 }
 // ---------- effects: flying dirt and smoke after a blast, sparkles for the teleport ----------
