@@ -69,7 +69,7 @@ begin
            'description', 'Awarded by a PepecoinHub game',
            'earned_at', b.earned_at) order by b.earned_at), '[]'::jsonb)
     into extra_badges
-    from games.passport_badges b where b.user_id = u;
+    from games.passport_badges b where b.user_id = u and b.badge_id <> 'certified_fren';
 
   select coalesce(jsonb_agg(jsonb_build_object(
            'id', s.secret_id, 'discovered_at', s.discovered_at)
@@ -90,8 +90,9 @@ begin
       'description', 'Recorded a 6000 m YEET flight. Moon Rock inventory validation is not enabled yet.',
       'earned_at', case when best_distance = 60000 then best_date else null end),
     jsonb_build_object('id', 'certified_fren', 'title', 'Certified Fren',
-      'description', '100 distinct care days in PepeGochi.', 'earned_at', null,
-      'coming_soon', true)
+      'description', '100 distinct care days in PepeGochi.',
+      'earned_at', (select b.earned_at from games.passport_badges b
+                    where b.user_id = u and b.badge_id = 'certified_fren'))
   );
   select count(*) into earned_count from jsonb_array_elements(badge_catalog) x
     where x->>'earned_at' is not null;
@@ -119,7 +120,7 @@ grant execute on function public.gry_passport_state() to authenticated;
 -- days, limited badges and valuable inventory) must be awarded by their own
 -- validated game code, never by this RPC.
 create or replace function public.gry_passport_discover(p_secret text)
-returns jsonb language plpgsql security definer set search_path = '' as $
+returns jsonb language plpgsql security definer set search_path = '' as $$
 declare
   u uuid := auth.uid();
   d jsonb;
@@ -148,7 +149,7 @@ begin
     'discovered_at', existing_discovery
   );
 end
-$;
+$$;
 revoke all on function public.gry_passport_discover(text) from public, anon, authenticated;
 grant execute on function public.gry_passport_discover(text) to authenticated;
 
