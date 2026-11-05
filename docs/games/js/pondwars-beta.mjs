@@ -1,4 +1,4 @@
-// POND WARS: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
+// FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
 import { W, H, WATER, STEP, G, WEAPONS, newGame, startTurn, step, fire, walk, hop, backflip, canMove, MAPS, makeTerrain, skip, cpuPlan, me, aliveOf, projectileOrigin, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261105a';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';

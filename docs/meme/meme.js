@@ -196,7 +196,7 @@
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Where's Pepe?", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
-      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['POND WARS (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).forEach(function (g) {
+      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
@@ -1385,8 +1385,8 @@
     A.host.classList.add('app-full');
   }
   function pondWarsApp() {
-    var A = openApp('pondwars', 'POND WARS · BETA', 'pondwars', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars-beta.html?embed=1" title="POND WARS"></iframe>';
+    var A = openApp('pondwars', 'FROGAGEDDON · BETA', 'pondwars', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars-beta.html?embed=1" title="FROGAGEDDON"></iframe>';
       A.host.querySelector('.w-min').addEventListener('click', function () {
         A.body.querySelector('iframe').contentWindow.postMessage('pondwars-pause', location.origin);
       });
