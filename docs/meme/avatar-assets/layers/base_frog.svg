@@ -5,12 +5,14 @@
      mouth center y=300, mouth span x=176..336 ; chin y~362.
      neck y=360..404, neck span x=214..298 ; shoulder line y=404 ; shoulders span x=96..416.
      Paint order: bg -> base -> clothing -> mouth -> eyes -> hat -> accessory.
-     Palette: olive skin #83a04a (light #97b35e, shadow #6a8339), outline #16210f, mouth brown #6b3d22 inner pink #d98c86. FLAT fills, no gradients. -->
+     SKIN RECOLOR 2026-11-05: muted olive, gloss sheen removed.
+     Palette: MUTED OLIVE skin #7a8b45 (shadow #637138), outline #16210f, mouth brown #6b3d22 inner pink #d98c86.
+     FLAT fills, NO gradients, NO glossy crown sheen (hand-drawn MS-Paint look). -->
 <!-- neck -->
-<path d="M214 338 Q210 378 212 404 L300 404 Q302 378 298 338 Z" fill="#6a8339" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
+<path d="M214 338 Q210 378 212 404 L300 404 Q302 378 298 338 Z" fill="#637138" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
 <!-- shoulders / torso base (plain olive, clothing sits on top) -->
-<path d="M256 392 Q150 400 110 452 Q92 476 90 512 L422 512 Q420 476 402 452 Q362 400 256 392 Z" fill="#7a9343" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
-<!-- head: classic rounded Pepe head, slightly wider than tall, soft jaw -->
+<path d="M256 392 Q150 400 110 452 Q92 476 90 512 L422 512 Q420 476 402 452 Q362 400 256 392 Z" fill="#71804a" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
+<!-- head: classic rounded Pepe head, slightly wider than tall, soft jaw. FLAT muted olive, no top-of-head sheen. -->
 <path d="M256 60
   Q150 60 112 150
   Q96 188 100 236
@@ -20,11 +22,9 @@
   Q408 300 412 236
   Q416 188 400 150
   Q362 60 256 60 Z"
-  fill="#83a04a" stroke="#16210f" stroke-width="8" stroke-linejoin="round"/>
-<!-- top-of-head light sheen area (flat, no gradient) -->
-<path d="M256 74 Q176 74 140 150 Q168 112 256 110 Q344 112 372 150 Q336 74 256 74 Z" fill="#97b35e"/>
-<!-- cheek / jaw shadow (flat) -->
-<path d="M150 336 Q196 372 256 372 Q316 372 362 336 Q330 360 256 360 Q182 360 150 336 Z" fill="#6a8339"/>
+  fill="#7a8b45" stroke="#16210f" stroke-width="8" stroke-linejoin="round"/>
+<!-- cheek / jaw shadow (flat, subtle) -->
+<path d="M150 336 Q196 372 256 372 Q316 372 362 336 Q330 360 256 360 Q182 360 150 336 Z" fill="#637138"/>
 <!-- brow skin folds above eyes (characteristic Pepe) -->
 <path d="M150 182 Q196 150 240 172" fill="none" stroke="#16210f" stroke-width="6" stroke-linecap="round"/>
 <path d="M362 182 Q316 150 272 172" fill="none" stroke="#16210f" stroke-width="6" stroke-linecap="round"/>

@@ -44,12 +44,25 @@ randomizations, with zero failed `*.svg` requests.
   character reads as one consistent hand-drawn Pepe. See `contact-sheet.jpg`
   and `01-neutral.jpg`.
 
+## Art revision (2026-11-05, after first look)
+
+Per user approval of "option 1": the base skin was flattened to a MUTED OLIVE
+(`#7a8b45`, shadow `#637138`) and the glossy top-of-head sheen path was removed
+entirely, so the head is a flat MS-Paint fill with no plastic/lit look. The
+skin tones were also updated in `eyes_sleepy.svg` (its eyelid is skin-colored).
+A `hat_astronaut` (Space helmet) option was added: an open-face white bubble
+whose visor opening stays transparent over the face so the eyes/mouth read
+through the "glass", with a PEP collar badge. `01-neutral.jpg`,
+`07-astronaut.jpg` and `contact-sheet.jpg` are re-rendered from these updated
+real layers.
+
 ## Misalignment found / fixed
 
 None. The FEAT-001 layers were authored to a single shared 512x512 geometry
 contract, so every slot overlapped correctly on first render with NO per-part
 CSS offsets in the demonstrator. No layer SVG geometry needed correcting during
-this proof. The `grep -L 'viewBox="0 0 512 512"'` gate, the id->file map, the
+this proof. The 2026-11-05 skin/helmet revision above was a color/asset change,
+not a geometry fix. The `grep -L 'viewBox="0 0 512 512"'` gate, the id->file map, the
 well-formed-XML gate, and `scripts/check_site.py` all stayed green.
 
 ## Screenshot index

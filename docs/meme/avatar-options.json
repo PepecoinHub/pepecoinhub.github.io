@@ -1,6 +1,7 @@
 {
   "schema_version": 2,
   "coordinate_system": "512x512 shared SVG canvas; every layer uses viewBox 0 0 512 512, transparent per layer, identical head/eye/mouth/shoulder geometry so parts stack with no per-part offsets",
+  "palette": "Muted olive skin #7a8b45 (shadow #637138), near-black outline #16210f, mouth brown #6b3d22 inner pink #d98c86. Flat fills, no gradients, no glossy crown sheen (hand-drawn MS-Paint look).",
   "geometry": {
     "head_center_x": 256,
     "crown_top_y": 72,
@@ -61,6 +62,7 @@
       { "id": "hat_beanie", "label": "Beanie" },
       { "id": "hat_bucket", "label": "Bucket hat" },
       { "id": "hat_crown", "label": "Paper crown" },
+      { "id": "hat_astronaut", "label": "Space helmet" },
       { "id": "hat_hardhat", "label": "Hard hat", "unlock": "miner_fren" },
       { "id": "hat_detective", "label": "Detective hat", "unlock": "detective_fren" }
     ],

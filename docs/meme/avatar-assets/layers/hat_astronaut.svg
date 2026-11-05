@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
+<!-- FREN AVATAR v2 shared geometry: head center x=256, crown y~72, head widest x=120..392, chin y~362, shoulder line y=404.
+     Astronaut helmet: an OPEN-FACE bubble. The white shell rings the head and the visor opening stays transparent
+     over the face (x~150..362, y~150..360) so the eyes/mouth below still read through the "glass". Paints after eyes
+     by layer order, so the thin visor rim sits in front without covering the pupils. FLAT fills, muted palette. -->
+<!-- helmet shell: big white bubble around the whole head, with a face opening cut back via the inner path.
+     Drawn as one even-odd path (outer bubble minus inner oval) so only the shell ring is opaque. -->
+<path fill-rule="evenodd" fill="#eef0ea" stroke="#16210f" stroke-width="8" stroke-linejoin="round"
+  d="M256 34
+     Q120 34 86 170
+     Q74 250 108 338
+     Q140 410 256 414
+     Q372 410 404 338
+     Q438 250 426 170
+     Q392 34 256 34 Z
+     M256 150
+     Q170 150 156 232
+     Q150 296 190 338
+     Q222 366 256 366
+     Q290 366 322 338
+     Q362 296 356 232
+     Q342 150 256 150 Z"/>
+<!-- soft inner shade on the shell (flat, subtle) -->
+<path d="M96 180 Q92 110 150 70 Q116 120 118 190 Z" fill="#d7dbe0"/>
+<path d="M416 180 Q420 110 362 70 Q396 120 394 190 Z" fill="#d7dbe0"/>
+<!-- visor rim around the face opening (thin ring, lets eyes show through) -->
+<path d="M256 150 Q170 150 156 232 Q150 296 190 338 Q222 366 256 366 Q290 366 322 338 Q362 296 356 232 Q342 150 256 150 Z"
+  fill="none" stroke="#c8ccd0" stroke-width="9"/>
+<path d="M256 150 Q170 150 156 232 Q150 296 190 338 Q222 366 256 366 Q290 366 322 338 Q362 296 356 232 Q342 150 256 150 Z"
+  fill="none" stroke="#16210f" stroke-width="4"/>
+<!-- a faint glass glare streak on the visor (flat, does not cover the eyes: upper-left of the opening) -->
+<path d="M196 176 Q172 210 176 252 Q188 214 212 188 Z" fill="#f7faec" opacity="0.5"/>
+<!-- helmet collar / neck ring sitting on the shoulders -->
+<path d="M150 360 Q256 388 362 360 Q372 392 360 414 Q256 392 152 414 Q140 392 150 360 Z"
+  fill="#d7dbe0" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
+<!-- PEP badge on the collar -->
+<rect x="226" y="372" width="60" height="26" rx="5" fill="#2f5fd0" stroke="#16210f" stroke-width="4"/>
+<text x="256" y="392" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="20" fill="#ffffff">PEP</text>
+</svg>

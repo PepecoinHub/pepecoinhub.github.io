@@ -3,8 +3,8 @@
 <ellipse cx="205" cy="215" rx="44" ry="40" fill="#f7faec" stroke="#16210f" stroke-width="7"/>
 <ellipse cx="307" cy="215" rx="44" ry="40" fill="#f7faec" stroke="#16210f" stroke-width="7"/>
 <!-- heavy droopy lids covering top half -->
-<path d="M161 215 Q205 196 249 215 Q249 184 205 182 Q161 184 161 215 Z" fill="#83a04a" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
-<path d="M263 215 Q307 196 351 215 Q351 184 307 182 Q263 184 263 215 Z" fill="#83a04a" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
+<path d="M161 215 Q205 196 249 215 Q249 184 205 182 Q161 184 161 215 Z" fill="#7a8b45" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
+<path d="M263 215 Q307 196 351 215 Q351 184 307 182 Q263 184 263 215 Z" fill="#7a8b45" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
 <!-- small lower pupils peeking -->
 <circle cx="205" cy="228" r="12" fill="#13200f"/>
 <circle cx="307" cy="228" r="12" fill="#13200f"/>
