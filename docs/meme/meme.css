@@ -1045,6 +1045,9 @@ footer.foot a { color: #edf3e3; }
 .ad-sub { margin: 0; max-width: 34em; font: 600 15px/1.35 var(--f-body); text-shadow: 1px 1px 0 #000; }
 .ad-fine { margin: 0; font: 400 13px/1.35 var(--f-body); color: #dfe6ff; }
 .ad-pic { max-height: 130px; width: auto; border: 3px solid #fff; box-shadow: 4px 4px 0 #000; background: #fff; }
+/* a full-width banner frame (e.g. a game's title screen) that sits above the ad copy */
+.ad-hero { width: 100%; max-height: 190px; object-fit: cover; object-position: 50% 42%; border: 3px solid #fff; box-shadow: 4px 4px 0 #000; }
+.gz-frame .ad-hero { max-height: 90px; }
 .ad-cta { display: inline-block; padding: 10px 16px; background: #d41f1f; color: #fff !important; text-decoration: none; text-transform: uppercase; font: 400 18px/1 Impact, "Arial Black", sans-serif; border: 3px solid #fff; box-shadow: 4px 4px 0 #000; cursor: pointer; }
 .ad-ba { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
 .ad-ba figure { margin: 0; position: relative; padding: 26px 10px 10px; border: 3px solid #fff; box-shadow: 4px 4px 0 #000; display: grid; justify-items: center; gap: 8px; }
