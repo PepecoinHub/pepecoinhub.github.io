@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [24, 12, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [25, 12, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -62,4 +62,13 @@ test('Certified Fren earned record appears once instead of a locked duplicate', 
   assert.match(sql, /b\.badge_id <> 'certified_fren'/);
   assert.match(sql, /where b\.user_id = u and b\.badge_id = 'certified_fren'/);
   assert.doesNotMatch(sql, /'certified_fren'[\s\S]{0,200}'earned_at', null/);
+});
+
+test('first avatar badge is planned until server-verified avatar save is shipped', () => {
+  const avatar = catalog.achievements.find(x => x.id === 'first_avatar');
+  assert.ok(avatar, 'Fresh Fren catalog entry missing');
+  assert.equal(avatar.title, 'Fresh Fren');
+  assert.equal(avatar.status, 'planned');
+  assert.match(avatar.description, /create and save your first custom fren avatar/i);
+  assert.doesNotMatch(sql, /insert into games\.passport_badges[^;]*first_avatar/i);
 });
