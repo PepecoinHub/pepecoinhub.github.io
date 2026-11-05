@@ -48,3 +48,18 @@ test('all badge and secret catalog items use distinct statuses', () => {
   }
   assert.match(pond, /passport-catalog\.json/);
 });
+
+test('both Passport RPCs have balanced dollar-quoted SQL bodies', () => {
+  const starts = [...sql.matchAll(/\\bas \\$\\$/g)];
+  const ends = [...sql.matchAll(/^\\$\\$;/gm)];
+  assert.equal(starts.length, 2, 'expected two properly delimited RPC definitions');
+  assert.equal(ends.length, 2, 'expected two closing $$ delimiters');
+  assert.doesNotMatch(sql, /\\bas \\$\\n/);
+  assert.doesNotMatch(sql, /^\\$;/m);
+});
+
+test('Certified Fren earned record appears once instead of a locked duplicate', () => {
+  assert.match(sql, /b\\.badge_id <> 'certified_fren'/);
+  assert.match(sql, /where b\\.user_id = u and b\\.badge_id = 'certified_fren'/);
+  assert.doesNotMatch(sql, /'certified_fren'[\\s\\S]{0,200}'earned_at', null/);
+});
