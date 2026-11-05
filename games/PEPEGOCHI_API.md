@@ -94,7 +94,7 @@ Run on the PEP Games page (or its PondOS 98 iframe) with the **existing** authen
 | Accepted care actions/day | Maximum 12 (UTC day; protects write volume) |
 | Stats | 0-100, clipped server-side |
 
-Needs decay per 24 h while unattended: hunger -20, hygiene -15, mood -18, energy -10 (rounded down by elapsed whole points). Needs are derived without database writes; even returning 30 days later costs one read. Accepted care actions apply:
+Needs decay per 24 h while unattended: hunger -20, hygiene -15, mood -18, energy -10. **The database persists numeric(7,4) need values, including fractions, after each accepted action. Only the read-only JSON snapshot rounds down to 0–100 integer UI percentages.** This prevents frequent care actions from erasing small hourly decay. Needs are derived without database writes; even returning 30 days later costs one read. Accepted care actions apply:
 - Feed: hunger +35.
 - Clean: hygiene +40.
 - Play: mood +35, energy -10, hunger -3.
@@ -124,3 +124,13 @@ The v1 database deliberately has **no inventory/personalization write API**. Dec
 **Use the existing PondOS 98 window, wallpaper, green title bars, dark graphite panels, icons, spacing and CSS.** Do not create a replacement desktop, oversized new OS or modern mobile-game UI. The solo pet should begin in a modest room/pond with Feed / Clean / Play / Rest and gradual unlocks.
 
 **Art licensing:** `mlewis412/pepegachi` is a private reference repo. Before copying or publishing assets to this public repo, obtain confirmation of the friend's permission and applicable licenses. A mock-up or locally authored temporary placeholder is acceptable until then.
+
+## Regression testing and PR dependencies
+
+- `node --test tests/pepegochi_backend.test.mjs` runs source invariants in a plain Node checkout.
+- Optional **real PostgreSQL engine (PGlite)** test: install `@electric-sql/pglite` in a temporary/test-only Node environment, then run `node --test tests/pepegochi_postgres.integration.mjs`. Without this dependency the test intentionally **skips**, and must not be represented as passing.
+- The PGlite suite checks real decimal decay over two consecutive 2-hour care gaps, one-care-day-per-UTC-day behavior, basic Discord gating and repeated migrations.
+- **PR #184 (Fren Passport) must be present in the same working tree** to run the optional 100-day badge integration section. The bridge SQL and catalog are intentionally separate from this PR.
+- Before release, repeat authorization, concurrency, full-day/timezone and load tests against real staging Supabase. Local WASM Postgres does not prove correct behavior under concurrent connections or deployed JWT/RLS configuration.
+
+**Important:** The source backend is complete for v1 only. The live PepeGochi frontend does not exist in this PR. The current public catalog marks adoption, evolution and room-decorating achievements as *planned*, not presently earnable. Do not mark them live until the corresponding validated award logic has actually shipped.
