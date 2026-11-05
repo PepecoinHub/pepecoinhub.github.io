@@ -9,6 +9,13 @@
       "status": "live"
     },
     {
+      "id": "first_avatar",
+      "title": "Fresh Fren",
+      "description": "Create and save your first custom Fren avatar.",
+      "category": "avatar",
+      "status": "planned"
+    },
+    {
       "id": "moonwalker",
       "title": "Moonwalker",
       "description": "Record a 6000 m flight in YEET THE PEP. Moon Rock is a separate future reward.",
