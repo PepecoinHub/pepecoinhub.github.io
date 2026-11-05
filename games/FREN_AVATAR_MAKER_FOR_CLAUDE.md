@@ -12,7 +12,7 @@
 - Player can choose **mouth, eyes/glasses, hat, outfit**; show live stacked pixel-art preview; \`Randomize\`, \`Save Look\` and \`Use in Passport\` buttons.
 - First **successful SERVER-SAVED avatar** earns achievement \`first_avatar\`, title **Fresh Fren**, description \`Create and save your first custom Fren avatar.\`; never grant it on browser clicks or on localStorage. Repeated saves do not reaward.
 - Existing \`first_fren\` for Discord registration is a separate welcome achievement. \`Fresh Fren\` is the first *active* accomplishment.
-- The \`first_avatar\` catalog entry is already included in this PR with \`status: planned\`; change to \`live\` **only when the server award logic and UI are tested**.
+- The \`first_avatar\` catalog entry is already included in this PR with \`status: planned\`, and its icon is \`docs/meme/avatar-assets/first-avatar-badge.svg\`. Change the catalog to \`live\` **only when the server award logic and UI are tested**.
 - All parts of the creator must be **free**. No NFT, PEP spending, XP, levels, rarity odds, artificial streaks or premium inventory.
 - Keep the actual dark mountain-lake wallpaper, existing icons, green title bars and graphite panels. Do not replace or recreate PondOS 98.
 - UI copy in concise American English. No emojis required. Respects keyboard, touchscreen, reduced motion, light/dark theme and screen readers.
@@ -33,7 +33,7 @@ Avatar artwork: **64×64 native pixel coordinate system**; nearest-neighbor disp
 
 ## Locked V1 art + option IDs (600 combinations)
 
-The downloadable complete art pack is \`FREN_AVATAR_CLAUDE_PACKAGE.zip\` in the ChatGPT handoff. **Copy its \`assets/layers\` images into the site** (e.g. \`docs/meme/avatar-assets/layers/\`) and its \`avatar-options.json\` into an appropriately referenced static path. The accompanying \`avatar-preview.html\` is a standalone demonstration, **NOT** a replacement PondOS window.
+The 22 individual art layers are **already committed** in this PR under \`docs/meme/avatar-assets/layers/\`, and the canonical option manifest is \`docs/meme/avatar-options.json\`. The downloadable \`FREN_AVATAR_CLAUDE_PACKAGE.zip\` in the ChatGPT handoff additionally contains a standalone interactive \`avatar-preview.html\`, five example PNGs, asset validation and a full design brief; it is an optional offline mirror, **NOT** a replacement PondOS window.
 
 Layers in paint order:
 1. \`bg_pond.svg\`
@@ -106,7 +106,7 @@ The first successful save inserts \`games.passport_badges(user_id,badge_id='firs
 
 1. Read this brief plus actual PondOS code, Passport PR #184 and \`FREN_AVATAR_CLAUDE_PACKAGE.zip\`.
 2. Start on a **separate feature branch**, not on \`main\` or an unreviewed accidental merge.
-3. Copy the included 22 sprite layers and \`avatar-options.json\` into site static assets.
+3. Use the already committed 22 sprite layers and \`avatar-options.json\`. Do not duplicate, rename or redraw them without an explicit visual review.
 4. Implement UI using native PondOS \`openApp\` and existing CSS. Show working preview to user.
 5. Build guarded Supabase migration, save RPC and Passport-avatar property. Keep draft until staging verification.
 6. Integrate badge \`first_avatar\`, keep \`planned\` until completion, then mark \`live\` on release.
