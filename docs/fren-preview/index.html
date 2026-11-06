@@ -10,74 +10,73 @@
   :root { color-scheme: dark; }
   body { margin: 0; background: #11170f; color: #e7efe0; font: 15px/1.5 Tahoma, "Segoe UI", Arial, sans-serif; padding: 18px 14px 60px; }
   h1 { font-size: 20px; margin: 0 0 4px; }
-  p.note { color: #a9bbab; margin: 0 0 22px; font-size: 13px; }
+  h2 { font-size: 17px; margin: 30px 0 12px; color: #ffe27a; }
+  p.note { color: #a9bbab; margin: 0 0 14px; font-size: 13px; }
   figure { margin: 0 0 30px; }
   figcaption { font-weight: 700; margin: 0 0 8px; color: #8fdca0; }
   figcaption small { display: block; font-weight: 400; color: #9fb09f; margin-top: 2px; }
   img { display: block; width: 100%; height: auto; max-width: 760px; border: 2px solid #0a0a0a; border-radius: 6px; background: #000; }
+  img.phone { max-width: 360px; }
   .wrap { max-width: 820px; margin: 0 auto; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Fren Passport + Avatar Maker — preview (PR #191)</h1>
-  <p class="note"><b>Updated Nov 6 (2):</b> new Avatar Maker from your mockup and part art. <b>Earlier:</b> the Fren Passport now uses your hand-drawn passport art. Every sample value from the mockup was erased; names, dates and stamps are filled in from the server. Shown with a test account.</p>
-  <p class="note">Draft only — nothing merged, no Supabase migration run. Real renders in the actual PondOS window. Test account data in a throwaway database (the "earned" stamps prove earned-vs-locked rendering, not a real user).</p>
+  <p class="note"><b>Updated Nov 6 (3):</b> 21 stamps the server checks, Lily's stamp art, the special avatar Explorer Pepe, the explorer hat with "14", and the Avatar Maker buttons pinned on phones.</p>
+  <p class="note">Draft only — nothing merged, no Supabase migration run. Real renders in the actual PondOS window, with a test account in a throwaway database (so the Fren ID shows #00000000).</p>
 
+  <h2>Avatar Maker</h2>
   <figure>
-    <figcaption>Create Your Fren — new Avatar Maker (desktop)
-      <small>Built from your mockup and your part art. Left: the Fren in the taped photo frame. Right: one row per part (Mouth, Eyes, Hat, Clothing, Accessory, Background); arrows scroll a row; the yellow frame marks the chosen part. The player picks every part. Parts with a small lock are rewards for future stamps and cannot be picked yet.</small>
+    <figcaption>Normal Fren with the explorer hat
+      <small>One row per part, then Background and the new Special row. The explorer hat with "14" opens with Scout Fren (14 days in a row in Pepe Guesser). Parts with a small lock open with other stamps.</small>
     </figcaption>
-    <img src="avatar-maker-desktop.jpg" alt="Avatar Maker, desktop">
+    <img src="avatar-maker-desktop.jpg" alt="Avatar Maker with the explorer hat">
   </figure>
-
   <figure>
-    <figcaption>Avatar Maker — light theme</figcaption>
-    <img src="avatar-maker-light.jpg" alt="Avatar Maker, light theme">
-  </figure>
-
-  <figure>
-    <figcaption>Avatar Maker — phone
-      <small>Photo on top, rows below (swipe a row sideways), buttons stay at the bottom.</small>
+    <figcaption>Special avatar: Explorer Pepe by Lily
+      <small>Picked in the Special row: the whole drawing replaces the parts, only the background can still change (here: mountains). Picking any part switches back to the normal Fren. Opens with Scout Fren.</small>
     </figcaption>
-    <img src="avatar-maker-phone.jpg" alt="Avatar Maker, phone">
+    <img src="avatar-maker-explorer.jpg" alt="Avatar Maker with Explorer Pepe">
+  </figure>
+  <figure>
+    <figcaption>Reward parts
+      <small>Detective Fren opens the detective hat and the suit; Miner Fren the hard hat. Locked parts show a small lock.</small>
+    </figcaption>
+    <img src="avatar-maker-rewards.jpg" alt="Avatar Maker with reward parts">
+  </figure>
+  <figure>
+    <figcaption>Phone
+      <small>Randomize / Save Look / Use in Passport stay at the bottom of the screen while the rows scroll.</small>
+    </figcaption>
+    <img class="phone" src="avatar-maker-phone.jpg" alt="Avatar Maker on a phone">
   </figure>
 
+  <h2>Fren Passport</h2>
   <figure>
-    <figcaption>Fren Passport — hand-drawn booklet (desktop, dark theme)
-      <small>Left page: the saved Fren shows through the photo window under the paper clip and tape; Fren ID, nickname, member since and Discord status are real. Right page: earned stamps (Fresh Fren, First Fren), then empty "?" slots; BALI / $0.01 - BALI printed and locked. Right side: My Fren Journey (factual counts, no XP), Next Milestone (Moonwalker, bar from the real best YEET flight). Bottom: Recent Stamps.</small>
+    <figcaption>The booklet
+      <small>The saved Fren (Explorer Pepe) is the photo. Right page: earned stamps, Lily's new art where it exists. Next Milestone shows the closest stamp with a real count (letters and chat are never suggested).</small>
     </figcaption>
     <img src="passport-book.jpg" alt="Fren Passport booklet">
   </figure>
-
   <figure>
-    <figcaption>Fren Passport — light theme, narrower window
-      <small>Same booklet; the page text scales with the page.</small>
-    </figcaption>
-    <img src="passport-light.jpg" alt="Fren Passport, light theme">
-  </figure>
-
-  <figure>
-    <figcaption>Stamps tab — the full album
-      <small>All 36 stamps by name. Earned ones show their art and date; "Locked" can be earned today; "Coming soon" cannot be earned yet.</small>
+    <figcaption>Stamps tab
+      <small>21 stamps can be earned today; the rest show "???" and "Coming soon". BALI stays locked until $0.01.</small>
     </figcaption>
     <img src="passport-stamps.jpg" alt="Stamps tab">
   </figure>
-
   <figure>
-    <figcaption>Fren Passport — phone
-      <small>One page per row, so the text stays readable.</small>
+    <figcaption>New stamp notice
+      <small>Shown once per stamp when PondOS opens, with Lily's small stamp icon. Click it to open the Passport.</small>
     </figcaption>
-    <img src="passport-phone.jpg" alt="Fren Passport, phone">
+    <img src="stamp-notice.jpg" alt="New stamps notice">
   </figure>
-
   <figure>
-    <figcaption>PEP-TV ad: fren_passport.mpg
-      <small>Four scenes; the last button opens the Passport. Marked not a real offer.</small>
+    <figcaption>PEP-TV ad: pond_stamps.mpg (last scene)
+      <small>The button opens the Passport. Marked not a real offer.</small>
     </figcaption>
-    <img src="passport-ad.jpg" alt="PEP-TV ad for the Fren Passport">
+    <img src="stamps-ad.jpg" alt="PEP-TV ad for the stamps">
   </figure>
-
 </div>
 </body>
 </html>
