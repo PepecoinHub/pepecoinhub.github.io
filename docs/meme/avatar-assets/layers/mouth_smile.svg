@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
-<!-- FREN AVATAR v2 shared geometry: mouth center y=300, span x=176..336. Classic wide Pepe smile, brown line + pink lower lip. -->
-<path d="M176 290 Q256 352 336 290" fill="none" stroke="#6b3d22" stroke-width="9" stroke-linecap="round"/>
-<!-- lower lip pink hint under the smile -->
-<path d="M200 318 Q256 346 312 318 Q256 336 200 318 Z" fill="#d98c86"/>
-</svg>

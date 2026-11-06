@@ -1,19 +1,7 @@
 {
   "schema_version": 2,
-  "coordinate_system": "512x512 shared SVG canvas; every layer uses viewBox 0 0 512 512, transparent per layer, identical head/eye/mouth/shoulder geometry so parts stack with no per-part offsets",
-  "palette": "Muted olive skin #7a8b45 (shadow #637138), near-black outline #16210f, mouth brown #6b3d22 inner pink #d98c86. Flat fills, no gradients, no glossy crown sheen (hand-drawn MS-Paint look).",
-  "geometry": {
-    "head_center_x": 256,
-    "crown_top_y": 72,
-    "eye_line_y": 215,
-    "eye_left_x": 205,
-    "eye_right_x": 307,
-    "mouth_center_y": 300,
-    "chin_y": 362,
-    "neck_y": [360, 404],
-    "shoulder_line_y": 404,
-    "shoulders_x": [96, 416]
-  },
+  "coordinate_system": "512x512 shared canvas; every layer is a 512x512 transparent WebP with its part already in place, so layers stack with no per-part offsets. Built by scripts/build_avatar_layers.py from the hand-drawn sheets in games/fren-avatar/source/.",
+  "palette": "Hand-drawn classic Pepe (ChatGPT art, approved 2026-11-06): muted olive skin, brown mouth with pink inside, white eyes with black pupils, black uneven outlines, flat fills.",
   "layers_order": [
     "bg",
     "base",
@@ -37,7 +25,8 @@
     "bg": [
       { "id": "bg_none", "label": "None" },
       { "id": "bg_pond", "label": "Pond" },
-      { "id": "bg_solid_green", "label": "Studio green" },
+      { "id": "bg_solid_green", "label": "Grass" },
+      { "id": "bg_meadow", "label": "Meadow" },
       { "id": "bg_sunset", "label": "Sunset", "unlock": "moon_fren" }
     ],
     "mouth": [
@@ -58,11 +47,12 @@
     ],
     "hat": [
       { "id": "hat_none", "label": "None" },
-      { "id": "hat_pep_cap", "label": "PEP cap" },
+      { "id": "hat_pep_cap", "label": "Green cap" },
       { "id": "hat_beanie", "label": "Beanie" },
       { "id": "hat_bucket", "label": "Bucket hat" },
       { "id": "hat_crown", "label": "Paper crown" },
       { "id": "hat_astronaut", "label": "Space helmet" },
+      { "id": "hat_fedora", "label": "Fedora" },
       { "id": "hat_hardhat", "label": "Hard hat", "unlock": "miner_fren" },
       { "id": "hat_detective", "label": "Detective hat", "unlock": "detective_fren" }
     ],
@@ -83,8 +73,8 @@
     ]
   },
   "paths": {
-    "bg": "avatar-assets/layers/bg_none.svg",
-    "base": "avatar-assets/layers/base_frog.svg",
-    "layer_template": "avatar-assets/layers/{id}.svg"
+    "bg": "avatar-assets/layers/bg_none.webp",
+    "base": "avatar-assets/layers/base_frog.webp",
+    "layer_template": "avatar-assets/layers/{id}.webp"
   }
 }

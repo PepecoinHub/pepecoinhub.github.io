@@ -106,11 +106,11 @@ begin
   -- accessory_pin, accessory_headphones) are intentionally absent and so are
   -- rejected here, just like any unknown id. See the INTERIM RESERVED-ID RULE
   -- comment at the top of this file.
-  if p_bg is null or p_bg not in ('bg_none', 'bg_pond', 'bg_solid_green')
+  if p_bg is null or p_bg not in ('bg_none', 'bg_pond', 'bg_solid_green', 'bg_meadow')
      or p_clothing is null or p_clothing not in ('clothing_blue', 'clothing_purple_hoodie', 'clothing_black_hoodie', 'clothing_white_pep', 'clothing_orange_vest')
      or p_mouth is null or p_mouth not in ('mouth_smile', 'mouth_grin', 'mouth_open', 'mouth_tongue', 'mouth_flat', 'mouth_smirk')
      or p_eyes is null or p_eyes not in ('eyes_classic', 'eyes_sleepy', 'eyes_wide', 'eyes_shades', 'eyes_round', 'eyes_3d')
-     or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_astronaut')
+     or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_astronaut', 'hat_fedora')
      or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_chain', 'accessory_scarf') then
     raise exception 'Unknown avatar option' using errcode = '22023';
   end if;

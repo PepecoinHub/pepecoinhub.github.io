@@ -86,7 +86,7 @@ async function rpcHandler(route) {
 }
 const passportCalls = () => calls.filter(c => ALLOWED_RPC.has(c.fn));
 
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.gif': 'image/gif', '.ico': 'image/x-icon', '.txt': 'text/plain', '.xml': 'application/xml', '.woff2': 'font/woff2' };
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.gif': 'image/gif', '.ico': 'image/x-icon', '.txt': 'text/plain', '.xml': 'application/xml', '.woff2': 'font/woff2' };
 async function staticHandler(route) {
   const url = new URL(route.request().url());
   let p = decodeURIComponent(url.pathname);
@@ -170,7 +170,7 @@ try {
     assert.equal(passportCalls().length, 1);
     assert.deepEqual(await lookOnPage(page), { bg: 'bg_none', clothing: 'clothing_blue', mouth: 'mouth_smile', eyes: 'eyes_classic', hat: 'hat_none', accessory: 'accessory_none' });
     // non-unlock options offered per slot: bg 3, clothing 5, mouth 6, eyes 6, hat 6, accessory 3 = 29
-    assert.equal(await page.locator(maker + ' .fa-opt').count(), 29);
+    assert.equal(await page.locator(maker + ' .fa-opt').count(), 31); // 4 bg + 5 clothing + 6 mouth + 6 eyes + 7 hats + 3 accessories
     assert.equal(await statusText(page), 'Not saved yet.');
     const w = await page.evaluate(sel => document.querySelector(sel).getBoundingClientRect().width, maker);
     assert.ok(w >= 680 && w <= 740, 'window width ' + w);
@@ -184,7 +184,7 @@ try {
     await pick(page, 'mouth', 'mouth_grin'); await pick(page, 'eyes', 'eyes_shades');
     await pick(page, 'hat', 'hat_crown'); await pick(page, 'accessory', 'accessory_chain');
     assert.deepEqual((await previewSrcs(page)).map(s => s.split('/').pop()),
-      ['bg_pond.svg', 'base_frog.svg', 'clothing_purple_hoodie.svg', 'mouth_grin.svg', 'eyes_shades.svg', 'hat_crown.svg', 'accessory_chain.svg']);
+      ['bg_pond.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_grin.webp', 'eyes_shades.webp', 'hat_crown.webp', 'accessory_chain.webp']);
     assert.equal(await statusText(page), 'Unsaved changes');
     for (let i = 0; i < 12; i++) await page.click(maker + ' .fa-random');
     assert.equal(passportCalls().length, before, 'no RPC while choosing');
@@ -225,7 +225,7 @@ try {
     const P = '.app-win[aria-label="Fren Passport - Properties"]';
     assert.equal(passportCalls().length, before, 'no read after the save response');
     assert.deepEqual(await page.evaluate(sel => [...document.querySelectorAll(sel + ' .pp-photo .fa-stack img')].map(i => i.getAttribute('src').split('/').pop()), P),
-      ['bg_pond.svg', 'base_frog.svg', 'clothing_purple_hoodie.svg', 'mouth_grin.svg', 'eyes_shades.svg', 'hat_crown.svg', 'accessory_chain.svg']);
+      ['bg_pond.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_grin.webp', 'eyes_shades.webp', 'hat_crown.webp', 'accessory_chain.webp']);
     assert.equal(await page.textContent(P + ' .pp-make'), 'Edit your Fren');
     const fresh = await page.locator(P + ' .pp-stamp', { hasText: 'Fresh Fren' }).textContent();
     assert.doesNotMatch(fresh, /Locked/);
@@ -272,7 +272,7 @@ try {
     await page.waitForSelector(maker, { state: 'detached' });
     assert.equal((await dbRow(1)).hat, 'hat_crown');
     const P = '.app-win[aria-label="Fren Passport - Properties"]';
-    assert.ok((await page.getAttribute(P + ' .pp-photo .fa-stack img[data-layer="hat"]', 'src')).endsWith('hat_crown.svg'));
+    assert.ok((await page.getAttribute(P + ' .pp-photo .fa-stack img[data-layer="hat"]', 'src')).endsWith('hat_crown.webp'));
   });
   await step('Missing migration: clear message, nothing claimed', async () => {
     await page.click('.pp-make'); await page.waitForSelector(maker + ' .fa');
@@ -294,7 +294,7 @@ try {
     await openPassport(page);
     const P = '.app-win[aria-label="Fren Passport - Properties"]';
     assert.deepEqual(await page.evaluate(sel => [...document.querySelectorAll(sel + ' .pp-photo .fa-stack img')].map(i => i.getAttribute('src').split('/').pop()), P),
-      ['bg_pond.svg', 'base_frog.svg', 'clothing_purple_hoodie.svg', 'mouth_grin.svg', 'eyes_3d.svg', 'hat_crown.svg', 'accessory_chain.svg']);
+      ['bg_pond.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_grin.webp', 'eyes_3d.webp', 'hat_crown.webp', 'accessory_chain.webp']);
     assert.doesNotMatch(await page.locator(P + ' .pp-stamp', { hasText: 'Fresh Fren' }).textContent(), /Locked/);
     await shot(page, '08-passport-second-device-light');
     await page.click('.pp-make'); await page.waitForSelector(maker + ' .fa');

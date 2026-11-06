@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
-<!-- FREN AVATAR v2 shared geometry: mouth center y=300, span x=176..336. Tongue out. -->
-<path d="M176 290 Q256 340 336 290" fill="none" stroke="#6b3d22" stroke-width="9" stroke-linecap="round"/>
-<!-- tongue hanging out -->
-<path d="M230 318 Q228 372 256 378 Q284 372 282 318 Z" fill="#d98c86" stroke="#6b3d22" stroke-width="6" stroke-linejoin="round"/>
-<!-- tongue center crease -->
-<path d="M256 328 L256 364" fill="none" stroke="#c06a63" stroke-width="5" stroke-linecap="round"/>
-</svg>

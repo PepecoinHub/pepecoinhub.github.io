@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
-<!-- FREN AVATAR v2 shared geometry: mouth center y=300, span x=176..336. Open laugh. -->
-<ellipse cx="256" cy="304" rx="78" ry="48" fill="#6b3d22" stroke="#5a3119" stroke-width="7"/>
-<!-- inner pink -->
-<ellipse cx="256" cy="312" rx="58" ry="32" fill="#d98c86"/>
-<!-- tongue hint -->
-<ellipse cx="256" cy="332" rx="34" ry="16" fill="#c06a63"/>
-</svg>

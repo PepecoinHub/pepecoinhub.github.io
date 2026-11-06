@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
-<!-- FREN AVATAR v2 shared geometry: mouth center y=300, span x=176..336. Neutral flat Pepe line. -->
-<path d="M180 302 Q256 316 332 302" fill="none" stroke="#6b3d22" stroke-width="9" stroke-linecap="round"/>
-<!-- subtle lower lip -->
-<path d="M212 312 Q256 322 300 312" fill="none" stroke="#d98c86" stroke-width="6" stroke-linecap="round"/>
-</svg>

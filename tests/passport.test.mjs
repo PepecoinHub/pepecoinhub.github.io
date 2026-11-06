@@ -88,14 +88,14 @@ test('Fresh Fren is live only together with its server award path', () => {
   assert.match(firstBranch.split(/\n  else\n/)[1], /insert into games\.passport_badges/, 'award sits in the first-save branch');
 });
 
-test('avatar manifest v2: 512 canvas layers, 9720 offered looks, valid defaults', () => {
+test('avatar manifest v2: 512 canvas layers, 15120 offered looks, valid defaults', () => {
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
   assert.equal(manifest.schema_version, 2);
   // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [4, 6, 6, 6, 8, 5]);
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [5, 6, 6, 6, 9, 5]);
   // the only looks a player can actually compose and save are built from the non-unlock (base) ids
-  assert.deepEqual(SLOTS.map(k => baseIds(k).length), [3, 5, 6, 6, 6, 3]);
-  assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 9720, 'offered looks');
+  assert.deepEqual(SLOTS.map(k => baseIds(k).length), [4, 5, 6, 6, 7, 3]);
+  assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 15120, 'offered looks');
   assert.equal(new Set(ids).size, ids.length);
   assert.deepEqual(manifest.layers_order, ['bg', 'base', 'clothing', 'mouth', 'eyes', 'hat', 'accessory']);
   assert.equal(manifest.defaults.base, 'base_frog');
@@ -104,17 +104,25 @@ test('avatar manifest v2: 512 canvas layers, 9720 offered looks, valid defaults'
     assert.ok(baseIds(k).includes(manifest.defaults[k]), 'default ' + k);
     for (const o of manifest.options[k]) { assert.match(o.id, new RegExp('^' + k + '_[a-z0-9_]+$')); assert.ok(o.label); }
   }
-  // one SVG per option id, plus the implied base layer; bg_none doubles as manifest.paths.bg
+  // one 512x512 WebP per option id, plus the implied base layer; bg_none doubles as manifest.paths.bg
   const files = [...new Set([manifest.paths.base, ...ids.map(id => manifest.paths.layer_template.replace('{id}', id))])];
-  assert.equal(files.length, 36, '35 option layers + base_frog');
-  assert.equal(manifest.paths.bg.split('/').pop(), 'bg_none.svg');
-  assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/layers/', import.meta.url)).filter(f => f.endsWith('.svg')).sort(),
-    files.map(f => f.split('/').pop()).sort(), 'no unused or missing layer files');
+  assert.equal(files.length, 38, '37 option layers + base_frog');
+  assert.equal(manifest.paths.bg.split('/').pop(), 'bg_none.webp');
+  assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/layers/', import.meta.url)).sort(),
+    files.map(f => f.split('/').pop()).sort(), 'no unused, stray or missing layer files');
   for (const f of files) {
-    const svg = file('docs/meme/' + f);
-    assert.match(svg, /<svg[^>]*viewBox="0 0 512 512"/, f);
-    assert.match(svg, /width="512" height="512"/, f);
-    assert.doesNotMatch(svg, /<script|<image|href=|on[a-z]+=/i, f + ' is plain vector art');
+    const b = readFileSync(new URL('../docs/meme/' + f, import.meta.url));
+    assert.equal(b.toString('latin1', 0, 4) + b.toString('latin1', 8, 12), 'RIFFWEBP', f + ' is a WebP');
+    // VP8X (layers with alpha): canvas size minus one, 24-bit LE at bytes 24..29.
+    // VP8 (opaque backgrounds): 14-bit width/height at bytes 26..29. VP8L (lossless): packed at byte 21.
+    const kind = b.toString('latin1', 12, 16);
+    let w, h;
+    if (kind === 'VP8X') { w = 1 + b.readUIntLE(24, 3); h = 1 + b.readUIntLE(27, 3); }
+    else if (kind === 'VP8 ') { w = b.readUInt16LE(26) & 0x3fff; h = b.readUInt16LE(28) & 0x3fff; }
+    else if (kind === 'VP8L') { const v = b.readUInt32LE(21); w = 1 + (v & 0x3fff); h = 1 + ((v >> 14) & 0x3fff); }
+    assert.deepEqual([w, h], [512, 512], f + ' is 512x512');
+    // only backgrounds may be opaque; every other layer must carry alpha
+    if (!/\/bg_/.test(f)) assert.notEqual(kind, 'VP8 ', f + ' must be transparent outside its part');
   }
 });
 

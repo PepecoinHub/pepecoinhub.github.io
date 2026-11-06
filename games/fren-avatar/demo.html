@@ -103,7 +103,7 @@
 <body>
   <h1>Fren Avatar v2 layer demonstrator</h1>
   <p class="sub">
-    Stacks the real SVG layers from <code>docs/meme/avatar-assets/layers/</code> in the manifest
+    Stacks the real WebP layers from <code>docs/meme/avatar-assets/layers/</code> in the manifest
     <code>layers_order</code>. Switch any slot or hit Randomize. This is the live composite, not a mockup.
   </p>
 
@@ -135,7 +135,7 @@
   var layerImgs = {};       // slot -> <img>
 
   function layerUrl(id) {
-    // layer_template is "avatar-assets/layers/{id}.svg", relative to docs/meme/.
+    // layer_template is "avatar-assets/layers/{id}.webp", relative to docs/meme/.
     var tmpl = manifest.paths.layer_template;
     return ASSET_BASE + tmpl.replace("{id}", id);
   }

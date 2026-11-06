@@ -90,7 +90,7 @@ painted between `bg` and `clothing` and is never a saved column. The saveable
 slots (columns) are `bg`, `clothing`, `mouth`, `eyes`, `hat`, `accessory`.
 
 Only non-unlock (base) options are offered and saveable this stage. The offered
-counts are **bg 3 × clothing 5 × mouth 6 × eyes 6 × hat 6 × accessory 3 = 9,720
+counts are **bg 4 × clothing 5 × mouth 6 × eyes 6 × hat 7 × accessory 3 = 15,120
 looks**, all free. Some manifest options carry an `unlock` key (`bg_sunset`,
 `clothing_suit`, `hat_hardhat`, `hat_detective`, `accessory_pin`,
 `accessory_headphones`): they are reserved for future server-verified activity
@@ -130,7 +130,7 @@ fancy id. Saving the same look again is a no-op success; a different look within
 never call Supabase: one read when the Passport opens, one write per Save Look.
 
 **Tests:** `node --test tests/passport.test.mjs` runs the static v2 checks
-(512 canvas layers, 9,720 offered looks, the six-argument save RPC, and the
+(512 canvas layers, 15,120 offered looks, the six-argument save RPC, and the
 server allowlists matching the manifest's non-unlock ids).
 `tests/passport-avatar-sql.test.mjs` runs the migrations on a real, disposable
 PostgreSQL (15 or newer) when `PASSPORT_PG_URL` and `PASSPORT_PG_MODULE` (path to
@@ -141,3 +141,14 @@ isolation between players, one badge under concurrent first saves, rollback,
 cooldown and the daily limit. Never point it at Supabase. Fresh Fren
 (`first_avatar`) is `live` in `docs/meme/passport-catalog.json` only because this
 secure server award path is wired and tested.
+
+### Avatar art (2026-11-06)
+
+The avatar layers are the hand-drawn ChatGPT art. The original sheets are kept
+losslessly in `games/fren-avatar/source/`; `scripts/build_avatar_layers.py`
+cuts each item out, places it on the shared 512×512 canvas and writes
+`docs/meme/avatar-assets/layers/<id>.webp` (38 files, about 480 KB). Placement
+numbers live in that script, not in CSS. To change a part, edit the sheet or the
+numbers and rebuild (`pip install pillow numpy scipy` first). New ids this round:
+`hat_fedora` and `bg_meadow`, both free and in the save allowlist. The previous
+vector set is in git history (commit before this change) if it is ever needed.

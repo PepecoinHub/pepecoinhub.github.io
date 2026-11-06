@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
-<!-- FREN AVATAR v2 shared geometry: shoulder line y=404, shoulders x=96..416. White tee with PEP print. -->
-<path d="M256 396 Q150 404 110 456 Q90 480 88 512 L424 512 Q422 480 402 456 Q362 404 256 396 Z" fill="#f2f4ee" stroke="#16210f" stroke-width="7" stroke-linejoin="round"/>
-<!-- crew collar -->
-<path d="M214 400 Q256 428 298 400 Q256 416 214 400 Z" fill="#d9ddd2" stroke="#16210f" stroke-width="6" stroke-linejoin="round"/>
-<!-- PEP wordmark -->
-<text x="256" y="486" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="58" fill="#2f8f46">PEP</text>
-</svg>

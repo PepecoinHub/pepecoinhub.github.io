@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" aria-hidden="true">
-<!-- FREN AVATAR v2 shared geometry: full-canvas flat green studio background, painted FIRST. -->
-<rect x="0" y="0" width="512" height="512" fill="#6fae57"/>
-<!-- subtle flat vignette ring (no gradient, flat ellipse) -->
-<ellipse cx="256" cy="236" rx="220" ry="220" fill="#7cbb63"/>
-</svg>
