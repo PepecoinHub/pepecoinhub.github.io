@@ -1926,17 +1926,37 @@
         // Esri World Street Map: place names in English, no key (note the {y}/{x} order). If its tiles fail to load
         // (several errors before any tile arrives, or nothing after 8 s), the map switches to OpenStreetMap's own
         // tiles (local place names). CARTO's free tiles needed an API key, so they are gone.
+        var loaded = 0, failed = 0, switched = false, m0 = map;
+        // If BOTH tile providers fail (zero tiles ever load, only errors), the
+        // tiles are almost certainly blocked by the player's network — a VPN,
+        // ad/tracker blocker or a restricted network often block arcgisonline.com
+        // and tile.openstreetmap.org. Show a plain note on the map box instead of
+        // a silent grey square. It clears the moment any tile loads.
+        var noteShown = false;
+        var mapBlockedNote = function () {
+          if (noteShown || loaded || !map || map !== m0) return; noteShown = true;
+          var n = el('div', { class: 'wp-map-blocked', role: 'status' },
+            '<b>The map could not load.</b><span>A VPN, ad/tracker blocker or your network is probably blocking the map tile servers (OpenStreetMap / Esri). Turn the VPN or blocker off for this page, then reopen the game. You can still place your pin on the grey map.</span>');
+          box.appendChild(n);
+        };
+        var clearNote = function () { var n = box.querySelector('.wp-map-blocked'); if (n) n.remove(); };
+        var tileOk = function () { loaded++; clearNote(); };
         var osm = function () {
-          return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' });
+          var o = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' });
+          var oErr = 0;
+          o.on('tileload', tileOk);
+          // OSM is the fallback; if it ALSO only errors, the network is blocking tiles.
+          o.on('tileerror', function () { oErr++; if (!loaded && oErr >= 3) mapBlockedNote(); });
+          setTimeout(function () { if (!loaded) mapBlockedNote(); }, 8000);
+          return o;
         };
         var esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
           maxZoom: 18, attribution: 'Tiles © <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a> · Sources: Esri, HERE, Garmin, USGS, © OpenStreetMap contributors and the GIS user community' });
-        var loaded = 0, failed = 0, switched = false, m0 = map;
         var fallback = function () {
           if (switched || map !== m0) return; switched = true;
           m0.removeLayer(esri); osm().addTo(m0);
         };
-        esri.on('tileload', function () { loaded++; });
+        esri.on('tileload', tileOk);
         esri.on('tileerror', function () { failed++; if (!loaded && failed >= 3) fallback(); });
         setTimeout(function () { if (!loaded) fallback(); }, 8000);
         esri.addTo(map);
