@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [45, 12, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [46, 12, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -92,7 +92,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 32400 offered look
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
   assert.equal(manifest.schema_version, 2);
   // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 6, 6, 6, 9, 8, 2]);
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 6, 6, 6, 9, 7, 2]);
   // the only looks a player can actually compose and save are built from the non-unlock (base) ids
   assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 5, 6, 6, 6, 6, 1]);
   assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 32400, 'offered looks');
@@ -106,7 +106,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 32400 offered look
   }
   // one 512x512 WebP per option id, plus the implied base layer
   const files = [...new Set([manifest.paths.base, ...ids.map(id => manifest.paths.layer_template.replace('{id}', id))])];
-  assert.equal(files.length, 44, '43 option layers + base_frog');
+  assert.equal(files.length, 43, '42 option layers + base_frog');
   // one small picture of each part for the maker rows, nothing else in the folder
   assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/thumbs/', import.meta.url)).sort(),
     ids.map(id => manifest.paths.thumb_template.replace('{id}', id).split('/').pop()).sort(), 'no unused, stray or missing thumbnails');

@@ -58,7 +58,6 @@
 --     hat_detective      (unlock detective_fren)
 --     clothing_suit      (unlock detective_fren)
 --     bg_sunset          (unlock yeet_adept, not earnable yet)
---     accessory_pin      (unlock scout_fren)
 --     accessory_headphones (unlock gamer_fren, not earnable yet)
 --     hat_explorer       (unlock scout_fren)
 --     special_explorer   (unlock scout_fren)
@@ -119,7 +118,7 @@ begin
      or p_mouth is null or p_mouth not in ('mouth_flat', 'mouth_smile', 'mouth_open', 'mouth_tongue', 'mouth_teeth', 'mouth_smirk')
      or p_eyes is null or p_eyes not in ('eyes_classic', 'eyes_sleepy', 'eyes_angry', 'eyes_bloodshot', 'eyes_3d', 'eyes_hypno')
      or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_wizard', 'hat_hardhat', 'hat_detective', 'hat_explorer')
-     or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_shades', 'accessory_round', 'accessory_orange', 'accessory_cigarette', 'accessory_pipe', 'accessory_headphones', 'accessory_pin')
+     or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_shades', 'accessory_round', 'accessory_orange', 'accessory_cigarette', 'accessory_pipe', 'accessory_headphones')
      or p_special is null or p_special not in ('special_none', 'special_explorer') then
     raise exception 'Unknown avatar option' using errcode = '22023';
   end if;
@@ -127,7 +126,7 @@ begin
   -- (the manifest's 'unlock' keys; stamps are awarded by the server only).
   if exists (
     select 1 from (values ('bg_sunset', 'yeet_adept'), ('clothing_suit', 'detective_fren'), ('hat_hardhat', 'miner_fren'),
-                          ('hat_detective', 'detective_fren'), ('accessory_headphones', 'gamer_fren'), ('accessory_pin', 'scout_fren'),
+                          ('hat_detective', 'detective_fren'), ('accessory_headphones', 'gamer_fren'),
                           ('hat_explorer', 'scout_fren'), ('special_explorer', 'scout_fren')) r(part, stamp)
      where r.part in (p_bg, p_clothing, p_hat, p_accessory, p_special)
        and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)) then

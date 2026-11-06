@@ -2,7 +2,6 @@
 """Build the Fren Avatar layers and option thumbnails from the hand-drawn source sheets.
 
 Input:  games/fren-avatar/source/base.webp          the frog head and shoulders (no eyes, no mouth)
-        games/fren-avatar/source/accessories.webp   only for the reserved PEP pin
         games/fren-avatar/source-v3/*.webp          the owner's part sheets (white background, lossless):
             mouths, eyes, hats, clothing, accessories, backgrounds
 Output: docs/meme/avatar-assets/layers/<id>.webp    one 512x512 layer per option, part already in place
@@ -133,23 +132,6 @@ def cut_backgrounds():
     return out
 
 
-def old_pin():
-    """The reserved PEP pin keeps its earlier art (bottom-left item of the old accessories sheet)."""
-    a = np.array(Image.open(os.path.join(SRC, 'accessories.webp')).convert('RGBA'))
-    m = a[..., 3] > 20
-    lab, _ = nd.label(nd.binary_dilation(m, iterations=22))
-    comps = []
-    for i, sl in enumerate(nd.find_objects(lab)):
-        keep = lab[sl] == i + 1
-        if (keep & m[sl]).sum() < 1500:
-            continue
-        sub = a[sl].copy(); sub[~keep] = 0
-        ys, xs = np.where(sub[..., 3] > 20)
-        comps.append((sl[0].start, sl[1].start, sub[ys.min():ys.max() + 1, xs.min():xs.max() + 1]))
-    return max(comps, key=lambda c: c[0] - c[1])[2]
-
-
-# ---------------------------------------------------------------- placing
 def place(arr, w, cx, top=None, bottom=None, cy=None):
     img = Image.fromarray(arr)
     s = (w * K) / img.width
@@ -256,8 +238,6 @@ def build():
         # headphones: the cups sit behind the face (worn on the ears), so the head covers their middle
         layers[spec[0]] = under_chin(L, base) if behind else L
         thumbs[spec[0]] = thumb(arr)
-    pin = old_pin()
-    layers['accessory_pin'] = place(pin, w=56, cx=150, cy=520); thumbs['accessory_pin'] = thumb(pin)
     for lid, img in zip(BACKGROUNDS, cut_backgrounds()):
         layers[lid] = img; thumbs[lid] = thumb(img.resize((THUMB[0], THUMB[0])).crop((0, 12, THUMB[0], 12 + THUMB[1])))
     empty = Image.new('RGBA', (WORK, WORK), (0, 0, 0, 0))

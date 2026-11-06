@@ -92,7 +92,7 @@ slots (columns) are `bg`, `clothing`, `mouth`, `eyes`, `hat`, `accessory`.
 Only non-unlock (base) options are offered and saveable this stage. The offered
 counts are **bg 4 × clothing 5 × mouth 6 × eyes 6 × hat 7 × accessory 3 = 15,120
 looks**, all free. Some manifest options carry an `unlock` key (`bg_sunset`,
-`clothing_suit`, `hat_hardhat`, `hat_detective`, `accessory_pin`,
+`clothing_suit`, `hat_hardhat`, `hat_detective`, `hat_explorer`, `special_explorer`,
 `accessory_headphones`): they are reserved for future server-verified activity
 achievements, are hidden in the UI, and are rejected by the save RPC exactly like
 an unknown id until such an achievement grants them.
@@ -162,7 +162,7 @@ server allowlists matching the manifest's non-unlock ids).
 PostgreSQL (15 or newer) when `PASSPORT_PG_URL` and `PASSPORT_PG_MODULE` (path to
 node-postgres) are set: grants, anonymous/non-Discord rejection, ID injection,
 rejection of every reward part without its stamp (`bg_sunset`, `clothing_suit`,
-`hat_hardhat`, `hat_detective`, `accessory_pin`, `accessory_headphones`),
+`hat_hardhat`, `hat_detective`, `hat_explorer`, `accessory_headphones`, `special_explorer`),
 isolation between players, one badge under concurrent first saves, rollback,
 cooldown and the daily limit. Never point it at Supabase. Fresh Fren
 (`first_avatar`) is `live` in `docs/meme/passport-catalog.json` only because this

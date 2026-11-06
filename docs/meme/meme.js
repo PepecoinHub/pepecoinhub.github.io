@@ -1574,7 +1574,7 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261106stamps2';
+  var PP_CATALOG = 'passport-catalog.json?v=20261106lily2';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
       document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106lily1'}));
@@ -1701,6 +1701,7 @@
           detective_fren: [num(P.wp_perfect_days), 5, function(n){ return more(n, 'perfect 5000', 'perfect 5000s'); }],
           week_scout: [num(P.wp_streak), 7, function(n){ return more(n, 'day in a row', 'days in a row'); }],
           scout_fren: [num(P.wp_streak), 14, function(n){ return more(n, 'day in a row', 'days in a row'); }],
+          streak_14: [num(P.login_streak), 14, function(n){ return more(n, 'day in a row', 'days in a row'); }],
           like_it_here: [num(P.login_streak), 30, function(n){ return more(n, 'day in a row', 'days in a row'); }],
           rookie_miner: [num(P.miner_minutes), 10, function(n){ return more(n, 'minute', 'minutes'); }],
           miner_fren: [num(P.miner_minutes), 60, function(n){ return more(n, 'minute', 'minutes'); }]
@@ -1945,7 +1946,7 @@
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261106special1').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261106lily2').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -2241,7 +2242,7 @@
 
   // ---------- Fren Passport check-in (games/supabase/update_passport_awards.sql) ----------
   // A Discord player's PondOS page asks once (at most every 5 minutes per tab). The server notes the UTC day
-  // for Welcome Back! and the 30-day run, and returns the stamps it has not announced yet; each one is announced only once.
+  // for Welcome Back! and the 14- and 30-day runs, and returns the stamps it has not announced yet; each one is announced only once.
   // The browser sends nothing but the request itself.
   if (mainEl) (function () {
     var s = sbSession();
@@ -3113,15 +3114,15 @@
   }
   var ADS = [
     { file: 'pond_stamps.mpg', added: '2026-11-06', title: 'Stamps That Check Out', ch: 'CH 19 · POND POST OFFICE', icon: 'pep-logo', scenes: [
-      '<p class="ad-kick">Did your frog do anything today? Can you prove it?</p><h3 class="ad-big">Stamps that<br><em>check out!</em></h3><p class="ad-sub">Your Fren Passport now collects 20 stamps, each one from something the pond\'s own server saw you do.</p>',
-      '<p class="ad-kick">Guess where Pepe is. Chat in the lobby. Write to the editor. Mine for an hour.</p><h3 class="ad-big">The games <em>stamp</em><br>your passport!</h3><p class="ad-sub">Pepe Guesser, the LAN Party chat, letters to the editor, Pepe Miner, YEET THE PEP and a month in a row on PondOS. Your old Pepe Guesser games and letters count too.</p>',
-      '<div class="ad-frens">' + adFren('clothing_suit', 'mouth_smirk', 'eyes_classic', 'hat_detective', 'accessory_pin') + '</div><p class="ad-kick">Five perfect 5000s in Pepe Guesser?</p><h3 class="ad-big">Dress like a<br><em>detective!</em></h3><p class="ad-sub">Detective Fren opens the detective hat and the suit. Scout Fren opens the PEP pin. Miner Fren opens the hard hat.</p>',
+      '<p class="ad-kick">Did your frog do anything today? Can you prove it?</p><h3 class="ad-big">Stamps that<br><em>check out!</em></h3><p class="ad-sub">Your Fren Passport now collects 21 stamps, each one from something the pond\'s own server saw you do.</p>',
+      '<p class="ad-kick">Guess where Pepe is. Chat in the lobby. Write to the editor. Mine for an hour.</p><h3 class="ad-big">The games <em>stamp</em><br>your passport!</h3><p class="ad-sub">Pepe Guesser, the LAN Party chat, letters to the editor, Pepe Miner, YEET THE PEP and 14 or 30 days in a row on PondOS. Your old Pepe Guesser games and letters count too.</p>',
+      '<div class="ad-frens">' + adFren('clothing_suit', 'mouth_smirk', 'eyes_classic', 'hat_detective', 'accessory_none') + '</div><p class="ad-kick">Five perfect 5000s in Pepe Guesser?</p><h3 class="ad-big">Dress like a<br><em>detective!</em></h3><p class="ad-sub">Detective Fren opens the detective hat and the suit. Miner Fren opens the hard hat. 14 days in a row of Pepe Guesser opens Lily\'s Explorer Pepe.</p>',
       '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Here early?<br><em>Pond Pioneer!</em></h3><p class="ad-sub">Every account with Discord linked on launch day gets it. After that, the door closes.</p><p class="ad-fine">Not a real offer. Stamps are cosmetic: no PEP, no points, nothing to sell. Only what the server records counts. Log on with Discord to collect.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
     ] },
     { file: 'fren_passport.mpg', added: '2026-11-06', title: 'The Fren Passport', ch: 'CH 98 · POND TRAVEL AGENCY', icon: 'pep-logo', scenes: [
       '<p class="ad-kick">Tired of profiles that look like a spreadsheet?</p><h3 class="ad-big">Get a real<br><em>passport!</em></h3><p class="ad-sub">A hand-drawn paper booklet, with your Fren clipped in as the photo.</p>',
       '<img class="ad-pic" src="passport-assets/page-left.webp?v=20261106pp1" alt=""><p class="ad-kick">Fren ID. Nickname. Member since. All filled in from your Discord log-on.</p><h3 class="ad-big">No fake numbers.<br><em>Just you.</em></h3>',
-      '<img class="ad-pic" src="passport-assets/page-right.webp?v=20261106pp1" alt=""><p class="ad-kick">44 stamp slots. The pond checks every one on its own server.</p><h3 class="ad-big">Collect <em>stamps!</em></h3><p class="ad-sub">20 of them can be earned today, from what the games record. The rest say "coming soon" until they really work.</p>',
+      '<img class="ad-pic" src="passport-assets/page-right.webp?v=20261106pp1" alt=""><p class="ad-kick">45 stamp slots. The pond checks every one on its own server.</p><h3 class="ad-big">Collect <em>stamps!</em></h3><p class="ad-sub">21 of them can be earned today, from what the games record. The rest say "coming soon" until they really work.</p>',
       '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">One stamp says<br><em>$0.01 - BALI</em></h3><p class="ad-sub">It stays locked for every fren until Pepecoin reaches one cent. Then everybody gets it. Same day, same stamp.</p><p class="ad-fine">Not a real offer. No trip, no prize, no price prediction, no financial advice. Stamps are cosmetic: no PEP, no points, nothing to sell. Log on with Discord to open yours.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
     ] },
     { file: 'create_your_fren.mpg', added: '2026-11-05', title: 'Create Your Fren', ch: 'CH 64 · POND MAKEOVER HOUR', icon: 'fresh-fren', scenes: [

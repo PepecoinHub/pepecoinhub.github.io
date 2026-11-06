@@ -192,7 +192,7 @@ try {
     assert.equal(await page.locator(maker + ' .fa-opt:not(.is-locked)').count(), 35);
     // reserved parts show a lock and cannot be picked: sunset, detective jacket, hard hat, detective hat, headphones, pin
     assert.deepEqual(await page.$$eval(maker + ' .fa-opt.is-locked input', l => l.map(i => [i.value, i.disabled])),
-      [['hat_hardhat', true], ['hat_detective', true], ['hat_explorer', true], ['clothing_suit', true], ['accessory_headphones', true], ['accessory_pin', true], ['bg_sunset', true], ['special_explorer', true]]);
+      [['hat_hardhat', true], ['hat_detective', true], ['hat_explorer', true], ['clothing_suit', true], ['accessory_headphones', true], ['bg_sunset', true], ['special_explorer', true]]);
     assert.equal(await statusText(page), 'Not saved yet.');
     const w = await page.evaluate(sel => document.querySelector(sel).getBoundingClientRect().width, maker);
     assert.ok(w >= 860 && w <= 920, 'window width ' + w);
@@ -418,14 +418,14 @@ try {
     // the booklet: the server's stamps, newest first; Next Milestone is the closest one with a real count
     assert.equal(await page.locator(P + ' .pp-grid .pp-slot.is-earned').count(), 8, 'seven new + First Fren');
     // letters are never suggested (no spam nudge); today's visit starts the 30-day run
-    assert.match(await page.textContent(P + ' .pp-mile-title'), /Guess You Like It Here\s*29 more days in a row/);
+    assert.match(await page.textContent(P + ' .pp-mile-title'), /14-Day Streak\s*13 more days in a row/);
     assert.equal(await page.getAttribute(P + ' .pp-mile .pp-bar', 'aria-valuenow'), '1');
     await shot(page, '17-stamps-passport');
     await page.click(P + ' [role=tab]:has-text("Stamps")');
     const album = await page.$$eval(P + ' .pp-album .pp-stamp', l => l.map(s => [s.querySelector('.pp-stamp-name').textContent, s.querySelector('.pp-stamp-sub').textContent]));
-    assert.equal(album.length, 44);
+    assert.equal(album.length, 45);
     const named = Object.fromEntries(album.filter(a => a[0] !== '???'));
-    assert.equal(Object.keys(named).length, 20, 'only the 20 live stamps are named');
+    assert.equal(Object.keys(named).length, 21, 'only the 21 live stamps are named');
     assert.equal(named['Senior Editor'], 'Locked'); assert.equal(named['Welcome Back!'], 'Locked');
     assert.equal(named['Junior Editor'], 'Locked'); assert.equal(named['NASA Is Hiring'], 'Locked');
     assert.ok(album.filter(a => a[0] === '???').every(a => a[1] === 'Coming soon'));
@@ -451,11 +451,11 @@ try {
     assert.match(await page.getAttribute(`${maker} input[value="hat_hardhat"]`, 'value'), /hat_hardhat/);
     assert.match(await page.getAttribute(`${maker} label:has(input[value="hat_hardhat"])`, 'title'), /earn the Miner Fren stamp/);
     assert.match(await page.getAttribute(`${maker} label:has(input[value="bg_sunset"])`, 'title'), /a future stamp/);
-    await pick(page, 'hat', 'hat_detective'); await pick(page, 'clothing', 'clothing_suit'); await pick(page, 'accessory', 'accessory_pin');
+    await pick(page, 'hat', 'hat_detective'); await pick(page, 'clothing', 'clothing_suit');
     await page.click(maker + ' .fa-save');
     await page.waitForFunction(sel => /Saved in your Fren Passport/.test(document.querySelector(sel + ' .fa-state').textContent), maker);
     const row = await dbRow(3);
-    assert.deepEqual([row.hat, row.clothing, row.accessory], ['hat_detective', 'clothing_suit', 'accessory_pin']);
+    assert.deepEqual([row.hat, row.clothing, row.accessory], ['hat_detective', 'clothing_suit', 'accessory_none']);
     await closeBalloons(page);
     await shot(page, '19-maker-reward-parts');
     // Lily's special avatar: only the background stays under it; picking a part brings the parts back

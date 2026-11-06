@@ -31,6 +31,7 @@
 --   week_scout      a guess on 7 puzzle days in a row (UTC)
 --   scout_fren      a guess on 14 puzzle days in a row (UTC)
 --   welcome_back    back in PondOS on the day after the first visit (gry_passport_checkin)
+--   streak_14       PondOS opened signed in on 14 UTC days in a row (gry_passport_checkin)
 --   like_it_here    PondOS opened signed in on 30 UTC days in a row (gry_passport_checkin)
 --   first_words     first lobby chat message
 --   community_fren  lobby chat on five different UTC days
@@ -100,7 +101,7 @@ create or replace function games.passport_award(u uuid, b text, at timestamptz d
 returns boolean language plpgsql volatile security definer set search_path = '' as $$
 begin
   if b is null or b not in ('pond_pioneer', 'moonwalker', 'nasa_is_hiring', 'pepe_guesser', 'sharp_eye',
-      'detective_fren', 'week_scout', 'scout_fren', 'welcome_back', 'like_it_here', 'first_words',
+      'detective_fren', 'week_scout', 'scout_fren', 'welcome_back', 'streak_14', 'like_it_here', 'first_words',
       'community_fren', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'rookie_miner', 'miner_fren') then
     raise exception 'Unknown passport stamp %', b;
   end if;
@@ -342,7 +343,7 @@ drop trigger if exists passport_miner_aiu on games.miner_saves;
 create trigger passport_miner_aiu after insert or update on games.miner_saves
   for each row execute function games.passport_miner_after();
 
--- ---------- PondOS visits: Welcome Back!, Guess You Like It Here, and new-stamp notices ----------
+-- ---------- PondOS visits: Welcome Back!, 14-Day Streak, Guess You Like It Here, and new-stamp notices ----------
 -- Called by PondOS (docs/meme/meme.js) when a Discord player opens a page. It writes one row per UTC day
 -- at most, and hands back the stamps the player has not been told about yet (each one only once).
 create or replace function public.gry_passport_checkin()
@@ -363,7 +364,9 @@ begin
        and exists (select 1 from games.passport_days where user_id = u and day = today - 1) then
       perform games.passport_award(u, 'welcome_back');
     end if;
-    -- days are unique, so 30 rows in the last 30 days are 30 days in a row
+    -- days are unique, so 14 rows in the last 14 days are 14 days in a row (and 30 in 30)
+    select count(*) into n from games.passport_days where user_id = u and day > today - 14;
+    if n >= 14 then perform games.passport_award(u, 'streak_14'); end if;
     select count(*) into n from games.passport_days where user_id = u and day > today - 30;
     if n >= 30 then perform games.passport_award(u, 'like_it_here'); end if;
   end if;

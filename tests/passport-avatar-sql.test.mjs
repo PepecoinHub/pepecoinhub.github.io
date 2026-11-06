@@ -145,7 +145,6 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
       look('bg_sky', 'clothing_suit', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none'),              // clothing_suit -> detective_fren
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_hardhat', 'accessory_none'),           // hat_hardhat -> miner_fren
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_detective', 'accessory_none'),         // hat_detective -> detective_fren
-      look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_pin'),               // accessory_pin -> scout_fren
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_headphones')         // accessory_headphones -> gamer_fren
     ];
     reserved.push([...DEFAULT, 'special_explorer']);                                                       // special_explorer -> scout_fren

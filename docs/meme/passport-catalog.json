@@ -62,7 +62,7 @@
     {
       "id": "scout_fren",
       "title": "Scout Fren",
-      "description": "Guess in Pepe Guesser on 14 days in a row (UTC days). Unlocks the PEP pin.",
+      "description": "Guess in Pepe Guesser on 14 days in a row (UTC days). Unlocks Lily's Explorer Pepe and the explorer hat.",
       "category": "where_pepe",
       "status": "live"
     },
@@ -105,6 +105,13 @@
       "id": "senior_editor",
       "title": "Senior Editor",
       "description": "Send 10 letters to the editor.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "streak_14",
+      "title": "14-Day Streak",
+      "description": "Open PondOS signed in with Discord on 14 days in a row (UTC days).",
       "category": "community",
       "status": "live"
     },

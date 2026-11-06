@@ -9,7 +9,7 @@ Status: **built in Draft PR #191, not deployed.** The server side is `games/supa
 3. **Stamps not designed yet show as `???` / "Coming soon"**, without their name or rule.
 4. Stamps are cosmetic: no PEP, no points, nothing to sell or trade.
 
-## Live stamps (20)
+## Live stamps (21)
 
 | Badge ID | Name | Rule | Server source | Backfilled |
 |---|---|---|---|---|
@@ -21,13 +21,14 @@ Status: **built in Draft PR #191, not deployed.** The server side is `games/supa
 | `sharp_eye` | Sharp Eye | First perfect 5000 | `wp_plays.points` (server scored) | yes |
 | `detective_fren` | Detective Fren | 5000 on 5 different puzzle days. Unlocks detective hat + suit. | `wp_plays` | yes |
 | `week_scout` | Week Scout | A guess on 7 puzzle days in a row (UTC) | `wp_plays` | yes |
-| `scout_fren` | Scout Fren | A guess on 14 puzzle days in a row (UTC). Unlocks the PEP pin. | `wp_plays` | yes |
+| `scout_fren` | Scout Fren | A guess on 14 puzzle days in a row (UTC). Unlocks Lily's Explorer Pepe and the explorer hat. | `wp_plays` | yes |
 | `first_words` | First Words | First lobby chat message | trigger on `games.lobby_chat` | no (chat kept 24 h) |
 | `hey_fren` | Hey @Fren | First @mention of another fren | trigger on `games.lobby_mentions` | no |
 | `community_fren` | Community Fren | Lobby chat on 5 different UTC days | `games.passport_chat_days` | no |
 | `dear_editor` | Dear Editor | First letter to the editor | trigger on `games.letters` (`discord = true`) | yes |
 | `junior_editor` | Junior Editor | 5 letters to the editor | `games.passport_progress.letters` | yes |
 | `senior_editor` | Senior Editor | 10 letters to the editor | same | yes |
+| `streak_14` | 14-Day Streak | PondOS opened signed in on 14 UTC days in a row | `gry_passport_checkin` → `games.passport_days` | no |
 | `like_it_here` | Guess You Like It Here | PondOS opened signed in on 30 UTC days in a row (replaced 7 Day Fren, then 10 Day Fren) | `gry_passport_checkin` → `games.passport_days` | no |
 | `rookie_miner` | Rookie Miner | 10 minutes of Pepe Miner | server clock between cloud saves | no |
 | `miner_fren` | Miner Fren | 1 hour of Pepe Miner. Unlocks the hard hat. | same | no |
@@ -43,7 +44,7 @@ Details:
 - **Stamps added later keep current progress** when the data is already kept: PondOS days (`passport_days`), chat days, letters, Miner seconds, every accepted YEET flight and every one over 5000 m (`passport_progress.yeet_flights`, `yeet_5k_total`), and all Pepe Guesser plays. A new stamp needs its own backfill statement in its migration, like the ones at the end of `update_passport_awards.sql`.
 - **Notices:** `gry_passport_checkin()` (no arguments) runs when a Discord player opens a PondOS page, at most every 5 minutes per tab. It returns each new stamp once (`passport_badges.notified_at`), and PondOS shows one balloon.
 - **Safety:** every game hook catches its own errors and logs a warning, so a stamp bug cannot break a game, a chat message or a save.
-- **Avatar reward parts** (`hat_detective`, `clothing_suit`, `accessory_pin`, `hat_hardhat`) become saveable when the player holds the stamp; the save RPC checks it again on the server. `bg_sunset` (Adept) and `accessory_headphones` (Gamer Fren) stay locked, because those stamps are not live.
+- **Avatar reward parts** (`hat_detective`, `clothing_suit`, `hat_hardhat`, `hat_explorer`, `special_explorer`) become saveable when the player holds the stamp; the save RPC checks it again on the server. `bg_sunset` (Adept) and `accessory_headphones` (Gamer Fren) stay locked, because those stamps are not live.
 
 ## Special avatars (owner decision, 2026-11-06)
 
@@ -59,9 +60,9 @@ To add one: put Lily's transparent square PNG in `games/fren-avatar/source/speci
 
 Lily's sheets are kept in `games/fren-passport/source/stamps-lily/`. `scripts/build_lily_stamps.mjs` cuts them into `docs/meme/passport-assets/stamps-lily.webp` (15 tiles, 138×150 each, shown at 69×75), the "New stamp" notice icon `stamp-new.webp`, and the explorer hat layer. The tile order in the script must equal `PP_LILY` in `docs/meme/meme.js` (a test checks it). Earned stamps without a Lily tile still use the older sprite `stamps.webp`.
 
-Lily tiles: Pond Pioneer, Welcome Back!, Pepe Guesser, Week Scout, Scout Fren, First Words, Hey @Fren, Dear Editor, Junior Editor, Senior Editor, Rookie Miner, First Hatch, Little Fren, One Small Step, and a spare "14-Day Streak" tile (`streak_14`, not used by any stamp yet).
+Lily tiles: Pond Pioneer, Welcome Back!, Pepe Guesser, Week Scout, Scout Fren, First Words, Hey @Fren, Dear Editor, Junior Editor, Senior Editor, Rookie Miner, First Hatch, Little Fren, One Small Step, and 14-Day Streak (14 PondOS days in a row).
 
-Scout Fren rewards: the PEP pin, the **explorer hat with "14"** (`hat_explorer`), and the special avatar Explorer Pepe.
+Scout Fren rewards: Lily's special avatar **Explorer Pepe** and the **explorer hat with "14"** (`hat_explorer`). The PEP pin was removed on the owner's call.
 
 ## Still planned ("???" / Coming soon)
 

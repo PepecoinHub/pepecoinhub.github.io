@@ -271,6 +271,15 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     for (let back = 1; back <= 28; back++) await visit(6, back);
     await call(6, 'select public.gry_passport_checkin() as v');
     assert.ok(!(await has(6, 'like_it_here')), '29 days');
+    assert.ok(await has(6, 'streak_14'), '14 days in a row are inside the 29');
+    // 14-Day Streak: 13 days are not enough, the 14th day is
+    await addUser(12);
+    for (let back = 1; back <= 12; back++) await visit(12, back);
+    await call(12, 'select public.gry_passport_checkin() as v');
+    assert.ok(!(await has(12, 'streak_14')), '13 days');
+    await notTodayVisit(12); await visit(12, 13);
+    await call(12, 'select public.gry_passport_checkin() as v');
+    assert.ok(await has(12, 'streak_14'));
     await notTodayVisit(6); await visit(6, 29);
     const month = await call(6, 'select public.gry_passport_checkin() as v');
     assert.ok(await has(6, 'like_it_here'));
@@ -317,16 +326,16 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     await assert.rejects(call(1, SAVE, look('bg_sunset', 'clothing_blue', 'hat_none', 'accessory_none')), /That part is locked/, 'Adept is not earnable yet');
     await assert.rejects(call(1, SAVE, look('bg_sky', 'clothing_blue', 'hat_none', 'accessory_headphones')), /That part is locked/);
     assert.equal(await one('select count(*)::int from games.passport_avatars where user_id = $1', [uid(6)]), 0);
-    // user 1: Detective Fren (suit + detective hat) and Scout Fren (PEP pin)
-    const dressed = await call(1, SAVE, look('bg_sky', 'clothing_suit', 'hat_detective', 'accessory_pin'));
+    // user 1: Detective Fren (suit + detective hat) and Scout Fren (explorer hat)
+    const dressed = await call(1, SAVE, look('bg_sky', 'clothing_suit', 'hat_detective', 'accessory_none'));
     assert.equal(dressed.avatar.hat, 'hat_detective'); assert.equal(dressed.badge.new, true);
     assert.equal(dressed.avatar.special, 'special_none');
     // Scout Fren also opens Lily's special avatar Explorer Pepe; it is saved with the parts under it
     const SAVE7 = 'select public.gry_passport_avatar_save($1, $2, $3, $4, $5, $6, $7) as v';
     await assert.rejects(call(6, SAVE7, [...look('bg_sky', 'clothing_blue', 'hat_none', 'accessory_none'), 'special_explorer']), /That part is locked/);
     await db.query("update games.passport_avatars set updated_at = now() - interval '5 seconds' where user_id = $1", [uid(1)]);
-    const explorer = await call(1, SAVE7, [...look('bg_forest', 'clothing_suit', 'hat_detective', 'accessory_pin'), 'special_explorer']);
-    assert.equal(explorer.avatar.special, 'special_explorer'); assert.equal(explorer.avatar.hat, 'hat_detective');
+    const explorer = await call(1, SAVE7, [...look('bg_forest', 'clothing_suit', 'hat_explorer', 'accessory_none'), 'special_explorer']);
+    assert.equal(explorer.avatar.special, 'special_explorer'); assert.equal(explorer.avatar.hat, 'hat_explorer');
     assert.equal((await call(1, 'select public.gry_passport_state() as v')).avatar.special, 'special_explorer');
     // user 3: Miner Fren opens the hard hat
     assert.equal((await call(3, SAVE, look('bg_sky', 'clothing_blue', 'hat_hardhat', 'accessory_none'))).avatar.hat, 'hat_hardhat');
