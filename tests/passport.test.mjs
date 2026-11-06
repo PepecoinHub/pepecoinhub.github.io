@@ -164,3 +164,25 @@ test('Avatar Maker client: one save RPC with six v2 IDs, nothing kept in localSt
   assert.match(maker, /if \(r\.badge && r\.badge\.new\) balloon\('Fresh Fren unlocked!'/);
   assert.match(pond, /avatar-options\.json\?v=/);
 });
+
+test('Passport booklet art: four small transparent WebPs with the sizes the page layout assumes', () => {
+  const dir = new URL('../docs/meme/passport-assets/', import.meta.url);
+  const want = { 'page-left.webp': [360, 528], 'page-right.webp': [360, 528], 'stamps.webp': [16 * 69, 75], 'icons.webp': [12 * 48, 48] };
+  assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
+  let total = 0;
+  for (const [f, size] of Object.entries(want)) {
+    const b = readFileSync(new URL(f, dir));
+    total += b.length;
+    assert.equal(b.toString('latin1', 0, 4) + b.toString('latin1', 8, 12), 'RIFFWEBP', f + ' is a WebP');
+    // VP8X is the extended header used for images with alpha (the photo window and sprite edges are transparent)
+    assert.equal(b.toString('latin1', 12, 16), 'VP8X', f + ' carries alpha');
+    assert.deepEqual([1 + b.readUIntLE(24, 3), 1 + b.readUIntLE(27, 3)], size, f + ' size');
+  }
+  assert.ok(total < 260 * 1024, 'passport art stays small: ' + total + ' bytes');
+  // the client must use the sprite with the same cell counts
+  const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
+  const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
+  assert.equal(count('PP_STAMPS'), 16);
+  assert.equal(count('PP_ICONS'), 12);
+  assert.ok(existsSync(new URL('../games/fren-passport/source/passport-mockup.webp', import.meta.url)), 'lossless source art is kept');
+});

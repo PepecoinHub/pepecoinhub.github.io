@@ -158,7 +158,7 @@ try {
     assert.equal(passportCalls().length, 1); assert.equal(passportCalls()[0].fn, 'gry_passport_state');
     assert.equal(await page.textContent(P + ' .pp-make'), 'Create your Fren');
     assert.equal(await page.getAttribute(P + ' .pp-photo > img', 'src'), 'img/pep-logo.webp');
-    assert.match(await page.textContent(P + ' .pp-idcard dd'), /PondTester/);
+    assert.match(await page.textContent(P + ' .pp-idrow.is-nick dd'), /PondTester/);
     const fresh = await page.locator(P + ' .pp-stamp', { hasText: 'Fresh Fren' }).textContent();
     assert.match(fresh, /Locked/);
     assert.match(await page.textContent(P + ' .pp-mythic-name'), /BALI/);
@@ -382,6 +382,23 @@ try {
     }
     await page.click(AD + ' .ad-frenbtn');
     await page.waitForSelector(maker + ' .fa');
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  });
+  await step('PEP-TV ad fren_passport.mpg plays and its button opens the Passport booklet', async () => {
+    const { page, errors, ctx } = await newPage({ user: 1, name: 'PondTester' });
+    await page.click('.start'); await page.getByRole('button', { name: /Find/ }).click();
+    await page.fill('.find-in', 'fren_passport'); await page.press('.find-in', 'Enter');
+    const AD = '.app-win[aria-label="fren_passport.mpg - Pond Media Player"]';
+    await page.waitForSelector(AD);
+    await page.click(AD + ' .ptv-play');
+    for (let i = 1; i <= 4; i++) {
+      await page.waitForTimeout(450);
+      await shot(page, '15-pass-ad-scene-' + i, { clip: await page.locator(AD).boundingBox() });
+      if (i < 4) await page.click(AD + ' .ptv-next');
+    }
+    await page.click(AD + ' .ad-passbtn');
+    await page.waitForSelector('.app-win[aria-label="Fren Passport - Properties"] .pp-page-art');
     assert.deepEqual(errors, []);
     await ctx.close();
   });
