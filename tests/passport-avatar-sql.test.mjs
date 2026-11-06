@@ -139,7 +139,7 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     // --- reserved/unlock ids: valid manifest ids, but NOT saveable this stage. Each is rejected
     //     with 'Unknown avatar option' and writes nothing (no avatar row, no Fresh Fren).
     const reserved = [
-      look('bg_sunset', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none'),            // bg_sunset -> moon_fren
+      look('bg_sunset', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none'),            // bg_sunset -> yeet_adept
       look('bg_none', 'clothing_suit', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none'),              // clothing_suit -> detective_fren
       look('bg_none', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_hardhat', 'accessory_none'),           // hat_hardhat -> miner_fren
       look('bg_none', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_detective', 'accessory_none'),         // hat_detective -> detective_fren
