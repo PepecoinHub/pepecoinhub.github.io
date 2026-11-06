@@ -202,7 +202,11 @@
   .fa-group { grid-template-columns: 26px minmax(0, 1fr) 26px; }
   .fa-legend { grid-column: 1 / -1; font-size: 13px; }
   .fa-legend .fa-ico, .fa-rowicon.is-bg { width: 22px; height: 22px; }
-  .fa-actions { position: sticky; bottom: 0; z-index: 1; padding: 6px 0; background: #0f2e1d; gap: 6px; }
+  /* the buttons stay on screen while the part rows scroll: the footer box dissolves, so the button row
+     is a direct grid item of the whole maker (a sticky box only sticks inside its own parent) */
+  .fa-foot { display: contents; }
+  .fa-actions { position: sticky; bottom: 0; z-index: 3; margin: 0 -8px; padding: 6px 8px; background: #0f2e1d;
+    gap: 6px; box-shadow: 0 -2px 0 #3c6b4c, 0 -8px 10px -6px #000; }
   .fa-actions .app-btn { min-height: 44px; font-size: 12.5px; gap: 4px; padding: 4px; }
   .fa-actions .app-btn .fa-ico { width: 22px; height: 22px; }
 }

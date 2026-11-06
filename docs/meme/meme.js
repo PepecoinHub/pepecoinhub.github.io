@@ -1574,10 +1574,10 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261106stamps1';
+  var PP_CATALOG = 'passport-catalog.json?v=20261106stamps2';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106mk1'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106stamps2'}));
     }
   }
   // one read: the server snapshot, plus two static files from this site (labels and avatar parts)
@@ -1604,11 +1604,11 @@
   // the stamp each achievement shows once earned; anything else falls back to its category
   // (stamps without their own drawing yet reuse the closest one)
   var PP_STAMP_OF = {
-    first_fren: 'duck', first_avatar: 'sprout', moonwalker: 'moon', ten_day_fren: 'calendar', certified_fren: 'handshake',
+    first_fren: 'duck', first_avatar: 'sprout', moonwalker: 'moon', like_it_here: 'calendar', welcome_back: 'duck', senior_editor: 'folders', certified_fren: 'handshake',
     pond_pioneer: 'handshake', sharp_eye: 'magnifier', week_scout: 'binoculars', first_words: 'people', hey_fren: 'people',
     dear_editor: 'computer', junior_editor: 'folders', rookie_miner: 'pickaxe',
     hundred_day_fren: 'handshake', community_fren: 'people', curious_fren: 'magnifier', pepe_guesser: 'binoculars',
-    scout_fren: 'binoculars', detective_fren: 'deerstalker', frog_detective: 'deerstalker', miner_fren: 'pickaxe',
+    scout_fren: 'binoculars', detective_fren: 'deerstalker', miner_fren: 'pickaxe',
     gamer_fren: 'gamepad', game_night: 'computer', arcade_hopper: 'joystick', game_collector: 'joystick',
     collector: 'folders', trophy_shelf: 'folders', yeet_adept: 'rocket', nasa_is_hiring: 'rocket', no_panic: 'rocket',
     first_hatch: 'sprout', frog_mail_reader: 'computer'
@@ -1685,18 +1685,24 @@
         function shown(x, e) { return e || x.status==='live' || x.id===MYTHIC_ID; }
         function nameOf(x, e) { return shown(x, e) ? (x.title||x.id) : '???'; }
         function stateOf(x) { return x.status!=='live' ? 'Coming soon' : x.limited ? 'Closed' : 'Locked'; }
-        // the server's own counters (gry_passport_state.progress) for the stamps that have a count
+        // the server's own counters (gry_passport_state.progress) for the stamps that have a count:
+        // [now, goal, what is still missing]. Letters and chat have no counter on purpose, so nobody is
+        // nudged to spam the editor or the lobby; those stamps can still be earned.
         var P = state.progress || {};
         var num = function(v){ return typeof v === 'number' && isFinite(v) ? v : 0; };
+        var more = function(n, one, many){ return fmt.int(n) + ' more ' + (n === 1 ? one : many); };
         var PROG = {
-          moonwalker: [yeetBest || 0, 6000, ' m'], nasa_is_hiring: [num(P.yeet_5k_flights), 3, ' flights'],
-          sharp_eye: [num(P.wp_perfect_days), 1, ''], detective_fren: [num(P.wp_perfect_days), 5, ' perfect days'],
-          frog_detective: [num(P.wp_days), 10, ' days'], week_scout: [num(P.wp_streak), 7, ' days in a row'],
-          scout_fren: [num(P.wp_streak), 14, ' days in a row'], community_fren: [num(P.chat_days), 5, ' days'],
-          dear_editor: [num(P.letters), 1, ''], junior_editor: [num(P.letters), 5, ' letters'],
-          ten_day_fren: [num(P.login_streak), 10, ' days in a row'],
-          rookie_miner: [num(P.miner_minutes), 10, ' min'], miner_fren: [num(P.miner_minutes), 60, ' min']
+          moonwalker: [yeetBest || 0, 6000, function(n){ return fmt.int(Math.ceil(n)) + ' m to go'; }],
+          nasa_is_hiring: [num(P.yeet_5k_flights), 3, function(n){ return more(n, 'flight over 5000 m', 'flights over 5000 m'); }],
+          detective_fren: [num(P.wp_perfect_days), 5, function(n){ return more(n, 'perfect 5000', 'perfect 5000s'); }],
+          week_scout: [num(P.wp_streak), 7, function(n){ return more(n, 'day in a row', 'days in a row'); }],
+          scout_fren: [num(P.wp_streak), 14, function(n){ return more(n, 'day in a row', 'days in a row'); }],
+          like_it_here: [num(P.login_streak), 30, function(n){ return more(n, 'day in a row', 'days in a row'); }],
+          rookie_miner: [num(P.miner_minutes), 10, function(n){ return more(n, 'minute', 'minutes'); }],
+          miner_fren: [num(P.miner_minutes), 60, function(n){ return more(n, 'minute', 'minutes'); }]
         };
+        // never suggested as the next goal: closed stamps, one-day chances, and anything that could invite spam
+        var NOT_NEXT = { pond_pioneer: 1, welcome_back: 1, first_words: 1, hey_fren: 1, community_fren: 1, dear_editor: 1, junior_editor: 1, senior_editor: 1 };
         function openMaker() { avatarMaker(); }
         box.replaceChildren();
 
@@ -1755,7 +1761,7 @@
         // Next Milestone: the unearned LIVE stamp the player is closest to (catalog order breaks ties);
         // a progress bar only where the server state gives a true measure (PROG above).
         var near = function(x){ var p = PROG[x.id]; return p ? Math.min(p[0] / p[1], 0.999) : 0; };
-        var next = regular.filter(function(x){ return x.status==='live' && !x.limited && !earnedOf(x.id); })
+        var next = regular.filter(function(x){ return x.status==='live' && !x.limited && !NOT_NEXT[x.id] && !earnedOf(x.id); })
           .reduce(function(best, x){ return !best || near(x) > near(best) ? x : best; }, null);
         var soon = !next;
         var mile = el('section', {class:'pp-panel pp-mile'});
@@ -1766,7 +1772,7 @@
           var mt = el('div', {class:'pp-mile-text'});
           var head = el('p', {class:'pp-mile-title'}); head.appendChild(piece('strong','',next.title||next.id));
           var pg = PROG[next.id], prog = pg && pg[1] > 1 ? [Math.min(pg[0], pg[1]), pg[1], pg[2]] : null;
-          if (prog) head.appendChild(piece('span','pp-mile-n', fmt.int(Math.floor(prog[0]))+' / '+fmt.int(prog[1])+prog[2]));
+          if (prog) head.appendChild(piece('span','pp-mile-n', prog[2](prog[1] - prog[0])));
           mt.appendChild(head);
           mt.appendChild(piece('p','pp-mile-desc', next.description || 'A server-verified stamp.'));
           mb.appendChild(mt);
@@ -2361,7 +2367,7 @@
     'find the place on the map. Fast and close = more points.',
     '',
     '== HOW TO PLAY ==',
-    '1. Open WheresPepe.exe and press Start.',
+    '1. Open PepeGuesser.exe and press Start.',
     '   No account needed: a quick bot check, and you play',
     '   as a guest (or log on with Discord first).',
     '2. The photo shows up and the 2-minute clock starts.',
@@ -2430,9 +2436,9 @@
   }
   function wpFolder() {
     openApp('wp-folder', "C:\\Pond\\Where's Pepe", 'wp-folder', function (A) {
-      var F = [['WheresPepe.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme]];
+      var F = [['PepeGuesser.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme]];
       A.body.innerHTML = '<ul class="folder">' + F.map(function (f, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(f[1]) + '" alt="" width="40" height="40"><span>' + f[0] + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then double-click WheresPepe.exe.</p>';
+        '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then double-click PepeGuesser.exe.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { F[+b.getAttribute('data-i')][2](); };
         b.addEventListener('dblclick', go);
@@ -3087,15 +3093,15 @@
   }
   var ADS = [
     { file: 'pond_stamps.mpg', added: '2026-11-06', title: 'Stamps That Check Out', ch: 'CH 19 · POND POST OFFICE', icon: 'pep-logo', scenes: [
-      '<p class="ad-kick">Did your frog do anything today? Can you prove it?</p><h3 class="ad-big">Stamps that<br><em>check out!</em></h3><p class="ad-sub">Your Fren Passport now collects 19 stamps, each one from something the pond\'s own server saw you do.</p>',
-      '<p class="ad-kick">Guess where Pepe is. Chat in the lobby. Write to the editor. Mine for an hour.</p><h3 class="ad-big">The games <em>stamp</em><br>your passport!</h3><p class="ad-sub">Pepe Guesser, the LAN Party chat, letters to the editor, Pepe Miner, YEET THE PEP and 10 days in a row on PondOS. Your old Pepe Guesser games and letters count too.</p>',
+      '<p class="ad-kick">Did your frog do anything today? Can you prove it?</p><h3 class="ad-big">Stamps that<br><em>check out!</em></h3><p class="ad-sub">Your Fren Passport now collects 20 stamps, each one from something the pond\'s own server saw you do.</p>',
+      '<p class="ad-kick">Guess where Pepe is. Chat in the lobby. Write to the editor. Mine for an hour.</p><h3 class="ad-big">The games <em>stamp</em><br>your passport!</h3><p class="ad-sub">Pepe Guesser, the LAN Party chat, letters to the editor, Pepe Miner, YEET THE PEP and a month in a row on PondOS. Your old Pepe Guesser games and letters count too.</p>',
       '<div class="ad-frens">' + adFren('clothing_suit', 'mouth_smirk', 'eyes_classic', 'hat_detective', 'accessory_pin') + '</div><p class="ad-kick">Five perfect 5000s in Pepe Guesser?</p><h3 class="ad-big">Dress like a<br><em>detective!</em></h3><p class="ad-sub">Detective Fren opens the detective hat and the suit. Scout Fren opens the PEP pin. Miner Fren opens the hard hat.</p>',
       '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Here early?<br><em>Pond Pioneer!</em></h3><p class="ad-sub">Every account with Discord linked on launch day gets it. After that, the door closes.</p><p class="ad-fine">Not a real offer. Stamps are cosmetic: no PEP, no points, nothing to sell. Only what the server records counts. Log on with Discord to collect.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
     ] },
     { file: 'fren_passport.mpg', added: '2026-11-06', title: 'The Fren Passport', ch: 'CH 98 · POND TRAVEL AGENCY', icon: 'pep-logo', scenes: [
       '<p class="ad-kick">Tired of profiles that look like a spreadsheet?</p><h3 class="ad-big">Get a real<br><em>passport!</em></h3><p class="ad-sub">A hand-drawn paper booklet, with your Fren clipped in as the photo.</p>',
       '<img class="ad-pic" src="passport-assets/page-left.webp?v=20261106pp1" alt=""><p class="ad-kick">Fren ID. Nickname. Member since. All filled in from your Discord log-on.</p><h3 class="ad-big">No fake numbers.<br><em>Just you.</em></h3>',
-      '<img class="ad-pic" src="passport-assets/page-right.webp?v=20261106pp1" alt=""><p class="ad-kick">43 stamp slots. The pond checks every one on its own server.</p><h3 class="ad-big">Collect <em>stamps!</em></h3><p class="ad-sub">19 of them can be earned today, from what the games record. The rest say "coming soon" until they really work.</p>',
+      '<img class="ad-pic" src="passport-assets/page-right.webp?v=20261106pp1" alt=""><p class="ad-kick">44 stamp slots. The pond checks every one on its own server.</p><h3 class="ad-big">Collect <em>stamps!</em></h3><p class="ad-sub">20 of them can be earned today, from what the games record. The rest say "coming soon" until they really work.</p>',
       '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">One stamp says<br><em>$0.01 - BALI</em></h3><p class="ad-sub">It stays locked for every fren until Pepecoin reaches one cent. Then everybody gets it. Same day, same stamp.</p><p class="ad-fine">Not a real offer. No trip, no prize, no price prediction, no financial advice. Stamps are cosmetic: no PEP, no points, nothing to sell. Log on with Discord to open yours.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
     ] },
     { file: 'create_your_fren.mpg', added: '2026-11-05', title: 'Create Your Fren', ch: 'CH 64 · POND MAKEOVER HOUR', icon: 'fresh-fren', scenes: [

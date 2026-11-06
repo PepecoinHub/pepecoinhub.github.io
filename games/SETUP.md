@@ -122,7 +122,7 @@ an unknown id until such an achievement grants them.
 
 ### Fren Passport stamps (draft, not yet enabled)
 
-`games/supabase/update_passport_awards.sql` awards the 19 live stamps from the
+`games/supabase/update_passport_awards.sql` awards the live stamps from the
 games' own records. The rules, sources and tests are listed in
 `games/FREN_PASSPORT_ACHIEVEMENTS_DECISIONS_2026-11-06.md`. Order: after
 `update_fren_passport.sql` and `update_fren_avatar.sql`, on a database that
@@ -133,8 +133,8 @@ migrations. Safe to run twice.
   that has Discord linked at that moment; `games.passport_meta` makes sure later
   runs never add anyone.
 - It backfills Moonwalker, the Pepe Guesser stamps and the letter stamps from
-  existing records. Chat, YEET 3×5000 m, Miner time and 10 Day Fren count from
-  that day on.
+  existing records. Chat, YEET 3×5000 m, Miner time, Welcome Back! and the 30-day
+  run count from that day on.
 - It replaces `public.gry_yeet_submit` with the same body plus one hook line,
   and adds triggers on `games.wp_plays`, `games.lobby_chat`,
   `games.lobby_mentions`, `games.letters` and `games.miner_saves`. A failing hook

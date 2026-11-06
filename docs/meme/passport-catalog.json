@@ -25,6 +25,13 @@
       "status": "live"
     },
     {
+      "id": "welcome_back",
+      "title": "Welcome Back!",
+      "description": "Come back to PondOS on the day after your first visit (UTC days).",
+      "category": "community",
+      "status": "live"
+    },
+    {
       "id": "pepe_guesser",
       "title": "Pepe Guesser",
       "description": "Make your first Pepe Guesser guess with a pin on the map.",
@@ -42,13 +49,6 @@
       "id": "week_scout",
       "title": "Week Scout",
       "description": "Guess in Pepe Guesser on 7 days in a row (UTC days).",
-      "category": "where_pepe",
-      "status": "live"
-    },
-    {
-      "id": "frog_detective",
-      "title": "Frog Detective",
-      "description": "Guess in Pepe Guesser on 10 different days.",
       "category": "where_pepe",
       "status": "live"
     },
@@ -102,9 +102,16 @@
       "status": "live"
     },
     {
-      "id": "ten_day_fren",
-      "title": "10 Day Fren",
-      "description": "Open PondOS signed in with Discord on 10 days in a row (UTC days).",
+      "id": "senior_editor",
+      "title": "Senior Editor",
+      "description": "Send 10 letters to the editor.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "like_it_here",
+      "title": "Guess You Like It Here",
+      "description": "Open PondOS signed in with Discord on 30 days in a row (UTC days).",
       "category": "community",
       "status": "live"
     },
@@ -202,14 +209,14 @@
     {
       "id": "little_fren",
       "title": "Little Fren",
-      "description": "Help PepeGochi reach its first evolution.",
+      "description": "Come back to your PepeGochi on a second day: it grows into a froglet.",
       "category": "pepegachi",
       "status": "planned"
     },
     {
       "id": "grown_fren",
-      "title": "Grown Fren",
-      "description": "Help PepeGochi reach its adult stage.",
+      "title": "One Small Step",
+      "description": "Your PepeGochi grows up on its 7th care day. One small step for a man, one giant leap for a frog.",
       "category": "pepegachi",
       "status": "planned"
     },

@@ -375,6 +375,15 @@ try {
     assert.ok(m.winScroll <= 0, 'window scrolls sideways ' + JSON.stringify(m));
     assert.ok(m.stacked, 'preview above choices'); assert.ok(m.minOpt >= 44, 'option size ' + m.minOpt); assert.ok(m.minBtn >= 44, 'button ' + m.minBtn);
     assert.ok(m.right <= m.vw, 'option rows inside the screen (each row scrolls on its own)');
+    // the three buttons are on screen right away and stay there while the rows scroll
+    const onScreen = () => page.evaluate(sel => [...document.querySelectorAll(sel + ' .fa-actions .app-btn')].every(b => {
+      const r = b.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      return r.top >= 0 && r.bottom <= innerHeight && b.contains(document.elementFromPoint(x, y));
+    }), maker);
+    assert.ok(await onScreen(), 'buttons visible without scrolling');
+    await page.evaluate(sel => { document.querySelector(sel).scrollTop = 300; }, maker);
+    assert.ok(await onScreen(), 'buttons still visible half way down');
+    await page.evaluate(sel => { document.querySelector(sel).scrollTop = 0; }, maker);
     await shot(page, '12-phone-maker-top');
     await page.tap(`${maker} input[name="fa-clothing"][value="clothing_camo"] + .fa-thumb`);
     assert.equal((await lookOnPage(page)).clothing, 'clothing_camo');
@@ -398,27 +407,29 @@ try {
     const b = await page.waitForSelector('.balloon:has-text("new stamps")', { timeout: 8000 });
     assert.equal(checkins().length, 1); assert.deepEqual(checkins()[0].body, {});
     const text = await b.textContent();
-    for (const t of ['Pond Pioneer', 'Pepe Guesser', 'Sharp Eye', 'Detective Fren', 'Week Scout', 'Frog Detective', 'Scout Fren', 'Dear Editor'])
+    for (const t of ['Pond Pioneer', 'Pepe Guesser', 'Sharp Eye', 'Detective Fren', 'Week Scout', 'Scout Fren', 'Dear Editor'])
       assert.ok(text.includes(t), t + ' in ' + text);
-    assert.match(text, /^8 new stamps!/);
+    assert.match(text, /^7 new stamps!/);
     await shot(page, '16-stamps-balloon');
     const before = passportCalls().length;
     await b.click();
     await page.waitForSelector(P + ' .pp-book');
     assert.deepEqual(passportCalls().slice(before).map(c => c.fn), ['gry_passport_state']);
     // the booklet: the server's stamps, newest first; Next Milestone is the closest one with a real count
-    assert.equal(await page.locator(P + ' .pp-grid .pp-slot.is-earned').count(), 9, 'eight new + First Fren');
-    assert.match(await page.textContent(P + ' .pp-mile-title'), /Junior Editor\s*2 \/ 5 letters/);
-    assert.equal(await page.getAttribute(P + ' .pp-mile .pp-bar', 'aria-valuenow'), '2');
+    assert.equal(await page.locator(P + ' .pp-grid .pp-slot.is-earned').count(), 8, 'seven new + First Fren');
+    // letters are never suggested (no spam nudge); today's visit starts the 30-day run
+    assert.match(await page.textContent(P + ' .pp-mile-title'), /Guess You Like It Here\s*29 more days in a row/);
+    assert.equal(await page.getAttribute(P + ' .pp-mile .pp-bar', 'aria-valuenow'), '1');
     await shot(page, '17-stamps-passport');
     await page.click(P + ' [role=tab]:has-text("Stamps")');
     const album = await page.$$eval(P + ' .pp-album .pp-stamp', l => l.map(s => [s.querySelector('.pp-stamp-name').textContent, s.querySelector('.pp-stamp-sub').textContent]));
-    assert.equal(album.length, 43);
+    assert.equal(album.length, 44);
     const named = Object.fromEntries(album.filter(a => a[0] !== '???'));
-    assert.equal(Object.keys(named).length, 19, 'only the 19 live stamps are named');
+    assert.equal(Object.keys(named).length, 20, 'only the 20 live stamps are named');
+    assert.equal(named['Senior Editor'], 'Locked'); assert.equal(named['Welcome Back!'], 'Locked');
     assert.equal(named['Junior Editor'], 'Locked'); assert.equal(named['NASA Is Hiring'], 'Locked');
     assert.ok(album.filter(a => a[0] === '???').every(a => a[1] === 'Coming soon'));
-    assert.ok(!album.some(a => /Certified Fren|Adept|Gamer Fren|7 Day Fren/.test(a[0])), 'planned names stay hidden');
+    assert.ok(!album.some(a => /Certified Fren|Adept|Gamer Fren|7 Day Fren|10 Day Fren|Frog Detective|One Small Step/.test(a[0])), 'planned and removed names stay hidden');
     await shot(page, '18-stamps-album');
     // reload: the server already told this player, so no second notice
     await page.evaluate(k => sessionStorage.removeItem(k), 'pondos-checkin:' + uid(3));

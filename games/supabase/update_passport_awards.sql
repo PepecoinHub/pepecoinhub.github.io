@@ -28,19 +28,25 @@
 --   pepe_guesser    first Pepe Guesser guess with a pin on the map (Discord-verified play)
 --   sharp_eye       first perfect 5000
 --   detective_fren  5000 on five different puzzle days
---   frog_detective  a guess on ten different puzzle days
 --   week_scout      a guess on 7 puzzle days in a row (UTC)
 --   scout_fren      a guess on 14 puzzle days in a row (UTC)
---   ten_day_fren    PondOS opened signed in on 10 UTC days in a row (gry_passport_checkin)
+--   welcome_back    back in PondOS on the day after the first visit (gry_passport_checkin)
+--   like_it_here    PondOS opened signed in on 30 UTC days in a row (gry_passport_checkin)
 --   first_words     first lobby chat message
 --   community_fren  lobby chat on five different UTC days
 --   hey_fren        first @mention of another fren (games.lobby_mentions)
 --   dear_editor     first letter to the editor
 --   junior_editor   five letters to the editor
+--   senior_editor   ten letters to the editor
 --   rookie_miner    10 minutes of Pepe Miner, measured by the server between cloud saves
 --   miner_fren      one hour of Pepe Miner, measured the same way
 -- Pepe Guesser, letters and Moonwalker are backfilled from existing records. Chat history is kept only
 -- 24 h and YEET keeps only the best flight, so those stamps count from the day this file runs.
+--
+-- Stamps added later: everything a future stamp might count is kept from today on (PondOS days, chat
+-- days, letters, Miner seconds, every accepted YEET flight and every one over 5000 m, and all Pepe Guesser
+-- plays). A later migration can add a stamp with its own backfill from these records, so players keep
+-- the progress they already have.
 begin;
 
 -- ---------- storage ----------
@@ -70,13 +76,17 @@ create table if not exists games.passport_chat_days (
   day     date not null,
   primary key (user_id, day)
 );
--- counters the server keeps itself: letters sent, Pepe Miner seconds
+-- counters the server keeps itself: letters sent, Pepe Miner seconds, accepted YEET flights
 create table if not exists games.passport_progress (
   user_id       uuid primary key references auth.users(id) on delete cascade,
   letters       integer not null default 0 check (letters >= 0),
   miner_seconds integer not null default 0 check (miner_seconds >= 0),
-  miner_last_at timestamptz
+  miner_last_at timestamptz,
+  yeet_flights  integer not null default 0 check (yeet_flights >= 0),
+  yeet_5k_total integer not null default 0 check (yeet_5k_total >= 0)
 );
+alter table games.passport_progress add column if not exists yeet_flights integer not null default 0 check (yeet_flights >= 0);
+alter table games.passport_progress add column if not exists yeet_5k_total integer not null default 0 check (yeet_5k_total >= 0);
 alter table games.passport_meta enable row level security;
 alter table games.passport_yeet_5k enable row level security;
 alter table games.passport_days enable row level security;
@@ -90,8 +100,8 @@ create or replace function games.passport_award(u uuid, b text, at timestamptz d
 returns boolean language plpgsql volatile security definer set search_path = '' as $$
 begin
   if b is null or b not in ('pond_pioneer', 'moonwalker', 'nasa_is_hiring', 'pepe_guesser', 'sharp_eye',
-      'detective_fren', 'frog_detective', 'week_scout', 'scout_fren', 'ten_day_fren', 'first_words',
-      'community_fren', 'hey_fren', 'dear_editor', 'junior_editor', 'rookie_miner', 'miner_fren') then
+      'detective_fren', 'week_scout', 'scout_fren', 'welcome_back', 'like_it_here', 'first_words',
+      'community_fren', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'rookie_miner', 'miner_fren') then
     raise exception 'Unknown passport stamp %', b;
   end if;
   if u is null or games.discord_identity(u) is null then return false; end if;
@@ -108,6 +118,12 @@ returns void language plpgsql volatile security definer set search_path = '' as 
 declare kept integer;
 begin
   if p_score is null then return; end if;
+  -- every accepted flight is counted, for stamps that may be added later
+  insert into games.passport_progress (user_id, yeet_flights, yeet_5k_total)
+  values (u, 1, case when p_score > 50000 then 1 else 0 end)
+  on conflict (user_id) do update set
+    yeet_flights = games.passport_progress.yeet_flights + 1,
+    yeet_5k_total = games.passport_progress.yeet_5k_total + excluded.yeet_5k_total;
   if p_score >= 60000 then perform games.passport_award(u, 'moonwalker'); end if;
   if p_score <= 50000 then return; end if;
   -- the caller holds this player's games.yeet_records row lock, so flights are counted one at a time
@@ -184,14 +200,12 @@ begin
   select min(at) filter (where k = 1) as first_guess,
          min(at) filter (where k5 = 1) as first_perfect,
          min(at) filter (where k5 = 5) as five_perfect,
-         min(at) filter (where k = 10) as ten_days,
          min(at) filter (where run = 7) as run7,
          min(at) filter (where run = 14) as run14
     into r from s;
   if r.first_guess is not null then perform games.passport_award(u, 'pepe_guesser', r.first_guess); end if;
   if r.first_perfect is not null then perform games.passport_award(u, 'sharp_eye', r.first_perfect); end if;
   if r.five_perfect is not null then perform games.passport_award(u, 'detective_fren', r.five_perfect); end if;
-  if r.ten_days is not null then perform games.passport_award(u, 'frog_detective', r.ten_days); end if;
   if r.run7 is not null then perform games.passport_award(u, 'week_scout', r.run7); end if;
   if r.run14 is not null then perform games.passport_award(u, 'scout_fren', r.run14); end if;
 end
@@ -287,6 +301,7 @@ begin
       returning letters into n;
       if n >= 1 then perform games.passport_award(new.user_id, 'dear_editor', new.created_at); end if;
       if n >= 5 then perform games.passport_award(new.user_id, 'junior_editor', new.created_at); end if;
+      if n >= 10 then perform games.passport_award(new.user_id, 'senior_editor', new.created_at); end if;
     exception when others then
       raise warning 'passport letter hook: %', sqlerrm;
     end;
@@ -327,7 +342,7 @@ drop trigger if exists passport_miner_aiu on games.miner_saves;
 create trigger passport_miner_aiu after insert or update on games.miner_saves
   for each row execute function games.passport_miner_after();
 
--- ---------- PondOS visits: 10 Day Fren, and new-stamp notices ----------
+-- ---------- PondOS visits: Welcome Back!, Guess You Like It Here, and new-stamp notices ----------
 -- Called by PondOS (docs/meme/meme.js) when a Discord player opens a page. It writes one row per UTC day
 -- at most, and hands back the stamps the player has not been told about yet (each one only once).
 create or replace function public.gry_passport_checkin()
@@ -343,9 +358,14 @@ begin
   end if;
   insert into games.passport_days (user_id, day) values (u, today) on conflict (user_id, day) do nothing;
   if found then
-    -- days are unique, so ten rows in the last ten days are ten days in a row
-    select count(*) into n from games.passport_days where user_id = u and day > today - 10;
-    if n >= 10 then perform games.passport_award(u, 'ten_day_fren'); end if;
+    -- Welcome Back!: the first visit was yesterday, and this is the second one
+    if (select count(*) from games.passport_days where user_id = u) = 2
+       and exists (select 1 from games.passport_days where user_id = u and day = today - 1) then
+      perform games.passport_award(u, 'welcome_back');
+    end if;
+    -- days are unique, so 30 rows in the last 30 days are 30 days in a row
+    select count(*) into n from games.passport_days where user_id = u and day > today - 30;
+    if n >= 30 then perform games.passport_award(u, 'like_it_here'); end if;
   end if;
   -- Fresh Fren has its own notice in the Avatar Maker
   with shown as (
@@ -431,6 +451,8 @@ begin
   end loop;
   progress := jsonb_build_object(
     'yeet_5k_flights', (select count(*) from games.passport_yeet_5k f where f.user_id = u),
+    'yeet_5k_total', coalesce(pr.yeet_5k_total, 0),
+    'login_days', (select count(*) from games.passport_days x where x.user_id = u),
     'letters', coalesce(pr.letters, 0),
     'miner_minutes', coalesce(pr.miner_seconds, 0) / 60,
     'chat_days', (select count(*) from games.passport_chat_days c where c.user_id = u),
@@ -505,9 +527,9 @@ select l.user_id, count(*) from games.letters l
   join auth.users au on au.id = l.user_id
  where l.discord group by l.user_id
 on conflict (user_id) do nothing;
-select games.passport_award(l.user_id, case when l.k = 1 then 'dear_editor' else 'junior_editor' end, l.created_at)
+select games.passport_award(l.user_id, case l.k when 1 then 'dear_editor' when 5 then 'junior_editor' else 'senior_editor' end, l.created_at)
   from (select user_id, created_at, row_number() over (partition by user_id order by created_at, id) as k
           from games.letters where discord) l
- where l.k in (1, 5);
+ where l.k in (1, 5, 10);
 
 commit;

@@ -119,7 +119,7 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     assert.equal(+(await one("select earned_at from games.passport_badges where user_id = $1 and badge_id = 'moonwalker'", [uid(1)])),
       +(await one('select achieved_at from games.yeet_records where user_id = $1', [uid(1)])));
     assert.deepEqual((await stamps(1)).filter(s => !['pond_pioneer', 'moonwalker'].includes(s)),
-      ['frog_detective', 'pepe_guesser', 'scout_fren', 'sharp_eye', 'week_scout'], 'four perfect days are not five');
+      ['pepe_guesser', 'scout_fren', 'sharp_eye', 'week_scout'], 'four perfect days are not five');
     assert.deepEqual(await stamps(2), ['dear_editor', 'junior_editor', 'pond_pioneer'], 'a timeout without a pin is not a guess');
     assert.equal(await one('select letters from games.passport_progress where user_id = $1', [uid(2)]), 6);
     assert.deepEqual(await stamps(4), [], 'guests get nothing');
@@ -234,8 +234,14 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
       await db.query("update games.letters set created_at = created_at - interval '25 hours' where user_id = $1", [uid(3)]);
       await call(3, "select public.gry_letter_send('Another letter', '', '/meme/', false) as v");
     }
-    assert.ok(await has(3, 'junior_editor'));
-    assert.equal(await one('select letters from games.passport_progress where user_id = $1', [uid(3)]), 5);
+    assert.ok(await has(3, 'junior_editor')); assert.ok(!(await has(3, 'senior_editor')));
+    for (let k = 0; k < 5; k++) {
+      await db.query("update games.letters set created_at = created_at - interval '25 hours' where user_id = $1", [uid(3)]);
+      await call(3, "select public.gry_letter_send('Letter again', '', '/meme/', false) as v");
+      if (k === 3) assert.ok(!(await has(3, 'senior_editor')), 'nine letters');
+    }
+    assert.ok(await has(3, 'senior_editor'));
+    assert.equal(await one('select letters from games.passport_progress where user_id = $1', [uid(3)]), 10);
 
     // --- Pepe Miner: the server's own clock between saves at most 120 s apart
     const mine = u => call(u, "select public.gry_miner_save('{\"allTime\":1}'::jsonb, 1) as v");
@@ -255,38 +261,53 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     assert.ok(await has(3, 'miner_fren'));
     await assert.rejects(call(4, "select public.gry_miner_save('{}'::jsonb, 1) as v"), /Sign in with Discord/);
 
-    // --- 10 Day Fren and the one-time notices
+    // --- Welcome Back!, Guess You Like It Here (30 days in a row) and the one-time notices
     assert.deepEqual(await call(4, 'select public.gry_passport_checkin() as v'), { signed_in: false });
     const first = await call(2, 'select public.gry_passport_checkin() as v');
     assert.deepEqual(first.new_badges.map(b => b.id).sort(), ['dear_editor', 'junior_editor', 'pond_pioneer']);
     assert.deepEqual((await call(2, 'select public.gry_passport_checkin() as v')).new_badges, [], 'each notice once');
-    for (let back = 1; back <= 8; back++) await db.query("insert into games.passport_days values ($1, (now() at time zone 'utc')::date - $2::int)", [uid(6), back]);
+    const visit = (u, back) => db.query("insert into games.passport_days values ($1, (now() at time zone 'utc')::date - $2::int)", [uid(u), back]);
+    const notTodayVisit = u => db.query("delete from games.passport_days where user_id = $1 and day = (now() at time zone 'utc')::date", [uid(u)]);
+    for (let back = 1; back <= 28; back++) await visit(6, back);
     await call(6, 'select public.gry_passport_checkin() as v');
-    assert.ok(!(await has(6, 'ten_day_fren')), 'nine days');
-    await db.query("delete from games.passport_days where user_id = $1 and day = (now() at time zone 'utc')::date", [uid(6)]);
-    await db.query("insert into games.passport_days values ($1, (now() at time zone 'utc')::date - 9)", [uid(6)]);
-    const tenth = await call(6, 'select public.gry_passport_checkin() as v');
-    assert.ok(await has(6, 'ten_day_fren'));
-    assert.ok(tenth.new_badges.some(b => b.id === 'ten_day_fren'));
+    assert.ok(!(await has(6, 'like_it_here')), '29 days');
+    await notTodayVisit(6); await visit(6, 29);
+    const month = await call(6, 'select public.gry_passport_checkin() as v');
+    assert.ok(await has(6, 'like_it_here'));
+    assert.ok(month.new_badges.some(b => b.id === 'like_it_here'));
+    assert.ok(!(await has(6, 'welcome_back')), 'an old regular is not "back on day two"');
     // a gap breaks the run
-    for (const back of [1, 2, 3, 4, 6, 7, 8, 9, 10]) await db.query("insert into games.passport_days values ($1, (now() at time zone 'utc')::date - $2::int)", [uid(7), back]);
+    for (let back = 1; back <= 30; back++) if (back !== 5) await visit(7, back);   // 30 days, one missing
     await call(7, 'select public.gry_passport_checkin() as v');
-    assert.ok(!(await has(7, 'ten_day_fren')));
+    assert.ok(!(await has(7, 'like_it_here')));
+    // Welcome Back!: first visit yesterday, second today. Not on the first day, not after a gap, not on a third day.
+    await addUser(9); await addUser(10); await addUser(11);
+    await call(9, 'select public.gry_passport_checkin() as v');
+    assert.ok(!(await has(9, 'welcome_back')), 'first visit');
+    await notTodayVisit(9); await visit(9, 1);
+    await call(9, 'select public.gry_passport_checkin() as v');
+    assert.ok(await has(9, 'welcome_back'));
+    await visit(10, 3); await call(10, 'select public.gry_passport_checkin() as v');
+    assert.ok(!(await has(10, 'welcome_back')), 'came back after a gap');
+    await visit(11, 2); await visit(11, 1); await call(11, 'select public.gry_passport_checkin() as v');
+    assert.ok(!(await has(11, 'welcome_back')), 'third day');
 
     // --- the Passport read path: stored stamps once each, plus the server's own counters
     const st = await call(3, 'select public.gry_passport_state() as v');
     const ids = st.achievements.filter(a => a.earned_at).map(a => a.id);
     assert.equal(new Set(ids).size, ids.length, 'no duplicates');
     for (const id of ['first_fren', 'pond_pioneer', 'moonwalker', 'nasa_is_hiring', 'pepe_guesser', 'first_words', 'hey_fren',
-      'community_fren', 'dear_editor', 'junior_editor', 'rookie_miner', 'miner_fren']) assert.ok(ids.includes(id), id);
-    assert.deepEqual(st.progress, { yeet_5k_flights: 3, letters: 5, miner_minutes: 60, chat_days: 5, login_streak: 0,
-      wp_days: 1, wp_perfect_days: 0, wp_streak: 1 });
+      'community_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'rookie_miner', 'miner_fren']) assert.ok(ids.includes(id), id);
+    assert.deepEqual(st.progress, { yeet_5k_flights: 3, yeet_5k_total: 5, letters: 10, miner_minutes: 60, chat_days: 5, login_streak: 0,
+      login_days: 0, wp_days: 1, wp_perfect_days: 0, wp_streak: 1 });
+    // every accepted flight is counted for later stamps (the rate-limited one is not)
+    assert.equal(await one('select yeet_flights from games.passport_progress where user_id = $1', [uid(3)]), 6);
     const s1 = await call(1, 'select public.gry_passport_state() as v');
     assert.equal(s1.progress.wp_days, 16); assert.equal(s1.progress.wp_perfect_days, 5);
     assert.equal(s1.progress.wp_streak, 1, 'today only: days 5..1 back were not played');
     assert.equal(s1.achievements.filter(a => a.id === 'moonwalker').length, 1);
     const s6 = await call(6, 'select public.gry_passport_state() as v');
-    assert.equal(s6.progress.login_streak, 10);
+    assert.equal(s6.progress.login_streak, 30); assert.equal(s6.progress.login_days, 30);
 
     // --- reward parts in the Avatar Maker: locked without the stamp, saveable with it
     const SAVE = 'select public.gry_passport_avatar_save($1, $2, $3, $4, $5, $6) as v';

@@ -25,7 +25,8 @@ test('every live stamp has a server award path, and only live stamps do', () => 
   // each allowed stamp is really awarded somewhere besides the allowlist
   const rest = sql.replace(award, '');
   for (const id of allowed) assert.match(rest, new RegExp("'" + id + "'"), id + ' has no award');
-  assert.ok(!catalog.achievements.some(x => x.id === 'seven_day_fren'), '7 Day Fren became 10 Day Fren');
+  for (const gone of ['seven_day_fren', 'ten_day_fren', 'frog_detective'])
+    assert.ok(!catalog.achievements.some(x => x.id === gone), gone + ' was removed');
 });
 
 test('awards come from game records, never from browser arguments', () => {
