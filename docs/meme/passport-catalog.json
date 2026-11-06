@@ -19,14 +19,14 @@
     {
       "id": "moonwalker",
       "title": "Moonwalker",
-      "description": "Record a 6000 m flight in YEET THE PEP. Moon Rock is a separate future reward.",
+      "description": "Record a flight of at least 6000 m in YEET THE PEP. Moon Rock is a separate future reward.",
       "category": "yeet",
       "status": "live"
     },
     {
       "id": "certified_fren",
       "title": "Certified Fren",
-      "description": "Log on to the pond on 100 distinct days. Server verified.",
+      "description": "Return to PondOS and complete at least one accepted signed-in interaction on 100 distinct UTC days (not necessarily consecutive). Server verified.",
       "category": "community",
       "status": "planned"
     },
@@ -61,7 +61,7 @@
     {
       "id": "scout_fren",
       "title": "Scout Fren",
-      "description": "Keep a 14 day Where's Pepe guessing streak. Server verified.",
+      "description": "Complete the daily Pepe Guesser hunt on 14 consecutive UTC days. Unlocks the PEP pin when server-verified.",
       "category": "where_pepe",
       "status": "planned"
     },
@@ -75,14 +75,14 @@
     {
       "id": "detective_fren",
       "title": "Detective Fren",
-      "description": "Crack a PondOS mystery case. Server verified.",
-      "category": "arcade",
+      "description": "Score a perfect 5000 points in five distinct daily Pepe Guesser hunts. Unlocks the detective hat and suit when server-verified.",
+      "category": "where_pepe",
       "status": "planned"
     },
     {
-      "id": "moon_fren",
-      "title": "Moon Fren",
-      "description": "Reach the moon in YEET THE PEP. Server verified.",
+      "id": "yeet_adept",
+      "title": "Adept",
+      "description": "Reach at least 3000 m in YEET THE PEP. Unlocks the Sunset avatar background once server-verified achievements go live.",
       "category": "yeet",
       "status": "planned"
     },
@@ -180,7 +180,7 @@
     {
       "id": "nasa_is_hiring",
       "title": "NASA Is Hiring",
-      "description": "Reach 6000 m in YEET three separate times.",
+      "description": "Record three separate YEET flights each exceeding 5000 m (strictly greater than 5000 m). Server-verified qualifying flights required.",
       "category": "yeet",
       "status": "planned"
     },
@@ -194,7 +194,7 @@
     {
       "id": "frog_detective",
       "title": "Frog Detective",
-      "description": "Find Pepe in ten different daily photo hunts.",
+      "description": "Complete Pepe Guesser hunts on ten different UTC days. Separate from perfect-score Detective Fren and streak-based Scout Fren.",
       "category": "where_pepe",
       "status": "planned"
     },
@@ -248,9 +248,9 @@
       "status": "planned"
     },
     {
-      "id": "hundred_year_fren",
-      "title": "Hundred Day Fren",
-      "description": "Reach 100 days as a registered Fren.",
+      "id": "hundred_day_fren",
+      "title": "100 Days Together",
+      "description": "Reach 100 days since your Discord Fren account was registered. Account age, not active days.",
       "category": "community",
       "status": "planned"
     },
