@@ -43,7 +43,10 @@ CONNECT = ['\'self\'', SUPA, 'wss://azbwciqfbsdpwubznncg.supabase.co',
 # Executable scripts loaded by <script src>: self + goatcounter counter.
 SCRIPT_HOSTS = ['\'self\'', 'https://gc.zgo.at']
 IMG = ['\'self\'', 'data:', 'blob:', 'https://gc.zgo.at',
-       'https://pepecoinhub.goatcounter.com']
+       'https://pepecoinhub.goatcounter.com',
+       # Leaflet map tiles for Pepe Guesser (Where's Pepe). Tiles are <img>, so
+       # they need img-src, not connect-src. Esri is primary, OSM is fallback.
+       'https://tile.openstreetmap.org', 'https://server.arcgisonline.com']
 STYLE = ['\'self\'', '\'unsafe-inline\'', 'https://fonts.googleapis.com']
 FONT = ['\'self\'', 'https://fonts.gstatic.com']
 
