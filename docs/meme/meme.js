@@ -72,7 +72,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; return 'img/ico/' + n + '.webp'; }
   function icoFrom(src) { var m = /^img\/([\w-]+)\.webp$/.exec(src || ''); return m ? ico(m[1]) : src; }
   function json(name) {
     if (!cache[name]) cache[name] = fetch(DATA + name, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(name + ' ' + r.status); return r.json(); });
@@ -734,10 +734,11 @@
       ['play', [['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
         ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads']]],
       ['pond', [['./', 'My Pond', 'pep-logo'], ['#shop', 'Shop', 'shop-bag'], ['#mail', 'Write a letter', 'frog-mail']]],
-      ['nerds', [['#nerds', 'NERDS ONLY', 'nerds-folder']]],
+      // the community: our subreddit and the official Pepecoin account (the classic bird), next to NERDS ONLY above the taskbar
+      ['nerds', [['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#reddit', 'r/pepecoin', 'reddit'], ['#twitter', 'Twitter', 'twitter-bird']]],
       ['bin', [['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
-    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -2288,7 +2289,7 @@
       '<p class="gz-fine">Heard on Discord, not confirmed by CoinEx. Not financial advice. The frog still does not know wen moon.</p></section>' +
       '<section class="gz-pollsec"><p class="gz-flash gz-new">New! Pond Poll</p><h4>Do you like polls?</h4>' +
       '<div class="gz-poll" data-poll="like_polls" aria-live="polite"><p class="gz-poll-msg">Opening the ballot box…</p></div>' +
-      '<p class="gz-fine">Yes, this is a test poll. It is open for 2 days. One vote per Discord account, and a vote is final. You see the results after you vote; everyone sees them when the poll closes.</p></section>' +
+      '<p class="gz-fine">Yes, this is a test poll. It is open for 2 days. Everyone can vote, Discord players and guests: one vote each, and a vote is final. You see the results after you vote; everyone sees them when the poll closes.</p></section>' +
       '<p class="gz-foot">*Almost weekend: issue #5 lands on a Friday. The next one comes when it is ready.</p></article>';
   }
   // Pond Poll in the Gazette (games/supabase/update_polls.sql): the server counts; the page only shows its answer
@@ -2310,24 +2311,25 @@
           return '<li' + (o.id === p.my_choice ? ' class="mine"' : '') + '><b>' + esc(o.label) + (o.id === p.my_choice ? ' ✓' : '') + '</b><span class="gz-bar"><i style="width:' + pc + '%"></i></span><span>' + pc + '% (' + fmt.int(n) + ')</span></li>';
         }).join('') + '</ul>';
         if (p.my_choice) html += '<p class="gz-poll-msg">Thanks for voting, fren.</p>';
-      } else if (p.can_vote) {
-        html += '<div class="app-row gz-votes">' + p.options.map(function (o) { return '<button type="button" class="app-btn go gz-vote" data-c="' + esc(o.id) + '">' + esc(o.label) + '</button>'; }).join('') + '</div>';
       } else if (p.open) {
-        var me = sbSession();
-        html += me && me.discord ? '<p class="gz-poll-msg">Your vote is in.</p>' : '<div class="app-row"><button type="button" class="app-btn go gz-pollon">Log on with Discord to vote</button></div>';
+        // everyone votes: with no session yet, a click makes a guest player first (one quick bot check)
+        html += '<div class="app-row gz-votes">' + p.options.map(function (o) { return '<button type="button" class="app-btn go gz-vote" data-c="' + esc(o.id) + '">' + esc(o.label) + '</button>'; }).join('') + '</div>';
+        if (!anySession()) html += '<p class="gz-poll-msg">No account needed: your vote starts a guest log-on with a quick bot check.</p>';
       }
       box.innerHTML = html;
       box.querySelectorAll('.gz-vote').forEach(function (b) {
         b.addEventListener('click', function () {
           box.querySelectorAll('.gz-vote').forEach(function (x) { x.disabled = true; });
-          rpc('gry_poll_vote', { p_poll: id, p_choice: b.getAttribute('data-c') }).then(show, function (e) {
-            say(/closed/i.test(e.message || '') ? 'This poll is closed.' : /Discord/.test(e.message || '') ? 'Log on with Discord to vote.' : 'Your vote did not go through. Try again in a moment.');
-          });
+          var c = b.getAttribute('data-c');
+          freshSession().then(function (s) { if (s) return s; say('Quick bot check…'); return guestSignIn(); })
+            .then(function () { return chatRpc('gry_poll_vote', { p_poll: id, p_choice: c }); }).then(show, function (e) {
+              var m = (e && e.message) || '';
+              say(/closed/i.test(m) ? 'This poll is closed.' : /network has already voted/.test(m) ? esc(m) : /guest player|captcha|bot/i.test(m) ? 'The bot check did not pass. Try again, or log on with Discord.' : 'Your vote did not go through. Try again in a moment.');
+            });
         });
       });
-      var lo = box.querySelector('.gz-pollon'); if (lo) lo.addEventListener('click', logOn);
     };
-    rpc('gry_poll', { p_poll: id }).then(show, function () { say('The ballot box opens soon. Come back in a bit.'); });
+    wpRpc('gry_poll', { p_poll: id }).then(show, function () { say('The ballot box opens soon. Come back in a bit.'); });
   }
   function frogMail(view) {
     try { localStorage.setItem(MAIL_KEY, String(MAIL_ISSUE)); } catch (e) {}
@@ -2583,12 +2585,6 @@
   // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
   // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
   var ADS = [
-    { file: 'pond_poll.mpg', added: '2026-11-06', title: 'The Pond Poll', ch: 'CH 5 · POND ELECTION NIGHT', icon: 'frog-mail', scenes: [
-      '<p class="ad-kick">Tired of nobody asking what YOU think?</p><h3 class="ad-big">The pond wants<br>your <em>vote!</em></h3>',
-      '<p class="ad-kick">New in The Pond Gazette #5</p><h3 class="ad-big">The <em>Pond Poll</em></h3><p class="ad-sub">One question. One click. One vote per Discord account, and the server counts every one.</p>',
-      '<p class="ad-kick">This week\'s burning question:</p><h3 class="ad-big">Do you like<br><em>polls?</em></h3><p class="ad-sub">Yes, it is a test poll. It closes in 2 days. Results show the moment you vote.</p>',
-      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Vote now,<br>see it <em>live!</em></h3><p class="ad-fine">Not a real offer. No prize, no PEP, no election to win. Log on with Discord to vote; guests can read the results when the poll closes.</p><button type="button" class="ad-cta ad-gzbtn">Open The Pond Gazette →</button>'
-    ] },
     { file: 'frogageddon.mpg', added: '2026-11-05', title: 'FROGAGEDDON: frog artillery', ch: 'CH 2000 · FREN SOFTWARE LATE NIGHT', icon: 'pondwars', scenes: [
       '<img class="ad-hero" src="../games/img/pondwars/title.jpg" alt=""><p class="ad-kick">Small frogs. Big grudges. Questionable footwear.</p><h3 class="ad-big">FROG<em>AGEDDON</em><br>is here!</h3>',
       '<p class="ad-kick">Turn-based frog artillery on a destructible pond.</p><h3 class="ad-big">Nine weapons.<br><em>Exploding toes.</em></h3><p class="ad-sub">Bazooka, grenades, land mines, a grapple rope and a jetpack. Pick your team, pick your map, then flatten the other frogs.</p>',
@@ -2714,7 +2710,6 @@
       if (lap && window.PepPrices) window.PepPrices.quote().then(function (q) { if (q && q.usd != null) lap.textContent = fmt.usd(40e6 * q.usd); }).catch(function () {});
       var lb = A.body.querySelector('.ad-lapbtn'); if (lb) lb.addEventListener('click', function () { laptop(); });
       var wb = A.body.querySelector('.ad-wpbtn'); if (wb) wb.addEventListener('click', function () { wheresPepe(); });
-      var gzb = A.body.querySelector('.ad-gzbtn'); if (gzb) gzb.addEventListener('click', function () { frogMail(); });
       var yb = A.body.querySelector('.ad-yeetbtn'); if (yb) yb.addEventListener('click', function () { yeetApp(); });
       var lnb = A.body.querySelector('.ad-lanbtn'); if (lnb) lnb.addEventListener('click', function () { lanParty(); });
       var mlb = A.body.querySelector('.ad-mailbtn'); if (mlb) mlb.addEventListener('click', function () { frogMail('write'); });
@@ -2962,15 +2957,6 @@
         '<svg viewBox="0 0 24 20" width="22" height="18" aria-hidden="true"><path class="mb-post" d="M11 13h2v7h-2z"/><path class="mb-box" d="M3 6a5 5 0 0 1 10 0v7H3zM8 1h8a5 5 0 0 1 5 5v7H13V6a5 5 0 0 0-5-5z"/><path class="mb-flag" d="M18 3h1v7h-1zM19 3h4l-1.5 1.5L23 6h-4z"/></svg><span class="mail-new mail-badge" hidden>1</span>');
       mb.addEventListener('click', frogMail);
       trayEl2.insertBefore(mb, trayEl2.firstChild);
-      // the community links: our subreddit and the official Pepecoin account (with the classic bird)
-      [['https://www.reddit.com/r/pepecoin/', 'r/pepecoin on Reddit', 'tray-reddit',
-        '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="#ff4500"/><circle cx="14.6" cy="4.4" r="1.4" fill="#fff"/><path d="M10.4 6.2l.9-3.3 3.2.8" fill="none" stroke="#fff" stroke-width="1"/><ellipse cx="10" cy="11.6" rx="6" ry="4.1" fill="#fff"/><circle cx="4.6" cy="9.4" r="1.5" fill="#fff"/><circle cx="15.4" cy="9.4" r="1.5" fill="#fff"/><circle cx="7.6" cy="11" r="1.05" fill="#ff4500"/><circle cx="12.4" cy="11" r="1.05" fill="#ff4500"/><path d="M7.4 13.4q2.6 1.7 5.2 0" fill="none" stroke="#111" stroke-width=".8" stroke-linecap="round"/></svg>'],
-       ['https://x.com/PepecoinNetwork', 'Pepecoin on Twitter: @PepecoinNetwork', 'tray-bird',
-        '<svg viewBox="0 0 24 20" width="20" height="17" aria-hidden="true"><path fill="#1da1f2" d="M23.6 2.4c-.9.4-1.8.6-2.8.8 1-.6 1.8-1.5 2.1-2.7-.9.6-2 1-3.1 1.2A4.9 4.9 0 0 0 11.5 6C7.4 5.8 3.8 3.8 1.4.9.1 3.1.8 5.9 2.9 7.3c-.8 0-1.6-.2-2.2-.6 0 2.4 1.7 4.4 3.9 4.8-.7.2-1.5.2-2.2.1.6 2 2.4 3.4 4.6 3.4A9.9 9.9 0 0 1 0 17.1 13.9 13.9 0 0 0 7.5 19.3c9.1 0 14-7.5 14-14v-.6c1-.7 1.8-1.5 2.1-2.3z"/></svg>']
-      ].forEach(function (x) {
-        var a = el('a', { class: 'tray-social ' + x[2], href: x[0], target: '_blank', rel: 'noopener', title: x[1], 'aria-label': x[1] }, x[3]);
-        trayEl2.insertBefore(a, mb);
-      });
       paintMail();
       if (!mailRead()) setTimeout(function () { if (!mailRead()) balloon('You\u2019ve got frog mail!', 'The Pond Gazette #5 is in your mailbox, with the first Pond Poll. Click the mailbox in the corner.', 'frog-mail'); }, 17000);
     }

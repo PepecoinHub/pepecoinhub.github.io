@@ -10,7 +10,7 @@ import { readFile } from 'node:fs/promises';
 const URL_ENV = process.env.PASSPORT_PG_URL, MOD_ENV = process.env.PASSPORT_PG_MODULE;
 const read = p => readFile(new URL('../' + p, import.meta.url), 'utf8');
 
-test('Gazette polls: Discord-only, one final vote, counts hidden until you vote or it closes',
+test('Gazette polls: everyone votes once (guests once per network), counts hidden until you vote or it closes',
   { skip: !(URL_ENV && MOD_ENV) && 'set PASSPORT_PG_URL and PASSPORT_PG_MODULE', timeout: 120000 }, async () => {
   const pg = (await import(MOD_ENV)).default;
   const admin = new pg.Client({ connectionString: URL_ENV }); await admin.connect();
@@ -29,6 +29,8 @@ test('Gazette polls: Discord-only, one final vote, counts hidden until you vote 
       grant usage on schema public, auth, games to anon, authenticated;`);
     const schema = await read('games/supabase/schema.sql');
     await db.query(schema.match(/create or replace function games\.discord_identity\(u uuid\)[\s\S]*?\n\$\$;/)[0]);
+    await db.query("create table games.config (id int primary key, host_code_salt text not null); insert into games.config values (1, 'test-salt')");
+    await db.query(schema.match(/create or replace function games\.client_ip_hash\(\)[\s\S]*?\nend \$\$;/)[0]);
     const sql = await read('games/supabase/update_polls.sql');
     await db.query(sql);
     const closes = (await db.query("select closes_at from games.polls where id = 'like_polls'")).rows[0].closes_at;
@@ -37,13 +39,16 @@ test('Gazette polls: Discord-only, one final vote, counts hidden until you vote 
     assert.ok(+closes - Date.now() > 47.9 * 3600e3 && +closes - Date.now() <= 48 * 3600e3, 'closes in 2 days');
 
     const uid = i => '00000000-0000-4000-8000-' + String(i).padStart(12, '0');
-    for (const i of [1, 2, 3, 4]) await db.query('insert into auth.users values ($1)', [uid(i)]);
-    for (const i of [1, 2, 3]) await db.query("insert into auth.identities values ($1, 'discord', $2)", [uid(i), 'd' + i]);   // 4 is a guest
+    for (const i of [1, 2, 3, 4, 5, 6, 7]) await db.query('insert into auth.users values ($1)', [uid(i)]);
+    for (const i of [1, 2, 3]) await db.query("insert into auth.identities values ($1, 'discord', $2)", [uid(i), 'd' + i]);   // 4-7 are guests
+    // the network each request comes from (PostgREST passes the headers to the database)
+    const NET = { 1: '1.1.1.1', 2: '2.2.2.2', 3: '9.9.9.9', 4: '9.9.9.9', 5: '9.9.9.9', 6: '6.6.6.6', 7: null };
     const call = async (user, q, args = [], role = 'authenticated') => {
       await db.query('begin');
       try {
         await db.query('set local role ' + role);
         await db.query("select set_config('request.jwt.claim.sub', $1, true)", [user ? uid(user) : '']);
+        await db.query("select set_config('request.headers', $1, true)", [user && NET[user] ? JSON.stringify({ 'cf-connecting-ip': NET[user] }) : '{}']);
         const r = await db.query(q, args); await db.query('commit'); return r.rows[0] && r.rows[0].v;
       } catch (e) { await db.query('rollback'); throw e; }
     };
@@ -58,8 +63,8 @@ test('Gazette polls: Discord-only, one final vote, counts hidden until you vote 
     assert.equal((await view(null, 'anon')).can_vote, false);
     assert.equal(await call(1, "select public.gry_poll('nope') as v"), null);
 
-    // guests, anon and bad answers cannot vote
-    await assert.rejects(vote(4, 'yes'), /Log on with Discord/);
+    // visitors without any session and bad answers cannot vote
+    assert.equal((await view(4)).can_vote, true, 'guests can vote');
     await assert.rejects(call(null, "select public.gry_poll_vote('like_polls', 'yes') as v", [], 'anon'), /permission denied/);
     await assert.rejects(vote(1, 'maybe'), /Unknown answer/);
     await assert.rejects(vote(1, null), /Unknown answer/);
@@ -77,14 +82,21 @@ test('Gazette polls: Discord-only, one final vote, counts hidden until you vote 
     await vote(2, 'no'); await vote(3, 'yes');
     assert.equal((await view(4)).show_results, false, 'not voted, still open: no counts');
     assert.deepEqual((await view(2)).options.map(o => o.votes), [2, 1]);
+    // guests: one vote each, and one guest vote per network (a Discord player on that network does not count)
+    const g = await vote(4, 'no');
+    assert.equal(g.my_choice, 'no'); assert.deepEqual(g.options.map(o => o.votes), [2, 2]);
+    await assert.rejects(vote(5, 'yes'), /A guest on your network has already voted/);
+    assert.equal((await vote(4, 'yes')).my_choice, 'no', 'a guest vote is final too');
+    assert.equal((await vote(6, 'yes')).my_choice, 'yes', 'another network');
+    await assert.rejects(vote(7, 'yes'), /Log on with Discord/, 'a guest with no known network cannot vote');
+    const rows = (await db.query("select user_id, verified, ip_hash is not null as has_ip from games.poll_votes order by user_id")).rows.map(r => [r.verified, r.has_ip]);
+    assert.deepEqual(rows, [[true, false], [true, false], [true, false], [false, true], [false, true]], 'Discord votes keep no network hash');
 
     // closed: no more votes, results for everyone (guests and visitors too)
     await db.query("update games.polls set opens_at = now() - interval '3 days', closes_at = now() - interval '1 minute' where id = 'like_polls'");
-    await assert.rejects(vote(4, 'yes'), /Log on with Discord/);
-    await db.query("insert into auth.identities values ($1, 'discord', 'd4')", [uid(4)]);
-    await assert.rejects(vote(4, 'yes'), /closed/);
+    await assert.rejects(vote(5, 'yes'), /closed/);
     const closed = await view(null, 'anon');
-    assert.equal(closed.open, false); assert.equal(closed.total, 3); assert.deepEqual(closed.options.map(o => o.votes), [2, 1]);
+    assert.equal(closed.open, false); assert.equal(closed.total, 5); assert.deepEqual(closed.options.map(o => o.votes), [3, 2]);
 
     // grants and definer settings
     const priv = (await db.query(`select
@@ -95,7 +107,7 @@ test('Gazette polls: Discord-only, one final vote, counts hidden until you vote 
     assert.deepEqual(priv, { anon_read: true, anon_vote: false, helper: false, cfg: ['search_path=""'] });
     // deleting an account removes its vote
     await db.query('delete from auth.users where id = $1', [uid(2)]);
-    assert.deepEqual((await view(null, 'anon')).options.map(o => o.votes), [2, 0]);
+    assert.deepEqual((await view(null, 'anon')).options.map(o => o.votes), [3, 1]);
   } finally {
     await db.end().catch(() => {});
     await admin.query('drop database if exists ' + dbName + ' with (force)').catch(() => {});

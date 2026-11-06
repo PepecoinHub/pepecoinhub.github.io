@@ -1502,7 +1502,3 @@ footer.foot a { color: #edf3e3; }
 .gz-discord { background: #313338; color: #dbdee1; }
 .gz-discord .gz-rd-title { font-weight: 400; }
 
-/* tray: Reddit and the classic bird, next to the mailbox */
-.pondos .tray-social { display: inline-flex; align-items: center; height: 22px; padding: 0 3px; }
-.pondos .tray-social:hover svg, .pondos .tray-social:focus-visible svg { transform: translateY(-1px); }
-.pondos .tray-social:focus-visible { outline: 1px dotted currentColor; }

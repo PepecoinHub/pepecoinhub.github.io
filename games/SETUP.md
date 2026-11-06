@@ -45,7 +45,7 @@ Quiz dnia z nagrodą (logowanie Discordem, jeden adres PEP na konto, limit dzien
 
 Run `games/supabase/update_polls.sql` once in the Supabase SQL editor, **at the moment the Gazette issue with the poll goes live**: the first poll (`like_polls`, "Do you like polls?") closes 2 days after the first run. Safe to run again (the closing time does not move).
 
-- One vote per Discord account per poll, final. Guests cannot vote; everyone sees the results once a poll closes, a voter sees them right after voting.
+- Everyone votes: one vote per account per poll (Discord or guest), final; guests also one vote per network per poll. A voter sees the results right after voting, everyone once a poll closes.
 - A new poll is one insert: `insert into games.polls (id, question, options, closes_at) values ('my_poll', 'Question?', '[{"id": "a", "label": "A"}, {"id": "b", "label": "B"}]', now() + interval '3 days');` and a `<div class="gz-poll" data-poll="my_poll">` in the Gazette issue.
 - Until the SQL is run, the Gazette shows "The ballot box opens soon".
 - Test: `tests/polls-sql.test.mjs` (real PostgreSQL, `PASSPORT_PG_URL` / `PASSPORT_PG_MODULE`).
