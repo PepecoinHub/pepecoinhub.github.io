@@ -2213,7 +2213,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 4, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 5, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -2270,6 +2270,65 @@
       '<p>This was just the warm-up. Big changes are coming to the pond soon. Keep an eye on the flag on the mailbox.</p></section>' +
       '<p class="gz-foot">*Almost weekly: this is the third issue this week. We are still working on the “weekly” part.</p></article>';
   }
+  // Issue #5 (Friday 6 Nov 2026): the outage confession, CoinEx, and the first Pond Poll
+  function gazette5() {
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #5</span><span>Price: 0 PEP</span><span>Almost weekend*</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking"><p class="gz-flash">🚨 Disaster 🚨</p><h4>A frog tried to improve the site and locked the games out</h4>' +
+      '<div class="gz-wpbox"><img src="img/gz5-oops.webp" alt="Pepe crying at his computer" width="110" height="110"><div>' +
+      '<p>This week the editor fitted the pond with a shiny new security lock. Great idea, bad aim. First the Pepe Guesser map went blank, then Pond TV and the guest log-on, and in the end every game window opened empty: YEET THE PEP, PEPE SWEEPER, Pepe Miner, FROGAGEDDON and Draw &amp; Guess.</p>' +
+      '<p><b>It is all fixed now</b> and everything should work again. If something still looks broken, write to the Editor and it gets fixed.</p></div></div>' +
+      '<p>Sorry for the beta bumps. We will make it up to you somehow. Chill. 🐸</p>' +
+      '<p class="gz-ask">New house rule, pinned above the editor\'s desk: <b>if it works, don\'t touch it.</b></p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-wpgo">Play Pepe Guesser →</button><button type="button" class="app-btn gz-yeet">YEET THE PEP</button><button type="button" class="app-btn gz-write">🐛 Something still broken?</button></div></section>' +
+      '<section class="gz-market"><p class="gz-kick">Markets</p><h4>Did CoinEx just dump everything it had?</h4>' +
+      '<figure class="gz-reddit gz-discord"><p class="gz-rd-top"><b>Pepecoin Discord</b> · Zordiak ✓</p><p class="gz-rd-title">Wow we\'re recovering nicely</p>' +
+      '<p class="gz-rd-title">I spoke to Coinex, they\'re done selling on Kraken</p><figcaption>🔥 10 · 💚 6 · 🧢 5 · 🗑️ 4</figcaption></figure>' +
+      '<p>Word in the pond: CoinEx has finished selling its PEP on Kraken. A lot of fear, not much pain? We will see.</p>' +
+      '<p class="gz-count gz-price"></p>' +
+      '<p class="gz-fine">Heard on Discord, not confirmed by CoinEx. Not financial advice. The frog still does not know wen moon.</p></section>' +
+      '<section class="gz-pollsec"><p class="gz-flash gz-new">New! Pond Poll</p><h4>Do you like polls?</h4>' +
+      '<div class="gz-poll" data-poll="like_polls" aria-live="polite"><p class="gz-poll-msg">Opening the ballot box…</p></div>' +
+      '<p class="gz-fine">Yes, this is a test poll. It is open for 2 days. One vote per Discord account, and a vote is final. You see the results after you vote; everyone sees them when the poll closes.</p></section>' +
+      '<p class="gz-foot">*Almost weekend: issue #5 lands on a Friday. The next one comes when it is ready.</p></article>';
+  }
+  // Pond Poll in the Gazette (games/supabase/update_polls.sql): the server counts; the page only shows its answer
+  function paintPoll(box) {
+    var id = box.getAttribute('data-poll');
+    var say = function (t) { box.innerHTML = '<p class="gz-poll-msg">' + t + '</p>'; };
+    var left = function (iso) {
+      var ms = Date.parse(iso) - Date.now(); if (!(ms > 0)) return 'Closed';
+      var h = Math.floor(ms / 3600000), m = Math.floor(ms / 60000) % 60;
+      return 'Closes in ' + (h >= 24 ? Math.floor(h / 24) + 'd ' + (h % 24) + 'h' : h + 'h ' + m + 'm');
+    };
+    var show = function (p) {
+      if (!p || !Array.isArray(p.options)) return say('The ballot box opens soon. Come back in a bit.');
+      var html = '<p class="gz-poll-when">' + (p.open ? left(p.closes_at) : 'Closed') + (p.total != null ? ' · ' + fmt.int(p.total) + (p.total === 1 ? ' vote' : ' votes') : '') + '</p>';
+      if (p.show_results) {
+        var max = Math.max(1, p.total || 0);
+        html += '<ul class="gz-bars">' + p.options.map(function (o) {
+          var n = o.votes || 0, pc = Math.round(n * 100 / max);
+          return '<li' + (o.id === p.my_choice ? ' class="mine"' : '') + '><b>' + esc(o.label) + (o.id === p.my_choice ? ' ✓' : '') + '</b><span class="gz-bar"><i style="width:' + pc + '%"></i></span><span>' + pc + '% (' + fmt.int(n) + ')</span></li>';
+        }).join('') + '</ul>';
+        if (p.my_choice) html += '<p class="gz-poll-msg">Thanks for voting, fren.</p>';
+      } else if (p.can_vote) {
+        html += '<div class="app-row gz-votes">' + p.options.map(function (o) { return '<button type="button" class="app-btn go gz-vote" data-c="' + esc(o.id) + '">' + esc(o.label) + '</button>'; }).join('') + '</div>';
+      } else if (p.open) {
+        var me = sbSession();
+        html += me && me.discord ? '<p class="gz-poll-msg">Your vote is in.</p>' : '<div class="app-row"><button type="button" class="app-btn go gz-pollon">Log on with Discord to vote</button></div>';
+      }
+      box.innerHTML = html;
+      box.querySelectorAll('.gz-vote').forEach(function (b) {
+        b.addEventListener('click', function () {
+          box.querySelectorAll('.gz-vote').forEach(function (x) { x.disabled = true; });
+          rpc('gry_poll_vote', { p_poll: id, p_choice: b.getAttribute('data-c') }).then(show, function (e) {
+            say(/closed/i.test(e.message || '') ? 'This poll is closed.' : /Discord/.test(e.message || '') ? 'Log on with Discord to vote.' : 'Your vote did not go through. Try again in a moment.');
+          });
+        });
+      });
+      var lo = box.querySelector('.gz-pollon'); if (lo) lo.addEventListener('click', logOn);
+    };
+    rpc('gry_poll', { p_poll: id }).then(show, function () { say('The ballot box opens soon. Come back in a bit.'); });
+  }
   function frogMail(view) {
     try { localStorage.setItem(MAIL_KEY, String(MAIL_ISSUE)); } catch (e) {}
     paintMail();
@@ -2277,7 +2336,8 @@
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
         // one compact row of tabs: the letter form, then the Gazette issues by number (newest first)
         '<li><button type="button" data-v="write" title="Ideas, bugs, wishes, notices">✏️ Letter to the Editor</button></li>' +
-        '<li><button type="button" data-v="gz" title="The Pond Gazette #4: the Pepe Guesser leak" aria-label="The Pond Gazette #4">📰 #4</button></li>' +
+        '<li><button type="button" data-v="gz" title="The Pond Gazette #5: the lockout, CoinEx and the first Pond Poll" aria-label="The Pond Gazette #5">📰 #5</button></li>' +
+        '<li><button type="button" data-v="gz4" title="The Pond Gazette #4 (archive): the Pepe Guesser leak" aria-label="The Pond Gazette #4">#4</button></li>' +
         '<li><button type="button" data-v="gz3" title="The Pond Gazette #3 (archive): an internet in your internet" aria-label="The Pond Gazette #3">#3</button></li>' +
         '<li><button type="button" data-v="gz2" title="The Pond Gazette #2 (archive): Pepe Guesser is coming" aria-label="The Pond Gazette #2">#2</button></li>' +
         '<li class="ml-owner" hidden><button type="button" data-v="box" title="Editor\'s desk: only you can see these" aria-label="Editor\'s desk">📥 <span class="ml-n"></span></button></li>' +
@@ -2294,8 +2354,8 @@
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
         if (v === 'write') return writeLetter(pane);
         if (v === 'box') return letterInbox(pane, paintOwner);
-        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : 4;
-        pane.innerHTML = issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : 5;
+        pane.innerHTML = issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
@@ -2353,6 +2413,8 @@
         on('.gz-frog', pondWarsApp);
         on('.gz-frogad', function () { adPlayer(Math.max(0, adByFile('frogageddon.mpg'))); });
         on('.gz-miner', minerApp);
+        on('.gz-yeet', function () { yeetApp(); });
+        var pollBox = pane.querySelector('.gz-poll'); if (pollBox) paintPoll(pollBox);
         on('.gz-online', function () {
           show('write');
           var lb = pane.querySelector('.lt-body'); if (lb) { lb.value = 'Dear Editor, I want FROGAGEDDON online! '; lb.dispatchEvent(new Event('input')); lb.focus(); }
@@ -2521,6 +2583,12 @@
   // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
   // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
   var ADS = [
+    { file: 'pond_poll.mpg', added: '2026-11-06', title: 'The Pond Poll', ch: 'CH 5 · POND ELECTION NIGHT', icon: 'frog-mail', scenes: [
+      '<p class="ad-kick">Tired of nobody asking what YOU think?</p><h3 class="ad-big">The pond wants<br>your <em>vote!</em></h3>',
+      '<p class="ad-kick">New in The Pond Gazette #5</p><h3 class="ad-big">The <em>Pond Poll</em></h3><p class="ad-sub">One question. One click. One vote per Discord account, and the server counts every one.</p>',
+      '<p class="ad-kick">This week\'s burning question:</p><h3 class="ad-big">Do you like<br><em>polls?</em></h3><p class="ad-sub">Yes, it is a test poll. It closes in 2 days. Results show the moment you vote.</p>',
+      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Vote now,<br>see it <em>live!</em></h3><p class="ad-fine">Not a real offer. No prize, no PEP, no election to win. Log on with Discord to vote; guests can read the results when the poll closes.</p><button type="button" class="ad-cta ad-gzbtn">Open The Pond Gazette →</button>'
+    ] },
     { file: 'frogageddon.mpg', added: '2026-11-05', title: 'FROGAGEDDON: frog artillery', ch: 'CH 2000 · FREN SOFTWARE LATE NIGHT', icon: 'pondwars', scenes: [
       '<img class="ad-hero" src="../games/img/pondwars/title.jpg" alt=""><p class="ad-kick">Small frogs. Big grudges. Questionable footwear.</p><h3 class="ad-big">FROG<em>AGEDDON</em><br>is here!</h3>',
       '<p class="ad-kick">Turn-based frog artillery on a destructible pond.</p><h3 class="ad-big">Nine weapons.<br><em>Exploding toes.</em></h3><p class="ad-sub">Bazooka, grenades, land mines, a grapple rope and a jetpack. Pick your team, pick your map, then flatten the other frogs.</p>',
@@ -2646,6 +2714,7 @@
       if (lap && window.PepPrices) window.PepPrices.quote().then(function (q) { if (q && q.usd != null) lap.textContent = fmt.usd(40e6 * q.usd); }).catch(function () {});
       var lb = A.body.querySelector('.ad-lapbtn'); if (lb) lb.addEventListener('click', function () { laptop(); });
       var wb = A.body.querySelector('.ad-wpbtn'); if (wb) wb.addEventListener('click', function () { wheresPepe(); });
+      var gzb = A.body.querySelector('.ad-gzbtn'); if (gzb) gzb.addEventListener('click', function () { frogMail(); });
       var yb = A.body.querySelector('.ad-yeetbtn'); if (yb) yb.addEventListener('click', function () { yeetApp(); });
       var lnb = A.body.querySelector('.ad-lanbtn'); if (lnb) lnb.addEventListener('click', function () { lanParty(); });
       var mlb = A.body.querySelector('.ad-mailbtn'); if (mlb) mlb.addEventListener('click', function () { frogMail('write'); });
@@ -2893,8 +2962,17 @@
         '<svg viewBox="0 0 24 20" width="22" height="18" aria-hidden="true"><path class="mb-post" d="M11 13h2v7h-2z"/><path class="mb-box" d="M3 6a5 5 0 0 1 10 0v7H3zM8 1h8a5 5 0 0 1 5 5v7H13V6a5 5 0 0 0-5-5z"/><path class="mb-flag" d="M18 3h1v7h-1zM19 3h4l-1.5 1.5L23 6h-4z"/></svg><span class="mail-new mail-badge" hidden>1</span>');
       mb.addEventListener('click', frogMail);
       trayEl2.insertBefore(mb, trayEl2.firstChild);
+      // the community links: our subreddit and the official Pepecoin account (with the classic bird)
+      [['https://www.reddit.com/r/pepecoin/', 'r/pepecoin on Reddit', 'tray-reddit',
+        '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="#ff4500"/><circle cx="14.6" cy="4.4" r="1.4" fill="#fff"/><path d="M10.4 6.2l.9-3.3 3.2.8" fill="none" stroke="#fff" stroke-width="1"/><ellipse cx="10" cy="11.6" rx="6" ry="4.1" fill="#fff"/><circle cx="4.6" cy="9.4" r="1.5" fill="#fff"/><circle cx="15.4" cy="9.4" r="1.5" fill="#fff"/><circle cx="7.6" cy="11" r="1.05" fill="#ff4500"/><circle cx="12.4" cy="11" r="1.05" fill="#ff4500"/><path d="M7.4 13.4q2.6 1.7 5.2 0" fill="none" stroke="#111" stroke-width=".8" stroke-linecap="round"/></svg>'],
+       ['https://x.com/PepecoinNetwork', 'Pepecoin on Twitter: @PepecoinNetwork', 'tray-bird',
+        '<svg viewBox="0 0 24 20" width="20" height="17" aria-hidden="true"><path fill="#1da1f2" d="M23.6 2.4c-.9.4-1.8.6-2.8.8 1-.6 1.8-1.5 2.1-2.7-.9.6-2 1-3.1 1.2A4.9 4.9 0 0 0 11.5 6C7.4 5.8 3.8 3.8 1.4.9.1 3.1.8 5.9 2.9 7.3c-.8 0-1.6-.2-2.2-.6 0 2.4 1.7 4.4 3.9 4.8-.7.2-1.5.2-2.2.1.6 2 2.4 3.4 4.6 3.4A9.9 9.9 0 0 1 0 17.1 13.9 13.9 0 0 0 7.5 19.3c9.1 0 14-7.5 14-14v-.6c1-.7 1.8-1.5 2.1-2.3z"/></svg>']
+      ].forEach(function (x) {
+        var a = el('a', { class: 'tray-social ' + x[2], href: x[0], target: '_blank', rel: 'noopener', title: x[1], 'aria-label': x[1] }, x[3]);
+        trayEl2.insertBefore(a, mb);
+      });
       paintMail();
-      if (!mailRead()) setTimeout(function () { if (!mailRead()) balloon('You\u2019ve got frog mail!', 'Breaking news: The Pond Gazette #4 is in your mailbox. Click the mailbox in the corner.', 'frog-mail'); }, 17000);
+      if (!mailRead()) setTimeout(function () { if (!mailRead()) balloon('You\u2019ve got frog mail!', 'The Pond Gazette #5 is in your mailbox, with the first Pond Poll. Click the mailbox in the corner.', 'frog-mail'); }, 17000);
     }
   }
 

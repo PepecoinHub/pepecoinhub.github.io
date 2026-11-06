@@ -1487,3 +1487,22 @@ footer.foot a { color: #edf3e3; }
 .today-pond .tp-stats:empty { display: none; }
 .today-pond .tp-play { flex: none; white-space: nowrap; }
 @media (max-width: 560px) { .today-pond { flex-wrap: wrap; } .today-pond .tp-play { width: 100%; text-align: center; } }
+
+/* Pond Gazette #5: Pond Poll (results come from games/supabase/update_polls.sql) */
+.gz-new { display: inline-block; animation: none; letter-spacing: .08em; }
+.gz-poll { margin: 4px 0 6px; padding: 8px 10px; background: #fffbe0; border: 2px solid #1b1b1b; box-shadow: 3px 3px 0 rgba(0, 0, 0, .2); }
+.gz-poll-when { margin: 0 0 6px; font: 700 11px/1.2 var(--f-chrome); text-transform: uppercase; letter-spacing: .06em; color: #8a1c1c; }
+.gz-poll-msg { margin: 4px 0 0; font-style: italic; }
+.gz-votes .gz-vote { min-width: 96px; min-height: 40px; font-size: 15px; }
+.gz-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.gz-bars li { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 8px; align-items: center; font: 400 13px/1.2 var(--f-chrome); }
+.gz-bar { display: block; height: 16px; background: #e6dcc0; border: 1px solid #1b1b1b; }
+.gz-bar i { display: block; height: 100%; background: #2e8a3a; }
+.gz-bars li.mine b { color: #8a1c1c; }
+.gz-discord { background: #313338; color: #dbdee1; }
+.gz-discord .gz-rd-title { font-weight: 400; }
+
+/* tray: Reddit and the classic bird, next to the mailbox */
+.pondos .tray-social { display: inline-flex; align-items: center; height: 22px; padding: 0 3px; }
+.pondos .tray-social:hover svg, .pondos .tray-social:focus-visible svg { transform: translateY(-1px); }
+.pondos .tray-social:focus-visible { outline: 1px dotted currentColor; }
