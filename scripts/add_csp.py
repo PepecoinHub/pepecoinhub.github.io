@@ -39,9 +39,13 @@ CONNECT = ['\'self\'', SUPA, 'wss://azbwciqfbsdpwubznncg.supabase.co',
            # DefiLlama: market.js hits stablecoins.*, the compare.html age chart
            # hits coins.* (built inline as LL = 'https://coins.llama.fi/').
            'https://stablecoins.llama.fi', 'https://coins.llama.fi',
-           'https://api.alternative.me']
-# Executable scripts loaded by <script src>: self + goatcounter counter.
-SCRIPT_HOSTS = ['\'self\'', 'https://gc.zgo.at']
+           'https://api.alternative.me',
+           # Cloudflare Turnstile token exchange for the guest bot check.
+           'https://challenges.cloudflare.com']
+# Executable scripts loaded by <script src>: self + goatcounter counter +
+# Cloudflare Turnstile (the guest "bot check" used by Frog Mail letters, guest
+# sign-in, LAN Party chat and score submit — human.js loads its api.js).
+SCRIPT_HOSTS = ['\'self\'', 'https://gc.zgo.at', 'https://challenges.cloudflare.com']
 IMG = ['\'self\'', 'data:', 'blob:', 'https://gc.zgo.at',
        'https://pepecoinhub.goatcounter.com',
        # Leaflet map tiles for Pepe Guesser (Where's Pepe). Tiles are <img>, so
@@ -83,9 +87,11 @@ def build_meta(html: str) -> str:
         'img-src ' + ' '.join(IMG),
         'media-src \'self\' blob:',
         'connect-src ' + ' '.join(CONNECT),
-        # Pond TV embeds YouTube videos in an <iframe> (youtube-nocookie.com).
-        # Without this the CRT television in PondOS stays blank.
-        'frame-src https://www.youtube-nocookie.com',
+        # frame-src: Pond TV embeds YouTube (youtube-nocookie.com); the guest
+        # bot check renders a Cloudflare Turnstile widget in an iframe. Without
+        # these the CRT TV stays blank and guests can't pass the bot check
+        # (so guest letters / sign-in / chat break).
+        'frame-src https://www.youtube-nocookie.com https://challenges.cloudflare.com',
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
