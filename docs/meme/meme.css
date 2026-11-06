@@ -1078,10 +1078,13 @@ footer.foot a { color: #edf3e3; }
 /* minimized app windows (games, LAN Party, players): hidden, with a button on the taskbar, phones included */
 .app-win.is-min { display: none !important; }
 @media (max-width: 760px) {
-  .tasks:has(.app-task) { display: flex; flex: 0 0 auto; overflow: visible; }
+  .tasks:has(.app-task), .tasks:has(.task.is-min:not([hidden])) { display: flex; flex: 0 0 auto; overflow: visible; }
   .tasks .task:not(.app-task) { display: none; }
+  /* a minimised page window (PEP.exe and friends) keeps its button too, or it could never come back */
+  .tasks .task.is-min:not([hidden]) { display: flex; flex: 0 0 40px; }
+  .tasks .task.is-min span { display: none; }
   .tasks .app-task { flex: 0 0 40px; }
-  .bar:has(.app-task) .tray-clock { display: none; }
+  .bar:has(.app-task) .tray-clock, .bar:has(.task.is-min:not([hidden])) .tray-clock { display: none; }
 }
 
 /* iPhone "Add to Home Screen" (and any screen with a home bar): the taskbar grows by the safe area instead of
