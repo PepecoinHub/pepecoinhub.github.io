@@ -75,34 +75,106 @@ are static assets on GitHub Pages. Don't poll the whole profile each second.
 
 ### Fren Avatar Maker and Fresh Fren (draft, not yet enabled)
 
+**Stage D supersedes the earlier v1 avatar migration.** The avatar is now a
+stack of hand-drawn 512 × 512 SVG layers (`schema_version 2`). The old v1 draft
+(64 × 64, slots mouth/eyes/hat/outfit, a 4-argument save RPC) is replaced; do not
+apply it. `games/supabase/update_fren_avatar.sql` in this branch is the v2 file.
+
 `Create Your Fren - Avatar Maker` opens from the Passport (`Create your Fren` /
 `Edit your Fren`), from Find… and from the `create_your_fren.mpg` PEP-TV ad. It
-stacks the 22 committed layers in `docs/meme/avatar-assets/layers/` as listed in
-`docs/meme/avatar-options.json` (4 × 6 × 5 × 5 = 600 looks, all free).
+stacks the committed 512 × 512 layers in `docs/meme/avatar-assets/layers/`
+(35 option layers plus the constant `base_frog`) as listed in
+`docs/meme/avatar-options.json`. The v2 `layers_order` is
+`[bg, base, clothing, mouth, eyes, hat, accessory]`; `base` is a constant layer
+painted between `bg` and `clothing` and is never a saved column. The saveable
+slots (columns) are `bg`, `clothing`, `mouth`, `eyes`, `hat`, `accessory`.
+
+Only non-unlock (base) options are offered and saveable this stage. The offered
+counts are **bg 4 × clothing 5 × mouth 6 × eyes 6 × hat 7 × accessory 3 = 15,120
+looks**, all free. Some manifest options carry an `unlock` key (`bg_sunset`,
+`clothing_suit`, `hat_hardhat`, `hat_detective`, `hat_explorer`, `special_explorer`,
+`accessory_headphones`): they are reserved for future server-verified activity
+achievements, are hidden in the UI, and are rejected by the save RPC exactly like
+an unknown id until such an achievement grants them.
 
 **Installation order, after review (and after `update_fren_passport.sql`):**
-1. Apply `games/supabase/update_fren_avatar.sql` once in PH-games. It creates the
-   private `games.passport_avatars` table, `public.gry_passport_avatar_save(text,
-   text, text, text)` and a newer `public.gry_passport_state()` that adds
-   `avatar`. It is safe to run twice and awards nothing by itself.
-2. Only then merge the frontend. Before the migration the maker still works as
+1. This stage targets a **fresh apply**: `games/supabase/update_fren_avatar.sql`
+   runs `create table if not exists games.passport_avatars` with the v2 columns
+   (`schema_version` default/check 2; `bg`, `clothing`, `mouth`, `eyes`, `hat`,
+   `accessory`). It also creates `public.gry_passport_avatar_save(text, text,
+   text, text, text, text)` (six option IDs, in order bg/clothing/mouth/eyes/
+   hat/accessory) and a newer `public.gry_passport_state()` that adds the v2
+   `avatar` object. It is safe to run twice and awards nothing by itself. This
+   file does **not** migrate a live v1 table.
+2. If a live v1 `games.passport_avatars` already exists, migrate it in place with
+   a reviewed `ALTER` run (outside this draft): rename `outfit` to `clothing` and
+   swap its check, add `bg` and `accessory` columns with defaults, set
+   `schema_version` default/check to 2, then backfill and remap any legacy
+   `outfit_*` ids to `clothing_*`. The exact statements are in the header comment
+   of `update_fren_avatar.sql`.
+3. Only then merge the frontend. Before the migration the maker still works as
    a preview, but Save Look reports `Saving is waiting for its database update`.
-3. If an option is ever added to `avatar-options.json`, add the same ID to the
-   allowlist in the save RPC in a new migration. The tests compare the lists.
+4. If an option is ever added to `avatar-options.json`, add the same ID to the
+   matching slot allowlist in the save RPC (and, for a reward part, its
+   `(part, stamp)` pair) in a new migration. The tests compare both to the manifest.
+5. Then apply `games/supabase/update_passport_awards.sql` **on launch day** (see
+   "Fren Passport stamps" below).
 
-**Trust rules:** the browser sends only four option IDs. The server takes the
-player from `auth.uid()`, requires a real Discord identity, checks each slot
-against an exact allowlist, and writes one row per player. The first save
-inserts `first_avatar` into `games.passport_badges` in the same transaction
-(`on conflict do nothing`), so Fresh Fren is minted once and a failed save
-leaves nothing behind. Saving the same look again is a no-op success; a
-different look within 3 seconds or past 40 saves per UTC day is an error. Picking
-parts and Randomize never call Supabase: one read when the Passport opens, one
-write per Save Look.
+### Fren Passport stamps (draft, not yet enabled)
 
-**Tests:** `node --test tests/passport.test.mjs` runs the static checks.
+`games/supabase/update_passport_awards.sql` awards the live stamps from the
+games' own records. The rules, sources and tests are listed in
+`games/FREN_PASSPORT_ACHIEVEMENTS_DECISIONS_2026-11-06.md`. Order: after
+`update_fren_passport.sql` and `update_fren_avatar.sql`, on a database that
+already has the YEET, Where's Pepe, lobby chat, mentions, letters and miner
+migrations. Safe to run twice.
+
+- **Run it on launch day.** Its first run gives Pond Pioneer to every account
+  that has Discord linked at that moment; `games.passport_meta` makes sure later
+  runs never add anyone.
+- It backfills Moonwalker, the Pepe Guesser stamps and the letter stamps from
+  existing records. Chat, YEET 3×5000 m, Miner time, Welcome Back! and the 30-day
+  run count from that day on.
+- It replaces `public.gry_yeet_submit` with the same body plus one hook line,
+  and adds triggers on `games.wp_plays`, `games.lobby_chat`,
+  `games.lobby_mentions`, `games.letters` and `games.miner_saves`. A failing hook
+  only logs a warning and never blocks the game.
+- New browser RPC: `public.gry_passport_checkin()` (no arguments, Discord only),
+  called by PondOS at most every 5 minutes per tab.
+- Real-database test: `tests/passport-awards-sql.test.mjs` with the same
+  `PASSPORT_PG_URL` / `PASSPORT_PG_MODULE` variables as below.
+
+**Trust rules:** the browser sends only six option IDs (no user id, badge or
+image). The server takes the player from `auth.uid()`, requires a real Discord
+identity, checks each slot against an exact allowlist, accepts a reward part
+only when the player holds its stamp, and writes one row per player. The first save inserts `first_avatar` into
+`games.passport_badges` in the same transaction (`on conflict do nothing`), so
+Fresh Fren is minted once and a failed save leaves nothing behind. A reward part
+sent without its stamp is rejected, so nothing can be unlocked by sending a
+fancy id. Saving the same look again is a no-op success; a different look within
+3 seconds or past 40 saves per UTC day is an error. Picking parts and Randomize
+never call Supabase: one read when the Passport opens, one write per Save Look.
+
+**Tests:** `node --test tests/passport.test.mjs` runs the static v2 checks
+(512 canvas layers, 15,120 offered looks, the six-argument save RPC, and the
+server allowlists matching the manifest's non-unlock ids).
 `tests/passport-avatar-sql.test.mjs` runs the migrations on a real, disposable
 PostgreSQL (15 or newer) when `PASSPORT_PG_URL` and `PASSPORT_PG_MODULE` (path to
 node-postgres) are set: grants, anonymous/non-Discord rejection, ID injection,
+rejection of every reward part without its stamp (`bg_sunset`, `clothing_suit`,
+`hat_hardhat`, `hat_detective`, `hat_explorer`, `accessory_headphones`, `special_explorer`),
 isolation between players, one badge under concurrent first saves, rollback,
-cooldown and the daily limit. Never point it at Supabase.
+cooldown and the daily limit. Never point it at Supabase. Fresh Fren
+(`first_avatar`) is `live` in `docs/meme/passport-catalog.json` only because this
+secure server award path is wired and tested.
+
+### Avatar art (2026-11-06)
+
+The avatar layers are the hand-drawn ChatGPT art. The original sheets are kept
+losslessly in `games/fren-avatar/source/`; `scripts/build_avatar_layers.py`
+cuts each item out, places it on the shared 512×512 canvas and writes
+`docs/meme/avatar-assets/layers/<id>.webp` (38 files, about 480 KB). Placement
+numbers live in that script, not in CSS. To change a part, edit the sheet or the
+numbers and rebuild (`pip install pillow numpy scipy` first). New ids this round:
+`hat_fedora` and `bg_meadow`, both free and in the save allowlist. The previous
+vector set is in git history (commit before this change) if it is ever needed.

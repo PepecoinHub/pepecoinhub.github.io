@@ -72,7 +72,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; return 'img/ico/' + n + '.webp'; }
   function icoFrom(src) { var m = /^img\/([\w-]+)\.webp$/.exec(src || ''); return m ? ico(m[1]) : src; }
   function json(name) {
     if (!cache[name]) cache[name] = fetch(DATA + name, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(name + ' ' + r.status); return r.json(); });
@@ -1574,16 +1574,17 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
+  var PP_CATALOG = 'passport-catalog.json?v=20261106lily2';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261105avatar1'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106lily1'}));
     }
   }
   // one read: the server snapshot, plus two static files from this site (labels and avatar parts)
   function passportLoad(session) {
     return Promise.all([
       rpc('gry_passport_state', {}),
-      fetch('passport-catalog.json?v=20261105avatar1').then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
+      fetch(PP_CATALOG).then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
       avatarOptions().catch(function () { return null; })
     ]).then(function (r) {
       if (r[0] && r[0].signed_in) passportCache = { userId: session.userId, state: r[0], catalog: r[1], opts: r[2] };
@@ -1591,9 +1592,49 @@
     });
   }
   function passportMine() { var s = sbSession(); return s && s.discord && passportCache && passportCache.userId === s.userId ? passportCache : null; }
+
+  // ---------- Fren Passport art (hand-drawn, cut by scripts/build_passport_art.py) ----------
+  // passport-assets/stamps.webp is one row of 16 stamp tiles (15 drawn stamps, then the '?' slot);
+  // passport-assets/icons.webp is one row of 12 small Win98-style icons. The art is pure decoration:
+  // which stamps are earned comes from the server state alone (see A.render).
+  var PP_ART = 'passport-assets/', PP_ART_V = '?v=20261106pp1';
+  var PP_STAMPS = ['calendar', 'gamepad', 'pickaxe', 'duck', 'magnifier', 'folders', 'computer', 'people',
+    'sprout', 'handshake', 'rocket', 'binoculars', 'deerstalker', 'moon', 'joystick', 'locked'];
+  var PP_ICONS = ['plane', 'calendar', 'trophy', 'box', 'gamepad', 'star', 'gift', 'tab_home', 'tab_trophy', 'tab_stamp', 'tab_box', 'tab_stats'];
+  // the stamp each achievement shows once earned; anything else falls back to its category
+  // (stamps without their own drawing yet reuse the closest one)
+  var PP_STAMP_OF = {
+    first_fren: 'duck', first_avatar: 'sprout', moonwalker: 'moon', like_it_here: 'calendar', welcome_back: 'duck', senior_editor: 'folders', certified_fren: 'handshake',
+    pond_pioneer: 'handshake', sharp_eye: 'magnifier', week_scout: 'binoculars', first_words: 'people', hey_fren: 'people',
+    dear_editor: 'computer', junior_editor: 'folders', rookie_miner: 'pickaxe',
+    hundred_day_fren: 'handshake', community_fren: 'people', curious_fren: 'magnifier', pepe_guesser: 'binoculars',
+    scout_fren: 'binoculars', detective_fren: 'deerstalker', miner_fren: 'pickaxe',
+    gamer_fren: 'gamepad', game_night: 'computer', arcade_hopper: 'joystick', game_collector: 'joystick',
+    collector: 'folders', trophy_shelf: 'folders', yeet_adept: 'rocket', nasa_is_hiring: 'rocket', no_panic: 'rocket',
+    first_hatch: 'sprout', frog_mail_reader: 'computer'
+  };
+  var PP_STAMP_CAT = { community: 'people', avatar: 'sprout', yeet: 'rocket', where_pepe: 'binoculars', arcade: 'joystick',
+    pepegachi: 'sprout', secrets: 'magnifier', exploration: 'magnifier' };
+  function ppSprite(cls, names, name, label) {
+    var i = Math.max(0, names.indexOf(name));
+    var n = el('span', label ? { class: cls, role: 'img', 'aria-label': label } : { class: cls, 'aria-hidden': 'true' });
+    n.style.backgroundPositionX = (i * 100 / (names.length - 1)) + '%';
+    return n;
+  }
+  // Lily's stamps (passport-assets/stamps-lily.webp, scripts/build_lily_stamps.mjs): one tile per stamp id, same order
+  var PP_LILY = ['pond_pioneer', 'welcome_back', 'pepe_guesser', 'week_scout', 'scout_fren', 'first_words', 'hey_fren', 'dear_editor',
+    'junior_editor', 'senior_editor', 'rookie_miner', 'first_hatch', 'little_fren', 'grown_fren', 'streak_14'];
+  function ppStamp(x, earned) {
+    if (earned && PP_LILY.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-lily', PP_LILY, x.id);
+    var art = earned ? (PP_STAMP_OF[x.id] || PP_STAMP_CAT[x.category] || 'duck') : 'locked';
+    return ppSprite('pp-art pp-art-stamp', PP_STAMPS, art);
+  }
+  function ppIcon(name) { return ppSprite('pp-art pp-art-icon', PP_ICONS, name); }
+
   function frenPassport(fromCache) {
     var A = openApp('passport', 'Fren Passport - Properties', 'pep-logo', function (A) {
       passportCss();
+      A.host.classList.add('fren-win');
       A.body.innerHTML = '<div class="passport"><p class="passport-muted" role="status">Loading your Fren Passport…</p></div>';
       function notice(message, needsLogin) {
         var box = A.body.querySelector('.passport');
@@ -1609,11 +1650,18 @@
           box.appendChild(row);
         }
       }
+      // The Passport is the hand-drawn open booklet inside the PondOS window chrome. The page art has
+      // every sample value erased; the live layer on top fills in only real server data:
+      //  - left page: the saved avatar shows through the photo window; Fren ID / nickname / member since / status
+      //  - right page: the earned stamps (server earned_at only), then '?' slots; the BALI stamp is printed
+      //    on the page and stays locked (future server-verified $0.01 condition, never awarded or priced here)
+      //  - My Fren Journey and Next Milestone: factual counters only; no XP, levels or invented ranks
+      // Tabs (Overview, Achievements, Stamps, Collection, Stats) show the same data in list form.
+      var tab = 0;
       A.render = function () {
         var d = passportMine(), box = A.body.querySelector('.passport');
         if (!d || !box) return;
         var state=d.state, catalog=d.catalog;
-        var best = Number(state.yeet_best) || 0;
         var earnedBadges = Array.isArray(state.achievements) ? state.achievements : [];
         var discovered = Array.isArray(state.secrets) ? state.secrets : [];
         var owned = Array.isArray(state.items) ? state.items : [];
@@ -1621,83 +1669,244 @@
         var badges = catalog && Array.isArray(catalog.achievements) ? catalog.achievements : earnedBadges;
         var secrets = catalog && Array.isArray(catalog.secrets) ? catalog.secrets : discovered;
         var items = catalog && Array.isArray(catalog.items) ? catalog.items : owned;
-        var achievementsCount=earnedBadges.filter(function(b){return !!b.earned_at;}).length;
+        // honest earned test: present in server state with a real earned_at timestamp
+        var earnedOf = function(id){ var e=find(earnedBadges,id); return e && e.earned_at ? e : null; };
+        var MYTHIC_ID = 'bali';
+        var regular = badges.filter(function(x){ return x.id!==MYTHIC_ID && (x.tier!=='mythic'); });
+        var earnedList = regular.filter(function(x){ return !!earnedOf(x.id); })
+          .sort(function(a,b){ return String(earnedOf(b.id).earned_at).localeCompare(String(earnedOf(a.id).earned_at)); });
+        var earnedCount = earnedList.length;
+        var secretsCount = discovered.filter(function(s){ return !!s.discovered_at; }).length;
+        var itemsCount = owned.length;
+        // account age in whole days. This is NOT an activity counter (see the badge decisions doc).
+        var days = state.member_since ? Math.max(0, Math.floor((Date.now() - new Date(state.member_since).getTime()) / 86400000)) : null;
+        // games.yeet_records.best is stored in tenths of a metre (0..60000 = 0..6000 m), like the YEET high scores
+        var yeetBest = typeof state.yeet_best === 'number' && isFinite(state.yeet_best) && state.yeet_best > 0 ? state.yeet_best / 10 : null;
+        var metres = function(v){ return fmt.dec(v, 1) + ' m'; };
         function piece(tag,cls,value) { var n=el(tag,{class:cls}); n.textContent=value; return n; }
+        function stampTitle(x, e) { return (x.title||x.id) + (e ? ' - earned ' + fmt.date(e.earned_at) : ' - locked'); }
+        // stamps that cannot be earned yet keep their name to themselves: '???' and "Coming soon"
+        function shown(x, e) { return e || x.status==='live' || x.id===MYTHIC_ID; }
+        function nameOf(x, e) { return shown(x, e) ? (x.title||x.id) : '???'; }
+        function stateOf(x) { return x.status!=='live' ? 'Coming soon' : x.limited ? 'Closed' : 'Locked'; }
+        // the server's own counters (gry_passport_state.progress) for the stamps that have a count:
+        // [now, goal, what is still missing]. Letters and chat have no counter on purpose, so nobody is
+        // nudged to spam the editor or the lobby; those stamps can still be earned.
+        var P = state.progress || {};
+        var num = function(v){ return typeof v === 'number' && isFinite(v) ? v : 0; };
+        var more = function(n, one, many){ return fmt.int(n) + ' more ' + (n === 1 ? one : many); };
+        var PROG = {
+          moonwalker: [yeetBest || 0, 6000, function(n){ return fmt.int(Math.ceil(n)) + ' m to go'; }],
+          nasa_is_hiring: [num(P.yeet_5k_flights), 3, function(n){ return more(n, 'flight over 5000 m', 'flights over 5000 m'); }],
+          detective_fren: [num(P.wp_perfect_days), 5, function(n){ return more(n, 'perfect 5000', 'perfect 5000s'); }],
+          week_scout: [num(P.wp_streak), 7, function(n){ return more(n, 'day in a row', 'days in a row'); }],
+          scout_fren: [num(P.wp_streak), 14, function(n){ return more(n, 'day in a row', 'days in a row'); }],
+          streak_14: [num(P.login_streak), 14, function(n){ return more(n, 'day in a row', 'days in a row'); }],
+          like_it_here: [num(P.login_streak), 30, function(n){ return more(n, 'day in a row', 'days in a row'); }],
+          rookie_miner: [num(P.miner_minutes), 10, function(n){ return more(n, 'minute', 'minutes'); }],
+          miner_fren: [num(P.miner_minutes), 60, function(n){ return more(n, 'minute', 'minutes'); }]
+        };
+        // never suggested as the next goal: closed stamps, one-day chances, and anything that could invite spam
+        var NOT_NEXT = { pond_pioneer: 1, welcome_back: 1, first_words: 1, hey_fren: 1, community_fren: 1, dear_editor: 1, junior_editor: 1, senior_editor: 1 };
+        function openMaker() { avatarMaker(); }
         box.replaceChildren();
-        var identity=el('div',{class:'passport-identity'});
-        // the saved Fren (only what the server returned), or the site logo until there is one
+
+        // ---------- the booklet ----------
+        var book = el('div', {class:'pp-book'});
+        var left = el('section', {class:'pp-page pp-left','aria-label':'Fren identity'});
         var look = d.opts && avatarLook(d.opts, state.avatar);
-        var face = el('div', {class:'passport-face'});
-        if (look) face.appendChild(avatarStack(d.opts, look, 'Your Fren: ' + avatarSay(d.opts, look)));
-        else face.appendChild(el('img',{src:'img/pep-logo.webp',alt:'PepecoinHub frog emblem',width:'64',height:'64'}));
-        identity.appendChild(face);
-        var who=el('div');
-        who.appendChild(piece('strong','',state.nickname || 'Discord fren'));
-        who.appendChild(piece('p','passport-muted','Member since '+(state.member_since ? fmt.date(state.member_since) : 'unknown')));
-        who.appendChild(piece('span','passport-muted','Discord verified · A little history of your pond'));
-        if (d.opts) {
-          var make = el('button', {type:'button',class:'app-btn passport-make'});
-          make.textContent = look ? 'Edit your Fren' : 'Create your Fren';
-          make.addEventListener('click', function () { avatarMaker(); });
-          who.appendChild(make);
+        var photo = el('button', {type:'button',class:'pp-photo',title: d.opts ? (look ? 'Edit your Fren' : 'Create your Fren') : 'Your Fren'});
+        if (look) photo.appendChild(avatarStack(d.opts, look, 'Your Fren: ' + avatarSay(d.opts, look)));
+        else photo.appendChild(el('img',{src:'img/pep-logo.webp',alt:'PepecoinHub frog emblem',width:'64',height:'64'}));
+        if (d.opts) photo.addEventListener('click', openMaker); else photo.disabled = true;
+        left.appendChild(photo);
+        left.appendChild(el('img', {class:'pp-page-art',src:PP_ART+'page-left.webp'+PP_ART_V,alt:'',width:'360',height:'528',draggable:'false'}));
+        var idcard = el('dl', {class:'pp-idcard'});
+        function idrow(k,v,cls){ var r=el('div',{class:'pp-idrow'+(cls?' '+cls:'')}); r.appendChild(piece('dt','',k)); r.appendChild(piece('dd','',v)); idcard.appendChild(r); }
+        idrow('Fren ID:', d.userId ? ('#'+String(d.userId).replace(/-/g,'').slice(0,8).toUpperCase()) : '—', 'is-id');
+        idrow('Nickname:', state.nickname || 'Discord fren', 'is-nick');
+        idrow('Member since:', state.member_since ? fmt.date(state.member_since) : 'unknown');
+        idrow('Status:', 'Discord verified', 'is-status');
+        left.appendChild(idcard);
+        book.appendChild(left);
+
+        var right = el('section', {class:'pp-page pp-right','aria-label':'Achievement stamps'});
+        right.appendChild(el('img', {class:'pp-page-art',src:PP_ART+'page-right.webp'+PP_ART_V,alt:'',width:'360',height:'528',draggable:'false'}));
+        right.appendChild(piece('p','sr','Achievement stamps: ' + earnedCount + ' of ' + regular.length + ' collected.'));
+        var grid = el('div', {class:'pp-grid'});
+        for (var gi = 0; gi < 20; gi++) {
+          var gx = earnedList[gi];
+          var gc = el('div', {class:'pp-slot'+(gx?' is-earned':' is-locked'), title: gx ? stampTitle(gx, earnedOf(gx.id)) : 'Empty stamp slot'});
+          gc.appendChild(ppStamp(gx || {}, !!gx));
+          if (gx) gc.appendChild(piece('span','sr', stampTitle(gx, earnedOf(gx.id))));
+          grid.appendChild(gc);
         }
-        identity.appendChild(who); box.appendChild(identity);
-        var stats=el('div',{class:'passport-stats'});
+        right.appendChild(grid);
+        right.appendChild(el('div', {class:'pp-bali',role:'img','aria-label':'BALI: $0.01 - BALI. Reserved mythic stamp for every fren when Pepecoin reaches $0.01 USD. Locked.',
+          title:'Reserved mythic stamp - awarded by the server when Pepecoin reaches $0.01 USD'}));
+        book.appendChild(right);
+
+        // ---------- side panels: My Fren Journey + Next Milestone ----------
+        var side = el('aside', {class:'pp-side'});
+        var journey = el('section', {class:'pp-panel'});
+        var jh = el('h3', {class:'pp-panel-h'}); jh.appendChild(ppIcon('plane')); jh.appendChild(document.createTextNode('My Fren Journey')); journey.appendChild(jh);
+        var jl = el('dl', {class:'pp-jlist'});
         [
-          ['YEET record',best?(best/10).toLocaleString('en-US',{maximumFractionDigits:1})+' m':'—'],
-          ['Badges',String(achievementsCount)+(catalog?' / '+badges.length:'')],
-          ['Secrets',String(discovered.length)+(catalog?' / '+secrets.length:'')],
-          ['Care days',state.care_days==null?'Soon':String(state.care_days)],
-          ['Items',String(owned.length)]
-        ].forEach(function(v) {
-          var d=el('div',{class:'passport-stat'});
-          d.appendChild(piece('strong','',v[1]));d.appendChild(piece('span','',v[0]));stats.appendChild(d);
+          ['calendar', 'Days registered:', days==null?'—':fmt.int(days)],
+          ['trophy', 'Stamps:', earnedCount+' / '+regular.length],
+          ['box', 'Items collected:', itemsCount+' / '+items.length],
+          ['star', 'Secrets found:', secretsCount+' / '+secrets.length],
+          ['gamepad', 'YEET best:', yeetBest==null?'—':metres(yeetBest)]
+        ].forEach(function(v){
+          var r = el('div', {class:'pp-jrow'}); r.appendChild(ppIcon(v[0])); r.appendChild(piece('dt','',v[1])); r.appendChild(piece('dd','',v[2])); jl.appendChild(r);
         });
-        box.appendChild(stats);
-        var tabs=el('div',{class:'passport-tabs',role:'tablist','aria-label':'Passport sections'});
-        var panel=el('div',{class:'passport-panel',role:'tabpanel'});
-        var sections=[
-          {name:'Achievements',entries:badges.map(function(x){
-            var earned=find(earnedBadges,x.id);
-            return {title:x.title||x.id,detail:x.description||'PepecoinHub achievement',icon:x.icon,
-              date:earned&&earned.earned_at, status:x.status, locked:!(earned&&earned.earned_at), secret:false};
-          })},
-          {name:'Secrets',entries:secrets.map(function(x){
-            var earned=find(discovered,x.id),locked=!earned;
-            return {title:locked?'???':(x.title||x.id),
-              detail:locked?(x.status==='live'?(x.hint||'Explore PondOS to find this.'):'A mystery for the future.'):'Discovered '+fmt.date(earned.discovered_at),
-              date:earned&&earned.discovered_at,status:x.status,locked:locked,secret:true};
-          })},
-          {name:'Inventory',entries:items.map(function(x){
-            var found=find(owned,x.id),locked=!found;
-            return {title:x.title||x.id,detail:found?'Quantity: '+found.quantity:(x.description||'Not collected yet.'),
-              date:found&&found.earned_at,status:x.status,locked:locked,secret:false};
-          })}
-        ];
-        function selectTab(i) {
-          A.tab = i;
-          tabs.querySelectorAll('button').forEach(function(b,j){b.setAttribute('aria-selected',String(i===j));b.tabIndex=i===j?0:-1;});
-          panel.replaceChildren();
-          var group=sections[i], grid=el('div',{class:'passport-grid'});
-          group.entries.forEach(function(v) {
-            var tile=el('div',{class:'passport-entry'+(v.locked?' locked':'')});
-            if(v.icon&&/^avatar-assets\/[\w-]+\.svg$/.test(v.icon))tile.appendChild(el('img',{class:'passport-badge',src:v.icon,alt:'',width:'32',height:'32'}));
-            tile.appendChild(piece('b','',v.locked?'[Locked] '+v.title:v.title));
-            tile.appendChild(piece('small','',v.detail));
-            if(v.locked&&v.status==='planned')tile.appendChild(piece('small','passport-coming','Coming later'));
-            else if(v.date&&!v.secret)tile.appendChild(piece('small','',fmt.date(v.date)));
-            grid.appendChild(tile);
-          });
-          if(!group.entries.length)panel.appendChild(piece('p','passport-muted','Nothing in this section yet.'));
-          else panel.appendChild(grid);
-          if(i===1)panel.appendChild(piece('p','passport-muted','Three PondOS mysteries can be found now. The others will be released gradually.'));
-          if(i===2)panel.appendChild(piece('p','passport-muted','Moon Rock is not yet a server-verified inventory item. Your YEET souvenir stays in the game until a secure award path is ready.'));
+        journey.appendChild(jl);
+        side.appendChild(journey);
+
+        // Next Milestone: the unearned LIVE stamp the player is closest to (catalog order breaks ties);
+        // a progress bar only where the server state gives a true measure (PROG above).
+        var near = function(x){ var p = PROG[x.id]; return p ? Math.min(p[0] / p[1], 0.999) : 0; };
+        var next = regular.filter(function(x){ return x.status==='live' && !x.limited && !NOT_NEXT[x.id] && !earnedOf(x.id); })
+          .reduce(function(best, x){ return !best || near(x) > near(best) ? x : best; }, null);
+        var soon = !next;
+        var mile = el('section', {class:'pp-panel pp-mile'});
+        mile.appendChild(piece('h3','pp-panel-h is-blue','Next Milestone'));
+        var mb = el('div', {class:'pp-mile-body'});
+        if (next) {
+          mb.appendChild(ppIcon('gift'));
+          var mt = el('div', {class:'pp-mile-text'});
+          var head = el('p', {class:'pp-mile-title'}); head.appendChild(piece('strong','',next.title||next.id));
+          var pg = PROG[next.id], prog = pg && pg[1] > 1 ? [Math.min(pg[0], pg[1]), pg[1], pg[2]] : null;
+          if (prog) head.appendChild(piece('span','pp-mile-n', prog[2](prog[1] - prog[0])));
+          mt.appendChild(head);
+          mt.appendChild(piece('p','pp-mile-desc', next.description || 'A server-verified stamp.'));
+          mb.appendChild(mt);
+          mile.appendChild(mb);
+          if (prog) {
+            var bar = el('div', {class:'pp-bar',role:'progressbar','aria-valuemin':'0','aria-valuemax':String(prog[1]),'aria-valuenow':String(prog[0]),'aria-label':(next.title||next.id)+' progress'});
+            var fill = el('span'); fill.style.width = (prog[0] / prog[1] * 100).toFixed(1) + '%'; bar.appendChild(fill); mile.appendChild(bar);
+          }
+        } else {
+          mb.appendChild(piece('p','pp-mile-desc', soon && regular.some(function(x){ return x.status!=='live'; })
+            ? 'Every stamp you can earn today is yours. More are coming soon.' : 'Every stamp collected. Legend.'));
+          mile.appendChild(mb);
         }
-        sections.forEach(function(section,i){
-          var b=el('button',{type:'button',class:'app-btn',role:'tab','aria-selected':String(i===0)});
-          b.textContent=section.name;b.addEventListener('click',function(){selectTab(i);});tabs.appendChild(b);
+        side.appendChild(mile);
+        if (d.opts) {
+          var make = el('button', {type:'button',class:'app-btn pp-make'});
+          make.textContent = look ? 'Edit your Fren' : 'Create your Fren';
+          make.addEventListener('click', openMaker);
+          side.appendChild(make);
+        }
+
+        // ---------- tabs ----------
+        var TABS = [['Overview','tab_home'],['Achievements','tab_trophy'],['Stamps','tab_stamp'],['Collection','tab_box'],['Stats','tab_stats']];
+        var bar98 = el('div', {class:'tabs98 pp-tabs',role:'tablist','aria-label':'Passport sections'});
+        var panes = [];
+        TABS.forEach(function(t, i){
+          var b = el('button', {type:'button',role:'tab',id:'pp-tab-'+i,'aria-controls':'pp-pane-'+i,'aria-selected':String(i===tab),tabindex:i===tab?'0':'-1'});
+          b.appendChild(ppIcon(t[1])); b.appendChild(piece('span','',t[0]));
+          b.addEventListener('click', function(){ pick(i); });
+          b.addEventListener('keydown', function(ev){
+            var k = ev.key==='ArrowRight' ? 1 : ev.key==='ArrowLeft' ? -1 : 0; if (!k) return;
+            ev.preventDefault(); var j = (i + k + TABS.length) % TABS.length; pick(j); bar98.children[j].focus();
+          });
+          bar98.appendChild(b);
+          panes.push(el('div', {class:'tabpane pp-pane',role:'tabpanel',id:'pp-pane-'+i,'aria-labelledby':'pp-tab-'+i}));
         });
-        box.appendChild(tabs);box.appendChild(panel);selectTab(A.tab||0);
+        function pick(i) {
+          tab = i;
+          [].forEach.call(bar98.children, function(b, j){ b.setAttribute('aria-selected', String(j===i)); b.tabIndex = j===i ? 0 : -1; });
+          panes.forEach(function(p, j){ p.hidden = j!==i; });
+        }
+
+        // Overview: the booklet, the side panels, and the most recent real stamps
+        var over = el('div', {class:'pp-over'}); over.appendChild(book); over.appendChild(side);
+        panes[0].appendChild(over);
+        var recent = el('section', {class:'pp-panel pp-recent'});
+        recent.appendChild(piece('h3','pp-panel-h','Recent Stamps'));
+        var rl = el('ul', {class:'pp-recent-list'});
+        for (var ri = 0; ri < 7; ri++) {
+          var rx = earnedList[ri], li = el('li', {class: rx ? 'is-earned' : 'is-locked'});
+          li.appendChild(ppStamp(rx || {}, !!rx));
+          li.appendChild(piece('b','', rx ? (rx.title||rx.id) : '???'));
+          if (rx) li.appendChild(piece('small','', fmt.date(earnedOf(rx.id).earned_at)));
+          rl.appendChild(li);
+        }
+        recent.appendChild(rl);
+        panes[0].appendChild(recent);
+
+        // Achievements: every catalog stamp with its rule and its real state
+        var al = el('ul', {class:'pp-list'});
+        regular.concat([find(badges, MYTHIC_ID) || {id:MYTHIC_ID,title:'BALI',description:'$0.01 - BALI.',status:'planned'}]).forEach(function(x){
+          var e = x.id===MYTHIC_ID ? null : earnedOf(x.id);
+          var li = el('li', {class:'pp-row'+(e?' is-earned':'')});
+          li.appendChild(ppStamp(x, !!e));
+          var tx = el('div'); tx.appendChild(piece('b','',nameOf(x, e))); tx.appendChild(piece('small','',shown(x, e) ? x.description||'' : 'A new stamp is on its way.'));
+          li.appendChild(tx);
+          li.appendChild(piece('span','pp-tag'+(e?' is-on':''), e ? 'Earned '+fmt.date(e.earned_at) : stateOf(x)));
+          al.appendChild(li);
+        });
+        panes[1].appendChild(piece('p','pp-muted', earnedCount+' of '+regular.length+' stamps earned. Stamps are awarded by the server only, from what the games record; "Coming soon" stamps cannot be earned yet.'));
+        panes[1].appendChild(al);
+
+        // Stamps: the whole album with names (locked stamps show the '?' slot)
+        var album = el('div', {class:'pp-album'});
+        regular.forEach(function(x){
+          var e = earnedOf(x.id);
+          var c = el('div', {class:'pp-stamp'+(e?' is-earned':' is-locked'), title: shown(x, e) ? x.description || '' : 'Coming soon'});
+          c.appendChild(ppStamp(x, !!e));
+          c.appendChild(piece('b','pp-stamp-name', nameOf(x, e)));
+          c.appendChild(piece('small','pp-stamp-sub', e ? fmt.date(e.earned_at) : stateOf(x)));
+          album.appendChild(c);
+        });
+        panes[2].appendChild(album);
+        var mythic = el('div', {class:'pp-mythic is-locked', title:'Reserved mythic stamp - awarded by the server when Pepecoin reaches $0.01 USD'});
+        mythic.appendChild(piece('b','pp-mythic-name','BALI'));
+        mythic.appendChild(piece('span','pp-mythic-sub','$0.01 - BALI'));
+        mythic.appendChild(piece('small','pp-muted','Reserved for every fren when Pepecoin reaches $0.01 USD. Locked until then.'));
+        panes[2].appendChild(mythic);
+
+        // Collection: items and secrets, as the server lists them
+        function collect(title, list, has, sub) {
+          var sec = el('section', {class:'pp-panel'});
+          sec.appendChild(piece('h3','pp-panel-h', title));
+          var ul = el('ul', {class:'pp-list'});
+          list.forEach(function(x){
+            var got = has(x), li = el('li', {class:'pp-row'+(got?' is-earned':'')});
+            li.appendChild(ppIcon(got ? 'box' : 'gift'));
+            var tx = el('div'); tx.appendChild(piece('b','', got || x.status==='live' && x.hint ? (x.title||x.id) : '???'));
+            tx.appendChild(piece('small','', got ? (x.description||'') : (x.hint || x.description || '')));
+            li.appendChild(tx);
+            li.appendChild(piece('span','pp-tag'+(got?' is-on':''), got ? sub(got) : (x.status==='live' ? 'Not found yet' : 'Coming soon')));
+            ul.appendChild(li);
+          });
+          sec.appendChild(ul);
+          return sec;
+        }
+        var cgrid = el('div', {class:'pp-cols'});
+        cgrid.appendChild(collect('Items  ' + itemsCount + ' / ' + items.length, items, function(x){ return find(owned, x.id); }, function(){ return 'Owned'; }));
+        cgrid.appendChild(collect('Secrets  ' + secretsCount + ' / ' + secrets.length, secrets,
+          function(x){ var s = find(discovered, x.id); return s && s.discovered_at ? s : null; }, function(s){ return 'Found ' + fmt.date(s.discovered_at); }));
+        panes[3].appendChild(cgrid);
+
+        // Stats: factual numbers from the server snapshot
+        var st = el('dl', {class:'pp-stats'});
+        [
+          ['Member since', state.member_since ? fmt.date(state.member_since) : 'unknown'],
+          ['Days registered (account age)', days==null?'—':fmt.int(days)],
+          ['Stamps earned', earnedCount+' / '+regular.length],
+          ['Secrets found', secretsCount+' / '+secrets.length],
+          ['Items collected', itemsCount+' / '+items.length],
+          ['Best YEET flight', yeetBest==null?'—':metres(yeetBest)],
+          ['Avatar saved', look ? 'Yes' : 'Not yet']
+        ].forEach(function(v){ var r=el('div'); r.appendChild(piece('dt','',v[0])); r.appendChild(piece('dd','',v[1])); st.appendChild(r); });
+        panes[4].appendChild(st);
+        panes[4].appendChild(piece('p','pp-muted','Days registered counts calendar days since you joined; it is not an activity counter.'));
+
+        box.appendChild(bar98);
+        panes.forEach(function(p){ box.appendChild(p); });
+        pick(tab);
       };
       var session = sbSession();
       if (!session || !session.discord) {
@@ -1714,50 +1923,84 @@
           ? 'Fren Passport is waiting for its database update.'
           : 'Could not load your profile. Please try again later.',false);
       });
-    }, 610);
+    }, 1000);
     return A;
   }
 
   // ---------- Create Your Fren: the Avatar Maker of the Fren Passport ----------
-  // The player's own pixel Fren, stacked from aligned 64×64 layers in avatar-assets/layers/ (listed in
-  // avatar-options.json). Picking parts and Randomize only change this preview, with no server traffic.
-  // Save Look is the one write (gry_passport_avatar_save): only its answer counts as saved, and the
-  // server alone awards Fresh Fren (first_avatar) for the first look it saves.
-  var AV_SLOTS = [['mouth', 'Mouth'], ['eyes', 'Eyes & glasses'], ['hat', 'Hat'], ['outfit', 'Outfit']];
-  // the part of the 64×64 picture each thumbnail zooms in on: [x, y, size]
-  var AV_CROP = { mouth: [18, 28, 32], eyes: [13, 10, 44], hat: [10, 2, 46], outfit: [8, 17, 48] };
+  // The player's own hand-drawn Fren, stacked from aligned 512×512 hand-drawn WebP layers in avatar-assets/layers/
+  // (listed in avatar-options.json, schema_version 2). Every layer shares one 0 0 512 512 canvas with the
+  // same head/eye/mouth/shoulder geometry, so the parts stack with no per-part offsets. The editable slots
+  // are bg, clothing, mouth, eyes, hat and accessory; base (defaults.base) is an implied constant layer that
+  // is always painted between bg and clothing and is never a choice. Options carrying an 'unlock' key are
+  // reward parts: they open once the server state holds that stamp; until then the maker shows them with a lock
+  // (not pickable), and the save RPC checks the stamp again on its own.
+  // Picking parts and Randomize only change this preview, with no server traffic. Save Look is the one write
+  // (gry_passport_avatar_save, six ids bg/clothing/mouth/eyes/hat/accessory): only its answer counts as saved,
+  // and the server alone awards Fresh Fren (first_avatar) for the first look it saves.
+  var AV_SLOTS = [['bg', 'Background'], ['clothing', 'Clothing'], ['mouth', 'Mouth'], ['eyes', 'Eyes'], ['hat', 'Hat'], ['accessory', 'Accessory'], ['special', 'Special']];
+  // Special avatars: a whole character drawn by Lily for a big milestone. When one is picked it covers every
+  // part layer except the background; the parts stay saved underneath.
+  var AV_PLAIN = 'special_none';
+  function avatarSpecial(look) { return !!look && !!look.special && look.special !== AV_PLAIN; }
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261105avatar1').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261106lily2').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
   }
+  // the offerable (selectable) options for a slot: the free parts, plus reward parts whose stamp the player has
+  // (owns(stampId) reads the server state). The save RPC rejects a reward part without its stamp anyway.
+  function avatarPicks(o, k, owns) { return (o.options[k] || []).filter(function (p) { return !p.unlock || (owns && owns(p.unlock)); }); }
   // a clean copy of a look, or null unless every slot holds a known part
   function avatarLook(o, x) {
     if (!o || !o.options || !x || typeof x !== 'object') return null;
     var look = {};
     for (var i = 0; i < AV_SLOTS.length; i++) {
       var k = AV_SLOTS[i][0], id = x[k];
+      if (k === 'special' && id == null) id = AV_PLAIN;   // looks saved before special avatars existed
       if (!(o.options[k] || []).some(function (p) { return p.id === id; })) return null;
       look[k] = id;
     }
     return look;
   }
   function avatarSame(a, b) { return !!a && !!b && AV_SLOTS.every(function (s) { return a[s[0]] === b[s[0]]; }); }
-  function avatarSrc(o, layer, look) { return o.paths[layer] || o.paths.layer_template.replace('{id}', look[layer]); }
+  // base is the one constant layer (defaults.base); every editable layer resolves to its chosen id
+  function avatarSrc(o, layer, look) {
+    if (layer === 'base') return o.paths.base || o.paths.layer_template.replace('{id}', o.defaults.base);
+    return o.paths.layer_template.replace('{id}', look[layer]);
+  }
   function avatarStack(o, look, label) {
-    var s = el('span', label ? { class: 'fa-stack', role: 'img', 'aria-label': label } : { class: 'fa-stack', 'aria-hidden': 'true' });
+    var cls = 'fa-stack' + (avatarSpecial(look) ? ' is-special' : '');
+    var s = el('span', label ? { class: cls, role: 'img', 'aria-label': label } : { class: cls, 'aria-hidden': 'true' });
     o.layers_order.forEach(function (layer) { s.appendChild(el('img', { src: avatarSrc(o, layer, look), alt: '', 'data-layer': layer, draggable: 'false' })); });
     return s;
   }
   function avatarSay(o, look) {
-    return AV_SLOTS.map(function (s) { var p = o.options[s[0]].filter(function (x) { return x.id === look[s[0]]; })[0]; return p ? p.label : look[s[0]]; }).join(', ');
+    var name = function (k) { var p = o.options[k].filter(function (x) { return x.id === look[k]; })[0]; return p ? p.label : look[k]; };
+    if (avatarSpecial(look)) return name('special') + ', ' + name('bg');
+    return AV_SLOTS.filter(function (s) { return s[0] !== 'special'; }).map(function (s) { var p = o.options[s[0]].filter(function (x) { return x.id === look[s[0]]; })[0]; return p ? p.label : look[s[0]]; }).join(', ');
   }
+  // the maker window art (scripts/build_maker_art.py) and its icon row: one 48px cell per icon
+  var FA_V = '?v=20261106mk1';
+  var FA_ICONS = ['mouth', 'eyes', 'hat', 'clothing', 'accessory', 'dice', 'floppy', 'check', 'passport'];
+  function faIcon(name) {
+    var n = el('span', { class: 'fa-ico', 'aria-hidden': 'true' });
+    n.style.backgroundPositionX = (Math.max(0, FA_ICONS.indexOf(name)) * 100 / (FA_ICONS.length - 1)) + '%';
+    return n;
+  }
+  // rows in the mockup's order (slot, label, icon); the background row comes last
+  var FA_ROWS = [['mouth', 'Mouth', 'mouth'], ['eyes', 'Eyes', 'eyes'], ['hat', 'Hat', 'hat'], ['clothing', 'Clothing', 'clothing'],
+    ['accessory', 'Accessory', 'accessory'], ['bg', 'Background', null], ['special', 'Special', null]];
+  // which stamp opens a reserved part (catalog titles)
+  // (only stamps that can be earned today are named; the others stay "a future stamp", like '???' in the Passport)
+  var FA_UNLOCK = { detective_fren: 'Detective Fren', miner_fren: 'Miner Fren', scout_fren: 'Scout Fren' };
   function avatarMaker() {
     return openApp('avatar', 'Create Your Fren - Avatar Maker', 'pep-logo', function (A) {
       passportCss();
+      A.host.classList.add('fren-win');
       A.body.innerHTML = '<div class="fa-load"><p class="passport-muted" role="status">Loading the Avatar Maker…</p></div>';
       var session = sbSession(), signed = !!(session && session.discord && session.userId);
       // opened from the Passport: its snapshot already has the saved look; otherwise read it once
@@ -1770,51 +2013,99 @@
       });
       function build(o, signed) {
         var d = signed ? passportMine() : null;
+        // a stamp the server says this player has earned (reward parts open with it)
+        var owns = function (id) { var l = d && Array.isArray(d.state.achievements) ? d.state.achievements : []; return l.some(function (b) { return b.id === id && !!b.earned_at; }); };
         var saved = d ? avatarLook(o, d.state.avatar) : null;
         var start = saved || avatarLook(o, o.defaults);
-        var look = Object.assign({}, start), pending = false, msg = '';
-        var wrap = el('div', { class: 'fa' }), side = el('div', { class: 'fa-side' }), frame = el('div', { class: 'fa-frame' });
+        var look = Object.assign({}, start), pending = false, msg = '', strips = [];
+        // Layout of the owner's mockup: title band, the Fren in a taped photo frame on the left, one row
+        // per part on the right (arrows scroll the row), then Randomize / Save Look / Use in Passport.
+        // Each row shows the part itself; the player picks every part on their own.
+        var wrap = el('div', { class: 'fa' });
+        var head = el('img', { class: 'fa-head', src: 'avatar-assets/maker/header.webp' + FA_V, width: '880', height: '104',
+          alt: 'Fren Passport, PepecoinHub. Avatar Maker: create your custom Pepe for your Fren Passport.' });
+        var main = el('div', { class: 'fa-main' }), side = el('div', { class: 'fa-side' }), frame = el('div', { class: 'fa-frame' });
         var big = avatarStack(o, look, 'Preview');
-        frame.appendChild(big); side.appendChild(frame);
+        frame.appendChild(big);
+        frame.appendChild(el('img', { class: 'fa-frame-art', src: 'avatar-assets/maker/frame.webp' + FA_V, alt: '', width: '296', height: '364', draggable: 'false' }));
+        side.appendChild(frame);
         var who = el('p', { class: 'fa-who' }); who.textContent = d && d.state.nickname ? d.state.nickname : signed ? 'Discord fren' : 'Guest preview';
         var said = el('p', { class: 'fa-state', role: 'status' });
-        side.appendChild(who); side.appendChild(said); wrap.appendChild(side);
-        var parts = el('div', { class: 'fa-parts' }), thumbs = [];
-        AV_SLOTS.forEach(function (slot) {
-          var k = slot[0], c = AV_CROP[k];
-          var fs = el('fieldset', { class: 'fa-group' }), lg = el('legend'), row = el('div', { class: 'fa-opts' });
-          lg.textContent = slot[1]; fs.appendChild(lg);
-          o.options[k].forEach(function (p) {
-            var lab = el('label', { class: 'fa-opt' }), inp = el('input', { type: 'radio', name: 'fa-' + k, value: p.id });
+        side.appendChild(who); side.appendChild(said); main.appendChild(side);
+        var parts = el('div', { class: 'fa-parts' });
+        FA_ROWS.forEach(function (row) {
+          var k = row[0];
+          var fs = el('fieldset', { class: 'fa-group' }), lg = el('legend', { class: 'fa-legend' }), strip = el('div', { class: 'fa-opts' });
+          lg.appendChild(!row[2] ? el('img', { class: 'fa-rowicon is-bg', src: o.paths.thumb_template.replace('{id}', k === 'bg' ? o.defaults.bg : 'special_explorer'), alt: '' }) : faIcon(row[2]));
+          lg.appendChild(document.createTextNode(row[1] + ':'));
+          fs.appendChild(lg);
+          // the arrows are a mouse/touch shortcut; keyboard users move through a row with the arrow keys
+          // (the focused part scrolls into view), and Tab goes to the next row
+          var prev = el('button', { type: 'button', class: 'fa-arr is-prev', tabindex: '-1', 'aria-hidden': 'true' });
+          var next = el('button', { type: 'button', class: 'fa-arr is-next', tabindex: '-1', 'aria-hidden': 'true' });
+          (o.options[k] || []).forEach(function (p) {
+            var locked = !!p.unlock && !owns(p.unlock), stamp = locked && FA_UNLOCK[p.unlock] || 'a future stamp';
+            var lab = el('label', { class: 'fa-opt' + (locked ? ' is-locked' : ''), title: locked ? p.label + ' - locked: earn the ' + stamp + ' stamp' : p.label });
+            var inp = el('input', { type: 'radio', name: 'fa-' + k, value: p.id });
+            // reserved parts are shown with a lock and cannot be picked; the save RPC rejects them too
+            if (locked) inp.disabled = true;
             inp.checked = look[k] === p.id;
-            inp.addEventListener('change', function () { if (inp.checked) { look[k] = p.id; msg = ''; paint(); } });
-            // the thumbnail shows the current look with this part swapped in, zoomed on the part
-            var mine = {}; mine[k] = p.id;
-            var t = el('span', { class: 'fa-thumb' }), st = avatarStack(o, Object.assign({}, look, mine));
-            st.style.width = st.style.height = 6400 / c[2] + '%'; st.style.left = -100 * c[0] / c[2] + '%'; st.style.top = -100 * c[1] / c[2] + '%';
-            t.appendChild(st); thumbs.push({ k: k, stack: st });
-            var name = el('span', { class: 'fa-lab' }); name.textContent = p.label;
-            lab.appendChild(inp); lab.appendChild(t); lab.appendChild(name); row.appendChild(lab);
+            inp.addEventListener('change', function () {
+              if (!inp.checked || locked) return;
+              look[k] = p.id;
+              // picking a part shows the parts again (a special avatar would hide it)
+              if (k !== 'bg' && k !== 'special') look.special = AV_PLAIN;
+              msg = ''; paint();
+            });
+            var t = el('span', { class: 'fa-thumb' + (k === 'bg' ? ' is-bg' : '') });
+            t.appendChild(el('img', { src: o.paths.thumb_template.replace('{id}', p.id), alt: '', draggable: 'false', loading: 'lazy' }));
+            var name = el('span', { class: 'fa-lab' }); name.textContent = p.label + (locked ? ' (locked: ' + stamp + ' stamp)' : '');
+            lab.appendChild(inp); lab.appendChild(t); lab.appendChild(name); strip.appendChild(lab);
           });
-          fs.appendChild(row); parts.appendChild(fs);
+          var ends = function () {
+            prev.disabled = strip.scrollLeft <= 1;
+            next.disabled = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 1;
+          };
+          prev.addEventListener('click', function () { strip.scrollBy({ left: -strip.clientWidth * 0.8, behavior: 'smooth' }); });
+          next.addEventListener('click', function () { strip.scrollBy({ left: strip.clientWidth * 0.8, behavior: 'smooth' }); });
+          strip.addEventListener('scroll', ends, { passive: true });
+          fs.appendChild(prev); fs.appendChild(strip); fs.appendChild(next);
+          parts.appendChild(fs);
+          setTimeout(ends, 0);
+          strips.push({ strip: strip, ends: ends, k: k });
         });
-        wrap.appendChild(parts);
-        var bar = el('div', { class: 'app-row fa-actions' });
-        var rnd = el('button', { type: 'button', class: 'app-btn fa-random' }); rnd.textContent = 'Randomize';
-        var saveB = el('button', { type: 'button', class: 'app-btn fa-save' }); saveB.textContent = signed ? 'Save Look' : 'Log on to save';
-        var useB = el('button', { type: 'button', class: 'app-btn fa-use' }); useB.textContent = 'Use in Passport';
-        bar.appendChild(rnd); bar.appendChild(el('span', { class: 'grow' })); bar.appendChild(saveB); bar.appendChild(useB);
+        main.appendChild(parts);
+        var foot = el('div', { class: 'fa-foot' });
         var note = el('p', { class: 'fa-note' });
-        note.textContent = signed ? 'Every part is free. Changes stay on this screen until you press Save Look.'
-          : 'Every part is free. Try any look as a guest; log on with Discord to save it to your Fren Passport.';
-        A.body.replaceChildren(wrap, bar, note);
+        note.appendChild(faIcon('passport'));
+        note.appendChild(el('span', {}, signed ? 'This avatar is used in your <b>Fren Passport</b>. Every part is free; changes stay here until you press Save Look.'
+          : 'Every part is free. Try any look as a guest; log on with Discord to save it to your <b>Fren Passport</b>.'));
+        var bar = el('div', { class: 'app-row fa-actions' });
+        var btn = function (cls, icon, text) {
+          var b = el('button', { type: 'button', class: 'app-btn ' + cls }); b.appendChild(faIcon(icon));
+          var tx = el('span', { class: 'fa-btn-t' }); tx.textContent = text; b.appendChild(tx); return b;
+        };
+        var rnd = btn('fa-random', 'dice', 'Randomize');
+        var saveB = btn('fa-save', 'floppy', signed ? 'Save Look' : 'Log on to save');
+        var useB = btn('fa-use', 'check', 'Use in Passport');
+        var setBtn = function (b, text) { b.querySelector('.fa-btn-t').textContent = text; };
+        bar.appendChild(rnd); bar.appendChild(saveB); bar.appendChild(useB);
+        foot.appendChild(note); foot.appendChild(bar);
+        wrap.appendChild(head); wrap.appendChild(main); wrap.appendChild(foot);
+        A.body.replaceChildren(wrap);
+        // keep the chosen part in view in its row
+        function showPicked() {
+          strips.forEach(function (s) {
+            var on = s.strip.querySelector('input:checked');
+            if (on) { var l = on.parentNode, r = l.offsetLeft - s.strip.offsetLeft; if (r < s.strip.scrollLeft || r + l.offsetWidth > s.strip.scrollLeft + s.strip.clientWidth) s.strip.scrollLeft = r - 8; }
+            s.ends();
+          });
+        }
         var setSrc = function (img, src) { if (img.getAttribute('src') !== src) img.setAttribute('src', src); };
         function paint() {
           big.querySelectorAll('img').forEach(function (img) { setSrc(img, avatarSrc(o, img.getAttribute('data-layer'), look)); });
           big.setAttribute('aria-label', 'Preview: ' + avatarSay(o, look));
-          thumbs.forEach(function (t) {
-            t.stack.querySelectorAll('img').forEach(function (img) { var L = img.getAttribute('data-layer'); if (L !== t.k) setSrc(img, avatarSrc(o, L, look)); });
-          });
+          big.classList.toggle('is-special', avatarSpecial(look));
           parts.querySelectorAll('input').forEach(function (inp) { inp.checked = look[inp.name.slice(3)] === inp.value; });
           status();
         }
@@ -1833,17 +2124,18 @@
           if (/Log on with Discord|JWT/i.test(m)) return 'Your Discord session expired. Log on again to save.';
           if (/^(Saving too fast|Daily save limit)/.test(m)) return m;
           if (/Unknown avatar option/.test(m)) return 'One of those parts is not available. Reload the page and try again.';
+          if (/That part is locked/.test(m)) return 'One of those parts is still locked: earn its stamp first. Your look was not saved.';
           return 'Could not save. Check your connection and try again. Your look was not saved.';
         }
         // Save Look: one RPC; the look counts as saved only when the server confirms it
         function save() {
           if (pending || !signed) return Promise.reject(new Error('not now'));
           var sent = Object.assign({}, look);
-          pending = true; msg = ''; saveB.textContent = 'Saving…'; status();
-          return rpc('gry_passport_avatar_save', { p_mouth: sent.mouth, p_eyes: sent.eyes, p_hat: sent.hat, p_outfit: sent.outfit }).then(function (r) {
+          pending = true; msg = ''; setBtn(saveB, 'Saving…'); status();
+          return rpc('gry_passport_avatar_save', { p_bg: sent.bg, p_clothing: sent.clothing, p_mouth: sent.mouth, p_eyes: sent.eyes, p_hat: sent.hat, p_accessory: sent.accessory, p_special: sent.special }).then(function (r) {
             var conf = r && avatarLook(o, r.avatar);
             if (!conf) throw new Error('The server did not confirm the save.');
-            pending = false; saveB.textContent = 'Save Look';
+            pending = false; setBtn(saveB, 'Save Look');
             saved = conf;
             if (avatarSame(look, sent)) look = Object.assign({}, conf);
             var pc = passportMine();
@@ -1862,7 +2154,7 @@
             if (r.badge && r.badge.new) balloon('Fresh Fren unlocked!', 'You saved your first Fren. The achievement is in your Fren Passport now.', 'fresh-fren');
             return conf;
           }, function (err) {
-            pending = false; saveB.textContent = 'Save Look';
+            pending = false; setBtn(saveB, 'Save Look');
             msg = failText(err); status();
             throw err;
           });
@@ -1872,9 +2164,10 @@
           var next;
           do {
             next = {};
-            AV_SLOTS.forEach(function (s) { var l = o.options[s[0]]; next[s[0]] = l[Math.floor(Math.random() * l.length)].id; });
+            AV_SLOTS.forEach(function (s) { var l = avatarPicks(o, s[0], owns); next[s[0]] = l[Math.floor(Math.random() * l.length)].id; });
+            next.special = AV_PLAIN;   // Randomize mixes parts; a special avatar is picked on purpose
           } while (avatarSame(next, look));
-          look = next; msg = ''; paint();
+          look = next; msg = ''; paint(); showPicked();
         });
         saveB.addEventListener('click', function () { if (!signed) logOn(); else save().catch(function () {}); });
         useB.addEventListener('click', function () {
@@ -1888,8 +2181,9 @@
           ], 'pep-logo');
         });
         paint();
+        setTimeout(showPicked, 0);
       }
-    }, 720);
+    }, 900);
   }
 
   // Only cosmetic, low-stakes discoveries are claimable by a browser.
@@ -1945,6 +2239,35 @@
       if (me0) setTimeout(function () { balloon('Welcome to the pond, ' + me0.name, me0.discord ? 'Signed in with Discord ✓. LAN Party and High Scores now use your name.' : 'Signed in as a guest. You can chat and submit scores.', 'gif-045-still'); }, 900);
     }
   }
+
+  // ---------- Fren Passport check-in (games/supabase/update_passport_awards.sql) ----------
+  // A Discord player's PondOS page asks once (at most every 5 minutes per tab). The server notes the UTC day
+  // for Welcome Back! and the 14- and 30-day runs, and returns the stamps it has not announced yet; each one is announced only once.
+  // The browser sends nothing but the request itself.
+  if (mainEl) (function () {
+    var s = sbSession();
+    if (!s || !s.discord || !s.userId) return;
+    var k = 'pondos-checkin:' + s.userId, now = Date.now();
+    try { if (now - (+sessionStorage.getItem(k) || 0) < 300000) return; sessionStorage.setItem(k, String(now)); } catch (e) {}
+    setTimeout(function () {
+      rpc('gry_passport_checkin', {}).then(function (r) {
+        var fresh = r && Array.isArray(r.new_badges) ? r.new_badges : [];
+        if (!fresh.length) return;
+        if (passportCache && passportCache.userId === s.userId) passportCache = null;   // the next Passport opens fresh
+        return fetch(PP_CATALOG).then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; }).then(function (c) {
+          var names = fresh.map(function (b) {
+            var x = c && Array.isArray(c.achievements) ? c.achievements.filter(function (a) { return a.id === b.id; })[0] : null;
+            return x ? x.title : null;
+          }).filter(Boolean);
+          if (!names.length) return;
+          var t = names.length === 1 ? balloon('New stamp: ' + esc(names[0]), 'It is in your Fren Passport now. Click to open it.', 'stamp-new')
+            : balloon(names.length + ' new stamps!', esc(names.join(', ')) + '. Click to open your Fren Passport.', 'stamp-new');
+          t.addEventListener('click', function (ev) { if (!ev.target.closest('button')) frenPassport(); });
+          t.style.cursor = 'pointer';
+        });
+      }, function () { /* the migration may not be installed yet; nothing to show */ });
+    }, 2500);
+  })();
 
   // ---------- counter.exe: a tiny 90s visitor counter. One number from the server (people counted once a day,
   // no cookie, no IP; the same data as the owner's statistics). Hidden if the server does not answer.
@@ -2065,7 +2388,7 @@
     'find the place on the map. Fast and close = more points.',
     '',
     '== HOW TO PLAY ==',
-    '1. Open WheresPepe.exe and press Start.',
+    '1. Open PepeGuesser.exe and press Start.',
     '   No account needed: a quick bot check, and you play',
     '   as a guest (or log on with Discord first).',
     '2. The photo shows up and the 2-minute clock starts.',
@@ -2134,9 +2457,9 @@
   }
   function wpFolder() {
     openApp('wp-folder', "C:\\Pond\\Where's Pepe", 'wp-folder', function (A) {
-      var F = [['WheresPepe.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme]];
+      var F = [['PepeGuesser.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme]];
       A.body.innerHTML = '<ul class="folder">' + F.map(function (f, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(f[1]) + '" alt="" width="40" height="40"><span>' + f[0] + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then double-click WheresPepe.exe.</p>';
+        '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then double-click PepeGuesser.exe.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { F[+b.getAttribute('data-i')][2](); };
         b.addEventListener('dblclick', go);
@@ -2784,16 +3107,29 @@
   // Every claim in them is a fact from this site; the "offers" are jokes, and every ad says so.
   // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
   // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
-  // a Fren from the Avatar Maker's own layers, for the ads (same paint order as avatar-options.json)
-  function adFren(m, e, h, o) {
-    return '<span class="ad-fren" aria-hidden="true">' + ['bg_pond', 'base_frog', o, m, e, h].map(function (id) { return '<img src="avatar-assets/layers/' + id + '.svg" alt="">'; }).join('') + '</span>';
+  // a Fren from the Avatar Maker's own layers, for the ads (same paint order as avatar-options.json:
+  // layers_order [bg, base, clothing, mouth, eyes, hat, accessory]). Reward parts appear only to show what a stamp opens.
+  function adFren(c, m, e, h, a) {
+    return '<span class="ad-fren" aria-hidden="true">' + ['bg_forest', 'base_frog', c, m, e, h, a].map(function (id) { return '<img src="avatar-assets/layers/' + id + '.webp" alt="">'; }).join('') + '</span>';
   }
   var ADS = [
+    { file: 'pond_stamps.mpg', added: '2026-11-06', title: 'Stamps That Check Out', ch: 'CH 19 · POND POST OFFICE', icon: 'pep-logo', scenes: [
+      '<p class="ad-kick">Did your frog do anything today? Can you prove it?</p><h3 class="ad-big">Stamps that<br><em>check out!</em></h3><p class="ad-sub">Your Fren Passport now collects 21 stamps, each one from something the pond\'s own server saw you do.</p>',
+      '<p class="ad-kick">Guess where Pepe is. Chat in the lobby. Write to the editor. Mine for an hour.</p><h3 class="ad-big">The games <em>stamp</em><br>your passport!</h3><p class="ad-sub">Pepe Guesser, the LAN Party chat, letters to the editor, Pepe Miner, YEET THE PEP and 14 or 30 days in a row on PondOS. Your old Pepe Guesser games and letters count too.</p>',
+      '<div class="ad-frens">' + adFren('clothing_suit', 'mouth_smirk', 'eyes_classic', 'hat_detective', 'accessory_none') + '</div><p class="ad-kick">Five perfect 5000s in Pepe Guesser?</p><h3 class="ad-big">Dress like a<br><em>detective!</em></h3><p class="ad-sub">Detective Fren opens the detective hat and the suit. Miner Fren opens the hard hat. 14 days in a row of Pepe Guesser opens Lily\'s Explorer Pepe.</p>',
+      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Here early?<br><em>Pond Pioneer!</em></h3><p class="ad-sub">Every account with Discord linked on launch day gets it. After that, the door closes.</p><p class="ad-fine">Not a real offer. Stamps are cosmetic: no PEP, no points, nothing to sell. Only what the server records counts. Log on with Discord to collect.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
+    ] },
+    { file: 'fren_passport.mpg', added: '2026-11-06', title: 'The Fren Passport', ch: 'CH 98 · POND TRAVEL AGENCY', icon: 'pep-logo', scenes: [
+      '<p class="ad-kick">Tired of profiles that look like a spreadsheet?</p><h3 class="ad-big">Get a real<br><em>passport!</em></h3><p class="ad-sub">A hand-drawn paper booklet, with your Fren clipped in as the photo.</p>',
+      '<img class="ad-pic" src="passport-assets/page-left.webp?v=20261106pp1" alt=""><p class="ad-kick">Fren ID. Nickname. Member since. All filled in from your Discord log-on.</p><h3 class="ad-big">No fake numbers.<br><em>Just you.</em></h3>',
+      '<img class="ad-pic" src="passport-assets/page-right.webp?v=20261106pp1" alt=""><p class="ad-kick">45 stamp slots. The pond checks every one on its own server.</p><h3 class="ad-big">Collect <em>stamps!</em></h3><p class="ad-sub">21 of them can be earned today, from what the games record. The rest say "coming soon" until they really work.</p>',
+      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">One stamp says<br><em>$0.01 - BALI</em></h3><p class="ad-sub">It stays locked for every fren until Pepecoin reaches one cent. Then everybody gets it. Same day, same stamp.</p><p class="ad-fine">Not a real offer. No trip, no prize, no price prediction, no financial advice. Stamps are cosmetic: no PEP, no points, nothing to sell. Log on with Discord to open yours.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
+    ] },
     { file: 'create_your_fren.mpg', added: '2026-11-05', title: 'Create Your Fren', ch: 'CH 64 · POND MAKEOVER HOUR', icon: 'fresh-fren', scenes: [
       '<p class="ad-kick">Is your Fren Passport photo just a logo?</p><h3 class="ad-big">Your pond needs<br>a <em>face!</em></h3>',
-      '<div class="ad-ba"><figure class="ad-before"><b>Before</b><img src="img/pep-logo.webp" alt=""><figcaption>“My Passport photo was a logo.”</figcaption></figure><figure class="ad-after"><b>After</b>' + adFren('mouth_grin', 'eyes_shades', 'hat_crown', 'outfit_purple_hoodie') + '<figcaption>A Fren in a paper crown!</figcaption></figure></div>',
-      '<p class="ad-kick">4 mouths. 6 eyes and glasses. 5 hats. 5 outfits.</p><h3 class="ad-big"><em>600</em> looks.<br>Zero PEP.</h3><div class="ad-frens">' + adFren('mouth_tongue', 'eyes_3d', 'hat_pep_cap', 'outfit_white_pep') + adFren('mouth_open', 'eyes_round', 'hat_bucket', 'outfit_orange_vest') + adFren('mouth_smile', 'eyes_sleepy', 'hat_beanie', 'outfit_black_hoodie') + '</div><p class="ad-sub">Every part is free. Hit Randomize until it feels like you.</p>',
-      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Save it once.<br>Get <em>Fresh Fren!</em></h3><p class="ad-sub">Your first saved look unlocks the Fresh Fren achievement in your Fren Passport. One per frog.</p><p class="ad-fine">Log on with Discord to save; guests can try every look. No NFTs, no XP, no rarity, no purchase. It\'s just a hat.</p><button type="button" class="ad-cta ad-frenbtn">Create Your Fren →</button>'
+      '<div class="ad-ba"><figure class="ad-before"><b>Before</b><img src="img/pep-logo.webp" alt=""><figcaption>“My Passport photo was a logo.”</figcaption></figure><figure class="ad-after"><b>After</b>' + adFren('clothing_purple_hoodie', 'mouth_teeth', 'eyes_hypno', 'hat_crown', 'accessory_shades') + '<figcaption>A Fren in a crown!</figcaption></figure></div>',
+      '<p class="ad-kick">5 backgrounds. 5 outfits. 6 mouths. 6 eyes. 6 hats. 6 extras.</p><h3 class="ad-big"><em>32,400</em> looks.<br>Zero PEP.</h3><div class="ad-frens">' + adFren('clothing_shirt_tie', 'mouth_tongue', 'eyes_3d', 'hat_pep_cap', 'accessory_pipe') + adFren('clothing_camo', 'mouth_open', 'eyes_bloodshot', 'hat_bucket', 'accessory_none') + adFren('clothing_black_hoodie', 'mouth_smile', 'eyes_sleepy', 'hat_beanie', 'accessory_shades') + '</div><p class="ad-sub">Every part is free. Hit Randomize until it feels like you.</p>',
+      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Save it once.<br>Get <em>Fresh Fren!</em></h3><p class="ad-sub">Your first saved look unlocks the Fresh Fren achievement in your Fren Passport. One per frog.</p><p class="ad-fine">Log on with Discord to save; guests can try every look. No NFTs, no rarity, no purchase, no spendable points. It\'s just a hat.</p><button type="button" class="ad-cta ad-frenbtn">Create Your Fren →</button>'
     ] },
     { file: 'frogageddon.mpg', added: '2026-11-05', title: 'FROGAGEDDON: frog artillery', ch: 'CH 2000 · FREN SOFTWARE LATE NIGHT', icon: 'pondwars', scenes: [
       '<img class="ad-hero" src="../games/img/pondwars/title.jpg" alt=""><p class="ad-kick">Small frogs. Big grudges. Questionable footwear.</p><h3 class="ad-big">FROG<em>AGEDDON</em><br>is here!</h3>',
@@ -2926,6 +3262,7 @@
       var sb = A.body.querySelector('.ad-sweepbtn'); if (sb) sb.addEventListener('click', function () { pepeSweeperApp(); });
       var fb2 = A.body.querySelector('.ad-frogbtn'); if (fb2) fb2.addEventListener('click', function () { pondWarsApp(); });
       var frb = A.body.querySelector('.ad-frenbtn'); if (frb) frb.addEventListener('click', function () { avatarMaker(); });
+      var ppb = A.body.querySelector('.ad-passbtn'); if (ppb) ppb.addEventListener('click', function () { frenPassport(); });
       var wl = A.body.querySelector('.ad-launch'); if (wl) { wl.innerHTML = launchText(); var wlt = setInterval(function () { if (!document.body.contains(wl)) clearInterval(wlt); else wl.innerHTML = launchText(); }, 1000); }
       liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
     }, 720);

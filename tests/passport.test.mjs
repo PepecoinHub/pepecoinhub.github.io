@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [25, 12, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [46, 12, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -42,7 +42,7 @@ test('secret RPC requires Discord and cannot issue premium or gameplay rewards',
 });
 
 test('all badge and secret catalog items use distinct statuses', () => {
-  const reserved = new Set(['moon_rock','certified_fren','pond_pioneer']);
+  const reserved = new Set(['moon_rock','certified_fren']);
   for (const item of [...catalog.achievements,...catalog.items]) {
     if (reserved.has(item.id)) assert.equal(item.status, 'planned');
   }
@@ -64,10 +64,13 @@ test('Certified Fren earned record appears once instead of a locked duplicate', 
   assert.doesNotMatch(sql, /'certified_fren'[\s\S]{0,200}'earned_at', null/);
 });
 
-// ---------- Fren Avatar Maker (static checks; tests/passport-avatar-sql.test.mjs runs the SQL for real) ----------
+// ---------- Fren Avatar Maker v2 (static checks; tests/passport-avatar-sql.test.mjs runs the SQL for real) ----------
 const avatarSql = file('games/supabase/update_fren_avatar.sql');
 const manifest = JSON.parse(file('docs/meme/avatar-options.json'));
-const SLOTS = ['mouth', 'eyes', 'hat', 'outfit'];
+// v2 saveable slots (columns), in save-RPC order. 'base' is a constant implied layer, not a slot.
+const SLOTS = ['bg', 'clothing', 'mouth', 'eyes', 'hat', 'accessory', 'special'];
+// Only options without an 'unlock' key are offered and saveable this stage.
+const baseIds = k => manifest.options[k].filter(o => !o.unlock).map(o => o.id);
 
 test('Fresh Fren is live only together with its server award path', () => {
   const avatar = catalog.achievements.find(x => x.id === 'first_avatar');
@@ -85,57 +88,113 @@ test('Fresh Fren is live only together with its server award path', () => {
   assert.match(firstBranch.split(/\n  else\n/)[1], /insert into games\.passport_badges/, 'award sits in the first-save branch');
 });
 
-test('avatar manifest: 22 aligned 64x64 layers, 600 looks, valid defaults', () => {
+test('avatar manifest v2: 512 canvas layers, part thumbnails, 32400 offered looks, valid defaults', () => {
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [4, 6, 5, 5]);
-  assert.equal(SLOTS.reduce((n, k) => n * manifest.options[k].length, 1), 600);
+  assert.equal(manifest.schema_version, 2);
+  // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 6, 6, 6, 9, 7, 2]);
+  // the only looks a player can actually compose and save are built from the non-unlock (base) ids
+  assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 5, 6, 6, 6, 6, 1]);
+  assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 32400, 'offered looks');
   assert.equal(new Set(ids).size, ids.length);
-  assert.deepEqual(manifest.layers_order, ['bg', 'base', 'outfit', 'mouth', 'eyes', 'hat']);
+  assert.deepEqual(manifest.layers_order, ['bg', 'base', 'clothing', 'mouth', 'eyes', 'hat', 'accessory', 'special']);
+  assert.equal(manifest.defaults.base, 'base_frog');
   for (const k of SLOTS) {
-    assert.ok(manifest.options[k].some(o => o.id === manifest.defaults[k]), 'default ' + k);
+    // the default must be a non-unlock option so a fresh Fren is always valid
+    assert.ok(baseIds(k).includes(manifest.defaults[k]), 'default ' + k);
     for (const o of manifest.options[k]) { assert.match(o.id, new RegExp('^' + k + '_[a-z0-9_]+$')); assert.ok(o.label); }
   }
-  const files = [manifest.paths.bg, manifest.paths.base, ...ids.map(id => manifest.paths.layer_template.replace('{id}', id))];
-  assert.equal(files.length, 22);
-  assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/layers/', import.meta.url)).filter(f => f.endsWith('.svg')).sort(),
-    files.map(f => f.split('/').pop()).sort(), 'no unused or missing layer files');
+  // one 512x512 WebP per option id, plus the implied base layer
+  const files = [...new Set([manifest.paths.base, ...ids.map(id => manifest.paths.layer_template.replace('{id}', id))])];
+  assert.equal(files.length, 43, '42 option layers + base_frog');
+  // one small picture of each part for the maker rows, nothing else in the folder
+  assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/thumbs/', import.meta.url)).sort(),
+    ids.map(id => manifest.paths.thumb_template.replace('{id}', id).split('/').pop()).sort(), 'no unused, stray or missing thumbnails');
+  assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/layers/', import.meta.url)).sort(),
+    files.map(f => f.split('/').pop()).sort(), 'no unused, stray or missing layer files');
   for (const f of files) {
-    const svg = file('docs/meme/' + f);
-    assert.match(svg, /<svg[^>]*viewBox="0 0 64 64"/, f);
-    assert.match(svg, /width="64" height="64"/, f);
-    assert.doesNotMatch(svg, /<script|<image|href=|on[a-z]+=/i, f + ' is plain vector art');
+    const b = readFileSync(new URL('../docs/meme/' + f, import.meta.url));
+    assert.equal(b.toString('latin1', 0, 4) + b.toString('latin1', 8, 12), 'RIFFWEBP', f + ' is a WebP');
+    // VP8X (layers with alpha): canvas size minus one, 24-bit LE at bytes 24..29.
+    // VP8 (opaque backgrounds): 14-bit width/height at bytes 26..29. VP8L (lossless): packed at byte 21.
+    const kind = b.toString('latin1', 12, 16);
+    let w, h;
+    if (kind === 'VP8X') { w = 1 + b.readUIntLE(24, 3); h = 1 + b.readUIntLE(27, 3); }
+    else if (kind === 'VP8 ') { w = b.readUInt16LE(26) & 0x3fff; h = b.readUInt16LE(28) & 0x3fff; }
+    else if (kind === 'VP8L') { const v = b.readUInt32LE(21); w = 1 + (v & 0x3fff); h = 1 + ((v >> 14) & 0x3fff); }
+    assert.deepEqual([w, h], [512, 512], f + ' is 512x512');
+    // only backgrounds may be opaque; every other layer must carry alpha
+    if (!/\/bg_/.test(f)) assert.notEqual(kind, 'VP8 ', f + ' must be transparent outside its part');
   }
 });
 
-test('avatar save RPC: Discord identity, exact allowlists, no user or badge argument, locked-down grants', () => {
+test('avatar save RPC v2: Discord identity, non-unlock allowlists, no user or badge argument, locked-down grants', () => {
   const fn = avatarSql.split('create or replace function public.gry_passport_avatar_save')[1].split('$$;')[0];
-  assert.match(fn, /^\(\s*p_mouth text, p_eyes text, p_hat text, p_outfit text\)/);
+  assert.match(fn, /^\(\s*\n?\s*p_bg text, p_clothing text, p_mouth text, p_eyes text, p_hat text, p_accessory text, p_special text default 'special_none'\)/);
+  assert.match(avatarSql, /drop function if exists public\.gry_passport_avatar_save\(text, text, text, text, text, text\);/);
   assert.match(fn, /security definer set search_path = ''/);
   assert.match(fn, /u uuid := auth\.uid\(\)/);
   assert.match(fn, /games\.discord_identity\(u\) is null/);
+  // the server allowlist equals the manifest ids per slot, in manifest order (free parts first)
   for (const k of SLOTS) {
     const list = fn.match(new RegExp('p_' + k + ' is null or p_' + k + ' not in \\(([^)]*)\\)'));
     assert.ok(list, k + ' allowlist');
     assert.deepEqual([...list[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]), manifest.options[k].map(o => o.id), k);
   }
+  // every reward part is checked against exactly the stamp its manifest 'unlock' key names
+  const rewards = [...fn.split('from (values')[1].split('r(part, stamp)')[0].matchAll(/\('([a-z0-9_]+)', '([a-z0-9_]+)'\)/g)].map(x => x[1] + '>' + x[2]).sort();
+  const wanted = SLOTS.flatMap(k => manifest.options[k].filter(o => o.unlock).map(o => o.id + '>' + o.unlock)).sort();
+  assert.ok(wanted.length >= 6, 'manifest should still carry reward parts');
+  assert.deepEqual(rewards, wanted);
+  assert.match(fn, /raise exception 'That part is locked: earn its stamp first'/);
+  const sixText = /\(text, text, text, text, text, text, text\)/;
   assert.match(avatarSql, /revoke all on games\.passport_avatars from public, anon, authenticated/);
   assert.match(avatarSql, /alter table games\.passport_avatars enable row level security/);
-  assert.match(avatarSql, /revoke all on function public\.gry_passport_avatar_save\(text, text, text, text\) from public, anon, authenticated/);
-  assert.match(avatarSql, /grant execute on function public\.gry_passport_avatar_save\(text, text, text, text\) to authenticated;/);
+  assert.match(avatarSql, new RegExp('revoke all on function public\\.gry_passport_avatar_save' + sixText.source + ' from public, anon, authenticated'));
+  assert.match(avatarSql, new RegExp('grant execute on function public\\.gry_passport_avatar_save' + sixText.source + ' to authenticated;'));
   assert.equal([...avatarSql.matchAll(/\bas \$\$/g)].length, [...avatarSql.matchAll(/^\$\$;/gm)].length);
   // the Passport read path carries the saved look
   assert.match(avatarSql, /'avatar', look,/);
 });
 
-test('Avatar Maker client: one save RPC with four IDs, nothing kept in localStorage', () => {
+test('Avatar Maker client: one save RPC with six v2 IDs, nothing kept in localStorage', () => {
   const maker = pond.split('// ---------- Create Your Fren: the Avatar Maker')[1].split('// Only cosmetic, low-stakes discoveries')[0];
   assert.ok(maker, 'Avatar Maker block missing');
   const calls = [...maker.matchAll(/rpc\('([a-z_]+)'/g)].map(x => x[1]);
   assert.deepEqual(calls, ['gry_passport_avatar_save']);
-  assert.match(maker, /rpc\('gry_passport_avatar_save', \{ p_mouth: sent\.mouth, p_eyes: sent\.eyes, p_hat: sent\.hat, p_outfit: sent\.outfit \}\)/);
+  assert.match(maker, /rpc\('gry_passport_avatar_save', \{ p_bg: sent\.bg, p_clothing: sent\.clothing, p_mouth: sent\.mouth, p_eyes: sent\.eyes, p_hat: sent\.hat, p_accessory: sent\.accessory, p_special: sent\.special \}\)/);
   assert.doesNotMatch(maker, /localStorage|sessionStorage/);
   assert.match(maker, /openApp\('avatar', 'Create Your Fren - Avatar Maker'/);
   // the balloon only follows a server answer that minted the badge
   assert.match(maker, /if \(r\.badge && r\.badge\.new\) balloon\('Fresh Fren unlocked!'/);
   assert.match(pond, /avatar-options\.json\?v=/);
+});
+
+test('Passport booklet art: four small transparent WebPs with the sizes the page layout assumes', () => {
+  const dir = new URL('../docs/meme/passport-assets/', import.meta.url);
+  const want = { 'page-left.webp': [360, 528], 'page-right.webp': [360, 528], 'stamps.webp': [16 * 69, 75], 'icons.webp': [12 * 48, 48],
+    // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
+    'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80] };
+  assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
+  let total = 0;
+  for (const [f, size] of Object.entries(want)) {
+    const b = readFileSync(new URL(f, dir));
+    if (f !== 'stamps-lily.webp') total += b.length;
+    else assert.ok(b.length < 160 * 1024, 'Lily stamp sprite stays small: ' + b.length);
+    assert.equal(b.toString('latin1', 0, 4) + b.toString('latin1', 8, 12), 'RIFFWEBP', f + ' is a WebP');
+    // VP8X is the extended header used for images with alpha (the photo window and sprite edges are transparent)
+    assert.equal(b.toString('latin1', 12, 16), 'VP8X', f + ' carries alpha');
+    assert.deepEqual([1 + b.readUIntLE(24, 3), 1 + b.readUIntLE(27, 3)], size, f + ' size');
+  }
+  assert.ok(total < 260 * 1024, 'passport art stays small: ' + total + ' bytes');
+  // the client must use the sprite with the same cell counts
+  const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
+  const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
+  assert.equal(count('PP_STAMPS'), 16);
+  assert.equal(count('PP_ICONS'), 12);
+  // the Lily sprite order in the client equals the build script order
+  const lily = js.match(/var PP_LILY = \[([^\]]*)\]/)[1].match(/'([a-z0-9_]+)'/g).map(x => x.slice(1, -1));
+  const built = [...readFileSync(new URL('../scripts/build_lily_stamps.mjs', import.meta.url), 'utf8').matchAll(/\['([a-z0-9_]+)', S[123],/g)].map(x => x[1]);
+  assert.equal(lily.length, 15); assert.deepEqual(lily, built);
+  assert.ok(existsSync(new URL('../games/fren-passport/source/passport-mockup.webp', import.meta.url)), 'lossless source art is kept');
 });

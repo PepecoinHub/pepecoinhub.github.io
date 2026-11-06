@@ -9,6 +9,14 @@
       "status": "live"
     },
     {
+      "id": "pond_pioneer",
+      "title": "Pond Pioneer",
+      "description": "Had Discord linked to PepecoinHub on the day the Fren Passport opened. It cannot be earned any more.",
+      "category": "community",
+      "limited": true,
+      "status": "live"
+    },
+    {
       "id": "first_avatar",
       "title": "Fresh Fren",
       "description": "Create and save your first custom Fren avatar.",
@@ -17,24 +25,171 @@
       "status": "live"
     },
     {
+      "id": "welcome_back",
+      "title": "Welcome Back!",
+      "description": "Come back to PondOS on the day after your first visit (UTC days).",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "pepe_guesser",
+      "title": "Pepe Guesser",
+      "description": "Make your first Pepe Guesser guess with a pin on the map.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "sharp_eye",
+      "title": "Sharp Eye",
+      "description": "Score a perfect 5000 in a daily Pepe Guesser hunt.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "week_scout",
+      "title": "Week Scout",
+      "description": "Guess in Pepe Guesser on 7 days in a row (UTC days).",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "detective_fren",
+      "title": "Detective Fren",
+      "description": "Score a perfect 5000 in Pepe Guesser on 5 different days. Unlocks the detective hat and the suit.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "scout_fren",
+      "title": "Scout Fren",
+      "description": "Guess in Pepe Guesser on 14 days in a row (UTC days). Unlocks Lily's Explorer Pepe and the explorer hat.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "first_words",
+      "title": "First Words",
+      "description": "Send your first message in the lobby chat (LAN Party).",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "hey_fren",
+      "title": "Hey @Fren",
+      "description": "Mention another fren in the lobby chat with @ and their nickname.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "community_fren",
+      "title": "Community Fren",
+      "description": "Chat in the lobby on 5 different days (UTC days).",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "dear_editor",
+      "title": "Dear Editor",
+      "description": "Send your first letter to the editor.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "junior_editor",
+      "title": "Junior Editor",
+      "description": "Send 5 letters to the editor.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "senior_editor",
+      "title": "Senior Editor",
+      "description": "Send 10 letters to the editor.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "streak_14",
+      "title": "14-Day Streak",
+      "description": "Open PondOS signed in with Discord on 14 days in a row (UTC days).",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "like_it_here",
+      "title": "Guess You Like It Here",
+      "description": "Open PondOS signed in with Discord on 30 days in a row (UTC days).",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "rookie_miner",
+      "title": "Rookie Miner",
+      "description": "Play Pepe Miner for 10 minutes with the cloud save on.",
+      "category": "arcade",
+      "status": "live"
+    },
+    {
+      "id": "miner_fren",
+      "title": "Miner Fren",
+      "description": "Play Pepe Miner for one hour in total. Unlocks the hard hat.",
+      "category": "arcade",
+      "status": "live"
+    },
+    {
+      "id": "nasa_is_hiring",
+      "title": "NASA Is Hiring",
+      "description": "Fly more than 5000 m in YEET THE PEP three times. Each flight counts once.",
+      "category": "yeet",
+      "status": "live"
+    },
+    {
       "id": "moonwalker",
       "title": "Moonwalker",
-      "description": "Record a 6000 m flight in YEET THE PEP. Moon Rock is a separate future reward.",
+      "description": "Fly the full 6000 m in YEET THE PEP. A very rare stamp. Moon Rock is a separate future reward.",
       "category": "yeet",
       "status": "live"
     },
     {
       "id": "certified_fren",
       "title": "Certified Fren",
-      "description": "Care for your PepeGochi on 100 distinct days.",
-      "category": "pepegachi",
+      "description": "Return to PondOS and complete at least one accepted signed-in interaction on 100 distinct UTC days (not necessarily consecutive). Server verified.",
+      "category": "community",
       "status": "planned"
     },
     {
-      "id": "pond_pioneer",
-      "title": "Pond Pioneer",
-      "description": "Be among the earliest registered frens.",
-      "category": "community",
+      "id": "curious_fren",
+      "title": "Curious Fren",
+      "description": "Open five different PondOS apps. Server verified.",
+      "category": "exploration",
+      "status": "planned"
+    },
+    {
+      "id": "yeet_adept",
+      "title": "Adept",
+      "description": "Reach at least 3000 m in YEET THE PEP. Unlocks the Sunset avatar background once server-verified achievements go live.",
+      "category": "yeet",
+      "status": "planned"
+    },
+    {
+      "id": "gamer_fren",
+      "title": "Gamer Fren",
+      "description": "Play across the PondOS arcade. Server verified.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "game_night",
+      "title": "Game Night",
+      "description": "Join a live LAN Party game night. Server verified.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "collector",
+      "title": "Collector",
+      "description": "Gather a shelf of PondOS collectibles. Server verified.",
+      "category": "pepegachi",
       "status": "planned"
     },
     {
@@ -61,14 +216,14 @@
     {
       "id": "little_fren",
       "title": "Little Fren",
-      "description": "Help PepeGochi reach its first evolution.",
+      "description": "Come back to your PepeGochi on a second day: it grows into a froglet.",
       "category": "pepegachi",
       "status": "planned"
     },
     {
       "id": "grown_fren",
-      "title": "Grown Fren",
-      "description": "Help PepeGochi reach its adult stage.",
+      "title": "One Small Step",
+      "description": "Your PepeGochi grows up on its 7th care day. One small step for a man, one giant leap for a frog.",
       "category": "pepegachi",
       "status": "planned"
     },
@@ -101,24 +256,10 @@
       "status": "planned"
     },
     {
-      "id": "nasa_is_hiring",
-      "title": "NASA Is Hiring",
-      "description": "Reach 6000 m in YEET three separate times.",
-      "category": "yeet",
-      "status": "planned"
-    },
-    {
       "id": "no_panic",
       "title": "No Panic",
       "description": "Finish YEET without using any panic flaps.",
       "category": "yeet",
-      "status": "planned"
-    },
-    {
-      "id": "frog_detective",
-      "title": "Frog Detective",
-      "description": "Find Pepe in ten different daily photo hunts.",
-      "category": "where_pepe",
       "status": "planned"
     },
     {
@@ -171,10 +312,18 @@
       "status": "planned"
     },
     {
-      "id": "hundred_year_fren",
-      "title": "Hundred Day Fren",
-      "description": "Reach 100 days as a registered Fren.",
+      "id": "hundred_day_fren",
+      "title": "100 Days Together",
+      "description": "Reach 100 days since your Discord Fren account was registered. Account age, not active days.",
       "category": "community",
+      "status": "planned"
+    },
+    {
+      "id": "bali",
+      "title": "BALI",
+      "description": "$0.01 - BALI. A mythic stamp for every fren when Pepecoin reaches $0.01 USD. Server verified; reserved until then.",
+      "category": "mythic",
+      "tier": "mythic",
       "status": "planned"
     }
   ],
