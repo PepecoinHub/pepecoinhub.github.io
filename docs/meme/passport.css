@@ -27,15 +27,8 @@
 .pp-idcard dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
 .pp-make { display: block; width: 100%; padding: 6px 10px; font-size: 12px; }
 
-/* My Fren Journey panel (cosmetic) */
+/* My Fren Journey: factual activity and collection counters */
 .pp-journey { margin-top: 10px; padding-top: 6px; border-top: 1px solid var(--chrome-lo); }
-.pp-level { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
-.pp-level strong { font: bold 13px var(--f-chrome),Tahoma,sans-serif; }
-.pp-level span { font-size: 10.5px; }
-.pp-xp { height: 14px; margin: 4px 0 8px; background: var(--chrome); border: 1px solid var(--chrome-dk);
-  box-shadow: inset 1px 1px 0 var(--chrome-lo); overflow: hidden; }
-.pp-xp-fill { display: block; height: 100%; background: repeating-linear-gradient(90deg, #51ac45 0 7px, #46983b 7px 8px);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
 .pp-jstats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 5px; }
 .pp-jstat { padding: 5px 4px; text-align: center; border: 1px solid var(--chrome-lo); background: var(--chrome); }
 .pp-jstat strong { display: block; font: bold 16px/1.1 var(--f-chrome),Tahoma,sans-serif; }
