@@ -139,7 +139,7 @@ async function openPassport(page) {
 const maker = '.app-win[aria-label="Create Your Fren - Avatar Maker"]';
 const pick = (page, slot, id) => page.click(`${maker} input[name="fa-${slot}"][value="${id}"] + .fa-thumb`);
 const lookOnPage = page => page.evaluate(sel => Object.fromEntries([...document.querySelectorAll(sel + ' input:checked')].map(i => [i.name.slice(3), i.value])), maker);
-const previewSrcs = page => page.evaluate(sel => [...document.querySelectorAll(sel + ' .fa-frame img')].map(i => i.getAttribute('src')), maker);
+const previewSrcs = page => page.evaluate(sel => [...document.querySelectorAll(sel + ' .fa-frame .fa-stack img')].map(i => i.getAttribute('src')), maker);
 const statusText = page => page.textContent(maker + ' .fa-state');
 const dbRow = async i => (await db.query('select bg, clothing, mouth, eyes, hat, accessory from games.passport_avatars where user_id = $1', [uid(i)])).rows[0] || null;
 const dbBadges = async i => (await db.query("select count(*)::int n from games.passport_badges where user_id = $1 and badge_id = 'first_avatar'", [uid(i)])).rows[0].n;
@@ -168,29 +168,34 @@ try {
     await page.click('.pp-make');
     await page.waitForSelector(maker + ' .fa');
     assert.equal(passportCalls().length, 1);
-    assert.deepEqual(await lookOnPage(page), { bg: 'bg_none', clothing: 'clothing_blue', mouth: 'mouth_smile', eyes: 'eyes_classic', hat: 'hat_none', accessory: 'accessory_none' });
-    // non-unlock options offered per slot: bg 3, clothing 5, mouth 6, eyes 6, hat 6, accessory 3 = 29
-    assert.equal(await page.locator(maker + ' .fa-opt').count(), 31); // 4 bg + 5 clothing + 6 mouth + 6 eyes + 7 hats + 3 accessories
+    assert.deepEqual(await lookOnPage(page), { bg: 'bg_sky', clothing: 'clothing_blue', mouth: 'mouth_flat', eyes: 'eyes_sleepy', hat: 'hat_none', accessory: 'accessory_none' });
+    // every part has a tile; free: 5 bg + 5 clothing + 6 mouth + 6 eyes + 6 hats + 6 accessories = 34
+    assert.equal(await page.locator(maker + ' .fa-opt:not(.is-locked)').count(), 34);
+    // reserved parts show a lock and cannot be picked: sunset, detective jacket, hard hat, detective hat, headphones, pin
+    assert.deepEqual(await page.$$eval(maker + ' .fa-opt.is-locked input', l => l.map(i => [i.value, i.disabled])),
+      [['hat_hardhat', true], ['hat_detective', true], ['clothing_suit', true], ['accessory_headphones', true], ['accessory_pin', true], ['bg_sunset', true]]);
     assert.equal(await statusText(page), 'Not saved yet.');
     const w = await page.evaluate(sel => document.querySelector(sel).getBoundingClientRect().width, maker);
-    assert.ok(w >= 680 && w <= 740, 'window width ' + w);
+    assert.ok(w >= 860 && w <= 920, 'window width ' + w);
     const thumbs = await page.$$eval(maker + ' .fa-thumb', t => t.map(x => [Math.round(x.getBoundingClientRect().width), Math.round(x.getBoundingClientRect().height)]));
-    assert.ok(thumbs.every(([a, b]) => a === 52 && b === 52), 'thumbnail sizes ' + JSON.stringify(thumbs));
+    assert.ok(thumbs.every(([a, b]) => a === 50 && b === 36), 'thumbnail sizes ' + JSON.stringify(thumbs));
+    // the rows show the part pictures, not whole portraits
+    assert.ok((await page.getAttribute(`${maker} input[value="hat_crown"] + .fa-thumb img`, 'src')).endsWith('thumbs/hat_crown.webp'));
     await shot(page, '02-maker-default-dark');
   });
   await step('Picking parts and Randomize change only the preview (no API traffic)', async () => {
     const before = passportCalls().length;
-    await pick(page, 'bg', 'bg_pond'); await pick(page, 'clothing', 'clothing_purple_hoodie');
-    await pick(page, 'mouth', 'mouth_grin'); await pick(page, 'eyes', 'eyes_shades');
-    await pick(page, 'hat', 'hat_crown'); await pick(page, 'accessory', 'accessory_chain');
+    await pick(page, 'bg', 'bg_forest'); await pick(page, 'clothing', 'clothing_purple_hoodie');
+    await pick(page, 'mouth', 'mouth_teeth'); await pick(page, 'eyes', 'eyes_hypno');
+    await pick(page, 'hat', 'hat_crown'); await pick(page, 'accessory', 'accessory_shades');
     assert.deepEqual((await previewSrcs(page)).map(s => s.split('/').pop()),
-      ['bg_pond.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_grin.webp', 'eyes_shades.webp', 'hat_crown.webp', 'accessory_chain.webp']);
+      ['bg_forest.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_teeth.webp', 'eyes_hypno.webp', 'hat_crown.webp', 'accessory_shades.webp']);
     assert.equal(await statusText(page), 'Unsaved changes');
     for (let i = 0; i < 12; i++) await page.click(maker + ' .fa-random');
     assert.equal(passportCalls().length, before, 'no RPC while choosing');
-    await pick(page, 'bg', 'bg_pond'); await pick(page, 'clothing', 'clothing_purple_hoodie');
-    await pick(page, 'mouth', 'mouth_grin'); await pick(page, 'eyes', 'eyes_shades');
-    await pick(page, 'hat', 'hat_crown'); await pick(page, 'accessory', 'accessory_chain');
+    await pick(page, 'bg', 'bg_forest'); await pick(page, 'clothing', 'clothing_purple_hoodie');
+    await pick(page, 'mouth', 'mouth_teeth'); await pick(page, 'eyes', 'eyes_hypno');
+    await pick(page, 'hat', 'hat_crown'); await pick(page, 'accessory', 'accessory_shades');
     assert.equal(await dbRow(1), null);
     await shot(page, '03-maker-unsaved-dark');
   });
@@ -201,7 +206,7 @@ try {
     await page.keyboard.press('ArrowRight');
     assert.equal((await lookOnPage(page)).hat, 'hat_crown');
     await page.keyboard.press('Tab');
-    assert.equal(await page.evaluate(() => document.activeElement.name), 'fa-accessory');
+    assert.equal(await page.evaluate(() => document.activeElement.name), 'fa-clothing'); // rows: mouth, eyes, hat, clothing, accessory, background
     assert.equal(await page.evaluate(() => getComputedStyle(document.activeElement.closest('.fa-opt')).outlineStyle), 'dotted');
   });
   await step('Save Look: one write, server confirms, Fresh Fren once, balloon', async () => {
@@ -210,8 +215,8 @@ try {
     await page.waitForFunction(sel => /Saved in your Fren Passport/.test(document.querySelector(sel + ' .fa-state').textContent), maker);
     const after = passportCalls().slice(before);
     assert.deepEqual(after.map(c => c.fn), ['gry_passport_avatar_save']);
-    assert.deepEqual(after[0].body, { p_bg: 'bg_pond', p_clothing: 'clothing_purple_hoodie', p_mouth: 'mouth_grin', p_eyes: 'eyes_shades', p_hat: 'hat_crown', p_accessory: 'accessory_chain' });
-    assert.deepEqual(await dbRow(1), { bg: 'bg_pond', clothing: 'clothing_purple_hoodie', mouth: 'mouth_grin', eyes: 'eyes_shades', hat: 'hat_crown', accessory: 'accessory_chain' });
+    assert.deepEqual(after[0].body, { p_bg: 'bg_forest', p_clothing: 'clothing_purple_hoodie', p_mouth: 'mouth_teeth', p_eyes: 'eyes_hypno', p_hat: 'hat_crown', p_accessory: 'accessory_shades' });
+    assert.deepEqual(await dbRow(1), { bg: 'bg_forest', clothing: 'clothing_purple_hoodie', mouth: 'mouth_teeth', eyes: 'eyes_hypno', hat: 'hat_crown', accessory: 'accessory_shades' });
     assert.equal(await dbBadges(1), 1);
     await page.waitForSelector('.balloon:has-text("Fresh Fren")');
     assert.equal(await page.isDisabled(maker + ' .fa-save'), true);
@@ -225,7 +230,7 @@ try {
     const P = '.app-win[aria-label="Fren Passport - Properties"]';
     assert.equal(passportCalls().length, before, 'no read after the save response');
     assert.deepEqual(await page.evaluate(sel => [...document.querySelectorAll(sel + ' .pp-photo .fa-stack img')].map(i => i.getAttribute('src').split('/').pop()), P),
-      ['bg_pond.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_grin.webp', 'eyes_shades.webp', 'hat_crown.webp', 'accessory_chain.webp']);
+      ['bg_forest.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_teeth.webp', 'eyes_hypno.webp', 'hat_crown.webp', 'accessory_shades.webp']);
     assert.equal(await page.textContent(P + ' .pp-make'), 'Edit your Fren');
     const fresh = await page.locator(P + ' .pp-stamp', { hasText: 'Fresh Fren' }).textContent();
     assert.doesNotMatch(fresh, /Locked/);
@@ -245,7 +250,7 @@ try {
     await page.click(maker + ' .fa-save');
     await page.waitForFunction(sel => /too fast/i.test(document.querySelector(sel + ' .fa-state').textContent), maker);
     assert.equal(passportCalls().length, before + 1);
-    assert.equal((await dbRow(1)).eyes, 'eyes_shades', 'nothing changed on the server');
+    assert.equal((await dbRow(1)).eyes, 'eyes_hypno', 'nothing changed on the server');
     assert.equal(await page.locator('.balloon').count(), 0);
     assert.equal(await page.isDisabled(maker + ' .fa-save'), false);
     await shot(page, '07-too-fast-error-dark');
@@ -255,7 +260,7 @@ try {
     failMode = 'network';
     await page.click(maker + ' .fa-save');
     await page.waitForFunction(sel => /Could not save/.test(document.querySelector(sel + ' .fa-state').textContent), maker);
-    assert.equal((await dbRow(1)).eyes, 'eyes_shades');
+    assert.equal((await dbRow(1)).eyes, 'eyes_hypno');
   });
   await step('Second save after cooldown: saved, no second Fresh Fren', async () => {
     await page.click(maker + ' .fa-save');
@@ -282,7 +287,7 @@ try {
     await page.click(maker + ' .fa-save');
     await page.waitForFunction(sel => /waiting for its database update/.test(document.querySelector(sel + ' .fa-state').textContent), maker);
     failMode = null;
-    assert.equal((await dbRow(1)).mouth, 'mouth_grin');
+    assert.equal((await dbRow(1)).mouth, 'mouth_teeth');
     await page.click(maker + ' .w-x');
   });
   assert.deepEqual(errors, [], 'no page errors: ' + errors.join(' | '));
@@ -294,11 +299,11 @@ try {
     await openPassport(page);
     const P = '.app-win[aria-label="Fren Passport - Properties"]';
     assert.deepEqual(await page.evaluate(sel => [...document.querySelectorAll(sel + ' .pp-photo .fa-stack img')].map(i => i.getAttribute('src').split('/').pop()), P),
-      ['bg_pond.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_grin.webp', 'eyes_3d.webp', 'hat_crown.webp', 'accessory_chain.webp']);
+      ['bg_forest.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_teeth.webp', 'eyes_3d.webp', 'hat_crown.webp', 'accessory_shades.webp']);
     assert.doesNotMatch(await page.locator(P + ' .pp-stamp', { hasText: 'Fresh Fren' }).textContent(), /Locked/);
     await shot(page, '08-passport-second-device-light');
     await page.click('.pp-make'); await page.waitForSelector(maker + ' .fa');
-    assert.deepEqual(await lookOnPage(page), { bg: 'bg_pond', clothing: 'clothing_purple_hoodie', mouth: 'mouth_grin', eyes: 'eyes_3d', hat: 'hat_crown', accessory: 'accessory_chain' });
+    assert.deepEqual(await lookOnPage(page), { bg: 'bg_forest', clothing: 'clothing_purple_hoodie', mouth: 'mouth_teeth', eyes: 'eyes_3d', hat: 'hat_crown', accessory: 'accessory_shades' });
     await shot(page, '09-maker-light');
     assert.deepEqual(errors, []);
     await ctx.close();
@@ -345,15 +350,15 @@ try {
       const btns = [...w.querySelectorAll('.fa-actions .app-btn')].map(o => o.getBoundingClientRect());
       return { docW: document.documentElement.scrollWidth, vw: innerWidth, winScroll: w.scrollWidth - w.clientWidth,
         stacked: parts.top >= side.bottom - 1, minOpt: Math.min(...opts.map(r => Math.min(r.width, r.height))),
-        minBtn: Math.min(...btns.map(r => r.height)), right: Math.max(...opts.map(r => r.right)) };
+        minBtn: Math.min(...btns.map(r => r.height)), right: Math.max(...[...w.querySelectorAll('.fa-opts')].map(o => o.getBoundingClientRect().right)) };
     }, maker);
     assert.ok(m.docW <= m.vw, 'page scrolls sideways ' + JSON.stringify(m));
     assert.ok(m.winScroll <= 0, 'window scrolls sideways ' + JSON.stringify(m));
     assert.ok(m.stacked, 'preview above choices'); assert.ok(m.minOpt >= 44, 'option size ' + m.minOpt); assert.ok(m.minBtn >= 44, 'button ' + m.minBtn);
-    assert.ok(m.right <= m.vw, 'options inside the screen');
+    assert.ok(m.right <= m.vw, 'option rows inside the screen (each row scrolls on its own)');
     await shot(page, '12-phone-maker-top');
-    await page.tap(`${maker} input[name="fa-clothing"][value="clothing_orange_vest"] + .fa-thumb`);
-    assert.equal((await lookOnPage(page)).clothing, 'clothing_orange_vest');
+    await page.tap(`${maker} input[name="fa-clothing"][value="clothing_camo"] + .fa-thumb`);
+    assert.equal((await lookOnPage(page)).clothing, 'clothing_camo');
     await page.evaluate(sel => { const w = document.querySelector(sel); w.scrollTop = w.scrollHeight; }, maker);
     await shot(page, '13-phone-maker-bottom');
     await page.setViewportSize({ width: 320, height: 640 });

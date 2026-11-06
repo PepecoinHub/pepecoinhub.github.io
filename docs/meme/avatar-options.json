@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "coordinate_system": "512x512 shared canvas; every layer is a 512x512 transparent WebP with its part already in place, so layers stack with no per-part offsets. Built by scripts/build_avatar_layers.py from the hand-drawn sheets in games/fren-avatar/source/.",
-  "palette": "Hand-drawn classic Pepe (ChatGPT art, approved 2026-11-06): muted olive skin, brown mouth with pink inside, white eyes with black pupils, black uneven outlines, flat fills.",
+  "coordinate_system": "512x512 shared canvas; every layer is a 512x512 transparent WebP with its part already in place, so layers stack with no per-part offsets. Built by scripts/build_avatar_layers.py from the owner's part sheets in games/fren-avatar/source-v3/ (head and shoulders from games/fren-avatar/source/base.webp). Each option also has a small picture of the part itself in avatar-assets/thumbs/ for the maker rows.",
+  "palette": "Owner's part sheets (2026-11-06): bright Pepe green, thick black outlines, flat fills; pixel-art backgrounds.",
   "layers_order": [
     "bg",
     "base",
@@ -12,32 +12,36 @@
     "accessory"
   ],
   "defaults": {
-    "bg": "bg_none",
+    "bg": "bg_sky",
     "base": "base_frog",
     "clothing": "clothing_blue",
-    "mouth": "mouth_smile",
-    "eyes": "eyes_classic",
+    "mouth": "mouth_flat",
+    "eyes": "eyes_sleepy",
     "hat": "hat_none",
     "accessory": "accessory_none"
   },
-  "unlock_note": "Options with an unlock key are PLANNED rewards for server-verified achievements and cannot be saved until server logic is implemented. The Sunrise/Sunset avatar background is earned from the planned YEET Adept achievement (at least 3000 m). Current server allowlists continue to reject unlock-gated options.",
+  "unlock_note": "Options with an unlock key are PLANNED rewards for server-verified achievements. The maker shows them with a lock and they cannot be picked or saved; the server allowlist rejects them until the matching stamp exists. Sunset background: Adept (YEET at least 3000 m). Detective hat and jacket: Detective Fren. Hard hat: Miner Fren. Headphones: Gamer Fren. PEP pin: Scout Fren.",
   "options": {
     "bg": [
       {
-        "id": "bg_none",
-        "label": "None"
+        "id": "bg_sky",
+        "label": "Blue sky"
       },
       {
-        "id": "bg_pond",
-        "label": "Pond"
+        "id": "bg_night",
+        "label": "Moonlit night"
       },
       {
-        "id": "bg_solid_green",
-        "label": "Grass"
+        "id": "bg_city",
+        "label": "City lights"
       },
       {
-        "id": "bg_meadow",
-        "label": "Meadow"
+        "id": "bg_snow",
+        "label": "Snowy peaks"
+      },
+      {
+        "id": "bg_forest",
+        "label": "Forest pond"
       },
       {
         "id": "bg_sunset",
@@ -47,12 +51,12 @@
     ],
     "mouth": [
       {
-        "id": "mouth_smile",
-        "label": "Classic smile"
+        "id": "mouth_flat",
+        "label": "Classic"
       },
       {
-        "id": "mouth_grin",
-        "label": "Grin"
+        "id": "mouth_smile",
+        "label": "Smile"
       },
       {
         "id": "mouth_open",
@@ -63,8 +67,8 @@
         "label": "Tongue out"
       },
       {
-        "id": "mouth_flat",
-        "label": "Neutral"
+        "id": "mouth_teeth",
+        "label": "Gritted teeth"
       },
       {
         "id": "mouth_smirk",
@@ -74,27 +78,27 @@
     "eyes": [
       {
         "id": "eyes_classic",
-        "label": "Classic"
+        "label": "Big eyes"
       },
       {
         "id": "eyes_sleepy",
         "label": "Sleepy"
       },
       {
-        "id": "eyes_wide",
-        "label": "Wide eyes"
+        "id": "eyes_angry",
+        "label": "Angry"
       },
       {
-        "id": "eyes_shades",
-        "label": "Shades"
-      },
-      {
-        "id": "eyes_round",
-        "label": "Round glasses"
+        "id": "eyes_bloodshot",
+        "label": "Bloodshot"
       },
       {
         "id": "eyes_3d",
         "label": "3D glasses"
+      },
+      {
+        "id": "eyes_hypno",
+        "label": "Hypnotized"
       }
     ],
     "hat": [
@@ -104,7 +108,7 @@
       },
       {
         "id": "hat_pep_cap",
-        "label": "Green cap"
+        "label": "PEP cap"
       },
       {
         "id": "hat_beanie",
@@ -116,15 +120,11 @@
       },
       {
         "id": "hat_crown",
-        "label": "Paper crown"
+        "label": "Crown"
       },
       {
-        "id": "hat_astronaut",
-        "label": "Space helmet"
-      },
-      {
-        "id": "hat_fedora",
-        "label": "Fedora"
+        "id": "hat_wizard",
+        "label": "Wizard hat"
       },
       {
         "id": "hat_hardhat",
@@ -140,7 +140,7 @@
     "clothing": [
       {
         "id": "clothing_blue",
-        "label": "Blue shirt"
+        "label": "Blue tee"
       },
       {
         "id": "clothing_purple_hoodie",
@@ -151,16 +151,16 @@
         "label": "Black hoodie"
       },
       {
-        "id": "clothing_white_pep",
-        "label": "White PEP tee"
+        "id": "clothing_shirt_tie",
+        "label": "Shirt and tie"
       },
       {
-        "id": "clothing_orange_vest",
-        "label": "Orange vest"
+        "id": "clothing_camo",
+        "label": "Camo jacket"
       },
       {
         "id": "clothing_suit",
-        "label": "Detective suit",
+        "label": "Detective jacket",
         "unlock": "detective_fren"
       }
     ],
@@ -170,28 +170,40 @@
         "label": "None"
       },
       {
-        "id": "accessory_chain",
-        "label": "Gold chain"
+        "id": "accessory_shades",
+        "label": "Pixel shades"
       },
       {
-        "id": "accessory_scarf",
-        "label": "Scarf"
+        "id": "accessory_round",
+        "label": "Round glasses"
       },
       {
-        "id": "accessory_pin",
-        "label": "PEP pin",
-        "unlock": "scout_fren"
+        "id": "accessory_orange",
+        "label": "Orange glasses"
+      },
+      {
+        "id": "accessory_cigarette",
+        "label": "Cigarette"
+      },
+      {
+        "id": "accessory_pipe",
+        "label": "Pipe"
       },
       {
         "id": "accessory_headphones",
         "label": "Headphones",
         "unlock": "gamer_fren"
+      },
+      {
+        "id": "accessory_pin",
+        "label": "PEP pin",
+        "unlock": "scout_fren"
       }
     ]
   },
   "paths": {
-    "bg": "avatar-assets/layers/bg_none.webp",
     "base": "avatar-assets/layers/base_frog.webp",
-    "layer_template": "avatar-assets/layers/{id}.webp"
+    "layer_template": "avatar-assets/layers/{id}.webp",
+    "thumb_template": "avatar-assets/thumbs/{id}.webp"
   }
 }

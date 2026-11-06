@@ -1576,7 +1576,7 @@
   var passportCache = null; // { userId, state, catalog, opts }
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106pp1'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106mk1'}));
     }
   }
   // one read: the server snapshot, plus two static files from this site (labels and avatar parts)
@@ -1902,15 +1902,15 @@
   // same head/eye/mouth/shoulder geometry, so the parts stack with no per-part offsets. The editable slots
   // are bg, clothing, mouth, eyes, hat and accessory; base (defaults.base) is an implied constant layer that
   // is always painted between bg and clothing and is never a choice. Options carrying an 'unlock' key are
-  // reserved for a future server-verified achievement, so they are hidden here and rejected by the save RPC.
+  // reserved for a future server-verified achievement: the maker shows them with a lock (not pickable) and the save RPC rejects them.
   // Picking parts and Randomize only change this preview, with no server traffic. Save Look is the one write
   // (gry_passport_avatar_save, six ids bg/clothing/mouth/eyes/hat/accessory): only its answer counts as saved,
   // and the server alone awards Fresh Fren (first_avatar) for the first look it saves.
-  var AV_SLOTS = [['bg', 'Background'], ['clothing', 'Clothing'], ['mouth', 'Mouth'], ['eyes', 'Eyes & glasses'], ['hat', 'Hat'], ['accessory', 'Accessory']];
+  var AV_SLOTS = [['bg', 'Background'], ['clothing', 'Clothing'], ['mouth', 'Mouth'], ['eyes', 'Eyes'], ['hat', 'Hat'], ['accessory', 'Accessory']];
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261106art3').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261106mk1').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -1943,6 +1943,19 @@
   function avatarSay(o, look) {
     return AV_SLOTS.map(function (s) { var p = o.options[s[0]].filter(function (x) { return x.id === look[s[0]]; })[0]; return p ? p.label : look[s[0]]; }).join(', ');
   }
+  // the maker window art (scripts/build_maker_art.py) and its icon row: one 48px cell per icon
+  var FA_V = '?v=20261106mk1';
+  var FA_ICONS = ['mouth', 'eyes', 'hat', 'clothing', 'accessory', 'dice', 'floppy', 'check', 'passport'];
+  function faIcon(name) {
+    var n = el('span', { class: 'fa-ico', 'aria-hidden': 'true' });
+    n.style.backgroundPositionX = (Math.max(0, FA_ICONS.indexOf(name)) * 100 / (FA_ICONS.length - 1)) + '%';
+    return n;
+  }
+  // rows in the mockup's order (slot, label, icon); the background row comes last
+  var FA_ROWS = [['mouth', 'Mouth', 'mouth'], ['eyes', 'Eyes', 'eyes'], ['hat', 'Hat', 'hat'], ['clothing', 'Clothing', 'clothing'],
+    ['accessory', 'Accessory', 'accessory'], ['bg', 'Background', null]];
+  // which stamp opens a reserved part (catalog titles)
+  var FA_UNLOCK = { yeet_adept: 'Adept', detective_fren: 'Detective Fren', miner_fren: 'Miner Fren', gamer_fren: 'Gamer Fren', scout_fren: 'Scout Fren' };
   function avatarMaker() {
     return openApp('avatar', 'Create Your Fren - Avatar Maker', 'pep-logo', function (A) {
       passportCss();
@@ -1961,49 +1974,88 @@
         var d = signed ? passportMine() : null;
         var saved = d ? avatarLook(o, d.state.avatar) : null;
         var start = saved || avatarLook(o, o.defaults);
-        var look = Object.assign({}, start), pending = false, msg = '';
-        var wrap = el('div', { class: 'fa' }), side = el('div', { class: 'fa-side' }), frame = el('div', { class: 'fa-frame' });
+        var look = Object.assign({}, start), pending = false, msg = '', strips = [];
+        // Layout of the owner's mockup: title band, the Fren in a taped photo frame on the left, one row
+        // per part on the right (arrows scroll the row), then Randomize / Save Look / Use in Passport.
+        // Each row shows the part itself; the player picks every part on their own.
+        var wrap = el('div', { class: 'fa' });
+        var head = el('img', { class: 'fa-head', src: 'avatar-assets/maker/header.webp' + FA_V, width: '880', height: '104',
+          alt: 'Fren Passport, PepecoinHub. Avatar Maker: create your custom Pepe for your Fren Passport.' });
+        var main = el('div', { class: 'fa-main' }), side = el('div', { class: 'fa-side' }), frame = el('div', { class: 'fa-frame' });
         var big = avatarStack(o, look, 'Preview');
-        frame.appendChild(big); side.appendChild(frame);
+        frame.appendChild(big);
+        frame.appendChild(el('img', { class: 'fa-frame-art', src: 'avatar-assets/maker/frame.webp' + FA_V, alt: '', width: '296', height: '364', draggable: 'false' }));
+        side.appendChild(frame);
         var who = el('p', { class: 'fa-who' }); who.textContent = d && d.state.nickname ? d.state.nickname : signed ? 'Discord fren' : 'Guest preview';
         var said = el('p', { class: 'fa-state', role: 'status' });
-        side.appendChild(who); side.appendChild(said); wrap.appendChild(side);
-        var parts = el('div', { class: 'fa-parts' }), thumbs = [];
-        AV_SLOTS.forEach(function (slot) {
-          var k = slot[0];
-          var fs = el('fieldset', { class: 'fa-group' }), lg = el('legend'), row = el('div', { class: 'fa-opts' });
-          lg.textContent = slot[1]; fs.appendChild(lg);
-          // only non-unlock options are offered; reserved parts are hidden and rejected server-side
-          avatarPicks(o, k).forEach(function (p) {
-            var lab = el('label', { class: 'fa-opt' }), inp = el('input', { type: 'radio', name: 'fa-' + k, value: p.id });
+        side.appendChild(who); side.appendChild(said); main.appendChild(side);
+        var parts = el('div', { class: 'fa-parts' });
+        FA_ROWS.forEach(function (row) {
+          var k = row[0];
+          var fs = el('fieldset', { class: 'fa-group' }), lg = el('legend', { class: 'fa-legend' }), strip = el('div', { class: 'fa-opts' });
+          lg.appendChild(k === 'bg' ? el('img', { class: 'fa-rowicon is-bg', src: o.paths.thumb_template.replace('{id}', o.defaults.bg), alt: '' }) : faIcon(row[2]));
+          lg.appendChild(document.createTextNode(row[1] + ':'));
+          fs.appendChild(lg);
+          // the arrows are a mouse/touch shortcut; keyboard users move through a row with the arrow keys
+          // (the focused part scrolls into view), and Tab goes to the next row
+          var prev = el('button', { type: 'button', class: 'fa-arr is-prev', tabindex: '-1', 'aria-hidden': 'true' });
+          var next = el('button', { type: 'button', class: 'fa-arr is-next', tabindex: '-1', 'aria-hidden': 'true' });
+          (o.options[k] || []).forEach(function (p) {
+            var locked = !!p.unlock, stamp = locked && FA_UNLOCK[p.unlock] || 'a future stamp';
+            var lab = el('label', { class: 'fa-opt' + (locked ? ' is-locked' : ''), title: locked ? p.label + ' - locked: earn the ' + stamp + ' stamp' : p.label });
+            var inp = el('input', { type: 'radio', name: 'fa-' + k, value: p.id });
+            // reserved parts are shown with a lock and cannot be picked; the save RPC rejects them too
+            if (locked) inp.disabled = true;
             inp.checked = look[k] === p.id;
-            inp.addEventListener('change', function () { if (inp.checked) { look[k] = p.id; msg = ''; paint(); } });
-            // the thumbnail is the whole hand-drawn portrait with this one part swapped in (no pixel crop)
-            var mine = {}; mine[k] = p.id;
-            var t = el('span', { class: 'fa-thumb' }), st = avatarStack(o, Object.assign({}, look, mine));
-            t.appendChild(st); thumbs.push({ k: k, stack: st });
-            var name = el('span', { class: 'fa-lab' }); name.textContent = p.label;
-            lab.appendChild(inp); lab.appendChild(t); lab.appendChild(name); row.appendChild(lab);
+            inp.addEventListener('change', function () { if (inp.checked && !locked) { look[k] = p.id; msg = ''; paint(); } });
+            var t = el('span', { class: 'fa-thumb' + (k === 'bg' ? ' is-bg' : '') });
+            t.appendChild(el('img', { src: o.paths.thumb_template.replace('{id}', p.id), alt: '', draggable: 'false', loading: 'lazy' }));
+            var name = el('span', { class: 'fa-lab' }); name.textContent = p.label + (locked ? ' (locked: ' + stamp + ' stamp)' : '');
+            lab.appendChild(inp); lab.appendChild(t); lab.appendChild(name); strip.appendChild(lab);
           });
-          fs.appendChild(row); parts.appendChild(fs);
+          var ends = function () {
+            prev.disabled = strip.scrollLeft <= 1;
+            next.disabled = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 1;
+          };
+          prev.addEventListener('click', function () { strip.scrollBy({ left: -strip.clientWidth * 0.8, behavior: 'smooth' }); });
+          next.addEventListener('click', function () { strip.scrollBy({ left: strip.clientWidth * 0.8, behavior: 'smooth' }); });
+          strip.addEventListener('scroll', ends, { passive: true });
+          fs.appendChild(prev); fs.appendChild(strip); fs.appendChild(next);
+          parts.appendChild(fs);
+          setTimeout(ends, 0);
+          strips.push({ strip: strip, ends: ends, k: k });
         });
-        wrap.appendChild(parts);
-        var bar = el('div', { class: 'app-row fa-actions' });
-        var rnd = el('button', { type: 'button', class: 'app-btn fa-random' }); rnd.textContent = 'Randomize';
-        var saveB = el('button', { type: 'button', class: 'app-btn fa-save' }); saveB.textContent = signed ? 'Save Look' : 'Log on to save';
-        var useB = el('button', { type: 'button', class: 'app-btn fa-use' }); useB.textContent = 'Use in Passport';
-        bar.appendChild(rnd); bar.appendChild(el('span', { class: 'grow' })); bar.appendChild(saveB); bar.appendChild(useB);
+        main.appendChild(parts);
+        var foot = el('div', { class: 'fa-foot' });
         var note = el('p', { class: 'fa-note' });
-        note.textContent = signed ? 'Every part is free. Changes stay on this screen until you press Save Look.'
-          : 'Every part is free. Try any look as a guest; log on with Discord to save it to your Fren Passport.';
-        A.body.replaceChildren(wrap, bar, note);
+        note.appendChild(faIcon('passport'));
+        note.appendChild(el('span', {}, signed ? 'This avatar is used in your <b>Fren Passport</b>. Every part is free; changes stay here until you press Save Look.'
+          : 'Every part is free. Try any look as a guest; log on with Discord to save it to your <b>Fren Passport</b>.'));
+        var bar = el('div', { class: 'app-row fa-actions' });
+        var btn = function (cls, icon, text) {
+          var b = el('button', { type: 'button', class: 'app-btn ' + cls }); b.appendChild(faIcon(icon));
+          var tx = el('span', { class: 'fa-btn-t' }); tx.textContent = text; b.appendChild(tx); return b;
+        };
+        var rnd = btn('fa-random', 'dice', 'Randomize');
+        var saveB = btn('fa-save', 'floppy', signed ? 'Save Look' : 'Log on to save');
+        var useB = btn('fa-use', 'check', 'Use in Passport');
+        var setBtn = function (b, text) { b.querySelector('.fa-btn-t').textContent = text; };
+        bar.appendChild(rnd); bar.appendChild(saveB); bar.appendChild(useB);
+        foot.appendChild(note); foot.appendChild(bar);
+        wrap.appendChild(head); wrap.appendChild(main); wrap.appendChild(foot);
+        A.body.replaceChildren(wrap);
+        // keep the chosen part in view in its row
+        function showPicked() {
+          strips.forEach(function (s) {
+            var on = s.strip.querySelector('input:checked');
+            if (on) { var l = on.parentNode, r = l.offsetLeft - s.strip.offsetLeft; if (r < s.strip.scrollLeft || r + l.offsetWidth > s.strip.scrollLeft + s.strip.clientWidth) s.strip.scrollLeft = r - 8; }
+            s.ends();
+          });
+        }
         var setSrc = function (img, src) { if (img.getAttribute('src') !== src) img.setAttribute('src', src); };
         function paint() {
           big.querySelectorAll('img').forEach(function (img) { setSrc(img, avatarSrc(o, img.getAttribute('data-layer'), look)); });
           big.setAttribute('aria-label', 'Preview: ' + avatarSay(o, look));
-          thumbs.forEach(function (t) {
-            t.stack.querySelectorAll('img').forEach(function (img) { var L = img.getAttribute('data-layer'); if (L !== t.k) setSrc(img, avatarSrc(o, L, look)); });
-          });
           parts.querySelectorAll('input').forEach(function (inp) { inp.checked = look[inp.name.slice(3)] === inp.value; });
           status();
         }
@@ -2028,11 +2080,11 @@
         function save() {
           if (pending || !signed) return Promise.reject(new Error('not now'));
           var sent = Object.assign({}, look);
-          pending = true; msg = ''; saveB.textContent = 'Saving…'; status();
+          pending = true; msg = ''; setBtn(saveB, 'Saving…'); status();
           return rpc('gry_passport_avatar_save', { p_bg: sent.bg, p_clothing: sent.clothing, p_mouth: sent.mouth, p_eyes: sent.eyes, p_hat: sent.hat, p_accessory: sent.accessory }).then(function (r) {
             var conf = r && avatarLook(o, r.avatar);
             if (!conf) throw new Error('The server did not confirm the save.');
-            pending = false; saveB.textContent = 'Save Look';
+            pending = false; setBtn(saveB, 'Save Look');
             saved = conf;
             if (avatarSame(look, sent)) look = Object.assign({}, conf);
             var pc = passportMine();
@@ -2051,7 +2103,7 @@
             if (r.badge && r.badge.new) balloon('Fresh Fren unlocked!', 'You saved your first Fren. The achievement is in your Fren Passport now.', 'fresh-fren');
             return conf;
           }, function (err) {
-            pending = false; saveB.textContent = 'Save Look';
+            pending = false; setBtn(saveB, 'Save Look');
             msg = failText(err); status();
             throw err;
           });
@@ -2063,7 +2115,7 @@
             next = {};
             AV_SLOTS.forEach(function (s) { var l = avatarPicks(o, s[0]); next[s[0]] = l[Math.floor(Math.random() * l.length)].id; });
           } while (avatarSame(next, look));
-          look = next; msg = ''; paint();
+          look = next; msg = ''; paint(); showPicked();
         });
         saveB.addEventListener('click', function () { if (!signed) logOn(); else save().catch(function () {}); });
         useB.addEventListener('click', function () {
@@ -2077,8 +2129,9 @@
           ], 'pep-logo');
         });
         paint();
+        setTimeout(showPicked, 0);
       }
-    }, 720);
+    }, 900);
   }
 
   // Only cosmetic, low-stakes discoveries are claimable by a browser.
@@ -2976,7 +3029,7 @@
   // a Fren from the Avatar Maker's own layers, for the ads (same paint order as avatar-options.json:
   // layers_order [bg, base, clothing, mouth, eyes, hat, accessory]). Only non-unlock (base) ids here.
   function adFren(c, m, e, h, a) {
-    return '<span class="ad-fren" aria-hidden="true">' + ['bg_pond', 'base_frog', c, m, e, h, a].map(function (id) { return '<img src="avatar-assets/layers/' + id + '.webp" alt="">'; }).join('') + '</span>';
+    return '<span class="ad-fren" aria-hidden="true">' + ['bg_forest', 'base_frog', c, m, e, h, a].map(function (id) { return '<img src="avatar-assets/layers/' + id + '.webp" alt="">'; }).join('') + '</span>';
   }
   var ADS = [
     { file: 'fren_passport.mpg', added: '2026-11-06', title: 'The Fren Passport', ch: 'CH 98 · POND TRAVEL AGENCY', icon: 'pep-logo', scenes: [
@@ -2987,8 +3040,8 @@
     ] },
     { file: 'create_your_fren.mpg', added: '2026-11-05', title: 'Create Your Fren', ch: 'CH 64 · POND MAKEOVER HOUR', icon: 'fresh-fren', scenes: [
       '<p class="ad-kick">Is your Fren Passport photo just a logo?</p><h3 class="ad-big">Your pond needs<br>a <em>face!</em></h3>',
-      '<div class="ad-ba"><figure class="ad-before"><b>Before</b><img src="img/pep-logo.webp" alt=""><figcaption>“My Passport photo was a logo.”</figcaption></figure><figure class="ad-after"><b>After</b>' + adFren('clothing_purple_hoodie', 'mouth_grin', 'eyes_shades', 'hat_crown', 'accessory_chain') + '<figcaption>A Fren in a paper crown!</figcaption></figure></div>',
-      '<p class="ad-kick">4 backgrounds. 5 shirts. 6 mouths. 6 eyes and glasses. 7 hats. 3 extras.</p><h3 class="ad-big"><em>15,120</em> looks.<br>Zero PEP.</h3><div class="ad-frens">' + adFren('clothing_white_pep', 'mouth_tongue', 'eyes_3d', 'hat_pep_cap', 'accessory_scarf') + adFren('clothing_orange_vest', 'mouth_open', 'eyes_round', 'hat_bucket', 'accessory_none') + adFren('clothing_black_hoodie', 'mouth_smile', 'eyes_sleepy', 'hat_beanie', 'accessory_chain') + '</div><p class="ad-sub">Every part is free. Hit Randomize until it feels like you.</p>',
+      '<div class="ad-ba"><figure class="ad-before"><b>Before</b><img src="img/pep-logo.webp" alt=""><figcaption>“My Passport photo was a logo.”</figcaption></figure><figure class="ad-after"><b>After</b>' + adFren('clothing_purple_hoodie', 'mouth_teeth', 'eyes_hypno', 'hat_crown', 'accessory_shades') + '<figcaption>A Fren in a crown!</figcaption></figure></div>',
+      '<p class="ad-kick">5 backgrounds. 5 outfits. 6 mouths. 6 eyes. 6 hats. 6 extras.</p><h3 class="ad-big"><em>32,400</em> looks.<br>Zero PEP.</h3><div class="ad-frens">' + adFren('clothing_shirt_tie', 'mouth_tongue', 'eyes_3d', 'hat_pep_cap', 'accessory_pipe') + adFren('clothing_camo', 'mouth_open', 'eyes_bloodshot', 'hat_bucket', 'accessory_none') + adFren('clothing_black_hoodie', 'mouth_smile', 'eyes_sleepy', 'hat_beanie', 'accessory_shades') + '</div><p class="ad-sub">Every part is free. Hit Randomize until it feels like you.</p>',
       '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Save it once.<br>Get <em>Fresh Fren!</em></h3><p class="ad-sub">Your first saved look unlocks the Fresh Fren achievement in your Fren Passport. One per frog.</p><p class="ad-fine">Log on with Discord to save; guests can try every look. No NFTs, no rarity, no purchase, no spendable points. It\'s just a hat.</p><button type="button" class="ad-cta ad-frenbtn">Create Your Fren →</button>'
     ] },
     { file: 'frogageddon.mpg', added: '2026-11-05', title: 'FROGAGEDDON: frog artillery', ch: 'CH 2000 · FREN SOFTWARE LATE NIGHT', icon: 'pondwars', scenes: [

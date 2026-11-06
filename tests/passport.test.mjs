@@ -88,14 +88,14 @@ test('Fresh Fren is live only together with its server award path', () => {
   assert.match(firstBranch.split(/\n  else\n/)[1], /insert into games\.passport_badges/, 'award sits in the first-save branch');
 });
 
-test('avatar manifest v2: 512 canvas layers, 15120 offered looks, valid defaults', () => {
+test('avatar manifest v2: 512 canvas layers, part thumbnails, 32400 offered looks, valid defaults', () => {
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
   assert.equal(manifest.schema_version, 2);
   // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [5, 6, 6, 6, 9, 5]);
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 6, 6, 6, 8, 8]);
   // the only looks a player can actually compose and save are built from the non-unlock (base) ids
-  assert.deepEqual(SLOTS.map(k => baseIds(k).length), [4, 5, 6, 6, 7, 3]);
-  assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 15120, 'offered looks');
+  assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 5, 6, 6, 6, 6]);
+  assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 32400, 'offered looks');
   assert.equal(new Set(ids).size, ids.length);
   assert.deepEqual(manifest.layers_order, ['bg', 'base', 'clothing', 'mouth', 'eyes', 'hat', 'accessory']);
   assert.equal(manifest.defaults.base, 'base_frog');
@@ -104,10 +104,12 @@ test('avatar manifest v2: 512 canvas layers, 15120 offered looks, valid defaults
     assert.ok(baseIds(k).includes(manifest.defaults[k]), 'default ' + k);
     for (const o of manifest.options[k]) { assert.match(o.id, new RegExp('^' + k + '_[a-z0-9_]+$')); assert.ok(o.label); }
   }
-  // one 512x512 WebP per option id, plus the implied base layer; bg_none doubles as manifest.paths.bg
+  // one 512x512 WebP per option id, plus the implied base layer
   const files = [...new Set([manifest.paths.base, ...ids.map(id => manifest.paths.layer_template.replace('{id}', id))])];
-  assert.equal(files.length, 38, '37 option layers + base_frog');
-  assert.equal(manifest.paths.bg.split('/').pop(), 'bg_none.webp');
+  assert.equal(files.length, 41, '40 option layers + base_frog');
+  // one small picture of each part for the maker rows, nothing else in the folder
+  assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/thumbs/', import.meta.url)).sort(),
+    ids.map(id => manifest.paths.thumb_template.replace('{id}', id).split('/').pop()).sort(), 'no unused, stray or missing thumbnails');
   assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/layers/', import.meta.url)).sort(),
     files.map(f => f.split('/').pop()).sort(), 'no unused, stray or missing layer files');
   for (const f of files) {
