@@ -1516,3 +1516,24 @@ footer.foot a { color: #edf3e3; }
 }
 /* very small phones (iPhone SE 1st gen, 320 px): Log On stays on the desktop, the tray button goes */
 @media (max-width: 340px) { .pondos .tray-logon { display: none; } }
+
+/* phones in portrait (up to 560 px): the taskbar has two rows, so nothing is squeezed or covered.
+   Row 1: Start, the window buttons, the "show desktop" strip. Row 2: the tray (mail, chat, log on, mode,
+   light/dark, clock). Everything that sits above the taskbar moves up by the second row (--tb2). */
+@media (max-width: 560px) {
+  :root.pondos { --tb2: 34px; }
+  .pondos header.top { height: calc(40px + var(--tb2) + var(--sab)) !important; }
+  .pondos body { padding-bottom: calc(40px + var(--tb2) + var(--sab)) !important; }
+  .pondos .bar { height: calc(40px + var(--tb2)); flex-wrap: wrap; align-content: center; row-gap: 4px; }
+  .pondos .start { order: 0; }
+  .tasks, .tasks:has(.app-task), .tasks:has(.task.is-min:not([hidden])) { display: flex; order: 1; flex: 1 1 0; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+  .pondos .show-desk { order: 2; height: 30px; align-self: center; margin: 0 -2px 0 2px; }
+  .pondos .tray { order: 3; flex: 1 0 100%; min-width: 0; margin-left: 0; justify-content: space-evenly; }
+  .pondos .tray-clock, .bar:has(.app-task) .tray-clock, .bar:has(.task.is-min:not([hidden])) .tray-clock { display: inline; }
+  .balloon { bottom: calc(50px + var(--tb2) + var(--sab)); }
+  .pondos .nav.startmenu { bottom: calc(44px + var(--tb2) + var(--sab)) !important; max-height: calc(100dvh - 60px - var(--tb2) - var(--sab)); }
+  .app-win { max-height: calc(100dvh - var(--app-top, 50px) - 48px - var(--tb2) - var(--sab)); }
+  .app-win.app-full, .app-win.is-max { height: calc(100dvh - 40px - var(--tb2) - var(--sab)); }
+  .win-host.is-max { inset: 0 0 calc(40px + var(--tb2) + var(--sab)) 0; }
+  .wp-photo.big { bottom: calc(48px + var(--tb2) + var(--sab)); }
+}
