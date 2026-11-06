@@ -9,7 +9,8 @@
     "mouth",
     "eyes",
     "hat",
-    "accessory"
+    "accessory",
+    "special"
   ],
   "defaults": {
     "bg": "bg_sky",
@@ -18,9 +19,10 @@
     "mouth": "mouth_flat",
     "eyes": "eyes_sleepy",
     "hat": "hat_none",
-    "accessory": "accessory_none"
+    "accessory": "accessory_none",
+    "special": "special_none"
   },
-  "unlock_note": "Options with an unlock key are PLANNED rewards for server-verified achievements. The maker shows them with a lock and they cannot be picked or saved; the server allowlist rejects them until the matching stamp exists. Sunset background: Adept (YEET at least 3000 m). Detective hat and jacket: Detective Fren. Hard hat: Miner Fren. Headphones: Gamer Fren. PEP pin: Scout Fren.",
+  "unlock_note": "Options with an unlock key are rewards for server-verified stamps. The maker shows them with a lock until the player has the stamp, and the save RPC checks the stamp again. Sunset background: Adept (planned). Detective hat and jacket: Detective Fren. Hard hat: Miner Fren. Headphones: Gamer Fren (planned). PEP pin and Explorer Pepe: Scout Fren.",
   "options": {
     "bg": [
       {
@@ -199,11 +201,23 @@
         "label": "PEP pin",
         "unlock": "scout_fren"
       }
+    ],
+    "special": [
+      {
+        "id": "special_none",
+        "label": "None"
+      },
+      {
+        "id": "special_explorer",
+        "label": "Explorer Pepe (Pepe Guesser)",
+        "unlock": "scout_fren"
+      }
     ]
   },
   "paths": {
     "base": "avatar-assets/layers/base_frog.webp",
     "layer_template": "avatar-assets/layers/{id}.webp",
     "thumb_template": "avatar-assets/thumbs/{id}.webp"
-  }
+  },
+  "special_note": "A special avatar is a whole drawn character by Lily for a big milestone. When one is picked it replaces every part layer except the background (bg)."
 }

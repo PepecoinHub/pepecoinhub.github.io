@@ -1577,7 +1577,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261106stamps2';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106stamps2'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106special1'}));
     }
   }
   // one read: the server snapshot, plus two static files from this site (labels and avatar parts)
@@ -1933,11 +1933,15 @@
   // Picking parts and Randomize only change this preview, with no server traffic. Save Look is the one write
   // (gry_passport_avatar_save, six ids bg/clothing/mouth/eyes/hat/accessory): only its answer counts as saved,
   // and the server alone awards Fresh Fren (first_avatar) for the first look it saves.
-  var AV_SLOTS = [['bg', 'Background'], ['clothing', 'Clothing'], ['mouth', 'Mouth'], ['eyes', 'Eyes'], ['hat', 'Hat'], ['accessory', 'Accessory']];
+  var AV_SLOTS = [['bg', 'Background'], ['clothing', 'Clothing'], ['mouth', 'Mouth'], ['eyes', 'Eyes'], ['hat', 'Hat'], ['accessory', 'Accessory'], ['special', 'Special']];
+  // Special avatars: a whole character drawn by Lily for a big milestone. When one is picked it covers every
+  // part layer except the background; the parts stay saved underneath.
+  var AV_PLAIN = 'special_none';
+  function avatarSpecial(look) { return !!look && !!look.special && look.special !== AV_PLAIN; }
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261106mk1').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261106special1').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -1951,6 +1955,7 @@
     var look = {};
     for (var i = 0; i < AV_SLOTS.length; i++) {
       var k = AV_SLOTS[i][0], id = x[k];
+      if (k === 'special' && id == null) id = AV_PLAIN;   // looks saved before special avatars existed
       if (!(o.options[k] || []).some(function (p) { return p.id === id; })) return null;
       look[k] = id;
     }
@@ -1963,12 +1968,15 @@
     return o.paths.layer_template.replace('{id}', look[layer]);
   }
   function avatarStack(o, look, label) {
-    var s = el('span', label ? { class: 'fa-stack', role: 'img', 'aria-label': label } : { class: 'fa-stack', 'aria-hidden': 'true' });
+    var cls = 'fa-stack' + (avatarSpecial(look) ? ' is-special' : '');
+    var s = el('span', label ? { class: cls, role: 'img', 'aria-label': label } : { class: cls, 'aria-hidden': 'true' });
     o.layers_order.forEach(function (layer) { s.appendChild(el('img', { src: avatarSrc(o, layer, look), alt: '', 'data-layer': layer, draggable: 'false' })); });
     return s;
   }
   function avatarSay(o, look) {
-    return AV_SLOTS.map(function (s) { var p = o.options[s[0]].filter(function (x) { return x.id === look[s[0]]; })[0]; return p ? p.label : look[s[0]]; }).join(', ');
+    var name = function (k) { var p = o.options[k].filter(function (x) { return x.id === look[k]; })[0]; return p ? p.label : look[k]; };
+    if (avatarSpecial(look)) return name('special') + ', ' + name('bg');
+    return AV_SLOTS.filter(function (s) { return s[0] !== 'special'; }).map(function (s) { var p = o.options[s[0]].filter(function (x) { return x.id === look[s[0]]; })[0]; return p ? p.label : look[s[0]]; }).join(', ');
   }
   // the maker window art (scripts/build_maker_art.py) and its icon row: one 48px cell per icon
   var FA_V = '?v=20261106mk1';
@@ -1980,7 +1988,7 @@
   }
   // rows in the mockup's order (slot, label, icon); the background row comes last
   var FA_ROWS = [['mouth', 'Mouth', 'mouth'], ['eyes', 'Eyes', 'eyes'], ['hat', 'Hat', 'hat'], ['clothing', 'Clothing', 'clothing'],
-    ['accessory', 'Accessory', 'accessory'], ['bg', 'Background', null]];
+    ['accessory', 'Accessory', 'accessory'], ['bg', 'Background', null], ['special', 'Special', null]];
   // which stamp opens a reserved part (catalog titles)
   // (only stamps that can be earned today are named; the others stay "a future stamp", like '???' in the Passport)
   var FA_UNLOCK = { detective_fren: 'Detective Fren', miner_fren: 'Miner Fren', scout_fren: 'Scout Fren' };
@@ -2023,7 +2031,7 @@
         FA_ROWS.forEach(function (row) {
           var k = row[0];
           var fs = el('fieldset', { class: 'fa-group' }), lg = el('legend', { class: 'fa-legend' }), strip = el('div', { class: 'fa-opts' });
-          lg.appendChild(k === 'bg' ? el('img', { class: 'fa-rowicon is-bg', src: o.paths.thumb_template.replace('{id}', o.defaults.bg), alt: '' }) : faIcon(row[2]));
+          lg.appendChild(!row[2] ? el('img', { class: 'fa-rowicon is-bg', src: o.paths.thumb_template.replace('{id}', k === 'bg' ? o.defaults.bg : 'special_explorer'), alt: '' }) : faIcon(row[2]));
           lg.appendChild(document.createTextNode(row[1] + ':'));
           fs.appendChild(lg);
           // the arrows are a mouse/touch shortcut; keyboard users move through a row with the arrow keys
@@ -2037,7 +2045,13 @@
             // reserved parts are shown with a lock and cannot be picked; the save RPC rejects them too
             if (locked) inp.disabled = true;
             inp.checked = look[k] === p.id;
-            inp.addEventListener('change', function () { if (inp.checked && !locked) { look[k] = p.id; msg = ''; paint(); } });
+            inp.addEventListener('change', function () {
+              if (!inp.checked || locked) return;
+              look[k] = p.id;
+              // picking a part shows the parts again (a special avatar would hide it)
+              if (k !== 'bg' && k !== 'special') look.special = AV_PLAIN;
+              msg = ''; paint();
+            });
             var t = el('span', { class: 'fa-thumb' + (k === 'bg' ? ' is-bg' : '') });
             t.appendChild(el('img', { src: o.paths.thumb_template.replace('{id}', p.id), alt: '', draggable: 'false', loading: 'lazy' }));
             var name = el('span', { class: 'fa-lab' }); name.textContent = p.label + (locked ? ' (locked: ' + stamp + ' stamp)' : '');
@@ -2086,6 +2100,7 @@
         function paint() {
           big.querySelectorAll('img').forEach(function (img) { setSrc(img, avatarSrc(o, img.getAttribute('data-layer'), look)); });
           big.setAttribute('aria-label', 'Preview: ' + avatarSay(o, look));
+          big.classList.toggle('is-special', avatarSpecial(look));
           parts.querySelectorAll('input').forEach(function (inp) { inp.checked = look[inp.name.slice(3)] === inp.value; });
           status();
         }
@@ -2112,7 +2127,7 @@
           if (pending || !signed) return Promise.reject(new Error('not now'));
           var sent = Object.assign({}, look);
           pending = true; msg = ''; setBtn(saveB, 'Saving…'); status();
-          return rpc('gry_passport_avatar_save', { p_bg: sent.bg, p_clothing: sent.clothing, p_mouth: sent.mouth, p_eyes: sent.eyes, p_hat: sent.hat, p_accessory: sent.accessory }).then(function (r) {
+          return rpc('gry_passport_avatar_save', { p_bg: sent.bg, p_clothing: sent.clothing, p_mouth: sent.mouth, p_eyes: sent.eyes, p_hat: sent.hat, p_accessory: sent.accessory, p_special: sent.special }).then(function (r) {
             var conf = r && avatarLook(o, r.avatar);
             if (!conf) throw new Error('The server did not confirm the save.');
             pending = false; setBtn(saveB, 'Save Look');
@@ -2145,6 +2160,7 @@
           do {
             next = {};
             AV_SLOTS.forEach(function (s) { var l = avatarPicks(o, s[0], owns); next[s[0]] = l[Math.floor(Math.random() * l.length)].id; });
+            next.special = AV_PLAIN;   // Randomize mixes parts; a special avatar is picked on purpose
           } while (avatarSame(next, look));
           look = next; msg = ''; paint(); showPicked();
         });

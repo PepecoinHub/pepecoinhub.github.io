@@ -60,6 +60,12 @@
 --     bg_sunset          (unlock yeet_adept, not earnable yet)
 --     accessory_pin      (unlock scout_fren)
 --     accessory_headphones (unlock gamer_fren, not earnable yet)
+--     special_explorer   (unlock scout_fren)
+--
+-- SPECIAL AVATARS: the 'special' slot holds a whole drawn character (by Lily) for a
+-- big milestone. 'special_none' means the normal stacked parts; any other id
+-- replaces every part layer except the background in the browser. The parts are
+-- still saved, so turning the special avatar off brings the old look back.
 begin;
 
 create table if not exists games.passport_avatars (
@@ -71,6 +77,7 @@ create table if not exists games.passport_avatars (
   eyes text not null check (eyes ~ '^eyes_[a-z0-9_]{1,40}$'),
   hat text not null check (hat ~ '^hat_[a-z0-9_]{1,40}$'),
   accessory text not null check (accessory ~ '^accessory_[a-z0-9_]{1,40}$'),
+  special text not null default 'special_none' check (special ~ '^special_[a-z0-9_]{1,40}$'),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   -- save budget, never sent to the browser
@@ -79,11 +86,16 @@ create table if not exists games.passport_avatars (
 );
 
 -- Private table: no direct client access. Only the RPCs below touch it.
+alter table games.passport_avatars add column if not exists special text not null default 'special_none'
+  check (special ~ '^special_[a-z0-9_]{1,40}$');
 alter table games.passport_avatars enable row level security;
 revoke all on games.passport_avatars from public, anon, authenticated;
 
+-- the six-part version of this RPC is replaced (one signature only; an old page that sends six parts
+-- still works, because p_special has a default)
+drop function if exists public.gry_passport_avatar_save(text, text, text, text, text, text);
 create or replace function public.gry_passport_avatar_save(
-  p_bg text, p_clothing text, p_mouth text, p_eyes text, p_hat text, p_accessory text)
+  p_bg text, p_clothing text, p_mouth text, p_eyes text, p_hat text, p_accessory text, p_special text default 'special_none')
 returns jsonb language plpgsql volatile security definer set search_path = '' as $$
 declare
   u uuid := auth.uid();
@@ -106,23 +118,25 @@ begin
      or p_mouth is null or p_mouth not in ('mouth_flat', 'mouth_smile', 'mouth_open', 'mouth_tongue', 'mouth_teeth', 'mouth_smirk')
      or p_eyes is null or p_eyes not in ('eyes_classic', 'eyes_sleepy', 'eyes_angry', 'eyes_bloodshot', 'eyes_3d', 'eyes_hypno')
      or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_wizard', 'hat_hardhat', 'hat_detective')
-     or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_shades', 'accessory_round', 'accessory_orange', 'accessory_cigarette', 'accessory_pipe', 'accessory_headphones', 'accessory_pin') then
+     or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_shades', 'accessory_round', 'accessory_orange', 'accessory_cigarette', 'accessory_pipe', 'accessory_headphones', 'accessory_pin')
+     or p_special is null or p_special not in ('special_none', 'special_explorer') then
     raise exception 'Unknown avatar option' using errcode = '22023';
   end if;
   -- Reward parts: saveable only by a player who holds the stamp that unlocks them
   -- (the manifest's 'unlock' keys; stamps are awarded by the server only).
   if exists (
     select 1 from (values ('bg_sunset', 'yeet_adept'), ('clothing_suit', 'detective_fren'), ('hat_hardhat', 'miner_fren'),
-                          ('hat_detective', 'detective_fren'), ('accessory_headphones', 'gamer_fren'), ('accessory_pin', 'scout_fren')) r(part, stamp)
-     where r.part in (p_bg, p_clothing, p_hat, p_accessory)
+                          ('hat_detective', 'detective_fren'), ('accessory_headphones', 'gamer_fren'), ('accessory_pin', 'scout_fren'),
+                          ('special_explorer', 'scout_fren')) r(part, stamp)
+     where r.part in (p_bg, p_clothing, p_hat, p_accessory, p_special)
        and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)) then
     raise exception 'That part is locked: earn its stamp first' using errcode = '42501';
   end if;
 
   -- First save. A concurrent first save of the same player waits on the
   -- primary key here, then takes the update path below.
-  insert into games.passport_avatars (user_id, bg, clothing, mouth, eyes, hat, accessory)
-  values (u, p_bg, p_clothing, p_mouth, p_eyes, p_hat, p_accessory)
+  insert into games.passport_avatars (user_id, bg, clothing, mouth, eyes, hat, accessory, special)
+  values (u, p_bg, p_clothing, p_mouth, p_eyes, p_hat, p_accessory, p_special)
   on conflict (user_id) do nothing
   returning * into saved;
   first_save := found;
@@ -130,8 +144,8 @@ begin
   if not first_save then
     -- One save at a time per player.
     select * into saved from games.passport_avatars a where a.user_id = u for update;
-    changed := (saved.bg, saved.clothing, saved.mouth, saved.eyes, saved.hat, saved.accessory)
-               is distinct from (p_bg, p_clothing, p_mouth, p_eyes, p_hat, p_accessory);
+    changed := (saved.bg, saved.clothing, saved.mouth, saved.eyes, saved.hat, saved.accessory, saved.special)
+               is distinct from (p_bg, p_clothing, p_mouth, p_eyes, p_hat, p_accessory, p_special);
     -- Saving the same look again (a double click, a retry) is a no-op success.
     if changed then
       if saved.updated_at > now() - cooldown then
@@ -141,7 +155,7 @@ begin
         raise exception 'Daily save limit reached. Your Fren can change again tomorrow (UTC).' using errcode = 'P0001';
       end if;
       update games.passport_avatars a
-         set bg = p_bg, clothing = p_clothing, mouth = p_mouth, eyes = p_eyes, hat = p_hat, accessory = p_accessory,
+         set bg = p_bg, clothing = p_clothing, mouth = p_mouth, eyes = p_eyes, hat = p_hat, accessory = p_accessory, special = p_special,
              updated_at = now(),
              budget_used = case when a.budget_day = today then a.budget_used + 1 else 1 end,
              budget_day = today
@@ -164,7 +178,7 @@ begin
     'avatar', jsonb_build_object(
       'schema_version', saved.schema_version,
       'bg', saved.bg, 'clothing', saved.clothing,
-      'mouth', saved.mouth, 'eyes', saved.eyes, 'hat', saved.hat, 'accessory', saved.accessory),
+      'mouth', saved.mouth, 'eyes', saved.eyes, 'hat', saved.hat, 'accessory', saved.accessory, 'special', saved.special),
     'updated_at', saved.updated_at,
     'first_save', first_save,
     'changed', changed,
@@ -174,8 +188,8 @@ begin
 end
 $$;
 
-revoke all on function public.gry_passport_avatar_save(text, text, text, text, text, text) from public, anon, authenticated;
-grant execute on function public.gry_passport_avatar_save(text, text, text, text, text, text) to authenticated;
+revoke all on function public.gry_passport_avatar_save(text, text, text, text, text, text, text) from public, anon, authenticated;
+grant execute on function public.gry_passport_avatar_save(text, text, text, text, text, text, text) to authenticated;
 
 -- Passport read path: the same snapshot as update_fren_passport.sql, plus
 -- avatar {schema_version, bg, clothing, mouth, eyes, hat, accessory} or null.
@@ -235,7 +249,7 @@ begin
 
   select jsonb_build_object('schema_version', a.schema_version,
            'bg', a.bg, 'clothing', a.clothing,
-           'mouth', a.mouth, 'eyes', a.eyes, 'hat', a.hat, 'accessory', a.accessory)
+           'mouth', a.mouth, 'eyes', a.eyes, 'hat', a.hat, 'accessory', a.accessory, 'special', a.special)
     into look
     from games.passport_avatars a where a.user_id = u;
 

@@ -439,7 +439,7 @@ begin
 
   select jsonb_build_object('schema_version', a.schema_version,
            'bg', a.bg, 'clothing', a.clothing,
-           'mouth', a.mouth, 'eyes', a.eyes, 'hat', a.hat, 'accessory', a.accessory)
+           'mouth', a.mouth, 'eyes', a.eyes, 'hat', a.hat, 'accessory', a.accessory, 'special', a.special)
     into look
     from games.passport_avatars a where a.user_id = u;
 

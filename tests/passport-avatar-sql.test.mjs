@@ -71,12 +71,15 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
         return r.rows[0] && r.rows[0].v;
       } catch (e) { await conn.query('rollback'); throw e; }
     };
-    const SAVE = 'select public.gry_passport_avatar_save($1, $2, $3, $4, $5, $6) as v';
+    // six parts, plus the special avatar when a 7th value is given (it defaults to special_none)
+    const SAVE6 = 'select public.gry_passport_avatar_save($1, $2, $3, $4, $5, $6) as v';
+    const SAVE7 = 'select public.gry_passport_avatar_save($1, $2, $3, $4, $5, $6, $7) as v';
+    const SAVE = SAVE6;
     const STATE = 'select public.gry_passport_state() as v';
     // v2 order matches the save RPC: bg, clothing, mouth, eyes, hat, accessory
     const look = (bg, c, m, e, h, a) => [bg, c, m, e, h, a];
     const DEFAULT = look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none');
-    const save = (user, args = DEFAULT, conn = db) => call(conn, user, SAVE, args);
+    const save = (user, args = DEFAULT, conn = db) => call(conn, user, args.length === 7 ? SAVE7 : SAVE6, args);
     const state = (user, conn = db) => call(conn, user, STATE);
     const count = async (sql, args = []) => (await db.query(sql, args)).rows[0].n;
     const badges = user => count("select count(*)::int as n from games.passport_badges where user_id = $1 and badge_id = 'first_avatar'", [uid(user)]);
@@ -88,7 +91,7 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     await addUser(5, null);      // anonymous Supabase user, no identity
 
     // --- grants: no anon/PUBLIC execute, no direct table access for anyone
-    const SIG = 'text,text,text,text,text,text';
+    const SIG = 'text,text,text,text,text,text,text';
     const priv = (await db.query(`select
       has_function_privilege('anon', 'public.gry_passport_avatar_save(${SIG})', 'EXECUTE') as anon_save,
       has_function_privilege('authenticated', 'public.gry_passport_avatar_save(${SIG})', 'EXECUTE') as user_save,
@@ -145,7 +148,9 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_pin'),               // accessory_pin -> scout_fren
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_headphones')         // accessory_headphones -> gamer_fren
     ];
+    reserved.push([...DEFAULT, 'special_explorer']);                                                       // special_explorer -> scout_fren
     for (const args of reserved) await assert.rejects(save(1, args), /That part is locked/, 'reserved ' + JSON.stringify(args));
+    await assert.rejects(save(1, [...DEFAULT, 'special_ghost']), /Unknown avatar option/);
     assert.equal(await avatars(1), 0); assert.equal(await badges(1), 0);
 
     // --- state before any save: avatar is null, Fresh Fren not earned
@@ -155,7 +160,7 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
 
     // --- first save awards Fresh Fren once
     const first = await save(1, look('bg_forest', 'clothing_purple_hoodie', 'mouth_teeth', 'eyes_3d', 'hat_crown', 'accessory_shades'));
-    assert.deepEqual(first.avatar, { schema_version: 2, bg: 'bg_forest', clothing: 'clothing_purple_hoodie', mouth: 'mouth_teeth', eyes: 'eyes_3d', hat: 'hat_crown', accessory: 'accessory_shades' });
+    assert.deepEqual(first.avatar, { schema_version: 2, bg: 'bg_forest', clothing: 'clothing_purple_hoodie', mouth: 'mouth_teeth', eyes: 'eyes_3d', hat: 'hat_crown', accessory: 'accessory_shades', special: 'special_none' });
     assert.equal(first.first_save, true); assert.equal(first.changed, true);
     assert.equal(first.badge.id, 'first_avatar'); assert.equal(first.badge.new, true); assert.ok(first.badge.earned_at);
     assert.equal(await badges(1), 1);
@@ -247,12 +252,12 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     const manifest = JSON.parse(await read('docs/meme/avatar-options.json'));
     const allIds = slot => manifest.options[slot].map(o => o.id);
     const src = (await db.query("select prosrc from pg_proc where proname = 'gry_passport_avatar_save'")).rows[0].prosrc;
-    for (const slot of ['bg', 'clothing', 'mouth', 'eyes', 'hat', 'accessory']) {
+    for (const slot of ['bg', 'clothing', 'mouth', 'eyes', 'hat', 'accessory', 'special']) {
       const list = src.match(new RegExp('p_' + slot + ' is null or p_' + slot + ' not in \\(([^)]*)\\)'));
       assert.ok(list, slot + ' allowlist');
       assert.deepEqual([...list[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]), allIds(slot), slot);
     }
-    const rewards = [...src.matchAll(/\('([a-z0-9_]+)', '([a-z0-9_]+)'\)/g)].map(x => x[1] + '>' + x[2]).sort();
+    const rewards = [...src.split('from (values')[1].split('r(part, stamp)')[0].matchAll(/\('([a-z0-9_]+)', '([a-z0-9_]+)'\)/g)].map(x => x[1] + '>' + x[2]).sort();
     const wanted = Object.values(manifest.options).flat().filter(o => o.unlock).map(o => o.id + '>' + o.unlock).sort();
     assert.deepEqual(rewards, wanted, 'reward parts and their stamps');
   } finally {

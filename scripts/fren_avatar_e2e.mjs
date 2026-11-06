@@ -187,12 +187,12 @@ try {
     await page.click('.pp-make');
     await page.waitForSelector(maker + ' .fa');
     assert.equal(passportCalls().length, 1);
-    assert.deepEqual(await lookOnPage(page), { bg: 'bg_sky', clothing: 'clothing_blue', mouth: 'mouth_flat', eyes: 'eyes_sleepy', hat: 'hat_none', accessory: 'accessory_none' });
-    // every part has a tile; free: 5 bg + 5 clothing + 6 mouth + 6 eyes + 6 hats + 6 accessories = 34
-    assert.equal(await page.locator(maker + ' .fa-opt:not(.is-locked)').count(), 34);
+    assert.deepEqual(await lookOnPage(page), { bg: 'bg_sky', clothing: 'clothing_blue', mouth: 'mouth_flat', eyes: 'eyes_sleepy', hat: 'hat_none', accessory: 'accessory_none', special: 'special_none' });
+    // every part has a tile; free: 5 bg + 5 clothing + 6 mouth + 6 eyes + 6 hats + 6 accessories + 1 special (none) = 35
+    assert.equal(await page.locator(maker + ' .fa-opt:not(.is-locked)').count(), 35);
     // reserved parts show a lock and cannot be picked: sunset, detective jacket, hard hat, detective hat, headphones, pin
     assert.deepEqual(await page.$$eval(maker + ' .fa-opt.is-locked input', l => l.map(i => [i.value, i.disabled])),
-      [['hat_hardhat', true], ['hat_detective', true], ['clothing_suit', true], ['accessory_headphones', true], ['accessory_pin', true], ['bg_sunset', true]]);
+      [['hat_hardhat', true], ['hat_detective', true], ['clothing_suit', true], ['accessory_headphones', true], ['accessory_pin', true], ['bg_sunset', true], ['special_explorer', true]]);
     assert.equal(await statusText(page), 'Not saved yet.');
     const w = await page.evaluate(sel => document.querySelector(sel).getBoundingClientRect().width, maker);
     assert.ok(w >= 860 && w <= 920, 'window width ' + w);
@@ -208,7 +208,7 @@ try {
     await pick(page, 'mouth', 'mouth_teeth'); await pick(page, 'eyes', 'eyes_hypno');
     await pick(page, 'hat', 'hat_crown'); await pick(page, 'accessory', 'accessory_shades');
     assert.deepEqual((await previewSrcs(page)).map(s => s.split('/').pop()),
-      ['bg_forest.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_teeth.webp', 'eyes_hypno.webp', 'hat_crown.webp', 'accessory_shades.webp']);
+      ['bg_forest.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_teeth.webp', 'eyes_hypno.webp', 'hat_crown.webp', 'accessory_shades.webp', 'special_none.webp']);
     assert.equal(await statusText(page), 'Unsaved changes');
     for (let i = 0; i < 12; i++) await page.click(maker + ' .fa-random');
     assert.equal(passportCalls().length, before, 'no RPC while choosing');
@@ -234,7 +234,7 @@ try {
     await page.waitForFunction(sel => /Saved in your Fren Passport/.test(document.querySelector(sel + ' .fa-state').textContent), maker);
     const after = passportCalls().slice(before);
     assert.deepEqual(after.map(c => c.fn), ['gry_passport_avatar_save']);
-    assert.deepEqual(after[0].body, { p_bg: 'bg_forest', p_clothing: 'clothing_purple_hoodie', p_mouth: 'mouth_teeth', p_eyes: 'eyes_hypno', p_hat: 'hat_crown', p_accessory: 'accessory_shades' });
+    assert.deepEqual(after[0].body, { p_bg: 'bg_forest', p_clothing: 'clothing_purple_hoodie', p_mouth: 'mouth_teeth', p_eyes: 'eyes_hypno', p_hat: 'hat_crown', p_accessory: 'accessory_shades', p_special: 'special_none' });
     assert.deepEqual(await dbRow(1), { bg: 'bg_forest', clothing: 'clothing_purple_hoodie', mouth: 'mouth_teeth', eyes: 'eyes_hypno', hat: 'hat_crown', accessory: 'accessory_shades' });
     assert.equal(await dbBadges(1), 1);
     await page.waitForSelector('.balloon:has-text("Fresh Fren")');
@@ -249,7 +249,7 @@ try {
     const P = '.app-win[aria-label="Fren Passport - Properties"]';
     assert.equal(passportCalls().length, before, 'no read after the save response');
     assert.deepEqual(await page.evaluate(sel => [...document.querySelectorAll(sel + ' .pp-photo .fa-stack img')].map(i => i.getAttribute('src').split('/').pop()), P),
-      ['bg_forest.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_teeth.webp', 'eyes_hypno.webp', 'hat_crown.webp', 'accessory_shades.webp']);
+      ['bg_forest.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_teeth.webp', 'eyes_hypno.webp', 'hat_crown.webp', 'accessory_shades.webp', 'special_none.webp']);
     assert.equal(await page.textContent(P + ' .pp-make'), 'Edit your Fren');
     const fresh = await page.locator(P + ' .pp-stamp', { hasText: 'Fresh Fren' }).textContent();
     assert.doesNotMatch(fresh, /Locked/);
@@ -318,11 +318,11 @@ try {
     await openPassport(page);
     const P = '.app-win[aria-label="Fren Passport - Properties"]';
     assert.deepEqual(await page.evaluate(sel => [...document.querySelectorAll(sel + ' .pp-photo .fa-stack img')].map(i => i.getAttribute('src').split('/').pop()), P),
-      ['bg_forest.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_teeth.webp', 'eyes_3d.webp', 'hat_crown.webp', 'accessory_shades.webp']);
+      ['bg_forest.webp', 'base_frog.webp', 'clothing_purple_hoodie.webp', 'mouth_teeth.webp', 'eyes_3d.webp', 'hat_crown.webp', 'accessory_shades.webp', 'special_none.webp']);
     assert.doesNotMatch(await page.locator(P + ' .pp-stamp', { hasText: 'Fresh Fren' }).textContent(), /Locked/);
     await shot(page, '08-passport-second-device-light');
     await page.click('.pp-make'); await page.waitForSelector(maker + ' .fa');
-    assert.deepEqual(await lookOnPage(page), { bg: 'bg_forest', clothing: 'clothing_purple_hoodie', mouth: 'mouth_teeth', eyes: 'eyes_3d', hat: 'hat_crown', accessory: 'accessory_shades' });
+    assert.deepEqual(await lookOnPage(page), { bg: 'bg_forest', clothing: 'clothing_purple_hoodie', mouth: 'mouth_teeth', eyes: 'eyes_3d', hat: 'hat_crown', accessory: 'accessory_shades', special: 'special_none' });
     await shot(page, '09-maker-light');
     assert.deepEqual(errors, []);
     await ctx.close();
@@ -455,6 +455,25 @@ try {
     assert.deepEqual([row.hat, row.clothing, row.accessory], ['hat_detective', 'clothing_suit', 'accessory_pin']);
     await closeBalloons(page);
     await shot(page, '19-maker-reward-parts');
+    // Lily's special avatar: only the background stays under it; picking a part brings the parts back
+    await page.waitForTimeout(3200);
+    await pick(page, 'bg', 'bg_snow'); await pick(page, 'special', 'special_explorer');
+    const visible = () => page.evaluate(sel => [...document.querySelectorAll(sel + ' .fa-frame .fa-stack img')]
+      .filter(i => getComputedStyle(i).display !== 'none').map(i => i.getAttribute('data-layer')), maker);
+    assert.deepEqual(await visible(), ['bg', 'special']);
+    assert.match(await page.getAttribute(maker + ' .fa-frame .fa-stack', 'aria-label'), /Explorer Pepe \(Pepe Guesser\), Snow/);
+    await page.click(maker + ' .fa-save');
+    await page.waitForFunction(sel => /Saved in your Fren Passport/.test(document.querySelector(sel + ' .fa-state').textContent), maker);
+    assert.equal((await db.query('select special, hat from games.passport_avatars where user_id = $1', [uid(3)])).rows[0].special, 'special_explorer');
+    await shot(page, '21-maker-explorer');
+    await page.click(maker + ' .fa-use');
+    await page.waitForSelector(maker, { state: 'detached' });
+    assert.ok(await page.evaluate(() => document.querySelector('.pp-photo .fa-stack').classList.contains('is-special')));
+    await shot(page, '22-passport-explorer');
+    await page.click('.pp-make'); await page.waitForSelector(maker + ' .fa');
+    await pick(page, 'hat', 'hat_crown');
+    assert.equal((await lookOnPage(page)).special, 'special_none');
+    assert.ok((await visible()).includes('hat'));
     assert.deepEqual(errors, []);
     await ctx.close();
   });

@@ -45,6 +45,16 @@ Details:
 - **Safety:** every game hook catches its own errors and logs a warning, so a stamp bug cannot break a game, a chat message or a save.
 - **Avatar reward parts** (`hat_detective`, `clothing_suit`, `accessory_pin`, `hat_hardhat`) become saveable when the player holds the stamp; the save RPC checks it again on the server. `bg_sunset` (Adept) and `accessory_headphones` (Gamer Fren) stay locked, because those stamps are not live.
 
+## Special avatars (owner decision, 2026-11-06)
+
+Big milestones unlock a **special avatar**: a whole character drawn by **Lily**, not a set of parts. It sits in the Avatar Maker's **Special** row. When it is picked, it covers every part layer except the background, which stays selectable. The parts stay saved underneath, and picking any part switches back to them. The save RPC (`p_special`) accepts a special avatar only from a player who holds its stamp.
+
+| Special avatar | Unlocked by | Source |
+|---|---|---|
+| `special_explorer`: Explorer Pepe (the Pepe Guesser logo Pepe) | Scout Fren (14 Pepe Guesser days in a row) | `games/fren-avatar/source/special/explorer-pepe-original.png` |
+
+To add one: put Lily's transparent square PNG in `games/fren-avatar/source/special/`, add it to `SPECIALS` in `scripts/build_special_avatars.mjs` (with any stray marks to erase and the head crop for the thumbnail), and run the script. Then add the option with its `unlock` key to `avatar-options.json`, and the id plus its `(part, stamp)` pair to the save RPC in a new migration. The tests compare both with the manifest.
+
 ## Still planned ("???" / Coming soon)
 
 PepeGochi (needs PR #186 and a frontend): `first_hatch` (adopt the pet), `little_fren` (second care day: the tadpole becomes a froglet), `grown_fren` "One Small Step" (7th care day: adult; "one small step for a man, one giant leap for a frog"). These match the life cycle in `games/PEPEGOCHI_API.md` (tadpole 0-1 care days, froglet 2-6, adult 7+). Care days are distinct UTC days, not in a row.

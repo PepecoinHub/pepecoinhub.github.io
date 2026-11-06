@@ -320,6 +320,14 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     // user 1: Detective Fren (suit + detective hat) and Scout Fren (PEP pin)
     const dressed = await call(1, SAVE, look('bg_sky', 'clothing_suit', 'hat_detective', 'accessory_pin'));
     assert.equal(dressed.avatar.hat, 'hat_detective'); assert.equal(dressed.badge.new, true);
+    assert.equal(dressed.avatar.special, 'special_none');
+    // Scout Fren also opens Lily's special avatar Explorer Pepe; it is saved with the parts under it
+    const SAVE7 = 'select public.gry_passport_avatar_save($1, $2, $3, $4, $5, $6, $7) as v';
+    await assert.rejects(call(6, SAVE7, [...look('bg_sky', 'clothing_blue', 'hat_none', 'accessory_none'), 'special_explorer']), /That part is locked/);
+    await db.query("update games.passport_avatars set updated_at = now() - interval '5 seconds' where user_id = $1", [uid(1)]);
+    const explorer = await call(1, SAVE7, [...look('bg_forest', 'clothing_suit', 'hat_detective', 'accessory_pin'), 'special_explorer']);
+    assert.equal(explorer.avatar.special, 'special_explorer'); assert.equal(explorer.avatar.hat, 'hat_detective');
+    assert.equal((await call(1, 'select public.gry_passport_state() as v')).avatar.special, 'special_explorer');
     // user 3: Miner Fren opens the hard hat
     assert.equal((await call(3, SAVE, look('bg_sky', 'clothing_blue', 'hat_hardhat', 'accessory_none'))).avatar.hat, 'hat_hardhat');
     // a reward part in the wrong slot is still an unknown option
