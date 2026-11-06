@@ -20,56 +20,173 @@
     "hat": "hat_none",
     "accessory": "accessory_none"
   },
-  "unlock_note": "The 'unlock' key on an option reserves it for a FUTURE server-verified activity achievement (Scout/Miner/Detective/Moon/Gamer Fren). Unlock logic is NOT implemented in this stage; options without an 'unlock' key are base/default and always available.",
+  "unlock_note": "Options with an unlock key are PLANNED rewards for server-verified achievements and cannot be saved until server logic is implemented. The Sunrise/Sunset avatar background is earned from the planned YEET Adept achievement (at least 3000 m). Current server allowlists continue to reject unlock-gated options.",
   "options": {
     "bg": [
-      { "id": "bg_none", "label": "None" },
-      { "id": "bg_pond", "label": "Pond" },
-      { "id": "bg_solid_green", "label": "Grass" },
-      { "id": "bg_meadow", "label": "Meadow" },
-      { "id": "bg_sunset", "label": "Sunset", "unlock": "moon_fren" }
+      {
+        "id": "bg_none",
+        "label": "None"
+      },
+      {
+        "id": "bg_pond",
+        "label": "Pond"
+      },
+      {
+        "id": "bg_solid_green",
+        "label": "Grass"
+      },
+      {
+        "id": "bg_meadow",
+        "label": "Meadow"
+      },
+      {
+        "id": "bg_sunset",
+        "label": "Sunset",
+        "unlock": "yeet_adept"
+      }
     ],
     "mouth": [
-      { "id": "mouth_smile", "label": "Classic smile" },
-      { "id": "mouth_grin", "label": "Grin" },
-      { "id": "mouth_open", "label": "Laugh" },
-      { "id": "mouth_tongue", "label": "Tongue out" },
-      { "id": "mouth_flat", "label": "Neutral" },
-      { "id": "mouth_smirk", "label": "Smirk" }
+      {
+        "id": "mouth_smile",
+        "label": "Classic smile"
+      },
+      {
+        "id": "mouth_grin",
+        "label": "Grin"
+      },
+      {
+        "id": "mouth_open",
+        "label": "Laugh"
+      },
+      {
+        "id": "mouth_tongue",
+        "label": "Tongue out"
+      },
+      {
+        "id": "mouth_flat",
+        "label": "Neutral"
+      },
+      {
+        "id": "mouth_smirk",
+        "label": "Smirk"
+      }
     ],
     "eyes": [
-      { "id": "eyes_classic", "label": "Classic" },
-      { "id": "eyes_sleepy", "label": "Sleepy" },
-      { "id": "eyes_wide", "label": "Wide eyes" },
-      { "id": "eyes_shades", "label": "Shades" },
-      { "id": "eyes_round", "label": "Round glasses" },
-      { "id": "eyes_3d", "label": "3D glasses" }
+      {
+        "id": "eyes_classic",
+        "label": "Classic"
+      },
+      {
+        "id": "eyes_sleepy",
+        "label": "Sleepy"
+      },
+      {
+        "id": "eyes_wide",
+        "label": "Wide eyes"
+      },
+      {
+        "id": "eyes_shades",
+        "label": "Shades"
+      },
+      {
+        "id": "eyes_round",
+        "label": "Round glasses"
+      },
+      {
+        "id": "eyes_3d",
+        "label": "3D glasses"
+      }
     ],
     "hat": [
-      { "id": "hat_none", "label": "None" },
-      { "id": "hat_pep_cap", "label": "Green cap" },
-      { "id": "hat_beanie", "label": "Beanie" },
-      { "id": "hat_bucket", "label": "Bucket hat" },
-      { "id": "hat_crown", "label": "Paper crown" },
-      { "id": "hat_astronaut", "label": "Space helmet" },
-      { "id": "hat_fedora", "label": "Fedora" },
-      { "id": "hat_hardhat", "label": "Hard hat", "unlock": "miner_fren" },
-      { "id": "hat_detective", "label": "Detective hat", "unlock": "detective_fren" }
+      {
+        "id": "hat_none",
+        "label": "None"
+      },
+      {
+        "id": "hat_pep_cap",
+        "label": "Green cap"
+      },
+      {
+        "id": "hat_beanie",
+        "label": "Beanie"
+      },
+      {
+        "id": "hat_bucket",
+        "label": "Bucket hat"
+      },
+      {
+        "id": "hat_crown",
+        "label": "Paper crown"
+      },
+      {
+        "id": "hat_astronaut",
+        "label": "Space helmet"
+      },
+      {
+        "id": "hat_fedora",
+        "label": "Fedora"
+      },
+      {
+        "id": "hat_hardhat",
+        "label": "Hard hat",
+        "unlock": "miner_fren"
+      },
+      {
+        "id": "hat_detective",
+        "label": "Detective hat",
+        "unlock": "detective_fren"
+      }
     ],
     "clothing": [
-      { "id": "clothing_blue", "label": "Blue shirt" },
-      { "id": "clothing_purple_hoodie", "label": "Purple hoodie" },
-      { "id": "clothing_black_hoodie", "label": "Black hoodie" },
-      { "id": "clothing_white_pep", "label": "White PEP tee" },
-      { "id": "clothing_orange_vest", "label": "Orange vest" },
-      { "id": "clothing_suit", "label": "Detective suit", "unlock": "detective_fren" }
+      {
+        "id": "clothing_blue",
+        "label": "Blue shirt"
+      },
+      {
+        "id": "clothing_purple_hoodie",
+        "label": "Purple hoodie"
+      },
+      {
+        "id": "clothing_black_hoodie",
+        "label": "Black hoodie"
+      },
+      {
+        "id": "clothing_white_pep",
+        "label": "White PEP tee"
+      },
+      {
+        "id": "clothing_orange_vest",
+        "label": "Orange vest"
+      },
+      {
+        "id": "clothing_suit",
+        "label": "Detective suit",
+        "unlock": "detective_fren"
+      }
     ],
     "accessory": [
-      { "id": "accessory_none", "label": "None" },
-      { "id": "accessory_chain", "label": "Gold chain" },
-      { "id": "accessory_scarf", "label": "Scarf" },
-      { "id": "accessory_pin", "label": "PEP pin", "unlock": "scout_fren" },
-      { "id": "accessory_headphones", "label": "Headphones", "unlock": "gamer_fren" }
+      {
+        "id": "accessory_none",
+        "label": "None"
+      },
+      {
+        "id": "accessory_chain",
+        "label": "Gold chain"
+      },
+      {
+        "id": "accessory_scarf",
+        "label": "Scarf"
+      },
+      {
+        "id": "accessory_pin",
+        "label": "PEP pin",
+        "unlock": "scout_fren"
+      },
+      {
+        "id": "accessory_headphones",
+        "label": "Headphones",
+        "unlock": "gamer_fren"
+      }
     ]
   },
   "paths": {
