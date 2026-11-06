@@ -114,17 +114,43 @@ an unknown id until such an achievement grants them.
    of `update_fren_avatar.sql`.
 3. Only then merge the frontend. Before the migration the maker still works as
    a preview, but Save Look reports `Saving is waiting for its database update`.
-4. If a non-unlock option is ever added to `avatar-options.json`, add the same ID
-   to the matching slot allowlist in the save RPC in a new migration. The tests
-   compare the server allowlists to the manifest's non-unlock ids.
+4. If an option is ever added to `avatar-options.json`, add the same ID to the
+   matching slot allowlist in the save RPC (and, for a reward part, its
+   `(part, stamp)` pair) in a new migration. The tests compare both to the manifest.
+5. Then apply `games/supabase/update_passport_awards.sql` **on launch day** (see
+   "Fren Passport stamps" below).
+
+### Fren Passport stamps (draft, not yet enabled)
+
+`games/supabase/update_passport_awards.sql` awards the 19 live stamps from the
+games' own records. The rules, sources and tests are listed in
+`games/FREN_PASSPORT_ACHIEVEMENTS_DECISIONS_2026-11-06.md`. Order: after
+`update_fren_passport.sql` and `update_fren_avatar.sql`, on a database that
+already has the YEET, Where's Pepe, lobby chat, mentions, letters and miner
+migrations. Safe to run twice.
+
+- **Run it on launch day.** Its first run gives Pond Pioneer to every account
+  that has Discord linked at that moment; `games.passport_meta` makes sure later
+  runs never add anyone.
+- It backfills Moonwalker, the Pepe Guesser stamps and the letter stamps from
+  existing records. Chat, YEET 3×5000 m, Miner time and 10 Day Fren count from
+  that day on.
+- It replaces `public.gry_yeet_submit` with the same body plus one hook line,
+  and adds triggers on `games.wp_plays`, `games.lobby_chat`,
+  `games.lobby_mentions`, `games.letters` and `games.miner_saves`. A failing hook
+  only logs a warning and never blocks the game.
+- New browser RPC: `public.gry_passport_checkin()` (no arguments, Discord only),
+  called by PondOS at most every 5 minutes per tab.
+- Real-database test: `tests/passport-awards-sql.test.mjs` with the same
+  `PASSPORT_PG_URL` / `PASSPORT_PG_MODULE` variables as below.
 
 **Trust rules:** the browser sends only six option IDs (no user id, badge or
 image). The server takes the player from `auth.uid()`, requires a real Discord
-identity, checks each slot against an exact non-unlock allowlist, and writes one
-row per player. The first save inserts `first_avatar` into
+identity, checks each slot against an exact allowlist, accepts a reward part
+only when the player holds its stamp, and writes one row per player. The first save inserts `first_avatar` into
 `games.passport_badges` in the same transaction (`on conflict do nothing`), so
-Fresh Fren is minted once and a failed save leaves nothing behind. Reserved
-unlock-gated ids are never saveable, so Fresh Fren cannot be gained by sending a
+Fresh Fren is minted once and a failed save leaves nothing behind. A reward part
+sent without its stamp is rejected, so nothing can be unlocked by sending a
 fancy id. Saving the same look again is a no-op success; a different look within
 3 seconds or past 40 saves per UTC day is an error. Picking parts and Randomize
 never call Supabase: one read when the Passport opens, one write per Save Look.
@@ -135,7 +161,7 @@ server allowlists matching the manifest's non-unlock ids).
 `tests/passport-avatar-sql.test.mjs` runs the migrations on a real, disposable
 PostgreSQL (15 or newer) when `PASSPORT_PG_URL` and `PASSPORT_PG_MODULE` (path to
 node-postgres) are set: grants, anonymous/non-Discord rejection, ID injection,
-rejection of every reserved/unlock id (`bg_sunset`, `clothing_suit`,
+rejection of every reward part without its stamp (`bg_sunset`, `clothing_suit`,
 `hat_hardhat`, `hat_detective`, `accessory_pin`, `accessory_headphones`),
 isolation between players, one badge under concurrent first saves, rollback,
 cooldown and the daily limit. Never point it at Supabase. Fresh Fren

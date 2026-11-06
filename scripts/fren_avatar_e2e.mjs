@@ -26,7 +26,7 @@ const SHOTS = process.env.FREN_SHOTS || path.join(TOOLS, 'shots');
 const CHROME = process.env.FREN_CHROME;
 const SB = 'https://azbwciqfbsdpwubznncg.supabase.co';
 const ORIGIN = 'https://pondos.test';
-const ALLOWED_RPC = new Set(['gry_passport_state', 'gry_passport_avatar_save', 'gry_passport_discover']);
+const ALLOWED_RPC = new Set(['gry_passport_state', 'gry_passport_avatar_save', 'gry_passport_discover', 'gry_passport_checkin']);
 const uid = i => '00000000-0000-4000-8000-' + String(i).padStart(12, '0');
 const log = (...a) => console.log('•', ...a);
 
@@ -40,18 +40,33 @@ await db.connect();
 const rd = p => readFile(REPO + '/' + p, 'utf8');
 await db.query(`
 create role anon nologin; create role authenticated nologin;
-create schema auth; create schema games;
-create table auth.users(id uuid primary key, created_at timestamptz not null default now());
+create schema auth;
+create table auth.users(id uuid primary key, created_at timestamptz not null default now(), is_anonymous boolean not null default false);
 create table auth.identities(user_id uuid references auth.users(id) on delete cascade, provider text not null, provider_id text not null, identity_data jsonb not null default '{}');
 create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
 grant usage on schema public, auth to anon, authenticated;`);
-await db.query((await rd('games/supabase/schema.sql')).match(/create or replace function games\.discord_identity\(u uuid\)[\s\S]*?\n\$\$;/)[0]);
-for (const f of ['update_yeet.sql', 'update_fren_passport.sql', 'update_fren_avatar.sql']) await db.query(await rd('games/supabase/' + f));
-await db.query("insert into auth.users(id, created_at) values ($1, '2026-10-12T18:00:00Z'), ($2, '2026-10-20T09:30:00Z')", [uid(1), uid(2)]);
-await db.query("insert into auth.identities values ($1, 'discord', '111', $2), ($3, 'discord', '222', $4)",
-  [uid(1), JSON.stringify({ custom_claims: { global_name: 'PondTester' } }), uid(2), JSON.stringify({ full_name: 'SecondFren' })]);
+// the real game database: schema.sql, the games the stamps hook into, then the Passport files
+for (const f of ['schema.sql', 'update_yeet.sql', 'update_wheres_pepe.sql', 'update_wheres_pepe_guests.sql', 'update_lobby_chat.sql',
+  'update_open_chat.sql', 'update_lobby_mentions.sql', 'update_frog_letters.sql', 'update_letters_community.sql', 'update_miner_cloud.sql',
+  'update_fren_passport.sql', 'update_fren_avatar.sql']) await db.query(await rd('games/supabase/' + f));
+await db.query("insert into auth.users(id, created_at) values ($1, '2026-10-12T18:00:00Z'), ($2, '2026-10-20T09:30:00Z'), ($3, '2026-09-01T10:00:00Z')", [uid(1), uid(2), uid(3)]);
+await db.query("insert into auth.identities values ($1, 'discord', '111', $2), ($3, 'discord', '222', $4), ($5, 'discord', '333', $6)",
+  [uid(1), JSON.stringify({ custom_claims: { global_name: 'PondTester' } }), uid(2), JSON.stringify({ full_name: 'SecondFren' }), uid(3), JSON.stringify({ full_name: 'StampFren' })]);
 await db.query("insert into games.yeet_records(user_id, nick, best, duration_ms, achieved_at) values ($1, 'PondTester', 18420, 30000, '2026-11-02T12:00:00Z')", [uid(1)]);
 await db.query("insert into games.passport_secrets(user_id, secret_id) values ($1, 'notes_reader')", [uid(1)]);
+// StampFren's history from before the launch: Pepe Guesser on 15 days in a row (5000 on five of them), two letters
+for (let back = 1; back <= 15; back++) {
+  const id = (await db.query(`insert into games.wp_puzzles(qid, status, day, num, title, lat, lon, country, country_code, continent, credit, license, source_url)
+    values ($1, 'approved', (now() at time zone 'utc')::date - $2::int, $2, 'Place', 52.2, 21.0, 'Poland', 'PL', 'Europe', 'c', 'cc0', 'https://example.org') returning id`, ['Q' + back, back])).rows[0].id;
+  await db.query(`insert into games.wp_plays(puzzle_id, user_id, nick, verified, started_at, guessed_at, g_lat, g_lon, km, points)
+    values ($1, $2, 'StampFren', true, now() - make_interval(days => $3::int), now() - make_interval(days => $3::int) + interval '40 seconds', 52, 21, 5, $4)`, [id, uid(3), back, back <= 5 ? 5000 : 3600]);
+}
+for (const days of [6, 2]) await db.query("insert into games.letters(user_id, name, discord, body, created_at) values ($1, 'StampFren', true, 'Dear editor', now() - make_interval(days => $2::int))", [uid(3), days]);
+// launch day: the stamps migration runs (Pond Pioneer snapshot + backfills)
+await db.query(await rd('games/supabase/update_passport_awards.sql'));
+// LateFren links Discord after the launch: no Pond Pioneer
+await db.query("insert into auth.users(id) values ($1)", [uid(4)]);
+await db.query("insert into auth.identities values ($1, 'discord', '444', $2)", [uid(4), JSON.stringify({ full_name: 'LateFren' })]);
 
 // ---------- fake PostgREST in front of the real functions ----------
 const calls = [];
@@ -84,7 +99,9 @@ async function rpcHandler(route) {
     return json(e.code === '42501' ? 403 : 400, { code: e.code, message: e.message });
   }
 }
-const passportCalls = () => calls.filter(c => ALLOWED_RPC.has(c.fn));
+// the page-load check-in is counted on its own, so the Passport/Maker request counts stay exact
+const passportCalls = () => calls.filter(c => ALLOWED_RPC.has(c.fn) && c.fn !== 'gry_passport_checkin');
+const checkins = () => calls.filter(c => c.fn === 'gry_passport_checkin');
 
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.gif': 'image/gif', '.ico': 'image/x-icon', '.txt': 'text/plain', '.xml': 'application/xml', '.woff2': 'font/woff2' };
 async function staticHandler(route) {
@@ -103,7 +120,8 @@ const token = i => 'x.' + Buffer.from(JSON.stringify({ sub: uid(i), role: 'authe
 const session = (i, name) => JSON.stringify({ access_token: token(i), expires_at: Math.floor(Date.now() / 1000) + 3600,
   user: { id: uid(i), is_anonymous: false, identities: [{ provider: 'discord', identity_data: { full_name: name } }], user_metadata: { full_name: name } } });
 
-async function newPage({ user = null, name = '', theme = 'dark', mobile = false, reduced = false } = {}) {
+// checkin: false marks this tab as already checked in, so no stamp notice pops up in the middle of a step
+async function newPage({ user = null, name = '', theme = 'dark', mobile = false, reduced = false, checkin = false } = {}) {
   const ctx = await browser.newContext(mobile
     ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, reducedMotion: reduced ? 'reduce' : 'no-preference' }
     : { viewport: { width: 1280, height: 800 }, reducedMotion: reduced ? 'reduce' : 'no-preference' });
@@ -113,14 +131,15 @@ async function newPage({ user = null, name = '', theme = 'dark', mobile = false,
     if (u.startsWith(SB + '/rest/v1/rpc/')) return rpcHandler(route);
     return route.abort('blockedbyclient');
   });
-  await ctx.addInitScript(({ s, theme }) => {
+  await ctx.addInitScript(({ s, theme, skip }) => {
     try {
       sessionStorage.setItem('pondos-boot', '1'); sessionStorage.setItem('pondos-notice', '1');
+      if (skip && !sessionStorage.getItem(skip)) sessionStorage.setItem(skip, String(Date.now()));
       localStorage.setItem('phw-theme', theme);
       localStorage.setItem('pondos-mail-read', '999');
       if (s) localStorage.setItem('sb-azbwciqfbsdpwubznncg-auth-token', s); else localStorage.removeItem('sb-azbwciqfbsdpwubznncg-auth-token');
     } catch (e) {}
-  }, { s: user ? session(user, name) : null, theme });
+  }, { s: user ? session(user, name) : null, theme, skip: user && !checkin ? 'pondos-checkin:' + uid(user) : null });
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
@@ -368,6 +387,89 @@ try {
       return { docW: document.documentElement.scrollWidth, vw: innerWidth, winScroll: w.scrollWidth - w.clientWidth, minOpt: Math.min(...opts.map(r => Math.min(r.width, r.height))) };
     }, maker);
     assert.ok(s.docW <= s.vw && s.winScroll <= 0 && s.minOpt >= 44, '320px phone ' + JSON.stringify(s));
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  });
+
+  // ===== stamps from game records (update_passport_awards.sql) =====
+  const P = '.app-win[aria-label="Fren Passport - Properties"]';
+  await step('Stamps: one check-in on page load announces the backfilled stamps once', async () => {
+    const { page, errors, ctx } = await newPage({ user: 3, name: 'StampFren', checkin: true });
+    const b = await page.waitForSelector('.balloon:has-text("new stamps")', { timeout: 8000 });
+    assert.equal(checkins().length, 1); assert.deepEqual(checkins()[0].body, {});
+    const text = await b.textContent();
+    for (const t of ['Pond Pioneer', 'Pepe Guesser', 'Sharp Eye', 'Detective Fren', 'Week Scout', 'Frog Detective', 'Scout Fren', 'Dear Editor'])
+      assert.ok(text.includes(t), t + ' in ' + text);
+    assert.match(text, /^8 new stamps!/);
+    await shot(page, '16-stamps-balloon');
+    const before = passportCalls().length;
+    await b.click();
+    await page.waitForSelector(P + ' .pp-book');
+    assert.deepEqual(passportCalls().slice(before).map(c => c.fn), ['gry_passport_state']);
+    // the booklet: the server's stamps, newest first; Next Milestone is the closest one with a real count
+    assert.equal(await page.locator(P + ' .pp-grid .pp-slot.is-earned').count(), 9, 'eight new + First Fren');
+    assert.match(await page.textContent(P + ' .pp-mile-title'), /Junior Editor\s*2 \/ 5 letters/);
+    assert.equal(await page.getAttribute(P + ' .pp-mile .pp-bar', 'aria-valuenow'), '2');
+    await shot(page, '17-stamps-passport');
+    await page.click(P + ' [role=tab]:has-text("Stamps")');
+    const album = await page.$$eval(P + ' .pp-album .pp-stamp', l => l.map(s => [s.querySelector('.pp-stamp-name').textContent, s.querySelector('.pp-stamp-sub').textContent]));
+    assert.equal(album.length, 43);
+    const named = Object.fromEntries(album.filter(a => a[0] !== '???'));
+    assert.equal(Object.keys(named).length, 19, 'only the 19 live stamps are named');
+    assert.equal(named['Junior Editor'], 'Locked'); assert.equal(named['NASA Is Hiring'], 'Locked');
+    assert.ok(album.filter(a => a[0] === '???').every(a => a[1] === 'Coming soon'));
+    assert.ok(!album.some(a => /Certified Fren|Adept|Gamer Fren|7 Day Fren/.test(a[0])), 'planned names stay hidden');
+    await shot(page, '18-stamps-album');
+    // reload: the server already told this player, so no second notice
+    await page.evaluate(k => sessionStorage.removeItem(k), 'pondos-checkin:' + uid(3));
+    await page.reload(); await page.waitForSelector('.start');
+    await page.waitForTimeout(3500);
+    assert.equal(checkins().length, 2);
+    assert.equal(await page.locator('.balloon:has-text("stamp")').count(), 0);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  });
+  await step('Stamps: Detective Fren and Scout Fren open their Avatar Maker parts; others stay locked', async () => {
+    const { page, errors, ctx } = await newPage({ user: 3, name: 'StampFren' });
+    await openPassport(page);
+    await page.click('.pp-make'); await page.waitForSelector(maker + ' .fa');
+    assert.deepEqual(await page.$$eval(maker + ' .fa-opt.is-locked input', l => l.map(i => i.value)), ['hat_hardhat', 'accessory_headphones', 'bg_sunset']);
+    assert.match(await page.getAttribute(`${maker} input[value="hat_hardhat"]`, 'value'), /hat_hardhat/);
+    assert.match(await page.getAttribute(`${maker} label:has(input[value="hat_hardhat"])`, 'title'), /earn the Miner Fren stamp/);
+    assert.match(await page.getAttribute(`${maker} label:has(input[value="bg_sunset"])`, 'title'), /a future stamp/);
+    await pick(page, 'hat', 'hat_detective'); await pick(page, 'clothing', 'clothing_suit'); await pick(page, 'accessory', 'accessory_pin');
+    await page.click(maker + ' .fa-save');
+    await page.waitForFunction(sel => /Saved in your Fren Passport/.test(document.querySelector(sel + ' .fa-state').textContent), maker);
+    const row = await dbRow(3);
+    assert.deepEqual([row.hat, row.clothing, row.accessory], ['hat_detective', 'clothing_suit', 'accessory_pin']);
+    await closeBalloons(page);
+    await shot(page, '19-maker-reward-parts');
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  });
+  await step('Stamps: a fren who joined after the launch sees Pond Pioneer as Closed', async () => {
+    const { page, errors, ctx } = await newPage({ user: 4, name: 'LateFren' });
+    await openPassport(page);
+    await page.click(P + ' [role=tab]:has-text("Stamps")');
+    assert.match(await page.locator(P + ' .pp-stamp', { hasText: 'Pond Pioneer' }).textContent(), /Closed/);
+    assert.doesNotMatch(await page.textContent(P + ' .pp-mile-title'), /Pond Pioneer/);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  });
+  await step('PEP-TV ad pond_stamps.mpg plays and its button opens the Passport', async () => {
+    const { page, errors, ctx } = await newPage({ user: 1, name: 'PondTester' });
+    await page.click('.start'); await page.getByRole('button', { name: /Find/ }).click();
+    await page.fill('.find-in', 'pond_stamps'); await page.press('.find-in', 'Enter');
+    const AD = '.app-win[aria-label="pond_stamps.mpg - Pond Media Player"]';
+    await page.waitForSelector(AD);
+    await page.click(AD + ' .ptv-play');
+    for (let i = 1; i <= 4; i++) {
+      await page.waitForTimeout(450);
+      await shot(page, '20-stamps-ad-scene-' + i, { clip: await page.locator(AD).boundingBox() });
+      if (i < 4) await page.click(AD + ' .ptv-next');
+    }
+    await page.click(AD + ' .ad-passbtn');
+    await page.waitForSelector(P + ' .pp-page-art');
     assert.deepEqual(errors, []);
     await ctx.close();
   });

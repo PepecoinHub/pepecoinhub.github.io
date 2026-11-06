@@ -1574,6 +1574,7 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
+  var PP_CATALOG = 'passport-catalog.json?v=20261106stamps1';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
       document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106mk1'}));
@@ -1583,7 +1584,7 @@
   function passportLoad(session) {
     return Promise.all([
       rpc('gry_passport_state', {}),
-      fetch('passport-catalog.json?v=20261106avatar2').then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
+      fetch(PP_CATALOG).then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
       avatarOptions().catch(function () { return null; })
     ]).then(function (r) {
       if (r[0] && r[0].signed_in) passportCache = { userId: session.userId, state: r[0], catalog: r[1], opts: r[2] };
@@ -1601,8 +1602,11 @@
     'sprout', 'handshake', 'rocket', 'binoculars', 'deerstalker', 'moon', 'joystick', 'locked'];
   var PP_ICONS = ['plane', 'calendar', 'trophy', 'box', 'gamepad', 'star', 'gift', 'tab_home', 'tab_trophy', 'tab_stamp', 'tab_box', 'tab_stats'];
   // the stamp each achievement shows once earned; anything else falls back to its category
+  // (stamps without their own drawing yet reuse the closest one)
   var PP_STAMP_OF = {
-    first_fren: 'duck', first_avatar: 'sprout', moonwalker: 'moon', seven_day_fren: 'calendar', certified_fren: 'handshake',
+    first_fren: 'duck', first_avatar: 'sprout', moonwalker: 'moon', ten_day_fren: 'calendar', certified_fren: 'handshake',
+    pond_pioneer: 'handshake', sharp_eye: 'magnifier', week_scout: 'binoculars', first_words: 'people', hey_fren: 'people',
+    dear_editor: 'computer', junior_editor: 'folders', rookie_miner: 'pickaxe',
     hundred_day_fren: 'handshake', community_fren: 'people', curious_fren: 'magnifier', pepe_guesser: 'binoculars',
     scout_fren: 'binoculars', detective_fren: 'deerstalker', frog_detective: 'deerstalker', miner_fren: 'pickaxe',
     gamer_fren: 'gamepad', game_night: 'computer', arcade_hopper: 'joystick', game_collector: 'joystick',
@@ -1677,6 +1681,22 @@
         var metres = function(v){ return fmt.dec(v, 1) + ' m'; };
         function piece(tag,cls,value) { var n=el(tag,{class:cls}); n.textContent=value; return n; }
         function stampTitle(x, e) { return (x.title||x.id) + (e ? ' - earned ' + fmt.date(e.earned_at) : ' - locked'); }
+        // stamps that cannot be earned yet keep their name to themselves: '???' and "Coming soon"
+        function shown(x, e) { return e || x.status==='live' || x.id===MYTHIC_ID; }
+        function nameOf(x, e) { return shown(x, e) ? (x.title||x.id) : '???'; }
+        function stateOf(x) { return x.status!=='live' ? 'Coming soon' : x.limited ? 'Closed' : 'Locked'; }
+        // the server's own counters (gry_passport_state.progress) for the stamps that have a count
+        var P = state.progress || {};
+        var num = function(v){ return typeof v === 'number' && isFinite(v) ? v : 0; };
+        var PROG = {
+          moonwalker: [yeetBest || 0, 6000, ' m'], nasa_is_hiring: [num(P.yeet_5k_flights), 3, ' flights'],
+          sharp_eye: [num(P.wp_perfect_days), 1, ''], detective_fren: [num(P.wp_perfect_days), 5, ' perfect days'],
+          frog_detective: [num(P.wp_days), 10, ' days'], week_scout: [num(P.wp_streak), 7, ' days in a row'],
+          scout_fren: [num(P.wp_streak), 14, ' days in a row'], community_fren: [num(P.chat_days), 5, ' days'],
+          dear_editor: [num(P.letters), 1, ''], junior_editor: [num(P.letters), 5, ' letters'],
+          ten_day_fren: [num(P.login_streak), 10, ' days in a row'],
+          rookie_miner: [num(P.miner_minutes), 10, ' min'], miner_fren: [num(P.miner_minutes), 60, ' min']
+        };
         function openMaker() { avatarMaker(); }
         box.replaceChildren();
 
@@ -1732,11 +1752,12 @@
         journey.appendChild(jl);
         side.appendChild(journey);
 
-        // Next Milestone: the first unearned LIVE stamp (it can really be earned today); a progress bar
-        // only where the server state gives a true measure (Moonwalker: best YEET flight vs 6000 m).
-        var next = regular.filter(function(x){ return x.status==='live' && !earnedOf(x.id); })[0];
+        // Next Milestone: the unearned LIVE stamp the player is closest to (catalog order breaks ties);
+        // a progress bar only where the server state gives a true measure (PROG above).
+        var near = function(x){ var p = PROG[x.id]; return p ? Math.min(p[0] / p[1], 0.999) : 0; };
+        var next = regular.filter(function(x){ return x.status==='live' && !x.limited && !earnedOf(x.id); })
+          .reduce(function(best, x){ return !best || near(x) > near(best) ? x : best; }, null);
         var soon = !next;
-        if (!next) next = regular.filter(function(x){ return !earnedOf(x.id); })[0];
         var mile = el('section', {class:'pp-panel pp-mile'});
         mile.appendChild(piece('h3','pp-panel-h is-blue','Next Milestone'));
         var mb = el('div', {class:'pp-mile-body'});
@@ -1744,12 +1765,10 @@
           mb.appendChild(ppIcon('gift'));
           var mt = el('div', {class:'pp-mile-text'});
           var head = el('p', {class:'pp-mile-title'}); head.appendChild(piece('strong','',next.title||next.id));
-          var prog = null;
-          if (next.id==='moonwalker' && yeetBest!=null) prog = [Math.min(yeetBest, 6000), 6000];
-          if (prog) head.appendChild(piece('span','pp-mile-n', fmt.int(Math.floor(prog[0]))+' / '+fmt.int(prog[1])+' m'));
-          else if (soon) head.appendChild(piece('span','pp-mile-n','coming soon'));
+          var pg = PROG[next.id], prog = pg && pg[1] > 1 ? [Math.min(pg[0], pg[1]), pg[1], pg[2]] : null;
+          if (prog) head.appendChild(piece('span','pp-mile-n', fmt.int(Math.floor(prog[0]))+' / '+fmt.int(prog[1])+prog[2]));
           mt.appendChild(head);
-          mt.appendChild(piece('p','pp-mile-desc', next.description || 'A future server-verified stamp.'));
+          mt.appendChild(piece('p','pp-mile-desc', next.description || 'A server-verified stamp.'));
           mb.appendChild(mt);
           mile.appendChild(mb);
           if (prog) {
@@ -1757,7 +1776,8 @@
             var fill = el('span'); fill.style.width = (prog[0] / prog[1] * 100).toFixed(1) + '%'; bar.appendChild(fill); mile.appendChild(bar);
           }
         } else {
-          mb.appendChild(piece('p','pp-mile-desc','Every stamp collected. Legend.'));
+          mb.appendChild(piece('p','pp-mile-desc', soon && regular.some(function(x){ return x.status!=='live'; })
+            ? 'Every stamp you can earn today is yours. More are coming soon.' : 'Every stamp collected. Legend.'));
           mile.appendChild(mb);
         }
         side.appendChild(mile);
@@ -1811,22 +1831,22 @@
           var e = x.id===MYTHIC_ID ? null : earnedOf(x.id);
           var li = el('li', {class:'pp-row'+(e?' is-earned':'')});
           li.appendChild(ppStamp(x, !!e));
-          var tx = el('div'); tx.appendChild(piece('b','',x.title||x.id)); tx.appendChild(piece('small','',x.description||''));
+          var tx = el('div'); tx.appendChild(piece('b','',nameOf(x, e))); tx.appendChild(piece('small','',shown(x, e) ? x.description||'' : 'A new stamp is on its way.'));
           li.appendChild(tx);
-          li.appendChild(piece('span','pp-tag'+(e?' is-on':''), e ? 'Earned '+fmt.date(e.earned_at) : (x.status==='live' ? 'Locked' : 'Coming soon')));
+          li.appendChild(piece('span','pp-tag'+(e?' is-on':''), e ? 'Earned '+fmt.date(e.earned_at) : stateOf(x)));
           al.appendChild(li);
         });
-        panes[1].appendChild(piece('p','pp-muted', earnedCount+' of '+regular.length+' stamps earned. Stamps are awarded by the server only; "Coming soon" stamps cannot be earned yet.'));
+        panes[1].appendChild(piece('p','pp-muted', earnedCount+' of '+regular.length+' stamps earned. Stamps are awarded by the server only, from what the games record; "Coming soon" stamps cannot be earned yet.'));
         panes[1].appendChild(al);
 
         // Stamps: the whole album with names (locked stamps show the '?' slot)
         var album = el('div', {class:'pp-album'});
         regular.forEach(function(x){
           var e = earnedOf(x.id);
-          var c = el('div', {class:'pp-stamp'+(e?' is-earned':' is-locked'), title: x.description || ''});
+          var c = el('div', {class:'pp-stamp'+(e?' is-earned':' is-locked'), title: shown(x, e) ? x.description || '' : 'Coming soon'});
           c.appendChild(ppStamp(x, !!e));
-          c.appendChild(piece('b','pp-stamp-name', x.title||x.id));
-          c.appendChild(piece('small','pp-stamp-sub', e ? fmt.date(e.earned_at) : (x.status==='live' ? 'Locked' : 'Coming soon')));
+          c.appendChild(piece('b','pp-stamp-name', nameOf(x, e)));
+          c.appendChild(piece('small','pp-stamp-sub', e ? fmt.date(e.earned_at) : stateOf(x)));
           album.appendChild(c);
         });
         panes[2].appendChild(album);
@@ -1902,7 +1922,8 @@
   // same head/eye/mouth/shoulder geometry, so the parts stack with no per-part offsets. The editable slots
   // are bg, clothing, mouth, eyes, hat and accessory; base (defaults.base) is an implied constant layer that
   // is always painted between bg and clothing and is never a choice. Options carrying an 'unlock' key are
-  // reserved for a future server-verified achievement: the maker shows them with a lock (not pickable) and the save RPC rejects them.
+  // reward parts: they open once the server state holds that stamp; until then the maker shows them with a lock
+  // (not pickable), and the save RPC checks the stamp again on its own.
   // Picking parts and Randomize only change this preview, with no server traffic. Save Look is the one write
   // (gry_passport_avatar_save, six ids bg/clothing/mouth/eyes/hat/accessory): only its answer counts as saved,
   // and the server alone awards Fresh Fren (first_avatar) for the first look it saves.
@@ -1915,9 +1936,9 @@
     }
     return avOpts;
   }
-  // the offerable (selectable) options for a slot: everything without an 'unlock' key. Reserved/unlock-gated
-  // parts are never offered here and are rejected server-side, so a browser cannot pick or save them.
-  function avatarPicks(o, k) { return (o.options[k] || []).filter(function (p) { return !p.unlock; }); }
+  // the offerable (selectable) options for a slot: the free parts, plus reward parts whose stamp the player has
+  // (owns(stampId) reads the server state). The save RPC rejects a reward part without its stamp anyway.
+  function avatarPicks(o, k, owns) { return (o.options[k] || []).filter(function (p) { return !p.unlock || (owns && owns(p.unlock)); }); }
   // a clean copy of a look, or null unless every slot holds a known part
   function avatarLook(o, x) {
     if (!o || !o.options || !x || typeof x !== 'object') return null;
@@ -1955,7 +1976,8 @@
   var FA_ROWS = [['mouth', 'Mouth', 'mouth'], ['eyes', 'Eyes', 'eyes'], ['hat', 'Hat', 'hat'], ['clothing', 'Clothing', 'clothing'],
     ['accessory', 'Accessory', 'accessory'], ['bg', 'Background', null]];
   // which stamp opens a reserved part (catalog titles)
-  var FA_UNLOCK = { yeet_adept: 'Adept', detective_fren: 'Detective Fren', miner_fren: 'Miner Fren', gamer_fren: 'Gamer Fren', scout_fren: 'Scout Fren' };
+  // (only stamps that can be earned today are named; the others stay "a future stamp", like '???' in the Passport)
+  var FA_UNLOCK = { detective_fren: 'Detective Fren', miner_fren: 'Miner Fren', scout_fren: 'Scout Fren' };
   function avatarMaker() {
     return openApp('avatar', 'Create Your Fren - Avatar Maker', 'pep-logo', function (A) {
       passportCss();
@@ -1972,6 +1994,8 @@
       });
       function build(o, signed) {
         var d = signed ? passportMine() : null;
+        // a stamp the server says this player has earned (reward parts open with it)
+        var owns = function (id) { var l = d && Array.isArray(d.state.achievements) ? d.state.achievements : []; return l.some(function (b) { return b.id === id && !!b.earned_at; }); };
         var saved = d ? avatarLook(o, d.state.avatar) : null;
         var start = saved || avatarLook(o, o.defaults);
         var look = Object.assign({}, start), pending = false, msg = '', strips = [];
@@ -2001,7 +2025,7 @@
           var prev = el('button', { type: 'button', class: 'fa-arr is-prev', tabindex: '-1', 'aria-hidden': 'true' });
           var next = el('button', { type: 'button', class: 'fa-arr is-next', tabindex: '-1', 'aria-hidden': 'true' });
           (o.options[k] || []).forEach(function (p) {
-            var locked = !!p.unlock, stamp = locked && FA_UNLOCK[p.unlock] || 'a future stamp';
+            var locked = !!p.unlock && !owns(p.unlock), stamp = locked && FA_UNLOCK[p.unlock] || 'a future stamp';
             var lab = el('label', { class: 'fa-opt' + (locked ? ' is-locked' : ''), title: locked ? p.label + ' - locked: earn the ' + stamp + ' stamp' : p.label });
             var inp = el('input', { type: 'radio', name: 'fa-' + k, value: p.id });
             // reserved parts are shown with a lock and cannot be picked; the save RPC rejects them too
@@ -2074,6 +2098,7 @@
           if (/Log on with Discord|JWT/i.test(m)) return 'Your Discord session expired. Log on again to save.';
           if (/^(Saving too fast|Daily save limit)/.test(m)) return m;
           if (/Unknown avatar option/.test(m)) return 'One of those parts is not available. Reload the page and try again.';
+          if (/That part is locked/.test(m)) return 'One of those parts is still locked: earn its stamp first. Your look was not saved.';
           return 'Could not save. Check your connection and try again. Your look was not saved.';
         }
         // Save Look: one RPC; the look counts as saved only when the server confirms it
@@ -2113,7 +2138,7 @@
           var next;
           do {
             next = {};
-            AV_SLOTS.forEach(function (s) { var l = avatarPicks(o, s[0]); next[s[0]] = l[Math.floor(Math.random() * l.length)].id; });
+            AV_SLOTS.forEach(function (s) { var l = avatarPicks(o, s[0], owns); next[s[0]] = l[Math.floor(Math.random() * l.length)].id; });
           } while (avatarSame(next, look));
           look = next; msg = ''; paint(); showPicked();
         });
@@ -2187,6 +2212,35 @@
       if (me0) setTimeout(function () { balloon('Welcome to the pond, ' + me0.name, me0.discord ? 'Signed in with Discord ✓. LAN Party and High Scores now use your name.' : 'Signed in as a guest. You can chat and submit scores.', 'gif-045-still'); }, 900);
     }
   }
+
+  // ---------- Fren Passport check-in (games/supabase/update_passport_awards.sql) ----------
+  // A Discord player's PondOS page asks once (at most every 5 minutes per tab). The server notes the UTC day
+  // for 10 Day Fren and returns the stamps it has not announced yet; each one is announced only once.
+  // The browser sends nothing but the request itself.
+  if (mainEl) (function () {
+    var s = sbSession();
+    if (!s || !s.discord || !s.userId) return;
+    var k = 'pondos-checkin:' + s.userId, now = Date.now();
+    try { if (now - (+sessionStorage.getItem(k) || 0) < 300000) return; sessionStorage.setItem(k, String(now)); } catch (e) {}
+    setTimeout(function () {
+      rpc('gry_passport_checkin', {}).then(function (r) {
+        var fresh = r && Array.isArray(r.new_badges) ? r.new_badges : [];
+        if (!fresh.length) return;
+        if (passportCache && passportCache.userId === s.userId) passportCache = null;   // the next Passport opens fresh
+        return fetch(PP_CATALOG).then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; }).then(function (c) {
+          var names = fresh.map(function (b) {
+            var x = c && Array.isArray(c.achievements) ? c.achievements.filter(function (a) { return a.id === b.id; })[0] : null;
+            return x ? x.title : null;
+          }).filter(Boolean);
+          if (!names.length) return;
+          var t = names.length === 1 ? balloon('New stamp: ' + esc(names[0]), 'It is in your Fren Passport now. Click to open it.', 'pep-logo')
+            : balloon(names.length + ' new stamps!', esc(names.join(', ')) + '. Click to open your Fren Passport.', 'pep-logo');
+          t.addEventListener('click', function (ev) { if (!ev.target.closest('button')) frenPassport(); });
+          t.style.cursor = 'pointer';
+        });
+      }, function () { /* the migration may not be installed yet; nothing to show */ });
+    }, 2500);
+  })();
 
   // ---------- counter.exe: a tiny 90s visitor counter. One number from the server (people counted once a day,
   // no cookie, no IP; the same data as the owner's statistics). Hidden if the server does not answer.
@@ -3027,15 +3081,21 @@
   // New ads: give them "added" (YYYY-MM-DD). For 21 days an ad nobody has played here yet gets a red dot,
   // on the PEP-TV Ads desktop icon and on the ad in the folder (like a Win98 "new" mark). Playing it clears the dot.
   // a Fren from the Avatar Maker's own layers, for the ads (same paint order as avatar-options.json:
-  // layers_order [bg, base, clothing, mouth, eyes, hat, accessory]). Only non-unlock (base) ids here.
+  // layers_order [bg, base, clothing, mouth, eyes, hat, accessory]). Reward parts appear only to show what a stamp opens.
   function adFren(c, m, e, h, a) {
     return '<span class="ad-fren" aria-hidden="true">' + ['bg_forest', 'base_frog', c, m, e, h, a].map(function (id) { return '<img src="avatar-assets/layers/' + id + '.webp" alt="">'; }).join('') + '</span>';
   }
   var ADS = [
+    { file: 'pond_stamps.mpg', added: '2026-11-06', title: 'Stamps That Check Out', ch: 'CH 19 · POND POST OFFICE', icon: 'pep-logo', scenes: [
+      '<p class="ad-kick">Did your frog do anything today? Can you prove it?</p><h3 class="ad-big">Stamps that<br><em>check out!</em></h3><p class="ad-sub">Your Fren Passport now collects 19 stamps, each one from something the pond\'s own server saw you do.</p>',
+      '<p class="ad-kick">Guess where Pepe is. Chat in the lobby. Write to the editor. Mine for an hour.</p><h3 class="ad-big">The games <em>stamp</em><br>your passport!</h3><p class="ad-sub">Pepe Guesser, the LAN Party chat, letters to the editor, Pepe Miner, YEET THE PEP and 10 days in a row on PondOS. Your old Pepe Guesser games and letters count too.</p>',
+      '<div class="ad-frens">' + adFren('clothing_suit', 'mouth_smirk', 'eyes_classic', 'hat_detective', 'accessory_pin') + '</div><p class="ad-kick">Five perfect 5000s in Pepe Guesser?</p><h3 class="ad-big">Dress like a<br><em>detective!</em></h3><p class="ad-sub">Detective Fren opens the detective hat and the suit. Scout Fren opens the PEP pin. Miner Fren opens the hard hat.</p>',
+      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Here early?<br><em>Pond Pioneer!</em></h3><p class="ad-sub">Every account with Discord linked on launch day gets it. After that, the door closes.</p><p class="ad-fine">Not a real offer. Stamps are cosmetic: no PEP, no points, nothing to sell. Only what the server records counts. Log on with Discord to collect.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
+    ] },
     { file: 'fren_passport.mpg', added: '2026-11-06', title: 'The Fren Passport', ch: 'CH 98 · POND TRAVEL AGENCY', icon: 'pep-logo', scenes: [
       '<p class="ad-kick">Tired of profiles that look like a spreadsheet?</p><h3 class="ad-big">Get a real<br><em>passport!</em></h3><p class="ad-sub">A hand-drawn paper booklet, with your Fren clipped in as the photo.</p>',
       '<img class="ad-pic" src="passport-assets/page-left.webp?v=20261106pp1" alt=""><p class="ad-kick">Fren ID. Nickname. Member since. All filled in from your Discord log-on.</p><h3 class="ad-big">No fake numbers.<br><em>Just you.</em></h3>',
-      '<img class="ad-pic" src="passport-assets/page-right.webp?v=20261106pp1" alt=""><p class="ad-kick">36 stamp slots. The pond checks every one on its own server.</p><h3 class="ad-big">Collect <em>stamps!</em></h3><p class="ad-sub">First Fren, Fresh Fren and Moonwalker can be earned today. The rest say "coming soon" until they really work.</p>',
+      '<img class="ad-pic" src="passport-assets/page-right.webp?v=20261106pp1" alt=""><p class="ad-kick">43 stamp slots. The pond checks every one on its own server.</p><h3 class="ad-big">Collect <em>stamps!</em></h3><p class="ad-sub">19 of them can be earned today, from what the games record. The rest say "coming soon" until they really work.</p>',
       '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">One stamp says<br><em>$0.01 - BALI</em></h3><p class="ad-sub">It stays locked for every fren until Pepecoin reaches one cent. Then everybody gets it. Same day, same stamp.</p><p class="ad-fine">Not a real offer. No trip, no prize, no price prediction, no financial advice. Stamps are cosmetic: no PEP, no points, nothing to sell. Log on with Discord to open yours.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
     ] },
     { file: 'create_your_fren.mpg', added: '2026-11-05', title: 'Create Your Fren', ch: 'CH 64 · POND MAKEOVER HOUR', icon: 'fresh-fren', scenes: [

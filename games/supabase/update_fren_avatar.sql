@@ -42,26 +42,24 @@
 --   * The browser only sends six option IDs. No user ID, badge ID or image.
 --   * auth.uid() plus a real Discord identity decide whose row is written.
 --   * Option IDs must match the fixed lists below exactly. They mirror the
---     NON-UNLOCK (base) options in docs/meme/avatar-options.json
+--     options in docs/meme/avatar-options.json
 --     (tests/passport-avatar-sql.test.mjs checks this).
 --   * first_avatar is inserted only by the first save, in the same transaction
 --     as the avatar row, so a failed save never leaves a badge behind.
 --   * A save can be rejected (too fast, daily budget). Errors are never success.
 --
--- INTERIM RESERVED-ID RULE (Stage D):
---   Some manifest options carry an 'unlock' key: they are reserved for a FUTURE
---   server-verified activity achievement and are NOT yet saveable. The unlock
---   achievements do not exist yet, so the allowlists below deliberately OMIT
---   every unlock-gated id, and the save RPC rejects them with 'Unknown avatar
---   option' (errcode 22023) exactly like an unknown id. Reserved ids are valid
---   manifest ids but not saveable until a future achievement grants them; this
---   keeps the "cannot be gained by tampering" guarantee. The reserved ids are:
+-- REWARD PARTS:
+--   Some manifest options carry an 'unlock' key. They are saveable only when
+--   the player already holds that stamp in games.passport_badges (stamps are
+--   awarded by the server, see update_passport_awards.sql); otherwise the save
+--   is rejected with 'That part is locked' (errcode 42501). Tampering with the
+--   browser cannot unlock them. The reward parts are:
 --     hat_hardhat        (unlock miner_fren)
 --     hat_detective      (unlock detective_fren)
 --     clothing_suit      (unlock detective_fren)
---     bg_sunset          (unlock yeet_adept)
+--     bg_sunset          (unlock yeet_adept, not earnable yet)
 --     accessory_pin      (unlock scout_fren)
---     accessory_headphones (unlock gamer_fren)
+--     accessory_headphones (unlock gamer_fren, not earnable yet)
 begin;
 
 create table if not exists games.passport_avatars (
@@ -101,18 +99,24 @@ begin
   if u is null or games.discord_identity(u) is null then
     raise exception 'Log on with Discord to save your Fren' using errcode = '42501';
   end if;
-  -- Exact per-slot allowlists, in manifest order, NON-UNLOCK (base) ids ONLY.
-  -- Unlock-gated ids (bg_sunset, clothing_suit, hat_hardhat, hat_detective,
-  -- accessory_pin, accessory_headphones) are intentionally absent and so are
-  -- rejected here, just like any unknown id. See the INTERIM RESERVED-ID RULE
-  -- comment at the top of this file.
-  if p_bg is null or p_bg not in ('bg_sky', 'bg_night', 'bg_city', 'bg_snow', 'bg_forest')
-     or p_clothing is null or p_clothing not in ('clothing_blue', 'clothing_purple_hoodie', 'clothing_black_hoodie', 'clothing_shirt_tie', 'clothing_camo')
+  -- Exact per-slot allowlists, in manifest order: every part of the manifest,
+  -- the free ones first, then the reward parts (the ones with an 'unlock' key).
+  if p_bg is null or p_bg not in ('bg_sky', 'bg_night', 'bg_city', 'bg_snow', 'bg_forest', 'bg_sunset')
+     or p_clothing is null or p_clothing not in ('clothing_blue', 'clothing_purple_hoodie', 'clothing_black_hoodie', 'clothing_shirt_tie', 'clothing_camo', 'clothing_suit')
      or p_mouth is null or p_mouth not in ('mouth_flat', 'mouth_smile', 'mouth_open', 'mouth_tongue', 'mouth_teeth', 'mouth_smirk')
      or p_eyes is null or p_eyes not in ('eyes_classic', 'eyes_sleepy', 'eyes_angry', 'eyes_bloodshot', 'eyes_3d', 'eyes_hypno')
-     or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_wizard')
-     or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_shades', 'accessory_round', 'accessory_orange', 'accessory_cigarette', 'accessory_pipe') then
+     or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_wizard', 'hat_hardhat', 'hat_detective')
+     or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_shades', 'accessory_round', 'accessory_orange', 'accessory_cigarette', 'accessory_pipe', 'accessory_headphones', 'accessory_pin') then
     raise exception 'Unknown avatar option' using errcode = '22023';
+  end if;
+  -- Reward parts: saveable only by a player who holds the stamp that unlocks them
+  -- (the manifest's 'unlock' keys; stamps are awarded by the server only).
+  if exists (
+    select 1 from (values ('bg_sunset', 'yeet_adept'), ('clothing_suit', 'detective_fren'), ('hat_hardhat', 'miner_fren'),
+                          ('hat_detective', 'detective_fren'), ('accessory_headphones', 'gamer_fren'), ('accessory_pin', 'scout_fren')) r(part, stamp)
+     where r.part in (p_bg, p_clothing, p_hat, p_accessory)
+       and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)) then
+    raise exception 'That part is locked: earn its stamp first' using errcode = '42501';
   end if;
 
   -- First save. A concurrent first save of the same player waits on the

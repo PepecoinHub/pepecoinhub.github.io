@@ -1,45 +1,56 @@
-# Fren Passport — confirmed badge rules (2026-11-06)
+# Fren Passport — confirmed stamp rules (2026-11-06)
 
-Status: **design decisions only**. This file does not implement server-side awarding. All new badges below remain **planned** until verified backend logic, migrations, and integration tests are approved. Never grant badges based solely on client-reported values. This branch is Draft PR #191, stacked on #189 and #184. Do not run SQL on production or merge without owner approval.
+Status: **built in Draft PR #191, not deployed.** The server side is `games/supabase/update_passport_awards.sql`. Apply it only after review, after `update_fren_passport.sql` and `update_fren_avatar.sql`, and **on launch day** (it takes the Pond Pioneer snapshot on its first run). Do not run SQL on production or merge without owner approval.
 
-## Locked-in decisions
+## Owner rules
 
-| Badge ID | Name | Condition | Unlock / reward | Status |
+1. **Only stamps the server can verify.** If only the browser could know about something (opening the NERDS ONLY folder, starting FROGAGEDDON, playing PEPE SWEEPER), it is **not** a stamp. Those ideas were dropped.
+2. **Discord accounts only.** Guests and accounts without Discord never collect stamps. Every award goes through `games.passport_award()`, which checks `games.discord_identity()`.
+3. **Stamps not designed yet show as `???` / "Coming soon"**, without their name or rule.
+4. Stamps are cosmetic: no PEP, no points, nothing to sell or trade.
+
+## Live stamps (19)
+
+| Badge ID | Name | Rule | Server source | Backfilled |
 |---|---|---|---|---|
-| `certified_fren` | Certified Fren | At least one accepted, authenticated PondOS interaction on **100 distinct calendar days**. Days need not be consecutive. Opening a page without an accepted action does not count. | Passport stamp and the existing planned Certified Fren title | Planned |
-| `hundred_day_fren` | 100 Days Together | **100 days elapsed since Discord-linked Fren registration**. Not active days. | Stamp | Planned |
-| `yeet_adept` | Adept | A YEET flight of **at least 3000 m**. | Stamp, `bg_sunset` background | Planned |
-| `moonwalker` | Moonwalker | A YEET flight of **at least 6000 m**. | Existing stamp only; Moon Rock is a separate future item | Existing live catalog entry; client results are not server-replayed |
-| `nasa_is_hiring` | NASA Is Hiring | **Three distinct YEET flight attempts**, each **strictly above 5000 m**. Counting one personal-best record three times is forbidden. | Stamp | Planned |
-| `detective_fren` | Detective Fren | **Five different daily Pepe Guesser puzzles**, each yielding the maximum **5000 points**, as confirmed by the game backend. Repeated client submissions for one puzzle do not add extra completions. | Stamp, `hat_detective` and `clothing_suit` | Planned |
-| `scout_fren` | Scout Fren | **14 consecutive calendar days** with one accepted completed Pepe Guesser guess per day. Score does not have to be perfect. | Stamp, `accessory_pin` | Planned |
+| `first_fren` | First Fren | Signed in with Discord | `auth.users.created_at` | yes (always) |
+| `pond_pioneer` | Pond Pioneer | Discord linked when the stamps migration first runs. Closed afterwards. | one-time snapshot of `auth.identities` | snapshot |
+| `first_avatar` | Fresh Fren | First saved avatar | `gry_passport_avatar_save` | — |
+| `pepe_guesser` | Pepe Guesser | First guess with a pin | `games.wp_plays` (verified, pin) | yes |
+| `sharp_eye` | Sharp Eye | First perfect 5000 | `wp_plays.points` (server scored) | yes |
+| `detective_fren` | Detective Fren | 5000 on 5 different puzzle days. Unlocks detective hat + suit. | `wp_plays` | yes |
+| `frog_detective` | Frog Detective | A guess on 10 different puzzle days | `wp_plays` | yes |
+| `week_scout` | Week Scout | A guess on 7 puzzle days in a row (UTC) | `wp_plays` | yes |
+| `scout_fren` | Scout Fren | A guess on 14 puzzle days in a row (UTC). Unlocks the PEP pin. | `wp_plays` | yes |
+| `first_words` | First Words | First lobby chat message | trigger on `games.lobby_chat` | no (chat kept 24 h) |
+| `hey_fren` | Hey @Fren | First @mention of another fren | trigger on `games.lobby_mentions` | no |
+| `community_fren` | Community Fren | Lobby chat on 5 different UTC days | `games.passport_chat_days` | no |
+| `dear_editor` | Dear Editor | First letter to the editor | trigger on `games.letters` (`discord = true`) | yes |
+| `junior_editor` | Junior Editor | 5 letters to the editor | `games.passport_progress.letters` | yes |
+| `ten_day_fren` | 10 Day Fren | PondOS opened signed in on 10 UTC days in a row (replaces 7 Day Fren) | `gry_passport_checkin` → `games.passport_days` | no |
+| `rookie_miner` | Rookie Miner | 10 minutes of Pepe Miner | server clock between cloud saves | no |
+| `miner_fren` | Miner Fren | 1 hour of Pepe Miner. Unlocks the hard hat. | same | no |
+| `nasa_is_hiring` | NASA Is Hiring | Three accepted YEET flights strictly above 5000 m | first three kept in `games.passport_yeet_5k` | no (only the best flight was stored before) |
+| `moonwalker` | Moonwalker | A 6000 m YEET flight (the maximum). Very rare. | `gry_yeet_submit` hook | yes (`yeet_records.best = 60000`) |
 
-**Optional extra reward awaiting owner approval:** a Scout Fren title displayed below the nickname. No new art or title has been shipped for this yet.
+Details:
+- **Pepe Guesser** counts plays with `verified = true` and a pin (`g_lat is not null`). A timeout without a pin is not a guess. Days are puzzle days (`wp_puzzles.day`, UTC). If no puzzle goes live on a day, the run breaks for everyone, the same as the game's own streak.
+- **Pepe Miner time** is measured by the server: the game sends its cloud save every 60 s, and the time between two accepted saves at most 120 s apart counts. A longer gap starts a new session. The game's own numbers are ignored. A script that keeps calling the save RPC can still collect time; this is a cosmetic stamp, not anti-bot proof.
+- **YEET** distances are client-reported with plausibility checks only (`update_yeet.sql`), so YEET stamps are as trustworthy as the leaderboard. Rate-limited submissions do not count. A flight above 5000 m counts even when it is not a new best.
+- **Notices:** `gry_passport_checkin()` (no arguments) runs when a Discord player opens a PondOS page, at most every 5 minutes per tab. It returns each new stamp once (`passport_badges.notified_at`), and PondOS shows one balloon.
+- **Safety:** every game hook catches its own errors and logs a warning, so a stamp bug cannot break a game, a chat message or a save.
+- **Avatar reward parts** (`hat_detective`, `clothing_suit`, `accessory_pin`, `hat_hardhat`) become saveable when the player holds the stamp; the save RPC checks it again on the server. `bg_sunset` (Adept) and `accessory_headphones` (Gamer Fren) stay locked, because those stamps are not live.
 
-## No XP or levels
+## Still planned ("???" / Coming soon)
 
-XP, cosmetic levels and the derived progress bar are removed from the Draft PR #191 Passport UI. “My Fren Journey” keeps factual counts: **days registered** (account age), earned stamps, secrets and items. Never label calendar days elapsed since registration as actual activity days. A real **active days** counter may be shown only after backend activity-day tracking is implemented.
-
-## Required server-side work before any of the planned badges goes live
-
-1. For Certified Fren, persist one authenticated **accepted action** per `(user_id, UTC_date)` with server timestamps, indexed uniquely and rate-limited. Avoid a write for every click: record only the first accepted action of the day. A scripted request can still simulate an action; this is a **cosmetic** achievement, not anti-bot proof.
-2. For Scout Fren, the server must evaluate distinct **daily Pepe Guesser completions** on 14 consecutive UTC days using trusted game records, not browser-local streaks.
-3. For Detective Fren, verify the server-computed **5000-point perfect score** on five **different puzzle dates**. Ensure the game backend represents 5000 accurately and record at most one qualifying result per puzzle/user.
-4. For Adept, Moonwalker and NASA, note that YEET currently validates plausibility but does **not** replay every flight server-side. Cosmetic stamp only. NASA requires an **append-only/unique attempt history or equivalent trusted evidence** for each of the three independent flights, not merely a user's all-time maximum distance. Don't make these unlock real PEP, transferable items or financial benefits.
-5. For age-based `hundred_day_fren`, use the server's account creation timestamp. No activity counter should be inferred.
-6. Update future server-side avatar save allowlists to permit `bg_sunset`, `hat_detective`, `clothing_suit` and `accessory_pin` **only if** the associated server-verified badge exists. Draft PR #191 deliberately rejects currently locked options.
-7. Dates are specified as UTC for consistent rules globally. If the team later chooses a user-local timezone, make that a deliberate, tested migration, not a browser-controlled preference.
+Everything else in `docs/meme/passport-catalog.json` with `status: "planned"`, including `certified_fren`, `yeet_adept` (3000 m, rule already agreed), `hundred_day_fren`, the PepeGochi stamps and BALI. `games.passport_days` can serve Certified Fren later (100 distinct days).
 
 ## Cross-PR conflict to resolve before merge
 
-**Critical:** Draft PR #186 (`games/supabase/update_pepegochi_passport_bridge.sql`) originally grants `certified_fren` after **100 PepeGochi care days**. Draft PR #184's `games/supabase/update_fren_passport.sql` also describes `certified_fren` as “100 distinct care days in PepeGochi.” This **conflicts with the new confirmed 100 days of PondOS activity rule**.
+Draft PR #186 (`games/supabase/update_pepegochi_passport_bridge.sql`) grants `certified_fren` after 100 PepeGochi care days. That conflicts with the agreed rule (100 days of PondOS activity). Before publishing #186, stop its bridge from minting `certified_fren` and pick a PepeGochi-specific stamp instead. Its `gry_passport_state` changes would also have to be rebased on the newest definition, which is now in `update_passport_awards.sql`.
 
-Before publishing either backend PR:
-- Stop PepeGochi's 100-care-day hook from minting `certified_fren`, and reserve a different PepeGochi-specific badge if desired.
-- Update the passport SQL description and tests.
-- Implement the chosen PondOS action-day tracker and tests in a dedicated, reviewable migration.
-- Keep all planned badge statuses `planned` until the server supports them.
+## Tests
 
-## Items untouched
-
-BALI remains reserved for the server-verified PEP/USD $0.01 event. The three current cosmetic secrets remain low trust. PepeGochi, game-room and additional inventory mechanics are out of scope for these catalog/UI edits.
+- `tests/passport-awards.test.mjs` (static, runs in CI): live catalog == award allowlist, no browser arguments, Discord-only award path, hooks catch errors, `gry_yeet_submit` equals `update_yeet.sql` plus the hook.
+- `tests/passport-awards-sql.test.mjs` (real PostgreSQL, opt-in): loads `schema.sql` and all hooked game migrations, then plays through the real RPCs (`gry_yeet_submit`, `gry_wp_start`/`gry_wp_guess`, `gry_lobby_say`, `gry_letter_send`, `gry_miner_save`, `gry_passport_checkin`, `gry_passport_avatar_save`). It covers the Pioneer snapshot and a re-run, backfills, guests, an unlinked Discord account, thresholds, gaps, grants, one notice per stamp, reward parts, a failing hook, and account deletion. Eight deliberate bugs in the migration were each caught by it.
+- `scripts/fren_avatar_e2e.mjs` (browser, opt-in): the stamp balloon, the Passport and album, reward parts in the maker, Pioneer "Closed" for a late account, the `pond_stamps.mpg` ad.

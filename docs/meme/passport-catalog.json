@@ -9,6 +9,14 @@
       "status": "live"
     },
     {
+      "id": "pond_pioneer",
+      "title": "Pond Pioneer",
+      "description": "Had Discord linked to PepecoinHub on the day the Fren Passport opened. It cannot be earned any more.",
+      "category": "community",
+      "limited": true,
+      "status": "live"
+    },
+    {
       "id": "first_avatar",
       "title": "Fresh Fren",
       "description": "Create and save your first custom Fren avatar.",
@@ -17,9 +25,114 @@
       "status": "live"
     },
     {
+      "id": "pepe_guesser",
+      "title": "Pepe Guesser",
+      "description": "Make your first Pepe Guesser guess with a pin on the map.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "sharp_eye",
+      "title": "Sharp Eye",
+      "description": "Score a perfect 5000 in a daily Pepe Guesser hunt.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "week_scout",
+      "title": "Week Scout",
+      "description": "Guess in Pepe Guesser on 7 days in a row (UTC days).",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "frog_detective",
+      "title": "Frog Detective",
+      "description": "Guess in Pepe Guesser on 10 different days.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "detective_fren",
+      "title": "Detective Fren",
+      "description": "Score a perfect 5000 in Pepe Guesser on 5 different days. Unlocks the detective hat and the suit.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "scout_fren",
+      "title": "Scout Fren",
+      "description": "Guess in Pepe Guesser on 14 days in a row (UTC days). Unlocks the PEP pin.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "first_words",
+      "title": "First Words",
+      "description": "Send your first message in the lobby chat (LAN Party).",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "hey_fren",
+      "title": "Hey @Fren",
+      "description": "Mention another fren in the lobby chat with @ and their nickname.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "community_fren",
+      "title": "Community Fren",
+      "description": "Chat in the lobby on 5 different days (UTC days).",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "dear_editor",
+      "title": "Dear Editor",
+      "description": "Send your first letter to the editor.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "junior_editor",
+      "title": "Junior Editor",
+      "description": "Send 5 letters to the editor.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "ten_day_fren",
+      "title": "10 Day Fren",
+      "description": "Open PondOS signed in with Discord on 10 days in a row (UTC days).",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "rookie_miner",
+      "title": "Rookie Miner",
+      "description": "Play Pepe Miner for 10 minutes with the cloud save on.",
+      "category": "arcade",
+      "status": "live"
+    },
+    {
+      "id": "miner_fren",
+      "title": "Miner Fren",
+      "description": "Play Pepe Miner for one hour in total. Unlocks the hard hat.",
+      "category": "arcade",
+      "status": "live"
+    },
+    {
+      "id": "nasa_is_hiring",
+      "title": "NASA Is Hiring",
+      "description": "Fly more than 5000 m in YEET THE PEP three times. Each flight counts once.",
+      "category": "yeet",
+      "status": "live"
+    },
+    {
       "id": "moonwalker",
       "title": "Moonwalker",
-      "description": "Record a flight of at least 6000 m in YEET THE PEP. Moon Rock is a separate future reward.",
+      "description": "Fly the full 6000 m in YEET THE PEP. A very rare stamp. Moon Rock is a separate future reward.",
       "category": "yeet",
       "status": "live"
     },
@@ -31,52 +144,10 @@
       "status": "planned"
     },
     {
-      "id": "seven_day_fren",
-      "title": "7 Day Fren",
-      "description": "Visit the pond on seven days in a row. Server verified.",
-      "category": "community",
-      "status": "planned"
-    },
-    {
-      "id": "community_fren",
-      "title": "Community Fren",
-      "description": "Say hello in LAN Party chat on five distinct days. Server verified.",
-      "category": "community",
-      "status": "planned"
-    },
-    {
       "id": "curious_fren",
       "title": "Curious Fren",
       "description": "Open five different PondOS apps. Server verified.",
       "category": "exploration",
-      "status": "planned"
-    },
-    {
-      "id": "pepe_guesser",
-      "title": "Pepe Guesser",
-      "description": "Find Pepe in the daily Where's Pepe hunt. Server verified.",
-      "category": "where_pepe",
-      "status": "planned"
-    },
-    {
-      "id": "scout_fren",
-      "title": "Scout Fren",
-      "description": "Complete the daily Pepe Guesser hunt on 14 consecutive UTC days. Unlocks the PEP pin when server-verified.",
-      "category": "where_pepe",
-      "status": "planned"
-    },
-    {
-      "id": "miner_fren",
-      "title": "Miner Fren",
-      "description": "Put in the hours in the mining game. Server verified.",
-      "category": "arcade",
-      "status": "planned"
-    },
-    {
-      "id": "detective_fren",
-      "title": "Detective Fren",
-      "description": "Score a perfect 5000 points in five distinct daily Pepe Guesser hunts. Unlocks the detective hat and suit when server-verified.",
-      "category": "where_pepe",
       "status": "planned"
     },
     {
@@ -105,13 +176,6 @@
       "title": "Collector",
       "description": "Gather a shelf of PondOS collectibles. Server verified.",
       "category": "pepegachi",
-      "status": "planned"
-    },
-    {
-      "id": "pond_pioneer",
-      "title": "Pond Pioneer",
-      "description": "Be among the earliest registered frens.",
-      "category": "community",
       "status": "planned"
     },
     {
@@ -178,24 +242,10 @@
       "status": "planned"
     },
     {
-      "id": "nasa_is_hiring",
-      "title": "NASA Is Hiring",
-      "description": "Record three separate YEET flights each exceeding 5000 m (strictly greater than 5000 m). Server-verified qualifying flights required.",
-      "category": "yeet",
-      "status": "planned"
-    },
-    {
       "id": "no_panic",
       "title": "No Panic",
       "description": "Finish YEET without using any panic flaps.",
       "category": "yeet",
-      "status": "planned"
-    },
-    {
-      "id": "frog_detective",
-      "title": "Frog Detective",
-      "description": "Complete Pepe Guesser hunts on ten different UTC days. Separate from perfect-score Detective Fren and streak-based Scout Fren.",
-      "category": "where_pepe",
       "status": "planned"
     },
     {

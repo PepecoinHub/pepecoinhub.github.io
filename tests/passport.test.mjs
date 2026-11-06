@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [37, 12, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [44, 12, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -42,7 +42,7 @@ test('secret RPC requires Discord and cannot issue premium or gameplay rewards',
 });
 
 test('all badge and secret catalog items use distinct statuses', () => {
-  const reserved = new Set(['moon_rock','certified_fren','pond_pioneer']);
+  const reserved = new Set(['moon_rock','certified_fren']);
   for (const item of [...catalog.achievements,...catalog.items]) {
     if (reserved.has(item.id)) assert.equal(item.status, 'planned');
   }
@@ -134,16 +134,18 @@ test('avatar save RPC v2: Discord identity, non-unlock allowlists, no user or ba
   assert.match(fn, /security definer set search_path = ''/);
   assert.match(fn, /u uuid := auth\.uid\(\)/);
   assert.match(fn, /games\.discord_identity\(u\) is null/);
-  // the server allowlist equals the manifest NON-UNLOCK ids per slot, in manifest order
+  // the server allowlist equals the manifest ids per slot, in manifest order (free parts first)
   for (const k of SLOTS) {
     const list = fn.match(new RegExp('p_' + k + ' is null or p_' + k + ' not in \\(([^)]*)\\)'));
     assert.ok(list, k + ' allowlist');
-    assert.deepEqual([...list[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]), baseIds(k), k);
+    assert.deepEqual([...list[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]), manifest.options[k].map(o => o.id), k);
   }
-  // reserved/unlock ids must NOT appear in any allowlist (they stay unsaveable this stage)
-  const reserved = SLOTS.flatMap(k => manifest.options[k].filter(o => o.unlock).map(o => o.id));
-  assert.ok(reserved.length >= 6, 'manifest should still carry reserved ids');
-  for (const id of reserved) assert.doesNotMatch(fn, new RegExp("'" + id + "'"), id + ' is reserved and must not be allowlisted');
+  // every reward part is checked against exactly the stamp its manifest 'unlock' key names
+  const rewards = [...fn.matchAll(/\('([a-z0-9_]+)', '([a-z0-9_]+)'\)/g)].map(x => x[1] + '>' + x[2]).sort();
+  const wanted = SLOTS.flatMap(k => manifest.options[k].filter(o => o.unlock).map(o => o.id + '>' + o.unlock)).sort();
+  assert.ok(wanted.length >= 6, 'manifest should still carry reward parts');
+  assert.deepEqual(rewards, wanted);
+  assert.match(fn, /raise exception 'That part is locked: earn its stamp first'/);
   const sixText = /\(text, text, text, text, text, text\)/;
   assert.match(avatarSql, /revoke all on games\.passport_avatars from public, anon, authenticated/);
   assert.match(avatarSql, /alter table games\.passport_avatars enable row level security/);

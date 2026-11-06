@@ -15,10 +15,9 @@ const read = p => readFile(new URL('../' + p, import.meta.url), 'utf8');
 
 // Supabase pieces the migrations rely on: roles, auth.users/identities, auth.uid().
 const SUPABASE_STUB = `
-do $$ begin
-  if not exists (select 1 from pg_roles where rolname = 'anon') then create role anon nologin; end if;
-  if not exists (select 1 from pg_roles where rolname = 'authenticated') then create role authenticated nologin; end if;
-end $$;
+-- roles are shared by the whole server and the SQL tests run in parallel, so a race is not an error
+do $$ begin create role anon nologin; exception when duplicate_object or unique_violation then null; end $$;
+do $$ begin create role authenticated nologin; exception when duplicate_object or unique_violation then null; end $$;
 create schema auth; create schema games;
 create table auth.users(id uuid primary key, created_at timestamptz not null default now(), is_anonymous boolean not null default false);
 create table auth.identities(user_id uuid references auth.users(id) on delete cascade, provider text not null,
@@ -136,8 +135,8 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     for (const args of bad) await assert.rejects(save(1, args), /Unknown avatar option/, JSON.stringify(args));
     assert.equal(await avatars(1), 0); assert.equal(await badges(1), 0);
 
-    // --- reserved/unlock ids: valid manifest ids, but NOT saveable this stage. Each is rejected
-    //     with 'Unknown avatar option' and writes nothing (no avatar row, no Fresh Fren).
+    // --- reward parts: valid manifest ids, saveable only with their stamp (tests/passport-awards-sql.test.mjs
+    //     covers the unlocked case). Without it each is rejected and writes nothing (no avatar row, no Fresh Fren).
     const reserved = [
       look('bg_sunset', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none'),            // bg_sunset -> yeet_adept
       look('bg_sky', 'clothing_suit', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none'),              // clothing_suit -> detective_fren
@@ -146,7 +145,7 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_pin'),               // accessory_pin -> scout_fren
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_headphones')         // accessory_headphones -> gamer_fren
     ];
-    for (const args of reserved) await assert.rejects(save(1, args), /Unknown avatar option/, 'reserved ' + JSON.stringify(args));
+    for (const args of reserved) await assert.rejects(save(1, args), /That part is locked/, 'reserved ' + JSON.stringify(args));
     assert.equal(await avatars(1), 0); assert.equal(await badges(1), 0);
 
     // --- state before any save: avatar is null, Fresh Fren not earned
@@ -243,19 +242,19 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     await db.query('delete from auth.users where id = $1', [uid(2)]);
     assert.equal(await avatars(2), 0); assert.equal(await badges(2), 0);
 
-    // --- the server allowlists match the public manifest NON-UNLOCK (base) ids exactly
+    // --- the server allowlists match the public manifest ids exactly, and every reward part is
+    //     tied to the same stamp as its manifest 'unlock' key
     const manifest = JSON.parse(await read('docs/meme/avatar-options.json'));
-    const baseIds = slot => manifest.options[slot].filter(o => !o.unlock).map(o => o.id);
+    const allIds = slot => manifest.options[slot].map(o => o.id);
     const src = (await db.query("select prosrc from pg_proc where proname = 'gry_passport_avatar_save'")).rows[0].prosrc;
     for (const slot of ['bg', 'clothing', 'mouth', 'eyes', 'hat', 'accessory']) {
       const list = src.match(new RegExp('p_' + slot + ' is null or p_' + slot + ' not in \\(([^)]*)\\)'));
       assert.ok(list, slot + ' allowlist');
-      assert.deepEqual([...list[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]), baseIds(slot), slot);
+      assert.deepEqual([...list[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]), allIds(slot), slot);
     }
-    // and no reserved/unlock id leaked into the function body
-    for (const slot of ['bg', 'clothing', 'mouth', 'eyes', 'hat', 'accessory'])
-      for (const o of manifest.options[slot].filter(x => x.unlock))
-        assert.ok(!src.includes("'" + o.id + "'"), o.id + ' must not be allowlisted');
+    const rewards = [...src.matchAll(/\('([a-z0-9_]+)', '([a-z0-9_]+)'\)/g)].map(x => x[1] + '>' + x[2]).sort();
+    const wanted = Object.values(manifest.options).flat().filter(o => o.unlock).map(o => o.id + '>' + o.unlock).sort();
+    assert.deepEqual(rewards, wanted, 'reward parts and their stamps');
   } finally {
     for (const c of clients) await c.end().catch(() => {});
     await admin.query('drop database if exists ' + dbName + ' with (force)').catch(() => {});
