@@ -59,6 +59,37 @@
         caps: result.d.filter(function (c) { return c.top && c.market_cap > 0; }).map(function (c) { return c.market_cap; }).sort(function (a, b) { return b - a; }) };
     });
   }
+  // PEP alone (price, 24h change, on-chain supply, top caps for the rank) for widgets that show nothing else,
+  // like the PondOS tray and ticker: data/price.json (about 4 KB) is written by scripts/fetch_quotes.py together
+  // with market-prices.json (about 80 KB), so it has the same quote and time. A page that already loaded the
+  // full list reuses it; if price.json fails, the full list is used as before.
+  var pepPending, pepRequested = 0, pepListeners = [], pepVersion;
+  function pepQuote() {
+    if (pending && Date.now() - requested < TTL) return quote();
+    if (pepPending && Date.now() - pepRequested < TTL) return pepPending;
+    pepRequested = Date.now();
+    pepPending = json(base + 'data/price.json').then(function (p) {
+      var t = Date.parse(p.updated_at || p.date);
+      if (!(p.price_usd > 0) || !(p.supply > 0) || !isFinite(t)) throw new Error('no PEP quote');
+      return { usd: p.price_usd, change_24h: p.change_24h, supply: p.supply, mcap: p.price_usd * p.supply,
+        supply_time: p.supply_time, time: new Date(t).toISOString(), saved: Date.now() - t > 3 * 3600000,
+        caps: (Array.isArray(p.top_caps) ? p.top_caps : []).filter(function (c) { return c > 0; }).sort(function (a, b) { return b - a; }) };
+    }).catch(function () { pepPending = null; return quote(); });
+    return pepPending;
+  }
+  function subscribeQuote(fn) {
+    pepListeners.push(fn);
+    pepQuote().then(function (q) { pepVersion = q.time + ':' + (q.supply_time || '') + ':' + q.saved; fn(q); }).catch(function () { /* The dated page fallback remains. */ });
+  }
+  function refreshQuote() {
+    if (document.hidden || !pepListeners.length) return;
+    pepQuote().then(function (q) {
+      var v = q.time + ':' + (q.supply_time || '') + ':' + q.saved;
+      if (v === pepVersion) return;
+      pepVersion = v;
+      pepListeners.forEach(function (fn) { fn(q); });
+    }).catch(function () { /* Retry at the next poll. */ });
+  }
   function describe(q, locale) {
     var labels = {
       en: ['Updated', 'Saved quote'], pl: ['Aktualizacja', 'Zapisana cena'], es: ['Actualizado', 'Precio guardado'],
@@ -79,8 +110,8 @@
       listeners.forEach(function (fn) { fn(result); });
     }).catch(function () { /* Retry at the next poll without inventing a fresh timestamp. */ });
   }
-  setInterval(refresh, TTL);
-  document.addEventListener('visibilitychange', refresh);
-  window.PepPrices = { markets: markets, quote: quote, describe: describe, subscribe: subscribe };
+  setInterval(function () { refresh(); refreshQuote(); }, TTL);
+  document.addEventListener('visibilitychange', function () { refresh(); refreshQuote(); });
+  window.PepPrices = { markets: markets, quote: quote, describe: describe, subscribe: subscribe, pepQuote: pepQuote, subscribeQuote: subscribeQuote };
   Object.defineProperty(window.PepPrices, 'file', { get: chartFile, enumerable: true });
 })();

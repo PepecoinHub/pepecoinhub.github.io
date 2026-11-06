@@ -130,7 +130,7 @@
   var ticker = document.querySelector('.ticker');
   if (ticker) {
     ticker.setAttribute('aria-label', 'Key numbers');
-    function refreshTicker() { return Promise.all([json('ticker.json'), json('network.json').catch(function () { return null; }), window.PepPrices.quote().catch(function () { return null; })]).then(function (r) {
+    function refreshTicker() { return Promise.all([json('ticker.json'), json('network.json').catch(function () { return null; }), window.PepPrices.pepQuote().catch(function () { return null; })]).then(function (r) {
       var t = r[0], n = r[1], last = n && n.rows && n.rows[n.rows.length - 1];
       var items = [];
       t.price = r[2];
@@ -146,7 +146,7 @@
       var ul = items.map(function (i) { return '<li><b>' + i[0] + '</b>' + i[1] + '</li>'; }).join('');
       ticker.innerHTML = '<div class="ticker-track"><ul>' + ul + '</ul><ul aria-hidden="true">' + ul + '</ul></div>';
     }).catch(function () { ticker.hidden = true; }); }
-    window.PepPrices.subscribe(refreshTicker);
+    window.PepPrices.subscribeQuote(refreshTicker);
   }
 
   /* ---------------------------------------------------------------- taskbar */
@@ -183,7 +183,7 @@
       return g;
     };
     smMain.appendChild(el('a', { class: 'sm-item', href: './' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>My Pond</b></span>'));
-    var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="img/gif-085-still.webp" alt="" width="28" height="28"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
+    var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="' + ico('gif-085-still') + '" alt="" width="28" height="28" loading="lazy"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
     meItem.addEventListener('click', function () { setOpen(false); logOn(); });
     smMain.appendChild(meItem);
     var findItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('search') + '" alt="" width="28" height="28"><span><b>Find…</b> <small>games, pages, tools</small></span>');
@@ -220,8 +220,8 @@
     var sd = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">⏻</span><span>Shut down…</span>');
     arrange.addEventListener('click', function () { setOpen(false); arrangeAll(); });
     sd.addEventListener('click', function () { setOpen(false); shutDown(); });
-    smMain.appendChild(el('a', { class: 'sm-item', href: serious }, '<img src="img/serious.webp" alt="" width="28" height="28"><span>Serious mode</span>'));
-    var lanItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/gif-080-still.webp" alt="" width="28" height="28"><span>LAN Party chat</span>');
+    smMain.appendChild(el('a', { class: 'sm-item', href: serious }, '<img src="' + ico('serious') + '" alt="" width="28" height="28" loading="lazy"><span>Serious mode</span>'));
+    var lanItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('gif-080-still') + '" alt="" width="28" height="28" loading="lazy"><span>LAN Party chat</span>');
     lanItem.addEventListener('click', function () { setOpen(false); lanParty(); });
     smMain.appendChild(lanItem);
     [['Frog Mail', 'frog-mail', function () { frogMail(); }], ['AddressCheck.exe', 'pepe-search', function () { addressCheck(); }]].forEach(function (x) {
@@ -820,8 +820,8 @@
     tick(); setInterval(tick, 20000);
   }
   var trayPrice = document.querySelector('.tray-price'), trayHash = document.querySelector('.tray-hash');
-  if (trayPrice && window.PepPrices) window.PepPrices.subscribe(function () {
-    return window.PepPrices.quote().then(function (q) {
+  if (trayPrice && window.PepPrices) window.PepPrices.subscribeQuote(function () {
+    return window.PepPrices.pepQuote().then(function (q) {
       if (!q || q.usd == null) return;
       trayPrice.innerHTML = 'PEP ' + fmt.usd(q.usd) + (q.change_24h == null ? '' : ' <span class="' + (q.change_24h < 0 ? 'dn">▼' : 'up">▲') + fmt.pct(Math.abs(q.change_24h)) + '</span>');
       trayPrice.title = 'PEP price, ' + window.PepPrices.describe(q, 'en-US') + '. Click for the Laptop Index.';
@@ -2429,7 +2429,7 @@
         var gp = pane.querySelector('.gz-price');   // the live PEP price, same source as the tray
         if (gp) {
           if (!window.PepPrices) gp.remove();
-          else window.PepPrices.quote().then(function (q) {
+          else window.PepPrices.pepQuote().then(function (q) {
             if (!q || q.usd == null) { gp.remove(); return; }
             gp.innerHTML = 'PEP now: <b>' + fmt.usd(q.usd) + '</b>' + (q.change_24h == null ? '' : ' (' + (q.change_24h < 0 ? '▼ ' : '▲ ') + fmt.pct(Math.abs(q.change_24h)) + ' in 24 h)');
           }, function () { gp.remove(); });
@@ -2569,7 +2569,7 @@
   // ---------- live numbers, for the PEP-TV crawl ----------
   function liveFacts() {
     var items = [];
-    var q = window.PepPrices ? window.PepPrices.quote().catch(function () { return null; }) : Promise.resolve(null);
+    var q = window.PepPrices ? window.PepPrices.pepQuote().catch(function () { return null; }) : Promise.resolve(null);
     return Promise.all([q, json('ticker.json').catch(function () { return null; }), json('network.json').catch(function () { return null; })]).then(function (r) {
       var pq = r[0], t = r[1], n = r[2];
       var price = pq && pq.usd != null ? pq : (t && t.price);
@@ -2710,7 +2710,7 @@
       var pb = A.body.querySelector('.ptv-play');
       pb.addEventListener('click', function () { playing = !playing; pb.setAttribute('aria-pressed', String(playing)); pb.textContent = playing ? '❚❚' : '▶'; loop(); });
       var lap = A.body.querySelector('.ad-lap');
-      if (lap && window.PepPrices) window.PepPrices.quote().then(function (q) { if (q && q.usd != null) lap.textContent = fmt.usd(40e6 * q.usd); }).catch(function () {});
+      if (lap && window.PepPrices) window.PepPrices.pepQuote().then(function (q) { if (q && q.usd != null) lap.textContent = fmt.usd(40e6 * q.usd); }).catch(function () {});
       var lb = A.body.querySelector('.ad-lapbtn'); if (lb) lb.addEventListener('click', function () { laptop(); });
       var wb = A.body.querySelector('.ad-wpbtn'); if (wb) wb.addEventListener('click', function () { wheresPepe(); });
       var yb = A.body.querySelector('.ad-yeetbtn'); if (yb) yb.addEventListener('click', function () { yeetApp(); });
@@ -3004,7 +3004,7 @@
       ['Loading receipts', 'ok, one per number'],
       ['Checking ticker: PEP ≠ PEPE', 'ok'],
       ['Scrypt engine, shared with LTC + DOGE', 'ok'],
-      ['Price, hourly snapshot', function () { return window.PepPrices ? window.PepPrices.quote().then(function (q) { return fmt.usd(q.usd); }) : Promise.reject(); }],
+      ['Price, hourly snapshot', function () { return window.PepPrices ? window.PepPrices.pepQuote().then(function (q) { return fmt.usd(q.usd); }) : Promise.reject(); }],
       ['Blocks, daily snapshot', function () { return json('network.json').then(function (n) { return '#' + fmt.int(n.rows[n.rows.length - 1][1]); }); }],
       ['Seed phrase requests', 'never. Whoever asks is a scammer'],
       ['Starting desktop', '…']
