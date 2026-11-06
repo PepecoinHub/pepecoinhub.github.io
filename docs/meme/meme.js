@@ -1696,7 +1696,7 @@
         var idcard = el('dl', {class:'pp-idcard'});
         function idrow(k,v){ idcard.appendChild(piece('dt','',k)); idcard.appendChild(piece('dd','',v)); }
         idrow('Fren', state.nickname || 'Discord fren');
-        idrow('Fren ID', state.fren_id || state.user_tag || (d.userId ? ('#'+String(d.userId).slice(0,8)) : '—'));
+        idrow('Fren ID', d.userId ? ('#'+String(d.userId).slice(0,8)) : '—');
         idrow('Member since', state.member_since ? fmt.date(state.member_since) : 'unknown');
         idrow('Status', 'Discord verified');
         left.appendChild(idcard);
