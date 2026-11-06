@@ -59,7 +59,7 @@
 --     hat_hardhat        (unlock miner_fren)
 --     hat_detective      (unlock detective_fren)
 --     clothing_suit      (unlock detective_fren)
---     bg_sunset          (unlock moon_fren)
+--     bg_sunset          (unlock yeet_adept)
 --     accessory_pin      (unlock scout_fren)
 --     accessory_headphones (unlock gamer_fren)
 begin;
