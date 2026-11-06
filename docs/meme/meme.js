@@ -2306,9 +2306,12 @@
       var html = '<p class="gz-poll-when">' + (p.open ? left(p.closes_at) : 'Closed') + (p.total != null ? ' · ' + fmt.int(p.total) + (p.total === 1 ? ' vote' : ' votes') : '') + '</p>';
       if (p.show_results) {
         var max = Math.max(1, p.total || 0);
+        var top = Math.max.apply(null, p.options.map(function (o) { return o.votes || 0; }));
+        // the bigger the result, the bigger the row: --s (0…1) is the option's share and scales the label, bar and number
         html += '<ul class="gz-bars">' + p.options.map(function (o) {
           var n = o.votes || 0, pc = Math.round(n * 100 / max);
-          return '<li' + (o.id === p.my_choice ? ' class="mine"' : '') + '><b>' + esc(o.label) + (o.id === p.my_choice ? ' ✓' : '') + '</b><span class="gz-bar"><i style="width:' + pc + '%"></i></span><span>' + pc + '% (' + fmt.int(n) + ')</span></li>';
+          var cls = (o.id === p.my_choice ? 'mine' : '') + (top > 0 && n === top ? ' lead' : '');
+          return '<li style="--s:' + (n / max).toFixed(3) + '"' + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + '><b>' + esc(o.label) + (o.id === p.my_choice ? ' ✓' : '') + '</b><span class="gz-bar"><i style="width:' + pc + '%"></i></span><span>' + pc + '% (' + fmt.int(n) + ')</span></li>';
         }).join('') + '</ul>';
         if (p.my_choice) html += '<p class="gz-poll-msg">Thanks for voting, fren.</p>';
       } else if (p.open) {

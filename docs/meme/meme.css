@@ -1497,10 +1497,15 @@ footer.foot a { color: #edf3e3; }
 .gz-poll-when { margin: 0 0 6px; font: 700 11px/1.2 var(--f-chrome); text-transform: uppercase; letter-spacing: .06em; color: #8a1c1c; }
 .gz-poll-msg { margin: 4px 0 0; font-style: italic; }
 .gz-votes .gz-vote { min-width: 96px; min-height: 40px; font-size: 15px; }
-.gz-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.gz-bars li { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 8px; align-items: center; font: 400 13px/1.2 var(--f-chrome); }
-.gz-bar { display: block; height: 16px; background: #e6dcc0; border: 1px solid #1b1b1b; }
+/* one shared grid (rows are display: contents) so the labels line up while each row grows with its share --s */
+.gz-bars { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(64px, max-content) minmax(0, 1fr) auto; gap: 6px 8px; align-items: center; }
+.gz-bars li { display: contents; --s: 0; }
+.gz-bars li > * { font: 400 calc(13px + 11px * var(--s))/1.15 var(--f-chrome); }
+.gz-bars li.lead > b, .gz-bars li.lead > span:last-child { font-weight: 700; }
+.gz-bars li:not(.lead) > * { opacity: .75; }
+.gz-bar { display: block; height: calc(10px + 22px * var(--s)); background: #e6dcc0; border: 1px solid #1b1b1b; }
 .gz-bar i { display: block; height: 100%; background: #2e8a3a; }
+.gz-bars li.lead .gz-bar { border-width: 2px; box-shadow: 2px 2px 0 rgba(0, 0, 0, .2); }
 .gz-bars li.mine b { color: #8a1c1c; }
 .gz-discord { background: #313338; color: #dbdee1; }
 .gz-discord .gz-rd-title { font-weight: 400; }
