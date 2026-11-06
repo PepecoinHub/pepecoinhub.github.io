@@ -1505,3 +1505,14 @@ footer.foot a { color: #edf3e3; }
 .gz-discord { background: #313338; color: #dbdee1; }
 .gz-discord .gz-rd-title { font-weight: 400; }
 
+
+/* iPhone-size portrait screens (up to 440 px): the taskbar ran past the screen edge, cutting off the
+   "show desktop" strip (minimise all) after the light/dark button. The phone shows the time anyway, so the
+   clock goes, and the bar items may shrink instead of pushing the strip out. */
+@media (max-width: 440px) {
+  .pondos .tray-clock { display: none; }
+  .pondos .tray { min-width: 0; flex-shrink: 1; }
+  .pondos .show-desk { flex: none; }
+}
+/* very small phones (iPhone SE 1st gen, 320 px): Log On stays on the desktop, the tray button goes */
+@media (max-width: 340px) { .pondos .tray-logon { display: none; } }
