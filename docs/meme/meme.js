@@ -1715,30 +1715,14 @@
           left.appendChild(make);
         }
 
-        // ----- My Fren Journey (cosmetic) -----
-        // XP/level is FLAVOUR ONLY, derived purely from earned achievements. It is not a currency,
-        // cannot be bought, spent, traded or ground; no PEP is involved. Formula (documented on purpose):
-        //   xp    = earnedCount * 100            (100 cosmetic points per earned stamp)
-        //   level = floor(sqrt(xp / 100)) + 1    (so each new stamp nudges a gentle progress bar)
-        // The bar below only shows progress toward the next whole level; it unlocks nothing.
-        var xp = earnedCount * 100;
-        var level = Math.floor(Math.sqrt(xp / 100)) + 1;
-        var intoLevel = xp - ((level - 1) * (level - 1) * 100);
-        var span = (level * level * 100) - ((level - 1) * (level - 1) * 100);
-        var pct = span > 0 ? Math.max(0, Math.min(100, Math.round(intoLevel / span * 100))) : 0;
+        // ----- My Fren Journey: factual stats only; no XP, levels or grind -----
+        // Account age is NOT a substitute for the planned 100-day activity counter.
         var days = state.member_since ? Math.max(0, Math.floor((Date.now() - new Date(state.member_since).getTime()) / 86400000)) : null;
         var journey = el('div', {class:'pp-journey'});
         journey.appendChild(piece('p','pp-page-head','My Fren Journey'));
-        var lvlrow = el('div', {class:'pp-level'});
-        lvlrow.appendChild(piece('strong','','Level '+level));
-        lvlrow.appendChild(piece('span','pp-muted',intoLevel+' / '+span+' XP (cosmetic)'));
-        journey.appendChild(lvlrow);
-        var bar = el('div', {class:'pp-xp','role':'progressbar','aria-valuemin':'0','aria-valuemax':'100','aria-valuenow':String(pct),'aria-label':'Cosmetic XP progress'});
-        var fill = el('span', {class:'pp-xp-fill'}); fill.style.width = pct + '%'; bar.appendChild(fill);
-        journey.appendChild(bar);
         var jstats = el('div', {class:'pp-jstats'});
         [
-          ['Days with Pepe', days==null?'—':String(days)],
+          ['Days registered', days==null?'—':String(days)],
           ['Stamps', earnedCount+' / '+regular.length],
           ['Secrets', secretsCount+' / '+secrets.length],
           ['Items', String(itemsCount)]
