@@ -72,7 +72,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; return 'img/ico/' + n + '.webp'; }
   function icoFrom(src) { var m = /^img\/([\w-]+)\.webp$/.exec(src || ''); return m ? ico(m[1]) : src; }
   function json(name) {
     if (!cache[name]) cache[name] = fetch(DATA + name, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(name + ' ' + r.status); return r.json(); });
@@ -1577,7 +1577,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261106stamps2';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106special1'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106lily1'}));
     }
   }
   // one read: the server snapshot, plus two static files from this site (labels and avatar parts)
@@ -1621,7 +1621,11 @@
     n.style.backgroundPositionX = (i * 100 / (names.length - 1)) + '%';
     return n;
   }
+  // Lily's stamps (passport-assets/stamps-lily.webp, scripts/build_lily_stamps.mjs): one tile per stamp id, same order
+  var PP_LILY = ['pond_pioneer', 'welcome_back', 'pepe_guesser', 'week_scout', 'scout_fren', 'first_words', 'hey_fren', 'dear_editor',
+    'junior_editor', 'senior_editor', 'rookie_miner', 'first_hatch', 'little_fren', 'grown_fren', 'streak_14'];
   function ppStamp(x, earned) {
+    if (earned && PP_LILY.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-lily', PP_LILY, x.id);
     var art = earned ? (PP_STAMP_OF[x.id] || PP_STAMP_CAT[x.category] || 'duck') : 'locked';
     return ppSprite('pp-art pp-art-stamp', PP_STAMPS, art);
   }
@@ -2255,8 +2259,8 @@
             return x ? x.title : null;
           }).filter(Boolean);
           if (!names.length) return;
-          var t = names.length === 1 ? balloon('New stamp: ' + esc(names[0]), 'It is in your Fren Passport now. Click to open it.', 'pep-logo')
-            : balloon(names.length + ' new stamps!', esc(names.join(', ')) + '. Click to open your Fren Passport.', 'pep-logo');
+          var t = names.length === 1 ? balloon('New stamp: ' + esc(names[0]), 'It is in your Fren Passport now. Click to open it.', 'stamp-new')
+            : balloon(names.length + ' new stamps!', esc(names.join(', ')) + '. Click to open your Fren Passport.', 'stamp-new');
           t.addEventListener('click', function (ev) { if (!ev.target.closest('button')) frenPassport(); });
           t.style.cursor = 'pointer';
         });

@@ -192,7 +192,7 @@ try {
     assert.equal(await page.locator(maker + ' .fa-opt:not(.is-locked)').count(), 35);
     // reserved parts show a lock and cannot be picked: sunset, detective jacket, hard hat, detective hat, headphones, pin
     assert.deepEqual(await page.$$eval(maker + ' .fa-opt.is-locked input', l => l.map(i => [i.value, i.disabled])),
-      [['hat_hardhat', true], ['hat_detective', true], ['clothing_suit', true], ['accessory_headphones', true], ['accessory_pin', true], ['bg_sunset', true], ['special_explorer', true]]);
+      [['hat_hardhat', true], ['hat_detective', true], ['hat_explorer', true], ['clothing_suit', true], ['accessory_headphones', true], ['accessory_pin', true], ['bg_sunset', true], ['special_explorer', true]]);
     assert.equal(await statusText(page), 'Not saved yet.');
     const w = await page.evaluate(sel => document.querySelector(sel).getBoundingClientRect().width, maker);
     assert.ok(w >= 860 && w <= 920, 'window width ' + w);
@@ -445,6 +445,9 @@ try {
     await openPassport(page);
     await page.click('.pp-make'); await page.waitForSelector(maker + ' .fa');
     assert.deepEqual(await page.$$eval(maker + ' .fa-opt.is-locked input', l => l.map(i => i.value)), ['hat_hardhat', 'accessory_headphones', 'bg_sunset']);
+    assert.equal(await page.isDisabled(`${maker} input[value="hat_explorer"]`), false, 'Scout Fren opens the explorer hat');
+    await pick(page, 'hat', 'hat_explorer'); await pick(page, 'clothing', 'clothing_camo');
+    await shot(page, '23-maker-explorer-hat');
     assert.match(await page.getAttribute(`${maker} input[value="hat_hardhat"]`, 'value'), /hat_hardhat/);
     assert.match(await page.getAttribute(`${maker} label:has(input[value="hat_hardhat"])`, 'title'), /earn the Miner Fren stamp/);
     assert.match(await page.getAttribute(`${maker} label:has(input[value="bg_sunset"])`, 'title'), /a future stamp/);

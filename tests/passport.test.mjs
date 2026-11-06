@@ -92,7 +92,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 32400 offered look
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
   assert.equal(manifest.schema_version, 2);
   // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 6, 6, 6, 8, 8, 2]);
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 6, 6, 6, 9, 8, 2]);
   // the only looks a player can actually compose and save are built from the non-unlock (base) ids
   assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 5, 6, 6, 6, 6, 1]);
   assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 32400, 'offered looks');
@@ -106,7 +106,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 32400 offered look
   }
   // one 512x512 WebP per option id, plus the implied base layer
   const files = [...new Set([manifest.paths.base, ...ids.map(id => manifest.paths.layer_template.replace('{id}', id))])];
-  assert.equal(files.length, 43, '42 option layers + base_frog');
+  assert.equal(files.length, 44, '43 option layers + base_frog');
   // one small picture of each part for the maker rows, nothing else in the folder
   assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/thumbs/', import.meta.url)).sort(),
     ids.map(id => manifest.paths.thumb_template.replace('{id}', id).split('/').pop()).sort(), 'no unused, stray or missing thumbnails');
@@ -172,12 +172,15 @@ test('Avatar Maker client: one save RPC with six v2 IDs, nothing kept in localSt
 
 test('Passport booklet art: four small transparent WebPs with the sizes the page layout assumes', () => {
   const dir = new URL('../docs/meme/passport-assets/', import.meta.url);
-  const want = { 'page-left.webp': [360, 528], 'page-right.webp': [360, 528], 'stamps.webp': [16 * 69, 75], 'icons.webp': [12 * 48, 48] };
+  const want = { 'page-left.webp': [360, 528], 'page-right.webp': [360, 528], 'stamps.webp': [16 * 69, 75], 'icons.webp': [12 * 48, 48],
+    // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
+    'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
   let total = 0;
   for (const [f, size] of Object.entries(want)) {
     const b = readFileSync(new URL(f, dir));
-    total += b.length;
+    if (f !== 'stamps-lily.webp') total += b.length;
+    else assert.ok(b.length < 160 * 1024, 'Lily stamp sprite stays small: ' + b.length);
     assert.equal(b.toString('latin1', 0, 4) + b.toString('latin1', 8, 12), 'RIFFWEBP', f + ' is a WebP');
     // VP8X is the extended header used for images with alpha (the photo window and sprite edges are transparent)
     assert.equal(b.toString('latin1', 12, 16), 'VP8X', f + ' carries alpha');
@@ -189,5 +192,9 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
   assert.equal(count('PP_STAMPS'), 16);
   assert.equal(count('PP_ICONS'), 12);
+  // the Lily sprite order in the client equals the build script order
+  const lily = js.match(/var PP_LILY = \[([^\]]*)\]/)[1].match(/'([a-z0-9_]+)'/g).map(x => x.slice(1, -1));
+  const built = [...readFileSync(new URL('../scripts/build_lily_stamps.mjs', import.meta.url), 'utf8').matchAll(/\['([a-z0-9_]+)', S[123],/g)].map(x => x[1]);
+  assert.equal(lily.length, 15); assert.deepEqual(lily, built);
   assert.ok(existsSync(new URL('../games/fren-passport/source/passport-mockup.webp', import.meta.url)), 'lossless source art is kept');
 });

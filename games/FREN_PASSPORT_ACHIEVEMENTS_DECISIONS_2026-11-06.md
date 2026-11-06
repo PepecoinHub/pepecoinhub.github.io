@@ -55,6 +55,14 @@ Big milestones unlock a **special avatar**: a whole character drawn by **Lily**,
 
 To add one: put Lily's transparent square PNG in `games/fren-avatar/source/special/`, add it to `SPECIALS` in `scripts/build_special_avatars.mjs` (with any stray marks to erase and the head crop for the thumbnail), and run the script. Then add the option with its `unlock` key to `avatar-options.json`, and the id plus its `(part, stamp)` pair to the save RPC in a new migration. The tests compare both with the manifest.
 
+## Stamp art by Lily
+
+Lily's sheets are kept in `games/fren-passport/source/stamps-lily/`. `scripts/build_lily_stamps.mjs` cuts them into `docs/meme/passport-assets/stamps-lily.webp` (15 tiles, 138×150 each, shown at 69×75), the "New stamp" notice icon `stamp-new.webp`, and the explorer hat layer. The tile order in the script must equal `PP_LILY` in `docs/meme/meme.js` (a test checks it). Earned stamps without a Lily tile still use the older sprite `stamps.webp`.
+
+Lily tiles: Pond Pioneer, Welcome Back!, Pepe Guesser, Week Scout, Scout Fren, First Words, Hey @Fren, Dear Editor, Junior Editor, Senior Editor, Rookie Miner, First Hatch, Little Fren, One Small Step, and a spare "14-Day Streak" tile (`streak_14`, not used by any stamp yet).
+
+Scout Fren rewards: the PEP pin, the **explorer hat with "14"** (`hat_explorer`), and the special avatar Explorer Pepe.
+
 ## Still planned ("???" / Coming soon)
 
 PepeGochi (needs PR #186 and a frontend): `first_hatch` (adopt the pet), `little_fren` (second care day: the tadpole becomes a froglet), `grown_fren` "One Small Step" (7th care day: adult; "one small step for a man, one giant leap for a frog"). These match the life cycle in `games/PEPEGOCHI_API.md` (tadpole 0-1 care days, froglet 2-6, adult 7+). Care days are distinct UTC days, not in a row.

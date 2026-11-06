@@ -60,6 +60,7 @@
 --     bg_sunset          (unlock yeet_adept, not earnable yet)
 --     accessory_pin      (unlock scout_fren)
 --     accessory_headphones (unlock gamer_fren, not earnable yet)
+--     hat_explorer       (unlock scout_fren)
 --     special_explorer   (unlock scout_fren)
 --
 -- SPECIAL AVATARS: the 'special' slot holds a whole drawn character (by Lily) for a
@@ -117,7 +118,7 @@ begin
      or p_clothing is null or p_clothing not in ('clothing_blue', 'clothing_purple_hoodie', 'clothing_black_hoodie', 'clothing_shirt_tie', 'clothing_camo', 'clothing_suit')
      or p_mouth is null or p_mouth not in ('mouth_flat', 'mouth_smile', 'mouth_open', 'mouth_tongue', 'mouth_teeth', 'mouth_smirk')
      or p_eyes is null or p_eyes not in ('eyes_classic', 'eyes_sleepy', 'eyes_angry', 'eyes_bloodshot', 'eyes_3d', 'eyes_hypno')
-     or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_wizard', 'hat_hardhat', 'hat_detective')
+     or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_wizard', 'hat_hardhat', 'hat_detective', 'hat_explorer')
      or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_shades', 'accessory_round', 'accessory_orange', 'accessory_cigarette', 'accessory_pipe', 'accessory_headphones', 'accessory_pin')
      or p_special is null or p_special not in ('special_none', 'special_explorer') then
     raise exception 'Unknown avatar option' using errcode = '22023';
@@ -127,7 +128,7 @@ begin
   if exists (
     select 1 from (values ('bg_sunset', 'yeet_adept'), ('clothing_suit', 'detective_fren'), ('hat_hardhat', 'miner_fren'),
                           ('hat_detective', 'detective_fren'), ('accessory_headphones', 'gamer_fren'), ('accessory_pin', 'scout_fren'),
-                          ('special_explorer', 'scout_fren')) r(part, stamp)
+                          ('hat_explorer', 'scout_fren'), ('special_explorer', 'scout_fren')) r(part, stamp)
      where r.part in (p_bg, p_clothing, p_hat, p_accessory, p_special)
        and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)) then
     raise exception 'That part is locked: earn its stamp first' using errcode = '42501';

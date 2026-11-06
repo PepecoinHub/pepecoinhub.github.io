@@ -22,7 +22,7 @@
     "accessory": "accessory_none",
     "special": "special_none"
   },
-  "unlock_note": "Options with an unlock key are rewards for server-verified stamps. The maker shows them with a lock until the player has the stamp, and the save RPC checks the stamp again. Sunset background: Adept (planned). Detective hat and jacket: Detective Fren. Hard hat: Miner Fren. Headphones: Gamer Fren (planned). PEP pin and Explorer Pepe: Scout Fren.",
+  "unlock_note": "Options with an unlock key are rewards for server-verified stamps. The maker shows them with a lock until the player has the stamp, and the save RPC checks the stamp again. Sunset background: Adept (planned). Detective hat and jacket: Detective Fren. Hard hat: Miner Fren. Headphones: Gamer Fren (planned). PEP pin, explorer hat and Explorer Pepe: Scout Fren.",
   "options": {
     "bg": [
       {
@@ -137,6 +137,11 @@
         "id": "hat_detective",
         "label": "Detective hat",
         "unlock": "detective_fren"
+      },
+      {
+        "id": "hat_explorer",
+        "label": "Explorer hat (14 days)",
+        "unlock": "scout_fren"
       }
     ],
     "clothing": [
