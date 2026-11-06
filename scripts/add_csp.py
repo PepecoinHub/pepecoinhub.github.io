@@ -83,6 +83,9 @@ def build_meta(html: str) -> str:
         'img-src ' + ' '.join(IMG),
         'media-src \'self\' blob:',
         'connect-src ' + ' '.join(CONNECT),
+        # Pond TV embeds YouTube videos in an <iframe> (youtube-nocookie.com).
+        # Without this the CRT television in PondOS stays blank.
+        'frame-src https://www.youtube-nocookie.com',
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
