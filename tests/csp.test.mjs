@@ -105,3 +105,18 @@ test('CSP connect-src covers every Supabase + data-API host meme.js fetches', ()
   // realtime websocket
   assert.ok(conn.includes('wss://azbwciqfbsdpwubznncg.supabase.co'), 'connect-src missing Supabase realtime wss');
 });
+
+// PondOS opens every game (YEET, PEPE SWEEPER, Pepe Miner, FROGAGEDDON, ...) as an iframe of this
+// site's own games/ pages. Without 'self' in frame-src every game window stays blank (Nov 2026).
+test('CSP lets PondOS frame its own game pages (frame-src self)', () => {
+  const own = [...meme.matchAll(/<iframe[^>]*src="' \+ BASE \+ '(games\/[a-z0-9_-]+\.html)/g)].map(m => m[1]);
+  assert.ok(own.length >= 4, 'expected the game iframes in meme.js, got ' + own.join(', '));
+  for (const f of ['games/yeet.html', 'games/pepe-sweeper.html', 'games/miner.html', 'games/pondwars-beta.html'])
+    assert.ok(own.includes(f), f + ' is opened as an iframe');
+  assert.ok(directive('frame-src').includes("'self'"), "frame-src must include 'self' or the game windows are blocked");
+  // every PondOS page carries the same policy
+  for (const u of pages.filter(u => u.pathname.includes('/meme/'))) {
+    const csp = (readFileSync(u, 'utf8').match(/http-equiv="Content-Security-Policy" content="([^"]*)"/) || [])[1] || '';
+    assert.match(csp, /frame-src 'self' /, u.pathname);
+  }
+});
