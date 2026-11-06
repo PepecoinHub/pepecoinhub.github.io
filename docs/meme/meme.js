@@ -1624,11 +1624,19 @@
     var key = PP_ICONS[id] ? id : (PP_ICON_CAT[category] || 'first_fren');
     return PP_ICONS[key];
   }
-  // Build the stamp inner markup: earned uses the category/id glyph, locked shows a retro '?' slot.
+  // Build the stamp inner markup. Earned: the full-colour retro glyph. Locked: an empty
+  // passport-page slot — a dotted stamp frame with a faint grey "pre-print" of the stamp's
+  // own glyph, so you can see what it will become without it reading as collected. This is
+  // purely cosmetic; server state alone decides earned vs locked (see A.render).
   function ppStampSvg(id, category, earned, mythic) {
-    var inner = earned ? ppStampGlyph(id, category)
-      : '<rect x="7" y="6" width="18" height="20" fill="#cfcabf" stroke="#20261e" stroke-width="2"/>'
-        + '<path d="M12 12a4 4 0 1 1 6 3c-1 1-2 1-2 3h-2c0-3 3-3 3-5a2 2 0 0 0-3-1zM15 21h2v2h-2z" fill="#6b6454"/>';
+    var inner;
+    if (earned) {
+      inner = ppStampGlyph(id, category);
+    } else {
+      // dotted "stamp here" frame + a desaturated ghost of the real glyph underneath
+      inner = '<rect x="4" y="4" width="24" height="24" fill="none" stroke="#9a9488" stroke-width="1.5" stroke-dasharray="3 2"/>'
+        + '<g opacity="0.22">' + ppStampGlyph(id, category) + '</g>';
+    }
     return '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="crispEdges" aria-hidden="true">'
       + (mythic ? '<rect x="1" y="1" width="30" height="30" fill="none" stroke="#c43b2e" stroke-width="2" stroke-dasharray="3 2"/>' : '')
       + inner + '</svg>';
