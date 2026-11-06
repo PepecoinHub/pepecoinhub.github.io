@@ -87,11 +87,13 @@ def build_meta(html: str) -> str:
         'img-src ' + ' '.join(IMG),
         'media-src \'self\' blob:',
         'connect-src ' + ' '.join(CONNECT),
-        # frame-src: Pond TV embeds YouTube (youtube-nocookie.com); the guest
-        # bot check renders a Cloudflare Turnstile widget in an iframe. Without
-        # these the CRT TV stays blank and guests can't pass the bot check
-        # (so guest letters / sign-in / chat break).
-        'frame-src https://www.youtube-nocookie.com https://challenges.cloudflare.com',
+        # frame-src: PondOS opens every game (YEET, PEPE SWEEPER, Pepe Miner,
+        # FROGAGEDDON, ...) as an iframe of this site's own games/ pages, so
+        # 'self' is required or every game window stays blank. Pond TV embeds
+        # YouTube (youtube-nocookie.com); the guest bot check renders a
+        # Cloudflare Turnstile widget in an iframe. Without these the CRT TV
+        # stays blank and guests can't pass the bot check.
+        "frame-src 'self' https://www.youtube-nocookie.com https://challenges.cloudflare.com",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
