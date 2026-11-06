@@ -2221,7 +2221,7 @@
 
   // ---------- Fren Passport check-in (games/supabase/update_passport_awards.sql) ----------
   // A Discord player's PondOS page asks once (at most every 5 minutes per tab). The server notes the UTC day
-  // for 10 Day Fren and returns the stamps it has not announced yet; each one is announced only once.
+  // for Welcome Back! and the 30-day run, and returns the stamps it has not announced yet; each one is announced only once.
   // The browser sends nothing but the request itself.
   if (mainEl) (function () {
     var s = sbSession();
