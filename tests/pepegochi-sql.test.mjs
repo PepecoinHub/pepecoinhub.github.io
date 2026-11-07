@@ -1,0 +1,629 @@
+// PepeGochi v2 on a real PostgreSQL (15+): games/supabase/update_pepegochi_v2.sql through its four browser RPCs.
+// Needs a disposable PostgreSQL server and node-postgres, like the other SQL tests:
+//   PASSPORT_PG_URL=postgres://postgres:pw@localhost:5432/postgres \
+//   PASSPORT_PG_MODULE=/abs/path/node_modules/pg/lib/index.js \
+//   node --test tests/pepegochi-sql.test.mjs
+// It creates and drops its own database. Never point it at Supabase.
+// Time is virtual: the test database replaces games.pepegochi_clock() (scripts/pepegochi_sim.mjs).
+// Test ids (A1, C2, R3 ...) match docs/design/pepegochi-v2/TECH_PLAN.md, section 13.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { prepare, setRules, addPlayer, callRpc, asDb, uid, Sim, SCENARIOS, START, DAY_MS, KINDS } from '../scripts/pepegochi_sim.mjs';
+
+const URL_ENV = process.env.PASSPORT_PG_URL;
+const MOD_ENV = process.env.PASSPORT_PG_MODULE;
+const H = 36e5;
+const RPCS = ['gry_pepegochi_state()', "gry_pepegochi_adopt('Fren')", "gry_pepegochi_action('feed')", 'gry_pepegochi_letter_read()'];
+
+test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and milestones',
+  { skip: !(URL_ENV && MOD_ENV) && 'set PASSPORT_PG_URL and PASSPORT_PG_MODULE', timeout: 600000 }, async t => {
+  const pg = (await import(MOD_ENV)).default;
+  const admin = new pg.Client({ connectionString: URL_ENV });
+  await admin.connect();
+  const dbName = 'pepegochi_test_' + process.pid + '_' + Date.now();
+  await admin.query('create database ' + dbName);
+  const url = new URL(URL_ENV); url.pathname = '/' + dbName;
+  const clients = [];
+  const connect = async () => {
+    const c = new pg.Client({ connectionString: url.toString() });
+    await c.connect();
+    c.on('notice', n => warnings.push(n.message));
+    clients.push(c);
+    return c;
+  };
+  const warnings = [];
+  const raw = await connect();
+  const db = asDb(raw);
+  try {
+    // the Passport tables exist too, to prove that moving out never touches them (E1)
+    const { base } = await prepare(db, { extra: ['update_yeet.sql', 'update_fren_passport.sql', 'update_fren_avatar.sql'] });
+    let next = 1;
+    const player = async (opts) => { const n = next++; await addPlayer(db, n, opts); return n; };
+    const at = (h = 0) => new Date(+new Date(START) + h * H);
+    const rpc = (user, fn, now = at(), extra = {}) => callRpc(db, { user, now, ...extra }, 'public.' + fn);
+    const ok = async (...a) => { const r = await rpc(...a); assert.ok(r.ok, r.error); return r.value; };
+    const one = async (sql, args = []) => (await db.query(sql, args)).rows[0];
+    const life = async (user, gen) => one('select * from games.pepegochi_lives where user_id = $1 and generation = $2', [uid(user), gen]);
+    const rowText = async user => (await db.query(
+      `select coalesce(string_agg(x::text, '|' order by x::text), '') as v from (
+         select l::text as x from games.pepegochi_lives l where l.user_id = $1
+         union all select o::text from games.pepegochi_owners o where o.user_id = $1
+         union all select m::text from games.pepegochi_milestones m where m.user_id = $1) q`, [uid(user)])).rows[0].v;
+    // a full short visit at hour h: every action the frog needs, 3 s apart
+    const careAt = async (user, h) => {
+      const s = new Sim(db, { user, start: at(h) });
+      await s.care();
+      return s.last;
+    };
+    const parallel = async (n, user, fn, now) => {
+      const cs = await Promise.all(Array.from({ length: n }, connect));
+      const res = await Promise.all(cs.map(c => callRpc(asDb(c), { user, now }, 'public.' + fn)));
+      await Promise.all(cs.map(c => c.end()));
+      clients.splice(clients.length - n, n);
+      return res;
+    };
+
+    // ---------- A: sign-in and ownership ----------
+    await t.test('A1 anon role cannot run any PepeGochi RPC', async () => {
+      const p = await player();
+      for (const f of RPCS) {
+        const r = await rpc(p, f, at(), { role: 'anon' });
+        assert.equal(r.ok, false); assert.match(r.error, /permission denied/, f);
+      }
+    });
+
+    await t.test('A2 anonymous guests and e-mail-only accounts are refused and write nothing', async () => {
+      const guest = await player({ provider: null });
+      const mail = await player({ provider: 'email' });
+      for (const u of [guest, mail]) for (const f of RPCS) {
+        const r = await rpc(u, f);
+        assert.equal(r.ok, false); assert.match(r.error, /Discord sign-in required/);
+        assert.equal(r.code, '42501');
+      }
+      const none = await rpc(null, 'gry_pepegochi_state()');
+      assert.match(none.error, /Discord sign-in required/);
+      assert.equal((await one('select count(*)::int n from games.pepegochi_owners where user_id = any($1)', [[uid(guest), uid(mail)]])).n, 0);
+    });
+
+    await t.test('A3 browser RPCs take no user id, stat, time, count or stamp argument', async () => {
+      const rows = (await db.query(`select p.proname, pg_get_function_identity_arguments(p.oid) a from pg_proc p
+        join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'gry_pepegochi%' order by 1`)).rows;
+      assert.deepEqual(rows.map(r => [r.proname, r.a]), [
+        ['gry_pepegochi_action', 'p_action text'], ['gry_pepegochi_adopt', 'p_name text'],
+        ['gry_pepegochi_letter_read', ''], ['gry_pepegochi_state', '']]);
+    });
+
+    await t.test('A4 one player never reads or changes another player\'s frog', async () => {
+      const a = await player(); const b = await player();
+      await ok(b, "gry_pepegochi_adopt('Bobs Frog')");
+      const before = await rowText(b);
+      await ok(a, "gry_pepegochi_adopt('Alice Frog')");
+      await careAt(a, 1);
+      await ok(a, 'gry_pepegochi_state()', at(200));
+      await ok(a, 'gry_pepegochi_letter_read()', at(200));
+      await ok(a, "gry_pepegochi_adopt('Alice Two')", at(201));
+      assert.equal(await rowText(b), before);
+      const s = await ok(a, 'gry_pepegochi_state()', at(202));
+      assert.ok(!JSON.stringify(s).includes('Bobs Frog'));
+      assert.equal(s.history.length, 1);
+    });
+
+    await t.test('A5 an account whose Discord was unlinked is refused everywhere; the frog waits, unchanged', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      await careAt(p, 1);
+      await db.query('update auth.identities set provider = $2 where user_id = $1', [uid(p), 'email']);
+      const before = await rowText(p);
+      for (const f of RPCS) {
+        const r = await rpc(p, f, at(10));
+        assert.equal(r.ok, false, f); assert.match(r.error, /Discord sign-in required/);
+      }
+      assert.equal(await rowText(p), before);
+      await db.query('update auth.identities set provider = $2 where user_id = $1', [uid(p), 'discord']);
+      assert.equal((await ok(p, 'gry_pepegochi_state()', at(12))).pet.name, 'Fren');
+      // relinked after more than a week: the clock kept running, so the frog has moved out
+      assert.equal((await ok(p, 'gry_pepegochi_state()', at(1 + 200))).pet.status, 'departed');
+    });
+
+    // ---------- B: grants and function hygiene ----------
+    await t.test('B1 no table privilege for browser roles', async () => {
+      for (const role of ['anon', 'authenticated']) for (const tbl of ['pepegochi_owners', 'pepegochi_lives', 'pepegochi_milestones'])
+        for (const priv of ['SELECT', 'INSERT', 'UPDATE', 'DELETE'])
+          assert.equal((await one('select has_table_privilege($1, $2, $3) v', [role, 'games.' + tbl, priv])).v, false, role + ' ' + priv + ' ' + tbl);
+    });
+
+    await t.test('B2 internal functions are not callable by browser roles; the four RPCs only by authenticated', async () => {
+      const rows = (await db.query(`select p.oid::regprocedure::text f, n.nspname s from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+        where p.proname like 'pepegochi%' or p.proname like 'gry_pepegochi%'`)).rows;
+      assert.ok(rows.length >= 13, 'functions found: ' + rows.length);
+      for (const { f, s } of rows) {
+        assert.equal((await one('select has_function_privilege($1, $2, $3) v', ['anon', f, 'EXECUTE'])).v, false, 'anon ' + f);
+        assert.equal((await one('select has_function_privilege($1, $2, $3) v', ['authenticated', f, 'EXECUTE'])).v, s === 'public', 'authenticated ' + f);
+      }
+    });
+
+    await t.test('B3 browser RPCs are security definer with an empty search_path', async () => {
+      const rows = (await db.query(`select p.proname, p.prosecdef, p.proconfig from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+        where n.nspname = 'public' and p.proname like 'gry_pepegochi%'`)).rows;
+      assert.equal(rows.length, 4);
+      for (const r of rows) { assert.equal(r.prosecdef, true, r.proname); assert.deepEqual(r.proconfig, ['search_path=""'], r.proname); }
+      const internal = (await db.query(`select p.proname, p.proconfig from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+        where n.nspname = 'games' and p.proname like 'pepegochi%'`)).rows;
+      for (const r of internal) assert.deepEqual(r.proconfig, ['search_path=""'], r.proname);
+    });
+
+    await t.test('B4 state is read-only, also when the frog is due to move out', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      for (const h of [1, 300]) {
+        await raw.query('begin read only');
+        await raw.query('set local role authenticated');
+        await raw.query("select set_config('request.jwt.claim.sub', $1, true), set_config('pepegochi.sim_now', $2, true)", [uid(p), at(h).toISOString()]);
+        const s = (await raw.query('select public.gry_pepegochi_state() v')).rows[0].v;
+        await raw.query('rollback');
+        assert.equal(s.pet.status, h === 1 ? 'healthy' : 'departed');
+      }
+      assert.equal((await life(p, 1)).status, 'active', 'reading never writes the move-out');
+    });
+
+    await t.test('B5 names and actions are validated before anything is written', async () => {
+      const p = await player();
+      for (const name of [null, '', 'a', ' a ', 'x'.repeat(19), 'Fren\u200b', 'Fren\u202e', 'Fren\n', '<b>x</b>', 'x'.repeat(10240), "Fren'; drop table x;--"]) {
+        const r = await callRpc(db, { user: p, now: at() }, 'public.gry_pepegochi_adopt($1)', [name]);
+        assert.equal(r.ok, false, JSON.stringify(name)); assert.equal(r.code, '22023');
+      }
+      assert.equal((await one('select count(*)::int n from games.pepegochi_owners where user_id = $1', [uid(p)])).n, 0);
+      const s = await ok(p, "gry_pepegochi_adopt('  Mr. Frog_2-B  ')");
+      assert.equal(s.pet.name, 'Mr. Frog_2-B');
+      for (const a of [null, '', 'FEED', 'feed ', 'cheat', 'feed; select 1', 'x'.repeat(5000)]) {
+        const r = await callRpc(db, { user: p, now: at(1) }, 'public.gry_pepegochi_action($1)', [a]);
+        assert.equal(r.ok, false); assert.equal(r.code, '22023', String(a).slice(0, 20));
+      }
+    });
+
+    // ---------- C: concurrency and repeats ----------
+    await t.test('C1 twelve adoptions at once make one owner and one frog', async () => {
+      const p = await player();
+      const res = await parallel(12, p, "gry_pepegochi_adopt('Fren')", at());
+      assert.ok(res.every(r => r.ok), res.find(r => !r.ok)?.error);
+      assert.equal(res.filter(r => r.value.adopt_result === 'adopted').length, 1);
+      assert.equal((await one('select count(*)::int n from games.pepegochi_lives where user_id = $1', [uid(p)])).n, 1);
+    });
+
+    await t.test('C2 twelve feeds at once: one accepted, one care day', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      const res = await parallel(12, p, "gry_pepegochi_action('feed')", at(1));
+      assert.equal(res.filter(r => r.ok).length, 1);
+      const l = await life(p, 1);
+      assert.equal(l.actions_today, 1); assert.equal(l.care_days, 1); assert.equal(l.feeds, 1);
+    });
+
+    await t.test('C3 twelve letter reads at once after the frog left: written once', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      const res = await parallel(12, p, 'gry_pepegochi_letter_read()', at(200));
+      assert.ok(res.every(r => r.ok));
+      const l = await life(p, 1);
+      assert.equal(l.status, 'departed');
+      assert.equal(+l.departed_at, +at(168));
+      assert.equal(+l.letter_seen_at, +at(200));
+      assert.ok(res.every(r => r.value.can_adopt === true));
+    });
+
+    await t.test('C4 letter and adoption from two tabs at once make at most one new frog', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      const cs = await Promise.all(Array.from({ length: 8 }, connect));
+      const res = await Promise.all(cs.map((c, i) => callRpc(asDb(c), { user: p, now: at(200) },
+        i % 2 ? 'public.gry_pepegochi_letter_read()' : "public.gry_pepegochi_adopt('Fren II')")));
+      await Promise.all(cs.map(c => c.end())); clients.splice(clients.length - 8, 8);
+      assert.ok(res.every(r => r.ok));
+      const n = (await one('select count(*)::int n from games.pepegochi_lives where user_id = $1', [uid(p)])).n;
+      assert.ok(n <= 2, 'lives: ' + n);
+      assert.equal((await one("select count(*)::int n from games.pepegochi_lives where user_id = $1 and status = 'active'", [uid(p)])).n, n - 1);
+    });
+
+    await t.test('C5 an action after the deadline, racing a read, never brings the frog back', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      const cs = await Promise.all(Array.from({ length: 6 }, connect));
+      const res = await Promise.all(cs.map((c, i) => callRpc(asDb(c), { user: p, now: at(168 + 1 / 3600) },
+        i % 2 ? 'public.gry_pepegochi_state()' : "public.gry_pepegochi_action('feed')")));
+      await Promise.all(cs.map(c => c.end())); clients.splice(clients.length - 6, 6);
+      assert.ok(res.every(r => r.ok && r.value.pet.status === 'departed'));
+      assert.ok(res.filter((r, i) => i % 2 === 0).every(r => r.value.action_result === 'moved_out'));
+      const l = await life(p, 1);
+      assert.equal(l.status, 'departed'); assert.equal(l.feeds, 0); assert.equal(l.care_days, 0);
+    });
+
+    await t.test('C6 retried letter reads and adoptions give the same result', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      const a = await ok(p, 'gry_pepegochi_letter_read()', at(170));
+      const b = await ok(p, 'gry_pepegochi_letter_read()', at(171));
+      assert.equal(a.pet.departed_at, b.pet.departed_at);
+      assert.equal(+(await life(p, 1)).letter_seen_at, +at(170));
+      const x = await ok(p, "gry_pepegochi_adopt('Fren II')", at(172));
+      const y = await ok(p, "gry_pepegochi_adopt('Fren II')", at(172.01));
+      assert.equal(x.adopt_result, 'adopted'); assert.equal(y.adopt_result, 'already_have_fren');
+      assert.equal(x.pet.life_id, y.pet.life_id);
+    });
+
+    // ---------- D: time ----------
+    await t.test('D1 needs keep their fractions between actions (v1 regression)', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, "gry_pepegochi_action('clean')", at(2));
+      const e2 = Number((await life(p, 1)).energy);
+      assert.ok(e2 > 74.1 && e2 < 75, String(e2));
+      await ok(p, "gry_pepegochi_action('feed')", at(4));
+      const e4 = Number((await life(p, 1)).energy);
+      assert.ok(e4 > 73.1 && e4 < 73.5, String(e4));
+      assert.equal((await ok(p, 'gry_pepegochi_state()', at(28))).pet.needs.energy, 63);
+      // hygiene: 100 after the clean at 2 h, 98.75 saved at 4 h, then 72 h at 15 per day
+      assert.equal((await ok(p, 'gry_pepegochi_state()', at(4 + 72))).pet.needs.hygiene, Math.floor(98.75 - 72 * 15 / 24));
+    });
+
+    await t.test('D2 one care day per UTC day, a new one right after midnight', async () => {
+      const p = await player();
+      const midnight = new Date('2026-11-10T00:00:00Z');
+      await ok(p, "gry_pepegochi_adopt('Fren')", new Date(+midnight - 2 * H));
+      await ok(p, "gry_pepegochi_action('feed')", new Date(+midnight - 2000));
+      await ok(p, "gry_pepegochi_action('clean')", new Date(+midnight + 1000));
+      await ok(p, "gry_pepegochi_action('play')", new Date(+midnight + 5000));
+      const l = await one('select care_days, last_care_day_utc::text d from games.pepegochi_lives where user_id = $1', [uid(p)]);
+      assert.equal(l.care_days, 2);
+      assert.equal(l.d, '2026-11-10');
+    });
+
+    await t.test('D3 status boundaries of a frog left alone after its first visit', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      await careAt(p, 0);
+      const s0 = await ok(p, 'gry_pepegochi_state()', at(0.01));
+      const since = new Date(s0.pet.most_neglected_since);
+      const h = x => new Date(+since + x * H);
+      const status = async x => (await ok(p, 'gry_pepegochi_state()', h(x))).pet.status;
+      assert.equal(await status(47.99), 'healthy');
+      assert.equal(await status(48.01), 'neglected');
+      assert.equal(await status(119.99), 'neglected');
+      assert.equal(await status(120.01), 'packing');
+      assert.equal(await status(167.99), 'packing');
+      assert.equal(await status(168.01), 'departed');
+      assert.equal(+new Date(s0.pet.departs_at), +h(168));
+      // a visit just before the deadline still rescues the frog
+      const late = new Sim(db, { user: p, start: h(167.99) });
+      await late.care();
+      assert.equal(late.last.pet.status, 'recovering');
+      assert.equal((await life(p, 1)).status, 'active');
+    });
+
+    await t.test('D4 the move-out time does not depend on when it is written', async () => {
+      const a = await player(); const b = await player();
+      for (const u of [a, b]) { await ok(u, "gry_pepegochi_adopt('Fren')"); await careAt(u, 0); }
+      await ok(a, 'gry_pepegochi_letter_read()', at(8 * 24));
+      await ok(b, 'gry_pepegochi_letter_read()', at(60 * 24));
+      const la = await life(a, 1), lb = await life(b, 1);
+      assert.equal(+la.departed_at, +lb.departed_at);
+      assert.equal(la.departure_reason, lb.departure_reason);
+    });
+
+    await t.test('D5 the session time zone changes nothing', async () => {
+      const results = [];
+      for (const tz of ['UTC', 'Pacific/Kiritimati', 'America/Adak']) {
+        const p = await player();
+        const steps = [['adopt', new Date('2026-11-09T23:59:00Z')], ['feed', new Date('2026-11-09T23:59:30Z')],
+          ['clean', new Date('2026-11-10T00:00:30Z')], ['play', new Date('2026-11-10T10:00:00Z')]];
+        let s;
+        for (const [k, now] of steps) {
+          const r = await callRpc(db, { user: p, now, tz }, k === 'adopt' ? "public.gry_pepegochi_adopt('Fren')" : `public.gry_pepegochi_action('${k}')`);
+          assert.ok(r.ok, r.error); s = r.value;
+        }
+        results.push([s.pet.care_days, s.pet.last_care_day_utc, +new Date(s.pet.departs_at), s.pet.action_budget.accepted_today]);
+      }
+      assert.deepEqual(results[1], results[0]); assert.deepEqual(results[2], results[0]);
+      assert.equal(results[0][0], 2);
+    });
+
+    await t.test('D6 every rejection writes nothing', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, "gry_pepegochi_action('feed')", at(1));
+      const before = await rowText(p);
+      const tries = [["gry_pepegochi_action('clean')", at(1 + 1 / 3600)],   // 1 s gap
+        ["gry_pepegochi_action('feed')", at(1.2)],                           // cooldown
+        ["gry_pepegochi_action('feed')", at(2)],                             // hunger is 100: not needed
+        ["gry_pepegochi_action('cheat')", at(2)]];
+      for (const [f, now] of tries) { const r = await rpc(p, f, now); assert.equal(r.ok, false, f); }
+      assert.equal(await rowText(p), before);
+    });
+
+    // ---------- E: life, letter, history ----------
+    await t.test('E1 moving out leaves stamps, items, secrets and the avatar exactly as they were', async () => {
+      const p = await player();
+      await db.query("insert into games.passport_badges(user_id, badge_id) values ($1, 'first_fren'), ($1, 'moonwalker')", [uid(p)]);
+      await db.query("insert into games.passport_items(user_id, item_id) values ($1, 'frog_tv')", [uid(p)]);
+      await db.query("insert into games.passport_secrets(user_id, secret_id) values ($1, 'lost_floppy')", [uid(p)]);
+      await db.query(`insert into games.passport_avatars(user_id, bg, clothing, mouth, eyes, hat, accessory)
+        values ($1, 'bg_pond', 'clothing_none', 'mouth_smile', 'eyes_happy', 'hat_none', 'accessory_none')`, [uid(p)]);
+      const snap = async () => (await db.query(`select (select string_agg(b::text, '|' order by b::text) from games.passport_badges b where b.user_id = $1)
+        || (select string_agg(i::text, '|') from games.passport_items i where i.user_id = $1)
+        || (select string_agg(s::text, '|') from games.passport_secrets s where s.user_id = $1)
+        || (select string_agg(a::text, '|') from games.passport_avatars a where a.user_id = $1) v`, [uid(p)])).rows[0].v;
+      const before = await snap();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, 'gry_pepegochi_letter_read()', at(200));
+      await ok(p, "gry_pepegochi_adopt('Fren II')", at(201));
+      assert.equal(await snap(), before);
+    });
+
+    await t.test('E2 a frog that moved out stays gone; a new one is a new life', async () => {
+      const p = await player();
+      const first = await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, 'gry_pepegochi_letter_read()', at(200));
+      const gone = await life(p, 1);
+      for (const k of KINDS) {
+        const r = await ok(p, `gry_pepegochi_action('${k}')`, at(201));
+        assert.equal(r.action_result, 'moved_out');
+      }
+      const second = await ok(p, "gry_pepegochi_adopt('Fren II')", at(202));
+      assert.notEqual(second.pet.life_id, first.pet.life_id);
+      assert.equal(second.pet.generation, 2);
+      await careAt(p, 203);
+      assert.deepEqual(await life(p, 1), gone);
+    });
+
+    await t.test('E3 adopting with a frog at home keeps it; after a move-out the letter comes first', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      const again = await ok(p, "gry_pepegochi_adopt('Other')", at(1));
+      assert.equal(again.adopt_result, 'already_have_fren'); assert.equal(again.pet.name, 'Fren');
+      const due = await ok(p, "gry_pepegochi_adopt('Other')", at(200));
+      assert.equal(due.adopt_result, 'read_the_letter_first');
+      assert.equal(due.can_adopt, false);
+      assert.equal((await life(p, 1)).status, 'departed', 'the move-out itself is written');
+      assert.equal((await one('select count(*)::int n from games.pepegochi_lives where user_id = $1', [uid(p)])).n, 1);
+      const letter = await ok(p, 'gry_pepegochi_letter_read()', at(201));
+      assert.equal(letter.can_adopt, true); assert.equal(letter.pet.letter.seen, true);
+      assert.equal((await ok(p, "gry_pepegochi_adopt('Other')", at(202))).adopt_result, 'adopted');
+    });
+
+    await t.test('E4 history lists the 10 newest former frens with real numbers', async () => {
+      const p = await player();
+      let h = 0;
+      for (let g = 1; g <= 12; g++) {
+        await ok(p, `gry_pepegochi_adopt('Fren ${g}')`, at(h));
+        await careAt(p, h + 1);
+        h += 200;
+        await ok(p, 'gry_pepegochi_letter_read()', at(h));
+      }
+      const s = await ok(p, "gry_pepegochi_adopt('Fren 13')", at(h + 1));
+      assert.equal(s.history.length, 10);
+      assert.deepEqual(s.history.map(x => x.generation), [12, 11, 10, 9, 8, 7, 6, 5, 4, 3]);
+      assert.ok(s.history.every(x => x.care_days === 1 && x.days_together === 7 && x.departure_reason));
+      assert.equal(s.summary.former_frens, 12); assert.equal(s.summary.frens_adopted, 13);
+      assert.equal(s.summary.longest_friendship_days, 7);
+    });
+
+    await t.test('E5 a second move-out counts as two; the first one keeps its date', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      const one1 = await ok(p, 'gry_pepegochi_letter_read()', at(170));
+      await ok(p, "gry_pepegochi_adopt('Fren II')", at(171));
+      const two = await ok(p, 'gry_pepegochi_letter_read()', at(400));
+      assert.equal(two.summary.former_frens, 2);
+      assert.equal(two.summary.first_departed_at, one1.summary.first_departed_at);
+    });
+
+    // ---------- F: what counts as care ----------
+    await t.test('F1 an action the frog does not need is refused and moves no clock', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, "gry_pepegochi_action('feed')", at(1));
+      const before = await life(p, 1);
+      const r = await rpc(p, "gry_pepegochi_action('feed')", at(2));
+      assert.match(r.error, /does not need that/);
+      assert.deepEqual(await life(p, 1), before);
+    });
+
+    await t.test('F5 cooldowns and 12 accepted actions per UTC day still apply (v1 rules)', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')", at(-18));      // Monday 00:00 UTC
+      await setRules(db, base, { meaningful_below: 101 });     // allow repeated actions for this check
+      try {
+        let accepted = 0;
+        for (let i = 0; i < 16; i++) {                            // all on the same UTC day
+          const r = await rpc(p, `gry_pepegochi_action('${KINDS[i % 4]}')`, at(-17 + i * 1.01));
+          if (r.ok) accepted++;
+          else assert.match(r.error, /limit reached|cooling down/);
+        }
+        assert.equal(accepted, 12);
+        const cd = await rpc(p, "gry_pepegochi_action('rest')", at(30));
+        assert.ok(cd.ok, 'a new UTC day resets the count');
+      } finally { await setRules(db, base); }
+    });
+
+    // ---------- R: rescue and recovery (the scenarios of scripts/pepegochi_sim.mjs) ----------
+    const scenario = async (name, overrides = {}) => {
+      const p = await player();
+      if (Object.keys(overrides).length) await setRules(db, base, overrides);
+      try {
+        const s = new Sim(db, { user: p });
+        await SCENARIOS[name].run(s);
+        const st = s.last;
+        const left = [...st.history].reverse().map(h => [s.day(h.departed_at), h.departure_reason]);
+        if (st.pet?.status === 'departed') left.push([s.day(st.pet.departed_at), st.pet.departure_reason]);
+        return { s, st, left, seen: new Set(s.events.map(e => e.status)) };
+      } finally { if (Object.keys(overrides).length) await setRules(db, base); }
+    };
+
+    await t.test('R1 one feed every 6 days: the frog moves out on day 7', async () => {
+      const { left } = await scenario('feed-every-6-days');
+      assert.deepEqual(left.map(x => x[0]), [7]);
+      assert.ok(['clean', 'play', 'rest'].includes(left[0][1]));
+    });
+
+    await t.test('R2 feeding every day but nothing else: moves out on day 7', async () => {
+      const { left } = await scenario('feed-only-daily');
+      assert.deepEqual(left.map(x => x[0]), [7]);
+    });
+
+    await t.test('R3 a full visit every 6 days: rescue starts recovery, which is then missed (day 9)', async () => {
+      const { left, seen } = await scenario('checkup-every-6-days');
+      assert.deepEqual(left, [[9, 'recovery']]);
+      assert.ok(seen.has('recovering'));
+    });
+
+    await t.test('R4 a visit every 4 days keeps the frog (neglected, never packing)', async () => {
+      const { st, left, seen } = await scenario('every-4-days');
+      assert.deepEqual(left, []); assert.equal(st.pet.status, 'healthy');
+      assert.ok(seen.has('neglected')); assert.ok(!seen.has('packing'));
+    });
+
+    await t.test('R5 Friday-to-Sunday visits keep the frog: packing and recovery every week', async () => {
+      const { left, seen } = await scenario('weekend-fri-sun');
+      assert.deepEqual(left, []);
+      assert.ok(seen.has('packing') && seen.has('recovering'));
+    });
+
+    await t.test('R6 Saturday+Sunday only: moves out with 2 recovery days, stays with 1', async () => {
+      const two = await scenario('weekend-sat-sun');
+      assert.equal(two.left.length, 1); assert.equal(two.left[0][1], 'recovery');
+      const one1 = await scenario('weekend-sat-sun', { recovery_days: 1 });
+      assert.deepEqual(one1.left, []);
+    });
+
+    await t.test('R7 rescue: half a visit does not stop the deadline, a full one starts 2 days of recovery', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      await careAt(p, 0);
+      const packing = await ok(p, 'gry_pepegochi_state()', at(130));
+      assert.equal(packing.pet.status, 'packing'); assert.equal(packing.pet.rescue_starts_recovery, true);
+      const deadline = packing.pet.departs_at;
+      const fed = await ok(p, "gry_pepegochi_action('feed')", at(130));
+      assert.equal(fed.pet.recovery, null);
+      // status follows the most neglected need that is left (waiting about 117 h), and the rescue is still owed
+      assert.equal(fed.pet.status, 'neglected');
+      assert.equal(fed.pet.rescue_starts_recovery, true);
+      // the deadline only moves to the next overdue need, it does not start a new week
+      assert.ok(+new Date(fed.pet.departs_at) >= +new Date(deadline));
+      assert.ok(+new Date(fed.pet.departs_at) < +at(130 + 72), fed.pet.departs_at);
+      assert.deepEqual(fed.pet.overdue, ['clean', 'play', 'rest']);
+      const s = new Sim(db, { user: p, start: at(130.01) });
+      await s.care();
+      assert.equal(s.last.pet.status, 'recovering'); assert.equal(s.last.pet.recovery.days_left, 2);
+      // while recovering: 72 h from the last care
+      assert.equal(+new Date(s.last.pet.departs_at), +new Date(s.last.server_now) + 72 * H);
+      // same UTC day: no progress
+      await careAt(p, 131);
+      assert.equal((await ok(p, 'gry_pepegochi_state()', at(131.1))).pet.recovery.days_left, 2);
+      const d1 = await careAt(p, 130 + 24);
+      assert.equal(d1.pet.recovery.days_left, 1);
+      const d2 = await careAt(p, 130 + 48);
+      assert.equal(d2.pet.status, 'healthy'); assert.equal(d2.pet.recovery, null);
+    });
+
+    await t.test('R8 while recovering, 72 hours without care is enough to move out', async () => {
+      const { left } = await scenario('rescue-then-vanish');
+      assert.deepEqual(left, [[13, 'recovery']]);
+    });
+
+    await t.test('R9 daily visits: always healthy, one care day per day', async () => {
+      const { st, left, seen } = await scenario('daily');
+      assert.deepEqual(left, []); assert.deepEqual([...seen], ['healthy']);
+      assert.equal(st.pet.care_days, 61); assert.equal(st.pet.stage, 'adult');
+    });
+
+    await t.test('R10 an 8-day trip: moved out, letter, new egg, history', async () => {
+      const { st, left } = await scenario('trip-8-days');
+      assert.equal(left.length, 1);
+      assert.equal(st.pet.name, 'Fren II'); assert.equal(st.history[0].name, 'Fren');
+      assert.equal(st.history[0].care_days, 10);
+    });
+
+    // ---------- M: milestones survive a broken Passport ----------
+    await t.test('M1 first adoption, froglet and adult are recorded once per account', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      for (let d = 0; d < 8; d++) await careAt(p, d * 24);
+      await ok(p, 'gry_pepegochi_letter_read()', at(8 * 24 + 200));
+      await ok(p, "gry_pepegochi_adopt('Fren II')", at(8 * 24 + 201));
+      for (let d = 0; d < 8; d++) await careAt(p, 8 * 24 + 202 + d * 24);
+      const rows = (await db.query('select milestone, life_id from games.pepegochi_milestones where user_id = $1 order by reached_at', [uid(p)])).rows;
+      assert.deepEqual(rows.map(r => r.milestone), ['first_adoption', 'froglet', 'adult']);
+      assert.equal(new Set(rows.map(r => r.life_id)).size, 1, 'all from the first life');
+    });
+
+    await t.test('M2-M4 a failing Passport hook keeps the care; the milestone waits and is delivered later', async () => {
+      const p = await player();
+      await db.exec(`create table if not exists games.test_hook_calls(user_id uuid, at timestamptz default clock_timestamp());
+        create or replace function games.pepegochi_passport_sync(u uuid) returns void language plpgsql volatile set search_path = '' as $$
+        begin
+          insert into games.test_hook_calls(user_id) values (u);
+          raise exception 'stamp storage is broken';
+        end $$;`);
+      try {
+        warnings.length = 0;
+        const s = await ok(p, "gry_pepegochi_adopt('Fren')");
+        assert.equal(s.adopt_result, 'adopted');
+        await careAt(p, 1);
+        const c = await careAt(p, 25);
+        assert.equal(c.pet.care_days, 2, 'care kept although the hook failed');
+        assert.ok(warnings.some(w => /pepegochi passport sync: stamp storage is broken/.test(w)));
+        assert.equal((await one('select count(*)::int n from games.test_hook_calls')).n, 0, 'the failed hook\'s own writes were undone');
+        const pending = (await db.query('select milestone from games.pepegochi_milestones where user_id = $1 and synced_at is null order by 1', [uid(p)])).rows;
+        assert.deepEqual(pending.map(r => r.milestone), ['first_adoption', 'froglet']);
+        // M4: running the migration again does not switch off a hook installed later
+        await db.exec(await readFile(new URL('../games/supabase/update_pepegochi_v2.sql', import.meta.url), 'utf8'));
+        await db.exec((await import('../scripts/pepegochi_sim.mjs')).VIRTUAL_CLOCK);
+        assert.match((await one("select prosrc from pg_proc where proname = 'pepegochi_passport_sync'")).prosrc, /stamp storage is broken/);
+        // M3: the hook is fixed (as PR C will do): the next accepted action delivers everything pending
+        await db.exec(`create or replace function games.pepegochi_passport_sync(u uuid) returns void language plpgsql volatile set search_path = '' as $$
+          begin
+            insert into games.test_hook_calls(user_id) values (u);
+            update games.pepegochi_milestones set synced_at = games.pepegochi_clock() where user_id = u and synced_at is null;
+          end $$;`);
+        const next = await careAt(p, 49);
+        assert.equal(next.action_result, 'accepted');
+        assert.equal((await one('select count(*)::int n from games.pepegochi_milestones where user_id = $1 and synced_at is null', [uid(p)])).n, 0);
+        const calls = (await one('select count(*)::int n from games.test_hook_calls where user_id = $1', [uid(p)])).n;
+        assert.equal(calls, 1);
+        await careAt(p, 73);
+        assert.equal((await one('select count(*)::int n from games.test_hook_calls where user_id = $1', [uid(p)])).n, calls,
+          'nothing pending: the hook is not called');
+      } finally {
+        await db.exec(`create or replace function games.pepegochi_passport_sync(u uuid) returns void language plpgsql volatile set search_path = '' as $$
+          begin return; end $$;`);
+      }
+    });
+
+    // ---------- H: migration ----------
+    await t.test('H1 running the migration again changes no data', async () => {
+      const before = (await one(`select md5(string_agg(l::text, '|' order by l.life_id)) v from games.pepegochi_lives l`)).v;
+      await db.exec(await readFile(new URL('../games/supabase/update_pepegochi_v2.sql', import.meta.url), 'utf8'));
+      await db.exec((await import('../scripts/pepegochi_sim.mjs')).VIRTUAL_CLOCK);
+      assert.equal((await one(`select md5(string_agg(l::text, '|' order by l.life_id)) v from games.pepegochi_lives l`)).v, before);
+    });
+
+    await t.test('H2 the migration refuses to run on top of a v1 table', async () => {
+      await db.exec('create table games.pepegochi_pets(user_id uuid primary key)');
+      await assert.rejects(db.exec(await readFile(new URL('../games/supabase/update_pepegochi_v2.sql', import.meta.url), 'utf8')), /PepeGochi v1/);
+      await db.exec('rollback');   // the file opened a transaction before the guard stopped it
+      await db.exec('drop table games.pepegochi_pets');
+    });
+
+    await t.test('H3 deleting an account removes its frogs and milestones', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      await careAt(p, 1);
+      await db.query('delete from auth.users where id = $1', [uid(p)]);
+      assert.equal(await rowText(p), '');
+    });
+  } finally {
+    for (const c of clients) await c.end().catch(() => {});
+    await admin.query('drop database ' + dbName + ' with (force)');
+    await admin.end();
+  }
+});
