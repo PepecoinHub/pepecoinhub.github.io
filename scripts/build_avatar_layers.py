@@ -132,10 +132,26 @@ def cut_backgrounds():
     return out
 
 
-def place(arr, w, cx, top=None, bottom=None, cy=None):
+def drop_inside(arr):
+    """Bucket hat: the sheet draws the dark underside of the back brim below the front brim line.
+    On a head that part is hidden behind the head, so everything from the first dark-brown pixel
+    down (the underside and its bottom outline) is cut away, column by column."""
+    a = arr.copy(); c = a[..., :3].astype(int)
+    brown = (a[..., 3] > 200) & (abs(c[..., 0] - 150) < 30) & (abs(c[..., 1] - 117) < 25) & (abs(c[..., 2] - 70) < 25)
+    brown[: a.shape[0] // 2] = False
+    brown = nd.binary_opening(brown, iterations=2)
+    for x in range(a.shape[1]):
+        ys = np.nonzero(brown[:, x])[0]
+        if len(ys):
+            a[ys[0]:, x, 3] = 0
+    return a
+
+
+def place(arr, w, cx, top=None, bottom=None, cy=None, sy=1.0):
+    # sy < 1 squashes the part vertically (a lower crown for the bucket hat)
     img = Image.fromarray(arr)
     s = (w * K) / img.width
-    im = img.resize((max(1, round(img.width * s)), max(1, round(img.height * s))), Image.LANCZOS)
+    im = img.resize((max(1, round(img.width * s)), max(1, round(img.height * s * sy))), Image.LANCZOS)
     x = round(tx(cx) - im.width / 2)
     if top is not None:
         y = round(ty(top))
@@ -184,7 +200,7 @@ HATS = [  # the first cell is the 'none' tile
     None,
     ('hat_pep_cap', {'w': 380, 'cx': 300, 'bottom': 182}),
     ('hat_beanie', {'w': 370, 'cx': 298, 'bottom': 188}),
-    ('hat_bucket', {'w': 410, 'cx': 298, 'bottom': 184}),
+    ('hat_bucket', {'w': 390, 'cx': 296, 'bottom': 176}),   # underside of the back brim cut away (drop_inside), owner 2026-11-07
     ('hat_hardhat', {'w': 400, 'cx': 298, 'bottom': 186}),
     ('hat_crown', {'w': 270, 'cx': 302, 'bottom': 174}),
     ('-hat_wizard', {'w': 340, 'cx': 262, 'bottom': 172}),   # removed 2026-11-07 (owner); '-' = cut but not written
@@ -194,10 +210,10 @@ CLOTHING = [('clothing_blue', 372), ('clothing_purple_hoodie', 356), ('clothing_
             ('clothing_suit', 368), ('clothing_shirt_tie', 370), ('clothing_camo', 368)]
 ACCESSORIES = [  # the first box is the 'none' tile
     None,
-    # glasses: lens centres on the eye-white centres of the eyes layers (about x 251/360, y 206 on the 512 layer)
-    ('accessory_shades', {'w': 314, 'cx': 330, 'cy': 192}),
-    ('accessory_round', {'w': 304, 'cx': 330, 'cy': 192}),
-    ('accessory_orange', {'w': 304, 'cx': 330, 'cy': 192}),
+    # glasses: centred on the eyes (eye whites about x 195-308 / 312-409, y 206 on the 512 layer), big enough to cover them
+    ('accessory_shades', {'w': 350, 'cx': 330, 'cy': 192}),
+    ('accessory_round', {'w': 340, 'cx': 330, 'cy': 192}),
+    ('accessory_orange', {'w': 340, 'cx': 330, 'cy': 192}),
     # the sheet draws them for the left side of a face: the cigarette body is mirrored (the smoke stays over
     # the lit end) and the pipe is mirrored whole, so the filter / mouthpiece sits in the mouth corner
     ('accessory_cigarette', {'w': 120, 'cx': 452, 'cy': 318, 'mirror': 'body'}),
@@ -300,6 +316,8 @@ def build():
             thumbs['hat_none'] = thumb(arr); continue
         if spec[0].startswith('-'):
             continue
+        if spec[0] == 'hat_bucket':
+            arr = drop_inside(arr)
         layers[spec[0]] = place(arr, **spec[1]); thumbs[spec[0]] = thumb(arr)
     clothes = cut_clothing(); assert len(clothes) == len(CLOTHING), len(clothes)
     for (lid, top), arr in zip(CLOTHING, clothes):
