@@ -81,8 +81,9 @@ These are the owner's working numbers from 2026-11-07, not final rules. They liv
 | `packing_h` | 120 | `packing`: "Your Fren is thinking of leaving" |
 | `departs_h` | 168 | the frog moves out |
 | `rescue_from_h` | 120 | caring again for a frog that reached this starts recovery |
-| `recovery_days` | 2 | later UTC days with care needed to end recovery |
+| `recovery_days` | 1 | later UTC days with care needed to end recovery (**owner decision, 2026-11-07**) |
 | `recovery_departs_h` | 72 | while recovering, the frog moves out after this long without care |
+| `recovery_min_gap_h` | 0 | off. Optional knob: hours between the check-up and the next-day visit (see below) |
 | `max_actions_per_utc_day` | 12 | accepted actions per UTC day (as v1) |
 | `min_gap_s` | 2 | seconds between two actions (as v1) |
 
@@ -104,33 +105,47 @@ Every need has its own clock. The clock starts when the need falls below 90. It 
 | ≥ 168 h | `departed` | read the letter, adopt a new egg |
 
 `recovering` (after a rescue from `packing`):
-- the frog needs care on **2 more UTC days** (not the rescue day);
-- each time within **72 h**;
+- the frog needs care on **1 later UTC day** (not the rescue day);
+- within **72 h** of the last care;
 - after that it is `healthy` again;
 - without it, the frog moves out with `departure_reason: 'recovery'`.
 
-Why this works: a single feed only resets hunger, so a frog fed once every 6 days still moves out on day 7 because nobody played with it. A full visit once every 6 days rescues it, but then the follow-up visits are missed. A player who comes back regularly keeps the frog, even with gaps. Every case below is played out by `scripts/pepegochi_sim.mjs` on the real SQL:
+`pet.recovery.counts_from` tells the game the earliest moment the next visit counts.
 
-| Visits | `recovery_days` = 2 | `recovery_days` = 1 |
+The rescue is not simplified. Feeding alone never rescues a frog: every overdue need has to be cared for, and the player has to come back on another day. Keeping a frog and earning the prestige stamps for good care (PR A2/D) stay two different challenges.
+
+Every case below is played out by `scripts/pepegochi_sim.mjs` on the real SQL and checked by `tests/pepegochi-sql.test.mjs` (R and W tests):
+
+| Visits | Result (1 recovery day) | With 2 recovery days |
 |---|---|---|
 | every day | stays, always healthy | stays |
 | every 4 days | stays, neglected in between | stays |
 | Friday + Saturday + Sunday | stays, packing and recovery every week | stays |
-| Saturday + Sunday | **moves out on day 16** | stays |
-| one feed every 6 days | moves out on day 7 | moves out on day 7 |
-| feeds daily, nothing else | moves out on day 7 | moves out on day 7 |
-| full visit every 6 days | moves out on day 9 | moves out on day 9 |
+| Saturday + Sunday, 18:00 UTC | **stays**, packing and recovery every week | moves out on day 16 |
+| Saturday 08:00 + Sunday 21:00 | stays | — |
+| Saturday 21:00 + Sunday 08:00 | stays | — |
+| Saturday 23:30 + Sunday 00:30 (across midnight) | stays (see the note) | — |
+| a random time every Saturday and Sunday, 12 weeks | stays | — |
+| weekends, but only feeding | moves out on day 7 | same |
+| a missed Saturday, Sunday at 12:00, no weekday visit | moves out on Wednesday (day 22, recovery) | — |
+| the same, plus a Monday visit | stays | — |
+| a missed Saturday, Sunday at 19:00 (over 7 days) | already moved out when the player arrives (day 20) | — |
+| one feed every 6 days | moves out on day 7 | same |
+| feeds daily, nothing else | moves out on day 7 | same |
+| full visit every 6 days | moves out on day 9 | same |
 | away 6 days, rescue, then daily | stays | stays |
-| away 6 days, rescue, away 4 days | moves out on day 13 | moves out on day 13 |
+| away 6 days, rescue, away 4 days | moves out on day 13 | same |
 | away 8 days | moves out on day 16; letter, new egg | same |
 
-The Saturday + Sunday row is the decision to make in playtests. With 2 recovery days, players who only play at the weekend lose their frog in the second week. With 1 recovery day, they keep it.
+**Missed Saturday.** Sunday to Sunday is the 7-day limit itself. A player who comes on Sunday a bit earlier than the week before can still rescue the frog, but then has 72 hours, until Wednesday, to come back once. A player who comes later than the week before finds the letter.
+
+**Across UTC midnight.** Days are UTC days, so a session on Saturday 23:30 and a short visit at 00:30 count as the check-up and the next day. With `recovery_min_gap_h` set to 8, the next-day visit counts only 8 hours after the check-up. Then that late-night pattern loses the frog, while Saturday 21:00 + Sunday 08:00 and random weekend hours still keep it. The knob is off (0) because it is not an approved rule. It can be tried in the simulator with `--rule recovery_min_gap_h=8`.
 
 ### What to tell players (the screen must say this before adoption)
 
 - "Look after every need at least once a week, or your Fren moves out."
 - "After 2 days without care your Fren feels neglected. After 5 days it starts packing."
-- "If it started packing, a full check-up calms it down, and it wants to see you on 2 more days."
+- "If it started packing, a full check-up calms it down, and it wants to see you again on another day."
 
 ## Milestones and the Fren Passport
 

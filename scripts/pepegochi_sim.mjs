@@ -188,7 +188,7 @@ function describe(sim, what, result, s) {
   return `  day ${String(sim.day()).padStart(2)}  ${fmt(sim.now)}  ${what.padEnd(16)} ${result.padEnd(22)} ${(p?.status ?? 'no frog').padEnd(10)} ${tail}`;
 }
 
-// ---------- built-in scenarios (start: Monday 18:00 UTC) ----------
+// ---------- built-in scenarios (start: Monday 18:00 UTC; day 5 = Saturday, day 6 = Sunday) ----------
 const repeatDays = async (s, days, pick, how = 'care') => {
   for (let d = 1; d <= days; d++) {
     if (!pick(d)) continue;
@@ -198,6 +198,29 @@ const repeatDays = async (s, days, pick, how = 'care') => {
   }
 };
 const after = async (s, day) => { s.goto(day, '18:30'); await s.state('check'); };
+
+// a small seeded random generator, so "random" scenarios are the same on every run
+export const rng = seed => () => {
+  seed = (seed + 0x6d2b79f5) | 0;
+  let x = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
+  return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+};
+const hhmm = m => `${p2(Math.floor(m / 60))}:${p2(m % 60)}`;
+
+// Weekly visits for a number of weeks. at(day) returns 'HH:MM' (UTC) or null for no visit that day.
+const weekly = async (s, weeks, at, how = 'care') => {
+  for (let d = 1; d < weeks * 7; d++) {
+    const when = at(d);
+    if (!when) continue;
+    for (const t of [].concat(when)) {
+      s.goto(d, t);
+      await s.visit(how);
+      if (s.last?.pet?.status === 'departed') return d;
+    }
+  }
+};
+const weekendAt = (sat, sun) => d => (d % 7 === 5 ? sat : d % 7 === 6 ? sun : null);
 
 export const SCENARIOS = {
   'daily': {
@@ -209,12 +232,61 @@ export const SCENARIOS = {
     run: async s => { await s.adopt('Fren'); await s.care(); await repeatDays(s, 60, d => d % 4 === 0); await after(s, 60); },
   },
   'weekend-fri-sun': {
-    about: 'Visits on Friday, Saturday and Sunday every week.',
+    about: 'Visits on Friday, Saturday and Sunday every week (18:00 UTC).',
     run: async s => { await s.adopt('Fren'); await s.care(); await repeatDays(s, 56, d => d % 7 >= 4); await after(s, 56); },
   },
   'weekend-sat-sun': {
-    about: 'Visits on Saturday and Sunday only.',
+    about: 'Visits on Saturday and Sunday only (18:00 UTC).',
     run: async s => { await s.adopt('Fren'); await s.care(); await repeatDays(s, 56, d => d % 7 >= 5); await after(s, 56); },
+  },
+  'weekend-morning-evening': {
+    about: 'Weekends only: Saturday 08:00, Sunday 21:00 UTC, 8 weeks.',
+    run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 8, weekendAt('08:00', '21:00')); await after(s, 56); },
+  },
+  'weekend-evening-morning': {
+    about: 'Weekends only: Saturday 21:00, Sunday 08:00 UTC, 8 weeks.',
+    run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 8, weekendAt('21:00', '08:00')); await after(s, 56); },
+  },
+  'weekend-across-midnight': {
+    about: 'Weekends only: Saturday 23:30 and Sunday 00:30 UTC (one late session split by midnight).',
+    run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 8, weekendAt('23:30', '00:30')); await after(s, 56); },
+  },
+  'weekend-random-hours': {
+    about: 'Weekends only, a different random time (UTC) every Saturday and Sunday, 12 weeks.',
+    run: async s => {
+      const r = rng(2026);
+      await s.adopt('Fren'); await s.care();
+      await weekly(s, 12, d => (d % 7 >= 5 ? hhmm(Math.floor(r() * 1440)) : null));
+      await after(s, 84);
+    },
+  },
+  'weekend-feed-only': {
+    about: 'Weekends only, but only feeds.',
+    run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 8, weekendAt('18:00', '18:00'), 'feed'); await after(s, 56); },
+  },
+  'weekend-missed-saturday': {
+    about: 'Weekends at 18:00; in week 3 Saturday is missed and Sunday comes at 12:00. No weekday visit.',
+    run: async s => {
+      await s.adopt('Fren'); await s.care();
+      await weekly(s, 8, d => (d === 19 ? null : d === 20 ? '12:00' : weekendAt('18:00', '18:00')(d)));
+      await after(s, 56);
+    },
+  },
+  'weekend-missed-saturday-monday': {
+    about: 'Same, but the player also comes back on Monday of week 4 at 18:00.',
+    run: async s => {
+      await s.adopt('Fren'); await s.care();
+      await weekly(s, 8, d => (d === 19 ? null : d === 20 ? '12:00' : d === 21 ? '18:00' : weekendAt('18:00', '18:00')(d)));
+      await after(s, 56);
+    },
+  },
+  'weekend-missed-saturday-late': {
+    about: 'Same as missed Saturday, but Sunday comes at 19:00: more than 7 days after the last visit.',
+    run: async s => {
+      await s.adopt('Fren'); await s.care();
+      await weekly(s, 8, d => (d === 19 ? null : d === 20 ? '19:00' : weekendAt('18:00', '18:00')(d)));
+      await after(s, 56);
+    },
   },
   'feed-every-6-days': {
     about: 'One feed every 6 days, nothing else (the owner\'s example).',

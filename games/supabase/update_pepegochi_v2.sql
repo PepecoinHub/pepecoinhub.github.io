@@ -73,6 +73,7 @@ create table if not exists games.pepegochi_lives (
   rescue_pending     boolean not null default false,
   recovery_days_left smallint not null default 0 check (recovery_days_left between 0 and 30),
   recovery_day_utc   date,
+  recovery_since     timestamptz,   -- when the last recovery step counted (check-up or follow-up)
   -- accepted actions per UTC day, kept in this row (no request log)
   action_day_utc date,
   actions_today  integer not null default 0 check (actions_today between 0 and 1000),
@@ -135,8 +136,11 @@ returns jsonb language sql stable set search_path = '' as $$
     'packing_h', 120,             -- ... packing: "Your Fren is thinking of leaving"
     'departs_h', 168,             -- ... the frog moves out
     'rescue_from_h', 120,         -- caring again for a frog that reached this starts recovery
-    'recovery_days', 2,           -- later UTC days with care needed to finish recovery
+    'recovery_days', 1,           -- later UTC days with care needed to finish recovery (owner: 1, so
+                                  -- Saturday + Sunday players can keep their frog)
     'recovery_departs_h', 72,     -- while recovering, the frog moves out after this long without care
+    'recovery_min_gap_h', 0,      -- off. Playtest knob: hours between the check-up and the next-day visit,
+                                  -- so one session across UTC midnight cannot count as two days
     'max_actions_per_utc_day', 12,
     'min_gap_s', 2,
     'cooldown_min', jsonb_build_object('feed', 30, 'clean', 20, 'play', 45, 'rest', 60),
@@ -148,6 +152,10 @@ returns jsonb language sql stable set search_path = '' as $$
 $$;
 
 -- ---------- derived state (no writes) ----------
+-- Time arithmetic is exact on purpose (docs/games/js/pepegochi-model.mjs must give the same answers):
+-- decay multiplies before its single division, and computed moments are rounded to whole microseconds.
+-- Never add day-sized intervals: in a session time zone with daylight saving time they move by an hour.
+--
 -- When a need starts waiting for care, after an accepted action at time t left it at value v:
 -- at/above the threshold it is fine until linear decay takes it below; cared for just now it waits
 -- from t; otherwise it keeps waiting since it was last fine.
@@ -156,7 +164,8 @@ create or replace function games.pepegochi_due(
 returns timestamptz language sql immutable set search_path = '' as $$
   select case
     when v >= threshold then
-      case when per_day > 0 then t + ((v - threshold) / per_day) * interval '1 day'
+      case when per_day > 0
+           then t + round((v - threshold) * 86400000000 / per_day)::bigint * interval '1 microsecond'
            else 'infinity'::timestamptz end
     when acted then t
     else least(prev, t)
@@ -177,7 +186,7 @@ declare
   play_at  timestamptz := coalesce(l.mood_due_at, l.adopted_at);
   rest_at  timestamptz := coalesce(l.energy_due_at, l.adopted_at);
   by_recovery timestamptz;
-  hours numeric;
+  secs numeric;
   age_h numeric;
   idle_h numeric;
 begin
@@ -203,11 +212,11 @@ begin
   end if;
 
   -- needs fall linearly until the frog leaves, never below 0
-  hours := greatest(0::numeric, extract(epoch from (least(t, departs_at) - l.needs_at)) / 3600);
-  hunger  := greatest(0::numeric, l.hunger  - hours * (r#>>'{decay_per_day,hunger}')::numeric / 24);
-  hygiene := greatest(0::numeric, l.hygiene - hours * (r#>>'{decay_per_day,hygiene}')::numeric / 24);
-  mood    := greatest(0::numeric, l.mood    - hours * (r#>>'{decay_per_day,mood}')::numeric / 24);
-  energy  := greatest(0::numeric, l.energy  - hours * (r#>>'{decay_per_day,energy}')::numeric / 24);
+  secs := greatest(0::numeric, extract(epoch from (least(t, departs_at) - l.needs_at)));
+  hunger  := greatest(0::numeric, l.hunger  - secs * (r#>>'{decay_per_day,hunger}')::numeric / 86400);
+  hygiene := greatest(0::numeric, l.hygiene - secs * (r#>>'{decay_per_day,hygiene}')::numeric / 86400);
+  mood    := greatest(0::numeric, l.mood    - secs * (r#>>'{decay_per_day,mood}')::numeric / 86400);
+  energy  := greatest(0::numeric, l.energy  - secs * (r#>>'{decay_per_day,energy}')::numeric / 86400);
 
   age_h := extract(epoch from (t - oldest_at)) / 3600;
   idle_h := extract(epoch from (t - care_at)) / 3600;
@@ -302,7 +311,10 @@ begin
       'rescue_starts_recovery', l.recovery_days_left = 0
                                 and (l.rescue_pending or age_h >= (r->>'rescue_from_h')::numeric),
       'recovery', case when l.recovery_days_left > 0 then
-                    jsonb_build_object('days_left', l.recovery_days_left, 'last_day_utc', l.recovery_day_utc) end,
+                    jsonb_build_object('days_left', l.recovery_days_left, 'last_day_utc', l.recovery_day_utc,
+                      -- the earliest moment the next visit counts: a later UTC day (and the gap, if set)
+                      'counts_from', greatest(((l.recovery_day_utc + 1)::timestamp at time zone 'UTC'),
+                                              l.recovery_since + (r->>'recovery_min_gap_h')::numeric * interval '1 hour')) end,
       'departs_at', e.departs_at,
       'departure_reason', e.departure_reason,
       'cooldowns', jsonb_build_object(
@@ -513,6 +525,7 @@ declare
   rescue boolean;
   rec_left smallint;
   rec_day date;
+  rec_since timestamptz;
 begin
   if u is null or games.discord_identity(u) is null then
     raise exception 'Discord sign-in required' using errcode = '42501';
@@ -592,11 +605,15 @@ begin
   rescue := l.rescue_pending;
   rec_left := l.recovery_days_left;
   rec_day := l.recovery_day_utc;
+  rec_since := l.recovery_since;
   if rec_left > 0 then
-    -- recovering: each later UTC day with care counts once
-    if rec_day is null or day_utc > rec_day then
+    -- recovering: each later UTC day with care counts once (and, if set, only after the minimum gap)
+    if (rec_day is null or day_utc > rec_day)
+       and (rec_since is null
+            or t >= rec_since + (r->>'recovery_min_gap_h')::numeric * interval '1 hour') then
       rec_left := rec_left - 1;
       rec_day := day_utc;
+      rec_since := t;
     end if;
   else
     if was_age_h >= (r->>'rescue_from_h')::numeric then rescue := true; end if;
@@ -605,6 +622,7 @@ begin
       rescue := false;
       rec_left := (r->>'recovery_days')::smallint;
       rec_day := day_utc;
+      rec_since := t;
     end if;
   end if;
 
@@ -626,7 +644,8 @@ begin
     last_care_day_utc = day_utc,
     rescue_pending = rescue,
     recovery_days_left = rec_left,
-    recovery_day_utc = rec_day
+    recovery_day_utc = rec_day,
+    recovery_since = rec_since
   where life_id = l.life_id
   returning * into strict l;
 

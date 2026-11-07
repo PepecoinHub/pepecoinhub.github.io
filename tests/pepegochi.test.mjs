@@ -61,6 +61,15 @@ test('one active frog per account, enforced by the database', () => {
   }
 });
 
+test('time arithmetic is exact and never uses day-sized intervals', () => {
+  // day intervals move by an hour across daylight saving time in a non-UTC session
+  assert.doesNotMatch(code, /interval '\d* ?days?'/);
+  // decay: one multiplication, then one division
+  for (const need of ['hunger', 'hygiene', 'mood', 'energy'])
+    assert.match(fnBody('games.pepegochi_eval'), new RegExp(`l\\.${need}\\s+- secs \\* \\(r#>>'\\{decay_per_day,${need}\\}'\\)::numeric / 86400`));
+  assert.match(fnBody('games.pepegochi_due'), /round\(\(v - threshold\) \* 86400000000 \/ per_day\)::bigint \* interval '1 microsecond'/);
+});
+
 test('the production clock is the server clock; only tests and the simulator replace it', () => {
   assert.equal(fnBody('games.pepegochi_clock').trim(), 'select clock_timestamp()');
   assert.doesNotMatch(code, /pepegochi\.sim_now|current_setting/);
@@ -101,8 +110,9 @@ test('v2 starts from a clean schema and refuses to run over v1', () => {
 test('playtest rules are marked as such and documented with the same numbers', () => {
   const rules = fnBody('games.pepegochi_rules');
   assert.match(rules, /'playtest', true/);
+  // recovery_days = 1 is the owner's decision (2026-11-07): Saturday + Sunday players keep their frog
   const want = { meaningful_below: 90, neglected_h: 48, packing_h: 120, departs_h: 168, rescue_from_h: 120,
-    recovery_days: 2, recovery_departs_h: 72, max_actions_per_utc_day: 12, min_gap_s: 2 };
+    recovery_days: 1, recovery_departs_h: 72, recovery_min_gap_h: 0, max_actions_per_utc_day: 12, min_gap_s: 2 };
   for (const [k, v] of Object.entries(want)) {
     assert.match(rules, new RegExp(`'${k}', ${v}\\b`), k);
     assert.match(api, new RegExp('`' + k + '`\\s*\\|\\s*' + v + '\\b'), 'API doc: ' + k);
