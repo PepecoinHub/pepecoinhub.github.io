@@ -200,7 +200,7 @@ export class BetaGame {
     const limitReached = p.action_budget.accepted_today >= p.action_budget.max_per_utc_day;
     v.pet = {
       title: `${p.name} · ${p.stage} · day ${p.life_day}${p.generation > 1 ? ` · fren #${p.generation}` : ''}`,
-      status: p.status,
+      status: p.status, stage: p.stage,
       statusText: COPY[p.status] || p.status,
       needs: KINDS.map(k => {
         const n = NEED_OF[k], val = p.needs[n];
