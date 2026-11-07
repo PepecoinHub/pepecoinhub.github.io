@@ -45,6 +45,16 @@ Wszystkie poprzednie wysokiej jakości źródła i archiwa v2/v3 znajdują się 
 4. Przygotować czysty pokój jako bazowe tło oraz 6 niezależnych sprite'ów przedmiotów, w tym telewizor i lampę. Obecne tła są spłaszczonymi referencjami.
 5. Po backendzie A1/A2 i QA można przygotować osobny mały Draft PR na integrację obrazu/UI. Bez merge'a, deploymentu i SQL na PH-games do zgody właściciela.
 
+
+## Nowy etap: Room Architecture v1 (2026-11-07)
+
+- **[ROOM_ARCHITECTURE_V1.md](ROOM_ARCHITECTURE_V1.md)** — warstwy, 11 slotów, kategorie przedmiotów, zasady właściciela, magazynu, nagród z innych gier, bezpieczna wyprowadzka i PR-y wdrożeniowe.
+- **[room_manifest_v1.json](demo/room_manifest_v1.json)** — maszynowo czytelne 11 slotów w układzie 640×400 i katalog 10 przykładowych obiektów. Wszystkie assety nadal robocze.
+- **[room_editor_v1.html](demo/room_editor_v1.html)** — samodzielny, interaktywny podgląd lokalny, otwierany po pobraniu z GitHuba, bez połączenia z Supabase. Kliknij przedmiot w kolekcji i pasujące miejsce w pokoju. Można testowo otrzymać dyskietkę, symulować wyprowadzkę, odczytać GOODBYE.TXT i adoptować kolejną żabę.
+- [room_editor_browser_qa_v1.json](demo/room_editor_browser_qa_v1.json) — test Chromium 1280/390/360 px: przenoszenie, testowy upominek, wyprowadzka, list, adopcja, brak overflow i JS errors.
+
+**Zasada:** własność konta ≠ umiejscowienie w pokoju ≠ chwilowo schowany rekwizyt po wyprowadzce. A1/A2 backend są rozwijane w draft PR #218/#221; nie zmieniać ich logiki opieki przy projektowaniu pokoju. Demo nie przyznaje realnych przedmiotów i nie zapisuje danych na serwerze. Księżycowa skała pozostaje planowaną nagrodą dopóki jej źródło nie będzie wiarygodnie weryfikowane po stronie serwera.
+
 ## Co dalej
 
 - Warstwowa grafika pokoju + rekwizyty, w tym brak po zabranym obiekcie.
