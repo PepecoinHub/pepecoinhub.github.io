@@ -1040,7 +1040,7 @@ footer.foot a { color: #edf3e3; }
 @keyframes pager-scroll { to { transform: translateX(-50%); } }
 @keyframes pager-led { 50% { opacity: .25; } }
 
-.icons img[src$="shop-bag.webp"], .icons img[src$="pep-tv-ads.webp"], .icons img[src$="games-folder.webp"] { object-fit: contain; background: none; box-shadow: none; border: 0; border-radius: 0; }
+.icons img[src$="shop-bag.webp"], .icons img[src$="pep-tv-ads.webp"], .icons img[src$="games-folder.webp"], .icons img[src$="wp-folder.webp"], .icons img[src$="internet.webp"] { object-fit: contain; background: none; box-shadow: none; border: 0; border-radius: 0; }
 
 /* ---------- PEP-TV Ads: late-night infomercials in a TV window ---------- */
 .ptv { position: relative; overflow: hidden; background: #1438a8; color: #fff; font-family: Impact, "Arial Narrow Bold", "Arial Black", sans-serif; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); }

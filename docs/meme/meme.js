@@ -748,7 +748,7 @@
       ['logon', [['#logon', 'Log On', 'gif-085-still'], ['#find', 'Find', 'search']]],
       ['play', [['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
         ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads']]],
-      ['pond', [['./', 'My Pond', 'pep-logo'], ['#shop', 'Shop', 'shop-bag'], ['#mail', 'Write a letter', 'frog-mail']]],
+      ['pond', [['./', 'Internet', 'internet'], ['#shop', 'Shop', 'shop-bag'], ['#mail', 'Write a letter', 'frog-mail']]],
       // the community: our subreddit and the official Pepecoin account (the classic bird), next to NERDS ONLY above the taskbar
       ['nerds', [['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#reddit', 'r/pepecoin', 'reddit'], ['#twitter', 'Twitter', 'twitter-bird']]],
       ['bin', [['#bin', 'Recycle Bin', 'recycle-bin']]]
@@ -1030,7 +1030,7 @@
   if (mainEl && PAGE === 'index') (function () {
     var ctas = document.querySelector('.ctas'); if (!ctas) return;
     var card = el('div', { class: 'today-pond', role: 'region', 'aria-label': 'Today in the pond' },
-      '<img src="img/wp-pepe.webp" alt="" width="64" height="60"><div><b>Today in the pond: Where\u2019s Pepe?</b>' +
+      '<img src="img/wp-pepe.webp" alt="" width="64" height="60"><div><b>Today in the pond: Pepe Guesser</b>' +
       '<span class="tp-line">A new photo every day. Find Pepe on the map in 2 minutes and get some free PEP.</span><span class="tp-stats"></span></div>' +
       '<button type="button" class="btn go tp-play">Play today\u2019s photo \u2192</button>');
     ctas.parentNode.insertBefore(card, ctas.nextSibling);
@@ -2474,7 +2474,7 @@
     'find the place on the map. Fast and close = more points.',
     '',
     '== HOW TO PLAY ==',
-    '1. Open WheresPepe.exe and press Start.',
+    '1. Open PepeGuesser.exe and press Start.',
     '   No account needed: a quick bot check, and you play',
     '   as a guest (or log on with Discord first).',
     '2. The photo shows up and the 2-minute clock starts.',
@@ -2543,9 +2543,9 @@
   }
   function wpFolder() {
     openApp('wp-folder', "C:\\Pond\\Pepe Guesser", 'wp-folder', function (A) {
-      var F = [['WheresPepe.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme]];
+      var F = [['PepeGuesser.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme]];
       A.body.innerHTML = '<ul class="folder">' + F.map(function (f, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(f[1]) + '" alt="" width="40" height="40"><span>' + f[0] + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then double-click WheresPepe.exe.</p>';
+        '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then double-click PepeGuesser.exe.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { F[+b.getAttribute('data-i')][2](); };
         b.addEventListener('dblclick', go);
