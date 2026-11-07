@@ -704,7 +704,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
       return { good: st.pet?.good_days ?? 0, goalDay: reached ? reached.day : null, left, st, s };
     };
 
-    await t.test('G1 the rule: 2 different kinds, every need >= 50 after the action, at most one per UTC day', async () => {
+    await t.test('G1 the rule: 2 different kinds, every need >= 40 after the action, at most one per UTC day', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");                    // needs 75/80/80/75
       const feed = await ok(p, "gry_pepegochi_action('feed')", at(0));
