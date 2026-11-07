@@ -1,0 +1,223 @@
+{
+  "schema_version": 2,
+  "coordinate_system": "512x512 shared canvas; every layer is a 512x512 transparent WebP with its part already in place, so layers stack with no per-part offsets. Built by scripts/build_avatar_layers.py from the owner's part sheets in games/fren-avatar/source-v3/ (head and shoulders from games/fren-avatar/source/base.webp). Each option also has a small picture of the part itself in avatar-assets/thumbs/ for the maker rows.",
+  "palette": "Owner's part sheets (2026-11-06): bright Pepe green, thick black outlines, flat fills; pixel-art backgrounds.",
+  "layers_order": [
+    "bg",
+    "base",
+    "clothing",
+    "mouth",
+    "eyes",
+    "hat",
+    "accessory",
+    "special"
+  ],
+  "defaults": {
+    "bg": "bg_sky",
+    "base": "base_frog",
+    "clothing": "clothing_blue",
+    "mouth": "mouth_flat",
+    "eyes": "eyes_sleepy",
+    "hat": "hat_none",
+    "accessory": "accessory_none",
+    "special": "special_none"
+  },
+  "unlock_note": "Options with an unlock key are rewards for server-verified stamps. The maker shows them with a lock until the player has the stamp, and the save RPC checks the stamp again. Sunset background: Adept (planned). Detective hat and jacket: Detective Fren. Hard hat: Miner Fren. Headphones: Gamer Fren (planned). Explorer hat and Explorer Pepe: Scout Fren.",
+  "options": {
+    "bg": [
+      {
+        "id": "bg_sky",
+        "label": "Blue sky"
+      },
+      {
+        "id": "bg_night",
+        "label": "Moonlit night"
+      },
+      {
+        "id": "bg_city",
+        "label": "City lights"
+      },
+      {
+        "id": "bg_snow",
+        "label": "Snowy peaks"
+      },
+      {
+        "id": "bg_forest",
+        "label": "Forest pond"
+      },
+      {
+        "id": "bg_sunset",
+        "label": "Sunset",
+        "unlock": "yeet_adept"
+      }
+    ],
+    "mouth": [
+      {
+        "id": "mouth_flat",
+        "label": "Classic"
+      },
+      {
+        "id": "mouth_smile",
+        "label": "Smile"
+      },
+      {
+        "id": "mouth_open",
+        "label": "Laugh"
+      },
+      {
+        "id": "mouth_tongue",
+        "label": "Tongue out"
+      },
+      {
+        "id": "mouth_teeth",
+        "label": "Gritted teeth"
+      },
+      {
+        "id": "mouth_smirk",
+        "label": "Smirk"
+      }
+    ],
+    "eyes": [
+      {
+        "id": "eyes_classic",
+        "label": "Big eyes"
+      },
+      {
+        "id": "eyes_sleepy",
+        "label": "Sleepy"
+      },
+      {
+        "id": "eyes_angry",
+        "label": "Angry"
+      },
+      {
+        "id": "eyes_bloodshot",
+        "label": "Bloodshot"
+      },
+      {
+        "id": "eyes_3d",
+        "label": "3D glasses"
+      },
+      {
+        "id": "eyes_hypno",
+        "label": "Hypnotized"
+      }
+    ],
+    "hat": [
+      {
+        "id": "hat_none",
+        "label": "None"
+      },
+      {
+        "id": "hat_pep_cap",
+        "label": "PEP cap"
+      },
+      {
+        "id": "hat_beanie",
+        "label": "Beanie"
+      },
+      {
+        "id": "hat_bucket",
+        "label": "Bucket hat"
+      },
+      {
+        "id": "hat_crown",
+        "label": "Crown"
+      },
+      {
+        "id": "hat_wizard",
+        "label": "Wizard hat"
+      },
+      {
+        "id": "hat_hardhat",
+        "label": "Hard hat",
+        "unlock": "miner_fren"
+      },
+      {
+        "id": "hat_detective",
+        "label": "Detective hat",
+        "unlock": "detective_fren"
+      },
+      {
+        "id": "hat_explorer",
+        "label": "Explorer hat (14 days)",
+        "unlock": "scout_fren"
+      }
+    ],
+    "clothing": [
+      {
+        "id": "clothing_blue",
+        "label": "Blue tee"
+      },
+      {
+        "id": "clothing_purple_hoodie",
+        "label": "Purple hoodie"
+      },
+      {
+        "id": "clothing_black_hoodie",
+        "label": "Black hoodie"
+      },
+      {
+        "id": "clothing_shirt_tie",
+        "label": "Shirt and tie"
+      },
+      {
+        "id": "clothing_camo",
+        "label": "Camo jacket"
+      },
+      {
+        "id": "clothing_suit",
+        "label": "Detective jacket",
+        "unlock": "detective_fren"
+      }
+    ],
+    "accessory": [
+      {
+        "id": "accessory_none",
+        "label": "None"
+      },
+      {
+        "id": "accessory_shades",
+        "label": "Pixel shades"
+      },
+      {
+        "id": "accessory_round",
+        "label": "Round glasses"
+      },
+      {
+        "id": "accessory_orange",
+        "label": "Orange glasses"
+      },
+      {
+        "id": "accessory_cigarette",
+        "label": "Cigarette"
+      },
+      {
+        "id": "accessory_pipe",
+        "label": "Pipe"
+      },
+      {
+        "id": "accessory_headphones",
+        "label": "Headphones",
+        "unlock": "gamer_fren"
+      }
+    ],
+    "special": [
+      {
+        "id": "special_none",
+        "label": "None"
+      },
+      {
+        "id": "special_explorer",
+        "label": "Explorer Pepe (Pepe Guesser)",
+        "unlock": "scout_fren"
+      }
+    ]
+  },
+  "paths": {
+    "base": "avatar-assets/layers/base_frog.webp",
+    "layer_template": "avatar-assets/layers/{id}.webp",
+    "thumb_template": "avatar-assets/thumbs/{id}.webp"
+  },
+  "special_note": "A special avatar is a whole drawn character by Lily for a big milestone. When one is picked it replaces every part layer except the background (bg)."
+}

@@ -1,0 +1,216 @@
+/* Fren Passport: PondOS 98 window content only. The open booklet is the owner's hand-drawn art
+   (passport-assets/, cut by scripts/build_passport_art.py); the real data sits on top of it.
+   All page positions are percentages of one 360x528 page, taken from that script's output. */
+.passport { font: 12px/1.45 var(--f-chrome), Tahoma, sans-serif; color: var(--ink); min-width: 0; }
+.passport h3 { font: bold 13px var(--f-chrome),Tahoma,sans-serif; margin: 0; }
+.passport-muted, .pp-muted { color: var(--muted); margin: 2px 0; }
+.passport-note { margin: 0; padding: 9px; border: 1px dotted var(--chrome-lo); }
+.passport .tabpane[hidden] { display: none; }
+
+/* Fren windows (Passport, Avatar Maker) are taller than most apps. When the window scrolls, its title bar
+   (move / minimize / close) stays at the top, and the window ends above the taskbar instead of behind it. */
+.fren-win > .win > .win-bar { position: sticky; top: 0; z-index: 5; }
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+  .fren-win .fa-side { position: sticky; top: 34px; }
+  .fren-win:not(.app-full):not(.is-max):not(.is-sized) { max-height: calc(100vh - var(--app-top, 50px) - 44px); max-height: calc(100dvh - var(--app-top, 50px) - 44px); }
+}
+
+/* sprites: one row of tiles each */
+.pp-art { display: inline-block; flex: none; background-repeat: no-repeat; background-position-y: 0; }
+.pp-art-stamp { width: 46px; aspect-ratio: 69 / 75; background-image: url(passport-assets/stamps.webp?v=20261106pp1); background-size: 1600% 100%; }
+/* Lily's stamps: one row of 15 tiles drawn at 2x (scripts/build_lily_stamps.mjs) */
+.pp-art-stamp.is-lily { background-image: url(passport-assets/stamps-lily.webp?v=20261106lily1); background-size: 1500% 100%; }
+.pp-art-icon { width: 24px; height: 24px; background-image: url(passport-assets/icons.webp?v=20261106pp1); background-size: 1200% 100%; }
+
+/* Overview: booklet + side panels */
+.pp-over { display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 8px; align-items: start; }
+.pp-book { display: grid; grid-template-columns: 1fr 1fr; min-width: 0; filter: drop-shadow(2px 3px 0 rgba(0,0,0,.35)); }
+.pp-page { position: relative; container-type: inline-size; aspect-ratio: 360 / 528; min-width: 0; }
+.pp-page-art { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; margin: 0; z-index: 1; pointer-events: none; user-select: none; }
+
+/* left page: the avatar sits UNDER the page art and shows through its transparent photo window */
+.pp-photo { position: absolute; z-index: 0; left: 8.402%; top: 34.47%; width: 39.427%; height: 36.171%; padding: 0; border: 0; overflow: hidden;
+  background: #7eb7dc; cursor: pointer; clip-path: polygon(0 4.213%, 94.124% 0, 100% 95.698%, 2.94% 100%); }
+.pp-photo:disabled { cursor: default; }
+.pp-photo .fa-stack { position: absolute; top: 0; left: 50%; height: 100%; width: auto; aspect-ratio: 1; transform: translateX(-50%); }
+.pp-photo > img { position: absolute; inset: 0; margin: auto; width: 60%; height: auto; }
+.pp-photo:focus-visible { outline: none; }
+.pp-left:has(.pp-photo:focus-visible) .pp-page-art { filter: drop-shadow(0 0 2px #1f7a40) drop-shadow(0 0 2px #1f7a40); }
+.pp-idcard { position: absolute; z-index: 2; left: 50.4%; top: 35.606%; width: 48.2%; height: 27.273%; margin: 0;
+  display: grid; grid-template-rows: repeat(4, 1fr); font-family: Tahoma, Verdana, var(--f-chrome), sans-serif; color: #241c12; }
+.pp-idrow { display: flex; align-items: center; justify-content: space-between; gap: 1.2cqw; min-width: 0; padding: 0 .4cqw;
+  background: linear-gradient(90deg, rgba(60,45,30,.45) 50%, transparent 50%) left bottom / 6px 1px repeat-x; }
+.pp-idrow dt { flex: none; font-size: 3.15cqw; font-weight: 700; }
+.pp-idrow dd { margin: 0; min-width: 0; font-size: 3.4cqw; font-weight: 700; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-idrow.is-id dd { padding: .2em .5em; background: #b8d46a; border-radius: 2px; letter-spacing: .02em; }
+.pp-idrow.is-status dd { padding: .25em .6em; color: #fff; background: #2e8b3e; border-radius: 3px; font-size: 3.4cqw;
+  box-shadow: inset 1px 1px 0 #7fd18a, inset -1px -1px 0 #145a22, 0 0 0 1px #0f3d18; }
+
+/* right page: 5 x 4 stamp slots over the erased grid; BALI is printed on the page art */
+.pp-grid { position: absolute; z-index: 2; left: .833%; top: 14.962%; width: 94.167%; height: 58.333%;
+  display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr); place-items: center; }
+.pp-slot { width: 100%; height: 100%; display: grid; place-items: center; }
+.pp-slot .pp-art-stamp { width: 92%; }
+.pp-slot.is-earned .pp-art-stamp { filter: drop-shadow(1px 1px 0 rgba(60,40,20,.35)); }
+.pp-bali { position: absolute; z-index: 2; left: 7.2%; top: 74.8%; width: 80%; height: 23%; }
+
+/* side panels (dark green, like the mockup) */
+.pp-side { display: grid; gap: 8px; min-width: 0; }
+.pp-panel { min-width: 0; padding: 0 0 6px; color: #eef6e8; background: #173d27;
+  box-shadow: inset 1px 1px 0 #b8c0b8, inset -1px -1px 0 #3c443c, inset 2px 2px 0 #1a221c, inset -2px -2px 0 #8c948c; }
+.pp-panel-h { display: flex; align-items: center; gap: 6px; margin: 0 0 4px !important; padding: 4px 8px; color: #fff;
+  background: linear-gradient(90deg, var(--title), var(--title-2)); box-shadow: inset 0 0 0 2px #173d27; }
+.pp-panel-h.is-blue { background: linear-gradient(90deg, #0a2a8a, #2650c8); }
+.pp-jlist { margin: 0; padding: 0 8px; }
+.pp-jrow { display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 6px; padding: 3px 0; border-bottom: 1px solid #4b6a55; }
+.pp-jrow:last-child { border-bottom: 0; }
+.pp-jrow dt { font-size: 12px; }
+.pp-jrow dd { margin: 0; font-weight: 700; font-size: 13px; }
+.pp-mile-body { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: start; padding: 2px 8px; }
+.pp-mile-body .pp-art-icon { width: 36px; height: 36px; }
+.pp-mile-title { display: grid; gap: 1px; margin: 0; }
+.pp-mile-n { color: #ffe27a; font-size: 11.5px; font-weight: 700; }
+.pp-mile-desc { margin: 2px 0 0; color: #d5e6d0; font-size: 11.5px; }
+.pp-bar { height: 12px; margin: 6px 8px 0; background: #3f4a44; border-radius: 6px; box-shadow: inset 1px 1px 0 #1d241f, 0 0 0 1px #9aa49c; overflow: hidden; }
+.pp-bar > span { display: block; height: 100%; background: linear-gradient(#7bff6a, #22c71c); border-radius: 6px; }
+.pp-make { display: block; width: 100%; padding: 6px 10px; font-size: 12px; }
+
+/* tabs with icons */
+.pp-tabs { margin-top: 8px; flex-wrap: wrap; }
+.pp-tabs [role=tab] { display: inline-flex; align-items: center; gap: 6px; }
+.pp-tabs [role=tab] .pp-art-icon { width: 20px; height: 20px; }
+.pp-pane { min-width: 0; }
+
+/* Overview: recent stamps strip */
+.pp-recent-list { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 2px 8px; list-style: none; text-align: center; }
+.pp-recent-list li { display: grid; justify-items: center; gap: 2px; min-width: 0; }
+.pp-recent-list b { font-size: 11px; line-height: 1.15; overflow-wrap: anywhere; }
+.pp-recent-list small { font-size: 10px; color: #d5e6d0; }
+.pp-recent-list .is-locked { opacity: .7; }
+
+/* Achievements / Collection lists */
+.pp-list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; max-height: min(60vh, 520px); overflow: auto; }
+.pp-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 4px 6px; background: var(--pane);
+  border: 1px solid var(--chrome-lo); }
+.pp-row .pp-art-stamp { width: 34px; }
+.pp-row b { display: block; }
+.pp-row small { display: block; color: var(--muted); }
+.pp-panel .pp-row { color: var(--ink); }
+.pp-tag { padding: 1px 6px; font-size: 10.5px; font-weight: 700; white-space: nowrap; color: var(--muted); border: 1px solid var(--chrome-lo); background: var(--chrome); }
+.pp-tag.is-on { color: #fff; background: #2e8b3e; border-color: #145a22; }
+.pp-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.pp-cols .pp-panel { padding: 0 6px 6px; }
+
+/* Stamps album */
+.pp-album { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; max-height: min(60vh, 520px); overflow: auto; padding: 2px; }
+.pp-stamp { display: grid; justify-items: center; gap: 2px; padding: 6px 4px; text-align: center; background: var(--pane); border: 1px solid var(--chrome-lo); }
+.pp-stamp .pp-art-stamp { width: 52px; }
+.pp-stamp-name { font-weight: 700; font-size: 10.5px; line-height: 1.1; overflow-wrap: anywhere; }
+.pp-stamp-sub { display: block; font-size: 9.5px; color: var(--muted); }
+.pp-stamp.is-earned .pp-stamp-sub { color: #2e8b3e; font-weight: 700; }
+.pp-stamp.is-locked { opacity: .8; }
+.pp-mythic { display: grid; gap: 2px; margin-top: 8px; padding: 8px 10px; background: var(--pane); border: 2px dashed #a8452e; }
+.pp-mythic-name { font: bold 16px var(--f-chrome),Tahoma,sans-serif; letter-spacing: 2px; color: #a8452e; }
+.pp-mythic-sub { font-weight: 700; }
+
+/* Stats */
+.pp-stats { display: grid; gap: 0; margin: 0; max-width: 460px; }
+.pp-stats > div { display: flex; justify-content: space-between; gap: 12px; padding: 4px 6px; border-bottom: 1px solid var(--chrome-lo); }
+.pp-stats dd { margin: 0; font-weight: 700; }
+
+/* narrower windows: side panels go under the booklet */
+@media (max-width: 860px) {
+  .pp-over { grid-template-columns: minmax(0, 1fr); }
+  .pp-side { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+}
+/* phone: one page per row, so the page text stays readable */
+@media (max-width: 600px) {
+  .pp-book { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .pp-recent-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .pp-cols { grid-template-columns: minmax(0, 1fr); }
+  .pp-tabs [role=tab] { padding: 5px 7px 4px; }
+  .pp-tabs [role=tab] span { font-size: 11px; }
+}
+
+/* Create Your Fren (Avatar Maker), laid out like the owner's mockup: title band, taped photo frame,
+   one dark-green row per part with arrow buttons, big Win98 buttons. Every Fren is stacked from aligned
+   512x512 layers; the rows show the part pictures from avatar-assets/thumbs/. */
+.fa-stack { position: relative; display: block; overflow: hidden; aspect-ratio: 1; }
+/* a special avatar covers every part layer except the background */
+.fa-stack.is-special img:not([data-layer="bg"]):not([data-layer="special"]) { display: none; }
+.fa-stack img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; margin: 0; border-radius: 0; pointer-events: none; user-select: none; }
+.fa, .fa-note, .fa-load { font: 12px/1.35 var(--f-chrome), Tahoma, sans-serif; color: var(--ink); }
+.fa { display: grid; gap: 8px; min-width: 0; padding: 8px; color: #eef6e8; background: #0f2e1d;
+  box-shadow: inset 1px 1px 0 #000, inset -1px -1px 0 #3c6b4c; }
+.fa-head { display: block; width: 100%; height: auto; max-height: 96px; object-fit: cover; object-position: 50% 50%; max-width: none; margin: 0; border-bottom: 2px solid #cfe3cf; }
+.fa-main { display: grid; grid-template-columns: minmax(200px, 270px) minmax(0, 1fr); gap: 12px; align-items: start; min-width: 0; }
+.fa-side { display: grid; gap: 6px; justify-items: center; text-align: center; min-width: 0; }
+.fa-frame { position: relative; width: 100%; aspect-ratio: 296 / 364; }
+/* the avatar sits under the frame art and shows through its photo window (build_maker_art.py: 7.77% 7.69% 84.12% 85.71%) */
+.fa-frame > .fa-stack { position: absolute; left: 7.77%; top: 7.69%; width: 84.12%; height: 85.71%; aspect-ratio: auto; background: #7eb7dc; }
+.fa-frame > .fa-stack img { left: 50%; width: auto; height: 100%; aspect-ratio: 1; transform: translateX(-50%); }
+.fa-frame-art { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; margin: 0; pointer-events: none; user-select: none; }
+.fa-who { margin: 0; font-weight: 700; font-size: 13px; overflow-wrap: anywhere; }
+.fa-state { margin: 0; min-height: 1.4em; color: #b9cfbb; }
+.fa-state.is-dirty { color: #ffe27a; font-weight: 700; }
+
+.fa-ico { display: inline-block; flex: none; width: 28px; height: 28px; background: url(avatar-assets/maker/icons.webp?v=20261106mk1) no-repeat 0 0 / 900% 100%; }
+.fa-parts { display: grid; gap: 6px; min-width: 0; }
+.fa-group { display: grid; grid-template-columns: 136px 24px minmax(0, 1fr) 24px; align-items: center; gap: 4px; min-width: 0; margin: 0; padding: 3px 6px;
+  border: 2px solid #8fd49c; border-radius: 10px; background: #123a24; box-shadow: inset 0 0 0 1px #0a2416; }
+.fa-legend { display: flex; align-items: center; gap: 6px; float: left; margin: 0; padding: 0; font: 700 15px var(--f-chrome), Tahoma, sans-serif; color: #fff; white-space: nowrap; }
+.fa-rowicon.is-bg { width: 28px; height: 21px; margin: 0; border: 1px solid #000; }
+.fa-arr { width: 24px; height: 38px; padding: 0; border: 0; cursor: pointer; background: var(--chrome, #c3c3bd); color: #000;
+  box-shadow: inset -1px -1px 0 #0a0a0a, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080, inset 2px 2px 0 #dfdfdf; }
+.fa-arr::before { content: ""; display: block; margin: auto; width: 0; height: 0; border: 7px solid transparent; }
+.fa-arr.is-prev::before { border-right-color: #000; border-left-width: 0; }
+.fa-arr.is-next::before { border-left-color: #000; border-right-width: 0; }
+.fa-arr:disabled { cursor: default; }
+.fa-arr:disabled::before { opacity: .35; }
+.fa-arr:active:not(:disabled) { box-shadow: inset 1px 1px 0 #0a0a0a, inset -1px -1px 0 #fff, inset 2px 2px 0 #808080; }
+.fa-opts { display: flex; gap: 6px; min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: none; padding: 3px 2px; }
+.fa-opts::-webkit-scrollbar { display: none; }
+.fa-opt { position: relative; flex: none; display: grid; place-items: center; width: 56px; height: 44px; scroll-snap-align: start; cursor: pointer;
+  border-radius: 6px; background: #3b4a40; box-shadow: inset 0 0 0 1px #0a1a10, inset 1px 1px 0 #6d7f72; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.fa-opt input { position: absolute; top: 0; left: 0; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.fa-thumb { display: block; width: 50px; height: 36px; }
+.fa-thumb img { display: block; width: 100%; height: 100%; max-width: none; margin: 0; object-fit: contain; }
+.fa-thumb.is-bg img { object-fit: cover; border-radius: 3px; }
+.fa-lab { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.fa-opt:hover:not(.is-locked) { background: #4b5d51; }
+.fa-opt:has(input:checked) { background: #4b5d51; box-shadow: 0 0 0 3px #ffd400, inset 0 0 0 1px #0a1a10; }
+.fa-opt:has(input:focus-visible) { outline: 2px dotted #fff; outline-offset: 3px; }
+.fa-opt.is-locked { cursor: not-allowed; }
+.fa-opt.is-locked .fa-thumb { opacity: .4; filter: grayscale(.7); }
+.fa-opt.is-locked::after { content: ""; position: absolute; right: 3px; bottom: 3px; width: 11px; height: 9px; border-radius: 2px; background: #e6e3d4; box-shadow: 0 0 0 1px #000; }
+.fa-opt.is-locked::before { content: ""; position: absolute; right: 5px; bottom: 10px; width: 5px; height: 5px; border: 2px solid #e6e3d4; border-bottom: 0; border-radius: 4px 4px 0 0; box-shadow: 0 0 0 1px #000; z-index: 1; }
+
+.fa-foot { display: grid; grid-template-columns: minmax(200px, 270px) minmax(0, 1fr); gap: 12px; align-items: center; }
+.fa-note { display: flex; align-items: center; gap: 8px; margin: 0; color: #e7efe0; font-style: italic; font-size: 12.5px; }
+.fa-note .fa-ico { width: 40px; height: 40px; }
+.fa-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.fa-actions .app-btn { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; font-size: 15px; font-weight: 700;
+  color: #111; background: #c9c9c3; border: 0; box-shadow: inset -1px -1px 0 #0a0a0a, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080, inset 2px 2px 0 #e4e4df; }
+.fa-actions .app-btn:active:not(:disabled) { box-shadow: inset 1px 1px 0 #0a0a0a, inset -1px -1px 0 #fff, inset 2px 2px 0 #808080; }
+.fa-actions .app-btn:disabled { color: #808080; text-shadow: 1px 1px 0 #fff; }
+.fa-actions .app-btn:focus-visible { outline: 1px dotted #000; outline-offset: -6px; }
+.fa-actions .app-btn .fa-ico { width: 30px; height: 30px; }
+.fa-actions .app-btn:disabled .fa-ico { opacity: .45; filter: grayscale(1); }
+.fa-dlg-face { padding: 3px; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
+.fa-dlg-face .fa-stack { width: 96px; height: 96px; }
+@media (max-width: 760px) {
+  .fa-main, .fa-foot { grid-template-columns: minmax(0, 1fr); }
+  .fa-side { grid-template-columns: 150px minmax(0, 1fr); justify-items: start; text-align: left; align-items: center; }
+  .fa-frame { grid-row: span 2; }
+  .fa-state { min-height: 0; }
+  .fa-group { grid-template-columns: 26px minmax(0, 1fr) 26px; }
+  .fa-legend { grid-column: 1 / -1; font-size: 13px; }
+  .fa-legend .fa-ico, .fa-rowicon.is-bg { width: 22px; height: 22px; }
+  /* the buttons stay on screen while the part rows scroll: the footer box dissolves, so the button row
+     is a direct grid item of the whole maker (a sticky box only sticks inside its own parent) */
+  .fa-foot { display: contents; }
+  .fa-actions { position: sticky; bottom: 0; z-index: 3; margin: 0 -8px; padding: 6px 8px; background: #0f2e1d;
+    gap: 6px; box-shadow: 0 -2px 0 #3c6b4c, 0 -8px 10px -6px #000; }
+  .fa-actions .app-btn { min-height: 44px; font-size: 12.5px; gap: 4px; padding: 4px; }
+  .fa-actions .app-btn .fa-ico { width: 22px; height: 22px; }
+}
