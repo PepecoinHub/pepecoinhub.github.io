@@ -193,6 +193,30 @@ Every response is the full state, so the browser should not fetch again after an
 
   The virtual clock comes from a replaced `games.pepegochi_clock()` that exists only in the simulator's and tests' throwaway databases. In the migration it is exactly `select clock_timestamp()`, and a static test checks that.
 
+### Browser test simulator (PR B1, local only)
+
+The owner chose a light JavaScript copy of the rules (no 5 MB PGlite, no CSP change). The SQL above stays the reference.
+
+- `docs/games/js/pepegochi-model.mjs`: the same rules in plain JavaScript.
+  - Same RPC names, same JSON, same error messages and codes.
+  - It keeps needs in 1/10000 units and times in microseconds, and rounds the way PostgreSQL does, so the answers are exact rather than "close".
+  - It has no network access, no storage, and no Supabase or Passport calls. Its milestones stay in memory and are never stamps. Every local response says `local_preview: true`.
+- `docs/games/pepegochi-sim.html`: a plain test page with a fast-forward clock, the four actions, GOODBYE.TXT, former frens and editable playtest values.
+  - The page's CSP has `connect-src 'none'`, so the browser itself blocks any request to a server.
+  - `noindex`, not linked from the site, nothing saved: a reload starts again.
+  - Temporary layout for testing the rules, not the game's design.
+- `tests/pepegochi-parity.test.mjs` (needs PGlite or a disposable PostgreSQL) makes every call on the real SQL and on the model at the same virtual time. It compares every full response, then the stored life rows and the milestones. It covers:
+  - all simulator scenarios under 5 rule sets;
+  - every status and departure boundary 1 ms either side;
+  - each need crossing 90;
+  - 300 seeded random games.
+- `tests/pepegochi-model.test.mjs` runs in CI without a database. It checks:
+  - that the model's rules equal the SQL file's;
+  - the documented scenario outcomes and the thresholds;
+  - that the model and the page stay local.
+
+**If the SQL rules change, the model must change in the same PR.** The parity test fails otherwise.
+
 ## Release gates
 
 1. Review this SQL. Run both test files and the simulator locally or on a separate staging project.

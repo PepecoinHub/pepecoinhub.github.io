@@ -205,3 +205,8 @@ egg can be adopted. Contract, playtest rules and the rescue system:
   `PASSPORT_PG_MODULE` variables as below).
 - Time simulator: `scripts/pepegochi_sim.mjs` runs the same SQL in an in-memory
   PGlite database with a virtual clock (setup at the top of the script).
+- Browser test simulator (local only, nothing saved or awarded):
+  `docs/games/pepegochi-sim.html` with the JavaScript copy of the rules in
+  `docs/games/js/pepegochi-model.mjs`. `tests/pepegochi-parity.test.mjs` checks
+  it call by call against the SQL (needs `PEPEGOCHI_PGLITE_MODULE` or the
+  PostgreSQL variables); `tests/pepegochi-model.test.mjs` runs in CI.

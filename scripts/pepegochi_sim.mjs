@@ -17,6 +17,7 @@
 // other playtest numbers (nested keys use dots: --rule cooldown_min.feed=10).
 //
 // tests/pepegochi-sql.test.mjs imports this file and checks the same scenarios on a real PostgreSQL.
+// tests/pepegochi-parity.test.mjs replays them on the browser model (docs/games/js/pepegochi-model.mjs).
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
@@ -107,16 +108,41 @@ const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct',
 const p2 = n => String(n).padStart(2, '0');
 export const fmt = d => { d = new Date(d); return `${W[d.getUTCDay()]} ${p2(d.getUTCDate())} ${M[d.getUTCMonth()]} ${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}`; };
 
-// A player with a virtual clock.
+// The four RPCs by name, on the real SQL (this file) or on the browser model (docs/games/js/pepegochi-model.mjs).
+const SQL_CALL = {
+  gry_pepegochi_state: () => ['public.gry_pepegochi_state()', []],
+  gry_pepegochi_adopt: a => ['public.gry_pepegochi_adopt($1)', [a.p_name]],
+  gry_pepegochi_action: a => ['public.gry_pepegochi_action($1)', [a.p_action]],
+  gry_pepegochi_letter_read: () => ['public.gry_pepegochi_letter_read()', []],
+};
+export const sqlBackend = (db, user) => ({
+  kind: 'sql',
+  call: (name, args, now) => { const [fn, a] = SQL_CALL[name](args || {}); return callRpc(db, { user, now }, fn, a); },
+});
+export const modelBackend = local => ({
+  kind: 'model',
+  call: async (name, args, now) => {
+    const r = local.rpc(name, args || {}, new Date(now));
+    if (r.ok) delete r.value.local_preview;
+    return r;
+  },
+});
+
+// A player with a virtual clock. The first argument is a database (SQL) or a backend from above.
 export class Sim {
-  constructor(db, { user = 1, start = START, print = () => {}, verbose = false } = {}) {
-    this.db = db; this.user = user; this.start = new Date(start); this.now = new Date(start);
+  constructor(dbOrBackend, { user = 1, start = START, print = () => {}, verbose = false, onCall = null } = {}) {
+    this.backend = dbOrBackend.call ? dbOrBackend : sqlBackend(dbOrBackend, user);
+    this.db = dbOrBackend.call ? null : dbOrBackend;
+    this.user = user; this.start = new Date(start); this.now = new Date(start);
     this.print = print; this.verbose = verbose; this.last = null; this.lastShown = '';
+    this.onCall = onCall;
     this.events = [];   // { day, at, what, result, status }
   }
   day(t = this.now) { return Math.floor((new Date(t) - this.start) / DAY_MS); }
-  async rpc(fn, args = []) {
-    const r = await callRpc(this.db, { user: this.user, now: this.now }, fn, args);
+  async call(name, args = {}) {
+    const now = new Date(this.now);
+    const r = await this.backend.call(name, args, now);
+    if (this.onCall) this.onCall({ name, args, now, result: r });
     if (r.ok) this.last = r.value;
     return r;
   }
@@ -132,11 +158,11 @@ export class Sim {
     this.lastShown = key;
     return r;
   }
-  async state(label = 'look') { return this.note(label, await this.rpc('public.gry_pepegochi_state()')); }
-  async adopt(name) { return this.note('adopt ' + name, await this.rpc('public.gry_pepegochi_adopt($1)', [name])); }
-  async letter() { return this.note('read GOODBYE.TXT', await this.rpc('public.gry_pepegochi_letter_read()')); }
+  async state(label = 'look') { return this.note(label, await this.call('gry_pepegochi_state')); }
+  async adopt(name) { return this.note('adopt ' + name, await this.call('gry_pepegochi_adopt', { p_name: name })); }
+  async letter() { return this.note('read GOODBYE.TXT', await this.call('gry_pepegochi_letter_read')); }
   async act(kind) {
-    const r = await this.note(kind, await this.rpc('public.gry_pepegochi_action($1)', [kind]));
+    const r = await this.note(kind, await this.call('gry_pepegochi_action', { p_action: kind }));
     this.now = new Date(+this.now + 3000);   // past the 2 s gap between actions
     return r;
   }
