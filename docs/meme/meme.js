@@ -3373,11 +3373,11 @@
       '<p class="ad-kick">Away from the pond?</p><h3 class="ad-big">The mention <em>waits</em><br>for you.</h3><p class="ad-sub">For 24 hours. Too many pings? One click turns them off.</p>',
       '<p class="ad-fine">Verified (Discord) players only. Guests can still read and say gm.</p><button type="button" class="ad-cta ad-lanbtn">Open the LAN Party →</button>'
     ] },
-    { file: 'pepe_sweeper.mpg', added: '2026-11-03', title: 'PEPE SWEEPER', ch: 'CH 9 · POND SAFETY HOUR', icon: 'pepesweeper', scenes: [
-      '<p class="ad-kick">Are you sure that frog is the right frog?</p><h3 class="ad-big">The <em>WRONG PEPE</em><br>is hiding in the pond!</h3>',
-      '<img class="ad-pic" src="../assets/coins/pepe.png" alt=""><p class="ad-sub">PEPE on Ethereum sneaked under the lily pads. The numbers tell you how many are close.</p>',
-      '<h3 class="ad-big">Plant a <em>flag</em>.<br>Clear the pond.</h3><p class="ad-sub">Three levels: Tadpole, Pond Regular, Diamond Hands. Beat your best time.</p>',
-      '<p class="ad-fine">No PEP prizes. Just you, the lily pads and your nerves.</p><button type="button" class="ad-cta ad-sweepbtn">Play PEPE SWEEPER →</button>'
+    { file: 'pepe_sweeper.mpg', style: 'quiz', secs: 5, added: '2026-11-03', title: 'PEPE SWEEPER', ch: 'CH 9 · POND SAFETY HOUR', icon: 'pepesweeper', scenes: [
+      '<p class="ad-kick">Are you sure that frog is the right frog?</p><h3 class="ad-big">Spot the<br><em>WRONG PEPE!</em></h3><p class="ad-life"><span>50:50</span><span>☎</span><span>👥</span></p>',
+      '<div class="ad-q">Which of these is NOT Pepecoin (PEP)?</div><ol class="ad-ans"><li><b>A:</b> A coin with its own blockchain</li><li><b>B:</b> Addresses that start with P</li><li><b>C:</b> PEPE, a token on Ethereum</li><li><b>D:</b> Merge-mined with Litecoin</li></ol>',
+      '<p class="ad-kick">50:50, please!</p><div class="ad-q">Which of these is NOT Pepecoin (PEP)?</div><ol class="ad-ans"><li class="is-out"><b>A:</b> A coin with its own blockchain</li><li><b>B:</b> Addresses that start with P</li><li class="is-pick"><b>C:</b> PEPE, a token on Ethereum</li><li class="is-out"><b>D:</b> Merge-mined with Litecoin</li></ol><p class="ad-life"><span class="is-used">50:50</span><span>☎</span><span>👥</span></p>',
+      '<ol class="ad-ans ad-one"><li class="is-right"><b>C:</b> PEPE, a token on Ethereum</li></ol><p class="ad-sub">Correct! PEPE is an ERC-20 token on Ethereum. Now it is hiding under the lily pads: three levels, Tadpole to Diamond Hands. Plant a flag on it.</p><p class="ad-fine">No PEP prizes. Just you, the lily pads and your nerves.</p><button type="button" class="ad-cta ad-sweepbtn">Play PEPE SWEEPER →</button>'
     ] },
     { file: 'yeet_the_pep.mpg', added: '2026-11-02', title: 'YEET THE PEP', ch: 'CH 404 · THE UNOFFICIAL SPACE PROGRAM', icon: 'yeet', scenes: [
       '<p class="ad-kick">Pepe wanted to go to the moon.</p><h3 class="ad-big">Nobody gave him<br>a <em>rocket.</em></h3>',
@@ -3398,17 +3398,17 @@
       '<p class="ad-kick">The job, in full:</p><p class="ad-sub">• set the date of the night<br>• pick the pictures<br>• start the rounds<br>• keep the chat friendly<br>• crown the winner of the night</p><h3 class="ad-big">Eternal <em>pond fame!</em></h3>',
       '<p class="ad-fine">Volunteer job. Pay: zero PEP and a lot of “gg”. All in the chat: no voice, no camera. Real frogs only, no bots.</p><a class="ad-cta" href="https://discord.gg/pepecoin" target="_blank" rel="noopener">Apply on the Pepecoin Discord →</a>'
     ] },
-    { file: 'better_frog.mpg', title: 'There has to be a better frog!', ch: 'CH 42 · THE FROG SHOPPING HOUR', icon: 'wrongpep', scenes: [
-      '<p class="ad-kick">Are you tired of frogs that turn out to be tokens?</p><h3 class="ad-big">There has to be<br>a <em>better frog!</em></h3>',
-      '<div class="ad-ba"><figure class="ad-before"><b>Before</b><img src="img/wrongpep.webp" alt=""><figcaption>“I bought a frog on Ethereum by mistake.”</figcaption></figure><figure class="ad-after"><b>After</b><img src="img/pep-logo.webp" alt=""><figcaption>Pepecoin (PEP). The frog with its own blockchain!</figcaption></figure></div>',
-      '<p class="ad-kick">Not a token. Not on Ethereum.</p><h3 class="ad-big">Its own chain.<br><em>0% premine!</em></h3><p class="ad-sub">Proof-of-work. Mined, not minted. Merge-mined with Litecoin and Dogecoin.</p>',
-      '<h3 class="ad-big">Operators are<br><em>NOT</em> standing by.</h3><p class="ad-sub">Read the guide. Check the ticker. Then decide for yourself.</p><a class="ad-cta" href="buy.html">How to get PEP →</a>'
+    { file: 'better_frog.mpg', style: 'shop', added: '2026-11-08', title: 'There has to be a better frog!', ch: 'CH 42 · THE FROG SHOPPING HOUR', icon: 'wrongpep', scenes: [
+      '<span class="ad-asseen">As seen on PEP-TV</span><div class="ad-shop"><div class="ad-prod"><img src="img/pep-logo.webp" alt=""><b class="ad-burst">Own chain!</b></div><div class="ad-pitch"><p class="ad-kick">Tired of frogs that turn out to be tokens?</p><h3 class="ad-big">There has to be a <em>better frog!</em></h3></div></div>',
+      '<figure class="ad-testi"><img src="img/wrongpep.webp" alt=""><blockquote>“I bought a frog on Ethereum by mistake. It was a token, not a coin with its own chain.”</blockquote><figcaption>Gary, pond regular<small>*Actor portrayal. Gary is a frog.</small></figcaption></figure><h3 class="ad-big">Don’t be <em>Gary!</em></h3>',
+      '<div class="ad-shop"><div class="ad-prod"><img src="img/pep-logo.webp" alt=""></div><div class="ad-pitch"><h3 class="ad-big">Pepecoin <em>(PEP)</em></h3><ul class="ad-tick"><li>Its own blockchain, not a token</li><li>0% premine: mined, not minted</li><li>Proof-of-work (Scrypt)</li><li>Merge-mined with Litecoin and Dogecoin</li></ul></div></div>',
+      '<p class="ad-price"><s>The wrong frog</s> <b>The right ticker!</b></p><p class="ad-call">☎ Operators are <b>NOT</b> standing by</p><p class="ad-fine">Not a real offer. Read the guide, check the ticker, then decide for yourself. Not financial advice.</p><a class="ad-cta" href="buy.html">How to get PEP →</a>'
     ] },
-    { file: 'but_wait_theres_more.mpg', title: 'But wait, there’s more!', ch: 'CH 7 · MINER’S MIDNIGHT MARKET', icon: 'pickaxe', scenes: [
-      '<p class="ad-kick">Already mining Litecoin or Dogecoin?</p><h3 class="ad-big">Your Scrypt rig<br>is <em>bored.</em></h3>',
-      '<h3 class="ad-big">But wait,<br><em>there’s more!</em></h3><p class="ad-sub">Pepecoin uses the same Scrypt algorithm and can be merge-mined alongside them.</p>',
-      '<h3 class="ad-big">One hash.<br><em>Three chains.*</em></h3><img class="ad-pic" src="img/triple-mine.png" alt="">',
-      '<p class="ad-fine">*Only on pools that merge-mine PEP. Electricity, hardware and patience not included.</p><a class="ad-cta" href="mining.html">See the mining guide →</a>'
+    { file: 'but_wait_theres_more.mpg', style: 'shop', added: '2026-11-08', title: 'But wait, there’s more!', ch: 'CH 7 · MINER’S MIDNIGHT MARKET', icon: 'pickaxe', scenes: [
+      '<div class="ad-shop"><div class="ad-prod"><img src="img/triple-mine.png" alt=""><b class="ad-burst">3 in 1!</b></div><div class="ad-pitch"><p class="ad-kick">Already mining Litecoin or Dogecoin?</p><h3 class="ad-big">Your Scrypt rig is <em>bored.</em></h3></div></div>',
+      '<span class="ad-asseen">Not sold in stores</span><h3 class="ad-big">But wait,<br><em>there’s more!</em></h3><p class="ad-sub">Pepecoin uses the same Scrypt algorithm and can be merge-mined alongside them.</p>',
+      '<div class="ad-shop"><div class="ad-prod"><img src="img/triple-mine.png" alt=""></div><div class="ad-pitch"><ul class="ad-tick"><li>The same Scrypt hardware</li><li>No extra hashing power</li><li>A pool that merge-mines PEP does the rest</li></ul><p class="ad-timer">Offer ends in <b>09:59</b></p></div></div>',
+      '<p class="ad-price"><s>Three rigs</s> <b>One hash!*</b></p><p class="ad-call">☎ Ask your pool, <b>not us</b></p><p class="ad-fine">*Only on pools that merge-mine PEP. Electricity, hardware and patience not included. Not a real offer.</p><a class="ad-cta" href="mining.html">See the mining guide →</a>'
     ] },
     { file: 'seed_phrase_hotline.mpg', title: 'The Seed Phrase Hotline', ch: 'CH 911 · PUBLIC SERVICE FROG', icon: 'gif-085-still', scenes: [
       '<p class="ad-kick">Got a seed phrase?</p><h3 class="ad-big">Call now!<br><em>0-800-NOBODY</em></h3>',
@@ -3416,11 +3416,11 @@
       '<img class="ad-pic" src="img/gif-085.webp" alt=""><p class="ad-sub">“Support” in your DMs? That is a scammer, fren.</p>',
       '<h3 class="ad-big">Keep it <em>offline.</em></h3><p class="ad-sub">This has been a public service frog.</p><a class="ad-cta" href="wallets.html">Wallet safety →</a>'
     ] },
-    { file: 'legendary_laptop.mpg', title: 'The Legendary Laptop', ch: 'CH 40M · LEGENDS AT LATE NIGHT', icon: 'laptop', scenes: [
-      '<p class="ad-kick">As the pond tells it…</p><h3 class="ad-big">The Legendary<br><em>Laptop!</em></h3><img class="ad-pic" src="img/laptop.webp" alt="">',
-      '<h3 class="ad-big">Only<br><em>40,000,000 PEP!</em></h3><p class="ad-sub">A fren once paid that for one laptop. The pond has never forgotten.</p>',
-      '<p class="ad-kick">What would it cost today?</p><h3 class="ad-big"><em class="ad-lap">…</em></h3><p class="ad-sub">40M PEP × today’s hourly price snapshot.</p>',
-      '<p class="ad-fine">Laptop not included. Not an offer. Not financial advice.</p><button type="button" class="ad-cta ad-lapbtn">Open the Laptop Index →</button>'
+    { file: 'legendary_laptop.mpg', style: 'shop', added: '2026-11-08', title: 'The Legendary Laptop', ch: 'CH 40M · LEGENDS AT LATE NIGHT', icon: 'laptop', scenes: [
+      '<span class="ad-asseen">As told in the pond</span><div class="ad-shop"><div class="ad-prod"><img src="img/laptop.webp" alt=""><b class="ad-burst">Legend!</b></div><div class="ad-pitch"><p class="ad-kick">As the pond tells it…</p><h3 class="ad-big">The Legendary <em>Laptop!</em></h3></div></div>',
+      '<div class="ad-shop"><div class="ad-prod"><img src="img/laptop.webp" alt=""></div><div class="ad-pitch"><p class="ad-kick">One laptop. One fren. One legend.</p><p class="ad-price">Only <b>40,000,000 PEP!</b></p><p class="ad-sub">A fren once paid that for one laptop. The pond has never forgotten.</p><p class="ad-timer">Offer ends in <b>09:59</b></p></div></div>',
+      '<p class="ad-kick">What would it cost today?</p><p class="ad-price">40M PEP = <b class="ad-lap">…</b></p><p class="ad-sub">40,000,000 PEP × today’s hourly price snapshot.</p>',
+      '<p class="ad-call">☎ Call now: <b>0-800-LAPTOP</b></p><p class="ad-fine">Laptop not included. Not an offer, not financial advice, and the phone number is not real either.</p><button type="button" class="ad-cta ad-lapbtn">Open the Laptop Index →</button>'
     ] },
     { file: 'frog_doctor.mpg', title: 'Ask the Frog Doctor', ch: 'CH 0x · THE TICKER CLINIC', icon: 'pepe-search', scenes: [
       '<p class="ad-kick">Does your wallet say PEPE when you meant PEP?</p><h3 class="ad-big">You may suffer from<br><em>Ticker Confusion!</em></h3>',
@@ -3428,11 +3428,11 @@
       '<h3 class="ad-big">Ask the<br><em>Frog Doctor!</em></h3><p class="ad-sub">PEP has its own chain, and its addresses start with a capital P. PEPE is an ERC-20 token. PEPECOIN (2016) is another project again.</p>',
       '<p class="ad-fine">Side effects of reading the comparison may include checking the ticker twice. Not medical advice. Not financial advice either.</p><a class="ad-cta" href="which-pepecoin.html">See the side-by-side →</a>'
     ] },
-    { file: 'sixty_second_frog.mpg', title: 'The 60-Second Frog', ch: 'CH 60 · BLOCKS AROUND THE CLOCK', icon: 'alarm-still', scenes: [
-      '<p class="ad-kick">Tired of waiting ten minutes for the next block?</p><h3 class="ad-big">Meet the<br><em>60-Second Frog!</em></h3>',
-      '<img class="ad-pic" src="img/alarm.webp" alt=""><p class="ad-sub">Pepecoin aims for one new block about every 60 seconds. Bitcoin aims for one every ten minutes.</p>',
-      '<h3 class="ad-big">Same pace<br>as <em>Dogecoin!</em></h3><p class="ad-sub">Both chains target a 60-second block, and both can be merge-mined with Litecoin.</p>',
-      '<p class="ad-fine">Block times vary: “about 60 seconds” is the target, not a promise. Frog not included.</p><a class="ad-cta" href="network.html">Watch the live network →</a>'
+    { file: 'sixty_second_frog.mpg', style: 'quiz', secs: 5, added: '2026-11-08', title: 'The 60-Second Frog', ch: 'CH 60 · BLOCKS AROUND THE CLOCK', icon: 'alarm-still', scenes: [
+      '<p class="ad-kick">For eternal pond fame:</p><h3 class="ad-big">The <em>60-Second</em><br>Question!</h3><p class="ad-life"><span>50:50</span><span>☎</span><span>👥</span></p>',
+      '<div class="ad-q">How often does Pepecoin aim to make a new block?</div><ol class="ad-ans"><li><b>A:</b> Every 10 minutes</li><li><b>B:</b> About every 60 seconds</li><li><b>C:</b> When the frog wakes up</li><li><b>D:</b> Every full moon</li></ol>',
+      '<p class="ad-kick">Is that your final answer?</p><div class="ad-q">How often does Pepecoin aim to make a new block?</div><ol class="ad-ans"><li><b>A:</b> Every 10 minutes</li><li class="is-pick"><b>B:</b> About every 60 seconds</li><li><b>C:</b> When the frog wakes up</li><li><b>D:</b> Every full moon</li></ol>',
+      '<ol class="ad-ans"><li class="is-out"><b>A:</b> Every 10 minutes</li><li class="is-right"><b>B:</b> About every 60 seconds</li></ol><p class="ad-sub">Correct! Pepecoin aims for one block about every 60 seconds, like Dogecoin. Bitcoin aims for one every ten minutes.</p><p class="ad-fine">Block times vary: about 60 seconds is the target, not a promise. No prize, just pond fame.</p><a class="ad-cta" href="network.html">Watch the live network →</a>'
     ] }
   ];
   var adSeen = function () { try { return JSON.parse(localStorage.getItem('pondos-ads-seen') || '[]'); } catch (e) { return []; } };
@@ -3449,18 +3449,26 @@
     document.querySelectorAll('.ads-folder button[data-i]').forEach(function (b) { b.classList.toggle('is-new', adNew(ADS[+b.getAttribute('data-i')])); });
   }
   setTimeout(adBadges, 0);
+  // Three looks, so the ads do not all follow one template. An ad picks one with "style":
+  //  (none)  late-night infomercial: blue studio, Impact headlines (ad-kick / ad-big / ad-sub / ad-fine / ad-cta)
+  //  'shop'  cheap 90s/00s teleshopping: WordArt headlines, product on a turntable (ad-shop, ad-prod, ad-burst),
+  //          price tag (ad-price), checklist (ad-tick), testimonial (ad-testi), phone bar (ad-call),
+  //          fake countdown (ad-timer), "as seen on" sticker (ad-asseen); scenes change with a star wipe
+  //  'quiz'  00s TV quiz show: question (ad-q), answers A-D (ad-ans; is-pick, is-right, is-out), lifelines (ad-life)
+  // [badge, logo, crawl label]; "secs" sets how long a scene stays (quiz answers need more time to read)
+  var PTV_STYLE = { shop: ['ORDER NOW', 'PEP-SHOP', '☎ CALL NOW'], quiz: ['ON AIR', 'PEP QUIZ', 'FACT CHECK'] };
   function adPlayer(i) {
-    var ad = ADS[i];
+    var ad = ADS[i], sty = PTV_STYLE[ad.style] || ['LIVE', 'PEP-TV', 'PEP NOW'];
     if (adNew(ad)) { try { localStorage.setItem('pondos-ads-seen', JSON.stringify(adSeen().concat(ad.file).slice(-50))); } catch (e) {} adBadges(); }
     var A = openApp('ad-' + i, ad.file + ' - Pond Media Player', 'pond-tv', function (A) {
-      A.body.innerHTML = '<div class="ptv"><div class="ptv-top"><span class="ptv-live">LIVE</span><b>PEP-TV</b><span class="ptv-ch">' + ad.ch + '</span></div>' +
+      A.body.innerHTML = '<div class="ptv' + (PTV_STYLE[ad.style] ? ' ptv-' + ad.style : '') + '"><div class="ptv-top"><span class="ptv-live">' + sty[0] + '</span><b>' + sty[1] + '</b><span class="ptv-ch">' + ad.ch + '</span></div>' +
         '<div class="ptv-stage">' + ad.scenes.map(function (h, k) { return '<div class="ptv-scene' + (k ? '' : ' on') + '">' + h + '</div>'; }).join('') + '</div>' +
-        '<div class="ptv-crawl"><b>PEP NOW</b><span class="ptv-run"></span></div></div>' +
+        '<div class="ptv-crawl"><b>' + sty[2] + '</b><span class="ptv-run"></span></div></div>' +
         '<div class="app-row"><button type="button" class="app-btn ptv-prev">◀◀</button><button type="button" class="app-btn ptv-play" aria-pressed="true">❚❚</button><button type="button" class="app-btn ptv-next">▶▶</button><span class="grow ptv-pos"></span><span class="ptv-nfa">Not a real offer. Not financial advice.</span></div>' +
         '<div class="app-row ptv-ads"><button type="button" class="app-btn ptv-ad-prev" title="Previous ad">⏮ Previous ad</button><span class="grow ptv-adpos">Ad ' + (i + 1) + ' of ' + ADS.length + '</span><button type="button" class="app-btn ptv-ad-next" title="Next ad">Next ad ⏭</button></div>';
       var sc = A.body.querySelectorAll('.ptv-scene'), cur = 0, playing = true, t = null, pos = A.body.querySelector('.ptv-pos');
       var show = function (k) { cur = (k + sc.length) % sc.length; sc.forEach(function (x, j) { x.classList.toggle('on', j === cur); }); pos.textContent = 'Scene ' + (cur + 1) + ' of ' + sc.length; };
-      var loop = function () { clearTimeout(t); if (playing && document.body.contains(A.host)) t = setTimeout(function () { show(cur + 1); loop(); }, REDUCE ? 6000 : 3800); };
+      var loop = function () { clearTimeout(t); if (playing && document.body.contains(A.host)) t = setTimeout(function () { show(cur + 1); loop(); }, REDUCE ? 6000 : (ad.secs || 3.8) * 1000); };
       show(0); loop();
       A.body.querySelector('.ptv-next').addEventListener('click', function () { show(cur + 1); loop(); });
       A.body.querySelector('.ptv-prev').addEventListener('click', function () { show(cur - 1); loop(); });
@@ -3488,6 +3496,13 @@
       var frb = A.body.querySelector('.ad-frenbtn'); if (frb) frb.addEventListener('click', function () { avatarMaker(); });
       var ppb = A.body.querySelector('.ad-passbtn'); if (ppb) ppb.addEventListener('click', function () { frenPassport(); });
       var wl = A.body.querySelector('.ad-launch'); if (wl) { wl.innerHTML = launchText(); var wlt = setInterval(function () { if (!document.body.contains(wl)) clearInterval(wlt); else wl.innerHTML = launchText(); }, 1000); }
+      // teleshopping "offer ends in 09:59": a fake countdown that starts again at zero (the ad says it is not real)
+      A.body.querySelectorAll('.ad-timer b').forEach(function (b) {
+        var s = 599, tv = setInterval(function () {
+          if (!document.body.contains(b)) { clearInterval(tv); return; }
+          s = s > 0 ? s - 1 : 599; b.textContent = '0' + Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2);
+        }, 1000);
+      });
       liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
     }, 720);
     return A;
