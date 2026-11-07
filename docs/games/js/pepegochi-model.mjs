@@ -22,7 +22,7 @@ export const DEFAULT_RULES = Object.freeze({
   rescue_from_h: 120,
   recovery_days: 1,
   recovery_departs_h: 72,
-  recovery_min_gap_h: 0,
+  recovery_min_gap_h: 8,
   max_actions_per_utc_day: 12,
   min_gap_s: 2,
   cooldown_min: Object.freeze({ feed: 30, clean: 20, play: 45, rest: 60 }),

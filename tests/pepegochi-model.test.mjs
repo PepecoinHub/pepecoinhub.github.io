@@ -44,13 +44,15 @@ const runScenario = async (name, rules = {}) => {
 
 test('model scenarios: the outcomes documented in games/PEPEGOCHI_API.md', async () => {
   const stays = ['daily', 'every-4-days', 'weekend-fri-sun', 'weekend-sat-sun', 'weekend-morning-evening',
-    'weekend-evening-morning', 'weekend-across-midnight', 'weekend-random-hours', 'weekend-missed-saturday-monday', 'trip-6-days'];
+    'weekend-evening-morning', 'weekend-random-hours', 'weekend-missed-saturday-monday', 'trip-6-days'];
   for (const name of stays) assert.deepEqual((await runScenario(name)).left, [], name);
   const leaves = { 'feed-every-6-days': 7, 'feed-only-daily': 7, 'weekend-feed-only': 7, 'checkup-every-6-days': 9,
     'rescue-then-vanish': 13, 'weekend-missed-saturday': 22, 'weekend-missed-saturday-late': 20, 'trip-8-days': 16 };
   for (const [name, day] of Object.entries(leaves)) assert.equal((await runScenario(name)).left[0]?.[0], day, name);
   assert.equal((await runScenario('weekend-sat-sun', { recovery_days: 2 })).left[0][0], 16);
-  assert.equal((await runScenario('weekend-across-midnight', { recovery_min_gap_h: 8 })).left.length, 1);
+  // 8 h rule (owner decision): a session split by UTC midnight is one visit
+  assert.equal((await runScenario('weekend-across-midnight')).left[0]?.[1], 'recovery');
+  assert.deepEqual((await runScenario('weekend-across-midnight', { recovery_min_gap_h: 0 })).left, []);
   // weekend frogs still go through the rescue every week: keeping a frog is not the same as good care
   assert.ok((await runScenario('weekend-sat-sun')).seen.has('recovering'));
 });

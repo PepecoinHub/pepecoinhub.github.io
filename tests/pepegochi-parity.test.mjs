@@ -110,7 +110,7 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
     const RULESETS = [
       {},
       { recovery_days: 2 },
-      { recovery_min_gap_h: 8 },
+      { recovery_min_gap_h: 0 },
       { meaningful_below: 95, neglected_h: 30, packing_h: 70, departs_h: 100, rescue_from_h: 60, recovery_departs_h: 40 },
       // decay rates that do not divide a day evenly, so the rounding of "when does a need start waiting" matters
       { 'decay_per_day.hunger': 7, 'decay_per_day.hygiene': 11, 'decay_per_day.mood': 13, 'decay_per_day.energy': 17 },
@@ -170,7 +170,7 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
       const names = ['Fren', 'Żabka', 'Mr. Frog_2', 'x', '  Pad  ', 'bad<name>', 'Frog II'];
       for (let g = 0; g < 300; g++) {
         const r = rng(1000 + g);
-        const overrides = [{}, {}, { recovery_days: 2 }, { recovery_min_gap_h: 8 }, { meaningful_below: 95 },
+        const overrides = [{}, {}, { recovery_days: 2 }, { recovery_min_gap_h: 0 }, { meaningful_below: 95 },
           { 'decay_per_day.hunger': 7, 'decay_per_day.hygiene': 11, 'decay_per_day.mood': 13, 'decay_per_day.energy': 17 }][g % 6];
         await withRules(overrides, async () => {
           const p = await pair(overrides);

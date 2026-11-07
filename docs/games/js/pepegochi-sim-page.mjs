@@ -94,7 +94,9 @@ function render() {
       ['Most neglected', `${p.most_neglected}, waiting since ${fmt(msOf(p.most_neglected_since))}`],
       ['Overdue', p.overdue.join(', ')],
       ['Rescue starts recovery', p.rescue_starts_recovery ? 'yes: care for every overdue need' : ''],
-      ['Recovery', p.recovery ? `${p.recovery.days_left} day(s) left; the next visit counts from ${fmt(msOf(p.recovery.counts_from))}` : ''],
+      ['Recovery', p.recovery ? (msOf(p.recovery.counts_from) > nowMs()
+        ? `can be finished from ${fmt(msOf(p.recovery.counts_from))} (in ${span(msOf(p.recovery.counts_from) - nowMs())}). A visit before that still helps, but does not finish it.`
+        : `${p.recovery.days_left} day(s) left: care now finishes it`) : ''],
       ['Moves out', `${fmt(msOf(p.departs_at))} (in ${span(msOf(p.departs_at) - nowMs())}) unless ${p.departure_reason === 'recovery' ? 'you visit again' : p.departure_reason + ' is cared for'}`],
       ['Accepted actions today', `${p.action_budget.accepted_today} / ${p.action_budget.max_per_utc_day}`],
     ]));
