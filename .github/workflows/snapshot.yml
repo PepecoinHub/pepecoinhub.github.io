@@ -42,13 +42,18 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Scheduled and manual runs always take a snapshot. A push takes one only
-      # if there is none for today yet, so editing the site never overwrites it.
+      # Manual runs always take a snapshot. Scheduled runs and pushes take one only
+      # if there is none for today yet (hourly runs: from 03:00 UTC), so a day keeps
+      # one snapshot and editing the site never overwrites it. GitHub often starts
+      # the daily cron hours late (around 11:00 UTC lately) or drops it, so the first
+      # hourly run after 03:00 UTC that actually fires takes the snapshot instead.
       - name: Take snapshot
         run: |
           today="$(date -u +%F)"
-          if [ "${{ github.event.schedule }}" = "41 * * * *" ]; then
-            echo "Hourly price run, no snapshot."
+          if [ "${{ github.event_name }}" = "schedule" ] && [ -f "docs/data/snapshots/${today}.json" ]; then
+            echo "Scheduled run, today's snapshot already exists."
+          elif [ "${{ github.event.schedule }}" = "41 * * * *" ] && [ "$(date -u +%H)" -lt 3 ]; then
+            echo "Hourly price run before 03:00 UTC, the daily snapshot comes later."
           elif [ "${{ github.event_name }}" = "push" ] && [ -f "docs/data/snapshots/${today}.json" ]; then
             echo "Today's snapshot already exists, not taking another one on a push."
           else
@@ -100,7 +105,11 @@ jobs:
           if git diff --cached --quiet; then
             echo "Nothing new to commit."
           else
-            git commit -m "data: snapshot $(date -u +%F)"
+            if [ -f "docs/data/snapshots/$(date -u +%F).json" ] && ! git diff --cached --quiet -- docs/data/snapshots; then
+              git commit -m "data: snapshot $(date -u +%F)"
+            else
+              git commit -m "data: prices $(date -u '+%F %H:%M') UTC"
+            fi
             # a merge can land at the same moment: rebase and try again a few times
             for i in 1 2 3; do
               git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
@@ -115,7 +124,7 @@ jobs:
     needs: [snapshot, validate]
     if: ${{ !cancelled() && needs.validate.result == 'success' && github.ref == 'refs/heads/main' }}   # still publish (old data) if the snapshot failed
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 40
     permissions:
       contents: read
       pages: write
@@ -146,8 +155,22 @@ jobs:
         with:
           path: docs
 
-      - id: deployment
+      # Pages sometimes hangs in "syncing_files" and the action gives up after 10 minutes
+      # (2026-11-07 03:25). Wait longer, and try once more before failing the run.
+      - id: deploy1
         uses: actions/deploy-pages@v4
+        continue-on-error: true
+        with:
+          timeout: 900000
+
+      - id: deploy2
+        if: steps.deploy1.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 900000
+
+      - id: deployment
+        run: echo "page_url=${{ steps.deploy1.outputs.page_url || steps.deploy2.outputs.page_url }}" >> "$GITHUB_OUTPUT"
 
       # tell Bing (IndexNow) about the pages changed today; the "Run workflow" button sends all
       # of them. Not on the hourly price runs, so the same pages aren't sent 24 times a day.
