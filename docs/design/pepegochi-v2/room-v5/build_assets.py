@@ -198,5 +198,7 @@ for nm,fun in [('crt_tv',draw_tv),('lava_lamp',draw_lava),('potted_plant',draw_p
 items={}
 for nm in ['crt_tv','lava_lamp','potted_plant','p_poster','rubber_duck','mug','floppy_disk','paper_crown']:
  im=Image.open(os.path.join(ROOT,nm+'.png')); alpha=im.getchannel('A');items[nm]={'file':nm+'.png','dimensions':[128,128],'visible_bounds':list(alpha.getbbox()),'alpha':True,'pixelated':True,'candidate':True}
+if os.path.isfile(os.path.join(ROOT,'pepegochi_adult_idle.png')):
+ items['pepegochi_adult_idle']={'file':'pepegochi_adult_idle.png','dimensions':[128,128],'alpha':True,'candidate':True,'origin':'earlier approved visual reference / character sprite'}
 with open(os.path.join(BASE,'ART_MANIFEST.json'),'w') as f:json.dump({'version':5,'room':{'file':'room_clean_base.png','dimensions':[640,400],'props_baked_in':False},'item_sprites':items,'status':'pixel-art functional candidate, artwork not final approved'},f,indent=2)
 print('assets',len(os.listdir(ROOT)))
