@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fren Avatar v2 layer demonstrator</title>
+<style>
+  :root {
+    --ink: #16210f;
+    --panel: #d7e3c7;
+    --panel-edge: #8aa06a;
+    --accent: #2f8f46;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    background: #c5d6b1;
+    color: var(--ink);
+    padding: 20px;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.sub { margin: 0 0 18px; font-size: 13px; color: #3c4a2c; }
+  .wrap {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  /* The composited avatar: layers stacked absolutely in one square box. */
+  .stage {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    border: 3px solid var(--ink);
+    border-radius: 10px;
+    background: #ffffff;
+    flex: 0 0 auto;
+    overflow: hidden;
+  }
+  .stage img.layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: auto;
+    pointer-events: none;
+  }
+  .controls {
+    flex: 1 1 360px;
+    min-width: 300px;
+    background: var(--panel);
+    border: 2px solid var(--panel-edge);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .slot { margin-bottom: 14px; }
+  .slot > label {
+    display: block;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 6px;
+  }
+  .choices { display: flex; flex-wrap: wrap; gap: 6px; }
+  .choices button {
+    font: inherit;
+    font-size: 12px;
+    padding: 5px 10px;
+    border: 2px solid var(--panel-edge);
+    border-radius: 6px;
+    background: #f4f8ec;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .choices button[aria-pressed="true"] {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .toolbar { margin-top: 10px; display: flex; gap: 10px; }
+  .toolbar button {
+    font: inherit;
+    font-weight: 700;
+    padding: 8px 16px;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    background: #f2c518;
+    cursor: pointer;
+  }
+  .state {
+    margin-top: 12px;
+    font-size: 11px;
+    font-family: Consolas, "Courier New", monospace;
+    color: #3c4a2c;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .err { color: #b02317; font-weight: 700; }
+</style>
+</head>
+<body>
+  <h1>Fren Avatar v2 layer demonstrator</h1>
+  <p class="sub">
+    Stacks the real WebP layers from <code>docs/meme/avatar-assets/layers/</code> in the manifest
+    <code>layers_order</code>. Switch any slot or hit Randomize. This is the live composite, not a mockup.
+  </p>
+
+  <div class="wrap">
+    <div class="stage" id="stage" aria-label="Composited Pepe avatar"></div>
+    <div class="controls">
+      <div id="slots"></div>
+      <div class="toolbar">
+        <button type="button" id="randomize">Randomize</button>
+        <button type="button" id="reset">Reset to default</button>
+      </div>
+      <div class="state" id="state">Loading manifest...</div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Paths are relative to games/fren-avatar/demo.html.
+  var MANIFEST_URL = "../../docs/meme/avatar-options.json";
+  var ASSET_BASE = "../../docs/meme/";
+
+  var stage = document.getElementById("stage");
+  var slotsEl = document.getElementById("slots");
+  var stateEl = document.getElementById("state");
+  var manifest = null;
+  var current = {};         // slot -> option id
+  var layerImgs = {};       // slot -> <img>
+
+  function layerUrl(id) {
+    // layer_template is "avatar-assets/layers/{id}.webp", relative to docs/meme/.
+    var tmpl = manifest.paths.layer_template;
+    return ASSET_BASE + tmpl.replace("{id}", id);
+  }
+
+  // The "base" slot is implied (not in options); it sits between bg and clothing.
+  function renderStack() {
+    stage.innerHTML = "";
+    layerImgs = {};
+    manifest.layers_order.forEach(function (slot) {
+      var id;
+      if (slot === "base") {
+        id = manifest.defaults.base; // single neutral base
+      } else {
+        id = current[slot];
+      }
+      if (!id) return;
+      var img = document.createElement("img");
+      img.className = "layer";
+      img.dataset.slot = slot;
+      img.dataset.id = id;
+      img.alt = slot + ": " + id;
+      img.src = layerUrl(id);
+      stage.appendChild(img);
+      layerImgs[slot] = img;
+    });
+    updateState();
+  }
+
+  function updateState() {
+    var lines = manifest.layers_order.map(function (slot) {
+      var id = slot === "base" ? manifest.defaults.base : current[slot];
+      return slot + " = " + id;
+    });
+    stateEl.classList.remove("err");
+    stateEl.textContent = lines.join("\n");
+  }
+
+  function setSlot(slot, id) {
+    current[slot] = id;
+    // refresh pressed state on the slot's buttons
+    var group = slotsEl.querySelector('[data-group="' + slot + '"]');
+    if (group) {
+      Array.prototype.forEach.call(group.querySelectorAll("button"), function (b) {
+        b.setAttribute("aria-pressed", String(b.dataset.id === id));
+      });
+    }
+    renderStack();
+  }
+
+  function buildControls() {
+    // One row of buttons per selectable slot (every slot except the implied base).
+    manifest.layers_order.forEach(function (slot) {
+      if (slot === "base") return;
+      var opts = manifest.options[slot];
+      if (!opts) return;
+      var wrap = document.createElement("div");
+      wrap.className = "slot";
+      var label = document.createElement("label");
+      label.textContent = slot;
+      wrap.appendChild(label);
+      var choices = document.createElement("div");
+      choices.className = "choices";
+      choices.dataset.group = slot;
+      opts.forEach(function (o) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = o.label;
+        b.dataset.id = o.id;
+        b.setAttribute("aria-pressed", String(current[slot] === o.id));
+        b.addEventListener("click", function () { setSlot(slot, o.id); });
+        choices.appendChild(b);
+      });
+      wrap.appendChild(choices);
+      slotsEl.appendChild(wrap);
+    });
+  }
+
+  function randomize() {
+    manifest.layers_order.forEach(function (slot) {
+      if (slot === "base") return;
+      var opts = manifest.options[slot];
+      if (!opts || !opts.length) return;
+      var pick = opts[Math.floor(Math.random() * opts.length)];
+      current[slot] = pick.id;
+    });
+    // refresh all pressed states
+    manifest.layers_order.forEach(function (slot) {
+      if (slot === "base") return;
+      var group = slotsEl.querySelector('[data-group="' + slot + '"]');
+      if (!group) return;
+      Array.prototype.forEach.call(group.querySelectorAll("button"), function (b) {
+        b.setAttribute("aria-pressed", String(b.dataset.id === current[slot]));
+      });
+    });
+    renderStack();
+  }
+
+  function resetDefault() {
+    manifest.layers_order.forEach(function (slot) {
+      if (slot === "base") return;
+      current[slot] = manifest.defaults[slot];
+    });
+    manifest.layers_order.forEach(function (slot) {
+      if (slot === "base") return;
+      var group = slotsEl.querySelector('[data-group="' + slot + '"]');
+      if (!group) return;
+      Array.prototype.forEach.call(group.querySelectorAll("button"), function (b) {
+        b.setAttribute("aria-pressed", String(b.dataset.id === current[slot]));
+      });
+    });
+    renderStack();
+  }
+
+  document.getElementById("randomize").addEventListener("click", randomize);
+  document.getElementById("reset").addEventListener("click", resetDefault);
+
+  // Expose state for the headless-Chromium verification harness.
+  window.__fren = {
+    get current() { return current; },
+    get manifest() { return manifest; },
+    setSlot: setSlot,
+    randomize: randomize,
+    resetDefault: resetDefault,
+    layerImages: function () { return layerImgs; },
+    ready: false
+  };
+
+  fetch(MANIFEST_URL)
+    .then(function (r) {
+      if (!r.ok) throw new Error("manifest HTTP " + r.status);
+      return r.json();
+    })
+    .then(function (m) {
+      manifest = m;
+      manifest.layers_order.forEach(function (slot) {
+        if (slot === "base") return;
+        current[slot] = manifest.defaults[slot];
+      });
+      buildControls();
+      renderStack();
+      window.__fren.ready = true;
+    })
+    .catch(function (e) {
+      stateEl.classList.add("err");
+      stateEl.textContent = "Failed to load manifest: " + e.message;
+    });
+})();
+</script>
+</body>
+</html>
