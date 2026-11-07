@@ -195,7 +195,7 @@
       return g;
     };
     smMain.appendChild(el('a', { class: 'sm-item', href: './' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>My Pond</b></span>'));
-    var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="' + ico('gif-085-still') + '" alt="" width="28" height="28" loading="lazy"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
+    var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="' + ico('pep-logo') + '" alt="" width="28" height="28" loading="lazy"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
     meItem.addEventListener('click', function () { setOpen(false); logOn(); });
     smMain.appendChild(meItem);
     var passportItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>Fren Passport</b><small>My Fren, achievements and secrets</small></span>');
@@ -745,7 +745,7 @@
     // wide screens: from the top-left corner, Log On alone, a gap, then the games in two columns;
     // the rest of the pond in a small group lower down, NERDS ONLY on its own by the Start button, the bin far right
     var DESKTOP = [
-      ['logon', [['#logon', 'Log On', 'gif-085-still'], ['#find', 'Find', 'search']]],
+      ['logon', [['#logon', 'Log On', 'pep-logo'], ['#find', 'Find', 'search']]],
       ['play', [['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
         ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads']]],
       ['pond', [['./', 'Internet', 'internet'], ['#shop', 'Shop', 'shop-bag'], ['#mail', 'Write a letter', 'frog-mail']]],
@@ -1482,7 +1482,7 @@
       ['Shop', 'Official Pepecoin shop', 'shop-bag', 'shop merch buy store', act('#shop')],
       ['About me', 'Who builds this pond (and how to support it)', 'night-shift', 'about me byl author tip donate support', aboutMe],
       ['Write a letter', 'Send an idea, a wish or a bug to the builder', 'frog-mail', 'write letter feedback contact message bug idea mail', function () { frogMail('write'); }],
-      ['Log On', 'Guest or Discord', 'gif-085-still', 'log on login sign in account discord guest', logOn],
+      ['Log On', 'Guest or Discord', 'pep-logo', 'log on login sign in account discord guest', logOn],
       ['LaptopIndex.exe', 'The Legendary Laptop', 'gif-012-still', 'laptop legend 40 million ath', laptop],
       ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', 'bin trash recycle paper hands', paperHands]
     ].concat(FREN ? [
@@ -2290,7 +2290,7 @@
   }
 
   function logOn() {
-    openApp('logon', 'Log On to the Pond', 'gif-085-still', function (A) {
+    openApp('logon', 'Log On to the Pond', 'pep-logo', function (A) {
       var paint = function () {
         var me = whoAmI();
         A.body.innerHTML = '<div class="tip"><img src="img/' + (me ? 'gif-045' : 'gif-085') + '.webp" alt="" width="96" height="96"><div>' +
