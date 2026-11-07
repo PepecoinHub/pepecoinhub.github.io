@@ -66,6 +66,17 @@ Wszystkie poprzednie wysokiej jakości źródła i archiwa v2/v3 znajdują się 
 - Grafiki to zatwierdzany osobno **funkcjonalny zestaw kandydatów**, nie finalny artbook. Łóżko/szafka/dywan w tle pozostają stałym wyposażeniem; kolejne przedmioty nagrodowe mają oddzielny system po stronie backendu.
 - Bez produkcyjnego SQL, merge, deploy, realnych PEP czy 1,5×. Zaplecze inventory nadal wymaga osobnego PR i testów DB.
 
+## Room-2 — Draft PR #224: private room inventory (2026-11-07)
+
+**[PR #224: server-owned item collection and 11 room slots](https://github.com/PepecoinHub/pepecoinhub.github.io/pull/224)** is stacked on A2 (#221), not on this visual documentation branch. It contains:
+
+- `games/supabase/update_pepegochi_room_v1.sql` — 5 private tables (catalog, inventory, placements, revisions and slots) plus four Discord-only room RPCs. No public item grant endpoint.
+- `tests/pepegochi-room-static.test.mjs` — **6/6 passed** locally.
+- `tests/pepegochi-room-sql.test.mjs` — PostgreSQL integration tests prepared but **not yet run**; use a disposable LOCAL PostgreSQL 17 to validate before considering merge.
+- `games/PEPEGOCHI_ROOM_API.md` — integration contract and release gates.
+
+This step deliberately **does not** enable gifts from other games, the Moon Rock, departure's durable random item choice, real PEP or 1.5×. Room artwork and the offline editor remain in #222. Nothing has been deployed or merged.
+
 ## Co dalej
 
 - Warstwowa grafika pokoju + rekwizyty, w tym brak po zabranym obiekcie.
