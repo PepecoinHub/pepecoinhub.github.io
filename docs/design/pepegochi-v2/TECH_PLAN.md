@@ -13,10 +13,10 @@ Wartości liczbowe w tym dokumencie (godziny, progi potrzeb, liczba dni) to **ka
 
 1. **Fundament bezpieczeństwa v1 jest dobry i warto go zachować**: tożsamość tylko z `auth.uid()` + Discord, brak grantów do tabel, blokada wiersza, czas serwera po blokadzie, limity akcji, ułamkowy spadek potrzeb. Potwierdziłem to na prawdziwym PostgreSQL 17, także przy 12 równoległych połączeniach (sekcja 1).
 2. **Model danych v1 nie pozwala na wyprowadzkę.** `games.pepegochi_pets` ma klucz `user_id`, więc jeden zwierzak na zawsze, bez historii, bez statusu i bez konsekwencji. Po 30 dniach nieobecności żaba ma wszystkie potrzeby 0 i dalej przyjmuje karmienie. Potrzebny jest nowy model: wiele kolejnych żyć, najwyżej jedno aktywne.
-3. **v1 nie jest wdrożone, Passport też nie** (według PR #186, PR #212 i komentarza w `docs/meme/meme.js`). Jeśli to potwierdzisz, v2 może być czystym schematem zamiast migracji danych. Konwersję starych wierszy v1 i tak dodam jako zabezpieczenie.
+3. **v1 nie jest wdrożone, Passport też nie.** Właściciel potwierdził to 2026-11-07, sprawdzając PH-games bez zmian. v2 to czysty schemat, bez migracji danych.
 4. **Bridge z #186 trzeba wyrzucić, a nie poprawiać.** Przyznaje `certified_fren` za 100 dni opieki, z pominięciem `games.passport_award()`. Test pokazał też, że błąd zapisu stempla cofa całą akcję opieki, a ponowne uruchomienie bazowego SQL po cichu wyłącza bridge.
 5. **„Dzień opieki” w v1 nie mierzy opieki.** Kliknięcie Rest przy energii 100 zmienia tylko nastrój o +5, a i tak daje dzień opieki. Proponuję dwa liczniki: dzień opieki (wzrost żaby) i dobry dzień opieki (prestiżowe stemple).
-6. **Wyprowadzkę da się zrobić bez crona i bez zapisu przy odczycie.** Moment odejścia wynika z zapisanych znaczników czasu (`ostatnia sensowna opieka + 168 h`), więc każde wywołanie liczy ten sam wynik. Zapis odejścia następuje raz, przy pierwszym wywołaniu zapisującym.
+6. **Wyprowadzkę da się zrobić bez crona i bez zapisu przy odczycie.** Moment odejścia wynika z zapisanych znaczników czasu (najstarszy zegar potrzeby + 168 h, sekcja 5.2a), więc każde wywołanie liczy ten sam wynik. Zapis odejścia następuje raz, przy pierwszym wywołaniu zapisującym.
 7. **Plan to 7 małych PR-ów przed wydaniem** (A1, A2, B1, B2, C, D, R). Pierwsze dwa to sam backend i testy na prawdziwym PostgreSQL.
 
 ---
@@ -89,7 +89,7 @@ Uwaga o nazwach: w `schema.sql` istnieje już tabela `games.owners` (inna funkcj
 | K4 | `good_parent`: w katalogu „Provide care on 30 distinct days”. README chce 30 dni **dobrej** opieki w jednym życiu. | `passport-catalog.json` | Jawna zmiana opisu w PR D, razem z wpisem w pliku decyzji. Bez cichej zmiany reguły. |
 | K5 | `perfect_parent` („Complete a full month of good care”) nie różni się od nowego `good_parent`. | jw. | Zostaje `???`, dopóki nie zapadnie decyzja o wyzwaniu Fren Guardian (sekcja 10). Jeśli Guardian powstanie, to on jest `perfect_parent`. |
 | K6 | Nagroda za 100 dni z jednym zwierzakiem nie ma ID. | — | Nowy stempel PepeGochi, roboczo `best_fren_forever` „Best Fren Forever”: 100 dobrych dni opieki w jednym życiu. Nazwa i reguła do decyzji. |
-| K7 | „It's Not Me, It's You” nie może nagradzać zaniedbania ani przechodzić przez `gry_passport_discover(text)` (to API klient może wywołać sam). | — | Zapis w historii zwierzaka (`pepegochi_owners.first_departed_at`), nie stempel. Pokazywany w Pet History. |
+| K7 | „It's Not Me, It's You” nie może nagradzać zaniedbania ani przechodzić przez `gry_passport_discover(text)` (to API klient może wywołać sam). | — | Zapis w historii zwierzaka (`summary.first_departed_at` w stanie, liczony z żyć), nie stempel. Pokazywany w Pet History. |
 | K8 | Katalog i lista dozwolonych ID muszą się zgadzać (test w `tests/passport-awards.test.mjs`). Jeśli PepeGochi stemple będą `live`, a gra ukryta, Passport pokaże stemple nie do zdobycia. | katalog | Zmiana statusu `first_hatch`, `little_fren`, `grown_fren` na `live` dopiero w PR wydania (R), razem z rozszerzeniem listy. |
 | K9 | `gry_passport_state()` ma pole `'care_days', null`, a wcześniejsza wersja #186 chciała zmieniać tę funkcję. | `update_passport_awards.sql` | Nie ruszać `gry_passport_state()`. Karta PepeGochi w Passporcie wywołuje osobno `gry_pepegochi_state()` (1 dodatkowe RPC przy otwarciu Passportu, tylko przy włączonej becie PepeGochi). Zgodne z zasadą „if it works, don't touch it”. |
 | K10 | YEET zapisuje „Moon Rock” w localStorage pod kluczem `pepegachi-moon-rock-v1`. | `docs/games/js/yeet.mjs` | Nie importować tego do inwentarza PepeGochi. Moon Rock zostaje `planned` do czasu serwerowego inwentarza (PR E). |
@@ -99,7 +99,13 @@ Uwaga o nazwach: w `schema.sql` istnieje już tabela `games.owners` (inna funkcj
 
 ## 4. Docelowy model danych
 
-Szkic, nie finalny SQL. Wszystko w schemacie `games`, RLS włączone, `revoke all … from public, anon, authenticated`.
+Szkic z etapu przeglądu. **Zaimplementowana wersja jest w `games/supabase/update_pepegochi_v2.sql` (PR #218).** Różnice względem szkicu:
+- `pepegochi_owners` ma tylko `user_id` i `created_at`, bo podsumowanie jest liczone z żyć przy odczycie;
+- zamiast `last_care_at` / `protected_until` są zegary potrzeb (`hunger_due_at` …) oraz `rescue_pending` i `recovery_days_left`;
+- doszła tabela `pepegochi_milestones`;
+- kolumny dobrych dni dojdą w A2.
+
+Wszystko w schemacie `games`, RLS włączone, `revoke all … from public, anon, authenticated`.
 
 ```sql
 -- 1 wiersz na konto: cel blokady przy adopcji/odejściu + podsumowanie, które nigdy nie znika przy odejściu
@@ -148,18 +154,21 @@ create unique index pepegochi_one_active on games.pepegochi_lives(user_id) where
 
 ## 5. Stany i reguły
 
-### 5.1 Parametry (kandydaci do playtestu)
+### 5.1 Parametry (wartości robocze do playtestu)
 
-| Parametr | Kandydat | Skąd |
+Właściciel zatwierdził je 2026-11-07 jako **wartości robocze, nie ostateczne zasady**. Wersja zaimplementowana w PR A1 (#218).
+
+| Parametr | Wartość robocza | Skąd |
 |---|---|---|
-| Sensowna akcja | potrzeba docelowa (zaokrąglona) < 90 przed akcją | nowe |
-| Dzień opieki (wzrost) | ≥ 1 sensowna akcja w dniu UTC | v1, z poprawką wyżej |
-| Dobry dzień opieki | w dniu UTC ≥ 2 różne sensowne akcje i po tej, która spełnia warunek, wszystkie potrzeby ≥ 50 | nowe |
-| neglected | ≥ 48 h od ostatniej sensownej akcji | README 2.4 |
-| packing (ostrzeżenie „Your Fren is thinking of leaving”) | ≥ 120 h | README 2.4 |
+| Sensowna akcja | potrzeba docelowa < 90 przed akcją | nowe |
+| Zegar potrzeby | rusza, gdy potrzeba spadnie poniżej 90; staje, gdy gracz się nią zajmie lub potrzeba wróci do ≥ 90 | A1, zamiast jednego zegara |
+| Dzień opieki (wzrost) | ≥ 1 przyjęta akcja w dniu UTC | v1, z poprawką wyżej |
+| Dobry dzień opieki | w dniu UTC ≥ 2 różne sensowne akcje i po tej, która spełnia warunek, wszystkie potrzeby ≥ 50 | nowe, PR A2 |
+| neglected | najbardziej zaniedbana potrzeba czeka ≥ 48 h | README 2.4 |
+| packing („Your Fren is thinking of leaving”) | ≥ 120 h | README 2.4 |
 | departed | ≥ 168 h | README 2.4 |
-| Rekonwalescencja | ratunek po ≥ 48 h → 2 kolejne dni opieki (nie licząc dnia ratunku), nastrój maks. 60 | README 2.3 |
-| Ochrona po migracji v1 | odejście nie wcześniej niż 168 h od wdrożenia | README 2.6 |
+| Ratunek | po `packing`: zająć się każdą zaległą potrzebą | A1 |
+| Rekonwalescencja | po ratunku: opieka w 2 kolejne dni UTC (bez dnia ratunku), za każdym razem w ciągu 72 h | README 2.3, A1 |
 | Etapy | tadpole 0–1, froglet 2–6, adult 7+ dni opieki | v1 |
 | Cooldowny / limity | 30/20/45/60 min, 2 s, 12 na dzień UTC | v1 |
 
@@ -176,26 +185,40 @@ Ryzyko do playtestu: gracz, który gra o 23:30 i 00:30 UTC, w drugiej sesji moż
 ```mermaid
 stateDiagram-v2
   [*] --> healthy: adopcja
-  healthy --> neglected: 48 h bez sensownej opieki
+  healthy --> neglected: potrzeba czeka 48 h
+  neglected --> healthy: zajęcie się zaległymi potrzebami
   neglected --> packing: 120 h
+  packing --> recovering: ratunek, wszystkie zaległe potrzeby
   packing --> departed: 168 h
-  neglected --> recovering: sensowna akcja
-  packing --> recovering: sensowna akcja
-  recovering --> healthy: 2 kolejne dni opieki
-  recovering --> neglected: 48 h bez opieki
+  recovering --> healthy: opieka w 2 kolejne dni UTC
+  recovering --> departed: 72 h bez opieki
   departed --> [*]: list przeczytany, nowa adopcja = nowe życie
 ```
 
-Pierwszeństwo przy wyświetlaniu: departed > packing > neglected > recovering > etykiety potrzeb > healthy.
+Pierwszeństwo przy wyświetlaniu: departed > packing > neglected > recovering > etykiety potrzeb > healthy. Status zależy od najbardziej zaniedbanej potrzeby. W trakcie rekonwalescencji `packing` oznacza 48 h bez opieki.
+
+### 5.2a System ratowania (decyzja właściciela 2026-11-07: jedno karmienie co 6 dni nie może utrzymywać żaby)
+
+Jeden zegar od ostatniej akcji tego nie zapewniał: każde kliknięcie odnawiało 7 dni. W A1 każda potrzeba ma własny zegar, a ratunek po `packing` wymaga powrotów w kolejne dni. Wyniki symulatora na prawdziwym SQL (PR #218):
+
+| Wizyty | 2 dni rekonwalescencji | 1 dzień |
+|---|---|---|
+| codziennie / co 4 dni / pt + sob + nd | zostaje | zostaje |
+| sob + nd | wyprowadza się 16. dnia | zostaje |
+| jedno karmienie co 6 dni | 7. dnia | 7. dnia |
+| tylko karmienie, codziennie | 7. dnia | 7. dnia |
+| pełna wizyta co 6 dni | 9. dnia | 9. dnia |
+
+Rekonwalescencja zaczyna się dopiero po `packing` (120 h), a nie od 48 h. Przy 48 h gracz wracający co 4 dni traciłby żabę mimo regularnych wizyt.
 
 ### 5.3 Odejście bez crona
 
-- `departs_at = greatest(coalesce(last_care_at, adopted_at) + 168 h, coalesce(protected_until, -infinity))`.
+- `departs_at = najstarszy zegar potrzeby + 168 h`; w trakcie rekonwalescencji wcześniejsze z tego i `ostatnia opieka + 72 h`.
 - `gry_pepegochi_state()` zostaje tylko do odczytu. Jeśli `teraz >= departs_at`, zwraca `status: 'departed'` i `departure_saved: false`.
 - Pierwsze wywołanie zapisujące (akcja, przeczytanie listu, adopcja) wykonuje pod blokadą:
   `update … set status = 'departed', departed_at = departs_at … where life_id = … and status = 'active'`.
   Warunek `status = 'active'` sprawia, że drugi zapis nic nie zmienia. `departed_at` to obliczony moment, więc nie zależy od tego, czy gracz wróci po 8 dniach czy po roku.
-- W tej samej transakcji: `departures + 1`, `longest_life_days`, `first_departed_at` (tylko jeśli pusty) i zdarzenie dla Passportu (odizolowane).
+- Liczba odejść, najdłuższa przyjaźń i data pierwszego odejścia są liczone z wierszy żyć przy odczycie, więc nie ma osobnych liczników do zsynchronizowania.
 - Akcja po progu nie jest stosowana. Odpowiedź to stan „departed”. Retry daje ten sam wynik. Nie ma RPC, które przywraca `active`.
 - Przedmioty, stemple, awatary i sekrety nie są dotykane w ogóle. Kod odejścia nie ma żadnego `delete`. „P.S. I took the TV” to tylko scena w UI.
 
@@ -221,7 +244,7 @@ Pierwszeństwo przy wyświetlaniu: departed > packing > neglected > recovering >
 | Bot klikający raz na 6 dni | żaba zostaje, ale bez dobrych dni, stale neglected/recovering, bez prestiżowych stempli | odejście możliwe |
 | Wartość dodana | — | niewielka: po 5 dniach głód i tak spada do 0, więc potrzeby pokrywają się z czasem |
 
-**Rekomendacja: Model 1 w MVP.** Ochronę przed „opieką botem raz w tygodniu” dają `good_days`: prestiżowe stemple wymagają dobrych dni, a nie samego utrzymania żaby przy życiu. Model 2 można dodać później, jeśli playtest pokaże taką potrzebę.
+**Wybrane w A1: Model 1 z osobnym zegarem dla każdej potrzeby** (sekcja 5.2a). Zostaje przewidywalny („zajmij się każdą potrzebą przynajmniej raz w tygodniu”), a jedno karmienie co 6 dni już nie wystarcza. Prestiżowe stemple dalej wymagają dobrych dni (PR A2/D).
 
 ---
 
@@ -276,7 +299,7 @@ sequenceDiagram
     RPC-->>UI: stan departed, akcja nie zapisana
   else przed progiem
     RPC->>RPC: 2 s, cooldown, limit 12, potrzeba < 90
-    RPC->>DB: UPDATE zycia (potrzeby, liczniki, last_care_at)
+    RPC->>DB: UPDATE zycia (potrzeby, zegary potrzeb, liczniki, ratunek)
     opt nowy dzien opieki lub kamien milowy
       RPC->>PP: pepegochi_passport_event, blad = tylko warning
     end
@@ -324,10 +347,9 @@ flowchart LR
 
 ## 9. Migracja i zgodność
 
-- **Oczekiwany przypadek:** na produkcji nie ma `games.pepegochi_pets` (v1 nie wdrożone). Migracja tworzy pusty schemat v2.
-- **Zabezpieczenie, jeśli tabela v1 istnieje** (np. staging): każdy wiersz staje się życiem nr 1 z tym samym imieniem, datą adopcji, potrzebami, `care_days`, `last_care_day_utc` i cooldownami. `last_care_at = last_action_at`, `protected_until = czas migracji + 168 h`, `good_days = 0` (nie wymyślamy historii jakości, której v1 nie zapisywało). Stara tabela dostaje nazwę `pepegochi_pets_v1_archive` i nie jest usuwana.
-- Stan zwraca `protected_until`, więc UI może raz wyjaśnić nowe zasady („New: frens can now move out. Yours is safe until …”).
-- Test: żaba v1 nieaktywna od 30 dni po migracji **nie** odchodzi i ma 7 dni ochrony.
+- **Potwierdzone przez właściciela 2026-11-07:** w PH-games nie ma tabel ani funkcji PepeGochi i Fren Passport. v2 to czysty schemat, bez konwersji danych.
+- Zabezpieczenie: migracja odmawia działania, jeśli istnieje tabela v1 `games.pepegochi_pets` (test H2), żeby nikt przypadkiem nie zostawił starych żab bez opieki.
+- Gdyby kiedyś trzeba było przenieść żaby z innej bazy, zasada z README 2.6 nadal obowiązuje: ochrona przez 7 dni i brak natychmiastowej wyprowadzki. Wymaga to osobnej, ręcznej migracji.
 
 ---
 
@@ -361,6 +383,10 @@ flowchart LR
 
 - Każdy stempel raz na konto (klucz `user_id + badge_id`). Kolejne życia nie dają duplikatów.
 - Przyznawanie tylko przez `games.passport_award()` (kontrola Discord + lista ID). Hook odizolowany.
+- **Odzyskiwanie należnych stempli (decyzja właściciela 2026-11-07, zrobione w A1):**
+  - Kamienie milowe (`first_adoption`, `froglet`, `adult`) zapisują się w `games.pepegochi_milestones` w tej samej transakcji co opieka.
+  - Hook Passportu jest odizolowany. Jeśli zawiedzie, opieka zostaje, a wiersz czeka z `synced_at = null`. Każda kolejna przyjęta akcja próbuje ponownie. Migracja PR C może przyznać wszystkie zaległe naraz.
+  - Hook no-op jest tworzony tylko wtedy, gdy nie istnieje, więc ponowne uruchomienie A1 nie wyłącza mostu z PR C.
 - Karta w Passport Overview: imię, etap, status, dzień życia, następny kamień milowy. Po odejściu „Former Fren / Adopt a new egg”. Dane z `gry_pepegochi_state()`.
 - Stats: „Former Frens”, „Longest Friendship”, dni opieki, liczba odejść. Tylko własne dane.
 - Bez zmian w `gry_passport_state()` (K9).
@@ -391,7 +417,13 @@ flowchart LR
 
 ## 13. Plan testów
 
-Testy SQL na prawdziwym PostgreSQL 15+ przez istniejący harness (`PASSPORT_PG_URL`, `PASSPORT_PG_MODULE`), każdy na własnej, tymczasowej bazie, z wieloma połączeniami do testów równoległości. Czas kontrolowany przez przesuwanie zapisanych znaczników w danych testowych. W kodzie produkcyjnym nie ma żadnego „testowego zegara”. Testy statyczne działają w CI bez zależności.
+Testy SQL działają na prawdziwym PostgreSQL 15+ przez istniejący harness (`PASSPORT_PG_URL`, `PASSPORT_PG_MODULE`). Każdy przebieg ma własną, tymczasową bazę i wiele połączeń do testów równoległości.
+
+Czas jest wirtualny: test i symulator podmieniają `games.pepegochi_clock()` we własnej bazie. W migracji ta funkcja to dokładnie `select clock_timestamp()`, co sprawdza test statyczny. Testy statyczne działają w CI bez zależności.
+
+**Stan po A1 (#218):** A, B, C, D, E, F1, F5, R, M i H1–H3 zaimplementowane. Lokalnie 44/44 przypadki SQL i 11/11 statycznych.
+
+**Do czasu osobnej zgody na wdrożenie:** testy tylko na lokalnej bazie lub w osobnym środowisku staging. Ukryta beta nie może wymagać zmian w produkcyjnym PH-games.
 
 | ID | Przypadek | Oczekiwany wynik | PR |
 |---|---|---|---|
@@ -400,25 +432,25 @@ Testy SQL na prawdziwym PostgreSQL 15+ przez istniejący harness (`PASSPORT_PG_U
 | A2 | anonimowy użytkownik Supabase / konto tylko e-mail | „Discord sign-in required”, zero zapisów | A1 |
 | A3 | żadne publiczne RPC nie ma argumentu `user_id`, `life_id`, statystyk, czasu, ID stempla (statycznie + `pg_proc`) | brak | A1 |
 | A4 | pełny scenariusz gracza A nie zmienia wierszy B (suma kontrolna), stan A nie zawiera historii B | izolacja | A1 |
-| A5 | Discord odłączony po adopcji | RPC odrzucane, żaba bez zmian, brak stempla | A1 |
+| A5 | Discord odłączony po adopcji | wszystkie 4 RPC odrzucone, zero zapisów; zegar żaby biegnie dalej; po ponownym połączeniu ta sama żaba, a po tygodniu list | A1 |
 | **Uprawnienia i higiena funkcji** ||||
 | B1 | `has_table_privilege` dla `anon` / `authenticated` na wszystkich tabelach `pepegochi_*` | brak SELECT/INSERT/UPDATE/DELETE | A1 |
-| B2 | funkcje wewnętrzne (`rules`, `snapshot`, `settle`, `passport_event`) | brak EXECUTE dla klientów | A1 |
+| B2 | wszystkie funkcje wewnętrzne `games.pepegochi_*` | brak EXECUTE dla klientów | A1 |
 | B3 | publiczne RPC: `security definer` + `search_path=''` (`pg_proc.proconfig`) | tak | A1 |
 | B4 | `gry_pepegochi_state()` w transakcji READ ONLY, także po progu odejścia | działa | A1 |
 | B5 | imię: długość, znaki sterujące, zerowa szerokość, RTL override, 10 KB tekstu, NULL; akcja spoza listy | odrzucone bez zapisu | A1 |
 | **Równoległość i idempotencja** ||||
 | C1 | 12 równoległych `adopt` | 1 owner, 1 aktywne życie | A1 |
 | C2 | 12 równoległych `feed` | 1 przyjęty, 1 dzień opieki | A1 |
-| C3 | 12 równoległych `letter_read` po progu | 1 odejście, `departures = 1` | A1 |
+| C3 | 12 równoległych `letter_read` po progu | 1 odejście z obliczonym `departed_at`, list przeczytany raz | A1 |
 | C4 | `letter_read` i `adopt` z dwóch kart naraz | najwyżej 1 nowe życie | A1 |
 | C5 | akcja tuż po progu równolegle ze `state` | akcja odrzucona jako departed, brak „wskrzeszenia” | A1 |
 | C6 | retry `letter_read` / `adopt` po zerwanym połączeniu | ten sam wynik, bez duplikatów | A1 |
 | **Czas i progi** ||||
 | D1 | spadek potrzeb po 2 h, 24 h, 3 dniach (regresja v1) | ułamki zachowane | A1 |
 | D2 | akcje 23:59:58 i 00:00:01 UTC / dwie akcje tego samego dnia | 2 dni / 1 dzień | A1 |
-| D3 | 47:59:50 / 48:00:10 / 119:59:50 / 120:00:10 / 167:59:50 / 168:00:10 | healthy / neglected / neglected / packing / packing i akcja ratuje / departed i akcja odrzucona | A1 |
-| D4 | odejście zapisane po 8 dniach i po 60 dniach | `departed_at` = ostatnia sensowna opieka + 168 h w obu | A1 |
+| D3 | 47:59 / 48:01 / 119:59 / 120:01 / 167:59 / 168:01 od najstarszego zegara potrzeby | healthy / neglected / neglected / packing / packing i wizyta ratuje / departed | A1 |
+| D4 | odejście zapisane po 8 dniach i po 60 dniach | ten sam `departed_at` i powód w obu | A1 |
 | D5 | strefa czasowa sesji `Pacific/Kiritimati` i `America/Adak` | wyniki identyczne jak w UTC | A1 |
 | D6 | każde odrzucenie (cooldown, limit, 2 s, „nie potrzebuje”, departed) | wiersz bez zmian | A1 |
 | **Cykl życia i historia** ||||
@@ -426,24 +458,39 @@ Testy SQL na prawdziwym PostgreSQL 15+ przez istniejący harness (`PASSPORT_PG_U
 | E2 | po odejściu brak drogi do `status = 'active'`; nowa adopcja = nowy `life_id`, `generation + 1` | tak | A1 |
 | E3 | adopcja przy aktywnej żabie / przy nieprzeczytanym liście | zwraca istniejącą / błąd „Read the letter first” | A1 |
 | E4 | historia: 12 żyć w bazie, stan zwraca 10 najnowszych z poprawnymi liczbami | tak | A1 |
-| E5 | drugie odejście | `departures = 2`, `first_departed_at` bez zmian | A1 |
+| E5 | drugie odejście | `former_frens = 2`, `first_departed_at` bez zmian | A1 |
 | **Jakość opieki i farmienie** ||||
 | F1 | akcja przy potrzebie ≥ 90 | odrzucona, nie przesuwa zegara odejścia ani dnia opieki | A1 |
-| F2 | jedna akcja co 6 dni przez 60 dni | żaba zostaje, `good_days = 0`, brak `good_parent` / `best_fren_forever` | A2 |
+| F2 | wizyty co 4 dni przez 60 dni (żaba zostaje) | `good_days = 0`, brak `good_parent` / `best_fren_forever` | A2 |
 | F3 | codzienna sesja Feed + Clean + Play | dobry dzień każdego dnia; 1 rodzaj akcji albo potrzeba < 50 → nie | A2 |
-| F4 | ratunek po ≥ 48 h | recovering przez 2 kolejne dni opieki, nastrój ≤ 60, potem healthy | A2 |
 | F5 | limit 12 i cooldowny (regresja v1) | bez zmian | A1 |
+| **Ratowanie i rekonwalescencja (scenariusze symulatora)** ||||
+| R1 | jedno karmienie co 6 dni | wyprowadzka 7. dnia | A1 |
+| R2 | codziennie tylko karmienie | wyprowadzka 7. dnia | A1 |
+| R3 | pełna wizyta co 6 dni | ratunek, potem pominięta rekonwalescencja, wyprowadzka 9. dnia | A1 |
+| R4 | wizyta co 4 dni | zostaje, bywa neglected, nigdy packing | A1 |
+| R5 | pt + sob + nd co tydzień | zostaje, co tydzień packing i recovering | A1 |
+| R6 | tylko sob + nd | 2 dni rekonwalescencji: wyprowadzka; 1 dzień: zostaje | A1 |
+| R7 | samo karmienie po `packing` / pełna wizyta | termin nie zaczyna nowego tygodnia / recovering, 2 dni, ten sam dzień UTC się nie liczy, potem healthy | A1 |
+| R8 | ratunek, potem 4 dni przerwy | wyprowadzka po 72 h (`recovery`) | A1 |
+| R9 | codziennie przez 60 dni | zawsze healthy, 61 dni opieki, adult | A1 |
+| R10 | 8 dni przerwy | wyprowadzka, list, nowe jajko, historia | A1 |
+| **Kamienie milowe** ||||
+| M1 | adopcja, 2. i 7. dzień opieki, potem drugie życie | `first_adoption`, `froglet`, `adult` raz na konto | A1 |
+| M2 | hook Passportu rzuca błąd | opieka zapisana, warning, kamień milowy czeka, zapisy hooka cofnięte | A1 |
+| M3 | hook naprawiony | następna przyjęta akcja doręcza wszystko; bez zaległości hook nie jest wołany | A1 |
+| M4 | ponowne uruchomienie migracji A1 | hook zainstalowany później zostaje | A1 |
 | **Passport** ||||
 | G1 | pierwsza i druga adopcja | `first_hatch` raz | C |
 | G2 | 2. i 7. dzień opieki w życiu 1, potem w życiu 2 | `little_fren`, `grown_fren` raz | C |
-| G3 | kamień milowy po odłączeniu Discorda | brak stempla, akcja przyjęta | C |
-| G4 | wymuszony błąd zapisu stempla | akcja przyjęta, warning w logu (regresja z próby #186) | A1 (atrapa hooka), C |
+| G3 | kamień milowy czeka, a `passport_award()` dostaje konto bez Discorda (bezpośrednie wywołanie, bo RPC i tak odrzuca takie konto, A5) | brak stempla, kamień milowy dalej czeka; po ponownym połączeniu Discorda pierwsza przyjęta akcja doręcza stempel | C |
+| G4 | wymuszony błąd zapisu stempla | akcja przyjęta, warning w logu (regresja z próby #186); zrobione w A1 jako M2 | A1, C |
 | G5 | 100 dni opieki + statyczne wyszukanie | żadna ścieżka PepeGochi nie przyznaje `certified_fren` | C |
 | G6 | ponowne uruchomienie migracji v2 po pliku Passportu | hook dalej działa (regresja z próby #186) | C |
 | G7 | backfill uruchomiony dwa razy | te same wiersze | C |
 | **Migracja i regresje** ||||
 | H1 | każda migracja uruchomiona dwa razy | bez błędów, bez zmian danych | A1 |
-| H2 | wiersz v1 nieaktywny od 30 dni | po migracji aktywny, `protected_until` = migracja + 168 h, `care_days` zachowane, `good_days = 0` | A1 |
+| H2 | istnieje tabela v1 `games.pepegochi_pets` | migracja odmawia działania | A1 |
 | H3 | usunięcie konta | brak osieroconych wierszy | A1 |
 | H4 | cały `node --test tests/*.test.mjs` z PostgreSQL | dalej zielony (dziś 92/92) | każdy |
 | H5 | statycznie: brak wypłat, portfeli, mnożnika w SQL i JS PepeGochi | brak | A1 |
@@ -461,21 +508,23 @@ Po wdrożeniu na produkcję (osobna zgoda): ponowne doradcy bezpieczeństwa i wy
 
 ## 14. Decyzje dla właściciela
 
-Nie blokują PR A1 poza punktami 1–2. Do pozostałych używam kandydatów z tabeli 5.1.
+**Odpowiedzi właściciela z 2026-11-07** (punkty 1–6, 11 i 13):
 
-1. **Stan produkcji:** czy potwierdzasz, że SQL z #186 nie był uruchamiany na PH-games, a pliki Passportu (`update_fren_passport.sql`, `update_fren_avatar.sql`, `update_passport_awards.sql`) też jeszcze nie?
-2. **Następca #186:** czy PR A1 ma zastąpić #186 (nowa gałąź od `main`, #186 zamykasz po scaleniu A1)? Proponuję przenieść do A1 bez zmian `games/SECURITY_REVIEW_2026-11-05.md`.
-3. Progi 48 / 120 / 168 h od ostatniej sensownej opieki: OK na playtest?
-4. Sensowna akcja = potrzeba < 90; akcja bez efektu odrzucana: OK?
-5. Dobry dzień = ≥ 2 różne sensowne akcje i wszystkie potrzeby ≥ 50: OK?
-6. Rekonwalescencja od 48 h przez 2 dni opieki, nastrój ≤ 60: OK? (Alternatywa: dopiero od 120 h.)
+1. ✅ PH-games nie ma tabel ani funkcji PepeGochi i Fren Passport (sprawdzone bez zmian). v2 to czysty schemat.
+2. ✅ A1 zastępuje #186 (nowa gałąź od `main`, osobny Draft PR #218). #186 zostaje jako punkt odniesienia i nie jest scalany. `SECURITY_REVIEW_2026-11-05.md` zostaje w #186.
+3. ✅ jako wartości robocze: 48 / 120 / 168 h (liczone od najstarszego zegara potrzeby, sekcja 5.2a).
+4. ✅ jako wartość robocza: sensowna akcja = potrzeba < 90.
+5. ✅ jako wartość robocza: dobry dzień = ≥ 2 różne akcje i potrzeby ≥ 50 (PR A2).
+6. ✅ jako wartość robocza: 2 dni rekonwalescencji. Zaczyna się od 120 h, nie od 48 h (powód w 5.2a). Bez ograniczenia nastroju, bo konsekwencją jest krótszy termin 72 h. **Nowe pytanie po symulacji:** czy gracze grający tylko w sobotę i niedzielę mają zachować żabę? Przy 2 dniach rekonwalescencji tracą ją 16. dnia, przy 1 dniu ją zachowują.
 7. Wyzwanie 30 dni: wariant 1 teraz, wariant 2 później jako `perfect_parent`?
 8. Stempel 100 dni: ID i nazwa (`best_fren_forever` / „Best Fren Forever”?) oraz reguła (100 dobrych dni w jednym życiu?).
 9. „It's Not Me, It's You”: wpis w historii (rekomendacja) czy ukryty stempel?
 10. Etap jajka przed pierwszą akcją: tak czy nie? (v1 zaczyna od kijanki.)
-11. Środowisko testowe: czy masz osobny projekt Supabase do testów? Jeśli nie, testuję na lokalnym PostgreSQL, a Ty grasz w ukrytej becie.
+11. ✅ Do czasu osobnej zgody na wdrożenie: tylko lokalna baza albo osobny staging. Ukryta beta nie może wymagać zmian w PH-games.
 12. Flaga bety: osobna `?beta=gochi` czy wspólna z `?beta=fren`?
-13. Tryb podglądu do playtestu: lokalny symulator w przeglądarce z przewijaniem czasu (+1 h, +1 dzień), oznaczony TEST PREVIEW, nic nie zapisuje na serwerze. Pozwoli Ci sprawdzić 7 dni do wyprowadzki w kilka minut. Chcesz go w PR B1?
+13. ✅ Symulator przyspieszonego czasu: w A1 jako `scripts/pepegochi_sim.mjs` (ten sam SQL w PGlite, scenariusze, tryb interaktywny, zmiana wartości roboczych). **Do wyboru przed B1** — wersja w przeglądarce dla ukrytej bety:
+    - (a) ten sam SQL w PGlite w przeglądarce: ~5 MB gzip, `wasm-unsafe-eval` w CSP tylko na stronie testowej, zero rozbieżności z serwerem;
+    - (b) lekki model JS z testem zgodności z SQL: mały, bez zmiany CSP, ale druga implementacja zasad.
 14. Lista dozwolonych stempli: wariant 1 czy 2 z K3?
 
 ---
@@ -486,9 +535,9 @@ Każdy PR jako Draft, z gałęzi od `main`, z opisem zgodnym z CLAUDE_HANDOFF.md
 
 | PR | Zakres | Pliki | DONE | Rozmiar |
 |---|---|---|---|---|
-| **A1** cykl życia (backend) | owners + lives, 4 RPC, sensowna akcja, statusy, odejście, list, historia, ponowna adopcja, konwersja v1, odizolowany hook no-op, liczniki akcji pod warianty listu | `games/supabase/update_pepegochi_v2.sql`, `games/PEPEGOCHI_API.md` (v2), `tests/pepegochi.test.mjs` (statyczny, CI), `tests/pepegochi-sql.test.mjs` (PostgreSQL) | testy A, B, C, D, E, F1, F5, G4 (atrapa), H1–H5 zielone | ~350 linii SQL + testy |
-| **A2** jakość opieki | dobre dni, seria, rekonwalescencja | ten sam plik SQL + testy | F2–F4 | mały |
-| **B1** model w przeglądarce | czysta funkcja projekcji potrzeb/statusu między wywołaniami, teksty ze STORY_CONTENT.md, opcjonalnie symulator podglądu (decyzja 13) | `docs/games/js/pepegochi-model.mjs`, test jednostkowy | wyniki zgodne z SQL dla tych samych danych | mały |
+| **A1** cykl życia (backend) — **Draft #218** | owners + lives + milestones, 4 RPC, sensowna akcja, zegar każdej potrzeby, statusy, ratunek i rekonwalescencja, odejście, list, historia, ponowna adopcja, rejestr kamieni milowych z odizolowanym hookiem, liczniki akcji pod warianty listu, symulator czasu | `games/supabase/update_pepegochi_v2.sql`, `games/PEPEGOCHI_API.md`, `scripts/pepegochi_sim.mjs`, `tests/pepegochi.test.mjs` (CI), `tests/pepegochi-sql.test.mjs` (PostgreSQL) | A, B, C, D, E, F1, F5, R, M, H1–H3 zielone lokalnie | 561 linii SQL bez komentarzy + testy |
+| **A2** jakość opieki | dobre dni i seria dobrych dni | ten sam plik SQL + testy | F2, F3 | mały |
+| **B1** lokalny backend dla bety | symulator w przeglądarce według decyzji 13 (a lub b), projekcja potrzeb między wywołaniami, teksty ze STORY_CONTENT.md | według decyzji 13 | wyniki zgodne z SQL dla scenariuszy z A1 | mały–średni |
 | **B2** tymczasowe UI | okno PondOS (iframe jak YEET) za flagą bety: imię, etap, 4 potrzeby, 4 akcje, ostrzeżenie, recovery, pusty pokój, GOODBYE.TXT, Past Frens, nowa adopcja. Tylko istniejące komponenty PondOS, bez nowej grafiki | `docs/games/pepegochi.html`, `docs/games/js/pepegochi.mjs`, wpis w `docs/meme/meme.js` za flagą | I1–I6, test CSP, wszystkie okna PondOS sprawdzone w przeglądarce | średni |
 | **C** Passport | lista ID (K3), `first_hatch` / `little_fren` / `grown_fren`, backfill, karta Overview, Stats; katalog bez zmiany statusów do R | `games/supabase/update_pepegochi_passport.sql`, `docs/meme/meme.js` (Passport), testy, plik decyzji | G1–G7, istniejące testy Passportu zielone | mały |
 | **D** Good Parent | wariant wyzwania z decyzji 7, `best_fren_forever` jeśli zatwierdzony, jawna zmiana opisów w katalogu | `update_pepegochi_good_parent.sql`, katalog, plik decyzji, testy | testy 30 dni, pominięcia, 7 dni nieobecności, strefy, duble | mały |
