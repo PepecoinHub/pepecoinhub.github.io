@@ -168,7 +168,8 @@ Właściciel zatwierdził je 2026-11-07 jako **wartości robocze, nie ostateczne
 | packing („Your Fren is thinking of leaving”) | ≥ 120 h | README 2.4 |
 | departed | ≥ 168 h | README 2.4 |
 | Ratunek | po `packing`: zająć się każdą zaległą potrzebą | A1 |
-| Rekonwalescencja | po ratunku: opieka w 2 kolejne dni UTC (bez dnia ratunku), za każdym razem w ciągu 72 h | README 2.3, A1 |
+| Rekonwalescencja | po ratunku: opieka w **1** późniejszy dzień UTC, w ciągu 72 h (decyzja właściciela) | README 2.3, A1 |
+| Minimalna przerwa przed wizytą „następnego dnia” | 0 h (wyłączona; pokrętło do playtestu) | A1 |
 | Etapy | tadpole 0–1, froglet 2–6, adult 7+ dni opieki | v1 |
 | Cooldowny / limity | 30/20/45/60 min, 2 s, 12 na dzień UTC | v1 |
 
@@ -190,24 +191,35 @@ stateDiagram-v2
   neglected --> packing: 120 h
   packing --> recovering: ratunek, wszystkie zaległe potrzeby
   packing --> departed: 168 h
-  recovering --> healthy: opieka w 2 kolejne dni UTC
+  recovering --> healthy: opieka w późniejszy dzień UTC
   recovering --> departed: 72 h bez opieki
   departed --> [*]: list przeczytany, nowa adopcja = nowe życie
 ```
 
 Pierwszeństwo przy wyświetlaniu: departed > packing > neglected > recovering > etykiety potrzeb > healthy. Status zależy od najbardziej zaniedbanej potrzeby. W trakcie rekonwalescencji `packing` oznacza 48 h bez opieki.
 
-### 5.2a System ratowania (decyzja właściciela 2026-11-07: jedno karmienie co 6 dni nie może utrzymywać żaby)
+### 5.2a System ratowania (decyzje właściciela 2026-11-07)
 
-Jeden zegar od ostatniej akcji tego nie zapewniał: każde kliknięcie odnawiało 7 dni. W A1 każda potrzeba ma własny zegar, a ratunek po `packing` wymaga powrotów w kolejne dni. Wyniki symulatora na prawdziwym SQL (PR #218):
+Właściciel ustalił:
+- jedno karmienie co 6 dni nie może utrzymywać żaby;
+- **rekonwalescencja trwa 1 dzień**, żeby gracze grający tylko w sobotę i niedzielę mogli zachować żabę;
+- ratunku nie wolno upraszczać: trzeba zająć się wszystkimi zaległymi potrzebami i wrócić innego dnia, samo karmienie nie wystarcza;
+- utrzymanie żaby i prestiżowe stemple za dobrą opiekę to dwa różne wyzwania.
 
-| Wizyty | 2 dni rekonwalescencji | 1 dzień |
-|---|---|---|
-| codziennie / co 4 dni / pt + sob + nd | zostaje | zostaje |
-| sob + nd | wyprowadza się 16. dnia | zostaje |
-| jedno karmienie co 6 dni | 7. dnia | 7. dnia |
-| tylko karmienie, codziennie | 7. dnia | 7. dnia |
-| pełna wizyta co 6 dni | 9. dnia | 9. dnia |
+Jeden zegar od ostatniej akcji tego nie zapewniał: każde kliknięcie odnawiało 7 dni. W A1 każda potrzeba ma własny zegar. Wyniki symulatora na prawdziwym SQL (PR #218, testy R i W):
+
+| Wizyty | Wynik (1 dzień) |
+|---|---|
+| codziennie / co 4 dni / pt + sob + nd | zostaje |
+| sob + nd: 18:00, 08:00/21:00, 21:00/08:00, przez północ UTC, losowe godziny | zostaje, co tydzień ratunek i rekonwalescencja |
+| weekendy, tylko karmienie | 7. dnia |
+| opuszczona sobota, niedziela 12:00, bez wizyty w tygodniu | środa (22. dzień, `recovery`) |
+| to samo + poniedziałek | zostaje |
+| opuszczona sobota, niedziela 19:00 (ponad 7 dni) | już po wyprowadzce |
+| jedno karmienie co 6 dni / tylko karmienie codziennie | 7. dnia |
+| pełna wizyta co 6 dni | 9. dnia |
+
+Opcjonalny `recovery_min_gap_h` (domyślnie 0) to pokrętło do playtestu. Przy 8 h sesja sob 23:30 + nd 00:30 nie liczy się jako dwa dni.
 
 Rekonwalescencja zaczyna się dopiero po `packing` (120 h), a nie od 48 h. Przy 48 h gracz wracający co 4 dni traciłby żabę mimo regularnych wizyt.
 
@@ -470,8 +482,14 @@ Czas jest wirtualny: test i symulator podmieniają `games.pepegochi_clock()` we 
 | R3 | pełna wizyta co 6 dni | ratunek, potem pominięta rekonwalescencja, wyprowadzka 9. dnia | A1 |
 | R4 | wizyta co 4 dni | zostaje, bywa neglected, nigdy packing | A1 |
 | R5 | pt + sob + nd co tydzień | zostaje, co tydzień packing i recovering | A1 |
-| R6 | tylko sob + nd | 2 dni rekonwalescencji: wyprowadzka; 1 dzień: zostaje | A1 |
-| R7 | samo karmienie po `packing` / pełna wizyta | termin nie zaczyna nowego tygodnia / recovering, 2 dni, ten sam dzień UTC się nie liczy, potem healthy | A1 |
+| R6 | tylko sob + nd | przy 1 dniu rekonwalescencji (decyzja): zostaje; przy 2 dniach: wyprowadzka | A1 |
+| R7 | samo karmienie po `packing` / pełna wizyta | termin nie zaczyna nowego tygodnia / recovering, ten sam dzień UTC się nie liczy, następny dzień kończy | A1 |
+| W1 | weekendy o różnych godzinach: 08:00/21:00, 21:00/08:00, 23:30/00:30, losowe przez 12 tygodni | zostaje, co tydzień ratunek | A1 |
+| W2 | weekendy, tylko karmienie | wyprowadzka 7. dnia | A1 |
+| W3 | opuszczona sobota: niedziela 12:00 bez wizyty w tygodniu / z poniedziałkiem / niedziela 19:00 | środa (`recovery`) / zostaje / już po wyprowadzce | A1 |
+| W4 | ratunek przez północ UTC | 2 dni opieki; wizyta następnego dnia musi być w późniejszym dniu UTC | A1 |
+| W5 | sesja sob 23:30 + nd 00:30 | liczy się jako dwa dni; przy `recovery_min_gap_h` = 8 nie | A1 |
+| P | zgodność modelu JS z SQL: wszystkie scenariusze × 5 zestawów zasad, progi ±1 ms, przekroczenie 90, 300 losowych gier | 0 różnic w odpowiedziach, wierszach i kamieniach milowych (20 781 wywołań) | B1 |
 | R8 | ratunek, potem 4 dni przerwy | wyprowadzka po 72 h (`recovery`) | A1 |
 | R9 | codziennie przez 60 dni | zawsze healthy, 61 dni opieki, adult | A1 |
 | R10 | 8 dni przerwy | wyprowadzka, list, nowe jajko, historia | A1 |
@@ -515,16 +533,17 @@ Po wdrożeniu na produkcję (osobna zgoda): ponowne doradcy bezpieczeństwa i wy
 3. ✅ jako wartości robocze: 48 / 120 / 168 h (liczone od najstarszego zegara potrzeby, sekcja 5.2a).
 4. ✅ jako wartość robocza: sensowna akcja = potrzeba < 90.
 5. ✅ jako wartość robocza: dobry dzień = ≥ 2 różne akcje i potrzeby ≥ 50 (PR A2).
-6. ✅ jako wartość robocza: 2 dni rekonwalescencji. Zaczyna się od 120 h, nie od 48 h (powód w 5.2a). Bez ograniczenia nastroju, bo konsekwencją jest krótszy termin 72 h. **Nowe pytanie po symulacji:** czy gracze grający tylko w sobotę i niedzielę mają zachować żabę? Przy 2 dniach rekonwalescencji tracą ją 16. dnia, przy 1 dniu ją zachowują.
+6. ✅ **1 dzień rekonwalescencji** (decyzja 2026-11-07): gracze sob + nd zachowują żabę, a ratunek nie jest uproszczony. Rekonwalescencja zaczyna się od 120 h, nie od 48 h (powód w 5.2a). Bez ograniczenia nastroju. Otwarte: czy włączyć `recovery_min_gap_h` (dziś 0) przeciw sesji przez północ UTC.
 7. Wyzwanie 30 dni: wariant 1 teraz, wariant 2 później jako `perfect_parent`?
 8. Stempel 100 dni: ID i nazwa (`best_fren_forever` / „Best Fren Forever”?) oraz reguła (100 dobrych dni w jednym życiu?).
 9. „It's Not Me, It's You”: wpis w historii (rekomendacja) czy ukryty stempel?
 10. Etap jajka przed pierwszą akcją: tak czy nie? (v1 zaczyna od kijanki.)
 11. ✅ Do czasu osobnej zgody na wdrożenie: tylko lokalna baza albo osobny staging. Ukryta beta nie może wymagać zmian w PH-games.
 12. Flaga bety: osobna `?beta=gochi` czy wspólna z `?beta=fren`?
-13. ✅ Symulator przyspieszonego czasu: w A1 jako `scripts/pepegochi_sim.mjs` (ten sam SQL w PGlite, scenariusze, tryb interaktywny, zmiana wartości roboczych). **Do wyboru przed B1** — wersja w przeglądarce dla ukrytej bety:
-    - (a) ten sam SQL w PGlite w przeglądarce: ~5 MB gzip, `wasm-unsafe-eval` w CSP tylko na stronie testowej, zero rozbieżności z serwerem;
-    - (b) lekki model JS z testem zgodności z SQL: mały, bez zmiany CSP, ale druga implementacja zasad.
+13. ✅ Symulator przyspieszonego czasu:
+    - w A1 jako `scripts/pepegochi_sim.mjs` (ten sam SQL w PGlite), który zostaje źródłem referencyjnym;
+    - w przeglądarce **wariant (b), lekki JS** (decyzja 2026-11-07), bez PGlite i bez rozszerzania CSP: Draft #220, z automatycznymi testami zgodności z SQL;
+    - działa wyłącznie lokalnie, nie przyznaje osiągnięć i nie zmienia danych graczy.
 14. Lista dozwolonych stempli: wariant 1 czy 2 z K3?
 
 ---
@@ -537,7 +556,7 @@ Każdy PR jako Draft, z gałęzi od `main`, z opisem zgodnym z CLAUDE_HANDOFF.md
 |---|---|---|---|---|
 | **A1** cykl życia (backend) — **Draft #218** | owners + lives + milestones, 4 RPC, sensowna akcja, zegar każdej potrzeby, statusy, ratunek i rekonwalescencja, odejście, list, historia, ponowna adopcja, rejestr kamieni milowych z odizolowanym hookiem, liczniki akcji pod warianty listu, symulator czasu | `games/supabase/update_pepegochi_v2.sql`, `games/PEPEGOCHI_API.md`, `scripts/pepegochi_sim.mjs`, `tests/pepegochi.test.mjs` (CI), `tests/pepegochi-sql.test.mjs` (PostgreSQL) | A, B, C, D, E, F1, F5, R, M, H1–H3 zielone lokalnie | 561 linii SQL bez komentarzy + testy |
 | **A2** jakość opieki | dobre dni i seria dobrych dni | ten sam plik SQL + testy | F2, F3 | mały |
-| **B1** lokalny backend dla bety | symulator w przeglądarce według decyzji 13 (a lub b), projekcja potrzeb między wywołaniami, teksty ze STORY_CONTENT.md | według decyzji 13 | wyniki zgodne z SQL dla scenariuszy z A1 | mały–średni |
+| **B1** lokalny symulator w przeglądarce — **Draft #220** (stacked na #218) | zasady w JS (te same RPC i JSON), strona testowa z przewijaniem czasu, tylko lokalnie (CSP `connect-src 'none'`, brak zapisu, brak stempli) | `docs/games/js/pepegochi-model.mjs`, `docs/games/pepegochi-sim.html`, `tests/pepegochi-parity.test.mjs`, `tests/pepegochi-model.test.mjs` | test P: 0 różnic z SQL | średni |
 | **B2** tymczasowe UI | okno PondOS (iframe jak YEET) za flagą bety: imię, etap, 4 potrzeby, 4 akcje, ostrzeżenie, recovery, pusty pokój, GOODBYE.TXT, Past Frens, nowa adopcja. Tylko istniejące komponenty PondOS, bez nowej grafiki | `docs/games/pepegochi.html`, `docs/games/js/pepegochi.mjs`, wpis w `docs/meme/meme.js` za flagą | I1–I6, test CSP, wszystkie okna PondOS sprawdzone w przeglądarce | średni |
 | **C** Passport | lista ID (K3), `first_hatch` / `little_fren` / `grown_fren`, backfill, karta Overview, Stats; katalog bez zmiany statusów do R | `games/supabase/update_pepegochi_passport.sql`, `docs/meme/meme.js` (Passport), testy, plik decyzji | G1–G7, istniejące testy Passportu zielone | mały |
 | **D** Good Parent | wariant wyzwania z decyzji 7, `best_fren_forever` jeśli zatwierdzony, jawna zmiana opisów w katalogu | `update_pepegochi_good_parent.sql`, katalog, plik decyzji, testy | testy 30 dni, pominięcia, 7 dni nieobecności, strefy, duble | mały |
