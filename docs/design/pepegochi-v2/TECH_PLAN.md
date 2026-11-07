@@ -169,7 +169,8 @@ Właściciel zatwierdził je 2026-11-07 jako **wartości robocze, nie ostateczne
 | departed | ≥ 168 h | README 2.4 |
 | Ratunek | po `packing`: zająć się każdą zaległą potrzebą | A1 |
 | Rekonwalescencja | po ratunku: opieka w **1** późniejszy dzień UTC, w ciągu 72 h (decyzja właściciela) | README 2.3, A1 |
-| Minimalna przerwa przed wizytą „następnego dnia” | 0 h (wyłączona; pokrętło do playtestu) | A1 |
+| Minimalna przerwa przed wizytą „następnego dnia” | **8 h** od ratunku (decyzja właściciela); wcześniejsza wizyta pomaga, ale nie kończy rekonwalescencji; gra pokazuje najwcześniejszy moment (`counts_from`) | A1 |
+| Good Parent | 30 dobrych dni w jednym życiu, niekoniecznie z rzędu (decyzja robocza) | A2 |
 | Etapy | tadpole 0–1, froglet 2–6, adult 7+ dni opieki | v1 |
 | Cooldowny / limity | 30/20/45/60 min, 2 s, 12 na dzień UTC | v1 |
 
@@ -219,7 +220,7 @@ Jeden zegar od ostatniej akcji tego nie zapewniał: każde kliknięcie odnawiał
 | jedno karmienie co 6 dni / tylko karmienie codziennie | 7. dnia |
 | pełna wizyta co 6 dni | 9. dnia |
 
-Opcjonalny `recovery_min_gap_h` (domyślnie 0) to pokrętło do playtestu. Przy 8 h sesja sob 23:30 + nd 00:30 nie liczy się jako dwa dni.
+**`recovery_min_gap_h` = 8 (decyzja 2026-11-07).** Rekonwalescencję kończy opieka w późniejszym dniu UTC, co najmniej 8 h po ratunku, więc sesja sob 23:30 + nd 00:30 jest jedną wizytą. Wcześniejsza wizyta jest przyjęta i poprawia potrzeby, ale nie kończy rekonwalescencji. Sob 21:00 + nd 08:00 (11 h) dalej zachowuje żabę.
 
 Rekonwalescencja zaczyna się dopiero po `packing` (120 h), a nie od 48 h. Przy 48 h gracz wracający co 4 dni traciłby żabę mimo regularnych wizyt.
 
@@ -473,8 +474,14 @@ Czas jest wirtualny: test i symulator podmieniają `games.pepegochi_clock()` we 
 | E5 | drugie odejście | `former_frens = 2`, `first_departed_at` bez zmian | A1 |
 | **Jakość opieki i farmienie** ||||
 | F1 | akcja przy potrzebie ≥ 90 | odrzucona, nie przesuwa zegara odejścia ani dnia opieki | A1 |
-| F2 | wizyty co 4 dni przez 60 dni (żaba zostaje) | `good_days = 0`, brak `good_parent` / `best_fren_forever` | A2 |
-| F3 | codzienna sesja Feed + Clean + Play | dobry dzień każdego dnia; 1 rodzaj akcji albo potrzeba < 50 → nie | A2 |
+| F2 → G8 | wizyty co 4 dni / pełna wizyta co 6 dni | ≤ 1 dobry dzień, brak `good_parent` | A2 (#221) |
+| F3 → G1–G3 | reguła dobrego dnia; codziennie krótka wizyta | 2 rodzaje i potrzeby ≥ 50; 1 na dzień UTC; seria; 61 dni, Good Parent 29. dnia | A2 (#221) |
+| G4 | sob + nd przez 20 tygodni: krótko / ok. godziny / dwie wizyty dziennie | 1 / 41 (cel 103. dnia) / 41 | A2 (#221) |
+| G5 | opieka rozdzielona północą UTC | najwyżej 1 dobry dzień na dzień UTC | A2 (#221) |
+| G6 | ratunek i powrót < 8 h | wizyta pomaga, nie kończy rekonwalescencji | A2 (#221) |
+| G7 | zaniedbanie, potem lepsza opieka | dobre dni wracają drugiego dnia opieki | A2 (#221) |
+| G9 | propozycje ≥ 40 / ≥ 30 / „opieka tego dnia” | 21 / 41 / 41 dla sob + nd, 2 / 16 / 16 przy wizytach co 4 dni | A2 (#221) |
+| G10 | Good Parent raz na konto, dobre dni w historii | tak | A2 (#221) |
 | F5 | limit 12 i cooldowny (regresja v1) | bez zmian | A1 |
 | **Ratowanie i rekonwalescencja (scenariusze symulatora)** ||||
 | R1 | jedno karmienie co 6 dni | wyprowadzka 7. dnia | A1 |
@@ -488,7 +495,7 @@ Czas jest wirtualny: test i symulator podmieniają `games.pepegochi_clock()` we 
 | W2 | weekendy, tylko karmienie | wyprowadzka 7. dnia | A1 |
 | W3 | opuszczona sobota: niedziela 12:00 bez wizyty w tygodniu / z poniedziałkiem / niedziela 19:00 | środa (`recovery`) / zostaje / już po wyprowadzce | A1 |
 | W4 | ratunek przez północ UTC | 2 dni opieki; wizyta następnego dnia musi być w późniejszym dniu UTC | A1 |
-| W5 | sesja sob 23:30 + nd 00:30 | liczy się jako dwa dni; przy `recovery_min_gap_h` = 8 nie | A1 |
+| W5 | ratunek sob 23:30, powrót 00:30; potem 1 ms przed i po `counts_from` | 00:30 pomaga, ale nie kończy; kończy dopiero 8 h po ratunku | A1 |
 | P | zgodność modelu JS z SQL: wszystkie scenariusze × 5 zestawów zasad, progi ±1 ms, przekroczenie 90, 300 losowych gier | 0 różnic w odpowiedziach, wierszach i kamieniach milowych (20 781 wywołań) | B1 |
 | R8 | ratunek, potem 4 dni przerwy | wyprowadzka po 72 h (`recovery`) | A1 |
 | R9 | codziennie przez 60 dni | zawsze healthy, 61 dni opieki, adult | A1 |
@@ -533,7 +540,8 @@ Po wdrożeniu na produkcję (osobna zgoda): ponowne doradcy bezpieczeństwa i wy
 3. ✅ jako wartości robocze: 48 / 120 / 168 h (liczone od najstarszego zegara potrzeby, sekcja 5.2a).
 4. ✅ jako wartość robocza: sensowna akcja = potrzeba < 90.
 5. ✅ jako wartość robocza: dobry dzień = ≥ 2 różne akcje i potrzeby ≥ 50 (PR A2).
-6. ✅ **1 dzień rekonwalescencji** (decyzja 2026-11-07): gracze sob + nd zachowują żabę, a ratunek nie jest uproszczony. Rekonwalescencja zaczyna się od 120 h, nie od 48 h (powód w 5.2a). Bez ograniczenia nastroju. Otwarte: czy włączyć `recovery_min_gap_h` (dziś 0) przeciw sesji przez północ UTC.
+6. ✅ **1 dzień rekonwalescencji i co najmniej 8 h od ratunku** (decyzje 2026-11-07): gracze sob + nd zachowują żabę, a ratunek nie jest uproszczony. Rekonwalescencja zaczyna się od 120 h, nie od 48 h (powód w 5.2a). Bez ograniczenia nastroju.
+6a. **Otwarte (A2, #221):** próg dobrego dnia. Przy ≥ 50 krótkie wizyty weekendowe dają około 0 dobrych dni, a godzinne sesje lub dwie wizyty dziennie dają 2 tygodniowo. Rekomendacja: zostawić 50; jeśli krótkie wizyty mają się liczyć, wybrać 40 (nie 30 i nie „opieka tego dnia”).
 7. Wyzwanie 30 dni: wariant 1 teraz, wariant 2 później jako `perfect_parent`?
 8. Stempel 100 dni: ID i nazwa (`best_fren_forever` / „Best Fren Forever”?) oraz reguła (100 dobrych dni w jednym życiu?).
 9. „It's Not Me, It's You”: wpis w historii (rekomendacja) czy ukryty stempel?
@@ -555,7 +563,7 @@ Każdy PR jako Draft, z gałęzi od `main`, z opisem zgodnym z CLAUDE_HANDOFF.md
 | PR | Zakres | Pliki | DONE | Rozmiar |
 |---|---|---|---|---|
 | **A1** cykl życia (backend) — **Draft #218** | owners + lives + milestones, 4 RPC, sensowna akcja, zegar każdej potrzeby, statusy, ratunek i rekonwalescencja, odejście, list, historia, ponowna adopcja, rejestr kamieni milowych z odizolowanym hookiem, liczniki akcji pod warianty listu, symulator czasu | `games/supabase/update_pepegochi_v2.sql`, `games/PEPEGOCHI_API.md`, `scripts/pepegochi_sim.mjs`, `tests/pepegochi.test.mjs` (CI), `tests/pepegochi-sql.test.mjs` (PostgreSQL) | A, B, C, D, E, F1, F5, R, M, H1–H3 zielone lokalnie | 561 linii SQL bez komentarzy + testy |
-| **A2** jakość opieki | dobre dni i seria dobrych dni | ten sam plik SQL + testy | F2, F3 | mały |
+| **A2** jakość opieki — **Draft #221** (stacked na #220) | dobre dni, seria, kamień milowy `good_parent` (30 w jednym życiu), te same zasady w modelu JS, symulacje graczy | ten sam plik SQL, model, symulator, testy | G1–G10, H4, zgodność 0 różnic | mały–średni |
 | **B1** lokalny symulator w przeglądarce — **Draft #220** (stacked na #218) | zasady w JS (te same RPC i JSON), strona testowa z przewijaniem czasu, tylko lokalnie (CSP `connect-src 'none'`, brak zapisu, brak stempli) | `docs/games/js/pepegochi-model.mjs`, `docs/games/pepegochi-sim.html`, `tests/pepegochi-parity.test.mjs`, `tests/pepegochi-model.test.mjs` | test P: 0 różnic z SQL | średni |
 | **B2** tymczasowe UI | okno PondOS (iframe jak YEET) za flagą bety: imię, etap, 4 potrzeby, 4 akcje, ostrzeżenie, recovery, pusty pokój, GOODBYE.TXT, Past Frens, nowa adopcja. Tylko istniejące komponenty PondOS, bez nowej grafiki | `docs/games/pepegochi.html`, `docs/games/js/pepegochi.mjs`, wpis w `docs/meme/meme.js` za flagą | I1–I6, test CSP, wszystkie okna PondOS sprawdzone w przeglądarce | średni |
 | **C** Passport | lista ID (K3), `first_hatch` / `little_fren` / `grown_fren`, backfill, karta Overview, Stats; katalog bez zmiany statusów do R | `games/supabase/update_pepegochi_passport.sql`, `docs/meme/meme.js` (Passport), testy, plik decyzji | G1–G7, istniejące testy Passportu zielone | mały |
