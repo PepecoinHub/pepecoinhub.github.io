@@ -1,0 +1,15 @@
+/* PepeGochi test simulator: temporary layout for testing the rules, not the game's design. */
+.pgs { padding: 16px; display: grid; gap: 14px; }
+.pgs-banner { margin: 0; padding: 10px 14px; border: 2px dashed var(--muted); border-radius: 8px; background: var(--surface); }
+.pgs-buttons { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+.pgs-needs { display: grid; grid-template-columns: max-content 1fr max-content; gap: 4px 10px; align-items: center; max-width: 420px; }
+.pgs-needs meter { width: 100%; }
+.pgs-letter { white-space: pre-wrap; padding: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-2); }
+.pgs-log { max-height: 320px; overflow: auto; padding-left: 22px; }
+.pgs-log .err { color: var(--muted); }
+.pgs-rules { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px 14px; align-items: center; }
+.pgs-rules label { display: flex; justify-content: space-between; gap: 8px; }
+.pgs-rules input { width: 6em; }
+.pgs dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 8px 0; }
+.pgs dt { color: var(--muted); }
+.pgs dd { margin: 0; }
