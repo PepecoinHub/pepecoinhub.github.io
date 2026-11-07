@@ -180,27 +180,93 @@ MOUTHS = ['mouth_flat', 'mouth_smile', 'mouth_open', 'mouth_tongue', 'mouth_teet
 MOUTH_W = 200
 MOUTH_CX, MOUTH_TOP = 306, 296
 HATS = [  # the first cell is the 'none' tile
+    # sizes and places retuned 2026-11-07 (owner: hats sat too far left and too small): centred over the eyes
     None,
-    ('hat_pep_cap', {'w': 330, 'cx': 270, 'bottom': 176}),
-    ('hat_beanie', {'w': 320, 'cx': 268, 'bottom': 180}),
-    ('hat_bucket', {'w': 370, 'cx': 268, 'bottom': 186}),
-    ('hat_hardhat', {'w': 350, 'cx': 268, 'bottom': 180}),
-    ('hat_crown', {'w': 250, 'cx': 266, 'bottom': 162}),
-    ('hat_wizard', {'w': 340, 'cx': 262, 'bottom': 172}),
-    ('hat_detective', {'w': 360, 'cx': 268, 'bottom': 186}),
+    ('hat_pep_cap', {'w': 380, 'cx': 300, 'bottom': 182}),
+    ('hat_beanie', {'w': 370, 'cx': 298, 'bottom': 188}),
+    ('hat_bucket', {'w': 410, 'cx': 298, 'bottom': 184}),
+    ('hat_hardhat', {'w': 400, 'cx': 298, 'bottom': 186}),
+    ('hat_crown', {'w': 270, 'cx': 302, 'bottom': 174}),
+    ('-hat_wizard', {'w': 340, 'cx': 262, 'bottom': 172}),   # removed 2026-11-07 (owner); '-' = cut but not written
+    ('hat_detective', {'w': 410, 'cx': 298, 'bottom': 184}),
 ]
 CLOTHING = [('clothing_blue', 372), ('clothing_purple_hoodie', 356), ('clothing_black_hoodie', 356),
             ('clothing_suit', 368), ('clothing_shirt_tie', 370), ('clothing_camo', 368)]
 ACCESSORIES = [  # the first box is the 'none' tile
     None,
-    ('accessory_shades', {'w': 330, 'cx': 304, 'cy': 196}),
-    ('accessory_round', {'w': 320, 'cx': 304, 'cy': 196}),
-    ('accessory_orange', {'w': 320, 'cx': 304, 'cy': 196}),
-    ('accessory_cigarette', {'w': 120, 'cx': 452, 'cy': 318}),
-    ('accessory_pipe', {'w': 130, 'cx': 452, 'cy': 344}),
+    # glasses: lens centres on the eye-white centres of the eyes layers (about x 251/360, y 206 on the 512 layer)
+    ('accessory_shades', {'w': 314, 'cx': 330, 'cy': 192}),
+    ('accessory_round', {'w': 304, 'cx': 330, 'cy': 192}),
+    ('accessory_orange', {'w': 304, 'cx': 330, 'cy': 192}),
+    # the sheet draws them for the left side of a face: the cigarette body is mirrored (the smoke stays over
+    # the lit end) and the pipe is mirrored whole, so the filter / mouthpiece sits in the mouth corner
+    ('accessory_cigarette', {'w': 120, 'cx': 452, 'cy': 318, 'mirror': 'body'}),
+    ('accessory_pipe', {'w': 130, 'cx': 452, 'cy': 344, 'mirror': 'all'}),
     ('accessory_headphones', {'w': 640, 'cx': 282, 'top': -30, 'behind_head': True}),
 ]
+# single drawings from the owner (2026-11-07), transparent PNGs saved losslessly in source-v3/extra/
+EXTRA_EYES = {'eyes_side': {'w': 330, 'cx': 304, 'cy': 192}, 'eyes_happy': {'w': 320, 'cx': 304, 'cy': 186},
+              'eyes_hearts': {'w': 340, 'cx': 304, 'cy': 196}}
+EXTRA_MOUTHS = {'mouth_shout': {'w': 150, 'cx': 300, 'top': 290}, 'mouth_wide_tongue': {'w': 215, 'cx': 300, 'top': 296},
+                'mouth_laugh': {'w': 200, 'cx': 306, 'top': 290}}
 BACKGROUNDS = ['bg_sunset', 'bg_sky', 'bg_night', 'bg_city', 'bg_snow', 'bg_forest']
+
+
+def extra(name):
+    return np.asarray(Image.open(os.path.join(SRC3, 'extra', name + '.webp')).convert('RGBA'))
+
+
+def mirror(arr, how):
+    if how == 'all':
+        return arr[:, ::-1].copy()
+    # 'body': flip only the largest piece (the cigarette), keep the rest (the smoke) where it is
+    lab, n = nd.label(arr[..., 3] > 20)
+    sizes = nd.sum(np.ones(lab.shape), lab, range(1, n + 1))
+    body = lab == 1 + int(np.argmax(sizes))
+    ys, xs = np.nonzero(body)
+    out = arr.copy(); out[body] = 0
+    x0, x1 = xs.min(), xs.max() + 1
+    piece = np.where(body[..., None], arr, 0)[:, x0:x1][:, ::-1]
+    view = out[:, x0:x1]
+    keep = piece[..., 3] > view[..., 3]
+    view[keep] = piece[keep]
+    return out
+
+
+def bare_body(tee, base):
+    """'No shirt': the blue tee's outline filled with the frog's own green. The outline is drawn only
+    where the body meets the background, so there is no collar line across the neck."""
+    t = np.array(tee); b = np.array(base)
+    sil = t[..., 3] > 40
+    sil = nd.binary_fill_holes(sil)
+    green = np.median(b[..., :3][(b[..., 3] > 200) & (b[..., 1] > b[..., 0] + 30)], axis=0)
+    edge = sil & ~nd.binary_erosion(sil, iterations=6)
+    outside = ~nd.binary_dilation(sil, iterations=1) & (b[..., 3] < 30)
+    near_out = nd.binary_dilation(outside, iterations=7)
+    line = edge & near_out
+    out = np.zeros_like(t)
+    out[sil, :3] = green.astype(np.uint8); out[sil, 3] = 255
+    out[line, :3] = 0
+    # the arms: keep the tee's two inner arm lines (dark strokes low on the body)
+    dark = (t[..., 3] > 200) & (t[..., :3].max(-1) < 60)
+    lab, n = nd.label(dark & ~nd.binary_dilation(edge, iterations=4))
+    for i, sl in enumerate(nd.find_objects(lab)):
+        if sl[0].start > 0.8 * WORK and (lab[sl] == i + 1).sum() > 200:
+            out[lab == i + 1, :3] = 0
+    return Image.fromarray(out)
+
+
+def skin_patch(shape, base, top):
+    b = np.array(base); m = np.array(shape)[..., 3] > 40
+    m = nd.binary_fill_holes(m)
+    green = np.median(b[..., :3][(b[..., 3] > 200) & (b[..., 1] > b[..., 0] + 30)], axis=0)
+    out = np.zeros_like(b)
+    out[m, :3] = green.astype(np.uint8); out[m, 3] = 255
+    # keep the outline of the eye bumps where the patch meets the sky, so the head shape stays drawn
+    edge = m & ~nd.binary_erosion(m, iterations=5) & nd.binary_dilation(b[..., 3] < 30, iterations=6)
+    out[edge, :3] = 0
+    img = Image.fromarray(out); img.alpha_composite(top)
+    return img
 
 
 def thumb(arr):
@@ -221,19 +287,31 @@ def build():
     for lid, arr in zip(MOUTHS, mouths):
         # the open mouths hang down from the same lip line
         layers[lid] = place(arr, w=MOUTH_W * (1.0 if lid != 'mouth_teeth' else 0.92), cx=MOUTH_CX, top=MOUTH_TOP); thumbs[lid] = thumb(arr)
+    for lid, p in EXTRA_EYES.items():
+        arr = extra(lid); layers[lid] = place(arr, **p); thumbs[lid] = thumb(arr)
+    # closed eyes are only lines: lay them on a patch of skin shaped like the open eyes, so the
+    # base drawing's eyelid arcs under the eyes do not show through as extra brows
+    layers['eyes_happy'] = skin_patch(layers['eyes_classic'], base, layers['eyes_happy'])
+    for lid, p in EXTRA_MOUTHS.items():
+        arr = extra(lid); layers[lid] = place(arr, **p); thumbs[lid] = thumb(arr)
     hats = cut_cells('hats'); assert len(hats) == len(HATS)
     for spec, arr in zip(HATS, hats):
         if spec is None:
             thumbs['hat_none'] = thumb(arr); continue
+        if spec[0].startswith('-'):
+            continue
         layers[spec[0]] = place(arr, **spec[1]); thumbs[spec[0]] = thumb(arr)
     clothes = cut_clothing(); assert len(clothes) == len(CLOTHING), len(clothes)
     for (lid, top), arr in zip(CLOTHING, clothes):
         layers[lid] = under_chin(place(arr, w=600, cx=250, top=top), base); thumbs[lid] = thumb(arr)
+    layers['clothing_none'] = bare_body(layers['clothing_blue'], base); thumbs['clothing_none'] = thumbs['hat_none']
     acc = cut_cells('accessories'); assert len(acc) == len(ACCESSORIES), len(acc)
     for spec, arr in zip(ACCESSORIES, acc):
         if spec is None:
             thumbs['accessory_none'] = thumb(arr); continue
-        p = dict(spec[1]); behind = p.pop('behind_head', False)
+        p = dict(spec[1]); behind = p.pop('behind_head', False); how = p.pop('mirror', None)
+        if how:
+            arr = mirror(arr, how)
         L = place(arr, **p)
         # headphones: the cups sit behind the face (worn on the ears), so the head covers their middle
         layers[spec[0]] = under_chin(L, base) if behind else L
@@ -246,11 +324,16 @@ def build():
     return layers, thumbs
 
 
-def save(layers, thumbs):
+def save(layers, thumbs, only=None):
+    # --only id,id,...: write just those layers and thumbs and leave every other file as it is
+    # (the special avatars come from scripts/build_special_avatars.mjs and must not be deleted)
+    if only:
+        layers = {k: v for k, v in layers.items() if k in only}
+        thumbs = {k: v for k, v in thumbs.items() if k in only}
     for d in (OUT_DIR, THUMB_DIR):
         os.makedirs(d, exist_ok=True)
         for f in os.listdir(d):
-            if f.endswith('.webp'):
+            if f.endswith('.webp') and not only:
                 os.remove(os.path.join(d, f))
     for lid, img in layers.items():
         img.resize((SIZE, SIZE), Image.LANCZOS).save(os.path.join(OUT_DIR, lid + '.webp'), 'WEBP', quality=90, alpha_quality=100, method=6)
@@ -275,7 +358,7 @@ def test_sheet(layers, path, looks):
 
 if __name__ == '__main__':
     L, T = build()
-    save(L, T)
+    save(L, T, sys.argv[sys.argv.index('--only') + 1].split(',') if '--only' in sys.argv else None)
     if '--sheet' in sys.argv:
         out = sys.argv[sys.argv.index('--sheet') + 1]
         H = [h[0] for h in HATS if h] + ['hat_none']

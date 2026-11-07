@@ -2013,7 +2013,7 @@
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261106lily2').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261107hats').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -2043,7 +2043,24 @@
     var cls = 'fa-stack' + (avatarSpecial(look) ? ' is-special' : '');
     var s = el('span', label ? { class: cls, role: 'img', 'aria-label': label } : { class: cls, 'aria-hidden': 'true' });
     o.layers_order.forEach(function (layer) { s.appendChild(el('img', { src: avatarSrc(o, layer, look), alt: '', 'data-layer': layer, draggable: 'false' })); });
+    avatarFit(o, s, look);
     return s;
+  }
+  // a cigarette or pipe (option with in_mouth) goes under the mouth layer and moves to that mouth's corner,
+  // so every mouth holds it; any other accessory stays on top at its own place
+  function avatarFit(o, stack, look) {
+    var pick = function (k) { return (o.options[k] || []).filter(function (p) { return p.id === look[k]; })[0] || {}; };
+    var acc = stack.querySelector('img[data-layer="accessory"]'), mouth = stack.querySelector('img[data-layer="mouth"]');
+    if (!acc || !mouth) return;
+    var a = pick('accessory').in_mouth, c = pick('mouth').corner;
+    if (a && c) {
+      acc.style.translate = ((c[0] - a[0]) / 5.12) + '% ' + ((c[1] - a[1]) / 5.12) + '%';   // 'translate', not 'transform': the maker frame already centres its layers with a transform
+      if (acc.nextSibling !== mouth) stack.insertBefore(acc, mouth);
+    } else {
+      acc.style.translate = '';
+      var after = stack.querySelector('img[data-layer="hat"]');
+      if (after && after.nextSibling !== acc) stack.insertBefore(acc, after.nextSibling);
+    }
   }
   function avatarSay(o, look) {
     var name = function (k) { var p = o.options[k].filter(function (x) { return x.id === look[k]; })[0]; return p ? p.label : look[k]; };
@@ -2171,6 +2188,7 @@
         var setSrc = function (img, src) { if (img.getAttribute('src') !== src) img.setAttribute('src', src); };
         function paint() {
           big.querySelectorAll('img').forEach(function (img) { setSrc(img, avatarSrc(o, img.getAttribute('data-layer'), look)); });
+          avatarFit(o, big, look);
           big.setAttribute('aria-label', 'Preview: ' + avatarSay(o, look));
           big.classList.toggle('is-special', avatarSpecial(look));
           parts.querySelectorAll('input').forEach(function (inp) { inp.checked = look[inp.name.slice(3)] === inp.value; });

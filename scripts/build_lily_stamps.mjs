@@ -30,8 +30,8 @@ export const LILY = [
 const TILE = [138, 150];
 const ICON = [S2, [824, 312, 972, 456]];
 const HAT = { file: 'hat-14-explorer.png', crop: [96, 164, 916, 708], thumb: [720, 808, 964, 976],
-  // same place as the other hats on the shared 512 canvas (hat_bucket spans x 114-403, bottom y 201)
-  to: [108, 2, 408, 201] };
+  // same place as the other hats on the shared 512 canvas (centred over the eyes like hat_bucket)
+  to: [131, 0, 431, 199] };   // moved right with the other hats (2026-11-07)
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const sheets = {};
