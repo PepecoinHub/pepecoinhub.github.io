@@ -255,6 +255,19 @@ def bare_body(tee, base):
     return Image.fromarray(out)
 
 
+def skin_patch(shape, base, top):
+    b = np.array(base); m = np.array(shape)[..., 3] > 40
+    m = nd.binary_fill_holes(m)
+    green = np.median(b[..., :3][(b[..., 3] > 200) & (b[..., 1] > b[..., 0] + 30)], axis=0)
+    out = np.zeros_like(b)
+    out[m, :3] = green.astype(np.uint8); out[m, 3] = 255
+    # keep the outline of the eye bumps where the patch meets the sky, so the head shape stays drawn
+    edge = m & ~nd.binary_erosion(m, iterations=5) & nd.binary_dilation(b[..., 3] < 30, iterations=6)
+    out[edge, :3] = 0
+    img = Image.fromarray(out); img.alpha_composite(top)
+    return img
+
+
 def thumb(arr):
     im = Image.fromarray(arr) if not isinstance(arr, Image.Image) else arr
     im = im.copy(); im.thumbnail(THUMB, Image.LANCZOS)
@@ -275,6 +288,9 @@ def build():
         layers[lid] = place(arr, w=MOUTH_W * (1.0 if lid != 'mouth_teeth' else 0.92), cx=MOUTH_CX, top=MOUTH_TOP); thumbs[lid] = thumb(arr)
     for lid, p in EXTRA_EYES.items():
         arr = extra(lid); layers[lid] = place(arr, **p); thumbs[lid] = thumb(arr)
+    # closed eyes are only lines: lay them on a patch of skin shaped like the open eyes, so the
+    # base drawing's eyelid arcs under the eyes do not show through as extra brows
+    layers['eyes_happy'] = skin_patch(layers['eyes_classic'], base, layers['eyes_happy'])
     for lid, p in EXTRA_MOUTHS.items():
         arr = extra(lid); layers[lid] = place(arr, **p); thumbs[lid] = thumb(arr)
     hats = cut_cells('hats'); assert len(hats) == len(HATS)
