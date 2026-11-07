@@ -1,18 +1,20 @@
 /* PEPEGOCHI.EXE hidden-beta window: temporary layout for testing the mechanics, not the game's design.
    In a PondOS window (html.embed) the cards and buttons get the 98 look from gry.css. */
 .pgb { display: grid; gap: 10px; padding: 10px; grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "banner" "main" "time" "rules" "past" "log"; }
+  grid-template-areas: "banner" "scene" "main" "time" "rules" "past" "log"; }
 .pgb-banner { grid-area: banner; }
+.pgb-scene { grid-area: scene; }
 .pgb-main { grid-area: main; }
 .pgb-time { grid-area: time; }
 .pgb-rules-card { grid-area: rules; }
 .pgb-past-card { grid-area: past; }
 .pgb-log-card { grid-area: log; }
-/* a wider window: the time machine stays next to the frog, so every jump shows its effect at once.
-   It is alone in its column: anything placed under it would be pushed down by the frog's height. */
+/* a wider window: the room gets the full width (up to its own 640 px, where every art pixel is one
+   screen pixel), and the time machine stays next to the frog's needs, so every jump shows its effect.
+   It is alone in its column: anything placed under it would be pushed down by the needs' height. */
 @media (min-width: 680px) {
   .pgb { grid-template-columns: minmax(0, 1fr) 250px; align-items: start;
-    grid-template-areas: "banner banner" "main time" "rules rules" "past past" "log log"; }
+    grid-template-areas: "banner banner" "scene scene" "main time" "rules rules" "past past" "log log"; }
   .pgb-time { position: sticky; top: 8px; }
 }
 .pgb h2 { font-size: 1rem; margin: 0 0 6px; }
@@ -45,19 +47,41 @@ html.embed .pgb-banner { background: #ffffe1 !important; }
 .pgb-log { max-height: 220px; overflow: auto; font-family: monospace; font-size: 12px; padding-left: 22px; }
 @media (max-width: 480px) {
   .pgb { padding: 6px; }
+  .pgb-scene { padding: 4px !important; }
   .pgb-need { grid-template-columns: 5.5em 1fr 2.5em; }
 }
 
-/* room v5 scene (layered art from the design PR); slot anchors in js/pepegochi-room.mjs */
-.pgr { position: relative; width: 100%; aspect-ratio: 8 / 5; margin: 8px 0; overflow: hidden; border: 3px inset #9a9a9a; background: #a790b4; isolation: isolate; }
-.pgr img { position: absolute; image-rendering: pixelated; pointer-events: none; user-select: none; }
+/* the room: layers from room v5 (#222) and the frog from the pixel art pack v2 (#227).
+   Anchors and sizes in js/pepegochi-room.mjs, in pixels of the 640x400 room. */
+.pgb-scene { padding: 10px; }
+/* in the PondOS window the page's 20 px side margins (facts.css) only make the room smaller */
+html.embed body { padding-inline: 0; }
+.pgb-scene .pgb-title { margin: 0 0 6px; }
+.pgr-frame { max-width: 646px; margin: 0 auto; border: 3px inset #9a9a9a; background: #a790b4; }
+.pgr { position: relative; width: 100%; aspect-ratio: 8 / 5; overflow: hidden; isolation: isolate; container-type: inline-size; }
+.pgr-art { position: absolute; inset: 0; }
+.pgr img { position: absolute; image-rendering: pixelated; pointer-events: none; user-select: none; -webkit-user-drag: none; }
 .pgr-bg { inset: 0; width: 100%; height: 100%; z-index: 1; }
 .pgr-item { transform: translate(-50%, -100%); }
 .pgr-wall { transform: translate(-50%, -50%); }
-.pgr-pet { left: 50%; top: 72%; transform: translate(-50%, -50%); z-index: 60; filter: drop-shadow(2px 3px 0 #403454); animation: pgr-bob 2.4s ease-in-out infinite; }
-@keyframes pgr-bob { 50% { transform: translate(-50%, -54%); } }
-.pgr-neglected .pgr-pet { filter: grayscale(.45) drop-shadow(2px 3px 0 #403454); animation-duration: 4s; }
-.pgr-packing .pgr-pet { filter: grayscale(.7) drop-shadow(2px 3px 0 #403454); animation: none; left: 62%; }
-.pgr-bubble { position: absolute; z-index: 70; left: 50%; top: 38%; transform: translate(-10%, -100%); background: #fff; border: 2px solid #222; border-radius: 10px; padding: 3px 8px; font: 700 clamp(10px, 2.6vw, 15px) Tahoma, sans-serif; color: #111; white-space: nowrap; }
-.pgr-letter { position: absolute; z-index: 90; left: 70%; top: 72%; transform: translate(-50%, -50%) rotate(-5deg); background: #f9e9bd; border: 3px outset #e3bc6d; padding: 2px 8px; font: 700 clamp(11px, 3vw, 18px) Tahoma, sans-serif; color: #111; }
-@media (prefers-reduced-motion: reduce) { .pgr-pet { animation: none; } }
+/* the frog: 128 px sprite, its foot line (--foot, set per sprite) on the anchor */
+.pgr-pet { --foot: 96.875%; z-index: 80; transform: translate(-50%, calc(-1 * var(--foot))); animation: pgr-bob 1.2s steps(1, end) infinite; }
+/* idle: up and down by 2 art pixels (1.5625% of 128), in steps, so the pixels never blur between two places */
+@keyframes pgr-bob { 50% { transform: translate(-50%, calc(-1 * var(--foot) - 1.5625%)); } }
+.pgr-neglected .pgr-pet { animation-duration: 2.4s; }
+.pgr-packing .pgr-pet, .pgr-adopt .pgr-pet { animation: none; }
+/* young frogs have no state sprites yet: a hint of grey when neglected or packing */
+.pgr-neglected .pgr-pet:not([data-sprite^="adult"]), .pgr-packing .pgr-pet:not([data-sprite^="adult"]) { filter: grayscale(.45); }
+.pgr-suitcase { z-index: 81; transform: translate(-50%, -90.625%); }
+.pgr-bubble { position: absolute; z-index: 90; left: 50%; transform: translate(-50%, -100%); background: #fff; border: 2px solid #222; border-radius: 8px; padding: 2px 7px; font: 700 clamp(10px, 2.4cqw, 15px) Tahoma, sans-serif; color: #111; white-space: nowrap; }
+/* moving out: the frames from the art pack, the actor glides between them */
+.pgr-actor { --foot: 96.875%; position: absolute; z-index: 80; transform: translate(-50%, calc(-1 * var(--foot))); transition: left 250ms linear; }
+.pgr-actor > img:first-child { position: relative; display: block; width: 100%; }
+.pgr-young > img:first-child { filter: grayscale(.45); }
+/* GOODBYE.TXT on the rug: the envelope, or the open letter once read. Its click area is bigger than the art. */
+.pgr-letter { position: absolute; z-index: 85; transform: translate(-50%, -50%); padding: 0; border: 0; background: none; cursor: pointer; }
+.pgr-letter::before { content: ""; position: absolute; inset: -12px; }
+.pgr-letter img { position: relative; display: block; width: 100%; }
+.pgr-letter:focus-visible { outline: 2px dotted #111; outline-offset: 2px; }
+.pgr-letter[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .pgr-pet { animation: none; } .pgr-actor { transition: none; } }

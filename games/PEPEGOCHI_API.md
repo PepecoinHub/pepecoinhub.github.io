@@ -267,7 +267,7 @@ The owner chose a light JavaScript copy of the rules (no 5 MB PGlite, no CSP cha
 
 ### PondOS test window (PR B2, hidden beta, local only)
 
-A playable PEPEGOCHI.EXE window in PondOS 98 for the owner and testers. It runs on the same JavaScript model, so it is the full game logic with a temporary look.
+A playable PEPEGOCHI.EXE window in PondOS 98 for the owner and testers. It runs on the same JavaScript model, so it is the full game logic. The look uses candidate art (next section).
 
 - **Who sees it:** only a browser that opened `/meme/?beta=gochi` once (kept in localStorage `pondos-gochi-beta`; `/meme/?beta=off` hides it again). It is then in Start → Games and in Find as `PEPEGOCHI.EXE (test)`. Nobody else gets a new menu entry, icon or request.
 - **What it opens:** `docs/games/pepegochi.html?embed=1` in a PondOS window (`pepegochiApp()` in `docs/meme/meme.js`). That page has `connect-src 'none'`, `frame-src 'none'` and `worker-src 'none'`: the browser blocks every request to a server, Supabase included.
@@ -284,6 +284,18 @@ A playable PEPEGOCHI.EXE window in PondOS 98 for the owner and testers. It runs 
   - `tests/pepegochi-beta.test.mjs` (CI) plays the whole checklist in the window's game object and checks the local-only rules and the hidden menu entry.
   - `tests/pepegochi-parity.test.mjs` replays the same window session call by call on the real SQL.
   - `scripts/pepegochi_sim.mjs --scenario full-life-cycle` runs the same checklist on the SQL.
+
+### Room and frog art in the test window (candidates, not final)
+
+The window draws the layered room v5 from #222 and the frog from the pixel art pack v2 in #227 (commit `36514091`). The files are copied unchanged into `docs/games/img/pepegochi/`. `docs/games/js/pepegochi-room.mjs` only draws: it reads the game state the window already has and changes nothing.
+
+- **Scale:** every frog sprite is drawn at 1 sprite pixel = 1 room pixel (128 px on the 640×400 room), the same for every stage, so nothing is resized at runtime. The room is at most 640 px wide; in the default PondOS window (760 px) it is exactly 640×400.
+- **Where the frog stands:** feet at x 320, y 372 (on the rug, in front of the bed), on each sprite's floor line (124; the older froglet 121).
+- **Which sprite:** `packing`, `recovering` and `neglected` use their adult sprites. Otherwise a healthy adult shows the need it wants most once it is below 75 (`hungry`, `dirty`, `moody`, `tired`), else `idle`. 75 is a picture setting only: energy, the slowest need, is at 70 when the frog becomes neglected, so a lower value would never show `tired`. Tadpole and froglet use their idle sprite; when they pack, the separate suitcase stands next to them. Before the first adoption an egg waits on the rug (the egg stage itself, decision 10, is not added).
+- **Moving out:** when a frog that was on screen moves out (after a time jump or an action), the 6 frames play once, 250 ms each: frames 1-2 in place, frames 3 and 4 in turn while it walks right, frames 5-6 at the room's right edge, where they leave their own frame. Then the frog is gone. A frog that had already left is simply not there. With reduced motion there is no animation and no idle bounce.
+- **The empty room:** the furniture and props stay. Only the TV is not drawn, because GOODBYE.TXT says "P.S. I took the TV."; it is back when the next frog moves in. The letter lies on the rug (the spot of `props/room_departed_overlay.png`) as a button: the envelope until it is read, then the open letter. Clicking it opens GOODBYE.TXT in the Notepad box below the room. Its click area is 12 px bigger than the art on every side.
+- **Not here yet:** the room on the server (`room_state`, Room-2), the server choosing which item leaves with the matching P.S. line (Room-4), state sprites for tadpole and froglet, a moving-out animation for young frogs (they slide out with the suitcase), the alternative `packing_angry`.
+- **Tests:** `tests/pepegochi-room-window.test.mjs` (CI): files and sizes, one scale, feet, which sprite, the hidden TV, the letter, the 10-step moving-out timeline, and a small DOM check of the letter button and the animation timer.
 
 ## Release gates
 

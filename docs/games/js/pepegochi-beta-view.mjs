@@ -192,7 +192,7 @@ export class BetaGame {
         letterSeen: p.letter.seen, canAdopt: s.can_adopt,
       };
       v.letter = { open: this.letterOpen, title: 'GOODBYE.TXT - Notepad', text: GOODBYE,
-        note: 'The TV is a joke: nothing ever leaves your inventory. (This is a local test: there is no inventory here.)' };
+        note: 'The TV only left the picture: it is still yours and it is back in the room with your next fren. (Local test: there is no real inventory here.)' };
       return v;
     }
     v.mode = 'pet';
