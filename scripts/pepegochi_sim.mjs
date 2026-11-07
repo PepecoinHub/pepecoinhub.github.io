@@ -150,7 +150,8 @@ export class Sim {
     const s = r.ok ? r.value : this.last;
     const status = s?.pet?.status ?? (s?.has_pet === false ? 'no frog' : '?');
     const result = r.ok ? (r.value.action_result || r.value.adopt_result || 'ok') : 'rejected: ' + r.error;
-    this.events.push({ day: this.day(), at: this.now.toISOString(), what, result, status });
+    this.events.push({ day: this.day(), at: this.now.toISOString(), what, result, status,
+      good: s?.pet?.good_days ?? null, goal: s?.pet?.good_days_goal ?? null, generation: s?.pet?.generation ?? null });
     const line = describe(this, what, result, s);
     const key = status + '|' + (s?.pet?.recovery?.days_left ?? '') + '|' + (s?.pet?.generation ?? '');
     const always = !/^(accepted|ok)$/.test(result) || /^(adopt|read)/.test(what);
@@ -180,10 +181,25 @@ export class Sim {
       await this.act(k);
     }
   }
+  // only the given kinds, each one if the frog needs it and it is not cooling down
+  async careFor(kinds) {
+    for (const k of kinds) {
+      const p = this.last?.pet;
+      if (!p || p.status === 'departed') return;
+      if (p.needs[NEED_OF[k]] >= this.last.rules.meaningful_below) continue;
+      if (p.cooldowns[k] && new Date(p.cooldowns[k]) > this.now) continue;
+      await this.act(k);
+    }
+  }
+  // how: 'care' (a short visit), 'long' (two rounds an hour apart, about a one-hour session),
+  // a kind ('feed'), or a list of kinds (['play', 'rest'])
   async visit(how = 'care') {
     await this.state('arrive');
     if (this.last?.pet?.status === 'departed') return;
-    if (how === 'care') await this.care(); else await this.act(how);
+    if (how === 'care') await this.care();
+    else if (how === 'long') { await this.care(); this.wait('60m'); await this.state('still there'); await this.care(); }
+    else if (Array.isArray(how)) await this.careFor(how);
+    else await this.act(how);
   }
   wait(spec) {
     const m = /^(\d+(?:\.\d+)?)\s*(s|m|h|d)$/.exec(String(spec).trim());
@@ -204,8 +220,10 @@ function describe(sim, what, result, s) {
   let tail = '';
   if (p && p.status !== 'departed') {
     const n = p.needs;
-    tail = `H${n.hunger} C${n.hygiene} M${n.mood} E${n.energy}  care days ${p.care_days}  leaves ${fmt(p.departs_at)}`
-      + (p.recovery ? `  recovery: ${p.recovery.days_left} day(s) left` : '')
+    tail = `H${n.hunger} C${n.hygiene} M${n.mood} E${n.energy}  care days ${p.care_days}`
+      + (p.good_days != null ? `  good days ${p.good_days}/${p.good_days_goal}${p.good_day?.today ? ' (today)' : ''}` : '')
+      + `  leaves ${fmt(p.departs_at)}`
+      + (p.recovery ? `  recovery: ${p.recovery.days_left} day(s) left, counts from ${fmt(p.recovery.counts_from)}` : '')
       + (p.overdue.length ? `  overdue: ${p.overdue.join(', ')}` : '');
   } else if (p) {
     tail = `moved out ${fmt(p.departed_at)} (day ${sim.day(p.departed_at)}, ${p.departure_reason})`
@@ -359,7 +377,82 @@ export const SCENARIOS = {
       await after(s, 20);
     },
   },
+
+  // ---------- good care days (PR A2) ----------
+  'weekend-quick-20w': {
+    about: 'Good days: Saturday + Sunday 18:00 UTC, a short visit each day, 20 weeks.',
+    run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 20, weekendAt('18:00', '18:00')); await after(s, 140); },
+  },
+  'weekend-quick-32w': {
+    about: 'Good days: Saturday + Sunday 18:00 UTC, a short visit each day, 32 weeks (long enough for Good Parent at >= 40).',
+    run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 32, weekendAt('18:00', '18:00')); await after(s, 224); },
+  },
+  'weekend-long-20w': {
+    about: 'Good days: Saturday + Sunday 18:00 UTC, about an hour each day (two rounds an hour apart), 20 weeks.',
+    run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 20, weekendAt('18:00', '18:00'), 'long'); await after(s, 140); },
+  },
+  'weekend-two-visits-20w': {
+    about: 'Good days: Saturday + Sunday, short visits at 10:00 and 20:00 UTC, 20 weeks.',
+    run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 20, weekendAt(['10:00', '20:00'], ['10:00', '20:00'])); await after(s, 140); },
+  },
+  'weekend-random-20w': {
+    about: 'Good days: a random time every Saturday and Sunday, short visits, 20 weeks.',
+    run: async s => {
+      const r = rng(1520);
+      await s.adopt('Fren'); await s.care();
+      await weekly(s, 20, d => (d % 7 >= 5 ? hhmm(Math.floor(r() * 1380)) : null));
+      await after(s, 140);
+    },
+  },
+  'weekend-random-long-20w': {
+    about: 'Good days: a random time every Saturday and Sunday, about an hour each, 20 weeks.',
+    run: async s => {
+      const r = rng(1520);
+      await s.adopt('Fren'); await s.care();
+      await weekly(s, 20, d => (d % 7 >= 5 ? hhmm(Math.floor(r() * 1380)) : null), 'long');
+      await after(s, 140);
+    },
+  },
+  'daily-midnight-split': {
+    about: 'Good days: every day, Feed + Clean at 23:50 and Play + Rest at 00:10 UTC (care split by midnight), 40 days.',
+    run: async s => {
+      await s.adopt('Fren'); await s.care();
+      for (let d = 1; d <= 40; d++) {
+        s.goto(d, '00:10'); await s.visit(['play', 'rest']);
+        s.goto(d, '23:50'); await s.visit(['feed', 'clean']);
+        if (s.last?.pet?.status === 'departed') break;
+      }
+      await after(s, 41);
+    },
+  },
+  'weekend-midnight-then-noon': {
+    about: 'Weekends: rescue Saturday 23:30, back 00:30 (too soon to count), back again Sunday 12:00, 20 weeks.',
+    run: async s => {
+      await s.adopt('Fren'); await s.care();
+      await weekly(s, 20, weekendAt('23:30', ['00:30', '12:00']));
+      await after(s, 140);
+    },
+  },
+  'neglect-then-daily': {
+    about: 'Good days: daily for 14 days, away 6 days (packing), rescue, then daily until day 50.',
+    run: async s => {
+      await s.adopt('Fren'); await s.care();
+      await repeatDays(s, 13, () => true);
+      await repeatDays(s, 50, d => d >= 20);
+      await after(s, 50);
+    },
+  },
 };
+// the scenarios the good-day comparison (--good-days) runs
+export const GOOD_DAY_SCENARIOS = ['daily', 'daily-midnight-split', 'neglect-then-daily', 'every-4-days',
+  'weekend-quick-20w', 'weekend-quick-32w', 'weekend-long-20w', 'weekend-two-visits-20w', 'weekend-random-20w', 'weekend-random-long-20w',
+  'weekend-midnight-then-noon', 'checkup-every-6-days'];
+export const GOOD_DAY_VARIANTS = [
+  ['decided: 2 kinds, every need >= 40', {}],
+  ['before: every need >= 50', { good_day_min_need: 50 }],
+  ['every need >= 30', { good_day_min_need: 30 }],
+  ['>= 40, or cared for that day', { good_day_cared_counts: true }],
+];
 
 export function outcome(s) {
   const st = s.last;
@@ -368,8 +461,14 @@ export function outcome(s) {
   if (st?.pet?.status === 'departed') left.push(`${st.pet.name} moved out day ${s.day(st.pet.departed_at)} (${st.pet.departure_reason})`);
   const seen = [...new Set(s.events.map(e => e.status))].filter(x => x !== '?');
   const now = st?.has_pet ? `has ${st.pet.name}: ${st.pet.status}, ${st.pet.care_days} care days` : 'no frog';
-  return { left, seen, now };
+  // good days of the frog at the end (or of the one that just left), and the day the Good Parent goal was met
+  const good = st?.pet?.good_days ?? 0;
+  const reached = s.events.find(e => e.good != null && e.goal != null && e.good >= e.goal);
+  const firstGood = s.events.find(e => e.good > 0);
+  return { left, seen, now, good, goalDay: reached ? reached.day : null, firstGoodDay: firstGood ? firstGood.day : null,
+    bestStreak: st?.pet?.best_good_streak ?? 0, days: s.day() };
 }
+const parseValue = v => (v === 'true' ? true : v === 'false' ? false : Number(v));
 
 // ---------- command line ----------
 const HELP = `Commands (separate with ";" or new lines):
@@ -399,7 +498,7 @@ async function runCommand(s, line, ctx) {
     case 'letter': return s.letter();
     case 'history': await s.state('look'); return ctx.out(JSON.stringify({ history: s.last.history, summary: s.last.summary }, null, 2));
     case 'rule': {
-      const [k, v] = arg.split('='); ctx.overrides[k] = Number(v);
+      const [k, v] = arg.split('='); ctx.overrides[k] = parseValue(v);
       ctx.rules = await setRules(s.db, ctx.base, ctx.overrides); return ctx.out(`rule ${k} = ${v}`);
     }
     case 'rules': return ctx.out(JSON.stringify(ctx.rules, null, 2));
@@ -410,12 +509,13 @@ async function runCommand(s, line, ctx) {
 }
 
 async function main(argv) {
-  const opt = { scenarios: [], rules: {}, script: null, all: false, verbose: false, start: START };
+  const opt = { scenarios: [], rules: {}, script: null, all: false, verbose: false, start: START, goodDays: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--all') opt.all = true;
+    else if (a === '--good-days') opt.goodDays = true;
     else if (a === '--scenario') opt.scenarios.push(argv[++i]);
-    else if (a === '--rule') { const [k, v] = argv[++i].split('='); opt.rules[k] = Number(v); }
+    else if (a === '--rule') { const [k, v] = argv[++i].split('='); opt.rules[k] = parseValue(v); }
     else if (a === '--script') opt.script = argv[++i];
     else if (a === '--start') opt.start = argv[++i];
     else if (a === '--verbose') opt.verbose = true;
@@ -434,6 +534,30 @@ async function main(argv) {
   };
   const names = opt.all ? Object.keys(SCENARIOS) : opt.scenarios;
   if (Object.keys(opt.rules).length) console.log('Playtest overrides:', JSON.stringify(opt.rules));
+  if (opt.goodDays) {
+    // every good-day scenario under every rule variant: good days at the end and the day 30 was reached
+    const table = {};
+    for (const [, overrides] of GOOD_DAY_VARIANTS) {
+      const db = asDb(new PGlite());
+      const { base } = await prepare(db);
+      await setRules(db, base, { ...overrides, ...opt.rules });
+      let n = 0;
+      for (const name of (names.length ? names : GOOD_DAY_SCENARIOS)) {
+        await addPlayer(db, ++n);
+        const s = new Sim(db, { user: n, start: opt.start });
+        await SCENARIOS[name].run(s);
+        (table[name] ||= []).push(outcome(s));
+      }
+    }
+    console.log('Good care days at the end, and the day the Good Parent goal (30) was reached.');
+    console.log('Columns: ' + GOOD_DAY_VARIANTS.map((v, i) => `[${i + 1}] ${v[0]}`).join('   '));
+    for (const [name, outs] of Object.entries(table)) {
+      const cells = outs.map(o => `${String(o.good).padStart(3)} ${o.goalDay != null ? 'day ' + String(o.goalDay).padStart(3) : '   —   '}`
+        + (o.left.length ? ' (left)' : '       '));
+      console.log(`  ${name.padEnd(28)} ${outs[0].days.toString().padStart(3)} days  ` + cells.join('  |  '));
+    }
+    return;
+  }
   if (names.length) {
     const rows = [];
     for (const name of names) {
@@ -448,7 +572,8 @@ async function main(argv) {
     console.log('\nSummary');
     for (const [name, o] of rows) {
       console.log(`  ${name.padEnd(22)} ${(o.left.length ? o.left.join('; ') : 'never moved out').padEnd(44)} end: ${o.now}`);
-      console.log(`  ${''.padEnd(22)} statuses seen: ${o.seen.join(', ')}`);
+      console.log(`  ${''.padEnd(22)} statuses seen: ${o.seen.join(', ')}; good days ${o.good}`
+        + (o.goalDay != null ? `, Good Parent goal on day ${o.goalDay}` : ''));
     }
     return;
   }

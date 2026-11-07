@@ -57,6 +57,29 @@ test('model scenarios: the outcomes documented in games/PEPEGOCHI_API.md', async
   assert.ok((await runScenario('weekend-sat-sun')).seen.has('recovering'));
 });
 
+test('model good care days: the numbers in games/PEPEGOCHI_API.md', async () => {
+  const good = async (name, rules = {}) => {
+    const r = await runScenario(name, rules);
+    return [r.st.pet?.good_days ?? 0, r.left.length > 0];
+  };
+  // decided threshold (owner, 2026-11-07): every need >= 40
+  assert.deepEqual(await good('daily'), [61, false]);
+  assert.deepEqual(await good('weekend-quick-20w'), [21, false], 'short weekend visits: every Sunday');
+  assert.deepEqual(await good('weekend-quick-32w'), [33, false], 'Good Parent reachable with short weekend visits');
+  assert.deepEqual(await good('weekend-long-20w'), [41, false], 'an hour each weekend day');
+  assert.deepEqual(await good('weekend-two-visits-20w'), [41, false]);
+  assert.deepEqual(await good('daily-midnight-split'), [41, false]);
+  assert.deepEqual(await good('neglect-then-daily'), [44, false]);
+  assert.ok((await good('every-4-days'))[0] <= 2, 'care every 4 days: practically no progress');
+  assert.deepEqual(await good('weekend-quick-20w', { good_day_min_need: 50 }), [1, false], 'the earlier >= 50');
+  assert.deepEqual(await good('every-4-days', { good_day_cared_counts: true }), [16, false]);
+  // Good Parent: a milestone in memory only, once
+  const sim = new LocalPepegochi({ start: START, rules: { good_parent_days: 2 } });
+  sim.rpc('gry_pepegochi_adopt', { p_name: 'Fren' });
+  for (let d = 0; d < 3; d++) { for (const k of KINDS) { sim.rpc('gry_pepegochi_action', { p_action: k }); sim.advance(3000); } sim.advance(24 * H); }
+  assert.deepEqual(sim.world.milestones.filter(m => m.milestone === 'good_parent').length, 1);
+});
+
 test('model statuses at the thresholds', () => {
   const sim = new LocalPepegochi({ start: START });
   const t0 = Date.parse(START);

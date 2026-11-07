@@ -86,6 +86,10 @@ These are the owner's working numbers from 2026-11-07, not final rules. They liv
 | `recovery_min_gap_h` | 8 | hours between the check-up and the next-day visit (**owner decision, 2026-11-07**) |
 | `max_actions_per_utc_day` | 12 | accepted actions per UTC day (as v1) |
 | `min_gap_s` | 2 | seconds between two actions (as v1) |
+| `good_day_min_kinds` | 2 | good care day: different kinds of care on that UTC day (PR A2) |
+| `good_day_min_need` | 40 | good care day: every need at least this right after the action that completes it (**owner decision, 2026-11-07**) |
+| `good_day_cared_counts` | false | proposal, off: a need cared for that day also counts below `good_day_min_need` |
+| `good_parent_days` | 30 | Good Parent goal: good days in one life, not necessarily in a row (owner, working value) |
 
 As in v1:
 - cooldowns are 30/20/45/60 min;
@@ -143,6 +147,50 @@ Every case below is played out by `scripts/pepegochi_sim.mjs` on the real SQL an
 **Missed Saturday.** Sunday to Sunday is the 7-day limit itself. A player who comes on Sunday a bit earlier than the week before can still rescue the frog, but then has 72 hours, until Wednesday, to come back once. A player who comes later than the week before finds the letter.
 
 **Across UTC midnight.** A rescue on Saturday 23:30 and a visit at 00:30 are one session, not two days. The 00:30 visit helps, but the recovery can only be finished from 07:30. A weekend player who plays only that late Saturday session loses the frog. Saturday 21:00 + Sunday 08:00 (11 h apart) and random weekend hours still keep it. `--rule recovery_min_gap_h=0` brings back the old behaviour in the simulator.
+
+### Good care days and the Good Parent foundation (PR A2)
+
+Keeping a frog and earning the prestige stamps are two different challenges. Good care days measure the second.
+
+**A good care day** is a UTC day on which:
+- the player gave at least **2 different kinds** of care;
+- right after the action that completes it, **every need is 40 or more** (owner decision, 2026-11-07).
+
+The rules:
+- At most one per UTC day, never taken back, counted by the server in the same row update as the action. There is no extra table and no cron.
+- Counters per life: `good_days`, `good_streak` (good days in a row), `best_good_streak`.
+- They start from 0 with every new frog. Former frens keep theirs in the history.
+- **Good Parent goal:** 30 good days in one life, not necessarily in a row. Reaching it records the account milestone `good_parent` (once per account). The stamp itself comes with the Passport bridge (PR C) and needs an explicit catalog change.
+
+New fields in `pet`:
+- `good_days`, `good_days_goal`, `good_streak` (0 when yesterday was not a good day), `best_good_streak`;
+- `good_day: {today, kinds_today, needs_low}`. `needs_low` lists the actions whose needs are below 40 right now, so the game can say exactly which need blocks today's good day ("feed again for a good day").
+
+Departed frogs and history entries carry `good_days` and `best_good_streak`.
+
+**Why ≥ 40 (owner decision, 2026-11-07).** Weekend players can earn Good Parent without hour-long sessions, while care every 4 days earns practically nothing. Good days at the end, and the day the Good Parent goal was reached (`node scripts/pepegochi_sim.mjs --good-days`):
+
+| Player | Days | **≥ 40 (decided)** | ≥ 50 (before) | ≥ 30 | ≥ 40 or cared that day |
+|---|---|---|---|---|---|
+| daily, short visit | 60 | 61, day 29 | 61, day 29 | 61, day 29 | 61, day 29 |
+| daily, care split by UTC midnight (23:50 + 00:10) | 41 | 41, day 28 | 41, day 28 | 41, day 28 | 41, day 28 |
+| daily, away 6 days, rescue, daily again | 50 | 44, day 36 | 43, day 37 | 45, day 35 | 45, day 35 |
+| every 4 days | 60 | **2** | 1 | 16 | 16 |
+| full visit every 6 days (moves out) | 60 | 1 | 1 | 2 | 2 |
+| Sat + Sun, short visits, 20 weeks | 140 | **21** (every Sunday) | 1 | 41, day 103 | 41, day 103 |
+| Sat + Sun, short visits, 32 weeks | 224 | **33, day 202** | 1 | 65, day 103 | 65, day 103 |
+| Sat + Sun, about an hour each (two rounds an hour apart) | 140 | 41, day 103 | 41, day 103 | 41, day 103 | 41, day 103 |
+| Sat + Sun, short visits at 10:00 and 20:00 | 140 | 41, day 103 | 41, day 103 | 41, day 102 | 41, day 102 |
+| Sat + Sun, random times, about an hour | 140 | 41, day 103 | 41, day 103 | 41, day 103 | 41, day 103 |
+| Sat + Sun, random times, short visits | 140 | 9, moved out day 92 (see below) | 5, moved out | 27, moved out | 27, moved out |
+| Sat + Sun, rescue 23:30, back 00:30 and 12:00 | 140 | 21 | 21 | 41, day 103 | 41, day 103 |
+
+What the table shows:
+- **Short weekend visits.** Saturday is a rescue day: the frog has waited 6 days, and one round of care lifts the needs only to about 31/39/39/40, below 40. Sunday's round lifts them above 40, so short weekend visits earn every Sunday and reach Good Parent in about 29 weeks.
+- **Longer weekend sessions.** About an hour (feed has a 30-minute cooldown, rest 60) or two visits a day also earn Saturdays: 2 a week, about 15 weeks.
+- **Rejected variants.** ≥ 30 and "cared that day" were not chosen: both give a player who visits every 4 days 16 good days in 60 days, and both turn rescue days into good days.
+
+**Rescue + a visit less than 8 h later.** In the "weekend, random times, short visits" run (20 weeks), one Saturday rescue at 17:01 was followed by a Sunday visit at 00:15. That was too soon to finish the recovery, nobody came back before Wednesday, and the frog moved out on day 92. This is the 8 h rule doing its job. It is also why the game must show `recovery.counts_from`.
 
 ### What to tell players (the screen must say this before adoption)
 
@@ -224,4 +272,4 @@ The owner chose a light JavaScript copy of the rules (no 5 MB PGlite, no CSP cha
 3. Only with the owner's explicit approval: apply `update_pepegochi_v2.sql` to PH-games after `schema.sql`. It does not depend on the Fren Passport files.
 4. Passport bridge (PR C) after the Passport migrations, then Supabase security/performance advisors and a negative test with a real JWT.
 
-Not in this PR: good care days and Good Parent (A2/D), the Passport bridge (C), the game window (B), any art.
+Not here yet: the Good Parent stamp itself (Passport bridge, C), the game window (B2), any art.
