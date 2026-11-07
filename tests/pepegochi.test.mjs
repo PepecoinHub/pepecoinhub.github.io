@@ -115,7 +115,7 @@ test('playtest rules are marked as such and documented with the same numbers', (
   const want = { meaningful_below: 90, neglected_h: 48, packing_h: 120, departs_h: 168, rescue_from_h: 120,
     recovery_days: 1, recovery_departs_h: 72, recovery_min_gap_h: 8, max_actions_per_utc_day: 12, min_gap_s: 2,
     // good care days (A2): working values; 30 good days in one life is the owner's working Good Parent goal
-    good_day_min_kinds: 2, good_day_min_need: 50, good_day_cared_counts: false, good_parent_days: 30 };
+    good_day_min_kinds: 2, good_day_min_need: 40, good_day_cared_counts: false, good_parent_days: 30 };
   for (const [k, v] of Object.entries(want)) {
     assert.match(rules, new RegExp(`'${k}', ${v}\\b`), k);
     assert.match(api, new RegExp('`' + k + '`\\s*\\|\\s*' + v + '\\b'), 'API doc: ' + k);

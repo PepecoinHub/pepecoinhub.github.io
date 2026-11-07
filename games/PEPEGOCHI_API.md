@@ -87,7 +87,7 @@ These are the owner's working numbers from 2026-11-07, not final rules. They liv
 | `max_actions_per_utc_day` | 12 | accepted actions per UTC day (as v1) |
 | `min_gap_s` | 2 | seconds between two actions (as v1) |
 | `good_day_min_kinds` | 2 | good care day: different kinds of care on that UTC day (PR A2) |
-| `good_day_min_need` | 50 | good care day: every need at least this right after the action that completes it |
+| `good_day_min_need` | 40 | good care day: every need at least this right after the action that completes it (**owner decision, 2026-11-07**) |
 | `good_day_cared_counts` | false | proposal, off: a need cared for that day also counts below `good_day_min_need` |
 | `good_parent_days` | 30 | Good Parent goal: good days in one life, not necessarily in a row (owner, working value) |
 
@@ -154,7 +154,7 @@ Keeping a frog and earning the prestige stamps are two different challenges. Goo
 
 **A good care day** is a UTC day on which:
 - the player gave at least **2 different kinds** of care;
-- right after the action that completes it, **every need is 50 or more**.
+- right after the action that completes it, **every need is 40 or more** (owner decision, 2026-11-07).
 
 The rules:
 - At most one per UTC day, never taken back, counted by the server in the same row update as the action. There is no extra table and no cron.
@@ -164,33 +164,31 @@ The rules:
 
 New fields in `pet`:
 - `good_days`, `good_days_goal`, `good_streak` (0 when yesterday was not a good day), `best_good_streak`;
-- `good_day: {today, kinds_today, needs_low}`. `needs_low` lists the actions whose needs are below 50 right now, so the game can say "feed again for a good day".
+- `good_day: {today, kinds_today, needs_low}`. `needs_low` lists the actions whose needs are below 40 right now, so the game can say exactly which need blocks today's good day ("feed again for a good day").
 
 Departed frogs and history entries carry `good_days` and `best_good_streak`.
 
-**Is ≥ 50 too strict for weekend players?** The simulator says: for short visits, yes; for an hour or two visits a day, no. Good days at the end, and the day the Good Parent goal was reached:
+**Why ≥ 40 (owner decision, 2026-11-07).** Weekend players can earn Good Parent without hour-long sessions, while care every 4 days earns practically nothing. Good days at the end, and the day the Good Parent goal was reached (`node scripts/pepegochi_sim.mjs --good-days`):
 
-| Player | Days | ≥ 50 (current) | ≥ 40 | ≥ 30 | ≥ 50 or cared that day |
+| Player | Days | **≥ 40 (decided)** | ≥ 50 (before) | ≥ 30 | ≥ 40 or cared that day |
 |---|---|---|---|---|---|
 | daily, short visit | 60 | 61, day 29 | 61, day 29 | 61, day 29 | 61, day 29 |
 | daily, care split by UTC midnight (23:50 + 00:10) | 41 | 41, day 28 | 41, day 28 | 41, day 28 | 41, day 28 |
-| daily, away 6 days, rescue, daily again | 50 | 43, day 37 | 44, day 36 | 45, day 35 | 45, day 35 |
-| every 4 days | 60 | 1 | 2 | 16 | 16 |
+| daily, away 6 days, rescue, daily again | 50 | 44, day 36 | 43, day 37 | 45, day 35 | 45, day 35 |
+| every 4 days | 60 | **2** | 1 | 16 | 16 |
 | full visit every 6 days (moves out) | 60 | 1 | 1 | 2 | 2 |
-| Sat + Sun, short visits | 140 | **1** | 21 | 41, day 103 | 41, day 103 |
-| Sat + Sun, about an hour each (two rounds an hour apart) | 140 | **41, day 103** | 41, day 103 | 41, day 103 | 41, day 103 |
-| Sat + Sun, short visits at 10:00 and 20:00 | 140 | **41, day 103** | 41, day 103 | 41, day 102 | 41, day 102 |
+| Sat + Sun, short visits, 20 weeks | 140 | **21** (every Sunday) | 1 | 41, day 103 | 41, day 103 |
+| Sat + Sun, short visits, 32 weeks | 224 | **33, day 202** | 1 | 65, day 103 | 65, day 103 |
+| Sat + Sun, about an hour each (two rounds an hour apart) | 140 | 41, day 103 | 41, day 103 | 41, day 103 | 41, day 103 |
+| Sat + Sun, short visits at 10:00 and 20:00 | 140 | 41, day 103 | 41, day 103 | 41, day 102 | 41, day 102 |
 | Sat + Sun, random times, about an hour | 140 | 41, day 103 | 41, day 103 | 41, day 103 | 41, day 103 |
-| Sat + Sun, random times, short visits | 140 | 5, moved out day 92 (see below) | 9, moved out | 27, moved out | 27, moved out |
+| Sat + Sun, random times, short visits | 140 | 9, moved out day 92 (see below) | 5, moved out | 27, moved out | 27, moved out |
 | Sat + Sun, rescue 23:30, back 00:30 and 12:00 | 140 | 21 | 21 | 41, day 103 | 41, day 103 |
 
-Why short weekend visits miss out at 50: on Saturday the frog has waited 6 days, so one round of care lifts the needs only to about 31/39/39/40. On Sunday hunger is still about 44 after one round. A second round an hour later (feed has a 30-minute cooldown, rest 60) lifts every need above 50. With that, a weekend player earns 2 good days a week and reaches Good Parent in about 15 weeks.
-
-**Recommendation:** keep ≥ 50 for now, and have the game show `needs_low` ("come back in an hour for a good day"). If short weekend visits should count too:
-- **≥ 40** is the data-backed option. Sundays count (1 a week, Good Parent in about 30 weeks), while care every 4 days still earns about none.
-- ≥ 30 and "cared that day" both give a player who visits every 4 days 16 good days in 60 days, and they turn rescue days into good days. That rewards sparse care, so they are not recommended.
-
-Try them with `node scripts/pepegochi_sim.mjs --good-days` or `--rule good_day_min_need=40`.
+What the table shows:
+- **Short weekend visits.** Saturday is a rescue day: the frog has waited 6 days, and one round of care lifts the needs only to about 31/39/39/40, below 40. Sunday's round lifts them above 40, so short weekend visits earn every Sunday and reach Good Parent in about 29 weeks.
+- **Longer weekend sessions.** About an hour (feed has a 30-minute cooldown, rest 60) or two visits a day also earn Saturdays: 2 a week, about 15 weeks.
+- **Rejected variants.** ≥ 30 and "cared that day" were not chosen: both give a player who visits every 4 days 16 good days in 60 days, and both turn rescue days into good days.
 
 **Rescue + a visit less than 8 h later.** In the "weekend, random times, short visits" run (20 weeks), one Saturday rescue at 17:01 was followed by a Sunday visit at 00:15. That was too soon to finish the recovery, nobody came back before Wednesday, and the frog moved out on day 92. This is the 8 h rule doing its job. It is also why the game must show `recovery.counts_from`.
 

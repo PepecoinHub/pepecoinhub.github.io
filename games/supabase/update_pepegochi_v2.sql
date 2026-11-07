@@ -162,7 +162,7 @@ returns jsonb language sql stable set search_path = '' as $$
     'adult_care_days', 7,
     -- good care days (PR A2), PLAYTEST: at most one per UTC day
     'good_day_min_kinds', 2,      -- different kinds of care on that UTC day
-    'good_day_min_need', 50,      -- every need at least this after the action that completes the day
+    'good_day_min_need', 40,      -- owner, 2026-11-07: every need at least this after the action that completes the day
     'good_day_cared_counts', false, -- proposal, off: a need cared for that day counts as fine below min_need
     'good_parent_days', 30,       -- owner, working value: good days in one life, not necessarily in a row
     'history_limit', 10

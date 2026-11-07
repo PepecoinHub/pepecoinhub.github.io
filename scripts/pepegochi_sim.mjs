@@ -383,6 +383,10 @@ export const SCENARIOS = {
     about: 'Good days: Saturday + Sunday 18:00 UTC, a short visit each day, 20 weeks.',
     run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 20, weekendAt('18:00', '18:00')); await after(s, 140); },
   },
+  'weekend-quick-32w': {
+    about: 'Good days: Saturday + Sunday 18:00 UTC, a short visit each day, 32 weeks (long enough for Good Parent at >= 40).',
+    run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 32, weekendAt('18:00', '18:00')); await after(s, 224); },
+  },
   'weekend-long-20w': {
     about: 'Good days: Saturday + Sunday 18:00 UTC, about an hour each day (two rounds an hour apart), 20 weeks.',
     run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 20, weekendAt('18:00', '18:00'), 'long'); await after(s, 140); },
@@ -441,13 +445,13 @@ export const SCENARIOS = {
 };
 // the scenarios the good-day comparison (--good-days) runs
 export const GOOD_DAY_SCENARIOS = ['daily', 'daily-midnight-split', 'neglect-then-daily', 'every-4-days',
-  'weekend-quick-20w', 'weekend-long-20w', 'weekend-two-visits-20w', 'weekend-random-20w', 'weekend-random-long-20w',
+  'weekend-quick-20w', 'weekend-quick-32w', 'weekend-long-20w', 'weekend-two-visits-20w', 'weekend-random-20w', 'weekend-random-long-20w',
   'weekend-midnight-then-noon', 'checkup-every-6-days'];
 export const GOOD_DAY_VARIANTS = [
-  ['current: 2 kinds, every need >= 50', {}],
-  ['every need >= 40', { good_day_min_need: 40 }],
+  ['decided: 2 kinds, every need >= 40', {}],
+  ['before: every need >= 50', { good_day_min_need: 50 }],
   ['every need >= 30', { good_day_min_need: 30 }],
-  ['>= 50, or cared for that day', { good_day_cared_counts: true }],
+  ['>= 40, or cared for that day', { good_day_cared_counts: true }],
 ];
 
 export function outcome(s) {

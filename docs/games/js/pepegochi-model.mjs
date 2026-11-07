@@ -31,7 +31,7 @@ export const DEFAULT_RULES = Object.freeze({
   adult_care_days: 7,
   history_limit: 10,
   good_day_min_kinds: 2,
-  good_day_min_need: 50,
+  good_day_min_need: 40,
   good_day_cared_counts: false,
   good_parent_days: 30,
 });

@@ -170,20 +170,22 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
       }
     });
 
-    await t.test('a good day decided by a need at exactly 50, and 1 unit either side', async () => {
+    await t.test('a good day decided by a need at exactly 40, and 2 s either side', async () => {
       // with min_gap_s = 0 two actions happen at the same instant, so no decay comes between them:
-      // 36 h after adoption energy is exactly 60, and Play takes it to exactly 50
+      // 60 h after adoption energy is exactly 50, and Play takes it to exactly 40 (hunger 25 + 35 - 3,
+      // hygiene 42.5, mood 35 + 35). Feed stores the needs with 4 decimals (about 0.9 s of energy decay),
+      // so the shift has to be bigger than that: 2 s earlier energy ends at 40.0002, 2 s later at 39.9998.
       const overrides = { min_gap_s: 0 };
       await withRules(overrides, async () => {
-        for (const d of [-1, 0, 1]) {
+        for (const d of [-2000, 0, 2000]) {
           const p = await pair(overrides);
           const t0 = Date.parse(START);
-          await p.call('gry_pepegochi_adopt', { p_name: 'Fren' }, t0, 'exact 50');
-          const t = t0 + 36 * H + d;                       // 1 ms earlier or later: energy just above or below 60
-          await p.call('gry_pepegochi_action', { p_action: 'feed' }, t, 'exact 50');
-          const r = await p.call('gry_pepegochi_action', { p_action: 'play' }, t, 'exact 50');
-          if (d === 0) assert.equal(r.value.pet.good_days, 1, 'energy exactly 50 counts');
-          await p.finish('exact 50 ' + d);
+          await p.call('gry_pepegochi_adopt', { p_name: 'Fren' }, t0, 'exact 40');
+          const t = t0 + 60 * H + d;
+          await p.call('gry_pepegochi_action', { p_action: 'feed' }, t, 'exact 40');
+          const r = await p.call('gry_pepegochi_action', { p_action: 'play' }, t, 'exact 40');
+          assert.equal(r.value.pet.good_days, d <= 0 ? 1 : 0, `energy ${d <= 0 ? 'at or above' : 'below'} 40`);
+          await p.finish('exact 40 ' + d);
         }
       });
     });
@@ -196,7 +198,7 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
         const r = rng(1000 + g);
         const overrides = [{}, {}, { recovery_days: 2 }, { recovery_min_gap_h: 0 }, { meaningful_below: 95 },
           { 'decay_per_day.hunger': 7, 'decay_per_day.hygiene': 11, 'decay_per_day.mood': 13, 'decay_per_day.energy': 17 },
-          { good_day_cared_counts: true, good_parent_days: 2 }, { good_day_min_need: 40, good_parent_days: 2 }][g % 8];
+          { good_day_cared_counts: true, good_parent_days: 2 }, { good_day_min_need: 50, good_parent_days: 2 }][g % 8];
         await withRules(overrides, async () => {
           const p = await pair(overrides);
           let now = Date.parse(START) + Math.floor(r() * DAY);

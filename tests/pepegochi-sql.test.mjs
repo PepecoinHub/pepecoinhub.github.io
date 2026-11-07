@@ -722,19 +722,20 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
       assert.equal((await ok(p, 'gry_pepegochi_state()', at(24 * 5))).pet.good_streak, 0, 'no good day yesterday: current streak 0');
     });
 
-    await t.test('G2 a need below 50 blocks the day; the state says which one', async () => {
+    await t.test('G2 a need below 40 blocks the day; the state says which one', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");
-      const s = await ok(p, 'gry_pepegochi_state()', at(48));       // hunger 75 - 40 = 35, mood 80 - 36 = 44
+      // 59 h after adoption: hunger 75 - 49.2 = 25.8, hygiene 43.1, mood 80 - 44.25 = 35.75, energy 50.4
+      const s = await ok(p, 'gry_pepegochi_state()', at(59));
       assert.deepEqual(s.pet.good_day.needs_low, ['feed', 'play']);
-      await ok(p, "gry_pepegochi_action('clean')", at(48));
-      const b = await ok(p, "gry_pepegochi_action('rest')", at(48.001));
-      assert.equal(b.pet.good_days, 0, '2 kinds, but hunger and mood are still below 50');
+      await ok(p, "gry_pepegochi_action('clean')", at(59));
+      const b = await ok(p, "gry_pepegochi_action('feed')", at(59.001));
+      assert.equal(b.pet.good_days, 0, '2 kinds, but mood is still below 40');
       assert.equal(b.pet.good_day.kinds_today, 2);
-      const c = await ok(p, "gry_pepegochi_action('feed')", at(48.002));
-      assert.equal(c.pet.good_days, 0, 'mood still below 50');
-      const d = await ok(p, "gry_pepegochi_action('play')", at(48.003));
-      assert.equal(d.pet.good_days, 1, 'every need is 50 or more now');
+      assert.deepEqual(b.pet.good_day.needs_low, ['play'], 'the one need that blocks the good day');
+      const d = await ok(p, "gry_pepegochi_action('play')", at(59.002));   // energy 50.4 - 10 stays above 40
+      assert.equal(d.pet.good_days, 1, 'every need is 40 or more now');
+      assert.deepEqual(d.pet.good_day.needs_low, []);
     });
 
     await t.test('G3 daily short visits: a good day every day; Good Parent goal on day 29 (the 30th good day)', async () => {
@@ -743,9 +744,11 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
       assert.equal(st.pet.best_good_streak, 61);
     });
 
-    await t.test('G4 weekends only, 20 weeks: short visits earn almost nothing at >= 50; an hour or two visits a day earn 2 a week', async () => {
+    await t.test('G4 weekends only at >= 40: short visits earn every Sunday (Good Parent day 202); an hour or two visits a day earn 2 a week', async () => {
       const quick = await goodOf('weekend-quick-20w');
-      assert.deepEqual(quick.left, []); assert.equal(quick.good, 1); assert.equal(quick.goalDay, null);
+      assert.deepEqual(quick.left, []); assert.equal(quick.good, 21); assert.equal(quick.goalDay, null);
+      const longer = await goodOf('weekend-quick-32w');
+      assert.deepEqual(longer.left, []); assert.equal(longer.good, 33); assert.equal(longer.goalDay, 202);
       for (const name of ['weekend-long-20w', 'weekend-two-visits-20w', 'weekend-random-long-20w']) {
         const r = await goodOf(name);
         assert.deepEqual(r.left, [], name);
@@ -767,24 +770,23 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     await t.test('G6 rescue and a visit less than 8 h later: the visit helps, no recovery and no free good day', async () => {
       const r = await goodOf('weekend-midnight-then-noon');
       assert.deepEqual(r.left, [], 'the Sunday noon visit finishes the recovery');
-      assert.equal(r.good, 21, 'one good day a weekend (Sunday noon), as short visits at >= 50 allow');
+      assert.equal(r.good, 21, 'one good day a weekend (Sunday noon); the 00:30 visit does not add one');
       const gone = await goodOf('weekend-across-midnight');
       assert.equal(gone.left[0][1], 'recovery', 'without the noon visit, the frog moves out');
     });
 
-    await t.test('G7 neglect, then better care: good days stop, then come back after 2 days of care', async () => {
+    await t.test('G7 neglect, then better care: good days stop, and come back on the day after the rescue', async () => {
       const { s, good, goalDay } = await goodOf('neglect-then-daily');
       const at = d => Math.max(0, ...s.events.filter(e => e.day <= d && e.good != null).map(e => e.good));
       assert.equal(at(13), 14, 'every day while cared for');
       assert.equal(at(19), 14, 'none while away');
-      assert.equal(at(20), 14, 'the rescue day is not a good day');
-      assert.equal(at(21), 14, 'nor the day after: hunger is still below 50');
-      assert.equal(at(22), 15, 'the second day of care is');
-      assert.equal(good, 43); assert.equal(goalDay, 37);
+      assert.equal(at(20), 14, 'the rescue day is not a good day (hygiene and mood stay below 40)');
+      assert.equal(at(21), 15, 'the next day of care is');
+      assert.equal(good, 44); assert.equal(goalDay, 36);
     });
 
     await t.test('G8 sparse care earns no prestige: every 4 days, or a check-up every 6 days', async () => {
-      assert.ok((await goodOf('every-4-days')).good <= 1);
+      assert.ok((await goodOf('every-4-days')).good <= 2);
       assert.ok((await goodOf('checkup-every-6-days')).good <= 1);
     });
 
@@ -793,8 +795,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
         await setRules(db, base, overrides);
         try { return await goodOf(name); } finally { await setRules(db, base); }
       };
-      assert.equal((await run({ good_day_min_need: 40 }, 'weekend-quick-20w')).good, 21, '>= 40: Sundays count');
-      assert.ok((await run({ good_day_min_need: 40 }, 'every-4-days')).good <= 2, '>= 40: sparse care still ~0');
+      assert.equal((await run({ good_day_min_need: 50 }, 'weekend-quick-20w')).good, 1, 'the earlier >= 50: short weekend visits earn nothing');
       assert.equal((await run({ good_day_min_need: 30 }, 'weekend-quick-20w')).good, 41);
       assert.equal((await run({ good_day_min_need: 30 }, 'every-4-days')).good, 16, '>= 30: one per visit, even every 4 days');
       assert.equal((await run({ good_day_cared_counts: true }, 'weekend-quick-20w')).good, 41);
