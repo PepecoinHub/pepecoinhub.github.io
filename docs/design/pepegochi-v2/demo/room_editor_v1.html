@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PepeGochi v5 | Layered Room Laboratory</title>
+<style>
+:root{color-scheme:light;font-family:Tahoma,Arial,sans-serif;font-size:13px;background:#2c7080;color:#222}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:linear-gradient(138deg,#217685,#255d77);min-height:100vh}
+.window{margin:0 auto;max-width:1130px;border:3px ridge #fff;background:#c0c0c0;box-shadow:4px 5px 0 #173347}
+.titlebar{display:flex;align-items:center;justify-content:space-between;gap:8px;background:linear-gradient(90deg,#07166f,#2579be);color:white;padding:7px 10px;font-size:16px;font-weight:bold}
+.winbuttons{font-size:14px;letter-spacing:4px}main{padding:12px}
+.sub{background:#f6f2dd;border:1px solid #a39e84;padding:10px;line-height:1.45;margin-bottom:12px}
+.layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,.95fr);gap:12px}
+.panel{background:#dadada;border:2px inset #fff;padding:9px;min-width:0}
+.panel h2{font-size:15px;background:#322275;color:white;margin:-9px -9px 10px;padding:7px 9px}
+.stage-wrap{background:#33315d;padding:6px;border:3px inset #8a8a8a}
+.stage{aspect-ratio:8/5;position:relative;overflow:hidden;background:#b39bb8;isolation:isolate}
+.wall{position:absolute;inset:0 0 32%;background:repeating-linear-gradient(90deg,transparent 0 8%,#ac91ac 8.2% 8.7%,transparent 9% 18%),linear-gradient(#aa95b6,#bda8bd);z-index:0}
+.wall::after{content:"";position:absolute;inset:0;background:radial-gradient(#8c7aa3 1px,transparent 1px);background-size:25px 24px;opacity:.22}
+.floor{position:absolute;inset:68% 0 0;background:repeating-linear-gradient(0deg,#935c3d 0 5px,#70492e 6px 8px,#b17b4e 9px 18px);z-index:1;border-top:8px solid #76513b}
+.window-outside{position:absolute;left:69%;top:11%;width:22%;height:24%;background:linear-gradient(#283880 0 58%,#237b79 58%);border:7px ridge #a27150;box-shadow:2px 4px 0 #4f3d44;z-index:2}
+.window-outside::before{content:"✦";font-size:22px;color:#ffed92;position:absolute;left:66%;top:10%}.window-outside::after{content:"";position:absolute;left:48%;width:7px;height:100%;top:0;background:#9e755b}
+.bed{position:absolute;left:35%;top:61%;width:28%;height:17%;background:#6675ac;border:6px solid #313d85;border-radius:48%;z-index:3}
+.rug{position:absolute;left:27%;top:77%;width:45%;height:20%;border:7px solid #a5a02c;background:#637d9b;z-index:4;transform:perspective(60px) rotateX(18deg)}
+.dresser{position:absolute;left:2%;top:45%;width:18%;height:33%;background:repeating-linear-gradient(#8d512f 0 16px,#a76a40 17px 25px);border:4px solid #603b28;z-index:5}
+.tv-stand{position:absolute;left:78%;top:59%;width:19%;height:20%;background:#8d5e3c;border:4px solid #583d2c;z-index:5}
+.table{position:absolute;left:62%;top:72%;width:15%;height:13%;background:#96603a;border:4px solid #64412f;z-index:5}
+.poster{position:absolute;left:35%;top:18%;width:9%;height:19%;border:4px ridge #e9e2c1;background:#392d7e;color:#eee;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:bold;z-index:2;transform:rotate(-6deg)}
+.pet{position:absolute;left:45%;top:62%;font-size:clamp(22px,6vw,65px);line-height:1;z-index:60;filter:drop-shadow(2px 4px 0 #433e5f);transform:translate(-50%,-15%)}
+.slot{position:absolute;left:var(--x);top:var(--y);width:12%;min-width:30px;height:15%;min-height:27px;transform:translate(-50%,-50%);border:2px dashed rgba(255,255,255,.55);background:rgba(63,41,124,.14);color:white;text-shadow:1px 1px 2px #13121c;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:var(--z);border-radius:3px}
+.slot:hover,.slot:focus-visible{outline:2px solid #ffe367;outline-offset:1px;background:rgba(255,221,81,.15)}
+.slot.compat{border-color:#d6ef6c;background:rgba(153,211,60,.26)}.slot.blocked{border-color:#bf7e7e;opacity:.72}.slot .glyph{font-size:clamp(15px,3.3vw,34px);line-height:1}.slot small{font-size:8px;display:block;background:rgba(14,14,37,.75);max-width:110%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:1px 3px}
+.slot.missing .glyph{opacity:.26;filter:grayscale(1)}.slot.missing{border:2px dotted #ffe870;background:rgba(39,24,60,.26)}
+.letter{position:absolute;left:64%;top:80%;transform:translate(-50%,-50%);z-index:92;border:2px solid #ab6a35;background:#ffecc1;font-size:23px;cursor:pointer;padding:1px 7px}
+.right{display:grid;gap:12px;align-content:start}.inventory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.invitem{border:2px outset #fff;padding:7px;background:#ececec;text-align:left;display:flex;align-items:center;gap:6px;cursor:pointer;min-height:55px;font-family:inherit;color:inherit}
+.invitem .emoji{font-size:24px}.invitem span:last-child{min-width:0}.invitem.selected{outline:3px solid #3944a7;background:#fbfac5}.invitem.locked{background:#d8d8d8;color:#6e6e6e}.invitem:focus-visible{outline:3px solid #3944a7}
+.actions{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}.btn{border:2px outset #fff;background:#ececec;padding:8px 10px;font-family:inherit;font-weight:bold;cursor:pointer;color:#252525}.btn:disabled{opacity:.45;cursor:not-allowed}.btn:active{border-style:inset}
+.note{font-size:12px;background:#eeebfb;border:1px solid #aaa;padding:8px;line-height:1.4}.log{background:#161d36;color:#bceebd;padding:10px;min-height:56px;line-height:1.4;font-family:monospace;white-space:pre-wrap}
+.legend{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0}.pill{font-size:12px;padding:4px 7px;background:#edf0ff;border:1px solid #aaa}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:15px;z-index:500}.modal[hidden]{display:none}.notepad{width:min(520px,100%);background:#eee;border:3px ridge white;box-shadow:5px 6px 0 #202432}.notepad .body{padding:16px;line-height:1.6;font-family:monospace;font-size:14px;white-space:pre-wrap}
+footer{padding:9px;color:#444;font-size:11px;border-top:1px solid #999}strong{font-weight:700}
+@media(max-width:820px){body{padding:8px}.layout{grid-template-columns:1fr}.right{grid-template-columns:1fr}.stage{width:100%}.slot{width:13%;height:17%}.slot small{display:none}.invitem{min-height:51px}.titlebar{font-size:14px}}
+@media(prefers-reduced-motion:reduce){*,*::after,*::before{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="window">
+  <div class="titlebar"><span>🐸 PepeGochi v5 — ROOM.EXE / laboratory</span><span class="winbuttons" aria-hidden="true">▁ ▢ ×</span></div>
+  <main>
+   <div class="sub"><strong>TEST PREVIEW – nie zapisuje nic na serwerze.</strong> Wybierz przedmiot z kolekcji, następnie kliknij dozwolony slot w pokoju. Kliknięcie zajętego slotu bez wybranego przedmiotu odkłada go do kolekcji. Symulacja wyprowadzki usuwa go <em>tylko wizualnie</em>.</div>
+   <div class="layout">
+     <section class="panel" aria-label="Wizualny pokój PepeGochi">
+       <h2>Pokój / warstwy 640 × 400</h2>
+       <div class="stage-wrap"><div id="stage" class="stage">
+        <div class="wall"></div><div class="floor"></div><div class="window-outside"></div><div class="bed"></div><div class="rug"></div><div class="dresser"></div><div class="tv-stand"></div><div class="table"></div>
+        <div id="pet" class="pet" aria-label="Twój PepeGochi">🐸</div>
+        <div id="slots"></div><button id="letter" class="letter" hidden aria-label="Otwórz GOODBYE.TXT">✉️</button>
+       </div></div>
+       <div class="legend"><span class="pill">11 slotów</span><span class="pill">6 podstawowych dekoracji</span><span class="pill">osobna warstwa żaby</span><span class="pill">1 przedmiot w slocie</span></div>
+       <div id="status" class="note" role="status" aria-live="polite"></div>
+       <div class="actions"><button id="depart" class="btn">Symuluj wyprowadzkę</button><button id="adopt" class="btn" disabled>Nowa adopcja</button><button id="reset" class="btn">Resetuj pokój</button></div>
+       <div id="activity" class="log" aria-live="polite">Gotowy. Wybierz przedmiot.</div>
+     </section>
+     <aside class="right">
+       <section class="panel"><h2>INVENTORY.EXE — kolekcja</h2><div id="inventory" class="inventory"></div><div class="actions"><button id="gift" class="btn">Przetestuj nagrodę z eventu</button><button id="clearSelect" class="btn">Anuluj wybór</button></div><div class="note">Przedmioty z innych gier są tutaj tylko przykładami. W prawdziwej wersji serwer musi potwierdzić ich zdobycie. Księżycowa skała pozostaje zablokowana.</div></section>
+       <section class="panel"><h2>ROOM RULES / zasady</h2><p>Stałe tło i meble nie są przedmiotami w kolekcji. Sloty mają dozwolone kategorie. Nie można położyć telewizora na ścianie ani dwóch obiektów na tym samym stoliku.</p><p><strong>Po odejściu:</strong> znika tylko wizualna instancja losowo zabranego przedmiotu. Nie ginie własność, pieczątki ani wspomnienia. Po nowej adopcji wyposażenie wraca.</p><p><strong>W produkcji:</strong> osobny bezpieczny backend zapisuje własność i ustawienia. Ten demonstrator działa całkowicie w pamięci przeglądarki.</p></section>
+     </aside>
+   </div>
+  </main>
+  <footer>PepecoinHub / PondOS 98 · Dokumentacyjny projekt ROOM_ARCHITECTURE_V1 · bez połączeń sieciowych, SQL i wypłat PEP</footer>
+</div>
+<div id="modal" class="modal" hidden><div class="notepad" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div id="modalTitle" class="titlebar">GOODBYE.TXT — Notatnik <button id="closeLetter" class="btn" aria-label="Zamknij list">×</button></div><div class="body" id="letterText"></div></div></div>
+<script>
+'use strict';
+// Standalone illustrative layout. NO fetch, no localStorage, no Supabase, NO true awards.
+const slots=[
+ ['wall_left','Ściana L',169,96,['wall'],30],['wall_right','Ściana P',414,112,['wall'],30],
+ ['shelf_a','Półka A',252,140,['small','trophy'],40],['shelf_b','Półka B',318,140,['small','trophy'],40],
+ ['dresser_top','Komoda',90,215,['lamp','small'],50],['tv_stand','Szafka RTV',546,240,['electronics','large'],50],
+ ['table_top','Stolik',453,258,['small','toy'],50],['floor_left','Podłoga L',95,331,['plant','large'],50],
+ ['floor_right','Podłoga P',559,331,['plant','large'],50],['rug_left','Dywan L',246,341,['toy','small'],70],
+ ['rug_right','Dywan P',398,341,['toy','small'],70]
+].map(([id,label,x,y,allowed,z])=>({id,label,x,y,allowed,z}));
+const items=[
+ ['p_poster','Plakat P','wall','🖼️',true,'wall_left',true],['crt_tv','Telewizor CRT','electronics','📺',true,'tv_stand',true],
+ ['lava_lamp','Lampa lawa','lamp','💡',true,'dresser_top',true],['potted_plant','Roślina','plant','🪴',true,'floor_left',true],
+ ['rubber_duck','Kaczuszka','toy','🦆',true,'rug_left',true],['mug','Kubek','small','☕',true,'table_top',true],
+ ['floppy_disk','Dyskietka','small','💾',false,null,false],['paper_crown','Papierowa korona','trophy','👑',false,null,false],
+ ['moon_rock','Księżycowa skała','trophy','🪨',false,null,false],['lost_pond_artifact','Artefakt Lost Pond','trophy','❔',false,null,false]
+].map(([id,label,category,icon,borrowable,initial,defaultOwned])=>({id,label,category,icon,borrowable,initial,defaultOwned}));
+const getItem=id=>items.find(i=>i.id===id);
+const getSlot=id=>slots.find(s=>s.id===id);
+const initial=()=>Object.fromEntries(items.filter(i=>i.initial).map(i=>[i.initial,i.id]));
+let placed=initial(),owned=new Set(items.filter(i=>i.defaultOwned).map(i=>i.id)),selected=null,departed=false,taken=null,readLetter=false,history=[];
+const $=id=>document.getElementById(id);
+const tell=t=>{$('activity').textContent=t};
+function render(){
+ const slotRoot=$('slots');slotRoot.replaceChildren();
+ slots.forEach(s=>{
+  const id=placed[s.id],i=getItem(id),missing=departed&&id===taken;
+  const compatible=selected&&s.allowed.includes(getItem(selected).category);
+  const b=document.createElement('button');b.type='button';b.className='slot'+(compatible?' compat':'')+(selected&&!compatible?' blocked':'')+(missing?' missing':'');
+  b.style.setProperty('--x',(s.x/640*100)+'%');b.style.setProperty('--y',(s.y/400*100)+'%');b.style.setProperty('--z',s.z);
+  b.title=s.label+(i?' – '+i.label:' – pusty');b.setAttribute('aria-label',b.title);b.disabled=departed;
+  const glyph=document.createElement('span');glyph.className='glyph';glyph.textContent=missing?'▧':i?i.icon:'+';
+  const label=document.createElement('small');label.textContent=i?.label||s.label;b.append(glyph,label);
+  b.onclick=()=>place(s.id);slotRoot.append(b);
+ });
+ const ir=$('inventory');ir.replaceChildren();
+ items.forEach(i=>{
+   const unlocked=owned.has(i.id),b=document.createElement('button');b.type='button';b.className='invitem'+(selected===i.id?' selected':'')+(!unlocked?' locked':'');b.disabled=departed||!unlocked;
+   b.setAttribute('aria-label',i.label+(unlocked?'':' – niedostępne'));
+   const ic=document.createElement('span');ic.className='emoji';ic.textContent=unlocked?i.icon:'🔒';
+   const name=document.createElement('span');name.textContent=i.label+(Object.values(placed).includes(i.id)?' · wystawione':'');b.append(ic,name);
+   b.onclick=()=>{selected=i.id;tell('Wybrano: '+i.label+'. Teraz wskaż zgodne miejsce w pokoju.');render()};ir.append(b);
+ });
+ $('pet').hidden=departed;$('letter').hidden=!departed;
+ $('depart').disabled=departed;$('adopt').disabled=!(departed&&readLetter);
+ $('gift').disabled=departed||owned.has('floppy_disk');
+ $('status').textContent=departed?'Fren się wyprowadził. '+(taken?'Zabrał: '+getItem(taken).label+'. ':'Nie miał nic do zabrania. ')+'W pokoju został GOODBYE.TXT.':'Żaba mieszka w pokoju. Własność przedmiotów na koncie jest niezależna od ich położenia.';
+}
+function place(slotId){
+ if(departed){tell('Pokój po wyprowadzce jest tylko do oglądania.');return}
+ const s=getSlot(slotId),current=placed[slotId];
+ if(!selected){if(current){delete placed[slotId];tell('Schowano do kolekcji: '+getItem(current).label)}else tell('Najpierw wybierz przedmiot z kolekcji.');render();return}
+ const item=getItem(selected);
+ if(!s.allowed.includes(item.category)){tell('Ten slot nie pasuje do „'+item.label+'”.');return}
+ if(current&&current!==selected){tell('To miejsce jest zajęte. Najpierw schowaj „'+getItem(current).label+'”.');return}
+ for(const key of Object.keys(placed))if(placed[key]===selected)delete placed[key];
+ placed[slotId]=selected;tell('Ustawiono '+item.label+' w slocie '+s.label+'.');selected=null;render();
+}
+$('clearSelect').onclick=()=>{selected=null;tell('Anulowano wybór. Kliknij zajęty slot, aby schować przedmiot.');render()};
+$('gift').onclick=()=>{owned.add('floppy_disk');tell('TEST: symulowano nagrodę z wydarzenia. W prawdziwej grze taki przedmiot otrzymuje się wyłącznie po potwierdzeniu na serwerze.');render()};
+$('depart').onclick=()=>{
+ if(departed)return;const elig=Object.values(placed).filter(id=>getItem(id).borrowable);
+ taken=elig.length?elig[Math.floor(Math.random()*elig.length)]:null;
+ departed=true;readLetter=false;selected=null;history.push({name:'PepeGochi #'+(history.length+1),taken});
+ tell('Odejście zapisane w tej sesji demonstracyjnej. '+(taken?'Zabrano: '+getItem(taken).label:'Nic nie zabrano')+'. Otwórz list.');render();
+};
+$('letter').onclick=()=>{
+ if(!departed)return;readLetter=true;const text='Dear Fren,\n\nI waited. I got hungry.\nThen I decided to find a better pond.\n\n'+(taken?'P.S. I took the '+getItem(taken).label+'.':'P.S. Your room was too empty to steal anything.')+'\n\nYour former PepeGochi';
+ $('letterText').textContent=text;$('modal').hidden=false;render();$('closeLetter').focus();
+};
+$('closeLetter').onclick=()=>{$('modal').hidden=true;$('letter').focus()};
+$('modal').addEventListener('click',e=>{if(e.target===$('modal'))$('closeLetter').click()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modal').hidden)$('closeLetter').click()});
+$('adopt').onclick=()=>{if(!departed||!readLetter)return;departed=false;readLetter=false;taken=null;selected=null;tell('Nowy Fren przybył! Wróciły wszystkie wystawione przedmioty. W historii zapisano '+history.length+' poprzednich Frenów.');render()};
+$('reset').onclick=()=>{placed=initial();owned=new Set(items.filter(i=>i.defaultOwned).map(i=>i.id));selected=null;departed=false;taken=null;readLetter=false;history=[];tell('Zresetowano wyłącznie lokalny podgląd.');render()};
+render();
+</script>
+</body>
+</html>
