@@ -542,7 +542,7 @@ Po wdrożeniu na produkcję (osobna zgoda): ponowne doradcy bezpieczeństwa i wy
 5. ✅ jako wartość robocza: dobry dzień = ≥ 2 różne akcje i potrzeby ≥ 40 (PR A2; próg zmieniony z 50 w punkcie 6a).
 6. ✅ **1 dzień rekonwalescencji i co najmniej 8 h od ratunku** (decyzje 2026-11-07): gracze sob + nd zachowują żabę, a ratunek nie jest uproszczony. Rekonwalescencja zaczyna się od 120 h, nie od 48 h (powód w 5.2a). Bez ograniczenia nastroju.
 6a. ✅ **Próg dobrego dnia: ≥ 40** (decyzja 2026-11-07, A2 #221). Zostają: co najmniej 2 różne sensowne akcje, wszystkie potrzeby ≥ 40, najwyżej 1 dobry dzień na dzień UTC, Good Parent = 30 dobrych dni w jednym życiu. Bez zmian w rekonwalescencji, odejściu i ratunku. Przy ≥ 50 krótkie wizyty weekendowe dawały 1 dobry dzień w 20 tygodni; przy ≥ 40 dają 21, a wizyty co 4 dni dalej najwyżej 2.
-7. Wyzwanie 30 dni: wariant 1 teraz, wariant 2 później jako `perfect_parent`?
+7. ✅ Wyzwanie 30 dni: wariant 1 (licznik): Good Parent = 30 dobrych dni w jednym życiu, niekoniecznie z rzędu (decyzja 2026-11-07, A2 #221). Wariant 2 ewentualnie później jako `perfect_parent`.
 8. Stempel 100 dni: ID i nazwa (`best_fren_forever` / „Best Fren Forever”?) oraz reguła (100 dobrych dni w jednym życiu?).
 9. „It's Not Me, It's You”: wpis w historii (rekomendacja) czy ukryty stempel?
 10. Etap jajka przed pierwszą akcją: tak czy nie? (v1 zaczyna od kijanki.)
@@ -552,7 +552,14 @@ Po wdrożeniu na produkcję (osobna zgoda): ponowne doradcy bezpieczeństwa i wy
     - w A1 jako `scripts/pepegochi_sim.mjs` (ten sam SQL w PGlite), który zostaje źródłem referencyjnym;
     - w przeglądarce **wariant (b), lekki JS** (decyzja 2026-11-07), bez PGlite i bez rozszerzania CSP: Draft #220, z automatycznymi testami zgodności z SQL;
     - działa wyłącznie lokalnie, nie przyznaje osiągnięć i nie zmienia danych graczy.
-14. Lista dozwolonych stempli: wariant 1 czy 2 z K3?
+14. Lista dozwolonych stempli (K3): w Passporcie obowiązuje zasada „stempel `planned` nie jest do zdobycia” (`tests/passport-awards.test.mjs`), a stemple PepeGochi zostają `planned` do R (K8). Dlatego most (PR C, #229) jest gotowy, ale ID dopisujemy do listy w `update_passport_awards.sql` (wariant 1) dopiero w PR wydania, razem z `live` w katalogu. Do tego czasu kamienie milowe czekają i nic nie ginie. Do potwierdzenia przez właściciela.
+15. ✅ Okno testowe z grafiką (#228, decyzje 2026-11-07):
+    - próg wyglądu `LOOK_BELOW = 75` zostaje (sam wygląd);
+    - bez `packing_angry` i bez nowych mechanik wyprowadzki;
+    - telefon: cały pokój, bez automatycznego przycinania (zbliżenie żaby ewentualnie później);
+    - telewizor zostaje tymczasowym „zabranym” przedmiotem do Room-4;
+    - poprawki grafiki (`hungry`, `dirty`, `froglet`, `recovering`, klatki wyprowadzki: dorosła żaba ok. 113 px, stopy na stałej linii, siatka pokoju) robi strona graficzna. Różnic nie poprawiamy skalowaniem CSS; po dostawie podmieniamy tylko te pliki i powtarzamy testy na komputerze i telefonie;
+    - kolejność integracji przyjęta, ale to nie jest zgoda na merge ani publikację.
 
 ---
 
@@ -566,14 +573,14 @@ Każdy PR jako Draft, z gałęzi od `main`, z opisem zgodnym z CLAUDE_HANDOFF.md
 | **A2** jakość opieki — **Draft #221** (stacked na #220) | dobre dni, seria, kamień milowy `good_parent` (30 w jednym życiu), te same zasady w modelu JS, symulacje graczy | ten sam plik SQL, model, symulator, testy | G1–G10, H4, zgodność 0 różnic | mały–średni |
 | **B1** lokalny symulator w przeglądarce — **Draft #220** (stacked na #218) | zasady w JS (te same RPC i JSON), strona testowa z przewijaniem czasu, tylko lokalnie (CSP `connect-src 'none'`, brak zapisu, brak stempli) | `docs/games/js/pepegochi-model.mjs`, `docs/games/pepegochi-sim.html`, `tests/pepegochi-parity.test.mjs`, `tests/pepegochi-model.test.mjs` | test P: 0 różnic z SQL | średni |
 | **B2** tymczasowe UI — **Draft #223** (stacked na #221) | okno PondOS (iframe jak YEET) za flagą `?beta=gochi`, **na lokalnym modelu JS z B1** (decyzja 2026-11-07): imię, etap, 4 potrzeby, 4 akcje, ostrzeżenia, ratunek i rekonwalescencja z najwcześniejszym momentem zakończenia, pusty pokój, GOODBYE.TXT, Past Frens, nowa adopcja, dobre dni z potrzebą, która blokuje dzień, time machine z godzinami. CSP `connect-src 'none'`, żaba w `sessionStorage` karty, bez stempli. Tylko istniejące komponenty PondOS, bez nowej grafiki | `docs/games/pepegochi.html`, `docs/games/js/pepegochi-beta*.mjs`, wpis w `docs/meme/meme.js` za flagą, `tests/pepegochi-beta.test.mjs`, powtórka sesji okna w teście zgodności | I2, I5, I6, zgodność z SQL 0 różnic, wszystkie okna PondOS sprawdzone w przeglądarce; I1, I3, I4 przy podłączeniu okna do prawdziwych RPC | średni |
-| **C** Passport | lista ID (K3), `first_hatch` / `little_fren` / `grown_fren`, backfill, karta Overview, Stats; katalog bez zmiany statusów do R | `games/supabase/update_pepegochi_passport.sql`, `docs/meme/meme.js` (Passport), testy, plik decyzji | G1–G7, istniejące testy Passportu zielone | mały |
+| **C** Passport — **C1 Draft #229** (stacked na #221) | C1: most `update_pepegochi_passport.sql`: kamienie milowe → `first_hatch` / `little_fren` / `grown_fren` przez `passport_award()`, data kamienia milowego, backfill; stemple czekają do R (decyzja 14). C2: karta PepeGochi w Overview i Stats (za `?beta=gochi`) | `games/supabase/update_pepegochi_passport.sql`, `tests/pepegochi-passport*.test.mjs`, dokumenty; C2: `docs/meme/meme.js` (Passport) | C1: C1–C11 na PostgreSQL, mutacje 6/6; C2: przeglądarka | mały |
 | **D** Good Parent | wariant wyzwania z decyzji 7, `best_fren_forever` jeśli zatwierdzony, jawna zmiana opisów w katalogu | `update_pepegochi_good_parent.sql`, katalog, plik decyzji, testy | testy 30 dni, pominięcia, 7 dni nieobecności, strefy, duble | mały |
 | **R** wydanie | Twoja grafika, reklama PEP-TV (zasada repo: większe funkcje dostają reklamę w `ADS`), katalog `live`, zdjęcie flagi bety, instrukcja SQL w kolejności z 8.4 | według potrzeb | Twoja zgoda na SQL i publikację | — |
 | E, F | pokój i inwentarz; osobowości, warianty listu, rebirth | osobne specyfikacje po projekcie graficznym | — | — |
 
 Kolejność: A1 → A2 → B1 → B2 (od tego momentu możesz grać w becie) → C → D → R. B1 może iść równolegle z A2.
 
-Kolejność scalania stosu Draft PR-ów: #218 (A1) → #220 (B1) → #221 (A2) → #223 (B2). Okno z B2 działa na lokalnym modelu; podłączenie go do prawdziwych RPC (lokalny backend albo staging, testy I1, I3, I4) to osobny krok do ustalenia.
+Kolejność scalania stosu Draft PR-ów: #218 (A1) → #220 (B1) → #221 (A2) → #223 (B2) + #224 (Room-2) → #225 (pokój w oknie) → #228 (grafika v2 w oknie). Most do Passportu #229 stoi osobno na #221. Okno z B2 działa na lokalnym modelu; podłączenie go do prawdziwych RPC (lokalny backend albo staging, testy I1, I3, I4) to osobny krok do ustalenia.
 
 ---
 
