@@ -136,6 +136,16 @@
       "alpha": true,
       "pixelated": true,
       "candidate": true
+    },
+    "pepegochi_adult_idle": {
+      "file": "pepegochi_adult_idle.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "candidate": true,
+      "origin": "earlier approved visual reference / character sprite"
     }
   },
   "status": "pixel-art functional candidate, artwork not final approved"
