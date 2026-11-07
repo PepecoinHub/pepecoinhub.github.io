@@ -284,8 +284,8 @@
   },
   "paths": {
     "base": "avatar-assets/layers/base_frog.webp",
-    "layer_template": "avatar-assets/layers/{id}.webp?v=20261107b",
-    "thumb_template": "avatar-assets/thumbs/{id}.webp?v=20261107b"
+    "layer_template": "avatar-assets/layers/{id}.webp?v=20261107c",
+    "thumb_template": "avatar-assets/thumbs/{id}.webp?v=20261107c"
   },
   "special_note": "A special avatar is a whole drawn character by Lily for a big milestone. When one is picked it replaces every part layer except the background (bg).",
   "mouth_note": "Cigarette and pipe (in_mouth) are drawn under the mouth layer and moved so their in_mouth point lands on the chosen mouth's corner (512 canvas pixels), so the filter or mouthpiece is held in every mouth."

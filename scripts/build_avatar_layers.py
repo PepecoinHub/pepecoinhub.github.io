@@ -180,14 +180,15 @@ MOUTHS = ['mouth_flat', 'mouth_smile', 'mouth_open', 'mouth_tongue', 'mouth_teet
 MOUTH_W = 200
 MOUTH_CX, MOUTH_TOP = 306, 296
 HATS = [  # the first cell is the 'none' tile
+    # sizes and places retuned 2026-11-07 (owner: hats sat too far left and too small): centred over the eyes
     None,
-    ('hat_pep_cap', {'w': 330, 'cx': 270, 'bottom': 176}),
-    ('hat_beanie', {'w': 320, 'cx': 268, 'bottom': 180}),
-    ('hat_bucket', {'w': 370, 'cx': 268, 'bottom': 186}),
-    ('hat_hardhat', {'w': 350, 'cx': 268, 'bottom': 180}),
-    ('hat_crown', {'w': 250, 'cx': 266, 'bottom': 162}),
+    ('hat_pep_cap', {'w': 380, 'cx': 300, 'bottom': 182}),
+    ('hat_beanie', {'w': 370, 'cx': 298, 'bottom': 188}),
+    ('hat_bucket', {'w': 410, 'cx': 298, 'bottom': 184}),
+    ('hat_hardhat', {'w': 400, 'cx': 298, 'bottom': 186}),
+    ('hat_crown', {'w': 270, 'cx': 302, 'bottom': 174}),
     ('-hat_wizard', {'w': 340, 'cx': 262, 'bottom': 172}),   # removed 2026-11-07 (owner); '-' = cut but not written
-    ('hat_detective', {'w': 360, 'cx': 268, 'bottom': 186}),
+    ('hat_detective', {'w': 410, 'cx': 298, 'bottom': 184}),
 ]
 CLOTHING = [('clothing_blue', 372), ('clothing_purple_hoodie', 356), ('clothing_black_hoodie', 356),
             ('clothing_suit', 368), ('clothing_shirt_tie', 370), ('clothing_camo', 368)]
