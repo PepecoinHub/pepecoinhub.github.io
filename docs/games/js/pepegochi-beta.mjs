@@ -3,6 +3,7 @@
 // LOCAL TEST ONLY: the page CSP has connect-src 'none', so no request can leave it. No Supabase,
 // no Passport, no stamps. The test frog is kept in this tab's sessionStorage only.
 import { BetaGame, TIME_STEPS } from './pepegochi-beta-view.mjs';
+import { renderRoom } from './pepegochi-room.mjs';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {
@@ -26,8 +27,7 @@ function meter(n) {
 function renderPet(box, p) {
   box.append(el('p', { class: 'pgb-title' }, p.title));
   // temporary placeholder for the room and the frog: just words, no art
-  box.append(el('div', { class: 'pgb-room pgb-room-' + p.status, role: 'img', 'aria-label': 'Room: ' + p.status },
-    p.status === 'packing' ? '[ room · your Fren · a tiny suitcase ]' : '[ room · your Fren ]'));
+  box.append(renderRoom(document, { status: p.status, stage: p.stage }));
   box.append(el('p', { class: 'pgb-status' }, p.statusText));
   for (const w of p.warnings) box.append(el('p', { class: 'pgb-warn' }, w));
   if (p.recovery) box.append(el('p', { class: 'pgb-warn pgb-recovery' }, p.recovery));
@@ -60,7 +60,7 @@ function renderPet(box, p) {
 function renderDeparted(box, v) {
   const d = v.departed;
   box.append(el('p', { class: 'pgb-status' }, d.text));
-  box.append(el('div', { class: 'pgb-room pgb-room-empty', role: 'img', 'aria-label': 'Empty room with a letter' }, '[ empty room · a letter on the table ]'));
+  box.append(renderRoom(document, { departed: true }));
   const ul = el('ul', { class: 'pgb-list' });
   d.facts.forEach(f => ul.append(el('li', {}, f)));
   box.append(el('p', {}, d.name), ul);

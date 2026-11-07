@@ -26,9 +26,6 @@ html.embed .pgb-banner { background: #ffffe1 !important; }
 .pgb .btn:disabled { opacity: .55; }
 .pgb-title { font-weight: 700; }
 .pgb-msg { min-height: 1.2em; font-weight: 700; }
-.pgb-room { margin: 8px 0; padding: 14px; text-align: center; background: #fff; border: 1px dashed #808080; font-family: monospace; }
-.pgb-room-packing, .pgb-room-neglected { background: #fff8e1; }
-.pgb-room-empty { color: #555; }
 .pgb-status { font-style: italic; }
 .pgb-warn { padding: 4px 8px; background: #fff; border-left: 4px solid #a00; }
 .pgb-recovery { border-left-color: #0c5a2c; }
@@ -50,3 +47,17 @@ html.embed .pgb-banner { background: #ffffe1 !important; }
   .pgb { padding: 6px; }
   .pgb-need { grid-template-columns: 5.5em 1fr 2.5em; }
 }
+
+/* room v5 scene (layered art from the design PR); slot anchors in js/pepegochi-room.mjs */
+.pgr { position: relative; width: 100%; aspect-ratio: 8 / 5; margin: 8px 0; overflow: hidden; border: 3px inset #9a9a9a; background: #a790b4; isolation: isolate; }
+.pgr img { position: absolute; image-rendering: pixelated; pointer-events: none; user-select: none; }
+.pgr-bg { inset: 0; width: 100%; height: 100%; z-index: 1; }
+.pgr-item { transform: translate(-50%, -100%); }
+.pgr-wall { transform: translate(-50%, -50%); }
+.pgr-pet { left: 50%; top: 72%; transform: translate(-50%, -50%); z-index: 60; filter: drop-shadow(2px 3px 0 #403454); animation: pgr-bob 2.4s ease-in-out infinite; }
+@keyframes pgr-bob { 50% { transform: translate(-50%, -54%); } }
+.pgr-neglected .pgr-pet { filter: grayscale(.45) drop-shadow(2px 3px 0 #403454); animation-duration: 4s; }
+.pgr-packing .pgr-pet { filter: grayscale(.7) drop-shadow(2px 3px 0 #403454); animation: none; left: 62%; }
+.pgr-bubble { position: absolute; z-index: 70; left: 50%; top: 38%; transform: translate(-10%, -100%); background: #fff; border: 2px solid #222; border-radius: 10px; padding: 3px 8px; font: 700 clamp(10px, 2.6vw, 15px) Tahoma, sans-serif; color: #111; white-space: nowrap; }
+.pgr-letter { position: absolute; z-index: 90; left: 70%; top: 72%; transform: translate(-50%, -50%) rotate(-5deg); background: #f9e9bd; border: 3px outset #e3bc6d; padding: 2px 8px; font: 700 clamp(11px, 3vw, 18px) Tahoma, sans-serif; color: #111; }
+@media (prefers-reduced-motion: reduce) { .pgr-pet { animation: none; } }
