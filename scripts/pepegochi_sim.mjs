@@ -248,7 +248,7 @@ export const SCENARIOS = {
     run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 8, weekendAt('21:00', '08:00')); await after(s, 56); },
   },
   'weekend-across-midnight': {
-    about: 'Weekends only: Saturday 23:30 and Sunday 00:30 UTC (one late session split by midnight).',
+    about: 'Weekends only: Saturday 23:30 and Sunday 00:30 UTC (one late session split by midnight: under the 8 h rule it is one visit).',
     run: async s => { await s.adopt('Fren'); await s.care(); await weekly(s, 8, weekendAt('23:30', '00:30')); await after(s, 56); },
   },
   'weekend-random-hours': {

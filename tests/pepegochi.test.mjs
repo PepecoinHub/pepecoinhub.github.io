@@ -110,9 +110,10 @@ test('v2 starts from a clean schema and refuses to run over v1', () => {
 test('playtest rules are marked as such and documented with the same numbers', () => {
   const rules = fnBody('games.pepegochi_rules');
   assert.match(rules, /'playtest', true/);
-  // recovery_days = 1 is the owner's decision (2026-11-07): Saturday + Sunday players keep their frog
+  // owner decisions (2026-11-07): recovery_days = 1 so Saturday + Sunday players keep their frog, and
+  // recovery_min_gap_h = 8 so one session across UTC midnight is not two days
   const want = { meaningful_below: 90, neglected_h: 48, packing_h: 120, departs_h: 168, rescue_from_h: 120,
-    recovery_days: 1, recovery_departs_h: 72, recovery_min_gap_h: 0, max_actions_per_utc_day: 12, min_gap_s: 2 };
+    recovery_days: 1, recovery_departs_h: 72, recovery_min_gap_h: 8, max_actions_per_utc_day: 12, min_gap_s: 2 };
   for (const [k, v] of Object.entries(want)) {
     assert.match(rules, new RegExp(`'${k}', ${v}\\b`), k);
     assert.match(api, new RegExp('`' + k + '`\\s*\\|\\s*' + v + '\\b'), 'API doc: ' + k);
