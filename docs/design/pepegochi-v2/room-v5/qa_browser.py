@@ -1,7 +1,8 @@
 from playwright.sync_api import sync_playwright
 from pathlib import Path
 import json
-root=Path('/mnt/data/pepegochi_room_v5')
+root=Path(__file__).resolve().parent
+(root/'screenshots').mkdir(exist_ok=True)
 results=[]
 with sync_playwright() as p:
   browser=p.chromium.launch(headless=True, executable_path='/usr/bin/chromium',args=['--no-sandbox'])
