@@ -1,0 +1,52 @@
+/* PEPEGOCHI.EXE hidden-beta window: temporary layout for testing the mechanics, not the game's design.
+   In a PondOS window (html.embed) the cards and buttons get the 98 look from gry.css. */
+.pgb { display: grid; gap: 10px; padding: 10px; grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "banner" "main" "time" "rules" "past" "log"; }
+.pgb-banner { grid-area: banner; }
+.pgb-main { grid-area: main; }
+.pgb-time { grid-area: time; }
+.pgb-rules-card { grid-area: rules; }
+.pgb-past-card { grid-area: past; }
+.pgb-log-card { grid-area: log; }
+/* a wider window: the time machine stays next to the frog, so every jump shows its effect at once.
+   It is alone in its column: anything placed under it would be pushed down by the frog's height. */
+@media (min-width: 680px) {
+  .pgb { grid-template-columns: minmax(0, 1fr) 250px; align-items: start;
+    grid-template-areas: "banner banner" "main time" "rules rules" "past past" "log log"; }
+  .pgb-time { position: sticky; top: 8px; }
+}
+.pgb h2 { font-size: 1rem; margin: 0 0 6px; }
+.pgb p { margin: 4px 0; }
+.pgb-banner { margin: 0; padding: 8px 10px; background: #ffffe1; }
+html.embed .pgb-banner { background: #ffffe1 !important; }
+.pgb-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }
+.pgb-row input[type=number] { width: 6em; }
+.pgb-row input[type=text] { width: 12em; }
+.pgb .btn { min-height: 32px; padding: 4px 10px; }
+.pgb .btn:disabled { opacity: .55; }
+.pgb-title { font-weight: 700; }
+.pgb-msg { min-height: 1.2em; font-weight: 700; }
+.pgb-room { margin: 8px 0; padding: 14px; text-align: center; background: #fff; border: 1px dashed #808080; font-family: monospace; }
+.pgb-room-packing, .pgb-room-neglected { background: #fff8e1; }
+.pgb-room-empty { color: #555; }
+.pgb-status { font-style: italic; }
+.pgb-warn { padding: 4px 8px; background: #fff; border-left: 4px solid #a00; }
+.pgb-recovery { border-left-color: #0c5a2c; }
+.pgb-needs { display: grid; gap: 4px; margin: 8px 0; max-width: 520px; }
+.pgb-need { display: grid; grid-template-columns: 6em 1fr 2.5em; gap: 8px; align-items: center; }
+.pgb-need meter { width: 100%; height: 14px; }
+.pgb-need-note { grid-column: 1 / -1; color: #a00; }
+.pgb-need.is-low .pgb-need-name { font-weight: 700; }
+.pgb-good { margin: 8px 0; padding: 6px 8px; background: #fff; border: 1px solid #808080; }
+.pgb-good progress { width: 100%; max-width: 520px; height: 14px; }
+.pgb-list { margin: 4px 0; padding-left: 20px; }
+.pgb-notepad { margin: 8px 0; background: #fff; border: 1px solid #0a0a0a; max-width: 520px; }
+.pgb-notepad-bar { background: #0c5a2c; color: #fff; padding: 2px 6px; font-weight: 700; }
+.pgb-notepad pre { margin: 0; padding: 10px; white-space: pre-wrap; font-family: "Courier New", monospace; font-size: 14px; }
+.pgb-notepad .btn { margin: 0 10px 10px; }
+.pgb-notepad p { padding: 0 10px; }
+.pgb-log { max-height: 220px; overflow: auto; font-family: monospace; font-size: 12px; padding-left: 22px; }
+@media (max-width: 480px) {
+  .pgb { padding: 6px; }
+  .pgb-need { grid-template-columns: 5.5em 1fr 2.5em; }
+}

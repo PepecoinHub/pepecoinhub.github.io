@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; frame-src 'none'; worker-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>PEPEGOCHI.EXE (local test) | Pepecoin Hub</title>
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../facts.css?v=20261104coin">
+<link rel="stylesheet" href="gry.css?v=20261103m">
+<link rel="stylesheet" href="pepegochi.css?v=20261107b2">
+<script src="js/embed.js?v=20261103bot"></script>
+<script type="module" src="js/pepegochi-beta.mjs?v=20261107b2"></script>
+</head>
+<body>
+<main class="wrap pgb" id="main">
+  <p class="pgb-banner card" role="note"><b>LOCAL TEST.</b> This frog lives only in this browser tab, on a copy of the game rules. Nothing is sent to the server and no stamp is real. Temporary look: the game's art comes later. <button type="button" class="btn" id="pgb-reset">Reset</button></p>
+
+  <section class="card pgb-main" aria-labelledby="pgb-main-h">
+    <h2 id="pgb-main-h">PEPEGOCHI.EXE</h2>
+    <p id="pgb-msg" class="pgb-msg" aria-live="polite"></p>
+    <div id="pgb-body"></div>
+  </section>
+
+  <section class="card pgb-time" aria-labelledby="pgb-time-h">
+    <h2 id="pgb-time-h">Time machine</h2>
+    <p><b id="pgb-clock"></b> <span id="pgb-day" class="muted"></span></p>
+    <div class="pgb-row" id="pgb-steps"></div>
+    <form class="pgb-row" id="pgb-hours">
+      <label for="pgb-h">Hours</label>
+      <input type="number" id="pgb-h" min="0.1" max="400" step="0.1" value="8">
+      <button type="submit" class="btn">Skip</button>
+      <button type="button" class="btn" id="pgb-sat">Next Saturday 18:00</button>
+      <button type="button" class="btn" id="pgb-sun">Next Sunday 18:00</button>
+    </form>
+  </section>
+
+  <section class="card pgb-rules-card" aria-labelledby="pgb-rules-h">
+    <h2 id="pgb-rules-h">Rules (from the server values)</h2>
+    <ul id="pgb-rules" class="pgb-list"></ul>
+  </section>
+
+  <section class="card pgb-past-card" aria-labelledby="pgb-past-h">
+    <h2 id="pgb-past-h">Past Frens</h2>
+    <div id="pgb-past"></div>
+  </section>
+
+  <details class="card pgb-log-card">
+    <summary>Log</summary>
+    <ol id="pgb-log" class="pgb-log"></ol>
+  </details>
+</main>
+</body>
+</html>

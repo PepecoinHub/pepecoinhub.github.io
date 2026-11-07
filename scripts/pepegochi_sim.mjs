@@ -378,6 +378,28 @@ export const SCENARIOS = {
     },
   },
 
+  'full-life-cycle': {
+    about: 'The beta checklist (PR B2): adopt, care, neglect, packing, feed alone, rescue, a too-early visit, recovery, moving out, letter, new egg.',
+    run: async s => {
+      await s.adopt('Fren'); await s.care();
+      await repeatDays(s, 3, () => true);           // days 1-3 at 18:00; the needs start waiting about 7 h later
+      s.goto(6, '12:00'); await s.state('look');    // neglected
+      s.goto(9, '20:00'); await s.state('look');    // packing
+      await s.act('feed');                          // feeding alone does not rescue
+      s.wait('2m'); await s.care();                 // the full check-up at 20:02: recovering, finish from 04:02
+      s.wait('5h'); await s.care();                 // 01:02: a later UTC day but under 8 h: helps, does not finish
+      s.goto(10, '06:00'); await s.care();          // a later UTC day and 8 h after the rescue: healthy
+      await repeatDays(s, 12, d => d >= 11);
+      s.goto(21); await s.state('arrive');          // nobody for 9 days: moved out
+      await s.adopt('Fren II');                     // refused until the letter is read
+      await s.letter();
+      await s.adopt('Fren II');
+      await s.care();
+      await repeatDays(s, 24, d => d >= 22);
+      await after(s, 24);
+    },
+  },
+
   // ---------- good care days (PR A2) ----------
   'weekend-quick-20w': {
     about: 'Good days: Saturday + Sunday 18:00 UTC, a short visit each day, 20 weeks.',

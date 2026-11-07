@@ -10,6 +10,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { prepare, setRules, addPlayer, asDb, uid, Sim, SCENARIOS, START, sqlBackend, modelBackend, rng } from '../scripts/pepegochi_sim.mjs';
 import { LocalPepegochi, parseTimestampUs, KINDS } from '../docs/games/js/pepegochi-model.mjs';
+import { BetaGame } from '../docs/games/js/pepegochi-beta-view.mjs';
+import { walk } from './pepegochi-beta-walk.mjs';
 
 const PGLITE = process.env.PEPEGOCHI_PGLITE_MODULE;
 const PG_URL = process.env.PASSPORT_PG_URL, PG_MOD = process.env.PASSPORT_PG_MODULE;
@@ -188,6 +190,29 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
           await p.finish('exact 40 ' + d);
         }
       });
+    });
+
+    await t.test('the PondOS beta window: every call of a whole life cycle gives the SQL answer', async () => {
+      const game = new BetaGame({ storage: null, start: Date.parse(START) });
+      const calls = [];
+      const rpc = game.sim.rpc.bind(game.sim);
+      game.sim.rpc = (name, args = {}, at = null) => {
+        const now = at == null ? game.sim.now / 1000 : +new Date(at);
+        const r = rpc(name, args, at);
+        calls.push({ name, args, now, r: JSON.parse(JSON.stringify(r)) });
+        return r;
+      };
+      walk(game);
+      assert.ok(calls.length > 40, 'calls: ' + calls.length);
+      const user = next++;
+      await addPlayer(db, user);
+      const sql = sqlBackend(db, user);
+      for (const c of calls) {
+        const a = await sql.call(c.name, c.args, new Date(c.now));
+        if (c.r.ok) delete c.r.value.local_preview;
+        stats.calls++; stats.compared++;
+        assert.deepEqual(normResult(c.r), normResult(a), `window: ${c.name} ${JSON.stringify(c.args)} at ${new Date(c.now).toISOString()}`);
+      }
     });
 
     // ---------- seeded random play: waits, actions, adoption, letters, bad input ----------

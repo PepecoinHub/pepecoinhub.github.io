@@ -265,6 +265,26 @@ The owner chose a light JavaScript copy of the rules (no 5 MB PGlite, no CSP cha
 
 **If the SQL rules change, the model must change in the same PR.** The parity test fails otherwise.
 
+### PondOS test window (PR B2, hidden beta, local only)
+
+A playable PEPEGOCHI.EXE window in PondOS 98 for the owner and testers. It runs on the same JavaScript model, so it is the full game logic with a temporary look.
+
+- **Who sees it:** only a browser that opened `/meme/?beta=gochi` once (kept in localStorage `pondos-gochi-beta`; `/meme/?beta=off` hides it again). It is then in Start → Games and in Find as `PEPEGOCHI.EXE (test)`. Nobody else gets a new menu entry, icon or request.
+- **What it opens:** `docs/games/pepegochi.html?embed=1` in a PondOS window (`pepegochiApp()` in `docs/meme/meme.js`). That page has `connect-src 'none'`, `frame-src 'none'` and `worker-src 'none'`: the browser blocks every request to a server, Supabase included.
+- **Where the frog lives:** sessionStorage `pepegochi-local-sim-v1`, in this tab only. Closing and reopening the window, or a reload, keeps it; closing the tab or Reset removes it. Nothing goes to localStorage, cookies or the server.
+- **What it shows:**
+  - adoption, the four needs, the four actions with their cooldowns, and why an action is not available;
+  - neglect, packing, the needs still overdue, the rescue, and the earliest moment the recovery can be finished (next UTC day and at least `recovery_min_gap_h` after the rescue);
+  - moving out, the empty room, GOODBYE.TXT (adoption waits until it is read), the new egg and Past Frens;
+  - good care days towards Good Parent (30), the streaks, and the exact thing still missing today, for example "Hunger is 31, needs 40: Feed";
+  - the moment the frog moves out if nobody comes, and which need decides it.
+- **Time machine:** +10 min, +1 h, +3 h, +6 h, +12 h, +1/+2/+7 days, any number of hours, next Saturday or Sunday 18:00 UTC. Every action also moves the clock 3 s, past the 2 s gap between actions. "Everything it needs" is a test shortcut that does every action the frog can take right now.
+- **No stamps, no Passport, no PEP:** milestones stay in the model's memory and the window never mentions stamps as earned.
+- **Tests:**
+  - `tests/pepegochi-beta.test.mjs` (CI) plays the whole checklist in the window's game object and checks the local-only rules and the hidden menu entry.
+  - `tests/pepegochi-parity.test.mjs` replays the same window session call by call on the real SQL.
+  - `scripts/pepegochi_sim.mjs --scenario full-life-cycle` runs the same checklist on the SQL.
+
 ## Release gates
 
 1. Review this SQL. Run both test files and the simulator locally or on a separate staging project.
@@ -272,4 +292,4 @@ The owner chose a light JavaScript copy of the rules (no 5 MB PGlite, no CSP cha
 3. Only with the owner's explicit approval: apply `update_pepegochi_v2.sql` to PH-games after `schema.sql`. It does not depend on the Fren Passport files.
 4. Passport bridge (PR C) after the Passport migrations, then Supabase security/performance advisors and a negative test with a real JWT.
 
-Not here yet: the Good Parent stamp itself (Passport bridge, C), the game window (B2), any art.
+Not here yet: the Good Parent stamp itself (Passport bridge, C), the window on the real backend, any art.
