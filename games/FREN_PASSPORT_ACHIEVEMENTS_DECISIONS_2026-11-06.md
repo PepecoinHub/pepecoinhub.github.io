@@ -66,16 +66,21 @@ Scout Fren rewards: Lily's special avatar **Explorer Pepe** and the **explorer h
 
 ## Still planned ("???" / Coming soon)
 
-PepeGochi (needs PR #186 and a frontend): `first_hatch` (adopt the pet), `little_fren` (second care day: the tadpole becomes a froglet), `grown_fren` "One Small Step" (7th care day: adult; "one small step for a man, one giant leap for a frog"). These match the life cycle in `games/PEPEGOCHI_API.md` (tadpole 0-1 care days, froglet 2-6, adult 7+). Care days are distinct UTC days, not in a row.
+PepeGochi: `first_hatch` (adopt the pet), `little_fren` (second care day: the tadpole becomes a froglet), `grown_fren` "One Small Step" (7th care day: adult; "one small step for a man, one giant leap for a frog"). These match the life cycle in `games/PEPEGOCHI_API.md` (tadpole 0-1 care days, froglet 2-6, adult 7+). Care days are distinct UTC days, not in a row.
+
+- Source: the server records each of them once per account as a milestone (`games.pepegochi_milestones`, `update_pepegochi_v2.sql`). The bridge `update_pepegochi_passport.sql` turns the milestones into stamps through `games.passport_award()`, dated at the milestone. Its backfill delivers every pending milestone.
+- They stay planned until the PepeGochi release. The release PR adds the three IDs to the allowlist in `update_passport_awards.sql` and sets them live here; until then the bridge leaves the milestones pending, so nothing is lost.
+- `good_parent` (30 good care days in one life, owner decision 2026-11-07) comes with its own PR and an explicit change of the catalog text.
 
 Everything else in `docs/meme/passport-catalog.json` with `status: "planned"`, including `certified_fren`, `yeet_adept` (3000 m, rule already agreed), `hundred_day_fren`, the PepeGochi stamps and BALI. `games.passport_days` can serve Certified Fren later (100 distinct days).
 
 ## Cross-PR conflict to resolve before merge
 
-Draft PR #186 (`games/supabase/update_pepegochi_passport_bridge.sql`) grants `certified_fren` after 100 PepeGochi care days. That conflicts with the agreed rule (100 days of PondOS activity). Before publishing #186, stop its bridge from minting `certified_fren` and pick a PepeGochi-specific stamp instead. Its `gry_passport_state` changes would also have to be rebased on the newest definition, which is now in `update_passport_awards.sql`.
+Draft PR #186 (`games/supabase/update_pepegochi_passport_bridge.sql`) granted `certified_fren` after 100 PepeGochi care days, which conflicts with the agreed rule (100 days of PondOS activity). PepeGochi v2 replaces #186 and does not take that bridge over: the v2 bridge never awards `certified_fren` and does not change `gry_passport_state`.
 
 ## Tests
 
 - `tests/passport-awards.test.mjs` (static, runs in CI): live catalog == award allowlist, no browser arguments, Discord-only award path, hooks catch errors, `gry_yeet_submit` equals `update_yeet.sql` plus the hook.
 - `tests/passport-awards-sql.test.mjs` (real PostgreSQL, opt-in): loads `schema.sql` and all hooked game migrations, then plays through the real RPCs (`gry_yeet_submit`, `gry_wp_start`/`gry_wp_guess`, `gry_lobby_say`, `gry_letter_send`, `gry_miner_save`, `gry_passport_checkin`, `gry_passport_avatar_save`). It covers the Pioneer snapshot and a re-run, backfills, guests, an unlinked Discord account, thresholds, gaps, grants, one notice per stamp, reward parts, a failing hook, and account deletion. Eight deliberate bugs in the migration were each caught by it.
 - `scripts/fren_avatar_e2e.mjs` (browser, opt-in): the stamp balloon, the Passport and album, reward parts in the maker, Pioneer "Closed" for a late account, the `pond_stamps.mpg` ad.
+- `tests/pepegochi-passport.test.mjs` (static, CI) and `tests/pepegochi-passport-sql.test.mjs` (real PostgreSQL, opt-in): the PepeGochi bridge, including "a planned stamp is never awardable, a live one always is" for its three stamps.

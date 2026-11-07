@@ -206,11 +206,35 @@ This file never writes stamps. It records account milestones in `games.pepegochi
 - `adult` (7th care day).
 
 The rows then go to `games.pepegochi_passport_sync(u)`:
-- In this PR the hook is a **no-op**. The Passport bridge (PR C) will replace it and award `first_hatch`, `little_fren` and `grown_fren` through `games.passport_award()`.
+- In this file the hook is a **no-op**. The Passport bridge `games/supabase/update_pepegochi_passport.sql` (PR C, next section) replaces it.
 - The hook runs inside its own exception block. If it fails, the care action is kept, a warning is logged, and the milestone stays `synced_at = null`. Every later accepted write tries again. PR C's migration can also award everything pending at once.
 - Re-running this file never switches off a hook installed later: the no-op is created only when the hook does not exist.
 - If an account loses Discord, its RPCs are refused, so nothing new is earned. Pending milestones are delivered after Discord is linked again, on the next accepted action. `passport_award()` also refuses accounts without Discord, which keeps such a milestone pending.
 - `certified_fren` is **never** awarded by PepeGochi. It means 100 days of PondOS activity.
+
+### The Passport bridge (PR C, `update_pepegochi_passport.sql`)
+
+Install it after the Fren Passport files and this file. It is safe to run again.
+
+| Milestone | Stamp | Catalog name |
+|---|---|---|
+| `first_adoption` | `first_hatch` | First Hatch |
+| `froglet` (2nd care day) | `little_fren` | Little Fren |
+| `adult` (7th care day) | `grown_fren` | One Small Step |
+
+- Every stamp goes through `games.passport_award()`: its allowlist, the Discord check and once per account. A later frog earns no second copy.
+- The stamp is dated at the milestone (`reached_at`), also when it is delivered later.
+- A milestone counts as delivered only when the stamp row exists. `passport_award()` answers `false` both for "had it already" and for "no Discord", so an account without Discord keeps its milestones until it is linked again.
+- Backfill: running the file delivers every pending milestone.
+- **The stamps wait until the release.** They are `planned` in the Passport catalog, and the Passport rule is that only live stamps can be earned (`tests/passport-awards.test.mjs`). So they are not in `passport_award()`'s allowlist yet. The hook then leaves their milestones pending, silently: no warning, no lost care, nothing lost.
+  - The release PR adds `first_hatch`, `little_fren` and `grown_fren` to the allowlist in `update_passport_awards.sql` and sets them `live` in `docs/meme/passport-catalog.json`.
+  - Then the next accepted PepeGochi action, or running this file again, delivers everything pending, with the original dates.
+  - `tests/pepegochi-passport.test.mjs` checks both sides: a planned stamp is not in the allowlist, a live one is.
+- Only that one error ("Unknown passport stamp") is caught by the hook. Any other failure (a broken Passport table, a failing trigger) reaches `games.pepegochi_sync()`: warning, care kept, milestone pending.
+- `good_parent` stays pending: its stamp and the catalog text change ("Provide care on 30 distinct days" → 30 good care days in one life) come with PR D.
+- It replaces no Passport function and writes no Passport table except through `passport_award()`. `gry_passport_state()` already lists the stamps; the Passport window takes names and art from the catalog.
+- Re-running `update_pepegochi_v2.sql` keeps this hook. Re-running today's `update_passport_awards.sql` only makes the stamps wait again.
+- Tests: `tests/pepegochi-passport.test.mjs` (CI) and `tests/pepegochi-passport-sql.test.mjs` (real PostgreSQL, C1–C11). The SQL test plays the release by adding exactly the three IDs to today's allowlist.
 
 ## Resource budget
 
@@ -270,6 +294,7 @@ The owner chose a light JavaScript copy of the rules (no 5 MB PGlite, no CSP cha
 1. Review this SQL. Run both test files and the simulator locally or on a separate staging project.
 2. Playtest the rules with the simulator, then in the hidden beta (PR B, on a local backend: no production change).
 3. Only with the owner's explicit approval: apply `update_pepegochi_v2.sql` to PH-games after `schema.sql`. It does not depend on the Fren Passport files.
-4. Passport bridge (PR C) after the Passport migrations, then Supabase security/performance advisors and a negative test with a real JWT.
+4. Passport bridge (PR C, `update_pepegochi_passport.sql`) after the Passport migrations and this file, then Supabase security/performance advisors and a negative test with a real JWT.
+5. Release (PR R, owner's approval): add `first_hatch`, `little_fren`, `grown_fren` to `passport_award()`'s allowlist in `update_passport_awards.sql`, set them `live` in the catalog, run `update_passport_awards.sql` and then `update_pepegochi_passport.sql` again (delivers everything pending).
 
-Not here yet: the Good Parent stamp itself (Passport bridge, C), the game window (B2), any art.
+Not here yet: the Good Parent stamp (PR D), the Passport card for PepeGochi, any art.
