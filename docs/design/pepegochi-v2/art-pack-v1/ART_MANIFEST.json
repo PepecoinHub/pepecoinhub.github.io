@@ -1,0 +1,227 @@
+{
+  "version": "concept-v1",
+  "authoring": "ImageGen drafts normalized to fixed-size alpha canvases",
+  "manifest_source": "PR #222 ART_MANIFEST.json; no item ids overwritten",
+  "status": "review_required",
+  "room_ref": {
+    "size": [
+      640,
+      400
+    ],
+    "character_size": [
+      128,
+      128
+    ],
+    "pixel_art_mismatch_warning": "Illustrations are smooth/cel-shaded, not genuine 320x200 pixel art; review before integrating into pixel room."
+  },
+  "characters": {
+    "pepegochi_tadpole_idle": {
+      "file": "sprites/pepegochi_tadpole_idle.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "anchor": [
+        64,
+        121
+      ],
+      "source": "source/pepegochi_tadpole_idle.png"
+    },
+    "pepegochi_froglet_idle": {
+      "file": "sprites/pepegochi_froglet_idle.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "anchor": [
+        64,
+        121
+      ],
+      "source": "source/pepegochi_froglet_idle.png"
+    },
+    "pepegochi_adult_idle": {
+      "file": "sprites/pepegochi_adult_idle.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "anchor": [
+        64,
+        121
+      ],
+      "source": "source/pepegochi_adult_idle.png"
+    },
+    "pepegochi_adult_neglected": {
+      "file": "sprites/pepegochi_adult_neglected.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "anchor": [
+        64,
+        121
+      ],
+      "source": "source/pepegochi_adult_neglected.png"
+    },
+    "pepegochi_adult_packing": {
+      "file": "sprites/pepegochi_adult_packing.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "anchor": [
+        64,
+        121
+      ],
+      "source": "source/pepegochi_adult_packing.png"
+    }
+  },
+  "animations": {
+    "feed": {
+      "frames": [
+        "sprites/feed_01.png",
+        "sprites/feed_02.png",
+        "sprites/feed_03.png",
+        "sprites/feed_04.png"
+      ],
+      "sprite_sheet": "animations/feed_sheet.png",
+      "frame_dimensions": [
+        128,
+        128
+      ],
+      "frame_ms_preview": 260,
+      "anchor": [
+        64,
+        122
+      ],
+      "loops": 1,
+      "source": "source/anim_feed.png",
+      "notes": "Four independently exported frames; no GIF is required by the game."
+    },
+    "clean": {
+      "frames": [
+        "sprites/clean_01.png",
+        "sprites/clean_02.png",
+        "sprites/clean_03.png",
+        "sprites/clean_04.png"
+      ],
+      "sprite_sheet": "animations/clean_sheet.png",
+      "frame_dimensions": [
+        128,
+        128
+      ],
+      "frame_ms_preview": 260,
+      "anchor": [
+        64,
+        122
+      ],
+      "loops": 1,
+      "source": "source/anim_clean.png",
+      "notes": "Four independently exported frames; no GIF is required by the game."
+    },
+    "play": {
+      "frames": [
+        "sprites/play_01.png",
+        "sprites/play_02.png",
+        "sprites/play_03.png",
+        "sprites/play_04.png"
+      ],
+      "sprite_sheet": "animations/play_sheet.png",
+      "frame_dimensions": [
+        128,
+        128
+      ],
+      "frame_ms_preview": 260,
+      "anchor": [
+        64,
+        122
+      ],
+      "loops": 1,
+      "source": "source/anim_play.png",
+      "notes": "Four independently exported frames; no GIF is required by the game."
+    },
+    "rest": {
+      "frames": [
+        "sprites/rest_01.png",
+        "sprites/rest_02.png",
+        "sprites/rest_03.png",
+        "sprites/rest_04.png"
+      ],
+      "sprite_sheet": "animations/rest_sheet.png",
+      "frame_dimensions": [
+        128,
+        128
+      ],
+      "frame_ms_preview": 260,
+      "anchor": [
+        64,
+        122
+      ],
+      "loops": 1,
+      "source": "source/anim_rest.png",
+      "notes": "Four independently exported frames; no GIF is required by the game."
+    }
+  },
+  "props": {
+    "goodbye_suitcase_letter": {
+      "file": "sprites/goodbye_suitcase_letter.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "anchor": [
+        64,
+        121
+      ],
+      "source": "source/goodbye_suitcase_letter.png"
+    }
+  },
+  "original_sources": {
+    "pepegochi_tadpole_idle": {
+      "file": "source/pepegochi_tadpole_idle.png",
+      "sha256": "2c9c99c4ca54077db7ed7e916195eb0d44cbba8dd708956762ce4e4061b9e8b2"
+    },
+    "pepegochi_froglet_idle": {
+      "file": "source/pepegochi_froglet_idle.png",
+      "sha256": "8142a083ce1d66284bc1a24a1cc5cb7138d57f82d51bb3989d5a77aaf5e348be"
+    },
+    "pepegochi_adult_idle": {
+      "file": "source/pepegochi_adult_idle.png",
+      "sha256": "56e40594f52e31e79dd3ce054017f7b8c7206cf80f8798f9bfef5410e8fff2e7"
+    },
+    "pepegochi_adult_neglected": {
+      "file": "source/pepegochi_adult_neglected.png",
+      "sha256": "a641e18dfaa3c591726743cbea98877a9a74de637e687115bbc0602cc0c07143"
+    },
+    "pepegochi_adult_packing": {
+      "file": "source/pepegochi_adult_packing.png",
+      "sha256": "6774ab0af9758c97d789fb141cffb155974f61b8a3b9e6b1a3e1186b4185ad13"
+    },
+    "goodbye_suitcase_letter": {
+      "file": "source/goodbye_suitcase_letter.png",
+      "sha256": "f42c2b47208e42a1e9ca357f6a64205bffd11ad1d175e4efdc4340e01d0d7657"
+    },
+    "anim_feed": {
+      "file": "source/anim_feed.png",
+      "sha256": "152f879c2211b273f0fcdc40e7461fa419773d97f48368488bc43925efda3133"
+    },
+    "anim_clean": {
+      "file": "source/anim_clean.png",
+      "sha256": "30fc0f5952a570f67191a16ec4e97a5bcce67c578c9772c4a2e84670bdc041fc"
+    },
+    "anim_play": {
+      "file": "source/anim_play.png",
+      "sha256": "6a6838f0a5502991812a4cbed8ebdff67149ea364bba5512cc4e3e892ae95adc"
+    },
+    "anim_rest": {
+      "file": "source/anim_rest.png",
+      "sha256": "28f9b0d803d553aa22fe4b43af5714a48a9b89598893ac18e7405b9b6906a0f4"
+    }
+  }
+}
