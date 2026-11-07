@@ -497,13 +497,17 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     });
 
     // ---------- W: weekend players (owner decision 2026-11-07: they can keep their frog) ----------
-    await t.test('W1 weekends at different hours keep the frog: morning/evening, evening/morning, across midnight, random', async () => {
-      for (const name of ['weekend-morning-evening', 'weekend-evening-morning', 'weekend-across-midnight', 'weekend-random-hours']) {
+    await t.test('W1 weekends at different hours keep the frog: morning/evening, evening/morning, random', async () => {
+      for (const name of ['weekend-morning-evening', 'weekend-evening-morning', 'weekend-random-hours']) {
         const { st, left, seen } = await scenario(name);
         assert.deepEqual(left, [], name);
         assert.equal(st.pet.status, 'healthy', name);
         assert.ok(seen.has('recovering'), name + ': the rescue still happens every week');
       }
+      // one late session split by UTC midnight is one visit (8 h rule): that pattern loses the frog
+      const split = await scenario('weekend-across-midnight');
+      assert.equal(split.left.length, 1);
+      assert.equal(split.left[0][1], 'recovery');
     });
 
     await t.test('W2 weekends with feeding only: moves out on day 7', async () => {
@@ -541,31 +545,44 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
       assert.equal(monday.pet.status, 'healthy');
     });
 
-    await t.test('W5 one session split by UTC midnight counts as the next day; the optional minimum gap closes that', async () => {
-      const split = async overrides => {
-        const p = await player();
-        if (overrides) await setRules(db, base, overrides);
-        try {
-          await ok(p, "gry_pepegochi_adopt('Fren')");           // Monday 18:00, then nothing: packing by Saturday
-          const s = new Sim(db, { user: p, start: new Date('2026-11-14T23:30:00Z') });
-          await s.care();
-          assert.equal(s.last.pet.status, 'recovering');
-          const counts = s.last.pet.recovery.counts_from;
-          s.now = new Date('2026-11-15T00:30:00Z');
-          await s.care();
-          return { status: s.last.pet.status, counts };
-        } finally { if (overrides) await setRules(db, base); }
-      };
-      const off = await split();
-      assert.equal(off.status, 'healthy', 'default (knob off): 00:30 is a later UTC day');
-      assert.equal(+new Date(off.counts), +new Date('2026-11-15T00:00:00Z'));
-      const gap = await split({ recovery_min_gap_h: 8 });
-      assert.equal(gap.status, 'recovering', 'with an 8 h gap, 00:30 is too soon');
-      assert.ok(+new Date(gap.counts) >= +new Date('2026-11-15T07:30:00Z'));
-      const scen = await scenario('weekend-across-midnight', { recovery_min_gap_h: 8 });
-      assert.equal(scen.left.length, 1, 'that weekend pattern then loses the frog');
-      const normal = await scenario('weekend-evening-morning', { recovery_min_gap_h: 8 });
-      assert.deepEqual(normal.left, [], 'Saturday 21:00 / Sunday 08:00 still keeps it');
+    await t.test('W5 recovery needs a later UTC day and 8 h after the rescue; an earlier visit still helps but does not count', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");             // Monday 18:00, then nothing: packing by Saturday
+      const s = new Sim(db, { user: p, start: new Date('2026-11-14T23:30:00Z') });
+      await s.care();
+      assert.equal(s.last.pet.status, 'recovering');
+      const rescuedAt = +new Date(s.last.server_now);
+      const countsFrom = +new Date(s.last.pet.recovery.counts_from);
+      assert.equal(countsFrom, rescuedAt + 8 * H, 'the earliest finish is shown: 8 h after the rescue (later than midnight)');
+      // 00:30: a later UTC day, but too soon. The care is accepted and helps; recovery is not finished.
+      const before = s.last.pet.needs.hunger;
+      s.now = new Date('2026-11-15T00:30:00Z');
+      await s.care();
+      assert.equal(s.last.action_result, 'accepted');
+      assert.ok(s.last.pet.needs.hunger > before, 'needs improved by the early visit');
+      assert.equal(s.last.pet.status, 'recovering');
+      assert.equal(s.last.pet.recovery.days_left, 1);
+      assert.equal(+new Date(s.last.pet.recovery.counts_from), countsFrom, 'an early visit does not move the finish');
+      // 1 ms before the finish: still recovering; at the finish: healthy
+      const early = await callRpc(db, { user: p, now: new Date(countsFrom - 1) }, "public.gry_pepegochi_action('feed')");
+      assert.ok(early.ok, early.error);
+      assert.equal(early.value.pet.status, 'recovering');
+      const done = await callRpc(db, { user: p, now: new Date(countsFrom + 3000) }, "public.gry_pepegochi_action('play')");
+      assert.ok(done.ok, done.error);
+      assert.equal(done.value.pet.status, 'healthy');
+      // with the gap switched off (playtest value 0), 00:30 would have counted
+      await setRules(db, base, { recovery_min_gap_h: 0 });
+      try {
+        const q = await player();
+        await ok(q, "gry_pepegochi_adopt('Fren')");
+        const s0 = new Sim(db, { user: q, start: new Date('2026-11-14T23:30:00Z') });
+        await s0.care();
+        s0.now = new Date('2026-11-15T00:30:00Z');
+        await s0.care();
+        assert.equal(s0.last.pet.status, 'healthy');
+      } finally { await setRules(db, base); }
+      const normal = await scenario('weekend-evening-morning');
+      assert.deepEqual(normal.left, [], 'Saturday 21:00 / Sunday 08:00 (11 h) still keeps the frog');
     });
 
     await t.test('R7 rescue: half a visit does not stop the deadline, a full one starts recovery, the next day ends it', async () => {

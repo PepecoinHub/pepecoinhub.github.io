@@ -83,7 +83,7 @@ These are the owner's working numbers from 2026-11-07, not final rules. They liv
 | `rescue_from_h` | 120 | caring again for a frog that reached this starts recovery |
 | `recovery_days` | 1 | later UTC days with care needed to end recovery (**owner decision, 2026-11-07**) |
 | `recovery_departs_h` | 72 | while recovering, the frog moves out after this long without care |
-| `recovery_min_gap_h` | 0 | off. Optional knob: hours between the check-up and the next-day visit (see below) |
+| `recovery_min_gap_h` | 8 | hours between the check-up and the next-day visit (**owner decision, 2026-11-07**) |
 | `max_actions_per_utc_day` | 12 | accepted actions per UTC day (as v1) |
 | `min_gap_s` | 2 | seconds between two actions (as v1) |
 
@@ -106,11 +106,14 @@ Every need has its own clock. The clock starts when the need falls below 90. It 
 
 `recovering` (after a rescue from `packing`):
 - the frog needs care on **1 later UTC day** (not the rescue day);
+- that care counts only **8 h or more after the rescue**;
 - within **72 h** of the last care;
 - after that it is `healthy` again;
 - without it, the frog moves out with `departure_reason: 'recovery'`.
 
-`pet.recovery.counts_from` tells the game the earliest moment the next visit counts.
+A visit before that moment is still accepted and still improves the needs (and restarts the 72 h), but it does not finish the recovery.
+
+`pet.recovery.counts_from` is the earliest moment the recovery can be finished: the later of the next UTC midnight and rescue + 8 h. The game should show it ("Come back after Sun 07:30 to make up"). An early visit does not move it.
 
 The rescue is not simplified. Feeding alone never rescues a frog: every overdue need has to be cared for, and the player has to come back on another day. Keeping a frog and earning the prestige stamps for good care (PR A2/D) stay two different challenges.
 
@@ -124,7 +127,7 @@ Every case below is played out by `scripts/pepegochi_sim.mjs` on the real SQL an
 | Saturday + Sunday, 18:00 UTC | **stays**, packing and recovery every week | moves out on day 16 |
 | Saturday 08:00 + Sunday 21:00 | stays | — |
 | Saturday 21:00 + Sunday 08:00 | stays | — |
-| Saturday 23:30 + Sunday 00:30 (across midnight) | stays (see the note) | — |
+| Saturday 23:30 + Sunday 00:30 (one session across midnight) | moves out: the 00:30 visit is too soon to count (see the note) | — |
 | a random time every Saturday and Sunday, 12 weeks | stays | — |
 | weekends, but only feeding | moves out on day 7 | same |
 | a missed Saturday, Sunday at 12:00, no weekday visit | moves out on Wednesday (day 22, recovery) | — |
@@ -139,13 +142,13 @@ Every case below is played out by `scripts/pepegochi_sim.mjs` on the real SQL an
 
 **Missed Saturday.** Sunday to Sunday is the 7-day limit itself. A player who comes on Sunday a bit earlier than the week before can still rescue the frog, but then has 72 hours, until Wednesday, to come back once. A player who comes later than the week before finds the letter.
 
-**Across UTC midnight.** Days are UTC days, so a session on Saturday 23:30 and a short visit at 00:30 count as the check-up and the next day. With `recovery_min_gap_h` set to 8, the next-day visit counts only 8 hours after the check-up. Then that late-night pattern loses the frog, while Saturday 21:00 + Sunday 08:00 and random weekend hours still keep it. The knob is off (0) because it is not an approved rule. It can be tried in the simulator with `--rule recovery_min_gap_h=8`.
+**Across UTC midnight.** A rescue on Saturday 23:30 and a visit at 00:30 are one session, not two days. The 00:30 visit helps, but the recovery can only be finished from 07:30. A weekend player who plays only that late Saturday session loses the frog. Saturday 21:00 + Sunday 08:00 (11 h apart) and random weekend hours still keep it. `--rule recovery_min_gap_h=0` brings back the old behaviour in the simulator.
 
 ### What to tell players (the screen must say this before adoption)
 
 - "Look after every need at least once a week, or your Fren moves out."
 - "After 2 days without care your Fren feels neglected. After 5 days it starts packing."
-- "If it started packing, a full check-up calms it down, and it wants to see you again on another day."
+- "If it started packing, a full check-up calms it down, and it wants to see you again on another day, at least 8 hours later."
 
 ## Milestones and the Fren Passport
 

@@ -139,7 +139,7 @@ returns jsonb language sql stable set search_path = '' as $$
     'recovery_days', 1,           -- later UTC days with care needed to finish recovery (owner: 1, so
                                   -- Saturday + Sunday players can keep their frog)
     'recovery_departs_h', 72,     -- while recovering, the frog moves out after this long without care
-    'recovery_min_gap_h', 0,      -- off. Playtest knob: hours between the check-up and the next-day visit,
+    'recovery_min_gap_h', 8,      -- owner, 2026-11-07: the next-day visit counts only 8 h after the check-up,
                                   -- so one session across UTC midnight cannot count as two days
     'max_actions_per_utc_day', 12,
     'min_gap_s', 2,
