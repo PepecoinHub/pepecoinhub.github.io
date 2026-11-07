@@ -1,8 +1,8 @@
 {
-  "version": "v2.0-candidate",
+  "version": "v2.1-consistency-qa",
   "date": "2026-11-07",
   "style": "1998-2003 PondOS 98; nearest-neighbor pixel art; green frog, blue P hoodie adult",
-  "status": "owner-approved artistic direction; candidate technical exports pending in-game visual QA",
+  "status": "Pixel-grid and geometry corrected exports; draft awaiting final in-room approval",
   "base_canvas": [
     128,
     128
@@ -25,12 +25,15 @@
       ],
       "source": "jajeczko_pepegochi_w_pikselach.png",
       "bbox": [
-        31,
+        30,
         42,
         96,
         124
       ],
-      "review": "owner-approved-direction"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "rendered_height": 82,
+      "feet_y": 124,
+      "pixel_grid": 2
     },
     "pepegochi_tadpole_idle": {
       "file": "sprites/pepegochi_tadpole_idle.png",
@@ -47,10 +50,13 @@
       "bbox": [
         16,
         50,
-        111,
+        110,
         124
       ],
-      "review": "owner-approved-direction"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "rendered_height": 74,
+      "feet_y": 124,
+      "pixel_grid": 2
     },
     "pepegochi_adult_idle": {
       "file": "sprites/pepegochi_adult_idle.png",
@@ -65,12 +71,15 @@
       ],
       "source": "pixelowy_żabek_w_niebieskiej_bluzie.png",
       "bbox": [
-        27,
-        9,
+        26,
+        8,
         100,
         124
       ],
-      "review": "owner-approved-direction"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "rendered_height": 116,
+      "feet_y": 124,
+      "pixel_grid": 2
     },
     "pepegochi_adult_hungry": {
       "file": "sprites/pepegochi_adult_hungry.png",
@@ -85,12 +94,15 @@
       ],
       "source": "głodny_żabolek_z_ciasteczkiem.png",
       "bbox": [
-        12,
-        9,
-        115,
+        24,
+        8,
+        106,
         124
       ],
-      "review": "owner-approved-direction"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "rendered_height": 116,
+      "feet_y": 124,
+      "pixel_grid": 2
     },
     "pepegochi_adult_dirty": {
       "file": "sprites/pepegochi_adult_dirty.png",
@@ -105,12 +117,15 @@
       ],
       "source": "brudny_dorosły_pepegochi_z_muchą.png",
       "bbox": [
-        23,
-        9,
-        104,
+        26,
+        8,
+        102,
         124
       ],
-      "review": "owner-approved-direction"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "rendered_height": 116,
+      "feet_y": 124,
+      "pixel_grid": 2
     },
     "pepegochi_adult_moody": {
       "file": "sprites/pepegochi_adult_moody.png",
@@ -126,11 +141,14 @@
       "source": "nastrojony_pepegochi_w_niebieskiej_bluzie_siatkowe.png",
       "bbox": [
         24,
-        9,
-        104,
+        8,
+        94,
         124
       ],
-      "review": "owner-approved-direction"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "rendered_height": 116,
+      "feet_y": 124,
+      "pixel_grid": 2
     },
     "pepegochi_adult_tired": {
       "file": "sprites/pepegochi_adult_tired.png",
@@ -145,12 +163,15 @@
       ],
       "source": "zmęczony_pepegochi_w_niebieskiej_bluzie.png",
       "bbox": [
-        19,
-        9,
-        108,
+        18,
+        8,
+        98,
         124
       ],
-      "review": "owner-approved-direction"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "rendered_height": 116,
+      "feet_y": 124,
+      "pixel_grid": 2
     },
     "pepegochi_adult_neglected": {
       "file": "sprites/pepegochi_adult_neglected.png",
@@ -165,12 +186,15 @@
       ],
       "source": "zaniedbana_żaba_w_niebieskiej_bluzie.png",
       "bbox": [
-        27,
-        9,
+        26,
+        8,
         100,
         124
       ],
-      "review": "owner-approved-direction"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "rendered_height": 116,
+      "feet_y": 124,
+      "pixel_grid": 2
     },
     "pepegochi_adult_recovering": {
       "file": "sprites/pepegochi_adult_recovering.png",
@@ -186,11 +210,14 @@
       "source": "uśmiechnięta_żabia_regeneracja.png",
       "bbox": [
         24,
-        9,
-        103,
+        8,
+        100,
         124
       ],
-      "review": "candidate"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "rendered_height": 116,
+      "feet_y": 124,
+      "pixel_grid": 2
     },
     "pepegochi_adult_packing": {
       "file": "sprites/pepegochi_adult_packing.png",
@@ -205,12 +232,15 @@
       ],
       "source": "wściekły_pepegochi_z_walizką.png",
       "bbox": [
-        11,
-        9,
-        117,
+        10,
+        8,
+        100,
         124
       ],
-      "review": "owner-approved-direction"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "rendered_height": 116,
+      "feet_y": 124,
+      "pixel_grid": 2
     },
     "pepegochi_adult_packing_angry": {
       "file": "sprites/pepegochi_adult_packing_angry.png",
@@ -225,12 +255,15 @@
       ],
       "source": "pakkowanie_na_pełnym_wkurzeniu.png",
       "bbox": [
-        14,
-        9,
-        113,
+        24,
+        8,
+        112,
         124
       ],
-      "review": "candidate"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "rendered_height": 116,
+      "feet_y": 124,
+      "pixel_grid": 2
     },
     "pepegochi_froglet_idle": {
       "file": "sprites/pepegochi_froglet_idle.png",
@@ -243,7 +276,16 @@
         64,
         124
       ],
-      "review": "older placeholder; final pixel-art froglet pending"
+      "review": "v2.1 QA correction; compare in B2 room before release",
+      "bbox": [
+        34,
+        34,
+        94,
+        124
+      ],
+      "rendered_height": 90,
+      "feet_y": 124,
+      "pixel_grid": 2
     }
   },
   "animations": {
@@ -259,7 +301,9 @@
       "sheet": "animations/depart_sheet.png",
       "preview": "previews/departure_preview.gif",
       "frame_ms": 250,
-      "loop": false
+      "loop": false,
+      "feet_y": 124,
+      "source_height_normalized": true
     }
   },
   "props": {
@@ -284,10 +328,21 @@
     ]
   },
   "qa_warnings": [
-    "Froglet from earlier pack remains candidate, needs approved P pixel-art version",
-    "Recovering and packing-angry originals do not show P hoodie letter consistently; user-approved overall appearance not exact approved frame-to-frame rig",
-    "Do not bake suitcase or furniture into room background; GIF/depart sequence has a moving character with some edge clipping intended near frame 6",
-    "Each source has independently authored anatomy, so for smooth animation more hand cleanup may be necessary",
-    "No production game data or SQL is included"
-  ]
+    "v2.1 fixes measured sprite sizes and shared pixel grid, but in-room visual approval is still pending",
+    "Froglet remains derived from earlier concept art, now proportionally smaller and with P; verify face consistency in room",
+    "Hungry and dirty lose detached thought-bubble/fly overlays so only the character scales; standalone FX can be reintroduced separately later",
+    "The six departure frames may crop at the right edge by design; check expected rightward motion in PR #228",
+    "No production game code, account data, Supabase or SQL is included"
+  ],
+  "pixel_grid": [
+    2,
+    2
+  ],
+  "palette_limit": 42,
+  "corrections": {
+    "geometry": "hungry, dirty and departure frames normalized to adult height; froglet reduced below adult size",
+    "wardrobe": "white P added to froglet and recovering",
+    "rendering": "all sprites use a 2x2 square pixel grid and one shared palette, no CSS scaling required",
+    "reference": "approved source images from 2026-11-07"
+  }
 }
