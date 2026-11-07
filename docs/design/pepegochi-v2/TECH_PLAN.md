@@ -163,7 +163,7 @@ Właściciel zatwierdził je 2026-11-07 jako **wartości robocze, nie ostateczne
 | Sensowna akcja | potrzeba docelowa < 90 przed akcją | nowe |
 | Zegar potrzeby | rusza, gdy potrzeba spadnie poniżej 90; staje, gdy gracz się nią zajmie lub potrzeba wróci do ≥ 90 | A1, zamiast jednego zegara |
 | Dzień opieki (wzrost) | ≥ 1 przyjęta akcja w dniu UTC | v1, z poprawką wyżej |
-| Dobry dzień opieki | w dniu UTC ≥ 2 różne sensowne akcje i po tej, która spełnia warunek, wszystkie potrzeby ≥ 50 | nowe, PR A2 |
+| Dobry dzień opieki | w dniu UTC ≥ 2 różne sensowne akcje i po tej, która spełnia warunek, wszystkie potrzeby ≥ **40** (decyzja właściciela 2026-11-07) | nowe, PR A2 |
 | neglected | najbardziej zaniedbana potrzeba czeka ≥ 48 h | README 2.4 |
 | packing („Your Fren is thinking of leaving”) | ≥ 120 h | README 2.4 |
 | departed | ≥ 168 h | README 2.4 |
@@ -475,12 +475,12 @@ Czas jest wirtualny: test i symulator podmieniają `games.pepegochi_clock()` we 
 | **Jakość opieki i farmienie** ||||
 | F1 | akcja przy potrzebie ≥ 90 | odrzucona, nie przesuwa zegara odejścia ani dnia opieki | A1 |
 | F2 → G8 | wizyty co 4 dni / pełna wizyta co 6 dni | ≤ 1 dobry dzień, brak `good_parent` | A2 (#221) |
-| F3 → G1–G3 | reguła dobrego dnia; codziennie krótka wizyta | 2 rodzaje i potrzeby ≥ 50; 1 na dzień UTC; seria; 61 dni, Good Parent 29. dnia | A2 (#221) |
-| G4 | sob + nd przez 20 tygodni: krótko / ok. godziny / dwie wizyty dziennie | 1 / 41 (cel 103. dnia) / 41 | A2 (#221) |
+| F3 → G1–G3 | reguła dobrego dnia; codziennie krótka wizyta | 2 rodzaje i potrzeby ≥ 40; 1 na dzień UTC; seria; 61 dni, Good Parent 29. dnia | A2 (#221) |
+| G4 | sob + nd przez 20 tygodni: krótko / ok. godziny / dwie wizyty dziennie (przy ≥ 40) | 21 (32 tygodnie: 33, cel 202. dnia) / 41 (cel 103. dnia) / 41 | A2 (#221) |
 | G5 | opieka rozdzielona północą UTC | najwyżej 1 dobry dzień na dzień UTC | A2 (#221) |
 | G6 | ratunek i powrót < 8 h | wizyta pomaga, nie kończy rekonwalescencji | A2 (#221) |
 | G7 | zaniedbanie, potem lepsza opieka | dobre dni wracają drugiego dnia opieki | A2 (#221) |
-| G9 | propozycje ≥ 40 / ≥ 30 / „opieka tego dnia” | 21 / 41 / 41 dla sob + nd, 2 / 16 / 16 przy wizytach co 4 dni | A2 (#221) |
+| G9 | dawne ≥ 50 / ≥ 30 / „opieka tego dnia” | 1 / 41 / 41 dla krótkich wizyt sob + nd; ≥ 30 i „opieka tego dnia” dają 16 przy wizytach co 4 dni (dlatego odrzucone) | A2 (#221) |
 | G10 | Good Parent raz na konto, dobre dni w historii | tak | A2 (#221) |
 | F5 | limit 12 i cooldowny (regresja v1) | bez zmian | A1 |
 | **Ratowanie i rekonwalescencja (scenariusze symulatora)** ||||
@@ -520,12 +520,12 @@ Czas jest wirtualny: test i symulator podmieniają `games.pepegochi_clock()` we 
 | H4 | cały `node --test tests/*.test.mjs` z PostgreSQL | dalej zielony (dziś 92/92) | każdy |
 | H5 | statycznie: brak wypłat, portfeli, mnożnika w SQL i JS PepeGochi | brak | A1 |
 | **Frontend** ||||
-| I1 | licznik żądań w teście e2e | 1 RPC przy otwarciu, 1 na akcję, 0 w tle | B2 |
-| I2 | telefon 360 px, klawiatura, czytnik ekranu, reduced motion | wszystkie akcje dostępne | B2 |
-| I3 | dwie karty: akcja w A, stara akcja w B | B pokazuje świeży stan z serwera | B2 |
-| I4 | brak sieci w trakcie akcji | UI wraca do ostatniego stanu z serwera, animacja nie udaje zapisu | B2 |
-| I5 | wszystkie okna i gry PondOS po dodaniu nowej strony (zasada CSP) | działają | B2 |
-| I6 | scenariusz „wyjazd”: 8 dni przerwy, powrót, list, nowa adopcja | zrozumiały przebieg | B2 |
+| I1 | licznik żądań w teście e2e | 1 RPC przy otwarciu, 1 na akcję, 0 w tle | okno na prawdziwych RPC (po B2) |
+| I2 | telefon 360 px, klawiatura, czytnik ekranu, reduced motion | wszystkie akcje dostępne | B2 (#223) |
+| I3 | dwie karty: akcja w A, stara akcja w B | B pokazuje świeży stan z serwera | okno na prawdziwych RPC (po B2) |
+| I4 | brak sieci w trakcie akcji | UI wraca do ostatniego stanu z serwera, animacja nie udaje zapisu | okno na prawdziwych RPC (po B2) |
+| I5 | wszystkie okna i gry PondOS po dodaniu nowej strony (zasada CSP) | działają | B2 (#223) |
+| I6 | scenariusz „wyjazd”: 8 dni przerwy, powrót, list, nowa adopcja | zrozumiały przebieg | B2 (#223) |
 
 Po wdrożeniu na produkcję (osobna zgoda): ponowne doradcy bezpieczeństwa i wydajności Supabase oraz test negatywny z prawdziwym JWT.
 
@@ -539,15 +539,15 @@ Po wdrożeniu na produkcję (osobna zgoda): ponowne doradcy bezpieczeństwa i wy
 2. ✅ A1 zastępuje #186 (nowa gałąź od `main`, osobny Draft PR #218). #186 zostaje jako punkt odniesienia i nie jest scalany. `SECURITY_REVIEW_2026-11-05.md` zostaje w #186.
 3. ✅ jako wartości robocze: 48 / 120 / 168 h (liczone od najstarszego zegara potrzeby, sekcja 5.2a).
 4. ✅ jako wartość robocza: sensowna akcja = potrzeba < 90.
-5. ✅ jako wartość robocza: dobry dzień = ≥ 2 różne akcje i potrzeby ≥ 50 (PR A2).
+5. ✅ jako wartość robocza: dobry dzień = ≥ 2 różne akcje i potrzeby ≥ 40 (PR A2; próg zmieniony z 50 w punkcie 6a).
 6. ✅ **1 dzień rekonwalescencji i co najmniej 8 h od ratunku** (decyzje 2026-11-07): gracze sob + nd zachowują żabę, a ratunek nie jest uproszczony. Rekonwalescencja zaczyna się od 120 h, nie od 48 h (powód w 5.2a). Bez ograniczenia nastroju.
-6a. **Otwarte (A2, #221):** próg dobrego dnia. Przy ≥ 50 krótkie wizyty weekendowe dają około 0 dobrych dni, a godzinne sesje lub dwie wizyty dziennie dają 2 tygodniowo. Rekomendacja: zostawić 50; jeśli krótkie wizyty mają się liczyć, wybrać 40 (nie 30 i nie „opieka tego dnia”).
+6a. ✅ **Próg dobrego dnia: ≥ 40** (decyzja 2026-11-07, A2 #221). Zostają: co najmniej 2 różne sensowne akcje, wszystkie potrzeby ≥ 40, najwyżej 1 dobry dzień na dzień UTC, Good Parent = 30 dobrych dni w jednym życiu. Bez zmian w rekonwalescencji, odejściu i ratunku. Przy ≥ 50 krótkie wizyty weekendowe dawały 1 dobry dzień w 20 tygodni; przy ≥ 40 dają 21, a wizyty co 4 dni dalej najwyżej 2.
 7. Wyzwanie 30 dni: wariant 1 teraz, wariant 2 później jako `perfect_parent`?
 8. Stempel 100 dni: ID i nazwa (`best_fren_forever` / „Best Fren Forever”?) oraz reguła (100 dobrych dni w jednym życiu?).
 9. „It's Not Me, It's You”: wpis w historii (rekomendacja) czy ukryty stempel?
 10. Etap jajka przed pierwszą akcją: tak czy nie? (v1 zaczyna od kijanki.)
 11. ✅ Do czasu osobnej zgody na wdrożenie: tylko lokalna baza albo osobny staging. Ukryta beta nie może wymagać zmian w PH-games.
-12. Flaga bety: osobna `?beta=gochi` czy wspólna z `?beta=fren`?
+12. ✅ Flaga bety: osobna `?beta=gochi` (`?beta=off` ukrywa), niezależna od `?beta=fren` (B2). Można to zmienić jednym miejscem w `meme.js`.
 13. ✅ Symulator przyspieszonego czasu:
     - w A1 jako `scripts/pepegochi_sim.mjs` (ten sam SQL w PGlite), który zostaje źródłem referencyjnym;
     - w przeglądarce **wariant (b), lekki JS** (decyzja 2026-11-07), bez PGlite i bez rozszerzania CSP: Draft #220, z automatycznymi testami zgodności z SQL;
@@ -565,13 +565,15 @@ Każdy PR jako Draft, z gałęzi od `main`, z opisem zgodnym z CLAUDE_HANDOFF.md
 | **A1** cykl życia (backend) — **Draft #218** | owners + lives + milestones, 4 RPC, sensowna akcja, zegar każdej potrzeby, statusy, ratunek i rekonwalescencja, odejście, list, historia, ponowna adopcja, rejestr kamieni milowych z odizolowanym hookiem, liczniki akcji pod warianty listu, symulator czasu | `games/supabase/update_pepegochi_v2.sql`, `games/PEPEGOCHI_API.md`, `scripts/pepegochi_sim.mjs`, `tests/pepegochi.test.mjs` (CI), `tests/pepegochi-sql.test.mjs` (PostgreSQL) | A, B, C, D, E, F1, F5, R, M, H1–H3 zielone lokalnie | 561 linii SQL bez komentarzy + testy |
 | **A2** jakość opieki — **Draft #221** (stacked na #220) | dobre dni, seria, kamień milowy `good_parent` (30 w jednym życiu), te same zasady w modelu JS, symulacje graczy | ten sam plik SQL, model, symulator, testy | G1–G10, H4, zgodność 0 różnic | mały–średni |
 | **B1** lokalny symulator w przeglądarce — **Draft #220** (stacked na #218) | zasady w JS (te same RPC i JSON), strona testowa z przewijaniem czasu, tylko lokalnie (CSP `connect-src 'none'`, brak zapisu, brak stempli) | `docs/games/js/pepegochi-model.mjs`, `docs/games/pepegochi-sim.html`, `tests/pepegochi-parity.test.mjs`, `tests/pepegochi-model.test.mjs` | test P: 0 różnic z SQL | średni |
-| **B2** tymczasowe UI | okno PondOS (iframe jak YEET) za flagą bety: imię, etap, 4 potrzeby, 4 akcje, ostrzeżenie, recovery, pusty pokój, GOODBYE.TXT, Past Frens, nowa adopcja. Tylko istniejące komponenty PondOS, bez nowej grafiki | `docs/games/pepegochi.html`, `docs/games/js/pepegochi.mjs`, wpis w `docs/meme/meme.js` za flagą | I1–I6, test CSP, wszystkie okna PondOS sprawdzone w przeglądarce | średni |
+| **B2** tymczasowe UI — **Draft #223** (stacked na #221) | okno PondOS (iframe jak YEET) za flagą `?beta=gochi`, **na lokalnym modelu JS z B1** (decyzja 2026-11-07): imię, etap, 4 potrzeby, 4 akcje, ostrzeżenia, ratunek i rekonwalescencja z najwcześniejszym momentem zakończenia, pusty pokój, GOODBYE.TXT, Past Frens, nowa adopcja, dobre dni z potrzebą, która blokuje dzień, time machine z godzinami. CSP `connect-src 'none'`, żaba w `sessionStorage` karty, bez stempli. Tylko istniejące komponenty PondOS, bez nowej grafiki | `docs/games/pepegochi.html`, `docs/games/js/pepegochi-beta*.mjs`, wpis w `docs/meme/meme.js` za flagą, `tests/pepegochi-beta.test.mjs`, powtórka sesji okna w teście zgodności | I2, I5, I6, zgodność z SQL 0 różnic, wszystkie okna PondOS sprawdzone w przeglądarce; I1, I3, I4 przy podłączeniu okna do prawdziwych RPC | średni |
 | **C** Passport | lista ID (K3), `first_hatch` / `little_fren` / `grown_fren`, backfill, karta Overview, Stats; katalog bez zmiany statusów do R | `games/supabase/update_pepegochi_passport.sql`, `docs/meme/meme.js` (Passport), testy, plik decyzji | G1–G7, istniejące testy Passportu zielone | mały |
 | **D** Good Parent | wariant wyzwania z decyzji 7, `best_fren_forever` jeśli zatwierdzony, jawna zmiana opisów w katalogu | `update_pepegochi_good_parent.sql`, katalog, plik decyzji, testy | testy 30 dni, pominięcia, 7 dni nieobecności, strefy, duble | mały |
 | **R** wydanie | Twoja grafika, reklama PEP-TV (zasada repo: większe funkcje dostają reklamę w `ADS`), katalog `live`, zdjęcie flagi bety, instrukcja SQL w kolejności z 8.4 | według potrzeb | Twoja zgoda na SQL i publikację | — |
 | E, F | pokój i inwentarz; osobowości, warianty listu, rebirth | osobne specyfikacje po projekcie graficznym | — | — |
 
 Kolejność: A1 → A2 → B1 → B2 (od tego momentu możesz grać w becie) → C → D → R. B1 może iść równolegle z A2.
+
+Kolejność scalania stosu Draft PR-ów: #218 (A1) → #220 (B1) → #221 (A2) → #223 (B2). Okno z B2 działa na lokalnym modelu; podłączenie go do prawdziwych RPC (lokalny backend albo staging, testy I1, I3, I4) to osobny krok do ustalenia.
 
 ---
 
