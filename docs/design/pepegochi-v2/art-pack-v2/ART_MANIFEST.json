@@ -1,0 +1,293 @@
+{
+  "version": "v2.0-candidate",
+  "date": "2026-11-07",
+  "style": "1998-2003 PondOS 98; nearest-neighbor pixel art; green frog, blue P hoodie adult",
+  "status": "owner-approved artistic direction; candidate technical exports pending in-game visual QA",
+  "base_canvas": [
+    128,
+    128
+  ],
+  "room_canvas": [
+    640,
+    400
+  ],
+  "sprites": {
+    "pepegochi_egg_idle": {
+      "file": "sprites/pepegochi_egg_idle.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "source": "jajeczko_pepegochi_w_pikselach.png",
+      "bbox": [
+        31,
+        42,
+        96,
+        124
+      ],
+      "review": "owner-approved-direction"
+    },
+    "pepegochi_tadpole_idle": {
+      "file": "sprites/pepegochi_tadpole_idle.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "source": "wesoła_kijanka_pepegochi_w_stylu_retro.png",
+      "bbox": [
+        16,
+        50,
+        111,
+        124
+      ],
+      "review": "owner-approved-direction"
+    },
+    "pepegochi_adult_idle": {
+      "file": "sprites/pepegochi_adult_idle.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "source": "pixelowy_żabek_w_niebieskiej_bluzie.png",
+      "bbox": [
+        27,
+        9,
+        100,
+        124
+      ],
+      "review": "owner-approved-direction"
+    },
+    "pepegochi_adult_hungry": {
+      "file": "sprites/pepegochi_adult_hungry.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "source": "głodny_żabolek_z_ciasteczkiem.png",
+      "bbox": [
+        12,
+        9,
+        115,
+        124
+      ],
+      "review": "owner-approved-direction"
+    },
+    "pepegochi_adult_dirty": {
+      "file": "sprites/pepegochi_adult_dirty.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "source": "brudny_dorosły_pepegochi_z_muchą.png",
+      "bbox": [
+        23,
+        9,
+        104,
+        124
+      ],
+      "review": "owner-approved-direction"
+    },
+    "pepegochi_adult_moody": {
+      "file": "sprites/pepegochi_adult_moody.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "source": "nastrojony_pepegochi_w_niebieskiej_bluzie_siatkowe.png",
+      "bbox": [
+        24,
+        9,
+        104,
+        124
+      ],
+      "review": "owner-approved-direction"
+    },
+    "pepegochi_adult_tired": {
+      "file": "sprites/pepegochi_adult_tired.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "source": "zmęczony_pepegochi_w_niebieskiej_bluzie.png",
+      "bbox": [
+        19,
+        9,
+        108,
+        124
+      ],
+      "review": "owner-approved-direction"
+    },
+    "pepegochi_adult_neglected": {
+      "file": "sprites/pepegochi_adult_neglected.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "source": "zaniedbana_żaba_w_niebieskiej_bluzie.png",
+      "bbox": [
+        27,
+        9,
+        100,
+        124
+      ],
+      "review": "owner-approved-direction"
+    },
+    "pepegochi_adult_recovering": {
+      "file": "sprites/pepegochi_adult_recovering.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "source": "uśmiechnięta_żabia_regeneracja.png",
+      "bbox": [
+        24,
+        9,
+        103,
+        124
+      ],
+      "review": "candidate"
+    },
+    "pepegochi_adult_packing": {
+      "file": "sprites/pepegochi_adult_packing.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "source": "wściekły_pepegochi_z_walizką.png",
+      "bbox": [
+        11,
+        9,
+        117,
+        124
+      ],
+      "review": "owner-approved-direction"
+    },
+    "pepegochi_adult_packing_angry": {
+      "file": "sprites/pepegochi_adult_packing_angry.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "source": "pakkowanie_na_pełnym_wkurzeniu.png",
+      "bbox": [
+        14,
+        9,
+        113,
+        124
+      ],
+      "review": "candidate"
+    },
+    "pepegochi_froglet_idle": {
+      "file": "sprites/pepegochi_froglet_idle.png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": true,
+      "base_anchor": [
+        64,
+        124
+      ],
+      "review": "older placeholder; final pixel-art froglet pending"
+    }
+  },
+  "animations": {
+    "depart": {
+      "frame_files": [
+        "animations/depart_01.png",
+        "animations/depart_02.png",
+        "animations/depart_03.png",
+        "animations/depart_04.png",
+        "animations/depart_05.png",
+        "animations/depart_06.png"
+      ],
+      "sheet": "animations/depart_sheet.png",
+      "preview": "previews/departure_preview.gif",
+      "frame_ms": 250,
+      "loop": false
+    }
+  },
+  "props": {
+    "suitcase": "props/suitcase.png",
+    "goodbye_letter": "props/goodbye_letter.png",
+    "goodbye_envelope": "props/goodbye_envelope.png",
+    "room_departed_overlay": "props/room_departed_overlay.png"
+  },
+  "room_integration": {
+    "base": "docs/design/pepegochi-v2/room-v5/assets/room_clean_base.png in PR #222",
+    "do_not_replace_existing_room": true,
+    "behavior": "hide pet sprite on departed; keep background and placed collectible layers; visually hide one eligible placed prop; draw independent letter/envelope and show GOODBYE.TXT from HTML",
+    "retain_item_ids": [
+      "crt_tv",
+      "lava_lamp",
+      "potted_plant",
+      "p_poster",
+      "rubber_duck",
+      "mug",
+      "floppy_disk",
+      "paper_crown"
+    ]
+  },
+  "qa_warnings": [
+    "Froglet from earlier pack remains candidate, needs approved P pixel-art version",
+    "Recovering and packing-angry originals do not show P hoodie letter consistently; user-approved overall appearance not exact approved frame-to-frame rig",
+    "Do not bake suitcase or furniture into room background; GIF/depart sequence has a moving character with some edge clipping intended near frame 6",
+    "Each source has independently authored anatomy, so for smooth animation more hand cleanup may be necessary",
+    "No production game data or SQL is included"
+  ]
+}
