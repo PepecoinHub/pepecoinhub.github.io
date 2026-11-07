@@ -1,6 +1,7 @@
 from playwright.sync_api import sync_playwright
 from pathlib import Path
-root=Path('/mnt/data/pepegochi_room_v5')
+root=Path(__file__).resolve().parent
+(root/'screenshots').mkdir(exist_ok=True)
 with sync_playwright() as p:
     b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
     page=b.new_page(viewport={'width':390,'height':844})
