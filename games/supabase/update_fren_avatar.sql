@@ -114,10 +114,10 @@ begin
   -- Exact per-slot allowlists, in manifest order: every part of the manifest,
   -- the free ones first, then the reward parts (the ones with an 'unlock' key).
   if p_bg is null or p_bg not in ('bg_sky', 'bg_night', 'bg_city', 'bg_snow', 'bg_forest', 'bg_sunset')
-     or p_clothing is null or p_clothing not in ('clothing_blue', 'clothing_purple_hoodie', 'clothing_black_hoodie', 'clothing_shirt_tie', 'clothing_camo', 'clothing_suit')
-     or p_mouth is null or p_mouth not in ('mouth_flat', 'mouth_smile', 'mouth_open', 'mouth_tongue', 'mouth_teeth', 'mouth_smirk')
-     or p_eyes is null or p_eyes not in ('eyes_classic', 'eyes_sleepy', 'eyes_angry', 'eyes_bloodshot', 'eyes_3d', 'eyes_hypno')
-     or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_wizard', 'hat_hardhat', 'hat_detective', 'hat_explorer')
+     or p_clothing is null or p_clothing not in ('clothing_none', 'clothing_blue', 'clothing_purple_hoodie', 'clothing_black_hoodie', 'clothing_shirt_tie', 'clothing_camo', 'clothing_suit')
+     or p_mouth is null or p_mouth not in ('mouth_flat', 'mouth_smile', 'mouth_open', 'mouth_tongue', 'mouth_teeth', 'mouth_smirk', 'mouth_shout', 'mouth_wide_tongue', 'mouth_laugh')
+     or p_eyes is null or p_eyes not in ('eyes_classic', 'eyes_sleepy', 'eyes_angry', 'eyes_bloodshot', 'eyes_3d', 'eyes_hypno', 'eyes_side', 'eyes_happy', 'eyes_hearts')
+     or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_hardhat', 'hat_detective', 'hat_explorer')
      or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_shades', 'accessory_round', 'accessory_orange', 'accessory_cigarette', 'accessory_pipe', 'accessory_headphones')
      or p_special is null or p_special not in ('special_none', 'special_explorer') then
     raise exception 'Unknown avatar option' using errcode = '22023';

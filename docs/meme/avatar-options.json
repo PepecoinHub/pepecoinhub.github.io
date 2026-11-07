@@ -75,6 +75,18 @@
       {
         "id": "mouth_smirk",
         "label": "Smirk"
+      },
+      {
+        "id": "mouth_shout",
+        "label": "Ooh"
+      },
+      {
+        "id": "mouth_wide_tongue",
+        "label": "Silly tongue"
+      },
+      {
+        "id": "mouth_laugh",
+        "label": "Big laugh"
       }
     ],
     "eyes": [
@@ -101,6 +113,18 @@
       {
         "id": "eyes_hypno",
         "label": "Hypnotized"
+      },
+      {
+        "id": "eyes_side",
+        "label": "Side-eye"
+      },
+      {
+        "id": "eyes_happy",
+        "label": "Happy"
+      },
+      {
+        "id": "eyes_hearts",
+        "label": "Heart eyes"
       }
     ],
     "hat": [
@@ -125,10 +149,6 @@
         "label": "Crown"
       },
       {
-        "id": "hat_wizard",
-        "label": "Wizard hat"
-      },
-      {
         "id": "hat_hardhat",
         "label": "Hard hat",
         "unlock": "miner_fren"
@@ -145,6 +165,10 @@
       }
     ],
     "clothing": [
+      {
+        "id": "clothing_none",
+        "label": "No shirt"
+      },
       {
         "id": "clothing_blue",
         "label": "Blue tee"
@@ -216,8 +240,8 @@
   },
   "paths": {
     "base": "avatar-assets/layers/base_frog.webp",
-    "layer_template": "avatar-assets/layers/{id}.webp",
-    "thumb_template": "avatar-assets/thumbs/{id}.webp"
+    "layer_template": "avatar-assets/layers/{id}.webp?v=20261107",
+    "thumb_template": "avatar-assets/thumbs/{id}.webp?v=20261107"
   },
   "special_note": "A special avatar is a whole drawn character by Lily for a big milestone. When one is picked it replaces every part layer except the background (bg)."
 }
