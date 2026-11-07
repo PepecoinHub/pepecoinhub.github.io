@@ -1,0 +1,142 @@
+{
+  "version": 5,
+  "room": {
+    "file": "room_clean_base.png",
+    "dimensions": [
+      640,
+      400
+    ],
+    "props_baked_in": false
+  },
+  "item_sprites": {
+    "crt_tv": {
+      "file": "crt_tv.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "visible_bounds": [
+        6,
+        16,
+        124,
+        118
+      ],
+      "alpha": true,
+      "pixelated": true,
+      "candidate": true
+    },
+    "lava_lamp": {
+      "file": "lava_lamp.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "visible_bounds": [
+        32,
+        16,
+        102,
+        114
+      ],
+      "alpha": true,
+      "pixelated": true,
+      "candidate": true
+    },
+    "potted_plant": {
+      "file": "potted_plant.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "visible_bounds": [
+        12,
+        16,
+        118,
+        114
+      ],
+      "alpha": true,
+      "pixelated": true,
+      "candidate": true
+    },
+    "p_poster": {
+      "file": "p_poster.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "visible_bounds": [
+        18,
+        14,
+        112,
+        114
+      ],
+      "alpha": true,
+      "pixelated": true,
+      "candidate": true
+    },
+    "rubber_duck": {
+      "file": "rubber_duck.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "visible_bounds": [
+        16,
+        24,
+        110,
+        110
+      ],
+      "alpha": true,
+      "pixelated": true,
+      "candidate": true
+    },
+    "mug": {
+      "file": "mug.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "visible_bounds": [
+        26,
+        32,
+        122,
+        110
+      ],
+      "alpha": true,
+      "pixelated": true,
+      "candidate": true
+    },
+    "floppy_disk": {
+      "file": "floppy_disk.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "visible_bounds": [
+        24,
+        24,
+        106,
+        106
+      ],
+      "alpha": true,
+      "pixelated": true,
+      "candidate": true
+    },
+    "paper_crown": {
+      "file": "paper_crown.png",
+      "dimensions": [
+        128,
+        128
+      ],
+      "visible_bounds": [
+        16,
+        28,
+        116,
+        104
+      ],
+      "alpha": true,
+      "pixelated": true,
+      "candidate": true
+    }
+  },
+  "status": "pixel-art functional candidate, artwork not final approved"
+}
