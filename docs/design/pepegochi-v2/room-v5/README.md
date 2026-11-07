@@ -12,6 +12,10 @@ Open `room_v5_standalone.html` in any modern browser. It is an **offline, self-c
 4. Simulate departure. The room hides exactly one eligible placed item and shows a letter; ownership and placement records stay unchanged.
 5. Read `GOODBYE.TXT`, adopt again, and observe that the previously taken item returns.
 
+## Regeneration from GitHub
+
+The GitHub PR contains **all 10 PNGs as separate versioned files** under `assets/`, as well as a standalone HTML with the exact PNG data embedded. `python extract_embedded_assets.py` is an optional recovery route if an asset is accidentally lost; no chat ZIP is needed. Install Pillow if you want to regenerate the original procedural sprite candidates (`python -m pip install Pillow`). Next run `python build_assets.py` and `python build_html.py` if you want to rebuild the demo. The local automated test is `node --test room_core.test.mjs`; browser QA uses Playwright plus Chromium.
+
 ## Source of truth
 
 - `room_core.mjs`: pure local-only model with 30 Node tests (`node --test room_core.test.mjs`).
