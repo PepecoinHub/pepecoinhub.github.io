@@ -7,8 +7,8 @@ the album and the stamp rules already exist in code; only the pictures are missi
 **How to use it with ChatGPT:** attach the reference images from §1, paste §2 to §8 once, then ask for
 one stamp card from §9 at a time (or three cards for one sheet). A ready prompt is in §11.
 
-Status: v1, 2026-11-07. The stamps in groups A and B are confirmed by the owner (labels marked "proposed"
-are not decided yet). Group C waits for the owner's final stamp list; group D is optional.
+Status: v2, 2026-11-07. Groups A and B in §9 are confirmed by the owner (labels marked "proposed" are not
+decided yet). Group C waits for the owner's final list; group D is optional.
 
 ## 1. Reference images (attach them every time)
 
@@ -53,7 +53,7 @@ Outfits by family:
 - No gradients, glow, airbrush, texture, 3D, glossy highlights or photo look.
 - One flat background colour per stamp, plus simple scenery: clouds, hills, water, stars, a Win98-style
   window or a beige CRT monitor.
-- Background palette (stamps next to each other in the album should differ):
+- Background palette (stamps next to each other should differ; the main page grid is in §9):
   sky blue `#4BA6F8`, blue `#4F84EA`, royal blue `#3052D3`, purple `#9C6DE0`, yellow `#FDD236`,
   light green `#9FD480`, navy `#1D266E`.
 - Signature motif: 2 or 3 short yellow "spark" strokes (`#FDD236` with a black outline) near Pepe's head.
@@ -62,23 +62,26 @@ Outfits by family:
 
 ## 5. Small size
 
-The site shows a stamp between 34 and about 64 px wide (the tile is 138×150 px). Use one clear subject, one or
-two props and big shapes. Zoom out to 10%: if you can no longer tell what the stamp is about, simplify.
+The album shows a stamp between 34 and about 64 px wide; the 12 stamps on the Passport's main page will be
+about 78 px wide (the tile is 138×150 px). Use one clear subject, one or two props and big shapes. Zoom out
+to 10%: if you can no longer tell what the stamp is about, simplify.
 
 ## 6. Not allowed
 
 - Real logos and trademarks (NASA, Discord, X/Twitter, Reddit, Windows), real people, a celebrity look.
 - Other coins or tokens, prices, "$" signs, money bags. (The BALI stamp is already printed on the page.)
-- Weapons, blood, alcohol, smoking.
+- Realistic weapons, blood, alcohol, smoking. (Pixel shots on a retro arcade screen are fine.)
 - The Avatar Maker's olive Pepe, or the navy "P" hoodie from PR #230.
 - Gold frames, grey "locked" versions or "?" stamps: the site makes those (§7).
+- Counters like "×2" or years: the site adds them on top of the stamp.
 - Any text except the label and the one word or number from the card.
 
 ## 7. Gold (rare) stamps
 
-Some stamps are rare; their card says **gold**. Draw them exactly like the others: cream paper, grey
-label. The build recolours the paper to gold, the label to cream and adds a small glint, so all gold
-stamps match. See `games/fren-passport/stamps-review/gold-frame-demo.jpg`.
+Rare stamps say **gold** on their card: Moonwalker, Frog of the Week, Season Champion, Vox Populi,
+Certified Fren and The Secret Pond. Draw them exactly like the others: cream paper, grey label. The build
+recolours the paper to gold, the label to cream and adds a small glint, so all gold stamps match. See
+`games/fren-passport/stamps-review/gold-frame-demo.jpg`.
 
 ## 8. Delivery
 
@@ -104,7 +107,25 @@ Check before delivering:
 
 **Rule** says what the player did, so the picture fits. Do not write the rule on the stamp.
 
+### Main page grid
+
+The Passport's main page shows these 12 stamps in a 4 × 3 grid, with the BALI stamp below them. The
+background colours in the cards are chosen so that neighbours differ:
+
+| | Column 1 | Column 2 | Column 3 | Column 4 |
+|---|---|---|---|---|
+| Row 1 | Pond Pioneer (exists, sky blue) | Frog of the Week (purple) | Season Champion (royal blue) | Vox Populi (light green) |
+| Row 2 | Moonwalker (navy) | Certified Fren (yellow) | Old Frog (light green) | The Secret Pond (navy) |
+| Row 3 | Scout Fren (exists, sky blue) | Detective Fren (purple) | Picasso Fren (yellow) | Good Parent (light green) |
+
 ### A. Live stamps that still have no drawing of their own (draw these first)
+
+**`detective_fren`**, label **"Detective Fren"** (main page)
+- Rule: a perfect 5000 in Pepe Guesser on 5 different days. It unlocks the detective hat and suit.
+- Scene: Pepe in a deerstalker hat and a brown detective suit with a tie (the same parts as in the Avatar
+  Maker) holds a magnifier over a photo pinned to a cork board, with red string to a map pin.
+- Background: purple `#9C6DE0`.
+- Note: today this stamp shows an old pixel icon, which would stand out on the main page.
 
 **`like_it_here`**, label **"30-Day Streak"** (proposed)
 - Rule: opened PondOS on 30 days in a row. (Its full name, Guess You Like It Here, is too long for the
@@ -123,7 +144,7 @@ Check before delivering:
 - Background: royal blue `#3052D3` with a few white stars at the top.
 - Avoid: any real NASA logo, space suits, the Moon close up.
 
-**`moonwalker`**, label **"Moonwalker"**, gold
+**`moonwalker`**, label **"Moonwalker"**, gold (main page)
 - Rule: a YEET flight of the full 6000 m. Very rare.
 - Scene: YEET Pepe has been thrown all the way to the Moon. He lands on the grey surface doing a
   backwards-sliding dance step. A dotted flight arc leads back to a small Earth in the corner. A tiny sign
@@ -134,20 +155,94 @@ Check before delivering:
 
 ### B. Confirmed by the owner (2026-11-07)
 
-**`frog_of_the_week`**, label **"Frog of the Week"** (proposed), gold
-- Rule: first place of the week in Pepe Guesser (Monday to Sunday, UTC).
-- Scene: an "employee of the month" joke. Explorer Pepe proudly holds up a big gold trophy cup with **1**
-  on it. Behind him, a framed portrait of himself hangs on the wall with a gold ribbon. A map pin and a
-  small globe on the desk. Big proud smile, spark lines.
-- Background: sky blue `#4BA6F8`.
-- Avoid: podium steps (Podium uses them).
+No new drawings for the editor stamps: Dear Editor, Junior Editor and Senior Editor keep Lily's art even if
+their rules change.
 
-**`rookie_miner`**, label **"Happy Mining!"** (a label edit, not a new drawing)
+**`rookie_miner`**, label **"Happy Mining!"** (proposed; a label edit, not a new drawing)
 - Rule (new): started Pepe Miner (its first cloud save). It replaces Rookie Miner (10 minutes) and
   Miner Fren (1 hour).
 - Task: keep Lily's Rookie Miner drawing exactly as it is (sheet 3, bottom right). Only replace the label
   text "Rookie Miner" with "Happy Mining!" in the same lettering. Other names under discussion:
   "Good Luck, Miner!", "Proof of Work".
+
+**`frog_of_the_week`**, label **"Frog of the Week"** (proposed), gold (main page)
+- Rule: first place of the week in Pepe Guesser (Monday to Sunday, UTC). It can be won again; the site
+  shows ×2, ×3 on top.
+- Scene: an "employee of the month" joke. Explorer Pepe proudly holds up a big gold trophy cup with **1**
+  on it. Behind him, a framed portrait of himself hangs on the wall with a gold ribbon. A map pin and a
+  small globe on the desk. Big proud smile, spark lines.
+- Background: purple `#9C6DE0`.
+- Avoid: podium steps (Podium uses them), a laurel wreath (Season Champion uses it).
+
+**`season_champion`**, label **"Season Champion"**, gold (main page)
+- Rule: first place at the end of a ranked Pepe Pictures season. It can be won again (×2, ×3 on top).
+- Scene: Pepe wearing a laurel wreath and a red champion sash lifts a big gold cup with both hands under a
+  spotlight. Confetti falls.
+- Background: royal blue `#3052D3`.
+- Avoid: the explorer outfit and the framed portrait (Frog of the Week), podium steps.
+
+**`vox_populi`**, label **"Vox Populi"** (proposed name for "the voice of the people"), gold (main page)
+- Rule: 10 of your letters printed in the Pond Gazette.
+- Scene: Pepe stands on a wooden soapbox and speaks through a megaphone. Behind him a giant newspaper front
+  page with the masthead **GAZETTE**. A small crowd of frog heads cheers with raised hands.
+- Background: light green `#9FD480`.
+
+**`certified_fren`**, label **"Certified Fren"**, gold (main page)
+- Rule: active in PondOS on 100 different days (not in a row).
+- Scene: Pepe in a graduation cap and gown holds a framed certificate with a red wax seal and a big **100**.
+  Small calendar pages fly around him.
+- Background: yellow `#FDD236`.
+
+**`old_frog`**, label **"Old Frog"** (main page)
+- Rule: one year since joining.
+- Scene: grandpa Pepe with bushy white eyebrows and moustache, round glasses, a cardigan and a walking
+  cane, in a rocking chair. A cupcake with **one** candle on a small table.
+- Background: light green `#9FD480`.
+
+**`the_secret_pond`**, label **"The Secret Pond"**, gold (main page)
+- Rule: put together the six-piece map of the Lost Pond Files.
+- Scene: explorer Pepe holds up an old map made of six torn pieces (the seams show) with a red X. Behind
+  him a hidden moonlit pond with glowing lily pads, fireflies and a small wooden sign. Amazed, excited face.
+- Background: navy `#1D266E`.
+
+**`picasso_fren`**, label **"Picasso Fren"** (main page)
+- Rule: other players guessed your drawings in Draw & Guess (one drawing, or 10 if the owner raises it).
+- Scene: Pepe with a red beret and a paint palette stands by an easel with a wobbly, funny drawing of a sun.
+  A white speech bubble from outside the picture holds a big green check mark: someone guessed it.
+- Background: yellow `#FDD236`.
+
+**`good_parent`**, label **"Good Parent"** (main page)
+- Rule: 30 days of good PepeGochi care.
+- Scene: grown-up Pepe in a cosy apron hugs a small froglet (like Little Fren). A heart above them, a
+  feeding bowl, a small calendar with **30**.
+- Background: light green `#9FD480`.
+
+**`frogageddon_beta`**, label **"Beta Tester"**
+- Rule: played an online FROGAGEDDON match during the beta. Limited: it closes when the game leaves beta.
+- Scene: Pepe in a white lab coat and safety goggles ticks a checklist on a clipboard. A small badge on his
+  coat reads **BETA**. Behind him a cartoon dust cloud and a tiny gold frog flag.
+- Background: blue `#4F84EA`.
+- Avoid: weapons.
+
+**`frogmas`**, label **"Frogmas"**
+- Rule: active in PondOS on 24 to 26 December (UTC). It comes back every year; the site adds the year.
+- Scene: Pepe in a red Santa hat and a knitted sweater with a frog pattern holds a wrapped present next to
+  a small decorated pine tree. Snow falls.
+- Background: royal blue `#3052D3` with white snowflakes.
+- Avoid: a year in the picture, real brands.
+
+**`fud_buster`**, label **"FUD Buster"**
+- Rule: a FUD Invaders score of at least X (the owner picks X).
+- Scene: Pepe at a retro arcade cabinet, excited, slamming the buttons. On the screen, pixel invaders shaped
+  like small grey storm clouds with angry faces explode under green pixel shots. The one word: **FUD** on the
+  screen.
+- Background: purple `#9C6DE0`.
+
+**`long_snake`**, label **"Long Snake"**
+- Rule: a PEP Snake score of at least X (the owner picks X).
+- Scene: Pepe grips a joystick and grins while a very long pixel snake made of green blocks winds through the
+  picture and is about to eat one more block.
+- Background: yellow `#FDD236`.
 
 ### C. Proposed (wait for the owner's final list)
 
@@ -156,18 +251,6 @@ Check before delivering:
 - Scene: Pepe drops a folded ballot with a green check mark into a wooden ballot box. A round check-mark
   sticker on his chest. Proud smile.
 - Background: yellow `#FDD236`.
-
-**`certified_fren`**, label **"Certified Fren"**, gold
-- Rule: active in PondOS on 100 different days (not in a row).
-- Scene: Pepe in a graduation cap and gown holds a framed certificate with a red wax seal and a big **100**.
-  Small calendar pages fly around him.
-- Background: purple `#9C6DE0`.
-
-**`old_frog`**, label **"Old Frog"**
-- Rule: one year since joining.
-- Scene: grandpa Pepe with bushy white eyebrows and moustache, round glasses, a cardigan and a walking
-  cane, in a rocking chair. A cupcake with **one** candle on a small table.
-- Background: blue `#4F84EA`.
 
 **`yeet_adept`**, label **"Adept"**
 - Rule: a YEET flight of 3000 m.
@@ -187,12 +270,6 @@ Check before delivering:
 - Scene: the classic smug Pepe (half-closed eyes, satisfied smirk) leans back with his arms crossed. On the
   board in front of him the black king lies tipped over next to his white queen. Spark lines.
 - Background: purple `#9C6DE0`.
-
-**`picasso_fren`**, label **"Picasso Fren"**
-- Rule: someone guessed your drawing in Draw & Guess.
-- Scene: Pepe with a red beret and a paint palette stands by an easel with a wobbly, funny drawing of a sun.
-  A white speech bubble from outside the picture holds a big green check mark: someone guessed it.
-- Background: yellow `#FDD236`.
 
 **`podium`**, label **"Podium"**
 - Rule: top 3 in a Pepe Pictures quiz night or a Draw & Guess game.
@@ -218,12 +295,6 @@ Check before delivering:
   icons: a joystick, a pickaxe, a map pin, a small rocket and a chess pawn.
 - Background: blue `#4F84EA`.
 
-**`good_parent`**, label **"Good Parent"**
-- Rule: 30 days of good PepeGochi care.
-- Scene: grown-up Pepe in a cosy apron hugs a small froglet (like Little Fren). A heart above them, a
-  feeding bowl, a small calendar with **30**.
-- Background: yellow `#FDD236`.
-
 **`interior_designer`**, label **"Pond Decorator"** (the name Interior Designer is too long for the label;
 the owner picks the final name)
 - Rule: placed 10 decorations in the PepeGochi room.
@@ -243,13 +314,19 @@ the owner picks the final name)
   and a torn piece of an old map on top. Spark lines.
 - Background: purple `#9C6DE0`.
 
-**`the_secret_pond`**, label **"The Secret Pond"**, gold
-- Rule: put together the six-piece map of the Lost Pond Files.
-- Scene: explorer Pepe holds up an old map made of six torn pieces (the seams show) with a red X. Behind
-  him a hidden moonlit pond with glowing lily pads, fireflies and a small wooden sign. Amazed, excited face.
-- Background: navy `#1D266E`.
+**`bug_hunter`**, label **"Bug Hunter"**
+- Rule: reported a real bug that got fixed. The owner grants it.
+- Scene: explorer Pepe swings a butterfly net and catches a cartoon beetle with a "!" sign. Next to him a
+  beige CRT shows a small Win98 error window.
+- Background: yellow `#FDD236`.
 
-### D. Optional: redraw the five PR #230 concepts in this style
+**`quiz_master`**, label **"Quiz Master"**
+- Rule: hosted a Pepe Pictures quiz night with at least 4 players.
+- Scene: Pepe as a game-show host in a bow tie and a sparkly jacket, holding a microphone and a question
+  card, in front of a quiz screen with a blocky pixelated picture.
+- Background: royal blue `#3052D3`.
+
+### D. Optional: redraw the other four PR #230 concepts in this style
 
 Only if the owner wants one consistent set instead of the AI concepts.
 
@@ -258,7 +335,6 @@ Only if the owner wants one consistent set instead of the AI concepts.
 | `first_fren` | First Fren | Pepe waves hello at a beige CRT showing a tiny PondOS desktop. Yellow. |
 | `first_avatar` | Fresh Fren | Pepe at an easel draws his own portrait with a pencil. Purple. |
 | `sharp_eye` | Sharp Eye | Explorer Pepe looks through a magnifier at a photo pinned with a red bullseye pin. Sky blue. |
-| `detective_fren` | Detective Fren | Pepe in a deerstalker and a brown detective suit with a tie, a magnifier, footprints on the ground. Navy. |
 | `community_fren` | Community Fren | Three Pepes around a CRT with chat speech bubbles. Light green. |
 
 ## 10. Special avatars (only the ones the owner picks)
@@ -273,8 +349,8 @@ not stamps, and they use a different style:
 - no background (the player picks one).
 
 Candidates, not decided yet: The Secret Pond (archivist Pepe with a floppy and the map), Certified Fren
-(graduate Pepe), Frog of the Week (champion Pepe with a laurel wreath), Moonwalker (YEET Pepe with goggles
-and scarf).
+(graduate Pepe), Frog of the Week (explorer Pepe with the gold trophy), Season Champion (Pepe with a laurel
+wreath), Moonwalker (YEET Pepe with goggles and scarf).
 
 ## 11. Prompt for ChatGPT
 
