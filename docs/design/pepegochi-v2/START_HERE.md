@@ -55,6 +55,17 @@ Wszystkie poprzednie wysokiej jakości źródła i archiwa v2/v3 znajdują się 
 
 **Zasada:** własność konta ≠ umiejscowienie w pokoju ≠ chwilowo schowany rekwizyt po wyprowadzce. A1/A2 backend są rozwijane w draft PR #218/#221; nie zmieniać ich logiki opieki przy projektowaniu pokoju. Demo nie przyznaje realnych przedmiotów i nie zapisuje danych na serwerze. Księżycowa skała pozostaje planowaną nagrodą dopóki jej źródło nie będzie wiarygodnie weryfikowane po stronie serwera.
 
+## Room v5 — osobny pakiet warstwowy / Draft PR #222 (2026-11-07)
+
+**[PR #222: Warstwowy pokój v5, osobne PNG i interaktywny edytor](https://github.com/PepecoinHub/pepecoinhub.github.io/pull/222)** — kolejny niezależny etap, oparty na zasadach Room Architecture v1.
+
+- 10 plików PNG bezpośrednio na GitHubie w `docs/design/pepegochi-v2/room-v5/assets/`: czyste tło, 8 przedmiotów i sprite PepeGochi. Wiele wariantów przedmiotów nie wymaga już ponownego renderowania pokoju.
+- [Podgląd offline](https://github.com/PepecoinHub/pepecoinhub.github.io/blob/design/pepegochi-room-v5-layered-prototype/docs/design/pepegochi-v2/room-v5/room_v5_standalone.html) — pobierz HTML i otwórz w przeglądarce; obrazy są również wbudowane w sam plik.
+- [Model i testy](https://github.com/PepecoinHub/pepecoinhub.github.io/tree/design/pepegochi-room-v5-layered-prototype/docs/design/pepegochi-v2/room-v5) — 30/30 testów Node oraz Chromium 1280/390/360, także scena zabranego TV i odzyskania po nowej adopcji. Wszystko lokalnie i bez sieci.
+- Na potrzeby tego wariantu `floor_left` ma poprawiony punkt (170,345) zamiast pierwotnego (95,331), żeby roślina stała na podłodze, nie na komodzie. Identyfikator i typ slotu nie ulegają zmianie.
+- Grafiki to zatwierdzany osobno **funkcjonalny zestaw kandydatów**, nie finalny artbook. Łóżko/szafka/dywan w tle pozostają stałym wyposażeniem; kolejne przedmioty nagrodowe mają oddzielny system po stronie backendu.
+- Bez produkcyjnego SQL, merge, deploy, realnych PEP czy 1,5×. Zaplecze inventory nadal wymaga osobnego PR i testów DB.
+
 ## Co dalej
 
 - Warstwowa grafika pokoju + rekwizyty, w tym brak po zabranym obiekcie.
