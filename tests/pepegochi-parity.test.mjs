@@ -59,7 +59,8 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
               (energy * 10000)::bigint::text e, needs_at::text, hunger_due_at::text hd, hygiene_due_at::text cd,
               mood_due_at::text md, energy_due_at::text ed, care_days, last_care_day_utc::text lcd, rescue_pending,
               recovery_days_left, recovery_day_utc::text rd, recovery_since::text rs, actions_today, feeds, cleans, plays, rests,
-              status, departed_at::text, departure_reason, letter_seen_at::text
+              status, departed_at::text, departure_reason, letter_seen_at::text,
+              day_kinds, good_days, last_good_day_utc::text lgd, good_streak, best_good_streak
          from games.pepegochi_lives where user_id = $1 order by generation`, [uid(user)])).rows;
     const ts = s => (s == null ? null : parseTimestampUs(s.replace(' ', 'T').replace(/([+-]\d\d)$/, '$1:00')));
     const dayNo = s => (s == null ? null : Date.parse(s + 'T00:00:00Z') / DAY);
@@ -69,11 +70,13 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
         const l = world.lives[i];
         const want = [x.generation, +x.h, +x.c, +x.m, +x.e, ts(x.needs_at), ts(x.hd), ts(x.cd), ts(x.md), ts(x.ed), x.care_days,
           dayNo(x.lcd), x.rescue_pending, x.recovery_days_left, dayNo(x.rd), ts(x.rs), x.actions_today, x.feeds, x.cleans,
-          x.plays, x.rests, x.status, ts(x.departed_at), x.departure_reason, ts(x.letter_seen_at)];
+          x.plays, x.rests, x.status, ts(x.departed_at), x.departure_reason, ts(x.letter_seen_at),
+          x.day_kinds, x.good_days, dayNo(x.lgd), x.good_streak, x.best_good_streak];
         const got = [l.generation, l.hunger, l.hygiene, l.mood, l.energy, l.needs_at, l.hunger_due_at, l.hygiene_due_at,
           l.mood_due_at, l.energy_due_at, l.care_days, l.last_care_day_utc, l.rescue_pending, l.recovery_days_left,
           l.recovery_day_utc, l.recovery_since, l.actions_today, l.feeds, l.cleans, l.plays, l.rests, l.status,
-          l.departed_at, l.departure_reason, l.letter_seen_at];
+          l.departed_at, l.departure_reason, l.letter_seen_at,
+          l.day_kinds, l.good_days, l.last_good_day_utc, l.good_streak, l.best_good_streak];
         assert.deepEqual(got, want, `${label}: stored life ${x.generation}`);
       });
     };
@@ -114,6 +117,9 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
       { meaningful_below: 95, neglected_h: 30, packing_h: 70, departs_h: 100, rescue_from_h: 60, recovery_departs_h: 40 },
       // decay rates that do not divide a day evenly, so the rounding of "when does a need start waiting" matters
       { 'decay_per_day.hunger': 7, 'decay_per_day.hygiene': 11, 'decay_per_day.mood': 13, 'decay_per_day.energy': 17 },
+      // good days (A2): the proposal knob, other thresholds, and a short Good Parent goal so the milestone fires
+      { good_day_cared_counts: true, good_parent_days: 3 },
+      { good_day_min_need: 30, good_day_min_kinds: 3, good_parent_days: 5 },
     ];
     for (const overrides of RULESETS) {
       await t.test('scenarios, rules ' + JSON.stringify(overrides), async () => {
@@ -164,6 +170,24 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
       }
     });
 
+    await t.test('a good day decided by a need at exactly 50, and 1 unit either side', async () => {
+      // with min_gap_s = 0 two actions happen at the same instant, so no decay comes between them:
+      // 36 h after adoption energy is exactly 60, and Play takes it to exactly 50
+      const overrides = { min_gap_s: 0 };
+      await withRules(overrides, async () => {
+        for (const d of [-1, 0, 1]) {
+          const p = await pair(overrides);
+          const t0 = Date.parse(START);
+          await p.call('gry_pepegochi_adopt', { p_name: 'Fren' }, t0, 'exact 50');
+          const t = t0 + 36 * H + d;                       // 1 ms earlier or later: energy just above or below 60
+          await p.call('gry_pepegochi_action', { p_action: 'feed' }, t, 'exact 50');
+          const r = await p.call('gry_pepegochi_action', { p_action: 'play' }, t, 'exact 50');
+          if (d === 0) assert.equal(r.value.pet.good_days, 1, 'energy exactly 50 counts');
+          await p.finish('exact 50 ' + d);
+        }
+      });
+    });
+
     // ---------- seeded random play: waits, actions, adoption, letters, bad input ----------
     await t.test('300 random seeded games, 50 calls each', async () => {
       const waits = [1000, 2500, 60e3, 10 * 60e3, 31 * 60e3, H, 3 * H, 7 * H, 13 * H, DAY, 2 * DAY, 3 * DAY, 5 * DAY, 7 * DAY, 9 * DAY];
@@ -171,7 +195,8 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
       for (let g = 0; g < 300; g++) {
         const r = rng(1000 + g);
         const overrides = [{}, {}, { recovery_days: 2 }, { recovery_min_gap_h: 0 }, { meaningful_below: 95 },
-          { 'decay_per_day.hunger': 7, 'decay_per_day.hygiene': 11, 'decay_per_day.mood': 13, 'decay_per_day.energy': 17 }][g % 6];
+          { 'decay_per_day.hunger': 7, 'decay_per_day.hygiene': 11, 'decay_per_day.mood': 13, 'decay_per_day.energy': 17 },
+          { good_day_cared_counts: true, good_parent_days: 2 }, { good_day_min_need: 40, good_parent_days: 2 }][g % 8];
         await withRules(overrides, async () => {
           const p = await pair(overrides);
           let now = Date.parse(START) + Math.floor(r() * DAY);

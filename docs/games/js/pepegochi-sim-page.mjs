@@ -31,7 +31,8 @@ P.S. I took the TV.
 
 - Your former PepeGochi`;
 const RULE_KEYS = ['meaningful_below', 'neglected_h', 'packing_h', 'departs_h', 'rescue_from_h', 'recovery_days',
-  'recovery_departs_h', 'recovery_min_gap_h', 'max_actions_per_utc_day'];
+  'recovery_departs_h', 'recovery_min_gap_h', 'max_actions_per_utc_day', 'good_day_min_kinds', 'good_day_min_need',
+  'good_parent_days'];
 
 const $ = id => document.getElementById(id);
 const el = (tag, text, cls) => { const n = document.createElement(tag); if (text != null) n.textContent = text; if (cls) n.className = cls; return n; };
@@ -99,6 +100,13 @@ function render() {
         : `${p.recovery.days_left} day(s) left: care now finishes it`) : ''],
       ['Moves out', `${fmt(msOf(p.departs_at))} (in ${span(msOf(p.departs_at) - nowMs())}) unless ${p.departure_reason === 'recovery' ? 'you visit again' : p.departure_reason + ' is cared for'}`],
       ['Accepted actions today', `${p.action_budget.accepted_today} / ${p.action_budget.max_per_utc_day}`],
+      ['Good care days', `${p.good_days} / ${p.good_days_goal} for Good Parent (in a row now: ${p.good_streak}, best ${p.best_good_streak})`],
+      ['Good day today', p.good_day.today ? 'yes'
+        : 'not yet: ' + [
+          p.good_day.kinds_today < s.rules.good_day_min_kinds
+            ? `${p.good_day.kinds_today} of ${s.rules.good_day_min_kinds} kinds of care` : '',
+          p.good_day.needs_low.length ? `still below ${s.rules.good_day_min_need}: ${p.good_day.needs_low.join(', ')}` : '',
+        ].filter(Boolean).join('; ')],
     ]));
   }
   for (const b of $('pgs-actions').querySelectorAll('[data-act]')) {

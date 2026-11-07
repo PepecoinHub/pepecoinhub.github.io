@@ -77,6 +77,12 @@ create table if not exists games.pepegochi_lives (
   -- accepted actions per UTC day, kept in this row (no request log)
   action_day_utc date,
   actions_today  integer not null default 0 check (actions_today between 0 and 1000),
+  -- good care days (PR A2): which kinds of care were given on action_day_utc (1 feed, 2 clean, 4 play, 8 rest)
+  day_kinds         smallint not null default 0 check (day_kinds between 0 and 15),
+  good_days         integer not null default 0 check (good_days >= 0),
+  last_good_day_utc date,
+  good_streak       integer not null default 0 check (good_streak >= 0),   -- good days in a row, up to the last one
+  best_good_streak  integer not null default 0 check (best_good_streak >= 0),
   -- totals for future goodbye-letter variants (they cannot be rebuilt later)
   feeds  integer not null default 0 check (feeds >= 0),
   cleans integer not null default 0 check (cleans >= 0),
@@ -92,11 +98,18 @@ create table if not exists games.pepegochi_lives (
   check ((status = 'departed') = (departed_at is not null)),
   check (letter_seen_at is null or status = 'departed')
 );
+-- a local or staging database that already ran the A1 version of this file gets the good-day columns
+alter table games.pepegochi_lives
+  add column if not exists day_kinds smallint not null default 0 check (day_kinds between 0 and 15),
+  add column if not exists good_days integer not null default 0 check (good_days >= 0),
+  add column if not exists last_good_day_utc date,
+  add column if not exists good_streak integer not null default 0 check (good_streak >= 0),
+  add column if not exists best_good_streak integer not null default 0 check (best_good_streak >= 0);
 -- exactly one active frog per account, enforced by the database
 create unique index if not exists pepegochi_one_active_life
   on games.pepegochi_lives (user_id) where status = 'active';
 
--- Account milestones the server has seen (first adoption, froglet, adult). Written in the same
+-- Account milestones the server has seen (first adoption, froglet, adult, good parent). Written in the same
 -- transaction as the action. synced_at stays null until the Passport hook has delivered the stamp.
 create table if not exists games.pepegochi_milestones (
   user_id    uuid not null references games.pepegochi_owners(user_id) on delete cascade,
@@ -147,6 +160,11 @@ returns jsonb language sql stable set search_path = '' as $$
     'decay_per_day', jsonb_build_object('hunger', 20, 'hygiene', 15, 'mood', 18, 'energy', 10),
     'froglet_care_days', 2,
     'adult_care_days', 7,
+    -- good care days (PR A2), PLAYTEST: at most one per UTC day
+    'good_day_min_kinds', 2,      -- different kinds of care on that UTC day
+    'good_day_min_need', 50,      -- every need at least this after the action that completes the day
+    'good_day_cared_counts', false, -- proposal, off: a need cared for that day counts as fine below min_need
+    'good_parent_days', 30,       -- owner, working value: good days in one life, not necessarily in a row
     'history_limit', 10
   )
 $$;
@@ -251,6 +269,10 @@ declare
   age_h numeric;
   overdue jsonb;
   today integer;
+  kinds_today integer;
+  low jsonb;
+  mn numeric := (r->>'good_day_min_need')::numeric;
+  cared boolean := (r->>'good_day_cared_counts')::boolean;
   day_utc date := (t at time zone 'UTC')::date;
 begin
   select * into l from games.pepegochi_lives x where x.user_id = u order by x.generation desc limit 1;
@@ -276,6 +298,7 @@ begin
       'departure_saved', l.status = 'departed',
       'departure_reason', e.departure_reason,
       'days_together', floor(extract(epoch from (e.departs_at - l.adopted_at)) / 86400)::integer,
+      'good_days', l.good_days, 'best_good_streak', l.best_good_streak,
       'letter', jsonb_build_object('variant', coalesce(l.letter_variant, 'classic'),
                                    'seen', l.letter_seen_at is not null));
   else
@@ -289,6 +312,12 @@ begin
      where l.recovery_days_left = 0
        and extract(epoch from (t - v.since)) / 3600 >= (r->>'neglected_h')::numeric;
     today := case when l.action_day_utc = day_utc then l.actions_today else 0 end;
+    kinds_today := case when l.action_day_utc = day_utc then l.day_kinds else 0 end;
+    -- the needs that would stop a good day right now
+    select coalesce(jsonb_agg(v.k order by v.n), '[]'::jsonb) into low
+      from (values (1, 'feed', e.hunger, 1), (2, 'clean', e.hygiene, 2),
+                   (3, 'play', e.mood, 4), (4, 'rest', e.energy, 8)) v(n, k, val, b)
+     where v.val < mn and not (cared and (kinds_today & v.b) <> 0);
     pet := jsonb_build_object(
       'life_id', l.life_id, 'generation', l.generation, 'name', l.pet_name, 'adopted_at', l.adopted_at,
       'life_day', floor(extract(epoch from (t - l.adopted_at)) / 86400)::integer + 1,
@@ -324,7 +353,16 @@ begin
         'rest',  l.last_rest_at  + (r#>>'{cooldown_min,rest}')::numeric  * interval '1 minute',
         'any_action', l.last_action_at + (r->>'min_gap_s')::numeric * interval '1 second'),
       'action_budget', jsonb_build_object('accepted_today', today,
-                                          'max_per_utc_day', (r->>'max_actions_per_utc_day')::integer));
+                                          'max_per_utc_day', (r->>'max_actions_per_utc_day')::integer),
+      -- good care days (PR A2) and the Good Parent goal (good days in this life, not necessarily in a row)
+      'good_days', l.good_days,
+      'good_days_goal', (r->>'good_parent_days')::integer,
+      'good_streak', case when l.last_good_day_utc >= day_utc - 1 then l.good_streak else 0 end,
+      'best_good_streak', l.best_good_streak,
+      'good_day', jsonb_build_object(
+        'today', coalesce(l.last_good_day_utc = day_utc, false),
+        'kinds_today', (kinds_today & 1) + ((kinds_today >> 1) & 1) + ((kinds_today >> 2) & 1) + ((kinds_today >> 3) & 1),
+        'needs_low', low));
   end if;
 
   -- earlier lives: all of them have moved out (a new life is only adopted after that)
@@ -332,7 +370,8 @@ begin
            'generation', h.generation, 'name', h.pet_name,
            'adopted_at', h.adopted_at, 'departed_at', h.departed_at,
            'days_together', floor(extract(epoch from (h.departed_at - h.adopted_at)) / 86400)::integer,
-           'care_days', h.care_days, 'departure_reason', h.departure_reason)
+           'care_days', h.care_days, 'departure_reason', h.departure_reason,
+           'good_days', h.good_days, 'best_good_streak', h.best_good_streak)
            order by h.generation desc), '[]'::jsonb)
     into hist
     from (select * from games.pepegochi_lives x
@@ -382,7 +421,7 @@ $$;
 create or replace function games.pepegochi_milestone(u uuid, m text, life uuid, p_at timestamptz)
 returns void language plpgsql volatile set search_path = '' as $$
 begin
-  if m not in ('first_adoption', 'froglet', 'adult') then
+  if m not in ('first_adoption', 'froglet', 'adult', 'good_parent') then
     raise exception 'Unknown PepeGochi milestone %', m;
   end if;
   insert into games.pepegochi_milestones (user_id, milestone, life_id, reached_at)
@@ -526,6 +565,11 @@ declare
   rec_left smallint;
   rec_day date;
   rec_since timestamptz;
+  kinds integer;
+  mn numeric;
+  cared boolean;
+  good_now boolean := false;
+  g_days integer; g_last date; g_streak integer; g_best integer;
 begin
   if u is null or games.discord_identity(u) is null then
     raise exception 'Discord sign-in required' using errcode = '42501';
@@ -626,6 +670,28 @@ begin
     end if;
   end if;
 
+  -- good care day (PR A2): at most one per UTC day, never taken back. It needs enough different kinds of
+  -- care that day and, right after this action, every need at good_day_min_need or more (or, only with the
+  -- proposal knob good_day_cared_counts, cared for that day).
+  kinds := (case when l.action_day_utc = day_utc then l.day_kinds else 0 end)
+           | (case p_action when 'feed' then 1 when 'clean' then 2 when 'play' then 4 else 8 end);
+  mn := (r->>'good_day_min_need')::numeric;
+  cared := (r->>'good_day_cared_counts')::boolean;
+  g_days := l.good_days; g_last := l.last_good_day_utc; g_streak := l.good_streak; g_best := l.best_good_streak;
+  if l.last_good_day_utc is distinct from day_utc
+     and (kinds & 1) + ((kinds >> 1) & 1) + ((kinds >> 2) & 1) + ((kinds >> 3) & 1)
+         >= (r->>'good_day_min_kinds')::integer
+     and (h >= mn or (cared and (kinds & 1) <> 0))
+     and (c >= mn or (cared and (kinds & 2) <> 0))
+     and (m >= mn or (cared and (kinds & 4) <> 0))
+     and (en >= mn or (cared and (kinds & 8) <> 0)) then
+    good_now := true;
+    g_days := g_days + 1;
+    g_streak := case when l.last_good_day_utc = day_utc - 1 then l.good_streak + 1 else 1 end;
+    g_best := greatest(g_best, g_streak);
+    g_last := day_utc;
+  end if;
+
   update games.pepegochi_lives set
     hunger = h, hygiene = c, mood = m, energy = en, needs_at = t,
     hunger_due_at = due_h, hygiene_due_at = due_c, mood_due_at = due_m, energy_due_at = due_e,
@@ -645,7 +711,12 @@ begin
     rescue_pending = rescue,
     recovery_days_left = rec_left,
     recovery_day_utc = rec_day,
-    recovery_since = rec_since
+    recovery_since = rec_since,
+    day_kinds = kinds,
+    good_days = g_days,
+    last_good_day_utc = g_last,
+    good_streak = g_streak,
+    best_good_streak = g_best
   where life_id = l.life_id
   returning * into strict l;
 
@@ -656,6 +727,11 @@ begin
     if l.care_days >= (r->>'adult_care_days')::integer then
       perform games.pepegochi_milestone(u, 'adult', l.life_id, t);
     end if;
+  end if;
+  -- Good Parent foundation: good_parent_days good days in this one life. A milestone only; the stamp
+  -- itself comes with the Passport bridge.
+  if good_now and l.good_days >= (r->>'good_parent_days')::integer then
+    perform games.pepegochi_milestone(u, 'good_parent', l.life_id, t);
   end if;
   perform games.pepegochi_sync(u);
   return games.pepegochi_view(u, t) || jsonb_build_object('action_result', 'accepted');

@@ -697,6 +697,131 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
       }
     });
 
+    // ---------- G: good care days and the Good Parent foundation (PR A2) ----------
+    const goodOf = async name => {
+      const { s, st, left } = await scenario(name);
+      const reached = s.events.find(e => e.good != null && e.goal != null && e.good >= e.goal);
+      return { good: st.pet?.good_days ?? 0, goalDay: reached ? reached.day : null, left, st, s };
+    };
+
+    await t.test('G1 the rule: 2 different kinds, every need >= 50 after the action, at most one per UTC day', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");                    // needs 75/80/80/75
+      const feed = await ok(p, "gry_pepegochi_action('feed')", at(0));
+      assert.equal(feed.pet.good_days, 0, 'one kind is not enough');
+      assert.deepEqual(feed.pet.good_day, { today: false, kinds_today: 1, needs_low: [] });
+      const clean = await ok(p, "gry_pepegochi_action('clean')", at(0.001));
+      assert.equal(clean.pet.good_days, 1); assert.equal(clean.pet.good_day.today, true);
+      assert.equal(clean.pet.good_streak, 1);
+      await ok(p, "gry_pepegochi_action('play')", at(0.002));
+      assert.equal((await ok(p, "gry_pepegochi_action('rest')", at(0.003))).pet.good_days, 1, 'one per UTC day');
+      // next UTC day: streak 2; a skipped day resets the streak but keeps the best
+      const d1 = await careAt(p, 24); assert.equal(d1.pet.good_days, 2); assert.equal(d1.pet.good_streak, 2);
+      const d3 = await careAt(p, 72); assert.equal(d3.pet.good_days, 3); assert.equal(d3.pet.good_streak, 1);
+      assert.equal(d3.pet.best_good_streak, 2);
+      assert.equal((await ok(p, 'gry_pepegochi_state()', at(24 * 5))).pet.good_streak, 0, 'no good day yesterday: current streak 0');
+    });
+
+    await t.test('G2 a need below 50 blocks the day; the state says which one', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      const s = await ok(p, 'gry_pepegochi_state()', at(48));       // hunger 75 - 40 = 35, mood 80 - 36 = 44
+      assert.deepEqual(s.pet.good_day.needs_low, ['feed', 'play']);
+      await ok(p, "gry_pepegochi_action('clean')", at(48));
+      const b = await ok(p, "gry_pepegochi_action('rest')", at(48.001));
+      assert.equal(b.pet.good_days, 0, '2 kinds, but hunger and mood are still below 50');
+      assert.equal(b.pet.good_day.kinds_today, 2);
+      const c = await ok(p, "gry_pepegochi_action('feed')", at(48.002));
+      assert.equal(c.pet.good_days, 0, 'mood still below 50');
+      const d = await ok(p, "gry_pepegochi_action('play')", at(48.003));
+      assert.equal(d.pet.good_days, 1, 'every need is 50 or more now');
+    });
+
+    await t.test('G3 daily short visits: a good day every day; Good Parent goal on day 29 (the 30th good day)', async () => {
+      const { good, goalDay, st } = await goodOf('daily');
+      assert.equal(good, 61); assert.equal(goalDay, 29);
+      assert.equal(st.pet.best_good_streak, 61);
+    });
+
+    await t.test('G4 weekends only, 20 weeks: short visits earn almost nothing at >= 50; an hour or two visits a day earn 2 a week', async () => {
+      const quick = await goodOf('weekend-quick-20w');
+      assert.deepEqual(quick.left, []); assert.equal(quick.good, 1); assert.equal(quick.goalDay, null);
+      for (const name of ['weekend-long-20w', 'weekend-two-visits-20w', 'weekend-random-long-20w']) {
+        const r = await goodOf(name);
+        assert.deepEqual(r.left, [], name);
+        assert.equal(r.good, 41, name);
+        assert.ok(r.goalDay >= 102 && r.goalDay <= 103, name + ' goal day ' + r.goalDay);
+      }
+    });
+
+    await t.test('G5 care split by UTC midnight: still at most one good day per UTC day', async () => {
+      const { good, goalDay, s } = await goodOf('daily-midnight-split');
+      assert.equal(good, 41, '41 UTC days, 41 good days');
+      assert.equal(goalDay, 28);
+      const perDay = new Map();
+      for (const e of s.events) if (e.good != null) perDay.set(e.at.slice(0, 10), Math.max(perDay.get(e.at.slice(0, 10)) ?? 0, e.good));
+      const days = [...perDay.values()];
+      for (let i = 1; i < days.length; i++) assert.ok(days[i] - days[i - 1] <= 1, 'never two good days on one UTC day');
+    });
+
+    await t.test('G6 rescue and a visit less than 8 h later: the visit helps, no recovery and no free good day', async () => {
+      const r = await goodOf('weekend-midnight-then-noon');
+      assert.deepEqual(r.left, [], 'the Sunday noon visit finishes the recovery');
+      assert.equal(r.good, 21, 'one good day a weekend (Sunday noon), as short visits at >= 50 allow');
+      const gone = await goodOf('weekend-across-midnight');
+      assert.equal(gone.left[0][1], 'recovery', 'without the noon visit, the frog moves out');
+    });
+
+    await t.test('G7 neglect, then better care: good days stop, then come back after 2 days of care', async () => {
+      const { s, good, goalDay } = await goodOf('neglect-then-daily');
+      const at = d => Math.max(0, ...s.events.filter(e => e.day <= d && e.good != null).map(e => e.good));
+      assert.equal(at(13), 14, 'every day while cared for');
+      assert.equal(at(19), 14, 'none while away');
+      assert.equal(at(20), 14, 'the rescue day is not a good day');
+      assert.equal(at(21), 14, 'nor the day after: hunger is still below 50');
+      assert.equal(at(22), 15, 'the second day of care is');
+      assert.equal(good, 43); assert.equal(goalDay, 37);
+    });
+
+    await t.test('G8 sparse care earns no prestige: every 4 days, or a check-up every 6 days', async () => {
+      assert.ok((await goodOf('every-4-days')).good <= 1);
+      assert.ok((await goodOf('checkup-every-6-days')).good <= 1);
+    });
+
+    await t.test('G9 the proposals, on the same scenarios (playtest values only)', async () => {
+      const run = async (overrides, name) => {
+        await setRules(db, base, overrides);
+        try { return await goodOf(name); } finally { await setRules(db, base); }
+      };
+      assert.equal((await run({ good_day_min_need: 40 }, 'weekend-quick-20w')).good, 21, '>= 40: Sundays count');
+      assert.ok((await run({ good_day_min_need: 40 }, 'every-4-days')).good <= 2, '>= 40: sparse care still ~0');
+      assert.equal((await run({ good_day_min_need: 30 }, 'weekend-quick-20w')).good, 41);
+      assert.equal((await run({ good_day_min_need: 30 }, 'every-4-days')).good, 16, '>= 30: one per visit, even every 4 days');
+      assert.equal((await run({ good_day_cared_counts: true }, 'weekend-quick-20w')).good, 41);
+      assert.equal((await run({ good_day_cared_counts: true }, 'every-4-days')).good, 16);
+    });
+
+    await t.test('G10 Good Parent: one milestone per account, good days stay with their life in the history', async () => {
+      const p = await player();
+      await setRules(db, base, { good_parent_days: 3 });
+      try {
+        await ok(p, "gry_pepegochi_adopt('Fren')");
+        for (let d = 0; d < 4; d++) await careAt(p, d * 24);
+        const rows = async () => (await db.query("select life_id from games.pepegochi_milestones where user_id = $1 and milestone = 'good_parent'", [uid(p)])).rows;
+        assert.equal((await rows()).length, 1);
+        const first = (await rows())[0].life_id;
+        const gone = await ok(p, 'gry_pepegochi_letter_read()', at(4 * 24 + 200));
+        assert.equal(gone.pet.good_days, 4); assert.equal(gone.pet.best_good_streak, 4);
+        await ok(p, "gry_pepegochi_adopt('Fren II')", at(4 * 24 + 201));
+        for (let d = 0; d < 4; d++) await careAt(p, 4 * 24 + 202 + d * 24);
+        const after = await ok(p, 'gry_pepegochi_state()', at(4 * 24 + 202 + 4 * 24));
+        assert.equal(after.pet.good_days, 4, 'a new life starts from 0 and earns its own');
+        assert.equal(after.history[0].good_days, 4);
+        assert.equal((await rows()).length, 1, 'still one milestone');
+        assert.equal((await rows())[0].life_id, first);
+      } finally { await setRules(db, base); }
+    });
+
     // ---------- H: migration ----------
     await t.test('H1 running the migration again changes no data', async () => {
       const before = (await one(`select md5(string_agg(l::text, '|' order by l.life_id)) v from games.pepegochi_lives l`)).v;
@@ -710,6 +835,17 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
       await assert.rejects(db.exec(await readFile(new URL('../games/supabase/update_pepegochi_v2.sql', import.meta.url), 'utf8')), /PepeGochi v1/);
       await db.exec('rollback');   // the file opened a transaction before the guard stopped it
       await db.exec('drop table games.pepegochi_pets');
+    });
+
+    await t.test('H4 a test database from A1 (no good-day columns) is upgraded by running the file again', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      await db.exec(`alter table games.pepegochi_lives drop column day_kinds, drop column good_days,
+        drop column last_good_day_utc, drop column good_streak, drop column best_good_streak`);
+      await db.exec(await readFile(new URL('../games/supabase/update_pepegochi_v2.sql', import.meta.url), 'utf8'));
+      await db.exec((await import('../scripts/pepegochi_sim.mjs')).VIRTUAL_CLOCK);
+      const s = await careAt(p, 1);
+      assert.equal(s.pet.good_days, 1);
     });
 
     await t.test('H3 deleting an account removes its frogs and milestones', async () => {

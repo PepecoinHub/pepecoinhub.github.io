@@ -30,6 +30,10 @@ export const DEFAULT_RULES = Object.freeze({
   froglet_care_days: 2,
   adult_care_days: 7,
   history_limit: 10,
+  good_day_min_kinds: 2,
+  good_day_min_need: 50,
+  good_day_cared_counts: false,
+  good_parent_days: 30,
 });
 
 export const KINDS = ['feed', 'clean', 'play', 'rest'];
@@ -38,6 +42,8 @@ const NEEDS = ['hunger', 'hygiene', 'mood', 'energy'];
 const DUE = { hunger: 'hunger_due_at', hygiene: 'hygiene_due_at', mood: 'mood_due_at', energy: 'energy_due_at' };
 const LAST = { feed: 'last_feed_at', clean: 'last_clean_at', play: 'last_play_at', rest: 'last_rest_at' };
 const COUNT = { feed: 'feeds', clean: 'cleans', play: 'plays', rest: 'rests' };
+const BIT = { feed: 1, clean: 2, play: 4, rest: 8 };   // day_kinds
+const bits = k => (k & 1) + ((k >> 1) & 1) + ((k >> 2) & 1) + ((k >> 3) & 1);
 
 const UNIT = 10000;                  // 1 need point = 10000 units (numeric(7,4))
 const K = 8640000;                   // A = units * K - elapsed_us * per_day
@@ -164,6 +170,7 @@ export function evaluate(l, t, r) {
 }
 const pts = A => fdiv(A, POINT_A);                                           // floor(need) for the UI
 const storeUnits = A => roundHalfAway(A, K);                                 // numeric(7,4)
+const needA = points => Math.round(num(points) * UNIT) * K;                  // a threshold in need points, as A
 
 const stageOf = (l, r) => (l.care_days >= r.adult_care_days ? 'adult' : l.care_days >= r.froglet_care_days ? 'froglet' : 'tadpole');
 const daysBetween = (a, b) => fdiv(b - a, US_DAY);
@@ -185,6 +192,7 @@ export function view(w, t, r) {
       stage, care_days: l.care_days, status: 'departed', departed_at: isoUs(e.departsAt),
       departure_saved: l.status === 'departed', departure_reason: e.reason,
       days_together: daysBetween(l.adopted_at, e.departsAt),
+      good_days: l.good_days, best_good_streak: l.best_good_streak,
       letter: { variant: l.letter_variant ?? 'classic', seen: l.letter_seen_at != null },
     };
   } else {
@@ -192,6 +200,9 @@ export function view(w, t, r) {
     const overdue = l.recovery_days_left === 0
       ? KINDS.filter((k, i) => t - (l[DUE[NEEDS[i]]] ?? l.adopted_at) >= span(r.neglected_h, US_HOUR)) : [];
     const today = l.action_day_utc === dayOf(t) ? l.actions_today : 0;
+    const kindsToday = l.action_day_utc === dayOf(t) ? l.day_kinds : 0;
+    const minA = needA(r.good_day_min_need), cared = r.good_day_cared_counts === true;
+    const needsLow = KINDS.filter((k, i) => e.A[NEEDS[i]] < minA && !(cared && (kindsToday & BIT[k]) !== 0));
     const plus = (at, n, unit) => (at == null ? null : isoUs(at + span(n, unit)));
     pet = {
       life_id: l.life_id, generation: l.generation, name: l.pet_name, adopted_at: isoUs(l.adopted_at),
@@ -219,12 +230,18 @@ export function view(w, t, r) {
         any_action: plus(l.last_action_at, r.min_gap_s, US_SEC),
       },
       action_budget: { accepted_today: today, max_per_utc_day: r.max_actions_per_utc_day },
+      good_days: l.good_days,
+      good_days_goal: r.good_parent_days,
+      good_streak: l.last_good_day_utc != null && l.last_good_day_utc >= dayOf(t) - 1 ? l.good_streak : 0,
+      best_good_streak: l.best_good_streak,
+      good_day: { today: l.last_good_day_utc === dayOf(t), kinds_today: bits(kindsToday), needs_low: needsLow },
     };
   }
   const earlier = w.lives.filter(x => x.generation < l.generation);
   const history = earlier.slice().sort((a, b) => b.generation - a.generation).slice(0, r.history_limit).map(h => ({
     generation: h.generation, name: h.pet_name, adopted_at: isoUs(h.adopted_at), departed_at: isoUs(h.departed_at),
     days_together: daysBetween(h.adopted_at, h.departed_at), care_days: h.care_days, departure_reason: h.departure_reason,
+    good_days: h.good_days, best_good_streak: h.best_good_streak,
   }));
   let former = earlier.length;
   let longest = earlier.reduce((m, h) => Math.max(m, daysBetween(h.adopted_at, h.departed_at)), 0);
@@ -286,6 +303,7 @@ export function adopt(w, pName, t, r) {
     last_feed_at: null, last_clean_at: null, last_play_at: null, last_rest_at: null, last_action_at: null,
     rescue_pending: false, recovery_days_left: 0, recovery_day_utc: null, recovery_since: null,
     action_day_utc: null, actions_today: 0, feeds: 0, cleans: 0, plays: 0, rests: 0,
+    day_kinds: 0, good_days: 0, last_good_day_utc: null, good_streak: 0, best_good_streak: 0,
     status: 'active', departed_at: null, departure_reason: null, letter_variant: null, letter_seen_at: null,
   };
   w.lives.push(life);
@@ -307,7 +325,7 @@ export function action(w, kind, t, r) {
   if (todayCount >= r.max_actions_per_utc_day) fail('limit');
   const lastKind = l[LAST[kind]];
   if (lastKind != null && t < lastKind + span(r.cooldown_min[kind], US_MIN)) fail('cooldown');
-  const thrA = Math.round(num(r.meaningful_below) * UNIT) * K;
+  const thrA = needA(r.meaningful_below);
   if (e.A[NEED[kind]] >= thrA) fail('not_needed');
 
   const A = { ...e.A };
@@ -336,6 +354,19 @@ export function action(w, kind, t, r) {
     }
   }
 
+  // good care day: at most one per UTC day, never taken back (same rule as the SQL)
+  const kinds = (l.action_day_utc === day ? l.day_kinds : 0) | BIT[kind];
+  const minA = needA(r.good_day_min_need), cared = r.good_day_cared_counts === true;
+  let goodNow = false;
+  if (l.last_good_day_utc !== day && bits(kinds) >= r.good_day_min_kinds
+      && NEEDS.every((n, i) => A[n] >= minA || (cared && (kinds & BIT[KINDS[i]]) !== 0))) {
+    goodNow = true;
+    const streak = l.last_good_day_utc === day - 1 ? l.good_streak + 1 : 1;
+    Object.assign(l, { good_days: l.good_days + 1, good_streak: streak,
+      best_good_streak: Math.max(l.best_good_streak, streak), last_good_day_utc: day });
+  }
+  l.day_kinds = kinds;
+
   for (const n of NEEDS) { l[n] = storeUnits(A[n]); l[DUE[n]] = dues[n]; }
   l.needs_at = t;
   l.last_action_at = t;
@@ -350,6 +381,7 @@ export function action(w, kind, t, r) {
     if (l.care_days >= r.froglet_care_days) milestone(w, 'froglet', l, t);
     if (l.care_days >= r.adult_care_days) milestone(w, 'adult', l, t);
   }
+  if (goodNow && l.good_days >= r.good_parent_days) milestone(w, 'good_parent', l, t);
   return { ...view(w, t, r), action_result: 'accepted' };
 }
 
