@@ -210,3 +210,8 @@ egg can be adopted. Contract, playtest rules and the rescue system:
   `docs/games/js/pepegochi-model.mjs`. `tests/pepegochi-parity.test.mjs` checks
   it call by call against the SQL (needs `PEPEGOCHI_PGLITE_MODULE` or the
   PostgreSQL variables); `tests/pepegochi-model.test.mjs` runs in CI.
+- PondOS test window (hidden beta, local only): open `/meme/?beta=gochi` once,
+  then Start → Games → `PEPEGOCHI.EXE (test)`; `?beta=off` hides it. It runs
+  the same JavaScript model in `docs/games/pepegochi.html` (no network allowed
+  by its CSP); the frog is kept in this tab's sessionStorage only.
+  `tests/pepegochi-beta.test.mjs` runs in CI.
