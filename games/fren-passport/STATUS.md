@@ -38,7 +38,7 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | 9 | `junior_editor` | Junior Editor | PRINT | hidden | ✅ Lily |
 | 10 | `senior_editor` | Senior Editor | PRINT | hidden | ✅ Lily |
 | 11 | `vox_populi` | Vox Populi | PRINT | hidden | ✅ |
-| 12 | `i_voted` | I Voted | HOOK | hidden | 🚧 384 px |
+| 12 | `i_voted` | I Voted | HOOK | hidden | ✅ in #233 (owner-approved) |
 | 13 | `streak_14` | 14-Day Streak | ON | shown | ✅ Lily |
 | 14 | `like_it_here` | 30-Day Streak | ON | shown | 👀 |
 | 15 | `certified_fren` | Certified Fren | HOOK | ??? | ✅ |
@@ -61,7 +61,7 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | 32 | `season_champion` | Season Champion | HOOK | hidden | 🔄 redraw |
 | 33 | `quiz_master` | Quiz Master | HOOK | hidden | ⬜ |
 | 34 | `top_ten` | Top 10 | HOOK | hidden | 🚧 384 px |
-| 35 | `arcade_hopper` | Arcade Hopper | HOOK | hidden | ⬜ |
+| 35 | `arcade_hopper` | Arcade Hopper | HOOK | hidden | ✅ in #233 (owner-approved) |
 | 36 | `fud_buster` | FUD Buster | HOOK | hidden | ✅ in #233 (owner-approved) |
 | 37 | `long_snake` | Long Snake | HOOK | hidden | ✅ in #233 (owner-approved) |
 | 38 | `bug_hunter` | Bug Hunter | OWNER | hidden | 🚧 384 px |
@@ -71,7 +71,7 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | 42 | `grown_fren` | One Small Step | WAIT (PepeGochi) | hidden | ✅ Lily |
 | 43 | `good_parent` | Good Parent | WAIT (PepeGochi) | hidden | ✅ |
 | 44 | `interior_designer` | Pond Decorator | WAIT | hidden | ⬜ (later) |
-| 45 | `secret_starter` | Secret Starter | HOOK | hidden | ⬜ |
+| 45 | `secret_starter` | Secret Starter | HOOK | hidden | ✅ in #233 (owner-approved) |
 | 46 | `treasure_hunter` | Treasure Hunter | HOOK (only 3 secrets exist) | hidden | ⬜ |
 | 47 | `the_secret_pond` | The Secret Pond | NEW | ??? | 🔁 300 px |
 | 48 | `frogmas` | Frogmas | HOOK | hidden | ⬜ |
