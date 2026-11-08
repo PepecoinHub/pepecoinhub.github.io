@@ -215,6 +215,36 @@
       "owner_review": "label-only preview",
       "remaining_work": "Exact text edit on Lily source via build; preserve artwork. Revised cloud-save award rule separate backend task.",
       "production_ready": false
+    },
+    {
+      "id": "i_voted",
+      "file": "games/fren-passport/stamps-review/art-v3-batch3-wip/i_voted.png",
+      "width": 384,
+      "height": 342,
+      "git_blob_sha": "3a32a408e80bac26dc4a7111eefd65f3b83d5178",
+      "owner_review": "not yet reviewed; generated WIP concept",
+      "remaining_work": "Change purple bg to yellow; add round check-mark chest sticker; ballot-box scene already communicates voting",
+      "production_ready": false
+    },
+    {
+      "id": "top_ten",
+      "file": "games/fren-passport/stamps-review/art-v3-batch3-wip/top_ten.png",
+      "width": 384,
+      "height": 344,
+      "git_blob_sha": "9861f72d5961936d8809cb5994f3733e38de7873",
+      "owner_review": "not yet reviewed; generated WIP concept",
+      "remaining_work": "Replace trophy/ranked list with Win98 list showing highlighted green row and gold star; ribbon with 10",
+      "production_ready": false
+    },
+    {
+      "id": "bug_hunter",
+      "file": "games/fren-passport/stamps-review/art-v3-batch3-wip/bug_hunter.png",
+      "width": 384,
+      "height": 344,
+      "git_blob_sha": "02fb22e56fdde7c0aee08fa43a8489299b6f52a5",
+      "owner_review": "not yet reviewed; generated WIP concept",
+      "remaining_work": "Draw explorer catching cartoon bug marked ! using butterfly net; beige CRT with small Win98 error popup",
+      "production_ready": false
     }
   ],
   "other_required": [
@@ -235,12 +265,14 @@
     "WIP 3 low-resolution concepts do not meet 900px sources",
     "season_champion previous artwork rejected",
     "Good Parent no hearts, 30-day PepeGochi survival",
-    "Current production page 5x4 vs proposed 4x3"
+    "Current production page 5x4 vs proposed 4x3",
+    "Batch 3 first 3 concepts are native ~384x342 cutouts from AI working sheets; not final production sources, background colors and details still need v3 corrections."
   ],
   "owner_decision": {
     "date": "2026-11-08",
     "featured_ten": "approved visually, no composition corrections requested",
     "notes": "Keep technical/source resolution and UI checks separate from visual approval"
   },
-  "batch2_review_image": "games/fren-passport/stamps-review/art-v3-batch2-review.png"
+  "batch2_review_image": "games/fren-passport/stamps-review/art-v3-batch2-review.png",
+  "batch3_review_image": "games/fren-passport/stamps-review/art-v3-batch3-review.png"
 }
