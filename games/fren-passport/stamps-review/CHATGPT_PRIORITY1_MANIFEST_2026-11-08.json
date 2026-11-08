@@ -1,0 +1,34 @@
+[
+  {
+    "id": "first_fren",
+    "file": "games/fren-passport/source/stamps-new/first_fren.png",
+    "width": 1173,
+    "height": 1341,
+    "status": "candidate",
+    "notes": "First Fren, welcome at a CRT. Original full-resolution PNG; owner visual review and browser QA pending."
+  },
+  {
+    "id": "first_avatar",
+    "file": "games/fren-passport/source/stamps-new/first_avatar.png",
+    "width": 1100,
+    "height": 1257,
+    "status": "owner-approved",
+    "notes": "Fresh Fren. Owner accepted CRT avatar editor composition in chat on 2026-11-08 (supersedes v3 optional easel scene). Uploaded from native 1344x1536 original, losslessly formatted as PNG after downsampling to 1100px for transfer. Final technical/browser QA pending; not production-ready."
+  },
+  {
+    "id": "sharp_eye",
+    "file": "games/fren-passport/source/stamps-new/sharp_eye.png",
+    "width": 1100,
+    "height": 1258,
+    "status": "candidate",
+    "notes": "Sharp Eye, explorer using magnifier over a pinned photo/map. Downsampled from native 1173x1341 source to 1100px for upload. Owner review and browser QA pending."
+  },
+  {
+    "id": "community_fren",
+    "file": "games/fren-passport/source/stamps-new/community_fren.png",
+    "width": 1173,
+    "height": 1341,
+    "status": "candidate",
+    "notes": "Three frens at a retro CRT chat. Original full-resolution PNG; owner review and browser QA pending."
+  }
+]

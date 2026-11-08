@@ -1,17 +1,18 @@
 # Priority 1 stamp art handoff, 2026-11-08
 
-Four new stamp artworks have been produced in ChatGPT, but **their PNG binaries are not yet attached to this PR**. This file records exactly which assets are pending transfer, to avoid confusion with previously committed stamp art.
+Four PNGs are **now uploaded to Draft PR #233** under `games/fren-passport/source/stamps-new/`. All four GitHub blob SHA-1 values were checked against the local source bytes.
 
-| ID | Label | Source dimensions | Visual status | SHA-256 prefix (local PNG) |
-|---|---|---|---|---|
-| `first_fren` | First Fren | 1173×1341 | candidate | `6c946e5bc785a96d` |
-| `first_avatar` | Fresh Fren | 1344×1536 | owner accepted illustration in chat; final QA pending | `62bb25cda308f572` |
-| `sharp_eye` | Sharp Eye | 1173×1341 | candidate | `2f20ade8fc738a4c` |
-| `community_fren` | Community Fren | 1173×1341 | candidate | `3ca1afc187730cfd` |
+| ID | Exact label | Committed PNG dimensions | Visual status |
+|---|---|---:|---|
+| `first_fren` | First Fren | 1173×1341 | candidate |
+| `first_avatar` | Fresh Fren | 1100×1257 | **owner-approved** visually on 2026-11-08 |
+| `sharp_eye` | Sharp Eye | 1100×1258 | candidate |
+| `community_fren` | Community Fren | 1173×1341 | candidate |
 
-Expected destination, once the actual PNG files are available:
-`games/fren-passport/source/stamps-new/<id>.png`
+The owner-approved Fresh Fren art is the original CRT avatar-editor composition supplied in chat, **not** the optional §14 easel scene. The exterior checkerboard is masked to alpha. For transport-size reasons Fresh Fren was downsampled from native 1344×1536 and Sharp Eye from native 1173×1341; both stay above 900 pixels wide. Original full-size copies remain in the ChatGPT handoff package. First Fren and Community Fren preserve their full 1173×1341 sources.
 
-All four local files are PNG with a transparent exterior. Fresh Fren's approved CRT avatar-editor scene supersedes the optional v3 easel reference by owner choice; it should be assessed as a visual exception to §14. All files must pass frame/label checks and 34/52/64/78 px legibility review before sprite integration.
+Manifest: `games/fren-passport/stamps-review/CHATGPT_PRIORITY1_MANIFEST_2026-11-08.json`.
 
-Do not integrate or mark production-ready from this note alone. Do not touch Lily originals, special avatars, SQL, Passport UI, or the main catalog. Keep this PR in Draft status.
+**Do not merge or integrate this art from the PR alone.** Claude should perform the final visual/frame/label QA and browser size checks at 34, 52, 64 and 78 px before sprite construction. Owner approval is visual, not a production green light.
+
+Do not touch Lily's original stamps, the special avatars, SQL, catalog or UI. Keep PR #233 Draft.
