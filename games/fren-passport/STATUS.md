@@ -77,7 +77,7 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | 48 | `frogmas` | Frogmas | HOOK | hidden | ⬜ |
 | — | `bali` | BALI | OWNER | printed on the page | ✅ page; postmark later |
 
-**Totals.** Code: 18 ON · 3 PRINT · 17 HOOK · 2 NEW · 1 OWNER · 6 WAIT (+1 repeat noted on Frog of the Week).
+**Totals.** Code: 18 ON · 3 PRINT · 18 HOOK · 2 NEW · 1 OWNER · 6 WAIT = 48.
 Art: 21 ✅ · 2 👀 · 4 📤 · 3 🔁 · 1 🔄 · 3 🚧 · 14 ⬜ = 48.
 
 Note: the stamps marked ON show the old AI art or the category placeholder until their v3 art is cut into the sprite.
