@@ -19,6 +19,8 @@ V3 = [
     'frog_of_the_week', 'moonwalker', 'vox_populi', 'certified_fren', 'old_frog', 'good_parent', 'first_avatar',
     'detective_fren', 'good_game', 'yeet_adept', 'fud_buster', 'long_snake', 'arcade_hopper', 'secret_starter',
     'i_voted', 'checkmate', 'the_secret_pond', 'picasso_fren',
+    # the owner's pixel-art sheet of 7 (2026-11-09); first_avatar above uses its new picture too
+    'first_fren', 'sharp_eye', 'community_fren', 'like_it_here', 'nasa_is_hiring', 'rookie_miner',
 ]
 SMALL = {'the_secret_pond', 'picasso_fren'}   # accepted scenes that exist only as the small review files so far
 TILE = (138, 150)

@@ -16,7 +16,7 @@ Last update: 2026-11-09, Claude. Update this file in every Passport PR.
 | Album | 40 shown, 3 `???` teasers (Picasso Fren, First Hatch, Beta Tester), 5 hidden. |
 | Secrets | 11 findable (none advertised; a short Gazette note later) + 2 event days for everyone. Map pieces dropped. |
 | Special avatars | 16, each behind a secret, a stamp or an event day. Own **Avatars** tab in the Passport (section 5). |
-| Art | 32 of 48 final (18 v3 in the album sprite + 14 Lily). 6 waiting for the owner's OK, 10 still to draw or finish. |
+| Art | 38 of 48 final (24 v3 in the album sprite + 14 Lily). 10 still to draw or finish. The 7 pixel-art stamps (owner's sheet, 2026-11-09) are in. |
 
 ## 2. All 48 stamps
 
@@ -25,32 +25,32 @@ Album: **shown** · **???** (teaser) · hidden.
 
 | # | ID | Label | How it is earned (server) | Album | Art |
 |---:|---|---|---|---|---|
-| 1 | `first_fren` | First Fren | Discord sign-in | shown | 👀 |
+| 1 | `first_fren` | First Fren | Discord sign-in | shown | ✅ v3 (pixel) |
 | 2 | `pond_pioneer` | Pond Pioneer | Discord linked on launch day (one-time snapshot) | shown | ✅ Lily |
-| 3 | `first_avatar` | Fresh Fren | first saved avatar | shown | ✅ v3 |
+| 3 | `first_avatar` | Fresh Fren | first saved avatar | shown | ✅ v3 (pixel) |
 | 4 | `welcome_back` | Welcome Back! | back the day after the first visit | shown | ✅ Lily |
 | 5 | `first_words` | First Words | first lobby chat message | shown | ✅ Lily |
 | 6 | `hey_fren` | Hey @Fren | first @mention | shown | ✅ Lily |
-| 7 | `community_fren` | Community Fren | chat on 5 different days | shown | 👀 |
+| 7 | `community_fren` | Community Fren | chat on 5 different days | shown | ✅ v3 (pixel) |
 | 8 | `dear_editor` | Dear Editor | first letter to the editor | shown | ✅ Lily |
 | 9 | `junior_editor` | Junior Editor | 1 letter marked **Printed** by the owner | shown | ✅ Lily |
 | 10 | `senior_editor` | Senior Editor | 5 letters marked Printed | shown | ✅ Lily |
 | 11 | `vox_populi` | Vox Populi | 10 letters marked Printed | shown | ✅ v3 |
 | 12 | `i_voted` | I Voted | a verified vote in a Pond Poll | shown | ✅ v3 |
 | 13 | `streak_14` | 14-Day Streak | PondOS 14 days in a row | shown | ✅ Lily |
-| 14 | `like_it_here` | 30-Day Streak | PondOS 30 days in a row | shown | 👀 |
+| 14 | `like_it_here` | 30-Day Streak | PondOS 30 days in a row | shown | ✅ v3 (pixel) |
 | 15 | `certified_fren` | Certified Fren | 100 different PondOS days | shown | ✅ v3 |
 | 16 | `old_frog` | Old Frog | one year since the first Discord log-on | shown | ✅ v3 |
 | 17 | `pepe_guesser` | Pepe Guesser | first Pepe Guesser guess | shown | ✅ Lily |
-| 18 | `sharp_eye` | Sharp Eye | first perfect 5000 | shown | 👀 |
+| 18 | `sharp_eye` | Sharp Eye | first perfect 5000 | shown | ✅ v3 (pixel) |
 | 19 | `detective_fren` | Detective Fren | 5000 on 5 different days | shown | ✅ v3 |
 | 20 | `week_scout` | Week Scout | Pepe Guesser 7 days in a row | shown | ✅ Lily |
 | 21 | `scout_fren` | Scout Fren | Pepe Guesser 14 days in a row | shown | ✅ Lily |
 | 22 | `frog_of_the_week` | Frog of the Week | best Pepe Guesser week (Mon–Sun); the only repeatable stamp (×2, ×3…) | shown | ✅ v3 |
 | 23 | `yeet_adept` | Adept | YEET 3000 m | shown | ✅ v3 |
-| 24 | `nasa_is_hiring` | NASA Is Hiring | 3 YEET flights over 5000 m | shown | 👀 |
+| 24 | `nasa_is_hiring` | NASA Is Hiring | 3 YEET flights over 5000 m | shown | ✅ v3 (pixel) |
 | 25 | `moonwalker` | Moonwalker | YEET 6000 m | shown | ✅ v3 |
-| 26 | `rookie_miner` | Happy Mining! | first Pepe Miner cloud save | shown | 👀 Lily + new label |
+| 26 | `rookie_miner` | Happy Mining! | first Pepe Miner cloud save | shown | ✅ v3 (pixel) |
 | 27 | `good_game` | Good Game | board game finished with another Discord player, 10+ moves, no resign/leave | shown | ✅ v3 |
 | 28 | `checkmate` | Checkmate! | chess win by mate (same rules) | shown | ✅ v3 |
 | 29 | `picasso_fren` | Picasso Fren | no data yet (Draw & Guess saves nothing) | ??? | 🔁 in sprite, 304 px |
@@ -75,7 +75,7 @@ Album: **shown** · **???** (teaser) · hidden.
 | 48 | `frogmas` | Frogmas | a visit on 24–26 December | shown | ⬜ |
 | — | `bali` | BALI | the owner opens it when PEP hits $0.01; every fren gets it on the next visit | printed on the page | ✅ ticket + postmark |
 
-**Totals.** Rules: 40 + BALI. Art: 32 final (30 ✅ + the 2 🔁 already in the sprite) · 6 👀 · 1 🔄 · 2 🚧 · 5 ⬜ · 2 ⬜ for later features = 48.
+**Totals.** Rules: 40 + BALI. Art: 38 final (36 ✅ + the 2 🔁 already in the sprite) · 1 🔄 · 2 🚧 · 5 ⬜ · 2 ⬜ for later features = 48.
 
 Stamps with a rule but no final art show the category icon in the album until their art is cut into the sprite.
 
@@ -85,7 +85,7 @@ Stamps with a rule but no final art show the category icon in the album until th
   5 → Senior Editor, 10 → Vox Populi. Clicking again unmarks it (a mis-click), and a stamp the count no longer
   reaches is taken back. The marks survive the mailbox clean-up.
 - **🐞 Give Bug Hunter** on a Discord letter. Clicking again takes it back (asks first).
-- **🏝 Open BALI…** at the top of the desk, two clicks. From then on every Discord fren gets BALI on the next
+- **🏝 PEP hit $0.01? Open BALI…** at the top of the desk, two clicks, only on the day PEP really reaches $0.01. Tapping the BALI ticket in the Passport never gives the stamp (it only finds the Bali Dreamer secret). From then on every Discord fren gets BALI on the next
   visit; the owner gets it at once. "Close BALI" stops new awards and takes nothing back.
 
 These buttons call the new RPCs, so they work only after the migrations run.
@@ -93,16 +93,13 @@ These buttons call the new RPCs, so they work only after the migrations run.
 ## 4. What is left
 
 **Owner**
-1. OK (or notes) for the 6 👀 stamps: `first_fren`, `community_fren`, `like_it_here`, `sharp_eye`, `nasa_is_hiring`,
-   `rookie_miner`.
-2. Launch day: run the three migrations in Supabase, then the `?beta=fren` gate comes off.
+1. Launch day: run the three migrations in Supabase, then the `?beta=fren` gate comes off.
 
 **ChatGPT** (with `GPT_MASTER_PROMPT.md`): `top_ten`, `bug_hunter` (finish at 900+ px), `season_champion` (redraw),
 `podium`, `game_night`, `quiz_master` (Pepe Pictures only: no drawing or easel), `frogmas`, `treasure_hunter`; later
 900+ px files for `picasso_fren` and `the_secret_pond`. Not yet: `frogageddon_beta`, `interior_designer`.
 
 **Claude**
-1. After the owner's OK: the 6 stamps into the v3 sprite.
 1a. **New-reward notice** (owner, 2026-11-09): an animated Windows 98 style notice for a new stamp, secret or avatar
    that nobody can miss. Today a plain tray balloon shows new stamps only. Plan: the tray balloon with a stamp
    "thump" animation, a blinking Passport icon in the tray until the Passport is opened, and the same notice for

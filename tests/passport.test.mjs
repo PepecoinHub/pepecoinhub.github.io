@@ -183,7 +183,7 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
     // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
     'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
     // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
-    'stamps-v3.webp': [18 * 138, 150],
+    'stamps-v3.webp': [24 * 138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
@@ -191,7 +191,8 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   for (const [f, size] of Object.entries(want)) {
     const b = readFileSync(new URL(f, dir));
     if (f !== 'stamps-lily.webp' && f !== 'stamps-v3.webp') total += b.length;
-    else assert.ok(b.length < 200 * 1024, 'stamp sprite stays small: ' + f + ' ' + b.length);
+    // the sprites load only when the Passport opens; the v3 one holds 24 tiles now (about 9-10 KB each)
+    else assert.ok(b.length < (f === 'stamps-v3.webp' ? 256 : 200) * 1024, 'stamp sprite stays small: ' + f + ' ' + b.length);
     assert.equal(b.toString('latin1', 0, 4) + b.toString('latin1', 8, 12), 'RIFFWEBP', f + ' is a WebP');
     // VP8X is the extended header used for images with alpha (the photo window and sprite edges are transparent)
     assert.equal(b.toString('latin1', 12, 16), 'VP8X', f + ' carries alpha');
@@ -202,7 +203,7 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
   assert.equal(count('PP_STAMPS'), 16);
-  assert.equal(count('PP_V3'), 18, 'PP_V3 matches the 18 tiles of stamps-v3.webp');
+  assert.equal(count('PP_V3'), 24, 'PP_V3 matches the 24 tiles of stamps-v3.webp');
   const v3 = readFileSync(new URL('../scripts/build_v3_stamps.py', import.meta.url), 'utf8').match(/V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join();
   assert.equal(v3, js.match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join(), 'same order as the build script');
   assert.equal(count('PP_ICONS'), 12);
