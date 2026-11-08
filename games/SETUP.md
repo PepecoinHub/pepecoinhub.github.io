@@ -199,7 +199,15 @@ egg can be adopted. Contract, playtest rules and the rescue system:
   database or a separate staging project. The hidden beta must not need any
   change to production PH-games.
 - Order, after review: `schema.sql`, then this file. It does not depend on the
-  Fren Passport files; the Passport bridge comes later in its own PR.
+  Fren Passport files.
+- Passport bridge (draft PR C): `games/supabase/update_pepegochi_passport.sql`,
+  after the Fren Passport files and `update_pepegochi_v2.sql`. It turns the
+  first adoption, the 2nd and the 7th care day into the stamps First Hatch,
+  Little Fren and One Small Step through `games.passport_award()`. Until the
+  release adds those three IDs to the allowlist in `update_passport_awards.sql`
+  (and sets them live in the catalog), the stamps wait and nothing is awarded.
+  Tests: `tests/pepegochi-passport.test.mjs` (CI) and
+  `tests/pepegochi-passport-sql.test.mjs` (real PostgreSQL).
 - Tests: `node --test tests/pepegochi.test.mjs` (static, CI) and
   `tests/pepegochi-sql.test.mjs` (real PostgreSQL, same `PASSPORT_PG_URL` /
   `PASSPORT_PG_MODULE` variables as below).
