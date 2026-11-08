@@ -54,11 +54,11 @@
 --   awarded by the server, see update_passport_awards.sql); otherwise the save
 --   is rejected with 'That part is locked' (errcode 42501). Tampering with the
 --   browser cannot unlock them. The reward parts are:
---     hat_hardhat        (unlock miner_fren)
+--     hat_hardhat        (unlock rookie_miner: first Pepe Miner cloud save)
 --     hat_detective      (unlock detective_fren)
 --     clothing_suit      (unlock detective_fren)
 --     bg_sunset          (unlock yeet_adept, not earnable yet)
---     accessory_headphones (unlock gamer_fren, not earnable yet)
+--     accessory_headphones (unlock arcade_hopper, not earnable yet)
 --     hat_explorer       (unlock scout_fren)
 --     special_explorer   (unlock scout_fren)
 --
@@ -125,8 +125,8 @@ begin
   -- Reward parts: saveable only by a player who holds the stamp that unlocks them
   -- (the manifest's 'unlock' keys; stamps are awarded by the server only).
   if exists (
-    select 1 from (values ('bg_sunset', 'yeet_adept'), ('clothing_suit', 'detective_fren'), ('hat_hardhat', 'miner_fren'),
-                          ('hat_detective', 'detective_fren'), ('accessory_headphones', 'gamer_fren'),
+    select 1 from (values ('bg_sunset', 'yeet_adept'), ('clothing_suit', 'detective_fren'), ('hat_hardhat', 'rookie_miner'),
+                          ('hat_detective', 'detective_fren'), ('accessory_headphones', 'arcade_hopper'),
                           ('hat_explorer', 'scout_fren'), ('special_explorer', 'scout_fren')) r(part, stamp)
      where r.part in (p_bg, p_clothing, p_hat, p_accessory, p_special)
        and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)) then

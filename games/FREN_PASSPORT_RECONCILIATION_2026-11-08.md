@@ -10,7 +10,7 @@ Sources compared:
   `art/fren-passport-v3-handoff-20261108` (PR #233, `ART_V3_INVENTORY_2026-11-08.json`).
 
 **v3 is the source of truth for which stamps exist and their labels.** This file decides how each one is checked.
-Nothing here is built yet: no catalog, SQL or UI change is part of this file.
+The live status (what is built, what is drawn) is kept in `games/fren-passport/STATUS.md`.
 
 ## Important before anything else
 

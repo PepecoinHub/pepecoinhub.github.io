@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [46, 12, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [49, 12, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {

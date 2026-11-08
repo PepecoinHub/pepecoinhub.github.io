@@ -37,10 +37,9 @@
 --   community_fren  lobby chat on five different UTC days
 --   hey_fren        first @mention of another fren (games.lobby_mentions)
 --   dear_editor     first letter to the editor
---   junior_editor   five letters to the editor
---   senior_editor   ten letters to the editor
---   rookie_miner    10 minutes of Pepe Miner, measured by the server between cloud saves
---   miner_fren      one hour of Pepe Miner, measured the same way
+--   rookie_miner    "Happy Mining!": the first Pepe Miner cloud save (unlocks the hard hat)
+-- Junior Editor and Senior Editor (first and five letters printed in the Gazette) wait for the owner's
+-- "Printed" mark on letters; they are not awarded from the number of letters sent (owner, 2026-11-08).
 -- Pepe Guesser, letters and Moonwalker are backfilled from existing records. Chat history is kept only
 -- 24 h and YEET keeps only the best flight, so those stamps count from the day this file runs.
 --
@@ -102,7 +101,7 @@ returns boolean language plpgsql volatile security definer set search_path = '' 
 begin
   if b is null or b not in ('pond_pioneer', 'moonwalker', 'nasa_is_hiring', 'pepe_guesser', 'sharp_eye',
       'detective_fren', 'week_scout', 'scout_fren', 'welcome_back', 'streak_14', 'like_it_here', 'first_words',
-      'community_fren', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'rookie_miner', 'miner_fren') then
+      'community_fren', 'hey_fren', 'dear_editor', 'rookie_miner') then
     raise exception 'Unknown passport stamp %', b;
   end if;
   if u is null or games.discord_identity(u) is null then return false; end if;
@@ -301,8 +300,6 @@ begin
       on conflict (user_id) do update set letters = games.passport_progress.letters + 1
       returning letters into n;
       if n >= 1 then perform games.passport_award(new.user_id, 'dear_editor', new.created_at); end if;
-      if n >= 5 then perform games.passport_award(new.user_id, 'junior_editor', new.created_at); end if;
-      if n >= 10 then perform games.passport_award(new.user_id, 'senior_editor', new.created_at); end if;
     exception when others then
       raise warning 'passport letter hook: %', sqlerrm;
     end;
@@ -331,8 +328,8 @@ begin
                else 0 end,
       miner_last_at = clock_timestamp()
     returning miner_seconds into n;
-    if n >= 600 then perform games.passport_award(new.user_id, 'rookie_miner'); end if;
-    if n >= 3600 then perform games.passport_award(new.user_id, 'miner_fren'); end if;
+    -- Happy Mining!: the first cloud save (v3). Play time is still counted for a future stamp.
+    perform games.passport_award(new.user_id, 'rookie_miner');
   exception when others then
     raise warning 'passport miner hook: %', sqlerrm;
   end;
@@ -530,9 +527,18 @@ select l.user_id, count(*) from games.letters l
   join auth.users au on au.id = l.user_id
  where l.discord group by l.user_id
 on conflict (user_id) do nothing;
-select games.passport_award(l.user_id, case l.k when 1 then 'dear_editor' when 5 then 'junior_editor' else 'senior_editor' end, l.created_at)
+select games.passport_award(l.user_id, 'dear_editor', l.created_at)
   from (select user_id, created_at, row_number() over (partition by user_id order by created_at, id) as k
           from games.letters where discord) l
- where l.k in (1, 5, 10);
+ where l.k = 1;
+-- Happy Mining!: everyone who already has a Pepe Miner cloud save.
+select games.passport_award(m.user_id, 'rookie_miner') from games.miner_saves m;
+-- Stamps retired or re-ruled by the v3 list (2026-11-08). The Passport is not public yet, so nothing
+-- anyone has seen is removed; this only matters if an earlier draft of this file already ran.
+delete from games.passport_badges
+ where badge_id = 'miner_fren'
+    or (badge_id in ('junior_editor', 'senior_editor')
+        and not exists (select 1 from information_schema.columns
+                         where table_schema = 'games' and table_name = 'letters' and column_name = 'printed_at'));
 
 commit;

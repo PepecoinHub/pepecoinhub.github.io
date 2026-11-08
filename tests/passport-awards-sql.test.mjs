@@ -120,7 +120,7 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
       +(await one('select achieved_at from games.yeet_records where user_id = $1', [uid(1)])));
     assert.deepEqual((await stamps(1)).filter(s => !['pond_pioneer', 'moonwalker'].includes(s)),
       ['pepe_guesser', 'scout_fren', 'sharp_eye', 'week_scout'], 'four perfect days are not five');
-    assert.deepEqual(await stamps(2), ['dear_editor', 'junior_editor', 'pond_pioneer'], 'a timeout without a pin is not a guess');
+    assert.deepEqual(await stamps(2), ['dear_editor', 'pond_pioneer'], 'a timeout without a pin is not a guess; letters sent never give Junior Editor');
     assert.equal(await one('select letters from games.passport_progress where user_id = $1', [uid(2)]), 6);
     assert.deepEqual(await stamps(4), [], 'guests get nothing');
     assert.deepEqual(await stamps(8), [], 'Discord unlinked: nothing, even with old records');
@@ -234,37 +234,37 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
       await db.query("update games.letters set created_at = created_at - interval '25 hours' where user_id = $1", [uid(3)]);
       await call(3, "select public.gry_letter_send('Another letter', '', '/meme/', false) as v");
     }
-    assert.ok(await has(3, 'junior_editor')); assert.ok(!(await has(3, 'senior_editor')));
+    assert.ok(!(await has(3, 'junior_editor')), 'Junior Editor is for a printed letter, not for letters sent');
     for (let k = 0; k < 5; k++) {
       await db.query("update games.letters set created_at = created_at - interval '25 hours' where user_id = $1", [uid(3)]);
       await call(3, "select public.gry_letter_send('Letter again', '', '/meme/', false) as v");
-      if (k === 3) assert.ok(!(await has(3, 'senior_editor')), 'nine letters');
     }
-    assert.ok(await has(3, 'senior_editor'));
+    assert.ok(!(await has(3, 'senior_editor')), 'Senior Editor is for printed letters, not for ten letters sent');
     assert.equal(await one('select letters from games.passport_progress where user_id = $1', [uid(3)]), 10);
 
     // --- Pepe Miner: the server's own clock between saves at most 120 s apart
     const mine = u => call(u, "select public.gry_miner_save('{\"allTime\":1}'::jsonb, 1) as v");
     const gap = (u, s) => db.query("update games.miner_saves set updated_at = now() - make_interval(secs => $2::int) where user_id = $1; ", [uid(u), s])
       .then(() => db.query('update games.passport_progress set miner_last_at = clock_timestamp() - make_interval(secs => $2::int) where user_id = $1', [uid(u), s]));
+    assert.ok(!(await has(3, 'rookie_miner')));
     await mine(3);
+    assert.ok(await has(3, 'rookie_miner'), 'Happy Mining!: the first cloud save');
     assert.equal(await one('select miner_seconds from games.passport_progress where user_id = $1', [uid(3)]), 0);
     assert.equal((await mine(3)).saved, false, 'the miner RPC itself refuses saves within 20 s');
+    // play time is still measured (kept for a future stamp): one-minute gaps count, a five-minute break does not
     for (let k = 0; k < 9; k++) { await gap(3, 60); await mine(3); }
-    assert.ok(!(await has(3, 'rookie_miner')), '9 minutes');
-    await gap(3, 300); await mine(3);                  // a five-minute break is not play time
-    assert.ok(!(await has(3, 'rookie_miner')));
+    await gap(3, 300); await mine(3);
     await gap(3, 61); await mine(3);
-    assert.ok(await has(3, 'rookie_miner'));
+    assert.ok(await one('select miner_seconds from games.passport_progress where user_id = $1', [uid(3)]) >= 600);
     await db.query('update games.passport_progress set miner_seconds = 3590 where user_id = $1', [uid(3)]);
     await gap(3, 30); await mine(3);
-    assert.ok(await has(3, 'miner_fren'));
+    assert.ok(!(await has(3, 'miner_fren')), 'Miner Fren was retired by the v3 list');
     await assert.rejects(call(4, "select public.gry_miner_save('{}'::jsonb, 1) as v"), /Sign in with Discord/);
 
     // --- Welcome Back!, Guess You Like It Here (30 days in a row) and the one-time notices
     assert.deepEqual(await call(4, 'select public.gry_passport_checkin() as v'), { signed_in: false });
     const first = await call(2, 'select public.gry_passport_checkin() as v');
-    assert.deepEqual(first.new_badges.map(b => b.id).sort(), ['dear_editor', 'junior_editor', 'pond_pioneer']);
+    assert.deepEqual(first.new_badges.map(b => b.id).sort(), ['dear_editor', 'pond_pioneer']);
     assert.deepEqual((await call(2, 'select public.gry_passport_checkin() as v')).new_badges, [], 'each notice once');
     const visit = (u, back) => db.query("insert into games.passport_days values ($1, (now() at time zone 'utc')::date - $2::int)", [uid(u), back]);
     const notTodayVisit = u => db.query("delete from games.passport_days where user_id = $1 and day = (now() at time zone 'utc')::date", [uid(u)]);
@@ -306,7 +306,8 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     const ids = st.achievements.filter(a => a.earned_at).map(a => a.id);
     assert.equal(new Set(ids).size, ids.length, 'no duplicates');
     for (const id of ['first_fren', 'pond_pioneer', 'moonwalker', 'nasa_is_hiring', 'pepe_guesser', 'first_words', 'hey_fren',
-      'community_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'rookie_miner', 'miner_fren']) assert.ok(ids.includes(id), id);
+      'community_fren', 'dear_editor', 'rookie_miner']) assert.ok(ids.includes(id), id);
+    for (const id of ['junior_editor', 'senior_editor', 'miner_fren']) assert.ok(!ids.includes(id), id);
     assert.deepEqual(st.progress, { yeet_5k_flights: 3, yeet_5k_total: 5, letters: 10, miner_minutes: 60, chat_days: 5, login_streak: 0,
       login_days: 0, wp_days: 1, wp_perfect_days: 0, wp_streak: 1 });
     // every accepted flight is counted for later stamps (the rate-limited one is not)

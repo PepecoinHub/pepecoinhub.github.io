@@ -1599,7 +1599,7 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261106lily2';
+  var PP_CATALOG = 'passport-catalog.json?v=20261108v3';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
       document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106lily1'}));
@@ -1669,11 +1669,10 @@
     first_fren: 'duck', first_avatar: 'sprout', moonwalker: 'moon', like_it_here: 'calendar', welcome_back: 'duck', senior_editor: 'folders', certified_fren: 'handshake',
     pond_pioneer: 'handshake', sharp_eye: 'magnifier', week_scout: 'binoculars', first_words: 'people', hey_fren: 'people',
     dear_editor: 'computer', junior_editor: 'folders', rookie_miner: 'pickaxe',
-    hundred_day_fren: 'handshake', community_fren: 'people', curious_fren: 'magnifier', pepe_guesser: 'binoculars',
-    scout_fren: 'binoculars', detective_fren: 'deerstalker', miner_fren: 'pickaxe',
-    gamer_fren: 'gamepad', game_night: 'computer', arcade_hopper: 'joystick', game_collector: 'joystick',
-    collector: 'folders', trophy_shelf: 'folders', yeet_adept: 'rocket', nasa_is_hiring: 'rocket', no_panic: 'rocket',
-    first_hatch: 'sprout', frog_mail_reader: 'computer'
+    community_fren: 'people', pepe_guesser: 'binoculars',
+    scout_fren: 'binoculars', detective_fren: 'deerstalker',
+    game_night: 'computer', arcade_hopper: 'joystick', yeet_adept: 'rocket', nasa_is_hiring: 'rocket',
+    first_hatch: 'sprout'
   };
   var PP_STAMP_CAT = { community: 'people', avatar: 'sprout', yeet: 'rocket', where_pepe: 'binoculars', arcade: 'joystick',
     pepegachi: 'sprout', secrets: 'magnifier', exploration: 'magnifier' };
@@ -1734,7 +1733,15 @@
         // honest earned test: present in server state with a real earned_at timestamp
         var earnedOf = function(id){ var e=find(earnedBadges,id); return e && e.earned_at ? e : null; };
         var MYTHIC_ID = 'bali';
-        var regular = badges.filter(function(x){ return x.id!==MYTHIC_ID && (x.tier!=='mythic'); });
+        // Only what can be earned today is listed, plus the few catalog 'teaser' entries shown as '???' so
+        // players know more is coming. Everything else that is planned stays out of sight until it goes live.
+        var listed = function(x, got){ return x.status==='live' || x.teaser || !!got; };
+        var regular = badges.filter(function(x){ return x.id!==MYTHIC_ID && (x.tier!=='mythic') && listed(x, earnedOf(x.id)); });
+        var goal = regular.filter(function(x){ return x.status==='live' || !!earnedOf(x.id); }).length;
+        secrets = secrets.filter(function(x){ var s = find(discovered, x.id); return listed(x, s && s.discovered_at); });
+        items = items.filter(function(x){ return listed(x, find(owned, x.id)); });
+        var secretsGoal = secrets.filter(function(x){ return x.status==='live'; }).length;
+        var itemsGoal = items.filter(function(x){ return x.status==='live'; }).length;
         var earnedList = regular.filter(function(x){ return !!earnedOf(x.id); })
           .sort(function(a,b){ return String(earnedOf(b.id).earned_at).localeCompare(String(earnedOf(a.id).earned_at)); });
         var earnedCount = earnedList.length;
@@ -1764,9 +1771,7 @@
           week_scout: [num(P.wp_streak), 7, function(n){ return more(n, 'day in a row', 'days in a row'); }],
           scout_fren: [num(P.wp_streak), 14, function(n){ return more(n, 'day in a row', 'days in a row'); }],
           streak_14: [num(P.login_streak), 14, function(n){ return more(n, 'day in a row', 'days in a row'); }],
-          like_it_here: [num(P.login_streak), 30, function(n){ return more(n, 'day in a row', 'days in a row'); }],
-          rookie_miner: [num(P.miner_minutes), 10, function(n){ return more(n, 'minute', 'minutes'); }],
-          miner_fren: [num(P.miner_minutes), 60, function(n){ return more(n, 'minute', 'minutes'); }]
+          like_it_here: [num(P.login_streak), 30, function(n){ return more(n, 'day in a row', 'days in a row'); }]
         };
         // never suggested as the next goal: closed stamps, one-day chances, and anything that could invite spam
         var NOT_NEXT = { pond_pioneer: 1, welcome_back: 1, first_words: 1, hey_fren: 1, community_fren: 1, dear_editor: 1, junior_editor: 1, senior_editor: 1 };
@@ -1794,7 +1799,7 @@
 
         var right = el('section', {class:'pp-page pp-right','aria-label':'Achievement stamps'});
         right.appendChild(el('img', {class:'pp-page-art',src:PP_ART+'page-right.webp'+PP_ART_V,alt:'',width:'360',height:'528',draggable:'false'}));
-        right.appendChild(piece('p','sr','Achievement stamps: ' + earnedCount + ' of ' + regular.length + ' collected.'));
+        right.appendChild(piece('p','sr','Achievement stamps: ' + earnedCount + ' of ' + goal + ' collected.'));
         var grid = el('div', {class:'pp-grid'});
         for (var gi = 0; gi < 20; gi++) {
           var gx = earnedList[gi];
@@ -1815,9 +1820,9 @@
         var jl = el('dl', {class:'pp-jlist'});
         [
           ['calendar', 'Days registered:', days==null?'—':fmt.int(days)],
-          ['trophy', 'Stamps:', earnedCount+' / '+regular.length],
-          ['box', 'Items collected:', itemsCount+' / '+items.length],
-          ['star', 'Secrets found:', secretsCount+' / '+secrets.length],
+          ['trophy', 'Stamps:', earnedCount+' / '+goal],
+          ['box', 'Items collected:', itemsGoal ? itemsCount+' / '+itemsGoal : fmt.int(itemsCount)],
+          ['star', 'Secrets found:', secretsCount+' / '+secretsGoal],
           ['gamepad', 'YEET best:', yeetBest==null?'—':metres(yeetBest)]
         ].forEach(function(v){
           var r = el('div', {class:'pp-jrow'}); r.appendChild(ppIcon(v[0])); r.appendChild(piece('dt','',v[1])); r.appendChild(piece('dd','',v[2])); jl.appendChild(r);
@@ -1909,7 +1914,7 @@
           li.appendChild(piece('span','pp-tag'+(e?' is-on':''), e ? 'Earned '+fmt.date(e.earned_at) : stateOf(x)));
           al.appendChild(li);
         });
-        panes[1].appendChild(piece('p','pp-muted', earnedCount+' of '+regular.length+' stamps earned. Stamps are awarded by the server only, from what the games record; "Coming soon" stamps cannot be earned yet.'));
+        panes[1].appendChild(piece('p','pp-muted', earnedCount+' of '+goal+' stamps earned. Stamps are awarded by the server only, from what the games record; "Coming soon" stamps cannot be earned yet.'));
         panes[1].appendChild(al);
 
         // Stamps: the whole album with names (locked stamps show the '?' slot)
@@ -1947,8 +1952,8 @@
           return sec;
         }
         var cgrid = el('div', {class:'pp-cols'});
-        cgrid.appendChild(collect('Items  ' + itemsCount + ' / ' + items.length, items, function(x){ return find(owned, x.id); }, function(){ return 'Owned'; }));
-        cgrid.appendChild(collect('Secrets  ' + secretsCount + ' / ' + secrets.length, secrets,
+        cgrid.appendChild(collect('Items  ' + (itemsGoal ? itemsCount + ' / ' + itemsGoal : itemsCount), items, function(x){ return find(owned, x.id); }, function(){ return 'Owned'; }));
+        cgrid.appendChild(collect('Secrets  ' + secretsCount + ' / ' + secretsGoal, secrets,
           function(x){ var s = find(discovered, x.id); return s && s.discovered_at ? s : null; }, function(s){ return 'Found ' + fmt.date(s.discovered_at); }));
         panes[3].appendChild(cgrid);
 
@@ -1957,9 +1962,9 @@
         [
           ['Member since', state.member_since ? fmt.date(state.member_since) : 'unknown'],
           ['Days registered (account age)', days==null?'—':fmt.int(days)],
-          ['Stamps earned', earnedCount+' / '+regular.length],
-          ['Secrets found', secretsCount+' / '+secrets.length],
-          ['Items collected', itemsCount+' / '+items.length],
+          ['Stamps earned', earnedCount+' / '+goal],
+          ['Secrets found', secretsCount+' / '+secretsGoal],
+          ['Items collected', itemsGoal ? itemsCount+' / '+itemsGoal : fmt.int(itemsCount)],
           ['Best YEET flight', yeetBest==null?'—':metres(yeetBest)],
           ['Avatar saved', look ? 'Yes' : 'Not yet']
         ].forEach(function(v){ var r=el('div'); r.appendChild(piece('dt','',v[0])); r.appendChild(piece('dd','',v[1])); st.appendChild(r); });
@@ -2013,7 +2018,7 @@
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261107fit2').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261108v3').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -2080,7 +2085,7 @@
     ['accessory', 'Accessory', 'accessory'], ['bg', 'Background', null], ['special', 'Special', null]];
   // which stamp opens a reserved part (catalog titles)
   // (only stamps that can be earned today are named; the others stay "a future stamp", like '???' in the Passport)
-  var FA_UNLOCK = { detective_fren: 'Detective Fren', miner_fren: 'Miner Fren', scout_fren: 'Scout Fren' };
+  var FA_UNLOCK = { detective_fren: 'Detective Fren', rookie_miner: 'Happy Mining!', scout_fren: 'Scout Fren' };
   function avatarMaker() {
     return openApp('avatar', 'Create Your Fren - Avatar Maker', 'pep-logo', function (A) {
       passportCss();

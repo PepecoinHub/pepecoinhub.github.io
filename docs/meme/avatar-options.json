@@ -187,7 +187,7 @@
       {
         "id": "hat_hardhat",
         "label": "Hard hat",
-        "unlock": "miner_fren"
+        "unlock": "rookie_miner"
       },
       {
         "id": "hat_detective",
@@ -267,7 +267,7 @@
       {
         "id": "accessory_headphones",
         "label": "Headphones",
-        "unlock": "gamer_fren"
+        "unlock": "arcade_hopper"
       }
     ],
     "special": [

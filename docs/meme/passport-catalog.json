@@ -32,41 +32,6 @@
       "status": "live"
     },
     {
-      "id": "pepe_guesser",
-      "title": "Pepe Guesser",
-      "description": "Make your first Pepe Guesser guess with a pin on the map.",
-      "category": "where_pepe",
-      "status": "live"
-    },
-    {
-      "id": "sharp_eye",
-      "title": "Sharp Eye",
-      "description": "Score a perfect 5000 in a daily Pepe Guesser hunt.",
-      "category": "where_pepe",
-      "status": "live"
-    },
-    {
-      "id": "week_scout",
-      "title": "Week Scout",
-      "description": "Guess in Pepe Guesser on 7 days in a row (UTC days).",
-      "category": "where_pepe",
-      "status": "live"
-    },
-    {
-      "id": "detective_fren",
-      "title": "Detective Fren",
-      "description": "Score a perfect 5000 in Pepe Guesser on 5 different days. Unlocks the detective hat and the suit.",
-      "category": "where_pepe",
-      "status": "live"
-    },
-    {
-      "id": "scout_fren",
-      "title": "Scout Fren",
-      "description": "Guess in Pepe Guesser on 14 days in a row (UTC days). Unlocks Lily's Explorer Pepe and the explorer hat.",
-      "category": "where_pepe",
-      "status": "live"
-    },
-    {
       "id": "first_words",
       "title": "First Words",
       "description": "Send your first message in the lobby chat (LAN Party).",
@@ -97,16 +62,31 @@
     {
       "id": "junior_editor",
       "title": "Junior Editor",
-      "description": "Send 5 letters to the editor.",
+      "description": "Get your first letter printed in The Pond Gazette.",
       "category": "community",
-      "status": "live"
+      "status": "planned"
     },
     {
       "id": "senior_editor",
       "title": "Senior Editor",
-      "description": "Send 10 letters to the editor.",
+      "description": "Get 5 of your letters printed in The Pond Gazette.",
       "category": "community",
-      "status": "live"
+      "status": "planned"
+    },
+    {
+      "id": "vox_populi",
+      "title": "Vox Populi",
+      "description": "Get 10 of your letters printed in The Pond Gazette.",
+      "category": "community",
+      "gold": true,
+      "status": "planned"
+    },
+    {
+      "id": "i_voted",
+      "title": "I Voted",
+      "description": "Vote in a Pond Poll, signed in with Discord.",
+      "category": "community",
+      "status": "planned"
     },
     {
       "id": "streak_14",
@@ -117,24 +97,78 @@
     },
     {
       "id": "like_it_here",
-      "title": "Guess You Like It Here",
+      "title": "30-Day Streak",
       "description": "Open PondOS signed in with Discord on 30 days in a row (UTC days).",
       "category": "community",
       "status": "live"
     },
     {
-      "id": "rookie_miner",
-      "title": "Rookie Miner",
-      "description": "Play Pepe Miner for 10 minutes with the cloud save on.",
-      "category": "arcade",
+      "id": "certified_fren",
+      "title": "Certified Fren",
+      "description": "Be active in PondOS on 100 different UTC days (not necessarily in a row).",
+      "category": "community",
+      "gold": true,
+      "teaser": true,
+      "status": "planned"
+    },
+    {
+      "id": "old_frog",
+      "title": "Old Frog",
+      "description": "One year since your first Discord log-on to PepecoinHub.",
+      "category": "community",
+      "status": "planned"
+    },
+    {
+      "id": "pepe_guesser",
+      "title": "Pepe Guesser",
+      "description": "Make your first Pepe Guesser guess with a pin on the map.",
+      "category": "where_pepe",
       "status": "live"
     },
     {
-      "id": "miner_fren",
-      "title": "Miner Fren",
-      "description": "Play Pepe Miner for one hour in total. Unlocks the hard hat.",
-      "category": "arcade",
+      "id": "sharp_eye",
+      "title": "Sharp Eye",
+      "description": "Score a perfect 5000 in a daily Pepe Guesser hunt.",
+      "category": "where_pepe",
       "status": "live"
+    },
+    {
+      "id": "detective_fren",
+      "title": "Detective Fren",
+      "description": "Score a perfect 5000 in Pepe Guesser on 5 different days. Unlocks the detective hat and the suit.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "week_scout",
+      "title": "Week Scout",
+      "description": "Guess in Pepe Guesser on 7 days in a row (UTC days).",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "scout_fren",
+      "title": "Scout Fren",
+      "description": "Guess in Pepe Guesser on 14 days in a row (UTC days). Unlocks Lily's Explorer Pepe and the explorer hat.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
+      "id": "frog_of_the_week",
+      "title": "Frog of the Week",
+      "description": "Finish a Pepe Guesser week (Monday to Sunday, UTC) in first place. Can be won again.",
+      "category": "where_pepe",
+      "gold": true,
+      "repeatable": true,
+      "teaser": true,
+      "status": "planned"
+    },
+    {
+      "id": "yeet_adept",
+      "title": "Adept",
+      "description": "Fly at least 3000 m in YEET THE PEP. Unlocks the Sunset avatar background.",
+      "category": "yeet",
+      "status": "planned"
     },
     {
       "id": "nasa_is_hiring",
@@ -146,64 +180,109 @@
     {
       "id": "moonwalker",
       "title": "Moonwalker",
-      "description": "Fly the full 6000 m in YEET THE PEP. A very rare stamp. Moon Rock is a separate future reward.",
+      "description": "Fly the full 6000 m in YEET THE PEP. A very rare stamp.",
       "category": "yeet",
+      "gold": true,
       "status": "live"
     },
     {
-      "id": "certified_fren",
-      "title": "Certified Fren",
-      "description": "Return to PondOS and complete at least one accepted signed-in interaction on 100 distinct UTC days (not necessarily consecutive). Server verified.",
-      "category": "community",
+      "id": "rookie_miner",
+      "title": "Happy Mining!",
+      "description": "Make your first Pepe Miner cloud save. Unlocks the hard hat.",
+      "category": "arcade",
+      "status": "live"
+    },
+    {
+      "id": "good_game",
+      "title": "Good Game",
+      "description": "Finish a board game (chess, checkers, Connect Four or Sea Battle) against another Discord fren. A resigned or abandoned game does not count.",
+      "category": "arcade",
+      "teaser": true,
       "status": "planned"
     },
     {
-      "id": "curious_fren",
-      "title": "Curious Fren",
-      "description": "Open five different PondOS apps. Server verified.",
-      "category": "exploration",
+      "id": "checkmate",
+      "title": "Checkmate!",
+      "description": "Win a game of chess by checkmate against another Discord fren.",
+      "category": "arcade",
       "status": "planned"
     },
     {
-      "id": "yeet_adept",
-      "title": "Adept",
-      "description": "Reach at least 3000 m in YEET THE PEP. Unlocks the Sunset avatar background once server-verified achievements go live.",
-      "category": "yeet",
+      "id": "picasso_fren",
+      "title": "Picasso Fren",
+      "description": "Other players guess 10 of your drawings in Draw & Guess.",
+      "category": "arcade",
       "status": "planned"
     },
     {
-      "id": "gamer_fren",
-      "title": "Gamer Fren",
-      "description": "Play across the PondOS arcade. Server verified.",
+      "id": "podium",
+      "title": "Podium",
+      "description": "Finish in the top 3 of a Pepe Pictures game.",
       "category": "arcade",
       "status": "planned"
     },
     {
       "id": "game_night",
       "title": "Game Night",
-      "description": "Join a live LAN Party game night. Server verified.",
+      "description": "Play in a scheduled Pepe Pictures game night.",
       "category": "arcade",
       "status": "planned"
     },
     {
-      "id": "collector",
-      "title": "Collector",
-      "description": "Gather a shelf of PondOS collectibles. Server verified.",
-      "category": "pepegachi",
+      "id": "season_champion",
+      "title": "Season Champion",
+      "description": "Finish a ranked Pepe Pictures season in first place.",
+      "category": "arcade",
+      "gold": true,
       "status": "planned"
     },
     {
-      "id": "old_frog",
-      "title": "Old Frog",
-      "description": "Reach a full year since joining the pond.",
+      "id": "quiz_master",
+      "title": "Quiz Master",
+      "description": "Host a Pepe Pictures game with at least 4 ranked players.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "top_ten",
+      "title": "Top 10",
+      "description": "Reach the top 10 of the Pepe Guesser week board, the YEET board or the Pepe Pictures season ranking.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "arcade_hopper",
+      "title": "Arcade Hopper",
+      "description": "Get a score recorded in 5 different PondOS games. Unlocks the headphones.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "fud_buster",
+      "title": "FUD Buster",
+      "description": "Score 2,000 points or more in FUD Invaders.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "long_snake",
+      "title": "Long Snake",
+      "description": "Grow PEP Snake to 40 blocks or more.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "bug_hunter",
+      "title": "Bug Hunter",
+      "description": "Report a real bug that gets fixed. Given by the editor.",
       "category": "community",
       "status": "planned"
     },
     {
-      "id": "one_month_fren",
-      "title": "One Month Fren",
-      "description": "Reach your first month in the pond.",
-      "category": "community",
+      "id": "frogageddon_beta",
+      "title": "Beta Tester",
+      "description": "Play an online FROGAGEDDON match during the beta.",
+      "category": "arcade",
       "status": "planned"
     },
     {
@@ -230,50 +309,15 @@
     {
       "id": "good_parent",
       "title": "Good Parent",
-      "description": "Provide care on 30 distinct days.",
-      "category": "pepegachi",
-      "status": "planned"
-    },
-    {
-      "id": "perfect_parent",
-      "title": "Perfect Parent",
-      "description": "Complete a full month of good care.",
+      "description": "Keep your PepeGochi well cared for on 30 days.",
       "category": "pepegachi",
       "status": "planned"
     },
     {
       "id": "interior_designer",
-      "title": "Interior Designer",
+      "title": "Pond Decorator",
       "description": "Place 10 decorations in your PepeGochi room.",
       "category": "pepegachi",
-      "status": "planned"
-    },
-    {
-      "id": "lunar_decorator",
-      "title": "Lunar Decorator",
-      "description": "Decorate PepeGochi's room with moon-themed collectibles.",
-      "category": "pepegachi",
-      "status": "planned"
-    },
-    {
-      "id": "no_panic",
-      "title": "No Panic",
-      "description": "Finish YEET without using any panic flaps.",
-      "category": "yeet",
-      "status": "planned"
-    },
-    {
-      "id": "arcade_hopper",
-      "title": "Arcade Hopper",
-      "description": "Try five different PondOS games.",
-      "category": "arcade",
-      "status": "planned"
-    },
-    {
-      "id": "game_collector",
-      "title": "Game Collector",
-      "description": "Complete challenges in five PondOS games.",
-      "category": "arcade",
       "status": "planned"
     },
     {
@@ -286,35 +330,23 @@
     {
       "id": "treasure_hunter",
       "title": "Treasure Hunter",
-      "description": "Discover ten different secrets.",
+      "description": "Find 6 different PondOS secrets.",
       "category": "secrets",
       "status": "planned"
     },
     {
       "id": "the_secret_pond",
       "title": "The Secret Pond",
-      "description": "Finish the six-part mystery hidden across the pond.",
+      "description": "Put together all 6 pieces of the lost pond map.",
       "category": "secrets",
+      "gold": true,
+      "teaser": true,
       "status": "planned"
     },
     {
-      "id": "frog_mail_reader",
-      "title": "Frog Mail Reader",
-      "description": "Find a mysterious message in Frog Mail.",
-      "category": "exploration",
-      "status": "planned"
-    },
-    {
-      "id": "trophy_shelf",
-      "title": "Trophy Shelf",
-      "description": "Display five different collectibles in your room.",
-      "category": "pepegachi",
-      "status": "planned"
-    },
-    {
-      "id": "hundred_day_fren",
-      "title": "100 Days Together",
-      "description": "Reach 100 days since your Discord Fren account was registered. Account age, not active days.",
+      "id": "frogmas",
+      "title": "Frogmas",
+      "description": "Visit PondOS on 24, 25 or 26 December (UTC).",
       "category": "community",
       "status": "planned"
     },
@@ -350,7 +382,8 @@
       "id": "bsod_fren",
       "title": "Blue Screen of Fren",
       "hint": "Something is wrong with this computer.",
-      "status": "planned"
+      "status": "planned",
+      "teaser": true
     },
     {
       "id": "midnight_fren",
@@ -368,7 +401,8 @@
       "id": "pond_map_1",
       "title": "Map Fragment I",
       "hint": "One of six pieces of an old pond map.",
-      "status": "planned"
+      "status": "planned",
+      "teaser": true
     },
     {
       "id": "pond_map_2",
@@ -406,13 +440,15 @@
       "id": "moon_rock",
       "title": "Moon Rock",
       "description": "A souvenir from a real 6000 m YEET flight.",
-      "status": "planned"
+      "status": "planned",
+      "teaser": true
     },
     {
       "id": "golden_fly",
       "title": "Golden Fly",
       "description": "A very fancy snack.",
-      "status": "planned"
+      "status": "planned",
+      "teaser": true
     },
     {
       "id": "rubber_duck",
