@@ -54,7 +54,7 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | 25 | `moonwalker` | Moonwalker | ON | shown | ✅ |
 | 26 | `rookie_miner` | Happy Mining! | ON (first cloud save) | shown | 👀 Lily + new label in #233 |
 | 27 | `good_game` | Good Game | HOOK | ??? | ✅ in #233 (owner-approved) |
-| 28 | `checkmate` | Checkmate! | HOOK | hidden | ⬜ |
+| 28 | `checkmate` | Checkmate! | HOOK | hidden | ✅ in #233 (owner-approved) |
 | 29 | `picasso_fren` | Picasso Fren | NEW | hidden | 🔁 304 px |
 | 30 | `podium` | Podium | HOOK | hidden | ⬜ |
 | 31 | `game_night` | Game Night | HOOK | hidden | ⬜ |
