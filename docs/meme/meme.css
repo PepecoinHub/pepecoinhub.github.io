@@ -1560,3 +1560,14 @@ footer.foot a { color: #edf3e3; }
   .win-host.is-max { inset: 0 0 calc(40px + var(--tb2) + var(--sab)) 0; }
   .wp-photo.big { bottom: calc(48px + var(--tb2) + var(--sab)); }
 }
+
+/* Blue Screen of Fren (secret): classic 98 fatal-exception screen over everything */
+.bsod { position: fixed; inset: 0; z-index: 100000; display: grid; place-items: center; background: #0000aa; color: #fff; cursor: pointer;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.bsod:focus { outline: none; }
+.bsod-in { max-width: 640px; font: 16px/1.45 "Lucida Console", Consolas, "Courier New", monospace; }
+.bsod-in p { margin: 0 0 1.1em; }
+.bsod-in .bsod-h { width: max-content; margin: 0 auto 1.4em; background: #aaa; color: #0000aa; font-weight: bold; }
+.bsod-c { text-align: center; }
+@media (prefers-reduced-motion: no-preference) { .bsod-cur { animation: bsodblink 1s steps(1) infinite; } }
+@keyframes bsodblink { 50% { opacity: 0; } }

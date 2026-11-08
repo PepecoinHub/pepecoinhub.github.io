@@ -13,7 +13,7 @@ Last update: 2026-11-08 15:30, Claude. Update this file in every Passport PR.
 | Public site | Passport **hidden**. Only browsers that opened `/meme/?beta=fren` see it. |
 | Server (Supabase) | The three passport migrations are **drafts, not run**. The Passport works as a local test preview; no stamp is real yet. |
 | Catalog (`docs/meme/passport-catalog.json`) | **v3: 48 stamps + BALI** (this PR). 18 earnable, 4 shown as `???` teasers, 26 hidden until they can be earned. |
-| Collection | Secrets: 3 findable + 2 `???`. Items: none yet, 2 `???`. The other 7 secrets and 6 items stay hidden. |
+| Collection | Secrets: 4 findable (Wrong Frog, Why Do You Need This?, The Magic Word, Blue Screen of Fren), no `???` (secrets are not advertised; a short Gazette note only). Lost Floppy and Forgotten Notes retired. Map pieces not planned. Items: 2 `???`. |
 | Art | 21 of 48 final. 27 still to draw, finish or upload (list below). |
 
 ## 2. All 48 stamps

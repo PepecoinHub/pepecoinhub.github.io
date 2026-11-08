@@ -1509,7 +1509,13 @@
       };
       var open = function (x) { if (x) x.go(); };
       ul.addEventListener('click', function (e) { var b = e.target.closest('[data-i]'); if (b) open(hits[+b.getAttribute('data-i')]); });
-      A.body.querySelector('.find-form').addEventListener('submit', function (e) { e.preventDefault(); open(hits[0]); });
+      A.body.querySelector('.find-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var q = norm(inp.value).trim();
+        if (/^format\s*c:?$/.test(q)) { bsod(); return; }
+        if (magicWord(q)) return;
+        open(hits[0]);
+      });
       inp.addEventListener('input', run);
       A.run = function (q) { if (q != null) inp.value = q; run(); setTimeout(function () { inp.focus(); }, 30); };
     }, 460);
@@ -1599,7 +1605,7 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261108v3';
+  var PP_CATALOG = 'passport-catalog.json?v=20261108sec';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
       document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261108pp48b'}));
@@ -2284,7 +2290,7 @@
       if(!result||result.id!==id) return;
       try { localStorage.setItem(k,'1'); } catch(e) {}
       if(result.new) {
-        var names={lost_floppy:'The Lost Floppy',wrong_frog:'The Wrong Frog',notes_reader:'The Forgotten Notes'};
+        var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren'};
         balloon('Secret discovered!',(names[id]||'A mysterious find')+' is now in your Fren Passport.','gif-045-still');
       }
     },function(){ /* Migration may not be installed yet; retry on next discovery. */ });
@@ -2402,7 +2408,7 @@
       A.body.querySelectorAll('[data-a]').forEach(function (b) {
         b.addEventListener('click', function () {
           var t = b.getAttribute('data-a');
-          var ok = function () { m.textContent = 'Copied. The frog thanks you. Double-check the first and last characters after pasting.'; };
+          var ok = function () { m.textContent = 'Copied. The frog thanks you. Double-check the first and last characters after pasting.'; discoverSecret('why_tho'); };
           if (navigator.clipboard) navigator.clipboard.writeText(t).then(ok, function () { m.textContent = 'Copy blocked by the browser. Select the address and copy it by hand.'; });
           else m.textContent = 'Select the address and copy it by hand.';
         });
@@ -3254,9 +3260,8 @@
         ['📸', 'screenshot_of_someone_elses_gains.png', '3 MB', 'Not your keys, not your coins, not your screenshot.'],
         ['💻', 'legendary_laptop_receipt.pdf', '40M PEP', 'Receipt for one laptop, paid in PEP. Double-click to see what it costs today.'],
         ['🧻', 'paper_hands.exe', '∞ KB', 'Runs automatically during every dip.'],
-        ['📝', 'notes.txt', '1 KB', 'A crumpled note. Somebody wrote down secrets. Double-click (or tap) to read it.', notes],
-        ['💾', 'FREN_BACKUP_98.BAK', '4 KB', 'An ancient floppy backup. Probably harmless. Probably.', function () { discoverSecret('lost_floppy'); }]
-      ].filter(function (f) { return FREN || f[1] !== 'FREN_BACKUP_98.BAK'; });
+        ['📝', 'notes.txt', '1 KB', 'A crumpled note. Somebody wrote down secrets. Double-click (or tap) to read it.', notes]
+      ];
       A.body.innerHTML = '<ul class="bin-list">' + FILES.map(function (f, i) { return '<li data-i="' + i + '"><span aria-hidden="true">' + f[0] + '</span><span>' + f[1] + '</span><small>' + f[2] + '</small></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">Click a file to see what is inside.</p><div class="app-row"><span class="grow">' + FILES.length + ' object(s)</span><button type="button" class="app-btn bin-empty">Empty Recycle Bin</button></div>';
       var tip = A.body.querySelector('.bin-tip');
@@ -3271,7 +3276,6 @@
 
   // notes.txt in the Recycle Bin: every easter egg, written down by a frog who keeps forgetting them
   function notes() {
-    discoverSecret('notes_reader');
     var L = [
       'NOTES.TXT - do NOT share (ok maybe with frens)',
       '',
@@ -3514,6 +3518,32 @@
       setTimeout(function () { var im = el('img', { class: 'coin-rain', src: 'img/pep-logo.webp', alt: '' }); im.style.left = Math.random() * 96 + 'vw'; im.style.animationDuration = (1.8 + Math.random() * 1.6) + 's'; document.body.appendChild(im); setTimeout(function () { im.remove(); }, 3800); }, i * 70);
     })(i);
   }
+  // The desktop words from notes.txt. Typing one while signed in with Discord finds the secret "The Magic Word".
+  // Find runs them too, so phones (no desktop keyboard) can use them.
+  var MAGIC = {
+    wen: function () { osDialog('wen.exe', '<div class="dlg-row"><img src="img/gif-064.webp" alt="" width="96" height="70"><div><h3>wen.exe has performed a legal operation.</h3><p>No price predictions are installed on this system. For arithmetic, open WhatIf.exe.</p></div></div>', [{ label: 'OK', go: true }, { label: 'Open WhatIf.exe', href: 'calculator.html' }], 'gif-064-still'); },
+    seed: function () { osDialog('Security Center', '<div class="dlg-row"><img src="img/gif-085.webp" alt="" width="96" height="96"><div><h3>Seed phrase? Never here.</h3><p>PondOS will never ask for it. Not support, not admins, not frogs. If anything asks you to type it, close it.</p></div></div>', [{ label: 'Understood', go: true }], 'gif-085-still'); },
+    tip: function () { aboutMe(); },
+    laptop: function () { laptop(); },
+    moon: function () { coinRain(8); balloon('Moon not found', 'The frog checked. There is no moon in chainparams.cpp.', 'gif-084-still'); }
+  };
+  function magicWord(w) { if (!MAGIC[w]) return false; MAGIC[w](); discoverSecret('magic_word'); return true; }
+  // Blue Screen of Fren: "format c:" in Find (or typed on the desktop). Any key or click brings PondOS back.
+  function bsod() {
+    if (document.querySelector('.bsod')) return;
+    var d = document.createElement('div');
+    d.className = 'bsod'; d.setAttribute('role', 'alertdialog'); d.setAttribute('aria-label', 'Blue Screen of Fren'); d.tabIndex = -1;
+    d.innerHTML = '<div class="bsod-in"><p class="bsod-h">&nbsp;PondOS&nbsp;</p>' +
+      '<p>A fatal exception 0E has occurred at 0028:C0FFEE69 in VXD FROG(01) + 00000420. The current application will be terminated.</p>' +
+      '<p>The frog tried to format drive C: and found only memes, one lily pad and a wallet backup it refuses to touch.</p>' +
+      '<p>*&nbsp; Never type commands a stranger sends you. Not in PondOS, not in your wallet.<br>*&nbsp; Press any key (or tap) to return to the pond.</p>' +
+      '<p class="bsod-c">Press any key to continue <span class="bsod-cur">_</span></p></div>';
+    var close = function () { document.removeEventListener('keydown', close, true); d.remove(); };
+    d.addEventListener('click', close);
+    document.addEventListener('keydown', close, true);
+    document.body.appendChild(d); d.focus();
+    discoverSecret('bsod_fren');
+  }
   var typed = '', KONAMI = 'ArrowUp ArrowUp ArrowDown ArrowDown ArrowLeft ArrowRight ArrowLeft ArrowRight b a', kseq = [];
   document.addEventListener('keydown', function (e) {
     if (!mainEl || (e.target.closest && e.target.closest('input, textarea, select'))) return;
@@ -3521,11 +3551,9 @@
     if (kseq.join(' ') === KONAMI) { coinRain(30); balloon('Cheat code accepted', '+0 PEP. Nice try, fren. Coins come from mining, not from cheat codes.', 'pep-logo'); kseq = []; return; }
     if (e.key.length !== 1) return;
     typed = (typed + e.key.toLowerCase()).slice(-12);
-    if (/wen$/.test(typed)) { typed = ''; osDialog('wen.exe', '<div class="dlg-row"><img src="img/gif-064.webp" alt="" width="96" height="70"><div><h3>wen.exe has performed a legal operation.</h3><p>No price predictions are installed on this system. For arithmetic, open WhatIf.exe.</p></div></div>', [{ label: 'OK', go: true }, { label: 'Open WhatIf.exe', href: 'calculator.html' }], 'gif-064-still'); }
-    else if (/seed$/.test(typed)) { typed = ''; osDialog('Security Center', '<div class="dlg-row"><img src="img/gif-085.webp" alt="" width="96" height="96"><div><h3>Seed phrase? Never here.</h3><p>PondOS will never ask for it. Not support, not admins, not frogs. If anything asks you to type it, close it.</p></div></div>', [{ label: 'Understood', go: true }], 'gif-085-still'); }
-    else if (/tip$/.test(typed)) { typed = ''; aboutMe(); }
-    else if (/laptop$/.test(typed)) { typed = ''; laptop(); }
-    else if (/moon$/.test(typed)) { typed = ''; coinRain(8); balloon('Moon not found', 'The frog checked. There is no moon in chainparams.cpp.', 'gif-084-still'); }
+    var hit = /(wen|seed|tip|laptop|moon)$/.exec(typed);
+    if (/format c:$/.test(typed)) { typed = ''; bsod(); }
+    else if (hit) { typed = ''; magicWord(hit[1]); }
   });
   var startClicks = 0, startT = null, startBtn = document.querySelector('.start');
   if (startBtn) startBtn.addEventListener('click', function () {

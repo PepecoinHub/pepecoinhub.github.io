@@ -130,7 +130,7 @@ begin
   if u is null then raise exception 'Log on with Discord to save secrets'; end if;
   d := games.discord_identity(u);
   if d is null then raise exception 'Log on with Discord to save secrets'; end if;
-  if p_secret is null or p_secret not in ('lost_floppy', 'wrong_frog', 'notes_reader') then
+  if p_secret is null or p_secret not in ('wrong_frog', 'why_tho', 'magic_word', 'bsod_fren') then
     raise exception 'Unknown discovery';
   end if;
 

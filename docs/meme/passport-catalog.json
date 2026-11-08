@@ -168,7 +168,8 @@
       "title": "Adept",
       "description": "Fly at least 3000 m in YEET THE PEP. Unlocks the Sunset avatar background.",
       "category": "yeet",
-      "status": "planned"
+      "status": "planned",
+      "teaser": true
     },
     {
       "id": "nasa_is_hiring",
@@ -340,7 +341,6 @@
       "description": "Put together all 6 pieces of the lost pond map.",
       "category": "secrets",
       "gold": true,
-      "teaser": true,
       "status": "planned"
     },
     {
@@ -361,29 +361,29 @@
   ],
   "secrets": [
     {
-      "id": "lost_floppy",
-      "title": "The Lost Floppy",
-      "hint": "A backup from 1998 is gathering dust.",
-      "status": "live"
-    },
-    {
       "id": "wrong_frog",
       "title": "The Wrong Frog",
       "hint": "A very suspicious shortcut is hiding in plain sight.",
       "status": "live"
     },
     {
-      "id": "notes_reader",
-      "title": "The Forgotten Notes",
-      "hint": "Sometimes frogs write their secrets down.",
-      "status": "live"
+      "id": "why_tho",
+      "title": "Why Do You Need This?",
+      "status": "live",
+      "description": "Some addresses are not for you. Or are they?"
+    },
+    {
+      "id": "magic_word",
+      "title": "The Magic Word",
+      "status": "live",
+      "description": "Somebody wrote the words down. Say one out loud."
     },
     {
       "id": "bsod_fren",
       "title": "Blue Screen of Fren",
       "hint": "Something is wrong with this computer.",
-      "status": "planned",
-      "teaser": true
+      "status": "live",
+      "description": "Some commands should never be typed. Try one anyway."
     },
     {
       "id": "midnight_fren",
@@ -401,8 +401,7 @@
       "id": "pond_map_1",
       "title": "Map Fragment I",
       "hint": "One of six pieces of an old pond map.",
-      "status": "planned",
-      "teaser": true
+      "status": "planned"
     },
     {
       "id": "pond_map_2",
