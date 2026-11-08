@@ -86,7 +86,7 @@
       "title": "I Voted",
       "description": "Vote in a Pond Poll, signed in with Discord.",
       "category": "community",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "streak_14",
@@ -108,15 +108,14 @@
       "description": "Be active in PondOS on 100 different UTC days (not necessarily in a row).",
       "category": "community",
       "gold": true,
-      "teaser": true,
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "old_frog",
       "title": "Old Frog",
       "description": "One year since your first Discord log-on to PepecoinHub.",
       "category": "community",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "pepe_guesser",
@@ -156,20 +155,18 @@
     {
       "id": "frog_of_the_week",
       "title": "Frog of the Week",
-      "description": "Finish a Pepe Guesser week (Monday to Sunday, UTC) in first place. Can be won again.",
+      "description": "Finish a Pepe Guesser week (Monday to Sunday, UTC) in first place. Every win adds one more (x2, x3...).",
       "category": "where_pepe",
       "gold": true,
       "repeatable": true,
-      "teaser": true,
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "yeet_adept",
       "title": "Adept",
       "description": "Fly at least 3000 m in YEET THE PEP. Unlocks the Sunset avatar background.",
       "category": "yeet",
-      "status": "planned",
-      "teaser": true
+      "status": "live"
     },
     {
       "id": "nasa_is_hiring",
@@ -212,21 +209,22 @@
       "title": "Picasso Fren",
       "description": "Other players guess 10 of your drawings in Draw & Guess.",
       "category": "arcade",
-      "status": "planned"
+      "status": "planned",
+      "teaser": true
     },
     {
       "id": "podium",
       "title": "Podium",
       "description": "Finish in the top 3 of a Pepe Pictures game.",
       "category": "arcade",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "game_night",
       "title": "Game Night",
       "description": "Play in a scheduled Pepe Pictures game night.",
       "category": "arcade",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "season_champion",
@@ -234,42 +232,42 @@
       "description": "Finish a ranked Pepe Pictures season in first place.",
       "category": "arcade",
       "gold": true,
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "quiz_master",
       "title": "Quiz Master",
       "description": "Host a Pepe Pictures game with at least 4 ranked players.",
       "category": "arcade",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "top_ten",
       "title": "Top 10",
-      "description": "Reach the top 10 of the Pepe Guesser week board, the YEET board or the Pepe Pictures season ranking.",
+      "description": "Reach the top 10 of the YEET board, the Pepe Guesser week board or the Pepe Pictures season ranking. Checked when you visit PondOS.",
       "category": "arcade",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "arcade_hopper",
       "title": "Arcade Hopper",
-      "description": "Get a score recorded in 5 different PondOS games. Unlocks the headphones.",
+      "description": "Get a score kept by the server in 5 different games (YEET, Pepe Guesser, FUD Invaders, PEP Snake, Pepe Miner, Pepe Pictures, a board game). Unlocks the headphones.",
       "category": "arcade",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "fud_buster",
       "title": "FUD Buster",
       "description": "Score 2,000 points or more in FUD Invaders.",
       "category": "arcade",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "long_snake",
       "title": "Long Snake",
       "description": "Grow PEP Snake to 40 blocks or more.",
       "category": "arcade",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "bug_hunter",
@@ -283,14 +281,16 @@
       "title": "Beta Tester",
       "description": "Play an online FROGAGEDDON match during the beta.",
       "category": "arcade",
-      "status": "planned"
+      "status": "planned",
+      "teaser": true
     },
     {
       "id": "first_hatch",
       "title": "First Hatch",
       "description": "Adopt your first PepeGochi.",
       "category": "pepegachi",
-      "status": "planned"
+      "status": "planned",
+      "teaser": true
     },
     {
       "id": "little_fren",
@@ -325,14 +325,14 @@
       "title": "Secret Starter",
       "description": "Find your first PondOS secret.",
       "category": "secrets",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "treasure_hunter",
       "title": "Treasure Hunter",
       "description": "Find 6 different PondOS secrets.",
       "category": "secrets",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "the_secret_pond",
@@ -347,7 +347,7 @@
       "title": "Frogmas",
       "description": "Visit PondOS on 24, 25 or 26 December (UTC).",
       "category": "community",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "bali",

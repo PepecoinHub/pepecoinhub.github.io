@@ -46,7 +46,8 @@ test('secret RPC requires Discord and cannot issue premium or gameplay rewards',
 });
 
 test('all badge and secret catalog items use distinct statuses', () => {
-  const reserved = new Set(['moon_rock','certified_fren']);
+  // Certified Fren went live with its daily rule (2026-11-08); Moon Rock is still reserved
+  const reserved = new Set(['moon_rock']);
   for (const item of [...catalog.achievements,...catalog.items]) {
     if (reserved.has(item.id)) assert.equal(item.status, 'planned');
   }

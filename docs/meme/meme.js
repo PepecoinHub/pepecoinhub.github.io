@@ -1618,7 +1618,7 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261108sa';
+  var PP_CATALOG = 'passport-catalog.json?v=20261109r';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
       document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261108v3a'}));
@@ -1941,7 +1941,8 @@
           var c = el('button', {type:'button',class:'pp-stamp'+(e?' is-earned':' is-locked'), title: shown(x, e) ? x.description || '' : 'Coming soon'});
           c.appendChild(ppStamp(x, !!e));
           c.appendChild(piece('b','pp-stamp-name', nameOf(x, e)));
-          c.appendChild(piece('small','pp-stamp-sub', e ? fmt.date(e.earned_at) : stateOf(x)));
+          // Frog of the Week can be won again: the server counts the wins (times)
+          c.appendChild(piece('small','pp-stamp-sub', e ? (e.times > 1 ? '×' + e.times + ' · ' : '') + fmt.date(e.earned_at) : stateOf(x)));
           c.addEventListener('click', function(){
             [].forEach.call(album.children, function(n){ n.classList.toggle('is-picked', n===c); });
             info.textContent = nameOf(x, e) + ': ' + (shown(x, e) ? x.description || '' : 'A new stamp is on its way.');

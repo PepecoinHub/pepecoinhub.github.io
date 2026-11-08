@@ -28,7 +28,7 @@ grant usage on schema public, auth to anon, authenticated;
 `;
 const GAMES = ['schema.sql', 'update_yeet.sql', 'update_wheres_pepe.sql', 'update_wheres_pepe_guests.sql',
   'update_lobby_chat.sql', 'update_open_chat.sql', 'update_lobby_mentions.sql', 'update_frog_letters.sql',
-  'update_letters_community.sql', 'update_miner_cloud.sql', 'update_fren_passport.sql', 'update_fren_avatar.sql'];
+  'update_letters_community.sql', 'update_miner_cloud.sql', 'update_polls.sql', 'update_arcade.sql', 'update_fren_passport.sql', 'update_fren_avatar.sql'];
 
 test('Passport awards SQL: stamps come only from real game records, once, for Discord players',
   { skip: !(URL_ENV && MOD_ENV) && 'set PASSPORT_PG_URL and PASSPORT_PG_MODULE', timeout: 180000 }, async () => {
@@ -115,10 +115,10 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     assert.ok(!(await has(4, 'pond_pioneer')), 'guest'); assert.ok(!(await has(5, 'pond_pioneer')), 'e-mail account');
     assert.ok(!(await has(6, 'pond_pioneer')), 'joined after launch');
     // backfills, dated from the real records
-    assert.ok(await has(1, 'moonwalker'));
+    assert.ok(await has(1, 'moonwalker')); assert.ok(await has(1, 'yeet_adept'), 'a 6000 m record is also 3000 m');
     assert.equal(+(await one("select earned_at from games.passport_badges where user_id = $1 and badge_id = 'moonwalker'", [uid(1)])),
       +(await one('select achieved_at from games.yeet_records where user_id = $1', [uid(1)])));
-    assert.deepEqual((await stamps(1)).filter(s => !['pond_pioneer', 'moonwalker'].includes(s)),
+    assert.deepEqual((await stamps(1)).filter(s => !['pond_pioneer', 'moonwalker', 'yeet_adept'].includes(s)),
       ['pepe_guesser', 'scout_fren', 'sharp_eye', 'week_scout'], 'four perfect days are not five');
     assert.deepEqual(await stamps(2), ['dear_editor', 'pond_pioneer'], 'a timeout without a pin is not a guess; letters sent never give Junior Editor');
     assert.equal(await one('select letters from games.passport_progress where user_id = $1', [uid(2)]), 6);
@@ -357,7 +357,7 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     const look = (bg, c, h, a) => [bg, c, 'mouth_smile', 'eyes_classic', h, a];
     await assert.rejects(call(6, SAVE, look('bg_sky', 'clothing_suit', 'hat_none', 'accessory_none')), /That part is locked/);
     await assert.rejects(call(6, SAVE, look('bg_sky', 'clothing_blue', 'hat_hardhat', 'accessory_none')), /That part is locked/);
-    await assert.rejects(call(1, SAVE, look('bg_sunset', 'clothing_blue', 'hat_none', 'accessory_none')), /That part is locked/, 'Adept is not earnable yet');
+    await assert.rejects(call(6, SAVE, look('bg_sunset', 'clothing_blue', 'hat_none', 'accessory_none')), /That part is locked/, 'Sunset needs Adept (3000 m)');
     await assert.rejects(call(1, SAVE, look('bg_sky', 'clothing_blue', 'hat_none', 'accessory_headphones')), /That part is locked/);
     assert.equal(await one('select count(*)::int from games.passport_avatars where user_id = $1', [uid(6)]), 0);
     // user 1: Detective Fren (suit + detective hat) and Scout Fren (explorer hat)
@@ -375,6 +375,66 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     assert.equal((await call(3, SAVE, look('bg_sky', 'clothing_blue', 'hat_hardhat', 'accessory_none'))).avatar.hat, 'hat_hardhat');
     // a reward part in the wrong slot is still an unknown option
     await assert.rejects(call(1, SAVE, look('hat_detective', 'clothing_blue', 'hat_none', 'accessory_none')), /Unknown avatar option/);
+
+    // --- the stamps added on 2026-11-08: events in other games, and the daily rules run by the check-in
+    await addUser(51); await addUser(52); await addUser(53); await addUser(54, null);
+    // I Voted: a Discord vote; a guest vote earns nothing
+    await db.query("insert into games.polls(id, question, options, closes_at) values ('poll_one', 'Pond?', '[{\"id\":\"y\",\"label\":\"Y\"},{\"id\":\"n\",\"label\":\"N\"}]', now() + interval '1 day')");
+    await db.query("insert into games.poll_votes(poll_id, user_id, choice, verified) values ('poll_one', $1, 'y', true), ('poll_one', $2, 'n', false)", [uid(51), uid(54)]);
+    assert.ok(await has(51, 'i_voted')); assert.ok(!(await has(54, 'i_voted')));
+    // FUD Buster at 2,000 points and Long Snake at 40 blocks (verified scores only)
+    const arcade = (u, game, score, v = true) => db.query("insert into games.arcade_scores(game, nick, score, verified, user_id, duration_ms) values ($1, 'n', $2, $3, $4, 60000)", [game, score, v, uid(u)]);
+    await arcade(51, 'fud', 1990); await arcade(51, 'snake', 39);
+    assert.ok(!(await has(51, 'fud_buster')) && !(await has(51, 'long_snake')), 'just below the thresholds');
+    await arcade(51, 'fud', 2000); await arcade(51, 'snake', 40); await arcade(52, 'fud', 5000, false);
+    assert.ok(await has(51, 'fud_buster')); assert.ok(await has(51, 'long_snake')); assert.ok(!(await has(52, 'fud_buster')), 'unverified score');
+    // Secret Starter at the first secret, Treasure Hunter at six
+    for (const [k, s] of ['wrong_frog', 'why_tho', 'magic_word', 'bsod_fren', 'midnight_fren', 'nerd_alert'].entries()) {
+      await db.query('insert into games.passport_secrets(user_id, secret_id) values ($1, $2)', [uid(52), s]);
+      if (k === 0) { assert.ok(await has(52, 'secret_starter')); assert.ok(!(await has(52, 'treasure_hunter'))); }
+    }
+    assert.ok(await has(52, 'treasure_hunter'));
+    // Pepe Pictures: Podium (top 3), Game Night (a scheduled night), Quiz Master (host of a game with 4+ ranked players)
+    await db.query("insert into games.rooms(code, mode, title, host_id) values ('QZ1', 'obrazek', 'Quiz', $1)", [uid(53)]);
+    await db.query("insert into games.events(title, mode, starts_at, room_code) values ('Friday night', 'obrazek', now() - interval '1 hour', 'QZ1')");
+    const mid = await one("insert into games.matches(room_code, mode, title, started_at, finished_at) values ('QZ1', 'obrazek', 'Quiz', now() - interval '50 minutes', now()) returning id");
+    const result = (u, place, v = true) => db.query("insert into games.results(match_id, user_id, nick, nick_key, verified, points, place, finished_at) values ($1, $2, 'n' || $3::text, 'n' || $3::text, $4, 10 - $3::int, $3::int, now())", [mid, uid(u), place, v]);
+    await result(51, 1); await result(52, 4); await result(54, 2, false);
+    assert.ok(await has(51, 'podium')); assert.ok(!(await has(52, 'podium')), '4th place');
+    assert.ok(await has(51, 'game_night')); assert.ok(await has(52, 'game_night'));
+    assert.ok(!(await has(53, 'quiz_master')), 'three players so far');
+    await result(1, 3);
+    assert.ok(await has(53, 'quiz_master'), 'four players: the host earns it');
+    // daily rules at the check-in: Certified Fren (100 days), Old Frog (a year), Arcade Hopper (5 games), Top 10, Frog of the Week
+    const checkin = u => call(u, 'select public.gry_passport_checkin() as v');
+    for (let back = 1; back <= 99; back++) await db.query("insert into games.passport_days values ($1, (now() at time zone 'utc')::date - $2::int)", [uid(53), back]);
+    await db.query("update auth.users set created_at = now() - interval '400 days' where id = $1", [uid(53)]);
+    await checkin(53);
+    assert.ok(await has(53, 'certified_fren')); assert.ok(await has(53, 'old_frog'));
+    assert.ok(!(await has(51, 'old_frog')), 'a new account');
+    // user 51 has FUD, Snake and Pepe Pictures; YEET and a Pepe Guesser week win make 5 games
+    await db.query("insert into games.yeet_records(user_id, nick, best) values ($1, 'n51', 100)", [uid(51)]);
+    await checkin(51); assert.ok(!(await has(51, 'arcade_hopper')), 'four games');
+    const lastMon = await one("select (date_trunc('week', (now() at time zone 'utc'))::date - 7)::text as d");
+    // the earlier part of the test already made puzzles for most past days: reuse them
+    const dayPuzzle = async (d, i) => (await one('select max(id) as v from games.wp_puzzles where day = $1::date', [d])) || puzzle(d, i);
+    const p1 = await dayPuzzle(lastMon, 9001), p2 = await dayPuzzle(await one("select ($1::date + 2)::text as d", [lastMon]), 9002);
+    // only users 51 and 52 play that week here (the earlier part of the test filled it with user 1's perfect days)
+    await db.query('delete from games.wp_plays x using games.wp_puzzles q where q.id = x.puzzle_id and q.day between $1::date and $1::date + 6', [lastMon]);
+    await db.query("delete from games.passport_weeks");
+    const play = (pid, u, pts) => db.query("insert into games.wp_plays(puzzle_id, user_id, nick, verified, started_at, guessed_at, g_lat, g_lon, km, points) values ($1, $2, 'n', true, now() - interval '9 days', now() - interval '9 days', 1, 1, 1, $3)", [pid, uid(u), pts]);
+    await play(p1, 51, 4000); await play(p2, 51, 4000); await play(p1, 52, 3000);
+    await checkin(51);
+    assert.ok(await has(51, 'arcade_hopper'), 'five games');
+    assert.ok(await has(51, 'top_ten'), 'a YEET record in the top 10');
+    assert.ok(await has(51, 'frog_of_the_week')); assert.ok(!(await has(52, 'frog_of_the_week')));
+    assert.equal(await one("select times from games.passport_badges where user_id = $1 and badge_id = 'frog_of_the_week'", [uid(51)]), 1);
+    await checkin(52);   // the same week is settled once, not again
+    assert.equal(await one("select times from games.passport_badges where user_id = $1 and badge_id = 'frog_of_the_week'", [uid(51)]), 1);
+    await db.query("delete from games.passport_weeks");   // a later week won again counts twice
+    await checkin(52);
+    assert.equal(await one("select times from games.passport_badges where user_id = $1 and badge_id = 'frog_of_the_week'", [uid(51)]), 2);
+    assert.equal((await call(51, 'select public.gry_passport_state() as v')).achievements.find(a => a.id === 'frog_of_the_week').times, 2);
 
     // --- account deletion removes the new rows too
     await db.query('delete from auth.users where id = $1', [uid(3)]);
