@@ -84,6 +84,9 @@ Note: the stamps marked ON show the old AI art or the category placeholder until
 
 ## 3. ChatGPT: what to do next (in this order)
 
+**Every image uses `games/fren-passport/GPT_MASTER_PROMPT.md`:** the same master prompt, the same 3 reference
+PNGs, one stamp per image, 3 variants, checklist, then upload. Scenes come from that file.
+
 1. ~~Upload the 4 Priority 1 PNGs~~: done in #233 (commit `1f1a15bd`, 1100–1173 px).
 2. **Owner review** of 6 stamps in #233: `first_fren`, `first_avatar`, `sharp_eye`, `community_fren`, `like_it_here`,
    `nasa_is_hiring`. Fix whatever the owner says.
