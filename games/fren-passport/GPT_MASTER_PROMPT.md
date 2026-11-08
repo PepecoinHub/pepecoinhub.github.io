@@ -6,9 +6,10 @@ Only the SCENE block changes. Uneven quality comes from drifting prompts; this f
 ## How to run it (every time)
 
 1. **New image, one stamp.** Never several stamps on one sheet, never "edit the previous image" for a new stamp.
-2. **Attach the same 3 reference PNGs every time** (from PR #233, `games/fren-passport/source/stamps-new/`):
-   `frog_of_the_week.png`, `moonwalker.png`, `first_fren.png`. For a redraw, also attach the old version of that stamp
-   as the composition reference.
+2. **Attach the same 3 references every time.** Use the light copies in `games/fren-passport/refs/`
+   (`ref_frog_of_the_week.jpg`, `ref_moonwalker.jpg`, `ref_first_fren.jpg`, about 100-150 KB each; or all three in
+   `ref_sheet.jpg`). The full PNGs in #233 are 2+ MB and GitHub does not always serve them whole. The owner can also
+   attach the same files in the chat. For a redraw, also attach the old version of that stamp as the composition reference.
 3. Paste the **MASTER PROMPT** below, then the **SCENE** block of the stamp.
 4. Generate **3 variants**, pick the best with the checklist, and show the owner only that one.
 5. Upload the PNG to #233 as `games/fren-passport/source/stamps-new/<id>.png` and add it to the manifest with
