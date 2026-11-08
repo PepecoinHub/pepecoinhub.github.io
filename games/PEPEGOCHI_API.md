@@ -1,0 +1,307 @@
+# PepeGochi v2: backend contract
+
+**Status:** draft (PR A1). `games/supabase/update_pepegochi_v2.sql` is **NOT installed** on any Supabase project.
+It replaces the v1 draft in PR #186, which was never applied. PR #186 stays open as a reference only.
+
+**Testing until the owner approves a deployment:** a local database or a separate staging project only.
+The hidden beta must not need any change to the production PH-games project.
+
+Design and decisions: `docs/design/pepegochi-v2/` (README.md, TECH_PLAN.md).
+
+## What the server owns
+
+- One personal frog at a time per Discord account. A frog can **move out** after neglect (it is never shown dying). It leaves GOODBYE.TXT, and the owner can then adopt a new egg. Earlier lives stay as history.
+- The database owns time, needs, growth, care days, moving out and history. The browser sends only a pet name or one of four action names. It never sends a user id, a stat, a count, a time or a stamp id.
+- Discord accounts only. Anonymous guests, e-mail accounts and accounts whose Discord was unlinked are refused by every RPC. The frog is not changed, but its clock keeps running.
+- Private tables in schema `games`: `pepegochi_owners` (one row per account), `pepegochi_lives` (one row per frog life, at most one `active`, enforced by a unique index) and `pepegochi_milestones`. RLS is on, and the browser roles have no grants.
+- Every write locks the owner's row, then the newest life, then reads server time. No cron, Realtime, heartbeat or click log.
+- Moving out deletes nothing. Stamps, items, avatars and secrets are never touched. "P.S. I took the TV" is a joke in the scene only.
+
+## RPCs
+
+Call them like the other PEP Games RPCs (`docs/games/js/backend.js`, `backend.rpc(name, args)`).
+
+| RPC | Arguments | Writes | Returns |
+|---|---|---|---|
+| `gry_pepegochi_state` | `{}` | never | full state |
+| `gry_pepegochi_adopt` | `{p_name}` | a new life, only when there is no frog, or the last one moved out **and** its letter was read | full state + `adopt_result`: `adopted`, `already_have_fren` or `read_the_letter_first` |
+| `gry_pepegochi_action` | `{p_action}`: `feed` / `clean` / `play` / `rest` | only when accepted (or the move-out, once) | full state + `action_result`: `accepted` or `moved_out` |
+| `gry_pepegochi_letter_read` | `{}` | the move-out if due, and the letter as read, once | full state |
+
+**Rejected actions raise an error and write nothing:**
+- `Wait a moment before the next care action` (2 s gap);
+- `That action is cooling down`;
+- `Daily care action limit reached`;
+- `Your Fren does not need that right now` (the need is at 90 or more);
+- `Unknown care action`;
+- `Adopt a Fren first`.
+
+Bad names raise `22023`. Sign-in problems raise `42501`.
+
+A frog that is due to move out is not an error. The next write call stores the move-out and returns `action_result: 'moved_out'`. Reading is always read-only, so `state` may show `status: 'departed'` with `departure_saved: false` until then.
+
+### Full state (example, not real data)
+
+```json
+{
+  "version": 2,
+  "server_now": "2026-11-15T18:00:00Z",
+  "rules": { "playtest": true, "neglected_h": 48, "packing_h": 120, "departs_h": 168, "...": "..." },
+  "has_pet": true,
+  "can_adopt": false,
+  "pet": {
+    "life_id": "…", "generation": 1, "name": "Fren", "adopted_at": "2026-11-09T18:00:00Z",
+    "life_day": 7, "stage": "froglet", "next_growth_care_days": 7, "care_days": 3,
+    "status": "packing",
+    "needs": { "hunger": 0, "hygiene": 9, "mood": 0, "energy": 39 },
+    "waiting_since": { "feed": "…", "clean": "…", "play": "…", "rest": "…" },
+    "most_neglected": "feed", "most_neglected_since": "2026-11-10T01:12:00Z",
+    "overdue": ["feed", "clean", "play", "rest"],
+    "rescue_starts_recovery": true,
+    "recovery": null,
+    "departs_at": "2026-11-17T01:12:00Z", "departure_reason": "feed",
+    "cooldowns": { "feed": null, "clean": null, "play": null, "rest": null, "any_action": "…" },
+    "action_budget": { "accepted_today": 0, "max_per_utc_day": 12 }
+  },
+  "history": [],
+  "summary": { "frens_adopted": 1, "former_frens": 0, "longest_friendship_days": 6, "first_departed_at": null }
+}
+```
+
+When the frog has moved out, `pet` has `status: "departed"`, `departed_at`, `departure_saved`, `departure_reason`, `days_together`, `care_days` and `letter: {variant, seen}`. It has no needs. `can_adopt` becomes true once the letter has been read. `history` lists up to 10 earlier lives, newest first. All times are server UTC. The browser may show them in local time, but must never use its own clock as proof.
+
+## Rules (PLAYTEST values)
+
+These are the owner's working numbers from 2026-11-07, not final rules. They live in `games.pepegochi_rules()`, and every response carries them in `rules`. The game should explain the rules with these values, not with numbers written into the page.
+
+| Rule | Value | Meaning |
+|---|---|---|
+| `meaningful_below` | 90 | an action is accepted only while its need is below this |
+| `neglected_h` | 48 | the most neglected need has waited this long: `neglected` |
+| `packing_h` | 120 | `packing`: "Your Fren is thinking of leaving" |
+| `departs_h` | 168 | the frog moves out |
+| `rescue_from_h` | 120 | caring again for a frog that reached this starts recovery |
+| `recovery_days` | 1 | later UTC days with care needed to end recovery (**owner decision, 2026-11-07**) |
+| `recovery_departs_h` | 72 | while recovering, the frog moves out after this long without care |
+| `recovery_min_gap_h` | 8 | hours between the check-up and the next-day visit (**owner decision, 2026-11-07**) |
+| `max_actions_per_utc_day` | 12 | accepted actions per UTC day (as v1) |
+| `min_gap_s` | 2 | seconds between two actions (as v1) |
+| `good_day_min_kinds` | 2 | good care day: different kinds of care on that UTC day (PR A2) |
+| `good_day_min_need` | 40 | good care day: every need at least this right after the action that completes it (**owner decision, 2026-11-07**) |
+| `good_day_cared_counts` | false | proposal, off: a need cared for that day also counts below `good_day_min_need` |
+| `good_parent_days` | 30 | Good Parent goal: good days in one life, not necessarily in a row (owner, working value) |
+
+As in v1:
+- cooldowns are 30/20/45/60 min;
+- needs decay by 20/15/18/10 per day (hunger/hygiene/mood/energy) and keep their fractions;
+- the effects are Feed +35 hunger, Clean +40 hygiene, Play +35 mood (−10 energy, −3 hunger), Rest +40 energy (+5 mood);
+- the stages are tadpole (0–1 care days), froglet (2–6) and adult (7+). A care day is a UTC day with at least one accepted action.
+
+### Moving out and the rescue
+
+Every need has its own clock. The clock starts when the need falls below 90. It stops when the player cares for that need, or when the need is back at 90 or more. The status follows the **most neglected** need.
+
+| Waiting | Status | What it takes |
+|---|---|---|
+| < 48 h | `healthy` | nothing special |
+| 48–120 h | `neglected` | care for the needs listed in `overdue` |
+| 120–168 h | `packing` | the same, and then the frog is `recovering` |
+| ≥ 168 h | `departed` | read the letter, adopt a new egg |
+
+`recovering` (after a rescue from `packing`):
+- the frog needs care on **1 later UTC day** (not the rescue day);
+- that care counts only **8 h or more after the rescue**;
+- within **72 h** of the last care;
+- after that it is `healthy` again;
+- without it, the frog moves out with `departure_reason: 'recovery'`.
+
+A visit before that moment is still accepted and still improves the needs (and restarts the 72 h), but it does not finish the recovery.
+
+`pet.recovery.counts_from` is the earliest moment the recovery can be finished: the later of the next UTC midnight and rescue + 8 h. The game should show it ("Come back after Sun 07:30 to make up"). An early visit does not move it.
+
+The rescue is not simplified. Feeding alone never rescues a frog: every overdue need has to be cared for, and the player has to come back on another day. Keeping a frog and earning the prestige stamps for good care (PR A2/D) stay two different challenges.
+
+Every case below is played out by `scripts/pepegochi_sim.mjs` on the real SQL and checked by `tests/pepegochi-sql.test.mjs` (R and W tests):
+
+| Visits | Result (1 recovery day) | With 2 recovery days |
+|---|---|---|
+| every day | stays, always healthy | stays |
+| every 4 days | stays, neglected in between | stays |
+| Friday + Saturday + Sunday | stays, packing and recovery every week | stays |
+| Saturday + Sunday, 18:00 UTC | **stays**, packing and recovery every week | moves out on day 16 |
+| Saturday 08:00 + Sunday 21:00 | stays | — |
+| Saturday 21:00 + Sunday 08:00 | stays | — |
+| Saturday 23:30 + Sunday 00:30 (one session across midnight) | moves out: the 00:30 visit is too soon to count (see the note) | — |
+| a random time every Saturday and Sunday, 12 weeks | stays | — |
+| weekends, but only feeding | moves out on day 7 | same |
+| a missed Saturday, Sunday at 12:00, no weekday visit | moves out on Wednesday (day 22, recovery) | — |
+| the same, plus a Monday visit | stays | — |
+| a missed Saturday, Sunday at 19:00 (over 7 days) | already moved out when the player arrives (day 20) | — |
+| one feed every 6 days | moves out on day 7 | same |
+| feeds daily, nothing else | moves out on day 7 | same |
+| full visit every 6 days | moves out on day 9 | same |
+| away 6 days, rescue, then daily | stays | stays |
+| away 6 days, rescue, away 4 days | moves out on day 13 | same |
+| away 8 days | moves out on day 16; letter, new egg | same |
+
+**Missed Saturday.** Sunday to Sunday is the 7-day limit itself. A player who comes on Sunday a bit earlier than the week before can still rescue the frog, but then has 72 hours, until Wednesday, to come back once. A player who comes later than the week before finds the letter.
+
+**Across UTC midnight.** A rescue on Saturday 23:30 and a visit at 00:30 are one session, not two days. The 00:30 visit helps, but the recovery can only be finished from 07:30. A weekend player who plays only that late Saturday session loses the frog. Saturday 21:00 + Sunday 08:00 (11 h apart) and random weekend hours still keep it. `--rule recovery_min_gap_h=0` brings back the old behaviour in the simulator.
+
+### Good care days and the Good Parent foundation (PR A2)
+
+Keeping a frog and earning the prestige stamps are two different challenges. Good care days measure the second.
+
+**A good care day** is a UTC day on which:
+- the player gave at least **2 different kinds** of care;
+- right after the action that completes it, **every need is 40 or more** (owner decision, 2026-11-07).
+
+The rules:
+- At most one per UTC day, never taken back, counted by the server in the same row update as the action. There is no extra table and no cron.
+- Counters per life: `good_days`, `good_streak` (good days in a row), `best_good_streak`.
+- They start from 0 with every new frog. Former frens keep theirs in the history.
+- **Good Parent goal:** 30 good days in one life, not necessarily in a row. Reaching it records the account milestone `good_parent` (once per account). The stamp itself comes with the Passport bridge (PR C) and needs an explicit catalog change.
+
+New fields in `pet`:
+- `good_days`, `good_days_goal`, `good_streak` (0 when yesterday was not a good day), `best_good_streak`;
+- `good_day: {today, kinds_today, needs_low}`. `needs_low` lists the actions whose needs are below 40 right now, so the game can say exactly which need blocks today's good day ("feed again for a good day").
+
+Departed frogs and history entries carry `good_days` and `best_good_streak`.
+
+**Why ≥ 40 (owner decision, 2026-11-07).** Weekend players can earn Good Parent without hour-long sessions, while care every 4 days earns practically nothing. Good days at the end, and the day the Good Parent goal was reached (`node scripts/pepegochi_sim.mjs --good-days`):
+
+| Player | Days | **≥ 40 (decided)** | ≥ 50 (before) | ≥ 30 | ≥ 40 or cared that day |
+|---|---|---|---|---|---|
+| daily, short visit | 60 | 61, day 29 | 61, day 29 | 61, day 29 | 61, day 29 |
+| daily, care split by UTC midnight (23:50 + 00:10) | 41 | 41, day 28 | 41, day 28 | 41, day 28 | 41, day 28 |
+| daily, away 6 days, rescue, daily again | 50 | 44, day 36 | 43, day 37 | 45, day 35 | 45, day 35 |
+| every 4 days | 60 | **2** | 1 | 16 | 16 |
+| full visit every 6 days (moves out) | 60 | 1 | 1 | 2 | 2 |
+| Sat + Sun, short visits, 20 weeks | 140 | **21** (every Sunday) | 1 | 41, day 103 | 41, day 103 |
+| Sat + Sun, short visits, 32 weeks | 224 | **33, day 202** | 1 | 65, day 103 | 65, day 103 |
+| Sat + Sun, about an hour each (two rounds an hour apart) | 140 | 41, day 103 | 41, day 103 | 41, day 103 | 41, day 103 |
+| Sat + Sun, short visits at 10:00 and 20:00 | 140 | 41, day 103 | 41, day 103 | 41, day 102 | 41, day 102 |
+| Sat + Sun, random times, about an hour | 140 | 41, day 103 | 41, day 103 | 41, day 103 | 41, day 103 |
+| Sat + Sun, random times, short visits | 140 | 9, moved out day 92 (see below) | 5, moved out | 27, moved out | 27, moved out |
+| Sat + Sun, rescue 23:30, back 00:30 and 12:00 | 140 | 21 | 21 | 41, day 103 | 41, day 103 |
+
+What the table shows:
+- **Short weekend visits.** Saturday is a rescue day: the frog has waited 6 days, and one round of care lifts the needs only to about 31/39/39/40, below 40. Sunday's round lifts them above 40, so short weekend visits earn every Sunday and reach Good Parent in about 29 weeks.
+- **Longer weekend sessions.** About an hour (feed has a 30-minute cooldown, rest 60) or two visits a day also earn Saturdays: 2 a week, about 15 weeks.
+- **Rejected variants.** ≥ 30 and "cared that day" were not chosen: both give a player who visits every 4 days 16 good days in 60 days, and both turn rescue days into good days.
+
+**Rescue + a visit less than 8 h later.** In the "weekend, random times, short visits" run (20 weeks), one Saturday rescue at 17:01 was followed by a Sunday visit at 00:15. That was too soon to finish the recovery, nobody came back before Wednesday, and the frog moved out on day 92. This is the 8 h rule doing its job. It is also why the game must show `recovery.counts_from`.
+
+### What to tell players (the screen must say this before adoption)
+
+- "Look after every need at least once a week, or your Fren moves out."
+- "After 2 days without care your Fren feels neglected. After 5 days it starts packing."
+- "If it started packing, a full check-up calms it down, and it wants to see you again on another day, at least 8 hours later."
+
+## Milestones and the Fren Passport
+
+This file never writes stamps. It records account milestones in `games.pepegochi_milestones`, once per account, in the same transaction as the care action:
+- `first_adoption`;
+- `froglet` (2nd care day);
+- `adult` (7th care day).
+
+The rows then go to `games.pepegochi_passport_sync(u)`:
+- In this PR the hook is a **no-op**. The Passport bridge (PR C) will replace it and award `first_hatch`, `little_fren` and `grown_fren` through `games.passport_award()`.
+- The hook runs inside its own exception block. If it fails, the care action is kept, a warning is logged, and the milestone stays `synced_at = null`. Every later accepted write tries again. PR C's migration can also award everything pending at once.
+- Re-running this file never switches off a hook installed later: the no-op is created only when the hook does not exist.
+- If an account loses Discord, its RPCs are refused, so nothing new is earned. Pending milestones are delivered after Discord is linked again, on the next accepted action. `passport_award()` also refuses accounts without Discord, which keeps such a milestone pending.
+- `certified_fren` is **never** awarded by PepeGochi. It means 100 days of PondOS activity.
+
+## Resource budget
+
+| Moment | RPCs | Writes |
+|---|---|---|
+| open the game | 1 | 0 |
+| accepted action | 1 | 1 life row (+ ≤ 1 milestone row on the days a stage is reached) |
+| rejected action | 1 | 0 |
+| letter / adoption | 1 | 1–2, once per life |
+| window hidden or minimised | 0 | 0 |
+
+Every response is the full state, so the browser should not fetch again after an action. Animate needs locally between calls. Re-read the state when the tab comes back after a long break, or after an error. No polling, no Realtime.
+
+## Tests and the simulator
+
+- `node --test tests/pepegochi.test.mjs`: static checks, runs in CI.
+- `tests/pepegochi-sql.test.mjs`: real PostgreSQL 15+. It needs `PASSPORT_PG_URL` and `PASSPORT_PG_MODULE`, like the other SQL tests. It creates and drops its own database, uses 12 parallel connections for the race cases, and moves a virtual clock for the time cases. Test ids match `docs/design/pepegochi-v2/TECH_PLAN.md`. Never point it at Supabase.
+- `scripts/pepegochi_sim.mjs`: the time simulator. It runs this exact SQL in an in-memory PGlite database with a virtual clock. It never connects to Supabase.
+
+  ```sh
+  mkdir -p /tmp/pepegochi-sim && (cd /tmp/pepegochi-sim && npm i @electric-sql/pglite)
+  export PEPEGOCHI_PGLITE_MODULE=/tmp/pepegochi-sim/node_modules/@electric-sql/pglite/dist/index.js
+  node scripts/pepegochi_sim.mjs --all
+  node scripts/pepegochi_sim.mjs --scenario weekend-sat-sun --rule recovery_days=1
+  node scripts/pepegochi_sim.mjs --script "adopt Fren; care; wait 6d; feed; wait 1d; state"
+  node scripts/pepegochi_sim.mjs        # interactive: adopt, feed, care, wait 36h, letter, history, rule ...
+  ```
+
+  The virtual clock comes from a replaced `games.pepegochi_clock()` that exists only in the simulator's and tests' throwaway databases. In the migration it is exactly `select clock_timestamp()`, and a static test checks that.
+
+### Browser test simulator (PR B1, local only)
+
+The owner chose a light JavaScript copy of the rules (no 5 MB PGlite, no CSP change). The SQL above stays the reference.
+
+- `docs/games/js/pepegochi-model.mjs`: the same rules in plain JavaScript.
+  - Same RPC names, same JSON, same error messages and codes.
+  - It keeps needs in 1/10000 units and times in microseconds, and rounds the way PostgreSQL does, so the answers are exact rather than "close".
+  - It has no network access, no storage, and no Supabase or Passport calls. Its milestones stay in memory and are never stamps. Every local response says `local_preview: true`.
+- `docs/games/pepegochi-sim.html`: a plain test page with a fast-forward clock, the four actions, GOODBYE.TXT, former frens and editable playtest values.
+  - The page's CSP has `connect-src 'none'`, so the browser itself blocks any request to a server.
+  - `noindex`, not linked from the site, nothing saved: a reload starts again.
+  - Temporary layout for testing the rules, not the game's design.
+- `tests/pepegochi-parity.test.mjs` (needs PGlite or a disposable PostgreSQL) makes every call on the real SQL and on the model at the same virtual time. It compares every full response, then the stored life rows and the milestones. It covers:
+  - all simulator scenarios under 5 rule sets;
+  - every status and departure boundary 1 ms either side;
+  - each need crossing 90;
+  - 300 seeded random games.
+- `tests/pepegochi-model.test.mjs` runs in CI without a database. It checks:
+  - that the model's rules equal the SQL file's;
+  - the documented scenario outcomes and the thresholds;
+  - that the model and the page stay local.
+
+**If the SQL rules change, the model must change in the same PR.** The parity test fails otherwise.
+
+### PondOS test window (PR B2, hidden beta, local only)
+
+A playable PEPEGOCHI.EXE window in PondOS 98 for the owner and testers. It runs on the same JavaScript model, so it is the full game logic. The look uses candidate art (next section).
+
+- **Who sees it:** only a browser that opened `/meme/?beta=gochi` once (kept in localStorage `pondos-gochi-beta`; `/meme/?beta=off` hides it again). It is then in Start → Games and in Find as `PEPEGOCHI.EXE (test)`. Nobody else gets a new menu entry, icon or request.
+- **What it opens:** `docs/games/pepegochi.html?embed=1` in a PondOS window (`pepegochiApp()` in `docs/meme/meme.js`). That page has `connect-src 'none'`, `frame-src 'none'` and `worker-src 'none'`: the browser blocks every request to a server, Supabase included.
+- **Where the frog lives:** sessionStorage `pepegochi-local-sim-v1`, in this tab only. Closing and reopening the window, or a reload, keeps it; closing the tab or Reset removes it. Nothing goes to localStorage, cookies or the server.
+- **What it shows:**
+  - adoption, the four needs, the four actions with their cooldowns, and why an action is not available;
+  - neglect, packing, the needs still overdue, the rescue, and the earliest moment the recovery can be finished (next UTC day and at least `recovery_min_gap_h` after the rescue);
+  - moving out, the empty room, GOODBYE.TXT (adoption waits until it is read), the new egg and Past Frens;
+  - good care days towards Good Parent (30), the streaks, and the exact thing still missing today, for example "Hunger is 31, needs 40: Feed";
+  - the moment the frog moves out if nobody comes, and which need decides it.
+- **Time machine:** +10 min, +1 h, +3 h, +6 h, +12 h, +1/+2/+7 days, any number of hours, next Saturday or Sunday 18:00 UTC. Every action also moves the clock 3 s, past the 2 s gap between actions. "Everything it needs" is a test shortcut that does every action the frog can take right now.
+- **No stamps, no Passport, no PEP:** milestones stay in the model's memory and the window never mentions stamps as earned.
+- **Tests:**
+  - `tests/pepegochi-beta.test.mjs` (CI) plays the whole checklist in the window's game object and checks the local-only rules and the hidden menu entry.
+  - `tests/pepegochi-parity.test.mjs` replays the same window session call by call on the real SQL.
+  - `scripts/pepegochi_sim.mjs --scenario full-life-cycle` runs the same checklist on the SQL.
+
+### Room and frog art in the test window (candidates, not final)
+
+The window draws the layered room v5 from #222 and the frog from the pixel art pack v2 in #227 (commit `36514091`). The files are copied unchanged into `docs/games/img/pepegochi/`. `docs/games/js/pepegochi-room.mjs` only draws: it reads the game state the window already has and changes nothing.
+
+- **Scale:** every frog sprite is drawn at 1 sprite pixel = 1 room pixel (128 px on the 640×400 room), the same for every stage, so nothing is resized at runtime. The room is at most 640 px wide; in the default PondOS window (760 px) it is exactly 640×400.
+- **Where the frog stands:** feet at x 320, y 372 (on the rug, in front of the bed), on each sprite's floor line (124; the older froglet 121).
+- **Which sprite:** `packing`, `recovering` and `neglected` use their adult sprites. Otherwise a healthy adult shows the need it wants most once it is below 75 (`hungry`, `dirty`, `moody`, `tired`), else `idle`. 75 is a picture setting only: energy, the slowest need, is at 70 when the frog becomes neglected, so a lower value would never show `tired`. Tadpole and froglet use their idle sprite; when they pack, the separate suitcase stands next to them. Before the first adoption an egg waits on the rug (the egg stage itself, decision 10, is not added).
+- **Moving out:** when a frog that was on screen moves out (after a time jump or an action), the 6 frames play once, 250 ms each: frames 1-2 in place, frames 3 and 4 in turn while it walks right, frames 5-6 at the room's right edge, where they leave their own frame. Then the frog is gone. A frog that had already left is simply not there. With reduced motion there is no animation and no idle bounce.
+- **The empty room:** the furniture and props stay. Only the TV is not drawn, because GOODBYE.TXT says "P.S. I took the TV."; it is back when the next frog moves in. The letter lies on the rug (the spot of `props/room_departed_overlay.png`) as a button: the envelope until it is read, then the open letter. Clicking it opens GOODBYE.TXT in the Notepad box below the room. Its click area is 12 px bigger than the art on every side.
+- **Not here yet:** the room on the server (`room_state`, Room-2), the server choosing which item leaves with the matching P.S. line (Room-4), state sprites for tadpole and froglet, a moving-out animation for young frogs (they slide out with the suitcase), the alternative `packing_angry`.
+- **Tests:** `tests/pepegochi-room-window.test.mjs` (CI): files and sizes, one scale, feet, which sprite, the hidden TV, the letter, the 10-step moving-out timeline, and a small DOM check of the letter button and the animation timer.
+
+## Release gates
+
+1. Review this SQL. Run both test files and the simulator locally or on a separate staging project.
+2. Playtest the rules with the simulator, then in the hidden beta (PR B, on a local backend: no production change).
+3. Only with the owner's explicit approval: apply `update_pepegochi_v2.sql` to PH-games after `schema.sql`. It does not depend on the Fren Passport files.
+4. Passport bridge (PR C) after the Passport migrations, then Supabase security/performance advisors and a negative test with a real JWT.
+
+Not here yet: the Good Parent stamp itself (Passport bridge, C), the window on the real backend, any art.

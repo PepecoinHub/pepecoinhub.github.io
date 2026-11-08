@@ -29,6 +29,17 @@
       return localStorage.getItem('pondos-fren-beta') === '1';
     } catch (e) { return false; }
   })();
+  // PepeGochi in testing: hidden for everyone except a browser that opened /meme/?beta=gochi once
+  // (?beta=off hides it again). The window runs a LOCAL copy of the game rules (games/pepegochi.html,
+  // whose CSP allows no network at all): no Supabase, no Passport, no stamps.
+  var GOCHI = (function () {
+    try {
+      var q = new URLSearchParams(location.search).get('beta');
+      if (q === 'gochi') localStorage.setItem('pondos-gochi-beta', '1');
+      if (q === 'off') localStorage.removeItem('pondos-gochi-beta');
+      return localStorage.getItem('pondos-gochi-beta') === '1';
+    } catch (e) { return false; }
+  })();
 
 
   /* ------------------------------------------------------------------ pages */
@@ -222,7 +233,7 @@
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
-      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).forEach(function (g) {
+      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE (test)', 'Local rules simulator · nothing is saved or awarded', 'pep-logo', function () { pepegochiApp(); }]] : []).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
@@ -1424,6 +1435,13 @@
     }, 1000);
     A.host.classList.add('app-full');
   }
+  // PepeGochi hidden beta (?beta=gochi): a local test of the rules in its own page, no server, no stamps
+  function pepegochiApp() {
+    var A = openApp('pepegochi', 'PEPEGOCHI.EXE · LOCAL TEST', 'pep-logo', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepegochi.html?embed=1" title="PEPEGOCHI.EXE (local test)"></iframe>';
+    }, 760);
+    return A;
+  }
   function pondWarsApp() {
     var A = openApp('pondwars', 'FROGAGEDDON · BETA', 'pondwars', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars-beta.html?embed=1" title="FROGAGEDDON"></iframe>';
@@ -1501,6 +1519,8 @@
     ].concat(FREN ? [
       ['Fren Passport', 'Your Fren, achievements and secrets', 'pep-logo', 'passport profile achievements badges secrets items account', function () { frenPassport(); }],
       ['Create Your Fren', 'Avatar Maker for your Fren Passport', 'fresh-fren', 'avatar maker profile picture face hat outfit glasses look character fresh fren', function () { avatarMaker(); }]
+    ] : []).concat(GOCHI ? [
+      ['PEPEGOCHI.EXE (test)', 'Local rules simulator for the PepeGochi beta', 'pep-logo', 'pepegochi tamagotchi pet frog care feed test beta simulator', function () { pepegochiApp(); }]
     ] : []).map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
     NAV.forEach(function (g) { g[1].forEach(function (p) { L.push({ name: p[1], desc: p[2], icon: p[3], kw: 'page ' + g[0] + ' ' + p[0].replace(/[@\/-]/g, ' '), go: page(p[0]) }); }); });
     ADS.forEach(function (ad, i) { L.push({ name: ad.file, desc: 'PEP-TV ad: ' + ad.title, icon: ad.icon, kw: 'ad ads tv video ' + ad.title, go: function () { adPlayer(i); } }); });
