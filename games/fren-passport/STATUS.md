@@ -45,14 +45,14 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | 16 | `old_frog` | Old Frog | HOOK | hidden | ✅ |
 | 17 | `pepe_guesser` | Pepe Guesser | ON | shown | ✅ Lily |
 | 18 | `sharp_eye` | Sharp Eye | ON | shown | 👀 v3 in #233 (1f1a15bd), waiting for owner OK |
-| 19 | `detective_fren` | Detective Fren | ON | shown | 🔁 303 px |
+| 19 | `detective_fren` | Detective Fren | ON | shown | ✅ full size in #233 (owner-approved) |
 | 20 | `week_scout` | Week Scout | ON | shown | ✅ Lily |
 | 21 | `scout_fren` | Scout Fren | ON | shown | ✅ Lily |
 | 22 | `frog_of_the_week` | Frog of the Week | HOOK + repeat | ??? | ✅ |
 | 23 | `yeet_adept` | Adept | HOOK | hidden | ⬜ |
 | 24 | `nasa_is_hiring` | NASA Is Hiring | ON | shown | 👀 |
 | 25 | `moonwalker` | Moonwalker | ON | shown | ✅ |
-| 26 | `rookie_miner` | Happy Mining! | ON (first cloud save) | shown | ✅ Lily, label edit pending |
+| 26 | `rookie_miner` | Happy Mining! | ON (first cloud save) | shown | 👀 Lily + new label in #233 |
 | 27 | `good_game` | Good Game | HOOK | ??? | ⬜ |
 | 28 | `checkmate` | Checkmate! | HOOK | hidden | ⬜ |
 | 29 | `picasso_fren` | Picasso Fren | NEW | hidden | 🔁 304 px |
@@ -78,7 +78,7 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | — | `bali` | BALI | OWNER | printed on the page | ✅ page; postmark later |
 
 **Totals.** Code: 18 ON · 3 PRINT · 18 HOOK · 2 NEW · 1 OWNER · 6 WAIT = 48.
-Art: 21 ✅ · 6 👀 · 3 🔁 · 1 🔄 · 3 🚧 · 14 ⬜ = 48.
+Art: 21 ✅ · 6 👀 · 3 🔁 · 1 🔄 · 3 🚧 · 14 ⬜ = 48 before today's Detective/Happy Mining update; now 21 ✅ (Detective in, Happy Mining! out until the OK) · 7 👀 · 2 🔁 · 1 🔄 · 3 🚧 · 14 ⬜ = 48.
 
 Note: the stamps marked ON show the old AI art or the category placeholder until their v3 art is cut into the sprite.
 
@@ -90,8 +90,8 @@ PNGs, one stamp per image, 3 variants, checklist, then upload. Scenes come from 
 1. ~~Upload the 4 Priority 1 PNGs~~: done in #233 (commit `1f1a15bd`, 1100–1173 px).
 2. **Owner review** of 6 stamps in #233: `first_fren`, `first_avatar`, `sharp_eye`, `community_fren`, `like_it_here`,
    `nasa_is_hiring`. Fix whatever the owner says.
-3. **`detective_fren` at 900+ px:** same approved scene, no redesign. It is shown on launch day.
-4. **`rookie_miner`:** the "Happy Mining!" label on Lily's art (preview exists; deliver the final PNG).
+3. ~~`detective_fren` at full size~~: done, owner-approved, in #233 (`252145b1`).
+4. ~~`rookie_miner` label~~: done by Claude on Lily's art, in #233, waiting for owner OK.
 5. **The 4 teasers next** (they appear as `???` first and go live next): `good_game` (⬜, a game played to the end, no white
    flag). `certified_fren`, `frog_of_the_week` and `the_secret_pond` only need QA, except `the_secret_pond`, which needs 900+ px.
 6. **Next hook stamps:** `i_voted` (finish at 900+ px), `yeet_adept`, `checkmate`, `fud_buster`, `long_snake`,
