@@ -1,0 +1,210 @@
+{
+  "version": "v3",
+  "date": "2026-11-08",
+  "source_spec_pr": 231,
+  "older_ai_concepts_pr": 230,
+  "summary": {
+    "lily_existing": 15,
+    "ai_older_optional": 4,
+    "new_stamps_to_draw": 29,
+    "main_page_new": 10,
+    "batch2": 2,
+    "batch3": 12,
+    "batch4": 5,
+    "label_edit": 1,
+    "special_avatars": 4,
+    "wallpaper": 1,
+    "bali_postmark": 1,
+    "optional_hosts": 2
+  },
+  "existing": {
+    "lily": [
+      "pond_pioneer",
+      "welcome_back",
+      "pepe_guesser",
+      "week_scout",
+      "scout_fren",
+      "first_words",
+      "hey_fren",
+      "dear_editor",
+      "junior_editor",
+      "senior_editor",
+      "rookie_miner",
+      "first_hatch",
+      "little_fren",
+      "grown_fren",
+      "streak_14"
+    ],
+    "ai230": [
+      "first_fren",
+      "first_avatar",
+      "sharp_eye",
+      "community_fren"
+    ]
+  },
+  "pending": {
+    "batch1": [
+      "frog_of_the_week",
+      "season_champion",
+      "vox_populi",
+      "moonwalker",
+      "certified_fren",
+      "old_frog",
+      "the_secret_pond",
+      "detective_fren",
+      "picasso_fren",
+      "good_parent"
+    ],
+    "batch2": [
+      "like_it_here",
+      "nasa_is_hiring"
+    ],
+    "batch3": [
+      "i_voted",
+      "yeet_adept",
+      "good_game",
+      "checkmate",
+      "podium",
+      "game_night",
+      "top_ten",
+      "arcade_hopper",
+      "quiz_master",
+      "bug_hunter",
+      "fud_buster",
+      "long_snake"
+    ],
+    "batch4": [
+      "interior_designer",
+      "secret_starter",
+      "treasure_hunter",
+      "frogageddon_beta",
+      "frogmas"
+    ],
+    "rename_only": {
+      "id": "rookie_miner",
+      "new_label": "Happy Mining!"
+    }
+  },
+  "art": [
+    {
+      "id": "frog_of_the_week",
+      "file": "games/fren-passport/source/stamps-new/frog_of_the_week.png",
+      "width": 1173,
+      "height": 1341,
+      "git_blob_sha": "403353c299c7787d6175ca031642e6d178678936",
+      "owner_review": "owner-favorite; good reference",
+      "remaining_work": "review alignment and 78px readability",
+      "production_ready": false
+    },
+    {
+      "id": "moonwalker",
+      "file": "games/fren-passport/source/stamps-new/moonwalker.png",
+      "width": 1173,
+      "height": 1341,
+      "git_blob_sha": "7013365e65a983afb2bfbbd3d1c768261a0acdf9",
+      "owner_review": "owner-favorite; good reference",
+      "remaining_work": "check 6000m sign and real YEET pilot costume",
+      "production_ready": false
+    },
+    {
+      "id": "vox_populi",
+      "file": "games/fren-passport/source/stamps-new/vox_populi.png",
+      "width": 1173,
+      "height": 1341,
+      "git_blob_sha": "77f4af009ecca7f5c6d5411c9837c0dfac118779",
+      "owner_review": "candidate",
+      "remaining_work": "final check: soapbox, GAZETTE, no ballot box or unrelated writing",
+      "production_ready": false
+    },
+    {
+      "id": "certified_fren",
+      "file": "games/fren-passport/source/stamps-new/certified_fren.png",
+      "width": 1173,
+      "height": 1341,
+      "git_blob_sha": "f50f2700f369b67d238bae6e329ea55d2a8bafbd",
+      "owner_review": "candidate",
+      "remaining_work": "final check: framed 100 certificate; no P hoodie",
+      "production_ready": false
+    },
+    {
+      "id": "old_frog",
+      "file": "games/fren-passport/source/stamps-new/old_frog.png",
+      "width": 1173,
+      "height": 1341,
+      "git_blob_sha": "4640f7db289d2e8bb8adbbd2120149315ce70a21",
+      "owner_review": "candidate",
+      "remaining_work": "final check: cane, rocker, one candle",
+      "production_ready": false
+    },
+    {
+      "id": "good_parent",
+      "file": "games/fren-passport/source/stamps-new/good_parent.png",
+      "width": 1173,
+      "height": 1341,
+      "git_blob_sha": "2131254f5e82691a9ad832a3a9e1bc54908da9cd",
+      "owner_review": "owner-preferred humorous direction",
+      "remaining_work": "30-day survival: surprised parent, happy living PepeGochi; absolutely NO hearts",
+      "production_ready": false
+    },
+    {
+      "id": "detective_fren",
+      "file": "games/fren-passport/stamps-review/art-v3-wip/detective_fren.png",
+      "width": 303,
+      "height": 457,
+      "git_blob_sha": "349c344bef657892afab5f3f918700ee519157e6",
+      "owner_review": "owner accepted illustrated concept; LOW RES",
+      "remaining_work": "redraw >=900px: tied map pin and real photo, Maker hat/suit/tie",
+      "production_ready": false
+    },
+    {
+      "id": "the_secret_pond",
+      "file": "games/fren-passport/stamps-review/art-v3-wip/the_secret_pond.png",
+      "width": 300,
+      "height": 458,
+      "git_blob_sha": "3b87d8de03768b93d00c296c557061063197f739",
+      "owner_review": "owner accepted illustrated concept; LOW RES",
+      "remaining_work": "redraw >=900px: 6 visibly joined torn map pieces, X, pond, blank sign",
+      "production_ready": false
+    },
+    {
+      "id": "picasso_fren",
+      "file": "games/fren-passport/stamps-review/art-v3-wip/picasso_fren.png",
+      "width": 304,
+      "height": 458,
+      "git_blob_sha": "ef5b4a332c41cdc919aab4788740579c68aaaae8",
+      "owner_review": "owner accepted illustrated concept; LOW RES",
+      "remaining_work": "redraw >=900px: silly SUN on canvas and green tick in bubble",
+      "production_ready": false
+    },
+    {
+      "id": "season_champion",
+      "file": "games/fren-passport/stamps-review/art-v3-wip/season_champion.png",
+      "width": 310,
+      "height": 424,
+      "git_blob_sha": "c37049b3ae64f4f900417fd2064e3c4f63a53203",
+      "owner_review": "PREVIOUS ART REJECTED",
+      "remaining_work": "new unique Pepe Pictures season champion scene, not generic #1 cup; no final asset",
+      "production_ready": false
+    }
+  ],
+  "other_required": [
+    "special_yeet_pilot",
+    "special_graduate",
+    "special_parent",
+    "special_archivist",
+    "wall-secret-pond.png",
+    "bali-postmark.png"
+  ],
+  "optional": [
+    "host-shop.png",
+    "host-quiz.png",
+    "4 PR230 concept redraws"
+  ],
+  "warnings": [
+    "Not production; no SQL; v3 48 stamps vs main catalog 46 achievements",
+    "WIP 3 low-resolution concepts do not meet 900px sources",
+    "season_champion previous artwork rejected",
+    "Good Parent no hearts, 30-day PepeGochi survival",
+    "Current production page 5x4 vs proposed 4x3"
+  ]
+}
