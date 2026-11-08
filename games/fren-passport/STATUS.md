@@ -1,6 +1,6 @@
 # Fren Passport: status (one place, kept up to date)
 
-Last update: 2026-11-08, Claude. Update this file in every Passport PR.
+Last update: 2026-11-08 15:30, Claude. Update this file in every Passport PR.
 
 - **Rules for each stamp:** `games/FREN_PASSPORT_RECONCILIATION_2026-11-08.md`
 - **Art rules for ChatGPT:** PR #231 spec + `games/fren-passport/GPT_STAMP_BRIEF_2026-11-08.md`
@@ -27,13 +27,13 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 
 | # | ID | Label | Code | Album | Art |
 |---:|---|---|---|---|---|
-| 1 | `first_fren` | First Fren | ON | shown | 📤 v3 redraw (old AI concept on the page today) |
+| 1 | `first_fren` | First Fren | ON | shown | 👀 v3 in #233 (1f1a15bd), waiting for owner OK |
 | 2 | `pond_pioneer` | Pond Pioneer | ON | shown | ✅ Lily |
-| 3 | `first_avatar` | Fresh Fren | ON | shown | 📤 v3 redraw |
+| 3 | `first_avatar` | Fresh Fren | ON | shown | 👀 v3 in #233 (1f1a15bd), waiting for owner OK |
 | 4 | `welcome_back` | Welcome Back! | ON | shown | ✅ Lily |
 | 5 | `first_words` | First Words | ON | shown | ✅ Lily |
 | 6 | `hey_fren` | Hey @Fren | ON | shown | ✅ Lily |
-| 7 | `community_fren` | Community Fren | ON | shown | 📤 v3 redraw |
+| 7 | `community_fren` | Community Fren | ON | shown | 👀 v3 in #233 (1f1a15bd), waiting for owner OK |
 | 8 | `dear_editor` | Dear Editor | ON | shown | ✅ Lily |
 | 9 | `junior_editor` | Junior Editor | PRINT | hidden | ✅ Lily |
 | 10 | `senior_editor` | Senior Editor | PRINT | hidden | ✅ Lily |
@@ -44,7 +44,7 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | 15 | `certified_fren` | Certified Fren | HOOK | ??? | ✅ |
 | 16 | `old_frog` | Old Frog | HOOK | hidden | ✅ |
 | 17 | `pepe_guesser` | Pepe Guesser | ON | shown | ✅ Lily |
-| 18 | `sharp_eye` | Sharp Eye | ON | shown | 📤 v3 redraw |
+| 18 | `sharp_eye` | Sharp Eye | ON | shown | 👀 v3 in #233 (1f1a15bd), waiting for owner OK |
 | 19 | `detective_fren` | Detective Fren | ON | shown | 🔁 303 px |
 | 20 | `week_scout` | Week Scout | ON | shown | ✅ Lily |
 | 21 | `scout_fren` | Scout Fren | ON | shown | ✅ Lily |
@@ -78,15 +78,15 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | — | `bali` | BALI | OWNER | printed on the page | ✅ page; postmark later |
 
 **Totals.** Code: 18 ON · 3 PRINT · 18 HOOK · 2 NEW · 1 OWNER · 6 WAIT = 48.
-Art: 21 ✅ · 2 👀 · 4 📤 · 3 🔁 · 1 🔄 · 3 🚧 · 14 ⬜ = 48.
+Art: 21 ✅ · 6 👀 · 3 🔁 · 1 🔄 · 3 🚧 · 14 ⬜ = 48.
 
 Note: the stamps marked ON show the old AI art or the category placeholder until their v3 art is cut into the sprite.
 
 ## 3. ChatGPT: what to do next (in this order)
 
-1. **Upload** the 4 finished PNGs to #233 (`games/fren-passport/source/stamps-new/`): `first_fren`, `first_avatar`,
-   `sharp_eye`, `community_fren`. Right now they exist only in the ChatGPT chat.
-2. **Owner review** of `like_it_here` and `nasa_is_hiring` (already in #233). Fix whatever the owner says.
+1. ~~Upload the 4 Priority 1 PNGs~~: done in #233 (commit `1f1a15bd`, 1100–1173 px).
+2. **Owner review** of 6 stamps in #233: `first_fren`, `first_avatar`, `sharp_eye`, `community_fren`, `like_it_here`,
+   `nasa_is_hiring`. Fix whatever the owner says.
 3. **`detective_fren` at 900+ px:** same approved scene, no redesign. It is shown on launch day.
 4. **`rookie_miner`:** the "Happy Mining!" label on Lily's art (preview exists; deliver the final PNG).
 5. **The 4 teasers next** (they appear as `???` first and go live next): `good_game` (⬜, a game played to the end, no white
