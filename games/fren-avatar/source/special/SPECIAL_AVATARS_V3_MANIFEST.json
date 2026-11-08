@@ -1,0 +1,79 @@
+{
+  "version": 3,
+  "kind": "special_avatars",
+  "reference_pr": 231,
+  "art_review_pr": 233,
+  "status": "candidate_not_integrated",
+  "date": "2026-11-08",
+  "design": {
+    "shape": "head_and_shoulders",
+    "transparent_background": true,
+    "original_geometry": [
+      512,
+      512
+    ],
+    "export_pixels": [
+      1024,
+      1024
+    ],
+    "style": "classic flat-color Pepe, shared facial geometry",
+    "portrait_covers_normal_avatar_layers": true,
+    "background_unaffected": true
+  },
+  "characters": [
+    {
+      "id": "special_yeet_pilot",
+      "unlocks_with_achievement": "Moonwalker",
+      "unlock_id": "moonwalker",
+      "png": "games/fren-avatar/source/special/special_yeet_pilot.png",
+      "svg_source": "games/fren-avatar/source/special/special_yeet_pilot.svg",
+      "png_git_blob_sha": "ed105c6570a9cc05fa6bedcbb725f34b37cb2497",
+      "svg_git_blob_sha": "7bd73f594e0b74f46b58612f6d11744dc9f80ff0",
+      "owner_approved": false,
+      "production_integrated": false
+    },
+    {
+      "id": "special_graduate",
+      "unlocks_with_achievement": "Certified Fren",
+      "unlock_id": "certified_fren",
+      "png": "games/fren-avatar/source/special/special_graduate.png",
+      "svg_source": "games/fren-avatar/source/special/special_graduate.svg",
+      "png_git_blob_sha": "d49aadc8d22ff86645cd7a8ca36ef523e39824a3",
+      "svg_git_blob_sha": "fbbcfe9abda5cb2e9740c38970f5be3e605685cd",
+      "owner_approved": false,
+      "production_integrated": false
+    },
+    {
+      "id": "special_parent",
+      "unlocks_with_achievement": "Good Parent",
+      "unlock_id": "good_parent",
+      "png": "games/fren-avatar/source/special/special_parent.png",
+      "svg_source": "games/fren-avatar/source/special/special_parent.svg",
+      "png_git_blob_sha": "14effd2e74646d4d69c1a3aad9f9c8f9ee2d1995",
+      "svg_git_blob_sha": "e7565329a2eae44fa5faa8da2b1e48b1b253eea9",
+      "owner_approved": false,
+      "production_integrated": false
+    },
+    {
+      "id": "special_archivist",
+      "unlocks_with_achievement": "The Secret Pond",
+      "unlock_id": "the_secret_pond",
+      "png": "games/fren-avatar/source/special/special_archivist.png",
+      "svg_source": "games/fren-avatar/source/special/special_archivist.svg",
+      "png_git_blob_sha": "66f8b6f83739f82b52b1af6d590e5bd711aeaa35",
+      "svg_git_blob_sha": "22e94e87779c84fd7099c47c47b7d937c19aa245",
+      "owner_approved": false,
+      "production_integrated": false
+    }
+  ],
+  "qc": {
+    "all_files_created": true,
+    "all_pngs_1024x1024": true,
+    "all_pngs_rgba_transparent": true,
+    "svg_sources_editable": true,
+    "real_browser_avatar_maker_test": false,
+    "compared_pixel_for_pixel_with_Lily_reference": false
+  },
+  "changes_to_game_logic": false,
+  "changes_to_supabase": false
+}
