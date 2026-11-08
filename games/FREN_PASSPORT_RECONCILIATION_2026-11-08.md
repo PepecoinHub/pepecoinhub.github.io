@@ -53,7 +53,7 @@ leaderboards today. Fine for a cosmetic stamp, never for anything of value.
 | 13 | `streak_14` | 14-Day Streak | PondOS opened on 14 UTC days in a row | `passport_days` | CODED | Lily ✓ |
 | 14 | `like_it_here` | 30-Day Streak | PondOS opened on 30 UTC days in a row | `passport_days` | CODED (label changes only) | B2 candidate (hi-res) |
 | 15 | `certified_fren` | Certified Fren | Active on 100 different UTC days | `passport_days` count | HOOK (in checkin) | B1 hi-res candidate, gold |
-| 16 | `old_frog` | Old Frog | One year since joining (see decision 7) | `auth.users.created_at` or first `passport_days` | HOOK (in checkin) | B1 hi-res candidate |
+| 16 | `old_frog` | Old Frog | One year since the first Discord log-on to PepecoinHub | the Discord identity's creation time (`auth.identities`) | HOOK (in checkin) | B1 hi-res candidate |
 | 17 | `pepe_guesser` | Pepe Guesser | First guess with a pin | `wp_plays` | CODED | Lily ✓ |
 | 18 | `sharp_eye` | Sharp Eye | First perfect 5000 | `wp_plays` | CODED | AI #230 |
 | 19 | `detective_fren` | Detective Fren | 5000 on 5 different days; unlocks detective hat + suit | `wp_plays` | CODED | B1, accepted, **low-res (303 px)** |
@@ -64,17 +64,17 @@ leaderboards today. Fine for a cosmetic stamp, never for anything of value.
 | 24 | `nasa_is_hiring` | NASA Is Hiring | Three YEET flights over 5000 m | `passport_yeet_5k`; client score | CODED | B2 candidate (hi-res) |
 | 25 | `moonwalker` | Moonwalker | YEET flight of the full 6000 m | `yeet_records`; client score | CODED | B1 hi-res, gold |
 | 26 | `rookie_miner` | Happy Mining! | **First Pepe Miner cloud save** (was: 10 min); unlocks hard hat | `miner_saves` | CODED, RULE CHANGE | Lily ✓, label edit only |
-| 27 | `good_game` | Good Game | Finished a board game (chess, checkers, Connect Four, Sea Battle) against another Discord fren | `tables` (`status`, `result`) + `table_members.verified`; trigger when `result` is set | HOOK | B3 not drawn |
-| 28 | `checkmate` | Checkmate! | Won chess by checkmate against another Discord fren | `tables.reason = 'checkmate'` + winner seat | HOOK | B3 not drawn |
+| 27 | `good_game` | Good Game | Finished a board game (chess, checkers, Connect Four, Sea Battle) against another Discord fren; **a resigned or abandoned game does not count** | `tables` (`status`, `result`) + `table_members.verified`; trigger when `result` is set | HOOK | B3 not drawn |
+| 28 | `checkmate` | Checkmate! | Won chess by checkmate against another Discord fren (a resignation is not a checkmate) | `tables.reason = 'checkmate'` + winner seat | HOOK | B3 not drawn |
 | 29 | `picasso_fren` | Picasso Fren | Other players guessed 10 of your drawings in Draw & Guess | **nothing kept**: Draw & Guess has no ranking and its matches are deleted | NEW DATA (count at turn end) | B1, accepted, **low-res (304 px)** |
-| 30 | `podium` | Podium | Top 3 in a Pepe Pictures game (or Draw & Guess, see decision 6) | Pictures: `results.place ≤ 3` ✓; Draw & Guess: nothing kept | HOOK (Pictures) / NEW DATA (D&G) | B3 not drawn |
-| 31 | `game_night` | Game Night | Played in a scheduled game night | `events.room_code` + `starts_at` matched to `matches`/`results` | HOOK (Pictures nights only) | B3 not drawn |
-| 32 | `season_champion` | Season Champion | #1 when a ranked Pepe Pictures season ends; repeatable | `seasons` + `results.points` | HOOK + REPEAT | B1, **reference only, must be redrawn**, gold |
+| 30 | `podium` | Podium | Top 3 in a Pepe Pictures game (**Pepe Pictures only**) | `results.place ≤ 3` | HOOK | B3 not drawn |
+| 31 | `game_night` | Game Night | Played in a scheduled Pepe Pictures game night | `events.room_code` + `starts_at` matched to `matches`/`results` | HOOK (Pictures nights only) | B3 not drawn |
+| 32 | `season_champion` | Season Champion | #1 when a ranked Pepe Pictures season ends (held once, not repeated) | `seasons` + `results.points` | HOOK | B1, **reference only, must be redrawn**, gold |
 | 33 | `quiz_master` | Quiz Master | Hosted a Pepe Pictures game with at least 4 ranked players | `rooms.host_id` at game end (host is not in `results`) | HOOK (in the game-end function) | B3 not drawn |
-| 34 | `top_ten` | Top 10 | A place in a LEADERS top 10 (see decision 2) | each leaderboard, checked when a score is saved | HOOK (one per board) | B3 WIP (384 px) |
+| 34 | `top_ten` | Top 10 | Top 10 on one of: Pepe Guesser week board, YEET board, Pepe Pictures season ranking; checked when the score is saved, kept after dropping out | `gry_wp_top('week')`, `yeet_records`, `gry_ranking('season')` | HOOK (three places) | B3 WIP (384 px) |
 | 35 | `arcade_hopper` | Arcade Hopper | A server-recorded play in 5 different games; unlocks headphones | `yeet_records`, `wp_plays`, `arcade_scores` (fud, snake), `miner_saves`, `results`, `tables` | HOOK | B3 not drawn |
-| 36 | `fud_buster` | FUD Buster | FUD Invaders score ≥ X (owner picks X) | `arcade_scores` (`game='fud'`, `verified`); client score | HOOK | B3 not drawn |
-| 37 | `long_snake` | Long Snake | PEP Snake score ≥ X (owner picks X) | `arcade_scores` (`game='snake'`); client score | HOOK | B3 not drawn |
+| 36 | `fud_buster` | FUD Buster | FUD Invaders score of **2,000** or more (about 8 full waves) | `arcade_scores` (`game='fud'`, `verified`); client score | HOOK | B3 not drawn |
+| 37 | `long_snake` | Long Snake | PEP Snake score of **40 blocks** or more | `arcade_scores` (`game='snake'`); client score | HOOK | B3 not drawn |
 | 38 | `bug_hunter` | Bug Hunter | Reported a real bug that got fixed | owner decision | OWNER | B3 WIP (384 px) |
 | 39 | `frogageddon_beta` | Beta Tester | Played an online FROGAGEDDON match during the beta | FROGAGEDDON online matches are not stored on `main` | BLOCKED | B4 not drawn |
 | 40 | `first_hatch` | First Hatch | First PepeGochi adopted | PepeGochi backend is only on branch `codex/pepegochi-secure-backend-v1` | BLOCKED | Lily ✓ |
@@ -85,7 +85,7 @@ leaderboards today. Fine for a cosmetic stamp, never for anything of value.
 | 45 | `secret_starter` | Secret Starter | First secret found | `passport_secrets` count, in `gry_passport_discover` | HOOK | B4 not drawn |
 | 46 | `treasure_hunter` | Treasure Hunter | 6 secrets found (was: 10) | `passport_secrets` count | HOOK, **but only 3 secrets exist** | B4 not drawn |
 | 47 | `the_secret_pond` | The Secret Pond | All 6 map pieces of the Lost Pond Files | the map pieces are not built | NEW DATA | B1, accepted, **low-res (300 px)**, gold |
-| 48 | `frogmas` | Frogmas | Active on 24–26 December (UTC); repeatable yearly | `passport_days` | HOOK + REPEAT | B4 not drawn |
+| 48 | `frogmas` | Frogmas | Active on 24–26 December (UTC); held once, not repeated | `passport_days` | HOOK | B4 not drawn |
 | — | `bali` | BALI | PEP reaches $0.01 | the server has no PEP price; the owner flips it once | OWNER (global) | exists; postmark to draw |
 
 ### Count by status
@@ -135,12 +135,11 @@ they are a HOOK. They are **not ready for integration**: no hook is written and 
 ### Things the current database cannot do yet
 
 1. **Repeatable stamps.** `passport_badges` has primary key `(user_id, badge_id)`, so a stamp can be held once.
-   `frog_of_the_week`, `season_champion` (×2, ×3) and `frogmas` (yearly) need a `times` column or a small
-   `passport_badge_wins` table.
+   Only `frog_of_the_week` repeats (owner decision), so it alone needs a `times` counter column.
 2. **"Printed in the Gazette"** is not stored. `letters.print_ok` is only the writer's permission. Needed:
    `letters.printed_at` and an owner-only button in "Letters to you". Blocks 3 stamps (9, 10, 11).
-3. **Draw & Guess keeps nothing** after the game (no ranking by design, its matches are deleted). `picasso_fren`
-   and the Draw & Guess half of `podium` need new counting at turn/game end.
+3. **Draw & Guess keeps nothing** after the game (no ranking by design, its matches are deleted). Only
+   `picasso_fren` needs new counting at turn end (Podium and Game Night are Pepe Pictures only).
 4. **Owner grant function.** `bug_hunter` (and BALI) need one owner-only RPC, checked with `games.is_owner()`.
 
 ### Farming and trust (cosmetic stamps, but worth closing the obvious holes)
@@ -152,19 +151,21 @@ they are a HOOK. They are **not ready for integration**: no hook is written and 
 - Secrets: the repo is public, so a secret found by reading `meme.js` can be claimed directly. The earlier
   proposal (a password drawn in a picture, checked as a hash on the server) still stands for the new secrets.
 
-## Owner decisions needed (short)
+## Owner decisions (answered 2026-11-08)
 
-1. **FUD Buster / Long Snake:** the score X for each. (Claude can suggest numbers from the current top scores once
-   it can read them.)
-2. **Top 10:** which boards count. Suggestion: YEET, Pepe Guesser (all time), FUD, Snake, Miner, Pepe Pictures
-   season. Checked at the moment the score is saved, so a later drop out of the top 10 does not remove it.
-3. **Good Game:** does a resignation or abandoned game count? Suggested minimum game length above.
-4. **Printed letters:** OK to add a "Printed" button in your inbox that marks a letter as printed?
-5. **Repeatable stamps:** confirm the ×2/×3 counter for Frog of the Week, Season Champion and Frogmas (needs the
-   schema change above).
-6. **Podium / Game Night:** Pepe Pictures only for now, or also build Draw & Guess counting?
-7. **Old Frog:** counted from the Discord link to PepecoinHub (account creation) or from the first PondOS day?
-8. **Treasure Hunter / The Secret Pond:** keep them as `???` until 6 secrets and the 6 map pieces exist.
+1. **FUD Buster / Long Snake:** owner asked Claude to set a real challenge. FUD Buster = **2,000** points (FUD scores 10
+   per receipt hit, 240 per wave, and each wave is faster, so that is about 8 cleared waves). Long Snake = **40 blocks**
+   (the board is 20×15 and the snake reaches top speed after about 17 blocks). Revisit after a month of real scores.
+2. **Top 10:** Pepe Guesser and YEET, plus (Claude's pick) the Pepe Pictures season ranking. Pepe Guesser uses the
+   **week** board (the day board is too easy, all-time too closed to new players). FUD and Snake have their own stamps.
+3. **Good Game:** a resigned or abandoned game does not count. Claude adds a minimum length so instant draws don't
+   count either.
+4. **Printed letters:** yes, add `letters.printed_at` and a "Printed" button in the owner's inbox.
+5. **Repeatable:** only **Frog of the Week** repeats (×2, ×3 drawn by the UI). Season Champion and Frogmas are held once.
+6. **Podium / Game Night:** Pepe Pictures only. No Draw & Guess counting for these.
+7. **Old Frog:** one year from the first Discord log-on to PepecoinHub.
+8. **`???`:** only **a few** locked teaser slots (3 to 4), so players know more is coming. Stamps that cannot be
+   earned yet are otherwise **hidden**, not shown as a wall of `???`.
 
 ## Suggested order of work (each step a separate, small PR)
 
@@ -174,10 +175,11 @@ they are a HOOK. They are **not ready for integration**: no hook is written and 
 2. **Cheap hooks on existing data:** `i_voted`, `yeet_adept`, `certified_fren`, `old_frog`, `secret_starter`,
    `good_game`, `checkmate`, `fud_buster`, `long_snake`, `arcade_hopper`.
 3. **Owner tools:** `letters.printed_at` + button (unlocks 9, 10, 11) and the owner grant RPC (38, BALI).
-4. **Weekly/season/repeat:** `times` column, then `frog_of_the_week`, `season_champion`, `frogmas`, `podium`,
+4. **Weekly/season:** `times` column for `frog_of_the_week`, then `season_champion`, `frogmas`, `podium`,
    `game_night`, `quiz_master`, `top_ten`.
 5. **Later, with their features:** PepeGochi (40–44), FROGAGEDDON online (39), Draw & Guess counting (29),
    map pieces and more secrets (46, 47).
 
-Art can continue in parallel: nothing above changes which 48 stamps exist. The UI shows `???` for every stamp that
-is not yet earnable, whether or not its picture is ready.
+Art can continue in parallel: nothing above changes which 48 stamps exist. The album shows earnable stamps and only
+3 to 4 `???` teasers; the rest stay hidden until they can be earned. ChatGPT's art brief:
+`games/fren-passport/GPT_STAMP_BRIEF_2026-11-08.md`.
