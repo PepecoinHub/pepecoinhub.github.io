@@ -63,7 +63,7 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | 34 | `top_ten` | Top 10 | HOOK | hidden | 🚧 384 px |
 | 35 | `arcade_hopper` | Arcade Hopper | HOOK | hidden | ⬜ |
 | 36 | `fud_buster` | FUD Buster | HOOK | hidden | ✅ in #233 (owner-approved) |
-| 37 | `long_snake` | Long Snake | HOOK | hidden | ⬜ |
+| 37 | `long_snake` | Long Snake | HOOK | hidden | ✅ in #233 (owner-approved) |
 | 38 | `bug_hunter` | Bug Hunter | OWNER | hidden | 🚧 384 px |
 | 39 | `frogageddon_beta` | Beta Tester | WAIT | hidden | ⬜ (later) |
 | 40 | `first_hatch` | First Hatch | WAIT (PepeGochi) | hidden | ✅ Lily |
