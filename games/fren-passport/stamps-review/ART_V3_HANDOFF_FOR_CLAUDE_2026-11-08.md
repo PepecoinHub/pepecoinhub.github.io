@@ -5,7 +5,7 @@
 ## What is actually in this PR
 
 - Six source-format PNGs in `games/fren-passport/source/stamps-new/`, each **1173×1341 px**, with transparency, cream perforated paper, grey label, and hand-drawn look. These are **not automatically production approved**; some need art QA.
-- Four **WIP reference cutouts**, each only around 300×450 px, isolated under `games/fren-passport/stamps-review/art-v3-wip/`. Three depicted scenes were liked/accepted by owner **as concepts**, not as production-resolution sources; the fourth (`season_champion`) is **rejected for composition**.
+- Four **WIP reference cutouts**, each only around 300×450 px, isolated under `games/fren-passport/stamps-review/art-v3-wip/`. All ten featured-stamp illustrations were **accepted visually by the owner on 2026-11-08**. Four WIP cutouts remain low-resolution as files, but the owner requested no further redesign.
 - `games/fren-passport/stamps-review/art-v3-overview.jpg`: a contact sheet, expressly for review only.
 - `ART_V3_INVENTORY_2026-11-08.json`: all IDs, statuses, missing work and image paths.
 
@@ -21,16 +21,18 @@
 | `certified_fren` | `source/stamps-new/` | 1173×1341 | candidate | final check: framed 100 certificate; no P hoodie |
 | `old_frog` | `source/stamps-new/` | 1173×1341 | candidate | final check: cane, rocker, one candle |
 | `good_parent` | `source/stamps-new/` | 1173×1341 | owner-preferred humorous direction | 30-day survival: surprised parent, happy living PepeGochi; absolutely NO hearts |
-| `detective_fren` | `stamps-review/art-v3-wip/` | 303×457 | owner accepted illustrated concept; LOW RES | redraw >=900px: tied map pin and real photo, Maker hat/suit/tie |
-| `the_secret_pond` | `stamps-review/art-v3-wip/` | 300×458 | owner accepted illustrated concept; LOW RES | redraw >=900px: 6 visibly joined torn map pieces, X, pond, blank sign |
-| `picasso_fren` | `stamps-review/art-v3-wip/` | 304×458 | owner accepted illustrated concept; LOW RES | redraw >=900px: silly SUN on canvas and green tick in bubble |
-| `season_champion` | `stamps-review/art-v3-wip/` | 310×424 | PREVIOUS ART REJECTED | new unique Pepe Pictures season champion scene, not generic #1 cup; no final asset |
+| `detective_fren` | `stamps-review/art-v3-wip/` | 303×457 | owner accepted illustrated concept; LOW RES | source 900px requirement not met; preserve accepted scene: tied map pin and real photo, Maker hat/suit/tie |
+| `the_secret_pond` | `stamps-review/art-v3-wip/` | 300×458 | owner accepted illustrated concept; LOW RES | source 900px requirement not met; preserve accepted scene: 6 visibly joined torn map pieces, X, pond, blank sign |
+| `picasso_fren` | `stamps-review/art-v3-wip/` | 304×458 | owner accepted illustrated concept; LOW RES | source 900px requirement not met; preserve accepted scene: silly SUN on canvas and green tick in bubble |
+| `season_champion` | `stamps-review/art-v3-wip/` | 310×424 | owner approved concept on 2026-11-08; low resolution | one unique Pepe Pictures season winner; technical build QA only unless owner requests visual change |
+
+The owner approved all 10 featured images without further visual corrections. This approval is about *illustrations*, not source resolution, browser verification, SQL or deployment.
 
 The 12 featured slots are a **4×3 design proposal** described in PR #231, not an already implemented UI. The two unchanged Lily assets in those slots are `pond_pioneer` and `scout_fren`. Current `main` still uses 5×4 slots: layout needs a separate code PR.
 
 ## Owner's specific decisions that override older example art
 
-1. The visual baseline is the owner's preferred detailed, slightly irregular cartoon stamps `frog_of_the_week` and `moonwalker`, not clean geometric SVGs and **not** the old AI concepts in #230.
+1. The owner approved the ten main-page compositions on 2026-11-08. The visual baseline is the owner's preferred detailed, slightly irregular cartoon stamps `frog_of_the_week` and `moonwalker`, not clean geometric SVGs and **not** the old AI concepts in #230.
 2. `moonwalker`: actual YEET pilot, **red helmet with goggles, blue shirt, grey shorts and red sneakers**. No astronaut suit.
 3. `good_parent`: 30 days of PepeGochi surviving. Comic disbelief, the relieved adult and a thriving froglet. **No hearts.** This explicitly updates the scene described in §9 of the v3 spec.
 4. `season_champion`: **one winner of the entire Pepe Pictures season**. Previous near-identical generic trophy versions were rejected. The file in `art-v3-wip` is a reference only and must not be shipped.
@@ -63,3 +65,11 @@ Totals in approved spec: **48 regular stamps = 15 Lily + 4 AI + 29 new**, plus s
 ## Safety and project boundaries
 
 This PR adds only art sources + review documents. No edits to `docs/meme/`, games/SQL, Supabase, real rewards, UI scripts or style sheets. No art is wired into live gameplay. This work is reversible and deliberately **Draft**.
+
+## Batch 2 update (2026-11-08)
+
+Two new **review candidates** are in `art-v3-wip/`: `like_it_here.png` (251×438, native sheet crop, light-green background, 30 consecutive days in PondOS with a laptop) and `nasa_is_hiring.png` (1173×1341, manually composited reuse of the accepted red-helmet YEET pilot, 5000m sign and three-check poster). Both require visual signoff and technical QA; neither is final or integrated.
+
+`art-v3-wip/happy_mining_label_only.png` is a **label preview only**, not a replacement for Lily's Rookie Miner illustration. The code build can rewrite the original grey label to exactly `Happy Mining!`. The associated changed award rule requires separate Claude review.
+
+See `BATCH2_HANDOFF_FOR_CLAUDE_2026-11-08.md` and `BATCH2_MANIFEST_2026-11-08.json`. No new game logic, code or awards added.

@@ -92,7 +92,7 @@
       "width": 1173,
       "height": 1341,
       "git_blob_sha": "403353c299c7787d6175ca031642e6d178678936",
-      "owner_review": "owner-favorite; good reference",
+      "owner_review": "accepted visually on 2026-11-08",
       "remaining_work": "review alignment and 78px readability",
       "production_ready": false
     },
@@ -102,7 +102,7 @@
       "width": 1173,
       "height": 1341,
       "git_blob_sha": "7013365e65a983afb2bfbbd3d1c768261a0acdf9",
-      "owner_review": "owner-favorite; good reference",
+      "owner_review": "accepted visually on 2026-11-08",
       "remaining_work": "check 6000m sign and real YEET pilot costume",
       "production_ready": false
     },
@@ -112,7 +112,7 @@
       "width": 1173,
       "height": 1341,
       "git_blob_sha": "77f4af009ecca7f5c6d5411c9837c0dfac118779",
-      "owner_review": "candidate",
+      "owner_review": "accepted visually on 2026-11-08",
       "remaining_work": "final check: soapbox, GAZETTE, no ballot box or unrelated writing",
       "production_ready": false
     },
@@ -122,7 +122,7 @@
       "width": 1173,
       "height": 1341,
       "git_blob_sha": "f50f2700f369b67d238bae6e329ea55d2a8bafbd",
-      "owner_review": "candidate",
+      "owner_review": "accepted visually on 2026-11-08",
       "remaining_work": "final check: framed 100 certificate; no P hoodie",
       "production_ready": false
     },
@@ -132,7 +132,7 @@
       "width": 1173,
       "height": 1341,
       "git_blob_sha": "4640f7db289d2e8bb8adbbd2120149315ce70a21",
-      "owner_review": "candidate",
+      "owner_review": "accepted visually on 2026-11-08",
       "remaining_work": "final check: cane, rocker, one candle",
       "production_ready": false
     },
@@ -142,7 +142,7 @@
       "width": 1173,
       "height": 1341,
       "git_blob_sha": "2131254f5e82691a9ad832a3a9e1bc54908da9cd",
-      "owner_review": "owner-preferred humorous direction",
+      "owner_review": "accepted visually on 2026-11-08",
       "remaining_work": "30-day survival: surprised parent, happy living PepeGochi; absolutely NO hearts",
       "production_ready": false
     },
@@ -152,8 +152,8 @@
       "width": 303,
       "height": 457,
       "git_blob_sha": "349c344bef657892afab5f3f918700ee519157e6",
-      "owner_review": "owner accepted illustrated concept; LOW RES",
-      "remaining_work": "redraw >=900px: tied map pin and real photo, Maker hat/suit/tie",
+      "owner_review": "accepted visually on 2026-11-08",
+      "remaining_work": "Native source below 900px; owner approves visible composition. Any build-quality reproduction must preserve it; no unsolicited redesign.",
       "production_ready": false
     },
     {
@@ -162,8 +162,8 @@
       "width": 300,
       "height": 458,
       "git_blob_sha": "3b87d8de03768b93d00c296c557061063197f739",
-      "owner_review": "owner accepted illustrated concept; LOW RES",
-      "remaining_work": "redraw >=900px: 6 visibly joined torn map pieces, X, pond, blank sign",
+      "owner_review": "accepted visually on 2026-11-08",
+      "remaining_work": "Native source below 900px; owner approves visible composition. Any build-quality reproduction must preserve it; no unsolicited redesign.",
       "production_ready": false
     },
     {
@@ -172,8 +172,8 @@
       "width": 304,
       "height": 458,
       "git_blob_sha": "ef5b4a332c41cdc919aab4788740579c68aaaae8",
-      "owner_review": "owner accepted illustrated concept; LOW RES",
-      "remaining_work": "redraw >=900px: silly SUN on canvas and green tick in bubble",
+      "owner_review": "accepted visually on 2026-11-08",
+      "remaining_work": "Native source below 900px; owner approves visible composition. Any build-quality reproduction must preserve it; no unsolicited redesign.",
       "production_ready": false
     },
     {
@@ -182,8 +182,38 @@
       "width": 310,
       "height": 424,
       "git_blob_sha": "c37049b3ae64f4f900417fd2064e3c4f63a53203",
-      "owner_review": "PREVIOUS ART REJECTED",
-      "remaining_work": "new unique Pepe Pictures season champion scene, not generic #1 cup; no final asset",
+      "owner_review": "accepted visually on 2026-11-08",
+      "remaining_work": "Native source below 900px; owner approves visible composition. Any build-quality reproduction must preserve it; no unsolicited redesign.",
+      "production_ready": false
+    },
+    {
+      "id": "like_it_here",
+      "file": "games/fren-passport/stamps-review/art-v3-wip/like_it_here.png",
+      "width": 251,
+      "height": 438,
+      "git_blob_sha": "a9ce75500ee7567c958a64bc1fc7621914e6074a",
+      "owner_review": "candidate, not yet owner approved",
+      "remaining_work": "Visual refinement: comfy armchair, slippers, CRT and mug per v3; original source below 900px.",
+      "production_ready": false
+    },
+    {
+      "id": "nasa_is_hiring",
+      "file": "games/fren-passport/stamps-review/art-v3-wip/nasa_is_hiring.png",
+      "width": 1173,
+      "height": 1341,
+      "git_blob_sha": "819b2e282e9d079bebf8b5fff3b619be8731dfad",
+      "owner_review": "candidate, not yet owner approved",
+      "remaining_work": "Refine composite. Red helmet/goggles and blue shirt, 5000m sign, three green checkmarks, no NASA trademark.",
+      "production_ready": false
+    },
+    {
+      "id": "rookie_miner",
+      "file": "games/fren-passport/stamps-review/art-v3-wip/happy_mining_label_only.png",
+      "width": 900,
+      "height": 170,
+      "git_blob_sha": "d348cbb66bd5298ff2eb3f68be7237040dd5539d",
+      "owner_review": "label-only preview",
+      "remaining_work": "Exact text edit on Lily source via build; preserve artwork. Revised cloud-save award rule separate backend task.",
       "production_ready": false
     }
   ],
@@ -206,5 +236,11 @@
     "season_champion previous artwork rejected",
     "Good Parent no hearts, 30-day PepeGochi survival",
     "Current production page 5x4 vs proposed 4x3"
-  ]
+  ],
+  "owner_decision": {
+    "date": "2026-11-08",
+    "featured_ten": "approved visually, no composition corrections requested",
+    "notes": "Keep technical/source resolution and UI checks separate from visual approval"
+  },
+  "batch2_review_image": "games/fren-passport/stamps-review/art-v3-batch2-review.png"
 }
