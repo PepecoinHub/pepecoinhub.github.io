@@ -49,7 +49,7 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | 20 | `week_scout` | Week Scout | ON | shown | ✅ Lily |
 | 21 | `scout_fren` | Scout Fren | ON | shown | ✅ Lily |
 | 22 | `frog_of_the_week` | Frog of the Week | HOOK + repeat | ??? | ✅ |
-| 23 | `yeet_adept` | Adept | HOOK | hidden | ⬜ |
+| 23 | `yeet_adept` | Adept | HOOK | hidden | ✅ in #233 (owner-approved) |
 | 24 | `nasa_is_hiring` | NASA Is Hiring | ON | shown | 👀 |
 | 25 | `moonwalker` | Moonwalker | ON | shown | ✅ |
 | 26 | `rookie_miner` | Happy Mining! | ON (first cloud save) | shown | 👀 Lily + new label in #233 |
