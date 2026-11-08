@@ -32,15 +32,22 @@ test('every live stamp has a server award path, and only live stamps do', () => 
 test('awards come from game records, never from browser arguments', () => {
   // the only new browser RPC takes no arguments
   const rpcs = [...sql.matchAll(/create or replace function public\.([a-z_]+)\(([^)]*)\)/g)].map(x => [x[1], x[2].trim()]);
-  assert.deepEqual(rpcs.map(x => x[0]).sort(), ['gry_passport_checkin', 'gry_passport_state', 'gry_yeet_submit']);
+  assert.deepEqual(rpcs.map(x => x[0]).sort(), ['gry_letter_bug_hunter', 'gry_letter_printed', 'gry_letters', 'gry_passport_bali',
+    'gry_passport_checkin', 'gry_passport_state', 'gry_yeet_submit']);
   assert.equal(rpcs.find(x => x[0] === 'gry_passport_checkin')[1], '');
+  // the owner tools (Printed, Bug Hunter, BALI, the mailbox) refuse everyone but the site owner, first thing
+  for (const f of ['public.gry_letter_printed', 'public.gry_letter_bug_hunter', 'public.gry_passport_bali'])
+    assert.match(fnBody(sql, f), / as \$\$\n(declare[^\n]*\n)?begin\n\s+if not games\.is_owner\(auth\.uid\(\)\) then raise exception/, f);
+  assert.match(fnBody(sql, 'public.gry_letters'), /if not games\.is_owner\(auth\.uid\(\)\) then\s+return null;/);
+  // a letter can be marked printed only when its writer ticked "OK to print"
+  assert.match(fnBody(sql, 'public.gry_letter_printed'), /if not l\.print_ok then raise exception/);
   assert.match(sql, /revoke all on function public\.gry_passport_checkin\(\) from public, anon, authenticated;\ngrant execute on function public\.gry_passport_checkin\(\) to authenticated;/);
   // Discord only, at the single award path
   assert.match(fnBody(sql, 'games.passport_award'), /games\.discord_identity\(u\) is null then return false/);
   assert.match(fnBody(sql, 'games.passport_award'), /on conflict \(user_id, badge_id\) do nothing/);
   // internal helpers are closed to the browser
   assert.match(sql, /revoke all on function games\.passport_award\(uuid, text, timestamptz\)/);
-  for (const t of ['passport_meta', 'passport_yeet_5k', 'passport_days', 'passport_chat_days', 'passport_progress'])
+  for (const t of ['passport_meta', 'passport_yeet_5k', 'passport_days', 'passport_chat_days', 'passport_progress', 'passport_printed'])
     assert.match(sql, new RegExp('alter table games\\.' + t + ' enable row level security'), t);
   // Pepe Guesser counts only Discord-verified plays with a pin
   assert.match(fnBody(sql, 'games.passport_wp_check'), /x\.verified and x\.g_lat is not null/);

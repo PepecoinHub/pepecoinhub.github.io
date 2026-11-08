@@ -127,6 +127,22 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
 .pp-mythic { display: grid; justify-items: center; gap: 4px; margin: 0; padding: 0; background: none; border: 0; }
 .pp-mythic img { width: min(100%, 360px); height: auto; }
 .pp-mythic small { font-size: 11px; color: #5b4628; text-align: center; }
+.pp-mythic-ticket { position: relative; width: min(100%, 360px); }
+.pp-mythic-ticket img { display: block; width: 100%; }
+/* BALI earned: a red postmark stamped over the printed padlock */
+.pp-bali-mark { position: absolute; left: 83%; top: 60%; width: 28%; aspect-ratio: 1; transform: translate(-50%, -50%) rotate(-14deg);
+  display: grid; place-content: center; justify-items: center; gap: 1px; box-sizing: border-box;
+  background: radial-gradient(circle, #f6e3d3 62%, #efd5c1 100%); border: 3px double #b22234; border-radius: 50%;
+  box-shadow: 0 0 0 2px #f6e3d3; color: #b22234;
+  font-family: "Courier New", Courier, monospace; font-weight: 700; line-height: 1; text-align: center; pointer-events: none; }
+.pp-bali-mark b { font-size: clamp(7px, 1.5vw, 11px); letter-spacing: .1em; }
+.pp-bali-mark i { font-style: normal; font-size: clamp(11px, 2.8vw, 20px); letter-spacing: .06em; }
+.pp-bali-mark small { font-size: clamp(6px, 1.1vw, 9px); letter-spacing: .02em; }
+.pp-bali .pp-bali-mark { left: 89%; top: 55%; width: 22%; }
+.pp-bali .pp-bali-mark b { font-size: clamp(5px, .8vw, 8px); }
+.pp-bali .pp-bali-mark i { font-size: clamp(8px, 1.5vw, 14px); }
+.pp-bali .pp-bali-mark small { font-size: clamp(4px, .6vw, 6px); }
+.pp-mythic.is-earned > small { color: #6e2233; font-weight: 600; }
 
 /* Stats */
 .pp-stats { display: grid; gap: 0; margin: 0; max-width: 460px; }

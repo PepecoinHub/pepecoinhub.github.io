@@ -64,14 +64,14 @@
       "title": "Junior Editor",
       "description": "Get your first letter printed in The Pond Gazette.",
       "category": "community",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "senior_editor",
       "title": "Senior Editor",
       "description": "Get 5 of your letters printed in The Pond Gazette.",
       "category": "community",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "vox_populi",
@@ -79,7 +79,7 @@
       "description": "Get 10 of your letters printed in The Pond Gazette.",
       "category": "community",
       "gold": true,
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "i_voted",
@@ -272,9 +272,9 @@
     {
       "id": "bug_hunter",
       "title": "Bug Hunter",
-      "description": "Report a real bug that gets fixed. Given by the editor.",
+      "description": "Report a real bug in a letter to the editor. Given by the editor once it is fixed.",
       "category": "community",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "frogageddon_beta",
@@ -352,10 +352,10 @@
     {
       "id": "bali",
       "title": "BALI",
-      "description": "$0.01 - BALI. A mythic stamp for every fren when Pepecoin reaches $0.01 USD. Server verified; reserved until then.",
+      "description": "$0.01 - BALI. A mythic stamp for every fren when Pepecoin reaches $0.01 USD. The editor opens it on the day, and every fren gets it on their next PondOS visit.",
       "category": "mythic",
       "tier": "mythic",
-      "status": "planned"
+      "status": "live"
     }
   ],
   "secrets": [

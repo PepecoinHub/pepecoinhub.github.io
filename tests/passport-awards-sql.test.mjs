@@ -149,7 +149,7 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     assert.deepEqual(priv, { t1: false, t2: false, t3: false, t4: false, t5: false, f1: false, f2: false, f3: false,
       anon_checkin: false, checkin: true, yeet: true, rls: true });
     await assert.rejects(call(1, "select games.passport_award($1, 'moonwalker') as v", [uid(3)]), /permission denied/);
-    await assert.rejects(db.query("select games.passport_award($1, 'bali')", [uid(3)]), /Unknown passport stamp/);
+    await assert.rejects(db.query("select games.passport_award($1, 'miner_fren')", [uid(3)]), /Unknown passport stamp/);
 
     // --- YEET: three accepted flights over 5000 m; 5000.0 exactly does not count; rate-limited ones do not count
     const cool = u => db.query("update games.yeet_records set last_attempt_at = now() - interval '20 seconds' where user_id = $1", [uid(u)]);
@@ -435,6 +435,69 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     await checkin(52);
     assert.equal(await one("select times from games.passport_badges where user_id = $1 and badge_id = 'frog_of_the_week'", [uid(51)]), 2);
     assert.equal((await call(51, 'select public.gry_passport_state() as v')).achievements.find(a => a.id === 'frog_of_the_week').times, 2);
+
+    // --- owner tools: "Printed" letters, Bug Hunter, BALI (2026-11-09)
+    await addUser(60); await addUser(61); await addUser(62);
+    await db.query("insert into games.owners(discord_id, note) values ('p60', 'test owner')");
+    const letter = async (u, ok, discord = true) => one("insert into games.letters(user_id, name, discord, body, print_ok) values ($1, 'n', $2, 'a letter', $3) returning id as v",
+      [uid(u), discord, ok]);
+    const printed = (by, id, on) => call(by, 'select public.gry_letter_printed($1, $2) as v', [id, on]);
+    const ok61 = []; for (let k = 0; k < 10; k++) ok61.push(await letter(61, true));
+    const no61 = await letter(61, false);
+    await assert.rejects(printed(61, ok61[0], true), /Only the site owner/, 'a fren cannot mark their own letter');
+    await assert.rejects(printed(60, no61, true), /did not tick "OK to print"/);
+    assert.equal((await printed(60, ok61[0], true)).printed_count, 1);
+    await printed(60, ok61[0], true);                        // marking twice counts once
+    assert.ok(await has(61, 'junior_editor')); assert.ok(!(await has(61, 'senior_editor')));
+    for (let k = 1; k < 5; k++) await printed(60, ok61[k], true);
+    assert.ok(await has(61, 'senior_editor')); assert.ok(!(await has(61, 'vox_populi')));
+    for (let k = 5; k < 10; k++) await printed(60, ok61[k], true);
+    assert.ok(await has(61, 'vox_populi'));
+    assert.equal((await printed(60, ok61[9], false)).printed_count, 9, 'a mis-click is undone');
+    assert.ok(!(await has(61, 'vox_populi'))); assert.ok(await has(61, 'senior_editor'));
+    // read letters beyond the newest 2000 are deleted: the printed count stays
+    await db.query('delete from games.letters where id = $1', [ok61[0]]);
+    assert.equal(await one('select count(*)::int as v from games.passport_printed where user_id = $1', [uid(61)]), 9);
+    // a guest's letter can be marked printed, but gives no stamp
+    const g = await letter(4, true, false);
+    assert.equal((await printed(60, g, true)).printed_count, 0);
+    assert.deepEqual(await stamps(4), []);
+    // the owner's mailbox shows the marks; anyone else gets nothing
+    const box = await call(60, 'select public.gry_letters(50) as v');
+    assert.equal(box.letters.find(l => l.id === +ok61[1]).printed, true);
+    assert.equal(box.letters.find(l => l.id === +ok61[9]).printed, false);
+    assert.equal(box.letters.find(l => l.id === +ok61[1]).printed_count, 9);
+    assert.equal(box.bali_open, false);
+    assert.equal(await call(61, 'select public.gry_letters(50) as v'), null);
+    // Bug Hunter: owner only, Discord writers only, and it can be taken back
+    const bug = (by, id, on) => call(by, 'select public.gry_letter_bug_hunter($1, $2) as v', [id, on]);
+    await assert.rejects(bug(61, ok61[1], true), /Only the site owner/);
+    await assert.rejects(bug(60, g, true), /came from a guest/);
+    await bug(60, ok61[1], true);
+    assert.ok(await has(61, 'bug_hunter'));
+    assert.equal((await call(60, 'select public.gry_letters(50) as v')).letters.find(l => l.id === +ok61[2]).bug_hunter, true, 'shown on all their letters');
+    await bug(60, ok61[1], false);
+    assert.ok(!(await has(61, 'bug_hunter')));
+    await bug(60, ok61[1], true);
+    // BALI: closed means nobody gets it; the owner opens it and every Discord fren gets it on the next visit
+    await checkin(62); assert.ok(!(await has(62, 'bali')));
+    await assert.rejects(call(62, 'select public.gry_passport_bali(true) as v'), /Only the site owner/);
+    assert.equal((await call(60, 'select public.gry_passport_bali(true) as v')).bali_open, true);
+    assert.ok(await has(60, 'bali'), 'the owner gets it right away');
+    await checkin(62); assert.ok(await has(62, 'bali'));
+    await checkin(4); assert.ok(!(await has(4, 'bali')), 'guests get nothing');
+    await call(60, 'select public.gry_passport_bali(false) as v');
+    assert.ok(await has(62, 'bali'), 'closing takes nothing back');
+    await checkin(61); assert.ok(!(await has(61, 'bali')), 'closed again: no new awards');
+    // the file runs again: the printed stamps stay, as their count still reaches them
+    await db.query(awards);
+    assert.ok(await has(61, 'senior_editor')); assert.ok(await has(61, 'bug_hunter')); assert.ok(await has(62, 'bali'));
+    const priv2 = (await db.query(`select
+      has_table_privilege('authenticated', 'games.passport_printed', 'SELECT') as t,
+      has_function_privilege('authenticated', 'games.passport_printed_check(uuid)', 'EXECUTE') as f,
+      has_function_privilege('anon', 'public.gry_letter_printed(bigint,boolean)', 'EXECUTE') as anon_printed,
+      has_function_privilege('anon', 'public.gry_passport_bali(boolean)', 'EXECUTE') as anon_bali`)).rows[0];
+    assert.deepEqual(priv2, { t: false, f: false, anon_printed: false, anon_bali: false });
 
     // --- account deletion removes the new rows too
     await db.query('delete from auth.users where id = $1', [uid(3)]);

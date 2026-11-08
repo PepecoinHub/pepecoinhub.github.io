@@ -1618,10 +1618,10 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261109r';
+  var PP_CATALOG = 'passport-catalog.json?v=20261109ed';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261108v3a'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109ed'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1833,9 +1833,14 @@
           grid.appendChild(gc);
         }
         right.appendChild(grid);
-        var baliBtn = el('button', {type:'button',class:'pp-bali','aria-label':'BALI: $0.01 - BALI. Reserved mythic stamp for every fren when Pepecoin reaches $0.01 USD. Locked.',
-          title:'Reserved mythic stamp - awarded by the server when Pepecoin reaches $0.01 USD'});
-        baliBtn.addEventListener('click', baliTouch);
+        var baliE = earnedOf(MYTHIC_ID);
+        var baliBtn = baliE
+          ? el('button', {type:'button',class:'pp-bali is-earned','aria-label':'BALI: $0.01 - BALI. Mythic stamp, earned ' + fmt.date(baliE.earned_at) + '.',
+              title:'BALI - earned ' + fmt.date(baliE.earned_at)})
+          : el('button', {type:'button',class:'pp-bali','aria-label':'BALI: $0.01 - BALI. Reserved mythic stamp for every fren when Pepecoin reaches $0.01 USD. Locked.',
+              title:'Reserved mythic stamp - every fren gets it when Pepecoin reaches $0.01 USD'});
+        if (baliE) baliBtn.appendChild(baliMark(baliE));
+        baliBtn.addEventListener('click', function(){ baliTouch(!!baliE); });
         right.appendChild(baliBtn);
         book.appendChild(right);
 
@@ -1951,11 +1956,16 @@
         });
         sheet.appendChild(album);
         sheet.appendChild(info);
-        var mythic = el('div', {class:'pp-mythic is-locked', role:'button', tabindex:'0', title:'Reserved mythic stamp - awarded by the server when Pepecoin reaches $0.01 USD'});
-        mythic.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); baliTouch(); } });
-        mythic.appendChild(el('img', {src:PP_ART+'bali-ticket.webp'+PP_ART_V, alt:'BALI, $0.01 - BALI. Locked.', width:'310', height:'114', draggable:'false'}));
-        mythic.appendChild(piece('small','','Reserved for every fren when Pepecoin reaches $0.01 USD. Locked until then.'));
-        mythic.addEventListener('click', baliTouch);
+        var mythic = el('div', {class:'pp-mythic ' + (baliE ? 'is-earned' : 'is-locked'), role:'button', tabindex:'0',
+          title: baliE ? 'BALI - earned ' + fmt.date(baliE.earned_at) : 'Reserved mythic stamp - every fren gets it when Pepecoin reaches $0.01 USD'});
+        mythic.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); baliTouch(!!baliE); } });
+        var ticket = el('div', {class:'pp-mythic-ticket'});
+        ticket.appendChild(el('img', {src:PP_ART+'bali-ticket.webp'+PP_ART_V, alt: baliE ? 'BALI, $0.01 - BALI. Earned.' : 'BALI, $0.01 - BALI. Locked.', width:'310', height:'114', draggable:'false'}));
+        if (baliE) ticket.appendChild(baliMark(baliE));
+        mythic.appendChild(ticket);
+        mythic.appendChild(piece('small','', baliE ? 'Pepecoin reached $0.01. Welcome to Bali, fren. Stamped ' + fmt.date(baliE.earned_at) + '.'
+          : 'Reserved for every fren when Pepecoin reaches $0.01 USD. Locked until then.'));
+        mythic.addEventListener('click', function(){ baliTouch(!!baliE); });
         sheet.appendChild(mythic);
         panes[1].appendChild(sheet);
 
@@ -2309,9 +2319,18 @@
   // Only cosmetic, low-stakes discoveries are claimable by a browser.
   // This is intentionally NOT the pathway for YEET Moon Rock or care-day badges.
   // touching the locked BALI stamp: not yet, but it finds the secret "Bali Dreamer" (the straw-hat avatar)
-  function baliTouch() {
-    balloon('Not yet, fren', 'BALI opens when Pepecoin reaches $0.01. Pack the straw hat anyway.', 'gif-045-still');
+  function baliTouch(earned) {
+    if (earned) balloon('BALI!', 'Pepecoin reached $0.01 and you were here for it. Straw hat on, fren.', 'gif-045-still');
+    else balloon('Not yet, fren', 'BALI opens when Pepecoin reaches $0.01. Pack the straw hat anyway.', 'gif-045-still');
     discoverSecret('bali_dreamer');
+  }
+  // the postmark over the BALI ticket once it is earned
+  function baliMark(e) {
+    var m = el('span', {class:'pp-bali-mark','aria-hidden':'true'});
+    m.appendChild(el('b')).textContent = 'ARRIVED';
+    m.appendChild(el('i')).textContent = 'BALI';
+    m.appendChild(el('small')).textContent = new Date(e.earned_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+    return m;
   }
   function discoverSecret(id) {
     if (!FREN) return;
@@ -3261,19 +3280,77 @@
       if (after) after();
       if (!box) { pane.innerHTML = '<p class="hs-note">Only the site owner can open this mailbox.</p>'; return; }
       if (!box.letters.length) { pane.innerHTML = '<div class="letters"><p class="hs-note">No letters yet. When someone writes, the flag on the mailbox goes up.</p></div>'; return; }
-      pane.innerHTML = '<div class="letters">' + box.letters.map(function (l) {
+      // Passport owner tools (only with the Passport beta on, until its migrations run on launch day):
+      // the "Printed" mark (Junior Editor 1, Senior Editor 5, Vox Populi 10), Bug Hunter, and BALI.
+      var tools = function (l) {
+        if (!FREN) return '';
+        var t = '';
+        if (l.print) t += '<button type="button" class="app-btn lt-printed" aria-pressed="' + !!l.printed + '" title="Printed in The Pond Gazette. Counts for Junior Editor (1), Senior Editor (5) and Vox Populi (10).">' +
+          (l.printed ? '✅ Printed' : '🖨 Mark printed') + '</button>';
+        if (l.discord) t += '<button type="button" class="app-btn lt-bug" aria-pressed="' + !!l.bug_hunter + '" title="Give Bug Hunter for a real bug that got fixed.">' +
+          (l.bug_hunter ? '🐞 Bug Hunter ✓' : '🐞 Give Bug Hunter') + '</button>';
+        return t;
+      };
+      var printedNote = function (l) { return l.discord && l.printed_count ? 'Printed letters from this fren: ' + l.printed_count + '. ' : ''; };
+      pane.innerHTML = '<div class="letters">' + (FREN ? '<div class="app-row lt-bali"><span class="grow">BALI mythic stamp: <b>' + (box.bali_open ? 'open' : 'closed') + '</b></span>' +
+          '<button type="button" class="app-btn lt-bali-btn">' + (box.bali_open ? 'Close BALI' : '🏝 Open BALI…') + '</button></div>' : '') + box.letters.map(function (l) {
         return '<details class="lt-item' + (l.read ? '' : ' new') + '" data-id="' + l.id + '"><summary><b>' + (l.discord ? esc(l.name) + ' <span class="hs-ok" title="Discord">✓</span>' : esc(l.name) + ' <small>(guest)</small>') + '</b>' +
           '<small>' + esc(new Date(l.at).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</small>' +
-          (l.print ? '<span class="lt-tag">🖨 OK to print</span>' : '') + '<span class="lt-peek">' + esc(l.body.slice(0, 70)) + '</span></summary>' +
-          '<p class="lt-text">' + esc(l.body) + '</p><p class="hs-note">' + (l.page ? 'Sent from ' + esc(l.page) : '') + '</p>' +
-          '<div class="app-row"><button type="button" class="app-btn lt-del">🗑 Delete</button></div></details>';
+          (l.print ? '<span class="lt-tag">' + (l.printed ? '✅ Printed' : '🖨 OK to print') + '</span>' : '') + '<span class="lt-peek">' + esc(l.body.slice(0, 70)) + '</span></summary>' +
+          '<p class="lt-text">' + esc(l.body) + '</p><p class="hs-note lt-note">' + (l.page ? 'Sent from ' + esc(l.page) + '. ' : '') + esc(printedNote(l)) + '</p>' +
+          '<div class="app-row">' + tools(l) + '<button type="button" class="app-btn lt-del">🗑 Delete</button></div></details>';
       }).join('') + '</div>';
+      var baliBtn = pane.querySelector('.lt-bali-btn');
+      if (baliBtn) baliBtn.addEventListener('click', function () {
+        var opening = !box.bali_open;
+        // opening hands the mythic stamp to every fren who visits, so it takes a second click
+        if (opening && !baliBtn.classList.contains('armed')) {
+          baliBtn.classList.add('armed');
+          baliBtn.textContent = 'Pepecoin is at $0.01? Click again to open BALI for everyone';
+          setTimeout(function () { if (baliBtn.classList.contains('armed')) { baliBtn.classList.remove('armed'); baliBtn.textContent = '🏝 Open BALI…'; } }, 6000);
+          return;
+        }
+        baliBtn.classList.remove('armed');
+        baliBtn.disabled = true;
+        rpc('gry_passport_bali', { p_open: opening }).then(function (r) {
+          box.bali_open = !!(r && r.bali_open);
+          baliBtn.disabled = false;
+          baliBtn.textContent = box.bali_open ? 'Close BALI' : '🏝 Open BALI…';
+          baliBtn.previousSibling.innerHTML = 'BALI mythic stamp: <b>' + (box.bali_open ? 'open' : 'closed') + '</b>' + (box.bali_open ? ' · every fren gets it on their next visit' : '');
+        }, function (e) { baliBtn.disabled = false; alert(e.message); });
+      });
       pane.querySelectorAll('.lt-item').forEach(function (d) {
         var id = +d.getAttribute('data-id');
         d.addEventListener('toggle', function () {
           if (!d.open || !d.classList.contains('new')) return;
           d.classList.remove('new');
           rpc('gry_letter_mark', { p_id: id }).then(function () { if (letterBox && letterBox.unread) letterBox.unread--; paintMail(); if (after) after(); }, function () {});
+        });
+        var l = box.letters.find(function (x) { return x.id === id; }) || {};
+        var pr = d.querySelector('.lt-printed'), bug = d.querySelector('.lt-bug');
+        if (pr) pr.addEventListener('click', function () {
+          pr.disabled = true;
+          rpc('gry_letter_printed', { p_id: id, p_printed: !l.printed }).then(function (r) {
+            l.printed = !!(r && r.printed);
+            if (r && typeof r.printed_count === 'number') {
+              l.printed_count = r.printed_count;
+            }
+            pr.disabled = false;
+            pr.setAttribute('aria-pressed', String(l.printed));
+            pr.textContent = l.printed ? '✅ Printed' : '🖨 Mark printed';
+            var tag = d.querySelector('.lt-tag'); if (tag) tag.textContent = l.printed ? '✅ Printed' : '🖨 OK to print';
+            d.querySelector('.lt-note').textContent = (l.page ? 'Sent from ' + l.page + '. ' : '') + printedNote(l);
+          }, function (e) { pr.disabled = false; alert(e.message); });
+        });
+        if (bug) bug.addEventListener('click', function () {
+          if (l.bug_hunter && !confirm('Take Bug Hunter back from ' + l.name + '?')) return;
+          bug.disabled = true;
+          rpc('gry_letter_bug_hunter', { p_id: id, p_on: !l.bug_hunter }).then(function (r) {
+            l.bug_hunter = !!(r && r.bug_hunter);
+            bug.disabled = false;
+            bug.setAttribute('aria-pressed', String(l.bug_hunter));
+            bug.textContent = l.bug_hunter ? '🐞 Bug Hunter ✓' : '🐞 Give Bug Hunter';
+          }, function (e) { bug.disabled = false; alert(e.message); });
         });
         d.querySelector('.lt-del').addEventListener('click', function () {
           if (!confirm('Delete this letter for good?')) return;

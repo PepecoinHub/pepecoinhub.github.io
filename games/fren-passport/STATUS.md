@@ -1,9 +1,9 @@
 # Fren Passport: status (one place, kept up to date)
 
-Last update: 2026-11-08 15:30, Claude. Update this file in every Passport PR.
+Last update: 2026-11-09, Claude. Update this file in every Passport PR.
 
-- **Rules for each stamp:** `games/FREN_PASSPORT_RECONCILIATION_2026-11-08.md`
-- **Art rules for ChatGPT:** PR #231 spec + `games/fren-passport/GPT_STAMP_BRIEF_2026-11-08.md`
+- **Rules for each stamp:** `games/FREN_PASSPORT_RECONCILIATION_2026-11-08.md` (owner decisions of 2026-11-08 below win)
+- **Art rules for ChatGPT:** `games/fren-passport/GPT_MASTER_PROMPT.md`
 - **Art in progress:** Draft PR #233 (the only art PR)
 
 ## 1. Where things stand
@@ -11,106 +11,101 @@ Last update: 2026-11-08 15:30, Claude. Update this file in every Passport PR.
 | Area | State |
 |---|---|
 | Public site | Passport **hidden**. Only browsers that opened `/meme/?beta=fren` see it. |
-| Server (Supabase) | The three passport migrations are **drafts, not run**. The Passport works as a local test preview; no stamp is real yet. |
-| Catalog (`docs/meme/passport-catalog.json`) | **v3: 48 stamps + BALI** (this PR). 18 earnable, 4 shown as `???` teasers, 26 hidden until they can be earned. |
-| Collection | Secrets: 4 findable (Wrong Frog, Why Do You Need This?, The Magic Word, Blue Screen of Fren), no `???` (secrets are not advertised; a short Gazette note only). Lost Floppy and Forgotten Notes retired. Map pieces not planned. Items: 2 `???`. |
-| Art | 21 of 48 final. 27 still to draw, finish or upload (list below). |
+| Server (Supabase) | The three passport migrations are **drafts, not run**: `update_fren_passport.sql` → `update_fren_avatar.sql` → `update_passport_awards.sql`. Until then no stamp is real. |
+| Stamps | **40 of 48 have a rule** (+ BALI). 8 wait: 5 PepeGochi stamps and Beta Tester (features not built), Picasso Fren and The Secret Pond (no data yet). |
+| Album | 40 shown, 3 `???` teasers (Picasso Fren, First Hatch, Beta Tester), 5 hidden. |
+| Secrets | 9 findable, none advertised (a short Gazette note later). Map pieces dropped. |
+| Special avatars | 7, each behind a secret or a stamp (section 5). |
+| Art | 32 of 48 final (18 v3 in the album sprite + 14 Lily). 6 waiting for the owner's OK, 10 still to draw or finish. |
 
 ## 2. All 48 stamps
 
-Code: **ON** = earnable once the migrations run · **PRINT** = needs the owner's "Printed" mark on letters ·
-**HOOK** = data exists, rule not written · **NEW** = new data needed · **OWNER** = given by hand · **WAIT** = feature not built.
+Art: ✅ final · 👀 waiting for owner OK · 🔁 approved scene, small file (900+ px later) · 🔄 redraw · 🚧 sketch · ⬜ not started.
 Album: **shown** · **???** (teaser) · hidden.
 
-Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploaded · 🔁 approved scene, too small (needs 900+ px) ·
-🔄 redraw · 🚧 WIP concept · ⬜ not started.
-
-| # | ID | Label | Code | Album | Art |
+| # | ID | Label | How it is earned (server) | Album | Art |
 |---:|---|---|---|---|---|
-| 1 | `first_fren` | First Fren | ON | shown | 👀 v3 in #233 (1f1a15bd), waiting for owner OK |
-| 2 | `pond_pioneer` | Pond Pioneer | ON | shown | ✅ Lily |
-| 3 | `first_avatar` | Fresh Fren | ON | shown | 👀 v3 in #233 (1f1a15bd), waiting for owner OK |
-| 4 | `welcome_back` | Welcome Back! | ON | shown | ✅ Lily |
-| 5 | `first_words` | First Words | ON | shown | ✅ Lily |
-| 6 | `hey_fren` | Hey @Fren | ON | shown | ✅ Lily |
-| 7 | `community_fren` | Community Fren | ON | shown | 👀 v3 in #233 (1f1a15bd), waiting for owner OK |
-| 8 | `dear_editor` | Dear Editor | ON | shown | ✅ Lily |
-| 9 | `junior_editor` | Junior Editor | PRINT | hidden | ✅ Lily |
-| 10 | `senior_editor` | Senior Editor | PRINT | hidden | ✅ Lily |
-| 11 | `vox_populi` | Vox Populi | PRINT | hidden | ✅ |
-| 12 | `i_voted` | I Voted | HOOK | hidden | ✅ in #233 (owner-approved) |
-| 13 | `streak_14` | 14-Day Streak | ON | shown | ✅ Lily |
-| 14 | `like_it_here` | 30-Day Streak | ON | shown | 👀 |
-| 15 | `certified_fren` | Certified Fren | HOOK | ??? | ✅ |
-| 16 | `old_frog` | Old Frog | HOOK | hidden | ✅ |
-| 17 | `pepe_guesser` | Pepe Guesser | ON | shown | ✅ Lily |
-| 18 | `sharp_eye` | Sharp Eye | ON | shown | 👀 v3 in #233 (1f1a15bd), waiting for owner OK |
-| 19 | `detective_fren` | Detective Fren | ON | shown | ✅ full size in #233 (owner-approved) |
-| 20 | `week_scout` | Week Scout | ON | shown | ✅ Lily |
-| 21 | `scout_fren` | Scout Fren | ON | shown | ✅ Lily |
-| 22 | `frog_of_the_week` | Frog of the Week | HOOK + repeat | ??? | ✅ |
-| 23 | `yeet_adept` | Adept | HOOK | hidden | ✅ in #233 (owner-approved) |
-| 24 | `nasa_is_hiring` | NASA Is Hiring | ON | shown | 👀 |
-| 25 | `moonwalker` | Moonwalker | ON | shown | ✅ |
-| 26 | `rookie_miner` | Happy Mining! | ON (first cloud save) | shown | 👀 Lily + new label in #233 |
-| 27 | `good_game` | Good Game | ON (finished board game, 2 Discord players, 10+ moves, no resign/leave) | shown | ✅ in #233 (owner-approved) |
-| 28 | `checkmate` | Checkmate! | ON (chess win by mate, same rules) | shown | ✅ in #233 (owner-approved) |
-| 29 | `picasso_fren` | Picasso Fren | NEW | hidden | 🔁 304 px |
-| 30 | `podium` | Podium | HOOK | hidden | ⬜ |
-| 31 | `game_night` | Game Night | HOOK | hidden | ⬜ |
-| 32 | `season_champion` | Season Champion | HOOK | hidden | 🔄 redraw |
-| 33 | `quiz_master` | Quiz Master | HOOK | hidden | ⬜ |
-| 34 | `top_ten` | Top 10 | HOOK | hidden | 🚧 384 px |
-| 35 | `arcade_hopper` | Arcade Hopper | HOOK | hidden | ✅ in #233 (owner-approved) |
-| 36 | `fud_buster` | FUD Buster | HOOK | hidden | ✅ in #233 (owner-approved) |
-| 37 | `long_snake` | Long Snake | HOOK | hidden | ✅ in #233 (owner-approved) |
-| 38 | `bug_hunter` | Bug Hunter | OWNER | hidden | 🚧 384 px |
-| 39 | `frogageddon_beta` | Beta Tester | WAIT | hidden | ⬜ (later) |
-| 40 | `first_hatch` | First Hatch | WAIT (PepeGochi) | hidden | ✅ Lily |
-| 41 | `little_fren` | Little Fren | WAIT (PepeGochi) | hidden | ✅ Lily |
-| 42 | `grown_fren` | One Small Step | WAIT (PepeGochi) | hidden | ✅ Lily |
-| 43 | `good_parent` | Good Parent | WAIT (PepeGochi) | hidden | ✅ |
-| 44 | `interior_designer` | Pond Decorator | WAIT | hidden | ⬜ (later) |
-| 45 | `secret_starter` | Secret Starter | HOOK | hidden | ✅ in #233 (owner-approved) |
-| 46 | `treasure_hunter` | Treasure Hunter | HOOK (only 3 secrets exist) | hidden | ⬜ |
-| 47 | `the_secret_pond` | The Secret Pond | NEW | ??? | 🔁 300 px |
-| 48 | `frogmas` | Frogmas | HOOK | hidden | ⬜ |
-| — | `bali` | BALI | OWNER | printed on the page | ✅ page; postmark later |
+| 1 | `first_fren` | First Fren | Discord sign-in | shown | 👀 |
+| 2 | `pond_pioneer` | Pond Pioneer | Discord linked on launch day (one-time snapshot) | shown | ✅ Lily |
+| 3 | `first_avatar` | Fresh Fren | first saved avatar | shown | ✅ v3 |
+| 4 | `welcome_back` | Welcome Back! | back the day after the first visit | shown | ✅ Lily |
+| 5 | `first_words` | First Words | first lobby chat message | shown | ✅ Lily |
+| 6 | `hey_fren` | Hey @Fren | first @mention | shown | ✅ Lily |
+| 7 | `community_fren` | Community Fren | chat on 5 different days | shown | 👀 |
+| 8 | `dear_editor` | Dear Editor | first letter to the editor | shown | ✅ Lily |
+| 9 | `junior_editor` | Junior Editor | 1 letter marked **Printed** by the owner | shown | ✅ Lily |
+| 10 | `senior_editor` | Senior Editor | 5 letters marked Printed | shown | ✅ Lily |
+| 11 | `vox_populi` | Vox Populi | 10 letters marked Printed | shown | ✅ v3 |
+| 12 | `i_voted` | I Voted | a verified vote in a Pond Poll | shown | ✅ v3 |
+| 13 | `streak_14` | 14-Day Streak | PondOS 14 days in a row | shown | ✅ Lily |
+| 14 | `like_it_here` | 30-Day Streak | PondOS 30 days in a row | shown | 👀 |
+| 15 | `certified_fren` | Certified Fren | 100 different PondOS days | shown | ✅ v3 |
+| 16 | `old_frog` | Old Frog | one year since the first Discord log-on | shown | ✅ v3 |
+| 17 | `pepe_guesser` | Pepe Guesser | first Pepe Guesser guess | shown | ✅ Lily |
+| 18 | `sharp_eye` | Sharp Eye | first perfect 5000 | shown | 👀 |
+| 19 | `detective_fren` | Detective Fren | 5000 on 5 different days | shown | ✅ v3 |
+| 20 | `week_scout` | Week Scout | Pepe Guesser 7 days in a row | shown | ✅ Lily |
+| 21 | `scout_fren` | Scout Fren | Pepe Guesser 14 days in a row | shown | ✅ Lily |
+| 22 | `frog_of_the_week` | Frog of the Week | best Pepe Guesser week (Mon–Sun); the only repeatable stamp (×2, ×3…) | shown | ✅ v3 |
+| 23 | `yeet_adept` | Adept | YEET 3000 m | shown | ✅ v3 |
+| 24 | `nasa_is_hiring` | NASA Is Hiring | 3 YEET flights over 5000 m | shown | 👀 |
+| 25 | `moonwalker` | Moonwalker | YEET 6000 m | shown | ✅ v3 |
+| 26 | `rookie_miner` | Happy Mining! | first Pepe Miner cloud save | shown | 👀 Lily + new label |
+| 27 | `good_game` | Good Game | board game finished with another Discord player, 10+ moves, no resign/leave | shown | ✅ v3 |
+| 28 | `checkmate` | Checkmate! | chess win by mate (same rules) | shown | ✅ v3 |
+| 29 | `picasso_fren` | Picasso Fren | no data yet (Draw & Guess saves nothing) | ??? | 🔁 in sprite, 304 px |
+| 30 | `podium` | Podium | top 3 in Pepe Pictures | shown | ⬜ |
+| 31 | `game_night` | Game Night | Pepe Pictures during a scheduled event (±3 h) | shown | ⬜ |
+| 32 | `season_champion` | Season Champion | winner of a ranked Pepe Pictures season | shown | 🔄 |
+| 33 | `quiz_master` | Quiz Master | hosted a Pepe Pictures game with 4+ ranked players | shown | ⬜ |
+| 34 | `top_ten` | Top 10 | top 10 in YEET, the Pepe Guesser week or the Pictures season | shown | 🚧 384 px |
+| 35 | `arcade_hopper` | Arcade Hopper | a server score in 5 different games | shown | ✅ v3 |
+| 36 | `fud_buster` | FUD Buster | 2000 points in FUD Invaders | shown | ✅ v3 |
+| 37 | `long_snake` | Long Snake | 40 blocks in PEP Snake | shown | ✅ v3 |
+| 38 | `bug_hunter` | Bug Hunter | given by the owner from the mailbox | shown | 🚧 384 px |
+| 39 | `frogageddon_beta` | Beta Tester | waits for online FROGAGEDDON | ??? | ⬜ (later) |
+| 40 | `first_hatch` | First Hatch | waits for PepeGochi | ??? | ✅ Lily |
+| 41 | `little_fren` | Little Fren | waits for PepeGochi | hidden | ✅ Lily |
+| 42 | `grown_fren` | One Small Step | waits for PepeGochi | hidden | ✅ Lily |
+| 43 | `good_parent` | Good Parent | waits for PepeGochi | hidden | ✅ v3 |
+| 44 | `interior_designer` | Pond Decorator | waits for PepeGochi | hidden | ⬜ (later) |
+| 45 | `secret_starter` | Secret Starter | first secret | shown | ✅ v3 |
+| 46 | `treasure_hunter` | Treasure Hunter | 6 secrets | shown | ⬜ |
+| 47 | `the_secret_pond` | The Secret Pond | no data yet | hidden | 🔁 in sprite, 300 px |
+| 48 | `frogmas` | Frogmas | a visit on 24–26 December | shown | ⬜ |
+| — | `bali` | BALI | the owner opens it when PEP hits $0.01; every fren gets it on the next visit | printed on the page | ✅ ticket + postmark |
 
-**Totals.** Code: 18 ON · 3 PRINT · 18 HOOK · 2 NEW · 1 OWNER · 6 WAIT = 48.
-Art: 21 ✅ · 6 👀 · 3 🔁 · 1 🔄 · 3 🚧 · 14 ⬜ = 48 before today's Detective/Happy Mining update; now 21 ✅ (Detective in, Happy Mining! out until the OK) · 7 👀 · 2 🔁 · 1 🔄 · 3 🚧 · 14 ⬜ = 48.
+**Totals.** Rules: 40 + BALI. Art: 32 final (30 ✅ + the 2 🔁 already in the sprite) · 6 👀 · 1 🔄 · 2 🚧 · 5 ⬜ · 2 ⬜ for later features = 48.
 
-Note: the stamps marked ON show the old AI art or the category placeholder until their v3 art is cut into the sprite.
+Stamps with a rule but no final art show the category icon in the album until their art is cut into the sprite.
 
-## 3. ChatGPT: what to do next (in this order)
+## 3. Owner tools (in Frog Mail → Editor's desk, with `?beta=fren`)
 
-**Every image uses `games/fren-passport/GPT_MASTER_PROMPT.md`:** the same master prompt, the same 3 reference
-PNGs, one stamp per image, 3 variants, checklist, then upload. Scenes come from that file.
+- **🖨 Mark printed** on a letter whose writer ticked "OK to print". Counts per Discord writer: 1 → Junior Editor,
+  5 → Senior Editor, 10 → Vox Populi. Clicking again unmarks it (a mis-click), and a stamp the count no longer
+  reaches is taken back. The marks survive the mailbox clean-up.
+- **🐞 Give Bug Hunter** on a Discord letter. Clicking again takes it back (asks first).
+- **🏝 Open BALI…** at the top of the desk, two clicks. From then on every Discord fren gets BALI on the next
+  visit; the owner gets it at once. "Close BALI" stops new awards and takes nothing back.
 
-1. ~~Upload the 4 Priority 1 PNGs~~: done in #233 (commit `1f1a15bd`, 1100–1173 px).
-2. **Owner review** of 6 stamps in #233: `first_fren`, `first_avatar`, `sharp_eye`, `community_fren`, `like_it_here`,
-   `nasa_is_hiring`. Fix whatever the owner says.
-3. ~~`detective_fren` at full size~~: done, owner-approved, in #233 (`252145b1`).
-4. ~~`rookie_miner` label~~: done by Claude on Lily's art, in #233, waiting for owner OK.
-5. **The 4 teasers next** (they appear as `???` first and go live next): `good_game` (⬜, a game played to the end, no white
-   flag). `certified_fren`, `frog_of_the_week` and `the_secret_pond` only need QA, except `the_secret_pond`, which needs 900+ px.
-6. **Next hook stamps:** `i_voted` (finish at 900+ px), `yeet_adept`, `checkmate`, `fud_buster`, `long_snake`,
-   `arcade_hopper`, `secret_starter`.
-7. **Then:** `top_ten`, `bug_hunter` (finish at 900+ px), `season_champion` (redraw), `podium`, `game_night`, `quiz_master`
-   (Pepe Pictures only: no drawing or easel), `frogmas`, `treasure_hunter`, `picasso_fren` (900+ px).
-8. **Do not start yet:** `frogageddon_beta`, `interior_designer`.
+These buttons call the new RPCs, so they work only after the migrations run.
 
-Same rules as before: 900+ px native PNG, transparent outside, exact label, checked at 34/52/64/78 px, one manifest,
-nothing in `docs/`, SQL, catalog or tests, no merging.
+## 4. What is left
 
-## 4. Claude: what comes next
+**Owner**
+1. OK (or notes) for the 6 👀 stamps: `first_fren`, `community_fren`, `like_it_here`, `sharp_eye`, `nasa_is_hiring`,
+   `rookie_miner`.
+2. Launch day: run the three migrations in Supabase, then the `?beta=fren` gate comes off.
 
-1. This PR: catalog v3, Happy Mining! rule, old editor and Miner Fren awards removed, hard hat → Happy Mining!,
-   headphones → Arcade Hopper, only 4 `???` teasers, this STATUS file.
-2. Cut the approved v3 art into the stamp sprite (as soon as the 📤 files are uploaded).
-3. Owner tools: the "Printed" mark on letters (Junior/Senior Editor, Vox Populi) and the owner grant (Bug Hunter, BALI).
-4. Hooks on existing data, in the order of section 3.
-5. Launch day: the owner runs the three migrations in Supabase, and the `?beta=fren` gate is removed.
+**ChatGPT** (with `GPT_MASTER_PROMPT.md`): `top_ten`, `bug_hunter` (finish at 900+ px), `season_champion` (redraw),
+`podium`, `game_night`, `quiz_master` (Pepe Pictures only: no drawing or easel), `frogmas`, `treasure_hunter`; later
+900+ px files for `picasso_fren` and `the_secret_pond`. Not yet: `frogageddon_beta`, `interior_designer`.
+
+**Claude**
+1. After the owner's OK: the 6 stamps into the v3 sprite.
+2. Scene blocks in `GPT_MASTER_PROMPT.md` for the stamps above, and each new upload into #233 and the sprite.
+3. A short Gazette note about secrets, when the owner asks.
+4. Launch-day removal of the beta gate.
 
 ## 5. Special avatars (secret rewards, 2026-11-08)
 
@@ -123,8 +118,8 @@ Whole-character avatars in Create Your Fren (the `special` slot), locked until e
 | Smiley | secret `happy_fren` | a `:)` in the lobby chat (server trigger, not claimable) |
 | Nerd | secret `nerd_alert` | open README_NERD.txt in NERDS ONLY |
 | Born to Fren | secret `born_to_fren` | the word "fren" in the lobby chat (@mentions do not count; server trigger) |
-| Bali Dreamer | secret `bali_dreamer` | tap the locked BALI stamp in the Passport |
+| Bali Dreamer | secret `bali_dreamer` | tap the BALI stamp in the Passport |
 | Knight | stamp `good_game` | finish a board game with another Discord fren |
 
 Live secrets: 9 (Wrong Frog, Why Do You Need This?, The Magic Word, Blue Screen of Fren, Midnight Fren, Nerds Only,
-Bali Dreamer, Happy Fren, Born to Fren), so Treasure Hunter (6) can be earned once its rule is written.
+Bali Dreamer, Happy Fren, Born to Fren).
