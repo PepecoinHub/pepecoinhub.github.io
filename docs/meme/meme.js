@@ -741,7 +741,7 @@
     // two groups, one column each on a wide screen (anchored at the bottom, by the Start button);
     // the numbers and tools live in the "Nerds only" folder, and the Recycle Bin sits in the bottom-right corner
     var NERDS = [['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'], ['calculator.html', 'What-if machine', 'p-eyes-still'],
-      ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'], ['#addr', 'AddressCheck.exe', 'pepe-search'], ['#notpep', 'Not PEP (0x)', 'wrongpep']];
+      ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'], ['#addr', 'AddressCheck.exe', 'pepe-search'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], ['#nerdreadme', 'README_NERD.txt', 'news']];
     // wide screens: from the top-left corner, Log On alone, a gap, then the games in two columns;
     // the rest of the pond in a small group lower down, NERDS ONLY on its own by the Start button, the bin far right
     var DESKTOP = [
@@ -768,6 +768,16 @@
           b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
         });
       }, 520);
+    };
+    // README_NERD.txt: reading the fine print in NERDS ONLY finds the secret "Nerds Only" (the Nerd avatar)
+    ACT['#nerdreadme'] = function () {
+      openApp('nerdreadme', 'README_NERD.txt - Notepad', 'nerds-folder', function (A) {
+        A.body.innerHTML = '<div class="win-menu notepad-menu"><span>File</span><span>Edit</span><span>Search</span><span>Help</span></div><pre class="notepad"></pre>';
+        A.body.querySelector('.notepad').textContent = ['README_NERD.TXT', '', 'You opened the folder AND the readme.', 'Respect, fren. Nobody reads the readme.', '',
+          'Facts for the road:', '  PEP is its own proof-of-work chain (Scrypt, merge-mined with LTC and DOGE).', '  The supply schedule is in the code, not in a promise.',
+          '  Every number in this folder comes from the chain or a public API.', '', 'Glasses on. Pocket protector optional.'].join('\n');
+      }, 440);
+      discoverSecret('nerd_alert');
     };
     ACT['#find'] = function () { finder(); };
     DESK_ACT = ACT;
@@ -907,6 +917,9 @@
     var FROGS = ['big-eyes', 'believe', 'chonk', 'cowboy', 'detective', 'diamond', 'gibup', 'farmer', 'born-to-fren', 'brain', 'gif-034-still', 'gif-071-still', 'gif-045-still', 'gif-085-still',
       'chars/balloons', 'chars/juicebox', 'chars/brb', 'chars/chonky', 'chars/comfy', 'chars/explorer', 'chars/backpack'];
     var pick = FROGS[Math.floor(Math.random() * FROGS.length)];
+    // around local midnight (23:30-00:30) the screensaver finds the secret "Midnight Fren" (the Vampire avatar)
+    var now = new Date(), mins = now.getHours() * 60 + now.getMinutes();
+    if (mins >= 23 * 60 + 30 || mins <= 30) discoverSecret('midnight_fren');
     saverEl = el('div', { class: 'saver', 'aria-hidden': 'true' }, '<img class="sv-frog' + (pick.indexOf('chars/') === 0 ? ' cut' : '') + '" src="img/' + pick + '.webp" alt=""><p>PondOS is resting. Move the mouse, fren.</p>');
     document.body.appendChild(saverEl);
     var coin = saverEl.querySelector('.sv-frog'), x = 40, y = 40, dx = 2.2, dy = 1.7, raf;
@@ -1605,10 +1618,10 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261108sec';
+  var PP_CATALOG = 'passport-catalog.json?v=20261108sa';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261108pp48b'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261108sa'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1815,8 +1828,10 @@
           grid.appendChild(gc);
         }
         right.appendChild(grid);
-        right.appendChild(el('div', {class:'pp-bali',role:'img','aria-label':'BALI: $0.01 - BALI. Reserved mythic stamp for every fren when Pepecoin reaches $0.01 USD. Locked.',
-          title:'Reserved mythic stamp - awarded by the server when Pepecoin reaches $0.01 USD'}));
+        var baliBtn = el('button', {type:'button',class:'pp-bali','aria-label':'BALI: $0.01 - BALI. Reserved mythic stamp for every fren when Pepecoin reaches $0.01 USD. Locked.',
+          title:'Reserved mythic stamp - awarded by the server when Pepecoin reaches $0.01 USD'});
+        baliBtn.addEventListener('click', baliTouch);
+        right.appendChild(baliBtn);
         book.appendChild(right);
 
         // ---------- side panels: My Fren Journey + Next Milestone ----------
@@ -1930,9 +1945,11 @@
         });
         sheet.appendChild(album);
         sheet.appendChild(info);
-        var mythic = el('div', {class:'pp-mythic is-locked', title:'Reserved mythic stamp - awarded by the server when Pepecoin reaches $0.01 USD'});
+        var mythic = el('div', {class:'pp-mythic is-locked', role:'button', tabindex:'0', title:'Reserved mythic stamp - awarded by the server when Pepecoin reaches $0.01 USD'});
+        mythic.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); baliTouch(); } });
         mythic.appendChild(el('img', {src:PP_ART+'bali-ticket.webp'+PP_ART_V, alt:'BALI, $0.01 - BALI. Locked.', width:'310', height:'114', draggable:'false'}));
         mythic.appendChild(piece('small','','Reserved for every fren when Pepecoin reaches $0.01 USD. Locked until then.'));
+        mythic.addEventListener('click', baliTouch);
         sheet.appendChild(mythic);
         panes[1].appendChild(sheet);
 
@@ -2020,7 +2037,7 @@
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261108v3').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261108sa').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -2087,7 +2104,9 @@
     ['accessory', 'Accessory', 'accessory'], ['bg', 'Background', null], ['special', 'Special', null]];
   // which stamp opens a reserved part (catalog titles)
   // (only stamps that can be earned today are named; the others stay "a future stamp", like '???' in the Passport)
-  var FA_UNLOCK = { detective_fren: 'Detective Fren', rookie_miner: 'Happy Mining!', scout_fren: 'Scout Fren' };
+  var FA_UNLOCK = { detective_fren: 'Detective Fren', rookie_miner: 'Happy Mining!', scout_fren: 'Scout Fren', good_game: 'Good Game' };
+  // special avatars hidden behind a secret: the lock says only that (no hint where)
+  var FA_SECRET = { why_tho: 1, midnight_fren: 1, happy_fren: 1, nerd_alert: 1, born_to_fren: 1, bali_dreamer: 1 };
   function avatarMaker() {
     return openApp('avatar', 'Create Your Fren - Avatar Maker', 'pep-logo', function (A) {
       passportCss();
@@ -2105,7 +2124,10 @@
       function build(o, signed) {
         var d = signed ? passportMine() : null;
         // a stamp the server says this player has earned (reward parts open with it)
-        var owns = function (id) { var l = d && Array.isArray(d.state.achievements) ? d.state.achievements : []; return l.some(function (b) { return b.id === id && !!b.earned_at; }); };
+        var owns = function (id) {
+          var l = d && Array.isArray(d.state.achievements) ? d.state.achievements : [], s = d && Array.isArray(d.state.secrets) ? d.state.secrets : [];
+          return l.some(function (b) { return b.id === id && !!b.earned_at; }) || s.some(function (x) { return x.id === id && !!x.discovered_at; });
+        };
         var saved = d ? avatarLook(o, d.state.avatar) : null;
         var start = saved || avatarLook(o, o.defaults);
         var look = Object.assign({}, start), pending = false, msg = '', strips = [];
@@ -2136,7 +2158,7 @@
           var next = el('button', { type: 'button', class: 'fa-arr is-next', tabindex: '-1', 'aria-hidden': 'true' });
           (o.options[k] || []).forEach(function (p) {
             var locked = !!p.unlock && !owns(p.unlock), stamp = locked && FA_UNLOCK[p.unlock] || 'a future stamp';
-            var lab = el('label', { class: 'fa-opt' + (locked ? ' is-locked' : ''), title: locked ? p.label + ' - locked: earn the ' + stamp + ' stamp' : p.label });
+            var lab = el('label', { class: 'fa-opt' + (locked ? ' is-locked' : ''), title: locked ? (FA_SECRET[p.unlock] ? p.label + ' - locked: find its secret somewhere in PondOS' : p.label + ' - locked: earn the ' + stamp + ' stamp') : p.label });
             var inp = el('input', { type: 'radio', name: 'fa-' + k, value: p.id });
             // reserved parts are shown with a lock and cannot be picked; the save RPC rejects them too
             if (locked) inp.disabled = true;
@@ -2280,6 +2302,11 @@
 
   // Only cosmetic, low-stakes discoveries are claimable by a browser.
   // This is intentionally NOT the pathway for YEET Moon Rock or care-day badges.
+  // touching the locked BALI stamp: not yet, but it finds the secret "Bali Dreamer" (the straw-hat avatar)
+  function baliTouch() {
+    balloon('Not yet, fren', 'BALI opens when Pepecoin reaches $0.01. Pack the straw hat anyway.', 'gif-045-still');
+    discoverSecret('bali_dreamer');
+  }
   function discoverSecret(id) {
     if (!FREN) return;
     var session=sbSession();
@@ -2290,8 +2317,9 @@
       if(!result||result.id!==id) return;
       try { localStorage.setItem(k,'1'); } catch(e) {}
       if(result.new) {
-        var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren'};
-        balloon('Secret discovered!',(names[id]||'A mysterious find')+' is now in your Fren Passport.','gif-045-still');
+        var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren',midnight_fren:'Midnight Fren',nerd_alert:'Nerds Only',bali_dreamer:'Bali Dreamer'};
+        var av={why_tho:1,midnight_fren:1,nerd_alert:1,bali_dreamer:1};
+        balloon('Secret discovered!',(names[id]||'A mysterious find')+' is now in your Fren Passport.'+(av[id]?' A special avatar is waiting in Create Your Fren.':''),'gif-045-still');
       }
     },function(){ /* Migration may not be installed yet; retry on next discovery. */ });
   }

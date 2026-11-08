@@ -72,7 +72,8 @@ test('Pond Pioneer is a one-time snapshot and closed afterwards', () => {
 });
 
 test('reward parts open with stamps that exist in the catalog', () => {
-  const ids = new Set(catalog.achievements.map(x => x.id));
+  // an unlock is a stamp, or (for most special avatars) a live secret
+  const ids = new Set([...catalog.achievements.map(x => x.id), ...catalog.secrets.filter(x => x.status === 'live').map(x => x.id)]);
   for (const o of Object.values(manifest.options).flat().filter(o => o.unlock)) assert.ok(ids.has(o.unlock), o.id + ' -> ' + o.unlock);
   // the Maker names only stamps that can be earned today
   const named = pond.match(/var FA_UNLOCK = \{([^}]*)\}/)[1];

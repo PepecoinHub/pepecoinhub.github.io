@@ -101,7 +101,7 @@ returns boolean language plpgsql volatile security definer set search_path = '' 
 begin
   if b is null or b not in ('pond_pioneer', 'moonwalker', 'nasa_is_hiring', 'pepe_guesser', 'sharp_eye',
       'detective_fren', 'week_scout', 'scout_fren', 'welcome_back', 'streak_14', 'like_it_here', 'first_words',
-      'community_fren', 'hey_fren', 'dear_editor', 'rookie_miner') then
+      'community_fren', 'hey_fren', 'dear_editor', 'rookie_miner', 'good_game', 'checkmate') then
     raise exception 'Unknown passport stamp %', b;
   end if;
   if u is null or games.discord_identity(u) is null then return false; end if;
@@ -260,6 +260,18 @@ begin
         select count(*) into n from games.passport_chat_days where user_id = new.user_id;
         if n >= 5 then perform games.passport_award(new.user_id, 'community_fren', new.created_at); end if;
       end if;
+      -- two chat secrets (each unlocks a special avatar): a smiley, and the word "fren"
+      if games.discord_identity(new.user_id) is not null then
+        if new.body ~ '(:-?\)|\(:)' then
+          insert into games.passport_secrets (user_id, secret_id, discovered_at) values (new.user_id, 'happy_fren', new.created_at)
+          on conflict (user_id, secret_id) do nothing;
+        end if;
+        -- @mentions do not count: a nickname like @Fren6 is not saying the word
+        if regexp_replace(new.body, '@\S+', '', 'g') ~* '(^|[^a-z])frens?([^a-z]|$)' then
+          insert into games.passport_secrets (user_id, secret_id, discovered_at) values (new.user_id, 'born_to_fren', new.created_at)
+          on conflict (user_id, secret_id) do nothing;
+        end if;
+      end if;
     exception when others then
       raise warning 'passport chat hook: %', sqlerrm;
     end;
@@ -270,6 +282,40 @@ $$;
 drop trigger if exists passport_chat_ai on games.lobby_chat;
 create trigger passport_chat_ai after insert on games.lobby_chat
   for each row execute function games.passport_chat_after();
+
+-- ---------- board games (chess, checkers, Connect Four, Sea Battle) ----------
+-- Good Game: a game played to its end by two different Discord players. A resignation, a player who left,
+-- an aborted game and very short games (fewer than 10 moves; Sea Battle always takes longer) do not count.
+-- Checkmate!: the winner of a chess game that ended in checkmate under the same conditions.
+create or replace function games.passport_table_after()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare v1 boolean; v2 boolean; w uuid;
+begin
+  if new.status = 'finished' and old.status is distinct from 'finished' and new.result is not null
+     and new.p1 is not null and new.p2 is not null and new.p1 <> new.p2 then
+    begin
+      if coalesce(new.reason, '') ~* '(resigned|left the table|players left|did not place|did not make)' then return null; end if;
+      if new.game <> 'battleship' and coalesce(array_length(new.history, 1), 0) < 10 then return null; end if;
+      select coalesce(bool_or(m.verified) filter (where m.user_id = new.p1), false),
+             coalesce(bool_or(m.verified) filter (where m.user_id = new.p2), false)
+        into v1, v2 from games.table_members m where m.table_code = new.code;
+      if not (v1 and v2) then return null; end if;
+      perform games.passport_award(new.p1, 'good_game');
+      perform games.passport_award(new.p2, 'good_game');
+      if new.game = 'chess' and new.reason = 'checkmate' and new.result in ('p1', 'p2') then
+        w := case new.result when 'p1' then new.p1 else new.p2 end;
+        perform games.passport_award(w, 'checkmate');
+      end if;
+    exception when others then
+      raise warning 'passport table hook: %', sqlerrm;
+    end;
+  end if;
+  return null;
+end
+$$;
+drop trigger if exists passport_table_au on games.tables;
+create trigger passport_table_au after update of status on games.tables
+  for each row execute function games.passport_table_after();
 
 -- a mention row exists only when a verified player really @mentioned another reserved nickname
 create or replace function games.passport_mention_after()

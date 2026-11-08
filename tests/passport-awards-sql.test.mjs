@@ -223,6 +223,39 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     assert.ok(await has(3, 'community_fren'));
     // a no-session visitor's message has no account and earns nothing
     await call(null, "select public.gry_lobby_say('anon hi', 'Visitor') as v", [], 'anon').catch(() => {});
+    // chat secrets: a smiley and the word "fren" (an @mention of a Fren nickname is not the word)
+    const secrets = async u => (await db.query('select secret_id from games.passport_secrets where user_id = $1 order by secret_id', [uid(u)])).rows.map(r => r.secret_id);
+    assert.deepEqual(await secrets(3), [], '@Fren6 is a nickname, not the word');
+    await backdateChat(3); await say(3, 'nice one :)', 'Fren3');
+    assert.deepEqual(await secrets(3), ['happy_fren']);
+    await backdateChat(3); await say(3, 'gm frens', 'Fren3');
+    assert.deepEqual(await secrets(3), ['born_to_fren', 'happy_fren']);
+    await backdateChat(3); await say(3, 'frenzy friend', 'Fren3');   // not the word on its own: nothing new
+    assert.deepEqual(await secrets(3), ['born_to_fren', 'happy_fren']);
+    await assert.rejects(call(3, "select public.gry_passport_discover('happy_fren') as v"), /Unknown discovery/);
+    // board games: Good Game for both players of a game played to the end; Checkmate! for the winner by mate
+    await addUser(41); await addUser(42);
+    const table = async (code, game, reason, result, moves, v2 = true) => {
+      await db.query(`insert into games.tables(code, game, creator_id, status, p1, p2, pos, history) values ($1, $2, $3, 'playing', $3, $4, 'x', $5)`,
+        [code, game, uid(41), uid(42), Array.from({ length: moves }, (_, i) => 'm' + i)]);
+      await db.query("insert into games.table_members(table_code, user_id, nick, nick_key, verified) values ($1, $2, 'Fren41', 'fren41', true), ($1, $3, 'Fren42', 'fren42', $4)", [code, uid(41), uid(42), v2]);
+      await db.query("update games.tables set status = 'finished', result = $2, reason = $3 where code = $1", [code, result, reason]);
+    };
+    await table('TRES', 'chess', 'Fren42 resigned', 'p1', 30);
+    await table('TLEFT', 'checkers', 'Fren42 left the table', 'p1', 30);
+    await table('TSHORT', 'connect4', 'four in a row', 'p1', 7);
+    await table('TGUEST', 'chess', 'checkmate', 'p1', 30, false);
+    assert.ok(!(await has(41, 'good_game')) && !(await has(42, 'good_game')), 'resigned, left, short and non-Discord games do not count');
+    await table('TMATE', 'chess', 'checkmate', 'p2', 24);
+    assert.ok(await has(41, 'good_game')); assert.ok(await has(42, 'good_game'));
+    assert.ok(await has(42, 'checkmate')); assert.ok(!(await has(41, 'checkmate')), 'only the winner');
+    // special avatars: a secret or a stamp opens them
+    const SAVE7s = 'select public.gry_passport_avatar_save($1, $2, $3, $4, $5, $6, $7) as v';
+    const plain = ['bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none'];
+    assert.equal((await call(3, SAVE7s, [...plain, 'special_smile'])).avatar.special, 'special_smile');
+    await db.query("update games.passport_avatars set updated_at = now() - interval '5 seconds' where user_id = $1", [uid(3)]);
+    await assert.rejects(call(3, SAVE7s, [...plain, 'special_batman']), /That part is locked/);
+    assert.equal((await call(42, SAVE7s, [...plain, 'special_knight'])).avatar.special, 'special_knight');
     assert.equal(await one("select count(*)::int from games.passport_chat_days where user_id is null"), 0);
 
     // --- letters through gry_letter_send: Discord only

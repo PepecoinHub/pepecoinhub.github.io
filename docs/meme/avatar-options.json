@@ -279,6 +279,41 @@
         "id": "special_explorer",
         "label": "Explorer Pepe (Pepe Guesser)",
         "unlock": "scout_fren"
+      },
+      {
+        "id": "special_batman",
+        "label": "Batfren (secret)",
+        "unlock": "why_tho"
+      },
+      {
+        "id": "special_vampire",
+        "label": "Vampire (secret)",
+        "unlock": "midnight_fren"
+      },
+      {
+        "id": "special_smile",
+        "label": "Smiley (secret)",
+        "unlock": "happy_fren"
+      },
+      {
+        "id": "special_nerd",
+        "label": "Nerd (secret)",
+        "unlock": "nerd_alert"
+      },
+      {
+        "id": "special_soldier",
+        "label": "Born to Fren (secret)",
+        "unlock": "born_to_fren"
+      },
+      {
+        "id": "special_straw",
+        "label": "Bali Dreamer (secret)",
+        "unlock": "bali_dreamer"
+      },
+      {
+        "id": "special_knight",
+        "label": "Knight (Good Game)",
+        "unlock": "good_game"
       }
     ]
   },
@@ -287,6 +322,6 @@
     "layer_template": "avatar-assets/layers/{id}.webp?v=20261107e",
     "thumb_template": "avatar-assets/thumbs/{id}.webp?v=20261107e"
   },
-  "special_note": "A special avatar is a whole drawn character by Lily for a big milestone. When one is picked it replaces every part layer except the background (bg).",
+  "special_note": "A special avatar is a whole character (Lily's drawing for a big milestone, or a classic Pepe meme for a secret). When one is picked it replaces every part layer except the background (bg).",
   "mouth_note": "Cigarette and pipe (in_mouth) are drawn under the mouth layer and moved so their in_mouth point lands on the chosen mouth's corner (512 canvas pixels), so the filter or mouthpiece is held in every mouth."
 }

@@ -53,6 +53,9 @@
 .pp-slot .pp-art-stamp { width: 92%; }
 .pp-slot.is-earned .pp-art-stamp { filter: drop-shadow(1px 1px 0 rgba(60,40,20,.35)); }
 .pp-bali { position: absolute; z-index: 2; left: 7.2%; top: 74.8%; width: 80%; height: 23%; }
+button.pp-bali { padding: 0; background: none; border: 0; cursor: pointer; }
+button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px; }
+.pp-mythic { cursor: pointer; }
 
 /* side panels (dark green, like the mockup) */
 .pp-side { display: grid; gap: 8px; min-width: 0; }

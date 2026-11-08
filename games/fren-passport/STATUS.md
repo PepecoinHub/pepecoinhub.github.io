@@ -53,8 +53,8 @@ Art: ✅ final · 👀 waiting for owner OK · 📤 done in ChatGPT, not uploade
 | 24 | `nasa_is_hiring` | NASA Is Hiring | ON | shown | 👀 |
 | 25 | `moonwalker` | Moonwalker | ON | shown | ✅ |
 | 26 | `rookie_miner` | Happy Mining! | ON (first cloud save) | shown | 👀 Lily + new label in #233 |
-| 27 | `good_game` | Good Game | HOOK | ??? | ✅ in #233 (owner-approved) |
-| 28 | `checkmate` | Checkmate! | HOOK | hidden | ✅ in #233 (owner-approved) |
+| 27 | `good_game` | Good Game | ON (finished board game, 2 Discord players, 10+ moves, no resign/leave) | shown | ✅ in #233 (owner-approved) |
+| 28 | `checkmate` | Checkmate! | ON (chess win by mate, same rules) | shown | ✅ in #233 (owner-approved) |
 | 29 | `picasso_fren` | Picasso Fren | NEW | hidden | 🔁 304 px |
 | 30 | `podium` | Podium | HOOK | hidden | ⬜ |
 | 31 | `game_night` | Game Night | HOOK | hidden | ⬜ |
@@ -111,3 +111,20 @@ nothing in `docs/`, SQL, catalog or tests, no merging.
 3. Owner tools: the "Printed" mark on letters (Junior/Senior Editor, Vox Populi) and the owner grant (Bug Hunter, BALI).
 4. Hooks on existing data, in the order of section 3.
 5. Launch day: the owner runs the three migrations in Supabase, and the `?beta=fren` gate is removed.
+
+## 5. Special avatars (secret rewards, 2026-11-08)
+
+Whole-character avatars in Create Your Fren (the `special` slot), locked until earned:
+
+| Avatar | Unlock | How |
+|---|---|---|
+| Batfren | secret `why_tho` | copy a tip address in About me |
+| Vampire | secret `midnight_fren` | the screensaver runs between 23:30 and 00:30 local time (desktop only) |
+| Smiley | secret `happy_fren` | a `:)` in the lobby chat (server trigger, not claimable) |
+| Nerd | secret `nerd_alert` | open README_NERD.txt in NERDS ONLY |
+| Born to Fren | secret `born_to_fren` | the word "fren" in the lobby chat (@mentions do not count; server trigger) |
+| Bali Dreamer | secret `bali_dreamer` | tap the locked BALI stamp in the Passport |
+| Knight | stamp `good_game` | finish a board game with another Discord fren |
+
+Live secrets: 9 (Wrong Frog, Why Do You Need This?, The Magic Word, Blue Screen of Fren, Midnight Fren, Nerds Only,
+Bali Dreamer, Happy Fren, Born to Fren), so Treasure Hunter (6) can be earned once its rule is written.

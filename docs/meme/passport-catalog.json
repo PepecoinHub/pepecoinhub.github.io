@@ -196,17 +196,16 @@
     {
       "id": "good_game",
       "title": "Good Game",
-      "description": "Finish a board game (chess, checkers, Connect Four or Sea Battle) against another Discord fren. A resigned or abandoned game does not count.",
+      "description": "Finish a board game (chess, checkers, Connect Four or Sea Battle) against another Discord fren. A resigned or abandoned game does not count. Unlocks the Knight avatar.",
       "category": "arcade",
-      "teaser": true,
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "checkmate",
       "title": "Checkmate!",
       "description": "Win a game of chess by checkmate against another Discord fren.",
       "category": "arcade",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "picasso_fren",
@@ -370,7 +369,7 @@
       "id": "why_tho",
       "title": "Why Do You Need This?",
       "status": "live",
-      "description": "Some addresses are not for you. Or are they?"
+      "description": "Some addresses are not for you. Or are they? Unlocks a special avatar."
     },
     {
       "id": "magic_word",
@@ -389,7 +388,34 @@
       "id": "midnight_fren",
       "title": "Midnight Fren",
       "hint": "The screensaver knows more than it says.",
-      "status": "planned"
+      "status": "live",
+      "description": "The screensaver knows more than it says, around midnight. Unlocks a special avatar."
+    },
+    {
+      "id": "nerd_alert",
+      "title": "Nerds Only",
+      "description": "Some folders are only for the brave. Read the fine print. Unlocks a special avatar.",
+      "status": "live"
+    },
+    {
+      "id": "bali_dreamer",
+      "title": "Bali Dreamer",
+      "description": "Some stamps are worth touching early. Unlocks a special avatar.",
+      "status": "live"
+    },
+    {
+      "id": "happy_fren",
+      "title": "Happy Fren",
+      "description": "A small face in the chat says a lot. Unlocks a special avatar.",
+      "status": "live",
+      "source": "chat"
+    },
+    {
+      "id": "born_to_fren",
+      "title": "Born to Fren",
+      "description": "Say the word in the chat. Unlocks a special avatar.",
+      "status": "live",
+      "source": "chat"
     },
     {
       "id": "paper_crown",
