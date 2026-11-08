@@ -418,6 +418,32 @@
       "source": "chat"
     },
     {
+      "id": "find_fren",
+      "title": "Looking Glass",
+      "description": "The pond has a search box. Use it. Unlocks a special avatar.",
+      "status": "live"
+    },
+    {
+      "id": "address_check",
+      "title": "Trust, But Verify",
+      "description": "Never send to an address you did not check. Unlocks a special avatar.",
+      "status": "live"
+    },
+    {
+      "id": "pep_birthday",
+      "title": "Pepecoin's Birthday",
+      "description": "Be in the pond on 30 January, Pepecoin's birthday. Unlocks a special avatar.",
+      "status": "live",
+      "source": "event"
+    },
+    {
+      "id": "thanksgiving_fren",
+      "title": "Thanksgiving Fren",
+      "description": "Visit the pond on Thanksgiving weekend. Unlocks a special avatar.",
+      "status": "live",
+      "source": "event"
+    },
+    {
       "id": "paper_crown",
       "title": "Paper Crown",
       "hint": "You might find this in the trash.",

@@ -1520,7 +1520,7 @@
         ul.innerHTML = hits.map(function (x, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(x.icon) + '" alt="" width="28" height="28"><span><b>' + esc(x.name) + '</b><small>' + esc(x.desc) + '</small></span></button></li>'; }).join('');
         tip.textContent = words.length ? (hits.length ? hits.length + (hits.length === 1 ? ' match' : ' matches') + '. Enter opens the first one.' : 'Nothing found. Try another word: game, chat, price, mining, wallet…') : 'Popular right now. Type to find anything in the pond.';
       };
-      var open = function (x) { if (x) x.go(); };
+      var open = function (x) { if (x) { discoverSecret('find_fren'); x.go(); } };
       ul.addEventListener('click', function (e) { var b = e.target.closest('[data-i]'); if (b) open(hits[+b.getAttribute('data-i')]); });
       A.body.querySelector('.find-form').addEventListener('submit', function (e) {
         e.preventDefault();
@@ -1621,7 +1621,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261109ed';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109ed'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109av'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1898,7 +1898,7 @@
         }
 
         // ---------- tabs ----------
-        var TABS = [['Overview','tab_home'],['Stamps','tab_stamp'],['Collection','tab_box'],['Stats','tab_stats']];
+        var TABS = [['Overview','tab_home'],['Stamps','tab_stamp'],['Avatars','tab_trophy'],['Collection','tab_box'],['Stats','tab_stats']];
         var bar98 = el('div', {class:'tabs98 pp-tabs',role:'tablist','aria-label':'Passport sections'});
         var panes = [];
         TABS.forEach(function(t, i){
@@ -1969,6 +1969,38 @@
         sheet.appendChild(mythic);
         panes[1].appendChild(sheet);
 
+        // Avatars: the special avatars of Create Your Fren, and what opens each one
+        if (d.opts) {
+          var ownsAv = function (u) { return !!earnedOf(u) || discovered.some(function (x) { return x.id === u && x.discovered_at; }); };
+          var avs = (d.opts.options.special || []).filter(function (p) { return p.id !== AV_PLAIN; });
+          var avOpen = avs.filter(function (p) { return !p.unlock || ownsAv(p.unlock); }).length;
+          var avSec = el('section', {class:'pp-panel pp-avatars'});
+          avSec.appendChild(piece('h3','pp-panel-h','Special Avatars  ' + avOpen + ' / ' + avs.length));
+          var avGrid = el('ul', {class:'pp-av-grid'});
+          avs.forEach(function (p) {
+            var open = !p.unlock || ownsAv(p.unlock), worn = look && look.special === p.id;
+            var li = el('li', {class:'pp-av' + (open ? ' is-open' : ' is-locked') + (worn ? ' is-worn' : '')});
+            var pic = el('span', {class:'pp-av-pic'});
+            pic.appendChild(el('img', {src: d.opts.paths.layer_template.replace('{id}', p.id), alt:'', loading:'lazy', width:'96', height:'96', draggable:'false'}));
+            if (!open) pic.appendChild(piece('i','pp-av-lock','🔒'));
+            li.appendChild(pic);
+            li.appendChild(piece('b','', avName(p)));
+            li.appendChild(piece('small','', open ? (worn ? 'Wearing it now' : 'Unlocked') : avHow(p.unlock)));
+            if (open) {
+              var wear = el('button', {type:'button',class:'app-btn pp-av-btn'});
+              wear.textContent = worn ? 'Edit your Fren' : 'Wear it';
+              wear.addEventListener('click', function () { avatarMaker(); });
+              li.appendChild(wear);
+            }
+            avGrid.appendChild(li);
+          });
+          avSec.appendChild(avGrid);
+          avSec.appendChild(piece('p','pp-muted','A special avatar covers your Fren\'s parts (not the background). Pick one in Create Your Fren, under Special.'));
+          panes[2].appendChild(avSec);
+        } else {
+          panes[2].appendChild(piece('p','pp-muted','The avatar list did not load. Close the Passport and open it again.'));
+        }
+
         // Collection: items and secrets, as the server lists them
         function collect(title, list, has, sub) {
           var sec = el('section', {class:'pp-panel'});
@@ -1990,7 +2022,7 @@
         cgrid.appendChild(collect('Items  ' + (itemsGoal ? itemsCount + ' / ' + itemsGoal : itemsCount), items, function(x){ return find(owned, x.id); }, function(){ return 'Owned'; }));
         cgrid.appendChild(collect('Secrets  ' + secretsCount + ' / ' + secretsGoal, secrets,
           function(x){ var s = find(discovered, x.id); return s && s.discovered_at ? s : null; }, function(s){ return 'Found ' + fmt.date(s.discovered_at); }));
-        panes[2].appendChild(cgrid);
+        panes[3].appendChild(cgrid);
 
         // Stats: factual numbers from the server snapshot
         var st = el('dl', {class:'pp-stats'});
@@ -2003,8 +2035,8 @@
           ['Best YEET flight', yeetBest==null?'—':metres(yeetBest)],
           ['Avatar saved', look ? 'Yes' : 'Not yet']
         ].forEach(function(v){ var r=el('div'); r.appendChild(piece('dt','',v[0])); r.appendChild(piece('dd','',v[1])); st.appendChild(r); });
-        panes[3].appendChild(st);
-        panes[3].appendChild(piece('p','pp-muted','Days registered counts calendar days since you joined; it is not an activity counter.'));
+        panes[4].appendChild(st);
+        panes[4].appendChild(piece('p','pp-muted','Days registered counts calendar days since you joined; it is not an activity counter.'));
 
         box.appendChild(bar98);
         panes.forEach(function(p){ box.appendChild(p); });
@@ -2053,7 +2085,7 @@
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261108sa').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261109av').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -2120,9 +2152,21 @@
     ['accessory', 'Accessory', 'accessory'], ['bg', 'Background', null], ['special', 'Special', null]];
   // which stamp opens a reserved part (catalog titles)
   // (only stamps that can be earned today are named; the others stay "a future stamp", like '???' in the Passport)
-  var FA_UNLOCK = { detective_fren: 'Detective Fren', rookie_miner: 'Happy Mining!', scout_fren: 'Scout Fren', good_game: 'Good Game' };
+  var FA_UNLOCK = { detective_fren: 'Detective Fren', rookie_miner: 'Happy Mining!', scout_fren: 'Scout Fren', good_game: 'Good Game',
+    yeet_adept: 'Adept', arcade_hopper: 'Arcade Hopper', secret_starter: 'Secret Starter', dear_editor: 'Dear Editor',
+    senior_editor: 'Senior Editor', frogmas: 'Frogmas' };
+  // event days: open to every fren who visits PondOS on that day (the check-in gives them)
+  var FA_EVENT = { pep_birthday: 'visit PondOS on 30 January, Pepecoin\'s birthday', thanksgiving_fren: 'visit PondOS on Thanksgiving weekend' };
+  // how a locked special avatar opens, in a few words (secrets keep their hiding place to themselves)
+  function avHow(u) {
+    if (FA_EVENT[u]) return 'Opens when you ' + FA_EVENT[u] + '.';
+    if (FA_SECRET[u]) return 'Hidden behind a secret somewhere in PondOS.';
+    if (u === 'frogmas') return 'Earn the Frogmas stamp: visit PondOS on 24–26 December.';
+    return 'Earn the ' + (FA_UNLOCK[u] || 'matching') + ' stamp.';
+  }
+  function avName(p) { return String(p.label || p.id).replace(/\s*\([^)]*\)\s*$/, ''); }
   // special avatars hidden behind a secret: the lock says only that (no hint where)
-  var FA_SECRET = { why_tho: 1, midnight_fren: 1, happy_fren: 1, nerd_alert: 1, born_to_fren: 1, bali_dreamer: 1 };
+  var FA_SECRET = { why_tho: 1, midnight_fren: 1, happy_fren: 1, nerd_alert: 1, born_to_fren: 1, bali_dreamer: 1, find_fren: 1, address_check: 1 };
   function avatarMaker() {
     return openApp('avatar', 'Create Your Fren - Avatar Maker', 'pep-logo', function (A) {
       passportCss();
@@ -2174,7 +2218,7 @@
           var next = el('button', { type: 'button', class: 'fa-arr is-next', tabindex: '-1', 'aria-hidden': 'true' });
           (o.options[k] || []).forEach(function (p) {
             var locked = !!p.unlock && !owns(p.unlock), stamp = locked && FA_UNLOCK[p.unlock] || 'a future stamp';
-            var lab = el('label', { class: 'fa-opt' + (locked ? ' is-locked' : ''), title: locked ? (FA_SECRET[p.unlock] ? p.label + ' - locked: find its secret somewhere in PondOS' : p.label + ' - locked: earn the ' + stamp + ' stamp') : p.label });
+            var lab = el('label', { class: 'fa-opt' + (locked ? ' is-locked' : ''), title: locked ? (FA_SECRET[p.unlock] || FA_EVENT[p.unlock] ? p.label + ' - locked: ' + avHow(p.unlock) : p.label + ' - locked: earn the ' + stamp + ' stamp') : p.label });
             var inp = el('input', { type: 'radio', name: 'fa-' + k, value: p.id });
             // reserved parts are shown with a lock and cannot be picked; the save RPC rejects them too
             if (locked) inp.disabled = true;
@@ -2342,8 +2386,8 @@
       if(!result||result.id!==id) return;
       try { localStorage.setItem(k,'1'); } catch(e) {}
       if(result.new) {
-        var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren',midnight_fren:'Midnight Fren',nerd_alert:'Nerds Only',bali_dreamer:'Bali Dreamer'};
-        var av={why_tho:1,midnight_fren:1,nerd_alert:1,bali_dreamer:1};
+        var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren',midnight_fren:'Midnight Fren',nerd_alert:'Nerds Only',bali_dreamer:'Bali Dreamer',find_fren:'Looking Glass',address_check:'Trust, But Verify'};
+        var av={why_tho:1,midnight_fren:1,nerd_alert:1,bali_dreamer:1,find_fren:1,address_check:1};
         balloon('Secret discovered!',(names[id]||'A mysterious find')+' is now in your Fren Passport.'+(av[id]?' A special avatar is waiting in Create Your Fren.':''),'gif-045-still');
       }
     },function(){ /* Migration may not be installed yet; retry on next discovery. */ });
@@ -2514,6 +2558,7 @@
         var a = inp.value.replace(/\s+/g, '');
         addrVerdict(a).then(function (r) {
           if (!r) { out.innerHTML = ''; return; }
+          if (r[0] === 'ok') discoverSecret('address_check');   // checked a real PEP address before using it
           out.innerHTML = '<div class="sc-verdict sc-' + r[0] + '"><b>' + (r[0] === 'ok' ? '✓ ' : r[0] === 'warn' ? '! ' : '✗ ') + r[1] + '</b><p>' + r[2] + '</p>' +
             (r[0] === 'ok' ? '<p class="ac-more"><a href="' + BASE + 'rich-list.html#addr=' + a + '">Is it on the rich list? Check its rank →</a></p>' : '') + '</div>';
         });

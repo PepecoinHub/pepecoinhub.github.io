@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [49, 16, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [49, 20, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -23,15 +23,16 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
 
 test('every live casual secret is server allowlisted and discoverable', () => {
   // chat secrets (source: chat) are given by the server's chat trigger only, so they must NOT be claimable
-  const live = catalog.secrets.filter(x => x.status === 'live' && x.source !== 'chat').map(x => x.id).sort();
-  const chat = catalog.secrets.filter(x => x.status === 'live' && x.source === 'chat').map(x => x.id);
+  // event secrets (source: event) are given by the check-in on their day only, so they are not claimable either
+  const live = catalog.secrets.filter(x => x.status === 'live' && !x.source).map(x => x.id).sort();
+  const chat = catalog.secrets.filter(x => x.status === 'live' && (x.source === 'chat' || x.source === 'event')).map(x => x.id);
   const block = sql.match(/p_secret\s+not\s+in\s*\(([^)]*)\)/i);
   assert.ok(block, 'SQL casual-secret whitelist missing');
   const allowed = [...block[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]).sort();
   assert.deepEqual(live, allowed);
   for (const id of live) assert.ok(pond.includes("discoverSecret('" + id + "')"), id);
   const awards = readFileSync(new URL('../games/supabase/update_passport_awards.sql', import.meta.url), 'utf8');
-  for (const id of chat) { assert.ok(!allowed.includes(id), id + ' must not be claimable'); assert.ok(awards.includes("'" + id + "'"), id + ' given by the chat trigger'); }
+  for (const id of chat) { assert.ok(!allowed.includes(id), id + ' must not be claimable'); assert.ok(awards.includes("'" + id + "'"), id + ' given by the server'); }
 });
 
 test('secret RPC requires Discord and cannot issue premium or gameplay rewards', () => {
@@ -97,7 +98,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered look
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
   assert.equal(manifest.schema_version, 2);
   // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 9]);
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 17]);
   // the only looks a player can actually compose and save are built from the non-unlock (base) ids
   assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 6, 9, 9, 5, 6, 1]);
   assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 72900, 'offered looks');
@@ -112,7 +113,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered look
   // one 512x512 WebP per option id, plus the implied base layer
   const noQ = f => f.split('?')[0];   // the templates carry a ?v= cache key
   const files = [...new Set([manifest.paths.base, ...ids.map(id => noQ(manifest.paths.layer_template.replace('{id}', id)))])];
-  assert.equal(files.length, 56, '55 option layers + base_frog');
+  assert.equal(files.length, 64, '63 option layers + base_frog');
   // one small picture of each part for the maker rows, nothing else in the folder
   assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/thumbs/', import.meta.url)).sort(),
     ids.map(id => noQ(manifest.paths.thumb_template.replace('{id}', id)).split('/').pop()).sort(), 'no unused, stray or missing thumbnails');

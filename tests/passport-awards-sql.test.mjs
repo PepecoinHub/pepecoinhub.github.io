@@ -499,6 +499,16 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
       has_function_privilege('anon', 'public.gry_passport_bali(boolean)', 'EXECUTE') as anon_bali`)).rows[0];
     assert.deepEqual(priv2, { t: false, f: false, anon_printed: false, anon_bali: false });
 
+    // --- event days (Pepecoin's birthday, Thanksgiving) are for everyone: they are not "found", so no Secret Starter
+    await db.query("insert into games.passport_secrets(user_id, secret_id) values ($1, 'pep_birthday'), ($1, 'thanksgiving_fren')", [uid(62)]);
+    assert.ok(!(await has(62, 'secret_starter')));
+    // US Thanksgiving: the fourth Thursday of November (the check-in's own formula)
+    const tg = y => one(`select (make_date($1, 11, 1) + ((4 - extract(dow from make_date($1, 11, 1))::int + 7) % 7) + 21)::text as v`, [y]);
+    assert.deepEqual([await tg(2026), await tg(2027), await tg(2028)], ['2026-11-26', '2027-11-25', '2028-11-23']);
+    assert.ok(awards.includes("tg := tg + ((4 - extract(dow from tg)::int + 7) % 7) + 21;"), 'same formula as the check-in');
+    // and a browser cannot claim them
+    await assert.rejects(call(62, "select public.gry_passport_discover('pep_birthday') as v"), /Unknown discovery/);
+
     // --- account deletion removes the new rows too
     await db.query('delete from auth.users where id = $1', [uid(3)]);
     for (const t of ['passport_progress', 'passport_yeet_5k', 'passport_chat_days', 'passport_days', 'passport_badges'])

@@ -14,8 +14,8 @@ Last update: 2026-11-09, Claude. Update this file in every Passport PR.
 | Server (Supabase) | The three passport migrations are **drafts, not run**: `update_fren_passport.sql` → `update_fren_avatar.sql` → `update_passport_awards.sql`. Until then no stamp is real. |
 | Stamps | **40 of 48 have a rule** (+ BALI). 8 wait: 5 PepeGochi stamps and Beta Tester (features not built), Picasso Fren and The Secret Pond (no data yet). |
 | Album | 40 shown, 3 `???` teasers (Picasso Fren, First Hatch, Beta Tester), 5 hidden. |
-| Secrets | 9 findable, none advertised (a short Gazette note later). Map pieces dropped. |
-| Special avatars | 7, each behind a secret or a stamp (section 5). |
+| Secrets | 11 findable (none advertised; a short Gazette note later) + 2 event days for everyone. Map pieces dropped. |
+| Special avatars | 16, each behind a secret, a stamp or an event day. Own **Avatars** tab in the Passport (section 5). |
 | Art | 32 of 48 final (18 v3 in the album sprite + 14 Lily). 6 waiting for the owner's OK, 10 still to draw or finish. |
 
 ## 2. All 48 stamps
@@ -103,13 +103,20 @@ These buttons call the new RPCs, so they work only after the migrations run.
 
 **Claude**
 1. After the owner's OK: the 6 stamps into the v3 sprite.
+1a. **New-reward notice** (owner, 2026-11-09): an animated Windows 98 style notice for a new stamp, secret or avatar
+   that nobody can miss. Today a plain tray balloon shows new stamps only. Plan: the tray balloon with a stamp
+   "thump" animation, a blinking Passport icon in the tray until the Passport is opened, and the same notice for
+   secrets and avatars. Not in Frog Mail (that stays for letters and the Gazette).
+1b. **Incognito avatar** (`games/fren-passport/source/avatars/incognito_original.png`): for the "invisible" status,
+   once the bigger chat window with statuses (available / back soon / invisible) exists.
 2. Scene blocks in `GPT_MASTER_PROMPT.md` for the stamps above, and each new upload into #233 and the sprite.
 3. A short Gazette note about secrets, when the owner asks.
 4. Launch-day removal of the beta gate.
 
-## 5. Special avatars (secret rewards, 2026-11-08)
+## 5. Special avatars (2026-11-08, more on 2026-11-09)
 
-Whole-character avatars in Create Your Fren (the `special` slot), locked until earned:
+Whole-character avatars in Create Your Fren (the `special` slot), locked until earned. The Passport's **Avatars**
+tab (where Achievements used to be) lists all of them with how each one opens (secrets keep their hiding place):
 
 | Avatar | Unlock | How |
 |---|---|---|
@@ -120,6 +127,16 @@ Whole-character avatars in Create Your Fren (the `special` slot), locked until e
 | Born to Fren | secret `born_to_fren` | the word "fren" in the lobby chat (@mentions do not count; server trigger) |
 | Bali Dreamer | secret `bali_dreamer` | tap the BALI stamp in the Passport |
 | Knight | stamp `good_game` | finish a board game with another Discord fren |
+| Explorer Pepe | stamp `scout_fren` | Pepe Guesser 14 days in a row |
+| Secret Seeker | stamp `secret_starter` | find any secret |
+| Looking Glass | secret `find_fren` | open a result in the Find app |
+| Sherlock | secret `address_check` | check a valid PEP address in AddressCheck.exe |
+| Scribe | stamp `dear_editor` | send a letter to the editor |
+| Old Editor | stamp `senior_editor` | 5 letters printed |
+| Birthday Fren | event `pep_birthday` | visit on 30 January, Pepecoin's birthday (UTC 30–31) |
+| Santa Fren | stamp `frogmas` | visit on 24–26 December |
+| Turkey Fren | event `thanksgiving_fren` | visit on US Thanksgiving weekend (4th Thursday of November to Sunday) |
 
-Live secrets: 9 (Wrong Frog, Why Do You Need This?, The Magic Word, Blue Screen of Fren, Midnight Fren, Nerds Only,
-Bali Dreamer, Happy Fren, Born to Fren).
+Live secrets: 11 (Wrong Frog, Why Do You Need This?, The Magic Word, Blue Screen of Fren, Midnight Fren, Nerds Only,
+Bali Dreamer, Happy Fren, Born to Fren, Looking Glass, Trust But Verify). The two event days are listed with the secrets
+but are not "found": they do not count for Secret Starter or Treasure Hunter.

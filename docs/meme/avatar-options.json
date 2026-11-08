@@ -314,6 +314,46 @@
         "id": "special_knight",
         "label": "Knight (Good Game)",
         "unlock": "good_game"
+      },
+      {
+        "id": "special_seeker",
+        "label": "Secret Seeker (Secret Starter)",
+        "unlock": "secret_starter"
+      },
+      {
+        "id": "special_looking",
+        "label": "Looking Glass (secret)",
+        "unlock": "find_fren"
+      },
+      {
+        "id": "special_sherlock",
+        "label": "Sherlock (secret)",
+        "unlock": "address_check"
+      },
+      {
+        "id": "special_scribe",
+        "label": "Scribe (Dear Editor)",
+        "unlock": "dear_editor"
+      },
+      {
+        "id": "special_editor",
+        "label": "Old Editor (Senior Editor)",
+        "unlock": "senior_editor"
+      },
+      {
+        "id": "special_birthday",
+        "label": "Birthday Fren (30 January)",
+        "unlock": "pep_birthday"
+      },
+      {
+        "id": "special_santa",
+        "label": "Santa Fren (Frogmas)",
+        "unlock": "frogmas"
+      },
+      {
+        "id": "special_turkey",
+        "label": "Turkey Fren (Thanksgiving)",
+        "unlock": "thanksgiving_fren"
       }
     ]
   },
