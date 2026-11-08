@@ -1602,7 +1602,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261108v3';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261106lily1'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261108pp48b'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1717,7 +1717,7 @@
       //  - right page: the earned stamps (server earned_at only), then '?' slots; the BALI stamp is printed
       //    on the page and stays locked (future server-verified $0.01 condition, never awarded or priced here)
       //  - My Fren Journey and Next Milestone: factual counters only; no XP, levels or invented ranks
-      // Tabs (Overview, Achievements, Stamps, Collection, Stats) show the same data in list form.
+      // Tabs (Overview, Stamps, Collection, Stats) show the same data in list form.
       var tab = 0;
       A.render = function () {
         var d = passportMine(), box = A.body.querySelector('.passport');
@@ -1867,7 +1867,7 @@
         }
 
         // ---------- tabs ----------
-        var TABS = [['Overview','tab_home'],['Achievements','tab_trophy'],['Stamps','tab_stamp'],['Collection','tab_box'],['Stats','tab_stats']];
+        var TABS = [['Overview','tab_home'],['Stamps','tab_stamp'],['Collection','tab_box'],['Stats','tab_stats']];
         var bar98 = el('div', {class:'tabs98 pp-tabs',role:'tablist','aria-label':'Passport sections'});
         var panes = [];
         TABS.forEach(function(t, i){
@@ -1903,36 +1903,32 @@
         recent.appendChild(rl);
         panes[0].appendChild(recent);
 
-        // Achievements: every catalog stamp with its rule and its real state
-        var al = el('ul', {class:'pp-list'});
-        regular.concat([find(badges, MYTHIC_ID) || {id:MYTHIC_ID,title:'BALI',description:'$0.01 - BALI.',status:'planned'}]).forEach(function(x){
-          var e = x.id===MYTHIC_ID ? null : earnedOf(x.id);
-          var li = el('li', {class:'pp-row'+(e?' is-earned':'')});
-          li.appendChild(ppStamp(x, !!e));
-          var tx = el('div'); tx.appendChild(piece('b','',nameOf(x, e))); tx.appendChild(piece('small','',shown(x, e) ? x.description||'' : 'A new stamp is on its way.'));
-          li.appendChild(tx);
-          li.appendChild(piece('span','pp-tag'+(e?' is-on':''), e ? 'Earned '+fmt.date(e.earned_at) : stateOf(x)));
-          al.appendChild(li);
-        });
-        panes[1].appendChild(piece('p','pp-muted', earnedCount+' of '+goal+' stamps earned. Stamps are awarded by the server only, from what the games record; "Coming soon" stamps cannot be earned yet.'));
-        panes[1].appendChild(al);
-
-        // Stamps: the whole album with names (locked stamps show the '?' slot)
+        // Stamps: the album on passport paper. Tap a stamp to read how it is earned (no hover on phones).
+        var sheet = el('div', {class:'pp-sheet'});
+        sheet.appendChild(piece('h3','pp-sheet-h','Achievement Stamps'));
+        sheet.appendChild(piece('p','pp-sheet-count', earnedCount+' of '+goal+' stamps earned'));
         var album = el('div', {class:'pp-album'});
+        var info = el('p', {class:'pp-sheet-info','aria-live':'polite'});
+        info.textContent = 'Tap a stamp to see how to earn it.';
         regular.forEach(function(x){
           var e = earnedOf(x.id);
-          var c = el('div', {class:'pp-stamp'+(e?' is-earned':' is-locked'), title: shown(x, e) ? x.description || '' : 'Coming soon'});
+          var c = el('button', {type:'button',class:'pp-stamp'+(e?' is-earned':' is-locked'), title: shown(x, e) ? x.description || '' : 'Coming soon'});
           c.appendChild(ppStamp(x, !!e));
           c.appendChild(piece('b','pp-stamp-name', nameOf(x, e)));
           c.appendChild(piece('small','pp-stamp-sub', e ? fmt.date(e.earned_at) : stateOf(x)));
+          c.addEventListener('click', function(){
+            [].forEach.call(album.children, function(n){ n.classList.toggle('is-picked', n===c); });
+            info.textContent = nameOf(x, e) + ': ' + (shown(x, e) ? x.description || '' : 'A new stamp is on its way.');
+          });
           album.appendChild(c);
         });
-        panes[2].appendChild(album);
+        sheet.appendChild(album);
+        sheet.appendChild(info);
         var mythic = el('div', {class:'pp-mythic is-locked', title:'Reserved mythic stamp - awarded by the server when Pepecoin reaches $0.01 USD'});
-        mythic.appendChild(piece('b','pp-mythic-name','BALI'));
-        mythic.appendChild(piece('span','pp-mythic-sub','$0.01 - BALI'));
-        mythic.appendChild(piece('small','pp-muted','Reserved for every fren when Pepecoin reaches $0.01 USD. Locked until then.'));
-        panes[2].appendChild(mythic);
+        mythic.appendChild(el('img', {src:PP_ART+'bali-ticket.webp'+PP_ART_V, alt:'BALI, $0.01 - BALI. Locked.', width:'310', height:'114', draggable:'false'}));
+        mythic.appendChild(piece('small','','Reserved for every fren when Pepecoin reaches $0.01 USD. Locked until then.'));
+        sheet.appendChild(mythic);
+        panes[1].appendChild(sheet);
 
         // Collection: items and secrets, as the server lists them
         function collect(title, list, has, sub) {
@@ -1955,7 +1951,7 @@
         cgrid.appendChild(collect('Items  ' + (itemsGoal ? itemsCount + ' / ' + itemsGoal : itemsCount), items, function(x){ return find(owned, x.id); }, function(){ return 'Owned'; }));
         cgrid.appendChild(collect('Secrets  ' + secretsCount + ' / ' + secretsGoal, secrets,
           function(x){ var s = find(discovered, x.id); return s && s.discovered_at ? s : null; }, function(s){ return 'Found ' + fmt.date(s.discovered_at); }));
-        panes[3].appendChild(cgrid);
+        panes[2].appendChild(cgrid);
 
         // Stats: factual numbers from the server snapshot
         var st = el('dl', {class:'pp-stats'});
@@ -1968,8 +1964,8 @@
           ['Best YEET flight', yeetBest==null?'—':metres(yeetBest)],
           ['Avatar saved', look ? 'Yes' : 'Not yet']
         ].forEach(function(v){ var r=el('div'); r.appendChild(piece('dt','',v[0])); r.appendChild(piece('dd','',v[1])); st.appendChild(r); });
-        panes[4].appendChild(st);
-        panes[4].appendChild(piece('p','pp-muted','Days registered counts calendar days since you joined; it is not an activity counter.'));
+        panes[3].appendChild(st);
+        panes[3].appendChild(piece('p','pp-muted','Days registered counts calendar days since you joined; it is not an activity counter.'));
 
         box.appendChild(bar98);
         panes.forEach(function(p){ box.appendChild(p); });
@@ -3351,7 +3347,7 @@
     { file: 'fren_passport.mpg', fren: true, added: '2026-11-06', title: 'The Fren Passport', ch: 'CH 98 · POND TRAVEL AGENCY', icon: 'pep-logo', scenes: [
       '<p class="ad-kick">Tired of profiles that look like a spreadsheet?</p><h3 class="ad-big">Get a real<br><em>passport!</em></h3><p class="ad-sub">A hand-drawn paper booklet, with your Fren clipped in as the photo.</p>',
       '<img class="ad-pic" src="passport-assets/page-left.webp?v=20261106pp1" alt=""><p class="ad-kick">Fren ID. Nickname. Member since. All filled in from your Discord log-on.</p><h3 class="ad-big">No fake numbers.<br><em>Just you.</em></h3>',
-      '<img class="ad-pic" src="passport-assets/page-right.webp?v=20261106pp1" alt=""><p class="ad-kick">45 stamp slots. The pond checks every one on its own server.</p><h3 class="ad-big">Collect <em>stamps!</em></h3><p class="ad-sub">21 of them can be earned today, from what the games record. The rest say "coming soon" until they really work.</p>',
+      '<img class="ad-pic" src="passport-assets/page-right.webp?v=20261106pp1" alt=""><p class="ad-kick">48 stamps to collect. The pond checks every one on its own server.</p><h3 class="ad-big">Collect <em>stamps!</em></h3><p class="ad-sub">21 of them can be earned today, from what the games record. The rest say "coming soon" until they really work.</p>',
       '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">One stamp says<br><em>$0.01 - BALI</em></h3><p class="ad-sub">It stays locked for every fren until Pepecoin reaches one cent. Then everybody gets it. Same day, same stamp.</p><p class="ad-fine">Not a real offer. No trip, no prize, no price prediction, no financial advice. Stamps are cosmetic: no PEP, no points, nothing to sell. Log on with Discord to open yours.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
     ] },
     { file: 'create_your_fren.mpg', fren: true, added: '2026-11-05', title: 'Create Your Fren', ch: 'CH 64 · POND MAKEOVER HOUR', icon: 'fresh-fren', scenes: [
