@@ -203,7 +203,6 @@
     if (FREN) smMain.appendChild(passportItem);
     var findItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('search') + '" alt="" width="28" height="28"><span><b>Find…</b> <small>games, pages, tools</small></span>');
     findItem.addEventListener('click', function () { setOpen(false); finder(); });
-    smMain.appendChild(findItem);
     smMain.appendChild(el('hr'));
     NAV.forEach(function (g, gi) {
       var list = el('div', { class: 'sm-list' });
@@ -252,6 +251,7 @@
     var aboutItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('night-shift') + '" alt="" width="28" height="28"><span>About me</span>');
     aboutItem.addEventListener('click', function () { setOpen(false); aboutMe(); });
     smMain.appendChild(aboutItem);
+    smMain.appendChild(findItem);
     smMain.appendChild(sd);
     nav.appendChild(el('div', { class: 'sm-band', 'aria-hidden': 'true' }, '<span>Pond<b>OS</b> 1.0</span>'));
     nav.appendChild(smMain);
@@ -746,7 +746,7 @@
     // the rest of the pond in a small group lower down, NERDS ONLY on its own by the Start button, the bin far right
     var DESKTOP = [
       ['logon', [['#logon', 'Log On', 'pep-logo'], ['#find', 'Find', 'search']]],
-      ['play', [['#paint', 'PEPaint.exe', 'pepaint'], ['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
+      ['play', [['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
         ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads']]],
       ['pond', [['./', 'Internet', 'internet'], ['#shop', 'Shop', 'shop-bag'], ['#mail', 'Write a letter', 'frog-mail']]],
       // the community: our subreddit and the official Pepecoin account (the classic bird), next to NERDS ONLY above the taskbar
