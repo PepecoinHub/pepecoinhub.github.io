@@ -25,7 +25,7 @@ V3 = [
     'season_champion', 'bug_hunter', 'podium', 'game_night', 'quiz_master', 'frogmas',
     'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren',
     # redraws of Lily's stamps (owner, 2026-11-09)
-    'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14', 'pepe_guesser',
+    'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14', 'pepe_guesser', 'week_scout',
 ]
 SMALL = {'picasso_fren'}   # an accepted scene that exist only as the small review files so far
 TILE = (138, 150)
