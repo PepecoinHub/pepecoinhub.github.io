@@ -130,7 +130,10 @@ begin
   if u is null then raise exception 'Log on with Discord to save secrets'; end if;
   d := games.discord_identity(u);
   if d is null then raise exception 'Log on with Discord to save secrets'; end if;
-  if p_secret is null or p_secret not in ('lost_floppy', 'wrong_frog', 'notes_reader') then
+  -- happy_fren and born_to_fren are given by the chat trigger only (update_passport_awards.sql), never claimed here
+  -- pep_birthday and thanksgiving_fren are given by the check-in on those days only, never claimed here
+  if p_secret is null or p_secret not in ('wrong_frog', 'why_tho', 'magic_word', 'bsod_fren', 'midnight_fren', 'nerd_alert', 'bali_dreamer',
+      'find_fren', 'address_check') then
     raise exception 'Unknown discovery';
   end if;
 

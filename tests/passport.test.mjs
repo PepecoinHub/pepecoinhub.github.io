@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [46, 12, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [49, 20, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -22,12 +22,17 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
 });
 
 test('every live casual secret is server allowlisted and discoverable', () => {
-  const live = catalog.secrets.filter(x => x.status === 'live').map(x => x.id).sort();
+  // chat secrets (source: chat) are given by the server's chat trigger only, so they must NOT be claimable
+  // event secrets (source: event) are given by the check-in on their day only, so they are not claimable either
+  const live = catalog.secrets.filter(x => x.status === 'live' && !x.source).map(x => x.id).sort();
+  const chat = catalog.secrets.filter(x => x.status === 'live' && (x.source === 'chat' || x.source === 'event')).map(x => x.id);
   const block = sql.match(/p_secret\s+not\s+in\s*\(([^)]*)\)/i);
   assert.ok(block, 'SQL casual-secret whitelist missing');
   const allowed = [...block[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]).sort();
   assert.deepEqual(live, allowed);
   for (const id of live) assert.ok(pond.includes("discoverSecret('" + id + "')"), id);
+  const awards = readFileSync(new URL('../games/supabase/update_passport_awards.sql', import.meta.url), 'utf8');
+  for (const id of chat) { assert.ok(!allowed.includes(id), id + ' must not be claimable'); assert.ok(awards.includes("'" + id + "'"), id + ' given by the server'); }
 });
 
 test('secret RPC requires Discord and cannot issue premium or gameplay rewards', () => {
@@ -42,7 +47,8 @@ test('secret RPC requires Discord and cannot issue premium or gameplay rewards',
 });
 
 test('all badge and secret catalog items use distinct statuses', () => {
-  const reserved = new Set(['moon_rock','certified_fren']);
+  // Certified Fren went live with its daily rule (2026-11-08); Moon Rock is still reserved
+  const reserved = new Set(['moon_rock']);
   for (const item of [...catalog.achievements,...catalog.items]) {
     if (reserved.has(item.id)) assert.equal(item.status, 'planned');
   }
@@ -92,7 +98,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered look
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
   assert.equal(manifest.schema_version, 2);
   // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 2]);
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 17]);
   // the only looks a player can actually compose and save are built from the non-unlock (base) ids
   assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 6, 9, 9, 5, 6, 1]);
   assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 72900, 'offered looks');
@@ -107,7 +113,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered look
   // one 512x512 WebP per option id, plus the implied base layer
   const noQ = f => f.split('?')[0];   // the templates carry a ?v= cache key
   const files = [...new Set([manifest.paths.base, ...ids.map(id => noQ(manifest.paths.layer_template.replace('{id}', id)))])];
-  assert.equal(files.length, 49, '48 option layers + base_frog');
+  assert.equal(files.length, 64, '63 option layers + base_frog');
   // one small picture of each part for the maker rows, nothing else in the folder
   assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/thumbs/', import.meta.url)).sort(),
     ids.map(id => noQ(manifest.paths.thumb_template.replace('{id}', id)).split('/').pop()).sort(), 'no unused, stray or missing thumbnails');
@@ -175,13 +181,18 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   const dir = new URL('../docs/meme/passport-assets/', import.meta.url);
   const want = { 'page-left.webp': [360, 528], 'page-right.webp': [360, 528], 'stamps.webp': [16 * 69, 75], 'icons.webp': [12 * 48, 48],
     // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
-    'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80] };
+    'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
+    // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
+    'stamps-v3.webp': [24 * 138, 150],
+    // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
+    'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
   let total = 0;
   for (const [f, size] of Object.entries(want)) {
     const b = readFileSync(new URL(f, dir));
-    if (f !== 'stamps-lily.webp') total += b.length;
-    else assert.ok(b.length < 160 * 1024, 'Lily stamp sprite stays small: ' + b.length);
+    if (f !== 'stamps-lily.webp' && f !== 'stamps-v3.webp') total += b.length;
+    // the sprites load only when the Passport opens; the v3 one holds 24 tiles now (about 9-10 KB each)
+    else assert.ok(b.length < (f === 'stamps-v3.webp' ? 256 : 200) * 1024, 'stamp sprite stays small: ' + f + ' ' + b.length);
     assert.equal(b.toString('latin1', 0, 4) + b.toString('latin1', 8, 12), 'RIFFWEBP', f + ' is a WebP');
     // VP8X is the extended header used for images with alpha (the photo window and sprite edges are transparent)
     assert.equal(b.toString('latin1', 12, 16), 'VP8X', f + ' carries alpha');
@@ -192,6 +203,9 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
   assert.equal(count('PP_STAMPS'), 16);
+  assert.equal(count('PP_V3'), 24, 'PP_V3 matches the 24 tiles of stamps-v3.webp');
+  const v3 = readFileSync(new URL('../scripts/build_v3_stamps.py', import.meta.url), 'utf8').match(/V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join();
+  assert.equal(v3, js.match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join(), 'same order as the build script');
   assert.equal(count('PP_ICONS'), 12);
   // the Lily sprite order in the client equals the build script order
   const lily = js.match(/var PP_LILY = \[([^\]]*)\]/)[1].match(/'([a-z0-9_]+)'/g).map(x => x.slice(1, -1));

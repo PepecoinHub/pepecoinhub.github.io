@@ -187,7 +187,7 @@
       {
         "id": "hat_hardhat",
         "label": "Hard hat",
-        "unlock": "miner_fren"
+        "unlock": "rookie_miner"
       },
       {
         "id": "hat_detective",
@@ -267,7 +267,7 @@
       {
         "id": "accessory_headphones",
         "label": "Headphones",
-        "unlock": "gamer_fren"
+        "unlock": "arcade_hopper"
       }
     ],
     "special": [
@@ -279,6 +279,81 @@
         "id": "special_explorer",
         "label": "Explorer Pepe (Pepe Guesser)",
         "unlock": "scout_fren"
+      },
+      {
+        "id": "special_batman",
+        "label": "Batfren (secret)",
+        "unlock": "why_tho"
+      },
+      {
+        "id": "special_vampire",
+        "label": "Vampire (secret)",
+        "unlock": "midnight_fren"
+      },
+      {
+        "id": "special_smile",
+        "label": "Smiley (secret)",
+        "unlock": "happy_fren"
+      },
+      {
+        "id": "special_nerd",
+        "label": "Nerd (secret)",
+        "unlock": "nerd_alert"
+      },
+      {
+        "id": "special_soldier",
+        "label": "Born to Fren (secret)",
+        "unlock": "born_to_fren"
+      },
+      {
+        "id": "special_straw",
+        "label": "Bali Dreamer (secret)",
+        "unlock": "bali_dreamer"
+      },
+      {
+        "id": "special_knight",
+        "label": "Knight (Good Game)",
+        "unlock": "good_game"
+      },
+      {
+        "id": "special_seeker",
+        "label": "Secret Seeker (Secret Starter)",
+        "unlock": "secret_starter"
+      },
+      {
+        "id": "special_looking",
+        "label": "Looking Glass (secret)",
+        "unlock": "find_fren"
+      },
+      {
+        "id": "special_sherlock",
+        "label": "Sherlock (secret)",
+        "unlock": "address_check"
+      },
+      {
+        "id": "special_scribe",
+        "label": "Scribe (Dear Editor)",
+        "unlock": "dear_editor"
+      },
+      {
+        "id": "special_editor",
+        "label": "Old Editor (Senior Editor)",
+        "unlock": "senior_editor"
+      },
+      {
+        "id": "special_birthday",
+        "label": "Birthday Fren (30 January)",
+        "unlock": "pep_birthday"
+      },
+      {
+        "id": "special_santa",
+        "label": "Santa Fren (Frogmas)",
+        "unlock": "frogmas"
+      },
+      {
+        "id": "special_turkey",
+        "label": "Turkey Fren (Thanksgiving)",
+        "unlock": "thanksgiving_fren"
       }
     ]
   },
@@ -287,6 +362,6 @@
     "layer_template": "avatar-assets/layers/{id}.webp?v=20261107e",
     "thumb_template": "avatar-assets/thumbs/{id}.webp?v=20261107e"
   },
-  "special_note": "A special avatar is a whole drawn character by Lily for a big milestone. When one is picked it replaces every part layer except the background (bg).",
+  "special_note": "A special avatar is a whole character (Lily's drawing for a big milestone, or a classic Pepe meme for a secret). When one is picked it replaces every part layer except the background (bg).",
   "mouth_note": "Cigarette and pipe (in_mouth) are drawn under the mouth layer and moved so their in_mouth point lands on the chosen mouth's corner (512 canvas pixels), so the filter or mouthpiece is held in every mouth."
 }

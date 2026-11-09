@@ -1,0 +1,108 @@
+# Fren Passport: master prompt for stamp images (ChatGPT)
+
+Use this for **every** stamp. Do not rewrite it, do not shorten it, do not "improve" it between stamps.
+Only the SCENE block changes. Uneven quality comes from drifting prompts; this file stops the drift.
+
+## How to run it (every time)
+
+1. **New image, one stamp.** Never several stamps on one sheet, never "edit the previous image" for a new stamp.
+2. **Attach the same 3 references every time.** Use the light copies in `games/fren-passport/refs/`
+   (`ref_frog_of_the_week.jpg`, `ref_moonwalker.jpg`, `ref_first_fren.jpg`, about 100-150 KB each; or all three in
+   `ref_sheet.jpg`). The full PNGs in #233 are 2+ MB and GitHub does not always serve them whole. The owner can also
+   attach the same files in the chat. For a redraw, also attach the old version of that stamp as the composition reference.
+3. Paste the **MASTER PROMPT** below, then the **SCENE** block of the stamp.
+4. Generate **3 variants**, pick the best with the checklist, and show the owner only that one.
+5. Upload the PNG to #233 as `games/fren-passport/source/stamps-new/<id>.png` and add it to the manifest with
+   status `candidate`. The owner says OK; then status `owner-approved`.
+
+## MASTER PROMPT (paste as is)
+
+```
+Create ONE postage stamp illustration for the "Fren Passport" in PondOS.
+Match the three attached reference stamps exactly in style, line weight, colouring, frame and label. They are the
+standard. Same artist, same series.
+
+FORMAT
+- Portrait stamp, about 1173 x 1341 px, transparent background outside the stamp edge.
+- Cream paper #FCEDD5 with round scalloped perforations: 7 scallops across the top and bottom, 8 down each side.
+- Inner picture window with a thick dark-brown ink outline, slightly irregular, hand-drawn.
+- Bottom label: a grey #C7BEAF rounded bar with a dark outline, inside it ONLY this text: "{LABEL}".
+  Bold rounded hand-lettered font like the references, dark ink, centred, spelled exactly.
+
+STYLE
+- Detailed, slightly irregular cartoon with thick confident ink outlines and flat colour with light hand shading,
+  like a hand-inked sticker. Not vector-clean, not 3D, not painterly, not photo.
+- Pepe the frog as in the references: green skin #6DB33F range, big white eyes with black pupils, wide red-pink
+  mouth, friendly and happy. Same face proportions as the references.
+- Bold, saturated, warm colours. One clear background colour behind the scene.
+- Must read at 64 px: one main subject, big shapes, no tiny clutter, no small text in the scene.
+
+NOT ALLOWED
+- Any text except the label (no numbers, dates, years, logos, brand names, watermarks, signatures).
+- Gold frames, counters (x2), locks, question marks, ribbons around the stamp. The site adds those.
+- Hearts, astronaut suits on YEET stamps, real logos (NASA, Discord, Microsoft...), blood, weapons.
+- Extra stamps, a sheet of stamps, a border outside the perforations, drop shadows outside the stamp.
+
+SCENE
+{SCENE}
+```
+
+## Checklist before showing the owner (reject if any is "no")
+
+- [ ] Looks like the same series as Frog of the Week, Moonwalker and First Fren side by side.
+- [ ] 7 x 8 scallops, cream paper, grey label, label text spelled exactly, nothing else written.
+- [ ] Transparent outside, at least 900 px wide.
+- [ ] At 64 px you still understand the idea; the label is readable at 52 px.
+- [ ] Pepe's face matches the references.
+
+## SCENE blocks (next in line)
+
+**`detective_fren`, label `Detective Fren`.** Redraw of the accepted scene at full size; keep its composition.
+```
+Pepe in a brown deerstalker detective hat and a dark suit, holding a big magnifying glass up to one eye,
+the eye looks huge through the lens. Behind him a cork board with five pinned photos joined by red string,
+each photo shows a tiny green frog hidden in a landscape. Warm orange background.
+```
+
+**`rookie_miner`, label `Happy Mining!`.** Lily's existing art, only the label changes. Do NOT redraw the picture:
+replace the label text on the existing PNG and keep everything else pixel for pixel.
+
+**`good_game`, label `Good Game`.**
+```
+Two Pepe frogs across a finished chess board, shaking hands over the board, both smiling. The game is over:
+a few pieces left standing, no piece knocked over. Small Win98-style CRT monitor in the corner. Calm teal background.
+No white flag.
+```
+
+**`checkmate`, label `Checkmate!`.**
+```
+Pepe leaning over a chess board, moving a white queen with a confident grin; the black king stands cornered
+by the queen and a rook. Big shapes, few pieces. Purple background.
+```
+
+**`yeet_adept`, label `Adept`.**
+```
+Pepe in the YEET THE PEP pilot outfit (leather cap and goggles, scarf) flying high above the clouds, arms
+spread, sunset orange and pink sky behind him. No rocket, no space suit.
+```
+
+**`fud_buster`, label `FUD Buster`.**
+```
+Pepe as a retro arcade hero at a cabinet joystick, blasting a row of falling pixel "FUD" paper receipts with
+green laser bolts; the receipts are drawn as crumpled paper with no readable text. Dark blue background.
+```
+
+**`long_snake`, label `Long Snake`.**
+```
+A very long happy green pixel-block snake winding through the whole picture in loops, Pepe riding on its head
+and cheering. Black arcade-screen background with a faint grid.
+```
+
+**`secret_starter`, label `Secret Starter`.**
+```
+Pepe opening a dusty old floppy disk box under a desk lamp, a soft glow coming out of the box, eyes wide
+with surprise. Dark green background.
+```
+
+More SCENE blocks are added here by Claude when those stamps come up. ChatGPT does not write its own scenes for
+new stamps; ask the owner or Claude.

@@ -54,13 +54,19 @@
 --   awarded by the server, see update_passport_awards.sql); otherwise the save
 --   is rejected with 'That part is locked' (errcode 42501). Tampering with the
 --   browser cannot unlock them. The reward parts are:
---     hat_hardhat        (unlock miner_fren)
+--     hat_hardhat        (unlock rookie_miner: first Pepe Miner cloud save)
 --     hat_detective      (unlock detective_fren)
 --     clothing_suit      (unlock detective_fren)
 --     bg_sunset          (unlock yeet_adept, not earnable yet)
---     accessory_headphones (unlock gamer_fren, not earnable yet)
+--     accessory_headphones (unlock arcade_hopper, not earnable yet)
 --     hat_explorer       (unlock scout_fren)
 --     special_explorer   (unlock scout_fren)
+--     special_knight     (unlock good_game: a board game played to the end with another Discord player)
+--     special_batman, special_vampire, special_smile, special_nerd, special_soldier, special_straw
+--                        (unlocked by the secrets why_tho, midnight_fren, happy_fren, nerd_alert, born_to_fren, bali_dreamer)
+--     special_seeker (secret_starter), special_scribe (dear_editor), special_editor (senior_editor),
+--     special_santa (frogmas), special_looking and special_sherlock (the secrets find_fren, address_check),
+--     special_birthday and special_turkey (the event days pep_birthday, thanksgiving_fren)
 --
 -- SPECIAL AVATARS: the 'special' slot holds a whole drawn character (by Lily) for a
 -- big milestone. 'special_none' means the normal stacked parts; any other id
@@ -119,17 +125,27 @@ begin
      or p_eyes is null or p_eyes not in ('eyes_classic', 'eyes_sleepy', 'eyes_angry', 'eyes_bloodshot', 'eyes_3d', 'eyes_hypno', 'eyes_side', 'eyes_happy', 'eyes_hearts')
      or p_hat is null or p_hat not in ('hat_none', 'hat_pep_cap', 'hat_beanie', 'hat_bucket', 'hat_crown', 'hat_hardhat', 'hat_detective', 'hat_explorer')
      or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_shades', 'accessory_round', 'accessory_orange', 'accessory_cigarette', 'accessory_pipe', 'accessory_headphones')
-     or p_special is null or p_special not in ('special_none', 'special_explorer') then
+     or p_special is null or p_special not in ('special_none', 'special_explorer', 'special_batman', 'special_vampire', 'special_smile', 'special_nerd', 'special_soldier', 'special_straw', 'special_knight',
+                                                   'special_seeker', 'special_looking', 'special_sherlock', 'special_scribe', 'special_editor',
+                                                   'special_birthday', 'special_santa', 'special_turkey') then
     raise exception 'Unknown avatar option' using errcode = '22023';
   end if;
   -- Reward parts: saveable only by a player who holds the stamp that unlocks them
   -- (the manifest's 'unlock' keys; stamps are awarded by the server only).
   if exists (
-    select 1 from (values ('bg_sunset', 'yeet_adept'), ('clothing_suit', 'detective_fren'), ('hat_hardhat', 'miner_fren'),
-                          ('hat_detective', 'detective_fren'), ('accessory_headphones', 'gamer_fren'),
-                          ('hat_explorer', 'scout_fren'), ('special_explorer', 'scout_fren')) r(part, stamp)
+    select 1 from (values ('bg_sunset', 'yeet_adept'), ('clothing_suit', 'detective_fren'), ('hat_hardhat', 'rookie_miner'),
+                          ('hat_detective', 'detective_fren'), ('accessory_headphones', 'arcade_hopper'),
+                          ('hat_explorer', 'scout_fren'), ('special_explorer', 'scout_fren'),
+                          ('special_knight', 'good_game'),
+                          ('special_batman', 'why_tho'), ('special_vampire', 'midnight_fren'), ('special_smile', 'happy_fren'),
+                          ('special_nerd', 'nerd_alert'), ('special_soldier', 'born_to_fren'), ('special_straw', 'bali_dreamer'),
+                          ('special_seeker', 'secret_starter'), ('special_looking', 'find_fren'), ('special_sherlock', 'address_check'),
+                          ('special_scribe', 'dear_editor'), ('special_editor', 'senior_editor'), ('special_birthday', 'pep_birthday'),
+                          ('special_santa', 'frogmas'), ('special_turkey', 'thanksgiving_fren')) r(part, stamp)
      where r.part in (p_bg, p_clothing, p_hat, p_accessory, p_special)
-       and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)) then
+       -- the unlock is a stamp, or (for most special avatars) a secret
+       and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)
+       and not exists (select 1 from games.passport_secrets s where s.user_id = u and s.secret_id = r.stamp)) then
     raise exception 'That part is locked: earn its stamp first' using errcode = '42501';
   end if;
 
