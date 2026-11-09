@@ -2742,6 +2742,15 @@
       });
     });
   }
+  // payout lines for a Discord tip bot, e.g. "send 12.5 PEP to P..." (the weekly robot, scripts/wp_payouts.py, uses the same pattern)
+  var WP_PAYOUT_TEMPLATE = 'send {amount} PEP to {address}';
+  function wpPayoutLines(sum, tpl) {
+    tpl = tpl && tpl.indexOf('{address}') >= 0 && tpl.indexOf('{amount}') >= 0 ? tpl : WP_PAYOUT_TEMPLATE;
+    return Object.keys(sum).map(function (a) {
+      var amt = String(Math.round(Number(sum[a]) * 100) / 100);
+      return tpl.split('{amount}').join(amt).split('{address}').join(a);
+    });
+  }
   function wpRpc(name, args) { return freshSession().then(function () { return chatRpc(name, args || {}); }); }
   var leafletReady = null;
   function loadLeaflet() {
@@ -3074,6 +3083,10 @@
               if (c.secs != null && c.secs < 5 && c.points > 4700) fl.push('⚠ ' + c.points + ' pts in ' + c.secs + ' s');
               return '<li data-id="' + c.id + '"><span>' + esc(c.nick) + (c.verified ? ' ✓' : '') + ' · #' + c.num + ' · ' + c.points + ' pts · <b>' + c.pep + ' PEP</b><br><code>' + esc(c.address) + '</code>' + (fl.length ? '<br><b class="bad">' + fl.join(' · ') + '</b>' : '') + '</span><button type="button" class="app-btn" data-hold="' + (c.status === 'held' ? 0 : 1) + '">' + (c.status === 'held' ? 'Release' : 'Hold') + '</button></li>'; }).join('') + '</ol>' +
             (open.length ? '<p class="wp-small">1. Send from your own wallet: in Pepecoin Core, the Send tab, one recipient per address (Add Recipient), the amounts from the list. Or in the console: <code>sendmany ""</code> followed by the list. 2. Check the total before you confirm. 3. Paste the transaction id here and mark the rewards as paid.</p>' +
+              '<h4 class="wp-h">For a Discord tip bot</h4><p class="wp-small">One line per address. Change the pattern to match your bot: {amount} and {address} are filled in.</p>' +
+              '<div class="app-row"><input class="ac-in wp-tpl" type="text" spellcheck="false" aria-label="Line pattern"><button type="button" class="app-btn wp-copybot">Copy for the bot</button></div>' +
+              '<textarea class="sc-in wp-bot" rows="5" readonly></textarea>' +
+              '<h4 class="wp-h">For Pepecoin Core (sendmany)</h4>' +
               '<textarea class="sc-in wp-many" rows="3" readonly></textarea><div class="app-row"><button type="button" class="app-btn wp-copymany">Copy the list</button><input class="ac-in wp-txid" type="text" spellcheck="false" placeholder="Transaction id (64 characters)" aria-label="Transaction id"><button type="button" class="app-btn wp-paid">Mark as paid</button></div>' : '<p class="wp-small">Nothing to pay right now.</p>') +
             '<h4 class="wp-h">Settings</h4><form class="app-row wp-set"><label>PEP per 50 pts <input class="ac-in" name="a" type="number" step="0.01" min="0" value="' + st.per_50 + '"></label>' +
               '<label>Discord: max a day <input class="ac-in" name="b" type="number" min="0" value="' + st.max_day + '"></label><label>a week <input class="ac-in" name="c" type="number" min="0" value="' + st.max_week + '"></label>' +
@@ -3085,7 +3098,15 @@
           var many = body.querySelector('.wp-many');
           if (many) {
             many.value = JSON.stringify(sum);
-            body.querySelector('.wp-copymany').addEventListener('click', function () { many.select(); if (navigator.clipboard) navigator.clipboard.writeText(many.value).then(function () { say('Copied.'); }, function () { say('Select the text and copy it.', true); }); });
+            var copyBox = function (box) { box.select(); if (navigator.clipboard) navigator.clipboard.writeText(box.value).then(function () { say('Copied.'); }, function () { say('Select the text and copy it.', true); }); };
+            body.querySelector('.wp-copymany').addEventListener('click', function () { copyBox(many); });
+            var tpl = body.querySelector('.wp-tpl'), bot = body.querySelector('.wp-bot'), TPL_KEY = 'wp-payout-template';
+            try { tpl.value = localStorage.getItem(TPL_KEY) || ''; } catch (e) {}
+            if (!tpl.value) tpl.value = WP_PAYOUT_TEMPLATE;
+            var fillBot = function () { bot.value = wpPayoutLines(sum, tpl.value).join('\n'); };
+            tpl.addEventListener('input', function () { fillBot(); try { localStorage.setItem(TPL_KEY, tpl.value); } catch (e) {} });
+            fillBot();
+            body.querySelector('.wp-copybot').addEventListener('click', function () { copyBox(bot); });
             body.querySelector('.wp-paid').addEventListener('click', function () {
               var tx = body.querySelector('.wp-txid').value.trim();
               wpRpc('gry_wp_host_paid', { p_ids: open.map(function (c) { return c.id; }), p_txid: tx }).then(function (n) { say(n + ' claims marked as paid.'); payouts(); }, function (e) { say(e.message, true); });
