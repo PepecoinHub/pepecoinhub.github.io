@@ -30,10 +30,16 @@ end loop;
 return s;
 end $$;
 
+-- start of this reward week: Monday 00:00 UTC
+create or replace function games.wp_week_start() returns timestamptz
+language sql stable set search_path = '' as $$
+select date_trunc('week', now() at time zone 'utc') at time zone 'utc'
+$$;
+
 create or replace function games.wp_budget_left() returns numeric
 language sql stable security definer set search_path = '' as $$
 select greatest(0, (select wp_week_budget from games.config where id = 1)
-- coalesce((select sum(pep) from games.wp_claims where status <> 'held' and created_at > now() - interval '7 days'), 0))
+- coalesce((select sum(pep) from games.wp_claims where status <> 'held' and created_at >= games.wp_week_start()), 0))
 $$;
 
 -- what this player can get: the page shows it under the result
@@ -81,7 +87,7 @@ end if;
 mx_d := case when ver then c.wp_max_day else c.wp_guest_max_day end;
 mx_w := case when ver then c.wp_max_week else c.wp_guest_max_week end;
 pep := least(mx_d, floor(coalesce(pl.points, 0) / 50.0) * c.wp_pep_per_50);
-select coalesce(sum(k.pep), 0) into wk from games.wp_claims k where k.user_id = u and k.status <> 'held' and k.created_at > now() - interval '7 days';
+select coalesce(sum(k.pep), 0) into wk from games.wp_claims k where k.user_id = u and k.status <> 'held' and k.created_at >= games.wp_week_start();
 pep := least(pep, greatest(0, mx_w - wk), games.wp_budget_left());
 if pep <= 0 then
 if games.wp_budget_left() <= 0 then raise exception 'This week''s PEP budget is used up. More next week!'; end if;
