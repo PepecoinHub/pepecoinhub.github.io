@@ -3911,11 +3911,10 @@
     return mentionsJs;
   }
   function verifiedHere() { var me = whoAmI(); return !!(me && me.discord); }
-  // the name in front of a message. Fren Passport beta: a verified (Discord) name opens that fren's passport;
-  // guests have no passport, so their names stay plain text. Without the beta every name is plain text.
+  // the name in front of a message: every name is a button that opens the small fren card (who, online or not,
+  // and the Fren Passport for verified frens while the passport beta is on)
   function lanWho(m) {
-    var b = '<b>' + esc(m.nick) + '</b>';
-    return FREN && m.verified && FREN_ID.test(m.user_id || '') ? '<button type="button" class="lan-who" title="Open the Fren Passport of ' + esc(m.nick) + '">' + b + '</button>' : b;
+    return '<button type="button" class="lan-who" data-u="' + esc(m.user_id || '') + '" data-n="' + esc(m.nick) + '" data-v="' + (m.verified ? 1 : '') + '" title="' + esc(m.nick) + ': fren card"><b>' + esc(m.nick) + '</b></button>';
   }
   var onlineN = null;
   function paintOnline(n) {
@@ -3923,21 +3922,160 @@
     document.querySelectorAll('.lan-n').forEach(function (e) { e.textContent = n; });
     document.querySelectorAll('.lan-badge').forEach(function (e) { e.hidden = n == null; });
   }
+  var LAN_H = 'pondos-lan-h', LAN_LIST = 'pondos-lan-list';
   function lanParty() {
     var A = openApp('lan', 'LAN Party - #pond chat', 'gif-080-still', function (A) {
-      A.body.innerHTML = '<div class="app-row"><span class="grow"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online in the pond</span></div>' +
-        '<div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
+      var listPref = null; try { listPref = localStorage.getItem(LAN_LIST); } catch (e) {}
+      A.host.classList.add('lan-win');
+      A.body.innerHTML =
+        '<div class="lan-top"><button type="button" class="app-btn lan-list-btn" aria-expanded="false" aria-controls="lan-buddies" title="Who is online"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online</button>' +
+        '<span class="lan-room">#pond</span><span class="grow"></span><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span></div>' +
+        '<div class="lan-main"><div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
+        '<aside class="lan-buddies" id="lan-buddies" aria-label="Who is online"><div class="lan-bl"><p class="lan-bh">Loading…</p></div></aside></div>' +
         '<div class="emo-pop" hidden role="group" aria-label="Pepe emotes"><div class="emo-head"><input type="search" class="emo-q" placeholder="Search Pepes… (laugh, pray, apu)" aria-label="Search emotes" autocomplete="off">' +
         '<div class="emo-tabs" role="tablist"><button type="button" data-t="recent" title="Recently used">⏱</button>' + EMO_FAM.map(function (f) { return '<button type="button" data-t="' + f[0] + '">' + f[1] + '</button>'; }).join('') + '<button type="button" data-t="gif">GIFs</button></div></div>' +
         '<div class="emo-grid" role="group" aria-label="Emotes"></div></div>' +
         '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + EMO_DIR + 'peepo_happy.webp' + EMO_V + '" alt="" width="22" height="22"></button><input name="n" class="lan-nick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname" hidden><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
-        '<p class="hs-note lan-note"></p><p class="hs-note lan-ment" hidden><button type="button" class="app-btn lan-ment-btn"></button> <span></span></p>';
+        '<p class="hs-note lan-note"></p><p class="hs-note lan-ment" hidden><button type="button" class="app-btn lan-ment-btn"></button> <span></span></p>' +
+        '<div class="lan-status"><span class="lan-st">Connecting…</span><span class="lan-grip" role="separator" tabindex="0" aria-orientation="horizontal" aria-label="Chat height. Drag, or use the arrow keys, to make the chat taller or shorter" title="Drag to make the chat taller"><i></i><i></i><i></i></span></div>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input[name=t]'), note = A.body.querySelector('.lan-note');
-      if (FREN) log.addEventListener('click', function (e) {
-        var b = e.target.closest('.lan-who'), row = b && b.closest('.lan-msg');
-        if (row && row._m) frenPassport(false, { id: row._m.user_id, nick: row._m.nick });
-      });
+      var main = A.body.querySelector('.lan-main'), listBtn = A.body.querySelector('.lan-list-btn'), bl = A.body.querySelector('.lan-bl');
+      var stEl = A.body.querySelector('.lan-st'), hostTag = A.body.querySelector('.lan-host-tag');
+      var canMod = false, who = null, whoT = 0;
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false;
+
+      // ----- who is online: a buddy list beside the log (a wide window) or folded under the top bar (a phone)
+      var wide = function () { return A.host.offsetWidth >= 600; };
+      var showList = function (on) {
+        main.classList.toggle('list-on', on); listBtn.setAttribute('aria-expanded', String(on)); listBtn.setAttribute('aria-pressed', String(on));
+        if (on) loadWho();
+      };
+      listBtn.addEventListener('click', function () {
+        var on = !main.classList.contains('list-on'); showList(on);
+        try { localStorage.setItem(LAN_LIST, on ? '1' : '0'); } catch (e) {}
+      });
+      if (window.innerWidth > 760 && A.host.offsetWidth < 600) A.host.style.width = 'min(660px, calc(100vw - 16px))';
+      var row = function (p, kind) {
+        var tip = kind === 'fren' ? (p.me ? 'You' : 'Online now, verified with Discord') : 'Guest, wrote here in the last 15 minutes';
+        return '<li><button type="button" class="lan-who lan-buddy is-' + kind + '" data-u="' + esc(p.user_id || '') + '" data-n="' + esc(p.nick) + '" data-v="' + (kind === 'fren' ? 1 : '') + '" title="' + tip + '">' +
+          '<span class="lan-flower" aria-hidden="true"></span><span class="lan-bn">' + esc(p.nick) + (p.me ? ' <i>(you)</i>' : '') + '</span>' + (kind === 'fren' ? '<span class="hs-ok" aria-label="verified">✓</span>' : '') + '</button></li>';
+      };
+      var paintWho = function () {
+        if (!who) return;
+        var fr = who.frens || [], gu = who.guests || [], lurk = Math.max(0, who.lurkers || 0);
+        bl.innerHTML = '<p class="lan-bh">Frens online (' + fr.length + ')</p>' + (fr.length ? '<ul>' + fr.map(function (p) { return row(p, 'fren'); }).join('') + '</ul>' : '<p class="lan-empty">No verified frens right now.</p>') +
+          (gu.length ? '<p class="lan-bh">Guests chatting (' + gu.length + ')</p><ul>' + gu.map(function (p) { return row(p, 'guest'); }).join('') + '</ul>' : '') +
+          (lurk ? '<p class="lan-lurk">+ ' + lurk + (lurk === 1 ? ' fren reading quietly' : ' frens reading quietly') + '</p>' : '') +
+          (who.local ? '<p class="lan-empty">Names from the last 15 minutes of chat.</p>' : '');
+      };
+      // until gry_lobby_who is in the database, the list is made from the chat itself (who wrote in the last 15 minutes)
+      var localWho = function () {
+        var cut = Date.now() - 15 * 60000, fr = {}, gu = {};
+        Object.keys(seen).forEach(function (id) {
+          var m = seen[id]._m; if (!m || new Date(m.at).getTime() < cut) return;
+          if (m.verified) fr[m.user_id || m.nick] = { user_id: m.user_id, nick: m.nick }; else gu[m.nick.toLowerCase()] = { nick: m.nick };
+        });
+        var f = Object.keys(fr).map(function (k) { return fr[k]; }), g = Object.keys(gu).map(function (k) { return gu[k]; });
+        return { frens: f, guests: g, lurkers: Math.max(0, (onlineN || 0) - f.length - g.length), local: true };
+      };
+      var noWhoRpc = false;
+      var loadWho = function () {
+        clearTimeout(whoT);
+        if (!alive) return;
+        if ((!who || main.classList.contains('list-on')) && !document.hidden && !A.host.classList.contains('is-min')) {
+          (noWhoRpc ? Promise.reject() : chatRpc('gry_lobby_who', { p_visitor: visitorId() })).then(function (r) { who = r || {}; paintWho(); },
+            function (err) { if (err && /gry_lobby_who|function|schema cache/i.test(err.message || '')) noWhoRpc = true; who = localWho(); paintWho(); });
+        }
+        whoT = setTimeout(loadWho, 30000);
+      };
+      showList(listPref ? listPref === '1' : wide());
+
+      // ----- the fren card: click any name (in the log or the list)
+      var card = null;
+      var closeCard = function () { if (card) { card.remove(); card = null; } };
+      var openCard = function (b) {
+        closeCard();
+        var u = b.getAttribute('data-u') || '', nick = b.getAttribute('data-n') || '', ver = !!b.getAttribute('data-v');
+        var mine = anySession(), isMe = !!(mine && mine.user && u && mine.user.id === u);
+        var on = !!(who && (who.frens || []).some(function (p) { return p.user_id === u; }) || who && (who.guests || []).some(function (p) { return p.nick === nick; }));
+        var msgs = Object.keys(seen).map(function (id) { return seen[id]._m; }).filter(function (m) { return m && (ver ? m.user_id === u : !m.verified && m.nick === nick); });
+        var lastM = msgs[msgs.length - 1];
+        var passOk = FREN && ver && FREN_ID.test(u);
+        card = el('div', { class: 'lan-card win', role: 'dialog', 'aria-label': 'Fren card: ' + nick });
+        card.innerHTML = '<div class="win-bar"><span class="win-t">Fren card</span><span class="win-ctl"><button type="button" class="w-x lan-card-x" title="Close">' + ICO.x + '<span class="sr">Close</span></button></span></div>' +
+          '<div class="lan-card-in"><div class="lan-card-pic" aria-hidden="true"><img src="' + BASE + 'games/img/emotes/' + (ver ? 'gmfren' : 'peek') + '.webp" alt="" width="56" height="56"></div><div>' +
+          '<b class="lan-card-n">' + esc(nick) + (isMe ? ' <i>(you)</i>' : '') + '</b>' +
+          '<span>' + (ver ? '<span class="hs-ok">✓</span> Verified with Discord' : 'Guest (no Discord log-on)') + '</span>' +
+          (who ? '<span><span class="lan-st-dot' + (on ? ' on' : '') + '" aria-hidden="true"></span> ' + (on ? 'Online now' : 'Not online right now') + '</span>' : '') +
+          '<span class="lan-card-m">' + (msgs.length ? msgs.length + (msgs.length === 1 ? ' message' : ' messages') + ' today · last at ' + new Date(lastM.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'No messages in the last 24 hours') + '</span></div></div>' +
+          '<div class="lan-card-act">' +
+          (passOk ? '<button type="button" class="app-btn lan-c-pass">📘 Fren Passport</button>' : '<span class="lan-c-soon">' + (ver ? '📘 Fren Passports open soon' : '📘 Guests have no Fren Passport') + '</span>') +
+          (!isMe && ver && verifiedHere() ? '<button type="button" class="app-btn lan-c-at">@ Mention</button>' : '') +
+          (canMod && lastM && !isMe ? '<button type="button" class="app-btn lan-c-mute">🔇 Mute 24 h</button>' : '') + '</div>';
+        A.body.appendChild(card);
+        var br = b.getBoundingClientRect(), hr = A.body.getBoundingClientRect();
+        card.style.top = Math.max(4, Math.min(br.bottom - hr.top + 4, A.body.clientHeight - card.offsetHeight - 4)) + 'px';
+        card.style.left = Math.max(4, Math.min(br.left - hr.left, A.body.clientWidth - card.offsetWidth - 4)) + 'px';
+        card.querySelector('.lan-card-x').addEventListener('click', closeCard);
+        var pb = card.querySelector('.lan-c-pass'); if (pb) pb.addEventListener('click', function () { closeCard(); frenPassport(false, { id: u, nick: nick }); });
+        var ab = card.querySelector('.lan-c-at'); if (ab) ab.addEventListener('click', function () {
+          closeCard(); var v = inp.value; inp.value = (v && !/\s$/.test(v) ? v + ' ' : v) + '@' + nick + ' '; inp.focus();
+        });
+        var mb = card.querySelector('.lan-c-mute'); if (mb) mb.addEventListener('click', function () { closeCard(); modMute(lastM); });
+        (pb || ab || card.querySelector('.lan-card-x')).focus();
+      };
+      A.body.addEventListener('click', function (e) {
+        var b = e.target.closest('.lan-who'); if (b) { e.preventDefault(); openCard(b); return; }
+        if (card && !e.target.closest('.lan-card')) closeCard();
+      });
+      A.body.addEventListener('keydown', function (e) { if (e.key === 'Escape' && card) { closeCard(); e.stopPropagation(); } });
+
+      // ----- host: delete one message, or mute the writer for 24 h (the database checks games.is_host_user)
+      var modSay = function (t) { stEl.textContent = t; };
+      var dropRow = function (id) { if (seen[id]) { seen[id].remove(); delete seen[id]; } };
+      var modMute = function (m) {
+        if (!confirm('Mute ' + m.nick + ' in the chat for 24 hours? Their messages from today are hidden too.')) return;
+        chatRpc('gry_lobby_mute_msg', { p_id: m.id, p_hours: 24 }).then(function () { modSay(m.nick + ' is muted for 24 hours'); force = true; poll(); }, function (err) { modSay(err.message); });
+      };
+      log.addEventListener('click', function (e) {
+        var b = e.target.closest('.lan-del'); if (!b) return;
+        var r = b.closest('.lan-msg'), m = r && r._m; if (!m) return;
+        if (!b.classList.contains('sure')) {   // first tap arms the button, a second tap deletes
+          log.querySelectorAll('.lan-del.sure').forEach(function (x) { x.classList.remove('sure'); x.textContent = '✕'; });
+          b.classList.add('sure'); b.textContent = 'Delete?'; return;
+        }
+        b.disabled = true;
+        chatRpc('gry_lobby_hide', { p_id: m.id }).then(function () { dropRow(m.id); modSay('Message deleted'); }, function (err) { b.disabled = false; modSay(err.message); });
+      });
+      var modBtns = function (r) {
+        if (!canMod || r.querySelector('.lan-del')) return;
+        r.appendChild(el('button', { type: 'button', class: 'lan-del', title: 'Delete this message (host)', 'aria-label': 'Delete this message' }, '✕'));
+      };
+
+      // ----- drag the bottom bar to make the chat taller or shorter (remembered in this browser)
+      var grip = A.body.querySelector('.lan-grip'), stBar = A.body.querySelector('.lan-status');
+      var maxH = function () { return Math.max(180, window.innerHeight - log.getBoundingClientRect().top - (window.innerWidth <= 760 ? 210 : 150)); };
+      var setH = function (h, save) {
+        h = Math.round(Math.min(Math.max(h, 140), maxH()));
+        A.body.style.setProperty('--lan-h', h + 'px');
+        if (save) try { localStorage.setItem(LAN_H, String(h)); } catch (e) {}
+      };
+      try { var h0 = +localStorage.getItem(LAN_H); if (h0) setH(h0); } catch (e) {}
+      stBar.addEventListener('pointerdown', function (e) {
+        if (e.button !== 0 || A.host.classList.contains('is-max')) return;
+        e.preventDefault();
+        A.host.style.height = '';   // a window sized from the corner goes back to following its content
+        var y0 = e.clientY, h0 = log.offsetHeight;
+        stBar.setPointerCapture(e.pointerId); stBar.classList.add('drag');
+        var mv = function (ev) { setH(h0 + ev.clientY - y0); if (log.scrollHeight - log.scrollTop - log.clientHeight < 80) log.scrollTop = log.scrollHeight; };
+        var up = function () { stBar.classList.remove('drag'); setH(log.offsetHeight, true); stBar.removeEventListener('pointermove', mv); stBar.removeEventListener('pointerup', up); stBar.removeEventListener('pointercancel', up); };
+        stBar.addEventListener('pointermove', mv); stBar.addEventListener('pointerup', up); stBar.addEventListener('pointercancel', up);
+      });
+      grip.addEventListener('keydown', function (e) {
+        var d = e.key === 'ArrowDown' ? 40 : e.key === 'ArrowUp' ? -40 : 0; if (!d) return;
+        e.preventDefault(); setH(log.offsetHeight + d, true);
+      });
+
       var pop = A.body.querySelector('.emo-pop'), eb = A.body.querySelector('.emo-btn');
       // the picker: tabs by family (static), GIFs, recently used (this browser), and a search over the names
       var grid = pop.querySelector('.emo-grid'), q = pop.querySelector('.emo-q'), tab = '';
@@ -4012,20 +4150,24 @@
         chatRpc('gry_lobby_chat', { p_after: last, p_visitor: visitorId() }).then(function (r) {
           if (!alive) return;
           paintOnline(r.online);
+          if (!!r.can_mod !== canMod) { canMod = !!r.can_mod; hostTag.hidden = !canMod; A.host.classList.toggle('lan-mod', canMod); Object.keys(seen).forEach(function (id) { modBtns(seen[id]); }); }
+          stEl.textContent = (live ? 'Connected' : 'Connected (checking every few seconds)') + ' · #pond';
           var initial = first;
           if (first) { log.innerHTML = ''; first = false; }
-          (r.hidden || []).forEach(function (id) { if (seen[id]) { seen[id].remove(); delete seen[id]; } });
+          (r.hidden || []).forEach(dropRow);
           var atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 60;
           (r.messages || []).forEach(function (m) {
             if (seen[m.id]) return;
             var row = el('div', { class: 'lan-msg' + (emoOnly(m.body) ? ' lan-big' : '') }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> ' + lanWho(m) + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
             var tipEl = log.querySelector('.bin-tip'); if (tipEl) tipEl.remove();
             row._m = m; if (forMe(m)) { row.classList.add('lan-me'); if (!initial) { PM.ring(m.nick, m.body, function () { A.restore ? A.restore() : null; }); seenMentions(); } }
+            modBtns(row);
             seen[m.id] = row; log.appendChild(row); last = Math.max(last, m.id);
           });
           if (!log.children.length) log.innerHTML = '<p class="bin-tip">No messages in the last 24 hours. Say gm!</p>';
           if (atBottom || r.messages && r.messages.length) log.scrollTop = log.scrollHeight;
-        }, function (err) { if (first) log.innerHTML = '<p class="bin-tip">' + esc(err.message) + '. Trying again…</p>'; })
+          if (initial || noWhoRpc && r.messages && r.messages.length) loadWho();
+        }, function (err) { stEl.textContent = 'Offline: ' + err.message; if (first) log.innerHTML = '<p class="bin-tip">' + esc(err.message) + '. Trying again…</p>'; })
           .then(function () { if (alive) timer = setTimeout(poll, live ? 60000 : document.hidden ? 25000 : 4000); });
       };
       // a burst of rings makes one call, spread over a second so not every open chat asks at the same moment
@@ -4052,7 +4194,7 @@
         }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
       });
       paintNote(); loadPepeEmotes().then(poll);
-      A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); stopBell(); };
+      A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); };
     }, 480);
     return A;
   }

@@ -913,7 +913,7 @@ footer.foot a { color: #edf3e3; }
 /* ---------- LAN Party chat ---------- */
 .lan-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #3ddc6a; box-shadow: 0 0 0 0 rgba(61, 220, 106, 0.7); animation: lanpulse 2s ease-out infinite; vertical-align: 0; }
 @keyframes lanpulse { 70%, 100% { box-shadow: 0 0 0 7px rgba(61, 220, 106, 0); } }
-.lan-log { height: min(52vh, 420px); overflow-y: auto; padding: 6px 8px; background: var(--pane); color: var(--ink); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); font: 400 13px/1.45 var(--f-chrome); }
+.lan-log { height: var(--lan-h, min(52vh, 420px)); overflow-y: auto; padding: 6px 8px; background: var(--pane); color: var(--ink); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); font: 400 13px/1.45 var(--f-chrome); }
 .lan-msg { padding: 2px 0; overflow-wrap: anywhere; }
 .lan-t { color: var(--muted); font-size: 11px; }
 /* Fren Passport beta: a verified name opens that fren's passport */
@@ -1504,7 +1504,7 @@ footer.foot a { color: #edf3e3; }
 .app-win.is-max .app-body, .app-win.is-sized .app-body { display: flex; flex-direction: column; }
 .app-win.is-max .app-body > *, .app-win.is-sized .app-body > * { flex: none; }
 .app-win.is-max .app-body > .mail, .app-win.is-sized .app-body > .mail,
-.app-win.is-max .app-body > .lan-log, .app-win.is-sized .app-body > .lan-log,
+.app-win.is-max .app-body > .lan-main, .app-win.is-sized .app-body > .lan-main,
 .app-win.is-max .app-body > .app-frame, .app-win.is-sized .app-body > .app-frame { flex: 1 1 auto; min-height: 120px; height: auto !important; }
 .app-win.is-max .mail, .app-win.is-sized .mail { min-height: 0; }
 .app-win.is-max .mail-pane, .app-win.is-sized .mail-pane { display: flex; flex-direction: column; min-height: 0; }
@@ -1598,3 +1598,72 @@ footer.foot a { color: #edf3e3; }
 .gz-letter-ok { display: inline-block; margin-left: 6px; padding: 1px 8px; background: #e3f1dc; color: #2c5e22; font-size: 13px; }
 .gz-letter blockquote { margin: 0 0 6px; font-size: 16px; }
 .gz-letter figcaption { color: #8aa38a; font-size: 13px; }
+
+/* ---------- LAN Party 2: buddy list, fren card, host delete, a bottom bar that makes the chat taller ---------- */
+.lan-win .app-body { position: relative; container-type: inline-size; gap: 6px; }
+.lan-top { display: flex; align-items: center; gap: 6px; font: 400 12px/1.2 var(--f-chrome); color: var(--ink); }
+.lan-top .grow { flex: 1; }
+.lan-list-btn { padding: 5px 9px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; }
+.lan-room { padding: 3px 7px; background: var(--pane); color: var(--ink); font: 700 12px/1.2 var(--f-chrome); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
+.lan-host-tag { padding: 2px 7px; background: #ffd84a; color: #1d1d1d; font: 700 11px/1.4 var(--f-chrome); border: 1px solid #8a6d00; }
+.lan-host-tag[hidden] { display: none; }
+.lan-main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; min-height: 0; }
+.lan-buddies { display: none; min-height: 0; overflow-y: auto; background: var(--pane); color: var(--ink); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); font: 400 12px/1.3 var(--f-chrome); }
+.lan-main.list-on .lan-buddies { display: block; order: -1; max-height: 112px; }
+/* a narrow window (a phone): the list is a row of name chips above the log, and the log gives up the room */
+.lan-main.list-on .lan-bl ul { display: flex; flex-wrap: wrap; gap: 2px 4px; padding: 0 4px; }
+.lan-main.list-on .lan-buddy { width: auto; min-height: 30px; }
+.lan-main.list-on .lan-log { height: max(140px, calc(var(--lan-h, min(52vh, 420px)) - 118px)); }
+@container (min-width: 560px) {
+  .lan-main.list-on { grid-template-columns: minmax(0, 1fr) 172px; }
+  .lan-main.list-on .lan-buddies { order: 0; max-height: none; }
+  .lan-main.list-on .lan-bl ul { display: block; padding: 0; }
+  .lan-main.list-on .lan-buddy { width: 100%; min-height: 28px; }
+  .lan-main.list-on .lan-log { height: var(--lan-h, min(52vh, 420px)); }
+}
+.lan-bl { padding: 4px 0; }
+.lan-bl ul { list-style: none; margin: 0 0 4px; padding: 0; }
+.lan-bh { margin: 0; padding: 3px 8px; font-weight: 700; font-size: 11px; color: var(--muted); }
+.lan-bh::before { content: "\25BE  "; }
+.lan-empty, .lan-lurk { margin: 2px 8px 6px; color: var(--muted); font-size: 11px; }
+.lan-buddy { display: flex !important; align-items: center; gap: 6px; width: 100%; padding: 4px 8px !important; min-height: 28px; box-sizing: border-box; }
+.lan-buddy:hover, .lan-buddy:focus-visible { background: var(--sel) !important; color: #fff !important; outline: none; }
+.lan-buddy:hover b, .lan-buddy .lan-bn { text-decoration: none; }
+.lan-bn { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lan-bn i { font-style: normal; opacity: .7; }
+/* a lily pad: green for a verified fren, yellow for a guest */
+.lan-flower, .lan-st-dot { flex: none; display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #9ff0a8, #2fae4f 60%, #136b2c); box-shadow: 0 0 0 1px rgba(0,0,0,.35); vertical-align: -1px; }
+.is-guest .lan-flower { background: radial-gradient(circle at 35% 35%, #fff2a8, #e2b62b 60%, #8c6a00); }
+.lan-st-dot:not(.on) { background: #9aa39c; }
+.lan-msg { position: relative; padding: 2px 4px; margin: 0 -4px; }
+.lan-msg:hover { background: color-mix(in srgb, var(--sel) 10%, transparent); }
+.lan-mod .lan-msg { padding-right: 34px; }
+.lan-del { position: absolute; top: 2px; right: 2px; padding: 0 6px; height: 20px; border: 1px solid; border-color: var(--chrome-hi) var(--chrome-dk) var(--chrome-dk) var(--chrome-hi); background: var(--chrome); color: #a11d1d; font: 700 11px/18px var(--f-chrome); cursor: pointer; opacity: 0; }
+.lan-msg:hover .lan-del, .lan-del:focus-visible, .lan-del.sure { opacity: 1; }
+.lan-del.sure { background: #c62f2f; color: #fff; z-index: 1; }
+@media (hover: none) { .lan-del { opacity: .75; height: 24px; } }
+/* the bottom bar: a 98-style status bar; dragging it (mouse or finger) makes the chat taller */
+.lan-status { display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 2px 0 6px; font: 400 11px/1 var(--f-chrome); color: var(--ink); cursor: ns-resize; touch-action: none; user-select: none; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
+.lan-st { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lan-grip { flex: none; display: grid; gap: 2px; place-content: center; width: 44px; height: 22px; cursor: ns-resize; }
+.lan-grip i { display: block; width: 26px; height: 2px; background: var(--chrome-dk); box-shadow: 0 1px 0 var(--chrome-hi); }
+.lan-grip:focus-visible { outline: 1px dotted currentColor; }
+.lan-status.drag, .lan-status:hover { background: color-mix(in srgb, var(--sel) 12%, var(--chrome)); }
+.app-win.is-max .lan-status { cursor: default; }
+.app-win.is-max .lan-grip { visibility: hidden; }
+.app-win.is-max .lan-log, .app-win.is-sized .lan-log { height: auto; min-height: 120px; }
+.app-win.is-max .lan-main, .app-win.is-sized .lan-main { grid-template-rows: minmax(0, 1fr); }
+.app-win.is-max .lan-main.list-on, .app-win.is-sized .lan-main.list-on { grid-template-rows: auto minmax(0, 1fr); }
+@container (min-width: 560px) { .app-win.is-max .lan-main.list-on, .app-win.is-sized .lan-main.list-on { grid-template-rows: minmax(0, 1fr); } }
+/* the fren card */
+.lan-card { position: absolute; z-index: 5; width: min(270px, calc(100% - 8px)); padding: 3px; box-sizing: border-box; }
+.lan-card .win-bar { background: linear-gradient(90deg, var(--title), var(--title-2)); color: var(--title-ink); }
+.lan-card-in { display: flex; gap: 10px; padding: 10px 8px 6px; background: var(--chrome); color: var(--ink); font: 400 12px/1.45 var(--f-chrome); }
+.lan-card-in > div:last-child { display: grid; min-width: 0; }
+.lan-card-pic { flex: none; width: 60px; height: 60px; display: grid; place-items: center; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); }
+.lan-card-n { font-size: 14px; overflow-wrap: anywhere; }
+.lan-card-n i { font-style: normal; font-weight: 400; opacity: .7; }
+.lan-card-m { color: var(--muted); }
+.lan-card-act { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 8px 8px; background: var(--chrome); }
+.lan-card-act .app-btn { padding: 6px 10px; font-size: 12px; }
+.lan-c-soon { font: 400 11px/1.3 var(--f-chrome); color: var(--muted); align-self: center; }
