@@ -1639,8 +1639,11 @@ footer.foot a { color: #edf3e3; }
 .lan-msg:hover { background: color-mix(in srgb, var(--sel) 10%, transparent); }
 .lan-mod .lan-msg { padding-right: 34px; }
 .lan-del { position: absolute; top: 2px; right: 2px; padding: 0 6px; height: 20px; border: 1px solid; border-color: var(--chrome-hi) var(--chrome-dk) var(--chrome-dk) var(--chrome-hi); background: var(--chrome); color: #a11d1d; font: 700 11px/18px var(--f-chrome); cursor: pointer; opacity: 0; }
-.lan-msg:hover .lan-del, .lan-del:focus-visible, .lan-del.sure { opacity: 1; }
-.lan-del.sure { background: #c62f2f; color: #fff; z-index: 1; }
+.lan-msg:hover .lan-del, .lan-del:focus-visible, .lan-msg:has(.lan-modbox) .lan-del { opacity: 1; }
+.lan-modbox { position: absolute; z-index: 2; top: 24px; right: 2px; display: grid; padding: 2px; background: var(--chrome); border: 1px solid; border-color: var(--chrome-hi) var(--chrome-dk) var(--chrome-dk) var(--chrome-hi); box-shadow: 2px 2px 0 rgba(0,0,0,.35); }
+.lan-modbox button { padding: 6px 12px; min-height: 32px; border: 0; background: none; color: #000; font: 400 12px/1 var(--f-chrome); text-align: left; cursor: pointer; white-space: nowrap; }
+.lan-modbox button:hover, .lan-modbox button:focus-visible { background: var(--sel); color: #fff; outline: none; }
+.lan-modbox .lan-m-del { color: #a11d1d; font-weight: 700; }
 @media (hover: none) { .lan-del { opacity: .75; height: 24px; } }
 /* the bottom bar: a 98-style status bar; dragging it (mouse or finger) makes the chat taller */
 .lan-status { display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 2px 0 6px; font: 400 11px/1 var(--f-chrome); color: var(--ink); cursor: ns-resize; touch-action: none; user-select: none; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
@@ -1659,11 +1662,12 @@ footer.foot a { color: #edf3e3; }
 .lan-card { position: absolute; z-index: 5; width: min(270px, calc(100% - 8px)); padding: 3px; box-sizing: border-box; }
 .lan-card .win-bar { background: linear-gradient(90deg, var(--title), var(--title-2)); color: var(--title-ink); }
 .lan-card-in { display: flex; gap: 10px; padding: 10px 8px 6px; background: var(--chrome); color: var(--ink); font: 400 12px/1.45 var(--f-chrome); }
-.lan-card-in > div:last-child { display: grid; min-width: 0; }
-.lan-card-pic { flex: none; width: 60px; height: 60px; display: grid; place-items: center; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); }
+.lan-card-in > div:last-child { display: grid; align-content: center; gap: 6px; min-width: 0; }
+.lan-card-pic { flex: none; width: 72px; height: 72px; overflow: hidden; display: grid; place-items: center; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); }
 .lan-card-n { font-size: 14px; overflow-wrap: anywhere; }
 .lan-card-n i { font-style: normal; font-weight: 400; opacity: .7; }
 .lan-card-m { color: var(--muted); }
 .lan-card-act { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 8px 8px; background: var(--chrome); }
 .lan-card-act .app-btn { padding: 6px 10px; font-size: 12px; }
 .lan-c-soon { font: 400 11px/1.3 var(--f-chrome); color: var(--muted); align-self: center; }
+.lan-card-pic > * { width: 72px !important; height: 72px !important; max-width: none; }

@@ -244,11 +244,10 @@ test('public passport RPC: Discord frens only, read only, no private counters, n
 });
 
 test('other frens\' passports stay behind ?beta=fren and come from the server only', () => {
-  // LAN Party: every name opens the fren card; its Fren Passport button exists only in the beta,
-  // only for a verified fren with a real user id
-  assert.match(pond, /var passOk = FREN && ver && FREN_ID\.test\(u\);/);
-  assert.match(pond, /\(passOk \? '<button type="button" class="app-btn lan-c-pass">/);
-  assert.match(pond, /var pb = card\.querySelector\('\.lan-c-pass'\); if \(pb\) pb\.addEventListener\('click', function \(\) \{ closeCard\(\); frenPassport\(false, \{ id: u, nick: nick \}\); \}\);/);
+  // LAN Party: a name is a button (to the fren card + passport) only in the beta, only for a verified message with a real user id
+  assert.match(pond, /function lanWho\(m\) \{\s*var b = '<b>' \+ esc\(m\.nick\) \+ '<\/b>';\s*return FREN && m\.verified && FREN_ID\.test\(m\.user_id \|\| ''\) \? '<button type="button" class="lan-who"/);
+  assert.match(pond, /if \(!FREN \|\| !FREN_ID\.test\(u\)\) return;/);
+  assert.match(pond, /pb\.addEventListener\('click', function \(\) \{ closeCard\(\); frenPassport\(false, \{ id: u, nick: nick \}\); \}\);/);
   assert.match(pond, /if \(mainEl && FREN\) \(function \(\) \{\s*var id = ''; try \{ id = new URLSearchParams\(location\.search\)\.get\('fren'\)/);
   // read only: the public RPC (never the local preview), no Avatar Maker, no Next Milestone for somebody else
   const of = pond.split('function passportOf(id) {')[1].split('\n  }')[0];

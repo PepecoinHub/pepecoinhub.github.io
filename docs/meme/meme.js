@@ -3911,10 +3911,11 @@
     return mentionsJs;
   }
   function verifiedHere() { var me = whoAmI(); return !!(me && me.discord); }
-  // the name in front of a message: every name is a button that opens the small fren card (who, online or not,
-  // and the Fren Passport for verified frens while the passport beta is on)
+  // the name in front of a message. Fren Passport beta: a verified (Discord) name opens a small fren card (the Fren
+  // and the join date) with a button to the passport; guests and everyone outside the beta see plain text.
   function lanWho(m) {
-    return '<button type="button" class="lan-who" data-u="' + esc(m.user_id || '') + '" data-n="' + esc(m.nick) + '" data-v="' + (m.verified ? 1 : '') + '" title="' + esc(m.nick) + ': fren card"><b>' + esc(m.nick) + '</b></button>';
+    var b = '<b>' + esc(m.nick) + '</b>';
+    return FREN && m.verified && FREN_ID.test(m.user_id || '') ? '<button type="button" class="lan-who" data-u="' + esc(m.user_id) + '" data-n="' + esc(m.nick) + '" title="' + esc(m.nick) + ': fren card">' + b + '</button>' : b;
   }
   var onlineN = null;
   function paintOnline(n) {
@@ -3957,8 +3958,9 @@
       if (window.innerWidth > 760 && A.host.offsetWidth < 600) A.host.style.width = 'min(660px, calc(100vw - 16px))';
       var row = function (p, kind) {
         var tip = kind === 'fren' ? (p.me ? 'You' : 'Online now, verified with Discord') : 'Guest, wrote here in the last 15 minutes';
-        return '<li><button type="button" class="lan-who lan-buddy is-' + kind + '" data-u="' + esc(p.user_id || '') + '" data-n="' + esc(p.nick) + '" data-v="' + (kind === 'fren' ? 1 : '') + '" title="' + tip + '">' +
-          '<span class="lan-flower" aria-hidden="true"></span><span class="lan-bn">' + esc(p.nick) + (p.me ? ' <i>(you)</i>' : '') + '</span>' + (kind === 'fren' ? '<span class="hs-ok" aria-label="verified">✓</span>' : '') + '</button></li>';
+        var tag = FREN && kind === 'fren' && FREN_ID.test(p.user_id || '') ? 'button' : 'span';
+        return '<li><' + tag + (tag === 'button' ? ' type="button"' : '') + ' class="lan-who lan-buddy is-' + kind + '" data-u="' + esc(p.user_id || '') + '" data-n="' + esc(p.nick) + '" title="' + tip + '">' +
+          '<span class="lan-flower" aria-hidden="true"></span><span class="lan-bn">' + esc(p.nick) + (p.me ? ' <i>(you)</i>' : '') + '</span>' + (kind === 'fren' ? '<span class="hs-ok" aria-label="verified">✓</span>' : '') + '</' + tag + '></li>';
       };
       var paintWho = function () {
         if (!who) return;
@@ -3991,41 +3993,42 @@
       showList(listPref ? listPref === '1' : wide());
 
       // ----- the fren card: click any name (in the log or the list)
-      var card = null;
+      var card = null, cardInfo = {};
       var closeCard = function () { if (card) { card.remove(); card = null; } };
       var openCard = function (b) {
         closeCard();
-        var u = b.getAttribute('data-u') || '', nick = b.getAttribute('data-n') || '', ver = !!b.getAttribute('data-v');
-        var mine = anySession(), isMe = !!(mine && mine.user && u && mine.user.id === u);
-        var on = !!(who && (who.frens || []).some(function (p) { return p.user_id === u; }) || who && (who.guests || []).some(function (p) { return p.nick === nick; }));
-        var msgs = Object.keys(seen).map(function (id) { return seen[id]._m; }).filter(function (m) { return m && (ver ? m.user_id === u : !m.verified && m.nick === nick); });
-        var lastM = msgs[msgs.length - 1];
-        var passOk = FREN && ver && FREN_ID.test(u);
+        var u = b.getAttribute('data-u') || '', nick = b.getAttribute('data-n') || '';
+        if (!FREN || !FREN_ID.test(u)) return;   // fren cards come with the Fren Passport (beta only, verified frens only)
+        var mine = anySession(), isMe = !!(mine && mine.user && mine.user.id === u);
         card = el('div', { class: 'lan-card win', role: 'dialog', 'aria-label': 'Fren card: ' + nick });
         card.innerHTML = '<div class="win-bar"><span class="win-t">Fren card</span><span class="win-ctl"><button type="button" class="w-x lan-card-x" title="Close">' + ICO.x + '<span class="sr">Close</span></button></span></div>' +
-          '<div class="lan-card-in"><div class="lan-card-pic" aria-hidden="true"><img src="' + BASE + 'games/img/emotes/' + (ver ? 'gmfren' : 'peek') + '.webp" alt="" width="56" height="56"></div><div>' +
-          '<b class="lan-card-n">' + esc(nick) + (isMe ? ' <i>(you)</i>' : '') + '</b>' +
-          '<span>' + (ver ? '<span class="hs-ok">✓</span> Verified with Discord' : 'Guest (no Discord log-on)') + '</span>' +
-          (who ? '<span><span class="lan-st-dot' + (on ? ' on' : '') + '" aria-hidden="true"></span> ' + (on ? 'Online now' : 'Not online right now') + '</span>' : '') +
-          '<span class="lan-card-m">' + (msgs.length ? msgs.length + (msgs.length === 1 ? ' message' : ' messages') + ' today · last at ' + new Date(lastM.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'No messages in the last 24 hours') + '</span></div></div>' +
-          '<div class="lan-card-act">' +
-          (passOk ? '<button type="button" class="app-btn lan-c-pass">📘 Fren Passport</button>' : '<span class="lan-c-soon">' + (ver ? '📘 Fren Passports open soon' : '📘 Guests have no Fren Passport') + '</span>') +
-          (!isMe && ver && verifiedHere() ? '<button type="button" class="app-btn lan-c-at">@ Mention</button>' : '') +
-          (canMod && lastM && !isMe ? '<button type="button" class="app-btn lan-c-mute">🔇 Mute 24 h</button>' : '') + '</div>';
+          '<div class="lan-card-in"><div class="lan-card-pic"><img src="' + BASE + 'games/img/emotes/gmfren.webp" alt="" width="56" height="56"></div><div>' +
+          '<b class="lan-card-n">' + esc(nick) + (isMe ? ' <i>(you)</i>' : '') + ' <span class="hs-ok" title="Verified with Discord">✓</span></b>' +
+          '<span class="lan-card-m">Member since <b class="lan-since">…</b></span></div></div>' +
+          '<div class="lan-card-act"><button type="button" class="app-btn lan-c-pass">📘 Fren Passport</button>' +
+          (!isMe && verifiedHere() ? '<button type="button" class="app-btn lan-c-at">@ Mention</button>' : '') + '</div>';
         A.body.appendChild(card);
         var br = b.getBoundingClientRect(), hr = A.body.getBoundingClientRect();
         card.style.top = Math.max(4, Math.min(br.bottom - hr.top + 4, A.body.clientHeight - card.offsetHeight - 4)) + 'px';
         card.style.left = Math.max(4, Math.min(br.left - hr.left, A.body.clientWidth - card.offsetWidth - 4)) + 'px';
         card.querySelector('.lan-card-x').addEventListener('click', closeCard);
-        var pb = card.querySelector('.lan-c-pass'); if (pb) pb.addEventListener('click', function () { closeCard(); frenPassport(false, { id: u, nick: nick }); });
+        var pb = card.querySelector('.lan-c-pass'); pb.addEventListener('click', function () { closeCard(); frenPassport(false, { id: u, nick: nick }); });
         var ab = card.querySelector('.lan-c-at'); if (ab) ab.addEventListener('click', function () {
           closeCard(); var v = inp.value; inp.value = (v && !/\s$/.test(v) ? v + ' ' : v) + '@' + nick + ' '; inp.focus();
         });
-        var mb = card.querySelector('.lan-c-mute'); if (mb) mb.addEventListener('click', function () { closeCard(); modMute(lastM); });
-        (pb || ab || card.querySelector('.lan-card-x')).focus();
+        pb.focus();
+        // the Fren (avatar) and the join date, from the same read-only public passport the Passport window uses
+        var mineCard = card, since = card.querySelector('.lan-since');
+        (cardInfo[u] || (cardInfo[u] = passportOf(u).catch(function () { delete cardInfo[u]; return null; }))).then(function (d) {
+          if (card !== mineCard) return;
+          var st = d && d.state || {};
+          since.textContent = st.member_since ? fmt.date(st.member_since) : 'unknown';
+          var look = d && d.opts && avatarLook(d.opts, st.avatar);
+          if (look) { passportCss(); var pic = card.querySelector('.lan-card-pic'); pic.replaceChildren(avatarStack(d.opts, look, 'The Fren of ' + nick + ': ' + avatarSay(d.opts, look))); }
+        });
       };
       A.body.addEventListener('click', function (e) {
-        var b = e.target.closest('.lan-who'); if (b) { e.preventDefault(); openCard(b); return; }
+        var b = e.target.closest('button.lan-who'); if (b) { e.preventDefault(); openCard(b); return; }
         if (card && !e.target.closest('.lan-card')) closeCard();
       });
       A.body.addEventListener('keydown', function (e) { if (e.key === 'Escape' && card) { closeCard(); e.stopPropagation(); } });
@@ -4033,19 +4036,18 @@
       // ----- host: delete one message, or mute the writer for 24 h (the database checks games.is_host_user)
       var modSay = function (t) { stEl.textContent = t; };
       var dropRow = function (id) { if (seen[id]) { seen[id].remove(); delete seen[id]; } };
-      var modMute = function (m) {
-        if (!confirm('Mute ' + m.nick + ' in the chat for 24 hours? Their messages from today are hidden too.')) return;
-        chatRpc('gry_lobby_mute_msg', { p_id: m.id, p_hours: 24 }).then(function () { modSay(m.nick + ' is muted for 24 hours'); force = true; poll(); }, function (err) { modSay(err.message); });
-      };
+      // the ✕ opens a small host menu on that message: Delete it, or mute whoever wrote it for 24 h
+      var closeMod = function () { log.querySelectorAll('.lan-modbox').forEach(function (x) { x.remove(); }); };
       log.addEventListener('click', function (e) {
-        var b = e.target.closest('.lan-del'); if (!b) return;
-        var r = b.closest('.lan-msg'), m = r && r._m; if (!m) return;
-        if (!b.classList.contains('sure')) {   // first tap arms the button, a second tap deletes
-          log.querySelectorAll('.lan-del.sure').forEach(function (x) { x.classList.remove('sure'); x.textContent = '✕'; });
-          b.classList.add('sure'); b.textContent = 'Delete?'; return;
-        }
-        b.disabled = true;
-        chatRpc('gry_lobby_hide', { p_id: m.id }).then(function () { dropRow(m.id); modSay('Message deleted'); }, function (err) { b.disabled = false; modSay(err.message); });
+        var r = e.target.closest('.lan-msg'), m = r && r._m;
+        var d = e.target.closest('.lan-del');
+        if (d && m) { var had = r.querySelector('.lan-modbox'); closeMod(); if (had) return;
+          r.appendChild(el('span', { class: 'lan-modbox' }, '<button type="button" class="lan-m-del">Delete</button><button type="button" class="lan-m-mute">Mute 24 h</button>')); return; }
+        var del = e.target.closest('.lan-m-del'), mute = e.target.closest('.lan-m-mute');
+        if (!m || !(del || mute)) return;
+        (del || mute).disabled = true;
+        if (del) chatRpc('gry_lobby_hide', { p_id: m.id }).then(function () { dropRow(m.id); modSay('Message deleted'); }, function (err) { closeMod(); modSay(err.message); });
+        else chatRpc('gry_lobby_mute_msg', { p_id: m.id, p_hours: 24 }).then(function () { closeMod(); modSay(m.nick + ' is muted for 24 hours, their messages from today are hidden'); force = true; poll(); }, function (err) { closeMod(); modSay(err.message); });
       });
       var modBtns = function (r) {
         if (!canMod || r.querySelector('.lan-del')) return;
