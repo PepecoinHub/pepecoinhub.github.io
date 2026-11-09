@@ -350,6 +350,20 @@
       "status": "live"
     },
     {
+      "id": "pep_birthday",
+      "title": "Pepecoin's Birthday",
+      "description": "Visit PondOS on 30 January, Pepecoin's birthday (30 or 31 January, UTC). Unlocks a special avatar.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "thanksgiving_fren",
+      "title": "Thanksgiving",
+      "description": "Visit PondOS on US Thanksgiving weekend (the fourth Thursday of November to Sunday, UTC). Unlocks a special avatar.",
+      "category": "community",
+      "status": "live"
+    },
+    {
       "id": "bali",
       "title": "BALI",
       "description": "$0.01 - BALI. A mythic stamp for every fren when Pepecoin reaches $0.01 USD. The editor opens it on the day, and every fren gets it on their next PondOS visit.",
@@ -428,20 +442,6 @@
       "title": "Trust, But Verify",
       "description": "Never send to an address you did not check. Unlocks a special avatar.",
       "status": "live"
-    },
-    {
-      "id": "pep_birthday",
-      "title": "Pepecoin's Birthday",
-      "description": "Be in the pond on 30 January, Pepecoin's birthday. Unlocks a special avatar.",
-      "status": "live",
-      "source": "event"
-    },
-    {
-      "id": "thanksgiving_fren",
-      "title": "Thanksgiving Fren",
-      "description": "Visit the pond on Thanksgiving weekend. Unlocks a special avatar.",
-      "status": "live",
-      "source": "event"
     },
     {
       "id": "paper_crown",

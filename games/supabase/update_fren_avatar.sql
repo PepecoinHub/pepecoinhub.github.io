@@ -66,7 +66,7 @@
 --                        (unlocked by the secrets why_tho, midnight_fren, happy_fren, nerd_alert, born_to_fren, bali_dreamer)
 --     special_seeker (secret_starter), special_scribe (dear_editor), special_editor (senior_editor),
 --     special_santa (frogmas), special_looking and special_sherlock (the secrets find_fren, address_check),
---     special_birthday and special_turkey (the event days pep_birthday, thanksgiving_fren)
+--     special_birthday and special_turkey (the event-day stamps pep_birthday, thanksgiving_fren)
 --
 -- SPECIAL AVATARS: the 'special' slot holds a whole drawn character (by Lily) for a
 -- big milestone. 'special_none' means the normal stacked parts; any other id

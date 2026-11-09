@@ -18,7 +18,7 @@ Last update: 2026-11-09 (launch plan), Claude. Update this file in every Passpor
 | Special avatars | 16, each behind a secret, a stamp or an event day. Own **Avatars** tab in the Passport (section 5). |
 | Art | 38 of 48 final (24 v3 in the album sprite + 14 Lily). 10 still to draw or finish. The 7 pixel-art stamps (owner's sheet, 2026-11-09) are in. |
 
-## 2. All 48 stamps
+## 2. All 50 stamps (48 + the two event days, owner 2026-11-09)
 
 Art: ✅ final · 👀 waiting for owner OK · 🔁 approved scene, small file (900+ px later) · 🔄 redraw · 🚧 sketch · ⬜ not started.
 Album: **shown** · **???** (teaser) · hidden.
@@ -56,9 +56,9 @@ Album: **shown** · **???** (teaser) · hidden.
 | 29 | `picasso_fren` | Picasso Fren | no data yet (Draw & Guess saves nothing) | ??? | 🔁 in sprite, 304 px |
 | 30 | `podium` | Podium | top 3 in Pepe Pictures | shown | ⬜ |
 | 31 | `game_night` | Game Night | Pepe Pictures during a scheduled event (±3 h) | shown | ⬜ |
-| 32 | `season_champion` | Season Champion | winner of a ranked Pepe Pictures season | shown | 🔄 |
+| 32 | `season_champion` | Season Champion | winner of a ranked Pepe Pictures season | shown | ✅ v3 |
 | 33 | `quiz_master` | Quiz Master | hosted a Pepe Pictures game with 4+ ranked players | shown | ⬜ |
-| 34 | `top_ten` | Top 10 | top 10 in YEET, the Pepe Guesser week or the Pictures season | shown | 🚧 384 px |
+| 34 | `top_ten` | Top 10 | top 10 in YEET, the Pepe Guesser week or the Pictures season | shown | ✅ v3 |
 | 35 | `arcade_hopper` | Arcade Hopper | a server score in 5 different games | shown | ✅ v3 |
 | 36 | `fud_buster` | FUD Buster | 2000 points in FUD Invaders | shown | ✅ v3 |
 | 37 | `long_snake` | Long Snake | 40 blocks in PEP Snake | shown | ✅ v3 |
@@ -73,6 +73,8 @@ Album: **shown** · **???** (teaser) · hidden.
 | 46 | `treasure_hunter` | Treasure Hunter | 6 secrets | shown | ⬜ |
 | 47 | `the_secret_pond` | The Secret Pond | no data yet | hidden | 🔁 in sprite, 300 px |
 | 48 | `frogmas` | Frogmas | a visit on 24–26 December | shown | ⬜ |
+| 49 | `pep_birthday` | Pepecoin's Birthday | a visit on 30 January (UTC 30–31); unlocks Birthday Fren | shown | ⬜ |
+| 50 | `thanksgiving_fren` | Thanksgiving | a visit on US Thanksgiving weekend; unlocks Turkey Fren | shown | ⬜ |
 | — | `bali` | BALI | the owner opens it when PEP hits $0.01; every fren gets it on the next visit | printed on the page | ✅ ticket + postmark |
 
 **Totals.** Rules: 40 + BALI. Art: 38 final (36 ✅ + the 2 🔁 already in the sprite) · 1 🔄 · 2 🚧 · 5 ⬜ · 2 ⬜ for later features = 48.
@@ -116,8 +118,8 @@ is checked against the site's style before it goes in (it tends to drift from th
 - PepeGochi sprite fixes from #228: `adult_hungry`, `adult_dirty`, `froglet_idle`, `adult_recovering`, the 6 moving-out
   frames (adult about 113 px tall, feet on one line, 2×2 pixel grid). Egg hatching frames.
 - Decorations: Paper Crown, Moon Rock, Golden Fly (pixel art, room style).
-- Stamps (cartoon, like the album): Top 10, Bug Hunter, Season Champion, Podium, Game Night, Quiz Master, Frogmas,
-  Treasure Hunter.
+- Stamps (cartoon, like the album; scene blocks in `GPT_MASTER_PROMPT.md`): Bug Hunter, Podium, Game Night, Quiz Master,
+  Frogmas, Treasure Hunter, Pond Decorator, Pepecoin's Birthday, Thanksgiving. Done: Season Champion, Top 10.
 
 **Owner, launch day:** run the SQL in the order the release PR gives; the beta flags come off with the release.
 

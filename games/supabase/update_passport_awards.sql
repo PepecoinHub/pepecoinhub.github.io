@@ -113,7 +113,7 @@ begin
       'community_fren', 'hey_fren', 'dear_editor', 'rookie_miner', 'good_game', 'checkmate',
       'i_voted', 'yeet_adept', 'fud_buster', 'long_snake', 'secret_starter', 'treasure_hunter', 'podium', 'game_night',
       'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'top_ten', 'season_champion', 'frog_of_the_week',
-      'junior_editor', 'senior_editor', 'vox_populi', 'bug_hunter', 'bali') then
+      'junior_editor', 'senior_editor', 'vox_populi', 'bug_hunter', 'bali', 'pep_birthday', 'thanksgiving_fren') then
     raise exception 'Unknown passport stamp %', b;
   end if;
   if u is null or games.discord_identity(u) is null then return false; end if;
@@ -556,9 +556,7 @@ returns trigger language plpgsql security definer set search_path = '' as $$
 declare n integer;
 begin
   begin
-    -- the two event days are for everyone who visits, so they are not "found" and do not count here
-    select count(*) into n from games.passport_secrets
-     where user_id = new.user_id and secret_id not in ('pep_birthday', 'thanksgiving_fren');
+    select count(*) into n from games.passport_secrets where user_id = new.user_id;
     if n >= 1 then perform games.passport_award(new.user_id, 'secret_starter', new.discovered_at); end if;
     if n >= 6 then perform games.passport_award(new.user_id, 'treasure_hunter', new.discovered_at); end if;
   exception when others then raise warning 'passport secret hook: %', sqlerrm; end;
@@ -631,16 +629,16 @@ begin
   if joined is not null and joined <= now() - interval '365 days' then perform games.passport_award(u, 'old_frog'); end if;
   -- BALI: the owner opened it (gry_passport_bali), so every fren gets it on the next visit
   if exists (select 1 from games.passport_meta m where m.k = 'bali_open') then perform games.passport_award(u, 'bali'); end if;
-  -- Event days for every fren who visits (each unlocks a special avatar, not a stamp):
+  -- Event days for every fren who visits (each is a stamp, like Frogmas, and unlocks a special avatar):
   -- Pepecoin's birthday, 30 January (UTC 30-31, so every time zone has its 30th), and US Thanksgiving,
   -- the fourth Thursday of November, through that Sunday
   if extract(month from today) = 1 and extract(day from today) between 30 and 31 then
-    insert into games.passport_secrets (user_id, secret_id) values (u, 'pep_birthday') on conflict (user_id, secret_id) do nothing;
+    perform games.passport_award(u, 'pep_birthday');
   end if;
   tg := make_date(extract(year from today)::int, 11, 1);
   tg := tg + ((4 - extract(dow from tg)::int + 7) % 7) + 21;
   if today between tg and tg + 3 then
-    insert into games.passport_secrets (user_id, secret_id) values (u, 'thanksgiving_fren') on conflict (user_id, secret_id) do nothing;
+    perform games.passport_award(u, 'thanksgiving_fren');
   end if;
   -- Frogmas: a visit on 24, 25 or 26 December (UTC)
   if extract(month from today) = 12 and extract(day from today) between 24 and 26 then perform games.passport_award(u, 'frogmas'); end if;
@@ -928,11 +926,8 @@ do $$ begin
       where a.verified and a.user_id is not null and ((a.game = 'fud' and a.score >= 2000) or (a.game = 'snake' and a.score >= 40));
   end if;
 end $$;
-select games.passport_award(s.user_id, 'secret_starter')
-  from (select distinct user_id from games.passport_secrets where secret_id not in ('pep_birthday', 'thanksgiving_fren')) s;
-select games.passport_award(s.user_id, 'treasure_hunter')
-  from (select user_id from games.passport_secrets where secret_id not in ('pep_birthday', 'thanksgiving_fren')
-         group by user_id having count(*) >= 6) s;
+select games.passport_award(s.user_id, 'secret_starter') from (select distinct user_id from games.passport_secrets) s;
+select games.passport_award(s.user_id, 'treasure_hunter') from (select user_id from games.passport_secrets group by user_id having count(*) >= 6) s;
 -- Happy Mining!: everyone who already has a Pepe Miner cloud save.
 select games.passport_award(m.user_id, 'rookie_miner') from games.miner_saves m;
 -- Stamps retired or re-ruled by the v3 list (2026-11-08). The Passport is not public yet, so nothing

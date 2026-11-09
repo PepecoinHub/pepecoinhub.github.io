@@ -160,5 +160,18 @@ Pepe in a cosy room hanging a framed picture on the wall with a little hammer, a
 and a lava lamp already placed around him, a paint roller leaning on the wall. Soft teal background.
 ```
 
+**`pep_birthday`, label `Pepecoin's Birthday`.** (event stamp, 30 January)
+```
+Pepe in a purple polka-dot party hat, arms up and cheering, holding the string of one red balloon, a small
+birthday cake with candles on a table in front of him, confetti falling. Light lilac background.
+No numbers on the cake or anywhere else.
+```
+
+**`thanksgiving_fren`, label `Thanksgiving`.** (event stamp, US Thanksgiving weekend)
+```
+Pepe at a cosy dinner table with a roast turkey on a big plate, a pumpkin and autumn leaves beside it,
+holding a fork and knife with a big happy grin. Warm autumn orange background.
+```
+
 More SCENE blocks are added here by Claude when those stamps come up. ChatGPT does not write its own scenes for
 new stamps; ask the owner or Claude.

@@ -499,9 +499,8 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
       has_function_privilege('anon', 'public.gry_passport_bali(boolean)', 'EXECUTE') as anon_bali`)).rows[0];
     assert.deepEqual(priv2, { t: false, f: false, anon_printed: false, anon_bali: false });
 
-    // --- event days (Pepecoin's birthday, Thanksgiving) are for everyone: they are not "found", so no Secret Starter
-    await db.query("insert into games.passport_secrets(user_id, secret_id) values ($1, 'pep_birthday'), ($1, 'thanksgiving_fren')", [uid(62)]);
-    assert.ok(!(await has(62, 'secret_starter')));
+    // --- event days (Pepecoin's birthday, Thanksgiving) are stamps, like Frogmas, given by the check-in on their days
+    assert.ok(/perform games\.passport_award\(u, 'pep_birthday'\)/.test(awards) && /perform games\.passport_award\(u, 'thanksgiving_fren'\)/.test(awards));
     // US Thanksgiving: the fourth Thursday of November (the check-in's own formula)
     const tg = y => one(`select (make_date($1, 11, 1) + ((4 - extract(dow from make_date($1, 11, 1))::int + 7) % 7) + 21)::text as v`, [y]);
     assert.deepEqual([await tg(2026), await tg(2027), await tg(2028)], ['2026-11-26', '2027-11-25', '2028-11-23']);
