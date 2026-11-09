@@ -116,7 +116,9 @@ is checked against the site's style before it goes in (it tends to drift from th
    on the server; the local simulator stays for testers as "PEPEGOCHI (local test)". Both behind `?beta=gochi` until launch.
 3. ~~Passport card~~ done: Overview shows the frog (name, stage, day, mood, good care days) and opens PEPEGOCHI.EXE.
    Bug Hunter waits (owner, 2026-11-09): hidden, no grant tool at launch.
-4. Decorations: the three items with their rules, room placement, Pond Decorator.
+4. Decorations (owner, 2026-11-09): Moon Rock = Moonwalker, Paper Crown = Frog of the Week, Golden Fly = Treasure
+   Hunter, Floppy Disk = Secret Starter; Pond Decorator = 3 earned decorations placed at once. Server side done
+   (`update_pepegochi_rewards.sql`, run last). Still to do: the decorate panel in PEPEGOCHI.EXE and the 4 item sprites.
 5. Picasso Fren: Draw & Guess results on the server, then the stamp. The Secret Pond: its rule.
 6. Beta Tester out of the album; the new-reward notice (Windows 98 style, impossible to miss).
 7. Release: PEP-TV ad, beta flags off, one SQL run order for the owner.

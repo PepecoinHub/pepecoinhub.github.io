@@ -307,9 +307,9 @@
     {
       "id": "interior_designer",
       "title": "Pond Decorator",
-      "description": "Place 10 decorations in your PepeGochi room.",
+      "description": "Place 3 decorations you earned in your PepeGochi room at the same time.",
       "category": "pepegachi",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "secret_starter",
