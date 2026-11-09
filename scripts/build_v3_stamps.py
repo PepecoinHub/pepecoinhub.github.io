@@ -22,7 +22,7 @@ V3 = [
     # the owner's pixel-art sheet of 7 (2026-11-09); first_avatar above uses its new picture too
     'first_fren', 'sharp_eye', 'community_fren', 'like_it_here', 'nasa_is_hiring', 'rookie_miner',
     # launch scene blocks (2026-11-09)
-    'season_champion', 'top_ten', 'bug_hunter', 'podium', 'game_night', 'quiz_master', 'frogmas',
+    'season_champion', 'bug_hunter', 'podium', 'game_night', 'quiz_master', 'frogmas',
     'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren',
 ]
 SMALL = {'the_secret_pond', 'picasso_fren'}   # accepted scenes that exist only as the small review files so far

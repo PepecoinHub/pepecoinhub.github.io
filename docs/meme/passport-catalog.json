@@ -242,13 +242,6 @@
       "status": "live"
     },
     {
-      "id": "top_ten",
-      "title": "Top 10",
-      "description": "Reach the top 10 of the YEET board, the Pepe Guesser week board or the Pepe Pictures season ranking. Checked when you visit PondOS.",
-      "category": "arcade",
-      "status": "live"
-    },
-    {
       "id": "arcade_hopper",
       "title": "Arcade Hopper",
       "description": "Get a score kept by the server in 5 different games (YEET, Pepe Guesser, FUD Invaders, PEP Snake, Pepe Miner, Pepe Pictures, a board game). Unlocks the headphones.",

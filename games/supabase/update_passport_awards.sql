@@ -112,7 +112,7 @@ begin
       'detective_fren', 'week_scout', 'scout_fren', 'welcome_back', 'streak_14', 'like_it_here', 'first_words',
       'community_fren', 'hey_fren', 'dear_editor', 'rookie_miner', 'good_game', 'checkmate',
       'i_voted', 'yeet_adept', 'fud_buster', 'long_snake', 'secret_starter', 'treasure_hunter', 'podium', 'game_night',
-      'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'top_ten', 'season_champion', 'frog_of_the_week',
+      'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'season_champion', 'frog_of_the_week',
       'junior_editor', 'senior_editor', 'vox_populi', 'bug_hunter', 'bali', 'pep_birthday', 'thanksgiving_fren') then
     raise exception 'Unknown passport stamp %', b;
   end if;
@@ -655,29 +655,6 @@ begin
                           where r.user_id = u and r.verified and m.mode = 'obrazek') then 1 else 0 end)
     + (case when exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = 'good_game') then 1 else 0 end);
   if games_played >= 5 then perform games.passport_award(u, 'arcade_hopper'); end if;
-  -- Top 10: YEET board, Pepe Guesser week board (last 7 days), Pepe Pictures season ranking
-  select y.best into mine from games.yeet_records y where y.user_id = u;
-  if coalesce(mine, 0) > 0 and (select count(*) from games.yeet_records y where y.best > mine) < 10 then
-    perform games.passport_award(u, 'top_ten');
-  end if;
-  select sum(x.points) into mine from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
-   where x.user_id = u and x.verified and x.guessed_at is not null and q.day > today - 7;
-  if coalesce(mine, 0) > 0 and (select count(*) from (
-        select x.user_id from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
-         where x.guessed_at is not null and q.day > today - 7 group by x.user_id having sum(x.points) > mine) z) < 10 then
-    perform games.passport_award(u, 'top_ten');
-  end if;
-  if cur is not null then
-    select sum(4 - g.place) into mine from games.guesses g join games.matches m on m.id = g.match_id
-     where g.user_id = u and g.verified and m.ranked and m.season_no = cur and m.mode = 'obrazek';
-    if coalesce(mine, 0) > 0 and (select count(*) from (
-          select 1 from games.guesses g join games.matches m on m.id = g.match_id
-           where m.ranked and m.season_no = cur and m.mode = 'obrazek'
-           group by case when g.verified then 'u:' || g.user_id::text else 'g:' || g.nick_key end
-          having sum(4 - g.place) > mine) z) < 10 then
-      perform games.passport_award(u, 'top_ten');
-    end if;
-  end if;
   -- Frog of the Week: settle the last finished week once (Monday-Sunday, UTC); every tied first place wins
   insert into games.passport_weeks (week_start) values (wk) on conflict (week_start) do nothing;
   if found then
@@ -934,7 +911,7 @@ select games.passport_award(m.user_id, 'rookie_miner') from games.miner_saves m;
 -- anyone has seen is removed; this only matters if an earlier draft of this file already ran.
 -- Junior and Senior Editor once counted letters sent; now only "Printed" marks count.
 delete from games.passport_badges b
- where b.badge_id = 'miner_fren'
+ where b.badge_id in ('miner_fren', 'top_ten')   -- Top 10 dropped by the owner, 2026-11-09
     or (b.badge_id in ('junior_editor', 'senior_editor', 'vox_populi')
         and (select count(*) from games.passport_printed p where p.user_id = b.user_id)
             < case b.badge_id when 'junior_editor' then 1 when 'senior_editor' then 5 else 10 end);

@@ -426,7 +426,7 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     await play(p1, 51, 4000); await play(p2, 51, 4000); await play(p1, 52, 3000);
     await checkin(51);
     assert.ok(await has(51, 'arcade_hopper'), 'five games');
-    assert.ok(await has(51, 'top_ten'), 'a YEET record in the top 10');
+    assert.ok(!(await has(51, 'top_ten')), 'Top 10 is gone (owner, 2026-11-09)');
     assert.ok(await has(51, 'frog_of_the_week')); assert.ok(!(await has(52, 'frog_of_the_week')));
     assert.equal(await one("select times from games.passport_badges where user_id = $1 and badge_id = 'frog_of_the_week'", [uid(51)]), 1);
     await checkin(52);   // the same week is settled once, not again

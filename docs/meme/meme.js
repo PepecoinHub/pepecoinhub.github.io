@@ -1638,10 +1638,10 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261109lb';
+  var PP_CATALOG = 'passport-catalog.json?v=20261109fm';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109lb'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109fm'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1729,7 +1729,7 @@
     'detective_fren', 'good_game', 'yeet_adept', 'fud_buster', 'long_snake', 'arcade_hopper', 'secret_starter',
     'i_voted', 'checkmate', 'the_secret_pond', 'picasso_fren',
     'first_fren', 'sharp_eye', 'community_fren', 'like_it_here', 'nasa_is_hiring', 'rookie_miner',
-    'season_champion', 'top_ten', 'bug_hunter', 'podium', 'game_night', 'quiz_master', 'frogmas',
+    'season_champion', 'bug_hunter', 'podium', 'game_night', 'quiz_master', 'frogmas',
     'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren'];
   function ppStamp(x, earned) {
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);

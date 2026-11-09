@@ -20,7 +20,7 @@
 .pp-art-stamp { width: 46px; aspect-ratio: 69 / 75; background-image: url(passport-assets/stamps.webp?v=20261106pp1); background-size: 1600% 100%; }
 /* Lily's stamps: one row of 15 tiles drawn at 2x (scripts/build_lily_stamps.mjs) */
 .pp-art-stamp.is-lily { background-image: url(passport-assets/stamps-lily.webp?v=20261106lily1); background-size: 1500% 100%; }
-.pp-art-stamp.is-v3 { background-image: url(passport-assets/stamps-v3.webp?v=20261109lb); background-size: 3500% 100%; }
+.pp-art-stamp.is-v3 { background-image: url(passport-assets/stamps-v3.webp?v=20261109fm); background-size: 3400% 100%; }
 .pp-art-icon { width: 24px; height: 24px; background-image: url(passport-assets/icons.webp?v=20261106pp1); background-size: 1200% 100%; }
 
 /* Overview: booklet + side panels */
