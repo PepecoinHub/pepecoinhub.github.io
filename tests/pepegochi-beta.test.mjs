@@ -139,13 +139,13 @@ test('PondOS: the window exists only for ?beta=gochi testers and opens the local
   assert.match(pond, /if \(q === 'gochi'\) localStorage\.setItem\('pondos-gochi-beta', '1'\);/);
   assert.match(pond, /if \(q === 'off'\) localStorage\.removeItem\('pondos-gochi-beta'\);/);
   // every place that can open it is behind the flag
-  const uses = [...pond.matchAll(/pepegochiApp\(\)/g)].map(m => m.index);
-  assert.equal(uses.length, 3, 'definition + Start menu + Find');
+  const uses = [...pond.matchAll(/pepegochi(Test)?App\(\)/g)].map(m => m.index);
+  assert.equal(uses.length, 7, 'two definitions + Start menu + Find (real game and local test) + the Passport card');
   for (const i of uses) {
     const line = pond.slice(pond.lastIndexOf('\n', i) + 1, pond.indexOf('\n', i));
-    if (/function pepegochiApp/.test(line)) continue;
-    const before = pond.slice(Math.max(0, i - 400), i);
-    assert.match(before, /GOCHI \? \[/, 'not behind the flag: ' + line.trim().slice(0, 80));
+    if (/function pepegochi(Test)?App/.test(line)) continue;
+    const before = pond.slice(Math.max(0, i - 2500), i);
+    assert.match(before, /GOCHI \? \[|if \(GOCHI\) \{/, 'not behind the flag: ' + line.trim().slice(0, 80));
   }
   assert.match(pond, /games\/pepegochi\.html\?embed=1" title="PEPEGOCHI\.EXE \(local test\)"/);
   // not linked from anywhere else on the site
