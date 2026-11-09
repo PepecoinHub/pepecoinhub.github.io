@@ -166,17 +166,25 @@ export class BetaGame {
 
   // ---------- what the window shows ----------
   view() {
-    const s = this.last, r = s.rules, now = this.now, p = s.pet;
+    return buildView(this.last, this.now, { message: this.message, showHistory: this.showHistory, log: this.log,
+      letterOpen: this.letterOpen, start: this.start });
+  }
+}
+
+// What the window shows for one full state (the same JSON the server sends), at time `now` (ms).
+// Shared by the local test (BetaGame) and the live window (pepegochi-live-view.mjs).
+export function buildView(s, now, { message = '', showHistory = false, log = [], letterOpen = false, start = now, live = false } = {}) {
+    const r = s.rules, p = s.pet;
     const v = {
-      clock: { text: fmt(now), day: Math.floor((now - this.start) / 864e5) },
-      message: this.message,
+      clock: { text: fmt(now), day: Math.floor((now - start) / 864e5) },
+      message,
       rules: rulesText(r),
       history: s.history.map(h => ({
         text: `#${h.generation} ${h.name}: ${h.days_together} days together, ${h.care_days} care days, ${h.good_days} good days. Left for a different pond (${h.departure_reason === 'recovery' ? 'nobody came back while it recovered' : NEED_NAME[NEED_OF[h.departure_reason]] + ' waited too long'}).`,
       })),
       summary: s.summary,
-      showHistory: this.showHistory,
-      log: this.log.slice(0, 12).map(x => `${fmt(x.at)}  ${x.what}: ${x.result}`),
+      showHistory,
+      log: log.slice(0, 12).map(x => `${fmt(x.at)}  ${x.what}: ${x.result}`),
     };
     if (!p) {
       v.mode = 'adopt';
@@ -191,8 +199,8 @@ export class BetaGame {
           `Moved out ${fmt(msOf(p.departed_at))}`],
         letterSeen: p.letter.seen, canAdopt: s.can_adopt,
       };
-      v.letter = { open: this.letterOpen, title: 'GOODBYE.TXT - Notepad', text: GOODBYE,
-        note: 'The TV only left the picture: it is still yours and it is back in the room with your next fren. (Local test: there is no real inventory here.)' };
+      v.letter = { open: letterOpen, title: 'GOODBYE.TXT - Notepad', text: GOODBYE,
+        note: 'The TV only left the picture: it is still yours and it is back in the room with your next fren.' + (live ? '' : ' (Local test: there is no real inventory here.)') };
       return v;
     }
     v.mode = 'pet';
@@ -244,5 +252,4 @@ export class BetaGame {
       text: gd.today ? 'Today is a good care day.' : 'Not a good care day yet.',
     };
     return v;
-  }
 }

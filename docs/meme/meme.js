@@ -30,8 +30,9 @@
     } catch (e) { return false; }
   })();
   // PepeGochi in testing: hidden for everyone except a browser that opened /meme/?beta=gochi once
-  // (?beta=off hides it again). The window runs a LOCAL copy of the game rules (games/pepegochi.html,
-  // whose CSP allows no network at all): no Supabase, no Passport, no stamps.
+  // (?beta=off hides it again). Testers get the real game (games/pepegochi-live.html: the frog on the server,
+  // Discord only; it needs the PepeGochi SQL) and the LOCAL rules simulator (games/pepegochi.html, no network).
+  // Launch day: the gate comes off together with the Passport's.
   var GOCHI = (function () {
     try {
       var q = new URLSearchParams(location.search).get('beta');
@@ -233,7 +234,8 @@
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
-      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE (test)', 'Local rules simulator · nothing is saved or awarded', 'pep-logo', function () { pepegochiApp(); }]] : []).forEach(function (g) {
+      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', function () { pepegochiApp(); }],
+        ['PEPEGOCHI (local test)', 'Rules simulator with a time machine · nothing is saved', 'pep-logo', function () { pepegochiTestApp(); }]] : []).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
@@ -1435,9 +1437,16 @@
     }, 1000);
     A.host.classList.add('app-full');
   }
-  // PepeGochi hidden beta (?beta=gochi): a local test of the rules in its own page, no server, no stamps
+  // PEPEGOCHI.EXE: your frog on the server (one per Discord account)
   function pepegochiApp() {
-    var A = openApp('pepegochi', 'PEPEGOCHI.EXE · LOCAL TEST', 'pep-logo', function (A) {
+    var A = openApp('pepegochi', 'PEPEGOCHI.EXE', 'pep-logo', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepegochi-live.html?embed=1" title="PEPEGOCHI.EXE"></iframe>';
+    }, 760);
+    return A;
+  }
+  // the rules simulator for testers: a local copy of the rules with a time machine, no server, no stamps
+  function pepegochiTestApp() {
+    var A = openApp('pepegochi-test', 'PEPEGOCHI · LOCAL TEST', 'pep-logo', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepegochi.html?embed=1" title="PEPEGOCHI.EXE (local test)"></iframe>';
     }, 760);
     return A;
@@ -1520,7 +1529,8 @@
       ['Fren Passport', 'Your Fren, achievements and secrets', 'pep-logo', 'passport profile achievements badges secrets items account', function () { frenPassport(); }],
       ['Create Your Fren', 'Avatar Maker for your Fren Passport', 'fresh-fren', 'avatar maker profile picture face hat outfit glasses look character fresh fren', function () { avatarMaker(); }]
     ] : []).concat(GOCHI ? [
-      ['PEPEGOCHI.EXE (test)', 'Local rules simulator for the PepeGochi beta', 'pep-logo', 'pepegochi tamagotchi pet frog care feed test beta simulator', function () { pepegochiApp(); }]
+      ['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', 'pepegochi tamagotchi pet frog care feed egg hatch', function () { pepegochiApp(); }],
+      ['PEPEGOCHI (local test)', 'Rules simulator for the PepeGochi beta', 'pep-logo', 'pepegochi test beta simulator time machine', function () { pepegochiTestApp(); }]
     ] : []).map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
     NAV.forEach(function (g) { g[1].forEach(function (p) { L.push({ name: p[1], desc: p[2], icon: p[3], kw: 'page ' + g[0] + ' ' + p[0].replace(/[@\/-]/g, ' '), go: page(p[0]) }); }); });
     ADS.forEach(function (ad, i) { L.push({ name: ad.file, desc: 'PEP-TV ad: ' + ad.title, icon: ad.icon, kw: 'ad ads tv video ' + ad.title, go: function () { adPlayer(i); } }); });

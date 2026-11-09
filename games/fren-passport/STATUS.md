@@ -112,7 +112,8 @@ is checked against the site's style before it goes in (it tends to drift from th
 **Code, in this order (Claude)**
 1. ~~Egg stage~~ done: a new frog is an egg until its first care; that care records `hatched` → First Hatch.
    First Hatch, Little Fren, One Small Step and Good Parent are live (bridge + allowlist).
-2. PepeGochi window on the real RPCs (today: local model behind `?beta=gochi`).
+2. ~~Window on the real RPCs~~ done: `games/pepegochi-live.html` (PEPEGOCHI.EXE in PondOS), Discord only, the frog
+   on the server; the local simulator stays for testers as "PEPEGOCHI (local test)". Both behind `?beta=gochi` until launch.
 3. Passport: PepeGochi card (Overview/Stats); `first_hatch`, `little_fren`, `grown_fren`, `good_parent` live.
 4. Decorations: the three items with their rules, room placement, Pond Decorator.
 5. Picasso Fren: Draw & Guess results on the server, then the stamp. The Secret Pond: its rule.
