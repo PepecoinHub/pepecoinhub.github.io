@@ -2544,7 +2544,7 @@
         '<p class="bin-tip tip-msg">Tips go one way only. This site never asks for a seed phrase or a password.</p>' +
         '<div class="tip about-task"><img src="img/unclesam.webp" alt="Pepe pointing at you" width="96" height="96"><div>' +
         '<p>Answered <b>"no"</b> to any of those? Then you have a task: post about Pepecoin on X or Reddit, or tell a friend. <b>Today. Now.</b></p>' +
-        '<div class="app-row"><button type="button" class="app-btn" disabled title="Coming soon">Post on X (soon)</button>' +
+        '<div class="app-row"><a class="app-btn" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(SHARE_TEXT + '\n' + url) + '">Post on X</a>' +
         '<a class="app-btn" target="_blank" rel="noopener" href="https://www.reddit.com/submit?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent('Pepecoin $PEP: a frog with its own PoW chain') + '">Reddit</a>' +
         '<button type="button" class="app-btn about-mail">✏️ Write to me</button></div></div></div>';
       var m = A.body.querySelector('.tip-msg');
@@ -2927,11 +2927,11 @@
           '<p class="wp-place">Pepe was at <b>' + esc(a.title || '?') + '</b>, ' + esc(a.country || '') + ' ' + flagOf(a.country_code) + (a.wiki_url ? ' · <a href="' + esc(a.wiki_url) + '" target="_blank" rel="noopener">Wikipedia</a>' : '') + '</p>' +
           '<div class="wp-map"></div>' +
           '<p class="wp-small">Photo: ' + esc(a.credit || '') + ', <a href="' + esc(a.source_url || '#') + '" target="_blank" rel="noopener">' + esc(a.license || 'licence') + '</a>, cropped, Pepe added.' + (r.leaves ? ' Tab left ' + r.leaves + '×.' : '') + '</p>' +
-          '<div class="app-row">' + (navigator.share ? '<button type="button" class="app-btn go wp-share">Share…</button>' : '') + '<button type="button" class="app-btn wp-copy">Copy result</button><button type="button" class="app-btn wp-x" disabled title="Coming soon: X does not take links to this site yet">Post on X (soon)</button><span class="grow"></span><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
+          '<div class="app-row">' + (navigator.share ? '<button type="button" class="app-btn go wp-share">Share…</button>' : '') + '<button type="button" class="app-btn wp-copy">Copy result</button><a class="app-btn wp-x" target="_blank" rel="noopener">Post on X</a><span class="grow"></span><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
           '<div class="wp-reward"></div></div><div class="wp-board"></div></div>';
         main.querySelector('.wp-readme').addEventListener('click', wpReadme); wireHost();
         var txt = shareText(r);
-        // "Post on X" waits until X accepts links to pepecoinhub.com; then make it a link to https://x.com/intent/post?text=…
+        main.querySelector('.wp-x').href = 'https://x.com/intent/post?text=' + encodeURIComponent(txt);
         var shb = main.querySelector('.wp-share');
         if (shb) shb.addEventListener('click', function () { navigator.share({ text: txt }).catch(function () {}); });
         main.querySelector('.wp-copy').addEventListener('click', function () {
