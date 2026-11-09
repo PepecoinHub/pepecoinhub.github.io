@@ -1405,6 +1405,9 @@ footer.foot a { color: #edf3e3; }
 .find-list b { display: block; font-size: 13px; }
 .find-list small { display: block; font-size: 11px; opacity: .8; }
 .app-win.app-full.pondwars-window { width: 100% !important; box-sizing: border-box; }
+/* PEPaint.exe: a tall window, the paint program fills it (its own menu bar, tool box, colour box, status bar) */
+.app-win.pepaint-window .app-frame { height: min(calc(100vh - 70px), 860px); height: min(calc(100dvh - 70px), 860px); }
+.app-win.pepaint-window.is-max .app-frame { height: calc(100dvh - 76px); }
 .saver .sv-frog.cut { border: 0; box-shadow: none; width: 220px; filter: drop-shadow(0 6px 12px rgba(0,0,0,.6)); }
 /* @mentions in the LAN Party chat */
 .lan-msg.lan-me { background: #ffe9a0; color: #1d1d1d; border-left: 3px solid #e0a800; padding-left: 5px; }

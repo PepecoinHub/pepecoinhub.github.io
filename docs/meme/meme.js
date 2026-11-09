@@ -221,7 +221,7 @@
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', function () { pepeSweeperApp(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
-      ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
+      ['PEPaint', 'The party room: draw and guess with frens', 'pepaint', function () { drawGuess(); }],
       ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
@@ -746,14 +746,14 @@
     // the rest of the pond in a small group lower down, NERDS ONLY on its own by the Start button, the bin far right
     var DESKTOP = [
       ['logon', [['#logon', 'Log On', 'pep-logo'], ['#find', 'Find', 'search']]],
-      ['play', [['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
+      ['play', [['#paint', 'PEPaint.exe', 'pepaint'], ['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
         ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads']]],
       ['pond', [['./', 'Internet', 'internet'], ['#shop', 'Shop', 'shop-bag'], ['#mail', 'Write a letter', 'frog-mail']]],
       // the community: our subreddit and the official Pepecoin account (the classic bird), next to NERDS ONLY above the taskbar
       ['nerds', [['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#reddit', 'r/pepecoin', 'reddit'], ['#twitter', 'Twitter', 'twitter-bird']]],
       ['bin', [['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
-    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -1406,17 +1406,28 @@
       choose();
     }, 500);
   }
-  // Draw & Guess (charades with other players): the PEP Games lobby opens on its rooms, inside a window
-  function drawGuess() {
-    var G = BASE + 'games/';
-    if (window.innerWidth < 760) { location.href = osPage('#game-dg'); return; }
-    tabbedGame('dg', 'Draw & Guess - PEP charades', 'gif-061-still', [
-      ['LAN Party: rooms', G + '?embed=1&only=dg#game-dg', function (row) {
-        row.innerHTML = '<span class="grow">Start a room and share the link with frens (up to 12 players), join an open room, or type a room code. Needs a <a href="#" class="tab-logon">log on</a> (Discord or guest).</span>';
-        row.querySelector('.tab-logon').addEventListener('click', function (e) { e.preventDefault(); logOn(); });
-      }],
-      ['How to play', G + 'rules.html?embed=1', null]
-    ], 980);
+  // PEPaint.exe: the party room (Draw & Guess) in a paint-program window. It opens straight on its main menu
+  // (new party room, quick join, join with a code, the open rooms); the rooms open in the same window.
+  // The page inside tells the title bar where it is ("Room ABCDE - PEPaint") and File > Exit closes the window.
+  function drawGuess(join) {
+    join = typeof join === 'string' ? join : '';
+    var G = BASE + 'games/', q = join ? '&join=' + encodeURIComponent(join) : '';
+    if (window.innerWidth < 760) { location.href = osPage('pepaint.html' + (join ? '?join=' + encodeURIComponent(join) : '')); return; }
+    var A = openApp('dg', 'Main menu - PEPaint', 'pepaint', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame pepaint-frame" src="' + G + 'pepaint.html?embed=1' + q + '" title="PEPaint" allow="clipboard-write"></iframe>';
+      A.body.style.padding = '0';
+      var fr = A.body.querySelector('iframe'), t = A.host.querySelector('.win-t');
+      var onMsg = function (e) {
+        if (e.source !== fr.contentWindow || e.origin !== location.origin || !e.data) return;
+        if (e.data.type === 'pepaint-title' && typeof e.data.title === 'string') { t.textContent = e.data.title.slice(0, 60); A.host.setAttribute('aria-label', t.textContent); }
+        else if (e.data.type === 'pepaint-close') A.close();
+      };
+      window.addEventListener('message', onMsg);
+      A.stop = function () { window.removeEventListener('message', onMsg); };
+    }, 1180);
+    A.host.classList.add('pepaint-window');
+    A.host.style.top = '12px'; A.host.style.setProperty('--app-top', '12px');
+    return A;
   }
   function yeetApp() {
     var A = openApp('yeet', 'YEET THE PEP', 'yeet', function (A) {
@@ -1482,7 +1493,7 @@
       ['Checkers', 'vs the bot or with a fren', 'pond-playground', 'game board checkers draughts warcaby bot friend', function () { boardGame('checkers', 'Checkers'); }],
       ['Connect Four', 'vs the bot or with a fren', 'pond-playground', 'game board connect four 4 bot friend', function () { boardGame('connect4', 'Connect Four'); }],
       ['Sea Battle', 'vs the bot or with a fren', 'pond-playground', 'game board battleship ships sea bot friend statki', function () { boardGame('battleship', 'Sea Battle'); }],
-      ['Draw & Guess', 'Charades with frens', 'gif-061-still', 'game draw guess charades kalambury multiplayer room', drawGuess],
+      ['PEPaint.exe', 'The party room: draw and guess with frens', 'pepaint', 'game draw guess charades kalambury paint party multiplayer room pepaint', drawGuess],
       ['Pepe Pictures', 'Weekly quiz night: host wanted', 'unclesam', 'game quiz pictures host night', pepePictures],
       ['Games folder', 'All the games', 'games-folder', 'games play folder', gamesFolder],
       ['LAN Party', 'The lobby chat', 'gif-080-still', 'chat talk frens online lobby messages', lanParty],
@@ -1544,9 +1555,9 @@
         ['PEPE SWEEPER', 'pepesweeper', function () { pepeSweeperApp(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
-        ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];
+        ['PEPaint.exe', 'pepaint', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];
       A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="' + ico(g[1]) + '" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or get a link for a fren. Draw &amp; Guess: open a room for frens or join one with a code. 🏆 LEADERS has every top 10.</p>';
+        '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or get a link for a fren. PEPaint: the party room, draw and guess with frens. 🏆 LEADERS has every top 10.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { G[+b.getAttribute('data-i')][2](); };
         b.addEventListener('dblclick', go);
@@ -2439,7 +2450,7 @@
         var me = whoAmI();
         A.body.innerHTML = '<div class="tip"><img src="img/' + (me ? 'gif-045' : 'gif-085') + '.webp" alt="" width="96" height="96"><div>' +
           (me ? '<b>Signed in as ' + esc(me.name) + (me.discord ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : ' (guest)') + '</b><p>' + (me.discord ? 'Your Discord name shows with a ✓ in LAN Party and on the High Scores.' : 'Guests can chat and submit scores. Log in with Discord to get the ✓ verified badge.') + '</p>'
-            : '<b>Who goes there, fren?</b><p>Sign in once and use it everywhere: LAN Party chat, High Scores, Draw &amp; Guess and the other PEP Games.</p>') +
+            : '<b>Who goes there, fren?</b><p>Sign in once and use it everywhere: LAN Party chat, High Scores, PEPaint and the other PEP Games.</p>') +
           '</div></div>' +
           '<div class="app-row">' + (me && me.discord ? '' : '<a class="app-btn logon-discord" href="' + signInHref() + '">' + (me ? 'Log in with Discord' : 'Log in with Discord or as a guest') + '</a>') +
           (me ? '<button type="button" class="app-btn logon-out">Log off</button>' : '') + '</div>' +
