@@ -37,7 +37,14 @@ export const EMOTES = [
   { code: 'explorer', label: 'Exploring' },
   { code: 'backpack', label: 'On my way' },
 ];
-const BY = Object.fromEntries(EMOTES.map((e) => [e.code, e]));
+const ALL = Object.fromEntries(EMOTES.map((e) => [e.code, e]));
+let BY = ALL, SHOWN = EMOTES;
+// A room can keep to a short list of emotes (PEPaint: only the small still ones). null = all of them again.
+// Codes outside the list are not drawn and not offered; they stay as plain text.
+export function limitEmotes(codes) {
+  SHOWN = codes ? EMOTES.filter((e) => codes.includes(e.code)) : EMOTES;
+  BY = codes ? Object.fromEntries(SHOWN.map((e) => [e.code, e])) : ALL;
+}
 const src = (c) => `img/emotes/${c}.webp`;
 
 export function emoteImg(code, cls = 'emote') {
@@ -60,7 +67,7 @@ export function attachPicker(form, input, isHost = () => false) {
   const pop = h('div', { class: 'emote-pop hidden', role: 'group', 'aria-label': 'Emotes' });
   const fill = () => {
     pop.textContent = '';
-    for (const e of EMOTES) {
+    for (const e of SHOWN) {
       pop.append(h('button', { type: 'button', class: 'emote-pick', title: e.label, 'aria-label': e.label,
         onclick: () => { input.value = (input.value + ' :' + e.code + ':').trim(); input.focus(); close(); } }, emoteImg(e.code, 'emote-big')));
     }

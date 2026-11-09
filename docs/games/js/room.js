@@ -1,14 +1,40 @@
-import { $, h, toast, getBackend, identityCard, badge, nickStore, backendBanner, paintMe } from './common.js';
-import { renderBody, attachPicker, emoteImg } from './emotes.js';
+import { $, $$, h, toast, getBackend, identityCard, badge, nickStore, backendBanner, paintMe } from './common.js';
+import { renderBody, attachPicker, emoteImg, limitEmotes } from './emotes.js?v=20261110';
 import { stickerEl, attachStickerPicker } from './stickers.js';
 import { loadQueue, saveQueue, shrink } from './queue.js';
 import { fitImage, pack, canChunk, makeSender, makeReceiver } from './imgchunks.js';
+import { menuBar, statusBar, dialog, howToPlay, TOOL_SVG, PALETTE, setWinTitle } from './paintchrome.js';
 
 const code = (new URLSearchParams(location.search).get('r') || '').toUpperCase();
 if (!/^[A-Z0-9]{5}$/.test(code)) location.replace('./');
 const be = await getBackend();
 backendBanner($('#main')); paintMe(be);
 document.title = `Room ${code} · PEP Games`;
+
+// ---------- PEPaint: a Draw & Guess room wears the Paint-style window (menu bar, tool box, colour box, status bar).
+// It is on from the start (rooms are almost always Draw & Guess) and goes off for a Pepe Pictures night.
+const LOBBY = 'pepaint.html';
+// PEPaint chat keeps to a few small, still emotes (a few KB each): the big animated ones stay out of the party room
+const LIGHT_EMOTES = ['peek', 'ready', 'waiting', 'serious', 'brb', 'comfy', 'bigbrain', 'hmm'];
+const isPaint = () => document.documentElement.classList.contains('paint');
+const ptStatus = statusBar(3);
+const ptHint = (t) => ptStatus.set(0, t);
+const inviteLink = () => 'https://pepecoinhub.com/games/room.html?r=' + code;
+const copyInvite = async () => {
+  try { await navigator.clipboard.writeText(inviteLink()); toast('Invite link copied: send it to your frens', 'good'); }
+  catch { dialog('Invite your frens', h('div', { class: 'pt-form' }, h('label', {}, 'Link'), h('input', { type: 'text', readonly: true, value: inviteLink(), onfocus: (e) => e.target.select() }))); }
+};
+const leaveRoom = async () => { try { await be.rpc('gry_leave', { p_code: code }); } catch {} location.href = LOBBY; };
+const ptMenu = menuBar([
+  ['File', () => [['Copy the invite link', copyInvite], '-', ['Leave the room', leaveRoom], ['Back to the main menu', () => { location.href = LOBBY; }]]],
+  ['Edit', () => [['Undo the last line', () => undo(), { disabled: !isDrawer() || !hist.length, key: 'Ctrl+Z' }], ['Clear the picture', () => clearAll(), { disabled: !isDrawer() }], ['Skip this word', () => be.rpc('gry_skip', { p_code: code }).catch((e) => toast(e.message, 'bad')), { disabled: !isDrawer() }]]],
+  ['Help', [['How to play', () => dialog('How to play - PEPaint', howToPlay(), [['OK', null, { primary: true }]], { wide: true })]]],
+]);
+document.documentElement.classList.add('paint');
+limitEmotes(LIGHT_EMOTES);
+$('#main').prepend(ptMenu); $('#main').append(ptStatus.el);
+ptHint('Joining room ' + code + '…'); ptStatus.set(1, 'Room ' + code); ptStatus.set(2, '1000 × 700px');
+setWinTitle(`Room ${code} - PEPaint`);
 
 // ---------- stan ----------
 let S = null, offset = 0, roomCh = null, turnCh = null, turnTopic = null, curTurn = null;
@@ -32,9 +58,10 @@ async function enter(nick) {
     $('#joinbox').classList.add('hidden');
     $('#room').classList.remove('hidden');
     subscribeRoom();
+    if (isPaint() && !$('#invite')) $('.players h3').append(h('button', { class: 'btn sm', id: 'invite', title: 'Copy the invite link for your frens', onclick: copyInvite }, 'Invite'));
     if (!$('#leave')) $('.players h3').append(h('button', { class: 'btn sm', id: 'leave', title: 'Leave this room', onclick: async () => {
       try { await be.rpc('gry_leave', { p_code: code }); } catch {}
-      location.href = './';
+      location.href = isPaint() ? LOBBY : './';
     } }, 'Leave'));
     apply(s);
     setInterval(() => fetchState(), 10000);
@@ -47,7 +74,7 @@ async function enter(nick) {
 function message(text, sub = '') {
   $('#room').classList.add('hidden'); $('#joinbox').classList.add('hidden');
   const b = $('#msgbox'); b.classList.remove('hidden'); b.textContent = '';
-  b.append(h('h2', {}, text), sub ? h('p', { class: 'muted' }, sub) : null, h('a', { class: 'btn primary', href: './' }, 'Back to lobby'));
+  b.append(h('h2', {}, text), sub ? h('p', { class: 'muted' }, sub) : null, h('a', { class: 'btn primary', href: isPaint() ? LOBBY : './' }, isPaint() ? 'Back to the main menu' : 'Back to lobby'));
   roomCh?.close(); turnCh?.close();
 }
 
@@ -104,7 +131,12 @@ function apply(s) {
   if (s.room.phase === 'finished' && prev?.room.phase !== 'finished') blank();
   if (s.room.mode === 'kalambury' && prev?.room.phase !== 'turn' && s.room.phase === 'turn' && isDrawer()) toast('Your turn! Draw: ' + s.secret, 'good');
   if (prev && prev.room.phase === 'turn' && s.room.phase === 'reveal' && isImgHost()) sendFinalImage();
+  if (s.room.mode !== 'kalambury' && isPaint()) {   // a Pepe Pictures night keeps its own look
+    document.documentElement.classList.toggle('paint', false); ptMenu.replaceWith(); ptStatus.el.replaceWith(); limitEmotes(null); $('#invite')?.replaceWith();
+    delete $('#tools').dataset.ready; $('#tools').textContent = ''; document.title = `Room ${code} · PEP Games`;
+  }
   renderPlayers(); renderTop(); renderOverlay(); renderTools(); renderHostbar(); renderImgPanel(); renderMsgs(s.messages);
+  if (isPaint()) paintStatus();
   $('#cwrap').classList.toggle('can-draw', isDrawer());
   $('#cwrap').classList.toggle('pixel', s.room.mode === 'obrazek');
   const ci = $('#chatin');
@@ -112,7 +144,7 @@ function apply(s) {
 }
 
 function onNewTurn(turnId) {
-  curTurn = turnId; hintMarks = new Set(); strokes.clear();
+  curTurn = turnId; hintMarks = new Set(); strokes.clear(); hist.length = 0;
   turnCh?.close(); turnCh = null; turnTopic = null;
   blank(); recv.reset(); if (!isImgHost()) sender.stop();
   if (!turnId) return;
@@ -207,7 +239,7 @@ function frogMedia() {
 }
 function renderOverlay(force) {
   const o = $('#overlay'), r = S.room, view = overlayView();
-  const sig = [view, r.turn_id, r.phase === 'lobby' ? S.players.length : '', r.phase === 'finished' ? JSON.stringify(S.results) : '',
+  const sig = [view, r.turn_id, r.phase === 'reveal' ? (S.messages || []).length : '', r.phase === 'lobby' ? S.players.length : '', r.phase === 'finished' ? JSON.stringify(S.results) : '',
     JSON.stringify(S.next || null), r.last_answer, isRoomHost(), r.final_turn, r.last_mult, r.scorers, r.phase === 'reveal' ? JSON.stringify(S.podium || []) : ''].join('|');
   if (!force && sig === overlaySig) return;
   frogWasOn = !!frogVideo?.isConnected;
@@ -233,7 +265,7 @@ function renderOverlay(force) {
       h('div', { class: 'small', style: 'opacity:.8;margin-top:6px' }, 'The word was ', h('b', {}, r.last_answer || '?'), ' · ', h('span', { id: 'nextin' }, ''))));
   } else if (view === 'reveal') {
     o.append(h('div', {}, h('div', {}, r.mode === 'kalambury' ? 'The word was:' : 'The answer was:'), h('div', { class: 'ans' }, r.last_answer || '?'),
-      r.mode === 'obrazek' ? winnersBlock() : null));
+      r.mode === 'obrazek' ? winnersBlock() : h('div', { class: 'first-line' }, firstLine())));
     if (r.mode === 'obrazek') { o.classList.add('reveal-bar'); if (S.podium?.length) o.classList.add('party'); }
   } else if (view === 'waiting' && !isImgHost()) {
     o.classList.add('intermission-ov');
@@ -250,6 +282,15 @@ function renderOverlay(force) {
   } else show = false;
   o.classList.toggle('hidden', !show);
   updateNextIn();
+}
+// PEPaint is "first come, first served": who got the word first in the turn that just ended (from the chat log),
+// or that nobody did
+function firstLine() {
+  const ms = S.messages || [];
+  let i = ms.length - 1;
+  while (i >= 0 && !(ms[i].kind === 'system' && / is drawing now$/.test(ms[i].body || ''))) i--;
+  const win = ms.slice(i + 1).find((m) => m.kind === 'correct');
+  return win ? '🏆 ' + win.body : 'Nobody got it in time. No points this turn.';
 }
 const MEDALS = { 1: '🥇', 2: '🥈', 3: '🥉' }, WIN_MEME = { 1: 'pep', 2: 'ready', 3: 'peek' };
 function winnersBlock() {
@@ -412,9 +453,25 @@ function loop() {
 const COLORS = ['#15201b', '#ffffff', '#269B4D', '#16532A', '#d23c2f', '#f2a33a', '#f5d90a', '#2f6fd2', '#79559f', '#8a5a2b', '#f19ac2', '#9aa3a0'];
 const SIZES = [4, 9, 18, 36];
 let color = COLORS[0], size = SIZES[1], strokeId = 0, cur = null, buf = [];
+try { const c = localStorage.getItem('pepaint-color'); if (PALETTE.includes(c)) color = c; } catch {}
+// PEPaint undo: the artist keeps their own lines; undo redraws the picture without the last one and sends
+// everyone a fresh snapshot (the same small JPEG a late joiner gets), at most one per half second
+const hist = [];
+let undoTimer = null;
+function redraw() { blank(); for (const st of hist) for (let i = 0; i < st.p.length; i += 2) seg(st.c, st.w, [st.p[Math.max(0, i - 2)], st.p[Math.max(1, i - 1)]], [st.p[i], st.p[i + 1]]); }
+function undo() {
+  if (!isDrawer() || !hist.length) return;
+  cur = null; buf.length = 0; hist.pop(); redraw();
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(() => { if (!isDrawer()) return; turnCh?.send('clear', {}); turnCh?.send('snap', { data: cv.toDataURL('image/jpeg', 0.6) }); }, 500);
+}
+function clearAll() { if (!isDrawer()) return; cur = null; buf.length = 0; hist.length = 0; clearTimeout(undoTimer); blank(); turnCh?.send('clear', {}); }
+let ptTool = 'brush';   // PEPaint tool: pencil (thin), brush, eraser (white), picker
+const strokeStyle = () => ptTool === 'eraser' ? ['#ffffff', Math.max(size, 18)] : ptTool === 'pencil' ? [color, 3] : [color, size];
 const strokes = new Map(); // id -> last point (u odbiorców)
 function renderTools() {
   const t = $('#tools'); const show = isDrawer();
+  if (isPaint()) return renderPaintTools(t, show);
   t.classList.toggle('hidden', !show);
   if (!show || t.dataset.ready) return;
   t.dataset.ready = '1'; t.textContent = '';
@@ -428,15 +485,67 @@ function renderTools() {
     h('button', { class: 'btn sm', onclick: () => { blank(); turnCh?.send('clear', {}); } }, '🗑 Clear'),
     h('button', { class: 'btn sm', onclick: async () => { try { await be.rpc('gry_skip', { p_code: code }); } catch (e) { toast(e.message, 'bad'); } } }, '⏭ Skip'));
 }
-new MutationObserver(() => { if ($('#tools').classList.contains('hidden')) delete $('#tools').dataset.ready; }).observe($('#tools'), { attributes: true, attributeFilter: ['class'] });
+new MutationObserver(() => { if ($('#tools').classList.contains('hidden') && !isPaint()) delete $('#tools').dataset.ready; }).observe($('#tools'), { attributes: true, attributeFilter: ['class'] });
+// PEPaint: the tool box (pencil, brush, eraser, colour picker, line widths, clear, skip) stays on screen for everyone,
+// greyed out until it is your turn to draw; the colour box sits under the canvas
+function renderPaintTools(t, on) {
+  t.classList.remove('hidden');
+  if (t.dataset.ready !== 'paint') {
+    t.dataset.ready = 'paint'; t.textContent = '';
+    const tool = (k, name) => {
+      const b = h('button', { type: 'button', class: 'pt-tool', 'data-tool': k, title: name, 'aria-label': name, 'aria-pressed': String(k === ptTool),
+        onclick: () => { ptTool = k; t.querySelectorAll('[data-tool]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); $('#cwrap').classList.toggle('pt-eraser', k === 'eraser'); } });
+      b.innerHTML = TOOL_SVG[k]; return b;
+    };
+    const act = (k, name, fn) => { const b = h('button', { type: 'button', class: 'pt-tool pt-act', title: name, 'aria-label': name, onclick: fn }); b.innerHTML = TOOL_SVG[k]; return b; };
+    const opts = h('div', { class: 'pt-opts', role: 'group', 'aria-label': 'Line width' }, SIZES.map((s, i) => h('button', { type: 'button', 'data-size': s, title: `Line width ${i + 1} of 4 (key ${i + 1})`, 'aria-label': 'Line width ' + s, 'aria-pressed': String(s === size),
+      onclick: (e) => { size = s; opts.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === e.currentTarget))); } }, h('i', { style: `height:${Math.max(1, Math.round(s / 4))}px` }))));
+    const box = h('div', { class: 'pt-box', role: 'toolbar', 'aria-label': 'Tool box' },
+      tool('brush', 'Brush (B)'), tool('pencil', 'Pencil, thin line (P)'), tool('eraser', 'Eraser (E)'), tool('picker', 'Pick a colour from the picture (I)'),
+      opts, h('span', { class: 'pt-gap' }),
+      act('undo', 'Undo the last line (Ctrl+Z)', () => undo()),
+      act('trash', 'Clear the picture', () => clearAll()),
+      act('skip', 'Skip this word', async () => { try { await be.rpc('gry_skip', { p_code: code }); } catch (e) { toast(e.message, 'bad'); } }));
+    const cur = h('span', { class: 'pt-cur', 'aria-hidden': 'true' }, h('i', { class: 'fg', style: `background:${color}` }), h('i', { class: 'bg' }));
+    const pal = h('div', { class: 'pt-pal', role: 'group', 'aria-label': 'Colour box' }, cur, h('div', { class: 'pt-swatches' },
+      PALETTE.map((c) => h('button', { type: 'button', class: 'pt-sw', 'data-c': c, style: `background:${c}`, 'aria-label': 'Colour ' + c, 'aria-pressed': String(c === color), onclick: () => setColor(c) }))));
+    t.append(box, pal);
+  }
+  t.classList.toggle('pt-off', !on);
+  t.querySelectorAll('button').forEach((b) => { b.disabled = !on; });
+}
+function setColor(c) {
+  color = c;
+  $('#tools .pt-cur .fg')?.style.setProperty('background', c);
+  $$('#tools .pt-sw').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.c === c)));
+  if (ptTool === 'eraser' || ptTool === 'picker') $('#tools [data-tool=brush]')?.click();
+}
+// the status bar says whose turn it is and what to do now
+function paintStatus() {
+  const r = S.room, drawer = S.players.find((p) => p.user_id === r.drawer_id);
+  ptStatus.set(1, `Room ${code} · ${S.players.length} player${S.players.length === 1 ? '' : 's'}`);
+  if (r.phase === 'lobby') ptHint(isRoomHost() ? 'You are the moderator: press Invite to copy the link, then Start when your frens are in.' : 'Waiting for the moderator to press Start.');
+  else if (r.phase === 'turn' && isDrawer()) ptHint('Your turn! Draw: ' + S.secret + '. Keys: B P E I, 1-4, Ctrl+Z.');
+  else if (r.phase === 'turn') ptHint(`${drawer?.nick || 'A fren'} is drawing. Be the first to type the word in the chat!`);
+  else if (r.phase === 'reveal') ptHint('The word was: ' + (r.last_answer || '?') + '. ' + firstLine());
+  else if (r.phase === 'finished') ptHint('Game over! ' + (isRoomHost() ? 'Press Play again for another game.' : 'The moderator can start another game.'));
+  else ptHint('');
+}
 
 function pos(e) { const r = cv.getBoundingClientRect(); return [Math.round((e.clientX - r.left) / r.width * W), Math.round((e.clientY - r.top) / r.height * H)]; }
 function seg(c, w, a, b) { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
 cv.addEventListener('pointerdown', (e) => {
   if (!isDrawer()) return;
   cv.setPointerCapture(e.pointerId); e.preventDefault();
-  const p = pos(e); cur = { id: ++strokeId, c: color, w: size, last: p };
-  seg(color, size, p, p); buf.push({ id: cur.id, c: color, w: size, p: [p[0], p[1]] });
+  const p = pos(e);
+  if (ptTool === 'picker') {
+    const d = ctx.getImageData(Math.min(W - 1, Math.max(0, p[0])), Math.min(H - 1, Math.max(0, p[1])), 1, 1).data;
+    setColor('#' + [d[0], d[1], d[2]].map((v) => v.toString(16).padStart(2, '0')).join('')); return;
+  }
+  const [c, w] = strokeStyle();
+  cur = { id: ++strokeId, c, w, last: p, h: { c, w, p: [p[0], p[1]] } };
+  hist.push(cur.h);
+  seg(c, w, p, p); buf.push({ id: cur.id, c, w, p: [p[0], p[1]] });
 });
 cv.addEventListener('pointermove', (e) => {
   if (!cur || !isDrawer()) return;
@@ -447,10 +556,22 @@ cv.addEventListener('pointermove', (e) => {
     seg(cur.c, cur.w, cur.last, p); cur.last = p;
     let b = buf.at(-1);
     if (!b || b.id !== cur.id) { b = { id: cur.id, c: cur.c, w: cur.w, p: [] }; buf.push(b); }
-    b.p.push(p[0], p[1]);
+    b.p.push(p[0], p[1]); cur.h.p.push(p[0], p[1]);
   }
 });
+// keys for the artist (never while typing in the chat): B brush, P pencil, E eraser, I colour picker, 1-4 line width, Ctrl+Z undo
+document.addEventListener('keydown', (e) => {
+  if (!isPaint() || !isDrawer() || e.target.closest?.('input, textarea, select, [contenteditable]') || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); undo(); return; }
+  if (e.ctrlKey || e.metaKey) return;
+  const tool = { b: 'brush', p: 'pencil', e: 'eraser', i: 'picker' }[k];
+  if (tool) $(`#tools [data-tool=${tool}]`)?.click();
+  else if (/^[1-4]$/.test(k)) $(`#tools [data-size="${SIZES[+k - 1]}"]`)?.click();
+});
 const endStroke = () => { cur = null; };
+cv.addEventListener('pointermove', (e) => { if (isPaint()) { const p = pos(e); ptStatus.set(2, `${Math.max(0, p[0])}, ${Math.max(0, p[1])}px`); } });
+cv.addEventListener('pointerleave', () => { if (isPaint()) ptStatus.set(2, '1000 × 700px'); });
 cv.addEventListener('pointerup', endStroke); cv.addEventListener('pointercancel', endStroke);
 // paczkowanie: limit wiadomości Supabase Free = 100/s na projekt → im więcej graczy, tym rzadziej wysyłamy
 let lastFlush = 0;
