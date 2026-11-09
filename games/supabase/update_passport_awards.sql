@@ -39,7 +39,7 @@
 --   dear_editor     first letter to the editor
 --   rookie_miner    "Happy Mining!": the first Pepe Miner cloud save (unlocks the hard hat)
 --   junior_editor, senior_editor, vox_populi   1, 5 and 10 letters the owner marked "Printed" (gry_letter_printed)
---   bug_hunter      given by the owner from the mailbox (gry_letter_bug_hunter)
+--   (bug_hunter waits: the owner adds it later if needed, 2026-11-09)
 --   bali            for every fren once the owner opens it, the day Pepecoin reaches $0.01 (gry_passport_bali)
 -- The editor stamps are never awarded from the number of letters sent (owner, 2026-11-08).
 -- Pepe Guesser, letters and Moonwalker are backfilled from existing records. Chat history is kept only
@@ -113,7 +113,7 @@ begin
       'community_fren', 'hey_fren', 'dear_editor', 'rookie_miner', 'good_game', 'checkmate',
       'i_voted', 'yeet_adept', 'fud_buster', 'long_snake', 'secret_starter', 'treasure_hunter', 'podium', 'game_night',
       'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'season_champion', 'frog_of_the_week',
-      'junior_editor', 'senior_editor', 'vox_populi', 'bug_hunter', 'bali', 'pep_birthday', 'thanksgiving_fren',
+      'junior_editor', 'senior_editor', 'vox_populi', 'bali', 'pep_birthday', 'thanksgiving_fren',
       'first_hatch', 'little_fren', 'grown_fren', 'good_parent') then
     raise exception 'Unknown passport stamp %', b;
   end if;
@@ -371,7 +371,7 @@ drop trigger if exists passport_letter_ai on games.letters;
 create trigger passport_letter_ai after insert on games.letters
   for each row execute function games.passport_letter_after();
 
--- ---------- owner tools: "Printed" letters, Bug Hunter, BALI ----------
+-- ---------- owner tools: "Printed" letters, BALI ----------
 -- Junior Editor (1), Senior Editor (5) and Vox Populi (10) count the letters the owner marked as printed
 -- in The Pond Gazette. Only letters whose writer ticked "OK to print" can be marked. The marks live in
 -- their own table, because games.letters deletes read letters beyond the newest 2000 and the count must
@@ -420,27 +420,8 @@ $$;
 revoke all on function public.gry_letter_printed(bigint, boolean) from public, anon;
 grant execute on function public.gry_letter_printed(bigint, boolean) to authenticated;
 
--- Bug Hunter: the owner gives it to the Discord writer of a letter that reported a real, fixed bug.
-create or replace function public.gry_letter_bug_hunter(p_id bigint, p_on boolean default true)
-returns jsonb language plpgsql volatile security definer set search_path = '' as $$
-declare l record;
-begin
-  if not games.is_owner(auth.uid()) then raise exception 'Only the site owner can do that'; end if;
-  select x.user_id, x.discord into l from games.letters x where x.id = p_id;
-  if not found then raise exception 'That letter is gone'; end if;
-  if not l.discord or games.discord_identity(l.user_id) is null then
-    raise exception 'Bug Hunter is a Passport stamp, and this letter came from a guest (no Discord)';
-  end if;
-  if coalesce(p_on, true) then
-    perform games.passport_award(l.user_id, 'bug_hunter');
-  else
-    delete from games.passport_badges b where b.user_id = l.user_id and b.badge_id = 'bug_hunter';
-  end if;
-  return jsonb_build_object('ok', true, 'bug_hunter', coalesce(p_on, true));
-end
-$$;
-revoke all on function public.gry_letter_bug_hunter(bigint, boolean) from public, anon;
-grant execute on function public.gry_letter_bug_hunter(bigint, boolean) to authenticated;
+-- Bug Hunter waits (owner, 2026-11-09): no grant tool at launch. An earlier draft's function is removed.
+drop function if exists public.gry_letter_bug_hunter(bigint, boolean);
 
 -- BALI: the owner opens it on the day Pepecoin reaches $0.01. From then on every Discord fren gets the
 -- mythic stamp on their next PondOS visit (games.passport_daily). Closing it again stops new awards and
@@ -462,7 +443,7 @@ revoke all on function public.gry_passport_bali(boolean) from public, anon;
 grant execute on function public.gry_passport_bali(boolean) to authenticated;
 
 -- The owner's mailbox: as update_letters_community.sql, plus each letter's "printed" mark, whether its
--- writer has Bug Hunter, how many of their letters were printed, and whether BALI is open.
+-- how many of the writer's letters were printed, and whether BALI is open.
 create or replace function public.gry_letters(p_limit int default 100)
 returns jsonb
 language plpgsql security definer set search_path = ''
@@ -482,9 +463,7 @@ begin
                'discord', q.discord, 'print', q.print_ok, 'body', q.body,
                'page', q.page, 'read', q.read_at is not null,
                'printed', exists (select 1 from games.passport_printed p where p.letter_id = q.id),
-               'printed_count', case when q.discord then (select count(*) from games.passport_printed p where p.user_id = q.user_id) else 0 end,
-               'bug_hunter', q.discord and exists (select 1 from games.passport_badges b
-                                                    where b.user_id = q.user_id and b.badge_id = 'bug_hunter'))
+               'printed_count', case when q.discord then (select count(*) from games.passport_printed p where p.user_id = q.user_id) else 0 end)
              order by q.created_at desc)
       from (select * from games.letters
             order by created_at desc limit lim) q), '[]'::jsonb));
@@ -912,7 +891,7 @@ select games.passport_award(m.user_id, 'rookie_miner') from games.miner_saves m;
 -- anyone has seen is removed; this only matters if an earlier draft of this file already ran.
 -- Junior and Senior Editor once counted letters sent; now only "Printed" marks count.
 delete from games.passport_badges b
- where b.badge_id in ('miner_fren', 'top_ten', 'the_secret_pond')   -- Top 10 and The Secret Pond dropped by the owner, 2026-11-09
+ where b.badge_id in ('miner_fren', 'top_ten', 'the_secret_pond', 'bug_hunter')   -- Top 10 and The Secret Pond dropped by the owner, 2026-11-09
     or (b.badge_id = 'treasure_hunter' and (select count(*) from games.passport_secrets s where s.user_id = b.user_id) < 10)
     or (b.badge_id in ('junior_editor', 'senior_editor', 'vox_populi')
         and (select count(*) from games.passport_printed p where p.user_id = b.user_id)

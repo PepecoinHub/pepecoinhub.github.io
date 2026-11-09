@@ -437,7 +437,7 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     assert.equal(await one("select times from games.passport_badges where user_id = $1 and badge_id = 'frog_of_the_week'", [uid(51)]), 2);
     assert.equal((await call(51, 'select public.gry_passport_state() as v')).achievements.find(a => a.id === 'frog_of_the_week').times, 2);
 
-    // --- owner tools: "Printed" letters, Bug Hunter, BALI (2026-11-09)
+    // --- owner tools: "Printed" letters, BALI (2026-11-09)
     await addUser(60); await addUser(61); await addUser(62);
     await db.query("insert into games.owners(discord_id, note) values ('p60', 'test owner')");
     const letter = async (u, ok, discord = true) => one("insert into games.letters(user_id, name, discord, body, print_ok) values ($1, 'n', $2, 'a letter', $3) returning id as v",
@@ -470,16 +470,8 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     assert.equal(box.letters.find(l => l.id === +ok61[1]).printed_count, 9);
     assert.equal(box.bali_open, false);
     assert.equal(await call(61, 'select public.gry_letters(50) as v'), null);
-    // Bug Hunter: owner only, Discord writers only, and it can be taken back
-    const bug = (by, id, on) => call(by, 'select public.gry_letter_bug_hunter($1, $2) as v', [id, on]);
-    await assert.rejects(bug(61, ok61[1], true), /Only the site owner/);
-    await assert.rejects(bug(60, g, true), /came from a guest/);
-    await bug(60, ok61[1], true);
-    assert.ok(await has(61, 'bug_hunter'));
-    assert.equal((await call(60, 'select public.gry_letters(50) as v')).letters.find(l => l.id === +ok61[2]).bug_hunter, true, 'shown on all their letters');
-    await bug(60, ok61[1], false);
-    assert.ok(!(await has(61, 'bug_hunter')));
-    await bug(60, ok61[1], true);
+    // Bug Hunter waits (owner, 2026-11-09): no grant tool, not awardable
+    await assert.rejects(db.query("select games.passport_award($1, 'bug_hunter')", [uid(61)]), /Unknown passport stamp/);
     // BALI: closed means nobody gets it; the owner opens it and every Discord fren gets it on the next visit
     await checkin(62); assert.ok(!(await has(62, 'bali')));
     await assert.rejects(call(62, 'select public.gry_passport_bali(true) as v'), /Only the site owner/);
@@ -492,7 +484,7 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     await checkin(61); assert.ok(!(await has(61, 'bali')), 'closed again: no new awards');
     // the file runs again: the printed stamps stay, as their count still reaches them
     await db.query(awards);
-    assert.ok(await has(61, 'senior_editor')); assert.ok(await has(61, 'bug_hunter')); assert.ok(await has(62, 'bali'));
+    assert.ok(await has(61, 'senior_editor')); assert.ok(await has(62, 'bali'));
     const priv2 = (await db.query(`select
       has_table_privilege('authenticated', 'games.passport_printed', 'SELECT') as t,
       has_function_privilege('authenticated', 'games.passport_printed_check(uuid)', 'EXECUTE') as f,

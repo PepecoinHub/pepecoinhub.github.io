@@ -3361,14 +3361,12 @@
       if (!box) { pane.innerHTML = '<p class="hs-note">Only the site owner can open this mailbox.</p>'; return; }
       if (!box.letters.length) { pane.innerHTML = '<div class="letters"><p class="hs-note">No letters yet. When someone writes, the flag on the mailbox goes up.</p></div>'; return; }
       // Passport owner tools (only with the Passport beta on, until its migrations run on launch day):
-      // the "Printed" mark (Junior Editor 1, Senior Editor 5, Vox Populi 10), Bug Hunter, and BALI.
+      // the "Printed" mark (Junior Editor 1, Senior Editor 5, Vox Populi 10) and BALI.
       var tools = function (l) {
         if (!FREN) return '';
         var t = '';
         if (l.print) t += '<button type="button" class="app-btn lt-printed" aria-pressed="' + !!l.printed + '" title="Printed in The Pond Gazette. Counts for Junior Editor (1), Senior Editor (5) and Vox Populi (10).">' +
           (l.printed ? '✅ Printed' : '🖨 Mark printed') + '</button>';
-        if (l.discord) t += '<button type="button" class="app-btn lt-bug" aria-pressed="' + !!l.bug_hunter + '" title="Give Bug Hunter for a real bug that got fixed.">' +
-          (l.bug_hunter ? '🐞 Bug Hunter ✓' : '🐞 Give Bug Hunter') + '</button>';
         return t;
       };
       var printedNote = function (l) { return l.discord && l.printed_count ? 'Printed letters from this fren: ' + l.printed_count + '. ' : ''; };
@@ -3407,7 +3405,7 @@
           rpc('gry_letter_mark', { p_id: id }).then(function () { if (letterBox && letterBox.unread) letterBox.unread--; paintMail(); if (after) after(); }, function () {});
         });
         var l = box.letters.find(function (x) { return x.id === id; }) || {};
-        var pr = d.querySelector('.lt-printed'), bug = d.querySelector('.lt-bug');
+        var pr = d.querySelector('.lt-printed');
         if (pr) pr.addEventListener('click', function () {
           pr.disabled = true;
           rpc('gry_letter_printed', { p_id: id, p_printed: !l.printed }).then(function (r) {
@@ -3421,16 +3419,6 @@
             var tag = d.querySelector('.lt-tag'); if (tag) tag.textContent = l.printed ? '✅ Printed' : '🖨 OK to print';
             d.querySelector('.lt-note').textContent = (l.page ? 'Sent from ' + l.page + '. ' : '') + printedNote(l);
           }, function (e) { pr.disabled = false; alert(e.message); });
-        });
-        if (bug) bug.addEventListener('click', function () {
-          if (l.bug_hunter && !confirm('Take Bug Hunter back from ' + l.name + '?')) return;
-          bug.disabled = true;
-          rpc('gry_letter_bug_hunter', { p_id: id, p_on: !l.bug_hunter }).then(function (r) {
-            l.bug_hunter = !!(r && r.bug_hunter);
-            bug.disabled = false;
-            bug.setAttribute('aria-pressed', String(l.bug_hunter));
-            bug.textContent = l.bug_hunter ? '🐞 Bug Hunter ✓' : '🐞 Give Bug Hunter';
-          }, function (e) { bug.disabled = false; alert(e.message); });
         });
         d.querySelector('.lt-del').addEventListener('click', function () {
           if (!confirm('Delete this letter for good?')) return;

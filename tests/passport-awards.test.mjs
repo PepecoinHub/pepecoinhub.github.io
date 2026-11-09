@@ -33,11 +33,11 @@ test('every live stamp has a server award path, and only live stamps do', () => 
 test('awards come from game records, never from browser arguments', () => {
   // the only new browser RPC takes no arguments
   const rpcs = [...sql.matchAll(/create or replace function public\.([a-z_]+)\(([^)]*)\)/g)].map(x => [x[1], x[2].trim()]);
-  assert.deepEqual(rpcs.map(x => x[0]).sort(), ['gry_letter_bug_hunter', 'gry_letter_printed', 'gry_letters', 'gry_passport_bali',
+  assert.deepEqual(rpcs.map(x => x[0]).sort(), ['gry_letter_printed', 'gry_letters', 'gry_passport_bali',
     'gry_passport_checkin', 'gry_passport_state', 'gry_yeet_submit']);
   assert.equal(rpcs.find(x => x[0] === 'gry_passport_checkin')[1], '');
-  // the owner tools (Printed, Bug Hunter, BALI, the mailbox) refuse everyone but the site owner, first thing
-  for (const f of ['public.gry_letter_printed', 'public.gry_letter_bug_hunter', 'public.gry_passport_bali'])
+  // the owner tools (Printed, BALI, the mailbox) refuse everyone but the site owner, first thing
+  for (const f of ['public.gry_letter_printed', 'public.gry_passport_bali'])
     assert.match(fnBody(sql, f), / as \$\$\n(declare[^\n]*\n)?begin\n\s+if not games\.is_owner\(auth\.uid\(\)\) then raise exception/, f);
   assert.match(fnBody(sql, 'public.gry_letters'), /if not games\.is_owner\(auth\.uid\(\)\) then\s+return null;/);
   // a letter can be marked printed only when its writer ticked "OK to print"
