@@ -22,6 +22,7 @@ export const TOOL_SVG = {
   poly: S('<path d="M4 2h7v1h1v2h1v2h1v1h-2v2h1v3H2v-1h1V9H2V5h1V3h1zm0 2v2H3v2h1v2H3v2h9v-1h-1V8h1V7h-1V5h-1V3H5v1z" fill="#111"/>'),
   ellipse: S('<path d="M5 3h6v1h2v1h1v6h-1v1h-2v1H5v-1H3v-1H2V5h1V4h2zm0 2H4v6h1v1h6v-1h1V5h-1V4H5z" fill="#111"/>'),
   rrect: S('<path d="M4 3h8v1h1v1h1v6h-1v1h-1v1H4v-1H3v-1H2V5h1V4h1zm0 2v6h8V5z" fill="#111"/>'),
+  undo: S('<path d="M6 2h1v3h4v1h2v1h1v5h-1v1h-2v1H6v-2h4v-1h1V8h-1V7H7v3H6V9H5V8H4V7H3V6h1V5h1V4h1z" fill="#111"/>'),
   trash: S('<path d="M6 1h4v1h4v2H2V2h4zM3 5h10v10H3zm2 2v6h1V7zm3 0v6h1V7zm3 0v6h1V7z" fill="#111"/>'),
   skip: S('<path d="M2 3h2v1h1v1h1v1h1v1h1v2H7v1H6v1H5v1H4v1H2zm6 0h2v1h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1v1H8z" fill="#111"/>'),
 };
@@ -29,6 +30,8 @@ export const TOOL_SVG = {
 export const DECOR_TOOLS = [['lasso', 'Free-form select'], ['select', 'Select'], ['eraser', 'Eraser'], ['bucket', 'Fill with colour'],
   ['picker', 'Pick colour'], ['zoom', 'Magnifier'], ['pencil', 'Pencil'], ['brush', 'Brush'], ['spray', 'Airbrush'], ['text', 'Text'],
   ['line', 'Line'], ['curve', 'Curve'], ['rect', 'Rectangle'], ['poly', 'Polygon'], ['ellipse', 'Ellipse'], ['rrect', 'Rounded rectangle']];
+// time to draw one word, in seconds (the server accepts 30 to 120 for everyone)
+export const TIMES = [30, 45, 60, 80, 120];
 // the 28-colour palette, two rows (the frog greens are ours)
 export const PALETTE = ['#000000', '#808080', '#7f1d1d', '#808000', '#16532A', '#0b6b6b', '#1c2f8c', '#6b2a8c', '#7a6a2c', '#0d3b2a', '#1f7ab8', '#203a6b', '#5b2bd6', '#8a5a2b',
   '#ffffff', '#c3c3bd', '#d23c2f', '#f5d90a', '#269B4D', '#3fd0c9', '#2f6fd2', '#f19ac2', '#f2e3a0', '#9ee26b', '#a6dcff', '#9aa3ff', '#ff4fa6', '#f2a33a'];
@@ -95,10 +98,12 @@ export function howToPlay() {
   return h('div', { class: 'pt-help' },
     h('p', {}, h('b', {}, 'PEPaint is the party room of PondOS: draw a word, the others guess it in the chat.')),
     h('ol', {},
-      h('li', {}, 'Start a party room (or join one) and send the invite link to your frens. Up to 12 players.'),
+      h('li', {}, 'Start a party (or join one) and press Invite to copy the link for your frens. Up to 12 players.'),
       h('li', {}, 'The room moderator presses Start. Everyone takes turns drawing a secret word.'),
-      h('li', {}, 'Guess by typing in the chat. Faster guesses score more, and the artist gets points for every correct guess.'),
-      h('li', {}, 'Letter hints appear as the time runs out. No letters or words on the drawing, fren.')),
+      h('li', {}, 'Guess by typing in the chat. A correct guess is 20 to 100 points: the faster, the more. The first three get a bonus (+15, +8, +4).'),
+      h('li', {}, 'The artist gets 10 points for every fren who guesses the word.'),
+      h('li', {}, 'Letters of the word appear after 40%, 60% and 80% of the time. The turn ends when everyone got it or the time is up.'),
+      h('li', {}, 'No letters or words on the drawing, fren.')),
     h('p', { class: 'small' }, 'Just for fun: scores last only for the current game. ', h('a', { href: 'rules.html', target: '_blank', rel: 'noopener' }, 'Full rules')));
 }
 
