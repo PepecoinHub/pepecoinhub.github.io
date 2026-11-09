@@ -182,5 +182,21 @@
     "height": 1414,
     "status": "owner-approved",
     "notes": "Forwarded by the owner; black background removed by Claude."
+  },
+  {
+    "id": "treasure_hunter",
+    "file": "games/fren-passport/source/stamps-new/treasure_hunter.png",
+    "width": 1173,
+    "height": 1341,
+    "status": "owner-approved",
+    "notes": "Forwarded by the owner, 2026-11-09."
+  },
+  {
+    "id": "interior_designer",
+    "file": "games/fren-passport/source/stamps-new/interior_designer.png",
+    "width": 1173,
+    "height": 1341,
+    "status": "owner-approved",
+    "notes": "Forwarded by the owner, 2026-11-09."
   }
 ]
