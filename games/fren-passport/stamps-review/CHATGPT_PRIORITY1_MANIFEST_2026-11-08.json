@@ -126,5 +126,21 @@
     "notes": "Pixel-art version from the owner's sheet of 7 (2026-11-09), cut by Claude, 2x nearest-neighbour.",
     "width": 938,
     "height": 1036
+  },
+  {
+    "id": "season_champion",
+    "file": "games/fren-passport/source/stamps-new/season_champion.png",
+    "width": 1096,
+    "height": 1435,
+    "status": "owner-approved",
+    "notes": "Cartoon, from the launch scene blocks (2026-11-09); forwarded by the owner."
+  },
+  {
+    "id": "top_ten",
+    "file": "games/fren-passport/source/stamps-new/top_ten.png",
+    "width": 1096,
+    "height": 1435,
+    "status": "owner-approved",
+    "notes": "Cartoon, from the launch scene blocks (2026-11-09); forwarded by the owner."
   }
 ]
