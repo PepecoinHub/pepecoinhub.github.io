@@ -86,9 +86,9 @@ html.paint main.pt-app { display: flex; flex-direction: column; padding: 0 !impo
 html.os98 main.pt-app { max-width: 1180px; height: auto; min-height: calc(100dvh - 90px); }
 .pt-loading { padding: 20px; }
 .pt-work { flex: 1; min-height: 0; display: grid; grid-template-columns: 78px minmax(0, 1fr); }
-.pt-area { background: #808080; box-shadow: var(--down); padding: 8px; overflow: auto; min-height: 0; display: flex; }
+.pt-area { background: #808080; box-shadow: var(--down); padding: 8px; overflow: auto; min-height: 0; }
 /* the sheet fills the workspace: the party controls on the left, the open rooms take all the rest */
-.pt-sheet { flex: 1; min-width: 0; background: #fff; color: #111; padding: 18px 20px; box-shadow: 1px 1px 0 #000; display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 24px; align-items: stretch; }
+.pt-sheet { position: relative; box-sizing: border-box; min-height: 100%; min-width: 0; background: #fff; color: #111; padding: 18px 20px; box-shadow: 1px 1px 0 #000; display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 24px; align-items: stretch; }
 .pt-side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .pt-brand { margin: 0 !important; display: flex; align-items: center; gap: 8px; }
 .pt-frog { width: 84px; height: auto; flex: 0 0 auto; }
@@ -234,7 +234,7 @@ html.paint .overlay .first-line { margin-top: 10px; font-size: 1.15rem; font-wei
 .pt-top3 { display: flex; flex: 1; flex-wrap: wrap; gap: 4px 14px; margin: 0; padding: 0; list-style: none; min-width: 0; }
 .pt-top3 li { white-space: nowrap; }
 .pt-top3 li.me, .pt-toplist tr.me td { background: #fff7c2; }
-.pt-top-none { flex: 1; color: #444; margin: 0; }
+.pt-top-none { flex: 1 1 170px; color: #444; margin: 0; }
 p.pt-top-none { padding: 18px 10px; text-align: center; }
 .pt-tabs { display: flex; gap: 2px; margin-bottom: -1px; position: relative; z-index: 1; }
 .pt-tabs button { min-height: 30px; padding: 4px 14px; border: 0; font: 14px var(--sys); color: #111; background: var(--w-face); box-shadow: var(--up); cursor: default; }
@@ -252,3 +252,12 @@ p.pt-top-none { padding: 18px 10px; text-align: center; }
 .pt-mine dt { font-size: 12px; color: #444; }
 .pt-mine dd { margin: 0; font: 700 18px var(--sys); }
 @media (max-width: 560px) { .pt-mine dl { grid-template-columns: repeat(2, 1fr); } .pt-toplist th, .pt-toplist td { padding: 5px 5px; } .pt-toplist th:nth-child(4), .pt-toplist td:nth-child(4) { display: none; } }
+/* ---------- doodling on the main menu sheet ---------- */
+.pt-ink { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
+@media (hover: hover) and (min-width: 821px) {
+  .pt-app:not(.no-box) .pt-sheet { cursor: crosshair; user-select: none; -webkit-user-select: none; }
+  .pt-sheet a, .pt-sheet .pt-link { cursor: pointer; }
+  .pt-sheet button, .pt-sheet select, .pt-sheet label { cursor: default; }
+  .pt-sheet input { cursor: text; user-select: text; -webkit-user-select: text; }
+  .pt-sheet img { -webkit-user-drag: none; }
+}

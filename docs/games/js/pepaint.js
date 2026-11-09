@@ -24,7 +24,7 @@ const status = statusBar(3);
 const HINT = 'Start a party, type a code, or click a room on the list.';
 const hint = (t) => status.set(0, t || HINT);
 const menu = menuBar([
-  ['File', () => [['New party room', () => createRoom()], ['Quick join', quickJoin], '-', ['Refresh the room list', () => load(true)], '-', [framed ? 'Exit' : 'Exit to PondOS', exit]]],
+  ['File', () => [['New party room', () => createRoom()], ['Quick join', quickJoin], '-', ['Refresh the room list', () => load(true)], ['Clear my doodles', () => clearInk(), { disabled: !inked }], '-', [framed ? 'Exit' : 'Exit to PondOS', exit]]],
   ['Top', [['Top of the week', () => openTop('week')], ['Last week', () => openTop('last')], ['All time', () => openTop('all')], '-', ['My stats', () => openTop('week')]]],
   ['View', () => [[(app.classList.contains('no-box') ? 'Show' : 'Hide') + ' the tool box', () => toggle('no-box')], [(app.classList.contains('no-pal') ? 'Show' : 'Hide') + ' the colour box', () => toggle('no-pal')], [(app.classList.contains('no-status') ? 'Show' : 'Hide') + ' the status bar', () => toggle('no-status')]]],
   ['Help', [['How to play', help], '-', ['About PEPaint', about]]],
@@ -32,10 +32,14 @@ const menu = menuBar([
 function toggle(cls) { app.classList.toggle(cls); ls('pepaint-view', ['no-box', 'no-pal', 'no-status'].filter((c) => app.classList.contains(c)).join(' ')); }
 (ls('pepaint-view') || '').split(' ').filter(Boolean).forEach((c) => app.classList.add(c));
 
+// the tool box works on the main menu too: you can doodle on the sheet (your own screen only, nothing is sent)
+const DRAWS = ['pencil', 'brush', 'eraser', 'spray', 'line', 'rect', 'ellipse', 'rrect'];
+let tool = 'brush', inkColor = '#000000';
 const box = h('div', { class: 'pt-box', role: 'toolbar', 'aria-label': 'Tool box' },
   DECOR_TOOLS.map(([k, name]) => {
     const b = h('button', { type: 'button', class: 'pt-tool', title: name, 'aria-label': name, 'aria-pressed': String(k === 'brush'),
-      onclick: () => { box.querySelectorAll('.pt-tool').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); hint(name + ': open a party room to draw with your frens.'); } });
+      onclick: () => { box.querySelectorAll('.pt-tool').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); tool = k;
+        hint(DRAWS.includes(k) ? name + ': doodle anywhere on the sheet. Only you see it.' : name + ': just for show here. Try the pencil, brush, spray, eraser or a shape.'); } });
     b.innerHTML = TOOL_SVG[k];
     return b;
   }));
@@ -85,10 +89,70 @@ hint(); status.set(2, '');
 
 // the colour box picks the colour your brush starts with in a room
 function myColor(c) {
-  cur.querySelector('.fg').style.background = c; ls('pepaint-color', c);
+  cur.querySelector('.fg').style.background = c; ls('pepaint-color', c); inkColor = c;
   pal.querySelectorAll('.pt-sw').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.c === c)));
 }
 myColor(PALETTE.includes(ls('pepaint-color')) ? ls('pepaint-color') : '#000000');
+
+// ---------- doodling on the sheet ----------
+// A see-through canvas lies over the whole sheet. Clicks on buttons, links and fields work as always; a press anywhere
+// else draws with the chosen tool and colour. Mouse and pen only, so a finger still scrolls the page.
+const ink = h('canvas', { class: 'pt-ink', 'aria-hidden': 'true' });
+sheet.append(ink);
+const ictx = ink.getContext('2d');
+let inked = false, pen = null;
+function fitInk() {
+  const d = Math.min(2, window.devicePixelRatio || 1), w = sheet.clientWidth, hh = sheet.clientHeight;
+  if (!w || !hh || (ink.width === Math.round(w * d) && ink.height === Math.round(hh * d))) return;
+  const old = inked && ink.width ? h('canvas', { width: ink.width, height: ink.height }) : null;
+  if (old) old.getContext('2d').drawImage(ink, 0, 0);
+  const ow = ink.width / (ink._d || d), oh = ink.height / (ink._d || d);
+  ink.width = Math.round(w * d); ink.height = Math.round(hh * d); ink._d = d;
+  ictx.setTransform(d, 0, 0, d, 0, 0);
+  if (old) ictx.drawImage(old, 0, 0, ow, oh);
+}
+new ResizeObserver(fitInk).observe(sheet); fitInk();
+function clearInk() { ictx.clearRect(0, 0, ink.width, ink.height); inked = false; hint(); }
+const at = (e) => { const r = ink.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+function style() {
+  ictx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
+  ictx.strokeStyle = ictx.fillStyle = inkColor; ictx.lineCap = ictx.lineJoin = 'round';
+  ictx.lineWidth = { pencil: 2, brush: 8, eraser: 22 }[tool] || 3;
+}
+function spray(x, y) { for (let i = 0; i < 14; i++) { const a = Math.random() * 6.283, r = Math.random() * 13; ictx.fillRect(x + Math.cos(a) * r, y + Math.sin(a) * r, 1.4, 1.4); } }
+function shape(a, b) {
+  const x = Math.min(a[0], b[0]), y = Math.min(a[1], b[1]), w = Math.abs(b[0] - a[0]), hh = Math.abs(b[1] - a[1]);
+  ictx.beginPath();
+  if (tool === 'line') { ictx.moveTo(a[0], a[1]); ictx.lineTo(b[0], b[1]); }
+  else if (tool === 'rect') ictx.rect(x, y, w, hh);
+  else if (tool === 'ellipse') ictx.ellipse(x + w / 2, y + hh / 2, w / 2, hh / 2, 0, 0, 6.283);
+  else ictx.roundRect ? ictx.roundRect(x, y, w, hh, Math.min(14, w / 2, hh / 2)) : ictx.rect(x, y, w, hh);
+  ictx.stroke();
+}
+sheet.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0 || e.pointerType === 'touch' || app.classList.contains('no-box') || !box.offsetParent) return;
+  if (e.target.closest('a, button, input, select, textarea, label, legend')) return;
+  if (!DRAWS.includes(tool)) { hint('That tool is just for show here. Try the pencil, brush, spray, eraser or a shape.'); return; }
+  e.preventDefault(); fitInk(); style();
+  const p = at(e);
+  pen = { id: e.pointerId, from: p, last: p, snap: ['line', 'rect', 'ellipse', 'rrect'].includes(tool) ? ictx.getImageData(0, 0, ink.width, ink.height) : null };
+  try { sheet.setPointerCapture(e.pointerId); } catch {}
+  if (tool === 'spray') spray(p[0], p[1]);
+  else if (!pen.snap) { ictx.beginPath(); ictx.moveTo(p[0], p[1]); ictx.lineTo(p[0] + 0.01, p[1]); ictx.stroke(); }
+  if (!inked) hint('Nice. This doodle is only on your screen. File > Clear my doodles wipes it.');
+  inked = true;
+});
+sheet.addEventListener('pointermove', (e) => {
+  if (!pen || e.pointerId !== pen.id) return;
+  const p = at(e);
+  if (pen.snap) { ictx.putImageData(pen.snap, 0, 0); style(); shape(pen.from, p); }
+  else if (tool === 'spray') spray(p[0], p[1]);
+  else { ictx.beginPath(); ictx.moveTo(pen.last[0], pen.last[1]); ictx.lineTo(p[0], p[1]); ictx.stroke(); }
+  pen.last = p;
+});
+const penUp = (e) => { if (pen && e.pointerId === pen.id) { pen = null; ictx.globalCompositeOperation = 'source-over'; } };
+sheet.addEventListener('pointerup', penUp); sheet.addEventListener('pointercancel', penUp);
+sheet.addEventListener('dragstart', (e) => e.preventDefault());
 
 // ---------- who is playing ----------
 async function paintWho() {
