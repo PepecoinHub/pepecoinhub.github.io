@@ -49,11 +49,12 @@ end $$;
 create or replace function games.wp_finish(p games.wp_puzzles, pl games.wp_plays, a_lat double precision, a_lon double precision)
 returns games.wp_plays language plpgsql security definer set search_path = '' as $$
 declare el double precision := extract(epoch from now() - pl.started_at); cap int; k double precision; pts int := 0; r games.wp_plays;
+  rk double precision := case when p.day >= date '2026-11-10' then 1 else 10 end;   -- full-points radius in km: 1 km from puzzle day 2026-11-10 (UTC), 10 km before
 begin
 cap := case when el <= 62 then 5000 when el <= 92 then 4000 when el <= 130 then 3000 else 0 end;   -- a little grace for slow networks
 if a_lat is not null and a_lon is not null and cap > 0 then
 k := games.wp_km(a_lat, a_lon, p.lat, p.lon);
-pts := greatest(0, round(cap * case when k <= 1 then 1 else exp(-(k - 1) / 1500.0) end)::int - greatest(0, pl.leaves - 1) * 1000);
+pts := greatest(0, round(cap * case when k <= rk then 1 else exp(-(k - rk) / 1500.0) end)::int - greatest(0, pl.leaves - 1) * 1000);
 elsif a_lat is not null and a_lon is not null then
 k := games.wp_km(a_lat, a_lon, p.lat, p.lon);
 end if;
