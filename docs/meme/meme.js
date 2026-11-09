@@ -1055,6 +1055,34 @@
       rpc('gry_wp_top', { p_scope: 'day' }).then(function (rows) { if (rows && rows[0]) { bits[1] = '\ud83c\udfc6 ' + rows[0].nick + ' leads with ' + Number(rows[0].points).toLocaleString('en-US'); paint(); } }, function () {});
     }, 0);
   })();
+  // ---------- calendar page: "on this day in PEP history" (home page only) ----------
+  // Same data as the serious home (../data/on-this-day.json, English text). Shows on the matching day every year,
+  // under "Today in the pond". ?day=MM-DD previews any day.
+  if (mainEl && PAGE === 'index' && window.fetch) (function () {
+    var now = new Date(), q = /[?&]day=(\d\d)-(\d\d)/.exec(location.search);
+    var md = q ? q[1] + '-' + q[2] : ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
+    var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    fetch('../data/on-this-day.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      var hits = ((j && j.days) || []).filter(function (d) { return d.date && d.date.slice(5) === md; });
+      if (!hits.length) return;
+      var after = document.querySelector('.today-pond') || document.querySelector('.ctas'); if (!after) return;
+      hits.forEach(function (d) {
+        var y = Number(d.date.slice(0, 4)), at = new Date(y, Number(d.date.slice(5, 7)) - 1, Number(d.date.slice(8, 10)));
+        var ago = now.getFullYear() - y;
+        var when = at.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + (ago > 0 ? ' · ' + (ago === 1 ? 'a year ago' : ago + ' years ago') : '');
+        var link = d.link || '';
+        var src = (d.src || []).map(function (s) { return '<a href="' + esc(s.url) + '" rel="noopener">' + esc(s.label) + '</a>'; }).join(', ');
+        var card = el('aside', { class: 'otd-98 otd-' + esc(d.icon || 'day'), 'aria-label': 'On this day in PEP history' },
+          '<div class="otd-pg" aria-hidden="true"><span class="otd-m">' + at.toLocaleDateString('en-US', { month: 'short' }) + '</span><b>' + at.getDate() + '</b><span class="otd-y">' + y + '</span></div>' +
+          '<div><span class="otd-k">On this day in PEP history · ' + esc(when) + '</span><b class="otd-t">' + esc(d.title.en) + '</b>' +
+          '<span class="tp-line">' + esc(d.text.en) + '</span><span class="otd-row">' +
+          (link ? '<a class="btn go otd-go" href="' + esc(link) + '">' + esc((d.more && d.more.en) || 'More') + ' →</a>' : '') +
+          (src ? '<span class="otd-s">Receipt: ' + src + '</span>' : '') + '</span></div>');
+        after.parentNode.insertBefore(card, after.nextSibling);
+        after = card;
+      });
+    }, function () {});
+  })();
   function invaders() {
     openApp('fud', 'FUD Invaders - receipts vs FUD', 'gif-008-still', function (A) {
       A.body.innerHTML = '<canvas width="480" height="360" aria-label="FUD Invaders. Move with the arrow keys and fire receipts with Space."></canvas>' +

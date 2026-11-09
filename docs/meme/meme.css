@@ -1584,3 +1584,20 @@ footer.foot a { color: #edf3e3; }
 .wp-bot .app-btn { min-height: 36px; }
 .wp-bot li.is-copied { background: #e6f4e6; }
 @media (max-width: 520px) { .wp-bot li { grid-template-columns: 1fr 1fr; } .wp-bot code { grid-column: 1 / -1; } }
+/* calendar page "on this day in PEP history" (meme.js, ../data/on-this-day.json) */
+.otd-98 { display: flex; align-items: center; gap: 14px; margin: 12px 0 4px; padding: 12px 12px 12px 14px; background: var(--chrome, #e6e3d4); border: 2px solid; border-color: var(--chrome-hi, #fff) var(--chrome-dk, #2b2f28) var(--chrome-dk, #2b2f28) var(--chrome-hi, #fff); color: var(--ink); max-width: 720px; }
+.otd-98 > div:not(.otd-pg) { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.otd-pg { flex: none; width: 64px; text-align: center; background: #fffdf8; color: #23261f; border: 1px solid #2b2f28; box-shadow: 3px 3px 0 #2b2f28; transform: rotate(-3deg); }
+.otd-pg .otd-m { display: block; padding: 3px 0; background: #1f7a3c; color: #fff; font: 700 .72rem/1.2 var(--f-mono, monospace); letter-spacing: .12em; text-transform: uppercase; }
+.otd-pg b { display: block; font-size: 2rem; line-height: 1.1; }
+.otd-pg .otd-y { display: block; padding-bottom: 3px; font: .66rem/1 var(--f-mono, monospace); color: #5d6357; }
+.otd-low .otd-pg .otd-m { background: #b4532a; }
+.otd-high .otd-pg .otd-m { background: #e0a530; color: #2b1f05; }
+.otd-98 .otd-k { font-size: .76rem; color: var(--muted); }
+.otd-98 .otd-t { font-size: 1rem; }
+.otd-98 .tp-line { font-size: .86rem; }
+.otd-98 .otd-s { font-size: .76rem; color: var(--muted); }
+.otd-98 .otd-s a { color: inherit; }
+.otd-98 .otd-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 6px; }
+.otd-98 .otd-go { flex: none; white-space: nowrap; }
+@media (max-width: 560px) { .otd-98 { flex-wrap: wrap; align-items: flex-start; } .otd-98 > div:not(.otd-pg) { flex-basis: calc(100% - 80px); } .otd-98 .otd-go { width: 100%; text-align: center; } }

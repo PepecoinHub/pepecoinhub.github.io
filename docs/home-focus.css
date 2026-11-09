@@ -59,3 +59,38 @@
 @media (max-width:640px){.other-side{grid-template-columns:1fr}.os-door{max-width:320px;margin:0 auto}}
 @media (prefers-reduced-motion:reduce){.os-door{transform:none;transition:none}}
 .other-side .os-go{display:inline-block;padding:9px 16px;background:#2a8a3a;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;box-shadow:0 3px 0 #1b5e2a}.other-side .os-go:hover{background:#237a32}
+/* calendar page "on this day in PEP history" (home.js, data/on-this-day.json): a torn-off page next to the story */
+.otd { margin-bottom: 14px; display: grid; grid-template-columns: auto 1fr; gap: 26px; align-items: center; padding: 22px 26px; border: 1px solid var(--rule); border-radius: 20px; background: var(--panel); box-shadow: var(--shadow); }
+.otd-page { position: relative; width: 112px; padding: 0 0 12px; border-radius: 10px; background: #fffdf8; color: #23261f; text-align: center; box-shadow: 0 1px 0 rgba(0,0,0,.06), 0 8px 18px -10px rgba(40,30,10,.45); transform: rotate(-3deg); overflow: visible; }
+.otd-page::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: -5px; height: 8px; z-index: -1; border-radius: 0 0 8px 8px; background: #efe7d8; box-shadow: 0 6px 12px -8px rgba(40,30,10,.5); }
+.otd-rings { position: absolute; top: -7px; left: 0; right: 0; display: flex; justify-content: space-around; padding: 0 24px; }
+.otd-rings i { width: 8px; height: 16px; border-radius: 4px; background: linear-gradient(#8a8f86, #3b3f38); box-shadow: inset 0 1px 0 rgba(255,255,255,.4); }
+.otd-mon { display: block; padding: 12px 0 6px; border-radius: 10px 10px 0 0; background: var(--accent); color: #fff; font: 700 .82rem/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; }
+.otd-day { display: block; margin-top: 4px; font: 700 3.4rem/1 var(--f-display); letter-spacing: -.04em; color: #16532A; }
+.otd-year { display: block; margin-top: 2px; font: .74rem/1 var(--f-mono); letter-spacing: .12em; color: #5d6357; }
+.otd-low .otd-mon { background: #C07A4E; }
+.otd-high .otd-mon { background: linear-gradient(90deg, #d79a35, #F6BB60); color: #3b2a08; }
+.otd-body { min-width: 0; display: grid; gap: 6px; }
+.otd-kick { margin: 0; font: .72rem/1.4 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent-mid); }
+.otd-kick span { color: var(--muted); letter-spacing: .04em; }
+.otd-kick span::before { content: "· "; }
+.otd h2 { margin: 0; font-size: clamp(1.25rem, 2.2vw, 1.6rem); line-height: 1.15; letter-spacing: -.02em; }
+.otd-text { margin: 0; max-width: 62ch; color: var(--ink); line-height: 1.55; }
+.otd-foot { margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; }
+.otd-more { font-weight: 700; color: var(--link); }
+.otd-src { font: .74rem/1.4 var(--f-mono); color: var(--muted); }
+.otd-src a { color: inherit; }
+@media (max-width: 560px) {
+  .otd { grid-template-columns: 76px 1fr; grid-template-areas: "page kick" "page title" "text text" "foot foot"; gap: 4px 16px; padding: 20px 18px 18px; align-items: start; }
+  .otd-body { display: contents; }
+  .otd-page { grid-area: page; width: 76px; padding-bottom: 8px; margin-top: 6px; }
+  .otd-mon { padding: 13px 0 4px; font-size: .7rem; }
+  .otd-rings { top: -9px; padding: 0 16px; }
+  .otd-rings i { width: 7px; height: 14px; }
+  .otd-day { font-size: 2.3rem; }
+  .otd-year { font-size: .64rem; }
+  .otd-kick { grid-area: kick; font-size: .66rem; }
+  .otd h2 { grid-area: title; align-self: start; }
+  .otd-text { grid-area: text; margin-top: 12px; }
+  .otd-foot { grid-area: foot; margin-top: 8px; }
+}

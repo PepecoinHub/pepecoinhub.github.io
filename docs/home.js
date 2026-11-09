@@ -173,4 +173,46 @@
   stamp.style.display = 'block';
   priceEl.parentNode.appendChild(stamp);
   window.PepPrices.subscribe(load);
+  // ---------- calendar page: "on this day in PEP history" ----------
+  // data/on-this-day.json lists dated events. On the day whose month and day match (the visitor's own calendar), a
+  // torn-off calendar page shows up right under the hero, every year. ?day=MM-DD previews any day.
+  (function () {
+    var hero = document.querySelector('.home-hero');
+    if (!hero || !me || !window.fetch) return;
+    var T = {
+      en: ['On this day in PEP history', 'Source'], pl: ['Tego dnia w historii PEP', 'Źródło'],
+      de: ['An diesem Tag in der PEP-Geschichte', 'Quelle'], es: ['Un día como hoy en la historia de PEP', 'Fuente'],
+      fr: ['Ce jour-là dans l’histoire de PEP', 'Source'], it: ['Accadde oggi nella storia di PEP', 'Fonte'],
+      tr: ['PEP tarihinde bugün', 'Kaynak'], zh: ['PEP 历史上的今天', '来源']
+    };
+    var L = lang.indexOf('zh') === 0 ? 'zh' : lang.split('-')[0]; if (!T[L]) L = 'en';
+    var now = new Date(), q = /[?&]day=(\d\d)-(\d\d)/.exec(location.search);
+    var md = q ? q[1] + '-' + q[2] : ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
+    var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    var pick = function (o) { return o ? (o[L] || o.en || '') : ''; };
+    fetch(new URL('data/on-this-day.json', me).href).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      var hits = ((j && j.days) || []).filter(function (d) { return d.date && d.date.slice(5) === md; });
+      var after = hero;
+      hits.forEach(function (d) {
+        var y = Number(d.date.slice(0, 4)), at = new Date(y, Number(d.date.slice(5, 7)) - 1, Number(d.date.slice(8, 10)));
+        var ago = now.getFullYear() - y, when = at.toLocaleDateString(LOC, { day: 'numeric', month: 'long', year: 'numeric' });
+        if (ago > 0 && window.Intl && Intl.RelativeTimeFormat) when += ' · ' + new Intl.RelativeTimeFormat(LOC, { numeric: 'auto' }).format(-ago, 'year');
+        var mon = at.toLocaleDateString(LOC, { month: 'short' }).replace(/\.$/, '');
+        var href = /^https?:/.test(d.link || '') ? d.link : (d.link ? new URL(d.link, new URL('./', location.href)).href : '');
+        var src = (d.src || []).map(function (s) { return '<a href="' + esc(s.url) + '" rel="noopener">' + esc(s.label) + '</a>'; }).join(', ');
+        var card = document.createElement('aside');
+        card.className = 'otd otd-' + esc(d.icon || 'day');
+        card.setAttribute('aria-label', T[L][0]);
+        card.innerHTML =
+          '<div class="otd-page" aria-hidden="true"><span class="otd-rings"><i></i><i></i></span><span class="otd-mon">' + esc(mon) + '</span>' +
+          '<b class="otd-day">' + Number(d.date.slice(8, 10)) + '</b><span class="otd-year">' + y + '</span></div>' +
+          '<div class="otd-body"><p class="otd-kick">' + esc(T[L][0]) + ' <span>' + esc(when) + '</span></p>' +
+          '<h2>' + esc(pick(d.title)) + '</h2><p class="otd-text">' + esc(pick(d.text)) + '</p>' +
+          '<p class="otd-foot">' + (href ? '<a class="otd-more" href="' + esc(href) + '">' + esc(pick(d.more)) + ' →</a>' : '') +
+          (src ? '<span class="otd-src">' + esc(T[L][1]) + ': ' + src + '</span>' : '') + '</p></div>';
+        after.parentNode.insertBefore(card, after.nextSibling);
+        after = card;
+      });
+    }, function () {});
+  })();
 })();

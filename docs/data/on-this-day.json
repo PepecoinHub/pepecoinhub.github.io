@@ -1,0 +1,121 @@
+{
+  "_readme": "Calendar pages ('On this day in PEP history'). On the day whose month-day matches 'date', the home pages (serious and PondOS) show the page, every year. To add one, copy an entry: date = YYYY-MM-DD of the event, title/text in all 8 languages (en is the fallback), link = a page of this site (path from the site root) or a full https URL, src = where the fact comes from. Preview any day with ?day=MM-DD on the home page. Never put founders' personal names here.",
+  "schema": 1,
+  "days": [
+    {
+      "date": "2024-01-30",
+      "icon": "block",
+      "title": {
+        "en": "Pepecoin's first block",
+        "pl": "Pierwszy blok Pepecoina",
+        "de": "Der erste Block von Pepecoin",
+        "es": "El primer bloque de Pepecoin",
+        "fr": "Le premier bloc de Pepecoin",
+        "it": "Il primo blocco di Pepecoin",
+        "tr": "Pepecoin'in ilk bloğu",
+        "zh": "Pepecoin 的第一个区块"
+      },
+      "text": {
+        "en": "On this day in 2024 the Pepecoin network went live. The genesis block carries a Wall Street Journal headline from 22 January 2024. No premine and no ICO: every PEP since then has come from mining.",
+        "pl": "Tego dnia w 2024 roku wystartowała sieć Pepecoin. W bloku genesis zapisano nagłówek z Wall Street Journal z 22 stycznia 2024. Bez premine i bez ICO: każdy PEP od tamtej pory pochodzi z kopania.",
+        "de": "An diesem Tag im Jahr 2024 ging das Pepecoin-Netzwerk an den Start. Der Genesis-Block enthält eine Schlagzeile des Wall Street Journal vom 22. Januar 2024. Kein Premine, kein ICO: Jeder PEP seitdem stammt aus dem Mining.",
+        "es": "Un día como hoy de 2024 arrancó la red de Pepecoin. El bloque génesis lleva un titular del Wall Street Journal del 22 de enero de 2024. Sin premine y sin ICO: cada PEP desde entonces ha salido del mining.",
+        "fr": "Ce jour-là, en 2024, le réseau Pepecoin a démarré. Le bloc genesis contient un titre du Wall Street Journal daté du 22 janvier 2024. Ni premine ni ICO : chaque PEP depuis vient du mining.",
+        "it": "In questo giorno del 2024 è partita la rete Pepecoin. Il blocco genesis contiene un titolo del Wall Street Journal del 22 gennaio 2024. Niente premine e niente ICO: ogni PEP da allora arriva dal mining.",
+        "tr": "2024'te bugün Pepecoin ağı çalışmaya başladı. Genesis bloğunda Wall Street Journal'ın 22 Ocak 2024 tarihli bir manşeti yer alıyor. Premine yok, ICO yok: o günden beri her PEP mining ile üretildi.",
+        "zh": "2024 年的今天，Pepecoin 网络正式启动。创世区块里写入了《华尔街日报》2024 年 1 月 22 日的一条标题。没有 premine，也没有 ICO：此后的每一枚 PEP 都来自挖矿。"
+      },
+      "link": "network.html",
+      "more": {
+        "en": "The network since day one",
+        "pl": "Sieć od pierwszego dnia",
+        "de": "Das Netzwerk seit Tag eins",
+        "es": "La red desde el primer día",
+        "fr": "Le réseau depuis le premier jour",
+        "it": "La rete dal primo giorno",
+        "tr": "İlk günden bu yana ağ",
+        "zh": "从第一天起的网络数据"
+      },
+      "src": [
+        { "label": "chainparams.cpp", "url": "https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp" },
+        { "label": "MiCA whitepaper (D.8)", "url": "https://pepecoin.com/mica-whitepaper.xhtml" }
+      ]
+    },
+    {
+      "date": "2024-07-25",
+      "icon": "low",
+      "title": {
+        "en": "The lowest price ever: $0.0000026",
+        "pl": "Najniższa cena w historii: 0,0000026 $",
+        "de": "Der tiefste Kurs aller Zeiten: 0,0000026 $",
+        "es": "El precio más bajo de la historia: 0,0000026 $",
+        "fr": "Le prix le plus bas de l'histoire : 0,0000026 $",
+        "it": "Il prezzo più basso di sempre: 0,0000026 $",
+        "tr": "Tüm zamanların en düşük fiyatı: 0,0000026 $",
+        "zh": "历史最低价：0.0000026 美元"
+      },
+      "text": {
+        "en": "On this day in 2024 PEP hit its all-time low. Less than five months later it reached its all-time high, roughly 700 times higher.",
+        "pl": "Tego dnia w 2024 roku PEP zaliczył dno wszech czasów (ATL). Niecałe pięć miesięcy później był na szczycie (ATH), mniej więcej 700 razy wyżej.",
+        "de": "An diesem Tag im Jahr 2024 erreichte PEP sein Allzeittief (ATL). Keine fünf Monate später stand er auf dem Allzeithoch (ATH), etwa 700-mal höher.",
+        "es": "Un día como hoy de 2024 PEP tocó su mínimo histórico (ATL). Menos de cinco meses después marcó su máximo histórico (ATH), unas 700 veces más arriba.",
+        "fr": "Ce jour-là, en 2024, PEP a touché son plus bas historique (ATL). Moins de cinq mois plus tard, il atteignait son plus haut historique (ATH), environ 700 fois plus haut.",
+        "it": "In questo giorno del 2024 PEP ha toccato il minimo storico (ATL). Meno di cinque mesi dopo era al massimo storico (ATH), circa 700 volte più in alto.",
+        "tr": "2024'te bugün PEP tüm zamanların en düşüğünü (ATL) gördü. Beş aydan kısa bir süre sonra tüm zamanların zirvesine (ATH) çıktı, yaklaşık 700 kat yukarı.",
+        "zh": "2024 年的今天，PEP 跌到历史最低点（ATL）。不到五个月后，它涨到历史最高点（ATH），高出约 700 倍。"
+      },
+      "link": "price.html",
+      "more": {
+        "en": "Today's price",
+        "pl": "Dzisiejsza cena",
+        "de": "Der heutige Kurs",
+        "es": "El precio de hoy",
+        "fr": "Le prix du jour",
+        "it": "Il prezzo di oggi",
+        "tr": "Bugünkü fiyat",
+        "zh": "今日价格"
+      },
+      "src": [
+        { "label": "CoinGecko", "url": "https://www.coingecko.com/en/coins/pepecoin-network" }
+      ]
+    },
+    {
+      "date": "2024-12-09",
+      "icon": "high",
+      "title": {
+        "en": "All-time high: $0.001824",
+        "pl": "Szczyt wszech czasów: 0,001824 $",
+        "de": "Allzeithoch: 0,001824 $",
+        "es": "Máximo histórico: 0,001824 $",
+        "fr": "Plus haut historique : 0,001824 $",
+        "it": "Massimo storico: 0,001824 $",
+        "tr": "Tüm zamanların zirvesi: 0,001824 $",
+        "zh": "历史最高价：0.001824 美元"
+      },
+      "text": {
+        "en": "On this day in 2024 PEP reached its highest price so far (ATH). That is still the mark to beat.",
+        "pl": "Tego dnia w 2024 roku PEP osiągnął najwyższą cenę w historii (ATH). Do dziś to poprzeczka do pobicia.",
+        "de": "An diesem Tag im Jahr 2024 erreichte PEP seinen bisher höchsten Kurs (ATH). Bis heute die Marke, die es zu schlagen gilt.",
+        "es": "Un día como hoy de 2024 PEP alcanzó su precio más alto hasta ahora (ATH). Sigue siendo la marca a batir.",
+        "fr": "Ce jour-là, en 2024, PEP a atteint son prix le plus haut à ce jour (ATH). C'est toujours la barre à battre.",
+        "it": "In questo giorno del 2024 PEP ha raggiunto il prezzo più alto finora (ATH). È ancora il record da battere.",
+        "tr": "2024'te bugün PEP şimdiye kadarki en yüksek fiyatına (ATH) ulaştı. Hâlâ geçilmesi gereken çıta bu.",
+        "zh": "2024 年的今天，PEP 创下迄今为止的最高价（ATH）。这仍是有待打破的纪录。"
+      },
+      "link": "price.html",
+      "more": {
+        "en": "How far from the top today",
+        "pl": "Ile dziś brakuje do szczytu",
+        "de": "Wie weit es heute bis zum Hoch ist",
+        "es": "Cuánto falta hoy para el máximo",
+        "fr": "La distance au sommet aujourd'hui",
+        "it": "Quanto manca oggi al massimo",
+        "tr": "Bugün zirveye ne kadar var",
+        "zh": "今天距最高点还有多远"
+      },
+      "src": [
+        { "label": "CoinGecko", "url": "https://www.coingecko.com/en/coins/pepecoin-network" }
+      ]
+    }
+  ]
+}
