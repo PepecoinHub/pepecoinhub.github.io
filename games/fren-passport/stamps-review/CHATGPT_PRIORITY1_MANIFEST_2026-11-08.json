@@ -318,5 +318,13 @@
     "height": 1321,
     "status": "owner-approved",
     "notes": "Redraw forwarded by the owner, 2026-11-09."
+  },
+  {
+    "id": "picasso_fren",
+    "file": "games/fren-passport/source/stamps-new/picasso_fren.png",
+    "width": 1095,
+    "height": 1389,
+    "status": "owner-approved",
+    "notes": "Full-size redraw forwarded by the owner, 2026-11-09."
   }
 ]
