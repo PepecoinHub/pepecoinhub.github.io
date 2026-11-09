@@ -2644,7 +2644,8 @@
     'does not stop it.',
     '',
     '== POINTS ==',
-    'Within 1 km: full points.',
+    'Within 1 km: full points (from 10 Nov;',
+    'it used to be 10 km).',
     'Further away: fewer points.',
     'Left the tab? 1st time a warning, then -1000 each time.',
     '',
@@ -3139,7 +3140,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 5, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 6, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -3217,6 +3218,35 @@
       '<p class="gz-fine">Yes, this is a test poll. It is open for 2 days. Everyone can vote, Discord players and guests: one vote each, and a vote is final. You see the results after you vote; everyone sees them when the poll closes.</p></section>' +
       '<p class="gz-foot">*Almost weekend: issue #5 lands on a Friday. The next one comes when it is ready.</p></article>';
   }
+  // Issue #6 (Monday 9 Nov 2026): X unblocks the site, the first faucet payout, 1 km from tomorrow, the poll result
+  function gazette6() {
+    var xText = '🐸 Pepe Guesser: one photo a day, 2 minutes, one pin. Find the frog, get some free PEP.\nhttps://pepecoinhub.com/meme/';
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #6</span><span>Price: 0 PEP</span><span>Almost weekly*</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking"><p class="gz-flash">Breaking</p><h4>Twitter unblocked PepecoinHub!</h4>' +
+      '<div class="gz-wpbox"><img src="img/wow.webp" alt="Pepe with his mouth wide open" width="110" height="110"><div>' +
+      '<p>For weeks X would not take a single link to this site. Today the wall came down: links to pepecoinhub.com go through again.</p>' +
+      '<p><b>So the button works now.</b> Finish today\'s Pepe Guesser and hit <b>Post on X</b>: your distance, your points and your streak, ready to post. Show the timeline who knows their geography.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-wpgo">Play today\'s photo →</button><a class="app-btn" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(xText) + '">Post on X</a></div></section>' +
+      '<section class="gz-wp"><p class="gz-kick">The pond faucet</p><h4>The first weekly payout is done</h4>' +
+      '<div class="gz-wpbox"><img src="img/rich.webp" alt="Pepe reading How to be rich" width="110" height="110"><div>' +
+      '<p>Today the host paid out the first full week of Pepe Guesser rewards: <b>4,704 PEP to 24 addresses</b>, for 76 good guesses. Real coins, sent straight to your wallets. Check yours.</p>' +
+      '<p>The weekly pot is fresh again: it now resets every Monday, so a new week means a new 5,000 PEP to play for.</p></div></div></section>' +
+      '<section class="gz-market"><p class="gz-kick">Heads up 👀</p><h4>From tomorrow, the frog hides better</h4>' +
+      '<p>Up to now, a pin within 10 km of Pepe got the full 5,000 points. <b>From tomorrow\'s photo it has to be within 1 km.</b> Close is no longer close enough: zoom in, read the street signs, find the exact spot.</p>' +
+      '<p class="gz-fine">Points still fall off gently further away, so a good guess still pays almost as much. The perfect 5,000 is what gets hard.</p></section>' +
+      '<section class="gz-soon"><p class="gz-kick">From the editor</p><h4>Big changes are on the horizon</h4>' +
+      '<div class="gz-wpbox"><img src="img/hardhat.webp" alt="Pepe in a hard hat with a hammer" width="110" height="110"><div>' +
+      '<p>PepecoinHub is at the very start of the road, and you can help build it: post your scores on X, bring a fren to the pond, and write to the Editor when something breaks or when you have an idea. Every letter is read.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-write">✏️ Write to the Editor</button></div></section>' +
+      '<section class="gz-pollsec"><p class="gz-kick">Pond Poll results</p><h4>Do you like polls?</h4>' +
+      '<p>Thank you to all <b>5 of you</b> (yes, five) who voted. Now we know at least someone reads the Gazette to the very end.</p>' +
+      '<div class="gz-poll" data-poll="like_polls" aria-live="polite"><p class="gz-poll-msg">Opening the ballot box…</p></div></section>' +
+      '<section class="gz-letters"><p class="gz-kick">Fact of the day, from a loyal reader</p>' +
+      '<figure class="gz-letter"><p class="gz-letter-from"><b>Smolpepewithaquestion</b> (guest) <span class="gz-letter-ok">🖨️ OK to print</span></p>' +
+      '<blockquote>Hello have you heard of Pepecoin? Is gud.</blockquote><figcaption>Sent from /meme/.</figcaption></figure>' +
+      '<p class="gz-fine">The editor checked. It is gud.</p></section>' +
+      '<p class="gz-foot">*Almost weekly: three days after issue #5. Close enough.</p></article>';
+  }
   // Pond Poll in the Gazette (games/supabase/update_polls.sql): the server counts; the page only shows its answer
   function paintPoll(box) {
     var id = box.getAttribute('data-poll');
@@ -3266,7 +3296,8 @@
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
         // one compact row of tabs: the letter form, then the Gazette issues by number (newest first)
         '<li><button type="button" data-v="write" title="Ideas, bugs, wishes, notices">✏️ Letter to the Editor</button></li>' +
-        '<li><button type="button" data-v="gz" title="The Pond Gazette #5: the lockout, CoinEx and the first Pond Poll" aria-label="The Pond Gazette #5">📰 #5</button></li>' +
+        '<li><button type="button" data-v="gz" title="The Pond Gazette #6: X unblocked us, the first faucet payout, 1 km from tomorrow" aria-label="The Pond Gazette #6">📰 #6</button></li>' +
+        '<li><button type="button" data-v="gz5" title="The Pond Gazette #5 (archive): the lockout, CoinEx and the first Pond Poll" aria-label="The Pond Gazette #5">#5</button></li>' +
         '<li><button type="button" data-v="gz4" title="The Pond Gazette #4 (archive): the Pepe Guesser leak" aria-label="The Pond Gazette #4">#4</button></li>' +
         '<li><button type="button" data-v="gz3" title="The Pond Gazette #3 (archive): an internet in your internet" aria-label="The Pond Gazette #3">#3</button></li>' +
         '<li><button type="button" data-v="gz2" title="The Pond Gazette #2 (archive): Pepe Guesser is coming" aria-label="The Pond Gazette #2">#2</button></li>' +
@@ -3284,8 +3315,8 @@
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
         if (v === 'write') return writeLetter(pane);
         if (v === 'box') return letterInbox(pane, paintOwner);
-        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : 5;
-        pane.innerHTML = issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : 6;
+        pane.innerHTML = issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +

@@ -1584,3 +1584,9 @@ footer.foot a { color: #edf3e3; }
 .wp-bot .app-btn { min-height: 36px; }
 .wp-bot li.is-copied { background: #e6f4e6; }
 @media (max-width: 520px) { .wp-bot li { grid-template-columns: 1fr 1fr; } .wp-bot code { grid-column: 1 / -1; } }
+/* Gazette #6: a reader's letter, printed like a clipping */
+.gz-letter { margin: 0 0 8px; padding: 10px 12px; background: #fffef6; color: #1b1b1b; border: 1px solid #cfc8a8; box-shadow: 2px 3px 0 rgba(0, 0, 0, .18); transform: rotate(.5deg); font: 400 15px/1.45 system-ui, sans-serif; }
+.gz-letter-from { margin: 0 0 6px; }
+.gz-letter-ok { display: inline-block; margin-left: 6px; padding: 1px 8px; background: #e3f1dc; color: #2c5e22; font-size: 13px; }
+.gz-letter blockquote { margin: 0 0 6px; font-size: 16px; }
+.gz-letter figcaption { color: #8aa38a; font-size: 13px; }
