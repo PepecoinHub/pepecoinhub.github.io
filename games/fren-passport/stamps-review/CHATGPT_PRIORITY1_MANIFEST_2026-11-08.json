@@ -278,5 +278,13 @@
     "height": 381,
     "status": "owner-approved",
     "notes": "Redraw from the owner's sheet of 10 (2026-11-09), cut by Claude; Week Scout from that sheet was not taken."
+  },
+  {
+    "id": "week_scout",
+    "file": "games/fren-passport/source/stamps-new/week_scout.png",
+    "width": 1064,
+    "height": 1409,
+    "status": "owner-approved",
+    "notes": "Redraw forwarded by the owner, 2026-11-09."
   }
 ]
