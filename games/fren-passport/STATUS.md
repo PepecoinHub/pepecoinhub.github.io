@@ -110,7 +110,8 @@ is checked against the site's style before it goes in (it tends to drift from th
   they also feed **Pond Decorator**.
 
 **Code, in this order (Claude)**
-1. Egg stage in the PepeGochi rules (SQL + JS model + parity tests).
+1. ~~Egg stage~~ done: a new frog is an egg until its first care; that care records `hatched` → First Hatch.
+   First Hatch, Little Fren, One Small Step and Good Parent are live (bridge + allowlist).
 2. PepeGochi window on the real RPCs (today: local model behind `?beta=gochi`).
 3. Passport: PepeGochi card (Overview/Stats); `first_hatch`, `little_fren`, `grown_fren`, `good_parent` live.
 4. Decorations: the three items with their rules, room placement, Pond Decorator.

@@ -146,7 +146,7 @@ test('local responses are marked and carry no stamps', () => {
   const s = sim.rpc('gry_pepegochi_state').value;
   assert.equal(s.pet.stage, 'adult');
   assert.doesNotMatch(JSON.stringify(s), /badge|stamp|first_hatch|little_fren|grown_fren|passport/i);
-  assert.deepEqual(sim.world.milestones.map(m => m.milestone), ['first_adoption', 'froglet', 'adult'], 'kept in memory only');
+  assert.deepEqual(sim.world.milestones.map(m => m.milestone), ['first_adoption', 'hatched', 'froglet', 'adult'], 'kept in memory only');
 });
 
 test('the test page is not linked from the site', () => {

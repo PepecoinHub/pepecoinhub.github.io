@@ -642,7 +642,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     });
 
     // ---------- M: milestones survive a broken Passport ----------
-    await t.test('M1 first adoption, froglet and adult are recorded once per account', async () => {
+    await t.test('M1 first adoption, hatching, froglet and adult are recorded once per account', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");
       for (let d = 0; d < 8; d++) await careAt(p, d * 24);
@@ -650,7 +650,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
       await ok(p, "gry_pepegochi_adopt('Fren II')", at(8 * 24 + 201));
       for (let d = 0; d < 8; d++) await careAt(p, 8 * 24 + 202 + d * 24);
       const rows = (await db.query('select milestone, life_id from games.pepegochi_milestones where user_id = $1 order by reached_at', [uid(p)])).rows;
-      assert.deepEqual(rows.map(r => r.milestone), ['first_adoption', 'froglet', 'adult']);
+      assert.deepEqual(rows.map(r => r.milestone), ['first_adoption', 'hatched', 'froglet', 'adult']);
       assert.equal(new Set(rows.map(r => r.life_id)).size, 1, 'all from the first life');
     });
 
@@ -672,7 +672,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
         assert.ok(warnings.some(w => /pepegochi passport sync: stamp storage is broken/.test(w)));
         assert.equal((await one('select count(*)::int n from games.test_hook_calls')).n, 0, 'the failed hook\'s own writes were undone');
         const pending = (await db.query('select milestone from games.pepegochi_milestones where user_id = $1 and synced_at is null order by 1', [uid(p)])).rows;
-        assert.deepEqual(pending.map(r => r.milestone), ['first_adoption', 'froglet']);
+        assert.deepEqual(pending.map(r => r.milestone), ['first_adoption', 'froglet', 'hatched']);
         // M4: running the migration again does not switch off a hook installed later
         await db.exec(await readFile(new URL('../games/supabase/update_pepegochi_v2.sql', import.meta.url), 'utf8'));
         await db.exec((await import('../scripts/pepegochi_sim.mjs')).VIRTUAL_CLOCK);

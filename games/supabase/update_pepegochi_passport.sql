@@ -6,21 +6,18 @@
 -- What it does
 --   * Replaces the no-op hook games.pepegochi_passport_sync(u) from update_pepegochi_v2.sql. The hook turns
 --     the account milestones that PepeGochi records (games.pepegochi_milestones) into Passport stamps:
---       first_adoption -> first_hatch   "First Hatch"
+--       hatched        -> first_hatch   "First Hatch"      (the first care hatches the egg; owner, 2026-11-09)
 --       froglet        -> little_fren   "Little Fren"      (2nd care day)
 --       adult          -> grown_fren    "One Small Step"   (7th care day)
+--       good_parent    -> good_parent   "Good Parent"      (good care days in one life)
 --   * Every stamp goes through games.passport_award(): its allowlist, the Discord check and "once per account".
 --     The stamp's date is the moment of the milestone, also when it is delivered later.
 --   * Backfill: it delivers every milestone that is still pending when the file runs.
 --
 -- What it does not do
---   * No stamp is awardable yet. The three stamps are "planned" in docs/meme/passport-catalog.json, and the
---     Passport rule is that only live stamps can be earned (tests/passport-awards.test.mjs). So they are not in
---     passport_award()'s allowlist, and this hook leaves their milestones pending, silently. The release PR
---     adds the three IDs to the allowlist in update_passport_awards.sql and sets them live in the catalog;
---     then the next accepted PepeGochi action (or running this file again) delivers everything pending,
---     with the original dates. Nothing is lost while the stamps wait.
---   * good_parent stays pending: its stamp and the catalog text change come with PR D.
+--   * Launch branch: the four stamps are live in the catalog and in passport_award()'s allowlist. A milestone
+--     whose stamp is not allowed (an older Passport file) stays pending, silently, and is delivered later.
+--   * first_adoption is recorded but is not a stamp (a new frog is an egg until its first care).
 --   * certified_fren is never awarded by PepeGochi (it means 100 days of PondOS activity).
 --   * It does not change gry_passport_state(), passport_award() or any Passport table.
 --
@@ -41,9 +38,10 @@ end $$;
 create or replace function games.pepegochi_passport_stamp(m text)
 returns text language sql immutable set search_path = '' as $$
   select case m
-    when 'first_adoption' then 'first_hatch'
+    when 'hatched' then 'first_hatch'
     when 'froglet' then 'little_fren'
     when 'adult' then 'grown_fren'
+    when 'good_parent' then 'good_parent'
   end
 $$;
 
@@ -62,7 +60,12 @@ begin
        for update
   loop
     s := games.pepegochi_passport_stamp(m.milestone);
-    continue when s is null;
+    if s is null then
+      -- not a stamp (first_adoption): nothing to deliver, so it is done
+      update games.pepegochi_milestones ms set synced_at = games.pepegochi_clock()
+       where ms.user_id = u and ms.milestone = m.milestone;
+      continue;
+    end if;
     begin
       perform games.passport_award(u, s, m.reached_at);
     exception when raise_exception then

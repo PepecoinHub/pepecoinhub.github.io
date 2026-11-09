@@ -5,9 +5,9 @@
 //   node --test tests/pepegochi-passport-sql.test.mjs
 // It creates and drops its own database. Never point it at Supabase. Time is virtual (scripts/pepegochi_sim.mjs).
 //
-// "Release" below means the change the release PR will make: the three stamp IDs added to
-// games.passport_award()'s allowlist in update_passport_awards.sql. The test builds that version from the
-// file itself, so it always matches today's list plus exactly those three.
+// The launch branch has the four life-cycle stamps in games.passport_award()'s allowlist. "Old" below is that
+// function without them (a Passport file from before the release): the milestones must wait and never get lost.
+// A new frog is an egg; its first accepted care hatches it (milestone "hatched" -> First Hatch).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -41,9 +41,10 @@ test('PepeGochi v2 → Fren Passport bridge: life-cycle stamps through passport_
     const bridge = await read('games/supabase/update_pepegochi_passport.sql');
     const awardsFile = await read('games/supabase/update_passport_awards.sql');
     const todayAward = awardsFile.match(/create or replace function games\.passport_award\([\s\S]*?\n\$\$;/)[0];
-    const releaseAward = todayAward.replace(/(b not in \([^)]*)\)/, "$1, 'first_hatch', 'little_fren', 'grown_fren')");
-    assert.notEqual(releaseAward, todayAward);
-    const release = () => db.exec(releaseAward);
+    const oldAward = todayAward.replace(/,\s*'first_hatch', 'little_fren', 'grown_fren', 'good_parent'/, '');
+    assert.notEqual(oldAward, todayAward);
+    const release = () => db.exec(todayAward);
+    await db.exec(oldAward);
 
     let next = 1;
     const player = async opts => { const n = next++; await addPlayer(db, n, opts); return n; };
@@ -63,7 +64,7 @@ test('PepeGochi v2 → Fren Passport bridge: life-cycle stamps through passport_
     const reached = async (p, m) => (await one('select reached_at from games.pepegochi_milestones where user_id = $1 and milestone = $2', [uid(p), m])).reached_at;
     const datedAtMilestones = async p => {
       const b = await badges(p);
-      for (const [m, s] of [['first_adoption', 'first_hatch'], ['froglet', 'little_fren'], ['adult', 'grown_fren']])
+      for (const [m, s] of [['hatched', 'first_hatch'], ['froglet', 'little_fren'], ['adult', 'grown_fren']])
         assert.equal(+b.find(x => x.badge_id === s).earned_at, +(await reached(p, m)), s + ' is dated at its milestone');
     };
     const ourWarnings = () => warnings.filter(w => /pepegochi|passport/i.test(w));
@@ -83,17 +84,17 @@ test('PepeGochi v2 → Fren Passport bridge: life-cycle stamps through passport_
       } finally { await db.exec('rollback'); }
     });
 
-    await t.test('C2 installed today the stamps wait: they are planned, so not awardable; nothing is lost, no warning', async () => {
+    await t.test('C2 with an old Passport the stamps wait: not awardable yet; nothing is lost, no warning', async () => {
       warnings.length = 0;
       await db.exec(bridge);
       assert.deepEqual(await ids(early), []);
-      assert.deepEqual(await pending(early), ['adult', 'first_adoption', 'froglet']);
+      assert.deepEqual(await pending(early), ['adult', 'froglet', 'hatched'], 'first_adoption is not a stamp: done');
       const p = await player();
       await grow(p, 300);
       const s = await ok(p, 'gry_pepegochi_state()', at(300 + 8 * 24));
       assert.equal(s.pet.stage, 'adult', 'the game itself is unaffected');
       assert.deepEqual(await ids(p), []);
-      assert.deepEqual(await pending(p), ['adult', 'first_adoption', 'froglet']);
+      assert.deepEqual(await pending(p), ['adult', 'froglet', 'hatched']);
       assert.deepEqual(ourWarnings(), [], '"not in the allowlist yet" is silent');
     });
 
@@ -105,7 +106,7 @@ test('PepeGochi v2 → Fren Passport bridge: life-cycle stamps through passport_
       assert.deepEqual(await pending(early), []);
       // an account without Discord gets nothing and keeps its milestones
       assert.deepEqual(await ids(unlinked), []);
-      assert.deepEqual(await pending(unlinked), ['adult', 'first_adoption', 'froglet']);
+      assert.deepEqual(await pending(unlinked), ['adult', 'froglet', 'hatched']);
       // again: no change
       const snap = async () => JSON.stringify([await badges(early), (await db.query('select * from games.pepegochi_milestones order by user_id, milestone')).rows]);
       const before = await snap();
@@ -115,10 +116,12 @@ test('PepeGochi v2 → Fren Passport bridge: life-cycle stamps through passport_
 
     await t.test('C4 after release each stamp arrives in the same action as its milestone', async () => {
       const p = await player();
-      await ok(p, "gry_pepegochi_adopt('Fren')", at(600));
-      assert.deepEqual(await ids(p), ['first_hatch']);
+      const a = await ok(p, "gry_pepegochi_adopt('Fren')", at(600));
+      assert.equal(a.pet.stage, 'egg', 'a new frog is an egg');
+      assert.deepEqual(await ids(p), [], 'adopting is not hatching');
       await careAt(p, 601);
-      assert.deepEqual(await ids(p), ['first_hatch'], 'one care day: still a tadpole');
+      assert.deepEqual(await ids(p), ['first_hatch'], 'the first care hatches it');
+      assert.equal((await ok(p, 'gry_pepegochi_state()', at(602))).pet.stage, 'tadpole');
       await careAt(p, 625);
       assert.deepEqual(await ids(p), ['first_hatch', 'little_fren']);
       for (let d = 2; d < 7; d++) await careAt(p, 601 + d * 24);
@@ -159,26 +162,28 @@ test('PepeGochi v2 → Fren Passport bridge: life-cycle stamps through passport_
         const p = await player();
         const a = await ok(p, "gry_pepegochi_adopt('Fren')", at(1500));
         assert.equal(a.adopt_result, 'adopted');
+        const c = await careAt(p, 1501);
+        assert.ok(c, 'the care is kept');
         assert.ok(ourWarnings().some(w => /pepegochi passport sync: division by zero/.test(w)), ourWarnings().join(' | '));
         assert.deepEqual(await ids(p), []);
-        assert.deepEqual(await pending(p), ['first_adoption']);
+        assert.deepEqual(await pending(p), ['hatched']);
         await db.exec('drop trigger test_break on games.passport_badges');
-        await careAt(p, 1501);
-        assert.deepEqual(await ids(p), ['first_hatch']);
+        await careAt(p, 1525);
+        assert.deepEqual(await ids(p), ['first_hatch', 'little_fren']);
         assert.deepEqual(await pending(p), []);
       } finally {
         await db.exec('drop trigger if exists test_break on games.passport_badges; drop function games.test_break_badges();');
       }
     });
 
-    await t.test('C8 good_parent is not a stamp yet (PR D): it waits, the others are delivered', async () => {
+    await t.test('C8 Good Parent is a stamp: good care days in one life', async () => {
       await setRules(db, base, { good_parent_days: 2 });
       try {
         const p = await player();
         await grow(p, 2000, 3);
-        assert.ok((await pending(p)).includes('good_parent'));
-        assert.deepEqual(await ids(p), ['first_hatch', 'little_fren']);
-        assert.equal((await one("select count(*)::int n from games.passport_badges where badge_id in ('good_parent', 'certified_fren')")).n, 0);
+        assert.deepEqual(await pending(p), []);
+        assert.deepEqual(await ids(p), ['first_hatch', 'good_parent', 'little_fren']);
+        assert.equal((await one("select count(*)::int n from games.passport_badges where badge_id = 'certified_fren'")).n, 0, 'never from PepeGochi');
       } finally { await setRules(db, base); }
     });
 
@@ -187,28 +192,24 @@ test('PepeGochi v2 → Fren Passport bridge: life-cycle stamps through passport_
       await db.exec(VIRTUAL_CLOCK);
       assert.match((await one("select prosrc from pg_proc where proname = 'pepegochi_passport_sync'")).prosrc, /passport_award/,
         'the bridge hook survives a new run of A1');
-      // today's Passport file has no PepeGochi IDs: the stamps wait again, silently
       warnings.length = 0;
       await db.exec(awardsFile);
       const p = await player();
       await grow(p, 2500, 2);
-      assert.deepEqual(await ids(p), []);
-      assert.deepEqual(await pending(p), ['first_adoption', 'froglet']);
-      assert.deepEqual(ourWarnings(), []);
-      await release();
-      await careAt(p, 2500 + 1 + 2 * 24);
       assert.deepEqual(await ids(p), ['first_hatch', 'little_fren']);
+      assert.deepEqual(await pending(p), []);
+      assert.deepEqual(ourWarnings(), []);
     });
 
     await t.test('C10 one player\'s action delivers only that player\'s milestones', async () => {
-      await db.exec(todayAward);
+      await db.exec(oldAward);
       const a = await player(), b = await player();
       await grow(a, 3000, 2); await grow(b, 3000, 2);
       await release();
       await careAt(a, 3000 + 1 + 2 * 24);
       assert.deepEqual(await ids(a), ['first_hatch', 'little_fren']);
       assert.deepEqual(await ids(b), []);
-      assert.deepEqual(await pending(b), ['first_adoption', 'froglet']);
+      assert.deepEqual(await pending(b), ['froglet', 'hatched']);
     });
 
     await t.test('C11 the bridge is closed to the browser and keeps the PepeGochi function rules', async () => {

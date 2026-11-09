@@ -172,7 +172,9 @@ const pts = A => fdiv(A, POINT_A);                                           // 
 const storeUnits = A => roundHalfAway(A, K);                                 // numeric(7,4)
 const needA = points => Math.round(num(points) * UNIT) * K;                  // a threshold in need points, as A
 
-const stageOf = (l, r) => (l.care_days >= r.adult_care_days ? 'adult' : l.care_days >= r.froglet_care_days ? 'froglet' : 'tadpole');
+// a new frog is an egg until its first accepted care (owner, 2026-11-09), then a tadpole
+const stageOf = (l, r) => (l.care_days >= r.adult_care_days ? 'adult' : l.care_days >= r.froglet_care_days ? 'froglet'
+  : l.care_days >= 1 ? 'tadpole' : 'egg');
 const daysBetween = (a, b) => fdiv(b - a, US_DAY);
 
 // The full state, the same JSON as games.pepegochi_view.
@@ -208,7 +210,7 @@ export function view(w, t, r) {
       life_id: l.life_id, generation: l.generation, name: l.pet_name, adopted_at: isoUs(l.adopted_at),
       life_day: daysBetween(l.adopted_at, t) + 1,
       stage,
-      next_growth_care_days: stage === 'tadpole' ? r.froglet_care_days : stage === 'froglet' ? r.adult_care_days : null,
+      next_growth_care_days: stage === 'egg' ? 1 : stage === 'tadpole' ? r.froglet_care_days : stage === 'froglet' ? r.adult_care_days : null,
       care_days: l.care_days,
       last_care_day_utc: l.last_care_day_utc == null ? null : dayText(l.last_care_day_utc),
       status: e.status,
@@ -378,6 +380,7 @@ export function action(w, kind, t, r) {
   l.last_care_day_utc = day;
   Object.assign(l, { rescue_pending: rescue, recovery_days_left: recLeft, recovery_day_utc: recDay, recovery_since: recSince });
   if (newCareDay) {
+    if (l.care_days === 1) milestone(w, 'hatched', l, t);   // the first accepted care hatches the egg
     if (l.care_days >= r.froglet_care_days) milestone(w, 'froglet', l, t);
     if (l.care_days >= r.adult_care_days) milestone(w, 'adult', l, t);
   }

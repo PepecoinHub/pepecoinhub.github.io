@@ -285,9 +285,11 @@ begin
 
   e := games.pepegochi_eval(l, t, r);
   departed := e.status = 'departed';
+  -- a new frog is an egg until its first accepted care (owner, 2026-11-09), then a tadpole
   stage := case when l.care_days >= (r->>'adult_care_days')::integer then 'adult'
                 when l.care_days >= (r->>'froglet_care_days')::integer then 'froglet'
-                else 'tadpole' end;
+                when l.care_days >= 1 then 'tadpole'
+                else 'egg' end;
 
   if departed then
     pet := jsonb_build_object(
@@ -322,7 +324,7 @@ begin
       'life_id', l.life_id, 'generation', l.generation, 'name', l.pet_name, 'adopted_at', l.adopted_at,
       'life_day', floor(extract(epoch from (t - l.adopted_at)) / 86400)::integer + 1,
       'stage', stage,
-      'next_growth_care_days', case stage when 'tadpole' then (r->>'froglet_care_days')::integer
+      'next_growth_care_days', case stage when 'egg' then 1 when 'tadpole' then (r->>'froglet_care_days')::integer
                                           when 'froglet' then (r->>'adult_care_days')::integer end,
       'care_days', l.care_days,
       'last_care_day_utc', l.last_care_day_utc,
@@ -417,11 +419,11 @@ begin
 end
 $$;
 
--- Records an account milestone once (first_adoption, froglet, adult). Never a stamp by itself.
+-- Records an account milestone once (first_adoption, hatched, froglet, adult, good_parent). Never a stamp by itself.
 create or replace function games.pepegochi_milestone(u uuid, m text, life uuid, p_at timestamptz)
 returns void language plpgsql volatile set search_path = '' as $$
 begin
-  if m not in ('first_adoption', 'froglet', 'adult', 'good_parent') then
+  if m not in ('first_adoption', 'hatched', 'froglet', 'adult', 'good_parent') then
     raise exception 'Unknown PepeGochi milestone %', m;
   end if;
   insert into games.pepegochi_milestones (user_id, milestone, life_id, reached_at)
@@ -721,6 +723,10 @@ begin
   returning * into strict l;
 
   if new_care_day then
+    -- the first accepted care hatches the egg
+    if l.care_days = 1 then
+      perform games.pepegochi_milestone(u, 'hatched', l.life_id, t);
+    end if;
     if l.care_days >= (r->>'froglet_care_days')::integer then
       perform games.pepegochi_milestone(u, 'froglet', l.life_id, t);
     end if;

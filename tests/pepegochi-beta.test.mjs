@@ -55,7 +55,7 @@ test('the whole life cycle in the window: adopt, care, neglect, packing, rescue,
   assert.equal(v.letter.departed.canAdopt, true);
   // a new egg: generation 2, the old frog in Past Frens
   assert.equal(v.readopted.message, COPY.readopted);
-  assert.match(v.readopted.pet.title, /^Fren II · tadpole · day 1 · fren #2$/);
+  assert.match(v.readopted.pet.title, /^Fren II · egg · day 1 · fren #2$/);
   assert.equal(v.readopted.history.length, 1);
   assert.match(v.readopted.history[0].text, /^#1 Fren: \d+ days together, \d+ care days, \d+ good days\. Left for a different pond/);
   assert.equal(v.end.pet.goodDays.count, 1, 'good days start again with the new frog');

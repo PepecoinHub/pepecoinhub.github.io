@@ -23,7 +23,8 @@ test('every live stamp has a server award path, and only live stamps do', () => 
     assert.doesNotMatch(sql, new RegExp("insert into games\\.passport_badges[^;]*'" + x.id + "'"), x.id);
   }
   // each allowed stamp is really awarded somewhere besides the allowlist
-  const rest = sql.replace(award, '');
+  // PepeGochi's four life-cycle stamps are awarded by its bridge (update_pepegochi_passport.sql)
+  const rest = sql.replace(award, '') + file('games/supabase/update_pepegochi_passport.sql');
   for (const id of allowed) assert.match(rest, new RegExp("'" + id + "'"), id + ' has no award');
   for (const gone of ['seven_day_fren', 'ten_day_fren', 'frog_detective'])
     assert.ok(!catalog.achievements.some(x => x.id === gone), gone + ' was removed');

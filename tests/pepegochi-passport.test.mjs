@@ -16,12 +16,15 @@ const fnBody = (src, name) => (src.split('create or replace function ' + name)[1
 const MAP = Object.fromEntries([...fnBody(code, 'games.pepegochi_passport_stamp').matchAll(/when '([a-z_]+)' then '([a-z_]+)'/g)].map(m => [m[1], m[2]]));
 const allowlist = [...fnBody(awards, 'games.passport_award').match(/b not in \(([^)]*)\)/)[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]);
 
-test('the three life-cycle stamps, from the milestones PepeGochi records', () => {
-  assert.deepEqual(MAP, { first_adoption: 'first_hatch', froglet: 'little_fren', adult: 'grown_fren' });
+test('the four life-cycle stamps, from the milestones PepeGochi records', () => {
+  // the first care hatches the egg (owner, 2026-11-09); first_adoption is not a stamp
+  assert.deepEqual(MAP, { hatched: 'first_hatch', froglet: 'little_fren', adult: 'grown_fren', good_parent: 'good_parent' });
   const known = v2.match(/if m not in \(([^)]*)\)/)[1];
   for (const m of Object.keys(MAP)) assert.match(known, new RegExp("'" + m + "'"), m + ' is a v2 milestone');
-  // good_parent waits for PR D, certified_fren is never PepeGochi's
-  assert.doesNotMatch(code, /good_parent|certified_fren|best_fren_forever|perfect_parent/);
+  // certified_fren is never PepeGochi's; no 100-day stamp for now (owner, 2026-11-09)
+  assert.doesNotMatch(code, /certified_fren|best_fren_forever|perfect_parent/);
+  // all four are live and in the Passport allowlist
+  for (const s of Object.values(MAP)) assert.ok(allowlist.includes(s), s + ' is awardable');
 });
 
 test('every stamp goes through games.passport_award(), dated at the milestone', () => {
