@@ -2644,7 +2644,7 @@
     'does not stop it.',
     '',
     '== POINTS ==',
-    'Within 10 km: full points.',
+    'Within 1 km: full points.',
     'Further away: fewer points.',
     'Left the tab? 1st time a warning, then -1000 each time.',
     '',

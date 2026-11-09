@@ -53,7 +53,7 @@ begin
 cap := case when el <= 62 then 5000 when el <= 92 then 4000 when el <= 130 then 3000 else 0 end;   -- a little grace for slow networks
 if a_lat is not null and a_lon is not null and cap > 0 then
 k := games.wp_km(a_lat, a_lon, p.lat, p.lon);
-pts := greatest(0, round(cap * case when k <= 10 then 1 else exp(-(k - 10) / 1500.0) end)::int - greatest(0, pl.leaves - 1) * 1000);
+pts := greatest(0, round(cap * case when k <= 1 then 1 else exp(-(k - 1) / 1500.0) end)::int - greatest(0, pl.leaves - 1) * 1000);
 elsif a_lat is not null and a_lon is not null then
 k := games.wp_km(a_lat, a_lon, p.lat, p.lon);
 end if;
