@@ -196,5 +196,11 @@ Pepe looks happy, draw ONLY what the SCENE says (no extra hats, outfits, props o
 15. "Detective Fren": Same scene as before, redrawn in the standard format: Pepe in a brown deerstalker hat and a dark suit holding a big magnifying glass up to one eye, a cork board with pinned photos and red string behind him. Warm orange background. The stamp must fill the 1173 x 1341 canvas like the other stamps (not narrower).
 ```
 
+**`picasso_fren`, label `Picasso Fren`.** (redraw at full size, same look as the latest redraws)
+```
+Pepe in a black beret at a small easel, painting a funny portrait of a frog, a palette with blobs of paint in
+his other hand, other frogs peeking in and pointing at the picture. Purple background.
+```
+
 More SCENE blocks are added here by Claude when those stamps come up. ChatGPT does not write its own scenes for
 new stamps; ask the owner or Claude.
