@@ -1651,7 +1651,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261109sp';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109pic'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109skin'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -2090,6 +2090,8 @@
         panes[3].appendChild(cgrid);
 
         // Stats: factual numbers from the server snapshot
+        var stSec = el('section', {class:'pp-panel pp-statsheet'});
+        stSec.appendChild(piece('h3','pp-panel-h','Fren Stats'));
         var st = el('dl', {class:'pp-stats'});
         [
           ['Member since', state.member_since ? fmt.date(state.member_since) : 'unknown'],
@@ -2100,8 +2102,9 @@
           ['Best YEET flight', yeetBest==null?'—':metres(yeetBest)],
           ['Avatar saved', look ? 'Yes' : 'Not yet']
         ].forEach(function(v){ var r=el('div'); r.appendChild(piece('dt','',v[0])); r.appendChild(piece('dd','',v[1])); st.appendChild(r); });
-        panes[4].appendChild(st);
-        panes[4].appendChild(piece('p','pp-muted','Days registered counts calendar days since you joined; it is not an activity counter.'));
+        stSec.appendChild(st);
+        stSec.appendChild(piece('p','pp-muted','Days registered counts calendar days since you joined; it is not an activity counter.'));
+        panes[4].appendChild(stSec);
 
         box.appendChild(bar98);
         panes.forEach(function(p){ box.appendChild(p); });
