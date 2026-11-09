@@ -28,7 +28,7 @@ V3 = [
     'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14', 'pepe_guesser', 'week_scout',
     'scout_fren', 'first_hatch', 'little_fren', 'grown_fren',
 ]
-SMALL = {'picasso_fren'}   # an accepted scene that exist only as the small review files so far
+SMALL = set()   # every stamp has its full-size file now
 TILE = (138, 150)
 PAD = 3
 
