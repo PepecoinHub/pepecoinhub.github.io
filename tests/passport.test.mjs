@@ -182,7 +182,7 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
     // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
     'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
     // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
-    'stamps-v3.webp': [42 * 138, 150],
+    'stamps-v3.webp': [46 * 138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
@@ -202,7 +202,7 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
   assert.equal(count('PP_STAMPS'), 16);
-  assert.equal(count('PP_V3'), 42, 'PP_V3 matches the 42 tiles of stamps-v3.webp');
+  assert.equal(count('PP_V3'), 46, 'PP_V3 matches the 46 tiles of stamps-v3.webp');
   const v3 = readFileSync(new URL('../scripts/build_v3_stamps.py', import.meta.url), 'utf8').match(/V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join();
   assert.equal(v3, js.match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join(), 'same order as the build script');
   assert.equal(count('PP_ICONS'), 12);
