@@ -7,6 +7,14 @@
 import { $, h, toast, nickStore } from './common.js';
 import { renderBody, attachPicker } from './emotes.js';
 
+// Fren Passport beta (only a browser that opened /meme/?beta=fren): a verified (Discord) name links to that
+// fren's passport in PondOS. Guests have no passport, and without the beta every name stays plain text.
+const FREN_BETA = (() => { try { return localStorage.getItem('pondos-fren-beta') === '1'; } catch { return false; } })();
+const FREN_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const nameOf = (m) => (FREN_BETA && m.verified && FREN_ID.test(m.user_id || '')
+  ? h('a', { class: 'cn', href: '../meme/?fren=' + m.user_id, target: '_blank', rel: 'noopener', title: 'Open the Fren Passport of ' + m.nick }, h('b', {}, m.nick))
+  : h('b', { class: 'cn' }, m.nick));
+
 export function lobbyChat(be, { openLogin }) {
   const panel = $('#chat'), box = $('#lchat'), form = $('#chatform'), input = $('#chatin'), send = $('#chatsend'), fab = $('#chatfab');
   if (be.kind === 'none') {
@@ -81,7 +89,7 @@ export function lobbyChat(be, { openLogin }) {
   function line(m) {
     const row = h('div', { class: 'cmsg', 'data-id': m.id },
       h('span', { class: 'ct' }, hhmm(m.at)),
-      h('b', { class: 'cn' }, m.nick), m.verified ? h('span', { class: 'cv', title: 'Verified with Discord' }, '✓') : '', ': ',
+      nameOf(m), m.verified ? h('span', { class: 'cv', title: 'Verified with Discord' }, '✓') : '', ': ',
       h('span', { class: 'cb' }, ...renderBody(m.body)));
     row._m = m;
     if (forMe(m)) row.classList.add('cmsg-me');

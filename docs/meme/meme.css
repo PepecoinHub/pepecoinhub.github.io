@@ -916,6 +916,10 @@ footer.foot a { color: #edf3e3; }
 .lan-log { height: min(52vh, 420px); overflow-y: auto; padding: 6px 8px; background: var(--pane); color: var(--ink); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); font: 400 13px/1.45 var(--f-chrome); }
 .lan-msg { padding: 2px 0; overflow-wrap: anywhere; }
 .lan-t { color: var(--muted); font-size: 11px; }
+/* Fren Passport beta: a verified name opens that fren's passport */
+.lan-who { padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; text-align: inherit; }
+.lan-who:hover b, .lan-who:focus-visible b { text-decoration: underline; }
+.lan-who:focus-visible { outline: 1px dotted currentColor; outline-offset: 1px; }
 .emo-img { width: 24px; height: 24px; vertical-align: middle; }
 .lan-form input { flex: 1; min-width: 0; padding: 6px 8px; font: 400 13px var(--f-chrome); border: 0; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); background: var(--pane); color: var(--ink); }
 .lan-note a { color: inherit; }
