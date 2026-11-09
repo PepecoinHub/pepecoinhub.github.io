@@ -1,6 +1,6 @@
 # Fren Passport: status (one place, kept up to date)
 
-Last update: 2026-11-09, Claude. Update this file in every Passport PR.
+Last update: 2026-11-09 (launch plan), Claude. Update this file in every Passport PR.
 
 - **Rules for each stamp:** `games/FREN_PASSPORT_RECONCILIATION_2026-11-08.md` (owner decisions of 2026-11-08 below win)
 - **Art rules for ChatGPT:** `games/fren-passport/GPT_MASTER_PROMPT.md`
@@ -90,25 +90,36 @@ Stamps with a rule but no final art show the category icon in the album until th
 
 These buttons call the new RPCs, so they work only after the migrations run.
 
-## 4. What is left
+## 4. Launch plan (owner, 2026-11-09)
 
-**Owner**
-1. Launch day: run the three migrations in Supabase, then the `?beta=fren` gate comes off.
+**Avatar Maker, Fren Passport and PepeGochi ship together**, from the draft PR `release/pondos-fren-launch` (#236).
+Everything listed at launch must work. Claude owns the code and checks every picture; ChatGPT draws, and its art
+is checked against the site's style before it goes in (it tends to drift from the brief).
 
-**ChatGPT** (with `GPT_MASTER_PROMPT.md`): `top_ten`, `bug_hunter` (finish at 900+ px), `season_champion` (redraw),
-`podium`, `game_night`, `quiz_master` (Pepe Pictures only: no drawing or easel), `frogmas`, `treasure_hunter`; later
-900+ px files for `picasso_fren` and `the_secret_pond`. Not yet: `frogageddon_beta`, `interior_designer`.
+**Owner decisions, 2026-11-09**
+- PepeGochi starts from an **egg**; it hatches at the first care, and that is when First Hatch is given.
+- **No 100-day stamp** for now (Good Parent, 30 good days in one life, is enough at launch).
+- **Picasso Fren** gets built (Draw & Guess saves results on the server). **Beta Tester** is hidden until online FROGAGEDDON exists.
+- **Paper Crown, Moon Rock, Golden Fly** become PepeGochi room decorations, each earned by a server-verified action;
+  they also feed **Pond Decorator**.
 
-**Claude**
-1a. **New-reward notice** (owner, 2026-11-09): an animated Windows 98 style notice for a new stamp, secret or avatar
-   that nobody can miss. Today a plain tray balloon shows new stamps only. Plan: the tray balloon with a stamp
-   "thump" animation, a blinking Passport icon in the tray until the Passport is opened, and the same notice for
-   secrets and avatars. Not in Frog Mail (that stays for letters and the Gazette).
-1b. **Incognito avatar** (`games/fren-passport/source/avatars/incognito_original.png`): for the "invisible" status,
-   once the bigger chat window with statuses (available / back soon / invisible) exists.
-2. Scene blocks in `GPT_MASTER_PROMPT.md` for the stamps above, and each new upload into #233 and the sprite.
-3. A short Gazette note about secrets, when the owner asks.
-4. Launch-day removal of the beta gate.
+**Code, in this order (Claude)**
+1. Egg stage in the PepeGochi rules (SQL + JS model + parity tests).
+2. PepeGochi window on the real RPCs (today: local model behind `?beta=gochi`).
+3. Passport: PepeGochi card (Overview/Stats); `first_hatch`, `little_fren`, `grown_fren`, `good_parent` live.
+4. Decorations: the three items with their rules, room placement, Pond Decorator.
+5. Picasso Fren: Draw & Guess results on the server, then the stamp. The Secret Pond: its rule.
+6. Beta Tester out of the album; the new-reward notice (Windows 98 style, impossible to miss).
+7. Release: PEP-TV ad, beta flags off, one SQL run order for the owner.
+
+**Art (ChatGPT, checked by Claude)**
+- PepeGochi sprite fixes from #228: `adult_hungry`, `adult_dirty`, `froglet_idle`, `adult_recovering`, the 6 moving-out
+  frames (adult about 113 px tall, feet on one line, 2×2 pixel grid). Egg hatching frames.
+- Decorations: Paper Crown, Moon Rock, Golden Fly (pixel art, room style).
+- Stamps (cartoon, like the album): Top 10, Bug Hunter, Season Champion, Podium, Game Night, Quiz Master, Frogmas,
+  Treasure Hunter.
+
+**Owner, launch day:** run the SQL in the order the release PR gives; the beta flags come off with the release.
 
 ## 5. Special avatars (2026-11-08, more on 2026-11-09)
 
