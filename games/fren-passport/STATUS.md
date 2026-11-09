@@ -100,9 +100,9 @@ is checked against the site's style before it goes in (it tends to drift from th
 
 **Owner decisions, 2026-11-09**
 - **Top 10** and **The Secret Pond** removed. **Treasure Hunter** needs 10 secrets. 49 stamps + BALI.
-- Redraw in cartoon: Welcome Back, First Words, Hey @Fren, Community Fren, Dear Editor, Junior Editor, Senior Editor,
-  14-Day Streak, Pepe Guesser, Week Scout, Scout Fren, First Hatch, Little Fren, One Small Step, and Detective Fren at
-  the standard size (scene blocks in `GPT_MASTER_PROMPT.md`). Frogmas is now the Santa Fren avatar picture.
+- Redraws: done from the owner's sheet (2026-11-09): Welcome Back, First Words, Hey @Fren, Community Fren, Dear Editor,
+  Junior Editor, Senior Editor, 14-Day Streak, Pepe Guesser. Still to redraw: Week Scout, Scout Fren, First Hatch,
+  Little Fren, One Small Step, Detective Fren (standard size). Scene blocks in `GPT_MASTER_PROMPT.md`. Frogmas is now the Santa Fren avatar picture.
 - PepeGochi starts from an **egg**; it hatches at the first care, and that is when First Hatch is given.
 - **No 100-day stamp** for now (Good Parent, 30 good days in one life, is enough at launch).
 - **Picasso Fren** gets built (Draw & Guess saves results on the server). **Beta Tester** is hidden until online FROGAGEDDON exists.
