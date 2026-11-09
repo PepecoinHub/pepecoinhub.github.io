@@ -3879,8 +3879,27 @@
     }).catch(function () { onState(false); });
     return function () { gone = true; onState(false); if (ch && bellSb) bellSb.removeChannel(ch); ch = null; };
   }
+  // the Pepe emotes from Pepecoin.com's "Pepe Emojis for Reddit" set (scripts/build_chat_emotes.py), self-hosted as webp.
+  // The old frog-crew codes above still draw (old messages, PEP Games); the picker offers the Pepes.
+  var PEPE_EMO = null, pepeEmoP = null, EMO_DIR = BASE + 'meme/emotes/', EMO_V = '?v=20261109pe';
+  var EMO_FAM = [['pepe', 'Pepe'], ['apu', 'Apu'], ['peepo', 'Peepo'], ['pepega', 'Pepega']];
+  function loadPepeEmotes() {
+    if (!pepeEmoP) pepeEmoP = fetch(EMO_DIR + 'emotes.json' + EMO_V).then(function (r) { if (!r.ok) throw new Error('emotes'); return r.json(); })
+      .then(function (j) { var by = {}; (j.emotes || []).forEach(function (e) { by[e.c] = e; }); PEPE_EMO = { list: j.emotes || [], by: by }; return PEPE_EMO; })
+      .catch(function () { pepeEmoP = null; return null; });
+    return pepeEmoP;
+  }
+  function emoKnown(c) { return !!(PEPE_EMO && PEPE_EMO.by[c]) || EMO.indexOf(' ' + c + ' ') >= 0; }
   function chatBody(t) {
-    return esc(t).replace(/:([a-z]{3,10}):/g, function (m, c) { return EMO.indexOf(' ' + c + ' ') >= 0 ? '<img class="emo-img" src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="24" height="24">' : m; });
+    return esc(t).replace(/:([a-z0-9_]{2,32}):/g, function (m, c) {
+      if (PEPE_EMO && PEPE_EMO.by[c]) return '<img class="emo-img" src="' + EMO_DIR + c + '.webp' + EMO_V + '" alt=":' + c + ':" title=":' + c + ':" width="28" height="28">';
+      return EMO.indexOf(' ' + c + ' ') >= 0 ? '<img class="emo-img" src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="24" height="24">' : m;
+    });
+  }
+  // a message of one to three emotes and nothing else is drawn big, like in the old messengers
+  function emoOnly(t) {
+    var codes = String(t).match(/:([a-z0-9_]{2,32}):/g);
+    return !!codes && codes.length <= 3 && !String(t).replace(/:([a-z0-9_]{2,32}):/g, '').trim() && codes.every(function (x) { return emoKnown(x.slice(1, -1)); });
   }
   // @mentions (games/js/mentions.js, loaded when needed): verified (Discord) players only, the server decides
   var mentionsJs = null;
@@ -3908,8 +3927,10 @@
     var A = openApp('lan', 'LAN Party - #pond chat', 'gif-080-still', function (A) {
       A.body.innerHTML = '<div class="app-row"><span class="grow"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online in the pond</span></div>' +
         '<div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
-        '<div class="emo-pop" hidden role="group" aria-label="Emotes">' + EMO.trim().split(' ').map(function (c) { return '<button type="button" data-e="' + c + '" title=":' + c + ':"><img src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="32" height="32" loading="lazy"></button>'; }).join('') + '</div>' +
-        '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + BASE + 'games/img/emotes/pep.webp" alt="" width="22" height="22"></button><input name="n" class="lan-nick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname" hidden><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
+        '<div class="emo-pop" hidden role="group" aria-label="Pepe emotes"><div class="emo-head"><input type="search" class="emo-q" placeholder="Search Pepes… (laugh, pray, apu)" aria-label="Search emotes" autocomplete="off">' +
+        '<div class="emo-tabs" role="tablist"><button type="button" data-t="recent" title="Recently used">⏱</button>' + EMO_FAM.map(function (f) { return '<button type="button" data-t="' + f[0] + '">' + f[1] + '</button>'; }).join('') + '<button type="button" data-t="gif">GIFs</button></div></div>' +
+        '<div class="emo-grid" role="group" aria-label="Emotes"></div></div>' +
+        '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + EMO_DIR + 'peepo_happy.webp' + EMO_V + '" alt="" width="22" height="22"></button><input name="n" class="lan-nick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname" hidden><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
         '<p class="hs-note lan-note"></p><p class="hs-note lan-ment" hidden><button type="button" class="app-btn lan-ment-btn"></button> <span></span></p>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input[name=t]'), note = A.body.querySelector('.lan-note');
       if (FREN) log.addEventListener('click', function (e) {
@@ -3918,9 +3939,31 @@
       });
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false;
       var pop = A.body.querySelector('.emo-pop'), eb = A.body.querySelector('.emo-btn');
-      eb.addEventListener('click', function () { pop.hidden = !pop.hidden; eb.setAttribute('aria-expanded', String(!pop.hidden)); });
+      // the picker: tabs by family (static), GIFs, recently used (this browser), and a search over the names
+      var grid = pop.querySelector('.emo-grid'), q = pop.querySelector('.emo-q'), tab = '';
+      var recent = function () { try { return JSON.parse(localStorage.getItem('pondos-emo-recent') || '[]').filter(function (c) { return PEPE_EMO && PEPE_EMO.by[c]; }); } catch (e) { return []; } };
+      var paintEmo = function () {
+        if (!PEPE_EMO) { grid.innerHTML = '<p class="bin-tip">Loading Pepes…</p>'; return; }
+        var s = q.value.trim().toLowerCase(), list;
+        if (s) list = PEPE_EMO.list.filter(function (e) { return e.n.toLowerCase().indexOf(s) >= 0 || e.c.indexOf(s.replace(/\s+/g, '_')) >= 0; });
+        else if (tab === 'recent') list = recent().map(function (c) { return PEPE_EMO.by[c]; });
+        else if (tab === 'gif') list = PEPE_EMO.list.filter(function (e) { return e.a; });
+        else list = PEPE_EMO.list.filter(function (e) { return !e.a && e.f === tab; });
+        pop.querySelectorAll('.emo-tabs [data-t]').forEach(function (b) { b.setAttribute('aria-pressed', String(!s && b.getAttribute('data-t') === tab)); });
+        grid.innerHTML = list.length ? list.map(function (e) { return '<button type="button" data-e="' + e.c + '" title=":' + e.c + ':"><img src="' + EMO_DIR + e.c + '.webp' + EMO_V + '" alt=":' + e.c + ':" width="40" height="40" loading="lazy"></button>'; }).join('')
+          : '<p class="bin-tip">' + (s ? 'No Pepe called “' + esc(s) + '”.' : 'Nothing here yet. Pick a Pepe from the other tabs.') + '</p>';
+        grid.scrollTop = 0;
+      };
+      pop.querySelector('.emo-tabs').addEventListener('click', function (e) { var b = e.target.closest('[data-t]'); if (!b) return; tab = b.getAttribute('data-t'); q.value = ''; paintEmo(); });
+      q.addEventListener('input', paintEmo);
+      q.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); var f = grid.querySelector('[data-e]'); if (f) f.click(); } });
+      eb.addEventListener('click', function () {
+        pop.hidden = !pop.hidden; eb.setAttribute('aria-expanded', String(!pop.hidden));
+        if (!pop.hidden) loadPepeEmotes().then(function () { if (!tab) tab = recent().length ? 'recent' : 'pepe'; paintEmo(); });
+      });
       pop.addEventListener('click', function (e) {
         var b = e.target.closest('[data-e]'); if (!b || inp.disabled) return;
+        try { var rc = JSON.parse(localStorage.getItem('pondos-emo-recent') || '[]').filter(function (c) { return c !== b.getAttribute('data-e'); }); rc.unshift(b.getAttribute('data-e')); localStorage.setItem('pondos-emo-recent', JSON.stringify(rc.slice(0, 24))); } catch (err) {}
         var v = inp.value, at = inp.selectionStart == null ? v.length : inp.selectionStart, code = ':' + b.getAttribute('data-e') + ':';
         var pre = v.slice(0, at), post = v.slice(at);
         inp.value = (pre && !/\s$/.test(pre) ? pre + ' ' : pre) + code + ' ' + post.replace(/^\s+/, '');
@@ -3975,7 +4018,7 @@
           var atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 60;
           (r.messages || []).forEach(function (m) {
             if (seen[m.id]) return;
-            var row = el('div', { class: 'lan-msg' }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> ' + lanWho(m) + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
+            var row = el('div', { class: 'lan-msg' + (emoOnly(m.body) ? ' lan-big' : '') }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> ' + lanWho(m) + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
             var tipEl = log.querySelector('.bin-tip'); if (tipEl) tipEl.remove();
             row._m = m; if (forMe(m)) { row.classList.add('lan-me'); if (!initial) { PM.ring(m.nick, m.body, function () { A.restore ? A.restore() : null; }); seenMentions(); } }
             seen[m.id] = row; log.appendChild(row); last = Math.max(last, m.id);
@@ -4008,7 +4051,7 @@
           poll();
         }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
       });
-      paintNote(); poll();
+      paintNote(); loadPepeEmotes().then(poll);
       A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); stopBell(); };
     }, 480);
     return A;

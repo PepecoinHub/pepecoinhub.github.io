@@ -920,7 +920,8 @@ footer.foot a { color: #edf3e3; }
 .lan-who { padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; text-align: inherit; }
 .lan-who:hover b, .lan-who:focus-visible b { text-decoration: underline; }
 .lan-who:focus-visible { outline: 1px dotted currentColor; outline-offset: 1px; }
-.emo-img { width: 24px; height: 24px; vertical-align: middle; }
+.emo-img { width: 28px; height: 28px; vertical-align: middle; }
+.lan-msg.lan-big .emo-img { width: 56px; height: 56px; }
 .lan-form input { flex: 1; min-width: 0; padding: 6px 8px; font: 400 13px var(--f-chrome); border: 0; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); background: var(--pane); color: var(--ink); }
 .lan-note a { color: inherit; }
 .pondos .tray-lan { display: inline-flex; align-items: center; gap: 5px; padding: 0 6px; height: 22px; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
@@ -1002,11 +1003,18 @@ footer.foot a { color: #edf3e3; }
 .pondos .sticker { border-radius: 0 !important; }
 .pondos .bubble { border-radius: 0; }
 .pondos main > .loading { display: none; }
-.emo-pop { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 4px; padding: 6px; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); }
+.emo-pop { display: grid; gap: 4px; padding: 4px; background: var(--chrome); box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px -1px 0 var(--chrome-dk); }
+.emo-head { display: grid; gap: 4px; }
+.emo-q { min-width: 0; padding: 6px 8px; font: 400 13px var(--f-chrome); border: 0; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); background: var(--pane); color: var(--ink); }
+.emo-tabs { display: flex; flex-wrap: wrap; gap: 2px; }
+.emo-pop .emo-tabs button { padding: 5px 9px; min-height: 30px; border: 1px solid; border-color: var(--chrome-hi) var(--chrome-dk) var(--chrome-dk) var(--chrome-hi); background: var(--chrome); color: #000; font: 700 12px/1 var(--f-chrome); }
+.emo-pop .emo-tabs button[aria-pressed="true"] { border-color: var(--chrome-dk) var(--chrome-hi) var(--chrome-hi) var(--chrome-dk); background: var(--pane); color: var(--ink); }
+.emo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 2px; max-height: 216px; overflow-y: auto; padding: 4px; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); overscroll-behavior: contain; }
+.emo-grid .bin-tip { grid-column: 1 / -1; margin: 6px; }
 .emo-pop[hidden] { display: none; }
 .emo-pop button { padding: 2px; border: 1px solid transparent; background: none; cursor: pointer; }
 .emo-pop button:hover, .emo-pop button:focus-visible { border-color: var(--sel); background: color-mix(in srgb, var(--sel) 15%, transparent); outline: none; }
-.emo-pop img { display: block; width: 32px; height: 32px; }
+.emo-pop img { display: block; width: 40px; height: 40px; margin: auto; }
 .lan-form .emo-btn { padding: 4px 8px; font-size: 16px; }
 .pondos .tray-logon { display: inline-flex; align-items: center; height: 22px; padding: 0 5px; border: 0; background: none; color: inherit; font-size: 14px; cursor: pointer; }
 .logon-discord { text-decoration: none; }
