@@ -18,14 +18,14 @@ from PIL import Image
 V3 = [
     'frog_of_the_week', 'moonwalker', 'vox_populi', 'certified_fren', 'old_frog', 'good_parent', 'first_avatar',
     'detective_fren', 'good_game', 'yeet_adept', 'fud_buster', 'long_snake', 'arcade_hopper', 'secret_starter',
-    'i_voted', 'checkmate', 'the_secret_pond', 'picasso_fren',
+    'i_voted', 'checkmate', 'picasso_fren',
     # the owner's pixel-art sheet of 7 (2026-11-09); first_avatar above uses its new picture too
     'first_fren', 'sharp_eye', 'community_fren', 'like_it_here', 'nasa_is_hiring', 'rookie_miner',
     # launch scene blocks (2026-11-09)
     'season_champion', 'bug_hunter', 'podium', 'game_night', 'quiz_master', 'frogmas',
     'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren',
 ]
-SMALL = {'the_secret_pond', 'picasso_fren'}   # accepted scenes that exist only as the small review files so far
+SMALL = {'picasso_fren'}   # an accepted scene that exist only as the small review files so far
 TILE = (138, 150)
 PAD = 3
 

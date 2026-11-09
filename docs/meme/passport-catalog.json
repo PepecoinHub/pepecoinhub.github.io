@@ -322,17 +322,9 @@
     {
       "id": "treasure_hunter",
       "title": "Treasure Hunter",
-      "description": "Find 6 different PondOS secrets.",
+      "description": "Find 10 different PondOS secrets.",
       "category": "secrets",
       "status": "live"
-    },
-    {
-      "id": "the_secret_pond",
-      "title": "The Secret Pond",
-      "description": "Put together all 6 pieces of the lost pond map.",
-      "category": "secrets",
-      "gold": true,
-      "status": "planned"
     },
     {
       "id": "frogmas",

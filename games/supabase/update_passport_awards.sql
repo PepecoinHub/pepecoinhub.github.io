@@ -550,7 +550,7 @@ begin
 end
 $$;
 
--- ---------- secrets: Secret Starter (1), Treasure Hunter (6) ----------
+-- ---------- secrets: Secret Starter (1), Treasure Hunter (10; owner, 2026-11-09) ----------
 create or replace function games.passport_secret_after()
 returns trigger language plpgsql security definer set search_path = '' as $$
 declare n integer;
@@ -558,7 +558,7 @@ begin
   begin
     select count(*) into n from games.passport_secrets where user_id = new.user_id;
     if n >= 1 then perform games.passport_award(new.user_id, 'secret_starter', new.discovered_at); end if;
-    if n >= 6 then perform games.passport_award(new.user_id, 'treasure_hunter', new.discovered_at); end if;
+    if n >= 10 then perform games.passport_award(new.user_id, 'treasure_hunter', new.discovered_at); end if;
   exception when others then raise warning 'passport secret hook: %', sqlerrm; end;
   return null;
 end
@@ -904,14 +904,15 @@ do $$ begin
   end if;
 end $$;
 select games.passport_award(s.user_id, 'secret_starter') from (select distinct user_id from games.passport_secrets) s;
-select games.passport_award(s.user_id, 'treasure_hunter') from (select user_id from games.passport_secrets group by user_id having count(*) >= 6) s;
+select games.passport_award(s.user_id, 'treasure_hunter') from (select user_id from games.passport_secrets group by user_id having count(*) >= 10) s;
 -- Happy Mining!: everyone who already has a Pepe Miner cloud save.
 select games.passport_award(m.user_id, 'rookie_miner') from games.miner_saves m;
 -- Stamps retired or re-ruled by the v3 list (2026-11-08). The Passport is not public yet, so nothing
 -- anyone has seen is removed; this only matters if an earlier draft of this file already ran.
 -- Junior and Senior Editor once counted letters sent; now only "Printed" marks count.
 delete from games.passport_badges b
- where b.badge_id in ('miner_fren', 'top_ten')   -- Top 10 dropped by the owner, 2026-11-09
+ where b.badge_id in ('miner_fren', 'top_ten', 'the_secret_pond')   -- Top 10 and The Secret Pond dropped by the owner, 2026-11-09
+    or (b.badge_id = 'treasure_hunter' and (select count(*) from games.passport_secrets s where s.user_id = b.user_id) < 10)
     or (b.badge_id in ('junior_editor', 'senior_editor', 'vox_populi')
         and (select count(*) from games.passport_printed p where p.user_id = b.user_id)
             < case b.badge_id when 'junior_editor' then 1 when 'senior_editor' then 5 else 10 end);

@@ -388,10 +388,11 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     assert.ok(!(await has(51, 'fud_buster')) && !(await has(51, 'long_snake')), 'just below the thresholds');
     await arcade(51, 'fud', 2000); await arcade(51, 'snake', 40); await arcade(52, 'fud', 5000, false);
     assert.ok(await has(51, 'fud_buster')); assert.ok(await has(51, 'long_snake')); assert.ok(!(await has(52, 'fud_buster')), 'unverified score');
-    // Secret Starter at the first secret, Treasure Hunter at six
-    for (const [k, s] of ['wrong_frog', 'why_tho', 'magic_word', 'bsod_fren', 'midnight_fren', 'nerd_alert'].entries()) {
+    // Secret Starter at the first secret, Treasure Hunter at ten
+    for (const [k, s] of ['wrong_frog', 'why_tho', 'magic_word', 'bsod_fren', 'midnight_fren', 'nerd_alert', 'bali_dreamer', 'happy_fren', 'born_to_fren', 'find_fren'].entries()) {
       await db.query('insert into games.passport_secrets(user_id, secret_id) values ($1, $2)', [uid(52), s]);
       if (k === 0) { assert.ok(await has(52, 'secret_starter')); assert.ok(!(await has(52, 'treasure_hunter'))); }
+      if (k === 8) assert.ok(!(await has(52, 'treasure_hunter')), 'nine is not enough');
     }
     assert.ok(await has(52, 'treasure_hunter'));
     // Pepe Pictures: Podium (top 3), Game Night (a scheduled night), Quiz Master (host of a game with 4+ ranked players)

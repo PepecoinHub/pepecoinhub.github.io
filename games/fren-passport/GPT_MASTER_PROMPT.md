@@ -173,5 +173,28 @@ Pepe at a cosy dinner table with a roast turkey on a big plate, a pumpkin and au
 holding a fork and knife with a big happy grin. Warm autumn orange background.
 ```
 
+## Redraws (owner, 2026-11-09)
+
+```
+Redraws. Same MASTER PROMPT and rules, one image per stamp, real transparent background, 1173 x 1341 px format,
+Pepe looks happy, draw ONLY what the SCENE says (no extra hats, outfits, props or text).
+
+1. "Welcome Back!": Pepe stepping back through an open front door with a small suitcase, waving hello, a doormat in front. Sunny yellow background.
+2. "First Words": Pepe at a beige Win98-style computer typing, a big empty white speech bubble popping out of the screen. Light green background.
+3. "Hey @Fren": Two Pepe frogs at two computers side by side, one waving at the other, a big "@" sign floating between them (the only symbol allowed). Sky blue background.
+4. "Community Fren": Four happy Pepe frogs squeezed together around one Win98-style monitor, laughing, one giving a thumbs up. No logos. Purple background.
+5. "Dear Editor": Pepe at a wooden desk sealing an envelope with a red wax seal, a quill pen in an ink pot beside him. Warm brown background.
+6. "Junior Editor": Pepe proudly holding up a fresh newspaper with a small picture of himself on the front page (no readable text). Light blue background.
+7. "Senior Editor": Older Pepe with round glasses and a grey beard at a desk piled with newspapers, a green editor's visor on his head, red pencil in hand. Dark green background.
+8. "14-Day Streak": Pepe tearing a page off a big wall calendar, cheering, a small trail of torn pages on the floor (no numbers on the pages). Orange background.
+9. "Pepe Guesser": Pepe holding a big map with a red pin, looking at a photo of a landscape, finger on his chin, thinking. Teal background.
+10. "Week Scout": Pepe in a scout neckerchief looking through binoculars over green hills, seven small flags planted along a path behind him. Light green background.
+11. "Scout Fren": Pepe as a proud scout in a neckerchief and explorer hat, saluting, a full backpack and a compass on his belt, mountains behind. Forest green background.
+12. "First Hatch": A tiny baby Pepe popping out of a cracked spotted egg, eyes wide and happy, eggshell on its head. Soft yellow background.
+13. "Little Fren": A small froglet Pepe with a little tail hopping happily on a lily pad, a few water drops around. Light blue pond background.
+14. "One Small Step": Pepe in a simple white space helmet (no logos, no flag) taking his first step on the Moon, a single footprint behind him, Earth in the sky. Dark navy background.
+15. "Detective Fren": Same scene as before, redrawn in the standard format: Pepe in a brown deerstalker hat and a dark suit holding a big magnifying glass up to one eye, a cork board with pinned photos and red string behind him. Warm orange background. The stamp must fill the 1173 x 1341 canvas like the other stamps (not narrower).
+```
+
 More SCENE blocks are added here by Claude when those stamps come up. ChatGPT does not write its own scenes for
 new stamps; ask the owner or Claude.
