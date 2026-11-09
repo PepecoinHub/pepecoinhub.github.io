@@ -54,15 +54,15 @@ Album: **shown** · **???** (teaser) · hidden.
 | 27 | `good_game` | Good Game | board game finished with another Discord player, 10+ moves, no resign/leave | shown | ✅ v3 |
 | 28 | `checkmate` | Checkmate! | chess win by mate (same rules) | shown | ✅ v3 |
 | 29 | `picasso_fren` | Picasso Fren | no data yet (Draw & Guess saves nothing) | ??? | 🔁 in sprite, 304 px |
-| 30 | `podium` | Podium | top 3 in Pepe Pictures | shown | ⬜ |
-| 31 | `game_night` | Game Night | Pepe Pictures during a scheduled event (±3 h) | shown | ⬜ |
+| 30 | `podium` | Podium | top 3 in Pepe Pictures | shown | ✅ v3 |
+| 31 | `game_night` | Game Night | Pepe Pictures during a scheduled event (±3 h) | shown | ✅ v3 |
 | 32 | `season_champion` | Season Champion | winner of a ranked Pepe Pictures season | shown | ✅ v3 |
-| 33 | `quiz_master` | Quiz Master | hosted a Pepe Pictures game with 4+ ranked players | shown | ⬜ |
+| 33 | `quiz_master` | Quiz Master | hosted a Pepe Pictures game with 4+ ranked players | shown | ✅ v3 |
 | 34 | `top_ten` | Top 10 | top 10 in YEET, the Pepe Guesser week or the Pictures season | shown | ✅ v3 |
 | 35 | `arcade_hopper` | Arcade Hopper | a server score in 5 different games | shown | ✅ v3 |
 | 36 | `fud_buster` | FUD Buster | 2000 points in FUD Invaders | shown | ✅ v3 |
 | 37 | `long_snake` | Long Snake | 40 blocks in PEP Snake | shown | ✅ v3 |
-| 38 | `bug_hunter` | Bug Hunter | given by the owner from the mailbox | shown | 🚧 384 px |
+| 38 | `bug_hunter` | Bug Hunter | given by the owner from the mailbox | shown | ✅ v3 |
 | 39 | `frogageddon_beta` | Beta Tester | waits for online FROGAGEDDON | ??? | ⬜ (later) |
 | 40 | `first_hatch` | First Hatch | waits for PepeGochi | ??? | ✅ Lily |
 | 41 | `little_fren` | Little Fren | waits for PepeGochi | hidden | ✅ Lily |
@@ -72,7 +72,7 @@ Album: **shown** · **???** (teaser) · hidden.
 | 45 | `secret_starter` | Secret Starter | first secret | shown | ✅ v3 |
 | 46 | `treasure_hunter` | Treasure Hunter | 6 secrets | shown | ⬜ |
 | 47 | `the_secret_pond` | The Secret Pond | no data yet | hidden | 🔁 in sprite, 300 px |
-| 48 | `frogmas` | Frogmas | a visit on 24–26 December | shown | ⬜ |
+| 48 | `frogmas` | Frogmas | a visit on 24–26 December | shown | ✅ v3 |
 | 49 | `pep_birthday` | Pepecoin's Birthday | a visit on 30 January (UTC 30–31); unlocks Birthday Fren | shown | ⬜ |
 | 50 | `thanksgiving_fren` | Thanksgiving | a visit on US Thanksgiving weekend; unlocks Turkey Fren | shown | ⬜ |
 | — | `bali` | BALI | the owner opens it when PEP hits $0.01; every fren gets it on the next visit | printed on the page | ✅ ticket + postmark |
@@ -118,8 +118,8 @@ is checked against the site's style before it goes in (it tends to drift from th
 - PepeGochi sprite fixes from #228: `adult_hungry`, `adult_dirty`, `froglet_idle`, `adult_recovering`, the 6 moving-out
   frames (adult about 113 px tall, feet on one line, 2×2 pixel grid). Egg hatching frames.
 - Decorations: Paper Crown, Moon Rock, Golden Fly (pixel art, room style).
-- Stamps (cartoon, like the album; scene blocks in `GPT_MASTER_PROMPT.md`): Bug Hunter, Podium, Game Night, Quiz Master,
-  Frogmas, Treasure Hunter, Pond Decorator, Pepecoin's Birthday, Thanksgiving. Done: Season Champion, Top 10.
+- Stamps (cartoon, like the album; scene blocks in `GPT_MASTER_PROMPT.md`): Treasure Hunter, Pond Decorator, Pepecoin's
+  Birthday, Thanksgiving. Done: Season Champion, Top 10, Bug Hunter, Podium, Game Night, Quiz Master, Frogmas.
 
 **Owner, launch day:** run the SQL in the order the release PR gives; the beta flags come off with the release.
 
