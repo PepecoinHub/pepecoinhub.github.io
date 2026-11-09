@@ -113,7 +113,7 @@ begin
       'community_fren', 'hey_fren', 'dear_editor', 'rookie_miner', 'good_game', 'checkmate',
       'i_voted', 'yeet_adept', 'fud_buster', 'long_snake', 'secret_starter', 'treasure_hunter', 'podium', 'game_night',
       'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'season_champion', 'frog_of_the_week',
-      'junior_editor', 'senior_editor', 'vox_populi', 'bali', 'pep_birthday', 'thanksgiving_fren',
+      'junior_editor', 'senior_editor', 'vox_populi', 'bali', 'pep_birthday', 'thanksgiving_fren', 'valentine_fren',
       'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'interior_designer', 'picasso_fren',
       'share_fren') then
     raise exception 'Unknown passport stamp %', b;
@@ -676,6 +676,10 @@ begin
   -- the fourth Thursday of November, through that Sunday
   if extract(month from today) = 1 and extract(day from today) between 30 and 31 then
     perform games.passport_award(u, 'pep_birthday');
+  end if;
+  -- Valentine's Day (owner, 2026-11-09): 14 February (UTC 14-15, so every time zone has its 14th)
+  if extract(month from today) = 2 and extract(day from today) between 14 and 15 then
+    perform games.passport_award(u, 'valentine_fren');
   end if;
   tg := make_date(extract(year from today)::int, 11, 1);
   tg := tg + ((4 - extract(dow from tg)::int + 7) % 7) + 21;

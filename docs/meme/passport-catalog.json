@@ -353,6 +353,13 @@
       "status": "live"
     },
     {
+      "id": "valentine_fren",
+      "title": "Valentine Fren",
+      "description": "Visit PondOS on 14 February, Valentine's Day (14 or 15 February, UTC). Unlocks the Cupid Fren avatar.",
+      "category": "community",
+      "status": "live"
+    },
+    {
       "id": "bali",
       "title": "BALI",
       "description": "$0.01 - BALI. A mythic stamp for every fren when Pepecoin reaches $0.01 USD. The editor opens it on the day, and every fren gets it on their next PondOS visit.",

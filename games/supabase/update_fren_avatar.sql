@@ -67,6 +67,7 @@
 --     special_seeker (secret_starter), special_scribe (dear_editor), special_editor (senior_editor),
 --     special_santa (frogmas), special_looking and special_sherlock (the secrets find_fren, address_check),
 --     special_birthday and special_turkey (the event-day stamps pep_birthday, thanksgiving_fren)
+--     owner, 2026-11-09: special_gamer (arcade_hopper), special_gigachad (share_fren), special_party (old_frog), special_cupid (valentine_fren), special_juice (welcome_back), special_beanie (streak_14), special_chill (like_it_here), special_bigfren (certified_fren), special_dolphin (nasa_is_hiring), special_retro (fud_buster)
 --
 -- SPECIAL AVATARS: the 'special' slot holds a whole drawn character (by Lily) for a
 -- big milestone. 'special_none' means the normal stacked parts; any other id
@@ -127,7 +128,8 @@ begin
      or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_shades', 'accessory_round', 'accessory_orange', 'accessory_cigarette', 'accessory_pipe', 'accessory_headphones')
      or p_special is null or p_special not in ('special_none', 'special_explorer', 'special_batman', 'special_vampire', 'special_smile', 'special_nerd', 'special_soldier', 'special_straw', 'special_knight',
                                                    'special_seeker', 'special_looking', 'special_sherlock', 'special_scribe', 'special_editor',
-                                                   'special_birthday', 'special_santa', 'special_turkey') then
+                                                   'special_birthday', 'special_santa', 'special_turkey',
+                                                   'special_gamer', 'special_gigachad', 'special_party', 'special_cupid', 'special_juice', 'special_beanie', 'special_chill', 'special_bigfren', 'special_dolphin', 'special_retro') then
     raise exception 'Unknown avatar option' using errcode = '22023';
   end if;
   -- Reward parts: saveable only by a player who holds the stamp that unlocks them
@@ -141,7 +143,8 @@ begin
                           ('special_nerd', 'nerd_alert'), ('special_soldier', 'born_to_fren'), ('special_straw', 'bali_dreamer'),
                           ('special_seeker', 'secret_starter'), ('special_looking', 'find_fren'), ('special_sherlock', 'address_check'),
                           ('special_scribe', 'dear_editor'), ('special_editor', 'senior_editor'), ('special_birthday', 'pep_birthday'),
-                          ('special_santa', 'frogmas'), ('special_turkey', 'thanksgiving_fren')) r(part, stamp)
+                          ('special_santa', 'frogmas'), ('special_turkey', 'thanksgiving_fren'),
+                          ('special_gamer', 'arcade_hopper'), ('special_gigachad', 'share_fren'), ('special_party', 'old_frog'), ('special_cupid', 'valentine_fren'), ('special_juice', 'welcome_back'), ('special_beanie', 'streak_14'), ('special_chill', 'like_it_here'), ('special_bigfren', 'certified_fren'), ('special_dolphin', 'nasa_is_hiring'), ('special_retro', 'fud_buster')) r(part, stamp)
      where r.part in (p_bg, p_clothing, p_hat, p_accessory, p_special)
        -- the unlock is a stamp, or (for most special avatars) a secret
        and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)

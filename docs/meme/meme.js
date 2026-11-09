@@ -1648,10 +1648,10 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261109share';
+  var PP_CATALOG = 'passport-catalog.json?v=20261109val';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109share'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109val'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1742,7 +1742,7 @@
     'season_champion', 'bug_hunter', 'podium', 'game_night', 'quiz_master', 'frogmas',
     'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren',
     'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14', 'pepe_guesser', 'week_scout',
-    'scout_fren', 'first_hatch', 'little_fren', 'grown_fren', 'share_fren'];
+    'scout_fren', 'first_hatch', 'little_fren', 'grown_fren', 'share_fren', 'valentine_fren'];
   function ppStamp(x, earned) {
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
     if (earned && PP_LILY.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-lily', PP_LILY, x.id);
@@ -2162,7 +2162,7 @@
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261109av').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261109sp').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -2231,9 +2231,11 @@
   // (only stamps that can be earned today are named; the others stay "a future stamp", like '???' in the Passport)
   var FA_UNLOCK = { detective_fren: 'Detective Fren', rookie_miner: 'Happy Mining!', scout_fren: 'Scout Fren', good_game: 'Good Game',
     yeet_adept: 'Adept', arcade_hopper: 'Arcade Hopper', secret_starter: 'Secret Starter', dear_editor: 'Dear Editor',
-    senior_editor: 'Senior Editor', frogmas: 'Frogmas' };
+    senior_editor: 'Senior Editor', frogmas: 'Frogmas', share_fren: 'Share Fren', old_frog: 'Old Frog', welcome_back: 'Welcome Back',
+    streak_14: '14-day streak', like_it_here: 'I Like It Here', certified_fren: 'Certified Fren', nasa_is_hiring: 'NASA Is Hiring', fud_buster: 'FUD Buster' };
   // event days: open to every fren who visits PondOS on that day (the check-in gives them)
-  var FA_EVENT = { pep_birthday: 'visit PondOS on 30 January, Pepecoin\'s birthday', thanksgiving_fren: 'visit PondOS on Thanksgiving weekend' };
+  var FA_EVENT = { pep_birthday: 'visit PondOS on 30 January, Pepecoin\'s birthday', thanksgiving_fren: 'visit PondOS on Thanksgiving weekend',
+    valentine_fren: 'visit PondOS on 14 February, Valentine\'s Day' };
   // how a locked special avatar opens, in a few words (secrets keep their hiding place to themselves)
   function avHow(u) {
     if (FA_EVENT[u]) return 'Opens when you ' + FA_EVENT[u] + '.';

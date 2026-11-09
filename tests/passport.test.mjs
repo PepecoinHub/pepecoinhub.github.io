@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [50, 18, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [51, 18, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -97,7 +97,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered look
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
   assert.equal(manifest.schema_version, 2);
   // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 17]);
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 27]);
   // the only looks a player can actually compose and save are built from the non-unlock (base) ids
   assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 6, 9, 9, 5, 6, 1]);
   assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 72900, 'offered looks');
@@ -112,7 +112,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered look
   // one 512x512 WebP per option id, plus the implied base layer
   const noQ = f => f.split('?')[0];   // the templates carry a ?v= cache key
   const files = [...new Set([manifest.paths.base, ...ids.map(id => noQ(manifest.paths.layer_template.replace('{id}', id)))])];
-  assert.equal(files.length, 64, '63 option layers + base_frog');
+  assert.equal(files.length, 74, '73 option layers + base_frog');
   // one small picture of each part for the maker rows, nothing else in the folder
   assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/thumbs/', import.meta.url)).sort(),
     ids.map(id => noQ(manifest.paths.thumb_template.replace('{id}', id)).split('/').pop()).sort(), 'no unused, stray or missing thumbnails');
@@ -182,7 +182,7 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
     // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
     'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
     // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
-    'stamps-v3.webp': [47 * 138, 150],
+    'stamps-v3.webp': [48 * 138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
@@ -202,7 +202,7 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
   assert.equal(count('PP_STAMPS'), 16);
-  assert.equal(count('PP_V3'), 47, 'PP_V3 matches the 47 tiles of stamps-v3.webp');
+  assert.equal(count('PP_V3'), 48, 'PP_V3 matches the 48 tiles of stamps-v3.webp');
   const v3 = readFileSync(new URL('../scripts/build_v3_stamps.py', import.meta.url), 'utf8').match(/V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join();
   assert.equal(v3, js.match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join(), 'same order as the build script');
   assert.equal(count('PP_ICONS'), 12);

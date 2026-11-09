@@ -354,13 +354,63 @@
         "id": "special_turkey",
         "label": "Turkey Fren (Thanksgiving)",
         "unlock": "thanksgiving_fren"
+      },
+      {
+        "id": "special_gamer",
+        "label": "Gamer Fren (Arcade Hopper)",
+        "unlock": "arcade_hopper"
+      },
+      {
+        "id": "special_gigachad",
+        "label": "Gigafren (Share Fren)",
+        "unlock": "share_fren"
+      },
+      {
+        "id": "special_party",
+        "label": "Party Fren (one year)",
+        "unlock": "old_frog"
+      },
+      {
+        "id": "special_cupid",
+        "label": "Cupid Fren (Valentine's Day)",
+        "unlock": "valentine_fren"
+      },
+      {
+        "id": "special_juice",
+        "label": "Juice Box Fren (Welcome Back)",
+        "unlock": "welcome_back"
+      },
+      {
+        "id": "special_beanie",
+        "label": "Beanie Fren (14 days)",
+        "unlock": "streak_14"
+      },
+      {
+        "id": "special_chill",
+        "label": "Chill Fren (30 days)",
+        "unlock": "like_it_here"
+      },
+      {
+        "id": "special_bigfren",
+        "label": "Big Fren (100 days)",
+        "unlock": "certified_fren"
+      },
+      {
+        "id": "special_dolphin",
+        "label": "Dolphin Fren (NASA Is Hiring)",
+        "unlock": "nasa_is_hiring"
+      },
+      {
+        "id": "special_retro",
+        "label": "Retro Fren (FUD Buster)",
+        "unlock": "fud_buster"
       }
     ]
   },
   "paths": {
     "base": "avatar-assets/layers/base_frog.webp",
-    "layer_template": "avatar-assets/layers/{id}.webp?v=20261107e",
-    "thumb_template": "avatar-assets/thumbs/{id}.webp?v=20261107e"
+    "layer_template": "avatar-assets/layers/{id}.webp?v=20261109sp",
+    "thumb_template": "avatar-assets/thumbs/{id}.webp?v=20261109sp"
   },
   "special_note": "A special avatar is a whole character (Lily's drawing for a big milestone, or a classic Pepe meme for a secret). When one is picked it replaces every part layer except the background (bg).",
   "mouth_note": "Cigarette and pipe (in_mouth) are drawn under the mouth layer and moved so their in_mouth point lands on the chosen mouth's corner (512 canvas pixels), so the filter or mouthpiece is held in every mouth."
