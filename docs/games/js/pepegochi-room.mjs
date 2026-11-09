@@ -37,6 +37,11 @@ export const ITEMS = {
   potted_plant: { size: 19, dy: 4 },
   rubber_duck: { size: 14, dy: 0 },
   mug: { size: 13, dy: 20 },
+  // earned decorations (update_pepegochi_rewards.sql; sprite pack 2026-11-09)
+  moon_rock: { size: 11, dy: 6 },
+  paper_crown: { size: 11, dy: 6 },
+  golden_fly: { size: 11, dy: 6 },
+  floppy_disk: { size: 11, dy: 6 },
 };
 
 // the six starter props and where they stand (starter_slot_id in the room SQL)

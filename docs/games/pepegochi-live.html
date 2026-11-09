@@ -10,13 +10,13 @@
 <link rel="icon" href="img/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../facts.css?v=20261104coin">
 <link rel="stylesheet" href="gry.css?v=20261103m">
-<link rel="stylesheet" href="pepegochi.css?v=20261107art2">
+<link rel="stylesheet" href="pepegochi.css?v=20261109decor2">
 <script src="js/embed.js?v=20261103bot"></script>
 <script src="js/config.js"></script>
-<script type="module" src="js/pepegochi-live.mjs?v=20261109hatch"></script>
+<script type="module" src="js/pepegochi-live.mjs?v=20261109decor"></script>
 </head>
 <body>
-<main class="wrap pgb" id="main">
+<main class="wrap pgb pgb-live" id="main">
   <section class="card pgb-scene" aria-label="The room">
     <p id="pgb-scene-title" class="pgb-title"></p>
     <div id="pgb-scene"></div>
@@ -26,6 +26,11 @@
     <h2 id="pgb-main-h">PEPEGOCHI.EXE</h2>
     <p id="pgb-msg" class="pgb-msg" aria-live="polite"></p>
     <div id="pgb-body"></div>
+  </section>
+
+  <section class="card pgb-decor-card" id="pgb-decor-card" aria-labelledby="pgb-decor-h" hidden>
+    <h2 id="pgb-decor-h">Decorate</h2>
+    <div id="pgb-decor"></div>
   </section>
 
   <section class="card pgb-rules-card" aria-labelledby="pgb-rules-h">

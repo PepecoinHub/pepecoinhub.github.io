@@ -85,3 +85,16 @@ html.embed body { padding-inline: 0; }
 .pgr-letter:focus-visible { outline: 2px dotted #111; outline-offset: 2px; }
 .pgr-letter[hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) { .pgr-pet { animation: none; } .pgr-actor { transition: none; } }
+
+/* live window: Decorate */
+.pgb-decor { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.pgb-decor-item { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto auto; align-items: center; gap: 4px 10px; }
+.pgb-decor-item img { image-rendering: pixelated; grid-row: span 2; }
+.pgb-decor-item small { grid-column: 2; }
+.pgb-decor-item select { grid-column: 3; grid-row: 1 / span 2; max-width: 11em; }
+.pgb-decor-item button { grid-column: 4; grid-row: 1 / span 2; }
+@media (max-width: 420px) { .pgb-decor-item { grid-template-columns: 48px minmax(0, 1fr); } .pgb-decor-item select, .pgb-decor-item button { grid-column: 2; grid-row: auto; } }
+/* the live window has no banner, time machine or log: room, frog, Decorate, rules, past frens */
+.pgb.pgb-live, .pgb.pgb-live { grid-template-columns: minmax(0, 1fr); grid-template-areas: "scene" "main" "decor" "rules" "past"; }
+@media (min-width: 680px) { .pgb.pgb-live { grid-template-columns: minmax(0, 1fr); grid-template-areas: "scene" "main" "decor" "rules" "past"; } }
+.pgb-decor-card { grid-area: decor; }

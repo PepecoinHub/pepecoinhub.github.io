@@ -118,7 +118,8 @@ is checked against the site's style before it goes in (it tends to drift from th
    Bug Hunter waits (owner, 2026-11-09): hidden, no grant tool at launch.
 4. Decorations (owner, 2026-11-09): Moon Rock = Moonwalker, Paper Crown = Frog of the Week, Golden Fly = Treasure
    Hunter, Floppy Disk = Secret Starter; Pond Decorator = 3 earned decorations placed at once. Server side done
-   (`update_pepegochi_rewards.sql`, run last). Item sprites in (#227, 2026-11-09). Still to do: the decorate panel in PEPEGOCHI.EXE.
+   (`update_pepegochi_rewards.sql`, run last). Item sprites in (#227, 2026-11-09). Decorate panel in PEPEGOCHI.EXE done (place, move, put away; the room picture
+   follows the server room).
 5. Picasso Fren: Draw & Guess results on the server, then the stamp. The Secret Pond: its rule.
 6. Beta Tester out of the album; the new-reward notice (Windows 98 style, impossible to miss).
 7. Release: PEP-TV ad, beta flags off, one SQL run order for the owner.

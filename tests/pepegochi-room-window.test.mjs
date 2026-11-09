@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import {
   SLOTS, ITEMS, STARTER_ROOM, BACKGROUND, FROG, ROOM_W, ROOM_H, FROG_PX, FOOT_Y, HOME, SPRITES, spriteSrc,
-  DEPART_FRAMES, DEPART_FOOT, DEPART_MS, SUITCASE, LETTER, TAKEN_BY_LETTER, LOOK_BELOW,
+  DEPART_FRAMES, DEPART_FOOT, IMG, DEPART_MS, SUITCASE, LETTER, TAKEN_BY_LETTER, LOOK_BELOW,
   frogLook, roomScene, departTimeline, renderRoom, playDeparture,
 } from '../docs/games/js/pepegochi-room.mjs';
 
@@ -36,8 +36,10 @@ test('every image the window draws is a file in docs/games, at the size the art 
   for (const f of all) assert.ok(existsSync(file(f)), f);
   assert.deepEqual(pngSize(BACKGROUND), [ROOM_W, ROOM_H]);
   for (const f of [...sprites, ...DEPART_FRAMES, SUITCASE.src, LETTER.envelope, LETTER.open]) assert.deepEqual(pngSize(f), [128, 128], f);
-  // the window uses the item IDs of #222 unchanged
-  assert.deepEqual(Object.keys(ITEMS).sort(), ['crt_tv', 'lava_lamp', 'mug', 'p_poster', 'potted_plant', 'rubber_duck']);
+  // the window uses the item IDs of #222 unchanged, plus the four earned decorations (update_pepegochi_rewards.sql)
+  assert.deepEqual(Object.keys(ITEMS).sort(), ['crt_tv', 'floppy_disk', 'golden_fly', 'lava_lamp', 'moon_rock', 'mug', 'p_poster',
+    'paper_crown', 'potted_plant', 'rubber_duck']);
+  for (const id of Object.keys(ITEMS)) { assert.ok(existsSync(file(IMG + id + '.png')), id); assert.deepEqual(pngSize(IMG + id + '.png'), [128, 128], id); }
 });
 
 test('the frog: one scale for every stage, standing on its feet at the same spot', () => {

@@ -84,3 +84,42 @@ test('the live page talks only to the game server, keeps nothing in the browser 
   assert.deepEqual(calls.map(c => c[0]).sort(), ['gry_pepegochi_action', 'gry_pepegochi_adopt', 'gry_pepegochi_letter_read', 'gry_pepegochi_state']);
   assert.deepEqual(calls.filter(c => c[1]).map(c => c[1]).sort(), ["{ p_action: kind }", "{ p_name: String(name || '').trim() }"]);
 });
+
+test('Decorate: the room picture follows the server room; a conflict re-reads it', async () => {
+  const slots = [{ slot_id: 'shelf_a', label: 'Shelf A', allowed_categories: ['small', 'trophy'] },
+    { slot_id: 'rug_left', label: 'Rug left', allowed_categories: ['toy', 'small'] }];
+  let room = { initialized: false, revision: null, slots, inventory: [], placements: [] }, conflict = false;
+  const calls = [];
+  const rpc = async (name, args) => {
+    calls.push(name);
+    if (name === 'gry_pepegochi_state') return { server_now: '2026-11-09T12:00:00.000000+00:00', pet: { status: 'healthy', stage: 'tadpole' } };
+    if (name === 'gry_pepegochi_room_state') return room;
+    if (name === 'gry_pepegochi_room_initialize') {
+      room = { initialized: true, revision: 1, slots,
+        inventory: [{ item_instance_id: 'd1', item_id: 'rubber_duck', display_name: 'Rubber duck', category: 'toy' },
+                    { item_instance_id: 'm1', item_id: 'moon_rock', display_name: 'Moon Rock', category: 'trophy' }],
+        placements: [{ slot_id: 'rug_left', item_instance_id: 'd1' }] };
+      return room;
+    }
+    if (name === 'gry_pepegochi_room_place') {
+      if (conflict) { conflict = false; throw new Error('ROOM_REVISION_CONFLICT'); }
+      assert.equal(args.p_expected_revision, room.revision);
+      room = { ...room, revision: room.revision + 1, placements: [...room.placements, { slot_id: args.p_slot_id, item_instance_id: args.p_item_instance_id }] };
+      return room;
+    }
+    throw new Error('unexpected ' + name);
+  };
+  const game = new LiveGame({ rpc });
+  await game.refresh();
+  await game.loadRoom();
+  assert.deepEqual(calls, ['gry_pepegochi_state', 'gry_pepegochi_room_state', 'gry_pepegochi_room_initialize'], 'the first visit unpacks the starter room');
+  assert.deepEqual(game.placements(), { rug_left: 'rubber_duck' });
+  const moon = game.decor().find(x => x.item === 'moon_rock');
+  assert.equal(moon.slotLabel, 'In the box');
+  assert.deepEqual(moon.fits.map(f => f.id), ['shelf_a'], 'only the places it fits');
+  assert.ok(await game.place('m1', 'shelf_a'));
+  assert.deepEqual(game.placements(), { rug_left: 'rubber_duck', shelf_a: 'moon_rock' });
+  conflict = true;
+  assert.equal(await game.place('m1', 'shelf_a'), false);
+  assert.match(game.roomError, /another tab/);
+});

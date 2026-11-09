@@ -96,11 +96,11 @@ function renderScene(v) {
   let room;
   if (v.mode === 'pet') {
     title.textContent = v.pet.title;
-    room = renderRoom(document, { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs });
+    room = renderRoom(document, { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs, ...(game.placements() ? { placements: game.placements() } : {}) });
     if (!preloaded) { preloaded = true; DEPART_FRAMES.forEach(src => { const i = new Image(); i.src = src; }); }
   } else if (v.mode === 'departed') {
     title.textContent = `${v.departed.name} · moved out`;
-    room = renderRoom(document, { mode: 'departed', letterSeen: v.departed.letterSeen });
+    room = renderRoom(document, { mode: 'departed', letterSeen: v.departed.letterSeen, ...(game.placements() ? { placements: game.placements() } : {}) });
   } else { title.textContent = 'Your room'; room = renderRoom(document, { mode: 'adopt' }); }
   scene.replaceChildren(room);
   if (v.mode === 'departed' && shown && shown.mode === 'pet' && !reduceMotion()) stopAnim = playDeparture(room, shown.stage);
@@ -128,10 +128,34 @@ function render() {
   const past = $('pgb-past'); past.replaceChildren();
   if (!v.history || !v.history.length) past.append(el('p', { class: 'muted' }, 'None yet.'));
   else { const ul = el('ul', { class: 'pgb-list' }); v.history.forEach(h => ul.append(el('li', {}, h.text))); past.append(ul); }
+  renderDecor(v);
   if (v.summary) past.append(el('p', { class: 'small' }, `Former frens: ${v.summary.former_frens}. Longest friendship: ${v.summary.longest_friendship_days} days.`));
 }
 
-async function run(p) { render(); await p; render(); }
+// Decorate: every decoration the account owns, where it stands, and the places it fits (only with a frog at home)
+function renderDecor(v) {
+  const box = $('pgb-decor'), card = $('pgb-decor-card');
+  const list = v.mode === 'pet' ? game.decor() : null;
+  card.hidden = !list;
+  if (!list) return;
+  box.replaceChildren();
+  if (game.roomError) box.append(el('p', { class: 'pgb-warn' }, game.roomError));
+  const ul = el('ul', { class: 'pgb-decor' });
+  for (const it of list) {
+    const li = el('li', { class: 'pgb-decor-item' });
+    li.append(el('img', { src: 'img/pepegochi/' + it.item + '.png', alt: '', width: 48, height: 48 }),
+      el('b', {}, it.name), el('small', { class: 'muted' }, it.slotLabel));
+    const sel = el('select', { 'aria-label': 'Where to put ' + it.name, 'data-item': it.id });
+    sel.append(el('option', { value: '' }, it.slot ? 'Move to…' : 'Put on…'));
+    it.fits.filter(f => f.id !== it.slot).forEach(f => sel.append(el('option', { value: f.id }, f.label)));
+    li.append(sel);
+    if (it.slot) li.append(el('button', { type: 'button', class: 'btn', 'data-unplace': it.slot }, 'Put away'));
+    ul.append(li);
+  }
+  box.append(ul, el('p', { class: 'small muted' }, 'Decorations you earn with Passport stamps show up here. Three earned decorations in the room at once: Pond Decorator.'));
+}
+
+async function run(p) { render(); await p; if (game.last && game.last.pet && !game.room) await game.loadRoom(); render(); }
 
 async function openLetter() {
   await run(game.readLetter());
@@ -147,6 +171,14 @@ $('pgb-body').addEventListener('click', e => {
   else if (t.dataset.letter) openLetter();
   else if (t.dataset.closeLetter) { game.closeLetter(); render(); }
   else if (t.dataset.signin) backend.discord().catch(err => { game.message = err.message; render(); });
+});
+$('pgb-decor').addEventListener('change', e => {
+  const s = e.target.closest('select[data-item]');
+  if (s && s.value && !game.busy) run(game.place(s.dataset.item, s.value));
+});
+$('pgb-decor').addEventListener('click', e => {
+  const b = e.target.closest('[data-unplace]');
+  if (b && !game.busy) run(game.unplace(b.dataset.unplace));
 });
 $('pgb-body').addEventListener('submit', e => {
   if (!e.target.closest('[data-adopt]')) return;

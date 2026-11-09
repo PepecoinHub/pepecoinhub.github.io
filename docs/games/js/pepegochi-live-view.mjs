@@ -29,6 +29,8 @@ export class LiveGame {
     this.message = '';
     this.letterOpen = false;
     this.busy = false;
+    this.room = null;
+    this.roomError = '';
   }
   get now() { return this.serverAt + (this.clock() - this.localAt); }
   get stale() { return !this.last || this.clock() - this.localAt > STALE_MS; }
@@ -73,6 +75,46 @@ export class LiveGame {
     return r;
   }
   closeLetter() { this.letterOpen = false; }
+
+  // ---------- the room (update_pepegochi_room_v1.sql): the account's decorations and where they stand ----------
+  async roomCall(name, args = {}) {
+    try {
+      this.room = await this.rpc(name, args);
+      this.roomError = '';
+      return true;
+    } catch (e) {
+      const m = (e && e.message) || String(e);
+      if (/ROOM_REVISION_CONFLICT/.test(m)) { await this.loadRoom(); this.roomError = 'The room changed in another tab. Here it is now.'; }
+      else this.roomError = m;
+      return false;
+    }
+  }
+  // read the room; the first time a frog is home, unpack the starter furniture
+  async loadRoom() {
+    const ok = await this.roomCall('gry_pepegochi_room_state');
+    const p = this.last && this.last.pet;
+    if (ok && this.room && !this.room.initialized && p && p.status !== 'departed') await this.roomCall('gry_pepegochi_room_initialize');
+    return this.room;
+  }
+  place(instanceId, slotId) { return this.roomCall('gry_pepegochi_room_place', { p_item_instance_id: instanceId, p_slot_id: slotId, p_expected_revision: this.room.revision }); }
+  unplace(slotId) { return this.roomCall('gry_pepegochi_room_unplace', { p_slot_id: slotId, p_expected_revision: this.room.revision }); }
+  // slot -> item_id, for the room picture (null: not loaded, the window shows the starter room)
+  placements() {
+    if (!this.room || !this.room.initialized) return null;
+    const byId = Object.fromEntries(this.room.inventory.map(i => [i.item_instance_id, i.item_id]));
+    return Object.fromEntries(this.room.placements.map(p => [p.slot_id, byId[p.item_instance_id]]).filter(x => x[1]));
+  }
+  // what the Decorate panel lists: every owned item, where it stands, and the slots it fits
+  decor() {
+    if (!this.room || !this.room.initialized) return null;
+    const at = Object.fromEntries(this.room.placements.map(p => [p.item_instance_id, p.slot_id]));
+    const label = Object.fromEntries(this.room.slots.map(s => [s.slot_id, s.label]));
+    return this.room.inventory.map(i => ({
+      id: i.item_instance_id, item: i.item_id, name: i.display_name, slot: at[i.item_instance_id] || null,
+      slotLabel: at[i.item_instance_id] ? label[at[i.item_instance_id]] : 'In the box',
+      fits: this.room.slots.filter(s => s.allowed_categories.includes(i.category)).map(s => ({ id: s.slot_id, label: s.label })),
+    }));
+  }
 
   view() {
     if (this.signin) return { mode: 'signin', signin: { title: LIVE_COPY.signinTitle, text: LIVE_COPY.signinText } };
