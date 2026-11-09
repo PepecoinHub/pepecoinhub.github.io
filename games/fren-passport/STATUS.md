@@ -124,7 +124,7 @@ is checked against the site's style before it goes in (it tends to drift from th
    `games.passport_drawings`); 10 drawings = the stamp. (The Secret Pond was dropped.)
 6. ~~Beta Tester hidden; new-reward notice~~ done: new stamps and secrets open a Windows 98 dialog from the tray with
    the stamp thumped in; it stays until closed, several queue up.
-7. Release: PEP-TV ad, beta flags off, one SQL run order for the owner.
+7. Release: the run order and checklist are in `games/LAUNCH_FREN_PASSPORT_PEPEGOCHI.md`. Open: a PEP-TV ad (owner's call).
 
 **Art (ChatGPT, checked by Claude)**
 - 2026-11-09: the 17-sprite pack from #227 is in the game (hungry, dirty, recovering, froglet, 6 moving-out frames,
