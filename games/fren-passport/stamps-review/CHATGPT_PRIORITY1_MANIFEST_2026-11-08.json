@@ -142,5 +142,45 @@
     "height": 1435,
     "status": "owner-approved",
     "notes": "Cartoon, from the launch scene blocks (2026-11-09); forwarded by the owner."
+  },
+  {
+    "id": "bug_hunter",
+    "file": "games/fren-passport/source/stamps-new/bug_hunter.png",
+    "width": 416,
+    "height": 572,
+    "status": "owner-approved",
+    "notes": "Cut by Claude from the owner's sheet of 6 (stamps-review/sheet-6_2026-11-09.png); fake checker background removed. Small file, fine for the album."
+  },
+  {
+    "id": "podium",
+    "file": "games/fren-passport/source/stamps-new/podium.png",
+    "width": 406,
+    "height": 555,
+    "status": "owner-approved",
+    "notes": "Cut by Claude from the owner's sheet of 6 (stamps-review/sheet-6_2026-11-09.png); fake checker background removed. Small file, fine for the album."
+  },
+  {
+    "id": "game_night",
+    "file": "games/fren-passport/source/stamps-new/game_night.png",
+    "width": 416,
+    "height": 558,
+    "status": "owner-approved",
+    "notes": "Cut by Claude from the owner's sheet of 6 (stamps-review/sheet-6_2026-11-09.png); fake checker background removed. Small file, fine for the album."
+  },
+  {
+    "id": "quiz_master",
+    "file": "games/fren-passport/source/stamps-new/quiz_master.png",
+    "width": 406,
+    "height": 558,
+    "status": "owner-approved",
+    "notes": "Cut by Claude from the owner's sheet of 6 (stamps-review/sheet-6_2026-11-09.png); fake checker background removed. Small file, fine for the album."
+  },
+  {
+    "id": "frogmas",
+    "file": "games/fren-passport/source/stamps-new/frogmas.png",
+    "width": 1039,
+    "height": 1414,
+    "status": "owner-approved",
+    "notes": "Forwarded by the owner; black background removed by Claude."
   }
 ]
