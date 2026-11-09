@@ -104,7 +104,7 @@ export function howToPlay() {
       h('li', {}, 'The winner gets 50 to 100 points and the artist 25 to 50: the faster the word falls, the more for both.'),
       h('li', {}, 'Nobody gets it in time: no points for anyone. Letters of the word appear after 40%, 60% and 80% of the time.'),
       h('li', {}, 'No letters or words on the drawing, fren.')),
-    h('p', { class: 'small' }, 'Just for fun: scores last only for the current game. ', h('a', { href: 'rules.html', target: '_blank', rel: 'noopener' }, 'Full rules')));
+    h('p', { class: 'small' }, 'A game with 3+ frens and 3+ guessed pictures counts for the top of the week (Discord accounts). ', h('a', { href: 'rules.html', target: '_blank', rel: 'noopener' }, 'Full rules')));
 }
 
 // When the window is a PondOS app (an iframe), tell it the title to show on its title bar

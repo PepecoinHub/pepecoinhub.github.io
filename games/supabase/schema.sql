@@ -407,17 +407,60 @@ begin
   return out;
 end $$;
 
+-- ---------- PEPaint: top of the week and player stats ----------
+-- pp_firsts: who guessed first in each turn of the game being played (cleared when the game ends).
+-- pp_results: one row per player per finished game that counted (3+ players and 3+ guessed pictures).
+create table if not exists games.pp_firsts (
+  turn_id uuid primary key,
+  match_id uuid not null,
+  guesser_id uuid not null,
+  drawer_id uuid not null,
+  at timestamptz not null default now()
+);
+create index if not exists pp_firsts_match_idx on games.pp_firsts(match_id);
+create table if not exists games.pp_results (
+  match_id uuid not null,
+  user_id uuid not null,
+  nick text not null,
+  verified boolean not null,
+  points int not null,
+  place int not null,
+  firsts int not null default 0,      -- pictures this player guessed first
+  drawn int not null default 0,       -- this player's own pictures that somebody guessed
+  players int not null,
+  finished_at timestamptz not null default now(),
+  primary key (match_id, user_id)
+);
+create index if not exists pp_results_time_idx on games.pp_results(finished_at);
+create index if not exists pp_results_user_idx on games.pp_results(user_id);
+alter table games.pp_firsts enable row level security;    -- no policies = no direct access from the API
+alter table games.pp_results enable row level security;
+revoke all on games.pp_firsts, games.pp_results from public, anon, authenticated;
+
 -- ---------- przebieg gry ----------
 create or replace function games.finish(p_code text) returns void
 language plpgsql security definer set search_path = '' as $$
-declare r games.rooms;
+declare r games.rooms; n int; t int; counted boolean := false;
 begin
   select * into r from games.rooms where code = p_code for update;
   delete from games.secrets where room_code = p_code;
   update games.rooms set phase = 'finished', drawer_id = null, turn_ends_at = null, next_at = null where code = p_code;
   if r.mode = 'kalambury' then
-    -- Draw & Guess: bez rankingu; wynik żyje tylko w pokoju (games.players.score) do następnej gry
+    -- PEPaint: a game counts for the top of the week when 3+ players took part and 3+ pictures were guessed
     delete from games.used_words where match_id = r.match_id;
+    select count(*) into n from games.players p where p.room_code = p_code and not p.kicked and (p.score > 0 or p.left_at is null);
+    select count(*) into t from games.pp_firsts f where f.match_id = r.match_id;
+    counted := r.match_id is not null and n >= 3 and t >= 3;
+    if counted then
+      insert into games.pp_results(match_id, user_id, nick, verified, points, place, firsts, drawn, players)
+      select r.match_id, p.user_id, p.nick, p.verified, p.score, rank() over (order by p.score desc),
+             (select count(*) from games.pp_firsts f where f.match_id = r.match_id and f.guesser_id = p.user_id),
+             (select count(*) from games.pp_firsts f where f.match_id = r.match_id and f.drawer_id = p.user_id), n
+      from games.players p
+      where p.room_code = p_code and not p.kicked and (p.score > 0 or p.left_at is null)
+      on conflict do nothing;
+    end if;
+    delete from games.pp_firsts f where f.match_id = r.match_id or f.at < now() - interval '1 day';
   elsif r.match_id is not null then
     update games.matches set finished_at = now() where id = r.match_id;
     insert into games.results(match_id, user_id, nick, nick_key, verified, points, place, finished_at)
@@ -431,7 +474,8 @@ begin
       and (p.score > 0 or p.left_at is null)
     on conflict do nothing;
   end if;
-  perform games.sys(p_code, case when r.mode = 'kalambury' then 'Game over! Final scores are on screen (this game only).'
+  perform games.sys(p_code, case when r.mode = 'kalambury' and counted then 'Game over! This game counts for the top of the week.'
+                                 when r.mode = 'kalambury' then 'Game over! Just for fun: a game counts for the top of the week with 3+ players and 3+ guessed pictures.'
                                  else 'Game over! Scores were added to the leaderboard.' end);
   perform games.notify(p_code, 'state');
 end $$;
@@ -950,6 +994,7 @@ begin
       rnk := 25 + ceil(25 * remaining / greatest(1, r.turn_seconds))::int;   -- the artist's share
       update games.players set score = score + pts, guessed_turn = r.turn_id where room_code = r.code and user_id = u;
       update games.players set score = score + rnk where room_code = r.code and user_id = r.drawer_id;
+      insert into games.pp_firsts(turn_id, match_id, guesser_id, drawer_id) values (r.turn_id, r.match_id, u, r.drawer_id) on conflict do nothing;
       perform games.sys(r.code, me.nick || ' got it first! (+' || pts || ', artist +' || rnk || ')', 'correct');
       perform games.end_turn(r.code);
       return jsonb_build_object('ok', true, 'correct', true, 'points', pts);
@@ -1156,6 +1201,39 @@ language sql stable security definer set search_path = '' as $$
   ) y, lateral (select y.season_no, y.season_name,
       (select jsonb_agg(e) from jsonb_array_elements(y.all_rows) e where (e->>'place')::int <= 3) top) z
 $$;
+
+-- PEPaint top list. p_period: 'week' (since Monday 00:00 UTC) | 'last' (the week before) | 'all'.
+-- The list shows Discord accounts only (guests play, but a guest name can be anyone). 'me' = the caller's row in this
+-- period, 'mine' = the caller's own numbers from all their counted games (guests see theirs too, on this device).
+create or replace function public.gry_pp_top(p_period text default 'week') returns jsonb
+language plpgsql stable security definer set search_path = '' as $$
+declare u uuid := auth.uid(); wk timestamptz := date_trunc('week', now() at time zone 'utc') at time zone 'utc';
+        f timestamptz; t timestamptz; v_rows jsonb; v_me jsonb; v_mine jsonb;
+begin
+  if p_period = 'last' then f := wk - interval '7 days'; t := wk;
+  elsif p_period = 'all' then f := '-infinity'; t := 'infinity';
+  else p_period := 'week'; f := wk; t := 'infinity'; end if;
+  with agg as (
+    select r.user_id, sum(r.points)::int points, count(*)::int games, (count(*) filter (where r.place = 1))::int wins,
+           sum(r.firsts)::int firsts, sum(r.drawn)::int drawn, max(r.finished_at) last_at,
+           (array_agg(r.nick order by r.finished_at desc))[1] nick
+      from games.pp_results r where r.verified and r.finished_at >= f and r.finished_at < t group by r.user_id),
+  ranked as (
+    select a.user_id, jsonb_build_object('place', rank() over (order by a.points desc, a.wins desc, a.last_at asc),
+             'nick', coalesce(pr.nick, a.nick), 'points', a.points, 'games', a.games, 'wins', a.wins,
+             'firsts', a.firsts, 'drawn', a.drawn, 'me', a.user_id = u) x
+      from agg a left join games.profiles pr on pr.user_id = a.user_id)
+  select coalesce(jsonb_agg(x order by (x->>'place')::int, x->>'nick') filter (where (x->>'place')::int <= 50), '[]'::jsonb),
+         (jsonb_agg(x) filter (where user_id = u))->0
+    into v_rows, v_me from ranked;
+  select jsonb_build_object('games', count(*), 'wins', count(*) filter (where r.place = 1), 'points', coalesce(sum(r.points), 0),
+           'firsts', coalesce(sum(r.firsts), 0), 'drawn', coalesce(sum(r.drawn), 0), 'best', coalesce(max(r.points), 0))
+    into v_mine from games.pp_results r where u is not null and r.user_id = u;
+  return jsonb_build_object('period', p_period, 'week_start', wk, 'week_end', wk + interval '7 days',
+    'verified', u is not null and games.discord_identity(u) is not null, 'rows', v_rows, 'me', v_me, 'mine', v_mine);
+end $$;
+revoke all on function public.gry_pp_top(text) from public;
+grant execute on function public.gry_pp_top(text) to anon, authenticated;
 
 create or replace function public.gry_recent_games(p_limit int default 10) returns jsonb
 language sql stable security definer set search_path = '' as $$
@@ -2482,7 +2560,7 @@ do $$ declare f regprocedure; begin
   end loop;
 end $$;
 grant execute on function public.gry_lobby(), public.gry_ranking(text), public.gry_hall_of_fame(),
-  public.gry_recent_games(int), public.gry_season(), public.gry_tables_lobby() to anon;
+  public.gry_recent_games(int), public.gry_season(), public.gry_tables_lobby(), public.gry_pp_top(text) to anon;
 
 -- ---------- migracja: Draw & Guess bez trwałego rankingu (idempotentne) ----------
 update games.rooms x set match_id = null where x.mode = 'kalambury' and x.match_id in (select id from games.matches where mode = 'kalambury');

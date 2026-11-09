@@ -25,6 +25,7 @@ const HINT = 'Start a party, type a code, or click a room on the list.';
 const hint = (t) => status.set(0, t || HINT);
 const menu = menuBar([
   ['File', () => [['New party room', () => createRoom()], ['Quick join', quickJoin], '-', ['Refresh the room list', () => load(true)], '-', [framed ? 'Exit' : 'Exit to PondOS', exit]]],
+  ['Top', [['Top of the week', () => openTop('week')], ['Last week', () => openTop('last')], ['All time', () => openTop('all')], '-', ['My stats', () => openTop('week')]]],
   ['View', () => [[(app.classList.contains('no-box') ? 'Show' : 'Hide') + ' the tool box', () => toggle('no-box')], [(app.classList.contains('no-pal') ? 'Show' : 'Hide') + ' the colour box', () => toggle('no-pal')], [(app.classList.contains('no-status') ? 'Show' : 'Hide') + ' the status bar', () => toggle('no-status')]]],
   ['Help', [['How to play', help], '-', ['About PEPaint', about]]],
 ]);
@@ -42,6 +43,7 @@ const box = h('div', { class: 'pt-box', role: 'toolbar', 'aria-label': 'Tool box
 const who = h('p', { class: 'pt-who', 'aria-live': 'polite' });
 const listBox = h('div', { class: 'pt-list' });
 const count = h('span', { class: 'pt-count' });
+const topBox = h('div', { class: 'pt-top' });
 // start a party: the two settings that matter, remembered for next time
 const saved = (() => { try { return JSON.parse(ls('pepaint-new') || '{}'); } catch { return {}; } })();
 const name = h('input', { type: 'text', id: 'pt-name', maxlength: 40, placeholder: 'Party name (optional)', 'aria-label': 'Party name (optional)' });
@@ -66,12 +68,12 @@ const sheet = h('div', { class: 'pt-sheet' },
         h('label', {}, h('span', {}, 'Time to draw'), secs)),
       createBtn),
     h('fieldset', { class: 'pt-group' }, h('legend', {}, 'Got a room code?'), codeForm),
-    h('p', { class: 'pt-fine' }, h('button', { type: 'button', class: 'pt-link', onclick: help }, 'How to play'), ' · up to 12 players · just for fun, no leaderboard')),
+    h('p', { class: 'pt-fine' }, h('button', { type: 'button', class: 'pt-link', onclick: help }, 'How to play'), ' · up to 12 players · games with 3+ frens count for the top of the week')),
   h('div', { class: 'pt-main' },
     h('div', { class: 'pt-main-head' }, h('h2', {}, 'Open party rooms ', count),
       h('button', { type: 'button', class: 'pt-btn', onclick: quickJoin, title: 'Jump into the first room with a free spot' }, 'Quick join'),
       h('button', { type: 'button', class: 'pt-btn pt-refresh', onclick: () => load(true), title: 'Refresh the list', 'aria-label': 'Refresh the list' }, '↻')),
-    listBox));
+    listBox, topBox));
 const area = h('div', { class: 'pt-area' }, sheet);
 const cur = h('span', { class: 'pt-cur', 'aria-hidden': 'true' }, h('i', { class: 'fg' }), h('i', { class: 'bg' }));
 const pal = h('div', { class: 'pt-pal', role: 'group', 'aria-label': 'Colour box' }, cur, h('div', { class: 'pt-swatches' },
@@ -165,7 +167,54 @@ function render() {
   })));
 }
 
+// ---------- top of the week and my stats ----------
+// A finished game counts when 3+ frens played and 3+ pictures were guessed. The list shows Discord accounts only.
+const MEDAL = ['🥇', '🥈', '🥉'];
+let topData = null;
+async function loadTop() {
+  if (be.kind === 'none') return;
+  try { topData = await be.rpc('gry_pp_top', { p_period: 'week' }); } catch { topData = null; }   // old server: no strip, the rest works
+  renderTop();
+}
+function renderTop() {
+  topBox.textContent = '';
+  if (!topData) return;
+  const rows = (topData.rows || []).slice(0, 3);
+  topBox.append(h('b', { class: 'pt-top-t' }, '🏆 Top of the week'),
+    rows.length ? h('ol', { class: 'pt-top3' }, rows.map((r, i) => h('li', { class: r.me ? 'me' : '' }, MEDAL[i] + ' ', h('b', {}, r.nick), ' ' + r.points)))
+      : h('span', { class: 'pt-top-none' }, 'Nobody yet this week. Be the first: play a game with 3+ frens.'),
+    h('button', { type: 'button', class: 'pt-btn', onclick: () => openTop('week') }, 'Top list and my stats'));
+}
+const TABS = [['week', 'This week'], ['last', 'Last week'], ['all', 'All time']];
+function openTop(period) {
+  const body = h('div', { class: 'pt-topdlg' });
+  dialog('Top list - PEPaint', body, [['Close', null, { primary: true }]], { wide: true });
+  const show = async (p) => {
+    body.textContent = ''; body.append(h('p', { class: 'small' }, 'Loading...'));
+    let d; try { d = await be.rpc('gry_pp_top', { p_period: p }); if (p === 'week') { topData = d; renderTop(); } }
+    catch (e) { body.textContent = ''; body.append(errorNote(e)); return; }
+    const rows = d.rows || [], m = d.mine || {};
+    const end = new Date(d.week_end), left = Math.max(0, end - Date.now()), dd = Math.floor(left / 864e5), hh = Math.floor(left % 864e5 / 36e5);
+    body.textContent = '';
+    body.append(...[
+      h('div', { class: 'pt-tabs', role: 'tablist' }, TABS.map(([k, t]) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(k === p), onclick: () => show(k) }, t))),
+      h('div', { class: 'pt-toplist' }, rows.length ? h('table', {},
+        h('thead', {}, h('tr', {}, h('th', {}, '#'), h('th', {}, 'Fren'), h('th', { title: 'Points from counted games' }, 'Points'), h('th', {}, 'Games'), h('th', { title: 'Games finished in 1st place' }, 'Wins'), h('th', { title: 'Pictures guessed first' }, 'Firsts'))),
+        h('tbody', {}, rows.map((r) => h('tr', { class: r.me ? 'me' : '' }, h('td', {}, MEDAL[r.place - 1] || r.place), h('td', {}, r.nick + (r.me ? ' (you)' : '')), h('td', {}, h('b', {}, r.points)), h('td', {}, r.games), h('td', {}, r.wins), h('td', {}, r.firsts)))))
+        : h('p', { class: 'pt-top-none' }, p === 'last' ? 'Nobody was on the list last week.' : 'Nobody on the list yet. Play a game with 3+ frens and take the first spot.')),
+      d.me && !rows.some((r) => r.me) ? h('p', { class: 'small' }, `You are #${d.me.place} with ${d.me.points} points.`) : null,
+      p === 'week' ? h('p', { class: 'small' }, `The week ends in ${dd} d ${hh} h (Monday 00:00 UTC), then everyone starts from zero.`) : null,
+      h('fieldset', { class: 'pt-group pt-mine' }, h('legend', {}, 'My stats (all time)'),
+        m.games ? h('dl', {}, [['Games', m.games], ['Wins', m.wins], ['First guesses', m.firsts], ['My pictures guessed', m.drawn], ['Best game', m.best + ' pts'], ['All points', m.points]]
+          .map(([k, v]) => h('div', {}, h('dt', {}, k), h('dd', {}, String(v)))))
+          : h('p', { class: 'small' }, 'No counted games yet. A game counts when 3+ frens play and 3+ pictures are guessed.'),
+        d.verified ? '' : h('p', { class: 'small' }, 'Guests keep their stats on this device only. ', h('b', {}, 'Log on with Discord'), ' to get on the list.'))].filter(Boolean));
+  };
+  show(period);
+}
+
 paintWho();
+loadTop();
 await load();
 setInterval(load, 15000);
 // ?join=CODE from a PondOS link: straight into that room

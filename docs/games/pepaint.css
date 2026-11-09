@@ -226,3 +226,29 @@ html.paint .overlay { border-radius: 0; }
   html.paint .stage-top { padding: 4px 8px; }
 }
 html.paint .overlay .first-line { margin-top: 10px; font-size: 1.15rem; font-weight: 700; }
+
+/* ---------- top of the week ---------- */
+.pt-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px; padding: 7px 9px; background: var(--w-face); box-shadow: var(--down); font-size: 14px; }
+.pt-top:empty { display: none; }
+.pt-top-t { white-space: nowrap; }
+.pt-top3 { display: flex; flex: 1; flex-wrap: wrap; gap: 4px 14px; margin: 0; padding: 0; list-style: none; min-width: 0; }
+.pt-top3 li { white-space: nowrap; }
+.pt-top3 li.me, .pt-toplist tr.me td { background: #fff7c2; }
+.pt-top-none { flex: 1; color: #444; margin: 0; }
+p.pt-top-none { padding: 18px 10px; text-align: center; }
+.pt-tabs { display: flex; gap: 2px; margin-bottom: -1px; position: relative; z-index: 1; }
+.pt-tabs button { min-height: 30px; padding: 4px 14px; border: 0; font: 14px var(--sys); color: #111; background: var(--w-face); box-shadow: var(--up); cursor: default; }
+.pt-tabs button[aria-selected=true] { font-weight: 700; padding-bottom: 7px; margin-top: -3px; }
+.pt-toplist { max-height: min(300px, 36vh); overflow: auto; background: #fff; box-shadow: var(--down); padding: 3px; }
+.pt-toplist table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.pt-toplist th { position: sticky; top: 0; padding: 4px 8px; text-align: right; font: 400 13px var(--sys); text-transform: none; letter-spacing: 0; color: #111; white-space: nowrap; background: var(--w-face); box-shadow: var(--up); }
+.pt-toplist td { padding: 5px 8px; text-align: right; border-bottom: 1px solid #e6e6e0; }
+.pt-toplist th:nth-child(2), .pt-toplist td:nth-child(2) { text-align: left; width: 99%; }
+.pt-toplist td:first-child { text-align: center; }
+.pt-topdlg .small { margin: 8px 0 0; font-size: 13px; color: #333; }
+.pt-mine { margin-top: 12px; }
+.pt-mine dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0; }
+.pt-mine dl div { padding: 6px 8px; background: #fff; box-shadow: var(--down); }
+.pt-mine dt { font-size: 12px; color: #444; }
+.pt-mine dd { margin: 0; font: 700 18px var(--sys); }
+@media (max-width: 560px) { .pt-mine dl { grid-template-columns: repeat(2, 1fr); } .pt-toplist th, .pt-toplist td { padding: 5px 5px; } .pt-toplist th:nth-child(4), .pt-toplist td:nth-child(4) { display: none; } }
