@@ -104,5 +104,61 @@ Pepe opening a dusty old floppy disk box under a desk lamp, a soft glow coming o
 with surprise. Dark green background.
 ```
 
+## SCENE blocks for launch (2026-11-09): the 9 stamps still missing
+
+**`top_ten`, label `Top 10`.**
+```
+Pepe standing proudly on a tall stack of ten wooden crates, the top crate under his feet, one fist raised,
+a small leaderboard scroll unrolled beside him with ten blank lines (no writing). Light blue sky background.
+```
+
+**`bug_hunter`, label `Bug Hunter`.**
+```
+Pepe in a safari hat holding a butterfly net, and inside the net a small cartoon computer bug: a beetle
+made of a green circuit board with tiny legs. Behind him a beige Win98-style CRT monitor. Green background.
+```
+
+**`season_champion`, label `Season Champion`.** Gold stamp; redraw (attach the old version only as a reference).
+```
+Pepe holding a big golden trophy cup above his head with both hands, confetti falling, a red winner's sash
+across his chest with no writing on it. Deep royal blue background.
+```
+
+**`podium`, label `Podium`.**
+```
+Three Pepe frogs on a wooden winners' podium, the middle one highest and cheering, the other two clapping
+on the lower steps. No numbers on the podium. Warm yellow background.
+```
+
+**`game_night`, label `Game Night`.**
+```
+Pepe on a sofa at night with a bowl of popcorn, looking at a big Win98-style CRT monitor that shows a framed
+picture with a big question mark, a crescent moon in the window behind. Dark purple night background.
+```
+
+**`quiz_master`, label `Quiz Master`.**
+```
+Pepe as a TV quiz-show host in a bow tie, holding a handheld microphone in one hand and a stack of picture
+cards in the other, under a small spotlight. Red curtain background. No drawing, no easel, no paint brush.
+```
+
+**`frogmas`, label `Frogmas`.**
+```
+Pepe in a red Santa hat and a red knitted sweater, holding a mug of hot cocoa, beside a small decorated
+Christmas tree with a star on top, snow falling. Warm red background.
+```
+
+**`treasure_hunter`, label `Treasure Hunter`.**
+```
+Pepe in an explorer hat kneeling over an open wooden treasure chest that glows from inside, a rolled-up old
+map in his other hand, a small shovel stuck in the sand. Sandy orange background.
+```
+
+**`interior_designer`, label `Pond Decorator`.**
+```
+Pepe in a cosy room hanging a framed picture on the wall with a little hammer, a potted plant, a rubber duck
+and a lava lamp already placed around him, a paint roller leaning on the wall. Soft teal background.
+```
+
 More SCENE blocks are added here by Claude when those stamps come up. ChatGPT does not write its own scenes for
 new stamps; ask the owner or Claude.
