@@ -178,10 +178,10 @@
   {
     "id": "frogmas",
     "file": "games/fren-passport/source/stamps-new/frogmas.png",
-    "width": 1039,
-    "height": 1414,
+    "width": 1173,
+    "height": 1341,
     "status": "owner-approved",
-    "notes": "Forwarded by the owner; black background removed by Claude."
+    "notes": "Owner, 2026-11-09: the Santa Fren avatar picture in a stamp frame (Claude). Earlier ChatGPT version in git history."
   },
   {
     "id": "treasure_hunter",
