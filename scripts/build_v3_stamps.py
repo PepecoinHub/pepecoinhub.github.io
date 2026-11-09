@@ -23,6 +23,7 @@ V3 = [
     'first_fren', 'sharp_eye', 'community_fren', 'like_it_here', 'nasa_is_hiring', 'rookie_miner',
     # launch scene blocks (2026-11-09)
     'season_champion', 'top_ten', 'bug_hunter', 'podium', 'game_night', 'quiz_master', 'frogmas',
+    'treasure_hunter', 'interior_designer',
 ]
 SMALL = {'the_secret_pond', 'picasso_fren'}   # accepted scenes that exist only as the small review files so far
 TILE = (138, 150)

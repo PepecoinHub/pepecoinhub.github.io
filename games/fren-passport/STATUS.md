@@ -68,9 +68,9 @@ Album: **shown** · **???** (teaser) · hidden.
 | 41 | `little_fren` | Little Fren | waits for PepeGochi | hidden | ✅ Lily |
 | 42 | `grown_fren` | One Small Step | waits for PepeGochi | hidden | ✅ Lily |
 | 43 | `good_parent` | Good Parent | waits for PepeGochi | hidden | ✅ v3 |
-| 44 | `interior_designer` | Pond Decorator | waits for PepeGochi | hidden | ⬜ (later) |
+| 44 | `interior_designer` | Pond Decorator | waits for PepeGochi | hidden | ✅ v3 |
 | 45 | `secret_starter` | Secret Starter | first secret | shown | ✅ v3 |
-| 46 | `treasure_hunter` | Treasure Hunter | 6 secrets | shown | ⬜ |
+| 46 | `treasure_hunter` | Treasure Hunter | 6 secrets | shown | ✅ v3 |
 | 47 | `the_secret_pond` | The Secret Pond | no data yet | hidden | 🔁 in sprite, 300 px |
 | 48 | `frogmas` | Frogmas | a visit on 24–26 December | shown | ✅ v3 |
 | 49 | `pep_birthday` | Pepecoin's Birthday | a visit on 30 January (UTC 30–31); unlocks Birthday Fren | shown | ⬜ |
@@ -118,8 +118,8 @@ is checked against the site's style before it goes in (it tends to drift from th
 - PepeGochi sprite fixes from #228: `adult_hungry`, `adult_dirty`, `froglet_idle`, `adult_recovering`, the 6 moving-out
   frames (adult about 113 px tall, feet on one line, 2×2 pixel grid). Egg hatching frames.
 - Decorations: Paper Crown, Moon Rock, Golden Fly (pixel art, room style).
-- Stamps (cartoon, like the album; scene blocks in `GPT_MASTER_PROMPT.md`): Treasure Hunter, Pond Decorator, Pepecoin's
-  Birthday, Thanksgiving. Done: Season Champion, Top 10, Bug Hunter, Podium, Game Night, Quiz Master, Frogmas.
+- Stamps (cartoon, like the album; scene blocks in `GPT_MASTER_PROMPT.md`): Pepecoin's Birthday, Thanksgiving.
+  Done: Season Champion, Top 10, Bug Hunter, Podium, Game Night, Quiz Master, Frogmas, Treasure Hunter, Pond Decorator.
 
 **Owner, launch day:** run the SQL in the order the release PR gives; the beta flags come off with the release.
 
