@@ -53,6 +53,11 @@
 .pp-slot { width: 100%; height: 100%; display: grid; place-items: center; }
 .pp-slot .pp-art-stamp { width: 92%; }
 .pp-slot.is-earned .pp-art-stamp { filter: drop-shadow(1px 1px 0 rgba(60,40,20,.35)); }
+/* front page tiers: a gold row, a silver row (the frame shows even before the stamp is earned) */
+.pp-slot.is-gold .pp-art-stamp, .pp-slot.is-silver .pp-art-stamp { border-radius: 3px; }
+.pp-slot.is-gold .pp-art-stamp { box-shadow: 0 0 0 2px #f2c94c, 0 0 0 3px #8a6400, 0 0 6px 2px rgba(242,201,76,.55); }
+.pp-slot.is-silver .pp-art-stamp { box-shadow: 0 0 0 2px #d9dde2, 0 0 0 3px #6c737b, 0 0 5px 1px rgba(200,205,212,.5); }
+.pp-slot.is-locked .pp-art-stamp { opacity: .8; }
 .pp-bali { position: absolute; z-index: 2; left: 7.2%; top: 74.8%; width: 80%; height: 23%; }
 button.pp-bali { padding: 0; background: none; border: 0; cursor: pointer; }
 button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px; }

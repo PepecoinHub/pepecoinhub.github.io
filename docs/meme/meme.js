@@ -1651,7 +1651,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261109val';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109val'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109front'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1743,6 +1743,11 @@
     'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren',
     'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14', 'pepe_guesser', 'week_scout',
     'scout_fren', 'first_hatch', 'little_fren', 'grown_fren', 'share_fren', 'valentine_fren'];
+  // the 20 places on the Passport's front page, in order: gold row, silver row, then the first steps
+  var PP_FRONT = ['moonwalker', 'season_champion', 'frog_of_the_week', 'certified_fren', 'treasure_hunter',
+    'old_frog', 'vox_populi', 'checkmate', 'detective_fren', 'like_it_here',
+    'first_fren', 'first_avatar', 'welcome_back', 'pepe_guesser', 'share_fren',
+    'good_game', 'rookie_miner', 'dear_editor', 'i_voted', 'secret_starter'];
   function ppStamp(x, earned) {
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
     if (earned && PP_LILY.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-lily', PP_LILY, x.id);
@@ -1859,14 +1864,18 @@
         var right = el('section', {class:'pp-page pp-right','aria-label':'Achievement stamps'});
         right.appendChild(el('img', {class:'pp-page-art',src:PP_ART+'page-right.webp'+PP_ART_V,alt:'',width:'360',height:'528',draggable:'false'}));
         right.appendChild(piece('p','sr','Achievement stamps: ' + earnedCount + ' of ' + goal + ' collected.'));
+        // the front page is a showcase with a fixed place for each of the 20 key stamps (owner, 2026-11-09):
+        // row 1 gold, row 2 silver, rows 3-4 first steps. Every other stamp lives in the Stamps tab.
         var grid = el('div', {class:'pp-grid'});
-        for (var gi = 0; gi < 20; gi++) {
-          var gx = earnedList[gi];
-          var gc = el('div', {class:'pp-slot'+(gx?' is-earned':' is-locked'), title: gx ? stampTitle(gx, earnedOf(gx.id)) : 'Empty stamp slot'});
-          gc.appendChild(ppStamp(gx || {}, !!gx));
-          if (gx) gc.appendChild(piece('span','sr', stampTitle(gx, earnedOf(gx.id))));
+        PP_FRONT.forEach(function (fid, gi) {
+          var gx = find(badges, fid) || { id: fid, title: fid };
+          var ge = earnedOf(fid), tier = gi < 5 ? 'gold' : gi < 10 ? 'silver' : 'plain';
+          var tip = ge ? stampTitle(gx, ge) : gx.title + ' (' + (tier === 'plain' ? '' : tier + ', ') + 'not yet): ' + (gx.description || '');
+          var gc = el('div', {class:'pp-slot is-' + tier + (ge ? ' is-earned' : ' is-locked'), title: tip});
+          gc.appendChild(ppStamp(gx, !!ge));
+          gc.appendChild(piece('span','sr', tip));
           grid.appendChild(gc);
-        }
+        });
         right.appendChild(grid);
         var baliE = earnedOf(MYTHIC_ID);
         var baliBtn = baliE
