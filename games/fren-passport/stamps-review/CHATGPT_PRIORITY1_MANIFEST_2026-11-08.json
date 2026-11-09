@@ -186,18 +186,18 @@
   {
     "id": "treasure_hunter",
     "file": "games/fren-passport/source/stamps-new/treasure_hunter.png",
-    "width": 1173,
-    "height": 1341,
+    "width": 716,
+    "height": 944,
     "status": "owner-approved",
-    "notes": "Forwarded by the owner, 2026-11-09."
+    "notes": "Second version, owner chose it (2026-11-09); cut by Claude from a black sheet."
   },
   {
     "id": "interior_designer",
     "file": "games/fren-passport/source/stamps-new/interior_designer.png",
-    "width": 1173,
-    "height": 1341,
+    "width": 717,
+    "height": 944,
     "status": "owner-approved",
-    "notes": "Forwarded by the owner, 2026-11-09."
+    "notes": "Second version, owner chose it (2026-11-09); cut by Claude from a black sheet."
   },
   {
     "id": "pep_birthday",
