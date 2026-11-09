@@ -1573,3 +1573,29 @@ footer.foot a { color: #edf3e3; }
 .bsod-c { text-align: center; }
 @media (prefers-reduced-motion: no-preference) { .bsod-cur { animation: bsodblink 1s steps(1) infinite; } }
 @keyframes bsodblink { 50% { opacity: 0; } }
+
+/* ---------- reward98: a new stamp / secret, as a Windows 98 dialog that rises from the tray and stays ---------- */
+.reward98 { position: fixed; right: 12px; bottom: 56px; z-index: 95; width: min(340px, calc(100vw - 24px)); background: #c0c0c0; color: #000;
+  border: 1px solid #000; box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080, 4px 4px 0 rgba(0,0,0,.35);
+  font: 13px/1.35 "Tahoma", "MS Sans Serif", system-ui, sans-serif; animation: reward98-up .45s cubic-bezier(.2,1.4,.4,1) both; }
+.reward98.out { animation: reward98-down .25s ease-in both; }
+.reward98-bar { display: flex; align-items: center; gap: 6px; padding: 3px 3px 3px 6px; color: #fff; font-weight: 700;
+  background: linear-gradient(90deg, #000080, #1084d0); }
+.reward98-bar b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reward98-x { width: 18px; height: 16px; padding: 0; display: grid; place-items: center; background: #c0c0c0; border: 1px solid #000;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080; cursor: pointer; }
+.reward98-x svg { width: 10px; height: 10px; }
+.reward98-body { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; align-items: center; padding: 12px 12px 6px; }
+.reward98-art { width: 76px; height: 82px; display: grid; place-items: center; position: relative; }
+.reward98-art .pp-art-stamp { width: 69px; height: 75px; animation: reward98-thump .55s .35s cubic-bezier(.3,1.6,.5,1) both; }
+.reward98-art::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; border: 3px solid rgba(178,34,52,.0);
+  animation: reward98-ink .7s .55s ease-out both; pointer-events: none; }
+.reward98-art img { image-rendering: auto; animation: reward98-thump .55s .35s cubic-bezier(.3,1.6,.5,1) both; }
+.reward98-txt { display: grid; gap: 4px; min-width: 0; }
+.reward98-txt b { font-size: 14px; }
+.reward98-row { display: flex; justify-content: flex-end; gap: 8px; padding: 6px 12px 12px; }
+@keyframes reward98-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes reward98-down { to { transform: translateY(30px); opacity: 0; } }
+@keyframes reward98-thump { 0% { transform: scale(1.9) rotate(-14deg); opacity: 0; } 60% { transform: scale(.92) rotate(3deg); opacity: 1; } 100% { transform: none; opacity: 1; } }
+@keyframes reward98-ink { 0% { border-color: rgba(178,34,52,.55); transform: scale(.6); } 100% { border-color: rgba(178,34,52,0); transform: scale(1.35); } }
+@media (prefers-reduced-motion: reduce) { .reward98, .reward98.out, .reward98-art .pp-art-stamp, .reward98-art img, .reward98-art::after { animation: none; } }

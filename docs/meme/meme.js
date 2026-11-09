@@ -2453,7 +2453,9 @@
       if(result.new) {
         var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren',midnight_fren:'Midnight Fren',nerd_alert:'Nerds Only',bali_dreamer:'Bali Dreamer',find_fren:'Looking Glass',address_check:'Trust, But Verify'};
         var av={why_tho:1,midnight_fren:1,nerd_alert:1,bali_dreamer:1,find_fren:1,address_check:1};
-        balloon('Secret discovered!',(names[id]||'A mysterious find')+' is now in your Fren Passport.'+(av[id]?' A special avatar is waiting in Create Your Fren.':''),'gif-045-still');
+        rewardNotice({ bar: 'Fren Passport - Secret Found', title: 'Secret discovered: ' + (names[id] || 'A mysterious find'),
+          text: 'It is in your Fren Passport now.' + (av[id] ? ' A special avatar is waiting for you in Create Your Fren.' : ''),
+          img: ico('gif-045-still'), go: av[id] ? 'Open Create Your Fren' : 'Open Fren Passport', open: av[id] ? avatarMaker : frenPassport });
       }
     },function(){ /* Migration may not be installed yet; retry on next discovery. */ });
   }
@@ -2510,15 +2512,12 @@
         if (!fresh.length) return;
         if (passportCache && passportCache.userId === s.userId) passportCache = null;   // the next Passport opens fresh
         return fetch(PP_CATALOG).then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; }).then(function (c) {
-          var names = fresh.map(function (b) {
-            var x = c && Array.isArray(c.achievements) ? c.achievements.filter(function (a) { return a.id === b.id; })[0] : null;
-            return x ? x.title : null;
+          var stamps = fresh.map(function (b) {
+            return c && Array.isArray(c.achievements) ? c.achievements.filter(function (a) { return a.id === b.id; })[0] : null;
           }).filter(Boolean);
-          if (!names.length) return;
-          var t = names.length === 1 ? balloon('New stamp: ' + esc(names[0]), 'It is in your Fren Passport now. Click to open it.', 'stamp-new')
-            : balloon(names.length + ' new stamps!', esc(names.join(', ')) + '. Click to open your Fren Passport.', 'stamp-new');
-          t.addEventListener('click', function (ev) { if (!ev.target.closest('button')) frenPassport(); });
-          t.style.cursor = 'pointer';
+          stamps.forEach(function (x) {
+            rewardNotice({ bar: 'Fren Passport - New Stamp', stamp: x, title: x.title, text: x.description || 'It is in your Fren Passport now.' });
+          });
         });
       }, function () { /* the migration may not be installed yet; nothing to show */ });
     }, 2500);
@@ -3981,6 +3980,39 @@
     setTimeout(bye, 12000);
     return t;
   }
+  // A new stamp, secret or avatar: a Windows 98 dialog that rises from the tray with the stamp being "thumped" in.
+  // It stays until it is closed (a balloon fades out and is easy to miss). Several rewards at once queue up.
+  var rewardQueue = [], rewardOpen = false;
+  function rewardNotice(r) {
+    rewardQueue.push(r);
+    if (!rewardOpen) nextReward();
+  }
+  function nextReward() {
+    var r = rewardQueue.shift();
+    if (!r) { rewardOpen = false; return; }
+    rewardOpen = true;
+    passportCss();
+    var w = el('div', { class: 'reward98', role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'reward98-t' });
+    w.innerHTML = '<div class="reward98-bar"><img src="' + ico('pep-logo') + '" alt="" width="16" height="16"><b id="reward98-t"></b>' +
+      '<button type="button" class="reward98-x" aria-label="Close">' + ICO.x + '</button></div>' +
+      '<div class="reward98-body"><div class="reward98-art"></div><div class="reward98-txt"><b></b><span></span></div></div>' +
+      '<div class="reward98-row"><button type="button" class="app-btn reward98-go"></button><button type="button" class="app-btn reward98-ok">OK</button></div>';
+    w.querySelector('#reward98-t').textContent = r.bar;
+    w.querySelector('.reward98-txt b').textContent = r.title;
+    w.querySelector('.reward98-txt span').textContent = r.text;
+    var art = w.querySelector('.reward98-art');
+    if (r.stamp) art.appendChild(ppStamp(r.stamp, true));
+    else { var im = el('img', { src: r.img || ico('gif-045-still'), alt: '', width: '64', height: '64' }); art.appendChild(im); }
+    var go = w.querySelector('.reward98-go'); go.textContent = r.go || 'Open Fren Passport';
+    document.body.appendChild(w);
+    var bye = function () { w.classList.add('out'); setTimeout(function () { w.remove(); nextReward(); }, REDUCE ? 0 : 250); };
+    w.querySelector('.reward98-x').addEventListener('click', bye);
+    w.querySelector('.reward98-ok').addEventListener('click', bye);
+    go.addEventListener('click', function () { bye(); (r.open || frenPassport)(); });
+    setTimeout(function () { try { w.querySelector('.reward98-ok').focus({ preventScroll: true }); } catch (e) {} }, 50);
+  }
+  window.PONDOS_REWARD = rewardNotice;   // lets the browser console test it: PONDOS_REWARD({ bar: '…', title: '…', text: '…' })
+
   var noticed = '1';
   try { noticed = sessionStorage.getItem('pondos-notice'); sessionStorage.setItem('pondos-notice', '1'); } catch (e) {}
   if (!noticed && mainEl) setTimeout(function () { balloon('PondOS Security Center', 'Nobody legit will ask for your seed phrase. Not support, not admins, not frogs.', 'gif-085-still'); }, 4500);

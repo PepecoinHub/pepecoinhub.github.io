@@ -122,7 +122,8 @@ is checked against the site's style before it goes in (it tends to drift from th
    follows the server room).
 5. ~~Picasso Fren~~ done: a drawing counts when another Discord player guesses it in Draw & Guess (server side,
    `games.passport_drawings`); 10 drawings = the stamp. (The Secret Pond was dropped.)
-6. Beta Tester out of the album; the new-reward notice (Windows 98 style, impossible to miss).
+6. ~~Beta Tester hidden; new-reward notice~~ done: new stamps and secrets open a Windows 98 dialog from the tray with
+   the stamp thumped in; it stays until closed, several queue up.
 7. Release: PEP-TV ad, beta flags off, one SQL run order for the owner.
 
 **Art (ChatGPT, checked by Claude)**
