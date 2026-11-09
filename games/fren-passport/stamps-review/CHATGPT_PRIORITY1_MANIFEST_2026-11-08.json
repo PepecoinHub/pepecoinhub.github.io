@@ -24,14 +24,6 @@
     "notes": "Pixel-art version from the owner's sheet of 7 (2026-11-09), cut by Claude, 2x nearest-neighbour."
   },
   {
-    "id": "community_fren",
-    "file": "games/fren-passport/source/stamps-new/community_fren.png",
-    "width": 732,
-    "height": 932,
-    "status": "owner-approved",
-    "notes": "Pixel-art version from the owner's sheet of 7 (2026-11-09), cut by Claude, 2x nearest-neighbour."
-  },
-  {
     "id": "detective_fren",
     "file": "games/fren-passport/source/stamps-new/detective_fren.png",
     "width": 1024,
@@ -214,5 +206,77 @@
     "height": 1341,
     "status": "owner-approved",
     "notes": "Owner idea (2026-11-09): the special-avatar picture in a stamp frame. Built by Claude from the Treasure Hunter frame, Fredoka Bold label."
+  },
+  {
+    "id": "welcome_back",
+    "file": "games/fren-passport/source/stamps-new/welcome_back.png",
+    "width": 314,
+    "height": 378,
+    "status": "owner-approved",
+    "notes": "Redraw from the owner's sheet of 10 (2026-11-09), cut by Claude; Week Scout from that sheet was not taken."
+  },
+  {
+    "id": "first_words",
+    "file": "games/fren-passport/source/stamps-new/first_words.png",
+    "width": 314,
+    "height": 378,
+    "status": "owner-approved",
+    "notes": "Redraw from the owner's sheet of 10 (2026-11-09), cut by Claude; Week Scout from that sheet was not taken."
+  },
+  {
+    "id": "hey_fren",
+    "file": "games/fren-passport/source/stamps-new/hey_fren.png",
+    "width": 315,
+    "height": 378,
+    "status": "owner-approved",
+    "notes": "Redraw from the owner's sheet of 10 (2026-11-09), cut by Claude; Week Scout from that sheet was not taken."
+  },
+  {
+    "id": "community_fren",
+    "file": "games/fren-passport/source/stamps-new/community_fren.png",
+    "width": 316,
+    "height": 378,
+    "status": "owner-approved",
+    "notes": "Redraw from the owner's sheet of 10 (2026-11-09), cut by Claude; Week Scout from that sheet was not taken."
+  },
+  {
+    "id": "dear_editor",
+    "file": "games/fren-passport/source/stamps-new/dear_editor.png",
+    "width": 315,
+    "height": 371,
+    "status": "owner-approved",
+    "notes": "Redraw from the owner's sheet of 10 (2026-11-09), cut by Claude; Week Scout from that sheet was not taken."
+  },
+  {
+    "id": "junior_editor",
+    "file": "games/fren-passport/source/stamps-new/junior_editor.png",
+    "width": 315,
+    "height": 370,
+    "status": "owner-approved",
+    "notes": "Redraw from the owner's sheet of 10 (2026-11-09), cut by Claude; Week Scout from that sheet was not taken."
+  },
+  {
+    "id": "senior_editor",
+    "file": "games/fren-passport/source/stamps-new/senior_editor.png",
+    "width": 314,
+    "height": 371,
+    "status": "owner-approved",
+    "notes": "Redraw from the owner's sheet of 10 (2026-11-09), cut by Claude; Week Scout from that sheet was not taken."
+  },
+  {
+    "id": "streak_14",
+    "file": "games/fren-passport/source/stamps-new/streak_14.png",
+    "width": 313,
+    "height": 371,
+    "status": "owner-approved",
+    "notes": "Redraw from the owner's sheet of 10 (2026-11-09), cut by Claude; Week Scout from that sheet was not taken."
+  },
+  {
+    "id": "pepe_guesser",
+    "file": "games/fren-passport/source/stamps-new/pepe_guesser.png",
+    "width": 323,
+    "height": 381,
+    "status": "owner-approved",
+    "notes": "Redraw from the owner's sheet of 10 (2026-11-09), cut by Claude; Week Scout from that sheet was not taken."
   }
 ]
