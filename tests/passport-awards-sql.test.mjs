@@ -7,6 +7,7 @@
 //   node --test tests/passport-awards-sql.test.mjs
 // It creates and drops its own database. Never point it at Supabase.
 import test from 'node:test';
+import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
@@ -500,6 +501,28 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     assert.ok(awards.includes("tg := tg + ((4 - extract(dow from tg)::int + 7) % 7) + 21;"), 'same formula as the check-in');
     // and a browser cannot claim them
     await assert.rejects(call(62, "select public.gry_passport_discover('pep_birthday') as v"), /Unknown discovery/);
+
+    // --- Picasso Fren: 10 of your drawings guessed by other Discord players in Draw & Guess
+    await addUser(70); await addUser(71);
+    await db.query("insert into games.rooms(code, mode, title, host_id, drawer_id) values ('DRAWX', 'kalambury', 'Draw', $1, $1)", [uid(70)]);
+    await db.query("insert into games.players(room_code, user_id, nick, nick_key, verified) values ('DRAWX', $1, 'a', 'a', true), ('DRAWX', $2, 'b', 'b', true)", [uid(70), uid(71)]);
+    const turn = async () => { const id = crypto.randomUUID(); await db.query("update games.rooms set turn_id = $1 where code = 'DRAWX'", [id]); return id; };
+    const guess = (u, id) => db.query("update games.players set guessed_turn = $1 where room_code = 'DRAWX' and user_id = $2", [id, uid(u)]);
+    let tid = await turn();
+    await guess(70, tid);                                   // the drawer cannot guess their own drawing
+    await db.query("update games.players set verified = false where user_id = $1", [uid(71)]);
+    await guess(71, tid);                                   // an unverified guess does not count
+    await db.query("update games.players set verified = true where user_id = $1", [uid(71)]);
+    assert.equal(await one('select count(*)::int as v from games.passport_drawings'), 0);
+    for (let k = 0; k < 9; k++) { tid = await turn(); await guess(71, tid); }
+    assert.ok(!(await has(70, 'picasso_fren')), 'nine drawings');
+    await guess(71, tid); await db.query("update games.players set guessed_turn = null where user_id = $1", [uid(71)]); await guess(71, tid);
+    assert.ok(!(await has(70, 'picasso_fren')), 'the same drawing counts once');
+    tid = await turn(); await guess(71, tid);
+    assert.ok(await has(70, 'picasso_fren'));
+    assert.ok(!(await has(71, 'picasso_fren')), 'the guesser earns nothing');
+    await db.query("update games.rooms set mode = 'obrazek', turn_id = $1 where code = 'DRAWX'", [crypto.randomUUID()]);
+    assert.equal(await one('select count(*)::int as v from games.passport_drawings'), 10, 'Pepe Pictures is not Draw & Guess');
 
     // --- account deletion removes the new rows too
     await db.query('delete from auth.users where id = $1', [uid(3)]);

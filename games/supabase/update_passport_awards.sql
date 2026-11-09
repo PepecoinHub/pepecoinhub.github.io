@@ -114,7 +114,7 @@ begin
       'i_voted', 'yeet_adept', 'fud_buster', 'long_snake', 'secret_starter', 'treasure_hunter', 'podium', 'game_night',
       'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'season_champion', 'frog_of_the_week',
       'junior_editor', 'senior_editor', 'vox_populi', 'bali', 'pep_birthday', 'thanksgiving_fren',
-      'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'interior_designer') then
+      'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'interior_designer', 'picasso_fren') then
     raise exception 'Unknown passport stamp %', b;
   end if;
   if u is null or games.discord_identity(u) is null then return false; end if;
@@ -370,6 +370,49 @@ $$;
 drop trigger if exists passport_letter_ai on games.letters;
 create trigger passport_letter_ai after insert on games.letters
   for each row execute function games.passport_letter_after();
+
+-- ---------- Picasso Fren: other players guessed 10 of your drawings in Draw & Guess ----------
+-- Draw & Guess (rooms in mode 'kalambury') is run by the server: gry_guess() marks a correct guess by setting
+-- games.players.guessed_turn. A drawing counts once (per turn) when a different, verified (Discord) player
+-- guesses it, and the drawer is a Discord player too. Kept in its own table, so finished rooms can be deleted.
+create table if not exists games.passport_drawings (
+  turn_id    uuid primary key,
+  drawer_id  uuid not null references auth.users(id) on delete cascade,
+  guessed_at timestamptz not null default clock_timestamp()
+);
+create index if not exists passport_drawings_drawer on games.passport_drawings (drawer_id);
+alter table games.passport_drawings enable row level security;
+
+create or replace function games.passport_drawing_after()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare r record; n integer;
+begin
+  if new.guessed_turn is null or new.guessed_turn is not distinct from old.guessed_turn or not new.verified then return null; end if;
+  select x.mode, x.drawer_id, x.turn_id into r from games.rooms x where x.code = new.room_code;
+  if not found or r.mode <> 'kalambury' or r.drawer_id is null or r.drawer_id = new.user_id
+     or r.turn_id is distinct from new.guessed_turn or games.discord_identity(r.drawer_id) is null
+     or games.discord_identity(new.user_id) is null then
+    return null;
+  end if;
+  begin
+    insert into games.passport_drawings (turn_id, drawer_id) values (new.guessed_turn, r.drawer_id) on conflict (turn_id) do nothing;
+    select count(*) into n from games.passport_drawings d where d.drawer_id = r.drawer_id;
+    if n >= 10 then perform games.passport_award(r.drawer_id, 'picasso_fren'); end if;
+  exception when others then
+    raise warning 'passport drawing: %', sqlerrm;   -- never undoes the guess
+  end;
+  return null;
+end
+$$;
+revoke all on function games.passport_drawing_after() from public, anon, authenticated;
+do $$
+begin
+  if to_regclass('games.players') is not null then
+    drop trigger if exists passport_drawing_au on games.players;
+    create trigger passport_drawing_au after update of guessed_turn on games.players
+      for each row execute function games.passport_drawing_after();
+  end if;
+end $$;
 
 -- ---------- owner tools: "Printed" letters, BALI ----------
 -- Junior Editor (1), Senior Editor (5) and Vox Populi (10) count the letters the owner marked as printed

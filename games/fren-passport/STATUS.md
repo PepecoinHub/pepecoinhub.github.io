@@ -120,7 +120,8 @@ is checked against the site's style before it goes in (it tends to drift from th
    Hunter, Floppy Disk = Secret Starter; Pond Decorator = 3 earned decorations placed at once. Server side done
    (`update_pepegochi_rewards.sql`, run last). Item sprites in (#227, 2026-11-09). Decorate panel in PEPEGOCHI.EXE done (place, move, put away; the room picture
    follows the server room).
-5. Picasso Fren: Draw & Guess results on the server, then the stamp. The Secret Pond: its rule.
+5. ~~Picasso Fren~~ done: a drawing counts when another Discord player guesses it in Draw & Guess (server side,
+   `games.passport_drawings`); 10 drawings = the stamp. (The Secret Pond was dropped.)
 6. Beta Tester out of the album; the new-reward notice (Windows 98 style, impossible to miss).
 7. Release: PEP-TV ad, beta flags off, one SQL run order for the owner.
 

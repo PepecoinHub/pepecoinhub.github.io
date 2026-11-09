@@ -207,10 +207,9 @@
     {
       "id": "picasso_fren",
       "title": "Picasso Fren",
-      "description": "Other players guess 10 of your drawings in Draw & Guess.",
+      "description": "Other players guessed 10 of your drawings in Draw & Guess (Discord players, one per drawing).",
       "category": "arcade",
-      "status": "planned",
-      "teaser": true
+      "status": "live"
     },
     {
       "id": "podium",
