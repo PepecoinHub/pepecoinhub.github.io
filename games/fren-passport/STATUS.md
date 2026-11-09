@@ -73,8 +73,8 @@ Album: **shown** · **???** (teaser) · hidden.
 | 46 | `treasure_hunter` | Treasure Hunter | 6 secrets | shown | ✅ v3 |
 | 47 | `the_secret_pond` | The Secret Pond | no data yet | hidden | 🔁 in sprite, 300 px |
 | 48 | `frogmas` | Frogmas | a visit on 24–26 December | shown | ✅ v3 |
-| 49 | `pep_birthday` | Pepecoin's Birthday | a visit on 30 January (UTC 30–31); unlocks Birthday Fren | shown | ⬜ |
-| 50 | `thanksgiving_fren` | Thanksgiving | a visit on US Thanksgiving weekend; unlocks Turkey Fren | shown | ⬜ |
+| 49 | `pep_birthday` | Pepecoin's Birthday | a visit on 30 January (UTC 30–31); unlocks Birthday Fren | shown | ✅ v3 (avatar picture) |
+| 50 | `thanksgiving_fren` | Thanksgiving | a visit on US Thanksgiving weekend; unlocks Turkey Fren | shown | ✅ v3 (avatar picture) |
 | — | `bali` | BALI | the owner opens it when PEP hits $0.01; every fren gets it on the next visit | printed on the page | ✅ ticket + postmark |
 
 **Totals.** Rules: 40 + BALI. Art: 38 final (36 ✅ + the 2 🔁 already in the sprite) · 1 🔄 · 2 🚧 · 5 ⬜ · 2 ⬜ for later features = 48.
@@ -118,8 +118,8 @@ is checked against the site's style before it goes in (it tends to drift from th
 - PepeGochi sprite fixes from #228: `adult_hungry`, `adult_dirty`, `froglet_idle`, `adult_recovering`, the 6 moving-out
   frames (adult about 113 px tall, feet on one line, 2×2 pixel grid). Egg hatching frames.
 - Decorations: Paper Crown, Moon Rock, Golden Fly (pixel art, room style).
-- Stamps (cartoon, like the album; scene blocks in `GPT_MASTER_PROMPT.md`): Pepecoin's Birthday, Thanksgiving.
-  Done: Season Champion, Top 10, Bug Hunter, Podium, Game Night, Quiz Master, Frogmas, Treasure Hunter, Pond Decorator.
+- Stamps (cartoon, like the album; scene blocks in `GPT_MASTER_PROMPT.md`): none left.
+  Done: Pepecoin's Birthday and Thanksgiving (avatar pictures in a stamp frame), Season Champion, Top 10, Bug Hunter, Podium, Game Night, Quiz Master, Frogmas, Treasure Hunter, Pond Decorator.
 
 **Owner, launch day:** run the SQL in the order the release PR gives; the beta flags come off with the release.
 
