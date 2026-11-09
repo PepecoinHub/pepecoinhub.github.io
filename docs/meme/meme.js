@@ -2742,8 +2742,9 @@
       });
     });
   }
-  // payout lines for a Discord tip bot, e.g. "send 12.5 PEP to P..." (the weekly robot, scripts/wp_payouts.py, uses the same pattern)
-  var WP_PAYOUT_TEMPLATE = 'send {amount} PEP to {address}';
+  // payout lines for a Discord tip bot, e.g. "send 12.5 PEPE to P..." for Filippy
+  var WP_PAYOUT_TEMPLATE = 'send {amount} PEPE to {address}';   // Filippy's word for PEP
+  function wpTpl() { var t = ''; try { t = localStorage.getItem('wp-payout-template') || ''; } catch (e) {} return t || WP_PAYOUT_TEMPLATE; }
   function wpPayoutLines(sum, tpl) {
     tpl = tpl && tpl.indexOf('{address}') >= 0 && tpl.indexOf('{amount}') >= 0 ? tpl : WP_PAYOUT_TEMPLATE;
     return Object.keys(sum).map(function (a) {
@@ -3075,6 +3076,10 @@
           var st = d.settings;
           body.innerHTML = '<h4 class="wp-h">Open rewards: ' + open.length + ' claims, ' + Object.keys(sum).length + ' addresses, ' + total.toLocaleString('en-US') + ' PEP</h4>' +
             '<p class="wp-small">Budget left this week: <b>' + Number(d.budget_left).toLocaleString('en-US') + ' PEP</b>. ⚠ marks are worth a look before you pay; Hold keeps a reward out of the payout.</p>' +
+            (open.length ? '<h4 class="wp-h">Pay with the tip bot</h4><p class="wp-small">Tap <b>Copy</b>, paste it to the bot (e.g. Filippy in a DM), then tap <b>Paid</b>. One line per address.</p>' +
+              '<ol class="wp-bot">' + wpPayoutLines(sum, wpTpl()).map(function (l, i) { var a = Object.keys(sum)[i]; return '<li data-a="' + esc(a) + '"><code>' + esc(l) + '</code><button type="button" class="app-btn" data-copy>Copy</button><button type="button" class="app-btn" data-paid>Paid</button></li>'; }).join('') + '</ol>' +
+              '<details class="wp-tplbox"><summary class="wp-small">Bot command pattern</summary><div class="app-row"><input class="ac-in wp-tpl" type="text" spellcheck="false" aria-label="Bot command pattern"><button type="button" class="app-btn wp-tplsave">Save</button></div><p class="wp-small">{amount} and {address} are filled in.</p></details>' +
+              '<h4 class="wp-h">All open rewards</h4>' : '') +
             '<ol class="wp-claims">' + d.claims.map(function (c) {
               var fl = [];
               if (!c.verified) fl.push('guest');
@@ -3083,10 +3088,7 @@
               if (c.secs != null && c.secs < 5 && c.points > 4700) fl.push('⚠ ' + c.points + ' pts in ' + c.secs + ' s');
               return '<li data-id="' + c.id + '"><span>' + esc(c.nick) + (c.verified ? ' ✓' : '') + ' · #' + c.num + ' · ' + c.points + ' pts · <b>' + c.pep + ' PEP</b><br><code>' + esc(c.address) + '</code>' + (fl.length ? '<br><b class="bad">' + fl.join(' · ') + '</b>' : '') + '</span><button type="button" class="app-btn" data-hold="' + (c.status === 'held' ? 0 : 1) + '">' + (c.status === 'held' ? 'Release' : 'Hold') + '</button></li>'; }).join('') + '</ol>' +
             (open.length ? '<p class="wp-small">1. Send from your own wallet: in Pepecoin Core, the Send tab, one recipient per address (Add Recipient), the amounts from the list. Or in the console: <code>sendmany ""</code> followed by the list. 2. Check the total before you confirm. 3. Paste the transaction id here and mark the rewards as paid.</p>' +
-              '<h4 class="wp-h">For a Discord tip bot</h4><p class="wp-small">One line per address. Change the pattern to match your bot: {amount} and {address} are filled in.</p>' +
-              '<div class="app-row"><input class="ac-in wp-tpl" type="text" spellcheck="false" aria-label="Line pattern"><button type="button" class="app-btn wp-copybot">Copy for the bot</button></div>' +
-              '<textarea class="sc-in wp-bot" rows="5" readonly></textarea>' +
-              '<h4 class="wp-h">For Pepecoin Core (sendmany)</h4>' +
+              '<h4 class="wp-h">Or all at once from Pepecoin Core (sendmany)</h4>' +
               '<textarea class="sc-in wp-many" rows="3" readonly></textarea><div class="app-row"><button type="button" class="app-btn wp-copymany">Copy the list</button><input class="ac-in wp-txid" type="text" spellcheck="false" placeholder="Transaction id (64 characters)" aria-label="Transaction id"><button type="button" class="app-btn wp-paid">Mark as paid</button></div>' : '<p class="wp-small">Nothing to pay right now.</p>') +
             '<h4 class="wp-h">Settings</h4><form class="app-row wp-set"><label>PEP per 50 pts <input class="ac-in" name="a" type="number" step="0.01" min="0" value="' + st.per_50 + '"></label>' +
               '<label>Discord: max a day <input class="ac-in" name="b" type="number" min="0" value="' + st.max_day + '"></label><label>a week <input class="ac-in" name="c" type="number" min="0" value="' + st.max_week + '"></label>' +
@@ -3094,19 +3096,27 @@
               '<label>from streak day <input class="ac-in" name="g" type="number" min="1" max="30" value="' + st.guest_streak + '"></label>' +
               '<label>Budget for all, a week <input class="ac-in" name="h" type="number" min="0" value="' + st.week_budget + '"></label>' +
               '<label><input type="checkbox" name="d"' + (st.open ? ' checked' : '') + '> Rewards on</label><button type="submit" class="app-btn">Save</button></form>' +
-            (d.paid.length ? '<h4 class="wp-h">Last payouts</h4><ul class="wp-paidlist">' + d.paid.map(function (p) { return '<li>' + new Date(p.at).toLocaleDateString() + ' · ' + p.n + ' claims · ' + p.pep + ' PEP · <a href="https://pepeblocks.com/tx/' + esc(p.txid) + '" target="_blank" rel="noopener">' + esc(p.txid.slice(0, 12)) + '…</a></li>'; }).join('') + '</ul>' : '');
+            (d.paid.length ? '<h4 class="wp-h">Last payouts</h4><ul class="wp-paidlist">' + d.paid.map(function (p) { return '<li>' + new Date(p.at).toLocaleDateString() + ' · ' + p.n + ' claims · ' + p.pep + ' PEP · ' + (p.txid ? '<a href="https://pepeblocks.com/tx/' + esc(p.txid) + '" target="_blank" rel="noopener">' + esc(p.txid.slice(0, 12)) + '…</a>' : 'tip bot, all so far') + '</li>'; }).join('') + '</ul>' : '');
           var many = body.querySelector('.wp-many');
           if (many) {
             many.value = JSON.stringify(sum);
             var copyBox = function (box) { box.select(); if (navigator.clipboard) navigator.clipboard.writeText(box.value).then(function () { say('Copied.'); }, function () { say('Select the text and copy it.', true); }); };
             body.querySelector('.wp-copymany').addEventListener('click', function () { copyBox(many); });
-            var tpl = body.querySelector('.wp-tpl'), bot = body.querySelector('.wp-bot'), TPL_KEY = 'wp-payout-template';
-            try { tpl.value = localStorage.getItem(TPL_KEY) || ''; } catch (e) {}
-            if (!tpl.value) tpl.value = WP_PAYOUT_TEMPLATE;
-            var fillBot = function () { bot.value = wpPayoutLines(sum, tpl.value).join('\n'); };
-            tpl.addEventListener('input', function () { fillBot(); try { localStorage.setItem(TPL_KEY, tpl.value); } catch (e) {} });
-            fillBot();
-            body.querySelector('.wp-copybot').addEventListener('click', function () { copyBox(bot); });
+            var tpl = body.querySelector('.wp-tpl');
+            tpl.value = wpTpl();
+            body.querySelector('.wp-tplsave').addEventListener('click', function () { try { localStorage.setItem('wp-payout-template', tpl.value); } catch (e) {} payouts(); });
+            body.querySelectorAll('.wp-bot li').forEach(function (li) {
+              var line = li.querySelector('code').textContent, a = li.getAttribute('data-a');
+              li.querySelector('[data-copy]').addEventListener('click', function (ev) {
+                var b = ev.currentTarget, done = function () { b.textContent = 'Copied ✓'; li.classList.add('is-copied'); };
+                if (navigator.clipboard) navigator.clipboard.writeText(line).then(done, function () { say('Hold the line and copy it by hand.', true); });
+                else say('Hold the line and copy it by hand.', true);
+              });
+              li.querySelector('[data-paid]').addEventListener('click', function () {
+                var ids = open.filter(function (c) { return c.address === a; }).map(function (c) { return c.id; });
+                wpRpc('gry_wp_host_paid', { p_ids: ids, p_txid: '' }).then(function (n) { say(n + ' reward(s) marked as paid.'); payouts(); }, function (e) { say(e.message, true); });
+              });
+            });
             body.querySelector('.wp-paid').addEventListener('click', function () {
               var tx = body.querySelector('.wp-txid').value.trim();
               wpRpc('gry_wp_host_paid', { p_ids: open.map(function (c) { return c.id; }), p_txid: tx }).then(function (n) { say(n + ' claims marked as paid.'); payouts(); }, function (e) { say(e.message, true); });

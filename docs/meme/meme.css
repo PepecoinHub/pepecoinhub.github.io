@@ -1577,3 +1577,10 @@ footer.foot a { color: #edf3e3; }
 .bsod-c { text-align: center; }
 @media (prefers-reduced-motion: no-preference) { .bsod-cur { animation: bsodblink 1s steps(1) infinite; } }
 @keyframes bsodblink { 50% { opacity: 0; } }
+/* Pepe Guesser host: one tip-bot line per address, big buttons for phones */
+.wp-bot { margin: 0 0 8px; padding: 0; list-style: none; display: grid; gap: 6px; }
+.wp-bot li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: center; padding: 8px; background: #fff; color: #000; }
+.wp-bot code { font-size: 12px; word-break: break-all; user-select: all; -webkit-user-select: all; }
+.wp-bot .app-btn { min-height: 36px; }
+.wp-bot li.is-copied { background: #e6f4e6; }
+@media (max-width: 520px) { .wp-bot li { grid-template-columns: 1fr 1fr; } .wp-bot code { grid-column: 1 / -1; } }
