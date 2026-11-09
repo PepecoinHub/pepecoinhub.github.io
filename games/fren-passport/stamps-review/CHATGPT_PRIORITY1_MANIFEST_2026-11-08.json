@@ -198,5 +198,21 @@
     "height": 1341,
     "status": "owner-approved",
     "notes": "Forwarded by the owner, 2026-11-09."
+  },
+  {
+    "id": "pep_birthday",
+    "file": "games/fren-passport/source/stamps-new/pep_birthday.png",
+    "width": 1173,
+    "height": 1341,
+    "status": "owner-approved",
+    "notes": "Owner idea (2026-11-09): the special-avatar picture in a stamp frame. Built by Claude from the Treasure Hunter frame, Fredoka Bold label."
+  },
+  {
+    "id": "thanksgiving_fren",
+    "file": "games/fren-passport/source/stamps-new/thanksgiving_fren.png",
+    "width": 1173,
+    "height": 1341,
+    "status": "owner-approved",
+    "notes": "Owner idea (2026-11-09): the special-avatar picture in a stamp frame. Built by Claude from the Treasure Hunter frame, Fredoka Bold label."
   }
 ]
