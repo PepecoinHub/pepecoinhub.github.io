@@ -114,7 +114,8 @@ begin
       'i_voted', 'yeet_adept', 'fud_buster', 'long_snake', 'secret_starter', 'treasure_hunter', 'podium', 'game_night',
       'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'season_champion', 'frog_of_the_week',
       'junior_editor', 'senior_editor', 'vox_populi', 'bali', 'pep_birthday', 'thanksgiving_fren',
-      'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'interior_designer', 'picasso_fren') then
+      'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'interior_designer', 'picasso_fren',
+      'share_fren') then
     raise exception 'Unknown passport stamp %', b;
   end if;
   if u is null or games.discord_identity(u) is null then return false; end if;
@@ -484,6 +485,24 @@ end
 $$;
 revoke all on function public.gry_passport_bali(boolean) from public, anon;
 grant execute on function public.gry_passport_bali(boolean) to authenticated;
+
+-- Share Fren (owner, 2026-11-09): a Discord fren shares a Pepe Guesser result (Share…, Copy result or Post on X).
+-- The site cannot see the post itself, so the click is the claim. The server only checks what it can: the fren
+-- has finished at least one Pepe Guesser round with this account. Nothing else comes from the browser.
+create or replace function public.gry_passport_share()
+returns jsonb language plpgsql volatile security definer set search_path = '' as $$
+declare u uuid := auth.uid(); got boolean := false;
+begin
+  if u is null or games.discord_identity(u) is null then raise exception 'Log on with Discord to save stamps'; end if;
+  if exists (select 1 from games.wp_plays p where p.user_id = u and p.guessed_at is not null) then
+    got := games.passport_award(u, 'share_fren');
+  end if;
+  return jsonb_build_object('id', 'share_fren', 'new', got,
+    'earned', exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = 'share_fren'));
+end
+$$;
+revoke all on function public.gry_passport_share() from public, anon;
+grant execute on function public.gry_passport_share() to authenticated;
 
 -- The owner's mailbox: as update_letters_community.sql, plus each letter's "printed" mark, whether its
 -- how many of the writer's letters were printed, and whether BALI is open.

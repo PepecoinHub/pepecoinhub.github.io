@@ -27,6 +27,8 @@ V3 = [
     # redraws of Lily's stamps (owner, 2026-11-09)
     'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14', 'pepe_guesser', 'week_scout',
     'scout_fren', 'first_hatch', 'little_fren', 'grown_fren',
+    # owner, 2026-11-09
+    'share_fren',
 ]
 SMALL = set()   # every stamp has its full-size file now
 TILE = (138, 150)

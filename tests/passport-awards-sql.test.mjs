@@ -483,6 +483,13 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     await call(60, 'select public.gry_passport_bali(false) as v');
     assert.ok(await has(62, 'bali'), 'closing takes nothing back');
     await checkin(61); assert.ok(!(await has(61, 'bali')), 'closed again: no new awards');
+    // Share Fren: sharing a Pepe Guesser result, only after a finished round with this account
+    const share = u => call(u, 'select public.gry_passport_share() as v');
+    assert.deepEqual(await share(62), { id: 'share_fren', new: false, earned: false }, 'never played: nothing');
+    assert.deepEqual(await share(1), { id: 'share_fren', new: true, earned: true });
+    assert.deepEqual(await share(1), { id: 'share_fren', new: false, earned: true }, 'once');
+    await assert.rejects(share(4), /Log on with Discord/);
+    assert.equal((await db.query("select has_function_privilege('anon', 'public.gry_passport_share()', 'EXECUTE') as v")).rows[0].v, false);
     // the file runs again: the printed stamps stay, as their count still reaches them
     await db.query(awards);
     assert.ok(await has(61, 'senior_editor')); assert.ok(await has(62, 'bali'));

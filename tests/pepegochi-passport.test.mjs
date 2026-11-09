@@ -51,12 +51,15 @@ test('the hook replaces the A1 no-op exactly, and stays closed to the browser', 
   assert.match(code, /select games\.pepegochi_passport_sync\(x\.user_id\)\s+from \(select distinct user_id from games\.pepegochi_milestones where synced_at is null\) x;/);
 });
 
-test('the Passport rule holds: a planned stamp is never awardable, a live one always is', () => {
+// PepeGochi comes after the Passport (owner, 2026-11-09). Its stamps show as Coming soon in the Passport and stay
+// in passport_award()'s allowlist: only the PepeGochi SQL awards them, and it is installed on PepeGochi's own launch day,
+// when the catalog turns them live (games/LAUNCH_FREN_PASSPORT_PEPEGOCHI.md).
+test('PepeGochi stamps: in the catalog as Coming soon, accepted by passport_award() for the later launch', () => {
   for (const s of Object.values(MAP)) {
     const c = catalog.achievements.find(x => x.id === s);
     assert.ok(c, s + ' is in the Passport catalog');
     assert.equal(c.category, 'pepegachi');
-    if (c.status === 'live') assert.ok(allowlist.includes(s), s + ' is live: passport_award() must accept it (release PR)');
-    else assert.ok(!allowlist.includes(s), s + ' is planned: passport_award() must refuse it until the release PR');
+    assert.equal(c.status, 'planned', s + ' waits for PepeGochi');
+    assert.ok(allowlist.includes(s), s + ': passport_award() must accept it once the PepeGochi SQL runs');
   }
 });

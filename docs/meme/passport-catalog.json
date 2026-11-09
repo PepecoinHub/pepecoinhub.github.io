@@ -125,6 +125,13 @@
       "status": "live"
     },
     {
+      "id": "share_fren",
+      "title": "Share Fren",
+      "description": "Share a Pepe Guesser result: Share, Copy result or Post on X.",
+      "category": "where_pepe",
+      "status": "live"
+    },
+    {
       "id": "sharp_eye",
       "title": "Sharp Eye",
       "description": "Score a perfect 5000 in a daily Pepe Guesser hunt.",
@@ -280,35 +287,35 @@
       "title": "First Hatch",
       "description": "Hatch your first PepeGochi: adopt an egg and give it its first care.",
       "category": "pepegachi",
-      "status": "live"
+      "status": "planned"
     },
     {
       "id": "little_fren",
       "title": "Little Fren",
       "description": "Come back to your PepeGochi on a second day: it grows into a froglet.",
       "category": "pepegachi",
-      "status": "live"
+      "status": "planned"
     },
     {
       "id": "grown_fren",
       "title": "One Small Step",
       "description": "Your PepeGochi grows up on its 7th care day. One small step for a man, one giant leap for a frog.",
       "category": "pepegachi",
-      "status": "live"
+      "status": "planned"
     },
     {
       "id": "good_parent",
       "title": "Good Parent",
       "description": "Keep your PepeGochi well cared for on 30 days.",
       "category": "pepegachi",
-      "status": "live"
+      "status": "planned"
     },
     {
       "id": "interior_designer",
       "title": "Pond Decorator",
       "description": "Place 3 decorations you earned in your PepeGochi room at the same time.",
       "category": "pepegachi",
-      "status": "live"
+      "status": "planned"
     },
     {
       "id": "secret_starter",

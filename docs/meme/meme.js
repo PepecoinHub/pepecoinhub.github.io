@@ -1648,10 +1648,10 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261109sp';
+  var PP_CATALOG = 'passport-catalog.json?v=20261109share';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109skin'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109share'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1742,7 +1742,7 @@
     'season_champion', 'bug_hunter', 'podium', 'game_night', 'quiz_master', 'frogmas',
     'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren',
     'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14', 'pepe_guesser', 'week_scout',
-    'scout_fren', 'first_hatch', 'little_fren', 'grown_fren'];
+    'scout_fren', 'first_hatch', 'little_fren', 'grown_fren', 'share_fren'];
   function ppStamp(x, earned) {
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
     if (earned && PP_LILY.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-lily', PP_LILY, x.id);
@@ -1997,6 +1997,15 @@
           go.addEventListener('click', function () { pepegochiApp(); });
           gc.appendChild(go);
           panes[0].appendChild(gc);
+        } else {
+          // PepeGochi comes after the Passport (owner, 2026-11-09): its place in the Passport is kept
+          var gw = el('section', {class:'pp-panel pp-gochi is-soon'});
+          gw.appendChild(piece('h3','pp-panel-h','PepeGochi'));
+          var gr = el('div', {class:'pp-gochi-soon'});
+          gr.appendChild(el('img', {src: BASE + 'games/img/pepegochi/pepegochi_egg_idle.png', alt: '', width: '48', height: '48'}));
+          gr.appendChild(piece('p','', 'Coming soon: your own frog to hatch and look after. Its stamps will be in this Passport.'));
+          gw.appendChild(gr);
+          panes[0].appendChild(gw);
         }
 
         // Stamps: the album on passport paper. Tap a stamp to read how it is earned (no hover on phones).
@@ -2461,6 +2470,26 @@
           img: ico('gif-045-still'), go: av[id] ? 'Open Create Your Fren' : 'Open Fren Passport', open: av[id] ? avatarMaker : frenPassport });
       }
     },function(){ /* Migration may not be installed yet; retry on next discovery. */ });
+  }
+
+  // Share Fren: a Discord fren shares a Pepe Guesser result. The server checks a finished round and gives the stamp once.
+  function passportShare() {
+    if (!FREN) return;
+    var session = sbSession();
+    if (!session || !session.discord || !session.userId) return;
+    var k = 'pondos-passport-share-v1:' + session.userId;
+    try { if (localStorage.getItem(k) === '1') return; } catch (e) {}
+    frenRpc('gry_passport_share', {}).then(function (r) {
+      if (!r || !r.earned) return;
+      try { localStorage.setItem(k, '1'); } catch (e) {}
+      if (!r['new']) return;
+      if (passportCache && passportCache.userId === session.userId) passportCache = null;
+      fetch(PP_CATALOG).then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; }).then(function (c) {
+        var x = c && Array.isArray(c.achievements) ? c.achievements.filter(function (a) { return a.id === 'share_fren'; })[0] : null;
+        rewardNotice({ bar: 'Fren Passport - New Stamp', stamp: x || { id: 'share_fren', title: 'Share Fren' }, title: 'Share Fren',
+          text: 'Thanks for spreading the frog. It is in your Fren Passport now.' });
+      });
+    }, function () { /* the migration may not be installed yet */ });
   }
 
   function logOn() {
@@ -2941,11 +2970,11 @@
           '<div class="wp-reward"></div></div><div class="wp-board"></div></div>';
         main.querySelector('.wp-readme').addEventListener('click', wpReadme); wireHost();
         var txt = shareText(r);
-        // "Post on X" waits until X accepts links to pepecoinhub.com; then make it a link to https://x.com/intent/post?text=…
+        // "Post on X" waits until X accepts links to pepecoinhub.com; then make it a link to https://x.com/intent/post?text=… and call passportShare() on its click
         var shb = main.querySelector('.wp-share');
-        if (shb) shb.addEventListener('click', function () { navigator.share({ text: txt }).catch(function () {}); });
+        if (shb) shb.addEventListener('click', function () { navigator.share({ text: txt }).then(passportShare, function () {}); });
         main.querySelector('.wp-copy').addEventListener('click', function () {
-          var ok = function () { say('Copied. Paste it on Discord or X.'); };
+          var ok = function () { say('Copied. Paste it on Discord or X.'); passportShare(); };
           if (navigator.clipboard) navigator.clipboard.writeText(txt).then(ok, function () { say('Copy blocked by the browser.', true); }); else say('Copy blocked by the browser.', true);
         });
         loadLeaflet().then(function () {

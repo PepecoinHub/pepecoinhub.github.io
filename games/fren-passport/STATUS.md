@@ -164,3 +164,12 @@ tab (where Achievements used to be) lists all of them with how each one opens (s
 Live secrets: 11 (Wrong Frog, Why Do You Need This?, The Magic Word, Blue Screen of Fren, Midnight Fren, Nerds Only,
 Bali Dreamer, Happy Fren, Born to Fren, Looking Glass, Trust But Verify). The two event days are listed with the secrets
 but are not "found": they do not count for Secret Starter or Treasure Hunter.
+
+## 2026-11-09 (later): Share Fren, PepeGochi waits
+
+- Share Fren stamp (owner's art): a Discord fren clicks Share…, Copy result (or, once enabled, Post on X) on a Pepe Guesser
+  result. `public.gry_passport_share()` takes no arguments and only gives the stamp after a finished Guesser round on that account.
+- PepeGochi launches after the Passport. Its five stamps are "Coming soon" in the catalog (still accepted by
+  `passport_award()` for when the PepeGochi SQL runs). The Overview keeps a PepeGochi card that says Coming soon.
+  PepeGochi launch day: run the PepeGochi SQL files, turn the five stamps `live`, remove the `?beta=gochi` gate.
+- Every Passport tab uses one skin: passport paper, burgundy edge, navy plaque titles.
