@@ -13,8 +13,8 @@ from PIL import Image, ImageSequence
 SRC = Path(sys.argv[1]); OUT = Path(__file__).resolve().parent.parent / 'docs/meme/emotes'
 OUT.mkdir(parents=True, exist_ok=True)
 # names our chat filter would mask or punish (games.badwords / blocked_terms), or that do not fit a public chat
-RENAME = {'pepe lets fucking go lfg': 'pepe lfg'}
-SKIP = {'pepe retard', 'pepe feels ahegao man'}
+RENAME = {'pepe lets fucking go lfg': 'pepe lfg', 'pepe retard': 'pepe rtd'}
+SKIP = {'pepe feels ahegao man'}
 FAM = {'1': 'pepe', '2': 'apu', '3': 'peepo', '4': 'pepega', '5': 'pepega'}
 
 def code_of(name):
