@@ -100,9 +100,9 @@ export function howToPlay() {
     h('ol', {},
       h('li', {}, 'Start a party (or join one) and press Invite to copy the link for your frens. Up to 12 players.'),
       h('li', {}, 'The room moderator presses Start. Everyone takes turns drawing a secret word.'),
-      h('li', {}, 'Guess by typing in the chat. A correct guess is 20 to 100 points: the faster, the more. The first three get a bonus (+15, +8, +4).'),
-      h('li', {}, 'The artist gets 10 points for every fren who guesses the word.'),
-      h('li', {}, 'Letters of the word appear after 40%, 60% and 80% of the time. The turn ends when everyone got it or the time is up.'),
+      h('li', {}, 'First come, first served: only the first fren who types the word in the chat scores, and the turn ends right there.'),
+      h('li', {}, 'The winner gets 50 to 100 points and the artist 25 to 50: the faster the word falls, the more for both.'),
+      h('li', {}, 'Nobody gets it in time: no points for anyone. Letters of the word appear after 40%, 60% and 80% of the time.'),
       h('li', {}, 'No letters or words on the drawing, fren.')),
     h('p', { class: 'small' }, 'Just for fun: scores last only for the current game. ', h('a', { href: 'rules.html', target: '_blank', rel: 'noopener' }, 'Full rules')));
 }

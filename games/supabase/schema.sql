@@ -31,7 +31,7 @@ alter table games.config add column if not exists empty_room_minutes int not nul
 alter table games.config add column if not exists picture_max_seconds int not null default 120;
 alter table games.config add column if not exists picture_scorers int not null default 3;
 -- Draw & Guess: anti-spam, min. odstęp (s) między kolejnymi wiadomościami/odpowiedziami jednego gracza (0 = wyłączone)
-alter table games.config add column if not exists dg_message_cooldown_seconds int not null default 5;
+alter table games.config add column if not exists dg_message_cooldown_seconds int not null default 2;
 -- ostatnie sprzątanie pokoi (games.cleanup biegnie najwyżej raz na 30 s)
 alter table games.config add column if not exists cleanup_at timestamptz;
 
@@ -943,23 +943,15 @@ begin
       return jsonb_build_object('ok', true, 'correct', true, 'points', pts, 'place', rnk);
     end if;
     if is_guesser and k = any(s.keys) then
+      -- PEPaint (Draw & Guess): first come, first served. The first correct guess ends the turn.
+      -- The guesser gets 50 to 100 points and the artist 25 to 50, both by how much time was left.
       remaining := least(r.turn_seconds, greatest(0, extract(epoch from r.turn_ends_at - now())));
-      select count(*) + 1 into rnk from games.players where room_code = r.code and guessed_turn = r.turn_id;
-      pts := 20 + ceil(80 * remaining / greatest(1, r.turn_seconds))::int
-             + case rnk when 1 then 15 when 2 then 8 when 3 then 4 else 0 end;
+      pts := 50 + ceil(50 * remaining / greatest(1, r.turn_seconds))::int;
+      rnk := 25 + ceil(25 * remaining / greatest(1, r.turn_seconds))::int;   -- the artist's share
       update games.players set score = score + pts, guessed_turn = r.turn_id where room_code = r.code and user_id = u;
-      if r.mode = 'kalambury' then
-        update games.players set score = score + 10 where room_code = r.code and user_id = r.drawer_id;
-      end if;
-      perform games.sys(r.code, me.nick || ' guessed it! (+' || pts || ')', 'correct');
-      select count(*) filter (where p.guessed_turn = r.turn_id), count(*) into done, eligible
-        from games.players p where p.room_code = r.code and games.active(p)
-         and not ((r.mode = 'kalambury' and p.user_id = r.drawer_id) or (r.mode = 'obrazek' and p.is_host));
-      if done >= eligible then
-        perform games.end_turn(r.code, 'Everyone guessed it!');
-      else
-        perform games.notify(r.code, 'state');
-      end if;
+      update games.players set score = score + rnk where room_code = r.code and user_id = r.drawer_id;
+      perform games.sys(r.code, me.nick || ' got it first! (+' || pts || ', artist +' || rnk || ')', 'correct');
+      perform games.end_turn(r.code);
       return jsonb_build_object('ok', true, 'correct', true, 'points', pts);
     end if;
     if is_guesser and s.keys is not null and char_length(k) >= 4

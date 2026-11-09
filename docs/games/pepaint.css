@@ -225,3 +225,4 @@ html.paint .overlay { border-radius: 0; }
   html.paint .stage-top .word { font-size: 1.2rem; }
   html.paint .stage-top { padding: 4px 8px; }
 }
+html.paint .overlay .first-line { margin-top: 10px; font-size: 1.15rem; font-weight: 700; }

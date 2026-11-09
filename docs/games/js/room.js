@@ -239,7 +239,7 @@ function frogMedia() {
 }
 function renderOverlay(force) {
   const o = $('#overlay'), r = S.room, view = overlayView();
-  const sig = [view, r.turn_id, r.phase === 'lobby' ? S.players.length : '', r.phase === 'finished' ? JSON.stringify(S.results) : '',
+  const sig = [view, r.turn_id, r.phase === 'reveal' ? (S.messages || []).length : '', r.phase === 'lobby' ? S.players.length : '', r.phase === 'finished' ? JSON.stringify(S.results) : '',
     JSON.stringify(S.next || null), r.last_answer, isRoomHost(), r.final_turn, r.last_mult, r.scorers, r.phase === 'reveal' ? JSON.stringify(S.podium || []) : ''].join('|');
   if (!force && sig === overlaySig) return;
   frogWasOn = !!frogVideo?.isConnected;
@@ -265,7 +265,7 @@ function renderOverlay(force) {
       h('div', { class: 'small', style: 'opacity:.8;margin-top:6px' }, 'The word was ', h('b', {}, r.last_answer || '?'), ' · ', h('span', { id: 'nextin' }, ''))));
   } else if (view === 'reveal') {
     o.append(h('div', {}, h('div', {}, r.mode === 'kalambury' ? 'The word was:' : 'The answer was:'), h('div', { class: 'ans' }, r.last_answer || '?'),
-      r.mode === 'obrazek' ? winnersBlock() : null));
+      r.mode === 'obrazek' ? winnersBlock() : h('div', { class: 'first-line' }, firstLine())));
     if (r.mode === 'obrazek') { o.classList.add('reveal-bar'); if (S.podium?.length) o.classList.add('party'); }
   } else if (view === 'waiting' && !isImgHost()) {
     o.classList.add('intermission-ov');
@@ -282,6 +282,15 @@ function renderOverlay(force) {
   } else show = false;
   o.classList.toggle('hidden', !show);
   updateNextIn();
+}
+// PEPaint is "first come, first served": who got the word first in the turn that just ended (from the chat log),
+// or that nobody did
+function firstLine() {
+  const ms = S.messages || [];
+  let i = ms.length - 1;
+  while (i >= 0 && !(ms[i].kind === 'system' && / is drawing now$/.test(ms[i].body || ''))) i--;
+  const win = ms.slice(i + 1).find((m) => m.kind === 'correct');
+  return win ? '🏆 ' + win.body : 'Nobody got it in time. No points this turn.';
 }
 const MEDALS = { 1: '🥇', 2: '🥈', 3: '🥉' }, WIN_MEME = { 1: 'pep', 2: 'ready', 3: 'peek' };
 function winnersBlock() {
@@ -517,8 +526,8 @@ function paintStatus() {
   ptStatus.set(1, `Room ${code} · ${S.players.length} player${S.players.length === 1 ? '' : 's'}`);
   if (r.phase === 'lobby') ptHint(isRoomHost() ? 'You are the moderator: press Invite to copy the link, then Start when your frens are in.' : 'Waiting for the moderator to press Start.');
   else if (r.phase === 'turn' && isDrawer()) ptHint('Your turn! Draw: ' + S.secret + '. Keys: B P E I, 1-4, Ctrl+Z.');
-  else if (r.phase === 'turn') ptHint(S.me.guessed ? 'You got it! Chat with the others who guessed.' : `${drawer?.nick || 'A fren'} is drawing. Type your guess in the chat.`);
-  else if (r.phase === 'reveal') ptHint('The word was: ' + (r.last_answer || '?'));
+  else if (r.phase === 'turn') ptHint(`${drawer?.nick || 'A fren'} is drawing. Be the first to type the word in the chat!`);
+  else if (r.phase === 'reveal') ptHint('The word was: ' + (r.last_answer || '?') + '. ' + firstLine());
   else if (r.phase === 'finished') ptHint('Game over! ' + (isRoomHost() ? 'Press Play again for another game.' : 'The moderator can start another game.'));
   else ptHint('');
 }
