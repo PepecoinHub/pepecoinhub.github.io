@@ -53,15 +53,16 @@ export const FOOT_Y = 124;         // the art pack's foot line
 // where the frog stands: on the rug, in front of the bed (room pixels, its feet)
 export const HOME = { x: 320, y: 372 };
 // sprite -> [top, bottom] of its visible pixels (the bounding boxes in the art manifest). The top puts the
-// bubble above the head. The bottom is where it touches the floor: 124 for all but the older froglet
-// (121), so the froglet is moved down 3 px instead of floating. Only moved, never resized.
+// bubble above the head. The bottom is where it touches the floor: 124 for every sprite since the
+// sprite pack of 2026-11-09 (#227). Only moved, never resized.
 export const SPRITES = {
-  egg_idle: [42, 124], tadpole_idle: [50, 124], froglet_idle: [7, 121],
-  adult_idle: [9, 124], adult_hungry: [9, 124], adult_dirty: [9, 124], adult_moody: [9, 124], adult_tired: [9, 124],
-  adult_neglected: [9, 124], adult_recovering: [9, 124], adult_packing: [9, 124],
+  egg_idle: [42, 124], tadpole_idle: [50, 124], froglet_idle: [30, 124],
+  adult_idle: [9, 124], adult_hungry: [8, 124], adult_dirty: [8, 124], adult_moody: [9, 124], adult_tired: [9, 124],
+  adult_neglected: [9, 124], adult_recovering: [8, 124], adult_packing: [9, 124],
+  hatch_01: [42, 124], hatch_02: [42, 124], hatch_03: [20, 124],
 };
-// the moving-out frames touch the floor higher up (y 118-120), see departTimeline
-export const DEPART_FOOT = [118, 118, 119, 119, 120, 120];
+// the moving-out frames (sprite pack 2026-11-09) stand on the same floor line as the frog
+export const DEPART_FOOT = [124, 124, 124, 124, 124, 124];
 export const spriteSrc = id => IMG + 'pepegochi_' + id + '.png';
 export const FROG = spriteSrc('adult_idle');
 

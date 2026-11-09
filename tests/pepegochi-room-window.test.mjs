@@ -52,9 +52,9 @@ test('the frog: one scale for every stage, standing on its feet at the same spot
   // feet: the art pack's line, except the older froglet, which is moved down instead of floating
   for (const [id, [top, foot]] of Object.entries(SPRITES)) {
     assert.ok(top < foot, id);
-    assert.equal(foot, id === 'froglet_idle' ? 121 : FOOT_Y, id);
+    assert.equal(foot, FOOT_Y, id);
   }
-  assert.equal(roomScene({ stage: 'froglet' }).frog.foot, 121);
+  assert.equal(roomScene({ stage: 'froglet' }).frog.foot, FOOT_Y);
   // the bubble sits above the head of the sprite that is shown
   const b = roomScene({ status: 'packing' }).frog;
   assert.equal(b.bubbleTop, (HOME.y - (124 - 9) - 6) / ROOM_H * 100);

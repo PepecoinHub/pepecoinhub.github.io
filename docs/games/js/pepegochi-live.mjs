@@ -79,6 +79,16 @@ function renderDeparted(box, v) {
 }
 
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const HATCH = [1, 2, 3].map(n => 'img/pepegochi/pepegochi_hatch_0' + n + '.png');
+function playHatch(room) {
+  const img = [...room.querySelectorAll('img')].find(i => /pepegochi_tadpole_idle/.test(i.getAttribute('src') || ''));
+  if (!img) return null;
+  const final = img.getAttribute('src'), timers = [];
+  HATCH.forEach((src, k) => timers.push(setTimeout(() => img.setAttribute('src', src), k * 450)));
+  timers.push(setTimeout(() => img.setAttribute('src', final), HATCH.length * 450));
+  img.setAttribute('src', HATCH[0]);
+  return () => { timers.forEach(clearTimeout); img.setAttribute('src', final); };
+}
 let shown = null, stopAnim = null, preloaded = false;
 function renderScene(v) {
   if (stopAnim) { stopAnim(); stopAnim = null; }
@@ -94,6 +104,8 @@ function renderScene(v) {
   } else { title.textContent = 'Your room'; room = renderRoom(document, { mode: 'adopt' }); }
   scene.replaceChildren(room);
   if (v.mode === 'departed' && shown && shown.mode === 'pet' && !reduceMotion()) stopAnim = playDeparture(room, shown.stage);
+  // the egg hatches: three cracking frames, then the tadpole (sprite pack 2026-11-09)
+  if (v.mode === 'pet' && v.pet.stage === 'tadpole' && shown && shown.stage === 'egg' && !reduceMotion()) stopAnim = playHatch(room);
   shown = { mode: v.mode, stage: v.pet?.stage };
 }
 
