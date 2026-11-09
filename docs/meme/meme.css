@@ -1601,3 +1601,22 @@ footer.foot a { color: #edf3e3; }
 .gz-letter-ok { display: inline-block; margin-left: 6px; padding: 1px 8px; background: #e3f1dc; color: #2c5e22; font-size: 13px; }
 .gz-letter blockquote { margin: 0 0 6px; font-size: 16px; }
 .gz-letter figcaption { color: #8aa38a; font-size: 13px; }
+/* ---------- PondOS home ("Internet"): first screen ---------- */
+.pondos .hero { align-items: start; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); gap: 28px; padding-block: 26px 22px; }
+.pondos .hero-copy { gap: 14px; }
+.pondos .hero h1 { font-size: clamp(1.9rem, 3.3vw, 2.7rem); line-height: 1.08; margin: 0; }
+.pondos .hero .lede { margin: 0; }
+.pondos .hero .strip { grid-template-columns: 1fr; gap: 10px; }
+.pondos .hero .strip .p2 { display: none; }
+.pondos .hero .today-pond { margin: 0; }
+.pond-do { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 6px; padding: 10px; background: var(--chrome); box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px -1px 0 var(--chrome-lo); font: 400 12px/1.3 var(--f-chrome); }
+.pond-do p { grid-column: 1 / -1; margin: 0 0 2px; font-weight: 700; }
+.pd-door { display: flex; align-items: center; gap: 9px; min-height: 52px; padding: 6px 9px; border: 0; text-align: left; color: inherit; font: inherit; background: var(--chrome); box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px -1px 0 var(--chrome-lo), 0 0 0 1px var(--chrome-dk); cursor: pointer; }
+.pd-door:hover, .pd-door:focus-visible { background: color-mix(in srgb, #ffcc37 22%, var(--chrome)); }
+.pd-door:active { box-shadow: inset -1px -1px 0 var(--chrome-hi), inset 1px 1px 0 var(--chrome-lo); }
+.pd-door img { flex: none; width: 36px; height: 36px; object-fit: cover; border-radius: 3px; }
+.pd-door span { display: grid; min-width: 0; }
+.pd-door b { font-size: 13px; }
+.pd-door small { font-size: 11.5px; opacity: .8; }
+@media (max-width: 900px) { .pondos .hero { grid-template-columns: 1fr; } .pondos .hero .strip { max-width: 300px; justify-self: center; } }
+@media (max-width: 560px) { .pond-do { grid-template-columns: 1fr 1fr; } .pd-door small { display: none; } }
