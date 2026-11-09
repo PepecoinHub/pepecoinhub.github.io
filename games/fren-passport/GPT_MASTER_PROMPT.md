@@ -133,7 +133,7 @@ on the lower steps. No numbers on the podium. Warm yellow background.
 **`game_night`, label `Game Night`.**
 ```
 Pepe on a sofa at night with a bowl of popcorn, looking at a big Win98-style CRT monitor that shows a framed
-picture with a big question mark, a crescent moon in the window behind. Dark purple night background.
+picture of a half-hidden frog to guess, a crescent moon in the window behind. Dark purple night background.
 ```
 
 **`quiz_master`, label `Quiz Master`.**
