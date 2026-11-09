@@ -260,3 +260,10 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
 .pp-av.is-worn { border-color: #2f8f2a; box-shadow: 0 0 0 2px #7bd36f inset; }
 .pp-av-btn { margin-top: 2px; padding: 2px 10px; font-size: 11px; }
 .pp-avatars .pp-muted { color: #d6e8d0; }
+
+/* Overview: the PepeGochi card */
+.pp-gochi { padding: 0 8px 10px; display: grid; gap: 4px; justify-items: start; }
+.pp-gochi p { margin: 0; }
+.pp-gochi-name { font-weight: 700; text-transform: none; }
+.pp-gochi-warn { color: #ffd166; font-weight: 700; }
+.pp-gochi .pp-muted { color: #cfe3cf; }

@@ -1651,7 +1651,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261109sp';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109fin'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109gc'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1968,6 +1968,36 @@
         }
         recent.appendChild(rl);
         panes[0].appendChild(recent);
+
+        // PepeGochi: the frog's card (read-only gry_pepegochi_state, once per Passport window)
+        if (GOCHI) {
+          var gc = el('section', {class:'pp-panel pp-gochi'});
+          gc.appendChild(piece('h3','pp-panel-h','PepeGochi'));
+          var gs = A.gochi;
+          if (gs === undefined) {
+            A.gochi = null;
+            rpc('gry_pepegochi_state', {}).then(function (r) { A.gochi = r || false; if (A.render) A.render(); },
+              function () { A.gochi = false; if (A.render) A.render(); });
+            gc.appendChild(piece('p','pp-muted','Looking for your frog…'));
+          } else if (!gs) {
+            gc.appendChild(piece('p','pp-muted','Your frog could not be loaded right now.'));
+          } else {
+            var gp = gs.pet, gsum = gs.summary || {};
+            if (!gp) gc.appendChild(piece('p','', 'No frog yet. Adopt an egg in PEPEGOCHI.EXE: its first care hatches it (First Hatch).'));
+            else if (gp.status === 'departed') gc.appendChild(piece('p','', gp.name + ' moved out. GOODBYE.TXT is waiting for you in PEPEGOCHI.EXE.'));
+            else {
+              gc.appendChild(piece('p','pp-gochi-name', gp.name + ' · ' + gp.stage + ' · day ' + gp.life_day + (gp.generation > 1 ? ' · fren #' + gp.generation : '')));
+              var gmood = { healthy:'Doing fine.', neglected:'Misses you: something is overdue.', packing:'Packing a tiny suitcase. Go now!', recovering:'Still upset. Come back on another day.' };
+              gc.appendChild(piece('p', gp.status === 'packing' ? 'pp-gochi-warn' : '', gmood[gp.status] || gp.status));
+              gc.appendChild(piece('p','pp-muted','Care days: ' + gp.care_days + ' · Good care days: ' + gp.good_days + ' / ' + (gp.good_days_goal || 30) + ' for Good Parent'));
+            }
+            if (gsum.former_frens) gc.appendChild(piece('p','pp-muted','Former frens: ' + gsum.former_frens + ' · Longest friendship: ' + gsum.longest_friendship_days + ' days'));
+          }
+          var go = el('button', {type:'button',class:'app-btn'}); go.textContent = 'Open PEPEGOCHI.EXE';
+          go.addEventListener('click', function () { pepegochiApp(); });
+          gc.appendChild(go);
+          panes[0].appendChild(gc);
+        }
 
         // Stamps: the album on passport paper. Tap a stamp to read how it is earned (no hover on phones).
         var sheet = el('div', {class:'pp-sheet'});
