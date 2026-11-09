@@ -61,7 +61,7 @@
   ];
   // PondOS "app" name and icon for each meme page
   var APP = {
-    index: ['PEP.exe', 'pep-logo'], 'which-pepecoin': ['WhichFrog.exe', 'glasses'], compare: ['PepVsDoge.exe', 'pepe-doge'],
+    index: ['Internet', 'internet'], 'which-pepecoin': ['WhichFrog.exe', 'glasses'], compare: ['PepVsDoge.exe', 'pepe-doge'],
     'scrypt-family': ['ScryptFamily.exe', 'peaky'], mica: ['MiCA.pdf', 'serious'], glossary: ['Glossary.hlp', 'brain'],
     buy: ['BuyPEP.exe', 'wrongpep'], wallets: ['Wallets.exe', 'zipper'], mining: ['Miner.exe', 'pickaxe'],
     price: ['Price.exe', 'charts'], calculator: ['WhatIf.exe', 'p-eyes-still'], 'rich-list': ['WhaleWatch.exe', 'detective'],
@@ -194,11 +194,10 @@
       g.appendChild(b); g.appendChild(sub);
       return g;
     };
-    smMain.appendChild(el('a', { class: 'sm-item', href: './' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>My Pond</b></span>'));
     var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="' + ico('pep-logo') + '" alt="" width="28" height="28" loading="lazy"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
     meItem.addEventListener('click', function () { setOpen(false); logOn(); });
     smMain.appendChild(meItem);
-    var passportItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>Fren Passport</b><small>My Fren, achievements and secrets</small></span>');
+    var passportItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('passport') + '" alt="" width="28" height="28"><span><b>Fren Passport</b> <small>My Fren, achievements and secrets</small></span>');
     passportItem.addEventListener('click', function () { setOpen(false); frenPassport(); });
     if (FREN) smMain.appendChild(passportItem);
     var findItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('search') + '" alt="" width="28" height="28"><span><b>Find…</b> <small>games, pages, tools</small></span>');
@@ -227,22 +226,19 @@
       gl.appendChild(b);
     });
     smMain.appendChild(subGroup('Games', 'gif-061-still', gl));
-    smMain.appendChild(el('hr'));
     var winsUl = el('ul', { class: 'sm-wins' });
-    smMain.appendChild(subGroup('Windows on this page', 'gif-045-still', winsUl, 'sm-windows'));
+    var winsGroup = subGroup('Windows on this page', 'gif-045-still', winsUl, 'sm-windows');
     var arrange = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">▦</span><span>Arrange windows</span>');
     var sd = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">⏻</span><span>Shut down…</span>');
     arrange.addEventListener('click', function () { setOpen(false); arrangeAll(); });
     sd.addEventListener('click', function () { setOpen(false); shutDown(); });
-    smMain.appendChild(el('a', { class: 'sm-item', href: serious }, '<img src="' + ico('serious') + '" alt="" width="28" height="28" loading="lazy"><span>Serious mode</span>'));
-    var lanItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('gif-080-still') + '" alt="" width="28" height="28" loading="lazy"><span>LAN Party chat</span>');
-    lanItem.addEventListener('click', function () { setOpen(false); lanParty(); });
-    smMain.appendChild(lanItem);
     [['Frog Mail', 'frog-mail', function () { frogMail(); }], ['AddressCheck.exe', 'pepe-search', function () { addressCheck(); }]].forEach(function (x) {
       var it = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico(x[1]) + '" alt="" width="28" height="28"><span>' + x[0] + (x[0] === 'Frog Mail' ? ' <b class="mail-new sm-new" hidden>1 new</b>' : '') + '</span>');
       it.addEventListener('click', function () { setOpen(false); x[2](); });
       smMain.appendChild(it);
     });
+    smMain.appendChild(el('hr'));
+    smMain.appendChild(winsGroup);
     var themeItem = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">🌓</span><span>Day / night mode</span>');
     themeItem.addEventListener('click', function () { setOpen(false); if (themeBtn) themeBtn.click(); });
     smMain.appendChild(themeItem);
@@ -418,7 +414,7 @@
   };
   function winTitle(host, body) {
     var app = (APP[PAGE] || ['PEP.exe'])[0], lab = host.getAttribute('aria-labelledby') || '';
-    if (body.classList.contains('hero')) return 'PEP.exe - Pepecoin (PEP), meme edition';
+    if (body.classList.contains('hero')) return 'Internet - Pepecoin Hub, meme edition';
     if (body.classList.contains('pagehead')) { var h1 = body.querySelector('h1'); return app + ' - ' + (h1 ? h1.textContent.replace(/\s+/g, ' ').trim().split(/[.?:!]/)[0] : 'Pepecoin'); }
     if (body.classList.contains('chooser')) return 'Choose your frog';
     if (body.classList.contains('loading')) return 'Loading…';
@@ -529,7 +525,7 @@
     var title = opts.title || winTitle(host, body);
     // the window's icon is its first picture, so the taskbar buttons are told apart at a glance
     var pic = body.querySelector('img:not([src$=".svg"])');
-    var iconSrc = opts.icon ? ico(opts.icon) : body.classList.contains('hero') ? 'img/pep-logo.webp' : pic ? icoFrom(pic.getAttribute('src')) : ico((APP[PAGE] || ['', 'pep-logo'])[1]);
+    var iconSrc = opts.icon ? ico(opts.icon) : body.classList.contains('hero') ? ico('internet') : pic ? icoFrom(pic.getAttribute('src')) : ico((APP[PAGE] || ['', 'pep-logo'])[1]);
     host.classList.add('wide'); // every window takes the full width: the pages' inner layouts need it
     var win = el('div', { class: 'win' });
     var bar = el('div', { class: 'win-bar' }, '<img src="' + iconSrc + '" alt="" width="16" height="16" loading="lazy"><span class="win-t">' + esc(title) + '</span>' +
@@ -703,7 +699,7 @@
       var hero = null;
       wins.forEach(function (w) { if (w.body.classList.contains('hero')) hero = w; });
       if (hero) {
-        var row = el('div', { class: 'win-launch' }, '<p>Explore the pond, open a window:</p>');
+        var row = el('div', { class: 'win-launch' }, '<p>Looking for facts? Open a window:</p>');
         wins.forEach(function (w) {
           if (w === hero || w.body.classList.contains('chooser')) return;
           w.host.classList.remove('is-min'); w.state = 'closed'; w.host.classList.add('is-closed'); sync(w);
@@ -711,7 +707,7 @@
           b.addEventListener('click', function () { setState(w, 'open'); });
           row.appendChild(b);
         });
-        var ctas = hero.body.querySelector('.ctas');
+        var ctas = hero.body.querySelector('.pond-do') || hero.body.querySelector('.ctas');
         if (ctas) ctas.parentNode.insertBefore(row, ctas.nextSibling); else hero.win.insertBefore(row, hero.status || null);
       }
     }
@@ -1048,6 +1044,19 @@
       '<button type="button" class="btn go tp-play">Play today\u2019s photo \u2192</button>');
     ctas.parentNode.insertBefore(card, ctas.nextSibling);
     card.querySelector('.tp-play').addEventListener('click', function () { wheresPepe(); });
+    // "Click around": the pond is more than one page. Five big doors right under today's game.
+    var doors = el('div', { class: 'pond-do', role: 'group', 'aria-label': 'Things to do in the pond' }, '<p>Click, check, search. It is a whole pond in here:</p>');
+    [['newspaper-still', 'Read the Gazette', 'The pond\u2019s own newspaper', function () { frogMail('gz'); }],
+      ['gif-080-still', 'Drop by the LAN Party', 'Say gm in the chat', function () { lanParty(); }],
+      ['games-folder', 'Play something', 'Snake, Chess, YEET and more', function () { gamesFolder(); }],
+      ['pepe-search', 'Check an address', 'PEP or the wrong frog?', function () { addressCheck(); }],
+      ['leaders', 'See the LEADERS', 'Every top 10 in one place', function () { highScores(); }],
+      ['search', 'Find anything', 'Games, pages, tools', function () { finder(); }]].forEach(function (d) {
+      var b = el('button', { type: 'button', class: 'pd-door' }, '<img src="' + ico(d[0]) + '" alt="" width="36" height="36" loading="lazy"><span><b>' + d[1] + '</b><small>' + d[2] + '</small></span>');
+      b.addEventListener('click', d[3]);
+      doors.appendChild(b);
+    });
+    card.parentNode.insertBefore(doors, card.nextSibling);
     var stats = card.querySelector('.tp-stats'), bits = [];
     var paint = function () { stats.textContent = bits.filter(Boolean).join(' \u00b7 '); };
     setTimeout(function () {   // after the rest of this file has set up the Supabase address
