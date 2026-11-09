@@ -281,8 +281,7 @@
       "title": "Beta Tester",
       "description": "Play an online FROGAGEDDON match during the beta.",
       "category": "arcade",
-      "status": "planned",
-      "teaser": true
+      "status": "planned"
     },
     {
       "id": "first_hatch",
