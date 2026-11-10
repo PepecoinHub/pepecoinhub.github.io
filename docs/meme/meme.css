@@ -1271,6 +1271,7 @@ footer.foot a { color: #edf3e3; }
 .wp-top10 { margin: 0; padding: 6px 8px 6px 28px; background: #fff; color: #000; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
 .wp-top10 li { padding: 2px 0; }
 .wp-top10 li > b { float: right; font-variant-numeric: tabular-nums; }
+.wp-hidden { color: #6b6b6b; font-size: 11px; font-style: italic; }
 .wp-queue, .wp-claims, .wp-paidlist { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
 .wp-queue li, .wp-claims li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 8px; background: #fff; color: #000; }
 .wp-claims li { grid-template-columns: minmax(0, 1fr) auto; }
