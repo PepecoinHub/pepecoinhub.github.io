@@ -18,6 +18,17 @@ Last update: 2026-11-09, Claude. Update this file in every Passport PR.
 | Special avatars | 16, each behind a secret, a stamp or an event day. Own **Avatars** tab in the Passport (section 5). |
 | Art | 38 of 48 final (24 v3 in the album sprite + 14 Lily). 10 still to draw or finish. The 7 pixel-art stamps (owner's sheet, 2026-11-09) are in. |
 
+
+### Owner-only local QA sandbox (draft PR, not deployed)
+
+- URL after review/merge: `/meme/?beta=fren-test`. This **does not** persist the flag in localStorage; `?beta=fren` keeps its existing behavior.
+- Requires a real Discord login and a successful server-side owner check via the already existing `gry_letters` RPC (the same protection as the Editor's desk). An arbitrary visitor with the URL **cannot** use the sandbox.
+- Controls in the Passport: unlock a selected special avatar (by simulating its stamp/secret), simulate any stamp, simulate any secret/event, toggle all special avatar/part unlocks, and reset the local QA state.
+- Real clicking of supported PondOS secrets also writes to the **QA sandbox only** in this mode. QA does not set production discovery markers.
+- Simulated records and saved looks are stored under `pondos-fren-owner-sandbox-v1:<Discord user UUID>` in browser localStorage. `Reset sandbox` removes only this key; **no production badges, secrets, avatar saves, or migrations are touched**.
+- Return to ordinary `/meme/?beta=fren` to see the unmodified beta behavior. Close and reopen the Maker after a simulated unlock so it refreshes available parts.
+- Manual acceptance checks: non-owner denied, logged-out denied, mobile UI, all special avatars selectable in Maker, look restored on refresh, test discovery and manual stamp displayed in Passport, reset clears sandbox, ordinary beta unchanged, no `gry_passport_avatar_save`/`gry_passport_discover` network calls in sandbox mode.
+
 ## 2. All 48 stamps
 
 Art: ✅ final · 👀 waiting for owner OK · 🔁 approved scene, small file (900+ px later) · 🔄 redraw · 🚧 sketch · ⬜ not started.
