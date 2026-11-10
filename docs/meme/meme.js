@@ -2160,8 +2160,54 @@
         pick(tab);
         if (state.preview) {
           var pv = el('p', { class: 'passport-note fren-preview', role: 'note' });
-          pv.textContent = 'TEST PREVIEW (?beta=fren): kept in this browser only. Nothing is saved on the server and no stamp here is real.';
+          pv.textContent = FREN_TEST
+            ? 'OWNER SANDBOX (?beta=fren-test): simulated stamps, secrets and avatar looks exist only in this browser. No real rewards are awarded.'
+            : 'TEST PREVIEW (?beta=fren): kept in this browser only. Nothing is saved on the server and no stamp here is real.';
           box.insertBefore(pv, box.firstChild);
+        }
+        if (FREN_TEST && !other && state.preview && d.opts && catalog) {
+          var sandbox = el('section', { class: 'pp-test-tools', 'aria-label': 'Owner test sandbox' });
+          sandbox.appendChild(piece('h3', 'pp-test-heading', 'Owner test sandbox'));
+          sandbox.appendChild(piece('p', 'pp-test-info', 'Simulate unlocks to inspect every avatar and stamp. Stored in this browser only; no Supabase writes.'));
+          var status = piece('p', 'pp-test-status', '');
+          function runTest(action, id, button) {
+            button.disabled = true;
+            frenTestChange(action, id).catch(function (err) {
+              if (status.isConnected) status.textContent = (err && err.message) || 'Could not update the local test sandbox.';
+            }).then(function () { button.disabled = false; });
+          }
+          function testRow(title, values, buttonText, action) {
+            var row = el('div', { class: 'pp-test-row' });
+            var sel = el('select', { class: 'pp-test-select', 'aria-label': title });
+            values.forEach(function (v) {
+              var option = el('option', { value: v.id });
+              option.textContent = v.label || v.title || v.id;
+              sel.appendChild(option);
+            });
+            var button = el('button', { type: 'button', class: 'app-btn' });
+            button.textContent = buttonText;
+            button.disabled = !values.length;
+            button.addEventListener('click', function () { runTest(action, sel.value, button); });
+            row.appendChild(sel); row.appendChild(button); sandbox.appendChild(row);
+          }
+          testRow('Special avatar', (d.opts.options.special || []).filter(function (x) { return x.unlock; }),
+            'Unlock avatar', 'avatar');
+          testRow('Stamp', (catalog.achievements || []).filter(function (x) { return x.id !== 'bali'; }),
+            'Simulate stamp', 'stamp');
+          testRow('Secret or event', catalog.secrets || [], 'Simulate secret', 'secret');
+          var actions = el('div', { class: 'pp-test-row' });
+          var all = el('button', { type: 'button', class: 'app-btn' });
+          all.textContent = state.test_all_unlocked ? 'Disable all-unlocked preview' : 'Preview all avatars unlocked';
+          all.addEventListener('click', function () { runTest('all', '', all); });
+          var reset = el('button', { type: 'button', class: 'app-btn' });
+          reset.textContent = 'Reset sandbox';
+          reset.addEventListener('click', function () {
+            if (window.confirm('Reset only the local owner test sandbox? Real achievements will not change.'))
+              runTest('reset', '', reset);
+          });
+          actions.appendChild(all); actions.appendChild(reset);
+          sandbox.appendChild(actions); sandbox.appendChild(status);
+          box.insertBefore(sandbox, box.firstChild);
         }
         if (other) {
           var ro = el('p', { class: 'passport-note pp-other', role: 'note' });
@@ -2199,7 +2245,7 @@
       }).catch(function(err){
         notice(/PGRST202|could not find the function|does not exist/i.test(err.message||'')
           ? 'Fren Passport is waiting for its database update.'
-          : 'Could not load your profile. Please try again later.',false);
+          : FREN_TEST ? (err.message || 'Owner sandbox access denied.') : 'Could not load your profile. Please try again later.',false);
       });
     }, 1000);
     return A;
@@ -2313,12 +2359,15 @@
       A.body.innerHTML = '<div class="fa-load"><p class="passport-muted" role="status">Loading the Avatar Maker…</p></div>';
       var session = sbSession(), signed = FREN || !!(session && session.discord && session.userId);
       // opened from the Passport: its snapshot already has the saved look; otherwise read it once
-      Promise.all([avatarOptions(), signed && !passportMine() ? passportLoad(session).catch(function () { return null; }) : null]).then(function (r) {
+      var loading = FREN_TEST
+        ? frenTestAuthorize().then(function () { return Promise.all([avatarOptions(), passportLoad(session)]); })
+        : Promise.all([avatarOptions(), signed && !passportMine() ? passportLoad(session).catch(function () { return null; }) : null]);
+      loading.then(function (r) {
         if (signed && r[1] && !r[1].signed_in) signed = false;
         build(r[0], signed);
-      }, function () {
+      }, function (err) {
         var box = A.body.querySelector('.fa-load');
-        if (box) box.innerHTML = '<p class="passport-note" role="status">Could not load the Fren parts. Please try again later.</p>';
+        if (box) box.replaceChildren(piece('p', 'passport-note', FREN_TEST ? (err.message || 'Owner verification failed.') : 'Could not load the Fren parts. Please try again later.'));
       });
       function build(o, signed) {
         var d = signed ? passportMine() : null;
@@ -2521,10 +2570,16 @@
     var session=sbSession();
     if(!session||!session.discord||!session.userId) return;
     var k='pondos-passport-secret-v1:'+session.userId+':'+id;
-    try { if(localStorage.getItem(k)==='1') return; } catch(e) {}
+    // Test mode does not read or write the production discovery suppression marker.
+    if (!FREN_TEST) {
+      try { if(localStorage.getItem(k)==='1') return; } catch(e) {}
+    }
     frenRpc('gry_passport_discover',{p_secret:id}).then(function(result){
       if(!result||result.id!==id) return;
-      try { localStorage.setItem(k,'1'); } catch(e) {}
+      if (!FREN_TEST) { try { localStorage.setItem(k,'1'); } catch(e) {} }
+      if (FREN_TEST) passportLoad(sbSession()).then(function () {
+        if (apps.passport && apps.passport.render) apps.passport.render();
+      }).catch(function () {});
       if(result.new) {
         var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren',midnight_fren:'Midnight Fren',nerd_alert:'Nerds Only',bali_dreamer:'Bali Dreamer',find_fren:'Looking Glass',address_check:'Trust, But Verify'};
         var av={why_tho:1,midnight_fren:1,nerd_alert:1,bali_dreamer:1,find_fren:1,address_check:1};
