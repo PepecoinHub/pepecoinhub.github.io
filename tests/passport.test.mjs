@@ -184,7 +184,7 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
     // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
     'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
     // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
-    'stamps-v3.webp': [48 * 138, 150],
+    'stamps-v3.webp': [48 * 138, 150], 'pond-pioneer-v3.webp': [138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
@@ -205,13 +205,15 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
   assert.equal(count('PP_STAMPS'), 16);
   assert.equal(count('PP_V3'), 48, 'PP_V3 matches the 48 tiles of stamps-v3.webp');
+  assert.match(js, /if \(earned && x\.id === 'pond_pioneer'\)/, 'Pond Pioneer uses the exclusive new art');
+  assert.doesNotMatch(js, /PP_LILY/, 'No old Lily sprite fallback');
+  const css = readFileSync(new URL('../docs/meme/passport.css', import.meta.url), 'utf8');
+  assert.match(css, /\.pp-art-stamp\.is-pioneer/, 'Pond Pioneer class has its own stamp art');
+  assert.doesNotMatch(css, /\.pp-art-stamp\.is-lily|stamps-lily\.webp/, 'No runtime CSS dependency on Lily');
   const v3 = readFileSync(new URL('../scripts/build_v3_stamps.py', import.meta.url), 'utf8').match(/V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join();
   assert.equal(v3, js.match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join(), 'same order as the build script');
   assert.equal(count('PP_ICONS'), 12);
-  // the Lily sprite order in the client equals the build script order
-  const lily = js.match(/var PP_LILY = \[([^\]]*)\]/)[1].match(/'([a-z0-9_]+)'/g).map(x => x.slice(1, -1));
-  const built = [...readFileSync(new URL('../scripts/build_lily_stamps.mjs', import.meta.url), 'utf8').matchAll(/\['([a-z0-9_]+)', S[123],/g)].map(x => x[1]);
-  assert.equal(lily.length, 15); assert.deepEqual(lily, built);
+  // Legacy Lily sprite is archived as an asset, but no longer rendered in the Passport.
   assert.ok(existsSync(new URL('../games/fren-passport/source/passport-mockup.webp', import.meta.url)), 'lossless source art is kept');
 });
 

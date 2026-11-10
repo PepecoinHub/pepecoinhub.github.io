@@ -1651,7 +1651,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261109val';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109front'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261110pioneer'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1731,9 +1731,7 @@
     n.style.backgroundPositionX = (i * 100 / (names.length - 1)) + '%';
     return n;
   }
-  // Lily's stamps (passport-assets/stamps-lily.webp, scripts/build_lily_stamps.mjs): one tile per stamp id, same order
-  var PP_LILY = ['pond_pioneer', 'welcome_back', 'pepe_guesser', 'week_scout', 'scout_fren', 'first_words', 'hey_fren', 'dear_editor',
-    'junior_editor', 'senior_editor', 'rookie_miner', 'first_hatch', 'little_fren', 'grown_fren', 'streak_14'];
+  // Pond Pioneer is its own exclusive v3 asset; no fallback to the former Lily sprite.
   // Keep the former Share Fren tile in this sprite index to preserve every later tile position;
   // Share Fren is now a secret rather than a stamp.
   // the owner-approved v3 stamps (passport-assets/stamps-v3.webp, scripts/build_v3_stamps.py): same order as the script
@@ -1751,8 +1749,8 @@
     'first_fren', 'first_avatar', 'welcome_back', 'pepe_guesser', 'sharp_eye',
     'good_game', 'rookie_miner', 'dear_editor', 'i_voted', 'secret_starter'];
   function ppStamp(x, earned) {
+    if (earned && x.id === 'pond_pioneer') return el('span', {class:'pp-art pp-art-stamp is-pioneer',role:'img','aria-label':'Pond Pioneer'});
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
-    if (earned && PP_LILY.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-lily', PP_LILY, x.id);
     var art = earned ? (PP_STAMP_OF[x.id] || PP_STAMP_CAT[x.category] || 'duck') : 'locked';
     return ppSprite('pp-art pp-art-stamp', PP_STAMPS, art);
   }
