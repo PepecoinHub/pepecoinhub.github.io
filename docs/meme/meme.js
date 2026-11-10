@@ -1645,7 +1645,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261109ed';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261109px'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261111qa1'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -2393,7 +2393,32 @@
         side.appendChild(frame);
         var who = el('p', { class: 'fa-who' }); who.textContent = d && d.state.nickname ? d.state.nickname : signed ? 'Discord fren' : 'Guest preview';
         var said = el('p', { class: 'fa-state', role: 'status' });
-        side.appendChild(who); side.appendChild(said); main.appendChild(side);
+        side.appendChild(who); side.appendChild(said);
+        if (FREN_TEST && d && d.preview) {
+          // Put the test unlock on the Maker itself; on phones the Passport may be minimized behind it.
+          // Owner authorization and all test awards remain in the existing isolated QA engine.
+          var qaTag = el('p', { class: 'fa-owner-tag' });
+          qaTag.textContent = 'OWNER SANDBOX · Local test only';
+          side.appendChild(qaTag);
+          var qaUnlock = el('button', { type: 'button', class: 'app-btn fa-owner-unlock' });
+          qaUnlock.textContent = d.state.test_all_unlocked ? 'Relock test rewards' : 'Unlock all (test only)';
+          qaUnlock.addEventListener('click', function () {
+            if (pending) return;
+            qaUnlock.disabled = true;
+            frenTestChange('all', '').then(function () {
+              // Rebuild the radio options: each option's locked state and change handler
+              // is created once. Reopening uses the saved local avatar and fresh QA flags.
+              A.close();
+              avatarMaker();
+            }, function (err) {
+              msg = (err && err.message) || 'Could not change test unlocks.';
+              qaUnlock.disabled = false;
+              status();
+            });
+          });
+          side.appendChild(qaUnlock);
+        }
+        main.appendChild(side);
         var parts = el('div', { class: 'fa-parts' });
         FA_ROWS.forEach(function (row) {
           var k = row[0];
@@ -2475,7 +2500,8 @@
         function status() {
           var dirty = !avatarSame(look, saved);
           said.textContent = pending ? 'Saving…' : msg ? msg : !signed ? 'Preview only. Log on with Discord to save.'
-            : !saved ? (avatarSame(look, start) ? 'Not saved yet.' : 'Unsaved changes') : dirty ? 'Unsaved changes' : d && d.preview ? 'Saved in this browser (test preview).' : 'Saved in your Fren Passport.';
+            : !saved ? (avatarSame(look, start) ? 'Not saved yet.' : 'Unsaved changes') : dirty ? 'Unsaved changes'
+              : FREN_TEST ? 'Saved locally in owner sandbox (not a real reward).' : d && d.preview ? 'Saved in this browser (test preview).' : 'Saved in your Fren Passport.';
           said.classList.toggle('is-dirty', !pending && (!!msg || said.textContent === 'Unsaved changes'));
           saveB.disabled = pending || (signed && !!saved && !dirty);
           useB.disabled = !signed || pending;

@@ -131,3 +131,21 @@ test('the owner gate is checked again after switching accounts or logging out', 
   h.setSession(null);
   await assert.rejects(h.ctx.frenTestChange('reset', ''), /Log on with the owner Discord/);
 });
+
+test('QA unlock control is visible in the Maker, not only the Passport window', () => {
+  const maker = source.split('function avatarMaker() {')[1].split('// Only cosmetic, low-stakes discoveries')[0];
+  assert.ok(maker, 'Maker source is available');
+  assert.match(maker, /if \(FREN_TEST && d && d\.preview\)/);
+  assert.match(maker, /OWNER SANDBOX · Local test only/);
+  assert.match(maker, /Unlock all \(test only\)/);
+  assert.match(maker, /frenTestChange\('all', ''\)\.then/);
+  assert.match(maker, /A\.close\(\);\s*avatarMaker\(\);/);
+  assert.match(maker, /Saved locally in owner sandbox \(not a real reward\)/);
+  assert.ok(!maker.includes("localStorage.setItem('pondos-passport-secret-v1:"));
+});
+
+test('the home page busts stale JS and the maker reloads fresh QA CSS', () => {
+  const home = read('docs/meme/index.html');
+  assert.match(home, /<script src="meme\.js\?v=20261111qa1"><\/script>/);
+  assert.match(source, /passport\.css\?v=20261111qa1/);
+});

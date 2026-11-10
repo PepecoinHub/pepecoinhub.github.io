@@ -279,3 +279,16 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
   .pp-test-tools { margin-inline: 0; padding: 9px; }
   .pp-test-row > .app-btn { flex: 1 1 120px; }
 }
+
+/* Owner-only QA controls appear beside the portrait, above every locked avatar row. */
+.fa-owner-tag { margin: 3px 0 0; padding: 5px 8px; display: inline-block;
+  color: #f7f3b2; font: bold 12px/1.35 Arial,sans-serif;
+  background: #38513c; border: 1px solid #a7cb87; }
+.fa-owner-unlock { justify-self: start; min-height: 36px; padding: 7px 13px;
+  font: bold 13px/1.2 Arial,sans-serif; background: #efdc80; color: #211a00;
+  border: 2px solid; border-color: #fff0a2 #60511c #60511c #fff0a2; cursor: pointer; }
+.fa-owner-unlock:disabled { opacity: .65; cursor: wait; }
+@media (max-width: 760px) {
+  .fa-owner-tag { font-size: 11px; }
+  .fa-owner-unlock { max-width: 100%; font-size: 12px; }
+}
