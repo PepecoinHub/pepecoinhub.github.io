@@ -1734,6 +1734,8 @@
   // Lily's stamps (passport-assets/stamps-lily.webp, scripts/build_lily_stamps.mjs): one tile per stamp id, same order
   var PP_LILY = ['pond_pioneer', 'welcome_back', 'pepe_guesser', 'week_scout', 'scout_fren', 'first_words', 'hey_fren', 'dear_editor',
     'junior_editor', 'senior_editor', 'rookie_miner', 'first_hatch', 'little_fren', 'grown_fren', 'streak_14'];
+  // Keep the former Share Fren tile in this sprite index to preserve every later tile position;
+  // Share Fren is now a secret rather than a stamp.
   // the owner-approved v3 stamps (passport-assets/stamps-v3.webp, scripts/build_v3_stamps.py): same order as the script
   var PP_V3 = ['frog_of_the_week', 'moonwalker', 'vox_populi', 'certified_fren', 'old_frog', 'good_parent', 'first_avatar',
     'detective_fren', 'good_game', 'yeet_adept', 'fud_buster', 'long_snake', 'arcade_hopper', 'secret_starter',
@@ -1746,7 +1748,7 @@
   // the 20 places on the Passport's front page, in order: gold row, silver row, then the first steps
   var PP_FRONT = ['moonwalker', 'season_champion', 'frog_of_the_week', 'certified_fren', 'treasure_hunter',
     'old_frog', 'vox_populi', 'checkmate', 'detective_fren', 'like_it_here',
-    'first_fren', 'first_avatar', 'welcome_back', 'pepe_guesser', 'share_fren',
+    'first_fren', 'first_avatar', 'welcome_back', 'pepe_guesser', 'sharp_eye',
     'good_game', 'rookie_miner', 'dear_editor', 'i_voted', 'secret_starter'];
   function ppStamp(x, earned) {
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
@@ -2240,7 +2242,7 @@
   // (only stamps that can be earned today are named; the others stay "a future stamp", like '???' in the Passport)
   var FA_UNLOCK = { detective_fren: 'Detective Fren', rookie_miner: 'Happy Mining!', scout_fren: 'Scout Fren', good_game: 'Good Game',
     yeet_adept: 'Adept', arcade_hopper: 'Arcade Hopper', secret_starter: 'Secret Starter', dear_editor: 'Dear Editor',
-    senior_editor: 'Senior Editor', frogmas: 'Frogmas', share_fren: 'Share Fren', old_frog: 'Old Frog', welcome_back: 'Welcome Back',
+    senior_editor: 'Senior Editor', frogmas: 'Frogmas', old_frog: 'Old Frog', welcome_back: 'Welcome Back',
     streak_14: '14-day streak', like_it_here: 'I Like It Here', certified_fren: 'Certified Fren', nasa_is_hiring: 'NASA Is Hiring', fud_buster: 'FUD Buster' };
   // event days: open to every fren who visits PondOS on that day (the check-in gives them)
   var FA_EVENT = { pep_birthday: 'visit PondOS on 30 January, Pepecoin\'s birthday', thanksgiving_fren: 'visit PondOS on Thanksgiving weekend',
@@ -2254,7 +2256,7 @@
   }
   function avName(p) { return String(p.label || p.id).replace(/\s*\([^)]*\)\s*$/, ''); }
   // special avatars hidden behind a secret: the lock says only that (no hint where)
-  var FA_SECRET = { why_tho: 1, midnight_fren: 1, happy_fren: 1, nerd_alert: 1, born_to_fren: 1, bali_dreamer: 1, find_fren: 1, address_check: 1 };
+  var FA_SECRET = { why_tho: 1, midnight_fren: 1, happy_fren: 1, nerd_alert: 1, born_to_fren: 1, bali_dreamer: 1, find_fren: 1, address_check: 1, share_fren: 1 };
   function avatarMaker() {
     return openApp('avatar', 'Create Your Fren - Avatar Maker', 'pep-logo', function (A) {
       passportCss();
@@ -2483,23 +2485,22 @@
     },function(){ /* Migration may not be installed yet; retry on next discovery. */ });
   }
 
-  // Share Fren: a Discord fren shares a Pepe Guesser result. The server checks a finished round and gives the stamp once.
+  // Share Fren is a small secret, not a stamp or proof of posting on X.
+  // The server checks the player's own finished Pepe Guesser round.
   function passportShare() {
     if (!FREN) return;
     var session = sbSession();
     if (!session || !session.discord || !session.userId) return;
-    var k = 'pondos-passport-share-v1:' + session.userId;
+    var k = 'pondos-passport-share-v2:' + session.userId;
     try { if (localStorage.getItem(k) === '1') return; } catch (e) {}
     frenRpc('gry_passport_share', {}).then(function (r) {
-      if (!r || !r.earned) return;
+      if (!r || !r.found) return;
       try { localStorage.setItem(k, '1'); } catch (e) {}
-      if (!r['new']) return;
       if (passportCache && passportCache.userId === session.userId) passportCache = null;
-      fetch(PP_CATALOG).then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; }).then(function (c) {
-        var x = c && Array.isArray(c.achievements) ? c.achievements.filter(function (a) { return a.id === 'share_fren'; })[0] : null;
-        rewardNotice({ bar: 'Fren Passport - New Stamp', stamp: x || { id: 'share_fren', title: 'Share Fren' }, title: 'Share Fren',
-          text: 'Thanks for spreading the frog. It is in your Fren Passport now.' });
-      });
+      if (!r['new']) return;
+      rewardNotice({ bar: 'Fren Passport - Secret Found', title: 'Secret discovered: Share Fren',
+        text: 'You found a little PondOS secret by sharing a Pepe Guesser result. It is in your collection now.',
+        img: ico('gif-045-still'), go: 'Open Fren Passport', open: frenPassport });
     }, function () { /* the migration may not be installed yet */ });
   }
 
