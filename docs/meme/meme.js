@@ -1711,8 +1711,8 @@
   // In ordinary beta mode preserve the existing fallback until migrations launch.
   function frenRpc(name, args) {
     var s = sbSession();
-    if (FREN_TEST) return frenTestAuthorize().then(function () { return frenPreview(name, args || {}); });
     if (!FREN) return rpc(name, args);
+    if (FREN_TEST) return frenTestAuthorize().then(function () { return frenPreview(name, args || {}); });
     if (!s || !s.discord) return Promise.resolve(frenPreview(name, args));
     return rpc(name, args).catch(function (err) { if (frenMissing(err)) return frenPreview(name, args); throw err; });
   }
