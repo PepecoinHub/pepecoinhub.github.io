@@ -812,3 +812,9 @@ html.embed .g-sub { padding: 2px 8px !important; min-height: 0; }
 .mention-opt { text-align: left; background: none; border: 0; border-radius: 5px; padding: 6px 8px; font: inherit; font-weight: 600; color: inherit; cursor: pointer; }
 .mention-opt.on, .mention-opt:hover { background: var(--accent-wash); }
 .chat-mention-btn { background: none; border: 1px solid var(--grid); border-radius: 999px; padding: 1px 8px; font: inherit; font-size: .75rem; color: inherit; cursor: pointer; }
+
+/* Drop-down lists: Chrome paints every row of the open list with the select's background colour, which also
+   covers its hover highlight (white text on white). The box gets its colour from a background image instead,
+   so the colour itself stays transparent and the open list keeps the browser's own highlight. */
+select { background: linear-gradient(var(--surface-2), var(--surface-2)); }
+html.embed select, html.paint select { background: linear-gradient(#fff, #fff) !important; }

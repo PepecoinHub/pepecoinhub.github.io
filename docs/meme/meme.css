@@ -1620,3 +1620,6 @@ footer.foot a { color: #edf3e3; }
 .pd-door small { font-size: 11.5px; opacity: .8; }
 @media (max-width: 900px) { .pondos .hero { grid-template-columns: 1fr; } .pondos .hero .strip { max-width: 300px; justify-self: center; } }
 @media (max-width: 560px) { .pond-do { grid-template-columns: 1fr 1fr; } .pd-door small { display: none; } }
+/* Drop-down lists: the box colour comes from an image, so Chrome's open list keeps its hover highlight
+   (a background colour would be copied onto every row and hide the highlighted text) */
+.pondos select { background: linear-gradient(var(--pane), var(--pane)) !important; }

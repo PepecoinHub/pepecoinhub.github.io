@@ -261,3 +261,5 @@ p.pt-top-none { padding: 18px 10px; text-align: center; }
   .pt-sheet input { cursor: text; user-select: text; -webkit-user-select: text; }
   .pt-sheet img { -webkit-user-drag: none; }
 }
+/* see gry.css "Drop-down lists": colour from an image, so the open list keeps its hover highlight */
+.pt-group select { background: linear-gradient(#fff, #fff); }
