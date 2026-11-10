@@ -3957,7 +3957,7 @@
         var b = e.target.closest('.lan-who'), row = b && b.closest('.lan-msg');
         if (row && row._m) frenPassport(false, { id: row._m.user_id, nick: row._m.nick });
       });
-      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false;
+      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, canMod = false;
       var pop = A.body.querySelector('.emo-pop'), eb = A.body.querySelector('.emo-btn');
       // the picker: tabs by family (static), GIFs, recently used (this browser), and a search over the names
       var grid = pop.querySelector('.emo-grid'), q = pop.querySelector('.emo-q'), tab = '';
@@ -4027,11 +4027,46 @@
         note.innerHTML = s ? 'Signed in on PEP Games. Text and our emotes only, no links. Be nice, frens.' : 'Pick a nickname and say gm, no sign-in needed. <a href="#" class="lan-login">Log on with Discord</a> to keep your name and get the ✓. No links, be nice.';
         var l = note.querySelector('.lan-login'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); logOn(); });
       };
+      // Hosts can hide individual messages in the PondOS LAN Party chat.
+      // The server supplies can_mod and verifies games.is_host_user again inside gry_lobby_hide.
+      // Never infer host privileges from a saved nickname or client-side Discord metadata.
+      var syncDeleteButton = function (row) {
+        var btn = row.querySelector('.lan-del');
+        row.classList.toggle('lan-moderatable', canMod);
+        if (!canMod && btn) btn.remove();
+        if (canMod && !btn) row.appendChild(el('button', {
+          type: 'button', class: 'lan-del', title: 'Delete message (host)',
+          'aria-label': 'Delete message (host)'
+        }, '&#215;'));
+      };
+      log.addEventListener('click', function (e) {
+        var btn = e.target.closest('.lan-del');
+        if (!btn || !canMod || btn.disabled) return;
+        var row = btn.closest('.lan-msg'), m = row && row._m;
+        if (!m || !window.confirm('Delete the message from ' + m.nick + '?')) return;
+        btn.disabled = true;
+        freshSession().then(function (s) {
+          if (!s) throw new Error('Log in with your host Discord account to delete messages.');
+          return chatRpc('gry_lobby_hide', { p_id: m.id });
+        }).then(function () {
+          if (!alive) return;
+          row.remove(); delete seen[m.id];
+          poll(); // refresh the list; Realtime notifies everyone else about the hidden message
+        }).catch(function (err) {
+          if (!alive) return;
+          btn.disabled = false;
+          note.textContent = err.message || 'Could not delete the message.';
+        });
+      });
       var poll = function () {
         clearTimeout(timer);
         chatRpc('gry_lobby_chat', { p_after: last, p_visitor: visitorId() }).then(function (r) {
           if (!alive) return;
           paintOnline(r.online);
+          if (canMod !== !!r.can_mod) {
+            canMod = !!r.can_mod;
+            Object.keys(seen).forEach(function (id) { syncDeleteButton(seen[id]); });
+          }
           var initial = first;
           if (first) { log.innerHTML = ''; first = false; }
           (r.hidden || []).forEach(function (id) { if (seen[id]) { seen[id].remove(); delete seen[id]; } });
@@ -4041,6 +4076,7 @@
             var row = el('div', { class: 'lan-msg' + (emoOnly(m.body) ? ' lan-big' : '') }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> ' + lanWho(m) + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
             var tipEl = log.querySelector('.bin-tip'); if (tipEl) tipEl.remove();
             row._m = m; if (forMe(m)) { row.classList.add('lan-me'); if (!initial) { PM.ring(m.nick, m.body, function () { A.restore ? A.restore() : null; }); seenMentions(); } }
+            syncDeleteButton(row);
             seen[m.id] = row; log.appendChild(row); last = Math.max(last, m.id);
           });
           if (!log.children.length) log.innerHTML = '<p class="bin-tip">No messages in the last 24 hours. Say gm!</p>';
