@@ -95,8 +95,8 @@ html.os98 main.pt-app { max-width: 1180px; height: auto; min-height: calc(100dvh
 .pt-word { width: 100%; max-width: 232px; height: auto; min-width: 0; }
 .pt-tag { margin: 0; font-size: 14px; line-height: 1.35; }
 .pt-who { margin: 0; font-size: 14px; color: #333; }
-.pt-group { margin: 0; padding: 10px 12px 12px; border: 0; box-shadow: var(--thin-down), inset -2px -2px 0 var(--w-hi), inset 2px 2px 0 var(--w-lo); background: var(--w-face); min-width: 0; display: grid; gap: 10px; }
-.pt-group legend { padding: 0 5px; font: 700 14px var(--sys); color: #111; }
+.pt-group { margin: 0; padding: 8px 10px 12px; border: 2px groove var(--w-hi); background: var(--w-face); min-width: 0; display: grid; gap: 10px; }
+.pt-group legend { padding: 0 5px; margin-left: 4px; font: 700 14px var(--sys); color: #111; }
 .pt-group input, .pt-group select { width: 100%; min-height: 36px; font: 15px var(--sys) !important; padding: 6px 8px; background: #fff; color: #111; border: 0; border-radius: 0; box-shadow: var(--down); min-width: 0; }
 .pt-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .pt-two label { display: grid; gap: 3px; margin: 0; font: 13px var(--sys); color: #111; }
