@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [51, 18, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [50, 19, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -22,8 +22,8 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
 });
 
 test('every live casual secret is server allowlisted and discoverable', () => {
-  // chat secrets (source: chat) are given by the server's chat trigger only, so they must NOT be claimable
-  const live = catalog.secrets.filter(x => x.status === 'live' && x.source !== 'chat').map(x => x.id).sort();
+  // Chat and share secrets have dedicated server paths and cannot use the casual discovery RPC.
+  const live = catalog.secrets.filter(x => x.status === 'live' && !['chat','share'].includes(x.source)).map(x => x.id).sort();
   const chat = catalog.secrets.filter(x => x.status === 'live' && x.source === 'chat').map(x => x.id);
   const block = sql.match(/p_secret\s+not\s+in\s*\(([^)]*)\)/i);
   assert.ok(block, 'SQL casual-secret whitelist missing');
@@ -32,6 +32,8 @@ test('every live casual secret is server allowlisted and discoverable', () => {
   for (const id of live) assert.ok(pond.includes("discoverSecret('" + id + "')"), id);
   const awards = readFileSync(new URL('../games/supabase/update_passport_awards.sql', import.meta.url), 'utf8');
   for (const id of chat) { assert.ok(!allowed.includes(id), id + ' must not be claimable'); assert.ok(awards.includes("'" + id + "'"), id + ' given by the server'); }
+  assert.ok(!allowed.includes('share_fren'), 'Share Fren uses its dedicated server RPC');
+  assert.match(awards, /insert into games\.passport_secrets\(user_id, secret_id\)[\s\S]*?values \(u, 'share_fren'\)/);
 });
 
 test('secret RPC requires Discord and cannot issue premium or gameplay rewards', () => {
