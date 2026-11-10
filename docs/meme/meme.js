@@ -1645,7 +1645,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261109ed';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261111qa1'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261111v3'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1811,19 +1811,24 @@
     n.style.backgroundPositionX = (i * 100 / (names.length - 1)) + '%';
     return n;
   }
-  // Lily's stamps (passport-assets/stamps-lily.webp, scripts/build_lily_stamps.mjs): one tile per stamp id, same order
-  var PP_LILY = ['pond_pioneer', 'welcome_back', 'pepe_guesser', 'week_scout', 'scout_fren', 'first_words', 'hey_fren', 'dear_editor',
-    'junior_editor', 'senior_editor', 'rookie_miner', 'first_hatch', 'little_fren', 'grown_fren', 'streak_14'];
-  // the owner-approved v3 stamps (passport-assets/stamps-v3.webp, scripts/build_v3_stamps.py): same order as the script
-  var PP_V3 = ['frog_of_the_week', 'moonwalker', 'vox_populi', 'certified_fren', 'old_frog', 'good_parent', 'first_avatar',
+  // Only owner-approved V3 art. The 49 positions match scripts/build_v3_stamps.py exactly.
+  // NO Lily fallback: missing art gets a neutral placeholder, never an old illustration.
+  var PP_V3 = [
+    'frog_of_the_week', 'moonwalker', 'vox_populi', 'certified_fren', 'old_frog', 'good_parent', 'first_avatar',
     'detective_fren', 'good_game', 'yeet_adept', 'fud_buster', 'long_snake', 'arcade_hopper', 'secret_starter',
-    'i_voted', 'checkmate', 'the_secret_pond', 'picasso_fren',
-    'first_fren', 'sharp_eye', 'community_fren', 'like_it_here', 'nasa_is_hiring', 'rookie_miner'];
+    'i_voted', 'checkmate', 'the_secret_pond', 'picasso_fren', 'first_fren', 'sharp_eye', 'community_fren',
+    'like_it_here', 'nasa_is_hiring', 'rookie_miner', 'season_champion', 'top_ten', 'bug_hunter', 'podium',
+    'game_night', 'quiz_master', 'frogmas', 'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren',
+    'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14',
+    'pepe_guesser', 'week_scout', 'little_fren', 'first_hatch', 'grown_fren', 'scout_fren', 'pond_pioneer',
+  ];
   function ppStamp(x, earned) {
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
-    if (earned && PP_LILY.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-lily', PP_LILY, x.id);
-    var art = earned ? (PP_STAMP_OF[x.id] || PP_STAMP_CAT[x.category] || 'duck') : 'locked';
-    return ppSprite('pp-art pp-art-stamp', PP_STAMPS, art);
+    if (!earned) return ppSprite('pp-art pp-art-stamp', PP_STAMPS, 'locked');
+    // An earned stamp whose art isn't approved yet is never drawn from Lily or another stamp.
+    var pending = el('span', { class: 'pp-art pp-art-stamp is-pending', 'aria-hidden': 'true' });
+    pending.textContent = '?';
+    return pending;
   }
   function ppIcon(name) { return ppSprite('pp-art pp-art-icon', PP_ICONS, name); }
 
