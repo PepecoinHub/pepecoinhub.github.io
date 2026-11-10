@@ -260,3 +260,22 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
 .pp-av.is-worn { border-color: #2f8f2a; box-shadow: 0 0 0 2px #7bd36f inset; }
 .pp-av-btn { margin-top: 2px; padding: 2px 10px; font-size: 11px; }
 .pp-avatars .pp-muted { color: #d6e8d0; }
+
+
+/* Owner-only local test sandbox. No real awards or writes. */
+.pp-test-tools {
+  margin: 8px 6px 12px; padding: 12px; background: #e5e5e0; color: #202020;
+  border: 2px solid #555; box-shadow: inset 1px 1px #fff, inset -1px -1px #888;
+  display: grid; gap: 8px; font: 12px/1.4 Arial, sans-serif;
+}
+.pp-test-heading { margin: 0; font-size: 15px; color: #153d25; }
+.pp-test-info, .pp-test-status { margin: 0; }
+.pp-test-status { min-height: 1em; color: #8c2727; }
+.pp-test-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pp-test-select { box-sizing: border-box; flex: 1 1 155px; min-width: 0; min-height: 34px;
+  border: 2px solid; border-color: #777 #fff #fff #777; background: #fff; color: #111; padding: 4px 5px; }
+.pp-test-row > .app-btn { flex: 0 1 auto; min-height: 34px; }
+@media (max-width: 480px) {
+  .pp-test-tools { margin-inline: 0; padding: 9px; }
+  .pp-test-row > .app-btn { flex: 1 1 120px; }
+}

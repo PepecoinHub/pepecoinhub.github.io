@@ -17,6 +17,10 @@
       return localStorage.getItem('pondos-beta') === 'pondwars';
     } catch (e) { return false; }
   })();
+  // Owner sandbox activates for this visit only. The URL does not grant owner permissions.
+  var FREN_TEST = (function () {
+    try { return new URLSearchParams(location.search).get('beta') === 'fren-test'; } catch (e) { return false; }
+  })();
   // Fren Passport + Create Your Fren (avatar maker) in testing: hidden for everyone except a browser that
   // opened /meme/?beta=fren once (?beta=off hides it again). Until the Supabase migrations
   // (update_fren_passport.sql, update_fren_avatar.sql, update_passport_awards.sql) are run, the tester gets a
@@ -26,7 +30,7 @@
       var q = new URLSearchParams(location.search).get('beta');
       if (q === 'fren') localStorage.setItem('pondos-fren-beta', '1');
       if (q === 'off') localStorage.removeItem('pondos-fren-beta');
-      return localStorage.getItem('pondos-fren-beta') === '1';
+      return FREN_TEST || localStorage.getItem('pondos-fren-beta') === '1';
     } catch (e) { return false; }
   })();
 
@@ -1648,9 +1652,29 @@
   // signed in with Discord), the Passport and the Avatar Maker run on a local copy kept in this browser only.
   // Nothing is sent to the server and no stamp is real; the Passport says so at the top.
   var FREN_LOCAL = 'pondos-fren-preview';
+  var FREN_TEST_LOCAL = 'pondos-fren-owner-sandbox-v1:';
   var frenMissing = function (err) { return /PGRST202|could not find the function|does not exist/i.test((err && err.message) || ''); };
+  function frenTestKey() {
+    var s = sbSession();
+    return FREN_TEST_LOCAL + (s && s.discord && s.userId ? s.userId : 'no-owner');
+  }
+  // The existing Frog Mail owner RPC checks games.owners on the server.
+  // Never infer ownership from a URL, localStorage, or a client-supplied Discord ID.
+  function frenTestAuthorize() {
+    var s = sbSession();
+    if (!s || !s.discord || !s.userId)
+      return Promise.reject(new Error('Log on with the owner Discord account to use the test sandbox.'));
+    return rpc('gry_letters', { p_limit: 1 }).then(function (j) {
+      if (!j || !Array.isArray(j.letters)) throw new Error('Only the verified PondOS owner can use this sandbox.');
+      return s;
+    }, function () { throw new Error('Owner verification failed. Check your Discord login and try again.'); });
+  }
   function frenLocal(v) {
-    try { if (v) localStorage.setItem(FREN_LOCAL, JSON.stringify(v)); return JSON.parse(localStorage.getItem(FREN_LOCAL) || 'null') || {}; } catch (e) { return v || {}; }
+    var key = FREN_TEST ? frenTestKey() : FREN_LOCAL;
+    try {
+      if (v) localStorage.setItem(key, JSON.stringify(v));
+      return JSON.parse(localStorage.getItem(key) || 'null') || {};
+    } catch (e) { return v || {}; }
   }
   function frenPreview(name, args) {
     var L = frenLocal(), now = new Date().toISOString();
@@ -1662,20 +1686,74 @@
       frenLocal(L);
       return { avatar: L.avatar, badge: { id: 'first_avatar', earned_at: L.first_avatar, new: first } };
     }
+    if (name === 'gry_passport_discover' && FREN_TEST) {
+      var id = String(args.p_secret || '');
+      var allowed = ['wrong_frog','why_tho','magic_word','bsod_fren','midnight_fren','nerd_alert','bali_dreamer',
+        'happy_fren','born_to_fren','find_fren','address_check'];
+      if (allowed.indexOf(id) < 0) return {};
+      L.secrets = Array.isArray(L.secrets) ? L.secrets : [];
+      var old = L.secrets.some(function (x) { return x.id === id; });
+      if (!old) L.secrets.push({ id: id, discovered_at: now });
+      frenLocal(L);
+      return { id: id, new: !old, discovered_at: now };
+    }
     if (name === 'gry_passport_state') {
-      var me = whoAmI();
+      var me = whoAmI(), badges = FREN_TEST && Array.isArray(L.achievements) ? L.achievements.slice() : [];
+      if (L.first_avatar && !badges.some(function (x) { return x.id === 'first_avatar'; }))
+        badges.push({ id: 'first_avatar', title: 'Fresh Fren', earned_at: L.first_avatar });
       return { signed_in: true, preview: true, nickname: (me && me.name) || 'Test fren', member_since: L.since, yeet_best: null,
-        achievements: L.first_avatar ? [{ id: 'first_avatar', title: 'Fresh Fren', earned_at: L.first_avatar }] : [],
-        secrets: [], items: [], progress: {}, avatar: L.avatar || null };
+        achievements: badges, secrets: FREN_TEST && Array.isArray(L.secrets) ? L.secrets.slice() : [],
+        items: [], progress: {}, avatar: L.avatar || null, test_all_unlocked: FREN_TEST && !!L.all_unlocked };
     }
     return {};
   }
-  // the passport RPCs: in the test preview a missing server function (or no Discord log-on) falls back to frenPreview
+  // In owner test mode passport calls are ALWAYS local: no server award/save/discover RPC is reachable.
+  // In ordinary beta mode preserve the existing fallback until migrations launch.
   function frenRpc(name, args) {
     var s = sbSession();
     if (!FREN) return rpc(name, args);
+    if (FREN_TEST) return frenTestAuthorize().then(function () { return frenPreview(name, args || {}); });
     if (!s || !s.discord) return Promise.resolve(frenPreview(name, args));
     return rpc(name, args).catch(function (err) { if (frenMissing(err)) return frenPreview(name, args); throw err; });
+  }
+  function frenTestChange(action, id) {
+    return frenTestAuthorize().then(function () {
+      var d = passportMine();
+      if (!d || !d.catalog || !d.opts) throw new Error('Open the Passport again to load the test catalog.');
+      var L = frenLocal(), now = new Date().toISOString();
+      var badges = d.catalog.achievements || [], secrets = d.catalog.secrets || [];
+      var badge = badges.find(function (x) { return x.id === id && x.id !== 'bali'; });
+      var secret = secrets.find(function (x) { return x.id === id; });
+      if (action === 'reset') {
+        localStorage.removeItem(frenTestKey());
+      } else if (action === 'all') {
+        L.all_unlocked = !L.all_unlocked;
+        frenLocal(L);
+      } else {
+        if (action === 'avatar') {
+          var av = (d.opts.options.special || []).find(function (x) { return x.id === id && x.unlock; });
+          if (!av) throw new Error('Choose a special avatar.');
+          id = av.unlock;
+          badge = badges.find(function (x) { return x.id === id && x.id !== 'bali'; });
+          secret = secrets.find(function (x) { return x.id === id; });
+          action = badge ? 'stamp' : 'secret';
+        }
+        if (action === 'stamp' && badge) {
+          L.achievements = Array.isArray(L.achievements) ? L.achievements : [];
+          if (!L.achievements.some(function (x) { return x.id === id; }))
+            L.achievements.push({ id: id, title: badge.title || id, earned_at: now });
+          frenLocal(L);
+        } else if (action === 'secret' && secret) {
+          L.secrets = Array.isArray(L.secrets) ? L.secrets : [];
+          if (!L.secrets.some(function (x) { return x.id === id; }))
+            L.secrets.push({ id: id, discovered_at: now });
+          frenLocal(L);
+        } else throw new Error('Unknown test reward.');
+      }
+      return passportLoad(sbSession()).then(function () {
+        if (apps.passport && apps.passport.render) apps.passport.render();
+      });
+    });
   }
   // one read: the server snapshot, plus two static files from this site (labels and avatar parts)
   function passportLoad(session) {
@@ -1690,6 +1768,7 @@
   }
   function passportMine() {
     var s = sbSession();
+    if (FREN_TEST) return s && s.discord && passportCache && passportCache.preview && passportCache.userId === s.userId ? passportCache : null;
     if (FREN && passportCache && passportCache.preview) return passportCache;
     return s && s.discord && passportCache && passportCache.userId === s.userId ? passportCache : null;
   }
@@ -2008,7 +2087,7 @@
 
         // Avatars: the special avatars of Create Your Fren, and what opens each one
         if (d.opts) {
-          var ownsAv = function (u) { return !!earnedOf(u) || discovered.some(function (x) { return x.id === u && x.discovered_at; }); };
+          var ownsAv = function (u) { return !!(FREN_TEST && state.test_all_unlocked) || !!earnedOf(u) || discovered.some(function (x) { return x.id === u && x.discovered_at; }); };
           var avs = (d.opts.options.special || []).filter(function (p) { return p.id !== AV_PLAIN; });
           var avOpen = avs.filter(function (p) { return !p.unlock || ownsAv(p.unlock); }).length;
           var avSec = el('section', {class:'pp-panel pp-avatars'});
@@ -2081,8 +2160,54 @@
         pick(tab);
         if (state.preview) {
           var pv = el('p', { class: 'passport-note fren-preview', role: 'note' });
-          pv.textContent = 'TEST PREVIEW (?beta=fren): kept in this browser only. Nothing is saved on the server and no stamp here is real.';
+          pv.textContent = FREN_TEST
+            ? 'OWNER SANDBOX (?beta=fren-test): simulated stamps, secrets and avatar looks exist only in this browser. No real rewards are awarded.'
+            : 'TEST PREVIEW (?beta=fren): kept in this browser only. Nothing is saved on the server and no stamp here is real.';
           box.insertBefore(pv, box.firstChild);
+        }
+        if (FREN_TEST && !other && state.preview && d.opts && catalog) {
+          var sandbox = el('section', { class: 'pp-test-tools', 'aria-label': 'Owner test sandbox' });
+          sandbox.appendChild(piece('h3', 'pp-test-heading', 'Owner test sandbox'));
+          sandbox.appendChild(piece('p', 'pp-test-info', 'Simulate unlocks to inspect every avatar and stamp. Stored in this browser only; no Supabase writes.'));
+          var status = piece('p', 'pp-test-status', '');
+          function runTest(action, id, button) {
+            button.disabled = true;
+            frenTestChange(action, id).catch(function (err) {
+              if (status.isConnected) status.textContent = (err && err.message) || 'Could not update the local test sandbox.';
+            }).then(function () { button.disabled = false; });
+          }
+          function testRow(title, values, buttonText, action) {
+            var row = el('div', { class: 'pp-test-row' });
+            var sel = el('select', { class: 'pp-test-select', 'aria-label': title });
+            values.forEach(function (v) {
+              var option = el('option', { value: v.id });
+              option.textContent = v.label || v.title || v.id;
+              sel.appendChild(option);
+            });
+            var button = el('button', { type: 'button', class: 'app-btn' });
+            button.textContent = buttonText;
+            button.disabled = !values.length;
+            button.addEventListener('click', function () { runTest(action, sel.value, button); });
+            row.appendChild(sel); row.appendChild(button); sandbox.appendChild(row);
+          }
+          testRow('Special avatar', (d.opts.options.special || []).filter(function (x) { return x.unlock; }),
+            'Unlock avatar', 'avatar');
+          testRow('Stamp', (catalog.achievements || []).filter(function (x) { return x.id !== 'bali'; }),
+            'Simulate stamp', 'stamp');
+          testRow('Secret or event', catalog.secrets || [], 'Simulate secret', 'secret');
+          var actions = el('div', { class: 'pp-test-row' });
+          var all = el('button', { type: 'button', class: 'app-btn' });
+          all.textContent = state.test_all_unlocked ? 'Disable all-unlocked preview' : 'Preview all avatars unlocked';
+          all.addEventListener('click', function () { runTest('all', '', all); });
+          var reset = el('button', { type: 'button', class: 'app-btn' });
+          reset.textContent = 'Reset sandbox';
+          reset.addEventListener('click', function () {
+            if (window.confirm('Reset only the local owner test sandbox? Real achievements will not change.'))
+              runTest('reset', '', reset);
+          });
+          actions.appendChild(all); actions.appendChild(reset);
+          sandbox.appendChild(actions); sandbox.appendChild(status);
+          box.insertBefore(sandbox, box.firstChild);
         }
         if (other) {
           var ro = el('p', { class: 'passport-note pp-other', role: 'note' });
@@ -2120,7 +2245,7 @@
       }).catch(function(err){
         notice(/PGRST202|could not find the function|does not exist/i.test(err.message||'')
           ? 'Fren Passport is waiting for its database update.'
-          : 'Could not load your profile. Please try again later.',false);
+          : FREN_TEST ? (err.message || 'Owner sandbox access denied.') : 'Could not load your profile. Please try again later.',false);
       });
     }, 1000);
     return A;
@@ -2234,19 +2359,23 @@
       A.body.innerHTML = '<div class="fa-load"><p class="passport-muted" role="status">Loading the Avatar Maker…</p></div>';
       var session = sbSession(), signed = FREN || !!(session && session.discord && session.userId);
       // opened from the Passport: its snapshot already has the saved look; otherwise read it once
-      Promise.all([avatarOptions(), signed && !passportMine() ? passportLoad(session).catch(function () { return null; }) : null]).then(function (r) {
+      var loading = FREN_TEST
+        ? frenTestAuthorize().then(function () { return Promise.all([avatarOptions(), passportLoad(session)]); })
+        : Promise.all([avatarOptions(), signed && !passportMine() ? passportLoad(session).catch(function () { return null; }) : null]);
+      loading.then(function (r) {
         if (signed && r[1] && !r[1].signed_in) signed = false;
         build(r[0], signed);
-      }, function () {
+      }, function (err) {
         var box = A.body.querySelector('.fa-load');
-        if (box) box.innerHTML = '<p class="passport-note" role="status">Could not load the Fren parts. Please try again later.</p>';
+        if (box) box.replaceChildren(piece('p', 'passport-note', FREN_TEST ? (err.message || 'Owner verification failed.') : 'Could not load the Fren parts. Please try again later.'));
       });
       function build(o, signed) {
         var d = signed ? passportMine() : null;
         // a stamp the server says this player has earned (reward parts open with it)
         var owns = function (id) {
           var l = d && Array.isArray(d.state.achievements) ? d.state.achievements : [], s = d && Array.isArray(d.state.secrets) ? d.state.secrets : [];
-          return l.some(function (b) { return b.id === id && !!b.earned_at; }) || s.some(function (x) { return x.id === id && !!x.discovered_at; });
+          return !!(FREN_TEST && d && d.state.test_all_unlocked) ||
+            l.some(function (b) { return b.id === id && !!b.earned_at; }) || s.some(function (x) { return x.id === id && !!x.discovered_at; });
         };
         var saved = d ? avatarLook(o, d.state.avatar) : null;
         var start = saved || avatarLook(o, o.defaults);
@@ -2441,10 +2570,16 @@
     var session=sbSession();
     if(!session||!session.discord||!session.userId) return;
     var k='pondos-passport-secret-v1:'+session.userId+':'+id;
-    try { if(localStorage.getItem(k)==='1') return; } catch(e) {}
+    // Test mode does not read or write the production discovery suppression marker.
+    if (!FREN_TEST) {
+      try { if(localStorage.getItem(k)==='1') return; } catch(e) {}
+    }
     frenRpc('gry_passport_discover',{p_secret:id}).then(function(result){
       if(!result||result.id!==id) return;
-      try { localStorage.setItem(k,'1'); } catch(e) {}
+      if (!FREN_TEST) { try { localStorage.setItem(k,'1'); } catch(e) {} }
+      if (FREN_TEST) passportLoad(sbSession()).then(function () {
+        if (apps.passport && apps.passport.render) apps.passport.render();
+      }).catch(function () {});
       if(result.new) {
         var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren',midnight_fren:'Midnight Fren',nerd_alert:'Nerds Only',bali_dreamer:'Bali Dreamer',find_fren:'Looking Glass',address_check:'Trust, But Verify'};
         var av={why_tho:1,midnight_fren:1,nerd_alert:1,bali_dreamer:1,find_fren:1,address_check:1};
