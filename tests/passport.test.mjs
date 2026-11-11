@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [49, 20, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [50, 20, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -177,13 +177,15 @@ test('Avatar Maker client: one save RPC with six v2 IDs, nothing kept in localSt
   assert.match(pond, /avatar-options\.json\?v=/);
 });
 
-test('Passport booklet art: four small transparent WebPs with the sizes the page layout assumes', () => {
+test('Passport booklet art: small transparent WebPs with the sizes the page layout assumes', () => {
   const dir = new URL('../docs/meme/passport-assets/', import.meta.url);
   const want = { 'page-left.webp': [360, 528], 'page-right.webp': [360, 528], 'stamps.webp': [16 * 69, 75], 'icons.webp': [12 * 48, 48],
     // The legacy Lily archive remains on disk for provenance, but the client never references it.
     'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
     // One optimized sprite holds 49 approved V3 illustrations, including Pond Pioneer.
     'stamps-v3.webp': [49 * 138, 150],
+    // Pond Dominator: the owner's own art, one V3-sized tile outside the atlas (update_wheres_pepe_hall_of_fame.sql)
+    'pond-dominator.webp': [138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');

@@ -88,7 +88,10 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
+  // Hall of Fame icon: the owner's art (gold cup + open Pepe passport) goes to img/ico/hall-of-fame.webp, then this
+  // line becomes 'img/ico/hall-of-fame.webp'. Until then the LEADERS trophy stands in (no new art is made here).
+  var HOF_ICON = 'img/ico/leaders.webp';
   function icoFrom(src) { var m = /^img\/([\w-]+)\.webp$/.exec(src || ''); return m ? ico(m[1]) : src; }
   function json(name) {
     if (!cache[name]) cache[name] = fetch(DATA + name, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(name + ' ' + r.status); return r.json(); });
@@ -1289,7 +1292,7 @@
   }
   function whoLegend() { return '<p class="who-legend"><b class="who who-ok"><img src="img/pep-logo.webp" alt="" width="14" height="14">Bold</b> = Discord player · <span class="who-guest">grey</span> = guest. <a href="#" class="who-logon">Log on with Discord</a> to get the frog.</p>'; }
   function wireLegend(box) { var a = box.querySelector('.who-logon'); if (a) a.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); }
-  // LEADERS: every top 10 in one window (FUD Invaders, PEP Snake, YEET THE PEP, Pepe Guesser today and 7 days, Pepe Miner)
+  // LEADERS: every top 10 in one window (FUD Invaders, PEP Snake, YEET THE PEP, Pepe Guesser today and this week, Pepe Miner)
   var LEAD = [['fud', 'FUD Invaders'], ['snake', 'PEP Snake'], ['yeet', 'YEET THE PEP'], ['wp', "Pepe Guesser"], ['miner', 'Pepe Miner']];
   var LEAD_TIP = {
     fud: 'Best score per player. Scores run in your browser, so the server checks them for plausibility and rate.',
@@ -1314,7 +1317,7 @@
         A.body.querySelector('.lead-tip').textContent = LEAD_TIP[g];
         var box = A.body.querySelector('.lead-lists');
         box.className = 'lead-lists' + (g === 'wp' ? ' two' : '');
-        box.innerHTML = g === 'wp' ? '<div>' + list('Today') + '</div><div>' + list('Last 7 days') + '</div>' : list('');
+        box.innerHTML = g === 'wp' ? '<div>' + list('Today') + '</div><div>' + list('This week') + '</div>' : list('');
         var ols = box.querySelectorAll('ol');
         if (g === 'fud' || g === 'snake') rpc('gry_arcade_top', { p_game: g }).then(function (rows) {
           ols[0].innerHTML = rows && rows.length ? rows.map(function (r, i) { return row(r, i, fmt.int(r.score) + (g === 'snake' ? ' blocks' : '')); }).join('') : empty;
@@ -1642,10 +1645,10 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261109ed';
+  var PP_CATALOG = 'passport-catalog.json?v=20261111hof';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261111v3'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261111hof'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1760,8 +1763,10 @@
     return Promise.all([
       frenRpc('gry_passport_state', {}),
       fetch(PP_CATALOG).then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
-      avatarOptions().catch(function () { return null; })
+      avatarOptions().catch(function () { return null; }),
+      wpStats(null)
     ]).then(function (r) {
+      if (r[0] && r[3] && !r[0].preview) r[0].wp_stats = r[3];
       if (r[0] && r[0].signed_in) passportCache = { userId: session ? session.userId : 'preview', preview: !!r[0].preview, state: r[0], catalog: r[1], opts: r[2] };
       return r[0];
     });
@@ -1780,8 +1785,16 @@
     return Promise.all([
       rpc('gry_passport_public', { p_user: id }),
       fetch(PP_CATALOG).then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
-      avatarOptions().catch(function () { return null; })
-    ]).then(function (r) { return { userId: id, state: r[0] || {}, catalog: r[1], opts: r[2] }; });
+      avatarOptions().catch(function () { return null; }),
+      wpStats(id)
+    ]).then(function (r) { var st = r[0] || {}; if (r[3]) st.wp_stats = r[3]; return { userId: id, state: st, catalog: r[1], opts: r[2] }; });
+  }
+  // Pepe Guesser records for the Passport (games/supabase/update_wheres_pepe_hall_of_fame.sql): Days at #1 and the
+  // longest guessing streak, worked out by the server. Discord frens only; null when the migration is not there yet.
+  function wpStats(id) {
+    var s = sbSession();
+    if (FREN_TEST || !s || !s.discord) return Promise.resolve(null);
+    return rpc('gry_wp_stats', { p_user: id || null }).then(function (v) { return v && v.found ? v : null; }, function () { return null; });
   }
 
   // ---------- Fren Passport art (hand-drawn, cut by scripts/build_passport_art.py) ----------
@@ -1812,6 +1825,7 @@
     'pepe_guesser', 'week_scout', 'little_fren', 'first_hatch', 'grown_fren', 'scout_fren', 'pond_pioneer',
   ];
   function ppStamp(x, earned) {
+    if (earned && x.id === 'pond_dominator') return el('span', { class: 'pp-art pp-art-stamp is-dominator', 'aria-hidden': 'true' });
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
     if (!earned) return ppSprite('pp-art pp-art-stamp', PP_STAMPS, 'locked');
     // An earned stamp whose art isn't approved yet is never drawn from Lily or another stamp.
@@ -1895,6 +1909,8 @@
         // [now, goal, what is still missing]. Letters and chat have no counter on purpose, so nobody is
         // nudged to spam the editor or the lobby; those stamps can still be earned.
         var P = state.progress || {};
+        var WPS = state.wp_stats || null;   // Pepe Guesser records (gry_wp_stats), when the server has them
+        var wpDays = function(v){ var n = typeof v === 'number' && isFinite(v) ? v : 0; return fmt.int(n) + (n === 1 ? ' day' : ' days'); };
         var num = function(v){ return typeof v === 'number' && isFinite(v) ? v : 0; };
         var more = function(n, one, many){ return fmt.int(n) + ' more ' + (n === 1 ? one : many); };
         var PROG = {
@@ -1964,7 +1980,10 @@
           ['box', 'Items collected:', itemsGoal ? itemsCount+' / '+itemsGoal : fmt.int(itemsCount)],
           ['star', 'Secrets found:', secretsCount+' / '+secretsGoal],
           ['gamepad', 'YEET best:', yeetBest==null?'—':metres(yeetBest)]
-        ].forEach(function(v){
+        ].concat(WPS ? [
+          ['trophy', 'Days at #1:', fmt.int(num(WPS.days_at_1))],
+          ['calendar', 'Longest Guessing Streak:', wpDays(WPS.longest_streak)]
+        ] : []).forEach(function(v){
           var r = el('div', {class:'pp-jrow'}); r.appendChild(ppIcon(v[0])); r.appendChild(piece('dt','',v[1])); r.appendChild(piece('dd','',v[2])); jl.appendChild(r);
         });
         journey.appendChild(jl);
@@ -2145,7 +2164,10 @@
           ['Items collected', itemsGoal ? itemsCount+' / '+itemsGoal : fmt.int(itemsCount)],
           ['Best YEET flight', yeetBest==null?'—':metres(yeetBest)],
           ['Avatar saved', look ? 'Yes' : 'Not yet']
-        ].forEach(function(v){ var r=el('div'); r.appendChild(piece('dt','',v[0])); r.appendChild(piece('dd','',v[1])); st.appendChild(r); });
+        ].concat(WPS ? [
+          ['Days at #1 (Pepe Guesser)', fmt.int(num(WPS.days_at_1))],
+          ['Longest Guessing Streak', wpDays(WPS.longest_streak)]
+        ] : []).forEach(function(v){ var r=el('div'); r.appendChild(piece('dt','',v[0])); r.appendChild(piece('dd','',v[1])); st.appendChild(r); });
         panes[4].appendChild(st);
         panes[4].appendChild(piece('p','pp-muted','Days registered counts calendar days since ' + (other ? 'this fren' : 'you') + ' joined; it is not an activity counter.'));
 
@@ -2829,9 +2851,21 @@
     'Play every day to grow your streak (the fire badge).',
     '',
     '== RANKING ==',
-    'Today and the last 7 days, everyone. Discord players: bold with a frog.',
+    'Today and This week, everyone. Discord players: bold with a frog.',
     'Guests: grey, one per network.',
     'Under it: how many frens played today.',
+    'The week runs Monday 00:00 to Sunday 23:59:59 UTC.',
+    '',
+    '== HALL OF FAME ==',
+    'Only Discord players count (guests: no Passport).',
+    'Weekly Champion: #1 when the week ends (Frog of the',
+    '  Week stamp). A tie at the top = no winner.',
+    'Days at #1: every day at 23:59:59 UTC the one player',
+    '  leading the week gets +1. A tie = nobody.',
+    'Pond Dominator: lead the week alone on all 7 days.',
+    'Longest Guessing Streak: most days in a row with a',
+    '  guess. It stays when a streak breaks.',
+    'Open Hall of Fame in this folder to see them all.',
     '',
     '== PEP FAUCET (free PEP) ==',
     'After your guess, the yellow PEP Faucet box tells you',
@@ -2871,7 +2905,7 @@
   }
   function wpFolder() {
     openApp('wp-folder', "C:\\Pond\\Pepe Guesser", 'wp-folder', function (A) {
-      var F = [['PepeGuesser.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme]];
+      var F = [['PepeGuesser.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme], ['Hall of Fame', 'hall-of-fame', wpHallOfFame]];
       A.body.innerHTML = '<ul class="folder">' + F.map(function (f, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(f[1]) + '" alt="" width="40" height="40"><span>' + f[0] + '</span></button></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then double-click PepeGuesser.exe.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
@@ -2881,6 +2915,108 @@
         b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
       });
     }, 440);
+  }
+  // Hall of Fame (games/supabase/update_wheres_pepe_hall_of_fame.sql): settled weeks and the all-time boards.
+  // Everything comes from gry_wp_hof(); the page only draws it. A name opens that fren's Passport, read only
+  // (the server sends ids only to frens logged on with Discord, and the Passport stays behind its beta flag).
+  var HOF_CATS = [['weeks', 'Weeks won', function (n) { return fmt.int(n) + (n === 1 ? ' week' : ' weeks'); }],
+    ['days', 'Days at #1', function (n) { return fmt.int(n) + (n === 1 ? ' day' : ' days'); }],
+    ['streak', 'Longest streak', function (n) { return fmt.int(n) + (n === 1 ? ' day' : ' days'); }]];
+  function wpHallOfFame() {
+    openApp('wp-hof', 'Hall of Fame - Pepe Guesser', 'hall-of-fame', function (A) {
+      passportCss();   // the Fren avatars use the Passport's layer styles
+      A.body.innerHTML = '<div class="hof"><div class="tabs98 hof-tabs" role="tablist" aria-label="Hall of Fame">' +
+        '<button type="button" role="tab" aria-selected="true" data-t="weeks">Weekly Champions</button>' +
+        '<button type="button" role="tab" aria-selected="false" data-t="legends">All-Time Legends</button></div>' +
+        '<div class="hof-pane" role="tabpanel"><p class="bin-tip">Polishing the trophies…</p></div>' +
+        '<p class="hof-note"></p></div>';
+      var pane = A.body.querySelector('.hof-pane'), note = A.body.querySelector('.hof-note');
+      var H = null, opts = null, tab = 'weeks', cat = 'weeks';
+      var canOpen = function (c) { return FREN && c && c.id && FREN_ID.test(c.id); };
+      var dateShort = function (iso) { var d = new Date(iso + 'T00:00:00Z'); return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }); };
+      var face = function (c) {
+        var box = el('span', { class: 'hof-face' }), look = opts && c && avatarLook(opts, c.avatar);
+        if (look) box.appendChild(avatarStack(opts, look, 'The Fren of ' + (c.nick || 'this fren')));
+        else box.appendChild(el('img', { src: 'img/pep-logo.webp', alt: '', width: '28', height: '28' }));
+        return box;
+      };
+      // the name (and the face) open the Passport when they can; otherwise plain text
+      var person = function (c) {
+        var wrap = el('span', { class: 'hof-who' });
+        if (canOpen(c)) {
+          var b = el('button', { type: 'button', class: 'hof-open', title: 'Open the Fren Passport of ' + c.nick });
+          b.appendChild(face(c)); b.appendChild(el('span', { class: 'hof-nick' })).textContent = c.nick;
+          b.addEventListener('click', function () { frenPassport(false, { id: c.id.toLowerCase(), nick: c.nick }); });
+          wrap.appendChild(b);
+        } else {
+          wrap.appendChild(face(c)); wrap.appendChild(el('span', { class: 'hof-nick' })).textContent = (c && c.nick) || 'fren';
+        }
+        return wrap;
+      };
+      var paintWeeks = function () {
+        var weeks = (H && H.weeks) || [];
+        pane.replaceChildren();
+        if (!weeks.length) {
+          pane.appendChild(el('p', { class: 'bin-tip' })).textContent = H && H.since
+            ? 'No finished week yet. The first Hall of Fame week starts on ' + dateShort(H.since) + ' (Monday, 00:00 UTC). The champion is crowned after Sunday 23:59:59 UTC.'
+            : 'No finished week yet.';
+          return;
+        }
+        var ol = el('ol', { class: 'hof-list hof-weeks' });
+        weeks.forEach(function (w) {
+          var li = el('li', { class: 'hof-row' + (w.winner ? '' : ' is-empty') });
+          var when = el('span', { class: 'hof-when' });
+          when.appendChild(el('b')).textContent = 'Week ' + w.week + ', ' + w.year;
+          when.appendChild(el('small')).textContent = dateShort(w.week_start) + ' – ' + dateShort(w.week_end);
+          li.appendChild(when);
+          if (w.winner) {
+            li.appendChild(person(w.winner));
+            var pts = el('span', { class: 'hof-val' }); pts.textContent = fmt.int(w.points) + ' pts';
+            if (w.dominator) { var dm = el('small', { class: 'hof-dom', title: 'Led the week alone on all 7 days' }); dm.textContent = 'Pond Dominator'; pts.appendChild(dm); }
+            li.appendChild(pts);
+          } else {
+            li.appendChild(el('span', { class: 'hof-none' })).textContent = w.tied ? 'No Winner - Tie' : 'No Winner - no games';
+            li.appendChild(el('span', { class: 'hof-val' })).textContent = w.tied ? fmt.int(w.points) + ' pts' : '';
+          }
+          ol.appendChild(li);
+        });
+        pane.appendChild(ol);
+      };
+      var paintLegends = function () {
+        pane.replaceChildren();
+        var bar = el('div', { class: 'app-row hof-cats', role: 'group', 'aria-label': 'Category' });
+        HOF_CATS.forEach(function (c) {
+          var b = el('button', { type: 'button', class: 'app-btn', 'aria-pressed': String(c[0] === cat) }); b.textContent = c[1];
+          b.addEventListener('click', function () { cat = c[0]; paintLegends(); });
+          bar.appendChild(b);
+        });
+        pane.appendChild(bar);
+        var C = HOF_CATS.filter(function (c) { return c[0] === cat; })[0];
+        var rows = (H && H.legends && H.legends[cat]) || [];
+        if (!rows.length) { pane.appendChild(el('p', { class: 'bin-tip' })).textContent = 'Nobody here yet. Be the first legend of the pond!'; return; }
+        var ol = el('ol', { class: 'hof-list hof-legends' });
+        rows.forEach(function (r) {
+          var li = el('li', { class: 'hof-row' });
+          li.appendChild(el('span', { class: 'hof-rank' })).textContent = '#' + r.rank;
+          li.appendChild(person(r));
+          li.appendChild(el('span', { class: 'hof-val' })).textContent = C[2](Number(r.value) || 0);
+          ol.appendChild(li);
+        });
+        pane.appendChild(ol);
+      };
+      var paint = function () {
+        A.body.querySelectorAll('.hof-tabs [role=tab]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-t') === tab)); });
+        if (tab === 'weeks') paintWeeks(); else paintLegends();
+        var s = sbSession();
+        note.textContent = 'Discord players only. Weeks run Monday 00:00 to Sunday 23:59:59 UTC; a tie at the top has no winner. ' +
+          (H && H.since ? 'Counted from ' + dateShort(H.since) + ', older weeks are not rebuilt. ' : '') +
+          (FREN ? (s && s.discord ? 'Tap a name to open that Fren Passport.' : 'Log on with Discord to open Fren Passports.') : '');
+      };
+      A.body.querySelectorAll('.hof-tabs [role=tab]').forEach(function (b) { b.addEventListener('click', function () { tab = b.getAttribute('data-t'); paint(); }); });
+      Promise.all([wpRpc('gry_wp_hof', { p_limit: 20 }), avatarOptions().catch(function () { return null; })]).then(function (r) {
+        H = r[0] || {}; opts = r[1]; paint();
+      }, function () { pane.replaceChildren(el('p', { class: 'bin-tip' })); pane.firstChild.textContent = 'The Hall of Fame could not be loaded. Try again later.'; });
+    }, 560);
   }
   // a signed-in session that is still valid; an expired one is refreshed once (the PEP Games pages do the same)
   var wpRefreshing = null;
@@ -3179,7 +3315,7 @@
       };
       var board = function (box) {
         if (!box) return;
-        box.innerHTML = '<div class="tabs98 wp-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-s="day">Today</button><button type="button" role="tab" aria-selected="false" data-s="week">7 days</button></div><ol class="wp-top10"><li class="wp-small">Loading…</li></ol>' + whoLegend();
+        box.innerHTML = '<div class="tabs98 wp-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-s="day">Today</button><button type="button" role="tab" aria-selected="false" data-s="week">This week</button></div><ol class="wp-top10"><li class="wp-small">Loading…</li></ol>' + whoLegend();
         wireLegend(box);
         var ol = box.querySelector('ol');
         var show = function (s) {

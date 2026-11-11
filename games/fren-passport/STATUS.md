@@ -66,7 +66,7 @@ Album: **shown** · **???** (teaser) · hidden.
 | 19 | `detective_fren` | Detective Fren | 5000 on 5 different days | shown | ✅ v3 |
 | 20 | `week_scout` | Week Scout | Pepe Guesser 7 days in a row | shown | ✅ v3 |
 | 21 | `scout_fren` | Scout Fren | Pepe Guesser 14 days in a row | shown | ✅ v3 |
-| 22 | `frog_of_the_week` | Frog of the Week | best Pepe Guesser week (Mon–Sun); the only repeatable stamp (×2, ×3…) | shown | ✅ v3 |
+| 22 | `frog_of_the_week` | Frog of the Week | the Weekly Champion: alone at #1 of the Pepe Guesser week (Mon–Sun UTC); a tie has no winner (from `wp_hof_start`, `games.wp_settle`); the only repeatable stamp (×2, ×3…) | shown | ✅ v3 |
 | 23 | `yeet_adept` | Adept | YEET 3000 m | shown | ✅ v3 |
 | 24 | `nasa_is_hiring` | NASA Is Hiring | 3 YEET flights over 5000 m | shown | ✅ v3 |
 | 25 | `moonwalker` | Moonwalker | YEET 6000 m | shown | ✅ v3 |
@@ -93,6 +93,7 @@ Album: **shown** · **???** (teaser) · hidden.
 | 46 | `treasure_hunter` | Treasure Hunter | 6 secrets | shown | ✅ v3 |
 | 47 | `the_secret_pond` | The Secret Pond | no data yet | hidden | ✅ v3 |
 | 48 | `frogmas` | Frogmas | a visit on 24–26 December | shown | ✅ v3 |
+| 49 | `pond_dominator` | Pond Dominator | alone at #1 of the Pepe Guesser week at the end of all 7 days (`games.wp_settle`, `games/WP_HALL_OF_FAME.md`); once per account | shown | ✅ owner art, own file `pond-dominator.webp` |
 | — | `bali` | BALI | the owner opens it when PEP hits $0.01; every fren gets it on the next visit | printed on the page | ✅ ticket + postmark |
 
 **Totals.** Rules: 40 + BALI. Browser art: 47/48 achievement stamps use approved V3; Beta Tester remains a neutral placeholder. Two event-day art assets also live in the V3 sprite. BALI retains its approved ticket.

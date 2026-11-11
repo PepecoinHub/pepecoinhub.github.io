@@ -113,7 +113,7 @@ begin
       'community_fren', 'hey_fren', 'dear_editor', 'rookie_miner', 'good_game', 'checkmate',
       'i_voted', 'yeet_adept', 'fud_buster', 'long_snake', 'secret_starter', 'treasure_hunter', 'podium', 'game_night',
       'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'top_ten', 'season_champion', 'frog_of_the_week',
-      'junior_editor', 'senior_editor', 'vox_populi', 'bug_hunter', 'bali') then
+      'junior_editor', 'senior_editor', 'vox_populi', 'bug_hunter', 'bali', 'pond_dominator') then
     raise exception 'Unknown passport stamp %', b;
   end if;
   if u is null or games.discord_identity(u) is null then return false; end if;
@@ -622,6 +622,7 @@ declare
   w record;
   sn integer;
   tg date;
+  hof date;
 begin
   -- Certified Fren: 100 different UTC days
   if (select count(*) from games.passport_days where user_id = u) >= 100 then perform games.passport_award(u, 'certified_fren'); end if;
@@ -680,7 +681,19 @@ begin
       perform games.passport_award(u, 'top_ten');
     end if;
   end if;
-  -- Frog of the Week: settle the last finished week once (Monday-Sunday, UTC); every tied first place wins
+  -- Frog of the Week (the Weekly Champion) and Pond Dominator: from games.config.wp_hof_start on, the Hall of Fame
+  -- settlement games.wp_settle() (update_wheres_pepe_hall_of_fame.sql) closes each day and week: exactly one first
+  -- place wins, a tie has no winner, and leading alone all 7 days gives 'pond_dominator'. It marks the weeks it
+  -- settles in passport_weeks, so the older rule below (every tied first place wins) only sees weeks before that.
+  if to_regprocedure('games.wp_settle()') is not null then
+    begin
+      perform games.wp_settle();
+    exception when others then
+      raise warning 'passport wp settle hook: %', sqlerrm;
+    end;
+  end if;
+  hof := (select (to_jsonb(c) ->> 'wp_hof_start')::date from games.config c where c.id = 1);
+  if hof is null or wk < hof then
   insert into games.passport_weeks (week_start) values (wk) on conflict (week_start) do nothing;
   if found then
     for w in select z.user_id from (
@@ -693,6 +706,7 @@ begin
         on conflict (user_id, badge_id) do update set times = games.passport_badges.times + 1, earned_at = excluded.earned_at, notified_at = null;
       end if;
     end loop;
+  end if;
   end if;
   -- Season Champion: first place of each finished ranked Pepe Pictures season (settled once, held once)
   for sn in select distinct m.season_no from games.matches m

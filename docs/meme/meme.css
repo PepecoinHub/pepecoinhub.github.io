@@ -1276,6 +1276,34 @@ footer.foot a { color: #edf3e3; }
 .wp-top10 { margin: 0; padding: 6px 8px 6px 28px; background: #fff; color: #000; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
 .wp-top10 li { padding: 2px 0; }
 .wp-top10 li > b { float: right; font-variant-numeric: tabular-nums; }
+.hof { display: grid; gap: 6px; font: 400 13px/1.4 var(--f-chrome); color: var(--ink); }
+.hof-pane { display: grid; gap: 8px; padding: 8px; background: var(--chrome); box-shadow: inset -1px -1px 0 var(--chrome-dk), inset 1px 1px 0 var(--chrome-hi); min-height: 160px; max-height: min(60vh, 520px); overflow: auto; }
+.hof-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.hof-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 4px 10px; padding: 6px 8px; background: #fff; color: #000; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
+.hof-weeks .hof-row { grid-template-columns: 9.5em minmax(0, 1fr) auto; }
+.hof-row.is-empty { background: #efefe8; color: #444; }
+.hof-when { display: grid; line-height: 1.2; }
+.hof-when small { font-size: 11px; color: #555; }
+.hof-rank { min-width: 2.5ch; font-weight: 700; font-variant-numeric: tabular-nums; }
+.hof-who, .hof-open { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.hof-open { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.hof-open .hof-nick { color: #0000ee; text-decoration: underline; }
+.hof-open:focus-visible { outline: 1px dotted #000; outline-offset: 2px; }
+.hof-nick { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.hof-face { flex: none; display: block; width: 32px; height: 32px; overflow: hidden; background: #7eb7dc; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); }
+.hof-face .fa-stack { width: 100%; height: 100%; }
+.hof-face > img { display: block; width: 100%; height: 100%; object-fit: contain; background: var(--chrome); }
+.hof-val { display: grid; justify-items: end; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hof-dom { font-size: 10px; font-weight: 700; padding: 0 4px; background: #c9a227; color: #000; }
+.hof-none { font-style: italic; color: #555; }
+.hof-cats { flex-wrap: wrap; }
+.hof-cats .app-btn[aria-pressed="true"] { font-weight: 700; box-shadow: inset 1px 1px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi); }
+.hof-note { margin: 0; font-size: 11px; opacity: .85; }
+@media (max-width: 520px) {
+  .hof-weeks .hof-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .hof-weeks .hof-when { grid-column: 1 / -1; grid-template-columns: auto auto; justify-content: start; gap: 8px; align-items: baseline; }
+  .hof-pane { max-height: none; }
+}
 .wp-queue, .wp-claims, .wp-paidlist { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
 .wp-queue li, .wp-claims li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 8px; background: #fff; color: #000; }
 .wp-claims li { grid-template-columns: minmax(0, 1fr) auto; }
