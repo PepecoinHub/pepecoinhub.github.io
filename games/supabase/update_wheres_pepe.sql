@@ -10,7 +10,7 @@
 --     with the answers, and approves or rejects each puzzle. Approved puzzles go live one per UTC day.
 --   * The picture is handed out only when a signed-in player presses Start; the server notes the time.
 --     2 minutes per guess: up to 5000 points in the first minute, 4000 after the continent hint (1:00),
---     3000 after the flag hint (1:30). Full marks within 10 km. Each tab switch after the first: -1000.
+--     3000 after the flag hint (1:30). Full marks within 1 km. Each tab switch after the first: -1000.
 --   * Day and week rankings list Discord-verified players only (guest accounts are free to make).
 --   * PEP rewards: the site holds no coins. A verified player may leave a PEP address after a guess;
 --     the host pays the open claims from the host's own wallet (one sendmany) and records the txid.
@@ -159,11 +159,12 @@ end $$;
 create or replace function games.wp_finish(p games.wp_puzzles, pl games.wp_plays, a_lat double precision, a_lon double precision)
 returns games.wp_plays language plpgsql security definer set search_path = '' as $$
 declare el double precision := extract(epoch from now() - pl.started_at); cap int; k double precision; pts int := 0; r games.wp_plays;
+  rk double precision := case when p.day >= date '2026-11-10' then 1 else 10 end;   -- full-points radius in km: 1 km from puzzle day 2026-11-10 (UTC), 10 km before
 begin
   cap := case when el <= 62 then 5000 when el <= 92 then 4000 when el <= 130 then 3000 else 0 end;   -- a little grace for slow networks
   if a_lat is not null and a_lon is not null and cap > 0 then
     k := games.wp_km(a_lat, a_lon, p.lat, p.lon);
-    pts := greatest(0, round(cap * case when k <= 10 then 1 else exp(-(k - 10) / 1500.0) end)::int - greatest(0, pl.leaves - 1) * 1000);
+    pts := greatest(0, round(cap * case when k <= rk then 1 else exp(-(k - rk) / 1500.0) end)::int - greatest(0, pl.leaves - 1) * 1000);
   elsif a_lat is not null and a_lon is not null then
     k := games.wp_km(a_lat, a_lon, p.lat, p.lon);
   end if;
