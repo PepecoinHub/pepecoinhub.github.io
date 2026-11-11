@@ -483,11 +483,13 @@ test('Passport awards SQL: stamps come only from real game records, once, for Di
     await call(60, 'select public.gry_passport_bali(false) as v');
     assert.ok(await has(62, 'bali'), 'closing takes nothing back');
     await checkin(61); assert.ok(!(await has(61, 'bali')), 'closed again: no new awards');
-    // Share Fren: sharing a Pepe Guesser result, only after a finished round with this account
+    // Share Fren is an idempotent little secret, not a stamp and not proof of an X post.
     const share = u => call(u, 'select public.gry_passport_share() as v');
-    assert.deepEqual(await share(62), { id: 'share_fren', new: false, earned: false }, 'never played: nothing');
-    assert.deepEqual(await share(1), { id: 'share_fren', new: true, earned: true });
-    assert.deepEqual(await share(1), { id: 'share_fren', new: false, earned: true }, 'once');
+    assert.deepEqual(await share(62), { id: 'share_fren', new: false, found: false }, 'never played: nothing');
+    assert.deepEqual(await share(1), { id: 'share_fren', new: true, found: true });
+    assert.deepEqual(await share(1), { id: 'share_fren', new: false, found: true }, 'once');
+    assert.ok(!(await has(1, 'share_fren')), 'copy/share must never grant a stamp');
+    assert.equal(await one("select count(*)::int as n from games.passport_secrets where user_id = $1 and secret_id = 'share_fren'", [uid(1)]), 1);
     await assert.rejects(share(4), /Log on with Discord/);
     assert.equal((await db.query("select has_function_privilege('anon', 'public.gry_passport_share()', 'EXECUTE') as v")).rows[0].v, false);
     // the file runs again: the printed stamps stay, as their count still reaches them

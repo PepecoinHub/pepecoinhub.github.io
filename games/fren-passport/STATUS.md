@@ -26,7 +26,7 @@ Album: **shown** · **???** (teaser) · hidden.
 | # | ID | Label | How it is earned (server) | Album | Art |
 |---:|---|---|---|---|---|
 | 1 | `first_fren` | First Fren | Discord sign-in | shown | ✅ v3 (pixel) |
-| 2 | `pond_pioneer` | Pond Pioneer | Discord linked on launch day (one-time snapshot) | shown | ✅ Lily |
+| 2 | `pond_pioneer` | Pond Pioneer | Discord linked BEFORE Passport launch (one-time migration snapshot) | shown | ✅ exclusive v3 |
 | 3 | `first_avatar` | Fresh Fren | first saved avatar | shown | ✅ v3 (pixel) |
 | 4 | `welcome_back` | Welcome Back! | back the day after the first visit | shown | ✅ Lily |
 | 5 | `first_words` | First Words | first lobby chat message | shown | ✅ Lily |
@@ -173,3 +173,15 @@ but are not "found": they do not count for Secret Starter or Treasure Hunter.
   `passport_award()` for when the PepeGochi SQL runs). The Overview keeps a PepeGochi card that says Coming soon.
   PepeGochi launch day: run the PepeGochi SQL files, turn the five stamps `live`, remove the `?beta=gochi` gate.
 - Every Passport tab uses one skin: passport paper, burgundy edge, navy plaque titles.
+
+## 2026-11-10: Share Fren and Pond Pioneer clarification
+
+- **Share Fren is no longer a stamp.** Copying/sharing a completed Pepe Guesser result discovers a cosmetic secret in Collection via the existing argument-free server RPC. It does not prove an X post. The Gigafren avatar unlock stays linked to the same ID, now a secret. Keep the old sprite tile index to avoid shifting later stamps.
+- **Pond Pioneer** is limited to Discord accounts linked before the Passport opens. The first awards-migration execution takes the one-time prelaunch snapshot; later accounts cannot earn it.
+- This is release-branch work only; no production SQL or deployment is done.
+
+## 2026-11-10: Exclusive Pond Pioneer default art
+
+- Owner-approved pixelated green-flag Pond Pioneer replaces the old Lily image. Full native-resolution PNG saved at `games/fren-passport/source/stamps-new/pond_pioneer.png` (1167 x 1347, transparent). Optimized displayed tile at `docs/meme/passport-assets/pond-pioneer-v3.webp` (138 x 150).
+- `ppStamp` loads the dedicated art for earned `pond_pioneer`; other stamps keep their v3 sprite. The historical Lily sprite is no longer referenced in PondOS JavaScript or Passport CSS, but is left in the repo as an archive.
+- This only changes appearance and tests. No Pioneer awards logic, SQL, production deployment, or live data changed.

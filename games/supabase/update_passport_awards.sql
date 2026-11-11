@@ -6,8 +6,9 @@
 --   update_lobby_mentions.sql, update_frog_letters.sql, update_letters_community.sql, update_miner_cloud.sql.
 -- Safe to run twice.
 --
--- RUN IT ON LAUNCH DAY. The first run takes the Pond Pioneer snapshot: every account that has Discord
--- linked at that moment gets the stamp. Later runs never add anyone (games.passport_meta remembers the run).
+-- RUN IT ON LAUNCH DAY. The first run takes the Pond Pioneer snapshot: accounts with
+-- Discord linked BEFORE the Passport opens get the stamp; later arrivals cannot earn it.
+-- Later runs never add anyone (games.passport_meta remembers the snapshot).
 --
 -- Trust rules (games/FREN_PASSPORT_ACHIEVEMENTS_DECISIONS_2026-11-06.md):
 --   * Only events the server itself records can award a stamp. Nothing here takes a badge id, a count,
@@ -114,8 +115,7 @@ begin
       'i_voted', 'yeet_adept', 'fud_buster', 'long_snake', 'secret_starter', 'treasure_hunter', 'podium', 'game_night',
       'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'season_champion', 'frog_of_the_week',
       'junior_editor', 'senior_editor', 'vox_populi', 'bali', 'pep_birthday', 'thanksgiving_fren', 'valentine_fren',
-      'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'interior_designer', 'picasso_fren',
-      'share_fren') then
+      'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'interior_designer', 'picasso_fren') then
     raise exception 'Unknown passport stamp %', b;
   end if;
   if u is null or games.discord_identity(u) is null then return false; end if;
@@ -486,19 +486,22 @@ $$;
 revoke all on function public.gry_passport_bali(boolean) from public, anon;
 grant execute on function public.gry_passport_bali(boolean) to authenticated;
 
--- Share Fren (owner, 2026-11-09): a Discord fren shares a Pepe Guesser result (Share…, Copy result or Post on X).
--- The site cannot see the post itself, so the click is the claim. The server only checks what it can: the fren
--- has finished at least one Pepe Guesser round with this account. Nothing else comes from the browser.
+-- Share Fren (owner, 2026-11-10): a small cosmetic secret when a Discord fren copies/shares
+-- a finished Pepe Guesser result. The browser cannot prove an X post, so never award a stamp.
+-- This RPC takes no client-provided score or badge name and checks the player's own record.
 create or replace function public.gry_passport_share()
 returns jsonb language plpgsql volatile security definer set search_path = '' as $$
-declare u uuid := auth.uid(); got boolean := false;
+declare u uuid := auth.uid(); new_discovery timestamptz;
 begin
-  if u is null or games.discord_identity(u) is null then raise exception 'Log on with Discord to save stamps'; end if;
+  if u is null or games.discord_identity(u) is null then raise exception 'Log on with Discord to save secrets'; end if;
   if exists (select 1 from games.wp_plays p where p.user_id = u and p.guessed_at is not null) then
-    got := games.passport_award(u, 'share_fren');
+    insert into games.passport_secrets(user_id, secret_id)
+    values (u, 'share_fren')
+    on conflict (user_id, secret_id) do nothing
+    returning discovered_at into new_discovery;
   end if;
-  return jsonb_build_object('id', 'share_fren', 'new', got,
-    'earned', exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = 'share_fren'));
+  return jsonb_build_object('id', 'share_fren', 'new', new_discovery is not null,
+    'found', exists (select 1 from games.passport_secrets s where s.user_id = u and s.secret_id = 'share_fren'));
 end
 $$;
 revoke all on function public.gry_passport_share() from public, anon;

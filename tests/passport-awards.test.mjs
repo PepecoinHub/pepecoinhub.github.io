@@ -41,8 +41,11 @@ test('awards come from game records, never from browser arguments', () => {
   assert.deepEqual(rpcs.map(x => x[0]).sort(), ['gry_letter_printed', 'gry_letters', 'gry_passport_bali',
     'gry_passport_checkin', 'gry_passport_share', 'gry_passport_state', 'gry_yeet_submit']);
   assert.equal(rpcs.find(x => x[0] === 'gry_passport_checkin')[1], '');
-  assert.equal(rpcs.find(x => x[0] === 'gry_passport_share')[1], '', 'Share Fren: the server checks a finished Pepe Guesser round');
-  assert.match(fnBody(sql, 'public.gry_passport_share'), /games\.wp_plays p where p\.user_id = u and p\.guessed_at is not null/);
+  assert.equal(rpcs.find(x => x[0] === 'gry_passport_share')[1], '', 'Share Fren: only a finished Guesser round can reveal the secret');
+  const share = fnBody(sql, 'public.gry_passport_share');
+  assert.match(share, /games\.wp_plays p where p\.user_id = u and p\.guessed_at is not null/);
+  assert.match(share, /insert into games\.passport_secrets\(user_id, secret_id\)/);
+  assert.doesNotMatch(share, /passport_award|passport_badges/);
   // the owner tools (Printed, BALI, the mailbox) refuse everyone but the site owner, first thing
   for (const f of ['public.gry_letter_printed', 'public.gry_passport_bali'])
     assert.match(fnBody(sql, f), / as \$\$\n(declare[^\n]*\n)?begin\n\s+if not games\.is_owner\(auth\.uid\(\)\) then raise exception/, f);

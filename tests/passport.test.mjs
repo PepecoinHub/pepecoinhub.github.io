@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [51, 18, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [50, 19, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -22,8 +22,8 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
 });
 
 test('every live casual secret is server allowlisted and discoverable', () => {
-  // chat secrets (source: chat) are given by the server's chat trigger only, so they must NOT be claimable
-  const live = catalog.secrets.filter(x => x.status === 'live' && x.source !== 'chat').map(x => x.id).sort();
+  // Chat and share secrets have dedicated server paths and cannot use the casual discovery RPC.
+  const live = catalog.secrets.filter(x => x.status === 'live' && !['chat','share'].includes(x.source)).map(x => x.id).sort();
   const chat = catalog.secrets.filter(x => x.status === 'live' && x.source === 'chat').map(x => x.id);
   const block = sql.match(/p_secret\s+not\s+in\s*\(([^)]*)\)/i);
   assert.ok(block, 'SQL casual-secret whitelist missing');
@@ -32,6 +32,8 @@ test('every live casual secret is server allowlisted and discoverable', () => {
   for (const id of live) assert.ok(pond.includes("discoverSecret('" + id + "')"), id);
   const awards = readFileSync(new URL('../games/supabase/update_passport_awards.sql', import.meta.url), 'utf8');
   for (const id of chat) { assert.ok(!allowed.includes(id), id + ' must not be claimable'); assert.ok(awards.includes("'" + id + "'"), id + ' given by the server'); }
+  assert.ok(!allowed.includes('share_fren'), 'Share Fren uses its dedicated server RPC');
+  assert.match(awards, /insert into games\.passport_secrets\(user_id, secret_id\)[\s\S]*?values \(u, 'share_fren'\)/);
 });
 
 test('secret RPC requires Discord and cannot issue premium or gameplay rewards', () => {
@@ -182,7 +184,7 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
     // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
     'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
     // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
-    'stamps-v3.webp': [48 * 138, 150],
+    'stamps-v3.webp': [48 * 138, 150], 'pond-pioneer-v3.webp': [138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
@@ -203,13 +205,15 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
   assert.equal(count('PP_STAMPS'), 16);
   assert.equal(count('PP_V3'), 48, 'PP_V3 matches the 48 tiles of stamps-v3.webp');
+  assert.match(js, /if \(earned && x\.id === 'pond_pioneer'\)/, 'Pond Pioneer uses the exclusive new art');
+  assert.doesNotMatch(js, /PP_LILY/, 'No old Lily sprite fallback');
+  const css = readFileSync(new URL('../docs/meme/passport.css', import.meta.url), 'utf8');
+  assert.match(css, /\.pp-art-stamp\.is-pioneer/, 'Pond Pioneer class has its own stamp art');
+  assert.doesNotMatch(css, /\.pp-art-stamp\.is-lily|stamps-lily\.webp/, 'No runtime CSS dependency on Lily');
   const v3 = readFileSync(new URL('../scripts/build_v3_stamps.py', import.meta.url), 'utf8').match(/V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join();
   assert.equal(v3, js.match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join(), 'same order as the build script');
   assert.equal(count('PP_ICONS'), 12);
-  // the Lily sprite order in the client equals the build script order
-  const lily = js.match(/var PP_LILY = \[([^\]]*)\]/)[1].match(/'([a-z0-9_]+)'/g).map(x => x.slice(1, -1));
-  const built = [...readFileSync(new URL('../scripts/build_lily_stamps.mjs', import.meta.url), 'utf8').matchAll(/\['([a-z0-9_]+)', S[123],/g)].map(x => x[1]);
-  assert.equal(lily.length, 15); assert.deepEqual(lily, built);
+  // Legacy Lily sprite is archived as an asset, but no longer rendered in the Passport.
   assert.ok(existsSync(new URL('../games/fren-passport/source/passport-mockup.webp', import.meta.url)), 'lossless source art is kept');
 });
 
