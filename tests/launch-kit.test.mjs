@@ -10,7 +10,8 @@ const order = [...file('games/supabase/deploy/RUN_ORDER.md').matchAll(/^\d+\. `(
 const check = file('games/supabase/deploy/00_check.sql');
 
 test('launch kit: run order and the read-only check agree', () => {
-  assert.equal(order.length, 13);
+  assert.equal(order.length, 14);
+  assert.ok(order.indexOf('update_passport_season.sql') < order.indexOf('update_fren_passport.sql'), 'the season start first');
   for (const f of order) assert.ok(existsSync(new URL('../games/supabase/' + f, import.meta.url)), f);
   const checked = [...check.matchAll(/^\s+\((\d+),\s+'([a-z0-9_]+\.sql)/gm)].map(m => [+m[1], m[2]]);
   assert.deepEqual(checked, order.map((f, i) => [i + 1, f]));

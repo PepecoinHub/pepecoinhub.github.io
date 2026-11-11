@@ -2704,6 +2704,8 @@
     }
     frenRpc('gry_passport_discover',{p_secret:id}).then(function(result){
       if(!result||result.id!==id) return;
+      // public beta: the server keeps no secrets yet, so this browser must not remember it as claimed
+      if(result.beta) { balloon('Nice find, fren!','Secrets start counting on Monday. Find it again then and it goes into your Fren Passport.','gif-045-still'); return; }
       if (!FREN_TEST) { try { localStorage.setItem(k,'1'); } catch(e) {} }
       if (FREN_TEST) passportLoad(sbSession()).then(function () {
         if (apps.passport && apps.passport.render) apps.passport.render();

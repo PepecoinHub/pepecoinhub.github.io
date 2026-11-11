@@ -49,6 +49,11 @@ language sql volatile set search_path = '' as $$
   select coalesce(nullif(current_setting('pepegochi.sim_now', true), '')::timestamptz, clock_timestamp())
 $$;`;
 
+// Test/simulator only: the Passport season started long ago, so every rule sees the test history.
+export const OPEN_SEASON = `
+create or replace function games.passport_start() returns timestamptz
+language sql stable set search_path = '' as $$ select '2000-01-01 00:00:00+00'::timestamptz $$;`;
+
 // PGlite has exec() for many statements; node-postgres runs them through query().
 export const asDb = x => ({ exec: x.exec ? s => x.exec(s) : s => x.query(s), query: (s, p) => x.query(s, p) });
 
@@ -58,6 +63,11 @@ export const uid = n => '00000000-0000-4000-8000-' + String(n).padStart(12, '0')
 export async function prepare(db, { extra = [] } = {}) {
   await db.exec(SUPABASE_STUB);
   await db.exec(await read('games/supabase/schema.sql'));
+  // the Passport files need the season start (update_passport_season.sql); here the season is open, long ago
+  if (extra.some(f => /passport|fren_avatar/.test(f))) {
+    await db.exec(await read('games/supabase/update_passport_season.sql'));
+    await db.exec(OPEN_SEASON);
+  }
   for (const f of extra) await db.exec(await read('games/supabase/' + f));
   await db.exec(await read('games/supabase/update_pepegochi_v2.sql'));
   await db.exec(VIRTUAL_CLOCK);

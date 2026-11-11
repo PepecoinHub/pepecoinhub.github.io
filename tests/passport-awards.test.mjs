@@ -43,7 +43,7 @@ test('awards come from game records, never from browser arguments', () => {
   assert.equal(rpcs.find(x => x[0] === 'gry_passport_checkin')[1], '');
   assert.equal(rpcs.find(x => x[0] === 'gry_passport_share')[1], '', 'Share Fren: only a finished Guesser round can reveal the secret');
   const share = fnBody(sql, 'public.gry_passport_share');
-  assert.match(share, /games\.wp_plays p where p\.user_id = u and p\.guessed_at is not null/);
+  assert.match(share, /games\.passport_open\(\) and exists \(select 1 from games\.wp_plays p where p\.user_id = u and p\.guessed_at >= games\.passport_start\(\)\)/);
   assert.match(share, /insert into games\.passport_secrets\(user_id, secret_id\)/);
   assert.doesNotMatch(share, /passport_award|passport_badges/);
   // the owner tools (Printed, BALI, the mailbox) refuse everyone but the site owner, first thing
@@ -81,12 +81,15 @@ test('gry_yeet_submit keeps the update_yeet.sql body, plus only the passport hoo
   assert.match(sql, /grant execute on function public\.gry_yeet_submit\(integer, integer, integer\) to authenticated;/);
 });
 
-test('Pond Pioneer is a one-time snapshot and closed afterwards', () => {
+test('Pond Pioneer: the beta snapshot plus beta check-ins, closed at the season start', () => {
   const p = catalog.achievements.find(x => x.id === 'pond_pioneer');
   assert.equal(p.status, 'live'); assert.equal(p.limited, true);
-  assert.match(sql, /insert into games\.passport_meta \(k\) values \('pioneer_snapshot'\) on conflict \(k\) do nothing returning at into launch;\s+if launch is not null then/);
-  // no trigger or RPC ever awards it later
-  assert.equal([...sql.matchAll(/'pond_pioneer'/g)].length, 2, 'allowlist + snapshot only');
+  assert.match(sql, /insert into games\.passport_meta \(k\) values \('pioneer_snapshot'\) on conflict \(k\) do nothing returning at into launch;\s+if launch is not null and not games\.passport_open\(\) then/);
+  // the award path refuses it once the season is open; only the beta check-in gives it later
+  assert.match(sql, /if b = 'pond_pioneer' then\s+if games\.passport_open\(\) then return false; end if;/);
+  assert.match(sql, /if not games\.passport_open\(\) then\s+-- public beta[^\n]*\n\s+perform games\.passport_award\(u, 'pond_pioneer'\);/);
+  // allowlist, gate, beta check-in, snapshot, beta cleanup
+  assert.equal([...sql.matchAll(/'pond_pioneer'/g)].length, 5);
 });
 
 test('reward parts open with stamps that exist in the catalog', () => {

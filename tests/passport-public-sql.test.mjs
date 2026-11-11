@@ -28,7 +28,8 @@ grant usage on schema public, auth to anon, authenticated;
 `;
 const GAMES = ['schema.sql', 'update_yeet.sql', 'update_wheres_pepe.sql', 'update_wheres_pepe_guests.sql',
   'update_lobby_chat.sql', 'update_open_chat.sql', 'update_lobby_mentions.sql', 'update_frog_letters.sql',
-  'update_letters_community.sql', 'update_miner_cloud.sql', 'update_fren_passport.sql', 'update_fren_avatar.sql'];
+  'update_letters_community.sql', 'update_miner_cloud.sql', 'update_passport_season.sql', 'update_fren_passport.sql', 'update_fren_avatar.sql'];
+const seasonStart = ts => `create or replace function games.passport_start() returns timestamptz language sql stable set search_path = '' as $$ select (${ts})::timestamptz $$`;
 // what another fren may see; the owner's progress counters and the Discord id are not in it
 const KEYS = ['achievements', 'achievements_earned', 'avatar', 'found', 'items', 'member_since', 'nick', 'nickname',
   'secrets', 'signed_in', 'user_id', 'yeet_best'];
@@ -46,6 +47,7 @@ test('Fren Passport public view: Discord frens only, read only, the owner\'s sta
   try {
     await db.query(SUPABASE_STUB);
     for (const f of GAMES) await db.query(await read('games/supabase/' + f));
+    await db.query(seasonStart("'2000-01-01 00:00:00+00'"));
     const pub = await read('games/supabase/update_passport_public.sql');
     await db.query(pub);
     await db.query(pub);   // safe to run twice
@@ -128,7 +130,7 @@ test('Fren Passport public view: Discord frens only, read only, the owner\'s sta
     assert.equal(new Date(v1.member_since).getTime(), new Date(mine1.member_since).getTime());
     assert.deepEqual(v1.secrets.map(s => s.id), ['wrong_frog']); assert.ok(v1.secrets[0].discovered_at);
     assert.deepEqual(v1.items.map(i => [i.id, i.quantity]), [['moon_rock', 2]]);
-    assert.deepEqual(v1.achievements.map(a => a.id).sort(), ['first_avatar', 'first_fren', 'moonwalker'], 'Moonwalker from the YEET record');
+    assert.deepEqual(v1.achievements.map(a => a.id).sort(), ['first_avatar', 'first_fren'], 'no Moonwalker from an old YEET record');
     assert.deepEqual(earned(v1), earned(mine1), 'the same stamps and dates the owner sees');
     assert.equal(v1.achievements.find(a => a.id === 'first_avatar').title, 'Fresh Fren');
     // nothing private: no counters, no Discord account id
@@ -136,14 +138,18 @@ test('Fren Passport public view: Discord frens only, read only, the owner\'s sta
     assert.doesNotMatch(text, /discord-secret-id|progress|login|streak|letters|chat_days|miner|notified/);
 
     // --- after the awards migration: stored stamps, Moonwalker once, and a chat stamp shows up
+    // run in the beta (Pond Pioneer snapshot), then the season opens
+    await db.query(seasonStart("now() + interval '1 day'"));
     await db.query(await read('games/supabase/update_passport_awards.sql'));
     await db.query(pub);   // order does not matter
+    await db.query(seasonStart("'2000-01-01 00:00:00+00'"));
     await db.query("insert into games.lobby_chat(user_id, nick, verified, body) values ($1, 'PondNick2', true, 'gm frens')", [uid(2)]);
     await call(2, 'select public.gry_passport_checkin() as v');
     const v2 = await look(1, uid(2));
     const ids = v2.achievements.map(a => a.id);
-    assert.equal(ids.filter(x => x === 'moonwalker').length, 1, 'Moonwalker once');
-    for (const x of ['first_fren', 'first_avatar', 'moonwalker', 'pond_pioneer', 'first_words']) assert.ok(ids.includes(x), x);
+    assert.equal(ids.filter(x => x === 'moonwalker').length, 0, 'an old record is not backfilled');
+    for (const x of ['first_fren', 'pond_pioneer', 'first_words']) assert.ok(ids.includes(x), x);
+    assert.ok(!ids.includes('first_avatar'), 'the beta run clears stamps stored before the season start');
     const mine2 = await own(2);
     assert.deepEqual(earned(v2), earned(mine2), 'still the same as the owner sees');
     assert.ok(mine2.progress && mine2.progress.chat_days === 1, 'the owner keeps the counters');

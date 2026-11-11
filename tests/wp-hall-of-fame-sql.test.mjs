@@ -28,7 +28,7 @@ grant usage on schema public, auth to anon, authenticated;
 `;
 const FILES = ['schema.sql', 'update_yeet.sql', 'update_wheres_pepe.sql', 'update_wheres_pepe_guests.sql', 'update_wheres_pepe_top_all.sql',
   'update_wheres_pepe_monday_reset.sql', 'update_lobby_chat.sql', 'update_open_chat.sql', 'update_lobby_mentions.sql', 'update_frog_letters.sql',
-  'update_letters_community.sql', 'update_miner_cloud.sql', 'update_polls.sql', 'update_arcade.sql', 'update_fren_passport.sql',
+  'update_letters_community.sql', 'update_miner_cloud.sql', 'update_polls.sql', 'update_arcade.sql', 'update_passport_season.sql', 'update_fren_passport.sql',
   'update_fren_avatar.sql', 'update_passport_awards.sql', 'update_passport_public.sql'];
 
 test('Pepe Guesser Hall of Fame SQL: days, weeks, ties, Pond Dominator, streaks, history and access',
@@ -43,7 +43,9 @@ test('Pepe Guesser Hall of Fame SQL: days, weeks, ties, Pond Dominator, streaks,
   await db.connect();
   try {
     await db.query(SUPABASE_STUB);
-    for (const f of FILES) await db.query(await read('games/supabase/' + f));
+    for (const f of FILES) await db.query(await read('games/supabase/' + f));   // in the beta: the Pond Pioneer snapshot
+    // the Passport season is open (long ago) for the rest of this test; tests/passport-awards-sql checks the beta
+    await db.query("create or replace function games.passport_start() returns timestamptz language sql stable set search_path = '' as $$ select '2000-01-01 00:00:00+00'::timestamptz $$");
     const hofSql = await read('games/supabase/update_wheres_pepe_hall_of_fame.sql');
     await db.query(hofSql);
 
@@ -161,7 +163,7 @@ test('Pepe Guesser Hall of Fame SQL: days, weeks, ties, Pond Dominator, streaks,
     assert.equal(stats.days_at_1, 13); assert.equal(stats.weeks_won, 2);
     assert.equal(stats.longest_streak, 14, 'weeks A and B in a row; week C Mon-Fri had no play');
     assert.equal((await call(6, 'select public.gry_wp_stats() as v')).longest_streak, 5, 'a timeout without a pin breaks the run');
-    assert.equal(await one('select games.wp_longest_streak($1)', [uid(2)]), 16, 'streaks use all recorded plays, also before the Hall of Fame start');
+    assert.equal(await one('select games.wp_longest_streak($1)', [uid(2)]), 9, 'version A: the week before the start does not count (days 0-8 only)');
     assert.equal((await call(4, 'select public.gry_wp_stats($1) as v', [uid(1)])).signed_in, false, 'guests cannot look');
     assert.equal((await call(7, 'select public.gry_wp_stats($1) as v', [uid(4)])).found, false, 'guests have no record');
 
@@ -172,7 +174,7 @@ test('Pepe Guesser Hall of Fame SQL: days, weeks, ties, Pond Dominator, streaks,
     assert.ok(!JSON.stringify(hofAnon).includes(uid(1)), 'no user ids for visitors without Discord');
     assert.deepEqual(hofAnon.legends.weeks.map(r => [r.nick, r.value, r.rank]), [['Fren1', 2, 1]]);
     assert.deepEqual(hofAnon.legends.days.slice(0, 2).map(r => [r.nick, r.value]), [['Fren1', 13], ['Fren2', 6]]);
-    assert.deepEqual(hofAnon.legends.streak.slice(0, 3).map(r => [r.nick, r.value]), [['Fren2', 16], ['Fren1', 14], ['Fren6', 5]]);
+    assert.deepEqual(hofAnon.legends.streak.slice(0, 3).map(r => [r.nick, r.value]), [['Fren1', 14], ['Fren2', 9], ['Fren6', 5]]);
     assert.ok(!hofAnon.legends.streak.some(r => r.nick === 'Fren4'), 'guest plays never count');
     const hofFren = await call(7, 'select public.gry_wp_hof() as v');
     assert.equal(hofFren.weeks[1].winner.id, uid(1), 'a Discord fren gets the id that opens the Passport');

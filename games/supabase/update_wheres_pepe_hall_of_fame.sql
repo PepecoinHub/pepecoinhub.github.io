@@ -21,6 +21,7 @@
 --     wp_hof_start is the first Monday on or after the launch, the moment update_passport_awards.sql first ran
 --     (games.passport_meta 'pioneer_snapshot'). Launch on a Monday: that Monday. Before the launch nothing is settled.
 --     Days before wp_hof_start are never filled in afterwards (no history is rebuilt from old data).
+--   * Version A (owner, 2026-11-11): nothing before the start counts, the Longest Guessing Streak included.
 --   * Longest Guessing Streak is worked out from the plays themselves, with the same rule as the Passport's
 --     current streak (games.passport_wp_streak): Discord-verified plays with a pin, one per UTC day.
 
@@ -41,9 +42,20 @@ begin
   select (m.at at time zone 'utc')::date into launch from games.passport_meta m where m.k = 'pioneer_snapshot';
   if launch is null then return null; end if;
   st := launch + ((8 - extract(isodow from launch)::int) % 7);
+  -- the Passport season start (update_passport_season.sql, Monday 16 XI 2026): never earlier than that
+  if to_regprocedure('games.passport_start_day()') is not null then
+    st := greatest(st, games.passport_start_day());
+    st := st + ((8 - extract(isodow from st)::int) % 7);
+  end if;
   update games.config set wp_hof_start = st where id = 1 and wp_hof_start is null;
   return (select c.wp_hof_start from games.config c where c.id = 1);
 end
+$$;
+
+-- the stored start, read only (null until the launch): Longest Guessing Streak counts days from it on
+create or replace function games.wp_hof_start() returns date
+language sql stable security definer set search_path = '' as $$
+  select c.wp_hof_start from games.config c where c.id = 1
 $$;
 
 -- ---------- tables (server only) ----------
@@ -202,7 +214,8 @@ create or replace function games.wp_longest_streak(u uuid) returns integer
 language sql stable security definer set search_path = '' as $$
   with days as (
     select distinct q.day from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
-     where x.user_id = u and x.verified and x.g_lat is not null and x.guessed_at is not null and q.day is not null),
+     where x.user_id = u and x.verified and x.g_lat is not null and x.guessed_at is not null and q.day is not null
+       and q.day >= coalesce(games.wp_hof_start(), 'infinity'::date)),
   runs as (select day - (row_number() over (order by day))::int as grp from days)
   select coalesce(max(n), 0)::int from (select count(*) n from runs group by grp) r
 $$;
@@ -269,6 +282,7 @@ begin
                       select d.user_id, d.day - (row_number() over (partition by d.user_id order by d.day))::int grp
                         from (select distinct x.user_id, q.day from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
                                where x.verified and x.g_lat is not null and x.guessed_at is not null and q.day is not null
+                                 and q.day >= coalesce(games.wp_hof_start(), 'infinity'::date)
                                  and games.discord_identity(x.user_id) is not null
                                  and not games.is_host_user(x.user_id)) d) z
                      group by z.user_id, z.grp) r group by r.user_id) s
@@ -302,6 +316,7 @@ $$;
 -- ---------- access ----------
 revoke all on function games.wp_hof_begin(), games.wp_monday(date), games.wp_standings(date, date), games.wp_settle(), games.wp_dominator_stamps(), games.wp_longest_streak(uuid),
   games.wp_card(uuid, boolean) from public, anon, authenticated;
+revoke all on function games.wp_hof_start() from public, anon, authenticated;
 revoke all on function public.gry_wp_stats(uuid), public.gry_wp_hof(integer) from public;
 grant execute on function public.gry_wp_hof(integer) to anon, authenticated;
 grant execute on function public.gry_wp_stats(uuid) to authenticated;

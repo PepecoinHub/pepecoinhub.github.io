@@ -48,7 +48,7 @@ test('Pond Dominator and Frog of the Week go through the existing Passport paths
   // passport_daily hands Hall of Fame weeks to wp_settle and keeps the old rule only before wp_hof_start
   const daily = fnBody(awards, 'games.passport_daily');
   assert.match(daily, /perform games\.wp_settle\(\);\s+exception when others then\s+raise warning/);
-  assert.match(daily, /if hof is null or wk < hof then/);
+  assert.match(daily, /if wk >= sd and \(hof is null or wk < hof\) then/);
   // no Perfect Week, no Lily art for the new stamp
   assert.ok(!catalog.achievements.some(x => x.id === 'perfect_week'));
   assert.match(pond, /x\.id === 'pond_dominator'\) return el\('span', \{ class: 'pp-art pp-art-stamp is-dominator'/);

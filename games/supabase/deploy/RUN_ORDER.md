@@ -20,24 +20,26 @@ does no harm). The last row shows whether the Passport has launched (the Pond Pi
 7. `update_words_pepaint.sql`: 84 new PEPaint words.
 8. `update_lobby_who.sql`: LAN Party chat, who is online (#246).
 
-## B. The launch
-9. `update_fren_passport.sql`
-10. `update_fren_avatar.sql`
-11. `update_passport_awards.sql`: **its first run is the launch moment**: everyone with Discord linked right then gets
-    Pond Pioneer, and the Hall of Fame starts on the first Monday on or after this moment.
-12. `update_passport_public.sql`: other frens' passports, read only.
-13. `update_wheres_pepe_hall_of_fame.sql`: Days at #1, Weekly Champion, Pond Dominator, Hall of Fame (#258). Last, so
-    the week board is Monday-Sunday and still hides the host.
+## B. The launch (public beta Thursday 12 XI, season from Monday 16 XI)
+9. `update_passport_season.sql`: the season start, Monday 16 XI 2026 00:00 Warsaw time (2026-11-15 23:00 UTC).
+   Until then (the beta) the server gives only Pond Pioneer; from then on every stamp counts, from zero.
+10. `update_fren_passport.sql`
+11. `update_fren_avatar.sql`
+12. `update_passport_awards.sql`: its first run takes the Pond Pioneer snapshot (everyone with Discord linked right
+    then); after that, every Discord fren who opens PondOS before the season start gets it too. No backfills.
+13. `update_passport_public.sql`: other frens' passports, read only.
+14. `update_wheres_pepe_hall_of_fame.sql`: Days at #1, Weekly Champion, Pond Dominator, Hall of Fame (#258). Last, so
+    the week board is Monday-Sunday and still hides the host. The Hall of Fame starts with the season (16 XI).
 
 ## All at once
-`deploy/LAUNCH_ALL.sql` is files 1-13 in this order in ONE transaction (built by `scripts/build_launch_sql.py`, the
+`deploy/LAUNCH_ALL.sql` is files 1-14 in this order in ONE transaction (built by `scripts/build_launch_sql.py`, the
 files' own begin/commit lines taken out): paste it, Run, and either everything is in or, on any error, nothing is.
-Use it instead of the 13 files, not as well (running both is harmless, only slower).
+Use it instead of the 14 files, not as well (running both is harmless, only slower).
 
 Then run `deploy/00_check.sql` again: all rows `done`, and the last row shows the launch time.
 
 ## Optional, after B
-- Supabase > Database > Extensions > `pg_cron` on, then run step 15 again: the Hall of Fame closes each day at 00:01 UTC
+- Supabase > Database > Extensions > `pg_cron` on, then run step 14 again: the Hall of Fame closes each day at 00:01 UTC
   by itself. Without it, days close on the next Passport visit or Hall of Fame view (same result, a bit later).
 
 ## Later: PepeGochi day (owner, 2026-11-09: PepeGochi launches after the Passport)
