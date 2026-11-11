@@ -178,13 +178,15 @@ test('Avatar Maker client: one save RPC with six v2 IDs, nothing kept in localSt
   assert.match(pond, /avatar-options\.json\?v=/);
 });
 
-test('Passport booklet art: four small transparent WebPs with the sizes the page layout assumes', () => {
+test('Passport booklet art: small transparent WebPs with the sizes the page layout assumes', () => {
   const dir = new URL('../docs/meme/passport-assets/', import.meta.url);
   const want = { 'page-left.webp': [360, 528], 'page-right.webp': [360, 528], 'stamps.webp': [16 * 69, 75], 'icons.webp': [12 * 48, 48],
     // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
     'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
     // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
     'stamps-v3.webp': [48 * 138, 150], 'pond-pioneer-v3.webp': [138, 150],
+    // Pond Dominator: the owner's own art, one V3-sized tile outside the atlas (update_wheres_pepe_hall_of_fame.sql)
+    'pond-dominator.webp': [138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
