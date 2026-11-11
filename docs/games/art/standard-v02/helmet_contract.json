@@ -1,0 +1,14 @@
+{
+  "asset": "helmet_overlay_on_512_canvas.png",
+  "frameSize": [
+    512,
+    512
+  ],
+  "registration": "Coordinates align with standard_frog_no_helmet.png, no offsets at rest",
+  "visibility": "hp >= initialHP; after first hp decrement, helmet permanently gone for the match",
+  "event": "positive damage regardless of source (including falls); only once per life",
+  "durationSec": 1.5,
+  "physics": "visual effect only; never change hitboxes, HP, network damage or collision",
+  "currentPlayerArt": "concept alternative to the existing Classic skin; requires owner review",
+  "reducedMotion": "immediate disappearance, no fling particles"
+}

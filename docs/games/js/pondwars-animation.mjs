@@ -8,10 +8,12 @@ export class CharacterAnimator {
   advance(dt, paused = false) {
     if (!paused && Number.isFinite(dt) && dt > 0) this.time += dt;
   }
-  observe(g, events = [], { charging = false } = {}) {
+  observe(g, events = [], { charging = false, onHealthDrop } = {}) {
     for (const f of g.frogs) {
       let a = this.actors.get(f.id);
       if (!a) { a = { state: 'idle', since: this.time, hp: f.hp, ground: f.ground }; this.actors.set(f.id, a); }
+      // Optional presentation observer. Initial/restored actors never synthesize damage.
+      if (a.hp - f.hp >= 1) onHealthDrop?.(f, a.hp, this.time);
       let pulse = null;
       if (!a.ground && f.ground) pulse = 'landing';
       if (events.some(e => e.type === 'fire') && f.id === g.current) pulse = 'fire';

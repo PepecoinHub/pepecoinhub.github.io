@@ -1,11 +1,16 @@
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
 import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261111hand';
 import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261111hand';
-import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261111anim';
+import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261111helmet';
+import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261111helmet';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
 const $ = s => document.querySelector(s);
+// Opt-in art review: one standard model in 2.0, existing beta roster remains available without this flag.
+const standardPreview = new URLSearchParams(location.search).get('art') === 'standard-v02';
+let standardAssets = null;
+const helmets = new HelmetCosmetics();
 const framed = (() => { try { return window.self !== window.top; } catch { return true; } })();
 if (framed || /[?&]embed=1(&|$)/.test(location.search)) document.documentElement.classList.add('embed');
 
@@ -45,7 +50,7 @@ const teamPlayers=[[0,1,2,3],[4,5,6,0]];
 const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite','drill','candles','rope','jetpack','teleport'].map(w=>{const img=new Image();img.src='img/pondwars/'+w+'.svg';return[w,img];}));
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 let reduce = motionPreference.matches;
-motionPreference.addEventListener('change', e => { reduce = e.matches; });
+motionPreference.addEventListener('change', e => { reduce = e.matches; if (reduce) helmets.suppressMotion(); });
 const animator = new CharacterAnimator();
 // Optional assets keyed by PLAYERS.id. Existing art remains the default.
 const animationAssets = new Map();
@@ -139,13 +144,14 @@ function frog(f, t) {
   ctx.rotate(animation.rotation); ctx.scale(animation.sx, animation.sy);
   ctx.globalAlpha = animation.alpha;
   const choice=teamPlayers[f.team][Math.floor(f.id/2)]??0,person=PLAYERS[choice],art=playerArt[choice];
-  const asset = animationAssets.get(person.id);
+  const asset = standardPreview ? standardAssets : animationAssets.get(person.id);
   const frame = spriteFrame(asset?.manifest, animation.state, animation.age, reduce);
   const geometry = frame && asset.image?.naturalWidth ? frameGeometry(frame) : null;
   ctx.scale(s * (geometry ? 1 : person.face), 1);
   if (geometry) {
     const q = geometry;
     ctx.drawImage(asset.image,q.sx,q.sy,q.sw,q.sh,q.x,q.y+29,q.width,q.height);
+    if (standardPreview && helmets.wearing(f)) ctx.drawImage(asset.helmet,0,0,512,512,q.x,q.y+29,q.width,q.height);
   } else if(art.naturalWidth){
     const [sx,sy,sw,sh]=person.rect||[0,0,art.naturalWidth,art.naturalHeight],height=64,width=Math.min(64,height*sw/sh);
     // team-colour glow hugging the sprite, so the team still reads when the under-foot disc
@@ -161,7 +167,7 @@ function frog(f, t) {
   ctx.restore();
   // Held weapon is drawn in world space at hand height (matches projectileOrigin at f.y-32),
   // not as a sprite glued near the feet inside the character transform.
-  if (turn || animation.state === 'fire') heldWeapon(f, characterPoint(f, animation, geometry?.hand));
+  if (turn || animation.state === 'fire') heldWeapon(f, characterPoint(f, animation, standardPreview && geometry ? PROTOTYPE_WEAPON_HAND : geometry?.hand));
   // team pennant flag above the frog: a second team-colour cue near the label, readable even
   // when the under-foot disc is occluded. It waves on a frog's turn unless reduced-motion is on.
   const flagW = 15 * mk, flagH = 10 * mk, poleTop = f.y - 82 - 13 * mk, poleBot = f.y - 82 + 3;
@@ -315,6 +321,7 @@ function draw(t) {
     ctx.strokeStyle='#a6c65b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-4,y-9);ctx.moveTo(x,y);ctx.lineTo(x+5,y-7);ctx.stroke();
     if(x%3===0){ctx.fillStyle='#ede0ae';ctx.fillRect(x+11,y-11,3,10);ctx.fillStyle='#c1684d';ctx.beginPath();ctx.ellipse(x+12,y-12,7,4,0,Math.PI,Math.PI*2);ctx.fill();}
   }
+  drawHelmetFlights(); // Behind frogs/labels/flags so cosmetic debris cannot obscure identification.
   for (const f of g.frogs) if (f.alive || (f.gone === 'ko' && animator.sample(f, reduce).alpha > 0 && !reduce)) frog(pose(f), t);
     else if (f.gone === 'ko') { ctx.fillStyle = '#9aa3a8'; ctx.fillRect(f.x - 6, f.y - 14, 12, 14); ctx.beginPath(); ctx.arc(f.x, f.y - 14, 6, Math.PI, 0); ctx.fill(); ctx.fillStyle = '#555'; ctx.font = 'bold 7px Tahoma'; ctx.textAlign = 'center'; ctx.fillText('RIP', f.x, f.y - 7); }
   for(const m of g.mines) {ctx.drawImage(weaponArt.mine,m.x-10,m.y-13,20,20);if(m.t>1){ctx.fillStyle=Math.sin(t*8)>0?'#ff6b45':'#602d28';ctx.fillRect(m.x-2,m.y-12,4,3);}}
@@ -423,8 +430,12 @@ function hud() {
 }
 
 // ---------- turns, events, CPU ----------
+function observeCharacters(events = []) {
+  animator.observe(g, events, { charging: charging || !!cpu?.charging || remoteP > 0,
+    onHealthDrop: standardPreview ? (f, previousHP, time) => helmets.lose(f, previousHP, time, animator.sample(f, reduce), reduce) : undefined });
+}
 function events() {
-  animator.observe(g, g.events, { charging: charging || !!cpu?.charging || remoteP > 0 });
+  observeCharacters(g.events);
   for (const e of g.events) {
     if (e.type === 'turn') { closeArsenal();keys.clear();clearCharge();pending=[];remoteP=0;aimPointer=null;held.l=held.r=held.u=0; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x;
       status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : isOnline(g.team) ? `${f.name} (${TEAM[g.team].name}) is playing on the other device…` : touchUI.matches ? `${f.name}: tap the map to aim · hold FIRE to shoot · ◀ ▶ walk · ↑ jump, twice for a backflip` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
@@ -501,7 +512,7 @@ function start() {
   startTurn(g); launch();
 }
 function launch() {
-  animator.reset();
+  animator.reset(); helmets.restore(g);
   paused=false;$('#pause').textContent='Pause';acc=0;pending=[];remoteP=0;clearCharge();held.l=held.r=held.u=0;paintGround();events();hud();
   $('#menu').hidden = true; $('#over').hidden = true; cv.focus({ preventScroll: true });
 }
@@ -538,7 +549,7 @@ function frame(now) {
     hudTime+=dt;if(hudTime>.08){hud();hudTime=0;}
   }
   if (g && !paused) {
-    animator.observe(g, [], { charging: charging || !!cpu?.charging || remoteP > 0 });
+    observeCharacters();
     draw(animator.time);
   }
   requestAnimationFrame(frame);
@@ -672,6 +683,7 @@ function portrait(canvas,index){
 function paintPlayers(){
   for(const team of [0,1]){
     const box=$('#players'+team);box.replaceChildren();
+    if (standardPreview) { box.textContent = 'Standard Pepe · detachable helmet · art prototype v02'; continue; }
     for(let slot=0;slot<opts.n;slot++){
       const row=document.createElement('label');row.className='player-row';
       const thumb=document.createElement('canvas');thumb.width=48;thumb.height=52;thumb.setAttribute('aria-hidden','true');portrait(thumb,teamPlayers[team][slot]);
@@ -716,7 +728,7 @@ function setupNet(host) {
   document.querySelector('[data-mode]').closest('.pw-pick').hidden = true; $('#levels').hidden = true;
   for (const id of ['#pause', '#restart']) $(id).disabled = true;
   net.onstart = (game, setup) => { g = game; applyLooks(setup); launch(); };
-  net.onrestore = () => { status('Back in sync with the other tab.'); if (g.phase === 'over') over(); };
+  net.onrestore = () => { helmets.restore(g); status('Back in sync with the other tab.'); if (g.phase === 'over') over(); };
   net.onview = v => {
     if (net.drives() || !v.every(Number.isFinite)) return;
     aim = v[0]; aimX = Math.max(30, Math.min(W - 30, v[1])); aimY = v[2]; remoteP = Math.max(0, Math.min(1, v[3]));
@@ -767,4 +779,34 @@ title.focus({ preventScroll: true });
 g = newGame({ seed: 20261103, perTeam: 3 }); paintGround(); g.phase = 'menu';
 requestAnimationFrame(frame);
 menuButton();
-Promise.all(playerArt.map(img=>img.decode().catch(()=>null))).then(()=>{paintPlayers();crewReady=true;menuButton();});
+Promise.all([...playerArt.map(img=>img.decode().catch(()=>null)), loadStandardPrototype()]).then(()=>{paintPlayers();crewReady=true;menuButton();}).catch(error => {
+  $('#go').disabled = true; $('#go').textContent = 'PROTOTYPE ART UNAVAILABLE';
+  status('Prototype assets could not load. Reload or open the beta without ?art=standard-v02.');
+  console.warn('FROGAGEDDON prototype assets:', error);
+});
+
+// Asset loading is isolated from gameplay and from the legacy player registry.
+async function loadStandardPrototype() {
+  if (!standardPreview) return;
+  $('#art-prototype').hidden = false;
+  $('.pw-chrome small').textContent = ' / 2.0 ART PROTOTYPE v02';
+  cv.setAttribute('aria-label', 'FROGAGEDDON 2.0 standard frog art prototype v02 battlefield');
+  const base = 'img/pondwars/players/standard-v02/';
+  const response = await fetch(base + 'manifest_prototype.json');
+  if (!response.ok) throw new Error('Prototype manifest unavailable');
+  const manifest = await response.json();
+  if (!validateManifest(manifest) || manifest.frameSize[0] !== 512 || manifest.frameSize[1] !== 512) throw new Error('Invalid prototype manifest');
+  const [image, helmet, cutout] = await Promise.all(['standard_frog_no_helmet.png','helmet_overlay_on_512_canvas.png','helmet_cutout.png'].map(async file => {
+    const img = new Image(); img.src = base + file; await img.decode(); return img;
+  }));
+  if ([image, helmet].some(img => img.naturalWidth !== 512 || img.naturalHeight !== 512) || cutout.naturalWidth !== 320 || cutout.naturalHeight !== 120) throw new Error('Prototype layer dimensions differ from manifest');
+  standardAssets = { manifest, image, helmet, cutout };
+}
+function drawHelmetFlights() {
+  if (!standardAssets) return;
+  for (const p of helmets.sample(animator.time, reduce)) {
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation);
+    ctx.scale(p.face * p.sx, p.sy); ctx.globalAlpha = p.alpha;
+    ctx.drawImage(standardAssets.cutout, -20, -7.5, 40, 15); ctx.restore();
+  }
+}
