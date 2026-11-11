@@ -155,10 +155,18 @@
     {
       "id": "frog_of_the_week",
       "title": "Frog of the Week",
-      "description": "Finish a Pepe Guesser week (Monday to Sunday, UTC) in first place. Every win adds one more (x2, x3...).",
+      "description": "Finish a Pepe Guesser week (Monday to Sunday, UTC) alone in first place. A tie at the top has no winner. Every win adds one more (x2, x3...).",
       "category": "where_pepe",
       "gold": true,
       "repeatable": true,
+      "status": "live"
+    },
+    {
+      "id": "pond_dominator",
+      "title": "Pond Dominator",
+      "description": "Lead the Pepe Guesser week alone at the end of all seven days, Monday to Sunday (UTC). A tie at the top on any day ends the chance for that week. Very rare.",
+      "category": "where_pepe",
+      "gold": true,
       "status": "live"
     },
     {
