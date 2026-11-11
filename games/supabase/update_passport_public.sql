@@ -16,8 +16,8 @@
 --     never by nickname, so nobody can walk the list of players.
 --   * The browser UI stays behind /meme/?beta=fren until the owner opens the Passport to everyone.
 --
--- The stamp list is the same one gry_passport_state() gives the owner: First Fren (Discord linked), every
--- stored stamp, and Moonwalker from the YEET record when the awards migration has not stored it yet.
+-- The stamp list is the same one gry_passport_state() gives the owner: First Fren (from the season start)
+-- and every stored stamp.
 -- 'times' is passed on when the badges table has that column (repeatable stamps, Frog of the Week).
 begin;
 
@@ -59,10 +59,10 @@ begin
            'times', to_jsonb(b) -> 'times')) order by b.earned_at), '[]'::jsonb)
     into stamps
     from games.passport_badges b where b.user_id = p_user;
-  stamps := jsonb_build_array(jsonb_build_object('id', 'first_fren', 'title', 'First Fren', 'earned_at', joined)) || stamps;
-  if best_distance >= 60000 and best_date is not null and not exists (
-       select 1 from games.passport_badges b where b.user_id = p_user and b.badge_id = 'moonwalker') then
-    stamps := stamps || jsonb_build_array(jsonb_build_object('id', 'moonwalker', 'title', 'Moonwalker', 'earned_at', best_date));
+  -- First Fren counts from the season start, like every stamp; Moonwalker is a stored stamp (no old records)
+  if games.passport_open() then
+    stamps := jsonb_build_array(jsonb_build_object('id', 'first_fren', 'title', 'First Fren',
+                'earned_at', greatest(joined, games.passport_start()))) || stamps;
   end if;
 
   select coalesce(jsonb_agg(jsonb_build_object(

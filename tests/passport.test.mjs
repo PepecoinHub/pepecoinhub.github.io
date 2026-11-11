@@ -11,7 +11,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  assert.deepEqual(kinds.map(key => catalog[key].length), [49, 20, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [51, 19, 8, 4]);
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {
@@ -22,10 +22,9 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
 });
 
 test('every live casual secret is server allowlisted and discoverable', () => {
-  // chat secrets (source: chat) are given by the server's chat trigger only, so they must NOT be claimable
-  // event secrets (source: event) are given by the check-in on their day only, so they are not claimable either
-  const live = catalog.secrets.filter(x => x.status === 'live' && !x.source).map(x => x.id).sort();
-  const chat = catalog.secrets.filter(x => x.status === 'live' && (x.source === 'chat' || x.source === 'event')).map(x => x.id);
+  // Chat and share secrets have dedicated server paths and cannot use the casual discovery RPC.
+  const live = catalog.secrets.filter(x => x.status === 'live' && !['chat','share'].includes(x.source)).map(x => x.id).sort();
+  const chat = catalog.secrets.filter(x => x.status === 'live' && x.source === 'chat').map(x => x.id);
   const block = sql.match(/p_secret\s+not\s+in\s*\(([^)]*)\)/i);
   assert.ok(block, 'SQL casual-secret whitelist missing');
   const allowed = [...block[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]).sort();
@@ -33,6 +32,8 @@ test('every live casual secret is server allowlisted and discoverable', () => {
   for (const id of live) assert.ok(pond.includes("discoverSecret('" + id + "')"), id);
   const awards = readFileSync(new URL('../games/supabase/update_passport_awards.sql', import.meta.url), 'utf8');
   for (const id of chat) { assert.ok(!allowed.includes(id), id + ' must not be claimable'); assert.ok(awards.includes("'" + id + "'"), id + ' given by the server'); }
+  assert.ok(!allowed.includes('share_fren'), 'Share Fren uses its dedicated server RPC');
+  assert.match(awards, /insert into games\.passport_secrets\(user_id, secret_id\)[\s\S]*?values \(u, 'share_fren'\)/);
 });
 
 test('secret RPC requires Discord and cannot issue premium or gameplay rewards', () => {
@@ -85,20 +86,20 @@ test('Fresh Fren is live only together with its server award path', () => {
   assert.equal(avatar.status, 'live');
   assert.match(avatar.description, /create and save your first custom fren avatar/i);
   assert.ok(existsSync(new URL('../docs/meme/' + avatar.icon, import.meta.url)), 'badge icon');
-  // the older Passport migration never awards it; the avatar migration does, only on the first save
+  // the older Passport migration never awards it; the avatar migration does, on the first save from the season start
   assert.doesNotMatch(sql, /insert into games\.passport_badges[^;]*first_avatar/i);
   const awards = [...avatarSql.matchAll(/insert into games\.passport_badges[^;]*;/gi)];
   assert.equal(awards.length, 1);
   assert.match(awards[0][0], /'first_avatar'[\s\S]*on conflict \(user_id, badge_id\) do nothing/);
-  const firstBranch = avatarSql.split('first_save := found;')[1].split('select b.earned_at into badge_at')[0];
-  assert.match(firstBranch.split(/\n  else\n/)[1], /insert into games\.passport_badges/, 'award sits in the first-save branch');
+  const afterSave = avatarSql.split('first_save := found;')[1].split('select b.earned_at into badge_at')[0];
+  assert.match(afterSave, /if games\.passport_open\(\) then\s+insert into games\.passport_badges/, 'award waits for the season start');
 });
 
 test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered looks, valid defaults', () => {
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
   assert.equal(manifest.schema_version, 2);
   // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 17]);
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 27]);
   // the only looks a player can actually compose and save are built from the non-unlock (base) ids
   assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 6, 9, 9, 5, 6, 1]);
   assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 72900, 'offered looks');
@@ -113,7 +114,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered look
   // one 512x512 WebP per option id, plus the implied base layer
   const noQ = f => f.split('?')[0];   // the templates carry a ?v= cache key
   const files = [...new Set([manifest.paths.base, ...ids.map(id => noQ(manifest.paths.layer_template.replace('{id}', id)))])];
-  assert.equal(files.length, 64, '63 option layers + base_frog');
+  assert.equal(files.length, 74, '73 option layers + base_frog');
   // one small picture of each part for the maker rows, nothing else in the folder
   assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/thumbs/', import.meta.url)).sort(),
     ids.map(id => noQ(manifest.paths.thumb_template.replace('{id}', id)).split('/').pop()).sort(), 'no unused, stray or missing thumbnails');
@@ -177,13 +178,15 @@ test('Avatar Maker client: one save RPC with six v2 IDs, nothing kept in localSt
   assert.match(pond, /avatar-options\.json\?v=/);
 });
 
-test('Passport booklet art: four small transparent WebPs with the sizes the page layout assumes', () => {
+test('Passport booklet art: small transparent WebPs with the sizes the page layout assumes', () => {
   const dir = new URL('../docs/meme/passport-assets/', import.meta.url);
   const want = { 'page-left.webp': [360, 528], 'page-right.webp': [360, 528], 'stamps.webp': [16 * 69, 75], 'icons.webp': [12 * 48, 48],
-    // The legacy Lily archive remains on disk for provenance, but the client never references it.
+    // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
     'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
-    // One optimized sprite holds 49 approved V3 illustrations, including Pond Pioneer.
-    'stamps-v3.webp': [49 * 138, 150],
+    // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
+    'stamps-v3.webp': [48 * 138, 150], 'pond-pioneer-v3.webp': [138, 150],
+    // Pond Dominator: the owner's own art, one V3-sized tile outside the atlas (update_wheres_pepe_hall_of_fame.sql)
+    'pond-dominator.webp': [138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
@@ -191,8 +194,8 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   for (const [f, size] of Object.entries(want)) {
     const b = readFileSync(new URL(f, dir));
     if (f !== 'stamps-lily.webp' && f !== 'stamps-v3.webp') total += b.length;
-    // Still a single lazy-loaded WebP; never ship uncompressed high-res source PNGs to the phone.
-    else assert.ok(b.length < (f === 'stamps-v3.webp' ? 800 : 200) * 1024, 'stamp sprite stays small: ' + f + ' ' + b.length);
+    // the sprites load only when the Passport opens; the v3 one holds about 9 KB per tile, up to ~48 tiles at launch
+    else assert.ok(b.length < (f === 'stamps-v3.webp' ? 480 : 200) * 1024, 'stamp sprite stays small: ' + f + ' ' + b.length);
     assert.equal(b.toString('latin1', 0, 4) + b.toString('latin1', 8, 12), 'RIFFWEBP', f + ' is a WebP');
     // VP8X is the extended header used for images with alpha (the photo window and sprite edges are transparent)
     assert.equal(b.toString('latin1', 12, 16), 'VP8X', f + ' carries alpha');
@@ -203,34 +206,32 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
   assert.equal(count('PP_STAMPS'), 16);
-  assert.equal(count('PP_V3'), 49, 'PP_V3 matches the 49 approved tiles of stamps-v3.webp');
+  assert.equal(count('PP_V3'), 48, 'PP_V3 matches the 48 tiles of stamps-v3.webp');
+  assert.match(js, /if \(earned && x\.id === 'pond_pioneer'\)/, 'Pond Pioneer uses the exclusive new art');
+  assert.doesNotMatch(js, /PP_LILY/, 'No old Lily sprite fallback');
+  const css = readFileSync(new URL('../docs/meme/passport.css', import.meta.url), 'utf8');
+  assert.match(css, /\.pp-art-stamp\.is-pioneer/, 'Pond Pioneer class has its own stamp art');
+  assert.doesNotMatch(css, /\.pp-art-stamp\.is-lily|stamps-lily\.webp/, 'No runtime CSS dependency on Lily');
   const v3 = readFileSync(new URL('../scripts/build_v3_stamps.py', import.meta.url), 'utf8').match(/V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join();
   assert.equal(v3, js.match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join(), 'same order as the build script');
   assert.equal(count('PP_ICONS'), 12);
-  // Never display Lily artwork or mislead an earned but unillustrated stamp with another stamp's image.
-  assert.doesNotMatch(js, /PP_LILY|is-lily|stamps-lily\.webp/);
-  const css = readFileSync(new URL('../docs/meme/passport.css', import.meta.url), 'utf8');
-  assert.doesNotMatch(css, /is-lily|stamps-lily\.webp/);
-  assert.match(js, /class: 'pp-art pp-art-stamp is-pending'/);
-  assert.match(css, /pp-art-stamp\.is-pending/);
-  const v3ids = [...js.match(/var PP_V3 = \[([^\]]*)\]/)[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]);
-  for (const id of ['pond_pioneer','welcome_back','first_words','hey_fren','dear_editor','junior_editor',
-    'senior_editor','streak_14','pepe_guesser','week_scout','scout_fren','first_hatch','little_fren','grown_fren'])
-    assert.ok(v3ids.includes(id), id + ' must no longer use Lily art');
-  assert.ok(!v3ids.includes('frogageddon_beta'), 'unapproved Beta Tester art uses the neutral placeholder');
+  // Legacy Lily sprite is archived as an asset, but no longer rendered in the Passport.
   assert.ok(existsSync(new URL('../games/fren-passport/source/passport-mockup.webp', import.meta.url)), 'lossless source art is kept');
 });
 
-test('Fren Passport and Avatar Maker stay hidden unless the browser opened ?beta=fren', () => {
-  assert.match(pond, /if \(q === 'fren'\) localStorage\.setItem\('pondos-fren-beta', '1'\)/);
+test('launch: the Fren Passport and Avatar Maker are on for everyone; only testers get the local preview', () => {
+  assert.match(pond, /\n  var FREN = true;\n/);
+  assert.match(pond, /if \(q === 'fren'\) localStorage\.setItem\('pondos-fren-beta', '1'\)/);   // FREN_BETA, testers only
   assert.match(pond, /if \(FREN\) smMain\.appendChild\(passportItem\)/);
   assert.match(pond, /\]\.concat\(FREN \? \[\s*\['Fren Passport'/);
   assert.match(pond, /&& \(FREN \|\| !ad\.fren\)/);
-  for (const f of ['whose_passport.mpg', 'pond_stamps.mpg', 'fren_passport.mpg', 'create_your_fren.mpg']) assert.match(pond, new RegExp("file: '" + f.replace('.', '\\.') + "', fren: true"));
-  assert.match(pond, /function discoverSecret\(id\) \{\s*if \(!FREN\) return;/);
-  assert.match(pond, /if \(!FREN \|\| !s \|\| !s\.discord \|\| !s\.userId\) return;/);
-  // the local preview is used only in the beta, and only when the server functions are missing or there is no Discord log-on
-  assert.match(pond, /function frenRpc\(name, args\) \{\s*var s = sbSession\(\);\s*if \(!FREN\) return rpc\(name, args\);/);
+  for (const f of ['pond_stamps.mpg', 'fren_passport.mpg', 'create_your_fren.mpg']) assert.match(pond, new RegExp("file: '" + f.replace('.', '\\.') + "', fren: true"));
+  // everyone else talks to the server: no local test passport for a visitor without Discord
+  assert.match(pond, /function frenRpc\(name, args\) \{\s*var s = sbSession\(\);\s*if \(!FREN_BETA\) return rpc\(name, args\);/);
+  assert.match(pond, /if \(FREN_BETA && passportCache && passportCache\.preview\) return passportCache;/);
+  assert.match(pond, /if \(!FREN_BETA && \(!session \|\| !session\.discord\)\) \{/);
+  // PepeGochi launches later (owner, 2026-11-09): still behind ?beta=gochi
+  assert.match(pond, /return localStorage\.getItem\('pondos-gochi-beta'\) === '1';/);
 });
 
 // ---------- another fren's passport (static checks; tests/passport-public-sql.test.mjs runs the SQL for real) ----------
@@ -251,9 +252,10 @@ test('public passport RPC: Discord frens only, read only, no private counters, n
 });
 
 test('other frens\' passports stay behind ?beta=fren and come from the server only', () => {
-  // the LAN Party name is a button only in the beta, only for a verified message with a real user id
+  // LAN Party: a name is a button (to the fren card + passport) only in the beta, only for a verified message with a real user id
   assert.match(pond, /function lanWho\(m\) \{\s*var b = '<b>' \+ esc\(m\.nick\) \+ '<\/b>';\s*return FREN && m\.verified && FREN_ID\.test\(m\.user_id \|\| ''\) \? '<button type="button" class="lan-who"/);
-  assert.match(pond, /if \(FREN\) log\.addEventListener\('click', function \(e\) \{\s*var b = e\.target\.closest\('\.lan-who'\)/);
+  assert.match(pond, /if \(!FREN \|\| !FREN_ID\.test\(u\)\) return;/);
+  assert.match(pond, /pb\.addEventListener\('click', function \(\) \{ closeCard\(\); frenPassport\(false, \{ id: u, nick: nick \}\); \}\);/);
   assert.match(pond, /if \(mainEl && FREN\) \(function \(\) \{\s*var id = ''; try \{ id = new URLSearchParams\(location\.search\)\.get\('fren'\)/);
   // read only: the public RPC (never the local preview), no Avatar Maker, no Next Milestone for somebody else
   const of = pond.split('function passportOf(id) {')[1].split('\n  }')[0];

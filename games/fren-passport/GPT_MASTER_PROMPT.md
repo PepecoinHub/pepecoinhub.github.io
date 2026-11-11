@@ -104,5 +104,103 @@ Pepe opening a dusty old floppy disk box under a desk lamp, a soft glow coming o
 with surprise. Dark green background.
 ```
 
+## SCENE blocks for launch (2026-11-09): the 9 stamps still missing
+
+**`top_ten`, label `Top 10`.**
+```
+Pepe standing proudly on a tall stack of ten wooden crates, the top crate under his feet, one fist raised,
+a small leaderboard scroll unrolled beside him with ten blank lines (no writing). Light blue sky background.
+```
+
+**`bug_hunter`, label `Bug Hunter`.**
+```
+Pepe in a safari hat holding a butterfly net, and inside the net a small cartoon computer bug: a beetle
+made of a green circuit board with tiny legs. Behind him a beige Win98-style CRT monitor. Green background.
+```
+
+**`season_champion`, label `Season Champion`.** Gold stamp; redraw (attach the old version only as a reference).
+```
+Pepe holding a big golden trophy cup above his head with both hands, confetti falling, a red winner's sash
+across his chest with no writing on it. Deep royal blue background.
+```
+
+**`podium`, label `Podium`.**
+```
+Three Pepe frogs on a wooden winners' podium, the middle one highest and cheering, the other two clapping
+on the lower steps. No numbers on the podium. Warm yellow background.
+```
+
+**`game_night`, label `Game Night`.**
+```
+Pepe on a sofa at night with a bowl of popcorn, looking at a big Win98-style CRT monitor that shows a framed
+picture of a half-hidden frog to guess, a crescent moon in the window behind. Dark purple night background.
+```
+
+**`quiz_master`, label `Quiz Master`.**
+```
+Pepe as a TV quiz-show host in a bow tie, holding a handheld microphone in one hand and a stack of picture
+cards in the other, under a small spotlight. Red curtain background. No drawing, no easel, no paint brush.
+```
+
+**`frogmas`, label `Frogmas`.**
+```
+Pepe in a red Santa hat and a red knitted sweater, holding a mug of hot cocoa, beside a small decorated
+Christmas tree with a star on top, snow falling. Warm red background.
+```
+
+**`treasure_hunter`, label `Treasure Hunter`.**
+```
+Pepe in an explorer hat kneeling over an open wooden treasure chest that glows from inside, a rolled-up old
+map in his other hand, a small shovel stuck in the sand. Sandy orange background.
+```
+
+**`interior_designer`, label `Pond Decorator`.**
+```
+Pepe in a cosy room hanging a framed picture on the wall with a little hammer, a potted plant, a rubber duck
+and a lava lamp already placed around him, a paint roller leaning on the wall. Soft teal background.
+```
+
+**`pep_birthday`, label `Pepecoin's Birthday`.** (event stamp, 30 January)
+```
+Pepe in a purple polka-dot party hat, arms up and cheering, holding the string of one red balloon, a small
+birthday cake with candles on a table in front of him, confetti falling. Light lilac background.
+No numbers on the cake or anywhere else.
+```
+
+**`thanksgiving_fren`, label `Thanksgiving`.** (event stamp, US Thanksgiving weekend)
+```
+Pepe at a cosy dinner table with a roast turkey on a big plate, a pumpkin and autumn leaves beside it,
+holding a fork and knife with a big happy grin. Warm autumn orange background.
+```
+
+## Redraws (owner, 2026-11-09)
+
+```
+Redraws. Same MASTER PROMPT and rules, one image per stamp, real transparent background, 1173 x 1341 px format,
+Pepe looks happy, draw ONLY what the SCENE says (no extra hats, outfits, props or text).
+
+1. "Welcome Back!": Pepe stepping back through an open front door with a small suitcase, waving hello, a doormat in front. Sunny yellow background.
+2. "First Words": Pepe at a beige Win98-style computer typing, a big empty white speech bubble popping out of the screen. Light green background.
+3. "Hey @Fren": Two Pepe frogs at two computers side by side, one waving at the other, a big "@" sign floating between them (the only symbol allowed). Sky blue background.
+4. "Community Fren": Four happy Pepe frogs squeezed together around one Win98-style monitor, laughing, one giving a thumbs up. No logos. Purple background.
+5. "Dear Editor": Pepe at a wooden desk sealing an envelope with a red wax seal, a quill pen in an ink pot beside him. Warm brown background.
+6. "Junior Editor": Pepe proudly holding up a fresh newspaper with a small picture of himself on the front page (no readable text). Light blue background.
+7. "Senior Editor": Older Pepe with round glasses and a grey beard at a desk piled with newspapers, a green editor's visor on his head, red pencil in hand. Dark green background.
+8. "14-Day Streak": Pepe tearing a page off a big wall calendar, cheering, a small trail of torn pages on the floor (no numbers on the pages). Orange background.
+9. "Pepe Guesser": Pepe holding a big map with a red pin, looking at a photo of a landscape, finger on his chin, thinking. Teal background.
+10. "Week Scout": Pepe in a scout neckerchief looking through binoculars over green hills, seven small flags planted along a path behind him. Light green background.
+11. "Scout Fren": Pepe as a proud scout in a neckerchief and explorer hat, saluting, a full backpack and a compass on his belt, mountains behind. Forest green background.
+12. "First Hatch": A tiny baby Pepe popping out of a cracked spotted egg, eyes wide and happy, eggshell on its head. Soft yellow background.
+13. "Little Fren": A small froglet Pepe with a little tail hopping happily on a lily pad, a few water drops around. Light blue pond background.
+14. "One Small Step": Pepe in a simple white space helmet (no logos, no flag) taking his first step on the Moon, a single footprint behind him, Earth in the sky. Dark navy background.
+15. "Detective Fren": Same scene as before, redrawn in the standard format: Pepe in a brown deerstalker hat and a dark suit holding a big magnifying glass up to one eye, a cork board with pinned photos and red string behind him. Warm orange background. The stamp must fill the 1173 x 1341 canvas like the other stamps (not narrower).
+```
+
+**`picasso_fren`, label `Picasso Fren`.** (redraw at full size, same look as the latest redraws)
+```
+Pepe in a black beret at a small easel, painting a funny portrait of a frog, a palette with blobs of paint in
+his other hand, other frogs peeking in and pointing at the picture. Purple background.
+```
+
 More SCENE blocks are added here by Claude when those stamps come up. ChatGPT does not write its own scenes for
 new stamps; ask the owner or Claude.

@@ -16,14 +16,20 @@ test('every live stamp has a server award path, and only live stamps do', () => 
   const award = fnBody(sql, 'games.passport_award');
   const allowed = [...award.match(/b not in \(([^)]*)\)/)[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]).sort();
   // first_fren comes from the account itself, first_avatar from the Avatar Maker's first save
-  const live = catalog.achievements.filter(x => x.status === 'live').map(x => x.id);
+  // PepeGochi comes after the Passport (owner, 2026-11-09): its stamps show as Coming soon, and stay in the allowlist
+  // for the PepeGochi SQL, which is installed only on PepeGochi's own launch day (games/LAUNCH_FREN_PASSPORT_PEPEGOCHI.md)
+  const later = catalog.achievements.filter(x => x.category === 'pepegachi').map(x => x.id);
+  assert.deepEqual(later.sort(), ['first_hatch', 'good_parent', 'grown_fren', 'interior_designer', 'little_fren']);
+  for (const id of later) assert.equal(catalog.achievements.find(x => x.id === id).status, 'planned', id);
+  const live = catalog.achievements.filter(x => x.status === 'live' || later.includes(x.id)).map(x => x.id);
   assert.deepEqual(allowed, live.filter(id => !['first_fren', 'first_avatar'].includes(id)).sort());
-  for (const x of catalog.achievements.filter(x => x.status !== 'live')) {
+  for (const x of catalog.achievements.filter(x => x.status !== 'live' && !later.includes(x.id))) {
     assert.ok(!allowed.includes(x.id), x.id + ' is planned and must not be awardable');
     assert.doesNotMatch(sql, new RegExp("insert into games\\.passport_badges[^;]*'" + x.id + "'"), x.id);
   }
   // each allowed stamp is really awarded somewhere besides the allowlist
-  const rest = sql.replace(award, '');
+  // PepeGochi's four life-cycle stamps are awarded by its bridge (update_pepegochi_passport.sql)
+  const rest = sql.replace(award, '') + file('games/supabase/update_pepegochi_passport.sql') + file('games/supabase/update_pepegochi_rewards.sql');
   for (const id of allowed) assert.match(rest, new RegExp("'" + id + "'"), id + ' has no award');
   for (const gone of ['seven_day_fren', 'ten_day_fren', 'frog_detective'])
     assert.ok(!catalog.achievements.some(x => x.id === gone), gone + ' was removed');
@@ -32,11 +38,16 @@ test('every live stamp has a server award path, and only live stamps do', () => 
 test('awards come from game records, never from browser arguments', () => {
   // the only new browser RPC takes no arguments
   const rpcs = [...sql.matchAll(/create or replace function public\.([a-z_]+)\(([^)]*)\)/g)].map(x => [x[1], x[2].trim()]);
-  assert.deepEqual(rpcs.map(x => x[0]).sort(), ['gry_letter_bug_hunter', 'gry_letter_printed', 'gry_letters', 'gry_passport_bali',
-    'gry_passport_checkin', 'gry_passport_state', 'gry_yeet_submit']);
+  assert.deepEqual(rpcs.map(x => x[0]).sort(), ['gry_letter_printed', 'gry_letters', 'gry_passport_bali',
+    'gry_passport_checkin', 'gry_passport_share', 'gry_passport_state', 'gry_yeet_submit']);
   assert.equal(rpcs.find(x => x[0] === 'gry_passport_checkin')[1], '');
-  // the owner tools (Printed, Bug Hunter, BALI, the mailbox) refuse everyone but the site owner, first thing
-  for (const f of ['public.gry_letter_printed', 'public.gry_letter_bug_hunter', 'public.gry_passport_bali'])
+  assert.equal(rpcs.find(x => x[0] === 'gry_passport_share')[1], '', 'Share Fren: only a finished Guesser round can reveal the secret');
+  const share = fnBody(sql, 'public.gry_passport_share');
+  assert.match(share, /games\.passport_open\(\) and exists \(select 1 from games\.wp_plays p where p\.user_id = u and p\.guessed_at >= games\.passport_start\(\)\)/);
+  assert.match(share, /insert into games\.passport_secrets\(user_id, secret_id\)/);
+  assert.doesNotMatch(share, /passport_award|passport_badges/);
+  // the owner tools (Printed, BALI, the mailbox) refuse everyone but the site owner, first thing
+  for (const f of ['public.gry_letter_printed', 'public.gry_passport_bali'])
     assert.match(fnBody(sql, f), / as \$\$\n(declare[^\n]*\n)?begin\n\s+if not games\.is_owner\(auth\.uid\(\)\) then raise exception/, f);
   assert.match(fnBody(sql, 'public.gry_letters'), /if not games\.is_owner\(auth\.uid\(\)\) then\s+return null;/);
   // a letter can be marked printed only when its writer ticked "OK to print"
@@ -70,12 +81,15 @@ test('gry_yeet_submit keeps the update_yeet.sql body, plus only the passport hoo
   assert.match(sql, /grant execute on function public\.gry_yeet_submit\(integer, integer, integer\) to authenticated;/);
 });
 
-test('Pond Pioneer is a one-time snapshot and closed afterwards', () => {
+test('Pond Pioneer: the beta snapshot plus beta check-ins, closed at the season start', () => {
   const p = catalog.achievements.find(x => x.id === 'pond_pioneer');
   assert.equal(p.status, 'live'); assert.equal(p.limited, true);
-  assert.match(sql, /insert into games\.passport_meta \(k\) values \('pioneer_snapshot'\) on conflict \(k\) do nothing returning at into launch;\s+if launch is not null then/);
-  // no trigger or RPC ever awards it later
-  assert.equal([...sql.matchAll(/'pond_pioneer'/g)].length, 2, 'allowlist + snapshot only');
+  assert.match(sql, /insert into games\.passport_meta \(k\) values \('pioneer_snapshot'\) on conflict \(k\) do nothing returning at into launch;\s+if launch is not null and not games\.passport_open\(\) then/);
+  // the award path refuses it once the season is open; only the beta check-in gives it later
+  assert.match(sql, /if b = 'pond_pioneer' then\s+if games\.passport_open\(\) then return false; end if;/);
+  assert.match(sql, /if not games\.passport_open\(\) then\s+-- public beta[^\n]*\n\s+perform games\.passport_award\(u, 'pond_pioneer'\);/);
+  // allowlist, gate, beta check-in, snapshot, beta cleanup
+  assert.equal([...sql.matchAll(/'pond_pioneer'/g)].length, 5);
 });
 
 test('reward parts open with stamps that exist in the catalog', () => {

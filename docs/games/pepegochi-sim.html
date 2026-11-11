@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; frame-src 'none'; worker-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>PepeGochi test simulator (local only) | Pepecoin Hub</title>
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../facts.css?v=20261104coin">
+<link rel="stylesheet" href="gry.css?v=20261103m">
+<link rel="stylesheet" href="pepegochi-sim.css?v=20261107b1">
+<script type="module" src="js/pepegochi-sim-page.mjs?v=20261107b1"></script>
+</head>
+<body>
+<main class="wrap pgs" id="main">
+  <p class="pgs-banner" role="note"><b>TEST SIMULATOR, LOCAL ONLY.</b> It runs in this tab. Nothing is sent to a server, nothing is saved, and no stamp or achievement is real. Reload to start again. Temporary look for testing the rules, not the game's design.</p>
+  <h1>PepeGochi rules simulator</h1>
+  <p class="muted small">Same rules as the server (games/supabase/update_pepegochi_v2.sql), checked call by call by tests/pepegochi-parity.test.mjs. Times are UTC.</p>
+
+  <section class="card pgs-row" aria-labelledby="pgs-clock-h">
+    <h2 id="pgs-clock-h">Clock</h2>
+    <p><span id="pgs-now" class="mono"></span> <span id="pgs-day" class="muted"></span></p>
+    <div class="pgs-buttons" id="pgs-time">
+      <button class="btn" data-ms="600000">+10 min</button>
+      <button class="btn" data-ms="3600000">+1 h</button>
+      <button class="btn" data-ms="21600000">+6 h</button>
+      <button class="btn" data-ms="86400000">+1 day</button>
+      <button class="btn" data-ms="172800000">+2 days</button>
+      <button class="btn" data-ms="604800000">+7 days</button>
+      <button class="btn" id="pgs-next-sat">Next Saturday 18:00</button>
+    </div>
+  </section>
+
+  <section class="card pgs-row" aria-labelledby="pgs-fren-h">
+    <h2 id="pgs-fren-h">Your fren</h2>
+    <div id="pgs-pet" aria-live="polite"></div>
+    <form id="pgs-adopt" class="pgs-buttons">
+      <label for="pgs-name">Name</label>
+      <input type="text" id="pgs-name" value="Fren" maxlength="64" autocomplete="off">
+      <button class="btn primary" type="submit">Adopt</button>
+    </form>
+    <div class="pgs-buttons" id="pgs-actions">
+      <button class="btn" data-act="feed">Feed</button>
+      <button class="btn" data-act="clean">Clean</button>
+      <button class="btn" data-act="play">Play</button>
+      <button class="btn" data-act="rest">Rest</button>
+      <button class="btn" id="pgs-care">Everything it needs</button>
+      <button class="btn" id="pgs-letter">Open GOODBYE.TXT</button>
+      <button class="btn" id="pgs-look">Look</button>
+    </div>
+    <pre id="pgs-goodbye" class="pgs-letter" hidden></pre>
+  </section>
+
+  <section class="card pgs-row" aria-labelledby="pgs-hist-h">
+    <h2 id="pgs-hist-h">Former frens</h2>
+    <div id="pgs-history"></div>
+  </section>
+
+  <section class="card pgs-row" aria-labelledby="pgs-rules-h">
+    <h2 id="pgs-rules-h">Playtest values</h2>
+    <p class="muted small">Change a value and press Apply. It only changes this tab.</p>
+    <form id="pgs-rules" class="pgs-rules"></form>
+  </section>
+
+  <section class="card pgs-row" aria-labelledby="pgs-log-h">
+    <h2 id="pgs-log-h">Log</h2>
+    <ol id="pgs-log" class="pgs-log mono small"></ol>
+    <details><summary>Last response (JSON)</summary><pre id="pgs-json" class="mono small"></pre></details>
+  </section>
+</main>
+</body>
+</html>

@@ -66,7 +66,8 @@
 --                        (unlocked by the secrets why_tho, midnight_fren, happy_fren, nerd_alert, born_to_fren, bali_dreamer)
 --     special_seeker (secret_starter), special_scribe (dear_editor), special_editor (senior_editor),
 --     special_santa (frogmas), special_looking and special_sherlock (the secrets find_fren, address_check),
---     special_birthday and special_turkey (the event days pep_birthday, thanksgiving_fren)
+--     special_birthday and special_turkey (the event-day stamps pep_birthday, thanksgiving_fren)
+--     owner, 2026-11-09: special_gamer (arcade_hopper), special_gigachad (share_fren), special_party (old_frog), special_cupid (valentine_fren), special_juice (welcome_back), special_beanie (streak_14), special_chill (like_it_here), special_bigfren (certified_fren), special_dolphin (nasa_is_hiring), special_retro (fud_buster)
 --
 -- SPECIAL AVATARS: the 'special' slot holds a whole drawn character (by Lily) for a
 -- big milestone. 'special_none' means the normal stacked parts; any other id
@@ -127,7 +128,8 @@ begin
      or p_accessory is null or p_accessory not in ('accessory_none', 'accessory_shades', 'accessory_round', 'accessory_orange', 'accessory_cigarette', 'accessory_pipe', 'accessory_headphones')
      or p_special is null or p_special not in ('special_none', 'special_explorer', 'special_batman', 'special_vampire', 'special_smile', 'special_nerd', 'special_soldier', 'special_straw', 'special_knight',
                                                    'special_seeker', 'special_looking', 'special_sherlock', 'special_scribe', 'special_editor',
-                                                   'special_birthday', 'special_santa', 'special_turkey') then
+                                                   'special_birthday', 'special_santa', 'special_turkey',
+                                                   'special_gamer', 'special_gigachad', 'special_party', 'special_cupid', 'special_juice', 'special_beanie', 'special_chill', 'special_bigfren', 'special_dolphin', 'special_retro') then
     raise exception 'Unknown avatar option' using errcode = '22023';
   end if;
   -- Reward parts: saveable only by a player who holds the stamp that unlocks them
@@ -141,7 +143,8 @@ begin
                           ('special_nerd', 'nerd_alert'), ('special_soldier', 'born_to_fren'), ('special_straw', 'bali_dreamer'),
                           ('special_seeker', 'secret_starter'), ('special_looking', 'find_fren'), ('special_sherlock', 'address_check'),
                           ('special_scribe', 'dear_editor'), ('special_editor', 'senior_editor'), ('special_birthday', 'pep_birthday'),
-                          ('special_santa', 'frogmas'), ('special_turkey', 'thanksgiving_fren')) r(part, stamp)
+                          ('special_santa', 'frogmas'), ('special_turkey', 'thanksgiving_fren'),
+                          ('special_gamer', 'arcade_hopper'), ('special_gigachad', 'share_fren'), ('special_party', 'old_frog'), ('special_cupid', 'valentine_fren'), ('special_juice', 'welcome_back'), ('special_beanie', 'streak_14'), ('special_chill', 'like_it_here'), ('special_bigfren', 'certified_fren'), ('special_dolphin', 'nasa_is_hiring'), ('special_retro', 'fud_buster')) r(part, stamp)
      where r.part in (p_bg, p_clothing, p_hat, p_accessory, p_special)
        -- the unlock is a stamp, or (for most special avatars) a secret
        and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)
@@ -178,8 +181,9 @@ begin
        where a.user_id = u
       returning * into saved;
     end if;
-  else
-    -- Fresh Fren: only the first saved look can mint it, once per player.
+  end if;
+  -- Fresh Fren: the first save from the season start on (a look saved in the beta does not count), once per player.
+  if games.passport_open() then
     insert into games.passport_badges (user_id, badge_id)
     values (u, 'first_avatar')
     on conflict (user_id, badge_id) do nothing
@@ -271,10 +275,12 @@ begin
 
   badge_catalog := jsonb_build_array(
     jsonb_build_object('id', 'first_fren', 'title', 'First Fren',
-      'description', 'Joined the pond with Discord.', 'earned_at', joined),
+      'description', 'Joined the pond with Discord.',
+      'earned_at', case when games.passport_open() then greatest(joined, games.passport_start()) end),
     jsonb_build_object('id', 'moonwalker', 'title', 'Moonwalker',
       'description', 'Recorded a 6000 m YEET flight. Moon Rock inventory validation is not enabled yet.',
-      'earned_at', case when best_distance = 60000 then best_date else null end),
+      -- stored by update_passport_awards.sql from the season start; old records are not backfilled
+      'earned_at', (select b.earned_at from games.passport_badges b where b.user_id = u and b.badge_id = 'moonwalker')),
     jsonb_build_object('id', 'certified_fren', 'title', 'Certified Fren',
       'description', '100 distinct care days in PepeGochi.',
       'earned_at', (select b.earned_at from games.passport_badges b

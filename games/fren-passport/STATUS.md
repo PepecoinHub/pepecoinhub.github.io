@@ -1,6 +1,6 @@
 # Fren Passport: status (one place, kept up to date)
 
-Last update: 2026-11-11, ChatGPT (approved V3 browser sprite). Update this file in every Passport PR.
+Last update: 2026-11-09 (launch plan), Claude. Update this file in every Passport PR.
 
 - **Rules for each stamp:** `games/FREN_PASSPORT_RECONCILIATION_2026-11-08.md` (owner decisions of 2026-11-08 below win)
 - **Art rules for ChatGPT:** `games/fren-passport/GPT_MASTER_PROMPT.md`
@@ -16,64 +16,44 @@ Last update: 2026-11-11, ChatGPT (approved V3 browser sprite). Update this file 
 | Album | 40 shown, 3 `???` teasers (Picasso Fren, First Hatch, Beta Tester), 5 hidden. |
 | Secrets | 11 findable (none advertised; a short Gazette note later) + 2 event days for everyone. Map pieces dropped. |
 | Special avatars | 16, each behind a secret, a stamp or an event day. Own **Avatars** tab in the Passport (section 5). |
-| Art | 47 of 48 achievement stamps now display approved V3 art, and 2 event avatars also have V3-style stamps. No Lily drawings are used at runtime. Beta Tester remains a neutral placeholder pending the game feature; BALI is a separate ticket. |
+| Art | 38 of 48 final (24 v3 in the album sprite + 14 Lily). 10 still to draw or finish. The 7 pixel-art stamps (owner's sheet, 2026-11-09) are in. |
 
+## 2. All 50 stamps (48 + the two event days, owner 2026-11-09)
 
-### Owner-only local QA sandbox (deployed in PR #255/#256)
-
-- URL after review/merge: `/meme/?beta=fren-test`. This **does not** persist the flag in localStorage; `?beta=fren` keeps its existing behavior.
-- Requires a real Discord login and a successful server-side owner check via the already existing `gry_letters` RPC (the same protection as the Editor's desk). An arbitrary visitor with the URL **cannot** use the sandbox.
-- Controls in the Passport: unlock a selected special avatar (by simulating its stamp/secret), simulate any stamp, simulate any secret/event, toggle all special avatar/part unlocks, and reset the local QA state.
-- Real clicking of supported PondOS secrets also writes to the **QA sandbox only** in this mode. QA does not set production discovery markers.
-- Simulated records and saved looks are stored under `pondos-fren-owner-sandbox-v1:<Discord user UUID>` in browser localStorage. `Reset sandbox` removes only this key; **no production badges, secrets, avatar saves, or migrations are touched**.
-- Return to ordinary `/meme/?beta=fren` to see the unmodified beta behavior. Close and reopen the Maker after a simulated unlock so it refreshes available parts.
-- Manual acceptance checks: non-owner denied, logged-out denied, mobile UI, all special avatars selectable in Maker, look restored on refresh, test discovery and manual stamp displayed in Passport, reset clears sandbox, ordinary beta unchanged, no `gry_passport_avatar_save`/`gry_passport_discover` network calls in sandbox mode.
-
-
-### Approved V3 art integration (2026-11-11)
-
-- One WebP sprite: `docs/meme/passport-assets/stamps-v3.webp`, 49 tiles, 138 × 150 each.
-- Art source: owner-approved V3 PNGs in draft PR #233, plus exclusive Pond Pioneer accepted in PR #253. The updated builder `scripts/build_v3_stamps.py` lists the exact sprite order used by `docs/meme/meme.js`.
-- Runtime no longer refers to `stamps-lily.webp` or `PP_LILY`. Historical Lily files are retained for archival purposes only and are not loaded by the Passport.
-- `frogageddon_beta` has no approved picture, so the neutral placeholder is shown instead of an unrelated stamp. Locked stamps remain locked; no grants, Supabase SQL or achievement rules changed.
-- The image is a single optimized atlas for mobile; native PNG source files are not loaded by the browser.
-
-## 2. All 48 stamps
-
-Art: ✅ integrated V3 · ⬜ no approved drawing. The optimized 49-tile V3 sprite replaces the 14 runtime Lily references.
+Art: ✅ final · 👀 waiting for owner OK · 🔁 approved scene, small file (900+ px later) · 🔄 redraw · 🚧 sketch · ⬜ not started.
 Album: **shown** · **???** (teaser) · hidden.
 
 | # | ID | Label | How it is earned (server) | Album | Art |
 |---:|---|---|---|---|---|
-| 1 | `first_fren` | First Fren | Discord sign-in | shown | ✅ v3 |
-| 2 | `pond_pioneer` | Pond Pioneer | Discord linked on launch day (one-time snapshot) | shown | ✅ v3 |
-| 3 | `first_avatar` | Fresh Fren | first saved avatar | shown | ✅ v3 |
-| 4 | `welcome_back` | Welcome Back! | back the day after the first visit | shown | ✅ v3 |
-| 5 | `first_words` | First Words | first lobby chat message | shown | ✅ v3 |
-| 6 | `hey_fren` | Hey @Fren | first @mention | shown | ✅ v3 |
-| 7 | `community_fren` | Community Fren | chat on 5 different days | shown | ✅ v3 |
-| 8 | `dear_editor` | Dear Editor | first letter to the editor | shown | ✅ v3 |
-| 9 | `junior_editor` | Junior Editor | 1 letter marked **Printed** by the owner | shown | ✅ v3 |
-| 10 | `senior_editor` | Senior Editor | 5 letters marked Printed | shown | ✅ v3 |
+| 1 | `first_fren` | First Fren | Discord sign-in | shown | ✅ v3 (pixel) |
+| 2 | `pond_pioneer` | Pond Pioneer | Discord linked BEFORE Passport launch (one-time migration snapshot) | shown | ✅ exclusive v3 |
+| 3 | `first_avatar` | Fresh Fren | first saved avatar | shown | ✅ v3 (pixel) |
+| 4 | `welcome_back` | Welcome Back! | back the day after the first visit | shown | ✅ Lily |
+| 5 | `first_words` | First Words | first lobby chat message | shown | ✅ Lily |
+| 6 | `hey_fren` | Hey @Fren | first @mention | shown | ✅ Lily |
+| 7 | `community_fren` | Community Fren | chat on 5 different days | shown | ✅ v3 (pixel) |
+| 8 | `dear_editor` | Dear Editor | first letter to the editor | shown | ✅ Lily |
+| 9 | `junior_editor` | Junior Editor | 1 letter marked **Printed** by the owner | shown | ✅ Lily |
+| 10 | `senior_editor` | Senior Editor | 5 letters marked Printed | shown | ✅ Lily |
 | 11 | `vox_populi` | Vox Populi | 10 letters marked Printed | shown | ✅ v3 |
 | 12 | `i_voted` | I Voted | a verified vote in a Pond Poll | shown | ✅ v3 |
-| 13 | `streak_14` | 14-Day Streak | PondOS 14 days in a row | shown | ✅ v3 |
-| 14 | `like_it_here` | 30-Day Streak | PondOS 30 days in a row | shown | ✅ v3 |
+| 13 | `streak_14` | 14-Day Streak | PondOS 14 days in a row | shown | ✅ Lily |
+| 14 | `like_it_here` | 30-Day Streak | PondOS 30 days in a row | shown | ✅ v3 (pixel) |
 | 15 | `certified_fren` | Certified Fren | 100 different PondOS days | shown | ✅ v3 |
 | 16 | `old_frog` | Old Frog | one year since the first Discord log-on | shown | ✅ v3 |
-| 17 | `pepe_guesser` | Pepe Guesser | first Pepe Guesser guess | shown | ✅ v3 |
-| 18 | `sharp_eye` | Sharp Eye | first perfect 5000 | shown | ✅ v3 |
+| 17 | `pepe_guesser` | Pepe Guesser | first Pepe Guesser guess | shown | ✅ Lily |
+| 18 | `sharp_eye` | Sharp Eye | first perfect 5000 | shown | ✅ v3 (pixel) |
 | 19 | `detective_fren` | Detective Fren | 5000 on 5 different days | shown | ✅ v3 |
-| 20 | `week_scout` | Week Scout | Pepe Guesser 7 days in a row | shown | ✅ v3 |
-| 21 | `scout_fren` | Scout Fren | Pepe Guesser 14 days in a row | shown | ✅ v3 |
+| 20 | `week_scout` | Week Scout | Pepe Guesser 7 days in a row | shown | ✅ Lily |
+| 21 | `scout_fren` | Scout Fren | Pepe Guesser 14 days in a row | shown | ✅ Lily |
 | 22 | `frog_of_the_week` | Frog of the Week | best Pepe Guesser week (Mon–Sun); the only repeatable stamp (×2, ×3…) | shown | ✅ v3 |
 | 23 | `yeet_adept` | Adept | YEET 3000 m | shown | ✅ v3 |
-| 24 | `nasa_is_hiring` | NASA Is Hiring | 3 YEET flights over 5000 m | shown | ✅ v3 |
+| 24 | `nasa_is_hiring` | NASA Is Hiring | 3 YEET flights over 5000 m | shown | ✅ v3 (pixel) |
 | 25 | `moonwalker` | Moonwalker | YEET 6000 m | shown | ✅ v3 |
-| 26 | `rookie_miner` | Happy Mining! | first Pepe Miner cloud save | shown | ✅ v3 |
+| 26 | `rookie_miner` | Happy Mining! | first Pepe Miner cloud save | shown | ✅ v3 (pixel) |
 | 27 | `good_game` | Good Game | board game finished with another Discord player, 10+ moves, no resign/leave | shown | ✅ v3 |
 | 28 | `checkmate` | Checkmate! | chess win by mate (same rules) | shown | ✅ v3 |
-| 29 | `picasso_fren` | Picasso Fren | no data yet (Draw & Guess saves nothing) | ??? | ✅ v3 |
+| 29 | `picasso_fren` | Picasso Fren | no data yet (Draw & Guess saves nothing) | ??? | 🔁 in sprite, 304 px |
 | 30 | `podium` | Podium | top 3 in Pepe Pictures | shown | ✅ v3 |
 | 31 | `game_night` | Game Night | Pepe Pictures during a scheduled event (±3 h) | shown | ✅ v3 |
 | 32 | `season_champion` | Season Champion | winner of a ranked Pepe Pictures season | shown | ✅ v3 |
@@ -84,20 +64,22 @@ Album: **shown** · **???** (teaser) · hidden.
 | 37 | `long_snake` | Long Snake | 40 blocks in PEP Snake | shown | ✅ v3 |
 | 38 | `bug_hunter` | Bug Hunter | given by the owner from the mailbox | shown | ✅ v3 |
 | 39 | `frogageddon_beta` | Beta Tester | waits for online FROGAGEDDON | ??? | ⬜ (later) |
-| 40 | `first_hatch` | First Hatch | waits for PepeGochi | ??? | ✅ v3 |
-| 41 | `little_fren` | Little Fren | waits for PepeGochi | hidden | ✅ v3 |
-| 42 | `grown_fren` | One Small Step | waits for PepeGochi | hidden | ✅ v3 |
+| 40 | `first_hatch` | First Hatch | waits for PepeGochi | ??? | ✅ Lily |
+| 41 | `little_fren` | Little Fren | waits for PepeGochi | hidden | ✅ Lily |
+| 42 | `grown_fren` | One Small Step | waits for PepeGochi | hidden | ✅ Lily |
 | 43 | `good_parent` | Good Parent | waits for PepeGochi | hidden | ✅ v3 |
 | 44 | `interior_designer` | Pond Decorator | waits for PepeGochi | hidden | ✅ v3 |
 | 45 | `secret_starter` | Secret Starter | first secret | shown | ✅ v3 |
 | 46 | `treasure_hunter` | Treasure Hunter | 6 secrets | shown | ✅ v3 |
-| 47 | `the_secret_pond` | The Secret Pond | no data yet | hidden | ✅ v3 |
+| 47 | `the_secret_pond` | The Secret Pond | no data yet | hidden | 🔁 in sprite, 300 px |
 | 48 | `frogmas` | Frogmas | a visit on 24–26 December | shown | ✅ v3 |
+| 49 | `pep_birthday` | Pepecoin's Birthday | a visit on 30 January (UTC 30–31); unlocks Birthday Fren | shown | ✅ v3 (avatar picture) |
+| 50 | `thanksgiving_fren` | Thanksgiving | a visit on US Thanksgiving weekend; unlocks Turkey Fren | shown | ✅ v3 (avatar picture) |
 | — | `bali` | BALI | the owner opens it when PEP hits $0.01; every fren gets it on the next visit | printed on the page | ✅ ticket + postmark |
 
-**Totals.** Rules: 40 + BALI. Browser art: 47/48 achievement stamps use approved V3; Beta Tester remains a neutral placeholder. Two event-day art assets also live in the V3 sprite. BALI retains its approved ticket.
+**Totals.** Rules: 40 + BALI. Art: 38 final (36 ✅ + the 2 🔁 already in the sprite) · 1 🔄 · 2 🚧 · 5 ⬜ · 2 ⬜ for later features = 48.
 
-Stamps without approved art use a neutral question-mark placeholder if earned. Un-earned stamps use the locked tile. No Lily or category-themed illustration is substituted for an earned stamp.
+Stamps with a rule but no final art show the category icon in the album until their art is cut into the sprite.
 
 ## 3. Owner tools (in Frog Mail → Editor's desk, with `?beta=fren`)
 
@@ -110,25 +92,50 @@ Stamps without approved art use a neutral question-mark placeholder if earned. U
 
 These buttons call the new RPCs, so they work only after the migrations run.
 
-## 4. What is left
+## 4. Launch plan (owner, 2026-11-09)
 
-**Owner**
-1. Launch day: run the three migrations in Supabase, then the `?beta=fren` gate comes off.
+**Avatar Maker, Fren Passport and PepeGochi ship together**, from the draft PR `release/pondos-fren-launch` (#236).
+Everything listed at launch must work. Claude owns the code and checks every picture; ChatGPT draws, and its art
+is checked against the site's style before it goes in (it tends to drift from the brief).
 
-**ChatGPT:** All currently owner-approved V3 illustrations are integrated in the album. 
-`frogageddon_beta` (Beta Tester) has no approved source and uses the neutral placeholder until the game feature arrives.
-High-resolution redraws of any other stamp remain optional art-quality improvements, not blockers for V3 display.
+**Owner decisions, 2026-11-09**
+- **Top 10** and **The Secret Pond** removed. **Treasure Hunter** needs 10 secrets. 49 stamps + BALI.
+- Redraws: done from the owner's sheet (2026-11-09): Welcome Back, First Words, Hey @Fren, Community Fren, Dear Editor,
+  Junior Editor, Senior Editor, 14-Day Streak, Pepe Guesser, Week Scout, Scout Fren, First Hatch, Little Fren,
+  One Small Step, Detective Fren. Every stamp has its final art. Scene blocks in `GPT_MASTER_PROMPT.md`. Frogmas is now the Santa Fren avatar picture.
+- PepeGochi starts from an **egg**; it hatches at the first care, and that is when First Hatch is given.
+- **No 100-day stamp** for now (Good Parent, 30 good days in one life, is enough at launch).
+- **Picasso Fren** gets built (Draw & Guess saves results on the server). **Beta Tester** is hidden until online FROGAGEDDON exists.
+- **Paper Crown, Moon Rock, Golden Fly** become PepeGochi room decorations, each earned by a server-verified action;
+  they also feed **Pond Decorator**.
 
-**Claude**
-1a. **New-reward notice** (owner, 2026-11-09): an animated Windows 98 style notice for a new stamp, secret or avatar
-   that nobody can miss. Today a plain tray balloon shows new stamps only. Plan: the tray balloon with a stamp
-   "thump" animation, a blinking Passport icon in the tray until the Passport is opened, and the same notice for
-   secrets and avatars. Not in Frog Mail (that stays for letters and the Gazette).
-1b. **Incognito avatar** (`games/fren-passport/source/avatars/incognito_original.png`): for the "invisible" status,
-   once the bigger chat window with statuses (available / back soon / invisible) exists.
-2. Scene blocks in `GPT_MASTER_PROMPT.md` for the stamps above, and each new upload into #233 and the sprite.
-3. A short Gazette note about secrets, when the owner asks.
-4. Launch-day removal of the beta gate.
+**Code, in this order (Claude)**
+1. ~~Egg stage~~ done: a new frog is an egg until its first care; that care records `hatched` → First Hatch.
+   First Hatch, Little Fren, One Small Step and Good Parent are live (bridge + allowlist).
+2. ~~Window on the real RPCs~~ done: `games/pepegochi-live.html` (PEPEGOCHI.EXE in PondOS), Discord only, the frog
+   on the server; the local simulator stays for testers as "PEPEGOCHI (local test)". Both behind `?beta=gochi` until launch.
+3. ~~Passport card~~ done: Overview shows the frog (name, stage, day, mood, good care days) and opens PEPEGOCHI.EXE.
+   Bug Hunter waits (owner, 2026-11-09): hidden, no grant tool at launch.
+4. Decorations (owner, 2026-11-09): Moon Rock = Moonwalker, Paper Crown = Frog of the Week, Golden Fly = Treasure
+   Hunter, Floppy Disk = Secret Starter; Pond Decorator = 3 earned decorations placed at once. Server side done
+   (`update_pepegochi_rewards.sql`, run last). Item sprites in (#227, 2026-11-09). Decorate panel in PEPEGOCHI.EXE done (place, move, put away; the room picture
+   follows the server room).
+5. ~~Picasso Fren~~ done: a drawing counts when another Discord player guesses it in Draw & Guess (server side,
+   `games.passport_drawings`); 10 drawings = the stamp. (The Secret Pond was dropped.)
+6. ~~Beta Tester hidden; new-reward notice~~ done: new stamps and secrets open a Windows 98 dialog from the tray with
+   the stamp thumped in; it stays until closed, several queue up.
+7. Release: the run order and checklist are in `games/LAUNCH_FREN_PASSPORT_PEPEGOCHI.md`. Open: a PEP-TV ad (owner's call).
+
+**Art (ChatGPT, checked by Claude)**
+- 2026-11-09: the 17-sprite pack from #227 is in the game (hungry, dirty, recovering, froglet, 6 moving-out frames,
+  3 hatching frames, Moon Rock, Paper Crown, Golden Fly, Floppy Disk): 128 px, transparent, 2x2 grid, feet on y=124.
+- PepeGochi sprite fixes from #228: `adult_hungry`, `adult_dirty`, `froglet_idle`, `adult_recovering`, the 6 moving-out
+  frames (adult about 113 px tall, feet on one line, 2×2 pixel grid). Egg hatching frames.
+- Decorations: Paper Crown, Moon Rock, Golden Fly (pixel art, room style).
+- Stamps (cartoon, like the album; scene blocks in `GPT_MASTER_PROMPT.md`): none left.
+  Done: Pepecoin's Birthday and Thanksgiving (avatar pictures in a stamp frame), Season Champion, Top 10, Bug Hunter, Podium, Game Night, Quiz Master, Frogmas, Treasure Hunter, Pond Decorator.
+
+**Owner, launch day:** run the SQL in the order the release PR gives; the beta flags come off with the release.
 
 ## 5. Special avatars (2026-11-08, more on 2026-11-09)
 
@@ -157,3 +164,24 @@ tab (where Achievements used to be) lists all of them with how each one opens (s
 Live secrets: 11 (Wrong Frog, Why Do You Need This?, The Magic Word, Blue Screen of Fren, Midnight Fren, Nerds Only,
 Bali Dreamer, Happy Fren, Born to Fren, Looking Glass, Trust But Verify). The two event days are listed with the secrets
 but are not "found": they do not count for Secret Starter or Treasure Hunter.
+
+## 2026-11-09 (later): Share Fren, PepeGochi waits
+
+- Share Fren stamp (owner's art): a Discord fren clicks Share…, Copy result (or, once enabled, Post on X) on a Pepe Guesser
+  result. `public.gry_passport_share()` takes no arguments and only gives the stamp after a finished Guesser round on that account.
+- PepeGochi launches after the Passport. Its five stamps are "Coming soon" in the catalog (still accepted by
+  `passport_award()` for when the PepeGochi SQL runs). The Overview keeps a PepeGochi card that says Coming soon.
+  PepeGochi launch day: run the PepeGochi SQL files, turn the five stamps `live`, remove the `?beta=gochi` gate.
+- Every Passport tab uses one skin: passport paper, burgundy edge, navy plaque titles.
+
+## 2026-11-10: Share Fren and Pond Pioneer clarification
+
+- **Share Fren is no longer a stamp.** Copying/sharing a completed Pepe Guesser result discovers a cosmetic secret in Collection via the existing argument-free server RPC. It does not prove an X post. The Gigafren avatar unlock stays linked to the same ID, now a secret. Keep the old sprite tile index to avoid shifting later stamps.
+- **Pond Pioneer** is limited to Discord accounts linked before the Passport opens. The first awards-migration execution takes the one-time prelaunch snapshot; later accounts cannot earn it.
+- This is release-branch work only; no production SQL or deployment is done.
+
+## 2026-11-10: Exclusive Pond Pioneer default art
+
+- Owner-approved pixelated green-flag Pond Pioneer replaces the old Lily image. Full native-resolution PNG saved at `games/fren-passport/source/stamps-new/pond_pioneer.png` (1167 x 1347, transparent). Optimized displayed tile at `docs/meme/passport-assets/pond-pioneer-v3.webp` (138 x 150).
+- `ppStamp` loads the dedicated art for earned `pond_pioneer`; other stamps keep their v3 sprite. The historical Lily sprite is no longer referenced in PondOS JavaScript or Passport CSS, but is left in the repo as an archive.
+- This only changes appearance and tests. No Pioneer awards logic, SQL, production deployment, or live data changed.

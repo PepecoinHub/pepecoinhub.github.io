@@ -11,7 +11,7 @@
     {
       "id": "pond_pioneer",
       "title": "Pond Pioneer",
-      "description": "Had Discord linked to PepecoinHub on the day the Fren Passport opened. It cannot be earned any more.",
+      "description": "Logged in with Discord during the Fren Passport beta (until Sunday 15 November 2026). A one-time stamp: it closed when the season started.",
       "category": "community",
       "limited": true,
       "status": "live"
@@ -155,10 +155,18 @@
     {
       "id": "frog_of_the_week",
       "title": "Frog of the Week",
-      "description": "Finish a Pepe Guesser week (Monday to Sunday, UTC) in first place. Every win adds one more (x2, x3...).",
+      "description": "Finish a Pepe Guesser week (Monday to Sunday, UTC) alone in first place. A tie at the top has no winner. Every win adds one more (x2, x3...).",
       "category": "where_pepe",
       "gold": true,
       "repeatable": true,
+      "status": "live"
+    },
+    {
+      "id": "pond_dominator",
+      "title": "Pond Dominator",
+      "description": "Lead the Pepe Guesser week alone at the end of all seven days, Monday to Sunday (UTC). A tie at the top on any day ends the chance for that week. Very rare.",
+      "category": "where_pepe",
+      "gold": true,
       "status": "live"
     },
     {
@@ -207,10 +215,9 @@
     {
       "id": "picasso_fren",
       "title": "Picasso Fren",
-      "description": "Other players guess 10 of your drawings in Draw & Guess.",
+      "description": "Other players guessed 10 of your drawings in Draw & Guess (Discord players, one per drawing).",
       "category": "arcade",
-      "status": "planned",
-      "teaser": true
+      "status": "live"
     },
     {
       "id": "podium",
@@ -242,13 +249,6 @@
       "status": "live"
     },
     {
-      "id": "top_ten",
-      "title": "Top 10",
-      "description": "Reach the top 10 of the YEET board, the Pepe Guesser week board or the Pepe Pictures season ranking. Checked when you visit PondOS.",
-      "category": "arcade",
-      "status": "live"
-    },
-    {
       "id": "arcade_hopper",
       "title": "Arcade Hopper",
       "description": "Get a score kept by the server in 5 different games (YEET, Pepe Guesser, FUD Invaders, PEP Snake, Pepe Miner, Pepe Pictures, a board game). Unlocks the headphones.",
@@ -274,23 +274,21 @@
       "title": "Bug Hunter",
       "description": "Report a real bug in a letter to the editor. Given by the editor once it is fixed.",
       "category": "community",
-      "status": "live"
+      "status": "planned"
     },
     {
       "id": "frogageddon_beta",
       "title": "Beta Tester",
       "description": "Play an online FROGAGEDDON match during the beta.",
       "category": "arcade",
-      "status": "planned",
-      "teaser": true
+      "status": "planned"
     },
     {
       "id": "first_hatch",
       "title": "First Hatch",
-      "description": "Adopt your first PepeGochi.",
+      "description": "Hatch your first PepeGochi: adopt an egg and give it its first care.",
       "category": "pepegachi",
-      "status": "planned",
-      "teaser": true
+      "status": "planned"
     },
     {
       "id": "little_fren",
@@ -316,7 +314,7 @@
     {
       "id": "interior_designer",
       "title": "Pond Decorator",
-      "description": "Place 10 decorations in your PepeGochi room.",
+      "description": "Place 3 decorations you earned in your PepeGochi room at the same time.",
       "category": "pepegachi",
       "status": "planned"
     },
@@ -330,22 +328,35 @@
     {
       "id": "treasure_hunter",
       "title": "Treasure Hunter",
-      "description": "Find 6 different PondOS secrets.",
+      "description": "Find 10 different PondOS secrets.",
       "category": "secrets",
       "status": "live"
-    },
-    {
-      "id": "the_secret_pond",
-      "title": "The Secret Pond",
-      "description": "Put together all 6 pieces of the lost pond map.",
-      "category": "secrets",
-      "gold": true,
-      "status": "planned"
     },
     {
       "id": "frogmas",
       "title": "Frogmas",
       "description": "Visit PondOS on 24, 25 or 26 December (UTC).",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "pep_birthday",
+      "title": "Pepecoin's Birthday",
+      "description": "Visit PondOS on 30 January, Pepecoin's birthday (30 or 31 January, UTC). Unlocks a special avatar.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "thanksgiving_fren",
+      "title": "Thanksgiving",
+      "description": "Visit PondOS on US Thanksgiving weekend (the fourth Thursday of November to Sunday, UTC). Unlocks a special avatar.",
+      "category": "community",
+      "status": "live"
+    },
+    {
+      "id": "valentine_fren",
+      "title": "Valentine Fren",
+      "description": "Visit PondOS on 14 February, Valentine's Day (14 or 15 February, UTC). Unlocks the Cupid Fren avatar.",
       "category": "community",
       "status": "live"
     },
@@ -430,18 +441,11 @@
       "status": "live"
     },
     {
-      "id": "pep_birthday",
-      "title": "Pepecoin's Birthday",
-      "description": "Be in the pond on 30 January, Pepecoin's birthday. Unlocks a special avatar.",
-      "status": "live",
-      "source": "event"
-    },
-    {
-      "id": "thanksgiving_fren",
-      "title": "Thanksgiving Fren",
-      "description": "Visit the pond on Thanksgiving weekend. Unlocks a special avatar.",
-      "status": "live",
-      "source": "event"
+      "id": "share_fren",
+      "title": "Share Fren",
+      "description": "Copy or share a finished Pepe Guesser result. A small PondOS secret, not proof that anything was posted on X.",
+      "source": "share",
+      "status": "live"
     },
     {
       "id": "paper_crown",

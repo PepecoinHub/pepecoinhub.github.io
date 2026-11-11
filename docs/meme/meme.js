@@ -21,16 +21,27 @@
   var FREN_TEST = (function () {
     try { return new URLSearchParams(location.search).get('beta') === 'fren-test'; } catch (e) { return false; }
   })();
-  // Fren Passport + Create Your Fren (avatar maker) in testing: hidden for everyone except a browser that
-  // opened /meme/?beta=fren once (?beta=off hides it again). Until the Supabase migrations
-  // (update_fren_passport.sql, update_fren_avatar.sql, update_passport_awards.sql) are run, the tester gets a
-  // local preview: the look is kept in this browser only and nothing is sent to the server.
-  var FREN = (function () {
+  // Fren Passport + Create Your Fren: LIVE for everyone (launch). FREN_BETA is the old tester flag (/meme/?beta=fren,
+  // ?beta=off removes it): only testers still fall back to the local preview when the server says no.
+  var FREN = true;
+  var FREN_BETA = (function () {
     try {
       var q = new URLSearchParams(location.search).get('beta');
       if (q === 'fren') localStorage.setItem('pondos-fren-beta', '1');
       if (q === 'off') localStorage.removeItem('pondos-fren-beta');
       return FREN_TEST || localStorage.getItem('pondos-fren-beta') === '1';
+    } catch (e) { return false; }
+  })();
+  // PepeGochi in testing: hidden for everyone except a browser that opened /meme/?beta=gochi once
+  // (?beta=off hides it again). Testers get the real game (games/pepegochi-live.html: the frog on the server,
+  // Discord only; it needs the PepeGochi SQL) and the LOCAL rules simulator (games/pepegochi.html, no network).
+  // Launch day: the gate comes off together with the Passport's.
+  var GOCHI = (function () {
+    try {
+      var q = new URLSearchParams(location.search).get('beta');
+      if (q === 'gochi') localStorage.setItem('pondos-gochi-beta', '1');
+      if (q === 'off') localStorage.removeItem('pondos-gochi-beta');
+      return localStorage.getItem('pondos-gochi-beta') === '1';
     } catch (e) { return false; }
   })();
 
@@ -88,7 +99,10 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/gold.svg'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
+  // Hall of Fame icon: the owner's art (gold cup + open Pepe passport) goes to img/ico/hall-of-fame.webp, then this
+  // line becomes 'img/ico/hall-of-fame.webp'. Until then the LEADERS trophy stands in (no new art is made here).
+  var HOF_ICON = 'img/ico/leaders.webp';
   function icoFrom(src) { var m = /^img\/([\w-]+)\.webp$/.exec(src || ''); return m ? ico(m[1]) : src; }
   function json(name) {
     if (!cache[name]) cache[name] = fetch(DATA + name, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(name + ' ' + r.status); return r.json(); });
@@ -224,7 +238,8 @@
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['PEPaint', 'The party room: draw and guess with frens', 'pepaint', function () { drawGuess(); }],
-      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).forEach(function (g) {
+      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', function () { pepegochiApp(); }],
+        ['PEPEGOCHI (local test)', 'Rules simulator with a time machine · nothing is saved', 'pep-logo', function () { pepegochiTestApp(); }]] : []).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
       gl.appendChild(b);
@@ -1065,7 +1080,7 @@
     var paint = function () { stats.textContent = bits.filter(Boolean).join(' \u00b7 '); };
     setTimeout(function () {   // after the rest of this file has set up the Supabase address
       rpc('gry_wp_count').then(function (c) { if (c && c.players) { bits[0] = '\ud83d\udc38 ' + c.players + (c.players === 1 ? ' player' : ' players') + ' today'; paint(); } }, function () {});
-      rpc('gry_wp_top', { p_scope: 'day' }).then(function (rows) { if (rows && rows[0]) { bits[1] = '\ud83c\udfc6 ' + rows[0].nick + ' leads with ' + Number(rows[0].points).toLocaleString('en-US'); paint(); } }, function () {});
+      rpc('gry_wp_top', { p_scope: 'day' }).then(function (rows) { var lead = (rows || []).filter(function (x) { return !x.hidden; })[0]; if (lead) { bits[1] = '\ud83c\udfc6 ' + lead.nick + ' leads with ' + Number(lead.points).toLocaleString('en-US'); paint(); } }, function () {});
     }, 0);
   })();
   function invaders() {
@@ -1283,13 +1298,15 @@
     });
   }
   // names in score tables: Discord players in bold with a small frog, guests in grey (to make logging on worth it)
+  // Pepe Guesser: the host's own row comes back only to the host (marked hidden); others never get it
+  function hostHidden(x) { return x && x.hidden ? ' <small class="wp-hidden" title="You are the host, so other players do not see your score">(hidden, only you see this)</small>' : ''; }
   function who(nick, verified) {
     return verified ? '<b class="who who-ok" title="Discord player"><img src="img/pep-logo.webp" alt="" width="14" height="14">' + esc(nick) + '</b>'
       : '<span class="who who-guest" title="Guest">' + esc(nick) + '</span>';
   }
   function whoLegend() { return '<p class="who-legend"><b class="who who-ok"><img src="img/pep-logo.webp" alt="" width="14" height="14">Bold</b> = Discord player · <span class="who-guest">grey</span> = guest. <a href="#" class="who-logon">Log on with Discord</a> to get the frog.</p>'; }
   function wireLegend(box) { var a = box.querySelector('.who-logon'); if (a) a.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); }
-  // LEADERS: every top 10 in one window (FUD Invaders, PEP Snake, YEET THE PEP, Pepe Guesser today and 7 days, Pepe Miner)
+  // LEADERS: every top 10 in one window (FUD Invaders, PEP Snake, YEET THE PEP, Pepe Guesser today and this week, Pepe Miner)
   var LEAD = [['fud', 'FUD Invaders'], ['snake', 'PEP Snake'], ['yeet', 'YEET THE PEP'], ['wp', "Pepe Guesser"], ['miner', 'Pepe Miner']];
   var LEAD_TIP = {
     fud: 'Best score per player. Scores run in your browser, so the server checks them for plausibility and rate.',
@@ -1314,7 +1331,7 @@
         A.body.querySelector('.lead-tip').textContent = LEAD_TIP[g];
         var box = A.body.querySelector('.lead-lists');
         box.className = 'lead-lists' + (g === 'wp' ? ' two' : '');
-        box.innerHTML = g === 'wp' ? '<div>' + list('Today') + '</div><div>' + list('Last 7 days') + '</div>' : list('');
+        box.innerHTML = g === 'wp' ? '<div>' + list('Today') + '</div><div>' + list('This week') + '</div>' : list('');
         var ols = box.querySelectorAll('ol');
         if (g === 'fud' || g === 'snake') rpc('gry_arcade_top', { p_game: g }).then(function (rows) {
           ols[0].innerHTML = rows && rows.length ? rows.map(function (r, i) { return row(r, i, fmt.int(r.score) + (g === 'snake' ? ' blocks' : '')); }).join('') : empty;
@@ -1325,7 +1342,7 @@
         }, fail(ols[0]));
         else if (g === 'wp') ['day', 'week'].forEach(function (sc, k) {
           rpc('gry_wp_top', { p_scope: sc }).then(function (rows) {
-            ols[k].innerHTML = rows && rows.length ? rows.map(function (x, i) { return row(x, i, Number(x.points).toLocaleString('en-US') + ' pts'); }).join('') : empty;
+            ols[k].innerHTML = rows && rows.length ? rows.map(function (x, i) { return row(x, i, Number(x.points).toLocaleString('en-US') + ' pts' + hostHidden(x)); }).join('') : empty;
           }, fail(ols[k]));
         });
         else rpc('gry_miner_top', {}).then(function (rows) {
@@ -1448,6 +1465,20 @@
     }, 1000);
     A.host.classList.add('app-full');
   }
+  // PEPEGOCHI.EXE: your frog on the server (one per Discord account)
+  function pepegochiApp() {
+    var A = openApp('pepegochi', 'PEPEGOCHI.EXE', 'pep-logo', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepegochi-live.html?embed=1" title="PEPEGOCHI.EXE"></iframe>';
+    }, 760);
+    return A;
+  }
+  // the rules simulator for testers: a local copy of the rules with a time machine, no server, no stamps
+  function pepegochiTestApp() {
+    var A = openApp('pepegochi-test', 'PEPEGOCHI · LOCAL TEST', 'pep-logo', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepegochi.html?embed=1" title="PEPEGOCHI.EXE (local test)"></iframe>';
+    }, 760);
+    return A;
+  }
   function pondWarsApp() {
     var A = openApp('pondwars', 'FROGAGEDDON · BETA', 'pondwars', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars-beta.html?embed=1" title="FROGAGEDDON"></iframe>';
@@ -1525,6 +1556,9 @@
     ].concat(FREN ? [
       ['Fren Passport', 'Your Fren, achievements and secrets', 'pep-logo', 'passport profile achievements badges secrets items account', function () { frenPassport(); }],
       ['Create Your Fren', 'Avatar Maker for your Fren Passport', 'fresh-fren', 'avatar maker profile picture face hat outfit glasses look character fresh fren', function () { avatarMaker(); }]
+    ] : []).concat(GOCHI ? [
+      ['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', 'pepegochi tamagotchi pet frog care feed egg hatch', function () { pepegochiApp(); }],
+      ['PEPEGOCHI (local test)', 'Rules simulator for the PepeGochi beta', 'pep-logo', 'pepegochi test beta simulator time machine', function () { pepegochiTestApp(); }]
     ] : []).map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
     NAV.forEach(function (g) { g[1].forEach(function (p) { L.push({ name: p[1], desc: p[2], icon: p[3], kw: 'page ' + g[0] + ' ' + p[0].replace(/[@\/-]/g, ' '), go: page(p[0]) }); }); });
     ADS.forEach(function (ad, i) { L.push({ name: ad.file, desc: 'PEP-TV ad: ' + ad.title, icon: ad.icon, kw: 'ad ads tv video ' + ad.title, go: function () { adPlayer(i); } }); });
@@ -1642,10 +1676,10 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261109ed';
+  var PP_CATALOG = 'passport-catalog.json?v=20261111launch';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261111v3'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261111launch'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1711,7 +1745,7 @@
   // In ordinary beta mode preserve the existing fallback until migrations launch.
   function frenRpc(name, args) {
     var s = sbSession();
-    if (!FREN) return rpc(name, args);
+    if (!FREN_BETA) return rpc(name, args);
     if (FREN_TEST) return frenTestAuthorize().then(function () { return frenPreview(name, args || {}); });
     if (!s || !s.discord) return Promise.resolve(frenPreview(name, args));
     return rpc(name, args).catch(function (err) { if (frenMissing(err)) return frenPreview(name, args); throw err; });
@@ -1760,8 +1794,10 @@
     return Promise.all([
       frenRpc('gry_passport_state', {}),
       fetch(PP_CATALOG).then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
-      avatarOptions().catch(function () { return null; })
+      avatarOptions().catch(function () { return null; }),
+      wpStats(null)
     ]).then(function (r) {
+      if (r[0] && r[3] && !r[0].preview) r[0].wp_stats = r[3];
       if (r[0] && r[0].signed_in) passportCache = { userId: session ? session.userId : 'preview', preview: !!r[0].preview, state: r[0], catalog: r[1], opts: r[2] };
       return r[0];
     });
@@ -1769,7 +1805,7 @@
   function passportMine() {
     var s = sbSession();
     if (FREN_TEST) return s && s.discord && passportCache && passportCache.preview && passportCache.userId === s.userId ? passportCache : null;
-    if (FREN && passportCache && passportCache.preview) return passportCache;
+    if (FREN_BETA && passportCache && passportCache.preview) return passportCache;
     return s && s.discord && passportCache && passportCache.userId === s.userId ? passportCache : null;
   }
   // another fren's passport, read only (games/supabase/update_passport_public.sql): the server answers only
@@ -1780,8 +1816,16 @@
     return Promise.all([
       rpc('gry_passport_public', { p_user: id }),
       fetch(PP_CATALOG).then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
-      avatarOptions().catch(function () { return null; })
-    ]).then(function (r) { return { userId: id, state: r[0] || {}, catalog: r[1], opts: r[2] }; });
+      avatarOptions().catch(function () { return null; }),
+      wpStats(id)
+    ]).then(function (r) { var st = r[0] || {}; if (r[3]) st.wp_stats = r[3]; return { userId: id, state: st, catalog: r[1], opts: r[2] }; });
+  }
+  // Pepe Guesser records for the Passport (games/supabase/update_wheres_pepe_hall_of_fame.sql): Days at #1 and the
+  // longest guessing streak, worked out by the server. Discord frens only; null when the migration is not there yet.
+  function wpStats(id) {
+    var s = sbSession();
+    if (FREN_TEST || !s || !s.discord) return Promise.resolve(null);
+    return rpc('gry_wp_stats', { p_user: id || null }).then(function (v) { return v && v.found ? v : null; }, function () { return null; });
   }
 
   // ---------- Fren Passport art (hand-drawn, cut by scripts/build_passport_art.py) ----------
@@ -1800,21 +1844,29 @@
     n.style.backgroundPositionX = (i * 100 / (names.length - 1)) + '%';
     return n;
   }
-  // Only owner-approved V3 art. The 49 positions match scripts/build_v3_stamps.py exactly.
-  // NO Lily fallback: missing art gets a neutral placeholder, never an old illustration.
-  var PP_V3 = [
-    'frog_of_the_week', 'moonwalker', 'vox_populi', 'certified_fren', 'old_frog', 'good_parent', 'first_avatar',
+  // Pond Pioneer is its own exclusive v3 asset; no fallback to the former Lily sprite.
+  // Keep the former Share Fren tile in this sprite index to preserve every later tile position;
+  // Share Fren is now a secret rather than a stamp.
+  // the owner-approved v3 stamps (passport-assets/stamps-v3.webp, scripts/build_v3_stamps.py): same order as the script
+  var PP_V3 = ['frog_of_the_week', 'moonwalker', 'vox_populi', 'certified_fren', 'old_frog', 'good_parent', 'first_avatar',
     'detective_fren', 'good_game', 'yeet_adept', 'fud_buster', 'long_snake', 'arcade_hopper', 'secret_starter',
-    'i_voted', 'checkmate', 'the_secret_pond', 'picasso_fren', 'first_fren', 'sharp_eye', 'community_fren',
-    'like_it_here', 'nasa_is_hiring', 'rookie_miner', 'season_champion', 'top_ten', 'bug_hunter', 'podium',
-    'game_night', 'quiz_master', 'frogmas', 'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren',
-    'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14',
-    'pepe_guesser', 'week_scout', 'little_fren', 'first_hatch', 'grown_fren', 'scout_fren', 'pond_pioneer',
-  ];
+    'i_voted', 'checkmate', 'picasso_fren',
+    'first_fren', 'sharp_eye', 'community_fren', 'like_it_here', 'nasa_is_hiring', 'rookie_miner',
+    'season_champion', 'bug_hunter', 'podium', 'game_night', 'quiz_master', 'frogmas',
+    'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren',
+    'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14', 'pepe_guesser', 'week_scout',
+    'scout_fren', 'first_hatch', 'little_fren', 'grown_fren', 'share_fren', 'valentine_fren'];
+  // the 20 places on the Passport's front page, in order: gold row, silver row, then the first steps
+  var PP_FRONT = ['moonwalker', 'season_champion', 'frog_of_the_week', 'certified_fren', 'treasure_hunter',
+    'old_frog', 'vox_populi', 'checkmate', 'detective_fren', 'like_it_here',
+    'first_fren', 'first_avatar', 'welcome_back', 'pepe_guesser', 'sharp_eye',
+    'good_game', 'rookie_miner', 'dear_editor', 'i_voted', 'secret_starter'];
+  // Only owner-approved art (#257): missing art gets a neutral placeholder, never Lily or another stamp's drawing.
   function ppStamp(x, earned) {
+    if (earned && x.id === 'pond_pioneer') return el('span', {class:'pp-art pp-art-stamp is-pioneer',role:'img','aria-label':'Pond Pioneer'});
+    if (earned && x.id === 'pond_dominator') return el('span', { class: 'pp-art pp-art-stamp is-dominator', 'aria-hidden': 'true' });
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
     if (!earned) return ppSprite('pp-art pp-art-stamp', PP_STAMPS, 'locked');
-    // An earned stamp whose art isn't approved yet is never drawn from Lily or another stamp.
     var pending = el('span', { class: 'pp-art pp-art-stamp is-pending', 'aria-hidden': 'true' });
     pending.textContent = '?';
     return pending;
@@ -1895,6 +1947,8 @@
         // [now, goal, what is still missing]. Letters and chat have no counter on purpose, so nobody is
         // nudged to spam the editor or the lobby; those stamps can still be earned.
         var P = state.progress || {};
+        var WPS = state.wp_stats || null;   // Pepe Guesser records (gry_wp_stats), when the server has them
+        var wpDays = function(v){ var n = typeof v === 'number' && isFinite(v) ? v : 0; return fmt.int(n) + (n === 1 ? ' day' : ' days'); };
         var num = function(v){ return typeof v === 'number' && isFinite(v) ? v : 0; };
         var more = function(n, one, many){ return fmt.int(n) + ' more ' + (n === 1 ? one : many); };
         var PROG = {
@@ -1933,14 +1987,18 @@
         var right = el('section', {class:'pp-page pp-right','aria-label':'Achievement stamps'});
         right.appendChild(el('img', {class:'pp-page-art',src:PP_ART+'page-right.webp'+PP_ART_V,alt:'',width:'360',height:'528',draggable:'false'}));
         right.appendChild(piece('p','sr','Achievement stamps: ' + earnedCount + ' of ' + goal + ' collected.'));
+        // the front page is a showcase with a fixed place for each of the 20 key stamps (owner, 2026-11-09):
+        // row 1 gold, row 2 silver, rows 3-4 first steps. Every other stamp lives in the Stamps tab.
         var grid = el('div', {class:'pp-grid'});
-        for (var gi = 0; gi < 20; gi++) {
-          var gx = earnedList[gi];
-          var gc = el('div', {class:'pp-slot'+(gx?' is-earned':' is-locked'), title: gx ? stampTitle(gx, earnedOf(gx.id)) : 'Empty stamp slot'});
-          gc.appendChild(ppStamp(gx || {}, !!gx));
-          if (gx) gc.appendChild(piece('span','sr', stampTitle(gx, earnedOf(gx.id))));
+        PP_FRONT.forEach(function (fid, gi) {
+          var gx = find(badges, fid) || { id: fid, title: fid };
+          var ge = earnedOf(fid), tier = gi < 5 ? 'gold' : gi < 10 ? 'silver' : 'plain';
+          var tip = ge ? stampTitle(gx, ge) : gx.title + ' (' + (tier === 'plain' ? '' : tier + ', ') + 'not yet): ' + (gx.description || '');
+          var gc = el('div', {class:'pp-slot is-' + tier + (ge ? ' is-earned' : ' is-locked'), title: tip});
+          gc.appendChild(ppStamp(gx, !!ge));
+          gc.appendChild(piece('span','sr', tip));
           grid.appendChild(gc);
-        }
+        });
         right.appendChild(grid);
         var baliE = earnedOf(MYTHIC_ID);
         var baliBtn = baliE
@@ -1964,7 +2022,10 @@
           ['box', 'Items collected:', itemsGoal ? itemsCount+' / '+itemsGoal : fmt.int(itemsCount)],
           ['star', 'Secrets found:', secretsCount+' / '+secretsGoal],
           ['gamepad', 'YEET best:', yeetBest==null?'—':metres(yeetBest)]
-        ].forEach(function(v){
+        ].concat(WPS ? [
+          ['trophy', 'Days at #1:', fmt.int(num(WPS.days_at_1))],
+          ['calendar', 'Longest Guessing Streak:', wpDays(WPS.longest_streak)]
+        ] : []).forEach(function(v){
           var r = el('div', {class:'pp-jrow'}); r.appendChild(ppIcon(v[0])); r.appendChild(piece('dt','',v[1])); r.appendChild(piece('dd','',v[2])); jl.appendChild(r);
         });
         journey.appendChild(jl);
@@ -2043,6 +2104,45 @@
         }
         recent.appendChild(rl);
         panes[0].appendChild(recent);
+
+        // PepeGochi: the frog's card (read-only gry_pepegochi_state, once per Passport window)
+        if (GOCHI) {
+          var gc = el('section', {class:'pp-panel pp-gochi'});
+          gc.appendChild(piece('h3','pp-panel-h','PepeGochi'));
+          var gs = A.gochi;
+          if (gs === undefined) {
+            A.gochi = null;
+            rpc('gry_pepegochi_state', {}).then(function (r) { A.gochi = r || false; if (A.render) A.render(); },
+              function () { A.gochi = false; if (A.render) A.render(); });
+            gc.appendChild(piece('p','pp-muted','Looking for your frog…'));
+          } else if (!gs) {
+            gc.appendChild(piece('p','pp-muted','Your frog could not be loaded right now.'));
+          } else {
+            var gp = gs.pet, gsum = gs.summary || {};
+            if (!gp) gc.appendChild(piece('p','', 'No frog yet. Adopt an egg in PEPEGOCHI.EXE: its first care hatches it (First Hatch).'));
+            else if (gp.status === 'departed') gc.appendChild(piece('p','', gp.name + ' moved out. GOODBYE.TXT is waiting for you in PEPEGOCHI.EXE.'));
+            else {
+              gc.appendChild(piece('p','pp-gochi-name', gp.name + ' · ' + gp.stage + ' · day ' + gp.life_day + (gp.generation > 1 ? ' · fren #' + gp.generation : '')));
+              var gmood = { healthy:'Doing fine.', neglected:'Misses you: something is overdue.', packing:'Packing a tiny suitcase. Go now!', recovering:'Still upset. Come back on another day.' };
+              gc.appendChild(piece('p', gp.status === 'packing' ? 'pp-gochi-warn' : '', gmood[gp.status] || gp.status));
+              gc.appendChild(piece('p','pp-muted','Care days: ' + gp.care_days + ' · Good care days: ' + gp.good_days + ' / ' + (gp.good_days_goal || 30) + ' for Good Parent'));
+            }
+            if (gsum.former_frens) gc.appendChild(piece('p','pp-muted','Former frens: ' + gsum.former_frens + ' · Longest friendship: ' + gsum.longest_friendship_days + ' days'));
+          }
+          var go = el('button', {type:'button',class:'app-btn'}); go.textContent = 'Open PEPEGOCHI.EXE';
+          go.addEventListener('click', function () { pepegochiApp(); });
+          gc.appendChild(go);
+          panes[0].appendChild(gc);
+        } else {
+          // PepeGochi comes after the Passport (owner, 2026-11-09): its place in the Passport is kept
+          var gw = el('section', {class:'pp-panel pp-gochi is-soon'});
+          gw.appendChild(piece('h3','pp-panel-h','PepeGochi'));
+          var gr = el('div', {class:'pp-gochi-soon'});
+          gr.appendChild(el('img', {src: BASE + 'games/img/pepegochi/pepegochi_egg_idle.png', alt: '', width: '48', height: '48'}));
+          gr.appendChild(piece('p','', 'Coming soon: your own frog to hatch and look after. Its stamps will be in this Passport.'));
+          gw.appendChild(gr);
+          panes[0].appendChild(gw);
+        }
 
         // Stamps: the album on passport paper. Tap a stamp to read how it is earned (no hover on phones).
         var sheet = el('div', {class:'pp-sheet'});
@@ -2136,6 +2236,8 @@
         panes[3].appendChild(cgrid);
 
         // Stats: factual numbers from the server snapshot
+        var stSec = el('section', {class:'pp-panel pp-statsheet'});
+        stSec.appendChild(piece('h3','pp-panel-h','Fren Stats'));
         var st = el('dl', {class:'pp-stats'});
         [
           ['Member since', state.member_since ? fmt.date(state.member_since) : 'unknown'],
@@ -2145,9 +2247,13 @@
           ['Items collected', itemsGoal ? itemsCount+' / '+itemsGoal : fmt.int(itemsCount)],
           ['Best YEET flight', yeetBest==null?'—':metres(yeetBest)],
           ['Avatar saved', look ? 'Yes' : 'Not yet']
-        ].forEach(function(v){ var r=el('div'); r.appendChild(piece('dt','',v[0])); r.appendChild(piece('dd','',v[1])); st.appendChild(r); });
-        panes[4].appendChild(st);
-        panes[4].appendChild(piece('p','pp-muted','Days registered counts calendar days since ' + (other ? 'this fren' : 'you') + ' joined; it is not an activity counter.'));
+        ].concat(WPS ? [
+          ['Days at #1 (Pepe Guesser)', fmt.int(num(WPS.days_at_1))],
+          ['Longest Guessing Streak', wpDays(WPS.longest_streak)]
+        ] : []).forEach(function(v){ var r=el('div'); r.appendChild(piece('dt','',v[0])); r.appendChild(piece('dd','',v[1])); st.appendChild(r); });
+        stSec.appendChild(st);
+        stSec.appendChild(piece('p','pp-muted','Days registered counts calendar days since ' + (other ? 'this fren' : 'you') + ' joined; it is not an activity counter.'));
+        panes[4].appendChild(stSec);
 
         box.appendChild(bar98);
         panes.forEach(function(p){ box.appendChild(p); });
@@ -2227,7 +2333,7 @@
         });
         return;
       }
-      if (!FREN && (!session || !session.discord)) {
+      if (!FREN_BETA && (!session || !session.discord)) {
         notice('Log on with Discord to see your private passport. Guest scores do not create a permanent collection.', true);
         return;
       }
@@ -2264,7 +2370,7 @@
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261109av').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261111launch').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -2333,9 +2439,11 @@
   // (only stamps that can be earned today are named; the others stay "a future stamp", like '???' in the Passport)
   var FA_UNLOCK = { detective_fren: 'Detective Fren', rookie_miner: 'Happy Mining!', scout_fren: 'Scout Fren', good_game: 'Good Game',
     yeet_adept: 'Adept', arcade_hopper: 'Arcade Hopper', secret_starter: 'Secret Starter', dear_editor: 'Dear Editor',
-    senior_editor: 'Senior Editor', frogmas: 'Frogmas' };
+    senior_editor: 'Senior Editor', frogmas: 'Frogmas', old_frog: 'Old Frog', welcome_back: 'Welcome Back',
+    streak_14: '14-day streak', like_it_here: 'I Like It Here', certified_fren: 'Certified Fren', nasa_is_hiring: 'NASA Is Hiring', fud_buster: 'FUD Buster' };
   // event days: open to every fren who visits PondOS on that day (the check-in gives them)
-  var FA_EVENT = { pep_birthday: 'visit PondOS on 30 January, Pepecoin\'s birthday', thanksgiving_fren: 'visit PondOS on Thanksgiving weekend' };
+  var FA_EVENT = { pep_birthday: 'visit PondOS on 30 January, Pepecoin\'s birthday', thanksgiving_fren: 'visit PondOS on Thanksgiving weekend',
+    valentine_fren: 'visit PondOS on 14 February, Valentine\'s Day' };
   // how a locked special avatar opens, in a few words (secrets keep their hiding place to themselves)
   function avHow(u) {
     if (FA_EVENT[u]) return 'Opens when you ' + FA_EVENT[u] + '.';
@@ -2345,13 +2453,13 @@
   }
   function avName(p) { return String(p.label || p.id).replace(/\s*\([^)]*\)\s*$/, ''); }
   // special avatars hidden behind a secret: the lock says only that (no hint where)
-  var FA_SECRET = { why_tho: 1, midnight_fren: 1, happy_fren: 1, nerd_alert: 1, born_to_fren: 1, bali_dreamer: 1, find_fren: 1, address_check: 1 };
+  var FA_SECRET = { why_tho: 1, midnight_fren: 1, happy_fren: 1, nerd_alert: 1, born_to_fren: 1, bali_dreamer: 1, find_fren: 1, address_check: 1, share_fren: 1 };
   function avatarMaker() {
     return openApp('avatar', 'Create Your Fren - Avatar Maker', 'pep-logo', function (A) {
       passportCss();
       A.host.classList.add('fren-win');
       A.body.innerHTML = '<div class="fa-load"><p class="passport-muted" role="status">Loading the Avatar Maker…</p></div>';
-      var session = sbSession(), signed = FREN || !!(session && session.discord && session.userId);
+      var session = sbSession(), signed = FREN_BETA || !!(session && session.discord && session.userId);
       // opened from the Passport: its snapshot already has the saved look; otherwise read it once
       var loading = FREN_TEST
         ? frenTestAuthorize().then(function () { return Promise.all([avatarOptions(), passportLoad(session)]); })
@@ -2596,6 +2704,8 @@
     }
     frenRpc('gry_passport_discover',{p_secret:id}).then(function(result){
       if(!result||result.id!==id) return;
+      // public beta: the server keeps no secrets yet, so this browser must not remember it as claimed
+      if(result.beta) { balloon('Nice find, fren!','Secrets start counting on Monday. Find it again then and it goes into your Fren Passport.','gif-045-still'); return; }
       if (!FREN_TEST) { try { localStorage.setItem(k,'1'); } catch(e) {} }
       if (FREN_TEST) passportLoad(sbSession()).then(function () {
         if (apps.passport && apps.passport.render) apps.passport.render();
@@ -2603,9 +2713,30 @@
       if(result.new) {
         var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren',midnight_fren:'Midnight Fren',nerd_alert:'Nerds Only',bali_dreamer:'Bali Dreamer',find_fren:'Looking Glass',address_check:'Trust, But Verify'};
         var av={why_tho:1,midnight_fren:1,nerd_alert:1,bali_dreamer:1,find_fren:1,address_check:1};
-        balloon('Secret discovered!',(names[id]||'A mysterious find')+' is now in your Fren Passport.'+(av[id]?' A special avatar is waiting in Create Your Fren.':''),'gif-045-still');
+        rewardNotice({ bar: 'Fren Passport - Secret Found', title: 'Secret discovered: ' + (names[id] || 'A mysterious find'),
+          text: 'It is in your Fren Passport now.' + (av[id] ? ' A special avatar is waiting for you in Create Your Fren.' : ''),
+          img: ico('gif-045-still'), go: av[id] ? 'Open Create Your Fren' : 'Open Fren Passport', open: av[id] ? avatarMaker : frenPassport });
       }
     },function(){ /* Migration may not be installed yet; retry on next discovery. */ });
+  }
+
+  // Share Fren is a small secret, not a stamp or proof of posting on X.
+  // The server checks the player's own finished Pepe Guesser round.
+  function passportShare() {
+    if (!FREN) return;
+    var session = sbSession();
+    if (!session || !session.discord || !session.userId) return;
+    var k = 'pondos-passport-share-v2:' + session.userId;
+    try { if (localStorage.getItem(k) === '1') return; } catch (e) {}
+    frenRpc('gry_passport_share', {}).then(function (r) {
+      if (!r || !r.found) return;
+      try { localStorage.setItem(k, '1'); } catch (e) {}
+      if (passportCache && passportCache.userId === session.userId) passportCache = null;
+      if (!r['new']) return;
+      rewardNotice({ bar: 'Fren Passport - Secret Found', title: 'Secret discovered: Share Fren',
+        text: 'You found a little PondOS secret by sharing a Pepe Guesser result. It is in your collection now.',
+        img: ico('gif-045-still'), go: 'Open Fren Passport', open: frenPassport });
+    }, function () { /* the migration may not be installed yet */ });
   }
 
   function logOn() {
@@ -2660,15 +2791,12 @@
         if (!fresh.length) return;
         if (passportCache && passportCache.userId === s.userId) passportCache = null;   // the next Passport opens fresh
         return fetch(PP_CATALOG).then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; }).then(function (c) {
-          var names = fresh.map(function (b) {
-            var x = c && Array.isArray(c.achievements) ? c.achievements.filter(function (a) { return a.id === b.id; })[0] : null;
-            return x ? x.title : null;
+          var stamps = fresh.map(function (b) {
+            return c && Array.isArray(c.achievements) ? c.achievements.filter(function (a) { return a.id === b.id; })[0] : null;
           }).filter(Boolean);
-          if (!names.length) return;
-          var t = names.length === 1 ? balloon('New stamp: ' + esc(names[0]), 'It is in your Fren Passport now. Click to open it.', 'stamp-new')
-            : balloon(names.length + ' new stamps!', esc(names.join(', ')) + '. Click to open your Fren Passport.', 'stamp-new');
-          t.addEventListener('click', function (ev) { if (!ev.target.closest('button')) frenPassport(); });
-          t.style.cursor = 'pointer';
+          stamps.forEach(function (x) {
+            rewardNotice({ bar: 'Fren Passport - New Stamp', stamp: x, title: x.title, text: x.description || 'It is in your Fren Passport now.' });
+          });
         });
       }, function () { /* the migration may not be installed yet; nothing to show */ });
     }, 2500);
@@ -2829,9 +2957,21 @@
     'Play every day to grow your streak (the fire badge).',
     '',
     '== RANKING ==',
-    'Today and the last 7 days, everyone. Discord players: bold with a frog.',
+    'Today and This week, everyone. Discord players: bold with a frog.',
     'Guests: grey, one per network.',
     'Under it: how many frens played today.',
+    'The week runs Monday 00:00 to Sunday 23:59:59 UTC.',
+    '',
+    '== HALL OF FAME ==',
+    'Only Discord players count (guests: no Passport).',
+    'Weekly Champion: #1 when the week ends (Frog of the',
+    '  Week stamp). A tie at the top = no winner.',
+    'Days at #1: every day at 23:59:59 UTC the one player',
+    '  leading the week gets +1. A tie = nobody.',
+    'Pond Dominator: lead the week alone on all 7 days.',
+    'Longest Guessing Streak: most days in a row with a',
+    '  guess. It stays when a streak breaks.',
+    'Open Hall of Fame in this folder to see them all.',
     '',
     '== PEP FAUCET (free PEP) ==',
     'After your guess, the yellow PEP Faucet box tells you',
@@ -2871,7 +3011,7 @@
   }
   function wpFolder() {
     openApp('wp-folder', "C:\\Pond\\Pepe Guesser", 'wp-folder', function (A) {
-      var F = [['PepeGuesser.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme]];
+      var F = [['PepeGuesser.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme], ['Hall of Fame', 'hall-of-fame', wpHallOfFame]];
       A.body.innerHTML = '<ul class="folder">' + F.map(function (f, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(f[1]) + '" alt="" width="40" height="40"><span>' + f[0] + '</span></button></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then double-click PepeGuesser.exe.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
@@ -2881,6 +3021,108 @@
         b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
       });
     }, 440);
+  }
+  // Hall of Fame (games/supabase/update_wheres_pepe_hall_of_fame.sql): settled weeks and the all-time boards.
+  // Everything comes from gry_wp_hof(); the page only draws it. A name opens that fren's Passport, read only
+  // (the server sends ids only to frens logged on with Discord, and the Passport stays behind its beta flag).
+  var HOF_CATS = [['weeks', 'Weeks won', function (n) { return fmt.int(n) + (n === 1 ? ' week' : ' weeks'); }],
+    ['days', 'Days at #1', function (n) { return fmt.int(n) + (n === 1 ? ' day' : ' days'); }],
+    ['streak', 'Longest streak', function (n) { return fmt.int(n) + (n === 1 ? ' day' : ' days'); }]];
+  function wpHallOfFame() {
+    openApp('wp-hof', 'Hall of Fame - Pepe Guesser', 'hall-of-fame', function (A) {
+      passportCss();   // the Fren avatars use the Passport's layer styles
+      A.body.innerHTML = '<div class="hof"><div class="tabs98 hof-tabs" role="tablist" aria-label="Hall of Fame">' +
+        '<button type="button" role="tab" aria-selected="true" data-t="weeks">Weekly Champions</button>' +
+        '<button type="button" role="tab" aria-selected="false" data-t="legends">All-Time Legends</button></div>' +
+        '<div class="hof-pane" role="tabpanel"><p class="bin-tip">Polishing the trophies…</p></div>' +
+        '<p class="hof-note"></p></div>';
+      var pane = A.body.querySelector('.hof-pane'), note = A.body.querySelector('.hof-note');
+      var H = null, opts = null, tab = 'weeks', cat = 'weeks';
+      var canOpen = function (c) { return FREN && c && c.id && FREN_ID.test(c.id); };
+      var dateShort = function (iso) { var d = new Date(iso + 'T00:00:00Z'); return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }); };
+      var face = function (c) {
+        var box = el('span', { class: 'hof-face' }), look = opts && c && avatarLook(opts, c.avatar);
+        if (look) box.appendChild(avatarStack(opts, look, 'The Fren of ' + (c.nick || 'this fren')));
+        else box.appendChild(el('img', { src: 'img/pep-logo.webp', alt: '', width: '28', height: '28' }));
+        return box;
+      };
+      // the name (and the face) open the Passport when they can; otherwise plain text
+      var person = function (c) {
+        var wrap = el('span', { class: 'hof-who' });
+        if (canOpen(c)) {
+          var b = el('button', { type: 'button', class: 'hof-open', title: 'Open the Fren Passport of ' + c.nick });
+          b.appendChild(face(c)); b.appendChild(el('span', { class: 'hof-nick' })).textContent = c.nick;
+          b.addEventListener('click', function () { frenPassport(false, { id: c.id.toLowerCase(), nick: c.nick }); });
+          wrap.appendChild(b);
+        } else {
+          wrap.appendChild(face(c)); wrap.appendChild(el('span', { class: 'hof-nick' })).textContent = (c && c.nick) || 'fren';
+        }
+        return wrap;
+      };
+      var paintWeeks = function () {
+        var weeks = (H && H.weeks) || [];
+        pane.replaceChildren();
+        if (!weeks.length) {
+          pane.appendChild(el('p', { class: 'bin-tip' })).textContent = H && H.since
+            ? 'No finished week yet. The first Hall of Fame week starts on ' + dateShort(H.since) + ' (Monday, 00:00 UTC). The champion is crowned after Sunday 23:59:59 UTC.'
+            : 'No finished week yet.';
+          return;
+        }
+        var ol = el('ol', { class: 'hof-list hof-weeks' });
+        weeks.forEach(function (w) {
+          var li = el('li', { class: 'hof-row' + (w.winner ? '' : ' is-empty') });
+          var when = el('span', { class: 'hof-when' });
+          when.appendChild(el('b')).textContent = 'Week ' + w.week + ', ' + w.year;
+          when.appendChild(el('small')).textContent = dateShort(w.week_start) + ' – ' + dateShort(w.week_end);
+          li.appendChild(when);
+          if (w.winner) {
+            li.appendChild(person(w.winner));
+            var pts = el('span', { class: 'hof-val' }); pts.textContent = fmt.int(w.points) + ' pts';
+            if (w.dominator) { var dm = el('small', { class: 'hof-dom', title: 'Led the week alone on all 7 days' }); dm.textContent = 'Pond Dominator'; pts.appendChild(dm); }
+            li.appendChild(pts);
+          } else {
+            li.appendChild(el('span', { class: 'hof-none' })).textContent = w.tied ? 'No Winner - Tie' : 'No Winner - no games';
+            li.appendChild(el('span', { class: 'hof-val' })).textContent = w.tied ? fmt.int(w.points) + ' pts' : '';
+          }
+          ol.appendChild(li);
+        });
+        pane.appendChild(ol);
+      };
+      var paintLegends = function () {
+        pane.replaceChildren();
+        var bar = el('div', { class: 'app-row hof-cats', role: 'group', 'aria-label': 'Category' });
+        HOF_CATS.forEach(function (c) {
+          var b = el('button', { type: 'button', class: 'app-btn', 'aria-pressed': String(c[0] === cat) }); b.textContent = c[1];
+          b.addEventListener('click', function () { cat = c[0]; paintLegends(); });
+          bar.appendChild(b);
+        });
+        pane.appendChild(bar);
+        var C = HOF_CATS.filter(function (c) { return c[0] === cat; })[0];
+        var rows = (H && H.legends && H.legends[cat]) || [];
+        if (!rows.length) { pane.appendChild(el('p', { class: 'bin-tip' })).textContent = 'Nobody here yet. Be the first legend of the pond!'; return; }
+        var ol = el('ol', { class: 'hof-list hof-legends' });
+        rows.forEach(function (r) {
+          var li = el('li', { class: 'hof-row' });
+          li.appendChild(el('span', { class: 'hof-rank' })).textContent = '#' + r.rank;
+          li.appendChild(person(r));
+          li.appendChild(el('span', { class: 'hof-val' })).textContent = C[2](Number(r.value) || 0);
+          ol.appendChild(li);
+        });
+        pane.appendChild(ol);
+      };
+      var paint = function () {
+        A.body.querySelectorAll('.hof-tabs [role=tab]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-t') === tab)); });
+        if (tab === 'weeks') paintWeeks(); else paintLegends();
+        var s = sbSession();
+        note.textContent = 'Discord players only. Weeks run Monday 00:00 to Sunday 23:59:59 UTC; a tie at the top has no winner. ' +
+          (H && H.since ? 'Counted from ' + dateShort(H.since) + ', older weeks are not rebuilt. ' : '') +
+          (FREN ? (s && s.discord ? 'Tap a name to open that Fren Passport.' : 'Log on with Discord to open Fren Passports.') : '');
+      };
+      A.body.querySelectorAll('.hof-tabs [role=tab]').forEach(function (b) { b.addEventListener('click', function () { tab = b.getAttribute('data-t'); paint(); }); });
+      Promise.all([wpRpc('gry_wp_hof', { p_limit: 20 }), avatarOptions().catch(function () { return null; })]).then(function (r) {
+        H = r[0] || {}; opts = r[1]; paint();
+      }, function () { pane.replaceChildren(el('p', { class: 'bin-tip' })); pane.firstChild.textContent = 'The Hall of Fame could not be loaded. Try again later.'; });
+    }, 560);
   }
   // a signed-in session that is still valid; an expired one is refreshed once (the PEP Games pages do the same)
   var wpRefreshing = null;
@@ -3108,10 +3350,11 @@
         main.querySelector('.wp-readme').addEventListener('click', wpReadme); wireHost();
         var txt = shareText(r);
         main.querySelector('.wp-x').href = 'https://x.com/intent/post?text=' + encodeURIComponent(txt);
+        main.querySelector('.wp-x').addEventListener('click', function () { passportShare(); });
         var shb = main.querySelector('.wp-share');
-        if (shb) shb.addEventListener('click', function () { navigator.share({ text: txt }).catch(function () {}); });
+        if (shb) shb.addEventListener('click', function () { navigator.share({ text: txt }).then(passportShare, function () {}); });
         main.querySelector('.wp-copy').addEventListener('click', function () {
-          var ok = function () { say('Copied. Paste it on Discord or X.'); };
+          var ok = function () { say('Copied. Paste it on Discord or X.'); passportShare(); };
           if (navigator.clipboard) navigator.clipboard.writeText(txt).then(ok, function () { say('Copy blocked by the browser.', true); }); else say('Copy blocked by the browser.', true);
         });
         loadLeaflet().then(function () {
@@ -3179,13 +3422,13 @@
       };
       var board = function (box) {
         if (!box) return;
-        box.innerHTML = '<div class="tabs98 wp-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-s="day">Today</button><button type="button" role="tab" aria-selected="false" data-s="week">7 days</button></div><ol class="wp-top10"><li class="wp-small">Loading…</li></ol>' + whoLegend();
+        box.innerHTML = '<div class="tabs98 wp-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-s="day">Today</button><button type="button" role="tab" aria-selected="false" data-s="week">This week</button></div><ol class="wp-top10"><li class="wp-small">Loading…</li></ol>' + whoLegend();
         wireLegend(box);
         var ol = box.querySelector('ol');
         var show = function (s) {
           box.querySelectorAll('[data-s]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-s') === s)); });
           wpRpc('gry_wp_top', { p_scope: s }).then(function (rows) {
-            ol.innerHTML = rows.length ? rows.map(function (x) { return '<li><span>' + who(x.nick, x.verified !== false) + '</span><b>' + Number(x.points).toLocaleString('en-US') + '</b></li>'; }).join('')
+            ol.innerHTML = rows.length ? rows.map(function (x) { return '<li><span>' + who(x.nick, x.verified !== false) + hostHidden(x) + '</span><b>' + Number(x.points).toLocaleString('en-US') + '</b></li>'; }).join('')
               : '<li class="wp-small">Nobody yet. Be the first!</li>';
           }, function () { ol.innerHTML = '<li class="wp-small">The ranking could not be loaded.</li>'; });
         };
@@ -3315,7 +3558,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 6, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 7, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -3422,6 +3665,28 @@
       '<p class="gz-fine">The editor checked. It is gud.</p></section>' +
       '<p class="gz-foot">*Almost weekly: three days after issue #5. Close enough.</p></article>';
   }
+  // Issue #7 (12 Nov 2026): the Fren Passport public beta, Thursday to Sunday; the season starts Monday 16 XI
+  function gazette7() {
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #7</span><span>Price: 0 PEP</span><span>Special edition</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking"><p class="gz-flash">Breaking</p><h4>🐸 The Pond goes BETA</h4>' +
+      '<div class="gz-wpbox"><img src="img/wow.webp" alt="Pepe with his mouth wide open" width="110" height="110"><div>' +
+      '<p>Frens, it\'s here. Passports, stamps, avatars, all of it, live in the Pond right now.</p>' +
+      '<p>But hold your lily pads: <b>this is a BETA until Sunday night.</b> Poke around, click everything, try to break it. That\'s literally the job this weekend.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-pass">Open your Fren Passport →</button><button type="button" class="app-btn gz-fren">Create Your Fren</button></div></section>' +
+      '<section class="gz-market"><p class="gz-kick">About the Avatar Maker</p><h4>Yes, it\'s ugly. On purpose.</h4>' +
+      '<p>Those basic avatars are just the starting point. The good stuff has to be earned. Want a better face in the Pond? Go unlock one.</p></section>' +
+      '<section class="gz-wp"><p class="gz-kick">The rules</p><h4>Nothing counts yet</h4>' +
+      '<p>Stamps, secrets, avatars to unlock, Pepe Guesser records: all of it starts from zero on Monday. Everyone lines up at the same starting line. No head starts, no early grinders, old records included.</p>' +
+      '<p><b>Except one thing.</b> 🏅 <b>Pond Pioneer</b> is the only stamp you can grab this weekend. Already logged in with Discord? It\'s yours. Not yet? Log in with Discord before <b>Sunday 23:59 CET</b>. After that it\'s gone. Forever. No second chances, no "I was busy".</p></section>' +
+      '<section class="gz-soon"><p class="gz-kick">Found a bug?</p><h4>Tell us anywhere. We\'ll find you. 👀</h4>' +
+      '<div class="gz-wpbox"><img src="img/hardhat.webp" alt="Pepe in a hard hat with a hammer" width="110" height="110"><div>' +
+      '<p>Something broke, looks weird, or just feels off? Shout it in the LAN Party chat, write a letter to the Gazette, or ping us on Discord. Every bug you find now is one less bug ruining Monday.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-write">✏️ Write to the Editor</button><button type="button" class="app-btn gz-lan">LAN Party →</button></div></section>' +
+      '<section class="gz-letters"><p class="gz-kick">Monday 16 November</p><h4>The games begin</h4>' +
+      '<p>Stamps unlock. Pepe Guesser Season 1 kicks off, with Days at #1, the Weekly Champion, Pond Dominator and the Hall of Fame. The first Weekly Champion is crowned on Monday 23 November. A tie at the top? No winner. Play to win.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn gz-betaad">Watch the PEP-TV ad</button></div></section>' +
+      '<p class="gz-foot">See you in the Pond. 🐸 The Editor</p></article>';
+  }
   // Pond Poll in the Gazette (games/supabase/update_polls.sql): the server counts; the page only shows its answer
   function paintPoll(box) {
     var id = box.getAttribute('data-poll');
@@ -3471,7 +3736,8 @@
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
         // one compact row of tabs: the letter form, then the Gazette issues by number (newest first)
         '<li><button type="button" data-v="write" title="Ideas, bugs, wishes, notices">✏️ Letter to the Editor</button></li>' +
-        '<li><button type="button" data-v="gz" title="The Pond Gazette #6: X unblocked us, the first faucet payout, 1 km from tomorrow" aria-label="The Pond Gazette #6">📰 #6</button></li>' +
+        '<li><button type="button" data-v="gz" title="The Pond Gazette #7: the Pond goes BETA" aria-label="The Pond Gazette #7">📰 #7</button></li>' +
+        '<li><button type="button" data-v="gz6" title="The Pond Gazette #6 (archive): X unblocked us, the first faucet payout, 1 km" aria-label="The Pond Gazette #6">#6</button></li>' +
         '<li><button type="button" data-v="gz5" title="The Pond Gazette #5 (archive): the lockout, CoinEx and the first Pond Poll" aria-label="The Pond Gazette #5">#5</button></li>' +
         '<li><button type="button" data-v="gz4" title="The Pond Gazette #4 (archive): the Pepe Guesser leak" aria-label="The Pond Gazette #4">#4</button></li>' +
         '<li><button type="button" data-v="gz3" title="The Pond Gazette #3 (archive): an internet in your internet" aria-label="The Pond Gazette #3">#3</button></li>' +
@@ -3490,8 +3756,8 @@
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
         if (v === 'write') return writeLetter(pane);
         if (v === 'box') return letterInbox(pane, paintOwner);
-        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : 6;
-        pane.innerHTML = issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : v === 'gz6' ? 6 : 7;
+        pane.innerHTML = issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
@@ -3536,6 +3802,9 @@
           '<p class="gz-foot">When a new issue lands, the flag on the mailbox goes up.</p></article>';
         var on = function (sel, fn) { var x = pane.querySelector(sel); if (x) x.addEventListener('click', function (e) { e.preventDefault(); fn(); }); };
         on('.gz-write', function () { show('write'); });
+        on('.gz-pass', function () { frenPassport(); });
+        on('.gz-fren', function () { avatarMaker(); });
+        on('.gz-betaad', function () { adPlayer(Math.max(0, adByFile('pond_beta.mpg'))); });
         on('.gz-lan', function () { lanParty(); });
         on('.gz-wpgo', wheresPepe);
         on('.gz-wpad', function () { adPlayer(Math.max(0, adByFile('pepe_guesser.mpg'))); });
@@ -3610,14 +3879,12 @@
       if (!box) { pane.innerHTML = '<p class="hs-note">Only the site owner can open this mailbox.</p>'; return; }
       if (!box.letters.length) { pane.innerHTML = '<div class="letters"><p class="hs-note">No letters yet. When someone writes, the flag on the mailbox goes up.</p></div>'; return; }
       // Passport owner tools (only with the Passport beta on, until its migrations run on launch day):
-      // the "Printed" mark (Junior Editor 1, Senior Editor 5, Vox Populi 10), Bug Hunter, and BALI.
+      // the "Printed" mark (Junior Editor 1, Senior Editor 5, Vox Populi 10) and BALI.
       var tools = function (l) {
         if (!FREN) return '';
         var t = '';
         if (l.print) t += '<button type="button" class="app-btn lt-printed" aria-pressed="' + !!l.printed + '" title="Printed in The Pond Gazette. Counts for Junior Editor (1), Senior Editor (5) and Vox Populi (10).">' +
           (l.printed ? '✅ Printed' : '🖨 Mark printed') + '</button>';
-        if (l.discord) t += '<button type="button" class="app-btn lt-bug" aria-pressed="' + !!l.bug_hunter + '" title="Give Bug Hunter for a real bug that got fixed.">' +
-          (l.bug_hunter ? '🐞 Bug Hunter ✓' : '🐞 Give Bug Hunter') + '</button>';
         return t;
       };
       var printedNote = function (l) { return l.discord && l.printed_count ? 'Printed letters from this fren: ' + l.printed_count + '. ' : ''; };
@@ -3656,7 +3923,7 @@
           rpc('gry_letter_mark', { p_id: id }).then(function () { if (letterBox && letterBox.unread) letterBox.unread--; paintMail(); if (after) after(); }, function () {});
         });
         var l = box.letters.find(function (x) { return x.id === id; }) || {};
-        var pr = d.querySelector('.lt-printed'), bug = d.querySelector('.lt-bug');
+        var pr = d.querySelector('.lt-printed');
         if (pr) pr.addEventListener('click', function () {
           pr.disabled = true;
           rpc('gry_letter_printed', { p_id: id, p_printed: !l.printed }).then(function (r) {
@@ -3670,16 +3937,6 @@
             var tag = d.querySelector('.lt-tag'); if (tag) tag.textContent = l.printed ? '✅ Printed' : '🖨 OK to print';
             d.querySelector('.lt-note').textContent = (l.page ? 'Sent from ' + l.page + '. ' : '') + printedNote(l);
           }, function (e) { pr.disabled = false; alert(e.message); });
-        });
-        if (bug) bug.addEventListener('click', function () {
-          if (l.bug_hunter && !confirm('Take Bug Hunter back from ' + l.name + '?')) return;
-          bug.disabled = true;
-          rpc('gry_letter_bug_hunter', { p_id: id, p_on: !l.bug_hunter }).then(function (r) {
-            l.bug_hunter = !!(r && r.bug_hunter);
-            bug.disabled = false;
-            bug.setAttribute('aria-pressed', String(l.bug_hunter));
-            bug.textContent = l.bug_hunter ? '🐞 Bug Hunter ✓' : '🐞 Give Bug Hunter';
-          }, function (e) { bug.disabled = false; alert(e.message); });
         });
         d.querySelector('.lt-del').addEventListener('click', function () {
           if (!confirm('Delete this letter for good?')) return;
@@ -3782,6 +4039,12 @@
     return '<span class="ad-fren" aria-hidden="true">' + ['bg_forest', 'base_frog', c, m, e, h, a].map(function (id) { return '<img src="avatar-assets/layers/' + id + '.webp" alt="">'; }).join('') + '</span>';
   }
   var ADS = [
+    { file: 'pond_beta.mpg', fren: true, added: '2026-11-12', title: 'The Pond Goes BETA', ch: 'CH 0 · POND BREAKING NEWS', icon: 'pep-logo', scenes: [
+      '<p class="ad-kick">🚨 BREAKING</p><h3 class="ad-big">Passports have<br><em>landed!</em></h3><p class="ad-sub">Fren Passport, stamps and Create Your Fren are live in the Pond. BETA until Sunday night.</p>',
+      '<div class="ad-frens">' + adFren('clothing_none', 'mouth_flat', 'eyes_classic', 'hat_none', 'accessory_none') + '</div><p class="ad-kick">Is the Avatar Maker ugly?</p><h3 class="ad-big">Yes.<br><em>On purpose.</em></h3><p class="ad-sub">The good ones? You earn those.</p>',
+      '<p class="ad-kick">Only ONE stamp up for grabs this weekend</p><h3 class="ad-big">🏅 <em>Pond Pioneer</em></h3><p class="ad-sub">Log in with Discord before Sunday 23:59 CET. After that it\'s gone. Forever.</p>',
+      '<p class="ad-kick">Found a bug? Shout it in LAN Party, the Gazette or Discord.</p><h3 class="ad-big">Monday,<br>the <em>games begin.</em></h3><p class="ad-sub">Nothing counts until Monday. Then every stamp, Pepe Guesser Season 1 and the Hall of Fame start from zero. First Weekly Champion: 23 November.</p><p class="ad-fine">Not a real offer. Stamps are cosmetic: no PEP, no points, nothing to sell. The bugs are real, though.</p><button type="button" class="ad-cta ad-passbtn">Open your Fren Passport →</button>'
+    ] },
     { file: 'whose_passport.mpg', fren: true, added: '2026-11-08', title: 'Whose Passport Is That?', ch: 'CH 7 · POND GOSSIP HOUR', icon: 'pep-logo', scenes: [
       '<p class="ad-kick">Your fren says they flew the full 6000 m in YEET THE PEP…</p><h3 class="ad-big">…but can they<br><em>prove it?</em></h3>',
       '<div class="ad-frens">' + adFren('clothing_camo', 'mouth_smirk', 'eyes_side', 'hat_bucket', 'accessory_round') + '</div><p class="ad-kick">Click a name with a ✓ in the LAN Party chat.</p><h3 class="ad-big">Open their<br><em>Fren Passport!</em></h3><p class="ad-sub">Their Fren, their stamps with the dates, the secrets they found and their best YEET flight. Read only: nobody can change it but them.</p>',
@@ -3790,9 +4053,9 @@
     ] },
     { file: 'pond_stamps.mpg', fren: true, added: '2026-11-06', title: 'Stamps That Check Out', ch: 'CH 19 · POND POST OFFICE', icon: 'pep-logo', scenes: [
       '<p class="ad-kick">Did your frog do anything today? Can you prove it?</p><h3 class="ad-big">Stamps that<br><em>check out!</em></h3><p class="ad-sub">Your Fren Passport now collects 21 stamps, each one from something the pond\'s own server saw you do.</p>',
-      '<p class="ad-kick">Guess where Pepe is. Chat in the lobby. Write to the editor. Mine for an hour.</p><h3 class="ad-big">The games <em>stamp</em><br>your passport!</h3><p class="ad-sub">Pepe Guesser, the LAN Party chat, letters to the editor, Pepe Miner, YEET THE PEP and 14 or 30 days in a row on PondOS. Your old Pepe Guesser games and letters count too.</p>',
+      '<p class="ad-kick">Guess where Pepe is. Chat in the lobby. Write to the editor. Mine for an hour.</p><h3 class="ad-big">The games <em>stamp</em><br>your passport!</h3><p class="ad-sub">Pepe Guesser, the LAN Party chat, letters to the editor, Pepe Miner, YEET THE PEP and 14 or 30 days in a row on PondOS. Everything counts from Monday 16 November, for everyone from zero.</p>',
       '<div class="ad-frens">' + adFren('clothing_suit', 'mouth_smirk', 'eyes_classic', 'hat_detective', 'accessory_none') + '</div><p class="ad-kick">Five perfect 5000s in Pepe Guesser?</p><h3 class="ad-big">Dress like a<br><em>detective!</em></h3><p class="ad-sub">Detective Fren opens the detective hat and the suit. Miner Fren opens the hard hat. 14 days in a row of Pepe Guesser opens Lily\'s Explorer Pepe.</p>',
-      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Here early?<br><em>Pond Pioneer!</em></h3><p class="ad-sub">Every account with Discord linked on launch day gets it. After that, the door closes.</p><p class="ad-fine">Not a real offer. Stamps are cosmetic: no PEP, no points, nothing to sell. Only what the server records counts. Log on with Discord to collect.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
+      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Here early?<br><em>Pond Pioneer!</em></h3><p class="ad-sub">Log in with Discord during the beta, until Sunday 15 November. After that, the door closes.</p><p class="ad-fine">Not a real offer. Stamps are cosmetic: no PEP, no points, nothing to sell. Only what the server records counts. Log on with Discord to collect.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
     ] },
     { file: 'fren_passport.mpg', fren: true, added: '2026-11-06', title: 'The Fren Passport', ch: 'CH 98 · POND TRAVEL AGENCY', icon: 'pep-logo', scenes: [
       '<p class="ad-kick">Tired of profiles that look like a spreadsheet?</p><h3 class="ad-big">Get a real<br><em>passport!</em></h3><p class="ad-sub">A hand-drawn paper booklet, with your Fren clipped in as the photo.</p>',
@@ -4086,11 +4349,11 @@
     return mentionsJs;
   }
   function verifiedHere() { var me = whoAmI(); return !!(me && me.discord); }
-  // the name in front of a message. Fren Passport beta: a verified (Discord) name opens that fren's passport;
-  // guests have no passport, so their names stay plain text. Without the beta every name is plain text.
+  // the name in front of a message. Fren Passport beta: a verified (Discord) name opens a small fren card (the Fren
+  // and the join date) with a button to the passport; guests and everyone outside the beta see plain text.
   function lanWho(m) {
     var b = '<b>' + esc(m.nick) + '</b>';
-    return FREN && m.verified && FREN_ID.test(m.user_id || '') ? '<button type="button" class="lan-who" title="Open the Fren Passport of ' + esc(m.nick) + '">' + b + '</button>' : b;
+    return FREN && m.verified && FREN_ID.test(m.user_id || '') ? '<button type="button" class="lan-who" data-u="' + esc(m.user_id) + '" data-n="' + esc(m.nick) + '" title="' + esc(m.nick) + ': fren card">' + b + '</button>' : b;
   }
   var onlineN = null;
   function paintOnline(n) {
@@ -4098,21 +4361,161 @@
     document.querySelectorAll('.lan-n').forEach(function (e) { e.textContent = n; });
     document.querySelectorAll('.lan-badge').forEach(function (e) { e.hidden = n == null; });
   }
+  var LAN_H = 'pondos-lan-h', LAN_LIST = 'pondos-lan-list';
   function lanParty() {
     var A = openApp('lan', 'LAN Party - #pond chat', 'gif-080-still', function (A) {
-      A.body.innerHTML = '<div class="app-row"><span class="grow"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online in the pond</span></div>' +
-        '<div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
+      var listPref = null; try { listPref = localStorage.getItem(LAN_LIST); } catch (e) {}
+      A.host.classList.add('lan-win');
+      A.body.innerHTML =
+        '<div class="lan-top"><button type="button" class="app-btn lan-list-btn" aria-expanded="false" aria-controls="lan-buddies" title="Who is online"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online</button>' +
+        '<span class="lan-room">#pond</span><span class="grow"></span><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span></div>' +
+        '<div class="lan-main"><div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
+        '<aside class="lan-buddies" id="lan-buddies" aria-label="Who is online"><div class="lan-bl"><p class="lan-bh">Loading…</p></div></aside></div>' +
         '<div class="emo-pop" hidden role="group" aria-label="Pepe emotes"><div class="emo-head"><input type="search" class="emo-q" placeholder="Search Pepes… (laugh, pray, apu)" aria-label="Search emotes" autocomplete="off">' +
         '<div class="emo-tabs" role="tablist"><button type="button" data-t="recent" title="Recently used">⏱</button>' + EMO_FAM.map(function (f) { return '<button type="button" data-t="' + f[0] + '">' + f[1] + '</button>'; }).join('') + '<button type="button" data-t="gif">GIFs</button></div></div>' +
         '<div class="emo-grid" role="group" aria-label="Emotes"></div></div>' +
         '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + EMO_DIR + 'peepo_happy.webp' + EMO_V + '" alt="" width="22" height="22"></button><input name="n" class="lan-nick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname" hidden><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
-        '<p class="hs-note lan-note"></p><p class="hs-note lan-ment" hidden><button type="button" class="app-btn lan-ment-btn"></button> <span></span></p>';
+        '<p class="hs-note lan-note"></p><p class="hs-note lan-ment" hidden><button type="button" class="app-btn lan-ment-btn"></button> <span></span></p>' +
+        '<div class="lan-status"><span class="lan-st">Connecting…</span><span class="lan-grip" role="separator" tabindex="0" aria-orientation="horizontal" aria-label="Chat height. Drag, or use the arrow keys, to make the chat taller or shorter" title="Drag to make the chat taller"><i></i><i></i><i></i></span></div>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input[name=t]'), note = A.body.querySelector('.lan-note');
-      if (FREN) log.addEventListener('click', function (e) {
-        var b = e.target.closest('.lan-who'), row = b && b.closest('.lan-msg');
-        if (row && row._m) frenPassport(false, { id: row._m.user_id, nick: row._m.nick });
+      var main = A.body.querySelector('.lan-main'), listBtn = A.body.querySelector('.lan-list-btn'), bl = A.body.querySelector('.lan-bl');
+      var stEl = A.body.querySelector('.lan-st'), hostTag = A.body.querySelector('.lan-host-tag');
+      var canMod = false, who = null, whoT = 0;
+      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false;
+
+      // ----- who is online: a buddy list beside the log (a wide window) or folded under the top bar (a phone)
+      var wide = function () { return A.host.offsetWidth >= 600; };
+      var showList = function (on) {
+        main.classList.toggle('list-on', on); listBtn.setAttribute('aria-expanded', String(on)); listBtn.setAttribute('aria-pressed', String(on));
+        if (on) loadWho();
+      };
+      listBtn.addEventListener('click', function () {
+        var on = !main.classList.contains('list-on'); showList(on);
+        try { localStorage.setItem(LAN_LIST, on ? '1' : '0'); } catch (e) {}
       });
-      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, canMod = false;
+      if (window.innerWidth > 760 && A.host.offsetWidth < 600) A.host.style.width = 'min(660px, calc(100vw - 16px))';
+      var row = function (p, kind) {
+        var tip = kind === 'fren' ? (p.me ? 'You' : 'Online now, verified with Discord') : 'Guest, wrote here in the last 15 minutes';
+        var tag = FREN && kind === 'fren' && FREN_ID.test(p.user_id || '') ? 'button' : 'span';
+        return '<li><' + tag + (tag === 'button' ? ' type="button"' : '') + ' class="lan-who lan-buddy is-' + kind + '" data-u="' + esc(p.user_id || '') + '" data-n="' + esc(p.nick) + '" title="' + tip + '">' +
+          '<span class="lan-flower" aria-hidden="true"></span><span class="lan-bn">' + esc(p.nick) + (p.me ? ' <i>(you)</i>' : '') + '</span>' + (kind === 'fren' ? '<span class="hs-ok" aria-label="verified">✓</span>' : '') + '</' + tag + '></li>';
+      };
+      var paintWho = function () {
+        if (!who) return;
+        var fr = who.frens || [], gu = who.guests || [], lurk = Math.max(0, who.lurkers || 0);
+        bl.innerHTML = '<p class="lan-bh">Frens online (' + fr.length + ')</p>' + (fr.length ? '<ul>' + fr.map(function (p) { return row(p, 'fren'); }).join('') + '</ul>' : '<p class="lan-empty">No verified frens right now.</p>') +
+          (gu.length ? '<p class="lan-bh">Guests chatting (' + gu.length + ')</p><ul>' + gu.map(function (p) { return row(p, 'guest'); }).join('') + '</ul>' : '') +
+          (lurk ? '<p class="lan-lurk">+ ' + lurk + (lurk === 1 ? ' fren reading quietly' : ' frens reading quietly') + '</p>' : '') +
+          (who.local ? '<p class="lan-empty">Names from the last 15 minutes of chat.</p>' : '');
+      };
+      // until gry_lobby_who is in the database, the list is made from the chat itself (who wrote in the last 15 minutes)
+      var localWho = function () {
+        var cut = Date.now() - 15 * 60000, fr = {}, gu = {};
+        Object.keys(seen).forEach(function (id) {
+          var m = seen[id]._m; if (!m || new Date(m.at).getTime() < cut) return;
+          if (m.verified) fr[m.user_id || m.nick] = { user_id: m.user_id, nick: m.nick }; else gu[m.nick.toLowerCase()] = { nick: m.nick };
+        });
+        var f = Object.keys(fr).map(function (k) { return fr[k]; }), g = Object.keys(gu).map(function (k) { return gu[k]; });
+        return { frens: f, guests: g, lurkers: Math.max(0, (onlineN || 0) - f.length - g.length), local: true };
+      };
+      var noWhoRpc = false;
+      var loadWho = function () {
+        clearTimeout(whoT);
+        if (!alive) return;
+        if ((!who || main.classList.contains('list-on')) && !document.hidden && !A.host.classList.contains('is-min')) {
+          (noWhoRpc ? Promise.reject() : chatRpc('gry_lobby_who', { p_visitor: visitorId() })).then(function (r) { who = r || {}; paintWho(); },
+            function (err) { if (err && /gry_lobby_who|function|schema cache/i.test(err.message || '')) noWhoRpc = true; who = localWho(); paintWho(); });
+        }
+        whoT = setTimeout(loadWho, 30000);
+      };
+      showList(listPref ? listPref === '1' : wide());
+
+      // ----- the fren card: click any name (in the log or the list)
+      var card = null, cardInfo = {};
+      var closeCard = function () { if (card) { card.remove(); card = null; } };
+      var openCard = function (b) {
+        closeCard();
+        var u = b.getAttribute('data-u') || '', nick = b.getAttribute('data-n') || '';
+        if (!FREN || !FREN_ID.test(u)) return;   // fren cards come with the Fren Passport (beta only, verified frens only)
+        var mine = anySession(), isMe = !!(mine && mine.user && mine.user.id === u);
+        card = el('div', { class: 'lan-card win', role: 'dialog', 'aria-label': 'Fren card: ' + nick });
+        card.innerHTML = '<div class="win-bar"><span class="win-t">Fren card</span><span class="win-ctl"><button type="button" class="w-x lan-card-x" title="Close">' + ICO.x + '<span class="sr">Close</span></button></span></div>' +
+          '<div class="lan-card-in"><div class="lan-card-pic"><img src="' + BASE + 'games/img/emotes/gmfren.webp" alt="" width="56" height="56"></div><div>' +
+          '<b class="lan-card-n">' + esc(nick) + (isMe ? ' <i>(you)</i>' : '') + ' <span class="hs-ok" title="Verified with Discord">✓</span></b>' +
+          '<span class="lan-card-m">Member since <b class="lan-since">…</b></span></div></div>' +
+          '<div class="lan-card-act"><button type="button" class="app-btn lan-c-pass">📘 Fren Passport</button>' +
+          (!isMe && verifiedHere() ? '<button type="button" class="app-btn lan-c-at">@ Mention</button>' : '') + '</div>';
+        A.body.appendChild(card);
+        var br = b.getBoundingClientRect(), hr = A.body.getBoundingClientRect();
+        card.style.top = Math.max(4, Math.min(br.bottom - hr.top + 4, A.body.clientHeight - card.offsetHeight - 4)) + 'px';
+        card.style.left = Math.max(4, Math.min(br.left - hr.left, A.body.clientWidth - card.offsetWidth - 4)) + 'px';
+        card.querySelector('.lan-card-x').addEventListener('click', closeCard);
+        var pb = card.querySelector('.lan-c-pass'); pb.addEventListener('click', function () { closeCard(); frenPassport(false, { id: u, nick: nick }); });
+        var ab = card.querySelector('.lan-c-at'); if (ab) ab.addEventListener('click', function () {
+          closeCard(); var v = inp.value; inp.value = (v && !/\s$/.test(v) ? v + ' ' : v) + '@' + nick + ' '; inp.focus();
+        });
+        pb.focus();
+        // the Fren (avatar) and the join date, from the same read-only public passport the Passport window uses
+        var mineCard = card, since = card.querySelector('.lan-since');
+        (cardInfo[u] || (cardInfo[u] = passportOf(u).catch(function () { delete cardInfo[u]; return null; }))).then(function (d) {
+          if (card !== mineCard) return;
+          var st = d && d.state || {};
+          since.textContent = st.member_since ? fmt.date(st.member_since) : 'unknown';
+          var look = d && d.opts && avatarLook(d.opts, st.avatar);
+          if (look) { passportCss(); var pic = card.querySelector('.lan-card-pic'); pic.replaceChildren(avatarStack(d.opts, look, 'The Fren of ' + nick + ': ' + avatarSay(d.opts, look))); }
+        });
+      };
+      A.body.addEventListener('click', function (e) {
+        var b = e.target.closest('button.lan-who'); if (b) { e.preventDefault(); openCard(b); return; }
+        if (card && !e.target.closest('.lan-card')) closeCard();
+      });
+      A.body.addEventListener('keydown', function (e) { if (e.key === 'Escape' && card) { closeCard(); e.stopPropagation(); } });
+
+      // ----- host: delete one message, or mute the writer for 24 h (the database checks games.is_host_user)
+      var modSay = function (t) { stEl.textContent = t; };
+      var dropRow = function (id) { if (seen[id]) { seen[id].remove(); delete seen[id]; } };
+      // the ✕ opens a small host menu on that message: Delete it, or mute whoever wrote it for 24 h
+      var closeMod = function () { log.querySelectorAll('.lan-modbox').forEach(function (x) { x.remove(); }); };
+      log.addEventListener('click', function (e) {
+        var r = e.target.closest('.lan-msg'), m = r && r._m;
+        var d = e.target.closest('.lan-del');
+        if (d && m) { var had = r.querySelector('.lan-modbox'); closeMod(); if (had) return;
+          r.appendChild(el('span', { class: 'lan-modbox' }, '<button type="button" class="lan-m-del">Delete</button><button type="button" class="lan-m-mute">Mute 24 h</button>')); return; }
+        var del = e.target.closest('.lan-m-del'), mute = e.target.closest('.lan-m-mute');
+        if (!m || !(del || mute)) return;
+        (del || mute).disabled = true;
+        if (del) chatRpc('gry_lobby_hide', { p_id: m.id }).then(function () { dropRow(m.id); modSay('Message deleted'); }, function (err) { closeMod(); modSay(err.message); });
+        else chatRpc('gry_lobby_mute_msg', { p_id: m.id, p_hours: 24 }).then(function () { closeMod(); modSay(m.nick + ' is muted for 24 hours, their messages from today are hidden'); force = true; poll(); }, function (err) { closeMod(); modSay(err.message); });
+      });
+      var modBtns = function (r) {
+        if (!canMod || r.querySelector('.lan-del')) return;
+        r.appendChild(el('button', { type: 'button', class: 'lan-del', title: 'Delete this message (host)', 'aria-label': 'Delete this message' }, '✕'));
+      };
+
+      // ----- drag the bottom bar to make the chat taller or shorter (remembered in this browser)
+      var grip = A.body.querySelector('.lan-grip'), stBar = A.body.querySelector('.lan-status');
+      var maxH = function () { return Math.max(180, window.innerHeight - log.getBoundingClientRect().top - (window.innerWidth <= 760 ? 210 : 150)); };
+      var setH = function (h, save) {
+        h = Math.round(Math.min(Math.max(h, 140), maxH()));
+        A.body.style.setProperty('--lan-h', h + 'px');
+        if (save) try { localStorage.setItem(LAN_H, String(h)); } catch (e) {}
+      };
+      try { var h0 = +localStorage.getItem(LAN_H); if (h0) setH(h0); } catch (e) {}
+      stBar.addEventListener('pointerdown', function (e) {
+        if (e.button !== 0 || A.host.classList.contains('is-max')) return;
+        e.preventDefault();
+        A.host.style.height = '';   // a window sized from the corner goes back to following its content
+        var y0 = e.clientY, h0 = log.offsetHeight;
+        stBar.setPointerCapture(e.pointerId); stBar.classList.add('drag');
+        var mv = function (ev) { setH(h0 + ev.clientY - y0); if (log.scrollHeight - log.scrollTop - log.clientHeight < 80) log.scrollTop = log.scrollHeight; };
+        var up = function () { stBar.classList.remove('drag'); setH(log.offsetHeight, true); stBar.removeEventListener('pointermove', mv); stBar.removeEventListener('pointerup', up); stBar.removeEventListener('pointercancel', up); };
+        stBar.addEventListener('pointermove', mv); stBar.addEventListener('pointerup', up); stBar.addEventListener('pointercancel', up);
+      });
+      grip.addEventListener('keydown', function (e) {
+        var d = e.key === 'ArrowDown' ? 40 : e.key === 'ArrowUp' ? -40 : 0; if (!d) return;
+        e.preventDefault(); setH(log.offsetHeight + d, true);
+      });
+
       var pop = A.body.querySelector('.emo-pop'), eb = A.body.querySelector('.emo-btn');
       // the picker: tabs by family (static), GIFs, recently used (this browser), and a search over the names
       var grid = pop.querySelector('.emo-grid'), q = pop.querySelector('.emo-q'), tab = '';
@@ -4182,61 +4585,29 @@
         note.innerHTML = s ? 'Signed in on PEP Games. Text and our emotes only, no links. Be nice, frens.' : 'Pick a nickname and say gm, no sign-in needed. <a href="#" class="lan-login">Log on with Discord</a> to keep your name and get the ✓. No links, be nice.';
         var l = note.querySelector('.lan-login'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); logOn(); });
       };
-      // Hosts can hide individual messages in the PondOS LAN Party chat.
-      // The server supplies can_mod and verifies games.is_host_user again inside gry_lobby_hide.
-      // Never infer host privileges from a saved nickname or client-side Discord metadata.
-      var syncDeleteButton = function (row) {
-        var btn = row.querySelector('.lan-del');
-        row.classList.toggle('lan-moderatable', canMod);
-        if (!canMod && btn) btn.remove();
-        if (canMod && !btn) row.appendChild(el('button', {
-          type: 'button', class: 'lan-del', title: 'Delete message (host)',
-          'aria-label': 'Delete message (host)'
-        }, '&#215;'));
-      };
-      log.addEventListener('click', function (e) {
-        var btn = e.target.closest('.lan-del');
-        if (!btn || !canMod || btn.disabled) return;
-        var row = btn.closest('.lan-msg'), m = row && row._m;
-        if (!m || !window.confirm('Delete the message from ' + m.nick + '?')) return;
-        btn.disabled = true;
-        freshSession().then(function (s) {
-          if (!s) throw new Error('Log in with your host Discord account to delete messages.');
-          return chatRpc('gry_lobby_hide', { p_id: m.id });
-        }).then(function () {
-          if (!alive) return;
-          row.remove(); delete seen[m.id];
-          poll(); // refresh the list; Realtime notifies everyone else about the hidden message
-        }).catch(function (err) {
-          if (!alive) return;
-          btn.disabled = false;
-          note.textContent = err.message || 'Could not delete the message.';
-        });
-      });
       var poll = function () {
         clearTimeout(timer);
         chatRpc('gry_lobby_chat', { p_after: last, p_visitor: visitorId() }).then(function (r) {
           if (!alive) return;
           paintOnline(r.online);
-          if (canMod !== !!r.can_mod) {
-            canMod = !!r.can_mod;
-            Object.keys(seen).forEach(function (id) { syncDeleteButton(seen[id]); });
-          }
+          if (!!r.can_mod !== canMod) { canMod = !!r.can_mod; hostTag.hidden = !canMod; A.host.classList.toggle('lan-mod', canMod); Object.keys(seen).forEach(function (id) { modBtns(seen[id]); }); }
+          stEl.textContent = (live ? 'Connected' : 'Connected (checking every few seconds)') + ' · #pond';
           var initial = first;
           if (first) { log.innerHTML = ''; first = false; }
-          (r.hidden || []).forEach(function (id) { if (seen[id]) { seen[id].remove(); delete seen[id]; } });
+          (r.hidden || []).forEach(dropRow);
           var atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 60;
           (r.messages || []).forEach(function (m) {
             if (seen[m.id]) return;
             var row = el('div', { class: 'lan-msg' + (emoOnly(m.body) ? ' lan-big' : '') }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> ' + lanWho(m) + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
             var tipEl = log.querySelector('.bin-tip'); if (tipEl) tipEl.remove();
             row._m = m; if (forMe(m)) { row.classList.add('lan-me'); if (!initial) { PM.ring(m.nick, m.body, function () { A.restore ? A.restore() : null; }); seenMentions(); } }
-            syncDeleteButton(row);
+            modBtns(row);
             seen[m.id] = row; log.appendChild(row); last = Math.max(last, m.id);
           });
           if (!log.children.length) log.innerHTML = '<p class="bin-tip">No messages in the last 24 hours. Say gm!</p>';
           if (atBottom || r.messages && r.messages.length) log.scrollTop = log.scrollHeight;
-        }, function (err) { if (first) log.innerHTML = '<p class="bin-tip">' + esc(err.message) + '. Trying again…</p>'; })
+          if (initial || noWhoRpc && r.messages && r.messages.length) loadWho();
+        }, function (err) { stEl.textContent = 'Offline: ' + err.message; if (first) log.innerHTML = '<p class="bin-tip">' + esc(err.message) + '. Trying again…</p>'; })
           .then(function () { if (alive) timer = setTimeout(poll, live ? 60000 : document.hidden ? 25000 : 4000); });
       };
       // a burst of rings makes one call, spread over a second so not every open chat asks at the same moment
@@ -4263,7 +4634,7 @@
         }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
       });
       paintNote(); loadPepeEmotes().then(poll);
-      A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); stopBell(); };
+      A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); };
     }, 480);
     return A;
   }
@@ -4294,19 +4665,55 @@
       mb.addEventListener('click', frogMail);
       trayEl2.insertBefore(mb, trayEl2.firstChild);
       paintMail();
-      if (!mailRead()) setTimeout(function () { if (!mailRead()) balloon('You\u2019ve got frog mail!', 'The Pond Gazette #5 is in your mailbox, with the first Pond Poll. Click the mailbox in the corner.', 'frog-mail'); }, 17000);
+      if (!mailRead()) setTimeout(function () { if (!mailRead()) balloon('You\u2019ve got frog mail!', 'The Pond Gazette #7 is in your mailbox: the Pond goes BETA. Click the mailbox in the corner.', 'frog-mail'); }, 17000);
     }
   }
 
   // ---------- balloon notices ----------
+  // notices go on top of everything: into the window that is in the browser's full screen, if one is
+  // (nothing outside it can show then), otherwise onto the page above every PondOS window (meme.css z-index)
+  function noticeLayer() { return document.fullscreenElement || document.webkitFullscreenElement || document.body; }
   function balloon(title, text, icon) {
     var t = el('div', { class: 'balloon', role: 'status' }, '<img src="' + ico(icon) + '" alt="" width="40" height="40"><div><b>' + title + '</b><span>' + text + '</span></div><button type="button" aria-label="Dismiss">' + ICO.x + '</button>');
-    document.body.appendChild(t);
+    noticeLayer().appendChild(t);
     var bye = function () { t.classList.add('out'); setTimeout(function () { t.remove(); }, 300); };
     t.querySelector('button').addEventListener('click', bye);
     setTimeout(bye, 12000);
     return t;
   }
+  // A new stamp, secret or avatar: a Windows 98 dialog that rises from the tray with the stamp being "thumped" in.
+  // It stays until it is closed (a balloon fades out and is easy to miss). Several rewards at once queue up.
+  var rewardQueue = [], rewardOpen = false;
+  function rewardNotice(r) {
+    rewardQueue.push(r);
+    if (!rewardOpen) nextReward();
+  }
+  function nextReward() {
+    var r = rewardQueue.shift();
+    if (!r) { rewardOpen = false; return; }
+    rewardOpen = true;
+    passportCss();
+    var w = el('div', { class: 'reward98', role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'reward98-t' });
+    w.innerHTML = '<div class="reward98-bar"><img src="' + ico('pep-logo') + '" alt="" width="16" height="16"><b id="reward98-t"></b>' +
+      '<button type="button" class="reward98-x" aria-label="Close">' + ICO.x + '</button></div>' +
+      '<div class="reward98-body"><div class="reward98-art"></div><div class="reward98-txt"><b></b><span></span></div></div>' +
+      '<div class="reward98-row"><button type="button" class="app-btn reward98-go"></button><button type="button" class="app-btn reward98-ok">OK</button></div>';
+    w.querySelector('#reward98-t').textContent = r.bar;
+    w.querySelector('.reward98-txt b').textContent = r.title;
+    w.querySelector('.reward98-txt span').textContent = r.text;
+    var art = w.querySelector('.reward98-art');
+    if (r.stamp) art.appendChild(ppStamp(r.stamp, true));
+    else { var im = el('img', { src: r.img || ico('gif-045-still'), alt: '', width: '64', height: '64' }); art.appendChild(im); }
+    var go = w.querySelector('.reward98-go'); go.textContent = r.go || 'Open Fren Passport';
+    noticeLayer().appendChild(w);
+    var bye = function () { w.classList.add('out'); setTimeout(function () { w.remove(); nextReward(); }, REDUCE ? 0 : 250); };
+    w.querySelector('.reward98-x').addEventListener('click', bye);
+    w.querySelector('.reward98-ok').addEventListener('click', bye);
+    go.addEventListener('click', function () { bye(); (r.open || frenPassport)(); });
+    setTimeout(function () { try { w.querySelector('.reward98-ok').focus({ preventScroll: true }); } catch (e) {} }, 50);
+  }
+  window.PONDOS_REWARD = rewardNotice;   // lets the browser console test it: PONDOS_REWARD({ bar: '…', title: '…', text: '…' })
+
   var noticed = '1';
   try { noticed = sessionStorage.getItem('pondos-notice'); sessionStorage.setItem('pondos-notice', '1'); } catch (e) {}
   if (!noticed && mainEl) setTimeout(function () { balloon('PondOS Security Center', 'Nobody legit will ask for your seed phrase. Not support, not admins, not frogs.', 'gif-085-still'); }, 4500);

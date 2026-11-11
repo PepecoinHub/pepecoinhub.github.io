@@ -215,3 +215,39 @@ numbers live in that script, not in CSS. To change a part, edit the sheet or the
 numbers and rebuild (`pip install pillow numpy scipy` first). New ids this round:
 `hat_fedora` and `bg_meadow`, both free and in the save allowlist. The previous
 vector set is in git history (commit before this change) if it is ever needed.
+
+## PepeGochi v2 (draft PR A1, not yet enabled)
+
+`games/supabase/update_pepegochi_v2.sql`: one personal frog at a time per
+Discord account. It can move out after neglect, leaves GOODBYE.TXT, and a new
+egg can be adopted. Contract, playtest rules and the rescue system:
+`games/PEPEGOCHI_API.md`. It replaces the never-applied v1 draft in PR #186.
+
+- **Not installed anywhere.** Until the owner approves it, test only on a local
+  database or a separate staging project. The hidden beta must not need any
+  change to production PH-games.
+- Order, after review: `schema.sql`, then this file. It does not depend on the
+  Fren Passport files.
+- Passport bridge (draft PR C): `games/supabase/update_pepegochi_passport.sql`,
+  after the Fren Passport files and `update_pepegochi_v2.sql`. It turns the
+  first adoption, the 2nd and the 7th care day into the stamps First Hatch,
+  Little Fren and One Small Step through `games.passport_award()`. Until the
+  release adds those three IDs to the allowlist in `update_passport_awards.sql`
+  (and sets them live in the catalog), the stamps wait and nothing is awarded.
+  Tests: `tests/pepegochi-passport.test.mjs` (CI) and
+  `tests/pepegochi-passport-sql.test.mjs` (real PostgreSQL).
+- Tests: `node --test tests/pepegochi.test.mjs` (static, CI) and
+  `tests/pepegochi-sql.test.mjs` (real PostgreSQL, same `PASSPORT_PG_URL` /
+  `PASSPORT_PG_MODULE` variables as below).
+- Time simulator: `scripts/pepegochi_sim.mjs` runs the same SQL in an in-memory
+  PGlite database with a virtual clock (setup at the top of the script).
+- Browser test simulator (local only, nothing saved or awarded):
+  `docs/games/pepegochi-sim.html` with the JavaScript copy of the rules in
+  `docs/games/js/pepegochi-model.mjs`. `tests/pepegochi-parity.test.mjs` checks
+  it call by call against the SQL (needs `PEPEGOCHI_PGLITE_MODULE` or the
+  PostgreSQL variables); `tests/pepegochi-model.test.mjs` runs in CI.
+- PondOS test window (hidden beta, local only): open `/meme/?beta=gochi` once,
+  then Start → Games → `PEPEGOCHI.EXE (test)`; `?beta=off` hides it. It runs
+  the same JavaScript model in `docs/games/pepegochi.html` (no network allowed
+  by its CSP); the frog is kept in this tab's sessionStorage only.
+  `tests/pepegochi-beta.test.mjs` runs in CI.

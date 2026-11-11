@@ -20,7 +20,7 @@ function harness({ owner = true, discord = true } = {}) {
   const state = { catalog, opts, state: null };
   let renders = 0;
   const ctx = {
-    FREN_TEST: true, FREN: true,
+    FREN_TEST: true, FREN: true, FREN_BETA: true,
     localStorage: {
       getItem: key => storage.get(key) ?? null,
       setItem: (key, val) => storage.set(key, val),
@@ -146,6 +146,6 @@ test('QA unlock control is visible in the Maker, not only the Passport window', 
 
 test('the home page busts stale JS and the maker reloads fresh approved V3 CSS', () => {
   const home = read('docs/meme/index.html');
-  assert.match(home, /<script src="meme\.js\?v=20261111v3"><\/script>/);
-  assert.match(source, /passport\.css\?v=20261111v3/);
+  assert.match(home, /<script src="meme\.js\?v=20261111launch"><\/script>/);
+  assert.match(source, /passport\.css\?v=20261111launch/);
 });

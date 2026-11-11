@@ -18,8 +18,11 @@
 /* sprites: one row of tiles each */
 .pp-art { display: inline-block; flex: none; background-repeat: no-repeat; background-position-y: 0; }
 .pp-art-stamp { width: 46px; aspect-ratio: 69 / 75; background-image: url(passport-assets/stamps.webp?v=20261106pp1); background-size: 1600% 100%; }
-/* 49 owner-approved V3 tiles, 138 x 150 source each. No Lily image in runtime. */
-.pp-art-stamp.is-v3 { background-image: url(passport-assets/stamps-v3.webp?v=20261111all); background-size: 4900% 100%; }
+/* Exclusive owner-approved Pond Pioneer art, standard 138x150 v3 tile. */
+.pp-art-stamp.is-pioneer { background-image: url(passport-assets/pond-pioneer-v3.webp?v=20261110pioneer); background-size: 100% 100%; }
+.pp-art-stamp.is-v3 { background-image: url(passport-assets/stamps-v3.webp?v=20261109val); background-size: 4800% 100%; }
+/* Pond Dominator: its own owner-supplied file (games/fren-passport/source/stamps-new/pond_dominator.png), not in the V3 atlas */
+.pp-art-stamp.is-dominator { background-image: url(passport-assets/pond-dominator.webp?v=20261111pd); background-size: contain; background-position: center; }
 /* Fallback for an earned stamp with no approved drawing (e.g. future Beta Tester). */
 .pp-art-stamp.is-pending { display: inline-grid; place-items: center; box-sizing: border-box;
   background-image: none; background-color: #dbd6c7; border: 1px dashed #857960;
@@ -56,31 +59,41 @@
 .pp-slot { width: 100%; height: 100%; display: grid; place-items: center; }
 .pp-slot .pp-art-stamp { width: 92%; }
 .pp-slot.is-earned .pp-art-stamp { filter: drop-shadow(1px 1px 0 rgba(60,40,20,.35)); }
+/* front page tiers: a gold row, a silver row (the frame shows even before the stamp is earned) */
+.pp-slot.is-gold .pp-art-stamp, .pp-slot.is-silver .pp-art-stamp { border-radius: 3px; }
+.pp-slot.is-gold .pp-art-stamp { box-shadow: 0 0 0 2px #f2c94c, 0 0 0 3px #8a6400, 0 0 6px 2px rgba(242,201,76,.55); }
+.pp-slot.is-silver .pp-art-stamp { box-shadow: 0 0 0 2px #d9dde2, 0 0 0 3px #6c737b, 0 0 5px 1px rgba(200,205,212,.5); }
+.pp-slot.is-locked .pp-art-stamp { opacity: .8; }
 .pp-bali { position: absolute; z-index: 2; left: 7.2%; top: 74.8%; width: 80%; height: 23%; }
 button.pp-bali { padding: 0; background: none; border: 0; cursor: pointer; }
 button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px; }
 .pp-mythic { cursor: pointer; }
 
-/* side panels (dark green, like the mockup) */
+/* One passport skin for every tab: each panel is a page of the booklet (passport paper, burgundy cover edge),
+   its title a navy plaque like the Stamps sheet. Win98 stays in the window chrome, tabs and buttons only. */
 .pp-side { display: grid; gap: 8px; min-width: 0; }
-.pp-panel { min-width: 0; padding: 0 0 6px; color: #eef6e8; background: #173d27;
-  box-shadow: inset 1px 1px 0 #b8c0b8, inset -1px -1px 0 #3c443c, inset 2px 2px 0 #1a221c, inset -2px -2px 0 #8c948c; }
-.pp-panel-h { display: flex; align-items: center; gap: 6px; margin: 0 0 4px !important; padding: 4px 8px; color: #fff;
-  background: linear-gradient(90deg, var(--title), var(--title-2)); box-shadow: inset 0 0 0 2px #173d27; }
-.pp-panel-h.is-blue { background: linear-gradient(90deg, #0a2a8a, #2650c8); }
-.pp-jlist { margin: 0; padding: 0 8px; }
-.pp-jrow { display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 6px; padding: 3px 0; border-bottom: 1px solid #4b6a55; }
+.pp-panel, .pp-sheet { --pp-ink: #2a2014; --pp-soft: #6b5a40; --pp-navy: #1d2a6b; --pp-wine: #6e2233; --pp-card: rgba(255,250,235,.62); --pp-line: rgba(110,80,40,.45); }
+.pp-panel { min-width: 0; padding: 0 8px 8px; color: var(--pp-ink);
+  background: #ead8b0 url(passport-assets/paper.webp?v=20261108pp48) 0 0 / 320px 320px repeat;
+  border: 4px solid var(--pp-wine); border-radius: 5px; box-shadow: inset 0 0 0 1px #a8545f, inset 0 0 18px rgba(110,60,20,.3), 2px 3px 0 rgba(0,0,0,.35); }
+.pp-panel-h { display: flex; align-items: center; gap: 6px; width: fit-content; max-width: 100%; margin: 8px 0 6px !important; padding: 2px 10px;
+  font: bold 12px/1.3 var(--f-chrome), Tahoma, sans-serif !important; letter-spacing: 1px; text-transform: uppercase; white-space: pre-wrap;
+  color: var(--pp-navy); background: #f3e6c4; border: 2px solid var(--pp-navy); border-radius: 3px; box-shadow: 0 0 0 2px #f3e6c4, 0 0 0 3px var(--pp-navy); }
+.pp-panel-h .pp-art-icon { width: 18px; height: 18px; }
+.pp-panel .pp-muted { color: var(--pp-soft); }
+.pp-jlist { margin: 0; padding: 0; }
+.pp-jrow { display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 6px; padding: 3px 0; border-bottom: 1px dashed var(--pp-line); }
 .pp-jrow:last-child { border-bottom: 0; }
 .pp-jrow dt { font-size: 12px; }
 .pp-jrow dd { margin: 0; font-weight: 700; font-size: 13px; }
-.pp-mile-body { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: start; padding: 2px 8px; }
+.pp-mile-body { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: start; padding: 2px 0; }
 .pp-mile-body .pp-art-icon { width: 36px; height: 36px; }
 .pp-mile-title { display: grid; gap: 1px; margin: 0; }
-.pp-mile-n { color: #ffe27a; font-size: 11.5px; font-weight: 700; }
-.pp-mile-desc { margin: 2px 0 0; color: #d5e6d0; font-size: 11.5px; }
-.pp-bar { height: 12px; margin: 6px 8px 0; background: #3f4a44; border-radius: 6px; box-shadow: inset 1px 1px 0 #1d241f, 0 0 0 1px #9aa49c; overflow: hidden; }
-.pp-bar > span { display: block; height: 100%; background: linear-gradient(#7bff6a, #22c71c); border-radius: 6px; }
-.pp-make { display: block; width: 100%; padding: 6px 10px; font-size: 12px; }
+.pp-mile-n { color: var(--pp-wine); font-size: 11.5px; font-weight: 700; }
+.pp-mile-desc { margin: 2px 0 0; color: var(--pp-soft); font-size: 11.5px; }
+.pp-bar { height: 12px; margin: 6px 0 0; background: #d9c69c; border-radius: 6px; box-shadow: inset 1px 1px 0 rgba(60,40,20,.4), 0 0 0 1px var(--pp-wine); overflow: hidden; }
+.pp-bar > span { display: block; height: 100%; background: linear-gradient(#5fbf52, #2e8b3e); border-radius: 6px; }
+.pp-make { display: block; width: 100%; margin-top: 8px; padding: 6px 10px; font-size: 12px; }
 
 /* tabs with icons */
 .pp-tabs { margin-top: 8px; flex-wrap: wrap; }
@@ -89,24 +102,24 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
 .pp-pane { min-width: 0; }
 
 /* Overview: recent stamps strip */
-.pp-recent-list { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 2px 8px; list-style: none; text-align: center; }
+.pp-recent-list { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 2px 0; list-style: none; text-align: center; }
 .pp-recent-list li { display: grid; justify-items: center; gap: 2px; min-width: 0; }
 .pp-recent-list b { font-size: 11px; line-height: 1.15; overflow-wrap: anywhere; }
-.pp-recent-list small { font-size: 10px; color: #d5e6d0; }
+.pp-recent-list small { font-size: 10px; color: var(--pp-soft); }
 .pp-recent-list .is-locked { opacity: .7; }
 
 /* Achievements / Collection lists */
 .pp-list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; max-height: min(60vh, 520px); overflow: auto; }
-.pp-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 4px 6px; background: var(--pane);
-  border: 1px solid var(--chrome-lo); }
+.pp-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 4px 6px;
+  background: var(--pp-card, var(--pane)); border: 1px dashed var(--pp-line, var(--chrome-lo)); border-radius: 3px; }
+.pp-row.is-earned { background: rgba(255,250,235,.9); border-style: solid; }
 .pp-row .pp-art-stamp { width: 34px; }
 .pp-row b { display: block; }
-.pp-row small { display: block; color: var(--muted); }
-.pp-panel .pp-row { color: var(--ink); }
-.pp-tag { padding: 1px 6px; font-size: 10.5px; font-weight: 700; white-space: nowrap; color: var(--muted); border: 1px solid var(--chrome-lo); background: var(--chrome); }
+.pp-row small { display: block; color: var(--pp-soft, var(--muted)); }
+.pp-tag { padding: 1px 6px; font-size: 10.5px; font-weight: 700; white-space: nowrap; color: var(--pp-soft, var(--muted)); border: 1px solid var(--pp-line, var(--chrome-lo)); background: #f3e6c4; border-radius: 2px; }
 .pp-tag.is-on { color: #fff; background: #2e8b3e; border-color: #145a22; }
-.pp-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.pp-cols .pp-panel { padding: 0 6px 6px; }
+.pp-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: start; }
+
 
 /* Stamps: the album on passport paper (paper tile cut from the page art, burgundy cover edge like the booklet) */
 .pp-sheet { display: grid; gap: 8px; padding: 14px 14px 12px; color: #2a2014;
@@ -148,8 +161,11 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
 .pp-mythic.is-earned > small { color: #6e2233; font-weight: 600; }
 
 /* Stats */
-.pp-stats { display: grid; gap: 0; margin: 0; max-width: 460px; }
-.pp-stats > div { display: flex; justify-content: space-between; gap: 12px; padding: 4px 6px; border-bottom: 1px solid var(--chrome-lo); }
+.pp-statsheet .pp-stats { max-width: 560px; }
+.pp-stats { display: grid; gap: 0; margin: 0; }
+.pp-stats > div { display: flex; justify-content: space-between; gap: 12px; padding: 5px 4px; border-bottom: 1px dashed var(--pp-line); }
+.pp-stats > div:last-child { border-bottom: 0; }
+.pp-stats dt { color: var(--pp-soft); }
 .pp-stats dd { margin: 0; font-weight: 700; }
 
 /* narrower windows: side panels go under the booklet */
@@ -250,48 +266,24 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
 }
 
 /* Avatars tab: the special avatars and how each one opens */
-.pp-avatars { padding: 0 6px 8px; }
 .pp-av-grid { list-style: none; margin: 0; padding: 8px 0 4px; display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
 .pp-av { display: grid; justify-items: center; align-content: start; gap: 3px; padding: 6px 6px 8px; text-align: center;
-  background: #fffaf0; border: 1px solid #d8c7a4; box-shadow: inset 1px 1px 0 #fff; }
-.pp-av b { font-size: 12px; line-height: 1.2; color: #2b2112; }
-.pp-av small { font-size: 10.5px; line-height: 1.3; color: #6b5a40; }
-.pp-av-pic { position: relative; display: block; width: 96px; height: 96px; background: radial-gradient(circle at 50% 60%, #e7f2dc, #cfe1c0); border: 1px solid #b9cfa7; }
+  background: var(--pp-card); border: 1px dashed var(--pp-line); border-radius: 3px; }
+.pp-av.is-open { background: rgba(255,250,235,.9); border-style: solid; }
+.pp-av b { font-size: 12px; line-height: 1.2; color: var(--pp-ink); }
+.pp-av small { font-size: 10.5px; line-height: 1.3; color: var(--pp-soft); }
+.pp-av-pic { position: relative; display: block; width: 96px; height: 96px; background: radial-gradient(circle at 50% 60%, #e7f2dc, #cfe1c0); border: 2px solid #f8f1de; box-shadow: 0 0 0 1px var(--pp-line), 1px 2px 0 rgba(60,40,20,.3); }
 .pp-av-pic img { display: block; width: 100%; height: 100%; max-width: none; margin: 0; }
 .pp-av.is-locked .pp-av-pic img { filter: grayscale(1) brightness(.35) contrast(.8); opacity: .75; }
 .pp-av-lock { position: absolute; right: 3px; bottom: 2px; font-style: normal; font-size: 16px; }
-.pp-av.is-worn { border-color: #2f8f2a; box-shadow: 0 0 0 2px #7bd36f inset; }
+.pp-av.is-worn { border: 2px solid var(--pp-navy); }
 .pp-av-btn { margin-top: 2px; padding: 2px 10px; font-size: 11px; }
-.pp-avatars .pp-muted { color: #d6e8d0; }
 
-
-/* Owner-only local test sandbox. No real awards or writes. */
-.pp-test-tools {
-  margin: 8px 6px 12px; padding: 12px; background: #e5e5e0; color: #202020;
-  border: 2px solid #555; box-shadow: inset 1px 1px #fff, inset -1px -1px #888;
-  display: grid; gap: 8px; font: 12px/1.4 Arial, sans-serif;
-}
-.pp-test-heading { margin: 0; font-size: 15px; color: #153d25; }
-.pp-test-info, .pp-test-status { margin: 0; }
-.pp-test-status { min-height: 1em; color: #8c2727; }
-.pp-test-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.pp-test-select { box-sizing: border-box; flex: 1 1 155px; min-width: 0; min-height: 34px;
-  border: 2px solid; border-color: #777 #fff #fff #777; background: #fff; color: #111; padding: 4px 5px; }
-.pp-test-row > .app-btn { flex: 0 1 auto; min-height: 34px; }
-@media (max-width: 480px) {
-  .pp-test-tools { margin-inline: 0; padding: 9px; }
-  .pp-test-row > .app-btn { flex: 1 1 120px; }
-}
-
-/* Owner-only QA controls appear beside the portrait, above every locked avatar row. */
-.fa-owner-tag { margin: 3px 0 0; padding: 5px 8px; display: inline-block;
-  color: #f7f3b2; font: bold 12px/1.35 Arial,sans-serif;
-  background: #38513c; border: 1px solid #a7cb87; }
-.fa-owner-unlock { justify-self: start; min-height: 36px; padding: 7px 13px;
-  font: bold 13px/1.2 Arial,sans-serif; background: #efdc80; color: #211a00;
-  border: 2px solid; border-color: #fff0a2 #60511c #60511c #fff0a2; cursor: pointer; }
-.fa-owner-unlock:disabled { opacity: .65; cursor: wait; }
-@media (max-width: 760px) {
-  .fa-owner-tag { font-size: 11px; }
-  .fa-owner-unlock { max-width: 100%; font-size: 12px; }
-}
+/* Overview: the PepeGochi card */
+.pp-gochi { display: grid; gap: 4px; justify-items: start; }
+.pp-gochi p { margin: 0; }
+.pp-gochi-name { font-weight: 700; text-transform: none; }
+.pp-gochi-soon { display: flex; align-items: center; gap: 10px; }
+.pp-gochi-soon img { image-rendering: pixelated; flex: none; }
+.pp-gochi-soon p { color: var(--pp-soft); }
+.pp-gochi-warn { color: #b22234; font-weight: 700; }

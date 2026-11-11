@@ -85,10 +85,12 @@ begin
 
   badge_catalog := jsonb_build_array(
     jsonb_build_object('id', 'first_fren', 'title', 'First Fren',
-      'description', 'Joined the pond with Discord.', 'earned_at', joined),
+      'description', 'Joined the pond with Discord.',
+      'earned_at', case when games.passport_open() then greatest(joined, games.passport_start()) end),
     jsonb_build_object('id', 'moonwalker', 'title', 'Moonwalker',
       'description', 'Recorded a 6000 m YEET flight. Moon Rock inventory validation is not enabled yet.',
-      'earned_at', case when best_distance = 60000 then best_date else null end),
+      -- stored by update_passport_awards.sql from the season start; old records are not backfilled
+      'earned_at', (select b.earned_at from games.passport_badges b where b.user_id = u and b.badge_id = 'moonwalker')),
     jsonb_build_object('id', 'certified_fren', 'title', 'Certified Fren',
       'description', '100 distinct care days in PepeGochi.',
       'earned_at', (select b.earned_at from games.passport_badges b
@@ -131,10 +133,13 @@ begin
   d := games.discord_identity(u);
   if d is null then raise exception 'Log on with Discord to save secrets'; end if;
   -- happy_fren and born_to_fren are given by the chat trigger only (update_passport_awards.sql), never claimed here
-  -- pep_birthday and thanksgiving_fren are given by the check-in on those days only, never claimed here
   if p_secret is null or p_secret not in ('wrong_frog', 'why_tho', 'magic_word', 'bsod_fren', 'midnight_fren', 'nerd_alert', 'bali_dreamer',
       'find_fren', 'address_check') then
     raise exception 'Unknown discovery';
+  end if;
+  -- public beta: secrets are not kept before the season start
+  if not games.passport_open() then
+    return jsonb_build_object('id', p_secret, 'new', false, 'discovered_at', null, 'beta', true);
   end if;
 
   insert into games.passport_secrets(user_id, secret_id)

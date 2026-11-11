@@ -6,8 +6,12 @@
 --   update_lobby_mentions.sql, update_frog_letters.sql, update_letters_community.sql, update_miner_cloud.sql.
 -- Safe to run twice.
 --
--- RUN IT ON LAUNCH DAY. The first run takes the Pond Pioneer snapshot: every account that has Discord
--- linked at that moment gets the stamp. Later runs never add anyone (games.passport_meta remembers the run).
+-- RUN IT FOR THE PUBLIC BETA (Thursday 12 XI 2026), before the Passport opens to everyone.
+-- Season start (games.passport_start(), update_passport_season.sql): Monday 16 XI 00:00 Warsaw time.
+--   * Before it (the beta) the server gives only Pond Pioneer: to every account with Discord linked when
+--     this file first runs, and to every Discord fren who opens PondOS until the start.
+--   * From it on, every other stamp works, from zero: nothing dated before the start counts, and there are
+--     no backfills from old records (owner, 2026-11-11, "version A"). Pond Pioneer can no longer be earned.
 --
 -- Trust rules (games/FREN_PASSPORT_ACHIEVEMENTS_DECISIONS_2026-11-06.md):
 --   * Only events the server itself records can award a stamp. Nothing here takes a badge id, a count,
@@ -23,7 +27,7 @@
 --
 -- Stamps awarded here (the ids must match docs/meme/passport-catalog.json; tests check it):
 --   pond_pioneer    Discord linked when this file first runs (one-time snapshot)
---   moonwalker      a YEET flight of 6000 m (the maximum); old records are backfilled
+--   moonwalker      a YEET flight of 6000 m (the maximum), flown from the season start
 --   nasa_is_hiring  three accepted YEET flights over 5000 m; the first three are kept in passport_yeet_5k
 --   pepe_guesser    first Pepe Guesser guess with a pin on the map (Discord-verified play)
 --   sharp_eye       first perfect 5000
@@ -39,11 +43,10 @@
 --   dear_editor     first letter to the editor
 --   rookie_miner    "Happy Mining!": the first Pepe Miner cloud save (unlocks the hard hat)
 --   junior_editor, senior_editor, vox_populi   1, 5 and 10 letters the owner marked "Printed" (gry_letter_printed)
---   bug_hunter      given by the owner from the mailbox (gry_letter_bug_hunter)
+--   (bug_hunter waits: the owner adds it later if needed, 2026-11-09)
 --   bali            for every fren once the owner opens it, the day Pepecoin reaches $0.01 (gry_passport_bali)
 -- The editor stamps are never awarded from the number of letters sent (owner, 2026-11-08).
--- Pepe Guesser, letters and Moonwalker are backfilled from existing records. Chat history is kept only
--- 24 h and YEET keeps only the best flight, so those stamps count from the day this file runs.
+-- Nothing is backfilled from existing records: every stamp counts from the season start (version A).
 --
 -- Stamps added later: everything a future stamp might count is kept from today on (PondOS days, chat
 -- days, letters, Miner seconds, every accepted YEET flight and every one over 5000 m, and all Pepe Guesser
@@ -112,11 +115,20 @@ begin
       'detective_fren', 'week_scout', 'scout_fren', 'welcome_back', 'streak_14', 'like_it_here', 'first_words',
       'community_fren', 'hey_fren', 'dear_editor', 'rookie_miner', 'good_game', 'checkmate',
       'i_voted', 'yeet_adept', 'fud_buster', 'long_snake', 'secret_starter', 'treasure_hunter', 'podium', 'game_night',
-      'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'top_ten', 'season_champion', 'frog_of_the_week',
-      'junior_editor', 'senior_editor', 'vox_populi', 'bug_hunter', 'bali') then
+      'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'season_champion', 'frog_of_the_week',
+      'junior_editor', 'senior_editor', 'vox_populi', 'bali', 'pep_birthday', 'thanksgiving_fren', 'valentine_fren',
+      'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'interior_designer', 'picasso_fren',
+      'pond_dominator') then
     raise exception 'Unknown passport stamp %', b;
   end if;
   if u is null or games.discord_identity(u) is null then return false; end if;
+  -- Season start: in the beta only Pond Pioneer, and Pond Pioneer only in the beta.
+  -- From the start on, nothing dated before it counts (no head starts from old records).
+  if b = 'pond_pioneer' then
+    if games.passport_open() then return false; end if;
+  elsif not games.passport_open() or (at is not null and at < games.passport_start()) then
+    return false;
+  end if;
   insert into games.passport_badges (user_id, badge_id, earned_at)
   values (u, b, coalesce(at, clock_timestamp()))
   on conflict (user_id, badge_id) do nothing;
@@ -129,7 +141,7 @@ create or replace function games.passport_yeet_flight(u uuid, p_score integer)
 returns void language plpgsql volatile security definer set search_path = '' as $$
 declare kept integer;
 begin
-  if p_score is null then return; end if;
+  if p_score is null or not games.passport_open() then return; end if;
   -- every accepted flight is counted, for stamps that may be added later
   insert into games.passport_progress (user_id, yeet_flights, yeet_5k_total)
   values (u, 1, case when p_score > 50000 then 1 else 0 end)
@@ -202,7 +214,8 @@ begin
   with p as (
     select q.day, x.guessed_at as at, x.points
       from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
-     where x.user_id = u and x.verified and x.g_lat is not null and x.guessed_at is not null and q.day is not null),
+     where x.user_id = u and x.verified and x.g_lat is not null and x.guessed_at is not null and q.day is not null
+       and q.day >= games.passport_start_day()),
   g as (
     select day, at, points,
            row_number() over (order by day) as k,
@@ -233,7 +246,7 @@ begin
   played := exists (select 1 from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
                      where x.user_id = u and x.verified and x.g_lat is not null and q.day = d);
   if not played then d := d - 1; end if;
-  while s < 400 and exists (select 1 from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
+  while s < 400 and d - s >= games.passport_start_day() and exists (select 1 from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
                      where x.user_id = u and x.verified and x.g_lat is not null and q.day = d - s) loop
     s := s + 1;
   end loop;
@@ -263,7 +276,7 @@ create or replace function games.passport_chat_after()
 returns trigger language plpgsql security definer set search_path = '' as $$
 declare n integer;
 begin
-  if new.verified and new.user_id is not null then
+  if new.verified and new.user_id is not null and games.passport_open() then
     begin
       insert into games.passport_chat_days (user_id, day)
       values (new.user_id, (new.created_at at time zone 'utc')::date)
@@ -353,7 +366,7 @@ create or replace function games.passport_letter_after()
 returns trigger language plpgsql security definer set search_path = '' as $$
 declare n integer;
 begin
-  if new.discord then
+  if new.discord and games.passport_open() then
     begin
       insert into games.passport_progress (user_id, letters) values (new.user_id, 1)
       on conflict (user_id) do update set letters = games.passport_progress.letters + 1
@@ -370,7 +383,51 @@ drop trigger if exists passport_letter_ai on games.letters;
 create trigger passport_letter_ai after insert on games.letters
   for each row execute function games.passport_letter_after();
 
--- ---------- owner tools: "Printed" letters, Bug Hunter, BALI ----------
+-- ---------- Picasso Fren: other players guessed 10 of your drawings in Draw & Guess ----------
+-- Draw & Guess (rooms in mode 'kalambury') is run by the server: gry_guess() marks a correct guess by setting
+-- games.players.guessed_turn. A drawing counts once (per turn) when a different, verified (Discord) player
+-- guesses it, and the drawer is a Discord player too. Kept in its own table, so finished rooms can be deleted.
+create table if not exists games.passport_drawings (
+  turn_id    uuid primary key,
+  drawer_id  uuid not null references auth.users(id) on delete cascade,
+  guessed_at timestamptz not null default clock_timestamp()
+);
+create index if not exists passport_drawings_drawer on games.passport_drawings (drawer_id);
+alter table games.passport_drawings enable row level security;
+
+create or replace function games.passport_drawing_after()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare r record; n integer;
+begin
+  if new.guessed_turn is null or new.guessed_turn is not distinct from old.guessed_turn or not new.verified then return null; end if;
+  select x.mode, x.drawer_id, x.turn_id into r from games.rooms x where x.code = new.room_code;
+  if not found or r.mode <> 'kalambury' or r.drawer_id is null or r.drawer_id = new.user_id
+     or r.turn_id is distinct from new.guessed_turn or games.discord_identity(r.drawer_id) is null
+     or games.discord_identity(new.user_id) is null then
+    return null;
+  end if;
+  if not games.passport_open() then return null; end if;
+  begin
+    insert into games.passport_drawings (turn_id, drawer_id) values (new.guessed_turn, r.drawer_id) on conflict (turn_id) do nothing;
+    select count(*) into n from games.passport_drawings d where d.drawer_id = r.drawer_id;
+    if n >= 10 then perform games.passport_award(r.drawer_id, 'picasso_fren'); end if;
+  exception when others then
+    raise warning 'passport drawing: %', sqlerrm;   -- never undoes the guess
+  end;
+  return null;
+end
+$$;
+revoke all on function games.passport_drawing_after() from public, anon, authenticated;
+do $$
+begin
+  if to_regclass('games.players') is not null then
+    drop trigger if exists passport_drawing_au on games.players;
+    create trigger passport_drawing_au after update of guessed_turn on games.players
+      for each row execute function games.passport_drawing_after();
+  end if;
+end $$;
+
+-- ---------- owner tools: "Printed" letters, BALI ----------
 -- Junior Editor (1), Senior Editor (5) and Vox Populi (10) count the letters the owner marked as printed
 -- in The Pond Gazette. Only letters whose writer ticked "OK to print" can be marked. The marks live in
 -- their own table, because games.letters deletes read letters beyond the newest 2000 and the count must
@@ -387,7 +444,7 @@ create or replace function games.passport_printed_check(u uuid)
 returns integer language plpgsql volatile security definer set search_path = '' as $$
 declare n integer;
 begin
-  select count(*) into n from games.passport_printed p where p.user_id = u;
+  select count(*) into n from games.passport_printed p where p.user_id = u and p.printed_at >= games.passport_start();
   if n >= 1 then perform games.passport_award(u, 'junior_editor'); end if;
   if n >= 5 then perform games.passport_award(u, 'senior_editor'); end if;
   if n >= 10 then perform games.passport_award(u, 'vox_populi'); end if;
@@ -419,27 +476,8 @@ $$;
 revoke all on function public.gry_letter_printed(bigint, boolean) from public, anon;
 grant execute on function public.gry_letter_printed(bigint, boolean) to authenticated;
 
--- Bug Hunter: the owner gives it to the Discord writer of a letter that reported a real, fixed bug.
-create or replace function public.gry_letter_bug_hunter(p_id bigint, p_on boolean default true)
-returns jsonb language plpgsql volatile security definer set search_path = '' as $$
-declare l record;
-begin
-  if not games.is_owner(auth.uid()) then raise exception 'Only the site owner can do that'; end if;
-  select x.user_id, x.discord into l from games.letters x where x.id = p_id;
-  if not found then raise exception 'That letter is gone'; end if;
-  if not l.discord or games.discord_identity(l.user_id) is null then
-    raise exception 'Bug Hunter is a Passport stamp, and this letter came from a guest (no Discord)';
-  end if;
-  if coalesce(p_on, true) then
-    perform games.passport_award(l.user_id, 'bug_hunter');
-  else
-    delete from games.passport_badges b where b.user_id = l.user_id and b.badge_id = 'bug_hunter';
-  end if;
-  return jsonb_build_object('ok', true, 'bug_hunter', coalesce(p_on, true));
-end
-$$;
-revoke all on function public.gry_letter_bug_hunter(bigint, boolean) from public, anon;
-grant execute on function public.gry_letter_bug_hunter(bigint, boolean) to authenticated;
+-- Bug Hunter waits (owner, 2026-11-09): no grant tool at launch. An earlier draft's function is removed.
+drop function if exists public.gry_letter_bug_hunter(bigint, boolean);
 
 -- BALI: the owner opens it on the day Pepecoin reaches $0.01. From then on every Discord fren gets the
 -- mythic stamp on their next PondOS visit (games.passport_daily). Closing it again stops new awards and
@@ -460,8 +498,29 @@ $$;
 revoke all on function public.gry_passport_bali(boolean) from public, anon;
 grant execute on function public.gry_passport_bali(boolean) to authenticated;
 
+-- Share Fren (owner, 2026-11-10): a small cosmetic secret when a Discord fren copies/shares
+-- a finished Pepe Guesser result. The browser cannot prove an X post, so never award a stamp.
+-- This RPC takes no client-provided score or badge name and checks the player's own record.
+create or replace function public.gry_passport_share()
+returns jsonb language plpgsql volatile security definer set search_path = '' as $$
+declare u uuid := auth.uid(); new_discovery timestamptz;
+begin
+  if u is null or games.discord_identity(u) is null then raise exception 'Log on with Discord to save secrets'; end if;
+  if games.passport_open() and exists (select 1 from games.wp_plays p where p.user_id = u and p.guessed_at >= games.passport_start()) then
+    insert into games.passport_secrets(user_id, secret_id)
+    values (u, 'share_fren')
+    on conflict (user_id, secret_id) do nothing
+    returning discovered_at into new_discovery;
+  end if;
+  return jsonb_build_object('id', 'share_fren', 'new', new_discovery is not null,
+    'found', exists (select 1 from games.passport_secrets s where s.user_id = u and s.secret_id = 'share_fren'));
+end
+$$;
+revoke all on function public.gry_passport_share() from public, anon;
+grant execute on function public.gry_passport_share() to authenticated;
+
 -- The owner's mailbox: as update_letters_community.sql, plus each letter's "printed" mark, whether its
--- writer has Bug Hunter, how many of their letters were printed, and whether BALI is open.
+-- how many of the writer's letters were printed, and whether BALI is open.
 create or replace function public.gry_letters(p_limit int default 100)
 returns jsonb
 language plpgsql security definer set search_path = ''
@@ -481,9 +540,7 @@ begin
                'discord', q.discord, 'print', q.print_ok, 'body', q.body,
                'page', q.page, 'read', q.read_at is not null,
                'printed', exists (select 1 from games.passport_printed p where p.letter_id = q.id),
-               'printed_count', case when q.discord then (select count(*) from games.passport_printed p where p.user_id = q.user_id) else 0 end,
-               'bug_hunter', q.discord and exists (select 1 from games.passport_badges b
-                                                    where b.user_id = q.user_id and b.badge_id = 'bug_hunter'))
+               'printed_count', case when q.discord then (select count(*) from games.passport_printed p where p.user_id = q.user_id) else 0 end)
              order by q.created_at desc)
       from (select * from games.letters
             order by created_at desc limit lim) q), '[]'::jsonb));
@@ -500,6 +557,7 @@ create or replace function games.passport_miner_after()
 returns trigger language plpgsql security definer set search_path = '' as $$
 declare n integer;
 begin
+  if not games.passport_open() then return null; end if;
   begin
     insert into games.passport_progress (user_id, miner_last_at) values (new.user_id, clock_timestamp())
     on conflict (user_id) do update set
@@ -550,17 +608,15 @@ begin
 end
 $$;
 
--- ---------- secrets: Secret Starter (1), Treasure Hunter (6) ----------
+-- ---------- secrets: Secret Starter (1), Treasure Hunter (10; owner, 2026-11-09) ----------
 create or replace function games.passport_secret_after()
 returns trigger language plpgsql security definer set search_path = '' as $$
 declare n integer;
 begin
   begin
-    -- the two event days are for everyone who visits, so they are not "found" and do not count here
-    select count(*) into n from games.passport_secrets
-     where user_id = new.user_id and secret_id not in ('pep_birthday', 'thanksgiving_fren');
+    select count(*) into n from games.passport_secrets where user_id = new.user_id and discovered_at >= games.passport_start();
     if n >= 1 then perform games.passport_award(new.user_id, 'secret_starter', new.discovered_at); end if;
-    if n >= 6 then perform games.passport_award(new.user_id, 'treasure_hunter', new.discovered_at); end if;
+    if n >= 10 then perform games.passport_award(new.user_id, 'treasure_hunter', new.discovered_at); end if;
   exception when others then raise warning 'passport secret hook: %', sqlerrm; end;
   return null;
 end
@@ -622,7 +678,11 @@ declare
   w record;
   sn integer;
   tg date;
+  hof date;
+  st timestamptz := games.passport_start();
+  sd date := games.passport_start_day();
 begin
+  if not games.passport_open() then return; end if;
   -- Certified Fren: 100 different UTC days
   if (select count(*) from games.passport_days where user_id = u) >= 100 then perform games.passport_award(u, 'certified_fren'); end if;
   -- Old Frog: one year since the first Discord log-on (the Discord identity's creation time)
@@ -631,73 +691,75 @@ begin
   if joined is not null and joined <= now() - interval '365 days' then perform games.passport_award(u, 'old_frog'); end if;
   -- BALI: the owner opened it (gry_passport_bali), so every fren gets it on the next visit
   if exists (select 1 from games.passport_meta m where m.k = 'bali_open') then perform games.passport_award(u, 'bali'); end if;
-  -- Event days for every fren who visits (each unlocks a special avatar, not a stamp):
+  -- Event days for every fren who visits (each is a stamp, like Frogmas, and unlocks a special avatar):
   -- Pepecoin's birthday, 30 January (UTC 30-31, so every time zone has its 30th), and US Thanksgiving,
   -- the fourth Thursday of November, through that Sunday
   if extract(month from today) = 1 and extract(day from today) between 30 and 31 then
-    insert into games.passport_secrets (user_id, secret_id) values (u, 'pep_birthday') on conflict (user_id, secret_id) do nothing;
+    perform games.passport_award(u, 'pep_birthday');
+  end if;
+  -- Valentine's Day (owner, 2026-11-09): 14 February (UTC 14-15, so every time zone has its 14th)
+  if extract(month from today) = 2 and extract(day from today) between 14 and 15 then
+    perform games.passport_award(u, 'valentine_fren');
   end if;
   tg := make_date(extract(year from today)::int, 11, 1);
   tg := tg + ((4 - extract(dow from tg)::int + 7) % 7) + 21;
   if today between tg and tg + 3 then
-    insert into games.passport_secrets (user_id, secret_id) values (u, 'thanksgiving_fren') on conflict (user_id, secret_id) do nothing;
+    perform games.passport_award(u, 'thanksgiving_fren');
   end if;
   -- Frogmas: a visit on 24, 25 or 26 December (UTC)
   if extract(month from today) = 12 and extract(day from today) between 24 and 26 then perform games.passport_award(u, 'frogmas'); end if;
   -- Arcade Hopper: a score kept by the server in 5 different games
   games_played :=
-      (case when exists (select 1 from games.yeet_records y where y.user_id = u and y.best > 0) then 1 else 0 end)
-    + (case when exists (select 1 from games.wp_plays x where x.user_id = u and x.verified and x.guessed_at is not null) then 1 else 0 end)
+      (case when exists (select 1 from games.yeet_records y where y.user_id = u and y.best > 0 and y.achieved_at >= st)
+              or exists (select 1 from games.passport_progress p where p.user_id = u and p.yeet_flights > 0) then 1 else 0 end)
+    + (case when exists (select 1 from games.wp_plays x where x.user_id = u and x.verified and x.guessed_at >= st) then 1 else 0 end)
     + (case when to_regclass('games.arcade_scores') is not null
-              and exists (select 1 from games.arcade_scores a where a.user_id = u and a.game = 'fud') then 1 else 0 end)
+              and exists (select 1 from games.arcade_scores a where a.user_id = u and a.game = 'fud' and a.created_at >= st) then 1 else 0 end)
     + (case when to_regclass('games.arcade_scores') is not null
-              and exists (select 1 from games.arcade_scores a where a.user_id = u and a.game = 'snake') then 1 else 0 end)
-    + (case when exists (select 1 from games.miner_saves s where s.user_id = u) then 1 else 0 end)
+              and exists (select 1 from games.arcade_scores a where a.user_id = u and a.game = 'snake' and a.created_at >= st) then 1 else 0 end)
+    + (case when exists (select 1 from games.miner_saves s where s.user_id = u and s.updated_at >= st) then 1 else 0 end)
     + (case when exists (select 1 from games.results r join games.matches m on m.id = r.match_id
-                          where r.user_id = u and r.verified and m.mode = 'obrazek') then 1 else 0 end)
+                          where r.user_id = u and r.verified and m.mode = 'obrazek' and r.finished_at >= st) then 1 else 0 end)
     + (case when exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = 'good_game') then 1 else 0 end);
   if games_played >= 5 then perform games.passport_award(u, 'arcade_hopper'); end if;
-  -- Top 10: YEET board, Pepe Guesser week board (last 7 days), Pepe Pictures season ranking
-  select y.best into mine from games.yeet_records y where y.user_id = u;
-  if coalesce(mine, 0) > 0 and (select count(*) from games.yeet_records y where y.best > mine) < 10 then
-    perform games.passport_award(u, 'top_ten');
+  -- Frog of the Week (the Weekly Champion) and Pond Dominator: from games.config.wp_hof_start on, the Hall of Fame
+  -- settlement games.wp_settle() (update_wheres_pepe_hall_of_fame.sql) closes each day and week: exactly one first
+  -- place wins, a tie has no winner, and leading alone all 7 days gives 'pond_dominator'. It marks the weeks it
+  -- settles in passport_weeks, so the older rule below (every tied first place wins) only sees weeks before that.
+  if to_regprocedure('games.wp_settle()') is not null then
+    begin
+      perform games.wp_settle();
+    exception when others then
+      raise warning 'passport wp settle hook: %', sqlerrm;
+    end;
   end if;
-  select sum(x.points) into mine from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
-   where x.user_id = u and x.verified and x.guessed_at is not null and q.day > today - 7;
-  if coalesce(mine, 0) > 0 and (select count(*) from (
-        select x.user_id from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
-         where x.guessed_at is not null and q.day > today - 7 group by x.user_id having sum(x.points) > mine) z) < 10 then
-    perform games.passport_award(u, 'top_ten');
-  end if;
-  if cur is not null then
-    select sum(4 - g.place) into mine from games.guesses g join games.matches m on m.id = g.match_id
-     where g.user_id = u and g.verified and m.ranked and m.season_no = cur and m.mode = 'obrazek';
-    if coalesce(mine, 0) > 0 and (select count(*) from (
-          select 1 from games.guesses g join games.matches m on m.id = g.match_id
-           where m.ranked and m.season_no = cur and m.mode = 'obrazek'
-           group by case when g.verified then 'u:' || g.user_id::text else 'g:' || g.nick_key end
-          having sum(4 - g.place) > mine) z) < 10 then
-      perform games.passport_award(u, 'top_ten');
-    end if;
-  end if;
-  -- Frog of the Week: settle the last finished week once (Monday-Sunday, UTC); every tied first place wins
+  hof := (select (to_jsonb(c) ->> 'wp_hof_start')::date from games.config c where c.id = 1);
+  -- (a fallback for a database without the Hall of Fame file: weeks from the season start only, and like the
+  -- Hall of Fame, a tie at the top means no winner)
+  if wk >= sd and (hof is null or wk < hof) then
   insert into games.passport_weeks (week_start) values (wk) on conflict (week_start) do nothing;
   if found then
     for w in select z.user_id from (
-        select x.user_id, rank() over (order by sum(x.points) desc) r
-          from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
-         where x.verified and x.guessed_at is not null and q.day between wk and wk + 6
-         group by x.user_id) z where z.r = 1 loop
+        select y.user_id, y.r, count(*) over (partition by y.r) nr from (
+          select x.user_id, rank() over (order by sum(x.points) desc) r
+            from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
+           where x.verified and x.guessed_at is not null and q.day between wk and wk + 6
+           group by x.user_id) y) z
+       where z.r = 1 and z.nr = 1 loop
       if games.discord_identity(w.user_id) is not null then
         insert into games.passport_badges (user_id, badge_id, earned_at, times) values (w.user_id, 'frog_of_the_week', clock_timestamp(), 1)
         on conflict (user_id, badge_id) do update set times = games.passport_badges.times + 1, earned_at = excluded.earned_at, notified_at = null;
       end if;
     end loop;
   end if;
+  end if;
   -- Season Champion: first place of each finished ranked Pepe Pictures season (settled once, held once)
   for sn in select distinct m.season_no from games.matches m
              where m.ranked and m.mode = 'obrazek' and m.season_no is not null
                and (m.season_no < coalesce(cur, 0) or (m.season_no = cur and se->>'phase' = 'break'))
+               -- only seasons played wholly from the season start (no head starts)
+               and not exists (select 1 from games.matches m0 where m0.season_no = m.season_no and m0.ranked
+                                 and m0.mode = 'obrazek' and m0.started_at < st)
                and not exists (select 1 from games.passport_seasons p where p.season_no = m.season_no) loop
     insert into games.passport_seasons (season_no) values (sn) on conflict (season_no) do nothing;
     if found then
@@ -728,6 +790,10 @@ begin
   if u is null or games.discord_identity(u) is null then
     return jsonb_build_object('signed_in', false);
   end if;
+  if not games.passport_open() then
+    -- public beta: Pond Pioneer for every Discord fren who opens PondOS. Nothing else is counted yet.
+    perform games.passport_award(u, 'pond_pioneer');
+  else
   insert into games.passport_days (user_id, day) values (u, today) on conflict (user_id, day) do nothing;
   if found then
     -- Welcome Back!: the first visit was yesterday, and this is the second one
@@ -747,6 +813,7 @@ begin
   exception when others then
     raise warning 'passport daily hook: %', sqlerrm;
   end;
+  end if;
   -- Fresh Fren has its own notice in the Avatar Maker
   with shown as (
     update games.passport_badges b set notified_at = clock_timestamp()
@@ -838,14 +905,15 @@ begin
     'chat_days', (select count(*) from games.passport_chat_days c where c.user_id = u),
     'login_streak', login_streak,
     'wp_days', (select count(*) from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
-                 where x.user_id = u and x.verified and x.g_lat is not null and q.day is not null),
+                 where x.user_id = u and x.verified and x.g_lat is not null and q.day >= games.passport_start_day()),
     'wp_perfect_days', (select count(*) from games.wp_plays x join games.wp_puzzles q on q.id = x.puzzle_id
-                 where x.user_id = u and x.verified and x.g_lat is not null and x.points = 5000 and q.day is not null),
+                 where x.user_id = u and x.verified and x.g_lat is not null and x.points = 5000 and q.day >= games.passport_start_day()),
     'wp_streak', games.passport_wp_streak(u));
 
   badge_catalog := jsonb_build_array(
     jsonb_build_object('id', 'first_fren', 'title', 'First Fren',
-      'description', 'Joined the pond with Discord.', 'earned_at', joined),
+      'description', 'Joined the pond with Discord.',
+      'earned_at', case when games.passport_open() then greatest(joined, games.passport_start()) end),
     jsonb_build_object('id', 'certified_fren', 'title', 'Certified Fren',
       'description', '100 distinct days of signed-in PondOS activity.',
       'earned_at', (select b.earned_at from games.passport_badges b
@@ -885,7 +953,7 @@ declare launch timestamptz; r record;
 begin
   -- Pond Pioneer: every account with Discord linked right now. Never again after this run.
   insert into games.passport_meta (k) values ('pioneer_snapshot') on conflict (k) do nothing returning at into launch;
-  if launch is not null then
+  if launch is not null and not games.passport_open() then
     insert into games.passport_badges (user_id, badge_id, earned_at)
     select distinct i.user_id, 'pond_pioneer', launch
       from auth.identities i join auth.users au on au.id = i.user_id
@@ -894,52 +962,31 @@ begin
   end if;
 end $$;
 
--- Backfills from records the games already keep (safe to repeat: awards are on conflict do nothing).
--- Moonwalker: a 6000 m record, dated when it was flown.
-select games.passport_award(y.user_id, 'moonwalker', y.achieved_at)
-  from games.yeet_records y where y.best >= 60000;
--- Adept: a 3000 m record
-select games.passport_award(y.user_id, 'yeet_adept', y.achieved_at)
-  from games.yeet_records y where y.best >= 30000;
--- Podium: top 3 of a finished Pepe Pictures game
-select games.passport_award(r.user_id, 'podium', r.finished_at)
-  from games.results r join games.matches m on m.id = r.match_id where r.verified and r.place <= 3 and m.mode = 'obrazek';
--- Pepe Guesser: every Discord player with a verified play.
-select games.passport_wp_check(p.user_id)
-  from (select distinct x.user_id from games.wp_plays x where x.verified and x.g_lat is not null) p;
--- Letters: the server still has them (only read letters beyond the newest 2000 are ever deleted).
-insert into games.passport_progress (user_id, letters)
-select l.user_id, count(*) from games.letters l
-  join auth.users au on au.id = l.user_id
- where l.discord group by l.user_id
-on conflict (user_id) do nothing;
-select games.passport_award(l.user_id, 'dear_editor', l.created_at)
-  from (select user_id, created_at, row_number() over (partition by user_id order by created_at, id) as k
-          from games.letters where discord) l
- where l.k = 1;
--- I Voted, FUD Buster, Long Snake, Secret Starter, Treasure Hunter: from records that already exist
+-- No backfills (owner decision 2026-11-11, "version A"): everyone starts from zero at the season start,
+-- so old YEET records, letters, Guesser days, arcade scores, polls and secrets do not give stamps.
+-- If an earlier draft of these files already ran (test data), clear what it stored. Runs only before the
+-- season start, so running this file again later never takes anything away. Saved avatar looks stay.
 do $$ begin
-  if to_regclass('games.poll_votes') is not null then
-    perform games.passport_award(v.user_id, 'i_voted', v.voted_at) from games.poll_votes v where v.verified;
-  end if;
-  if to_regclass('games.arcade_scores') is not null then
-    perform games.passport_award(a.user_id, case a.game when 'fud' then 'fud_buster' else 'long_snake' end, a.created_at)
-       from games.arcade_scores a
-      where a.verified and a.user_id is not null and ((a.game = 'fud' and a.score >= 2000) or (a.game = 'snake' and a.score >= 40));
+  if not games.passport_open() then
+    delete from games.passport_badges where badge_id <> 'pond_pioneer';
+    delete from games.passport_secrets;
+    delete from games.passport_items;
+    delete from games.passport_days;
+    delete from games.passport_chat_days;
+    delete from games.passport_progress;
+    delete from games.passport_yeet_5k;
+    delete from games.passport_printed;
+    delete from games.passport_drawings;
+    delete from games.passport_weeks;
+    delete from games.passport_seasons;
   end if;
 end $$;
-select games.passport_award(s.user_id, 'secret_starter')
-  from (select distinct user_id from games.passport_secrets where secret_id not in ('pep_birthday', 'thanksgiving_fren')) s;
-select games.passport_award(s.user_id, 'treasure_hunter')
-  from (select user_id from games.passport_secrets where secret_id not in ('pep_birthday', 'thanksgiving_fren')
-         group by user_id having count(*) >= 6) s;
--- Happy Mining!: everyone who already has a Pepe Miner cloud save.
-select games.passport_award(m.user_id, 'rookie_miner') from games.miner_saves m;
 -- Stamps retired or re-ruled by the v3 list (2026-11-08). The Passport is not public yet, so nothing
 -- anyone has seen is removed; this only matters if an earlier draft of this file already ran.
 -- Junior and Senior Editor once counted letters sent; now only "Printed" marks count.
 delete from games.passport_badges b
- where b.badge_id = 'miner_fren'
+ where b.badge_id in ('miner_fren', 'top_ten', 'the_secret_pond', 'bug_hunter')   -- Top 10 and The Secret Pond dropped by the owner, 2026-11-09
+    or (b.badge_id = 'treasure_hunter' and (select count(*) from games.passport_secrets s where s.user_id = b.user_id) < 10)
     or (b.badge_id in ('junior_editor', 'senior_editor', 'vox_populi')
         and (select count(*) from games.passport_printed p where p.user_id = b.user_id)
             < case b.badge_id when 'junior_editor' then 1 when 'senior_editor' then 5 else 10 end);
