@@ -129,11 +129,11 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
   color: #1d2a6b; background: #f3e6c4; border: 2px solid #1d2a6b; border-radius: 3px; box-shadow: 0 0 0 2px #f3e6c4, 0 0 0 3px #1d2a6b; }
 .pp-sheet-h::before, .pp-sheet-h::after { content: "\2605"; margin: 0 10px; }
 .pp-sheet-count { margin: 0; text-align: center; font-weight: 700; font-size: 12px; color: #5b4628; }
-.pp-album { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 4px 2px; max-height: min(62vh, 620px); overflow: auto; padding: 4px; }
+.pp-album { display: grid; grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); gap: 4px 2px; max-height: min(62vh, 620px); overflow: auto; padding: 4px; }
 /* stamps sit straight on the passport paper (owner, 2026-11-11: no white tile behind them) */
 .pp-stamp { display: grid; justify-items: center; align-content: start; gap: 3px; padding: 4px 2px; text-align: center; font: inherit; color: inherit; cursor: pointer;
   background: none; border: 0; border-radius: 4px; }
-.pp-stamp .pp-art-stamp { width: min(100%, 96px); filter: drop-shadow(1px 2px 0 rgba(60,40,20,.35)); transition: transform .12s; }
+.pp-stamp .pp-art-stamp { width: min(92%, 128px); filter: drop-shadow(1px 2px 0 rgba(60,40,20,.35)); transition: transform .12s; }
 .pp-stamp:hover .pp-art-stamp { transform: rotate(-3deg) scale(1.04); }
 .pp-stamp:focus-visible, .pp-stamp.is-picked { outline: 2px dashed #1d2a6b; outline-offset: -1px; }
 .pp-stamp-name { font-weight: 700; font-size: 12px; line-height: 1.15; overflow-wrap: anywhere; }
@@ -179,7 +179,7 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
   .pp-book { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .pp-recent-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .pp-album { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
-  .pp-stamp .pp-art-stamp { width: min(100%, 84px); }
+  .pp-stamp .pp-art-stamp { width: 92%; }
   .pp-cols { grid-template-columns: minmax(0, 1fr); }
   .pp-tabs [role=tab] { padding: 5px 7px 4px; }
   .pp-tabs [role=tab] span { font-size: 11px; }
