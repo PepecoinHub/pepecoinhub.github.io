@@ -51,24 +51,8 @@ const topBox = h('div', { class: 'pt-top' });
 // start a party: the two settings that matter, remembered for next time
 const saved = (() => { try { return JSON.parse(ls('pepaint-new') || '{}'); } catch { return {}; } })();
 const name = h('input', { type: 'text', id: 'pt-name', maxlength: 40, placeholder: 'Party name (optional)', 'aria-label': 'Party name (optional)' });
-// 98-style button rows instead of drop-down lists (owner, 2026-11-11: the open list lost its highlighted text)
-function pick(id, label, values, show, start) {
-  let value = start;
-  const row = h('div', { class: 'pt-pick', id, role: 'radiogroup', 'aria-label': label });
-  const btns = values.map((v) => h('button', { type: 'button', role: 'radio', 'aria-checked': String(v === start), tabindex: v === start ? '0' : '-1',
-    onclick: () => set(v), onkeydown: (e) => {
-      const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
-      if (!d) return;
-      e.preventDefault();
-      const i = (values.indexOf(value) + d + values.length) % values.length;
-      set(values[i]); btns[i].focus();
-    } }, show(v)));
-  function set(v) { value = v; btns.forEach((b, i) => { const on = values[i] === v; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; }); }
-  row.append(...btns);
-  return { el: row, get value() { return value; } };
-}
-const rounds = pick('pt-rounds', 'Rounds', [1, 2, 3, 4, 5], String, [1, 2, 3, 4, 5].includes(+saved.rounds) ? +saved.rounds : 2);
-const secs = pick('pt-secs', 'Time to draw (seconds)', TIMES, (v) => v + ' s', TIMES.includes(+saved.secs) ? +saved.secs : 60);
+const rounds = h('select', { id: 'pt-rounds' }, [1, 2, 3, 4, 5].map((n) => h('option', { value: n, selected: n === (+saved.rounds || 2) }, n + (n === 1 ? ' round' : ' rounds'))));
+const secs = h('select', { id: 'pt-secs' }, TIMES.map((v) => h('option', { value: v, selected: v === (TIMES.includes(+saved.secs) ? +saved.secs : 60) }, v + ' s')));
 const createBtn = h('button', { type: 'button', class: 'pt-go', onclick: () => createRoom() }, 'Start a party');
 createBtn.prepend((() => { const s = h('span', { 'aria-hidden': 'true' }); s.innerHTML = TOOL_SVG.brush; return s; })());
 const codeIn = h('input', { type: 'text', id: 'pt-code', maxlength: 5, placeholder: 'PEP42', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Room code' });
@@ -83,9 +67,9 @@ const sheet = h('div', { class: 'pt-sheet' },
     who,
     h('fieldset', { class: 'pt-group' }, h('legend', {}, 'New party'),
       name,
-      h('div', { class: 'pt-picks' },
-        h('div', {}, h('span', {}, 'Rounds'), rounds.el),
-        h('div', {}, h('span', {}, 'Time to draw'), secs.el)),
+      h('div', { class: 'pt-two' },
+        h('label', {}, h('span', {}, 'Rounds'), rounds),
+        h('label', {}, h('span', {}, 'Time to draw'), secs)),
       createBtn),
     h('fieldset', { class: 'pt-group' }, h('legend', {}, 'Got a room code?'), codeForm),
     h('p', { class: 'pt-fine' }, h('button', { type: 'button', class: 'pt-link', onclick: help }, 'How to play'), ' · up to 12 players · games with 3+ frens count for the top of the week')),
