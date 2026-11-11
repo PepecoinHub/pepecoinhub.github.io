@@ -3,13 +3,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 
 const file = p => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 const order = [...file('games/supabase/deploy/RUN_ORDER.md').matchAll(/^\d+\. `([a-z0-9_]+\.sql)`/gm)].map(m => m[1]);
 const check = file('games/supabase/deploy/00_check.sql');
 
 test('launch kit: run order and the read-only check agree', () => {
-  assert.equal(order.length, 15);
+  assert.equal(order.length, 17);
   for (const f of order) assert.ok(existsSync(new URL('../games/supabase/' + f, import.meta.url)), f);
   const checked = [...check.matchAll(/^\s+\((\d+),\s+'([a-z0-9_]+\.sql)/gm)].map(m => [+m[1], m[2]]);
   assert.deepEqual(checked, order.map((f, i) => [i + 1, f]));
@@ -21,3 +22,13 @@ test('launch kit: run order and the read-only check agree', () => {
   assert.ok(order.indexOf('update_passport_awards.sql') < order.indexOf('update_wheres_pepe_hall_of_fame.sql'));
   assert.match(file('games/supabase/update_wheres_pepe_hall_of_fame.sql'), /where m\.k = 'pioneer_snapshot'/);
 });
+
+test('launch kit: LAUNCH_ALL.sql is the run order in one transaction and up to date', () => {
+  const all = file('games/supabase/deploy/LAUNCH_ALL.sql');
+  execFileSync('python3', ['scripts/build_launch_sql.py', '--check'], { cwd: new URL('..', import.meta.url) });
+  assert.equal([...all.matchAll(/^begin;$/gm)].length, 1);
+  assert.equal([...all.matchAll(/^commit;$/gm)].length, 1);
+  assert.ok(all.trimEnd().endsWith('commit;'));
+  assert.deepEqual([...all.matchAll(/^-- \d+\/\d+  ([a-z0-9_]+\.sql)$/gm)].map(m => m[1]), order);
+});
+
