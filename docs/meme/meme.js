@@ -1078,7 +1078,7 @@
     var paint = function () { stats.textContent = bits.filter(Boolean).join(' \u00b7 '); };
     setTimeout(function () {   // after the rest of this file has set up the Supabase address
       rpc('gry_wp_count').then(function (c) { if (c && c.players) { bits[0] = '\ud83d\udc38 ' + c.players + (c.players === 1 ? ' player' : ' players') + ' today'; paint(); } }, function () {});
-      rpc('gry_wp_top', { p_scope: 'day' }).then(function (rows) { if (rows && rows[0]) { bits[1] = '\ud83c\udfc6 ' + rows[0].nick + ' leads with ' + Number(rows[0].points).toLocaleString('en-US'); paint(); } }, function () {});
+      rpc('gry_wp_top', { p_scope: 'day' }).then(function (rows) { var lead = (rows || []).filter(function (x) { return !x.hidden; })[0]; if (lead) { bits[1] = '\ud83c\udfc6 ' + lead.nick + ' leads with ' + Number(lead.points).toLocaleString('en-US'); paint(); } }, function () {});
     }, 0);
   })();
   function invaders() {
@@ -1296,6 +1296,8 @@
     });
   }
   // names in score tables: Discord players in bold with a small frog, guests in grey (to make logging on worth it)
+  // Pepe Guesser: the host's own row comes back only to the host (marked hidden); others never get it
+  function hostHidden(x) { return x && x.hidden ? ' <small class="wp-hidden" title="You are the host, so other players do not see your score">(hidden, only you see this)</small>' : ''; }
   function who(nick, verified) {
     return verified ? '<b class="who who-ok" title="Discord player"><img src="img/pep-logo.webp" alt="" width="14" height="14">' + esc(nick) + '</b>'
       : '<span class="who who-guest" title="Guest">' + esc(nick) + '</span>';
@@ -1338,7 +1340,7 @@
         }, fail(ols[0]));
         else if (g === 'wp') ['day', 'week'].forEach(function (sc, k) {
           rpc('gry_wp_top', { p_scope: sc }).then(function (rows) {
-            ols[k].innerHTML = rows && rows.length ? rows.map(function (x, i) { return row(x, i, Number(x.points).toLocaleString('en-US') + ' pts'); }).join('') : empty;
+            ols[k].innerHTML = rows && rows.length ? rows.map(function (x, i) { return row(x, i, Number(x.points).toLocaleString('en-US') + ' pts' + hostHidden(x)); }).join('') : empty;
           }, fail(ols[k]));
         });
         else rpc('gry_miner_top', {}).then(function (rows) {
@@ -3289,7 +3291,7 @@
         var show = function (s) {
           box.querySelectorAll('[data-s]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-s') === s)); });
           wpRpc('gry_wp_top', { p_scope: s }).then(function (rows) {
-            ol.innerHTML = rows.length ? rows.map(function (x) { return '<li><span>' + who(x.nick, x.verified !== false) + '</span><b>' + Number(x.points).toLocaleString('en-US') + '</b></li>'; }).join('')
+            ol.innerHTML = rows.length ? rows.map(function (x) { return '<li><span>' + who(x.nick, x.verified !== false) + hostHidden(x) + '</span><b>' + Number(x.points).toLocaleString('en-US') + '</b></li>'; }).join('')
               : '<li class="wp-small">Nobody yet. Be the first!</li>';
           }, function () { ol.innerHTML = '<li class="wp-small">The ranking could not be loaded.</li>'; });
         };
