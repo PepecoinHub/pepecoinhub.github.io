@@ -32,7 +32,7 @@ test('settlement is server-side, keyed by day and week, and pays once', () => {
   // the browser gets two read RPCs; the settlement itself is closed
   const rpcs = [...sql.matchAll(/create or replace function public\.([a-z_]+)\(/g)].map(x => x[1]).sort();
   assert.deepEqual(rpcs, ['gry_wp_hof', 'gry_wp_stats', 'gry_wp_top']);
-  assert.match(sql, /revoke all on function games\.wp_monday\(date\), games\.wp_standings\(date, date\), games\.wp_settle\(\), games\.wp_dominator_stamps\(\)/);
+  assert.match(sql, /revoke all on function games\.wp_hof_begin\(\), games\.wp_monday\(date\), games\.wp_standings\(date, date\), games\.wp_settle\(\), games\.wp_dominator_stamps\(\)/);
   // the start follows the Passport launch (first Monday on or after the Pond Pioneer snapshot); no history rebuilt
   assert.match(fnBody(sql, 'games.wp_hof_begin'), /where m\.k = 'pioneer_snapshot'/);
   assert.match(fnBody(sql, 'games.wp_hof_begin'), /st := launch \+ \(\(8 - extract\(isodow from launch\)::int\) % 7\);/);
