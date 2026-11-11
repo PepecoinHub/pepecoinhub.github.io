@@ -177,6 +177,34 @@ cooldown and the daily limit. Never point it at Supabase. Fresh Fren
 (`first_avatar`) is `live` in `docs/meme/passport-catalog.json` only because this
 secure server award path is wired and tested.
 
+### Other frens' passports (draft, not yet enabled)
+
+`games/supabase/update_passport_public.sql` adds one read-only RPC,
+`public.gry_passport_public(p_user uuid)`. Owner decisions (2026-11-08): only a
+player logged on with Discord can look, everything in the booklet is public
+(Fren, nickname, member since, stamps with dates, secrets, items, YEET best) and
+there is no switch to hide it. The owner's progress counters (PondOS days and
+streak, chat days, letters, Miner minutes, Pepe Guesser streak) and the Discord
+account id are never sent.
+
+- **Order:** after `update_fren_passport.sql` and `update_fren_avatar.sql`;
+  `update_passport_awards.sql` can run before or after it. Safe to run twice; it
+  writes nothing and awards nothing.
+- **Answers:** `{signed_in:false}` when the caller is not a Discord player,
+  `{signed_in:true, found:false}` for a guest, an e-mail account or an unknown id,
+  otherwise the same booklet data as the owner's `gry_passport_state()` without
+  `progress`. A passport is looked up by user id only, never by nickname.
+- **Browser (only with `/meme/?beta=fren`):** a name with a ✓ in the LAN Party chat
+  opens that fren's passport, read only (no Avatar Maker, no Next Milestone).
+  Guests' names stay plain text. `/meme/?fren=<user id>` opens one directly; the
+  PEP Games lobby chat links verified names there. Without the beta nothing
+  changes: names are plain text and the link opens nothing.
+- **Before the SQL runs** the window says "waiting for its database update".
+- Real-database test: `tests/passport-public-sql.test.mjs` with the same
+  `PASSPORT_PG_URL` / `PASSPORT_PG_MODULE` variables. It checks the grants, who may
+  look, that nothing private is sent, that the stamps equal the owner's own view
+  (before and after the awards migration) and that looking writes nothing.
+
 ### Avatar art (2026-11-06)
 
 The avatar layers are the hand-drawn ChatGPT art. The original sheets are kept

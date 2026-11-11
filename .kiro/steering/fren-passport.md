@@ -11,3 +11,5 @@ fileMatchPattern: ["docs/meme/passport*", "docs/meme/avatar*", "games/supabase/u
 - Stamp art follows the existing sprite (`docs/meme/passport-assets/stamps.webp`): perforated edge, coloured panel, heavy black outline, flat colours.
 - Rules and sources of every stamp: `games/FREN_PASSPORT_ACHIEVEMENTS_DECISIONS_2026-11-06.md`. A new stamp needs a backfill from existing records in its migration.
 - Pepe Guesser is the game's name everywhere (the PondOS program is `PepeGuesser.exe`).
+- **Other frens' passports** (owner, 2026-11-08): only players logged on with Discord can look; everything in the booklet is public (Fren, nickname, member since, stamps, secrets, items, YEET best) and there is no switch to hide it. The progress counters behind Next Milestone and the Discord account id stay private. Server: `gry_passport_public(p_user uuid)` in `games/supabase/update_passport_public.sql`; it must keep showing the same stamps as `gry_passport_state()`, so a change to one read path needs the same change in the other.
+- The Passport, the Avatar Maker, other frens' passports and PepeGochi stay behind the beta flags until the owner says otherwise.

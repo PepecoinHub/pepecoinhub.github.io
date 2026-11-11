@@ -33,7 +33,12 @@
   .home-focus .home-hero h1 { font-size: clamp(1.85rem, 7.5vw, 2.5rem); }
   .home-focus .home-hero .h1-sub { font-size: .59em; }
   .home-focus .home-hero .lede { font-size: .95rem; line-height: 1.6; }
-  .home-focus .home-hero-visual { display: none; }
+  /* on a phone the coin stays, small, in the hero's top right corner next to the date and the title */
+  .home-focus .home-hero { position: relative; }
+  .home-focus .home-hero-visual { position: absolute; top: 12px; right: 10px; width: 68px; height: 68px; z-index: 1; pointer-events: none; }
+  .home-focus .home-hero .hero-coin, .home-focus .home-hero-frog { width: 68px; }
+  .home-focus .home-hero .eyebrow { padding-right: 60px; }
+  .home-focus .home-hero h1 { padding-right: 50px; }
   .home-focus .pep-glance { width: 100%; box-sizing: border-box; }
   .home-focus .hero-tabs .btn { font-size: .8rem; padding: 9px 11px; }
   .home-focus .home-stats { padding: 10px; }

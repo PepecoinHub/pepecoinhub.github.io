@@ -17,6 +17,10 @@
       return localStorage.getItem('pondos-beta') === 'pondwars';
     } catch (e) { return false; }
   })();
+  // Owner sandbox activates for this visit only. The URL does not grant owner permissions.
+  var FREN_TEST = (function () {
+    try { return new URLSearchParams(location.search).get('beta') === 'fren-test'; } catch (e) { return false; }
+  })();
   // Fren Passport + Create Your Fren (avatar maker) in testing: hidden for everyone except a browser that
   // opened /meme/?beta=fren once (?beta=off hides it again). Until the Supabase migrations
   // (update_fren_passport.sql, update_fren_avatar.sql, update_passport_awards.sql) are run, the tester gets a
@@ -26,7 +30,7 @@
       var q = new URLSearchParams(location.search).get('beta');
       if (q === 'fren') localStorage.setItem('pondos-fren-beta', '1');
       if (q === 'off') localStorage.removeItem('pondos-fren-beta');
-      return localStorage.getItem('pondos-fren-beta') === '1';
+      return FREN_TEST || localStorage.getItem('pondos-fren-beta') === '1';
     } catch (e) { return false; }
   })();
   // PepeGochi in testing: hidden for everyone except a browser that opened /meme/?beta=gochi once
@@ -73,7 +77,7 @@
   ];
   // PondOS "app" name and icon for each meme page
   var APP = {
-    index: ['PEP.exe', 'pep-logo'], 'which-pepecoin': ['WhichFrog.exe', 'glasses'], compare: ['PepVsDoge.exe', 'pepe-doge'],
+    index: ['Internet', 'internet'], 'which-pepecoin': ['WhichFrog.exe', 'glasses'], compare: ['PepVsDoge.exe', 'pepe-doge'],
     'scrypt-family': ['ScryptFamily.exe', 'peaky'], mica: ['MiCA.pdf', 'serious'], glossary: ['Glossary.hlp', 'brain'],
     buy: ['BuyPEP.exe', 'wrongpep'], wallets: ['Wallets.exe', 'zipper'], mining: ['Miner.exe', 'pickaxe'],
     price: ['Price.exe', 'charts'], calculator: ['WhatIf.exe', 'p-eyes-still'], 'rich-list': ['WhaleWatch.exe', 'detective'],
@@ -206,16 +210,14 @@
       g.appendChild(b); g.appendChild(sub);
       return g;
     };
-    smMain.appendChild(el('a', { class: 'sm-item', href: './' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>My Pond</b></span>'));
     var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="' + ico('pep-logo') + '" alt="" width="28" height="28" loading="lazy"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
     meItem.addEventListener('click', function () { setOpen(false); logOn(); });
     smMain.appendChild(meItem);
-    var passportItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="img/pep-logo.webp" alt="" width="28" height="28"><span><b>Fren Passport</b><small>My Fren, achievements and secrets</small></span>');
+    var passportItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('passport') + '" alt="" width="28" height="28"><span><b>Fren Passport</b> <small>My Fren, achievements and secrets</small></span>');
     passportItem.addEventListener('click', function () { setOpen(false); frenPassport(); });
     if (FREN) smMain.appendChild(passportItem);
     var findItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('search') + '" alt="" width="28" height="28"><span><b>Find…</b> <small>games, pages, tools</small></span>');
     findItem.addEventListener('click', function () { setOpen(false); finder(); });
-    smMain.appendChild(findItem);
     smMain.appendChild(el('hr'));
     NAV.forEach(function (g, gi) {
       var list = el('div', { class: 'sm-list' });
@@ -233,7 +235,7 @@
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', function () { pepeSweeperApp(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
-      ['Draw & Guess', 'Charades with other frens', 'gif-061-still', function () { drawGuess(); }],
+      ['PEPaint', 'The party room: draw and guess with frens', 'pepaint', function () { drawGuess(); }],
       ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', function () { pepegochiApp(); }],
         ['PEPEGOCHI (local test)', 'Rules simulator with a time machine · nothing is saved', 'pep-logo', function () { pepegochiTestApp(); }]] : []).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
@@ -241,22 +243,19 @@
       gl.appendChild(b);
     });
     smMain.appendChild(subGroup('Games', 'gif-061-still', gl));
-    smMain.appendChild(el('hr'));
     var winsUl = el('ul', { class: 'sm-wins' });
-    smMain.appendChild(subGroup('Windows on this page', 'gif-045-still', winsUl, 'sm-windows'));
+    var winsGroup = subGroup('Windows on this page', 'gif-045-still', winsUl, 'sm-windows');
     var arrange = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">▦</span><span>Arrange windows</span>');
     var sd = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">⏻</span><span>Shut down…</span>');
     arrange.addEventListener('click', function () { setOpen(false); arrangeAll(); });
     sd.addEventListener('click', function () { setOpen(false); shutDown(); });
-    smMain.appendChild(el('a', { class: 'sm-item', href: serious }, '<img src="' + ico('serious') + '" alt="" width="28" height="28" loading="lazy"><span>Serious mode</span>'));
-    var lanItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('gif-080-still') + '" alt="" width="28" height="28" loading="lazy"><span>LAN Party chat</span>');
-    lanItem.addEventListener('click', function () { setOpen(false); lanParty(); });
-    smMain.appendChild(lanItem);
     [['Frog Mail', 'frog-mail', function () { frogMail(); }], ['AddressCheck.exe', 'pepe-search', function () { addressCheck(); }]].forEach(function (x) {
       var it = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico(x[1]) + '" alt="" width="28" height="28"><span>' + x[0] + (x[0] === 'Frog Mail' ? ' <b class="mail-new sm-new" hidden>1 new</b>' : '') + '</span>');
       it.addEventListener('click', function () { setOpen(false); x[2](); });
       smMain.appendChild(it);
     });
+    smMain.appendChild(el('hr'));
+    smMain.appendChild(winsGroup);
     var themeItem = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">🌓</span><span>Day / night mode</span>');
     themeItem.addEventListener('click', function () { setOpen(false); if (themeBtn) themeBtn.click(); });
     smMain.appendChild(themeItem);
@@ -265,6 +264,7 @@
     var aboutItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('night-shift') + '" alt="" width="28" height="28"><span>About me</span>');
     aboutItem.addEventListener('click', function () { setOpen(false); aboutMe(); });
     smMain.appendChild(aboutItem);
+    smMain.appendChild(findItem);
     smMain.appendChild(sd);
     nav.appendChild(el('div', { class: 'sm-band', 'aria-hidden': 'true' }, '<span>Pond<b>OS</b> 1.0</span>'));
     nav.appendChild(smMain);
@@ -431,7 +431,7 @@
   };
   function winTitle(host, body) {
     var app = (APP[PAGE] || ['PEP.exe'])[0], lab = host.getAttribute('aria-labelledby') || '';
-    if (body.classList.contains('hero')) return 'PEP.exe - Pepecoin (PEP), meme edition';
+    if (body.classList.contains('hero')) return 'Internet - Pepecoin Hub, meme edition';
     if (body.classList.contains('pagehead')) { var h1 = body.querySelector('h1'); return app + ' - ' + (h1 ? h1.textContent.replace(/\s+/g, ' ').trim().split(/[.?:!]/)[0] : 'Pepecoin'); }
     if (body.classList.contains('chooser')) return 'Choose your frog';
     if (body.classList.contains('loading')) return 'Loading…';
@@ -542,7 +542,7 @@
     var title = opts.title || winTitle(host, body);
     // the window's icon is its first picture, so the taskbar buttons are told apart at a glance
     var pic = body.querySelector('img:not([src$=".svg"])');
-    var iconSrc = opts.icon ? ico(opts.icon) : body.classList.contains('hero') ? 'img/pep-logo.webp' : pic ? icoFrom(pic.getAttribute('src')) : ico((APP[PAGE] || ['', 'pep-logo'])[1]);
+    var iconSrc = opts.icon ? ico(opts.icon) : body.classList.contains('hero') ? ico('internet') : pic ? icoFrom(pic.getAttribute('src')) : ico((APP[PAGE] || ['', 'pep-logo'])[1]);
     host.classList.add('wide'); // every window takes the full width: the pages' inner layouts need it
     var win = el('div', { class: 'win' });
     var bar = el('div', { class: 'win-bar' }, '<img src="' + iconSrc + '" alt="" width="16" height="16" loading="lazy"><span class="win-t">' + esc(title) + '</span>' +
@@ -716,7 +716,7 @@
       var hero = null;
       wins.forEach(function (w) { if (w.body.classList.contains('hero')) hero = w; });
       if (hero) {
-        var row = el('div', { class: 'win-launch' }, '<p>Explore the pond, open a window:</p>');
+        var row = el('div', { class: 'win-launch' }, '<p>Looking for facts? Open a window:</p>');
         wins.forEach(function (w) {
           if (w === hero || w.body.classList.contains('chooser')) return;
           w.host.classList.remove('is-min'); w.state = 'closed'; w.host.classList.add('is-closed'); sync(w);
@@ -724,7 +724,7 @@
           b.addEventListener('click', function () { setState(w, 'open'); });
           row.appendChild(b);
         });
-        var ctas = hero.body.querySelector('.ctas');
+        var ctas = hero.body.querySelector('.pond-do') || hero.body.querySelector('.ctas');
         if (ctas) ctas.parentNode.insertBefore(row, ctas.nextSibling); else hero.win.insertBefore(row, hero.status || null);
       }
     }
@@ -766,7 +766,7 @@
       ['nerds', [['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#reddit', 'r/pepecoin', 'reddit'], ['#twitter', 'Twitter', 'twitter-bird']]],
       ['bin', [['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
-    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -1061,6 +1061,19 @@
       '<button type="button" class="btn go tp-play">Play today\u2019s photo \u2192</button>');
     ctas.parentNode.insertBefore(card, ctas.nextSibling);
     card.querySelector('.tp-play').addEventListener('click', function () { wheresPepe(); });
+    // "Click around": the pond is more than one page. Five big doors right under today's game.
+    var doors = el('div', { class: 'pond-do', role: 'group', 'aria-label': 'Things to do in the pond' }, '<p>Click, check, search. It is a whole pond in here:</p>');
+    [['newspaper-still', 'Read the Gazette', 'The pond\u2019s own newspaper', function () { frogMail('gz'); }],
+      ['gif-080-still', 'Drop by the LAN Party', 'Say gm in the chat', function () { lanParty(); }],
+      ['games-folder', 'Play something', 'Snake, Chess, YEET and more', function () { gamesFolder(); }],
+      ['pepe-search', 'Check an address', 'PEP or the wrong frog?', function () { addressCheck(); }],
+      ['leaders', 'See the LEADERS', 'Every top 10 in one place', function () { highScores(); }],
+      ['search', 'Find anything', 'Games, pages, tools', function () { finder(); }]].forEach(function (d) {
+      var b = el('button', { type: 'button', class: 'pd-door' }, '<img src="' + ico(d[0]) + '" alt="" width="36" height="36" loading="lazy"><span><b>' + d[1] + '</b><small>' + d[2] + '</small></span>');
+      b.addEventListener('click', d[3]);
+      doors.appendChild(b);
+    });
+    card.parentNode.insertBefore(doors, card.nextSibling);
     var stats = card.querySelector('.tp-stats'), bits = [];
     var paint = function () { stats.textContent = bits.filter(Boolean).join(' \u00b7 '); };
     setTimeout(function () {   // after the rest of this file has set up the Supabase address
@@ -1419,17 +1432,28 @@
       choose();
     }, 500);
   }
-  // Draw & Guess (charades with other players): the PEP Games lobby opens on its rooms, inside a window
-  function drawGuess() {
-    var G = BASE + 'games/';
-    if (window.innerWidth < 760) { location.href = osPage('#game-dg'); return; }
-    tabbedGame('dg', 'Draw & Guess - PEP charades', 'gif-061-still', [
-      ['LAN Party: rooms', G + '?embed=1&only=dg#game-dg', function (row) {
-        row.innerHTML = '<span class="grow">Start a room and share the link with frens (up to 12 players), join an open room, or type a room code. Needs a <a href="#" class="tab-logon">log on</a> (Discord or guest).</span>';
-        row.querySelector('.tab-logon').addEventListener('click', function (e) { e.preventDefault(); logOn(); });
-      }],
-      ['How to play', G + 'rules.html?embed=1', null]
-    ], 980);
+  // PEPaint.exe: the party room (Draw & Guess) in a paint-program window. It opens straight on its main menu
+  // (new party room, quick join, join with a code, the open rooms); the rooms open in the same window.
+  // The page inside tells the title bar where it is ("Room ABCDE - PEPaint") and File > Exit closes the window.
+  function drawGuess(join) {
+    join = typeof join === 'string' ? join : '';
+    var G = BASE + 'games/', q = join ? '&join=' + encodeURIComponent(join) : '';
+    if (window.innerWidth < 760) { location.href = osPage('pepaint.html' + (join ? '?join=' + encodeURIComponent(join) : '')); return; }
+    var A = openApp('dg', 'Main menu - PEPaint', 'pepaint', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame pepaint-frame" src="' + G + 'pepaint.html?embed=1' + q + '" title="PEPaint" allow="clipboard-write"></iframe>';
+      A.body.style.padding = '0';
+      var fr = A.body.querySelector('iframe'), t = A.host.querySelector('.win-t');
+      var onMsg = function (e) {
+        if (e.source !== fr.contentWindow || e.origin !== location.origin || !e.data) return;
+        if (e.data.type === 'pepaint-title' && typeof e.data.title === 'string') { t.textContent = e.data.title.slice(0, 60); A.host.setAttribute('aria-label', t.textContent); }
+        else if (e.data.type === 'pepaint-close') A.close();
+      };
+      window.addEventListener('message', onMsg);
+      A.stop = function () { window.removeEventListener('message', onMsg); };
+    }, 1180);
+    A.host.classList.add('pepaint-window');
+    A.host.style.top = '12px'; A.host.style.setProperty('--app-top', '12px');
+    return A;
   }
   function yeetApp() {
     var A = openApp('yeet', 'YEET THE PEP', 'yeet', function (A) {
@@ -1509,7 +1533,7 @@
       ['Checkers', 'vs the bot or with a fren', 'pond-playground', 'game board checkers draughts warcaby bot friend', function () { boardGame('checkers', 'Checkers'); }],
       ['Connect Four', 'vs the bot or with a fren', 'pond-playground', 'game board connect four 4 bot friend', function () { boardGame('connect4', 'Connect Four'); }],
       ['Sea Battle', 'vs the bot or with a fren', 'pond-playground', 'game board battleship ships sea bot friend statki', function () { boardGame('battleship', 'Sea Battle'); }],
-      ['Draw & Guess', 'Charades with frens', 'gif-061-still', 'game draw guess charades kalambury multiplayer room', drawGuess],
+      ['PEPaint.exe', 'The party room: draw and guess with frens', 'pepaint', 'game draw guess charades kalambury paint party multiplayer room pepaint', drawGuess],
       ['Pepe Pictures', 'Weekly quiz night: host wanted', 'unclesam', 'game quiz pictures host night', pepePictures],
       ['Games folder', 'All the games', 'games-folder', 'games play folder', gamesFolder],
       ['LAN Party', 'The lobby chat', 'gif-080-still', 'chat talk frens online lobby messages', lanParty],
@@ -1574,9 +1598,9 @@
         ['PEPE SWEEPER', 'pepesweeper', function () { pepeSweeperApp(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
-        ['Draw & Guess', 'gif-061-still', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];
+        ['PEPaint.exe', 'pepaint', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];
       A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="' + ico(g[1]) + '" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or get a link for a fren. Draw &amp; Guess: open a room for frens or join one with a code. 🏆 LEADERS has every top 10.</p>';
+        '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or get a link for a fren. PEPaint: the party room, draw and guess with frens. 🏆 LEADERS has every top 10.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { G[+b.getAttribute('data-i')][2](); };
         b.addEventListener('dblclick', go);
@@ -1658,9 +1682,29 @@
   // signed in with Discord), the Passport and the Avatar Maker run on a local copy kept in this browser only.
   // Nothing is sent to the server and no stamp is real; the Passport says so at the top.
   var FREN_LOCAL = 'pondos-fren-preview';
+  var FREN_TEST_LOCAL = 'pondos-fren-owner-sandbox-v1:';
   var frenMissing = function (err) { return /PGRST202|could not find the function|does not exist/i.test((err && err.message) || ''); };
+  function frenTestKey() {
+    var s = sbSession();
+    return FREN_TEST_LOCAL + (s && s.discord && s.userId ? s.userId : 'no-owner');
+  }
+  // The existing Frog Mail owner RPC checks games.owners on the server.
+  // Never infer ownership from a URL, localStorage, or a client-supplied Discord ID.
+  function frenTestAuthorize() {
+    var s = sbSession();
+    if (!s || !s.discord || !s.userId)
+      return Promise.reject(new Error('Log on with the owner Discord account to use the test sandbox.'));
+    return rpc('gry_letters', { p_limit: 1 }).then(function (j) {
+      if (!j || !Array.isArray(j.letters)) throw new Error('Only the verified PondOS owner can use this sandbox.');
+      return s;
+    }, function () { throw new Error('Owner verification failed. Check your Discord login and try again.'); });
+  }
   function frenLocal(v) {
-    try { if (v) localStorage.setItem(FREN_LOCAL, JSON.stringify(v)); return JSON.parse(localStorage.getItem(FREN_LOCAL) || 'null') || {}; } catch (e) { return v || {}; }
+    var key = FREN_TEST ? frenTestKey() : FREN_LOCAL;
+    try {
+      if (v) localStorage.setItem(key, JSON.stringify(v));
+      return JSON.parse(localStorage.getItem(key) || 'null') || {};
+    } catch (e) { return v || {}; }
   }
   function frenPreview(name, args) {
     var L = frenLocal(), now = new Date().toISOString();
@@ -1672,20 +1716,74 @@
       frenLocal(L);
       return { avatar: L.avatar, badge: { id: 'first_avatar', earned_at: L.first_avatar, new: first } };
     }
+    if (name === 'gry_passport_discover' && FREN_TEST) {
+      var id = String(args.p_secret || '');
+      var allowed = ['wrong_frog','why_tho','magic_word','bsod_fren','midnight_fren','nerd_alert','bali_dreamer',
+        'happy_fren','born_to_fren','find_fren','address_check'];
+      if (allowed.indexOf(id) < 0) return {};
+      L.secrets = Array.isArray(L.secrets) ? L.secrets : [];
+      var old = L.secrets.some(function (x) { return x.id === id; });
+      if (!old) L.secrets.push({ id: id, discovered_at: now });
+      frenLocal(L);
+      return { id: id, new: !old, discovered_at: now };
+    }
     if (name === 'gry_passport_state') {
-      var me = whoAmI();
+      var me = whoAmI(), badges = FREN_TEST && Array.isArray(L.achievements) ? L.achievements.slice() : [];
+      if (L.first_avatar && !badges.some(function (x) { return x.id === 'first_avatar'; }))
+        badges.push({ id: 'first_avatar', title: 'Fresh Fren', earned_at: L.first_avatar });
       return { signed_in: true, preview: true, nickname: (me && me.name) || 'Test fren', member_since: L.since, yeet_best: null,
-        achievements: L.first_avatar ? [{ id: 'first_avatar', title: 'Fresh Fren', earned_at: L.first_avatar }] : [],
-        secrets: [], items: [], progress: {}, avatar: L.avatar || null };
+        achievements: badges, secrets: FREN_TEST && Array.isArray(L.secrets) ? L.secrets.slice() : [],
+        items: [], progress: {}, avatar: L.avatar || null, test_all_unlocked: FREN_TEST && !!L.all_unlocked };
     }
     return {};
   }
-  // the passport RPCs: in the test preview a missing server function (or no Discord log-on) falls back to frenPreview
+  // In owner test mode passport calls are ALWAYS local: no server award/save/discover RPC is reachable.
+  // In ordinary beta mode preserve the existing fallback until migrations launch.
   function frenRpc(name, args) {
     var s = sbSession();
     if (!FREN) return rpc(name, args);
+    if (FREN_TEST) return frenTestAuthorize().then(function () { return frenPreview(name, args || {}); });
     if (!s || !s.discord) return Promise.resolve(frenPreview(name, args));
     return rpc(name, args).catch(function (err) { if (frenMissing(err)) return frenPreview(name, args); throw err; });
+  }
+  function frenTestChange(action, id) {
+    return frenTestAuthorize().then(function () {
+      var d = passportMine();
+      if (!d || !d.catalog || !d.opts) throw new Error('Open the Passport again to load the test catalog.');
+      var L = frenLocal(), now = new Date().toISOString();
+      var badges = d.catalog.achievements || [], secrets = d.catalog.secrets || [];
+      var badge = badges.find(function (x) { return x.id === id && x.id !== 'bali'; });
+      var secret = secrets.find(function (x) { return x.id === id; });
+      if (action === 'reset') {
+        localStorage.removeItem(frenTestKey());
+      } else if (action === 'all') {
+        L.all_unlocked = !L.all_unlocked;
+        frenLocal(L);
+      } else {
+        if (action === 'avatar') {
+          var av = (d.opts.options.special || []).find(function (x) { return x.id === id && x.unlock; });
+          if (!av) throw new Error('Choose a special avatar.');
+          id = av.unlock;
+          badge = badges.find(function (x) { return x.id === id && x.id !== 'bali'; });
+          secret = secrets.find(function (x) { return x.id === id; });
+          action = badge ? 'stamp' : 'secret';
+        }
+        if (action === 'stamp' && badge) {
+          L.achievements = Array.isArray(L.achievements) ? L.achievements : [];
+          if (!L.achievements.some(function (x) { return x.id === id; }))
+            L.achievements.push({ id: id, title: badge.title || id, earned_at: now });
+          frenLocal(L);
+        } else if (action === 'secret' && secret) {
+          L.secrets = Array.isArray(L.secrets) ? L.secrets : [];
+          if (!L.secrets.some(function (x) { return x.id === id; }))
+            L.secrets.push({ id: id, discovered_at: now });
+          frenLocal(L);
+        } else throw new Error('Unknown test reward.');
+      }
+      return passportLoad(sbSession()).then(function () {
+        if (apps.passport && apps.passport.render) apps.passport.render();
+      });
+    });
   }
   // one read: the server snapshot, plus two static files from this site (labels and avatar parts)
   function passportLoad(session) {
@@ -1700,8 +1798,20 @@
   }
   function passportMine() {
     var s = sbSession();
+    if (FREN_TEST) return s && s.discord && passportCache && passportCache.preview && passportCache.userId === s.userId ? passportCache : null;
     if (FREN && passportCache && passportCache.preview) return passportCache;
     return s && s.discord && passportCache && passportCache.userId === s.userId ? passportCache : null;
+  }
+  // another fren's passport, read only (games/supabase/update_passport_public.sql): the server answers only
+  // a fren logged on with Discord, and never sends the owner's progress counters. No local preview here:
+  // what you see of somebody else is always what the server has.
+  var FREN_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  function passportOf(id) {
+    return Promise.all([
+      rpc('gry_passport_public', { p_user: id }),
+      fetch(PP_CATALOG).then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }).catch(function () { return null; }),
+      avatarOptions().catch(function () { return null; })
+    ]).then(function (r) { return { userId: id, state: r[0] || {}, catalog: r[1], opts: r[2] }; });
   }
 
   // ---------- Fren Passport art (hand-drawn, cut by scripts/build_passport_art.py) ----------
@@ -1712,19 +1822,8 @@
   var PP_STAMPS = ['calendar', 'gamepad', 'pickaxe', 'duck', 'magnifier', 'folders', 'computer', 'people',
     'sprout', 'handshake', 'rocket', 'binoculars', 'deerstalker', 'moon', 'joystick', 'locked'];
   var PP_ICONS = ['plane', 'calendar', 'trophy', 'box', 'gamepad', 'star', 'gift', 'tab_home', 'tab_trophy', 'tab_stamp', 'tab_box', 'tab_stats'];
-  // the stamp each achievement shows once earned; anything else falls back to its category
-  // (stamps without their own drawing yet reuse the closest one)
-  var PP_STAMP_OF = {
-    first_fren: 'duck', first_avatar: 'sprout', moonwalker: 'moon', like_it_here: 'calendar', welcome_back: 'duck', senior_editor: 'folders', certified_fren: 'handshake',
-    pond_pioneer: 'handshake', sharp_eye: 'magnifier', week_scout: 'binoculars', first_words: 'people', hey_fren: 'people',
-    dear_editor: 'computer', junior_editor: 'folders', rookie_miner: 'pickaxe',
-    community_fren: 'people', pepe_guesser: 'binoculars',
-    scout_fren: 'binoculars', detective_fren: 'deerstalker',
-    game_night: 'computer', arcade_hopper: 'joystick', yeet_adept: 'rocket', nasa_is_hiring: 'rocket',
-    first_hatch: 'sprout'
-  };
-  var PP_STAMP_CAT = { community: 'people', avatar: 'sprout', yeet: 'rocket', where_pepe: 'binoculars', arcade: 'joystick',
-    pepegachi: 'sprout', secrets: 'magnifier', exploration: 'magnifier' };
+  // The legacy atlas is used only for the uniform locked stamp icon.
+  // All earned stamp art must come from the approved V3 atlas or the neutral placeholder.
   function ppSprite(cls, names, name, label) {
     var i = Math.max(0, names.indexOf(name));
     var n = el('span', label ? { class: cls, role: 'img', 'aria-label': label } : { class: cls, 'aria-hidden': 'true' });
@@ -1748,19 +1847,26 @@
     'old_frog', 'vox_populi', 'checkmate', 'detective_fren', 'like_it_here',
     'first_fren', 'first_avatar', 'welcome_back', 'pepe_guesser', 'sharp_eye',
     'good_game', 'rookie_miner', 'dear_editor', 'i_voted', 'secret_starter'];
+  // Only owner-approved art (#257): missing art gets a neutral placeholder, never Lily or another stamp's drawing.
   function ppStamp(x, earned) {
     if (earned && x.id === 'pond_pioneer') return el('span', {class:'pp-art pp-art-stamp is-pioneer',role:'img','aria-label':'Pond Pioneer'});
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
-    var art = earned ? (PP_STAMP_OF[x.id] || PP_STAMP_CAT[x.category] || 'duck') : 'locked';
-    return ppSprite('pp-art pp-art-stamp', PP_STAMPS, art);
+    if (!earned) return ppSprite('pp-art pp-art-stamp', PP_STAMPS, 'locked');
+    var pending = el('span', { class: 'pp-art pp-art-stamp is-pending', 'aria-hidden': 'true' });
+    pending.textContent = '?';
+    return pending;
   }
   function ppIcon(name) { return ppSprite('pp-art pp-art-icon', PP_ICONS, name); }
 
-  function frenPassport(fromCache) {
-    var A = openApp('passport', 'Fren Passport - Properties', 'pep-logo', function (A) {
+  // other: { id, nick } opens another fren's passport, read only (one window per fren); without it, your own
+  function frenPassport(fromCache, other) {
+    var mine = sbSession();
+    if (other && (!FREN_ID.test(other.id || '') || (mine && mine.userId === other.id))) other = null;   // your own name opens your own
+    var who = other ? other.nick || 'this fren' : '';
+    var A = openApp(other ? 'passport:' + other.id.toLowerCase() : 'passport', other ? (other.nick ? 'Fren Passport - ' + other.nick : 'Fren Passport') : 'Fren Passport - Properties', 'pep-logo', function (A) {
       passportCss();
       A.host.classList.add('fren-win');
-      A.body.innerHTML = '<div class="passport"><p class="passport-muted" role="status">Loading your Fren Passport…</p></div>';
+      A.body.innerHTML = '<div class="passport"><p class="passport-muted" role="status">' + (other ? 'Loading the Fren Passport of ' + esc(who) + '…' : 'Loading your Fren Passport…') + '</p></div>';
       function notice(message, needsLogin) {
         var box = A.body.querySelector('.passport');
         if (!box) return;
@@ -1784,7 +1890,7 @@
       // Tabs (Overview, Stamps, Collection, Stats) show the same data in list form.
       var tab = 0;
       A.render = function () {
-        var d = passportMine(), box = A.body.querySelector('.passport');
+        var d = other ? A.view : passportMine(), box = A.body.querySelector('.passport');
         if (!d || !box) return;
         var state=d.state, catalog=d.catalog;
         var earnedBadges = Array.isArray(state.achievements) ? state.achievements : [];
@@ -1846,10 +1952,10 @@
         var book = el('div', {class:'pp-book'});
         var left = el('section', {class:'pp-page pp-left','aria-label':'Fren identity'});
         var look = d.opts && avatarLook(d.opts, state.avatar);
-        var photo = el('button', {type:'button',class:'pp-photo',title: d.opts ? (look ? 'Edit your Fren' : 'Create your Fren') : 'Your Fren'});
-        if (look) photo.appendChild(avatarStack(d.opts, look, 'Your Fren: ' + avatarSay(d.opts, look)));
+        var photo = el('button', {type:'button',class:'pp-photo',title: other ? 'The Fren of ' + who : d.opts ? (look ? 'Edit your Fren' : 'Create your Fren') : 'Your Fren'});
+        if (look) photo.appendChild(avatarStack(d.opts, look, (other ? 'The Fren of ' + who + ': ' : 'Your Fren: ') + avatarSay(d.opts, look)));
         else photo.appendChild(el('img',{src:'img/pep-logo.webp',alt:'PepecoinHub frog emblem',width:'64',height:'64'}));
-        if (d.opts) photo.addEventListener('click', openMaker); else photo.disabled = true;
+        if (d.opts && !other) photo.addEventListener('click', openMaker); else photo.disabled = true;
         left.appendChild(photo);
         left.appendChild(el('img', {class:'pp-page-art',src:PP_ART+'page-left.webp'+PP_ART_V,alt:'',width:'360',height:'528',draggable:'false'}));
         var idcard = el('dl', {class:'pp-idcard'});
@@ -1884,14 +1990,14 @@
           : el('button', {type:'button',class:'pp-bali','aria-label':'BALI: $0.01 - BALI. Reserved mythic stamp for every fren when Pepecoin reaches $0.01 USD. Locked.',
               title:'Reserved mythic stamp - every fren gets it when Pepecoin reaches $0.01 USD'});
         if (baliE) baliBtn.appendChild(baliMark(baliE));
-        baliBtn.addEventListener('click', function(){ baliTouch(!!baliE); });
+        baliBtn.addEventListener('click', function(){ baliTouch(!!baliE, other); });
         right.appendChild(baliBtn);
         book.appendChild(right);
 
         // ---------- side panels: My Fren Journey + Next Milestone ----------
         var side = el('aside', {class:'pp-side'});
         var journey = el('section', {class:'pp-panel'});
-        var jh = el('h3', {class:'pp-panel-h'}); jh.appendChild(ppIcon('plane')); jh.appendChild(document.createTextNode('My Fren Journey')); journey.appendChild(jh);
+        var jh = el('h3', {class:'pp-panel-h'}); jh.appendChild(ppIcon('plane')); jh.appendChild(document.createTextNode(other ? 'Fren Journey' : 'My Fren Journey')); journey.appendChild(jh);
         var jl = el('dl', {class:'pp-jlist'});
         [
           ['calendar', 'Days registered:', days==null?'—':fmt.int(days)],
@@ -1933,8 +2039,9 @@
             ? 'Every stamp you can earn today is yours. More are coming soon.' : 'Every stamp collected. Legend.'));
           mile.appendChild(mb);
         }
-        side.appendChild(mile);
-        if (d.opts) {
+        // another fren's passport: no Next Milestone (the server does not send their counters) and no editing
+        if (!other) side.appendChild(mile);
+        if (d.opts && !other) {
           var make = el('button', {type:'button',class:'app-btn pp-make'});
           make.textContent = look ? 'Edit your Fren' : 'Create your Fren';
           make.addEventListener('click', openMaker);
@@ -2054,7 +2161,7 @@
 
         // Avatars: the special avatars of Create Your Fren, and what opens each one
         if (d.opts) {
-          var ownsAv = function (u) { return !!earnedOf(u) || discovered.some(function (x) { return x.id === u && x.discovered_at; }); };
+          var ownsAv = function (u) { return !!(FREN_TEST && state.test_all_unlocked) || !!earnedOf(u) || discovered.some(function (x) { return x.id === u && x.discovered_at; }); };
           var avs = (d.opts.options.special || []).filter(function (p) { return p.id !== AV_PLAIN; });
           var avOpen = avs.filter(function (p) { return !p.unlock || ownsAv(p.unlock); }).length;
           var avSec = el('section', {class:'pp-panel pp-avatars'});
@@ -2069,7 +2176,7 @@
             li.appendChild(pic);
             li.appendChild(piece('b','', avName(p)));
             li.appendChild(piece('small','', open ? (worn ? 'Wearing it now' : 'Unlocked') : avHow(p.unlock)));
-            if (open) {
+            if (open && !other) {   // another fren's passport: look only, the buttons would open your own maker
               var wear = el('button', {type:'button',class:'app-btn pp-av-btn'});
               wear.textContent = worn ? 'Edit your Fren' : 'Wear it';
               wear.addEventListener('click', function () { avatarMaker(); });
@@ -2078,7 +2185,8 @@
             avGrid.appendChild(li);
           });
           avSec.appendChild(avGrid);
-          avSec.appendChild(piece('p','pp-muted','A special avatar covers your Fren\'s parts (not the background). Pick one in Create Your Fren, under Special.'));
+          avSec.appendChild(piece('p','pp-muted', other ? 'The special avatars ' + who + ' has opened. Each fren picks theirs in Create Your Fren.'
+            : 'A special avatar covers your Fren\'s parts (not the background). Pick one in Create Your Fren, under Special.'));
           panes[2].appendChild(avSec);
         } else {
           panes[2].appendChild(piece('p','pp-muted','The avatar list did not load. Close the Passport and open it again.'));
@@ -2121,7 +2229,7 @@
           ['Avatar saved', look ? 'Yes' : 'Not yet']
         ].forEach(function(v){ var r=el('div'); r.appendChild(piece('dt','',v[0])); r.appendChild(piece('dd','',v[1])); st.appendChild(r); });
         stSec.appendChild(st);
-        stSec.appendChild(piece('p','pp-muted','Days registered counts calendar days since you joined; it is not an activity counter.'));
+        stSec.appendChild(piece('p','pp-muted','Days registered counts calendar days since ' + (other ? 'this fren' : 'you') + ' joined; it is not an activity counter.'));
         panes[4].appendChild(stSec);
 
         box.appendChild(bar98);
@@ -2129,11 +2237,79 @@
         pick(tab);
         if (state.preview) {
           var pv = el('p', { class: 'passport-note fren-preview', role: 'note' });
-          pv.textContent = 'TEST PREVIEW (?beta=fren): kept in this browser only. Nothing is saved on the server and no stamp here is real.';
+          pv.textContent = FREN_TEST
+            ? 'OWNER SANDBOX (?beta=fren-test): simulated stamps, secrets and avatar looks exist only in this browser. No real rewards are awarded.'
+            : 'TEST PREVIEW (?beta=fren): kept in this browser only. Nothing is saved on the server and no stamp here is real.';
           box.insertBefore(pv, box.firstChild);
+        }
+        if (FREN_TEST && !other && state.preview && d.opts && catalog) {
+          var sandbox = el('section', { class: 'pp-test-tools', 'aria-label': 'Owner test sandbox' });
+          sandbox.appendChild(piece('h3', 'pp-test-heading', 'Owner test sandbox'));
+          sandbox.appendChild(piece('p', 'pp-test-info', 'Simulate unlocks to inspect every avatar and stamp. Stored in this browser only; no Supabase writes.'));
+          var status = piece('p', 'pp-test-status', '');
+          function runTest(action, id, button) {
+            button.disabled = true;
+            frenTestChange(action, id).catch(function (err) {
+              if (status.isConnected) status.textContent = (err && err.message) || 'Could not update the local test sandbox.';
+            }).then(function () { button.disabled = false; });
+          }
+          function testRow(title, values, buttonText, action) {
+            var row = el('div', { class: 'pp-test-row' });
+            var sel = el('select', { class: 'pp-test-select', 'aria-label': title });
+            values.forEach(function (v) {
+              var option = el('option', { value: v.id });
+              option.textContent = v.label || v.title || v.id;
+              sel.appendChild(option);
+            });
+            var button = el('button', { type: 'button', class: 'app-btn' });
+            button.textContent = buttonText;
+            button.disabled = !values.length;
+            button.addEventListener('click', function () { runTest(action, sel.value, button); });
+            row.appendChild(sel); row.appendChild(button); sandbox.appendChild(row);
+          }
+          testRow('Special avatar', (d.opts.options.special || []).filter(function (x) { return x.unlock; }),
+            'Unlock avatar', 'avatar');
+          testRow('Stamp', (catalog.achievements || []).filter(function (x) { return x.id !== 'bali'; }),
+            'Simulate stamp', 'stamp');
+          testRow('Secret or event', catalog.secrets || [], 'Simulate secret', 'secret');
+          var actions = el('div', { class: 'pp-test-row' });
+          var all = el('button', { type: 'button', class: 'app-btn' });
+          all.textContent = state.test_all_unlocked ? 'Disable all-unlocked preview' : 'Preview all avatars unlocked';
+          all.addEventListener('click', function () { runTest('all', '', all); });
+          var reset = el('button', { type: 'button', class: 'app-btn' });
+          reset.textContent = 'Reset sandbox';
+          reset.addEventListener('click', function () {
+            if (window.confirm('Reset only the local owner test sandbox? Real achievements will not change.'))
+              runTest('reset', '', reset);
+          });
+          actions.appendChild(all); actions.appendChild(reset);
+          sandbox.appendChild(actions); sandbox.appendChild(status);
+          box.insertBefore(sandbox, box.firstChild);
+        }
+        if (other) {
+          var ro = el('p', { class: 'passport-note pp-other', role: 'note' });
+          ro.textContent = 'The Fren Passport of ' + who + ', as the server has it. Only they can change it.';
+          box.insertBefore(ro, box.firstChild);
         }
       };
       var session = sbSession();
+      if (other) {
+        if (!session || !session.discord) { notice('Log on with Discord to look at the Fren Passports of other frens.', true); return; }
+        passportOf(other.id).then(function (v) {
+          if (!v.state.signed_in) { notice('Your Discord session expired. Please log on again.', true); return; }
+          if (!v.state.found) { notice(who + ' has no Fren Passport. Only frens logged on with Discord have one.', false); return; }
+          if (!other.nick && (v.state.nick || v.state.nickname)) {   // opened from a link: the name comes from the server
+            who = v.state.nick || v.state.nickname;
+            var wt = A.host.querySelector('.win-t'); if (wt) wt.textContent = 'Fren Passport - ' + who;
+            A.host.setAttribute('aria-label', 'Fren Passport - ' + who);
+          }
+          A.view = v; A.render();
+        }).catch(function (err) {
+          notice(frenMissing(err) ? 'Looking at the Fren Passports of other frens is waiting for its database update.'
+            : 'Could not load this Fren Passport. Please try again later.', false);
+        });
+        return;
+      }
       if (!FREN && (!session || !session.discord)) {
         notice('Log on with Discord to see your private passport. Guest scores do not create a permanent collection.', true);
         return;
@@ -2146,7 +2322,7 @@
       }).catch(function(err){
         notice(/PGRST202|could not find the function|does not exist/i.test(err.message||'')
           ? 'Fren Passport is waiting for its database update.'
-          : 'Could not load your profile. Please try again later.',false);
+          : FREN_TEST ? (err.message || 'Owner sandbox access denied.') : 'Could not load your profile. Please try again later.',false);
       });
     }, 1000);
     return A;
@@ -2262,19 +2438,23 @@
       A.body.innerHTML = '<div class="fa-load"><p class="passport-muted" role="status">Loading the Avatar Maker…</p></div>';
       var session = sbSession(), signed = FREN || !!(session && session.discord && session.userId);
       // opened from the Passport: its snapshot already has the saved look; otherwise read it once
-      Promise.all([avatarOptions(), signed && !passportMine() ? passportLoad(session).catch(function () { return null; }) : null]).then(function (r) {
+      var loading = FREN_TEST
+        ? frenTestAuthorize().then(function () { return Promise.all([avatarOptions(), passportLoad(session)]); })
+        : Promise.all([avatarOptions(), signed && !passportMine() ? passportLoad(session).catch(function () { return null; }) : null]);
+      loading.then(function (r) {
         if (signed && r[1] && !r[1].signed_in) signed = false;
         build(r[0], signed);
-      }, function () {
+      }, function (err) {
         var box = A.body.querySelector('.fa-load');
-        if (box) box.innerHTML = '<p class="passport-note" role="status">Could not load the Fren parts. Please try again later.</p>';
+        if (box) box.replaceChildren(piece('p', 'passport-note', FREN_TEST ? (err.message || 'Owner verification failed.') : 'Could not load the Fren parts. Please try again later.'));
       });
       function build(o, signed) {
         var d = signed ? passportMine() : null;
         // a stamp the server says this player has earned (reward parts open with it)
         var owns = function (id) {
           var l = d && Array.isArray(d.state.achievements) ? d.state.achievements : [], s = d && Array.isArray(d.state.secrets) ? d.state.secrets : [];
-          return l.some(function (b) { return b.id === id && !!b.earned_at; }) || s.some(function (x) { return x.id === id && !!x.discovered_at; });
+          return !!(FREN_TEST && d && d.state.test_all_unlocked) ||
+            l.some(function (b) { return b.id === id && !!b.earned_at; }) || s.some(function (x) { return x.id === id && !!x.discovered_at; });
         };
         var saved = d ? avatarLook(o, d.state.avatar) : null;
         var start = saved || avatarLook(o, o.defaults);
@@ -2292,7 +2472,32 @@
         side.appendChild(frame);
         var who = el('p', { class: 'fa-who' }); who.textContent = d && d.state.nickname ? d.state.nickname : signed ? 'Discord fren' : 'Guest preview';
         var said = el('p', { class: 'fa-state', role: 'status' });
-        side.appendChild(who); side.appendChild(said); main.appendChild(side);
+        side.appendChild(who); side.appendChild(said);
+        if (FREN_TEST && d && d.preview) {
+          // Put the test unlock on the Maker itself; on phones the Passport may be minimized behind it.
+          // Owner authorization and all test awards remain in the existing isolated QA engine.
+          var qaTag = el('p', { class: 'fa-owner-tag' });
+          qaTag.textContent = 'OWNER SANDBOX · Local test only';
+          side.appendChild(qaTag);
+          var qaUnlock = el('button', { type: 'button', class: 'app-btn fa-owner-unlock' });
+          qaUnlock.textContent = d.state.test_all_unlocked ? 'Relock test rewards' : 'Unlock all (test only)';
+          qaUnlock.addEventListener('click', function () {
+            if (pending) return;
+            qaUnlock.disabled = true;
+            frenTestChange('all', '').then(function () {
+              // Rebuild the radio options: each option's locked state and change handler
+              // is created once. Reopening uses the saved local avatar and fresh QA flags.
+              A.close();
+              avatarMaker();
+            }, function (err) {
+              msg = (err && err.message) || 'Could not change test unlocks.';
+              qaUnlock.disabled = false;
+              status();
+            });
+          });
+          side.appendChild(qaUnlock);
+        }
+        main.appendChild(side);
         var parts = el('div', { class: 'fa-parts' });
         FA_ROWS.forEach(function (row) {
           var k = row[0];
@@ -2374,7 +2579,8 @@
         function status() {
           var dirty = !avatarSame(look, saved);
           said.textContent = pending ? 'Saving…' : msg ? msg : !signed ? 'Preview only. Log on with Discord to save.'
-            : !saved ? (avatarSame(look, start) ? 'Not saved yet.' : 'Unsaved changes') : dirty ? 'Unsaved changes' : d && d.preview ? 'Saved in this browser (test preview).' : 'Saved in your Fren Passport.';
+            : !saved ? (avatarSame(look, start) ? 'Not saved yet.' : 'Unsaved changes') : dirty ? 'Unsaved changes'
+              : FREN_TEST ? 'Saved locally in owner sandbox (not a real reward).' : d && d.preview ? 'Saved in this browser (test preview).' : 'Saved in your Fren Passport.';
           said.classList.toggle('is-dirty', !pending && (!!msg || said.textContent === 'Unsaved changes'));
           saveB.disabled = pending || (signed && !!saved && !dirty);
           useB.disabled = !signed || pending;
@@ -2451,8 +2657,8 @@
   // Only cosmetic, low-stakes discoveries are claimable by a browser.
   // This is intentionally NOT the pathway for YEET Moon Rock or care-day badges.
   // touching the locked BALI stamp: not yet, but it finds the secret "Bali Dreamer" (the straw-hat avatar)
-  function baliTouch(earned) {
-    if (earned) balloon('BALI!', 'Pepecoin reached $0.01 and you were here for it. Straw hat on, fren.', 'gif-045-still');
+  function baliTouch(earned, other) {
+    if (earned) balloon('BALI!', other ? 'Pepecoin reached $0.01 and this fren was here for it.' : 'Pepecoin reached $0.01 and you were here for it. Straw hat on, fren.', 'gif-045-still');
     else balloon('Not yet, fren', 'BALI opens when Pepecoin reaches $0.01. Pack the straw hat anyway.', 'gif-045-still');
     discoverSecret('bali_dreamer');
   }
@@ -2469,10 +2675,16 @@
     var session=sbSession();
     if(!session||!session.discord||!session.userId) return;
     var k='pondos-passport-secret-v1:'+session.userId+':'+id;
-    try { if(localStorage.getItem(k)==='1') return; } catch(e) {}
+    // Test mode does not read or write the production discovery suppression marker.
+    if (!FREN_TEST) {
+      try { if(localStorage.getItem(k)==='1') return; } catch(e) {}
+    }
     frenRpc('gry_passport_discover',{p_secret:id}).then(function(result){
       if(!result||result.id!==id) return;
-      try { localStorage.setItem(k,'1'); } catch(e) {}
+      if (!FREN_TEST) { try { localStorage.setItem(k,'1'); } catch(e) {} }
+      if (FREN_TEST) passportLoad(sbSession()).then(function () {
+        if (apps.passport && apps.passport.render) apps.passport.render();
+      }).catch(function () {});
       if(result.new) {
         var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren',midnight_fren:'Midnight Fren',nerd_alert:'Nerds Only',bali_dreamer:'Bali Dreamer',find_fren:'Looking Glass',address_check:'Trust, But Verify'};
         var av={why_tho:1,midnight_fren:1,nerd_alert:1,bali_dreamer:1,find_fren:1,address_check:1};
@@ -2508,7 +2720,7 @@
         var me = whoAmI();
         A.body.innerHTML = '<div class="tip"><img src="img/' + (me ? 'gif-045' : 'gif-085') + '.webp" alt="" width="96" height="96"><div>' +
           (me ? '<b>Signed in as ' + esc(me.name) + (me.discord ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : ' (guest)') + '</b><p>' + (me.discord ? 'Your Discord name shows with a ✓ in LAN Party and on the High Scores.' : 'Guests can chat and submit scores. Log in with Discord to get the ✓ verified badge.') + '</p>'
-            : '<b>Who goes there, fren?</b><p>Sign in once and use it everywhere: LAN Party chat, High Scores, Draw &amp; Guess and the other PEP Games.</p>') +
+            : '<b>Who goes there, fren?</b><p>Sign in once and use it everywhere: LAN Party chat, High Scores, PEPaint and the other PEP Games.</p>') +
           '</div></div>' +
           '<div class="app-row">' + (me && me.discord ? '' : '<a class="app-btn logon-discord" href="' + signInHref() + '">' + (me ? 'Log in with Discord' : 'Log in with Discord or as a guest') + '</a>') +
           (me ? '<button type="button" class="app-btn logon-out">Log off</button>' : '') + '</div>' +
@@ -2564,6 +2776,13 @@
       }, function () { /* the migration may not be installed yet; nothing to show */ });
     }, 2500);
   })();
+  // ?fren=<user id> opens that fren's passport (a verified name in the PEP Games lobby chat links here). Beta only.
+  if (mainEl && FREN) (function () {
+    var id = ''; try { id = new URLSearchParams(location.search).get('fren') || ''; } catch (e) {}
+    if (!FREN_ID.test(id)) return;
+    try { history.replaceState(null, '', location.pathname + location.search.replace(/[?&]fren=[^&]*/, '').replace(/^&/, '?') + location.hash); } catch (e) {}
+    setTimeout(function () { frenPassport(false, { id: id.toLowerCase() }); }, 600);
+  })();
 
   // ---------- counter.exe: a tiny 90s visitor counter. One number from the server (people counted once a day,
   // no cookie, no IP; the same data as the owner's statistics). Hidden if the server does not answer.
@@ -2603,7 +2822,7 @@
         '<p class="bin-tip tip-msg">Tips go one way only. This site never asks for a seed phrase or a password.</p>' +
         '<div class="tip about-task"><img src="img/unclesam.webp" alt="Pepe pointing at you" width="96" height="96"><div>' +
         '<p>Answered <b>"no"</b> to any of those? Then you have a task: post about Pepecoin on X or Reddit, or tell a friend. <b>Today. Now.</b></p>' +
-        '<div class="app-row"><button type="button" class="app-btn" disabled title="Coming soon">Post on X (soon)</button>' +
+        '<div class="app-row"><a class="app-btn" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(SHARE_TEXT + '\n' + url) + '">Post on X</a>' +
         '<a class="app-btn" target="_blank" rel="noopener" href="https://www.reddit.com/submit?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent('Pepecoin $PEP: a frog with its own PoW chain') + '">Reddit</a>' +
         '<button type="button" class="app-btn about-mail">✏️ Write to me</button></div></div></div>';
       var m = A.body.querySelector('.tip-msg');
@@ -2703,7 +2922,8 @@
     'does not stop it.',
     '',
     '== POINTS ==',
-    'Within 10 km: full points.',
+    'Within 1 km: full points (from 10 Nov;',
+    'it used to be 10 km).',
     'Further away: fewer points.',
     'Left the tab? 1st time a warning, then -1000 each time.',
     '',
@@ -2799,6 +3019,16 @@
         paintLogon();
         return j;
       });
+    });
+  }
+  // payout lines for a Discord tip bot, e.g. "send 12.5 PEPE to P..." for Filippy
+  var WP_PAYOUT_TEMPLATE = 'send {amount} PEPE to {address}';   // Filippy's word for PEP
+  function wpTpl() { var t = ''; try { t = localStorage.getItem('wp-payout-template') || ''; } catch (e) {} return t || WP_PAYOUT_TEMPLATE; }
+  function wpPayoutLines(sum, tpl) {
+    tpl = tpl && tpl.indexOf('{address}') >= 0 && tpl.indexOf('{amount}') >= 0 ? tpl : WP_PAYOUT_TEMPLATE;
+    return Object.keys(sum).map(function (a) {
+      var amt = String(Math.round(Number(sum[a]) * 100) / 100);
+      return tpl.split('{amount}').join(amt).split('{address}').join(a);
     });
   }
   function wpRpc(name, args) { return freshSession().then(function () { return chatRpc(name, args || {}); }); }
@@ -2976,11 +3206,12 @@
           '<p class="wp-place">Pepe was at <b>' + esc(a.title || '?') + '</b>, ' + esc(a.country || '') + ' ' + flagOf(a.country_code) + (a.wiki_url ? ' · <a href="' + esc(a.wiki_url) + '" target="_blank" rel="noopener">Wikipedia</a>' : '') + '</p>' +
           '<div class="wp-map"></div>' +
           '<p class="wp-small">Photo: ' + esc(a.credit || '') + ', <a href="' + esc(a.source_url || '#') + '" target="_blank" rel="noopener">' + esc(a.license || 'licence') + '</a>, cropped, Pepe added.' + (r.leaves ? ' Tab left ' + r.leaves + '×.' : '') + '</p>' +
-          '<div class="app-row">' + (navigator.share ? '<button type="button" class="app-btn go wp-share">Share…</button>' : '') + '<button type="button" class="app-btn wp-copy">Copy result</button><button type="button" class="app-btn wp-x" disabled title="Coming soon: X does not take links to this site yet">Post on X (soon)</button><span class="grow"></span><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
+          '<div class="app-row">' + (navigator.share ? '<button type="button" class="app-btn go wp-share">Share…</button>' : '') + '<button type="button" class="app-btn wp-copy">Copy result</button><a class="app-btn wp-x" target="_blank" rel="noopener">Post on X</a><span class="grow"></span><button type="button" class="app-btn wp-readme">README.TXT</button>' + hostBtn() + '</div>' +
           '<div class="wp-reward"></div></div><div class="wp-board"></div></div>';
         main.querySelector('.wp-readme').addEventListener('click', wpReadme); wireHost();
         var txt = shareText(r);
-        // "Post on X" waits until X accepts links to pepecoinhub.com; then make it a link to https://x.com/intent/post?text=… and call passportShare() on its click
+        main.querySelector('.wp-x').href = 'https://x.com/intent/post?text=' + encodeURIComponent(txt);
+        main.querySelector('.wp-x').addEventListener('click', function () { passportShare(); });
         var shb = main.querySelector('.wp-share');
         if (shb) shb.addEventListener('click', function () { navigator.share({ text: txt }).then(passportShare, function () {}); });
         main.querySelector('.wp-copy').addEventListener('click', function () {
@@ -3125,6 +3356,10 @@
           var st = d.settings;
           body.innerHTML = '<h4 class="wp-h">Open rewards: ' + open.length + ' claims, ' + Object.keys(sum).length + ' addresses, ' + total.toLocaleString('en-US') + ' PEP</h4>' +
             '<p class="wp-small">Budget left this week: <b>' + Number(d.budget_left).toLocaleString('en-US') + ' PEP</b>. ⚠ marks are worth a look before you pay; Hold keeps a reward out of the payout.</p>' +
+            (open.length ? '<h4 class="wp-h">Pay with the tip bot</h4><p class="wp-small">Tap <b>Copy</b>, paste it to the bot (e.g. Filippy in a DM), then tap <b>Paid</b>. One line per address.</p>' +
+              '<ol class="wp-bot">' + wpPayoutLines(sum, wpTpl()).map(function (l, i) { var a = Object.keys(sum)[i]; return '<li data-a="' + esc(a) + '"><code>' + esc(l) + '</code><button type="button" class="app-btn" data-copy>Copy</button><button type="button" class="app-btn" data-paid>Paid</button></li>'; }).join('') + '</ol>' +
+              '<details class="wp-tplbox"><summary class="wp-small">Bot command pattern</summary><div class="app-row"><input class="ac-in wp-tpl" type="text" spellcheck="false" aria-label="Bot command pattern"><button type="button" class="app-btn wp-tplsave">Save</button></div><p class="wp-small">{amount} and {address} are filled in.</p></details>' +
+              '<h4 class="wp-h">All open rewards</h4>' : '') +
             '<ol class="wp-claims">' + d.claims.map(function (c) {
               var fl = [];
               if (!c.verified) fl.push('guest');
@@ -3133,6 +3368,7 @@
               if (c.secs != null && c.secs < 5 && c.points > 4700) fl.push('⚠ ' + c.points + ' pts in ' + c.secs + ' s');
               return '<li data-id="' + c.id + '"><span>' + esc(c.nick) + (c.verified ? ' ✓' : '') + ' · #' + c.num + ' · ' + c.points + ' pts · <b>' + c.pep + ' PEP</b><br><code>' + esc(c.address) + '</code>' + (fl.length ? '<br><b class="bad">' + fl.join(' · ') + '</b>' : '') + '</span><button type="button" class="app-btn" data-hold="' + (c.status === 'held' ? 0 : 1) + '">' + (c.status === 'held' ? 'Release' : 'Hold') + '</button></li>'; }).join('') + '</ol>' +
             (open.length ? '<p class="wp-small">1. Send from your own wallet: in Pepecoin Core, the Send tab, one recipient per address (Add Recipient), the amounts from the list. Or in the console: <code>sendmany ""</code> followed by the list. 2. Check the total before you confirm. 3. Paste the transaction id here and mark the rewards as paid.</p>' +
+              '<h4 class="wp-h">Or all at once from Pepecoin Core (sendmany)</h4>' +
               '<textarea class="sc-in wp-many" rows="3" readonly></textarea><div class="app-row"><button type="button" class="app-btn wp-copymany">Copy the list</button><input class="ac-in wp-txid" type="text" spellcheck="false" placeholder="Transaction id (64 characters)" aria-label="Transaction id"><button type="button" class="app-btn wp-paid">Mark as paid</button></div>' : '<p class="wp-small">Nothing to pay right now.</p>') +
             '<h4 class="wp-h">Settings</h4><form class="app-row wp-set"><label>PEP per 50 pts <input class="ac-in" name="a" type="number" step="0.01" min="0" value="' + st.per_50 + '"></label>' +
               '<label>Discord: max a day <input class="ac-in" name="b" type="number" min="0" value="' + st.max_day + '"></label><label>a week <input class="ac-in" name="c" type="number" min="0" value="' + st.max_week + '"></label>' +
@@ -3140,11 +3376,27 @@
               '<label>from streak day <input class="ac-in" name="g" type="number" min="1" max="30" value="' + st.guest_streak + '"></label>' +
               '<label>Budget for all, a week <input class="ac-in" name="h" type="number" min="0" value="' + st.week_budget + '"></label>' +
               '<label><input type="checkbox" name="d"' + (st.open ? ' checked' : '') + '> Rewards on</label><button type="submit" class="app-btn">Save</button></form>' +
-            (d.paid.length ? '<h4 class="wp-h">Last payouts</h4><ul class="wp-paidlist">' + d.paid.map(function (p) { return '<li>' + new Date(p.at).toLocaleDateString() + ' · ' + p.n + ' claims · ' + p.pep + ' PEP · <a href="https://pepeblocks.com/tx/' + esc(p.txid) + '" target="_blank" rel="noopener">' + esc(p.txid.slice(0, 12)) + '…</a></li>'; }).join('') + '</ul>' : '');
+            (d.paid.length ? '<h4 class="wp-h">Last payouts</h4><ul class="wp-paidlist">' + d.paid.map(function (p) { return '<li>' + new Date(p.at).toLocaleDateString() + ' · ' + p.n + ' claims · ' + p.pep + ' PEP · ' + (p.txid ? '<a href="https://pepeblocks.com/tx/' + esc(p.txid) + '" target="_blank" rel="noopener">' + esc(p.txid.slice(0, 12)) + '…</a>' : 'tip bot, all so far') + '</li>'; }).join('') + '</ul>' : '');
           var many = body.querySelector('.wp-many');
           if (many) {
             many.value = JSON.stringify(sum);
-            body.querySelector('.wp-copymany').addEventListener('click', function () { many.select(); if (navigator.clipboard) navigator.clipboard.writeText(many.value).then(function () { say('Copied.'); }, function () { say('Select the text and copy it.', true); }); });
+            var copyBox = function (box) { box.select(); if (navigator.clipboard) navigator.clipboard.writeText(box.value).then(function () { say('Copied.'); }, function () { say('Select the text and copy it.', true); }); };
+            body.querySelector('.wp-copymany').addEventListener('click', function () { copyBox(many); });
+            var tpl = body.querySelector('.wp-tpl');
+            tpl.value = wpTpl();
+            body.querySelector('.wp-tplsave').addEventListener('click', function () { try { localStorage.setItem('wp-payout-template', tpl.value); } catch (e) {} payouts(); });
+            body.querySelectorAll('.wp-bot li').forEach(function (li) {
+              var line = li.querySelector('code').textContent, a = li.getAttribute('data-a');
+              li.querySelector('[data-copy]').addEventListener('click', function (ev) {
+                var b = ev.currentTarget, done = function () { b.textContent = 'Copied ✓'; li.classList.add('is-copied'); };
+                if (navigator.clipboard) navigator.clipboard.writeText(line).then(done, function () { say('Hold the line and copy it by hand.', true); });
+                else say('Hold the line and copy it by hand.', true);
+              });
+              li.querySelector('[data-paid]').addEventListener('click', function () {
+                var ids = open.filter(function (c) { return c.address === a; }).map(function (c) { return c.id; });
+                wpRpc('gry_wp_host_paid', { p_ids: ids, p_txid: '' }).then(function (n) { say(n + ' reward(s) marked as paid.'); payouts(); }, function (e) { say(e.message, true); });
+              });
+            });
             body.querySelector('.wp-paid').addEventListener('click', function () {
               var tx = body.querySelector('.wp-txid').value.trim();
               wpRpc('gry_wp_host_paid', { p_ids: open.map(function (c) { return c.id; }), p_txid: tx }).then(function (n) { say(n + ' claims marked as paid.'); payouts(); }, function (e) { say(e.message, true); });
@@ -3167,7 +3419,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 5, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 6, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -3245,6 +3497,35 @@
       '<p class="gz-fine">Yes, this is a test poll. It is open for 2 days. Everyone can vote, Discord players and guests: one vote each, and a vote is final. You see the results after you vote; everyone sees them when the poll closes.</p></section>' +
       '<p class="gz-foot">*Almost weekend: issue #5 lands on a Friday. The next one comes when it is ready.</p></article>';
   }
+  // Issue #6 (Monday 9 Nov 2026): X unblocks the site, the first faucet payout, 1 km from tomorrow, the poll result
+  function gazette6() {
+    var xText = '🐸 Pepe Guesser: one photo a day, 2 minutes, one pin. Find the frog, get some free PEP.\nhttps://pepecoinhub.com/meme/';
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #6</span><span>Price: 0 PEP</span><span>Almost weekly*</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking"><p class="gz-flash">Breaking</p><h4>Twitter unblocked PepecoinHub!</h4>' +
+      '<div class="gz-wpbox"><img src="img/wow.webp" alt="Pepe with his mouth wide open" width="110" height="110"><div>' +
+      '<p>For weeks X would not take a single link to this site. Today the wall came down: links to pepecoinhub.com go through again.</p>' +
+      '<p><b>So the button works now.</b> Finish today\'s Pepe Guesser and hit <b>Post on X</b>: your distance, your points and your streak, ready to post. Show the timeline who knows their geography.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-wpgo">Play today\'s photo →</button><a class="app-btn" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(xText) + '">Post on X</a></div></section>' +
+      '<section class="gz-wp"><p class="gz-kick">The pond faucet</p><h4>The first weekly payout is done</h4>' +
+      '<div class="gz-wpbox"><img src="img/rich.webp" alt="Pepe reading How to be rich" width="110" height="110"><div>' +
+      '<p>Today the host paid out the first full week of Pepe Guesser rewards: <b>4,704 PEP to 24 addresses</b>, for 76 good guesses. Real coins, sent straight to your wallets. Check yours.</p>' +
+      '<p>The weekly pot is fresh again: it now resets every Monday, so a new week means a new 5,000 PEP to play for.</p></div></div></section>' +
+      '<section class="gz-market"><p class="gz-kick">Heads up 👀</p><h4>From tomorrow, the frog hides better</h4>' +
+      '<p>Up to now, a pin within 10 km of Pepe got the full 5,000 points. <b>From tomorrow\'s photo it has to be within 1 km.</b> Close is no longer close enough: zoom in, read the street signs, find the exact spot.</p>' +
+      '<p class="gz-fine">Points still fall off gently further away, so a good guess still pays almost as much. The perfect 5,000 is what gets hard.</p></section>' +
+      '<section class="gz-soon"><p class="gz-kick">From the editor</p><h4>Big changes are on the horizon</h4>' +
+      '<div class="gz-wpbox"><img src="img/hardhat.webp" alt="Pepe in a hard hat with a hammer" width="110" height="110"><div>' +
+      '<p>PepecoinHub is at the very start of the road, and you can help build it: post your scores on X, bring a fren to the pond, and write to the Editor when something breaks or when you have an idea. Every letter is read.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-write">✏️ Write to the Editor</button></div></section>' +
+      '<section class="gz-pollsec"><p class="gz-kick">Pond Poll results</p><h4>Do you like polls?</h4>' +
+      '<p>Thank you to all <b>5 of you</b> (yes, five) who voted. Now we know at least someone reads the Gazette to the very end.</p>' +
+      '<div class="gz-poll" data-poll="like_polls" aria-live="polite"><p class="gz-poll-msg">Opening the ballot box…</p></div></section>' +
+      '<section class="gz-letters"><p class="gz-kick">Fact of the day, from a loyal reader</p>' +
+      '<figure class="gz-letter"><p class="gz-letter-from"><b>Smolpepewithaquestion</b> (guest) <span class="gz-letter-ok">🖨️ OK to print</span></p>' +
+      '<blockquote>Hello have you heard of Pepecoin? Is gud.</blockquote><figcaption>Sent from /meme/.</figcaption></figure>' +
+      '<p class="gz-fine">The editor checked. It is gud.</p></section>' +
+      '<p class="gz-foot">*Almost weekly: three days after issue #5. Close enough.</p></article>';
+  }
   // Pond Poll in the Gazette (games/supabase/update_polls.sql): the server counts; the page only shows its answer
   function paintPoll(box) {
     var id = box.getAttribute('data-poll');
@@ -3294,7 +3575,8 @@
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
         // one compact row of tabs: the letter form, then the Gazette issues by number (newest first)
         '<li><button type="button" data-v="write" title="Ideas, bugs, wishes, notices">✏️ Letter to the Editor</button></li>' +
-        '<li><button type="button" data-v="gz" title="The Pond Gazette #5: the lockout, CoinEx and the first Pond Poll" aria-label="The Pond Gazette #5">📰 #5</button></li>' +
+        '<li><button type="button" data-v="gz" title="The Pond Gazette #6: X unblocked us, the first faucet payout, 1 km from tomorrow" aria-label="The Pond Gazette #6">📰 #6</button></li>' +
+        '<li><button type="button" data-v="gz5" title="The Pond Gazette #5 (archive): the lockout, CoinEx and the first Pond Poll" aria-label="The Pond Gazette #5">#5</button></li>' +
         '<li><button type="button" data-v="gz4" title="The Pond Gazette #4 (archive): the Pepe Guesser leak" aria-label="The Pond Gazette #4">#4</button></li>' +
         '<li><button type="button" data-v="gz3" title="The Pond Gazette #3 (archive): an internet in your internet" aria-label="The Pond Gazette #3">#3</button></li>' +
         '<li><button type="button" data-v="gz2" title="The Pond Gazette #2 (archive): Pepe Guesser is coming" aria-label="The Pond Gazette #2">#2</button></li>' +
@@ -3312,8 +3594,8 @@
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
         if (v === 'write') return writeLetter(pane);
         if (v === 'box') return letterInbox(pane, paintOwner);
-        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : 5;
-        pane.innerHTML = issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : 6;
+        pane.innerHTML = issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
@@ -3592,6 +3874,12 @@
     return '<span class="ad-fren" aria-hidden="true">' + ['bg_forest', 'base_frog', c, m, e, h, a].map(function (id) { return '<img src="avatar-assets/layers/' + id + '.webp" alt="">'; }).join('') + '</span>';
   }
   var ADS = [
+    { file: 'whose_passport.mpg', fren: true, added: '2026-11-08', title: 'Whose Passport Is That?', ch: 'CH 7 · POND GOSSIP HOUR', icon: 'pep-logo', scenes: [
+      '<p class="ad-kick">Your fren says they flew the full 6000 m in YEET THE PEP…</p><h3 class="ad-big">…but can they<br><em>prove it?</em></h3>',
+      '<div class="ad-frens">' + adFren('clothing_camo', 'mouth_smirk', 'eyes_side', 'hat_bucket', 'accessory_round') + '</div><p class="ad-kick">Click a name with a ✓ in the LAN Party chat.</p><h3 class="ad-big">Open their<br><em>Fren Passport!</em></h3><p class="ad-sub">Their Fren, their stamps with the dates, the secrets they found and their best YEET flight. Read only: nobody can change it but them.</p>',
+      '<p class="ad-kick">Who gets to look?</p><h3 class="ad-big">Frens with<br>a <em>✓</em>.</h3><p class="ad-sub">Log on with Discord to open other frens\' passports. Guests have no passport, so their names stay plain. Streaks, letters and chat counts stay off the page.</p>',
+      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">They can see<br><em>yours</em> too!</h3><p class="ad-sub">Every Fren Passport is open to every fren logged on with Discord. Better collect some stamps.</p><p class="ad-fine">Not a real offer. Stamps are cosmetic: no PEP, no points, no ranking, nothing to sell. Only what the server records counts.</p><button type="button" class="ad-cta ad-lanbtn">Open the LAN Party →</button>'
+    ] },
     { file: 'pond_stamps.mpg', fren: true, added: '2026-11-06', title: 'Stamps That Check Out', ch: 'CH 19 · POND POST OFFICE', icon: 'pep-logo', scenes: [
       '<p class="ad-kick">Did your frog do anything today? Can you prove it?</p><h3 class="ad-big">Stamps that<br><em>check out!</em></h3><p class="ad-sub">Your Fren Passport now collects 21 stamps, each one from something the pond\'s own server saw you do.</p>',
       '<p class="ad-kick">Guess where Pepe is. Chat in the lobby. Write to the editor. Mine for an hour.</p><h3 class="ad-big">The games <em>stamp</em><br>your passport!</h3><p class="ad-sub">Pepe Guesser, the LAN Party chat, letters to the editor, Pepe Miner, YEET THE PEP and 14 or 30 days in a row on PondOS. Your old Pepe Guesser games and letters count too.</p>',
@@ -3858,8 +4146,27 @@
     }).catch(function () { onState(false); });
     return function () { gone = true; onState(false); if (ch && bellSb) bellSb.removeChannel(ch); ch = null; };
   }
+  // the Pepe emotes from Pepecoin.com's "Pepe Emojis for Reddit" set (scripts/build_chat_emotes.py), self-hosted as webp.
+  // The old frog-crew codes above still draw (old messages, PEP Games); the picker offers the Pepes.
+  var PEPE_EMO = null, pepeEmoP = null, EMO_DIR = BASE + 'meme/emotes/', EMO_V = '?v=20261109pe';
+  var EMO_FAM = [['pepe', 'Pepe'], ['apu', 'Apu'], ['peepo', 'Peepo'], ['pepega', 'Pepega']];
+  function loadPepeEmotes() {
+    if (!pepeEmoP) pepeEmoP = fetch(EMO_DIR + 'emotes.json' + EMO_V).then(function (r) { if (!r.ok) throw new Error('emotes'); return r.json(); })
+      .then(function (j) { var by = {}; (j.emotes || []).forEach(function (e) { by[e.c] = e; }); PEPE_EMO = { list: j.emotes || [], by: by }; return PEPE_EMO; })
+      .catch(function () { pepeEmoP = null; return null; });
+    return pepeEmoP;
+  }
+  function emoKnown(c) { return !!(PEPE_EMO && PEPE_EMO.by[c]) || EMO.indexOf(' ' + c + ' ') >= 0; }
   function chatBody(t) {
-    return esc(t).replace(/:([a-z]{3,10}):/g, function (m, c) { return EMO.indexOf(' ' + c + ' ') >= 0 ? '<img class="emo-img" src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="24" height="24">' : m; });
+    return esc(t).replace(/:([a-z0-9_]{2,32}):/g, function (m, c) {
+      if (PEPE_EMO && PEPE_EMO.by[c]) return '<img class="emo-img" src="' + EMO_DIR + c + '.webp' + EMO_V + '" alt=":' + c + ':" title=":' + c + ':" width="28" height="28">';
+      return EMO.indexOf(' ' + c + ' ') >= 0 ? '<img class="emo-img" src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="24" height="24">' : m;
+    });
+  }
+  // a message of one to three emotes and nothing else is drawn big, like in the old messengers
+  function emoOnly(t) {
+    var codes = String(t).match(/:([a-z0-9_]{2,32}):/g);
+    return !!codes && codes.length <= 3 && !String(t).replace(/:([a-z0-9_]{2,32}):/g, '').trim() && codes.every(function (x) { return emoKnown(x.slice(1, -1)); });
   }
   // @mentions (games/js/mentions.js, loaded when needed): verified (Discord) players only, the server decides
   var mentionsJs = null;
@@ -3871,6 +4178,12 @@
     return mentionsJs;
   }
   function verifiedHere() { var me = whoAmI(); return !!(me && me.discord); }
+  // the name in front of a message. Fren Passport beta: a verified (Discord) name opens that fren's passport;
+  // guests have no passport, so their names stay plain text. Without the beta every name is plain text.
+  function lanWho(m) {
+    var b = '<b>' + esc(m.nick) + '</b>';
+    return FREN && m.verified && FREN_ID.test(m.user_id || '') ? '<button type="button" class="lan-who" title="Open the Fren Passport of ' + esc(m.nick) + '">' + b + '</button>' : b;
+  }
   var onlineN = null;
   function paintOnline(n) {
     onlineN = n;
@@ -3881,15 +4194,43 @@
     var A = openApp('lan', 'LAN Party - #pond chat', 'gif-080-still', function (A) {
       A.body.innerHTML = '<div class="app-row"><span class="grow"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online in the pond</span></div>' +
         '<div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
-        '<div class="emo-pop" hidden role="group" aria-label="Emotes">' + EMO.trim().split(' ').map(function (c) { return '<button type="button" data-e="' + c + '" title=":' + c + ':"><img src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="32" height="32" loading="lazy"></button>'; }).join('') + '</div>' +
-        '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + BASE + 'games/img/emotes/pep.webp" alt="" width="22" height="22"></button><input name="n" class="lan-nick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname" hidden><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
+        '<div class="emo-pop" hidden role="group" aria-label="Pepe emotes"><div class="emo-head"><input type="search" class="emo-q" placeholder="Search Pepes… (laugh, pray, apu)" aria-label="Search emotes" autocomplete="off">' +
+        '<div class="emo-tabs" role="tablist"><button type="button" data-t="recent" title="Recently used">⏱</button>' + EMO_FAM.map(function (f) { return '<button type="button" data-t="' + f[0] + '">' + f[1] + '</button>'; }).join('') + '<button type="button" data-t="gif">GIFs</button></div></div>' +
+        '<div class="emo-grid" role="group" aria-label="Emotes"></div></div>' +
+        '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + EMO_DIR + 'peepo_happy.webp' + EMO_V + '" alt="" width="22" height="22"></button><input name="n" class="lan-nick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname" hidden><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
         '<p class="hs-note lan-note"></p><p class="hs-note lan-ment" hidden><button type="button" class="app-btn lan-ment-btn"></button> <span></span></p>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input[name=t]'), note = A.body.querySelector('.lan-note');
-      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false;
+      if (FREN) log.addEventListener('click', function (e) {
+        var b = e.target.closest('.lan-who'), row = b && b.closest('.lan-msg');
+        if (row && row._m) frenPassport(false, { id: row._m.user_id, nick: row._m.nick });
+      });
+      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, canMod = false;
       var pop = A.body.querySelector('.emo-pop'), eb = A.body.querySelector('.emo-btn');
-      eb.addEventListener('click', function () { pop.hidden = !pop.hidden; eb.setAttribute('aria-expanded', String(!pop.hidden)); });
+      // the picker: tabs by family (static), GIFs, recently used (this browser), and a search over the names
+      var grid = pop.querySelector('.emo-grid'), q = pop.querySelector('.emo-q'), tab = '';
+      var recent = function () { try { return JSON.parse(localStorage.getItem('pondos-emo-recent') || '[]').filter(function (c) { return PEPE_EMO && PEPE_EMO.by[c]; }); } catch (e) { return []; } };
+      var paintEmo = function () {
+        if (!PEPE_EMO) { grid.innerHTML = '<p class="bin-tip">Loading Pepes…</p>'; return; }
+        var s = q.value.trim().toLowerCase(), list;
+        if (s) list = PEPE_EMO.list.filter(function (e) { return e.n.toLowerCase().indexOf(s) >= 0 || e.c.indexOf(s.replace(/\s+/g, '_')) >= 0; });
+        else if (tab === 'recent') list = recent().map(function (c) { return PEPE_EMO.by[c]; });
+        else if (tab === 'gif') list = PEPE_EMO.list.filter(function (e) { return e.a; });
+        else list = PEPE_EMO.list.filter(function (e) { return !e.a && e.f === tab; });
+        pop.querySelectorAll('.emo-tabs [data-t]').forEach(function (b) { b.setAttribute('aria-pressed', String(!s && b.getAttribute('data-t') === tab)); });
+        grid.innerHTML = list.length ? list.map(function (e) { return '<button type="button" data-e="' + e.c + '" title=":' + e.c + ':"><img src="' + EMO_DIR + e.c + '.webp' + EMO_V + '" alt=":' + e.c + ':" width="40" height="40" loading="lazy"></button>'; }).join('')
+          : '<p class="bin-tip">' + (s ? 'No Pepe called “' + esc(s) + '”.' : 'Nothing here yet. Pick a Pepe from the other tabs.') + '</p>';
+        grid.scrollTop = 0;
+      };
+      pop.querySelector('.emo-tabs').addEventListener('click', function (e) { var b = e.target.closest('[data-t]'); if (!b) return; tab = b.getAttribute('data-t'); q.value = ''; paintEmo(); });
+      q.addEventListener('input', paintEmo);
+      q.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); var f = grid.querySelector('[data-e]'); if (f) f.click(); } });
+      eb.addEventListener('click', function () {
+        pop.hidden = !pop.hidden; eb.setAttribute('aria-expanded', String(!pop.hidden));
+        if (!pop.hidden) loadPepeEmotes().then(function () { if (!tab) tab = recent().length ? 'recent' : 'pepe'; paintEmo(); });
+      });
       pop.addEventListener('click', function (e) {
         var b = e.target.closest('[data-e]'); if (!b || inp.disabled) return;
+        try { var rc = JSON.parse(localStorage.getItem('pondos-emo-recent') || '[]').filter(function (c) { return c !== b.getAttribute('data-e'); }); rc.unshift(b.getAttribute('data-e')); localStorage.setItem('pondos-emo-recent', JSON.stringify(rc.slice(0, 24))); } catch (err) {}
         var v = inp.value, at = inp.selectionStart == null ? v.length : inp.selectionStart, code = ':' + b.getAttribute('data-e') + ':';
         var pre = v.slice(0, at), post = v.slice(at);
         inp.value = (pre && !/\s$/.test(pre) ? pre + ' ' : pre) + code + ' ' + post.replace(/^\s+/, '');
@@ -3933,20 +4274,56 @@
         note.innerHTML = s ? 'Signed in on PEP Games. Text and our emotes only, no links. Be nice, frens.' : 'Pick a nickname and say gm, no sign-in needed. <a href="#" class="lan-login">Log on with Discord</a> to keep your name and get the ✓. No links, be nice.';
         var l = note.querySelector('.lan-login'); if (l) l.addEventListener('click', function (e) { e.preventDefault(); logOn(); });
       };
+      // Hosts can hide individual messages in the PondOS LAN Party chat.
+      // The server supplies can_mod and verifies games.is_host_user again inside gry_lobby_hide.
+      // Never infer host privileges from a saved nickname or client-side Discord metadata.
+      var syncDeleteButton = function (row) {
+        var btn = row.querySelector('.lan-del');
+        row.classList.toggle('lan-moderatable', canMod);
+        if (!canMod && btn) btn.remove();
+        if (canMod && !btn) row.appendChild(el('button', {
+          type: 'button', class: 'lan-del', title: 'Delete message (host)',
+          'aria-label': 'Delete message (host)'
+        }, '&#215;'));
+      };
+      log.addEventListener('click', function (e) {
+        var btn = e.target.closest('.lan-del');
+        if (!btn || !canMod || btn.disabled) return;
+        var row = btn.closest('.lan-msg'), m = row && row._m;
+        if (!m || !window.confirm('Delete the message from ' + m.nick + '?')) return;
+        btn.disabled = true;
+        freshSession().then(function (s) {
+          if (!s) throw new Error('Log in with your host Discord account to delete messages.');
+          return chatRpc('gry_lobby_hide', { p_id: m.id });
+        }).then(function () {
+          if (!alive) return;
+          row.remove(); delete seen[m.id];
+          poll(); // refresh the list; Realtime notifies everyone else about the hidden message
+        }).catch(function (err) {
+          if (!alive) return;
+          btn.disabled = false;
+          note.textContent = err.message || 'Could not delete the message.';
+        });
+      });
       var poll = function () {
         clearTimeout(timer);
         chatRpc('gry_lobby_chat', { p_after: last, p_visitor: visitorId() }).then(function (r) {
           if (!alive) return;
           paintOnline(r.online);
+          if (canMod !== !!r.can_mod) {
+            canMod = !!r.can_mod;
+            Object.keys(seen).forEach(function (id) { syncDeleteButton(seen[id]); });
+          }
           var initial = first;
           if (first) { log.innerHTML = ''; first = false; }
           (r.hidden || []).forEach(function (id) { if (seen[id]) { seen[id].remove(); delete seen[id]; } });
           var atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 60;
           (r.messages || []).forEach(function (m) {
             if (seen[m.id]) return;
-            var row = el('div', { class: 'lan-msg' }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> <b>' + esc(m.nick) + '</b>' + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
+            var row = el('div', { class: 'lan-msg' + (emoOnly(m.body) ? ' lan-big' : '') }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> ' + lanWho(m) + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
             var tipEl = log.querySelector('.bin-tip'); if (tipEl) tipEl.remove();
             row._m = m; if (forMe(m)) { row.classList.add('lan-me'); if (!initial) { PM.ring(m.nick, m.body, function () { A.restore ? A.restore() : null; }); seenMentions(); } }
+            syncDeleteButton(row);
             seen[m.id] = row; log.appendChild(row); last = Math.max(last, m.id);
           });
           if (!log.children.length) log.innerHTML = '<p class="bin-tip">No messages in the last 24 hours. Say gm!</p>';
@@ -3977,7 +4354,7 @@
           poll();
         }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
       });
-      paintNote(); poll();
+      paintNote(); loadPepeEmotes().then(poll);
       A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); stopBell(); };
     }, 480);
     return A;

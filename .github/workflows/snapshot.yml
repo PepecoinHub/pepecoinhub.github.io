@@ -151,6 +151,14 @@ jobs:
         continue-on-error: true
         run: python3 scripts/fetch_market.py
 
+      # The site only reads the newest rich list snapshots (today and the two days before, app.js loadSnap);
+      # the old ones stay in git. Leaving them out shrinks the Pages artifact from ~54 MB to a few MB,
+      # which keeps Actions artifact storage low and the upload/deploy faster. Keeps the last 14 days.
+      - name: Leave old snapshots out of the published site
+        run: |
+          ls docs/data/snapshots/*.json | sort | head -n -14 | xargs -r rm -f
+          echo "snapshots published: $(ls docs/data/snapshots | wc -l), site size: $(du -sh docs | cut -f1)"
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs
