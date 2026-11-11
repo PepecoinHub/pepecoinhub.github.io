@@ -33,8 +33,9 @@ test('settlement is server-side, keyed by day and week, and pays once', () => {
   const rpcs = [...sql.matchAll(/create or replace function public\.([a-z_]+)\(/g)].map(x => x[1]).sort();
   assert.deepEqual(rpcs, ['gry_wp_hof', 'gry_wp_stats', 'gry_wp_top']);
   assert.match(sql, /revoke all on function games\.wp_monday\(date\), games\.wp_standings\(date, date\), games\.wp_settle\(\), games\.wp_dominator_stamps\(\)/);
-  // history is never rebuilt: the start is the next Monday on the first run
-  assert.match(sql, /set wp_hof_start = date_trunc\('week', now\(\) at time zone 'utc'\)::date \+ 7 where id = 1 and wp_hof_start is null/);
+  // the start follows the Passport launch (first Monday on or after the Pond Pioneer snapshot); no history rebuilt
+  assert.match(fnBody(sql, 'games.wp_hof_begin'), /where m\.k = 'pioneer_snapshot'/);
+  assert.match(fnBody(sql, 'games.wp_hof_begin'), /st := launch \+ \(\(8 - extract\(isodow from launch\)::int\) % 7\);/);
 });
 
 test('Pond Dominator and Frog of the Week go through the existing Passport paths', () => {

@@ -28,9 +28,10 @@ It runs: every night at 00:01 UTC through pg_cron (when the extension is on), on
 (`passport_daily`), and on every Hall of Fame / stats read. A late run gives the same answer: a day's points are fixed
 once its puzzle is over.
 
-**No history is rebuilt.** The first run of the file sets `wp_hof_start` to the next Monday. To start with the current
-week instead, before that week's first day is settled: `update games.config set wp_hof_start = '<that Monday>' where id = 1;`
-Weeks before the start keep the old Frog of the Week rule in `passport_daily` (every tied first place won).
+**Start: the launch** (owner, 2026-11-11). `wp_hof_start` is the first Monday (UTC) on or after the first run of
+`update_passport_awards.sql` (the Pond Pioneer snapshot in `games.passport_meta`). Before the launch nothing is settled,
+and no history is rebuilt. To move it (before its first day is settled):
+`update games.config set wp_hof_start = '<a Monday>' where id = 1;`
 
 ## Reads
 - `gry_wp_hof(p_limit)` (anyone): the last 52 settled weeks and three separate all-time boards (weeks won, Days at #1,
@@ -39,6 +40,7 @@ Weeks before the start keep the old Frog of the Week rule in `passport_daily` (e
 - Names in the Hall of Fame open the existing read-only Passport (`gry_passport_public`), behind the Passport beta flag.
 
 ## Run order (owner)
+The launch kit (PR #259, `games/supabase/deploy/RUN_ORDER.md`) has the full order. In short:
 1. `update_wheres_pepe_hall_of_fame.sql` (after the Pepe Guesser and Passport files; if PR #251's
    `update_wheres_pepe_hide_host.sql` runs later, run this one again: both replace `gry_wp_top`).
 2. `update_passport_awards.sql` again (the `pond_dominator` allowlist entry and the `passport_daily` hand-over).

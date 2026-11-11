@@ -73,6 +73,10 @@ test('Pepe Guesser Hall of Fame SQL: days, weeks, ties, Pond Dominator, streaks,
     const today = await one("select (now() at time zone 'utc')::date::text");
     const mon0 = await one('select games.wp_monday($1::date)::text', [today]);
     const st = await one("select ($1::date - 21)::text", [mon0]);
+    // the start follows the Passport launch (update_passport_awards.sql ran just now): the first Monday on or after today
+    assert.equal(await one("select wp_hof_start::text from games.config where id = 1"),
+      await one("select ($1::date + ((8 - extract(isodow from $1::date)::int) % 7))::text", [today]));
+    assert.deepEqual(await one('select games.wp_settle()'), { days: 0, weeks: 0 }, 'nothing before the launch week');
     await db.query('update games.config set wp_hof_start = $1 where id = 1', [st]);
     const dayAt = k => one('select ($1::date + $2::int)::text', [st, k]);   // k: days from the start (may be < 0)
     const pid = {};

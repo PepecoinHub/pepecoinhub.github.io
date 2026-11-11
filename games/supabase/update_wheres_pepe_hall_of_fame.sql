@@ -17,8 +17,10 @@
 --   * Who runs it: pg_cron every night just after 00:00 UTC when that extension is on (see the end of this file),
 --     the Passport check-in, and the Hall of Fame / stats reads. Late runs give the same result: a day's points
 --     are fixed once that day's puzzle is over.
---   * Days before wp_hof_start are never filled in afterwards (no history is rebuilt from old data). The first run
---     sets it to the next Monday.
+--   * The Hall of Fame starts with the launch of the Fren Passport and the Avatar Maker (owner, 2026-11-11):
+--     wp_hof_start is the first Monday on or after the launch, the moment update_passport_awards.sql first ran
+--     (games.passport_meta 'pioneer_snapshot'). Launch on a Monday: that Monday. Before the launch nothing is settled.
+--     Days before wp_hof_start are never filled in afterwards (no history is rebuilt from old data).
 --   * Longest Guessing Streak is worked out from the plays themselves, with the same rule as the Passport's
 --     current streak (games.passport_wp_streak): Discord-verified plays with a pin, one per UTC day.
 
@@ -27,7 +29,22 @@ alter table games.config add column if not exists wp_hof_start date;
 do $$ begin
   alter table games.config add constraint config_wp_hof_start_monday check (wp_hof_start is null or extract(isodow from wp_hof_start) = 1);
 exception when duplicate_object then null; end $$;
-update games.config set wp_hof_start = date_trunc('week', now() at time zone 'utc')::date + 7 where id = 1 and wp_hof_start is null;
+
+-- the start: the first Monday (UTC) on or after the Passport launch; stays null until the launch has happened
+create or replace function games.wp_hof_begin() returns date
+language plpgsql volatile security definer set search_path = '' as $$
+declare st date; launch date;
+begin
+  select c.wp_hof_start into st from games.config c where c.id = 1;
+  if st is not null then return st; end if;
+  if to_regclass('games.passport_meta') is null then return null; end if;
+  select (m.at at time zone 'utc')::date into launch from games.passport_meta m where m.k = 'pioneer_snapshot';
+  if launch is null then return null; end if;
+  st := launch + ((8 - extract(isodow from launch)::int) % 7);
+  update games.config set wp_hof_start = st where id = 1 and wp_hof_start is null;
+  return (select c.wp_hof_start from games.config c where c.id = 1);
+end
+$$;
 
 -- ---------- tables (server only) ----------
 create table if not exists games.wp_days (
@@ -122,7 +139,7 @@ declare
   nd integer := 0;
   nw integer := 0;
 begin
-  select c.wp_hof_start into st from games.config c where c.id = 1;
+  st := games.wp_hof_begin();
   if st is null or st >= today then return jsonb_build_object('days', 0, 'weeks', 0); end if;
   -- already up to date: yesterday is settled, and so is the last finished week
   if exists (select 1 from games.wp_days where day = today - 1)
@@ -202,6 +219,9 @@ language sql stable security definer set search_path = '' as $$
                  from games.passport_avatars a where a.user_id = u)))
 $$;
 
+-- after the launch, the first run of this file already fixes the start
+select games.wp_hof_begin();
+
 -- ---------- browser RPCs (read only, apart from closing finished days) ----------
 -- a player's Pepe Guesser records: yours (p_user null), or another Discord fren's when you are logged on with Discord
 create or replace function public.gry_wp_stats(p_user uuid default null) returns jsonb
@@ -215,7 +235,7 @@ begin
     'days_at_1', (select count(*) from games.wp_days x where x.leader_id = u),
     'weeks_won', (select count(*) from games.wp_weeks w where w.winner_id = u),
     'longest_streak', games.wp_longest_streak(u),
-    'since', (select c.wp_hof_start from games.config c where c.id = 1));
+    'since', games.wp_hof_begin());
 end
 $$;
 
@@ -227,7 +247,7 @@ begin
   begin perform games.wp_settle(); exception when others then raise warning 'wp settle: %', sqlerrm; end;
   ids := me is not null and games.discord_identity(me) is not null;   -- passports open by id, for Discord frens only
   return jsonb_build_object(
-    'since', (select c.wp_hof_start from games.config c where c.id = 1),
+    'since', games.wp_hof_begin(),
     'weeks', coalesce((select jsonb_agg(jsonb_build_object(
         'week_start', w.week_start, 'week_end', w.week_start + 6,
         'year', to_char(w.week_start, 'IYYY')::int, 'week', to_char(w.week_start, 'IW')::int,
@@ -280,7 +300,7 @@ from (select * from one where k = 1 order by pts desc, best_time limit 10) t
 $$;
 
 -- ---------- access ----------
-revoke all on function games.wp_monday(date), games.wp_standings(date, date), games.wp_settle(), games.wp_dominator_stamps(), games.wp_longest_streak(uuid),
+revoke all on function games.wp_hof_begin(), games.wp_monday(date), games.wp_standings(date, date), games.wp_settle(), games.wp_dominator_stamps(), games.wp_longest_streak(uuid),
   games.wp_card(uuid, boolean) from public, anon, authenticated;
 revoke all on function public.gry_wp_stats(uuid), public.gry_wp_hof(integer) from public;
 grant execute on function public.gry_wp_hof(integer) to anon, authenticated;
