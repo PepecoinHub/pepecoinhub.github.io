@@ -228,3 +228,43 @@ test('Fren Passport and Avatar Maker stay hidden unless the browser opened ?beta
   // the local preview is used only in the beta, and only when the server functions are missing or there is no Discord log-on
   assert.match(pond, /function frenRpc\(name, args\) \{\s*var s = sbSession\(\);\s*if \(!FREN\) return rpc\(name, args\);/);
 });
+
+// ---------- another fren's passport (static checks; tests/passport-public-sql.test.mjs runs the SQL for real) ----------
+test('public passport RPC: Discord frens only, read only, no private counters, no table access', () => {
+  const pub = file('games/supabase/update_passport_public.sql');
+  const fn = pub.split('create or replace function public.gry_passport_public(p_user uuid)')[1].split('\n$$;')[0];
+  assert.ok(fn, 'gry_passport_public missing');
+  assert.match(fn, /^\s*returns jsonb language plpgsql stable security definer set search_path = '' as \$\$/);
+  assert.match(fn, /if u is null or games\.discord_identity\(u\) is null then\s*return jsonb_build_object\('signed_in', false\);/);
+  assert.match(fn, /d := games\.discord_identity\(p_user\);/);
+  assert.doesNotMatch(fn, /\b(insert|update|delete)\b/i, 'it writes nothing');
+  // the owner's counters (Next Milestone) and the Discord account id stay private
+  assert.doesNotMatch(fn, /passport_progress|passport_days|passport_chat_days|passport_yeet_5k|wp_plays|letters|lobby_chat|'progress'|d->>'id'|provider_id/);
+  assert.match(pub, /revoke all on function public\.gry_passport_public\(uuid\) from public, anon, authenticated;/);
+  assert.match(pub, /grant execute on function public\.gry_passport_public\(uuid\) to authenticated;/);
+  assert.doesNotMatch(pub, /\bgrant\b[^;]*\bto\b[^;]*\b(anon|public)\b/i);
+  assert.equal([...pub.matchAll(/\bas \$\$/g)].length, [...pub.matchAll(/^\$\$;/gm)].length);
+});
+
+test('other frens\' passports stay behind ?beta=fren and come from the server only', () => {
+  // LAN Party: a name is a button (to the fren card + passport) only in the beta, only for a verified message with a real user id
+  assert.match(pond, /function lanWho\(m\) \{\s*var b = '<b>' \+ esc\(m\.nick\) \+ '<\/b>';\s*return FREN && m\.verified && FREN_ID\.test\(m\.user_id \|\| ''\) \? '<button type="button" class="lan-who"/);
+  assert.match(pond, /if \(!FREN \|\| !FREN_ID\.test\(u\)\) return;/);
+  assert.match(pond, /pb\.addEventListener\('click', function \(\) \{ closeCard\(\); frenPassport\(false, \{ id: u, nick: nick \}\); \}\);/);
+  assert.match(pond, /if \(mainEl && FREN\) \(function \(\) \{\s*var id = ''; try \{ id = new URLSearchParams\(location\.search\)\.get\('fren'\)/);
+  // read only: the public RPC (never the local preview), no Avatar Maker, no Next Milestone for somebody else
+  const of = pond.split('function passportOf(id) {')[1].split('\n  }')[0];
+  assert.match(of, /rpc\('gry_passport_public', \{ p_user: id \}\)/);
+  assert.doesNotMatch(of, /frenRpc|frenPreview|localStorage/);
+  const win = pond.split('function frenPassport(fromCache, other) {')[1].split('// ---------- Create Your Fren')[0];
+  assert.match(win, /var d = other \? A\.view : passportMine\(\)/);
+  assert.match(win, /if \(d\.opts && !other\) photo\.addEventListener\('click', openMaker\); else photo\.disabled = true;/);
+  assert.match(win, /if \(!other\) side\.appendChild\(mile\);/);
+  assert.match(win, /if \(d\.opts && !other\) \{\s*var make/);
+  assert.match(win, /if \(other\) \{\s*if \(!session \|\| !session\.discord\) \{ notice\('Log on with Discord/);
+  // the PEP Games lobby links a verified name to PondOS only in the beta
+  const lobby = file('docs/games/js/lobbychat.js');
+  assert.match(lobby, /const FREN_BETA = \(\(\) => \{ try \{ return localStorage\.getItem\('pondos-fren-beta'\) === '1'; \}/);
+  assert.match(lobby, /FREN_BETA && m\.verified && FREN_ID\.test\(m\.user_id \|\| ''\)\s*\? h\('a', \{ class: 'cn', href: '\.\.\/meme\/\?fren=' \+ m\.user_id/);
+  assert.match(lobby, /: h\('b', \{ class: 'cn' \}, m\.nick\)\);/);
+});
