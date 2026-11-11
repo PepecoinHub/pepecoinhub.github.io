@@ -37,6 +37,10 @@ Players said they could not tell which frog belonged to which team: both teams s
 - **Reduced-motion fallback:** the glow pulse and pennant wave only animate when `prefers-reduced-motion` is off; otherwise they render static.
 - No gameplay/physics change and no change to team numbering (team stays 0=PEP, 1=FUD). Cache-bust tag bumped to `v=20261106a` across `pondwars-beta.mjs`, `pondwars-beta-net.mjs` and `pondwars-beta.html`.
 
+## Hand-height weapons + aim preview (2026-11-11)
+
+Weapons used to be `drawImage`’d at `(10, -6)` inside the character transform, so the art hung near the frog’s feet while shots still left from `projectileOrigin` (`f.y - 32`). Held weapons now draw in world space at hand height and rotate with `aim` (placeables/utilities stay as a hand-side icon). Ballistic aiming also gets a dotted trajectory preview that mirrors gravity/wind, plus a soft guide line to the crosshair. Desktop HUD shows the power/angle strip again. Cache-bust: `v=20261111hand`.
+
 ## Online groundwork
 
 `js/pondwars-beta-net.mjs` (no DOM, runs in Node):

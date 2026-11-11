@@ -1,6 +1,6 @@
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261106a';
-import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261106a';
+import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261111hand';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261111hand';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
@@ -142,8 +142,10 @@ function frog(f, t) {
     ctx.drawImage(art,sx,sy,sw,sh,-width/2,-35,width,height);
   }
   ctx.scale(person.face,1);
-  if(turn && weaponArt[g.weapon]?.naturalWidth)ctx.drawImage(weaponArt[g.weapon],10,-6,29,29);
   ctx.restore();
+  // Held weapon is drawn in world space at hand height (matches projectileOrigin at f.y-32),
+  // not as a sprite glued near the feet inside the character transform.
+  if (turn) heldWeapon(f, bob);
   // team pennant flag above the frog: a second team-colour cue near the label, readable even
   // when the under-foot disc is occluded. It waves on a frog's turn unless reduced-motion is on.
   const flagW = 15 * mk, flagH = 10 * mk, poleTop = f.y - 82 - 13 * mk, poleBot = f.y - 82 + 3;
@@ -169,6 +171,81 @@ function frog(f, t) {
   // pick label text contrast against the actual (dark) box colour instead of a fixed shade
   ctx.fillStyle = readable(boxHex); ctx.fillText(label, f.x, f.y - 70);
   if (turn) { ctx.fillStyle = '#ffd400'; ctx.beginPath(); ctx.moveTo(f.x - 6, f.y - 96 + bob * 2); ctx.lineTo(f.x + 6, f.y - 96 + bob * 2); ctx.lineTo(f.x, f.y - 87 + bob * 2); ctx.fill(); }
+}
+// Draw the active frog's weapon at hand height. Ballistic / aimed weapons rotate with `aim`;
+// placeables and utilities sit near the hands as a readable icon (no bottom-of-sprite glue).
+// `base` corrects art that already points up-right (~−45°) so the tip follows the aim line.
+const HOLD = {
+  rocket: { w: 32, h: 32, ox: -6, oy: -16, base: Math.PI / 4 },
+  drill: { w: 32, h: 32, ox: -6, oy: -16, base: Math.PI / 4 },
+  bat: { w: 34, h: 34, ox: -4, oy: -17, base: Math.PI / 4 },
+  revolver: { w: 30, h: 24, ox: -2, oy: -12, base: 0 },
+  bow: { w: 32, h: 28, ox: -4, oy: -14, base: 0 },
+  // Thrown icons sit mostly above the grip so they read as “in hand”, not dangling to the ankles.
+  grenade: { w: 22, h: 26, ox: -8, oy: -22, base: 0 },
+  cluster: { w: 22, h: 26, ox: -8, oy: -22, base: 0 },
+  gold: { w: 26, h: 26, ox: -10, oy: -20, base: 0 },
+};
+const PLACE_HOLD = new Set(['mine', 'dynamite', 'candles', 'teleport', 'jetpack', 'rope']);
+function heldWeapon(f, bob = 0) {
+  const img = weaponArt[g.weapon];
+  if (!img?.naturalWidth) return;
+  const handX = f.x, handY = f.y - 32 + bob;
+  const side = Math.cos(aim) >= 0 ? 1 : -1;
+  if (PLACE_HOLD.has(g.weapon)) {
+    ctx.drawImage(img, handX + side * 14 - 13, handY - 24, 26, 26);
+    return;
+  }
+  // Thrown bombs stay upright in the hands (slight lean toward aim) so they read clearly at torso height.
+  if (['grenade', 'cluster', 'gold'].includes(g.weapon)) {
+    const h = HOLD[g.weapon];
+    ctx.save();
+    ctx.translate(handX + side * 12, handY - 2);
+    ctx.rotate(aim * .18);
+    ctx.drawImage(img, h.ox, h.oy, h.w, h.h);
+    ctx.restore();
+    return;
+  }
+  const h = HOLD[g.weapon] || { w: 28, h: 28, ox: -6, oy: -14, base: 0 };
+  ctx.save();
+  ctx.translate(handX + Math.cos(aim) * 8, handY + Math.sin(aim) * 8);
+  ctx.rotate(aim + h.base);
+  // Keep the top of the weapon upright when aiming left of vertical.
+  if (Math.cos(aim) < 0) ctx.scale(1, -1);
+  ctx.drawImage(img, h.ox, h.oy, h.w, h.h);
+  ctx.restore();
+}
+// Dotted arc that mirrors the real shot (gravity + wind). Shown while aiming ballistic weapons.
+function aimArc(f, angle, pwr) {
+  const w = WEAPONS[g.weapon];
+  if (!w || w.utility || PLACE_HOLD.has(g.weapon) || g.weapon === 'bat') return;
+  const origin = projectileOrigin(f, angle);
+  const speed = (g.weapon === 'revolver' ? 1 : Math.max(.08, Math.min(1, pwr))) * w.power;
+  let x = origin.x, y = origin.y, vx = Math.cos(angle) * speed, vy = Math.sin(angle) * speed;
+  const grav = G * (w.gravity ?? 1);
+  const s = ui;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 248, 210, 0.55)';
+  ctx.fillStyle = 'rgba(255, 210, 90, 0.9)';
+  ctx.lineWidth = 1.6 * s;
+  ctx.setLineDash([3.5 * s, 5.5 * s]);
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  let hitX = x, hitY = y;
+  for (let i = 0; i < 220; i++) {
+    vy += grav * STEP;
+    if (w.wind) vx += g.wind * WIND_ACC * STEP;
+    x += vx * STEP; y += vy * STEP;
+    if (x < -20 || x > W + 20 || y > WATER + 30 || y < -80) break;
+    if (solid(g.mask, x, y)) break;
+    ctx.lineTo(x, y);
+    hitX = x; hitY = y;
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(hitX, hitY, 3.2 * s, 0, 7); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.lineWidth = 1.2 * s; ctx.stroke();
+  ctx.restore();
 }
 // ---------- effects: flying dirt and smoke after a blast, sparkles for the teleport ----------
 function debris(x, y, r) {
@@ -254,9 +331,13 @@ function draw(t) {
     } else {
       const s = ui, ox = f.x, oy = f.y - 32, dx = Math.cos(aim), dy = Math.sin(aim);
       const cx = ox + dx * 52 * s, cy = oy + dy * 52 * s;
+      const p = charging ? power : cpu?.charging ? cpu.p : remoteP > 0 ? remoteP : .55;
+      // Soft guide from the hand to the crosshair, then a real trajectory preview.
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 1.4 * s;
+      ctx.beginPath(); ctx.moveTo(ox + dx * 14, oy + dy * 14); ctx.lineTo(cx, cy); ctx.stroke();
+      aimArc(f, aim, (charging || cpu?.charging || remoteP > 0) ? p : .55);
       ctx.strokeStyle = '#000a'; ctx.lineWidth = 4 * s; ctx.beginPath(); ctx.arc(cx, cy, 7 * s, 0, 7); ctx.stroke();
       ctx.strokeStyle = '#fff'; ctx.lineWidth = 2 * s; ctx.beginPath(); ctx.arc(cx, cy, 7 * s, 0, 7); ctx.moveTo(cx - 11 * s, cy); ctx.lineTo(cx + 11 * s, cy); ctx.moveTo(cx, cy - 11 * s); ctx.lineTo(cx, cy + 11 * s); ctx.stroke();
-      const p = charging ? power : cpu?.charging ? cpu.p : remoteP;
       if (charging || cpu?.charging || remoteP > 0) powerMeter(ox, oy, dx, dy, p, s, t);
     }
   }
