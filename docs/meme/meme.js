@@ -471,6 +471,8 @@
 
   // ---------- windows ----------
   var wins = [], zTop = 20, activeW = null, maxW = null, closedHint = false;
+  // the 'Window closed' tip shows once per browser: after the first time it stays quiet
+  try { closedHint = localStorage.getItem('pondos-closed-hint') === '1'; } catch (e) {}
   var tasks = document.querySelector('.tasks');
   var winList = document.querySelector('.sm-wins');
   function inView(W) { var r = W.host.getBoundingClientRect(); return r.bottom > 40 && r.top < window.innerHeight - 60; }
@@ -593,7 +595,7 @@
     W.maxBtn.addEventListener('click', function () { toggleMax(W); });
     bar.querySelector('.w-x').addEventListener('click', function () {
       setState(W, 'closed');
-      if (!closedHint) { closedHint = true; balloon('Window closed', 'Closed windows wait in Start ▸ Windows on this page. Nothing on the chain was harmed.', 'gif-040'); }
+      if (!closedHint) { closedHint = true; try { localStorage.setItem('pondos-closed-hint', '1'); } catch (e) {} balloon('Window closed', 'Closed windows wait in Start ▸ Windows on this page. Nothing on the chain was harmed.', 'gif-040'); }
     });
     bar.addEventListener('dblclick', function (e) { if (!e.target.closest('button')) toggleMax(W); });
     win.addEventListener('pointerdown', function () { if (activeW !== W) focusW(W); });
@@ -775,16 +777,16 @@
     // the numbers and tools live in the "Nerds only" folder, and the Recycle Bin sits in the bottom-right corner
     var NERDS = [['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'], ['calculator.html', 'What-if machine', 'p-eyes-still'],
       ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'], ['#addr', 'AddressCheck.exe', 'pepe-search'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], ['#nerdreadme', 'README_NERD.txt', 'news']];
-    // wide screens: from the top-left corner, Log On alone, a gap, then the games in two columns;
-    // the rest of the pond in a small group lower down, NERDS ONLY on its own by the Start button, the bin far right
+    // wide screens (byl's layout): two columns from the top-left corner (Log On, LAN Party, the games, PEP-TV Ads);
+    // Internet, Pond TV, NERDS ONLY and Find in the bottom-left corner; Shop, Twitter and r/pepecoin in a row at the
+    // bottom centre; Write a letter and the Recycle Bin in the bottom-right corner. Phones get one grid in the same order.
     var DESKTOP = [
-      ['logon', [['#logon', 'Log On', 'pep-logo'], ['#find', 'Find', 'search']]],
-      ['play', [['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'], ['#lan', 'LAN Party', 'gif-080-still'], ['#games', 'Games', 'games-folder'],
-        ['#tv', 'Pond TV', 'pond-tv'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads']]],
-      ['pond', [['./', 'Internet', 'internet'], ['#shop', 'Shop', 'shop-bag'], ['#mail', 'Write a letter', 'frog-mail']]],
-      // the community: our subreddit and the official Pepecoin account (the classic bird), next to NERDS ONLY above the taskbar
-      ['nerds', [['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#reddit', 'r/pepecoin', 'reddit'], ['#twitter', 'Twitter', 'twitter-bird']]],
-      ['bin', [['#bin', 'Recycle Bin', 'recycle-bin']]]
+      ['top', [['#logon', 'Log On', 'pep-logo'], ['#lan', 'LAN Party', 'gif-080-still'], ['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'],
+        ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#games', 'Games', 'games-folder']]],
+      ['low', [['./', 'Internet', 'internet'], ['#tv', 'Pond TV', 'pond-tv'], ['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#find', 'Find', 'search']]],
+      // the community: the shop, the official Pepecoin account (the classic bird) and our subreddit
+      ['mid', [['#shop', 'Shop', 'shop-bag'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit']]],
+      ['corner', [['#mail', 'Write a letter', 'frog-mail'], ['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
     var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
@@ -819,12 +821,18 @@
       return '<div class="icon-group g-' + g[0] + '"><ul class="icons">' + g[1].map(function (d) { return '<li' + (d[0] === '#bin' ? ' class="bin-li"' : '') + '><a href="' + d[0] + '" data-id="' + esc(d[1]) + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></a></li>'; }).join('') + '</ul></div>';
     }).join('') + '</div>';
     document.body.insertBefore(desk, mainEl);
-    // on a wide screen the Recycle Bin leaves its group for the bottom-right corner, above the clock
-    if (window.innerWidth > 1100) { var binLi = desk.querySelector('.bin-li'); if (binLi) { var corner = el('ul', { class: 'icons desk-corner', 'aria-label': 'Recycle Bin' }); corner.appendChild(binLi); document.body.appendChild(corner); } }
+    // on a wide screen the bottom rows leave the left strip: the community row to the bottom centre,
+    // Write a letter + the Recycle Bin to the bottom-right corner, above the clock
+    if (window.innerWidth > 1100) [['mid', 'Community'], ['corner', 'Mail and Recycle Bin']].forEach(function (g) {
+      var grp = desk.querySelector('.g-' + g[0]); if (!grp) return;
+      var dock = el('ul', { class: 'icons desk-corner desk-' + g[0], 'aria-label': g[1] });
+      grp.querySelectorAll('.icons > li').forEach(function (li) { dock.appendChild(li); });
+      grp.remove(); document.body.appendChild(dock);
+    });
     var lanIcon = desk.querySelector('a[href="#lan"]');
     if (lanIcon) lanIcon.insertAdjacentHTML('beforeend', '<span class="lan-badge icon-badge" hidden><span class="lan-dot" aria-hidden="true"></span><span class="lan-n"></span></span>');
     var FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
-    var iconPos = {}; try { iconPos = JSON.parse(localStorage.getItem('pondos-icons4') || '{}'); } catch (e) {}
+    var iconPos = {}; try { iconPos = JSON.parse(localStorage.getItem('pondos-icons5') || '{}'); } catch (e) {}
     var openIcon = function (a) { var h = a.getAttribute('href'); if (ACT[h]) ACT[h](); else location.href = a.href; };
     document.querySelectorAll('.desk .icons a, .desk-corner a').forEach(function (a) {
       var id = a.getAttribute('data-id'), p = iconPos[id];
@@ -848,7 +856,9 @@
         e.preventDefault();   // no text selection while dragging
         var sx = e.clientX, sy = e.clientY, base = iconPos[id] || [0, 0], cur = base;
         // icons stay on the desktop strip: the big window covers the rest, and an icon under it could not be grabbed again
-        var r0 = a.getBoundingClientRect(), x0 = r0.left - base[0], y0 = r0.top - base[1], dr = desk.getBoundingClientRect();
+        var r0 = a.getBoundingClientRect(), x0 = r0.left - base[0], y0 = r0.top - base[1];
+        // the left strip keeps its icons; the bottom rows may wander over the whole wallpaper
+        var dr = a.closest('.desk') ? desk.getBoundingClientRect() : { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight };
         var left = dr.left, right = Math.max(dr.left, dr.right - r0.width), top = Math.max(0, dr.top);
         var bottom = Math.min(window.innerHeight - 44, dr.bottom) - r0.height;   // and above the taskbar
         try { a.setPointerCapture(e.pointerId); } catch (err) {}
@@ -863,7 +873,7 @@
         var up = function () {
           a.removeEventListener('pointermove', mv); a.removeEventListener('pointerup', up); a.removeEventListener('pointercancel', up);
           a.classList.remove('dragging');
-          if (moved) { iconPos[id] = cur; try { localStorage.setItem('pondos-icons4', JSON.stringify(iconPos)); } catch (err) {} a.focus({ preventScroll: true }); }
+          if (moved) { iconPos[id] = cur; try { localStorage.setItem('pondos-icons5', JSON.stringify(iconPos)); } catch (err) {} a.focus({ preventScroll: true }); }
         };
         a.addEventListener('pointermove', mv); a.addEventListener('pointerup', up); a.addEventListener('pointercancel', up);
       });
@@ -912,7 +922,7 @@
     ctx = el('div', { class: 'ctx', role: 'menu' });
     [['Arrange windows', arrangeAll], ['Refresh', function () { location.reload(); }], null,
       [dark ? 'Wallpaper: day hills' : 'Wallpaper: night mountains', function () { if (themeBtn) themeBtn.click(); }],
-      ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons4'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
+      ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons5'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
       null, ["Pepe Guesser (today's photo)", function () { wheresPepe(); }], ['FROGAGEDDON (beta)', function () { pondWarsApp(); }], ['YEET THE PEP', function () { yeetApp(); }], ['Pepe Miner', function () { minerApp(); }], null, ['LEADERS', function () { highScores(); }], ['Properties…', aboutOS]].forEach(function (it) {
       if (!it) { ctx.appendChild(el('hr')); return; }
       var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
