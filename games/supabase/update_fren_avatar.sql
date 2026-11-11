@@ -178,8 +178,9 @@ begin
        where a.user_id = u
       returning * into saved;
     end if;
-  else
-    -- Fresh Fren: only the first saved look can mint it, once per player.
+  end if;
+  -- Fresh Fren: the first save from the season start on (a look saved in the beta does not count), once per player.
+  if games.passport_open() then
     insert into games.passport_badges (user_id, badge_id)
     values (u, 'first_avatar')
     on conflict (user_id, badge_id) do nothing
@@ -271,10 +272,12 @@ begin
 
   badge_catalog := jsonb_build_array(
     jsonb_build_object('id', 'first_fren', 'title', 'First Fren',
-      'description', 'Joined the pond with Discord.', 'earned_at', joined),
+      'description', 'Joined the pond with Discord.',
+      'earned_at', case when games.passport_open() then greatest(joined, games.passport_start()) end),
     jsonb_build_object('id', 'moonwalker', 'title', 'Moonwalker',
       'description', 'Recorded a 6000 m YEET flight. Moon Rock inventory validation is not enabled yet.',
-      'earned_at', case when best_distance = 60000 then best_date else null end),
+      -- stored by update_passport_awards.sql from the season start; old records are not backfilled
+      'earned_at', (select b.earned_at from games.passport_badges b where b.user_id = u and b.badge_id = 'moonwalker')),
     jsonb_build_object('id', 'certified_fren', 'title', 'Certified Fren',
       'description', '100 distinct care days in PepeGochi.',
       'earned_at', (select b.earned_at from games.passport_badges b

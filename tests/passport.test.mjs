@@ -85,13 +85,13 @@ test('Fresh Fren is live only together with its server award path', () => {
   assert.equal(avatar.status, 'live');
   assert.match(avatar.description, /create and save your first custom fren avatar/i);
   assert.ok(existsSync(new URL('../docs/meme/' + avatar.icon, import.meta.url)), 'badge icon');
-  // the older Passport migration never awards it; the avatar migration does, only on the first save
+  // the older Passport migration never awards it; the avatar migration does, on the first save from the season start
   assert.doesNotMatch(sql, /insert into games\.passport_badges[^;]*first_avatar/i);
   const awards = [...avatarSql.matchAll(/insert into games\.passport_badges[^;]*;/gi)];
   assert.equal(awards.length, 1);
   assert.match(awards[0][0], /'first_avatar'[\s\S]*on conflict \(user_id, badge_id\) do nothing/);
-  const firstBranch = avatarSql.split('first_save := found;')[1].split('select b.earned_at into badge_at')[0];
-  assert.match(firstBranch.split(/\n  else\n/)[1], /insert into games\.passport_badges/, 'award sits in the first-save branch');
+  const afterSave = avatarSql.split('first_save := found;')[1].split('select b.earned_at into badge_at')[0];
+  assert.match(afterSave, /if games\.passport_open\(\) then\s+insert into games\.passport_badges/, 'award waits for the season start');
 });
 
 test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered looks, valid defaults', () => {

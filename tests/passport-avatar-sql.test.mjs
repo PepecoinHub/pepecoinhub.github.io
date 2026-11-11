@@ -49,6 +49,9 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     await db.query(SUPABASE_STUB);
     await db.query(identityFn[0]);
     await db.query(await read('games/supabase/update_yeet.sql'));
+    await db.query(await read('games/supabase/update_passport_season.sql'));
+    // the season is open here (tests/passport-awards-sql.test.mjs checks the beta)
+    await db.query("create or replace function games.passport_start() returns timestamptz language sql stable set search_path = '' as $$ select '2000-01-01 00:00:00+00'::timestamptz $$");
     await db.query(await read('games/supabase/update_fren_passport.sql'));
     const migration = await read('games/supabase/update_fren_avatar.sql');
     await db.query(migration);
