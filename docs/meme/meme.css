@@ -1119,7 +1119,10 @@ footer.foot a { color: #edf3e3; }
 
 /* iPhone "Add to Home Screen" (and any screen with a home bar): the taskbar grows by the safe area instead of
    being squeezed by it, and everything that sits on top of the taskbar moves up with it */
-:root.pondos { --sab: env(safe-area-inset-bottom, 0px); }
+:root.pondos { --sab: calc(env(safe-area-inset-bottom, 0px) + var(--vvb, 0px)); }
+/* --vvb (meme.js): the part of the page that an app's own browser bar covers at the bottom (X, Telegram,
+   Discord in-app browsers draw their buttons over the page without resizing it). The taskbar grows by it,
+   so its buttons stay above that bar, and everything that sits on the taskbar moves up with it. */
 .pondos header.top { height: calc(40px + var(--sab)) !important; }
 .pondos body { padding-bottom: calc(40px + var(--sab)) !important; }
 .balloon { bottom: calc(50px + var(--sab)); }

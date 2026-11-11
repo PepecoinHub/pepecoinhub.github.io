@@ -32,6 +32,24 @@
       return FREN_TEST || localStorage.getItem('pondos-fren-beta') === '1';
     } catch (e) { return false; }
   })();
+  // In-app browsers (X, Telegram, Discord...) can cover the bottom of the page with their own buttons without
+  // making the page shorter, so a taskbar fixed at the bottom ends up under them. The visual viewport says
+  // how much is really visible: --vvb is the covered part, and the taskbar grows by it (meme.css --sab).
+  // Not while zoomed in or typing (the keyboard), so the taskbar does not jump around.
+  (function () {
+    var vv = window.visualViewport, root = document.documentElement, last = -1;
+    if (!vv) return;
+    function fit() {
+      var a = document.activeElement, typing = a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable);
+      var gap = (vv.scale > 1.01 || typing) ? 0 : Math.round(window.innerHeight - vv.height - vv.offsetTop);
+      gap = Math.max(0, Math.min(gap, 160));
+      if (gap !== last) { last = gap; root.style.setProperty('--vvb', gap + 'px'); }
+    }
+    vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit);
+    addEventListener('resize', fit); addEventListener('orientationchange', fit);
+    document.addEventListener('focusout', function () { setTimeout(fit, 300); });
+    fit();
+  })();
   // PepeGochi in testing: hidden for everyone except a browser that opened /meme/?beta=gochi once
   // (?beta=off hides it again). Testers get the real game (games/pepegochi-live.html: the frog on the server,
   // Discord only; it needs the PepeGochi SQL) and the LOCAL rules simulator (games/pepegochi.html, no network).
