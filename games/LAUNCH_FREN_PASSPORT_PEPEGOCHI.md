@@ -1,37 +1,24 @@
-# Launch day: Avatar Maker + Fren Passport + PepeGochi
+# Launch day: Fren Passport + Create Your Fren + Pepe Guesser Hall of Fame (PepeGochi later)
 
-Everything ships together from PR #236 (`release/pondos-fren-launch`). Nothing runs on production before the owner says go.
+Everything ships from the release PR (`claude/launch-release` → `main`): the launch branch (#236, with #253), `main`,
+#251, #246, #258 and the notice fix. **Nothing is public until that PR is merged** (the site is published from `main` only).
+PepeGochi launches after the Passport (owner, 2026-11-09): it stays behind `?beta=gochi` and its SQL waits.
 
-## 1. The owner runs the SQL in Supabase (SQL editor), in this order
+## On the owner's command, in this order
+1. Supabase > SQL Editor: `games/supabase/deploy/00_check.sql` (read only).
+2. Supabase > SQL Editor: `games/supabase/deploy/LAUNCH_ALL.sql` (13 files, one transaction: all or nothing).
+   The first run of `update_passport_awards.sql` inside it is the launch moment (Pond Pioneer snapshot; the Hall of
+   Fame starts the first Monday on or after it).
+3. `00_check.sql` again: every row `done`, the last row shows the launch time.
+4. Claude merges the release PR into `main`. The Passport and Create Your Fren are on for everyone (`FREN = true`);
+   `?beta=fren` only gives testers the local preview fallback; `?beta=fren-test` stays the owner sandbox.
+5. Live checks: log on with Discord → the Passport opens, First Fren and Pond Pioneer are there, the reward dialog
+   shows on top of every window; Create Your Fren saves (Fresh Fren); C:\Pond\Pepe Guesser has Hall of Fame;
+   LAN Party shows who is online; a guest sees "Log on with Discord" in the Passport.
 
-Each file is one transaction and safe to run twice. Stop at the first error and send it to Claude.
+If step 2 fails, nothing was applied: send the red message to Claude. Do not merge before step 3 is all `done`.
 
-1. `games/supabase/update_fren_passport.sql`
-2. `games/supabase/update_fren_avatar.sql`
-3. `games/supabase/update_passport_awards.sql`
-4. `games/supabase/update_pepegochi_v2.sql`
-5. `games/supabase/update_pepegochi_passport.sql`
-6. `games/supabase/update_pepegochi_room_v1.sql`
-7. `games/supabase/update_pepegochi_rewards.sql`
-
-The game migrations these hook into (YEET, Pepe Guesser, chat, letters, polls, arcade, Pepe Miner cloud saves, board games)
-are already live. A hook whose table is missing is skipped, not an error.
-
-## 2. Claude: the release commit (after step 1 succeeds)
-
-- Remove the `?beta=fren` and `?beta=gochi` gates in `docs/meme/meme.js` (FREN and GOCHI become always on).
-- Hide the "PEPEGOCHI (local test)" entries (testers only).
-- Bump cache versions, run all tests, merge #236 into `main`, close the superseded drafts (#186, #218–#229, #233, #235).
-
-## 3. Check on the live site (owner + Claude)
-
-- Log on with Discord: the Passport opens, First Fren is stamped, the reward dialog shows.
-- Create Your Fren saves; Fresh Fren arrives.
-- PEPEGOCHI.EXE: adopt an egg, feed it: it hatches, First Hatch arrives. Decorate shows the starter room.
-- Owner: Frog Mail → a letter with "OK to print" → 🖨 Mark printed → Junior Editor for its writer.
-
-## 4. Later (not launch)
-
+## Later
+- PepeGochi day: `deploy/RUN_ORDER.md` ("Later: PepeGochi day").
 - BALI: the owner opens it on the day PEP reaches $0.01 (Frog Mail → 🏝 PEP hit $0.01? Open BALI…).
-- Bug Hunter and Beta Tester wait (hidden).
-- A short Gazette note about secrets, when the owner wants it.
+- Optional: Supabase > Database > Extensions > `pg_cron`, then run `update_wheres_pepe_hall_of_fame.sql` again.

@@ -26,23 +26,24 @@ does no harm). The last row shows whether the Passport has launched (the Pond Pi
 11. `update_passport_awards.sql`: **its first run is the launch moment**: everyone with Discord linked right then gets
     Pond Pioneer, and the Hall of Fame starts on the first Monday on or after this moment.
 12. `update_passport_public.sql`: other frens' passports, read only.
-13. `update_pepegochi_v2.sql`
-14. `update_pepegochi_passport.sql`
-15. `update_pepegochi_room_v1.sql`
-16. `update_pepegochi_rewards.sql`
-17. `update_wheres_pepe_hall_of_fame.sql`: Days at #1, Weekly Champion, Pond Dominator, Hall of Fame (#258). Last, so
+13. `update_wheres_pepe_hall_of_fame.sql`: Days at #1, Weekly Champion, Pond Dominator, Hall of Fame (#258). Last, so
     the week board is Monday-Sunday and still hides the host.
 
 ## All at once
-`deploy/LAUNCH_ALL.sql` is files 1-17 in this order in ONE transaction (built by `scripts/build_launch_sql.py`, the
+`deploy/LAUNCH_ALL.sql` is files 1-13 in this order in ONE transaction (built by `scripts/build_launch_sql.py`, the
 files' own begin/commit lines taken out): paste it, Run, and either everything is in or, on any error, nothing is.
-Use it instead of the 17 files, not as well (running both is harmless, only slower).
+Use it instead of the 13 files, not as well (running both is harmless, only slower).
 
 Then run `deploy/00_check.sql` again: all rows `done`, and the last row shows the launch time.
 
 ## Optional, after B
 - Supabase > Database > Extensions > `pg_cron` on, then run step 15 again: the Hall of Fame closes each day at 00:01 UTC
   by itself. Without it, days close on the next Passport visit or Hall of Fame view (same result, a bit later).
+
+## Later: PepeGochi day (owner, 2026-11-09: PepeGochi launches after the Passport)
+Not in LAUNCH_ALL.sql. On PepeGochi day, in this order: `update_pepegochi_v2.sql`, `update_pepegochi_passport.sql`,
+`update_pepegochi_room_v1.sql`, `update_pepegochi_rewards.sql`; then its five stamps go `live` and the `?beta=gochi` gate
+comes off. Until then its API does not exist, so nobody can adopt a frog before the window is public.
 
 ## Included decisions
 - #253 (Pond Pioneer V3, Share Fren as a secret) is merged into the launch branch: step 11 is that file.

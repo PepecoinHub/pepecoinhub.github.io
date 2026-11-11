@@ -21,11 +21,10 @@
   var FREN_TEST = (function () {
     try { return new URLSearchParams(location.search).get('beta') === 'fren-test'; } catch (e) { return false; }
   })();
-  // Fren Passport + Create Your Fren (avatar maker) in testing: hidden for everyone except a browser that
-  // opened /meme/?beta=fren once (?beta=off hides it again). Until the Supabase migrations
-  // (update_fren_passport.sql, update_fren_avatar.sql, update_passport_awards.sql) are run, the tester gets a
-  // local preview: the look is kept in this browser only and nothing is sent to the server.
-  var FREN = (function () {
+  // Fren Passport + Create Your Fren: LIVE for everyone (launch). FREN_BETA is the old tester flag (/meme/?beta=fren,
+  // ?beta=off removes it): only testers still fall back to the local preview when the server says no.
+  var FREN = true;
+  var FREN_BETA = (function () {
     try {
       var q = new URLSearchParams(location.search).get('beta');
       if (q === 'fren') localStorage.setItem('pondos-fren-beta', '1');
@@ -1746,7 +1745,7 @@
   // In ordinary beta mode preserve the existing fallback until migrations launch.
   function frenRpc(name, args) {
     var s = sbSession();
-    if (!FREN) return rpc(name, args);
+    if (!FREN_BETA) return rpc(name, args);
     if (FREN_TEST) return frenTestAuthorize().then(function () { return frenPreview(name, args || {}); });
     if (!s || !s.discord) return Promise.resolve(frenPreview(name, args));
     return rpc(name, args).catch(function (err) { if (frenMissing(err)) return frenPreview(name, args); throw err; });
@@ -1806,7 +1805,7 @@
   function passportMine() {
     var s = sbSession();
     if (FREN_TEST) return s && s.discord && passportCache && passportCache.preview && passportCache.userId === s.userId ? passportCache : null;
-    if (FREN && passportCache && passportCache.preview) return passportCache;
+    if (FREN_BETA && passportCache && passportCache.preview) return passportCache;
     return s && s.discord && passportCache && passportCache.userId === s.userId ? passportCache : null;
   }
   // another fren's passport, read only (games/supabase/update_passport_public.sql): the server answers only
@@ -2334,7 +2333,7 @@
         });
         return;
       }
-      if (!FREN && (!session || !session.discord)) {
+      if (!FREN_BETA && (!session || !session.discord)) {
         notice('Log on with Discord to see your private passport. Guest scores do not create a permanent collection.', true);
         return;
       }
@@ -2460,7 +2459,7 @@
       passportCss();
       A.host.classList.add('fren-win');
       A.body.innerHTML = '<div class="fa-load"><p class="passport-muted" role="status">Loading the Avatar Maker…</p></div>';
-      var session = sbSession(), signed = FREN || !!(session && session.discord && session.userId);
+      var session = sbSession(), signed = FREN_BETA || !!(session && session.discord && session.userId);
       // opened from the Passport: its snapshot already has the saved look; otherwise read it once
       var loading = FREN_TEST
         ? frenTestAuthorize().then(function () { return Promise.all([avatarOptions(), passportLoad(session)]); })

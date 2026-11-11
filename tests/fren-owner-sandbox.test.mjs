@@ -20,7 +20,7 @@ function harness({ owner = true, discord = true } = {}) {
   const state = { catalog, opts, state: null };
   let renders = 0;
   const ctx = {
-    FREN_TEST: true, FREN: true,
+    FREN_TEST: true, FREN: true, FREN_BETA: true,
     localStorage: {
       getItem: key => storage.get(key) ?? null,
       setItem: (key, val) => storage.set(key, val),

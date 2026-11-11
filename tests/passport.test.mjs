@@ -219,16 +219,19 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
   assert.ok(existsSync(new URL('../games/fren-passport/source/passport-mockup.webp', import.meta.url)), 'lossless source art is kept');
 });
 
-test('Fren Passport and Avatar Maker stay hidden unless the browser opened ?beta=fren', () => {
-  assert.match(pond, /if \(q === 'fren'\) localStorage\.setItem\('pondos-fren-beta', '1'\)/);
+test('launch: the Fren Passport and Avatar Maker are on for everyone; only testers get the local preview', () => {
+  assert.match(pond, /\n  var FREN = true;\n/);
+  assert.match(pond, /if \(q === 'fren'\) localStorage\.setItem\('pondos-fren-beta', '1'\)/);   // FREN_BETA, testers only
   assert.match(pond, /if \(FREN\) smMain\.appendChild\(passportItem\)/);
   assert.match(pond, /\]\.concat\(FREN \? \[\s*\['Fren Passport'/);
   assert.match(pond, /&& \(FREN \|\| !ad\.fren\)/);
   for (const f of ['pond_stamps.mpg', 'fren_passport.mpg', 'create_your_fren.mpg']) assert.match(pond, new RegExp("file: '" + f.replace('.', '\\.') + "', fren: true"));
-  assert.match(pond, /function discoverSecret\(id\) \{\s*if \(!FREN\) return;/);
-  assert.match(pond, /if \(!FREN \|\| !s \|\| !s\.discord \|\| !s\.userId\) return;/);
-  // the local preview is used only in the beta, and only when the server functions are missing or there is no Discord log-on
-  assert.match(pond, /function frenRpc\(name, args\) \{\s*var s = sbSession\(\);\s*if \(!FREN\) return rpc\(name, args\);/);
+  // everyone else talks to the server: no local test passport for a visitor without Discord
+  assert.match(pond, /function frenRpc\(name, args\) \{\s*var s = sbSession\(\);\s*if \(!FREN_BETA\) return rpc\(name, args\);/);
+  assert.match(pond, /if \(FREN_BETA && passportCache && passportCache\.preview\) return passportCache;/);
+  assert.match(pond, /if \(!FREN_BETA && \(!session \|\| !session\.discord\)\) \{/);
+  // PepeGochi launches later (owner, 2026-11-09): still behind ?beta=gochi
+  assert.match(pond, /return localStorage\.getItem\('pondos-gochi-beta'\) === '1';/);
 });
 
 // ---------- another fren's passport (static checks; tests/passport-public-sql.test.mjs runs the SQL for real) ----------

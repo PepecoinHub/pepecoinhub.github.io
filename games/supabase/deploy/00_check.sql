@@ -33,17 +33,7 @@ with checks(step, file, done) as (values
                where n.nspname = 'games' and p.proname = 'passport_award' and p.prosrc like '%pond_dominator%')),
   (12, 'update_passport_public.sql',
        to_regprocedure('public.gry_passport_public(uuid)') is not null),
-  (13, 'update_pepegochi_v2.sql',
-       to_regclass('games.pepegochi_owners') is not null),
-  (14, 'update_pepegochi_passport.sql',
-       exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-               where n.nspname = 'games' and p.proname = 'pepegochi_passport_stamp')),
-  (15, 'update_pepegochi_room_v1.sql',
-       to_regclass('games.pepegochi_room_inventory') is not null),
-  (16, 'update_pepegochi_rewards.sql',
-       exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-               where n.nspname = 'games' and p.proname = 'pepegochi_reward_sync')),
-  (17, 'update_wheres_pepe_hall_of_fame.sql',
+  (13, 'update_wheres_pepe_hall_of_fame.sql',
        to_regclass('games.wp_days') is not null))
 select step, file, case when done then 'done' else 'missing' end as state from checks
 union all
