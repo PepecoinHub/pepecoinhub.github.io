@@ -1792,19 +1792,8 @@
   var PP_STAMPS = ['calendar', 'gamepad', 'pickaxe', 'duck', 'magnifier', 'folders', 'computer', 'people',
     'sprout', 'handshake', 'rocket', 'binoculars', 'deerstalker', 'moon', 'joystick', 'locked'];
   var PP_ICONS = ['plane', 'calendar', 'trophy', 'box', 'gamepad', 'star', 'gift', 'tab_home', 'tab_trophy', 'tab_stamp', 'tab_box', 'tab_stats'];
-  // the stamp each achievement shows once earned; anything else falls back to its category
-  // (stamps without their own drawing yet reuse the closest one)
-  var PP_STAMP_OF = {
-    first_fren: 'duck', first_avatar: 'sprout', moonwalker: 'moon', like_it_here: 'calendar', welcome_back: 'duck', senior_editor: 'folders', certified_fren: 'handshake',
-    pond_pioneer: 'handshake', sharp_eye: 'magnifier', week_scout: 'binoculars', first_words: 'people', hey_fren: 'people',
-    dear_editor: 'computer', junior_editor: 'folders', rookie_miner: 'pickaxe',
-    community_fren: 'people', pepe_guesser: 'binoculars',
-    scout_fren: 'binoculars', detective_fren: 'deerstalker',
-    game_night: 'computer', arcade_hopper: 'joystick', yeet_adept: 'rocket', nasa_is_hiring: 'rocket',
-    first_hatch: 'sprout'
-  };
-  var PP_STAMP_CAT = { community: 'people', avatar: 'sprout', yeet: 'rocket', where_pepe: 'binoculars', arcade: 'joystick',
-    pepegachi: 'sprout', secrets: 'magnifier', exploration: 'magnifier' };
+  // The legacy atlas is used only for the uniform locked stamp icon.
+  // All earned stamp art must come from the approved V3 atlas or the neutral placeholder.
   function ppSprite(cls, names, name, label) {
     var i = Math.max(0, names.indexOf(name));
     var n = el('span', label ? { class: cls, role: 'img', 'aria-label': label } : { class: cls, 'aria-hidden': 'true' });
