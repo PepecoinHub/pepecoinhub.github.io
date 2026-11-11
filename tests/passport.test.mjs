@@ -180,10 +180,10 @@ test('Avatar Maker client: one save RPC with six v2 IDs, nothing kept in localSt
 test('Passport booklet art: four small transparent WebPs with the sizes the page layout assumes', () => {
   const dir = new URL('../docs/meme/passport-assets/', import.meta.url);
   const want = { 'page-left.webp': [360, 528], 'page-right.webp': [360, 528], 'stamps.webp': [16 * 69, 75], 'icons.webp': [12 * 48, 48],
-    // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
+    // The legacy Lily archive remains on disk for provenance, but the client never references it.
     'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
-    // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
-    'stamps-v3.webp': [24 * 138, 150],
+    // One optimized sprite holds 49 approved V3 illustrations, including Pond Pioneer.
+    'stamps-v3.webp': [49 * 138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
@@ -191,8 +191,8 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   for (const [f, size] of Object.entries(want)) {
     const b = readFileSync(new URL(f, dir));
     if (f !== 'stamps-lily.webp' && f !== 'stamps-v3.webp') total += b.length;
-    // the sprites load only when the Passport opens; the v3 one holds 24 tiles now (about 9-10 KB each)
-    else assert.ok(b.length < (f === 'stamps-v3.webp' ? 256 : 200) * 1024, 'stamp sprite stays small: ' + f + ' ' + b.length);
+    // Still a single lazy-loaded WebP; never ship uncompressed high-res source PNGs to the phone.
+    else assert.ok(b.length < (f === 'stamps-v3.webp' ? 800 : 200) * 1024, 'stamp sprite stays small: ' + f + ' ' + b.length);
     assert.equal(b.toString('latin1', 0, 4) + b.toString('latin1', 8, 12), 'RIFFWEBP', f + ' is a WebP');
     // VP8X is the extended header used for images with alpha (the photo window and sprite edges are transparent)
     assert.equal(b.toString('latin1', 12, 16), 'VP8X', f + ' carries alpha');
@@ -203,14 +203,21 @@ test('Passport booklet art: four small transparent WebPs with the sizes the page
   const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
   assert.equal(count('PP_STAMPS'), 16);
-  assert.equal(count('PP_V3'), 24, 'PP_V3 matches the 24 tiles of stamps-v3.webp');
+  assert.equal(count('PP_V3'), 49, 'PP_V3 matches the 49 approved tiles of stamps-v3.webp');
   const v3 = readFileSync(new URL('../scripts/build_v3_stamps.py', import.meta.url), 'utf8').match(/V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join();
   assert.equal(v3, js.match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join(), 'same order as the build script');
   assert.equal(count('PP_ICONS'), 12);
-  // the Lily sprite order in the client equals the build script order
-  const lily = js.match(/var PP_LILY = \[([^\]]*)\]/)[1].match(/'([a-z0-9_]+)'/g).map(x => x.slice(1, -1));
-  const built = [...readFileSync(new URL('../scripts/build_lily_stamps.mjs', import.meta.url), 'utf8').matchAll(/\['([a-z0-9_]+)', S[123],/g)].map(x => x[1]);
-  assert.equal(lily.length, 15); assert.deepEqual(lily, built);
+  // Never display Lily artwork or mislead an earned but unillustrated stamp with another stamp's image.
+  assert.doesNotMatch(js, /PP_LILY|is-lily|stamps-lily\.webp/);
+  const css = readFileSync(new URL('../docs/meme/passport.css', import.meta.url), 'utf8');
+  assert.doesNotMatch(css, /is-lily|stamps-lily\.webp/);
+  assert.match(js, /class: 'pp-art pp-art-stamp is-pending'/);
+  assert.match(css, /pp-art-stamp\.is-pending/);
+  const v3ids = [...js.match(/var PP_V3 = \[([^\]]*)\]/)[1].matchAll(/'([a-z0-9_]+)'/g)].map(x => x[1]);
+  for (const id of ['pond_pioneer','welcome_back','first_words','hey_fren','dear_editor','junior_editor',
+    'senior_editor','streak_14','pepe_guesser','week_scout','scout_fren','first_hatch','little_fren','grown_fren'])
+    assert.ok(v3ids.includes(id), id + ' must no longer use Lily art');
+  assert.ok(!v3ids.includes('frogageddon_beta'), 'unapproved Beta Tester art uses the neutral placeholder');
   assert.ok(existsSync(new URL('../games/fren-passport/source/passport-mockup.webp', import.meta.url)), 'lossless source art is kept');
 });
 

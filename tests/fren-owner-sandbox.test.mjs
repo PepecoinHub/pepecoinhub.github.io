@@ -144,8 +144,8 @@ test('QA unlock control is visible in the Maker, not only the Passport window', 
   assert.ok(!maker.includes("localStorage.setItem('pondos-passport-secret-v1:"));
 });
 
-test('the home page busts stale JS and the maker reloads fresh QA CSS', () => {
+test('the home page busts stale JS and the maker reloads fresh approved V3 CSS', () => {
   const home = read('docs/meme/index.html');
-  assert.match(home, /<script src="meme\.js\?v=20261111qa1"><\/script>/);
-  assert.match(source, /passport\.css\?v=20261111qa1/);
+  assert.match(home, /<script src="meme\.js\?v=20261111v3"><\/script>/);
+  assert.match(source, /passport\.css\?v=20261111v3/);
 });

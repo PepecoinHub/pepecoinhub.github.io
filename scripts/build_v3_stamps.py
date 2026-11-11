@@ -1,11 +1,13 @@
 """Build the Fren Passport v3 stamp sprite from the owner-approved art (PR #233).
 
-Reads games/fren-passport/source/stamps-new/<id>.png (and the two accepted small scenes in
-stamps-review/art-v3-wip/), fits each stamp into a 138x150 tile (shown at 69x75, so 2x), and writes
+Reads the 41 owner-approved files listed in PR #233, six earlier V3-approved files,
+plus the owner-approved Pond Pioneer from PR #253. Sources are checked out into the art root
+by the one-time V3 build workflow. Never uses the Lily sprite. The only small scene lives in
+stamps-review/art-v3-wip/. Fits each stamp into a 138x150 tile (shown at 69x75, so 2x), and writes
 docs/meme/passport-assets/stamps-v3.webp: one row of tiles in the order of V3 below.
 docs/meme/meme.js PP_V3 must list the same ids in the same order (tests check it).
 
-Add a stamp here only after the owner approved its picture.
+Every ID must have an approved source image. Do not add unapproved artwork or copy Lily assets.
 Run: python3 scripts/build_v3_stamps.py [art-root]   (art-root defaults to games/fren-passport)
 """
 import os
@@ -18,11 +20,13 @@ from PIL import Image
 V3 = [
     'frog_of_the_week', 'moonwalker', 'vox_populi', 'certified_fren', 'old_frog', 'good_parent', 'first_avatar',
     'detective_fren', 'good_game', 'yeet_adept', 'fud_buster', 'long_snake', 'arcade_hopper', 'secret_starter',
-    'i_voted', 'checkmate', 'the_secret_pond', 'picasso_fren',
-    # the owner's pixel-art sheet of 7 (2026-11-09); first_avatar above uses its new picture too
-    'first_fren', 'sharp_eye', 'community_fren', 'like_it_here', 'nasa_is_hiring', 'rookie_miner',
+    'i_voted', 'checkmate', 'the_secret_pond', 'picasso_fren', 'first_fren', 'sharp_eye', 'community_fren',
+    'like_it_here', 'nasa_is_hiring', 'rookie_miner', 'season_champion', 'top_ten', 'bug_hunter', 'podium',
+    'game_night', 'quiz_master', 'frogmas', 'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren',
+    'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14',
+    'pepe_guesser', 'week_scout', 'little_fren', 'first_hatch', 'grown_fren', 'scout_fren', 'pond_pioneer',
 ]
-SMALL = {'the_secret_pond', 'picasso_fren'}   # accepted scenes that exist only as the small review files so far
+SMALL = {'the_secret_pond'}   # accepted scenes that exist only as the small review files so far
 TILE = (138, 150)
 PAD = 3
 
