@@ -3558,7 +3558,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 6, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 7, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -3665,6 +3665,28 @@
       '<p class="gz-fine">The editor checked. It is gud.</p></section>' +
       '<p class="gz-foot">*Almost weekly: three days after issue #5. Close enough.</p></article>';
   }
+  // Issue #7 (12 Nov 2026): the Fren Passport public beta, Thursday to Sunday; the season starts Monday 16 XI
+  function gazette7() {
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #7</span><span>Price: 0 PEP</span><span>Special edition</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking"><p class="gz-flash">Breaking</p><h4>🐸 The Pond goes BETA</h4>' +
+      '<div class="gz-wpbox"><img src="img/wow.webp" alt="Pepe with his mouth wide open" width="110" height="110"><div>' +
+      '<p>Frens, it\'s here. Passports, stamps, avatars, all of it, live in the Pond right now.</p>' +
+      '<p>But hold your lily pads: <b>this is a BETA until Sunday night.</b> Poke around, click everything, try to break it. That\'s literally the job this weekend.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-pass">Open your Fren Passport →</button><button type="button" class="app-btn gz-fren">Create Your Fren</button></div></section>' +
+      '<section class="gz-market"><p class="gz-kick">About the Avatar Maker</p><h4>Yes, it\'s ugly. On purpose.</h4>' +
+      '<p>Those basic avatars are just the starting point. The good stuff has to be earned. Want a better face in the Pond? Go unlock one.</p></section>' +
+      '<section class="gz-wp"><p class="gz-kick">The rules</p><h4>Nothing counts yet</h4>' +
+      '<p>Stamps, secrets, avatars to unlock, Pepe Guesser records: all of it starts from zero on Monday. Everyone lines up at the same starting line. No head starts, no early grinders, old records included.</p>' +
+      '<p><b>Except one thing.</b> 🏅 <b>Pond Pioneer</b> is the only stamp you can grab this weekend. Already logged in with Discord? It\'s yours. Not yet? Log in with Discord before <b>Sunday 23:59 CET</b>. After that it\'s gone. Forever. No second chances, no "I was busy".</p></section>' +
+      '<section class="gz-soon"><p class="gz-kick">Found a bug?</p><h4>Tell us anywhere. We\'ll find you. 👀</h4>' +
+      '<div class="gz-wpbox"><img src="img/hardhat.webp" alt="Pepe in a hard hat with a hammer" width="110" height="110"><div>' +
+      '<p>Something broke, looks weird, or just feels off? Shout it in the LAN Party chat, write a letter to the Gazette, or ping us on Discord. Every bug you find now is one less bug ruining Monday.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-write">✏️ Write to the Editor</button><button type="button" class="app-btn gz-lan">LAN Party →</button></div></section>' +
+      '<section class="gz-letters"><p class="gz-kick">Monday 16 November</p><h4>The games begin</h4>' +
+      '<p>Stamps unlock. Pepe Guesser Season 1 kicks off, with Days at #1, the Weekly Champion, Pond Dominator and the Hall of Fame. The first Weekly Champion is crowned on Monday 23 November. A tie at the top? No winner. Play to win.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn gz-betaad">Watch the PEP-TV ad</button></div></section>' +
+      '<p class="gz-foot">See you in the Pond. 🐸 The Editor</p></article>';
+  }
   // Pond Poll in the Gazette (games/supabase/update_polls.sql): the server counts; the page only shows its answer
   function paintPoll(box) {
     var id = box.getAttribute('data-poll');
@@ -3714,7 +3736,8 @@
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
         // one compact row of tabs: the letter form, then the Gazette issues by number (newest first)
         '<li><button type="button" data-v="write" title="Ideas, bugs, wishes, notices">✏️ Letter to the Editor</button></li>' +
-        '<li><button type="button" data-v="gz" title="The Pond Gazette #6: X unblocked us, the first faucet payout, 1 km from tomorrow" aria-label="The Pond Gazette #6">📰 #6</button></li>' +
+        '<li><button type="button" data-v="gz" title="The Pond Gazette #7: the Pond goes BETA" aria-label="The Pond Gazette #7">📰 #7</button></li>' +
+        '<li><button type="button" data-v="gz6" title="The Pond Gazette #6 (archive): X unblocked us, the first faucet payout, 1 km" aria-label="The Pond Gazette #6">#6</button></li>' +
         '<li><button type="button" data-v="gz5" title="The Pond Gazette #5 (archive): the lockout, CoinEx and the first Pond Poll" aria-label="The Pond Gazette #5">#5</button></li>' +
         '<li><button type="button" data-v="gz4" title="The Pond Gazette #4 (archive): the Pepe Guesser leak" aria-label="The Pond Gazette #4">#4</button></li>' +
         '<li><button type="button" data-v="gz3" title="The Pond Gazette #3 (archive): an internet in your internet" aria-label="The Pond Gazette #3">#3</button></li>' +
@@ -3733,8 +3756,8 @@
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
         if (v === 'write') return writeLetter(pane);
         if (v === 'box') return letterInbox(pane, paintOwner);
-        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : 6;
-        pane.innerHTML = issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : v === 'gz6' ? 6 : 7;
+        pane.innerHTML = issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
@@ -3779,6 +3802,9 @@
           '<p class="gz-foot">When a new issue lands, the flag on the mailbox goes up.</p></article>';
         var on = function (sel, fn) { var x = pane.querySelector(sel); if (x) x.addEventListener('click', function (e) { e.preventDefault(); fn(); }); };
         on('.gz-write', function () { show('write'); });
+        on('.gz-pass', function () { frenPassport(); });
+        on('.gz-fren', function () { avatarMaker(); });
+        on('.gz-betaad', function () { adPlayer(Math.max(0, adByFile('pond_beta.mpg'))); });
         on('.gz-lan', function () { lanParty(); });
         on('.gz-wpgo', wheresPepe);
         on('.gz-wpad', function () { adPlayer(Math.max(0, adByFile('pepe_guesser.mpg'))); });
@@ -4013,6 +4039,12 @@
     return '<span class="ad-fren" aria-hidden="true">' + ['bg_forest', 'base_frog', c, m, e, h, a].map(function (id) { return '<img src="avatar-assets/layers/' + id + '.webp" alt="">'; }).join('') + '</span>';
   }
   var ADS = [
+    { file: 'pond_beta.mpg', fren: true, added: '2026-11-12', title: 'The Pond Goes BETA', ch: 'CH 0 · POND BREAKING NEWS', icon: 'pep-logo', scenes: [
+      '<p class="ad-kick">🚨 BREAKING</p><h3 class="ad-big">Passports have<br><em>landed!</em></h3><p class="ad-sub">Fren Passport, stamps and Create Your Fren are live in the Pond. BETA until Sunday night.</p>',
+      '<div class="ad-frens">' + adFren('clothing_none', 'mouth_flat', 'eyes_classic', 'hat_none', 'accessory_none') + '</div><p class="ad-kick">Is the Avatar Maker ugly?</p><h3 class="ad-big">Yes.<br><em>On purpose.</em></h3><p class="ad-sub">The good ones? You earn those.</p>',
+      '<p class="ad-kick">Only ONE stamp up for grabs this weekend</p><h3 class="ad-big">🏅 <em>Pond Pioneer</em></h3><p class="ad-sub">Log in with Discord before Sunday 23:59 CET. After that it\'s gone. Forever.</p>',
+      '<p class="ad-kick">Found a bug? Shout it in LAN Party, the Gazette or Discord.</p><h3 class="ad-big">Monday,<br>the <em>games begin.</em></h3><p class="ad-sub">Nothing counts until Monday. Then every stamp, Pepe Guesser Season 1 and the Hall of Fame start from zero. First Weekly Champion: 23 November.</p><p class="ad-fine">Not a real offer. Stamps are cosmetic: no PEP, no points, nothing to sell. The bugs are real, though.</p><button type="button" class="ad-cta ad-passbtn">Open your Fren Passport →</button>'
+    ] },
     { file: 'whose_passport.mpg', fren: true, added: '2026-11-08', title: 'Whose Passport Is That?', ch: 'CH 7 · POND GOSSIP HOUR', icon: 'pep-logo', scenes: [
       '<p class="ad-kick">Your fren says they flew the full 6000 m in YEET THE PEP…</p><h3 class="ad-big">…but can they<br><em>prove it?</em></h3>',
       '<div class="ad-frens">' + adFren('clothing_camo', 'mouth_smirk', 'eyes_side', 'hat_bucket', 'accessory_round') + '</div><p class="ad-kick">Click a name with a ✓ in the LAN Party chat.</p><h3 class="ad-big">Open their<br><em>Fren Passport!</em></h3><p class="ad-sub">Their Fren, their stamps with the dates, the secrets they found and their best YEET flight. Read only: nobody can change it but them.</p>',
@@ -4021,9 +4053,9 @@
     ] },
     { file: 'pond_stamps.mpg', fren: true, added: '2026-11-06', title: 'Stamps That Check Out', ch: 'CH 19 · POND POST OFFICE', icon: 'pep-logo', scenes: [
       '<p class="ad-kick">Did your frog do anything today? Can you prove it?</p><h3 class="ad-big">Stamps that<br><em>check out!</em></h3><p class="ad-sub">Your Fren Passport now collects 21 stamps, each one from something the pond\'s own server saw you do.</p>',
-      '<p class="ad-kick">Guess where Pepe is. Chat in the lobby. Write to the editor. Mine for an hour.</p><h3 class="ad-big">The games <em>stamp</em><br>your passport!</h3><p class="ad-sub">Pepe Guesser, the LAN Party chat, letters to the editor, Pepe Miner, YEET THE PEP and 14 or 30 days in a row on PondOS. Your old Pepe Guesser games and letters count too.</p>',
+      '<p class="ad-kick">Guess where Pepe is. Chat in the lobby. Write to the editor. Mine for an hour.</p><h3 class="ad-big">The games <em>stamp</em><br>your passport!</h3><p class="ad-sub">Pepe Guesser, the LAN Party chat, letters to the editor, Pepe Miner, YEET THE PEP and 14 or 30 days in a row on PondOS. Everything counts from Monday 16 November, for everyone from zero.</p>',
       '<div class="ad-frens">' + adFren('clothing_suit', 'mouth_smirk', 'eyes_classic', 'hat_detective', 'accessory_none') + '</div><p class="ad-kick">Five perfect 5000s in Pepe Guesser?</p><h3 class="ad-big">Dress like a<br><em>detective!</em></h3><p class="ad-sub">Detective Fren opens the detective hat and the suit. Miner Fren opens the hard hat. 14 days in a row of Pepe Guesser opens Lily\'s Explorer Pepe.</p>',
-      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Here early?<br><em>Pond Pioneer!</em></h3><p class="ad-sub">Every account with Discord linked on launch day gets it. After that, the door closes.</p><p class="ad-fine">Not a real offer. Stamps are cosmetic: no PEP, no points, nothing to sell. Only what the server records counts. Log on with Discord to collect.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
+      '<p class="ad-kick">But wait, there\'s more!</p><h3 class="ad-big">Here early?<br><em>Pond Pioneer!</em></h3><p class="ad-sub">Log in with Discord during the beta, until Sunday 15 November. After that, the door closes.</p><p class="ad-fine">Not a real offer. Stamps are cosmetic: no PEP, no points, nothing to sell. Only what the server records counts. Log on with Discord to collect.</p><button type="button" class="ad-cta ad-passbtn">Open my Fren Passport →</button>'
     ] },
     { file: 'fren_passport.mpg', fren: true, added: '2026-11-06', title: 'The Fren Passport', ch: 'CH 98 · POND TRAVEL AGENCY', icon: 'pep-logo', scenes: [
       '<p class="ad-kick">Tired of profiles that look like a spreadsheet?</p><h3 class="ad-big">Get a real<br><em>passport!</em></h3><p class="ad-sub">A hand-drawn paper booklet, with your Fren clipped in as the photo.</p>',
@@ -4633,7 +4665,7 @@
       mb.addEventListener('click', frogMail);
       trayEl2.insertBefore(mb, trayEl2.firstChild);
       paintMail();
-      if (!mailRead()) setTimeout(function () { if (!mailRead()) balloon('You\u2019ve got frog mail!', 'The Pond Gazette #5 is in your mailbox, with the first Pond Poll. Click the mailbox in the corner.', 'frog-mail'); }, 17000);
+      if (!mailRead()) setTimeout(function () { if (!mailRead()) balloon('You\u2019ve got frog mail!', 'The Pond Gazette #7 is in your mailbox: the Pond goes BETA. Click the mailbox in the corner.', 'frog-mail'); }, 17000);
     }
   }
 
