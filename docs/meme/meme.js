@@ -1697,7 +1697,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261111launch';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261111launch'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261111stamps'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not

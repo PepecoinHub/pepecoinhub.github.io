@@ -99,6 +99,13 @@ html.os98 main.pt-app { max-width: 1180px; height: auto; min-height: calc(100dvh
 .pt-group legend { padding: 0 5px; margin-left: 4px; font: 700 14px var(--sys); color: #111; }
 .pt-group input, .pt-group select { width: 100%; min-height: 36px; font: 15px var(--sys) !important; padding: 6px 8px; background: #fff; color: #111; border: 0; border-radius: 0; box-shadow: var(--down); min-width: 0; }
 .pt-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pt-picks { display: grid; gap: 8px; }
+.pt-picks > div { display: grid; gap: 3px; font: 13px var(--sys); color: #111; }
+.pt-pick { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; }
+.pt-pick button { min-height: 34px; padding: 4px 2px; border: 0; background: var(--w-face); color: #111; font: 15px var(--sys) !important; box-shadow: var(--up); cursor: pointer; white-space: nowrap; }
+.pt-pick button:hover { background: #e6e6e6; }
+.pt-pick button[aria-checked=true] { background: #d9eecd; color: #0c5a2c; font-weight: 700 !important; box-shadow: var(--down); }
+.pt-pick button:focus-visible { outline: 1px dotted #111; outline-offset: -5px; }
 .pt-two label { display: grid; gap: 3px; margin: 0; font: 13px var(--sys); color: #111; }
 .pt-go { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 8px 14px; border: 0; background: #d9eecd; color: #0c5a2c; font: 700 18px var(--sys) !important; box-shadow: var(--up), 0 0 0 1px #111; cursor: pointer; }
 .pt-go span { display: grid; }
