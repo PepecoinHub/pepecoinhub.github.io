@@ -1772,3 +1772,28 @@ footer.foot a { color: #edf3e3; }
 
 /* boot.js: until meme.js has built the desktop, show only the wallpaper (no flash of the plain page) */
 .pond-boot body > *:not(noscript) { visibility: hidden; }
+
+
+/* PepeGochi's taskbar companion (beta). One existing 128px sprite, no GIFs or timers. */
+.pondos .pg-companion { position: relative; flex: none; display: inline-flex; align-items: center; height: 40px; }
+.pondos .pg-companion-button { position: relative; display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 40px; padding: 0; border: 0; background: transparent; cursor: pointer; color: var(--ink); }
+.pondos .pg-companion-button img { width: 42px; height: 42px; object-fit: contain; image-rendering: pixelated;
+  max-width: none; position: relative; top: -3px; }
+.pondos .pg-companion-button:hover img { top: -5px; }
+.pondos .pg-companion-alert { position: absolute; top: 1px; right: 0; width: 9px; height: 9px;
+  background: #d04432; border: 1px solid #fff; border-radius: 0; }
+.pondos .pg-companion-hint { position: absolute; z-index: 150; bottom: calc(100% + 3px); left: 50%;
+  transform: translateX(-50%); display: block; padding: 4px 7px; white-space: nowrap; font: 700 11px/1.2 var(--f-chrome);
+  color: var(--ink); background: var(--chrome); border: 1px solid var(--chrome-dk); box-shadow: 2px 2px 0 #1116;
+  visibility: hidden; pointer-events: none; }
+.pondos .pg-companion-button:hover .pg-companion-hint,
+.pondos .pg-companion-button:focus-visible .pg-companion-hint { visibility: visible; }
+@media (max-width: 480px) {
+  .pondos .pg-companion { height: 36px; }
+  .pondos .pg-companion-button { width: 34px; height: 36px; }
+  .pondos .pg-companion-button img { width: 34px; height: 34px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pondos .pg-companion-button:hover img { top: -3px; }
+}
