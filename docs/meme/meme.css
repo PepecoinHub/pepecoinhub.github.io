@@ -1769,3 +1769,6 @@ footer.foot a { color: #edf3e3; }
 .lan-card-act .app-btn { padding: 6px 10px; font-size: 12px; }
 .lan-c-soon { font: 400 11px/1.3 var(--f-chrome); color: var(--muted); align-self: center; }
 .lan-card-pic > * { width: 72px !important; height: 72px !important; max-width: none; }
+
+/* boot.js: until meme.js has built the desktop, show only the wallpaper (no flash of the plain page) */
+.pond-boot body > *:not(noscript) { visibility: hidden; }
