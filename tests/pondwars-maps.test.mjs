@@ -47,8 +47,8 @@ test('classic maps keep their terrain and spawn spots', () => {
 });
 
 test('map pack 1 spawns every frog on safe ground above the water', () => {
-  for (const map of ['moon', 'doom', 'farm']) {
-    assert.equal(MAPS[map].pack, 'maps1');
+  for (const map of ['moon', 'doom', 'farm', 'quarry', 'tower']) {
+    assert.ok(MAPS[map].pack === 'maps1' || MAPS[map].pack === 'maps2');
     for (let seed = 1; seed <= 25; seed++) {
       const g = newGame({ seed, map, perTeam: MAPS[map].max, cpu: [false, false] });
       assert.equal(g.frogs.length, MAPS[map].max * 2, map);
@@ -88,4 +88,21 @@ test('Pond of Doom is three islands and Doge Farm has a center gap', () => {
   assert.ok(farm.frogs.filter(f => f.team === 0).every(f => f.x < 560));
   assert.ok(farm.frogs.filter(f => f.team === 1).every(f => f.x > 640));
   assert.ok(W > 0 && H > WATER);
+});
+
+test('Lite Quarry is terraced and Bell Tower is a column between islands', () => {
+  const quarry = newGame({ seed: 1, map: 'quarry', perTeam: 2, cpu: [false, false] });
+  const top = x => { let y = 0; while (y < H && !solid(quarry.mask, x, y)) y++; return y; };
+  const a = top(200), b = top(480), c = top(750);
+  assert.ok(b - a > 40 && c - b > 40, 'terrace steps ' + [a, b, c]);
+  assert.equal(solid(quarry.mask, 920, 300), false);
+  const tower = newGame({ seed: 1, map: 'tower', perTeam: 2, cpu: [false, false] });
+  assert.equal(solid(tower.mask, 600, 250), true);
+  assert.equal(solid(tower.mask, 600, 160), false);
+  assert.equal(solid(tower.mask, 180, 430), true);
+  assert.equal(solid(tower.mask, 400, 400), false);
+  assert.equal(solid(tower.mask, 1020, 430), true);
+  assert.equal(solid(tower.mask, 800, 400), false);
+  assert.equal(MAPS.quarry.pack, 'maps2');
+  assert.equal(MAPS.tower.pack, 'maps2');
 });

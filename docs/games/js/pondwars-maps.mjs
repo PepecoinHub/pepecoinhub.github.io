@@ -48,13 +48,32 @@ function farm(seed) {
   return mask;
 }
 
+function quarry(seed) {
+  const mask = new Uint8Array(W * H), w = wobble(seed);
+  fillDown(mask, 60, 340, 280 + w);
+  fillDown(mask, 341, 620, 370 - Math.round(w / 2));
+  fillDown(mask, 621, 900, 450 + Math.round(w / 2));
+  fillDown(mask, 940, 1140, 320 - w);
+  return mask;
+}
+
+function tower(seed) {
+  const mask = new Uint8Array(W * H), w = wobble(seed);
+  fillDown(mask, 80, 280, 400 + w);
+  fillDown(mask, 520, 680, 210 - Math.round(w / 2));
+  fillDown(mask, 920, 1120, 400 - w);
+  return mask;
+}
+
 export const EXPANSION_MAPS = {
   moon: { name: 'Moon Base', max: 4, recommended: 3, pack: 'maps1' },
   doom: { name: 'Pond of Doom', max: 3, recommended: 2, pack: 'maps1', split: true },
   farm: { name: 'Doge Farm', max: 4, recommended: 3, pack: 'maps1', split: true },
+  quarry: { name: 'Lite Quarry', max: 4, recommended: 3, pack: 'maps2' },
+  tower: { name: 'Bell Tower', max: 3, recommended: 2, pack: 'maps2' },
 };
 
-const BUILDERS = { moon, doom, farm };
+const BUILDERS = { moon, doom, farm, quarry, tower };
 
 export function buildExpansionMap(map, seed) {
   const build = BUILDERS[map];
