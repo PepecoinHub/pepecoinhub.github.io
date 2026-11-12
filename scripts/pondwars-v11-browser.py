@@ -15,7 +15,7 @@ window.__qa={get game(){return g},get fx(){return weaponFX},get time(){return an
 PROBE='''
 window.__pngDraws=[];
 const draw=CanvasRenderingContext2D.prototype.drawImage;
-CanvasRenderingContext2D.prototype.drawImage=function(im,...args){if(this.canvas.id==='pw'&&im.src?.includes('/v11/')){const t=this.getTransform();window.__pngDraws.push({file:im.src.split('/').pop(),args,matrix:[t.a,t.b,t.c,t.d,t.e,t.f],smoothing:this.imageSmoothingEnabled});}return draw.call(this,im,...args);};
+CanvasRenderingContext2D.prototype.drawImage=function(im,...args){if(this.canvas.id==='pw'&&im.src&&/\/v1[12]\//.test(im.src)){const t=this.getTransform();window.__pngDraws.push({file:im.src.split('/').pop(),args,matrix:[t.a,t.b,t.c,t.d,t.e,t.f],smoothing:this.imageSmoothingEnabled});}return draw.call(this,im,...args);};
 '''
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
@@ -25,9 +25,9 @@ with sync_playwright() as p:
   page.on('pageerror',lambda e:errors.append(str(e)));page.on('request',lambda r:requests.append(r.url));page.add_init_script(PROBE)
   page.route('**/pondwars-beta.mjs?*',lambda r:r.fulfill(body=SOURCE+HOOK,content_type='text/javascript'))
   page.goto('http://127.0.0.1:8000/games/pondwars-beta.html?art=pixel-v06&packs=all&maps=all&qaMap=moon&qaSeed=123',wait_until='networkidle')
-  page.wait_for_function("window.__qa.clips.filter(c=>c.src.includes('/v11/')).length===6&&window.__qa.clips.every(c=>c.loaded)")
+  page.wait_for_function("window.__qa.clips.filter(c=>/\/v1[12]\//.test(c.src)).length===6&&window.__qa.clips.every(c=>c.loaded)")
   page.locator('#title').click();page.wait_for_timeout(150);page.locator('[data-mode=duo]').click();page.locator('#go').click();page.wait_for_timeout(70)
-  samples=page.evaluate('''()=>{window.__qa.pause();let count=0;for(const c of window.__qa.clips.filter(c=>c.src.includes('/v11/'))){const [id,role]=c.key.split('/');for(let n=0;n<c.frames;n++){window.__pngDraws=[];const ok=window.__qa.clip(id,role,(n+.1)/c.fps,600,160);const d=window.__pngDraws[0];if(!ok||!d||d.smoothing||d.args[0]!==((matchMedia('(prefers-reduced-motion: reduce)').matches?(c.reducedFrame||0):n)*128)||d.args[6]!==c.size[0]||d.args[7]!==c.size[1])throw Error('wrong frame '+c.key+'/'+n);count++;}}return count;}''')
+  samples=page.evaluate('''()=>{window.__qa.pause();let count=0;for(const c of window.__qa.clips.filter(c=>/\/v1[12]\//.test(c.src))){const [id,role]=c.key.split('/');for(let n=0;n<c.frames;n++){window.__pngDraws=[];const ok=window.__qa.clip(id,role,(n+.1)/c.fps,600,160);const d=window.__pngDraws[0];if(!ok||!d||d.smoothing||d.args[0]!==((matchMedia('(prefers-reduced-motion: reduce)').matches?(c.reducedFrame||0):n)*128)||d.args[6]!==c.size[0]||d.args[7]!==c.size[1])throw Error('wrong frame '+c.key+'/'+n);count++;}}return count;}''')
   assert samples==44
   def aim_point(x,y):
    pos=page.locator('#pw').evaluate('(c,p)=>{const r=c.getBoundingClientRect(),scale=Math.min(r.width/c.width,r.height/600);return {x:r.left+(r.width-c.width*scale)/2+(p.x+(c.width-1200)/2)*scale,y:r.top+(r.height-600*scale)/2+p.y*scale}}',{'x':x,'y':y})

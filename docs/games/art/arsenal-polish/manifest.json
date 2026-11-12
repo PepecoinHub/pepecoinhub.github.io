@@ -177,7 +177,7 @@
     },
     "donkey": {
       "flight": {
-        "src": "art/arsenal-polish/v11/sprites/silver_donkey_atlas.png",
+        "src": "art/arsenal-polish/v12/sprites/silver_donkey_atlas.png",
         "frame": [
           128,
           128
@@ -187,7 +187,7 @@
         "fps": 12,
         "loop": true,
         "anchor": [
-          64,
+          52,
           64
         ],
         "size": [

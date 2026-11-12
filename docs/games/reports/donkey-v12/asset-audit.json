@@ -1,0 +1,210 @@
+{
+  "sha256": "064a962c04830aaf22417e6090f52bda4768f9b55a0af45167d1eef1b92bf51c",
+  "onlyDonkeyFlightChanged": true,
+  "atlas": [
+    1024,
+    128
+  ],
+  "worldSize": [
+    52,
+    52
+  ],
+  "anchor": [
+    52,
+    64
+  ],
+  "frames": [
+    {
+      "frame": 0,
+      "originalBBox": [
+        22,
+        6,
+        128,
+        96
+      ],
+      "correctedBBox": [
+        10,
+        6,
+        120,
+        96
+      ],
+      "rightMargin": 8,
+      "changedOverlapBBox": [
+        114,
+        70,
+        116,
+        74
+      ],
+      "leftWorld": -17.0625,
+      "bodyPositionShiftWorld": 0
+    },
+    {
+      "frame": 1,
+      "originalBBox": [
+        24,
+        6,
+        128,
+        102
+      ],
+      "correctedBBox": [
+        12,
+        6,
+        120,
+        102
+      ],
+      "rightMargin": 8,
+      "changedOverlapBBox": [
+        114,
+        68,
+        116,
+        72
+      ],
+      "leftWorld": -16.25,
+      "bodyPositionShiftWorld": 0
+    },
+    {
+      "frame": 2,
+      "originalBBox": [
+        22,
+        6,
+        128,
+        106
+      ],
+      "correctedBBox": [
+        10,
+        6,
+        120,
+        106
+      ],
+      "rightMargin": 8,
+      "changedOverlapBBox": [
+        114,
+        66,
+        116,
+        68
+      ],
+      "leftWorld": -17.0625,
+      "bodyPositionShiftWorld": 0
+    },
+    {
+      "frame": 3,
+      "originalBBox": [
+        26,
+        8,
+        128,
+        106
+      ],
+      "correctedBBox": [
+        14,
+        8,
+        120,
+        106
+      ],
+      "rightMargin": 8,
+      "changedOverlapBBox": [
+        114,
+        66,
+        116,
+        68
+      ],
+      "leftWorld": -15.4375,
+      "bodyPositionShiftWorld": 0
+    },
+    {
+      "frame": 4,
+      "originalBBox": [
+        24,
+        10,
+        128,
+        104
+      ],
+      "correctedBBox": [
+        12,
+        10,
+        120,
+        104
+      ],
+      "rightMargin": 8,
+      "changedOverlapBBox": [
+        114,
+        72,
+        116,
+        74
+      ],
+      "leftWorld": -16.25,
+      "bodyPositionShiftWorld": 0
+    },
+    {
+      "frame": 5,
+      "originalBBox": [
+        24,
+        8,
+        128,
+        104
+      ],
+      "correctedBBox": [
+        12,
+        8,
+        120,
+        104
+      ],
+      "rightMargin": 8,
+      "changedOverlapBBox": [
+        114,
+        72,
+        116,
+        76
+      ],
+      "leftWorld": -16.25,
+      "bodyPositionShiftWorld": 0
+    },
+    {
+      "frame": 6,
+      "originalBBox": [
+        22,
+        8,
+        128,
+        100
+      ],
+      "correctedBBox": [
+        10,
+        8,
+        120,
+        100
+      ],
+      "rightMargin": 8,
+      "changedOverlapBBox": [
+        114,
+        74,
+        116,
+        78
+      ],
+      "leftWorld": -17.0625,
+      "bodyPositionShiftWorld": 0
+    },
+    {
+      "frame": 7,
+      "originalBBox": [
+        22,
+        10,
+        128,
+        100
+      ],
+      "correctedBBox": [
+        10,
+        10,
+        120,
+        100
+      ],
+      "rightMargin": 8,
+      "changedOverlapBBox": [
+        114,
+        78,
+        116,
+        82
+      ],
+      "leftWorld": -17.0625,
+      "bodyPositionShiftWorld": 0
+    }
+  ]
+}

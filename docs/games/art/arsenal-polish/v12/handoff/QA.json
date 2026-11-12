@@ -1,0 +1,153 @@
+{
+  "source_sha256": "de321d4dc88befa67d8c91e151ff400aa08d679cc2982224096f56ed834f80fb",
+  "corrected_sha256": "064a962c04830aaf22417e6090f52bda4768f9b55a0af45167d1eef1b92bf51c",
+  "frames": [
+    {
+      "frame": 0,
+      "original_bbox": [
+        22,
+        6,
+        128,
+        96
+      ],
+      "corrected_bbox": [
+        10,
+        6,
+        120,
+        96
+      ],
+      "right_margin_px": 8
+    },
+    {
+      "frame": 1,
+      "original_bbox": [
+        24,
+        6,
+        128,
+        102
+      ],
+      "corrected_bbox": [
+        12,
+        6,
+        120,
+        102
+      ],
+      "right_margin_px": 8
+    },
+    {
+      "frame": 2,
+      "original_bbox": [
+        22,
+        6,
+        128,
+        106
+      ],
+      "corrected_bbox": [
+        10,
+        6,
+        120,
+        106
+      ],
+      "right_margin_px": 8
+    },
+    {
+      "frame": 3,
+      "original_bbox": [
+        26,
+        8,
+        128,
+        106
+      ],
+      "corrected_bbox": [
+        14,
+        8,
+        120,
+        106
+      ],
+      "right_margin_px": 8
+    },
+    {
+      "frame": 4,
+      "original_bbox": [
+        24,
+        10,
+        128,
+        104
+      ],
+      "corrected_bbox": [
+        12,
+        10,
+        120,
+        104
+      ],
+      "right_margin_px": 8
+    },
+    {
+      "frame": 5,
+      "original_bbox": [
+        24,
+        8,
+        128,
+        104
+      ],
+      "corrected_bbox": [
+        12,
+        8,
+        120,
+        104
+      ],
+      "right_margin_px": 8
+    },
+    {
+      "frame": 6,
+      "original_bbox": [
+        22,
+        8,
+        128,
+        100
+      ],
+      "corrected_bbox": [
+        10,
+        8,
+        120,
+        100
+      ],
+      "right_margin_px": 8
+    },
+    {
+      "frame": 7,
+      "original_bbox": [
+        22,
+        10,
+        128,
+        100
+      ],
+      "corrected_bbox": [
+        10,
+        10,
+        120,
+        100
+      ],
+      "right_margin_px": 8
+    }
+  ],
+  "grid": "2x2",
+  "size": [
+    1024,
+    128
+  ],
+  "palette_colors": 9,
+  "anchor_before": [
+    64,
+    64
+  ],
+  "anchor_after": [
+    52,
+    64
+  ],
+  "world_units": [
+    52,
+    52
+  ],
+  "notes": "Frame 128x128 unchanged. Recenter 12 px to left and repair nose silhouette at 2x2 block level; corrected grip alignment by 12 px equivalent anchor shift. Original source retained in PR #282."
+}
