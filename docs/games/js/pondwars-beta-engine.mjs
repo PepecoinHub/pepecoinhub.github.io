@@ -240,7 +240,7 @@ function beginShot(g) {
   g.events.push({ type: 'fire', weapon: g.weapon });
 }
 // Melee, placed and thrown expansion weapons. Later packs add roles before the final return.
-function fireExpansion(g, f, w, angle, power) {
+function fireExpansion(g, f, w, angle, power, tx) {
   if (w.role === 'melee') {
     if (!spendExpansion(g, w)) return false;
     const dir = Math.cos(angle) >= 0 ? 1 : -1;
@@ -264,6 +264,16 @@ function fireExpansion(g, f, w, angle, power) {
   if (w.role === 'mine') {
     if (!spendExpansion(g, w)) return false;
     g.mines.push({ type: g.weapon, x: f.x + f.face * 22, y: f.y - 4, vx: 0, vy: 0, t: 0 });
+    beginShot(g);
+    return true;
+  }
+  if (w.role === 'salvo') {
+    if (!spendExpansion(g, w)) return false;
+    const x = Math.max(40, Math.min(W - 40, Number.isFinite(tx) ? tx : f.x));
+    const n = w.count, child = WEAPONS[w.childType];
+    for (let i = 0; i < n; i++) {
+      g.shots.push({ type: w.childType, x: x + (i - (n - 1) / 2) * w.spread, y: -20 - (i % 3) * 34, vx: 0, vy: child.power, t: 0, owner: f.id, ownerClear: true });
+    }
     beginShot(g);
     return true;
   }

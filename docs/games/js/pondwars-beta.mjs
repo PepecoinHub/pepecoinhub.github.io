@@ -1,7 +1,7 @@
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112simple';
-import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112simple';
-import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112simple';
+import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112pepe';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112pepe';
+import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112pepe';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
 import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261112pixel';
 import { compilePixelManifest, authoredPose, clipDuration, pixelHelmet } from './pondwars-pixel-art.mjs?v=20261112pixel';
@@ -307,12 +307,13 @@ function shot(s) {
   ctx.save(); ctx.translate(s.x, s.y);
   if(s.type==='drill'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle='#708454';ctx.fillRect(-10,-4,14,8);ctx.fillStyle='#a8b4ba';ctx.beginPath();ctx.moveTo(4,-5);ctx.lineTo(13,0);ctx.lineTo(4,5);ctx.fill();ctx.restore();return;}
   if(s.type==='bell'){ctx.fillStyle='#f0c14a';ctx.beginPath();ctx.moveTo(0,-8);ctx.quadraticCurveTo(10,-4,8,4);ctx.lineTo(-8,4);ctx.quadraticCurveTo(-10,-4,0,-8);ctx.fill();ctx.fillStyle='#8a6a22';ctx.beginPath();ctx.arc(0,7,3,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 12px Tahoma';ctx.textAlign='center';ctx.fillText(String(Math.max(1,Math.ceil(WEAPONS.bell.fuse-s.t))),0,-12);ctx.restore();return;}
+  if(s.type==='pep'){ctx.fillStyle=['#70c963','#edcf54','#4f9ef0'][Math.abs(Math.round(s.x))%3];ctx.beginPath();ctx.ellipse(0,0,4,6,0,0,7);ctx.fill();ctx.restore();return;}
   if(s.type==='dynamite'){ctx.drawImage(weaponArt.dynamite,-10,-18,20,25);ctx.fillStyle='#fff3ba';ctx.font='bold 12px monospace';ctx.fillText(Math.max(1,Math.ceil(5-s.t)),0,-22);}
   else if (WEAPONS[s.type].fuse) {
     ctx.fillStyle = ['gold','toe'].includes(s.type)?'#ffd257':s.type==='cluster'?'#c95d36':'#436d32'; if(['gold','toe'].includes(s.type)){ctx.rotate(s.t*5);ctx.fillRect(-5,-9,8,15);for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(-5+i*3,-9,2.5,0,7);ctx.fill();}} ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, 7); ctx.fill(); ctx.fillStyle = '#8fd27d'; ctx.fillRect(-1, -7, 3, 3);
     ctx.fillStyle = '#fff'; ctx.font = 'bold 12px Tahoma'; ctx.textAlign = 'center'; ctx.fillText(String(Math.max(1, Math.ceil(WEAPONS.grenade.fuse - s.t))), 0, -10);
-  } else if (s.type==='revolver'||s.type==='bow'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle=s.type==='bow'?'#e2b67e':'#fff4bb';ctx.fillRect(-14,-1,22,2);ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(4,-4);ctx.lineTo(4,4);ctx.fill();} else if (s.type === 'rocket') {
-    ctx.rotate(Math.atan2(s.vy, s.vx)); ctx.fillStyle = '#f2f2f2'; ctx.fillRect(-7, -2.5, 12, 5); ctx.fillStyle = '#e23b3b'; ctx.fillRect(5, -2.5, 3, 5);
+  } else if (s.type==='revolver'||s.type==='bow'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle=s.type==='bow'?'#e2b67e':'#fff4bb';ctx.fillRect(-14,-1,22,2);ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(4,-4);ctx.lineTo(4,4);ctx.fill();} else if (s.type === 'rocket' || s.type === 'moon') {
+    ctx.rotate(Math.atan2(s.vy, s.vx)); ctx.fillStyle = s.type==='moon'?'#d5deea':'#f2f2f2'; ctx.fillRect(-7, -2.5, 12, 5); ctx.fillStyle = s.type==='moon'?'#ffe680':'#e23b3b'; ctx.fillRect(5, -2.5, 3, 5);
     ctx.fillStyle = '#ffb000'; ctx.fillRect(-11 - Math.random() * 4, -1.5, 4, 3);
   } else {
     ctx.fillStyle = '#7a1218'; ctx.fillRect(-1, -16, 2, 30); ctx.fillStyle = '#e0414c'; ctx.fillRect(-5, -10, 10, 18);

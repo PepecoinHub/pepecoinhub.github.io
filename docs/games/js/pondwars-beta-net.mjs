@@ -11,7 +11,7 @@
 //
 // The transport is anything with send(message) and an onmessage callback. tabTransport() links two tabs of the
 // same browser (for testing without a server); a Supabase Realtime channel can implement the same two members.
-import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112simple';
+import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112pepe';
 
 export const PROTOCOL = 1;
 export const KEY = { L: 1, R: 2, U: 4, D: 8 };   // bits of input.m

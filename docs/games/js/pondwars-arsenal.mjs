@@ -54,7 +54,7 @@ const simple = {
 // --- pepecoin pack: wind rocket, short hammer, falling pep drops ---
 const pepecoin = {
   moon: {
-    pack: 'pepecoin', ready: false, expansion: true, role: 'rocket',
+    pack: 'pepecoin', ready: true, expansion: true, role: 'rocket',
     name: 'Moon Rocket', short: 'Moon', key: 'N', code: 'KeyN',
     hud: 'WIND AFFECTED · MEDIUM-LARGE BLAST · HIGH KNOCKBACK',
     fireLabel: 'HOLD TO FIRE',
@@ -62,7 +62,7 @@ const pepecoin = {
     knock: SCALE.knock.high, ammo: 2, power: 600, wind: true,
   },
   ban: {
-    pack: 'pepecoin', ready: false, expansion: true, role: 'melee', tap: true,
+    pack: 'pepecoin', ready: true, expansion: true, role: 'melee', tap: true,
     name: 'Ban Hammer', short: 'Ban Hammer', key: 'H', code: 'KeyH',
     hud: 'SHORT RANGE · DIRECT HIT · EXTREME KNOCKBACK · NO CRATER',
     fireLabel: 'SWING', cry: 'BANNED!',
@@ -71,7 +71,7 @@ const pepecoin = {
     ammo: 2, power: 1, wind: false,
   },
   rain: {
-    pack: 'pepecoin', ready: false, expansion: true, role: 'salvo', tap: true,
+    pack: 'pepecoin', ready: true, expansion: true, role: 'salvo', tap: true,
     name: 'Pep Rain', short: 'Pep Rain', key: 'P', code: 'KeyP',
     hud: 'TARGET THE MAP · 6 DROPS · ABOUT 8 EACH · UP TO 48',
     fireLabel: 'CALL PEP RAIN',
