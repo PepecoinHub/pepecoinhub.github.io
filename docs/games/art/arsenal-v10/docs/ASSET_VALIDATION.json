@@ -1,0 +1,122 @@
+{
+  "assets": [
+    {
+      "id": "golden_foot_v2",
+      "pixels": [
+        128,
+        128
+      ],
+      "colors_rgba": 8,
+      "alpha": true,
+      "grid": "2x2",
+      "hud_size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "bell_bomb",
+      "pixels": [
+        128,
+        128
+      ],
+      "colors_rgba": 12,
+      "alpha": true,
+      "grid": "2x2",
+      "hud_size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "frog_mine",
+      "pixels": [
+        128,
+        128
+      ],
+      "colors_rgba": 12,
+      "alpha": true,
+      "grid": "2x2",
+      "hud_size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "moon_rocket",
+      "pixels": [
+        128,
+        128
+      ],
+      "colors_rgba": 9,
+      "alpha": true,
+      "grid": "2x2",
+      "hud_size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "ban_hammer",
+      "pixels": [
+        128,
+        128
+      ],
+      "colors_rgba": 17,
+      "alpha": true,
+      "grid": "2x2",
+      "hud_size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "pep_rain",
+      "pixels": [
+        128,
+        128
+      ],
+      "colors_rgba": 11,
+      "alpha": true,
+      "grid": "2x2",
+      "hud_size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "doge_flyer",
+      "pixels": [
+        128,
+        128
+      ],
+      "colors_rgba": 12,
+      "alpha": true,
+      "grid": "2x2",
+      "hud_size": [
+        64,
+        64
+      ]
+    },
+    {
+      "id": "silver_donkey",
+      "pixels": [
+        128,
+        128
+      ],
+      "colors_rgba": 9,
+      "alpha": true,
+      "grid": "2x2",
+      "hud_size": [
+        64,
+        64
+      ]
+    }
+  ],
+  "effects": [
+    "golden_foot_impact",
+    "bell_bounce",
+    "frog_mine_arm"
+  ],
+  "status": "art prototypes; not integrated"
+}

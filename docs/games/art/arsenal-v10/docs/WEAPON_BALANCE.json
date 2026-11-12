@@ -1,0 +1,115 @@
+{
+  "status": "PROPOSAL_NOT_IMPLEMENTED",
+  "units": "world px / HP / seconds",
+  "base": "pondwars beta as inspected 2026-11-12",
+  "weapons": [
+    {
+      "id": "gold",
+      "art": "golden_foot_v2",
+      "name": "Mega Golden Foot",
+      "stage": "B",
+      "type": "bouncing_fused",
+      "damage": 58,
+      "radius": 66,
+      "fuse_s": 3,
+      "ammo": 1,
+      "children": {
+        "type": "toe",
+        "count": 5,
+        "damage": 12,
+        "radius": 16
+      },
+      "knockback_mult": 1.2,
+      "note": "update existing gold; illustration is five-toed foot; keep one per match"
+    },
+    {
+      "id": "bell_bomb",
+      "art": "bell_bomb",
+      "name": "Bell Bomb",
+      "stage": "B",
+      "type": "bouncing_fused",
+      "damage": 44,
+      "radius": 32,
+      "fuse_s": 3,
+      "ammo": 2,
+      "knockback_mult": 1.15,
+      "note": "ring on bounced collision (sound off honored); no fragments"
+    },
+    {
+      "id": "frog_mine",
+      "art": "frog_mine",
+      "name": "Frog Mine",
+      "stage": "B",
+      "type": "placeable_proximity_jump",
+      "damage": 34,
+      "radius": 30,
+      "arming_s": 1,
+      "detect_radius": 48,
+      "jump_delay_s": 0.35,
+      "ammo": 2,
+      "note": "independent of existing mine; enemy trigger, friendly fire on explosion"
+    },
+    {
+      "id": "moon_rocket",
+      "art": "moon_rocket",
+      "name": "Moon Rocket",
+      "stage": "C",
+      "type": "rocket",
+      "damage": 52,
+      "radius": 35,
+      "wind": true,
+      "power": 580,
+      "ammo": 2,
+      "knockback_mult": 1.1
+    },
+    {
+      "id": "ban_hammer",
+      "art": "ban_hammer",
+      "name": "Ban Hammer",
+      "stage": "C",
+      "type": "melee",
+      "damage": 42,
+      "range": 60,
+      "radius": 0,
+      "ammo": 2,
+      "knockback_mult": 1.8
+    },
+    {
+      "id": "pep_rain",
+      "art": "pep_rain",
+      "name": "PEP Rain",
+      "stage": "C",
+      "type": "targeted_airstrike",
+      "subshots": 6,
+      "damage_each": 8,
+      "radius_each": 11,
+      "ammo": 1,
+      "max_theoretical_direct_damage": 48
+    },
+    {
+      "id": "doge_flyer",
+      "art": "doge_flyer",
+      "name": "Doge Flyer",
+      "stage": "D",
+      "type": "player_guided",
+      "damage": 46,
+      "radius": 34,
+      "lifetime_s": 4.5,
+      "max_speed": 260,
+      "ammo": 1,
+      "controls": "arrows/WASD for flight, Space/Enter detonation"
+    },
+    {
+      "id": "silver_donkey",
+      "art": "silver_donkey",
+      "name": "Silver Donkey",
+      "stage": "D",
+      "type": "targeted_heavy_drop",
+      "damage": 78,
+      "radius": 72,
+      "warning_s": 1.2,
+      "knockback_mult": 1.3,
+      "ammo": 1
+    }
+  ]
+}

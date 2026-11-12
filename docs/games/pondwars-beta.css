@@ -62,3 +62,6 @@ html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%}
 @media(min-aspect-ratio:1/1){
   .title-art img{height:76%;width:auto;max-width:none;top:0;bottom:auto;left:0;right:0;margin:0 auto;object-fit:fill;-webkit-mask-image:radial-gradient(ellipse 50% 54% at 50% 44%,#000 58%,transparent 100%);mask-image:radial-gradient(ellipse 50% 54% at 50% 44%,#000 58%,transparent 100%);transform-origin:50% 30%}
 }
+
+/* Opt-in arsenal QA: bounded pages keep future icons off the live game. */
+.qa-arsenal{width:min(360px,calc(100vw - 16px));max-height:calc(100dvh - 16px);overflow:auto}.arsenal-tabs,.arsenal-pages{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:5px}.arsenal-tabs button,.arsenal-pages button{min-height:32px;font-size:10px;padding:4px 7px}.arsenal-tabs [aria-pressed=true]{background:#dac37f;color:#14271c}.arsenal-page-count{margin-right:auto;color:#fff0bd;font:11px Tahoma}.qa-arsenal .pw-weapons button{min-height:70px}.qa-arsenal .pw-weapons img{image-rendering:pixelated}.qa-arsenal .pw-weapons button>span:not(.weapon-key){display:block;font-size:8px}.qa-arsenal .pw-weapons small{font-size:8px}#arsenal-prototype{font:11px Tahoma;color:#ffe29b}

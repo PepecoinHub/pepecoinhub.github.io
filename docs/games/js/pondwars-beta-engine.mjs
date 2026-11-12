@@ -1,3 +1,4 @@
+import { ARSENAL_MODE, ARSENAL_STAGE } from './pondwars-arsenal.mjs?v=20261112arsenalA';
 // POND WARS engine: turn-based frog artillery on a destructible island. No DOM here (tests run it in Node).
 // Units are pixels and seconds; the world is W x H; the pond starts at WATER (anything below it drowns).
 // Movement and projectile ideas (bounce off the real slope, wind that drifts between turns, step-up walking,
@@ -34,6 +35,9 @@ export const WEAPONS = {
   jetpack: { name:'Jetpack', short:'Jetpack', radius:0, damage:0, ammo:2, power:1, utility:true },
   teleport: { name:'Teleport', short:'Teleport', radius:0, damage:0, ammo:2, power:1, utility:true },
 };
+export const weaponDefinitions = g => WEAPONS;
+export const weaponDef = (g,id) => weaponDefinitions(g)[id];
+export const selectableWeapon = (g,id) => typeof id === 'string' && Object.hasOwn(WEAPONS,id) && 'ammo' in WEAPONS[id];
 const NAMES = [['Hopper', 'Lily', 'Ribbit', 'Pad'], ['Croak', 'Bog', 'Toady', 'Murk']];
 
 export function rng(seed) {   // mulberry32
@@ -88,7 +92,7 @@ export function normalAt(mask, x, y, r = 5) {
 function surfaceBelow(mask, x, y) { for (let yy = Math.max(0, Math.floor(y)); yy < H; yy++) if (solid(mask, x, yy)) return yy; return H; }
 
 // ---------- a new match ----------
-export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1, map = 'island' } = {}) {
+export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1, map = 'island', arsenal = null } = {}) {
   map=MAPS[map]?map:'island';perTeam=Math.max(2,Math.min(MAPS[map].max,Math.floor(perTeam)||MAPS[map].recommended));
   const mask = makeTerrain(seed,map), r = rng(seed ^ 0x9e3779b9), frogs = [];
   const slots=[],candidates=[];
@@ -107,8 +111,10 @@ export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1,
     const team=i%2,{x,y}=slots[i];
     frogs.push({ id: i, team, name: NAMES[team][Math.floor(i / 2)], x, y, vx: 0, vy: 0, hp: 100, alive: true, ground: true, face: x < W / 2 ? 1 : -1, fallFrom: y, gone: '' });
   }
-  return { seed, map, perTeam, mask, mines:[], retreat:0, movement:MOVE_BUDGET, frogs, shots: [], booms: [], texts: [], dirty: [], cpu, level, turn: 0, team: 0, next: [0, 0], current: 0,
+  const game = { seed, map, perTeam, mask, mines:[], retreat:0, movement:MOVE_BUDGET, frogs, shots: [], booms: [], texts: [], dirty: [], cpu, level, turn: 0, team: 0, next: [0, 0], current: 0,
     wind: 0, weapon: 'grenade', ammo: [0, 1].map(() => ({candles:1,cluster:4,gold:1,mine:3,dynamite:2,drill:2,rope:5,jetpack:2,teleport:2})), ctl:{x:0,y:0}, pistolShots:0, phase: 'aim', timer: TURN_TIME, settle: 0, winner: null, rand: r, events: [] };
+  if (arsenal === ARSENAL_MODE) { game.arsenal=ARSENAL_MODE; game.arsenalStage=ARSENAL_STAGE; }
+  return game;
 }
 export function aliveOf(g, team) { return g.frogs.filter(f => f.alive && f.team === team); }
 export function startTurn(g) {
@@ -126,8 +132,8 @@ export const me = g => g.frogs[g.current];
 export function projectileOrigin(f, angle) {
   return {x:f.x+Math.cos(angle)*18,y:f.y-32+Math.sin(angle)*18};
 }
-export function makeProjectile(f, type, angle, power) {
-  const speed=(type==='revolver'?1:Math.max(.08,Math.min(1,power)))*WEAPONS[type].power;
+export function makeProjectile(f, type, angle, power, g) {
+  const speed=(type==='revolver'?1:Math.max(.08,Math.min(1,power)))*weaponDef(g,type).power;
   return {type,...projectileOrigin(f,angle),vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,t:0,owner:f.id,ownerClear:false};
 }
 export function safeDirection(g, dir) {
@@ -174,8 +180,8 @@ export function backflip(g) {
 }
 // angle in radians (0 = right, -PI/2 = up), power 0..1; for candles, tx is the x where they fall
 export function fire(g, angle, power, tx, ty) {
-  const f = me(g), w = WEAPONS[g.weapon];
-  if (g.phase !== 'aim' || !f.alive || !w || !Number.isFinite(angle) || !Number.isFinite(power)) return false;
+  const f = me(g), w = weaponDef(g,g.weapon);
+  if (!selectableWeapon(g,g.weapon) || g.phase !== 'aim' || !f.alive || !w || !Number.isFinite(angle) || !Number.isFinite(power)) return false;
   if (w.utility) return useUtility(g, f, angle, tx, ty);
   f.rope = null; f.jet = null;
   if (g.pistolShots && g.weapon !== 'revolver') return false;
@@ -206,7 +212,7 @@ export function fire(g, angle, power, tx, ty) {
     for (let i = -1; i <= 1; i++) g.shots.push({ type: 'candles', x: x + i * 34, y: -30 - Math.abs(i) * 40, vx: 0, vy: 60, t: 0 });
   } else {
     const p = (g.weapon==='revolver'?1:Math.max(.08, Math.min(1, power))) * w.power;
-    g.shots.push(makeProjectile(f,g.weapon,angle,power));
+    g.shots.push(makeProjectile(f,g.weapon,angle,power,g));
     f.face = Math.cos(angle) >= 0 ? 1 : -1;
   }
   g.phase = 'fire'; g.events.push({ type: 'fire', weapon: g.weapon }); return true;
@@ -262,7 +268,7 @@ export function skip(g) { if (g.phase === 'aim') { g.phase = 'settle'; g.settle 
 
 // ---------- simulation ----------
 export function stepShot(g, s, mask = g.mask, frogs = g.frogs) {
-  const w = WEAPONS[s.type];
+  const w = weaponDef(g,s.type);
   s.t += STEP;
   if(!s.ownerClear){const owner=frogs.find(f=>f.id===s.owner);if(!owner||Math.abs(s.x-owner.x)>15||s.y<owner.y-58||s.y>owner.y+2)s.ownerClear=true;}
   s.vy += G * (w.gravity ?? 1) * STEP;
@@ -312,7 +318,7 @@ function stepDrill(g, s, mask, frogs, nx, ny) {
 }
 // vx, vy: the speed of the shell that exploded. A hit frog takes part of that momentum and gets moved.
 export function explode(g, x, y, type, vx = 0, vy = 0) {
-  const w = WEAPONS[type];
+  const w = weaponDef(g,type);
   if(type==='revolver'||type==='bow'){
     const target=g.frogs.filter(f=>f.alive&&Math.abs(f.x-x)<18&&y>f.y-61&&y<f.y+5).sort((a,b)=>Math.hypot(a.x-x,a.y-28-y)-Math.hypot(b.x-x,b.y-28-y))[0];
     if(target){hurt(g,target,w.damage);const dir=Math.sign(vx)||(target.x>=x?1:-1);knock(g,target,dir*(type==='bow'?140:110),-100);}
@@ -441,7 +447,7 @@ export function step(g) {
   for (const s of g.shots.slice()) {
     const r = stepShot(g, s);
     if (r === 'boom') {
-      if (WEAPONS[s.type].children) {
+      if (weaponDef(g,s.type).children) {
         const type=s.type==='gold'?'toe':'shard';
         for(let i=0;i<5;i++){const a=-Math.PI+(i+.5)*Math.PI/5;g.shots.push({type,x:s.x,y:s.y-5,vx:Math.cos(a)*(160+g.rand()*100),vy:Math.sin(a)*240-60,t:0});}
       }
@@ -484,7 +490,7 @@ export function step(g) {
 
 // ---------- the CPU player: tries many throws in its head and picks a good one ----------
 function simulate(g, type, angle, power, target) {
-  const f=me(g),w=WEAPONS[type],s=makeProjectile(f,type,angle,power);
+  const f=me(g),w=weaponDef(g,type),s=makeProjectile(f,type,angle,power,g);
   if(type==='mine'||type==='dynamite')Object.assign(s,{x:f.x+f.face*20,y:f.y-3,vx:0,vy:0});
   for(let i=0;i<720;i++){const end=stepShot(g,s);if(end==='boom')break;if(end)return {score:-1e9};}
   let score=0;
@@ -506,7 +512,7 @@ export function cpuPlan(g) {
   const target=enemies.slice().sort((a,b)=>Math.hypot(a.x-f.x,a.y-f.y)-Math.hypot(b.x-f.x,b.y-f.y))[0];
   let best={score:-1e9,weapon:'grenade',angle:-Math.PI/2,power:.5};
   if(!target)return best;
-  const available=type=>!Number.isFinite(WEAPONS[type].ammo)||g.ammo[f.team][type]>0;
+  const available=type=>!Number.isFinite(weaponDef(g,type).ammo)||g.ammo[f.team][type]>0;
   for(const type of g.pistolShots?['revolver']:['rocket','grenade','cluster','gold','bow','revolver']){
     if(!available(type))continue;
     const powers=type==='revolver'?[1]:[.25,.4,.55,.7,.85,1];

@@ -1,3 +1,4 @@
+import { ARSENAL_STAGE, ARSENAL_MODE, ARSENAL_ART } from './pondwars-arsenal.mjs?v=20261112arsenalA';
 // FROGAGEDDON online groundwork. No DOM here (Node can run it).
 //
 // How a match stays the same on two devices:
@@ -11,7 +12,7 @@
 //
 // The transport is anything with send(message) and an onmessage callback. tabTransport() links two tabs of the
 // same browser (for testing without a server); a Supabase Realtime channel can implement the same two members.
-import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me } from './pondwars-beta-engine.mjs?v=20261111hand';
+import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me, selectableWeapon } from './pondwars-beta-engine.mjs?v=20261112arsenalA';
 
 export const PROTOCOL = 1;
 export const KEY = { L: 1, R: 2, U: 4, D: 8 };   // bits of input.m
@@ -20,7 +21,7 @@ const MAX_ACTS = 8, MAX_BATCH = 120;
 
 // ---------- one step of input ----------
 const num = v => typeof v === 'number' && Number.isFinite(v);
-const selectable = w => typeof w === 'string' && Object.hasOwn(WEAPONS, w) && 'ammo' in WEAPONS[w];
+const selectable = w => typeof w === 'string' && ((Object.hasOwn(WEAPONS, w) && 'ammo' in WEAPONS[w]) || Object.hasOwn(ARSENAL_ART,w));
 function cleanAct(a) {
   if (!a || typeof a !== 'object') return null;
   if (a.t === 'jump' || a.t === 'skip') return { t: a.t };
@@ -57,7 +58,7 @@ export function act(g, a) {
   if (a.t === 'face') { if (g.phase !== 'aim') return false; me(g).face = a.d; return true; }   // aiming turns the frog
   if (a.t === 'skip') { const was = g.phase; skip(g); return was !== g.phase; }
   if (a.t === 'weapon') {
-    if (g.phase !== 'aim' || g.pistolShots || g.ammo[g.team][a.w] === 0) return false;
+    if (!selectableWeapon(g,a.w) || g.phase !== 'aim' || g.pistolShots || g.ammo[g.team][a.w] === 0) return false;
     g.weapon = a.w; return true;
   }
   if (a.t === 'fire') return fire(g, a.a, a.p, a.x, a.y);
@@ -116,6 +117,7 @@ export const stateHash = g => snapshotHash(snapshot(g));
 // Overwrite g with a snapshot. Only keys the game already has are copied (a peer cannot add or replace others).
 export function restoreInto(g, snap) {
   if (!snap || typeof snap !== 'object' || !Array.isArray(snap.frogs) || snap.frogs.length !== g.frogs.length || !Number.isInteger(snap.rand)) throw new Error('bad snapshot');
+  if ((snap.arsenal ?? null) !== (g.arsenal ?? null) || (snap.arsenalStage ?? null) !== (g.arsenalStage ?? null)) throw new Error('arsenal snapshot mismatch');
   const mask = unpackMask(snap.mask), copy = JSON.parse(JSON.stringify(snap), back);
   for (const k of Object.keys(g)) if (!LOCAL.has(k) && Object.hasOwn(copy, k)) g[k] = copy[k];
   g.mask = mask; g.rand = rng(snap.rand >>> 0); g.events = []; g.dirty = [[0, 0, W - 1, H - 1]];
@@ -134,17 +136,18 @@ export class NetMatch {
     this.onstart = null; this.onrestore = null; this.onview = null; this.onpeer = null; this.onproblem = null;
     transport.onmessage = m => { try { this.receive(m); } catch (e) { this.onproblem?.(e.message); } };
   }
-  join() { if (!this.host && !this.g) this.t.send({ type: 'join', protocol: PROTOCOL }); }
+  join() { if (!this.host && !this.g) this.t.send({ type: 'join', protocol: PROTOCOL, arsenalStage:ARSENAL_STAGE }); }
   // Host: start as soon as a guest is there.
   begin(setup) {
     if (!this.host) return;
     if (!this.peer) { this.waiting = setup; return; }
+    if (setup.arsenal === ARSENAL_MODE && this.peerArsenalStage !== ARSENAL_STAGE) { this.onproblem?.('Arsenal builds differ; reload both QA tabs.'); return; }
     this.waiting = null; this.start(setup);
-    this.t.send({ type: 'hello', protocol: PROTOCOL, setup, snap: snapshot(this.g) });
+    this.t.send({ type: 'hello', protocol: PROTOCOL, setup, arsenalStage:ARSENAL_STAGE, snap: snapshot(this.g) });
   }
   start(setup, snap) {
     this.setup = setup;
-    this.g = newGame({ seed: setup.seed, map: setup.map, perTeam: setup.perTeam, cpu: [false, false] });
+    this.g = newGame({ seed: setup.seed, map: setup.map, perTeam: setup.perTeam, cpu: [false, false], arsenal:setup.arsenal });
     startTurn(this.g);
     if (snap && snapshotHash(snap) !== stateHash(this.g)) { restoreInto(this.g, snap); this.desyncs++; }
     this.tick = this.recv = 0; this.outbox = []; this.inbox = []; this.awaitSnap = false;
@@ -192,13 +195,16 @@ export class NetMatch {
     if (!m || typeof m !== 'object' || typeof m.type !== 'string') return;
     if (m.type === 'join' && this.host) {
       if (m.protocol !== PROTOCOL) return this.onproblem?.('The other tab runs a different game version.');
+      if (this.setup?.arsenal === ARSENAL_MODE && m.arsenalStage !== ARSENAL_STAGE) return this.onproblem?.('Arsenal builds differ; reload both QA tabs.');
+      this.peerArsenalStage=m.arsenalStage;
       this.peer = true; this.onpeer?.();
       if (this.waiting) this.begin(this.waiting);
-      else if (this.g) this.flush(), this.t.send({ type: 'hello', protocol: PROTOCOL, setup: this.setup, snap: snapshot(this.g), tick: this.tick });
+      else if (this.g) this.flush(), this.t.send({ type: 'hello', protocol: PROTOCOL, setup: this.setup, arsenalStage:ARSENAL_STAGE, snap: snapshot(this.g), tick: this.tick });
       return;
     }
     if (m.type === 'hello' && !this.host) {
       if (m.protocol !== PROTOCOL) return this.onproblem?.('The host runs a different game version.');
+      if (m.setup?.arsenal === ARSENAL_MODE && m.arsenalStage !== ARSENAL_STAGE) return this.onproblem?.('Arsenal builds differ; reload both QA tabs.');
       this.peer = true; this.start(m.setup, m.snap); this.tick = this.recv = m.tick | 0;
       return;
     }
