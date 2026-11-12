@@ -883,14 +883,13 @@ function mountExpansion(packs) {
   const box = arsenal.querySelector('.pw-weapons');
   box.querySelectorAll('[data-pack]').forEach(b => b.remove());
   const list = hudWeapons(packs);
-  $('#arsenal-art-status').hidden=!list.length;
   for (const w of list) {
     const b = document.createElement('button');
     b.type = 'button'; b.dataset.w = w.id; b.dataset.pack = w.pack;
     b.title = w.name + ' · key ' + w.key;
     b.setAttribute('aria-label', w.name);
     const artId={goldv2:'golden_foot_v2',bell:'bell_bomb',frogmine:'frog_mine',moon:'moon_rocket',ban:'ban_hammer',rain:'pep_rain',doge:'doge_flyer',donkey:'silver_donkey',pickaxe:'pickaxe'}[w.id];
-    b.innerHTML = '<span class="weapon-key">'+w.key+'</span><img src="art/arsenal-polish/hud_64/'+artId+'.png" alt=""><span>'+w.short+'</span><small>QA</small>';
+    b.innerHTML = '<span class="weapon-key">'+w.key+'</span><img src="art/arsenal-polish/hud_64/'+artId+'.png" alt=""><span>'+w.short+'</span><small></small>';
     b.querySelector('img').onerror=e=>{e.target.onerror=null;e.target.src='img/pondwars/'+w.id+'.svg';};
     b.addEventListener('click', () => chooseWeapon(w.id));
     box.append(b);
@@ -1109,15 +1108,25 @@ function syncMapPacks(){
   if($('#map-choice').selectedOptions[0]?.disabled){opts.map='island';$('#map-choice').value='island';}
   mapPreview(true);
 }
-const mapPreset=new URLSearchParams(location.search).get('maps');
+// Everything is on by default; ?maps= / ?packs= still pick a subset (or 'none' for the classic game).
+const mapPreset=new URLSearchParams(location.search).get('maps')??'all';
 document.querySelectorAll('#map-packs [data-mappack]').forEach(box=>{
   if(mapPreset==='all'||mapPreset===box.dataset.mappack||(mapPreset==='1'&&box.dataset.mappack==='maps1')||(mapPreset==='2'&&box.dataset.mappack==='maps2'))box.checked=true;
-  box.addEventListener('change',syncMapPacks);
+  box.addEventListener('change',()=>{syncMapPacks();menuSummary();});
 });
-const artStatus=document.createElement('p');artStatus.id='arsenal-art-status';artStatus.textContent='PLAYTEST · v11 PNG: Doge, Donkey, Moon, PEP. Ban hand calibration and Donkey warning art pending. Mobile awaits physical-device test.';artStatus.hidden=true;$('#arsenal-packs').after(artStatus);
-const presetPacks = normalizePacks(new URLSearchParams(location.search).get('packs'));
-document.querySelectorAll('#arsenal-packs [data-pack]').forEach(box => { if (presetPacks[box.dataset.pack]) box.checked = true; });
-$('#map-choice').value=opts.map;paintColors();mapPreview();syncMapPacks();artStatus.hidden=!Object.keys(readPacks()).length;
+const presetPacks = normalizePacks(new URLSearchParams(location.search).get('packs')??'all');
+document.querySelectorAll('#arsenal-packs [data-pack]').forEach(box => { if (presetPacks[box.dataset.pack]) box.checked = true; box.addEventListener('change', menuSummary); });
+$('#map-choice').value=opts.map;paintColors();mapPreview();syncMapPacks();
+// ---- menu tabs: Match · Teams · Map · Arsenal · How to play, and a one-line summary above START ----
+function menuTab(name){document.querySelectorAll('.menu-tabs [data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===name)));document.querySelectorAll('.menu-panel').forEach(p=>{p.hidden=p.dataset.panel!==name;});}
+document.querySelectorAll('.menu-tabs [data-tab]').forEach(b=>b.addEventListener('click',()=>menuTab(b.dataset.tab)));
+function menuSummary(){
+  const packs=Object.keys(readPacks()).length,maps=document.querySelectorAll('#map-packs [data-mappack]:checked').length;
+  const vs=opts.mode==='cpu'?'vs CPU · '+['Easy','Normal','Hard'][opts.level]:'2 players';
+  $('#menu-summary').textContent=vs+' · '+opts.n+' frogs each · '+($('#map-choice').selectedOptions[0]?.textContent.split(' · ')[0]||'')+' · '+(packs?packs+' weapon pack'+(packs>1?'s':''):'classic weapons')+(maps?' · '+(maps*1===2?'all maps':'extra maps'):'');
+}
+for(const el of document.querySelectorAll('#menu button,#menu select'))el.addEventListener('click',()=>setTimeout(menuSummary));
+$('#map-choice').addEventListener('change',menuSummary);menuSummary();
 
 pick('[data-mode]', 'mode', String); pick('[data-level]', 'level', Number); pick('[data-n]', 'n', Number);
 $('#go').addEventListener('click', start); $('#again').addEventListener('click', start);

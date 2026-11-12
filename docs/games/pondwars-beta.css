@@ -108,3 +108,34 @@ html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%}
 @media (max-height:460px){.pw-end{align-items:flex-start}.pw-end .end-logo{font-size:clamp(30px,7vw,54px)}.pw-end .end-body{gap:2px}.pw-end .end-kicker{font-size:10px}.pw-end #end-crew{width:min(360px,60vw)}.pw-end .end-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.pw-end .end-card{padding:3px 4px}.pw-end .end-card b{font-size:15px}.pw-end .end-card span,.pw-end .end-card small{font-size:9px}.pw-end .end-bar .bar{height:10px;margin:3px 0 1px}.pw-end .end-text{font-size:12px}.pw-end .end-buttons button{min-height:32px;padding:5px 14px}}
 @media (prefers-reduced-motion:reduce){.pw-end *,.pw-end.show *{animation:none!important;opacity:1!important;transition:none!important}.pw-end .end-confetti{display:none}}
 .pw-end h2.end-logo{color:transparent;text-shadow:none}
+/* ---- menu: tabs Match · Teams · Map · Arsenal · How to play ---- */
+.menu-tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;width:100%;margin:4px 0 2px;border-bottom:2px solid #af9d61}
+.menu-tabs button{padding:6px 12px;font:bold 12px Tahoma,Verdana,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#d7c48a;background:#14272b;border:1px solid #6f6640;border-bottom:0;border-radius:3px 3px 0 0;cursor:pointer}
+.menu-tabs button[aria-selected=true]{color:#1a1205;background:#e5d45f;border-color:#e5d45f}
+.menu-panel{width:100%;display:flex;flex-direction:column;gap:8px;min-height:180px}
+.menu-panel[hidden]{display:none}
+.pack-list{margin:0;padding:8px 10px}
+.pack-list p{margin:0 0 6px;font-size:11px;color:#d7c48a}
+.pack-list label{display:flex;gap:8px;align-items:center;margin:4px 0;padding:6px 8px;font-size:12px;color:#efe6c8;background:#0c1827aa;border:1px solid #445b5a;border-radius:2px;cursor:pointer}
+.pack-list label:has(input:checked){border-color:#e5d45f;background:#1d2d24}
+.pack-list label.pack-on{opacity:.85;cursor:default}
+.pack-list label span{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px}
+.pack-icons{display:inline-flex;gap:1px}
+.pack-icons img,.pack-list .pack-pick{width:28px;height:28px;image-rendering:pixelated}
+.pack-on .pack-icons img{width:22px;height:22px}
+.menu-help{text-align:left;font-size:12px;line-height:1.45;color:#efe6c8}
+.menu-help h3{margin:6px 0 0;font:bold 12px Tahoma,Verdana,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#e5d45f}
+.menu-help p,.menu-help ul{margin:0}
+.menu-help ul{padding-left:18px}
+.menu-help li{margin:2px 0}
+.menu-help .pw-small{display:block!important;margin:0;font-size:11px;color:#c9d6de}
+.pw-menu .menu-help .keys-hint{display:block}
+.menu-summary{margin:2px 0 0;font:bold 11px Tahoma,Verdana,sans-serif;color:#afc571;text-align:center}
+@media (pointer:coarse){.menu-help .keys-hint{display:none!important}}
+@media (pointer:fine){.menu-help .touch-hint{display:none!important}}
+@media (max-height:460px){.menu-tabs button{padding:4px 8px;font-size:11px}.menu-panel{min-height:0}.pack-icons img,.pack-list .pack-pick{width:22px;height:22px}}
+/* the active tab scrolls inside the menu; header, tabs, summary and START always stay visible */
+#menu.pw-menu{overflow:hidden;display:flex;flex-direction:column}
+#menu.pw-menu>*{flex-shrink:0}
+#menu.pw-menu>.menu-panel{flex:0 1 auto;min-height:90px;overflow:auto;overscroll-behavior:contain;padding-right:4px}
+@media (max-height:460px){#menu.pw-menu>p:not(.menu-summary),#menu .menu-tag,#menu .menu-kicker{display:none}#menu h1{font-size:26px}}
