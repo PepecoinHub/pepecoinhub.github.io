@@ -1,7 +1,7 @@
 import { validateClip, clipFrame, WEAPON_FALLBACK, MAP_DECORATIONS, MAP_TINT } from './pondwars-weapon-art.mjs?v=20261112v11';
 import { PointerHolds } from './pondwars-pointer-holds.mjs?v=20261112polish';
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { CANDLE_SINK, W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112polish';
+import { ROPE_MAX, CANDLE_SINK, CANDLE_DEPTH, W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112polish';
 import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112polish';
 import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112polish';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
@@ -420,9 +420,9 @@ function drawParts(dt) {
 const SPIN = { gold: 5, toe: 6, shard: 8, pickaxe: 13 }, ALONG = new Set(['rocket', 'revolver', 'bow', 'drill']);
 function shot(s) {
   if (s.type === 'candles' && s.sink != null) {
-    // stuck candle: it slides down into the ground over CANDLE_SINK seconds, cut off at the surface
-    const k = Math.min(1, s.sink / CANDLE_SINK), depth = k * 30;
-    ctx.save(); ctx.beginPath(); ctx.rect(s.x - 30, s.y - 80, 60, 80); ctx.clip();
+    // stuck candle: it bores down its own shaft over CANDLE_SINK seconds
+    const k = Math.min(1, s.sink / CANDLE_SINK), depth = k * CANDLE_DEPTH;
+    ctx.save();
     if (!drawWeaponClip('candles', 'flight', reduce ? 0 : s.t, s.x, s.y - 12 + depth)) { ctx.fillStyle = '#e0414c'; ctx.fillRect(s.x - 4, s.y - 22 + depth, 8, 20); }
     ctx.restore();
     if (!reduce && k < .6) { ctx.fillStyle = `rgba(120,80,50,${.6 - k})`; for (let i = -2; i <= 2; i++) ctx.fillRect(s.x + i * 5 - 1, s.y - 2 - Math.abs(Math.sin(s.sink * 9 + i)) * 4, 3, 3); }
@@ -525,6 +525,14 @@ function draw(t) {
     if (g.weapon === 'teleport') {
       ctx.strokeStyle = '#9fe3ff'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.arc(aimX, aimY - 25, 16, 0, 7); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle = '#9fe3ff'; ctx.font = 'bold 11px Tahoma'; ctx.textAlign = 'center'; ctx.fillText('TELEPORT HERE', aimX, aimY - 48);
+    } else if (g.weapon === 'rope' && !f.rope) {
+      // rope preview: where the hook would catch along the aim, or a red line when nothing is in reach
+      const ox = f.x, oy = f.y - 30, dx = Math.cos(aim), dy = Math.sin(aim), s = ui; let hit = null, end = ROPE_MAX;
+      for (let d = 14; d <= ROPE_MAX; d += 3) { const x = ox + dx * d, y = oy + dy * d; if (x < 0 || x >= W || y < 0 || y >= WATER) { end = d; break; } if (g.mask[Math.floor(y) * W + Math.floor(x)]) { hit = [x, y]; break; } }
+      const ex = hit ? hit[0] : ox + dx * end, ey = hit ? hit[1] : oy + dy * end;
+      ctx.strokeStyle = hit ? '#d8f5a2' : '#ff6b5a'; ctx.lineWidth = 2 * s; ctx.setLineDash([5 * s, 5 * s]); ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ex, ey); ctx.stroke(); ctx.setLineDash([]);
+      if (hit) { ctx.strokeStyle = '#000a'; ctx.lineWidth = 4 * s; ctx.beginPath(); ctx.arc(ex, ey, 6 * s, 0, 7); ctx.stroke(); ctx.strokeStyle = '#d8f5a2'; ctx.lineWidth = 2 * s; ctx.beginPath(); ctx.arc(ex, ey, 6 * s, 0, 7); ctx.stroke(); }
+      else { ctx.font = `bold ${Math.round(11 * s)}px Tahoma`; ctx.textAlign = 'center'; ctx.fillStyle = '#000'; ctx.fillText('NOTHING TO HOOK', ex + 1, ey - 8 * s + 1); ctx.fillStyle = '#ff6b5a'; ctx.fillText('NOTHING TO HOOK', ex, ey - 8 * s); }
     } else if (targeted(g.weapon)) {
       // Map strikes: a drop line and a target ring where it lands. No aim line, no power meter.
       const col = g.weapon === 'donkey' ? '#d7deea' : g.weapon === 'rain' ? '#7ee07a' : '#e0414c', s = ui;
