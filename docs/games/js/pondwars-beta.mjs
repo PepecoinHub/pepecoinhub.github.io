@@ -100,7 +100,7 @@ fetch('art/arsenal-polish/manifest.json?v=20261112v11').then(r=>r.json()).then(m
     if(!validateClip(c))throw new Error('Invalid weapon clip: '+id+'/'+role);
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
   }
-}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v15f')).then(r=>r.json()).then(manifest=>{
+}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v15x')).then(r=>r.json()).then(manifest=>{
   // v13: pixel art for every weapon (flight, held, explosions). It overrides older clips of the same role.
   for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(validateClip(c)){
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
@@ -663,10 +663,14 @@ function events() {
       if(clip?.image.naturalWidth)weaponFX.push({weapon:key,role:'explosion',x:e.x,y:e.y,time:animator.time,authored:true,life:clip.frames/clip.fps});
     }
     if(e.type==='boom'&&WEAPON_FALLBACK[e.weapon]){
-      const clip=weaponClips.get(e.weapon+'/explosion'),authored=/\/v1[13]\//.test(clip?.src||'');
+      const clip=weaponClips.get(e.weapon+'/explosion'),authored=/\/v1[1-5]\//.test(clip?.src||'');
       weaponFX.push({weapon:e.weapon,role:'explosion',x:e.x,y:e.y,time:animator.time,authored,life:e.weapon==='goldv2'?1.8:authored?clip.frames/clip.fps:.6});
     }
     // v14 pickaxe effects: dirt where it bites, a CLANG burst on a frog, a glint when it is caught
+    // v15: sound wave when the bell bounces, a swirl where a frog teleports out and back in
+    const fx = (weapon, role, x, y) => { const clip = weaponClips.get(weapon + '/' + role); if (clip?.image.naturalWidth) weaponFX.push({ weapon, role, x, y, time: animator.time, authored: true, life: clip.frames / clip.fps }); };
+    if (e.type === 'bell') fx('bell', 'bounce', e.x, e.y - 6);
+    if (e.type === 'teleport') { fx('teleport', 'flash', e.from.x, e.from.y - 26); fx('teleport', 'flash', e.to.x, e.to.y - 26); }
     const pickFX = { dig: 'dig', pickhit: 'hit', catch: 'catch' }[e.type];
     if (pickFX) { const clip = weaponClips.get('pickaxe/' + pickFX); if (clip?.image.naturalWidth) weaponFX.push({ weapon: 'pickaxe', role: pickFX, x: e.x, y: e.y, time: animator.time, authored: true, life: clip.frames / clip.fps }); }
     if(weaponFX.length>64)weaponFX.shift();

@@ -277,7 +277,7 @@
   },
   "blastS": {
    "explosion": {
-    "src": "art/arsenal-polish/v13/effects/explosion_medium.png",
+    "src": "art/arsenal-polish/v15/effects/explosion_medium.png",
     "frame": [
      128,
      128
@@ -291,14 +291,14 @@
      64
     ],
     "size": [
-     62,
-     62
+     66,
+     66
     ]
    }
   },
   "blastM": {
    "explosion": {
-    "src": "art/arsenal-polish/v13/effects/explosion_medium.png",
+    "src": "art/arsenal-polish/v15/effects/explosion_medium.png",
     "frame": [
      128,
      128
@@ -312,14 +312,14 @@
      64
     ],
     "size": [
-     92,
-     92
+     96,
+     96
     ]
    }
   },
   "blastL": {
    "explosion": {
-    "src": "art/arsenal-polish/v13/effects/explosion_large.png",
+    "src": "art/arsenal-polish/v15/effects/explosion_large.png",
     "frame": [
      128,
      128
@@ -333,8 +333,8 @@
      64
     ],
     "size": [
-     136,
-     136
+     140,
+     140
     ]
    }
   },
@@ -356,6 +356,25 @@
     "size": [
      64,
      64
+    ]
+   },
+   "explosion": {
+    "src": "art/arsenal-polish/v15/effects/mega_foot_imprint.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 10,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     130,
+     130
     ]
    }
   },
@@ -399,6 +418,25 @@
      34,
      34
     ]
+   },
+   "bounce": {
+    "src": "art/arsenal-polish/v15/effects/bell_bounce_wave.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 14,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     44,
+     44
+    ]
    }
   },
   "frogmine": {
@@ -424,7 +462,7 @@
   },
   "moon": {
    "explosion": {
-    "src": "art/arsenal-polish/v13/effects/moon_rocket_explosion.png",
+    "src": "art/arsenal-polish/v15/effects/moon_rocket_explosion.png",
     "frame": [
      128,
      128
@@ -438,8 +476,8 @@
      64
     ],
     "size": [
-     100,
-     100
+     104,
+     104
     ]
    }
   },
@@ -464,7 +502,7 @@
     ]
    },
    "explosion": {
-    "src": "art/arsenal-polish/v11/effects/donkey_impact_atlas.png",
+    "src": "art/arsenal-polish/v15/effects/donkey_impact.png",
     "frame": [
      128,
      128
@@ -480,26 +518,25 @@
     "size": [
      230,
      230
-    ],
-    "reducedFrame": 4
+    ]
    },
    "activation": {
-    "src": "art/arsenal-polish/v13/effects/silver_donkey_warning.png",
+    "src": "art/arsenal-polish/v15/effects/silver_donkey_warning.png",
     "frame": [
      128,
      128
     ],
     "columns": 6,
     "frames": 6,
-    "fps": 12,
+    "fps": 8,
     "loop": true,
     "anchor": [
      64,
      64
     ],
     "size": [
-     60,
-     60
+     64,
+     64
     ]
    }
   },
@@ -578,6 +615,69 @@
     "size": [
      44,
      44
+    ]
+   }
+  },
+  "doge": {
+   "explosion": {
+    "src": "art/arsenal-polish/v15/effects/doge_blast.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 14,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     112,
+     112
+    ]
+   }
+  },
+  "pep": {
+   "explosion": {
+    "src": "art/arsenal-polish/v15/effects/pep_coin_splash.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 16,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     50,
+     50
+    ]
+   }
+  },
+  "teleport": {
+   "flash": {
+    "src": "art/arsenal-polish/v15/effects/teleport_flash.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 16,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     70,
+     70
     ]
    }
   }
