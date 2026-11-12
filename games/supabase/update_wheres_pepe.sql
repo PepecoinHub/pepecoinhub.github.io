@@ -119,8 +119,8 @@ begin
   update games.wp_puzzles set day = d, num = coalesce((select max(num) from games.wp_puzzles), 0) + 1
    where id = (select id from games.wp_puzzles where status = 'approved' and day is null order by decided_at, id limit 1)
   returning * into p;
-  -- pictures of puzzles older than 30 days are deleted (the answers and scores stay)
-  delete from games.wp_images i using games.wp_puzzles q where q.id = i.puzzle_id and q.day < d - 30;
+  -- pictures of puzzles older than 7 days are deleted (the answers and scores stay)
+  delete from games.wp_images i using games.wp_puzzles q where q.id = i.puzzle_id and q.day < d - 7;
   return p;
 end $$;
 
