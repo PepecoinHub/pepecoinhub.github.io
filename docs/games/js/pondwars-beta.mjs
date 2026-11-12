@@ -13,7 +13,9 @@ import { bindHold } from './arcade-common.mjs';
 
 const $ = s => document.querySelector(s);
 // Opt-in art review: one standard model in 2.0, existing beta roster remains available without this flag.
-const artMode = new URLSearchParams(location.search).get('art');
+// Pixel v06 Pepe is the default look; ?art=classic brings back the old roster art, ?art=pixel-v06/v04 shows the QA bar.
+const artParam = new URLSearchParams(location.search).get('art'), artQA = artParam !== null && artParam !== 'classic';
+const artMode = artParam === null ? 'pixel-v06' : artParam;
 const standardPreview = artMode === 'standard-v02', pixelPreview = ['pixel-v04','pixel-v06'].includes(artMode);
 const pixelLabel = artMode === 'pixel-v06' ? 'v06' : 'v04';
 let pixelCompareLinks = [];
@@ -26,14 +28,17 @@ if (framed || /[?&]embed=1(&|$)/.test(location.search)) document.documentElement
 const cv = $('#pw'), ctx = cv.getContext('2d');
 // The battlefield is always W×H. On a wide screen the canvas gets wider instead of leaving empty bands at the sides:
 // the sky, hills and water simply go on to the left and right (OX = world units added on each side).
-let VW = W, OX = 0;
+// OY: extra sky above the battlefield, so high lobs stay on screen instead of vanishing at the top edge.
+const OY = 150;
+let VW = W, OX = 0, VH = H + OY;
 // ui: how much to enlarge the crosshair and power meter, so they stay readable when a phone shrinks the battlefield
 let ui = 1;
 function fitStage() {
   const r=cv.parentElement.getBoundingClientRect();
-  VW=Math.max(W,Math.round(H*r.width/Math.max(1,r.height)));OX=(VW-W)/2;
+  VW=Math.max(W,Math.round(VH*r.width/Math.max(1,r.height)));OX=(VW-W)/2;
   if(cv.width!==VW)cv.width=VW;
-  const shown=Math.min(r.width/VW,r.height/H)||1;ui=Math.max(1,Math.min(2,.9/shown));
+  if(cv.height!==VH)cv.height=VH;
+  const shown=Math.min(r.width/VW,r.height/VH)||1;ui=Math.max(1,Math.min(2,.9/shown));
 }
 addEventListener('resize', () => requestAnimationFrame(fitStage));
 if ('ResizeObserver' in window) { let ro = 0; new ResizeObserver(() => { cancelAnimationFrame(ro); ro = requestAnimationFrame(fitStage); }).observe(document.body); }
@@ -153,13 +158,13 @@ function paintGround(x0 = 0, y0 = 0, x1 = W - 1, y1 = H - 1) {
 // ---------- drawing ----------
 function sky(t) {
   const XL = -OX, XR = W + OX;
-  const sk=ctx.createLinearGradient(0,0,0,H);
+  const sk=ctx.createLinearGradient(0,-OY,0,H);
   if(g.map==='moon'){sk.addColorStop(0,'#12141c');sk.addColorStop(.5,'#3a4258');sk.addColorStop(1,'#6a6248');}
   else if(g.map==='doom'){sk.addColorStop(0,'#1a2430');sk.addColorStop(.5,'#3d5360');sk.addColorStop(1,'#6d7a62');}
   else if(g.map==='quarry'){sk.addColorStop(0,'#2a3340');sk.addColorStop(.5,'#7a7464');sk.addColorStop(1,'#d7c3a0');}
   else if(g.map==='tower'){sk.addColorStop(0,'#243044');sk.addColorStop(.5,'#6d7c88');sk.addColorStop(1,'#e4d2ae');}
   else {sk.addColorStop(0,'#193d68');sk.addColorStop(.5,'#628d9f');sk.addColorStop(1,'#ecc99c');}
-  ctx.fillStyle=sk;ctx.fillRect(XL,0,XR-XL,H);
+  ctx.fillStyle=sk;ctx.fillRect(XL,-OY,XR-XL,H+OY);
   ctx.fillStyle='#fce8b7';ctx.beginPath();ctx.arc(970,105,44,0,7);ctx.fill();
   for(let layer=0;layer<3;layer++){ctx.fillStyle=['#567789','#496d72','#355c5f'][layer];ctx.beginPath();ctx.moveTo(XL,H);
     for(let x=Math.floor(XL/10)*10;x<=XR+10;x+=10)ctx.lineTo(x,260+layer*65+Math.sin(x*.009+layer*2)*50+Math.sin(x*.023)*19);
@@ -398,7 +403,7 @@ function shot(s) {
 }
 function draw(t) {
   ctx.save();
-  ctx.translate(OX, 0);
+  ctx.translate(OX, OY);
   if (shake > 0 && !reduce) ctx.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake);
   sky(t);
   drawMapDecorations();
@@ -425,6 +430,7 @@ function draw(t) {
   for (const f of g.frogs) if (f.alive && f.jet) { ctx.fillStyle = '#c95d36'; ctx.fillRect(f.x - f.face * 12 - 4, f.y - 40, 8, 22); if (g.ctl && (g.ctl.y < 0 || g.ctl.x) && g.frogs[g.current] === f) { ctx.fillStyle = Math.random() < .5 ? '#ffc05b' : '#fff1b8'; ctx.beginPath(); ctx.moveTo(f.x - f.face * 12 - 4, f.y - 18); ctx.lineTo(f.x - f.face * 12 + 4, f.y - 18); ctx.lineTo(f.x - f.face * 12, f.y - 4 + Math.random() * 8); ctx.fill(); }
     ctx.fillStyle = '#000a'; ctx.fillRect(f.x - 16, f.y - 76, 32, 4); ctx.fillStyle = '#ffc05b'; ctx.fillRect(f.x - 16, f.y - 76, 32 * Math.max(0, f.jet.fuel) / 3.5, 4); }
   for (const s of g.shots) shot(pose(s));
+  for (const s of g.shots) offscreenMarker(s);
   drawParts(visualDt);
   for (const b of g.booms) {
     if(authoredExplosionAt(b))continue; // Keep the PNG burst visible; physics/debris are unchanged.
@@ -470,6 +476,17 @@ function draw(t) {
     ctx.fillStyle = '#ffe680'; ctx.fillText(text, W / 2, 8 + size * 1.3); ctx.globalAlpha = 1;
   }
   ctx.restore();
+}
+// A shot above the visible sky: a bouncing arrow at the top edge with the height, so it never just disappears.
+function offscreenMarker(s) {
+  const top = -OY + 6;
+  if (!(s.y < top - 4) || s.x < -OX || s.x > W + OX) return;
+  const bob = reduce ? 0 : Math.sin(performance.now() / 120) * 2, x = Math.max(-OX + 16 * ui, Math.min(W + OX - 16 * ui, s.x)), y = top + bob;
+  ctx.save(); ctx.translate(x, y); ctx.scale(ui, ui);
+  ctx.fillStyle = '#000b'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-11, 15); ctx.lineTo(11, 15); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#ffe680'; ctx.beginPath(); ctx.moveTo(0, 3); ctx.lineTo(-7, 13); ctx.lineTo(7, 13); ctx.closePath(); ctx.fill();
+  ctx.font = 'bold 11px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#000'; ctx.fillText(Math.round(top - s.y) + 'm', 1, 28);
+  ctx.fillStyle = '#ffe680'; ctx.fillText(Math.round(top - s.y) + 'm', 0, 27); ctx.restore();
 }
 // The charge: a row of beads growing out of the frog along the aim, green to red, with the percentage above.
 // Empty beads stay as outlines, so the full length is visible from the first moment.
@@ -737,7 +754,7 @@ const unselect = () => { const s = getSelection?.(); if (s && s.rangeCount && !t
 // loupe, the callout and double-tap zoom on iOS; pointer events still arrive.
 for (const el of [cv, $('#fire'), $('#left'), $('#right'), $('#hop')]) el.addEventListener('touchstart', e => { if (e.cancelable) e.preventDefault(); unselect(); }, { passive: false });
 function jump(){if(!movementAllowed()||!arsenal.hidden)return;clearCharge();pending.push({t:'jump'});}
-function toWorld(e) { const r = cv.getBoundingClientRect(); const scale=Math.min(r.width/VW,r.height/H),padX=(r.width-VW*scale)/2,padY=(r.height-H*scale)/2; return [(e.clientX-r.left-padX)/scale-OX,(e.clientY-r.top-padY)/scale]; }
+function toWorld(e) { const r = cv.getBoundingClientRect(); const scale=Math.min(r.width/VW,r.height/VH),padX=(r.width-VW*scale)/2,padY=(r.height-VH*scale)/2; return [(e.clientX-r.left-padX)/scale-OX,(e.clientY-r.top-padY)/scale-OY]; }
 function aimAt(e) {
   if (guiding()) {
     const [, y] = toWorld(e);
@@ -854,7 +871,7 @@ function paintPlayers(){
       const thumb=document.createElement('canvas');thumb.width=48;thumb.height=52;thumb.setAttribute('aria-hidden','true');portrait(thumb,teamPlayers[team][slot]);
       const caption=document.createElement('span');caption.textContent='Frog '+(slot+1);
       const select=document.createElement('select');select.setAttribute('aria-label','Team '+(team+1)+' frog '+(slot+1)+' character');
-      PLAYERS.forEach((p,i)=>{const option=document.createElement('option');option.value=i;option.textContent=pixelPreview && p.id === 'classic' ? p.name + ' · pixel ' + pixelLabel + ' QA' : p.name;select.append(option);});select.value=teamPlayers[team][slot];
+      PLAYERS.forEach((p,i)=>{const option=document.createElement('option');option.value=i;option.textContent=artQA && pixelPreview && p.id === 'classic' ? p.name + ' · pixel ' + pixelLabel + ' QA' : p.name;select.append(option);});select.value=teamPlayers[team][slot];
       select.onchange=()=>{teamPlayers[team][slot]=Number(select.value);portrait(thumb,Number(select.value));};
       row.append(thumb,caption,select);box.append(row);
     }
@@ -997,15 +1014,17 @@ function drawHelmetFlights() {
 
 async function loadPixelPrototype() {
   if (!pixelPreview) return;
+  cv.style.imageRendering = 'pixelated';
+  if (artQA) {
   $('#art-prototype').hidden = false;
   $('#art-prototype').textContent = 'PIXEL ART ' + pixelLabel + ' · QA alternative for Classic Pepe · not production-approved art. Other skins remain available.';
   $('.pw-chrome small').textContent = ' / PIXEL ' + pixelLabel + ' QA';
-  cv.style.imageRendering = 'pixelated';
   cv.setAttribute('aria-label', 'FROGAGEDDON pixel ' + pixelLabel + ' QA battlefield');
   pixelCompareLinks = ['pixel-v04','pixel-v06'].map(key => {
     const a=document.createElement('a');a.dataset.art=key;a.textContent=key+' · same map';
     a.target='_blank';a.rel='noopener';$('#art-prototype').append(' · ',a);return a;
   });
+  }
   updatePixelCompare();
   const base = 'img/pondwars/players/'+artMode+'/';
   const data = await Promise.all(['manifest.json','qa-anchors.json'].map(async file => {
