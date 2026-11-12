@@ -1509,7 +1509,7 @@
   }
   function pondWarsApp() {
     var A = openApp('pondwars', 'FROGAGEDDON · BETA', 'pondwars', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars-beta.html?embed=1" title="FROGAGEDDON"></iframe>';
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars-beta.html?embed=1&v=20261112menu" title="FROGAGEDDON"></iframe>';
       A.host.querySelector('.w-min').addEventListener('click', function () {
         A.body.querySelector('iframe').contentWindow.postMessage('pondwars-pause', location.origin);
       });
