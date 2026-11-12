@@ -1,7 +1,7 @@
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112arsenal';
-import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112arsenal';
-import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112arsenal';
+import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112simple';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112simple';
+import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112simple';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
 import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261112pixel';
 import { compilePixelManifest, authoredPose, clipDuration, pixelHelmet } from './pondwars-pixel-art.mjs?v=20261112pixel';
@@ -306,6 +306,7 @@ function drawParts(dt) {
 function shot(s) {
   ctx.save(); ctx.translate(s.x, s.y);
   if(s.type==='drill'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle='#708454';ctx.fillRect(-10,-4,14,8);ctx.fillStyle='#a8b4ba';ctx.beginPath();ctx.moveTo(4,-5);ctx.lineTo(13,0);ctx.lineTo(4,5);ctx.fill();ctx.restore();return;}
+  if(s.type==='bell'){ctx.fillStyle='#f0c14a';ctx.beginPath();ctx.moveTo(0,-8);ctx.quadraticCurveTo(10,-4,8,4);ctx.lineTo(-8,4);ctx.quadraticCurveTo(-10,-4,0,-8);ctx.fill();ctx.fillStyle='#8a6a22';ctx.beginPath();ctx.arc(0,7,3,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 12px Tahoma';ctx.textAlign='center';ctx.fillText(String(Math.max(1,Math.ceil(WEAPONS.bell.fuse-s.t))),0,-12);ctx.restore();return;}
   if(s.type==='dynamite'){ctx.drawImage(weaponArt.dynamite,-10,-18,20,25);ctx.fillStyle='#fff3ba';ctx.font='bold 12px monospace';ctx.fillText(Math.max(1,Math.ceil(5-s.t)),0,-22);}
   else if (WEAPONS[s.type].fuse) {
     ctx.fillStyle = ['gold','toe'].includes(s.type)?'#ffd257':s.type==='cluster'?'#c95d36':'#436d32'; if(['gold','toe'].includes(s.type)){ctx.rotate(s.t*5);ctx.fillRect(-5,-9,8,15);for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(-5+i*3,-9,2.5,0,7);ctx.fill();}} ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, 7); ctx.fill(); ctx.fillStyle = '#8fd27d'; ctx.fillRect(-1, -7, 3, 3);
@@ -334,7 +335,7 @@ function draw(t) {
   drawHelmetFlights(); // Behind frogs/labels/flags so cosmetic debris cannot obscure identification.
   for (const f of g.frogs) if (f.alive || (f.gone === 'ko' && animator.sample(f, reduce).alpha > 0 && !reduce)) frog(pose(f), t);
     else if (f.gone === 'ko') { ctx.fillStyle = '#9aa3a8'; ctx.fillRect(f.x - 6, f.y - 14, 12, 14); ctx.beginPath(); ctx.arc(f.x, f.y - 14, 6, Math.PI, 0); ctx.fill(); ctx.fillStyle = '#555'; ctx.font = 'bold 7px Tahoma'; ctx.textAlign = 'center'; ctx.fillText('RIP', f.x, f.y - 7); }
-  for(const m of g.mines) {ctx.drawImage(weaponArt.mine,m.x-10,m.y-13,20,20);if(m.t>1){ctx.fillStyle=Math.sin(t*8)>0?'#ff6b45':'#602d28';ctx.fillRect(m.x-2,m.y-12,4,3);}}
+  for(const m of g.mines) {const art=weaponArt[m.type]||weaponArt.mine;const arm=WEAPONS[m.type]?.arm??1;ctx.drawImage(art,m.x-10,m.y-13,20,20);if(m.t>arm){ctx.fillStyle=Math.sin(t*8)>0?'#ff6b45':'#602d28';ctx.fillRect(m.x-2,m.y-12,4,3);}}
   // rope and jetpack flame of the frog whose turn it is
   for (const f of g.frogs) if (f.alive && f.rope) { ctx.strokeStyle = '#d8b878'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(f.x, f.y - 30); ctx.lineTo(f.rope.x, f.rope.y); ctx.stroke(); ctx.fillStyle = '#a8b4ba'; ctx.beginPath(); ctx.arc(f.rope.x, f.rope.y, 3.5, 0, 7); ctx.fill(); }
   for (const f of g.frogs) if (f.alive && f.jet) { ctx.fillStyle = '#c95d36'; ctx.fillRect(f.x - f.face * 12 - 4, f.y - 40, 8, 22); if (g.ctl && (g.ctl.y < 0 || g.ctl.x) && g.frogs[g.current] === f) { ctx.fillStyle = Math.random() < .5 ? '#ffc05b' : '#fff1b8'; ctx.beginPath(); ctx.moveTo(f.x - f.face * 12 - 4, f.y - 18); ctx.lineTo(f.x - f.face * 12 + 4, f.y - 18); ctx.lineTo(f.x - f.face * 12, f.y - 4 + Math.random() * 8); ctx.fill(); }
@@ -463,6 +464,7 @@ function events() {
       status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : isOnline(g.team) ? `${f.name} (${TEAM[g.team].name}) is playing on the other device…` : touchUI.matches ? `${f.name}: tap the map to aim · hold FIRE to shoot · ◀ ▶ walk · ↑ jump, twice for a backflip` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
     if (e.type === 'fire') {closeArsenal();keys.clear();held.l=held.r=0;clearCharge();remoteP=0;status(g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
     if (e.type === 'boom') {shake=9;beep(65,.35);if(e.r)debris(e.x,e.y,e.r);}
+    if (e.type === 'bell') beep(880, .08);
     if (e.type === 'rope') {beep(520,.06);status('Hooked! A/D swing · W/S shorter/longer · Space lets go. Your turn goes on.');}
     if (e.type === 'unrope') status('Let go of the rope.');
     if (e.type === 'jet') {beep(180,.2);status('Jetpack on: W flies up, A/D sideways. Your turn goes on.');}

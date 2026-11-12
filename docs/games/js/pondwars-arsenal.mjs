@@ -25,7 +25,7 @@ export const GUIDE = {
 // --- simple pack: melee kick, timed bell, proximity trap ---
 const simple = {
   goldv2: {
-    pack: 'simple', ready: false, expansion: true, role: 'melee', tap: true,
+    pack: 'simple', ready: true, expansion: true, role: 'melee', tap: true,
     name: 'Golden Foot v2', short: 'Gold Foot', key: 'G', code: 'KeyG',
     hud: 'ONE PER MATCH · DIRECT HIT · VERY HIGH KNOCKBACK · TINY SCUFF',
     fireLabel: 'KICK', cry: 'KICK!',
@@ -34,7 +34,7 @@ const simple = {
     ammo: 1, power: 1, wind: false,
   },
   bell: {
-    pack: 'simple', ready: false, expansion: true, role: 'throw', bell: true,
+    pack: 'simple', ready: true, expansion: true, role: 'throw', bell: true,
     name: 'Bell Bomb', short: 'Bell', key: 'B', code: 'KeyB',
     hud: '3.0s FUSE · BOUNCES · MEDIUM BLAST',
     fireLabel: 'HOLD TO THROW',
@@ -42,7 +42,7 @@ const simple = {
     fuse: 3, ammo: Infinity, power: 520, wind: false,
   },
   frogmine: {
-    pack: 'simple', ready: false, expansion: true, role: 'mine', tap: true,
+    pack: 'simple', ready: true, expansion: true, role: 'mine', tap: true,
     name: 'Frog Mine', short: 'Frog Mine', key: 'M', code: 'KeyM',
     hud: 'ARMS AFTER 1.0s · PROXIMITY · SMALL CRATER · MEDIUM KNOCKBACK',
     fireLabel: 'PLACE MINE',

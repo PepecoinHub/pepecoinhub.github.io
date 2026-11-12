@@ -54,7 +54,7 @@ Not done yet: a real network transport (a Supabase Realtime channel only needs `
 
 ## Expansion arsenal (playtest, off by default)
 
-Eight new weapons are registered in `js/pondwars-arsenal.mjs` with their damage, ammo, crater and knockback. A normal match does not grant them and the CPU still chooses from the classic shortlist. The menu fieldset "PLAYTEST ARSENAL" (or `?packs=simple`, `pepecoin`, `advanced`, or `all`) shows that pack in the arsenal. Until a pack is marked playable, those buttons say SOON and firing them changes nothing. Classic weapon stats are untouched.
+Eight new weapons are registered in `js/pondwars-arsenal.mjs` with their damage, ammo, crater and knockback. A normal match does not grant them and the CPU still chooses from the classic shortlist. The menu fieldset "PLAYTEST ARSENAL" (or `?packs=simple`, `pepecoin`, `advanced`, or `all`) shows that pack in the arsenal. The simple pack is playable when its checkbox is on: Golden Foot v2 kicks once for 58 damage and a hard shove, Bell Bomb is a 3 second bouncing explosive, and Frog Mine arms after 1 second. The other packs still say SOON and do not fire. Classic weapon stats are untouched.
 
 ## Reference review
 

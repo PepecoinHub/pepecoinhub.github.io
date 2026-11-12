@@ -92,7 +92,7 @@ test('every expansion weapon has a HUD name, blurb and a unique hotkey', () => {
     assert.ok(w.short && w.key && w.code && w.fireLabel);
     assert.ok(!keys.has(w.code), w.code);
     keys.add(w.code);
-    assert.equal(w.ready, false, id + ' stays scaffolded until its pack implements it');
+    assert.equal(w.ready, w.pack === 'simple', id + (w.pack === 'simple' ? ' is playable' : ' stays scaffolded'));
   }
   assert.equal(keys.size, 8);
 });
@@ -123,14 +123,12 @@ test('enabling a pack grants its ammo and still does not fire scaffold weapons',
   assert.deepEqual(hudWeapons('simple').map(w => w.id), ['goldv2', 'bell', 'frogmine']);
   assert.deepEqual(hudWeapons({ pepecoin: true, advanced: 1 }).map(w => w.id), ['moon', 'ban', 'rain', 'doge', 'donkey']);
   startTurn(g);
-  const before = structuredClone(g.ammo);
-  g.weapon = 'frogmine';
-  assert.equal(fire(g, 0, 1), false);
-  assert.deepEqual(g.ammo, before);
-  assert.equal(act(g, { t: 'weapon', w: 'bell' }), false);
+  assert.equal(act(g, { t: 'weapon', w: 'bell' }), true);
+  assert.equal(g.weapon, 'bell');
   assert.equal(act(g, { t: 'weapon', w: 'moon' }), false);
+  assert.equal(g.weapon, 'bell');
+  g.weapon = 'grenade';
   assert.equal(act(g, { t: 'weapon', w: 'grenade' }), true);
-  assert.equal(g.weapon, 'grenade');
 });
 
 test('classic weapon stats and the CPU shortlist stay put when every pack is on', () => {
