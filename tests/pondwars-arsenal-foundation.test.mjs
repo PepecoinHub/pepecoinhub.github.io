@@ -29,7 +29,7 @@ test('QA config is per match, plain snapshots do not gain fields or change legac
 test('same seed and unchanged input replay match between QA and baseline; ammunition stays team-local',()=>{
  const a=newGame({seed:17}),b=newGame({seed:17,arsenal:'exp-v1'});
  for(let i=0;i<320;i++){const input=cleanInput({m:0,a:i===0?[{t:'weapon',w:'grenade'},{t:'fire',a:-.8,p:.5}]:[]});applyInput(a,input);applyInput(b,input);}
- const x=snapshot(a),y=snapshot(b);delete y.arsenal;delete y.arsenalStage;assert.deepEqual(x,y);
+ const x=snapshot(a),y=snapshot(b);delete y.arsenal;delete y.arsenalStage;for(const ammo of y.ammo){delete ammo.bell_bomb;delete ammo.frog_mine;}assert.deepEqual(x,y);
  b.ammo[0].cluster--;assert.notEqual(b.ammo[0].cluster,b.ammo[1].cluster);
 });
 test('restore preserves matching QA configuration and refuses silent loadout/stage substitution',()=>{

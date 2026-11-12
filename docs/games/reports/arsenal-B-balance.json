@@ -1,0 +1,525 @@
+{
+  "method": "actual cpuPlan per-weapon filter + fixed-step turn + existing CPU retreat; forced trap proximity fixtures; not complete matches",
+  "roundsPerWeaponMap": 300,
+  "totalRounds": 4800,
+  "directGoldPlusFiveToesBound": 118,
+  "legacyDirectBound": 248,
+  "rows": [
+    {
+      "weapon": "gold",
+      "mode": "QA-B",
+      "map": "island",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3,
+        4
+      ],
+      "meanEnemyDamage": 39.23,
+      "meanFriendlyDamage": 6.873,
+      "meanSelfDamage": 2.913,
+      "meanEnemyKills": 0.053,
+      "meanWaterKills": 0.033,
+      "maxEnemyDamage": 135,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 5.69,
+      "meanUses": 1,
+      "meanToeExplosions": 4.67,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "52944dcd"
+    },
+    {
+      "weapon": "gold",
+      "mode": "QA-B",
+      "map": "twin",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3,
+        4
+      ],
+      "meanEnemyDamage": 61.713,
+      "meanFriendlyDamage": 1.53,
+      "meanSelfDamage": 1.087,
+      "meanEnemyKills": 0.257,
+      "meanWaterKills": 0.237,
+      "maxEnemyDamage": 245,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 5.333,
+      "meanUses": 1,
+      "meanToeExplosions": 3.33,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "7636caaa"
+    },
+    {
+      "weapon": "gold",
+      "mode": "QA-B",
+      "map": "peaks",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3
+      ],
+      "meanEnemyDamage": 32.527,
+      "meanFriendlyDamage": 4.023,
+      "meanSelfDamage": 2.37,
+      "meanEnemyKills": 0.01,
+      "meanWaterKills": 0,
+      "maxEnemyDamage": 100,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 5.698,
+      "meanUses": 1,
+      "meanToeExplosions": 4.953,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "6f68a2ff"
+    },
+    {
+      "weapon": "gold",
+      "mode": "QA-B",
+      "map": "small",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2
+      ],
+      "meanEnemyDamage": 62.733,
+      "meanFriendlyDamage": 9.343,
+      "meanSelfDamage": 6.53,
+      "meanEnemyKills": 0.263,
+      "meanWaterKills": 0.263,
+      "maxEnemyDamage": 200,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 5.66,
+      "meanUses": 1,
+      "meanToeExplosions": 4.41,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "bfce43cf"
+    },
+    {
+      "weapon": "bell_bomb",
+      "mode": "QA-B",
+      "map": "island",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3,
+        4
+      ],
+      "meanEnemyDamage": 15.73,
+      "meanFriendlyDamage": 1.643,
+      "meanSelfDamage": 0.83,
+      "meanEnemyKills": 0.013,
+      "meanWaterKills": 0.003,
+      "maxEnemyDamage": 100,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 4.272,
+      "meanUses": 1,
+      "meanToeExplosions": 0,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "b37bcbb2"
+    },
+    {
+      "weapon": "bell_bomb",
+      "mode": "QA-B",
+      "map": "twin",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3,
+        4
+      ],
+      "meanEnemyDamage": 24.013,
+      "meanFriendlyDamage": 0,
+      "meanSelfDamage": 0,
+      "meanEnemyKills": 0.08,
+      "meanWaterKills": 0.077,
+      "maxEnemyDamage": 119,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 4.319,
+      "meanUses": 1,
+      "meanToeExplosions": 0,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "569ec53f"
+    },
+    {
+      "weapon": "bell_bomb",
+      "mode": "QA-B",
+      "map": "peaks",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3
+      ],
+      "meanEnemyDamage": 14.127,
+      "meanFriendlyDamage": 1.08,
+      "meanSelfDamage": 0.47,
+      "meanEnemyKills": 0,
+      "meanWaterKills": 0,
+      "maxEnemyDamage": 59,
+      "maxSingleEnemyDamage": 59,
+      "meanTurnSeconds": 4.235,
+      "meanUses": 1,
+      "meanToeExplosions": 0,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "644bfb7a"
+    },
+    {
+      "weapon": "bell_bomb",
+      "mode": "QA-B",
+      "map": "small",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2
+      ],
+      "meanEnemyDamage": 20.02,
+      "meanFriendlyDamage": 1.5,
+      "meanSelfDamage": 0,
+      "meanEnemyKills": 0.023,
+      "meanWaterKills": 0.023,
+      "maxEnemyDamage": 100,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 4.312,
+      "meanUses": 1,
+      "meanToeExplosions": 0,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "1e9700e2"
+    },
+    {
+      "weapon": "frog_mine",
+      "mode": "QA-B",
+      "map": "island",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3,
+        4
+      ],
+      "meanEnemyDamage": 9.177,
+      "meanFriendlyDamage": 0,
+      "meanSelfDamage": 1.647,
+      "meanEnemyKills": 0,
+      "meanWaterKills": 0,
+      "maxEnemyDamage": 66,
+      "maxSingleEnemyDamage": 66,
+      "meanTurnSeconds": 3.917,
+      "meanUses": 1,
+      "meanToeExplosions": 0,
+      "pendingTrapRate": 0.7,
+      "timeLimits": 0,
+      "deterministicProbe": "e15b1f33"
+    },
+    {
+      "weapon": "frog_mine",
+      "mode": "QA-B",
+      "map": "twin",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3,
+        4
+      ],
+      "meanEnemyDamage": 27.177,
+      "meanFriendlyDamage": 1.017,
+      "meanSelfDamage": 0,
+      "meanEnemyKills": 0.223,
+      "meanWaterKills": 0.223,
+      "maxEnemyDamage": 100,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 3.919,
+      "meanUses": 1,
+      "meanToeExplosions": 0,
+      "pendingTrapRate": 0.56,
+      "timeLimits": 0,
+      "deterministicProbe": "bfba8448"
+    },
+    {
+      "weapon": "frog_mine",
+      "mode": "QA-B",
+      "map": "peaks",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3
+      ],
+      "meanEnemyDamage": 5.413,
+      "meanFriendlyDamage": 0,
+      "meanSelfDamage": 0.483,
+      "meanEnemyKills": 0,
+      "meanWaterKills": 0,
+      "maxEnemyDamage": 52,
+      "maxSingleEnemyDamage": 52,
+      "meanTurnSeconds": 3.917,
+      "meanUses": 1,
+      "meanToeExplosions": 0,
+      "pendingTrapRate": 0.8,
+      "timeLimits": 0,
+      "deterministicProbe": "49670da3"
+    },
+    {
+      "weapon": "frog_mine",
+      "mode": "QA-B",
+      "map": "small",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2
+      ],
+      "meanEnemyDamage": 8.167,
+      "meanFriendlyDamage": 0,
+      "meanSelfDamage": 0,
+      "meanEnemyKills": 0,
+      "meanWaterKills": 0,
+      "maxEnemyDamage": 27,
+      "maxSingleEnemyDamage": 27,
+      "meanTurnSeconds": 3.917,
+      "meanUses": 1,
+      "meanToeExplosions": 0,
+      "pendingTrapRate": 0.667,
+      "timeLimits": 0,
+      "deterministicProbe": "d9b65988"
+    },
+    {
+      "weapon": "gold",
+      "mode": "legacy",
+      "map": "island",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3,
+        4
+      ],
+      "meanEnemyDamage": 60.677,
+      "meanFriendlyDamage": 16.007,
+      "meanSelfDamage": 7.19,
+      "meanEnemyKills": 0.133,
+      "meanWaterKills": 0.01,
+      "maxEnemyDamage": 230,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 6.04,
+      "meanUses": 1,
+      "meanToeExplosions": 4.703,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "77c91c6d"
+    },
+    {
+      "weapon": "gold",
+      "mode": "legacy",
+      "map": "twin",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3,
+        4
+      ],
+      "meanEnemyDamage": 88.94,
+      "meanFriendlyDamage": 3.667,
+      "meanSelfDamage": 1.937,
+      "meanEnemyKills": 0.28,
+      "meanWaterKills": 0.237,
+      "maxEnemyDamage": 306,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 5.695,
+      "meanUses": 1,
+      "meanToeExplosions": 3.257,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "c0647ddd"
+    },
+    {
+      "weapon": "gold",
+      "mode": "legacy",
+      "map": "peaks",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2,
+        3
+      ],
+      "meanEnemyDamage": 50.28,
+      "meanFriendlyDamage": 11.24,
+      "meanSelfDamage": 6.273,
+      "meanEnemyKills": 0.11,
+      "meanWaterKills": 0,
+      "maxEnemyDamage": 164,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 6.034,
+      "meanUses": 1,
+      "meanToeExplosions": 4.963,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "8e385ab1"
+    },
+    {
+      "weapon": "gold",
+      "mode": "legacy",
+      "map": "small",
+      "rounds": 300,
+      "sides": [
+        0,
+        1
+      ],
+      "levels": [
+        0,
+        1,
+        2
+      ],
+      "frogsPerTeam": [
+        2
+      ],
+      "meanEnemyDamage": 88.687,
+      "meanFriendlyDamage": 29.16,
+      "meanSelfDamage": 16.343,
+      "meanEnemyKills": 0.35,
+      "meanWaterKills": 0.223,
+      "maxEnemyDamage": 200,
+      "maxSingleEnemyDamage": 100,
+      "meanTurnSeconds": 6.451,
+      "meanUses": 1,
+      "meanToeExplosions": 4.457,
+      "pendingTrapRate": 0,
+      "timeLimits": 0,
+      "deterministicProbe": "057f8588"
+    }
+  ]
+}

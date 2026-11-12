@@ -1,5 +1,5 @@
 // Presentation/availability registry. Gameplay definitions stay in the engine.
-export const ARSENAL_STAGE = 'A';
+export const ARSENAL_STAGE = 'B';
 export const ARSENAL_MODE = 'exp-v1';
 const entries = [
   ['gold','golden_foot_v2','Mega Golden Foot','B',1,'Special'],
@@ -13,7 +13,13 @@ const entries = [
 ];
 export const ARSENAL_ART = Object.freeze(Object.fromEntries(entries.map(([id,art,name,stage,ammo,category])=>[id,Object.freeze({id,art,name,stage,ammo,category})])));
 export const arsenalFromSearch = search => new URLSearchParams(search).get('arsenal') === ARSENAL_MODE ? ARSENAL_MODE : null;
-export const experimentalWeaponEnabled = (mode,id) => false; // PR A has no new gameplay.
+export const experimentalWeaponEnabled = (mode,id) => mode===ARSENAL_MODE && ['gold','bell_bomb','frog_mine'].includes(id);
+export const SIMPLE_GAMEPLAY = Object.freeze({
+  gold: Object.freeze({name:'Mega Golden Foot',short:'Mega Foot',damage:58,radius:66,knockback:1.2}),
+  toe: Object.freeze({damage:12,radius:16}),
+  bell_bomb: Object.freeze({name:'Bell Bomb',short:'Bell',damage:44,radius:32,fuse:3,ammo:2,power:520,wind:false,knockback:1.15}),
+  frog_mine: Object.freeze({name:'Frog Mine',short:'Frog Mine',damage:34,radius:30,ammo:2,power:1,arming:1,detect:48,jumpTime:.35}),
+});
 export function arsenalArtPath(id,size=64) {
   const art=ARSENAL_ART[id];
   return art ? 'art/arsenal-v10/'+(size===128?'icons_128/':'hud_64/')+art.art+'.png' : null;
@@ -26,6 +32,6 @@ export function arsenalItems(definitions,qa=false) {
     return {id,name:def?.name??art.name,category:art?.category??'Classic',
       locked:!def,stage:art?.stage,plannedAmmo:art?.ammo,
       icon:art?arsenalArtPath(id):'img/pondwars/'+id+'.svg',
-      fallback:'img/pondwars/'+(def?id:'grenade')+'.svg'};
+      fallback:'img/pondwars/'+(Object.hasOwn(ARSENAL_ART,id)&&id!=='gold'?'grenade':id)+'.svg'};
   });
 }

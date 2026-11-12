@@ -1,4 +1,4 @@
-import { ARSENAL_STAGE, ARSENAL_MODE, ARSENAL_ART } from './pondwars-arsenal.mjs?v=20261112arsenalA';
+import { ARSENAL_STAGE, ARSENAL_MODE, ARSENAL_ART } from './pondwars-arsenal.mjs?v=20261112arsenalB';
 // FROGAGEDDON online groundwork. No DOM here (Node can run it).
 //
 // How a match stays the same on two devices:
@@ -12,7 +12,7 @@ import { ARSENAL_STAGE, ARSENAL_MODE, ARSENAL_ART } from './pondwars-arsenal.mjs
 //
 // The transport is anything with send(message) and an onmessage callback. tabTransport() links two tabs of the
 // same browser (for testing without a server); a Supabase Realtime channel can implement the same two members.
-import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me, selectableWeapon } from './pondwars-beta-engine.mjs?v=20261112arsenalA';
+import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me, selectableWeapon } from './pondwars-beta-engine.mjs?v=20261112arsenalB';
 
 export const PROTOCOL = 1;
 export const KEY = { L: 1, R: 2, U: 4, D: 8 };   // bits of input.m
@@ -128,19 +128,21 @@ export function restoreInto(g, snap) {
 // Host = team 0 and picks the setup. Guest = team 1.
 // Messages: join, hello {setup, snap}, frames {from, f, v}, turn {tick, turn, snap}.
 export class NetMatch {
-  constructor(transport, { host }) {
+  constructor(transport, { host, arsenal }) {
     this.t = transport; this.host = !!host; this.team = host ? 0 : 1;
+    this.expectedArsenal=arsenal;
     this.g = null; this.setup = null; this.peer = false; this.waiting = null;
     this.tick = 0; this.recv = 0; this.outbox = []; this.inbox = []; this.awaitSnap = false;
     this.view = null; this.desyncs = 0;
     this.onstart = null; this.onrestore = null; this.onview = null; this.onpeer = null; this.onproblem = null;
     transport.onmessage = m => { try { this.receive(m); } catch (e) { this.onproblem?.(e.message); } };
   }
-  join() { if (!this.host && !this.g) this.t.send({ type: 'join', protocol: PROTOCOL, arsenalStage:ARSENAL_STAGE }); }
+  join() { if (!this.host && !this.g) this.t.send({ type: 'join', protocol: PROTOCOL, arsenalStage:ARSENAL_STAGE, ...(this.expectedArsenal!==undefined?{arsenalMode:this.expectedArsenal}:{}) }); }
   // Host: start as soon as a guest is there.
   begin(setup) {
     if (!this.host) return;
     if (!this.peer) { this.waiting = setup; return; }
+    if(this.expectedArsenal!==undefined && this.peerExpectedArsenal!==this.expectedArsenal){this.onproblem?.('Open both tabs with the same arsenal flag.');return;}
     if (setup.arsenal === ARSENAL_MODE && this.peerArsenalStage !== ARSENAL_STAGE) { this.onproblem?.('Arsenal builds differ; reload both QA tabs.'); return; }
     this.waiting = null; this.start(setup);
     this.t.send({ type: 'hello', protocol: PROTOCOL, setup, arsenalStage:ARSENAL_STAGE, snap: snapshot(this.g) });
@@ -196,6 +198,7 @@ export class NetMatch {
     if (m.type === 'join' && this.host) {
       if (m.protocol !== PROTOCOL) return this.onproblem?.('The other tab runs a different game version.');
       if (this.setup?.arsenal === ARSENAL_MODE && m.arsenalStage !== ARSENAL_STAGE) return this.onproblem?.('Arsenal builds differ; reload both QA tabs.');
+      this.peerExpectedArsenal=m.arsenalMode??null;
       this.peerArsenalStage=m.arsenalStage;
       this.peer = true; this.onpeer?.();
       if (this.waiting) this.begin(this.waiting);
@@ -205,6 +208,7 @@ export class NetMatch {
     if (m.type === 'hello' && !this.host) {
       if (m.protocol !== PROTOCOL) return this.onproblem?.('The host runs a different game version.');
       if (m.setup?.arsenal === ARSENAL_MODE && m.arsenalStage !== ARSENAL_STAGE) return this.onproblem?.('Arsenal builds differ; reload both QA tabs.');
+      if(this.expectedArsenal!==undefined && (m.setup?.arsenal??null)!==this.expectedArsenal)return this.onproblem?.('Open both tabs with the same arsenal flag.');
       this.peer = true; this.start(m.setup, m.snap); this.tick = this.recv = m.tick | 0;
       return;
     }

@@ -145,7 +145,7 @@ with sync_playwright() as p:
         page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto('http://127.0.0.1:8000/games/pondwars-beta.html?art=pixel-v06&net='+role+'&room=pixel-lag-qa',wait_until='networkidle')
         page.evaluate('''async()=>{
-          const {NetMatch}=await import('/games/js/pondwars-beta-net.mjs?v=20261112arsenalA');
+          const {NetMatch}=await import('/games/js/pondwars-beta-net.mjs?v=20261112arsenalB');
           for(const name of ['advance','pump']){
             const original=NetMatch.prototype[name];
             NetMatch.prototype[name]=function(...args){window.__net=this;if(name==='pump' && window.__lag)return 0;return original.apply(this,args);};
@@ -167,7 +167,7 @@ with sync_playwright() as p:
     assert layers.count('atlas.png')==6 and layers.count('helmet_pose_atlas.png')==5,'resync replayed helmet loss'
     # Reconnect through the same onstart path as a hello snapshot.
     guest.evaluate('''async()=>{
-      const {snapshot}=await import('/games/js/pondwars-beta-net.mjs?v=20261112arsenalA');
+      const {snapshot}=await import('/games/js/pondwars-beta-net.mjs?v=20261112arsenalB');
       const net=window.__net,snap=snapshot(net.g);net.start(net.setup,snap);
     }''')
     guest.wait_for_timeout(100)

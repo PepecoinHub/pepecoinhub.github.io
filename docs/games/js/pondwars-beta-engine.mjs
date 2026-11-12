@@ -1,4 +1,4 @@
-import { ARSENAL_MODE, ARSENAL_STAGE } from './pondwars-arsenal.mjs?v=20261112arsenalA';
+import { ARSENAL_MODE, ARSENAL_STAGE, SIMPLE_GAMEPLAY } from './pondwars-arsenal.mjs?v=20261112arsenalB';
 // POND WARS engine: turn-based frog artillery on a destructible island. No DOM here (tests run it in Node).
 // Units are pixels and seconds; the world is W x H; the pond starts at WATER (anything below it drowns).
 // Movement and projectile ideas (bounce off the real slope, wind that drifts between turns, step-up walking,
@@ -35,9 +35,10 @@ export const WEAPONS = {
   jetpack: { name:'Jetpack', short:'Jetpack', radius:0, damage:0, ammo:2, power:1, utility:true },
   teleport: { name:'Teleport', short:'Teleport', radius:0, damage:0, ammo:2, power:1, utility:true },
 };
-export const weaponDefinitions = g => WEAPONS;
+const QA_WEAPONS = Object.freeze({...WEAPONS,...Object.fromEntries(Object.entries(SIMPLE_GAMEPLAY).map(([id,patch])=>[id,Object.freeze({...WEAPONS[id],...patch})]))});
+export const weaponDefinitions = g => g?.arsenal===ARSENAL_MODE ? QA_WEAPONS : WEAPONS;
 export const weaponDef = (g,id) => weaponDefinitions(g)[id];
-export const selectableWeapon = (g,id) => typeof id === 'string' && Object.hasOwn(WEAPONS,id) && 'ammo' in WEAPONS[id];
+export const selectableWeapon = (g,id) => typeof id === 'string' && Object.hasOwn(weaponDefinitions(g),id) && 'ammo' in weaponDefinitions(g)[id];
 const NAMES = [['Hopper', 'Lily', 'Ribbit', 'Pad'], ['Croak', 'Bog', 'Toady', 'Murk']];
 
 export function rng(seed) {   // mulberry32
@@ -113,7 +114,7 @@ export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1,
   }
   const game = { seed, map, perTeam, mask, mines:[], retreat:0, movement:MOVE_BUDGET, frogs, shots: [], booms: [], texts: [], dirty: [], cpu, level, turn: 0, team: 0, next: [0, 0], current: 0,
     wind: 0, weapon: 'grenade', ammo: [0, 1].map(() => ({candles:1,cluster:4,gold:1,mine:3,dynamite:2,drill:2,rope:5,jetpack:2,teleport:2})), ctl:{x:0,y:0}, pistolShots:0, phase: 'aim', timer: TURN_TIME, settle: 0, winner: null, rand: r, events: [] };
-  if (arsenal === ARSENAL_MODE) { game.arsenal=ARSENAL_MODE; game.arsenalStage=ARSENAL_STAGE; }
+  if (arsenal === ARSENAL_MODE) { game.arsenal=ARSENAL_MODE; game.arsenalStage=ARSENAL_STAGE; for(const team of game.ammo)Object.assign(team,{bell_bomb:2,frog_mine:2}); }
   return game;
 }
 export function aliveOf(g, team) { return g.frogs.filter(f => f.alive && f.team === team); }
@@ -192,9 +193,11 @@ export function fire(g, angle, power, tx, ty) {
   if (g.weapon === 'revolver') g.pistolShots++;
   g.retreat=(g.weapon==='revolver'&&g.pistolShots===1)?0:RETREAT_TIME;
   if(g.retreat>0)g.movement=90;
-  if(['mine','dynamite'].includes(g.weapon)){
+  if(['mine','dynamite','frog_mine'].includes(g.weapon)){
     const charge={type:g.weapon,x:f.x+f.face*20,y:f.y-3,vx:0,vy:0,t:0};
-    if(g.weapon==='mine')g.mines.push(charge);else g.shots.push(charge);
+    if(g.weapon==='frog_mine'){Object.assign(charge,{owner:f.id,team:f.team,phase:'arming'});
+      while(charge.y>0 && solid(g.mask,charge.x,charge.y+3))charge.y--;
+      g.mines.push(charge);}else if(g.weapon==='mine')g.mines.push(charge);else g.shots.push(charge);
     g.phase='fire';g.events.push({type:'fire',weapon:g.weapon});return true;
   }
   if (g.weapon === 'bat') {
@@ -283,7 +286,9 @@ export function stepShot(g, s, mask = g.mask, frogs = g.frogs) {
       const x=s.x+dx,y=s.y+dy;
       if(!solid(mask,x,y)){s.x=x;s.y=y;continue;}
       const n=normalAt(mask,s.x,s.y,5),vn=s.vx*n.x+s.vy*n.y;
-      if(vn<0){const tx=s.vx-vn*n.x,ty=s.vy-vn*n.y;s.vx=tx*.82-vn*.45*n.x;s.vy=ty*.82-vn*.45*n.y;}
+      if(vn<0){
+        if(s.type==='bell_bomb' && g.shots?.includes(s) && s.t-(s.lastBellBounce??-1)>=.12){s.lastBellBounce=s.t;g.events.push({type:'bounce',weapon:s.type,x:s.x,y:s.y});}
+        const tx=s.vx-vn*n.x,ty=s.vy-vn*n.y;s.vx=tx*.82-vn*.45*n.x;s.vy=ty*.82-vn*.45*n.y;}
       if(Math.hypot(s.vx,s.vy)<28&&solid(mask,s.x,s.y+2)){s.vx*=.5;s.vy=0;}
       if(solid(mask,s.x,s.y)){s.x+=n.x;s.y+=n.y;}
       break;
@@ -326,7 +331,7 @@ export function explode(g, x, y, type, vx = 0, vy = 0) {
   }
   g.dirty.push(carve(g.mask, x, y, w.radius));
   g.booms.push({ x, y, r: w.radius, t: 0 });
-  g.events.push({ type: 'boom', x, y, r: w.radius });
+  g.events.push({ type: 'boom', weapon:type, x, y, r: w.radius });
   const reach = w.reach ?? w.radius * 1.7, carry = Math.max(-80, Math.min(80, vx * .14));
   for (const f of g.frogs) {
     if (!f.alive) continue;
@@ -338,7 +343,11 @@ export function explode(g, x, y, type, vx = 0, vy = 0) {
     // plus the shell's own momentum: a rocket from the left shoves the frog to the right.
     const push = 260 * k + 60, away = Math.abs(dx) > 3 ? Math.sign(dx) : Math.sign(vx) || (f.x >= x ? 1 : -1);
     const side = d && Math.abs(dx / d) > .25 ? dx / d : away * .25;
-    knock(g, f, side * push + carry * k, -(150 * k + 90));
+    const boost=w.knockback??1;
+    knock(g, f, (side * push + carry * k)*boost, -(150 * k + 90)*boost);
+  }
+  if(g.arsenal===ARSENAL_MODE)for(const m of g.mines.slice())if(g.mines.includes(m) && m.type==='frog_mine' && Math.hypot(m.x-x,m.y-y)<=w.radius){
+    g.mines.splice(g.mines.indexOf(m),1);explode(g,m.x,m.y,'frog_mine');
   }
 }
 function knock(g, f, vx, vy) { f.vx += vx; f.vy += vy; f.ground = false; f.fallFrom = f.y; }
@@ -433,11 +442,42 @@ function stepFrog(g, f) {
   if (f.y > WATER) { f.alive = false; f.hp = 0; f.gone = 'splash'; g.events.push({ type: 'splash', x: f.x }); g.texts.push({ x: f.x, y: WATER - 20, text: 'SPLASH!', t: 0, team: f.team }); }
   else if (f.x < -40 || f.x > W + 40) { f.alive = false; f.hp = 0; f.gone = 'away'; }
 }
+// Frog Mine is a trap, never an additional player. Its owner team survives owner KO.
+function stepFrogMine(g,m) {
+  const w=weaponDef(g,'frog_mine');
+  const remove=()=>{const i=g.mines.indexOf(m);if(i>=0)g.mines.splice(i,1);};
+  if(m.phase!=='jump') {
+    if(!solid(g.mask,m.x,m.y+3)) {
+      m.vy+=G*STEP;const ny=m.y+m.vy*STEP,n=Math.max(1,Math.ceil(Math.abs(ny-m.y))),dy=(ny-m.y)/n;
+      for(let i=0;i<n;i++){if(solid(g.mask,m.x,m.y+dy+3)){m.vy=0;break;}m.y+=dy;}
+    } else m.vy=0;
+    if(m.y>WATER){remove();g.events.push({type:'plop',x:m.x});return;}
+    if(m.t+1e-9<w.arming)return;
+    m.phase='armed';
+    const targets=g.frogs.filter(f=>f.alive&&f.hp>0&&f.team!==m.team&&Math.hypot(f.x-m.x,f.y-m.y)<=w.detect)
+      .sort((a,b)=>Math.hypot(a.x-m.x,a.y-m.y)-Math.hypot(b.x-m.x,b.y-m.y)||a.id-b.id);
+    if(!targets.length || m.vy!==0)return;
+    m.phase='jump';m.jumpTicks=0;m.jumpT=0;m.vx=Math.max(-180,Math.min(180,(targets[0].x-m.x)/.25));m.vy=-170;
+    g.events.push({type:'mine_jump',weapon:'frog_mine',x:m.x,y:m.y});return;
+  }
+  m.jumpTicks++;m.jumpT=m.jumpTicks*STEP;m.vy+=G*STEP;
+  const nx=m.x+m.vx*STEP,ny=m.y+m.vy*STEP,n=Math.max(1,Math.ceil(Math.hypot(nx-m.x,ny-m.y))),dx=(nx-m.x)/n,dy=(ny-m.y)/n;
+  let hit=false;
+  for(let i=0;i<n;i++){
+    m.x+=dx;m.y+=dy;
+    if(solid(g.mask,m.x,m.y)||g.frogs.some(f=>f.alive&&f.hp>0&&Math.abs(f.x-m.x)<15&&m.y>f.y-58&&m.y<f.y+2)){hit=true;break;}
+  }
+  if(m.y>WATER){remove();g.events.push({type:'plop',x:m.x});return;}
+  if(hit || m.jumpTicks>=Math.ceil(w.jumpTime/STEP)){remove();explode(g,m.x,m.y,'frog_mine',m.vx,m.vy);}
+}
+
 // one fixed step of the whole game
 export function step(g) {
   if (g.winner !== null) return;
   for(const m of g.mines.slice()){
+    if(!g.mines.includes(m))continue;
     m.t+=STEP;
+    if(m.type==='frog_mine'){stepFrogMine(g,m);continue;}
     if(!solid(g.mask,m.x,m.y+3)){m.vy+=G*STEP;m.y+=m.vy*STEP;}else m.vy=0;
     if(m.y>WATER){g.mines.splice(g.mines.indexOf(m),1);continue;}
     if(m.t>1 && g.frogs.some(f=>f.alive&&Math.hypot(f.x-m.x,f.y-m.y)<32)){
@@ -473,13 +513,13 @@ export function step(g) {
   } else if (g.phase === 'fire') {
     if(g.weapon==='revolver'&&g.pistolShots===1)g.timer=Math.max(0,g.timer-STEP);
     g.retreat=Math.max(0,g.retreat-STEP);
-    if (!g.shots.length && g.retreat<=0) {
+    if (!g.shots.length && !g.mines.some(m=>m.phase==='jump') && g.retreat<=0) {
       if(g.weapon==='revolver' && g.pistolShots===1 && me(g).alive && me(g).hp>0) { g.phase='aim';g.timer=Math.max(0,g.timer); }
       else {g.phase='settle';g.settle=.9;}
     }
   } else if (g.phase === 'settle') {
     const still = g.frogs.every(f => !f.alive || f.ground);
-    if (still && !g.shots.length) g.settle -= STEP;
+    if (still && !g.shots.length && !g.mines.some(m=>m.phase==='jump')) g.settle -= STEP;
     if (g.settle <= 0) {
       const a = aliveOf(g, 0).length, b = aliveOf(g, 1).length;
       if (!a || !b) { g.winner = a ? 0 : b ? 1 : -1; g.phase = 'over'; g.events.push({ type: 'over' }); return; }
@@ -507,13 +547,15 @@ function simulate(g, type, angle, power, target) {
   if(!score)score=-Math.hypot(target.x-s.x,target.y-s.y)/10;
   return {score};
 }
-export function cpuPlan(g) {
+export function cpuPlan(g, {weapon:onlyWeapon} = {}) {
   const f=me(g),enemies=aliveOf(g,1-f.team);
   const target=enemies.slice().sort((a,b)=>Math.hypot(a.x-f.x,a.y-f.y)-Math.hypot(b.x-f.x,b.y-f.y))[0];
-  let best={score:-1e9,weapon:'grenade',angle:-Math.PI/2,power:.5};
+  let best={score:-1e9,weapon:onlyWeapon??'grenade',angle:-Math.PI/2,power:.5};
   if(!target)return best;
   const available=type=>!Number.isFinite(weaponDef(g,type).ammo)||g.ammo[f.team][type]>0;
-  for(const type of g.pistolShots?['revolver']:['rocket','grenade','cluster','gold','bow','revolver']){
+  const candidates=g.pistolShots?['revolver']:['rocket','grenade','cluster','gold','bow','revolver',...(g.arsenal===ARSENAL_MODE?['bell_bomb']:[])];
+  for(const type of candidates){
+    if(onlyWeapon && type!==onlyWeapon)continue;
     if(!available(type))continue;
     const powers=type==='revolver'?[1]:[.25,.4,.55,.7,.85,1];
     for(let degrees=-175;degrees<=-5;degrees+=g.level===2?5:10)for(const power of powers){
@@ -525,7 +567,7 @@ export function cpuPlan(g) {
       if(r.score>best.score)best={score:r.score,weapon:type,angle,power:1};
     }
   }
-  if(!g.pistolShots&&Math.hypot(target.x-f.x,target.y-f.y)<65){
+  if(!onlyWeapon && !g.pistolShots&&Math.hypot(target.x-f.x,target.y-f.y)<65){
     const dir=target.x>f.x?1:-1;
     const friends=aliveOf(g,f.team).some(o=>o.id!==f.id&&(o.x-f.x)*dir>=0&&Math.hypot(o.x-f.x,o.y-f.y)<65);
     if(!friends&&best.score<40)best={score:40,weapon:'bat',angle:dir===1?0:-Math.PI,power:1};
@@ -534,8 +576,9 @@ export function cpuPlan(g) {
       if(r.score>best.score)best={score:r.score,weapon:'dynamite',angle:0,power:1};
     }
   }
+  if(g.arsenal===ARSENAL_MODE && (!onlyWeapon || onlyWeapon==='frog_mine') && available('frog_mine') && f.ground && Math.hypot(target.x-f.x,target.y-f.y)<80 && best.score<34)best={score:34,weapon:'frog_mine',angle:0,power:1};
   const wobble=[.35,.17,.03][g.level]??.17,pw=[.25,.12,.03][g.level]??.12;   // how far the CPU misses: easy, normal, hard
-  if(!['bat','dynamite','mine'].includes(best.weapon)){
+  if(!['bat','dynamite','mine','frog_mine'].includes(best.weapon)){
     best.angle+=(g.rand()*2-1)*wobble;
     best.power=Math.max(.1,Math.min(1,best.power+(g.rand()*2-1)*pw));
   }

@@ -38,8 +38,17 @@ with sync_playwright() as p:
    page.locator('#pw').focus();page.keyboard.down('Enter');page.wait_for_timeout(350);page.keyboard.up('Enter');page.wait_for_timeout(80)
    assert page.evaluate('window.__game.shots.some(s=>s.type==="bell_bomb")')
    assert page.evaluate('window.__game.ammo[0].bell_bomb')==1
+   page.locator('#pause').click();page.wait_for_timeout(40);fuse=page.evaluate('window.__game.shots.find(s=>s.type==="bell_bomb").t');frozen=page.locator('#pw').screenshot();page.wait_for_timeout(200)
+   assert page.evaluate('window.__game.shots.find(s=>s.type==="bell_bomb").t')==fuse and page.locator('#pw').screenshot()==frozen
+   page.locator('#pause').click()
    page.screenshot(path=str(out/(stage+'-'+profile+'-bell.png')))
    page.wait_for_timeout(3200);assert page.evaluate('!window.__game.shots.some(s=>s.type==="bell_bomb")')
+   page.locator('#restart').click();page.locator('#go').click();page.wait_for_timeout(100)
+   page.locator('#arsenal-open').click();dialog.get_by_role('button',name='Special',exact=True).click();dialog.locator('[data-w=gold]').click()
+   page.locator('#pw').focus();page.keyboard.down('Enter');page.wait_for_timeout(350);page.keyboard.up('Enter')
+   page.wait_for_function('() => window.__game.shots.filter(s=>s.type==="toe").length===5')
+   assert page.evaluate('window.__game.ammo[0].gold')==0
+   page.screenshot(path=str(out/(stage+'-'+profile+'-mega-foot.png')))
    page.locator('#restart').click();page.locator('#go').click();page.wait_for_timeout(100)
    page.locator('#arsenal-open').click();dialog.get_by_role('button',name='Traps',exact=True).click();dialog.locator('[data-w=frog_mine]').click()
    page.locator('#pw').focus();page.keyboard.down('Enter');page.wait_for_timeout(200);page.keyboard.up('Enter');page.wait_for_timeout(100)

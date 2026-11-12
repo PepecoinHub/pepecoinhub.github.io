@@ -1,7 +1,7 @@
-import { ARSENAL_STAGE, ARSENAL_ART, arsenalFromSearch, arsenalItems, arsenalArtPath } from './pondwars-arsenal.mjs?v=20261112arsenalA';
+import { ARSENAL_STAGE, ARSENAL_ART, arsenalFromSearch, arsenalItems, arsenalArtPath } from './pondwars-arsenal.mjs?v=20261112arsenalB';
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, weaponDef, weaponDefinitions, selectableWeapon, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261112arsenalA';
-import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112arsenalA';
+import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, weaponDef, weaponDefinitions, selectableWeapon, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261112arsenalB';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112arsenalB';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
 import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261112pixel';
 import { compilePixelManifest, authoredPose, clipDuration, pixelHelmet, pixelFrame } from './pondwars-pixel-art.mjs?v=20261112pixel06';
@@ -59,9 +59,12 @@ const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver
 if (arsenalQA) for (const id of Object.keys(ARSENAL_ART)) if (!weaponArt[id]) {
   const img=new Image();img.src=arsenalArtPath(id,128);img.addEventListener('error',()=>{if(!img.src.endsWith('/grenade.svg'))img.src='img/pondwars/grenade.svg';});weaponArt[id]=img;
 }
+const arsenalSheets = {};
+let arsenalFX=[],lastBellAt=-Infinity;
+if(arsenalQA)for(const kind of ['golden_foot_impact','bell_bounce','frog_mine_arm']){const image=new Image();image.src='art/arsenal-v10/effects/'+kind+'_sheet.png';arsenalSheets[kind]=image;}
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 let reduce = motionPreference.matches;
-motionPreference.addEventListener('change', e => { reduce = e.matches; if (reduce) helmets.suppressMotion(); });
+motionPreference.addEventListener('change', e => { reduce = e.matches; if (reduce) { helmets.suppressMotion(); arsenalFX=[]; } });
 const animator = new CharacterAnimator();
 // Optional assets keyed by PLAYERS.id. Existing art remains the default.
 const animationAssets = new Map();
@@ -225,7 +228,7 @@ const HOLD = {
   cluster: { w: 22, h: 26, ox: -8, oy: -22, base: 0 },
   gold: { w: 26, h: 26, ox: -10, oy: -20, base: 0 },
 };
-const PLACE_HOLD = new Set(['mine', 'dynamite', 'candles', 'teleport', 'jetpack', 'rope']);
+const PLACE_HOLD = new Set(['mine', 'dynamite', 'candles', 'teleport', 'jetpack', 'rope', 'frog_mine']);
 function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false, imageKey) {
   const img = weaponArt[g.weapon];
   if (!img?.naturalWidth) return;
@@ -237,9 +240,9 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false, imageKey
     return;
   }
   // Thrown bombs stay upright in the hands (slight lean toward aim) so they read clearly at torso height.
-  if (['grenade', 'cluster', 'gold'].includes(g.weapon)) {
-    const h = calibrated || HOLD[g.weapon];
-    ctx.save();
+  if (['grenade', 'cluster', 'gold', 'bell_bomb'].includes(g.weapon)) {
+    const h = calibrated || HOLD[g.weapon] || HOLD.grenade;
+    ctx.save(); if(arsenalQA&&ARSENAL_ART[g.weapon])ctx.imageSmoothingEnabled=false;
     ctx.translate(handX + (precise ? 0 : side * 12), handY - (precise ? 0 : 2));
     ctx.rotate(aim * .18);
     ctx.drawImage(img, h.ox, h.oy, h.w, h.h);
@@ -247,7 +250,7 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false, imageKey
     return;
   }
   const h = calibrated || HOLD[g.weapon] || { w: 28, h: 28, ox: -6, oy: -14, base: 0 };
-  ctx.save();
+  ctx.save(); if(arsenalQA&&ARSENAL_ART[g.weapon])ctx.imageSmoothingEnabled=false;
   ctx.translate(handX + (precise ? 0 : Math.cos(aim) * 8), handY + (precise ? 0 : Math.sin(aim) * 8));
   ctx.rotate(aim + h.base);
   // Keep the top of the weapon upright when aiming left of vertical.
@@ -313,11 +316,15 @@ function drawParts(dt) {
 }
 function shot(s) {
   ctx.save(); ctx.translate(s.x, s.y);
+  if(arsenalQA && ['gold','bell_bomb'].includes(s.type)) {
+    ctx.imageSmoothingEnabled=false;if(!reduce)ctx.rotate(s.t*2);ctx.drawImage(weaponArt[s.type],-10,-10,20,20);ctx.restore();
+    ctx.save();ctx.font='bold 11px Tahoma';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(String(Math.max(1,Math.ceil(weaponDef(g,s.type).fuse-s.t))),s.x,s.y-16);ctx.restore();return;
+  }
   if(s.type==='drill'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle='#708454';ctx.fillRect(-10,-4,14,8);ctx.fillStyle='#a8b4ba';ctx.beginPath();ctx.moveTo(4,-5);ctx.lineTo(13,0);ctx.lineTo(4,5);ctx.fill();ctx.restore();return;}
   if(s.type==='dynamite'){ctx.drawImage(weaponArt.dynamite,-10,-18,20,25);ctx.fillStyle='#fff3ba';ctx.font='bold 12px monospace';ctx.fillText(Math.max(1,Math.ceil(5-s.t)),0,-22);}
   else if (weaponDef(g,s.type).fuse) {
     ctx.fillStyle = ['gold','toe'].includes(s.type)?'#ffd257':s.type==='cluster'?'#c95d36':'#436d32'; if(['gold','toe'].includes(s.type)){ctx.rotate(s.t*5);ctx.fillRect(-5,-9,8,15);for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(-5+i*3,-9,2.5,0,7);ctx.fill();}} ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, 7); ctx.fill(); ctx.fillStyle = '#8fd27d'; ctx.fillRect(-1, -7, 3, 3);
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 12px Tahoma'; ctx.textAlign = 'center'; ctx.fillText(String(Math.max(1, Math.ceil(WEAPONS.grenade.fuse - s.t))), 0, -10);
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 12px Tahoma'; ctx.textAlign = 'center'; ctx.fillText(String(Math.max(1, Math.ceil(weaponDef(g,s.type).fuse - s.t))), 0, -10);
   } else if (s.type==='revolver'||s.type==='bow'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle=s.type==='bow'?'#e2b67e':'#fff4bb';ctx.fillRect(-14,-1,22,2);ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(4,-4);ctx.lineTo(4,4);ctx.fill();} else if (s.type === 'rocket') {
     ctx.rotate(Math.atan2(s.vy, s.vx)); ctx.fillStyle = '#f2f2f2'; ctx.fillRect(-7, -2.5, 12, 5); ctx.fillStyle = '#e23b3b'; ctx.fillRect(5, -2.5, 3, 5);
     ctx.fillStyle = '#ffb000'; ctx.fillRect(-11 - Math.random() * 4, -1.5, 4, 3);
@@ -342,12 +349,13 @@ function draw(t) {
   drawHelmetFlights(); // Behind frogs/labels/flags so cosmetic debris cannot obscure identification.
   for (const f of g.frogs) if (f.alive || (f.gone === 'ko' && animator.sample(f, reduce).alpha > 0 && !reduce)) frog(pose(f), t);
     else if (f.gone === 'ko') { ctx.fillStyle = '#9aa3a8'; ctx.fillRect(f.x - 6, f.y - 14, 12, 14); ctx.beginPath(); ctx.arc(f.x, f.y - 14, 6, Math.PI, 0); ctx.fill(); ctx.fillStyle = '#555'; ctx.font = 'bold 7px Tahoma'; ctx.textAlign = 'center'; ctx.fillText('RIP', f.x, f.y - 7); }
-  for(const m of g.mines) {ctx.drawImage(weaponArt.mine,m.x-10,m.y-13,20,20);if(m.t>1){ctx.fillStyle=Math.sin(t*8)>0?'#ff6b45':'#602d28';ctx.fillRect(m.x-2,m.y-12,4,3);}}
+  for(const m of g.mines) {if(m.type==='frog_mine'){drawFrogMine(m);continue;}ctx.drawImage(weaponArt.mine,m.x-10,m.y-13,20,20);if(m.t>1){ctx.fillStyle=Math.sin(t*8)>0?'#ff6b45':'#602d28';ctx.fillRect(m.x-2,m.y-12,4,3);}}
   // rope and jetpack flame of the frog whose turn it is
   for (const f of g.frogs) if (f.alive && f.rope) { ctx.strokeStyle = '#d8b878'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(f.x, f.y - 30); ctx.lineTo(f.rope.x, f.rope.y); ctx.stroke(); ctx.fillStyle = '#a8b4ba'; ctx.beginPath(); ctx.arc(f.rope.x, f.rope.y, 3.5, 0, 7); ctx.fill(); }
   for (const f of g.frogs) if (f.alive && f.jet) { ctx.fillStyle = '#c95d36'; ctx.fillRect(f.x - f.face * 12 - 4, f.y - 40, 8, 22); if (g.ctl && (g.ctl.y < 0 || g.ctl.x) && g.frogs[g.current] === f) { ctx.fillStyle = Math.random() < .5 ? '#ffc05b' : '#fff1b8'; ctx.beginPath(); ctx.moveTo(f.x - f.face * 12 - 4, f.y - 18); ctx.lineTo(f.x - f.face * 12 + 4, f.y - 18); ctx.lineTo(f.x - f.face * 12, f.y - 4 + Math.random() * 8); ctx.fill(); }
     ctx.fillStyle = '#000a'; ctx.fillRect(f.x - 16, f.y - 76, 32, 4); ctx.fillStyle = '#ffc05b'; ctx.fillRect(f.x - 16, f.y - 76, 32 * Math.max(0, f.jet.fuel) / 3.5, 4); }
   for (const s of g.shots) shot(pose(s));
+  drawArsenalFX();
   drawParts(visualDt);
   for (const b of g.booms) {
     const k = b.t / .5;
@@ -440,9 +448,9 @@ function hud() {
     b.querySelector('small').textContent=planned?'PR '+ARSENAL_ART[w].stage+' · × '+ARSENAL_ART[w].ammo:Number.isFinite(count)?'× '+count:w==='revolver'?(2-g.pistolShots)+' SHOTS':'UNLIMITED';
   });
   $('#weapon-name').textContent=weaponDef(g,g.weapon).name;
-  $('#weapon-detail').textContent=(descriptions[g.weapon]||'')+(weaponDef(g,g.weapon).utility?' · TURN GOES ON':' · MAX '+weaponDef(g,g.weapon).damage+' HP'+(g.weapon==='cluster'||g.weapon==='gold'?' + FRAGMENTS':''));
+  $('#weapon-detail').textContent=(({bell_bomb:'3 SECOND FUSE · BOUNCES · NO FRAGMENTS',frog_mine:'ARMS 1s · ENEMY TRIGGER · ONE JUMP'}[g.weapon]||descriptions[g.weapon]||''))+(weaponDef(g,g.weapon).utility?' · TURN GOES ON':' · MAX '+weaponDef(g,g.weapon).damage+' HP'+(g.weapon==='cluster'||g.weapon==='gold'?' + FRAGMENTS':''));
   // The FIRE button only shows on touch screens: tap the map to aim or pick a spot, then press here.
-  const fu=me(g);$('#fire').textContent=g.weapon==='rope'?(fu.rope?'LET GO':'FIRE THE ROPE'):g.weapon==='jetpack'?(fu.jet?'JETPACK OFF':'START JETPACK'):g.weapon==='teleport'?'TELEPORT HERE':g.weapon==='candles'?'DROP CANDLES':g.weapon==='bat'?'SWING THE BAT':g.weapon==='revolver'?'FIRE · '+(2-g.pistolShots)+' LEFT':'HOLD TO FIRE';
+  const fu=me(g);$('#fire').textContent=g.weapon==='rope'?(fu.rope?'LET GO':'FIRE THE ROPE'):g.weapon==='jetpack'?(fu.jet?'JETPACK OFF':'START JETPACK'):g.weapon==='teleport'?'TELEPORT HERE':g.weapon==='candles'?'DROP CANDLES':g.weapon==='bat'?'SWING THE BAT':g.weapon==='frog_mine'?'PLACE FROG MINE':g.weapon==='revolver'?'FIRE · '+(2-g.pistolShots)+' LEFT':'HOLD TO FIRE';
   // phones hide the weapon readout, so the arsenal button names the weapon in hand
   $('#arsenal-open').textContent=touchUI.matches?'▲ '+(weaponDef(g,g.weapon).short||'Arsenal'):'Arsenal';
   $('#angle-read').textContent=Math.round(-aim*180/Math.PI)+'°';
@@ -466,6 +474,12 @@ function events() {
     if (e.type === 'turn') { closeArsenal();keys.clear();clearCharge();pending=[];remoteP=0;aimPointer=null;held.l=held.r=held.u=0; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x;
       status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : isOnline(g.team) ? `${f.name} (${TEAM[g.team].name}) is playing on the other device…` : touchUI.matches ? `${f.name}: tap the map to aim · hold FIRE to shoot · ◀ ▶ walk · ↑ jump, twice for a backflip` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
     if (e.type === 'fire') {closeArsenal();keys.clear();held.l=held.r=0;clearCharge();remoteP=0;status(g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
+    if (e.type === 'bounce' && arsenalQA) {
+      if(!reduce)arsenalFX.push({kind:'bell_bounce',x:e.x,y:e.y,size:48,start:animator.time});
+      if(animator.time-lastBellAt>=.12){beep(1100,.08);lastBellAt=animator.time;}
+    }
+    if (e.type === 'boom' && e.weapon === 'gold' && arsenalQA && !reduce) arsenalFX.push({kind:'golden_foot_impact',x:e.x,y:e.y,size:e.r*2.4,start:animator.time});
+    arsenalFX=arsenalFX.slice(-64);
     if (e.type === 'boom') {shake=9;beep(65,.35);if(e.r)debris(e.x,e.y,e.r);}
     if (e.type === 'rope') {beep(520,.06);status('Hooked! A/D swing · W/S shorter/longer · Space lets go. Your turn goes on.');}
     if (e.type === 'unrope') status('Let go of the rope.');
@@ -538,7 +552,7 @@ function start() {
   startTurn(g); launch();
 }
 function launch() {
-  animator.reset(); helmets.restore(g);
+  animator.reset(); helmets.restore(g); arsenalFX=[]; lastBellAt=-Infinity;
   paused=false;$('#pause').textContent='Pause';acc=0;pending=[];remoteP=0;clearCharge();held.l=held.r=held.u=0;paintGround();events();hud();
   $('#menu').hidden = true; $('#over').hidden = true; cv.focus({ preventScroll: true });
 }
@@ -786,12 +800,12 @@ $('#tomenu').addEventListener('click', () => { $('#over').hidden = true; $('#men
 // Optional &room=name keeps several test pairs apart. Nothing leaves the device: the tabs talk over BroadcastChannel.
 function setupNet(host) {
   const room = (new URLSearchParams(location.search).get('room') || 'test').replace(/[^\w-]/g, '').slice(0, 32) || 'test';
-  net = new NetMatch(tabTransport(room), { host });
+  net = new NetMatch(tabTransport(room), { host, arsenal:arsenalQA });
   opts.mode = 'net';
   document.querySelector('[data-mode]').closest('.pw-pick').hidden = true; $('#levels').hidden = true;
   for (const id of ['#pause', '#restart']) $(id).disabled = true;
   net.onstart = (game, setup) => { g = game; applyLooks(setup); launch(); };
-  net.onrestore = () => { helmets.restore(g); status('Back in sync with the other tab.'); if (g.phase === 'over') over(); };
+  net.onrestore = () => { helmets.restore(g); arsenalFX=[]; status('Back in sync with the other tab.'); if (g.phase === 'over') over(); };
   net.onview = v => {
     if (net.drives() || !v.every(Number.isFinite)) return;
     aim = v[0]; aimX = Math.max(30, Math.min(W - 30, v[1])); aimY = v[2]; remoteP = Math.max(0, Math.min(1, v[3]));
@@ -912,4 +926,21 @@ function updatePixelCompare() {
     url.searchParams.set('qaSeed',String(opts.mapSeed));url.searchParams.set('qaMap',opts.map);
     url.searchParams.delete('net');url.searchParams.delete('room');link.href=url.href;
   }
+}
+
+function drawArsenalFX() {
+  if(reduce){arsenalFX=[];return;}
+  arsenalFX=arsenalFX.filter(f=>animator.time-f.start<.6);
+  for(const f of arsenalFX){const image=arsenalSheets[f.kind];if(!image?.naturalWidth)continue;
+    const index=Math.min(5,Math.floor((animator.time-f.start)*10));
+    ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(image,index*128,0,128,128,f.x-f.size/2,f.y-f.size/2,f.size,f.size);ctx.restore();
+  }
+}
+function drawFrogMine(m) {
+  const image=arsenalSheets.frog_mine_arm;
+  ctx.save();ctx.translate(m.x,m.y);ctx.imageSmoothingEnabled=false;
+  if(m.phase==='jump' && !reduce)ctx.rotate(Math.atan2(m.vy,m.vx)*.12);
+  if(image?.naturalWidth){const index=reduce?(m.phase==='arming'?0:5):Math.min(5,Math.floor(m.t*6));ctx.drawImage(image,index*128,0,128,128,-12,-22,24,24);}
+  else if(weaponArt.frog_mine?.naturalWidth)ctx.drawImage(weaponArt.frog_mine,-12,-22,24,24);
+  ctx.restore();
 }
