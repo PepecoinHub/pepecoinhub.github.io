@@ -85,7 +85,7 @@ test('Silver Donkey warns, then drops a very large strike and is spent', () => {
   assert.equal(WEAPONS.rocket.damage, 42);
 });
 
-test('Red candles do not explode: a direct hit hurts and bounces, then they sink for 2 seconds', () => {
+test('Red candles do not explode: a direct hit hurts and bounces, then they bore down for 2 seconds', () => {
   const g = flat(400);
   const before = solids(g);
   g.frogs[0].x = 100; // the thrower stands away; three frogs share x = 600 under the middle candle
@@ -95,10 +95,11 @@ test('Red candles do not explode: a direct hit hurts and bounces, then they sink
   while (g.shots.some(s => s.sink == null) && steps++ < 600) step(g);
   const lost = g.frogs.map(f => 100 - f.hp);
   assert.deepEqual(lost.filter(n => n).sort(), [WEAPONS.candles.damage], 'one frog under the middle candle is hit once, no splash ' + lost);
-  assert.equal(solids(g), before, 'no crater');
   assert.ok(g.shots.length > 0, 'candles stay while sinking');
   for (let i = 0; i < 130; i++) step(g);
   assert.equal(g.shots.length, 0, 'gone after the sink');
+  const bored = before - solids(g);
+  assert.ok(bored > 1500 && bored < 6000, 'three narrow shafts, not a blast crater: ' + bored);
 });
 
 test('Silver Donkey lands on the first surface from the sky, not under a floating island', () => {

@@ -338,7 +338,8 @@ function useUtility(g, f, angle, tx, ty) {
       if (x < 0 || x >= W || y < 0 || y >= WATER) break;
       if (solid(g.mask, x, y)) {
         g.ammo[g.team].rope--; f.jet = null;
-        f.rope = { x, y, len: Math.max(26, d - 2), t: 0 };
+        // hook a little shorter than the distance, so the frog is lifted off the ground and hangs
+        f.rope = { x, y, len: Math.max(26, d - 14), t: 0 };
         f.ground = false; f.fallFrom = f.y; f.vy = Math.min(f.vy, -40);
         g.events.push({ type: 'rope', x, y }); return true;
       }
@@ -406,7 +407,8 @@ function stepDoge(g, s, mask, frogs) {
 }
 // Red candles: no blast. Each candle falls straight down; a frog it lands right on top of gets hurt and
 // bounced off, then the candle sinks into the ground for 2 seconds and is gone (no crater).
-export const CANDLE_SINK = 2;
+// While sinking, a candle bores a narrow shaft CANDLE_DEPTH deep, like the drill shell.
+export const CANDLE_SINK = 2, CANDLE_DEPTH = 64, CANDLE_BORE = 7;
 const centredOn = (f, x, y, half) => f.alive && Math.abs(f.x - x) < half && y > f.y - 58 && y < f.y + 2;
 function stepCandle(g, s, mask, frogs) {
   if (s.sink != null) { s.sink += STEP; return s.sink >= CANDLE_SINK ? 'gone' : ''; }
@@ -589,6 +591,8 @@ function stepFrog(g, f) {
       if (f.jet.fuel <= 0) f.jet = null;
     }
   }
+  // on a rope the frog never "stands": it hangs, swings and climbs (a landing used to drop the rope at once)
+  if (f.ground && f.rope) f.ground = false;
   if (f.ground) {
     if (!solid(g.mask, f.x, f.y + 1)) { f.ground = false; f.fallFrom = f.y; }
     else if (Math.abs(f.vx) > 12) { slide(g, f); if (f.ground) return; }
@@ -620,7 +624,7 @@ function stepFrog(g, f) {
     const drop = f.y - f.fallFrom;
     if (drop > 90) hurt(g, f, Math.min(40, Math.round((drop - 90) / 4)));
     // a knocked-back frog keeps part of its speed and slides; a hop or a fall just stops
-    f.vx = Math.abs(f.vx) > 150 ? f.vx * .45 : 0; f.vy = 0; f.rope = null;
+    f.vx = Math.abs(f.vx) > 150 ? f.vx * .45 : 0; f.vy = 0;
   } else if (f.vy<0 && solid(g.mask,nx,ny-55)) {
     f.x=nx;f.vy=0;
   } else { f.x = nx; f.y = ny; }
@@ -662,6 +666,7 @@ export function step(g) {
       if (f && s.type === 'candles') { hurt(g, f, w.damage); knock(g, f, (f.x >= s.x ? 1 : -1) * 150, -260); }
       if (f && s.type === 'pickaxe') { hurt(g, f, w.damage); knock(g, f, (Math.sign(s.vx) || (f.x >= s.x ? 1 : -1)) * w.knockVx, w.knockVy); g.texts.push({ x: f.x, y: f.y - 70, text: w.cry, t: 0 }); g.events.push({ type: 'pickhit', x: s.x, y: s.y }); }
     }
+    if (s.type === 'candles' && s.sink != null && r !== 'gone') { const depth = Math.min(1, s.sink / CANDLE_SINK) * CANDLE_DEPTH; g.dirty.push(carve(g.mask, s.x, s.y + depth - CANDLE_BORE, CANDLE_BORE)); }
     if (s.dig) { g.dirty.push(carve(g.mask, s.dig.x, s.dig.y, WEAPONS.pickaxe.crater)); g.events.push({ type: 'dig', x: s.dig.x, y: s.dig.y }); s.dig = null; }
     if (r === 'caught') { const o = g.frogs.find(f => f.id === s.owner); if (o && g.ammo[o.team]) g.ammo[o.team].pickaxe = (g.ammo[o.team].pickaxe || 0) + 1; g.texts.push({ x: s.x, y: s.y - 20, text: 'CAUGHT', t: 0 }); g.events.push({ type: 'catch', x: s.x, y: s.y }); g.shots.splice(g.shots.indexOf(s), 1); continue; }
     if (s.ding) { s.ding = false; g.events.push({ type: 'bell', x: s.x, y: s.y }); g.texts.push({ x: s.x, y: s.y - 14, text: 'DING', t: 0 }); }

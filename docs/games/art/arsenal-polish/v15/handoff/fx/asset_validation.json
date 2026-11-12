@@ -1,0 +1,1291 @@
+{
+  "project": "FROGAGEDDON",
+  "package": "FX v15",
+  "format": "PNG RGBA / 128×128 per frame / horizontal strips",
+  "total_files": 10,
+  "total_frames": 74,
+  "tests": {
+    "explosion_medium.png": {
+      "passed": true,
+      "frames": 8,
+      "atlas_px": [
+        1024,
+        128
+      ],
+      "frame_px": [
+        128,
+        128
+      ],
+      "margin_px_min": 8,
+      "grid_2x2": true,
+      "rgba": true,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "center_shift_max_between_adjacent_frames_logical_px": 1.54,
+      "center_offset_mean_logical_px": 0.31,
+      "frame_checks": [
+        {
+          "bbox_logical": [
+            10,
+            11,
+            54,
+            50
+          ],
+          "center_logical": [
+            32.21,
+            31.52
+          ],
+          "nonzero_pixels_logical": 411,
+          "min_margin_px": 20
+        },
+        {
+          "bbox_logical": [
+            13,
+            13,
+            54,
+            52
+          ],
+          "center_logical": [
+            32.09,
+            32.06
+          ],
+          "nonzero_pixels_logical": 928,
+          "min_margin_px": 20
+        },
+        {
+          "bbox_logical": [
+            9,
+            9,
+            58,
+            55
+          ],
+          "center_logical": [
+            31.96,
+            31.97
+          ],
+          "nonzero_pixels_logical": 1273,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            8,
+            8,
+            59,
+            56
+          ],
+          "center_logical": [
+            32.05,
+            32.05
+          ],
+          "nonzero_pixels_logical": 1394,
+          "min_margin_px": 10
+        },
+        {
+          "bbox_logical": [
+            9,
+            9,
+            57,
+            56
+          ],
+          "center_logical": [
+            31.93,
+            31.99
+          ],
+          "nonzero_pixels_logical": 1279,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            9,
+            12,
+            57,
+            52
+          ],
+          "center_logical": [
+            31.96,
+            31.03
+          ],
+          "nonzero_pixels_logical": 1319,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            8,
+            16,
+            60,
+            53
+          ],
+          "center_logical": [
+            31.71,
+            32.25
+          ],
+          "nonzero_pixels_logical": 940,
+          "min_margin_px": 8
+        },
+        {
+          "bbox_logical": [
+            11,
+            19,
+            52,
+            50
+          ],
+          "center_logical": [
+            30.85,
+            30.97
+          ],
+          "nonzero_pixels_logical": 386,
+          "min_margin_px": 22
+        }
+      ],
+      "description": "Średni wybuch: błysk, kula ognia, chmury dymu"
+    },
+    "explosion_large.png": {
+      "passed": true,
+      "frames": 8,
+      "atlas_px": [
+        1024,
+        128
+      ],
+      "frame_px": [
+        128,
+        128
+      ],
+      "margin_px_min": 10,
+      "grid_2x2": true,
+      "rgba": true,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "center_shift_max_between_adjacent_frames_logical_px": 2.93,
+      "center_offset_mean_logical_px": 2.03,
+      "frame_checks": [
+        {
+          "bbox_logical": [
+            12,
+            15,
+            53,
+            53
+          ],
+          "center_logical": [
+            31.99,
+            33.06
+          ],
+          "nonzero_pixels_logical": 428,
+          "min_margin_px": 22
+        },
+        {
+          "bbox_logical": [
+            8,
+            8,
+            59,
+            56
+          ],
+          "center_logical": [
+            32.03,
+            32.11
+          ],
+          "nonzero_pixels_logical": 1410,
+          "min_margin_px": 10
+        },
+        {
+          "bbox_logical": [
+            10,
+            11,
+            53,
+            57
+          ],
+          "center_logical": [
+            32.03,
+            33.02
+          ],
+          "nonzero_pixels_logical": 1186,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            9,
+            9,
+            56,
+            59
+          ],
+          "center_logical": [
+            32.16,
+            31.07
+          ],
+          "nonzero_pixels_logical": 1312,
+          "min_margin_px": 10
+        },
+        {
+          "bbox_logical": [
+            8,
+            7,
+            57,
+            54
+          ],
+          "center_logical": [
+            32.47,
+            29.44
+          ],
+          "nonzero_pixels_logical": 1382,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            6,
+            6,
+            57,
+            59
+          ],
+          "center_logical": [
+            31.45,
+            26.69
+          ],
+          "nonzero_pixels_logical": 1311,
+          "min_margin_px": 10
+        },
+        {
+          "bbox_logical": [
+            6,
+            6,
+            57,
+            58
+          ],
+          "center_logical": [
+            32.0,
+            27.99
+          ],
+          "nonzero_pixels_logical": 1451,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            8,
+            9,
+            55,
+            57
+          ],
+          "center_logical": [
+            29.82,
+            26.52
+          ],
+          "nonzero_pixels_logical": 661,
+          "min_margin_px": 14
+        }
+      ],
+      "description": "Duży wybuch z grzybem dymowym i grudkami ziemi"
+    },
+    "moon_rocket_explosion.png": {
+      "passed": true,
+      "frames": 8,
+      "atlas_px": [
+        1024,
+        128
+      ],
+      "frame_px": [
+        128,
+        128
+      ],
+      "margin_px_min": 12,
+      "grid_2x2": true,
+      "rgba": true,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "center_shift_max_between_adjacent_frames_logical_px": 2.98,
+      "center_offset_mean_logical_px": 0.86,
+      "frame_checks": [
+        {
+          "bbox_logical": [
+            14,
+            14,
+            51,
+            51
+          ],
+          "center_logical": [
+            32.0,
+            32.0
+          ],
+          "nonzero_pixels_logical": 429,
+          "min_margin_px": 26
+        },
+        {
+          "bbox_logical": [
+            12,
+            11,
+            54,
+            54
+          ],
+          "center_logical": [
+            31.94,
+            31.88
+          ],
+          "nonzero_pixels_logical": 515,
+          "min_margin_px": 20
+        },
+        {
+          "bbox_logical": [
+            8,
+            9,
+            58,
+            58
+          ],
+          "center_logical": [
+            31.88,
+            32.08
+          ],
+          "nonzero_pixels_logical": 747,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            7,
+            10,
+            57,
+            58
+          ],
+          "center_logical": [
+            32.03,
+            32.0
+          ],
+          "nonzero_pixels_logical": 745,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            6,
+            9,
+            57,
+            55
+          ],
+          "center_logical": [
+            32.61,
+            34.03
+          ],
+          "nonzero_pixels_logical": 1082,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            6,
+            9,
+            57,
+            55
+          ],
+          "center_logical": [
+            32.61,
+            34.03
+          ],
+          "nonzero_pixels_logical": 1082,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            10,
+            14,
+            56,
+            53
+          ],
+          "center_logical": [
+            33.15,
+            33.61
+          ],
+          "nonzero_pixels_logical": 602,
+          "min_margin_px": 16
+        },
+        {
+          "bbox_logical": [
+            15,
+            15,
+            54,
+            44
+          ],
+          "center_logical": [
+            34.77,
+            31.11
+          ],
+          "nonzero_pixels_logical": 206,
+          "min_margin_px": 20
+        }
+      ],
+      "description": "Księżycowa eksplozja, niebieski błysk, gwiazdy, pył"
+    },
+    "pep_coin_splash.png": {
+      "passed": true,
+      "frames": 8,
+      "atlas_px": [
+        1024,
+        128
+      ],
+      "frame_px": [
+        128,
+        128
+      ],
+      "margin_px_min": 8,
+      "grid_2x2": true,
+      "rgba": true,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "center_shift_max_between_adjacent_frames_logical_px": 1.52,
+      "center_offset_mean_logical_px": 1.52,
+      "frame_checks": [
+        {
+          "bbox_logical": [
+            16,
+            17,
+            49,
+            48
+          ],
+          "center_logical": [
+            32.05,
+            32.03
+          ],
+          "nonzero_pixels_logical": 495,
+          "min_margin_px": 30
+        },
+        {
+          "bbox_logical": [
+            13,
+            17,
+            51,
+            49
+          ],
+          "center_logical": [
+            31.15,
+            30.81
+          ],
+          "nonzero_pixels_logical": 706,
+          "min_margin_px": 26
+        },
+        {
+          "bbox_logical": [
+            11,
+            15,
+            53,
+            50
+          ],
+          "center_logical": [
+            31.35,
+            30.71
+          ],
+          "nonzero_pixels_logical": 906,
+          "min_margin_px": 22
+        },
+        {
+          "bbox_logical": [
+            10,
+            15,
+            54,
+            51
+          ],
+          "center_logical": [
+            31.25,
+            30.62
+          ],
+          "nonzero_pixels_logical": 1069,
+          "min_margin_px": 20
+        },
+        {
+          "bbox_logical": [
+            8,
+            13,
+            56,
+            53
+          ],
+          "center_logical": [
+            31.24,
+            30.56
+          ],
+          "nonzero_pixels_logical": 1129,
+          "min_margin_px": 16
+        },
+        {
+          "bbox_logical": [
+            7,
+            12,
+            57,
+            54
+          ],
+          "center_logical": [
+            31.16,
+            30.01
+          ],
+          "nonzero_pixels_logical": 905,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            7,
+            11,
+            59,
+            55
+          ],
+          "center_logical": [
+            30.67,
+            30.42
+          ],
+          "nonzero_pixels_logical": 638,
+          "min_margin_px": 10
+        },
+        {
+          "bbox_logical": [
+            6,
+            9,
+            60,
+            58
+          ],
+          "center_logical": [
+            30.99,
+            30.37
+          ],
+          "nonzero_pixels_logical": 490,
+          "min_margin_px": 8
+        }
+      ],
+      "description": "Rozprysk monet PEP i zielonych iskier"
+    },
+    "silver_donkey_warning.png": {
+      "passed": true,
+      "frames": 6,
+      "atlas_px": [
+        768,
+        128
+      ],
+      "frame_px": [
+        128,
+        128
+      ],
+      "margin_px_min": 12,
+      "grid_2x2": true,
+      "rgba": true,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "center_shift_max_between_adjacent_frames_logical_px": 0.1,
+      "center_offset_mean_logical_px": 1.44,
+      "frame_checks": [
+        {
+          "bbox_logical": [
+            8,
+            6,
+            57,
+            55
+          ],
+          "center_logical": [
+            33.39,
+            32.26
+          ],
+          "nonzero_pixels_logical": 903,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            8,
+            6,
+            57,
+            55
+          ],
+          "center_logical": [
+            33.47,
+            32.32
+          ],
+          "nonzero_pixels_logical": 935,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            8,
+            6,
+            57,
+            55
+          ],
+          "center_logical": [
+            33.39,
+            32.26
+          ],
+          "nonzero_pixels_logical": 903,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            8,
+            6,
+            57,
+            55
+          ],
+          "center_logical": [
+            33.39,
+            32.26
+          ],
+          "nonzero_pixels_logical": 903,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            8,
+            6,
+            57,
+            55
+          ],
+          "center_logical": [
+            33.47,
+            32.32
+          ],
+          "nonzero_pixels_logical": 935,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            8,
+            6,
+            57,
+            55
+          ],
+          "center_logical": [
+            33.39,
+            32.26
+          ],
+          "nonzero_pixels_logical": 903,
+          "min_margin_px": 12
+        }
+      ],
+      "description": "Migający czerwony celownik, wykrzyknik, cień osła"
+    },
+    "bell_bounce_wave.png": {
+      "passed": true,
+      "frames": 6,
+      "atlas_px": [
+        768,
+        128
+      ],
+      "frame_px": [
+        128,
+        128
+      ],
+      "margin_px_min": 8,
+      "grid_2x2": true,
+      "rgba": true,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "center_shift_max_between_adjacent_frames_logical_px": 6.0,
+      "center_offset_mean_logical_px": 1.39,
+      "frame_checks": [
+        {
+          "bbox_logical": [
+            10,
+            21,
+            49,
+            49
+          ],
+          "center_logical": [
+            27.19,
+            34.66
+          ],
+          "nonzero_pixels_logical": 493,
+          "min_margin_px": 20
+        },
+        {
+          "bbox_logical": [
+            10,
+            21,
+            49,
+            49
+          ],
+          "center_logical": [
+            27.19,
+            34.66
+          ],
+          "nonzero_pixels_logical": 493,
+          "min_margin_px": 20
+        },
+        {
+          "bbox_logical": [
+            10,
+            10,
+            56,
+            49
+          ],
+          "center_logical": [
+            32.95,
+            32.98
+          ],
+          "nonzero_pixels_logical": 660,
+          "min_margin_px": 16
+        },
+        {
+          "bbox_logical": [
+            10,
+            8,
+            56,
+            49
+          ],
+          "center_logical": [
+            33.04,
+            32.58
+          ],
+          "nonzero_pixels_logical": 673,
+          "min_margin_px": 16
+        },
+        {
+          "bbox_logical": [
+            10,
+            10,
+            60,
+            50
+          ],
+          "center_logical": [
+            37.55,
+            32.57
+          ],
+          "nonzero_pixels_logical": 821,
+          "min_margin_px": 8
+        },
+        {
+          "bbox_logical": [
+            10,
+            8,
+            60,
+            50
+          ],
+          "center_logical": [
+            37.64,
+            32.06
+          ],
+          "nonzero_pixels_logical": 842,
+          "min_margin_px": 8
+        }
+      ],
+      "description": "Złoty dzwon, łuki dźwięku i nutka"
+    },
+    "mega_foot_imprint.png": {
+      "passed": true,
+      "frames": 6,
+      "atlas_px": [
+        768,
+        128
+      ],
+      "frame_px": [
+        128,
+        128
+      ],
+      "margin_px_min": 10,
+      "grid_2x2": true,
+      "rgba": true,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "center_shift_max_between_adjacent_frames_logical_px": 1.46,
+      "center_offset_mean_logical_px": 3.38,
+      "frame_checks": [
+        {
+          "bbox_logical": [
+            10,
+            21,
+            54,
+            52
+          ],
+          "center_logical": [
+            32.06,
+            35.7
+          ],
+          "nonzero_pixels_logical": 360,
+          "min_margin_px": 20
+        },
+        {
+          "bbox_logical": [
+            8,
+            19,
+            59,
+            57
+          ],
+          "center_logical": [
+            31.74,
+            36.97
+          ],
+          "nonzero_pixels_logical": 1188,
+          "min_margin_px": 10
+        },
+        {
+          "bbox_logical": [
+            8,
+            13,
+            58,
+            57
+          ],
+          "center_logical": [
+            32.1,
+            35.56
+          ],
+          "nonzero_pixels_logical": 1336,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            6,
+            13,
+            58,
+            58
+          ],
+          "center_logical": [
+            32.09,
+            34.26
+          ],
+          "nonzero_pixels_logical": 1495,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            6,
+            16,
+            57,
+            58
+          ],
+          "center_logical": [
+            32.1,
+            34.52
+          ],
+          "nonzero_pixels_logical": 1400,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            6,
+            16,
+            57,
+            58
+          ],
+          "center_logical": [
+            32.05,
+            35.26
+          ],
+          "nonzero_pixels_logical": 1331,
+          "min_margin_px": 12
+        }
+      ],
+      "description": "Głęboki odcisk stopy, pęknięcia gleby, kurz"
+    },
+    "teleport_flash.png": {
+      "passed": true,
+      "frames": 8,
+      "atlas_px": [
+        1024,
+        128
+      ],
+      "frame_px": [
+        128,
+        128
+      ],
+      "margin_px_min": 18,
+      "grid_2x2": true,
+      "rgba": true,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "center_shift_max_between_adjacent_frames_logical_px": 0.85,
+      "center_offset_mean_logical_px": 0.82,
+      "frame_checks": [
+        {
+          "bbox_logical": [
+            10,
+            10,
+            55,
+            55
+          ],
+          "center_logical": [
+            31.18,
+            33.83
+          ],
+          "nonzero_pixels_logical": 865,
+          "min_margin_px": 18
+        },
+        {
+          "bbox_logical": [
+            11,
+            11,
+            55,
+            53
+          ],
+          "center_logical": [
+            31.01,
+            33.5
+          ],
+          "nonzero_pixels_logical": 801,
+          "min_margin_px": 18
+        },
+        {
+          "bbox_logical": [
+            16,
+            16,
+            49,
+            49
+          ],
+          "center_logical": [
+            31.21,
+            33.12
+          ],
+          "nonzero_pixels_logical": 649,
+          "min_margin_px": 30
+        },
+        {
+          "bbox_logical": [
+            22,
+            22,
+            43,
+            43
+          ],
+          "center_logical": [
+            31.7,
+            32.42
+          ],
+          "nonzero_pixels_logical": 345,
+          "min_margin_px": 42
+        },
+        {
+          "bbox_logical": [
+            26,
+            27,
+            39,
+            39
+          ],
+          "center_logical": [
+            31.87,
+            32.47
+          ],
+          "nonzero_pixels_logical": 120,
+          "min_margin_px": 50
+        },
+        {
+          "bbox_logical": [
+            10,
+            11,
+            55,
+            54
+          ],
+          "center_logical": [
+            31.93,
+            32.48
+          ],
+          "nonzero_pixels_logical": 568,
+          "min_margin_px": 18
+        },
+        {
+          "bbox_logical": [
+            10,
+            12,
+            54,
+            52
+          ],
+          "center_logical": [
+            31.95,
+            32.05
+          ],
+          "nonzero_pixels_logical": 255,
+          "min_margin_px": 20
+        },
+        {
+          "bbox_logical": [
+            26,
+            18,
+            41,
+            44
+          ],
+          "center_logical": [
+            32.04,
+            31.94
+          ],
+          "nonzero_pixels_logical": 51,
+          "min_margin_px": 36
+        }
+      ],
+      "description": "Zapadający się niebieski wir z białym rozbłyskiem"
+    },
+    "donkey_impact.png": {
+      "passed": true,
+      "frames": 8,
+      "atlas_px": [
+        1024,
+        128
+      ],
+      "frame_px": [
+        128,
+        128
+      ],
+      "margin_px_min": 8,
+      "grid_2x2": true,
+      "rgba": true,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "center_shift_max_between_adjacent_frames_logical_px": 7.08,
+      "center_offset_mean_logical_px": 2.63,
+      "frame_checks": [
+        {
+          "bbox_logical": [
+            8,
+            23,
+            56,
+            57
+          ],
+          "center_logical": [
+            31.81,
+            39.88
+          ],
+          "nonzero_pixels_logical": 376,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            13,
+            20,
+            53,
+            60
+          ],
+          "center_logical": [
+            32.0,
+            39.38
+          ],
+          "nonzero_pixels_logical": 581,
+          "min_margin_px": 8
+        },
+        {
+          "bbox_logical": [
+            6,
+            9,
+            58,
+            54
+          ],
+          "center_logical": [
+            32.68,
+            32.33
+          ],
+          "nonzero_pixels_logical": 1544,
+          "min_margin_px": 12
+        },
+        {
+          "bbox_logical": [
+            6,
+            9,
+            59,
+            54
+          ],
+          "center_logical": [
+            32.61,
+            31.8
+          ],
+          "nonzero_pixels_logical": 1623,
+          "min_margin_px": 10
+        },
+        {
+          "bbox_logical": [
+            5,
+            9,
+            60,
+            54
+          ],
+          "center_logical": [
+            32.57,
+            32.24
+          ],
+          "nonzero_pixels_logical": 1535,
+          "min_margin_px": 8
+        },
+        {
+          "bbox_logical": [
+            8,
+            14,
+            57,
+            54
+          ],
+          "center_logical": [
+            32.13,
+            32.4
+          ],
+          "nonzero_pixels_logical": 1343,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            10,
+            20,
+            54,
+            56
+          ],
+          "center_logical": [
+            31.85,
+            33.99
+          ],
+          "nonzero_pixels_logical": 720,
+          "min_margin_px": 16
+        },
+        {
+          "bbox_logical": [
+            11,
+            19,
+            51,
+            54
+          ],
+          "center_logical": [
+            31.27,
+            35.01
+          ],
+          "nonzero_pixels_logical": 420,
+          "min_margin_px": 20
+        }
+      ],
+      "description": "Uderzenie osła, fala, odpryski kamieni i kurz"
+    },
+    "doge_blast.png": {
+      "passed": true,
+      "frames": 8,
+      "atlas_px": [
+        1024,
+        128
+      ],
+      "frame_px": [
+        128,
+        128
+      ],
+      "margin_px_min": 14,
+      "grid_2x2": true,
+      "rgba": true,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "center_shift_max_between_adjacent_frames_logical_px": 4.42,
+      "center_offset_mean_logical_px": 0.75,
+      "frame_checks": [
+        {
+          "bbox_logical": [
+            15,
+            15,
+            53,
+            50
+          ],
+          "center_logical": [
+            33.72,
+            31.6
+          ],
+          "nonzero_pixels_logical": 439,
+          "min_margin_px": 22
+        },
+        {
+          "bbox_logical": [
+            13,
+            13,
+            54,
+            52
+          ],
+          "center_logical": [
+            31.94,
+            32.09
+          ],
+          "nonzero_pixels_logical": 935,
+          "min_margin_px": 20
+        },
+        {
+          "bbox_logical": [
+            9,
+            9,
+            57,
+            56
+          ],
+          "center_logical": [
+            31.98,
+            31.58
+          ],
+          "nonzero_pixels_logical": 1330,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            8,
+            9,
+            57,
+            57
+          ],
+          "center_logical": [
+            32.09,
+            31.63
+          ],
+          "nonzero_pixels_logical": 1472,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            9,
+            9,
+            57,
+            55
+          ],
+          "center_logical": [
+            31.88,
+            31.48
+          ],
+          "nonzero_pixels_logical": 1397,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            9,
+            14,
+            57,
+            56
+          ],
+          "center_logical": [
+            32.25,
+            31.34
+          ],
+          "nonzero_pixels_logical": 1187,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            9,
+            15,
+            57,
+            56
+          ],
+          "center_logical": [
+            31.86,
+            31.65
+          ],
+          "nonzero_pixels_logical": 884,
+          "min_margin_px": 14
+        },
+        {
+          "bbox_logical": [
+            15,
+            16,
+            57,
+            50
+          ],
+          "center_logical": [
+            36.07,
+            32.98
+          ],
+          "nonzero_pixels_logical": 431,
+          "min_margin_px": 14
+        }
+      ],
+      "description": "Pomarańczowy wybuch, kawałki gogli i iskry"
+    }
+  },
+  "notes": [
+    "Frames drawn on logical 64×64 grid, nearest scaled 2× to true 128×128 sprites.",
+    "All sprites with true transparency; 8px minimum margin in each frame.",
+    "Some effects expand, disperse and vanish intentionally; centroid drift is descriptive, not a strict failure.",
+    "Aesthetic comparison was performed visually against frog v06, pickaxe v14 and earlier game weapons."
+  ]
+}

@@ -1,0 +1,865 @@
+{
+  "version": "v15",
+  "assets": {
+    "grenade.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        20,
+        44
+      ],
+      "bbox": [
+        8,
+        4,
+        54,
+        56
+      ],
+      "margins": {
+        "left": 8,
+        "top": 4,
+        "right": 10,
+        "bottom": 8
+      },
+      "opaque_pixels": 1880,
+      "color_count": 40,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "bazooka.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        20,
+        44
+      ],
+      "bbox": [
+        6,
+        12,
+        58,
+        56
+      ],
+      "margins": {
+        "left": 6,
+        "top": 12,
+        "right": 6,
+        "bottom": 8
+      },
+      "opaque_pixels": 1580,
+      "color_count": 39,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "cluster_grenade.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        20,
+        44
+      ],
+      "bbox": [
+        8,
+        4,
+        54,
+        58
+      ],
+      "margins": {
+        "left": 8,
+        "top": 4,
+        "right": 10,
+        "bottom": 6
+      },
+      "opaque_pixels": 1968,
+      "color_count": 43,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "golden_foot.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        30,
+        44
+      ],
+      "bbox": [
+        8,
+        4,
+        56,
+        58
+      ],
+      "margins": {
+        "left": 8,
+        "top": 4,
+        "right": 8,
+        "bottom": 6
+      },
+      "opaque_pixels": 1728,
+      "color_count": 35,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "baseball.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        20,
+        46
+      ],
+      "bbox": [
+        6,
+        6,
+        58,
+        56
+      ],
+      "margins": {
+        "left": 6,
+        "top": 6,
+        "right": 6,
+        "bottom": 8
+      },
+      "opaque_pixels": 1152,
+      "color_count": 26,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "revolver.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        20,
+        44
+      ],
+      "bbox": [
+        4,
+        14,
+        58,
+        58
+      ],
+      "margins": {
+        "left": 4,
+        "top": 14,
+        "right": 6,
+        "bottom": 6
+      },
+      "opaque_pixels": 1544,
+      "color_count": 35,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "bow.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        46,
+        34
+      ],
+      "bbox": [
+        12,
+        4,
+        56,
+        60
+      ],
+      "margins": {
+        "left": 12,
+        "top": 4,
+        "right": 8,
+        "bottom": 4
+      },
+      "opaque_pixels": 1432,
+      "color_count": 27,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "landmine.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        32,
+        44
+      ],
+      "bbox": [
+        6,
+        16,
+        56,
+        58
+      ],
+      "margins": {
+        "left": 6,
+        "top": 16,
+        "right": 8,
+        "bottom": 6
+      },
+      "opaque_pixels": 1716,
+      "color_count": 35,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "dynamite.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        30,
+        40
+      ],
+      "bbox": [
+        12,
+        6,
+        52,
+        58
+      ],
+      "margins": {
+        "left": 12,
+        "top": 6,
+        "right": 12,
+        "bottom": 6
+      },
+      "opaque_pixels": 1412,
+      "color_count": 35,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "red_candles.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        32,
+        44
+      ],
+      "bbox": [
+        12,
+        10,
+        56,
+        60
+      ],
+      "margins": {
+        "left": 12,
+        "top": 10,
+        "right": 8,
+        "bottom": 4
+      },
+      "opaque_pixels": 1416,
+      "color_count": 9,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "drill_launcher.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        20,
+        44
+      ],
+      "bbox": [
+        4,
+        14,
+        60,
+        54
+      ],
+      "margins": {
+        "left": 4,
+        "top": 14,
+        "right": 4,
+        "bottom": 10
+      },
+      "opaque_pixels": 1324,
+      "color_count": 37,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "grappling_launcher.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        20,
+        44
+      ],
+      "bbox": [
+        6,
+        12,
+        56,
+        58
+      ],
+      "margins": {
+        "left": 6,
+        "top": 12,
+        "right": 8,
+        "bottom": 6
+      },
+      "opaque_pixels": 1412,
+      "color_count": 32,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "jetpack_backpack.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        32,
+        40
+      ],
+      "bbox": [
+        8,
+        6,
+        56,
+        58
+      ],
+      "margins": {
+        "left": 8,
+        "top": 6,
+        "right": 8,
+        "bottom": 6
+      },
+      "opaque_pixels": 2064,
+      "color_count": 44,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "teleport_device.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        20,
+        44
+      ],
+      "bbox": [
+        10,
+        12,
+        52,
+        58
+      ],
+      "margins": {
+        "left": 10,
+        "top": 12,
+        "right": 12,
+        "bottom": 6
+      },
+      "opaque_pixels": 1212,
+      "color_count": 37,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "ban_hammer.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        20,
+        46
+      ],
+      "bbox": [
+        6,
+        4,
+        60,
+        60
+      ],
+      "margins": {
+        "left": 6,
+        "top": 4,
+        "right": 4,
+        "bottom": 4
+      },
+      "opaque_pixels": 1820,
+      "color_count": 28,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "pep_rain.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        32,
+        44
+      ],
+      "bbox": [
+        10,
+        6,
+        54,
+        58
+      ],
+      "margins": {
+        "left": 10,
+        "top": 6,
+        "right": 10,
+        "bottom": 6
+      },
+      "opaque_pixels": 1724,
+      "color_count": 39,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "doge.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        30,
+        44
+      ],
+      "bbox": [
+        4,
+        8,
+        56,
+        56
+      ],
+      "margins": {
+        "left": 4,
+        "top": 8,
+        "right": 8,
+        "bottom": 8
+      },
+      "opaque_pixels": 1848,
+      "color_count": 42,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "donkey.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        30,
+        44
+      ],
+      "bbox": [
+        4,
+        6,
+        56,
+        58
+      ],
+      "margins": {
+        "left": 4,
+        "top": 6,
+        "right": 8,
+        "bottom": 6
+      },
+      "opaque_pixels": 1944,
+      "color_count": 37,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "moon_rocket.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        20,
+        44
+      ],
+      "bbox": [
+        6,
+        6,
+        56,
+        54
+      ],
+      "margins": {
+        "left": 6,
+        "top": 6,
+        "right": 8,
+        "bottom": 10
+      },
+      "opaque_pixels": 1568,
+      "color_count": 32,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "bell_bomb.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        32,
+        44
+      ],
+      "bbox": [
+        10,
+        8,
+        52,
+        60
+      ],
+      "margins": {
+        "left": 10,
+        "top": 8,
+        "right": 12,
+        "bottom": 4
+      },
+      "opaque_pixels": 1728,
+      "color_count": 41,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "frog_mine.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        32,
+        44
+      ],
+      "bbox": [
+        6,
+        12,
+        58,
+        56
+      ],
+      "margins": {
+        "left": 6,
+        "top": 12,
+        "right": 6,
+        "bottom": 8
+      },
+      "opaque_pixels": 1876,
+      "color_count": 41,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    },
+    "mega_golden_foot.png": {
+      "size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "fps": 0,
+      "grip": [
+        30,
+        46
+      ],
+      "bbox": [
+        6,
+        4,
+        58,
+        60
+      ],
+      "margins": {
+        "left": 6,
+        "top": 4,
+        "right": 6,
+        "bottom": 4
+      },
+      "opaque_pixels": 1976,
+      "color_count": 36,
+      "checks": {
+        "dimensions": true,
+        "single_frame": true,
+        "rgba": true,
+        "transparent_background": true,
+        "opaque_nontransparent_pixels": true,
+        "margin_min_4px": true,
+        "grid_2x2": true,
+        "visible": true,
+        "width_40_56px": true,
+        "one_frame_no_jitter": true
+      },
+      "passed": true
+    }
+  },
+  "all_passed": true,
+  "note": "Kontrole automatyczne dotyczą właściwości technicznych. Ocena porównawcza jakości grafiki pozostaje subiektywna."
+}

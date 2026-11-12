@@ -1,0 +1,192 @@
+{
+  "explosion_medium.png": {
+    "src": "effects/explosion_medium.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 16,
+    "loop": false,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      128,
+      128
+    ]
+  },
+  "explosion_large.png": {
+    "src": "effects/explosion_large.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 14,
+    "loop": false,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      128,
+      128
+    ]
+  },
+  "moon_rocket_explosion.png": {
+    "src": "effects/moon_rocket_explosion.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 16,
+    "loop": false,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      128,
+      128
+    ]
+  },
+  "pep_coin_splash.png": {
+    "src": "effects/pep_coin_splash.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 16,
+    "loop": false,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      128,
+      128
+    ]
+  },
+  "silver_donkey_warning.png": {
+    "src": "effects/silver_donkey_warning.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 12,
+    "loop": false,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      128,
+      128
+    ]
+  },
+  "bell_bounce_wave.png": {
+    "src": "effects/bell_bounce_wave.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 12,
+    "loop": false,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      128,
+      128
+    ]
+  },
+  "mega_foot_imprint.png": {
+    "src": "effects/mega_foot_imprint.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 12,
+    "loop": false,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      128,
+      128
+    ]
+  },
+  "teleport_flash.png": {
+    "src": "effects/teleport_flash.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 16,
+    "loop": false,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      128,
+      128
+    ]
+  },
+  "donkey_impact.png": {
+    "src": "effects/donkey_impact.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 16,
+    "loop": false,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      128,
+      128
+    ]
+  },
+  "doge_blast.png": {
+    "src": "effects/doge_blast.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 16,
+    "loop": false,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      128,
+      128
+    ]
+  }
+}
