@@ -102,9 +102,10 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
 .pp-pane { min-width: 0; }
 
 /* Overview: recent stamps strip */
-.pp-recent-list { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 2px 0; list-style: none; text-align: center; }
-.pp-recent-list li { display: grid; justify-items: center; gap: 2px; min-width: 0; }
-.pp-recent-list b { font-size: 11px; line-height: 1.15; overflow-wrap: anywhere; }
+.pp-recent-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 2px 0; list-style: none; text-align: center; }
+.pp-recent-list li { display: grid; justify-items: center; gap: 3px; min-width: 0; }
+.pp-recent-list .pp-art-stamp { width: min(88%, 120px); filter: drop-shadow(1px 2px 0 rgba(60,40,20,.35)); }
+.pp-recent-list b { font-size: 12px; line-height: 1.15; overflow-wrap: anywhere; }
 .pp-recent-list small { font-size: 10px; color: var(--pp-soft); }
 .pp-recent-list .is-locked { opacity: .7; }
 
@@ -177,7 +178,7 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
 /* phone: one page per row, so the page text stays readable */
 @media (max-width: 600px) {
   .pp-book { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .pp-recent-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .pp-recent-list { gap: 4px; }
   .pp-album { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
   .pp-stamp .pp-art-stamp { width: 92%; }
   .pp-cols { grid-template-columns: minmax(0, 1fr); }

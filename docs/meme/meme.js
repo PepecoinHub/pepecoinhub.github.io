@@ -1724,7 +1724,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261111launch';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261112big'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261112pr'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1902,10 +1902,11 @@
     'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14', 'pepe_guesser', 'week_scout',
     'scout_fren', 'first_hatch', 'little_fren', 'grown_fren', 'share_fren', 'valentine_fren'];
   // the 20 places on the Passport's front page, in order: gold row, silver row, then the first steps
-  var PP_FRONT = ['moonwalker', 'season_champion', 'frog_of_the_week', 'certified_fren', 'treasure_hunter',
-    'old_frog', 'vox_populi', 'checkmate', 'detective_fren', 'like_it_here',
-    'first_fren', 'first_avatar', 'welcome_back', 'pepe_guesser', 'sharp_eye',
-    'good_game', 'rookie_miner', 'dear_editor', 'i_voted', 'secret_starter'];
+  // owner, 2026-11-12: Pond Pioneer opens the gold row; the rest moved one place on (Secret Starter is in the Stamps tab)
+  var PP_FRONT = ['pond_pioneer', 'moonwalker', 'season_champion', 'frog_of_the_week', 'certified_fren',
+    'treasure_hunter', 'old_frog', 'vox_populi', 'checkmate', 'detective_fren',
+    'like_it_here', 'first_fren', 'first_avatar', 'welcome_back', 'pepe_guesser',
+    'sharp_eye', 'good_game', 'rookie_miner', 'dear_editor', 'i_voted'];
   // Only owner-approved art (#257): missing art gets a neutral placeholder, never Lily or another stamp's drawing.
   function ppStamp(x, earned) {
     if (earned && x.id === 'pond_pioneer') return el('span', {class:'pp-art pp-art-stamp is-pioneer',role:'img','aria-label':'Pond Pioneer'});
@@ -2140,7 +2141,7 @@
         var recent = el('section', {class:'pp-panel pp-recent'});
         recent.appendChild(piece('h3','pp-panel-h','Recent Stamps'));
         var rl = el('ul', {class:'pp-recent-list'});
-        for (var ri = 0; ri < 7; ri++) {
+        for (var ri = 0; ri < 4; ri++) {   // the last 4, big enough to see (owner, 2026-11-12)
           var rx = earnedList[ri], li = el('li', {class: rx ? 'is-earned' : 'is-locked'});
           li.appendChild(ppStamp(rx || {}, !!rx));
           li.appendChild(piece('b','', rx ? (rx.title||rx.id) : '???'));
