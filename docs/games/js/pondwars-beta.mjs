@@ -660,6 +660,9 @@ function events() {
     if (pickFX) { const clip = weaponClips.get('pickaxe/' + pickFX); if (clip?.image.naturalWidth) weaponFX.push({ weapon: 'pickaxe', role: pickFX, x: e.x, y: e.y, time: animator.time, authored: true, life: clip.frames / clip.fps }); }
     if(weaponFX.length>64)weaponFX.shift();
     if (e.type === 'turn' || e.type === 'fire') camFollow = true;
+    if (e.type === 'turn') statsTurn();
+    if (e.type === 'fire' && stats) stats.weapon = e.weapon || g.weapon;
+    if (e.type === 'ko') stats.kos.push({ name: e.name, by: stats.shooter });
     if (e.type === 'turn') { resetSteering();closeArsenal();keys.clear();clearCharge();pending=[];remoteP=0;aimPointer=null;held.l=held.r=held.u=0; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x;
       status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : isOnline(g.team) ? `${f.name} (${TEAM[g.team].name}) is playing on the other device…` : touchUI.matches ? `${f.name}: tap the map to aim · hold FIRE to shoot · ◀ ▶ walk · ↑ jump, twice for a backflip` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
     if (e.type === 'fire') {pointerHolds.clear();closeArsenal();keys.clear();held.l=held.r=held.u=held.pitch=0;steerY=null;clearCharge();remoteP=0;status(g.phase==='guide'?(touchUI.matches?'Fly the Doge: ◀ ▶ turn, ↑ climbs, drag on the map to steer up or down, DETONATE blows it up.':'Fly the Doge: A/D turn, W/S nose up / down, Enter or Space detonates.'):g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
@@ -701,14 +704,80 @@ function cpuTick(dt) {
   cpu.charging = true; cpu.p = Math.min(cpu.plan.power, (cpu.t - .7) / 1.1);
   if (cpu.p >= cpu.plan.power) { cpu.charging = false; fire(g, cpu.plan.angle, cpu.plan.power, cpu.plan.tx); }
 }
+// ---------- battle report: who did the damage, the best shot, the knockouts ----------
+let stats = null;
+function statsReset() { stats = { started: performance.now(), turns: 0, shooter: null, hp: null, frogs: {}, best: null, kos: [] }; }
+function statsTurn() {
+  if (!stats || !g) return;
+  if (stats.hp && stats.shooter != null) {
+    const by = g.frogs.find(f => f.id === stats.shooter); let dealt = 0, own = 0;
+    for (const f of g.frogs) { const lost = Math.max(0, (stats.hp[f.id] ?? 0) - Math.max(0, f.alive ? f.hp : 0)); if (!lost || !by) continue; if (f.team === by.team) own += lost; else dealt += lost; }
+    if (by) { const r = stats.frogs[by.id] ||= { name: by.name, team: by.team, dealt: 0, own: 0, kos: 0 }; r.dealt += dealt; r.own += own; if (dealt && (!stats.best || dealt > stats.best.dmg)) stats.best = { dmg: dealt, name: by.name, team: by.team, weapon: stats.weapon }; }
+    for (const k of stats.kos.filter(k => !k.counted)) { k.counted = true; const r = by && stats.frogs[by.id]; const victim = g.frogs.find(f => f.name === k.name); if (r && victim && victim.team !== by.team) r.kos++; }
+  }
+  stats.hp = Object.fromEntries(g.frogs.map(f => [f.id, f.alive ? f.hp : 0]));
+  if (g.phase !== 'over') { stats.turns++; stats.shooter = me(g)?.id ?? null; }
+}
 function over() {
-  const w = g.winner;
-  $('#over-title').textContent = w === -1 ? 'Nobody won. The pond won.' : `${TEAM[w].name} WINS!`;
-  $('#over-text').textContent = w>=0 ? TEAM[w].name+' claim the pond. Rematch?' : 'Everybody ended up in the water.';
-  $('#over').hidden = false; status('Game over.');
+  if (!stats) statsReset();
+  statsTurn();
+  const w = g.winner, el = $('#over'), col = w >= 0 ? (teamColors[w] != null ? COLORS[teamColors[w]].hex : TEAM[w].band) : '#5fb8e8';
+  el.style.setProperty('--team', col); el.classList.toggle('end-draw', w < 0);
+  const title = w === -1 ? 'THE POND WINS' : `${TEAM[w].name} WINS!`;
+  $('#over-title').textContent = title; $('#over-title').dataset.text = title;
+  const alive = w >= 0 ? g.frogs.filter(f => f.alive && f.team === w) : [];
+  $('#over-text').textContent = w >= 0 ? (alive.length === 1 ? `${alive[0].name} is the last frog standing.` : `${alive.length} frogs still standing. ${TEAM[w].name} claim the pond.`) : 'Everybody ended up in the water.';
+  const rows = Object.values(stats.frogs), mvp = rows.slice().sort((a, b) => b.dealt + b.kos * 25 - (a.dealt + a.kos * 25))[0];
+  const team = t => rows.filter(r => r.team === t).reduce((n, r) => n + r.dealt, 0), t0 = team(0), t1 = team(1), tot = Math.max(1, t0 + t1);
+  const secs = Math.round((performance.now() - stats.started) / 1000), time = Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
+  const bestW = stats.best?.weapon && WEAPONS[stats.best.weapon] ? ' · ' + (WEAPONS[stats.best.weapon].short || WEAPONS[stats.best.weapon].name) : '';
+  const card = (label, big, small = '') => `<div class="end-card"><span>${label}</span><b>${big}</b><small>${small}</small></div>`;
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  $('#end-stats').innerHTML =
+    card('MVP', mvp && mvp.dealt ? esc(mvp.name) : '—', mvp && mvp.dealt ? `${mvp.dealt} damage · ${mvp.kos} KO` : 'nobody landed a hit') +
+    card('BEST SHOT', stats.best ? stats.best.dmg + ' HP' : '—', stats.best ? esc(stats.best.name) + bestW : '') +
+    card('KNOCKOUTS', String(g.frogs.filter(f => !f.alive).length), `in ${stats.turns} turn${stats.turns === 1 ? "" : "s"} · ${time}`) +
+    `<div class="end-card end-bar"><span>DAMAGE</span><div class="bar"><i></i><i></i></div><small>${TEAM[0].name} ${t0} · ${t1} ${TEAM[1].name}</small></div>`;
+  // the page's CSP blocks style="" in markup, so the bar widths are set through the CSSOM
+  $('#end-stats').querySelectorAll('.bar i').forEach((bar, t) => { bar.style.setProperty('--w', ((t ? t1 : t0) / tot * 100).toFixed(1) + '%'); bar.style.setProperty('--c', COLORS[teamColors[t]]?.hex || TEAM[t].band); });
+  endConfetti(w >= 0 ? col : '#9fe3ff');
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  el.hidden = false; status('Game over.'); endCrew(alive, w);
   $('#again').disabled = !!net && !net.host; $('#again').textContent = net && !net.host ? 'The host starts the rematch' : 'Play again';
 }
 
+function endConfetti(col) {
+  const box = $('#end-confetti'); box.replaceChildren(); if (reduce) return;
+  for (let i = 0; i < 70; i++) { const c = document.createElement('i'); c.style.cssText = `left:${Math.random() * 100}%;--d:${2.6 + Math.random() * 2.4}s;--w:${(Math.random() * 1.8).toFixed(2)}s;--r:${Math.round(Math.random() * 720 - 360)}deg;background:${[col, '#ffe14d', '#fff6d8', col, '#ff9a1f'][i % 5]}`; box.append(c); }
+}
+let endRaf = 0;
+// Winners do the victory dance: the pixel v06 clip when it is loaded, the portrait art otherwise.
+function endCrew(frogs, w) {
+  cancelAnimationFrame(endRaf);
+  const c = $('#end-crew'), x = c.getContext('2d'), t0 = performance.now();
+  const loop = now => {
+    if ($('#over').hidden) return;
+    const t = (now - t0) / 1000; x.clearRect(0, 0, c.width, c.height); x.imageSmoothingEnabled = false;
+    if (w < 0) { x.fillStyle = '#2b7fb8'; x.beginPath(); x.moveTo(0, 150); for (let i = 0; i <= c.width; i += 12) x.lineTo(i, 150 + Math.sin(i * .04 + t * 3) * 6); x.lineTo(c.width, 190); x.lineTo(0, 190); x.fill(); }
+    const n = frogs.length, gap = Math.min(150, c.width / Math.max(1, n));
+    frogs.forEach((f, i) => {
+      const cx = c.width / 2 + (i - (n - 1) / 2) * gap, delay = .25 + i * .18, k = Math.min(1, Math.max(0, (t - delay) * 3)); if (!k) return;
+      const hop = reduce ? 0 : Math.abs(Math.sin((t - delay) * 4 + i)) * 14;
+      x.save(); x.translate(cx, 182 - hop); x.globalAlpha = k;
+      x.fillStyle = '#0006'; x.beginPath(); x.ellipse(0, hop, 34 - hop, 7, 0, 0, 7); x.fill();
+      const choice = teamPlayers[f.team][Math.floor(f.id / 2)] ?? 0;
+      if (pixelPreview && pixelAssets && choice === PIXEL_PLAYER) {
+        const frame = spriteFrame(pixelAssets.manifest, 'victory', reduce ? 0 : t - delay), q = frameGeometry(frame), h = pixelHelmet(frame, pixelAssets.imageKey);
+        x.scale(1.45 * (i % 2 ? -1 : 1), 1.45); x.drawImage(pixelAssets.image, q.sx, q.sy, q.sw, q.sh, q.x, q.y, q.width, q.height);
+        x.drawImage(pixelAssets.helmet, ...h.rect, h.x, h.y, h.width, h.height);
+      } else { const img = playerArt[choice]; if (img?.naturalWidth) { const p = PLAYERS[choice], [sx, sy, sw, sh] = p.rect || [0, 0, img.naturalWidth, img.naturalHeight], hh = 120, ww = hh * sw / sh; x.drawImage(img, sx, sy, sw, sh, -ww / 2, -hh, ww, hh); } }
+      x.restore();
+      x.font = 'bold 15px Tahoma, Verdana, sans-serif'; x.textAlign = 'center'; x.fillStyle = '#000'; x.fillText(f.name, cx + 1, 46 + 1); x.fillStyle = '#fff0bd'; x.fillText(f.name, cx, 46);
+    });
+    endRaf = requestAnimationFrame(loop);
+  };
+  endRaf = requestAnimationFrame(loop);
+}
 // ---------- start ----------
 // What both devices need to build the same match. Names, colors and characters are only looks.
 function readPacks() {
@@ -742,7 +811,7 @@ function start() {
 }
 function launch() {
   animator.reset(); helmets.restore(g);weaponFX=[];resetSteering();
-  zoom=1;camL=camT=0;camFollow=true;if(touchUI.matches)setZoom(1.8);uiFor();paused=false;$('#pause').textContent='Pause';acc=0;pending=[];remoteP=0;clearCharge();held.l=held.r=held.u=0;mountExpansion(g.packs);paintGround();events();hud();
+  statsReset();zoom=1;camL=camT=0;camFollow=true;if(touchUI.matches)setZoom(1.8);uiFor();paused=false;$('#pause').textContent='Pause';acc=0;pending=[];remoteP=0;clearCharge();held.l=held.r=held.u=0;mountExpansion(g.packs);paintGround();events();hud();
   $('#menu').hidden = true; $('#over').hidden = true; cv.focus({ preventScroll: true });
 }
 // One step of this device's input: held keys and buttons as bits, plus the queued actions.
