@@ -1,0 +1,2015 @@
+{
+  "validation_version": "1.0",
+  "grid_native": [
+    64,
+    64
+  ],
+  "export_frames": [
+    128,
+    128
+  ],
+  "reference_frog": "wzor_zaba_v06.png",
+  "reference_quality": "wzor_jakosc_kilof_v14.png",
+  "summary": {
+    "assets": 17,
+    "passed": 17,
+    "frames_total": 118
+  },
+  "assets": {
+    "grenade_flight.png": {
+      "frames": 8,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        1024,
+        128
+      ],
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        65.71,
+        67.41
+      ],
+      "frame_alpha_centers": [
+        [
+          65.37,
+          66.51
+        ],
+        [
+          65.39,
+          66.53
+        ],
+        [
+          65.48,
+          66.38
+        ],
+        [
+          65.33,
+          66.64
+        ],
+        [
+          65.44,
+          66.4
+        ],
+        [
+          65.4,
+          66.54
+        ],
+        [
+          65.37,
+          66.51
+        ],
+        [
+          65.39,
+          66.53
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          30,
+          20,
+          100,
+          106
+        ],
+        [
+          30,
+          20,
+          100,
+          106
+        ],
+        [
+          30,
+          20,
+          100,
+          106
+        ],
+        [
+          30,
+          22,
+          100,
+          106
+        ],
+        [
+          30,
+          18,
+          100,
+          106
+        ],
+        [
+          30,
+          22,
+          100,
+          106
+        ],
+        [
+          30,
+          20,
+          100,
+          106
+        ],
+        [
+          30,
+          20,
+          100,
+          106
+        ]
+      ],
+      "colors_per_frame": [
+        43,
+        43,
+        43,
+        43,
+        43,
+        43,
+        43,
+        43
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "bazooka_rocket_flight.png": {
+      "frames": 6,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        768,
+        128
+      ],
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        66.18,
+        65.09
+      ],
+      "frame_alpha_centers": [
+        [
+          63.39,
+          64.17
+        ],
+        [
+          62.78,
+          64.44
+        ],
+        [
+          60.93,
+          64.2
+        ],
+        [
+          64.19,
+          64.6
+        ],
+        [
+          62.02,
+          64.03
+        ],
+        [
+          61.65,
+          64.61
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          14,
+          36,
+          116,
+          90
+        ],
+        [
+          12,
+          40,
+          116,
+          90
+        ],
+        [
+          8,
+          36,
+          116,
+          90
+        ],
+        [
+          16,
+          40,
+          116,
+          90
+        ],
+        [
+          12,
+          36,
+          116,
+          90
+        ],
+        [
+          8,
+          40,
+          116,
+          90
+        ]
+      ],
+      "colors_per_frame": [
+        15,
+        16,
+        17,
+        14,
+        17,
+        16
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "cluster_grenade_flight.png": {
+      "frames": 8,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        1024,
+        128
+      ],
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        62.7,
+        66.61
+      ],
+      "frame_alpha_centers": [
+        [
+          62.2,
+          66.11
+        ],
+        [
+          62.2,
+          66.11
+        ],
+        [
+          62.2,
+          66.11
+        ],
+        [
+          62.2,
+          66.11
+        ],
+        [
+          62.2,
+          66.11
+        ],
+        [
+          62.2,
+          66.11
+        ],
+        [
+          62.2,
+          66.11
+        ],
+        [
+          62.2,
+          66.11
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          30,
+          26,
+          98,
+          106
+        ],
+        [
+          30,
+          26,
+          98,
+          106
+        ],
+        [
+          30,
+          26,
+          98,
+          106
+        ],
+        [
+          30,
+          26,
+          98,
+          106
+        ],
+        [
+          30,
+          26,
+          98,
+          106
+        ],
+        [
+          30,
+          26,
+          98,
+          106
+        ],
+        [
+          30,
+          26,
+          98,
+          106
+        ],
+        [
+          30,
+          26,
+          98,
+          106
+        ]
+      ],
+      "colors_per_frame": [
+        46,
+        48,
+        46,
+        46,
+        46,
+        48,
+        46,
+        46
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "cluster_fragment_flight.png": {
+      "frames": 6,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        768,
+        128
+      ],
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        65.17,
+        65.0
+      ],
+      "frame_alpha_centers": [
+        [
+          60.07,
+          64.49
+        ],
+        [
+          58.01,
+          64.56
+        ],
+        [
+          55.68,
+          64.52
+        ],
+        [
+          60.25,
+          64.56
+        ],
+        [
+          57.87,
+          64.49
+        ],
+        [
+          55.8,
+          64.58
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          26,
+          50,
+          86,
+          76
+        ],
+        [
+          30,
+          54,
+          86,
+          76
+        ],
+        [
+          26,
+          50,
+          86,
+          78
+        ],
+        [
+          34,
+          54,
+          86,
+          76
+        ],
+        [
+          26,
+          50,
+          86,
+          76
+        ],
+        [
+          26,
+          52,
+          86,
+          78
+        ]
+      ],
+      "colors_per_frame": [
+        9,
+        9,
+        9,
+        8,
+        9,
+        9
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "golden_foot_flight.png": {
+      "frames": 8,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        1024,
+        128
+      ],
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        63.07,
+        62.07
+      ],
+      "frame_alpha_centers": [
+        [
+          62.57,
+          61.57
+        ],
+        [
+          62.57,
+          61.57
+        ],
+        [
+          62.57,
+          61.57
+        ],
+        [
+          62.57,
+          61.57
+        ],
+        [
+          62.57,
+          61.57
+        ],
+        [
+          62.57,
+          61.57
+        ],
+        [
+          62.57,
+          61.57
+        ],
+        [
+          62.57,
+          61.57
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          28,
+          24,
+          100,
+          104
+        ],
+        [
+          28,
+          24,
+          100,
+          104
+        ],
+        [
+          28,
+          24,
+          100,
+          104
+        ],
+        [
+          28,
+          24,
+          100,
+          104
+        ],
+        [
+          28,
+          24,
+          100,
+          104
+        ],
+        [
+          28,
+          24,
+          100,
+          104
+        ],
+        [
+          28,
+          24,
+          100,
+          104
+        ],
+        [
+          28,
+          24,
+          100,
+          104
+        ]
+      ],
+      "colors_per_frame": [
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "golden_toe_flight.png": {
+      "frames": 6,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        768,
+        128
+      ],
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        66.0,
+        68.0
+      ],
+      "frame_alpha_centers": [
+        [
+          65.5,
+          67.5
+        ],
+        [
+          65.5,
+          67.5
+        ],
+        [
+          65.5,
+          67.5
+        ],
+        [
+          65.5,
+          67.5
+        ],
+        [
+          65.5,
+          67.5
+        ],
+        [
+          65.5,
+          67.5
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          46,
+          54,
+          86,
+          82
+        ],
+        [
+          46,
+          54,
+          86,
+          82
+        ],
+        [
+          46,
+          54,
+          86,
+          82
+        ],
+        [
+          46,
+          54,
+          86,
+          82
+        ],
+        [
+          46,
+          54,
+          86,
+          82
+        ],
+        [
+          46,
+          54,
+          86,
+          82
+        ]
+      ],
+      "colors_per_frame": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "revolver_bullet_flight.png": {
+      "frames": 6,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        768,
+        128
+      ],
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        70.43,
+        65.0
+      ],
+      "frame_alpha_centers": [
+        [
+          66.02,
+          64.49
+        ],
+        [
+          66.86,
+          64.48
+        ],
+        [
+          66.29,
+          64.5
+        ],
+        [
+          67.01,
+          64.48
+        ],
+        [
+          66.07,
+          64.49
+        ],
+        [
+          66.99,
+          64.49
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          14,
+          50,
+          100,
+          76
+        ],
+        [
+          14,
+          50,
+          100,
+          76
+        ],
+        [
+          16,
+          50,
+          100,
+          76
+        ],
+        [
+          18,
+          50,
+          100,
+          76
+        ],
+        [
+          14,
+          50,
+          100,
+          76
+        ],
+        [
+          14,
+          50,
+          100,
+          76
+        ]
+      ],
+      "colors_per_frame": [
+        11,
+        9,
+        11,
+        9,
+        11,
+        9
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "arrow_flight.png": {
+      "frames": 6,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        768,
+        128
+      ],
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        60.86,
+        65.35
+      ],
+      "frame_alpha_centers": [
+        [
+          59.94,
+          64.85
+        ],
+        [
+          59.93,
+          64.87
+        ],
+        [
+          60.25,
+          64.84
+        ],
+        [
+          59.77,
+          64.87
+        ],
+        [
+          60.1,
+          64.85
+        ],
+        [
+          60.08,
+          64.86
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          16,
+          48,
+          116,
+          82
+        ],
+        [
+          18,
+          48,
+          116,
+          82
+        ],
+        [
+          18,
+          48,
+          116,
+          82
+        ],
+        [
+          16,
+          48,
+          116,
+          82
+        ],
+        [
+          18,
+          48,
+          116,
+          82
+        ],
+        [
+          18,
+          48,
+          116,
+          82
+        ]
+      ],
+      "colors_per_frame": [
+        8,
+        7,
+        8,
+        7,
+        8,
+        7
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "drill_missile_flight.png": {
+      "frames": 8,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        1024,
+        128
+      ],
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        67.36,
+        64.96
+      ],
+      "frame_alpha_centers": [
+        [
+          65.38,
+          64.48
+        ],
+        [
+          64.25,
+          64.48
+        ],
+        [
+          62.85,
+          64.49
+        ],
+        [
+          65.38,
+          64.48
+        ],
+        [
+          64.25,
+          64.48
+        ],
+        [
+          62.85,
+          64.49
+        ],
+        [
+          65.38,
+          64.48
+        ],
+        [
+          64.25,
+          64.48
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          16,
+          40,
+          116,
+          90
+        ],
+        [
+          12,
+          40,
+          116,
+          90
+        ],
+        [
+          8,
+          40,
+          116,
+          90
+        ],
+        [
+          16,
+          40,
+          116,
+          90
+        ],
+        [
+          12,
+          40,
+          116,
+          90
+        ],
+        [
+          8,
+          40,
+          116,
+          90
+        ],
+        [
+          16,
+          40,
+          116,
+          90
+        ],
+        [
+          12,
+          40,
+          116,
+          90
+        ]
+      ],
+      "colors_per_frame": [
+        10,
+        11,
+        12,
+        10,
+        11,
+        12,
+        10,
+        11
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "red_candles_fall.png": {
+      "frames": 6,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        768,
+        128
+      ],
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        65.0,
+        66.64
+      ],
+      "frame_alpha_centers": [
+        [
+          64.49,
+          64.55
+        ],
+        [
+          64.46,
+          64.44
+        ],
+        [
+          64.47,
+          63.86
+        ],
+        [
+          64.47,
+          64.68
+        ],
+        [
+          64.48,
+          64.32
+        ],
+        [
+          64.45,
+          63.98
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          50,
+          14,
+          80,
+          114
+        ],
+        [
+          50,
+          16,
+          80,
+          114
+        ],
+        [
+          50,
+          14,
+          80,
+          114
+        ],
+        [
+          50,
+          18,
+          80,
+          114
+        ],
+        [
+          50,
+          14,
+          80,
+          114
+        ],
+        [
+          50,
+          14,
+          80,
+          114
+        ]
+      ],
+      "colors_per_frame": [
+        11,
+        10,
+        11,
+        10,
+        11,
+        10
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "dynamite_lit.png": {
+      "frames": 8,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        1024,
+        128
+      ],
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        96
+      ],
+      "core_center": [
+        67.14,
+        76.26
+      ],
+      "frame_alpha_centers": [
+        [
+          67.4,
+          74.88
+        ],
+        [
+          67.62,
+          74.57
+        ],
+        [
+          67.35,
+          74.93
+        ],
+        [
+          67.52,
+          74.73
+        ],
+        [
+          67.5,
+          74.72
+        ],
+        [
+          67.47,
+          74.78
+        ],
+        [
+          67.4,
+          74.88
+        ],
+        [
+          67.62,
+          74.57
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          28,
+          34,
+          108,
+          98
+        ],
+        [
+          28,
+          30,
+          108,
+          98
+        ],
+        [
+          28,
+          34,
+          104,
+          98
+        ],
+        [
+          28,
+          32,
+          108,
+          98
+        ],
+        [
+          28,
+          32,
+          106,
+          98
+        ],
+        [
+          28,
+          32,
+          106,
+          98
+        ],
+        [
+          28,
+          34,
+          108,
+          98
+        ],
+        [
+          28,
+          30,
+          108,
+          98
+        ]
+      ],
+      "colors_per_frame": [
+        13,
+        14,
+        13,
+        13,
+        14,
+        13,
+        13,
+        14
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "landmine_armed.png": {
+      "frames": 6,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        768,
+        128
+      ],
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        96
+      ],
+      "core_center": [
+        65.0,
+        71.88
+      ],
+      "frame_alpha_centers": [
+        [
+          64.5,
+          71.33
+        ],
+        [
+          64.5,
+          71.38
+        ],
+        [
+          64.5,
+          71.33
+        ],
+        [
+          64.5,
+          71.38
+        ],
+        [
+          64.5,
+          71.38
+        ],
+        [
+          64.5,
+          71.38
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          34,
+          42,
+          96,
+          96
+        ],
+        [
+          34,
+          44,
+          96,
+          96
+        ],
+        [
+          34,
+          42,
+          96,
+          96
+        ],
+        [
+          34,
+          44,
+          96,
+          96
+        ],
+        [
+          34,
+          44,
+          96,
+          96
+        ],
+        [
+          34,
+          44,
+          96,
+          96
+        ]
+      ],
+      "colors_per_frame": [
+        38,
+        36,
+        38,
+        36,
+        36,
+        36
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "jetpack_flames.png": {
+      "frames": 6,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        768,
+        128
+      ],
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        64.93,
+        54.24
+      ],
+      "frame_alpha_centers": [
+        [
+          65.7,
+          58.34
+        ],
+        [
+          64.08,
+          57.13
+        ],
+        [
+          63.97,
+          59.89
+        ],
+        [
+          64.7,
+          56.87
+        ],
+        [
+          63.56,
+          57.37
+        ],
+        [
+          64.53,
+          57.54
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          26,
+          22,
+          104,
+          110
+        ],
+        [
+          26,
+          22,
+          104,
+          104
+        ],
+        [
+          26,
+          22,
+          104,
+          110
+        ],
+        [
+          26,
+          22,
+          104,
+          102
+        ],
+        [
+          26,
+          22,
+          104,
+          110
+        ],
+        [
+          26,
+          22,
+          104,
+          104
+        ]
+      ],
+      "colors_per_frame": [
+        46,
+        46,
+        46,
+        46,
+        46,
+        46
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "mega_golden_foot_flight.png": {
+      "frames": 8,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        1024,
+        128
+      ],
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        65.36,
+        65.84
+      ],
+      "frame_alpha_centers": [
+        [
+          64.86,
+          65.34
+        ],
+        [
+          64.86,
+          65.34
+        ],
+        [
+          64.86,
+          65.34
+        ],
+        [
+          64.86,
+          65.34
+        ],
+        [
+          64.86,
+          65.34
+        ],
+        [
+          64.86,
+          65.34
+        ],
+        [
+          64.86,
+          65.34
+        ],
+        [
+          64.86,
+          65.34
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          18,
+          16,
+          110,
+          114
+        ],
+        [
+          18,
+          16,
+          110,
+          114
+        ],
+        [
+          18,
+          16,
+          110,
+          114
+        ],
+        [
+          18,
+          16,
+          110,
+          114
+        ],
+        [
+          18,
+          16,
+          110,
+          114
+        ],
+        [
+          18,
+          16,
+          110,
+          114
+        ],
+        [
+          18,
+          16,
+          110,
+          114
+        ],
+        [
+          18,
+          16,
+          110,
+          114
+        ]
+      ],
+      "colors_per_frame": [
+        38,
+        38,
+        38,
+        38,
+        38,
+        38,
+        38,
+        38
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "mega_toe_flight.png": {
+      "frames": 6,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        768,
+        128
+      ],
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        65.21,
+        66.72
+      ],
+      "frame_alpha_centers": [
+        [
+          64.71,
+          66.22
+        ],
+        [
+          64.71,
+          66.22
+        ],
+        [
+          64.71,
+          66.22
+        ],
+        [
+          64.71,
+          66.22
+        ],
+        [
+          64.71,
+          66.22
+        ],
+        [
+          64.71,
+          66.22
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          40,
+          50,
+          92,
+          84
+        ],
+        [
+          40,
+          50,
+          92,
+          84
+        ],
+        [
+          40,
+          50,
+          92,
+          84
+        ],
+        [
+          40,
+          50,
+          92,
+          84
+        ],
+        [
+          40,
+          50,
+          92,
+          84
+        ],
+        [
+          40,
+          50,
+          92,
+          84
+        ]
+      ],
+      "colors_per_frame": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "bell_bomb_flight.png": {
+      "frames": 8,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        1024,
+        128
+      ],
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "core_center": [
+        64.3,
+        67.98
+      ],
+      "frame_alpha_centers": [
+        [
+          63.8,
+          67.48
+        ],
+        [
+          63.86,
+          67.41
+        ],
+        [
+          63.8,
+          67.48
+        ],
+        [
+          63.83,
+          67.44
+        ],
+        [
+          63.8,
+          67.48
+        ],
+        [
+          63.83,
+          67.44
+        ],
+        [
+          63.8,
+          67.48
+        ],
+        [
+          63.86,
+          67.41
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          30,
+          22,
+          98,
+          106
+        ],
+        [
+          30,
+          22,
+          98,
+          106
+        ],
+        [
+          30,
+          22,
+          98,
+          106
+        ],
+        [
+          30,
+          22,
+          98,
+          106
+        ],
+        [
+          30,
+          22,
+          98,
+          106
+        ],
+        [
+          30,
+          22,
+          98,
+          106
+        ],
+        [
+          30,
+          22,
+          98,
+          106
+        ],
+        [
+          30,
+          22,
+          98,
+          106
+        ]
+      ],
+      "colors_per_frame": [
+        45,
+        45,
+        45,
+        45,
+        44,
+        45,
+        45,
+        45
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    },
+    "frog_mine_arming.png": {
+      "frames": 8,
+      "frame_size": [
+        128,
+        128
+      ],
+      "atlas_size": [
+        1024,
+        128
+      ],
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        96
+      ],
+      "core_center": [
+        65.48,
+        69.25
+      ],
+      "frame_alpha_centers": [
+        [
+          64.98,
+          68.75
+        ],
+        [
+          64.98,
+          68.75
+        ],
+        [
+          64.98,
+          68.75
+        ],
+        [
+          64.98,
+          68.75
+        ],
+        [
+          64.98,
+          68.75
+        ],
+        [
+          64.98,
+          68.75
+        ],
+        [
+          64.98,
+          68.75
+        ],
+        [
+          64.98,
+          68.75
+        ]
+      ],
+      "frame_bboxes": [
+        [
+          28,
+          36,
+          102,
+          98
+        ],
+        [
+          28,
+          36,
+          102,
+          98
+        ],
+        [
+          28,
+          36,
+          102,
+          98
+        ],
+        [
+          28,
+          36,
+          102,
+          98
+        ],
+        [
+          28,
+          36,
+          102,
+          98
+        ],
+        [
+          28,
+          36,
+          102,
+          98
+        ],
+        [
+          28,
+          36,
+          102,
+          98
+        ],
+        [
+          28,
+          36,
+          102,
+          98
+        ]
+      ],
+      "colors_per_frame": [
+        41,
+        41,
+        42,
+        41,
+        42,
+        41,
+        43,
+        41
+      ],
+      "checks": {
+        "dimensions": true,
+        "rgba": true,
+        "frame_count": true,
+        "transparent_background": true,
+        "margin_min_8px": true,
+        "grid_2x2": true,
+        "no_antialiasing": true,
+        "core_position_locked": true,
+        "core_anchor_distance_acceptable": true,
+        "valid": true
+      },
+      "errors": [],
+      "passed": true
+    }
+  }
+}

@@ -100,7 +100,7 @@ fetch('art/arsenal-polish/manifest.json?v=20261112v11').then(r=>r.json()).then(m
     if(!validateClip(c))throw new Error('Invalid weapon clip: '+id+'/'+role);
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
   }
-}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v15')).then(r=>r.json()).then(manifest=>{
+}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v15f')).then(r=>r.json()).then(manifest=>{
   // v13: pixel art for every weapon (flight, held, explosions). It overrides older clips of the same role.
   for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(validateClip(c)){
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});

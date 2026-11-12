@@ -1,0 +1,342 @@
+{
+  "sprites/grenade_flight.png": {
+    "src": "sprites/grenade_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "rows": 1,
+    "frames": 8,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      1024,
+      128
+    ]
+  },
+  "sprites/bazooka_rocket_flight.png": {
+    "src": "sprites/bazooka_rocket_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "rows": 1,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      768,
+      128
+    ]
+  },
+  "sprites/cluster_grenade_flight.png": {
+    "src": "sprites/cluster_grenade_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "rows": 1,
+    "frames": 8,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      1024,
+      128
+    ]
+  },
+  "sprites/cluster_fragment_flight.png": {
+    "src": "sprites/cluster_fragment_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "rows": 1,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      768,
+      128
+    ]
+  },
+  "sprites/golden_foot_flight.png": {
+    "src": "sprites/golden_foot_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "rows": 1,
+    "frames": 8,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      1024,
+      128
+    ]
+  },
+  "sprites/golden_toe_flight.png": {
+    "src": "sprites/golden_toe_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "rows": 1,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      768,
+      128
+    ]
+  },
+  "sprites/revolver_bullet_flight.png": {
+    "src": "sprites/revolver_bullet_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "rows": 1,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      768,
+      128
+    ]
+  },
+  "sprites/arrow_flight.png": {
+    "src": "sprites/arrow_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "rows": 1,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      768,
+      128
+    ]
+  },
+  "sprites/drill_missile_flight.png": {
+    "src": "sprites/drill_missile_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "rows": 1,
+    "frames": 8,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      1024,
+      128
+    ]
+  },
+  "sprites/red_candles_fall.png": {
+    "src": "sprites/red_candles_fall.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "rows": 1,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      768,
+      128
+    ]
+  },
+  "sprites/dynamite_lit.png": {
+    "src": "sprites/dynamite_lit.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "rows": 1,
+    "frames": 8,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+      64,
+      96
+    ],
+    "size": [
+      1024,
+      128
+    ]
+  },
+  "sprites/landmine_armed.png": {
+    "src": "sprites/landmine_armed.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "rows": 1,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+      64,
+      96
+    ],
+    "size": [
+      768,
+      128
+    ]
+  },
+  "sprites/jetpack_flames.png": {
+    "src": "sprites/jetpack_flames.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "rows": 1,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      768,
+      128
+    ]
+  },
+  "sprites/mega_golden_foot_flight.png": {
+    "src": "sprites/mega_golden_foot_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "rows": 1,
+    "frames": 8,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      1024,
+      128
+    ]
+  },
+  "sprites/mega_toe_flight.png": {
+    "src": "sprites/mega_toe_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 6,
+    "rows": 1,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      768,
+      128
+    ]
+  },
+  "sprites/bell_bomb_flight.png": {
+    "src": "sprites/bell_bomb_flight.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "rows": 1,
+    "frames": 8,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+      64,
+      64
+    ],
+    "size": [
+      1024,
+      128
+    ]
+  },
+  "sprites/frog_mine_arming.png": {
+    "src": "sprites/frog_mine_arming.png",
+    "frame": [
+      128,
+      128
+    ],
+    "columns": 8,
+    "rows": 1,
+    "frames": 8,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+      64,
+      96
+    ],
+    "size": [
+      1024,
+      128
+    ]
+  }
+}
