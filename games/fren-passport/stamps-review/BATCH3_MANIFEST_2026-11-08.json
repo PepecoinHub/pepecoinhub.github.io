@@ -1,0 +1,69 @@
+{
+  "version": 3,
+  "batch": 3,
+  "source_spec_pr": 231,
+  "art_pr": 233,
+  "created": "2026-11-08",
+  "status": "WIP_only",
+  "reference_approved": [
+    "frog_of_the_week",
+    "moonwalker"
+  ],
+  "assets": [
+    {
+      "id": "i_voted",
+      "label": "I Voted",
+      "source_file": "games/fren-passport/stamps-review/art-v3-batch3-wip/i_voted.png",
+      "git_blob_sha": "3a32a408e80bac26dc4a7111eefd65f3b83d5178",
+      "native_dimensions": [
+        384,
+        342
+      ],
+      "transparent_background": true,
+      "owner_approved": false,
+      "production_ready": false,
+      "expected_background": "yellow #FDD236",
+      "corrections": "Change purple bg to yellow; add round check-mark chest sticker; ballot-box scene already communicates voting"
+    },
+    {
+      "id": "top_ten",
+      "label": "Top 10",
+      "source_file": "games/fren-passport/stamps-review/art-v3-batch3-wip/top_ten.png",
+      "git_blob_sha": "9861f72d5961936d8809cb5994f3733e38de7873",
+      "native_dimensions": [
+        384,
+        344
+      ],
+      "transparent_background": true,
+      "owner_approved": false,
+      "production_ready": false,
+      "expected_background": "light green #9FD480",
+      "corrections": "Replace trophy/ranked list with Win98 list showing highlighted green row and gold star; ribbon with 10"
+    },
+    {
+      "id": "bug_hunter",
+      "label": "Bug Hunter",
+      "source_file": "games/fren-passport/stamps-review/art-v3-batch3-wip/bug_hunter.png",
+      "git_blob_sha": "02fb22e56fdde7c0aee08fa43a8489299b6f52a5",
+      "native_dimensions": [
+        384,
+        344
+      ],
+      "transparent_background": true,
+      "owner_approved": false,
+      "production_ready": false,
+      "expected_background": "yellow #FDD236",
+      "corrections": "Draw explorer catching cartoon bug marked ! using butterfly net; beige CRT with small Win98 error popup"
+    }
+  ],
+  "preview": "games/fren-passport/stamps-review/art-v3-batch3-review.png",
+  "technical_quality": {
+    "individual_files": 3,
+    "source_at_least_900px": false,
+    "browser_verified": false,
+    "backend_changes": false,
+    "avatar_changes": false,
+    "original_Lily_files_changed": false
+  },
+  "note": "Art is a thematic sketch extracted from multi-stamp generated sheets. Name I Voted was precisely corrected with typographic overlay. No claim of full-resolution, finished illustration."
+}
