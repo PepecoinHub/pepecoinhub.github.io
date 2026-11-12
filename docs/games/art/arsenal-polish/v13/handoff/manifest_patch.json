@@ -1,0 +1,135 @@
+{
+  "version": "13",
+  "weapons": {
+    "donkey": {
+      "explosion": {
+        "src": "art/arsenal-polish/v13/effects/donkey_impact_v13_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 14,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          178,
+          178
+        ],
+        "reducedFrame": 4
+      },
+      "activation": {
+        "src": "art/arsenal-polish/v13/effects/donkey_warning_v13_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 8,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          70,
+          70
+        ],
+        "reducedFrame": 0
+      }
+    },
+    "doge": {
+      "explosion": {
+        "src": "art/arsenal-polish/v13/effects/doge_blast_v13_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 14,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          108,
+          108
+        ],
+        "reducedFrame": 3
+      }
+    },
+    "moon": {
+      "explosion": {
+        "src": "art/arsenal-polish/v13/effects/moon_impact_v13_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 14,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          94,
+          94
+        ],
+        "reducedFrame": 2
+      }
+    },
+    "pep": {
+      "explosion": {
+        "src": "art/arsenal-polish/v13/effects/pep_impact_v13_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 12,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          40,
+          40
+        ],
+        "reducedFrame": 2
+      }
+    },
+    "ban": {
+      "activation": {
+        "src": "art/arsenal-polish/v13/effects/ban_impact_v13_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 12,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          65,
+          65
+        ],
+        "reducedFrame": 2
+      }
+    }
+  }
+}

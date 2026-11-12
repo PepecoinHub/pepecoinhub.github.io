@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "status": "Phase2 v11 art clips attached for QA; not production approved",
+  "version": "13",
+  "status": "FX v13, Donkey flight v12 and other flight v11 attached for QA; not production approved",
   "weapons": {
     "goldv2": {
       "flight": null,
@@ -98,11 +98,49 @@
         "rotationOffset": 0.7853981633974483
       },
       "activation": null,
-      "explosion": null
+      "explosion": {
+        "src": "art/arsenal-polish/v13/effects/moon_impact_v13_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 14,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          94,
+          94
+        ],
+        "reducedFrame": 2
+      }
     },
     "ban": {
       "flight": null,
-      "activation": null,
+      "activation": {
+        "src": "art/arsenal-polish/v13/effects/ban_impact_v13_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 12,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          65,
+          65
+        ],
+        "reducedFrame": 2
+      },
       "explosion": null
     },
     "rain": {
@@ -131,7 +169,26 @@
         ]
       },
       "activation": null,
-      "explosion": null
+      "explosion": {
+        "src": "art/arsenal-polish/v13/effects/pep_impact_v13_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 12,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          40,
+          40
+        ],
+        "reducedFrame": 2
+      }
     },
     "doge": {
       "flight": {
@@ -155,7 +212,7 @@
       },
       "activation": null,
       "explosion": {
-        "src": "art/arsenal-polish/v11/effects/doge_blast_atlas.png",
+        "src": "art/arsenal-polish/v13/effects/doge_blast_v13_atlas.png",
         "frame": [
           128,
           128
@@ -172,7 +229,7 @@
           108,
           108
         ],
-        "reducedFrame": 4
+        "reducedFrame": 3
       }
     },
     "donkey": {
@@ -195,9 +252,28 @@
           52
         ]
       },
-      "activation": null,
+      "activation": {
+        "src": "art/arsenal-polish/v13/effects/donkey_warning_v13_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 8,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          70,
+          70
+        ],
+        "reducedFrame": 0
+      },
       "explosion": {
-        "src": "art/arsenal-polish/v11/effects/donkey_impact_atlas.png",
+        "src": "art/arsenal-polish/v13/effects/donkey_impact_v13_atlas.png",
         "frame": [
           128,
           128

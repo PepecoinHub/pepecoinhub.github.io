@@ -14,7 +14,7 @@ with sync_playwright() as p:
   page.route('**/pondwars-beta.mjs?*',lambda r:r.fulfill(body=SOURCE+HOOK,content_type='text/javascript'))
   page.goto('http://127.0.0.1:8000/games/pondwars-beta.html?art=pixel-v06&packs=all&maps=all&net='+role+'&room=polish-doge-reconnect',wait_until='networkidle')
   page.locator('#title').click();page.wait_for_timeout(200)
-  page.evaluate("async()=>window.__netlib=await import('/games/js/pondwars-beta-net.mjs?v=20261112polish')")
+  page.evaluate("async()=>window.__netlib=await import('/games/js/pondwars-beta-net.mjs?v=20261112v13')")
   return page
  host=open_tab('host');guest=open_tab('join');host.locator('#go').click()
  host.wait_for_function('window.__qa.game');guest.wait_for_function('window.__qa.game')

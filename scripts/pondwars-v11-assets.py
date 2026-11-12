@@ -22,4 +22,4 @@ for name,expected in source.items():
  if clips:
   w,role,c=clips[0];row.update(weapon=w,role=role,worldSize=c['size'],visibleMaxWorld=[round(max(b[2]-b[0] for b in boxes)*c['size'][0]/fw,2),round(max(b[3]-b[1] for b in boxes)*c['size'][1]/fh,2)],anchor=c['anchor'])
  rows.append(row)
-print(json.dumps({'originalPNGs':7,'runtimeRoles':6,'rows':rows},indent=2))
+print(json.dumps({'originalPNGs':7,'runtimeRoles':sum(c is not None for roles in manifest['weapons'].values() for c in roles.values()),'rows':rows},indent=2))
