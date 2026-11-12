@@ -63,14 +63,20 @@ const playerArt=PLAYERS.map(p=>{const img=new Image();img.src=p.src;return img;}
 const teamPlayers=pixelPreview ? [Array(4).fill(PIXEL_PLAYER),Array(4).fill(PIXEL_PLAYER)] : [[0,1,2,3],[4,5,6,0]];
 const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite','drill','candles','rope','jetpack','teleport'].map(w=>{const img=new Image();img.src='img/pondwars/'+w+'.svg';return[w,img];}));
 // v11 clips remain opt-in playtest art; simulation and HUD keep separate assets.
-const weaponClips=new Map(), flightArt={};
+const weaponClips=new Map(), flightArt={}, heldArt={};
 for(const [id,fallback] of Object.entries(WEAPON_FALLBACK)){const image=new Image();image.src='img/pondwars/'+fallback+'.svg';flightArt[id]=image;}
 fetch('art/arsenal-polish/manifest.json?v=20261112v11').then(r=>r.json()).then(manifest=>{
   for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(c){
     if(!validateClip(c))throw new Error('Invalid weapon clip: '+id+'/'+role);
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
   }
-}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message));
+}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v13')).then(r=>r.json()).then(manifest=>{
+  // v13: pixel art for every weapon (flight, held, explosions). It overrides older clips of the same role.
+  for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(validateClip(c)){
+    const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
+  }
+  for(const [id,h] of Object.entries(manifest.held||{})){const image=new Image();image.src=h.src;heldArt[id]={...h,image};}
+}).catch(e=>console.warn('v13 weapon art unavailable',e.message));
 let weaponFX=[];
 function drawWeaponClip(id,role,time,x,y,reduced=reduce){
   const c=weaponClips.get(id+'/'+role);if(!c?.image.naturalWidth)return false;
@@ -286,6 +292,7 @@ const HOLD = {
 };
 const PLACE_HOLD = new Set(['frogmine', 'mine', 'dynamite', 'candles', 'teleport', 'jetpack', 'rope']);
 function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false, imageKey) {
+  if (heldPixel(hand)) return;
   const img = weaponArt[g.weapon];
   if (!img?.naturalWidth) return;
   const calibrated = imageKey === 'pixel-v06' ? v06WeaponHold(g.weapon) : null;
@@ -313,6 +320,16 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false, imageKey
   if (Math.cos(aim) < 0) ctx.scale(1, -1);
   ctx.drawImage(img, h.ox, h.oy, h.w, h.h);
   ctx.restore();
+}
+// v13 held pixel art: a 64×64 tile drawn with its grip point on the hand.
+function heldPixel(hand) {
+  const h = heldArt[g.weapon]; if (!h?.image.naturalWidth) return false;
+  const k = h.size / 64, side = Math.cos(aim) >= 0 ? 1 : -1;
+  ctx.save(); ctx.imageSmoothingEnabled = false; ctx.translate(hand.x, hand.y);
+  if (h.mode === 'aim') { ctx.rotate(aim + (side < 0 ? -h.base : h.base)); if (side < 0) ctx.scale(1, -1); }
+  else { ctx.translate(side * (h.mode === 'throw' ? 4 : 10), h.mode === 'throw' ? 2 : 6); if (side < 0) ctx.scale(-1, 1); if (h.mode === 'throw') ctx.rotate(aim * .12 * side); }
+  ctx.drawImage(h.image, -h.grip[0] * k, -h.grip[1] * k, 64 * k, 64 * k);
+  ctx.restore(); return true;
 }
 // Dotted arc that mirrors the real shot (gravity + wind). Shown while aiming ballistic weapons.
 function aimArc(f, angle, pwr) {
@@ -370,8 +387,16 @@ function drawParts(dt) {
     else { ctx.globalAlpha = Math.min(1, k * 1.5); ctx.fillStyle = p.c; ctx.fillRect(p.x - p.s / 2, p.y - p.s / 2, p.s, p.s); ctx.globalAlpha = 1; }
   }
 }
+const SPIN = { gold: 5, toe: 6, shard: 8 }, ALONG = new Set(['rocket', 'revolver', 'bow', 'drill']);
 function shot(s) {
   ctx.save(); ctx.translate(s.x, s.y);
+  if (!WEAPON_FALLBACK[s.type] && weaponClips.get(s.type + '/flight')?.image.naturalWidth) {
+    if (ALONG.has(s.type)) ctx.rotate(Math.atan2(s.vy, s.vx)); else if (SPIN[s.type] && !reduce) ctx.rotate(s.t * SPIN[s.type]);
+    drawWeaponClip(s.type, 'flight', s.t, 0, 0); ctx.restore();
+    const fuse = s.type === 'dynamite' ? 5 : WEAPONS[s.type]?.fuse;
+    if (fuse) { ctx.fillStyle = '#fff3ba'; ctx.font = 'bold 12px Tahoma'; ctx.textAlign = 'center'; ctx.fillText(String(Math.max(1, Math.ceil(fuse - s.t))), s.x, s.y - 22); }
+    return;
+  }
   if(s.type==='drill'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle='#708454';ctx.fillRect(-10,-4,14,8);ctx.fillStyle='#a8b4ba';ctx.beginPath();ctx.moveTo(4,-5);ctx.lineTo(13,0);ctx.lineTo(4,5);ctx.fill();ctx.restore();return;}
   if(WEAPON_FALLBACK[s.type]){
     if(s.type==='donkey' && s.warning){
@@ -421,13 +446,14 @@ function draw(t) {
     else if (f.gone === 'ko') { ctx.fillStyle = '#9aa3a8'; ctx.fillRect(f.x - 6, f.y - 14, 12, 14); ctx.beginPath(); ctx.arc(f.x, f.y - 14, 6, Math.PI, 0); ctx.fill(); ctx.fillStyle = '#555'; ctx.font = 'bold 7px Tahoma'; ctx.textAlign = 'center'; ctx.fillText('RIP', f.x, f.y - 7); }
   for(const m of g.mines) {
     if(m.type==='frogmine'&&drawWeaponClip('frogmine','activation',m.t,m.x,m.y,reduce&&m.t<1))continue;
+    if(m.type==='mine'&&drawWeaponClip('mine','flight',m.t,m.x,m.y,reduce))continue;
     const art=weaponArt[m.type]||weaponArt.mine;const arm=WEAPONS[m.type]?.arm??1;
     if(art.naturalWidth)ctx.drawImage(art,m.x-10,m.y-13,20,20);
     if(m.t>arm){ctx.fillStyle=reduce||Math.sin(t*8)>0?'#ff6b45':'#602d28';ctx.fillRect(m.x-2,m.y-12,4,3);}
   }
   // rope and jetpack flame of the frog whose turn it is
   for (const f of g.frogs) if (f.alive && f.rope) { ctx.strokeStyle = '#d8b878'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(f.x, f.y - 30); ctx.lineTo(f.rope.x, f.rope.y); ctx.stroke(); ctx.fillStyle = '#a8b4ba'; ctx.beginPath(); ctx.arc(f.rope.x, f.rope.y, 3.5, 0, 7); ctx.fill(); }
-  for (const f of g.frogs) if (f.alive && f.jet) { ctx.fillStyle = '#c95d36'; ctx.fillRect(f.x - f.face * 12 - 4, f.y - 40, 8, 22); if (g.ctl && (g.ctl.y < 0 || g.ctl.x) && g.frogs[g.current] === f) { ctx.fillStyle = Math.random() < .5 ? '#ffc05b' : '#fff1b8'; ctx.beginPath(); ctx.moveTo(f.x - f.face * 12 - 4, f.y - 18); ctx.lineTo(f.x - f.face * 12 + 4, f.y - 18); ctx.lineTo(f.x - f.face * 12, f.y - 4 + Math.random() * 8); ctx.fill(); }
+  for (const f of g.frogs) if (f.alive && f.jet) { if (drawWeaponClip('jetpack', 'flight', animator.time, f.x - f.face * 12, f.y - 28)) {} else { ctx.fillStyle = '#c95d36'; ctx.fillRect(f.x - f.face * 12 - 4, f.y - 40, 8, 22); } if (!weaponClips.get('jetpack/flight')?.image.naturalWidth && g.ctl && (g.ctl.y < 0 || g.ctl.x) && g.frogs[g.current] === f) { ctx.fillStyle = Math.random() < .5 ? '#ffc05b' : '#fff1b8'; ctx.beginPath(); ctx.moveTo(f.x - f.face * 12 - 4, f.y - 18); ctx.lineTo(f.x - f.face * 12 + 4, f.y - 18); ctx.lineTo(f.x - f.face * 12, f.y - 4 + Math.random() * 8); ctx.fill(); }
     ctx.fillStyle = '#000a'; ctx.fillRect(f.x - 16, f.y - 76, 32, 4); ctx.fillStyle = '#ffc05b'; ctx.fillRect(f.x - 16, f.y - 76, 32 * Math.max(0, f.jet.fuel) / 3.5, 4); }
   for (const s of g.shots) shot(pose(s));
   for (const s of g.shots) offscreenMarker(s);
@@ -565,8 +591,12 @@ function observeCharacters(events = []) {
 function events() {
   observeCharacters(g.events);
   for (const e of g.events) {
+    if(e.type==='boom'&&e.weapon&&!WEAPON_FALLBACK[e.weapon]&&e.r>0){
+      const key=e.r>=45?'blastL':e.r>=28?'blastM':'blastS',clip=weaponClips.get(key+'/explosion');
+      if(clip?.image.naturalWidth)weaponFX.push({weapon:key,role:'explosion',x:e.x,y:e.y,time:animator.time,authored:true,life:clip.frames/clip.fps});
+    }
     if(e.type==='boom'&&WEAPON_FALLBACK[e.weapon]){
-      const clip=weaponClips.get(e.weapon+'/explosion'),authored=!!clip?.src.includes('/v11/');
+      const clip=weaponClips.get(e.weapon+'/explosion'),authored=/\/v1[13]\//.test(clip?.src||'');
       weaponFX.push({weapon:e.weapon,role:'explosion',x:e.x,y:e.y,time:animator.time,authored,life:e.weapon==='goldv2'?1.8:authored?clip.frames/clip.fps:.6});
     }
     if(weaponFX.length>64)weaponFX.shift();

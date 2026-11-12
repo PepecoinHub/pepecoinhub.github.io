@@ -1,0 +1,630 @@
+{
+ "version": "v13",
+ "status": "default art",
+ "weapons": {
+  "grenade": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/grenade_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     30,
+     30
+    ]
+   }
+  },
+  "rocket": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/bazooka_rocket_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     36,
+     36
+    ]
+   }
+  },
+  "cluster": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/cluster_grenade_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     32,
+     32
+    ]
+   }
+  },
+  "shard": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/cluster_fragment_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     16,
+     16
+    ]
+   }
+  },
+  "gold": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/golden_foot_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     34,
+     34
+    ]
+   }
+  },
+  "toe": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/golden_toe_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     18,
+     18
+    ]
+   }
+  },
+  "revolver": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/revolver_bullet_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 16,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     24,
+     24
+    ]
+   }
+  },
+  "bow": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/arrow_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     34,
+     34
+    ]
+   }
+  },
+  "drill": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/drill_missile_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     34,
+     34
+    ]
+   }
+  },
+  "candles": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/red_candles_fall.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 11,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     34,
+     34
+    ]
+   }
+  },
+  "dynamite": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/dynamite_lit.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 9,
+    "loop": true,
+    "anchor": [
+     64,
+     82
+    ],
+    "size": [
+     34,
+     34
+    ]
+   }
+  },
+  "mine": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/landmine_armed.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 5,
+    "loop": true,
+    "anchor": [
+     64,
+     94
+    ],
+    "size": [
+     30,
+     30
+    ]
+   }
+  },
+  "jetpack": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/jetpack_flames.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     30,
+     30
+    ]
+   }
+  },
+  "blastS": {
+   "explosion": {
+    "src": "art/arsenal-polish/v13/effects/explosion_medium.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 16,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     62,
+     62
+    ]
+   }
+  },
+  "blastM": {
+   "explosion": {
+    "src": "art/arsenal-polish/v13/effects/explosion_medium.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 16,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     92,
+     92
+    ]
+   }
+  },
+  "blastL": {
+   "explosion": {
+    "src": "art/arsenal-polish/v13/effects/explosion_large.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 14,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     136,
+     136
+    ]
+   }
+  },
+  "goldv2": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/mega_golden_foot_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     62,
+     62
+    ]
+   }
+  },
+  "megatoe": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/mega_toe_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 10,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     20,
+     20
+    ]
+   }
+  },
+  "bell": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/bell_bomb_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 11,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     30,
+     30
+    ]
+   }
+  },
+  "frogmine": {
+   "activation": {
+    "src": "art/arsenal-polish/v13/sprites/frog_mine_arming.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 6,
+    "loop": true,
+    "anchor": [
+     64,
+     94
+    ],
+    "size": [
+     30,
+     30
+    ]
+   }
+  },
+  "moon": {
+   "explosion": {
+    "src": "art/arsenal-polish/v13/effects/moon_rocket_explosion.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 14,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     100,
+     100
+    ]
+   }
+  },
+  "donkey": {
+   "activation": {
+    "src": "art/arsenal-polish/v13/effects/silver_donkey_warning.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     40,
+     40
+    ]
+   }
+  }
+ },
+ "held": {
+  "grenade": {
+   "src": "art/arsenal-polish/v13/held/grenade.png",
+   "size": 30,
+   "grip": [
+    32,
+    42
+   ],
+   "base": 0,
+   "mode": "throw"
+  },
+  "cluster": {
+   "src": "art/arsenal-polish/v13/held/cluster_grenade.png",
+   "size": 30,
+   "grip": [
+    32,
+    42
+   ],
+   "base": 0,
+   "mode": "throw"
+  },
+  "gold": {
+   "src": "art/arsenal-polish/v13/held/golden_foot.png",
+   "size": 30,
+   "grip": [
+    30,
+    44
+   ],
+   "base": 0,
+   "mode": "throw"
+  },
+  "goldv2": {
+   "src": "art/arsenal-polish/v13/held/golden_foot.png",
+   "size": 36,
+   "grip": [
+    30,
+    44
+   ],
+   "base": 0,
+   "mode": "throw"
+  },
+  "rocket": {
+   "src": "art/arsenal-polish/v13/held/bazooka.png",
+   "size": 40,
+   "grip": [
+    22,
+    44
+   ],
+   "base": 0,
+   "mode": "aim"
+  },
+  "drill": {
+   "src": "art/arsenal-polish/v13/held/drill_launcher.png",
+   "size": 38,
+   "grip": [
+    22,
+    46
+   ],
+   "base": 0,
+   "mode": "aim"
+  },
+  "revolver": {
+   "src": "art/arsenal-polish/v13/held/revolver.png",
+   "size": 32,
+   "grip": [
+    20,
+    44
+   ],
+   "base": 0,
+   "mode": "aim"
+  },
+  "bow": {
+   "src": "art/arsenal-polish/v13/held/bow.png",
+   "size": 36,
+   "grip": [
+    46,
+    34
+   ],
+   "base": 0,
+   "mode": "aim"
+  },
+  "rope": {
+   "src": "art/arsenal-polish/v13/held/grappling_launcher.png",
+   "size": 34,
+   "grip": [
+    22,
+    46
+   ],
+   "base": 0,
+   "mode": "aim"
+  },
+  "teleport": {
+   "src": "art/arsenal-polish/v13/held/teleport_device.png",
+   "size": 34,
+   "grip": [
+    22,
+    46
+   ],
+   "base": 0,
+   "mode": "aim"
+  },
+  "bat": {
+   "src": "art/arsenal-polish/v13/held/baseball.png",
+   "size": 38,
+   "grip": [
+    22,
+    44
+   ],
+   "base": 0.785,
+   "mode": "aim"
+  },
+  "ban": {
+   "src": "art/arsenal-polish/v13/held/ban_hammer.png",
+   "size": 38,
+   "grip": [
+    20,
+    44
+   ],
+   "base": 0.785,
+   "mode": "aim"
+  },
+  "mine": {
+   "src": "art/arsenal-polish/v13/held/landmine.png",
+   "size": 30,
+   "grip": [
+    32,
+    44
+   ],
+   "base": 0,
+   "mode": "place"
+  },
+  "dynamite": {
+   "src": "art/arsenal-polish/v13/held/dynamite.png",
+   "size": 28,
+   "grip": [
+    30,
+    40
+   ],
+   "base": 0,
+   "mode": "place"
+  },
+  "candles": {
+   "src": "art/arsenal-polish/v13/held/red_candles.png",
+   "size": 28,
+   "grip": [
+    32,
+    44
+   ],
+   "base": 0,
+   "mode": "place"
+  },
+  "jetpack": {
+   "src": "art/arsenal-polish/v13/held/jetpack_backpack.png",
+   "size": 28,
+   "grip": [
+    32,
+    40
+   ],
+   "base": 0,
+   "mode": "place"
+  }
+ }
+}
