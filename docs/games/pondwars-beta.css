@@ -67,3 +67,44 @@ html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%}
 .playtest-packs label{display:flex;gap:6px;align-items:flex-start;margin:4px 0;font-size:12px;color:#efe6c8}
 .pw-arsenal .pw-weapons button[data-pack]{box-shadow:inset 0 0 0 1px #e5ac3188}
 .pw-zoom{position:absolute;z-index:4;top:6px;right:6px;display:flex;gap:4px}.pw-zoom button{width:34px;height:34px;padding:0;font:700 18px Tahoma,Verdana,sans-serif;line-height:1;color:#fff0bd;background:#0c1827cc;border:1px solid #85989f;border-radius:2px;cursor:pointer}.pw-zoom button:hover{background:#1a2c40}.pw-stage{position:relative}
+/* ---- battle report (end of match), styled like the title screen ---- */
+.pw-over.pw-end{position:fixed;inset:0;z-index:30;transform:none;max-height:none;display:flex;align-items:center;justify-content:center;padding:10px;overflow:auto;background:radial-gradient(ellipse 70% 55% at 50% 38%,color-mix(in srgb,var(--team,#ffcf6b) 38%,#2a0f05) 0,#120502 70%,#000 100%);border:0;box-shadow:none;color:#ffe9b0;text-align:center;--team:#ffcf6b}
+.pw-end.end-draw{background:radial-gradient(ellipse 70% 55% at 50% 38%,#1f5f86 0,#08202f 70%,#000 100%)}
+.pw-end .end-glow{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 34%,color-mix(in srgb,var(--team) 60%,transparent) 0,transparent 42%);opacity:0}
+.pw-end .title-scan{opacity:.55}
+.pw-end .end-body{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:clamp(4px,1.2vh,10px);width:min(760px,100%)}
+.pw-end .end-kicker{animation:none;opacity:0}
+.pw-end .end-logo{font-size:clamp(40px,10vw,112px);opacity:0}
+.pw-end.end-draw .end-logo{background:linear-gradient(#f2fdff 0,#9fe3ff 35%,#2f9de0 70%,#0b3f6a 100%);-webkit-background-clip:text;background-clip:text}
+.pw-end #end-crew{width:min(720px,100%);height:auto;aspect-ratio:720/190;image-rendering:pixelated}
+.pw-end .end-text{margin:0;font:bold clamp(12px,1.8vw,17px) Tahoma,Verdana,sans-serif;color:#fff;text-shadow:2px 2px 0 #000;opacity:0}
+.pw-end .end-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:100%}
+.pw-end .end-card{display:flex;flex-direction:column;gap:2px;padding:8px 6px;background:#0c1827e6;border:1px solid color-mix(in srgb,var(--team) 70%,#85989f);box-shadow:0 0 0 1px #000,4px 4px 0 #0008;opacity:0}
+.pw-end .end-card span{font:bold 10px Tahoma,Verdana,sans-serif;letter-spacing:.2em;color:#9fb3be}
+.pw-end .end-card b{font:900 clamp(17px,2.6vw,26px)/1.05 Impact,'Arial Black',sans-serif;color:#ffe680;letter-spacing:.03em;overflow-wrap:anywhere}
+.pw-end .end-card small{font:10px Tahoma,Verdana,sans-serif;color:#d7e2ea}
+.pw-end .end-bar .bar{display:flex;height:16px;margin:6px 0 3px;background:#1a2430;border:1px solid #6d7f88}
+.pw-end .end-bar .bar i{display:block;flex:none;width:var(--w);background:var(--c)}
+.pw-end.show .end-bar .bar i{animation:end-bar .9s ease-out 2.1s both}
+@keyframes end-bar{from{width:0}to{width:var(--w)}}
+.pw-end .end-buttons{display:flex;gap:8px;opacity:0}
+.pw-end .end-buttons button{min-height:40px;padding:8px 18px;font:bold 14px Tahoma,Verdana,sans-serif}
+.pw-end .end-confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.pw-end .end-confetti i{position:absolute;top:-14px;width:7px;height:11px;opacity:0;animation:end-fall var(--d) linear var(--w) infinite}
+.pw-end.show .end-glow{animation:end-glow 1.2s ease-out .45s both,end-pulse 3s ease-in-out 1.7s infinite alternate}
+.pw-end.show .end-kicker{animation:title-kicker 1s ease-out .1s both}
+.pw-end.show .end-logo{animation:title-slam .55s cubic-bezier(.2,.8,.3,1.2) .45s both}
+.pw-end.show .end-body{animation:title-shake .45s linear .95s both}
+.pw-end.show .end-text{animation:end-in .4s ease-out 1.15s both}
+.pw-end.show .end-card{animation:end-card .45s cubic-bezier(.2,.8,.3,1.3) both}
+.pw-end.show .end-card:nth-child(1){animation-delay:1.4s}.pw-end.show .end-card:nth-child(2){animation-delay:1.6s}.pw-end.show .end-card:nth-child(3){animation-delay:1.8s}.pw-end.show .end-card:nth-child(4){animation-delay:2s}
+.pw-end.show .end-buttons{animation:end-in .4s ease-out 2.6s both}
+@keyframes end-glow{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+@keyframes end-pulse{from{opacity:.7}to{opacity:1}}
+@keyframes end-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes end-card{from{opacity:0;transform:translateY(24px) scale(.85)}to{opacity:1;transform:none}}
+@keyframes end-fall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:1;transform:translateY(110vh) rotate(var(--r))}}
+@media (max-width:640px),(max-height:460px){.pw-end .end-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.pw-end #end-crew{width:min(520px,100%)}}
+@media (max-height:460px){.pw-end{align-items:flex-start}.pw-end .end-logo{font-size:clamp(30px,7vw,54px)}.pw-end .end-body{gap:2px}.pw-end .end-kicker{font-size:10px}.pw-end #end-crew{width:min(360px,60vw)}.pw-end .end-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.pw-end .end-card{padding:3px 4px}.pw-end .end-card b{font-size:15px}.pw-end .end-card span,.pw-end .end-card small{font-size:9px}.pw-end .end-bar .bar{height:10px;margin:3px 0 1px}.pw-end .end-text{font-size:12px}.pw-end .end-buttons button{min-height:32px;padding:5px 14px}}
+@media (prefers-reduced-motion:reduce){.pw-end *,.pw-end.show *{animation:none!important;opacity:1!important;transition:none!important}.pw-end .end-confetti{display:none}}
+.pw-end h2.end-logo{color:transparent;text-shadow:none}

@@ -5,8 +5,8 @@
 <meta name="referrer" content="strict-origin-when-cross-origin"><title>FROGAGEDDON BETA: frog artillery | Pepecoin Hub</title>
 <meta name="description" content="Turn-based frog artillery: custom teams, four destructible maps, nine weapons and exploding golden toes. Play against the CPU or a friend on one device.">
 <meta name="robots" content="noindex, nofollow"><link rel="canonical" href="https://pepecoinhub.com/games/pondwars.html"><link rel="icon" href="img/pondwars/gold.svg">
-<link rel="stylesheet" href="pondwars.css?v=20261103c"><script type="module" src="js/pondwars-beta.mjs?v=20261112doge5"></script>
-<link rel="stylesheet" href="pondwars-polish.css?v=20261104moves"><link rel="stylesheet" href="pondwars-beta.css?v=20261112zoom"></head><body>
+<link rel="stylesheet" href="pondwars.css?v=20261103c"><script type="module" src="js/pondwars-beta.mjs?v=20261112end"></script>
+<link rel="stylesheet" href="pondwars-polish.css?v=20261104moves"><link rel="stylesheet" href="pondwars-beta.css?v=20261112end"></head><body>
 <header class="pw-site"><a href="../meme/">← Pepecoin Hub</a><b>FROGAGEDDON</b><a href="index.html">More games</a></header>
 <main class="pw">
   <div class="pw-chrome"><span>FROGAGEDDON BETA <small> / FREN SOFTWARE · 2000</small></span><div><button id="sound">Sound: off</button><button id="pause">Pause</button><button id="restart">New match</button></div></div><div class="pw-bar">
@@ -56,7 +56,17 @@
       <p class="pw-small keys-hint">A/D or ← → move · W/S or ↑ ↓ aim<br>SPACE jumps · SPACE ×2 backflips<br>RIGHT CLICK: arsenal · HOLD LEFT CLICK / ENTER: fire</p>
       <p class="pw-small touch-hint">TAP OR DRAG ON THE MAP: aim · HOLD FIRE: charge, let go to shoot<br>◀ ▶ walk · ↑ jump · ↑ ×2 backflip · ▲ weapon button: arsenal</p>
     </div>
-    <div class="pw-over" id="over" hidden><h2 id="over-title"></h2><p id="over-text"></p><button type="button" class="pw-go" id="again">Play again</button><button type="button" id="tomenu">Menu</button></div>
+    <div class="pw-over pw-end" id="over" hidden role="dialog" aria-modal="true" aria-labelledby="over-title">
+      <div class="end-glow" aria-hidden="true"></div><div class="end-confetti" id="end-confetti" aria-hidden="true"></div><div class="title-scan" aria-hidden="true"></div>
+      <div class="end-body">
+        <span class="title-kicker end-kicker">BATTLE REPORT</span>
+        <h2 id="over-title" class="title-logo end-logo"></h2>
+        <canvas id="end-crew" width="720" height="190" aria-hidden="true"></canvas>
+        <p id="over-text" class="end-text"></p>
+        <div class="end-stats" id="end-stats"></div>
+        <div class="end-buttons"><button type="button" class="pw-go" id="again">Play again</button><button type="button" id="tomenu">Menu</button></div>
+      </div>
+    </div>
   </div>
   <div class="pw-title" id="title" role="dialog" aria-modal="true" aria-label="FROGAGEDDON title screen. Press any key to continue." tabindex="-1">
     <div class="title-art"><img id="title-art" src="img/pondwars/title.jpg" alt=""></div>
