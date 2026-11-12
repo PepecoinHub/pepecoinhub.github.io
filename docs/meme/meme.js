@@ -4819,4 +4819,5 @@
     if (window.innerWidth < 760) location.href = osPage(''); else gamesFolder();
   });
   window.Meme = { json: json, fmt: fmt, fill: fill, lineChart: lineChart, base: BASE, data: DATA, page: PAGE };
+  root.classList.remove('pond-boot');   // boot.js hid the page until the desktop was built
 })();
