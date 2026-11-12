@@ -38,7 +38,31 @@ function fitStage() {
   VW=Math.max(W,Math.round(VH*r.width/Math.max(1,r.height)));OX=(VW-W)/2;
   if(cv.width!==VW)cv.width=VW;
   if(cv.height!==VH)cv.height=VH;
-  const shown=Math.min(r.width/VW,r.height/VH)||1;ui=Math.max(1,Math.min(2,.9/shown));
+  shownBase=Math.min(r.width/VW,r.height/VH)||1;uiFor();
+}
+// ---- camera: zoom like a photo (wheel, pinch, + / − buttons). At zoom 1 the whole battlefield is shown.
+// camL / camT: top-left of the view in canvas units (0..VW, 0..VH before zoom). The camera follows the action.
+let shownBase = 1, zoom = 1, camL = 0, camT = 0, camFollow = true, camGoal = null;
+const ZOOM_MAX = 3;
+function uiFor(){ui=Math.max(1,Math.min(2,.9/(shownBase*zoom)));}
+function clampCam(){const vw=VW/zoom,vh=VH/zoom;camL=Math.max(0,Math.min(VW-vw,camL));camT=Math.max(0,Math.min(VH-vh,camT));}
+function setZoom(z, px = VW / 2, py = VH / 2) {
+  // keep the canvas point (px,py) under the same spot on screen
+  const nz = Math.max(1, Math.min(ZOOM_MAX, z)); if (Math.abs(nz - zoom) < 1e-4) return;
+  const wx = camL + px / zoom, wy = camT + py / zoom; zoom = nz; camL = wx - px / zoom; camT = wy - py / zoom; clampCam(); uiFor();
+}
+function camTarget() {
+  if (!g || ['menu'].includes(g.phase)) return null;
+  const shot = g.shots.find(x => WEAPONS[x.type]?.role === 'guide') || g.shots[0];
+  if (shot) return [shot.x, Math.max(-OY, shot.y)];
+  const b = g.booms[g.booms.length - 1]; if (b) return [b.x, b.y];
+  const f = me(g); return f ? [f.x, f.y - 30] : null;
+}
+function updateCamera(dt) {
+  if (zoom <= 1.001) { zoom = 1; camL = 0; camT = 0; return; }
+  const t = camFollow ? camTarget() : null; if (!t) return;
+  const vw = VW / zoom, vh = VH / zoom, gx = t[0] + OX - vw / 2, gy = t[1] + OY - vh / 2, k = reduce ? 1 : 1 - Math.exp(-dt * 5);
+  camL += (gx - camL) * k; camT += (gy - camT) * k; clampCam();
 }
 addEventListener('resize', () => requestAnimationFrame(fitStage));
 if ('ResizeObserver' in window) { let ro = 0; new ResizeObserver(() => { cancelAnimationFrame(ro); ro = requestAnimationFrame(fitStage); }).observe(document.body); }
@@ -63,14 +87,20 @@ const playerArt=PLAYERS.map(p=>{const img=new Image();img.src=p.src;return img;}
 const teamPlayers=pixelPreview ? [Array(4).fill(PIXEL_PLAYER),Array(4).fill(PIXEL_PLAYER)] : [[0,1,2,3],[4,5,6,0]];
 const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite','drill','candles','rope','jetpack','teleport'].map(w=>{const img=new Image();img.src='img/pondwars/'+w+'.svg';return[w,img];}));
 // v11 clips remain opt-in playtest art; simulation and HUD keep separate assets.
-const weaponClips=new Map(), flightArt={};
+const weaponClips=new Map(), flightArt={}, heldArt={};
 for(const [id,fallback] of Object.entries(WEAPON_FALLBACK)){const image=new Image();image.src='img/pondwars/'+fallback+'.svg';flightArt[id]=image;}
 fetch('art/arsenal-polish/manifest.json?v=20261112v11').then(r=>r.json()).then(manifest=>{
   for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(c){
     if(!validateClip(c))throw new Error('Invalid weapon clip: '+id+'/'+role);
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
   }
-}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message));
+}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v13')).then(r=>r.json()).then(manifest=>{
+  // v13: pixel art for every weapon (flight, held, explosions). It overrides older clips of the same role.
+  for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(validateClip(c)){
+    const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
+  }
+  for(const [id,h] of Object.entries(manifest.held||{})){const image=new Image();image.src=h.src;heldArt[id]={...h,image};}
+}).catch(e=>console.warn('v13 weapon art unavailable',e.message));
 let weaponFX=[];
 function drawWeaponClip(id,role,time,x,y,reduced=reduce){
   const c=weaponClips.get(id+'/'+role);if(!c?.image.naturalWidth)return false;
@@ -286,6 +316,7 @@ const HOLD = {
 };
 const PLACE_HOLD = new Set(['frogmine', 'mine', 'dynamite', 'candles', 'teleport', 'jetpack', 'rope']);
 function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false, imageKey) {
+  if (heldPixel(hand)) return;
   const img = weaponArt[g.weapon];
   if (!img?.naturalWidth) return;
   const calibrated = imageKey === 'pixel-v06' ? v06WeaponHold(g.weapon) : null;
@@ -313,6 +344,16 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false, imageKey
   if (Math.cos(aim) < 0) ctx.scale(1, -1);
   ctx.drawImage(img, h.ox, h.oy, h.w, h.h);
   ctx.restore();
+}
+// v13 held pixel art: a 64×64 tile drawn with its grip point on the hand.
+function heldPixel(hand) {
+  const h = heldArt[g.weapon]; if (!h?.image.naturalWidth) return false;
+  const k = h.size / 64, side = Math.cos(aim) >= 0 ? 1 : -1;
+  ctx.save(); ctx.imageSmoothingEnabled = false; ctx.translate(hand.x, hand.y);
+  if (h.mode === 'aim') { ctx.rotate(aim + (side < 0 ? -h.base : h.base)); if (side < 0) ctx.scale(1, -1); }
+  else { ctx.translate(side * (h.mode === 'throw' ? 4 : 10), h.mode === 'throw' ? 2 : 6); if (side < 0) ctx.scale(-1, 1); if (h.mode === 'throw') ctx.rotate(aim * .12 * side); }
+  ctx.drawImage(h.image, -h.grip[0] * k, -h.grip[1] * k, 64 * k, 64 * k);
+  ctx.restore(); return true;
 }
 // Dotted arc that mirrors the real shot (gravity + wind). Shown while aiming ballistic weapons.
 function aimArc(f, angle, pwr) {
@@ -370,18 +411,26 @@ function drawParts(dt) {
     else { ctx.globalAlpha = Math.min(1, k * 1.5); ctx.fillStyle = p.c; ctx.fillRect(p.x - p.s / 2, p.y - p.s / 2, p.s, p.s); ctx.globalAlpha = 1; }
   }
 }
+const SPIN = { gold: 5, toe: 6, shard: 8 }, ALONG = new Set(['rocket', 'revolver', 'bow', 'drill']);
 function shot(s) {
   ctx.save(); ctx.translate(s.x, s.y);
+  if (!WEAPON_FALLBACK[s.type] && weaponClips.get(s.type + '/flight')?.image.naturalWidth) {
+    if (ALONG.has(s.type)) ctx.rotate(Math.atan2(s.vy, s.vx)); else if (SPIN[s.type] && !reduce) ctx.rotate(s.t * SPIN[s.type]);
+    drawWeaponClip(s.type, 'flight', s.t, 0, 0); ctx.restore();
+    const fuse = s.type === 'dynamite' ? 5 : WEAPONS[s.type]?.fuse;
+    if (fuse) { ctx.fillStyle = '#fff3ba'; ctx.font = 'bold 12px Tahoma'; ctx.textAlign = 'center'; ctx.fillText(String(Math.max(1, Math.ceil(fuse - s.t))), s.x, s.y - 22); }
+    return;
+  }
   if(s.type==='drill'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle='#708454';ctx.fillRect(-10,-4,14,8);ctx.fillStyle='#a8b4ba';ctx.beginPath();ctx.moveTo(4,-5);ctx.lineTo(13,0);ctx.lineTo(4,5);ctx.fill();ctx.restore();return;}
   if(WEAPON_FALLBACK[s.type]){
     if(s.type==='donkey' && s.warning){
       ctx.strokeStyle='#d7deea';ctx.setLineDash([5,4]);ctx.strokeRect(-20,-8,40,16);ctx.setLineDash([]);
-      if(!drawWeaponClip('donkey','activation',s.t,0,-38)) {const image=flightArt.donkey;if(image.naturalWidth)ctx.drawImage(image,-16,-60,32,32);}
+      if(!drawWeaponClip('donkey','activation',s.t,0,-48)) {const image=flightArt.donkey;if(image.naturalWidth)ctx.drawImage(image,-16,-60,32,32);}
       ctx.restore();return;
     }
     if(['doge','moon'].includes(s.type))ctx.rotate(Math.atan2(s.vy,s.vx));
     else if(['goldv2','megatoe','bell'].includes(s.type)&&!reduce)ctx.rotate(s.t*4);
-    if(!drawWeaponClip(s.type,'flight',s.t-(s.type==='donkey'?WEAPONS.donkey.warn:0),0,0)){
+    if(!drawWeaponClip(s.type,'flight',s.t-(s.type==='donkey'?WEAPONS.donkey.warn:0),0,s.type==='donkey'?-30:0)){
       const image=flightArt[s.type],size=s.type==='goldv2'?58:s.type==='donkey'?56:s.type==='megatoe'?12:s.type==='pep'?14:32;
       if(image?.naturalWidth){if(s.type==='megatoe')ctx.drawImage(image,11,3,16,18,-6,-7,12,14);else ctx.drawImage(image,-size/2,-size/2,size,size);}
     }
@@ -403,7 +452,8 @@ function shot(s) {
 }
 function draw(t) {
   ctx.save();
-  ctx.translate(OX, OY);
+  updateCamera(visualDt || 0);
+  ctx.scale(zoom, zoom); ctx.translate(OX - camL, OY - camT);
   if (shake > 0 && !reduce) ctx.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake);
   sky(t);
   drawMapDecorations();
@@ -421,13 +471,14 @@ function draw(t) {
     else if (f.gone === 'ko') { ctx.fillStyle = '#9aa3a8'; ctx.fillRect(f.x - 6, f.y - 14, 12, 14); ctx.beginPath(); ctx.arc(f.x, f.y - 14, 6, Math.PI, 0); ctx.fill(); ctx.fillStyle = '#555'; ctx.font = 'bold 7px Tahoma'; ctx.textAlign = 'center'; ctx.fillText('RIP', f.x, f.y - 7); }
   for(const m of g.mines) {
     if(m.type==='frogmine'&&drawWeaponClip('frogmine','activation',m.t,m.x,m.y,reduce&&m.t<1))continue;
+    if(m.type==='mine'&&drawWeaponClip('mine','flight',m.t,m.x,m.y,reduce))continue;
     const art=weaponArt[m.type]||weaponArt.mine;const arm=WEAPONS[m.type]?.arm??1;
     if(art.naturalWidth)ctx.drawImage(art,m.x-10,m.y-13,20,20);
     if(m.t>arm){ctx.fillStyle=reduce||Math.sin(t*8)>0?'#ff6b45':'#602d28';ctx.fillRect(m.x-2,m.y-12,4,3);}
   }
   // rope and jetpack flame of the frog whose turn it is
   for (const f of g.frogs) if (f.alive && f.rope) { ctx.strokeStyle = '#d8b878'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(f.x, f.y - 30); ctx.lineTo(f.rope.x, f.rope.y); ctx.stroke(); ctx.fillStyle = '#a8b4ba'; ctx.beginPath(); ctx.arc(f.rope.x, f.rope.y, 3.5, 0, 7); ctx.fill(); }
-  for (const f of g.frogs) if (f.alive && f.jet) { ctx.fillStyle = '#c95d36'; ctx.fillRect(f.x - f.face * 12 - 4, f.y - 40, 8, 22); if (g.ctl && (g.ctl.y < 0 || g.ctl.x) && g.frogs[g.current] === f) { ctx.fillStyle = Math.random() < .5 ? '#ffc05b' : '#fff1b8'; ctx.beginPath(); ctx.moveTo(f.x - f.face * 12 - 4, f.y - 18); ctx.lineTo(f.x - f.face * 12 + 4, f.y - 18); ctx.lineTo(f.x - f.face * 12, f.y - 4 + Math.random() * 8); ctx.fill(); }
+  for (const f of g.frogs) if (f.alive && f.jet) { if (drawWeaponClip('jetpack', 'flight', animator.time, f.x - f.face * 12, f.y - 28)) {} else { ctx.fillStyle = '#c95d36'; ctx.fillRect(f.x - f.face * 12 - 4, f.y - 40, 8, 22); } if (!weaponClips.get('jetpack/flight')?.image.naturalWidth && g.ctl && (g.ctl.y < 0 || g.ctl.x) && g.frogs[g.current] === f) { ctx.fillStyle = Math.random() < .5 ? '#ffc05b' : '#fff1b8'; ctx.beginPath(); ctx.moveTo(f.x - f.face * 12 - 4, f.y - 18); ctx.lineTo(f.x - f.face * 12 + 4, f.y - 18); ctx.lineTo(f.x - f.face * 12, f.y - 4 + Math.random() * 8); ctx.fill(); }
     ctx.fillStyle = '#000a'; ctx.fillRect(f.x - 16, f.y - 76, 32, 4); ctx.fillStyle = '#ffc05b'; ctx.fillRect(f.x - 16, f.y - 76, 32 * Math.max(0, f.jet.fuel) / 3.5, 4); }
   for (const s of g.shots) shot(pose(s));
   for (const s of g.shots) offscreenMarker(s);
@@ -451,9 +502,15 @@ function draw(t) {
     if (g.weapon === 'teleport') {
       ctx.strokeStyle = '#9fe3ff'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.arc(aimX, aimY - 25, 16, 0, 7); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle = '#9fe3ff'; ctx.font = 'bold 11px Tahoma'; ctx.textAlign = 'center'; ctx.fillText('TELEPORT HERE', aimX, aimY - 48);
-    } else if (g.weapon === 'candles') {
-      ctx.strokeStyle = '#e0414c'; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.moveTo(aimX, 0); ctx.lineTo(aimX, WATER); ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle = '#e0414c'; ctx.font = 'bold 12px Tahoma'; ctx.fillText('CANDLES DROP HERE', aimX, 18);
+    } else if (targeted(g.weapon)) {
+      // Map strikes: a drop line and a target ring where it lands. No aim line, no power meter.
+      const col = g.weapon === 'donkey' ? '#d7deea' : g.weapon === 'rain' ? '#7ee07a' : '#e0414c', s = ui;
+      let gy = Math.max(0, Math.min(WATER - 1, aimY)); while (gy < WATER && !g.mask[Math.floor(gy) * W + Math.floor(aimX)]) gy++;
+      ctx.strokeStyle = col; ctx.lineWidth = 2 * s; ctx.setLineDash([6 * s, 6 * s]); ctx.beginPath(); ctx.moveTo(aimX, -OY); ctx.lineTo(aimX, gy); ctx.stroke(); ctx.setLineDash([]);
+      ctx.strokeStyle = '#000a'; ctx.lineWidth = 5 * s; ctx.beginPath(); ctx.ellipse(aimX, gy, 22 * s, 7 * s, 0, 0, 7); ctx.stroke();
+      ctx.strokeStyle = col; ctx.lineWidth = 2.5 * s; ctx.beginPath(); ctx.ellipse(aimX, gy, 22 * s, 7 * s, 0, 0, 7); ctx.stroke();
+      const label = { candles: 'CANDLES DROP HERE', rain: 'PEP RAIN HERE', donkey: 'DONKEY LANDS HERE' }[g.weapon] || 'TARGET';
+      ctx.font = `bold ${Math.round(12 * s)}px Tahoma`; ctx.textAlign = 'center'; ctx.fillStyle = '#000'; ctx.fillText(label, aimX + 1, gy - 15 * s + 1); ctx.fillStyle = col; ctx.fillText(label, aimX, gy - 15 * s);
     } else {
       const s = ui, ox = f.x, oy = f.y - 32, dx = Math.cos(aim), dy = Math.sin(aim);
       const cx = ox + dx * 52 * s, cy = oy + dy * 52 * s;
@@ -469,7 +526,7 @@ function draw(t) {
   }
   // first seconds of a turn on a phone: how the controls work
   if (touchUI.matches && mine() && g.timer > TURN_TIME - 5 && !charging) {
-    const text = 'TAP TO AIM · HOLD FIRE TO SHOOT', size = Math.round(13 * ui);
+    const text = targeted(g.weapon) ? 'TAP THE MAP TO PICK A SPOT · THEN FIRE' : noPower(g.weapon) ? 'TAP TO AIM · PRESS FIRE' : 'TAP TO AIM · HOLD FIRE TO SHOOT', size = Math.round(13 * ui);
     ctx.font = `bold ${size}px Tahoma, Verdana, sans-serif`; ctx.textAlign = 'center';
     const w = ctx.measureText(text).width + size;
     ctx.globalAlpha = Math.min(1, g.timer - (TURN_TIME - 5)); ctx.fillStyle = '#000b'; ctx.fillRect(W / 2 - w / 2, 8, w, size * 1.8);
@@ -479,9 +536,9 @@ function draw(t) {
 }
 // A shot above the visible sky: a bouncing arrow at the top edge with the height, so it never just disappears.
 function offscreenMarker(s) {
-  const top = -OY + 6;
-  if (!(s.y < top - 4) || s.x < -OX || s.x > W + OX) return;
-  const bob = reduce ? 0 : Math.sin(performance.now() / 120) * 2, x = Math.max(-OX + 16 * ui, Math.min(W + OX - 16 * ui, s.x)), y = top + bob;
+  const top = camT - OY + 6, L = camL - OX, R = L + VW / zoom;
+  if (!(s.y < top - 4) || s.x < L || s.x > R) return;
+  const bob = reduce ? 0 : Math.sin(performance.now() / 120) * 2, x = Math.max(L + 16 * ui, Math.min(R - 16 * ui, s.x)), y = top + bob;
   ctx.save(); ctx.translate(x, y); ctx.scale(ui, ui);
   ctx.fillStyle = '#000b'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-11, 15); ctx.lineTo(11, 15); ctx.closePath(); ctx.fill();
   ctx.fillStyle = '#ffe680'; ctx.beginPath(); ctx.moveTo(0, 3); ctx.lineTo(-7, 13); ctx.lineTo(7, 13); ctx.closePath(); ctx.fill();
@@ -565,14 +622,19 @@ function observeCharacters(events = []) {
 function events() {
   observeCharacters(g.events);
   for (const e of g.events) {
+    if(e.type==='boom'&&e.weapon&&!WEAPON_FALLBACK[e.weapon]&&e.r>0){
+      const key=e.r>=45?'blastL':e.r>=28?'blastM':'blastS',clip=weaponClips.get(key+'/explosion');
+      if(clip?.image.naturalWidth)weaponFX.push({weapon:key,role:'explosion',x:e.x,y:e.y,time:animator.time,authored:true,life:clip.frames/clip.fps});
+    }
     if(e.type==='boom'&&WEAPON_FALLBACK[e.weapon]){
-      const clip=weaponClips.get(e.weapon+'/explosion'),authored=!!clip?.src.includes('/v11/');
+      const clip=weaponClips.get(e.weapon+'/explosion'),authored=/\/v1[13]\//.test(clip?.src||'');
       weaponFX.push({weapon:e.weapon,role:'explosion',x:e.x,y:e.y,time:animator.time,authored,life:e.weapon==='goldv2'?1.8:authored?clip.frames/clip.fps:.6});
     }
     if(weaponFX.length>64)weaponFX.shift();
+    if (e.type === 'turn' || e.type === 'fire') camFollow = true;
     if (e.type === 'turn') { resetSteering();closeArsenal();keys.clear();clearCharge();pending=[];remoteP=0;aimPointer=null;held.l=held.r=held.u=0; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x;
       status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : isOnline(g.team) ? `${f.name} (${TEAM[g.team].name}) is playing on the other device…` : touchUI.matches ? `${f.name}: tap the map to aim · hold FIRE to shoot · ◀ ▶ walk · ↑ jump, twice for a backflip` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
-    if (e.type === 'fire') {pointerHolds.clear();closeArsenal();keys.clear();held.l=held.r=held.u=held.pitch=0;steerY=null;clearCharge();remoteP=0;status(g.phase==='guide'?'Fly the Doge: A/D turn, W/S altitude, Enter or Space detonates.':g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
+    if (e.type === 'fire') {pointerHolds.clear();closeArsenal();keys.clear();held.l=held.r=held.u=held.pitch=0;steerY=null;clearCharge();remoteP=0;status(g.phase==='guide'?(touchUI.matches?'Fly the Doge: ◀ ▶ turn, ↑ climbs, drag on the map to steer up or down, DETONATE blows it up.':'Fly the Doge: A/D turn, W/S nose up / down, Enter or Space detonates.'):g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
     if (e.type === 'boom') {shake=9;beep(65,.35);if(e.r)debris(e.x,e.y,e.r);}
     if (e.type === 'bell') {beep(880,.08);weaponFX.push({weapon:'bell',role:'activation',x:e.x,y:e.y,time:animator.time,life:.6});}
     if (e.type === 'rope') {beep(520,.06);status('Hooked! A/D swing · W/S shorter/longer · Space lets go. Your turn goes on.');}
@@ -652,7 +714,7 @@ function start() {
 }
 function launch() {
   animator.reset(); helmets.restore(g);weaponFX=[];resetSteering();
-  paused=false;$('#pause').textContent='Pause';acc=0;pending=[];remoteP=0;clearCharge();held.l=held.r=held.u=0;mountExpansion(g.packs);paintGround();events();hud();
+  zoom=1;camL=camT=0;camFollow=true;if(touchUI.matches)setZoom(1.8);uiFor();paused=false;$('#pause').textContent='Pause';acc=0;pending=[];remoteP=0;clearCharge();held.l=held.r=held.u=0;mountExpansion(g.packs);paintGround();events();hud();
   $('#menu').hidden = true; $('#over').hidden = true; cv.focus({ preventScroll: true });
 }
 // One step of this device's input: held keys and buttons as bits, plus the queued actions.
@@ -754,7 +816,8 @@ const unselect = () => { const s = getSelection?.(); if (s && s.rangeCount && !t
 // loupe, the callout and double-tap zoom on iOS; pointer events still arrive.
 for (const el of [cv, $('#fire'), $('#left'), $('#right'), $('#hop')]) el.addEventListener('touchstart', e => { if (e.cancelable) e.preventDefault(); unselect(); }, { passive: false });
 function jump(){if(!movementAllowed()||!arsenal.hidden)return;clearCharge();pending.push({t:'jump'});}
-function toWorld(e) { const r = cv.getBoundingClientRect(); const scale=Math.min(r.width/VW,r.height/VH),padX=(r.width-VW*scale)/2,padY=(r.height-VH*scale)/2; return [(e.clientX-r.left-padX)/scale-OX,(e.clientY-r.top-padY)/scale-OY]; }
+function toWorld(e) { const r = cv.getBoundingClientRect(); const scale=Math.min(r.width/VW,r.height/VH),padX=(r.width-VW*scale)/2,padY=(r.height-VH*scale)/2; return [((e.clientX-r.left-padX)/scale)/zoom+camL-OX,((e.clientY-r.top-padY)/scale)/zoom+camT-OY]; }
+function toCanvas(e) { const r = cv.getBoundingClientRect(); const scale=Math.min(r.width/VW,r.height/VH),padX=(r.width-VW*scale)/2,padY=(r.height-VH*scale)/2; return [(e.clientX-r.left-padX)/scale,(e.clientY-r.top-padY)/scale]; }
 function aimAt(e) {
   if (guiding()) {
     const [, y] = toWorld(e);
@@ -769,7 +832,13 @@ function aimAt(e) {
   pending = pending.filter(a => a.t !== 'face');
   if (f.face !== d) pending.push({ t: 'face', d });
 }
-function beginCharge() { if (guiding()) { pending.push({ t: 'detonate' }); return; } if (!mine() || charging || !arsenal.hidden) return; charging = true; chargeAt = performance.now(); power = 0; }
+// Weapons with no throw strength (map strikes, placed items, melee, utilities, the Doge launch) fire on press:
+// no power meter, the target is wherever you last aimed or tapped.
+function noPower(id) { const w = WEAPONS[id]; return !!(w && (w.utility || w.tap || id === 'candles')); }
+function targeted(id) { return id === 'candles' || ['strike', 'salvo'].includes(WEAPONS[id]?.role); }
+function beginCharge() { if (guiding()) { pending.push({ t: 'detonate' }); return; } if (!mine() || charging || !arsenal.hidden) return;
+  if (noPower(g.weapon)) { clearCharge(); pending.push({ t: 'fire', a: aim, p: 1, x: aimX, y: aimY }); return; }
+  charging = true; chargeAt = performance.now(); power = 0; }
 function release(cancelShort) {
   if (!charging) return;
   const heldFor = performance.now() - chargeAt; clearCharge();
@@ -781,16 +850,41 @@ function release(cancelShort) {
 // Mouse: move to aim, hold the left button to charge, let go to fire.
 // Touch and pen: tap or drag on the battlefield only aims; the FIRE button charges and fires.
 // One thumb can hold FIRE while the other finger keeps adjusting the aim.
+// Two fingers on the battlefield: pinch to zoom, move both to pan (like a photo). One finger still aims.
+const touches = new Map(); let pinch = null;
+function pinchState() { const [a, b] = [...touches.values()]; return { d: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mx: (a[0] + b[0]) / 2, my: (a[1] + b[1]) / 2 }; }
+cv.addEventListener('pointerdown', e => {
+  if (e.pointerType === 'mouse') return;
+  touches.set(e.pointerId, toCanvas(e));
+  if (touches.size === 2) { pinch = { ...pinchState(), z: zoom }; if (aimPointer !== null) { aimPointer = null; held.pitch = 0; steerY = null; } }
+}, true);
+cv.addEventListener('pointermove', e => {
+  if (!touches.has(e.pointerId)) return; touches.set(e.pointerId, toCanvas(e));
+  if (pinch && touches.size === 2) {
+    const p = pinchState(); setZoom(pinch.z * p.d / pinch.d, p.mx, p.my);
+    camL -= (p.mx - pinch.mx) / zoom; camT -= (p.my - pinch.my) / zoom; clampCam(); pinch.mx = p.mx; pinch.my = p.my; camFollow = false;
+    e.stopImmediatePropagation();
+  }
+}, true);
+for (const t of ['pointerup', 'pointercancel']) cv.addEventListener(t, e => { touches.delete(e.pointerId); if (touches.size < 2) pinch = null; }, true);
+cv.addEventListener('wheel', e => { if (!g || !$('#menu').hidden) return; e.preventDefault(); const [px, py] = toCanvas(e); setZoom(zoom * Math.exp(-e.deltaY * .0015), px, py); }, { passive: false });
 cv.addEventListener('pointerdown', e => {
   if (e.button) return; e.preventDefault(); unselect(); cv.focus({ preventScroll: true });
+  if (pinch) return;
   if (e.pointerType === 'mouse') { cv.setPointerCapture(e.pointerId); aimAt(e); beginCharge(); return; }
   if (aimPointer !== null) return;
   aimPointer = e.pointerId; try { cv.setPointerCapture(e.pointerId); } catch {} aimAt(e);
 });
-cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || e.pointerId === aimPointer) aimAt(e); });
+cv.addEventListener('pointermove', e => { if (pinch) return; if (e.pointerType === 'mouse' || e.pointerId === aimPointer) aimAt(e); });
 cv.addEventListener('pointerup',e=>{if(e.pointerId===aimPointer){held.pitch=0;steerY=null;aimPointer=null;}else if(e.pointerType==='mouse')release(true);});
 cv.addEventListener('pointercancel', e => { if (e.pointerId === aimPointer) {aimPointer=null;held.pitch=0;steerY=null;} else if (e.pointerType === 'mouse') clearCharge(); });
 cv.addEventListener('lostpointercapture', e => { if (e.pointerId === aimPointer) {aimPointer=null;held.pitch=0;steerY=null;} else if (e.pointerType === 'mouse' && charging) clearCharge(); });
+// Zoom buttons in the top-right corner of the battlefield.
+const zoomBar = document.createElement('div'); zoomBar.className = 'pw-zoom';
+zoomBar.innerHTML = '<button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out">−</button><button type="button" data-z="fit" aria-label="Show the whole map">⤢</button>';
+cv.parentElement.append(zoomBar);
+zoomBar.addEventListener('pointerdown', e => e.stopPropagation());
+zoomBar.addEventListener('click', e => { const b = e.target.closest('[data-z]'); if (!b) return; const z = b.dataset.z; setZoom(z === 'in' ? zoom * 1.35 : z === 'out' ? zoom / 1.35 : 1); camFollow = true; cv.focus({ preventScroll: true }); });
 const fb = $('#fire');
 bindHold(fb,beginCharge,()=>release(false),clearCharge);
 for (const [id, k] of [['#left', 'l'], ['#right', 'r']]) {
@@ -817,6 +911,7 @@ document.addEventListener('keydown', e => {
   if(e.code==='Escape'){closeArsenal(true);return;}
   if (!g || e.target.closest('input,textarea,select') || !$('#menu').hidden || !$('#over').hidden) return;
   const k=e.code;
+  if(['Equal','NumpadAdd','Minus','NumpadSubtract'].includes(k)){e.preventDefault();setZoom(zoom*(['Equal','NumpadAdd'].includes(k)?1.25:.8));camFollow=true;return;}
   if(k==='Enter'){e.preventDefault();if(!e.repeat&&guiding()){pending.push({t:'detonate'});return;}if(!e.repeat)beginCharge();return;}
   if(k==='Space'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat&&guiding()){pending.push({t:'detonate'});return;}if(!e.repeat)jump();return;}
   if(['ArrowLeft','ArrowRight','KeyA','KeyD'].includes(k)){

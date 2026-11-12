@@ -374,9 +374,18 @@ function clearSpot(g, x, y) {
 export function skip(g) { if (g.phase === 'aim') { g.phase = 'settle'; g.settle = .4; } }
 function stepDoge(g, s, mask, frogs) {
   const w = WEAPONS.doge, ctl = g.ctl || { x: 0, y: 0 };
+  // A/D (◀ ▶) turn the nose clockwise / anticlockwise; W/S (↑ ↓) swing the nose toward straight up / straight down.
+  // The flyer always flies where its nose points (the old code mixed a heading for x with a separate pitch for y,
+  // so turning left and right felt the same and the Doge could not really be steered).
   s.heading += ctl.x * w.turnRate * STEP;
-  s.pitch = Math.max(-1.1, Math.min(1.1, (s.pitch || 0) + ctl.y * w.pitchRate * STEP));
-  const wantX = Math.cos(s.heading) * w.cruise, wantY = Math.sin(s.pitch) * w.cruise;
+  if (ctl.y) {
+    const want = ctl.y < 0 ? -Math.PI / 2 : Math.PI / 2;
+    const diff = Math.atan2(Math.sin(want - s.heading), Math.cos(want - s.heading));
+    s.heading += Math.sign(diff) * Math.min(Math.abs(diff), w.pitchRate * STEP);
+  }
+  s.heading = Math.atan2(Math.sin(s.heading), Math.cos(s.heading));
+  s.pitch = s.heading;
+  const wantX = Math.cos(s.heading) * w.cruise, wantY = Math.sin(s.heading) * w.cruise;
   s.vx += (wantX - s.vx) * w.lag * STEP;
   s.vy += (wantY - s.vy) * w.lag * STEP;
   s.vy += G * w.guideGravity * STEP;

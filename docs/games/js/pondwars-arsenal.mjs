@@ -14,8 +14,8 @@ export const SCALE = {
 // Guided flyer. Inertia (lag) is low on purpose: heading changes faster than velocity.
 export const GUIDE = {
   lifetime: 4.5,
-  turnRate: 2.1,
-  pitchRate: 1.6,
+  turnRate: 2.8,
+  pitchRate: 2.8,
   cruise: 250,
   lag: 2.4,
   gravity: 0.12,
