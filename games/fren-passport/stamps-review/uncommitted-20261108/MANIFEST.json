@@ -1,0 +1,497 @@
+{
+  "scope": "Graphics made locally but not added as individually delivered art to PR #230/#231/#233",
+  "date": "2026-11-08",
+  "asset_count": 28,
+  "groups": {
+    "01_latest": "Recent sketches Adept, Good Game, Checkmate, two variants each",
+    "02_future": "Five future achievements only from unsubmitted composite sheet",
+    "03_old_alternates": "Historical versions rejected/replaced; many overlap IDs with graphics already in PRs, but these specific compositions not uploaded"
+  },
+  "assets": [
+    {
+      "group": "01_latest",
+      "id": "yeet_adept_vA",
+      "name": "Adept / A",
+      "path": "individual/01_latest/yeet_adept_vA.png",
+      "native_px": [
+        384,
+        342
+      ],
+      "source": "a_detailed_cartoon_illustration_of_a_full_set_of_t.png",
+      "note": "Incorrect scene: trophy/explorer; should be red-helmet YEET pilot leaving slingshot at 3000 m",
+      "quality": "REJECTED_COMPOSITION",
+      "in_pr": false,
+      "sha256": "65ce115d11ffcafd570dcb84966163765b061ff056bfeaf1a0d2cf8c704777af",
+      "source_original_sha256": "65ce115d11ffcafd570dcb84966163765b061ff056bfeaf1a0d2cf8c704777af",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "01_latest",
+      "id": "good_game_vA",
+      "name": "Good Game / A",
+      "path": "individual/01_latest/good_game_vA.png",
+      "native_px": [
+        384,
+        342
+      ],
+      "source": "a_detailed_cartoon_illustration_of_a_full_set_of_t.png",
+      "note": "Incorrect scene: single gamer at CRT; should be two Pepes shaking hands across board games",
+      "quality": "REJECTED_COMPOSITION",
+      "in_pr": false,
+      "sha256": "b21f2fd0ef18ad93f68e3da60cb2553790e41beb48e6ec04613211e1bd84f864",
+      "source_original_sha256": "b21f2fd0ef18ad93f68e3da60cb2553790e41beb48e6ec04613211e1bd84f864",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "01_latest",
+      "id": "checkmate_vA",
+      "name": "Checkmate! / A",
+      "path": "individual/01_latest/checkmate_vA.png",
+      "native_px": [
+        384,
+        342
+      ],
+      "source": "a_detailed_cartoon_illustration_of_a_full_set_of_t.png",
+      "note": "Partial scene: smug Pepe and chess pieces; missing clear toppled black king and white queen composition",
+      "quality": "REJECTED_COMPOSITION",
+      "in_pr": false,
+      "sha256": "74d5e8fdf00d434a5e167ef3fb1e43960a1e84d49cc2d094931cbba87168bf69",
+      "source_original_sha256": "74d5e8fdf00d434a5e167ef3fb1e43960a1e84d49cc2d094931cbba87168bf69",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "01_latest",
+      "id": "yeet_adept_vB",
+      "name": "Adept / B",
+      "path": "individual/01_latest/yeet_adept_vB.png",
+      "native_px": [
+        384,
+        342
+      ],
+      "source": "a_clean_high_detail_cartoon_illustration_in_a_uni.png",
+      "note": "Incorrect scene: trophy/explorer; should be red-helmet YEET pilot leaving slingshot at 3000 m",
+      "quality": "REJECTED_COMPOSITION",
+      "in_pr": false,
+      "sha256": "2d982219efaeee6390d872ee4b1c61b0bf6a9dec839a5a0fb4767bf7fd084f7c",
+      "source_original_sha256": "2d982219efaeee6390d872ee4b1c61b0bf6a9dec839a5a0fb4767bf7fd084f7c",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "01_latest",
+      "id": "good_game_vB",
+      "name": "Good Game / B",
+      "path": "individual/01_latest/good_game_vB.png",
+      "native_px": [
+        384,
+        342
+      ],
+      "source": "a_clean_high_detail_cartoon_illustration_in_a_uni.png",
+      "note": "Incorrect scene: single gamer at CRT; should be two Pepes shaking hands across board games",
+      "quality": "REJECTED_COMPOSITION",
+      "in_pr": false,
+      "sha256": "6e449cf1b86b6f9c9b883518c65ed7691e7eae84744deb48b6c83652310aca21",
+      "source_original_sha256": "6e449cf1b86b6f9c9b883518c65ed7691e7eae84744deb48b6c83652310aca21",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "01_latest",
+      "id": "checkmate_vB",
+      "name": "Checkmate! / B",
+      "path": "individual/01_latest/checkmate_vB.png",
+      "native_px": [
+        384,
+        342
+      ],
+      "source": "a_clean_high_detail_cartoon_illustration_in_a_uni.png",
+      "note": "Partial scene: smug Pepe and chess pieces; missing clear toppled black king and white queen composition",
+      "quality": "REJECTED_COMPOSITION",
+      "in_pr": false,
+      "sha256": "9f1afa3e336fd5628b5a987601be01a8493d891b849d433641eb147d878b0df6",
+      "source_original_sha256": "9f1afa3e336fd5628b5a987601be01a8493d891b849d433641eb147d878b0df6",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "02_future",
+      "id": "interior_designer",
+      "name": "Pond Decorator",
+      "path": "individual/02_future/interior_designer.png",
+      "native_px": [
+        256,
+        429
+      ],
+      "source": "a_colorful_crisp_cartoon_stamp_sheet_illustratio.png",
+      "note": "Needs Pepe on ladder decorating PepeGochi room, not outdoor pond",
+      "quality": "ROUGH_SHEET_CROP",
+      "in_pr": false,
+      "sha256": "36eaafe2c5d617f1209db393ed1f89c86289260d5a394fdca7d766e466ca2aa6",
+      "source_original_sha256": "36eaafe2c5d617f1209db393ed1f89c86289260d5a394fdca7d766e466ca2aa6",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "02_future",
+      "id": "secret_starter",
+      "name": "Secret Starter",
+      "path": "individual/02_future/secret_starter.png",
+      "native_px": [
+        255,
+        429
+      ],
+      "source": "a_colorful_crisp_cartoon_stamp_sheet_illustratio.png",
+      "note": "Needs glowing floppy inside Win98 Recycle Bin, not glowing treasure box",
+      "quality": "ROUGH_SHEET_CROP",
+      "in_pr": false,
+      "sha256": "4bf209126182c1523d3f26b8a427b2242f49ec864b78386b9b5ab9973790e31a",
+      "source_original_sha256": "4bf209126182c1523d3f26b8a427b2242f49ec864b78386b9b5ab9973790e31a",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "02_future",
+      "id": "treasure_hunter",
+      "name": "Treasure Hunter",
+      "path": "individual/02_future/treasure_hunter.png",
+      "native_px": [
+        255,
+        429
+      ],
+      "source": "a_colorful_crisp_cartoon_stamp_sheet_illustratio.png",
+      "note": "Needs open chest of floppy disks, paper crown and map piece, not cave exploration only",
+      "quality": "ROUGH_SHEET_CROP",
+      "in_pr": false,
+      "sha256": "6594bdfbe56cdc1d383778b7e5c48136fbd2af3307335b952f94d4ddadfea72d",
+      "source_original_sha256": "6594bdfbe56cdc1d383778b7e5c48136fbd2af3307335b952f94d4ddadfea72d",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "02_future",
+      "id": "frogageddon_beta",
+      "name": "Beta Tester",
+      "path": "individual/02_future/frogageddon_beta.png",
+      "native_px": [
+        256,
+        429
+      ],
+      "source": "a_colorful_crisp_cartoon_stamp_sheet_illustratio.png",
+      "note": "Needs white lab coat and safety goggles, not game headset",
+      "quality": "ROUGH_SHEET_CROP",
+      "in_pr": false,
+      "sha256": "ea934d157bd073fcbe1aa3d6d9e5f7cb53770d0446cb826d5b57aab022e9a0d0",
+      "source_original_sha256": "ea934d157bd073fcbe1aa3d6d9e5f7cb53770d0446cb826d5b57aab022e9a0d0",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "02_future",
+      "id": "frogmas",
+      "name": "Frogmas",
+      "path": "individual/02_future/frogmas.png",
+      "native_px": [
+        256,
+        429
+      ],
+      "source": "a_colorful_crisp_cartoon_stamp_sheet_illustratio.png",
+      "note": "Scene broadly matches, need correct blue background and complete quality check",
+      "quality": "ROUGH_SHEET_CROP",
+      "in_pr": false,
+      "sha256": "017234d252cd2eb6d28ad119b108bb9f812e2beffed1a45b4350a825eeca3908",
+      "source_original_sha256": "017234d252cd2eb6d28ad119b108bb9f812e2beffed1a45b4350a825eeca3908",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "early_first_fren",
+      "name": "first_fren",
+      "path": "individual/03_old_alternates/early_first_fren.png",
+      "native_px": [
+        276,
+        300
+      ],
+      "source": "PepecoinHub_FrenPassport_Stamps_Batch01_2026-11-07.zip",
+      "note": "Early version only, superseded by later approved visual system; Moonwalker wears wrong astronaut suit",
+      "quality": "OUTDATED_ALT",
+      "in_pr": false,
+      "sha256": "1aee3b1204ea79b724cb70472f6593fbe721757fa69b66545ce590c509673ff2",
+      "source_original_sha256": "1aee3b1204ea79b724cb70472f6593fbe721757fa69b66545ce590c509673ff2",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "early_first_avatar",
+      "name": "first_avatar",
+      "path": "individual/03_old_alternates/early_first_avatar.png",
+      "native_px": [
+        276,
+        300
+      ],
+      "source": "PepecoinHub_FrenPassport_Stamps_Batch01_2026-11-07.zip",
+      "note": "Early version only, superseded by later approved visual system; Moonwalker wears wrong astronaut suit",
+      "quality": "OUTDATED_ALT",
+      "in_pr": false,
+      "sha256": "58b292fafb2ff74ed0ac8c32cc8c4b8070cd9c3193e1a790eac54465efde6b50",
+      "source_original_sha256": "58b292fafb2ff74ed0ac8c32cc8c4b8070cd9c3193e1a790eac54465efde6b50",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "early_sharp_eye",
+      "name": "sharp_eye",
+      "path": "individual/03_old_alternates/early_sharp_eye.png",
+      "native_px": [
+        276,
+        300
+      ],
+      "source": "PepecoinHub_FrenPassport_Stamps_Batch01_2026-11-07.zip",
+      "note": "Early version only, superseded by later approved visual system; Moonwalker wears wrong astronaut suit",
+      "quality": "OUTDATED_ALT",
+      "in_pr": false,
+      "sha256": "322298942cb7d415f438ecfbad3c3304dda60a4e73af8af911b7716361cd1835",
+      "source_original_sha256": "322298942cb7d415f438ecfbad3c3304dda60a4e73af8af911b7716361cd1835",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "early_detective_fren",
+      "name": "detective_fren",
+      "path": "individual/03_old_alternates/early_detective_fren.png",
+      "native_px": [
+        276,
+        300
+      ],
+      "source": "PepecoinHub_FrenPassport_Stamps_Batch01_2026-11-07.zip",
+      "note": "Early version only, superseded by later approved visual system; Moonwalker wears wrong astronaut suit",
+      "quality": "OUTDATED_ALT",
+      "in_pr": false,
+      "sha256": "82168b469b54dbd0eed22a54c3ab6d5e8cd946ff70316ed6a1fd9f5173d3ce30",
+      "source_original_sha256": "82168b469b54dbd0eed22a54c3ab6d5e8cd946ff70316ed6a1fd9f5173d3ce30",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "early_community_fren",
+      "name": "community_fren",
+      "path": "individual/03_old_alternates/early_community_fren.png",
+      "native_px": [
+        276,
+        300
+      ],
+      "source": "PepecoinHub_FrenPassport_Stamps_Batch01_2026-11-07.zip",
+      "note": "Early version only, superseded by later approved visual system; Moonwalker wears wrong astronaut suit",
+      "quality": "OUTDATED_ALT",
+      "in_pr": false,
+      "sha256": "2aa6073633cd2e3d0306ade622ed725296038b0ebd06840eca0e8c7fb4a37dc4",
+      "source_original_sha256": "2aa6073633cd2e3d0306ade622ed725296038b0ebd06840eca0e8c7fb4a37dc4",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "early_moonwalker",
+      "name": "moonwalker",
+      "path": "individual/03_old_alternates/early_moonwalker.png",
+      "native_px": [
+        276,
+        300
+      ],
+      "source": "PepecoinHub_FrenPassport_Stamps_Batch01_2026-11-07.zip",
+      "note": "Early version only, superseded by later approved visual system; Moonwalker wears wrong astronaut suit",
+      "quality": "OUTDATED_ALT",
+      "in_pr": false,
+      "sha256": "308c985cc43b304b856785eea21aee839b11c06f4385069deba4d94fac75b969",
+      "source_original_sha256": "308c985cc43b304b856785eea21aee839b11c06f4385069deba4d94fac75b969",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "wip_certified_fren",
+      "name": "certified_fren",
+      "path": "individual/03_old_alternates/wip_certified_fren.png",
+      "native_px": [
+        903,
+        1272
+      ],
+      "source": "PepecoinHub_Passport_Next_Stamps_WIP.zip",
+      "note": "Alternative early low-resolution illustration, different from #233 source",
+      "quality": "OUTDATED_ALT",
+      "in_pr": false,
+      "sha256": "7e8096257b86bb8dd8207629fee50f6ee7443fd446b4cceddf2c2456779ea3ed",
+      "source_original_sha256": "7e8096257b86bb8dd8207629fee50f6ee7443fd446b4cceddf2c2456779ea3ed",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "wip_old_frog",
+      "name": "old_frog",
+      "path": "individual/03_old_alternates/wip_old_frog.png",
+      "native_px": [
+        930,
+        1272
+      ],
+      "source": "PepecoinHub_Passport_Next_Stamps_WIP.zip",
+      "note": "Alternative early low-resolution illustration, different from #233 source",
+      "quality": "OUTDATED_ALT",
+      "in_pr": false,
+      "sha256": "805d6421b524b0582833113d4d889d056f9f71e744a2b3e23dfe1545645f4e10",
+      "source_original_sha256": "805d6421b524b0582833113d4d889d056f9f71e744a2b3e23dfe1545645f4e10",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "wip_vox_populi",
+      "name": "vox_populi",
+      "path": "individual/03_old_alternates/wip_vox_populi.png",
+      "native_px": [
+        894,
+        1275
+      ],
+      "source": "PepecoinHub_Passport_Next_Stamps_WIP.zip",
+      "note": "Alternative early low-resolution illustration, different from #233 source",
+      "quality": "OUTDATED_ALT",
+      "in_pr": false,
+      "sha256": "ba1e75f648a64ce2ad3039495246a426b08cafd78f35db5c68c722b60b2846cb",
+      "source_original_sha256": "ba1e75f648a64ce2ad3039495246a426b08cafd78f35db5c68c722b60b2846cb",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "vector_frog_of_the_week",
+      "name": "frog_of_the_week",
+      "path": "individual/03_old_alternates/vector_frog_of_the_week.png",
+      "native_px": [
+        980,
+        1120
+      ],
+      "source": "PepecoinHub_Passport_v3_Stamps_Review_Package.zip",
+      "note": "Old vector variant; replaced after owner requested hand-drawn style",
+      "quality": "REJECTED_STYLE",
+      "in_pr": false,
+      "sha256": "985c619fe11cb2856d3985a825b69b2a91b6e29dbdfbb0ee6134f5361e6b57fd",
+      "source_original_sha256": "985c619fe11cb2856d3985a825b69b2a91b6e29dbdfbb0ee6134f5361e6b57fd",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "vector_moonwalker",
+      "name": "moonwalker",
+      "path": "individual/03_old_alternates/vector_moonwalker.png",
+      "native_px": [
+        980,
+        1120
+      ],
+      "source": "PepecoinHub_Passport_v3_Stamps_Review_Package.zip",
+      "note": "Old vector variant; replaced after owner requested hand-drawn style",
+      "quality": "REJECTED_STYLE",
+      "in_pr": false,
+      "sha256": "5334974a41b458907ba4f0b17617920986b7ba558182d81dd8194a73c08a1200",
+      "source_original_sha256": "5334974a41b458907ba4f0b17617920986b7ba558182d81dd8194a73c08a1200",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "vector_season_champion",
+      "name": "season_champion",
+      "path": "individual/03_old_alternates/vector_season_champion.png",
+      "native_px": [
+        980,
+        1120
+      ],
+      "source": "PepecoinHub_Passport_v3_Stamps_Review_Package.zip",
+      "note": "Old vector variant; replaced after owner requested hand-drawn style",
+      "quality": "REJECTED_STYLE",
+      "in_pr": false,
+      "sha256": "793a44017b4a657c838d610ee58c2cc832326d9f0114a730115d8867ac0a3743",
+      "source_original_sha256": "793a44017b4a657c838d610ee58c2cc832326d9f0114a730115d8867ac0a3743",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "pepe_mistrz_sezonu",
+      "name": "Season Champion",
+      "path": "individual/03_old_alternates/pepe_mistrz_sezonu.png",
+      "native_px": [
+        1173,
+        1341
+      ],
+      "source": "pepe_mistrz_sezonu.png",
+      "note": "Laurel wreath and gold cup. This full-resolution variation is not the 310px former PR #233 scene. Very similar pair.",
+      "quality": "ALT_NOT_IN_PR",
+      "in_pr": false,
+      "sha256": "d9acc58bc3cc0d48edb0065a844f77cba27691e5b5aecaf6f2c887b0dcb9fb22",
+      "source_original_sha256": "d9acc58bc3cc0d48edb0065a844f77cba27691e5b5aecaf6f2c887b0dcb9fb22",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "sezonowy_mistrz_pepe_z_trofeum",
+      "name": "Season Champion",
+      "path": "individual/03_old_alternates/sezonowy_mistrz_pepe_z_trofeum.png",
+      "native_px": [
+        1173,
+        1341
+      ],
+      "source": "sezonowy_mistrz_pepe_z_trofeum.png",
+      "note": "Laurel wreath and gold cup. This full-resolution variation is not the 310px former PR #233 scene. Very similar pair.",
+      "quality": "ALT_NOT_IN_PR",
+      "in_pr": false,
+      "sha256": "fd2a14e2c5446e6c839cbf2443867399c0b0eb795d14576bad84580c8ff18fea",
+      "source_original_sha256": "fd2a14e2c5446e6c839cbf2443867399c0b0eb795d14576bad84580c8ff18fea",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "wrong_30_day_streak",
+      "name": "30-Day Streak (wrong)",
+      "path": "individual/03_old_alternates/wrong_30_day_streak.png",
+      "native_px": [
+        1173,
+        1341
+      ],
+      "source": "a_colorful_cartoon_comic_style_postage_stamp_illus.png",
+      "note": "Incorrectly about pet care instead of visiting PondOS 30 times",
+      "quality": "REJECTED_WRONG_RULE",
+      "in_pr": false,
+      "sha256": "15f6956c61f4fcc9485e8c47159e0e3df6bfb6cc6d8071b4e1420602435f0ad7",
+      "source_original_sha256": "15f6956c61f4fcc9485e8c47159e0e3df6bfb6cc6d8071b4e1420602435f0ad7",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "wrong_nasa_is_hiring",
+      "name": "NASA Is Hiring (wrong)",
+      "path": "individual/03_old_alternates/wrong_nasa_is_hiring.png",
+      "native_px": [
+        1173,
+        1341
+      ],
+      "source": "a_vibrant_clean_cartoon_postage_stamp_style_illus.png",
+      "note": "Incorrect astronaut and trademark; rejected by owner art direction",
+      "quality": "REJECTED_WRONG_COSTUME",
+      "in_pr": false,
+      "sha256": "32174b118769a971ed4896df84b82feb93dc6d416c5ac7b11a1b491062813cf3",
+      "source_original_sha256": "32174b118769a971ed4896df84b82feb93dc6d416c5ac7b11a1b491062813cf3",
+      "source_original_unchanged_pixels": true
+    },
+    {
+      "group": "03_old_alternates",
+      "id": "early_good_parent",
+      "name": "Good Parent (older)",
+      "path": "individual/03_old_alternates/early_good_parent.png",
+      "native_px": [
+        1312,
+        1199
+      ],
+      "source": "a_colorful_cartoon_illustration_in_the_same_hand_d.png",
+      "note": "Early sweet family scene; owner later preferred humorous 30-day survival",
+      "quality": "OUTDATED_ALT",
+      "in_pr": false,
+      "sha256": "759862687688d35efc31b4a4c6097bba36d7269cd55092c6ef5be5245b682523",
+      "source_original_sha256": "759862687688d35efc31b4a4c6097bba36d7269cd55092c6ef5be5245b682523",
+      "source_original_unchanged_pixels": true
+    }
+  ],
+  "notes": [
+    "Draft PR is a read-only art review collection, not production assets.",
+    "28 PNG variants include old rejected/incorrect compositions. Never treat them as 28 unique achievements.",
+    "Native image dimensions remain unchanged, PNG pixels preserved losslessly. Original source ZIP stays available separately.",
+    "Source of truth for scene/rules/labels: v3 art spec in PR #231; approved art reference: PR #233.",
+    "Special avatars are out of scope. No code, SQL, catalog, or live interface changes."
+  ],
+  "pull_request_intent": "standalone Draft PR, no merge or integration",
+  "total_review_variants": 28
+}
