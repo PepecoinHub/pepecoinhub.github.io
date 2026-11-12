@@ -1,0 +1,156 @@
+{
+  "basePR": 283,
+  "node": {
+    "total": 246,
+    "pass": 235,
+    "skip": 11,
+    "fail": 0
+  },
+  "browser": [
+    {
+      "profile": "desktop",
+      "frames": 42,
+      "sameTickPEP": 6,
+      "banDistances": [
+        35,
+        47.99,
+        48,
+        55
+      ],
+      "banDirections": 2,
+      "gripSkins": 8,
+      "pause": true,
+      "restart": true,
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    },
+    {
+      "profile": "touch",
+      "frames": 42,
+      "sameTickPEP": 6,
+      "banDistances": [
+        35,
+        47.99,
+        48,
+        55
+      ],
+      "banDirections": 2,
+      "gripSkins": 8,
+      "pause": true,
+      "restart": true,
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    },
+    {
+      "profile": "reduced",
+      "frames": 42,
+      "sameTickPEP": 6,
+      "banDistances": [
+        35,
+        47.99,
+        48,
+        55
+      ],
+      "banDirections": 2,
+      "gripSkins": 8,
+      "pause": true,
+      "restart": true,
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    }
+  ],
+  "network": {
+    "queuedSteps": 13,
+    "midFlightReconnect": true,
+    "equalHashes": true,
+    "ammoAfterReconnect": 0,
+    "flightTimeRestored": 0.21666666666666665,
+    "physicalDeviceApproved": false,
+    "activeBurstBeforeReconnect": true,
+    "noBurstReplayAfterReconnect": true,
+    "pageErrors": []
+  },
+  "recordings": [
+    {
+      "weapon": "doge",
+      "seconds": 3.0,
+      "resolution": [
+        1200,
+        800
+      ],
+      "realTime": true
+    },
+    {
+      "weapon": "donkey",
+      "seconds": 3.8,
+      "resolution": [
+        1200,
+        800
+      ],
+      "realTime": true
+    },
+    {
+      "weapon": "moon",
+      "seconds": 3.0,
+      "resolution": [
+        1200,
+        800
+      ],
+      "realTime": true
+    },
+    {
+      "weapon": "rain",
+      "seconds": 3.3,
+      "resolution": [
+        1200,
+        800
+      ],
+      "realTime": true
+    },
+    {
+      "weapon": "ban",
+      "seconds": 2.2,
+      "resolution": [
+        1200,
+        800
+      ],
+      "realTime": true
+    }
+  ],
+  "physicalDeviceApproved": false,
+  "regressionVersionedClips": [
+    {
+      "profile": "desktop",
+      "sampledFrames": 70,
+      "rotationAngles": 8,
+      "pausedFlights": 4,
+      "restartClearsFX": true,
+      "manualDogeDetonation": true,
+      "sixPEPDrops": true,
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    },
+    {
+      "profile": "touch",
+      "sampledFrames": 70,
+      "rotationAngles": 8,
+      "pausedFlights": 4,
+      "restartClearsFX": true,
+      "manualDogeDetonation": true,
+      "sixPEPDrops": true,
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    },
+    {
+      "profile": "reduced",
+      "sampledFrames": 70,
+      "rotationAngles": 8,
+      "pausedFlights": 4,
+      "restartClearsFX": true,
+      "manualDogeDetonation": true,
+      "sixPEPDrops": true,
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    }
+  ]
+}

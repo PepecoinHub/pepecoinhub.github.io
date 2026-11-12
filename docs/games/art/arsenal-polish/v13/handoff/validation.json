@@ -1,0 +1,469 @@
+{
+  "atlas_count": 6,
+  "frame_count": 42,
+  "safe_margin_min_px": 12,
+  "frames": [
+    {
+      "asset": "donkey_impact_v13_atlas.png",
+      "frame": 0,
+      "alpha_bbox": [
+        44,
+        42,
+        86,
+        84
+      ],
+      "min_margin_px": 42
+    },
+    {
+      "asset": "donkey_impact_v13_atlas.png",
+      "frame": 1,
+      "alpha_bbox": [
+        34,
+        32,
+        96,
+        94
+      ],
+      "min_margin_px": 32
+    },
+    {
+      "asset": "donkey_impact_v13_atlas.png",
+      "frame": 2,
+      "alpha_bbox": [
+        12,
+        16,
+        114,
+        112
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "donkey_impact_v13_atlas.png",
+      "frame": 3,
+      "alpha_bbox": [
+        12,
+        18,
+        116,
+        110
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "donkey_impact_v13_atlas.png",
+      "frame": 4,
+      "alpha_bbox": [
+        12,
+        24,
+        116,
+        104
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "donkey_impact_v13_atlas.png",
+      "frame": 5,
+      "alpha_bbox": [
+        12,
+        22,
+        116,
+        106
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "donkey_impact_v13_atlas.png",
+      "frame": 6,
+      "alpha_bbox": [
+        20,
+        36,
+        112,
+        90
+      ],
+      "min_margin_px": 16
+    },
+    {
+      "asset": "donkey_impact_v13_atlas.png",
+      "frame": 7,
+      "alpha_bbox": [
+        20,
+        36,
+        112,
+        86
+      ],
+      "min_margin_px": 16
+    },
+    {
+      "asset": "doge_blast_v13_atlas.png",
+      "frame": 0,
+      "alpha_bbox": [
+        52,
+        54,
+        78,
+        80
+      ],
+      "min_margin_px": 48
+    },
+    {
+      "asset": "doge_blast_v13_atlas.png",
+      "frame": 1,
+      "alpha_bbox": [
+        42,
+        42,
+        88,
+        98
+      ],
+      "min_margin_px": 30
+    },
+    {
+      "asset": "doge_blast_v13_atlas.png",
+      "frame": 2,
+      "alpha_bbox": [
+        30,
+        30,
+        100,
+        102
+      ],
+      "min_margin_px": 26
+    },
+    {
+      "asset": "doge_blast_v13_atlas.png",
+      "frame": 3,
+      "alpha_bbox": [
+        18,
+        20,
+        112,
+        110
+      ],
+      "min_margin_px": 16
+    },
+    {
+      "asset": "doge_blast_v13_atlas.png",
+      "frame": 4,
+      "alpha_bbox": [
+        12,
+        26,
+        116,
+        100
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "doge_blast_v13_atlas.png",
+      "frame": 5,
+      "alpha_bbox": [
+        12,
+        28,
+        114,
+        100
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "doge_blast_v13_atlas.png",
+      "frame": 6,
+      "alpha_bbox": [
+        16,
+        34,
+        114,
+        102
+      ],
+      "min_margin_px": 14
+    },
+    {
+      "asset": "doge_blast_v13_atlas.png",
+      "frame": 7,
+      "alpha_bbox": [
+        16,
+        36,
+        112,
+        100
+      ],
+      "min_margin_px": 16
+    },
+    {
+      "asset": "moon_impact_v13_atlas.png",
+      "frame": 0,
+      "alpha_bbox": [
+        48,
+        46,
+        82,
+        80
+      ],
+      "min_margin_px": 46
+    },
+    {
+      "asset": "moon_impact_v13_atlas.png",
+      "frame": 1,
+      "alpha_bbox": [
+        36,
+        34,
+        94,
+        92
+      ],
+      "min_margin_px": 34
+    },
+    {
+      "asset": "moon_impact_v13_atlas.png",
+      "frame": 2,
+      "alpha_bbox": [
+        24,
+        22,
+        106,
+        104
+      ],
+      "min_margin_px": 22
+    },
+    {
+      "asset": "moon_impact_v13_atlas.png",
+      "frame": 3,
+      "alpha_bbox": [
+        18,
+        16,
+        112,
+        110
+      ],
+      "min_margin_px": 16
+    },
+    {
+      "asset": "moon_impact_v13_atlas.png",
+      "frame": 4,
+      "alpha_bbox": [
+        24,
+        34,
+        106,
+        106
+      ],
+      "min_margin_px": 22
+    },
+    {
+      "asset": "moon_impact_v13_atlas.png",
+      "frame": 5,
+      "alpha_bbox": [
+        30,
+        38,
+        102,
+        112
+      ],
+      "min_margin_px": 16
+    },
+    {
+      "asset": "moon_impact_v13_atlas.png",
+      "frame": 6,
+      "alpha_bbox": [
+        24,
+        44,
+        106,
+        114
+      ],
+      "min_margin_px": 14
+    },
+    {
+      "asset": "moon_impact_v13_atlas.png",
+      "frame": 7,
+      "alpha_bbox": [
+        14,
+        24,
+        112,
+        102
+      ],
+      "min_margin_px": 14
+    },
+    {
+      "asset": "pep_impact_v13_atlas.png",
+      "frame": 0,
+      "alpha_bbox": [
+        56,
+        56,
+        74,
+        74
+      ],
+      "min_margin_px": 54
+    },
+    {
+      "asset": "pep_impact_v13_atlas.png",
+      "frame": 1,
+      "alpha_bbox": [
+        48,
+        48,
+        82,
+        82
+      ],
+      "min_margin_px": 46
+    },
+    {
+      "asset": "pep_impact_v13_atlas.png",
+      "frame": 2,
+      "alpha_bbox": [
+        40,
+        40,
+        90,
+        90
+      ],
+      "min_margin_px": 38
+    },
+    {
+      "asset": "pep_impact_v13_atlas.png",
+      "frame": 3,
+      "alpha_bbox": [
+        34,
+        34,
+        96,
+        96
+      ],
+      "min_margin_px": 32
+    },
+    {
+      "asset": "pep_impact_v13_atlas.png",
+      "frame": 4,
+      "alpha_bbox": [
+        28,
+        32,
+        102,
+        88
+      ],
+      "min_margin_px": 26
+    },
+    {
+      "asset": "pep_impact_v13_atlas.png",
+      "frame": 5,
+      "alpha_bbox": [
+        34,
+        34,
+        98,
+        88
+      ],
+      "min_margin_px": 30
+    },
+    {
+      "asset": "donkey_warning_v13_atlas.png",
+      "frame": 0,
+      "alpha_bbox": [
+        20,
+        12,
+        108,
+        116
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "donkey_warning_v13_atlas.png",
+      "frame": 1,
+      "alpha_bbox": [
+        20,
+        12,
+        108,
+        116
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "donkey_warning_v13_atlas.png",
+      "frame": 2,
+      "alpha_bbox": [
+        20,
+        12,
+        108,
+        116
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "donkey_warning_v13_atlas.png",
+      "frame": 3,
+      "alpha_bbox": [
+        20,
+        12,
+        108,
+        116
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "donkey_warning_v13_atlas.png",
+      "frame": 4,
+      "alpha_bbox": [
+        20,
+        12,
+        108,
+        116
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "donkey_warning_v13_atlas.png",
+      "frame": 5,
+      "alpha_bbox": [
+        20,
+        12,
+        108,
+        116
+      ],
+      "min_margin_px": 12
+    },
+    {
+      "asset": "ban_impact_v13_atlas.png",
+      "frame": 0,
+      "alpha_bbox": [
+        54,
+        54,
+        76,
+        76
+      ],
+      "min_margin_px": 52
+    },
+    {
+      "asset": "ban_impact_v13_atlas.png",
+      "frame": 1,
+      "alpha_bbox": [
+        42,
+        42,
+        88,
+        88
+      ],
+      "min_margin_px": 40
+    },
+    {
+      "asset": "ban_impact_v13_atlas.png",
+      "frame": 2,
+      "alpha_bbox": [
+        24,
+        24,
+        106,
+        106
+      ],
+      "min_margin_px": 22
+    },
+    {
+      "asset": "ban_impact_v13_atlas.png",
+      "frame": 3,
+      "alpha_bbox": [
+        24,
+        34,
+        106,
+        96
+      ],
+      "min_margin_px": 22
+    },
+    {
+      "asset": "ban_impact_v13_atlas.png",
+      "frame": 4,
+      "alpha_bbox": [
+        32,
+        48,
+        90,
+        80
+      ],
+      "min_margin_px": 32
+    },
+    {
+      "asset": "ban_impact_v13_atlas.png",
+      "frame": 5,
+      "alpha_bbox": [
+        40,
+        72,
+        84,
+        80
+      ],
+      "min_margin_px": 40
+    }
+  ]
+}

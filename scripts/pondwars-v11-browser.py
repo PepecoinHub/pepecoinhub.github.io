@@ -12,10 +12,10 @@ window.__qa={get game(){return g},get fx(){return weaponFX},get time(){return an
  tick(n=1,until=''){let hit=null;for(let i=0;i<n;i++){for(const o of [...g.frogs,...g.shots])previousPose.set(o,{x:o.x,y:o.y});applyInput(g,{m:0,a:[]});animator.advance(STEP);acc=STEP;hit=g.events.find(e=>e.type==='boom'&&e.weapon===until)||null;this.render();if(hit)break;}return hit;},
  detonate(){applyInput(g,{m:0,a:[{t:'detonate'}]});this.render();},clip:drawWeaponClip,shot,authored:authoredExplosionAt};
 '''
-PROBE='''
+PROBE=r'''
 window.__pngDraws=[];
 const draw=CanvasRenderingContext2D.prototype.drawImage;
-CanvasRenderingContext2D.prototype.drawImage=function(im,...args){if(this.canvas.id==='pw'&&im.src&&/\/v1[12]\//.test(im.src)){const t=this.getTransform();window.__pngDraws.push({file:im.src.split('/').pop(),args,matrix:[t.a,t.b,t.c,t.d,t.e,t.f],smoothing:this.imageSmoothingEnabled});}return draw.call(this,im,...args);};
+CanvasRenderingContext2D.prototype.drawImage=function(im,...args){if(this.canvas.id==='pw'&&im.src&&/\/v[0-9]+\//.test(im.src)){const t=this.getTransform();window.__pngDraws.push({file:im.src.split('/').pop(),args,matrix:[t.a,t.b,t.c,t.d,t.e,t.f],smoothing:this.imageSmoothingEnabled});}return draw.call(this,im,...args);};
 '''
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
@@ -25,10 +25,13 @@ with sync_playwright() as p:
   page.on('pageerror',lambda e:errors.append(str(e)));page.on('request',lambda r:requests.append(r.url));page.add_init_script(PROBE)
   page.route('**/pondwars-beta.mjs?*',lambda r:r.fulfill(body=SOURCE+HOOK,content_type='text/javascript'))
   page.goto('http://127.0.0.1:8000/games/pondwars-beta.html?art=pixel-v06&packs=all&maps=all&qaMap=moon&qaSeed=123',wait_until='networkidle')
-  page.wait_for_function("window.__qa.clips.filter(c=>/\/v1[12]\//.test(c.src)).length===6&&window.__qa.clips.every(c=>c.loaded)")
+  for attempt in range(50):
+   if page.evaluate("window.__qa?.clips.filter(c=>/\\/v[0-9]+\\//.test(c.src)).length>=6&&window.__qa.clips.every(c=>c.loaded)"):break
+   page.wait_for_timeout(100)
+  else:raise AssertionError('Weapon PNGs did not load')
   page.locator('#title').click();page.wait_for_timeout(150);page.locator('[data-mode=duo]').click();page.locator('#go').click();page.wait_for_timeout(70)
-  samples=page.evaluate('''()=>{window.__qa.pause();let count=0;for(const c of window.__qa.clips.filter(c=>/\/v1[12]\//.test(c.src))){const [id,role]=c.key.split('/');for(let n=0;n<c.frames;n++){window.__pngDraws=[];const ok=window.__qa.clip(id,role,(n+.1)/c.fps,600,160);const d=window.__pngDraws[0];if(!ok||!d||d.smoothing||d.args[0]!==((matchMedia('(prefers-reduced-motion: reduce)').matches?(c.reducedFrame||0):n)*128)||d.args[6]!==c.size[0]||d.args[7]!==c.size[1])throw Error('wrong frame '+c.key+'/'+n);count++;}}return count;}''')
-  assert samples==44
+  samples=page.evaluate(r'''()=>{window.__qa.pause();let count=0;for(const c of window.__qa.clips.filter(c=>/\/v[0-9]+\//.test(c.src))){const [id,role]=c.key.split('/');for(let n=0;n<c.frames;n++){window.__pngDraws=[];const ok=window.__qa.clip(id,role,(n+.1)/c.fps,600,160);const d=window.__pngDraws[0];if(!ok||!d||d.smoothing||d.args[0]!==((matchMedia('(prefers-reduced-motion: reduce)').matches?(c.reducedFrame||0):n)*128)||d.args[6]!==c.size[0]||d.args[7]!==c.size[1])throw Error('wrong frame '+c.key+'/'+n);count++;}}return count;}''')
+  assert samples==sum(c['frames'] for c in page.evaluate('window.__qa.clips') if '/v' in c['src'])
   def aim_point(x,y):
    pos=page.locator('#pw').evaluate('(c,p)=>{const r=c.getBoundingClientRect(),scale=Math.min(r.width/c.width,r.height/600);return {x:r.left+(r.width-c.width*scale)/2+(p.x+(c.width-1200)/2)*scale,y:r.top+(r.height-600*scale)/2+p.y*scale}}',{'x':x,'y':y})
    page.mouse.move(pos['x'],pos['y'])
@@ -72,10 +75,10 @@ with sync_playwright() as p:
     assert page.evaluate('(type)=>window.__qa.fx.some(e=>e.weapon===type&&e.authored)',weapon)
     # Capture visible middle of the authored burst while preserving real impact coordinates.
     page.evaluate('window.__qa.tick(10);window.__pngDraws=[];window.__qa.render()')
-    blastfile='doge_blast_atlas.png' if weapon=='doge' else 'donkey_impact_atlas.png'
+    blastfile=page.evaluate('(w)=>window.__qa.clips.find(c=>c.key===w+"/explosion").src.split("/").pop()',weapon)
     burst=page.evaluate('(file)=>window.__pngDraws.filter(d=>d.file===file)',blastfile)
     assert burst,(name,weapon,'PNG burst absent')
-    if name=='reduced':assert burst[0]['args'][0]==4*128
+    if name=='reduced':assert burst[0]['args'][0]==page.evaluate('(w)=>window.__qa.clips.find(c=>c.key===w+"/explosion").reducedFrame',weapon)*128
     assert page.evaluate('window.__qa.game.booms.every(b=>window.__qa.authored(b))')
     before=page.evaluate('window.__qa.time');page.wait_for_timeout(120);assert page.evaluate('window.__qa.time')==before
    page.screenshot(path=str(OUT/f'{name}-{weapon}-impact.png'))
@@ -83,7 +86,7 @@ with sync_playwright() as p:
    assert page.evaluate('window.__qa.fx.length===0 && window.__qa.game.shots.length===0')
   assert not any('ban_hammer_atlas.png' in r for r in requests),'Ban concept was auto-loaded'
   assert not errors,errors
-  results.append({'profile':name,'sampledFrames':44,'rotationAngles':8,'pausedFlights':pauses,'restartClearsFX':True,'manualDogeDetonation':True,'sixPEPDrops':True,'pageErrors':errors,'physicalDeviceApproved':False})
+  results.append({'profile':name,'sampledFrames':samples,'rotationAngles':8,'pausedFlights':pauses,'restartClearsFX':True,'manualDogeDetonation':True,'sixPEPDrops':True,'pageErrors':errors,'physicalDeviceApproved':False})
   page.close()
  browser.close()
 (OUT/'browser-results.json').write_text(json.dumps(results,indent=2)+'\n');print(json.dumps(results))

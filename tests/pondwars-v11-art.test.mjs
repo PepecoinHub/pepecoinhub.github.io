@@ -8,6 +8,8 @@ const manifest=JSON.parse(readFileSync(new URL('manifest.json',root)));
 const audit=JSON.parse(readFileSync(new URL('v11/handoff/asset_validation.json',root)));
 const descriptors=JSON.parse(readFileSync(new URL('v11/handoff/manifest_patch.json',root)));
 descriptors.donkey.flight=JSON.parse(readFileSync(new URL('v12/handoff/manifest_patch.json',root))).weapons.donkey.flight;
+const fxPatch=JSON.parse(readFileSync(new URL('v13/handoff/manifest_patch.json',root))).weapons;
+for(const [id,roles] of Object.entries(descriptors))for(const role of Object.keys(roles))if(fxPatch[id]?.[role])roles[role]=fxPatch[id][role];
 const live=Object.entries(descriptors).flatMap(([id,roles])=>Object.keys(roles).map(role=>[id,role,manifest.weapons[id][role]]));
 test('all seven installed PNGs match original v11 hashes, RGBA dimensions and atlas bounds',()=>{
   for(const [name,expected] of Object.entries(audit)){
@@ -17,10 +19,10 @@ test('all seven installed PNGs match original v11 hashes, RGBA dimensions and at
     assert.equal(b.toString('hex',0,8),'89504e470d0a1a0a');assert.equal(b.readUInt32BE(16),expected.frame_px[0]*expected.frames);assert.equal(b.readUInt32BE(20),expected.frame_px[1]);assert.equal(b[25],6,'RGBA');
   }
 });
-test('six runtime clips preserve handoff timing, geometry and separate HUD paths; Ban stays manual',()=>{
+test('six runtime clips preserve handoff timing, geometry and separate HUD paths; Ban swing stays unregistered',()=>{
   assert.equal(live.length,6);
   for(const [id,role,c] of live){assert.ok(validateClip(c),id+'/'+role);for(const [key,value] of Object.entries(descriptors[id][role]))assert.deepEqual(c[key],value,id+'/'+role+'/'+key);}
-  assert.deepEqual(manifest.weapons.ban,{flight:null,activation:null,explosion:null});assert.equal(manifest.weapons.donkey.activation,null);
+  assert.equal(manifest.weapons.ban.flight,null);assert.equal(manifest.weapons.ban.explosion,null);assert.deepEqual(manifest.weapons.ban.activation,fxPatch.ban.activation);assert.deepEqual(manifest.weapons.donkey.activation,fxPatch.donkey.activation);
   assert.ok(manifest.weapons.goldv2.explosion.src.endsWith('golden_foot_impact_sheet.png'));assert.equal(manifest.weapons.rain.flight,null,'the selectable salvo is not a falling subprojectile');
 });
 test('all 44 active frames map inside PNGs at arbitrary FPS with matching render anchors',()=>{
@@ -32,7 +34,7 @@ test('all 44 active frames map inside PNGs at arbitrary FPS with matching render
  assert.equal(count,44);
 });
 test('reduced motion freezes flight and chooses a visible burst poster; offsets stay cosmetic',()=>{
- for(const [,role,c] of live)for(const age of [0,.15,.5,3])assert.equal(clipFrame(c,age,true).n,role==='explosion'?4:0);
+ for(const [,role,c] of live)for(const age of [0,.15,.5,3])assert.equal(clipFrame(c,age,true).n,c.reducedFrame??0);
  assert.equal(manifest.weapons.moon.flight.rotationOffset,Math.PI/4);
  assert.equal(validateClip({...manifest.weapons.moon.flight,rotationOffset:NaN}),false);
  assert.equal(validateClip({...manifest.weapons.doge.explosion,reducedFrame:8}),false);

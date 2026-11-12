@@ -249,13 +249,14 @@ function beginShot(g) {
 function fireExpansion(g, f, w, angle, power, tx, ty) {
   if (w.role === 'melee') {
     if (!spendExpansion(g, w)) return false;
-    const dir = Math.cos(angle) >= 0 ? 1 : -1;
+    const dir = Math.cos(angle) >= 0 ? 1 : -1, contacts = [];
     f.face = dir;
     g.texts.push({ x: f.x + dir * 28, y: f.y - 28, text: w.cry || 'WHACK!', t: 0, team: f.team });
     for (const target of g.frogs) {
       if (!target.alive || target.id === f.id) continue;
       if ((target.x - f.x) * dir < 0) continue;
       if (Math.hypot(target.x - f.x, target.y - f.y) >= w.range) continue;
+      if(g.weapon==='ban')contacts.push({id:target.id,x:target.x,y:target.y});
       hurt(g, target, w.damage);
       target.vx += dir * w.knockVx;
       target.vy += w.knockVy;
@@ -265,6 +266,8 @@ function fireExpansion(g, f, w, angle, power, tx, ty) {
     if (w.crater > 0) g.dirty.push(carve(g.mask, f.x + dir * 36, f.y + 2, w.crater));
     g.booms.push({ x: f.x + dir * 30, y: f.y - 8, r: Math.max(6, w.crater || 8), t: 0 });
     beginShot(g);
+    // Cosmetic metadata from the already-resolved melee contacts; no second hit test.
+    if(g.weapon==='ban')g.events.push({type:'melee_contacts',weapon:'ban',actor:f.id,face:dir,origin:{x:f.x,y:f.y},range:w.range,contacts});
     return true;
   }
   if (w.role === 'mine') {

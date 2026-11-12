@@ -22,3 +22,12 @@ export const MAP_DECORATIONS = {
   tower:[{id:'distant-belfry',x:600,y:90},{id:'ruins',x:220,y:170}],
 };
 export const MAP_TINT = {moon:'#bec9e8',doom:'#7f9386',farm:'#c9b989',quarry:'#abb7c5',tower:'#b4a09b'};
+
+// Presentation contract: grip pixel [34,46] on the existing 64px Ban SVG.
+export const BAN_HOLD = Object.freeze({w:38,h:38,ox:-34*38/64,oy:-46*38/64,base:Math.PI/2});
+export const authoredEffect = c => !!c && /^art\/arsenal-polish\/v\d+\//.test(c.src);
+// Contacts come from the engine's successful hit loop. Position the spark on the
+// near side of that torso at hand height, never at the outer edge of a whiff.
+export function meleeImpactPoints(event,hand) {
+  return event.contacts.map(hit=>({id:hit.id,x:hit.x-event.face*Math.min(8,Math.abs(hit.x-event.origin.x)/2),y:Math.max(hit.y-48,Math.min(hit.y-12,hand.y))}));
+}

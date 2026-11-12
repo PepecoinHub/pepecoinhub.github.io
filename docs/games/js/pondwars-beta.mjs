@@ -1,8 +1,8 @@
-import { validateClip, clipFrame, WEAPON_FALLBACK, MAP_DECORATIONS, MAP_TINT } from './pondwars-weapon-art.mjs?v=20261112v11';
+import { validateClip, clipFrame, WEAPON_FALLBACK, MAP_DECORATIONS, MAP_TINT, BAN_HOLD, authoredEffect, meleeImpactPoints } from './pondwars-weapon-art.mjs?v=20261112v13';
 import { PointerHolds } from './pondwars-pointer-holds.mjs?v=20261112polish';
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112polish';
-import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112polish';
+import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112v13';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112v13';
 import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112polish';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
 import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261112pixel';
@@ -60,7 +60,7 @@ const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver
 // v11 clips remain opt-in playtest art; simulation and HUD keep separate assets.
 const weaponClips=new Map(), flightArt={};
 for(const [id,fallback] of Object.entries(WEAPON_FALLBACK)){const image=new Image();image.src='img/pondwars/'+fallback+'.svg';flightArt[id]=image;}
-fetch('art/arsenal-polish/manifest.json?v=20261112v11').then(r=>r.json()).then(manifest=>{
+fetch('art/arsenal-polish/manifest.json?v=20261112v13').then(r=>r.json()).then(manifest=>{
   for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(c){
     if(!validateClip(c))throw new Error('Invalid weapon clip: '+id+'/'+role);
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
@@ -75,10 +75,22 @@ function drawWeaponClip(id,role,time,x,y,reduced=reduce){
 }
 function drawWeaponEffects(){
   weaponFX=weaponFX.filter(e=>animator.time-e.time<e.life);
-  for(const e of weaponFX){const age=animator.time-e.time;ctx.save();ctx.globalAlpha=e.authored?1:Math.min(1,(e.life-age)*2);drawWeaponClip(e.weapon,e.role,age,e.x,e.y,reduce);ctx.restore();}
+  for(const e of weaponFX){if(e.draw===false)continue;const age=animator.time-e.time;ctx.save();ctx.globalAlpha=e.authored?1:Math.min(1,(e.life-age)*2);drawWeaponClip(e.weapon,e.role,age,e.x,e.y,reduce);ctx.restore();}
 }
 function authoredExplosionAt(b){
-  return weaponFX.some(e=>e.authored&&e.role==='explosion'&&e.x===b.x&&e.y===b.y&&animator.time-e.time<e.life&&weaponClips.get(e.weapon+'/explosion')?.image.naturalWidth);
+  return weaponFX.some(e=>e.x===b.x&&e.y===b.y&&animator.time-e.time<e.life&&
+    (e.suppressLegacy || e.authored&&e.role==='explosion'&&weaponClips.get(e.weapon+'/explosion')?.image.naturalWidth));
+}
+// Reuse the character animator and the same authored anchors as heldWeapon.
+function weaponHand(f,animation,geometry){
+  if(!animation){
+    const choice=teamPlayers[f.team][Math.floor(f.id/2)]??0,person=PLAYERS[choice];
+    const asset=standardPreview?standardAssets:animationAssets.get(person.id),raw=animator.sample(f,reduce);
+    animation=asset?.authored?authoredPose(raw,f,asset.imageKey):raw;
+    const frame=asset===pixelAssets&&pixelAssets?pixelFrame(asset,animation,reduce):spriteFrame(asset?.manifest,animation.state,animation.age,reduce);
+    geometry=frame&&asset.image?.naturalWidth?frameGeometry(frame):null;
+  }
+  return characterPoint(f,animation,standardPreview&&geometry?PROTOTYPE_WEAPON_HAND:geometry?.hand);
 }
 function drawFootprints(){
   if(!flightArt.goldv2.naturalWidth)return;
@@ -238,7 +250,7 @@ function frog(f, t) {
   ctx.restore();
   // Weapon art remains in world space; authored clips provide the measured hand.
   // Legacy skins keep the PR266 hand-height anchor; projectileOrigin is unchanged.
-  if (turn || animation.state === 'fire') heldWeapon(f, characterPoint(f, animation, standardPreview && geometry ? PROTOTYPE_WEAPON_HAND : geometry?.hand), asset?.authored, asset?.imageKey);
+  if (turn || animation.state === 'fire') heldWeapon(f, weaponHand(f,animation,geometry), asset?.authored, asset?.imageKey);
   // team pennant flag above the frog: a second team-colour cue near the label, readable even
   // when the under-foot disc is occluded. It waves on a frog's turn unless reduced-motion is on.
   const flagW = 15 * mk, flagH = 10 * mk, poleTop = f.y - 82 - 13 * mk, poleBot = f.y - 82 + 3;
@@ -300,12 +312,13 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false, imageKey
     ctx.restore();
     return;
   }
-  const h = calibrated || HOLD[g.weapon] || { w: 28, h: 28, ox: -6, oy: -14, base: 0 };
+  const h = g.weapon==='ban'?BAN_HOLD:calibrated || HOLD[g.weapon] || { w: 28, h: 28, ox: -6, oy: -14, base: 0 };
   ctx.save();
-  ctx.translate(handX + (precise ? 0 : Math.cos(aim) * 8), handY + (precise ? 0 : Math.sin(aim) * 8));
-  ctx.rotate(aim + h.base);
+  const weaponAim=g.weapon==='ban'?(f.face===1?0:Math.PI):aim,atHand=precise||g.weapon==='ban';
+  ctx.translate(handX+(atHand?0:Math.cos(weaponAim)*8),handY+(atHand?0:Math.sin(weaponAim)*8));
+  ctx.rotate(weaponAim+h.base);
   // Keep the top of the weapon upright when aiming left of vertical.
-  if (Math.cos(aim) < 0) ctx.scale(1, -1);
+  if (Math.cos(weaponAim) < 0) ctx.scale(1, -1);
   ctx.drawImage(img, h.ox, h.oy, h.w, h.h);
   ctx.restore();
 }
@@ -371,7 +384,7 @@ function shot(s) {
   if(WEAPON_FALLBACK[s.type]){
     if(s.type==='donkey' && s.warning){
       ctx.strokeStyle='#d7deea';ctx.setLineDash([5,4]);ctx.strokeRect(-20,-8,40,16);ctx.setLineDash([]);
-      if(!drawWeaponClip('donkey','activation',s.t,0,-38)) {const image=flightArt.donkey;if(image.naturalWidth)ctx.drawImage(image,-16,-60,32,32);}
+      if(!drawWeaponClip('donkey','activation',s.t,0,-120)) {const image=flightArt.donkey;if(image.naturalWidth)ctx.drawImage(image,-16,-60,32,32);}
       ctx.restore();return;
     }
     if(['doge','moon'].includes(s.type))ctx.rotate(Math.atan2(s.vy,s.vx));
@@ -411,6 +424,7 @@ function draw(t) {
     if(x%3===0){ctx.fillStyle='#ede0ae';ctx.fillRect(x+11,y-11,3,10);ctx.fillStyle='#c1684d';ctx.beginPath();ctx.ellipse(x+12,y-12,7,4,0,Math.PI,Math.PI*2);ctx.fill();}
   }
   drawWeaponEffects();
+  for(const s of g.shots)if(s.type==='donkey'&&s.warning)shot(pose(s));
   drawHelmetFlights(); // Behind frogs/labels/flags so cosmetic debris cannot obscure identification.
   for (const f of g.frogs) if (f.alive || (f.gone === 'ko' && animator.sample(f, reduce).alpha > 0 && !reduce)) frog(pose(f), t);
     else if (f.gone === 'ko') { ctx.fillStyle = '#9aa3a8'; ctx.fillRect(f.x - 6, f.y - 14, 12, 14); ctx.beginPath(); ctx.arc(f.x, f.y - 14, 6, Math.PI, 0); ctx.fill(); ctx.fillStyle = '#555'; ctx.font = 'bold 7px Tahoma'; ctx.textAlign = 'center'; ctx.fillText('RIP', f.x, f.y - 7); }
@@ -424,7 +438,7 @@ function draw(t) {
   for (const f of g.frogs) if (f.alive && f.rope) { ctx.strokeStyle = '#d8b878'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(f.x, f.y - 30); ctx.lineTo(f.rope.x, f.rope.y); ctx.stroke(); ctx.fillStyle = '#a8b4ba'; ctx.beginPath(); ctx.arc(f.rope.x, f.rope.y, 3.5, 0, 7); ctx.fill(); }
   for (const f of g.frogs) if (f.alive && f.jet) { ctx.fillStyle = '#c95d36'; ctx.fillRect(f.x - f.face * 12 - 4, f.y - 40, 8, 22); if (g.ctl && (g.ctl.y < 0 || g.ctl.x) && g.frogs[g.current] === f) { ctx.fillStyle = Math.random() < .5 ? '#ffc05b' : '#fff1b8'; ctx.beginPath(); ctx.moveTo(f.x - f.face * 12 - 4, f.y - 18); ctx.lineTo(f.x - f.face * 12 + 4, f.y - 18); ctx.lineTo(f.x - f.face * 12, f.y - 4 + Math.random() * 8); ctx.fill(); }
     ctx.fillStyle = '#000a'; ctx.fillRect(f.x - 16, f.y - 76, 32, 4); ctx.fillStyle = '#ffc05b'; ctx.fillRect(f.x - 16, f.y - 76, 32 * Math.max(0, f.jet.fuel) / 3.5, 4); }
-  for (const s of g.shots) shot(pose(s));
+  for (const s of g.shots)if(!(s.type==='donkey'&&s.warning))shot(pose(s));
   drawParts(visualDt);
   for (const b of g.booms) {
     if(authoredExplosionAt(b))continue; // Keep the PNG burst visible; physics/debris are unchanged.
@@ -549,10 +563,15 @@ function events() {
   observeCharacters(g.events);
   for (const e of g.events) {
     if(e.type==='boom'&&WEAPON_FALLBACK[e.weapon]){
-      const clip=weaponClips.get(e.weapon+'/explosion'),authored=!!clip?.src.includes('/v11/');
+      const clip=weaponClips.get(e.weapon+'/explosion'),authored=authoredEffect(clip);
       weaponFX.push({weapon:e.weapon,role:'explosion',x:e.x,y:e.y,time:animator.time,authored,life:e.weapon==='goldv2'?1.8:authored?clip.frames/clip.fps:.6});
     }
-    if(weaponFX.length>64)weaponFX.shift();
+    if(e.type==='melee_contacts'&&e.weapon==='ban'){
+      const actor=g.frogs.find(f=>f.id===e.actor),clip=weaponClips.get('ban/activation');
+      weaponFX.push({weapon:'ban',draw:false,suppressLegacy:e.contacts.length===0||!!clip?.image.naturalWidth,x:e.origin.x+e.face*30,y:e.origin.y-8,time:animator.time,life:.5});
+      if(actor&&clip)for(const point of meleeImpactPoints(e,weaponHand(actor)))weaponFX.push({weapon:'ban',role:'activation',x:point.x,y:point.y,time:animator.time,authored:true,life:clip.frames/clip.fps});
+    }
+    if(weaponFX.length>64)weaponFX.splice(0,weaponFX.length-64);
     if (e.type === 'turn') { resetSteering();closeArsenal();keys.clear();clearCharge();pending=[];remoteP=0;aimPointer=null;held.l=held.r=held.u=0; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x;
       status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : isOnline(g.team) ? `${f.name} (${TEAM[g.team].name}) is playing on the other device…` : touchUI.matches ? `${f.name}: tap the map to aim · hold FIRE to shoot · ◀ ▶ walk · ↑ jump, twice for a backflip` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
     if (e.type === 'fire') {pointerHolds.clear();closeArsenal();keys.clear();held.l=held.r=held.u=held.pitch=0;steerY=null;clearCharge();remoteP=0;status(g.phase==='guide'?'Fly the Doge: A/D turn, W/S altitude, Enter or Space detonates.':g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
@@ -889,7 +908,7 @@ document.querySelectorAll('#map-packs [data-mappack]').forEach(box=>{
   if(mapPreset==='all'||mapPreset===box.dataset.mappack||(mapPreset==='1'&&box.dataset.mappack==='maps1')||(mapPreset==='2'&&box.dataset.mappack==='maps2'))box.checked=true;
   box.addEventListener('change',syncMapPacks);
 });
-const artStatus=document.createElement('p');artStatus.id='arsenal-art-status';artStatus.textContent='PLAYTEST · v11 PNG: Doge, Donkey, Moon, PEP. Ban hand calibration and Donkey warning art pending. Mobile awaits physical-device test.';artStatus.hidden=true;$('#arsenal-packs').after(artStatus);
+const artStatus=document.createElement('p');artStatus.id='arsenal-art-status';artStatus.textContent='PLAYTEST · FX v13: impacts, Donkey warning and calibrated Ban contact. Donkey flight v12. Prototype art; mobile awaits physical-device test.';artStatus.hidden=true;$('#arsenal-packs').after(artStatus);
 const presetPacks = normalizePacks(new URLSearchParams(location.search).get('packs'));
 document.querySelectorAll('#arsenal-packs [data-pack]').forEach(box => { if (presetPacks[box.dataset.pack]) box.checked = true; });
 $('#map-choice').value=opts.map;paintColors();mapPreview();syncMapPacks();artStatus.hidden=!Object.keys(readPacks()).length;

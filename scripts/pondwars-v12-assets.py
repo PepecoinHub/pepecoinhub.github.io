@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1];ART=ROOT/'docs/games/art/arsenal-polish
 qa=json.loads((ART/'v12/handoff/QA.json').read_text());patch=json.loads((ART/'v12/handoff/manifest_patch.json').read_text())
 manifest=json.loads((ART/'manifest.json').read_text())
 base=json.loads(subprocess.check_output(['git','show','b3f2d02087b59f5c7ec92e9463fda870fcce2843:docs/games/art/arsenal-polish/manifest.json'],cwd=ROOT))
-base['weapons']['donkey']['flight']=patch['weapons']['donkey']['flight'];assert manifest==base,'Only donkey.flight may change'
+assert manifest['weapons']['donkey']['flight']==patch['weapons']['donkey']['flight'],'v12 flight must stay intact'
 old=ART/'v11/sprites/silver_donkey_atlas.png';new=ART/'v12/sprites/silver_donkey_atlas.png'
 assert hashlib.sha256(old.read_bytes()).hexdigest()==qa['source_sha256']
 assert hashlib.sha256(new.read_bytes()).hexdigest()==qa['corrected_sha256']
@@ -22,4 +22,4 @@ for n,expected in enumerate(qa['frames']):
  changed=diff.convert('RGB').getbbox()
  assert changed is None or changed[0]>=114,'Unexpected change away from the nose'
  rows.append({'frame':n,'originalBBox':before.getbbox(),'correctedBBox':after.getbbox(),'rightMargin':128-after.getbbox()[2],'changedOverlapBBox':changed,'leftWorld':(after.getbbox()[0]-52)*52/128,'bodyPositionShiftWorld':0})
-print(json.dumps({'sha256':qa['corrected_sha256'],'onlyDonkeyFlightChanged':True,'atlas':[1024,128],'worldSize':[52,52],'anchor':[52,64],'frames':rows},indent=2))
+print(json.dumps({'sha256':qa['corrected_sha256'],'v12FlightDescriptorPreserved':True,'atlas':[1024,128],'worldSize':[52,52],'anchor':[52,64],'frames':rows},indent=2))
