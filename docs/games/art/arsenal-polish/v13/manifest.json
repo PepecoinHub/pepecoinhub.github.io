@@ -444,6 +444,45 @@
    }
   },
   "donkey": {
+   "flight": {
+    "src": "art/arsenal-polish/v12/sprites/silver_donkey_atlas.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+     52,
+     64
+    ],
+    "size": [
+     96,
+     96
+    ]
+   },
+   "explosion": {
+    "src": "art/arsenal-polish/v11/effects/donkey_impact_atlas.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 14,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     230,
+     230
+    ],
+    "reducedFrame": 4
+   },
    "activation": {
     "src": "art/arsenal-polish/v13/effects/silver_donkey_warning.png",
     "frame": [
@@ -459,8 +498,8 @@
      64
     ],
     "size": [
-     40,
-     40
+     60,
+     60
     ]
    }
   }
