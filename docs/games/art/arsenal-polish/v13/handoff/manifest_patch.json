@@ -1,0 +1,1843 @@
+{
+  "schema_version": "frogageddon-arsenal-v13",
+  "description": "Atlas 128x128 horizontally; held 64x64 RGBA. Transparency strict; display anchor and grip are full-resolution pixel units.",
+  "sprites": {
+    "grenade_flight": {
+      "src": "sprites/grenade_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 26
+    },
+    "bazooka_rocket_flight": {
+      "src": "sprites/bazooka_rocket_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 42
+    },
+    "cluster_grenade_flight": {
+      "src": "sprites/cluster_grenade_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 28
+    },
+    "cluster_fragment_flight": {
+      "src": "sprites/cluster_fragment_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 15
+    },
+    "golden_foot_flight": {
+      "src": "sprites/golden_foot_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 46
+    },
+    "golden_toe_flight": {
+      "src": "sprites/golden_toe_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 20
+    },
+    "baseball_swing": {
+      "src": "sprites/baseball_swing.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 13,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 56
+    },
+    "revolver_bullet_flight": {
+      "src": "sprites/revolver_bullet_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 16,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 22
+    },
+    "arrow_flight": {
+      "src": "sprites/arrow_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 48
+    },
+    "landmine_armed": {
+      "src": "sprites/landmine_armed.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 5,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 32
+    },
+    "dynamite_lit": {
+      "src": "sprites/dynamite_lit.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 9,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 32
+    },
+    "red_candles_fall": {
+      "src": "sprites/red_candles_fall.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 11,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 35
+    },
+    "drill_missile_flight": {
+      "src": "sprites/drill_missile_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 42
+    },
+    "grappling_hook_flight": {
+      "src": "sprites/grappling_hook_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 34
+    },
+    "jetpack_flames": {
+      "src": "sprites/jetpack_flames.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 44
+    },
+    "mega_golden_foot_flight": {
+      "src": "sprites/mega_golden_foot_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 64
+    },
+    "mega_toe_flight": {
+      "src": "sprites/mega_toe_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 31
+    },
+    "bell_bomb_flight": {
+      "src": "sprites/bell_bomb_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 11,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 46
+    },
+    "frog_mine_arming": {
+      "src": "sprites/frog_mine_arming.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 42
+    },
+    "ban_hammer_swing": {
+      "src": "sprites/ban_hammer_swing.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 13,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 58
+    },
+    "pep_rain_margin_fix": {
+      "src": "sprites/pep_rain_margin_fix.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 80
+    }
+  },
+  "effects": {
+    "teleport_flash": {
+      "src": "effects/teleport_flash.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 13,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 70
+    },
+    "mega_foot_imprint": {
+      "src": "effects/mega_foot_imprint.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 9,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 64
+    },
+    "bell_bounce_wave": {
+      "src": "effects/bell_bounce_wave.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 60
+    },
+    "moon_rocket_explosion": {
+      "src": "effects/moon_rocket_explosion.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 90
+    },
+    "silver_donkey_warning": {
+      "src": "effects/silver_donkey_warning.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 76
+    },
+    "pep_coin_splash": {
+      "src": "effects/pep_coin_splash.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 68
+    },
+    "explosion_medium": {
+      "src": "effects/explosion_medium.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 13,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 80
+    },
+    "explosion_large": {
+      "src": "effects/explosion_large.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 13,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 116
+    },
+    "doge_blast_margin_fix": {
+      "src": "effects/doge_blast_margin_fix.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 100
+    },
+    "donkey_impact_margin_fix": {
+      "src": "effects/donkey_impact_margin_fix.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 104
+    }
+  },
+  "held": {
+    "grenade": {
+      "src": "held/grenade.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "bazooka": {
+      "src": "held/bazooka.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "cluster_grenade": {
+      "src": "held/cluster_grenade.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "golden_foot": {
+      "src": "held/golden_foot.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "baseball": {
+      "src": "held/baseball.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "revolver": {
+      "src": "held/revolver.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "bow": {
+      "src": "held/bow.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "landmine": {
+      "src": "held/landmine.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "dynamite": {
+      "src": "held/dynamite.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "red_candles": {
+      "src": "held/red_candles.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "drill_launcher": {
+      "src": "held/drill_launcher.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "grappling_launcher": {
+      "src": "held/grappling_launcher.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "jetpack_backpack": {
+      "src": "held/jetpack_backpack.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "teleport_device": {
+      "src": "held/teleport_device.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "ban_hammer": {
+      "src": "held/ban_hammer.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    }
+  },
+  "weapons": {
+    "01": [
+      {
+        "role": "grenade_flight",
+        "src": "sprites/grenade_flight.png"
+      },
+      {
+        "role": "grenade",
+        "src": "held/grenade.png"
+      }
+    ],
+    "02": [
+      {
+        "role": "bazooka_rocket_flight",
+        "src": "sprites/bazooka_rocket_flight.png"
+      },
+      {
+        "role": "bazooka",
+        "src": "held/bazooka.png"
+      }
+    ],
+    "03": [
+      {
+        "role": "cluster_grenade_flight",
+        "src": "sprites/cluster_grenade_flight.png"
+      },
+      {
+        "role": "cluster_grenade",
+        "src": "held/cluster_grenade.png"
+      },
+      {
+        "role": "cluster_fragment_flight",
+        "src": "sprites/cluster_fragment_flight.png"
+      }
+    ],
+    "04": [
+      {
+        "role": "golden_foot_flight",
+        "src": "sprites/golden_foot_flight.png"
+      },
+      {
+        "role": "golden_toe_flight",
+        "src": "sprites/golden_toe_flight.png"
+      },
+      {
+        "role": "golden_foot",
+        "src": "held/golden_foot.png"
+      }
+    ],
+    "05": [
+      {
+        "role": "baseball_swing",
+        "src": "sprites/baseball_swing.png"
+      },
+      {
+        "role": "baseball",
+        "src": "held/baseball.png"
+      }
+    ],
+    "06": [
+      {
+        "role": "revolver_bullet_flight",
+        "src": "sprites/revolver_bullet_flight.png"
+      },
+      {
+        "role": "revolver",
+        "src": "held/revolver.png"
+      }
+    ],
+    "07": [
+      {
+        "role": "arrow_flight",
+        "src": "sprites/arrow_flight.png"
+      },
+      {
+        "role": "bow",
+        "src": "held/bow.png"
+      }
+    ],
+    "08": [
+      {
+        "role": "landmine_armed",
+        "src": "sprites/landmine_armed.png"
+      },
+      {
+        "role": "landmine",
+        "src": "held/landmine.png"
+      }
+    ],
+    "09": [
+      {
+        "role": "dynamite_lit",
+        "src": "sprites/dynamite_lit.png"
+      },
+      {
+        "role": "dynamite",
+        "src": "held/dynamite.png"
+      }
+    ],
+    "10": [
+      {
+        "role": "red_candles_fall",
+        "src": "sprites/red_candles_fall.png"
+      },
+      {
+        "role": "red_candles",
+        "src": "held/red_candles.png"
+      }
+    ],
+    "11": [
+      {
+        "role": "drill_missile_flight",
+        "src": "sprites/drill_missile_flight.png"
+      },
+      {
+        "role": "drill_launcher",
+        "src": "held/drill_launcher.png"
+      }
+    ],
+    "12": [
+      {
+        "role": "grappling_hook_flight",
+        "src": "sprites/grappling_hook_flight.png"
+      },
+      {
+        "role": "grappling_launcher",
+        "src": "held/grappling_launcher.png"
+      }
+    ],
+    "13": [
+      {
+        "role": "jetpack_flames",
+        "src": "sprites/jetpack_flames.png"
+      },
+      {
+        "role": "jetpack_backpack",
+        "src": "held/jetpack_backpack.png"
+      }
+    ],
+    "14": [
+      {
+        "role": "teleport_flash",
+        "src": "effects/teleport_flash.png"
+      },
+      {
+        "role": "teleport_device",
+        "src": "held/teleport_device.png"
+      }
+    ],
+    "15": [
+      {
+        "role": "mega_golden_foot_flight",
+        "src": "sprites/mega_golden_foot_flight.png"
+      },
+      {
+        "role": "mega_toe_flight",
+        "src": "sprites/mega_toe_flight.png"
+      },
+      {
+        "role": "mega_foot_imprint",
+        "src": "effects/mega_foot_imprint.png"
+      }
+    ],
+    "16": [
+      {
+        "role": "bell_bomb_flight",
+        "src": "sprites/bell_bomb_flight.png"
+      },
+      {
+        "role": "bell_bounce_wave",
+        "src": "effects/bell_bounce_wave.png"
+      }
+    ],
+    "17": [
+      {
+        "role": "frog_mine_arming",
+        "src": "sprites/frog_mine_arming.png"
+      }
+    ],
+    "18": [
+      {
+        "role": "ban_hammer_swing",
+        "src": "sprites/ban_hammer_swing.png"
+      },
+      {
+        "role": "ban_hammer",
+        "src": "held/ban_hammer.png"
+      }
+    ],
+    "19": [
+      {
+        "role": "moon_rocket_explosion",
+        "src": "effects/moon_rocket_explosion.png"
+      }
+    ],
+    "20": [
+      {
+        "role": "pep_coin_splash",
+        "src": "effects/pep_coin_splash.png"
+      }
+    ],
+    "21": [
+      {
+        "role": "silver_donkey_warning",
+        "src": "effects/silver_donkey_warning.png"
+      }
+    ],
+    "22": [
+      {
+        "role": "explosion_medium",
+        "src": "effects/explosion_medium.png"
+      },
+      {
+        "role": "explosion_large",
+        "src": "effects/explosion_large.png"
+      }
+    ],
+    "23": [
+      {
+        "role": "pep_rain_margin_fix",
+        "src": "sprites/pep_rain_margin_fix.png"
+      },
+      {
+        "role": "doge_blast_margin_fix",
+        "src": "effects/doge_blast_margin_fix.png"
+      },
+      {
+        "role": "donkey_impact_margin_fix",
+        "src": "effects/donkey_impact_margin_fix.png"
+      }
+    ]
+  },
+  "roles": {
+    "grenade_flight": {
+      "src": "sprites/grenade_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 26
+    },
+    "grenade": {
+      "src": "held/grenade.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "bazooka_rocket_flight": {
+      "src": "sprites/bazooka_rocket_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 42
+    },
+    "bazooka": {
+      "src": "held/bazooka.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "cluster_grenade_flight": {
+      "src": "sprites/cluster_grenade_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 28
+    },
+    "cluster_grenade": {
+      "src": "held/cluster_grenade.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "cluster_fragment_flight": {
+      "src": "sprites/cluster_fragment_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 15
+    },
+    "golden_foot_flight": {
+      "src": "sprites/golden_foot_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 46
+    },
+    "golden_toe_flight": {
+      "src": "sprites/golden_toe_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 20
+    },
+    "golden_foot": {
+      "src": "held/golden_foot.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "baseball_swing": {
+      "src": "sprites/baseball_swing.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 13,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 56
+    },
+    "baseball": {
+      "src": "held/baseball.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "revolver_bullet_flight": {
+      "src": "sprites/revolver_bullet_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 16,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 22
+    },
+    "revolver": {
+      "src": "held/revolver.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "arrow_flight": {
+      "src": "sprites/arrow_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 48
+    },
+    "bow": {
+      "src": "held/bow.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "landmine_armed": {
+      "src": "sprites/landmine_armed.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 5,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 32
+    },
+    "landmine": {
+      "src": "held/landmine.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "dynamite_lit": {
+      "src": "sprites/dynamite_lit.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 9,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 32
+    },
+    "dynamite": {
+      "src": "held/dynamite.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "red_candles_fall": {
+      "src": "sprites/red_candles_fall.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 11,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 35
+    },
+    "red_candles": {
+      "src": "held/red_candles.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "drill_missile_flight": {
+      "src": "sprites/drill_missile_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 42
+    },
+    "drill_launcher": {
+      "src": "held/drill_launcher.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "grappling_hook_flight": {
+      "src": "sprites/grappling_hook_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 34
+    },
+    "grappling_launcher": {
+      "src": "held/grappling_launcher.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "jetpack_flames": {
+      "src": "sprites/jetpack_flames.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 44
+    },
+    "jetpack_backpack": {
+      "src": "held/jetpack_backpack.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "teleport_flash": {
+      "src": "effects/teleport_flash.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 13,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 70
+    },
+    "teleport_device": {
+      "src": "held/teleport_device.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "mega_golden_foot_flight": {
+      "src": "sprites/mega_golden_foot_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 64
+    },
+    "mega_toe_flight": {
+      "src": "sprites/mega_toe_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 31
+    },
+    "mega_foot_imprint": {
+      "src": "effects/mega_foot_imprint.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 9,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 64
+    },
+    "bell_bomb_flight": {
+      "src": "sprites/bell_bomb_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 11,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 46
+    },
+    "bell_bounce_wave": {
+      "src": "effects/bell_bounce_wave.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 60
+    },
+    "frog_mine_arming": {
+      "src": "sprites/frog_mine_arming.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 42
+    },
+    "ban_hammer_swing": {
+      "src": "sprites/ban_hammer_swing.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 13,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 58
+    },
+    "ban_hammer": {
+      "src": "held/ban_hammer.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": 24,
+      "grip": [
+        20,
+        40
+      ]
+    },
+    "moon_rocket_explosion": {
+      "src": "effects/moon_rocket_explosion.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 90
+    },
+    "silver_donkey_warning": {
+      "src": "effects/silver_donkey_warning.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 76
+    },
+    "pep_coin_splash": {
+      "src": "effects/pep_coin_splash.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 68
+    },
+    "explosion_medium": {
+      "src": "effects/explosion_medium.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 13,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 80
+    },
+    "explosion_large": {
+      "src": "effects/explosion_large.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 13,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 116
+    },
+    "pep_rain_margin_fix": {
+      "src": "sprites/pep_rain_margin_fix.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 80
+    },
+    "doge_blast_margin_fix": {
+      "src": "effects/doge_blast_margin_fix.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 100
+    },
+    "donkey_impact_margin_fix": {
+      "src": "effects/donkey_impact_margin_fix.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": 104
+    }
+  },
+  "validation_file": "codex/asset_validation.json",
+  "counts": {
+    "weapons_steps": 23,
+    "atlases": 31,
+    "held": 15,
+    "total_png": 46
+  }
+}

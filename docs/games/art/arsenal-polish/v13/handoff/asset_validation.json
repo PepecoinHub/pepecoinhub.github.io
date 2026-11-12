@@ -1,0 +1,2762 @@
+{
+  "summary": {
+    "total": 46,
+    "pass": 46,
+    "fail": 0,
+    "validation": "pixel-exact 2x grid, binary alpha, edge margin, frame-centroid shifts, dimension checks"
+  },
+  "assets": {
+    "sprites/grenade_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        26,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24
+      ],
+      "frame_center_jumps_px": [
+        2.8,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "max_jump_px": 2.8,
+      "opaque_pixels_per_frame": [
+        2572,
+        2556,
+        2568,
+        2576,
+        2564,
+        2576,
+        2568,
+        2556
+      ],
+      "bbox_centers": [
+        [
+          63.0,
+          63.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          65.0,
+          65.0
+        ]
+      ]
+    },
+    "held/grenade.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        8
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        696
+      ],
+      "bbox_centers": [
+        [
+          32.0,
+          26.0
+        ]
+      ]
+    },
+    "sprites/bazooka_rocket_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        10,
+        8,
+        8,
+        10,
+        8,
+        8
+      ],
+      "frame_center_jumps_px": [
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0
+      ],
+      "max_jump_px": 1.0,
+      "opaque_pixels_per_frame": [
+        3416,
+        3464,
+        3488,
+        3416,
+        3464,
+        3488
+      ],
+      "bbox_centers": [
+        [
+          64.0,
+          63.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          63.0,
+          63.0
+        ]
+      ]
+    },
+    "held/bazooka.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        4
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        920
+      ],
+      "bbox_centers": [
+        [
+          35.0,
+          35.0
+        ]
+      ]
+    },
+    "sprites/cluster_grenade_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        26,
+        24,
+        24,
+        24,
+        26,
+        24,
+        24,
+        24
+      ],
+      "frame_center_jumps_px": [
+        2.8,
+        1.4,
+        1.0,
+        2.0,
+        2.0,
+        1.0,
+        1.4
+      ],
+      "max_jump_px": 2.8,
+      "opaque_pixels_per_frame": [
+        2572,
+        2572,
+        2576,
+        2568,
+        2556,
+        2568,
+        2576,
+        2572
+      ],
+      "bbox_centers": [
+        [
+          63.0,
+          63.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          63.0,
+          64.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          63.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          65.0,
+          65.0
+        ]
+      ]
+    },
+    "held/cluster_grenade.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        8
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        696
+      ],
+      "bbox_centers": [
+        [
+          32.0,
+          26.0
+        ]
+      ]
+    },
+    "sprites/cluster_fragment_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        42,
+        44,
+        44,
+        46,
+        44,
+        44
+      ],
+      "frame_center_jumps_px": [
+        1.0,
+        1.0,
+        2.0,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 2.0,
+      "opaque_pixels_per_frame": [
+        836,
+        828,
+        828,
+        832,
+        824,
+        836
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          63.0,
+          64.0
+        ],
+        [
+          63.0,
+          64.0
+        ],
+        [
+          63.0,
+          64.0
+        ]
+      ]
+    },
+    "sprites/golden_foot_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        18,
+        20,
+        22,
+        20,
+        18,
+        20,
+        22,
+        20
+      ],
+      "frame_center_jumps_px": [
+        2.2,
+        1.0,
+        2.0,
+        2.2,
+        2.2,
+        2.0,
+        1.0
+      ],
+      "max_jump_px": 2.2,
+      "opaque_pixels_per_frame": [
+        4260,
+        4260,
+        4264,
+        4264,
+        4272,
+        4264,
+        4264,
+        4260
+      ],
+      "bbox_centers": [
+        [
+          63.0,
+          65.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          65.0,
+          63.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          63.0
+        ],
+        [
+          65.0,
+          64.0
+        ]
+      ]
+    },
+    "sprites/golden_toe_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        34,
+        34,
+        32,
+        32,
+        32,
+        34
+      ],
+      "frame_center_jumps_px": [
+        1.4,
+        2.0,
+        0.0,
+        1.0,
+        2.2
+      ],
+      "max_jump_px": 2.2,
+      "opaque_pixels_per_frame": [
+        2348,
+        2352,
+        2352,
+        2316,
+        2332,
+        2364
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          64.0
+        ],
+        [
+          64.0,
+          65.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          65.0,
+          63.0
+        ],
+        [
+          63.0,
+          64.0
+        ]
+      ]
+    },
+    "held/golden_foot.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        8
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        672
+      ],
+      "bbox_centers": [
+        [
+          38.0,
+          32.0
+        ]
+      ]
+    },
+    "sprites/baseball_swing.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        16,
+        18,
+        24,
+        20,
+        14,
+        14
+      ],
+      "frame_center_jumps_px": [
+        1.4,
+        2.8,
+        1.4,
+        1.4,
+        1.0
+      ],
+      "max_jump_px": 2.8,
+      "opaque_pixels_per_frame": [
+        1500,
+        1512,
+        1504,
+        1504,
+        1512,
+        1508
+      ],
+      "bbox_centers": [
+        [
+          64.0,
+          64.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          63.0,
+          65.0
+        ],
+        [
+          63.0,
+          64.0
+        ]
+      ]
+    },
+    "held/baseball.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        8
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        412
+      ],
+      "bbox_centers": [
+        [
+          35.0,
+          28.0
+        ]
+      ]
+    },
+    "sprites/revolver_bullet_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        20,
+        16,
+        20,
+        16,
+        20,
+        16
+      ],
+      "frame_center_jumps_px": [
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ],
+      "max_jump_px": 2.0,
+      "opaque_pixels_per_frame": [
+        984,
+        984,
+        984,
+        984,
+        984,
+        984
+      ],
+      "bbox_centers": [
+        [
+          61.0,
+          65.0
+        ],
+        [
+          59.0,
+          65.0
+        ],
+        [
+          61.0,
+          65.0
+        ],
+        [
+          59.0,
+          65.0
+        ],
+        [
+          61.0,
+          65.0
+        ],
+        [
+          59.0,
+          65.0
+        ]
+      ]
+    },
+    "held/revolver.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        6
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        696
+      ],
+      "bbox_centers": [
+        [
+          36.0,
+          38.0
+        ]
+      ]
+    },
+    "sprites/arrow_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        20,
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 0.0,
+      "opaque_pixels_per_frame": [
+        716,
+        752,
+        716,
+        716,
+        752,
+        716
+      ],
+      "bbox_centers": [
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ]
+      ]
+    },
+    "held/bow.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        8
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        544
+      ],
+      "bbox_centers": [
+        [
+          38.0,
+          33.0
+        ]
+      ]
+    },
+    "sprites/landmine_armed.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        24,
+        24,
+        24,
+        24,
+        24,
+        24
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 0.0,
+      "opaque_pixels_per_frame": [
+        2268,
+        2268,
+        2268,
+        2268,
+        2268,
+        2268
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          72.0
+        ],
+        [
+          65.0,
+          72.0
+        ],
+        [
+          65.0,
+          72.0
+        ],
+        [
+          65.0,
+          72.0
+        ],
+        [
+          65.0,
+          72.0
+        ],
+        [
+          65.0,
+          72.0
+        ]
+      ]
+    },
+    "held/landmine.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        10
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        764
+      ],
+      "bbox_centers": [
+        [
+          32.0,
+          38.0
+        ]
+      ]
+    },
+    "sprites/dynamite_lit.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        28,
+        26,
+        24,
+        28,
+        26,
+        24,
+        28,
+        32
+      ],
+      "frame_center_jumps_px": [
+        1.0,
+        1.0,
+        2.0,
+        1.0,
+        1.0,
+        2.0,
+        4.0
+      ],
+      "max_jump_px": 4.0,
+      "opaque_pixels_per_frame": [
+        1944,
+        1956,
+        1972,
+        1944,
+        1956,
+        1972,
+        1944,
+        1896
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          55.0
+        ],
+        [
+          65.0,
+          54.0
+        ],
+        [
+          65.0,
+          53.0
+        ],
+        [
+          65.0,
+          55.0
+        ],
+        [
+          65.0,
+          54.0
+        ],
+        [
+          65.0,
+          53.0
+        ],
+        [
+          65.0,
+          55.0
+        ],
+        [
+          65.0,
+          59.0
+        ]
+      ]
+    },
+    "held/dynamite.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        12
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        656
+      ],
+      "bbox_centers": [
+        [
+          31.0,
+          29.0
+        ]
+      ]
+    },
+    "sprites/red_candles_fall.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        20,
+        22,
+        20,
+        22,
+        18,
+        20
+      ],
+      "frame_center_jumps_px": [
+        1.0,
+        1.0,
+        2.0,
+        1.4,
+        1.4
+      ],
+      "max_jump_px": 2.0,
+      "opaque_pixels_per_frame": [
+        2148,
+        2152,
+        2148,
+        2152,
+        2140,
+        2148
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          63.0,
+          64.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          65.0,
+          64.0
+        ]
+      ]
+    },
+    "held/red_candles.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        12
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        924
+      ],
+      "bbox_centers": [
+        [
+          34.0,
+          33.0
+        ]
+      ]
+    },
+    "sprites/drill_missile_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 0.0,
+      "opaque_pixels_per_frame": [
+        2500,
+        2500,
+        2500,
+        2500,
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "bbox_centers": [
+        [
+          66.0,
+          65.0
+        ],
+        [
+          66.0,
+          65.0
+        ],
+        [
+          66.0,
+          65.0
+        ],
+        [
+          66.0,
+          65.0
+        ],
+        [
+          66.0,
+          65.0
+        ],
+        [
+          66.0,
+          65.0
+        ],
+        [
+          66.0,
+          65.0
+        ],
+        [
+          66.0,
+          65.0
+        ]
+      ]
+    },
+    "held/drill_launcher.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        6
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        888
+      ],
+      "bbox_centers": [
+        [
+          36.0,
+          39.0
+        ]
+      ]
+    },
+    "sprites/grappling_hook_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        18,
+        18,
+        18,
+        18,
+        18,
+        18
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 0.0,
+      "opaque_pixels_per_frame": [
+        1168,
+        1168,
+        1168,
+        1168,
+        1168,
+        1168
+      ],
+      "bbox_centers": [
+        [
+          64.0,
+          68.0
+        ],
+        [
+          64.0,
+          68.0
+        ],
+        [
+          64.0,
+          68.0
+        ],
+        [
+          64.0,
+          68.0
+        ],
+        [
+          64.0,
+          68.0
+        ],
+        [
+          64.0,
+          68.0
+        ]
+      ]
+    },
+    "held/grappling_launcher.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        8
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        628
+      ],
+      "bbox_centers": [
+        [
+          35.0,
+          39.0
+        ]
+      ]
+    },
+    "sprites/jetpack_flames.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        20,
+        16,
+        12,
+        20,
+        16,
+        12
+      ],
+      "frame_center_jumps_px": [
+        2.0,
+        2.0,
+        4.0,
+        2.0,
+        2.0
+      ],
+      "max_jump_px": 4.0,
+      "opaque_pixels_per_frame": [
+        3364,
+        3468,
+        3572,
+        3364,
+        3468,
+        3572
+      ],
+      "bbox_centers": [
+        [
+          64.0,
+          68.0
+        ],
+        [
+          64.0,
+          70.0
+        ],
+        [
+          64.0,
+          72.0
+        ],
+        [
+          64.0,
+          68.0
+        ],
+        [
+          64.0,
+          70.0
+        ],
+        [
+          64.0,
+          72.0
+        ]
+      ]
+    },
+    "held/jetpack_backpack.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        10
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        1188
+      ],
+      "bbox_centers": [
+        [
+          33.0,
+          31.0
+        ]
+      ]
+    },
+    "effects/teleport_flash.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        54,
+        48,
+        36,
+        26,
+        16,
+        12,
+        28,
+        54
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 0.0,
+      "opaque_pixels_per_frame": [
+        212,
+        396,
+        988,
+        1652,
+        2260,
+        2516,
+        1476,
+        212
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ]
+      ]
+    },
+    "held/teleport_device.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        10
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        728
+      ],
+      "bbox_centers": [
+        [
+          34.0,
+          38.0
+        ]
+      ]
+    },
+    "sprites/mega_golden_foot_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        12,
+        16,
+        16,
+        18,
+        16,
+        18,
+        16,
+        16
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        1.4,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.4
+      ],
+      "max_jump_px": 1.4,
+      "opaque_pixels_per_frame": [
+        5688,
+        5668,
+        5680,
+        5676,
+        5668,
+        5676,
+        5680,
+        5668
+      ],
+      "bbox_centers": [
+        [
+          64.0,
+          65.0
+        ],
+        [
+          64.0,
+          65.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          64.0,
+          65.0
+        ]
+      ]
+    },
+    "sprites/mega_toe_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        26,
+        28,
+        30,
+        28,
+        26,
+        28
+      ],
+      "frame_center_jumps_px": [
+        1.0,
+        1.4,
+        1.4,
+        2.2,
+        2.2
+      ],
+      "max_jump_px": 2.2,
+      "opaque_pixels_per_frame": [
+        3692,
+        3700,
+        3700,
+        3700,
+        3712,
+        3700
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          63.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          64.0,
+          63.0
+        ]
+      ]
+    },
+    "effects/mega_foot_imprint.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        22,
+        24,
+        24,
+        18,
+        18,
+        18
+      ],
+      "frame_center_jumps_px": [
+        4.5,
+        0.0,
+        2.8,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 4.5,
+      "opaque_pixels_per_frame": [
+        2776,
+        2612,
+        2612,
+        2716,
+        2716,
+        2716
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          63.0
+        ],
+        [
+          67.0,
+          59.0
+        ],
+        [
+          67.0,
+          59.0
+        ],
+        [
+          65.0,
+          61.0
+        ],
+        [
+          65.0,
+          61.0
+        ],
+        [
+          65.0,
+          61.0
+        ]
+      ]
+    },
+    "sprites/bell_bomb_flight.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        24,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "max_jump_px": 1.0,
+      "opaque_pixels_per_frame": [
+        3288,
+        3284,
+        3288,
+        3280,
+        3288,
+        3284,
+        3288,
+        3288
+      ],
+      "bbox_centers": [
+        [
+          64.0,
+          63.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          65.0,
+          63.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          63.0,
+          63.0
+        ]
+      ]
+    },
+    "effects/bell_bounce_wave.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        22,
+        16,
+        26,
+        22,
+        16,
+        26
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 0.0,
+      "opaque_pixels_per_frame": [
+        1004,
+        968,
+        996,
+        976,
+        996,
+        968
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          73.0
+        ],
+        [
+          65.0,
+          73.0
+        ],
+        [
+          65.0,
+          73.0
+        ],
+        [
+          65.0,
+          73.0
+        ],
+        [
+          65.0,
+          73.0
+        ],
+        [
+          65.0,
+          73.0
+        ]
+      ]
+    },
+    "sprites/frog_mine_arming.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 0.0,
+      "opaque_pixels_per_frame": [
+        2832,
+        2832,
+        2832,
+        2832,
+        2832,
+        2832,
+        2832,
+        2832
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          66.0
+        ],
+        [
+          65.0,
+          66.0
+        ],
+        [
+          65.0,
+          66.0
+        ],
+        [
+          65.0,
+          66.0
+        ],
+        [
+          65.0,
+          66.0
+        ],
+        [
+          65.0,
+          66.0
+        ],
+        [
+          65.0,
+          66.0
+        ],
+        [
+          65.0,
+          66.0
+        ]
+      ]
+    },
+    "sprites/ban_hammer_swing.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        16,
+        16,
+        20,
+        18,
+        18,
+        16
+      ],
+      "frame_center_jumps_px": [
+        2.2,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "max_jump_px": 2.2,
+      "opaque_pixels_per_frame": [
+        3684,
+        3668,
+        3680,
+        3696,
+        3696,
+        3688
+      ],
+      "bbox_centers": [
+        [
+          63.0,
+          65.0
+        ],
+        [
+          64.0,
+          63.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          65.0
+        ]
+      ]
+    },
+    "held/ban_hammer.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_4px_held": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "margin_per_frame_px": [
+        8
+      ],
+      "frame_center_jumps_px": [],
+      "max_jump_px": 0,
+      "opaque_pixels_per_frame": [
+        652
+      ],
+      "bbox_centers": [
+        [
+          37.0,
+          26.0
+        ]
+      ]
+    },
+    "effects/moon_rocket_explosion.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        46,
+        34,
+        22,
+        16,
+        22,
+        26,
+        22,
+        14
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        2.8,
+        2.2,
+        1.4,
+        2.2,
+        0.0
+      ],
+      "max_jump_px": 2.8,
+      "opaque_pixels_per_frame": [
+        592,
+        1476,
+        3172,
+        3936,
+        3040,
+        2104,
+        1036,
+        892
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          64.0,
+          65.0
+        ],
+        [
+          65.0,
+          63.0
+        ],
+        [
+          65.0,
+          63.0
+        ]
+      ]
+    },
+    "effects/silver_donkey_warning.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        12,
+        12,
+        12,
+        12,
+        12,
+        12
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 0.0,
+      "opaque_pixels_per_frame": [
+        2712,
+        2712,
+        2712,
+        2712,
+        2712,
+        2712
+      ],
+      "bbox_centers": [
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ]
+      ]
+    },
+    "effects/pep_coin_splash.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        46,
+        34,
+        32,
+        20,
+        10,
+        8,
+        8,
+        8
+      ],
+      "frame_center_jumps_px": [
+        1.0,
+        2.2,
+        0.0,
+        2.8,
+        2.8,
+        1.4,
+        1.0
+      ],
+      "max_jump_px": 2.8,
+      "opaque_pixels_per_frame": [
+        884,
+        812,
+        1892,
+        1700,
+        1572,
+        416,
+        360,
+        208
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          64.0,
+          65.0
+        ]
+      ]
+    },
+    "effects/explosion_medium.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        56,
+        50,
+        40,
+        30,
+        20,
+        14,
+        12,
+        28
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 0.0,
+      "opaque_pixels_per_frame": [
+        148,
+        484,
+        1492,
+        3140,
+        5396,
+        7188,
+        1008,
+        1008
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ]
+      ]
+    },
+    "effects/explosion_large.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        54,
+        48,
+        36,
+        22,
+        14,
+        14,
+        10,
+        20
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_jump_px": 0.0,
+      "opaque_pixels_per_frame": [
+        212,
+        644,
+        2148,
+        4868,
+        7188,
+        7188,
+        1008,
+        1008
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ]
+      ]
+    },
+    "sprites/pep_rain_margin_fix.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        768,
+        128
+      ],
+      "frames": 6,
+      "margin_per_frame_px": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "frame_center_jumps_px": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "max_jump_px": 1.0,
+      "opaque_pixels_per_frame": [
+        4372,
+        4376,
+        4360,
+        4380,
+        4376,
+        4432
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          64.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          65.0,
+          64.0
+        ],
+        [
+          64.0,
+          64.0
+        ],
+        [
+          65.0,
+          64.0
+        ]
+      ]
+    },
+    "effects/doge_blast_margin_fix.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        54,
+        50,
+        42,
+        34,
+        26,
+        16,
+        8,
+        8
+      ],
+      "frame_center_jumps_px": [
+        2.0,
+        0.0,
+        0.0,
+        0.0,
+        2.8,
+        0.0,
+        1.4
+      ],
+      "max_jump_px": 2.8,
+      "opaque_pixels_per_frame": [
+        204,
+        516,
+        1396,
+        2500,
+        4020,
+        5836,
+        840,
+        520
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          63.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          64.0,
+          64.0
+        ]
+      ]
+    },
+    "effects/donkey_impact_margin_fix.png": {
+      "status": "PASS",
+      "tests": {
+        "dimensions": true,
+        "rgba": true,
+        "transparent_background": true,
+        "margin_8px": true,
+        "pixel_grid_2x2": true,
+        "frame_center_continuity": true,
+        "nonempty_frames": true
+      },
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frames": 8,
+      "margin_per_frame_px": [
+        22,
+        40,
+        34,
+        28,
+        20,
+        14,
+        8,
+        8
+      ],
+      "frame_center_jumps_px": [
+        2.0,
+        2.0,
+        2.8,
+        0.0,
+        2.0,
+        2.8,
+        1.0
+      ],
+      "max_jump_px": 2.8,
+      "opaque_pixels_per_frame": [
+        2692,
+        828,
+        1252,
+        1716,
+        2564,
+        3452,
+        4236,
+        4384
+      ],
+      "bbox_centers": [
+        [
+          65.0,
+          65.0
+        ],
+        [
+          63.0,
+          65.0
+        ],
+        [
+          65.0,
+          65.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          63.0,
+          63.0
+        ],
+        [
+          65.0,
+          63.0
+        ],
+        [
+          63.0,
+          65.0
+        ],
+        [
+          64.0,
+          65.0
+        ]
+      ]
+    }
+  }
+}
