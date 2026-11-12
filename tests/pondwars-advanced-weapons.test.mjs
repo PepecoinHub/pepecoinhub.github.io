@@ -84,3 +84,43 @@ test('Silver Donkey warns, then drops a very large strike and is spent', () => {
   assert.ok(hole > 18000 && hole < 25000, 'buried very-large crater, removed ' + hole);
   assert.equal(WEAPONS.rocket.damage, 42);
 });
+
+test('Red candles do not explode: a direct hit hurts and bounces, then they sink for 2 seconds', () => {
+  const g = flat(400);
+  const before = solids(g);
+  g.frogs[0].x = 100; // the thrower stands away; three frogs share x = 600 under the middle candle
+  g.weapon = 'candles';
+  assert.equal(fire(g, 0, 1, 600), true);
+  let steps = 0;
+  while (g.shots.some(s => s.sink == null) && steps++ < 600) step(g);
+  const lost = g.frogs.map(f => 100 - f.hp);
+  assert.deepEqual(lost.filter(n => n).sort(), [WEAPONS.candles.damage], 'one frog under the middle candle is hit once, no splash ' + lost);
+  assert.equal(solids(g), before, 'no crater');
+  assert.ok(g.shots.length > 0, 'candles stay while sinking');
+  for (let i = 0; i < 130; i++) step(g);
+  assert.equal(g.shots.length, 0, 'gone after the sink');
+});
+
+test('Silver Donkey lands on the first surface from the sky, not under a floating island', () => {
+  const g = flat(400);
+  for (let x = 560; x < 640; x++) for (let y = 250; y < 270; y++) g.mask[y * W + x] = 1;
+  g.weapon = 'donkey';
+  assert.equal(fire(g, 0, 1, 600, 390), true);
+  assert.equal(g.shots[0].targetY, 249);
+});
+
+test('Pickaxe hits the first frog, or digs and flies back to be caught with its ammo refunded', () => {
+  const g = flat(400);
+  g.packs = { simple: true }; g.ammo[0].pickaxe = 2;
+  const me = g.frogs[g.current];
+  for (const f of g.frogs) if (f !== me) f.x = me.x > 600 ? 100 : 1100;
+  g.weapon = 'pickaxe';
+  const before = solids(g);
+  assert.equal(fire(g, me.x > 600 ? -2.8 : -0.35, .35), true);
+  assert.equal(g.ammo[0].pickaxe, 1);
+  let back = false;
+  for (let i = 0; i < 900 && g.shots.length; i++) { step(g); back ||= g.shots[0]?.back; }
+  assert.ok(back, 'turned back');
+  assert.ok(solids(g) < before, 'dug a notch');
+  assert.equal(g.ammo[0].pickaxe, 2, 'caught and refunded');
+});

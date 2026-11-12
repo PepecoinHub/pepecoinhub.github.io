@@ -1,0 +1,460 @@
+{
+  "package": "Frogageddon_Pickaxe_v14",
+  "source_references": [
+    "wzor_zaba_v06.png",
+    "wzor_bron_doge_v11.png",
+    "wzor_kilof_obecny.png"
+  ],
+  "checks": {
+    "held/pickaxe.png": {
+      "path": "held/pickaxe.png",
+      "dimensions": [
+        64,
+        64
+      ],
+      "frame_size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "mode": "RGBA",
+      "transparent": true,
+      "grid_2x2": true,
+      "min_margin_px": 8,
+      "center_drift_max_px": 0,
+      "anchor_px": [
+        18,
+        48
+      ],
+      "frame_details": [
+        {
+          "frame": 0,
+          "bbox": [
+            8,
+            8,
+            54,
+            56
+          ],
+          "min_margin_px": 8
+        }
+      ],
+      "issues": [],
+      "passed": true
+    },
+    "sprites/pickaxe_flight.png": {
+      "path": "sprites/pickaxe_flight.png",
+      "dimensions": [
+        1024,
+        128
+      ],
+      "frame_size": [
+        128,
+        128
+      ],
+      "frames": 8,
+      "mode": "RGBA",
+      "transparent": true,
+      "grid_2x2": true,
+      "min_margin_px": 22,
+      "center_drift_max_px": 0.21,
+      "anchor_px": [
+        64,
+        64
+      ],
+      "frame_details": [
+        {
+          "frame": 0,
+          "bbox": [
+            22,
+            40,
+            86,
+            88
+          ],
+          "min_margin_px": 22
+        },
+        {
+          "frame": 1,
+          "bbox": [
+            24,
+            40,
+            86,
+            88
+          ],
+          "min_margin_px": 24
+        },
+        {
+          "frame": 2,
+          "bbox": [
+            26,
+            38,
+            86,
+            88
+          ],
+          "min_margin_px": 26
+        },
+        {
+          "frame": 3,
+          "bbox": [
+            24,
+            40,
+            86,
+            88
+          ],
+          "min_margin_px": 24
+        },
+        {
+          "frame": 4,
+          "bbox": [
+            22,
+            40,
+            86,
+            88
+          ],
+          "min_margin_px": 22
+        },
+        {
+          "frame": 5,
+          "bbox": [
+            24,
+            40,
+            86,
+            88
+          ],
+          "min_margin_px": 24
+        },
+        {
+          "frame": 6,
+          "bbox": [
+            26,
+            40,
+            86,
+            88
+          ],
+          "min_margin_px": 26
+        },
+        {
+          "frame": 7,
+          "bbox": [
+            24,
+            40,
+            86,
+            88
+          ],
+          "min_margin_px": 24
+        }
+      ],
+      "issues": [],
+      "passed": true
+    },
+    "effects/pickaxe_dig.png": {
+      "path": "effects/pickaxe_dig.png",
+      "dimensions": [
+        768,
+        128
+      ],
+      "frame_size": [
+        128,
+        128
+      ],
+      "frames": 6,
+      "mode": "RGBA",
+      "transparent": true,
+      "grid_2x2": true,
+      "min_margin_px": 16,
+      "center_drift_max_px": 10.95,
+      "anchor_px": [
+        70,
+        74
+      ],
+      "frame_details": [
+        {
+          "frame": 0,
+          "bbox": [
+            46,
+            36,
+            98,
+            90
+          ],
+          "min_margin_px": 30
+        },
+        {
+          "frame": 1,
+          "bbox": [
+            46,
+            40,
+            98,
+            90
+          ],
+          "min_margin_px": 30
+        },
+        {
+          "frame": 2,
+          "bbox": [
+            42,
+            36,
+            98,
+            90
+          ],
+          "min_margin_px": 30
+        },
+        {
+          "frame": 3,
+          "bbox": [
+            32,
+            32,
+            110,
+            90
+          ],
+          "min_margin_px": 18
+        },
+        {
+          "frame": 4,
+          "bbox": [
+            34,
+            22,
+            112,
+            90
+          ],
+          "min_margin_px": 16
+        },
+        {
+          "frame": 5,
+          "bbox": [
+            46,
+            64,
+            98,
+            90
+          ],
+          "min_margin_px": 30
+        }
+      ],
+      "issues": [],
+      "passed": true,
+      "ground_region_y_px": [
+        80,
+        127
+      ],
+      "ground_stable_across_frames": true
+    },
+    "effects/pickaxe_hit.png": {
+      "path": "effects/pickaxe_hit.png",
+      "dimensions": [
+        768,
+        128
+      ],
+      "frame_size": [
+        128,
+        128
+      ],
+      "frames": 6,
+      "mode": "RGBA",
+      "transparent": true,
+      "grid_2x2": true,
+      "min_margin_px": 8,
+      "center_drift_max_px": 0.91,
+      "anchor_px": [
+        64,
+        64
+      ],
+      "frame_details": [
+        {
+          "frame": 0,
+          "bbox": [
+            46,
+            46,
+            84,
+            82
+          ],
+          "min_margin_px": 44
+        },
+        {
+          "frame": 1,
+          "bbox": [
+            20,
+            26,
+            106,
+            108
+          ],
+          "min_margin_px": 20
+        },
+        {
+          "frame": 2,
+          "bbox": [
+            14,
+            14,
+            116,
+            116
+          ],
+          "min_margin_px": 12
+        },
+        {
+          "frame": 3,
+          "bbox": [
+            10,
+            10,
+            120,
+            120
+          ],
+          "min_margin_px": 8
+        },
+        {
+          "frame": 4,
+          "bbox": [
+            18,
+            24,
+            108,
+            110
+          ],
+          "min_margin_px": 18
+        },
+        {
+          "frame": 5,
+          "bbox": [
+            48,
+            46,
+            82,
+            82
+          ],
+          "min_margin_px": 46
+        }
+      ],
+      "issues": [],
+      "passed": true
+    },
+    "effects/pickaxe_catch.png": {
+      "path": "effects/pickaxe_catch.png",
+      "dimensions": [
+        768,
+        128
+      ],
+      "frame_size": [
+        128,
+        128
+      ],
+      "frames": 6,
+      "mode": "RGBA",
+      "transparent": true,
+      "grid_2x2": true,
+      "min_margin_px": 28,
+      "center_drift_max_px": 0.0,
+      "anchor_px": [
+        64,
+        64
+      ],
+      "frame_details": [
+        {
+          "frame": 0,
+          "bbox": [
+            60,
+            60,
+            70,
+            70
+          ],
+          "min_margin_px": 58
+        },
+        {
+          "frame": 1,
+          "bbox": [
+            46,
+            46,
+            84,
+            84
+          ],
+          "min_margin_px": 44
+        },
+        {
+          "frame": 2,
+          "bbox": [
+            38,
+            38,
+            92,
+            92
+          ],
+          "min_margin_px": 36
+        },
+        {
+          "frame": 3,
+          "bbox": [
+            30,
+            30,
+            100,
+            100
+          ],
+          "min_margin_px": 28
+        },
+        {
+          "frame": 4,
+          "bbox": [
+            46,
+            46,
+            84,
+            84
+          ],
+          "min_margin_px": 44
+        },
+        {
+          "frame": 5,
+          "bbox": [
+            56,
+            56,
+            74,
+            74
+          ],
+          "min_margin_px": 54
+        }
+      ],
+      "issues": [],
+      "passed": true
+    },
+    "hud/pickaxe.png": {
+      "path": "hud/pickaxe.png",
+      "dimensions": [
+        64,
+        64
+      ],
+      "frame_size": [
+        64,
+        64
+      ],
+      "frames": 1,
+      "mode": "RGBA",
+      "transparent": true,
+      "grid_2x2": true,
+      "min_margin_px": 8,
+      "center_drift_max_px": 0,
+      "anchor_px": [
+        32,
+        32
+      ],
+      "frame_details": [
+        {
+          "frame": 0,
+          "bbox": [
+            8,
+            8,
+            54,
+            56
+          ],
+          "min_margin_px": 8
+        }
+      ],
+      "issues": [],
+      "passed": true
+    }
+  },
+  "all_passed": true,
+  "tested_checks": [
+    "RGBA",
+    "sheet dimensions",
+    "frame count",
+    "alpha background",
+    "2x2 grid",
+    "margin 8px",
+    "centroid stability",
+    "frog v06 preview"
+  ],
+  "limitations": [
+    "Walidacja porównania stylistycznego z żabą jest wizualna (preview.png), nie numeryczna.",
+    "Efekt dig pokazuje odpryski ziemi; wycinanie terenu i powrót bumerangu muszą zostać zaimplementowane w silniku gry."
+  ]
+}

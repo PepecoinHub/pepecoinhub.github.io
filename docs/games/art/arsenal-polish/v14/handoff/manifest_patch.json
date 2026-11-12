@@ -1,0 +1,127 @@
+{
+  "version": "v14",
+  "weapon_id": "miners_pickaxe",
+  "weapon_name": "Miner's Pickaxe",
+  "render_note": "Obrót lotu realizuje silnik gry, nie atlas. Animacja błysku 12 FPS.",
+  "assets": {
+    "held": {
+      "src": "held/pickaxe.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "anchor": [
+        18,
+        48
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "grip": [
+        18,
+        48
+      ]
+    },
+    "flight": {
+      "src": "sprites/pickaxe_flight.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": [
+        1024,
+        128
+      ],
+      "engine_rotation": true
+    },
+    "dig": {
+      "src": "effects/pickaxe_dig.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        70,
+        74
+      ],
+      "size": [
+        768,
+        128
+      ]
+    },
+    "hit": {
+      "src": "effects/pickaxe_hit.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": [
+        768,
+        128
+      ]
+    },
+    "catch": {
+      "src": "effects/pickaxe_catch.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": [
+        768,
+        128
+      ]
+    },
+    "hud": {
+      "src": "hud/pickaxe.png",
+      "frame": [
+        64,
+        64
+      ],
+      "columns": 1,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "anchor": [
+        32,
+        32
+      ],
+      "size": [
+        64,
+        64
+      ]
+    }
+  }
+}

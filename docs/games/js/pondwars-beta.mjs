@@ -1,7 +1,7 @@
 import { validateClip, clipFrame, WEAPON_FALLBACK, MAP_DECORATIONS, MAP_TINT } from './pondwars-weapon-art.mjs?v=20261112v11';
 import { PointerHolds } from './pondwars-pointer-holds.mjs?v=20261112polish';
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112polish';
+import { CANDLE_SINK, W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112polish';
 import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112polish';
 import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112polish';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
@@ -100,7 +100,7 @@ fetch('art/arsenal-polish/manifest.json?v=20261112v11').then(r=>r.json()).then(m
     if(!validateClip(c))throw new Error('Invalid weapon clip: '+id+'/'+role);
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
   }
-}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v13')).then(r=>r.json()).then(manifest=>{
+}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v14')).then(r=>r.json()).then(manifest=>{
   // v13: pixel art for every weapon (flight, held, explosions). It overrides older clips of the same role.
   for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(validateClip(c)){
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
@@ -417,8 +417,17 @@ function drawParts(dt) {
     else { ctx.globalAlpha = Math.min(1, k * 1.5); ctx.fillStyle = p.c; ctx.fillRect(p.x - p.s / 2, p.y - p.s / 2, p.s, p.s); ctx.globalAlpha = 1; }
   }
 }
-const SPIN = { gold: 5, toe: 6, shard: 8 }, ALONG = new Set(['rocket', 'revolver', 'bow', 'drill']);
+const SPIN = { gold: 5, toe: 6, shard: 8, pickaxe: 13 }, ALONG = new Set(['rocket', 'revolver', 'bow', 'drill']);
 function shot(s) {
+  if (s.type === 'candles' && s.sink != null) {
+    // stuck candle: it slides down into the ground over CANDLE_SINK seconds, cut off at the surface
+    const k = Math.min(1, s.sink / CANDLE_SINK), depth = k * 30;
+    ctx.save(); ctx.beginPath(); ctx.rect(s.x - 30, s.y - 80, 60, 80); ctx.clip();
+    if (!drawWeaponClip('candles', 'flight', reduce ? 0 : s.t, s.x, s.y - 12 + depth)) { ctx.fillStyle = '#e0414c'; ctx.fillRect(s.x - 4, s.y - 22 + depth, 8, 20); }
+    ctx.restore();
+    if (!reduce && k < .6) { ctx.fillStyle = `rgba(120,80,50,${.6 - k})`; for (let i = -2; i <= 2; i++) ctx.fillRect(s.x + i * 5 - 1, s.y - 2 - Math.abs(Math.sin(s.sink * 9 + i)) * 4, 3, 3); }
+    return;
+  }
   ctx.save(); ctx.translate(s.x, s.y);
   if (!WEAPON_FALLBACK[s.type] && weaponClips.get(s.type + '/flight')?.image.naturalWidth) {
     if (ALONG.has(s.type)) ctx.rotate(Math.atan2(s.vy, s.vx)); else if (SPIN[s.type] && !reduce) ctx.rotate(s.t * SPIN[s.type]);
@@ -646,6 +655,9 @@ function events() {
       const clip=weaponClips.get(e.weapon+'/explosion'),authored=/\/v1[13]\//.test(clip?.src||'');
       weaponFX.push({weapon:e.weapon,role:'explosion',x:e.x,y:e.y,time:animator.time,authored,life:e.weapon==='goldv2'?1.8:authored?clip.frames/clip.fps:.6});
     }
+    // v14 pickaxe effects: dirt where it bites, a CLANG burst on a frog, a glint when it is caught
+    const pickFX = { dig: 'dig', pickhit: 'hit', catch: 'catch' }[e.type];
+    if (pickFX) { const clip = weaponClips.get('pickaxe/' + pickFX); if (clip?.image.naturalWidth) weaponFX.push({ weapon: 'pickaxe', role: pickFX, x: e.x, y: e.y, time: animator.time, authored: true, life: clip.frames / clip.fps }); }
     if(weaponFX.length>64)weaponFX.shift();
     if (e.type === 'turn' || e.type === 'fire') camFollow = true;
     if (e.type === 'turn') statsTurn();
@@ -862,7 +874,7 @@ function mountExpansion(packs) {
     b.type = 'button'; b.dataset.w = w.id; b.dataset.pack = w.pack;
     b.title = w.name + ' · key ' + w.key;
     b.setAttribute('aria-label', w.name);
-    const artId={goldv2:'golden_foot_v2',bell:'bell_bomb',frogmine:'frog_mine',moon:'moon_rocket',ban:'ban_hammer',rain:'pep_rain',doge:'doge_flyer',donkey:'silver_donkey'}[w.id];
+    const artId={goldv2:'golden_foot_v2',bell:'bell_bomb',frogmine:'frog_mine',moon:'moon_rocket',ban:'ban_hammer',rain:'pep_rain',doge:'doge_flyer',donkey:'silver_donkey',pickaxe:'pickaxe'}[w.id];
     b.innerHTML = '<span class="weapon-key">'+w.key+'</span><img src="art/arsenal-polish/hud_64/'+artId+'.png" alt=""><span>'+w.short+'</span><small>QA</small>';
     b.querySelector('img').onerror=e=>{e.target.onerror=null;e.target.src='img/pondwars/'+w.id+'.svg';};
     b.addEventListener('click', () => chooseWeapon(w.id));

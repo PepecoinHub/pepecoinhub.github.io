@@ -502,6 +502,84 @@
      60
     ]
    }
+  },
+  "pickaxe": {
+   "flight": {
+    "src": "art/arsenal-polish/v14/sprites/pickaxe_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 8,
+    "frames": 8,
+    "fps": 12,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     48,
+     48
+    ]
+   },
+   "dig": {
+    "src": "art/arsenal-polish/v14/effects/pickaxe_dig.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 12,
+    "loop": false,
+    "anchor": [
+     64,
+     84
+    ],
+    "size": [
+     46,
+     46
+    ]
+   },
+   "hit": {
+    "src": "art/arsenal-polish/v14/effects/pickaxe_hit.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 14,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     60,
+     60
+    ]
+   },
+   "catch": {
+    "src": "art/arsenal-polish/v14/effects/pickaxe_catch.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 6,
+    "frames": 6,
+    "fps": 12,
+    "loop": false,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     44,
+     44
+    ]
+   }
   }
  },
  "held": {
@@ -664,6 +742,16 @@
    ],
    "base": 0,
    "mode": "place"
+  },
+  "pickaxe": {
+   "src": "art/arsenal-polish/v14/held/pickaxe.png",
+   "size": 34,
+   "grip": [
+    18,
+    48
+   ],
+   "base": 0.785,
+   "mode": "aim"
   }
  }
 }
