@@ -1,0 +1,335 @@
+{
+  "version": "v2.1-alpha",
+  "purpose": "pixel art and geometry correction only",
+  "pixel_grid": 2,
+  "palette_limit": 42,
+  "metrics": {
+    "pepegochi_adult_dirty.png": {
+      "body_bbox": [
+        26,
+        8,
+        102,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 38,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "pepegochi_adult_hungry.png": {
+      "body_bbox": [
+        24,
+        8,
+        106,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 40,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "pepegochi_adult_idle.png": {
+      "body_bbox": [
+        26,
+        8,
+        100,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 34,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "pepegochi_adult_moody.png": {
+      "body_bbox": [
+        24,
+        8,
+        94,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 36,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "pepegochi_adult_neglected.png": {
+      "body_bbox": [
+        26,
+        8,
+        100,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 30,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "pepegochi_adult_packing.png": {
+      "body_bbox": [
+        10,
+        8,
+        100,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 36,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "pepegochi_adult_packing_angry.png": {
+      "body_bbox": [
+        24,
+        8,
+        112,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 31,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "pepegochi_adult_recovering.png": {
+      "body_bbox": [
+        24,
+        8,
+        100,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 32,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "pepegochi_adult_tired.png": {
+      "body_bbox": [
+        18,
+        8,
+        98,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 36,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "pepegochi_egg_idle.png": {
+      "body_bbox": [
+        30,
+        42,
+        96,
+        124
+      ],
+      "body_height": 82,
+      "feet": 124,
+      "color_count": 23,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "pepegochi_froglet_idle.png": {
+      "body_bbox": [
+        34,
+        34,
+        94,
+        124
+      ],
+      "body_height": 90,
+      "feet": 124,
+      "color_count": 29,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "pepegochi_tadpole_idle.png": {
+      "body_bbox": [
+        16,
+        50,
+        110,
+        124
+      ],
+      "body_height": 74,
+      "feet": 124,
+      "color_count": 27,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "depart_01.png": {
+      "body_bbox": [
+        8,
+        8,
+        98,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 31,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "depart_02.png": {
+      "body_bbox": [
+        10,
+        8,
+        106,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 31,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "depart_03.png": {
+      "body_bbox": [
+        2,
+        8,
+        116,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 30,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "depart_04.png": {
+      "body_bbox": [
+        6,
+        8,
+        126,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 31,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "depart_05.png": {
+      "body_bbox": [
+        26,
+        8,
+        128,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 31,
+      "size": [
+        128,
+        128
+      ]
+    },
+    "depart_06.png": {
+      "body_bbox": [
+        50,
+        8,
+        128,
+        124
+      ],
+      "body_height": 116,
+      "feet": 124,
+      "color_count": 28,
+      "size": [
+        128,
+        128
+      ]
+    }
+  },
+  "source_transforms": {
+    "pepegochi_adult_dirty.png": {
+      "scale": 1.1165,
+      "offset_x": -5.78,
+      "offset_y": -14.45,
+      "original_height": 103
+    },
+    "pepegochi_adult_hungry.png": {
+      "scale": 1.2366,
+      "offset_x": 10.59,
+      "offset_y": -29.33,
+      "original_height": 93
+    },
+    "pepegochi_froglet_idle.png": {
+      "scale": 0.7895,
+      "offset_x": 14.26,
+      "offset_y": 28.47,
+      "original_height": 114
+    },
+    "depart_01.png": {
+      "scale": 1.2234,
+      "offset_x": -14.3,
+      "offset_y": -20.36,
+      "original_height": 94
+    },
+    "depart_02.png": {
+      "scale": 1.2366,
+      "offset_x": -15.14,
+      "offset_y": -21.91,
+      "original_height": 93
+    },
+    "depart_03.png": {
+      "scale": 1.2366,
+      "offset_x": -15.14,
+      "offset_y": -23.15,
+      "original_height": 93
+    },
+    "depart_04.png": {
+      "scale": 1.2366,
+      "offset_x": -15.14,
+      "offset_y": -23.15,
+      "original_height": 93
+    },
+    "depart_05.png": {
+      "scale": 1.2105,
+      "offset_x": -13.47,
+      "offset_y": -21.26,
+      "original_height": 95
+    },
+    "depart_06.png": {
+      "scale": 1.2234,
+      "offset_x": -14.3,
+      "offset_y": -22.81,
+      "original_height": 94
+    }
+  },
+  "no_changes": "No SQL, gameplay, CSS, rewards or live product changes"
+}
