@@ -155,7 +155,15 @@ function renderDecor(v) {
   box.append(ul, el('p', { class: 'small muted' }, 'Decorations you earn with Passport stamps show up here. Three earned decorations in the room at once: Pond Decorator.'));
 }
 
-async function run(p) { render(); await p; if (game.last && game.last.pet && !game.room) await game.loadRoom(); render(); }
+async function run(p) {
+  render();
+  const result = await p;
+  if (game.last && game.last.pet && !game.room) await game.loadRoom();
+  render();
+  // Same-origin parent re-reads the authenticated state; never send private pet data via postMessage.
+  if (result && result.ok && window.parent !== window)
+    window.parent.postMessage({ type: 'pondos:pepegochi-changed' }, location.origin);
+}
 
 async function openLetter() {
   await run(game.readLetter());
