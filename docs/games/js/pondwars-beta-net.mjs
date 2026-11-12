@@ -11,7 +11,7 @@
 //
 // The transport is anything with send(message) and an onmessage callback. tabTransport() links two tabs of the
 // same browser (for testing without a server); a Supabase Realtime channel can implement the same two members.
-import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112pepe';
+import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me, weaponAllowed, detonateGuided } from './pondwars-beta-engine.mjs?v=20261112advanced';
 
 export const PROTOCOL = 1;
 export const KEY = { L: 1, R: 2, U: 4, D: 8 };   // bits of input.m
@@ -23,7 +23,7 @@ const num = v => typeof v === 'number' && Number.isFinite(v);
 const selectable = w => typeof w === 'string' && Object.hasOwn(WEAPONS, w) && 'ammo' in WEAPONS[w];
 function cleanAct(a) {
   if (!a || typeof a !== 'object') return null;
-  if (a.t === 'jump' || a.t === 'skip') return { t: a.t };
+  if (a.t === 'jump' || a.t === 'skip' || a.t === 'detonate') return { t: a.t };
   if (a.t === 'face') return a.d === 1 || a.d === -1 ? { t: 'face', d: a.d } : null;
   if (a.t === 'weapon') return selectable(a.w) ? { t: 'weapon', w: a.w } : null;
   if (a.t === 'fire' && num(a.a) && num(a.p)) {
@@ -54,6 +54,7 @@ export function jump(g) {
 }
 export function act(g, a) {
   if (a.t === 'jump') return jump(g);
+  if (a.t === 'detonate') return detonateGuided(g);
   if (a.t === 'face') { if (g.phase !== 'aim') return false; me(g).face = a.d; return true; }   // aiming turns the frog
   if (a.t === 'skip') { const was = g.phase; skip(g); return was !== g.phase; }
   if (a.t === 'weapon') {
@@ -70,7 +71,7 @@ export function applyInput(g, input) {
   if (m & KEY.L) walk(g, -1);
   if (m & KEY.R) walk(g, 1);
   const f = me(g);
-  g.ctl = canMove(g) && (f.rope || f.jet)
+  g.ctl = (canMove(g) && (f.rope || f.jet)) || g.phase === 'guide'
     ? { x: (m & KEY.R ? 1 : 0) - (m & KEY.L ? 1 : 0), y: (m & KEY.D ? 1 : 0) - (m & KEY.U ? 1 : 0) }
     : { x: 0, y: 0 };
   step(g);

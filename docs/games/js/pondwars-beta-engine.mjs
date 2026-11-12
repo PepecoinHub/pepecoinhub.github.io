@@ -240,7 +240,7 @@ function beginShot(g) {
   g.events.push({ type: 'fire', weapon: g.weapon });
 }
 // Melee, placed and thrown expansion weapons. Later packs add roles before the final return.
-function fireExpansion(g, f, w, angle, power, tx) {
+function fireExpansion(g, f, w, angle, power, tx, ty) {
   if (w.role === 'melee') {
     if (!spendExpansion(g, w)) return false;
     const dir = Math.cos(angle) >= 0 ? 1 : -1;
@@ -284,7 +284,39 @@ function fireExpansion(g, f, w, angle, power, tx) {
     beginShot(g);
     return true;
   }
+  if (w.role === 'guide') {
+    if (!spendExpansion(g, w)) return false;
+    const speed = w.power;
+    g.shots.push({ type: g.weapon, ...projectileOrigin(f, angle), vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, heading: angle, pitch: Math.max(-1.1, Math.min(1.1, angle)), t: 0, owner: f.id, ownerClear: false });
+    f.face = Math.cos(angle) >= 0 ? 1 : -1;
+    f.rope = null; f.jet = null;
+    g.retreat = 0;
+    g.phase = 'guide';
+    g.events.push({ type: 'fire', weapon: g.weapon });
+    return true;
+  }
+  if (w.role === 'strike') {
+    if (!spendExpansion(g, w)) return false;
+    const x = Math.max(40, Math.min(W - 40, Number.isFinite(tx) ? tx : f.x));
+    const aimY = Number.isFinite(ty) ? ty : 300;
+    const ground = surfaceBelow(g.mask, x, Math.min(H - 1, Math.max(0, aimY)));
+    g.shots.push({ type: g.weapon, x, y: ground - 1, targetX: x, targetY: ground - 1, vx: 0, vy: 0, t: 0, warning: true, owner: f.id, ownerClear: true });
+    beginShot(g);
+    return true;
+  }
   return false;
+}
+export function detonateGuided(g) {
+  if (g.phase !== 'guide') return false;
+  const i = g.shots.findIndex(s => WEAPONS[s.type]?.role === 'guide');
+  if (i < 0) return false;
+  const s = g.shots[i];
+  explode(g, s.x, s.y, s.type, s.vx, s.vy);
+  g.shots.splice(i, 1);
+  g.phase = 'settle';
+  g.settle = .9;
+  g.events.push({ type: 'detonate' });
+  return true;
 }
 // ---------- utilities: rope, jetpack, teleport (the turn goes on) ----------
 function useUtility(g, f, angle, tx, ty) {
@@ -334,12 +366,50 @@ function clearSpot(g, x, y) {
   return null;
 }
 export function skip(g) { if (g.phase === 'aim') { g.phase = 'settle'; g.settle = .4; } }
+function stepDoge(g, s, mask, frogs) {
+  const w = WEAPONS.doge, ctl = g.ctl || { x: 0, y: 0 };
+  s.heading += ctl.x * w.turnRate * STEP;
+  s.pitch = Math.max(-1.1, Math.min(1.1, (s.pitch || 0) + ctl.y * w.pitchRate * STEP));
+  const wantX = Math.cos(s.heading) * w.cruise, wantY = Math.sin(s.pitch) * w.cruise;
+  s.vx += (wantX - s.vx) * w.lag * STEP;
+  s.vy += (wantY - s.vy) * w.lag * STEP;
+  s.vy += G * w.guideGravity * STEP;
+  const nx = s.x + s.vx * STEP, ny = s.y + s.vy * STEP;
+  const n = Math.max(1, Math.ceil(Math.hypot(nx - s.x, ny - s.y) / 3));
+  for (let i = 1; i <= n; i++) {
+    const x = s.x + (nx - s.x) * i / n, y = s.y + (ny - s.y) * i / n;
+    if (solid(mask, x, y) || frogs.some(f => f.alive && (f.id !== s.owner || s.ownerClear) && Math.abs(f.x - x) < 15 && y > f.y - 58 && y < f.y + 2)) {
+      s.x = x; s.y = y; return 'boom';
+    }
+  }
+  s.x = nx; s.y = ny;
+  if (s.t >= w.lifetime) return 'boom';
+  if (s.y > WATER + 6) return 'splash';
+  if (s.x < -200 || s.x > W + 200) return 'gone';
+  return '';
+}
+function stepDonkey(g, s, mask) {
+  const w = WEAPONS.donkey;
+  if (s.t < w.warn) { s.x = s.targetX; s.y = s.targetY; s.vx = 0; s.vy = 0; s.warning = true; return ''; }
+  if (s.warning) { s.warning = false; s.x = s.targetX; s.y = Math.max(8, s.targetY - w.drop); s.vy = 60; s.vx = 0; }
+  s.vy += G * w.strikeGravity * STEP;
+  const ny = s.y + s.vy * STEP, steps = Math.max(1, Math.ceil(Math.abs(ny - s.y)));
+  for (let i = 1; i <= steps; i++) {
+    const y = s.y + (ny - s.y) * i / steps;
+    if (solid(mask, s.x, y) || y >= s.targetY) { s.y = y; return 'boom'; }
+  }
+  s.y = ny;
+  if (s.y > WATER + 6) return 'splash';
+  return '';
+}
 
 // ---------- simulation ----------
 export function stepShot(g, s, mask = g.mask, frogs = g.frogs) {
   const w = WEAPONS[s.type];
   s.t += STEP;
   if(!s.ownerClear){const owner=frogs.find(f=>f.id===s.owner);if(!owner||Math.abs(s.x-owner.x)>15||s.y<owner.y-58||s.y>owner.y+2)s.ownerClear=true;}
+  if (s.type === 'doge') return stepDoge(g, s, mask, frogs);
+  if (s.type === 'donkey') return stepDonkey(g, s, mask);
   s.vy += G * (w.gravity ?? 1) * STEP;
   if (w.wind) s.vx += g.wind * WIND_ACC * STEP;
   const nx = s.x + s.vx * STEP, ny = s.y + s.vy * STEP;
@@ -549,6 +619,8 @@ export function step(g) {
     g.timer -= STEP;
     if (!me(g).alive) { g.phase = 'settle'; g.settle = .6; }
     else if (g.timer <= 0) { g.phase = 'settle'; g.settle = .3; g.events.push({ type: 'timeout' }); }
+  } else if (g.phase === 'guide') {
+    if (!g.shots.some(s => WEAPONS[s.type]?.role === 'guide')) { g.phase = 'settle'; g.settle = .9; }
   } else if (g.phase === 'fire') {
     if(g.weapon==='revolver'&&g.pistolShots===1)g.timer=Math.max(0,g.timer-STEP);
     g.retreat=Math.max(0,g.retreat-STEP);

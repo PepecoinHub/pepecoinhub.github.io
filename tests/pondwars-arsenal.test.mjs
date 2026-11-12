@@ -92,7 +92,7 @@ test('every expansion weapon has a HUD name, blurb and a unique hotkey', () => {
     assert.ok(w.short && w.key && w.code && w.fireLabel);
     assert.ok(!keys.has(w.code), w.code);
     keys.add(w.code);
-    assert.equal(w.ready, w.pack === 'simple' || w.pack === 'pepecoin', id + ' playable flag');
+    assert.equal(w.ready, true, id);
   }
   assert.equal(keys.size, 8);
 });

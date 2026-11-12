@@ -1,7 +1,7 @@
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112pepe';
-import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112pepe';
-import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112pepe';
+import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112advanced';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112advanced';
+import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112advanced';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
 import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261112pixel';
 import { compilePixelManifest, authoredPose, clipDuration, pixelHelmet } from './pondwars-pixel-art.mjs?v=20261112pixel';
@@ -63,7 +63,7 @@ export function registerCharacterAnimation(id, manifest, image) {
   animationAssets.set(id, { manifest, image });
 }
 let g = null, opts = { mode: 'cpu', level: 1, n: 3, map:'island', mapSeed:20261103 }, seed = 0;
-let aimY = 300, parts = [], aim = -Math.PI / 4, aimX = W / 2, charging = false, chargeAt = 0, power = 0, held = { l: 0, r: 0 };
+let aimY = 300, parts = [], aim = -Math.PI / 4, aimX = W / 2, charging = false, chargeAt = 0, power = 0, held = { l: 0, r: 0, u: 0, pitch: 0 }, steerY = null;
 let paused=false, hudTime=0, visualDt=0;
 const previousPose=new WeakMap();
 function pose(o){const p=previousPose.get(o);const a=Math.min(1,acc/STEP);return p?{...o,x:p.x+(o.x-p.x)*a,y:p.y+(o.y-p.y)*a}:o;}
@@ -308,6 +308,8 @@ function shot(s) {
   if(s.type==='drill'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle='#708454';ctx.fillRect(-10,-4,14,8);ctx.fillStyle='#a8b4ba';ctx.beginPath();ctx.moveTo(4,-5);ctx.lineTo(13,0);ctx.lineTo(4,5);ctx.fill();ctx.restore();return;}
   if(s.type==='bell'){ctx.fillStyle='#f0c14a';ctx.beginPath();ctx.moveTo(0,-8);ctx.quadraticCurveTo(10,-4,8,4);ctx.lineTo(-8,4);ctx.quadraticCurveTo(-10,-4,0,-8);ctx.fill();ctx.fillStyle='#8a6a22';ctx.beginPath();ctx.arc(0,7,3,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 12px Tahoma';ctx.textAlign='center';ctx.fillText(String(Math.max(1,Math.ceil(WEAPONS.bell.fuse-s.t))),0,-12);ctx.restore();return;}
   if(s.type==='pep'){ctx.fillStyle=['#70c963','#edcf54','#4f9ef0'][Math.abs(Math.round(s.x))%3];ctx.beginPath();ctx.ellipse(0,0,4,6,0,0,7);ctx.fill();ctx.restore();return;}
+  if(s.type==='doge'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle='#e6c07a';ctx.beginPath();ctx.ellipse(0,0,11,6,0,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.fillRect(5,-3,4,3);ctx.restore();return;}
+  if(s.type==='donkey'){if(s.warning){ctx.strokeStyle='#d7deea';ctx.setLineDash([5,4]);ctx.strokeRect(-20,-8,40,16);ctx.setLineDash([]);ctx.fillStyle='#c5ccd6';ctx.fillRect(-7,-34,14,12);}else{ctx.fillStyle='#c5ccd6';ctx.fillRect(-9,-16,18,28);}ctx.restore();return;}
   if(s.type==='dynamite'){ctx.drawImage(weaponArt.dynamite,-10,-18,20,25);ctx.fillStyle='#fff3ba';ctx.font='bold 12px monospace';ctx.fillText(Math.max(1,Math.ceil(5-s.t)),0,-22);}
   else if (WEAPONS[s.type].fuse) {
     ctx.fillStyle = ['gold','toe'].includes(s.type)?'#ffd257':s.type==='cluster'?'#c95d36':'#436d32'; if(['gold','toe'].includes(s.type)){ctx.rotate(s.t*5);ctx.fillRect(-5,-9,8,15);for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(-5+i*3,-9,2.5,0,7);ctx.fill();}} ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, 7); ctx.fill(); ctx.fillStyle = '#8fd27d'; ctx.fillRect(-1, -7, 3, 3);
@@ -418,13 +420,15 @@ function hud() {
   $('#turn').textContent = g.phase === 'over' ? 'Game over' : `${f.name} (${TEAM[g.team].name})`;
   $('#turn').className = 't' + g.team;
   $('#turn').style.color=TEAM[g.team].band;
-  $('#timer').textContent = g.phase === 'aim' ? Math.ceil(g.timer) : g.retreat>0?'RUN '+Math.ceil(g.retreat):'·';
+  $('#timer').textContent = g.phase === 'aim' ? Math.ceil(g.timer) : g.phase === 'guide' ? 'FLY' : g.retreat>0?'RUN '+Math.ceil(g.retreat):'·';
   $('#timer').classList.toggle('low', g.phase === 'aim' && g.timer < 6);
   const wi = $('#wind i'); wi.style.width = Math.abs(g.wind) * 50 + '%'; wi.style.marginLeft = g.wind < 0 ? (50 - Math.abs(g.wind) * 50) + '%' : '50%';
   $('#wind').title = 'Wind ' + (g.wind < 0 ? '← ' : g.wind > 0 ? '→ ' : '') + Math.abs(g.wind * 10) + ': it pushes rockets';
   const mine = !paused && g.phase === 'aim' && !isCpu(g.team) && !remoteTurn();
-  document.querySelectorAll('.pw-controls button').forEach(b => { b.disabled = !mine; });
-  for(const id of ['#left','#right','#hop'])$(id).disabled=!movementAllowed();
+  const guiding = !paused && g.phase === 'guide' && !isCpu(g.team) && !remoteTurn();
+  document.querySelectorAll('.pw-controls button').forEach(b => { b.disabled = !mine && !guiding; });
+  for(const id of ['#left','#right','#hop'])$(id).disabled=!(movementAllowed()||guiding);
+  if (!mine) $('#skip').disabled = true;
   $('#movement').textContent='MOVE '+Math.floor(g.movement);
   document.querySelectorAll('[data-w]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.w === g.weapon)));
   document.querySelectorAll('[data-w]').forEach(b=>{
@@ -440,7 +444,7 @@ function hud() {
   // The FIRE button only shows on touch screens: tap the map to aim or pick a spot, then press here.
   const fu=me(g);
   const stock=g.weapon==='rope'?(fu.rope?'LET GO':'FIRE THE ROPE'):g.weapon==='jetpack'?(fu.jet?'JETPACK OFF':'START JETPACK'):g.weapon==='teleport'?'TELEPORT HERE':g.weapon==='candles'?'DROP CANDLES':g.weapon==='bat'?'SWING THE BAT':g.weapon==='revolver'?'FIRE · '+(2-g.pistolShots)+' LEFT':'HOLD TO FIRE';
-  $('#fire').textContent=heldWeapon.fireLabel||stock;
+  $('#fire').textContent=g.phase==='guide'?'DETONATE':(heldWeapon.fireLabel||stock);
   // phones hide the weapon readout, so the arsenal button names the weapon in hand
   $('#arsenal-open').textContent=touchUI.matches?'▲ '+(WEAPONS[g.weapon].short||'Arsenal'):'Arsenal';
   $('#angle-read').textContent=Math.round(-aim*180/Math.PI)+'°';
@@ -463,7 +467,7 @@ function events() {
   for (const e of g.events) {
     if (e.type === 'turn') { closeArsenal();keys.clear();clearCharge();pending=[];remoteP=0;aimPointer=null;held.l=held.r=held.u=0; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x;
       status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : isOnline(g.team) ? `${f.name} (${TEAM[g.team].name}) is playing on the other device…` : touchUI.matches ? `${f.name}: tap the map to aim · hold FIRE to shoot · ◀ ▶ walk · ↑ jump, twice for a backflip` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
-    if (e.type === 'fire') {closeArsenal();keys.clear();held.l=held.r=0;clearCharge();remoteP=0;status(g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
+    if (e.type === 'fire') {closeArsenal();keys.clear();held.l=held.r=held.u=held.pitch=0;steerY=null;clearCharge();remoteP=0;status(g.phase==='guide'?'Fly the Doge: A/D turn, W/S altitude, Enter or Space detonates.':g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
     if (e.type === 'boom') {shake=9;beep(65,.35);if(e.r)debris(e.x,e.y,e.r);}
     if (e.type === 'bell') beep(880, .08);
     if (e.type === 'rope') {beep(520,.06);status('Hooked! A/D swing · W/S shorter/longer · Space lets go. Your turn goes on.');}
@@ -549,8 +553,8 @@ function launch() {
 // One step of this device's input: held keys and buttons as bits, plus the queued actions.
 function localInput() {
   if(mine()&&arsenal.hidden&&!me(g).rope&&!me(g).jet){const dir=(keys.has("KeyS")||keys.has("ArrowDown")?1:0)-(keys.has("KeyW")||keys.has("ArrowUp")?1:0);aim+=dir*1.5*STEP*(me(g).face||1);}
-  if (!movementAllowed()) return { m: 0, a: pending.splice(0) };
-  const up = keys.has('KeyW') || keys.has('ArrowUp') || held.u, down = keys.has('KeyS') || keys.has('ArrowDown');
+  if (!movementAllowed() && !guiding()) return { m: 0, a: pending.splice(0) };
+  const up = keys.has('KeyW') || keys.has('ArrowUp') || held.u || held.pitch < 0, down = keys.has('KeyS') || keys.has('ArrowDown') || held.pitch > 0;
   return { m: (held.l ? KEY.L : 0) | (held.r ? KEY.R : 0) | (up ? KEY.U : 0) | (down ? KEY.D : 0), a: pending.splice(0) };
 }
 function frame(now) {
@@ -587,6 +591,7 @@ function frame(now) {
 
 // ---------- controls ----------
 const mine = () => !paused && g && g.phase === 'aim' && !isCpu(g.team) && !remoteTurn();
+const guiding = () => !paused && g && g.phase === 'guide' && !isCpu(g.team) && !remoteTurn() && $('#menu').hidden;
 const movementAllowed=()=>!paused&&g&&!isCpu(g.team)&&!remoteTurn()&&canMove(g)&&$('#menu').hidden;
 const keys=new Set();
 const arsenal=document.createElement('div');
@@ -642,13 +647,20 @@ for (const el of [cv, $('#fire'), $('#left'), $('#right'), $('#hop')]) el.addEve
 function jump(){if(!movementAllowed()||!arsenal.hidden)return;clearCharge();pending.push({t:'jump'});}
 function toWorld(e) { const r = cv.getBoundingClientRect(); const scale=Math.min(r.width/VW,r.height/H),padX=(r.width-VW*scale)/2,padY=(r.height-H*scale)/2; return [(e.clientX-r.left-padX)/scale-OX,(e.clientY-r.top-padY)/scale]; }
 function aimAt(e) {
+  if (guiding()) {
+    const [, y] = toWorld(e);
+    if (steerY == null) { steerY = y; return; }
+    const dy = y - steerY; steerY = y;
+    held.pitch = dy > 2 ? 1 : dy < -2 ? -1 : 0;
+    return;
+  }
   if (!mine()) return;
   const [x, y] = toWorld(e), f = me(g), d = x >= f.x ? 1 : -1;
   aimX = Math.max(30, Math.min(W - 30, x)); aimY = y; aim = Math.atan2(y - (f.y - 32), x - f.x);
   pending = pending.filter(a => a.t !== 'face');
   if (f.face !== d) pending.push({ t: 'face', d });
 }
-function beginCharge() { if (!mine() || charging || !arsenal.hidden) return; charging = true; chargeAt = performance.now(); power = 0; }
+function beginCharge() { if (guiding()) { pending.push({ t: 'detonate' }); return; } if (!mine() || charging || !arsenal.hidden) return; charging = true; chargeAt = performance.now(); power = 0; }
 function release(cancelShort) {
   if (!charging) return;
   const heldFor = performance.now() - chargeAt; clearCharge();
@@ -667,7 +679,7 @@ cv.addEventListener('pointerdown', e => {
   aimPointer = e.pointerId; try { cv.setPointerCapture(e.pointerId); } catch {} aimAt(e);
 });
 cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || e.pointerId === aimPointer) aimAt(e); });
-cv.addEventListener('pointerup', e => { if (e.pointerId === aimPointer) aimPointer = null; else if (e.pointerType === 'mouse') release(true); });
+cv.addEventListener('pointerup', e => { held.pitch = 0; steerY = null; if (e.pointerId === aimPointer) aimPointer = null; else if (e.pointerType === 'mouse') release(true); });
 cv.addEventListener('pointercancel', e => { if (e.pointerId === aimPointer) aimPointer = null; else if (e.pointerType === 'mouse') clearCharge(); });
 cv.addEventListener('lostpointercapture', e => { if (e.pointerId === aimPointer) aimPointer = null; else if (e.pointerType === 'mouse' && charging) clearCharge(); });
 const fb = $('#fire');
@@ -681,7 +693,7 @@ $('#arsenal-open').onclick=e=>{const r=e.target.getBoundingClientRect();openArse
 // ↑ reacts on touch-down (a quick second tap is the backflip); hold it to fly up with the jetpack.
 // A keyboard "click" on the focused button (detail 0) still jumps.
 const hopButton = $('#hop');
-hopButton.addEventListener('pointerdown', e => { if (e.button) return; e.preventDefault(); try { hopButton.setPointerCapture(e.pointerId); } catch {} if (g && me(g).jet) held.u = 1; else jump(); });
+hopButton.addEventListener('pointerdown', e => { if (e.button) return; e.preventDefault(); try { hopButton.setPointerCapture(e.pointerId); } catch {} if (g && g.phase === 'guide') held.u = 1; else if (g && me(g).jet) held.u = 1; else jump(); });
 hopButton.addEventListener('click', e => { if (e.detail === 0) jump(); });
 for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) hopButton.addEventListener(t, () => { held.u = 0; });
 $('#skip').addEventListener('click', () => { if (mine()) { pending.push({ t: 'skip' }); status('Turn skipped.'); } });
@@ -696,12 +708,12 @@ document.addEventListener('keydown', e => {
   if(e.code==='Escape'){closeArsenal(true);return;}
   if (!g || e.target.closest('input,textarea,select') || !$('#menu').hidden || !$('#over').hidden) return;
   const k=e.code;
-  if(k==='Enter'){e.preventDefault();if(!e.repeat)beginCharge();return;}
-  if(k==='Space'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)jump();return;}
+  if(k==='Enter'){e.preventDefault();if(!e.repeat&&guiding()){pending.push({t:'detonate'});return;}if(!e.repeat)beginCharge();return;}
+  if(k==='Space'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat&&guiding()){pending.push({t:'detonate'});return;}if(!e.repeat)jump();return;}
   if(['ArrowLeft','ArrowRight','KeyA','KeyD'].includes(k)){
-    e.preventDefault();if(movementAllowed()&&arsenal.hidden){keys.add(k);held.l=keys.has('ArrowLeft')||keys.has('KeyA');held.r=keys.has('ArrowRight')||keys.has('KeyD');}
+    e.preventDefault();if((movementAllowed()||guiding())&&arsenal.hidden){keys.add(k);held.l=keys.has('ArrowLeft')||keys.has('KeyA');held.r=keys.has('ArrowRight')||keys.has('KeyD');}
   }else if(['ArrowUp','ArrowDown','KeyW','KeyS'].includes(k)){
-    e.preventDefault();if(mine()&&arsenal.hidden)keys.add(k);
+    e.preventDefault();if((mine()||guiding())&&arsenal.hidden)keys.add(k);
   }else if((/^Digit[0-9]$/.test(k)||['KeyC','KeyR','KeyJ','KeyT'].includes(k))&&mine()){
     const w={KeyC:'candles',KeyR:'rope',KeyJ:'jetpack',KeyT:'teleport'}[k]||['drill','rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite'][Number(k.slice(-1))];
     chooseWeapon(w);

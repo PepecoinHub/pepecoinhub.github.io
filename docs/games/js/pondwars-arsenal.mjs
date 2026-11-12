@@ -89,7 +89,7 @@ const pep = {
 // --- advanced pack: steered flyer and a warned heavy strike ---
 const advanced = {
   doge: {
-    pack: 'advanced', ready: false, expansion: true, role: 'guide', tap: true,
+    pack: 'advanced', ready: true, expansion: true, role: 'guide', tap: true,
     name: 'Doge Flyer', short: 'Doge', key: 'F', code: 'KeyF',
     hud: 'STEER AFTER LAUNCH · 4.5s · ENTER OR SPACE DETONATES',
     fireLabel: 'LAUNCH FLYER',
@@ -99,7 +99,7 @@ const advanced = {
     cruise: GUIDE.cruise, lag: GUIDE.lag, guideGravity: GUIDE.gravity,
   },
   donkey: {
-    pack: 'advanced', ready: false, expansion: true, role: 'strike', tap: true,
+    pack: 'advanced', ready: true, expansion: true, role: 'strike', tap: true,
     name: 'Silver Donkey', short: 'Donkey', key: 'Y', code: 'KeyY',
     hud: 'TARGET THE MAP · 1.15s WARNING · HUGE IMPACT',
     fireLabel: 'CALL THE DONKEY',
