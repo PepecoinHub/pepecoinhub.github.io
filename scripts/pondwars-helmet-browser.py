@@ -33,7 +33,7 @@ with sync_playwright() as p:
         page.add_init_script(canvas_probe)
         page.goto('http://127.0.0.1:8000/games/pondwars-beta.html?art=standard-v02', wait_until='networkidle')
         page.evaluate('''async () => {
-          const {CharacterAnimator} = await import('/games/js/pondwars-animation.mjs?v=20261111helmet');
+          const {CharacterAnimator} = await import('/games/js/pondwars-animation.mjs?v=20261112pixel');
           const observe = CharacterAnimator.prototype.observe;
           CharacterAnimator.prototype.observe = function(g, ...args) { window.__game = g; return observe.call(this, g, ...args); };
         }''')

@@ -1,4 +1,4 @@
-import { characterPoint } from './pondwars-animation.mjs?v=20261111helmet';
+import { characterPoint } from './pondwars-animation.mjs?v=20261112pixel';
 
 // Art v02 is a review prototype. These constants describe its transparent canvas,
 // not physics. All frogs currently start with 100 HP and there is no healing.
@@ -18,10 +18,11 @@ export class HelmetCosmetics {
   }
   wearing(f) { return !this.lost.has(f.id); }
   suppressMotion() { this.flights.length = 0; }
-  lose(f, previousHP, time, pose, reduced = false) {
+  lose(f, previousHP, time, pose, reduced = false, art = {}) {
     if (previousHP - f.hp < 1 || this.lost.has(f.id)) return false;
     this.lost.add(f.id);
-    if (!reduced) this.flights.push({ id: f.id, start: time, ...characterPoint(f, pose, HELMET_CENTER),
+    if (!reduced) this.flights.push({ id: f.id, start: time, ...characterPoint(f, pose, art.center ?? HELMET_CENTER),
+      imageKey: art.imageKey ?? 'standard-v02', rect: art.rect ?? null, width: art.width ?? 40, height: art.height ?? 15,
       face: f.face, rotation: pose.rotation, sx: pose.sx, sy: pose.sy });
     return true;
   }

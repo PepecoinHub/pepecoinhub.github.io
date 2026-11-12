@@ -8,7 +8,7 @@ export class CharacterAnimator {
   advance(dt, paused = false) {
     if (!paused && Number.isFinite(dt) && dt > 0) this.time += dt;
   }
-  observe(g, events = [], { charging = false, onHealthDrop } = {}) {
+  observe(g, events = [], { charging = false, onHealthDrop, durationFor } = {}) {
     for (const f of g.frogs) {
       let a = this.actors.get(f.id);
       if (!a) { a = { state: 'idle', since: this.time, hp: f.hp, ground: f.ground }; this.actors.set(f.id, a); }
@@ -18,7 +18,7 @@ export class CharacterAnimator {
       if (!a.ground && f.ground) pulse = 'landing';
       if (events.some(e => e.type === 'fire') && f.id === g.current) pulse = 'fire';
       if (f.hp < a.hp) pulse = 'hit';
-      if (pulse && f.alive) { a.pulse = pulse; a.until = this.time + DURATION[pulse]; a.since = this.time; }
+      if (pulse && f.alive) { a.pulse = pulse; a.until = this.time + (durationFor?.(f, pulse) ?? DURATION[pulse]); a.since = this.time; }
       let state;
       if (!f.alive || f.hp <= 0) state = 'ko';
       else if (a.pulse && this.time < a.until) state = a.pulse;

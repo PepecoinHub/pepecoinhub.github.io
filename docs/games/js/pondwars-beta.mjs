@@ -1,15 +1,18 @@
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
 import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261111hand';
 import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261111hand';
-import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261111helmet';
-import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261111helmet';
+import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
+import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261112pixel';
+import { compilePixelManifest, authoredPose, clipDuration, pixelHelmet } from './pondwars-pixel-art.mjs?v=20261112pixel';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
 const $ = s => document.querySelector(s);
 // Opt-in art review: one standard model in 2.0, existing beta roster remains available without this flag.
-const standardPreview = new URLSearchParams(location.search).get('art') === 'standard-v02';
-let standardAssets = null;
+const artMode = new URLSearchParams(location.search).get('art');
+const standardPreview = artMode === 'standard-v02', pixelPreview = artMode === 'pixel-v04';
+const PIXEL_PLAYER = PLAYERS.findIndex(p => p.id === 'classic');
+let standardAssets = null, pixelAssets = null;
 const helmets = new HelmetCosmetics();
 const framed = (() => { try { return window.self !== window.top; } catch { return true; } })();
 if (framed || /[?&]embed=1(&|$)/.test(location.search)) document.documentElement.classList.add('embed');
@@ -46,7 +49,7 @@ function rgba(c,al){return `rgba(${c[0]},${c[1]},${c[2]},${al})`;}
 // Readable text on a given background colour (white on dark, near-black on light).
 function readable(h){const [r,gr,b]=hexRGB(h);return (r*0.299+gr*0.587+b*0.114)>150?'#1a1205':'#fff0cc';}
 const playerArt=PLAYERS.map(p=>{const img=new Image();img.src=p.src;return img;});
-const teamPlayers=[[0,1,2,3],[4,5,6,0]];
+const teamPlayers=pixelPreview ? [Array(4).fill(PIXEL_PLAYER),Array(4).fill(PIXEL_PLAYER)] : [[0,1,2,3],[4,5,6,0]];
 const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite','drill','candles','rope','jetpack','teleport'].map(w=>{const img=new Image();img.src='img/pondwars/'+w+'.svg';return[w,img];}));
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 let reduce = motionPreference.matches;
@@ -115,7 +118,10 @@ function water(t) {
 function frog(f, t) {
   const turn = g.current === f.id && g.phase === 'aim' && f.alive;
   ctx.save(); ctx.translate(f.x, f.y);
-  const animation = animator.sample(f, reduce), bob = animation.dy, s = f.face;
+  const choice=teamPlayers[f.team][Math.floor(f.id/2)]??0,person=PLAYERS[choice],art=playerArt[choice];
+  const asset = standardPreview ? standardAssets : animationAssets.get(person.id);
+  const rawAnimation = animator.sample(f, reduce);
+  const animation = asset?.authored ? authoredPose(rawAnimation) : rawAnimation, bob = animation.dy, s = f.face;
   const band = TEAM[f.team].band, dark = rgba(mix(band, '#000000', .55), 1);
   const mk = 1 + (ui - 1) * .6;               // markers grow a little on small/phone screens
   // ---- team platform disc under the frog's feet: a bold, high-contrast team marker ----
@@ -143,15 +149,18 @@ function frog(f, t) {
   ctx.translate(animation.dx, -29 + animation.dy);
   ctx.rotate(animation.rotation); ctx.scale(animation.sx, animation.sy);
   ctx.globalAlpha = animation.alpha;
-  const choice=teamPlayers[f.team][Math.floor(f.id/2)]??0,person=PLAYERS[choice],art=playerArt[choice];
-  const asset = standardPreview ? standardAssets : animationAssets.get(person.id);
   const frame = spriteFrame(asset?.manifest, animation.state, animation.age, reduce);
   const geometry = frame && asset.image?.naturalWidth ? frameGeometry(frame) : null;
   ctx.scale(s * (geometry ? 1 : person.face), 1);
   if (geometry) {
     const q = geometry;
+    if (asset.authored) ctx.imageSmoothingEnabled = false;
     ctx.drawImage(asset.image,q.sx,q.sy,q.sw,q.sh,q.x,q.y+29,q.width,q.height);
     if (standardPreview && helmets.wearing(f)) ctx.drawImage(asset.helmet,0,0,512,512,q.x,q.y+29,q.width,q.height);
+    if (asset === pixelAssets && helmets.wearing(f)) {
+      const h = pixelHelmet(frame);
+      ctx.drawImage(asset.helmet,...h.rect,h.x,h.y+29,h.width,h.height);
+    }
   } else if(art.naturalWidth){
     const [sx,sy,sw,sh]=person.rect||[0,0,art.naturalWidth,art.naturalHeight],height=64,width=Math.min(64,height*sw/sh);
     // team-colour glow hugging the sprite, so the team still reads when the under-foot disc
@@ -167,7 +176,7 @@ function frog(f, t) {
   ctx.restore();
   // Held weapon is drawn in world space at hand height (matches projectileOrigin at f.y-32),
   // not as a sprite glued near the feet inside the character transform.
-  if (turn || animation.state === 'fire') heldWeapon(f, characterPoint(f, animation, standardPreview && geometry ? PROTOTYPE_WEAPON_HAND : geometry?.hand));
+  if (turn || animation.state === 'fire') heldWeapon(f, characterPoint(f, animation, standardPreview && geometry ? PROTOTYPE_WEAPON_HAND : geometry?.hand), asset?.authored);
   // team pennant flag above the frog: a second team-colour cue near the label, readable even
   // when the under-foot disc is occluded. It waves on a frog's turn unless reduced-motion is on.
   const flagW = 15 * mk, flagH = 10 * mk, poleTop = f.y - 82 - 13 * mk, poleBot = f.y - 82 + 3;
@@ -209,20 +218,20 @@ const HOLD = {
   gold: { w: 26, h: 26, ox: -10, oy: -20, base: 0 },
 };
 const PLACE_HOLD = new Set(['mine', 'dynamite', 'candles', 'teleport', 'jetpack', 'rope']);
-function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }) {
+function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false) {
   const img = weaponArt[g.weapon];
   if (!img?.naturalWidth) return;
   const handX = hand.x, handY = hand.y;
   const side = Math.cos(aim) >= 0 ? 1 : -1;
   if (PLACE_HOLD.has(g.weapon)) {
-    ctx.drawImage(img, handX + side * 14 - 13, handY - 24, 26, 26);
+    ctx.drawImage(img, handX + (precise ? 0 : side * 14) - 13, handY - 24, 26, 26);
     return;
   }
   // Thrown bombs stay upright in the hands (slight lean toward aim) so they read clearly at torso height.
   if (['grenade', 'cluster', 'gold'].includes(g.weapon)) {
     const h = HOLD[g.weapon];
     ctx.save();
-    ctx.translate(handX + side * 12, handY - 2);
+    ctx.translate(handX + (precise ? 0 : side * 12), handY - (precise ? 0 : 2));
     ctx.rotate(aim * .18);
     ctx.drawImage(img, h.ox, h.oy, h.w, h.h);
     ctx.restore();
@@ -230,7 +239,7 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }) {
   }
   const h = HOLD[g.weapon] || { w: 28, h: 28, ox: -6, oy: -14, base: 0 };
   ctx.save();
-  ctx.translate(handX + Math.cos(aim) * 8, handY + Math.sin(aim) * 8);
+  ctx.translate(handX + (precise ? 0 : Math.cos(aim) * 8), handY + (precise ? 0 : Math.sin(aim) * 8));
   ctx.rotate(aim + h.base);
   // Keep the top of the weapon upright when aiming left of vertical.
   if (Math.cos(aim) < 0) ctx.scale(1, -1);
@@ -430,9 +439,16 @@ function hud() {
 }
 
 // ---------- turns, events, CPU ----------
+function pixelFrog(f) { return pixelPreview && pixelAssets && (teamPlayers[f.team][Math.floor(f.id/2)] ?? 0) === PIXEL_PLAYER; }
 function observeCharacters(events = []) {
   animator.observe(g, events, { charging: charging || !!cpu?.charging || remoteP > 0,
-    onHealthDrop: standardPreview ? (f, previousHP, time) => helmets.lose(f, previousHP, time, animator.sample(f, reduce), reduce) : undefined });
+    durationFor: (f, state) => pixelFrog(f) ? clipDuration(pixelAssets.manifest, state) : undefined,
+    onHealthDrop: (f, previousHP, time) => {
+      if (pixelFrog(f)) {
+        const p = authoredPose(animator.sample(f, reduce)), frame = spriteFrame(pixelAssets.manifest, p.state, p.age, reduce);
+        helmets.lose(f, previousHP, time, p, reduce, pixelHelmet(frame));
+      } else if (standardPreview) helmets.lose(f, previousHP, time, animator.sample(f, reduce), reduce);
+    } });
 }
 function events() {
   observeCharacters(g.events);
@@ -675,6 +691,12 @@ function pick(sel, key, parse) {
 }
 const COLORS=[{name:'Blue',hex:'#4f9ef0'},{name:'Red',hex:'#ef6c63'},{name:'Green',hex:'#70c963'},{name:'Yellow',hex:'#edcf54'},{name:'Purple',hex:'#bc92e9'},{name:'Orange',hex:'#ef9a4f'}],teamColors=[0,1];
 function portrait(canvas,index){
+  if (pixelPreview && pixelAssets && index === PIXEL_PLAYER) {
+    const c=canvas.getContext('2d'), frame=spriteFrame(pixelAssets.manifest,'idle',0), q=frameGeometry(frame), h=pixelHelmet(frame);
+    c.clearRect(0,0,48,52);c.save();c.translate(24,52);c.scale(.75,.75);c.imageSmoothingEnabled=false;
+    c.drawImage(pixelAssets.image,q.sx,q.sy,q.sw,q.sh,q.x,q.y,q.width,q.height);
+    c.drawImage(pixelAssets.helmet,...h.rect,h.x,h.y,h.width,h.height);c.restore();return;
+  }
   const img=playerArt[index],p=PLAYERS[index],c=canvas.getContext('2d');c.clearRect(0,0,48,52);
   if(!img.naturalWidth)return;
   const [sx,sy,sw,sh]=p.rect||[0,0,img.naturalWidth,img.naturalHeight],h=48,w=Math.min(46,h*sw/sh);
@@ -689,7 +711,7 @@ function paintPlayers(){
       const thumb=document.createElement('canvas');thumb.width=48;thumb.height=52;thumb.setAttribute('aria-hidden','true');portrait(thumb,teamPlayers[team][slot]);
       const caption=document.createElement('span');caption.textContent='Frog '+(slot+1);
       const select=document.createElement('select');select.setAttribute('aria-label','Team '+(team+1)+' frog '+(slot+1)+' character');
-      PLAYERS.forEach((p,i)=>{const option=document.createElement('option');option.value=i;option.textContent=p.name;select.append(option);});select.value=teamPlayers[team][slot];
+      PLAYERS.forEach((p,i)=>{const option=document.createElement('option');option.value=i;option.textContent=pixelPreview && p.id === 'classic' ? p.name + ' · pixel v04 QA' : p.name;select.append(option);});select.value=teamPlayers[team][slot];
       select.onchange=()=>{teamPlayers[team][slot]=Number(select.value);portrait(thumb,Number(select.value));};
       row.append(thumb,caption,select);box.append(row);
     }
@@ -779,9 +801,9 @@ title.focus({ preventScroll: true });
 g = newGame({ seed: 20261103, perTeam: 3 }); paintGround(); g.phase = 'menu';
 requestAnimationFrame(frame);
 menuButton();
-Promise.all([...playerArt.map(img=>img.decode().catch(()=>null)), loadStandardPrototype()]).then(()=>{paintPlayers();crewReady=true;menuButton();}).catch(error => {
+Promise.all([...playerArt.map(img=>img.decode().catch(()=>null)), loadStandardPrototype(), loadPixelPrototype()]).then(()=>{paintPlayers();crewReady=true;menuButton();}).catch(error => {
   $('#go').disabled = true; $('#go').textContent = 'PROTOTYPE ART UNAVAILABLE';
-  status('Prototype assets could not load. Reload or open the beta without ?art=standard-v02.');
+  status('Prototype assets could not load. Reload or open the beta without the art query parameter.');
   console.warn('FROGAGEDDON prototype assets:', error);
 });
 
@@ -803,10 +825,37 @@ async function loadStandardPrototype() {
   standardAssets = { manifest, image, helmet, cutout };
 }
 function drawHelmetFlights() {
-  if (!standardAssets) return;
+  if (!standardAssets && !pixelAssets) return;
   for (const p of helmets.sample(animator.time, reduce)) {
     ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation);
     ctx.scale(p.face * p.sx, p.sy); ctx.globalAlpha = p.alpha;
-    ctx.drawImage(standardAssets.cutout, -20, -7.5, 40, 15); ctx.restore();
+    if (p.imageKey === 'pixel-v04') {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(pixelAssets.helmet,...p.rect,-p.width/2,-p.height/2,p.width,p.height);
+    } else ctx.drawImage(standardAssets.cutout, -p.width/2,-p.height/2,p.width,p.height);
+    ctx.restore();
   }
+}
+
+async function loadPixelPrototype() {
+  if (!pixelPreview) return;
+  $('#art-prototype').hidden = false;
+  $('#art-prototype').textContent = 'PIXEL ART v04 · QA alternative for Classic Pepe · not production-approved art. Other skins remain available.';
+  $('.pw-chrome small').textContent = ' / PIXEL v04 QA';
+  cv.style.imageRendering = 'pixelated';
+  cv.setAttribute('aria-label', 'FROGAGEDDON pixel v04 QA battlefield');
+  const base = 'img/pondwars/players/pixel-v04/';
+  const data = await Promise.all(['manifest.json','qa-anchors.json'].map(async file => {
+    const r = await fetch(base+file); if (!r.ok) throw new Error('Pixel QA metadata unavailable'); return r.json();
+  }));
+  const manifest = compilePixelManifest(...data);
+  const [image, helmet] = await Promise.all(['atlas.png','helmet_pose_atlas.png'].map(async file => {
+    const img = new Image(); img.src = base+file; await img.decode();
+    if (img.naturalWidth !== 1024 || img.naturalHeight !== 896) throw new Error('Pixel atlas dimensions mismatch'); return img;
+  }));
+  for (const clip of Object.values(manifest.clips)) for (const f of clip.frames) {
+    if (f.rect[0]+128 > image.naturalWidth || f.rect[1]+128 > image.naturalHeight) throw new Error('Pixel frame outside atlas');
+  }
+  registerCharacterAnimation('classic', manifest, image);
+  pixelAssets = animationAssets.get('classic'); Object.assign(pixelAssets, { helmet, authored: true });
 }
