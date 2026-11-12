@@ -25,13 +25,12 @@ export const GUIDE = {
 // --- simple pack: melee kick, timed bell, proximity trap ---
 const simple = {
   goldv2: {
-    pack: 'simple', ready: true, expansion: true, role: 'melee', tap: true,
-    name: 'Golden Foot v2', short: 'Gold Foot', key: 'G', code: 'KeyG',
-    hud: 'ONE PER MATCH · DIRECT HIT · VERY HIGH KNOCKBACK · TINY SCUFF',
-    fireLabel: 'KICK', cry: 'KICK!',
-    damage: 58, radius: 0, crater: SCALE.crater.verySmall, range: 78,
-    knock: SCALE.knock.veryHigh, knockVx: 640, knockVy: -260,
-    ammo: 1, power: 1, wind: false,
+    pack: 'simple', ready: true, expansion: true, role: 'throw',
+    name: 'Mega Golden Foot', short: 'Mega Foot', key: 'G', code: 'KeyG',
+    hud: 'ONE PER MATCH · HUGE THROWN FOOT · FIVE GOLDEN TOES',
+    fireLabel: 'HOLD TO THROW',
+    damage: 58, radius: 66, crater: 66, knock: SCALE.knock.veryHigh,
+    ammo: 1, power: 480, wind: false, fuse: 3, children: 5, childType: 'megatoe',
   },
   bell: {
     pack: 'simple', ready: true, expansion: true, role: 'throw', bell: true,
@@ -39,7 +38,7 @@ const simple = {
     hud: '3.0s FUSE · BOUNCES · MEDIUM BLAST',
     fireLabel: 'HOLD TO THROW',
     damage: 44, radius: SCALE.crater.medium, crater: SCALE.crater.medium,
-    fuse: 3, ammo: Infinity, power: 520, wind: false,
+    fuse: 3, ammo: 2, power: 520, wind: false,
   },
   frogmine: {
     pack: 'simple', ready: true, expansion: true, role: 'mine', tap: true,
@@ -109,7 +108,9 @@ const advanced = {
   },
 };
 
-export const EXPANSION = { ...simple, ...pepecoin, pep, ...advanced };
+const megatoe = { pack:'simple', ready:true, expansion:true, child:true, role:'throw', name:'Mega Golden Toe', damage:12, radius:16, crater:16, fuse:1.5, power:300, wind:false };
+export const ARSENAL_BUILD = 'polish-1';
+export const EXPANSION = { ...simple, megatoe, ...pepecoin, pep, ...advanced };
 
 export const CLASSIC_AMMO = {
   candles: 1, cluster: 4, gold: 1, mine: 3, dynamite: 2, drill: 2, rope: 5, jetpack: 2, teleport: 2,

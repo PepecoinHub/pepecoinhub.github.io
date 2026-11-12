@@ -14,35 +14,15 @@ function flat(distance = 70) {
 }
 const solids = g => g.mask.reduce((n, v) => n + v, 0);
 
-test('Golden Foot v2 is a one-use kick, distinct from the baseball bat', () => {
-  const hit = flat(60);
-  hit.weapon = 'goldv2';
-  const ground = solids(hit);
-  assert.equal(fire(hit, 0, 1), true);
-  assert.equal(hit.frogs[1].hp, 42);
-  assert.ok(hit.frogs[1].vx >= 640);
-  assert.ok(hit.frogs[1].vy <= -260);
-  assert.equal(hit.shots.length, 0);
-  assert.equal(hit.ammo[0].goldv2, 0);
-  assert.equal(hit.ammo[0].gold, 1);
-  const carved = ground - solids(hit);
-  assert.ok(carved > 20 && carved < 250, 'scuff crater only, carved ' + carved);
-  hit.phase = 'aim';
-  assert.equal(fire(hit, 0, 1), false);
-
-  const miss = flat(100);
-  miss.weapon = 'goldv2';
-  assert.equal(fire(miss, 0, 1), true);
-  assert.equal(miss.frogs[1].hp, 100);
-  assert.equal(miss.ammo[0].goldv2, 0);
-
-  const bat = flat(60);
-  bat.weapon = 'bat';
-  assert.equal(fire(bat, 0, 1), true);
-  assert.equal(bat.frogs[1].hp, 68);
-  assert.ok(Math.abs(bat.frogs[1].vx) < 500);
-  assert.equal(bat.ammo[0].goldv2, 1);
-  assert.equal(me(bat).hp, 100);
+test('Mega Golden Foot is a one-use throw with five separate toes; classic stays intact', () => {
+  const g=flat(400);g.weapon='goldv2';const hp=g.frogs.map(f=>f.hp);
+  assert.equal(fire(g,-.7,.6),true);assert.equal(g.shots[0].type,'goldv2');
+  assert.deepEqual(g.frogs.map(f=>f.hp),hp);assert.equal(g.ammo[0].goldv2,0);assert.equal(g.ammo[0].gold,1);
+  const s=g.shots[0];Object.assign(s,{x:600,y:150,vx:0,vy:0,t:2.999});step(g);
+  assert.equal(g.shots.filter(s=>s.type==='megatoe').length,5);
+  assert.equal(g.shots.filter(s=>s.type==='toe').length,0);
+  g.phase='aim';assert.equal(fire(g,0,1),false);
+  assert.equal(WEAPONS.gold.damage,68);assert.equal(WEAPONS.toe.damage,36);
 });
 
 test('Bell Bomb bounces, dings, and explodes once without fragments', () => {
@@ -83,6 +63,7 @@ test('Bell Bomb bounces, dings, and explodes once without fragments', () => {
   assert.equal(stock.shots[0].type, 'bell');
   stock.phase = 'aim';
   assert.equal(fire(stock, -0.4, 0.7), true);
+  stock.phase='aim';assert.equal(fire(stock,-.4,.7),false);assert.equal(stock.ammo[0].bell,0);assert.equal(stock.ammo[1].bell,2);
 });
 
 test('Frog Mine arms after one second, then a small blast with medium knockback', () => {

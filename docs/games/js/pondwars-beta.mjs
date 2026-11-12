@@ -1,17 +1,22 @@
+import { validateClip, clipFrame, WEAPON_FALLBACK, MAP_DECORATIONS, MAP_TINT } from './pondwars-weapon-art.mjs?v=20261112polish';
+import { PointerHolds } from './pondwars-pointer-holds.mjs?v=20261112polish';
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112maps2';
-import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112maps2';
-import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112maps2';
+import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112polish';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112polish';
+import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112polish';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
 import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261112pixel';
-import { compilePixelManifest, authoredPose, clipDuration, pixelHelmet } from './pondwars-pixel-art.mjs?v=20261112pixel';
+import { compilePixelManifest, authoredPose, clipDuration, pixelHelmet, pixelFrame } from './pondwars-pixel-art.mjs?v=20261112pixel06';
+import { v06WeaponHold, qaTerrain } from './pondwars-v06-art.mjs?v=20261112pixel06';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
 const $ = s => document.querySelector(s);
 // Opt-in art review: one standard model in 2.0, existing beta roster remains available without this flag.
 const artMode = new URLSearchParams(location.search).get('art');
-const standardPreview = artMode === 'standard-v02', pixelPreview = artMode === 'pixel-v04';
+const standardPreview = artMode === 'standard-v02', pixelPreview = ['pixel-v04','pixel-v06'].includes(artMode);
+const pixelLabel = artMode === 'pixel-v06' ? 'v06' : 'v04';
+let pixelCompareLinks = [];
 const PIXEL_PLAYER = PLAYERS.findIndex(p => p.id === 'classic');
 let standardAssets = null, pixelAssets = null;
 const helmets = new HelmetCosmetics();
@@ -52,6 +57,47 @@ function readable(h){const [r,gr,b]=hexRGB(h);return (r*0.299+gr*0.587+b*0.114)>
 const playerArt=PLAYERS.map(p=>{const img=new Image();img.src=p.src;return img;});
 const teamPlayers=pixelPreview ? [Array(4).fill(PIXEL_PLAYER),Array(4).fill(PIXEL_PLAYER)] : [[0,1,2,3],[4,5,6,0]];
 const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite','drill','candles','rope','jetpack','teleport'].map(w=>{const img=new Image();img.src='img/pondwars/'+w+'.svg';return[w,img];}));
+// Clip manifest can be completed with v11 without changing the simulation or HUD.
+const weaponClips=new Map(), flightArt={};
+for(const [id,fallback] of Object.entries(WEAPON_FALLBACK)){const image=new Image();image.src='img/pondwars/'+fallback+'.svg';flightArt[id]=image;}
+fetch('art/arsenal-polish/manifest.json').then(r=>r.json()).then(manifest=>{
+  for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(c){
+    if(!validateClip(c))throw new Error('Invalid weapon clip: '+id+'/'+role);
+    const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
+  }
+}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message));
+let weaponFX=[];
+function drawWeaponClip(id,role,time,x,y,reduced=reduce){
+  const c=weaponClips.get(id+'/'+role);if(!c?.image.naturalWidth)return false;
+  const q=clipFrame(c,time,reduced);
+  if(c.image.naturalWidth<c.columns*q.sw || c.image.naturalHeight<Math.ceil(c.frames/c.columns)*q.sh)return false;
+  ctx.save();ctx.translate(x,y);ctx.imageSmoothingEnabled=false;ctx.drawImage(c.image,q.sx,q.sy,q.sw,q.sh,q.x,q.y,q.width,q.height);ctx.restore();return true;
+}
+function drawWeaponEffects(){
+  weaponFX=weaponFX.filter(e=>animator.time-e.time<e.life);
+  for(const e of weaponFX){const age=animator.time-e.time;ctx.save();ctx.globalAlpha=Math.min(1,(e.life-age)*2);drawWeaponClip(e.weapon,e.role,age,e.x,e.y,reduce);ctx.restore();}
+}
+function drawFootprints(){
+  if(!flightArt.goldv2.naturalWidth)return;
+  for(const e of weaponFX)if(e.weapon==='goldv2'&&animator.time-e.time<e.life){
+    ctx.save();ctx.globalAlpha=Math.min(.9,(e.life-(animator.time-e.time))*2);ctx.translate(e.x,e.y);ctx.scale(1,.65);ctx.drawImage(flightArt.goldv2,-38,-38,76,76);ctx.restore();
+  }
+}
+function drawMapDecorations(){
+  const slots=MAP_DECORATIONS[g.map];if(!slots)return;
+  ctx.save();ctx.fillStyle=MAP_TINT[g.map];ctx.strokeStyle=MAP_TINT[g.map];ctx.globalAlpha=.22;
+  // Distant, low-contrast wireframe placeholders. No mask reads or writes.
+  for(const p of slots){
+    ctx.save();ctx.translate(p.x,p.y);ctx.beginPath();
+    if(g.map==='moon') {ctx.arc(0,0,30,Math.PI,0);ctx.moveTo(-35,0);ctx.lineTo(35,0);ctx.moveTo(42,0);ctx.lineTo(42,-52);ctx.lineTo(55,-62);}
+    else if(g.map==='doom'){ctx.moveTo(-22,0);ctx.lineTo(-22,-35);ctx.quadraticCurveTo(0,-65,22,-35);ctx.lineTo(22,0);ctx.moveTo(48,0);ctx.lineTo(45,-50);ctx.moveTo(45,-28);ctx.lineTo(30,-42);}
+    else if(g.map==='farm'){ctx.rect(-28,-28,56,28);ctx.moveTo(-34,-28);ctx.lineTo(0,-50);ctx.lineTo(34,-28);ctx.moveTo(48,0);ctx.lineTo(48,-50);ctx.moveTo(30,-50);ctx.lineTo(66,-50);ctx.moveTo(48,-68);ctx.lineTo(48,-32);}
+    else if(g.map==='quarry'){ctx.moveTo(-20,0);ctx.lineTo(-20,-60);ctx.lineTo(50,-60);ctx.lineTo(50,-25);ctx.moveTo(-30,0);ctx.lineTo(-10,-60);ctx.moveTo(-20,-40);ctx.lineTo(30,-60);}
+    else {ctx.rect(-18,-65,36,65);ctx.moveTo(-23,-65);ctx.lineTo(0,-87);ctx.lineTo(23,-65);ctx.moveTo(-8,-34);ctx.quadraticCurveTo(0,-52,8,-34);ctx.lineTo(-8,-34);}
+    ctx.stroke();ctx.restore();
+  }
+  ctx.globalAlpha=.55;ctx.font='12px monospace';ctx.textAlign='center';ctx.fillText('DISTANT BACKDROP · NO COLLISION · ART PENDING',W/2,42);ctx.restore();
+}
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 let reduce = motionPreference.matches;
 motionPreference.addEventListener('change', e => { reduce = e.matches; if (reduce) helmets.suppressMotion(); });
@@ -62,7 +108,7 @@ export function registerCharacterAnimation(id, manifest, image) {
   if (!PLAYERS.some(p => p.id === id) || !validateManifest(manifest)) throw new Error('Unknown character or invalid animation manifest');
   animationAssets.set(id, { manifest, image });
 }
-let g = null, opts = { mode: 'cpu', level: 1, n: 3, map:'island', mapSeed:20261103 }, seed = 0;
+let g = null, opts = qaTerrain(location.search, MAPS, { mode: 'cpu', level: 1, n: 3, map:'island', mapSeed:20261103 }), seed = 0;
 let aimY = 300, parts = [], aim = -Math.PI / 4, aimX = W / 2, charging = false, chargeAt = 0, power = 0, held = { l: 0, r: 0, u: 0, pitch: 0 }, steerY = null;
 let paused=false, hudTime=0, visualDt=0;
 const previousPose=new WeakMap();
@@ -134,7 +180,7 @@ function frog(f, t) {
   const choice=teamPlayers[f.team][Math.floor(f.id/2)]??0,person=PLAYERS[choice],art=playerArt[choice];
   const asset = standardPreview ? standardAssets : animationAssets.get(person.id);
   const rawAnimation = animator.sample(f, reduce);
-  const animation = asset?.authored ? authoredPose(rawAnimation) : rawAnimation, bob = animation.dy, s = f.face;
+  const animation = asset?.authored ? authoredPose(rawAnimation, f, asset.imageKey) : rawAnimation, bob = animation.dy, s = f.face;
   const band = TEAM[f.team].band, dark = rgba(mix(band, '#000000', .55), 1);
   const mk = 1 + (ui - 1) * .6;               // markers grow a little on small/phone screens
   // ---- team platform disc under the frog's feet: a bold, high-contrast team marker ----
@@ -162,7 +208,7 @@ function frog(f, t) {
   ctx.translate(animation.dx, -29 + animation.dy);
   ctx.rotate(animation.rotation); ctx.scale(animation.sx, animation.sy);
   ctx.globalAlpha = animation.alpha;
-  const frame = spriteFrame(asset?.manifest, animation.state, animation.age, reduce);
+  const frame = asset === pixelAssets && pixelAssets ? pixelFrame(pixelAssets, animation, reduce) : spriteFrame(asset?.manifest, animation.state, animation.age, reduce);
   const geometry = frame && asset.image?.naturalWidth ? frameGeometry(frame) : null;
   ctx.scale(s * (geometry ? 1 : person.face), 1);
   if (geometry) {
@@ -171,7 +217,7 @@ function frog(f, t) {
     ctx.drawImage(asset.image,q.sx,q.sy,q.sw,q.sh,q.x,q.y+29,q.width,q.height);
     if (standardPreview && helmets.wearing(f)) ctx.drawImage(asset.helmet,0,0,512,512,q.x,q.y+29,q.width,q.height);
     if (asset === pixelAssets && helmets.wearing(f)) {
-      const h = pixelHelmet(frame);
+      const h = pixelHelmet(frame, pixelAssets.imageKey);
       ctx.drawImage(asset.helmet,...h.rect,h.x,h.y+29,h.width,h.height);
     }
   } else if(art.naturalWidth){
@@ -187,9 +233,9 @@ function frog(f, t) {
   }
   ctx.scale(person.face,1);
   ctx.restore();
-  // Held weapon is drawn in world space at hand height (matches projectileOrigin at f.y-32),
-  // not as a sprite glued near the feet inside the character transform.
-  if (turn || animation.state === 'fire') heldWeapon(f, characterPoint(f, animation, standardPreview && geometry ? PROTOTYPE_WEAPON_HAND : geometry?.hand), asset?.authored);
+  // Weapon art remains in world space; authored clips provide the measured hand.
+  // Legacy skins keep the PR266 hand-height anchor; projectileOrigin is unchanged.
+  if (turn || animation.state === 'fire') heldWeapon(f, characterPoint(f, animation, standardPreview && geometry ? PROTOTYPE_WEAPON_HAND : geometry?.hand), asset?.authored, asset?.imageKey);
   // team pennant flag above the frog: a second team-colour cue near the label, readable even
   // when the under-foot disc is occluded. It waves on a frog's turn unless reduced-motion is on.
   const flagW = 15 * mk, flagH = 10 * mk, poleTop = f.y - 82 - 13 * mk, poleBot = f.y - 82 + 3;
@@ -230,10 +276,11 @@ const HOLD = {
   cluster: { w: 22, h: 26, ox: -8, oy: -22, base: 0 },
   gold: { w: 26, h: 26, ox: -10, oy: -20, base: 0 },
 };
-const PLACE_HOLD = new Set(['mine', 'dynamite', 'candles', 'teleport', 'jetpack', 'rope']);
-function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false) {
+const PLACE_HOLD = new Set(['frogmine', 'mine', 'dynamite', 'candles', 'teleport', 'jetpack', 'rope']);
+function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false, imageKey) {
   const img = weaponArt[g.weapon];
   if (!img?.naturalWidth) return;
+  const calibrated = imageKey === 'pixel-v06' ? v06WeaponHold(g.weapon) : null;
   const handX = hand.x, handY = hand.y;
   const side = Math.cos(aim) >= 0 ? 1 : -1;
   if (PLACE_HOLD.has(g.weapon)) {
@@ -241,8 +288,8 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false) {
     return;
   }
   // Thrown bombs stay upright in the hands (slight lean toward aim) so they read clearly at torso height.
-  if (['grenade', 'cluster', 'gold'].includes(g.weapon)) {
-    const h = HOLD[g.weapon];
+  if (['grenade', 'cluster', 'gold','goldv2','bell'].includes(g.weapon)) {
+    const h = calibrated || HOLD[g.weapon] || HOLD.gold;
     ctx.save();
     ctx.translate(handX + (precise ? 0 : side * 12), handY - (precise ? 0 : 2));
     ctx.rotate(aim * .18);
@@ -250,7 +297,7 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false) {
     ctx.restore();
     return;
   }
-  const h = HOLD[g.weapon] || { w: 28, h: 28, ox: -6, oy: -14, base: 0 };
+  const h = calibrated || HOLD[g.weapon] || { w: 28, h: 28, ox: -6, oy: -14, base: 0 };
   ctx.save();
   ctx.translate(handX + (precise ? 0 : Math.cos(aim) * 8), handY + (precise ? 0 : Math.sin(aim) * 8));
   ctx.rotate(aim + h.base);
@@ -262,7 +309,7 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false) {
 // Dotted arc that mirrors the real shot (gravity + wind). Shown while aiming ballistic weapons.
 function aimArc(f, angle, pwr) {
   const w = WEAPONS[g.weapon];
-  if (!w || w.utility || PLACE_HOLD.has(g.weapon) || g.weapon === 'bat') return;
+  if (!w || w.utility || PLACE_HOLD.has(g.weapon) || g.weapon === 'bat' || ['melee','salvo','strike','guide'].includes(w.role)) return;
   const origin = projectileOrigin(f, angle);
   const speed = (g.weapon === 'revolver' ? 1 : Math.max(.08, Math.min(1, pwr))) * w.power;
   let x = origin.x, y = origin.y, vx = Math.cos(angle) * speed, vy = Math.sin(angle) * speed;
@@ -318,10 +365,22 @@ function drawParts(dt) {
 function shot(s) {
   ctx.save(); ctx.translate(s.x, s.y);
   if(s.type==='drill'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle='#708454';ctx.fillRect(-10,-4,14,8);ctx.fillStyle='#a8b4ba';ctx.beginPath();ctx.moveTo(4,-5);ctx.lineTo(13,0);ctx.lineTo(4,5);ctx.fill();ctx.restore();return;}
-  if(s.type==='bell'){ctx.fillStyle='#f0c14a';ctx.beginPath();ctx.moveTo(0,-8);ctx.quadraticCurveTo(10,-4,8,4);ctx.lineTo(-8,4);ctx.quadraticCurveTo(-10,-4,0,-8);ctx.fill();ctx.fillStyle='#8a6a22';ctx.beginPath();ctx.arc(0,7,3,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 12px Tahoma';ctx.textAlign='center';ctx.fillText(String(Math.max(1,Math.ceil(WEAPONS.bell.fuse-s.t))),0,-12);ctx.restore();return;}
-  if(s.type==='pep'){ctx.fillStyle=['#70c963','#edcf54','#4f9ef0'][Math.abs(Math.round(s.x))%3];ctx.beginPath();ctx.ellipse(0,0,4,6,0,0,7);ctx.fill();ctx.restore();return;}
-  if(s.type==='doge'){ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle='#e6c07a';ctx.beginPath();ctx.ellipse(0,0,11,6,0,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.fillRect(5,-3,4,3);ctx.restore();return;}
-  if(s.type==='donkey'){if(s.warning){ctx.strokeStyle='#d7deea';ctx.setLineDash([5,4]);ctx.strokeRect(-20,-8,40,16);ctx.setLineDash([]);ctx.fillStyle='#c5ccd6';ctx.fillRect(-7,-34,14,12);}else{ctx.fillStyle='#c5ccd6';ctx.fillRect(-9,-16,18,28);}ctx.restore();return;}
+  if(WEAPON_FALLBACK[s.type]){
+    if(s.type==='donkey' && s.warning){
+      ctx.strokeStyle='#d7deea';ctx.setLineDash([5,4]);ctx.strokeRect(-20,-8,40,16);ctx.setLineDash([]);
+      if(!drawWeaponClip('donkey','activation',s.t,0,-38)) {const image=flightArt.donkey;if(image.naturalWidth)ctx.drawImage(image,-16,-60,32,32);}
+      ctx.restore();return;
+    }
+    if(['doge','moon'].includes(s.type))ctx.rotate(Math.atan2(s.vy,s.vx));
+    else if(['goldv2','megatoe','bell'].includes(s.type)&&!reduce)ctx.rotate(s.t*4);
+    if(!drawWeaponClip(s.type,'flight',s.t,0,0)){
+      const image=flightArt[s.type],size=s.type==='goldv2'?58:s.type==='donkey'?56:s.type==='megatoe'?12:s.type==='pep'?14:32;
+      if(image?.naturalWidth){if(s.type==='megatoe')ctx.drawImage(image,11,3,16,18,-6,-7,12,14);else ctx.drawImage(image,-size/2,-size/2,size,size);}
+    }
+    ctx.restore();
+    if(WEAPONS[s.type].fuse){ctx.fillStyle='#fff';ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.fillText(Math.max(1,Math.ceil(WEAPONS[s.type].fuse-s.t)),s.x,s.y-34);}
+    return;
+  }
   if(s.type==='dynamite'){ctx.drawImage(weaponArt.dynamite,-10,-18,20,25);ctx.fillStyle='#fff3ba';ctx.font='bold 12px monospace';ctx.fillText(Math.max(1,Math.ceil(5-s.t)),0,-22);}
   else if (WEAPONS[s.type].fuse) {
     ctx.fillStyle = ['gold','toe'].includes(s.type)?'#ffd257':s.type==='cluster'?'#c95d36':'#436d32'; if(['gold','toe'].includes(s.type)){ctx.rotate(s.t*5);ctx.fillRect(-5,-9,8,15);for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(-5+i*3,-9,2.5,0,7);ctx.fill();}} ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, 7); ctx.fill(); ctx.fillStyle = '#8fd27d'; ctx.fillRect(-1, -7, 3, 3);
@@ -339,6 +398,7 @@ function draw(t) {
   ctx.translate(OX, 0);
   if (shake > 0 && !reduce) ctx.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake);
   sky(t);
+  drawMapDecorations();
   ctx.drawImage(ground, 0, 0);
   // Small rooted details follow the real surface, and disappear with destroyed soil.
   for(let x=135;x<W-120;x+=39){
@@ -347,10 +407,16 @@ function draw(t) {
     ctx.strokeStyle='#a6c65b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-4,y-9);ctx.moveTo(x,y);ctx.lineTo(x+5,y-7);ctx.stroke();
     if(x%3===0){ctx.fillStyle='#ede0ae';ctx.fillRect(x+11,y-11,3,10);ctx.fillStyle='#c1684d';ctx.beginPath();ctx.ellipse(x+12,y-12,7,4,0,Math.PI,Math.PI*2);ctx.fill();}
   }
+  drawWeaponEffects();
   drawHelmetFlights(); // Behind frogs/labels/flags so cosmetic debris cannot obscure identification.
   for (const f of g.frogs) if (f.alive || (f.gone === 'ko' && animator.sample(f, reduce).alpha > 0 && !reduce)) frog(pose(f), t);
     else if (f.gone === 'ko') { ctx.fillStyle = '#9aa3a8'; ctx.fillRect(f.x - 6, f.y - 14, 12, 14); ctx.beginPath(); ctx.arc(f.x, f.y - 14, 6, Math.PI, 0); ctx.fill(); ctx.fillStyle = '#555'; ctx.font = 'bold 7px Tahoma'; ctx.textAlign = 'center'; ctx.fillText('RIP', f.x, f.y - 7); }
-  for(const m of g.mines) {const art=weaponArt[m.type]||weaponArt.mine;const arm=WEAPONS[m.type]?.arm??1;ctx.drawImage(art,m.x-10,m.y-13,20,20);if(m.t>arm){ctx.fillStyle=Math.sin(t*8)>0?'#ff6b45':'#602d28';ctx.fillRect(m.x-2,m.y-12,4,3);}}
+  for(const m of g.mines) {
+    if(m.type==='frogmine'&&drawWeaponClip('frogmine','activation',m.t,m.x,m.y,reduce&&m.t<1))continue;
+    const art=weaponArt[m.type]||weaponArt.mine;const arm=WEAPONS[m.type]?.arm??1;
+    if(art.naturalWidth)ctx.drawImage(art,m.x-10,m.y-13,20,20);
+    if(m.t>arm){ctx.fillStyle=reduce||Math.sin(t*8)>0?'#ff6b45':'#602d28';ctx.fillRect(m.x-2,m.y-12,4,3);}
+  }
   // rope and jetpack flame of the frog whose turn it is
   for (const f of g.frogs) if (f.alive && f.rope) { ctx.strokeStyle = '#d8b878'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(f.x, f.y - 30); ctx.lineTo(f.rope.x, f.rope.y); ctx.stroke(); ctx.fillStyle = '#a8b4ba'; ctx.beginPath(); ctx.arc(f.rope.x, f.rope.y, 3.5, 0, 7); ctx.fill(); }
   for (const f of g.frogs) if (f.alive && f.jet) { ctx.fillStyle = '#c95d36'; ctx.fillRect(f.x - f.face * 12 - 4, f.y - 40, 8, 22); if (g.ctl && (g.ctl.y < 0 || g.ctl.x) && g.frogs[g.current] === f) { ctx.fillStyle = Math.random() < .5 ? '#ffc05b' : '#fff1b8'; ctx.beginPath(); ctx.moveTo(f.x - f.face * 12 - 4, f.y - 18); ctx.lineTo(f.x - f.face * 12 + 4, f.y - 18); ctx.lineTo(f.x - f.face * 12, f.y - 4 + Math.random() * 8); ctx.fill(); }
@@ -363,6 +429,7 @@ function draw(t) {
     ctx.fillStyle = `rgba(255,${200 - k * 150},40,${1 - k})`; ctx.beginPath(); ctx.arc(b.x, b.y, b.r * (.6 + k * .9), 0, 7); ctx.fill();
     ctx.strokeStyle = `rgba(255,255,255,${1 - k})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(b.x, b.y, b.r * (.4 + k * 1.4), 0, 7); ctx.stroke();
   }
+  drawFootprints();
   water(t);
   splashes = splashes.filter(s => (s.t += visualDt) < .8);
   for (const s of splashes) { ctx.fillStyle = `rgba(220,240,255,${1 - s.t / .8})`; for (let i = -3; i <= 3; i++) ctx.fillRect(s.x + i * 5, WATER - Math.sin((s.t / .8) * Math.PI) * (20 - Math.abs(i) * 4), 3, 6); }
@@ -452,7 +519,7 @@ function hud() {
   const heldWeapon=WEAPONS[g.weapon];
   $('#weapon-name').textContent=heldWeapon.name;
   const blurb=descriptions[g.weapon]||heldWeapon.hud||'';
-  $('#weapon-detail').textContent=heldWeapon.ready===false?blurb+' · NOT PLAYABLE YET':blurb+(heldWeapon.utility?' · TURN GOES ON':' · MAX '+heldWeapon.damage+' HP'+(g.weapon==='cluster'||g.weapon==='gold'?' + FRAGMENTS':''));
+  $('#weapon-detail').textContent=heldWeapon.ready===false?blurb+' · NOT PLAYABLE YET':blurb+(heldWeapon.utility?' · TURN GOES ON':' · MAX '+heldWeapon.damage+' HP'+(g.weapon==='goldv2'?' + 5 × 12 HP':g.weapon==='cluster'||g.weapon==='gold'?' + FRAGMENTS':''));
   // The FIRE button only shows on touch screens: tap the map to aim or pick a spot, then press here.
   const fu=me(g);
   const stock=g.weapon==='rope'?(fu.rope?'LET GO':'FIRE THE ROPE'):g.weapon==='jetpack'?(fu.jet?'JETPACK OFF':'START JETPACK'):g.weapon==='teleport'?'TELEPORT HERE':g.weapon==='candles'?'DROP CANDLES':g.weapon==='bat'?'SWING THE BAT':g.weapon==='revolver'?'FIRE · '+(2-g.pistolShots)+' LEFT':'HOLD TO FIRE';
@@ -469,19 +536,21 @@ function observeCharacters(events = []) {
     durationFor: (f, state) => pixelFrog(f) ? clipDuration(pixelAssets.manifest, state) : undefined,
     onHealthDrop: (f, previousHP, time) => {
       if (pixelFrog(f)) {
-        const p = authoredPose(animator.sample(f, reduce)), frame = spriteFrame(pixelAssets.manifest, p.state, p.age, reduce);
-        helmets.lose(f, previousHP, time, p, reduce, pixelHelmet(frame));
+        const p = authoredPose(animator.sample(f, reduce), f, pixelAssets.imageKey), frame = pixelFrame(pixelAssets, p, reduce);
+        helmets.lose(f, previousHP, time, p, reduce, pixelHelmet(frame, pixelAssets.imageKey));
       } else if (standardPreview) helmets.lose(f, previousHP, time, animator.sample(f, reduce), reduce);
     } });
 }
 function events() {
   observeCharacters(g.events);
   for (const e of g.events) {
-    if (e.type === 'turn') { closeArsenal();keys.clear();clearCharge();pending=[];remoteP=0;aimPointer=null;held.l=held.r=held.u=0; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x;
+    if(e.type==='boom'&&WEAPON_FALLBACK[e.weapon])weaponFX.push({weapon:e.weapon,role:'explosion',x:e.x,y:e.y,time:animator.time,life:e.weapon==='goldv2'?1.8:.6});
+    if(weaponFX.length>64)weaponFX.shift();
+    if (e.type === 'turn') { resetSteering();closeArsenal();keys.clear();clearCharge();pending=[];remoteP=0;aimPointer=null;held.l=held.r=held.u=0; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x;
       status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : isOnline(g.team) ? `${f.name} (${TEAM[g.team].name}) is playing on the other device…` : touchUI.matches ? `${f.name}: tap the map to aim · hold FIRE to shoot · ◀ ▶ walk · ↑ jump, twice for a backflip` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
-    if (e.type === 'fire') {closeArsenal();keys.clear();held.l=held.r=held.u=held.pitch=0;steerY=null;clearCharge();remoteP=0;status(g.phase==='guide'?'Fly the Doge: A/D turn, W/S altitude, Enter or Space detonates.':g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
+    if (e.type === 'fire') {pointerHolds.clear();closeArsenal();keys.clear();held.l=held.r=held.u=held.pitch=0;steerY=null;clearCharge();remoteP=0;status(g.phase==='guide'?'Fly the Doge: A/D turn, W/S altitude, Enter or Space detonates.':g.retreat>0?'RETREAT · 3 seconds to find cover!':'Revolver: aim your second shot.');}
     if (e.type === 'boom') {shake=9;beep(65,.35);if(e.r)debris(e.x,e.y,e.r);}
-    if (e.type === 'bell') beep(880, .08);
+    if (e.type === 'bell') {beep(880,.08);weaponFX.push({weapon:'bell',role:'activation',x:e.x,y:e.y,time:animator.time,life:.6});}
     if (e.type === 'rope') {beep(520,.06);status('Hooked! A/D swing · W/S shorter/longer · Space lets go. Your turn goes on.');}
     if (e.type === 'unrope') status('Let go of the rope.');
     if (e.type === 'jet') {beep(180,.2);status('Jetpack on: W flies up, A/D sideways. Your turn goes on.');}
@@ -558,7 +627,7 @@ function start() {
   startTurn(g); launch();
 }
 function launch() {
-  animator.reset(); helmets.restore(g);
+  animator.reset(); helmets.restore(g);weaponFX=[];resetSteering();
   paused=false;$('#pause').textContent='Pause';acc=0;pending=[];remoteP=0;clearCharge();held.l=held.r=held.u=0;mountExpansion(g.packs);paintGround();events();hud();
   $('#menu').hidden = true; $('#over').hidden = true; cv.focus({ preventScroll: true });
 }
@@ -605,7 +674,8 @@ function frame(now) {
 const mine = () => !paused && g && g.phase === 'aim' && !isCpu(g.team) && !remoteTurn();
 const guiding = () => !paused && g && g.phase === 'guide' && !isCpu(g.team) && !remoteTurn() && $('#menu').hidden;
 const movementAllowed=()=>!paused&&g&&!isCpu(g.team)&&!remoteTurn()&&canMove(g)&&$('#menu').hidden;
-const keys=new Set();
+const keys=new Set(), pointerHolds=new PointerHolds();
+function resetSteering(){pointerHolds.clear();keys.clear();held.l=held.r=held.u=held.pitch=0;steerY=null;aimPointer=null;}
 const arsenal=document.createElement('div');
 arsenal.className='pw-arsenal';arsenal.hidden=true;arsenal.setAttribute('role','dialog');arsenal.setAttribute('aria-label','Choose a weapon');
 arsenal.innerHTML='<div class="arsenal-title">ARSENAL <span>1–0 · C R J T · ESC TO CLOSE</span><button type="button" aria-label="Close weapon selection">×</button></div><div class="pw-weapons">'+$('#weapon-options').innerHTML+'</div>';
@@ -615,15 +685,18 @@ function mountExpansion(packs) {
   const box = arsenal.querySelector('.pw-weapons');
   box.querySelectorAll('[data-pack]').forEach(b => b.remove());
   const list = hudWeapons(packs);
+  $('#arsenal-art-status').hidden=!list.length;
   for (const w of list) {
     const b = document.createElement('button');
     b.type = 'button'; b.dataset.w = w.id; b.dataset.pack = w.pack;
     b.title = w.name + ' · key ' + w.key;
     b.setAttribute('aria-label', w.name);
-    b.innerHTML = '<span class="weapon-key">' + w.key + '</span><img src="img/pondwars/' + w.id + '.svg" alt=""><span>' + w.short + '</span><small>SOON</small>';
+    const artId={goldv2:'golden_foot_v2',bell:'bell_bomb',frogmine:'frog_mine',moon:'moon_rocket',ban:'ban_hammer',rain:'pep_rain',doge:'doge_flyer',donkey:'silver_donkey'}[w.id];
+    b.innerHTML = '<span class="weapon-key">'+w.key+'</span><img src="art/arsenal-polish/hud_64/'+artId+'.png" alt=""><span>'+w.short+'</span><small>QA</small>';
+    b.querySelector('img').onerror=e=>{e.target.onerror=null;e.target.src='img/pondwars/'+w.id+'.svg';};
     b.addEventListener('click', () => chooseWeapon(w.id));
     box.append(b);
-    if (!weaponArt[w.id]) { const img = new Image(); img.src = 'img/pondwars/' + w.id + '.svg'; weaponArt[w.id] = img; }
+    if (!weaponArt[w.id]) { const img = new Image(); img.src = 'img/pondwars/' + (WEAPON_FALLBACK[w.id]||w.id) + '.svg'; weaponArt[w.id] = img; }
   }
   const extra = list.map(w => w.key).join(' ');
   arsenal.querySelector('.arsenal-title span').textContent = '1–0 · C R J T' + (extra ? ' · ' + extra : '') + ' · ESC TO CLOSE';
@@ -691,23 +764,23 @@ cv.addEventListener('pointerdown', e => {
   aimPointer = e.pointerId; try { cv.setPointerCapture(e.pointerId); } catch {} aimAt(e);
 });
 cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || e.pointerId === aimPointer) aimAt(e); });
-cv.addEventListener('pointerup', e => { held.pitch = 0; steerY = null; if (e.pointerId === aimPointer) aimPointer = null; else if (e.pointerType === 'mouse') release(true); });
-cv.addEventListener('pointercancel', e => { if (e.pointerId === aimPointer) aimPointer = null; else if (e.pointerType === 'mouse') clearCharge(); });
-cv.addEventListener('lostpointercapture', e => { if (e.pointerId === aimPointer) aimPointer = null; else if (e.pointerType === 'mouse' && charging) clearCharge(); });
+cv.addEventListener('pointerup',e=>{if(e.pointerId===aimPointer){held.pitch=0;steerY=null;aimPointer=null;}else if(e.pointerType==='mouse')release(true);});
+cv.addEventListener('pointercancel', e => { if (e.pointerId === aimPointer) {aimPointer=null;held.pitch=0;steerY=null;} else if (e.pointerType === 'mouse') clearCharge(); });
+cv.addEventListener('lostpointercapture', e => { if (e.pointerId === aimPointer) {aimPointer=null;held.pitch=0;steerY=null;} else if (e.pointerType === 'mouse' && charging) clearCharge(); });
 const fb = $('#fire');
 bindHold(fb,beginCharge,()=>release(false),clearCharge);
 for (const [id, k] of [['#left', 'l'], ['#right', 'r']]) {
   const b = $(id);
-  b.addEventListener('pointerdown', e => { e.preventDefault(); b.setPointerCapture(e.pointerId); held[k] = 1; });
-  for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(t, () => { held[k] = 0; });
+  b.addEventListener('pointerdown', e => { e.preventDefault();try{b.setPointerCapture(e.pointerId);}catch{}pointerHolds.press(k,e.pointerId);held[k]=1; });
+  for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(t,e=>{pointerHolds.release(k,e.pointerId);held[k]=Number(pointerHolds.active(k));});
 }
 $('#arsenal-open').onclick=e=>{const r=e.target.getBoundingClientRect();openArsenal(r.left,r.top-250);};
 // ↑ reacts on touch-down (a quick second tap is the backflip); hold it to fly up with the jetpack.
 // A keyboard "click" on the focused button (detail 0) still jumps.
 const hopButton = $('#hop');
-hopButton.addEventListener('pointerdown', e => { if (e.button) return; e.preventDefault(); try { hopButton.setPointerCapture(e.pointerId); } catch {} if (g && g.phase === 'guide') held.u = 1; else if (g && me(g).jet) held.u = 1; else jump(); });
+hopButton.addEventListener('pointerdown', e => { if (e.button) return; e.preventDefault(); try { hopButton.setPointerCapture(e.pointerId); } catch {} if(g&&g.phase==='guide'){pointerHolds.press('u',e.pointerId);held.u=1;} else if (g && me(g).jet) held.u = 1; else jump(); });
 hopButton.addEventListener('click', e => { if (e.detail === 0) jump(); });
-for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) hopButton.addEventListener(t, () => { held.u = 0; });
+for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) hopButton.addEventListener(t,e=>{pointerHolds.release('u',e.pointerId);held.u=Number(pointerHolds.active('u'));});
 $('#skip').addEventListener('click', () => { if (mine()) { pending.push({ t: 'skip' }); status('Turn skipped.'); } });
 function chooseWeapon(w) {
   const spec = WEAPONS[w];
@@ -736,7 +809,7 @@ document.addEventListener('keydown', e => {
 },true);
 document.addEventListener('keyup',e=>{if(e.code==='Enter'){e.preventDefault();release(false);}keys.delete(e.code);if(['ArrowLeft','ArrowRight','KeyA','KeyD'].includes(e.code)){held.l=keys.has('ArrowLeft')||keys.has('KeyA');held.r=keys.has('ArrowRight')||keys.has('KeyD');}if(e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();}},true);
 // Online the other device keeps playing, so leaving the tab only lets go of the controls.
-function pauseGame(){closeArsenal();keys.clear();held.l=held.r=held.u=0;aimPointer=null; if(net){clearCharge();return;} if(!g || ['menu','over'].includes(g.phase))return;paused=true;pending=[];clearCharge();$('#pause').textContent='Resume';status('PAUSED · The pond can wait.');hud();}
+function pauseGame(){closeArsenal();resetSteering(); if(net){clearCharge();return;} if(!g || ['menu','over'].includes(g.phase))return;paused=true;pending=[];clearCharge();$('#pause').textContent='Resume';status('PAUSED · The pond can wait.');hud();}
 window.addEventListener('blur',pauseGame);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame();});
 window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===parent&&e.data==='pondwars-pause')pauseGame();});
@@ -755,7 +828,7 @@ function pick(sel, key, parse) {
 const COLORS=[{name:'Blue',hex:'#4f9ef0'},{name:'Red',hex:'#ef6c63'},{name:'Green',hex:'#70c963'},{name:'Yellow',hex:'#edcf54'},{name:'Purple',hex:'#bc92e9'},{name:'Orange',hex:'#ef9a4f'}],teamColors=[0,1];
 function portrait(canvas,index){
   if (pixelPreview && pixelAssets && index === PIXEL_PLAYER) {
-    const c=canvas.getContext('2d'), frame=spriteFrame(pixelAssets.manifest,'idle',0), q=frameGeometry(frame), h=pixelHelmet(frame);
+    const c=canvas.getContext('2d'), frame=spriteFrame(pixelAssets.manifest,'idle',0), q=frameGeometry(frame), h=pixelHelmet(frame, pixelAssets.imageKey);
     c.clearRect(0,0,48,52);c.save();c.translate(24,52);c.scale(.75,.75);c.imageSmoothingEnabled=false;
     c.drawImage(pixelAssets.image,q.sx,q.sy,q.sw,q.sh,q.x,q.y,q.width,q.height);
     c.drawImage(pixelAssets.helmet,...h.rect,h.x,h.y,h.width,h.height);c.restore();return;
@@ -774,7 +847,7 @@ function paintPlayers(){
       const thumb=document.createElement('canvas');thumb.width=48;thumb.height=52;thumb.setAttribute('aria-hidden','true');portrait(thumb,teamPlayers[team][slot]);
       const caption=document.createElement('span');caption.textContent='Frog '+(slot+1);
       const select=document.createElement('select');select.setAttribute('aria-label','Team '+(team+1)+' frog '+(slot+1)+' character');
-      PLAYERS.forEach((p,i)=>{const option=document.createElement('option');option.value=i;option.textContent=pixelPreview && p.id === 'classic' ? p.name + ' · pixel v04 QA' : p.name;select.append(option);});select.value=teamPlayers[team][slot];
+      PLAYERS.forEach((p,i)=>{const option=document.createElement('option');option.value=i;option.textContent=pixelPreview && p.id === 'classic' ? p.name + ' · pixel ' + pixelLabel + ' QA' : p.name;select.append(option);});select.value=teamPlayers[team][slot];
       select.onchange=()=>{teamPlayers[team][slot]=Number(select.value);portrait(thumb,Number(select.value));};
       row.append(thumb,caption,select);box.append(row);
     }
@@ -793,7 +866,7 @@ function mapPreview(recommend=false){
   const c=$('#map-preview').getContext('2d'),mask=makeTerrain(opts.mapSeed,opts.map);c.fillStyle='#264c68';c.fillRect(0,0,300,150);
   c.fillStyle='#9fc15d';for(let y=0;y<H;y+=4)for(let x=0;x<W;x+=4)if(mask[y*W+x])c.fillRect(x/4,y/4,1,1);
   c.fillStyle='#4b9ab1';c.fillRect(0,WATER/4,300,(H-WATER)/4);
-  paintPlayers();
+  paintPlayers(); updatePixelCompare();
 }
 $('#map-choice').onchange=e=>{opts.map=e.target.value;opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview(true);};
 $('#reroll-map').onclick=()=>{opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview();};
@@ -809,9 +882,11 @@ document.querySelectorAll('#map-packs [data-mappack]').forEach(box=>{
   if(mapPreset==='all'||mapPreset===box.dataset.mappack||(mapPreset==='1'&&box.dataset.mappack==='maps1')||(mapPreset==='2'&&box.dataset.mappack==='maps2'))box.checked=true;
   box.addEventListener('change',syncMapPacks);
 });
+const artStatus=document.createElement('p');artStatus.id='arsenal-art-status';artStatus.textContent='PLAYTEST · v11 art pending: SVG flight placeholders, v10 HUD/FX. Mobile awaiting physical-device test.';artStatus.hidden=true;$('#arsenal-packs').after(artStatus);
 const presetPacks = normalizePacks(new URLSearchParams(location.search).get('packs'));
 document.querySelectorAll('#arsenal-packs [data-pack]').forEach(box => { if (presetPacks[box.dataset.pack]) box.checked = true; });
-paintColors();mapPreview();syncMapPacks();
+$('#map-choice').value=opts.map;paintColors();mapPreview();syncMapPacks();artStatus.hidden=!Object.keys(readPacks()).length;
+
 pick('[data-mode]', 'mode', String); pick('[data-level]', 'level', Number); pick('[data-n]', 'n', Number);
 $('#go').addEventListener('click', start); $('#again').addEventListener('click', start);
 $('#tomenu').addEventListener('click', () => { $('#over').hidden = true; $('#menu').hidden = false; });
@@ -826,7 +901,7 @@ function setupNet(host) {
   document.querySelector('[data-mode]').closest('.pw-pick').hidden = true; $('#levels').hidden = true;
   for (const id of ['#pause', '#restart']) $(id).disabled = true;
   net.onstart = (game, setup) => { g = game; applyLooks(setup); launch(); };
-  net.onrestore = () => { helmets.restore(g); status('Back in sync with the other tab.'); if (g.phase === 'over') over(); };
+  net.onrestore = () => { helmets.restore(g);weaponFX=[];resetSteering(); status('Back in sync with the other tab.'); if (g.phase === 'over') over(); };
   net.onview = v => {
     if (net.drives() || !v.every(Number.isFinite)) return;
     aim = v[0]; aimX = Math.max(30, Math.min(W - 30, v[1])); aimY = v[2]; remoteP = Math.max(0, Math.min(1, v[3]));
@@ -905,7 +980,7 @@ function drawHelmetFlights() {
   for (const p of helmets.sample(animator.time, reduce)) {
     ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation);
     ctx.scale(p.face * p.sx, p.sy); ctx.globalAlpha = p.alpha;
-    if (p.imageKey === 'pixel-v04') {
+    if (p.imageKey === pixelAssets?.imageKey) {
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(pixelAssets.helmet,...p.rect,-p.width/2,-p.height/2,p.width,p.height);
     } else ctx.drawImage(standardAssets.cutout, -p.width/2,-p.height/2,p.width,p.height);
@@ -916,22 +991,35 @@ function drawHelmetFlights() {
 async function loadPixelPrototype() {
   if (!pixelPreview) return;
   $('#art-prototype').hidden = false;
-  $('#art-prototype').textContent = 'PIXEL ART v04 · QA alternative for Classic Pepe · not production-approved art. Other skins remain available.';
-  $('.pw-chrome small').textContent = ' / PIXEL v04 QA';
+  $('#art-prototype').textContent = 'PIXEL ART ' + pixelLabel + ' · QA alternative for Classic Pepe · not production-approved art. Other skins remain available.';
+  $('.pw-chrome small').textContent = ' / PIXEL ' + pixelLabel + ' QA';
   cv.style.imageRendering = 'pixelated';
-  cv.setAttribute('aria-label', 'FROGAGEDDON pixel v04 QA battlefield');
-  const base = 'img/pondwars/players/pixel-v04/';
+  cv.setAttribute('aria-label', 'FROGAGEDDON pixel ' + pixelLabel + ' QA battlefield');
+  pixelCompareLinks = ['pixel-v04','pixel-v06'].map(key => {
+    const a=document.createElement('a');a.dataset.art=key;a.textContent=key+' · same map';
+    a.target='_blank';a.rel='noopener';$('#art-prototype').append(' · ',a);return a;
+  });
+  updatePixelCompare();
+  const base = 'img/pondwars/players/'+artMode+'/';
   const data = await Promise.all(['manifest.json','qa-anchors.json'].map(async file => {
     const r = await fetch(base+file); if (!r.ok) throw new Error('Pixel QA metadata unavailable'); return r.json();
   }));
-  const manifest = compilePixelManifest(...data);
+  const manifest = compilePixelManifest(...data, { frameCount: artMode === 'pixel-v06' ? 53 : 49 });
   const [image, helmet] = await Promise.all(['atlas.png','helmet_pose_atlas.png'].map(async file => {
     const img = new Image(); img.src = base+file; await img.decode();
-    if (img.naturalWidth !== 1024 || img.naturalHeight !== 896) throw new Error('Pixel atlas dimensions mismatch'); return img;
+    if (img.naturalWidth !== 1024 || img.naturalHeight !== (artMode === 'pixel-v06' ? 1024 : 896)) throw new Error('Pixel atlas dimensions mismatch'); return img;
   }));
   for (const clip of Object.values(manifest.clips)) for (const f of clip.frames) {
     if (f.rect[0]+128 > image.naturalWidth || f.rect[1]+128 > image.naturalHeight) throw new Error('Pixel frame outside atlas');
   }
   registerCharacterAnimation('classic', manifest, image);
-  pixelAssets = animationAssets.get('classic'); Object.assign(pixelAssets, { helmet, authored: true });
+  pixelAssets = animationAssets.get('classic'); Object.assign(pixelAssets, { helmet, authored: true, imageKey:artMode });
+}
+
+function updatePixelCompare() {
+  for (const link of pixelCompareLinks) {
+    const url=new URL(location.href);url.searchParams.set('art',link.dataset.art);
+    url.searchParams.set('qaSeed',String(opts.mapSeed));url.searchParams.set('qaMap',opts.map);
+    url.searchParams.delete('net');url.searchParams.delete('room');link.href=url.href;
+  }
 }

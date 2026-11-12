@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "status": "v11 missing; v10 FX only; SVG flight placeholders",
+  "weapons": {
+    "goldv2": {
+      "flight": null,
+      "activation": null,
+      "explosion": {
+        "src": "art/arsenal-polish/effects/golden_foot_impact_sheet.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 10,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          128,
+          128
+        ]
+      }
+    },
+    "megatoe": {
+      "flight": null,
+      "activation": null,
+      "explosion": null
+    },
+    "bell": {
+      "flight": null,
+      "activation": {
+        "src": "art/arsenal-polish/effects/bell_bounce_sheet.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 10,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          32,
+          32
+        ]
+      },
+      "explosion": null
+    },
+    "frogmine": {
+      "flight": null,
+      "activation": {
+        "src": "art/arsenal-polish/effects/frog_mine_arm_sheet.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 10,
+        "loop": false,
+        "anchor": [
+          64,
+          100
+        ],
+        "size": [
+          28,
+          28
+        ]
+      },
+      "explosion": null
+    },
+    "moon": {
+      "flight": null,
+      "activation": null,
+      "explosion": null
+    },
+    "ban": {
+      "flight": null,
+      "activation": null,
+      "explosion": null
+    },
+    "rain": {
+      "flight": null,
+      "activation": null,
+      "explosion": null
+    },
+    "pep": {
+      "flight": null,
+      "activation": null,
+      "explosion": null
+    },
+    "doge": {
+      "flight": null,
+      "activation": null,
+      "explosion": null
+    },
+    "donkey": {
+      "flight": null,
+      "activation": null,
+      "explosion": null
+    }
+  }
+}

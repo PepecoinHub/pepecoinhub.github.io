@@ -104,7 +104,7 @@ with sync_playwright() as p:
         page.on('pageerror', lambda error: errors.append(str(error)))
         page.goto('http://127.0.0.1:8000/games/pondwars-beta.html?art=standard-v02&net=' + role + '&room=helmet-review', wait_until='networkidle')
         page.evaluate('''async () => {
-          const {NetMatch} = await import('/games/js/pondwars-beta-net.mjs?v=20261111hand');
+          const {NetMatch} = await import('/games/js/pondwars-beta-net.mjs?v=20261112polish');
           for (const method of ['advance', 'pump']) {
             const original = NetMatch.prototype[method];
             NetMatch.prototype[method] = function(...args) { window.__net = this; return original.apply(this, args); };
@@ -116,7 +116,7 @@ with sync_playwright() as p:
     host.locator('#go').click()
     guest.wait_for_function('window.__net?.g?.phase === "aim"')
     guest.evaluate('''async () => {
-      const {snapshot} = await import('/games/js/pondwars-beta-net.mjs?v=20261111hand');
+      const {snapshot} = await import('/games/js/pondwars-beta-net.mjs?v=20261112polish');
       const net = window.__net, snap = snapshot(net.g);
       snap.frogs[0].hp = 99;
       net.handover({snap, tick:net.tick}); // Calls the page's real net.onrestore.

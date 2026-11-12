@@ -1,3 +1,4 @@
+import { ARSENAL_BUILD } from './pondwars-arsenal.mjs';
 // FROGAGEDDON online groundwork. No DOM here (Node can run it).
 //
 // How a match stays the same on two devices:
@@ -11,7 +12,7 @@
 //
 // The transport is anything with send(message) and an onmessage callback. tabTransport() links two tabs of the
 // same browser (for testing without a server); a Supabase Realtime channel can implement the same two members.
-import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me, weaponAllowed, detonateGuided } from './pondwars-beta-engine.mjs?v=20261112maps2';
+import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me, weaponAllowed, detonateGuided } from './pondwars-beta-engine.mjs?v=20261112polish';
 
 export const PROTOCOL = 1;
 export const KEY = { L: 1, R: 2, U: 4, D: 8 };   // bits of input.m
@@ -117,6 +118,7 @@ export const stateHash = g => snapshotHash(snapshot(g));
 // Overwrite g with a snapshot. Only keys the game already has are copied (a peer cannot add or replace others).
 export function restoreInto(g, snap) {
   if (!snap || typeof snap !== 'object' || !Array.isArray(snap.frogs) || snap.frogs.length !== g.frogs.length || !Number.isInteger(snap.rand)) throw new Error('bad snapshot');
+  if(g.arsenalBuild!==snap.arsenalBuild)throw new Error('Arsenal snapshot build differs');
   const mask = unpackMask(snap.mask), copy = JSON.parse(JSON.stringify(snap), back);
   for (const k of Object.keys(g)) if (!LOCAL.has(k) && Object.hasOwn(copy, k)) g[k] = copy[k];
   g.mask = mask; g.rand = rng(snap.rand >>> 0); g.events = []; g.dirty = [[0, 0, W - 1, H - 1]];
@@ -135,13 +137,14 @@ export class NetMatch {
     this.onstart = null; this.onrestore = null; this.onview = null; this.onpeer = null; this.onproblem = null;
     transport.onmessage = m => { try { this.receive(m); } catch (e) { this.onproblem?.(e.message); } };
   }
-  join() { if (!this.host && !this.g) this.t.send({ type: 'join', protocol: PROTOCOL }); }
+  join() { if (!this.host && !this.g) this.t.send({ type: 'join', protocol: PROTOCOL, arsenalBuild: ARSENAL_BUILD }); }
   // Host: start as soon as a guest is there.
   begin(setup) {
     if (!this.host) return;
     if (!this.peer) { this.waiting = setup; return; }
+    if(Object.keys(setup.packs||{}).length && this.peerArsenalBuild!==ARSENAL_BUILD){this.onproblem?.('Arsenal builds differ; reload both playtest tabs.');return;}
     this.waiting = null; this.start(setup);
-    this.t.send({ type: 'hello', protocol: PROTOCOL, setup, snap: snapshot(this.g) });
+    this.t.send({ type: 'hello', protocol: PROTOCOL, arsenalBuild: ARSENAL_BUILD, setup, snap: snapshot(this.g) });
   }
   start(setup, snap) {
     this.setup = setup;
@@ -193,13 +196,16 @@ export class NetMatch {
     if (!m || typeof m !== 'object' || typeof m.type !== 'string') return;
     if (m.type === 'join' && this.host) {
       if (m.protocol !== PROTOCOL) return this.onproblem?.('The other tab runs a different game version.');
+      this.peerArsenalBuild=m.arsenalBuild;
+      if(Object.keys(this.setup?.packs||{}).length && m.arsenalBuild!==ARSENAL_BUILD)return this.onproblem?.('Arsenal builds differ; reload both playtest tabs.');
       this.peer = true; this.onpeer?.();
       if (this.waiting) this.begin(this.waiting);
-      else if (this.g) this.flush(), this.t.send({ type: 'hello', protocol: PROTOCOL, setup: this.setup, snap: snapshot(this.g), tick: this.tick });
+      else if (this.g) this.flush(), this.t.send({ type: 'hello', protocol: PROTOCOL, arsenalBuild: ARSENAL_BUILD, setup: this.setup, snap: snapshot(this.g), tick: this.tick });
       return;
     }
     if (m.type === 'hello' && !this.host) {
       if (m.protocol !== PROTOCOL) return this.onproblem?.('The host runs a different game version.');
+      if(Object.keys(m.setup?.packs||{}).length && m.arsenalBuild!==ARSENAL_BUILD)return this.onproblem?.('Arsenal builds differ; reload both playtest tabs.');
       this.peer = true; this.start(m.setup, m.snap); this.tick = this.recv = m.tick | 0;
       return;
     }

@@ -1,0 +1,13 @@
+{
+  "number_of_frames": 53,
+  "number_of_states": 11,
+  "same_foot": true,
+  "pixel_grid_2x2": true,
+  "palettes": {
+    "body_colors": 21,
+    "helmet_colors": 6
+  },
+  "alpha": true,
+  "physical_weapon_drawn": false,
+  "status": "art candidate; no repository integration"
+}

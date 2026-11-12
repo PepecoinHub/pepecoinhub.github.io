@@ -3,7 +3,7 @@
 // Movement and projectile ideas (bounce off the real slope, wind that drifts between turns, step-up walking,
 // slide after a knockback, speed caps, rope / jetpack / teleport / drill) are inspired by Squeak & Destroy
 // (MIT, Los Polos Amigos Kft.); the code here is our own.
-import { EXPANSION, normalizePacks, starterAmmo, packEnabled } from './pondwars-arsenal.mjs';
+import { EXPANSION, ARSENAL_BUILD, normalizePacks, starterAmmo, packEnabled } from './pondwars-arsenal.mjs';
 import { EXPANSION_MAPS, buildExpansionMap } from './pondwars-maps.mjs';
 export const W = 1200, H = 600, WATER = 560, STEP = 1 / 60, G = 520;
 export const MAPS={
@@ -124,7 +124,7 @@ export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1,
   }
   const ammo = [0, 1].map(() => starterAmmo(packs));
   return { seed, map, perTeam, mask, mines:[], retreat:0, movement:MOVE_BUDGET, frogs, shots: [], booms: [], texts: [], dirty: [], cpu, level, turn: 0, team: 0, next: [0, 0], current: 0,
-    wind: 0, weapon: 'grenade', ammo, packs, ctl:{x:0,y:0}, pistolShots:0, phase: 'aim', timer: TURN_TIME, settle: 0, winner: null, rand: r, events: [] };
+    ...(Object.keys(packs).length?{arsenalBuild:ARSENAL_BUILD}:{}), wind: 0, weapon: 'grenade', ammo, packs, ctl:{x:0,y:0}, pistolShots:0, phase: 'aim', timer: TURN_TIME, settle: 0, winner: null, rand: r, events: [] };
 }
 export function aliveOf(g, team) { return g.frogs.filter(f => f.alive && f.team === team); }
 export function startTurn(g) {
@@ -478,7 +478,7 @@ export function explode(g, x, y, type, vx = 0, vy = 0) {
   const hole = w.crater ?? w.radius;
   g.dirty.push(carve(g.mask, x, y, hole));
   g.booms.push({ x, y, r: w.radius, t: 0 });
-  g.events.push({ type: 'boom', x, y, r: w.radius });
+  g.events.push({ type: 'boom', weapon:type, x, y, r: w.radius });
   const reach = w.reach ?? w.radius * 1.7, carry = Math.max(-80, Math.min(80, vx * .14));
   for (const f of g.frogs) {
     if (!f.alive) continue;
@@ -603,7 +603,7 @@ export function step(g) {
     if (s.ding) { s.ding = false; g.events.push({ type: 'bell', x: s.x, y: s.y }); g.texts.push({ x: s.x, y: s.y - 14, text: 'DING', t: 0 }); }
     if (r === 'boom') {
       if (WEAPONS[s.type].children) {
-        const type=s.type==='gold'?'toe':'shard';
+        const type=WEAPONS[s.type].childType ?? (s.type==='gold'?'toe':'shard');
         for(let i=0;i<5;i++){const a=-Math.PI+(i+.5)*Math.PI/5;g.shots.push({type,x:s.x,y:s.y-5,vx:Math.cos(a)*(160+g.rand()*100),vy:Math.sin(a)*240-60,t:0});}
       }
       explode(g, s.x, s.y, s.type, s.vx, s.vy); g.shots.splice(g.shots.indexOf(s), 1); }

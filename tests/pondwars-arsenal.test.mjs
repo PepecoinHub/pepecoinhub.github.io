@@ -22,20 +22,20 @@ const CLASSIC = {
 };
 
 test('expansion weapons are registered with the approved balance', () => {
-  assert.deepEqual(Object.keys(EXPANSION), ['goldv2', 'bell', 'frogmine', 'moon', 'ban', 'rain', 'pep', 'doge', 'donkey']);
+  assert.deepEqual(Object.keys(EXPANSION), ['goldv2', 'bell', 'frogmine', 'megatoe', 'moon', 'ban', 'rain', 'pep', 'doge', 'donkey']);
   assert.equal(EXPANSION.goldv2.damage, 58);
   assert.equal(EXPANSION.goldv2.ammo, 1);
-  assert.equal(EXPANSION.goldv2.crater, SCALE.crater.verySmall);
+  assert.equal(EXPANSION.goldv2.crater, 66);
   assert.equal(EXPANSION.goldv2.knock, SCALE.knock.veryHigh);
-  assert.equal(EXPANSION.goldv2.children, undefined);
-  assert.ok(EXPANSION.goldv2.knockVx > 440, 'the kick shoves harder than the baseball bat');
-  assert.ok(EXPANSION.goldv2.range > 48 && EXPANSION.goldv2.range < 90);
+  assert.equal(EXPANSION.goldv2.children, 5);
+  assert.equal(EXPANSION.goldv2.role, 'throw');
+  assert.equal(EXPANSION.megatoe.damage, 12);
 
   assert.equal(EXPANSION.bell.damage, 44);
   assert.equal(EXPANSION.bell.fuse, 3);
   assert.equal(EXPANSION.bell.radius, SCALE.crater.medium);
   assert.equal(EXPANSION.bell.crater, SCALE.crater.medium);
-  assert.equal(EXPANSION.bell.ammo, Infinity);
+  assert.equal(EXPANSION.bell.ammo, 2);
   assert.equal(EXPANSION.bell.children, undefined);
   assert.equal(EXPANSION.bell.bell, true);
 
@@ -55,7 +55,7 @@ test('expansion weapons are registered with the approved balance', () => {
   assert.equal(EXPANSION.ban.range, 48);
   assert.equal(EXPANSION.ban.crater, SCALE.crater.none);
   assert.equal(EXPANSION.ban.knock, SCALE.knock.extreme);
-  assert.ok(EXPANSION.ban.knockVx > EXPANSION.goldv2.knockVx);
+  assert.ok(EXPANSION.ban.knockVx > 440);
   assert.equal(EXPANSION.ban.ammo, 2);
 
   assert.equal(EXPANSION.rain.ammo, 1);
@@ -118,7 +118,7 @@ test('enabling a pack grants its ammo and still does not fire scaffold weapons',
   const g = newGame({ seed: 4, perTeam: 2, cpu: [false, false], packs: 'simple' });
   assert.equal(g.ammo[0].goldv2, 1);
   assert.equal(g.ammo[0].frogmine, 3);
-  assert.equal('bell' in g.ammo[0], false);
+  assert.equal(g.ammo[0].bell, 2);
   assert.equal(g.ammo[0].moon, undefined);
   assert.deepEqual(hudWeapons('simple').map(w => w.id), ['goldv2', 'bell', 'frogmine']);
   assert.deepEqual(hudWeapons({ pepecoin: true, advanced: 1 }).map(w => w.id), ['moon', 'ban', 'rain', 'doge', 'donkey']);
