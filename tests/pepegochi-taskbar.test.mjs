@@ -39,3 +39,24 @@ test('taskbar stays behind the beta gate and refresh message carries no pet data
   assert.match(shell, /mountTaskbarFrog/);
   assert.match(game, /postMessage\(\{ type: 'pondos:pepegochi-changed' \}, location\.origin\)/);
 });
+
+test('animation plans follow the real pet mood without changing pet state', () => {
+  assert.equal(describeTaskbarFrog(null).motion, 'egg');
+  assert.equal(describeTaskbarFrog(pet({ stage: 'froglet' })).motion, 'froglet');
+  assert.equal(describeTaskbarFrog(pet({ status: 'packing' })).motion, 'packing');
+  assert.equal(describeTaskbarFrog(pet({ status: 'recovering' })).motion, 'recovering');
+  assert.equal(describeTaskbarFrog(pet({ needs: { ...needs, energy: 50 } })).motion, 'sleepy');
+  assert.equal(describeTaskbarFrog(pet({ status: 'departed' })).motion, 'letter');
+});
+test('nine short taskbar movements never use an infinite CSS loop and honor reduced motion', () => {
+  const css = readFileSync(new URL('../docs/meme/meme.css', import.meta.url), 'utf8');
+  const js = readFileSync(new URL('../docs/meme/pepegochi-taskbar.mjs', import.meta.url), 'utf8');
+  for (const action of ['wobble', 'bob', 'peek', 'hop', 'shuffle', 'greet', 'nod', 'slouch', 'tremble']) {
+    assert.match(css, new RegExp('pg-motion-' + action));
+    assert.match(css, new RegExp('@keyframes pgc-' + action));
+  }
+  assert.match(js, /prefers-reduced-motion: reduce/);
+  assert.match(js, /document\.visibilityState !== 'visible'/);
+  assert.match(js, /setTimeout\(queueMotion, 1050\)/);
+  assert.doesNotMatch(css.slice(css.indexOf('Short, rare PepeGochi actions')), /infinite/);
+});
