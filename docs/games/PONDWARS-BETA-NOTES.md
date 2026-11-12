@@ -52,6 +52,10 @@ Weapons used to be `drawImage`’d at `(10, -6)` inside the character transform,
 
 Not done yet: a real network transport (a Supabase Realtime channel only needs `send` and `onmessage`; the page CSP must then allow the Supabase `wss:` origin), rooms/invites, reconnecting after a dropped connection, and a turn timeout for a peer who disappears. The peer is trusted for its own turns, so ranked play would need server-side checks.
 
+## Expansion arsenal (playtest, off by default)
+
+Eight new weapons are registered in `js/pondwars-arsenal.mjs` with their damage, ammo, crater and knockback. A normal match does not grant them and the CPU still chooses from the classic shortlist. The menu fieldset "PLAYTEST ARSENAL" (or `?packs=simple`, `pepecoin`, `advanced`, or `all`) shows that pack in the arsenal. Until a pack is marked playable, those buttons say SOON and firing them changes nothing. Classic weapon stats are untouched.
+
 ## Reference review
 
 [Squeak & Destroy](https://github.com/lospolosadwords-dev/squeak-and-destroy) is a complete Canvas/JavaScript game, MIT licensed. Its surface collisions, movement feedback and compact artillery interaction are relevant. Existing Pond Wars movement already drew inspiration from it.

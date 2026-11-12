@@ -1,6 +1,7 @@
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection } from './pondwars-beta-engine.mjs?v=20261111hand';
-import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261111hand';
+import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112arsenal';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112arsenal';
+import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112arsenal';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
 import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261112pixel';
 import { compilePixelManifest, authoredPose, clipDuration, pixelHelmet } from './pondwars-pixel-art.mjs?v=20261112pixel';
@@ -426,13 +427,18 @@ function hud() {
   document.querySelectorAll('[data-w]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.w === g.weapon)));
   document.querySelectorAll('[data-w]').forEach(b=>{
     const w=b.dataset.w, count=g.ammo[g.team][w];
-    b.disabled=!mine || count===0 || (g.pistolShots>0 && w!=='revolver');
-    b.querySelector('small').textContent=Number.isFinite(count)?'× '+count:w==='revolver'?(2-g.pistolShots)+' SHOTS':'UNLIMITED';
+    const spec=WEAPONS[w];
+    b.disabled=!mine || count===0 || (g.pistolShots>0 && w!=='revolver') || spec?.ready===false;
+    b.querySelector('small').textContent=spec?.ready===false?'SOON':Number.isFinite(count)?'× '+count:w==='revolver'?(2-g.pistolShots)+' SHOTS':'UNLIMITED';
   });
-  $('#weapon-name').textContent=WEAPONS[g.weapon].name;
-  $('#weapon-detail').textContent=(descriptions[g.weapon]||'')+(WEAPONS[g.weapon].utility?' · TURN GOES ON':' · MAX '+WEAPONS[g.weapon].damage+' HP'+(g.weapon==='cluster'||g.weapon==='gold'?' + FRAGMENTS':''));
+  const heldWeapon=WEAPONS[g.weapon];
+  $('#weapon-name').textContent=heldWeapon.name;
+  const blurb=descriptions[g.weapon]||heldWeapon.hud||'';
+  $('#weapon-detail').textContent=heldWeapon.ready===false?blurb+' · NOT PLAYABLE YET':blurb+(heldWeapon.utility?' · TURN GOES ON':' · MAX '+heldWeapon.damage+' HP'+(g.weapon==='cluster'||g.weapon==='gold'?' + FRAGMENTS':''));
   // The FIRE button only shows on touch screens: tap the map to aim or pick a spot, then press here.
-  const fu=me(g);$('#fire').textContent=g.weapon==='rope'?(fu.rope?'LET GO':'FIRE THE ROPE'):g.weapon==='jetpack'?(fu.jet?'JETPACK OFF':'START JETPACK'):g.weapon==='teleport'?'TELEPORT HERE':g.weapon==='candles'?'DROP CANDLES':g.weapon==='bat'?'SWING THE BAT':g.weapon==='revolver'?'FIRE · '+(2-g.pistolShots)+' LEFT':'HOLD TO FIRE';
+  const fu=me(g);
+  const stock=g.weapon==='rope'?(fu.rope?'LET GO':'FIRE THE ROPE'):g.weapon==='jetpack'?(fu.jet?'JETPACK OFF':'START JETPACK'):g.weapon==='teleport'?'TELEPORT HERE':g.weapon==='candles'?'DROP CANDLES':g.weapon==='bat'?'SWING THE BAT':g.weapon==='revolver'?'FIRE · '+(2-g.pistolShots)+' LEFT':'HOLD TO FIRE';
+  $('#fire').textContent=heldWeapon.fireLabel||stock;
   // phones hide the weapon readout, so the arsenal button names the weapon in hand
   $('#arsenal-open').textContent=touchUI.matches?'▲ '+(WEAPONS[g.weapon].short||'Arsenal'):'Arsenal';
   $('#angle-read').textContent=Math.round(-aim*180/Math.PI)+'°';
@@ -503,8 +509,13 @@ function over() {
 
 // ---------- start ----------
 // What both devices need to build the same match. Names, colors and characters are only looks.
+function readPacks() {
+  const on = {};
+  document.querySelectorAll('#arsenal-packs [data-pack]').forEach(box => { if (box.checked) on[box.dataset.pack] = true; });
+  return normalizePacks(on);
+}
 function menuSetup() {
-  return { seed: opts.mapSeed, map: opts.map, perTeam: opts.n,
+  return { seed: opts.mapSeed, map: opts.map, perTeam: opts.n, packs: readPacks(),
     names: [0, 1].map(t => $('#team' + t).value.trim().slice(0, 18) || (t ? 'FUD' : 'PEP')),
     colors: [...teamColors], players: teamPlayers.map(list => list.slice()) };
 }
@@ -524,12 +535,12 @@ function start() {
   const setup = menuSetup();
   if (net) { net.begin(setup); if (!net.g) menuButton(); return; }   // online: starts when the other tab is there
   seed = setup.seed; applyLooks(setup);
-  g = newGame({ seed, map: setup.map, perTeam: setup.perTeam, cpu: [false, opts.mode === 'cpu'], level: opts.level });
+  g = newGame({ seed, map: setup.map, perTeam: setup.perTeam, cpu: [false, opts.mode === 'cpu'], level: opts.level, packs: setup.packs });
   startTurn(g); launch();
 }
 function launch() {
   animator.reset(); helmets.restore(g);
-  paused=false;$('#pause').textContent='Pause';acc=0;pending=[];remoteP=0;clearCharge();held.l=held.r=held.u=0;paintGround();events();hud();
+  paused=false;$('#pause').textContent='Pause';acc=0;pending=[];remoteP=0;clearCharge();held.l=held.r=held.u=0;mountExpansion(g.packs);paintGround();events();hud();
   $('#menu').hidden = true; $('#over').hidden = true; cv.focus({ preventScroll: true });
 }
 // One step of this device's input: held keys and buttons as bits, plus the queued actions.
@@ -580,6 +591,23 @@ arsenal.className='pw-arsenal';arsenal.hidden=true;arsenal.setAttribute('role','
 arsenal.innerHTML='<div class="arsenal-title">ARSENAL <span>1–0 · C R J T · ESC TO CLOSE</span><button type="button" aria-label="Close weapon selection">×</button></div><div class="pw-weapons">'+$('#weapon-options').innerHTML+'</div>';
 document.body.append(arsenal);
 for(const b of arsenal.querySelectorAll('[data-w]'))b.setAttribute('aria-label',WEAPONS[b.dataset.w].name);
+function mountExpansion(packs) {
+  const box = arsenal.querySelector('.pw-weapons');
+  box.querySelectorAll('[data-pack]').forEach(b => b.remove());
+  const list = hudWeapons(packs);
+  for (const w of list) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.dataset.w = w.id; b.dataset.pack = w.pack;
+    b.title = w.name + ' · key ' + w.key;
+    b.setAttribute('aria-label', w.name);
+    b.innerHTML = '<span class="weapon-key">' + w.key + '</span><img src="img/pondwars/' + w.id + '.svg" alt=""><span>' + w.short + '</span><small>SOON</small>';
+    b.addEventListener('click', () => chooseWeapon(w.id));
+    box.append(b);
+    if (!weaponArt[w.id]) { const img = new Image(); img.src = 'img/pondwars/' + w.id + '.svg'; weaponArt[w.id] = img; }
+  }
+  const extra = list.map(w => w.key).join(' ');
+  arsenal.querySelector('.arsenal-title span').textContent = '1–0 · C R J T' + (extra ? ' · ' + extra : '') + ' · ESC TO CLOSE';
+}
 arsenal.addEventListener('focusin',e=>{const b=e.target.closest('[data-w]');if(b)arsenal.querySelector('.arsenal-title span').textContent=WEAPONS[b.dataset.w].name;});
 function clearCharge(){charging=false;power=0;$('#power').style.width='0%';$('#fire').style.setProperty('--charge','0');}
 function closeArsenal(focus=false){arsenal.hidden=true;if(focus)cv.focus({preventScroll:true});}
@@ -622,7 +650,7 @@ function release(cancelShort) {
   if (!charging) return;
   const heldFor = performance.now() - chargeAt; clearCharge();
   if (!mine()) return;
-  if (WEAPONS[g.weapon].utility) { pending.push({ t: 'fire', a: aim, p: 1, x: aimX, y: aimY }); return; }   // rope, jetpack, teleport: a tap is enough
+  if (WEAPONS[g.weapon].utility || WEAPONS[g.weapon].tap) { pending.push({ t: 'fire', a: aim, p: 1, x: aimX, y: aimY }); return; }   // utilities and tap weapons: a tap is enough
   if (cancelShort && heldFor < 180) return;   // a short click only aims
   pending.push({ t: 'fire', a: aim, p: Math.max(.08, Math.min(1, heldFor / 1300)), x: aimX, y: aimY });
 }
@@ -654,7 +682,12 @@ hopButton.addEventListener('pointerdown', e => { if (e.button) return; e.prevent
 hopButton.addEventListener('click', e => { if (e.detail === 0) jump(); });
 for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) hopButton.addEventListener(t, () => { held.u = 0; });
 $('#skip').addEventListener('click', () => { if (mine()) { pending.push({ t: 'skip' }); status('Turn skipped.'); } });
-function chooseWeapon(w) { if (mine() && !g.pistolShots && g.ammo[g.team][w] !== 0) { clearCharge(); pending.push({ t: 'weapon', w }); closeArsenal(true); } }
+function chooseWeapon(w) {
+  const spec = WEAPONS[w];
+  if (mine() && spec && !g.pistolShots && weaponAllowed(g, w) && spec.ready !== false && g.ammo[g.team][w] !== 0) {
+    clearCharge(); pending.push({ t: 'weapon', w }); closeArsenal(true);
+  }
+}
 document.querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', () => chooseWeapon(b.dataset.w)));
 document.addEventListener('keydown', e => {
   if(e.code==='Escape'){closeArsenal(true);return;}
@@ -669,6 +702,9 @@ document.addEventListener('keydown', e => {
   }else if((/^Digit[0-9]$/.test(k)||['KeyC','KeyR','KeyJ','KeyT'].includes(k))&&mine()){
     const w={KeyC:'candles',KeyR:'rope',KeyJ:'jetpack',KeyT:'teleport'}[k]||['drill','rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite'][Number(k.slice(-1))];
     chooseWeapon(w);
+  }else if(mine()){
+    const extra=hudWeapons(g.packs).find(w=>w.code===k);
+    if(extra)chooseWeapon(extra.id);
   }
 },true);
 document.addEventListener('keyup',e=>{if(e.code==='Enter'){e.preventDefault();release(false);}keys.delete(e.code);if(['ArrowLeft','ArrowRight','KeyA','KeyD'].includes(e.code)){held.l=keys.has('ArrowLeft')||keys.has('KeyA');held.r=keys.has('ArrowRight')||keys.has('KeyD');}if(e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();}},true);
@@ -735,6 +771,8 @@ function mapPreview(recommend=false){
 $('#map-choice').onchange=e=>{opts.map=e.target.value;opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview(true);};
 $('#reroll-map').onclick=()=>{opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview();};
 $('#roll-map').onclick=()=>{const maps=Object.keys(MAPS);opts.map=maps[Math.floor(Math.random()*maps.length)];$('#map-choice').value=opts.map;opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview(true);};
+const presetPacks = normalizePacks(new URLSearchParams(location.search).get('packs'));
+document.querySelectorAll('#arsenal-packs [data-pack]').forEach(box => { if (presetPacks[box.dataset.pack]) box.checked = true; });
 paintColors();mapPreview();
 pick('[data-mode]', 'mode', String); pick('[data-level]', 'level', Number); pick('[data-n]', 'n', Number);
 $('#go').addEventListener('click', start); $('#again').addEventListener('click', start);

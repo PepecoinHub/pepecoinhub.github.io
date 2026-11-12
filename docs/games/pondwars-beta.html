@@ -5,8 +5,8 @@
 <meta name="referrer" content="strict-origin-when-cross-origin"><title>FROGAGEDDON BETA: frog artillery | Pepecoin Hub</title>
 <meta name="description" content="Turn-based frog artillery: custom teams, four destructible maps, nine weapons and exploding golden toes. Play against the CPU or a friend on one device.">
 <meta name="robots" content="noindex, nofollow"><link rel="canonical" href="https://pepecoinhub.com/games/pondwars.html"><link rel="icon" href="img/pondwars/gold.svg">
-<link rel="stylesheet" href="pondwars.css?v=20261103c"><script type="module" src="js/pondwars-beta.mjs?v=20261112pixel"></script>
-<link rel="stylesheet" href="pondwars-polish.css?v=20261104moves"><link rel="stylesheet" href="pondwars-beta.css?v=20261111hand"></head><body>
+<link rel="stylesheet" href="pondwars.css?v=20261103c"><script type="module" src="js/pondwars-beta.mjs?v=20261112arsenal"></script>
+<link rel="stylesheet" href="pondwars-polish.css?v=20261104moves"><link rel="stylesheet" href="pondwars-beta.css?v=20261112arsenal"></head><body>
 <header class="pw-site"><a href="../meme/">← Pepecoin Hub</a><b>FROGAGEDDON</b><a href="index.html">More games</a></header>
 <main class="pw">
   <div class="pw-chrome"><span>FROGAGEDDON BETA <small> / FREN SOFTWARE · 2000</small></span><div><button id="sound">Sound: off</button><button id="pause">Pause</button><button id="restart">New match</button></div></div><div class="pw-bar">
@@ -47,6 +47,7 @@
       </div>
       <div class="player-setup"><fieldset><legend>TEAM 1 · CHARACTERS</legend><div id="players0"></div></fieldset><fieldset><legend>TEAM 2 · CHARACTERS</legend><div id="players1"></div></fieldset></div>
       <div class="map-setup"><canvas id="map-preview" width="300" height="150" aria-label="Selected map preview"></canvas><div><label for="map-choice">BATTLEFIELD</label><select id="map-choice"><option value="island">Pond Island · large island</option><option value="twin">Split Decision · two islands</option><option value="peaks">Croak Canyon · mountains</option><option value="small">Last Lily · small arena</option></select><button type="button" id="roll-map">Random map</button><button type="button" id="reroll-map">New terrain</button><p id="map-info"></p></div></div>
+      <fieldset class="playtest-packs" id="arsenal-packs"><legend>PLAYTEST ARSENAL</legend><p>Off for a normal match. Classic weapons stay as they are. A pack shows its weapons in the arsenal; they do not fire until that pack is playable.</p><label><input type="checkbox" data-pack="simple"> Simple pack · Golden Foot v2, Bell Bomb, Frog Mine</label><label><input type="checkbox" data-pack="pepecoin"> Pepecoin pack · Moon Rocket, Ban Hammer, Pep Rain</label><label><input type="checkbox" data-pack="advanced"> Advanced pack · Doge Flyer, Silver Donkey</label></fieldset>
       <div class="pw-pick"><span>Play against</span><button type="button" data-mode="cpu" aria-pressed="true">CPU</button><button type="button" data-mode="duo" aria-pressed="false">A friend (one device)</button></div>
       <div class="pw-pick" id="levels"><span>CPU level</span><button type="button" data-level="0" aria-pressed="false">Easy</button><button type="button" data-level="1" aria-pressed="true">Normal</button><button type="button" data-level="2" aria-pressed="false">Hard</button></div>
       <div class="pw-pick"><span>Frogs per team</span><button type="button" data-n="2" aria-pressed="false">2</button><button type="button" data-n="3" aria-pressed="true">3</button><button type="button" data-n="4" aria-pressed="false">4</button></div>

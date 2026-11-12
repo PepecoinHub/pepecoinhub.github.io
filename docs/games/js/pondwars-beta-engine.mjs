@@ -3,6 +3,7 @@
 // Movement and projectile ideas (bounce off the real slope, wind that drifts between turns, step-up walking,
 // slide after a knockback, speed caps, rope / jetpack / teleport / drill) are inspired by Squeak & Destroy
 // (MIT, Los Polos Amigos Kft.); the code here is our own.
+import { EXPANSION, normalizePacks, starterAmmo, packEnabled } from './pondwars-arsenal.mjs';
 export const W = 1200, H = 600, WATER = 560, STEP = 1 / 60, G = 520;
 export const MAPS={
 island:{name:'Pond Island',max:4,recommended:3},
@@ -34,6 +35,13 @@ export const WEAPONS = {
   jetpack: { name:'Jetpack', short:'Jetpack', radius:0, damage:0, ammo:2, power:1, utility:true },
   teleport: { name:'Teleport', short:'Teleport', radius:0, damage:0, ammo:2, power:1, utility:true },
 };
+for (const [id, spec] of Object.entries(EXPANSION)) WEAPONS[id] = spec;
+export function weaponAllowed(g, id) {
+  const w = WEAPONS[id];
+  if (!w || !('ammo' in w) || w.child) return false;
+  if (w.expansion) return packEnabled(g && g.packs, id);
+  return true;
+}
 const NAMES = [['Hopper', 'Lily', 'Ribbit', 'Pad'], ['Croak', 'Bog', 'Toady', 'Murk']];
 
 export function rng(seed) {   // mulberry32
@@ -88,7 +96,8 @@ export function normalAt(mask, x, y, r = 5) {
 function surfaceBelow(mask, x, y) { for (let yy = Math.max(0, Math.floor(y)); yy < H; yy++) if (solid(mask, x, yy)) return yy; return H; }
 
 // ---------- a new match ----------
-export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1, map = 'island' } = {}) {
+export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1, map = 'island', packs: packInput } = {}) {
+  const packs = normalizePacks(packInput);
   map=MAPS[map]?map:'island';perTeam=Math.max(2,Math.min(MAPS[map].max,Math.floor(perTeam)||MAPS[map].recommended));
   const mask = makeTerrain(seed,map), r = rng(seed ^ 0x9e3779b9), frogs = [];
   const slots=[],candidates=[];
@@ -107,8 +116,9 @@ export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1,
     const team=i%2,{x,y}=slots[i];
     frogs.push({ id: i, team, name: NAMES[team][Math.floor(i / 2)], x, y, vx: 0, vy: 0, hp: 100, alive: true, ground: true, face: x < W / 2 ? 1 : -1, fallFrom: y, gone: '' });
   }
+  const ammo = [0, 1].map(() => starterAmmo(packs));
   return { seed, map, perTeam, mask, mines:[], retreat:0, movement:MOVE_BUDGET, frogs, shots: [], booms: [], texts: [], dirty: [], cpu, level, turn: 0, team: 0, next: [0, 0], current: 0,
-    wind: 0, weapon: 'grenade', ammo: [0, 1].map(() => ({candles:1,cluster:4,gold:1,mine:3,dynamite:2,drill:2,rope:5,jetpack:2,teleport:2})), ctl:{x:0,y:0}, pistolShots:0, phase: 'aim', timer: TURN_TIME, settle: 0, winner: null, rand: r, events: [] };
+    wind: 0, weapon: 'grenade', ammo, packs, ctl:{x:0,y:0}, pistolShots:0, phase: 'aim', timer: TURN_TIME, settle: 0, winner: null, rand: r, events: [] };
 }
 export function aliveOf(g, team) { return g.frogs.filter(f => f.alive && f.team === team); }
 export function startTurn(g) {
@@ -176,6 +186,10 @@ export function backflip(g) {
 export function fire(g, angle, power, tx, ty) {
   const f = me(g), w = WEAPONS[g.weapon];
   if (g.phase !== 'aim' || !f.alive || !w || !Number.isFinite(angle) || !Number.isFinite(power)) return false;
+  if (w.expansion) {
+    if (!weaponAllowed(g, g.weapon) || w.ready === false) return false;
+    return fireExpansion(g, f, w, angle, power, tx, ty);
+  }
   if (w.utility) return useUtility(g, f, angle, tx, ty);
   f.rope = null; f.jet = null;
   if (g.pistolShots && g.weapon !== 'revolver') return false;
@@ -211,6 +225,8 @@ export function fire(g, angle, power, tx, ty) {
   }
   g.phase = 'fire'; g.events.push({ type: 'fire', weapon: g.weapon }); return true;
 }
+// Expansion packs replace this once a weapon is marked ready. Scaffold calls never reach it.
+function fireExpansion() { return false; }
 // ---------- utilities: rope, jetpack, teleport (the turn goes on) ----------
 function useUtility(g, f, angle, tx, ty) {
   const kind = g.weapon, left = g.ammo[g.team][kind];

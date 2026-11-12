@@ -11,7 +11,7 @@
 //
 // The transport is anything with send(message) and an onmessage callback. tabTransport() links two tabs of the
 // same browser (for testing without a server); a Supabase Realtime channel can implement the same two members.
-import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me } from './pondwars-beta-engine.mjs?v=20261111hand';
+import { W, H, WEAPONS, rng, newGame, startTurn, step, walk, hop, backflip, fire, skip, canMove, me, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112arsenal';
 
 export const PROTOCOL = 1;
 export const KEY = { L: 1, R: 2, U: 4, D: 8 };   // bits of input.m
@@ -57,7 +57,7 @@ export function act(g, a) {
   if (a.t === 'face') { if (g.phase !== 'aim') return false; me(g).face = a.d; return true; }   // aiming turns the frog
   if (a.t === 'skip') { const was = g.phase; skip(g); return was !== g.phase; }
   if (a.t === 'weapon') {
-    if (g.phase !== 'aim' || g.pistolShots || g.ammo[g.team][a.w] === 0) return false;
+    if (g.phase !== 'aim' || g.pistolShots || !weaponAllowed(g, a.w) || WEAPONS[a.w].ready === false || g.ammo[g.team][a.w] === 0) return false;
     g.weapon = a.w; return true;
   }
   if (a.t === 'fire') return fire(g, a.a, a.p, a.x, a.y);
@@ -144,7 +144,7 @@ export class NetMatch {
   }
   start(setup, snap) {
     this.setup = setup;
-    this.g = newGame({ seed: setup.seed, map: setup.map, perTeam: setup.perTeam, cpu: [false, false] });
+    this.g = newGame({ seed: setup.seed, map: setup.map, perTeam: setup.perTeam, cpu: [false, false], packs: setup.packs });
     startTurn(this.g);
     if (snap && snapshotHash(snap) !== stateHash(this.g)) { restoreInto(this.g, snap); this.desyncs++; }
     this.tick = this.recv = 0; this.outbox = []; this.inbox = []; this.awaitSnap = false;
