@@ -70,7 +70,7 @@ test('expansion weapons are registered with the approved balance', () => {
   assert.equal(EXPANSION.doge.damage, 46);
   assert.equal(EXPANSION.doge.radius, SCALE.crater.medium);
   assert.equal(EXPANSION.doge.lifetime, GUIDE.lifetime);
-  assert.equal(GUIDE.lifetime, 4.5);
+  assert.equal(GUIDE.lifetime, 5);
   assert.ok(GUIDE.lag < 4, 'velocity lags the heading');
   assert.equal(EXPANSION.doge.ammo, 1);
 
