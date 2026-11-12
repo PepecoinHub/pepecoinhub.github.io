@@ -957,6 +957,7 @@ footer.foot a { color: #edf3e3; }
 :root.pondos.sky-night { --wall: url("img/wall-night.webp"); --wall-pos: 88% 30%; }
 @media (max-width: 760px) { :root.pondos.sky-night { --wall-pos: 96% 12%; } }
 .sky { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; container-type: size; }
+.sky[hidden] { display: none; }
 @supports not (width: 1cqw) { .sky { display: none; } }
 /* "cover", by hand: every layer of a scene is placed in % of the scene, so they always line up */
 .sky-scene {

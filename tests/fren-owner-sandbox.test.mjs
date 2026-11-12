@@ -146,6 +146,6 @@ test('QA unlock control is visible in the Maker, not only the Passport window', 
 
 test('the home page busts stale JS and the maker reloads fresh approved V3 CSS', () => {
   const home = read('docs/meme/index.html');
-  assert.match(home, /<script src="meme\.js\?v=20261112sky"><\/script>/);
+  assert.match(home, /<script src="meme\.js\?v=20261112wall"><\/script>/);
   assert.match(source, /passport\.css\?v=20261112pr/);
 });
