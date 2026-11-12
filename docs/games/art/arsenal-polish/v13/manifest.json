@@ -584,27 +584,27 @@
  },
  "held": {
   "grenade": {
-   "src": "art/arsenal-polish/v13/held/grenade.png",
-   "size": 30,
+   "src": "art/arsenal-polish/v15/held/grenade.png",
+   "size": 28,
    "grip": [
-    32,
-    42
+    20,
+    44
    ],
    "base": 0,
    "mode": "throw"
   },
   "cluster": {
-   "src": "art/arsenal-polish/v13/held/cluster_grenade.png",
+   "src": "art/arsenal-polish/v15/held/cluster_grenade.png",
    "size": 30,
    "grip": [
-    32,
-    42
+    20,
+    44
    ],
    "base": 0,
    "mode": "throw"
   },
   "gold": {
-   "src": "art/arsenal-polish/v13/held/golden_foot.png",
+   "src": "art/arsenal-polish/v15/held/golden_foot.png",
    "size": 30,
    "grip": [
     30,
@@ -614,37 +614,37 @@
    "mode": "throw"
   },
   "goldv2": {
-   "src": "art/arsenal-polish/v13/held/golden_foot.png",
+   "src": "art/arsenal-polish/v15/held/mega_golden_foot.png",
    "size": 36,
    "grip": [
     30,
-    44
+    46
    ],
    "base": 0,
    "mode": "throw"
   },
   "rocket": {
-   "src": "art/arsenal-polish/v13/held/bazooka.png",
+   "src": "art/arsenal-polish/v15/held/bazooka.png",
    "size": 40,
    "grip": [
-    22,
+    20,
     44
    ],
    "base": 0,
    "mode": "aim"
   },
   "drill": {
-   "src": "art/arsenal-polish/v13/held/drill_launcher.png",
+   "src": "art/arsenal-polish/v15/held/drill_launcher.png",
    "size": 38,
    "grip": [
-    22,
-    46
+    20,
+    44
    ],
    "base": 0,
    "mode": "aim"
   },
   "revolver": {
-   "src": "art/arsenal-polish/v13/held/revolver.png",
+   "src": "art/arsenal-polish/v15/held/revolver.png",
    "size": 32,
    "grip": [
     20,
@@ -654,7 +654,7 @@
    "mode": "aim"
   },
   "bow": {
-   "src": "art/arsenal-polish/v13/held/bow.png",
+   "src": "art/arsenal-polish/v15/held/bow.png",
    "size": 36,
    "grip": [
     46,
@@ -664,48 +664,48 @@
    "mode": "aim"
   },
   "rope": {
-   "src": "art/arsenal-polish/v13/held/grappling_launcher.png",
+   "src": "art/arsenal-polish/v15/held/grappling_launcher.png",
    "size": 34,
    "grip": [
-    22,
-    46
+    20,
+    44
    ],
    "base": 0,
    "mode": "aim"
   },
   "teleport": {
-   "src": "art/arsenal-polish/v13/held/teleport_device.png",
+   "src": "art/arsenal-polish/v15/held/teleport_device.png",
    "size": 34,
    "grip": [
-    22,
-    46
+    20,
+    44
    ],
    "base": 0,
    "mode": "aim"
   },
   "bat": {
-   "src": "art/arsenal-polish/v13/held/baseball.png",
-   "size": 38,
-   "grip": [
-    22,
-    44
-   ],
-   "base": 0.785,
-   "mode": "aim"
-  },
-  "ban": {
-   "src": "art/arsenal-polish/v13/held/ban_hammer.png",
+   "src": "art/arsenal-polish/v15/held/baseball.png",
    "size": 38,
    "grip": [
     20,
-    44
+    46
    ],
-   "base": 0.785,
+   "base": 0.7853981633974483,
+   "mode": "aim"
+  },
+  "ban": {
+   "src": "art/arsenal-polish/v15/held/ban_hammer.png",
+   "size": 38,
+   "grip": [
+    20,
+    46
+   ],
+   "base": 0.7853981633974483,
    "mode": "aim"
   },
   "mine": {
-   "src": "art/arsenal-polish/v13/held/landmine.png",
-   "size": 30,
+   "src": "art/arsenal-polish/v15/held/landmine.png",
+   "size": 28,
    "grip": [
     32,
     44
@@ -714,7 +714,7 @@
    "mode": "place"
   },
   "dynamite": {
-   "src": "art/arsenal-polish/v13/held/dynamite.png",
+   "src": "art/arsenal-polish/v15/held/dynamite.png",
    "size": 28,
    "grip": [
     30,
@@ -724,7 +724,7 @@
    "mode": "place"
   },
   "candles": {
-   "src": "art/arsenal-polish/v13/held/red_candles.png",
+   "src": "art/arsenal-polish/v15/held/red_candles.png",
    "size": 28,
    "grip": [
     32,
@@ -734,8 +734,8 @@
    "mode": "place"
   },
   "jetpack": {
-   "src": "art/arsenal-polish/v13/held/jetpack_backpack.png",
-   "size": 28,
+   "src": "art/arsenal-polish/v15/held/jetpack_backpack.png",
+   "size": 30,
    "grip": [
     32,
     40
@@ -751,6 +751,66 @@
     48
    ],
    "base": 0.785,
+   "mode": "aim"
+  },
+  "bell": {
+   "src": "art/arsenal-polish/v15/held/bell_bomb.png",
+   "size": 30,
+   "grip": [
+    32,
+    44
+   ],
+   "base": 0,
+   "mode": "throw"
+  },
+  "doge": {
+   "src": "art/arsenal-polish/v15/held/doge.png",
+   "size": 32,
+   "grip": [
+    30,
+    44
+   ],
+   "base": 0,
+   "mode": "throw"
+  },
+  "rain": {
+   "src": "art/arsenal-polish/v15/held/pep_rain.png",
+   "size": 30,
+   "grip": [
+    32,
+    44
+   ],
+   "base": 0,
+   "mode": "throw"
+  },
+  "donkey": {
+   "src": "art/arsenal-polish/v15/held/donkey.png",
+   "size": 32,
+   "grip": [
+    30,
+    44
+   ],
+   "base": 0,
+   "mode": "place"
+  },
+  "frogmine": {
+   "src": "art/arsenal-polish/v15/held/frog_mine.png",
+   "size": 30,
+   "grip": [
+    32,
+    44
+   ],
+   "base": 0,
+   "mode": "place"
+  },
+  "moon": {
+   "src": "art/arsenal-polish/v15/held/moon_rocket.png",
+   "size": 34,
+   "grip": [
+    20,
+    44
+   ],
+   "base": 0.7853981633974483,
    "mode": "aim"
   }
  }

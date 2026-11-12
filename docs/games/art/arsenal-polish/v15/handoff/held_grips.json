@@ -1,0 +1,90 @@
+{
+  "grenade.png": [
+    20,
+    44
+  ],
+  "bazooka.png": [
+    20,
+    44
+  ],
+  "cluster_grenade.png": [
+    20,
+    44
+  ],
+  "golden_foot.png": [
+    30,
+    44
+  ],
+  "baseball.png": [
+    20,
+    46
+  ],
+  "revolver.png": [
+    20,
+    44
+  ],
+  "bow.png": [
+    46,
+    34
+  ],
+  "landmine.png": [
+    32,
+    44
+  ],
+  "dynamite.png": [
+    30,
+    40
+  ],
+  "red_candles.png": [
+    32,
+    44
+  ],
+  "drill_launcher.png": [
+    20,
+    44
+  ],
+  "grappling_launcher.png": [
+    20,
+    44
+  ],
+  "jetpack_backpack.png": [
+    32,
+    40
+  ],
+  "teleport_device.png": [
+    20,
+    44
+  ],
+  "ban_hammer.png": [
+    20,
+    46
+  ],
+  "pep_rain.png": [
+    32,
+    44
+  ],
+  "doge.png": [
+    30,
+    44
+  ],
+  "donkey.png": [
+    30,
+    44
+  ],
+  "moon_rocket.png": [
+    20,
+    44
+  ],
+  "bell_bomb.png": [
+    32,
+    44
+  ],
+  "frog_mine.png": [
+    32,
+    44
+  ],
+  "mega_golden_foot.png": [
+    30,
+    46
+  ]
+}

@@ -100,12 +100,13 @@ fetch('art/arsenal-polish/manifest.json?v=20261112v11').then(r=>r.json()).then(m
     if(!validateClip(c))throw new Error('Invalid weapon clip: '+id+'/'+role);
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
   }
-}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v14')).then(r=>r.json()).then(manifest=>{
+}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v15')).then(r=>r.json()).then(manifest=>{
   // v13: pixel art for every weapon (flight, held, explosions). It overrides older clips of the same role.
   for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(validateClip(c)){
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
   }
   for(const [id,h] of Object.entries(manifest.held||{})){const image=new Image();image.src=h.src;heldArt[id]={...h,image};}
+  heldIcons();
 }).catch(e=>console.warn('v13 weapon art unavailable',e.message));
 let weaponFX=[];
 function drawWeaponClip(id,role,time,x,y,reduced=reduce){
@@ -351,6 +352,8 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false, imageKey
   ctx.drawImage(img, h.ox, h.oy, h.w, h.h);
   ctx.restore();
 }
+// The weapon menu shows the same pixel art the frog holds.
+function heldIcons() { for (const img of document.querySelectorAll('.pw-weapons [data-w] img')) { const h = heldArt[img.closest('[data-w]').dataset.w]; if (h) { img.src = h.src; img.style.imageRendering = 'pixelated'; } } }
 // v13 held pixel art: a 64×64 tile drawn with its grip point on the hand.
 function heldPixel(hand) {
   const h = heldArt[g.weapon]; if (!h?.image.naturalWidth) return false;
@@ -889,6 +892,7 @@ function mountExpansion(packs) {
     box.append(b);
     if (!weaponArt[w.id]) { const img = new Image(); img.src = 'img/pondwars/' + (WEAPON_FALLBACK[w.id]||w.id) + '.svg'; weaponArt[w.id] = img; }
   }
+  heldIcons();
   const extra = list.map(w => w.key).join(' ');
   arsenal.querySelector('.arsenal-title span').textContent = '1–0 · C R J T' + (extra ? ' · ' + extra : '') + ' · ESC TO CLOSE';
 }
