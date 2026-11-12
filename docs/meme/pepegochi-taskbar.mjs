@@ -11,12 +11,12 @@ export function describeTaskbarFrog(state) {
   const p = state && state.pet;
   if (!p) return {
     sprite: 'pepegochi_egg_idle.png', label: 'Adopt me?',
-    title: 'No PepeGochi yet. Click to adopt your egg.', warning: false, hasPet: false,
+    title: 'No PepeGochi yet. Click to adopt your egg.', warning: false, hasPet: false, motion: 'egg',
   };
   if (p.status === 'departed') return {
     sprite: 'goodbye_envelope.png', label: 'GOODBYE.TXT',
     title: 'Your Fren moved out. Open PEPEGOCHI.EXE to read the letter.',
-    warning: true, hasPet: false,
+    warning: true, hasPet: false, motion: 'letter',
   };
   const stage = VALID_STAGE.has(p.stage) ? p.stage : 'adult';
   const status = STATUS.has(p.status) ? p.status : 'healthy';
@@ -35,6 +35,7 @@ export function describeTaskbarFrog(state) {
     sprite: 'pepegochi_' + sprite + '.png', label: name,
     title: name + ' · ' + remarks[status] + ' Click to visit.',
     warning: status === 'packing' || status === 'neglected', hasPet: true,
+    motion: status !== 'healthy' ? status : (sprite === 'adult_tired' ? 'sleepy' : stage),
   };
 }
 
@@ -57,13 +58,51 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../' }) {
   const notice = document.createElement('span');
   notice.className = 'pg-companion-alert';
   notice.setAttribute('aria-hidden', 'true');
+  const sleep = document.createElement('span');
+  sleep.className = 'pg-companion-sleep';
+  sleep.textContent = 'z';
+  sleep.setAttribute('aria-hidden', 'true');
+  sleep.hidden = true;
   const hint = document.createElement('span');
   hint.className = 'pg-companion-hint';
   hint.setAttribute('aria-hidden', 'true');
-  button.append(img, notice, hint);
+  button.append(img, notice, sleep, hint);
   slot.append(button);
   start.after(slot);
   button.addEventListener('click', () => open());
+
+  // Very short motions, not an endlessly looping animation. Only one is active at a time,
+  // and no animation or running timer is needed when the browser is hidden / reduced motion is set.
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const motions = {
+    egg: ['wobble', 'bob'], tadpole: ['bob', 'peek'], froglet: ['hop', 'peek', 'shuffle'],
+    adult: ['hop', 'peek', 'shuffle', 'greet', 'bob'], sleepy: ['nod', 'bob'],
+    neglected: ['slouch', 'peek'], packing: ['tremble', 'shuffle'],
+    recovering: ['nod', 'bob'], letter: [],
+  };
+  let currentMood = 'egg', movement = null, motionTimer = null, restoreTimer = null;
+  function cancelMotion() {
+    if (motionTimer) clearTimeout(motionTimer);
+    if (restoreTimer) clearTimeout(restoreTimer);
+    motionTimer = restoreTimer = null;
+    if (movement) button.classList.remove('pg-motion-' + movement);
+    movement = null;
+  }
+  function queueMotion() {
+    cancelMotion();
+    if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return;
+    const choices = motions[currentMood] || motions.adult;
+    if (!choices.length) return;
+    motionTimer = setTimeout(() => {
+      motionTimer = null;
+      if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return;
+      movement = choices[Math.floor(Math.random() * choices.length)];
+      button.classList.add('pg-motion-' + movement);
+      restoreTimer = setTimeout(queueMotion, 1050);
+    }, 13000 + Math.floor(Math.random() * 20000));
+  }
+  const motionPreferenceChanged = () => queueMotion();
+  if (reduced.addEventListener) reduced.addEventListener('change', motionPreferenceChanged);
 
   function paint(view) {
     const path = base + 'games/img/pepegochi/' + view.sprite;
@@ -73,6 +112,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../' }) {
     hint.textContent = view.label;
     notice.hidden = !view.warning;
     slot.classList.toggle('pg-companion-empty', !view.hasPet);
+    sleep.hidden = view.motion !== 'sleepy';
+    if (currentMood !== view.motion) { currentMood = view.motion; queueMotion(); }
   }
   paint(describeTaskbarFrog(null));
 
@@ -107,7 +148,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../' }) {
     }
   }
 
-  function onVisible() { if (document.visibilityState === 'visible') refresh(); }
+  function onVisible() { if (document.visibilityState === 'visible') { refresh(); queueMotion(); } else cancelMotion(); }
   function onMessage(event) {
     if (event.origin !== location.origin || !event.data ||
         event.data.type !== 'pondos:pepegochi-changed') return;
@@ -124,7 +165,10 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../' }) {
   window.addEventListener('pondos:auth-changed', onAuth);
   document.addEventListener('visibilitychange', onVisible);
   refresh(true);
+  queueMotion();
   return () => {
+    cancelMotion();
+    if (reduced.removeEventListener) reduced.removeEventListener('change', motionPreferenceChanged);
     window.removeEventListener('message', onMessage);
     window.removeEventListener('focus', onVisible);
     window.removeEventListener('pondos:auth-changed', onAuth);
