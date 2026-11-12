@@ -1149,6 +1149,124 @@ footer.foot a { color: #edf3e3; }
 @media (max-width: 760px) { .ad-ba img { width: 64px; height: 64px; } .ptv-nfa { display: none; } .ad-ba .ad-fren { width: 64px; height: 64px; } .ad-fren { width: 64px; height: 64px; } }
 @media (prefers-reduced-motion: reduce) { .ptv-run { animation: none; padding-left: 10px; } .ptv-live { animation: none; } .ptv-scene { transition: none; } }
 
+/* ---------- PEP-TV looks: every ad is a different late-90s / early-2000s TV format (ADS[].look in meme.js) ---------- */
+.ad-row { display: flex; align-items: center; gap: 16px; width: 100%; }
+.ad-row > div { min-width: 0; display: grid; gap: 8px; }
+.ad-stamp { flex: none; display: inline-block; width: 74px; height: 80px; background: url(passport-assets/stamps-v3.webp?v=20261109val) 0 0 / 4800% 100% no-repeat; filter: drop-shadow(3px 3px 0 rgba(0,0,0,.55)); }
+.ad-stamp-xl { width: 120px; height: 130px; }
+.ad-stampimg { flex: none; width: 116px; height: auto; filter: drop-shadow(3px 3px 0 rgba(0,0,0,.55)); }
+.ad-ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+.ptv-scene.on .ad-blink { animation: ad-blink 0.8s steps(1) infinite; }
+@keyframes ad-blink { 50% { opacity: 0.2; } }
+.ptv-scene.on .ad-shine { animation: ad-shine 2.2s ease-in-out infinite; }
+@keyframes ad-shine { 0%, 100% { filter: drop-shadow(3px 3px 0 rgba(0,0,0,.55)) brightness(1); transform: rotate(-3deg) scale(1); } 50% { filter: drop-shadow(0 0 14px #ffe14d) brightness(1.18); transform: rotate(3deg) scale(1.06); } }
+
+/* PNN, Pond News Network: 2001 cable news with a glossy lower third and a spinning globe bug */
+.look-news { background: radial-gradient(120% 90% at 80% 0%, #3a63d8 0%, #0d2378 45%, #050c33 80%); }
+.look-news .ptv-stage::before { content: "🌐 PNN"; position: absolute; top: 10px; right: 12px; z-index: 2; padding: 3px 9px; font: 400 15px/1 Impact, "Arial Black", sans-serif; background: linear-gradient(#ff5a5a, #b30d0d); border: 2px solid #fff; box-shadow: 2px 2px 0 #000; }
+.look-news .ptv-scene { justify-content: flex-start; padding-top: 34px; padding-bottom: 64px; }
+.look-news .ad-kick { background: linear-gradient(#e33, #900); color: #fff; padding: 3px 8px; }
+.look-news .ad-big { font-size: clamp(28px, 5vw, 46px); }
+.ad-lower { position: absolute; left: 0; right: 0; bottom: 12px; margin: 0; display: flex; align-items: stretch; font: 400 16px/1 Impact, "Arial Black", sans-serif; text-transform: uppercase; transform: translateX(-102%); transition: transform .45s .25s cubic-bezier(.2,.9,.3,1.2); }
+.ptv-scene.on .ad-lower { transform: none; }
+.ad-lower b { flex: none; font-weight: 400; padding: 9px 12px; background: linear-gradient(#ff4b4b, #c40000 55%, #8f0000); color: #fff; }
+.ad-lower span { flex: 1; min-width: 0; padding: 9px 12px; background: linear-gradient(#ffffff, #cfd8f5 55%, #a9b6e6); color: #0b1d5e; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* Pond Gossip Tonight: hot pink tabloid TV, starburst stickers, a blurred "paparazzi" photo */
+.look-tabloid { background: radial-gradient(circle at 20% 20%, rgba(255,255,255,.25) 0 2px, transparent 3px) 0 0 / 38px 38px, linear-gradient(135deg, #ff2fa0, #8e0b8a 60%, #1c0222); }
+.look-tabloid .ad-big { color: #fff23a; text-shadow: 3px 3px 0 #d4007a, 6px 6px 0 #000; transform: rotate(-2deg); }
+.look-tabloid .ad-big em { color: #fff; }
+.look-tabloid .ad-kick { color: #fff; background: #000; padding: 3px 8px; transform: rotate(1deg); max-width: calc(100% - 140px); }
+.ad-sticker { position: absolute; top: 14px; right: 14px; z-index: 2; display: grid; place-items: center; width: 118px; height: 118px; padding: 10px; text-align: center; font: 400 19px/1 Impact, "Arial Black", sans-serif; color: #d4007a; background: #ffe600; transform: rotate(12deg);
+  clip-path: polygon(50% 0, 61% 14%, 79% 7%, 80% 25%, 98% 28%, 88% 44%, 100% 58%, 83% 66%, 88% 85%, 69% 83%, 60% 100%, 47% 87%, 32% 98%, 27% 80%, 8% 82%, 14% 64%, 0 52%, 14% 40%, 6% 22%, 25% 20%, 31% 2%, 44% 13%); }
+.ad-sticker-2 { top: auto; bottom: 16px; transform: rotate(-10deg); background: #00f0ff; color: #8e0b8a; }
+.ptv-scene.on .ad-sticker { animation: ad-pop .5s .2s both cubic-bezier(.2,1.6,.4,1); }
+@keyframes ad-pop { from { transform: rotate(40deg) scale(0); } }
+.ad-blur { flex: none; position: relative; display: grid; justify-items: center; gap: 4px; padding: 6px; background: #fff; transform: rotate(-4deg); box-shadow: 5px 5px 0 #000; }
+.ad-blur .ad-fren { border: 0; box-shadow: none; filter: blur(7px); transition: filter 1.6s 1s; }
+.ptv-scene.on .ad-blur .ad-fren { filter: blur(0); }
+.ad-blur small { font: 700 9px/1 var(--f-body); color: #000; letter-spacing: .04em; }
+
+/* Pond Shopping Network: purple-and-gold home shopping, a turntable, stamps thumped in, slashed prices */
+.look-shop { background: repeating-conic-gradient(from 0deg at 50% 120%, rgba(255,215,64,.16) 0 6deg, transparent 6deg 14deg), linear-gradient(#5b0f9c, #22004a); }
+.look-shop .ptv-stage::before { content: "AS SEEN ON PEP-TV"; position: absolute; right: 10px; top: 10px; z-index: 2; display: grid; place-items: center; width: 74px; height: 74px; border-radius: 50%; text-align: center; font: 400 11px/1.05 Impact, "Arial Black", sans-serif; color: #5b0f9c; background: radial-gradient(#fff6c4, #ffcb2b); border: 3px double #5b0f9c; transform: rotate(-14deg); }
+.look-shop .ad-big em { color: transparent; background: linear-gradient(#fff7b0, #ffcc00 50%, #c98a00 51%, #ffe27a); -webkit-background-clip: text; background-clip: text; text-shadow: none; filter: drop-shadow(3px 3px 0 #000); }
+.look-shop .ad-kick { color: #ffe27a; }
+.ad-turntable { flex: none; display: grid; place-items: center; padding-bottom: 14px; background: radial-gradient(60% 14% at 50% 96%, #c9c9d6 0 70%, #6d6d80 71% 100%, transparent 101%); }
+.ptv-scene.on .ad-turntable .ad-stamp { animation: ad-spin 3s linear infinite; }
+@keyframes ad-spin { 0% { transform: perspective(300px) rotateY(0); } 100% { transform: perspective(300px) rotateY(360deg); } }
+.ad-thump { display: flex; flex-wrap: wrap; gap: 6px; }
+.ad-thump .ad-stamp { width: 56px; height: 61px; opacity: 0; }
+.ptv-scene.on .ad-thump .ad-stamp { animation: ad-thump .3s both cubic-bezier(.3,1.8,.5,1); }
+.ptv-scene.on .ad-thump .ad-stamp:nth-child(2) { animation-delay: .35s; } .ptv-scene.on .ad-thump .ad-stamp:nth-child(3) { animation-delay: .7s; }
+.ptv-scene.on .ad-thump .ad-stamp:nth-child(4) { animation-delay: 1.05s; } .ptv-scene.on .ad-thump .ad-stamp:nth-child(5) { animation-delay: 1.4s; } .ptv-scene.on .ad-thump .ad-stamp:nth-child(6) { animation-delay: 1.75s; }
+@keyframes ad-thump { from { opacity: 0; transform: scale(2.6) rotate(-14deg); } to { opacity: 1; transform: rotate(-4deg); } }
+.ad-price { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font: 400 22px/1 Impact, "Arial Black", sans-serif; }
+.ad-price s { color: #ff8c8c; text-decoration-thickness: 4px; }
+.ad-price b { font-weight: 400; font-size: 30px; color: #d40000; background: #ffe600; padding: 26px 30px; clip-path: polygon(50% 0, 62% 18%, 85% 10%, 82% 34%, 100% 50%, 82% 66%, 85% 90%, 62% 82%, 50% 100%, 38% 82%, 15% 90%, 18% 66%, 0 50%, 18% 34%, 15% 10%, 38% 18%); }
+.ptv-scene.on .ad-price b { animation: ad-pop .5s 1s both cubic-bezier(.2,1.6,.4,1); }
+
+/* Lily Pad Travel & Timeshare: sunset gradient, WordArt, Comic Sans and crooked postcards */
+.look-travel { background: linear-gradient(#2a0f63 0%, #c2185b 38%, #ff7043 62%, #ffca28 76%, #26a69a 77%, #00796b 100%); font-family: "Comic Sans MS", "Comic Neue", "Chalkboard SE", cursive; }
+.look-travel .ptv-stage::before { content: "🌴"; position: absolute; right: 8px; bottom: 0; z-index: 0; font-size: 92px; line-height: 1; opacity: .9; }
+.look-travel .ad-sub, .look-travel .ad-kick, .look-travel .ad-fine { font-family: "Comic Sans MS", "Comic Neue", "Chalkboard SE", cursive; }
+.look-travel .ad-kick { color: #fff; text-transform: none; font-weight: 700; }
+.look-travel .ad-sub, .look-travel .ad-kick, .look-travel .ad-fine { justify-self: start; width: fit-content; background: rgba(42, 0, 70, 0.62); padding: 3px 8px; text-shadow: none; }
+.look-travel .ad-wordart { margin: 4px 0 8px; }
+.ad-wordart { font-family: Impact, "Arial Black", sans-serif; color: transparent; background: linear-gradient(90deg, #ff004c, #ff9a00, #ffe600, #3ef03e, #00c8ff, #b04bff); -webkit-background-clip: text; background-clip: text; text-shadow: none; transform: skewY(-4deg); filter: drop-shadow(2px 2px 0 #fff) drop-shadow(3px 3px 0 #3a0050); }
+.ad-wordart em { color: inherit; }
+.ad-postcard { flex: none; display: grid; gap: 4px; padding: 6px 6px 8px; background: #fffdf2; box-shadow: 5px 5px 0 rgba(0,0,0,.5); transform: rotate(-6deg); }
+.ad-postcard-2 { transform: rotate(5deg); }
+.ad-postcard img { width: 120px; height: auto; display: block; }
+.ad-postcard small { font: 700 11px/1.1 "Comic Sans MS", "Comic Neue", cursive; color: #c2185b; text-align: center; }
+.ad-ticket { width: min(210px, 55%); height: auto; transform: rotate(-4deg); box-shadow: 5px 5px 0 rgba(0,0,0,.45); }
+
+/* Pay-Per-Pepe: monster-truck / wrestling promo, chrome letters over flames */
+.look-fight { background: linear-gradient(to top, #ff3d00 0%, #ff9100 9%, rgba(255,145,0,0) 30%), radial-gradient(60% 70% at 50% 10%, #3b3b3b, #0a0a0a 70%); }
+.look-fight .ad-big { color: transparent; background: linear-gradient(#ffffff 0%, #b8c4d6 45%, #4b5568 50%, #dfe6f0 75%, #ffffff 100%); -webkit-background-clip: text; background-clip: text; text-shadow: none; filter: drop-shadow(0 0 2px #ff1a1a) drop-shadow(3px 3px 0 #8b0000); font-size: clamp(32px, 6vw, 56px); }
+.look-fight .ad-big em { color: transparent; background: linear-gradient(#fff7a0, #ffc400 50%, #c47a00 52%, #ffe066); -webkit-background-clip: text; background-clip: text; }
+.look-fight .ad-kick { color: #ff3b3b; font-size: clamp(17px, 2.8vw, 24px); }
+.look-fight .ptv-scene.on .ad-big { animation: ad-shake .35s 2 steps(2); }
+@keyframes ad-shake { 25% { transform: translate(-3px, 2px); } 50% { transform: translate(3px, -2px); } 75% { transform: translate(-2px, -1px); } }
+.ad-tape { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; width: 100%; }
+.ad-tape li { display: grid; gap: 2px; padding: 6px; text-align: center; background: linear-gradient(#2b2b2b, #111); border: 2px solid #ffc400; font: 600 12px/1.15 var(--f-body); text-transform: uppercase; }
+.ad-tape b { font: 400 24px/1 Impact, "Arial Black", sans-serif; color: #ffc400; }
+
+/* The Pond Telethon: stage curtain, a bulb-lit tote board stuck at zero, ringing phones */
+.look-telethon { background: linear-gradient(90deg, rgba(0,0,0,.25) 0 2%, transparent 2% 98%, rgba(0,0,0,.25) 98%), repeating-linear-gradient(90deg, #12308f 0 18px, #0b2370 18px 30px); }
+.look-telethon .ptv-stage::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 14px; z-index: 2; background: radial-gradient(circle, #fff3b0 0 4px, #ffb300 5px, transparent 6px) 0 0 / 22px 14px; }
+.ad-tote { display: flex; gap: 5px; padding: 8px; background: #111; border: 3px solid #ffb300; box-shadow: 0 0 18px rgba(255,179,0,.5); }
+.ad-tote span { display: grid; place-items: center; width: 36px; height: 50px; background: linear-gradient(#2b2b2b 49%, #000 50%, #1a1a1a 51%); color: #ffd84d; font: 400 36px/1 Impact, "Arial Black", sans-serif; }
+
+/* Madame Froggo's Psychic Hotline: midnight purple, twinkling stars, gold serif and three tarot cards */
+.look-psychic { background: radial-gradient(circle, #fff 0 1px, transparent 2px) 7px 11px / 53px 47px, radial-gradient(circle, #ffe9a8 0 1px, transparent 2px) 31px 29px / 71px 61px, radial-gradient(80% 70% at 50% 60%, #5a1a8c, #1a0433 75%); font-family: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif; }
+.look-psychic .ad-big { font-family: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif; font-style: italic; text-transform: none; color: #ffe08a; text-shadow: 0 0 14px rgba(255,200,80,.7), 2px 2px 0 #2a0040; }
+.look-psychic .ad-big em { color: #9fe6ff; }
+.look-psychic .ad-kick { font-family: "Palatino Linotype", Palatino, Georgia, serif; font-style: italic; text-transform: none; color: #d8b4ff; }
+.ad-tarot { display: flex; gap: 10px; }
+.ad-tarot span { display: grid; justify-items: center; gap: 4px; width: 78px; padding: 8px 4px; background: linear-gradient(#f7e7c0, #e3c98b); color: #3a0a55; border: 3px solid #b8892c; border-radius: 6px; font: italic 700 12px/1.1 "Palatino Linotype", Palatino, Georgia, serif; box-shadow: 0 0 12px rgba(255,210,120,.55); }
+.ad-tarot i { font-style: normal; font-size: 30px; }
+.ptv-scene.on .ad-tarot span { animation: ad-flip .6s both; }
+.ptv-scene.on .ad-tarot span:nth-child(2) { animation-delay: .4s; } .ptv-scene.on .ad-tarot span:nth-child(3) { animation-delay: .8s; }
+@keyframes ad-flip { from { transform: perspective(400px) rotateY(90deg); opacity: 0; } }
+
+@media (max-width: 760px) {
+  .ad-stamp-xl { width: 84px; height: 91px; } .ad-stampimg { width: 82px; } .ad-postcard img { width: 84px; }
+  .ad-sticker { width: 88px; height: 88px; font-size: 14px; } .ad-tape b { font-size: 18px; } .ad-tape li { font-size: 10px; }
+  .ad-tote span { width: 26px; height: 38px; font-size: 26px; } .ad-tarot span { width: 64px; } .ad-row { gap: 10px; }
+  .look-news .ptv-scene { padding-bottom: 58px; } .ad-lower { font-size: 13px; }
+  /* the styled ads carry more on a scene: a taller screen on a phone, a smaller seal and smaller headlines */
+  .ptv[class*="look-"] .ptv-stage { height: clamp(440px, 64vh, 540px); }
+  .ptv[class*="look-"] .ad-big { font-size: clamp(26px, 8.4vw, 40px); }
+  .look-shop .ptv-stage::before { width: 56px; height: 56px; font-size: 9px; }
+  .look-shop .ptv-scene, .look-tabloid .ptv-scene { padding-top: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ptv-scene.on .ad-blink, .ptv-scene.on .ad-shine, .ptv-scene.on .ad-sticker, .ptv-scene.on .ad-turntable .ad-stamp, .ptv-scene.on .ad-thump .ad-stamp,
+  .ptv-scene.on .ad-price b, .look-fight .ptv-scene.on .ad-big, .ptv-scene.on .ad-tarot span { animation: none; }
+  .ad-thump .ad-stamp { opacity: 1; } .ad-lower { transform: none; transition: none; } .ad-blur .ad-fren { filter: none; transition: none; }
+}
+
 .lan-form .lan-nick { flex: 0 1 110px; }
 .pane > .sec.off img { display: none; }   /* pictures in the hidden sections of a book window load when the section opens */
 
