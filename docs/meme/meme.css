@@ -1329,7 +1329,13 @@ footer.foot a { color: #edf3e3; }
 .icon-group-name { margin: 0 0 4px; padding: 1px 6px; align-self: flex-start; background: rgba(0, 0, 0, .45); color: #fff; font: 700 10px/1.4 var(--f-chrome); letter-spacing: .08em; text-transform: uppercase; border-radius: 2px; }
 @media (max-width: 1100px) {
   .icon-groups { display: grid; gap: 10px; }
+  /* one grid of icons, in the same order as on a PC */
   .icon-group-name { margin-bottom: 2px; }
+  .desk .icon-groups { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; }
+  .desk .icon-group, .desk .icon-group .icons { display: contents; }
+}
+@media (max-width: 760px) {
+  .desk .icon-groups { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; }
 }
 .gz-wpbox { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; align-items: start; }
 .gz-wpbox img { width: 110px; height: auto; }
@@ -1387,22 +1393,25 @@ footer.foot a { color: #edf3e3; }
 .wp-top10 li span .who, .hs-list .who { float: none; }
 /* the Recycle Bin lives in the bottom-right corner of the desktop, above the clock */
 @media (min-width: 1101px) { .desk-corner { position: fixed; z-index: 70; right: 10px; bottom: 50px; width: 92px; height: auto; margin: 0; padding: 0; list-style: none; } }
-.pondos.desk-view body .desk-corner, .pondos.desk-empty body .desk-corner { display: block !important; }
+.pondos.desk-view body .desk-corner, .pondos.desk-empty body .desk-corner { display: flex !important; }
 /* screensaver: a random meme frog bouncing off the edges */
 .saver .sv-frog { position: absolute; left: 0; top: 0; width: 200px; height: auto; border: 3px solid #fff; box-shadow: 4px 4px 0 #0008; will-change: transform; }
 /* on the other pages the bin waits behind the open window, like the rest of the desktop */
 .pondos body:not([data-page="index"]) .desk-corner { z-index: 1; }
-/* desktop icons from the top-left corner (no group names): Log On, a gap, the games in two columns,
-   the pond group lower down, NERDS ONLY alone by the Start button */
+/* desktop icons (byl's layout): two columns from the top-left corner, Internet / Pond TV / NERDS ONLY / Find
+   in the bottom-left corner, the community row at the bottom centre, mail + bin in the bottom-right corner */
 @media (min-width: 1101px) {
   .desk { top: 10px; }
   .desk .icon-groups { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 0; }
   .desk .icon-group { width: auto; }
   .desk .icon-group .icons { display: grid; grid-template-columns: repeat(2, 92px); gap: 2px; height: auto; padding: 0; }
-  .desk .g-logon { margin-bottom: 26px; }
-  .desk .g-pond { margin-top: 30px; }
-  .desk .g-nerds { margin-top: auto; }
-  .desk .g-nerds a span { font-weight: 700; letter-spacing: .04em; }
+  .desk .g-low { margin-top: auto; }
+  .desk a[href="#nerds"] span { font-weight: 700; letter-spacing: .04em; }
+  .desk-corner { width: auto; display: flex; gap: 2px; align-items: flex-end; }
+  .desk-corner li { width: 92px; height: 72px; }
+  /* the bottom rows wait behind open windows, like the rest of the desktop */
+  .desk-corner { z-index: 1; }
+  .desk-mid { right: auto; left: 50%; transform: translateX(-50%); }
 }
 /* labels stay readable on the bright sky */
 .desk .icons a span, .desk-corner a span { text-shadow: 0 0 3px #000, 1px 1px 2px #000, 0 0 6px rgba(0,0,0,.6); }
@@ -1495,6 +1504,11 @@ footer.foot a { color: #edf3e3; }
 .pondos .tray:has(.hitc-tray) .tray-moon { display: none; }
 @media (min-width: 761px) { .pondos body .hitc.hitc-page { display: none; } }
 @media (max-width: 760px) { .pondos .tray .hitc.hitc-tray { display: none; } }
+/* phone: the counter is a small row under the icon grid, right-aligned, no longer floating over the top-right corner */
+@media (max-width: 760px) {
+  .pondos body .hitc.hitc-page { position: static; z-index: auto; flex-direction: row; gap: 6px; width: max-content; margin: 6px 10px 2px auto; }
+  .pondos body .hitc.hitc-page .hitc-d i { width: 9px; font-size: 12px; line-height: 15px; }
+}
 @media (prefers-reduced-motion: no-preference) { .hitc:hover .hitc-d i { color: #7dff63; } }
 
 /* Letters to the Editor + Gazette #3 */
