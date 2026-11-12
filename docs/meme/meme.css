@@ -1797,3 +1797,29 @@ footer.foot a { color: #edf3e3; }
 @media (prefers-reduced-motion: reduce) {
   .pondos .pg-companion-button:hover img { top: -3px; }
 }
+
+/* Short, rare PepeGochi actions: no perpetual CSS loop or extra network requests. */
+.pondos .pg-companion-sleep { position: absolute; top: -7px; right: 0; z-index: 2; font: bold 12px/1 var(--f-chrome);
+  color: var(--ink); pointer-events: none; }
+.pondos .pg-companion-button[class*="pg-motion-"] img { animation: 950ms steps(1, end) both; transform-origin: 50% 95%; }
+.pondos .pg-motion-wobble img { animation-name: pgc-wobble !important; }
+.pondos .pg-motion-bob img { animation-name: pgc-bob !important; }
+.pondos .pg-motion-peek img { animation-name: pgc-peek !important; }
+.pondos .pg-motion-hop img { animation-name: pgc-hop !important; }
+.pondos .pg-motion-shuffle img { animation-name: pgc-shuffle !important; }
+.pondos .pg-motion-greet img { animation-name: pgc-greet !important; }
+.pondos .pg-motion-nod img { animation-name: pgc-nod !important; }
+.pondos .pg-motion-slouch img { animation-name: pgc-slouch !important; }
+.pondos .pg-motion-tremble img { animation-name: pgc-tremble !important; }
+@keyframes pgc-wobble { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } 75% { transform: rotate(-3deg); } }
+@keyframes pgc-bob { 0%, 100% { transform: translateY(0); } 35%, 70% { transform: translateY(-2px); } }
+@keyframes pgc-peek { 0%, 100% { transform: translateX(0); } 22%, 40% { transform: translateX(-3px); } 65%, 82% { transform: translateX(3px); } }
+@keyframes pgc-hop { 0%, 100% { transform: translateY(0); } 20% { transform: translateY(2px); } 43% { transform: translateY(-9px); } 60% { transform: translateY(-6px); } 80% { transform: translateY(1px); } }
+@keyframes pgc-shuffle { 0%, 100% { transform: translateX(0); } 22% { transform: translateX(-4px); } 48% { transform: translateX(4px); } 70% { transform: translateX(-2px); } }
+@keyframes pgc-greet { 0%, 100% { transform: rotate(0); } 25%, 65% { transform: rotate(-6deg) translateY(-2px); } 45%, 82% { transform: rotate(4deg); } }
+@keyframes pgc-nod { 0%, 100% { transform: rotate(0) translateY(0); } 30%, 68% { transform: rotate(4deg) translateY(2px); } }
+@keyframes pgc-slouch { 0%, 100% { transform: rotate(0) translateY(0); } 30%, 70% { transform: rotate(-5deg) translateY(2px); } }
+@keyframes pgc-tremble { 0%, 100% { transform: translateX(0); } 18%, 50%, 82% { transform: translateX(-2px); } 35%, 66% { transform: translateX(2px); } }
+@media (prefers-reduced-motion: reduce) {
+  .pondos .pg-companion-button[class*="pg-motion-"] img { animation: none !important; transform: none !important; }
+}
