@@ -1,0 +1,13 @@
+APPLY: 7 atlases and 6 clip roles
+  COPY sprites/moon_rocket_atlas.png
+  COPY sprites/doge_flyer_atlas.png
+  COPY sprites/silver_donkey_atlas.png
+  COPY sprites/pep_rain_atlas.png
+  COPY sprites/ban_hammer_atlas.png
+  COPY effects/doge_blast_atlas.png
+  COPY effects/donkey_impact_atlas.png
+  PATCH doge flight,explosion
+  PATCH donkey flight,explosion
+  PATCH moon flight
+  PATCH pep flight
+Copied. Review git diff, run tests, do not merge/deploy.

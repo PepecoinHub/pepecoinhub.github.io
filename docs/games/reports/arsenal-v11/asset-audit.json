@@ -1,0 +1,536 @@
+{
+  "originalPNGs": 7,
+  "runtimeRoles": 6,
+  "rows": [
+    {
+      "file": "doge_flyer_atlas.png",
+      "sha256": "9720519512be1af8aa63b9f2e007cd5903b5dc20d71dc7157bcbcbd3878d85d5",
+      "atlas": [
+        1024,
+        128
+      ],
+      "frame": [
+        128,
+        128
+      ],
+      "frames": 8,
+      "edgeFrames": [],
+      "bbox": [
+        [
+          12,
+          18,
+          124,
+          96
+        ],
+        [
+          8,
+          16,
+          124,
+          94
+        ],
+        [
+          12,
+          16,
+          124,
+          94
+        ],
+        [
+          10,
+          18,
+          124,
+          96
+        ],
+        [
+          10,
+          20,
+          124,
+          98
+        ],
+        [
+          6,
+          22,
+          124,
+          98
+        ],
+        [
+          12,
+          18,
+          124,
+          96
+        ],
+        [
+          10,
+          16,
+          124,
+          94
+        ]
+      ],
+      "pixelGrid2x2": true,
+      "registered": true,
+      "weapon": "doge",
+      "role": "flight",
+      "worldSize": [
+        44,
+        44
+      ],
+      "visibleMaxWorld": [
+        40.56,
+        26.81
+      ],
+      "anchor": [
+        64,
+        64
+      ]
+    },
+    {
+      "file": "silver_donkey_atlas.png",
+      "sha256": "de321d4dc88befa67d8c91e151ff400aa08d679cc2982224096f56ed834f80fb",
+      "atlas": [
+        1024,
+        128
+      ],
+      "frame": [
+        128,
+        128
+      ],
+      "frames": 8,
+      "edgeFrames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "bbox": [
+        [
+          22,
+          6,
+          128,
+          96
+        ],
+        [
+          24,
+          6,
+          128,
+          102
+        ],
+        [
+          22,
+          6,
+          128,
+          106
+        ],
+        [
+          26,
+          8,
+          128,
+          106
+        ],
+        [
+          24,
+          10,
+          128,
+          104
+        ],
+        [
+          24,
+          8,
+          128,
+          104
+        ],
+        [
+          22,
+          8,
+          128,
+          100
+        ],
+        [
+          22,
+          10,
+          128,
+          100
+        ]
+      ],
+      "pixelGrid2x2": true,
+      "registered": true,
+      "weapon": "donkey",
+      "role": "flight",
+      "worldSize": [
+        52,
+        52
+      ],
+      "visibleMaxWorld": [
+        43.06,
+        40.62
+      ],
+      "anchor": [
+        64,
+        64
+      ]
+    },
+    {
+      "file": "moon_rocket_atlas.png",
+      "sha256": "3aff4c83ced66009c87fb0496b4323f44e85ebf1d96648a0f09c3507d68cd937",
+      "atlas": [
+        768,
+        128
+      ],
+      "frame": [
+        128,
+        128
+      ],
+      "frames": 6,
+      "edgeFrames": [],
+      "bbox": [
+        [
+          12,
+          6,
+          116,
+          116
+        ],
+        [
+          12,
+          6,
+          116,
+          116
+        ],
+        [
+          14,
+          2,
+          114,
+          120
+        ],
+        [
+          14,
+          4,
+          116,
+          118
+        ],
+        [
+          12,
+          6,
+          116,
+          116
+        ],
+        [
+          10,
+          8,
+          116,
+          118
+        ]
+      ],
+      "pixelGrid2x2": true,
+      "registered": true,
+      "weapon": "moon",
+      "role": "flight",
+      "worldSize": [
+        35,
+        35
+      ],
+      "visibleMaxWorld": [
+        28.98,
+        32.27
+      ],
+      "anchor": [
+        64,
+        64
+      ]
+    },
+    {
+      "file": "ban_hammer_atlas.png",
+      "sha256": "fe382058cb9b41bcc9376fdec47bee536372448ff09aa3ab20fc131fc7979e3e",
+      "atlas": [
+        768,
+        128
+      ],
+      "frame": [
+        128,
+        128
+      ],
+      "frames": 6,
+      "edgeFrames": [],
+      "bbox": [
+        [
+          20,
+          8,
+          116,
+          110
+        ],
+        [
+          18,
+          10,
+          114,
+          112
+        ],
+        [
+          14,
+          10,
+          108,
+          116
+        ],
+        [
+          10,
+          4,
+          114,
+          118
+        ],
+        [
+          6,
+          2,
+          114,
+          120
+        ],
+        [
+          14,
+          10,
+          114,
+          116
+        ]
+      ],
+      "pixelGrid2x2": true,
+      "registered": false
+    },
+    {
+      "file": "pep_rain_atlas.png",
+      "sha256": "ca546a64377daa37dd44ec4c23252dbd2cea8766ed835e2d2a484045b2c93aeb",
+      "atlas": [
+        768,
+        128
+      ],
+      "frame": [
+        128,
+        128
+      ],
+      "frames": 6,
+      "edgeFrames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "bbox": [
+        [
+          10,
+          0,
+          118,
+          122
+        ],
+        [
+          10,
+          0,
+          118,
+          122
+        ],
+        [
+          10,
+          0,
+          118,
+          122
+        ],
+        [
+          10,
+          0,
+          118,
+          122
+        ],
+        [
+          10,
+          0,
+          120,
+          122
+        ],
+        [
+          2,
+          0,
+          118,
+          122
+        ]
+      ],
+      "pixelGrid2x2": true,
+      "registered": true,
+      "weapon": "pep",
+      "role": "flight",
+      "worldSize": [
+        22,
+        22
+      ],
+      "visibleMaxWorld": [
+        19.94,
+        20.97
+      ],
+      "anchor": [
+        64,
+        64
+      ]
+    },
+    {
+      "file": "doge_blast_atlas.png",
+      "sha256": "71789e8d614973b54688ea863a9d5d7733cece1522519d84b1e84118225b6aa7",
+      "atlas": [
+        1024,
+        128
+      ],
+      "frame": [
+        128,
+        128
+      ],
+      "frames": 8,
+      "edgeFrames": [
+        7
+      ],
+      "bbox": [
+        [
+          56,
+          62,
+          74,
+          76
+        ],
+        [
+          52,
+          56,
+          78,
+          82
+        ],
+        [
+          44,
+          48,
+          86,
+          90
+        ],
+        [
+          36,
+          40,
+          94,
+          98
+        ],
+        [
+          28,
+          32,
+          102,
+          106
+        ],
+        [
+          18,
+          22,
+          112,
+          116
+        ],
+        [
+          10,
+          14,
+          120,
+          124
+        ],
+        [
+          0,
+          6,
+          120,
+          110
+        ]
+      ],
+      "pixelGrid2x2": true,
+      "registered": true,
+      "weapon": "doge",
+      "role": "explosion",
+      "worldSize": [
+        108,
+        108
+      ],
+      "visibleMaxWorld": [
+        101.25,
+        92.81
+      ],
+      "anchor": [
+        64,
+        64
+      ]
+    },
+    {
+      "file": "donkey_impact_atlas.png",
+      "sha256": "454bb7570a75ec43886d06e576ad2fdd0410935fa141b3f02e58ac7395f77867",
+      "atlas": [
+        1024,
+        128
+      ],
+      "frame": [
+        128,
+        128
+      ],
+      "frames": 8,
+      "edgeFrames": [
+        7
+      ],
+      "bbox": [
+        [
+          26,
+          20,
+          108,
+          102
+        ],
+        [
+          42,
+          56,
+          88,
+          82
+        ],
+        [
+          36,
+          52,
+          94,
+          86
+        ],
+        [
+          30,
+          50,
+          100,
+          88
+        ],
+        [
+          22,
+          46,
+          108,
+          92
+        ],
+        [
+          16,
+          42,
+          114,
+          96
+        ],
+        [
+          10,
+          40,
+          120,
+          98
+        ],
+        [
+          2,
+          36,
+          128,
+          102
+        ]
+      ],
+      "pixelGrid2x2": true,
+      "registered": true,
+      "weapon": "donkey",
+      "role": "explosion",
+      "worldSize": [
+        178,
+        178
+      ],
+      "visibleMaxWorld": [
+        175.22,
+        114.03
+      ],
+      "anchor": [
+        64,
+        64
+      ]
+    }
+  ]
+}

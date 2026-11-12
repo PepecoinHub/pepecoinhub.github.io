@@ -4,11 +4,13 @@ export function validateClip(c) {
     && Array.isArray(c.frame) && c.frame.length===2 && c.frame.every(n=>Number.isInteger(n)&&n>0)
     && Number.isInteger(c.frames) && c.frames>0 && Number.isInteger(c.columns) && c.columns>0
     && Number.isFinite(c.fps) && c.fps>0 && Array.isArray(c.anchor) && c.anchor.length===2 && c.anchor.every(Number.isFinite)
+    && (c.rotationOffset===undefined || Number.isFinite(c.rotationOffset))
+    && (c.reducedFrame===undefined || Number.isInteger(c.reducedFrame)&&c.reducedFrame>=0&&c.reducedFrame<c.frames)
     && Array.isArray(c.size) && c.size.length===2 && c.size.every(n=>Number.isFinite(n)&&n>0);
 }
 export function clipFrame(c,time,reduced=false) {
   if(!validateClip(c))return null;
-  const n=reduced?0:c.loop?Math.floor(Math.max(0,time)*c.fps)%c.frames:Math.min(c.frames-1,Math.floor(Math.max(0,time)*c.fps));
+  const n=reduced?(c.reducedFrame??0):c.loop?Math.floor(Math.max(0,time)*c.fps)%c.frames:Math.min(c.frames-1,Math.floor(Math.max(0,time)*c.fps));
   return {n,sx:n%c.columns*c.frame[0],sy:Math.floor(n/c.columns)*c.frame[1],sw:c.frame[0],sh:c.frame[1],x:-c.anchor[0]*c.size[0]/c.frame[0],y:-c.anchor[1]*c.size[1]/c.frame[1],width:c.size[0],height:c.size[1]};
 }
 export const WEAPON_FALLBACK = {goldv2:'gold',megatoe:'gold',bell:'bell',frogmine:'frogmine',moon:'moon',ban:'ban',rain:'rain',pep:'rain',doge:'doge',donkey:'donkey'};

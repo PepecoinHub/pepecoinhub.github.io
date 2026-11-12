@@ -1,0 +1,66 @@
+{
+  "basePR": 281,
+  "baseCommit": "3b5296566b1cc99985c944e69836d95b76b41d99",
+  "installer": {
+    "dryRun": true,
+    "applied": true,
+    "originalPNGs": 7,
+    "roles": 6
+  },
+  "gameTests": {
+    "pass": 102,
+    "fail": 0
+  },
+  "fullNode": {
+    "total": 241,
+    "pass": 230,
+    "skip": 11,
+    "fail": 0
+  },
+  "browser": [
+    {
+      "profile": "desktop",
+      "sampledFrames": 44,
+      "rotationAngles": 8,
+      "pausedFlights": 4,
+      "restartClearsFX": true,
+      "manualDogeDetonation": true,
+      "sixPEPDrops": true,
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    },
+    {
+      "profile": "touch",
+      "sampledFrames": 44,
+      "rotationAngles": 8,
+      "pausedFlights": 4,
+      "restartClearsFX": true,
+      "manualDogeDetonation": true,
+      "sixPEPDrops": true,
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    },
+    {
+      "profile": "reduced",
+      "sampledFrames": 44,
+      "rotationAngles": 8,
+      "pausedFlights": 4,
+      "restartClearsFX": true,
+      "manualDogeDetonation": true,
+      "sixPEPDrops": true,
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    }
+  ],
+  "network": {
+    "queuedSteps": 13,
+    "midFlightReconnect": true,
+    "equalHashes": true,
+    "ammoAfterReconnect": 0,
+    "flightTimeRestored": 0.21666666666666665,
+    "physicalDeviceApproved": false,
+    "pageErrors": []
+  },
+  "physicsBalanceChanged": false,
+  "physicalDeviceApproved": false
+}

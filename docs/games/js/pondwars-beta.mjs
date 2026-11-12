@@ -1,4 +1,4 @@
-import { validateClip, clipFrame, WEAPON_FALLBACK, MAP_DECORATIONS, MAP_TINT } from './pondwars-weapon-art.mjs?v=20261112polish';
+import { validateClip, clipFrame, WEAPON_FALLBACK, MAP_DECORATIONS, MAP_TINT } from './pondwars-weapon-art.mjs?v=20261112v11';
 import { PointerHolds } from './pondwars-pointer-holds.mjs?v=20261112polish';
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
 import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112polish';
@@ -57,10 +57,10 @@ function readable(h){const [r,gr,b]=hexRGB(h);return (r*0.299+gr*0.587+b*0.114)>
 const playerArt=PLAYERS.map(p=>{const img=new Image();img.src=p.src;return img;});
 const teamPlayers=pixelPreview ? [Array(4).fill(PIXEL_PLAYER),Array(4).fill(PIXEL_PLAYER)] : [[0,1,2,3],[4,5,6,0]];
 const weaponArt=Object.fromEntries(['rocket','bat','grenade','cluster','revolver','bow','gold','mine','dynamite','drill','candles','rope','jetpack','teleport'].map(w=>{const img=new Image();img.src='img/pondwars/'+w+'.svg';return[w,img];}));
-// Clip manifest can be completed with v11 without changing the simulation or HUD.
+// v11 clips remain opt-in playtest art; simulation and HUD keep separate assets.
 const weaponClips=new Map(), flightArt={};
 for(const [id,fallback] of Object.entries(WEAPON_FALLBACK)){const image=new Image();image.src='img/pondwars/'+fallback+'.svg';flightArt[id]=image;}
-fetch('art/arsenal-polish/manifest.json').then(r=>r.json()).then(manifest=>{
+fetch('art/arsenal-polish/manifest.json?v=20261112v11').then(r=>r.json()).then(manifest=>{
   for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(c){
     if(!validateClip(c))throw new Error('Invalid weapon clip: '+id+'/'+role);
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
@@ -71,11 +71,14 @@ function drawWeaponClip(id,role,time,x,y,reduced=reduce){
   const c=weaponClips.get(id+'/'+role);if(!c?.image.naturalWidth)return false;
   const q=clipFrame(c,time,reduced);
   if(c.image.naturalWidth<c.columns*q.sw || c.image.naturalHeight<Math.ceil(c.frames/c.columns)*q.sh)return false;
-  ctx.save();ctx.translate(x,y);ctx.imageSmoothingEnabled=false;ctx.drawImage(c.image,q.sx,q.sy,q.sw,q.sh,q.x,q.y,q.width,q.height);ctx.restore();return true;
+  ctx.save();ctx.translate(x,y);ctx.rotate(c.rotationOffset??0);ctx.imageSmoothingEnabled=false;ctx.drawImage(c.image,q.sx,q.sy,q.sw,q.sh,q.x,q.y,q.width,q.height);ctx.restore();return true;
 }
 function drawWeaponEffects(){
   weaponFX=weaponFX.filter(e=>animator.time-e.time<e.life);
-  for(const e of weaponFX){const age=animator.time-e.time;ctx.save();ctx.globalAlpha=Math.min(1,(e.life-age)*2);drawWeaponClip(e.weapon,e.role,age,e.x,e.y,reduce);ctx.restore();}
+  for(const e of weaponFX){const age=animator.time-e.time;ctx.save();ctx.globalAlpha=e.authored?1:Math.min(1,(e.life-age)*2);drawWeaponClip(e.weapon,e.role,age,e.x,e.y,reduce);ctx.restore();}
+}
+function authoredExplosionAt(b){
+  return weaponFX.some(e=>e.authored&&e.role==='explosion'&&e.x===b.x&&e.y===b.y&&animator.time-e.time<e.life&&weaponClips.get(e.weapon+'/explosion')?.image.naturalWidth);
 }
 function drawFootprints(){
   if(!flightArt.goldv2.naturalWidth)return;
@@ -373,7 +376,7 @@ function shot(s) {
     }
     if(['doge','moon'].includes(s.type))ctx.rotate(Math.atan2(s.vy,s.vx));
     else if(['goldv2','megatoe','bell'].includes(s.type)&&!reduce)ctx.rotate(s.t*4);
-    if(!drawWeaponClip(s.type,'flight',s.t,0,0)){
+    if(!drawWeaponClip(s.type,'flight',s.t-(s.type==='donkey'?WEAPONS.donkey.warn:0),0,0)){
       const image=flightArt[s.type],size=s.type==='goldv2'?58:s.type==='donkey'?56:s.type==='megatoe'?12:s.type==='pep'?14:32;
       if(image?.naturalWidth){if(s.type==='megatoe')ctx.drawImage(image,11,3,16,18,-6,-7,12,14);else ctx.drawImage(image,-size/2,-size/2,size,size);}
     }
@@ -424,6 +427,7 @@ function draw(t) {
   for (const s of g.shots) shot(pose(s));
   drawParts(visualDt);
   for (const b of g.booms) {
+    if(authoredExplosionAt(b))continue; // Keep the PNG burst visible; physics/debris are unchanged.
     const k = b.t / .5;
     for(let i=0;i<12;i++){const a=i*Math.PI/6,r=b.r*(.6+k*2);ctx.fillStyle=i%2?'#e8b85c':'#674b3e';ctx.fillRect(b.x+Math.cos(a)*r,b.y+Math.sin(a)*r+35*k*k,4*(1-k),4*(1-k));}
     ctx.fillStyle = `rgba(255,${200 - k * 150},40,${1 - k})`; ctx.beginPath(); ctx.arc(b.x, b.y, b.r * (.6 + k * .9), 0, 7); ctx.fill();
@@ -544,7 +548,10 @@ function observeCharacters(events = []) {
 function events() {
   observeCharacters(g.events);
   for (const e of g.events) {
-    if(e.type==='boom'&&WEAPON_FALLBACK[e.weapon])weaponFX.push({weapon:e.weapon,role:'explosion',x:e.x,y:e.y,time:animator.time,life:e.weapon==='goldv2'?1.8:.6});
+    if(e.type==='boom'&&WEAPON_FALLBACK[e.weapon]){
+      const clip=weaponClips.get(e.weapon+'/explosion'),authored=!!clip?.src.includes('/v11/');
+      weaponFX.push({weapon:e.weapon,role:'explosion',x:e.x,y:e.y,time:animator.time,authored,life:e.weapon==='goldv2'?1.8:authored?clip.frames/clip.fps:.6});
+    }
     if(weaponFX.length>64)weaponFX.shift();
     if (e.type === 'turn') { resetSteering();closeArsenal();keys.clear();clearCharge();pending=[];remoteP=0;aimPointer=null;held.l=held.r=held.u=0; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x;
       status(isCpu(g.team) ? `${f.name} (${TEAM[g.team].name}, CPU) is thinking…` : isOnline(g.team) ? `${f.name} (${TEAM[g.team].name}) is playing on the other device…` : touchUI.matches ? `${f.name}: tap the map to aim · hold FIRE to shoot · ◀ ▶ walk · ↑ jump, twice for a backflip` : `${f.name}: A/D move · Space jump · Space ×2 backflip · Right click arsenal · Hold left click fire`); }
@@ -882,7 +889,7 @@ document.querySelectorAll('#map-packs [data-mappack]').forEach(box=>{
   if(mapPreset==='all'||mapPreset===box.dataset.mappack||(mapPreset==='1'&&box.dataset.mappack==='maps1')||(mapPreset==='2'&&box.dataset.mappack==='maps2'))box.checked=true;
   box.addEventListener('change',syncMapPacks);
 });
-const artStatus=document.createElement('p');artStatus.id='arsenal-art-status';artStatus.textContent='PLAYTEST · v11 art pending: SVG flight placeholders, v10 HUD/FX. Mobile awaiting physical-device test.';artStatus.hidden=true;$('#arsenal-packs').after(artStatus);
+const artStatus=document.createElement('p');artStatus.id='arsenal-art-status';artStatus.textContent='PLAYTEST · v11 PNG: Doge, Donkey, Moon, PEP. Ban hand calibration and Donkey warning art pending. Mobile awaits physical-device test.';artStatus.hidden=true;$('#arsenal-packs').after(artStatus);
 const presetPacks = normalizePacks(new URLSearchParams(location.search).get('packs'));
 document.querySelectorAll('#arsenal-packs [data-pack]').forEach(box => { if (presetPacks[box.dataset.pack]) box.checked = true; });
 $('#map-choice').value=opts.map;paintColors();mapPreview();syncMapPacks();artStatus.hidden=!Object.keys(readPacks()).length;

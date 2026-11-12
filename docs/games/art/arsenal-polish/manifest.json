@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "status": "v11 missing; v10 FX only; SVG flight placeholders",
+  "status": "Phase2 v11 art clips attached for QA; not production approved",
   "weapons": {
     "goldv2": {
       "flight": null,
@@ -77,7 +77,26 @@
       "explosion": null
     },
     "moon": {
-      "flight": null,
+      "flight": {
+        "src": "art/arsenal-polish/v11/sprites/moon_rocket_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 10,
+        "loop": true,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          35,
+          35
+        ],
+        "rotationOffset": 0.7853981633974483
+      },
       "activation": null,
       "explosion": null
     },
@@ -92,19 +111,111 @@
       "explosion": null
     },
     "pep": {
-      "flight": null,
+      "flight": {
+        "src": "art/arsenal-polish/v11/sprites/pep_rain_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 10,
+        "loop": true,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          22,
+          22
+        ]
+      },
       "activation": null,
       "explosion": null
     },
     "doge": {
-      "flight": null,
+      "flight": {
+        "src": "art/arsenal-polish/v11/sprites/doge_flyer_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 10,
+        "loop": true,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          44,
+          44
+        ]
+      },
       "activation": null,
-      "explosion": null
+      "explosion": {
+        "src": "art/arsenal-polish/v11/effects/doge_blast_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 14,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          108,
+          108
+        ],
+        "reducedFrame": 4
+      }
     },
     "donkey": {
-      "flight": null,
+      "flight": {
+        "src": "art/arsenal-polish/v11/sprites/silver_donkey_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 12,
+        "loop": true,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          52,
+          52
+        ]
+      },
       "activation": null,
-      "explosion": null
+      "explosion": {
+        "src": "art/arsenal-polish/v11/effects/donkey_impact_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 14,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          178,
+          178
+        ],
+        "reducedFrame": 4
+      }
     }
   }
 }
