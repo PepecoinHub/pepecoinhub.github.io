@@ -987,8 +987,25 @@
   /* ================================================================ PondOS 98 apps
      Floating windows for the mini games and the Paper hands bin, plus the easter eggs. */
   var apps = {}, appZ = 200, activeApp = null;
+  // What people use (games/supabase/update_app_opens.sql): +1 per app the first time its window opens on this
+  // page load, and 'desktop' (or 'page-price' etc.) once per visit. Only the app name is sent: no ID, no cookie, nothing stored here.
+  var counted = {};
+  function countOpen(id) {
+    var app = String(id).toLowerCase().replace(/^passport:.*/, 'passport-fren').replace(/^ad-.*/, 'ad').replace(/[^a-z0-9-]/g, '').slice(0, 32);
+    if (!app || counted[app] || !/^(www\.)?pepecoinhub\.com$/.test(location.hostname)) return;
+    counted[app] = 1;
+    try {
+      fetch('https://azbwciqfbsdpwubznncg.supabase.co/rest/v1/rpc/gry_open', {
+        method: 'POST', keepalive: true,
+        headers: { 'Content-Type': 'application/json', apikey: 'sb_publishable_GRByiqlX6v67phR8xcM6VA_6eXXwTKX' },
+        body: JSON.stringify({ p_app: app })
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  countOpen(PAGE === 'index' ? 'desktop' : 'page-' + PAGE);   // the visit itself: the desktop, or a meme page like price.html
   function openApp(id, title, icon, build, width) {
     if (apps[id]) { if (apps[id].host.classList.contains('is-min')) apps[id].restore(); else focusApp(apps[id]); return apps[id]; }
+    countOpen(id);
     var host = el('div', { class: 'app-win', role: 'dialog', 'aria-label': title });
     if (width) host.style.width = 'min(' + width + 'px, calc(100vw - 16px))';
     host.innerHTML = '<div class="win active"><div class="win-bar"><img src="' + ico(icon) + '" alt="" width="16" height="16"><span class="win-t">' + esc(title) + '</span><span class="win-ctl"><button type="button" class="w-min" title="Minimize">' + ICO.min + '<span class="sr">Minimize ' + esc(title) + '</span></button><button type="button" class="w-full" title="Full screen">' + ICO.max + '<span class="sr">Full screen ' + esc(title) + '</span></button><button type="button" class="w-x" title="Close">' + ICO.x + '<span class="sr">Close ' + esc(title) + '</span></button></span></div><div class="app-body"></div></div>';

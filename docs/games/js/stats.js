@@ -44,7 +44,8 @@ async function load(days = 30) {
         h('thead', {}, h('tr', {}, h('th', {}, 'Page'), h('th', { class: 'num' }, 'Views'), h('th', { class: 'num' }, 'People'))),
         h('tbody', {}, (d.pages || []).map((p) => h('tr', {}, h('td', {}, h('a', { href: p.path, class: 'mono' }, p.path)), h('td', { class: 'num' }, fmt(p.views)), h('td', { class: 'num' }, fmt(p.people))))))),
       h('p', { class: 'small muted' }, '"People" counts each person once per day. Over several days the same person is counted again on every day they come back, and a phone and a laptop count as two.')));
-  community(days);
+  await community(days);
+  await pondos(days);
 }
 
 // Do people come back? Counted from Pepe Guesser players (one row per player per daily photo), plus letters and chat.
@@ -68,5 +69,61 @@ async function community(days) {
         h('td', { class: 'num' }, fmt(r.players - r.new)), h('td', { class: 'num' }, fmt(r.discord)),
         h('td', { class: 'num' }, r.back_next_day == null ? '…' : `${fmt(r.back_next_day)} (${pct(r.back_next_day, r.players)})`)))))),
     h('p', { class: 'small muted' }, `${fmt(c.players_total)} different players so far. "New" = their first Pepe Guesser day. The number to watch: "Came back the next day". If it grows, people want this place; if it stays low, fix the daily game before adding more. A guest who clears the browser counts as a new player.`)));
+}
+// What people use in PondOS (games/supabase/update_app_opens.sql): window opens counted without any ID,
+// plus what people did, counted from the game tables we already have.
+const APP_NAME = {
+  desktop: 'PondOS desktop (visits)', dg: 'PEPaint', wp: 'Pepe Guesser', 'wp-folder': 'Pepe Guesser folder', 'wp-hof': 'Pepe Guesser Hall of Fame',
+  'wp-readme': 'Pepe Guesser README', 'wp-host': 'Pepe Guesser host tools', lan: 'LAN Party chat', mail: 'Frog Mail + Gazette', games: 'Games folder',
+  miner: 'Pepe Miner', yeet: 'YEET THE PEP', fud: 'FUD Invaders', snake: 'PEP Snake', pepesweeper: 'Pepe Sweeper', pondwars: 'Frogageddon (beta)',
+  pepegochi: 'PepeGochi', 'pepegochi-test': 'PepeGochi test', laptop: 'Legendary Laptop', hs: 'LEADERS', find: 'Find', tv: 'Pond TV', ads: 'PEP-TV Ads folder',
+  ad: 'PEP-TV ad', addr: 'AddressCheck', about: 'About me', logon: 'Log on', passport: 'Fren Passport (own)', 'passport-fren': "Fren Passport (someone else's)",
+  avatar: 'Avatar Maker', bin: 'Recycle Bin', notes: 'notes.txt', nerds: 'NERDS ONLY', nerdreadme: 'README_NERD',
+  'bg-chess': 'Chess', 'bg-checkers': 'Checkers', 'bg-connect4': 'Connect Four',
+};
+const appName = (a) => APP_NAME[a] || (a.startsWith('page-') ? 'Meme page: ' + a.slice(5) + '.html' : a.startsWith('bg-') ? 'Board game: ' + a.slice(3) : a);
+
+async function pondos(days) {
+  let u;
+  try { u = await be.rpc('gry_usage', { p_days: days }); }
+  catch (e) { box.append(h('section', { class: 'card' }, h('h2', {}, 'What people use in PondOS'), h('p', { class: 'small muted' }, 'Not set up yet: run games/supabase/update_app_opens.sql in Supabase.'))); return; }
+  const today = u.today, back = (n) => new Date(Date.parse(today + 'T12:00:00Z') - (n - 1) * 864e5).toISOString().slice(0, 10);
+  const d7 = back(7), d30 = back(30);
+  const apps = {};
+  for (const o of u.opens || []) {
+    const a = apps[o.app] ||= { today: 0, w: 0, m: 0 };
+    if (o.day === today) a.today += o.opens;
+    if (o.day >= d7) a.w += o.opens;
+    if (o.day >= d30) a.m += o.opens;
+  }
+  const visits = apps.desktop?.m || 0;
+  const list = Object.entries(apps).sort((a, b) => b[1].m - a[1].m || b[1].w - a[1].w);
+  const max = Math.max(1, ...list.filter(([k]) => k !== 'desktop' && !k.startsWith('page-')).map(([, v]) => v.m));
+  const meter = (v) => h('span', { style: 'display:inline-block;vertical-align:middle;width:96px' },
+    h('span', { style: `display:block;height:8px;border-radius:4px;background:var(--accent);opacity:.7;width:${Math.max(2, v / max * 90).toFixed(0)}px` }));
+  box.append(h('section', { class: 'card' }, h('h2', {}, 'What people open in PondOS'),
+    list.length ? h('div', { class: 'tscroll' }, h('table', { class: 'gtable' },
+      h('thead', {}, h('tr', {}, h('th', {}, 'Window'), h('th', { class: 'num' }, 'Today'), h('th', { class: 'num' }, '7 days'), h('th', { class: 'num' }, '30 days'), h('th', { class: 'num' }, 'Per 100 visits'))),
+      h('tbody', {}, list.map(([k, v]) => h('tr', {}, h('td', {}, k === 'desktop' || k.startsWith('page-') ? h('span', { style: 'display:inline-block;width:96px' }) : meter(v.m), appName(k)),
+        h('td', { class: 'num' }, fmt(v.today)), h('td', { class: 'num' }, fmt(v.w)), h('td', { class: 'num' }, fmt(v.m)),
+        h('td', { class: 'num' }, k === 'desktop' || k.startsWith('page-') || !visits ? '' : Math.round(v.m / visits * 100))))))) :
+      h('p', { class: 'muted' }, 'No windows counted yet. Numbers appear after the first visits to pepecoinhub.com/meme/.'),
+    h('p', { class: 'small muted' }, 'Each window counts once per page load, however often it is reopened. Nothing identifies the visitor: no ID, no cookie, no IP. "Per 100 visits": how many of 100 desktop visits opened that window (last 30 days).')));
+
+  const feats = {};
+  for (const r of u.report || []) {
+    const f = feats[r.feature] ||= { note: r.note, w: 0, m: 0, pw: 0, pm: 0, days: 0, people: r.actions == null };
+    const n = r.actions == null ? r.people : r.actions;
+    if (r.day >= d7) { f.w += n; f.pw += r.people; }
+    if (r.day >= d30) { f.m += n; f.pm += r.people; f.days += 1; }
+  }
+  const flist = Object.entries(feats).sort((a, b) => b[1].pm - a[1].pm);
+  box.append(h('section', { class: 'card' }, h('h2', {}, 'What people did (from game data)'),
+    flist.length ? h('div', { class: 'tscroll' }, h('table', { class: 'gtable' },
+      h('thead', {}, h('tr', {}, h('th', {}, 'Feature'), h('th', { class: 'num' }, '7 days'), h('th', { class: 'num' }, '30 days'), h('th', { class: 'num' }, 'Player-days, 30 d'), h('th', { class: 'num' }, 'Active days'), h('th', {}, 'Counted'))),
+      h('tbody', {}, flist.map(([k, f]) => h('tr', {}, h('td', {}, k), h('td', { class: 'num' }, fmt(f.w)), h('td', { class: 'num' }, fmt(f.m)),
+        h('td', { class: 'num' }, fmt(f.pm)), h('td', { class: 'num' }, fmt(f.days)), h('td', { class: 'small muted' }, f.note)))))) :
+      h('p', { class: 'muted' }, 'Nothing in the game tables for this period.'),
+    h('p', { class: 'small muted' }, '"Player-days": each player counted once per day they played, added up (one person playing on 5 days = 5). Sorted by it. Some tables keep only recent rows, see "Counted".')));
 }
 load();
