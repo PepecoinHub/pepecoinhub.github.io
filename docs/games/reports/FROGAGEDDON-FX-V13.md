@@ -2,7 +2,7 @@
 
 ## Zakres
 
-Osobna gałąź `feat/frogageddon-fx-v13` oparta na Draft PR #283 (`8cf0004ff50ba96dddc4f84e39398b0131d1b21d`). Przeczytano `codex/README_PL.md`. Skopiowano sześć oryginalnych PNG do ścieżek v13 i zachowano instrukcje, patch, walidację oraz sumy SHA-256 w `v13/handoff/`. Obrazów nie generowano ponownie, nie skalowano ani nie retuszowano.
+Osobna gałąź `feat/frogageddon-fx-v13` oparta na Draft PR #283 (`8cf0004ff50ba96dddc4f84e39398b0131d1b21d`). W trakcie kończenia pracy #283 został zamknięty bez scalenia (2026-11-12 12:35 UTC); jego gałąź i powyższy commit pozostały dostępne. Nowy Draft celuje w tę zachowaną gałąź, zgodnie ze zleceniem, i wymaga uwzględnienia tej zależności przy przeglądzie. Przeczytano `codex/README_PL.md`. Skopiowano sześć oryginalnych PNG do ścieżek v13 i zachowano instrukcje, patch, walidację oraz sumy SHA-256 w `v13/handoff/`. Obrazów nie generowano ponownie, nie skalowano ani nie retuszowano.
 
 Manifest scalono per broń/per rola; wcześniejsze wpisy, w tym lot Donkey v12 z anchorem [52,64], pozostają niezmienione. Top-level version przyjmuje wartość „13” z paczki, a status opisuje aktualny prototyp QA. Starsze pliki i atlasy nadal są w repozytorium. Nowe efekty działają tylko z istniejącymi packami playtest, bez zmiany klasycznego arsenału.
 
