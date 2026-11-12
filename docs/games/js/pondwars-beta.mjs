@@ -51,10 +51,16 @@ function setZoom(z, px = VW / 2, py = VH / 2) {
   const nz = Math.max(1, Math.min(ZOOM_MAX, z)); if (Math.abs(nz - zoom) < 1e-4) return;
   const wx = camL + px / zoom, wy = camT + py / zoom; zoom = nz; camL = wx - px / zoom; camT = wy - py / zoom; clampCam(); uiFor();
 }
+function dogeLeft() { const d = g?.shots.find(x => WEAPONS[x.type]?.role === 'guide'); return d ? Math.max(0, Math.ceil(WEAPONS[d.type].lifetime - d.t)) : 0; }
 function camTarget() {
   if (!g || ['menu'].includes(g.phase)) return null;
+  // Follow whatever is moving: the steered Doge, then any shot, then a frog that is flying, falling or
+  // sliding (the fastest one), then a fresh blast, and otherwise the frog whose turn it is.
   const shot = g.shots.find(x => WEAPONS[x.type]?.role === 'guide') || g.shots[0];
   if (shot) return [shot.x, Math.max(-OY, shot.y)];
+  let mover = null, best = 40;
+  for (const f of g.frogs) if (f.alive) { const v = Math.hypot(f.vx || 0, f.vy || 0); if ((!f.ground || f.rope || f.jet) && v > best) { best = v; mover = f; } }
+  if (mover) return [mover.x, mover.y - 30];
   const b = g.booms[g.booms.length - 1]; if (b) return [b.x, b.y];
   const f = me(g); return f ? [f.x, f.y - 30] : null;
 }
@@ -482,6 +488,14 @@ function draw(t) {
     ctx.fillStyle = '#000a'; ctx.fillRect(f.x - 16, f.y - 76, 32, 4); ctx.fillStyle = '#ffc05b'; ctx.fillRect(f.x - 16, f.y - 76, 32 * Math.max(0, f.jet.fuel) / 3.5, 4); }
   for (const s of g.shots) shot(pose(s));
   for (const s of g.shots) offscreenMarker(s);
+  for (const s of g.shots) if (WEAPONS[s.type]?.role === 'guide') {
+    // Doge countdown: big number above it, red and pulsing for the last two seconds.
+    const left = WEAPONS[s.type].lifetime - s.t, n = Math.max(0, Math.ceil(left)), hot = left <= 2, k = hot && !reduce ? 1 + .18 * Math.abs(Math.sin(s.t * 9)) : 1;
+    const size = Math.round(18 * ui * k);
+    ctx.font = `bold ${size}px Tahoma, Verdana, sans-serif`; ctx.textAlign = 'center';
+    ctx.lineWidth = 4; ctx.strokeStyle = '#000c'; ctx.strokeText(String(n), s.x, s.y - 26 * ui);
+    ctx.fillStyle = hot ? '#ff5a3c' : '#ffe680'; ctx.fillText(String(n), s.x, s.y - 26 * ui);
+  }
   drawParts(visualDt);
   for (const b of g.booms) {
     if(authoredExplosionAt(b))continue; // Keep the PNG burst visible; physics/debris are unchanged.
@@ -542,8 +556,10 @@ function offscreenMarker(s) {
   ctx.save(); ctx.translate(x, y); ctx.scale(ui, ui);
   ctx.fillStyle = '#000b'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-11, 15); ctx.lineTo(11, 15); ctx.closePath(); ctx.fill();
   ctx.fillStyle = '#ffe680'; ctx.beginPath(); ctx.moveTo(0, 3); ctx.lineTo(-7, 13); ctx.lineTo(7, 13); ctx.closePath(); ctx.fill();
-  ctx.font = 'bold 11px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#000'; ctx.fillText(Math.round(top - s.y) + 'm', 1, 28);
-  ctx.fillStyle = '#ffe680'; ctx.fillText(Math.round(top - s.y) + 'm', 0, 27); ctx.restore();
+  ctx.font = 'bold 11px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#000'; const guide = WEAPONS[s.type]?.role === 'guide', left = guide ? WEAPONS[s.type].lifetime - s.t : 0;
+  const label = Math.round(top - s.y) + 'm' + (guide ? ' · ' + Math.max(0, Math.ceil(left)) + 's' : '');
+  ctx.fillText(label, 1, 28);
+  ctx.fillStyle = guide && left <= 2 ? '#ff5a3c' : '#ffe680'; ctx.fillText(label, 0, 27); ctx.restore();
 }
 // The charge: a row of beads growing out of the frog along the aim, green to red, with the percentage above.
 // Empty beads stay as outlines, so the full length is visible from the first moment.
@@ -577,7 +593,7 @@ function hud() {
   $('#turn').textContent = g.phase === 'over' ? 'Game over' : `${f.name} (${TEAM[g.team].name})`;
   $('#turn').className = 't' + g.team;
   $('#turn').style.color=TEAM[g.team].band;
-  $('#timer').textContent = g.phase === 'aim' ? Math.ceil(g.timer) : g.phase === 'guide' ? 'FLY' : g.retreat>0?'RUN '+Math.ceil(g.retreat):'·';
+  $('#timer').textContent = g.phase === 'aim' ? Math.ceil(g.timer) : g.phase === 'guide' ? dogeLeft() + 's' : g.retreat>0?'RUN '+Math.ceil(g.retreat):'·';
   $('#timer').classList.toggle('low', g.phase === 'aim' && g.timer < 6);
   const wi = $('#wind i'); wi.style.width = Math.abs(g.wind) * 50 + '%'; wi.style.marginLeft = g.wind < 0 ? (50 - Math.abs(g.wind) * 50) + '%' : '50%';
   $('#wind').title = 'Wind ' + (g.wind < 0 ? '← ' : g.wind > 0 ? '→ ' : '') + Math.abs(g.wind * 10) + ': it pushes rockets';

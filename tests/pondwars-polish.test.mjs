@@ -36,8 +36,8 @@ test('Doge clock freeze is bounded by lifetime; restore mid-flight is determinis
   const g=fixture();g.mask.fill(0);g.weapon='doge';fire(g,-.2,1);Object.assign(g.shots[0],{x:600,y:140,vx:0,vy:0,heading:0,pitch:0});
   for(let i=0;i<100;i++)applyInput(g,{m:KEY.L,a:[]});
   assert.equal(g.phase,'guide');const timer=g.timer,snap=snapshot(g),copy=fixture();restoreInto(copy,snap);assert.equal(stateHash(copy),stateHash(g));
-  let ticks=100;while(g.phase==='guide'&&ticks<280){applyInput(g,{m:KEY.L,a:[]});applyInput(copy,{m:KEY.L,a:[]});ticks++;assert.equal(g.timer,timer);}
-  assert.ok(ticks<=271);assert.equal(g.shots.length,0);assert.equal(stateHash(copy),stateHash(g));assert.equal(g.ammo[0].doge,0);
+  let ticks=100;while(g.phase==='guide'&&ticks<310){applyInput(g,{m:KEY.L,a:[]});applyInput(copy,{m:KEY.L,a:[]});ticks++;assert.equal(g.timer,timer);}
+  assert.ok(ticks<=301);assert.equal(g.shots.length,0);assert.equal(stateHash(copy),stateHash(g));assert.equal(g.ammo[0].doge,0);
 });
 test('PEP rain remains six drops of eight; unsupported pack cannot spend ammo',()=>{
   const g=fixture();g.weapon='rain';fire(g,0,1,600,300);assert.equal(g.shots.length,6);assert.equal(WEAPONS.pep.damage,8);

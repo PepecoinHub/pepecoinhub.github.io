@@ -13,7 +13,7 @@ export const SCALE = {
 
 // Guided flyer. Inertia (lag) is low on purpose: heading changes faster than velocity.
 export const GUIDE = {
-  lifetime: 4.5,
+  lifetime: 5,
   turnRate: 2.8,
   pitchRate: 2.8,
   cruise: 250,
@@ -90,7 +90,7 @@ const advanced = {
   doge: {
     pack: 'advanced', ready: true, expansion: true, role: 'guide', tap: true,
     name: 'Doge Flyer', short: 'Doge', key: 'F', code: 'KeyF',
-    hud: 'STEER AFTER LAUNCH · 4.5s · ENTER OR SPACE DETONATES',
+    hud: 'STEER AFTER LAUNCH · 5s · ENTER OR SPACE DETONATES',
     fireLabel: 'LAUNCH FLYER',
     damage: 46, radius: SCALE.crater.medium, crater: SCALE.crater.medium,
     ammo: 1, power: GUIDE.launchSpeed, wind: false,

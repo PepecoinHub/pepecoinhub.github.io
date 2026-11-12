@@ -47,12 +47,12 @@ test('Doge Flyer keeps its heading until steered, and its velocity lags the nose
   assert.equal(fire(g, angle, 1), false);
 });
 
-test('Doge Flyer detonates itself when the 4.5 second lifetime runs out', () => {
+test('Doge Flyer detonates itself when the 5 second lifetime runs out', () => {
   const g = flat();
   g.weapon = 'doge';
   fire(g, -0.2, 1);
   const s = g.shots[0];
-  s.t = 4.49;
+  s.t = 4.99;
   step(g);
   assert.equal(g.shots.some(shot => shot.type === 'doge'), false);
   assert.equal(g.phase, 'settle');
