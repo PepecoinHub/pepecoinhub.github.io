@@ -663,7 +663,7 @@ export function step(g) {
       if (f && s.type === 'pickaxe') { hurt(g, f, w.damage); knock(g, f, (Math.sign(s.vx) || (f.x >= s.x ? 1 : -1)) * w.knockVx, w.knockVy); g.texts.push({ x: f.x, y: f.y - 70, text: w.cry, t: 0 }); g.events.push({ type: 'pickhit', x: s.x, y: s.y }); }
     }
     if (s.dig) { g.dirty.push(carve(g.mask, s.dig.x, s.dig.y, WEAPONS.pickaxe.crater)); g.events.push({ type: 'dig', x: s.dig.x, y: s.dig.y }); s.dig = null; }
-    if (r === 'caught') { const o = g.frogs.find(f => f.id === s.owner); if (o && g.ammo[o.team]) g.ammo[o.team].pickaxe = (g.ammo[o.team].pickaxe || 0) + 1; g.texts.push({ x: s.x, y: s.y - 20, text: 'CAUGHT', t: 0 }); g.events.push({ type: 'catch' }); g.shots.splice(g.shots.indexOf(s), 1); continue; }
+    if (r === 'caught') { const o = g.frogs.find(f => f.id === s.owner); if (o && g.ammo[o.team]) g.ammo[o.team].pickaxe = (g.ammo[o.team].pickaxe || 0) + 1; g.texts.push({ x: s.x, y: s.y - 20, text: 'CAUGHT', t: 0 }); g.events.push({ type: 'catch', x: s.x, y: s.y }); g.shots.splice(g.shots.indexOf(s), 1); continue; }
     if (s.ding) { s.ding = false; g.events.push({ type: 'bell', x: s.x, y: s.y }); g.texts.push({ x: s.x, y: s.y - 14, text: 'DING', t: 0 }); }
     if (r === 'boom') {
       if (WEAPONS[s.type].children) {

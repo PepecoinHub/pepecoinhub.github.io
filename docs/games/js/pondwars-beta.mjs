@@ -100,7 +100,7 @@ fetch('art/arsenal-polish/manifest.json?v=20261112v11').then(r=>r.json()).then(m
     if(!validateClip(c))throw new Error('Invalid weapon clip: '+id+'/'+role);
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
   }
-}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v13')).then(r=>r.json()).then(manifest=>{
+}).catch(e=>console.warn('Weapon prototype clips unavailable',e.message)).then(()=>fetch('art/arsenal-polish/v13/manifest.json?v=20261112v14')).then(r=>r.json()).then(manifest=>{
   // v13: pixel art for every weapon (flight, held, explosions). It overrides older clips of the same role.
   for(const [id,roles] of Object.entries(manifest.weapons||{}))for(const [role,c] of Object.entries(roles))if(validateClip(c)){
     const image=new Image();image.src=c.src;weaponClips.set(id+'/'+role,{...c,image});
@@ -655,6 +655,9 @@ function events() {
       const clip=weaponClips.get(e.weapon+'/explosion'),authored=/\/v1[13]\//.test(clip?.src||'');
       weaponFX.push({weapon:e.weapon,role:'explosion',x:e.x,y:e.y,time:animator.time,authored,life:e.weapon==='goldv2'?1.8:authored?clip.frames/clip.fps:.6});
     }
+    // v14 pickaxe effects: dirt where it bites, a CLANG burst on a frog, a glint when it is caught
+    const pickFX = { dig: 'dig', pickhit: 'hit', catch: 'catch' }[e.type];
+    if (pickFX) { const clip = weaponClips.get('pickaxe/' + pickFX); if (clip?.image.naturalWidth) weaponFX.push({ weapon: 'pickaxe', role: pickFX, x: e.x, y: e.y, time: animator.time, authored: true, life: clip.frames / clip.fps }); }
     if(weaponFX.length>64)weaponFX.shift();
     if (e.type === 'turn' || e.type === 'fire') camFollow = true;
     if (e.type === 'turn') { resetSteering();closeArsenal();keys.clear();clearCharge();pending=[];remoteP=0;aimPointer=null;held.l=held.r=held.u=0; const f = me(g); cpu = null; aim = f.face > 0 ? -Math.PI / 4 : -3 * Math.PI / 4; aimX = f.x;
