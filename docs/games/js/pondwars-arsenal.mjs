@@ -48,6 +48,16 @@ const simple = {
     damage: 34, radius: 28, crater: SCALE.crater.small, knock: SCALE.knock.medium,
     arm: 1, prox: 34, ammo: 3, power: 1, wind: false,
   },
+  pickaxe: {
+    pack: 'simple', ready: true, expansion: true, role: 'throw', boomerang: true,
+    name: "Miner's Pickaxe", short: 'Pickaxe', key: 'K', code: 'KeyK',
+    hud: 'SPINS · DIGS A NOTCH · COMES BACK IF IT MISSES',
+    fireLabel: 'HOLD TO THROW', cry: 'CLANG!',
+    // Hits the first frog it touches (no blast). A miss bites the ground and flies back;
+    // catching it gives the ammo back.
+    damage: 30, radius: 0, crater: 10, knockVx: 380, knockVy: -240,
+    ammo: 2, power: 560, gravity: 0.6, outTime: 1.1, returnSpeed: 430, wind: false,
+  },
 };
 
 // --- pepecoin pack: wind rocket, short hammer, falling pep drops ---

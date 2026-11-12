@@ -304,8 +304,9 @@ function fireExpansion(g, f, w, angle, power, tx, ty) {
   if (w.role === 'strike') {
     if (!spendExpansion(g, w)) return false;
     const x = Math.max(40, Math.min(W - 40, Number.isFinite(tx) ? tx : f.x));
-    const aimY = Number.isFinite(ty) ? ty : 300;
-    const ground = surfaceBelow(g.mask, x, Math.min(H - 1, Math.max(0, aimY)));
+    // The donkey comes from the sky, so it lands on the first surface at that x (a floating island
+    // above is hit, not passed through). ty is kept for the call signature only.
+    const ground = surfaceBelow(g.mask, x, 0);
     g.shots.push({ type: g.weapon, x, y: ground - 1, targetX: x, targetY: ground - 1, vx: 0, vy: 0, t: 0, warning: true, owner: f.id, ownerClear: true });
     beginShot(g);
     return true;
@@ -403,6 +404,51 @@ function stepDoge(g, s, mask, frogs) {
   if (s.x < -200 || s.x > W + 200) return 'gone';
   return '';
 }
+// Red candles: no blast. Each candle falls straight down; a frog it lands right on top of gets hurt and
+// bounced off, then the candle sinks into the ground for 2 seconds and is gone (no crater).
+export const CANDLE_SINK = 2;
+const centredOn = (f, x, y, half) => f.alive && Math.abs(f.x - x) < half && y > f.y - 58 && y < f.y + 2;
+function stepCandle(g, s, mask, frogs) {
+  if (s.sink != null) { s.sink += STEP; return s.sink >= CANDLE_SINK ? 'gone' : ''; }
+  s.vy += G * STEP;
+  const ny = s.y + s.vy * STEP, n = Math.max(1, Math.ceil(Math.abs(ny - s.y) / 2));
+  for (let i = 1; i <= n; i++) {
+    const y = s.y + (ny - s.y) * i / n;
+    const f = frogs.find(o => centredOn(o, s.x, y, 9) && !(s.hit || []).includes(o.id));
+    if (f) { s.hit = [...(s.hit || []), f.id]; s.hitNow = f.id; }
+    if (solid(mask, s.x, y)) { s.y = y; s.vy = 0; s.sink = 0; return ''; }
+  }
+  s.y = ny;
+  return s.y > WATER + 6 ? 'splash' : '';
+}
+// Miner's pickaxe: thrown with a spin. The first frog it touches takes the hit ('pickhit').
+// If it bites the ground or flies for outTime, it turns and homes back to the thrower through the terrain,
+// still able to hit anyone in the way; reaching the thrower is a catch ('caught'), which refunds it.
+function stepPickaxe(g, s, mask, frogs) {
+  const w = WEAPONS.pickaxe, owner = frogs.find(f => f.id === s.owner);
+  const touch = (x, y) => frogs.find(f => f.alive && (f.id !== s.owner || (s.ownerClear && !s.back)) && Math.abs(f.x - x) < 14 && y > f.y - 56 && y < f.y + 2);
+  if (!s.back) {
+    s.vy += G * w.gravity * STEP;
+    const nx = s.x + s.vx * STEP, ny = s.y + s.vy * STEP, n = Math.max(1, Math.ceil(Math.hypot(nx - s.x, ny - s.y) / 3));
+    for (let i = 1; i <= n; i++) {
+      const x = s.x + (nx - s.x) * i / n, y = s.y + (ny - s.y) * i / n;
+      const f = touch(x, y); if (f) { s.x = x; s.y = y; s.hitNow = f.id; return 'pickhit'; }
+      if (solid(mask, x, y)) { s.dig = { x, y }; s.back = true; s.x = s.x + (nx - s.x) * (i - 1) / n; s.y = s.y + (ny - s.y) * (i - 1) / n; return ''; }
+    }
+    s.x = nx; s.y = ny;
+    if (s.y > WATER + 6) return 'splash';
+    if (s.t >= w.outTime || s.x < -150 || s.x > W + 150) s.back = true;
+    return '';
+  }
+  if (!owner || !owner.alive) return 'gone';
+  const dx = owner.x - s.x, dy = owner.y - 30 - s.y, d = Math.hypot(dx, dy) || 1;
+  if (d < 22) return 'caught';
+  s.vx += (dx / d * w.returnSpeed - s.vx) * 5 * STEP; s.vy += (dy / d * w.returnSpeed - s.vy) * 5 * STEP;
+  const nx = s.x + s.vx * STEP, ny = s.y + s.vy * STEP, n = Math.max(1, Math.ceil(Math.hypot(nx - s.x, ny - s.y) / 3));
+  for (let i = 1; i <= n; i++) { const x = s.x + (nx - s.x) * i / n, y = s.y + (ny - s.y) * i / n, f = touch(x, y); if (f) { s.x = x; s.y = y; s.hitNow = f.id; return 'pickhit'; } }
+  s.x = nx; s.y = ny;
+  return s.t > 8 ? 'gone' : '';
+}
 function stepDonkey(g, s, mask) {
   const w = WEAPONS.donkey;
   if (s.t < w.warn) { s.x = s.targetX; s.y = s.targetY; s.vx = 0; s.vy = 0; s.warning = true; return ''; }
@@ -425,6 +471,8 @@ export function stepShot(g, s, mask = g.mask, frogs = g.frogs) {
   if(!s.ownerClear){const owner=frogs.find(f=>f.id===s.owner);if(!owner||Math.abs(s.x-owner.x)>15||s.y<owner.y-58||s.y>owner.y+2)s.ownerClear=true;}
   if (s.type === 'doge') return stepDoge(g, s, mask, frogs);
   if (s.type === 'donkey') return stepDonkey(g, s, mask);
+  if (s.type === 'candles') return stepCandle(g, s, mask, frogs);
+  if (s.type === 'pickaxe') return stepPickaxe(g, s, mask, frogs);
   s.vy += G * (w.gravity ?? 1) * STEP;
   if (w.wind) s.vx += g.wind * WIND_ACC * STEP;
   const nx = s.x + s.vx * STEP, ny = s.y + s.vy * STEP;
@@ -609,6 +657,13 @@ export function step(g) {
   }
   for (const s of g.shots.slice()) {
     const r = stepShot(g, s);
+    if (s.hitNow != null) {
+      const f = g.frogs.find(o => o.id === s.hitNow), w = WEAPONS[s.type]; s.hitNow = null;
+      if (f && s.type === 'candles') { hurt(g, f, w.damage); knock(g, f, (f.x >= s.x ? 1 : -1) * 150, -260); }
+      if (f && s.type === 'pickaxe') { hurt(g, f, w.damage); knock(g, f, (Math.sign(s.vx) || (f.x >= s.x ? 1 : -1)) * w.knockVx, w.knockVy); g.texts.push({ x: f.x, y: f.y - 70, text: w.cry, t: 0 }); g.events.push({ type: 'pickhit', x: s.x, y: s.y }); }
+    }
+    if (s.dig) { g.dirty.push(carve(g.mask, s.dig.x, s.dig.y, WEAPONS.pickaxe.crater)); g.events.push({ type: 'dig', x: s.dig.x, y: s.dig.y }); s.dig = null; }
+    if (r === 'caught') { const o = g.frogs.find(f => f.id === s.owner); if (o && g.ammo[o.team]) g.ammo[o.team].pickaxe = (g.ammo[o.team].pickaxe || 0) + 1; g.texts.push({ x: s.x, y: s.y - 20, text: 'CAUGHT', t: 0 }); g.events.push({ type: 'catch' }); g.shots.splice(g.shots.indexOf(s), 1); continue; }
     if (s.ding) { s.ding = false; g.events.push({ type: 'bell', x: s.x, y: s.y }); g.texts.push({ x: s.x, y: s.y - 14, text: 'DING', t: 0 }); }
     if (r === 'boom') {
       if (WEAPONS[s.type].children) {

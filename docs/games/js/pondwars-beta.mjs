@@ -1,7 +1,7 @@
 import { validateClip, clipFrame, WEAPON_FALLBACK, MAP_DECORATIONS, MAP_TINT } from './pondwars-weapon-art.mjs?v=20261112v11';
 import { PointerHolds } from './pondwars-pointer-holds.mjs?v=20261112polish';
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112polish';
+import { CANDLE_SINK, W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112polish';
 import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112polish';
 import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112polish';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
@@ -417,8 +417,17 @@ function drawParts(dt) {
     else { ctx.globalAlpha = Math.min(1, k * 1.5); ctx.fillStyle = p.c; ctx.fillRect(p.x - p.s / 2, p.y - p.s / 2, p.s, p.s); ctx.globalAlpha = 1; }
   }
 }
-const SPIN = { gold: 5, toe: 6, shard: 8 }, ALONG = new Set(['rocket', 'revolver', 'bow', 'drill']);
+const SPIN = { gold: 5, toe: 6, shard: 8, pickaxe: 13 }, ALONG = new Set(['rocket', 'revolver', 'bow', 'drill']);
 function shot(s) {
+  if (s.type === 'candles' && s.sink != null) {
+    // stuck candle: it slides down into the ground over CANDLE_SINK seconds, cut off at the surface
+    const k = Math.min(1, s.sink / CANDLE_SINK), depth = k * 30;
+    ctx.save(); ctx.beginPath(); ctx.rect(s.x - 30, s.y - 80, 60, 80); ctx.clip();
+    if (!drawWeaponClip('candles', 'flight', reduce ? 0 : s.t, s.x, s.y - 12 + depth)) { ctx.fillStyle = '#e0414c'; ctx.fillRect(s.x - 4, s.y - 22 + depth, 8, 20); }
+    ctx.restore();
+    if (!reduce && k < .6) { ctx.fillStyle = `rgba(120,80,50,${.6 - k})`; for (let i = -2; i <= 2; i++) ctx.fillRect(s.x + i * 5 - 1, s.y - 2 - Math.abs(Math.sin(s.sink * 9 + i)) * 4, 3, 3); }
+    return;
+  }
   ctx.save(); ctx.translate(s.x, s.y);
   if (!WEAPON_FALLBACK[s.type] && weaponClips.get(s.type + '/flight')?.image.naturalWidth) {
     if (ALONG.has(s.type)) ctx.rotate(Math.atan2(s.vy, s.vx)); else if (SPIN[s.type] && !reduce) ctx.rotate(s.t * SPIN[s.type]);
@@ -793,7 +802,7 @@ function mountExpansion(packs) {
     b.type = 'button'; b.dataset.w = w.id; b.dataset.pack = w.pack;
     b.title = w.name + ' · key ' + w.key;
     b.setAttribute('aria-label', w.name);
-    const artId={goldv2:'golden_foot_v2',bell:'bell_bomb',frogmine:'frog_mine',moon:'moon_rocket',ban:'ban_hammer',rain:'pep_rain',doge:'doge_flyer',donkey:'silver_donkey'}[w.id];
+    const artId={goldv2:'golden_foot_v2',bell:'bell_bomb',frogmine:'frog_mine',moon:'moon_rocket',ban:'ban_hammer',rain:'pep_rain',doge:'doge_flyer',donkey:'silver_donkey',pickaxe:'pickaxe'}[w.id];
     b.innerHTML = '<span class="weapon-key">'+w.key+'</span><img src="art/arsenal-polish/hud_64/'+artId+'.png" alt=""><span>'+w.short+'</span><small>QA</small>';
     b.querySelector('img').onerror=e=>{e.target.onerror=null;e.target.src='img/pondwars/'+w.id+'.svg';};
     b.addEventListener('click', () => chooseWeapon(w.id));

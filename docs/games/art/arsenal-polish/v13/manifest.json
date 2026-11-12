@@ -502,6 +502,27 @@
      60
     ]
    }
+  },
+  "pickaxe": {
+   "flight": {
+    "src": "art/arsenal-polish/v13/sprites/pickaxe_flight.png",
+    "frame": [
+     128,
+     128
+    ],
+    "columns": 1,
+    "frames": 1,
+    "fps": 1,
+    "loop": true,
+    "anchor": [
+     64,
+     64
+    ],
+    "size": [
+     34,
+     34
+    ]
+   }
   }
  },
  "held": {
@@ -664,6 +685,16 @@
    ],
    "base": 0,
    "mode": "place"
+  },
+  "pickaxe": {
+   "src": "art/arsenal-polish/v13/held/pickaxe.png",
+   "size": 34,
+   "grip": [
+    18,
+    48
+   ],
+   "base": 0.785,
+   "mode": "aim"
   }
  }
 }

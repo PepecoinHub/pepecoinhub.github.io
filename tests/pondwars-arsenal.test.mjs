@@ -22,7 +22,7 @@ const CLASSIC = {
 };
 
 test('expansion weapons are registered with the approved balance', () => {
-  assert.deepEqual(Object.keys(EXPANSION), ['goldv2', 'bell', 'frogmine', 'megatoe', 'moon', 'ban', 'rain', 'pep', 'doge', 'donkey']);
+  assert.deepEqual(Object.keys(EXPANSION), ['goldv2', 'bell', 'frogmine', 'pickaxe', 'megatoe', 'moon', 'ban', 'rain', 'pep', 'doge', 'donkey']);
   assert.equal(EXPANSION.goldv2.damage, 58);
   assert.equal(EXPANSION.goldv2.ammo, 1);
   assert.equal(EXPANSION.goldv2.crater, 66);
@@ -94,7 +94,7 @@ test('every expansion weapon has a HUD name, blurb and a unique hotkey', () => {
     keys.add(w.code);
     assert.equal(w.ready, true, id);
   }
-  assert.equal(keys.size, 8);
+  assert.equal(keys.size, 9);
 });
 
 test('a normal match keeps the classic loadout and refuses expansion weapons', () => {
@@ -120,7 +120,7 @@ test('enabling a pack grants its ammo and still does not fire scaffold weapons',
   assert.equal(g.ammo[0].frogmine, 3);
   assert.equal(g.ammo[0].bell, 2);
   assert.equal(g.ammo[0].moon, undefined);
-  assert.deepEqual(hudWeapons('simple').map(w => w.id), ['goldv2', 'bell', 'frogmine']);
+  assert.deepEqual(hudWeapons('simple').map(w => w.id), ['goldv2', 'bell', 'frogmine', 'pickaxe']);
   assert.deepEqual(hudWeapons({ pepecoin: true, advanced: 1 }).map(w => w.id), ['moon', 'ban', 'rain', 'doge', 'donkey']);
   startTurn(g);
   assert.equal(act(g, { t: 'weapon', w: 'bell' }), true);
