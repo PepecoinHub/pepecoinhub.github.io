@@ -1504,6 +1504,11 @@ footer.foot a { color: #edf3e3; }
 .pondos .tray:has(.hitc-tray) .tray-moon { display: none; }
 @media (min-width: 761px) { .pondos body .hitc.hitc-page { display: none; } }
 @media (max-width: 760px) { .pondos .tray .hitc.hitc-tray { display: none; } }
+/* phone: the counter is a small row under the icon grid, right-aligned, no longer floating over the top-right corner */
+@media (max-width: 760px) {
+  .pondos body .hitc.hitc-page { position: static; z-index: auto; flex-direction: row; gap: 6px; width: max-content; margin: 6px 10px 2px auto; }
+  .pondos body .hitc.hitc-page .hitc-d i { width: 9px; font-size: 12px; line-height: 15px; }
+}
 @media (prefers-reduced-motion: no-preference) { .hitc:hover .hitc-d i { color: #7dff63; } }
 
 /* Letters to the Editor + Gazette #3 */

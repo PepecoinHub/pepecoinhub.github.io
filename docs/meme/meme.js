@@ -2853,12 +2853,14 @@
             '<p>Best viewed in 800×600. Sign the guestbook in <b>Frog Mail</b>.</p></div></div>', [{ label: 'Write a letter', fn: function () { frogMail('write'); } }, { label: 'OK' }], 'pep-logo');
         });
         // on a computer it sits in the taskbar tray (instead of WEN MOON), so it never covers a window's buttons;
-        // on a phone a copy stays at the top of the page, under the windows
+        // on a phone a copy sits in the page flow right under the desktop icons, so it never covers an icon
+        // (FROGAGEDDON) or a window's close button
         var tr = document.querySelector('.tray'), mo = tr && tr.querySelector('.tray-moon');
         if (tr) { b.classList.add('hitc-tray'); if (mo) tr.insertBefore(b, mo); else tr.appendChild(b); }
         var b2 = b.cloneNode(true); b2.classList.remove('hitc-tray'); b2.classList.add('hitc-page');
         b2.addEventListener('click', function () { b.click(); });
-        document.body.appendChild(b2);
+        var dk = document.querySelector('nav.desk');
+        if (dk && dk.parentNode) dk.parentNode.insertBefore(b2, dk.nextSibling); else document.body.appendChild(b2);
       }, function () {});
   })();
 
