@@ -1,5 +1,5 @@
 // POND WARS: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, newGame, startTurn, step, fire, walk, hop, backflip, canMove, MAPS, makeTerrain, skip, cpuPlan, me, aliveOf, projectileOrigin, safeDirection, retreatDirection } from './pondwars-engine.mjs?v=20261104moves';
+import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, newGame, startTurn, step, fire, walk, hop, backflip, canMove, MAPS, makeTerrain, skip, cpuPlan, me, aliveOf, projectileOrigin, solid, safeDirection, retreatDirection } from './pondwars-engine.mjs?v=20261111hand';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
@@ -102,14 +102,81 @@ function frog(f, t) {
     ctx.drawImage(art,sx,sy,sw,sh,-width/2,-35,width,height);
   }
   ctx.scale(person.face,1);
-  if(turn && weaponArt[g.weapon]?.naturalWidth)ctx.drawImage(weaponArt[g.weapon],10,-6,29,29);
   ctx.restore();
+  if (turn) heldWeapon(f, bob);
   // name and health
   ctx.font = 'bold 12px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center';
   const label = f.name + ' ' + f.hp;
   ctx.fillStyle = '#000c'; ctx.fillRect(f.x - ctx.measureText(label).width / 2 - 3, f.y - 82, ctx.measureText(label).width + 6, 15);
   ctx.fillStyle = TEAM[f.team].text; ctx.fillText(label, f.x, f.y - 70);
   if (turn) { ctx.fillStyle = '#ffd400'; ctx.beginPath(); ctx.moveTo(f.x - 6, f.y - 96 + bob * 2); ctx.lineTo(f.x + 6, f.y - 96 + bob * 2); ctx.lineTo(f.x, f.y - 87 + bob * 2); ctx.fill(); }
+}
+const HOLD = {
+  rocket: { w: 32, h: 32, ox: -6, oy: -16, base: Math.PI / 4 },
+  drill: { w: 32, h: 32, ox: -6, oy: -16, base: Math.PI / 4 },
+  bat: { w: 34, h: 34, ox: -4, oy: -17, base: Math.PI / 4 },
+  revolver: { w: 30, h: 24, ox: -2, oy: -12, base: 0 },
+  bow: { w: 32, h: 28, ox: -4, oy: -14, base: 0 },
+  grenade: { w: 22, h: 26, ox: -8, oy: -22, base: 0 },
+  cluster: { w: 22, h: 26, ox: -8, oy: -22, base: 0 },
+  gold: { w: 26, h: 26, ox: -10, oy: -20, base: 0 },
+};
+const PLACE_HOLD = new Set(['mine', 'dynamite', 'candles', 'teleport', 'jetpack', 'rope']);
+function heldWeapon(f, bob = 0) {
+  const img = weaponArt[g.weapon];
+  if (!img?.naturalWidth) return;
+  const handX = f.x, handY = f.y - 32 + bob;
+  const side = Math.cos(aim) >= 0 ? 1 : -1;
+  if (PLACE_HOLD.has(g.weapon)) {
+    ctx.drawImage(img, handX + side * 14 - 13, handY - 24, 26, 26);
+    return;
+  }
+  if (['grenade', 'cluster', 'gold'].includes(g.weapon)) {
+    const h = HOLD[g.weapon];
+    ctx.save();
+    ctx.translate(handX + side * 12, handY - 2);
+    ctx.rotate(aim * .18);
+    ctx.drawImage(img, h.ox, h.oy, h.w, h.h);
+    ctx.restore();
+    return;
+  }
+  const h = HOLD[g.weapon] || { w: 28, h: 28, ox: -6, oy: -14, base: 0 };
+  ctx.save();
+  ctx.translate(handX + Math.cos(aim) * 8, handY + Math.sin(aim) * 8);
+  ctx.rotate(aim + h.base);
+  if (Math.cos(aim) < 0) ctx.scale(1, -1);
+  ctx.drawImage(img, h.ox, h.oy, h.w, h.h);
+  ctx.restore();
+}
+function aimArc(f, angle, pwr) {
+  const w = WEAPONS[g.weapon];
+  if (!w || w.utility || PLACE_HOLD.has(g.weapon) || g.weapon === 'bat') return;
+  const origin = projectileOrigin(f, angle);
+  const speed = (g.weapon === 'revolver' ? 1 : Math.max(.08, Math.min(1, pwr))) * w.power;
+  let x = origin.x, y = origin.y, vx = Math.cos(angle) * speed, vy = Math.sin(angle) * speed;
+  const grav = G * (w.gravity ?? 1);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 248, 210, 0.55)';
+  ctx.fillStyle = 'rgba(255, 210, 90, 0.9)';
+  ctx.lineWidth = 1.6;
+  ctx.setLineDash([3.5, 5.5]);
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  let hitX = x, hitY = y;
+  for (let i = 0; i < 220; i++) {
+    vy += grav * STEP;
+    if (w.wind) vx += g.wind * WIND_ACC * STEP;
+    x += vx * STEP; y += vy * STEP;
+    if (x < -20 || x > W + 20 || y > WATER + 30 || y < -80) break;
+    if (solid(g.mask, x, y)) break;
+    ctx.lineTo(x, y);
+    hitX = x; hitY = y;
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(hitX, hitY, 3.2, 0, 7); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.lineWidth = 1.2; ctx.stroke();
+  ctx.restore();
 }
 // ---------- effects: flying dirt and smoke after a blast, sparkles for the teleport ----------
 function debris(x, y, r) {
@@ -186,12 +253,16 @@ function draw(t) {
       ctx.strokeStyle = '#e0414c'; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.moveTo(aimX, 0); ctx.lineTo(aimX, WATER); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle = '#e0414c'; ctx.font = 'bold 12px Tahoma'; ctx.fillText('CANDLES DROP HERE', aimX, 18);
     } else {
-      const cx = f.x + Math.cos(aim) * 52, cy = f.y - 32 + Math.sin(aim) * 52;
+      const ox = f.x, oy = f.y - 32, dx = Math.cos(aim), dy = Math.sin(aim);
+      const cx = ox + dx * 52, cy = oy + dy * 52;
+      const p = charging || cpu?.charging ? (cpu?.charging ? cpu.p : power) : .55;
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(ox + dx * 14, oy + dy * 14); ctx.lineTo(cx, cy); ctx.stroke();
+      aimArc(f, aim, charging || cpu?.charging ? p : .55);
       ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, 7, 0, 7); ctx.moveTo(cx - 11, cy); ctx.lineTo(cx + 11, cy); ctx.moveTo(cx, cy - 11); ctx.lineTo(cx, cy + 11); ctx.stroke();
       if (charging || cpu?.charging) {
-        const p = cpu?.charging ? cpu.p : power;
         ctx.fillStyle = `hsl(${120 - p * 120} 90% 50%)`;
-        for (let i = 1; i <= 10; i++) if (i / 10 <= p) { ctx.beginPath(); ctx.arc(f.x + Math.cos(aim) * (12 + i * 4), f.y - 32 + Math.sin(aim) * (12 + i * 4), 1.5 + i * .25, 0, 7); ctx.fill(); }
+        for (let i = 1; i <= 10; i++) if (i / 10 <= p) { ctx.beginPath(); ctx.arc(ox + dx * (12 + i * 4), oy + dy * (12 + i * 4), 1.5 + i * .25, 0, 7); ctx.fill(); }
       }
     }
   }

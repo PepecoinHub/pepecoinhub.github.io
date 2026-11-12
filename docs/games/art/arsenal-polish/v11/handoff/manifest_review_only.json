@@ -1,0 +1,146 @@
+{
+  "doge": {
+    "flight": {
+      "src": "art/arsenal-polish/v11/sprites/doge_flyer_atlas.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": [
+        44,
+        44
+      ]
+    },
+    "explosion": {
+      "src": "art/arsenal-polish/v11/effects/doge_blast_atlas.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 14,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": [
+        108,
+        108
+      ]
+    }
+  },
+  "donkey": {
+    "flight": {
+      "src": "art/arsenal-polish/v11/sprites/silver_donkey_atlas.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": [
+        52,
+        52
+      ]
+    },
+    "explosion": {
+      "src": "art/arsenal-polish/v11/effects/donkey_impact_atlas.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 8,
+      "frames": 8,
+      "fps": 14,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": [
+        178,
+        178
+      ]
+    }
+  },
+  "moon": {
+    "flight": {
+      "src": "art/arsenal-polish/v11/sprites/moon_rocket_atlas.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": [
+        35,
+        35
+      ]
+    }
+  },
+  "pep": {
+    "flight": {
+      "src": "art/arsenal-polish/v11/sprites/pep_rain_atlas.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 10,
+      "loop": true,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": [
+        22,
+        22
+      ]
+    }
+  },
+  "ban": {
+    "activation": {
+      "src": "art/arsenal-polish/v11/sprites/ban_hammer_atlas.png",
+      "frame": [
+        128,
+        128
+      ],
+      "columns": 6,
+      "frames": 6,
+      "fps": 12,
+      "loop": false,
+      "anchor": [
+        64,
+        64
+      ],
+      "size": [
+        65,
+        65
+      ],
+      "review_required": "Needs hand anchoring; excluded from automatic install"
+    }
+  }
+}

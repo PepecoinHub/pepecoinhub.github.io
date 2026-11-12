@@ -1,0 +1,33 @@
+{
+  "frames": 49,
+  "palette_size": 15,
+  "atlas_size": [
+    1024,
+    896
+  ],
+  "frame_size": [
+    128,
+    128
+  ],
+  "grid": "2x2",
+  "states": {
+    "idle": 4,
+    "aim": 4,
+    "charge": 4,
+    "fire": 6,
+    "jump": 4,
+    "backflip": 4,
+    "falling": 3,
+    "landing": 4,
+    "hit": 5,
+    "victory": 6,
+    "ko": 5
+  },
+  "facing": "right",
+  "transparent": true,
+  "foot_anchor": [
+    64,
+    122
+  ],
+  "not_integrated": true
+}

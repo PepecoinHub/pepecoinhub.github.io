@@ -3,12 +3,15 @@
 // Movement and projectile ideas (bounce off the real slope, wind that drifts between turns, step-up walking,
 // slide after a knockback, speed caps, rope / jetpack / teleport / drill) are inspired by Squeak & Destroy
 // (MIT, Los Polos Amigos Kft.); the code here is our own.
+import { EXPANSION, ARSENAL_BUILD, normalizePacks, starterAmmo, packEnabled } from './pondwars-arsenal.mjs';
+import { EXPANSION_MAPS, buildExpansionMap } from './pondwars-maps.mjs';
 export const W = 1200, H = 600, WATER = 560, STEP = 1 / 60, G = 520;
 export const MAPS={
 island:{name:'Pond Island',max:4,recommended:3},
 twin:{name:'Split Decision',max:4,recommended:4},
 peaks:{name:'Croak Canyon',max:3,recommended:3},
-small:{name:'Last Lily',max:2,recommended:2}
+small:{name:'Last Lily',max:2,recommended:2},
+...EXPANSION_MAPS,
 };
 export const TURN_TIME=30, RETREAT_TIME=3, MOVE_BUDGET=160;
 export const WIND_ACC=230, STEP_UP=6, STEP_DOWN=6, ROPE_MAX=330, JET_FUEL=3.5;
@@ -34,6 +37,13 @@ export const WEAPONS = {
   jetpack: { name:'Jetpack', short:'Jetpack', radius:0, damage:0, ammo:2, power:1, utility:true },
   teleport: { name:'Teleport', short:'Teleport', radius:0, damage:0, ammo:2, power:1, utility:true },
 };
+for (const [id, spec] of Object.entries(EXPANSION)) WEAPONS[id] = spec;
+export function weaponAllowed(g, id) {
+  const w = WEAPONS[id];
+  if (!w || !('ammo' in w) || w.child) return false;
+  if (w.expansion) return packEnabled(g && g.packs, id);
+  return true;
+}
 const NAMES = [['Hopper', 'Lily', 'Ribbit', 'Pad'], ['Croak', 'Bog', 'Toady', 'Murk']];
 
 export function rng(seed) {   // mulberry32
@@ -45,6 +55,7 @@ export function rng(seed) {   // mulberry32
 
 // ---------- terrain: 1 = ground ----------
 export function makeTerrain(seed, map = 'island') {
+  if (EXPANSION_MAPS[map]) return buildExpansionMap(map, seed);
   const r = rng(seed), mask = new Uint8Array(W * H), top = new Float32Array(W);
   const waves = Array.from({ length: 4 }, (_, i) => ({ a: (60 - i * 12) * (.6 + r() * .8), f: (i + 1) * (.004 + r() * .004), p: r() * 7 }));
   const base = 330 + r() * 50;
@@ -88,7 +99,8 @@ export function normalAt(mask, x, y, r = 5) {
 function surfaceBelow(mask, x, y) { for (let yy = Math.max(0, Math.floor(y)); yy < H; yy++) if (solid(mask, x, yy)) return yy; return H; }
 
 // ---------- a new match ----------
-export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1, map = 'island' } = {}) {
+export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1, map = 'island', packs: packInput } = {}) {
+  const packs = normalizePacks(packInput);
   map=MAPS[map]?map:'island';perTeam=Math.max(2,Math.min(MAPS[map].max,Math.floor(perTeam)||MAPS[map].recommended));
   const mask = makeTerrain(seed,map), r = rng(seed ^ 0x9e3779b9), frogs = [];
   const slots=[],candidates=[];
@@ -96,19 +108,23 @@ export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1,
   for(let i=0;i<perTeam*2;i++){
     const team=i%2;
     const target=map==='twin'?(team===0?160:750)+(Math.floor(i/2)+.5)*290/perTeam:
-      map==='small'?370+(i+.5)*460/(perTeam*2):150+(i+.5)*900/(perTeam*2);
+      map==='small'?370+(i+.5)*460/(perTeam*2):
+      map==='doom'?(team===0?160:940)+Math.floor(i/2)*70:
+      map==='farm'?(team===0?120:720)+(Math.floor(i/2)+.5)*380/perTeam:
+      150+(i+.5)*900/(perTeam*2);
     const available=candidates.filter(p=>slots.every(q=>Math.abs(q.x-p.x)>=58));
     available.sort((a,b)=>Math.abs(a.x-target)-Math.abs(b.x-target));
     if(!available.length)throw new Error('Map has insufficient safe spawn locations');
     slots.push(available[0]);
   }
-  if(map!=='twin')for(let i=slots.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[slots[i],slots[j]]=[slots[j],slots[i]];}
+  if(map!=='twin'&&!MAPS[map].split)for(let i=slots.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[slots[i],slots[j]]=[slots[j],slots[i]];}
   for(let i=0;i<perTeam*2;i++){
     const team=i%2,{x,y}=slots[i];
     frogs.push({ id: i, team, name: NAMES[team][Math.floor(i / 2)], x, y, vx: 0, vy: 0, hp: 100, alive: true, ground: true, face: x < W / 2 ? 1 : -1, fallFrom: y, gone: '' });
   }
+  const ammo = [0, 1].map(() => starterAmmo(packs));
   return { seed, map, perTeam, mask, mines:[], retreat:0, movement:MOVE_BUDGET, frogs, shots: [], booms: [], texts: [], dirty: [], cpu, level, turn: 0, team: 0, next: [0, 0], current: 0,
-    wind: 0, weapon: 'grenade', ammo: [0, 1].map(() => ({candles:1,cluster:4,gold:1,mine:3,dynamite:2,drill:2,rope:5,jetpack:2,teleport:2})), ctl:{x:0,y:0}, pistolShots:0, phase: 'aim', timer: TURN_TIME, settle: 0, winner: null, rand: r, events: [] };
+    ...(Object.keys(packs).length?{arsenalBuild:ARSENAL_BUILD}:{}), wind: 0, weapon: 'grenade', ammo, packs, ctl:{x:0,y:0}, pistolShots:0, phase: 'aim', timer: TURN_TIME, settle: 0, winner: null, rand: r, events: [] };
 }
 export function aliveOf(g, team) { return g.frogs.filter(f => f.alive && f.team === team); }
 export function startTurn(g) {
@@ -176,6 +192,10 @@ export function backflip(g) {
 export function fire(g, angle, power, tx, ty) {
   const f = me(g), w = WEAPONS[g.weapon];
   if (g.phase !== 'aim' || !f.alive || !w || !Number.isFinite(angle) || !Number.isFinite(power)) return false;
+  if (w.expansion) {
+    if (!weaponAllowed(g, g.weapon) || w.ready === false) return false;
+    return fireExpansion(g, f, w, angle, power, tx, ty);
+  }
   if (w.utility) return useUtility(g, f, angle, tx, ty);
   f.rope = null; f.jet = null;
   if (g.pistolShots && g.weapon !== 'revolver') return false;
@@ -210,6 +230,99 @@ export function fire(g, angle, power, tx, ty) {
     f.face = Math.cos(angle) >= 0 ? 1 : -1;
   }
   g.phase = 'fire'; g.events.push({ type: 'fire', weapon: g.weapon }); return true;
+}
+function spendExpansion(g, w) {
+  if (!Number.isFinite(w.ammo)) return true;
+  if (!(g.ammo[g.team][g.weapon] > 0)) return false;
+  g.ammo[g.team][g.weapon]--;
+  return true;
+}
+function beginShot(g) {
+  const f = me(g);
+  f.rope = null; f.jet = null;
+  g.retreat = RETREAT_TIME;
+  g.movement = 90;
+  g.phase = 'fire';
+  g.events.push({ type: 'fire', weapon: g.weapon });
+}
+// Melee, placed and thrown expansion weapons. Later packs add roles before the final return.
+function fireExpansion(g, f, w, angle, power, tx, ty) {
+  if (w.role === 'melee') {
+    if (!spendExpansion(g, w)) return false;
+    const dir = Math.cos(angle) >= 0 ? 1 : -1;
+    f.face = dir;
+    g.texts.push({ x: f.x + dir * 28, y: f.y - 28, text: w.cry || 'WHACK!', t: 0, team: f.team });
+    for (const target of g.frogs) {
+      if (!target.alive || target.id === f.id) continue;
+      if ((target.x - f.x) * dir < 0) continue;
+      if (Math.hypot(target.x - f.x, target.y - f.y) >= w.range) continue;
+      hurt(g, target, w.damage);
+      target.vx += dir * w.knockVx;
+      target.vy += w.knockVy;
+      target.ground = false;
+      target.fallFrom = target.y;
+    }
+    if (w.crater > 0) g.dirty.push(carve(g.mask, f.x + dir * 36, f.y + 2, w.crater));
+    g.booms.push({ x: f.x + dir * 30, y: f.y - 8, r: Math.max(6, w.crater || 8), t: 0 });
+    beginShot(g);
+    return true;
+  }
+  if (w.role === 'mine') {
+    if (!spendExpansion(g, w)) return false;
+    g.mines.push({ type: g.weapon, x: f.x + f.face * 22, y: f.y - 4, vx: 0, vy: 0, t: 0 });
+    beginShot(g);
+    return true;
+  }
+  if (w.role === 'salvo') {
+    if (!spendExpansion(g, w)) return false;
+    const x = Math.max(40, Math.min(W - 40, Number.isFinite(tx) ? tx : f.x));
+    const n = w.count, child = WEAPONS[w.childType];
+    for (let i = 0; i < n; i++) {
+      g.shots.push({ type: w.childType, x: x + (i - (n - 1) / 2) * w.spread, y: -20 - (i % 3) * 34, vx: 0, vy: child.power, t: 0, owner: f.id, ownerClear: true });
+    }
+    beginShot(g);
+    return true;
+  }
+  if (w.role === 'throw' || w.role === 'rocket') {
+    if (!spendExpansion(g, w)) return false;
+    g.shots.push(makeProjectile(f, g.weapon, angle, power));
+    f.face = Math.cos(angle) >= 0 ? 1 : -1;
+    beginShot(g);
+    return true;
+  }
+  if (w.role === 'guide') {
+    if (!spendExpansion(g, w)) return false;
+    const speed = w.power;
+    g.shots.push({ type: g.weapon, ...projectileOrigin(f, angle), vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, heading: angle, pitch: Math.max(-1.1, Math.min(1.1, angle)), t: 0, owner: f.id, ownerClear: false });
+    f.face = Math.cos(angle) >= 0 ? 1 : -1;
+    f.rope = null; f.jet = null;
+    g.retreat = 0;
+    g.phase = 'guide';
+    g.events.push({ type: 'fire', weapon: g.weapon });
+    return true;
+  }
+  if (w.role === 'strike') {
+    if (!spendExpansion(g, w)) return false;
+    const x = Math.max(40, Math.min(W - 40, Number.isFinite(tx) ? tx : f.x));
+    const aimY = Number.isFinite(ty) ? ty : 300;
+    const ground = surfaceBelow(g.mask, x, Math.min(H - 1, Math.max(0, aimY)));
+    g.shots.push({ type: g.weapon, x, y: ground - 1, targetX: x, targetY: ground - 1, vx: 0, vy: 0, t: 0, warning: true, owner: f.id, ownerClear: true });
+    beginShot(g);
+    return true;
+  }
+  return false;
+}
+export function detonateGuided(g) {
+  if (g.phase !== 'guide') return false;
+  const i = g.shots.findIndex(s => WEAPONS[s.type]?.role === 'guide');
+  if (i < 0) return false;
+  const s = g.shots[i];
+  explode(g, s.x, s.y, s.type, s.vx, s.vy);
+  g.shots.splice(i, 1);
+  g.phase = 'settle';
+  g.settle = .9;
+  g.events.push({ type: 'detonate' });
+  return true;
 }
 // ---------- utilities: rope, jetpack, teleport (the turn goes on) ----------
 function useUtility(g, f, angle, tx, ty) {
@@ -259,12 +372,50 @@ function clearSpot(g, x, y) {
   return null;
 }
 export function skip(g) { if (g.phase === 'aim') { g.phase = 'settle'; g.settle = .4; } }
+function stepDoge(g, s, mask, frogs) {
+  const w = WEAPONS.doge, ctl = g.ctl || { x: 0, y: 0 };
+  s.heading += ctl.x * w.turnRate * STEP;
+  s.pitch = Math.max(-1.1, Math.min(1.1, (s.pitch || 0) + ctl.y * w.pitchRate * STEP));
+  const wantX = Math.cos(s.heading) * w.cruise, wantY = Math.sin(s.pitch) * w.cruise;
+  s.vx += (wantX - s.vx) * w.lag * STEP;
+  s.vy += (wantY - s.vy) * w.lag * STEP;
+  s.vy += G * w.guideGravity * STEP;
+  const nx = s.x + s.vx * STEP, ny = s.y + s.vy * STEP;
+  const n = Math.max(1, Math.ceil(Math.hypot(nx - s.x, ny - s.y) / 3));
+  for (let i = 1; i <= n; i++) {
+    const x = s.x + (nx - s.x) * i / n, y = s.y + (ny - s.y) * i / n;
+    if (solid(mask, x, y) || frogs.some(f => f.alive && (f.id !== s.owner || s.ownerClear) && Math.abs(f.x - x) < 15 && y > f.y - 58 && y < f.y + 2)) {
+      s.x = x; s.y = y; return 'boom';
+    }
+  }
+  s.x = nx; s.y = ny;
+  if (s.t >= w.lifetime) return 'boom';
+  if (s.y > WATER + 6) return 'splash';
+  if (s.x < -200 || s.x > W + 200) return 'gone';
+  return '';
+}
+function stepDonkey(g, s, mask) {
+  const w = WEAPONS.donkey;
+  if (s.t < w.warn) { s.x = s.targetX; s.y = s.targetY; s.vx = 0; s.vy = 0; s.warning = true; return ''; }
+  if (s.warning) { s.warning = false; s.x = s.targetX; s.y = Math.max(8, s.targetY - w.drop); s.vy = 60; s.vx = 0; }
+  s.vy += G * w.strikeGravity * STEP;
+  const ny = s.y + s.vy * STEP, steps = Math.max(1, Math.ceil(Math.abs(ny - s.y)));
+  for (let i = 1; i <= steps; i++) {
+    const y = s.y + (ny - s.y) * i / steps;
+    if (solid(mask, s.x, y) || y >= s.targetY) { s.y = y; return 'boom'; }
+  }
+  s.y = ny;
+  if (s.y > WATER + 6) return 'splash';
+  return '';
+}
 
 // ---------- simulation ----------
 export function stepShot(g, s, mask = g.mask, frogs = g.frogs) {
   const w = WEAPONS[s.type];
   s.t += STEP;
   if(!s.ownerClear){const owner=frogs.find(f=>f.id===s.owner);if(!owner||Math.abs(s.x-owner.x)>15||s.y<owner.y-58||s.y>owner.y+2)s.ownerClear=true;}
+  if (s.type === 'doge') return stepDoge(g, s, mask, frogs);
+  if (s.type === 'donkey') return stepDonkey(g, s, mask);
   s.vy += G * (w.gravity ?? 1) * STEP;
   if (w.wind) s.vx += g.wind * WIND_ACC * STEP;
   const nx = s.x + s.vx * STEP, ny = s.y + s.vy * STEP;
@@ -277,7 +428,13 @@ export function stepShot(g, s, mask = g.mask, frogs = g.frogs) {
       const x=s.x+dx,y=s.y+dy;
       if(!solid(mask,x,y)){s.x=x;s.y=y;continue;}
       const n=normalAt(mask,s.x,s.y,5),vn=s.vx*n.x+s.vy*n.y;
-      if(vn<0){const tx=s.vx-vn*n.x,ty=s.vy-vn*n.y;s.vx=tx*.82-vn*.45*n.x;s.vy=ty*.82-vn*.45*n.y;}
+      if (vn < 0) {
+        const tx = s.vx - vn * n.x, ty = s.vy - vn * n.y;
+        const rest = w.bell ? 0.92 : 0.82, bounce = w.bell ? 0.55 : 0.45;
+        s.vx = tx * rest - vn * bounce * n.x;
+        s.vy = ty * rest - vn * bounce * n.y;
+        if (w.bell && vn < -40) s.ding = true;
+      }
       if(Math.hypot(s.vx,s.vy)<28&&solid(mask,s.x,s.y+2)){s.vx*=.5;s.vy=0;}
       if(solid(mask,s.x,s.y)){s.x+=n.x;s.y+=n.y;}
       break;
@@ -318,9 +475,10 @@ export function explode(g, x, y, type, vx = 0, vy = 0) {
     if(target){hurt(g,target,w.damage);const dir=Math.sign(vx)||(target.x>=x?1:-1);knock(g,target,dir*(type==='bow'?140:110),-100);}
     g.dirty.push(carve(g.mask,x,y,w.radius));g.booms.push({x,y,r:5,t:0});g.events.push({type:'boom'});return;
   }
-  g.dirty.push(carve(g.mask, x, y, w.radius));
+  const hole = w.crater ?? w.radius;
+  g.dirty.push(carve(g.mask, x, y, hole));
   g.booms.push({ x, y, r: w.radius, t: 0 });
-  g.events.push({ type: 'boom', x, y, r: w.radius });
+  g.events.push({ type: 'boom', weapon:type, x, y, r: w.radius });
   const reach = w.reach ?? w.radius * 1.7, carry = Math.max(-80, Math.min(80, vx * .14));
   for (const f of g.frogs) {
     if (!f.alive) continue;
@@ -330,7 +488,7 @@ export function explode(g, x, y, type, vx = 0, vy = 0) {
     hurt(g, f, dmg);
     // Away from the blast, at least a little sideways (a hit from straight above still moves the frog),
     // plus the shell's own momentum: a rocket from the left shoves the frog to the right.
-    const push = 260 * k + 60, away = Math.abs(dx) > 3 ? Math.sign(dx) : Math.sign(vx) || (f.x >= x ? 1 : -1);
+    const push = (260 * k + 60) * (w.knock ?? 1), away = Math.abs(dx) > 3 ? Math.sign(dx) : Math.sign(vx) || (f.x >= x ? 1 : -1);
     const side = d && Math.abs(dx / d) > .25 ? dx / d : away * .25;
     knock(g, f, side * push + carry * k, -(150 * k + 90));
   }
@@ -434,15 +592,18 @@ export function step(g) {
     m.t+=STEP;
     if(!solid(g.mask,m.x,m.y+3)){m.vy+=G*STEP;m.y+=m.vy*STEP;}else m.vy=0;
     if(m.y>WATER){g.mines.splice(g.mines.indexOf(m),1);continue;}
-    if(m.t>1 && g.frogs.some(f=>f.alive&&Math.hypot(f.x-m.x,f.y-m.y)<32)){
-      explode(g,m.x,m.y,'mine');g.mines.splice(g.mines.indexOf(m),1);
+    const spec = WEAPONS[m.type] || WEAPONS.mine;
+    const arm = spec.arm ?? 1, prox = spec.prox ?? 32;
+    if(m.t>arm && g.frogs.some(f=>f.alive&&Math.hypot(f.x-m.x,f.y-m.y)<prox)){
+      explode(g,m.x,m.y,m.type||'mine');g.mines.splice(g.mines.indexOf(m),1);
     }
   }
   for (const s of g.shots.slice()) {
     const r = stepShot(g, s);
+    if (s.ding) { s.ding = false; g.events.push({ type: 'bell', x: s.x, y: s.y }); g.texts.push({ x: s.x, y: s.y - 14, text: 'DING', t: 0 }); }
     if (r === 'boom') {
       if (WEAPONS[s.type].children) {
-        const type=s.type==='gold'?'toe':'shard';
+        const type=WEAPONS[s.type].childType ?? (s.type==='gold'?'toe':'shard');
         for(let i=0;i<5;i++){const a=-Math.PI+(i+.5)*Math.PI/5;g.shots.push({type,x:s.x,y:s.y-5,vx:Math.cos(a)*(160+g.rand()*100),vy:Math.sin(a)*240-60,t:0});}
       }
       explode(g, s.x, s.y, s.type, s.vx, s.vy); g.shots.splice(g.shots.indexOf(s), 1); }
@@ -464,6 +625,8 @@ export function step(g) {
     g.timer -= STEP;
     if (!me(g).alive) { g.phase = 'settle'; g.settle = .6; }
     else if (g.timer <= 0) { g.phase = 'settle'; g.settle = .3; g.events.push({ type: 'timeout' }); }
+  } else if (g.phase === 'guide') {
+    if (!g.shots.some(s => WEAPONS[s.type]?.role === 'guide')) { g.phase = 'settle'; g.settle = .9; }
   } else if (g.phase === 'fire') {
     if(g.weapon==='revolver'&&g.pistolShots===1)g.timer=Math.max(0,g.timer-STEP);
     g.retreat=Math.max(0,g.retreat-STEP);

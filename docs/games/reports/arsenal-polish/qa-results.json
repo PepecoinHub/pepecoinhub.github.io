@@ -1,0 +1,47 @@
+{
+  "gameTests": {
+    "pass": 98,
+    "fail": 0
+  },
+  "fullNode": {
+    "total": 237,
+    "pass": 226,
+    "skipped": 11,
+    "fail": 0
+  },
+  "browser": [
+    {
+      "profile": "desktop",
+      "weapons": 8,
+      "touch": "synthetic ownership + keyboard",
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    },
+    {
+      "profile": "touch",
+      "weapons": 8,
+      "touch": "CDP two fingers + FIRE",
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    },
+    {
+      "profile": "reduced",
+      "weapons": 8,
+      "touch": "synthetic ownership + keyboard",
+      "pageErrors": [],
+      "physicalDeviceApproved": false
+    }
+  ],
+  "network": {
+    "queuedSteps": 13,
+    "midFlightReconnect": true,
+    "equalHashes": true,
+    "ammoAfterReconnect": 0,
+    "flightTimeRestored": 0.21666666666666665,
+    "physicalDeviceApproved": false,
+    "pageErrors": []
+  },
+  "balanceRounds": 24300,
+  "v11Available": false,
+  "physicalDeviceApproved": false
+}

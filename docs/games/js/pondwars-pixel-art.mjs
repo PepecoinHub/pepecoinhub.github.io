@@ -1,0 +1,44 @@
+import { STATES, validateManifest, spriteFrame } from './pondwars-animation.mjs?v=20261112pixel';
+
+// QA metadata is separate from the supplied, unchanged artist manifest.
+export function compilePixelManifest(source, anchors, { frameCount = 49 } = {}) {
+  if (!validateManifest(source) || source.frameSize[0] !== 128 || source.frameSize[1] !== 128 ||
+      STATES.some(state => !source.clips[state]) || anchors?.version !== 1 || !Array.isArray(anchors.frames)) throw new Error('Invalid pixel QA manifest');
+  const measured = new Map(anchors.frames.map(f => [f.rect.join(','), f]));
+  let count = 0;
+  const pair = a => Array.isArray(a) && a.length === 2 && a.every(n => Number.isFinite(n) && n >= 0 && n <= 128);
+  const clips = Object.fromEntries(Object.entries(source.clips).map(([state, clip]) => [state, { ...clip,
+    frames: clip.frames.map((frame, index) => {
+      count++;
+      const q = measured.get(frame.rect.join(',')), [x,y,w,h] = frame.rect;
+      if (frame.foot[0] !== 64 || frame.foot[1] !== 122 || !q || q.state !== state || q.index !== index || !pair(q.head) || !pair(q.hand) ||
+          !Array.isArray(q.helmetRect) || q.helmetRect.length !== 4 || !q.helmetRect.every(Number.isFinite) ||
+          q.helmetRect[0] < x || q.helmetRect[1] < y || q.helmetRect[2] <= 0 || q.helmetRect[3] <= 0 ||
+          q.helmetRect[0]+q.helmetRect[2] > x+w || q.helmetRect[1]+q.helmetRect[3] > y+h ||
+          q.head[0] !== q.helmetRect[0]-x+q.helmetRect[2]/2 || q.head[1] !== q.helmetRect[1]-y+q.helmetRect[3]/2) throw new Error('Invalid pixel frame anchors');
+      return { ...frame, hand: q.hand, head: q.head, helmetRect: q.helmetRect };
+    }) }]));
+  if (count !== frameCount || measured.size !== count || anchors.frames.length !== count) throw new Error('Pixel frame count mismatch');
+  return { ...source, clips };
+}
+
+// Authored limbs/face already contain motion. Keep only the existing KO fade.
+export const authoredPose = (p, f, imageKey) => ({ ...p,
+  // A hit may interrupt the visual state; never restart the same physical flip.
+  ...(imageKey === 'pixel-v06' && p.state === 'backflip' && Number.isFinite(f?.flipT) ? { age:f.flipT } : {}),
+  dx: 0, dy: 0, rotation: 0, sx: 1, sy: 1 });
+export const clipDuration = (manifest, state) => manifest.clips[state].frames.length / manifest.clips[state].fps;
+export function pixelHelmet(frame, imageKey = 'pixel-v04') {
+  const scale = 64 / frame.rect[3], [,,w,h] = frame.helmetRect;
+  const center = { x: (frame.head[0]-frame.foot[0])*scale, y: (frame.head[1]-frame.foot[1])*scale };
+  return { imageKey, rect: frame.helmetRect, width: w*scale, height: h*scale, center,
+    x: center.x-w*scale/2, y: center.y-h*scale/2 };
+}
+
+export function pixelFrame(asset, pose, reduced = false) {
+  // Eight authored frames cover 0..315 degrees. Complete the turn upright,
+  // rather than holding the 315-degree frame for the remaining airborne time.
+  const age = asset.imageKey === 'pixel-v06' && pose.state === 'backflip' &&
+    pose.age >= clipDuration(asset.manifest, 'backflip') ? 0 : pose.age;
+  return spriteFrame(asset.manifest, pose.state, age, reduced);
+}

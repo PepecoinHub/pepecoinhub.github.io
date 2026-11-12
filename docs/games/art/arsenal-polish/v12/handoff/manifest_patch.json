@@ -1,0 +1,25 @@
+{
+  "weapons": {
+    "donkey": {
+      "flight": {
+        "src": "art/arsenal-polish/v12/sprites/silver_donkey_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 12,
+        "loop": true,
+        "anchor": [
+          52,
+          64
+        ],
+        "size": [
+          52,
+          52
+        ]
+      }
+    }
+  }
+}

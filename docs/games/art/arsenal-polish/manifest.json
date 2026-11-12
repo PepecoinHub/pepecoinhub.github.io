@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "status": "Phase2 v11 art clips attached for QA; not production approved",
+  "weapons": {
+    "goldv2": {
+      "flight": null,
+      "activation": null,
+      "explosion": {
+        "src": "art/arsenal-polish/effects/golden_foot_impact_sheet.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 10,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          128,
+          128
+        ]
+      }
+    },
+    "megatoe": {
+      "flight": null,
+      "activation": null,
+      "explosion": null
+    },
+    "bell": {
+      "flight": null,
+      "activation": {
+        "src": "art/arsenal-polish/effects/bell_bounce_sheet.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 10,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          32,
+          32
+        ]
+      },
+      "explosion": null
+    },
+    "frogmine": {
+      "flight": null,
+      "activation": {
+        "src": "art/arsenal-polish/effects/frog_mine_arm_sheet.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 10,
+        "loop": false,
+        "anchor": [
+          64,
+          100
+        ],
+        "size": [
+          28,
+          28
+        ]
+      },
+      "explosion": null
+    },
+    "moon": {
+      "flight": {
+        "src": "art/arsenal-polish/v11/sprites/moon_rocket_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 10,
+        "loop": true,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          35,
+          35
+        ],
+        "rotationOffset": 0.7853981633974483
+      },
+      "activation": null,
+      "explosion": null
+    },
+    "ban": {
+      "flight": null,
+      "activation": null,
+      "explosion": null
+    },
+    "rain": {
+      "flight": null,
+      "activation": null,
+      "explosion": null
+    },
+    "pep": {
+      "flight": {
+        "src": "art/arsenal-polish/v11/sprites/pep_rain_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 6,
+        "frames": 6,
+        "fps": 10,
+        "loop": true,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          22,
+          22
+        ]
+      },
+      "activation": null,
+      "explosion": null
+    },
+    "doge": {
+      "flight": {
+        "src": "art/arsenal-polish/v11/sprites/doge_flyer_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 10,
+        "loop": true,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          44,
+          44
+        ]
+      },
+      "activation": null,
+      "explosion": {
+        "src": "art/arsenal-polish/v11/effects/doge_blast_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 14,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          108,
+          108
+        ],
+        "reducedFrame": 4
+      }
+    },
+    "donkey": {
+      "flight": {
+        "src": "art/arsenal-polish/v12/sprites/silver_donkey_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 12,
+        "loop": true,
+        "anchor": [
+          52,
+          64
+        ],
+        "size": [
+          52,
+          52
+        ]
+      },
+      "activation": null,
+      "explosion": {
+        "src": "art/arsenal-polish/v11/effects/donkey_impact_atlas.png",
+        "frame": [
+          128,
+          128
+        ],
+        "columns": 8,
+        "frames": 8,
+        "fps": 14,
+        "loop": false,
+        "anchor": [
+          64,
+          64
+        ],
+        "size": [
+          178,
+          178
+        ],
+        "reducedFrame": 4
+      }
+    }
+  }
+}

@@ -37,6 +37,10 @@ Players said they could not tell which frog belonged to which team: both teams s
 - **Reduced-motion fallback:** the glow pulse and pennant wave only animate when `prefers-reduced-motion` is off; otherwise they render static.
 - No gameplay/physics change and no change to team numbering (team stays 0=PEP, 1=FUD). Cache-bust tag bumped to `v=20261106a` across `pondwars-beta.mjs`, `pondwars-beta-net.mjs` and `pondwars-beta.html`.
 
+## Hand-height weapons + aim preview (2026-11-11)
+
+Weapons used to be `drawImage`’d at `(10, -6)` inside the character transform, so the art hung near the frog’s feet while shots still left from `projectileOrigin` (`f.y - 32`). Held weapons now draw in world space at hand height and rotate with `aim` (placeables/utilities stay as a hand-side icon). Ballistic aiming also gets a dotted trajectory preview that mirrors gravity/wind, plus a soft guide line to the crosshair. Desktop HUD shows the power/angle strip again. Cache-bust: `v=20261111hand`.
+
 ## Online groundwork
 
 `js/pondwars-beta-net.mjs` (no DOM, runs in Node):
@@ -47,6 +51,10 @@ Players said they could not tell which frog belonged to which team: both teams s
 - Two-tab test, nothing leaves the device: open `pondwars-beta.html?net=host` and `pondwars-beta.html?net=join` in two tabs of the same browser (optional `&room=name`).
 
 Not done yet: a real network transport (a Supabase Realtime channel only needs `send` and `onmessage`; the page CSP must then allow the Supabase `wss:` origin), rooms/invites, reconnecting after a dropped connection, and a turn timeout for a peer who disappears. The peer is trusted for its own turns, so ranked play would need server-side checks.
+
+## Expansion arsenal (playtest, off by default)
+
+Eight new weapons are registered in `js/pondwars-arsenal.mjs` with their damage, ammo, crater and knockback. A normal match does not grant them and the CPU still chooses from the classic shortlist. The menu fieldset "PLAYTEST ARSENAL" (or `?packs=simple`, `pepecoin`, `advanced`, or `all`) shows that pack in the arsenal. The simple, Pepecoin, and advanced packs are playable when their checkboxes are on. Pepecoin adds Moon Rocket (wind, two shots), Ban Hammer (short yeet, no crater) and Pep Rain (six drops of about 8). Advanced adds Doge Flyer (steer for 4.5 seconds, then Enter, Space, or FIRE detonates) and Silver Donkey (a warned heavy strike from above). Classic weapon stats are untouched. Map pack 1 (menu checkbox, or `?maps=1`) adds Moon Base, Pond of Doom and Doge Farm. Map pack 2 (`?maps=2`) adds Lite Quarry and Bell Tower. Random map only rolls battlefields that are currently visible. The classic four maps keep their old terrain and spawn spots.
 
 ## Reference review
 
