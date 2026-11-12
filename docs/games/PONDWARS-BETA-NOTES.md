@@ -54,7 +54,7 @@ Not done yet: a real network transport (a Supabase Realtime channel only needs `
 
 ## Expansion arsenal (playtest, off by default)
 
-Eight new weapons are registered in `js/pondwars-arsenal.mjs` with their damage, ammo, crater and knockback. A normal match does not grant them and the CPU still chooses from the classic shortlist. The menu fieldset "PLAYTEST ARSENAL" (or `?packs=simple`, `pepecoin`, `advanced`, or `all`) shows that pack in the arsenal. The simple, Pepecoin, and advanced packs are playable when their checkboxes are on. Pepecoin adds Moon Rocket (wind, two shots), Ban Hammer (short yeet, no crater) and Pep Rain (six drops of about 8). Advanced adds Doge Flyer (steer for 4.5 seconds, then Enter, Space, or FIRE detonates) and Silver Donkey (a warned heavy strike from above). Classic weapon stats are untouched.
+Eight new weapons are registered in `js/pondwars-arsenal.mjs` with their damage, ammo, crater and knockback. A normal match does not grant them and the CPU still chooses from the classic shortlist. The menu fieldset "PLAYTEST ARSENAL" (or `?packs=simple`, `pepecoin`, `advanced`, or `all`) shows that pack in the arsenal. The simple, Pepecoin, and advanced packs are playable when their checkboxes are on. Pepecoin adds Moon Rocket (wind, two shots), Ban Hammer (short yeet, no crater) and Pep Rain (six drops of about 8). Advanced adds Doge Flyer (steer for 4.5 seconds, then Enter, Space, or FIRE detonates) and Silver Donkey (a warned heavy strike from above). Classic weapon stats are untouched. Map pack 1 (menu checkbox, or `?maps=1`) adds Moon Base, Pond of Doom and Doge Farm. Random map only rolls battlefields that are currently visible. The classic four maps keep their old terrain and spawn spots.
 
 ## Reference review
 

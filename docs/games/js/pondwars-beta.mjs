@@ -1,7 +1,7 @@
 // FROGAGEDDON: the page (drawing, controls, CPU turns). The rules live in pondwars-engine.mjs.
-import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112advanced';
-import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112advanced';
-import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112advanced';
+import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn, fire, walk, canMove, MAPS, makeTerrain, cpuPlan, me, aliveOf, solid, projectileOrigin, safeDirection, retreatDirection, weaponAllowed } from './pondwars-beta-engine.mjs?v=20261112maps1';
+import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261112maps1';
+import { hudWeapons, normalizePacks } from './pondwars-arsenal.mjs?v=20261112maps1';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
 import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261112pixel';
 import { compilePixelManifest, authoredPose, clipDuration, pixelHelmet } from './pondwars-pixel-art.mjs?v=20261112pixel';
@@ -89,7 +89,11 @@ function paintGround(x0 = 0, y0 = 0, x1 = W - 1, y1 = H - 1) {
     const n = ((x * 73856093) ^ (y * 19349663)) & 15;
     if (depth < 3) { d[o] = 92 + n; d[o + 1] = 176 + n; d[o + 2] = 64; }
     else if (depth < 6) { d[o] = 58 + n; d[o + 1] = 128 + n; d[o + 2] = 46; }
-    else { const cellX=Math.floor(x/76),cellY=Math.floor(y/58),cx=cellX*76+38+Math.sin(cellY*7)*17,cy=cellY*58+29;const stone=Math.pow((x-cx)/29,2)+Math.pow((y-cy)/20,2)<1?24:0;const band=Math.sin(y*.055+x*.009)*13;const violet=g.map==='peaks';d[o]=(violet?128:173)+n+stone+band;d[o+1]=(violet?55:112)+n+stone;d[o+2]=(violet?103:48)+stone; }
+    else { const cellX=Math.floor(x/76),cellY=Math.floor(y/58),cx=cellX*76+38+Math.sin(cellY*7)*17,cy=cellY*58+29;const stone=Math.pow((x-cx)/29,2)+Math.pow((y-cy)/20,2)<1?24:0;const band=Math.sin(y*.055+x*.009)*13;const violet=g.map==='peaks';d[o]=(violet?128:173)+n+stone+band;d[o+1]=(violet?55:112)+n+stone;d[o+2]=(violet?103:48)+stone;
+      if(g.map==='moon'){d[o]=148+n;d[o+1]=154+n;d[o+2]=168;}
+      else if(g.map==='doom'){d[o]=64+n;d[o+1]=78+n;d[o+2]=58;}
+      else if(g.map==='farm'){d[o]=166+n+band;d[o+1]=118+n;d[o+2]=58;}
+    }
     d[o + 3] = 255;
   }
   gctx.putImageData(gimg, 0, 0, x0, y0, x1 - x0 + 1, y1 - y0 + 1);
@@ -98,7 +102,11 @@ function paintGround(x0 = 0, y0 = 0, x1 = W - 1, y1 = H - 1) {
 // ---------- drawing ----------
 function sky(t) {
   const XL = -OX, XR = W + OX;
-  const sk=ctx.createLinearGradient(0,0,0,H);sk.addColorStop(0,'#193d68');sk.addColorStop(.5,'#628d9f');sk.addColorStop(1,'#ecc99c');ctx.fillStyle=sk;ctx.fillRect(XL,0,XR-XL,H);
+  const sk=ctx.createLinearGradient(0,0,0,H);
+  if(g.map==='moon'){sk.addColorStop(0,'#12141c');sk.addColorStop(.5,'#3a4258');sk.addColorStop(1,'#6a6248');}
+  else if(g.map==='doom'){sk.addColorStop(0,'#1a2430');sk.addColorStop(.5,'#3d5360');sk.addColorStop(1,'#6d7a62');}
+  else {sk.addColorStop(0,'#193d68');sk.addColorStop(.5,'#628d9f');sk.addColorStop(1,'#ecc99c');}
+  ctx.fillStyle=sk;ctx.fillRect(XL,0,XR-XL,H);
   ctx.fillStyle='#fce8b7';ctx.beginPath();ctx.arc(970,105,44,0,7);ctx.fill();
   for(let layer=0;layer<3;layer++){ctx.fillStyle=['#567789','#496d72','#355c5f'][layer];ctx.beginPath();ctx.moveTo(XL,H);
     for(let x=Math.floor(XL/10)*10;x<=XR+10;x+=10)ctx.lineTo(x,260+layer*65+Math.sin(x*.009+layer*2)*50+Math.sin(x*.023)*19);
@@ -785,10 +793,21 @@ function mapPreview(recommend=false){
 }
 $('#map-choice').onchange=e=>{opts.map=e.target.value;opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview(true);};
 $('#reroll-map').onclick=()=>{opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview();};
-$('#roll-map').onclick=()=>{const maps=Object.keys(MAPS);opts.map=maps[Math.floor(Math.random()*maps.length)];$('#map-choice').value=opts.map;opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview(true);};
+$('#roll-map').onclick=()=>{const maps=[...$('#map-choice').options].filter(o=>!o.disabled).map(o=>o.value);opts.map=maps[Math.floor(Math.random()*maps.length)];$('#map-choice').value=opts.map;opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview(true);};
+function syncMapPacks(){
+  const on=new Set([...document.querySelectorAll('#map-packs [data-mappack]:checked')].map(b=>b.dataset.mappack));
+  document.querySelectorAll('#map-choice [data-mappack]').forEach(o=>{o.hidden=o.disabled=!on.has(o.dataset.mappack);});
+  if($('#map-choice').selectedOptions[0]?.disabled){opts.map='island';$('#map-choice').value='island';}
+  mapPreview(true);
+}
+const mapPreset=new URLSearchParams(location.search).get('maps');
+document.querySelectorAll('#map-packs [data-mappack]').forEach(box=>{
+  if(mapPreset==='all'||mapPreset===box.dataset.mappack||(mapPreset==='1'&&box.dataset.mappack==='maps1'))box.checked=true;
+  box.addEventListener('change',syncMapPacks);
+});
 const presetPacks = normalizePacks(new URLSearchParams(location.search).get('packs'));
 document.querySelectorAll('#arsenal-packs [data-pack]').forEach(box => { if (presetPacks[box.dataset.pack]) box.checked = true; });
-paintColors();mapPreview();
+paintColors();mapPreview();syncMapPacks();
 pick('[data-mode]', 'mode', String); pick('[data-level]', 'level', Number); pick('[data-n]', 'n', Number);
 $('#go').addEventListener('click', start); $('#again').addEventListener('click', start);
 $('#tomenu').addEventListener('click', () => { $('#over').hidden = true; $('#menu').hidden = false; });

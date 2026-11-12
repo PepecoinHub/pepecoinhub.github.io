@@ -4,12 +4,14 @@
 // slide after a knockback, speed caps, rope / jetpack / teleport / drill) are inspired by Squeak & Destroy
 // (MIT, Los Polos Amigos Kft.); the code here is our own.
 import { EXPANSION, normalizePacks, starterAmmo, packEnabled } from './pondwars-arsenal.mjs';
+import { EXPANSION_MAPS, buildExpansionMap } from './pondwars-maps.mjs';
 export const W = 1200, H = 600, WATER = 560, STEP = 1 / 60, G = 520;
 export const MAPS={
 island:{name:'Pond Island',max:4,recommended:3},
 twin:{name:'Split Decision',max:4,recommended:4},
 peaks:{name:'Croak Canyon',max:3,recommended:3},
-small:{name:'Last Lily',max:2,recommended:2}
+small:{name:'Last Lily',max:2,recommended:2},
+...EXPANSION_MAPS,
 };
 export const TURN_TIME=30, RETREAT_TIME=3, MOVE_BUDGET=160;
 export const WIND_ACC=230, STEP_UP=6, STEP_DOWN=6, ROPE_MAX=330, JET_FUEL=3.5;
@@ -53,6 +55,7 @@ export function rng(seed) {   // mulberry32
 
 // ---------- terrain: 1 = ground ----------
 export function makeTerrain(seed, map = 'island') {
+  if (EXPANSION_MAPS[map]) return buildExpansionMap(map, seed);
   const r = rng(seed), mask = new Uint8Array(W * H), top = new Float32Array(W);
   const waves = Array.from({ length: 4 }, (_, i) => ({ a: (60 - i * 12) * (.6 + r() * .8), f: (i + 1) * (.004 + r() * .004), p: r() * 7 }));
   const base = 330 + r() * 50;
@@ -105,13 +108,16 @@ export function newGame({ seed = 1, perTeam = 3, cpu = [false, true], level = 1,
   for(let i=0;i<perTeam*2;i++){
     const team=i%2;
     const target=map==='twin'?(team===0?160:750)+(Math.floor(i/2)+.5)*290/perTeam:
-      map==='small'?370+(i+.5)*460/(perTeam*2):150+(i+.5)*900/(perTeam*2);
+      map==='small'?370+(i+.5)*460/(perTeam*2):
+      map==='doom'?(team===0?160:940)+Math.floor(i/2)*70:
+      map==='farm'?(team===0?120:720)+(Math.floor(i/2)+.5)*380/perTeam:
+      150+(i+.5)*900/(perTeam*2);
     const available=candidates.filter(p=>slots.every(q=>Math.abs(q.x-p.x)>=58));
     available.sort((a,b)=>Math.abs(a.x-target)-Math.abs(b.x-target));
     if(!available.length)throw new Error('Map has insufficient safe spawn locations');
     slots.push(available[0]);
   }
-  if(map!=='twin')for(let i=slots.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[slots[i],slots[j]]=[slots[j],slots[i]];}
+  if(map!=='twin'&&!MAPS[map].split)for(let i=slots.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[slots[i],slots[j]]=[slots[j],slots[i]];}
   for(let i=0;i<perTeam*2;i++){
     const team=i%2,{x,y}=slots[i];
     frogs.push({ id: i, team, name: NAMES[team][Math.floor(i / 2)], x, y, vx: 0, vy: 0, hp: 100, alive: true, ground: true, face: x < W / 2 ? 1 : -1, fallFrom: y, gone: '' });
