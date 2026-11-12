@@ -276,7 +276,7 @@
     });
     smMain.appendChild(el('hr'));
     smMain.appendChild(winsGroup);
-    var themeItem = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">🌓</span><span>Day / night mode</span>');
+    var themeItem = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">🌓</span><span>Light / dark windows</span>');
     themeItem.addEventListener('click', function () { setOpen(false); if (themeBtn) themeBtn.click(); });
     smMain.appendChild(themeItem);
     smMain.appendChild(arrange);
@@ -918,12 +918,17 @@
   document.addEventListener('contextmenu', function (e) {
     if (!mainEl || e.target.closest('.win, .desk a, .desk button, header.top, dialog, a, button, input')) return;
     e.preventDefault(); closeCtx(); closeMenus();
-    var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
     ctx = el('div', { class: 'ctx', role: 'menu' });
     [['Arrange windows', arrangeAll], ['Refresh', function () { location.reload(); }], null,
-      [dark ? 'Wallpaper: day hills' : 'Wallpaper: night mountains', function () { if (themeBtn) themeBtn.click(); }],
+      sky && ['Wallpaper: ' + ({ auto: 'follows the clock', day: 'always day', night: 'always night' })[sky.mode()] + ' (change)', function () {
+        var next = ({ auto: 'day', day: 'night', night: 'auto' })[sky.mode()];
+        sky.setMode(next);
+        balloon('Wallpaper', next === 'auto' ? 'Back on the clock: Pepe sets at 18:00 and the moon frog rises at 20:00.' : next === 'day' ? 'Always day. Pepe stays up and grins.' : 'Always night. The moon frog stays up and broods.', 'pep-logo');
+      }],
+      sky && ['Watch the sun set', function () { sky.demo(); }],
       ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons5'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
       null, ["Pepe Guesser (today's photo)", function () { wheresPepe(); }], ['FROGAGEDDON (beta)', function () { pondWarsApp(); }], ['YEET THE PEP', function () { yeetApp(); }], ['Pepe Miner', function () { minerApp(); }], null, ['LEADERS', function () { highScores(); }], ['Properties…', aboutOS]].forEach(function (it) {
+      if (it === false) return;
       if (!it) { ctx.appendChild(el('hr')); return; }
       var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
       b.addEventListener('click', function () { closeCtx(); it[1](); });
@@ -4811,6 +4816,138 @@
     });
     timers.push(setTimeout(finish, 120 + lines.length * 230 + 650));
   }
+
+  /* ---------------------------------------------------------------- living sky
+     The wallpaper follows the visitor's clock. Pepe is the sun: by day he grins over the green hill, from 18:00
+     he sinks behind it while the sky turns orange, the night picture fades in, and at 20:00 sad Pepe rises over
+     the mountains like the moon. Before dawn he sets again and happy Pepe climbs back up by 07:30.
+     Only CSS moves anything: this sets a few numbers on .sky twice a minute, and only while the tab is visible.
+     The second picture's layers load only when its turn is within the hour. Wallpaper mode (right click on the
+     desktop): clock / always day / always night, kept in localStorage 'pondos-sky' (boot.js reads it too). */
+  var SKY = [
+    // minute of the day, day-Pepe down (0 up, 1 hidden), night-Pepe down, night picture opacity, sunset tint
+    [0, 1, 0, 1, 0.8], [300, 1, 0, 1, 0.8], [360, 1, 1, 1, 0.8], [400, 1, 1, 0, 0.7], [450, 0, 1, 0, 0],
+    [1080, 0, 1, 0, 0], [1140, 1, 1, 0, 0.9], [1170, 1, 1, 0, 0.9], [1200, 1, 1, 1, 0.9], [1260, 1, 0, 1, 0.8], [1440, 1, 0, 1, 0.8]
+  ];
+  function skyAt(m) {
+    m = ((m % 1440) + 1440) % 1440;
+    for (var i = 1; i < SKY.length; i++) {
+      var a = SKY[i - 1], b = SKY[i];
+      if (m <= b[0]) {
+        var t = (m - a[0]) / (b[0] - a[0] || 1);
+        return [1, 2, 3, 4].map(function (k) { return a[k] + (b[k] - a[k]) * t; });
+      }
+    }
+    return SKY[0].slice(1);
+  }
+  var sky = (function () {
+    if (!document.body || !(window.CSS && CSS.supports && CSS.supports('width', '1cqw'))) return null;
+    var mode = 'auto', demo = null, timer = 0, lastM = null;
+    try { mode = localStorage.getItem('pondos-sky') || 'auto'; } catch (e) {}
+    var box = el('div', { class: 'sky sky-jump', 'aria-hidden': 'true' });
+    function scene(name) {
+      var s = el('div', { class: 'sky-scene scene-' + name });
+      var files = ['sky', 'pepe', 'front'], imgs = files.map(function (f) {
+        var im = el('img', { class: 'sky-' + (f === 'sky' ? 'bg' : f), alt: '', decoding: 'async' });
+        s.appendChild(im);
+        return im;
+      });
+      var loaded = false;
+      s.load = function () {
+        if (loaded) return; loaded = true;
+        var left = imgs.length;
+        imgs.forEach(function (im, i) {
+          im.onload = function () { if (--left === 0) s.classList.add('ready'); };
+          im.src = 'img/sky/' + name + '-' + files[i] + '.webp';
+        });
+      };
+      return s;
+    }
+    var day = scene('day'), night = scene('night');
+    day.appendChild(el('div', { class: 'sky-tint' }));
+    day.appendChild(el('div', { class: 'sky-glow' }));
+    // a handful of stars that blink over the night sky and fireflies over the forest, always in the same places
+    var seed = 7, rnd = function () { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    for (var i = 0; i < 14; i++) {
+      var st = el('i', { class: 'sky-star' });
+      st.style.left = (3 + rnd() * 66).toFixed(1) + '%'; st.style.top = (2 + rnd() * 30).toFixed(1) + '%';
+      st.style.animationDelay = (-rnd() * 4).toFixed(1) + 's'; st.style.animationDuration = (3 + rnd() * 4).toFixed(1) + 's';
+      night.insertBefore(st, night.children[1]);
+    }
+    for (var j = 0; j < 9; j++) {
+      var fl = el('i', { class: 'sky-fly' });
+      fl.style.left = (6 + rnd() * 88).toFixed(1) + '%'; fl.style.top = (74 + rnd() * 22).toFixed(1) + '%';
+      fl.style.animationDelay = (-rnd() * 9).toFixed(1) + 's'; fl.style.animationDuration = (7 + rnd() * 6).toFixed(1) + 's';
+      night.appendChild(fl);
+    }
+    box.appendChild(day); box.appendChild(night);
+    document.body.insertBefore(box, document.body.firstChild);
+
+    function minuteNow() {
+      if (demo !== null) return demo;
+      if (mode === 'day') return 720;
+      if (mode === 'night') return 0;
+      var d = new Date();
+      return d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60;
+    }
+    function paint() {
+      var m = minuteNow(), v = skyAt(m);
+      // a big step (first paint, a tab left alone for an hour, a mode change) jumps instead of sliding for 30 s
+      var jump = lastM === null || (demo === null && Math.abs(((m - lastM + 720) % 1440) - 720) > 3);
+      box.classList.toggle('sky-jump', jump);
+      if (jump) void box.offsetWidth;
+      box.style.setProperty('--day-down', v[0].toFixed(4));
+      box.style.setProperty('--night-down', v[1].toFixed(4));
+      box.style.setProperty('--night', v[2].toFixed(4));
+      box.style.setProperty('--tint', v[3].toFixed(4));
+      lastM = m;
+      // the static picture under the sky (and the first paint of the next visit) follow along
+      root.classList.toggle('sky-night', v[2] >= 0.5);
+      root.classList.toggle('sky-day', v[2] < 0.5);
+      // load a picture's layers only when it is on screen or will be within the hour
+      var need = { day: false, night: false };
+      for (var k = 0; k <= 60; k += 10) {
+        var w = skyAt(m + (demo === null ? k : 0));
+        if (w[2] > 0) need.night = true;
+        if (w[2] < 1) need.day = true;
+      }
+      if (need.day) day.load();
+      if (need.night) night.load();
+      if (jump) requestAnimationFrame(function () { box.classList.remove('sky-jump'); });
+    }
+    function tick() {
+      clearTimeout(timer);
+      if (document.hidden || demo !== null) return;
+      paint();
+      timer = setTimeout(tick, 30000);
+    }
+    document.addEventListener('visibilitychange', tick);
+    tick();
+    return {
+      mode: function () { return mode; },
+      setMode: function (m) {
+        mode = m; lastM = null;
+        try { if (m === 'auto') localStorage.removeItem('pondos-sky'); else localStorage.setItem('pondos-sky', m); } catch (e) {}
+        tick();
+      },
+      // a whole evening and night in about 40 seconds, then back to the real clock
+      demo: function () {
+        if (demo !== null) return;
+        day.load(); night.load();
+        demo = 1060; lastM = null; paint();
+        box.classList.add('sky-fast');
+        var step = function () {
+          // slow through the changes, quick through the long quiet hours
+          var same = skyAt(demo).join() === skyAt(demo + 15).join();
+          demo += REDUCE ? 20 : same ? 15 : 2.5;
+          if (demo >= 1440 + 460) { demo = null; box.classList.remove('sky-fast'); lastM = null; tick(); return; }
+          paint();
+          setTimeout(step, REDUCE ? 400 : 50);
+        };
+        setTimeout(step, 600);
+      }
+    };
+  })();
 
   // links to PEP Games in the page text open the Games folder (a phone gets the 98-style games page)
   document.addEventListener('click', function (e) {

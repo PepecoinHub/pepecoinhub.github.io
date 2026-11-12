@@ -497,7 +497,7 @@ footer.foot a { color: #edf3e3; }
 @media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) { --wall: url("img/wall-night.webp"); } }
 :root.pondos[data-theme="dark"] { --wall: url("img/wall-night.webp"); }
 .pondos body { font-size: 15px; padding-bottom: 46px; min-height: 100vh; background: transparent; }
-.pondos body::after { content: ""; position: fixed; inset: 0; z-index: -1; background: var(--wall) var(--wall-pos, center) / cover no-repeat, var(--desk); }
+.pondos body::after { content: ""; position: fixed; inset: 0; z-index: -2; background: var(--wall) var(--wall-pos, center) / cover no-repeat, var(--desk); }
 .pondos .ticker, .pondos body::before { display: none; }
 .pondos.has-max body, .pondos.booting body { overflow: hidden; }
 
@@ -947,6 +947,58 @@ footer.foot a { color: #edf3e3; }
 }
 @media (max-width: 760px) and (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) { --wall-pos: 96% 12%; } }
 @media (max-width: 760px) { :root.pondos[data-theme="dark"] { --wall-pos: 96% 12%; } }
+
+/* ================================================================ living sky
+   The wallpaper follows the visitor's clock, not the light/dark theme (boot.js sets sky-day or sky-night
+   for the first picture). meme.js then lays the moving sky over it: Pepe is the sun by day and sets behind
+   the hill in the evening; sad Pepe is the moon and rises over the mountains. Layers come from
+   scripts/build_sky_layers.py; their boxes below are the percentages it prints. */
+:root.pondos.sky-day { --wall: url("img/wall-day.webp"); --wall-pos: 28% 50%; }
+:root.pondos.sky-night { --wall: url("img/wall-night.webp"); --wall-pos: 88% 30%; }
+@media (max-width: 760px) { :root.pondos.sky-night { --wall-pos: 96% 12%; } }
+.sky { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; container-type: size; }
+@supports not (width: 1cqw) { .sky { display: none; } }
+/* "cover", by hand: every layer of a scene is placed in % of the scene, so they always line up */
+.sky-scene {
+  --w: max(100cqw, calc(100cqh * var(--ar))); --h: max(100cqh, calc(100cqw / var(--ar)));
+  position: absolute; width: var(--w); height: var(--h);
+  left: calc((100cqw - var(--w)) * var(--px)); top: calc((100cqh - var(--h)) * var(--py));
+  overflow: hidden; visibility: hidden;
+}
+.sky-scene.ready { visibility: visible; }
+.scene-day { --ar: 1.90476; --px: 0.28; --py: 0.5; }
+.scene-night { --ar: 1.59521; --px: 0.88; --py: 0.3; opacity: var(--night, 0); }
+@media (max-width: 760px) { .scene-night { --px: 0.96; --py: 0.12; } }
+.sky-scene img { position: absolute; display: block; max-width: none; user-select: none; }
+.sky-scene .sky-bg { inset: 0; width: 100%; height: 100%; }
+.scene-day .sky-pepe { left: 1.583%; top: 19.524%; width: 56%; height: 44.127%; transform: translateY(calc(var(--day-down, 0) * 122%)); }
+.scene-day .sky-front { left: 1%; top: 57.143%; width: 57.167%; height: 42.857%; }
+.scene-night .sky-pepe { left: 73.25%; top: 3.988%; width: 26.75%; height: 40.479%; transform: translateY(calc(var(--night-down, 0) * 104%)); }
+.scene-night .sky-front { left: 72.812%; top: 40.479%; width: 27.187%; height: 59.521%; }
+/* the sun going down: a warm sky that darkens; the same, pinker, at dawn */
+.sky-tint { position: absolute; inset: 0; opacity: var(--tint, 0); mix-blend-mode: multiply;
+  background: linear-gradient(180deg, #4a3a8c 0%, #c86a8a 30%, #ff9a52 55%, #b4703c 75%, #5a4a3a 100%); }
+.sky-glow { position: absolute; inset: 0; opacity: calc(var(--tint, 0) * 0.55); mix-blend-mode: screen;
+  background: radial-gradient(60% 40% at 30% 58%, rgba(255, 170, 80, 0.9), rgba(255, 120, 60, 0) 70%); }
+/* a slow, smooth move between the clock's updates; .sky-jump skips it (first paint, back from another tab) */
+.sky-pepe, .scene-night, .sky-tint, .sky-glow { transition: transform 30s linear, opacity 30s linear; }
+.sky-jump .sky-pepe, .sky-jump .scene-night, .sky-jump .sky-tint, .sky-jump .sky-glow { transition: none; }
+.sky-fast .sky-pepe, .sky-fast .scene-night, .sky-fast .sky-tint, .sky-fast .sky-glow { transition-duration: 0.12s; }
+/* night life: a few stars blink, fireflies drift over the forest */
+.sky-star, .sky-fly { position: absolute; border-radius: 50%; }
+.sky-star { width: 0.18%; aspect-ratio: 1; background: #fff; box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.7); animation: sky-blink 4s ease-in-out infinite; }
+.sky-fly { width: 0.3%; aspect-ratio: 1; background: #fff6a8; box-shadow: 0 0 6px 2px rgba(255, 236, 110, 0.75); opacity: 0; animation: sky-fly 9s ease-in-out infinite; }
+@keyframes sky-blink { 0%, 100% { opacity: 0.15; } 50% { opacity: 1; } }
+@keyframes sky-fly {
+  0% { opacity: 0; transform: translate(0, 0); } 20% { opacity: 1; }
+  50% { transform: translate(140%, -260%); } 80% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(-120%, -480%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky-pepe, .scene-night, .sky-tint, .sky-glow { transition: none; }
+  .sky-star { animation: none; opacity: 0.6; }
+  .sky-fly { display: none; }
+}
 .win-launch { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px; background: var(--chrome); box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px -1px 0 var(--chrome-lo); font: 400 12px/1.3 var(--f-chrome); color: var(--ink); }
 .win-launch p { margin: 0 4px 0 0; font-weight: 700; }
 .pondos .win-launch .btn { min-width: 0; padding: 5px 9px; gap: 6px; }
