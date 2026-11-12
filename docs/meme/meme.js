@@ -1524,6 +1524,14 @@
     }, 760);
     return A;
   }
+  // Read-only PepeGochi companion on the PondOS taskbar; beta gate stays in place.
+  // The real game and server own the pet; this module never invents a local pet.
+  if (GOCHI && top && top.querySelector('.bar')) {
+    import('./pepegochi-taskbar.mjs?v=20261112assistant').then(function (m) {
+      m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
+        session: sbSession, rpc: rpc, base: BASE });
+    }).catch(function () { /* optional decoration; the game still works */ });
+  }
   function pondWarsApp() {
     var A = openApp('pondwars', 'FROGAGEDDON · BETA', 'pondwars', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pondwars-beta.html?embed=1" title="FROGAGEDDON"></iframe>';
@@ -2800,6 +2808,7 @@
         if (out) out.addEventListener('click', function () {
           try { Object.keys(localStorage).forEach(function (k) { if (/^sb-azbwciqfbsdpwubznncg-auth-token/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
           paintLogon(); paint();
+          window.dispatchEvent(new Event('pondos:auth-changed'));
         });
       };
       paint();
