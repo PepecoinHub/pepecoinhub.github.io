@@ -3,14 +3,17 @@ import { W, H, WATER, STEP, G, WEAPONS, WIND_ACC, TURN_TIME, newGame, startTurn,
 import { KEY, applyInput, NetMatch, tabTransport } from './pondwars-beta-net.mjs?v=20261111hand';
 import { CharacterAnimator, characterPoint, spriteFrame, frameGeometry, validateManifest } from './pondwars-animation.mjs?v=20261112pixel';
 import { HelmetCosmetics, PROTOTYPE_WEAPON_HAND } from './pondwars-helmet.mjs?v=20261112pixel';
-import { compilePixelManifest, authoredPose, clipDuration, pixelHelmet } from './pondwars-pixel-art.mjs?v=20261112pixel';
+import { compilePixelManifest, authoredPose, clipDuration, pixelHelmet, pixelFrame } from './pondwars-pixel-art.mjs?v=20261112pixel06';
+import { v06WeaponHold, qaTerrain } from './pondwars-v06-art.mjs?v=20261112pixel06';
 import { PLAYERS } from './pondwars-players.mjs';
 import { bindHold } from './arcade-common.mjs';
 
 const $ = s => document.querySelector(s);
 // Opt-in art review: one standard model in 2.0, existing beta roster remains available without this flag.
 const artMode = new URLSearchParams(location.search).get('art');
-const standardPreview = artMode === 'standard-v02', pixelPreview = artMode === 'pixel-v04';
+const standardPreview = artMode === 'standard-v02', pixelPreview = ['pixel-v04','pixel-v06'].includes(artMode);
+const pixelLabel = artMode === 'pixel-v06' ? 'v06' : 'v04';
+let pixelCompareLinks = [];
 const PIXEL_PLAYER = PLAYERS.findIndex(p => p.id === 'classic');
 let standardAssets = null, pixelAssets = null;
 const helmets = new HelmetCosmetics();
@@ -61,7 +64,7 @@ export function registerCharacterAnimation(id, manifest, image) {
   if (!PLAYERS.some(p => p.id === id) || !validateManifest(manifest)) throw new Error('Unknown character or invalid animation manifest');
   animationAssets.set(id, { manifest, image });
 }
-let g = null, opts = { mode: 'cpu', level: 1, n: 3, map:'island', mapSeed:20261103 }, seed = 0;
+let g = null, opts = qaTerrain(location.search, MAPS, { mode: 'cpu', level: 1, n: 3, map:'island', mapSeed:20261103 }), seed = 0;
 let aimY = 300, parts = [], aim = -Math.PI / 4, aimX = W / 2, charging = false, chargeAt = 0, power = 0, held = { l: 0, r: 0 };
 let paused=false, hudTime=0, visualDt=0;
 const previousPose=new WeakMap();
@@ -121,7 +124,7 @@ function frog(f, t) {
   const choice=teamPlayers[f.team][Math.floor(f.id/2)]??0,person=PLAYERS[choice],art=playerArt[choice];
   const asset = standardPreview ? standardAssets : animationAssets.get(person.id);
   const rawAnimation = animator.sample(f, reduce);
-  const animation = asset?.authored ? authoredPose(rawAnimation) : rawAnimation, bob = animation.dy, s = f.face;
+  const animation = asset?.authored ? authoredPose(rawAnimation, f, asset.imageKey) : rawAnimation, bob = animation.dy, s = f.face;
   const band = TEAM[f.team].band, dark = rgba(mix(band, '#000000', .55), 1);
   const mk = 1 + (ui - 1) * .6;               // markers grow a little on small/phone screens
   // ---- team platform disc under the frog's feet: a bold, high-contrast team marker ----
@@ -149,7 +152,7 @@ function frog(f, t) {
   ctx.translate(animation.dx, -29 + animation.dy);
   ctx.rotate(animation.rotation); ctx.scale(animation.sx, animation.sy);
   ctx.globalAlpha = animation.alpha;
-  const frame = spriteFrame(asset?.manifest, animation.state, animation.age, reduce);
+  const frame = asset === pixelAssets && pixelAssets ? pixelFrame(pixelAssets, animation, reduce) : spriteFrame(asset?.manifest, animation.state, animation.age, reduce);
   const geometry = frame && asset.image?.naturalWidth ? frameGeometry(frame) : null;
   ctx.scale(s * (geometry ? 1 : person.face), 1);
   if (geometry) {
@@ -158,7 +161,7 @@ function frog(f, t) {
     ctx.drawImage(asset.image,q.sx,q.sy,q.sw,q.sh,q.x,q.y+29,q.width,q.height);
     if (standardPreview && helmets.wearing(f)) ctx.drawImage(asset.helmet,0,0,512,512,q.x,q.y+29,q.width,q.height);
     if (asset === pixelAssets && helmets.wearing(f)) {
-      const h = pixelHelmet(frame);
+      const h = pixelHelmet(frame, pixelAssets.imageKey);
       ctx.drawImage(asset.helmet,...h.rect,h.x,h.y+29,h.width,h.height);
     }
   } else if(art.naturalWidth){
@@ -174,9 +177,9 @@ function frog(f, t) {
   }
   ctx.scale(person.face,1);
   ctx.restore();
-  // Held weapon is drawn in world space at hand height (matches projectileOrigin at f.y-32),
-  // not as a sprite glued near the feet inside the character transform.
-  if (turn || animation.state === 'fire') heldWeapon(f, characterPoint(f, animation, standardPreview && geometry ? PROTOTYPE_WEAPON_HAND : geometry?.hand), asset?.authored);
+  // Weapon art remains in world space; authored clips provide the measured hand.
+  // Legacy skins keep the PR266 hand-height anchor; projectileOrigin is unchanged.
+  if (turn || animation.state === 'fire') heldWeapon(f, characterPoint(f, animation, standardPreview && geometry ? PROTOTYPE_WEAPON_HAND : geometry?.hand), asset?.authored, asset?.imageKey);
   // team pennant flag above the frog: a second team-colour cue near the label, readable even
   // when the under-foot disc is occluded. It waves on a frog's turn unless reduced-motion is on.
   const flagW = 15 * mk, flagH = 10 * mk, poleTop = f.y - 82 - 13 * mk, poleBot = f.y - 82 + 3;
@@ -218,9 +221,10 @@ const HOLD = {
   gold: { w: 26, h: 26, ox: -10, oy: -20, base: 0 },
 };
 const PLACE_HOLD = new Set(['mine', 'dynamite', 'candles', 'teleport', 'jetpack', 'rope']);
-function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false) {
+function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false, imageKey) {
   const img = weaponArt[g.weapon];
   if (!img?.naturalWidth) return;
+  const calibrated = imageKey === 'pixel-v06' ? v06WeaponHold(g.weapon) : null;
   const handX = hand.x, handY = hand.y;
   const side = Math.cos(aim) >= 0 ? 1 : -1;
   if (PLACE_HOLD.has(g.weapon)) {
@@ -229,7 +233,7 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false) {
   }
   // Thrown bombs stay upright in the hands (slight lean toward aim) so they read clearly at torso height.
   if (['grenade', 'cluster', 'gold'].includes(g.weapon)) {
-    const h = HOLD[g.weapon];
+    const h = calibrated || HOLD[g.weapon];
     ctx.save();
     ctx.translate(handX + (precise ? 0 : side * 12), handY - (precise ? 0 : 2));
     ctx.rotate(aim * .18);
@@ -237,7 +241,7 @@ function heldWeapon(f, hand = { x: f.x, y: f.y - 32 }, precise = false) {
     ctx.restore();
     return;
   }
-  const h = HOLD[g.weapon] || { w: 28, h: 28, ox: -6, oy: -14, base: 0 };
+  const h = calibrated || HOLD[g.weapon] || { w: 28, h: 28, ox: -6, oy: -14, base: 0 };
   ctx.save();
   ctx.translate(handX + (precise ? 0 : Math.cos(aim) * 8), handY + (precise ? 0 : Math.sin(aim) * 8));
   ctx.rotate(aim + h.base);
@@ -445,8 +449,8 @@ function observeCharacters(events = []) {
     durationFor: (f, state) => pixelFrog(f) ? clipDuration(pixelAssets.manifest, state) : undefined,
     onHealthDrop: (f, previousHP, time) => {
       if (pixelFrog(f)) {
-        const p = authoredPose(animator.sample(f, reduce)), frame = spriteFrame(pixelAssets.manifest, p.state, p.age, reduce);
-        helmets.lose(f, previousHP, time, p, reduce, pixelHelmet(frame));
+        const p = authoredPose(animator.sample(f, reduce), f, pixelAssets.imageKey), frame = pixelFrame(pixelAssets, p, reduce);
+        helmets.lose(f, previousHP, time, p, reduce, pixelHelmet(frame, pixelAssets.imageKey));
       } else if (standardPreview) helmets.lose(f, previousHP, time, animator.sample(f, reduce), reduce);
     } });
 }
@@ -692,7 +696,7 @@ function pick(sel, key, parse) {
 const COLORS=[{name:'Blue',hex:'#4f9ef0'},{name:'Red',hex:'#ef6c63'},{name:'Green',hex:'#70c963'},{name:'Yellow',hex:'#edcf54'},{name:'Purple',hex:'#bc92e9'},{name:'Orange',hex:'#ef9a4f'}],teamColors=[0,1];
 function portrait(canvas,index){
   if (pixelPreview && pixelAssets && index === PIXEL_PLAYER) {
-    const c=canvas.getContext('2d'), frame=spriteFrame(pixelAssets.manifest,'idle',0), q=frameGeometry(frame), h=pixelHelmet(frame);
+    const c=canvas.getContext('2d'), frame=spriteFrame(pixelAssets.manifest,'idle',0), q=frameGeometry(frame), h=pixelHelmet(frame, pixelAssets.imageKey);
     c.clearRect(0,0,48,52);c.save();c.translate(24,52);c.scale(.75,.75);c.imageSmoothingEnabled=false;
     c.drawImage(pixelAssets.image,q.sx,q.sy,q.sw,q.sh,q.x,q.y,q.width,q.height);
     c.drawImage(pixelAssets.helmet,...h.rect,h.x,h.y,h.width,h.height);c.restore();return;
@@ -711,7 +715,7 @@ function paintPlayers(){
       const thumb=document.createElement('canvas');thumb.width=48;thumb.height=52;thumb.setAttribute('aria-hidden','true');portrait(thumb,teamPlayers[team][slot]);
       const caption=document.createElement('span');caption.textContent='Frog '+(slot+1);
       const select=document.createElement('select');select.setAttribute('aria-label','Team '+(team+1)+' frog '+(slot+1)+' character');
-      PLAYERS.forEach((p,i)=>{const option=document.createElement('option');option.value=i;option.textContent=pixelPreview && p.id === 'classic' ? p.name + ' · pixel v04 QA' : p.name;select.append(option);});select.value=teamPlayers[team][slot];
+      PLAYERS.forEach((p,i)=>{const option=document.createElement('option');option.value=i;option.textContent=pixelPreview && p.id === 'classic' ? p.name + ' · pixel ' + pixelLabel + ' QA' : p.name;select.append(option);});select.value=teamPlayers[team][slot];
       select.onchange=()=>{teamPlayers[team][slot]=Number(select.value);portrait(thumb,Number(select.value));};
       row.append(thumb,caption,select);box.append(row);
     }
@@ -730,12 +734,12 @@ function mapPreview(recommend=false){
   const c=$('#map-preview').getContext('2d'),mask=makeTerrain(opts.mapSeed,opts.map);c.fillStyle='#264c68';c.fillRect(0,0,300,150);
   c.fillStyle='#9fc15d';for(let y=0;y<H;y+=4)for(let x=0;x<W;x+=4)if(mask[y*W+x])c.fillRect(x/4,y/4,1,1);
   c.fillStyle='#4b9ab1';c.fillRect(0,WATER/4,300,(H-WATER)/4);
-  paintPlayers();
+  paintPlayers(); updatePixelCompare();
 }
 $('#map-choice').onchange=e=>{opts.map=e.target.value;opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview(true);};
 $('#reroll-map').onclick=()=>{opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview();};
 $('#roll-map').onclick=()=>{const maps=Object.keys(MAPS);opts.map=maps[Math.floor(Math.random()*maps.length)];$('#map-choice').value=opts.map;opts.mapSeed=crypto.getRandomValues(new Uint32Array(1))[0];mapPreview(true);};
-paintColors();mapPreview();
+$('#map-choice').value=opts.map;paintColors();mapPreview();
 pick('[data-mode]', 'mode', String); pick('[data-level]', 'level', Number); pick('[data-n]', 'n', Number);
 $('#go').addEventListener('click', start); $('#again').addEventListener('click', start);
 $('#tomenu').addEventListener('click', () => { $('#over').hidden = true; $('#menu').hidden = false; });
@@ -829,7 +833,7 @@ function drawHelmetFlights() {
   for (const p of helmets.sample(animator.time, reduce)) {
     ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation);
     ctx.scale(p.face * p.sx, p.sy); ctx.globalAlpha = p.alpha;
-    if (p.imageKey === 'pixel-v04') {
+    if (p.imageKey === pixelAssets?.imageKey) {
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(pixelAssets.helmet,...p.rect,-p.width/2,-p.height/2,p.width,p.height);
     } else ctx.drawImage(standardAssets.cutout, -p.width/2,-p.height/2,p.width,p.height);
@@ -840,22 +844,35 @@ function drawHelmetFlights() {
 async function loadPixelPrototype() {
   if (!pixelPreview) return;
   $('#art-prototype').hidden = false;
-  $('#art-prototype').textContent = 'PIXEL ART v04 · QA alternative for Classic Pepe · not production-approved art. Other skins remain available.';
-  $('.pw-chrome small').textContent = ' / PIXEL v04 QA';
+  $('#art-prototype').textContent = 'PIXEL ART ' + pixelLabel + ' · QA alternative for Classic Pepe · not production-approved art. Other skins remain available.';
+  $('.pw-chrome small').textContent = ' / PIXEL ' + pixelLabel + ' QA';
   cv.style.imageRendering = 'pixelated';
-  cv.setAttribute('aria-label', 'FROGAGEDDON pixel v04 QA battlefield');
-  const base = 'img/pondwars/players/pixel-v04/';
+  cv.setAttribute('aria-label', 'FROGAGEDDON pixel ' + pixelLabel + ' QA battlefield');
+  pixelCompareLinks = ['pixel-v04','pixel-v06'].map(key => {
+    const a=document.createElement('a');a.dataset.art=key;a.textContent=key+' · same map';
+    a.target='_blank';a.rel='noopener';$('#art-prototype').append(' · ',a);return a;
+  });
+  updatePixelCompare();
+  const base = 'img/pondwars/players/'+artMode+'/';
   const data = await Promise.all(['manifest.json','qa-anchors.json'].map(async file => {
     const r = await fetch(base+file); if (!r.ok) throw new Error('Pixel QA metadata unavailable'); return r.json();
   }));
-  const manifest = compilePixelManifest(...data);
+  const manifest = compilePixelManifest(...data, { frameCount: artMode === 'pixel-v06' ? 53 : 49 });
   const [image, helmet] = await Promise.all(['atlas.png','helmet_pose_atlas.png'].map(async file => {
     const img = new Image(); img.src = base+file; await img.decode();
-    if (img.naturalWidth !== 1024 || img.naturalHeight !== 896) throw new Error('Pixel atlas dimensions mismatch'); return img;
+    if (img.naturalWidth !== 1024 || img.naturalHeight !== (artMode === 'pixel-v06' ? 1024 : 896)) throw new Error('Pixel atlas dimensions mismatch'); return img;
   }));
   for (const clip of Object.values(manifest.clips)) for (const f of clip.frames) {
     if (f.rect[0]+128 > image.naturalWidth || f.rect[1]+128 > image.naturalHeight) throw new Error('Pixel frame outside atlas');
   }
   registerCharacterAnimation('classic', manifest, image);
-  pixelAssets = animationAssets.get('classic'); Object.assign(pixelAssets, { helmet, authored: true });
+  pixelAssets = animationAssets.get('classic'); Object.assign(pixelAssets, { helmet, authored: true, imageKey:artMode });
+}
+
+function updatePixelCompare() {
+  for (const link of pixelCompareLinks) {
+    const url=new URL(location.href);url.searchParams.set('art',link.dataset.art);
+    url.searchParams.set('qaSeed',String(opts.mapSeed));url.searchParams.set('qaMap',opts.map);
+    url.searchParams.delete('net');url.searchParams.delete('room');link.href=url.href;
+  }
 }
