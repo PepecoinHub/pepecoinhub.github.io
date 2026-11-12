@@ -1102,8 +1102,19 @@
     return A;
   }
   function focusApp(A) { appZ += 1; A.host.style.zIndex = appZ; activeApp = A; }
+  // Arcade keys: letter keys are matched case-insensitively (Caps Lock used to break A/D and WASD),
+  // and e.code is preferred so layout-shifted letters still map to the physical WASD cluster.
   function gameKeys(A, map) {
-    var on = function (down) { return function (e) { if (activeApp !== A || !(e.key in map)) return; if (e.target.closest && e.target.closest('input, textarea')) return; e.preventDefault(); map[e.key](down); }; };
+    var CODE = { KeyA: 'a', KeyD: 'd', KeyW: 'w', KeyS: 's', Space: ' ', ArrowLeft: 'ArrowLeft', ArrowRight: 'ArrowRight', ArrowUp: 'ArrowUp', ArrowDown: 'ArrowDown' };
+    var resolve = function (e) { return CODE[e.code] || (e.key && e.key.length === 1 ? e.key.toLowerCase() : e.key); };
+    var on = function (down) { return function (e) {
+      if (activeApp !== A) return;
+      var key = resolve(e);
+      if (!(key in map)) return;
+      if (e.target.closest && e.target.closest('input, textarea')) return;
+      e.preventDefault();
+      map[key](down);
+    }; };
     var kd = on(true), ku = on(false);
     window.addEventListener('keydown', kd); window.addEventListener('keyup', ku);
     return function () { window.removeEventListener('keydown', kd); window.removeEventListener('keyup', ku); };
@@ -1167,9 +1178,9 @@
       var cv = A.body.querySelector('canvas'), c = cv.getContext('2d'), msg = A.body.querySelector('.fd-msg'), hiEl = A.body.querySelector('.fd-hi');
       var W = 480, H = 360, WORDS = ['FUD', 'SCAM', 'RUG', 'DM ME', 'SEED?', '100x!!', 'FAKE', 'PUMP'];
       var ship = new Image(); ship.src = 'img/pep-logo.webp';
-      var st, keys = { left: 0, right: 0 }, raf, running = false, overAt = 0, againB = A.body.querySelector('.fd-again');
+      var st, keys = { left: 0, right: 0 }, raf, running = false, paused = false, overAt = 0, againB = A.body.querySelector('.fd-again');
       // after a game over a stray tap or a held Space must not wipe the score form: only Space (after a moment) or Play again restarts
-      var canRestart = function (how) { return !overAt || (how === 'again') || (how === 'space' && Date.now() - overAt > 900); };
+      var canRestart = function (how) { return !paused && (!overAt || (how === 'again') || (how === 'space' && Date.now() - overAt > 900)); };
       var showHi = function () { hiEl.textContent = 'High score: ' + hiScore('pondos-fud'); };
       showHi();
       var wave = function (n) {
@@ -1178,27 +1189,31 @@
         return { al: al, dir: 1, speed: 0.45 + n * 0.18, shots: [], bombs: [], cool: 0 };
       };
       var t0 = 0;
-      var reset = function () { overAt = 0; againB.hidden = true; st = { x: W / 2, lives: 3, score: 0, n: 0 }; Object.assign(st, wave(0)); running = true; t0 = Date.now(); var o = A.body.querySelector('.hs-submit'); if (o) o.remove(); msg.textContent = 'Wave 1. Receipts beat FUD.'; };
-      var fire = function (how) { if (!running) { if (canRestart(how)) reset(); return; } if (st.cool > 0 || st.shots.length > 2) return; st.shots.push({ x: st.x, y: H - 40 }); st.cool = 16; };
-      cv.addEventListener('pointerdown', function (e) { if (!running) { if (canRestart('tap')) reset(); return; } fire(); });
+      var reset = function () { overAt = 0; paused = false; againB.hidden = true; st = { x: W / 2, lives: 3, score: 0, n: 0 }; Object.assign(st, wave(0)); running = true; t0 = Date.now(); var o = A.body.querySelector('.hs-submit'); if (o) o.remove(); msg.textContent = 'Wave 1. Receipts beat FUD.'; };
+      var fire = function (how) { if (paused) return; if (!running) { if (canRestart(how)) reset(); return; } if (st.cool > 0 || st.shots.length > 2) return; st.shots.push({ x: st.x, y: H - 40 }); st.cool = 16; };
+      cv.addEventListener('pointerdown', function (e) { if (paused) return; if (!running) { if (canRestart('tap')) reset(); return; } fire(); });
       againB.addEventListener('click', function () { reset(); });
-      cv.addEventListener('pointermove', function (e) { if (!running || e.pointerType === 'mouse' && !e.buttons) { if (running && e.pointerType === 'mouse') { var r0 = cv.getBoundingClientRect(); st.x = Math.min(Math.max((e.clientX - r0.left) / r0.width * W, 20), W - 20); } return; } var r = cv.getBoundingClientRect(); st.x = Math.min(Math.max((e.clientX - r.left) / r.width * W, 20), W - 20); });
+      cv.addEventListener('pointermove', function (e) { if (!running || paused || e.pointerType === 'mouse' && !e.buttons) { if (running && !paused && e.pointerType === 'mouse') { var r0 = cv.getBoundingClientRect(); st.x = Math.min(Math.max((e.clientX - r0.left) / r0.width * W, 20), W - 20); } return; } var r = cv.getBoundingClientRect(); st.x = Math.min(Math.max((e.clientX - r.left) / r.width * W, 20), W - 20); });
       A.body.querySelectorAll('[data-k]').forEach(function (b) {
         var k = b.getAttribute('data-k');
         if (k === 'fire') b.addEventListener('pointerdown', function () { fire('tap'); });
-        else { b.addEventListener('pointerdown', function () { keys[k] = 1; }); ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) { b.addEventListener(t, function () { keys[k] = 0; }); }); }
+        else { b.addEventListener('pointerdown', function () { if (!paused) keys[k] = 1; }); ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) { b.addEventListener(t, function () { keys[k] = 0; }); }); }
       });
       var unkey = gameKeys(A, { ArrowLeft: function (d) { keys.left = d; }, ArrowRight: function (d) { keys.right = d; }, a: function (d) { keys.left = d; }, d: function (d) { keys.right = d; }, ' ': function (d) { if (d) fire('space'); } });
-      var end = function (text) { running = false; overAt = Date.now(); againB.hidden = false; hiScore('pondos-fud', st.score); showHi(); msg.textContent = text + ' Score ' + st.score + '. Space or Play again for a new game.'; offerSubmit(A, 'fud', st.score, Date.now() - t0); };
+      var end = function (text) { running = false; paused = false; overAt = Date.now(); againB.hidden = false; hiScore('pondos-fud', st.score); showHi(); msg.textContent = text + ' Score ' + st.score + '. Space or Play again for a new game.'; offerSubmit(A, 'fud', st.score, Date.now() - t0); };
       var frame = function () {
         c.fillStyle = '#071009'; c.fillRect(0, 0, W, H);
         for (var i = 0; i < 40; i++) { c.fillStyle = 'rgba(180,230,190,' + (0.15 + (i % 3) * 0.1) + ')'; c.fillRect((i * 97) % W, (i * 53) % (H - 60), 2, 2); }
-        if (running) {
+        if (running && !paused) {
           if (keys.left) st.x = Math.max(20, st.x - 4); if (keys.right) st.x = Math.min(W - 20, st.x + 4);
           if (st.cool > 0) st.cool--;
           var minX = W, maxX = 0, low = 0, alive = 0;
           st.al.forEach(function (a) { if (!a.alive) return; alive++; a.x += st.dir * st.speed; minX = Math.min(minX, a.x); maxX = Math.max(maxX, a.x + a.w); low = Math.max(low, a.y + a.h); });
-          if (maxX > W - 6 || minX < 6) { st.dir = -st.dir; st.al.forEach(function (a) { a.y += 12; }); }
+          // Flip and step back onto the playfield so a fast wave cannot bounce/drop twice in one stride.
+          if (alive && (maxX > W - 6 || minX < 6)) {
+            st.dir = -st.dir;
+            st.al.forEach(function (a) { if (!a.alive) return; a.x += st.dir * st.speed; a.y += 12; });
+          }
           if (Math.random() < 0.012 + st.n * 0.004) { var live = st.al.filter(function (a) { return a.alive; }); var sh = live[Math.floor(Math.random() * live.length)]; if (sh) st.bombs.push({ x: sh.x + sh.w / 2, y: sh.y + sh.h }); }
           st.shots.forEach(function (s) { s.y -= 7; st.al.forEach(function (a) { if (a.alive && s.y > a.y && s.y < a.y + a.h && s.x > a.x && s.x < a.x + a.w) { a.alive = false; s.y = -99; st.score += 10; } }); });
           st.shots = st.shots.filter(function (s) { return s.y > -10; });
@@ -1212,7 +1227,7 @@
           st.al.forEach(function (a) { if (!a.alive) return; c.fillStyle = '#5a1f1a'; c.fillRect(a.x, a.y, a.w, a.h); c.strokeStyle = '#e9726a'; c.lineWidth = 1.5; c.strokeRect(a.x + 0.5, a.y + 0.5, a.w - 1, a.h - 1); c.fillStyle = '#ffd5cf'; c.font = 'bold 11px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(a.t, a.x + a.w / 2, a.y + a.h / 2 + 1); });
           c.fillStyle = '#fffbe0'; st.shots.forEach(function (s) { c.fillRect(s.x - 3, s.y, 6, 10); c.fillStyle = '#8a8'; c.fillRect(s.x - 2, s.y + 3, 4, 1); c.fillStyle = '#fffbe0'; });
           c.fillStyle = '#ff7a6a'; st.bombs.forEach(function (b) { c.fillRect(b.x - 2, b.y, 4, 9); });
-          if (ship.complete) c.drawImage(ship, st.x - 18, H - 46, 36, 36); else drawCoin(c, st.x, H - 28, 16);
+          if (ship.complete && ship.naturalWidth) c.drawImage(ship, st.x - 18, H - 46, 36, 36); else drawCoin(c, st.x, H - 28, 16);
           c.fillStyle = '#7fd196'; c.font = '12px Tahoma, sans-serif'; c.textAlign = 'left'; c.textBaseline = 'top'; c.fillText('Score ' + st.score + '   Lives ' + '♥'.repeat(Math.max(0, st.lives)) + '   Wave ' + (st.n + 1), 8, 8);
         } else {
           c.fillStyle = '#7fd196'; c.font = 'bold 22px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
@@ -1222,9 +1237,9 @@
         raf = requestAnimationFrame(frame);
       };
       raf = requestAnimationFrame(frame);
-      A.stop = function () { cancelAnimationFrame(raf); raf = 0; unkey(); };
-      A.pause = function () { cancelAnimationFrame(raf); raf = 0; keys.left = keys.right = 0; };
-      A.resume = function () { if (!raf) raf = requestAnimationFrame(frame); };
+      A.stop = function () { cancelAnimationFrame(raf); raf = 0; paused = false; unkey(); };
+      A.pause = function () { if (!running || paused) return; cancelAnimationFrame(raf); raf = 0; paused = true; keys.left = keys.right = 0; };
+      A.resume = function () { if (!paused) return; paused = false; if (!raf) raf = requestAnimationFrame(frame); };
     }, 520);
   }
 
@@ -1236,15 +1251,23 @@
         '<div class="app-row touch-pad"><button type="button" class="app-btn" data-k="left">◀</button><button type="button" class="app-btn" data-k="up">▲</button><button type="button" class="app-btn" data-k="down">▼</button><button type="button" class="app-btn" data-k="right">▶</button></div>';
       var cv = A.body.querySelector('canvas'), c = cv.getContext('2d'), msg = A.body.querySelector('.sn-msg'), hiEl = A.body.querySelector('.sn-hi');
       var CS = 24, CW = 20, CH = 15, face = new Image(); face.src = 'img/pep-logo.webp';
-      var s = null, dir, next, food, timer = null, tickMs, overAt = 0, againB = A.body.querySelector('.sn-again');
-      // after a game over only Space (after a moment) or Play again starts a new game, so the score form stays put
-      var mayStart = function (how) { return !overAt || how === 'again' || (how === 'space' && Date.now() - overAt > 900); };
+      var s = null, dir, next, food, timer = null, tickMs, overAt = 0, held = false, againB = A.body.querySelector('.sn-again');
+      // after a game over only Space (after a moment) or Play again starts a new game, so the score form stays put.
+      // held means paused (minimize / hidden tab): never treat that as "not started".
+      var mayStart = function (how) { return !held && (!overAt || how === 'again' || (how === 'space' && Date.now() - overAt > 900)); };
       var DIRS = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] };
       var EAT = ['Block found. +10,000 PEP (on paper).', 'Another block. The chain grows, so do you.', 'Mined. Not minted.', 'One block every ~60 seconds. You are faster.'];
       var showHi = function () { hiEl.textContent = 'Best: ' + hiScore('pondos-snake') + ' blocks'; };
       showHi();
       var place = function () { do { food = [Math.floor(Math.random() * CW), Math.floor(Math.random() * CH)]; } while (s.some(function (p) { return p[0] === food[0] && p[1] === food[1]; })); };
-      var turn = function (k) { var d = DIRS[k]; if (!d || !s) return; if (d[0] === -dir[0] && d[1] === -dir[1]) return; next = d; };
+      // Compare the queued turn to both the current and next heading so a quick up+left cannot reverse into the body.
+      var turn = function (k) {
+        var d = DIRS[k]; if (!d || !s || held || !timer) return;
+        var against = next || dir;
+        if (d[0] === -against[0] && d[1] === -against[1]) return;
+        if (d[0] === -dir[0] && d[1] === -dir[1]) return;
+        next = d;
+      };
       var draw = function () {
         c.fillStyle = '#071009'; c.fillRect(0, 0, 480, 360);
         c.strokeStyle = 'rgba(120,200,140,0.06)';
@@ -1263,7 +1286,7 @@
         c.fillText('Blocks ' + (s.length - 3) + '   PEP on paper ' + fmt.int((s.length - 3) * 10000), 6, 4);
       };
       var over = function (why) {
-        clearInterval(timer); timer = null;
+        clearInterval(timer); timer = null; held = false;
         var blocks = s.length - 3; hiScore('pondos-snake', blocks); showHi(); offerSubmit(A, 'snake', blocks, Date.now() - t0);
         overAt = Date.now(); againB.hidden = false;
         msg.textContent = why + ' Blocks mined: ' + blocks + ' (' + fmt.int(blocks * 10000) + ' PEP, on paper). Space or Play again for a new game.';
@@ -1282,20 +1305,19 @@
         draw();
       };
       var t0 = 0;
-      var start = function (how) { if (timer || !mayStart(how)) return false; overAt = 0; againB.hidden = true; t0 = Date.now(); var o = A.body.querySelector('.hs-submit'); if (o) o.remove(); s = [[8, 7], [7, 7], [6, 7]]; dir = next = [1, 0]; place(); tickMs = 140; msg.textContent = 'Go, fren. Blocks are coins.'; draw(); timer = setInterval(tick, tickMs); return true; };
+      var start = function (how) { if (timer || held || !mayStart(how)) return false; overAt = 0; againB.hidden = true; t0 = Date.now(); var o = A.body.querySelector('.hs-submit'); if (o) o.remove(); s = [[8, 7], [7, 7], [6, 7]]; dir = next = [1, 0]; place(); tickMs = 140; msg.textContent = 'Go, fren. Blocks are coins.'; draw(); timer = setInterval(tick, tickMs); return true; };
       againB.addEventListener('click', function () { start('again'); });
       cv.addEventListener('pointerdown', function (e) {
-        if (!timer) { start('tap'); return; }
+        if (!timer) { if (!held) start('tap'); return; }
         var sx = e.clientX, sy = e.clientY;
         var up = function (ev) { cv.removeEventListener('pointerup', up); var dx = ev.clientX - sx, dy = ev.clientY - sy; if (Math.abs(dx) + Math.abs(dy) < 18) return; turn(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up')); };
         cv.addEventListener('pointerup', up);
       });
-      A.body.querySelectorAll('[data-k]').forEach(function (b) { b.addEventListener('pointerdown', function () { if (!timer && !start('tap')) return; turn(b.getAttribute('data-k')); }); });
-      var K = function (k) { return function (d) { if (d) { if (!timer && !start('key')) return; turn(k); } }; };
-      var unkey = gameKeys(A, { ArrowLeft: K('left'), ArrowRight: K('right'), ArrowUp: K('up'), ArrowDown: K('down'), a: K('left'), d: K('right'), w: K('up'), s: K('down'), ' ': function (d) { if (d && !timer) start('space'); } });
+      A.body.querySelectorAll('[data-k]').forEach(function (b) { b.addEventListener('pointerdown', function () { if (held) return; if (!timer && !start('tap')) return; turn(b.getAttribute('data-k')); }); });
+      var K = function (k) { return function (d) { if (d) { if (held) return; if (!timer && !start('key')) return; turn(k); } }; };
+      var unkey = gameKeys(A, { ArrowLeft: K('left'), ArrowRight: K('right'), ArrowUp: K('up'), ArrowDown: K('down'), a: K('left'), d: K('right'), w: K('up'), s: K('down'), ' ': function (d) { if (d && !timer && !held) start('space'); } });
       face.onload = draw; draw();
-      A.stop = function () { clearInterval(timer); unkey(); };
-      var held = false;
+      A.stop = function () { clearInterval(timer); timer = null; held = false; unkey(); };
       A.pause = function () { if (timer) { clearInterval(timer); timer = null; held = true; msg.textContent = 'Paused. The snake waits for you.'; } };
       A.resume = function () { if (held && s) { held = false; timer = setInterval(tick, tickMs); msg.textContent = 'Back in the pond!'; } };
     }, 520);
