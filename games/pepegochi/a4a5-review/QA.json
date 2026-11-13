@@ -1,0 +1,310 @@
+[
+  {
+    "file": "depart_turn_01.png",
+    "bounds": [
+      26,
+      8,
+      122,
+      124
+    ],
+    "colors": 39,
+    "sha256": "c5e9915d4668c9813ad253b039400bd74dfba23ab50a9d77334fbf53b5dc2393"
+  },
+  {
+    "file": "depart_turn_02.png",
+    "bounds": [
+      26,
+      8,
+      118,
+      124
+    ],
+    "colors": 37,
+    "sha256": "0db2a62bc62eb0499cd2c51bfc62166296e3d9517a02b24d8ba7d559ca5b3e38"
+  },
+  {
+    "file": "depart_walk_01.png",
+    "bounds": [
+      26,
+      8,
+      118,
+      124
+    ],
+    "colors": 37,
+    "sha256": "f7c9b37714bf4b69f99042e6ddd1eb29008dc2ef17ec66f98c7b2a3ff99da1b9"
+  },
+  {
+    "file": "depart_walk_02.png",
+    "bounds": [
+      26,
+      6,
+      118,
+      122
+    ],
+    "colors": 37,
+    "sha256": "cda0611418a8ab1c9039a2619282f9bb66fdb1cab3c9f4241f9d7546b43b57d0"
+  },
+  {
+    "file": "depart_walk_03.png",
+    "bounds": [
+      26,
+      8,
+      118,
+      124
+    ],
+    "colors": 37,
+    "sha256": "33d537698435ce3389cb7261fb8d6cc67db4ca51d9fa496f8c7b400458348471"
+  },
+  {
+    "file": "depart_walk_04.png",
+    "bounds": [
+      26,
+      6,
+      118,
+      122
+    ],
+    "colors": 37,
+    "sha256": "cda0611418a8ab1c9039a2619282f9bb66fdb1cab3c9f4241f9d7546b43b57d0"
+  },
+  {
+    "file": "froglet_depart_walk_01.png",
+    "bounds": [
+      24,
+      30,
+      114,
+      124
+    ],
+    "colors": 37,
+    "sha256": "784a928a756134f8744f5f69ff6545283d25380cca903b5f394d66b25647ac43"
+  },
+  {
+    "file": "froglet_depart_walk_02.png",
+    "bounds": [
+      24,
+      28,
+      114,
+      122
+    ],
+    "colors": 37,
+    "sha256": "9b4e897e8f70a3ddbf2221edc7225c36721d0487e9d742b9562db9492e87983f"
+  },
+  {
+    "file": "froglet_depart_walk_03.png",
+    "bounds": [
+      24,
+      30,
+      114,
+      124
+    ],
+    "colors": 37,
+    "sha256": "c366230628d056c688f0355ec635e55930a281158321396b1fb4874dbdd7f653"
+  },
+  {
+    "file": "froglet_depart_walk_04.png",
+    "bounds": [
+      24,
+      28,
+      114,
+      122
+    ],
+    "colors": 37,
+    "sha256": "9b4e897e8f70a3ddbf2221edc7225c36721d0487e9d742b9562db9492e87983f"
+  },
+  {
+    "file": "pepegochi_froglet_dirty.png",
+    "bounds": [
+      24,
+      30,
+      106,
+      124
+    ],
+    "colors": 35,
+    "sha256": "1817c5e1e7f24dfceda040e989238bf11ace92def8ab74b5df693bbd7ae02679"
+  },
+  {
+    "file": "pepegochi_froglet_hungry.png",
+    "bounds": [
+      24,
+      30,
+      112,
+      124
+    ],
+    "colors": 36,
+    "sha256": "1da7119712c2b032fa0dd23514bb30161e15b4c8ddff0321204c3f99288c5432"
+  },
+  {
+    "file": "pepegochi_froglet_moody.png",
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "colors": 32,
+    "sha256": "71d4900072698307c39508e151830ef71563ea7e920ffd67dccb479fcaf50a82"
+  },
+  {
+    "file": "pepegochi_froglet_neglected.png",
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "colors": 35,
+    "sha256": "18fbcac32d63d17f4f98bc1375fc66fa8f6dab3ea2e7aad8de6cce43e4b18c17"
+  },
+  {
+    "file": "pepegochi_froglet_packing.png",
+    "bounds": [
+      24,
+      30,
+      106,
+      124
+    ],
+    "colors": 37,
+    "sha256": "a15162228607696e63307fddab05c492483946dae878d3454e2abc61bbc86936"
+  },
+  {
+    "file": "pepegochi_froglet_recovering.png",
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "colors": 35,
+    "sha256": "b0169d6ec7c838b823bc9b0880cd88ec867360c173a1edbc962a2c597ffdd28f"
+  },
+  {
+    "file": "pepegochi_froglet_tired.png",
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "colors": 33,
+    "sha256": "92371ec852ebc46c397c27c3c9463e4e392be7c5fb6f3cb9fc310b7bb5ece67c"
+  },
+  {
+    "file": "pepegochi_tadpole_dirty.png",
+    "bounds": [
+      16,
+      50,
+      120,
+      124
+    ],
+    "colors": 24,
+    "sha256": "20f7788f175819358982d99e6c46b45782b814c1b096bd4fdfec9d6af18a91dd"
+  },
+  {
+    "file": "pepegochi_tadpole_hungry.png",
+    "bounds": [
+      16,
+      50,
+      126,
+      124
+    ],
+    "colors": 23,
+    "sha256": "58d4af366e7df5773aa2a105e6160378a420accd525481e1d7375b3d8939813a"
+  },
+  {
+    "file": "pepegochi_tadpole_moody.png",
+    "bounds": [
+      16,
+      50,
+      110,
+      124
+    ],
+    "colors": 20,
+    "sha256": "dd5d06336908f9409e82a4fbddcc47ef5281c46cb78aa1316574a77f3baf4abe"
+  },
+  {
+    "file": "pepegochi_tadpole_neglected.png",
+    "bounds": [
+      16,
+      50,
+      110,
+      124
+    ],
+    "colors": 22,
+    "sha256": "105276fa51172b88c6a4ed9783ad056aaae2dfcdf30ca7a832cea9eaa874add8"
+  },
+  {
+    "file": "pepegochi_tadpole_packing.png",
+    "bounds": [
+      16,
+      50,
+      126,
+      124
+    ],
+    "colors": 24,
+    "sha256": "d004a1055777d7ea42c799c1cfab85475058116481014f65465123c769afbce0"
+  },
+  {
+    "file": "pepegochi_tadpole_recovering.png",
+    "bounds": [
+      16,
+      50,
+      110,
+      124
+    ],
+    "colors": 24,
+    "sha256": "ffe047e8b4167b50658933306371eeac1066f70305941113223f66d8dbd44704"
+  },
+  {
+    "file": "pepegochi_tadpole_tired.png",
+    "bounds": [
+      16,
+      50,
+      110,
+      124
+    ],
+    "colors": 21,
+    "sha256": "cb9be0959145651438e148071a429763be54a56d4ba458e27af611e0ce86afc9"
+  },
+  {
+    "file": "tadpole_depart_01.png",
+    "bounds": [
+      16,
+      50,
+      126,
+      124
+    ],
+    "colors": 25,
+    "sha256": "2d959cd4e346dce798f6631ebf6dd3002b0f1d18a9a17153d9c38e3bd3432803"
+  },
+  {
+    "file": "tadpole_depart_02.png",
+    "bounds": [
+      16,
+      48,
+      126,
+      122
+    ],
+    "colors": 25,
+    "sha256": "085a1ce5f9c26fdafbc9bef9ce43e50636e04f1b6bb8222e821bb4ea6ab6bcb2"
+  },
+  {
+    "file": "tadpole_depart_03.png",
+    "bounds": [
+      16,
+      50,
+      126,
+      124
+    ],
+    "colors": 25,
+    "sha256": "32cb5df823611949e8f4aab283320af53db06af39261c2577fa7126c3c381c39"
+  },
+  {
+    "file": "tadpole_depart_04.png",
+    "bounds": [
+      16,
+      48,
+      126,
+      122
+    ],
+    "colors": 25,
+    "sha256": "085a1ce5f9c26fdafbc9bef9ce43e50636e04f1b6bb8222e821bb4ea6ab6bcb2"
+  }
+]
