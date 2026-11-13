@@ -1342,12 +1342,22 @@
   try { var autoNick = localStorage.getItem('pepgry-nick') || ''; if (/^Frog\d{4}$/.test(autoNick)) { localStorage.setItem('pondos-wp-nick', autoNick); localStorage.removeItem('pepgry-nick'); } } catch (e) {}
   var GAME_NAME = { fud: 'FUD Invaders', snake: 'PEP Snake' };
   // a PEP Games sign-in (Discord) lives in this browser's storage; a valid one makes the score "verified"
+  // Discord on a linked guest: identities[].provider, or app_metadata.providers once is_anonymous is false.
+  // The name is on identity_data (global_name / full_name / name). user_metadata is only filled for a fresh Discord signup.
+  function discordOf(user) {
+    var ids = (user && user.identities) || [], d = null, i;
+    for (i = 0; i < ids.length; i++) if (ids[i] && ids[i].provider === 'discord') { d = ids[i]; break; }
+    var providers = (user && user.app_metadata && user.app_metadata.providers) || [];
+    var linked = !!d || providers.indexOf('discord') >= 0;
+    var idd = (d && d.identity_data) || {}, claims = idd.custom_claims || {}, m = (user && user.user_metadata) || {};
+    var name = linked ? (claims.global_name || idd.full_name || idd.name || idd.user_name || idd.preferred_username || m.full_name || m.name || m.user_name || m.preferred_username) : null;
+    return { linked: linked, name: name };
+  }
   function sbSession() {
     try {
       var s = JSON.parse(localStorage.getItem(SB_STORE) || 'null');
       if (s && s.access_token && s.expires_at * 1000 > Date.now() + 30000 && !(s.user && s.user.is_anonymous)) {
-        var ids = (s.user && s.user.identities) || [];
-        return { token: s.access_token, userId: s.user && s.user.id, discord: ids.some(function (i) { return i.provider === 'discord'; }) };
+        return { token: s.access_token, userId: s.user && s.user.id, discord: discordOf(s.user).linked };
       }
     } catch (e) {}
     return null;
@@ -1774,10 +1784,9 @@
   // which sends the visitor straight back here afterwards.
   function whoAmI() {
     var s = anySession(); if (!s || !s.user) return null;
-    var ids = s.user.identities || [], d = ids.filter(function (i) { return i.provider === 'discord'; })[0], m = s.user.user_metadata || {};
-    var name = d ? ((d.identity_data && (d.identity_data.custom_claims && d.identity_data.custom_claims.global_name || d.identity_data.full_name || d.identity_data.name)) || m.full_name || m.name) : null;
+    var d = discordOf(s.user);
     var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
-    return { discord: !!d, name: name || nick || 'guest' };
+    return { discord: d.linked, name: d.name || nick || 'guest' };
   }
   function signInHref() { return BASE + 'games/?login=1&back=' + encodeURIComponent(location.pathname + location.search.replace(/[?&]signedin=1/, '')); }
   // Fren Passport: all durable player data comes from the server. The catalog
@@ -2881,8 +2890,14 @@
     paintLogon();
     if (/[?&]signedin=1/.test(location.search)) {
       try { history.replaceState(null, '', location.pathname + location.search.replace(/[?&]signedin=1/, '').replace(/^&/, '?') + location.hash); } catch (e) {}
+      var linkNote = '';
+      try { linkNote = sessionStorage.getItem('pepgry-oauth-note') || ''; if (linkNote) sessionStorage.removeItem('pepgry-oauth-note'); } catch (e) {}
       var me0 = whoAmI();
-      if (me0) setTimeout(function () { balloon('Welcome to the pond, ' + me0.name, me0.discord ? 'Signed in with Discord ✓. LAN Party and High Scores now use your name.' : 'Signed in as a guest. You can chat and submit scores.', 'gif-045-still'); }, 900);
+      if (me0 || linkNote) setTimeout(function () {
+        balloon('Welcome to the pond, ' + (me0 ? me0.name : 'fren'),
+          linkNote || (me0 && me0.discord ? 'Signed in with Discord ✓. LAN Party and High Scores now use your name.' : 'Signed in as a guest. You can chat and submit scores.'),
+          'gif-045-still');
+      }, 900);
     }
   }
 

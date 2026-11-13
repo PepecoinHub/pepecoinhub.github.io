@@ -4,7 +4,7 @@
 // who are not signed in. Reading and writing are open to everyone: without a sign-in a nickname goes
 // with each message (the server limits it per network); a guest or Discord sign-in keeps the same name.
 // Text and our own emotes only: the server rejects links, and the page never shows pictures from players.
-import { $, h, toast, nickStore } from './common.js';
+import { $, h, toast, nickStore } from './common.js?v=20261113link';
 import { renderBody, attachPicker } from './emotes.js';
 
 // Fren Passport beta (only a browser that opened /meme/?beta=fren): a verified (Discord) name links to that

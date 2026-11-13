@@ -19,6 +19,148 @@ export function friendlyError(e) {
   const x = new Error(OFFLINE_MSG); x.offline = true; return x;
 }
 
+// How a Discord button should talk to Supabase.
+// 'link' keeps an anonymous guest's user id (Pepe Guesser plays are keyed by it).
+// 'signin' is a visitor with no session. 'switch' is someone already signed in with Discord.
+export function oauthMode(user) {
+  if (!user) return 'signin';
+  if (user.is_anonymous) return 'link';
+  return 'switch';
+}
+
+// A linked guest is Discord once is_anonymous is false and either identities or app_metadata.providers says discord.
+// The Discord username and avatar live on identities[].identity_data; user_metadata is only a fallback.
+export function userHasDiscord(user) {
+  if (!user || user.is_anonymous) return false;
+  const ids = user.identities || [];
+  if (ids.some((i) => i && i.provider === 'discord')) return true;
+  const providers = user.app_metadata && user.app_metadata.providers;
+  return Array.isArray(providers) && providers.includes('discord');
+}
+
+export const LINK_UID_KEY = 'pepgry-link-uid';
+export const OAUTH_NOTE_KEY = 'pepgry-oauth-note';
+
+export function linkFailureMessage(err) {
+  const why = (err && (err.message || err.error_description)) || String(err || 'unknown error');
+  return 'Could not attach Discord to this guest (' + why + '). Signing in with Discord as a separate account instead. Points on this guest stay on the old guest id.';
+}
+
+function storageGet(storage, key) {
+  try { return storage.getItem(key); } catch { return null; }
+}
+function storageSet(storage, key, value) {
+  try { storage.setItem(key, value); } catch { /* private mode or a full store */ }
+}
+function storageDel(storage, key) {
+  try { storage.removeItem(key); } catch { /* ignore */ }
+}
+
+// Anonymous guests link Discord onto the same user. Anyone else uses a normal Discord login.
+// If linking is refused (manual linking off, or that Discord account is already on another user),
+// fall back to sign-out plus a new login so the button still works.
+export async function startOAuth(sb, sess, provider, redirectTo, storage) {
+  const user = sess && sess.user;
+  if (oauthMode(user) === 'link') {
+    storageSet(storage, LINK_UID_KEY, user.id);
+    let res;
+    try {
+      res = await sb.auth.linkIdentity({ provider, options: { redirectTo } });
+    } catch (e) {
+      return freshOAuth(sb, sess, provider, redirectTo, storage, e);
+    }
+    if (res && res.error) return freshOAuth(sb, sess, provider, redirectTo, storage, res.error);
+    return { linked: true };
+  }
+  return freshOAuth(sb, sess, provider, redirectTo, storage, null);
+}
+
+async function freshOAuth(sb, sess, provider, redirectTo, storage, linkErr) {
+  storageDel(storage, LINK_UID_KEY);
+  let note = null;
+  if (linkErr) {
+    note = linkFailureMessage(linkErr);
+    console.warn('[pep]', note);
+    storageSet(storage, OAUTH_NOTE_KEY, note);
+  }
+  if (sess) await sb.auth.signOut();
+  let res;
+  try {
+    res = await sb.auth.signInWithOAuth({ provider, options: { redirectTo } });
+  } catch (e) {
+    const err = friendlyError(e);
+    if (note) err.message = note + ' ' + err.message;
+    throw err;
+  }
+  if (res.error) {
+    const err = friendlyError(res.error);
+    if (note) err.message = note + ' ' + err.message;
+    throw err;
+  }
+  return { linked: false, note };
+}
+
+// After the browser comes back from Discord: refresh the user (identities, is_anonymous) and,
+// only when this same guest id now has Discord, ask the server to mark that user's old rows verified.
+export async function finishDiscordLink(sb, sess, storage, rpc) {
+  const uid = storageGet(storage, LINK_UID_KEY);
+  if (!uid || !sess || !sess.user) return { adopted: false, session: sess };
+  if (sess.user.id !== uid) {
+    storageDel(storage, LINK_UID_KEY);
+    return { adopted: false, session: sess };
+  }
+  let session = sess;
+  let refreshed = false;
+  try {
+    const { data, error } = await sb.auth.setSession({
+      access_token: sess.access_token,
+      refresh_token: sess.refresh_token,
+    });
+    if (!error && data && data.session && data.session.user) {
+      session = data.session;
+      refreshed = true;
+    }
+  } catch (e) {
+    console.warn('[pep] Could not refresh the session after Discord linking', e);
+  }
+  if (!userHasDiscord(session.user)) {
+    if (refreshed) storageDel(storage, LINK_UID_KEY);
+    return { adopted: false, session };
+  }
+  try {
+    const result = await rpc('gry_adopt_guest_rows');
+    storageDel(storage, LINK_UID_KEY);
+    console.info('[pep] Guest Pepe Guesser rows now count as Discord', result);
+    return { adopted: true, session, result };
+  } catch (e) {
+    const msg = (e && e.message) || String(e || '');
+    console.warn('[pep] Guest Pepe Guesser rows were not marked as Discord yet. Run games/supabase/update_adopt_guest_rows.sql in the Supabase SQL editor.', msg);
+    if (!/function|schema cache|PGRST202|does not exist/i.test(msg)) storageDel(storage, LINK_UID_KEY);
+    return { adopted: false, session, pending: true };
+  }
+}
+
+// The fallback note is shown here, except on the PondOS hand-off (login=1&back=) which shows it after returning.
+export function showStoredOAuthNote() {
+  const note = storageGet(sessionStorage, OAUTH_NOTE_KEY);
+  if (!note || typeof document === 'undefined') return;
+  const q = new URLSearchParams(location.search);
+  if (q.get('login') === '1' && q.get('back')) return;
+  storageDel(sessionStorage, OAUTH_NOTE_KEY);
+  console.warn('[pep]', note);
+  const paint = () => {
+    if (!document.body || document.getElementById('pep-oauth-note')) return;
+    const p = document.createElement('p');
+    p.id = 'pep-oauth-note';
+    p.setAttribute('role', 'status');
+    p.textContent = note;
+    p.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99999;margin:0;background:#3a2218;color:#fff8ee;padding:12px 14px;border:2px solid #111;font:14px/1.4 Ubuntu,system-ui,sans-serif';
+    document.body.append(p);
+  };
+  if (document.body) paint();
+  else document.addEventListener('DOMContentLoaded', paint);
+}
+
 let instance;
 export async function getBackend() {
   if (instance) return instance;
@@ -118,6 +260,11 @@ class SupaBackend {
     const { data } = await this.sb.auth.getSession();
     this.sess = data.session;
     this.sb.auth.onAuthStateChange((_e, s) => { this.sess = s; if (s) this.sb.realtime.setAuth(s.access_token); });
+    // A linked guest is no longer anonymous and has a discord identity. gry_me() then reports verified
+    // from games.discord_identity (auth.identities), the same check as a fresh Discord login.
+    const done = await finishDiscordLink(this.sb, this.sess, sessionStorage, (fn, args) => this.rpc(fn, args));
+    if (done.session) this.sess = done.session;
+    showStoredOAuthNote();
   }
   session() { return this.sess ? { user: { id: this.sess.user.id, is_anonymous: !!this.sess.user.is_anonymous } } : null; }
   async guest() {
@@ -131,10 +278,7 @@ class SupaBackend {
   async discord() { return this.oauth('discord'); }
   async reddit() { return this.oauth('reddit'); }
   async oauth(provider) {
-    if (this.sess) await this.sb.auth.signOut();
-    let res;
-    try { res = await this.sb.auth.signInWithOAuth({ provider, options: { redirectTo: location.href.split('#')[0] } }); } catch (e) { throw friendlyError(e); }
-    if (res.error) throw friendlyError(res.error);
+    await startOAuth(this.sb, this.sess, provider, location.href.split('#')[0], sessionStorage);
   }
   async logout() { await this.sb.auth.signOut(); this.sess = null; }
   async rpc(fn, args = {}) {
