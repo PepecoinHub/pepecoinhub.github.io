@@ -1662,13 +1662,13 @@
       ['Log On', 'Guest or Discord', 'pep-logo', 'log on login sign in account discord guest', logOn],
       ['LaptopIndex.exe', 'The Legendary Laptop', 'gif-012-still', 'laptop legend 40 million ath', laptop],
       ['Recycle Bin', 'Paper hands and a strange note', 'recycle-bin', 'bin trash recycle paper hands', paperHands]
-    ].concat(GOLDHOOK ? [['Pepe Gold Hook', '20 levels, a shop, one hook', 'goldhook', 'game gold hook claw miner mine nugget crate arcade levels shop upgrades dynamite', function () { goldHookApp(); }]] : []).concat(FREN ? [
+    ].concat(FREN ? [
       ['Fren Passport', 'Your Fren, achievements and secrets', 'pep-logo', 'passport profile achievements badges secrets items account', function () { frenPassport(); }],
       ['Create Your Fren', 'Avatar Maker for your Fren Passport', 'fresh-fren', 'avatar maker profile picture face hat outfit glasses look character fresh fren', function () { avatarMaker(); }]
     ] : []).concat(GOCHI ? [
       ['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', 'pepegochi tamagotchi pet frog care feed egg hatch', function () { pepegochiApp(); }],
       ['PEPEGOCHI (local test)', 'Rules simulator for the PepeGochi beta', 'pep-logo', 'pepegochi test beta simulator time machine', function () { pepegochiTestApp(); }]
-    ] : []).map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
+    ] : []).concat(GOLDHOOK ? [['Pepe Gold Hook', '20 levels, a shop, one hook', 'goldhook', 'game gold hook claw miner mine nugget crate arcade levels shop upgrades dynamite', function () { goldHookApp(); }]] : []).map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
     NAV.forEach(function (g) { g[1].forEach(function (p) { L.push({ name: p[1], desc: p[2], icon: p[3], kw: 'page ' + g[0] + ' ' + p[0].replace(/[@\/-]/g, ' '), go: page(p[0]) }); }); });
     ADS.forEach(function (ad, i) { L.push({ name: ad.file, desc: 'PEP-TV ad: ' + ad.title, icon: ad.icon, kw: 'ad ads tv video ' + ad.title, go: function () { adPlayer(i); } }); });
     return L;
