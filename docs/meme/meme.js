@@ -4968,13 +4968,14 @@
         if (loaded) return; loaded = true;
         var left = imgs.length;
         imgs.forEach(function (im, i) {
-          im.onload = function () { if (--left === 0) s.classList.add('ready'); };
+          im.onload = function () { if (--left === 0) { s.classList.add('ready'); if (s.onready) s.onready(); } };
           im.src = 'img/sky/' + name + '-' + files[i] + '.webp';
         });
       };
       return s;
     }
     var day = scene('day'), night = scene('night');
+    day.onready = function () { if (lastM !== null) paint(); };
     day.appendChild(el('div', { class: 'sky-tint' }));
     day.appendChild(el('div', { class: 'sky-glow' }));
     // a handful of stars that blink over the night sky and fireflies over the forest, always in the same places
@@ -5016,7 +5017,10 @@
       if (jump) void box.offsetWidth;
       box.style.setProperty('--day-down', v[0].toFixed(4));
       box.style.setProperty('--night-down', v[1].toFixed(4));
-      box.style.setProperty('--night', v[2].toFixed(4));
+      // the night picture fades in over the day layers; until those are loaded only the flat day wallpaper is
+      // under it, and a half-faded night showed the whole grinning Pepe through it, so snap instead of fading
+      var nightOp = day.classList.contains('ready') ? v[2] : v[2] >= 0.5 ? 1 : 0;
+      box.style.setProperty('--night', nightOp.toFixed(4));
       box.style.setProperty('--tint', v[3].toFixed(4));
       lastM = m;
       // the static picture under the sky (and the first paint of the next visit) follow along
