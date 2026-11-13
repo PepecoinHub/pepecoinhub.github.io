@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://azbwciqfbsdpwubznncg.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Pepe Gold Hook: swing, drop, reel in the gold | Pepecoin Hub</title>
+<meta name="description" content="Drop a swinging hook into the mine and reel in gold, PEP coins and crates before time runs out. Heavy loot comes up slowly. Free arcade game; game PEP are points, not real coins.">
+<link rel="canonical" href="https://pepecoinhub.com/games/gold-hook.html">
+<link rel="icon" href="img/gold-hook/objects/pm-nugget-large.png">
+<link rel="stylesheet" href="gold-hook.css?v=20261113a">
+<script src="js/config.js"></script>
+<script type="module" src="js/gold-hook.mjs?v=20261113a"></script>
+</head>
+<body>
+<header class="site-links"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · ARCADE</span><a href="index.html">More games →</a></header>
+<main class="gh-app">
+  <div class="stage" id="stage">
+    <canvas id="game" width="640" height="480" tabindex="0" aria-describedby="stats">Your browser needs Canvas to play this game.</canvas>
+
+    <div class="overlay" id="ov-loading" tabindex="-1">
+      <div class="panel"><p id="loading-text"></p></div>
+    </div>
+
+    <div class="overlay" id="ov-error" role="alertdialog" aria-labelledby="error-title" tabindex="-1" hidden>
+      <div class="panel panel-error">
+        <h2 id="error-title"></h2>
+        <p id="error-hint"></p>
+        <ul id="error-list"></ul>
+      </div>
+    </div>
+
+    <div class="overlay" id="ov-title" role="dialog" aria-modal="true" aria-labelledby="title-heading" hidden>
+      <div class="panel">
+        <h1 id="title-heading" class="game-name">Pepe Gold Hook</h1>
+        <p id="title-intro"></p>
+        <p id="title-goal" class="strong"></p>
+        <p id="title-keys" class="small"></p>
+        <div class="buttons"><button type="button" class="pm-btn" id="btn-play"></button></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="ov-pause" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
+      <div class="panel">
+        <h2 id="pause-title"></h2>
+        <p id="pause-text"></p>
+        <div class="buttons">
+          <button type="button" class="pm-btn" id="btn-resume"></button>
+          <button type="button" class="pm-btn" id="btn-restart"></button>
+          <button type="button" class="pm-btn" id="btn-exit"></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="ov-result" role="dialog" aria-modal="true" aria-labelledby="result-title" hidden>
+      <div class="panel">
+        <h2 id="result-title"></h2>
+        <p id="result-line" class="strong"></p>
+        <p id="result-text"></p>
+        <p id="result-best" class="small"></p>
+        <form id="hs-form" class="hs-form" hidden>
+          <p id="hs-discord" class="small" hidden></p>
+          <label id="hs-nick-row" class="hs-nick-row"><span id="hs-nick-label"></span> <input id="hs-nick" name="nick" maxlength="20" autocomplete="nickname"></label>
+          <button type="submit" class="pm-btn" id="hs-submit"></button>
+          <p id="hs-status" class="small" role="status"></p>
+          <p id="hs-note" class="small"></p>
+        </form>
+        <div class="buttons">
+          <button type="button" class="pm-btn" id="btn-again"></button>
+          <button type="button" class="pm-btn" id="btn-menu"></button>
+          <button type="button" class="pm-btn" id="btn-top"></button>
+        </div>
+        <div id="hs-top-box" class="hs-top-box" hidden><ol id="hs-top"></ol></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls" id="controls">
+    <button type="button" class="pm-btn" id="btn-fire" disabled></button>
+    <button type="button" class="pm-btn" id="btn-pause" disabled></button>
+  </div>
+
+  <p id="stats" class="sr-only"></p>
+  <div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+</main>
+</body></html>

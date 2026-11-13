@@ -117,7 +117,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'goldhook') return '../games/img/gold-hook/objects/pm-nugget-large.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
   // Hall of Fame icon: the owner's art (gold cup + open Pepe passport) goes to img/ico/hall-of-fame.webp, then this
   // line becomes 'img/ico/hall-of-fame.webp'. Until then the LEADERS trophy stands in (no new art is made here).
   var HOF_ICON = 'img/ico/leaders.webp';
@@ -265,6 +265,7 @@
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
       ['YEET THE PEP', 'A frog, a catapult, no flight plan', 'yeet', function () { yeetApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', function () { pepeSweeperApp(); }],
+      ['Pepe Gold Hook', 'Swing, drop, reel in the gold', 'goldhook', function () { goldHookApp(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['PEPaint', 'The party room: draw and guess with frens', 'pepaint', function () { drawGuess(); }],
@@ -1383,13 +1384,14 @@
   function whoLegend() { return '<p class="who-legend"><b class="who who-ok"><img src="img/pep-logo.webp" alt="" width="14" height="14">Bold</b> = Discord player · <span class="who-guest">grey</span> = guest. <a href="#" class="who-logon">Log on with Discord</a> to get the frog.</p>'; }
   function wireLegend(box) { var a = box.querySelector('.who-logon'); if (a) a.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); }
   // LEADERS: every top 10 in one window (FUD Invaders, PEP Snake, YEET THE PEP, Pepe Guesser today and this week, Pepe Miner)
-  var LEAD = [['fud', 'FUD Invaders'], ['snake', 'PEP Snake'], ['yeet', 'YEET THE PEP'], ['wp', "Pepe Guesser"], ['miner', 'Pepe Miner']];
+  var LEAD = [['fud', 'FUD Invaders'], ['snake', 'PEP Snake'], ['yeet', 'YEET THE PEP'], ['wp', "Pepe Guesser"], ['miner', 'Pepe Miner'], ['goldhook', 'Pepe Gold Hook']];
   var LEAD_TIP = {
     fud: 'Best score per player. Scores run in your browser, so the server checks them for plausibility and rate.',
     snake: 'Best score per player, in blocks. The server checks every score against the length of the game.',
     yeet: 'Best flight per pilot. Guests add a flight with a nickname after landing.',
     wp: 'Points from the daily photo hunts. Guests count once per network.',
-    miner: 'Blocks mined (10,000 game PEP each), from the cloud saves of Discord players. A guest’s mine stays in their browser.'
+    miner: 'Blocks mined (10,000 game PEP each), from the cloud saves of Discord players. A guest’s mine stays in their browser.',
+    goldhook: 'Best score per player. The game sends the list of caught loot and the server counts the points itself.'
   };
   function highScores(game) {
     var A = openApp('hs', 'LEADERS - top 10', 'leaders', function (A) {
@@ -1409,8 +1411,8 @@
         box.className = 'lead-lists' + (g === 'wp' ? ' two' : '');
         box.innerHTML = g === 'wp' ? '<div>' + list('Today') + '</div><div>' + list('This week') + '</div>' : list('');
         var ols = box.querySelectorAll('ol');
-        if (g === 'fud' || g === 'snake') rpc('gry_arcade_top', { p_game: g }).then(function (rows) {
-          ols[0].innerHTML = rows && rows.length ? rows.map(function (r, i) { return row(r, i, fmt.int(r.score) + (g === 'snake' ? ' blocks' : '')); }).join('') : empty;
+        if (g === 'fud' || g === 'snake' || g === 'goldhook') rpc('gry_arcade_top', { p_game: g }).then(function (rows) {
+          ols[0].innerHTML = rows && rows.length ? rows.map(function (r, i) { return row(r, i, fmt.int(r.score) + (g === 'snake' ? ' blocks' : g === 'goldhook' ? ' pts' : '')); }).join('') : empty;
         }, fail(ols[0]));
         else if (g === 'yeet') rpc('gry_yeet_state', {}).then(function (r) {
           var rows = (r && r.top) || [];
@@ -1587,6 +1589,27 @@
     }, 590);
     return A;
   }
+  // Pepe Gold Hook: a normal window that fits the game (the game reports its size), like PEPE SWEEPER.
+  // Minimizing pauses it (pauseFrames sends 'pause'); scores go to the shared arcade table.
+  function goldHookApp() {
+    var A = openApp('goldhook', 'Pepe Gold Hook', 'goldhook', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame sweep-frame" src="' + BASE + 'games/gold-hook.html?embed=1" title="Pepe Gold Hook"></iframe>';
+      A.body.style.padding = '0';
+      var fr = A.body.querySelector('iframe'), lastW = 0;
+      var onSize = function (e) {
+        if (e.source !== fr.contentWindow || !e.data || e.data.type !== 'gold-hook-size') return;
+        fr.style.height = Math.max(240, e.data.h) + 'px';
+        if (e.data.w !== lastW) {
+          lastW = e.data.w;
+          A.host.style.width = 'min(' + (e.data.w + 10) + 'px, calc(100vw - 16px))';
+          if (window.innerWidth > 760) { A.host.style.left = Math.max(8, (window.innerWidth - A.host.offsetWidth) / 2) + 'px'; A.host.style.transform = 'none'; }
+        }
+      };
+      window.addEventListener('message', onSize);
+      A.stop = function () { window.removeEventListener('message', onSize); };
+    }, 680);
+    return A;
+  }
   function minerApp() {
     var A = openApp('miner', 'Pepe Miner', 'pickaxe', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/miner.html?embed=1" title="Pepe Miner"></iframe>';
@@ -1606,6 +1629,7 @@
       ['LEADERS', 'Every top 10 in one place', 'leaders', 'scores high score top ranking leaderboard best winners', function () { highScores(); }],
       ['YEET THE PEP', 'Catapult a frog, three panic flaps', 'yeet', 'game catapult launch fly distance arcade', function () { yeetApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', 'game minesweeper saper flags lily pads wrong pepe eth arcade', function () { pepeSweeperApp(); }],
+      ['Pepe Gold Hook', 'Swing, drop, reel in the gold', 'goldhook', 'game gold hook claw miner mine nugget crate arcade', function () { goldHookApp(); }],
       ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', 'game arcade shooter invaders fud', invaders],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', 'game arcade snake blocks', snake],
       ['Pepe Miner', 'Click, mine, upgrade', 'pickaxe', 'game miner idle clicker mine blocks', minerApp],
@@ -1676,6 +1700,7 @@
       var G = [['🏆 LEADERS', 'leaders', function () { highScores(); }], ['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
         ['YEET THE PEP', 'yeet', function () { yeetApp(); }],
         ['PEPE SWEEPER', 'pepesweeper', function () { pepeSweeperApp(); }],
+        ['Pepe Gold Hook', 'goldhook', function () { goldHookApp(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
         ['PEPaint.exe', 'pepaint', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];

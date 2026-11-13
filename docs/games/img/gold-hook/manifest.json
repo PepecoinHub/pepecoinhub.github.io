@@ -1,0 +1,395 @@
+{
+ "version": "1.0.0",
+ "logicalViewport": [
+  640,
+  480
+ ],
+ "units": "pixels",
+ "filter": "nearest",
+ "assets": [
+  {
+   "id": "pm-miner-atlas",
+   "path": "characters/pm-miner-atlas.png",
+   "width": 640,
+   "height": 96,
+   "anchor": [
+    40,
+    88
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    20,
+    11,
+    627,
+    88
+   ],
+   "sha256": "11c006a3c0668899cf040a638a6f88c47123b9e75afcde0cffcaddad5ae4be35"
+  },
+  {
+   "id": "pm-coin-pep",
+   "path": "objects/pm-coin-pep.png",
+   "width": 24,
+   "height": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    21,
+    22
+   ],
+   "sha256": "0ae52815290abada6995524a71ea5ceb828bb2e683b4c14115af60fbeb146881"
+  },
+  {
+   "id": "pm-crate",
+   "path": "objects/pm-crate.png",
+   "width": 40,
+   "height": 40,
+   "anchor": [
+    20,
+    20
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    3,
+    2,
+    36,
+    38
+   ],
+   "sha256": "0eb664ab046324f1291140604a6e058def8e546508ef5baa6edeac8e20adb08d"
+  },
+  {
+   "id": "pm-hook-basic",
+   "path": "objects/pm-hook-basic.png",
+   "width": 32,
+   "height": 40,
+   "anchor": [
+    16,
+    3
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    3,
+    29,
+    38
+   ],
+   "sha256": "cb1a9f91e30f2ff5484a049eab72800393c77c97e22933d64858410a1fe77e01",
+   "cargoAnchor": [
+    16,
+    35
+   ]
+  },
+  {
+   "id": "pm-nugget-large",
+   "path": "objects/pm-nugget-large.png",
+   "width": 48,
+   "height": 48,
+   "anchor": [
+    24,
+    24
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    46,
+    45
+   ],
+   "sha256": "dcbc089ce8b428322dee6b69730cf65b3865ea542ec22c91b04eeaddc3d714da"
+  },
+  {
+   "id": "pm-nugget-medium",
+   "path": "objects/pm-nugget-medium.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    3,
+    30,
+    28
+   ],
+   "sha256": "1a4be3947bfcca1ac0cbed25add6341792e5a4db0d7459e075ee8212097478cf"
+  },
+  {
+   "id": "pm-nugget-small",
+   "path": "objects/pm-nugget-small.png",
+   "width": 24,
+   "height": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    22,
+    22
+   ],
+   "sha256": "cd8b4758249201c5aab009790c41d2b13e899d362473d64394c39425d8813fe0"
+  },
+  {
+   "id": "pm-rock",
+   "path": "objects/pm-rock.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    29,
+    30
+   ],
+   "sha256": "c663dbf128f6162b93612bc8db628c7b3470e5c0e01ba7fb95e62a0b60da3d1b"
+  },
+  {
+   "id": "pm-button-disabled",
+   "path": "ui/pm-button-disabled.png",
+   "width": 96,
+   "height": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    3,
+    94,
+    29
+   ],
+   "sha256": "4f4288de71715a52b5369d1243f56e0f4c5832a1dacc17d30f5123737a40fe55"
+  },
+  {
+   "id": "pm-button-normal",
+   "path": "ui/pm-button-normal.png",
+   "width": 96,
+   "height": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    3,
+    94,
+    29
+   ],
+   "sha256": "3e9a266c2ef470e34ab3030f2c86b04c88dae3a6a5f4b94fc27c3e948f888b4f"
+  },
+  {
+   "id": "pm-button-pressed",
+   "path": "ui/pm-button-pressed.png",
+   "width": 96,
+   "height": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    94,
+    29
+   ],
+   "sha256": "bc0f25932b9b9182e0459a5bce8922e02942a56eeadf8aff69023b6f5175ad83"
+  },
+  {
+   "id": "pm-hud",
+   "path": "ui/pm-hud.png",
+   "width": 600,
+   "height": 80,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    598,
+    78
+   ],
+   "sha256": "777ed8fcdee9ed0f1ada5a880db16959e4a6f8c2b3f363b7b8b6c8acaaddd15e"
+  }
+ ],
+ "atlas": {
+  "path": "characters/pm-miner-atlas.png",
+  "frameSize": [
+   80,
+   96
+  ],
+  "columns": 8,
+  "rows": 1,
+  "margin": 0,
+  "spacing": 0,
+  "frames": [
+   {
+    "name": "idle-00",
+    "x": 0,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "idle-01",
+    "x": 80,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "pull-00",
+    "x": 160,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "pull-01",
+    "x": 240,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "success-00",
+    "x": 320,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "success-01",
+    "x": 400,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "fail-00",
+    "x": 480,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "hurt-00",
+    "x": 560,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   }
+  ]
+ },
+ "animations": {
+  "idle": {
+   "frames": [
+    0,
+    1,
+    0
+   ],
+   "durationsMs": [
+    2400,
+    120,
+    240
+   ],
+   "loop": true
+  },
+  "pull": {
+   "frames": [
+    2,
+    3
+   ],
+   "durationsMs": [
+    160,
+    160
+   ],
+   "loop": true
+  },
+  "success": {
+   "frames": [
+    4,
+    5
+   ],
+   "durationsMs": [
+    180,
+    420
+   ],
+   "loop": false
+  },
+  "fail": {
+   "frames": [
+    6
+   ],
+   "durationsMs": [
+    650
+   ],
+   "loop": false
+  },
+  "hurt": {
+   "frames": [
+    7
+   ],
+   "durationsMs": [
+    450
+   ],
+   "loop": false
+  }
+ },
+ "hud": {
+  "valueRects": [
+   [
+    56,
+    23,
+    84,
+    34
+   ],
+   [
+    204,
+    23,
+    84,
+    34
+   ],
+   [
+    350,
+    23,
+    84,
+    34
+   ],
+   [
+    497,
+    23,
+    84,
+    34
+   ]
+  ],
+  "fields": [
+   "score",
+   "target",
+   "seconds",
+   "level"
+  ]
+ },
+ "notes": [
+  "Only assets/ files are runtime exports. Source sheets are originals.",
+  "Static objects. No closed hook, explosion, background or shop art supplied.",
+  "Character anchor is shared per-frame. Do not runtime-trim frames.",
+  "Pepe Gold Hook runtime subset of pep-miner-art-v1 (ChatGPT art pack, 2026-11-13). Paths are relative to this file. The pack logo (text PEP MINER) is not used."
+ ]
+}
