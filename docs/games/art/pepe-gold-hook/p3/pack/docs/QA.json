@@ -1,0 +1,597 @@
+{
+  "pack": "pepe-gold-hook-art-p3",
+  "passed": true,
+  "checks": [
+    {
+      "name": "size:pm-winch-crank",
+      "ok": true,
+      "detail": "(64, 64) expected (64, 64)"
+    },
+    {
+      "name": "alpha:pm-winch-crank",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-winch-crank",
+      "ok": true,
+      "detail": "15 opaque colors"
+    },
+    {
+      "name": "size:pm-winch-crank-00",
+      "ok": true,
+      "detail": "(64, 64) expected (64, 64)"
+    },
+    {
+      "name": "alpha:pm-winch-crank-00",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-winch-crank-00",
+      "ok": true,
+      "detail": "15 opaque colors"
+    },
+    {
+      "name": "size:pm-winch-crank-01",
+      "ok": true,
+      "detail": "(64, 64) expected (64, 64)"
+    },
+    {
+      "name": "alpha:pm-winch-crank-01",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-winch-crank-01",
+      "ok": true,
+      "detail": "15 opaque colors"
+    },
+    {
+      "name": "size:pm-winch-crank-02",
+      "ok": true,
+      "detail": "(64, 64) expected (64, 64)"
+    },
+    {
+      "name": "alpha:pm-winch-crank-02",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-winch-crank-02",
+      "ok": true,
+      "detail": "15 opaque colors"
+    },
+    {
+      "name": "size:pm-winch-crank-03",
+      "ok": true,
+      "detail": "(64, 64) expected (64, 64)"
+    },
+    {
+      "name": "alpha:pm-winch-crank-03",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-winch-crank-03",
+      "ok": true,
+      "detail": "15 opaque colors"
+    },
+    {
+      "name": "size:pm-miner-crank-00",
+      "ok": true,
+      "detail": "(80, 96) expected (80, 96)"
+    },
+    {
+      "name": "alpha:pm-miner-crank-00",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-miner-crank-00",
+      "ok": true,
+      "detail": "24 opaque colors"
+    },
+    {
+      "name": "size:pm-miner-crank-01",
+      "ok": true,
+      "detail": "(80, 96) expected (80, 96)"
+    },
+    {
+      "name": "alpha:pm-miner-crank-01",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-miner-crank-01",
+      "ok": true,
+      "detail": "24 opaque colors"
+    },
+    {
+      "name": "size:pm-miner-crank-02",
+      "ok": true,
+      "detail": "(80, 96) expected (80, 96)"
+    },
+    {
+      "name": "alpha:pm-miner-crank-02",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-miner-crank-02",
+      "ok": true,
+      "detail": "24 opaque colors"
+    },
+    {
+      "name": "size:pm-miner-crank-03",
+      "ok": true,
+      "detail": "(80, 96) expected (80, 96)"
+    },
+    {
+      "name": "alpha:pm-miner-crank-03",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-miner-crank-03",
+      "ok": true,
+      "detail": "24 opaque colors"
+    },
+    {
+      "name": "size:pm-miner-crank-idle",
+      "ok": true,
+      "detail": "(80, 96) expected (80, 96)"
+    },
+    {
+      "name": "alpha:pm-miner-crank-idle",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-miner-crank-idle",
+      "ok": true,
+      "detail": "24 opaque colors"
+    },
+    {
+      "name": "size:pm-miner-throw-00",
+      "ok": true,
+      "detail": "(80, 96) expected (80, 96)"
+    },
+    {
+      "name": "alpha:pm-miner-throw-00",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-miner-throw-00",
+      "ok": true,
+      "detail": "26 opaque colors"
+    },
+    {
+      "name": "size:pm-miner-throw-01",
+      "ok": true,
+      "detail": "(80, 96) expected (80, 96)"
+    },
+    {
+      "name": "alpha:pm-miner-throw-01",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-miner-throw-01",
+      "ok": true,
+      "detail": "26 opaque colors"
+    },
+    {
+      "name": "size:pm-miner-throw-02",
+      "ok": true,
+      "detail": "(80, 96) expected (80, 96)"
+    },
+    {
+      "name": "alpha:pm-miner-throw-02",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-miner-throw-02",
+      "ok": true,
+      "detail": "24 opaque colors"
+    },
+    {
+      "name": "size:pm-miner-throw-03",
+      "ok": true,
+      "detail": "(80, 96) expected (80, 96)"
+    },
+    {
+      "name": "alpha:pm-miner-throw-03",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-miner-throw-03",
+      "ok": true,
+      "detail": "24 opaque colors"
+    },
+    {
+      "name": "size:pm-dynamite-lit-00",
+      "ok": true,
+      "detail": "(16, 32) expected (16, 32)"
+    },
+    {
+      "name": "alpha:pm-dynamite-lit-00",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-dynamite-lit-00",
+      "ok": true,
+      "detail": "10 opaque colors"
+    },
+    {
+      "name": "size:pm-dynamite-lit-01",
+      "ok": true,
+      "detail": "(16, 32) expected (16, 32)"
+    },
+    {
+      "name": "alpha:pm-dynamite-lit-01",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-dynamite-lit-01",
+      "ok": true,
+      "detail": "10 opaque colors"
+    },
+    {
+      "name": "size:pm-surface-wide",
+      "ok": true,
+      "detail": "(960, 96) expected (960, 96)"
+    },
+    {
+      "name": "alpha:pm-surface-wide",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-surface-wide",
+      "ok": true,
+      "detail": "18 opaque colors"
+    },
+    {
+      "name": "size:pm-hud-wide",
+      "ok": true,
+      "detail": "(900, 80) expected (900, 80)"
+    },
+    {
+      "name": "alpha:pm-hud-wide",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "outline:pm-hud-wide",
+      "ok": true,
+      "detail": "17 opaque colors"
+    },
+    {
+      "name": "winch-static-matches-frame-00",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rope-clear:0",
+      "ok": true,
+      "detail": "0 pixels"
+    },
+    {
+      "name": "rope-exit-opaque:0",
+      "ok": true,
+      "detail": "(32, 32, 32, 255)"
+    },
+    {
+      "name": "stand-foot:0",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rope-cone:0",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "rope-clear:1",
+      "ok": true,
+      "detail": "0 pixels"
+    },
+    {
+      "name": "rope-exit-opaque:1",
+      "ok": true,
+      "detail": "(32, 32, 32, 255)"
+    },
+    {
+      "name": "stand-foot:1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rope-cone:1",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "rope-clear:2",
+      "ok": true,
+      "detail": "0 pixels"
+    },
+    {
+      "name": "rope-exit-opaque:2",
+      "ok": true,
+      "detail": "(32, 32, 32, 255)"
+    },
+    {
+      "name": "stand-foot:2",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rope-cone:2",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "rope-clear:3",
+      "ok": true,
+      "detail": "0 pixels"
+    },
+    {
+      "name": "rope-exit-opaque:3",
+      "ok": true,
+      "detail": "(32, 32, 32, 255)"
+    },
+    {
+      "name": "stand-foot:3",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rope-cone:3",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "crank-only-moves:1",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "crank-only-moves:2",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "crank-only-moves:3",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "feet-match:pm-miner-crank-00",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "anchor-sole:pm-miner-crank-00",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "feet-match:pm-miner-crank-01",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "anchor-sole:pm-miner-crank-01",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "feet-match:pm-miner-crank-02",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "anchor-sole:pm-miner-crank-02",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "feet-match:pm-miner-crank-03",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "anchor-sole:pm-miner-crank-03",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "feet-match:pm-miner-crank-idle",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "anchor-sole:pm-miner-crank-idle",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "feet-match:pm-miner-throw-00",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "anchor-sole:pm-miner-throw-00",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "feet-match:pm-miner-throw-01",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "anchor-sole:pm-miner-throw-01",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "feet-match:pm-miner-throw-02",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "anchor-sole:pm-miner-throw-02",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "feet-match:pm-miner-throw-03",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "anchor-sole:pm-miner-throw-03",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "hand-world:0",
+      "ok": true,
+      "detail": "(458, 262) vs (458, 262)"
+    },
+    {
+      "name": "grip-overlap:0",
+      "ok": true,
+      "detail": "overlap 18 visible-hand 10"
+    },
+    {
+      "name": "hand-world:1",
+      "ok": true,
+      "detail": "(451, 269) vs (451, 269)"
+    },
+    {
+      "name": "grip-overlap:1",
+      "ok": true,
+      "detail": "overlap 18 visible-hand 0"
+    },
+    {
+      "name": "hand-world:2",
+      "ok": true,
+      "detail": "(444, 262) vs (444, 262)"
+    },
+    {
+      "name": "grip-overlap:2",
+      "ok": true,
+      "detail": "overlap 15 visible-hand 44"
+    },
+    {
+      "name": "hand-world:3",
+      "ok": true,
+      "detail": "(451, 255) vs (451, 255)"
+    },
+    {
+      "name": "grip-overlap:3",
+      "ok": true,
+      "detail": "overlap 18 visible-hand 0"
+    },
+    {
+      "name": "idle-is-waiting-grip",
+      "ok": true,
+      "detail": "eyelid 20 other 0"
+    },
+    {
+      "name": "hud-number-fields",
+      "ok": true,
+      "detail": "{\"score\": [40, 23, 136, 34], \"goal\": [216, 23, 136, 34], \"time\": [392, 23, 136, 34], \"level\": [568, 23, 136, 34], \"wallet\": [744, 23, 136, 34]}"
+    },
+    {
+      "name": "surface-ground-line",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dynamite-flicker",
+      "ok": true,
+      "detail": "diff 19"
+    }
+  ],
+  "paletteNote": "Body colors match pondwars pixel-v06 Pepe (green, blue shirt, brown pants, olive helmet, cream eye, salmon mouth). Outline is #202020 as specified for this pack. Helmet has no letter.",
+  "crankHandles": [
+    [
+      18,
+      30
+    ],
+    [
+      11,
+      37
+    ],
+    [
+      4,
+      30
+    ],
+    [
+      11,
+      23
+    ]
+  ],
+  "frogHands": [
+    [
+      78,
+      50
+    ],
+    [
+      71,
+      57
+    ],
+    [
+      64,
+      50
+    ],
+    [
+      71,
+      43
+    ]
+  ],
+  "numberFields": {
+    "score": [
+      40,
+      23,
+      136,
+      34
+    ],
+    "goal": [
+      216,
+      23,
+      136,
+      34
+    ],
+    "time": [
+      392,
+      23,
+      136,
+      34
+    ],
+    "level": [
+      568,
+      23,
+      136,
+      34
+    ],
+    "wallet": [
+      744,
+      23,
+      136,
+      34
+    ]
+  },
+  "untouched": "v1/P1/P2 files are not in this pack and were not modified.",
+  "preview": null
+}
