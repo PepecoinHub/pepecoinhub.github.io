@@ -1,9 +1,12 @@
 // Pepe Gold Hook campaign: 20 levels, the money you earn, and the shop between levels.
 // Pure logic (no DOM). Every level layout is a fixed function of its number, so the server
 // (games/supabase/update_gold_hook_campaign.sql) can check a whole run against the same tables.
-import { HOOK, LAYOUT, OBJECT_TYPES } from './gold-hook-config.mjs';
+import { HOOK, LAYOUT, OBJECT_TYPES, BAG_VALUES } from './gold-hook-config.mjs';
 
 export const MAX_LEVEL = 20;
+// The seven P4 loot types (diamond, mystery bag, boulder, powder barrel, bone, frog relic, gold vein)
+// stay out of the levels until their art arrives; switching this on needs new SEEDS, goals and SQL.
+export const LOOT_P4 = false;
 export const CAMPAIGN_VERSION = 5;
 
 // Less time every level (down to 45 s), heavier loot (down to 80 % speed) and more rocks.
@@ -30,6 +33,17 @@ const COUNTS = (L) => ({
 
 // Where each kind may lie: distance of the cargo point from the winch, per level progress t∈[0,1].
 // Gold sinks deeper as the levels go on; rocks stay shallower, in the way.
+// P4 loot per level: rare valuables deep down, junk and barrels in the way.
+const COUNTS_P4 = (L) => ({
+  diamond: Math.floor(L / 4),
+  'mystery-bag': 1 + Math.floor(L / 8),
+  boulder: L >= 6 ? 1 + Math.floor((L - 6) / 4) : 0,
+  'tnt-barrel': Math.floor((L + 1) / 5),
+  bone: 1 + Math.floor(L / 6),
+  'frog-relic': L % 5 === 0 ? 1 : 0,
+  'gold-vein': Math.floor(L / 4),
+});
+
 const DEPTH = {
   'nugget-large': (t) => [240 + 90 * t, 445],
   'nugget-medium': (t) => [180 + 70 * t, 440],
@@ -37,6 +51,13 @@ const DEPTH = {
   'coin-pep': () => [110, 440],
   crate: () => [170, 430],
   rock: () => [100, 390],
+  diamond: (t) => [300 + 60 * t, 445],
+  'mystery-bag': () => [150, 430],
+  boulder: () => [140, 430],
+  'tnt-barrel': () => [150, 420],
+  bone: () => [100, 400],
+  'frog-relic': () => [330, 445],
+  'gold-vein': (t) => [220 + 60 * t, 440],
 };
 
 function mulberry32(seed) {
@@ -57,7 +78,9 @@ function blocks(x, y, r, p, W) {
   return off < r + HOOK.grabRadius + OBJECT_TYPES[p.type].radius * 0.5;
 }
 
-const HALF = { 'nugget-small': 12, 'nugget-medium': 16, 'nugget-large': 24, 'coin-pep': 12, rock: 16, crate: 20 };
+// Half of each sprite's bigger side: the whole picture must fit in the mine.
+export const HALF = { 'nugget-small': 12, 'nugget-medium': 16, 'nugget-large': 24, 'coin-pep': 12, rock: 16, crate: 20,
+  diamond: 12, 'mystery-bag': 16, boulder: 28, 'tnt-barrel': 20, bone: 16, 'frog-relic': 16, 'gold-vein': 24 };
 
 // The seed of each level's layout: picked (scripts/pick_gold_hook_seeds.mjs) so every level holds about
 // the same reachable loot; difficulty then comes from time, weight and rocks, not from luck.
@@ -65,15 +88,22 @@ export const SEEDS = [0,
   1, 10, 2, 16, 8, 12, 4, 22, 10, 12,
   24, 26, 6, 24, 18, 9, 16, 26, 19, 12];
 
-export function generateLayout(L, seed = SEEDS[L]) {
+export function generateLayout(L, seed = SEEDS[L], { p4 = LOOT_P4 } = {}) {
   const rand = mulberry32(0x60D1 + L * 7919 + seed * 104729);
   const t = (L - 1) / (MAX_LEVEL - 1);
   const m = LAYOUT.mine, W = LAYOUT.winch;
   const restCargoY = W.y + HOOK.restLength + HOOK.cargoOffset;
   const placed = [];
-  const order = ['nugget-large', 'nugget-medium', 'crate', 'coin-pep', 'nugget-small', 'rock'];
+  const counts = { ...COUNTS(L), ...(p4 ? COUNTS_P4(L) : {}) };
+  // with P4 loot, boulders and bones take the place of some plain rocks (the mine has limited room)
+  if (p4) counts.rock = Math.max(3, counts.rock - counts.boulder - counts.bone);
+  // P4 types come last, so with them off the random sequence (and every layout) is unchanged.
+  const order = p4
+    ? ['nugget-large', 'nugget-medium', 'crate', 'frog-relic', 'diamond', 'gold-vein', 'boulder', 'mystery-bag',
+      'tnt-barrel', 'coin-pep', 'nugget-small', 'rock', 'bone']
+    : ['nugget-large', 'nugget-medium', 'crate', 'coin-pep', 'nugget-small', 'rock'];
   for (const type of order) {
-    const n = COUNTS(L)[type];
+    const n = counts[type];
     for (let k = 0; k < n; k++) {
       const r = OBJECT_TYPES[type].radius, h = HALF[type];
       const [dMin, dMax] = DEPTH[type](t);
@@ -86,9 +116,10 @@ export function generateLayout(L, seed = SEEDS[L]) {
         if (y - r <= restCargoY + HOOK.grabRadius + 4) continue;
         if (Math.hypot(x - W.x, y - W.y) - HOOK.cargoOffset > HOOK.maxLength) continue;
         if (placed.some((p) => Math.hypot(p.x - x, p.y - y) <= OBJECT_TYPES[p.type].radius + r + 4)) continue;
-        // Big gold is never hidden behind other loot; rocks may hide it from level 5 on (dynamite!).
-        if ((type !== 'rock' || L < 5) && placed.some((p) => p.type === 'nugget-large' && blocks(x, y, r, p, W))) continue;
-        placed.push({ type, x, y });
+        // Big gold is never hidden behind other loot; rocks and boulders may hide it from level 5 on (dynamite!).
+        const junk = type === 'rock' || type === 'boulder';
+        if ((!junk || L < 5) && placed.some((p) => p.type === 'nugget-large' && blocks(x, y, r, p, W))) continue;
+        placed.push(type === 'mystery-bag' ? { type, x, y, points: BAG_VALUES[Math.floor(rand() * BAG_VALUES.length)] } : { type, x, y });
         ok = true;
       }
       if (!ok) throw new Error(`level ${L}: no room for ${type}`);
@@ -164,6 +195,7 @@ export function buy(run, item) {
 // Record a finished level (the result of the game logic) and move the run on.
 export function finishLevel(run, result) {
   const entry = { level: run.level, catches: result.run.catches.map((c) => ({ id: c.id, t: c.t })),
+    blasts: (result.run.blasts || []).map((b) => ({ id: b.id, t: b.t })),
     seconds: Math.round(result.played * 1000) / 1000, dynamite: result.run.dynamiteUsed, bought: [] };
   run.log.push(entry);
   run.total += result.score;
@@ -179,5 +211,5 @@ export function finishLevel(run, result) {
 
 // What goes to the server: the levels played, never a point total or money.
 export function submission(run) {
-  return { gameId: 'goldhook', version: run.version, levels: run.log.map((e) => ({ ...e, catches: e.catches.slice(), bought: e.bought.slice() })) };
+  return { gameId: 'goldhook', version: run.version, levels: run.log.map((e) => ({ ...e, catches: e.catches.slice(), blasts: (e.blasts || []).slice(), bought: e.bought.slice() })) };
 }

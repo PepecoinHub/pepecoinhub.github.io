@@ -372,6 +372,7 @@ async function boot() {
       if (e.type === 'score') announcer.say(T.srScore(e.points, e.total), { replaceKey: 'Plus' });
       else if (e.type === 'empty') announcer.say(T.srEmpty, { replaceKey: T.srEmpty });
       else if (e.type === 'dynamite') announcer.say(T.srDynamite(e.left));
+      else if (e.type === 'barrel') announcer.say(T.srBarrel);
       else if (e.type === 'time') announcer.say(T.srTime(e.seconds));
     }
   }

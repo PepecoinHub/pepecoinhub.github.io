@@ -14,12 +14,12 @@ const levels = [], objects = [];
 for (let L = 1; L <= MAX_LEVEL; L++) {
   const d = levelDef(L);
   levels.push(`(${L}, ${d.durationSec}, ${d.weight}, ${d.target})`);
-  for (const r of levelTable(L)) objects.push(`(${L}, ${r.id}, ${r.points}, ${r.speedMul}, ${r.travel})`);
+  for (const r of levelTable(L)) objects.push(`(${L}, ${r.id}, ${r.points}, ${r.speedMul}, ${r.travel}, ${r.x}, ${r.y}, ${r.blast})`);
 }
 const block = [BEGIN,
   'insert into games.goldhook_levels (level, duration, weight, target) values',
   levels.join(',\n') + ';',
-  'insert into games.goldhook_objects (level, id, points, speed_mul, travel) values',
+  'insert into games.goldhook_objects (level, id, points, speed_mul, travel, x, y, blast) values',
   objects.join(',\n') + ';',
   END].join('\n');
 

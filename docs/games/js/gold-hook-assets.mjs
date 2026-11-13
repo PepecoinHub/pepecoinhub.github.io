@@ -1,3 +1,5 @@
+import { LOOT_P4 } from './gold-hook-campaign.mjs';
+
 // Loads manifest.json and the pictures before the game starts. Returns a readable list of
 // problems instead of a blank screen. Paths in the manifest are relative to the manifest file.
 
@@ -12,6 +14,8 @@ export const REQUIRED_ASSETS = [
   'pm-sparkle-atlas', 'pm-dust-atlas', 'pm-dynamite',
   // art pack P2
   'pm-explosion-atlas',
+  // art pack P4 loot, only once it is switched on
+  ...(LOOT_P4 ? ['pm-diamond', 'pm-mystery-bag', 'pm-boulder', 'pm-tnt-barrel', 'pm-bone', 'pm-frog-relic', 'pm-gold-vein'] : []),
 ];
 
 function loadImage(url) {

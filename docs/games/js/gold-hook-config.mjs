@@ -41,7 +41,18 @@ export const OBJECT_TYPES = {
   'coin-pep':      { asset: 'pm-coin-pep',      points: 75,  speedMul: 1.00, radius: 9 },
   'rock':          { asset: 'pm-rock',          points: 10,  speedMul: 0.20, radius: 13 },
   'crate':         { asset: 'pm-crate',         points: 100, speedMul: 0.40, radius: 16 },
+  // Art pack P4 loot (off until the art arrives: LOOT_P4 in gold-hook-campaign.mjs).
+  'diamond':       { asset: 'pm-diamond',       points: 300, speedMul: 1.00, radius: 8 },
+  // a mystery bag's points come from the level layout (o.points): 20 to 400
+  'mystery-bag':   { asset: 'pm-mystery-bag',   points: 0,   speedMul: 0.70, radius: 13 },
+  'boulder':       { asset: 'pm-boulder',       points: 20,  speedMul: 0.12, radius: 22 },
+  // a powder barrel is never reeled in: it blows up on contact and destroys everything around it
+  'tnt-barrel':    { asset: 'pm-tnt-barrel',    points: 0,   speedMul: 1.00, radius: 14, blast: 80 },
+  'bone':          { asset: 'pm-bone',          points: 5,   speedMul: 1.10, radius: 9 },
+  'frog-relic':    { asset: 'pm-frog-relic',    points: 500, speedMul: 0.45, radius: 13 },
+  'gold-vein':     { asset: 'pm-gold-vein',     points: 180, speedMul: 0.40, radius: 17 },
 };
+export const BAG_VALUES = [20, 50, 100, 150, 250, 400];
 
 export const TIMING = {
   maxFrameDt: 0.05,    // s: cap on a time jump (e.g. coming back to the tab)

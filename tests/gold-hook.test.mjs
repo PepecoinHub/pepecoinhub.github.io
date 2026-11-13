@@ -11,9 +11,10 @@ import {
 } from '../docs/games/js/gold-hook-state.mjs';
 import {
   MAX_LEVEL, TARGETS, levelDef, durationFor, weightFor, SHOP, newRun, modsFor, priceOf, priceFor, canBuy, buy, generateLayout,
+  LOOT_P4, SEEDS, HALF,
   finishLevel, submission, speedsFor,
 } from '../docs/games/js/gold-hook-campaign.mjs';
-import { validateCampaign, levelTable } from '../docs/games/js/gold-hook-validation.mjs';
+import { validateCampaign, levelTable, tableFor, checkLevel } from '../docs/games/js/gold-hook-validation.mjs';
 import { createScores, buildSubmission, readSession, isNotDeployed } from '../docs/games/js/gold-hook-scores.mjs';
 import { botLevel, firstHit } from './gold-hook-bot.mjs';
 
@@ -25,7 +26,6 @@ function stepUntil(g, pred, dt = 1 / 60, maxSec = 60) {
   for (let t = 0; t < maxSec; t += dt) { if (pred(g)) return t; update(g, dt); }
   throw new Error('stepUntil: timed out');
 }
-const HALF = { 'nugget-small': 12, 'nugget-medium': 16, 'nugget-large': 24, 'coin-pep': 12, rock: 16, crate: 20 };
 
 // ---------- the shared perfect-aim bot (tests/gold-hook-bot.mjs) ----------
 // An object of this type that the hook reaches first when aimed straight at it.
@@ -363,7 +363,7 @@ test('the SQL level tables match the game', () => {
     const d = levelDef(L);
     assert.ok(sql.includes(`(${L}, ${d.durationSec}, ${d.weight}, ${d.target})`), `level row ${L}`);
     for (const row of levelTable(L)) {
-      const needle = `(${L}, ${row.id}, ${row.points}, ${row.speedMul}, ${row.travel})`;
+      const needle = `(${L}, ${row.id}, ${row.points}, ${row.speedMul}, ${row.travel}, ${row.x}, ${row.y}, ${row.blast})`;
       assert.ok(sql.includes(needle), `missing ${needle}`);
     }
   }
@@ -461,4 +461,77 @@ test('every picture the game loads is in the manifest and has the stated size', 
     assert.equal(an.atlas.rects.length, an.durationsMs.length, kind);
     for (const [x, y, w, h] of an.atlas.rects) assert.ok(x + w <= sheet.width && y + h <= sheet.height, kind);
   }
+});
+
+// ---------- P4 loot (off in the campaign until the art arrives) ----------
+const P4_TYPES = ['diamond', 'mystery-bag', 'boulder', 'tnt-barrel', 'bone', 'frog-relic', 'gold-vein'];
+
+test('P4 loot is off in the campaign: the current levels are unchanged', () => {
+  assert.equal(LOOT_P4, false);
+  for (let L = 1; L <= MAX_LEVEL; L++) assert.ok(levelDef(L).objects.every((o) => !P4_TYPES.includes(o.type)), `level ${L}`);
+});
+
+test('with P4 loot on, every layout still fits: inside the mine, no overlaps, within reach', () => {
+  const m = LAYOUT.mine;
+  for (let L = 1; L <= MAX_LEVEL; L++) {
+    const objs = generateLayout(L, SEEDS[L], { p4: true });
+    for (const t of ['diamond', 'mystery-bag', 'bone']) assert.ok(L < 4 || objs.some((o) => o.type === t) || t === 'diamond', `L${L} ${t}`);
+    objs.forEach((o, i) => {
+      const r = OBJECT_TYPES[o.type].radius, h = HALF[o.type];
+      assert.ok(h, `${o.type} has a size`);
+      assert.ok(o.x - h >= m.x0 && o.x + h <= m.x1 && o.y - h >= m.y0 && o.y + h <= m.y1, `L${L} ${o.type} inside`);
+      for (let j = i + 1; j < objs.length; j++) assert.ok(Math.hypot(o.x - objs[j].x, o.y - objs[j].y) > r + OBJECT_TYPES[objs[j].type].radius + 4, `L${L} overlap`);
+      if (o.type === 'mystery-bag') assert.ok([20, 50, 100, 150, 250, 400].includes(o.points), 'bag value from the layout');
+    });
+  }
+});
+
+// a small test level: barrel in the middle, gold next to it, a bag further away
+const testLevel = (objects) => ({ level: 1, durationSec: 60, target: 100, weight: 1, objects });
+const BARREL_LEVEL = testLevel([
+  { type: 'tnt-barrel', x: 480, y: 470 },
+  { type: 'nugget-small', x: 530, y: 480 },     // 51 px from the barrel: blown up
+  { type: 'mystery-bag', x: 300, y: 450, points: 250 },
+  { type: 'diamond', x: 700, y: 500 },
+]);
+
+test('a mystery bag scores the value from the layout; a diamond is light and worth 300', () => {
+  const g = createGame({ level: BARREL_LEVEL }); startRound(g);
+  shootAt(g, angleTo(g.objects[2]));
+  stepUntil(g, (x) => x.hook.mode === HOOK_MODE.READY);
+  assert.equal(g.score, 250);
+  shootAt(g, angleTo(g.objects[3]));
+  stepUntil(g, (x) => x.hook.mode === HOOK_MODE.READY);
+  assert.equal(g.score, 550);
+});
+
+test('a powder barrel blows up on the hook: no points, an empty hook, everything near it gone', () => {
+  const g = createGame({ level: BARREL_LEVEL }); startRound(g);
+  shootAt(g, angleTo(g.objects[0]));
+  stepUntil(g, (x) => x.hook.mode !== HOOK_MODE.EXTENDING);
+  assert.equal(g.hook.mode, HOOK_MODE.RETURNING_EMPTY);
+  assert.equal(g.hook.cargo, null);
+  assert.equal(g.objects[1].caught, true, 'the gold next to it is gone');
+  assert.equal(g.objects[2].caught, false, 'the bag far away is still there');
+  assert.ok(g.effects.some((e) => e.kind === 'explosion'));
+  assert.equal(g.blasts.length, 1);
+  stepUntil(g, (x) => x.hook.mode === HOOK_MODE.READY);
+  assert.equal(g.score, 0);
+  g.timeLeft = 0.01; run(g, 0.1);
+  assert.deepEqual(g.result.run.blasts.map((b) => b.id), [0]);
+});
+
+test('the run check knows barrels: no catching a barrel or anything after it blew up', () => {
+  const table = tableFor(BARREL_LEVEL), speeds = speedsFor({});
+  const blastT = 2;
+  const ok = checkLevel(BARREL_LEVEL, table, { seconds: 60, catches: [{ id: 2, t: 9 }], blasts: [{ id: 0, t: blastT }] }, speeds);
+  assert.ok(ok.ok, ok.reason);
+  assert.equal(ok.earned, 250, 'the bag value comes from the table, not the browser');
+  const after = checkLevel(BARREL_LEVEL, table, { seconds: 60, catches: [{ id: 1, t: 9 }], blasts: [{ id: 0, t: blastT }] }, speeds);
+  assert.equal(after.reason, 'blown-up');
+  const before = checkLevel(BARREL_LEVEL, table, { seconds: 60, catches: [{ id: 1, t: 1.9 }], blasts: [{ id: 0, t: blastT }] }, speeds);
+  assert.ok(before.ok, 'caught before the blast is fine');
+  assert.equal(checkLevel(BARREL_LEVEL, table, { seconds: 60, catches: [{ id: 0, t: 9 }] }, speeds).reason, 'barrel');
+  assert.equal(checkLevel(BARREL_LEVEL, table, { seconds: 60, catches: [], blasts: [{ id: 2, t: 3 }] }, speeds).reason, 'blast-id');
+  assert.equal(checkLevel(BARREL_LEVEL, table, { seconds: 60, catches: [], blasts: [{ id: 0, t: 3 }, { id: 0, t: 4 }] }, speeds).reason, 'blast-id');
 });

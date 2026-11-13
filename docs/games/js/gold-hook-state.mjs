@@ -45,7 +45,7 @@ export function resetRound(g) {
   g.objects = r.objects.map((o, i) => {
     const t = OBJECT_TYPES[o.type];
     return { id: i, type: o.type, asset: t.asset, x: o.x, y: o.y, r: t.radius,
-      points: t.points, speedMul: t.speedMul * r.weight, caught: false };
+      points: o.points ?? t.points, speedMul: t.speedMul * r.weight, blast: t.blast || 0, caught: false };
   });
   g.hook = { mode: HOOK_MODE.READY, phase: 0, angle: 0, length: HOOK.restLength, cargo: null };
   g.animClock = 0;          // ms of game time, for the idle/pull loops
@@ -57,6 +57,7 @@ export function resetRound(g) {
   g.lowTimeMarks = new Set();
   // Round log for score checks: object id and game time (s) of each delivery.
   g.catches = [];
+  g.blasts = [];            // powder barrels blown up: { id, t }
 }
 
 export function startRound(g) {
@@ -188,6 +189,19 @@ function stepHook(g, dt) {
         const t = segmentCircleEntry(before.cx, before.cy, after.cx, after.cy, o.x, o.y, o.r + HOOK.grabRadius);
         if (t !== null && t < bestT) { bestT = t; best = o; }
       }
+      if (best && best.blast) {
+        // A powder barrel: it blows up on the hook and destroys everything around it (no points).
+        h.length = prevLen + (h.length - prevLen) * bestT;
+        best.caught = true;
+        const t = Math.round((g.duration - g.timeLeft) * 1000) / 1000;
+        g.blasts.push({ id: best.id, t });
+        for (const o of g.objects) if (!o.caught && Math.hypot(o.x - best.x, o.y - best.y) <= best.blast) o.caught = true;
+        g.effects.push({ kind: 'explosion', x: best.x, y: best.y, t: 0 });
+        setReaction(g, 'hurt');
+        g.events.push({ type: 'barrel', id: best.id });
+        h.mode = HOOK_MODE.RETURNING_EMPTY;
+        break;
+      }
       if (best) {
         h.length = prevLen + (h.length - prevLen) * bestT;
         best.caught = true;                 // out of the collision pool
@@ -217,7 +231,7 @@ function endRound(g) {
   g.result = { won: g.score >= g.target, score: g.score, target: g.target, level: g.level,
     timeLeft: g.timeLeft, durationSec: g.duration, played: g.duration - g.timeLeft,
     // Data for a score submission: the server counts the points itself from the object list.
-    run: { gameId: GAME_ID, level: g.level, catches: g.catches.slice(), dynamiteUsed: g.dynamiteUsed } };
+    run: { gameId: GAME_ID, level: g.level, catches: g.catches.slice(), blasts: g.blasts.slice(), dynamiteUsed: g.dynamiteUsed } };
   g.app = APP.RESULT;
   g.events.push({ type: 'end', ...g.result });
 }

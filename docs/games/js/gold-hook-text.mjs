@@ -111,6 +111,7 @@ export const T = {
   srScore: (points, total) => `Plus ${points}. ${total} PEP.`,
   srEmpty: 'Empty hook.',
   srDynamite: (left) => `Boom. ${left} dynamite left.`,
+  srBarrel: 'The powder barrel blew up, and everything around it.',
   srTime: (s) => `${s} seconds left.`,
   srPaused: 'Paused.',
   srResumed: 'Resumed.',
