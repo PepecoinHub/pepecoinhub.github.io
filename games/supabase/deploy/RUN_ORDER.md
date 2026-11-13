@@ -45,7 +45,10 @@ Then run `deploy/00_check.sql` again: all rows `done`, and the last row shows th
 ## Later: PepeGochi day (owner, 2026-11-09: PepeGochi launches after the Passport)
 Not in LAUNCH_ALL.sql. On PepeGochi day, in this order: `update_pepegochi_v2.sql`, `update_pepegochi_passport.sql`,
 `update_pepegochi_room_v1.sql`, `update_pepegochi_rewards.sql`; then its five stamps go `live` and the `?beta=gochi` gate
-comes off. Until then its API does not exist, so nobody can adopt a frog before the window is public.
+comes off.
+Pond Quiz (the frog's fact of the day with points and a ranking, draft 2026-11-13): `update_pond_quiz.sql`, then
+`update_pond_quiz_questions.sql` (generated from `docs/data/pepecoin-quiz.json` by `scripts/build_pond_quiz_sql.mjs`;
+run it again whenever the questions change). Without them the taskbar frog asks the shared local fact, without points. Until then its API does not exist, so nobody can adopt a frog before the window is public.
 
 ## Included decisions
 - #253 (Pond Pioneer V3, Share Fren as a secret) is merged into the launch branch: step 11 is that file.

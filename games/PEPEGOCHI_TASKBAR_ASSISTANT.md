@@ -44,3 +44,20 @@ PR #299 itself is not changed. Its six files were brought onto this branch (it w
   them when they are drawn; nothing else has to change.
 
 Tests: `node --test tests/pepegochi-taskbar.test.mjs`. Still behind `?beta=gochi`; nothing released.
+
+## 2026-11-13 (later): Pond Quiz, points and a ranking (owner idea)
+
+- Signed in with Discord, with `update_pond_quiz.sql` + `update_pond_quiz_questions.sql` installed: the "?" opens the
+  **Pond Quiz**. One question a UTC day per account from that account's own pool; a right answer gives +1 point and
+  the question leaves the pool; a wrong answer gives nothing and the question comes back on a later day (never the
+  next one). The right answer and the order of the answers stay on the server; the browser sends one number, once a
+  day. "Ranking" shows the top 10 (ties: who got there first) and the player's own place.
+- Guests, or before the SQL is installed: the shared local fact of the day as before, with "Log on with Discord to
+  collect points."
+- Server reads: one `gry_quiz_today` per page load and at most one per 5 minutes after that (or on a new day / account).
+- No stamps yet: thresholds after the owner and Claude have checked the questions together. One question
+  (`tf97`, Tangem sales) waits for its source and is not asked.
+- Note: the questions and answers are public in `docs/data/pepecoin-quiz.json` (the answers are on PepecoinHub anyway).
+  The ranking rewards coming back every day, not secret knowledge.
+
+SQL tests (disposable local PostgreSQL): `PASSPORT_PG_URL=... PASSPORT_PG_MODULE=... node --test tests/pond-quiz-sql.test.mjs`.

@@ -2064,5 +2064,10 @@ footer.foot a { color: #edf3e3; }
 .pg-fact-a.is-wrong { background: #f4c4c0; text-decoration: line-through; }
 .pg-fact-out { margin: 6px 10px 0; min-height: 1.2em; }
 .pg-fact-out a { color: #000080; }
+.pg-fact-extra { margin: 6px 10px 0; }
+.pg-fact-note { margin: 4px 0 0; font-size: 12px; color: #333; }
+.pg-fact-rank { width: 100%; text-align: center; }
+.pg-fact-board { margin: 4px 0 0; padding: 0; list-style: none; font-size: 12px; }
+.pg-fact-board li { display: flex; justify-content: space-between; gap: 8px; }
 /* the frog flying from the PEPEGOCHI.EXE window to the taskbar */
 .pg-companion-fly { position: fixed; z-index: 98960; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }

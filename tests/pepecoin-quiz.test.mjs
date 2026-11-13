@@ -35,3 +35,12 @@ test('sources: a page of this site that exists (only the Tangem sales question h
     assert.ok(existsSync(new URL('../docs/' + (m[1] || 'index.html'), import.meta.url)), q.id + ': ' + q.source);
   }
 });
+
+test('the server question bank (update_pond_quiz_questions.sql) is generated from this file and up to date', async () => {
+  const { buildSql, OUT, isActive } = await import('../scripts/build_pond_quiz_sql.mjs');
+  const sql = readFileSync(new URL('../' + OUT, import.meta.url), 'utf8');
+  assert.equal(sql, buildSql(qs), 'run: node scripts/build_pond_quiz_sql.mjs');
+  // the server asks the same questions the guests see (pepegochi-facts.mjs: a source and no date-dependent answer)
+  const { usable } = await import('../docs/meme/pepegochi-facts.mjs');
+  assert.deepEqual(qs.filter(isActive).map(q => q.id), usable(qs).map(q => q.id));
+});

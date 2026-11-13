@@ -113,7 +113,7 @@ test('fact of the day: one answer a day in the browser, nothing breaks without s
 
 test('the fact never opens by itself, and the frog still opens the game', () => {
   const js = readFileSync(new URL('../docs/meme/pepegochi-taskbar.mjs', import.meta.url), 'utf8');
-  assert.match(js, /factBtn\.addEventListener\('click', \(\) => \{ loadFacts\(\)\.then\(openBalloon\); \}\)/);
+  assert.match(js, /factBtn\.addEventListener\('click', \(\) => \{ refreshFacts\(\)\.then\(openBalloon\); \}\)/);
   assert.equal((js.match(/openBalloon\(/g) || []).length, 1, 'opened only from the "?" button');
   assert.match(js, /button\.addEventListener\('click', \(\) => open\(\)\)/);
   assert.match(js, /base \+ 'data\/pepecoin-quiz\.json'/);

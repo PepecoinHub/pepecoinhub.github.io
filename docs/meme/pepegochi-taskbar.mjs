@@ -1,6 +1,7 @@
 // PepeGochi taskbar companion for PondOS. Read-only: the server remains the only source of pet state.
 // Loaded only behind the existing ?beta=gochi gate. No polling, rewards, chat or local fake pet.
-// Based on PR #299; adds the fact of the day (pepegochi-facts.mjs) and the hop out of the PEPEGOCHI.EXE window.
+// Based on PR #299; adds the fact of the day / Pond Quiz (pepegochi-facts.mjs, update_pond_quiz.sql) and the hop out of
+// the PEPEGOCHI.EXE window.
 import { frogLook } from '../games/js/pepegochi-room.mjs';
 import { factOfDay, dayNumber, loadAnswer, saveAnswer, remark } from './pepegochi-facts.mjs';
 
@@ -147,9 +148,12 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', storag
   }
   paint(describeTaskbarFrog(null));
 
-  // ---------- fact of the day ----------
-  let facts = null, factsLoading = null, balloon = null;
+  // ---------- fact of the day (Pond Quiz) ----------
+  // Signed in with Discord and the quiz SQL installed: the server picks the question from the account's own pool and
+  // keeps the points (update_pond_quiz.sql). Otherwise: the shared local fact of the day, without points.
+  let facts = null, factsLoading = null, balloon = null, server = null;
   const today = () => dayNumber(now());
+  const signedIn = () => { const a = session(); return !!(a && a.discord && a.userId); };
   function loadFacts() {
     if (!factsLoading) {
       factsLoading = fetch(base + 'data/pepecoin-quiz.json', { cache: 'force-cache' })
@@ -159,10 +163,33 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', storag
     }
     return factsLoading;
   }
-  function updateFactButton() {
-    const has = facts && factOfDay(facts, today());
-    factBtn.hidden = !has || !!loadAnswer(storage, today());
+  // the server's view of today, or null (guest, offline, or the quiz SQL is not installed yet)
+  let serverAt = 0, serverUser = null;
+  const todayText = () => new Date(today() * 864e5).toISOString().slice(0, 10);
+  async function loadServer(force = false) {
+    if (!signedIn()) { server = null; serverUser = null; return null; }
+    const who = session().userId;
+    // at most one read in 5 minutes, unless the day or the account changed (the same budget as the pet state)
+    if (!force && who === serverUser && Date.now() - serverAt < 5 * 60 * 1000 && (!server || server.day === todayText())) return server;
+    serverAt = Date.now(); serverUser = who;
+    try { server = await rpc('gry_quiz_today', {}); } catch (e) { server = null; }
+    if (server && server.day && server.day !== todayText()) server = null;
+    return server;
   }
+  // one shape for both modes: { question, answers, answered, picked, correct, right, source, points, server }
+  function current() {
+    if (server) return server.question ? { ...server, server: true } : null;
+    const f = facts && factOfDay(facts, today());
+    if (!f) return null;
+    const saved = loadAnswer(storage, f.day);
+    return { ...f, server: false, answered: !!saved, picked: saved ? saved.picked : null,
+      right: saved ? saved.picked === f.correct : null };
+  }
+  function updateFactButton() {
+    const f = current();
+    factBtn.hidden = !f || f.answered;
+  }
+  function refreshFacts(force = false) { return Promise.all([loadFacts(), loadServer(force)]).then(updateFactButton); }
   function closeBalloon() {
     if (!balloon) return;
     balloon.remove(); balloon = null;
@@ -171,44 +198,70 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', storag
   }
   function onKey(e) { if (e.key === 'Escape') { closeBalloon(); factBtn.focus(); } }
   function onOutside(e) { if (balloon && !balloon.contains(e.target) && e.target !== factBtn) closeBalloon(); }
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+  async function showBoard(box) {
+    box.replaceChildren(el('p', 'pg-fact-note', 'Loading the ranking…'));
+    let b = null;
+    try { b = await rpc('gry_quiz_board', {}); } catch (e) { b = null; }
+    box.replaceChildren();
+    if (!b) { box.append(el('p', 'pg-fact-note', 'The ranking cannot be read right now.')); return; }
+    const ol = el('ol', 'pg-fact-board');
+    for (const r of b.top) { const li = el('li'); li.append(el('span', null, r.rank + '. ' + r.nick), el('b', null, String(r.points))); ol.append(li); }
+    box.append(b.top.length ? ol : el('p', 'pg-fact-note', 'No points yet. Be the first!'));
+    if (b.me) box.append(el('p', 'pg-fact-note', b.me.rank ? `You: #${b.me.rank} with ${b.me.points}.` : 'You have no points yet.'));
+  }
   function openBalloon() {
     if (balloon) { closeBalloon(); return; }
-    const f = facts && factOfDay(facts, today());
+    let f = current();
     if (!f) return;
-    balloon = document.createElement('div');
-    balloon.className = 'pg-fact';
+    balloon = el('div', 'pg-fact');
     balloon.setAttribute('role', 'dialog');
     balloon.setAttribute('aria-label', 'Did you know?');
-    const head = document.createElement('div');
-    head.className = 'pg-fact-bar';
-    const t = document.createElement('b'); t.textContent = 'Did you know?';
-    const x = document.createElement('button'); x.type = 'button'; x.className = 'pg-fact-x'; x.textContent = '×';
-    x.setAttribute('aria-label', 'Close');
+    const head = el('div', 'pg-fact-bar');
+    const x = el('button', 'pg-fact-x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close');
     x.addEventListener('click', closeBalloon);
-    head.append(t, x);
-    const q = document.createElement('p'); q.className = 'pg-fact-q'; q.textContent = f.question;
-    const list = document.createElement('div'); list.className = 'pg-fact-answers';
-    const out = document.createElement('p'); out.className = 'pg-fact-out'; out.setAttribute('aria-live', 'polite');
-    const show = picked => {
+    head.append(el('b', null, f.server ? 'Pond Quiz' : 'Did you know?'), x);
+    const list = el('div', 'pg-fact-answers');
+    const out = el('p', 'pg-fact-out'); out.setAttribute('aria-live', 'polite');
+    const extra = el('div', 'pg-fact-extra');
+    const show = () => {
       [...list.children].forEach((b, i) => {
         b.disabled = true;
         b.classList.toggle('is-right', i === f.correct);
-        b.classList.toggle('is-wrong', i === picked && picked !== f.correct);
+        b.classList.toggle('is-wrong', i === f.picked && !f.right);
       });
-      const right = picked === f.correct;
-      out.textContent = (right ? '' : 'The answer: ' + f.answers[f.correct] + '. ') + remark(right, f.day);
-      const a = document.createElement('a');
-      a.href = f.source; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Read more';
-      out.append(' ', a);
+      let text = f.right ? '' : 'The answer: ' + f.answers[f.correct] + '. ';
+      if (f.server) text += f.right ? `+1 point. You have ${f.points}. ` : 'No point today: this one comes back another day. ';
+      out.textContent = text + remark(!!f.right, today());
+      if (f.source) {
+        const a = el('a', null, 'Read more'); a.href = f.source; a.target = '_blank'; a.rel = 'noopener';
+        out.append(' ', a);
+      }
+      extra.replaceChildren();
+      if (f.server) {
+        const rk = el('button', 'pg-fact-a pg-fact-rank', 'Ranking'); rk.type = 'button';
+        rk.addEventListener('click', () => showBoard(extra));
+        extra.append(rk);
+      } else if (!signedIn()) extra.append(el('p', 'pg-fact-note', 'Log on with Discord to collect points.'));
     };
     f.answers.forEach((ans, i) => {
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'pg-fact-a'; b.textContent = ans;
-      b.addEventListener('click', () => { saveAnswer(storage, i, f.day); show(i); updateFactButton(); });
+      const b = el('button', 'pg-fact-a', ans); b.type = 'button';
+      b.addEventListener('click', async () => {
+        [...list.children].forEach(x => { x.disabled = true; });
+        if (f.server) {
+          try { server = await rpc('gry_quiz_answer', { p_choice: i }); f = { ...server, server: true }; }
+          catch (e) { out.textContent = 'The answer could not be saved. Try again later.'; [...list.children].forEach(x => { x.disabled = false; }); return; }
+        } else {
+          saveAnswer(storage, i, f.day);
+          f = { ...f, answered: true, picked: i, right: i === f.correct };
+        }
+        show(); updateFactButton();
+      });
       list.append(b);
     });
-    balloon.append(head, q, list, out);
-    const saved = loadAnswer(storage, f.day);
-    if (saved) show(saved.picked);
+    balloon.append(head, el('p', 'pg-fact-q', f.question), list, out, extra);
+    if (f.answered) show();
+    else if (!f.server && !signedIn()) extra.append(el('p', 'pg-fact-note', 'Log on with Discord to collect points.'));
     document.body.append(balloon);
     // above the frog, inside the screen (also on a phone, where the taskbar has two rows)
     const r = slot.getBoundingClientRect();
@@ -219,8 +272,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', storag
     (list.querySelector('button:not(:disabled)') || x).focus();
     if (!reduced.matches) { cancelMotion(); playMotion(shownView && shownView.hasPet ? 'greet' : 'wobble'); }
   }
-  factBtn.addEventListener('click', () => { loadFacts().then(openBalloon); });
-  loadFacts().then(updateFactButton);
+  factBtn.addEventListener('click', () => { refreshFacts().then(openBalloon); });
+  refreshFacts();
 
   // ---------- the frog hops out of the PEPEGOCHI.EXE window onto the taskbar ----------
   function onLeftWindow(e) {
@@ -270,7 +323,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', storag
   }
 
   function onVisible() {
-    if (document.visibilityState === 'visible') { refresh(); queueMotion(); updateFactButton(); } else cancelMotion();
+    if (document.visibilityState === 'visible') { refresh(); queueMotion(); refreshFacts(); } else cancelMotion();
   }
   function onMessage(event) {
     if (event.origin !== location.origin || !event.data ||
@@ -279,7 +332,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', storag
       .some(node => node.contentWindow === event.source);
     if (frame) refresh(true);
   }
-  const onAuth = () => refresh(true);
+  const onAuth = () => { refresh(true); refreshFacts(true); };
   const onStorage = event => {
     if (event.key && event.key.startsWith('sb-azbwciqfbsdpwubznncg-auth-token')) onAuth();
     if (event.key === null || event.key === 'pondos-gochi-fact') updateFactButton();
