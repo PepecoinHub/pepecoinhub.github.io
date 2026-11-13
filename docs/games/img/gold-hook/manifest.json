@@ -1,0 +1,836 @@
+{
+ "version": "1.0.0",
+ "logicalViewport": [
+  640,
+  480
+ ],
+ "units": "pixels",
+ "filter": "nearest",
+ "assets": [
+  {
+   "id": "pm-miner-atlas",
+   "path": "characters/pm-miner-atlas.png",
+   "width": 640,
+   "height": 96,
+   "anchor": [
+    40,
+    88
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    20,
+    11,
+    627,
+    88
+   ],
+   "sha256": "11c006a3c0668899cf040a638a6f88c47123b9e75afcde0cffcaddad5ae4be35"
+  },
+  {
+   "id": "pm-coin-pep",
+   "path": "objects/pm-coin-pep.png",
+   "width": 24,
+   "height": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    21,
+    22
+   ],
+   "sha256": "0ae52815290abada6995524a71ea5ceb828bb2e683b4c14115af60fbeb146881"
+  },
+  {
+   "id": "pm-crate",
+   "path": "objects/pm-crate.png",
+   "width": 40,
+   "height": 40,
+   "anchor": [
+    20,
+    20
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    3,
+    2,
+    36,
+    38
+   ],
+   "sha256": "0eb664ab046324f1291140604a6e058def8e546508ef5baa6edeac8e20adb08d"
+  },
+  {
+   "id": "pm-hook-basic",
+   "path": "objects/pm-hook-basic.png",
+   "width": 32,
+   "height": 40,
+   "anchor": [
+    16,
+    3
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    3,
+    29,
+    38
+   ],
+   "sha256": "cb1a9f91e30f2ff5484a049eab72800393c77c97e22933d64858410a1fe77e01",
+   "cargoAnchor": [
+    16,
+    35
+   ]
+  },
+  {
+   "id": "pm-nugget-large",
+   "path": "objects/pm-nugget-large.png",
+   "width": 48,
+   "height": 48,
+   "anchor": [
+    24,
+    24
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    46,
+    45
+   ],
+   "sha256": "dcbc089ce8b428322dee6b69730cf65b3865ea542ec22c91b04eeaddc3d714da"
+  },
+  {
+   "id": "pm-nugget-medium",
+   "path": "objects/pm-nugget-medium.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    3,
+    30,
+    28
+   ],
+   "sha256": "1a4be3947bfcca1ac0cbed25add6341792e5a4db0d7459e075ee8212097478cf"
+  },
+  {
+   "id": "pm-nugget-small",
+   "path": "objects/pm-nugget-small.png",
+   "width": 24,
+   "height": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    22,
+    22
+   ],
+   "sha256": "cd8b4758249201c5aab009790c41d2b13e899d362473d64394c39425d8813fe0"
+  },
+  {
+   "id": "pm-rock",
+   "path": "objects/pm-rock.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    29,
+    30
+   ],
+   "sha256": "c663dbf128f6162b93612bc8db628c7b3470e5c0e01ba7fb95e62a0b60da3d1b"
+  },
+  {
+   "id": "pm-button-disabled",
+   "path": "ui/pm-button-disabled.png",
+   "width": 96,
+   "height": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    3,
+    94,
+    29
+   ],
+   "sha256": "4f4288de71715a52b5369d1243f56e0f4c5832a1dacc17d30f5123737a40fe55"
+  },
+  {
+   "id": "pm-button-normal",
+   "path": "ui/pm-button-normal.png",
+   "width": 96,
+   "height": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    3,
+    94,
+    29
+   ],
+   "sha256": "3e9a266c2ef470e34ab3030f2c86b04c88dae3a6a5f4b94fc27c3e948f888b4f"
+  },
+  {
+   "id": "pm-button-pressed",
+   "path": "ui/pm-button-pressed.png",
+   "width": 96,
+   "height": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    94,
+    29
+   ],
+   "sha256": "bc0f25932b9b9182e0459a5bce8922e02942a56eeadf8aff69023b6f5175ad83"
+  },
+  {
+   "id": "pm-hud",
+   "path": "ui/pm-hud.png",
+   "width": 600,
+   "height": 80,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    598,
+    78
+   ],
+   "sha256": "777ed8fcdee9ed0f1ada5a880db16959e4a6f8c2b3f363b7b8b6c8acaaddd15e"
+  },
+  {
+   "id": "pm-logo-goldhook",
+   "path": "ui/pm-logo-goldhook.png",
+   "width": 384,
+   "height": 96,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    4,
+    16,
+    380,
+    80
+   ],
+   "sha256": "6510e9343df166ce6c5ccb70fd0418b88d7c0f30f21d07d7cd5605c3ccf3638b"
+  },
+  {
+   "id": "pm-icon-goldhook",
+   "path": "ui/pm-icon-goldhook.png",
+   "width": 48,
+   "height": 48,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    10,
+    2,
+    38,
+    46
+   ],
+   "sha256": "4fc6427e3fc0fb44dbac31fd6e7488fb6c1fdc7e2bd89ad6d87eb924115bb56b"
+  },
+  {
+   "id": "pm-icon-goldhook-16",
+   "path": "ui/pm-icon-goldhook-16.png",
+   "width": 16,
+   "height": 16,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    3,
+    1,
+    13,
+    15
+   ],
+   "sha256": "4661e0deca75c8f534d73d1c5d53f757d3740ece0cb4e9c7b5212aef65ab52e0"
+  },
+  {
+   "id": "pm-surface",
+   "path": "objects/pm-surface.png",
+   "width": 640,
+   "height": 96,
+   "anchor": [
+    0,
+    88
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    0,
+    51,
+    640,
+    96
+   ],
+   "sha256": "4dac7b59393e885d0b38d8035eff21163d8ec015d62017a258c8aed63c5343aa",
+   "groundY": 88
+  },
+  {
+   "id": "pm-earth-tile",
+   "path": "objects/pm-earth-tile.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    0,
+    0,
+    32,
+    32
+   ],
+   "sha256": "f9d5e0707a0abf9e3123ab529c71efbe5923a29522e3086f42ab7b67112f3098"
+  },
+  {
+   "id": "pm-stone-tile",
+   "path": "objects/pm-stone-tile.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    0,
+    0,
+    32,
+    32
+   ],
+   "sha256": "ad0a9afe17805f929fbf6e363079dd4c4add315f66e35a10ab600634d38411eb"
+  },
+  {
+   "id": "pm-winch",
+   "path": "objects/pm-winch.png",
+   "width": 48,
+   "height": 48,
+   "anchor": [
+    24,
+    40
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    8,
+    10,
+    46,
+    41
+   ],
+   "sha256": "bfd22acfbdad91b728b8c8e7b819728e808c1da0136ecb51659c06d2f2efec72"
+  },
+  {
+   "id": "pm-hook-closed",
+   "path": "objects/pm-hook-closed.png",
+   "width": 32,
+   "height": 40,
+   "anchor": [
+    16,
+    3
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    7,
+    3,
+    25,
+    38
+   ],
+   "sha256": "a465bd413001982951669bb37c2b225330b22d43b88bad215685f5ed2c68d3b9",
+   "cargoAnchor": [
+    16,
+    35
+   ]
+  },
+  {
+   "id": "pm-sparkle-atlas",
+   "path": "objects/pm-sparkle-atlas.png",
+   "width": 64,
+   "height": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    8,
+    3,
+    61,
+    13
+   ],
+   "sha256": "c2788bf14deb0ee054832134d3a3409864e7303f06f2fb9cb012e16a51a97c48"
+  },
+  {
+   "id": "pm-dust-atlas",
+   "path": "objects/pm-dust-atlas.png",
+   "width": 128,
+   "height": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    8,
+    5,
+    121,
+    28
+   ],
+   "sha256": "ab72ecd944e0d46525f83b1616628bfb509d42430bf61e3a00e340eca61a348c"
+  },
+  {
+   "id": "pm-dynamite",
+   "path": "objects/pm-dynamite.png",
+   "width": 16,
+   "height": 32,
+   "anchor": [
+    8,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    13,
+    30
+   ],
+   "sha256": "110ee75946c95bcf50cb5e05382db3d4df0b41bd105793505eb40f6e5136be7d"
+  },
+  {
+   "id": "pm-explosion-atlas",
+   "path": "objects/pm-explosion-atlas.png",
+   "width": 384,
+   "height": 64,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    25,
+    5,
+    374,
+    60
+   ],
+   "sha256": "4319aa77b9c9d07341ddc4f9fec8170b07333500ed99a2dde63d24071d8729df"
+  },
+  {
+   "id": "pm-shop-clock",
+   "path": "ui/pm-shop-clock.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    7,
+    4,
+    27,
+    28
+   ],
+   "sha256": "19e167c22591a6b9e619ef91cecb399672e026b6d07a0675c8680f18573c3770"
+  },
+  {
+   "id": "pm-shop-dynamite",
+   "path": "ui/pm-shop-dynamite.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    12,
+    4,
+    23,
+    27
+   ],
+   "sha256": "3305ac4ecfa3dc7cc41a59edfce24cafcfeb34bab6cffa9efaaeca1d378349ba"
+  },
+  {
+   "id": "pm-shop-reel",
+   "path": "ui/pm-shop-reel.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    5,
+    7,
+    27,
+    27
+   ],
+   "sha256": "b83d1778949d23af181d3af4097603f856496a6cfa9961984911dcb5782e62d5"
+  },
+  {
+   "id": "pm-shop-strength",
+   "path": "ui/pm-shop-strength.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    5,
+    3,
+    27,
+    29
+   ],
+   "sha256": "e2c8ad6812655195124afd429881db47cf1ce573c1152a0a2595604302ec5626"
+  },
+  {
+   "id": "pm-trophy",
+   "path": "ui/pm-trophy.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    4,
+    6,
+    28,
+    28
+   ],
+   "sha256": "95ca920c5ace18f11186f360e062d54b1da035701a06f4eedcbbd41e71995ceb"
+  }
+ ],
+ "atlas": {
+  "path": "characters/pm-miner-atlas.png",
+  "frameSize": [
+   80,
+   96
+  ],
+  "columns": 8,
+  "rows": 1,
+  "margin": 0,
+  "spacing": 0,
+  "frames": [
+   {
+    "name": "idle-00",
+    "x": 0,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "idle-01",
+    "x": 80,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "pull-00",
+    "x": 160,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "pull-01",
+    "x": 240,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "success-00",
+    "x": 320,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "success-01",
+    "x": 400,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "fail-00",
+    "x": 480,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   },
+   {
+    "name": "hurt-00",
+    "x": 560,
+    "y": 0,
+    "w": 80,
+    "h": 96
+   }
+  ]
+ },
+ "animations": {
+  "idle": {
+   "frames": [
+    0,
+    1,
+    0
+   ],
+   "durationsMs": [
+    2400,
+    120,
+    240
+   ],
+   "loop": true
+  },
+  "pull": {
+   "frames": [
+    2,
+    3
+   ],
+   "durationsMs": [
+    160,
+    160
+   ],
+   "loop": true
+  },
+  "success": {
+   "frames": [
+    4,
+    5
+   ],
+   "durationsMs": [
+    180,
+    420
+   ],
+   "loop": false
+  },
+  "fail": {
+   "frames": [
+    6
+   ],
+   "durationsMs": [
+    650
+   ],
+   "loop": false
+  },
+  "hurt": {
+   "frames": [
+    7
+   ],
+   "durationsMs": [
+    450
+   ],
+   "loop": false
+  },
+  "sparkle": {
+   "durationsMs": [
+    80,
+    80,
+    80,
+    80
+   ],
+   "loop": false,
+   "atlas": {
+    "id": "pm-sparkle-atlas",
+    "rects": [
+     [
+      0,
+      0,
+      16,
+      16
+     ],
+     [
+      16,
+      0,
+      16,
+      16
+     ],
+     [
+      32,
+      0,
+      16,
+      16
+     ],
+     [
+      48,
+      0,
+      16,
+      16
+     ]
+    ]
+   }
+  },
+  "dust": {
+   "durationsMs": [
+    80,
+    80,
+    80,
+    80
+   ],
+   "loop": false,
+   "atlas": {
+    "id": "pm-dust-atlas",
+    "rects": [
+     [
+      0,
+      0,
+      32,
+      32
+     ],
+     [
+      32,
+      0,
+      32,
+      32
+     ],
+     [
+      64,
+      0,
+      32,
+      32
+     ],
+     [
+      96,
+      0,
+      32,
+      32
+     ]
+    ]
+   }
+  },
+  "explosion": {
+   "durationsMs": [
+    70,
+    70,
+    70,
+    70,
+    70,
+    70
+   ],
+   "loop": false,
+   "atlas": {
+    "id": "pm-explosion-atlas",
+    "rects": [
+     [
+      0,
+      0,
+      64,
+      64
+     ],
+     [
+      64,
+      0,
+      64,
+      64
+     ],
+     [
+      128,
+      0,
+      64,
+      64
+     ],
+     [
+      192,
+      0,
+      64,
+      64
+     ],
+     [
+      256,
+      0,
+      64,
+      64
+     ],
+     [
+      320,
+      0,
+      64,
+      64
+     ]
+    ]
+   }
+  }
+ },
+ "hud": {
+  "valueRects": [
+   [
+    56,
+    23,
+    84,
+    34
+   ],
+   [
+    204,
+    23,
+    84,
+    34
+   ],
+   [
+    350,
+    23,
+    84,
+    34
+   ],
+   [
+    497,
+    23,
+    84,
+    34
+   ]
+  ],
+  "fields": [
+   "score",
+   "target",
+   "seconds",
+   "level"
+  ]
+ },
+ "notes": [
+  "Only assets/ files are runtime exports. Source sheets are originals.",
+  "Static objects. No closed hook, explosion, background or shop art supplied.",
+  "Character anchor is shared per-frame. Do not runtime-trim frames.",
+  "Pepe Gold Hook runtime subset of pep-miner-art-v1 (ChatGPT art pack, 2026-11-13). Paths are relative to this file. The pack logo (text PEP MINER) is not used.",
+  "P1 pack (ChatGPT, pepe-gold-hook-art-p1): logo, icons, surface, tiles, winch, closed hook, sparkle and dust atlases. Effects use the atlas rects; 80 ms per frame, once.",
+  "P2 pack (ChatGPT, pepe-gold-hook-art-p2): shop icons, trophy and the dynamite explosion atlas (6 \u00d7 70 ms, once). The optional shop row frame and level badge are not used yet."
+ ]
+}

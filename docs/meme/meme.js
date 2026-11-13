@@ -17,6 +17,16 @@
       return localStorage.getItem('pondos-beta') === 'pondwars';
     } catch (e) { return false; }
   })();
+  // Pepe Gold Hook is in testing too: hidden unless this browser opened /meme/?beta=goldhook once (?beta=off hides
+  // it again). Its page is not linked from the lobby and not indexed.
+  var GOLDHOOK = (function () {
+    try {
+      var q = new URLSearchParams(location.search).get('beta');
+      if (q === 'goldhook') localStorage.setItem('pondos-beta-goldhook', '1');
+      if (q === 'off') localStorage.removeItem('pondos-beta-goldhook');
+      return localStorage.getItem('pondos-beta-goldhook') === '1';
+    } catch (e) { return false; }
+  })();
   // Owner sandbox activates for this visit only. The URL does not grant owner permissions.
   var FREN_TEST = (function () {
     try { return new URLSearchParams(location.search).get('beta') === 'fren-test'; } catch (e) { return false; }
@@ -117,7 +127,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'goldhook') return '../games/img/gold-hook/ui/pm-icon-goldhook.png'; if (n === 'goldhook16') return '../games/img/gold-hook/ui/pm-icon-goldhook-16.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
   // Hall of Fame icon: the owner's art (gold cup + open Pepe passport) goes to img/ico/hall-of-fame.webp, then this
   // line becomes 'img/ico/hall-of-fame.webp'. Until then the LEADERS trophy stands in (no new art is made here).
   var HOF_ICON = 'img/ico/leaders.webp';
@@ -268,7 +278,7 @@
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['PEPaint', 'The party room: draw and guess with frens', 'pepaint', function () { drawGuess(); }],
-      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', function () { pepegochiApp(); }],
+      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat(GOLDHOOK ? [['Pepe Gold Hook (beta)', '20 levels, a shop, one hook · field test', 'goldhook', function () { goldHookApp(); }]] : []).concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', function () { pepegochiApp(); }],
         ['PEPEGOCHI (local test)', 'Rules simulator with a time machine · nothing is saved', 'pep-logo', function () { pepegochiTestApp(); }]] : []).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
@@ -1384,12 +1394,14 @@
   function wireLegend(box) { var a = box.querySelector('.who-logon'); if (a) a.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); }
   // LEADERS: every top 10 in one window (FUD Invaders, PEP Snake, YEET THE PEP, Pepe Guesser today and this week, Pepe Miner)
   var LEAD = [['fud', 'FUD Invaders'], ['snake', 'PEP Snake'], ['yeet', 'YEET THE PEP'], ['wp', "Pepe Guesser"], ['miner', 'Pepe Miner']];
+  if (GOLDHOOK) LEAD.push(['goldhook', 'Pepe Gold Hook']);
   var LEAD_TIP = {
     fud: 'Best score per player. Scores run in your browser, so the server checks them for plausibility and rate.',
     snake: 'Best score per player, in blocks. The server checks every score against the length of the game.',
     yeet: 'Best flight per pilot. Guests add a flight with a nickname after landing.',
     wp: 'Points from the daily photo hunts. Guests count once per network.',
-    miner: 'Blocks mined (10,000 game PEP each), from the cloud saves of Discord players. A guest’s mine stays in their browser.'
+    miner: 'Blocks mined (10,000 game PEP each), from the cloud saves of Discord players. A guest’s mine stays in their browser.',
+    goldhook: 'Best run per player: PEP dug up over up to 20 levels. The game sends the levels played and the server replays the whole run.'
   };
   function highScores(game) {
     var A = openApp('hs', 'LEADERS - top 10', 'leaders', function (A) {
@@ -1409,8 +1421,8 @@
         box.className = 'lead-lists' + (g === 'wp' ? ' two' : '');
         box.innerHTML = g === 'wp' ? '<div>' + list('Today') + '</div><div>' + list('This week') + '</div>' : list('');
         var ols = box.querySelectorAll('ol');
-        if (g === 'fud' || g === 'snake') rpc('gry_arcade_top', { p_game: g }).then(function (rows) {
-          ols[0].innerHTML = rows && rows.length ? rows.map(function (r, i) { return row(r, i, fmt.int(r.score) + (g === 'snake' ? ' blocks' : '')); }).join('') : empty;
+        if (g === 'fud' || g === 'snake' || g === 'goldhook') rpc('gry_arcade_top', { p_game: g }).then(function (rows) {
+          ols[0].innerHTML = rows && rows.length ? rows.map(function (r, i) { return row(r, i, fmt.int(r.score) + (g === 'snake' ? ' blocks' : g === 'goldhook' ? ' pts' : '')); }).join('') : empty;
         }, fail(ols[0]));
         else if (g === 'yeet') rpc('gry_yeet_state', {}).then(function (r) {
           var rows = (r && r.top) || [];
@@ -1587,6 +1599,27 @@
     }, 590);
     return A;
   }
+  // Pepe Gold Hook: a normal window that fits the game (the game reports its size), like PEPE SWEEPER.
+  // Minimizing pauses it (pauseFrames sends 'pause'); scores go to the shared arcade table.
+  function goldHookApp() {
+    var A = openApp('goldhook', 'Pepe Gold Hook', 'goldhook16', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame sweep-frame" src="' + BASE + 'games/gold-hook.html?embed=1" title="Pepe Gold Hook"></iframe>';
+      A.body.style.padding = '0';
+      var fr = A.body.querySelector('iframe'), lastW = 0;
+      var onSize = function (e) {
+        if (e.source !== fr.contentWindow || !e.data || e.data.type !== 'gold-hook-size') return;
+        fr.style.height = Math.max(240, e.data.h) + 'px';
+        if (e.data.w !== lastW) {
+          lastW = e.data.w;
+          A.host.style.width = 'min(' + (e.data.w + 10) + 'px, calc(100vw - 16px))';
+          if (window.innerWidth > 760) { A.host.style.left = Math.max(8, (window.innerWidth - A.host.offsetWidth) / 2) + 'px'; A.host.style.transform = 'none'; }
+        }
+      };
+      window.addEventListener('message', onSize);
+      A.stop = function () { window.removeEventListener('message', onSize); };
+    }, 680);
+    return A;
+  }
   function minerApp() {
     var A = openApp('miner', 'Pepe Miner', 'pickaxe', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/miner.html?embed=1" title="Pepe Miner"></iframe>';
@@ -1635,7 +1668,7 @@
     ] : []).concat(GOCHI ? [
       ['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', 'pepegochi tamagotchi pet frog care feed egg hatch', function () { pepegochiApp(); }],
       ['PEPEGOCHI (local test)', 'Rules simulator for the PepeGochi beta', 'pep-logo', 'pepegochi test beta simulator time machine', function () { pepegochiTestApp(); }]
-    ] : []).map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
+    ] : []).concat(GOLDHOOK ? [['Pepe Gold Hook', '20 levels, a shop, one hook', 'goldhook', 'game gold hook claw miner mine nugget crate arcade levels shop upgrades dynamite', function () { goldHookApp(); }]] : []).map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
     NAV.forEach(function (g) { g[1].forEach(function (p) { L.push({ name: p[1], desc: p[2], icon: p[3], kw: 'page ' + g[0] + ' ' + p[0].replace(/[@\/-]/g, ' '), go: page(p[0]) }); }); });
     ADS.forEach(function (ad, i) { L.push({ name: ad.file, desc: 'PEP-TV ad: ' + ad.title, icon: ad.icon, kw: 'ad ads tv video ' + ad.title, go: function () { adPlayer(i); } }); });
     return L;
@@ -1678,7 +1711,7 @@
         ['PEPE SWEEPER', 'pepesweeper', function () { pepeSweeperApp(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
-        ['PEPaint.exe', 'pepaint', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];
+        ['PEPaint.exe', 'pepaint', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]].concat(GOLDHOOK ? [['Pepe Gold Hook', 'goldhook', function () { goldHookApp(); }]] : []);
       A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="' + ico(g[1]) + '" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or get a link for a fren. PEPaint: the party room, draw and guess with frens. 🏆 LEADERS has every top 10.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {

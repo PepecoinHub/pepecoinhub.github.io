@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://azbwciqfbsdpwubznncg.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noindex, nofollow">
+<title>Pepe Gold Hook: 20 levels of swinging, digging and shopping | Pepecoin Hub</title>
+<meta name="description" content="Drop a swinging hook into the mine, reel in gold, PEP coins and crates, and spend your loot on upgrades between 20 ever harder levels. Free arcade game; game PEP are points, not real coins.">
+<link rel="canonical" href="https://pepecoinhub.com/games/gold-hook.html">
+<link rel="icon" href="img/gold-hook/ui/pm-icon-goldhook.png">
+<link rel="preload" href="../meme/fonts/vt323-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="gold-hook.css?v=20261113e">
+<script src="js/config.js"></script>
+<script type="module" src="js/gold-hook.mjs?v=20261113e"></script>
+</head>
+<body>
+<header class="site-links"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · ARCADE</span><a href="index.html">More games →</a></header>
+<main class="gh-app">
+  <div class="stage" id="stage">
+    <canvas id="game" width="640" height="480" tabindex="0" aria-describedby="stats">Your browser needs Canvas to play this game.</canvas>
+
+    <div class="overlay" id="ov-loading" tabindex="-1">
+      <div class="panel"><h2>Pepe Gold Hook</h2><p id="loading-text"></p></div>
+    </div>
+
+    <div class="overlay" id="ov-error" role="alertdialog" aria-labelledby="error-title" tabindex="-1" hidden>
+      <div class="panel panel-error">
+        <h2 id="error-title"></h2>
+        <p id="error-hint"></p>
+        <ul id="error-list"></ul>
+      </div>
+    </div>
+
+    <!-- main menu -->
+    <div class="overlay" id="ov-menu" role="dialog" aria-modal="true" aria-labelledby="title-heading" hidden>
+      <div class="panel">
+        <h2 id="menu-bar">Pepe Gold Hook</h2>
+        <h1 id="title-heading" class="game-name"><img src="img/gold-hook/ui/pm-logo-goldhook.png" width="384" height="96" alt="Pepe Gold Hook" class="logo"></h1>
+        <p id="menu-tagline"></p>
+        <div class="buttons buttons-col">
+          <button type="button" class="pm-btn primary" id="btn-continue" hidden></button>
+          <button type="button" class="pm-btn primary" id="btn-new"></button>
+          <button type="button" class="pm-btn" id="btn-howto" aria-expanded="false" aria-controls="menu-howto"></button>
+          <button type="button" class="pm-btn" id="btn-menu-top" aria-expanded="false" aria-controls="menu-top-box"></button>
+          <button type="button" class="pm-btn" id="btn-stats" aria-expanded="false" aria-controls="menu-stats"></button>
+        </div>
+        <div id="menu-howto" class="info-box" hidden></div>
+        <div id="menu-top-box" class="hs-top-box" hidden><ol id="menu-top"></ol></div>
+        <div id="menu-stats" class="info-box" hidden></div>
+      </div>
+    </div>
+
+    <!-- before each level -->
+    <div class="overlay" id="ov-level" role="dialog" aria-modal="true" aria-labelledby="level-title" hidden>
+      <div class="panel">
+        <h2 id="level-title"></h2>
+        <p id="level-goal" class="strong"></p>
+        <p id="level-notes" class="small"></p>
+        <div class="buttons"><button type="button" class="pm-btn primary" id="btn-go"></button></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="ov-pause" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
+      <div class="panel">
+        <h2 id="pause-title"></h2>
+        <p id="pause-text"></p>
+        <div class="buttons">
+          <button type="button" class="pm-btn primary" id="btn-resume"></button>
+          <button type="button" class="pm-btn" id="btn-exit"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- level cleared -->
+    <div class="overlay" id="ov-cleared" role="dialog" aria-modal="true" aria-labelledby="cleared-title" hidden>
+      <div class="panel">
+        <h2 id="cleared-title"></h2>
+        <p id="cleared-line" class="strong"></p>
+        <p id="cleared-wallet"></p>
+        <div class="buttons"><button type="button" class="pm-btn primary" id="btn-to-shop"></button></div>
+      </div>
+    </div>
+
+    <!-- shop between levels -->
+    <div class="overlay" id="ov-shop" role="dialog" aria-modal="true" aria-labelledby="shop-title" hidden>
+      <div class="panel panel-shop">
+        <h2 id="shop-title"></h2>
+        <p><span id="shop-wallet" class="shop-wallet" aria-live="polite"></span></p>
+        <p id="shop-note" class="small"></p>
+        <ul id="shop-list" class="shop-list"></ul>
+        <div class="buttons">
+          <button type="button" class="pm-btn primary" id="btn-next-level"></button>
+          <button type="button" class="pm-btn" id="btn-shop-menu"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- game over or the end of level 20 -->
+    <div class="overlay" id="ov-end" role="dialog" aria-modal="true" aria-labelledby="end-title" hidden>
+      <div class="panel">
+        <h2 id="end-title"></h2>
+        <img id="end-trophy" class="trophy" src="img/gold-hook/ui/pm-trophy.png" width="32" height="32" alt="" hidden>
+        <p id="end-line" class="strong"></p>
+        <p id="end-text"></p>
+        <p id="end-best" class="small"></p>
+        <form id="hs-form" class="hs-form" hidden>
+          <p id="hs-discord" class="small" hidden></p>
+          <label id="hs-nick-row" class="hs-nick-row"><span id="hs-nick-label"></span> <input id="hs-nick" name="nick" maxlength="20" autocomplete="nickname"></label>
+          <button type="submit" class="pm-btn primary" id="hs-submit"></button>
+          <p id="hs-status" class="small" role="status"></p>
+          <p id="hs-note" class="small"></p>
+        </form>
+        <div class="buttons">
+          <button type="button" class="pm-btn" id="btn-share"></button>
+          <button type="button" class="pm-btn primary" id="btn-again"></button>
+          <button type="button" class="pm-btn" id="btn-end-menu"></button>
+          <button type="button" class="pm-btn" id="btn-top"></button>
+        </div>
+        <p id="share-status" class="small" role="status"></p>
+        <div id="hs-top-box" class="hs-top-box" hidden><ol id="hs-top"></ol></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls" id="controls">
+    <p class="hint"><kbd>Space</kbd> or click the mine: drop the hook · <kbd>D</kbd> dynamite · <kbd>Esc</kbd> pause</p>
+    <button type="button" class="pm-btn primary" id="btn-fire" disabled></button>
+    <button type="button" class="pm-btn btn-dyn" id="btn-dynamite" disabled><img src="img/gold-hook/objects/pm-dynamite.png" width="16" height="32" alt=""> <span id="dyn-label"></span></button>
+    <button type="button" class="pm-btn" id="btn-pause" disabled></button>
+  </div>
+
+  <p id="stats" class="sr-only"></p>
+  <div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+</main>
+</body></html>
