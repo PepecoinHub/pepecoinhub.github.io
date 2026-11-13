@@ -4525,14 +4525,14 @@
     document.querySelectorAll('.lan-n').forEach(function (e) { e.textContent = n; });
     document.querySelectorAll('.lan-badge').forEach(function (e) { e.hidden = n == null; });
   }
-  var LAN_H = 'pondos-lan-h', LAN_LIST = 'pondos-lan-list';
+  var LAN_H = 'pondos-lan-h', LAN_LIST = 'pondos-lan-list', LAN_ALERTS = 'pondos-lan-alerts';
   function lanParty() {
     var A = openApp('lan', 'LAN Party - #pond chat', 'gif-080-still', function (A) {
       var listPref = null; try { listPref = localStorage.getItem(LAN_LIST); } catch (e) {}
       A.host.classList.add('lan-win');
       A.body.innerHTML =
         '<div class="lan-top"><button type="button" class="app-btn lan-list-btn" aria-expanded="false" aria-controls="lan-buddies" title="Who is online"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online</button>' +
-        '<span class="lan-room">#pond</span><span class="grow"></span><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span></div>' +
+        '<span class="lan-room">#pond</span><span class="grow"></span><button type="button" class="app-btn lan-alerts" aria-label="Change LAN Party notification settings">Alerts: All</button><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span></div>' +
         '<div class="lan-main"><div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
         '<aside class="lan-buddies" id="lan-buddies" aria-label="Who is online"><div class="lan-bl"><p class="lan-bh">Loading…</p></div></aside></div>' +
         '<div class="emo-pop" hidden role="group" aria-label="Pepe emotes"><div class="emo-head"><input type="search" class="emo-q" placeholder="Search Pepes… (laugh, pray, apu)" aria-label="Search emotes" autocomplete="off">' +
@@ -4543,9 +4543,37 @@
         '<div class="lan-status"><span class="lan-st">Connecting…</span><span class="lan-grip" role="separator" tabindex="0" aria-orientation="horizontal" aria-label="Chat height. Drag, or use the arrow keys, to make the chat taller or shorter" title="Drag to make the chat taller"><i></i><i></i><i></i></span></div>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input[name=t]'), note = A.body.querySelector('.lan-note');
       var main = A.body.querySelector('.lan-main'), listBtn = A.body.querySelector('.lan-list-btn'), bl = A.body.querySelector('.lan-bl');
-      var stEl = A.body.querySelector('.lan-st'), hostTag = A.body.querySelector('.lan-host-tag');
+      var stEl = A.body.querySelector('.lan-st'), hostTag = A.body.querySelector('.lan-host-tag'), alertsBtn = A.body.querySelector('.lan-alerts');
       var canMod = false, who = null, whoT = 0;
-      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false;
+      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
+      var alertMode = 'all';
+      try { alertMode = localStorage.getItem(LAN_ALERTS) || 'all'; } catch (e) {}
+      if (['all', 'mentions', 'mute'].indexOf(alertMode) < 0) alertMode = 'all';
+      var isMinimized = function () { return A.host.classList.contains('is-min'); };
+      // Only show a counter on a minimized window. Never mark a new mention as read until LAN Party is visible.
+      var paintUnread = function () {
+        if (!A.taskBtn) return;
+        var count = alertMode === 'mute' ? 0 : unread;
+        A.taskBtn.classList.toggle('lan-has-unread', count > 0);
+        if (count > 0) A.taskBtn.setAttribute('data-unread', count > 99 ? '99+' : String(count));
+        else A.taskBtn.removeAttribute('data-unread');
+        var name = 'LAN Party - #pond chat' + (count ? ' (' + count + ' unread)' : '');
+        A.taskBtn.title = name;
+        A.taskBtn.setAttribute('aria-label', name);
+      };
+      var paintAlerts = function () {
+        var labels = { all: 'All', mentions: '@Only', mute: 'Muted' };
+        alertsBtn.textContent = 'Alerts: ' + labels[alertMode];
+        alertsBtn.title = alertMode === 'all' ? 'Badge for all new messages; popups only for mentions' :
+          alertMode === 'mentions' ? 'Badge and popup only for mentions (game invites in a future update)' : 'No LAN Party badges or mention popups';
+      };
+      alertsBtn.addEventListener('click', function () {
+        alertMode = alertMode === 'all' ? 'mentions' : alertMode === 'mentions' ? 'mute' : 'all';
+        unread = 0;
+        try { localStorage.setItem(LAN_ALERTS, alertMode); } catch (e) {}
+        paintAlerts(); paintUnread();
+      });
+      paintAlerts();
 
       // ----- who is online: a buddy list beside the log (a wide window) or folded under the top bar (a phone)
       var wide = function () { return A.host.offsetWidth >= 600; };
@@ -4716,7 +4744,7 @@
       // @mentions: highlight messages for me, suggest names after "@", ring on new ones, a switch to turn them off
       var PM = null, me = { verified: false }, mrow = A.body.querySelector('.lan-ment'), mbtn = mrow.querySelector('button');
       var forMe = function (m) { var s = anySession(); return !!(PM && me.verified && !me.optout && !(s && s.user && s.user.id === m.user_id) && PM.mentionsMe(m.body, me.nick)); };
-      var seenMentions = function () { if (alive && !document.hidden) chatRpc('gry_mentions_seen', { p_upto: null }).catch(function () {}); };
+      var seenMentions = function () { if (alive && !document.hidden && !isMinimized()) chatRpc('gry_mentions_seen', { p_upto: null }).catch(function () {}); };
       var paintMent = function () {
         mrow.hidden = !me.verified;
         mbtn.textContent = me.optout ? '🔕 Mentions off' : '🔔 Mentions on';
@@ -4751,6 +4779,10 @@
       };
       var poll = function () {
         clearTimeout(timer);
+        if (!alive) return;
+        // Coalesce doorbells and timer ticks while a request is in flight.
+        if (busy) { rerun = true; return; }
+        busy = true;
         chatRpc('gry_lobby_chat', { p_after: last, p_visitor: visitorId() }).then(function (r) {
           if (!alive) return;
           paintOnline(r.online);
@@ -4764,15 +4796,34 @@
             if (seen[m.id]) return;
             var row = el('div', { class: 'lan-msg' + (emoOnly(m.body) ? ' lan-big' : '') }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> ' + lanWho(m) + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
             var tipEl = log.querySelector('.bin-tip'); if (tipEl) tipEl.remove();
-            row._m = m; if (forMe(m)) { row.classList.add('lan-me'); if (!initial) { PM.ring(m.nick, m.body, function () { A.restore ? A.restore() : null; }); seenMentions(); } }
+            var mentioned = forMe(m), sess = anySession();
+            var mine = !!(sess && sess.user && sess.user.id === m.user_id);
+            if (!initial && (isMinimized() || document.hidden) && !mine &&
+                (alertMode === 'all' || alertMode === 'mentions' && mentioned)) unread++;
+            row._m = m;
+            if (mentioned) {
+              row.classList.add('lan-me');
+              if (!initial) {
+                if (alertMode !== 'mute') PM.ring(m.nick, m.body, function () { if (A.restore) A.restore(); });
+                seenMentions();
+              }
+            }
             modBtns(row);
             seen[m.id] = row; log.appendChild(row); last = Math.max(last, m.id);
           });
+          if (!isMinimized() && !document.hidden) unread = 0;
+          paintUnread();
           if (!log.children.length) log.innerHTML = '<p class="bin-tip">No messages in the last 24 hours. Say gm!</p>';
           if (atBottom || r.messages && r.messages.length) log.scrollTop = log.scrollHeight;
           if (initial || noWhoRpc && r.messages && r.messages.length) loadWho();
         }, function (err) { stEl.textContent = 'Offline: ' + err.message; if (first) log.innerHTML = '<p class="bin-tip">' + esc(err.message) + '. Trying again…</p>'; })
-          .then(function () { if (alive) timer = setTimeout(poll, live ? 60000 : document.hidden ? 25000 : 4000); });
+          .then(function () {
+            busy = false;
+            if (!alive) return;
+            if (rerun) { rerun = false; poll(); return; }
+            // Keep the Realtime doorbell while minimized; only slow down fallback polling.
+            timer = setTimeout(poll, live ? 60000 : document.hidden ? 60000 : isMinimized() ? 30000 : 4000);
+          });
       };
       // a burst of rings makes one call, spread over a second so not every open chat asks at the same moment
       var ring = function (id) {
@@ -4798,6 +4849,8 @@
         }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
       });
       paintNote(); loadPepeEmotes().then(poll);
+      // Restoring the taskbar window marks its messages as read and immediately syncs any missed events.
+      A.resume = function () { if (!alive) return; unread = 0; paintUnread(); seenMentions(); poll(); };
       A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); };
     }, 480);
     return A;
