@@ -64,7 +64,8 @@ test('the whole life cycle in the window: adopt, care, neglect, packing, rescue,
 test('good care days: progress, and the exact need that blocks today', () => {
   const g = new BetaGame({ storage: null });
   g.adopt('Fren');
-  g.advance(59 * H);                 // hunger 25.8, hygiene 43.1, mood 35.75, energy 50.4
+  g.act('clean');                    // the first care hatches the egg (an egg's needs do not fall)
+  g.advance(59 * H);                 // hunger 25.8, hygiene 63.1, mood 35.75, energy 50.4
   let gd = g.view().pet.goodDays;
   assert.equal(gd.progress, 'Good care days: 0 / 30 for Good Parent (in a row: 0, best 0)');
   assert.deepEqual(gd.blockers, ['2 more kinds of care today (0 of 2 so far)', 'Hunger is 25, needs 40: Feed', 'Mood is 35, needs 40: Play']);

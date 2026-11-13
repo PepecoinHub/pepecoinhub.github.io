@@ -44,7 +44,8 @@ Then run `deploy/00_check.sql` again: all rows `done`, and the last row shows th
 
 ## Later: PepeGochi day (owner, 2026-11-09: PepeGochi launches after the Passport)
 Not in LAUNCH_ALL.sql. On PepeGochi day, in this order: `update_pepegochi_v2.sql`, `update_pepegochi_passport.sql`,
-`update_pepegochi_room_v1.sql`, `update_pepegochi_rewards.sql`; then its five stamps go `live` and the `?beta=gochi` gate
+`update_pepegochi_room_v1.sql`, `update_pepegochi_rewards.sql`, `update_pepegochi_room_departure.sql` (Room-4: the frog
+takes one random starter item when it moves out); then its five stamps go `live` and the `?beta=gochi` gate
 comes off.
 Pond Quiz (the frog's fact of the day with points and a ranking, draft 2026-11-13), after the PepeGochi files:
 `update_pond_quiz.sql`, then the PRIVATE `update_pond_quiz_questions.sql`. The questions are not in this public repo:

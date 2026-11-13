@@ -156,6 +156,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     await t.test('B4 state is read-only, also when the frog is due to move out', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, "gry_pepegochi_action('clean')");   // hatched: an egg never moves out
       for (const h of [1, 300]) {
         await raw.query('begin read only');
         await raw.query('set local role authenticated');
@@ -203,6 +204,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     await t.test('C3 twelve letter reads at once after the frog left: written once', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, "gry_pepegochi_action('clean')");   // hatched: an egg never moves out
       const res = await parallel(12, p, 'gry_pepegochi_letter_read()', at(200));
       assert.ok(res.every(r => r.ok));
       const l = await life(p, 1);
@@ -215,6 +217,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     await t.test('C4 letter and adoption from two tabs at once make at most one new frog', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, "gry_pepegochi_action('clean')");   // hatched: an egg never moves out
       const cs = await Promise.all(Array.from({ length: 8 }, connect));
       const res = await Promise.all(cs.map((c, i) => callRpc(asDb(c), { user: p, now: at(200) },
         i % 2 ? 'public.gry_pepegochi_letter_read()' : "public.gry_pepegochi_adopt('Fren II')")));
@@ -228,6 +231,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     await t.test('C5 an action after the deadline, racing a read, never brings the frog back', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, "gry_pepegochi_action('clean')");   // hatched: an egg never moves out
       const cs = await Promise.all(Array.from({ length: 6 }, connect));
       const res = await Promise.all(cs.map((c, i) => callRpc(asDb(c), { user: p, now: at(168 + 1 / 3600) },
         i % 2 ? 'public.gry_pepegochi_state()' : "public.gry_pepegochi_action('feed')")));
@@ -235,12 +239,13 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
       assert.ok(res.every(r => r.ok && r.value.pet.status === 'departed'));
       assert.ok(res.filter((r, i) => i % 2 === 0).every(r => r.value.action_result === 'moved_out'));
       const l = await life(p, 1);
-      assert.equal(l.status, 'departed'); assert.equal(l.feeds, 0); assert.equal(l.care_days, 0);
+      assert.equal(l.status, 'departed'); assert.equal(l.feeds, 0); assert.equal(l.care_days, 1, 'only the hatching care');
     });
 
     await t.test('C6 retried letter reads and adoptions give the same result', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, "gry_pepegochi_action('clean')");   // hatched: an egg never moves out
       const a = await ok(p, 'gry_pepegochi_letter_read()', at(170));
       const b = await ok(p, 'gry_pepegochi_letter_read()', at(171));
       assert.equal(a.pet.departed_at, b.pet.departed_at);
@@ -255,13 +260,13 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     await t.test('D1 needs keep their fractions between actions (v1 regression)', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");
-      await ok(p, "gry_pepegochi_action('clean')", at(2));
+      await ok(p, "gry_pepegochi_action('clean')", at(2));   // hatches the egg: its needs did not fall before
       const e2 = Number((await life(p, 1)).energy);
-      assert.ok(e2 > 74.1 && e2 < 75, String(e2));
+      assert.equal(e2, 75, 'an egg loses nothing');
       await ok(p, "gry_pepegochi_action('feed')", at(4));
       const e4 = Number((await life(p, 1)).energy);
-      assert.ok(e4 > 73.1 && e4 < 73.5, String(e4));
-      assert.equal((await ok(p, 'gry_pepegochi_state()', at(28))).pet.needs.energy, 63);
+      assert.ok(e4 > 74.1 && e4 < 74.2, String(e4));
+      assert.equal((await ok(p, 'gry_pepegochi_state()', at(28))).pet.needs.energy, 64);
       // hygiene: 100 after the clean at 2 h, 98.75 saved at 4 h, then 72 h at 15 per day
       assert.equal((await ok(p, 'gry_pepegochi_state()', at(4 + 72))).pet.needs.hygiene, Math.floor(98.75 - 72 * 15 / 24));
     });
@@ -362,6 +367,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     await t.test('E2 a frog that moved out stays gone; a new one is a new life', async () => {
       const p = await player();
       const first = await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, "gry_pepegochi_action('clean')");   // hatched: an egg never moves out
       await ok(p, 'gry_pepegochi_letter_read()', at(200));
       const gone = await life(p, 1);
       for (const k of KINDS) {
@@ -378,6 +384,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     await t.test('E3 adopting with a frog at home keeps it; after a move-out the letter comes first', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, "gry_pepegochi_action('clean')");   // hatched: an egg never moves out
       const again = await ok(p, "gry_pepegochi_adopt('Other')", at(1));
       assert.equal(again.adopt_result, 'already_have_fren'); assert.equal(again.pet.name, 'Fren');
       const due = await ok(p, "gry_pepegochi_adopt('Other')", at(200));
@@ -410,11 +417,29 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     await t.test('E5 a second move-out counts as two; the first one keeps its date', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");
+      await ok(p, "gry_pepegochi_action('clean')");   // hatched: an egg never moves out
       const one1 = await ok(p, 'gry_pepegochi_letter_read()', at(170));
       await ok(p, "gry_pepegochi_adopt('Fren II')", at(171));
+      await ok(p, "gry_pepegochi_action('clean')", at(171));
       const two = await ok(p, 'gry_pepegochi_letter_read()', at(400));
       assert.equal(two.summary.former_frens, 2);
       assert.equal(two.summary.first_departed_at, one1.summary.first_departed_at);
+    });
+
+    await t.test('E6 an egg waits: never neglected, never moves out; its clocks start when it hatches (owner, 2026-11-13)', async () => {
+      const p = await player();
+      await ok(p, "gry_pepegochi_adopt('Fren')");
+      const egg = await ok(p, 'gry_pepegochi_state()', at(1000));
+      assert.deepEqual([egg.pet.stage, egg.pet.status, egg.pet.overdue, egg.pet.departs_at, egg.pet.departure_reason],
+        ['egg', 'healthy', [], 'infinity', null]);
+      assert.deepEqual(egg.pet.needs, { hunger: 75, hygiene: 80, mood: 80, energy: 75 });
+      await ok(p, 'gry_pepegochi_letter_read()', at(1000));
+      assert.equal((await life(p, 1)).status, 'active', 'nothing to write: the egg is still here');
+      const h = await ok(p, "gry_pepegochi_action('feed')", at(1000));
+      assert.deepEqual([h.pet.stage, h.pet.status], ['tadpole', 'healthy']);
+      assert.equal(+new Date(h.pet.most_neglected_since), +at(1000), 'the clocks start at hatching, not at adoption');
+      assert.equal((await ok(p, 'gry_pepegochi_state()', at(1000 + 167.99))).pet.status, 'packing');
+      assert.equal((await ok(p, 'gry_pepegochi_state()', at(1000 + 168))).pet.status, 'departed');
     });
 
     // ---------- F: what counts as care ----------
@@ -527,7 +552,8 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
 
     await t.test('W4 a check-up across UTC midnight: two care days; the follow-up must be on a later UTC day', async () => {
       const p = await player();
-      await ok(p, "gry_pepegochi_adopt('Fren')");             // Monday 18:00, never cared for since
+      await ok(p, "gry_pepegochi_adopt('Fren')");             // Monday 18:00
+      await ok(p, "gry_pepegochi_action('clean')");           // hatched at once, never cared for since
       const sat = new Date('2026-11-14T23:59:52Z');         // 126 hours later: packing
       assert.equal((await ok(p, 'gry_pepegochi_state()', sat)).pet.status, 'packing');
       await ok(p, "gry_pepegochi_action('feed')", sat);
@@ -535,7 +561,7 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
       await ok(p, "gry_pepegochi_action('play')", new Date(+sat + 6000));    // 23:59:58
       const done = await ok(p, "gry_pepegochi_action('rest')", new Date(+sat + 9000)); // 00:00:01 Sunday
       assert.equal(done.pet.status, 'recovering');
-      assert.equal(done.pet.care_days, 2, 'Saturday and Sunday are two care days');
+      assert.equal(done.pet.care_days, 3, 'the hatching Monday, then Saturday and Sunday: two more care days');
       assert.equal(done.pet.recovery.last_day_utc, '2026-11-15', 'the check-up finished on Sunday');
       assert.equal(+new Date(done.pet.recovery.counts_from), +new Date('2026-11-16T00:00:00Z'));
       // more care on Sunday does not finish the recovery; Monday does
@@ -547,7 +573,8 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
 
     await t.test('W5 recovery needs a later UTC day and 8 h after the rescue; an earlier visit still helps but does not count', async () => {
       const p = await player();
-      await ok(p, "gry_pepegochi_adopt('Fren')");             // Monday 18:00, then nothing: packing by Saturday
+      await ok(p, "gry_pepegochi_adopt('Fren')");             // Monday 18:00
+      await ok(p, "gry_pepegochi_action('clean')");           // hatched at once, then nothing: packing by Saturday
       const s = new Sim(db, { user: p, start: new Date('2026-11-14T23:30:00Z') });
       await s.care();
       assert.equal(s.last.pet.status, 'recovering');
@@ -725,7 +752,8 @@ test('PepeGochi v2 SQL: lives, moving out, rescue, letter, re-adoption and miles
     await t.test('G2 a need below 40 blocks the day; the state says which one', async () => {
       const p = await player();
       await ok(p, "gry_pepegochi_adopt('Fren')");
-      // 59 h after adoption: hunger 75 - 49.2 = 25.8, hygiene 43.1, mood 80 - 44.25 = 35.75, energy 50.4
+      await ok(p, "gry_pepegochi_action('clean')");   // hatched at once (an egg's needs do not fall)
+      // 59 h after adoption: hunger 75 - 49.2 = 25.8, hygiene 100 - 36.9 = 63.1, mood 80 - 44.25 = 35.75, energy 50.4
       const s = await ok(p, 'gry_pepegochi_state()', at(59));
       assert.deepEqual(s.pet.good_day.needs_low, ['feed', 'play']);
       await ok(p, "gry_pepegochi_action('clean')", at(59));

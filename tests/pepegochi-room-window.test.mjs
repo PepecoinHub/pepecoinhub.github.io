@@ -228,3 +228,32 @@ test('pixel art stays pixel art: nearest-neighbour scaling on every room image',
   assert.match(css, /prefers-reduced-motion: reduce\) \{ \.pgr-pet \{ animation: none; \} \.pgr-actor \{ transition: none; \} \}/);
   assert.match(read('docs/games/js/pepegochi-beta.mjs'), /prefers-reduced-motion: reduce\)'\)\.matches/, 'no moving-out frames with reduced motion');
 });
+
+// ---------- Room-4: the item the frog took (update_pepegochi_room_departure.sql) ----------
+import { takenItem, takenName } from '../docs/games/js/pepegochi-room.mjs';
+import { goodbyeText, letterNote, GOODBYE, TAKEN_LINE, NOTHING_LINE } from '../docs/games/js/pepegochi-beta-view.mjs';
+
+test('Room-4: the letter, the note and the picture follow the item the server picked', () => {
+  assert.equal(takenItem('classic'), 'crt_tv', 'the older letter took the TV');
+  assert.equal(takenItem(undefined), 'crt_tv');
+  assert.equal(takenItem('took_mug'), 'mug');
+  assert.equal(takenItem('took_nothing'), null);
+  assert.equal(goodbyeText('classic'), GOODBYE, 'the classic letter is unchanged word for word');
+  for (const [item, line] of Object.entries(TAKEN_LINE)) {
+    const text = goodbyeText('took_' + item);
+    assert.ok(text.includes(line) && !text.includes('P.S. I took the TV.\n'), item);
+    assert.ok(ITEMS[item], item + ' is a room item');
+  }
+  assert.ok(goodbyeText('took_nothing').includes(NOTHING_LINE));
+  assert.match(letterNote('took_rubber_duck'), /^The rubber duck only left the picture/);
+  assert.match(letterNote('took_nothing'), /Nothing was taken/);
+  assert.equal(takenName('some_new_thing'), 'the some new thing');
+  // the picture hides exactly that item, and only while the frog is away
+  const d = roomScene({ mode: 'departed', taken: 'mug' });
+  assert.deepEqual(d.items.map(i => i.itemId).sort(), ['crt_tv', 'lava_lamp', 'p_poster', 'potted_plant', 'rubber_duck']);
+  assert.match(d.label, /the mug is gone too/);
+  const none = roomScene({ mode: 'departed', taken: null });
+  assert.equal(none.items.length, 6);
+  assert.doesNotMatch(none.label, /gone too/);
+  assert.equal(roomScene({ mode: 'pet', taken: 'mug' }).items.length, 6);
+});

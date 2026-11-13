@@ -84,7 +84,14 @@ test('model statuses at the thresholds', () => {
   const sim = new LocalPepegochi({ start: START });
   const t0 = Date.parse(START);
   assert.equal(sim.rpc('gry_pepegochi_adopt', { p_name: 'Fren' }, t0).value.adopt_result, 'adopted');
-  const since = Date.parse(sim.rpc('gry_pepegochi_state', {}, t0).value.pet.most_neglected_since);
+  // an egg waits: still healthy, nothing overdue, no deadline, the needs do not fall (owner, 2026-11-13)
+  const egg = sim.rpc('gry_pepegochi_state', {}, t0 + 1000 * H).value.pet;
+  assert.deepEqual([egg.stage, egg.status, egg.overdue, egg.departs_at, egg.needs], ['egg', 'healthy', [], 'infinity',
+    { hunger: 75, hygiene: 80, mood: 80, energy: 75 }]);
+  // it hatches with its first care, a long time later: its clocks start then, not at the adoption
+  assert.equal(sim.rpc('gry_pepegochi_action', { p_action: 'feed' }, t0 + 1000 * H).value.pet.status, 'healthy');
+  const since = Date.parse(sim.rpc('gry_pepegochi_state', {}, t0 + 1000 * H).value.pet.most_neglected_since);
+  assert.equal(since, t0 + 1000 * H);
   const st = h => sim.rpc('gry_pepegochi_state', {}, since + h * H).value.pet.status;
   assert.deepEqual([47.99, 48, 119.99, 120, 167.99, 168].map(st), ['healthy', 'neglected', 'neglected', 'packing', 'packing', 'departed']);
   const r = sim.rpc('gry_pepegochi_action', { p_action: 'feed' }, since + 168 * H);

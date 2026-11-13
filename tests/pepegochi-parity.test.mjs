@@ -175,7 +175,7 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
     await t.test('a good day decided by a need at exactly 40, and 2 s either side', async () => {
       // with min_gap_s = 0 two actions happen at the same instant, so no decay comes between them:
       // 60 h after adoption energy is exactly 50, and Play takes it to exactly 40 (hunger 25 + 35 - 3,
-      // hygiene 42.5, mood 35 + 35). Feed stores the needs with 4 decimals (about 0.9 s of energy decay),
+      // hygiene 62.5 after the hatching Clean, mood 35 + 35). Feed stores the needs with 4 decimals (about 0.9 s of energy decay),
       // so the shift has to be bigger than that: 2 s earlier energy ends at 40.0002, 2 s later at 39.9998.
       const overrides = { min_gap_s: 0 };
       await withRules(overrides, async () => {
@@ -183,6 +183,8 @@ test('PepeGochi v2: the browser model gives exactly the SQL answers', {
           const p = await pair(overrides);
           const t0 = Date.parse(START);
           await p.call('gry_pepegochi_adopt', { p_name: 'Fren' }, t0, 'exact 40');
+          // hatch it at once (an egg's needs do not fall); Clean only moves hygiene, which is not the deciding need
+          await p.call('gry_pepegochi_action', { p_action: 'clean' }, t0, 'exact 40');
           const t = t0 + 60 * H + d;
           await p.call('gry_pepegochi_action', { p_action: 'feed' }, t, 'exact 40');
           const r = await p.call('gry_pepegochi_action', { p_action: 'play' }, t, 'exact 40');

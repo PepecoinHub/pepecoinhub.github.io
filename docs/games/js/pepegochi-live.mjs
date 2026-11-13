@@ -92,7 +92,7 @@ function renderScene(v) {
     opts = { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs, ...at };
   } else if (v.mode === 'departed') {
     title.textContent = `${v.departed.name} · moved out`;
-    opts = { mode: 'departed', letterSeen: v.departed.letterSeen, ...at };
+    opts = { mode: 'departed', letterSeen: v.departed.letterSeen, taken: v.departed.taken, ...at };
   } else { title.textContent = 'Your room'; opts = { mode: 'adopt' }; }
   const key = JSON.stringify([opts.mode, opts.status, opts.stage, opts.letterSeen, placements,
     v.mode === 'pet' ? frogLook(opts).sprite : null]);

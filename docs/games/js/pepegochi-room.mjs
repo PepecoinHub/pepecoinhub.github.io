@@ -110,10 +110,16 @@ export const SUITCASE = { src: IMG + 'suitcase.png', px: 64, dx: 60, foot: 58 };
 // The letter lies where the frog stood, at the spot of props/room_departed_overlay.png (its envelope
 // covers x 309-354, y 331-361). Half size, like the suitcase. Unread: the envelope; read: the open letter.
 export const LETTER = { x: 332, y: 346, px: 64, envelope: IMG + 'goodbye_envelope.png', open: IMG + 'goodbye_letter.png' };
-// GOODBYE.TXT says "P.S. I took the TV.", so the TV is not drawn while the frog is away. It is only
-// hidden in the picture: the item stays owned and placed, and it is back when a new frog moves in.
-// (Room-4 will let the server pick the item and the matching P.S. line.)
+// The frog takes ONE item when it moves out: the server picks it from the borrowable items placed in the room and
+// stores it on the life as letter_variant 'took_<item_id>' ('took_nothing' for an empty room; Room-4,
+// update_pepegochi_room_departure.sql). The older 'classic' letter took the TV. The item is only hidden in the
+// picture: it stays owned and placed, and it is back when a new frog moves in.
 export const TAKEN_BY_LETTER = 'crt_tv';
+export const takenItem = variant => (!variant || variant === 'classic' ? TAKEN_BY_LETTER
+  : variant === 'took_nothing' ? null : variant.startsWith('took_') ? variant.slice(5) : TAKEN_BY_LETTER);
+export const TAKEN_NAME = { crt_tv: 'the TV', lava_lamp: 'the lava lamp', potted_plant: 'the plant', p_poster: 'the poster',
+  rubber_duck: 'the rubber duck', mug: 'the mug' };
+export const takenName = item => TAKEN_NAME[item] || 'the ' + String(item).replace(/_/g, ' ');
 
 // The moving-out animation (art pack v2, animations/depart_01..06, 250 ms a frame, no loop).
 // Frames 1-2: the frog turns with its suitcase where it stood. Frames 3 and 4 are its steps: they take
@@ -176,20 +182,20 @@ export function playFrames(img, frames, ms, { setTimer = setTimeout, clearTimer 
 
 // ---------- one description of what the scene shows, so it can be tested without a browser ----------
 // mode: 'adopt' (an egg waits for a name), 'pet' or 'departed'
-export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false } = {}) {
+export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false, taken = TAKEN_BY_LETTER } = {}) {
   const departed = mode === 'departed';
   const items = [];
   for (const [slotId, itemId] of Object.entries(placements)) {
     const s = SLOTS[slotId], it = ITEMS[itemId];
     if (!s || !it) continue;
-    if (departed && itemId === TAKEN_BY_LETTER) continue;
+    if (departed && itemId === taken) continue;
     items.push({ slotId, itemId, src: IMG + itemId + '.png', wall: !!s.wall, z: s.z,
       left: s.x / ROOM_W * 100, top: (s.y + it.dy) / ROOM_H * 100, width: it.size });
   }
   const pct = (v, of) => v / of * 100;
   let frog = null, label;
   if (departed) {
-    label = 'Your room. The frog moved out' + (Object.values(placements).includes(TAKEN_BY_LETTER) ? ' and the TV is gone too' : '') + '. A letter lies on the rug.';
+    label = 'Your room. The frog moved out' + (taken && Object.values(placements).includes(taken) ? ' and ' + takenName(taken) + ' is gone too' : '') + '. A letter lies on the rug.';
   } else {
     const st = mode === 'adopt' ? 'healthy' : status;
     const lk = frogLook({ status: st, stage: mode === 'adopt' ? 'egg' : stage, needs });

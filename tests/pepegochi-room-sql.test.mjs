@@ -86,6 +86,7 @@ test('PepeGochi Room-2: account inventory, slots, grants, move, concurrency and 
 
       await sub.test('First adoption and init grant precisely 6 starters once',async()=>{
         await ok(1,"gry_pepegochi_adopt($1)",['Room Fren']);
+        await ok(1,"gry_pepegochi_action($1)",['clean']);   // hatched: an egg never moves out
         await ok(2,"gry_pepegochi_adopt($1)",['Other Fren']);
         let s=await ok(1,'gry_pepegochi_room_initialize()');
         assert.equal(s.initialized,true);assert.equal(s.revision,1);

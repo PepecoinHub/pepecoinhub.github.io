@@ -151,6 +151,11 @@ export function evaluate(l, t, r) {
     const A = {}; for (const n of NEEDS) A[n] = l[n] * K;
     return { A, oldestKind, oldestAt, careAt, departsAt: l.departed_at, reason: l.departure_reason, status: 'departed' };
   }
+  // an egg (no accepted care yet) waits: no decay, nothing overdue, it never moves out (owner, 2026-11-13)
+  if (l.care_days === 0) {
+    const A = {}; for (const n of NEEDS) A[n] = l[n] * K;
+    return { A, oldestKind, oldestAt: t, careAt: t, departsAt: Infinity, reason: null, status: 'healthy' };
+  }
   let departsAt = oldestAt + span(r.departs_h, US_HOUR), reason = oldestKind;
   if (l.recovery_days_left > 0) {
     const byRecovery = careAt + span(r.recovery_departs_h, US_HOUR);
@@ -199,7 +204,7 @@ export function view(w, t, r) {
     };
   } else {
     const age = t - e.oldestAt;
-    const overdue = l.recovery_days_left === 0
+    const overdue = l.recovery_days_left === 0 && l.care_days > 0
       ? KINDS.filter((k, i) => t - (l[DUE[NEEDS[i]]] ?? l.adopted_at) >= span(r.neglected_h, US_HOUR)) : [];
     const today = l.action_day_utc === dayOf(t) ? l.actions_today : 0;
     const kindsToday = l.action_day_utc === dayOf(t) ? l.day_kinds : 0;
@@ -340,7 +345,7 @@ export function action(w, kind, t, r) {
 
   const dues = {};
   for (const n of NEEDS)
-    dues[n] = due(A[n], l[DUE[n]] ?? l.adopted_at, t, NEED[kind] === n, num(r.decay_per_day[n]), thrA);
+    dues[n] = due(A[n], l.care_days === 0 ? t : (l[DUE[n]] ?? l.adopted_at), t, NEED[kind] === n, num(r.decay_per_day[n]), thrA);
   const newOldest = Math.min(...NEEDS.map(n => dues[n]));
   const wasAge = t - e.oldestAt;
   const newCareDay = l.last_care_day_utc !== day;
