@@ -52,6 +52,8 @@ test('the checks: a good sprite passes, every kind of mistake is named', () => {
   assert.equal(checkImage(tb, { format: 'B' }).ok, true);
   assert.equal(formatFor('docs/games/img/pepegochi/taskbar/tb_adult_sit.png'), 'B');
   assert.equal(formatFor('pepegochi_adult_hungry.png'), 'A');
+  // a tb_ file is format B even when the command line passes format: undefined
+  assert.equal(checkFile(new URL('../games/pepegochi/a2-review/candidates/tb_egg.png', import.meta.url).pathname, { format: undefined }).ok, true);
   assert.deepEqual(FORMATS.B, { size: 48, grid: 1, maxColours: 32, foot: 47 });
   // a replacement stands where the old picture stood
   assert.equal(compareWith([26, 8, 100, 124], [27, 9, 100, 124]).ok, true);

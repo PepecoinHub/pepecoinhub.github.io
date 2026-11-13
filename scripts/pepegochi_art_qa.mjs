@@ -112,7 +112,7 @@ export function checkImage(img, { format = 'A', foot, prop = false, allowEdge = 
 
 export function checkFile(file, opts = {}) {
   const img = decodePng(readFileSync(file));
-  const r = checkImage(img, { format: opts.format || formatFor(file), ...opts });
+  const r = checkImage(img, { ...opts, format: opts.format || formatFor(file) });
   if (opts.like && r.bbox) Object.assign(r, compareWith(r.bbox, bbox(decodePng(readFileSync(opts.like))), r.problems));
   return r;
 }
