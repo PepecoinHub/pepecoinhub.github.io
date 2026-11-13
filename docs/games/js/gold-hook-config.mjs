@@ -1,32 +1,31 @@
 // Pepe Gold Hook — settings. A swinging-hook arcade game; game PEP are points, not real coins.
-// The numbers are a tuning starting point. Changing the layout, points or hook speeds also means
-// updating the table in games/supabase/update_gold_hook.sql (tests/gold-hook.test.mjs checks it).
+// Changing the layout, points or hook speeds also means regenerating the SQL level tables
+// (node scripts/build_gold_hook_sql.mjs; tests/gold-hook.test.mjs checks it).
 
-export const VIEW = { width: 640, height: 480 };
+// A 960×720 screen with the sprites at their native size: a big mine with room for lots of loot.
+export const VIEW = { width: 960, height: 720 };
 
 // Game name in games.arcade_scores (next to 'fud' and 'snake'). Separate from Pepe Miner (miner_saves).
 export const GAME_ID = 'goldhook';
 
 export const LAYOUT = {
-  titleBar: { y0: 0, y1: 23 },
-  hud: { x: 20, y: 28, w: 600, h: 80 },
-  surface: { y0: 112, y1: 207, groundY: 200 },
-  miner: { x: 240, y: 112 },            // top-left of the 80×96 frame → feet at (280, 200)
-  winch: { x: 340, y: 190 },
-  mine: { x0: 16, x1: 624, y0: 216, y1: 432 },
-  hintBar: { y0: 440, y1: 479 },
-  // Where a click/tap fires the hook (not the HUD or the hint bar).
-  playArea: { y0: 112, y1: 440 },
+  hud: { x: 180, y: 12, w: 600, h: 80 },
+  surface: { y0: 104, y1: 311, groundY: 300 },
+  miner: { x: 380, y: 212 },            // top-left of the 80×96 frame → feet at (420, 300)
+  winch: { x: 480, y: 280 },
+  mine: { x0: 24, x1: 936, y0: 324, y1: 648 },
+  // Where a click/tap fires the hook (not the HUD).
+  playArea: { y0: 104, y1: 720 },
 };
 
 export const HOOK = {
   maxAngleDeg: 65,
   avgSwingDegPerSec: 70,     // average speed of the sine swing
-  extendSpeed: 220,          // px/s
-  returnEmptySpeed: 260,     // px/s
-  returnLoadedSpeed: 170,    // px/s × the object multiplier
+  extendSpeed: 300,          // px/s
+  returnEmptySpeed: 340,     // px/s
+  returnLoadedSpeed: 220,    // px/s × the object multiplier
   restLength: 12,            // px, from the winch to the hook mount
-  maxLength: 250,            // px
+  maxLength: 420,            // px
   cargoOffset: 32,           // from the mount (16,3) to the cargo point (16,35) in pm-hook-basic
   grabRadius: 6,             // radius of the hook's jaws, added to the object radius
 };
@@ -43,33 +42,6 @@ export const OBJECT_TYPES = {
   'rock':          { asset: 'pm-rock',          points: 10,  speedMul: 0.20, radius: 13 },
   'crate':         { asset: 'pm-crate',         points: 100, speedMul: 0.40, radius: 16 },
 };
-
-// Round 1: a hand-made, fixed layout. Positions are polar around the winch
-// (angle from vertical, distance of the cargo point), so every object sits on its own
-// ray within reach. tests/gold-hook.test.mjs checks: no overlaps, reach, every object
-// can be the first hit, and the target can be reached in time.
-export const ROUNDS = [
-  {
-    level: 1,
-    // Changing the layout, points or speeds = new version (old scores are not comparable).
-    layoutVersion: 2,
-    durationSec: 60,
-    target: 650,
-    objects: [
-      { type: 'nugget-small',  x: 225, y: 286 },  // θ −50°, d 150
-      { type: 'nugget-small',  x: 367, y: 297 },  // θ  14°, d 110
-      { type: 'nugget-small',  x: 504, y: 305 },  // θ  55°, d 200
-      { type: 'nugget-medium', x: 264, y: 353 },  // θ −25°, d 180
-      { type: 'nugget-medium', x: 488, y: 366 },  // θ  40°, d 230
-      { type: 'nugget-large',  x: 359, y: 404 },  // θ   5°, d 215
-      { type: 'coin-pep',      x: 150, y: 300 },  // θ −60°, d 220
-      { type: 'coin-pep',      x: 464, y: 256 },  // θ  62°, d 140
-      { type: 'rock',          x: 319, y: 308 },  // θ −10°, d 120
-      { type: 'rock',          x: 420, y: 340 },  // θ  28°, d 170
-      { type: 'crate',         x: 186, y: 374 },  // θ −40°, d 240
-    ],
-  },
-];
 
 export const TIMING = {
   maxFrameDt: 0.05,    // s: cap on a time jump (e.g. coming back to the tab)

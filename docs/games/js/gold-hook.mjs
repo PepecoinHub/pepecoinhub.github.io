@@ -31,7 +31,7 @@ const embedded = document.body.classList.contains('embed') && parent !== window;
 function postSize() {
   if (!embedded) return;
   const box = document.querySelector('.gh-app');
-  parent.postMessage({ type: 'gold-hook-size', w: 660, h: Math.ceil(box.getBoundingClientRect().height) }, location.origin);
+  parent.postMessage({ type: 'gold-hook-size', w: 980, h: Math.ceil(box.getBoundingClientRect().height) }, location.origin);
 }
 
 const canvas = $('game');
@@ -113,7 +113,10 @@ async function boot() {
   fillStaticText();
   show('loading');
   if (embedded && 'ResizeObserver' in window) new ResizeObserver(postSize).observe(document.querySelector('.gh-app'));
+  // the canvas draws numbers in VT323: wait for the font (never longer than the asset load)
+  const fontReady = document.fonts ? document.fonts.load('34px VT323').catch(() => null) : null;
   const assets = await loadAssets('img/gold-hook/manifest.json');
+  await fontReady;
   if (!assets.ok) { showError(assets); return; }
 
   const game = createGame({ reactionMs: reactionDurations(assets.manifest) });
@@ -230,7 +233,10 @@ async function boot() {
       const info = T.items[item];
       const price = priceOf(run, item);
       const icon = el('img', { className: 'shop-icon', src: `img/gold-hook/ui/pm-shop-${item}.png`, width: 32, height: 32, alt: '' });
-      const btn = el('button', { type: 'button', className: 'pm-btn shop-buy', textContent: price === null ? T.maxed : T.buy(price), disabled: !canBuy(run, item) });
+      const btn = el('button', { type: 'button', className: 'pm-btn shop-buy', disabled: !canBuy(run, item) });
+      if (price === null) btn.textContent = T.maxed;
+      else btn.append(T.buyLabel, el('span', { className: 'price', textContent: Number(price).toLocaleString('en-US') }), ' PEP');
+      btn.setAttribute('aria-label', price === null ? `${info.name}: ${T.maxed}` : `${T.buyLabel} ${info.name}, ${price} PEP`);
       btn.addEventListener('click', () => {
         if (!buy(run, item)) return;
         store.set(RUN_KEY, run);
@@ -239,8 +245,10 @@ async function boot() {
         const again = $('shop-list').querySelectorAll('.shop-buy')[SHOP_ITEMS.indexOf(item)];
         (again.disabled ? $('btn-next-level') : again).focus({ preventScroll: true });
       });
-      return el('li', { className: 'shop-item' }, icon,
-        el('div', { className: 'shop-text' }, el('b', { textContent: `${info.name} ` }), el('small', { textContent: T.owned(item, run) }), el('br'), el('span', { textContent: info.text })),
+      const owned = T.owned(item, run);
+      return el('li', { className: `shop-item${owned ? ' owned' : ''}` }, icon,
+        el('div', { className: 'shop-name' }, info.name, owned ? el('span', { className: 'owned-tag', textContent: owned }) : ''),
+        el('div', { className: 'shop-text', textContent: info.text }),
         btn);
     }));
     postSize();

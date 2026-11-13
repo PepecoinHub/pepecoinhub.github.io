@@ -1,40 +1,42 @@
 // Pepe Gold Hook campaign: 20 levels, the money you earn, and the shop between levels.
 // Pure logic (no DOM). Every level layout is a fixed function of its number, so the server
 // (games/supabase/update_gold_hook_campaign.sql) can check a whole run against the same tables.
-import { HOOK, LAYOUT, OBJECT_TYPES, ROUNDS } from './gold-hook-config.mjs';
+import { HOOK, LAYOUT, OBJECT_TYPES } from './gold-hook-config.mjs';
 
 export const MAX_LEVEL = 20;
 export const CAMPAIGN_VERSION = 4;
 
-// Less time every level (down to 40 s), heavier loot (down to 70 % speed) and more rocks.
-export const durationFor = (L) => Math.max(40, 60 - 2 * (L - 1));
-export const weightFor = (L) => Math.max(0.7, Math.round((1 - 0.0175 * (L - 1)) * 1000) / 1000);
+// Less time every level (down to 45 s), heavier loot (down to 80 % speed) and more rocks.
+// Whole seconds (the server stores them as integers). The last level, the finale, gets 50 s.
+export const durationFor = (L) => (L === MAX_LEVEL ? 50 : Math.max(45, 60 - Math.floor(1.5 * (L - 1))));
+export const weightFor = (L) => Math.max(0.8, Math.round((1 - 0.0125 * (L - 1)) * 1000) / 1000);
 
 // Goals, tuned with a perfect-aim bot that shops for every level with the money an average player
-// would have (65 % of the bot's): every goal is at most 80 % of what that bot digs up, and goals never
+// would have (60 % of the bot's): every goal is at most 83 % of what that bot digs up, and goals never
 // go down. Late levels keep the goal and get harder by time, weight and rocks. Index = level.
 export const TARGETS = [0,
-  650, 680, 710, 760, 800, 850, 900, 950, 980, 980,
-  980, 980, 980, 980, 980, 980, 980, 980, 980, 1000];
+  780, 830, 870, 910, 950, 990, 1030, 1040, 1040, 1040,
+  1040, 1040, 1040, 1040, 1040, 1040, 1040, 1040, 1090, 1090];
 
+// The mine is big (912×324 px), so every level has plenty of loot, and more of it is heavy or junk.
 const COUNTS = (L) => ({
-  'nugget-large': 1 + Math.floor((L - 1) / 3),
-  'nugget-medium': 2 + Math.floor((L - 1) / 5),
-  'nugget-small': 3,
-  'coin-pep': 2 + Math.floor(L / 10),
-  crate: 1 + Math.floor(L / 12),
-  rock: 2 + Math.floor((L - 1) / 2),
+  'nugget-large': 1 + Math.floor((L + 1) / 3),
+  'nugget-medium': 3 + Math.floor((L - 1) / 4),
+  'nugget-small': 4,
+  'coin-pep': 2 + Math.floor(L / 7),
+  crate: 1 + Math.floor(L / 8),
+  rock: 3 + Math.floor((2 * (L - 1)) / 3),
 });
 
 // Where each kind may lie: distance of the cargo point from the winch, per level progress t∈[0,1].
-// Gold sinks deeper as the levels go on; rocks stay shallow, in the way.
+// Gold sinks deeper as the levels go on; rocks stay shallower, in the way.
 const DEPTH = {
-  'nugget-large': (t) => [170 + 50 * t, 275],
-  'nugget-medium': (t) => [130 + 40 * t, 265],
-  'nugget-small': () => [95, 250],
-  'coin-pep': () => [95, 265],
-  crate: () => [130, 260],
-  rock: () => [90, 235],
+  'nugget-large': (t) => [240 + 90 * t, 445],
+  'nugget-medium': (t) => [180 + 70 * t, 440],
+  'nugget-small': () => [110, 420],
+  'coin-pep': () => [110, 440],
+  crate: () => [170, 430],
+  rock: () => [100, 390],
 };
 
 function mulberry32(seed) {
@@ -46,11 +48,20 @@ function mulberry32(seed) {
   };
 }
 
+// Would something at (x, y) with radius r stand in the way of the rope going to object p?
+function blocks(x, y, r, p, W) {
+  const dx = p.x - W.x, dy = p.y - W.y, len = Math.hypot(dx, dy);
+  const along = ((x - W.x) * dx + (y - W.y) * dy) / len;
+  if (along <= 0 || along >= len) return false;
+  const off = Math.abs((x - W.x) * dy - (y - W.y) * dx) / len;
+  return off < r + HOOK.grabRadius + OBJECT_TYPES[p.type].radius * 0.5;
+}
+
 const HALF = { 'nugget-small': 12, 'nugget-medium': 16, 'nugget-large': 24, 'coin-pep': 12, rock: 16, crate: 20 };
 
 function generateLayout(L) {
   const rand = mulberry32(0x60D1 + L * 7919);
-  const t = (L - 2) / (MAX_LEVEL - 2);
+  const t = (L - 1) / (MAX_LEVEL - 1);
   const m = LAYOUT.mine, W = LAYOUT.winch;
   const restCargoY = W.y + HOOK.restLength + HOOK.cargoOffset;
   const placed = [];
@@ -69,6 +80,8 @@ function generateLayout(L) {
         if (y - r <= restCargoY + HOOK.grabRadius + 4) continue;
         if (Math.hypot(x - W.x, y - W.y) - HOOK.cargoOffset > HOOK.maxLength) continue;
         if (placed.some((p) => Math.hypot(p.x - x, p.y - y) <= OBJECT_TYPES[p.type].radius + r + 4)) continue;
+        // Big gold is never hidden behind other loot; rocks may hide it from level 5 on (dynamite!).
+        if ((type !== 'rock' || L < 5) && placed.some((p) => p.type === 'nugget-large' && blocks(x, y, r, p, W))) continue;
         placed.push({ type, x, y });
         ok = true;
       }
@@ -81,7 +94,7 @@ function generateLayout(L) {
 const layoutCache = new Map();
 export function levelDef(L) {
   if (!Number.isInteger(L) || L < 1 || L > MAX_LEVEL) throw new Error(`no level ${L}`);
-  if (!layoutCache.has(L)) layoutCache.set(L, L === 1 ? ROUNDS[0].objects.map((o) => ({ ...o })) : generateLayout(L));
+  if (!layoutCache.has(L)) layoutCache.set(L, generateLayout(L));
   return { level: L, durationSec: durationFor(L), target: TARGETS[L], weight: weightFor(L), objects: layoutCache.get(L) };
 }
 
