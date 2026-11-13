@@ -113,3 +113,6 @@ footer a { color: #e2eac9; }
 .embed .site-bar, .embed footer, .embed .window > .titlebar { display: none !important; }
 .embed .desk { max-width: none; padding: 0; }
 .embed .window { box-shadow: none; border: 0; padding: 2px; }
+.toolbar { gap: 6px; }
+.toolbar button { font-size: 12px; padding: 4px 9px; }
+.toolbar .muted { font-size: 11px; }

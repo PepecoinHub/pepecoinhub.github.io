@@ -5,41 +5,26 @@
 // It creates and drops its own database. Never point it at Supabase.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { SKIP, pondDb, addUser } from './pond-sql-setup.mjs';
 
-const URL_ENV = process.env.PASSPORT_PG_URL, MOD_ENV = process.env.PASSPORT_PG_MODULE;
-const read = p => readFile(new URL('../' + p, import.meta.url), 'utf8');
 const BEATS = { r: 's', s: 'p', p: 'r' };   // what each move beats
 const counter = m => ({ r: 'p', p: 's', s: 'r' })[m];
 
 test('Pond King: hidden moves, one duel per king per player and network, the throne changes hands safely',
-  { skip: !(URL_ENV && MOD_ENV) && 'set PASSPORT_PG_URL and PASSPORT_PG_MODULE', timeout: 120000 }, async () => {
-  const pg = (await import(MOD_ENV)).default;
-  const admin = new pg.Client({ connectionString: URL_ENV }); await admin.connect();
-  const dbName = 'pond_king_test_' + process.pid + '_' + Date.now();
-  await admin.query('create database ' + dbName);
-  const url = new URL(URL_ENV); url.pathname = '/' + dbName;
-  const db = new pg.Client({ connectionString: url.toString() }); await db.connect();
+  { skip: SKIP, timeout: 120000 }, async () => {
+  const { db, drop } = await pondDb('pond_king_test', ['update_pond_bulletin.sql', 'update_pond_king.sql']);
   try {
-    await db.query(`
-      do $$ begin create role anon nologin; exception when duplicate_object or unique_violation then null; end $$;
-      do $$ begin create role authenticated nologin; exception when duplicate_object or unique_violation then null; end $$;
-      create schema games;
-      grant usage on schema public, games to anon, authenticated;
-      create table games.config (id int primary key, host_code_salt text not null); insert into games.config values (1, 'test-salt');
-      create function games.is_profane(t text) returns boolean language sql immutable as $$ select t ilike '%badword%' $$;`);
-    const schema = await read('games/supabase/schema.sql');
-    await db.query(schema.match(/create or replace function games\.client_ip_hash\(\)[\s\S]*?\nend \$\$;/)[0]);
-    const sql = await read('games/supabase/update_pond_king.sql');
-    await db.query(sql);
-    await db.query(sql);   // safe to run again: still one house frog
+    const sql = (await import('node:fs/promises')).readFile(new URL('../games/supabase/update_pond_king.sql', import.meta.url), 'utf8');
+    await db.query(await sql);   // safe to run again: still one house frog
     assert.equal((await db.query('select count(*)::int n from games.pk_kings')).rows[0].n, 1);
 
     const tok = i => 'player-token-' + String(i).padStart(10, '0');
+    let user = null;   // a signed-in account for the next calls (null = no sign-in)
     const call = async (ip, q, args = []) => {
       await db.query('begin');
       try {
-        await db.query('set local role anon');
+        await db.query('set local role ' + (user ? 'authenticated' : 'anon'));
+        await db.query("select set_config('request.jwt.claim.sub', $1, true)", [user || '']);
         await db.query("select set_config('request.headers', $1, true)", [ip ? JSON.stringify({ 'cf-connecting-ip': ip }) : '{}']);
         const r = await db.query(q, args); await db.query('commit'); return r.rows[0].v;
       } catch (e) { await db.query('rollback'); throw e; }
@@ -61,7 +46,7 @@ test('Pond King: hidden moves, one duel per king per player and network, the thr
     assert.equal((await duel('short', '1.1.1.1', k0, 'Fren', 'rps')).error, 'token');
     assert.equal((await duel(tok(1), '1.1.1.1', k0, 'Fren', 'rpx')).error, 'moves');
     assert.equal((await duel(tok(1), '1.1.1.1', k0, 'x', 'rps')).error, 'nick');
-    assert.equal((await duel(tok(1), '1.1.1.1', k0, 'badword99', 'rps')).error, 'nick_bad');
+    assert.equal((await duel(tok(1), '1.1.1.1', k0, 'badword99', 'rps')).error, 'nick');
     assert.equal((await duel(tok(1), '1.1.1.1', k0 + 99, 'Fren', 'rps')).error, 'changed');
 
     // make the house frog predictable: three rocks, so any order is the same
@@ -129,7 +114,36 @@ test('Pond King: hidden moves, one duel per king per player and network, the thr
     }
     const k = (await state(tok(200), '7.7.7.7')).king;
     assert.equal((await duel(tok(200), '7.7.7.7', k.id, 'TooMany', 'rrr')).error, 'slow');
+
+    // the Bulletin got one "new king" per crown
+    const ev = (await db.query("select kind, actor_nick, other_nick from games.bulletin_events where kind = 'king_crowned' order by id")).rows;
+    assert.equal(ev.length, 14);   // Winner, Loser, 12 x Busy
+    // Loser held the throne against 6 probes: one "5 defences" story
+    assert.equal((await db.query("select count(*)::int n from games.bulletin_events where kind = 'king_defended' and actor_nick = 'Loser'")).rows[0].n, 1);
+    assert.deepEqual(ev[0], { kind: 'king_crowned', actor_nick: 'Winner', other_nick: 'Pepe' });
+
+    // logged on: the throne follows the account to another browser; a Discord player's name is reserved for them (games.valid_nick)
+    await db.query('delete from games.pk_duels');
+    const discord = await addUser(db, 1, 'DiscordFrog');
+    user = discord;
+    const kA = (await state(tok(300), '30.0.0.1')).king;
+    await db.query("update games.pk_kings set moves = 'sss' where id = $1", [kA.id]);
+    const dw = await duel(tok(300), '30.0.0.1', kA.id, 'DiscordFrog', 'rrr');
+    assert.equal(dw.won, true);
+    const other = await state(tok(301), '30.0.0.2');   // a different browser token, the same account
+    assert.equal(other.king.you, true); assert.equal(other.king.nick, 'DiscordFrog'); assert.equal(other.king.passport, discord);
+    assert.equal((await setMoves(tok(301), '30.0.0.2', 'ppp')).ok, true);
+    // a guest without an account cannot use the Discord player's name
+    user = null;
+    assert.equal((await duel(tok(302), '30.0.0.3', other.king.id, 'DiscordFrog', 'sss')).error, 'nick');
+    // a long reign makes the news once: defences 5
+    await db.query("update games.pk_kings set defenses = 4 where ended_at is null");
+    const d5 = await duel(tok(303), '30.0.0.4', other.king.id, 'Fifth', 'rrr');   // rrr vs ppp: the king holds
+    assert.equal(d5.won, false);
+    const news = (await db.query("select actor_nick, other_nick, actor_user, data from games.bulletin_events where kind = 'king_defended' and actor_nick = 'DiscordFrog'")).rows;
+    assert.equal(news.length, 1); assert.equal(news[0].actor_nick, 'DiscordFrog'); assert.equal(news[0].actor_user, discord);
+    assert.equal(news[0].data.defenses, 5);
   } finally {
-    await db.end(); await admin.query('drop database ' + dbName); await admin.end();
+    await drop();
   }
 });

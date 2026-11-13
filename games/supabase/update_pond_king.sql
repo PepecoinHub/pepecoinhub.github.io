@@ -1,5 +1,6 @@
 -- POND KING: an asynchronous rock-paper-scissors "king of the hill" for the meme edition (PondOS 98).
--- Run once in the Supabase SQL editor after schema.sql. Safe to run again (nothing is deleted).
+-- Run once in the Supabase SQL editor after schema.sql and update_pond_bulletin.sql. Safe to run again
+-- (nothing is deleted).
 --
 -- Rules
 --   * One frog sits on the throne with three secret moves (r = rock, p = paper, s = scissors).
@@ -13,8 +14,11 @@
 --   * The king's moves never leave the database, except to the king (who holds the token) and as the
 --     shuffled rounds of a finished duel, which show the challenger only the king's set of moves.
 --
--- No sign-in: a player is a random token the browser keeps in localStorage. The database keeps only its
+-- No sign-in needed: a player is a random token the browser keeps in localStorage. The database keeps only its
 -- SHA-256 (with the project salt), the nickname, the moves and a salted IP hash (for the limits).
+-- A player who is logged on to the pond (Discord or guest) is also stored under their account: the throne
+-- follows them to other devices, the name comes from games.valid_nick, and a Discord king gets a Fren
+-- Passport link. New kings and long reigns go to the POND BULLETIN (games.bulletin_post).
 -- The tables are reachable only through the functions below.
 
 create table if not exists games.pk_kings (
@@ -56,6 +60,10 @@ insert into games.pk_meta (id) values (1) on conflict do nothing;
 alter table games.pk_meta enable row level security;
 revoke all on games.pk_meta from public, anon, authenticated;
 
+alter table games.pk_kings add column if not exists user_id uuid;   -- the account, if the player was logged on
+alter table games.pk_duels add column if not exists user_id uuid;
+create index if not exists pk_duels_user on games.pk_duels (king_id, user_id);
+
 -- the pond opens with the house frog on the throne
 insert into games.pk_kings (nick, moves)
 select 'Pepe', (select string_agg(substr('rps', 1 + floor(random() * 3)::int, 1), '') from generate_series(1, 3))
@@ -66,6 +74,12 @@ create or replace function games.pk_token_hash(p_token text) returns text
 language sql stable security definer set search_path = '' as $$
   select case when coalesce(p_token, '') ~ '^[A-Za-z0-9-]{20,64}$'
     then encode(sha256(convert_to((select host_code_salt from games.config where id = 1) || '|pk|' || p_token, 'UTF8')), 'hex') end
+$$;
+
+-- is this row (a king or a duel) the player? By browser token, or by account when logged on
+create or replace function games.pk_is(row_token text, row_user uuid, th text, u uuid) returns boolean
+language sql immutable set search_path = '' as $$
+  select coalesce(th is not null and row_token = th, false) or coalesce(u is not null and row_user = u, false)
 $$;
 
 -- 1 = a beats b, -1 = b beats a, 0 = the same move
@@ -80,6 +94,7 @@ create or replace function public.gry_pk_state(p_token text default null)
 returns jsonb language plpgsql stable security definer set search_path = '' as $$
 declare
   th text := games.pk_token_hash(p_token);
+  u uuid := auth.uid();
   ip text := games.client_ip_hash();
   k games.pk_kings;
   mine games.pk_duels;
@@ -88,21 +103,23 @@ declare
 begin
   select * into k from games.pk_kings where ended_at is null;
   if k.id is null then return jsonb_build_object('king', null); end if;
-  you := coalesce(th is not null and k.token_hash = th, false);
-  if th is not null then select * into mine from games.pk_duels where king_id = k.id and token_hash = th; end if;
+  you := games.pk_is(k.token_hash, k.user_id, th, u);
+  select * into mine from games.pk_duels d where d.king_id = k.id and games.pk_is(d.token_hash, d.user_id, th, u) limit 1;
   if ip is not null and mine.id is null then
     ip_used := exists (select 1 from games.pk_duels where king_id = k.id and ip_hash = ip);
   end if;
   return jsonb_build_object(
     'king', jsonb_build_object('id', k.id, 'nick', k.nick, 'defenses', k.defenses, 'since', k.crowned_at,
-                               'house', k.token_hash is null, 'you', you,
+                               'house', k.token_hash is null and k.user_id is null, 'you', you,
+                               'passport', games.passport_id(k.user_id),
                                'moves', case when you then k.moves end),
     'can_challenge', not you and mine.id is null and not ip_used,
     'tried', case when mine.id is not null then jsonb_build_object('won', mine.won, 'at', mine.created_at)
                   when ip_used then jsonb_build_object('network', true) end,
     'duels_today', (select count(*) from games.pk_duels where created_at > now() - interval '24 hours'),
     'top', coalesce((select jsonb_agg(jsonb_build_object('nick', t.nick, 'defenses', t.defenses, 'reigning', t.ended_at is null,
-                                                         'since', t.crowned_at, 'until', t.ended_at, 'you', coalesce(th is not null and t.token_hash = th, false))
+                                                         'since', t.crowned_at, 'until', t.ended_at, 'you', games.pk_is(t.token_hash, t.user_id, th, u),
+                                                         'passport', games.passport_id(t.user_id))
                                       order by t.defenses desc, t.crowned_at)
                      from (select * from games.pk_kings where defenses > 0 or ended_at is null
                             order by defenses desc, crowned_at limit 10) t), '[]'::jsonb),
@@ -122,8 +139,10 @@ create or replace function public.gry_pk_challenge(p_token text, p_king_id bigin
 returns jsonb language plpgsql security definer set search_path = '' as $$
 declare
   th text := games.pk_token_hash(p_token);
+  u uuid := auth.uid();
   ip text := games.client_ip_hash();
-  v_nick text := btrim(regexp_replace(coalesce(p_nick, ''), '\s+', ' ', 'g'));
+  nm jsonb;
+  v_nick text;
   v_moves text := lower(coalesce(p_moves, ''));
   k games.pk_kings;
   ord text; me int := 0; them int := 0; r int; won boolean; n int; new_id bigint;
@@ -131,15 +150,15 @@ declare
 begin
   if th is null then return jsonb_build_object('ok', false, 'error', 'token'); end if;
   if v_moves !~ '^[rps]{3}$' then return jsonb_build_object('ok', false, 'error', 'moves'); end if;
-  if char_length(v_nick) < 2 or char_length(v_nick) > 20 or v_nick !~ '^[A-Za-z0-9 _.\-]+$' then
-    return jsonb_build_object('ok', false, 'error', 'nick'); end if;
-  if games.is_profane(v_nick) then return jsonb_build_object('ok', false, 'error', 'nick_bad'); end if;
+  nm := games.pond_name(u, p_nick);
+  if nm ? 'error' then return jsonb_build_object('ok', false, 'error', 'nick', 'message', nm->>'message'); end if;
+  v_nick := nm->>'nick';
 
   -- the throne row lock makes duels happen one after another
   select * into k from games.pk_kings where ended_at is null for update;
   if k.id is null or k.id is distinct from p_king_id then return jsonb_build_object('ok', false, 'error', 'changed'); end if;
-  if k.token_hash = th then return jsonb_build_object('ok', false, 'error', 'self'); end if;
-  if exists (select 1 from games.pk_duels where king_id = k.id and token_hash = th) then
+  if games.pk_is(k.token_hash, k.user_id, th, u) then return jsonb_build_object('ok', false, 'error', 'self'); end if;
+  if exists (select 1 from games.pk_duels d where d.king_id = k.id and games.pk_is(d.token_hash, d.user_id, th, u)) then
     return jsonb_build_object('ok', false, 'error', 'tried'); end if;
   if ip is not null and exists (select 1 from games.pk_duels where king_id = k.id and ip_hash = ip) then
     return jsonb_build_object('ok', false, 'error', 'network'); end if;
@@ -160,14 +179,21 @@ begin
   end loop;
   won := me > them;
 
-  insert into games.pk_duels (king_id, token_hash, ip_hash, nick, moves, king_order, won)
-  values (k.id, th, ip, v_nick, v_moves, ord, won);
+  insert into games.pk_duels (king_id, token_hash, user_id, ip_hash, nick, moves, king_order, won)
+  values (k.id, th, u, ip, v_nick, v_moves, ord, won);
 
   if won then
     update games.pk_kings set ended_at = now(), ended_by = v_nick where id = k.id;
-    insert into games.pk_kings (token_hash, ip_hash, nick, moves) values (th, ip, v_nick, v_moves) returning id into new_id;
+    insert into games.pk_kings (token_hash, user_id, ip_hash, nick, moves) values (th, u, ip, v_nick, v_moves) returning id into new_id;
+    perform games.bulletin_post('pk:crown:' || new_id, 'pond_king', 'king_crowned', v_nick, u, k.nick, k.user_id, null,
+                                jsonb_build_object('old_reign', k.defenses));
   else
     update games.pk_kings set defenses = defenses + 1 where id = k.id;
+    -- long reigns make the news
+    if k.defenses + 1 in (5, 10, 25, 50, 100, 250, 500, 1000) then
+      perform games.bulletin_post('pk:def:' || k.id || ':' || (k.defenses + 1), 'pond_king', 'king_defended', k.nick, k.user_id, v_nick, u, null,
+                                  jsonb_build_object('defenses', k.defenses + 1));
+    end if;
   end if;
 
   -- tidy up at most once an hour: duels older than 60 days, and old reigns outside the all-time top 50
@@ -186,16 +212,16 @@ end $$;
 -- The reigning king changes their three moves (only with the token that won the throne).
 create or replace function public.gry_pk_set_moves(p_token text, p_moves text)
 returns jsonb language plpgsql security definer set search_path = '' as $$
-declare th text := games.pk_token_hash(p_token); v_moves text := lower(coalesce(p_moves, '')); k games.pk_kings;
+declare th text := games.pk_token_hash(p_token); u uuid := auth.uid(); v_moves text := lower(coalesce(p_moves, '')); k games.pk_kings;
 begin
   if th is null then return jsonb_build_object('ok', false, 'error', 'token'); end if;
   if v_moves !~ '^[rps]{3}$' then return jsonb_build_object('ok', false, 'error', 'moves'); end if;
   select * into k from games.pk_kings where ended_at is null for update;
-  if k.id is null or k.token_hash is distinct from th then return jsonb_build_object('ok', false, 'error', 'not_king'); end if;
+  if k.id is null or not games.pk_is(k.token_hash, k.user_id, th, u) then return jsonb_build_object('ok', false, 'error', 'not_king'); end if;
   update games.pk_kings set moves = v_moves where id = k.id;
   return jsonb_build_object('ok', true, 'moves', v_moves);
 end $$;
 
-revoke all on function games.pk_token_hash(text), games.pk_beats(text, text) from public, anon, authenticated;
+revoke all on function games.pk_token_hash(text), games.pk_beats(text, text), games.pk_is(text, uuid, text, uuid) from public, anon, authenticated;
 revoke all on function public.gry_pk_state(text), public.gry_pk_challenge(text, bigint, text, text), public.gry_pk_set_moves(text, text) from public;
 grant execute on function public.gry_pk_state(text), public.gry_pk_challenge(text, bigint, text, text), public.gry_pk_set_moves(text, text) to anon, authenticated;

@@ -3,10 +3,7 @@
 // except the king's own (with their token) and the shuffled rounds of a duel that has just been played.
 (function () {
   'use strict';
-  var framed = false; try { framed = window.self !== window.top; } catch (e) { framed = true; }
-  if (framed || /[?&]embed=1(&|$)/.test(location.search)) document.documentElement.classList.add('embed');
-
-  var CFG = window.PEP_GRY || {};
+  var N = window.PondNet, framed = N.framed, me = null;
   var MOVES = { r: ['🪨', 'Rock'], p: ['📄', 'Paper'], s: ['✂️', 'Scissors'] };
   var $ = function (id) { return document.getElementById(id); };
   var mk = function (tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
@@ -25,17 +22,7 @@
   var state = null, busy = false, lastKingId = null;
   var pick = ['', '', ''], def = ['', '', ''];
 
-  function rpc(name, args) {
-    if (!CFG.supabaseUrl || !CFG.supabaseKey) return Promise.reject(new Error('offline'));
-    return fetch(CFG.supabaseUrl + '/rest/v1/rpc/' + name, {
-      method: 'POST', headers: { apikey: CFG.supabaseKey, 'Content-Type': 'application/json' }, body: JSON.stringify(args || {})
-    }).then(function (r) {
-      return r.json().catch(function () { return null; }).then(function (j) {
-        if (!r.ok) { var e = new Error((j && j.message) || 'The pond did not answer'); e.status = r.status; throw e; }
-        return j;
-      });
-    });
-  }
+  var rpc = N.rpc;   // with the pond log-on (Discord or guest) when there is one, otherwise as a visitor
 
   function ago(iso) {
     var s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
@@ -92,7 +79,9 @@
     $('king-name').textContent = (k.you ? '👑 You, ' : '') + k.nick;
     $('king-line').textContent = (k.house ? 'The house frog keeps the seat warm. Somebody take it. ' : '') + 'On the throne since ' + ago(k.since) + '.';
     $('king-def').textContent = k.defenses;
-    $('who').textContent = k.you ? 'you are the king' : (store.get('pk-nick') || 'guest');
+    $('who').textContent = k.you ? 'you are the king' : me ? (me.name || 'guest') + (me.discord ? ' ✓' : ' (guest)') : (store.get('pk-nick') || 'visitor');
+    $('king-pass').hidden = !k.passport;
+    $('king-pass').onclick = function () { N.open('passport', k.passport); };
 
     // which panel: king, challenge, or wait for a new king
     var showResult = !!opts.keepResult;
@@ -159,6 +148,7 @@
     nick_bad: 'Pick a different name.', moves: 'Pick a move for every round.', busy: 'The pond is busy. Try again in a few minutes.',
     slow: 'Slow down a little, fren. Try again in a few minutes.', token: 'Your browser blocked the game’s storage. Reload and try again.'
   };
+  function errText(r) { return (r && r.error === 'nick' && r.message) || ERR[r && r.error] || 'Something went wrong.'; }
 
   $('duel').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -169,7 +159,7 @@
     var kingNick = state.king.nick;
     rpc('gry_pk_challenge', { p_token: token, p_king_id: state.king.id, p_nick: name, p_moves: pick.join('') }).then(function (r) {
       if (!r || !r.ok) {
-        busy = false; $('duel-msg').textContent = ERR[r && r.error] || 'Something went wrong.';
+        busy = false; $('duel-msg').textContent = errText(r);
         if (r && (r.error === 'changed' || r.error === 'tried' || r.error === 'network')) load();
         canFight(); return;
       }
@@ -228,9 +218,16 @@
     }, function () { $('def-msg').textContent = 'The pond did not answer. Try again.'; $('save-def').disabled = false; });
   });
   $('recheck').addEventListener('click', function () { status('Checking the throne…'); load(); });
+  $('to-bulletin').addEventListener('click', function () { N.open('bulletin'); });
+  $('to-lilies').addEventListener('click', function () { N.open('lilies'); });
 
   // a fresh look whenever the window comes back, and every minute while it is open
   document.addEventListener('visibilitychange', function () { if (!document.hidden && !busy && $('result').hidden) load({ keepDef: true }); });
   setInterval(function () { if (!document.hidden && !busy && $('result').hidden) load({ keepDef: true }); }, 60000);
-  load();
+  N.session().then(function (s) {
+    me = N.me(s);
+    if (me && me.name) nick.value = me.name;
+    $('acct').textContent = me ? 'Logged on as ' + (me.name || 'guest') + (me.discord ? ' ✓' : '') + ': your throne follows you.' : '';
+    canFight(); load();
+  });
 })();

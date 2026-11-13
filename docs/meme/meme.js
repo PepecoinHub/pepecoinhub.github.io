@@ -127,7 +127,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'pond-king') return '../games/img/pond-king.svg'; if (n === 'goldhook') return '../games/img/gold-hook/ui/pm-icon-goldhook.png'; if (n === 'goldhook16') return '../games/img/gold-hook/ui/pm-icon-goldhook-16.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'pond-king') return '../games/img/pond-king.svg'; if (n === 'lilies') return '../games/img/lilies.svg'; if (n === 'goldhook') return '../games/img/gold-hook/ui/pm-icon-goldhook.png'; if (n === 'goldhook16') return '../games/img/gold-hook/ui/pm-icon-goldhook-16.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
   // Hall of Fame icon: the owner's art (gold cup + open Pepe passport) goes to img/ico/hall-of-fame.webp, then this
   // line becomes 'img/ico/hall-of-fame.webp'. Until then the LEADERS trophy stands in (no new art is made here).
   var HOF_ICON = 'img/ico/leaders.webp';
@@ -273,7 +273,9 @@
     var gl = el('div', { class: 'sm-list' });
     [['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
+      ['POND BULLETIN', 'Open duels and pond news', 'news', function () { bulletinApp(); }],
       ['POND KING', 'Rock, paper, scissors for the throne', 'pond-king', function () { pondKingApp(); }],
+      ['BATTLE OF THREE LILIES', '10 flies, 3 lily pads, 1 fren', 'lilies', function () { liliesApp(); }],
       ['YEET THE PEP', 'A frog, a catapult, no flight plan', 'yeet', function () { yeetApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', function () { pepeSweeperApp(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
@@ -821,13 +823,13 @@
     // bottom centre; Write a letter and the Recycle Bin in the bottom-right corner. Phones get one grid in the same order.
     var DESKTOP = [
       ['top', [['#logon', 'Log On', 'pep-logo'], ['#lan', 'LAN Party', 'gif-080-still'], ['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'],
-        ['#king', 'Pond King', 'pond-king'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#games', 'Games', 'games-folder']]],
+        ['#bulletin', 'Pond Bulletin', 'news'], ['#king', 'Pond King', 'pond-king'], ['#lilies', 'Three Lilies', 'lilies'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#games', 'Games', 'games-folder']]],
       ['low', [['./', 'Internet', 'internet'], ['#tv', 'Pond TV', 'pond-tv'], ['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#find', 'Find', 'search']]],
       // the community: the shop, the official Pepecoin account (the classic bird) and our subreddit
       ['mid', [['#shop', 'Shop', 'shop-bag'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit']]],
       ['corner', [['#mail', 'Write a letter', 'frog-mail'], ['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
-    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#king': function () { pondKingApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#king': function () { pondKingApp(); }, '#lilies': function () { liliesApp(); }, '#bulletin': function () { bulletinApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -964,7 +966,7 @@
       }],
       sky && ['Watch the sun set', function () { sky.demo(); }],
       ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons5'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
-      null, ["Pepe Guesser (today's photo)", function () { wheresPepe(); }], ['FROGAGEDDON (beta)', function () { pondWarsApp(); }], ['POND KING', function () { pondKingApp(); }], ['YEET THE PEP', function () { yeetApp(); }], ['Pepe Miner', function () { minerApp(); }], null, ['LEADERS', function () { highScores(); }], ['Properties…', aboutOS]].forEach(function (it) {
+      null, ["Pepe Guesser (today's photo)", function () { wheresPepe(); }], ['FROGAGEDDON (beta)', function () { pondWarsApp(); }], ['POND BULLETIN', function () { bulletinApp(); }], ['POND KING', function () { pondKingApp(); }], ['YEET THE PEP', function () { yeetApp(); }], ['Pepe Miner', function () { minerApp(); }], null, ['LEADERS', function () { highScores(); }], ['Properties…', aboutOS]].forEach(function (it) {
       if (it === false) return;
       if (!it) { ctx.appendChild(el('hr')); return; }
       var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
@@ -1167,7 +1169,18 @@
     var kingDoor = el('button', { type: 'button', class: 'pd-door pd-king' }, '<img src="' + ico('pond-king') + '" alt="" width="36" height="36" loading="lazy"><span><b>Challenge the Pond King</b><small>Rock, paper, scissors for the throne</small></span>');
     kingDoor.addEventListener('click', function () { pondKingApp(); });
     doors.insertBefore(kingDoor, doors.children[1] || null);
+    var boardDoor = el('button', { type: 'button', class: 'pd-door pd-king' }, '<img src="' + ico('lilies') + '" alt="" width="36" height="36" loading="lazy"><span><b>Pond Bulletin</b><small>Open duels: 10 flies, 3 lily pads</small></span>');
+    boardDoor.addEventListener('click', function () { bulletinApp(); });
+    doors.insertBefore(boardDoor, kingDoor.nextSibling);
+    setTimeout(function () {
+      rpc('gry_bulletin', { p_limit: 20 }).then(function (b) {
+        var n = (b && b.open || []).length;
+        if (n) boardDoor.querySelector('small').textContent = n + (n === 1 ? ' open challenge' : ' open challenges') + ' waiting for a fren';
+      }, function () { boardDoor.hidden = true; });
+    }, 0);
     if (location.hash === '#king') setTimeout(function () { pondKingApp(); }, 0);
+    if (location.hash === '#lilies') setTimeout(function () { liliesApp(); }, 0);
+    if (location.hash === '#bulletin') setTimeout(function () { bulletinApp(); }, 0);
     setTimeout(function () {
       var tk = null; try { tk = localStorage.getItem('pk-token'); } catch (e) {}
       rpc('gry_pk_state', { p_token: tk }).then(function (st) {
@@ -1590,6 +1603,38 @@
     }, 720);
     return A;
   }
+  // BATTLE OF THREE LILIES (games/lilies.html): 10 flies on 3 lily pads, two frens, no need to be online together.
+  // id: a challenge to accept or a duel to show; 'new' opens "Create Challenge". An open window is pointed there.
+  function liliesApp(id) {
+    var q = id === 'new' ? '&tab=create' : id && /^[0-9a-f-]{36}$/i.test(id) ? '&c=' + id : '';
+    var src = BASE + 'games/lilies.html?embed=1' + q;
+    var A = openApp('lilies', 'BATTLE OF THREE LILIES.EXE', 'lilies', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + src + '" title="Battle of Three Lilies"></iframe>';
+    }, 720);
+    var fr = A.body.querySelector('iframe'); if (q && fr && fr.getAttribute('src') !== src) fr.setAttribute('src', src);
+    return A;
+  }
+  // POND BULLETIN (games/bulletin.html): open challenges and pond news, public metadata only
+  function bulletinApp() {
+    // already open: bring it up with fresh news (a duel may have just ended in another window)
+    if (apps.bulletin) { var f0 = apps.bulletin.body.querySelector('iframe'); try { f0.contentWindow.location.reload(); } catch (e) {} }
+    return openApp('bulletin', 'POND BULLETIN.EXE', 'news', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/bulletin.html?embed=1" title="Pond Bulletin"></iframe>';
+    }, 680);
+  }
+  // the pond duel pages ask PondOS for other windows (a Fren Passport, Log On, another duel). Only our own
+  // frames on this origin are listened to, and only these few requests are understood.
+  window.addEventListener('message', function (e) {
+    var m = e.data;
+    if (e.origin !== location.origin || !m || m.type !== 'pondos-open') return;
+    var ok = false; document.querySelectorAll('.app-win iframe').forEach(function (f) { if (f.contentWindow === e.source) ok = true; });
+    if (!ok) return;
+    if (m.open === 'passport' && FREN_ID.test(m.id || '')) frenPassport(false, { id: String(m.id).toLowerCase() });
+    else if (m.open === 'logon') logOn();
+    else if (m.open === 'lilies') liliesApp(m.id);
+    else if (m.open === 'king') pondKingApp();
+    else if (m.open === 'bulletin') bulletinApp();
+  });
   function yeetApp() {
     var A = openApp('yeet', 'YEET THE PEP', 'yeet', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/yeet.html?embed=1" title="YEET THE PEP" allow="web-share; clipboard-write; fullscreen"></iframe>';
@@ -1681,6 +1726,8 @@
       ["Pepe Guesser", 'Daily photo hunt on the map', 'wheres-pepe', 'game geo guess guesser where map photo travel daily faucet free pep reward points', function () { wheresPepe(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', 'scores high score top ranking leaderboard best winners', function () { highScores(); }],
       ['POND KING', 'Rock, paper, scissors for the throne', 'pond-king', 'game rock paper scissors king throne duel crown kamien papier nozyce', function () { pondKingApp(); }],
+      ['BATTLE OF THREE LILIES', '10 flies, 3 lily pads, 1 fren', 'lilies', 'game blotto lilies lily pads flies strategy duel challenge two players async', function () { liliesApp(); }],
+      ['POND BULLETIN', 'Open duels and pond news', 'news', 'bulletin board news challenges duels results notice', function () { bulletinApp(); }],
       ['YEET THE PEP', 'Catapult a frog, three panic flaps', 'yeet', 'game catapult launch fly distance arcade', function () { yeetApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', 'game minesweeper saper flags lily pads wrong pepe eth arcade', function () { pepeSweeperApp(); }],
       ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', 'game arcade shooter invaders fud', invaders],
@@ -1751,7 +1798,9 @@
   function gamesFolder() {
     openApp('games', 'C:\\Pond\\Games', 'games-folder', function (A) {
       var G = [['🏆 LEADERS', 'leaders', function () { highScores(); }], ['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
+        ['POND BULLETIN', 'news', function () { bulletinApp(); }],
         ['POND KING', 'pond-king', function () { pondKingApp(); }],
+        ['Three Lilies', 'lilies', function () { liliesApp(); }],
         ['YEET THE PEP', 'yeet', function () { yeetApp(); }],
         ['PEPE SWEEPER', 'pepesweeper', function () { pepeSweeperApp(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],

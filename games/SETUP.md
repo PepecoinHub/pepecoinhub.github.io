@@ -262,13 +262,12 @@ egg can be adopted. Contract, playtest rules and the rescue system:
   by its CSP); the frog is kept in this tab's sessionStorage only.
   `tests/pepegochi-beta.test.mjs` runs in CI.
 
-## POND KING (update_pond_king.sql)
+## Pojedynki w stawie: POND BULLETIN, POND KING, BATTLE OF THREE LILIES
 
-Kamień, papier, nożyce o tron w PondOS 98 (`/meme/`: ikona „Pond King” na pulpicie, menu Start, folder Games, Find, przycisk pod „Today in the pond” i raz dziennie dymek). Gra: `docs/games/pond-king.html`. Uruchom raz w SQL Editor plik `games/supabase/update_pond_king.sql` (bezpieczny do powtórzenia). Dopóki go nie uruchomisz, przycisk na `/meme/` się ukrywa, a okno gry pokazuje „opens soon”.
+Opis gier, architektura i testy są w `games/POND_DUELS.md`. Uruchomienie: w Supabase → SQL Editor po kolei całe pliki **w tej kolejności** (każdy można powtórzyć, żaden niczego nie kasuje):
 
-- Na tronie siedzi jedna żaba z 3 ukrytymi ruchami. Na start jest to żaba „Pepe” z losowymi ruchami.
-- Przy każdym pojedynku serwer tasuje kolejność ruchów króla. Pretendent musi wygrać więcej rund niż król, a remis zostawia króla na tronie. Zwycięzca zostaje królem, jego 3 ruchy są obroną i może je zmieniać.
-- Jeden pojedynek z danym królem na gracza (losowy token w przeglądarce, na serwerze tylko jego skrót z solą) i na sieć (skrót IP). Limity: 12 pojedynków na sieć w 10 min, 300 na godzinę łącznie.
-- Bez logowania i bez nagród w PEP. Pojedynki są kasowane po 60 dniach; stare panowania też, poza top 50.
-- Test: `PASSPORT_PG_URL=… PASSPORT_PG_MODULE=… node --test tests/pond-king-sql.test.mjs` (lokalny Postgres, nigdy Supabase).
-- Reset tronu (np. po spamie): `update games.pk_kings set ended_at = now() where ended_at is null; insert into games.pk_kings (nick, moves) values ('Pepe', 'rps');`
+1. `games/supabase/update_pond_bulletin.sql`: tablica ogłoszeń (`gry_bulletin`) i wspólne zasady nicków,
+2. `games/supabase/update_pond_king.sql`: Król Stawu (kamień, papier, nożyce o tron),
+3. `games/supabase/update_lilies.sql`: Bitwa o Trzy Liście (10 much na 3 liściach, dwie osoby).
+
+Dopóki pliki nie są uruchomione, przyciski na `/meme/` się chowają, a okna gier pokazują „opens soon”. Reset tronu Króla Stawu (np. po spamie): `update games.pk_kings set ended_at = now() where ended_at is null; insert into games.pk_kings (nick, moves) values ('Pepe', 'rps');`
