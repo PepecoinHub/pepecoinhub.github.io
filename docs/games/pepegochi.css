@@ -70,8 +70,8 @@ html.embed body { padding-inline: 0; }
 @keyframes pgr-bob { 50% { transform: translate(-50%, calc(-1 * var(--foot) - 1.5625%)); } }
 .pgr-neglected .pgr-pet { animation-duration: 2.4s; }
 .pgr-packing .pgr-pet, .pgr-adopt .pgr-pet { animation: none; }
-/* young frogs have no state sprites yet: a hint of grey when neglected or packing */
-.pgr-neglected .pgr-pet:not([data-sprite^="adult"]), .pgr-packing .pgr-pet:not([data-sprite^="adult"]) { filter: grayscale(.45); }
+/* a state sprite not drawn yet (frogLook: fallback): the idle sprite with a hint of grey when neglected or packing */
+.pgr-neglected .pgr-pet[data-fallback], .pgr-packing .pgr-pet[data-fallback] { filter: grayscale(.45); }
 .pgr-suitcase { z-index: 81; transform: translate(-50%, -90.625%); }
 .pgr-bubble { position: absolute; z-index: 90; left: 50%; transform: translate(-50%, -100%); background: #fff; border: 2px solid #222; border-radius: 8px; padding: 2px 7px; font: 700 clamp(10px, 2.4cqw, 15px) Tahoma, sans-serif; color: #111; white-space: nowrap; }
 /* moving out: the frames from the art pack, the actor glides between them */

@@ -7,7 +7,8 @@ import { readFileSync, existsSync } from 'node:fs';
 import {
   SLOTS, ITEMS, STARTER_ROOM, BACKGROUND, FROG, ROOM_W, ROOM_H, FROG_PX, FOOT_Y, HOME, SPRITES, spriteSrc,
   DEPART_FRAMES, DEPART_FOOT, IMG, DEPART_MS, SUITCASE, LETTER, TAKEN_BY_LETTER, LOOK_BELOW,
-  frogLook, roomScene, departTimeline, renderRoom, playDeparture,
+  DEPART_DX, HATCH_FRAMES, HATCH_MS, CARE, careFrames,
+  frogLook, roomScene, departTimeline, renderRoom, playDeparture, playFrames,
 } from '../docs/games/js/pepegochi-room.mjs';
 
 const read = p => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
@@ -74,9 +75,15 @@ test('which sprite: packing, recovering and neglected first, then the need the a
   assert.equal(look({ needs: needs({ hunger: LOOK_BELOW }) }), 'adult_idle', 'only below ' + LOOK_BELOW);
   assert.equal(look({ needs: needs({ hunger: LOOK_BELOW - 0.5 }) }), 'adult_hungry');
   for (const status of ['neglected', 'recovering', 'packing']) assert.equal(look({ status, needs: needs({ hunger: 0 }) }), 'adult_' + status);
-  // young stages have no state sprites yet; a packing one gets the separate suitcase
-  assert.deepEqual(frogLook({ stage: 'tadpole', status: 'packing', needs: needs({ hunger: 0 }) }), { sprite: 'tadpole_idle', look: null, suitcase: true });
+  // young stages have no state sprites yet: their idle sprite, marked as a fallback; a packing one gets the separate suitcase
+  assert.deepEqual(frogLook({ stage: 'tadpole', status: 'packing', needs: needs({ hunger: 0 }) }), { sprite: 'tadpole_idle', look: null, suitcase: true, fallback: true });
   assert.equal(frogLook({ stage: 'froglet', status: 'neglected' }).suitcase, false);
+  assert.equal(frogLook({ stage: 'froglet', status: 'neglected' }).fallback, true);
+  assert.deepEqual(frogLook({ stage: 'froglet', needs: needs({ hunger: 10 }) }), { sprite: 'froglet_idle', look: null, suitcase: false, fallback: true });
+  assert.deepEqual(frogLook({ stage: 'froglet', needs: needs() }), { sprite: 'froglet_idle', look: null, suitcase: false, fallback: false });
+  for (const s of ['healthy', 'recovering']) assert.equal(frogLook({ stage: 'egg', status: s }).fallback, false, 'the egg greys only when neglected or packing');
+  assert.equal(frogLook({ stage: 'egg', status: 'packing' }).fallback, true);
+  assert.equal(frogLook({ status: 'packing' }).fallback, false, 'the adult has its own packing sprite');
   assert.match(roomScene({ status: 'packing' }).frog.bubble, /Packing/);
   assert.match(roomScene({ status: 'neglected' }).frog.bubble, /miss you/);
   assert.match(roomScene({ needs: needs({ mood: 10 }) }).label, /healthy and in a bad mood/);
@@ -106,14 +113,43 @@ test('moving out: the 6 frames once, 250 ms each, walking right until the frog l
   assert.equal(t[0].x, HOME.x, 'starts where the frog stood');
   for (let i = 1; i < t.length; i++) assert.ok(t[i].x >= t[i - 1].x, 'never walks back');
   const last = t.at(-1);
-  assert.equal(last.x + FROG_PX / 2, ROOM_W, 'frames 5-6 leave their own frame at the room\'s right edge');
-  assert.equal(t.at(-2).x, last.x);
+  assert.equal(last.x + FROG_PX / 2, ROOM_W, 'frame 6 leaves its own frame at the room\'s right edge');
+  // the body (frame position + where the art draws it inside the frame) moves by an even step, no stutter
+  const body = t.map(s => s.x + DEPART_DX[+s.src.match(/depart_0(\d)/)[1] - 1]);
+  const steps = body.slice(1).map((b, i) => b - body[i]);
+  assert.ok(Math.max(...steps) - Math.min(...steps) <= 1, 'even steps: ' + steps.join(','));
+  assert.ok(steps.every(d => d > 0));
   assert.deepEqual(t.map(s => s.foot), [1, 2, 3, 4, 3, 4, 3, 4, 5, 6].map(n => DEPART_FOOT[n - 1]), 'each frame stands on its own floor line');
   assert.ok(t.every(s => !s.suitcase), 'the adult frames already pull the suitcase');
   // young frogs: their sprite and the separate suitcase slide out, no adult frames
   const y = departTimeline('tadpole');
   assert.ok(y.every(s => /tadpole_idle/.test(s.src) && s.suitcase));
   assert.ok(y.at(-1).x - FROG_PX / 2 >= ROOM_W, 'fully out of the room');
+  // an in-place walk cycle from a later art pack (backlog A4): turn where it stood, then walk out of the room
+  const w = departTimeline('adult', { turn: ['depart_turn_01.png', 'depart_turn_02.png'], walk: ['depart_walk_01.png', 'depart_walk_02.png'] });
+  assert.deepEqual(w.slice(0, 2).map(s => [s.src, s.x]), [[IMG + 'depart_turn_01.png', HOME.x], [IMG + 'depart_turn_02.png', HOME.x]]);
+  assert.deepEqual(w.slice(2, 5).map(s => s.src.slice(-6, -4)), ['01', '02', '01']);
+  for (let i = 3; i < w.length; i++) assert.equal(w[i].x - w[i - 1].x, 24);
+  assert.ok(w.at(-1).x - FROG_PX / 2 >= ROOM_W - 24 && w.at(-1).x < ROOM_W + FROG_PX / 2);
+  assert.ok(w.every(s => s.foot === FOOT_Y && !s.suitcase));
+});
+
+test('short frame animations: hatching now, care once its art exists', () => {
+  assert.equal(HATCH_MS, 450);
+  assert.deepEqual(HATCH_FRAMES, ['hatch_01', 'hatch_02', 'hatch_03'].map(spriteSrc));
+  assert.deepEqual(CARE, {}, 'no care art yet');
+  assert.deepEqual(careFrames('adult', 'feed'), [], 'so an accepted care plays nothing');
+  // playFrames: each frame on the frog's own <img>, then its sprite back; stop puts it back at once
+  const attrs = { src: 'idle.png' }, img = { getAttribute: k => attrs[k], setAttribute: (k, v) => { attrs[k] = v; } };
+  let pending = null; const t = { setTimer: (fn) => { pending = fn; return 1; }, clearTimer: () => { pending = null; } };
+  const seen = [];
+  playFrames(img, ['a.png', 'b.png'], 100, t);
+  seen.push(attrs.src); pending(); seen.push(attrs.src); pending(); seen.push(attrs.src);
+  assert.deepEqual(seen, ['a.png', 'b.png', 'idle.png']);
+  const stop = playFrames(img, ['a.png', 'b.png'], 100, t); stop();
+  assert.equal(attrs.src, 'idle.png'); assert.equal(pending, null);
+  assert.equal(playFrames(img, [], 100, t), null);
+  assert.equal(playFrames(null, ['a.png'], 100, t), null);
 });
 
 // ---------- a minimal DOM, enough for renderRoom and playDeparture ----------
@@ -144,6 +180,8 @@ test('the drawn room: layers in order, the letter is a real button, the frog car
   assert.match(art.getAttribute('aria-label'), /hungry/);
   const frog = pet.querySelector('.pgr-pet');
   assert.equal(frog.src, spriteSrc('adult_hungry'));
+  assert.equal(frog.dataset.fallback, undefined);
+  assert.equal(renderRoom(doc, { mode: 'pet', stage: 'froglet', status: 'neglected' }).querySelector('.pgr-pet').dataset.fallback, '1');
   assert.equal(frog.style.getPropertyValue('--foot'), 124 / 128 * 100 + '%');
   assert.equal(pet.querySelectorAll('.pgr-item').length, 6);
   assert.equal(pet.querySelector('.pgr-letter'), null);
@@ -186,6 +224,7 @@ test('the room module draws only: no network, storage or Supabase', () => {
 test('pixel art stays pixel art: nearest-neighbour scaling on every room image', () => {
   const css = read('docs/games/pepegochi.css');
   assert.match(css, /\.pgr img \{[^}]*image-rendering: pixelated/);
+  assert.match(css, /\.pgr-neglected \.pgr-pet\[data-fallback\], \.pgr-packing \.pgr-pet\[data-fallback\] \{ filter: grayscale/, 'grey only on a fallback sprite');
   assert.match(css, /prefers-reduced-motion: reduce\) \{ \.pgr-pet \{ animation: none; \} \.pgr-actor \{ transition: none; \} \}/);
   assert.match(read('docs/games/js/pepegochi-beta.mjs'), /prefers-reduced-motion: reduce\)'\)\.matches/, 'no moving-out frames with reduced motion');
 });
