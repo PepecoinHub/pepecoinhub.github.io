@@ -4,19 +4,19 @@
 import { HOOK, LAYOUT, OBJECT_TYPES } from './gold-hook-config.mjs';
 
 export const MAX_LEVEL = 20;
-export const CAMPAIGN_VERSION = 4;
+export const CAMPAIGN_VERSION = 5;
 
 // Less time every level (down to 45 s), heavier loot (down to 80 % speed) and more rocks.
 // Whole seconds (the server stores them as integers). The last level, the finale, gets 50 s.
 export const durationFor = (L) => (L === MAX_LEVEL ? 50 : Math.max(45, 60 - Math.floor(1.5 * (L - 1))));
 export const weightFor = (L) => Math.max(0.8, Math.round((1 - 0.0125 * (L - 1)) * 1000) / 1000);
 
-// Goals, tuned with a perfect-aim bot that shops for every level with the money an average player
-// would have (60 % of the bot's): every goal is at most 83 % of what that bot digs up, and goals never
-// go down. Late levels keep the goal and get harder by time, weight and rocks. Index = level.
+// Goals: every level holds about 1100 PEP that a perfect bot without upgrades can dig up (see SEEDS);
+// the goal asks for 64 % of that on level 1, rising to 75 % on level 20, on top of less time, heavier
+// loot and more rocks. Only the surplus above a goal goes to the shop. Index = level.
 export const TARGETS = [0,
-  780, 830, 870, 910, 950, 990, 1030, 1040, 1040, 1040,
-  1040, 1040, 1040, 1040, 1040, 1040, 1040, 1040, 1090, 1090];
+  700, 710, 720, 720, 730, 740, 740, 750, 750, 760,
+  770, 770, 780, 790, 790, 800, 810, 810, 820, 820];
 
 // The mine is big (912×324 px), so every level has plenty of loot, and more of it is heavy or junk.
 const COUNTS = (L) => ({
@@ -59,8 +59,14 @@ function blocks(x, y, r, p, W) {
 
 const HALF = { 'nugget-small': 12, 'nugget-medium': 16, 'nugget-large': 24, 'coin-pep': 12, rock: 16, crate: 20 };
 
-function generateLayout(L) {
-  const rand = mulberry32(0x60D1 + L * 7919);
+// The seed of each level's layout: picked (scripts/pick_gold_hook_seeds.mjs) so every level holds about
+// the same reachable loot; difficulty then comes from time, weight and rocks, not from luck.
+export const SEEDS = [0,
+  1, 10, 2, 16, 8, 12, 4, 22, 10, 12,
+  24, 26, 6, 24, 18, 9, 16, 26, 19, 12];
+
+export function generateLayout(L, seed = SEEDS[L]) {
+  const rand = mulberry32(0x60D1 + L * 7919 + seed * 104729);
   const t = (L - 1) / (MAX_LEVEL - 1);
   const m = LAYOUT.mine, W = LAYOUT.winch;
   const restCargoY = W.y + HOOK.restLength + HOOK.cargoOffset;
@@ -99,6 +105,7 @@ export function levelDef(L) {
 }
 
 // ---------- shop ----------
+// The wallet only gets what you dig up ABOVE each level's goal, so the shop rewards playing well.
 // Everything bought in the shop works for the NEXT LEVEL ONLY: nothing carries over, unused dynamite
 // is lost. Prices grow 5 % per level, so late in the game you cannot afford everything at once.
 // strength: loot comes up 50 % faster; reel: the hook flies out and comes back empty 30 % faster;
@@ -107,7 +114,7 @@ export const SHOP = {
   strength: { max: 1, base: 200, boost: 0.5 },
   reel: { max: 1, base: 160, boost: 0.3 },
   dynamite: { max: 3, base: 60 },
-  clock: { max: 1, base: 160, seconds: 10 },
+  clock: { max: 1, base: 120, seconds: 10 },
 };
 export const SHOP_ITEMS = ['strength', 'reel', 'dynamite', 'clock'];
 
@@ -159,8 +166,9 @@ export function finishLevel(run, result) {
   const entry = { level: run.level, catches: result.run.catches.map((c) => ({ id: c.id, t: c.t })),
     seconds: Math.round(result.played * 1000) / 1000, dynamite: result.run.dynamiteUsed, bought: [] };
   run.log.push(entry);
-  run.money += result.score;
   run.total += result.score;
+  // Only what you dug up above the goal goes to the wallet for the shop.
+  if (result.won) run.money += result.score - result.target;
   // the upgrades were for this level only; unused dynamite is lost
   run.strength = 0; run.reel = 0; run.dynamite = 0; run.clock = 0;
   if (!result.won) run.over = true;

@@ -18,7 +18,7 @@ export const T = {
   howToText: [
     'The hook swings over the mine. Press Space, click or tap the mine to drop it, and it reels in the first thing it hits.',
     'Reach the level goal before the clock runs out. Heavy loot comes up slowly; rocks are worth almost nothing.',
-    'Every level has less time, heavier loot and more rocks. Between levels, spend the PEP you dug up in the shop: upgrades work for the next level only.',
+    'Every level has less time, heavier loot and more rocks. Only what you dig up above the goal goes to your wallet for the shop, and upgrades work for the next level only.',
     'Dynamite (D, or the dynamite button) blows up whatever is on the hook, so a bad catch costs you less time.',
     'Miss a goal and the run is over. Game PEP are points, not real coins.',
   ],
@@ -56,7 +56,7 @@ export const T = {
 
   // level cleared and shop
   clearedTitle: (L) => `Level ${L} cleared!`,
-  clearedLine: (score, target) => `${n(score)} PEP dug up (goal ${n(target)})`,
+  clearedLine: (score, target) => `${n(score)} PEP dug up · goal ${n(target)} → +${n(score - target)} PEP to spend`,
   clearedWallet: (money) => `Wallet: ${n(money)} PEP`,
   toShop: 'To the shop',
   shopTitle: (L) => `Shop · before level ${L}`,
@@ -68,7 +68,7 @@ export const T = {
     clock: { name: 'Pocket watch', text: '+10 seconds.' },
   },
   owned: (item, run) => (item === 'dynamite' ? (run.dynamite ? `×${run.dynamite}` : '') : (run[item] ? 'bought' : '')),
-  shopNote: 'Everything here works for the next level only. Unused dynamite is lost.',
+  shopNote: 'Your wallet holds what you dug up above the goals. Everything here works for the next level only; unused dynamite is lost.',
   buy: (price) => `Buy · ${n(price)}`,
   buyLabel: 'Buy',
   maxed: 'Bought for this level',
