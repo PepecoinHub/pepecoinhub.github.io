@@ -61,10 +61,9 @@ test('nine short taskbar movements never use an infinite CSS loop and honor redu
   assert.doesNotMatch(css.slice(css.indexOf('Short, rare PepeGochi actions')), /infinite/);
 });
 
-// ---------- added on claude/kind-faraday-l3vxjs: fixes, fact of the day, hop out of the window ----------
+// ---------- added on claude/kind-faraday-l3vxjs: fixes, Pond Quiz, hop out of the window ----------
 import { UNAVAILABLE, hopPath } from '../docs/meme/pepegochi-taskbar.mjs';
-import { factOfDay, usable, dayNumber, loadAnswer, saveAnswer, remark, REMARKS, STORE_KEY } from '../docs/meme/pepegochi-facts.mjs';
-const quiz = JSON.parse(readFileSync(new URL('../docs/data/pepecoin-quiz.json', import.meta.url), 'utf8')).questions;
+import { remark, REMARKS, dayNumber } from '../docs/meme/pepegochi-facts.mjs';
 
 test('fixes from the review of #299: a motion in the fallback, the storage listener removed, pixel-safe moves', () => {
   assert.equal(UNAVAILABLE.motion, 'egg');
@@ -78,45 +77,24 @@ test('fixes from the review of #299: a motion in the fallback, the storage liste
     for (const v of m[1].split(',')) assert.match(v.trim(), /^-?\d+(px)?$/, 'whole pixels only: ' + m[0]);
 });
 
-test('fact of the day: the same for everyone on a UTC day, no repeat until every usable question was asked', () => {
-  const list = usable(quiz);
-  assert.ok(list.length > 100, 'enough questions: ' + list.length);
-  assert.ok(list.every(q => q.source && !q.dated));
-  const d0 = dayNumber(Date.UTC(2026, 10, 13, 0, 0)), d1 = dayNumber(Date.UTC(2026, 10, 13, 23, 59));
-  assert.equal(d0, d1);
-  assert.deepEqual(factOfDay(quiz, d0), factOfDay(quiz, d1));
-  const ids = new Set();
-  for (let d = d0; d < d0 + list.length; d++) ids.add(factOfDay(quiz, d).id);
-  assert.equal(ids.size, list.length, 'a full cycle asks every question once');
-  for (let d = d0; d < d0 + 60; d++) {
-    const f = factOfDay(quiz, d), q = quiz.find(x => x.id === f.id);
-    assert.equal(f.answers[f.correct], q.answers[q.correct], 'the right answer survives the shuffle');
-    assert.deepEqual([...f.answers].sort(), [...q.answers].sort());
-  }
-  const firstRight = new Set(Array.from({ length: 40 }, (_, k) => factOfDay(quiz, d0 + k).correct));
-  assert.ok(firstRight.size >= 3, 'the right answer is not always in the same place');
-  assert.equal(factOfDay([], d0), null);
-});
-
-test('fact of the day: one answer a day in the browser, nothing breaks without storage', () => {
-  const mem = {}, storage = { getItem: k => mem[k] ?? null, setItem: (k, v) => { mem[k] = v; } };
-  assert.equal(loadAnswer(storage, 100), null);
-  saveAnswer(storage, 2, 100);
-  assert.deepEqual(loadAnswer(storage, 100), { day: 100, picked: 2 });
-  assert.equal(loadAnswer(storage, 101), null, 'a new day asks again');
-  assert.ok(mem[STORE_KEY]);
-  const broken = { getItem() { throw new Error('blocked'); }, setItem() { throw new Error('blocked'); } };
-  assert.equal(loadAnswer(broken, 100), null);
-  assert.doesNotThrow(() => saveAnswer(broken, 1, 100));
-  assert.ok(REMARKS.right.includes(remark(true, 5)) && REMARKS.wrong.includes(remark(false, 5)));
-});
-
-test('the fact never opens by itself, and the frog still opens the game', () => {
+test('Pond Quiz in the browser: questions only from the server, only after hatching, never opens by itself', () => {
   const js = readFileSync(new URL('../docs/meme/pepegochi-taskbar.mjs', import.meta.url), 'utf8');
+  const facts = readFileSync(new URL('../docs/meme/pepegochi-facts.mjs', import.meta.url), 'utf8');
+  assert.doesNotMatch(js + facts, /pepecoin-quiz|data\/|fetch\(/, 'no questions file is loaded');
+  assert.match(js, /rpc\('gry_quiz_today', \{\}\)/);
+  assert.match(js, /rpc\('gry_quiz_answer', \{ p_choice: i \}\)/);
+  assert.match(js, /rpc\('gry_quiz_board', \{\}\)/);
+  assert.match(js, /if \(!signedIn\(\) \|\| !hatched\) \{ server = null;/, 'no request before the frog hatched');
+  assert.match(js, /hatched = !!\(state && state\.pet && state\.pet\.stage && state\.pet\.stage !== 'egg'\)/);
   assert.match(js, /factBtn\.addEventListener\('click', \(\) => \{ refreshFacts\(\)\.then\(openBalloon\); \}\)/);
   assert.equal((js.match(/openBalloon\(/g) || []).length, 1, 'opened only from the "?" button');
   assert.match(js, /button\.addEventListener\('click', \(\) => open\(\)\)/);
-  assert.match(js, /base \+ 'data\/pepecoin-quiz\.json'/);
+  assert.match(js, /Date\.now\(\) - serverAt < 5 \* 60 \* 1000/, 'at most one quiz read in 5 minutes');
+});
+
+test("the frog's remarks after an answer", () => {
+  assert.ok(REMARKS.right.includes(remark(true, 5)) && REMARKS.wrong.includes(remark(false, 5)));
+  assert.equal(dayNumber(Date.UTC(2026, 10, 13, 0, 0)), dayNumber(Date.UTC(2026, 10, 13, 23, 59)));
 });
 
 test('hop out of the window: whole-pixel arc from the window to the taskbar slot; meme.js sends the window box', () => {

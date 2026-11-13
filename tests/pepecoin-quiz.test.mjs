@@ -1,46 +1,40 @@
-// docs/data/pepecoin-quiz.json: the Pepecoin quiz questions for PondOS (PepeGochi taskbar facts, later a quiz).
-// Every question has four different answers, one right one, and a PepecoinHub page that has the answer.
+// Pond Quiz questions: the real questions and answers are NOT in this public repo (they live only in Supabase).
+// These tests check the generator and its checks on a made-up sample (tests/fixtures/pond-quiz-sample.json),
+// and that no questions file is published with the site.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { validate, buildSql, isActive, OUT } from '../scripts/build_pond_quiz_sql.mjs';
 
-const data = JSON.parse(readFileSync(new URL('../docs/data/pepecoin-quiz.json', import.meta.url), 'utf8'));
-const qs = data.questions;
+const sample = JSON.parse(readFileSync(new URL('./fixtures/pond-quiz-sample.json', import.meta.url), 'utf8')).questions;
 
-test('the bank: 99 Three Facts questions plus the extra ones, unique ids and questions', () => {
-  assert.equal(qs.filter(q => q.set === 'three_facts').length, 99);
-  assert.ok(qs.filter(q => q.set === 'quiz_extra').length > 0);
-  assert.equal(new Set(qs.map(q => q.id)).size, qs.length);
-  const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
-  assert.equal(new Set(qs.map(q => norm(q.question))).size, qs.length, 'no question twice');
+test('no questions file in the repo or on the site; the private output folder is git-ignored', () => {
+  assert.equal(existsSync(new URL('../docs/data/pepecoin-quiz.json', import.meta.url)), false);
+  for (const f of readdirSync(new URL('../docs/data/', import.meta.url))) assert.doesNotMatch(f, /quiz/i, f);
+  const ignore = readFileSync(new URL('../.gitignore', import.meta.url), 'utf8');
+  assert.match(ignore, /^games\/supabase\/private\/$/m);
+  assert.match(OUT, /^games\/supabase\/private\//);
 });
 
-test('every question: four different answers, a valid right answer, difficulty 1-3', () => {
-  for (const q of qs) {
-    assert.ok(q.question.trim().length > 8, q.id);
-    assert.equal(q.answers.length, 4, q.id);
-    assert.equal(new Set(q.answers.map(a => a.trim().toLowerCase())).size, 4, q.id + ': answers differ');
-    assert.ok(Number.isInteger(q.correct) && q.correct >= 0 && q.correct < 4, q.id);
-    assert.ok([1, 2, 3].includes(q.difficulty), q.id);
-    assert.equal(typeof q.dated, 'boolean', q.id);
-  }
+test('the checks: the sample passes, every kind of mistake is named', () => {
+  assert.deepEqual(validate(sample), []);
+  const one = (change) => validate([{ ...sample[0], ...change }]).join(' | ');
+  assert.match(one({ id: 'Bad Id' }), /id must be/);
+  assert.match(one({ answers: ['a', 'b', 'c'] }), /needs 4 answers/);
+  assert.match(one({ answers: ['a', 'b', 'c', 'A'] }), /two answers are the same/);
+  assert.match(one({ correct: 4 }), /correct must be 0-3/);
+  assert.match(one({ source: 'https://example.com/' }), /source must be a pepecoinhub\.com page/);
+  assert.match(one({ dated: 'no' }), /dated must be true or false/);
+  assert.match(validate([sample[0], sample[0]]).join(), /the same id twice/);
+  assert.deepEqual(validate([]), ['no questions']);
 });
 
-test('sources: a page of this site that exists (only the Tangem sales question has none yet)', () => {
-  const missing = qs.filter(q => !q.source).map(q => q.id);
-  assert.deepEqual(missing, ['tf97']);
-  for (const q of qs.filter(q => q.source)) {
-    const m = /^https:\/\/pepecoinhub\.com\/([a-z-]*\.html)?$/.exec(q.source);
-    assert.ok(m, q.id + ': ' + q.source);
-    assert.ok(existsSync(new URL('../docs/' + (m[1] || 'index.html'), import.meta.url)), q.id + ': ' + q.source);
-  }
-});
-
-test('the server question bank (update_pond_quiz_questions.sql) is generated from this file and up to date', async () => {
-  const { buildSql, OUT, isActive } = await import('../scripts/build_pond_quiz_sql.mjs');
-  const sql = readFileSync(new URL('../' + OUT, import.meta.url), 'utf8');
-  assert.equal(sql, buildSql(qs), 'run: node scripts/build_pond_quiz_sql.mjs');
-  // the server asks the same questions the guests see (pepegochi-facts.mjs: a source and no date-dependent answer)
-  const { usable } = await import('../docs/meme/pepegochi-facts.mjs');
-  assert.deepEqual(qs.filter(isActive).map(q => q.id), usable(qs).map(q => q.id));
+test('the SQL: quotes escaped, only questions with a source and no date are asked, removed ones switched off', () => {
+  const sql = buildSql(sample);
+  assert.match(sql, /'Sample question four, with a ''quote''\?'/);
+  assert.deepEqual(sample.filter(isActive).map(q => q.id), ['s01', 's02', 's03', 's04']);
+  assert.match(sql, /\('s05', [^\n]*, false\)/);
+  assert.match(sql, /\('s06', [^\n]*null, false\)/);
+  assert.match(sql, /update games\.quiz_questions set active = false\n  where id not in \('s01', 's02', 's03', 's04', 's05', 's06'\)/);
+  assert.match(sql, /PRIVATE/);
 });

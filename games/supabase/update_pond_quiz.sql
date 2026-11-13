@@ -11,9 +11,13 @@
 --    once a day. Answering again the same day changes nothing.
 --  * The ranking shows the top 10 by points (a tie goes to whoever got there first) and the caller's own place.
 --  * No stamps yet: the thresholds come after the owner has checked the questions.
---  * Guests (no Discord) keep the shared local fact of the day in the browser, without points.
+--  * Only after the account's PepeGochi has hatched from its egg (the 'hatched' milestone, any frog so far).
+--  * The questions and answers are NOT in the public repo: they are loaded from a private file with
+--    scripts/build_pond_quiz_sql.mjs (games/supabase/private/update_pond_quiz_questions.sql, git-ignored), and the
+--    browser only ever gets today's question from these RPCs.
 --
--- Dependency: PH-games schema.sql (games.discord_identity). Then update_pond_quiz_questions.sql (the questions).
+-- Dependency: PH-games schema.sql (games.discord_identity) and update_pepegochi_v2.sql (games.pepegochi_milestones).
+-- Then the private update_pond_quiz_questions.sql (the questions).
 -- Safe to run twice.
 begin;
 
@@ -86,7 +90,20 @@ begin
 end
 $$;
 
-revoke all on function games.quiz_clock(), games.quiz_view(uuid, date) from public, anon, authenticated;
+-- Discord account whose PepeGochi has hatched; otherwise the call stops with a clear message.
+create or replace function games.quiz_check(u uuid)
+returns void language plpgsql stable security definer set search_path = '' as $$
+begin
+  if u is null or games.discord_identity(u) is null then
+    raise exception 'Discord sign-in required' using errcode = '42501';
+  end if;
+  if not exists (select 1 from games.pepegochi_milestones m where m.user_id = u and m.milestone = 'hatched') then
+    raise exception 'Hatch your PepeGochi first' using errcode = 'P0001';
+  end if;
+end
+$$;
+
+revoke all on function games.quiz_clock(), games.quiz_view(uuid, date), games.quiz_check(uuid) from public, anon, authenticated;
 
 -- ---------- browser RPCs ----------
 
@@ -100,9 +117,7 @@ declare
   p games.quiz_players%rowtype;
   pick text;
 begin
-  if u is null or games.discord_identity(u) is null then
-    raise exception 'Discord sign-in required' using errcode = '42501';
-  end if;
+  perform games.quiz_check(u);
   today := (games.quiz_clock() at time zone 'UTC')::date;
   insert into games.quiz_players (user_id) values (u) on conflict (user_id) do nothing;
   select * into p from games.quiz_players where user_id = u for update;
@@ -131,9 +146,7 @@ declare
   q games.quiz_questions%rowtype;
   is_right boolean;
 begin
-  if u is null or games.discord_identity(u) is null then
-    raise exception 'Discord sign-in required' using errcode = '42501';
-  end if;
+  perform games.quiz_check(u);
   if p_choice is null or p_choice < 0 or p_choice > 3 then
     raise exception 'Pick one of the four answers' using errcode = '22023';
   end if;

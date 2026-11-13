@@ -31,7 +31,8 @@ PR #299 itself is not changed. Its six files were brought onto this branch (it w
 
 - **Fixes:** the `storage` listener is removed when the companion unmounts; the "unavailable" state (no SQL, offline)
   has a motion; the nine motions move by whole pixels only (no `rotate`, which blurs pixel art).
-- **Fact of the day** (`docs/meme/pepegochi-facts.mjs`, data `docs/data/pepecoin-quiz.json`): a small Windows 98 "?"
+- **Fact of the day** (first version, replaced later the same day by the Pond Quiz below; its local questions file was
+  removed from the repo): a small Windows 98 "?"
   on the frog while today's fact is unanswered. It never opens by itself. Click: a balloon with one question and four
   answers; after a pick it shows the right answer, a short remark from the frog and "Read more" (the PepecoinHub page).
   The same question for everyone on a UTC day, in a fixed shuffled order with no repeats until all usable questions
@@ -52,12 +53,15 @@ Tests: `node --test tests/pepegochi-taskbar.test.mjs`. Still behind `?beta=gochi
   the question leaves the pool; a wrong answer gives nothing and the question comes back on a later day (never the
   next one). The right answer and the order of the answers stay on the server; the browser sends one number, once a
   day. "Ranking" shows the top 10 (ties: who got there first) and the player's own place.
-- Guests, or before the SQL is installed: the shared local fact of the day as before, with "Log on with Discord to
-  collect points."
+- Only after the account's PepeGochi has hatched (server check on the 'hatched' milestone; the browser does not even
+  ask before the frog's state shows a hatched stage). Guests and eggs see no "?".
 - Server reads: one `gry_quiz_today` per page load and at most one per 5 minutes after that (or on a new day / account).
 - No stamps yet: thresholds after the owner and Claude have checked the questions together. One question
   (`tf97`, Tangem sales) waits for its source and is not asked.
-- Note: the questions and answers are public in `docs/data/pepecoin-quiz.json` (the answers are on PepecoinHub anyway).
-  The ranking rewards coming back every day, not secret knowledge.
+- **The questions and answers are not in this public repo** (owner, 2026-11-13). They live only in Supabase, loaded
+  from the owner's private file: `node scripts/build_pond_quiz_sql.mjs <private file>` writes
+  `games/supabase/private/update_pond_quiz_questions.sql` (git-ignored). Tests use six made-up questions
+  (`tests/fixtures/pond-quiz-sample.json`). The browser only ever receives today's question, and the right answer only
+  after answering.
 
 SQL tests (disposable local PostgreSQL): `PASSPORT_PG_URL=... PASSPORT_PG_MODULE=... node --test tests/pond-quiz-sql.test.mjs`.
