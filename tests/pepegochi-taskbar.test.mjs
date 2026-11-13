@@ -125,3 +125,21 @@ test('hop out of the window: whole-pixel arc from the window to the taskbar slot
   assert.match(shell, /new CustomEvent\('pondos:pepegochi-left'/);
   assert.match(shell, /minBtn\.addEventListener\('click', A\._hop, true\)/);
 });
+
+test('A3: the 9 animations are 33 real 48 x 48 frames that pass the art check, each drawn from one pose', async () => {
+  const { checkFile } = await import('../scripts/pepegochi_art_qa.mjs');
+  const { ANIMS, animFrames, POSES } = await import('../docs/meme/pepegochi-taskbar.mjs');
+  assert.deepEqual(Object.keys(ANIMS), ['wobble', 'bob', 'peek', 'hop', 'shuffle', 'greet', 'nod', 'slouch', 'tremble']);
+  let n = 0;
+  for (const name of Object.keys(ANIMS)) {
+    assert.ok(POSES.includes(ANIMS[name].base), name);
+    for (const f of animFrames(name)) {
+      n++;
+      const r = checkFile(new URL('../docs/games/img/pepegochi/' + f, import.meta.url).pathname, { format: 'B', prop: f.endsWith('tb_hop_03.png') });
+      assert.deepEqual(r.problems, [], f);
+    }
+  }
+  assert.equal(n, 33);
+  const js = readFileSync(new URL('../docs/meme/pepegochi-taskbar.mjs', import.meta.url), 'utf8');
+  assert.match(js, /if \(a && showing\(a\.base\)\)/, 'frames only over their own pose; otherwise the CSS move');
+});

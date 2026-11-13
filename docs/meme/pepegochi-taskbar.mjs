@@ -16,6 +16,21 @@ export const POSES = ['tb_egg', 'tb_tadpole', 'tb_froglet', 'tb_adult_sit', 'tb_
 export const pose = id => 'taskbar/' + id + '.png';
 // bumped when a pose file is redrawn under the same name, so browsers do not keep the old picture
 export const POSE_VERSION = '20261113stand';
+// The 9 short animations (A3, 33 frames in img/pepegochi/taskbar/anim/, approved 2026-11-13). Each one is drawn from
+// one pose and is played only while the frog shows that pose; otherwise the old whole-pixel CSS move is used.
+export const ANIMS = {
+  wobble: { base: 'tb_egg', frames: 4, ms: 150 },
+  bob: { base: 'tb_adult_sit', frames: 2, ms: 400 },
+  peek: { base: 'tb_adult_sit', frames: 4, ms: 250 },
+  hop: { base: 'tb_adult_sit', frames: 5, ms: 110 },
+  shuffle: { base: 'tb_adult_sit', frames: 4, ms: 160 },
+  greet: { base: 'tb_adult_sit', frames: 4, ms: 180 },
+  nod: { base: 'tb_adult_sleepy', frames: 4, ms: 300 },
+  slouch: { base: 'tb_adult_neglected', frames: 3, ms: 300 },
+  tremble: { base: 'tb_adult_packing', frames: 3, ms: 90 },
+};
+export const animFrames = name => Array.from({ length: ANIMS[name].frames },
+  (_, i) => 'taskbar/anim/tb_' + name + '_0' + (i + 1) + '.png');
 // the room's sprite for the frog's state (frogLook) -> the taskbar pose that shows the same state
 const POSE_OF = { egg_idle: 'tb_egg', tadpole_idle: 'tb_tadpole', froglet_idle: 'tb_froglet', adult_idle: 'tb_adult_sit',
   adult_hungry: 'tb_adult_hungry', adult_dirty: 'tb_adult_dirty', adult_moody: 'tb_adult_moody', adult_tired: 'tb_adult_sleepy',
@@ -131,28 +146,54 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     recovering: ['nod', 'bob'], letter: [],
   };
   let currentMood = 'egg', movement = null, motionTimer = null, restoreTimer = null;
+  let frameTimer = null;
   function cancelMotion() {
     if (motionTimer) clearTimeout(motionTimer);
     if (restoreTimer) clearTimeout(restoreTimer);
-    motionTimer = restoreTimer = null;
+    if (frameTimer) clearTimeout(frameTimer);
+    motionTimer = restoreTimer = frameTimer = null;
     if (movement) button.classList.remove('pg-motion-' + movement);
+    if (movement && shownView) paint(shownView);   // back to the state pose after a frame animation
     movement = null;
   }
+  // the frog shows exactly this pose right now (no talking/waving pose over it)
+  const showing = id => !act && shownView && shownView.sprite === pose(id);
   function playMotion(name) {
     if (movement) button.classList.remove('pg-motion-' + movement);
     movement = name;
+    const a = ANIMS[name];
+    if (a && showing(a.base)) {
+      // the drawn frames, then the state pose again
+      const frames = animFrames(name);
+      let i = 0;
+      const step = () => {
+        if (i < frames.length) { img.setAttribute('src', img_base + frames[i++] + '?v=' + POSE_VERSION); frameTimer = setTimeout(step, a.ms); }
+        else { frameTimer = null; paint(shownView); restoreTimer = setTimeout(queueMotion, 50); }
+      };
+      step();
+      return;
+    }
     button.classList.add('pg-motion-' + movement);
     restoreTimer = setTimeout(queueMotion, 1050);
+  }
+  // load the frames of the next animation while waiting, so it never flickers
+  const preloaded = new Set();
+  function preload(name) {
+    if (!ANIMS[name] || preloaded.has(name)) return;
+    preloaded.add(name);
+    for (const f of animFrames(name)) { const i = new Image(); i.src = img_base + f + '?v=' + POSE_VERSION; }
   }
   function queueMotion() {
     cancelMotion();
     if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return;
     const choices = motions[currentMood] || motions.adult;
     if (!choices.length) return;
+    const next = choices[Math.floor(Math.random() * choices.length)];
+    if (shownView && ANIMS[next] && showing(ANIMS[next].base)) preload(next);
     motionTimer = setTimeout(() => {
       motionTimer = null;
       if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return;
-      playMotion(choices[Math.floor(Math.random() * choices.length)]);
+      playMotion(next);
     }, 13000 + Math.floor(Math.random() * 20000));
   }
   const motionPreferenceChanged = () => queueMotion();
