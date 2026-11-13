@@ -537,6 +537,42 @@
     28
    ],
    "sha256": "95ca920c5ace18f11186f360e062d54b1da035701a06f4eedcbbd41e71995ceb"
+  },
+  {
+   "id": "pm-miner-crank-atlas",
+   "path": "characters/pm-miner-crank-atlas.png",
+   "width": 320,
+   "height": 96,
+   "anchor": [
+    40,
+    88
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    16,
+    13,
+    302,
+    89
+   ],
+   "sha256": "a4f722592da93413b021b96b845e6f318f990b58947b2ecfb46de96ce3b528e3"
+  },
+  {
+   "id": "pm-winch-crank-atlas",
+   "path": "objects/pm-winch-crank-atlas.png",
+   "width": 176,
+   "height": 57,
+   "anchor": [
+    25,
+    36
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    7,
+    3,
+    175,
+    57
+   ],
+   "sha256": "473a65747a461a38ad130453509f7d9dedce5f182a223997387774e7afa3f1e1"
   }
  ],
  "atlas": {
@@ -789,6 +825,75 @@
      ]
     ]
    }
+  },
+  "crank": {
+   "frames": [
+    0,
+    3,
+    2,
+    3
+   ],
+   "baseMs": 90,
+   "loop": true,
+   "atlas": {
+    "id": "pm-miner-crank-atlas",
+    "rects": [
+     [
+      0,
+      0,
+      80,
+      96
+     ],
+     [
+      80,
+      0,
+      80,
+      96
+     ],
+     [
+      160,
+      0,
+      80,
+      96
+     ],
+     [
+      240,
+      0,
+      80,
+      96
+     ]
+    ]
+   },
+   "winch": {
+    "id": "pm-winch-crank-atlas",
+    "rects": [
+     [
+      0,
+      0,
+      44,
+      57
+     ],
+     [
+      44,
+      0,
+      44,
+      57
+     ],
+     [
+      88,
+      0,
+      44,
+      57
+     ],
+     [
+      132,
+      0,
+      44,
+      57
+     ]
+    ],
+    "rest": 1
+   }
   }
  },
  "hud": {
@@ -831,6 +936,7 @@
   "Character anchor is shared per-frame. Do not runtime-trim frames.",
   "Pepe Gold Hook runtime subset of pep-miner-art-v1 (ChatGPT art pack, 2026-11-13). Paths are relative to this file. The pack logo (text PEP MINER) is not used.",
   "P1 pack (ChatGPT, pepe-gold-hook-art-p1): logo, icons, surface, tiles, winch, closed hook, sparkle and dust atlases. Effects use the atlas rects; 80 ms per frame, once.",
-  "P2 pack (ChatGPT, pepe-gold-hook-art-p2): shop icons, trophy and the dynamite explosion atlas (6 \u00d7 70 ms, once). The optional shop row frame and level badge are not used yet."
+  "P2 pack (ChatGPT, pepe-gold-hook-art-p2): shop icons, trophy and the dynamite explosion atlas (6 \u00d7 70 ms, once). The optional shop row frame and level badge are not used yet.",
+  "Crank pack (ChatGPT, pepe-gold-hook-frog-winch): 4 frog poses at the crank and the winch with its crank on the frog side, cut from the pack composite at the same offset (rope exit = winch anchor). Pose 1 (hands at the belly) misses the handle, so the loop is poses 0,3,2,3 and the winch at rest shows frame 1 (handle hanging). Frame time = baseMs / speedMul^0.6 of the cargo. The winch got legs: its two posts carried down to the ground (ours, not in the pack)."
  ]
 }

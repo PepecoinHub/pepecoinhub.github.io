@@ -12,6 +12,8 @@ export const REQUIRED_ASSETS = [
   'pm-sparkle-atlas', 'pm-dust-atlas', 'pm-dynamite',
   // art pack P2
   'pm-explosion-atlas',
+  // frog at the crank
+  'pm-miner-crank-atlas', 'pm-winch-crank-atlas',
 ];
 
 function loadImage(url) {

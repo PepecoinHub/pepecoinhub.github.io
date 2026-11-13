@@ -11,7 +11,7 @@ export const GAME_ID = 'goldhook';
 export const LAYOUT = {
   hud: { x: 180, y: 12, w: 600, h: 80 },
   surface: { y0: 104, y1: 311, groundY: 300 },
-  miner: { x: 380, y: 212 },            // top-left of the 80×96 frame → feet at (420, 300)
+  miner: { x: 403, y: 212 },            // top-left of the 80×96 frame → feet at (443, 300), hands on the crank
   winch: { x: 480, y: 280 },
   mine: { x0: 24, x1: 936, y0: 324, y1: 648 },
   // Where a click/tap fires the hook (not the HUD).
