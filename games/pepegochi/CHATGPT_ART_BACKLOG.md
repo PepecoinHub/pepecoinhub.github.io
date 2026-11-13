@@ -14,7 +14,7 @@ Format A (postać i rzeczy w pokoju, „128”):
 - PNG, dokładnie **128 × 128 px**, prawdziwa przezroczystość (bez białego, czarnego ani szachownicy w tle).
 - Pixel-art na siatce **2 × 2** (każdy „piksel” to blok 2×2), najwyżej 64 kolory, bez rozmycia, antyaliasingu,
   gradientów, półprzezroczystych krawędzi i tekstu.
-- **Stopy / dół na linii y = 124.** Dorosła żaba: 113 px wysokości (góra y = 9), tułów (bluza) wyśrodkowany na x = 60.
+- **Stopy / dół na linii y = 124**: postać stoi na tej linii, czyli ostatni widoczny rząd pikseli to y = 123 (tak jak w `adult_idle`). Dorosła żaba: 113 px wysokości (góra y = 9), tułów (bluza) wyśrodkowany na x = 60.
 - Jedna klatka w jednym pliku. Nigdy arkusz.
 - Bluza: niebieska, z białą literą **P skopiowaną piksel w piksel z `pepegochi_adult_idle.png`**. Nie „₱”, nie przekreślona,
   nie lustrzana (porównanie: `audit-2026-11-13/hoodie_p_compare.png`, pierwszy obrazek = wzór).
@@ -24,12 +24,15 @@ Format B (pasek Start, „48”):
 
 - PNG, dokładnie **48 × 48 px**, prawdziwa przezroczystość, siatka **1 × 1** (mała ikona w stylu Windows 98),
   najwyżej 32 kolory, ciemnozielony kontur 1 px, bez antyaliasingu.
-- Żaba **siedzi na krawędzi paska**: dół postaci na linii **y = 47**, wysokość postaci ok. 40 px (może wystawać ponad pasek).
+- Żaba **siedzi na krawędzi paska**: dół postaci na linii **y = 47** (ostatni widoczny rząd pikseli to y = 46), wysokość postaci ok. 40 px (może wystawać ponad pasek).
 - Środek tułowia na x = 24. To ta sama żaba co `adult_idle`: zielona, niebieska bluza z białym „P” (3 × 5 px), brązowe spodenki.
 
 Nazwy plików dokładnie jak w tabelach (małe litery, podkreślniki). Klatki animacji numerowane `_01`, `_02`…
 
 ---
+
+Każdy plik sprawdzam przed integracją: `node scripts/pepegochi_art_qa.mjs plik.png` (rozmiar, przezroczystość, siatka,
+liczba kolorów, linia stóp). Plik, który nie przejdzie, wraca do poprawy.
 
 ## Kolejność produkcji
 
@@ -235,7 +238,8 @@ FORMAT A (game sprites, A1)
 - PNG, exactly 128 x 128 px, real transparent background (no white, black or checkerboard fill).
 - Real pixel art on a 2 x 2 grid (every "pixel" is a 2 x 2 block), at most 64 colours, no blur,
   no anti-aliasing, no gradients, no semi-transparent edges, no text. One sprite per file, never a sheet.
-- Feet exactly on the line y = 124. Same size and position as the file being fixed.
+- Feet stand exactly on the line y = 124 (the lowest visible row of pixels is y = 123). Same size and position
+  as the file being fixed.
 - The white P on the hoodie is copied pixel for pixel from pepegochi_adult_idle.png (not a peso sign,
   not crossed, not mirrored).
 
@@ -243,7 +247,7 @@ FORMAT B (taskbar companion, A2)
 - PNG, exactly 48 x 48 px, real transparent background, 1 x 1 pixel grid, at most 32 colours,
   1 px dark green outline, no anti-aliasing, no text.
 - The same frog as pepegochi_adult_idle.png, sitting on the top edge of a Windows 98 taskbar:
-  bottom of the body on y = 47, about 40 px tall, body centred on x = 24, white P on the blue hoodie (3 x 5 px).
+  the body stands on the line y = 47 (lowest visible row y = 46), about 40 px tall, body centred on x = 24, white P on the blue hoodie (3 x 5 px).
 
 Deliver one file per image, named exactly as in the list.
 [paste the A1 or A2 table here]

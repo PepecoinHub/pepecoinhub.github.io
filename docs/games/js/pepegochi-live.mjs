@@ -3,7 +3,7 @@
 // PondOS opens this page in a window; it also works on its own.
 import { getBackend } from './backend.js';
 import { LiveGame } from './pepegochi-live-view.mjs';
-import { renderRoom, playDeparture, DEPART_FRAMES } from './pepegochi-room.mjs';
+import { renderRoom, playDeparture, playFrames, frogLook, careFrames, DEPART_FRAMES, HATCH_FRAMES, HATCH_MS, CARE_MS } from './pepegochi-room.mjs';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {
@@ -79,33 +79,39 @@ function renderDeparted(box, v) {
 }
 
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-const HATCH = [1, 2, 3].map(n => 'img/pepegochi/pepegochi_hatch_0' + n + '.png');
-function playHatch(room) {
-  const img = [...room.querySelectorAll('img')].find(i => /pepegochi_tadpole_idle/.test(i.getAttribute('src') || ''));
-  if (!img) return null;
-  const final = img.getAttribute('src'), timers = [];
-  HATCH.forEach((src, k) => timers.push(setTimeout(() => img.setAttribute('src', src), k * 450)));
-  timers.push(setTimeout(() => img.setAttribute('src', final), HATCH.length * 450));
-  img.setAttribute('src', HATCH[0]);
-  return () => { timers.forEach(clearTimeout); img.setAttribute('src', final); };
-}
-let shown = null, stopAnim = null, preloaded = false;
+const petImg = () => document.querySelector('#pgb-scene .pgr-pet');
+let shown = null, stopAnim = null, preloaded = false, sceneKey = '', careDone = null;
+// The scene is built again only when what it shows changes (mode, stage, status, sprite, room, letter), not on the
+// minute redraw: a new <img> would restart the idle bob and cut a hatching or care animation short.
 function renderScene(v) {
-  if (stopAnim) { stopAnim(); stopAnim = null; }
   const scene = $('pgb-scene'), title = $('pgb-scene-title');
-  let room;
+  const placements = game.placements(), at = placements ? { placements } : {};
+  let opts;
   if (v.mode === 'pet') {
     title.textContent = v.pet.title;
-    room = renderRoom(document, { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs, ...(game.placements() ? { placements: game.placements() } : {}) });
-    if (!preloaded) { preloaded = true; DEPART_FRAMES.forEach(src => { const i = new Image(); i.src = src; }); }
+    opts = { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs, ...at };
   } else if (v.mode === 'departed') {
     title.textContent = `${v.departed.name} · moved out`;
-    room = renderRoom(document, { mode: 'departed', letterSeen: v.departed.letterSeen, ...(game.placements() ? { placements: game.placements() } : {}) });
-  } else { title.textContent = 'Your room'; room = renderRoom(document, { mode: 'adopt' }); }
-  scene.replaceChildren(room);
-  if (v.mode === 'departed' && shown && shown.mode === 'pet' && !reduceMotion()) stopAnim = playDeparture(room, shown.stage);
-  // the egg hatches: three cracking frames, then the tadpole (sprite pack 2026-11-09)
-  if (v.mode === 'pet' && v.pet.stage === 'tadpole' && shown && shown.stage === 'egg' && !reduceMotion()) stopAnim = playHatch(room);
+    opts = { mode: 'departed', letterSeen: v.departed.letterSeen, ...at };
+  } else { title.textContent = 'Your room'; opts = { mode: 'adopt' }; }
+  const key = JSON.stringify([opts.mode, opts.status, opts.stage, opts.letterSeen, placements,
+    v.mode === 'pet' ? frogLook(opts).sprite : null]);
+  const care = careDone; careDone = null;
+  if (key !== sceneKey || !scene.firstChild) {
+    if (stopAnim) { stopAnim(); stopAnim = null; }
+    sceneKey = key;
+    const room = renderRoom(document, opts);
+    scene.replaceChildren(room);
+    if (v.mode === 'pet' && !preloaded) { preloaded = true; DEPART_FRAMES.forEach(src => { const i = new Image(); i.src = src; }); }
+    if (v.mode === 'departed' && shown && shown.mode === 'pet' && !reduceMotion()) stopAnim = playDeparture(room, shown.stage);
+    // the egg hatches: the cracking frames, then the tadpole
+    if (v.mode === 'pet' && v.pet.stage === 'tadpole' && shown && shown.stage === 'egg' && !reduceMotion()) stopAnim = playFrames(petImg(), HATCH_FRAMES, HATCH_MS);
+  }
+  // an accepted care action: its short animation, when the art for that stage exists (none yet: nothing plays)
+  if (care && v.mode === 'pet' && !(shown && shown.stage === 'egg') && !reduceMotion()) {
+    const frames = careFrames(v.pet.stage, care);
+    if (frames.length) { if (stopAnim) stopAnim(); stopAnim = playFrames(petImg(), frames, CARE_MS); }
+  }
   shown = { mode: v.mode, stage: v.pet?.stage };
 }
 
@@ -167,7 +173,7 @@ $('pgb-scene').addEventListener('click', e => { if (e.target.closest('[data-lett
 $('pgb-body').addEventListener('click', e => {
   const t = e.target.closest('button');
   if (!t || game.busy) return;
-  if (t.dataset.act) run(game.act(t.dataset.act));
+  if (t.dataset.act) { const kind = t.dataset.act; run(game.act(kind).then(r => { if (r.ok && r.value.action_result === 'accepted') careDone = kind; return r; })); }
   else if (t.dataset.letter) openLetter();
   else if (t.dataset.closeLetter) { game.closeLetter(); render(); }
   else if (t.dataset.signin) backend.discord().catch(err => { game.message = err.message; render(); });
