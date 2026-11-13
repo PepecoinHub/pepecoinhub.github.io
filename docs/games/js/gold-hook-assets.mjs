@@ -10,6 +10,8 @@ export const REQUIRED_ASSETS = [
   // art pack P1
   'pm-surface', 'pm-earth-tile', 'pm-stone-tile', 'pm-winch', 'pm-hook-closed',
   'pm-sparkle-atlas', 'pm-dust-atlas', 'pm-dynamite',
+  // art pack P2
+  'pm-explosion-atlas',
 ];
 
 function loadImage(url) {

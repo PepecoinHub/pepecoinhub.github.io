@@ -224,12 +224,12 @@ async function boot() {
   function renderShop() {
     $('shop-title').textContent = T.shopTitle(run.level);
     $('shop-wallet').textContent = T.shopWallet(run.money);
+    $('shop-note').textContent = T.shopNote;
     $('btn-next-level').textContent = T.nextLevel(run.level);
     $('shop-list').replaceChildren(...SHOP_ITEMS.map((item) => {
       const info = T.items[item];
       const price = priceOf(run, item);
-      const icon = info.icon ? el('span', { className: 'shop-icon', textContent: info.icon, ariaHidden: 'true' })
-        : el('img', { className: 'shop-icon', src: 'img/gold-hook/objects/pm-dynamite.png', width: 16, height: 32, alt: '' });
+      const icon = el('img', { className: 'shop-icon', src: `img/gold-hook/ui/pm-shop-${item}.png`, width: 32, height: 32, alt: '' });
       const btn = el('button', { type: 'button', className: 'pm-btn shop-buy', textContent: price === null ? T.maxed : T.buy(price), disabled: !canBuy(run, item) });
       btn.addEventListener('click', () => {
         if (!buy(run, item)) return;
@@ -265,6 +265,7 @@ async function boot() {
     const isNew = run.total > s.best;
     store.set(STATS_KEY, { best: Math.max(s.best, run.total), level: Math.max(s.level, level), runs: s.runs + 1 });
     $('end-best').textContent = isNew ? T.newBest(run.total) : T.best(s.best);
+    $('end-trophy').hidden = !(finished || isNew);
     // submit form
     const session = readSession(cfg);
     const verified = !!(session && session.discord);

@@ -75,7 +75,7 @@ export const TIMING = {
   maxFrameDt: 0.05,    // s: cap on a time jump (e.g. coming back to the tab)
   maxSubstep: 1 / 120, // s: simulation step
   popupSec: 0.9,
-  effectSec: 0.32,    // sparkle / dust: 4 frames × 80 ms, once (art pack P1)
+  effectSec: { sparkle: 0.32, dust: 0.32, explosion: 0.42 },   // art packs P1/P2: frames × ms, once
   lowTimeSec: 10,
 };
 

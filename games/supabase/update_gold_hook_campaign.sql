@@ -3,10 +3,10 @@
 --
 -- One call per finished run (game over or after level 20), only when the player presses "Submit score":
 --   public.gry_goldhook_submit_run(p_nick, p_run)
--- p_run = {"gameId":"goldhook","version":3,"levels":[{"level":1,"catches":[{"id":5,"t":4.07}],
+-- p_run = {"gameId":"goldhook","version":4,"levels":[{"level":1,"catches":[{"id":5,"t":4.07}],
 --          "seconds":60,"dynamite":0,"bought":["strength"]}, ...]}
 -- The server replays the whole run: every catch against the fastest possible hook cycle for the
--- upgrades owned at that moment, every purchase against the money earned so far, dynamite against the
+-- upgrades bought for that level (they last one level only), every purchase against the money earned so far, dynamite against the
 -- sticks bought, level goals and times. It counts the score itself; the browser never sends a total.
 -- The score (total PEP earned in the run) goes into the shared arcade table as game 'goldhook', so
 -- PondOS LEADERS and public.gry_arcade_top('goldhook') keep working. Nickname, Discord, rate limits
@@ -61,18 +61,18 @@ insert into games.goldhook_levels (level, duration, weight, target) values
 (6, 50, 0.913, 850),
 (7, 48, 0.895, 900),
 (8, 46, 0.878, 950),
-(9, 44, 0.86, 1000),
-(10, 42, 0.843, 1040),
-(11, 40, 0.825, 1080),
-(12, 40, 0.808, 1100),
-(13, 40, 0.79, 1110),
-(14, 40, 0.773, 1120),
-(15, 40, 0.755, 1130),
-(16, 40, 0.738, 1140),
-(17, 40, 0.72, 1140),
-(18, 40, 0.702, 1140),
-(19, 40, 0.7, 1140),
-(20, 40, 0.7, 1140);
+(9, 44, 0.86, 980),
+(10, 42, 0.843, 980),
+(11, 40, 0.825, 980),
+(12, 40, 0.808, 980),
+(13, 40, 0.79, 980),
+(14, 40, 0.773, 980),
+(15, 40, 0.755, 980),
+(16, 40, 0.738, 980),
+(17, 40, 0.72, 980),
+(18, 40, 0.702, 980),
+(19, 40, 0.7, 980),
+(20, 40, 0.7, 1000);
 insert into games.goldhook_objects (level, id, points, speed_mul, travel) values
 (1, 0, 50, 1, 90.803),
 (1, 1, 50, 1, 51.353),
@@ -517,7 +517,7 @@ declare
   ms_total numeric := 0; n int; place int; v_best int;
 begin
   if p_run is null or jsonb_typeof(p_run) <> 'object' or p_run ->> 'gameId' is distinct from 'goldhook'
-     or (p_run ->> 'version') is distinct from '3' or jsonb_typeof(p_run -> 'levels') is distinct from 'array' then
+     or (p_run ->> 'version') is distinct from '4' or jsonb_typeof(p_run -> 'levels') is distinct from 'array' then
     raise exception '%', bad;
   end if;
   n_levels := jsonb_array_length(p_run -> 'levels');
@@ -535,8 +535,8 @@ begin
     select l.duration, l.weight, l.target into v_dur, v_weight, v_target from games.goldhook_levels l where l.level = i;
     if v_dur is null then raise exception '%', bad; end if;
     v_dur := v_dur + case when s_clock > 0 then 10 else 0 end;
-    ext := 220 * (1 + 0.15 * s_reel);
-    loaded := 170 * (1 + 0.20 * s_str);
+    ext := 220 * (1 + 0.30 * s_reel);
+    loaded := 170 * (1 + 0.50 * s_str);
     v_seconds := (lv ->> 'seconds')::numeric;
     v_dyn := (lv ->> 'dynamite')::int;
     if v_seconds <= 0 or v_seconds > v_dur + 0.05 or v_dyn > s_dyn then raise exception '%', bad; end if;
@@ -565,8 +565,8 @@ begin
 
     money := money + earned;
     total := total + earned;
-    s_dyn := s_dyn - v_dyn;
-    s_clock := 0;
+    -- what was bought for this level is used up (unused dynamite is lost); the shop buys for the next one
+    s_str := 0; s_reel := 0; s_dyn := 0; s_clock := 0;
     ms_total := ms_total + v_seconds;
     won := earned >= v_target;
     if not won or i = 20 then
@@ -576,16 +576,16 @@ begin
     end if;
     if i = n_levels then raise exception 'Finish the run first'; end if;
 
-    -- the shop after this level: prices as in docs/games/js/gold-hook-campaign.mjs
+    -- the shop after this level, for level i + 1: base × (19 + level) / 20, as in docs/games/js/gold-hook-campaign.mjs
     for it in select e.value from jsonb_array_elements(lv -> 'bought') with ordinality as e(value, idx) order by e.idx loop
       if jsonb_typeof(it) is distinct from 'string' then raise exception '%', bad; end if;
       item := it #>> '{}';
       price := case item
-        when 'strength' then case s_str when 0 then 400 when 1 then 900 when 2 then 1600 end
-        when 'reel' then case s_reel when 0 then 350 when 1 then 800 end
-        when 'dynamite' then case when s_dyn < 3 then 150 end
-        when 'clock' then case when s_clock < 1 then 250 end
-      end;
+        when 'strength' then case when s_str < 1 then 200 end
+        when 'reel' then case when s_reel < 1 then 160 end
+        when 'dynamite' then case when s_dyn < 3 then 60 end
+        when 'clock' then case when s_clock < 1 then 160 end
+      end * (19 + i + 1) / 20;
       if price is null or money < price then raise exception '%', bad; end if;
       money := money - price;
       if item = 'strength' then s_str := s_str + 1;

@@ -7,9 +7,9 @@
 <meta name="description" content="Drop a swinging hook into the mine, reel in gold, PEP coins and crates, and spend your loot on upgrades between 20 ever harder levels. Free arcade game; game PEP are points, not real coins.">
 <link rel="canonical" href="https://pepecoinhub.com/games/gold-hook.html">
 <link rel="icon" href="img/gold-hook/ui/pm-icon-goldhook.png">
-<link rel="stylesheet" href="gold-hook.css?v=20261113c">
+<link rel="stylesheet" href="gold-hook.css?v=20261113d">
 <script src="js/config.js"></script>
-<script type="module" src="js/gold-hook.mjs?v=20261113c"></script>
+<script type="module" src="js/gold-hook.mjs?v=20261113d"></script>
 </head>
 <body>
 <header class="site-links"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · ARCADE</span><a href="index.html">More games →</a></header>
@@ -83,6 +83,7 @@
       <div class="panel panel-shop">
         <h2 id="shop-title"></h2>
         <p id="shop-wallet" class="strong" aria-live="polite"></p>
+        <p id="shop-note" class="small"></p>
         <ul id="shop-list" class="shop-list"></ul>
         <div class="buttons">
           <button type="button" class="pm-btn" id="btn-next-level"></button>
@@ -94,6 +95,7 @@
     <!-- game over or the end of level 20 -->
     <div class="overlay" id="ov-end" role="dialog" aria-modal="true" aria-labelledby="end-title" hidden>
       <div class="panel">
+        <img id="end-trophy" class="trophy" src="img/gold-hook/ui/pm-trophy.png" width="32" height="32" alt="" hidden>
         <h2 id="end-title"></h2>
         <p id="end-line" class="strong"></p>
         <p id="end-text"></p>

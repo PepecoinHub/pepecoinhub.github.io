@@ -51,7 +51,7 @@ export function resetRound(g) {
   g.animClock = 0;          // ms of game time, for the idle/pull loops
   g.reaction = null;        // { name, t, total } — success/fail/hurt
   g.popups = [];
-  g.effects = [];           // { kind: 'sparkle' | 'dust', x, y, t } in game time, so pause freezes them
+  g.effects = [];           // { kind: 'sparkle' | 'dust' | 'explosion', x, y, t } in game time, so pause freezes them
   g.events = [];            // event queue for the UI (announcements, later sounds)
   g.result = null;
   g.lowTimeMarks = new Set();
@@ -96,7 +96,7 @@ export function useDynamite(g) {
   const h = g.hook;
   if (g.app !== APP.PLAYING || h.mode !== HOOK_MODE.RETURNING_LOADED || g.dynamite <= 0) return false;
   const { cx, cy } = hookGeometry(h);
-  g.effects.push({ kind: 'dust', x: cx, y: cy, t: 0 });
+  g.effects.push({ kind: 'explosion', x: cx, y: cy, t: 0 });
   g.dynamite -= 1;
   g.dynamiteUsed += 1;
   h.cargo = null;
@@ -241,7 +241,7 @@ function stepOnce(g, dt) {
   for (const p of g.popups) p.t += dt;
   g.popups = g.popups.filter((p) => p.t < TIMING.popupSec);
   for (const e of g.effects) e.t += dt;
-  g.effects = g.effects.filter((e) => e.t < TIMING.effectSec);
+  g.effects = g.effects.filter((e) => e.t < TIMING.effectSec[e.kind]);
 
   // Everything collected and the hook is home: nothing left to wait for.
   if (g.hook.mode === HOOK_MODE.READY && g.objects.every((o) => o.caught)) endRound(g);

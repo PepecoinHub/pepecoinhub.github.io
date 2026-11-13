@@ -4,19 +4,18 @@
 import { HOOK, LAYOUT, OBJECT_TYPES, ROUNDS } from './gold-hook-config.mjs';
 
 export const MAX_LEVEL = 20;
-export const CAMPAIGN_VERSION = 3;
+export const CAMPAIGN_VERSION = 4;
 
 // Less time every level (down to 40 s), heavier loot (down to 70 % speed) and more rocks.
 export const durationFor = (L) => Math.max(40, 60 - 2 * (L - 1));
 export const weightFor = (L) => Math.max(0.7, Math.round((1 - 0.0175 * (L - 1)) * 1000) / 1000);
 
-// Goals, tuned with a perfect-aim bot that shops sensibly (tests/gold-hook.test.mjs keeps them
-// reachable). Index = level.
-// From level 9 a perfect bot needs upgrades; late levels keep the goal and get harder by
-// time, weight and rocks instead.
+// Goals, tuned with a perfect-aim bot that shops for every level with the money an average player
+// would have (65 % of the bot's): every goal is at most 80 % of what that bot digs up, and goals never
+// go down. Late levels keep the goal and get harder by time, weight and rocks. Index = level.
 export const TARGETS = [0,
-  650, 680, 710, 760, 800, 850, 900, 950, 1000, 1040,
-  1080, 1100, 1110, 1120, 1130, 1140, 1140, 1140, 1140, 1140];
+  650, 680, 710, 760, 800, 850, 900, 950, 980, 980,
+  980, 980, 980, 980, 980, 980, 980, 980, 980, 1000];
 
 const COUNTS = (L) => ({
   'nugget-large': 1 + Math.floor((L - 1) / 3),
@@ -87,26 +86,33 @@ export function levelDef(L) {
 }
 
 // ---------- shop ----------
-// strength: loot comes up faster; reel: the hook flies out and comes back empty faster;
-// dynamite: blow up whatever is on the hook (one per use); clock: +10 s on the next level only.
+// Everything bought in the shop works for the NEXT LEVEL ONLY: nothing carries over, unused dynamite
+// is lost. Prices grow 5 % per level, so late in the game you cannot afford everything at once.
+// strength: loot comes up 50 % faster; reel: the hook flies out and comes back empty 30 % faster;
+// dynamite: blow up whatever is on the hook (up to 3 sticks); clock: +10 s.
 export const SHOP = {
-  strength: { max: 3, costs: [400, 900, 1600], perTier: 0.20 },
-  reel: { max: 2, costs: [350, 800], perTier: 0.15 },
-  dynamite: { max: 3, cost: 150 },
-  clock: { max: 1, cost: 250, seconds: 10 },
+  strength: { max: 1, base: 200, boost: 0.5 },
+  reel: { max: 1, base: 160, boost: 0.3 },
+  dynamite: { max: 3, base: 60 },
+  clock: { max: 1, base: 160, seconds: 10 },
 };
 export const SHOP_ITEMS = ['strength', 'reel', 'dynamite', 'clock'];
 
-// Hook speeds for the current upgrades.
+// Price of an item for level L: base × (1 + 0.05 × (L − 1)). Bases are multiples of 20, so this is
+// always a whole number (the SQL uses the same integer formula).
+export const priceFor = (item, L) => (SHOP[item].base * (19 + L)) / 20;
+
+// Hook speeds for the upgrades bought for this level.
 export function speedsFor({ strength = 0, reel = 0 } = {}) {
-  const r = 1 + SHOP.reel.perTier * reel;
+  const r = 1 + SHOP.reel.boost * reel;
   return {
     extend: HOOK.extendSpeed * r,
     empty: HOOK.returnEmptySpeed * r,
-    loaded: HOOK.returnLoadedSpeed * (1 + SHOP.strength.perTier * strength),
+    loaded: HOOK.returnLoadedSpeed * (1 + SHOP.strength.boost * strength),
   };
 }
 
+// run.strength / reel / dynamite / clock = what is bought for the next level (cleared after it).
 export function newRun() {
   return { version: CAMPAIGN_VERSION, level: 1, money: 0, total: 0, strength: 0, reel: 0, dynamite: 0, clock: 0,
     over: false, finished: false, log: [] };
@@ -117,11 +123,9 @@ export function modsFor(run) {
   return { strength: run.strength, reel: run.reel, dynamite: run.dynamite, extraSec: run.clock ? SHOP.clock.seconds : 0 };
 }
 
-// Price of the next unit of an item, or null when it cannot be bought (maxed, or no money).
+// Price of the next unit of an item for the coming level, or null when the limit is reached.
 export function priceOf(run, item) {
-  const s = SHOP[item];
-  if (item === 'strength' || item === 'reel') return run[item] < s.max ? s.costs[run[item]] : null;
-  return run[item] < s.max ? s.cost : null;
+  return run[item] < SHOP[item].max ? priceFor(item, run.level) : null;
 }
 
 export function canBuy(run, item) {
@@ -144,8 +148,8 @@ export function finishLevel(run, result) {
   run.log.push(entry);
   run.money += result.score;
   run.total += result.score;
-  run.dynamite -= result.run.dynamiteUsed;
-  run.clock = 0;                          // the extra time was for this level only
+  // the upgrades were for this level only; unused dynamite is lost
+  run.strength = 0; run.reel = 0; run.dynamite = 0; run.clock = 0;
   if (!result.won) run.over = true;
   else if (run.level >= MAX_LEVEL) run.finished = true;
   else run.level += 1;

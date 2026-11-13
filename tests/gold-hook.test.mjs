@@ -10,7 +10,7 @@ import {
   hookGeometry, hookDir, currentAnim, drainEvents, useDynamite, segmentCircleEntry,
 } from '../docs/games/js/gold-hook-state.mjs';
 import {
-  MAX_LEVEL, TARGETS, levelDef, durationFor, weightFor, SHOP, newRun, modsFor, priceOf, canBuy, buy,
+  MAX_LEVEL, TARGETS, levelDef, durationFor, weightFor, SHOP, newRun, modsFor, priceOf, priceFor, canBuy, buy,
   finishLevel, submission, speedsFor,
 } from '../docs/games/js/gold-hook-campaign.mjs';
 import { validateCampaign, levelTable } from '../docs/games/js/gold-hook-validation.mjs';
@@ -61,7 +61,8 @@ function botLevel(def, mods, dt = 1 / 60) {
   while (g.app === APP.PLAYING) update(g, dt);
   return g.result;
 }
-const policy = (r) => { for (const item of ['strength', 'reel', 'strength', 'dynamite', 'clock', 'dynamite']) if (canBuy(r, item)) buy(r, item); };
+// every shop: the upgrades for the next level, most useful first, while the money lasts
+const policy = (r) => { for (const item of ['strength', 'reel', 'clock', 'dynamite', 'dynamite']) if (canBuy(r, item)) buy(r, item); };
 function botCampaign(dt = 1 / 60) {
   const r = newRun();
   while (!r.over && !r.finished) {
@@ -123,15 +124,16 @@ test("every goal leaves room for mistakes: the bot gets >= 1.25x the goal with a
     r.level = L;
     const res = botLevel(levelDef(L), modsFor(r));
     assert.ok(res.score >= 1.25 * TARGETS[L], `level ${L}: bot ${res.score}, goal ${TARGETS[L]}`);
-    r.money += Math.floor(res.score * 0.65); r.log.push({ bought: [] }); r.clock = 0;
-    policy(r);
+    r.money += Math.floor(res.score * 0.65); r.log.push({ bought: [] });
+    r.strength = 0; r.reel = 0; r.dynamite = 0; r.clock = 0;
+    if (L < MAX_LEVEL) { r.level = L + 1; policy(r); }
   }
 });
 
 test('from level 9 on, a perfect bot without upgrades often falls short: the shop matters', () => {
   let short = 0;
   for (let L = 9; L <= MAX_LEVEL; L++) if (botLevel(levelDef(L), {}).score < TARGETS[L]) short++;
-  assert.ok(short >= 6, `only ${short} of 12 late levels need upgrades`);
+  assert.ok(short >= 4, `only ${short} of 12 late levels need upgrades`);
 });
 
 // ---------- hook, scoring, upgrades ----------
@@ -177,15 +179,15 @@ test('heavier loot comes up slower, and later levels make everything heavier', (
   assert.ok(late.objects.every((o) => Math.abs(o.speedMul - OBJECT_TYPES[o.type].speedMul * 0.7) < 1e-9));
 });
 
-test('strength reels loot in faster, the reel shoots the hook out faster', () => {
+test('strong arms reel loot in 50 % faster, the fast reel shoots the hook out 30 % faster', () => {
   const t = (mods) => {
     const g = createGame({ mods }); startRound(g);
     shootAt(g, angleTo(g.objects.find((o) => o.type === 'nugget-large')));
     stepUntil(g, (x) => x.hook.mode === HOOK_MODE.RETURNING_LOADED, 1 / 240);
     return stepUntil(g, (x) => x.hook.mode === HOOK_MODE.READY, 1 / 240);
   };
-  assert.ok(Math.abs(t({}) / t({ strength: 3 }) - 1.6) < 0.05);
-  const s = speedsFor({ reel: 2 });
+  assert.ok(Math.abs(t({}) / t({ strength: 1 }) - 1.5) < 0.05);
+  const s = speedsFor({ reel: 1 });
   assert.equal(s.extend, HOOK.extendSpeed * 1.3);
   assert.equal(s.empty, HOOK.returnEmptySpeed * 1.3);
   assert.equal(s.loaded, HOOK.returnLoadedSpeed);
@@ -207,6 +209,7 @@ test('dynamite blows up the load: no points, a fast empty hook, one stick used',
   shootAt(g, angleTo(g.objects.find((o) => o.type === 'rock')));
   stepUntil(g, (x) => x.hook.mode === HOOK_MODE.RETURNING_LOADED);
   assert.equal(useDynamite(g), true);
+  assert.ok(g.effects.some((e) => e.kind === 'explosion'), 'the explosion plays');
   assert.equal(g.hook.mode, HOOK_MODE.RETURNING_EMPTY);
   assert.equal(g.dynamite, 0);
   assert.equal(currentAnim(g).name, 'hurt');
@@ -280,23 +283,36 @@ test('the same shot takes the same time at 30, 60 and 120 FPS; the bot scores al
 });
 
 // ---------- the run: shop and economy ----------
-test('shop: prices, limits, money; a loss ends the run, level 20 finishes it', () => {
+test('shop: prices grow with the level, limits, money; a loss ends the run', () => {
+  assert.deepEqual(['strength', 'reel', 'dynamite', 'clock'].map((i) => priceFor(i, 1)), [200, 160, 60, 160]);
+  assert.deepEqual(['strength', 'reel', 'dynamite', 'clock'].map((i) => priceFor(i, 20)), [390, 312, 117, 312]);
   const r = newRun();
-  assert.equal(priceOf(r, 'strength'), SHOP.strength.costs[0]);
+  assert.equal(priceOf(r, 'strength'), 200);
   assert.equal(canBuy(r, 'strength'), false, 'no money yet');
   finishLevel(r, botLevel(levelDef(1), modsFor(r)));
   assert.equal(r.level, 2);
   const before = r.money;
   assert.ok(buy(r, 'strength'));
-  assert.equal(r.money, before - 400);
+  assert.equal(r.money, before - priceFor('strength', 2));
   assert.deepEqual(r.log[0].bought, ['strength']);
   r.money = 1e6;
   while (buy(r, 'dynamite')); assert.equal(r.dynamite, SHOP.dynamite.max);
+  assert.equal(buy(r, 'strength'), false, 'one per level');
   while (buy(r, 'reel')); assert.equal(r.reel, SHOP.reel.max);
   assert.equal(priceOf(r, 'reel'), null);
   finishLevel(r, lostLevel);
   assert.equal(r.over, true);
   assert.equal(canBuy(r, 'clock'), false, 'no shop after game over');
+});
+
+test('upgrades last one level: nothing carries over, unused dynamite is lost', () => {
+  const r = newRun();
+  finishLevel(r, botLevel(levelDef(1), modsFor(r)));
+  r.money = 5000;
+  for (const item of ['strength', 'reel', 'clock', 'dynamite', 'dynamite']) assert.ok(buy(r, item), item);
+  assert.deepEqual(modsFor(r), { strength: 1, reel: 1, dynamite: 2, extraSec: 10 });
+  finishLevel(r, botLevel(levelDef(2), modsFor(r)));
+  assert.deepEqual(modsFor(r), { strength: 0, reel: 0, dynamite: 0, extraSec: 0 });
 });
 
 // ---------- run check (browser and SQL) ----------
@@ -434,12 +450,13 @@ test('every picture the game loads is in the manifest and has the stated size', 
   const manifest = JSON.parse(readFileSync(new URL('manifest.json', base), 'utf8'));
   const byId = new Map(manifest.assets.map((a) => [a.id, a]));
   const pngSize = (buf) => [buf.readUInt32BE(16), buf.readUInt32BE(20)];
-  for (const id of [...REQUIRED_ASSETS, 'pm-logo-goldhook', 'pm-icon-goldhook', 'pm-icon-goldhook-16', 'pm-button-normal', 'pm-button-pressed', 'pm-button-disabled', 'pm-dynamite']) {
+  for (const id of [...REQUIRED_ASSETS, 'pm-logo-goldhook', 'pm-icon-goldhook', 'pm-icon-goldhook-16', 'pm-button-normal', 'pm-button-pressed', 'pm-button-disabled', 'pm-dynamite',
+    'pm-shop-strength', 'pm-shop-reel', 'pm-shop-clock', 'pm-shop-dynamite', 'pm-trophy']) {
     const a = byId.get(id);
     assert.ok(a, `${id} missing from manifest.json`);
     assert.deepEqual(pngSize(readFileSync(new URL(a.path, base))), [a.width, a.height], id);
   }
-  for (const kind of ['sparkle', 'dust']) {
+  for (const kind of ['sparkle', 'dust', 'explosion']) {
     const an = manifest.animations[kind], sheet = byId.get(an.atlas.id);
     assert.equal(an.atlas.rects.length, an.durationsMs.length, kind);
     for (const [x, y, w, h] of an.atlas.rects) assert.ok(x + w <= sheet.width && y + h <= sheet.height, kind);

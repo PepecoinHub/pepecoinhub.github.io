@@ -18,7 +18,7 @@ export const T = {
   howToText: [
     'The hook swings over the mine. Press Space, click or tap the mine to drop it, and it reels in the first thing it hits.',
     'Reach the level goal before the clock runs out. Heavy loot comes up slowly; rocks are worth almost nothing.',
-    'Every level has less time, heavier loot and more rocks. Between levels, spend the PEP you dug up in the shop.',
+    'Every level has less time, heavier loot and more rocks. Between levels, spend the PEP you dug up in the shop: upgrades work for the next level only.',
     'Dynamite (D, or the dynamite button) blows up whatever is on the hook, so a bad catch costs you less time.',
     'Miss a goal and the run is over. Game PEP are points, not real coins.',
   ],
@@ -36,8 +36,8 @@ export const T = {
   levelNotes: (mods, heavier) => {
     const parts = [];
     if (heavier) parts.push('Loot is heavier down here.');
-    if (mods.strength) parts.push(`Strong arms ${mods.strength}/3.`);
-    if (mods.reel) parts.push(`Fast reel ${mods.reel}/2.`);
+    if (mods.strength) parts.push('Strong arms.');
+    if (mods.reel) parts.push('Fast reel.');
     if (mods.dynamite) parts.push(`Dynamite ×${mods.dynamite}.`);
     if (mods.extraSec) parts.push(`Pocket watch: +${mods.extraSec} s.`);
     return parts.join(' ');
@@ -62,12 +62,13 @@ export const T = {
   shopTitle: (L) => `Shop · before level ${L}`,
   shopWallet: (money) => `Wallet: ${n(money)} PEP`,
   items: {
-    strength: { name: 'Strong arms', icon: '💪', text: 'Loot comes up 20 % faster per level.' },
-    reel: { name: 'Fast reel', icon: '🎣', text: 'The hook flies out and comes back empty 15 % faster per level.' },
-    dynamite: { name: 'Dynamite', icon: null, text: 'Press D while reeling in to blow up a bad catch. Carry up to 3.' },
-    clock: { name: 'Pocket watch', icon: '⏱️', text: '+10 seconds on the next level.' },
+    strength: { name: 'Strong arms', text: 'Loot comes up 50 % faster.' },
+    reel: { name: 'Fast reel', text: 'The hook flies out and comes back empty 30 % faster.' },
+    dynamite: { name: 'Dynamite', text: 'Press D while reeling in to blow up a bad catch. Up to 3 sticks.' },
+    clock: { name: 'Pocket watch', text: '+10 seconds.' },
   },
-  owned: (item, run) => ({ strength: `${run.strength}/3`, reel: `${run.reel}/2`, dynamite: `×${run.dynamite}`, clock: run.clock ? 'ready' : '' })[item],
+  owned: (item, run) => (item === 'dynamite' ? (run.dynamite ? `×${run.dynamite}` : '') : (run[item] ? 'ready' : '')),
+  shopNote: 'Everything here works for the next level only. Unused dynamite is lost.',
   buy: (price) => `Buy · ${n(price)}`,
   maxed: 'Maxed',
   nextLevel: (L) => `Level ${L} →`,
