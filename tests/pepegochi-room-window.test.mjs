@@ -136,7 +136,7 @@ test('moving out: the 6 frames once, 250 ms each, walking right until the frog l
 
 test('short frame animations: hatching now, care once its art exists', () => {
   assert.equal(HATCH_MS, 450);
-  assert.deepEqual(HATCH_FRAMES, ['hatch_01', 'hatch_02', 'hatch_03'].map(spriteSrc));
+  assert.deepEqual(HATCH_FRAMES, ['hatch_01', 'hatch_02', 'hatch_03', 'hatch_04'].map(spriteSrc));
   assert.deepEqual(CARE, {}, 'no care art yet');
   assert.deepEqual(careFrames('adult', 'feed'), [], 'so an accepted care plays nothing');
   // playFrames: each frame on the frog's own <img>, then its sprite back; stop puts it back at once

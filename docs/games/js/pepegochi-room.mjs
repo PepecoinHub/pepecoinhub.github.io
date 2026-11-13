@@ -67,7 +67,7 @@ export const SPRITES = {
   egg_idle: [42, 124], tadpole_idle: [50, 124], froglet_idle: [30, 124],
   adult_idle: [9, 124], adult_hungry: [8, 124], adult_dirty: [8, 124], adult_moody: [9, 124], adult_tired: [9, 124],
   adult_neglected: [9, 124], adult_recovering: [8, 124], adult_packing: [9, 124],
-  hatch_01: [42, 124], hatch_02: [42, 124], hatch_03: [20, 124],
+  hatch_01: [42, 124], hatch_02: [42, 124], hatch_03: [20, 124], hatch_04: [50, 124],
 };
 // the moving-out frames (sprite pack 2026-11-09) stand on the same floor line as the frog
 export const DEPART_FOOT = [124, 124, 124, 124, 124, 124];
@@ -152,10 +152,9 @@ export function departTimeline(stage = 'adult', walk = WALK[stage]) {
 export const DEPART_FRAMES = [1, 2, 3, 4, 5, 6].map(n => IMG + 'depart_0' + n + '.png');
 
 // ---------- short frame animations on the frog: hatching, and care once the art exists ----------
-// The egg hatches: three cracking frames, then the tadpole (sprite pack 2026-11-09). hatch_04 (backlog A1) joins
-// the list when it is drawn.
+// The egg hatches: three cracking frames and the tadpole out of its shell (art pack A1, 2026-11-13), then the tadpole.
 export const HATCH_MS = 450;
-export const HATCH_FRAMES = ['hatch_01', 'hatch_02', 'hatch_03'].map(spriteSrc);
+export const HATCH_FRAMES = ['hatch_01', 'hatch_02', 'hatch_03', 'hatch_04'].map(spriteSrc);
 // Care animations (backlog A6/A6b): 'stage_kind' -> sprite ids, e.g. adult_feed: ['care_feed_01', ...].
 // Empty until the art is in: then an accepted care action plays nothing, exactly as today.
 export const CARE_MS = 200;
