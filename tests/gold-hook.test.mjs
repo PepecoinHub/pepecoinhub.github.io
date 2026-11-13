@@ -354,3 +354,44 @@ test('buildSubmission uses the played time, rounded to ms', () => {
   const result = { durationSec: 60, timeLeft: 12.3456, run: { catches: [{ id: 5, t: 4.075, extra: 1 }] } };
   assert.deepEqual(buildSubmission(result, 'Fren'), { p_nick: 'Fren', p_catches: [{ id: 5, t: 4.075 }], p_ms: 47654 });
 });
+
+// ---------- art pack P1: effects and files ----------
+test('a rock hit makes dust at the rock, a delivered find makes a sparkle; both fade, pause freezes them', () => {
+  const g = createGame(); startRound(g);
+  const rock = g.objects.find((o) => o.type === 'rock');
+  shootAt(g, angleTo(rock));
+  stepUntil(g, (x) => x.hook.mode === HOOK_MODE.RETURNING_LOADED);
+  assert.deepEqual(g.effects.map((e) => [e.kind, e.x, e.y]), [['dust', rock.x, rock.y]]);
+  pause(g); run(g, 2); resume(g);
+  assert.equal(g.effects.length, 1, 'paused effects stay');
+  run(g, 0.4);
+  assert.equal(g.effects.length, 0, 'gone after 320 ms of game time');
+  stepUntil(g, (x) => x.hook.mode === HOOK_MODE.READY);
+  assert.equal(g.effects.length, 0, 'no sparkle for a rock');
+
+  const g2 = createGame(); startRound(g2);
+  shootAt(g2, angleTo(g2.objects.find((o) => o.type === 'nugget-large')));
+  stepUntil(g2, (x) => x.hook.mode === HOOK_MODE.READY);
+  assert.deepEqual(g2.effects.map((e) => e.kind), ['sparkle']);
+  startRound(g2);
+  assert.equal(g2.effects.length, 0, 'restart clears effects');
+});
+
+test('every picture the game loads is in the manifest and has the stated size', async () => {
+  const { REQUIRED_ASSETS } = await import('../docs/games/js/gold-hook-assets.mjs');
+  const base = new URL('../docs/games/img/gold-hook/', import.meta.url);
+  const manifest = JSON.parse(readFileSync(new URL('manifest.json', base), 'utf8'));
+  const byId = new Map(manifest.assets.map((a) => [a.id, a]));
+  const pngSize = (buf) => [buf.readUInt32BE(16), buf.readUInt32BE(20)];
+  for (const id of [...REQUIRED_ASSETS, 'pm-logo-goldhook', 'pm-icon-goldhook', 'pm-icon-goldhook-16', 'pm-button-normal', 'pm-button-pressed', 'pm-button-disabled']) {
+    const a = byId.get(id);
+    assert.ok(a, `${id} missing from manifest.json`);
+    assert.deepEqual(pngSize(readFileSync(new URL(a.path, base))), [a.width, a.height], id);
+  }
+  for (const kind of ['sparkle', 'dust']) {
+    const an = manifest.animations[kind], sheet = byId.get(an.atlas.id);
+    assert.equal(an.atlas.rects.length, an.durationsMs.length, kind);
+    for (const [x, y, w, h] of an.atlas.rects) assert.ok(x + w <= sheet.width && y + h <= sheet.height, kind);
+    assert.equal(an.durationsMs.reduce((s, d) => s + d, 0) / 1000, 0.32, `${kind} matches TIMING.effectSec`);
+  }
+});

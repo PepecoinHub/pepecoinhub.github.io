@@ -226,6 +226,191 @@
     78
    ],
    "sha256": "777ed8fcdee9ed0f1ada5a880db16959e4a6f8c2b3f363b7b8b6c8acaaddd15e"
+  },
+  {
+   "id": "pm-logo-goldhook",
+   "path": "ui/pm-logo-goldhook.png",
+   "width": 384,
+   "height": 96,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    4,
+    16,
+    380,
+    80
+   ],
+   "sha256": "6510e9343df166ce6c5ccb70fd0418b88d7c0f30f21d07d7cd5605c3ccf3638b"
+  },
+  {
+   "id": "pm-icon-goldhook",
+   "path": "ui/pm-icon-goldhook.png",
+   "width": 48,
+   "height": 48,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    10,
+    2,
+    38,
+    46
+   ],
+   "sha256": "4fc6427e3fc0fb44dbac31fd6e7488fb6c1fdc7e2bd89ad6d87eb924115bb56b"
+  },
+  {
+   "id": "pm-icon-goldhook-16",
+   "path": "ui/pm-icon-goldhook-16.png",
+   "width": 16,
+   "height": 16,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    3,
+    1,
+    13,
+    15
+   ],
+   "sha256": "4661e0deca75c8f534d73d1c5d53f757d3740ece0cb4e9c7b5212aef65ab52e0"
+  },
+  {
+   "id": "pm-surface",
+   "path": "objects/pm-surface.png",
+   "width": 640,
+   "height": 96,
+   "anchor": [
+    0,
+    88
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    0,
+    51,
+    640,
+    96
+   ],
+   "sha256": "4dac7b59393e885d0b38d8035eff21163d8ec015d62017a258c8aed63c5343aa",
+   "groundY": 88
+  },
+  {
+   "id": "pm-earth-tile",
+   "path": "objects/pm-earth-tile.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    0,
+    0,
+    32,
+    32
+   ],
+   "sha256": "f9d5e0707a0abf9e3123ab529c71efbe5923a29522e3086f42ab7b67112f3098"
+  },
+  {
+   "id": "pm-stone-tile",
+   "path": "objects/pm-stone-tile.png",
+   "width": 32,
+   "height": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    0,
+    0,
+    32,
+    32
+   ],
+   "sha256": "ad0a9afe17805f929fbf6e363079dd4c4add315f66e35a10ab600634d38411eb"
+  },
+  {
+   "id": "pm-winch",
+   "path": "objects/pm-winch.png",
+   "width": 48,
+   "height": 48,
+   "anchor": [
+    24,
+    40
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    8,
+    10,
+    46,
+    41
+   ],
+   "sha256": "bfd22acfbdad91b728b8c8e7b819728e808c1da0136ecb51659c06d2f2efec72"
+  },
+  {
+   "id": "pm-hook-closed",
+   "path": "objects/pm-hook-closed.png",
+   "width": 32,
+   "height": 40,
+   "anchor": [
+    16,
+    3
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    7,
+    3,
+    25,
+    38
+   ],
+   "sha256": "a465bd413001982951669bb37c2b225330b22d43b88bad215685f5ed2c68d3b9",
+   "cargoAnchor": [
+    16,
+    35
+   ]
+  },
+  {
+   "id": "pm-sparkle-atlas",
+   "path": "objects/pm-sparkle-atlas.png",
+   "width": 64,
+   "height": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    8,
+    3,
+    61,
+    13
+   ],
+   "sha256": "c2788bf14deb0ee054832134d3a3409864e7303f06f2fb9cb012e16a51a97c48"
+  },
+  {
+   "id": "pm-dust-atlas",
+   "path": "objects/pm-dust-atlas.png",
+   "width": 128,
+   "height": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    8,
+    5,
+    121,
+    28
+   ],
+   "sha256": "ab72ecd944e0d46525f83b1616628bfb509d42430bf61e3a00e340eca61a348c"
   }
  ],
  "atlas": {
@@ -350,6 +535,82 @@
     450
    ],
    "loop": false
+  },
+  "sparkle": {
+   "durationsMs": [
+    80,
+    80,
+    80,
+    80
+   ],
+   "loop": false,
+   "atlas": {
+    "id": "pm-sparkle-atlas",
+    "rects": [
+     [
+      0,
+      0,
+      16,
+      16
+     ],
+     [
+      16,
+      0,
+      16,
+      16
+     ],
+     [
+      32,
+      0,
+      16,
+      16
+     ],
+     [
+      48,
+      0,
+      16,
+      16
+     ]
+    ]
+   }
+  },
+  "dust": {
+   "durationsMs": [
+    80,
+    80,
+    80,
+    80
+   ],
+   "loop": false,
+   "atlas": {
+    "id": "pm-dust-atlas",
+    "rects": [
+     [
+      0,
+      0,
+      32,
+      32
+     ],
+     [
+      32,
+      0,
+      32,
+      32
+     ],
+     [
+      64,
+      0,
+      32,
+      32
+     ],
+     [
+      96,
+      0,
+      32,
+      32
+     ]
+    ]
+   }
   }
  },
  "hud": {
@@ -390,6 +651,7 @@
   "Only assets/ files are runtime exports. Source sheets are originals.",
   "Static objects. No closed hook, explosion, background or shop art supplied.",
   "Character anchor is shared per-frame. Do not runtime-trim frames.",
-  "Pepe Gold Hook runtime subset of pep-miner-art-v1 (ChatGPT art pack, 2026-11-13). Paths are relative to this file. The pack logo (text PEP MINER) is not used."
+  "Pepe Gold Hook runtime subset of pep-miner-art-v1 (ChatGPT art pack, 2026-11-13). Paths are relative to this file. The pack logo (text PEP MINER) is not used.",
+  "P1 pack (ChatGPT, pepe-gold-hook-art-p1): logo, icons, surface, tiles, winch, closed hook, sparkle and dust atlases. Effects use the atlas rects; 80 ms per frame, once."
  ]
 }

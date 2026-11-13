@@ -87,12 +87,9 @@ body {
 .panel ul { text-align: left; margin: 8px 0 0; padding-left: 20px; font-family: Consolas, monospace; font-size: 0.85rem; }
 .panel-error { border-left: 6px solid var(--warn); }
 .panel-error h2::before { content: "⚠ "; }
-.game-name {
-  font: 900 1.9rem/1.1 "Courier New", monospace;
-  color: #E5B51C;
-  letter-spacing: 1px;
-  text-shadow: 2px 2px 0 var(--outline), -1px -1px 0 #94600C;
-}
+/* The logo is a pixel-art PNG (art pack P1); its alt text is the fallback title. */
+.game-name { margin: 0 0 4px; font: 900 1.6rem/1.1 "Courier New", monospace; color: #E5B51C; }
+.game-name .logo { display: block; width: 100%; max-width: 384px; height: auto; margin: 0 auto; image-rendering: pixelated; }
 
 .buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 12px; }
 

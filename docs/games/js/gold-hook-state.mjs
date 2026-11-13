@@ -41,6 +41,7 @@ export function resetRound(g) {
   g.animClock = 0;          // ms of game time, for the idle/pull loops
   g.reaction = null;        // { name, t, total } — success/fail/hurt
   g.popups = [];
+  g.effects = [];           // { kind: 'sparkle' | 'dust', x, y, t } in game time, so pause freezes them
   g.events = [];            // event queue for the UI (announcements, later sounds)
   g.result = null;
   g.lowTimeMarks = new Set();
@@ -133,6 +134,7 @@ function deliver(g) {
     setReaction(g, 'success');
     const { cx, cy } = hookGeometry(h);
     g.popups.push({ text: `+${cargo.points}`, x: cx, y: cy - 24, t: 0 });
+    if (cargo.type !== 'rock') g.effects.push({ kind: 'sparkle', x: cx, y: cy - 6, t: 0 });
     g.events.push({ type: 'score', points: cargo.points, objectType: cargo.type, total: g.score });
   } else {
     setReaction(g, 'fail');
@@ -163,6 +165,7 @@ function stepHook(g, dt) {
       if (best) {
         h.length = prevLen + (h.length - prevLen) * bestT;
         best.caught = true;                 // out of the collision pool
+        if (best.type === 'rock') g.effects.push({ kind: 'dust', x: best.x, y: best.y, t: 0 });
         h.cargo = best;
         h.mode = HOOK_MODE.RETURNING_LOADED;
         break;
@@ -211,6 +214,8 @@ function stepOnce(g, dt) {
   }
   for (const p of g.popups) p.t += dt;
   g.popups = g.popups.filter((p) => p.t < TIMING.popupSec);
+  for (const e of g.effects) e.t += dt;
+  g.effects = g.effects.filter((e) => e.t < TIMING.effectSec);
 
   // Everything collected and the hook is home: nothing left to wait for.
   if (g.hook.mode === HOOK_MODE.READY && g.objects.every((o) => o.caught)) endRound(g);

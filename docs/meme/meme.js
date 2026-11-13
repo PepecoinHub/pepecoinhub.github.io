@@ -117,7 +117,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'goldhook') return '../games/img/gold-hook/objects/pm-nugget-large.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'goldhook') return '../games/img/gold-hook/ui/pm-icon-goldhook.png'; if (n === 'goldhook16') return '../games/img/gold-hook/ui/pm-icon-goldhook-16.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
   // Hall of Fame icon: the owner's art (gold cup + open Pepe passport) goes to img/ico/hall-of-fame.webp, then this
   // line becomes 'img/ico/hall-of-fame.webp'. Until then the LEADERS trophy stands in (no new art is made here).
   var HOF_ICON = 'img/ico/leaders.webp';
@@ -1592,7 +1592,7 @@
   // Pepe Gold Hook: a normal window that fits the game (the game reports its size), like PEPE SWEEPER.
   // Minimizing pauses it (pauseFrames sends 'pause'); scores go to the shared arcade table.
   function goldHookApp() {
-    var A = openApp('goldhook', 'Pepe Gold Hook', 'goldhook', function (A) {
+    var A = openApp('goldhook', 'Pepe Gold Hook', 'goldhook16', function (A) {
       A.body.innerHTML = '<iframe class="app-frame sweep-frame" src="' + BASE + 'games/gold-hook.html?embed=1" title="Pepe Gold Hook"></iframe>';
       A.body.style.padding = '0';
       var fr = A.body.querySelector('iframe'), lastW = 0;

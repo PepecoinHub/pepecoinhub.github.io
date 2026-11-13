@@ -5,14 +5,15 @@ import { VIEW, LAYOUT, TIMING } from './gold-hook-config.mjs';
 import { hookGeometry, currentAnim, APP } from './gold-hook-state.mjs';
 import { T } from './gold-hook-text.mjs';
 
+// Earth tiles down to this row, stone tiles below (the mine gets harder the deeper you go).
+const STONE_FROM_Y = 344;
+
 const C = {
   outline: '#202020',
   windowBg: '#C0C0C0', windowDark: '#808080', windowLight: '#FFFFFF',
   titleBar: '#000080', titleText: '#FFFFFF',
-  sky: '#7FA7A0',
-  grass: '#658C35', grassDark: '#355326',
-  dirt: '#6E4527', dirtDark: '#4F311B', bedrock: '#3A2414',
-  wood: '#80502E',
+  sky: '#163534',         // night sky, as in the art pack preview
+  dirtDark: '#4F311B', bedrock: '#3A2414',
   rope: '#202020',
   hudText: '#FFF0A5', hudWarn: '#FF9C8F',
   popup: '#FFF0A5',
@@ -57,14 +58,21 @@ export function createRenderer(canvas, assets) {
     ctx.font = 'bold 13px "Segoe UI", Tahoma, sans-serif';
     ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
     ctx.fillText(T.windowTitle, 8, 12);
-    // Surface.
-    ctx.fillStyle = C.sky; ctx.fillRect(0, L.surface.y0, VIEW.width, L.surface.groundY - L.surface.y0);
-    ctx.fillStyle = C.grass; ctx.fillRect(0, L.surface.groundY, VIEW.width, 5);
-    ctx.fillStyle = C.grassDark; ctx.fillRect(0, L.surface.groundY + 5, VIEW.width, 3);
-    // Earth and mine (background layer: the rope is always above it).
-    ctx.fillStyle = C.dirtDark; ctx.fillRect(0, L.surface.groundY + 8, VIEW.width, L.hintBar.y0 - L.surface.groundY - 8);
-    const m = L.mine;
-    ctx.fillStyle = C.dirt; ctx.fillRect(m.x0, m.y0, m.x1 - m.x0, m.y1 - m.y0);
+    // Surface strip from the art pack: its ground row (y=88 in the file) sits on y=200.
+    // Drawn in the background layer, so the rope is always above it.
+    ctx.fillStyle = C.sky; ctx.fillRect(0, L.surface.y0, VIEW.width, L.surface.y1 - L.surface.y0 + 1);
+    const surface = img('pm-surface');
+    ctx.drawImage(surface.img, 0, L.surface.groundY - surface.meta.anchor[1]);
+    ctx.fillStyle = C.dirtDark; ctx.fillRect(0, L.surface.y1 + 1, VIEW.width, L.hintBar.y0 - L.surface.y1 - 1);
+    // Mine: earth tiles on top, stone tiles deeper, clipped to the mine.
+    const m = L.mine, earth = img('pm-earth-tile').img, stone = img('pm-stone-tile').img;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(m.x0, m.y0, m.x1 - m.x0, m.y1 - m.y0); ctx.clip();
+    for (let y = m.y0; y < m.y1; y += 32) {
+      const tile = y < STONE_FROM_Y ? earth : stone;
+      for (let x = m.x0; x < m.x1; x += 32) ctx.drawImage(tile, x, y);
+    }
+    ctx.restore();
     ctx.fillStyle = C.bedrock; ctx.fillRect(0, m.y1, VIEW.width, L.hintBar.y0 - m.y1);
   }
 
@@ -82,7 +90,8 @@ export function createRenderer(canvas, assets) {
       const off = cargo.r * 0.4;
       drawAnchored(cargo.asset, geo.cx + geo.dir.x * off, geo.cy + geo.dir.y * off);
     }
-    const hook = img('pm-hook-basic');
+    // Closed claw while it carries something; both share the mount (16,3) and cargo point (16,35).
+    const hook = img(cargo ? 'pm-hook-closed' : 'pm-hook-basic');
     ctx.save();
     ctx.translate(geo.ax, geo.ay);
     ctx.rotate(-g.hook.angle * Math.PI / 180);
@@ -91,21 +100,21 @@ export function createRenderer(canvas, assets) {
   }
 
   function drawWinch() {
-    // Simple beam and drum from shapes. The drum ends at the winch point and the posts
-    // stand outside the ±65° cone of the rope and resting hook, so the beam never hides the rope.
-    const { x, y } = LAYOUT.winch;
-    const top = y - 50, ground = LAYOUT.surface.groundY;
-    ctx.fillStyle = C.outline;
-    ctx.fillRect(x - 46, top, 6, ground - top); ctx.fillRect(x + 40, top, 6, ground - top);
-    ctx.fillStyle = C.wood;
-    ctx.fillRect(x - 45, top + 1, 4, ground - top - 1); ctx.fillRect(x + 41, top + 1, 4, ground - top - 1);
-    ctx.fillStyle = C.outline; ctx.fillRect(x - 50, top - 4, 100, 7);
-    ctx.fillStyle = C.wood; ctx.fillRect(x - 49, top - 3, 98, 5);
-    ctx.fillStyle = C.outline; ctx.fillRect(x - 1, top + 3, 2, 31);
-    ctx.fillStyle = C.outline; ctx.fillRect(x - 12, y - 16, 24, 16);
-    ctx.fillStyle = C.windowDark; ctx.fillRect(x - 11, y - 15, 22, 14);
-    ctx.fillStyle = C.windowBg; ctx.fillRect(x - 11, y - 15, 22, 3);
-    ctx.fillStyle = C.outline; ctx.fillRect(x - 1, y - 2, 2, 2);
+    // The art pack winch: its rope exit (24,40) is the winch point, and the rows under it are
+    // empty, so it never hides the rope at any angle.
+    drawAnchored('pm-winch', LAYOUT.winch.x, LAYOUT.winch.y);
+  }
+
+  // Sparkle on a delivered find, dust when the hook hits a rock: 4 atlas frames, 80 ms each, once.
+  function drawEffects(g, manifest) {
+    for (const e of g.effects) {
+      const def = manifest.animations[e.kind];
+      const sheet = img(def.atlas.id);
+      let t = e.t * 1000, i = 0;
+      while (i < def.durationsMs.length - 1 && t >= def.durationsMs[i]) { t -= def.durationsMs[i]; i++; }
+      const [fx, fy, fw, fh] = def.atlas.rects[i];
+      ctx.drawImage(sheet.img, fx, fy, fw, fh, Math.round(e.x - fw / 2), Math.round(e.y - fh / 2), fw, fh);
+    }
   }
 
   function drawMiner(g, manifest) {
@@ -168,6 +177,7 @@ export function createRenderer(canvas, assets) {
     drawHookAndCargo(g);
     drawWinch();
     drawMiner(g, manifest);
+    if (!reducedMotion) drawEffects(g, manifest);
     drawHud(g, manifest);
     drawPopups(g, reducedMotion);
     drawHintBar();
