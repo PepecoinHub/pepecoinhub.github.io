@@ -176,9 +176,12 @@ export const DEPART_FRAMES = Object.values(WALK).flatMap(w => [...w.turn, ...w.w
 export const HATCH_MS = 450;
 export const HATCH_FRAMES = ['hatch_01', 'hatch_02', 'hatch_03', 'hatch_04'].map(spriteSrc);
 // Care animations (backlog A6/A6b): 'stage_kind' -> sprite ids, e.g. adult_feed: ['care_feed_01', ...].
-// Empty until the art is in: then an accepted care action plays nothing, exactly as today.
 export const CARE_MS = 200;
-export const CARE = {};
+const careSet = pre => Object.fromEntries(['feed', 'clean', 'play', 'rest']
+  .map(k => [k, [1, 2, 3, 4].map(n => pre + k + '_0' + n)]));
+// art pack A6 (2026-11-13): 4 frames per care action for the adult, the froglet and the tadpole
+export const CARE = Object.fromEntries([['adult', 'care_'], ['froglet', 'care_froglet_'], ['tadpole', 'care_tadpole_']]
+  .flatMap(([stage, pre]) => Object.entries(careSet(pre)).map(([k, ids]) => [stage + '_' + k, ids])));
 export const careFrames = (stage, kind) => (CARE[stage + '_' + kind] || []).map(id => IMG + id + '.png');
 
 // Shows frames one after another on the frog's <img>, then puts its own sprite back. Returns a stop function.

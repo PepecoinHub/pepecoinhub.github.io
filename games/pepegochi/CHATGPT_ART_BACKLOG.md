@@ -43,10 +43,10 @@ liczba kolorów, linia stóp). Plik, który nie przejdzie, wraca do poprawy.
 | **A3** | Pasek Start: 9 krótkich animacji | 33 | ✅ w grze 2026-11-13 (`docs/games/img/pepegochi/taskbar/anim/`); pozy dorosłe na stojąco |
 | **A4** | Wyprowadzka dorosłej żaby: prawdziwy chód | 6 | ✅ w grze 2026-11-13 |
 | **A5** | Stany kijanki i młodej żaby + ich wyprowadzka | 22 | ✅ w grze 2026-11-13 |
-| **A6** | Animacje opieki dorosłej żaby (jedzenie, mycie, zabawa, sen) | 16 | 6. |
+| **A6** | Animacje opieki dorosłej żaby (jedzenie, mycie, zabawa, sen) | 16 | ✅ w grze 2026-11-13 |
 | **A7** | List GOODBYE.TXT jako pixel-art | 1 | 7. |
 | **A8** | Przedmioty pokoju w natywnej wielkości (wymaga zgody właściciela) | 9 | 8. |
-| A6b | Animacje opieki kijanki i młodej żaby | 32 | później |
+| A6b | Animacje opieki kijanki i młodej żaby | 32 | ✅ w grze 2026-11-13 |
 | A9 | Stara żaba (**tylko po decyzji właściciela**) | 9 | warunkowo |
 
 Jedna paczka naraz. Następna dopiero po sprawdzeniu poprzedniej.

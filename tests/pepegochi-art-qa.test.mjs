@@ -87,8 +87,10 @@ test('frames that a later art pack adds are real files that pass the check', () 
   for (const f of files) {
     assert.ok(existsSync(path(f)), f);
     // walk frames 02 and 04 bounce 2 px up on purpose: their feet line is checked separately
-    const r = checkFile(path(f).pathname, { allowEdge: /depart|walk/.test(f), prop: /depart|walk/.test(f) });
+    const moves = /depart|walk|play_03/.test(f);   // walk bounce and the play jump leave the floor on purpose
+    const r = checkFile(path(f).pathname, { allowEdge: moves || /care_/.test(f), prop: moves });
     assert.deepEqual(r.problems, [], f);
     if (/depart|walk/.test(f)) assert.ok([122, 124].includes(r.bbox[3]), f + ': on the floor or 2 px above it');
+    if (/play_03/.test(f)) assert.ok(r.bbox[3] >= 118 && r.bbox[3] < 124, f + ': a small jump');
   }
 });

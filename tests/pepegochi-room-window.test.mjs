@@ -148,8 +148,12 @@ test('moving out: the 6 frames once, 250 ms each, walking right until the frog l
 test('short frame animations: hatching now, care once its art exists', () => {
   assert.equal(HATCH_MS, 450);
   assert.deepEqual(HATCH_FRAMES, ['hatch_01', 'hatch_02', 'hatch_03', 'hatch_04'].map(spriteSrc));
-  assert.deepEqual(CARE, {}, 'no care art yet');
-  assert.deepEqual(careFrames('adult', 'feed'), [], 'so an accepted care plays nothing');
+  // art pack A6: 4 frames for each care action, for the adult, the froglet and the tadpole; nothing for the egg
+  assert.equal(Object.keys(CARE).length, 12);
+  assert.deepEqual(careFrames('adult', 'feed'), [1, 2, 3, 4].map(n => IMG + 'care_feed_0' + n + '.png'));
+  assert.deepEqual(careFrames('tadpole', 'rest'), [1, 2, 3, 4].map(n => IMG + 'care_tadpole_rest_0' + n + '.png'));
+  assert.deepEqual(careFrames('egg', 'feed'), []);
+  for (const k of Object.keys(CARE)) for (const f of careFrames(...k.split('_'))) assert.ok(existsSync(file(f)), f);
   // playFrames: each frame on the frog's own <img>, then its sprite back; stop puts it back at once
   const attrs = { src: 'idle.png' }, img = { getAttribute: k => attrs[k], setAttribute: (k, v) => { attrs[k] = v; } };
   let pending = null; const t = { setTimer: (fn) => { pending = fn; return 1; }, clearTimer: () => { pending = null; } };
