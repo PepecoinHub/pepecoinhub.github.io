@@ -1,0 +1,2246 @@
+{
+ "about": "Pepecoin quiz questions for PondOS (PepeGochi taskbar facts, later a quiz). three_facts: the 99-question bank of the Three Facts Reddit app; quiz_extra: questions only in pepecoin-quiz.csv. correct is the index in answers. source is the PepecoinHub page with the answer (null: not on the site yet). dated: the answer depends on a date.",
+ "version": "2026-11-13",
+ "questions": [
+  {
+   "id": "tf01",
+   "set": "three_facts",
+   "question": "When did the Pepecoin (PEP) network go live?",
+   "answers": [
+    "30 January 2024",
+    "23 January 2023",
+    "16 May 2023",
+    "1 April 2024"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf02",
+   "set": "three_facts",
+   "question": "Pepecoin is a fork of which software?",
+   "answers": [
+    "Dogecoin Core",
+    "Litecoin Core",
+    "Bitcoin Core",
+    "Ethereum's Geth"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/compare.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf03",
+   "set": "three_facts",
+   "question": "Which account model does Pepecoin use?",
+   "answers": [
+    "UTXO, like Bitcoin and Dogecoin",
+    "Accounts, like Ethereum",
+    "Balances inside an ERC-20 contract",
+    "A DAG, like IOTA"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf04",
+   "set": "three_facts",
+   "question": "What does a Pepecoin (PEP) address start with?",
+   "answers": [
+    "P",
+    "L",
+    "0x",
+    "D"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf05",
+   "set": "three_facts",
+   "question": "Was there a PEP premine or team allocation at launch?",
+   "answers": [
+    "No, 0%",
+    "3.5%",
+    "6.9%",
+    "10%"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": "fair-launch",
+   "dated": false
+  },
+  {
+   "id": "tf06",
+   "set": "three_facts",
+   "question": "What is the current block subsidy?",
+   "answers": [
+    "10,000 PEP",
+    "50,000 PEP",
+    "500,000 PEP",
+    "5,000 PEP"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "tf07",
+   "set": "three_facts",
+   "question": "What is Pepecoin's maximum supply?",
+   "answers": [
+    "There is no cap",
+    "21 billion PEP",
+    "133.8 million PEP",
+    "420.69 trillion PEP"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf08",
+   "set": "three_facts",
+   "question": "What is the target time between blocks?",
+   "answers": [
+    "60 seconds",
+    "2.5 minutes",
+    "10 minutes",
+    "15 seconds"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/mining.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf09",
+   "set": "three_facts",
+   "question": "Which mining algorithm does Pepecoin use?",
+   "answers": [
+    "Scrypt",
+    "SHA-256",
+    "Ethash",
+    "X11"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf10",
+   "set": "three_facts",
+   "question": "Pepecoin is merge-mined together with which two coins?",
+   "answers": [
+    "Litecoin and Dogecoin",
+    "Bitcoin and Bitcoin Cash",
+    "Monero and Zcash",
+    "Ethereum and Ethereum Classic"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf11",
+   "set": "three_facts",
+   "question": "From which block has Pepecoin used merged mining (AuxPoW)?",
+   "answers": [
+    "42,000",
+    "371,337",
+    "100,000",
+    "600,000"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf12",
+   "set": "three_facts",
+   "question": "What is Pepecoin's AuxPoW chain ID?",
+   "answers": [
+    "63",
+    "98",
+    "1",
+    "42"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf13",
+   "set": "three_facts",
+   "question": "What is the technical name for merged mining?",
+   "answers": [
+    "AuxPoW (Auxiliary Proof of Work)",
+    "Proof of Stake",
+    "Delegated Proof of Stake",
+    "Proof of History"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf14",
+   "set": "three_facts",
+   "question": "Can anyone blacklist your PEP address at the protocol level?",
+   "answers": [
+    "No, the protocol has no blacklist",
+    "Yes, Pepecoin LLC",
+    "Yes, the Pepecoin developers",
+    "Yes, Kraken"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf15",
+   "set": "three_facts",
+   "question": "PEP transaction fees are paid in which coin?",
+   "answers": [
+    "PEP",
+    "LTC",
+    "ETH",
+    "USDT"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf16",
+   "set": "three_facts",
+   "question": "Where did every PEP in existence come from?",
+   "answers": [
+    "Block rewards paid to miners",
+    "A team mint",
+    "An airdrop to PEPE ETH holders",
+    "A presale"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": "fair-launch",
+   "dated": false
+  },
+  {
+   "id": "tf17",
+   "set": "three_facts",
+   "question": "What is a fair launch?",
+   "answers": [
+    "No premine, presale or team allocation; every coin is mined",
+    "A launch with a big presale",
+    "A launch with free airdrops for VCs",
+    "A launch only on Kraken"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": "fair-launch",
+   "dated": false
+  },
+  {
+   "id": "tf18",
+   "set": "three_facts",
+   "question": "What is a premine?",
+   "answers": [
+    "Coins created for insiders at launch, outside normal mining",
+    "The first block ever mined",
+    "A mining pool's fee",
+    "A coin's price before listing"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": "fair-launch",
+   "dated": false
+  },
+  {
+   "id": "tf19",
+   "set": "three_facts",
+   "question": "What is a halving?",
+   "answers": [
+    "A cut of the block reward by half",
+    "Halving the block time",
+    "Burning half the supply",
+    "A split of the chain in two"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf20",
+   "set": "three_facts",
+   "question": "What does a full node do?",
+   "answers": [
+    "Downloads and checks every block itself",
+    "Holds coins for other people",
+    "Mines blocks with a GPU",
+    "Sets the coin's price"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf21",
+   "set": "three_facts",
+   "question": "To get PEP from a mining pool, what do you add in the pool settings?",
+   "answers": [
+    "A payout address that starts with P",
+    "A Kraken API key",
+    "An Ethereum 0x address",
+    "Your recovery phrase"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/mining.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf22",
+   "set": "three_facts",
+   "question": "From which block has the PEP block reward been fixed at 10,000?",
+   "answers": [
+    "600,000",
+    "1,000,000",
+    "42,000",
+    "100,000"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf23",
+   "set": "three_facts",
+   "question": "In its early phase, PEP's block reward halved every how many blocks?",
+   "answers": [
+    "100,000",
+    "210,000",
+    "50,000",
+    "840,000"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf24",
+   "set": "three_facts",
+   "question": "Before merged mining started, how long did a PEP block take on average in March–April 2024?",
+   "answers": [
+    "8 to 13 minutes",
+    "60 seconds",
+    "2.5 minutes",
+    "About an hour"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/network.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "tf25",
+   "set": "three_facts",
+   "question": "What does mining difficulty adjust for on Pepecoin?",
+   "answers": [
+    "To keep blocks arriving about once a minute",
+    "To keep the price stable",
+    "To keep supply capped",
+    "To block exchanges"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf26",
+   "set": "three_facts",
+   "question": "How many PEP did blocks 0 to 99,999 create?",
+   "answers": [
+    "50 billion",
+    "98.44 billion",
+    "5.26 billion",
+    "25 billion"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": "early-issuance",
+   "dated": false
+  },
+  {
+   "id": "tf27",
+   "set": "three_facts",
+   "question": "About how many PEP did the first 600,000 blocks create in total?",
+   "answers": [
+    "98.44 billion",
+    "104.9 billion",
+    "21 billion",
+    "50 billion"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": "early-issuance",
+   "dated": false
+  },
+  {
+   "id": "tf28",
+   "set": "three_facts",
+   "question": "At the 60-second target, how many new PEP can be created per year at most?",
+   "answers": [
+    "About 5.26 billion",
+    "About 50 billion",
+    "14.4 million",
+    "525,600"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf29",
+   "set": "three_facts",
+   "question": "At the 60-second target, how many new PEP can be created per day at most?",
+   "answers": [
+    "14.4 million",
+    "1.44 million",
+    "144,000",
+    "5.26 billion"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/mining.html",
+   "group": "per-day",
+   "dated": false
+  },
+  {
+   "id": "tf30",
+   "set": "three_facts",
+   "question": "How many blocks a day does Pepecoin aim for?",
+   "answers": [
+    "1,440",
+    "576",
+    "144",
+    "10,000"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/network.html",
+   "group": "per-day",
+   "dated": false
+  },
+  {
+   "id": "tf31",
+   "set": "three_facts",
+   "question": "What kind of machine mines Pepecoin?",
+   "answers": [
+    "A Scrypt ASIC",
+    "A Bitcoin SHA-256 ASIC",
+    "Only graphics cards",
+    "Only a laptop CPU"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/mining.html",
+   "group": "bitcoin-asic",
+   "dated": false
+  },
+  {
+   "id": "tf32",
+   "set": "three_facts",
+   "question": "Can a Bitcoin (SHA-256) miner mine Pepecoin?",
+   "answers": [
+    "No, PEP uses Scrypt",
+    "Yes, with a firmware update",
+    "Yes, through merged mining",
+    "Only on Binance Pool"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": "bitcoin-asic",
+   "dated": false
+  },
+  {
+   "id": "tf33",
+   "set": "three_facts",
+   "question": "Does merge-mining PEP lower a miner's LTC or DOGE rewards?",
+   "answers": [
+    "No, PEP comes on top",
+    "Yes, by about 10%",
+    "Yes, by half",
+    "Only the DOGE part"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/mining.html",
+   "group": "merged-hashrate",
+   "dated": false
+  },
+  {
+   "id": "tf34",
+   "set": "three_facts",
+   "question": "What is a mining pool?",
+   "answers": [
+    "A service where many miners combine work and share rewards",
+    "A wallet for miners",
+    "An exchange for ASICs",
+    "A liquidity pool on Ethereum"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf35",
+   "set": "three_facts",
+   "question": "What is hashrate?",
+   "answers": [
+    "The total computing power mining a chain",
+    "The number of holders",
+    "The price per hash",
+    "The size of a block"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf36",
+   "set": "three_facts",
+   "question": "Which of these miners does ViaBTC name as an example for mining PEP?",
+   "answers": [
+    "Antminer L9",
+    "Antminer S21",
+    "RTX 4090",
+    "Bitaxe"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/mining.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf37",
+   "set": "three_facts",
+   "question": "How does litecoinpool.org pay out the value of the PEP it merge-mines?",
+   "answers": [
+    "As extra LTC and DOGE (higher PPS ratio)",
+    "In PEP",
+    "In USDT",
+    "It does not mine PEP"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/mining.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf38",
+   "set": "three_facts",
+   "question": "Which big pool added PEP to its LTC merged mining on December 6, 2024?",
+   "answers": [
+    "AntPool",
+    "Ethermine",
+    "Mining-Dutch",
+    "Slush Pool"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "tf39",
+   "set": "three_facts",
+   "question": "Before running the Pepecoin Core installer, what should you check?",
+   "answers": [
+    "Its SHA256 hash against SHA256SUMS.asc on the release page",
+    "Nothing, any mirror is fine",
+    "That antivirus is turned off",
+    "Its file size only"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/wallets.html",
+   "group": "core-download",
+   "dated": false
+  },
+  {
+   "id": "tf40",
+   "set": "three_facts",
+   "question": "When did Litecoin launch?",
+   "answers": [
+    "October 2011",
+    "January 2009",
+    "December 2013",
+    "January 2024"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf41",
+   "set": "three_facts",
+   "question": "When did Dogecoin launch?",
+   "answers": [
+    "December 2013",
+    "October 2011",
+    "January 2024",
+    "April 2023"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/compare.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf42",
+   "set": "three_facts",
+   "question": "Who created Dogecoin?",
+   "answers": [
+    "Billy Markus and Jackson Palmer",
+    "Charlie Lee and Colin Percival",
+    "Satoshi Nakamoto",
+    "Vitalik Buterin and Charlie Lee"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf43",
+   "set": "three_facts",
+   "question": "Who created Litecoin?",
+   "answers": [
+    "Charlie Lee",
+    "Billy Markus",
+    "Jackson Palmer",
+    "Colin Percival"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf44",
+   "set": "three_facts",
+   "question": "When did Dogecoin start merged mining with Litecoin?",
+   "answers": [
+    "2014",
+    "2011",
+    "2021",
+    "2024"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf45",
+   "set": "three_facts",
+   "question": "What is Litecoin's maximum supply?",
+   "answers": [
+    "84 million",
+    "No cap",
+    "21 million",
+    "420.69 trillion"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf46",
+   "set": "three_facts",
+   "question": "Which exchange ended spot trading on 29 September 2026?",
+   "answers": [
+    "CoinEx",
+    "Kraken",
+    "MEXC",
+    "NonKYC"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/buy.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "tf47",
+   "set": "three_facts",
+   "question": "What does a Dogecoin address start with?",
+   "answers": [
+    "D",
+    "P",
+    "L",
+    "0x"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/compare.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf48",
+   "set": "three_facts",
+   "question": "Who designed the Scrypt hashing function?",
+   "answers": [
+    "Colin Percival",
+    "Satoshi Nakamoto",
+    "Charlie Lee",
+    "Vitalik Buterin"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf49",
+   "set": "three_facts",
+   "question": "Every merge-mined chain pays its own reward. What is shared?",
+   "answers": [
+    "Only the mining work",
+    "The ledger",
+    "The block rewards",
+    "The coin supply"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf50",
+   "set": "three_facts",
+   "question": "What are PEPE ETH and PEPECOIN2016 (MEMETIC), unlike PEP?",
+   "answers": [
+    "Tokens on Ethereum",
+    "Coins on their own Scrypt chain",
+    "Bitcoin sidechains",
+    "Litecoin forks"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": "eth-tokens",
+   "dated": false
+  },
+  {
+   "id": "tf51",
+   "set": "three_facts",
+   "question": "PEPE ETH is…",
+   "answers": [
+    "An ERC-20 token on Ethereum",
+    "A fork of Dogecoin Core",
+    "A Litecoin sidechain",
+    "A Scrypt proof-of-work coin"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": "eth-tokens",
+   "dated": false
+  },
+  {
+   "id": "tf52",
+   "set": "three_facts",
+   "question": "When did PEPE ETH launch?",
+   "answers": [
+    "April 2023",
+    "March 2016",
+    "January 2024",
+    "December 2013"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf53",
+   "set": "three_facts",
+   "question": "When did PEPECOIN2016 (MEMETIC) first launch?",
+   "answers": [
+    "March 2016",
+    "December 2013",
+    "January 2024",
+    "April 2023"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf54",
+   "set": "three_facts",
+   "question": "In which year did PEPECOIN2016 (MEMETIC) bridge from its own chain to Ethereum?",
+   "answers": [
+    "2023",
+    "2016",
+    "2020",
+    "2026"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf55",
+   "set": "three_facts",
+   "question": "Moving PEPE ETH on Ethereum needs gas paid in which coin?",
+   "answers": [
+    "ETH",
+    "PEPE ETH",
+    "PEP",
+    "DOGE"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf56",
+   "set": "three_facts",
+   "question": "What is PEPE ETH's total supply?",
+   "answers": [
+    "420.69 trillion",
+    "104.9 billion",
+    "133.8 million",
+    "21 million"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf57",
+   "set": "three_facts",
+   "question": "What share of PEPE ETH's supply went to a team multisig wallet at launch?",
+   "answers": [
+    "6.9%",
+    "0%",
+    "3.5%",
+    "93.1%"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf58",
+   "set": "three_facts",
+   "question": "How big was the PEPECOIN2016 (MEMETIC) premine for its development fund in 2016?",
+   "answers": [
+    "3.5%",
+    "6.9%",
+    "0%",
+    "50%"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf59",
+   "set": "three_facts",
+   "question": "How many addresses did the PEPE ETH deployer blacklist before renouncing ownership?",
+   "answers": [
+    "One",
+    "None",
+    "Ten",
+    "Hundreds"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf60",
+   "set": "three_facts",
+   "question": "Which ERC-20 token's contract address starts with 0xA9E8…?",
+   "answers": [
+    "PEPECOIN2016 (MEMETIC)",
+    "PEPE ETH",
+    "PEP",
+    "SHIB"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": "contracts",
+   "dated": false
+  },
+  {
+   "id": "tf61",
+   "set": "three_facts",
+   "question": "Which ERC-20 token's contract address starts with 0x6982…?",
+   "answers": [
+    "PEPE ETH",
+    "PEPECOIN2016 (MEMETIC)",
+    "DOGE",
+    "PEP"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": "contracts",
+   "dated": false
+  },
+  {
+   "id": "tf62",
+   "set": "three_facts",
+   "question": "The official Pepecoin cold wallet card is made together with which brand?",
+   "answers": [
+    "Tangem",
+    "Trezor",
+    "Ledger",
+    "MetaMask"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/wallets.html",
+   "group": "tangem",
+   "dated": false
+  },
+  {
+   "id": "tf63",
+   "set": "three_facts",
+   "question": "What is the name of the official desktop wallet and full node for PEP?",
+   "answers": [
+    "Pepecoin Core",
+    "Dogecoin Core",
+    "Electrum-PEP",
+    "Pepe Wallet Pro"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/wallets.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf64",
+   "set": "three_facts",
+   "question": "Where is the official Pepecoin Tangem card sold?",
+   "answers": [
+    "The Pepecoin Shop (shop.pepecoin.com)",
+    "Amazon only",
+    "The App Store",
+    "Kraken"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/wallets.html",
+   "group": "tangem",
+   "dated": false
+  },
+  {
+   "id": "tf65",
+   "set": "three_facts",
+   "question": "Which of these wallets can NOT hold PEP?",
+   "answers": [
+    "MetaMask",
+    "Pepecoin Core",
+    "Tangem",
+    "Coinomi"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/wallets.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf66",
+   "set": "three_facts",
+   "question": "What is a cold wallet?",
+   "answers": [
+    "A wallet whose keys stay off internet-connected computers",
+    "A wallet that has run out of coins",
+    "A wallet only for winter",
+    "An exchange account"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf67",
+   "set": "three_facts",
+   "question": "What does custodial mean?",
+   "answers": [
+    "Someone else, usually an exchange, holds your keys and coins",
+    "You hold your own keys",
+    "Your coins are frozen forever",
+    "Your coins live in an ERC-20 contract"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf68",
+   "set": "three_facts",
+   "question": "Which of these should you never share with anyone?",
+   "answers": [
+    "Your recovery phrase",
+    "Your PEP address",
+    "A transaction ID",
+    "A block explorer link"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf69",
+   "set": "three_facts",
+   "question": "What usually happens if you withdraw PEP to an Ethereum 0x address?",
+   "answers": [
+    "The transfer is usually lost and irreversible",
+    "It arrives a day later",
+    "Kraken refunds it",
+    "It converts to PEPE ETH automatically"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/buy.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf70",
+   "set": "three_facts",
+   "question": "When did PEP start trading on Kraken?",
+   "answers": [
+    "11 February 2026",
+    "16 May 2023",
+    "18 February 2026",
+    "30 January 2024"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": "kraken",
+   "dated": false
+  },
+  {
+   "id": "tf71",
+   "set": "three_facts",
+   "question": "Which markets does Kraken offer for PEP?",
+   "answers": [
+    "PEP/USD and PEP/EUR",
+    "PEP/BTC only",
+    "PEP/ETH only",
+    "None"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/buy.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf72",
+   "set": "three_facts",
+   "question": "Which of these exchanges lists a PEP/USDT market (as listed on pepecoin.com)?",
+   "answers": [
+    "MEXC",
+    "Binance US",
+    "Coinbase",
+    "Robinhood"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/buy.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf73",
+   "set": "three_facts",
+   "question": "Which of these is a swap service listed for PEP on pepecoin.com?",
+   "answers": [
+    "Trocador",
+    "Uniswap",
+    "PancakeSwap",
+    "Jupiter"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/buy.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf74",
+   "set": "three_facts",
+   "question": "Which service is listed on pepecoin.com for buying PEP with a card?",
+   "answers": [
+    "Alchemy Pay",
+    "PayPal",
+    "Revolut",
+    "Venmo"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/buy.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf75",
+   "set": "three_facts",
+   "question": "Which block explorer has a PEP rich list?",
+   "answers": [
+    "PepeBlocks",
+    "Etherscan",
+    "Solscan",
+    "BscScan"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf76",
+   "set": "three_facts",
+   "question": "Which PEP explorer also offers market data and an API?",
+   "answers": [
+    "PepecoinService",
+    "Etherscan",
+    "Blockchair",
+    "Solscan"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf77",
+   "set": "three_facts",
+   "question": "How often does the PepecoinHub rich list take a snapshot?",
+   "answers": [
+    "Every day",
+    "Every hour",
+    "Once a month",
+    "Once a year"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/rich-list.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf78",
+   "set": "three_facts",
+   "question": "About how many top addresses does each daily rich-list snapshot record?",
+   "answers": [
+    "About 2,000",
+    "About 20,000",
+    "100",
+    "All of them"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/rich-list.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf79",
+   "set": "three_facts",
+   "question": "Is one rich-list address the same as one person?",
+   "answers": [
+    "No, exchanges hold coins for many people",
+    "Yes, always",
+    "Only for the top 10",
+    "Only for miners"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/rich-list.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf80",
+   "set": "three_facts",
+   "question": "Why does PepeBlocks show fewer PEP addresses than PepecoinHub?",
+   "answers": [
+    "It counts only addresses with at least 0.001 PEP",
+    "It counts only one address per person",
+    "It ignores exchange addresses",
+    "It counts only addresses created in 2026"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/network.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf81",
+   "set": "three_facts",
+   "question": "Even without a protocol blacklist, who can freeze PEP?",
+   "answers": [
+    "An exchange or custodian holding your coins",
+    "Any miner",
+    "The Pepecoin Discord mods",
+    "Nobody, ever"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf82",
+   "set": "three_facts",
+   "question": "Under which license is the Pepecoin Core code published?",
+   "answers": [
+    "MIT",
+    "GPL",
+    "Proprietary",
+    "None, it is closed source"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf83",
+   "set": "three_facts",
+   "question": "What is MiCA?",
+   "answers": [
+    "The EU's Markets in Crypto-Assets Regulation",
+    "A US SEC rule",
+    "A Pepecoin mining pool",
+    "A Litecoin upgrade"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/mica.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf84",
+   "set": "three_facts",
+   "question": "Which regulator gave Kraken its MiCA licence?",
+   "answers": [
+    "The Central Bank of Ireland",
+    "Germany's BaFin",
+    "France's AMF",
+    "Cyprus's CySEC"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/mica.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf85",
+   "set": "three_facts",
+   "question": "How much PEP does Pepecoin LLC hold, according to its MiCA white paper?",
+   "answers": [
+    "None",
+    "1%",
+    "6.9%",
+    "10%"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/mica.html",
+   "group": "fair-launch",
+   "dated": false
+  },
+  {
+   "id": "tf86",
+   "set": "three_facts",
+   "question": "When was Pepecoin admitted to trading on Kraken for EU customers under MiCA?",
+   "answers": [
+    "1 July 2026",
+    "11 February 2026",
+    "8 May 2026",
+    "30 December 2024"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": "kraken",
+   "dated": false
+  },
+  {
+   "id": "tf87",
+   "set": "three_facts",
+   "question": "What does UTXO stand for?",
+   "answers": [
+    "Unspent transaction output",
+    "Unified transaction ownership",
+    "User transfer and exchange object",
+    "Universal token exchange order"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf88",
+   "set": "three_facts",
+   "question": "How is market cap calculated?",
+   "answers": [
+    "Price × supply",
+    "Price ÷ supply",
+    "Supply − burned coins",
+    "Hashrate × price"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/glossary.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf89",
+   "set": "three_facts",
+   "question": "What happens to PEP's inflation rate over the years?",
+   "answers": [
+    "It falls every year but never reaches zero",
+    "It stays exactly the same",
+    "It rises every year",
+    "It drops to zero when the cap is hit"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": "inflation",
+   "dated": false
+  },
+  {
+   "id": "tf90",
+   "set": "three_facts",
+   "question": "Around which year does PEP's inflation drop to Dogecoin's rate today (about 3.4%)?",
+   "answers": [
+    "2036",
+    "2028",
+    "2050",
+    "Never"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": "inflation",
+   "dated": true
+  },
+  {
+   "id": "tf91",
+   "set": "three_facts",
+   "question": "About how high is PEP's projected inflation in year 25 (2051)?",
+   "answers": [
+    "2.3%",
+    "5%",
+    "0%",
+    "10%"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": "inflation",
+   "dated": false
+  },
+  {
+   "id": "tf92",
+   "set": "three_facts",
+   "question": "PEP's supply follows Dogecoin's issuance curve about how many years behind it?",
+   "answers": [
+    "10",
+    "2",
+    "5",
+    "20"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/compare.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf93",
+   "set": "three_facts",
+   "question": "How many coins does ViaBTC's Litecoin pool list on top of LTC?",
+   "answers": [
+    "Seven",
+    "Two",
+    "Four",
+    "Twelve"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf94",
+   "set": "three_facts",
+   "question": "Which Pepecoin co-founder spoke on the merged-mining panel at Litecoin Summit 2026?",
+   "answers": [
+    "Zordiak",
+    "Karzo",
+    "Sajmafor",
+    "Hwang"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": "summit",
+   "dated": true
+  },
+  {
+   "id": "tf95",
+   "set": "three_facts",
+   "question": "In which city was Litecoin Summit 2026, with a Pepecoin co-founder on the merged-mining panel?",
+   "answers": [
+    "Amsterdam",
+    "Miami",
+    "Dubai",
+    "Lisbon"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": "summit",
+   "dated": true
+  },
+  {
+   "id": "tf96",
+   "set": "three_facts",
+   "question": "Pepecoin's genesis block embeds a headline from which newspaper?",
+   "answers": [
+    "The Wall Street Journal",
+    "The Times (London)",
+    "The New York Times",
+    "Financial Times"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "tf97",
+   "set": "three_facts",
+   "question": "How many Tangem x Pepecoin wallets sold in the first two days?",
+   "answers": [
+    "500",
+    "100",
+    "250",
+    "370"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": null,
+   "group": "tangem",
+   "dated": false
+  },
+  {
+   "id": "tf98",
+   "set": "three_facts",
+   "question": "How does a small coin like PEP get Doge-level hashrate?",
+   "answers": [
+    "Merged mining with LTC and DOGE",
+    "Staking rewards",
+    "A big premine for miners",
+    "Mining with graphics cards"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/mining.html",
+   "group": "merged-hashrate",
+   "dated": false
+  },
+  {
+   "id": "tf99",
+   "set": "three_facts",
+   "question": "Where should you download Pepecoin Core?",
+   "answers": [
+    "The official GitHub releases (pepecoinppc/pepecoin)",
+    "Any mirror site",
+    "A Telegram link",
+    "A Discord DM from an admin"
+   ],
+   "correct": 0,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/wallets.html",
+   "group": "core-download",
+   "dated": false
+  },
+  {
+   "id": "qx01",
+   "set": "quiz_extra",
+   "question": "What was PEP's peak price, reached in December 2024?",
+   "answers": [
+    "About $0.0018",
+    "About $0.18",
+    "About $1.80",
+    "About $0.000018"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/compare.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "qx02",
+   "set": "quiz_extra",
+   "question": "Who filed Pepecoin's MiCA white paper?",
+   "answers": [
+    "Coinbase",
+    "Kraken",
+    "ESMA",
+    "Pepecoin LLC"
+   ],
+   "correct": 3,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/mica.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx03",
+   "set": "quiz_extra",
+   "question": "What has PEP's real average block time been over the past year?",
+   "answers": [
+    "About 62.6 seconds",
+    "10 minutes",
+    "2.5 minutes",
+    "Exactly 60 seconds"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/network.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx04",
+   "set": "quiz_extra",
+   "question": "What is the ticker of Grayscale's spot Dogecoin fund?",
+   "answers": [
+    "GDOG",
+    "GDOGE",
+    "DOGX",
+    "LTCC"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx05",
+   "set": "quiz_extra",
+   "question": "According to the Litecoin Foundation, who said merged mining saved Dogecoin?",
+   "answers": [
+    "Jackson Palmer",
+    "Elon Musk",
+    "Charlie Lee",
+    "Billy Markus"
+   ],
+   "correct": 3,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx06",
+   "set": "quiz_extra",
+   "question": "Which Dogecoin developer pointed out in July 2026 that Doge's security rests on every merge-mined Scrypt chain?",
+   "answers": [
+    "Billy Markus",
+    "Charlie Lee",
+    "chromatic",
+    "Jackson Palmer"
+   ],
+   "correct": 2,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "qx07",
+   "set": "quiz_extra",
+   "question": "About how high is PEP's inflation for the 12 months from October 2026?",
+   "answers": [
+    "0%",
+    "21%",
+    "5%",
+    "2%"
+   ],
+   "correct": 2,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "qx08",
+   "set": "quiz_extra",
+   "question": "What was PEP's block height on October 6, 2026, roughly?",
+   "answers": [
+    "124,000",
+    "1.24 million",
+    "12.4 million",
+    "42,000"
+   ],
+   "correct": 1,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/network.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "qx09",
+   "set": "quiz_extra",
+   "question": "At which block did Dogecoin's merged mining with Litecoin go live?",
+   "answers": [
+    "42,000",
+    "371,337",
+    "600,000",
+    "144,000"
+   ],
+   "correct": 1,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx10",
+   "set": "quiz_extra",
+   "question": "From which block has Shibacoin been merge-mined with Litecoin?",
+   "answers": [
+    "144,000",
+    "24,000",
+    "371,337",
+    "42,000"
+   ],
+   "correct": 1,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx11",
+   "set": "quiz_extra",
+   "question": "What is Litecoin's block time?",
+   "answers": [
+    "15 seconds",
+    "1 minute",
+    "10 minutes",
+    "2.5 minutes"
+   ],
+   "correct": 3,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx12",
+   "set": "quiz_extra",
+   "question": "In which month did Dogecoin start merged mining with Litecoin?",
+   "answers": [
+    "September 2014",
+    "April 2014",
+    "January 2015",
+    "December 2013"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx13",
+   "set": "quiz_extra",
+   "question": "How long has the Dogecoin–Litecoin merged mining arrangement been running?",
+   "answers": [
+    "Since 2024",
+    "Since 2011",
+    "Since 2021",
+    "Since 2014"
+   ],
+   "correct": 3,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx14",
+   "set": "quiz_extra",
+   "question": "Dogecoin was built on code from which coins?",
+   "answers": [
+    "Bellscoin and Junkcoin",
+    "Luckycoin and Litecoin",
+    "Pepecoin and Litecoin",
+    "Bitcoin and Ethereum"
+   ],
+   "correct": 1,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx15",
+   "set": "quiz_extra",
+   "question": "Which proof of work did PEPECOIN (Memetic) originally use on its own chain?",
+   "answers": [
+    "SHA-256",
+    "Ethash",
+    "Scrypt",
+    "X11"
+   ],
+   "correct": 3,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx16",
+   "set": "quiz_extra",
+   "question": "Which Scrypt coin is Billy Markus's Animal Crossing coin from 2013?",
+   "answers": [
+    "Bellscoin",
+    "Dingocoin",
+    "Luckycoin",
+    "Junkcoin"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx17",
+   "set": "quiz_extra",
+   "question": "When did PEPE start trading on Kraken?",
+   "answers": [
+    "December 2024",
+    "February 18, 2026",
+    "February 11, 2026",
+    "May 16, 2023"
+   ],
+   "correct": 3,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/which-pepecoin.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx18",
+   "set": "quiz_extra",
+   "question": "In early October 2026, PEP's market cap was about what fraction of Dogecoin's?",
+   "answers": [
+    "About 1/1,555",
+    "About 1/155",
+    "About 1/155,500",
+    "About 1/15"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/compare.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "qx19",
+   "set": "quiz_extra",
+   "question": "When did Charlie Lee propose merged mining Litecoin with Dogecoin?",
+   "answers": [
+    "April 2014",
+    "2015",
+    "December 2013",
+    "September 2014"
+   ],
+   "correct": 0,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx20",
+   "set": "quiz_extra",
+   "question": "At the one-minute target, how many times more do DOGE miners earn per day than PEP miners (October 2026 prices)?",
+   "answers": [
+    "About 100,000×",
+    "About 1,043×",
+    "About 100×",
+    "About 10×"
+   ],
+   "correct": 1,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/compare.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "qx21",
+   "set": "quiz_extra",
+   "question": "Why can't a Bitcoin machine mine Scrypt coins?",
+   "answers": [
+    "Scrypt coins are tokens on Ethereum",
+    "Scrypt is proof of stake",
+    "Scrypt needs much more memory than SHA-256",
+    "Bitcoin forbids it in its code"
+   ],
+   "correct": 2,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx22",
+   "set": "quiz_extra",
+   "question": "What is Junkcoin's supply cap?",
+   "answers": [
+    "54 million",
+    "21 million",
+    "No cap",
+    "84 million"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx23",
+   "set": "quiz_extra",
+   "question": "Using October 4–5, 2026 data, what would one PEP be worth at Dogecoin's market cap?",
+   "answers": [
+    "About $1.40",
+    "About $14",
+    "About $0.0014",
+    "About $0.14"
+   ],
+   "correct": 3,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/calculator.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "qx24",
+   "set": "quiz_extra",
+   "question": "What was Pepecoin's very first block reward?",
+   "answers": [
+    "10,000 PEP",
+    "250,000 PEP",
+    "1,000,000 PEP",
+    "500,000 PEP"
+   ],
+   "correct": 3,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx25",
+   "set": "quiz_extra",
+   "question": "About what share of the PEP supply did the top 1,000 addresses hold on October 13, 2026?",
+   "answers": [
+    "38%",
+    "74%",
+    "15%",
+    "95%"
+   ],
+   "correct": 1,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/rich-list.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "qx26",
+   "set": "quiz_extra",
+   "question": "Which subreddit does PepecoinHub link for the Pepecoin community?",
+   "answers": [
+    "r/pepetoken",
+    "r/pepecoins",
+    "r/pepecoin",
+    "r/pepe"
+   ],
+   "correct": 2,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx27",
+   "set": "quiz_extra",
+   "question": "When was Pepecoin's MiCA white paper notified to the regulator?",
+   "answers": [
+    "February 11, 2026",
+    "December 30, 2024",
+    "May 8, 2026",
+    "April 7, 2026"
+   ],
+   "correct": 3,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/mica.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx28",
+   "set": "quiz_extra",
+   "question": "Does a MiCA white paper mean the EU approved PEP?",
+   "answers": [
+    "Yes, Kraken approved it",
+    "Only in Ireland",
+    "No, nobody approves it; it is notified and published",
+    "Yes, the EU approved it"
+   ],
+   "correct": 2,
+   "difficulty": 1,
+   "source": "https://pepecoinhub.com/mica.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx29",
+   "set": "quiz_extra",
+   "question": "About how big was Pepecoin's hashrate in early October 2026?",
+   "answers": [
+    "About 290 PH/s",
+    "About 2.9 TH/s",
+    "About 2.9 PH/s",
+    "About 2.9 EH/s"
+   ],
+   "correct": 2,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/compare.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "qx30",
+   "set": "quiz_extra",
+   "question": "What was the ticker of Canary's spot Litecoin ETF, the first in the US?",
+   "answers": [
+    "LTCX",
+    "LITE",
+    "GDOG",
+    "LTCC"
+   ],
+   "correct": 3,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx31",
+   "set": "quiz_extra",
+   "question": "When was Pepecoin's MiCA white paper published on pepecoin.com?",
+   "answers": [
+    "May 8, 2026",
+    "February 11, 2026",
+    "January 30, 2024",
+    "April 7, 2026"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/mica.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx32",
+   "set": "quiz_extra",
+   "question": "About how many addresses held PEP on October 6, 2026?",
+   "answers": [
+    "About 2.96 million",
+    "About 29.6 million",
+    "About 29,600",
+    "About 296,000"
+   ],
+   "correct": 3,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/network.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "qx33",
+   "set": "quiz_extra",
+   "question": "Since which year has Dogecoin paid a fixed 10,000 DOGE per block?",
+   "answers": [
+    "2013",
+    "2024",
+    "2021",
+    "2015"
+   ],
+   "correct": 3,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/supply.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx34",
+   "set": "quiz_extra",
+   "question": "How many months after launch did PEP reach its first big peak?",
+   "answers": [
+    "One",
+    "Ten",
+    "Thirty-two",
+    "Twenty"
+   ],
+   "correct": 1,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/compare.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx35",
+   "set": "quiz_extra",
+   "question": "Which coins does Haze Wallet support?",
+   "answers": [
+    "Only ETH tokens",
+    "PEP, DOGE, BTC and LTC",
+    "Only PEP",
+    "PEPE and PEPECOIN"
+   ],
+   "correct": 1,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/wallets.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx36",
+   "set": "quiz_extra",
+   "question": "For which service was Scrypt originally designed?",
+   "answers": [
+    "Litecoin",
+    "Bitcoin",
+    "Tarsnap (online backups)",
+    "Dropbox"
+   ],
+   "correct": 2,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx37",
+   "set": "quiz_extra",
+   "question": "What does the rich list's second view leave out?",
+   "answers": [
+    "The top 10 addresses",
+    "Exchanges and mining pools",
+    "Addresses starting with P",
+    "Addresses created in 2024"
+   ],
+   "correct": 1,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/rich-list.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx38",
+   "set": "quiz_extra",
+   "question": "What did Dogecoin cost at the same age PEP is now (2 years 8 months, in August 2016)?",
+   "answers": [
+    "About $0.000002",
+    "About $0.24",
+    "About $0.00024",
+    "About $0.0024"
+   ],
+   "correct": 2,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/compare.html",
+   "group": null,
+   "dated": true
+  },
+  {
+   "id": "qx39",
+   "set": "quiz_extra",
+   "question": "In which year was Scrypt published?",
+   "answers": [
+    "2013",
+    "2011",
+    "2014",
+    "2009"
+   ],
+   "correct": 3,
+   "difficulty": 2,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx40",
+   "set": "quiz_extra",
+   "question": "From which block has Bellscoin been merge-mined?",
+   "answers": [
+    "144,000",
+    "24,000",
+    "42,000",
+    "371,337"
+   ],
+   "correct": 0,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/scrypt-family.html",
+   "group": null,
+   "dated": false
+  },
+  {
+   "id": "qx41",
+   "set": "quiz_extra",
+   "question": "Since which date has MiCA required a white paper before an asset can trade on an EU platform?",
+   "answers": [
+    "May 8, 2026",
+    "June 25, 2025",
+    "December 30, 2024",
+    "January 1, 2023"
+   ],
+   "correct": 2,
+   "difficulty": 3,
+   "source": "https://pepecoinhub.com/mica.html",
+   "group": null,
+   "dated": false
+  }
+ ]
+}

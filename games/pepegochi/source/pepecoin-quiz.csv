@@ -1,0 +1,135 @@
+day,no,difficulty,question,A,B,C,D,correct,source
+1,1,★,What does a Pepecoin (PEP) address start with?,L,P,0x,D,B,https://pepecoinhub.com/which-pepecoin.html
+1,2,★★,"What was PEP's peak price, reached in December 2024?",About $0.0018,About $0.18,About $1.80,About $0.000018,A,https://pepecoinhub.com/compare.html
+1,3,★★,Who filed Pepecoin's MiCA white paper?,Coinbase,Kraken,ESMA,Pepecoin LLC,D,https://pepecoinhub.com/mica.html
+1,4,★★★,What has PEP's real average block time been over the past year?,About 62.6 seconds,10 minutes,2.5 minutes,Exactly 60 seconds,A,https://pepecoinhub.com/network.html
+2,1,★,The official Pepecoin cold wallet card is made together with which brand?,Tangem,Trezor,Ledger,MetaMask,A,https://pepecoinhub.com/wallets.html
+2,2,★★,Which block explorer has a PEP rich list?,Etherscan,PepeBlocks,Solscan,BscScan,B,https://pepecoinhub.com/
+2,3,★★,What is the ticker of Grayscale's spot Dogecoin fund?,GDOG,GDOGE,DOGX,LTCC,A,https://pepecoinhub.com/scrypt-family.html
+2,4,★★★,"According to the Litecoin Foundation, who said merged mining saved Dogecoin?",Jackson Palmer,Elon Musk,Charlie Lee,Billy Markus,D,https://pepecoinhub.com/scrypt-family.html
+3,1,★,"To get PEP from a mining pool, what do you add in the pool settings?",A payout address that starts with P,A Kraken API key,An Ethereum 0x address,Your recovery phrase,A,https://pepecoinhub.com/mining.html
+3,2,★★,"From which block has the PEP block reward been fixed at 10,000?","600,000","1,000,000","42,000","100,000",A,https://pepecoinhub.com/supply.html
+3,3,★★,"Which exchange ended spot trading on September 29, 2026?",Kraken,CoinEx,MEXC,NonKYC,B,https://pepecoinhub.com/buy.html
+3,4,★★★,How many addresses did the PEPE deployer blacklist before renouncing ownership?,Hundreds,None,One,Ten,C,https://pepecoinhub.com/which-pepecoin.html
+4,1,★,What is the name of the official desktop wallet and full node for PEP?,Dogecoin Core,Electrum-PEP,Pepecoin Core,Pepe Wallet Pro,C,https://pepecoinhub.com/wallets.html
+4,2,★★,Can anyone blacklist your PEP address at the protocol level?,"Yes, Pepecoin LLC","Yes, Kraken","Yes, the Pepecoin developers","No, the protocol has no blacklist",D,https://pepecoinhub.com/which-pepecoin.html
+4,3,★★,PEP's supply follows Dogecoin's issuance curve about how many years behind it?,10,2,20,5,A,https://pepecoinhub.com/compare.html
+4,4,★★★,Which Dogecoin developer pointed out in July 2026 that Doge's security rests on every merge-mined Scrypt chain?,Billy Markus,Charlie Lee,chromatic,Jackson Palmer,C,https://pepecoinhub.com/scrypt-family.html
+5,1,★,Pepecoin is a fork of which software?,Dogecoin Core,Litecoin Core,Ethereum's Geth,Bitcoin Core,A,https://pepecoinhub.com/compare.html
+5,2,★★,Which account model does Pepecoin use?,"UTXO, like Bitcoin and Dogecoin","A DAG, like IOTA",Balances inside an ERC-20 contract,"Accounts, like Ethereum",A,https://pepecoinhub.com/which-pepecoin.html
+5,3,★★,"In which city was Litecoin Summit 2026, with a Pepecoin co-founder on the merged-mining panel?",Miami,Amsterdam,Dubai,Lisbon,B,https://pepecoinhub.com/which-pepecoin.html
+5,4,★★★,Pepecoin's genesis block embeds a headline from which newspaper?,The Times (London),The New York Times,Financial Times,The Wall Street Journal,D,https://pepecoinhub.com/which-pepecoin.html
+6,1,★,What is Pepecoin's maximum supply?,21 billion PEP,There is no cap,133.8 million PEP,420.69 trillion PEP,B,https://pepecoinhub.com/supply.html
+6,2,★★,From which block has Pepecoin used merged mining (AuxPoW)?,"371,337","42,000","100,000","600,000",B,https://pepecoinhub.com/which-pepecoin.html
+6,3,★★,About how high is PEP's inflation for the 12 months from October 2026?,0%,21%,5%,2%,C,https://pepecoinhub.com/supply.html
+6,4,★★★,"Before running the Pepecoin Core installer, what should you check?",Its SHA256 hash against SHA256SUMS.asc on the release page,"Nothing, any mirror is fine",That antivirus is turned off,Its file size only,A,https://pepecoinhub.com/wallets.html
+7,1,★,"What are PEPE and PEPECOIN, unlike PEP?",Coins on their own Scrypt chain,Bitcoin sidechains,Tokens on Ethereum,Litecoin forks,C,https://pepecoinhub.com/which-pepecoin.html
+7,2,★★,Moving PEPE on Ethereum needs gas paid in which coin?,ETH,DOGE,PEPE,PEP,A,https://pepecoinhub.com/which-pepecoin.html
+7,3,★★,What is Litecoin's maximum supply?,84 million,No cap,21 million,420.69 trillion,A,https://pepecoinhub.com/scrypt-family.html
+7,4,★★★,Which regulator gave Kraken its MiCA licence?,Germany's BaFin,The Central Bank of Ireland,Cyprus's CySEC,France's AMF,B,https://pepecoinhub.com/mica.html
+8,1,★,What does a full node do?,Downloads and checks every block itself,Holds coins for other people,Mines blocks with a GPU,Sets the coin's price,A,https://pepecoinhub.com/glossary.html
+8,2,★★,When did PEP start trading on Kraken?,"February 18, 2026","May 16, 2023","January 30, 2024","February 11, 2026",D,https://pepecoinhub.com/which-pepecoin.html
+8,3,★★,"What was PEP's block height on October 6, 2026, roughly?","124,000",1.24 million,12.4 million,"42,000",B,https://pepecoinhub.com/network.html
+8,4,★★★,At which block did Dogecoin's merged mining with Litecoin go live?,"42,000","371,337","600,000","144,000",B,https://pepecoinhub.com/scrypt-family.html
+9,1,★,What is MiCA?,A US SEC rule,A Pepecoin mining pool,A Litecoin upgrade,The EU's Markets in Crypto-Assets Regulation,D,https://pepecoinhub.com/mica.html
+9,2,★★,"In its early phase, PEP's block reward halved every how many blocks?","840,000","50,000","100,000","210,000",C,https://pepecoinhub.com/supply.html
+9,3,★★,What does UTXO stand for?,Unified transaction ownership,User transfer and exchange object,Universal token exchange order,Unspent transaction output,D,https://pepecoinhub.com/glossary.html
+9,4,★★★,From which block has Shibacoin been merge-mined with Litecoin?,"144,000","24,000","371,337","42,000",B,https://pepecoinhub.com/scrypt-family.html
+10,1,★,What does a Dogecoin address start with?,D,0x,P,L,A,https://pepecoinhub.com/compare.html
+10,2,★★,About how many top addresses does each daily rich-list snapshot record?,"About 2,000","About 20,000",100,All of them,A,https://pepecoinhub.com/rich-list.html
+10,3,★★,What is Litecoin's block time?,15 seconds,1 minute,10 minutes,2.5 minutes,D,https://pepecoinhub.com/scrypt-family.html
+10,4,★★★,"Which big pool added PEP to its LTC merged mining on December 6, 2024?",AntPool,Ethermine,Mining-Dutch,Slush Pool,A,https://pepecoinhub.com/which-pepecoin.html
+11,1,★,What is a fair launch?,A launch with free airdrops for VCs,A launch with a big presale,A launch only on Kraken,"No premine, presale or team allocation; every coin is mined",D,https://pepecoinhub.com/glossary.html
+11,2,★★,In which month did Dogecoin start merged mining with Litecoin?,September 2014,April 2014,January 2015,December 2013,A,https://pepecoinhub.com/scrypt-family.html
+11,3,★★,In which year did PEPECOIN (Memetic) bridge from its own chain to Ethereum?,2016,2026,2023,2020,C,https://pepecoinhub.com/which-pepecoin.html
+11,4,★★★,"Before merged mining started, how long did a PEP block take on average in March–April 2024?",60 seconds,8 to 13 minutes,About an hour,2.5 minutes,B,https://pepecoinhub.com/network.html
+12,1,★,When did the Pepecoin (PEP) network go live?,December 2013,April 2023,March 2016,"January 30, 2024",D,https://pepecoinhub.com/which-pepecoin.html
+12,2,★★,How long has the Dogecoin–Litecoin merged mining arrangement been running?,Since 2024,Since 2011,Since 2021,Since 2014,D,https://pepecoinhub.com/scrypt-family.html
+12,3,★★,Dogecoin was built on code from which coins?,Bellscoin and Junkcoin,Luckycoin and Litecoin,Pepecoin and Litecoin,Bitcoin and Ethereum,B,https://pepecoinhub.com/scrypt-family.html
+12,4,★★★,Which proof of work did PEPECOIN (Memetic) originally use on its own chain?,SHA-256,Ethash,Scrypt,X11,D,https://pepecoinhub.com/which-pepecoin.html
+13,1,★,Where is the official Pepecoin Tangem card sold?,Amazon only,The App Store,Kraken,The Pepecoin Shop (shop.pepecoin.com),D,https://pepecoinhub.com/wallets.html
+13,2,★★,Which Scrypt coin is Billy Markus's Animal Crossing coin from 2013?,Bellscoin,Dingocoin,Luckycoin,Junkcoin,A,https://pepecoinhub.com/scrypt-family.html
+13,3,★★,What does mining difficulty adjust for on Pepecoin?,To block exchanges,To keep blocks arriving about once a minute,To keep supply capped,To keep the price stable,B,https://pepecoinhub.com/glossary.html
+13,4,★★★,"How many PEP did blocks 0 to 99,999 create?",25 billion,98.44 billion,5.26 billion,50 billion,D,https://pepecoinhub.com/supply.html
+14,1,★,What usually happens if you withdraw PEP to an Ethereum 0x address?,It arrives a day later,Kraken refunds it,It converts to PEPE automatically,The transfer is usually lost and irreversible,D,https://pepecoinhub.com/buy.html
+14,2,★★,When did PEPE start trading on Kraken?,December 2024,"February 18, 2026","February 11, 2026","May 16, 2023",D,https://pepecoinhub.com/which-pepecoin.html
+14,3,★★,Can a Bitcoin (SHA-256) miner mine Pepecoin?,"Yes, with a firmware update","No, PEP uses Scrypt","Yes, through merged mining",Only on Binance Pool,B,https://pepecoinhub.com/scrypt-family.html
+14,4,★★★,Around which year does PEP's inflation drop to Dogecoin's rate today (about 3.4%)?,2028,2050,Never,2036,D,https://pepecoinhub.com/supply.html
+15,1,★,Who created Dogecoin?,Charlie Lee and Colin Percival,Billy Markus and Jackson Palmer,Satoshi Nakamoto,Vitalik Buterin and Charlie Lee,B,https://pepecoinhub.com/scrypt-family.html
+15,2,★★,"In early October 2026, PEP's market cap was about what fraction of Dogecoin's?","About 1/1,555",About 1/155,"About 1/155,500",About 1/15,A,https://pepecoinhub.com/compare.html
+15,3,★★,"At the 60-second target, how many new PEP can be created per year at most?",About 50 billion,About 5.26 billion,14.4 million,"525,600",B,https://pepecoinhub.com/supply.html
+15,4,★★★,Which Pepecoin co-founder spoke on the merged-mining panel at Litecoin Summit 2026?,David Eichel,Charlie Lee,Billy Markus,Jackson Palmer,A,https://pepecoinhub.com/which-pepecoin.html
+16,1,★,How many new PEP does every block pay today?,"50,000","10,000","500,000","5,000",B,https://pepecoinhub.com/supply.html
+16,2,★★,When did Charlie Lee propose merged mining Litecoin with Dogecoin?,April 2014,2015,December 2013,September 2014,A,https://pepecoinhub.com/scrypt-family.html
+16,3,★★,What share of PEPE's supply went to a team multisig wallet at launch?,93.1%,0%,3.5%,6.9%,D,https://pepecoinhub.com/which-pepecoin.html
+16,4,★★★,"At the one-minute target, how many times more do DOGE miners earn per day than PEP miners (October 2026 prices)?","About 100,000×","About 1,043×",About 100×,About 10×,B,https://pepecoinhub.com/compare.html
+17,1,★,What is a halving?,Halving the block time,A split of the chain in two,Burning half the supply,A cut of the block reward by half,D,https://pepecoinhub.com/glossary.html
+17,2,★★,Who designed the Scrypt hashing function?,Vitalik Buterin,Satoshi Nakamoto,Charlie Lee,Colin Percival,D,https://pepecoinhub.com/scrypt-family.html
+17,3,★★,Why can't a Bitcoin machine mine Scrypt coins?,Scrypt coins are tokens on Ethereum,Scrypt is proof of stake,Scrypt needs much more memory than SHA-256,Bitcoin forbids it in its code,C,https://pepecoinhub.com/scrypt-family.html
+17,4,★★★,What is Junkcoin's supply cap?,54 million,21 million,No cap,84 million,A,https://pepecoinhub.com/scrypt-family.html
+18,1,★,PEP transaction fees are paid in which coin?,USDT,LTC,PEP,ETH,C,https://pepecoinhub.com/which-pepecoin.html
+18,2,★★,When did Litecoin launch?,January 2024,January 2009,December 2013,October 2011,D,https://pepecoinhub.com/scrypt-family.html
+18,3,★★,What is PEPE's total supply?,104.9 billion,133.8 million,21 million,420.69 trillion,D,https://pepecoinhub.com/which-pepecoin.html
+18,4,★★★,How many coins does ViaBTC's Litecoin pool list on top of LTC?,Two,Twelve,Seven,Four,C,https://pepecoinhub.com/scrypt-family.html
+19,1,★,What happens to PEP's inflation rate over the years?,It stays exactly the same,It rises every year,It falls every year but never reaches zero,It drops to zero when the cap is hit,C,https://pepecoinhub.com/supply.html
+19,2,★★,"Using October 4–5, 2026 data, what would one PEP be worth at Dogecoin's market cap?",About $1.40,About $14,About $0.0014,About $0.14,D,https://pepecoinhub.com/calculator.html
+19,3,★★,Which of these is a swap service listed for PEP on pepecoin.com?,PancakeSwap,Trocador,Uniswap,Jupiter,B,https://pepecoinhub.com/buy.html
+19,4,★★★,Under which license is the Pepecoin Core code published?,MIT,"None, it is closed source",GPL,Proprietary,A,https://pepecoinhub.com/which-pepecoin.html
+20,1,★,Pepecoin is merge-mined together with which two coins?,Litecoin and Dogecoin,Ethereum and Ethereum Classic,Monero and Zcash,Bitcoin and Bitcoin Cash,A,https://pepecoinhub.com/
+20,2,★★,"At the 60-second target, how many new PEP can be created per day at most?",1.44 million,14.4 million,"144,000",5.26 billion,B,https://pepecoinhub.com/mining.html
+20,3,★★,What was Pepecoin's very first block reward?,"10,000 PEP","250,000 PEP","1,000,000 PEP","500,000 PEP",D,https://pepecoinhub.com/supply.html
+20,4,★★★,Which ERC-20 token's contract address starts with 0xA9E8…?,PEPE,PEP,SHIB,PEPECOIN (PepeCoin / Memetic),D,https://pepecoinhub.com/which-pepecoin.html
+21,1,★,How much PEP was premined or allocated to a team at launch?,6.9%,10%,0%,3.5%,C,https://pepecoinhub.com/which-pepecoin.html
+21,2,★★,How many blocks a day does Pepecoin aim for?,576,"10,000",144,"1,440",D,https://pepecoinhub.com/network.html
+21,3,★★,Which ERC-20 token's contract address starts with 0x6982…?,PEPECOIN,PEPE,DOGE,PEP,B,https://pepecoinhub.com/which-pepecoin.html
+21,4,★★★,"About what share of the PEP supply did the top 1,000 addresses hold on October 13, 2026?",38%,74%,15%,95%,B,https://pepecoinhub.com/rich-list.html
+22,1,★,Which subreddit does PepecoinHub link for the Pepecoin community?,r/pepetoken,r/pepecoins,r/pepecoin,r/pepe,C,https://pepecoinhub.com/
+22,2,★★,What is a mining pool?,A wallet for miners,An exchange for ASICs,A service where many miners combine work and share rewards,A liquidity pool on Ethereum,C,https://pepecoinhub.com/glossary.html
+22,3,★★,What is hashrate?,The number of holders,The total computing power mining a chain,The price per hash,The size of a block,B,https://pepecoinhub.com/glossary.html
+22,4,★★★,When was Pepecoin's MiCA white paper notified to the regulator?,"February 11, 2026","December 30, 2024","May 8, 2026","April 7, 2026",D,https://pepecoinhub.com/mica.html
+23,1,★,Does a MiCA white paper mean the EU approved PEP?,"Yes, Kraken approved it",Only in Ireland,"No, nobody approves it; it is notified and published","Yes, the EU approved it",C,https://pepecoinhub.com/mica.html
+23,2,★★,About how big was Pepecoin's hashrate in early October 2026?,About 290 PH/s,About 2.9 TH/s,About 2.9 PH/s,About 2.9 EH/s,C,https://pepecoinhub.com/compare.html
+23,3,★★,"What was the ticker of Canary's spot Litecoin ETF, the first in the US?",LTCX,LITE,GDOG,LTCC,D,https://pepecoinhub.com/scrypt-family.html
+23,4,★★★,How does litecoinpool.org pay out the value of the PEP it merge-mines?,In USDT,In PEP,It does not mine PEP,As extra LTC and DOGE (higher PPS ratio),D,https://pepecoinhub.com/mining.html
+24,1,★,What is a premine?,A mining pool's fee,The first block ever mined,"Coins created for insiders at launch, outside normal mining",A coin's price before listing,C,https://pepecoinhub.com/glossary.html
+24,2,★★,"How much PEP does Pepecoin LLC hold, according to its MiCA white paper?",6.9%,1%,None,10%,C,https://pepecoinhub.com/mica.html
+24,3,★★,Every merge-mined chain pays its own reward. What is shared?,Only the mining work,The ledger,The block rewards,The coin supply,A,https://pepecoinhub.com/scrypt-family.html
+24,4,★★★,When was Pepecoin's MiCA white paper published on pepecoin.com?,"May 8, 2026","February 11, 2026","January 30, 2024","April 7, 2026",A,https://pepecoinhub.com/mica.html
+25,1,★,How often does the PepecoinHub rich list take a snapshot?,Once a year,Every day,Once a month,Every hour,B,https://pepecoinhub.com/rich-list.html
+25,2,★★,"About how many addresses held PEP on October 6, 2026?",About 2.96 million,About 29.6 million,"About 29,600","About 296,000",D,https://pepecoinhub.com/network.html
+25,3,★★,"Since which year has Dogecoin paid a fixed 10,000 DOGE per block?",2013,2024,2021,2015,D,https://pepecoinhub.com/supply.html
+25,4,★★★,How many months after launch did PEP reach its first big peak?,One,Ten,Thirty-two,Twenty,B,https://pepecoinhub.com/compare.html
+26,1,★,Who created Litecoin?,Colin Percival,Jackson Palmer,Charlie Lee,Billy Markus,C,https://pepecoinhub.com/scrypt-family.html
+26,2,★★,When did PEPECOIN (PepeCoin / Memetic) first launch?,March 2016,December 2013,January 2024,April 2023,A,https://pepecoinhub.com/which-pepecoin.html
+26,3,★★,Which coins does Haze Wallet support?,Only ETH tokens,"PEP, DOGE, BTC and LTC",Only PEP,PEPE and PEPECOIN,B,https://pepecoinhub.com/wallets.html
+26,4,★★★,For which service was Scrypt originally designed?,Litecoin,Bitcoin,Tarsnap (online backups),Dropbox,C,https://pepecoinhub.com/scrypt-family.html
+27,1,★,What is a cold wallet?,A wallet whose keys stay off internet-connected computers,A wallet that has run out of coins,A wallet only for winter,An exchange account,A,https://pepecoinhub.com/glossary.html
+27,2,★★,Which service is listed on pepecoin.com for buying PEP with a card?,Revolut,Venmo,PayPal,Alchemy Pay,D,https://pepecoinhub.com/buy.html
+27,3,★★,What does the rich list's second view leave out?,The top 10 addresses,Exchanges and mining pools,Addresses starting with P,Addresses created in 2024,B,https://pepecoinhub.com/rich-list.html
+27,4,★★★,Which of these miners does ViaBTC name as an example for mining PEP?,RTX 4090,Bitaxe,Antminer L9,Antminer S21,C,https://pepecoinhub.com/mining.html
+28,1,★,Which mining algorithm does Pepecoin use?,Ethash,X11,SHA-256,Scrypt,D,https://pepecoinhub.com/
+28,2,★★,"What did Dogecoin cost at the same age PEP is now (2 years 8 months, in August 2016)?",About $0.000002,About $0.24,About $0.00024,About $0.0024,C,https://pepecoinhub.com/compare.html
+28,3,★★,In which year was Scrypt published?,2013,2011,2014,2009,D,https://pepecoinhub.com/scrypt-family.html
+28,4,★★★,From which block has Bellscoin been merge-mined?,"144,000","24,000","42,000","371,337",A,https://pepecoinhub.com/scrypt-family.html
+29,1,★,What kind of machine mines Pepecoin?,Only a laptop CPU,A Scrypt ASIC,A Bitcoin SHA-256 ASIC,Only graphics cards,B,https://pepecoinhub.com/mining.html
+29,2,★★,How big was the PEPECOIN (Memetic) premine for its development fund in 2016?,3.5%,6.9%,0%,50%,A,https://pepecoinhub.com/which-pepecoin.html
+29,3,★★,Which of these exchanges lists a PEP/USDT market (as listed on pepecoin.com)?,Binance US,Robinhood,MEXC,Coinbase,C,https://pepecoinhub.com/buy.html
+29,4,★★★,Which PEP explorer also offers market data and an API?,Etherscan,Blockchair,Solscan,PepecoinService,D,https://pepecoinhub.com/
+30,1,★,Which of these should you never share with anyone?,A block explorer link,Your PEP address,Your recovery phrase,A transaction ID,C,https://pepecoinhub.com/glossary.html
+30,2,★★★,Since which date has MiCA required a white paper before an asset can trade on an EU platform?,"May 8, 2026","June 25, 2025","December 30, 2024","January 1, 2023",C,https://pepecoinhub.com/mica.html
+30,3,★,What does custodial mean?,"Someone else, usually an exchange, holds your keys and coins",Your coins live in an ERC-20 contract,Your coins are frozen forever,You hold your own keys,A,https://pepecoinhub.com/glossary.html
+30,4,★★★,When did PEPECOIN (PepeCoin / Memetic) start trading on Kraken?,"May 16, 2023","February 11, 2026","February 18, 2026",March 2016,C,https://pepecoinhub.com/which-pepecoin.html
+31,1,★,What is the technical name for merged mining?,Proof of History,AuxPoW (Auxiliary Proof of Work),Delegated Proof of Stake,Proof of Stake,B,https://pepecoinhub.com/glossary.html
+31,2,★★★,"About how many PEP did the first 600,000 blocks create in total?",104.9 billion,98.44 billion,21 billion,50 billion,B,https://pepecoinhub.com/supply.html
+31,3,★,Where did every PEP in existence come from?,A team mint,An airdrop to PEPE holders,A presale,Block rewards paid to miners,D,https://pepecoinhub.com/which-pepecoin.html
+31,4,★★★,What is Pepecoin's AuxPoW chain ID?,63,98,1,42,A,https://pepecoinhub.com/which-pepecoin.html
+32,1,★,Is one rich-list address the same as one person?,Only for the top 10,"Yes, always","No, exchanges hold coins for many people",Only for miners,C,https://pepecoinhub.com/rich-list.html
+32,2,★★★,About how high is PEP's projected inflation in year 25 (2051)?,2.3%,5%,0%,10%,A,https://pepecoinhub.com/supply.html
+32,3,★,What is PEPE (the frog on Ethereum)?,A fork of Dogecoin Core,An ERC-20 token on Ethereum,A Litecoin sidechain,A Scrypt proof-of-work coin,B,https://pepecoinhub.com/which-pepecoin.html
+32,4,★★★,Why does PepeBlocks show fewer PEP addresses than PepecoinHub?,It counts only one address per person,It counts only addresses created in 2026,It ignores exchange addresses,It counts only addresses with at least 0.001 PEP,D,https://pepecoinhub.com/network.html
+33,1,★,"Even without a protocol blacklist, who can freeze PEP?",The Pepecoin Discord mods,Any miner,An exchange or custodian holding your coins,"Nobody, ever",C,https://pepecoinhub.com/which-pepecoin.html
+33,2,★,Does merge-mining PEP lower a miner's LTC or DOGE rewards?,"Yes, by about 10%",Only the DOGE part,"No, PEP comes on top","Yes, by half",C,https://pepecoinhub.com/mining.html
+33,3,★,What is Pepecoin's target time between blocks?,15 seconds,60 seconds,10 minutes,2.5 minutes,B,https://pepecoinhub.com/mining.html
+33,4,★,Which markets does Kraken offer for PEP?,PEP/BTC only,None,PEP/USD and PEP/EUR,PEP/ETH only,C,https://pepecoinhub.com/buy.html
+34,1,★,How is market cap calculated?,Price ÷ supply,Price × supply,Supply − burned coins,Hashrate × price,B,https://pepecoinhub.com/glossary.html
+34,2,★,Which of these wallets can NOT hold PEP?,Tangem,Coinomi,MetaMask,Pepecoin Core,C,https://pepecoinhub.com/wallets.html
