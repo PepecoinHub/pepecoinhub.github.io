@@ -13,7 +13,7 @@ Strona gier jest w `docs/games/` (czysty HTML/JS, bez bundlera). Bez serwera dzi
 1. **Supabase → New project** (Free, Frankfurt). Zapisz hasło do bazy w menedżerze haseł.
 2. **SQL Editor**: uruchom po kolei całe pliki `games/supabase/schema.sql`, `seed.sql`, `realtime_policies.sql`.
 3. Ustaw własny kod hosta (min. 10 znaków): `select games.set_host_code('twój-kod');`. Opcjonalnie stałych hostów po Discord ID: `insert into games.host_discord(discord_id, note) values ('123…', 'imię');`.
-4. **Authentication → Sign In / Providers**: włącz **Allow anonymous sign-ins**. **URL Configuration**: Site URL `https://pepecoinhub.com/games/`, Redirect URLs `https://pepecoinhub.com/games/**`.
+4. **Authentication → Sign In / Providers**: włącz **Allow anonymous sign-ins** oraz **Allow manual linking** (zmienna `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED`). Manual linking musi być włączone: gość, który klika Connect Discord, zostaje przy tym samym `user_id`, więc punkty Pepe Guesser nie znikają. Gdy jest wyłączone, strona wraca do nowego logowania Discordem i punkty zostają przy starym id gościa. **URL Configuration**: Site URL `https://pepecoinhub.com/games/`, Redirect URLs `https://pepecoinhub.com/games/**`.
 5. **Project Settings → Realtime**: wyłącz **Allow public access** (zostają tylko kanały prywatne chronione politykami z kroku 2).
 6. **Project Settings → API Keys**: skopiuj Project URL i Publishable key do `docs/games/js/config.js` (`supabaseUrl`, `supabaseKey`) i zrób PR. Po zatwierdzeniu pokoje na żywo ruszą same.
 7. **Logowanie Discordem** (rezerwacja nicku, ranking, w przyszłości quiz z nagrodą): Discord Developer Portal → New Application → OAuth2 (Client ID, Secret, Redirect `https://<ref>.supabase.co/auth/v1/callback`) → w Supabase włącz providera Discord i wklej dane → w `config.js` ustaw `discord: true`.
@@ -33,7 +33,17 @@ Przycisk 🐸 obok czatu (pokoje i stoły). Wysyłane jest tylko id naklejki; se
 200 jednoczesnych połączeń, 100 wiadomości/s, 2 mln wiadomości/mies., 256 KB na wiadomość, 500 MB bazy, 5 GB transferu (egress)/mies. Piątkowy wieczór gier dla 10–40 osób mieści się w limitach. Największy koszt to transfer obrazków w pełnej jakości: obrazek 1 MB to ok. 1,37 MB (base64) na każdego gracza. Przykład: 30 graczy × 20 obrazków po 1 MB ≈ 0,8 GB na wieczór, 4 wieczory ≈ 3,3 GB/mies. (zwykłe zdjęcia 300–600 KB: ok. 1,0–2,0 GB/mies.). Przy dużym ruchu: plan Pro (25 USD/mies., 250 GB transferu).
 
 ## Prywatność i porządek
-Strona `docs/games/privacy.html` opisuje, co jest zapisywane (nick, losowe ID gościa, skrót IP z solą, wyniki, czat usuwany po ok. tygodniu). Jeśli zmieni się to, co zbieramy, zmień ją w tym samym PR. Starych anonimowych gości można czyścić raz na kilka miesięcy: `delete from auth.users where is_anonymous and created_at < now() - interval '30 days';`.
+Strona `docs/games/privacy.html` opisuje, co jest zapisywane (nick, losowe ID gościa, skrót IP z solą, wyniki, czat usuwany po ok. tygodniu). Jeśli zmieni się to, co zbieramy, zmień ją w tym samym PR. Starych anonimowych gości można czyścić raz na kilka miesięcy. **Uwaga:** zwykłe `delete` kasuje też gości, których punkty dałoby się jeszcze odzyskać po połączeniu Discorda (gra albo odbiór nagrody zostają przy ich `user_id`). Zostaw takie konta:
+
+```sql
+delete from auth.users
+where is_anonymous
+  and created_at < now() - interval '30 days'
+  and not exists (select 1 from games.wp_plays p where p.user_id = auth.users.id)
+  and not exists (select 1 from games.wp_claims c where c.user_id = auth.users.id);
+```
+
+Po tej zmianie uruchom raz w SQL Editor plik `games/supabase/update_adopt_guest_rows.sql`. Dzięki niemu gość, który połączył Discorda, dostaje nick z profilu i `verified = true` na swoich starych wierszach `games.wp_plays` i `games.wp_claims`. Plik nie łączy dwóch różnych kont.
 
 ## Testowanie lokalnie
 Prototyp ma emulator serwera (PGlite) i testy (logika, silniki botów, przeglądarkowe e2e). Leżą poza tym repo, w projekcie prototypu. Przy zmianach SQL lub logiki gier uruchamiaj je przed PR-em.

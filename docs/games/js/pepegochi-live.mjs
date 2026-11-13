@@ -1,7 +1,7 @@
 // PEPEGOCHI.EXE, the real game (docs/games/pepegochi-live.html): draws LiveGame (pepegochi-live-view.mjs).
 // The frog lives on the server (games/supabase/update_pepegochi_v2.sql), one per Discord account.
 // PondOS opens this page in a window; it also works on its own.
-import { getBackend } from './backend.js';
+import { getBackend } from './backend.js?v=20261113link';
 import { LiveGame } from './pepegochi-live-view.mjs';
 import { renderRoom, playDeparture, DEPART_FRAMES } from './pepegochi-room.mjs';
 
