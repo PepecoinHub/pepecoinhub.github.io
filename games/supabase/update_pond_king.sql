@@ -9,8 +9,10 @@
 --     a tie (1:1, 0:0) keeps the king on the throne.
 --   * A winning challenger becomes the new king; their three moves become their defence and they can
 --     change them at any time while they reign. A lost duel adds one defence to the king's reign.
---   * One duel per king per player (random browser token) and per network (hashed IP). When the king
---     changes, everybody may try again. Nobody can challenge themselves.
+--   * ONE DUEL A DAY: one duel per player (browser token or account) and per network (hashed IP) per UTC
+--     day, whoever sits on the throne. The day starts at 00:00 UTC.
+--   * And one duel per king per player and per network: losing to a king means waiting for a new king
+--     (and a new day). Nobody can challenge themselves.
 --   * The king's moves never leave the database, except to the king (who holds the token) and as the
 --     shuffled rounds of a finished duel, which show the challenger only the king's set of moves.
 --
@@ -82,6 +84,20 @@ language sql immutable set search_path = '' as $$
   select coalesce(th is not null and row_token = th, false) or coalesce(u is not null and row_user = u, false)
 $$;
 
+-- the start of today's game day (00:00 UTC)
+create or replace function games.pk_day() returns timestamptz language sql stable set search_path = '' as $$
+  select date_trunc('day', now() at time zone 'UTC') at time zone 'UTC'
+$$;
+
+-- today's duel of this player (by token or account) or, failing that, of this network
+create or replace function games.pk_today(th text, u uuid, ip text) returns games.pk_duels
+language sql stable security definer set search_path = '' as $$
+  select d.* from games.pk_duels d
+   where d.created_at >= games.pk_day()
+     and (games.pk_is(d.token_hash, d.user_id, th, u) or (ip is not null and d.ip_hash = ip))
+   order by games.pk_is(d.token_hash, d.user_id, th, u) desc, d.created_at desc limit 1
+$$;
+
 -- 1 = a beats b, -1 = b beats a, 0 = the same move
 create or replace function games.pk_beats(a text, b text) returns int
 language sql immutable set search_path = '' as $$
@@ -98,6 +114,7 @@ declare
   ip text := games.client_ip_hash();
   k games.pk_kings;
   mine games.pk_duels;
+  today games.pk_duels;
   ip_used boolean := false;
   you boolean;
 begin
@@ -108,12 +125,18 @@ begin
   if ip is not null and mine.id is null then
     ip_used := exists (select 1 from games.pk_duels where king_id = k.id and ip_hash = ip);
   end if;
+  today := games.pk_today(th, u, ip);
   return jsonb_build_object(
     'king', jsonb_build_object('id', k.id, 'nick', k.nick, 'defenses', k.defenses, 'since', k.crowned_at,
                                'house', k.token_hash is null and k.user_id is null, 'you', you,
                                'passport', games.passport_id(k.user_id),
                                'moves', case when you then k.moves end),
-    'can_challenge', not you and mine.id is null and not ip_used,
+    'can_challenge', not you and mine.id is null and not ip_used and today.id is null,
+    -- today's duel (one a day): yours, or one from your network; the next one opens at 00:00 UTC
+    'today', case when today.id is not null then jsonb_build_object(
+                    'won', today.won, 'at', today.created_at,
+                    'network', not games.pk_is(today.token_hash, today.user_id, th, u)) end,
+    'next_at', games.pk_day() + interval '1 day',
     'tried', case when mine.id is not null then jsonb_build_object('won', mine.won, 'at', mine.created_at)
                   when ip_used then jsonb_build_object('network', true) end,
     'duels_today', (select count(*) from games.pk_duels where created_at > now() - interval '24 hours'),
@@ -145,7 +168,7 @@ declare
   v_nick text;
   v_moves text := lower(coalesce(p_moves, ''));
   k games.pk_kings;
-  ord text; me int := 0; them int := 0; r int; won boolean; n int; new_id bigint;
+  ord text; me int := 0; them int := 0; r int; won boolean; new_id bigint;
   rounds jsonb := '[]'::jsonb;
 begin
   if th is null then return jsonb_build_object('ok', false, 'error', 'token'); end if;
@@ -158,17 +181,17 @@ begin
   select * into k from games.pk_kings where ended_at is null for update;
   if k.id is null or k.id is distinct from p_king_id then return jsonb_build_object('ok', false, 'error', 'changed'); end if;
   if games.pk_is(k.token_hash, k.user_id, th, u) then return jsonb_build_object('ok', false, 'error', 'self'); end if;
+  -- one duel a day per player and per network
+  if (games.pk_today(th, u, ip)).id is not null then
+    return jsonb_build_object('ok', false, 'error', 'daily', 'next_at', games.pk_day() + interval '1 day'); end if;
   if exists (select 1 from games.pk_duels d where d.king_id = k.id and games.pk_is(d.token_hash, d.user_id, th, u)) then
     return jsonb_build_object('ok', false, 'error', 'tried'); end if;
   if ip is not null and exists (select 1 from games.pk_duels where king_id = k.id and ip_hash = ip) then
     return jsonb_build_object('ok', false, 'error', 'network'); end if;
 
-  -- limits: 300 duels an hour overall; 12 per network (or 60 from clients without an IP header) in 10 minutes
+  -- and a ceiling for the whole pond: 300 duels an hour
   if (select count(*) from games.pk_duels where created_at > now() - interval '1 hour') >= 300 then
     return jsonb_build_object('ok', false, 'error', 'busy'); end if;
-  select count(*) into n from games.pk_duels where created_at > now() - interval '10 minutes'
-     and (ip_hash = ip or (ip is null and ip_hash is null));
-  if n >= (case when ip is null then 60 else 12 end) then return jsonb_build_object('ok', false, 'error', 'slow'); end if;
 
   -- the king's three moves in a fresh random order
   select string_agg(m, '' order by random()) into ord from regexp_split_to_table(k.moves, '') m;
@@ -222,6 +245,6 @@ begin
   return jsonb_build_object('ok', true, 'moves', v_moves);
 end $$;
 
-revoke all on function games.pk_token_hash(text), games.pk_beats(text, text), games.pk_is(text, uuid, text, uuid) from public, anon, authenticated;
+revoke all on function games.pk_token_hash(text), games.pk_beats(text, text), games.pk_is(text, uuid, text, uuid), games.pk_day(), games.pk_today(text, uuid, text) from public, anon, authenticated;
 revoke all on function public.gry_pk_state(text), public.gry_pk_challenge(text, bigint, text, text), public.gry_pk_set_moves(text, text) from public;
 grant execute on function public.gry_pk_state(text), public.gry_pk_challenge(text, bigint, text, text), public.gry_pk_set_moves(text, text) to anon, authenticated;

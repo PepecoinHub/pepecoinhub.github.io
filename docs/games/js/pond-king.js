@@ -31,6 +31,13 @@
     if (s < 86400) return Math.floor(s / 3600) + ' h ago';
     var d = Math.floor(s / 86400); return d + (d === 1 ? ' day ago' : ' days ago');
   }
+  // "in 7 h 12 min (00:00 UTC)": when the next day's duel opens
+  function untilText(iso) {
+    var ms = new Date(iso).getTime() - Date.now(); if (!(ms > 0)) return 'now';
+    var h = Math.floor(ms / 3600e3), m = Math.max(1, Math.ceil((ms % 3600e3) / 60e3));
+    if (m === 60) { h++; m = 0; }
+    return 'in ' + (h ? h + ' h ' : '') + (m ? m + ' min' : '') + ' (00:00 UTC)';
+  }
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
   function status(t) { $('status').textContent = t; }
 
@@ -99,7 +106,11 @@
       });
       if (!ch.children.length) ch.appendChild(mk('li', 'muted', 'Nobody yet. Enjoy the quiet, your majesty.'));
     } else if (!s.can_challenge) {
-      if (s.tried && s.tried.network) {
+      if (s.today) {
+        $('wait-title').textContent = s.today.network ? 'Your network already fought today' : 'That was today’s duel';
+        $('wait-line').textContent = (s.today.network ? 'One duel a day per network, and somebody here got in first. '
+          : 'One duel a day, fren. ' + (s.today.won ? 'You took the throne, then.' : 'The king held this time.') + ' ') + 'The next one opens ' + untilText(s.next_at) + '.';
+      } else if (s.tried && s.tried.network) {
         $('wait-title').textContent = 'Someone on your network got here first';
         $('wait-line').textContent = 'Each king can be challenged once per network. When a new frog takes the throne, you get a fresh shot.';
       } else {
@@ -128,7 +139,7 @@
     if (!rec.children.length) rec.appendChild(mk('li', 'muted', 'No duels yet. Be the first.'));
     $('today').textContent = s.duels_today ? '· ' + plural(s.duels_today, 'duel', 'duels') + ' in 24 h' : '';
 
-    status(k.you ? 'Long live the king. Your moves defend you while you are away.' : s.can_challenge ? 'The king is waiting. Pick three moves.' : 'Waiting for a new king.');
+    status(k.you ? 'Long live the king. Your moves defend you while you are away.' : s.can_challenge ? 'The king is waiting. Pick three moves.' : s.today ? 'Next duel ' + untilText(s.next_at) + '.' : 'Waiting for a new king.');
     canFight();
   }
   function moveStr(m) { return (m || '').split('').map(function (c) { return MOVES[c] ? MOVES[c][0] : '?'; }).join(''); }
@@ -146,7 +157,7 @@
     tried: 'You already challenged this king.', network: 'Someone on your network already challenged this king.',
     self: 'You cannot challenge yourself, your majesty.', nick: 'Name: 2 to 20 letters, digits, spaces, _ . -',
     nick_bad: 'Pick a different name.', moves: 'Pick a move for every round.', busy: 'The pond is busy. Try again in a few minutes.',
-    slow: 'Slow down a little, fren. Try again in a few minutes.', token: 'Your browser blocked the game’s storage. Reload and try again.'
+    slow: 'Slow down a little, fren. Try again in a few minutes.', daily: 'One duel a day, fren. Come back after midnight (UTC).', token: 'Your browser blocked the game’s storage. Reload and try again.'
   };
   function errText(r) { return (r && r.error === 'nick' && r.message) || ERR[r && r.error] || 'Something went wrong.'; }
 
@@ -190,8 +201,8 @@
       line.classList.add(r.won ? 'w' : 'l');
       var p = mk('p', 'muted', r.won
         ? 'Your three moves now defend the pond. The next challenger meets them in a shuffled order. You can change them below at any time.'
-        : r.score[0] === r.score[1] ? 'A tie keeps the king on the throne. ' + kingNick + ' has now held it ' + plural(r.king.defenses, 'time', 'times') + '. Come back when a new king rises.'
-          : kingNick + ' has now held the throne ' + plural(r.king.defenses, 'time', 'times') + '. Come back when a new king rises. Or tell a fren: you know which moves the king holds now.');
+        : r.score[0] === r.score[1] ? 'A tie keeps the king on the throne. ' + kingNick + ' has now held it ' + plural(r.king.defenses, 'time', 'times') + '. Your next duel opens tomorrow.'
+          : kingNick + ' has now held the throne ' + plural(r.king.defenses, 'time', 'times') + '. Your next duel opens tomorrow (00:00 UTC). Or tell a fren: you know which moves the king holds now.');
       after.appendChild(p);
       var row = mk('div', 'row'), ok = mk('button', r.won ? 'go' : '', r.won ? 'To my throne →' : 'OK'); ok.type = 'button';
       ok.addEventListener('click', function () { $('result').hidden = true; load(); });
