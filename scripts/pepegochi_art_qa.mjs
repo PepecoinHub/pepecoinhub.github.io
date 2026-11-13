@@ -5,6 +5,7 @@
 //   node scripts/pepegochi_art_qa.mjs path/to/file.png [more.png ...]        format from the name (tb_* = B, else A)
 //   node scripts/pepegochi_art_qa.mjs --format=B --foot=47 tb_new.png        override the format or the foot line
 //   node scripts/pepegochi_art_qa.mjs --prop goodbye_letter.png              a prop: no foot-line check
+//   node scripts/pepegochi_art_qa.mjs --like=old.png new.png                 a replacement: also compare its place with the old file
 //
 // Format A (game sprites and room props): 128 x 128, 2 x 2 pixel grid, at most 64 colours, feet on the line y = 124.
 // Format B (taskbar companion):           48 x 48, 1 x 1 pixel grid, at most 32 colours, feet on the line y = 47.
@@ -111,7 +112,18 @@ export function checkImage(img, { format = 'A', foot, prop = false, allowEdge = 
 
 export function checkFile(file, opts = {}) {
   const img = decodePng(readFileSync(file));
-  return checkImage(img, { format: opts.format || formatFor(file), ...opts });
+  const r = checkImage(img, { format: opts.format || formatFor(file), ...opts });
+  if (opts.like && r.bbox) Object.assign(r, compareWith(r.bbox, bbox(decodePng(readFileSync(opts.like))), r.problems));
+  return r;
+}
+
+// A drop-in replacement must stand where the old picture stood: same foot line, about the same centre and height.
+export function compareWith(box, old, problems = []) {
+  const centre = b => (b[0] + b[2]) / 2, dx = centre(box) - centre(old), dh = (box[3] - box[1]) - (old[3] - old[1]);
+  if (box[3] !== old[3]) problems.push(`stands on y = ${box[3]}, the old picture on y = ${old[3]}`);
+  if (Math.abs(dx) > 6) problems.push(`its centre moved ${dx > 0 ? 'right' : 'left'} by ${Math.abs(dx)} px (more than 6)`);
+  if (Math.abs(dh) > 8) problems.push(`it is ${Math.abs(dh)} px ${dh > 0 ? 'taller' : 'shorter'} than the old picture (more than 8)`);
+  return { ok: problems.length === 0, problems, old, dx, dh };
 }
 
 // ---------- command line ----------
@@ -123,10 +135,10 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   for (const f of files) {
     let r;
     try {
-      r = checkFile(f, { format: opt('format'), foot: opt('foot') != null ? Number(opt('foot')) : undefined, prop: !!opt('prop'), allowEdge: !!opt('allow-edge') });
+      r = checkFile(f, { format: opt('format'), foot: opt('foot') != null ? Number(opt('foot')) : undefined, prop: !!opt('prop'), allowEdge: !!opt('allow-edge'), like: opt('like') });
     } catch (e) { r = { ok: false, problems: [e.message] }; }
     if (!r.ok) bad++;
-    console.log(`${r.ok ? 'OK  ' : 'FAIL'} ${f}${r.bbox ? `  bbox ${r.bbox.join(',')}  colours ${r.colours}` : ''}`);
+    console.log(`${r.ok ? 'OK  ' : 'FAIL'} ${f}${r.bbox ? `  bbox ${r.bbox.join(',')}  colours ${r.colours}` : ''}${r.old ? `  (old bbox ${r.old.join(',')}, centre ${r.dx >= 0 ? '+' : ''}${r.dx}, height ${r.dh >= 0 ? '+' : ''}${r.dh})` : ''}`);
     for (const p of r.problems) console.log('       - ' + p);
   }
   process.exit(bad ? 1 : 0);
