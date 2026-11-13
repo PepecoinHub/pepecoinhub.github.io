@@ -1,19 +1,18 @@
-// Pepe Gold Hook high scores, in the shared PEP Games arcade table (games.arcade_scores).
-// One call per round, and only when the player presses "Submit score". The top 10 is read at most
-// once a minute. The browser sends the list of caught objects, never a point total: the server
-// function public.gry_goldhook_submit (games/supabase/update_gold_hook.sql) counts the points itself.
+// Pepe Gold Hook high scores and player stats, in the PEP Games Supabase project.
+// One call per finished run (game over or the last level), and only when the player presses
+// "Submit score". The browser sends the levels it played, never a total: the server function
+// public.gry_goldhook_submit_run (games/supabase/update_gold_hook_campaign.sql) replays the run and
+// counts the score itself. A Discord player's best run is kept on their account; "My stats" reads
+// it once when opened. The top 10 is read at most once a minute.
 import { GAME_ID } from './gold-hook-config.mjs';
-import { validateRun } from './gold-hook-validation.mjs';
+import { submission } from './gold-hook-campaign.mjs';
+import { validateCampaign } from './gold-hook-validation.mjs';
 
 export const TOP_CACHE_MS = 60_000;
 
-// Arguments for public.gry_goldhook_submit: no score field on purpose.
-export function buildSubmission(result, nick) {
-  return {
-    p_nick: String(nick ?? ''),
-    p_catches: result.run.catches.map((c) => ({ id: c.id, t: c.t })),
-    p_ms: Math.round((result.durationSec - result.timeLeft) * 1000),
-  };
+// Arguments for public.gry_goldhook_submit_run: no score field on purpose.
+export function buildSubmission(run, nick) {
+  return { p_nick: String(nick ?? ''), p_run: submission(run) };
 }
 
 // The PEP Games sign-in (Discord) keeps its session in this browser, like in PondOS (meme.js sbSession).
@@ -53,13 +52,14 @@ export function createScores(rpc, { now = () => Date.now() } = {}) {
   let inFlight = null;
   return {
     enabled: typeof rpc === 'function',
-    async submit(result, nick) {
-      const v = validateRun(result.run);
-      if (!v.ok) throw new Error('That round does not add up');
+    async submit(run, nick) {
+      if (!(run.over || run.finished)) throw new Error('Finish the run first');
+      const v = validateCampaign(submission(run));
+      if (!v.ok) throw new Error('That run does not add up');
       if (v.score <= 0) throw new Error('Nothing to submit');
-      const data = await rpc('gry_goldhook_submit', buildSubmission(result, nick));
+      const data = await rpc('gry_goldhook_submit_run', buildSubmission(run, nick));
       cache = null;
-      return data;                         // { nick, verified, place, score }
+      return data;                         // { nick, verified, place, score, level, best }
     },
     async top({ force = false } = {}) {
       if (!force && cache && now() - cache.at < TOP_CACHE_MS) return cache.rows;
@@ -68,6 +68,10 @@ export function createScores(rpc, { now = () => Date.now() } = {}) {
         .then((rows) => { cache = { at: now(), rows: Array.isArray(rows) ? rows : [] }; return cache.rows; })
         .finally(() => { inFlight = null; });
       return inFlight;
+    },
+    // The signed-in Discord player's saved stats: best score, best level, runs, all-time PEP.
+    async me() {
+      return rpc('gry_goldhook_me', {});
     },
   };
 }

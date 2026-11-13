@@ -105,6 +105,11 @@ export function createRenderer(canvas, assets) {
     drawAnchored('pm-winch', LAYOUT.winch.x, LAYOUT.winch.y);
   }
 
+  // The sticks of dynamite left, standing on the ground next to the miner.
+  function drawDynamiteStock(g) {
+    for (let i = 0; i < g.dynamite; i++) drawAnchored('pm-dynamite', 214 - i * 13, LAYOUT.surface.groundY - 16);
+  }
+
   // Sparkle on a delivered find, dust when the hook hits a rock: 4 atlas frames, 80 ms each, once.
   function drawEffects(g, manifest) {
     for (const e of g.effects) {
@@ -177,6 +182,7 @@ export function createRenderer(canvas, assets) {
     drawHookAndCargo(g);
     drawWinch();
     drawMiner(g, manifest);
+    drawDynamiteStock(g);
     if (!reducedMotion) drawEffects(g, manifest);
     drawHud(g, manifest);
     drawPopups(g, reducedMotion);

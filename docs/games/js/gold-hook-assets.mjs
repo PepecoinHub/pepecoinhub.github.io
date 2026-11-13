@@ -9,7 +9,7 @@ export const REQUIRED_ASSETS = [
   'pm-hud',
   // art pack P1
   'pm-surface', 'pm-earth-tile', 'pm-stone-tile', 'pm-winch', 'pm-hook-closed',
-  'pm-sparkle-atlas', 'pm-dust-atlas',
+  'pm-sparkle-atlas', 'pm-dust-atlas', 'pm-dynamite',
 ];
 
 function loadImage(url) {

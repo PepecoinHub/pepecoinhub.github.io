@@ -2,7 +2,7 @@
 // or DOM buttons). Space is taken only while the canvas has focus.
 import { VIEW, LAYOUT } from './gold-hook-config.mjs';
 
-export function attachInput(canvas, { onFire, onPauseKey }) {
+export function attachInput(canvas, { onFire, onPauseKey, onDynamite = () => {} }) {
   function toLogical(ev) {
     const r = canvas.getBoundingClientRect();
     return {
@@ -31,6 +31,9 @@ export function attachInput(canvas, { onFire, onPauseKey }) {
   window.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape') {
       if (onPauseKey()) ev.preventDefault();
+    } else if ((ev.key === 'd' || ev.key === 'D') && !ev.repeat && !ev.ctrlKey && !ev.metaKey && !ev.altKey
+      && !(ev.target instanceof HTMLInputElement)) {
+      onDynamite();
     }
   });
 }

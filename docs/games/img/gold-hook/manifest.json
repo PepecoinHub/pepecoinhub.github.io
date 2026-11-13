@@ -411,6 +411,24 @@
     28
    ],
    "sha256": "ab72ecd944e0d46525f83b1616628bfb509d42430bf61e3a00e340eca61a348c"
+  },
+  {
+   "id": "pm-dynamite",
+   "path": "objects/pm-dynamite.png",
+   "width": 16,
+   "height": 32,
+   "anchor": [
+    8,
+    16
+   ],
+   "alpha": "binary",
+   "contentBounds": [
+    2,
+    2,
+    13,
+    30
+   ],
+   "sha256": "110ee75946c95bcf50cb5e05382db3d4df0b41bd105793505eb40f6e5136be7d"
   }
  ],
  "atlas": {

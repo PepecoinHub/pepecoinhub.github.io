@@ -265,7 +265,7 @@
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
       ['YEET THE PEP', 'A frog, a catapult, no flight plan', 'yeet', function () { yeetApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', function () { pepeSweeperApp(); }],
-      ['Pepe Gold Hook', 'Swing, drop, reel in the gold', 'goldhook', function () { goldHookApp(); }],
+      ['Pepe Gold Hook', '20 levels, a shop, one hook', 'goldhook', function () { goldHookApp(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['PEPaint', 'The party room: draw and guess with frens', 'pepaint', function () { drawGuess(); }],
@@ -1391,7 +1391,7 @@
     yeet: 'Best flight per pilot. Guests add a flight with a nickname after landing.',
     wp: 'Points from the daily photo hunts. Guests count once per network.',
     miner: 'Blocks mined (10,000 game PEP each), from the cloud saves of Discord players. A guest’s mine stays in their browser.',
-    goldhook: 'Best score per player. The game sends the list of caught loot and the server counts the points itself.'
+    goldhook: 'Best run per player: PEP dug up over up to 20 levels. The game sends the levels played and the server replays the whole run.'
   };
   function highScores(game) {
     var A = openApp('hs', 'LEADERS - top 10', 'leaders', function (A) {
@@ -1629,7 +1629,7 @@
       ['LEADERS', 'Every top 10 in one place', 'leaders', 'scores high score top ranking leaderboard best winners', function () { highScores(); }],
       ['YEET THE PEP', 'Catapult a frog, three panic flaps', 'yeet', 'game catapult launch fly distance arcade', function () { yeetApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', 'game minesweeper saper flags lily pads wrong pepe eth arcade', function () { pepeSweeperApp(); }],
-      ['Pepe Gold Hook', 'Swing, drop, reel in the gold', 'goldhook', 'game gold hook claw miner mine nugget crate arcade', function () { goldHookApp(); }],
+      ['Pepe Gold Hook', '20 levels, a shop, one hook', 'goldhook', 'game gold hook claw miner mine nugget crate arcade levels shop upgrades dynamite', function () { goldHookApp(); }],
       ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', 'game arcade shooter invaders fud', invaders],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', 'game arcade snake blocks', snake],
       ['Pepe Miner', 'Click, mine, upgrade', 'pickaxe', 'game miner idle clicker mine blocks', minerApp],

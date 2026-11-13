@@ -1,6 +1,7 @@
 // Pure game logic: no DOM, canvas or system clock. Time comes from outside
 // (update(g, dt) in seconds), so results never depend on the device's frame rate.
-import { HOOK, LAYOUT, OBJECT_TYPES, ROUNDS, TIMING, ANIM_PRIORITY, GAME_ID } from './gold-hook-config.mjs';
+import { HOOK, LAYOUT, OBJECT_TYPES, TIMING, ANIM_PRIORITY, GAME_ID } from './gold-hook-config.mjs';
+import { levelDef, speedsFor } from './gold-hook-campaign.mjs';
 
 export const APP = { TITLE: 'TITLE', PLAYING: 'PLAYING', PAUSED: 'PAUSED', RESULT: 'RESULT' };
 export const HOOK_MODE = {
@@ -15,27 +16,36 @@ const DEG = Math.PI / 180;
 // Default reaction lengths (ms) from the art brief; replaced by the totals in manifest.json.
 const DEFAULT_REACTION_MS = { success: 600, fail: 650, hurt: 450 };
 
-export function createGame({ roundIndex = 0, reactionMs = DEFAULT_REACTION_MS } = {}) {
-  const g = {
-    app: APP.TITLE,
-    round: ROUNDS[roundIndex],
-    reactionMs: { ...DEFAULT_REACTION_MS, ...reactionMs },
-  };
-  resetRound(g);
+// A game plays one level at a time. `mods` are the shop upgrades the level is played with:
+// { strength, reel, dynamite, extraSec }.
+export function createGame({ level = levelDef(1), mods = {}, reactionMs = DEFAULT_REACTION_MS } = {}) {
+  const g = { app: APP.TITLE, reactionMs: { ...DEFAULT_REACTION_MS, ...reactionMs } };
+  setLevel(g, level, mods);
   return g;
+}
+
+export function setLevel(g, level, mods = {}) {
+  g.def = level;
+  g.mods = { strength: 0, reel: 0, dynamite: 0, extraSec: 0, ...mods };
+  resetRound(g);
 }
 
 // Full reset: objects, timer, hook, animations, messages.
 export function resetRound(g) {
-  const r = g.round;
+  const r = g.def;
   g.level = r.level;
   g.target = r.target;
-  g.timeLeft = r.durationSec;
+  g.duration = r.durationSec + g.mods.extraSec;
+  g.timeLeft = g.duration;
   g.score = 0;
+  g.speeds = speedsFor(g.mods);
+  g.dynamite = g.mods.dynamite;
+  g.dynamiteUsed = 0;
+  // Heavier loot on later levels: every object comes up slower by the level weight.
   g.objects = r.objects.map((o, i) => {
     const t = OBJECT_TYPES[o.type];
     return { id: i, type: o.type, asset: t.asset, x: o.x, y: o.y, r: t.radius,
-      points: t.points, speedMul: t.speedMul, caught: false };
+      points: t.points, speedMul: t.speedMul * r.weight, caught: false };
   });
   g.hook = { mode: HOOK_MODE.READY, phase: 0, angle: 0, length: HOOK.restLength, cargo: null };
   g.animClock = 0;          // ms of game time, for the idle/pull loops
@@ -78,6 +88,22 @@ export function fire(g) {
 
 export function hookDir(angleDeg) {
   return { x: Math.sin(angleDeg * DEG), y: Math.cos(angleDeg * DEG) };
+}
+
+// Dynamite: blow up whatever is on the hook (a rock, usually). The load is lost, the empty hook
+// comes back fast. Only while reeling something in, and only with a stick left.
+export function useDynamite(g) {
+  const h = g.hook;
+  if (g.app !== APP.PLAYING || h.mode !== HOOK_MODE.RETURNING_LOADED || g.dynamite <= 0) return false;
+  const { cx, cy } = hookGeometry(h);
+  g.effects.push({ kind: 'dust', x: cx, y: cy, t: 0 });
+  g.dynamite -= 1;
+  g.dynamiteUsed += 1;
+  h.cargo = null;
+  h.mode = HOOK_MODE.RETURNING_EMPTY;
+  setReaction(g, 'hurt');
+  g.events.push({ type: 'dynamite', left: g.dynamite });
+  return true;
 }
 
 // Hook mount (end of the rope) and cargo point.
@@ -130,7 +156,7 @@ function deliver(g) {
   h.cargo = null;
   if (cargo) {
     g.score += cargo.points;               // scored once, on delivery
-    g.catches.push({ id: cargo.id, t: Math.round((g.round.durationSec - g.timeLeft) * 1000) / 1000 });
+    g.catches.push({ id: cargo.id, t: Math.round((g.duration - g.timeLeft) * 1000) / 1000 });
     setReaction(g, 'success');
     const { cx, cy } = hookGeometry(h);
     g.popups.push({ text: `+${cargo.points}`, x: cx, y: cy - 24, t: 0 });
@@ -153,7 +179,7 @@ function stepHook(g, dt) {
     case HOOK_MODE.EXTENDING: {
       const prevLen = h.length;
       const before = hookGeometry(h);
-      h.length = Math.min(HOOK.maxLength, h.length + HOOK.extendSpeed * dt);
+      h.length = Math.min(HOOK.maxLength, h.length + g.speeds.extend * dt);
       const after = hookGeometry(h);
       // Collision along the path of the cargo point: a fast hook cannot skip an object.
       let best = null, bestT = Infinity;
@@ -177,7 +203,7 @@ function stepHook(g, dt) {
     }
     case HOOK_MODE.RETURNING_EMPTY:
     case HOOK_MODE.RETURNING_LOADED: {
-      const speed = h.cargo ? HOOK.returnLoadedSpeed * h.cargo.speedMul : HOOK.returnEmptySpeed;
+      const speed = h.cargo ? g.speeds.loaded * h.cargo.speedMul : g.speeds.empty;
       h.length -= speed * dt;
       if (h.length <= HOOK.restLength) deliver(g);
       break;
@@ -188,10 +214,10 @@ function stepHook(g, dt) {
 function endRound(g) {
   g.timeLeft = Math.max(0, g.timeLeft);
   // Anything still on the rope scores nothing; the game freezes as it is.
-  g.result = { won: g.score >= g.target, score: g.score, target: g.target,
-    timeLeft: g.timeLeft, durationSec: g.round.durationSec,
+  g.result = { won: g.score >= g.target, score: g.score, target: g.target, level: g.level,
+    timeLeft: g.timeLeft, durationSec: g.duration, played: g.duration - g.timeLeft,
     // Data for a score submission: the server counts the points itself from the object list.
-    run: { gameId: GAME_ID, layoutVersion: g.round.layoutVersion, catches: g.catches.slice() } };
+    run: { gameId: GAME_ID, level: g.level, catches: g.catches.slice(), dynamiteUsed: g.dynamiteUsed } };
   g.app = APP.RESULT;
   g.events.push({ type: 'end', ...g.result });
 }
