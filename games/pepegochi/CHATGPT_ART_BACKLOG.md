@@ -57,6 +57,18 @@ Jedna paczka naraz. Następna dopiero po sprawdzeniu poprzedniej.
 
 Podmiana 1:1: ta sama nazwa, ten sam kadr, ta sama wielkość i linia stóp. Zmienić tylko to, co opisane.
 
+Obecny kadr (widoczne piksele: lewo, góra, prawo, dół; dół 124 = linia stóp). Nowy plik ma stać w tym samym miejscu:
+środek przesunięty najwyżej o 6 px, wysokość różna najwyżej o 8 px, dół dokładnie 124.
+
+| Plik | Obecny kadr |
+|---|---|
+| `pepegochi_adult_hungry.png` | 26, 8, 100, 124 |
+| `pepegochi_adult_dirty.png` | 26, 8, 114, 124 (z muchą) |
+| `pepegochi_adult_recovering.png` | 26, 8, 100, 124 |
+| `pepegochi_froglet_idle.png` | 24, 30, 94, 124 |
+| `pepegochi_hatch_03.png` | 30, 20, 96, 124 (jajo 30–96 jak `hatch_01/02`, czubek skorupki uniesiony do y = 20) |
+| `pepegochi_hatch_04.png` | nowy: kijanka w miejscu `tadpole_idle` (16, 50, 111, 124), połówki skorupki obok, dół 124 |
+
 | Plik | Referencja | Co poprawić |
 |---|---|---|
 | `pepegochi_adult_hungry.png` | obecny plik + `adult_idle` | litera P jak w `adult_idle`; usunąć zbłąkane niebieskie piksele przy dłoniach i spodenkach; poza czytelna z daleka: obie dłonie na brzuchu, smutne oczy, mała pusta miska u stóp (mieści się w kadrze, dół na y = 124) |

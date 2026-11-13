@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
-import { decodePng, bbox, checkImage, checkFile, formatFor, FORMATS } from '../scripts/pepegochi_art_qa.mjs';
+import { decodePng, bbox, checkImage, checkFile, compareWith, formatFor, FORMATS } from '../scripts/pepegochi_art_qa.mjs';
 import { SPRITES, spriteSrc, DEPART_FRAMES, DEPART_DX, HATCH_FRAMES, CARE, careFrames, WALK, IMG, ITEMS, SUITCASE, LETTER } from '../docs/games/js/pepegochi-room.mjs';
 
 const path = src => new URL('../docs/games/' + src, import.meta.url);
@@ -53,6 +53,11 @@ test('the checks: a good sprite passes, every kind of mistake is named', () => {
   assert.equal(formatFor('docs/games/img/pepegochi/taskbar/tb_adult_sit.png'), 'B');
   assert.equal(formatFor('pepegochi_adult_hungry.png'), 'A');
   assert.deepEqual(FORMATS.B, { size: 48, grid: 1, maxColours: 32, foot: 47 });
+  // a replacement stands where the old picture stood
+  assert.equal(compareWith([26, 8, 100, 124], [27, 9, 100, 124]).ok, true);
+  assert.match(compareWith([40, 8, 114, 124], [26, 8, 100, 124]).problems.join(), /centre moved right by 14/);
+  assert.match(compareWith([26, 30, 100, 124], [26, 8, 100, 124]).problems.join(), /22 px shorter/);
+  assert.match(compareWith([26, 8, 100, 120], [26, 8, 100, 124]).problems.join(), /stands on y = 120/);
 });
 
 test('every frog sprite the game draws: the full check, except the accepted masters (size and feet only)', () => {
