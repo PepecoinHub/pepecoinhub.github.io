@@ -721,14 +721,63 @@
   window.addEventListener('pagehide', save);
 
   // ---------- cloud save: a player signed in with Discord keeps one copy of the mine on the server ----------
-  // (games/supabase/update_miner_cloud.sql). On start the better of the two saves wins (more all-time game PEP);
-  // after that the mine is sent every minute and when the page is hidden.
-  let cloud = null, sentAll = -1;
-  const push = () => {
-    if (!cloud || !S.started || S.allTime === sentAll) return;
-    save(); sentAll = S.allTime;
-    cloud.rpc('gry_miner_save', { p_data: S, p_all: S.allTime }).catch(() => { sentAll = -1; });
+  // (games/supabase/update_miner_cloud.sql). On start the better of the two saves wins (more all-time game PEP).
+  // After that the mine is sent every 5 minutes, and only when all-time game PEP changed since the last cloud
+  // save. It is also sent when the tab is hidden, when the page is left, and when PondOS closes the window
+  // (the desktop takes pepeMinerLeaveRequest and posts it itself). The server still keeps one row and drops a second
+  // write within 20 seconds. localStorage above is unchanged.
+  let cloud = null, sentAll = -1, sentDurable = false, sendGen = 0;
+  const markFail = (gen) => { if (gen === sendGen) { sentAll = -1; sentDurable = false; } };
+  // Builds one leave-save. Returns a request the caller posts, or null when there is nothing to send
+  // (or this frame already posted it, for the local backend). PondOS posts the request itself: the
+  // iframe is removed in the same turn, and a fetch that started inside the frame dies with it.
+  const beginLeave = () => {
+    if (!cloud || !S.started) return null;
+    if (S.allTime === sentAll && sentDurable) return null;
+    save();
+    const all = S.allTime, gen = ++sendGen, payload = { p_data: S, p_all: all };
+    sentAll = all;
+    const cfg = window.PEP_GRY;
+    if (!(cloud.kind === 'supabase' && cloud.sess && cloud.sess.access_token && cfg && cfg.supabaseUrl)) {
+      sentDurable = false;
+      cloud.rpc('gry_miner_save', payload).catch(() => markFail(gen));
+      return null;
+    }
+    sentDurable = true;
+    return {
+      gen,
+      url: cfg.supabaseUrl + '/rest/v1/rpc/gry_miner_save',
+      headers: { apikey: cfg.supabaseKey, Authorization: 'Bearer ' + cloud.sess.access_token, 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(payload),
+    };
   };
+  const postLeave = (req) => {
+    if (!req) return;
+    try {
+      fetch(req.url, { method: 'POST', keepalive: true, headers: req.headers, body: req.body })
+        .then((r) => { if (!r.ok) markFail(req.gen); }, () => markFail(req.gen));
+    } catch (e) {   // keepalive refuses a body over 64KB
+      sentDurable = false;
+      try { cloud.rpc('gry_miner_save', JSON.parse(req.body)).catch(() => markFail(req.gen)); } catch (e2) { markFail(req.gen); }
+    }
+  };
+  const push = (leave) => {
+    if (leave) { postLeave(beginLeave()); return; }
+    if (!cloud || !S.started || S.allTime === sentAll) return;
+    save();
+    const all = S.allTime, gen = ++sendGen;
+    sentAll = all; sentDurable = false;
+    cloud.rpc('gry_miner_save', { p_data: S, p_all: all }).catch(() => markFail(gen));
+  };
+  // Hidden tab, leaving the page, or a message: send from this document with keepalive.
+  window.pepeMinerFlush = () => push(true);
+  // PondOS (meme.js minerApp) takes the request and posts it from the desktop page, which stays open.
+  window.pepeMinerLeaveRequest = beginLeave;
+  window.addEventListener('message', (e) => {
+    if (e.origin !== location.origin) return;
+    const d = e.data;
+    if (d === 'pepe-miner-save' || (d && d.type === 'pepe-miner-save')) push(true);
+  });
   if (window.PEP_GRY) import('./backend.js').then((m) => m.getBackend()).then(async (be) => {
     const sess = be.kind === 'supabase' && be.session();
     if (!sess || sess.user.is_anonymous) return;
@@ -743,8 +792,10 @@
     if (S.started && mine > (r && r.all_time || 0)) push();
     let hi = false; try { hi = sessionStorage.getItem('pepminer-cloud-hi') === '1'; sessionStorage.setItem('pepminer-cloud-hi', '1'); } catch (e) {}
     if (!hi) toast('Cloud save on', 'Signed in with Discord: your mine is saved online too, so it opens on your other devices.', E('pep'));
-    setInterval(push, 60000);
-    document.addEventListener('visibilitychange', () => { if (document.hidden) push(); });
+    setInterval(push, 300000);
+    const leave = () => push(true);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) leave(); });
+    window.addEventListener('pagehide', leave);
   }).catch(() => {});
   if (/[?&]debug=1/.test(location.search)) window.__mn = {
     S: () => S, set: (o) => { Object.assign(S, o); renderAll(); }, spawnFoot, spawnTrap, runEvent, showEvent, fud, launchToken, hardFork, nextNews, setTab,

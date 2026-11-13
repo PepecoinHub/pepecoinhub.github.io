@@ -1633,6 +1633,20 @@
   function minerApp() {
     var A = openApp('miner', 'Pepe Miner', 'pickaxe', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/miner.html?embed=1" title="Pepe Miner"></iframe>';
+      var fr = A.body.querySelector('iframe');
+      // Close deletes this iframe in the same turn, before a posted message could run. Take the save
+      // from the game and post it from this page, which stays open, so the request is not cancelled
+      // with the frame. Minimizing does not come through here: the window stays, and the mine keeps running.
+      A.stop = function () {
+        try {
+          var w = fr.contentWindow;
+          if (!w) return;
+          if (typeof w.pepeMinerLeaveRequest === 'function') {
+            var req = w.pepeMinerLeaveRequest();
+            if (req && req.url) fetch(req.url, { method: 'POST', keepalive: true, headers: req.headers, body: req.body }).catch(function () {});
+          } else if (typeof w.pepeMinerFlush === 'function') w.pepeMinerFlush();
+        } catch (e) {}
+      };
     }, 1000);
     // the miner opens full screen (above the taskbar). Its progress is saved in this browser every few seconds
     // and when the window closes, so closing or minimizing never resets it.
@@ -4802,7 +4816,8 @@
     }, 480);
     return A;
   }
-  // the green online counter on the desktop icon and in the tray, refreshed every 45 seconds
+  // the green online counter on the desktop icon and in the tray, refreshed every 90 seconds
+  // while the LAN Party window is closed and this tab is visible. The first look is still soon after load.
   if (mainEl) {
     var pingOnline = function () { chatRpc('gry_lobby_chat', { p_after: 2147483647, p_visitor: visitorId() }).then(function (r) { paintOnline(r.online); }, function () {}); };
     setTimeout(pingOnline, 1500);
@@ -4818,7 +4833,7 @@
         b.addEventListener('click', function (e) { if (!e.target.closest('button')) { lanParty(); b.remove(); } });
       }, function () {});
     }, 6000);
-    setInterval(function () { if (!document.hidden && !apps.lan) pingOnline(); }, 45000);
+    setInterval(function () { if (!document.hidden && !apps.lan) pingOnline(); }, 90000);
     var trayEl2 = document.querySelector('.tray');
     if (trayEl2) {
       var tl = el('button', { type: 'button', class: 'tray-lan lan-badge', hidden: '', title: 'LAN Party chat' }, '<span class="lan-dot" aria-hidden="true"></span><span class="lan-n"></span><span class="sr"> online, open the chat</span>');
