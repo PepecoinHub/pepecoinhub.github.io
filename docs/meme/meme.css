@@ -843,8 +843,11 @@ footer.foot a { color: #edf3e3; }
 .app-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font: 400 12px/1.3 var(--f-chrome); color: var(--ink); }
 .app-row .grow { flex: 1; }
 .app-btn { padding: 8px 14px; background: var(--chrome); color: #000; font: 700 13px/1 var(--f-chrome); cursor: pointer; user-select: none; touch-action: none; }
+/* Touch pad only when this device is coarse+no-hover AND has no fine pointer (so
+   touchscreen laptops with a mouse/trackpad keep the canvas room and use the keyboard). */
 .touch-pad { display: none; }
-@media (hover: none), (pointer: coarse) { .touch-pad { display: flex; } }
+@media (hover: none) and (pointer: coarse) { .touch-pad { display: flex; } }
+@media (any-pointer: fine) { .touch-pad { display: none !important; } }
 .bin-list { list-style: none; margin: 0; padding: 4px; background: var(--pane); box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk); font: 400 12px/1.4 var(--f-chrome); color: var(--ink); }
 .bin-list li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 3px 4px; cursor: default; }
 .bin-list li:hover, .bin-list li.sel { background: var(--sel); color: #fff; }

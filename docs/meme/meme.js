@@ -1172,63 +1172,129 @@
   })();
   function invaders() {
     openApp('fud', 'FUD Invaders - receipts vs FUD', 'gif-008-still', function (A) {
-      A.body.innerHTML = '<canvas width="480" height="360" aria-label="FUD Invaders. Move with the arrow keys and fire receipts with Space."></canvas>' +
-        '<div class="app-row"><span class="grow fd-msg">Arrows or A/D to move, Space to fire receipts. Click to start.</span><button type="button" class="app-btn fd-again" hidden>▶ Play again</button><span class="fd-hi"></span></div>' +
+      A.body.innerHTML = '<canvas width="480" height="360" aria-label="FUD Invaders. Move with the arrow keys and fire receipts with Space. Esc pauses."></canvas>' +
+        '<div class="app-row"><span class="grow fd-msg">Arrows or A/D to move, Space to fire. Esc pauses. Click or drag to start.</span>' +
+        '<button type="button" class="app-btn fd-pause" hidden>⏸ Pause</button><button type="button" class="app-btn fd-again" hidden>▶ Play again</button><span class="fd-hi"></span></div>' +
         '<div class="app-row touch-pad"><button type="button" class="app-btn" data-k="left">◀</button><button type="button" class="app-btn" data-k="right">▶</button><button type="button" class="app-btn" data-k="fire">Fire receipt</button></div>';
       var cv = A.body.querySelector('canvas'), c = cv.getContext('2d'), msg = A.body.querySelector('.fd-msg'), hiEl = A.body.querySelector('.fd-hi');
+      var pauseB = A.body.querySelector('.fd-pause'), againB = A.body.querySelector('.fd-again');
       var W = 480, H = 360, WORDS = ['FUD', 'SCAM', 'RUG', 'DM ME', 'SEED?', '100x!!', 'FAKE', 'PUMP'];
       var ship = new Image(); ship.src = 'img/pep-logo.webp';
-      var st, keys = { left: 0, right: 0 }, raf, running = false, paused = false, overAt = 0, againB = A.body.querySelector('.fd-again');
+      var st, keys = { left: 0, right: 0 }, raf, running = false, paused = false, overAt = 0, ptr = null, bombGrace = 0;
       // after a game over a stray tap or a held Space must not wipe the score form: only Space (after a moment) or Play again restarts
       var canRestart = function (how) { return !paused && (!overAt || (how === 'again') || (how === 'space' && Date.now() - overAt > 900)); };
       var showHi = function () { hiEl.textContent = 'High score: ' + hiScore('pondos-fud'); };
+      var paintPause = function () { pauseB.hidden = !running; pauseB.textContent = paused ? '▶ Resume' : '⏸ Pause'; pauseB.setAttribute('aria-pressed', paused ? 'true' : 'false'); };
       showHi();
+      // Softer Wave 1: slower base + gentler ramp so a first clear is reachable before FUD drops into the pond.
       var wave = function (n) {
         var al = [];
         for (var r = 0; r < 4; r++) for (var k = 0; k < 6; k++) al.push({ x: 40 + k * 66, y: 34 + r * 34, w: 56, h: 22, t: WORDS[(r * 6 + k + n) % WORDS.length], alive: true });
-        return { al: al, dir: 1, speed: 0.45 + n * 0.18, shots: [], bombs: [], cool: 0 };
+        return { al: al, dir: 1, speed: 0.32 + n * 0.12, shots: [], bombs: [], cool: 0 };
       };
       var t0 = 0;
-      var reset = function () { overAt = 0; paused = false; againB.hidden = true; st = { x: W / 2, lives: 3, score: 0, n: 0 }; Object.assign(st, wave(0)); running = true; t0 = Date.now(); var o = A.body.querySelector('.hs-submit'); if (o) o.remove(); msg.textContent = 'Wave 1. Receipts beat FUD.'; };
+      var reset = function () {
+        overAt = 0; paused = false; againB.hidden = true; ptr = null;
+        st = { x: W / 2, lives: 3, score: 0, n: 0 }; Object.assign(st, wave(0));
+        running = true; t0 = Date.now(); bombGrace = 180; // ~3s at 60fps before bombs start
+        var o = A.body.querySelector('.hs-submit'); if (o) o.remove();
+        msg.textContent = 'Wave 1. Receipts beat FUD. Esc pauses.';
+        paintPause();
+      };
       var fire = function (how) { if (paused) return; if (!running) { if (canRestart(how)) reset(); return; } if (st.cool > 0 || st.shots.length > 2) return; st.shots.push({ x: st.x, y: H - 40 }); st.cool = 16; };
-      cv.addEventListener('pointerdown', function (e) { if (paused) return; if (!running) { if (canRestart('tap')) reset(); return; } fire(); });
+      var moveShipTo = function (clientX) {
+        var r = cv.getBoundingClientRect();
+        st.x = Math.min(Math.max((clientX - r.left) / r.width * W, 20), W - 20);
+      };
+      // Tap fires; a drag only steers — phone players were shooting when they meant to move.
+      cv.addEventListener('pointerdown', function (e) {
+        if (paused) return;
+        if (!running) { if (canRestart('tap')) reset(); return; }
+        ptr = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
+        try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+        if (e.pointerType === 'mouse') moveShipTo(e.clientX);
+      });
+      cv.addEventListener('pointermove', function (e) {
+        if (!running || paused) return;
+        if (ptr && e.pointerId === ptr.id) {
+          if (Math.abs(e.clientX - ptr.x) + Math.abs(e.clientY - ptr.y) > 10) ptr.moved = true;
+          moveShipTo(e.clientX);
+          return;
+        }
+        // Desktop: hover without a button still steers the ship.
+        if (e.pointerType === 'mouse' && !e.buttons) moveShipTo(e.clientX);
+      });
+      var endPtr = function (e) {
+        if (!ptr || e.pointerId !== ptr.id) return;
+        if (running && !paused && !ptr.moved) fire('tap');
+        ptr = null;
+      };
+      cv.addEventListener('pointerup', endPtr);
+      cv.addEventListener('pointercancel', function (e) { if (ptr && e.pointerId === ptr.id) ptr = null; });
       againB.addEventListener('click', function () { reset(); });
-      cv.addEventListener('pointermove', function (e) { if (!running || paused || e.pointerType === 'mouse' && !e.buttons) { if (running && !paused && e.pointerType === 'mouse') { var r0 = cv.getBoundingClientRect(); st.x = Math.min(Math.max((e.clientX - r0.left) / r0.width * W, 20), W - 20); } return; } var r = cv.getBoundingClientRect(); st.x = Math.min(Math.max((e.clientX - r.left) / r.width * W, 20), W - 20); });
+      pauseB.addEventListener('click', function () { if (paused) A.resume(); else A.pause(); });
       A.body.querySelectorAll('[data-k]').forEach(function (b) {
         var k = b.getAttribute('data-k');
         if (k === 'fire') b.addEventListener('pointerdown', function () { fire('tap'); });
         else { b.addEventListener('pointerdown', function () { if (!paused) keys[k] = 1; }); ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) { b.addEventListener(t, function () { keys[k] = 0; }); }); }
       });
-      var unkey = gameKeys(A, { ArrowLeft: function (d) { keys.left = d; }, ArrowRight: function (d) { keys.right = d; }, a: function (d) { keys.left = d; }, d: function (d) { keys.right = d; }, ' ': function (d) { if (d) fire('space'); } });
-      var end = function (text) { running = false; paused = false; overAt = Date.now(); againB.hidden = false; hiScore('pondos-fud', st.score); showHi(); msg.textContent = text + ' Score ' + st.score + '. Space or Play again for a new game.'; offerSubmit(A, 'fud', st.score, Date.now() - t0); };
+      var unkey = gameKeys(A, {
+        ArrowLeft: function (d) { keys.left = d; }, ArrowRight: function (d) { keys.right = d; },
+        a: function (d) { keys.left = d; }, d: function (d) { keys.right = d; },
+        ' ': function (d) { if (d) fire('space'); },
+        Escape: function (d) { if (d && running) { if (paused) A.resume(); else A.pause(); } }
+      });
+      var end = function (text) {
+        running = false; paused = false; ptr = null; overAt = Date.now(); againB.hidden = false; paintPause();
+        hiScore('pondos-fud', st.score); showHi();
+        msg.textContent = text + ' Score ' + st.score + '. Space or Play again for a new game.';
+        offerSubmit(A, 'fud', st.score, Date.now() - t0);
+      };
       var frame = function () {
         c.fillStyle = '#071009'; c.fillRect(0, 0, W, H);
         for (var i = 0; i < 40; i++) { c.fillStyle = 'rgba(180,230,190,' + (0.15 + (i % 3) * 0.1) + ')'; c.fillRect((i * 97) % W, (i * 53) % (H - 60), 2, 2); }
         if (running && !paused) {
           if (keys.left) st.x = Math.max(20, st.x - 4); if (keys.right) st.x = Math.min(W - 20, st.x + 4);
           if (st.cool > 0) st.cool--;
+          if (bombGrace > 0) bombGrace--;
           var minX = W, maxX = 0, low = 0, alive = 0;
           st.al.forEach(function (a) { if (!a.alive) return; alive++; a.x += st.dir * st.speed; minX = Math.min(minX, a.x); maxX = Math.max(maxX, a.x + a.w); low = Math.max(low, a.y + a.h); });
           // Flip and step back onto the playfield so a fast wave cannot bounce/drop twice in one stride.
           if (alive && (maxX > W - 6 || minX < 6)) {
             st.dir = -st.dir;
-            st.al.forEach(function (a) { if (!a.alive) return; a.x += st.dir * st.speed; a.y += 12; });
+            st.al.forEach(function (a) { if (!a.alive) return; a.x += st.dir * st.speed; a.y += 10; });
           }
-          if (Math.random() < 0.012 + st.n * 0.004) { var live = st.al.filter(function (a) { return a.alive; }); var sh = live[Math.floor(Math.random() * live.length)]; if (sh) st.bombs.push({ x: sh.x + sh.w / 2, y: sh.y + sh.h }); }
+          // Fewer early bombs; rate still climbs with the wave.
+          if (bombGrace <= 0 && Math.random() < 0.006 + st.n * 0.003) {
+            var live = st.al.filter(function (a) { return a.alive; });
+            var sh = live[Math.floor(Math.random() * live.length)];
+            if (sh) st.bombs.push({ x: sh.x + sh.w / 2, y: sh.y + sh.h });
+          }
           st.shots.forEach(function (s) { s.y -= 7; st.al.forEach(function (a) { if (a.alive && s.y > a.y && s.y < a.y + a.h && s.x > a.x && s.x < a.x + a.w) { a.alive = false; s.y = -99; st.score += 10; } }); });
           st.shots = st.shots.filter(function (s) { return s.y > -10; });
-          st.bombs.forEach(function (b) { b.y += 3 + st.n * 0.4; if (b.y > H - 44 && b.y < H - 20 && Math.abs(b.x - st.x) < 18) { b.y = H + 99; st.lives--; msg.textContent = st.lives > 0 ? 'Hit by FUD. ' + st.lives + ' lives left. Breathe, check the source.' : ''; } });
+          st.bombs.forEach(function (b) { b.y += 2.6 + st.n * 0.3; if (b.y > H - 44 && b.y < H - 20 && Math.abs(b.x - st.x) < 18) { b.y = H + 99; st.lives--; msg.textContent = st.lives > 0 ? 'Hit by FUD. ' + st.lives + ' lives left. Breathe, check the source.' : ''; } });
           st.bombs = st.bombs.filter(function (b) { return b.y < H; });
           if (st.lives <= 0) end('The FUD got through. DYOR and try again.');
           else if (low > H - 50) end('FUD reached the pond.');
-          else if (!alive) { st.n++; var keep = { x: st.x, lives: st.lives, score: st.score, n: st.n }; st = Object.assign(keep, wave(st.n)); msg.textContent = 'Wave ' + (st.n + 1) + '. Receipts > FUD. The FUD gets faster, as FUD does.'; }
+          else if (!alive) {
+            st.n++; var keep = { x: st.x, lives: st.lives, score: st.score, n: st.n };
+            st = Object.assign(keep, wave(st.n)); bombGrace = 90;
+            msg.textContent = 'Wave ' + (st.n + 1) + '. Receipts > FUD. The FUD gets faster, as FUD does.';
+          }
         }
         if (st) {
           st.al.forEach(function (a) { if (!a.alive) return; c.fillStyle = '#5a1f1a'; c.fillRect(a.x, a.y, a.w, a.h); c.strokeStyle = '#e9726a'; c.lineWidth = 1.5; c.strokeRect(a.x + 0.5, a.y + 0.5, a.w - 1, a.h - 1); c.fillStyle = '#ffd5cf'; c.font = 'bold 11px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(a.t, a.x + a.w / 2, a.y + a.h / 2 + 1); });
           c.fillStyle = '#fffbe0'; st.shots.forEach(function (s) { c.fillRect(s.x - 3, s.y, 6, 10); c.fillStyle = '#8a8'; c.fillRect(s.x - 2, s.y + 3, 4, 1); c.fillStyle = '#fffbe0'; });
           c.fillStyle = '#ff7a6a'; st.bombs.forEach(function (b) { c.fillRect(b.x - 2, b.y, 4, 9); });
           if (ship.complete && ship.naturalWidth) c.drawImage(ship, st.x - 18, H - 46, 36, 36); else drawCoin(c, st.x, H - 28, 16);
-          c.fillStyle = '#7fd196'; c.font = '12px Tahoma, sans-serif'; c.textAlign = 'left'; c.textBaseline = 'top'; c.fillText('Score ' + st.score + '   Lives ' + '♥'.repeat(Math.max(0, st.lives)) + '   Wave ' + (st.n + 1), 8, 8);
+          c.fillStyle = '#7fd196'; c.font = '12px Tahoma, sans-serif'; c.textAlign = 'left'; c.textBaseline = 'top';
+          c.fillText('Score ' + st.score + '   Lives ' + '♥'.repeat(Math.max(0, st.lives)) + '   Wave ' + (st.n + 1), 8, 8);
+          if (paused) {
+            c.fillStyle = 'rgba(0,0,0,0.45)'; c.fillRect(0, 0, W, H);
+            c.fillStyle = '#7fd196'; c.font = 'bold 22px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+            c.fillText('PAUSED', W / 2, H / 2 - 8); c.font = '13px Tahoma, sans-serif'; c.fillStyle = '#cfe8d4';
+            c.fillText('Esc or Resume to continue', W / 2, H / 2 + 18);
+          }
         } else {
           c.fillStyle = '#7fd196'; c.font = 'bold 22px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
           c.fillText('FUD INVADERS', W / 2, H / 2 - 24); c.font = '13px Tahoma, sans-serif'; c.fillStyle = '#cfe8d4';
@@ -1238,59 +1304,89 @@
       };
       raf = requestAnimationFrame(frame);
       A.stop = function () { cancelAnimationFrame(raf); raf = 0; paused = false; unkey(); };
-      A.pause = function () { if (!running || paused) return; cancelAnimationFrame(raf); raf = 0; paused = true; keys.left = keys.right = 0; };
-      A.resume = function () { if (!paused) return; paused = false; if (!raf) raf = requestAnimationFrame(frame); };
+      A.pause = function () { if (!running || paused) return; paused = true; keys.left = keys.right = 0; ptr = null; msg.textContent = 'Paused. Esc or Resume to continue.'; paintPause(); };
+      A.resume = function () { if (!paused) return; paused = false; msg.textContent = 'Back in the pond. Receipts ready.'; paintPause(); if (!raf) raf = requestAnimationFrame(frame); };
     }, 520);
   }
 
   // ---------- PEP Snake: eat blocks, grow, don't fork yourself ----------
   function snake() {
     openApp('snake', 'PEP Snake - eat blocks, not your tail', 'pep-logo', function (A) {
-      A.body.innerHTML = '<canvas width="480" height="360" aria-label="PEP Snake. Steer with the arrow keys or by swiping."></canvas>' +
-        '<div class="app-row"><span class="grow sn-msg">Arrows, WASD or swipe to steer. Click to start.</span><button type="button" class="app-btn sn-again" hidden>▶ Play again</button><span class="sn-hi"></span></div>' +
+      A.body.innerHTML = '<canvas width="480" height="360" aria-label="PEP Snake. Steer with the arrow keys or by swiping. Esc pauses."></canvas>' +
+        '<div class="app-row"><span class="grow sn-msg">Arrows, WASD or swipe to steer. Esc pauses. Click to start.</span>' +
+        '<button type="button" class="app-btn sn-pause" hidden>⏸ Pause</button><button type="button" class="app-btn sn-again" hidden>▶ Play again</button><span class="sn-hi"></span></div>' +
         '<div class="app-row touch-pad"><button type="button" class="app-btn" data-k="left">◀</button><button type="button" class="app-btn" data-k="up">▲</button><button type="button" class="app-btn" data-k="down">▼</button><button type="button" class="app-btn" data-k="right">▶</button></div>';
       var cv = A.body.querySelector('canvas'), c = cv.getContext('2d'), msg = A.body.querySelector('.sn-msg'), hiEl = A.body.querySelector('.sn-hi');
+      var pauseB = A.body.querySelector('.sn-pause'), againB = A.body.querySelector('.sn-again');
       var CS = 24, CW = 20, CH = 15, face = new Image(); face.src = 'img/pep-logo.webp';
-      var s = null, dir, next, food, timer = null, tickMs, overAt = 0, held = false, againB = A.body.querySelector('.sn-again');
+      var s = null, dir, next, food, timer = null, tickMs, overAt = 0, held = false, dead = false, deadWhy = '', deadBlocks = 0;
       // after a game over only Space (after a moment) or Play again starts a new game, so the score form stays put.
-      // held means paused (minimize / hidden tab): never treat that as "not started".
+      // held means paused (minimize / hidden tab / Pause button): never treat that as "not started".
       var mayStart = function (how) { return !held && (!overAt || how === 'again' || (how === 'space' && Date.now() - overAt > 900)); };
       var DIRS = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] };
       var EAT = ['Block found. +10,000 PEP (on paper).', 'Another block. The chain grows, so do you.', 'Mined. Not minted.', 'One block every ~60 seconds. You are faster.'];
       var showHi = function () { hiEl.textContent = 'Best: ' + hiScore('pondos-snake') + ' blocks'; };
+      var paintPause = function () {
+        var live = !!(timer || held) && !dead;
+        pauseB.hidden = !live; pauseB.textContent = held ? '▶ Resume' : '⏸ Pause';
+        pauseB.setAttribute('aria-pressed', held ? 'true' : 'false');
+      };
       showHi();
       var place = function () { do { food = [Math.floor(Math.random() * CW), Math.floor(Math.random() * CH)]; } while (s.some(function (p) { return p[0] === food[0] && p[1] === food[1]; })); };
       // Compare the queued turn to both the current and next heading so a quick up+left cannot reverse into the body.
       var turn = function (k) {
-        var d = DIRS[k]; if (!d || !s || held || !timer) return;
+        var d = DIRS[k]; if (!d || !s || held || dead || !timer) return;
         var against = next || dir;
         if (d[0] === -against[0] && d[1] === -against[1]) return;
         if (d[0] === -dir[0] && d[1] === -dir[1]) return;
         next = d;
       };
-      var draw = function () {
+      var drawBoard = function () {
         c.fillStyle = '#071009'; c.fillRect(0, 0, 480, 360);
         c.strokeStyle = 'rgba(120,200,140,0.06)';
         for (var x = 0; x <= CW; x++) { c.beginPath(); c.moveTo(x * CS, 0); c.lineTo(x * CS, 360); c.stroke(); }
         for (var y = 0; y <= CH; y++) { c.beginPath(); c.moveTo(0, y * CS); c.lineTo(480, y * CS); c.stroke(); }
-        if (!s) {
-          c.fillStyle = '#7fd196'; c.font = 'bold 22px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
-          c.fillText('PEP SNAKE', 240, 150); c.font = '13px Tahoma, sans-serif'; c.fillStyle = '#cfe8d4';
-          c.fillText('Eat blocks. Each one is worth 10,000 PEP, on paper.', 240, 182); c.fillText('Click to start', 240, 206); return;
-        }
-        drawCoin(c, food[0] * CS + CS / 2, food[1] * CS + CS / 2, 9);
+      };
+      var drawSnake = function () {
+        if (food) drawCoin(c, food[0] * CS + CS / 2, food[1] * CS + CS / 2, 9);
         for (var i = s.length - 1; i > 0; i--) { c.fillStyle = i % 2 ? '#3f9c5c' : '#4fb36d'; c.fillRect(s[i][0] * CS + 2, s[i][1] * CS + 2, CS - 4, CS - 4); }
         var h = s[0];
         if (face.complete && face.naturalWidth) c.drawImage(face, h[0] * CS - 2, h[1] * CS - 2, CS + 4, CS + 4); else drawCoin(c, h[0] * CS + CS / 2, h[1] * CS + CS / 2, 11);
         c.fillStyle = '#7fd196'; c.font = '12px Tahoma, sans-serif'; c.textAlign = 'left'; c.textBaseline = 'top';
         c.fillText('Blocks ' + (s.length - 3) + '   PEP on paper ' + fmt.int((s.length - 3) * 10000), 6, 4);
       };
+      var draw = function () {
+        drawBoard();
+        if (dead && s) {
+          drawSnake();
+          c.fillStyle = 'rgba(0,0,0,0.5)'; c.fillRect(0, 0, 480, 360);
+          c.fillStyle = '#7fd196'; c.font = 'bold 22px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+          c.fillText('GAME OVER', 240, 150);
+          c.font = '13px Tahoma, sans-serif'; c.fillStyle = '#cfe8d4';
+          c.fillText(deadWhy, 240, 182);
+          c.fillText(deadBlocks + ' block' + (deadBlocks === 1 ? '' : 's') + ' · Space or Play again', 240, 206);
+          return;
+        }
+        if (!s) {
+          c.fillStyle = '#7fd196'; c.font = 'bold 22px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+          c.fillText('PEP SNAKE', 240, 150); c.font = '13px Tahoma, sans-serif'; c.fillStyle = '#cfe8d4';
+          c.fillText('Eat blocks. Each one is worth 10,000 PEP, on paper.', 240, 182); c.fillText('Click to start', 240, 206); return;
+        }
+        drawSnake();
+        if (held) {
+          c.fillStyle = 'rgba(0,0,0,0.45)'; c.fillRect(0, 0, 480, 360);
+          c.fillStyle = '#7fd196'; c.font = 'bold 22px Tahoma, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+          c.fillText('PAUSED', 240, 168); c.font = '13px Tahoma, sans-serif'; c.fillStyle = '#cfe8d4';
+          c.fillText('Esc or Resume to continue', 240, 196);
+        }
+      };
       var over = function (why) {
         clearInterval(timer); timer = null; held = false;
-        var blocks = s.length - 3; hiScore('pondos-snake', blocks); showHi(); offerSubmit(A, 'snake', blocks, Date.now() - t0);
-        overAt = Date.now(); againB.hidden = false;
-        msg.textContent = why + ' Blocks mined: ' + blocks + ' (' + fmt.int(blocks * 10000) + ' PEP, on paper). Space or Play again for a new game.';
-        s = null; setTimeout(draw, 900);
+        deadBlocks = s.length - 3; deadWhy = why; dead = true;
+        hiScore('pondos-snake', deadBlocks); showHi(); offerSubmit(A, 'snake', deadBlocks, Date.now() - t0);
+        overAt = Date.now(); againB.hidden = false; paintPause();
+        msg.textContent = why + ' Blocks mined: ' + deadBlocks + ' (' + fmt.int(deadBlocks * 10000) + ' PEP, on paper). Space or Play again for a new game.';
+        draw(); // keep the corpse + GAME OVER overlay (no flash back to the title screen)
       };
       var tick = function () {
         dir = next;
@@ -1305,21 +1401,36 @@
         draw();
       };
       var t0 = 0;
-      var start = function (how) { if (timer || held || !mayStart(how)) return false; overAt = 0; againB.hidden = true; t0 = Date.now(); var o = A.body.querySelector('.hs-submit'); if (o) o.remove(); s = [[8, 7], [7, 7], [6, 7]]; dir = next = [1, 0]; place(); tickMs = 140; msg.textContent = 'Go, fren. Blocks are coins.'; draw(); timer = setInterval(tick, tickMs); return true; };
+      var start = function (how) {
+        if (timer || held || !mayStart(how)) return false;
+        overAt = 0; dead = false; deadWhy = ''; againB.hidden = true; t0 = Date.now();
+        var o = A.body.querySelector('.hs-submit'); if (o) o.remove();
+        s = [[8, 7], [7, 7], [6, 7]]; dir = next = [1, 0]; place(); tickMs = 140;
+        msg.textContent = 'Go, fren. Blocks are coins. Esc pauses.';
+        draw(); timer = setInterval(tick, tickMs); paintPause(); return true;
+      };
       againB.addEventListener('click', function () { start('again'); });
+      pauseB.addEventListener('click', function () { if (held) A.resume(); else A.pause(); });
       cv.addEventListener('pointerdown', function (e) {
+        if (dead) return; // score form stays; Space / Play again only
         if (!timer) { if (!held) start('tap'); return; }
+        if (held) return;
         var sx = e.clientX, sy = e.clientY;
         var up = function (ev) { cv.removeEventListener('pointerup', up); var dx = ev.clientX - sx, dy = ev.clientY - sy; if (Math.abs(dx) + Math.abs(dy) < 18) return; turn(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up')); };
         cv.addEventListener('pointerup', up);
       });
-      A.body.querySelectorAll('[data-k]').forEach(function (b) { b.addEventListener('pointerdown', function () { if (held) return; if (!timer && !start('tap')) return; turn(b.getAttribute('data-k')); }); });
-      var K = function (k) { return function (d) { if (d) { if (held) return; if (!timer && !start('key')) return; turn(k); } }; };
-      var unkey = gameKeys(A, { ArrowLeft: K('left'), ArrowRight: K('right'), ArrowUp: K('up'), ArrowDown: K('down'), a: K('left'), d: K('right'), w: K('up'), s: K('down'), ' ': function (d) { if (d && !timer && !held) start('space'); } });
+      A.body.querySelectorAll('[data-k]').forEach(function (b) { b.addEventListener('pointerdown', function () { if (held || dead) return; if (!timer && !start('tap')) return; turn(b.getAttribute('data-k')); }); });
+      var K = function (k) { return function (d) { if (d) { if (held || dead) return; if (!timer && !start('key')) return; turn(k); } }; };
+      var unkey = gameKeys(A, {
+        ArrowLeft: K('left'), ArrowRight: K('right'), ArrowUp: K('up'), ArrowDown: K('down'),
+        a: K('left'), d: K('right'), w: K('up'), s: K('down'),
+        ' ': function (d) { if (d && !timer && !held) start('space'); },
+        Escape: function (d) { if (!d || dead) return; if (held) A.resume(); else if (timer) A.pause(); }
+      });
       face.onload = draw; draw();
       A.stop = function () { clearInterval(timer); timer = null; held = false; unkey(); };
-      A.pause = function () { if (timer) { clearInterval(timer); timer = null; held = true; msg.textContent = 'Paused. The snake waits for you.'; } };
-      A.resume = function () { if (held && s) { held = false; timer = setInterval(tick, tickMs); msg.textContent = 'Back in the pond!'; } };
+      A.pause = function () { if (timer) { clearInterval(timer); timer = null; held = true; msg.textContent = 'Paused. Esc or Resume to continue.'; paintPause(); draw(); } };
+      A.resume = function () { if (held && s && !dead) { held = false; timer = setInterval(tick, tickMs); msg.textContent = 'Back in the pond!'; paintPause(); draw(); } };
     }, 520);
   }
 
@@ -1702,11 +1813,15 @@
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
         ['PEPaint.exe', 'pepaint', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];
       A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="' + ico(g[1]) + '" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or get a link for a fren. PEPaint: the party room, draw and guess with frens. 🏆 LEADERS has every top 10.</p>';
+        '<p class="bin-tip">Click a game to open it. Chess, Checkers, Connect Four and Sea Battle: play the bot, or get a link for a fren. PEPaint: the party room, draw and guess with frens. 🏆 LEADERS has every top 10.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { G[+b.getAttribute('data-i')][2](); };
-        b.addEventListener('dblclick', go);
-        b.addEventListener('click', function () { if (!matchMedia('(hover: hover) and (pointer: fine)').matches) go(); else { A.body.querySelectorAll('.folder .sel').forEach(function (x) { x.classList.remove('sel'); }); b.classList.add('sel'); } });
+        // Single click opens (desktop used to require double-click, which made FUD/Snake look broken).
+        b.addEventListener('click', function () {
+          A.body.querySelectorAll('.folder .sel').forEach(function (x) { x.classList.remove('sel'); });
+          b.classList.add('sel');
+          go();
+        });
         b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
       });
     }, 520);
