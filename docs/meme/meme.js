@@ -1546,6 +1546,16 @@
     var A = openApp('pepegochi', 'PEPEGOCHI.EXE', 'pep-logo', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepegochi-live.html?embed=1" title="PEPEGOCHI.EXE"></iframe>';
     }, 760);
+    // closing or minimizing the window: the frog hops out of it onto the taskbar (pepegochi-taskbar.mjs)
+    if (A && !A._hop) {
+      A._hop = function () {
+        var r = A.host.getBoundingClientRect();
+        if (r.width) window.dispatchEvent(new CustomEvent('pondos:pepegochi-left', { detail: { left: r.left, top: r.top, width: r.width, height: r.height } }));
+      };
+      A.stop = A._hop;
+      var minBtn = A.host.querySelector('.w-min');
+      if (minBtn) minBtn.addEventListener('click', A._hop, true);
+    }
     return A;
   }
   // the rules simulator for testers: a local copy of the rules with a time machine, no server, no stamps
@@ -1554,6 +1564,14 @@
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepegochi.html?embed=1" title="PEPEGOCHI.EXE (local test)"></iframe>';
     }, 760);
     return A;
+  }
+  // Read-only PepeGochi companion on the PondOS taskbar; beta gate stays in place.
+  // The real game and server own the pet; this module never invents a local pet.
+  if (GOCHI && top && top.querySelector('.bar')) {
+    import('./pepegochi-taskbar.mjs?v=20261113facts').then(function (m) {
+      m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
+        session: sbSession, rpc: rpc, base: BASE });
+    }).catch(function () { /* optional decoration; the game still works */ });
   }
   function pondWarsApp() {
     var A = openApp('pondwars', 'FROGAGEDDON · BETA', 'pondwars', function (A) {
@@ -2831,6 +2849,7 @@
         if (out) out.addEventListener('click', function () {
           try { Object.keys(localStorage).forEach(function (k) { if (/^sb-azbwciqfbsdpwubznncg-auth-token/.test(k)) localStorage.removeItem(k); }); } catch (e) {}
           paintLogon(); paint();
+          window.dispatchEvent(new Event('pondos:auth-changed'));
         });
       };
       paint();

@@ -1990,3 +1990,79 @@ footer.foot a { color: #edf3e3; }
 
 /* boot.js: until meme.js has built the desktop, show only the wallpaper (no flash of the plain page) */
 .pond-boot body > *:not(noscript) { visibility: hidden; }
+
+
+/* PepeGochi's taskbar companion (beta). One existing 128px sprite, no GIFs or timers. */
+.pondos .pg-companion { position: relative; flex: none; display: inline-flex; align-items: center; height: 40px; }
+.pondos .pg-companion-button { position: relative; display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 40px; padding: 0; border: 0; background: transparent; cursor: pointer; color: var(--ink); }
+.pondos .pg-companion-button img { width: 42px; height: 42px; object-fit: contain; image-rendering: pixelated;
+  max-width: none; position: relative; top: -3px; }
+.pondos .pg-companion-button:hover img { top: -5px; }
+.pondos .pg-companion-alert { position: absolute; top: 1px; right: 0; width: 9px; height: 9px;
+  background: #d04432; border: 1px solid #fff; border-radius: 0; }
+.pondos .pg-companion-hint { position: absolute; z-index: 150; bottom: calc(100% + 3px); left: 50%;
+  transform: translateX(-50%); display: block; padding: 4px 7px; white-space: nowrap; font: 700 11px/1.2 var(--f-chrome);
+  color: var(--ink); background: var(--chrome); border: 1px solid var(--chrome-dk); box-shadow: 2px 2px 0 #1116;
+  visibility: hidden; pointer-events: none; }
+.pondos .pg-companion-button:hover .pg-companion-hint,
+.pondos .pg-companion-button:focus-visible .pg-companion-hint { visibility: visible; }
+@media (max-width: 480px) {
+  .pondos .pg-companion { height: 36px; }
+  .pondos .pg-companion-button { width: 34px; height: 36px; }
+  .pondos .pg-companion-button img { width: 34px; height: 34px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pondos .pg-companion-button:hover img { top: -3px; }
+}
+
+/* Short, rare PepeGochi actions: no perpetual CSS loop or extra network requests. */
+.pondos .pg-companion-sleep { position: absolute; top: -7px; right: 0; z-index: 2; font: bold 12px/1 var(--f-chrome);
+  color: var(--ink); pointer-events: none; }
+/* whole-pixel moves only (no rotation), so the pixel art never blurs between two places */
+.pondos .pg-companion-button[class*="pg-motion-"] img { animation: 950ms steps(1, end) both; transform-origin: 50% 95%; }
+.pondos .pg-motion-wobble img { animation-name: pgc-wobble !important; }
+.pondos .pg-motion-bob img { animation-name: pgc-bob !important; }
+.pondos .pg-motion-peek img { animation-name: pgc-peek !important; }
+.pondos .pg-motion-hop img { animation-name: pgc-hop !important; }
+.pondos .pg-motion-shuffle img { animation-name: pgc-shuffle !important; }
+.pondos .pg-motion-greet img { animation-name: pgc-greet !important; }
+.pondos .pg-motion-nod img { animation-name: pgc-nod !important; }
+.pondos .pg-motion-slouch img { animation-name: pgc-slouch !important; }
+.pondos .pg-motion-tremble img { animation-name: pgc-tremble !important; }
+@keyframes pgc-wobble { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 50% { transform: translateX(2px); } 75% { transform: translateX(-1px); } }
+@keyframes pgc-bob { 0%, 100% { transform: translateY(0); } 35%, 70% { transform: translateY(-2px); } }
+@keyframes pgc-peek { 0%, 100% { transform: translateX(0); } 22%, 40% { transform: translateX(-3px); } 65%, 82% { transform: translateX(3px); } }
+@keyframes pgc-hop { 0%, 100% { transform: translateY(0); } 20% { transform: translateY(2px); } 43% { transform: translateY(-9px); } 60% { transform: translateY(-6px); } 80% { transform: translateY(1px); } }
+@keyframes pgc-shuffle { 0%, 100% { transform: translateX(0); } 22% { transform: translateX(-4px); } 48% { transform: translateX(4px); } 70% { transform: translateX(-2px); } }
+@keyframes pgc-greet { 0%, 100% { transform: translate(0, 0); } 25%, 65% { transform: translate(-1px, -3px); } 45%, 82% { transform: translate(1px, -1px); } }
+@keyframes pgc-nod { 0%, 100% { transform: translateY(0); } 30%, 68% { transform: translate(1px, 2px); } }
+@keyframes pgc-slouch { 0%, 100% { transform: translateY(0); } 30%, 70% { transform: translate(-1px, 3px); } }
+@keyframes pgc-tremble { 0%, 100% { transform: translateX(0); } 18%, 50%, 82% { transform: translateX(-2px); } 35%, 66% { transform: translateX(2px); } }
+@media (prefers-reduced-motion: reduce) {
+  .pondos .pg-companion-button[class*="pg-motion-"] img { animation: none !important; transform: none !important; }
+}
+
+/* the fact of the day: a small Windows 98 "?" button on the frog, and its balloon (pepegochi-facts.mjs) */
+.pondos .pg-companion-fact { position: absolute; z-index: 3; top: 0; left: -4px; width: 16px; height: 16px; padding: 0;
+  font: 700 11px/14px var(--f-chrome); color: #000080; background: var(--chrome); border: 1px solid;
+  border-color: #fff var(--chrome-dk) var(--chrome-dk) #fff; cursor: pointer; }
+.pondos .pg-companion-fact:active { border-color: var(--chrome-dk) #fff #fff var(--chrome-dk); }
+.pondos .pg-companion-fact[hidden] { display: none; }
+.pg-fact { position: fixed; z-index: 98950; width: min(320px, calc(100vw - 16px)); padding: 0 0 8px; color: #000;
+  background: #fffbe0; border: 1px solid var(--chrome-dk); box-shadow: 2px 2px 0 #1116; font: 13px/1.35 var(--f-body); }
+.pg-fact-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 3px 2px 8px;
+  color: #fff; background: #000080; font: 700 12px/1.4 var(--f-chrome); }
+.pg-fact-x { width: 18px; height: 16px; padding: 0; font: 700 12px/12px var(--f-chrome); color: #000; background: var(--chrome);
+  border: 1px solid; border-color: #fff var(--chrome-dk) var(--chrome-dk) #fff; cursor: pointer; }
+.pg-fact-q { margin: 8px 10px 6px; font-weight: 700; }
+.pg-fact-answers { display: grid; gap: 4px; margin: 0 10px; }
+.pg-fact-a { min-height: 30px; padding: 3px 8px; text-align: left; font: 12px/1.3 var(--f-chrome); color: #000; background: var(--chrome);
+  border: 1px solid; border-color: #fff var(--chrome-dk) var(--chrome-dk) #fff; cursor: pointer; }
+.pg-fact-a:disabled { cursor: default; color: #000; }
+.pg-fact-a.is-right { background: #c8f0c0; font-weight: 700; }
+.pg-fact-a.is-wrong { background: #f4c4c0; text-decoration: line-through; }
+.pg-fact-out { margin: 6px 10px 0; min-height: 1.2em; }
+.pg-fact-out a { color: #000080; }
+/* the frog flying from the PEPEGOCHI.EXE window to the taskbar */
+.pg-companion-fly { position: fixed; z-index: 98960; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }
