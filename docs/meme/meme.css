@@ -1879,6 +1879,8 @@ footer.foot a { color: #edf3e3; }
 .pd-door:hover, .pd-door:focus-visible { background: color-mix(in srgb, #ffcc37 22%, var(--chrome)); }
 .pd-door:active { box-shadow: inset -1px -1px 0 var(--chrome-hi), inset 1px 1px 0 var(--chrome-lo); }
 .pd-door img { flex: none; width: 36px; height: 36px; object-fit: cover; border-radius: 3px; }
+.pd-door.pd-king img { object-fit: contain; }
+.balloon.balloon-go { cursor: pointer; }
 .pd-door span { display: grid; min-width: 0; }
 .pd-door b { font-size: 13px; }
 .pd-door small { font-size: 11.5px; opacity: .8; }
