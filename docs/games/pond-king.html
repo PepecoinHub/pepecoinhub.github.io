@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://azbwciqfbsdpwubznncg.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin"><title>POND KING: rock, paper, scissors for the throne | Pepecoin Hub</title>
+<meta name="description" content="One frog holds the throne with three secret moves. Beat it at rock, paper, scissors and the pond is yours, until the next visitor comes for you.">
+<link rel="canonical" href="https://pepecoinhub.com/games/pond-king.html"><link rel="icon" href="img/pond-king.svg" type="image/svg+xml">
+<link rel="stylesheet" href="pond.css?v=20261114b"><script src="js/config.js"></script><script src="js/pond-net.js?v=20261114b" defer></script><script src="js/pond-king.js?v=20261114d" defer></script>
+</head><body>
+<header class="site-bar"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · NO CROWN WAS HARMED</span><a href="bulletin.html">Pond Bulletin ↗</a></header>
+<main class="desk">
+<section class="window" aria-labelledby="pk-title">
+  <div class="titlebar"><span><img src="img/pond-king.svg" alt="" width="20" height="20"> <b id="pk-title">POND KING</b></span><a href="../meme/" title="Back to PondOS" aria-label="Back to PondOS">×</a></div>
+  <div class="pk-body">
+    <div class="throne" id="throne" aria-live="polite">
+      <img class="throne-frog" src="img/pond-king.svg" alt="" width="84" height="84">
+      <div>
+        <p class="kicker">Now reigning</p>
+        <h1 id="king-name">Opening the pond…</h1>
+        <p id="king-line" class="muted">Asking the frogs who sits on the lily pad.</p>
+      </div>
+      <div class="reign"><b id="king-def">–</b><small>defences</small></div>
+    </div>
+    <div class="row toolbar"><button type="button" id="king-pass" hidden>👑 King’s Fren Passport</button><button type="button" id="to-bulletin">📌 Pond Bulletin</button><button type="button" id="to-lilies">🪷 Battle of Three Lilies</button><span class="muted" id="acct"></span></div>
+
+    <!-- challenge -->
+    <form class="panel" id="duel" hidden>
+      <h2>Challenge the king</h2>
+      <p class="muted">Pick three moves. The king picked three too, and the pond shuffles them for every duel. Win more rounds than the king to take the throne. A tie keeps the king.</p>
+      <div class="rounds" id="pick"></div>
+      <div class="row">
+        <label for="nick">Your name</label>
+        <input id="nick" maxlength="20" autocomplete="nickname" spellcheck="false" required>
+        <button type="button" id="dice" title="Random moves">🎲 Random</button>
+        <button type="submit" class="go" id="fight" disabled>⚔️ Challenge</button>
+      </div>
+      <p class="msg" id="duel-msg" role="status"></p>
+    </form>
+
+    <!-- result of a duel -->
+    <div class="panel" id="result" hidden>
+      <h2 id="res-title">Duel</h2>
+      <ol class="fight" id="res-rounds"></ol>
+      <p class="big" id="res-line"></p>
+      <div id="res-after"></div>
+    </div>
+
+    <!-- you are the king -->
+    <div class="panel crown" id="kingpanel" hidden>
+      <h2>👑 You are the Pond King</h2>
+      <p class="muted">Your three moves defend the throne. The pond shuffles their order for every challenger, so a fren who loses learns only <i>which</i> moves you hold, never the order. Change them whenever you like.</p>
+      <div class="rounds" id="def"></div>
+      <div class="row"><button type="button" class="go" id="save-def" disabled>Save my defence</button><span class="msg" id="def-msg" role="status"></span></div>
+      <h3>Who came for your crown</h3>
+      <ul class="feed" id="challengers"><li class="muted">Nobody yet. Enjoy the quiet, your majesty.</li></ul>
+    </div>
+
+    <!-- already played this king -->
+    <div class="panel" id="waitpanel" hidden>
+      <h2 id="wait-title">You already met this king</h2>
+      <p id="wait-line" class="muted"></p>
+      <button type="button" id="recheck">↻ Check the throne again</button>
+    </div>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Longest reigns</h3>
+        <ol class="top" id="top"><li class="muted">…</li></ol>
+      </div>
+      <div class="panel">
+        <h3>Latest duels <small id="today"></small></h3>
+        <ul class="feed" id="recent"><li class="muted">…</li></ul>
+      </div>
+    </div>
+
+    <details class="panel rules">
+      <summary>Rules of the pond</summary>
+      <ul>
+        <li>The king holds three secret moves. You pick three. For every duel the pond shuffles the king’s moves into a random order.</li>
+        <li>Three rounds: 🪨 beats ✂️, ✂️ beats 📄, 📄 beats 🪨. Win more rounds than the king and the throne is yours. Ties keep the king.</li>
+        <li><b>One duel every 4 hours</b> per player and per network. Lost? Your frog is bruised: rest and come back in 4 hours.</li>
+        <li>And one duel per king: lost to this king? Wait for somebody to knock them off the throne.</li>
+        <li>As king, your three moves defend you while you are away. Come back any time to change them.</li>
+        <li>No sign-in needed. Logged on to the pond (Discord or guest)? Then your throne follows your account to every device, and Discord kings get a Fren Passport link.</li>
+        <li>Your name, your moves and a scrambled network fingerprint are stored to run the game. No PEP, no prizes: only glory. New kings and long reigns make the Pond Bulletin.</li>
+      </ul>
+    </details>
+  </div>
+  <div class="statusbar"><span id="status">Connecting to the pond…</span><span id="who">guest</span></div>
+</section>
+<footer>Made for frens. <a href="privacy.html">Privacy</a> · <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues">Report a bug</a></footer>
+</main>
+</body></html>

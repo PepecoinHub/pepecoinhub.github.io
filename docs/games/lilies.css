@@ -1,0 +1,73 @@
+/* BATTLE OF THREE LILIES and POND BULLETIN, on top of pond.css.
+   PLACEHOLDER ART: the lily pads are drawn with CSS and the flies are an emoji until the final art arrives
+   (see games/POND_DUELS.md, "Art wanted"). Swap .pad-leaf and .fly for the images then. */
+.menubar { display: flex; flex-wrap: wrap; gap: 2px; padding: 4px 2px; }
+.menubar button { border: 0; box-shadow: none; background: none; padding: 5px 9px; font-size: 12px; font-weight: normal; }
+.menubar button:hover { background: var(--navy); color: #fff; }
+.menubar button[aria-pressed="true"] { background: #fff; border: 1px solid #42464b; font-weight: bold; }
+.menubar .bb { margin-left: auto; }
+
+.signin { background: #fff3cf; }
+.signin .go { min-height: 40px; }
+
+.pads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 10px 0; }
+.pad { display: grid; justify-items: center; gap: 6px; padding: 10px 6px 12px; background: linear-gradient(#cfe9f1, #9fd0e0); border: 2px inset #fff; position: relative; }
+.pad h3 { margin: 0; color: #0c306b; }
+.pad-leaf { width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 40% 35%, #8fd27a, #3f9a48 70%); border: 3px solid #2a6b31;
+  clip-path: polygon(50% 50%, 56% 0, 100% 0, 100% 100%, 0 100%, 0 0, 44% 0); box-shadow: inset -6px -8px 0 #0002; }
+.pad-leaf b { font: bold 30px/1 'Courier New', monospace; color: #fff; text-shadow: 2px 2px 0 #1d4d22; margin-top: 14px; }
+.flies { min-height: 18px; font-size: 12px; letter-spacing: -2px; text-align: center; max-width: 100%; overflow-wrap: anywhere; }
+.steps { display: flex; gap: 6px; }
+.steps button { width: 44px; height: 40px; padding: 0; font-size: 20px; }
+.left { margin: 0 0 10px; font: 12px 'Courier New', monospace; }
+.left b { font-size: 18px; }
+.left.done b { color: var(--win); }
+.left.over b { color: var(--lose); }
+
+/* the result: both numbers on each pad and who won it */
+.pads.result .pad { gap: 4px; }
+.pads.result .vsrow { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: center; width: 100%; font: bold 11px 'Courier New', monospace; text-align: center; }
+.pads.result .vsrow b { font-size: 26px; display: block; }
+.pads.result .vsrow small { display: block; font-weight: normal; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pads.result .verdict { font: bold 11px 'Courier New', monospace; padding: 2px 8px; background: #fff; border: 1px solid #c9c2a8; }
+.pad.won { background: linear-gradient(#e2f7c9, #b9e48c); }
+.pad.lost { background: linear-gradient(#f6dcd6, #e8b5a9); }
+.pad.tie { background: linear-gradient(#ececec, #d3d6d8); }
+.pad.won .verdict { color: var(--win); } .pad.lost .verdict { color: var(--lose); }
+.pad .vsrow b.hi { color: var(--win); }
+
+.cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.cards li.card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; background: #fff; border: 1px solid #c9c2a8; }
+.cards li.card.mine { background: #fff8de; }
+.cards .card .ic { font-size: 26px; }
+.cards .card p { margin: 0; }
+.cards .card small { color: var(--muted); font: 10px 'Courier New', monospace; }
+.cards .card .acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.linkish { background: none; border: 0; box-shadow: none; padding: 0; font-weight: bold; text-decoration: underline; color: #0c306b; cursor: pointer; }
+.linkish:active { border: 0; }
+.howto { padding-left: 20px; } .howto li { margin: 0 0 7px; }
+.placeholder-note { font: 10px 'Courier New', monospace; color: #8a5a12; border: 1px dashed #c9a35a; padding: 4px 8px; display: inline-block; }
+.feed li .acts { display: inline-flex; gap: 6px; margin-left: 6px; }
+.feed li button { padding: 2px 8px; font-size: 11px; }
+.tag { display: inline-block; padding: 0 6px; margin-right: 4px; font: bold 10px 'Courier New', monospace; border: 1px solid currentColor; }
+.tag.win { color: var(--win); } .tag.lose { color: var(--lose); } .tag.draw, .tag.open, .tag.expired, .tag.cancelled { color: var(--muted); }
+
+/* POND BULLETIN */
+.board-king { display: flex; align-items: center; gap: 10px; }
+.board-king img { width: 48px; height: 48px; }
+.board-king p { margin: 0; flex: 1; }
+.board-sec h2 { display: flex; align-items: baseline; gap: 8px; }
+.pin { color: #b0322a; }
+
+@media (max-width: 560px) {
+  .pads { gap: 6px; }
+  .pad-leaf { width: 70px; height: 70px; }
+  .pad-leaf b { font-size: 24px; }
+  .steps button { width: 38px; }
+  .cards li.card { grid-template-columns: minmax(0, 1fr); }
+  .cards .card .ic { display: none; }
+  .cards .card .acts { justify-content: stretch; }
+  .cards .card .acts button { flex: 1; min-height: 40px; }
+  .menubar .bb { margin-left: 0; }
+}

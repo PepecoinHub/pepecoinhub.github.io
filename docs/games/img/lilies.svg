@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- PLACEHOLDER icon for BATTLE OF THREE LILIES, to be replaced by the final art -->
+  <title>Battle of Three Lilies</title>
+  <rect width="64" height="64" rx="8" fill="#9fd0e0"/>
+  <path d="M18 40 L18 28 A12 12 0 1 0 22 30 Z" fill="#4caf50" stroke="#1f5e2c" stroke-width="2"/>
+  <path d="M46 40 L46 28 A12 12 0 1 0 50 30 Z" fill="#4caf50" stroke="#1f5e2c" stroke-width="2"/>
+  <path d="M32 22 L32 10 A12 12 0 1 0 36 12 Z" fill="#57b174" stroke="#1f5e2c" stroke-width="2"/>
+  <g fill="#1b1b1b"><circle cx="26" cy="50" r="2.2"/><circle cx="38" cy="52" r="2.2"/><circle cx="33" cy="30" r="2.2"/></g>
+  <g fill="#ffffffcc"><ellipse cx="24.5" cy="48.5" rx="2" ry="1.2"/><ellipse cx="36.5" cy="50.5" rx="2" ry="1.2"/><ellipse cx="31.5" cy="28.5" rx="2" ry="1.2"/></g>
+</svg>
