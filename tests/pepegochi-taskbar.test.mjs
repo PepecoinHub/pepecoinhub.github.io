@@ -6,31 +6,49 @@ import { describeTaskbarFrog } from '../docs/meme/pepegochi-taskbar.mjs';
 const needs = { hunger: 100, hygiene: 100, mood: 100, energy: 100 };
 const pet = (changes = {}) => ({ pet: { name: 'Fren', stage: 'adult', status: 'healthy', needs, ...changes } });
 
-test('unadopted account gets the existing egg sprite, not a fabricated pet', () => {
+test('no frog yet: the egg pose, not a made-up pet', () => {
   assert.deepEqual(describeTaskbarFrog({ pet: null }), describeTaskbarFrog(null));
-  assert.equal(describeTaskbarFrog(null).sprite, 'pepegochi_egg_idle.png');
+  assert.equal(describeTaskbarFrog(null).sprite, 'taskbar/tb_egg.png');
   assert.equal(describeTaskbarFrog(null).hasPet, false);
 });
-test('healthy adult uses exactly the same idle sprite as the room', () => {
+test('a healthy adult sits on the bar', () => {
   const v = describeTaskbarFrog(pet());
-  assert.equal(v.sprite, 'pepegochi_adult_idle.png');
+  assert.equal(v.sprite, 'taskbar/tb_adult_sit.png');
   assert.equal(v.warning, false);
+  assert.equal(v.adult, true);
   assert.match(v.title, /Fren/);
 });
-test('the lowest real need picks the corresponding room mood sprite', () => {
-  const v = describeTaskbarFrog(pet({ needs: { ...needs, hunger: 42, mood: 80 } }));
-  assert.equal(v.sprite, 'pepegochi_adult_hungry.png');
+test('the lowest real need picks the same mood as the room', () => {
+  assert.equal(describeTaskbarFrog(pet({ needs: { ...needs, hunger: 42, mood: 80 } })).sprite, 'taskbar/tb_adult_hungry.png');
+  assert.equal(describeTaskbarFrog(pet({ needs: { ...needs, hygiene: 42 } })).sprite, 'taskbar/tb_adult_dirty.png');
+  assert.equal(describeTaskbarFrog(pet({ needs: { ...needs, mood: 42 } })).sprite, 'taskbar/tb_adult_moody.png');
+  assert.equal(describeTaskbarFrog(pet({ needs: { ...needs, energy: 42 } })).sprite, 'taskbar/tb_adult_sleepy.png');
 });
 test('status overrides need, including moving out and recovering', () => {
-  assert.equal(describeTaskbarFrog(pet({ status: 'packing', needs: { ...needs, hunger: 2 } })).sprite, 'pepegochi_adult_packing.png');
+  assert.equal(describeTaskbarFrog(pet({ status: 'packing', needs: { ...needs, hunger: 2 } })).sprite, 'taskbar/tb_adult_packing.png');
   assert.equal(describeTaskbarFrog(pet({ status: 'packing' })).warning, true);
-  assert.equal(describeTaskbarFrog(pet({ status: 'recovering' })).sprite, 'pepegochi_adult_recovering.png');
-  assert.equal(describeTaskbarFrog(pet({ status: 'departed' })).sprite, 'goodbye_envelope.png');
+  assert.equal(describeTaskbarFrog(pet({ status: 'neglected' })).sprite, 'taskbar/tb_adult_neglected.png');
+  assert.equal(describeTaskbarFrog(pet({ status: 'recovering' })).sprite, 'taskbar/tb_adult_recovering.png');
+  assert.equal(describeTaskbarFrog(pet({ status: 'departed' })).sprite, 'taskbar/tb_letter.png');
 });
-test('young frog stages keep their correct art', () => {
-  assert.equal(describeTaskbarFrog(pet({ stage: 'egg' })).sprite, 'pepegochi_egg_idle.png');
-  assert.equal(describeTaskbarFrog(pet({ stage: 'tadpole' })).sprite, 'pepegochi_tadpole_idle.png');
-  assert.equal(describeTaskbarFrog(pet({ stage: 'froglet' })).sprite, 'pepegochi_froglet_idle.png');
+test('young frog stages keep their own pose, whatever their state', () => {
+  assert.equal(describeTaskbarFrog(pet({ stage: 'egg' })).sprite, 'taskbar/tb_egg.png');
+  assert.equal(describeTaskbarFrog(pet({ stage: 'tadpole', needs: { ...needs, hunger: 10 } })).sprite, 'taskbar/tb_tadpole.png');
+  assert.equal(describeTaskbarFrog(pet({ stage: 'froglet', status: 'packing' })).sprite, 'taskbar/tb_froglet.png');
+  assert.equal(describeTaskbarFrog(pet({ stage: 'froglet' })).adult, false, 'no talking or waving poses for the young');
+});
+test('the 16 approved poses are real 48 x 48 files that pass the art check', async () => {
+  const { checkFile } = await import('../scripts/pepegochi_art_qa.mjs');
+  const { POSES, pose } = await import('../docs/meme/pepegochi-taskbar.mjs');
+  assert.equal(POSES.length, 16);
+  for (const id of POSES) {
+    const f = new URL('../docs/games/img/pepegochi/' + pose(id), import.meta.url);
+    assert.deepEqual(checkFile(f.pathname).problems, [], id);
+  }
+  const js = readFileSync(new URL('../docs/meme/pepegochi-taskbar.mjs', import.meta.url), 'utf8');
+  assert.match(js, /setAct\('tb_adult_talk'\)/, 'talks while the quiz is open');
+  assert.match(js, /setAct\(f\.right \? 'tb_adult_laugh' : 'tb_adult_think'\)/, 'laughs or thinks after the answer');
+  assert.match(js, /setAct\('tb_adult_wave'\)/, 'waves on hover');
 });
 test('taskbar stays behind the beta gate and refresh message carries no pet data', () => {
   const shell = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');

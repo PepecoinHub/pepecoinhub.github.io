@@ -9,14 +9,26 @@ const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
 const NEEDS = new Set(['hunger', 'hygiene', 'mood', 'energy']);
 const STATUS = new Set(['healthy', 'neglected', 'packing', 'recovering']);
 
+// The 16 taskbar poses (48 x 48, drawn for the bar; approved by the owner 2026-11-13), in img/pepegochi/taskbar/.
+export const POSES = ['tb_egg', 'tb_tadpole', 'tb_froglet', 'tb_adult_sit', 'tb_adult_hungry', 'tb_adult_dirty',
+  'tb_adult_moody', 'tb_adult_sleepy', 'tb_adult_neglected', 'tb_adult_packing', 'tb_adult_recovering',
+  'tb_adult_talk', 'tb_adult_think', 'tb_adult_laugh', 'tb_adult_wave', 'tb_letter'];
+export const pose = id => 'taskbar/' + id + '.png';
+// the room's sprite for the frog's state (frogLook) -> the taskbar pose that shows the same state
+const POSE_OF = { egg_idle: 'tb_egg', tadpole_idle: 'tb_tadpole', froglet_idle: 'tb_froglet', adult_idle: 'tb_adult_sit',
+  adult_hungry: 'tb_adult_hungry', adult_dirty: 'tb_adult_dirty', adult_moody: 'tb_adult_moody', adult_tired: 'tb_adult_sleepy',
+  adult_neglected: 'tb_adult_neglected', adult_packing: 'tb_adult_packing', adult_recovering: 'tb_adult_recovering' };
+// a young frog has no state poses: its stage pose
+export const poseFor = roomSprite => POSE_OF[roomSprite] || POSE_OF[roomSprite.split('_')[0] + '_idle'] || 'tb_adult_sit';
+
 export function describeTaskbarFrog(state) {
   const p = state && state.pet;
   if (!p) return {
-    sprite: 'pepegochi_egg_idle.png', label: 'Adopt me?',
+    sprite: pose('tb_egg'), label: 'Adopt me?',
     title: 'No PepeGochi yet. Click to adopt your egg.', warning: false, hasPet: false, motion: 'egg',
   };
   if (p.status === 'departed') return {
-    sprite: 'goodbye_envelope.png', label: 'GOODBYE.TXT',
+    sprite: pose('tb_letter'), label: 'GOODBYE.TXT',
     title: 'Your Fren moved out. Open PEPEGOCHI.EXE to read the letter.',
     warning: true, hasPet: false, motion: 'letter',
   };
@@ -34,14 +46,14 @@ export function describeTaskbarFrog(state) {
     recovering: 'Your Fren is recovering.',
   };
   return {
-    sprite: 'pepegochi_' + sprite + '.png', label: name,
+    sprite: pose(poseFor(sprite)), label: name, adult: stage === 'adult',
     title: name + ' · ' + remarks[status] + ' Click to visit.',
     warning: status === 'packing' || status === 'neglected', hasPet: true,
     motion: status !== 'healthy' ? status : (sprite === 'adult_tired' ? 'sleepy' : stage),
   };
 }
 // shown when the state cannot be read (no SQL yet, offline): the egg, no claim about a frog
-export const UNAVAILABLE = { sprite: 'pepegochi_egg_idle.png', label: 'PepeGochi',
+export const UNAVAILABLE = { sprite: pose('tb_egg'), label: 'PepeGochi',
   title: 'PepeGochi is unavailable right now. Click to open the game.', warning: false, hasPet: false, motion: 'egg' };
 
 // The flight path of the hop from the game window to the taskbar: whole pixels, an arc, ending on the slot.
@@ -69,8 +81,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   button.className = 'pg-companion-button';
   const img = document.createElement('img');
   img.alt = '';
-  img.width = 42;
-  img.height = 42;
+  img.width = 48;
+  img.height = 48;
   img.draggable = false;
   const notice = document.createElement('span');
   notice.className = 'pg-companion-alert';
@@ -95,6 +107,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   slot.append(button, factBtn);
   start.after(slot);
   button.addEventListener('click', () => open());
+  button.addEventListener('pointerenter', () => { if (!act && shownView && shownView.adult && shownView.motion === 'adult') setAct('tb_adult_wave'); });
+  button.addEventListener('pointerleave', () => { if (act === 'tb_adult_wave') setAct(null); });
 
   // Very short motions, not an endlessly looping animation. Only one is active at a time,
   // and no animation or running timer is needed when the browser is hidden / reduced motion is set.
@@ -134,9 +148,12 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   if (reduced.addEventListener) reduced.addEventListener('change', motionPreferenceChanged);
 
   let shownView = null;
+  // a short pose over the state pose: talking, thinking, laughing, waving (adults only; null = the state pose)
+  let act = null;
+  function setAct(a) { act = a; if (shownView) paint(shownView); }
   function paint(view) {
     shownView = view;
-    const path = img_base + view.sprite;
+    const path = img_base + (act && view.adult ? pose(act) : view.sprite);
     if (img.getAttribute('src') !== path) img.setAttribute('src', path);
     button.setAttribute('aria-label', view.title);
     button.title = view.title;
@@ -176,6 +193,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   function closeBalloon() {
     if (!balloon) return;
     balloon.remove(); balloon = null;
+    setAct(null);
     document.removeEventListener('keydown', onKey, true);
     document.removeEventListener('pointerdown', onOutside, true);
   }
@@ -208,6 +226,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     const out = el('p', 'pg-fact-out'); out.setAttribute('aria-live', 'polite');
     const extra = el('div', 'pg-fact-extra');
     const show = () => {
+      setAct(f.right ? 'tb_adult_laugh' : 'tb_adult_think');
       [...list.children].forEach((b, i) => {
         b.disabled = true;
         b.classList.toggle('is-right', i === f.correct);
@@ -235,6 +254,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       list.append(b);
     });
     balloon.append(head, el('p', 'pg-fact-q', f.question), list, out, extra);
+    setAct('tb_adult_talk');
     if (f.answered) show();
     document.body.append(balloon);
     // above the frog, inside the screen (also on a phone, where the taskbar has two rows)

@@ -1995,8 +1995,9 @@ footer.foot a { color: #edf3e3; }
 /* PepeGochi's taskbar companion (beta). One existing 128px sprite, no GIFs or timers. */
 .pondos .pg-companion { position: relative; flex: none; display: inline-flex; align-items: center; height: 40px; }
 .pondos .pg-companion-button { position: relative; display: inline-flex; align-items: center; justify-content: center;
-  width: 44px; height: 40px; padding: 0; border: 0; background: transparent; cursor: pointer; color: var(--ink); }
-.pondos .pg-companion-button img { width: 42px; height: 42px; object-fit: contain; image-rendering: pixelated;
+  width: 48px; height: 40px; padding: 0; border: 0; background: transparent; cursor: pointer; color: var(--ink); }
+/* the taskbar poses are drawn at 48 x 48: shown 1:1, sitting on the bar (they may rise above it a little) */
+.pondos .pg-companion-button img { width: 48px; height: 48px; object-fit: contain; image-rendering: pixelated;
   max-width: none; position: relative; top: -3px; }
 .pondos .pg-companion-button:hover img { top: -5px; }
 .pondos .pg-companion-alert { position: absolute; top: 1px; right: 0; width: 9px; height: 9px;
@@ -2009,8 +2010,8 @@ footer.foot a { color: #edf3e3; }
 .pondos .pg-companion-button:focus-visible .pg-companion-hint { visibility: visible; }
 @media (max-width: 480px) {
   .pondos .pg-companion { height: 36px; }
-  .pondos .pg-companion-button { width: 34px; height: 36px; }
-  .pondos .pg-companion-button img { width: 34px; height: 34px; }
+  .pondos .pg-companion-button { width: 48px; height: 36px; }
+  .pondos .pg-companion-button img { width: 48px; height: 48px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .pondos .pg-companion-button:hover img { top: -3px; }
