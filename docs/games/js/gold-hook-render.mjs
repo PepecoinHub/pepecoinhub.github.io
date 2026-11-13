@@ -2,7 +2,7 @@
 // Layers: background → mine objects → rope → cargo → hook → surface/winch
 // → frog → HUD → messages. Dialogs are DOM.
 import { VIEW, LAYOUT, TIMING } from './gold-hook-config.mjs';
-import { hookGeometry, currentAnim, APP } from './gold-hook-state.mjs';
+import { hookGeometry, currentAnim, APP, HOOK_MODE } from './gold-hook-state.mjs';
 
 // Earth tiles down to this row, stone tiles below (the mine gets harder the deeper you go).
 const STONE_FROM_Y = 484;
@@ -86,10 +86,24 @@ export function createRenderer(canvas, assets) {
     ctx.restore();
   }
 
-  function drawWinch() {
-    // The art pack winch: its rope exit is the winch point, and the rows under it are empty, so it
-    // never hides the rope at any angle.
-    drawAnchored('pm-winch', LAYOUT.winch.x, LAYOUT.winch.y);
+  // Is the frog turning the crank, and how fast: while the hook comes back, slower the heavier the
+  // load (an empty hook spins it fastest). null when the winch is at rest.
+  function crankFrame(g, manifest) {
+    const def = manifest.animations.crank, h = g.hook;
+    if (g.reaction || (h.mode !== HOOK_MODE.RETURNING_LOADED && h.mode !== HOOK_MODE.RETURNING_EMPTY)) return null;
+    const mul = h.cargo ? Math.max(0.1, h.cargo.speedMul) : 1.5;
+    const ms = def.baseMs / Math.pow(mul, 0.6);
+    return def.frames[Math.floor(g.animClock / ms) % def.frames.length];
+  }
+
+  function drawWinch(g, manifest) {
+    // The winch with its crank on the frog's side: the rope exit (its anchor) is the winch point, so
+    // the rope comes out from under its base at any angle.
+    const def = manifest.animations.crank, frame = crankFrame(g, manifest);
+    const sheet = img(def.winch.id);
+    const [fx, fy, fw, fh] = def.winch.rects[frame ?? def.winch.rest];
+    const [ax, ay] = sheet.meta.anchor;
+    ctx.drawImage(sheet.img, fx, fy, fw, fh, LAYOUT.winch.x - ax, LAYOUT.winch.y - ay, fw, fh);
   }
 
   // The sticks of dynamite left, standing on the ground next to the miner.
@@ -110,9 +124,15 @@ export function createRenderer(canvas, assets) {
   }
 
   function drawMiner(g, manifest) {
+    const crank = crankFrame(g, manifest);
+    if (crank !== null) {
+      // Hands on the crank handle of the same winch frame (same offset as in the art pack composite).
+      const [sx, sy, sw, sh] = manifest.animations.crank.atlas.rects[crank];
+      ctx.drawImage(img('pm-miner-crank-atlas').img, sx, sy, sw, sh, LAYOUT.miner.x, LAYOUT.miner.y, sw, sh);
+      return;
+    }
     const anim = currentAnim(g);
-    // Until the crank poses (art pack P3) arrive, the frog stands still while the winch reels in:
-    // the old rope-pulling poses looked odd with the rope coming out of the winch.
+    // The old rope-pulling poses are not used: the frog turns the crank instead.
     const name = anim.name === 'pull' ? 'idle' : anim.name;
     const def = manifest.animations[name];
     let t = anim.t;
@@ -161,7 +181,7 @@ export function createRenderer(canvas, assets) {
     drawBackground();
     drawObjects(g);
     drawHookAndCargo(g);
-    drawWinch();
+    drawWinch(g, manifest);
     drawMiner(g, manifest);
     drawDynamiteStock(g);
     if (!reducedMotion) drawEffects(g, manifest);
