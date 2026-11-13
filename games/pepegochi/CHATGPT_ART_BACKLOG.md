@@ -38,8 +38,8 @@ liczba kolorów, linia stóp). Plik, który nie przejdzie, wraca do poprawy.
 
 | Paczka | Co | Plików | Priorytet |
 |---|---|---:|---|
-| **A1** | Poprawki grafik już używanych w grze (te same nazwy) | 6 | **1. najpierw** |
-| **A2** | Pasek Start: 16 póz | 16 | **2.** |
+| **A1** | Poprawki grafik już używanych w grze (te same nazwy) | 6 | ✅ zatwierdzone 2026-11-13 |
+| **A2** | Pasek Start: 16 póz | 16 | **teraz**: `games/pepegochi/a2-brief/A2_PROMPT.md` |
 | **A3** | Pasek Start: 9 krótkich animacji | 33 | 3. |
 | **A4** | Wyprowadzka dorosłej żaby: prawdziwy chód | 6 | 4. |
 | **A5** | Stany kijanki i młodej żaby + ich wyprowadzka | 22 | 5. |
@@ -81,6 +81,8 @@ Obecny kadr (widoczne piksele: lewo, góra, prawo, dół; dół 124 = linia stó
 ---
 
 ## A2. Pasek Start: 16 póz (format B, folder `docs/games/img/pepegochi/taskbar/`)
+
+Gotowy brief z tekstem do wklejenia, siatką 48×48 i zrzutem paska: `games/pepegochi/a2-brief/A2_PROMPT.md`.
 
 Każda poza to jedna nieruchoma klatka. Kod wybiera pozę ze stanu serwera, ten sam co w grze.
 
