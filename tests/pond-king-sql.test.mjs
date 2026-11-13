@@ -32,8 +32,8 @@ test('Pond King: hidden moves, one duel per king per player and network, the thr
     const state = (t, ip) => call(ip, 'select public.gry_pk_state($1) as v', [t]);
     const duel = (t, ip, king, nick, moves) => call(ip, 'select public.gry_pk_challenge($1, $2, $3, $4) as v', [t, king, nick, moves]);
     const setMoves = (t, ip, moves) => call(ip, 'select public.gry_pk_set_moves($1, $2) as v', [t, moves]);
-    // the clock moves on one day: every duel so far happened "yesterday"
-    const nextDay = () => db.query("update games.pk_duels set created_at = created_at - interval '1 day'");
+    // the clock moves on 4 hours: every duel so far happened 4 hours earlier
+    const later = () => db.query("update games.pk_duels set created_at = created_at - interval '4 hours'");
 
     // anon cannot read the tables directly
     await assert.rejects(call('1.1.1.1', 'select moves as v from games.pk_kings'), /permission denied/);
@@ -59,22 +59,26 @@ test('Pond King: hidden moves, one duel per king per player and network, the thr
     assert.equal(lost.ok, true); assert.equal(lost.won, false); assert.deepEqual(lost.score, [0, 3]);
     assert.deepEqual(lost.rounds.map(r => r.king), ['r', 'r', 'r']);
     assert.equal(lost.king.defenses, 1);
-    // one duel a day: the same player, and anybody else on the same network, wait for 00:00 UTC
+    // one duel every 4 hours: the same player, and anybody else on the same network, wait
+    const lostAt = (await db.query('select created_at from games.pk_duels order by id desc limit 1')).rows[0].created_at;
     const again = await duel(tok(1), '1.1.1.1', k0, 'Loser', 'ppp');
-    assert.equal(again.error, 'daily');
-    const midnight = new Date(); midnight.setUTCHours(24, 0, 0, 0);
-    assert.equal(+new Date(again.next_at), +midnight);
-    assert.equal((await duel(tok(2), '1.1.1.1', k0, 'Sneaky', 'ppp')).error, 'daily');
+    assert.equal(again.error, 'wait');
+    assert.equal(+new Date(again.next_at), +lostAt + 4 * 3600e3);
+    assert.equal((await duel(tok(2), '1.1.1.1', k0, 'Sneaky', 'ppp')).error, 'wait');
     const s1 = await state(tok(2), '1.1.1.1');
-    assert.equal(s1.can_challenge, false); assert.equal(s1.today.network, true); assert.equal(+new Date(s1.next_at), +midnight);
+    assert.equal(s1.can_challenge, false); assert.equal(s1.cooldown.network, true); assert.equal(+new Date(s1.cooldown.next_at), +lostAt + 4 * 3600e3);
     const s1b = await state(tok(1), '1.1.1.1');
-    assert.equal(s1b.today.network, false); assert.equal(s1b.today.won, false);
-    // the next day: still once per king per player, and per network
-    await nextDay();
+    assert.equal(s1b.cooldown.network, false); assert.equal(s1b.cooldown.won, false);
+    // 3 h 59 min later: still waiting
+    await db.query("update games.pk_duels set created_at = created_at - interval '3 hours 59 minutes'");
+    assert.equal((await duel(tok(1), '1.1.1.1', k0, 'Loser', 'ppp')).error, 'wait');
+    await db.query("update games.pk_duels set created_at = created_at + interval '3 hours 59 minutes'");
+    // 4 hours later: still once per king per player, and per network
+    await later();
     assert.equal((await duel(tok(1), '1.1.1.1', k0, 'Loser', 'ppp')).error, 'tried');
     assert.equal((await duel(tok(2), '1.1.1.1', k0, 'Sneaky', 'ppp')).error, 'network');
     const s1c = await state(tok(2), '1.1.1.1');
-    assert.equal(s1c.can_challenge, false); assert.equal(s1c.today, null); assert.equal(s1c.tried.network, true);
+    assert.equal(s1c.can_challenge, false); assert.equal(s1c.cooldown, null); assert.equal(s1c.tried.network, true);
     assert.equal((await state(tok(1), '1.1.1.1')).tried.won, false);
 
     // a tie keeps the king: rock, paper, scissors against rrr = 0 : 1 : 0 -> 1 win, 1 loss
@@ -117,24 +121,24 @@ test('Pond King: hidden moves, one duel per king per player and network, the thr
     const os = await state(tok(20), '20.0.0.1');
     assert.equal(os.challengers, null); assert.ok(os.recent.every(r => !('moves' in r)));
 
-    // one network, twelve days, twelve new kings: one duel a day is always allowed
+    // one network, twelve new kings, 4 hours apart: every one of those duels is allowed
     await db.query('delete from games.pk_duels');
     for (let i = 0; i < 12; i++) {
       const k = (await state(tok(100 + i), '7.7.7.7')).king;
       await db.query("update games.pk_kings set moves = 'sss' where id = $1", [k.id]);
       const d = await duel(tok(100 + i), '7.7.7.7', k.id, 'Busy' + i, counter('s').repeat(3));
-      assert.equal(d.won, true, 'day ' + i);
-      await nextDay();
+      assert.equal(d.won, true, 'duel ' + i);
+      await later();
     }
-    // the same day a second duel is refused, for the player on another network and for another player on this one
+    // within 4 hours a second duel is refused, for the player on another network and for another player on this one
     const k = (await state(tok(200), '7.7.7.7')).king;
     await db.query("update games.pk_kings set moves = 'sss' where id = $1", [k.id]);
     assert.equal((await duel(tok(200), '7.7.7.7', k.id, 'Daily', 'rrr')).won, true);
     const k2 = (await state(tok(201), '8.8.8.8')).king;   // Daily now reigns with rrr
     assert.equal((await duel(tok(202), '9.9.9.9', k2.id, 'Mover', 'sss')).won, false);
-    assert.equal((await duel(tok(202), '6.6.6.6', k2.id, 'Mover', 'ppp')).error, 'daily', 'the same player from another network');
-    assert.equal((await duel(tok(201), '7.7.7.7', k2.id, 'Roomie', 'ppp')).error, 'daily', 'another player on a network that played today');
-    await nextDay();
+    assert.equal((await duel(tok(202), '6.6.6.6', k2.id, 'Mover', 'ppp')).error, 'wait', 'the same player from another network');
+    assert.equal((await duel(tok(201), '7.7.7.7', k2.id, 'Roomie', 'ppp')).error, 'wait', 'another player on a network that just played');
+    await later();
 
     // the Bulletin got one "new king" per crown
     const ev = (await db.query("select kind, actor_nick, other_nick from games.bulletin_events where kind = 'king_crowned' order by id")).rows;

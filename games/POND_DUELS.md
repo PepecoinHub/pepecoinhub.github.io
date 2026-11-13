@@ -26,7 +26,7 @@ Trzy części, jeden mechanizm: gracz zostawia ukrytą strategię, a ktoś inny 
 
 ## Zasady POND KING
 
-Opisane w `games/SETUP.md` i w samym pliku SQL. W skrócie: król ma 3 ukryte ruchy, a serwer przy każdym pojedynku tasuje ich kolejność. Pretendent musi wygrać więcej rund niż król, remis zostaje przy królu. **Jeden pojedynek dziennie** na gracza (token przeglądarki albo konto) i na sieć, nowy dzień od 00:00 UTC. Do tego z jednym królem walczy się raz na osobę i raz na sieć. Nowe w tej wersji: zalogowany gracz jest zapisywany pod kontem (tron działa na każdym urządzeniu, król z Discordem ma link do Paszportu), a nowi królowie i panowania 5, 10, 25, 50, 100… obron trafiają do Bulletinu.
+Opisane w `games/SETUP.md` i w samym pliku SQL. W skrócie: król ma 3 ukryte ruchy, a serwer przy każdym pojedynku tasuje ich kolejność. Pretendent musi wygrać więcej rund niż król, remis zostaje przy królu. **Jeden pojedynek co 4 godziny** na gracza (token przeglądarki albo konto) i na sieć, licząc od ostatniego pojedynku. Po przegranej okno mówi, że żaba jest poobijana i ma wrócić za 4 godziny (z godziną następnej próby). Do tego z jednym królem walczy się raz na osobę i raz na sieć. Nowe w tej wersji: zalogowany gracz jest zapisywany pod kontem (tron działa na każdym urządzeniu, król z Discordem ma link do Paszportu), a nowi królowie i panowania 5, 10, 25, 50, 100… obron trafiają do Bulletinu.
 
 ## Architektura
 

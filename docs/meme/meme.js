@@ -1187,8 +1187,8 @@
         var k = st && st.king; if (!k) return;
         kingDoor.querySelector('b').textContent = k.you ? 'You rule the pond \ud83d\udc51' : 'Dethrone ' + k.nick;
         kingDoor.querySelector('small').textContent = k.you ? 'Defended ' + k.defenses + (k.defenses === 1 ? ' time' : ' times') + '. Check your throne'
-          : st.today ? 'Today\u2019s duel is done. The next one opens at 00:00 UTC'
-          : 'Holds the throne: ' + k.defenses + (k.defenses === 1 ? ' defence' : ' defences') + '. One duel a day';
+          : st.cooldown ? (st.cooldown.won || st.cooldown.network ? 'Next duel ' : 'Still bruised \ud83e\ude79 Next duel ') + 'at ' + new Date(st.cooldown.next_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          : 'Holds the throne: ' + k.defenses + (k.defenses === 1 ? ' defence' : ' defences') + '. One duel every 4 h';
         // one nudge a day, only when there is a king to beat
         var day = new Date().toISOString().slice(0, 10), seen = null;
         try { seen = localStorage.getItem('pk-balloon'); } catch (e) {}
