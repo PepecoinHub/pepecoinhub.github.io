@@ -106,6 +106,15 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   factBtn.hidden = true;
   slot.append(button, factBtn);
   start.after(slot);
+  // the frog sits ON the taskbar: measure how far the button is below the bar's top edge (CSS --pg-lift)
+  const edgeOf = bar.closest('header') || bar;
+  function place() {
+    const lift = Math.max(0, Math.round(button.getBoundingClientRect().top - edgeOf.getBoundingClientRect().top));
+    slot.style.setProperty('--pg-lift', lift + 'px');
+  }
+  place();
+  requestAnimationFrame(place);
+  window.addEventListener('resize', place);
   button.addEventListener('click', () => open());
   button.addEventListener('pointerenter', () => { if (!act && shownView && shownView.adult && shownView.motion === 'adult') setAct('tb_adult_wave'); });
   button.addEventListener('pointerleave', () => { if (act === 'tb_adult_wave') setAct(null); });
@@ -353,6 +362,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     window.removeEventListener('storage', onStorage);
     window.removeEventListener('pondos:auth-changed', onAuth);
     window.removeEventListener('pondos:pepegochi-left', onLeftWindow);
+    window.removeEventListener('resize', place);
     document.removeEventListener('visibilitychange', onVisible);
     slot.remove();
   };

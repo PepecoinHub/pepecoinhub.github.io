@@ -1996,13 +1996,14 @@ footer.foot a { color: #edf3e3; }
 .pondos .pg-companion { position: relative; flex: none; display: inline-flex; align-items: center; height: 40px; }
 .pondos .pg-companion-button { position: relative; display: inline-flex; align-items: center; justify-content: center;
   width: 48px; height: 40px; padding: 0; border: 0; background: transparent; cursor: pointer; color: var(--ink); }
-/* the taskbar poses are drawn at 48 x 48: shown 1:1, sitting on the bar (they may rise above it a little) */
-.pondos .pg-companion-button img { width: 48px; height: 48px; object-fit: contain; image-rendering: pixelated;
-  max-width: none; position: relative; top: -3px; }
-.pondos .pg-companion-button:hover img { top: -5px; }
-.pondos .pg-companion-alert { position: absolute; top: 1px; right: 0; width: 9px; height: 9px;
-  background: #d04432; border: 1px solid #fff; border-radius: 0; }
-.pondos .pg-companion-hint { position: absolute; z-index: 150; bottom: calc(100% + 3px); left: 50%;
+/* the taskbar poses are drawn at 48 x 48 and shown 1:1, ON the taskbar: the frog's feet (the pose's line y = 47)
+   stand on the bar's top edge and the frog sits above it. --pg-lift (set by pepegochi-taskbar.mjs) is how far the
+   button is below that edge, so this also holds for the two-row taskbar on a phone. The button stays in the bar. */
+.pondos .pg-companion-button img { position: absolute; left: 0; top: auto; bottom: calc(100% + var(--pg-lift, 3px) - 1px);
+  width: 48px; height: 48px; object-fit: contain; image-rendering: pixelated; max-width: none; z-index: 2; }
+.pondos .pg-companion-alert { position: absolute; z-index: 3; bottom: calc(100% + var(--pg-lift, 3px) + 36px); right: 0;
+  width: 9px; height: 9px; background: #d04432; border: 1px solid #fff; border-radius: 0; }
+.pondos .pg-companion-hint { position: absolute; z-index: 150; bottom: calc(100% + var(--pg-lift, 3px) + 50px); left: 50%;
   transform: translateX(-50%); display: block; padding: 4px 7px; white-space: nowrap; font: 700 11px/1.2 var(--f-chrome);
   color: var(--ink); background: var(--chrome); border: 1px solid var(--chrome-dk); box-shadow: 2px 2px 0 #1116;
   visibility: hidden; pointer-events: none; }
@@ -2011,14 +2012,10 @@ footer.foot a { color: #edf3e3; }
 @media (max-width: 480px) {
   .pondos .pg-companion { height: 36px; }
   .pondos .pg-companion-button { width: 48px; height: 36px; }
-  .pondos .pg-companion-button img { width: 48px; height: 48px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .pondos .pg-companion-button:hover img { top: -3px; }
 }
 
 /* Short, rare PepeGochi actions: no perpetual CSS loop or extra network requests. */
-.pondos .pg-companion-sleep { position: absolute; top: -7px; right: 0; z-index: 2; font: bold 12px/1 var(--f-chrome);
+.pondos .pg-companion-sleep { position: absolute; bottom: calc(100% + var(--pg-lift, 3px) + 40px); right: -4px; z-index: 3; font: bold 12px/1 var(--f-chrome);
   color: var(--ink); pointer-events: none; }
 /* whole-pixel moves only (no rotation), so the pixel art never blurs between two places */
 .pondos .pg-companion-button[class*="pg-motion-"] img { animation: 950ms steps(1, end) both; transform-origin: 50% 95%; }
