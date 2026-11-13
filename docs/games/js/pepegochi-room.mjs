@@ -68,6 +68,11 @@ export const SPRITES = {
   adult_idle: [9, 124], adult_hungry: [8, 124], adult_dirty: [8, 124], adult_moody: [9, 124], adult_tired: [9, 124],
   adult_neglected: [9, 124], adult_recovering: [8, 124], adult_packing: [9, 124],
   hatch_01: [42, 124], hatch_02: [42, 124], hatch_03: [20, 124], hatch_04: [50, 124],
+  // the young frogs' states (art pack A5, 2026-11-13)
+  tadpole_hungry: [50, 124], tadpole_dirty: [50, 124], tadpole_moody: [50, 124], tadpole_tired: [50, 124],
+  tadpole_neglected: [50, 124], tadpole_packing: [50, 124], tadpole_recovering: [50, 124],
+  froglet_hungry: [30, 124], froglet_dirty: [30, 124], froglet_moody: [30, 124], froglet_tired: [30, 124],
+  froglet_neglected: [30, 124], froglet_packing: [30, 124], froglet_recovering: [30, 124],
 };
 // the moving-out frames (sprite pack 2026-11-09) stand on the same floor line as the frog
 export const DEPART_FOOT = [124, 124, 124, 124, 124, 124];
@@ -133,12 +138,20 @@ export const DEPART_MS = 250;
 export const DEPART_DX = [0, 12, 24, 38, 54, 66];
 // In-place walk cycles from a later art pack (backlog A4/A5): stage -> { turn: [files], walk: [files] }, every
 // frame with the body in the middle of its 128 px frame. A stage listed here walks with them; the code moves it.
-export const WALK = {};
+const steps4 = pre => [1, 2, 3, 4].map(n => pre + n + '.png');
+export const WALK = {
+  // art pack A4 (2026-11-13): turn with the suitcase, then four steps in place
+  adult: { turn: ['depart_turn_01.png', 'depart_turn_02.png'], walk: steps4('depart_walk_0') },
+  // art pack A5: the young frogs walk out with their own small suitcase
+  froglet: { turn: [], walk: steps4('froglet_depart_walk_0') },
+  tadpole: { turn: [], walk: steps4('tadpole_depart_0') },
+};
 export function departTimeline(stage = 'adult', walk = WALK[stage]) {
   const edge = ROOM_W - FROG_PX / 2;           // a 128 px frame touching the right edge
   if (walk) {
     const out = walk.turn.map(src => ({ src: IMG + src, x: HOME.x, foot: FOOT_Y, suitcase: false }));
-    for (let x = HOME.x + 24, i = 0; x < ROOM_W + FROG_PX / 2; x += 24, i++)
+    // with no turn frames the first step starts where the frog stood (no jump)
+    for (let x = HOME.x + (walk.turn.length ? 24 : 0), i = 0; x < ROOM_W + FROG_PX / 2; x += 24, i++)
       out.push({ src: IMG + walk.walk[i % walk.walk.length], x, foot: FOOT_Y, suitcase: false });
     return out;
   }
@@ -155,7 +168,8 @@ export function departTimeline(stage = 'adult', walk = WALK[stage]) {
   return seq.map((n, i) => ({ src: IMG + 'depart_0' + n + '.png', foot: DEPART_FOOT[n - 1], suitcase: false,
     x: Math.round(from + (to - from) * i / (seq.length - 1)) - DEPART_DX[n - 1] }));
 }
-export const DEPART_FRAMES = [1, 2, 3, 4, 5, 6].map(n => IMG + 'depart_0' + n + '.png');
+// every moving-out frame the window may play (preloaded when a frog is home)
+export const DEPART_FRAMES = Object.values(WALK).flatMap(w => [...w.turn, ...w.walk]).map(f => IMG + f);
 
 // ---------- short frame animations on the frog: hatching, and care once the art exists ----------
 // The egg hatches: three cracking frames and the tadpole out of its shell (art pack A1, 2026-11-13), then the tadpole.
@@ -265,7 +279,7 @@ export function renderRoom(doc, opts = {}) {
 export function playDeparture(frame, stage = 'adult', { setTimer = setTimeout, clearTimer = clearTimeout } = {}) {
   const doc = frame.ownerDocument, art = frame.querySelector('.pgr-art'), letter = frame.querySelector('.pgr-letter');
   const steps = departTimeline(stage);
-  const actor = doc.createElement('div'); actor.className = 'pgr-actor' + (stage === 'adult' ? '' : ' pgr-young');
+  const actor = doc.createElement('div'); actor.className = 'pgr-actor' + (stage === 'adult' || WALK[stage] ? '' : ' pgr-young');
   const im = doc.createElement('img'); im.alt = ''; actor.append(im);
   // a young frog's suitcase walks with it: placed inside the 128 px actor, in actor percent
   if (steps[0].suitcase) { const s = suitcaseEl(doc); pos(s, 50 + SUITCASE.dx / FROG_PX * 100, steps[0].foot / FROG_PX * 100, SUITCASE.px / FROG_PX * 100); actor.append(s); }

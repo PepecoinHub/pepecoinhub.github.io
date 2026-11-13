@@ -75,11 +75,13 @@ test('which sprite: packing, recovering and neglected first, then the need the a
   assert.equal(look({ needs: needs({ hunger: LOOK_BELOW }) }), 'adult_idle', 'only below ' + LOOK_BELOW);
   assert.equal(look({ needs: needs({ hunger: LOOK_BELOW - 0.5 }) }), 'adult_hungry');
   for (const status of ['neglected', 'recovering', 'packing']) assert.equal(look({ status, needs: needs({ hunger: 0 }) }), 'adult_' + status);
-  // young stages have no state sprites yet: their idle sprite, marked as a fallback; a packing one gets the separate suitcase
-  assert.deepEqual(frogLook({ stage: 'tadpole', status: 'packing', needs: needs({ hunger: 0 }) }), { sprite: 'tadpole_idle', look: null, suitcase: true, fallback: true });
-  assert.equal(frogLook({ stage: 'froglet', status: 'neglected' }).suitcase, false);
-  assert.equal(frogLook({ stage: 'froglet', status: 'neglected' }).fallback, true);
-  assert.deepEqual(frogLook({ stage: 'froglet', needs: needs({ hunger: 10 }) }), { sprite: 'froglet_idle', look: null, suitcase: false, fallback: true });
+  // the young frogs have their own state sprites since art pack A5 (their packing sprite carries its own suitcase)
+  assert.deepEqual(frogLook({ stage: 'tadpole', status: 'packing', needs: needs({ hunger: 0 }) }), { sprite: 'tadpole_packing', look: null, suitcase: false, fallback: false });
+  assert.deepEqual(frogLook({ stage: 'froglet', status: 'neglected' }), { sprite: 'froglet_neglected', look: null, suitcase: false, fallback: false });
+  assert.deepEqual(frogLook({ stage: 'froglet', needs: needs({ hunger: 10 }) }), { sprite: 'froglet_hungry', look: 'hungry', suitcase: false, fallback: false });
+  assert.equal(frogLook({ stage: 'tadpole', needs: needs({ energy: 10 }) }).sprite, 'tadpole_tired');
+  for (const st of ['tadpole', 'froglet']) for (const k of ['hungry', 'dirty', 'moody', 'tired', 'neglected', 'packing', 'recovering'])
+    assert.ok(SPRITES[st + '_' + k], st + '_' + k);
   assert.deepEqual(frogLook({ stage: 'froglet', needs: needs() }), { sprite: 'froglet_idle', look: null, suitcase: false, fallback: false });
   for (const s of ['healthy', 'recovering']) assert.equal(frogLook({ stage: 'egg', status: s }).fallback, false, 'the egg greys only when neglected or packing');
   assert.equal(frogLook({ stage: 'egg', status: 'packing' }).fallback, true);
@@ -107,7 +109,7 @@ test('after moving out: no frog, the TV the letter mentions is hidden, everythin
 });
 
 test('moving out: the 6 frames once, 250 ms each, walking right until the frog leaves the room', () => {
-  const t = departTimeline('adult');
+  const t = departTimeline('adult', null);   // the older frames (used only without a walk cycle)
   assert.equal(DEPART_MS, 250, 'frame_ms in the art pack manifest');
   assert.deepEqual(t.map(s => s.src.match(/depart_0(\d)/)[1]).join(''), '1234343456', 'turn, steps, walk out');
   assert.equal(t[0].x, HOME.x, 'starts where the frog stood');
@@ -122,8 +124,17 @@ test('moving out: the 6 frames once, 250 ms each, walking right until the frog l
   assert.deepEqual(t.map(s => s.foot), [1, 2, 3, 4, 3, 4, 3, 4, 5, 6].map(n => DEPART_FOOT[n - 1]), 'each frame stands on its own floor line');
   assert.ok(t.every(s => !s.suitcase), 'the adult frames already pull the suitcase');
   // young frogs: their sprite and the separate suitcase slide out, no adult frames
-  const y = departTimeline('tadpole');
+  const y = departTimeline('tadpole', null);
   assert.ok(y.every(s => /tadpole_idle/.test(s.src) && s.suitcase));
+  // the drawn walk cycles in the game (art packs A4 and A5): turn where it stood, then steps out of the room
+  for (const st of ['adult', 'froglet', 'tadpole']) {
+    const w = departTimeline(st);
+    assert.equal(w[0].x, HOME.x, st);
+    assert.ok(w.every(s => s.foot === FOOT_Y && !s.suitcase), st + ': the frames carry their own suitcase');
+    assert.ok(w.at(-1).x >= ROOM_W, st + ': it leaves the room');
+    for (const s of w) assert.ok(existsSync(file(s.src)), s.src);
+  }
+  assert.deepEqual(departTimeline('adult').slice(0, 3).map(s => s.src.split('/').pop()), ['depart_turn_01.png', 'depart_turn_02.png', 'depart_walk_01.png']);
   assert.ok(y.at(-1).x - FROG_PX / 2 >= ROOM_W, 'fully out of the room');
   // an in-place walk cycle from a later art pack (backlog A4): turn where it stood, then walk out of the room
   const w = departTimeline('adult', { turn: ['depart_turn_01.png', 'depart_turn_02.png'], walk: ['depart_walk_01.png', 'depart_walk_02.png'] });
@@ -181,7 +192,8 @@ test('the drawn room: layers in order, the letter is a real button, the frog car
   const frog = pet.querySelector('.pgr-pet');
   assert.equal(frog.src, spriteSrc('adult_hungry'));
   assert.equal(frog.dataset.fallback, undefined);
-  assert.equal(renderRoom(doc, { mode: 'pet', stage: 'froglet', status: 'neglected' }).querySelector('.pgr-pet').dataset.fallback, '1');
+  const young = renderRoom(doc, { mode: 'pet', stage: 'froglet', status: 'neglected' }).querySelector('.pgr-pet');
+  assert.equal(young.dataset.sprite, 'froglet_neglected'); assert.equal(young.dataset.fallback, undefined, 'its own sprite, no grey');
   assert.equal(frog.style.getPropertyValue('--foot'), 124 / 128 * 100 + '%');
   assert.equal(pet.querySelectorAll('.pgr-item').length, 6);
   assert.equal(pet.querySelector('.pgr-letter'), null);
@@ -202,14 +214,15 @@ test('playDeparture: frames on a timer, the letter waits until the frog is out, 
   const actor = () => room.querySelector('.pgr-actor');
   const seen = [];
   assert.equal(room.querySelector('.pgr-letter').hidden, true, 'no letter while the frog is still here');
-  while (actor()) { seen.push(actor().children[0].src.match(/depart_0(\d)/)[1]); const f = pending; pending = null; f(); }
-  assert.equal(seen.join(''), '1234343456');
+  while (actor()) { seen.push(actor().children[0].src.split('/').pop()); const f = pending; pending = null; f(); }
+  assert.deepEqual(seen.slice(0, 6), ['depart_turn_01.png', 'depart_turn_02.png', 'depart_walk_01.png', 'depart_walk_02.png', 'depart_walk_03.png', 'depart_walk_04.png']);
+  assert.equal(seen.length, departTimeline('adult').length, 'every frame once, then gone');
   assert.ok(fired.every(ms => ms === DEPART_MS));
   assert.equal(room.querySelector('.pgr-letter').hidden, false);
   // a click in the window draws again: the old animation stops and the letter is shown
   const again = renderRoom(doc, { mode: 'departed' });
   const stop = playDeparture(again, 'froglet', timers);
-  assert.equal(again.querySelector('.pgr-suitcase') != null, true, 'a young frog leaves with the separate suitcase');
+  assert.equal(again.querySelector('.pgr-suitcase'), null, 'a young frog now carries its own drawn suitcase');
   stop();
   assert.equal(again.querySelector('.pgr-actor'), null);
   assert.equal(again.querySelector('.pgr-letter').hidden, false);

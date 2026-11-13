@@ -74,9 +74,11 @@ test('every frog sprite the game draws: the full check, except the accepted mast
 });
 
 test('moving-out frames: on the grid and the feet line; DEPART_DX is where each frame draws the body', () => {
-  const left = DEPART_FRAMES.map(f => bbox(png(f))[0]);
+  // the older frames (art pack v2): still in the repo, played only when a stage has no walk cycle
+  const OLD = [1, 2, 3, 4, 5, 6].map(n => IMG + 'depart_0' + n + '.png');
+  const left = OLD.map(f => bbox(png(f))[0]);
   assert.deepEqual(left.map(l => l - left[0]), DEPART_DX);
-  for (const f of DEPART_FRAMES) assert.deepEqual(checkFile(path(f).pathname, { allowEdge: true }).problems, [], f);
+  for (const f of OLD) assert.deepEqual(checkFile(path(f).pathname, { allowEdge: true }).problems, [], f);
 });
 
 test('frames that a later art pack adds are real files that pass the check', () => {
@@ -84,6 +86,9 @@ test('frames that a later art pack adds are real files that pass the check', () 
   for (const w of Object.values(WALK)) files.push(...[...w.turn, ...w.walk].map(f => IMG + f));
   for (const f of files) {
     assert.ok(existsSync(path(f)), f);
-    assert.deepEqual(checkFile(path(f).pathname, { allowEdge: /depart|walk/.test(f) }).problems, [], f);
+    // walk frames 02 and 04 bounce 2 px up on purpose: their feet line is checked separately
+    const r = checkFile(path(f).pathname, { allowEdge: /depart|walk/.test(f), prop: /depart|walk/.test(f) });
+    assert.deepEqual(r.problems, [], f);
+    if (/depart|walk/.test(f)) assert.ok([122, 124].includes(r.bbox[3]), f + ': on the floor or 2 px above it');
   }
 });
