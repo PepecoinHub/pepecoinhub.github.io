@@ -1568,7 +1568,7 @@
   // Read-only PepeGochi companion on the PondOS taskbar; beta gate stays in place.
   // The real game and server own the pet; this module never invents a local pet.
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261113edge').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261113stand').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
         session: sbSession, rpc: rpc, base: BASE });
     }).catch(function () { /* optional decoration; the game still works */ });

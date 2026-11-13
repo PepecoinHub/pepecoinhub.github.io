@@ -14,6 +14,8 @@ export const POSES = ['tb_egg', 'tb_tadpole', 'tb_froglet', 'tb_adult_sit', 'tb_
   'tb_adult_moody', 'tb_adult_sleepy', 'tb_adult_neglected', 'tb_adult_packing', 'tb_adult_recovering',
   'tb_adult_talk', 'tb_adult_think', 'tb_adult_laugh', 'tb_adult_wave', 'tb_letter'];
 export const pose = id => 'taskbar/' + id + '.png';
+// bumped when a pose file is redrawn under the same name, so browsers do not keep the old picture
+export const POSE_VERSION = '20261113stand';
 // the room's sprite for the frog's state (frogLook) -> the taskbar pose that shows the same state
 const POSE_OF = { egg_idle: 'tb_egg', tadpole_idle: 'tb_tadpole', froglet_idle: 'tb_froglet', adult_idle: 'tb_adult_sit',
   adult_hungry: 'tb_adult_hungry', adult_dirty: 'tb_adult_dirty', adult_moody: 'tb_adult_moody', adult_tired: 'tb_adult_sleepy',
@@ -162,7 +164,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   function setAct(a) { act = a; if (shownView) paint(shownView); }
   function paint(view) {
     shownView = view;
-    const path = img_base + (act && view.adult ? pose(act) : view.sprite);
+    const path = img_base + (act && view.adult ? pose(act) : view.sprite) + '?v=' + POSE_VERSION;
     if (img.getAttribute('src') !== path) img.setAttribute('src', path);
     button.setAttribute('aria-label', view.title);
     button.title = view.title;
@@ -267,8 +269,9 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     if (f.answered) show();
     document.body.append(balloon);
     // above the frog, inside the screen (also on a phone, where the taskbar has two rows)
-    const r = slot.getBoundingClientRect();
-    balloon.style.bottom = Math.max(8, window.innerHeight - r.top + 6) + 'px';
+    // the frog stands on the taskbar's edge: the balloon goes above its head, so the frog stays visible
+    const r = slot.getBoundingClientRect(), top = Math.min(r.top, img.getBoundingClientRect().top);
+    balloon.style.bottom = Math.max(8, window.innerHeight - top + 6) + 'px';
     balloon.style.left = Math.max(8, Math.min(r.left, window.innerWidth - balloon.offsetWidth - 8)) + 'px';
     document.addEventListener('keydown', onKey, true);
     document.addEventListener('pointerdown', onOutside, true);
