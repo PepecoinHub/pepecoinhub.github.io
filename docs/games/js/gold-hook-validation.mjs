@@ -1,7 +1,7 @@
 // Run check for a whole Pepe Gold Hook campaign. The same rules are in
 // games/supabase/update_gold_hook_campaign.sql, so the server counts the score itself from the levels
-// played instead of trusting a number from the browser. It replays the economy (money, prices, the
-// one-level upgrades, dynamite) and checks every catch against the fastest possible hook cycle.
+// played instead of trusting a number from the browser. It replays the economy (the wallet gets only
+// the surplus over each goal; prices; the one-level upgrades; dynamite) and checks every catch against the fastest possible hook cycle.
 // It will not stop a perfect bot; it stops typing any score into the console.
 import { HOOK, LAYOUT, OBJECT_TYPES } from './gold-hook-config.mjs';
 import { MAX_LEVEL, CAMPAIGN_VERSION, levelDef, speedsFor, SHOP, SHOP_ITEMS, newRun, priceOf } from './gold-hook-campaign.mjs';
@@ -55,11 +55,11 @@ export function validateCampaign(sub) {
       prevT = c.t;
       earned += table[c.id].points;
     }
-    s.money += earned;
     s.total += earned;
     // what was bought for this level is used up; the shop below buys for the next one
     s.strength = 0; s.reel = 0; s.dynamite = 0; s.clock = 0;
     const won = earned >= def.target;
+    if (won) s.money += earned - def.target;     // only the surplus over the goal can be spent
     const last = i === sub.levels.length - 1;
     if (!won || L === MAX_LEVEL) {
       if (!last) return fail('after-end', L);

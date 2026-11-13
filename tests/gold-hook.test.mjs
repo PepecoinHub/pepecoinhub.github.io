@@ -10,11 +10,12 @@ import {
   hookGeometry, hookDir, currentAnim, drainEvents, useDynamite, segmentCircleEntry,
 } from '../docs/games/js/gold-hook-state.mjs';
 import {
-  MAX_LEVEL, TARGETS, levelDef, durationFor, weightFor, SHOP, newRun, modsFor, priceOf, priceFor, canBuy, buy,
+  MAX_LEVEL, TARGETS, levelDef, durationFor, weightFor, SHOP, newRun, modsFor, priceOf, priceFor, canBuy, buy, generateLayout,
   finishLevel, submission, speedsFor,
 } from '../docs/games/js/gold-hook-campaign.mjs';
 import { validateCampaign, levelTable } from '../docs/games/js/gold-hook-validation.mjs';
 import { createScores, buildSubmission, readSession, isNotDeployed } from '../docs/games/js/gold-hook-scores.mjs';
+import { botLevel, firstHit } from './gold-hook-bot.mjs';
 
 const W = LAYOUT.winch;
 const angleTo = (o) => Math.atan2(o.x - W.x, o.y - W.y) * 180 / Math.PI;
@@ -26,42 +27,7 @@ function stepUntil(g, pred, dt = 1 / 60, maxSec = 60) {
 }
 const HALF = { 'nugget-small': 12, 'nugget-medium': 16, 'nugget-large': 24, 'coin-pep': 12, rock: 16, crate: 20 };
 
-// ---------- a perfect-aim bot (waits for the swing like a player) ----------
-function firstHit(g, ang) {
-  const d = hookDir(ang), s = HOOK.restLength + HOOK.cargoOffset;
-  let best = null, bestT = Infinity;
-  for (const o of g.objects) {
-    if (o.caught) continue;
-    const t = segmentCircleEntry(W.x + d.x * s, W.y + d.y * s, W.x + d.x * 400, W.y + d.y * 400, o.x, o.y, o.r + HOOK.grabRadius);
-    if (t !== null && t < bestT) { bestT = t; best = o; }
-  }
-  return best;
-}
-function botLevel(def, mods, dt = 1 / 60) {
-  const g = createGame({ level: def, mods }); startRound(g);
-  let target = null;
-  for (let i = 0; i < Math.round(80 / dt) && g.app === APP.PLAYING; i++) {
-    const prev = g.hook.angle;
-    update(g, dt);
-    if (g.hook.mode === HOOK_MODE.RETURNING_LOADED && g.hook.cargo.type === 'rock' && g.dynamite > 0) useDynamite(g);
-    if (g.hook.mode !== HOOK_MODE.READY) { target = null; continue; }
-    if (!target || target.caught) {
-      let bestRate = -1; target = null;
-      for (const o of g.objects) {
-        if (o.caught || firstHit(g, angleTo(o)) !== o) continue;
-        const dist = Math.hypot(o.x - W.x, o.y - W.y);
-        const rate = o.points / (dist / g.speeds.extend + dist / (g.speeds.loaded * o.speedMul) + 1.2);
-        if (rate > bestRate) { bestRate = rate; target = o; }
-      }
-      if (!target) break;
-    }
-    const a = angleTo(target);
-    if (i > 0 && (prev - a) * (g.hook.angle - a) <= 0) fire(g);
-  }
-  while (g.app === APP.PLAYING) update(g, dt);
-  return g.result;
-}
-// every shop: the upgrades for the next level, most useful first, while the money lasts
+// ---------- the shared perfect-aim bot (tests/gold-hook-bot.mjs) ----------
 // An object of this type that the hook reaches first when aimed straight at it.
 function reachable(g, type) {
   const o = g.objects.find((x) => x.type === type && !x.caught && firstHit(g, angleTo(x)) === x);
@@ -90,7 +56,7 @@ test('20 levels: less time (the finale gets 50 s), heavier loot, more rocks, goa
   }
   assert.equal(durationFor(1), 60); assert.equal(durationFor(19), 45); assert.equal(durationFor(20), 50);
   assert.equal(weightFor(1), 1); assert.equal(weightFor(20), 0.8);
-  assert.equal(levelDef(1).target, 780);
+  assert.equal(levelDef(1).target, 700);
 });
 
 test('every level layout: no overlaps, inside the mine, within reach, clear of the resting hook', () => {
@@ -126,23 +92,37 @@ test('a perfect-aim bot that shops sensibly finishes all 20 levels', () => {
   assert.equal(fullRun.log.length, MAX_LEVEL);
 });
 
-test("every goal leaves room for mistakes: the bot gets >= 1.2x the goal with an average player's upgrades", () => {
-  // an average player earns about 60 % of what the bot does, so buys less
+// A player who digs up a share of what the perfect bot gets, and shops with the surplus only.
+function playerCampaign(share) {
   const r = newRun();
+  let cleared = 0;
   for (let L = 1; L <= MAX_LEVEL; L++) {
     r.level = L;
-    const res = botLevel(levelDef(L), modsFor(r));
-    assert.ok(res.score >= 1.2 * TARGETS[L], `level ${L}: bot ${res.score}, goal ${TARGETS[L]}`);
-    r.money += Math.floor(res.score * 0.6); r.log.push({ bought: [] });
+    const got = Math.round(botLevel(levelDef(L), modsFor(r)).score * share);
+    if (got < TARGETS[L]) break;
+    cleared = L;
+    r.money += got - TARGETS[L]; r.log.push({ bought: [] });
     r.strength = 0; r.reel = 0; r.dynamite = 0; r.clock = 0;
     if (L < MAX_LEVEL) { r.level = L + 1; policy(r); }
   }
+  return cleared;
+}
+
+test('a good player (85 % of the perfect bot) clears all 20 levels shopping with the surplus only', () => {
+  assert.equal(playerCampaign(0.85), MAX_LEVEL);
 });
 
-test('from level 9 on, a perfect bot without upgrades often falls short: the shop matters', () => {
-  let short = 0;
-  for (let L = 9; L <= MAX_LEVEL; L++) if (botLevel(levelDef(L), {}).score < TARGETS[L]) short++;
-  assert.ok(short >= 4, `only ${short} of 12 late levels need upgrades`);
+test('an average player (75 %) gets far, but the end is hard', () => {
+  const cleared = playerCampaign(0.75);
+  assert.ok(cleared >= 15 && cleared < MAX_LEVEL, `cleared ${cleared}`);
+});
+
+test('every level holds about the same loot, and goals ask 64 % rising to 75 % of it', () => {
+  for (let L = 1; L <= MAX_LEVEL; L++) {
+    const loot = botLevel(levelDef(L), {}).score;
+    assert.ok(loot >= 1050 && loot <= 1200, `level ${L}: ${loot}`);
+    assert.ok(TARGETS[L] <= 0.76 * loot, `level ${L}: goal ${TARGETS[L]} of ${loot}`);
+  }
 });
 
 // ---------- hook, scoring, upgrades ----------
@@ -294,8 +274,8 @@ test('the same shot takes the same time at 30, 60 and 120 FPS; the bot scores al
 
 // ---------- the run: shop and economy ----------
 test('shop: prices grow with the level, limits, money; a loss ends the run', () => {
-  assert.deepEqual(['strength', 'reel', 'dynamite', 'clock'].map((i) => priceFor(i, 1)), [200, 160, 60, 160]);
-  assert.deepEqual(['strength', 'reel', 'dynamite', 'clock'].map((i) => priceFor(i, 20)), [390, 312, 117, 312]);
+  assert.deepEqual(['strength', 'reel', 'dynamite', 'clock'].map((i) => priceFor(i, 1)), [200, 160, 60, 120]);
+  assert.deepEqual(['strength', 'reel', 'dynamite', 'clock'].map((i) => priceFor(i, 20)), [390, 312, 117, 234]);
   const r = newRun();
   assert.equal(priceOf(r, 'strength'), 200);
   assert.equal(canBuy(r, 'strength'), false, 'no money yet');
@@ -313,6 +293,16 @@ test('shop: prices grow with the level, limits, money; a loss ends the run', () 
   finishLevel(r, lostLevel);
   assert.equal(r.over, true);
   assert.equal(canBuy(r, 'clock'), false, 'no shop after game over');
+});
+
+test('the wallet only gets the surplus above the goal', () => {
+  const r = newRun();
+  finishLevel(r, { won: true, score: 950, target: 700, played: 60, run: { catches: [], dynamiteUsed: 0 } });
+  assert.equal(r.money, 250);
+  assert.equal(r.total, 950);
+  finishLevel(r, { won: false, score: 500, target: 710, played: 59, run: { catches: [], dynamiteUsed: 0 } });
+  assert.equal(r.money, 250, 'a lost level adds nothing');
+  assert.equal(r.total, 1450);
 });
 
 test('upgrades last one level: nothing carries over, unused dynamite is lost', () => {
