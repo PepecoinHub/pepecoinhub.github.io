@@ -1026,14 +1026,14 @@
   }
   if (mainEl && !REDUCE && matchMedia('(hover: hover) and (pointer: fine)').matches) {
     var poke = function () { clearTimeout(idleT); idleT = setTimeout(saver, 120000); };
-    var ACT = ['pointermove', 'pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart', 'input'];
-    ACT.forEach(function (t) { window.addEventListener(t, poke, { passive: true }); });
+    var IDLE_EV = ['pointermove', 'pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart', 'input'];
+    IDLE_EV.forEach(function (t) { window.addEventListener(t, poke, { passive: true }); });
     // a game in a PondOS window is an iframe: its mouse and keys never reach this page, so listen inside it too
     // (same-origin frames only), including frames inside frames (the POND DUELS gadget, PEPaint rooms)
     var watchFrame = function (f) {
       try {
         var w = f.contentWindow; if (!w || w.__pondPoke) return; w.__pondPoke = true;
-        ACT.forEach(function (t) { w.addEventListener(t, poke, { passive: true, capture: true }); });
+        IDLE_EV.forEach(function (t) { w.addEventListener(t, poke, { passive: true, capture: true }); });
         w.document.addEventListener('load', function (e) { if (e.target && e.target.tagName === 'IFRAME') watchFrame(e.target); }, true);
         Array.prototype.forEach.call(w.document.querySelectorAll('iframe'), watchFrame);
       } catch (e) {}
