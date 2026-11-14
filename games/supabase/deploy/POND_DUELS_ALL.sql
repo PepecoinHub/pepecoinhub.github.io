@@ -434,10 +434,10 @@ begin
   select count(*) into n from games.lily_challenges where creator = u and status = 'open';
   if n >= 3 then return jsonb_build_object('ok', false, 'error', 'open_limit'); end if;
   select count(*) into n from games.lily_challenges where creator = u and created_at >= day;
-  if n >= 5 then return jsonb_build_object('ok', false, 'error', 'day_limit'); end if;
+  if n >= 10 then return jsonb_build_object('ok', false, 'error', 'day_limit'); end if;
   if ip is not null then
     select count(*) into n from games.lily_challenges where creator_ip = ip and created_at >= day;
-    if n >= 15 then return jsonb_build_object('ok', false, 'error', 'day_limit'); end if;
+    if n >= 30 then return jsonb_build_object('ok', false, 'error', 'day_limit'); end if;
   end if;
   if (select count(*) from games.lily_challenges where created_at > now() - interval '1 hour') >= 300 then
     return jsonb_build_object('ok', false, 'error', 'busy'); end if;

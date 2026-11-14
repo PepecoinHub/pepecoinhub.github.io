@@ -14,7 +14,7 @@
   var ERR = {
     signin: 'Log on first, fren.', sum: 'Exactly 10 flies, no more, no less.', flies: 'Whole flies only, 0 to 10 on a lily.',
     open_limit: 'You already have 3 open challenges. Wait for a taker, or cancel one in My Matches.',
-    day_limit: 'That is 5 new challenges today. The flies need to rest. Back tomorrow (UTC).',
+    day_limit: 'That is 10 new challenges today. The flies need to rest. Back tomorrow (UTC).',
     busy: 'The pond is busy. Try again in a few minutes.', expired: 'Too late: this challenge expired. No win, no loss.',
     taken: 'Somebody else got there first. The flies are already settled.', self: 'You cannot accept your own challenge.',
     invite: 'This rematch is for somebody else.', missing: 'That challenge is gone.', rematch: 'That rematch is not possible.'

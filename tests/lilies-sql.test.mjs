@@ -107,7 +107,12 @@ test('Three Lilies: secret allocations, fair settlement, limits, Bulletin', { sk
     assert.equal(winEv.actor, 'MinerFren'); assert.equal(winEv.other, 'FrogKing'); assert.deepEqual(winEv.data.pads, [2, 1]);
     assert.equal(evs.find(e => e.ref === c3.challenge.id).kind, 'lily_draw');
 
-    // 15. limits: 3 open at once, 5 new per UTC day (A has created 5 today already)
+    // 15. limits: 3 open at once, 10 new per UTC day (A has created 5 today already; cancelled ones count too)
+    for (let i = 0; i < 5; i++) {
+      const cx = await create(A, 4, 3, 3, 'FrogKing');
+      assert.equal(cx.ok, true);
+      assert.equal((await call(A, 'select public.gry_lily_cancel($1) as v', [cx.challenge.id])).ok, true);
+    }
     assert.equal((await create(A, 4, 3, 3, 'FrogKing')).error, 'day_limit');
     await reset();
     for (let i = 0; i < 3; i++) assert.equal((await create(C, 4, 3, 3, 'Cee')).ok, true);
@@ -117,13 +122,13 @@ test('Three Lilies: secret allocations, fair settlement, limits, Bulletin', { sk
     assert.equal((await call(B, 'select public.gry_lily_cancel($1) as v', [open[1].id])).error, 'missing', 'only the author cancels');
     assert.equal((await create(C, 4, 3, 3, 'Cee')).ok, true);   // a free slot again (4 today)
     assert.equal((await accept(B, open[0].id, 4, 3, 3, 'Brave')).error, 'taken', 'cancelled cannot be accepted');
-    // per network: 15 new challenges a day, whoever signs in
+    // per network: 30 new challenges a day, whoever signs in
     await reset();
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 30; i++) {
       const g = { user: await addUser(db, 100 + i), ip: '9.9.9.9' };
       assert.equal((await create(g, 1, 1, 8, 'Spam' + i)).ok, true);
     }
-    assert.equal((await create({ user: await addUser(db, 200), ip: '9.9.9.9' }, 1, 1, 8, 'Spam15')).error, 'day_limit');
+    assert.equal((await create({ user: await addUser(db, 200), ip: '9.9.9.9' }, 1, 1, 8, 'Spam30')).error, 'day_limit');
 
     // 8. an expired challenge cannot be accepted, even from a stale screen; it gives no win and no loss
     await reset();
