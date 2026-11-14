@@ -65,9 +65,8 @@
     if (framed) { try { window.parent.postMessage(m, location.origin); return; } catch (e) {} }
     location.href = FALLBACK[what](m);
   }
-  // a page shown as a desktop gadget (?gadget=1): compact layout, and PondOS is told its height so the window fits
-  function gadget() {
-    document.documentElement.classList.add('gadget');
+  // inside a PondOS window: tell PondOS how tall the page is, so the window fits it (no empty grey below the game)
+  function fit() {
     var lastH = 0, tell = function () {
       var w = document.querySelector('.window'); if (!w) return;
       var h = Math.ceil(w.getBoundingClientRect().height) + 4;
@@ -75,6 +74,10 @@
     };
     if (window.ResizeObserver) new ResizeObserver(tell).observe(document.body); else setInterval(tell, 1000);
   }
+  // a page shown as a desktop gadget (?gadget=1): compact layout, and the window fits it
+  var fitting = false;
+  function gadget() { document.documentElement.classList.add('gadget'); if (!fitting) { fitting = true; fit(); } }
+  if (framed && !/[?&]gadget=1(&|$)/.test(location.search)) { fitting = true; document.addEventListener('DOMContentLoaded', fit); }
   // a length of time, short: 45 min, 3 h 20 min, 2 d 5 h
   function dur(sec) {
     var m = Math.floor((sec || 0) / 60), h = Math.floor(m / 60), d = Math.floor(h / 24);

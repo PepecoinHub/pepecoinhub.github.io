@@ -2041,3 +2041,4 @@ footer.foot a { color: #edf3e3; }
 @media (max-width: 560px) { .ad-px-xl, .ad-anim { width: 76px; height: 76px; } .ad-anim { background-size: 304px 76px; animation-name: ad-anim-s; } .ad-vs .ad-px { width: 56px; height: 56px; } .ad-lilies .ad-px { width: 56px; height: 56px; } }
 @keyframes ad-anim-s { to { background-position: -304px 0; } }
 @media (prefers-reduced-motion: reduce) { .look-gameshow .ptv-stage::before, .look-gameshow .ptv-stage::after, .ad-anim { animation: none; } }
+.app-frame.fit-frame { height: 480px; }

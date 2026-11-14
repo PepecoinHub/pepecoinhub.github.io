@@ -1592,7 +1592,7 @@
   // POND KING: rock, paper, scissors for the throne (games/pond-king.html); one frog reigns until a visitor beats it
   function pondKingApp() {
     var A = openApp('pondking', 'POND KING', 'pond-king', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pond-king.html?embed=1" title="POND KING" allow="web-share"></iframe>';
+      A.body.innerHTML = '<iframe class="app-frame fit-frame" src="' + BASE + 'games/pond-king.html?embed=1" title="POND KING" allow="web-share"></iframe>';
     }, 720);
     return A;
   }
@@ -1665,7 +1665,7 @@
     var q = id === 'new' ? '&tab=create' : id && /^[0-9a-f-]{36}$/i.test(id) ? '&c=' + id : '';
     var src = BASE + 'games/lilies.html?embed=1' + q;
     var A = openApp('lilies', 'BATTLE OF THREE LILIES.EXE', 'lilies', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + src + '" title="Battle of Three Lilies"></iframe>';
+      A.body.innerHTML = '<iframe class="app-frame fit-frame" src="' + src + '" title="Battle of Three Lilies"></iframe>';
     }, 720);
     var fr = A.body.querySelector('iframe'); if (q && fr && fr.getAttribute('src') !== src) fr.setAttribute('src', src);
     return A;
@@ -1675,7 +1675,7 @@
     // already open: bring it up with fresh news (a duel may have just ended in another window)
     if (apps.bulletin) { var f0 = apps.bulletin.body.querySelector('iframe'); try { f0.contentWindow.location.reload(); } catch (e) {} }
     return openApp('bulletin', 'POND BULLETIN.EXE', 'bulletin', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/bulletin.html?embed=1" title="Pond Bulletin"></iframe>';
+      A.body.innerHTML = '<iframe class="app-frame fit-frame" src="' + BASE + 'games/bulletin.html?embed=1" title="Pond Bulletin"></iframe>';
     }, 680);
   }
   // the pond duel pages ask PondOS for other windows (a Fren Passport, Log On, another duel). Only our own
@@ -1684,9 +1684,10 @@
     var m = e.data;
     // the gadget tells its height, so its window (or card) fits the game without a scroll bar
     if (e.origin === location.origin && m && m.type === 'pondos-size' && m.h > 100) {
-      document.querySelectorAll('iframe.gadget-frame').forEach(function (f) {
+      // the pond games' own windows fit their page too, up to what the screen has room for (then the page scrolls)
+      document.querySelectorAll('iframe.gadget-frame, iframe.fit-frame').forEach(function (f) {
         if (f.contentWindow !== e.source) return;
-        f.style.height = Math.min(m.h, 640) + 'px';
+        f.style.height = Math.min(m.h, f.classList.contains('fit-frame') ? Math.max(260, window.innerHeight - 130) : 640) + 'px';
         if (!f.hidden && apps.pkgadget && apps.pkgadget.place && apps.pkgadget.body.contains(f) && !apps.pkgadget.moved) apps.pkgadget.place();
       });
       return;
