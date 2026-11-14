@@ -8,7 +8,7 @@
 --   * Player A creates a challenge: the allocation is stored as a secret. Player B accepts later with their
 --     own allocation; the server stores it, settles the duel and only then shows both allocations.
 --   * A challenge is open for 48 hours. Expired: no win, no loss. Only its author can cancel an open one.
---   * Limits: 3 open challenges per player, 5 new challenges per player per UTC day, 15 per network per UTC day.
+--   * Limits: 3 open challenges per player, 10 new challenges per player per UTC day, 30 per network per UTC day.
 --   * No stakes, no PEP, no points for posting.
 --
 -- Security: players come from the signed-in Supabase session (Discord or guest), never from an argument.
@@ -135,10 +135,10 @@ begin
   select count(*) into n from games.lily_challenges where creator = u and status = 'open';
   if n >= 3 then return jsonb_build_object('ok', false, 'error', 'open_limit'); end if;
   select count(*) into n from games.lily_challenges where creator = u and created_at >= day;
-  if n >= 5 then return jsonb_build_object('ok', false, 'error', 'day_limit'); end if;
+  if n >= 10 then return jsonb_build_object('ok', false, 'error', 'day_limit'); end if;
   if ip is not null then
     select count(*) into n from games.lily_challenges where creator_ip = ip and created_at >= day;
-    if n >= 15 then return jsonb_build_object('ok', false, 'error', 'day_limit'); end if;
+    if n >= 30 then return jsonb_build_object('ok', false, 'error', 'day_limit'); end if;
   end if;
   if (select count(*) from games.lily_challenges where created_at > now() - interval '1 hour') >= 300 then
     return jsonb_build_object('ok', false, 'error', 'busy'); end if;
