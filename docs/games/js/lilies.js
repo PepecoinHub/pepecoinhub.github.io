@@ -35,12 +35,41 @@
   $('logon').addEventListener('click', function () { N.open('logon'); });
 
   // ---------- the allocator ----------
+  // ---------- the pond: lily pads and flies, drawn in SVG ----------
+  // PLACEHOLDER ART (see games/POND_DUELS.md, "Art wanted"): a code-drawn lily pad and fly, to be swapped
+  // for the final images. Only class names style them (the page's CSP has no inline styles).
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function fly(x, y, cls) {
+    return '<g class="fly ' + cls + '" transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')">' +
+      '<ellipse class="wing" cx="-3.4" cy="-3.2" rx="3.6" ry="2.3" transform="rotate(-25 -3.4 -3.2)"/>' +
+      '<ellipse class="wing" cx="3.4" cy="-3.2" rx="3.6" ry="2.3" transform="rotate(25 3.4 -3.2)"/>' +
+      '<ellipse class="body" rx="2.7" ry="3.9"/><circle class="eye" cx="-1.2" cy="-3.4" r="0.9"/><circle class="eye" cx="1.2" cy="-3.4" r="0.9"/></g>';
+  }
+  // n flies on an arc (from a0 to a1 degrees) around the pad's centre, in two rings so 10 still fit
+  function ring(n, a0, a1, cls) {
+    var out = '';
+    for (var i = 0; i < n; i++) {
+      var t = n === 1 ? .5 : i / (n - 1), a = (a0 + (a1 - a0) * t) * Math.PI / 180, r = i % 2 ? 41 : 31;
+      out += fly(60 + r * Math.cos(a), 63 + r * Math.sin(a), cls);
+    }
+    return out;
+  }
+  // one lily pad: mine (and theirs, after a duel), with the centre badge
+  function padSvg(mine, theirs, badge) {
+    var veins = '';
+    for (var k = 0; k < 7; k++) { var a = (-60 + k * 50) * Math.PI / 180; veins += '<line class="vein" x1="60" y1="63" x2="' + (60 + 46 * Math.cos(a)).toFixed(1) + '" y2="' + (63 + 46 * Math.sin(a)).toFixed(1) + '"/>'; }
+    var flies = theirs == null ? ring(mine, -80, 250, 'mine') : ring(mine, 105, 255, 'mine') + ring(theirs, -75, 75, 'theirs');
+    return '<svg viewBox="0 0 120 120" class="leaf" aria-hidden="true">' +
+      '<ellipse class="shadow" cx="62" cy="68" rx="54" ry="52"/>' +
+      '<path class="pad-fill" d="M60 63 L76 13.6 A52 52 0 1 1 44 13.6 Z"/>' + veins +
+      '<ellipse class="shine" cx="42" cy="44" rx="16" ry="9" transform="rotate(-30 42 44)"/>' + flies +
+      '<circle class="badge" cx="60" cy="63" r="15"/><text class="badge-t" x="60" y="69" text-anchor="middle">' + badge + '</text></svg>';
+  }
   var padsEl = $('pads');
   LILIES.forEach(function (name, i) {
     var pad = mk('div', 'pad'); pad.setAttribute('role', 'group'); pad.setAttribute('aria-label', name);
     pad.appendChild(mk('h3', null, name));
-    var leaf = mk('div', 'pad-leaf'), num = mk('b', null, '0'); leaf.appendChild(num); pad.appendChild(leaf);
-    var fl = mk('div', 'flies'); fl.setAttribute('aria-hidden', 'true'); pad.appendChild(fl);
+    var art = mk('div', 'art'); pad.appendChild(art);
     var st = mk('div', 'steps');
     var minus = mk('button', null, '−'), plus = mk('button', null, '+');
     minus.type = plus.type = 'button';
@@ -48,23 +77,33 @@
     minus.addEventListener('click', function () { if (flies[i] > 0) { flies[i]--; paint(); } });
     plus.addEventListener('click', function () { if (sum() < 10) { flies[i]++; paint(); } });
     st.appendChild(minus); st.appendChild(plus); pad.appendChild(st);
-    pad._num = num; pad._fl = fl; pad._minus = minus; pad._plus = plus;
+    pad._art = art; pad._minus = minus; pad._plus = plus;
     padsEl.appendChild(pad);
   });
+  var jar = $('jar');
+  for (var j = 0; j < 10; j++) jar.appendChild(mk('span', 'dot'));
   function sum() { return flies[0] + flies[1] + flies[2]; }
   function paint() {
     var s = sum();
     Array.prototype.forEach.call(padsEl.children, function (pad, i) {
-      pad._num.textContent = flies[i]; pad._fl.textContent = '🪰'.repeat(flies[i]);
+      pad._art.innerHTML = padSvg(flies[i], null, String(flies[i]));
+      pad.classList.toggle('empty', flies[i] === 0);
+      pad.setAttribute('aria-label', LILIES[i] + ': ' + flies[i] + (flies[i] === 1 ? ' fly' : ' flies'));
       pad._minus.disabled = flies[i] === 0; pad._plus.disabled = s >= 10;
     });
+    Array.prototype.forEach.call(jar.children, function (d, i) { d.classList.toggle('used', i < s); });
     var left = 10 - s; $('flies-left').textContent = left; $('flies-word').textContent = left === 1 ? 'fly' : 'flies';
-    $('flies-left').parentNode.className = 'left' + (left === 0 ? ' done' : '');
+    $('left-line').className = 'left' + (left === 0 ? ' done' : '');
+    $('left-line').lastChild.textContent = left === 0 ? ' left. All 10 flies in position!' : ' still buzzing around';
+    document.querySelectorAll('.presets [data-spread]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.spread === flies.join(','))); });
     $('submit').disabled = busy || s !== 10 || !me || !nickOk();
   }
   $('spread').addEventListener('click', function () {
     var a = Math.floor(Math.random() * 11), b = Math.floor(Math.random() * (11 - a)); flies = [a, b, 10 - a - b];
     flies.sort(function () { return Math.random() - .5; }); paint();
+  });
+  document.querySelectorAll('.presets [data-spread]').forEach(function (b) {
+    b.addEventListener('click', function () { flies = b.dataset.spread.split(',').map(Number); paint(); });
   });
   var nick = $('nick');
   function nickOk() { var v = nick.value.trim(); return v.length >= 2 && v.length <= 20; }
@@ -113,14 +152,18 @@
     var otherPass = m.mine ? m.opponent_passport : m.creator_passport;
     $('res-title').textContent = (m.mine ? m.creator : m.opponent) + ' vs ' + other;
     var box = $('res-pads'); box.textContent = '';
+    $('tab-result').className = 'panel ' + (m.outcome === 'win' ? 'won' : m.outcome === 'lose' ? 'lost' : 'drawn');
+    $('res-kicker').textContent = 'Duel report · ' + N.ago(m.completed_at);
     LILIES.forEach(function (name, i) {
       var y = mine[i], t = theirs[i], cls = y > t ? 'won' : y < t ? 'lost' : 'tie';
       var pad = mk('div', 'pad ' + cls); pad.appendChild(mk('h3', null, name));
+      var art = mk('div', 'art'); art.innerHTML = padSvg(y, t, cls === 'won' ? '✓' : cls === 'lost' ? '✗' : '='); pad.appendChild(art);
       var row = mk('div', 'vsrow');
-      var a = mk('span'); var ab = mk('b', y > t ? 'hi' : '', String(y)); a.appendChild(ab); a.appendChild(mk('small', null, 'you'));
-      var b = mk('span'); var bb = mk('b', t > y ? 'hi' : '', String(t)); b.appendChild(bb); b.appendChild(mk('small', null, other));
-      row.appendChild(a); row.appendChild(mk('span', null, 'vs')); row.appendChild(b); pad.appendChild(row);
+      var a = mk('span', 'me'); a.appendChild(mk('b', null, String(y))); a.appendChild(mk('small', null, 'you'));
+      var b = mk('span', 'them'); b.appendChild(mk('b', null, String(t))); b.appendChild(mk('small', null, other));
+      row.appendChild(a); row.appendChild(mk('span', 'vs', 'vs')); row.appendChild(b); pad.appendChild(row);
       pad.appendChild(mk('span', 'verdict', cls === 'won' ? 'YOURS' : cls === 'lost' ? 'THEIRS' : 'UNDECIDED'));
+      pad.setAttribute('aria-label', name + ': you ' + y + ', ' + other + ' ' + t + ', ' + (cls === 'won' ? 'yours' : cls === 'lost' ? 'theirs' : 'undecided'));
       box.appendChild(pad);
     });
     var won = mine.reduce(function (n, y, i) { return n + (y > theirs[i] ? 1 : 0); }, 0);
@@ -143,6 +186,8 @@
     show('result');
     $('res-title').textContent = m.creator + ' vs ' + m.opponent;
     $('res-pads').textContent = '';
+    $('tab-result').className = 'panel drawn';
+    $('res-kicker').textContent = 'Duel report · ' + N.ago(m.completed_at);
     var p = m.pads || [0, 0], line = $('res-line');
     line.className = 'big';
     line.textContent = m.result === 'draw' ? 'Draw ' + p[0] + ':' + p[1] + '. The pond remains divided.'

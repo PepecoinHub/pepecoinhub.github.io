@@ -6,8 +6,8 @@
 <meta name="description" content="A strategy duel for two frogs who never have to be online together. Spread 10 flies over three lily pads, win two pads, win the duel.">
 <meta name="robots" content="noindex">
 <link rel="canonical" href="https://pepecoinhub.com/games/lilies.html"><link rel="icon" href="img/lilies.svg" type="image/svg+xml">
-<link rel="stylesheet" href="pond.css?v=20261114b"><link rel="stylesheet" href="lilies.css?v=20261114b">
-<script src="js/config.js"></script><script src="js/pond-net.js?v=20261114b" defer></script><script src="js/lilies.js?v=20261114b" defer></script>
+<link rel="stylesheet" href="pond.css?v=20261114d"><link rel="stylesheet" href="lilies.css?v=20261114d">
+<script src="js/config.js"></script><script src="js/pond-net.js?v=20261114b" defer></script><script src="js/lilies.js?v=20261114d" defer></script>
 </head><body>
 <header class="site-bar"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · FLY TRAFFIC CONTROL</span><a href="bulletin.html">Pond Bulletin ↗</a></header>
 <main class="desk">
@@ -38,20 +38,31 @@
     <section class="panel" id="tab-create" hidden>
       <h2 id="alloc-title">Create a challenge</h2>
       <p class="muted" id="alloc-sub">Spread exactly 10 flies over three lily pads. Nobody sees them until somebody accepts. Win two pads, win the duel.</p>
-      <div class="pads" id="pads"></div>
-      <p class="left"><b id="flies-left">10</b> <span id="flies-word">flies</span> still buzzing around</p>
-      <div class="row">
+      <div class="pond" id="pads"></div>
+      <div class="jar-row">
+        <div class="jar" id="jar" aria-hidden="true"></div>
+        <p class="left" id="left-line" role="status"><b id="flies-left">10</b> <span id="flies-word">flies</span> still buzzing around</p>
+      </div>
+      <div class="presets" role="group" aria-label="Quick spreads">
+        <span>Quick spreads:</span>
+        <button type="button" data-spread="3,3,4">3 · 3 · 4</button>
+        <button type="button" data-spread="2,4,4">2 · 4 · 4</button>
+        <button type="button" data-spread="5,5,0">5 · 5 · 0</button>
+        <button type="button" data-spread="1,1,8">1 · 1 · 8</button>
+        <button type="button" id="spread" title="A random spread">🎲 Surprise me</button>
+      </div>
+      <div class="row submit-row">
         <label for="nick">Your name</label><input id="nick" maxlength="20" autocomplete="nickname" spellcheck="false">
-        <button type="button" id="spread" title="A random spread">🎲 Random</button>
-        <button type="button" class="go" id="submit" disabled>Create Challenge</button>
+        <button type="button" class="go big-go" id="submit" disabled>Create Challenge</button>
       </div>
       <p class="msg" id="alloc-msg" role="status"></p>
     </section>
 
     <!-- result of one duel -->
     <section class="panel" id="tab-result" hidden>
+      <p class="kicker" id="res-kicker">Duel report</p>
       <h2 id="res-title">Duel</h2>
-      <div class="pads result" id="res-pads"></div>
+      <div class="pond result" id="res-pads"></div>
       <p class="big" id="res-line"></p>
       <p class="muted" id="res-sub"></p>
       <div class="row" id="res-actions"></div>

@@ -80,6 +80,8 @@ Ręcznie, w przeglądarce (Playwright, lokalna baza zamiast Supabase): gracz Dis
 
 ## Brakujące grafiki (dla ChatGPT)
 
+Gotowy prompt do wklejenia w ChatGPT (styl, paleta, rozmiary, nazwy plików i miejsca w kodzie): `games/POND_ART_GPT_PROMPT.md`.
+
 Wszystko poniżej to dziś placeholdery, oznaczone w kodzie (`PLACEHOLDER`):
 
 1. **Liść lilii**: 3 warianty albo jeden do obracania, widok z góry, ok. 256×256, przezroczyste tło, z miejscem na liczbę. Dziś zielone koło z CSS (`.pad-leaf` w `docs/games/lilies.css`).
