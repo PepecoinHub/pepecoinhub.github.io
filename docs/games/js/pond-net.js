@@ -29,6 +29,12 @@
     return refreshing;
   }
   // who is signed in: { id, discord, name } or null
+  // a display name the pond games accept: letters (Polish ones too), digits, space, _ . - ; 2 to 20 characters.
+  // A Discord name like "Lemon 🍋 Ᵽ" becomes "Lemon" instead of a name the server refuses.
+  var NICK_BAD = /[^A-Za-z0-9ĄĆĘŁŃÓŚŹŻąćęłńóśźż _.\-]/g, NICK_OK = /^[A-Za-z0-9ĄĆĘŁŃÓŚŹŻąćęłńóśźż _.\-]{2,20}$/;
+  function cleanNick(v) { v = String(v || '').replace(NICK_BAD, '').replace(/\s+/g, ' ').trim().slice(0, 20).trim(); return v.length >= 2 ? v : ''; }
+  function nickOk(v) { return NICK_OK.test(String(v || '').trim().replace(/\s+/g, ' ')); }
+  var NICK_RULE = 'Name: 2 to 20 letters, digits, spaces or _ . - (no emoji).';
   function me(s) {
     if (!s || !s.user) return null;
     var u = s.user, ids = u.identities || [], d = null;
@@ -37,7 +43,9 @@
     var discord = !!d || providers.indexOf('discord') >= 0;
     var idd = (d && d.identity_data) || {}, cl = idd.custom_claims || {}, m = u.user_metadata || {};
     var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
-    return { id: u.id, discord: discord, name: (discord && (cl.global_name || idd.full_name || idd.name || idd.user_name || m.full_name || m.name)) || nick || '' };
+    var names = discord ? [cl.global_name, idd.full_name, idd.name, idd.user_name, m.full_name, m.name, nick] : [nick];
+    for (var j = 0; j < names.length; j++) { var c = cleanNick(names[j]); if (c) return { id: u.id, discord: discord, name: c }; }
+    return { id: u.id, discord: discord, name: '' };
   }
   function rpc(name, args, opt) {
     if (!CFG.supabaseUrl || !CFG.supabaseKey) return Promise.reject(Object.assign(new Error('offline'), { status: 0 }));
@@ -110,7 +118,7 @@
     return Math.floor(s / 3600) + ' h left';
   }
   function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-  window.PondNet = { session: session, me: me, rpc: rpc, open: open, framed: framed, embedded: embedded, ago: ago, left: left, mk: mk, gadget: gadget, dur: dur, tabs: tabs };
+  window.PondNet = { session: session, me: me, rpc: rpc, open: open, framed: framed, embedded: embedded, ago: ago, left: left, mk: mk, gadget: gadget, dur: dur, tabs: tabs, cleanNick: cleanNick, nickOk: nickOk, NICK_RULE: NICK_RULE };
   document.addEventListener('DOMContentLoaded', function () { document.querySelectorAll('.mini-tabs').forEach(tabs); });
 })();
 
