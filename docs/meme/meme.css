@@ -2043,3 +2043,6 @@ footer.foot a { color: #edf3e3; }
 @media (prefers-reduced-motion: reduce) { .look-gameshow .ptv-stage::before, .look-gameshow .ptv-stage::after, .ad-anim { animation: none; } }
 .app-frame.fit-frame { height: 480px; }
 .balloon.is-link { cursor: pointer; }
+/* a Discord player's name in a top 10 opens their Fren Passport */
+.who-pass { padding: 0; border: 0; background: none; font: inherit; font-weight: 700; color: #0000ee; text-decoration: underline; cursor: pointer; }
+.who-pass:focus-visible { outline: 1px dotted #000; outline-offset: 2px; }
