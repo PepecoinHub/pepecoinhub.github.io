@@ -163,3 +163,16 @@ details.panel { padding-top: 12px; }
 .embed .site-bar, .embed footer, .embed .window > .titlebar { display: none !important; }
 .embed .desk { max-width: none; padding: 0; }
 .embed .window { box-shadow: none; padding: 0 4px; }
+
+/* ---------- the drawn art (docs/games/img/pond/, small PNGs scaled up in whole steps, never smoothed) ---------- */
+.px-img, .throne-frog, .stamp, .slot i img, .mv i img, .fight .side i img { image-rendering: pixelated; }
+.slot i img, .mv i img, .fight .side i img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.stamp { float: right; width: 96px; height: 96px; margin: 0 0 6px 10px; padding: 3px; background: var(--pane); box-shadow: var(--sunken); }
+/* result animations: 4 frames of 32x32 side by side, shown at 96x96 */
+.anim { width: 96px; height: 96px; margin: 4px 0; image-rendering: pixelated; background: 0 0 / 384px 96px no-repeat; animation: frames .8s steps(4) infinite; }
+.anim.win { background-image: url(img/pond/win-anim.png); }
+.anim.lose { background-image: url(img/pond/lose-anim.png); animation-duration: 1.2s; }
+.anim.draw { background-image: url(img/pond/draw-anim.png); }
+@keyframes frames { from { background-position: 0 0; } to { background-position: -384px 0; } }
+#result .anim, #tab-result .anim { float: right; }
+@media (prefers-reduced-motion: reduce) { .anim { animation: none; } }

@@ -23,7 +23,8 @@
   var pick = ['', '', ''], def = ['', '', ''];
   // a move as pixel art (rock / paper / scissors sprites in pond-net.js)
   var SPRITE = { r: 'rock', p: 'paper', s: 'scissors' };
-  function icon(m) { var i = mk('i'); i.innerHTML = N.px.sprite(SPRITE[m]); return i; }
+  function moveImg(m) { var im = mk('img', 'px-img'); im.src = 'img/pond/move-' + SPRITE[m] + '.png'; im.alt = ''; return im; }
+  function icon(m) { var i = mk('i'); i.appendChild(moveImg(m)); return i; }
 
   var rpc = N.rpc;   // with the pond log-on (Discord or guest) when there is one, otherwise as a visitor
 
@@ -77,7 +78,7 @@
       slots.forEach(function (b, i) {
         var m = arr[i];
         b.classList.toggle('filled', !!m); b.classList.toggle('next', i === next);
-        var ic = b.querySelector('i'); if (m) ic.innerHTML = N.px.sprite(SPRITE[m]); else ic.textContent = '?';
+        var ic = b.querySelector('i'); ic.textContent = ''; if (m) ic.appendChild(moveImg(m)); else ic.textContent = '?';
         b.querySelector('span').textContent = m ? MOVES[m][1] : '';
         b.setAttribute('aria-label', 'Round ' + (i + 1) + ': ' + (m ? MOVES[m][1] + ', click to clear' : 'empty'));
       });
@@ -224,6 +225,8 @@
       var line = $('res-line'), after = $('res-after');
       line.textContent = (r.won ? 'You took the throne! ' : 'The king holds. ') + r.score[0] + ' : ' + r.score[1];
       line.classList.add(r.won ? 'w' : 'l'); $('result').classList.add(r.won ? 'won' : 'lost');
+      var anim = mk('div', 'anim ' + (r.won ? 'win' : r.score[0] === r.score[1] ? 'draw' : 'lose')); anim.setAttribute('aria-hidden', 'true');
+      line.parentNode.insertBefore(anim, line);
       var p = mk('p', 'muted', r.won
         ? 'Your three moves now defend the pond. The next challenger meets them in a shuffled order. You can change them below at any time.'
         : r.score[0] === r.score[1] ? 'A tie keeps the king on the throne. ' + kingNick + ' has now held it ' + plural(r.king.defenses, 'time', 'times') + '. You walk away dizzy: come back in 4 hours.'

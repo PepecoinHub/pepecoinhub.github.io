@@ -119,3 +119,10 @@
   .notes { grid-template-columns: 1fr; }
   .king-note { flex-wrap: wrap; } .king-note p { flex: 1 1 60%; } .king-note button { flex: 1 1 100%; }
 }
+
+/* the drawn art */
+.leaf image { image-rendering: pixelated; }
+.leaf.dim image { filter: saturate(.45) brightness(.9); }
+.board { background: url(img/pond/cork-tile.png) 0 0 / 64px 64px; image-rendering: pixelated; }
+.board h2 img, .note-bar img, .clip > img, .cards .card .ic, .king-note img { image-rendering: pixelated; }
+.king-note img { width: 64px; height: 64px; }

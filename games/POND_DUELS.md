@@ -78,7 +78,13 @@ W CI te testy się pomijają, bo nie ma tam Postgresa. Tak samo działają pozos
 
 Ręcznie, w przeglądarce (Playwright, lokalna baza zamiast Supabase): gracz Discord tworzy wyzwanie 2/4/4 z Bulletinu w PondOS, gość na telefonie przyjmuje je z 4/3/3 i przegrywa 1:2. Wynik pojawia się w Bulletinie raz, „FrogKing’s Passport” otwiera okno Paszportu, a pierwszy gracz po ponownym wejściu widzi „You win 2:1”.
 
-## Brakujące grafiki (dla ChatGPT)
+## Grafiki
+
+Dostarczone (14.11.2026, z ChatGPT) i wstawione do `docs/games/img/pond/`: liście lilii a/b/c, kamień, papier i nożyce, Król Stawu, ikony Lilii i Bulletinu, kafelek korka, pinezka, animacje wygranej, przegranej i remisu (po 4 klatki, jako paski `*-anim.png`) oraz Pepe w koronie (`king-stamp.png`: awatar króla w Bulletinie i w panelu „You are the Pond King”, ikona Paszportu króla). Oryginały miały ok. 1250 px i rozmyte krawędzie. Zostały zmniejszone do prawdziwej siatki 32 px (Król 48 px), z kilkunastoma kolorami i ostrą przezroczystością, i są wyświetlane z `image-rendering: pixelated`. Wszystko razem waży ok. 20 KB.
+
+Nadal rysowane w kodzie: muchy (5x5 px w `docs/games/js/pond-net.js`, bo muchy z GPT przy tym rozmiarze zlewały się w plamę) i woda stawu (dithering w CSS).
+
+### Pierwotne zamówienie
 
 Gotowy prompt do wklejenia w ChatGPT (styl, paleta, rozmiary, nazwy plików i miejsca w kodzie): `games/POND_ART_GPT_PROMPT.md`.
 

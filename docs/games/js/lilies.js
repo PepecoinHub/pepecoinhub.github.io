@@ -72,10 +72,11 @@
     }
     return out;
   }
-  function padSvg(mine, theirs, badge, dim) {
+  // the lily pad itself is the drawn art (img/pond/lily-pad-a/b/c.png, 32x32); flies and the number go on top
+  function padSvg(mine, theirs, badge, dim, n) {
     var flies = theirs == null ? ring(mine, -70, 250, 'fly') : ring(mine, 110, 250, 'fly') + ring(theirs, -70, 70, 'flyTheirs');
-    return '<svg viewBox="0 0 32 32" class="leaf px" shape-rendering="crispEdges" aria-hidden="true">' +
-      PX.rects(LEAF, dim ? DIM_PAL : LEAF_PAL, 0, 0, 1) + flies +
+    return '<svg viewBox="0 0 32 32" class="leaf px' + (dim ? ' dim' : '') + '" shape-rendering="crispEdges" aria-hidden="true">' +
+      '<image href="img/pond/lily-pad-' + 'abc'.charAt(n || 0) + '.png" x="0" y="0" width="32" height="32"/>' + flies +
       '<rect x="12" y="13" width="8" height="7" fill="#142016"/><rect x="13" y="14" width="6" height="5" fill="#ffffff"/>' +
       '<text class="badge-t" x="16" y="18.6" text-anchor="middle">' + badge + '</text></svg>';
   }
@@ -100,7 +101,7 @@
   function paint() {
     var s = sum();
     Array.prototype.forEach.call(padsEl.children, function (pad, i) {
-      pad._art.innerHTML = padSvg(flies[i], null, String(flies[i]));
+      pad._art.innerHTML = padSvg(flies[i], null, String(flies[i]), false, i);
       pad.classList.toggle('empty', flies[i] === 0);
       pad.setAttribute('aria-label', LILIES[i] + ': ' + flies[i] + (flies[i] === 1 ? ' fly' : ' flies'));
       pad._minus.disabled = flies[i] === 0; pad._plus.disabled = s >= 10;
@@ -171,7 +172,7 @@
     LILIES.forEach(function (name, i) {
       var y = mine[i], t = theirs[i], cls = y > t ? 'won' : y < t ? 'lost' : 'tie';
       var pad = mk('div', 'pad ' + cls); pad.appendChild(mk('h3', null, name));
-      var art = mk('div', 'art'); art.innerHTML = padSvg(y, t, cls === 'won' ? '+' : cls === 'lost' ? '-' : '=', cls === 'lost'); pad.appendChild(art);
+      var art = mk('div', 'art'); art.innerHTML = padSvg(y, t, cls === 'won' ? '+' : cls === 'lost' ? '-' : '=', cls === 'lost', i); pad.appendChild(art);
       var row = mk('div', 'vsrow');
       var a = mk('span', 'me'); a.appendChild(mk('b', null, String(y))); a.appendChild(mk('small', null, 'you'));
       var b = mk('span', 'them'); b.appendChild(mk('b', null, String(t))); b.appendChild(mk('small', null, other));
@@ -185,6 +186,9 @@
     var line = $('res-line');
     line.textContent = m.outcome === 'win' ? 'You win ' + won + ':' + lost + '!' : m.outcome === 'lose' ? 'You lose ' + won + ':' + lost + '.' : 'Draw ' + won + ':' + lost + '.';
     line.className = 'big ' + (m.outcome === 'win' ? 'w' : m.outcome === 'lose' ? 'l' : '');
+    var old = $('tab-result').querySelector('.anim'); if (old) old.remove();
+    var anim = mk('div', 'anim ' + (m.outcome === 'win' ? 'win' : m.outcome === 'lose' ? 'lose' : 'draw')); anim.setAttribute('aria-hidden', 'true');
+    line.parentNode.insertBefore(anim, line);
     $('res-sub').textContent = m.outcome === 'win' ? 'The flies have spoken. ' + other + ' will be hearing about this.'
       : m.outcome === 'lose' ? other + ' read the pond better this time. The flies are already asking for a rematch.'
         : 'Nobody took two lilies. The pond remains divided.';
@@ -222,7 +226,7 @@
       lastOpen = b.open || [];
       var ul = $('open-list'); ul.textContent = '';
       lastOpen.forEach(function (c) {
-        var li = mk('li', 'card' + (c.mine ? ' mine' : '')); var ic = mk('img', 'ic'); ic.src = 'img/lilies.svg'; ic.alt = ''; li.appendChild(ic);
+        var li = mk('li', 'card' + (c.mine ? ' mine' : '')); var ic = mk('img', 'ic'); ic.src = 'img/pond/lilies.png'; ic.alt = ''; li.appendChild(ic);
         var t = mk('div');
         var p = mk('p'); p.appendChild(mk('b', null, c.creator));
         p.appendChild(document.createTextNode(c.invitee ? ' wants a rematch with ' + c.invitee + '.' : ' is looking for a brave fren. 10 flies. 3 lily pads. Zero excuses.'));

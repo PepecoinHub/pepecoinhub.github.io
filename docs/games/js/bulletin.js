@@ -27,7 +27,7 @@
     var ul = $('open'); ul.textContent = '';
     (b.open || []).slice(0, 9).forEach(function (c) {
       var li = mk('li', 'note' + (c.mine ? ' mine' : ''));
-      var bar = mk('div', 'note-bar'), ic = mk('img'); ic.src = 'img/lilies.svg'; ic.alt = ''; bar.appendChild(ic);
+      var bar = mk('div', 'note-bar'), ic = mk('img'); ic.src = 'img/pond/lilies.png'; ic.alt = ''; bar.appendChild(ic);
       bar.appendChild(document.createTextNode(c.invitee ? 'REMATCH.TXT' : 'CHALLENGE.TXT')); li.appendChild(bar);
       li.appendChild(mk('p', 'who', c.creator));
       li.appendChild(mk('p', null, c.invitee ? 'wants a rematch with ' + c.invitee + '. 10 flies each, no excuses.'
@@ -44,7 +44,7 @@
     var news = $('news'); news.textContent = '';
     (b.events || []).forEach(function (e) {
       var li = mk('li', 'clip'), parts = story(e);
-      var ic = mk('img'); ic.src = e.game === 'pond_king' ? 'img/pond-king.svg' : 'img/lilies.svg'; ic.alt = ''; li.appendChild(ic);
+      var ic = mk('img'); ic.src = e.game === 'pond_king' ? 'img/pond/pond-king.png' : 'img/pond/lilies.png'; ic.alt = ''; li.appendChild(ic);
       li.appendChild(mk('span', 'head', HEAD[e.kind] || 'Pond news'));
       var p = mk('span');
       parts.forEach(function (x, i) { p.appendChild(i % 2 ? document.createTextNode(x) : mk('b', null, x)); });
