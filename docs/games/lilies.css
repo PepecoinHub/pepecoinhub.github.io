@@ -228,7 +228,19 @@
 .gadget .cards li.empty-pond p { font-size: 16px; }
 
 /* records */
-#leaders .cols > div { min-width: 0; }
-.ly-record { margin: 2px 0 10px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.ly-record { margin: 2px 0 10px; }
 .gadget #leaders { display: none !important; }
-@media (max-width: 560px) { .ly-record { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* phones: a slimmer hero, one row of tabs, small secondary buttons */
+@media (max-width: 560px) {
+  .ly-hero .kicker, .ly-hero p:not(.kicker) { display: none; }
+  .ly-hero { grid-template-areas: "pond text count" "go go go"; grid-template-columns: auto minmax(0, 1fr) auto; padding: 8px; }
+  .ly-hero h1 { font-size: 26px; }
+  .ly-count { display: block; }
+  .ly-count b { font-size: 24px; min-width: 38px; }
+  .ly-count small { font-size: 9px; }
+  .hero-go { font-size: 17px; padding: 6px 10px; }
+  .menubar .bb { display: none; }
+  #tab-open > p.muted { display: none; }
+  .cards .duel .acts button.small { flex: 0 0 auto; min-height: 34px; }
+}

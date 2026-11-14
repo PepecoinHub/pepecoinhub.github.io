@@ -5,7 +5,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin"><title>POND KING: rock, paper, scissors for the throne | Pepecoin Hub</title>
 <meta name="description" content="One frog holds the throne with three secret moves. Beat it at rock, paper, scissors and the pond is yours, until the next visitor comes for you.">
 <link rel="canonical" href="https://pepecoinhub.com/games/pond-king.html"><link rel="icon" href="img/pond/king-stamp.png" type="image/png">
-<link rel="stylesheet" href="pond.css?v=20261114stats"><script src="js/config.js"></script><script src="js/pond-net.js?v=20261114stats" defer></script><script src="js/pond-king.js?v=20261114stats" defer></script>
+<link rel="stylesheet" href="pond.css?v=20261114tidy"><script src="js/config.js"></script><script src="js/pond-net.js?v=20261114tidy" defer></script><script src="js/pond-king.js?v=20261114tidy" defer></script>
 </head><body>
 <header class="site-bar"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · NO CROWN WAS HARMED</span><a href="bulletin.html">Pond Bulletin ↗</a></header>
 <main class="desk">
@@ -64,32 +64,27 @@
       <button type="button" id="recheck">↻ Check the throne again</button>
     </div>
 
-    <div class="cols">
-      <div class="panel">
-        <h3>Most defences in a row</h3>
-        <ol class="top" id="top"><li class="muted">…</li></ol>
+    <!-- the scoreboard: one box, four tabs -->
+    <section class="panel scoreboard" aria-label="Scoreboard">
+      <div class="mini-tabs" role="tablist" data-store="pk-board">
+        <button type="button" role="tab" data-pane="pane-recent" aria-selected="true">Latest</button>
+        <button type="button" role="tab" data-pane="pane-top" aria-selected="false">Defences</button>
+        <button type="button" role="tab" data-pane="pane-longest" aria-selected="false">Longest reign</button>
+        <button type="button" role="tab" data-pane="pane-me" aria-selected="false">Me</button>
       </div>
-      <div class="panel">
-        <h3>Longest on the throne</h3>
-        <ol class="top" id="longest"><li class="muted">…</li></ol>
-      </div>
-    </div>
-    <div class="cols">
-      <div class="panel">
-        <h3>Your record</h3>
-        <div class="stats" id="mystats">
+      <div id="pane-recent" role="tabpanel"><p class="pane-h">Latest duels <small id="today"></small></p><ul class="feed" id="recent"><li class="muted">…</li></ul></div>
+      <div id="pane-top" role="tabpanel" hidden><p class="pane-h">Most defences in a row</p><ol class="top" id="top"><li class="muted">…</li></ol></div>
+      <div id="pane-longest" role="tabpanel" hidden><p class="pane-h">Longest on the throne</p><ol class="top" id="longest"><li class="muted">…</li></ol></div>
+      <div id="pane-me" role="tabpanel" hidden>
+        <div class="stats row5" id="mystats">
           <div class="stat"><b id="st-duels">0</b><small>duels</small></div>
-          <div class="stat"><b id="st-thrones">0</b><small>thrones taken</small></div>
-          <div class="stat"><b id="st-losses">0</b><small>duels lost</small></div>
-          <div class="stat"><b id="st-def">0</b><small>best streak as king</small></div>
-          <div class="stat wide"><b id="st-reign">–</b><small>longest on the throne</small></div>
+          <div class="stat"><b id="st-thrones">0</b><small>thrones</small></div>
+          <div class="stat"><b id="st-losses">0</b><small>lost</small></div>
+          <div class="stat"><b id="st-def">0</b><small>best streak</small></div>
+          <div class="stat"><b id="st-reign">–</b><small>longest reign</small></div>
         </div>
       </div>
-      <div class="panel">
-        <h3>Latest duels <small id="today"></small></h3>
-        <ul class="feed" id="recent"><li class="muted">…</li></ul>
-      </div>
-    </div>
+    </section>
 
     <details class="panel rules">
       <summary>Rules of the pond</summary>
