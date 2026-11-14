@@ -11,7 +11,7 @@
     switch (e.kind) {
       case 'lily_win': return [e.actor, ' defeated ', e.other, ' ' + (e.data && e.data.pads ? e.data.pads.join(':') + ' ' : '') + 'in Battle of Three Lilies. The flies have spoken.'];
       case 'lily_draw': return [e.actor, ' and ', e.other, ' couldn’t settle their fly dispute. The pond remains divided.'];
-      case 'king_crowned': return [e.actor, ' took the throne from ', e.other, '. 👑 Long live the Pond King.'];
+      case 'king_crowned': return [e.actor, ' took the throne from ', e.other, '. Long live the Pond King.'];
       case 'king_defended': return [e.actor, ' has defended the throne ' + (e.data && e.data.defenses) + ' times. Latest to fall: ', e.other, '.'];
       default: return [e.actor, ' did something in the pond.'];
     }
@@ -20,17 +20,19 @@
     var k = b.king, kl = $('king-line');
     if (k) {
       kl.textContent = '';
-      kl.appendChild(mk('b', null, '👑 ' + k.nick));
+      kl.appendChild(mk('b', null, k.nick));
       kl.appendChild(document.createTextNode(k.house ? ' keeps the throne warm. Somebody take it.' : ' rules the pond: ' + k.defenses + (k.defenses === 1 ? ' defence' : ' defences') + ' so far.'));
     } else $('king').hidden = true;
 
     var ul = $('open'); ul.textContent = '';
     (b.open || []).slice(0, 9).forEach(function (c) {
       var li = mk('li', 'note' + (c.mine ? ' mine' : ''));
+      var bar = mk('div', 'note-bar'), ic = mk('img'); ic.src = 'img/lilies.svg'; ic.alt = ''; bar.appendChild(ic);
+      bar.appendChild(document.createTextNode(c.invitee ? 'REMATCH.TXT' : 'CHALLENGE.TXT')); li.appendChild(bar);
       li.appendChild(mk('p', 'who', c.creator));
       li.appendChild(mk('p', null, c.invitee ? 'wants a rematch with ' + c.invitee + '. 10 flies each, no excuses.'
         : 'deployed 10 highly trained flies. Three lily pads. One questionable strategy. Dare to challenge?'));
-      li.appendChild(mk('small', null, '🕒 ' + N.left(c.expires_at) + ' · posted ' + N.ago(c.created_at)));
+      li.appendChild(mk('small', null, N.left(c.expires_at) + ' · posted ' + N.ago(c.created_at)));
       var acts = mk('div', 'acts');
       if (c.mine) acts.appendChild(btn('Your challenge', '', function () { N.open('lilies'); }));
       else if (!c.invitee || c.for_me) acts.appendChild(btn('Accept Challenge', 'go', function () { N.open('lilies', c.id); }));
@@ -42,13 +44,14 @@
     var news = $('news'); news.textContent = '';
     (b.events || []).forEach(function (e) {
       var li = mk('li', 'clip'), parts = story(e);
+      var ic = mk('img'); ic.src = e.game === 'pond_king' ? 'img/pond-king.svg' : 'img/lilies.svg'; ic.alt = ''; li.appendChild(ic);
       li.appendChild(mk('span', 'head', HEAD[e.kind] || 'Pond news'));
       var p = mk('span');
       parts.forEach(function (x, i) { p.appendChild(i % 2 ? document.createTextNode(x) : mk('b', null, x)); });
-      li.appendChild(p); li.appendChild(document.createTextNode(' ')); li.appendChild(mk('time', null, N.ago(e.at)));
+      var tx = mk('div'); tx.appendChild(p); tx.appendChild(document.createTextNode(' ')); tx.appendChild(mk('time', null, N.ago(e.at))); li.appendChild(tx);
       var acts = mk('div', 'acts');
       if (e.game === 'lilies' && e.ref) acts.appendChild(btn('View Match', '', function () { N.open('lilies', e.ref); }));
-      if (e.game === 'pond_king') acts.appendChild(btn('👑 Throne', '', function () { N.open('king'); }));
+      if (e.game === 'pond_king') acts.appendChild(btn('Throne', '', function () { N.open('king'); }));
       if (e.actor_passport) acts.appendChild(passBtn(e.actor, e.actor_passport));
       else if (e.other_passport) acts.appendChild(passBtn(e.other, e.other_passport));
       li.appendChild(acts); news.appendChild(li);

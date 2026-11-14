@@ -81,3 +81,41 @@
   function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   window.PondNet = { session: session, me: me, rpc: rpc, open: open, framed: framed, embedded: embedded, ago: ago, left: left, mk: mk };
 })();
+
+// ---------- pixel art (PondOS is Windows 98: everything a little pixelated) ----------
+// A sprite is rows of characters; each character is one pixel of a colour from the palette ('.' = clear).
+// Drawn as crisp SVG rectangles, so it stays sharp at any size. PLACEHOLDER ART until the final images arrive.
+(function () {
+  'use strict';
+  var PAL = { k: '#142016', w: '#ffffff', g: '#9a9a9a', G: '#d8d8d8', d: '#6b6b6b', l: '#7fa7d6', s: '#cfd6dc', S: '#8a959e',
+              f: '#4f9f45', F: '#2e6b2a', L: '#9fd36b', y: '#f2b544', Y: '#ffe08a', o: '#b07a1a', r: '#e0403a', b: '#2c5ac4',
+              x: '#8a2a1b', e: '#ffd34d', p: '#f2a28f', c: '#1d2420' };
+  var SPRITES = {
+    rock: ['............', '....kkkk....', '..kkGGggkk..', '.kgGGggggdk.', '.kgGgggggddk', 'kggggggggddk',
+           'kgggggggdddk', 'kggggggdddk.', '.kggggdddk..', '..kkdddkk...', '....kkk.....', '............'],
+    paper: ['.kkkkkkk....', '.kwwwwwkk...', '.kwwwwwkwk..', '.kwllllkkkk.', '.kwwwwwwwwk.', '.kwlllllwwk.',
+            '.kwwwwwwwwk.', '.kwlllllwwk.', '.kwwwwwwwwk.', '.kwllllwwwk.', '.kwwwwwwwwk.', '.kkkkkkkkkk.'],
+    scissors: ['k..........k', 'ksk......ksk', '.ksk....ksk.', '..ksk..ksk..', '...kskksk...', '....kSSk....',
+               '.....kk.....', '....kkkk....', '..kkfk.kfkk.', '.kf.fk.kf.fk', '.kf.fk.kf.fk', '..kkk...kkk.'],
+    fly: ['w.k.w', 'wkckw', '.rcr.', '.ccc.', '..c..'],
+    flyTheirs: ['w.k.w', 'wkxkw', '.exe.', '.xxx.', '..x..']
+  };
+  function rects(rows, pal, ox, oy, px) {
+    var out = '';
+    rows.forEach(function (row, y) {
+      for (var x = 0; x < row.length;) {
+        var ch = row[x], n = 1; while (row[x + n] === ch) n++;
+        if (ch !== '.' && ch !== ' ') out += '<rect x="' + (ox + x * px) + '" y="' + (oy + y * px) + '" width="' + (n * px) + '" height="' + px + '" fill="' + (pal[ch] || PAL[ch]) + '"/>';
+        x += n;
+      }
+    });
+    return out;
+  }
+  // a whole <svg> for one sprite
+  function sprite(name, cls) {
+    var rows = SPRITES[name], w = rows[0].length, h = rows.length;
+    return '<svg class="px ' + (cls || '') + '" viewBox="0 0 ' + w + ' ' + h + '" shape-rendering="crispEdges" aria-hidden="true">' + rects(rows, PAL, 0, 0, 1) + '</svg>';
+  }
+  window.PondNet = window.PondNet || {};
+  window.PondNet.px = { PAL: PAL, SPRITES: SPRITES, rects: rects, sprite: sprite };
+})();

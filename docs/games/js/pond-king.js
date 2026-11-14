@@ -21,6 +21,9 @@
 
   var state = null, busy = false, lastKingId = null;
   var pick = ['', '', ''], def = ['', '', ''];
+  // a move as pixel art (rock / paper / scissors sprites in pond-net.js)
+  var SPRITE = { r: 'rock', p: 'paper', s: 'scissors' };
+  function icon(m) { var i = mk('i'); i.innerHTML = N.px.sprite(SPRITE[m]); return i; }
 
   var rpc = N.rpc;   // with the pond log-on (Discord or guest) when there is one, otherwise as a visitor
 
@@ -63,7 +66,7 @@
     });
     var tiles = Object.keys(MOVES).map(function (m) {
       var b = mk('button', 'mv'); b.type = 'button'; b.dataset.m = m;
-      b.appendChild(mk('i', null, MOVES[m][0])); b.appendChild(mk('span', null, MOVES[m][1]));
+      b.appendChild(icon(m)); b.appendChild(mk('span', null, MOVES[m][1]));
       b.setAttribute('aria-label', 'Add ' + MOVES[m][1]);
       b.addEventListener('click', function () { var i = arr.indexOf(''); if (i < 0) return; arr[i] = m; paint(); onChange(); });
       pal.appendChild(b); return b;
@@ -74,12 +77,12 @@
       slots.forEach(function (b, i) {
         var m = arr[i];
         b.classList.toggle('filled', !!m); b.classList.toggle('next', i === next);
-        b.querySelector('i').textContent = m ? MOVES[m][0] : '?';
+        var ic = b.querySelector('i'); if (m) ic.innerHTML = N.px.sprite(SPRITE[m]); else ic.textContent = '?';
         b.querySelector('span').textContent = m ? MOVES[m][1] : '';
-        b.setAttribute('aria-label', 'Round ' + (i + 1) + ': ' + (m ? MOVES[m][1] + ', tap to clear' : 'empty'));
+        b.setAttribute('aria-label', 'Round ' + (i + 1) + ': ' + (m ? MOVES[m][1] + ', click to clear' : 'empty'));
       });
       tiles.forEach(function (b) { b.disabled = next < 0; });
-      hint.textContent = next < 0 ? 'Ready. Tap a round to change it.' : 'Pick the move for round ' + (next + 1) + '.';
+      hint.textContent = next < 0 ? 'Ready. Click a round to change it.' : 'Pick the move for round ' + (next + 1) + '.';
     }
     root.paint = paint; paint();
   }
@@ -103,7 +106,7 @@
     var throne = $('throne');
     if (lastKingId !== null && lastKingId !== k.id) { throne.classList.remove('changed'); void throne.offsetWidth; throne.classList.add('changed'); }
     lastKingId = k.id;
-    $('king-name').textContent = (k.you ? '👑 You, ' : '') + k.nick;
+    $('king-name').textContent = (k.you ? 'You, ' : '') + k.nick;
     $('king-line').textContent = (k.house ? 'The house frog keeps the seat warm. Somebody take it. ' : '') + 'On the throne since ' + ago(k.since) + '.';
     $('king-def').textContent = k.defenses;
     $('who').textContent = k.you ? 'you are the king' : me ? (me.name || 'guest') + (me.discord ? ' ✓' : ' (guest)') : (store.get('pk-nick') || 'visitor');
@@ -143,7 +146,7 @@
     var top = $('top'); top.textContent = '';
     (s.top || []).forEach(function (t, i) {
       var li = mk('li', (t.reigning ? 'now' : '') + (t.you ? ' me' : ''));
-      li.appendChild(mk('b', null, ['🥇', '🥈', '🥉'][i] || (i + 1) + '.')); li.appendChild(mk('span', null, (t.reigning ? '👑 ' : '') + t.nick)); li.appendChild(mk('b', null, String(t.defenses)));
+      li.appendChild(mk('b', null, (i + 1) + '.')); li.appendChild(mk('span', null, t.nick + (t.reigning ? ' (reigning)' : ''))); li.appendChild(mk('b', null, String(t.defenses)));
       li.title = t.reigning ? 'reigning now' : 'reigned ' + ago(t.since);
       top.appendChild(li);
     });
@@ -207,9 +210,9 @@
     r.rounds.forEach(function (x, i) {
       var li = mk('li');
       li.appendChild(mk('span', 'n', 'ROUND ' + (i + 1)));
-      var a = mk('span', 'side'); a.appendChild(mk('i', null, MOVES[x.you][0])); a.appendChild(mk('small', null, 'you')); li.appendChild(a);
+      var a = mk('span', 'side'); a.appendChild(icon(x.you)); a.appendChild(mk('small', null, 'you')); li.appendChild(a);
       li.appendChild(mk('span', 'vs', 'vs'));
-      var b = mk('span', 'side k'); b.appendChild(mk('small', null, 'king')); b.appendChild(mk('i', null, MOVES[x.king][0])); li.appendChild(b);
+      var b = mk('span', 'side k'); b.appendChild(mk('small', null, 'king')); b.appendChild(icon(x.king)); li.appendChild(b);
       li.appendChild(mk('span', 'out ' + (x.result > 0 ? 'w' : x.result < 0 ? 'l' : 'd'), x.result > 0 ? 'YOU WIN' : x.result < 0 ? 'KING WINS' : 'DRAW'));
       li.className = x.result > 0 ? 'rw' : x.result < 0 ? 'rl' : 'rd';
       li.setAttribute('aria-label', 'Round ' + (i + 1) + ': you ' + MOVES[x.you][1] + ', king ' + MOVES[x.king][1] + ', ' + (x.result > 0 ? 'you win' : x.result < 0 ? 'king wins' : 'draw'));
@@ -219,7 +222,7 @@
     ol.querySelectorAll('li').forEach(function (li, i) { setTimeout(function () { li.classList.add('on'); }, step * (i + 1)); });
     setTimeout(function () {
       var line = $('res-line'), after = $('res-after');
-      line.textContent = (r.won ? '👑 You took the throne! ' : 'The king holds. ') + r.score[0] + ' : ' + r.score[1];
+      line.textContent = (r.won ? 'You took the throne! ' : 'The king holds. ') + r.score[0] + ' : ' + r.score[1];
       line.classList.add(r.won ? 'w' : 'l'); $('result').classList.add(r.won ? 'won' : 'lost');
       var p = mk('p', 'muted', r.won
         ? 'Your three moves now defend the pond. The next challenger meets them in a shuffled order. You can change them below at any time.'

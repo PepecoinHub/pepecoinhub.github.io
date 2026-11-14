@@ -5,7 +5,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin"><title>POND KING: rock, paper, scissors for the throne | Pepecoin Hub</title>
 <meta name="description" content="One frog holds the throne with three secret moves. Beat it at rock, paper, scissors and the pond is yours, until the next visitor comes for you.">
 <link rel="canonical" href="https://pepecoinhub.com/games/pond-king.html"><link rel="icon" href="img/pond-king.svg" type="image/svg+xml">
-<link rel="stylesheet" href="pond.css?v=20261114d"><script src="js/config.js"></script><script src="js/pond-net.js?v=20261114b" defer></script><script src="js/pond-king.js?v=20261114e" defer></script>
+<link rel="stylesheet" href="pond.css?v=20261114w98b"><script src="js/config.js"></script><script src="js/pond-net.js?v=20261114w98" defer></script><script src="js/pond-king.js?v=20261114w98b" defer></script>
 </head><body>
 <header class="site-bar"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · NO CROWN WAS HARMED</span><a href="bulletin.html">Pond Bulletin ↗</a></header>
 <main class="desk">
@@ -21,7 +21,7 @@
       </div>
       <div class="reign"><b id="king-def">–</b><small>defences</small></div>
     </div>
-    <div class="row toolbar"><button type="button" id="king-pass" hidden>👑 King’s Fren Passport</button><button type="button" id="to-bulletin">📌 Pond Bulletin</button><button type="button" id="to-lilies">🪷 Battle of Three Lilies</button><span class="muted" id="acct"></span></div>
+    <div class="row toolbar"><button type="button" id="king-pass" class="ib" hidden><img src="img/pond-king.svg" alt=""> King’s Fren Passport</button><button type="button" id="to-bulletin" class="ib"><img src="../meme/img/ico/news.webp" alt=""> Pond Bulletin</button><button type="button" id="to-lilies" class="ib"><img src="img/lilies.svg" alt=""> Battle of Three Lilies</button><span class="muted" id="acct"></span></div>
 
     <!-- challenge -->
     <form class="panel" id="duel" hidden>
@@ -31,8 +31,8 @@
       <div class="row">
         <label for="nick">Your name</label>
         <input id="nick" maxlength="20" autocomplete="nickname" spellcheck="false" required>
-        <button type="button" id="dice" title="Random moves">🎲 Random</button>
-        <button type="submit" class="go" id="fight" disabled>⚔️ Challenge</button>
+        <button type="button" id="dice" title="Random moves">Random</button>
+        <button type="submit" class="go" id="fight" disabled>Challenge!</button>
       </div>
       <p class="msg" id="duel-msg" role="status"></p>
     </form>
@@ -47,7 +47,7 @@
 
     <!-- you are the king -->
     <div class="panel crown" id="kingpanel" hidden>
-      <h2>👑 You are the Pond King</h2>
+      <h2>You are the Pond King</h2>
       <p class="muted">Your three moves defend the throne. The pond shuffles their order for every challenger, so a fren who loses learns only <i>which</i> moves you hold, never the order. Change them whenever you like.</p>
       <div class="rounds" id="def"></div>
       <div class="row"><button type="button" class="go" id="save-def" disabled>Save my defence</button><span class="msg" id="def-msg" role="status"></span></div>

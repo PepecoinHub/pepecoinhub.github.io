@@ -35,35 +35,49 @@
   $('logon').addEventListener('click', function () { N.open('logon'); });
 
   // ---------- the allocator ----------
-  // ---------- the pond: lily pads and flies, drawn in SVG ----------
-  // PLACEHOLDER ART (see games/POND_DUELS.md, "Art wanted"): a code-drawn lily pad and fly, to be swapped
-  // for the final images. Only class names style them (the page's CSP has no inline styles).
-  var SVGNS = 'http://www.w3.org/2000/svg';
-  function fly(x, y, cls) {
-    return '<g class="fly ' + cls + '" transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')">' +
-      '<ellipse class="wing" cx="-3.4" cy="-3.2" rx="3.6" ry="2.3" transform="rotate(-25 -3.4 -3.2)"/>' +
-      '<ellipse class="wing" cx="3.4" cy="-3.2" rx="3.6" ry="2.3" transform="rotate(25 3.4 -3.2)"/>' +
-      '<ellipse class="body" rx="2.7" ry="3.9"/><circle class="eye" cx="-1.2" cy="-3.4" r="0.9"/><circle class="eye" cx="1.2" cy="-3.4" r="0.9"/></g>';
-  }
-  // n flies on an arc (from a0 to a1 degrees) around the pad's centre, in two rings so 10 still fit
-  function ring(n, a0, a1, cls) {
+  // ---------- the pond: pixel-art lily pads and flies ----------
+  // PLACEHOLDER ART (games/POND_ART_GPT_PROMPT.md): a 32x32 pixel lily pad with a notch, drawn as crisp
+  // SVG rectangles, and 5x5 pixel flies from pond-net.js. Swapped for the final images later.
+  var PX = N.px, G = 32, CX = 16, CY = 16.5, R = 14.6;
+  var LEAF = (function () {   // the pad as rows of palette letters: k outline, g leaf, h light, v vein
+    function inside(x, y) {
+      var dx = x + .5 - CX, dy = y + .5 - CY, d = Math.sqrt(dx * dx + dy * dy);
+      if (d > R) return false;
+      var ang = Math.atan2(dx, -dy) * 180 / Math.PI;   // 0 = straight up
+      return !(Math.abs(ang) < 17 && d > 1.5);          // the notch
+    }
+    var rows = [];
+    for (var y = 0; y < G; y++) {
+      var row = '';
+      for (var x = 0; x < G; x++) {
+        if (!inside(x, y)) { row += '.'; continue; }
+        var edge = !inside(x - 1, y) || !inside(x + 1, y) || !inside(x, y - 1) || !inside(x, y + 1);
+        var dx = x + .5 - CX, dy = y + .5 - CY, ang = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360, d = Math.sqrt(dx * dx + dy * dy);
+        var vein = d > 3 && d < R - 2 && [30, 80, 140, 200, 330, 270].some(function (v) { return Math.abs(ang - v) < 3.2; });
+        var light = dx < -3 && dy < -3 && d > 5 && d < 10;
+        row += edge ? 'k' : vein ? 'v' : light ? 'h' : (d > R - 3 ? 'm' : 'g');
+      }
+      rows.push(row);
+    }
+    return rows;
+  })();
+  var LEAF_PAL = { k: '#142016', g: '#5cb84f', m: '#4aa23f', h: '#9fd36b', v: '#3c8a35' };
+  var DIM_PAL = { k: '#142016', g: '#7a9a72', m: '#6c8c65', h: '#9fb596', v: '#5d7a57' };
+  // n flies on an arc (degrees, 0 = right, clockwise) in two rings, each fly a 5x5 sprite
+  function ring(n, a0, a1, name) {
     var out = '';
     for (var i = 0; i < n; i++) {
-      var t = n === 1 ? .5 : i / (n - 1), a = (a0 + (a1 - a0) * t) * Math.PI / 180, r = i % 2 ? 41 : 31;
-      out += fly(60 + r * Math.cos(a), 63 + r * Math.sin(a), cls);
+      var t = n === 1 ? .5 : i / (n - 1), a = (a0 + (a1 - a0) * t) * Math.PI / 180, r = i % 2 ? 11 : 8;
+      out += PX.rects(PX.SPRITES[name], PX.PAL, Math.round(CX + r * Math.cos(a) - 2.5), Math.round(CY + r * Math.sin(a) - 2.5), 1);
     }
     return out;
   }
-  // one lily pad: mine (and theirs, after a duel), with the centre badge
-  function padSvg(mine, theirs, badge) {
-    var veins = '';
-    for (var k = 0; k < 7; k++) { var a = (-60 + k * 50) * Math.PI / 180; veins += '<line class="vein" x1="60" y1="63" x2="' + (60 + 46 * Math.cos(a)).toFixed(1) + '" y2="' + (63 + 46 * Math.sin(a)).toFixed(1) + '"/>'; }
-    var flies = theirs == null ? ring(mine, -80, 250, 'mine') : ring(mine, 105, 255, 'mine') + ring(theirs, -75, 75, 'theirs');
-    return '<svg viewBox="0 0 120 120" class="leaf" aria-hidden="true">' +
-      '<ellipse class="shadow" cx="62" cy="68" rx="54" ry="52"/>' +
-      '<path class="pad-fill" d="M60 63 L76 13.6 A52 52 0 1 1 44 13.6 Z"/>' + veins +
-      '<ellipse class="shine" cx="42" cy="44" rx="16" ry="9" transform="rotate(-30 42 44)"/>' + flies +
-      '<circle class="badge" cx="60" cy="63" r="15"/><text class="badge-t" x="60" y="69" text-anchor="middle">' + badge + '</text></svg>';
+  function padSvg(mine, theirs, badge, dim) {
+    var flies = theirs == null ? ring(mine, -70, 250, 'fly') : ring(mine, 110, 250, 'fly') + ring(theirs, -70, 70, 'flyTheirs');
+    return '<svg viewBox="0 0 32 32" class="leaf px" shape-rendering="crispEdges" aria-hidden="true">' +
+      PX.rects(LEAF, dim ? DIM_PAL : LEAF_PAL, 0, 0, 1) + flies +
+      '<rect x="12" y="13" width="8" height="7" fill="#142016"/><rect x="13" y="14" width="6" height="5" fill="#ffffff"/>' +
+      '<text class="badge-t" x="16" y="18.6" text-anchor="middle">' + badge + '</text></svg>';
   }
   var padsEl = $('pads');
   LILIES.forEach(function (name, i) {
@@ -157,7 +171,7 @@
     LILIES.forEach(function (name, i) {
       var y = mine[i], t = theirs[i], cls = y > t ? 'won' : y < t ? 'lost' : 'tie';
       var pad = mk('div', 'pad ' + cls); pad.appendChild(mk('h3', null, name));
-      var art = mk('div', 'art'); art.innerHTML = padSvg(y, t, cls === 'won' ? '✓' : cls === 'lost' ? '✗' : '='); pad.appendChild(art);
+      var art = mk('div', 'art'); art.innerHTML = padSvg(y, t, cls === 'won' ? '+' : cls === 'lost' ? '-' : '=', cls === 'lost'); pad.appendChild(art);
       var row = mk('div', 'vsrow');
       var a = mk('span', 'me'); a.appendChild(mk('b', null, String(y))); a.appendChild(mk('small', null, 'you'));
       var b = mk('span', 'them'); b.appendChild(mk('b', null, String(t))); b.appendChild(mk('small', null, other));
@@ -169,7 +183,7 @@
     var won = mine.reduce(function (n, y, i) { return n + (y > theirs[i] ? 1 : 0); }, 0);
     var lost = mine.reduce(function (n, y, i) { return n + (y < theirs[i] ? 1 : 0); }, 0);
     var line = $('res-line');
-    line.textContent = m.outcome === 'win' ? '🏆 You win ' + won + ':' + lost + '!' : m.outcome === 'lose' ? 'You lose ' + won + ':' + lost + '.' : 'Draw ' + won + ':' + lost + '.';
+    line.textContent = m.outcome === 'win' ? 'You win ' + won + ':' + lost + '!' : m.outcome === 'lose' ? 'You lose ' + won + ':' + lost + '.' : 'Draw ' + won + ':' + lost + '.';
     line.className = 'big ' + (m.outcome === 'win' ? 'w' : m.outcome === 'lose' ? 'l' : '');
     $('res-sub').textContent = m.outcome === 'win' ? 'The flies have spoken. ' + other + ' will be hearing about this.'
       : m.outcome === 'lose' ? other + ' read the pond better this time. The flies are already asking for a rematch.'
@@ -208,7 +222,7 @@
       lastOpen = b.open || [];
       var ul = $('open-list'); ul.textContent = '';
       lastOpen.forEach(function (c) {
-        var li = mk('li', 'card' + (c.mine ? ' mine' : '')); li.appendChild(mk('span', 'ic', '🪷'));
+        var li = mk('li', 'card' + (c.mine ? ' mine' : '')); var ic = mk('img', 'ic'); ic.src = 'img/lilies.svg'; ic.alt = ''; li.appendChild(ic);
         var t = mk('div');
         var p = mk('p'); p.appendChild(mk('b', null, c.creator));
         p.appendChild(document.createTextNode(c.invitee ? ' wants a rematch with ' + c.invitee + '.' : ' is looking for a brave fren. 10 flies. 3 lily pads. Zero excuses.'));

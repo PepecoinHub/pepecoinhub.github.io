@@ -4963,9 +4963,13 @@
   }
   window.PONDOS_REWARD = rewardNotice;   // lets the browser console test it: PONDOS_REWARD({ bar: '…', title: '…', text: '…' })
 
-  var noticed = '1';
-  try { noticed = sessionStorage.getItem('pondos-notice'); sessionStorage.setItem('pondos-notice', '1'); } catch (e) {}
-  if (!noticed && mainEl) setTimeout(function () { balloon('PondOS Security Center', 'Nobody legit will ask for your seed phrase. Not support, not admins, not frogs.', 'gif-085-still'); }, 4500);
+  // PondOS Security Center: no pop-up on its own any more (it covered game buttons on phones). A shield in the
+  // tray opens it when somebody wants it; typing "seed" on the desktop still works too.
+  if (mainEl) {
+    var tSec = el('button', { type: 'button', class: 'tray-logon tray-sec', title: 'PondOS Security Center' }, '<span aria-hidden="true">🛡️</span><span class="sr">Security Center</span>');
+    tSec.addEventListener('click', function () { MAGIC.seed(); });
+    var trayEl4 = document.querySelector('.tray'); if (trayEl4) trayEl4.insertBefore(tSec, trayEl4.firstChild);
+  }
 
   // ---------- boot screen, once per visit ----------
   var booted = '1';
