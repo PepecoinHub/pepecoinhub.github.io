@@ -105,7 +105,7 @@
   // the button says why it is grey: a name the pond cannot use (emoji, too short) gets a hint under it
   function canFight() {
     $('fight').disabled = busy || !nickOk() || pick.some(function (m) { return !m; });
-    var hint = $('nick-hint'); if (hint) hint.hidden = nickOk();
+    var hint = $('nick-hint'); if (hint) hint.hidden = nickOk() || !nick.value.trim();
   }
   picker($('pick'), pick, canFight);
   nick.addEventListener('input', canFight);
@@ -143,6 +143,13 @@
     var showResult = !!opts.keepResult;
     $('result').hidden = !showResult;
     $('kingpanel').hidden = !k.you;
+    if (k.you) store.set('pk-my-reign', String(k.id));   // PondOS tells you later if this reign has ended (meme.js pondNews)
+    var ks = $('king-share');
+    ks.textContent = '';
+    if (k.you) ks.appendChild(N.shareRow({ text: 'I rule the pond in POND KING on PondOS 98 (' + plural(k.defenses, 'defence', 'defences') + ' so far). Think you can dethrone me? 🐸👑', url: N.SITE + '#king' }, 'Dare a fren: dethrone me'));
+    var ws = $('wait-share');
+    ws.textContent = '';
+    if (!k.you) ws.appendChild(N.shareRow({ text: k.nick + ' rules the pond in POND KING on PondOS 98. I can’t challenge again: take the throne for me 🐸', url: N.SITE + '#king' }, 'Send a fren'));
     $('duel').hidden = !s.can_challenge || showResult;
     $('waitpanel').hidden = k.you || s.can_challenge || showResult;
     if (k.you) {
@@ -273,12 +280,14 @@
       var row = mk('div', 'row'), ok = mk('button', r.won ? 'go' : '', r.won ? 'To my throne →' : 'OK'); ok.type = 'button';
       ok.addEventListener('click', function () { $('result').hidden = true; load(); });
       row.appendChild(ok);
-      if (navigator.share && !r.won) {
-        var sh = mk('button', '', 'Send a fren'); sh.type = 'button';
-        sh.addEventListener('click', function () { navigator.share({ title: 'POND KING', text: kingNick + ' rules the pond. Can you take the throne?', url: 'https://pepecoinhub.com/meme/#king' }).catch(function () {}); });
-        row.appendChild(sh);
-      }
       after.appendChild(row);
+      // the best moment to tell the pond: a new king brags, a beaten frog sends a fren to avenge it
+      var brag = r.won
+        ? { label: 'Share your crown 👑', text: 'I just took the POND KING throne from ' + kingNick + ' on PondOS 98. Rock, paper, scissors: come and dethrone me 🐸👑' }
+        : { label: 'Send a fren ⚔', text: kingNick + ' just beat me in POND KING on PondOS 98. You know the moves now: avenge me and take the throne 🐸' };
+      var share = N.shareRow({ text: brag.text, url: N.SITE + '#king' }, brag.label);
+      share.classList.add(r.won ? 'brag' : 'avenge');
+      after.appendChild(share);
       busy = false;
       status(r.won ? 'Long live the king!' : 'The king holds.');
       try { if (framed) window.parent.postMessage({ type: 'pond-king', won: !!r.won }, location.origin); } catch (e) {}

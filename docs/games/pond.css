@@ -276,3 +276,12 @@ details.panel { padding-top: 12px; }
   .panel { margin-top: 8px; padding: 14px 8px 8px; }
   .panel h2 { font-size: 20px; top: -10px; }
 }
+
+/* sharing: a Share / Copy link button and a "Post on X" button that looks like one */
+.share-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+.share-row .btn-x { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 12px; color: var(--ink); text-decoration: none; font: 700 12px var(--f); background: var(--chrome); box-shadow: var(--raised); }
+.share-row .btn-x:active { box-shadow: var(--sunken); }
+.share-row.brag { padding: 6px; background: #fffbd8; box-shadow: var(--sunken); }
+#wait-share .share-row { margin-top: 0; }
+.copy-tmp { position: fixed; left: -9999px; top: 0; }
+.gadget .share-row .btn-x { display: none; }

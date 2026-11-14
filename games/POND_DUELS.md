@@ -136,3 +136,17 @@ Open challenges carry their creator's Fren avatar (`gry_bulletin`, when update_p
   still going counted up to now) and `longest` (the longest reigns, the house frog left out). The hourly
   cleanup keeps the 50 longest reigns as well as the 50 with the most defences.
 * Tests: `tests/pond-stats-sql.test.mjs`.
+
+## Sharing, news and the network rule
+
+* **Sharing** (`PondNet.shareRow`): the phone's share sheet, or "Copy link" where there is none, plus "Post on X".
+  POND KING: "Share your crown" after taking the throne, "Send a fren" after a loss and while waiting, "Dare a
+  fren" on the throne. THREE LILIES: "Share my challenge" right after posting (link `/meme/#lilies=<id>` opens
+  that challenge), "Share" on your own open challenges, "Share your win" after a win.
+* **Accept before Log On**: the picked challenge waits 30 minutes (`localStorage` `ly-pending`) and opens as soon
+  as the fren is logged on.
+* **News in PondOS** (`pondNews` in meme.js): a balloon and a red dot on the desktop icon when your throne fell
+  or one of your Lilies challenges was settled since the last visit. Nothing is sent by mail or push.
+* **Network rule**: one duel per king and the 4-hour wait also count per network only for players without an
+  account and for guest accounts (`games.pk_by_net`). Discord accounts are told apart by the account, so frens
+  behind one shared address (home, mobile network) do not block each other. Tests: `tests/pond-network-sql.test.mjs`.
