@@ -1992,3 +1992,10 @@ footer.foot a { color: #edf3e3; }
 
 /* boot.js: until meme.js has built the desktop, show only the wallpaper (no flash of the plain page) */
 .pond-boot body > *:not(noscript) { visibility: hidden; }
+
+/* POND KING gadget: the game, small, on the desktop (games/pond-king.html?gadget=1) */
+.app-win.app-gadget .app-frame { height: 360px; }
+.app-win.app-gadget .w-full { display: none; }
+.pk-card { margin: 14px 0; padding: 3px; background: var(--chrome); }
+.pk-card .win-bar { display: flex; align-items: center; gap: 5px; }
+.pk-card .app-frame { width: 100%; height: 400px; }

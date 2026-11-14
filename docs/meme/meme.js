@@ -1166,6 +1166,7 @@
     });
     card.parentNode.insertBefore(doors, card.nextSibling);
     // POND KING: whoever opens the pond meets the frog on the throne (and a link straight to the duel)
+    var cards = doors;   // the gadget card goes after these doors on a phone
     var kingDoor = el('button', { type: 'button', class: 'pd-door pd-king' }, '<img src="' + ico('pond-king') + '" alt="" width="36" height="36" loading="lazy"><span><b>Challenge the Pond King</b><small>Rock, paper, scissors for the throne</small></span>');
     kingDoor.addEventListener('click', function () { pondKingApp(); });
     doors.insertBefore(kingDoor, doors.children[1] || null);
@@ -1189,17 +1190,8 @@
         kingDoor.querySelector('small').textContent = k.you ? 'Defended ' + k.defenses + (k.defenses === 1 ? ' time' : ' times') + '. Check your throne'
           : st.cooldown ? (st.cooldown.won || st.cooldown.network ? 'Next duel ' : 'Still bruised \ud83e\ude79 Next duel ') + 'at ' + new Date(st.cooldown.next_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           : 'Holds the throne: ' + k.defenses + (k.defenses === 1 ? ' defence' : ' defences') + '. One duel every 4 h';
-        // one nudge a day, only when there is a king to beat
-        var day = new Date().toISOString().slice(0, 10), seen = null;
-        try { seen = localStorage.getItem('pk-balloon'); } catch (e) {}
-        if (!st.can_challenge || seen === day) return;
-        setTimeout(function () {
-          if (apps.pondking) return;
-          try { localStorage.setItem('pk-balloon', day); } catch (e) {}
-          var b = balloon('\ud83d\udc51 ' + esc(k.nick) + ' rules the pond', (k.defenses ? 'Held the throne against ' + k.defenses + (k.defenses === 1 ? ' frog' : ' frogs') + '. ' : '') + 'Three moves of rock, paper, scissors. Click to take the crown.', 'pond-king');
-          b.classList.add('balloon-go');
-          b.addEventListener('click', function (e) { if (e.target.closest('button')) return; b.remove(); pondKingApp(); });
-        }, 9000);
+        // the POND KING gadget: a small game window right on the desktop (a card in the page on a phone)
+        pondKingGadget(cards);
       }, function () { kingDoor.hidden = true; });   // until update_pond_king.sql runs, the door stays out of the way
     }, 0);
     var stats = card.querySelector('.tp-stats'), bits = [];
@@ -1604,6 +1596,40 @@
     }, 720);
     return A;
   }
+  // POND KING gadget: the game itself, small, already open when somebody lands on the PondOS home page. On a computer a
+  // real PondOS window in the bottom-right corner (drag, minimize, close; closed, it stays away until tomorrow);
+  // on a phone a card in the page under the "Things to do" doors, so it never covers anything.
+  function gadgetClosedToday() { try { return localStorage.getItem('pk-gadget-closed') === new Date().toISOString().slice(0, 10); } catch (e) { return false; } }
+  function pondKingGadget(after) {
+    var src = BASE + 'games/pond-king.html?embed=1&gadget=1';
+    if (window.innerWidth < 760) {
+      if (!after || document.querySelector('.pk-card')) return;
+      var card = el('section', { class: 'pk-card win active', 'aria-label': 'Pond King' },
+        '<div class="win-bar"><img src="' + ico('pond-king') + '" alt="" width="16" height="16"><span class="win-t">POND KING</span></div>' +
+        '<iframe class="app-frame gadget-frame" src="' + src + '" title="Pond King" allow="web-share"></iframe>');
+      after.parentNode.insertBefore(card, after.nextSibling);
+      return;
+    }
+    if (apps.pkgadget || apps.pondking || gadgetClosedToday()) return;
+    setTimeout(function () {
+      if (apps.pkgadget || apps.pondking) return;
+      var A = openApp('pkgadget', 'POND KING', 'pond-king', function (A) {
+        A.body.innerHTML = '<iframe class="app-frame gadget-frame" src="' + src + '" title="Pond King" allow="web-share"></iframe>';
+      }, 300);
+      A.host.classList.add('app-gadget');
+      var place = function () {
+        var r = A.host.getBoundingClientRect();
+        A.host.style.left = Math.max(8, window.innerWidth - r.width - 18) + 'px';
+        A.host.style.top = Math.max(40, window.innerHeight - r.height - 52) + 'px';
+        A.host.style.setProperty('--app-top', A.host.style.top); A.host.style.transform = 'none';
+      };
+      place(); A.place = place;
+      A.host.querySelector('.win-bar').addEventListener('pointerdown', function () { A.moved = true; });   // dragged: stay where the fren put it
+      var close = A.close;
+      A.close = function () { try { localStorage.setItem('pk-gadget-closed', new Date().toISOString().slice(0, 10)); } catch (e) {} close(); };
+      A.host.querySelector('.w-x').addEventListener('click', function () { try { localStorage.setItem('pk-gadget-closed', new Date().toISOString().slice(0, 10)); } catch (e) {} });
+    }, 1200);
+  }
   // BATTLE OF THREE LILIES (games/lilies.html): 10 flies on 3 lily pads, two frens, no need to be online together.
   // id: a challenge to accept or a duel to show; 'new' opens "Create Challenge". An open window is pointed there.
   function liliesApp(id) {
@@ -1627,6 +1653,15 @@
   // frames on this origin are listened to, and only these few requests are understood.
   window.addEventListener('message', function (e) {
     var m = e.data;
+    // the gadget tells its height, so its window (or card) fits the game without a scroll bar
+    if (e.origin === location.origin && m && m.type === 'pondos-size' && m.h > 100) {
+      document.querySelectorAll('iframe.gadget-frame').forEach(function (f) {
+        if (f.contentWindow !== e.source) return;
+        f.style.height = Math.min(m.h, 640) + 'px';
+        if (apps.pkgadget && apps.pkgadget.place && apps.pkgadget.body.contains(f) && !apps.pkgadget.moved) apps.pkgadget.place();
+      });
+      return;
+    }
     if (e.origin !== location.origin || !m || m.type !== 'pondos-open') return;
     var ok = false; document.querySelectorAll('.app-win iframe').forEach(function (f) { if (f.contentWindow === e.source) ok = true; });
     if (!ok) return;

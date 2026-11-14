@@ -188,3 +188,52 @@ details.panel { padding-top: 12px; }
 .king-progress { margin: 4px 0 8px; font-weight: 700; }
 .king-progress b { font: 400 20px/1 var(--f-px); color: var(--title); }
 @media (max-width: 560px) { .throne-face { width: 68px; height: 68px; } }
+
+/* ---------- the desktop gadget (pond-king.html?embed=1&gadget=1): a small PondOS window that invites a duel ---------- */
+.gadget-foot { display: none; }
+.gadget .gadget-foot { display: flex; gap: 4px; padding: 4px 2px 2px; }
+.gadget .gadget-foot button { flex: 1; font-weight: 400; justify-content: center; }
+.gadget .toolbar, .gadget .cols, .gadget .rules, .gadget #duel > p.muted, .gadget #challengers, .gadget #kingpanel h3,
+.gadget #kingpanel > p.muted, .gadget .statusbar, .gadget .hand-hint, .gadget #duel .row label, .gadget #dice, .gadget #res-after p { display: none !important; }
+.gadget .pk-body { gap: 4px; padding: 4px 2px; }
+.gadget .throne { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; padding: 8px; }
+.gadget .throne-face { width: 64px; height: 64px; }
+.gadget .throne .kicker { font-size: 13px; }
+.gadget .throne h1 { font-size: 28px; margin: 2px 0 0; }
+.gadget .throne #king-line { display: none; }
+.gadget .reign { grid-column: auto; display: block; }
+.gadget .reign b { display: block; min-width: 46px; font-size: 28px; }
+.gadget .reign small { font-size: 9px; }
+.gadget .panel { margin-top: 12px; padding: 12px 6px 6px; }
+.gadget .panel h2 { font-size: 20px; top: -10px; }
+.gadget .rounds { gap: 4px; margin: 2px 0 6px; }
+.gadget .hand, .gadget .palette { gap: 4px; }
+.gadget .slot { min-height: 0; padding: 3px 2px; }
+.gadget .slot i { width: 34px; height: 34px; font-size: 26px; }
+.gadget .slot span, .gadget .slot.filled::after { display: none; }
+.gadget .slot small { font-size: 10px; }
+.gadget .mv { min-height: 0; padding: 6px 2px 4px; }
+.gadget .mv i { width: 40px; height: 40px; }
+.gadget .mv span { font-size: 11px; }
+.gadget #duel .row { flex-wrap: nowrap; gap: 4px; }
+.gadget #duel .row input { flex: 1 1 auto; width: auto; min-width: 0; }
+.gadget #duel .row .go { flex: 0 0 auto; margin: 0; min-height: 30px; }
+.gadget .fight { margin: 2px 0 4px; }
+.gadget .fight li { grid-template-columns: 1fr auto 1fr auto; gap: 4px; padding: 2px 4px; }
+.gadget .fight .n { display: none; }
+.gadget .fight .side small { display: none; }
+.gadget .fight .side i { width: 30px; height: 30px; }
+.gadget .fight .out { font-size: 14px; }
+.gadget .big { font-size: 24px; margin: 4px 0; }
+.gadget .anim { width: 64px; height: 64px; background-size: 256px 64px; animation-name: frames-s; margin: 0 0 0 6px; }
+@keyframes frames-s { from { background-position: 0 0; } to { background-position: -256px 0; } }
+.gadget #waitpanel p { margin: 4px 0 6px; font-size: 12px; }
+.gadget #kingpanel .stamp { width: 56px; height: 56px; }
+.gadget .king-progress { font-size: 12px; }
+/* the gadget is narrow: let every column shrink instead of pushing the window wider */
+.gadget .pk-body { grid-template-columns: minmax(0, 1fr); }
+.gadget .throne > div:nth-child(2) { min-width: 0; }
+.gadget .throne h1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gadget .slot, .gadget .mv { min-width: 0; padding-left: 2px; padding-right: 2px; overflow: hidden; }
+.gadget .slot small { white-space: nowrap; }
+.gadget .msg { min-height: 0; margin: 4px 0 0; } .gadget .msg:empty { display: none; }

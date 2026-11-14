@@ -4,6 +4,17 @@
 (function () {
   'use strict';
   var N = window.PondNet, framed = N.framed, me = null;
+  // ?gadget=1: the small POND KING window that sits on the PondOS desktop (docs/meme/meme.js, pondKingGadget):
+  // the same game, laid out compact, telling PondOS its height so the window fits it
+  var GADGET = /[?&]gadget=1(&|$)/.test(location.search);
+  if (GADGET) {
+    document.documentElement.classList.add('gadget');
+    var lastH = 0, tell = function () {
+      var h = Math.ceil(document.querySelector('.window').getBoundingClientRect().height) + 4;
+      if (Math.abs(h - lastH) > 2 && framed) { lastH = h; try { window.parent.postMessage({ type: 'pondos-size', h: h }, location.origin); } catch (e) {} }
+    };
+    if (window.ResizeObserver) new ResizeObserver(tell).observe(document.body); else setInterval(tell, 1000);
+  }
   var MOVES = { r: ['🪨', 'Rock'], p: ['📄', 'Paper'], s: ['✂️', 'Scissors'] };
   var $ = function (id) { return document.getElementById(id); };
   var mk = function (tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
@@ -268,6 +279,8 @@
   });
   $('recheck').addEventListener('click', function () { status('Checking the throne…'); load(); });
   $('to-bulletin').addEventListener('click', function () { N.open('bulletin'); });
+  $('g-full').addEventListener('click', function () { N.open('king'); });
+  $('g-board').addEventListener('click', function () { N.open('bulletin'); });
   $('to-lilies').addEventListener('click', function () { N.open('lilies'); });
 
   // a fresh look whenever the window comes back, and every minute while it is open
