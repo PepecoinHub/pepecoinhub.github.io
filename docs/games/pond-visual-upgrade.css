@@ -1,0 +1,169 @@
+/* PondOS 98 visual patch v1.0: additive CSS for current Pond King, Three Lilies, Bulletin.
+   Loaded AFTER pond.css and lilies.css. No changes to game logic / JS data / Supabase.
+   Source artwork: img/pond/visual-v1/*.png, native pixels (nearest-neighbor rendering).
+*/
+:root {
+  --vu-dark: #142016;
+  --vu-green: #356b43;
+  --vu-gold: #e3b85f;
+  --vu-parchment: #fff3c7;
+  --vu-ink: #24321d;
+}
+.px-img, .pond, .board, .throne, .vu-native, .vu-badge, .vu-bulletin-icon { image-rendering: pixelated; }
+/* POND KING: a real throne-stage backdrop BEHIND the real current player's avatar and counters. */
+.throne {
+  background: #242943 url('img/pond/visual-v1/king-stage.png') center center / cover no-repeat;
+  border: 2px solid #11251b;
+  outline: 1px solid #d2b05e;
+  outline-offset: -5px;
+  min-height: 112px;
+}
+.throne-face { position: relative; z-index: 1; background: #bba26f; box-shadow: inset 2px 2px #ffec9d, inset -2px -2px #564127, 2px 3px 0 #132018; }
+.throne h1 { color: #fff9df; text-shadow: 2px 2px 0 #142016; }
+.throne .kicker { color: #ffe58d; }
+.throne .reign { border: 1px solid #70582b; }
+.throne .reign b { color: #fff0a3; }
+/* RPS choices: tactile 1998 tiles, same JS and move PNGs as before. */
+.hand .slot, .palette .mv { position: relative; border: 1px solid #8c8c84; }
+.hand .slot.next { border: 1px dashed #6f5e2c; background: #fff7d4; }
+.palette .mv:focus-visible, .hand .slot:focus-visible, .steps button:focus-visible { outline: 2px dotted #000; outline-offset: 2px; }
+/* RPS reveal: redesign existing list items; do not replace sequential reveal timers. */
+.fight { padding: 6px; gap: 5px; background: #b6b6af; }
+.fight li { position: relative; min-height: 52px; background: #f9f2dc; box-shadow: inset 1px 1px #fff, inset -2px -2px #7f7562, 1px 1px #191919; }
+.fight li.rw { background: #dcf0d6; }
+.fight li.rl { background: #f6dcd5; }
+.fight li.rd { background: #efeee6; }
+.fight li .n { color: #704b1c; }
+.fight li .out { position: relative; min-width: 86px; text-align: center; border: 1px solid #15191b; padding: 4px 2px; background: #e1e1da; box-shadow: 1px 1px 0 #fff; font-size: 15px; }
+.fight li .out.w { background: #c2e9ba; color: #185321; }
+.fight li .out.l { background: #f6c7c1; color: #962c24; }
+.fight li .out.d { background: #dadce1; color: #3b3d50; }
+#result.won .big { border-left: 4px solid #367b37; padding-left: 8px; }
+#result.lost .big { border-left: 4px solid #ae4c46; padding-left: 8px; }
+/* Small state image: appears in the existing cooldown/wait dialog, below actual server messages. */
+#waitpanel .vu-state { display: block; width: 132px; height: auto; margin: 2px 0 8px; image-rendering: pixelated; }
+#waitpanel .vu-state + #recheck { margin-top: 2px; }
+/* Restore calm layout in the tiny desktop gadget and on small screens. */
+.gadget .throne { min-height: 0; outline-offset: -3px; border-width: 1px; }
+.gadget .throne-face { box-shadow: var(--raised); }
+.gadget .fight li { min-height: 30px; }
+.gadget .fight li .out { min-width: 56px; padding: 1px 2px; font-size: 12px; }
+.gadget #waitpanel .vu-state { display: none; }
+
+/* THREE LILIES: real, crisp pad graphics remain the interactive focus. */
+.ly-hero { border: 2px solid #193024; background: #234e4f url('img/pond/visual-v1/king-stage.png') center 45% / cover no-repeat; }
+.ly-hero .hero-go { border: 1px solid #20241a; background: #ddd8cb; color: #142016; }
+.pond:not(.result) { border: 2px solid #1c3e40; }
+.pad .art, .ly-hero-pond img, .hid3 img { image-rendering: pixelated; }
+.pad h3 { color: var(--vu-ink); border: 1px solid #969688; }
+.pad .steps button { min-height: 34px; }
+.jar { border: 1px solid #666f67; }
+.jar .dot.used { background: #398a55; }
+.presets button { border: 1px solid #8c8c84; }
+/* Open challenges become small cork notices without changing the real creator, timer or Accept button. */
+#open-list { background: #a5784b url('img/pond/visual-v1/cork-detail.png') repeat; border: 2px inset #735134; gap: 8px; padding: 10px; }
+#open-list li.card.duel {
+  position: relative; background: #fff1c2 url('img/pond/visual-v1/paper-challenge.png') repeat;
+  border: 1px solid #806548; box-shadow: 2px 3px 0 #523e2e, inset 1px 1px #fffbe5;
+  padding: 11px 12px 9px;
+}
+#open-list li.card.duel.mine { background-color: #f1f1d8; }
+#open-list li.card.duel::after {
+  content: ''; position: absolute; top: -7px; left: 50%; width: 16px; height: 16px; pointer-events: none;
+  background: url('img/pond/visual-v1/pin-red.png') center / contain no-repeat; image-rendering: pixelated;
+}
+#open-list li.card.duel .ava { border: 1px solid #6b573a; }
+#open-list li.card.duel .duel-who { color: #2b2519; }
+#open-list li.card.duel .duel-who b { color: #27533f; }
+#open-list li.card.duel .accept { border: 1px solid #1d2b1d; color: #143a20; background: #dce8d2; }
+#open-list li.card.duel .accept:hover:not(:disabled) { background: #b8dba9; }
+#open-list li.empty-pond { color: #162c21; min-height: 150px; background: #fff6d2; box-shadow: inset 1px 1px #fff, inset -2px -2px #a78f6e; }
+#open-list li.empty-pond::before { content: ''; width: 160px; height: 96px; background: url('img/pond/visual-v1/state-quiet-pond.png') center / contain no-repeat; image-rendering: pixelated; }
+.vu-badge { display: inline-block; width: 70px; height: 26px; vertical-align: middle; margin: 0 4px 3px 0; background: center / contain no-repeat; }
+.vu-badge.vu-open { background-image: url('img/pond/visual-v1/tag-open.png'); }
+.vu-badge.vu-rematch { width: 104px; background-image: url('img/pond/visual-v1/tag-rematch.png'); }
+/* The original 48-h expiry bar and all live server-rendered values remain visible. */
+#tab-result .pond.result { background-color: #337d85; border: 2px solid #254649; }
+#tab-result .verdict { border: 1px solid #a18c62; }
+#mine-list .tag { border: 1px solid #777; }
+#mine-list .tag.win, #mine-list .tag.creator_win { color: #17491e; background: #b4ddb0; }
+#mine-list .tag.lose, #mine-list .tag.opponent_win { color: #853b34; background: #e9b8b1; }
+#mine-list .tag.draw { color: #48485a; background: #d2d2dd; }
+#mine-list .tag.open { color: #285940; background: #f9efc5; }
+
+/* POND BULLETIN: TYPE-SPECIFIC PINNED PAPER; actual server content, not fake notices. */
+.board { padding: 24px 12px 15px; background: #9d7047 url('img/pond/visual-v1/cork-detail.png') repeat; border: 3px ridge #85603c; }
+.board h2 { color: #253524; background: #fff2bc; border: 1px solid #826239; padding: 3px 8px; box-shadow: 2px 2px 0 #624934; }
+.board .notes { gap: 15px; }
+.board .note {
+  position: relative; background: #fff3cf url('img/pond/visual-v1/paper-challenge.png') repeat;
+  border: 1px solid #8c7353; box-shadow: 3px 4px 0 #705039;
+  transform: rotate(-0.45deg); padding-bottom: 10px;
+}
+.board .note:nth-child(3n+2) { transform: rotate(0.6deg); }
+.board .note:nth-child(3n+3) { transform: rotate(-0.8deg); }
+.board .note::before { content: ''; position: absolute; z-index: 2; width: 16px; height: 16px; top: -9px; left: 50%; pointer-events: none; background: url('img/pond/visual-v1/pin-yellow.png') center / contain no-repeat; image-rendering: pixelated; }
+.board .note:nth-child(3n+2)::before { background-image: url('img/pond/visual-v1/pin-red.png'); }
+.board .note:nth-child(3n+3)::before { background-image: url('img/pond/visual-v1/pin-blue.png'); }
+.board .note-bar { background: #356b43; }
+.board .note.vu-rematch-note .note-bar { background: #444975; }
+.board .note .who { font-weight: bold; color: #263b28; }
+.board .note .acts button.go { border: 1px solid #183321; background: #d7eacb; }
+/* Real bulletin news clipped to papers; display types are inferred from existing event labels. */
+.board .news { background: transparent; box-shadow: none; display: grid; gap: 10px; }
+.board .clip {
+  background: #f6eee0 url('img/pond/visual-v1/paper-news.png') repeat; position: relative;
+  border: 1px solid #84735e; padding: 9px 11px; box-shadow: 2px 3px 0 #6b4e35;
+}
+.board .clip.vu-king { border-left: 5px solid #dbb94e; }
+.board .clip.vu-lilies { border-left: 5px solid #5a9350; }
+.board .clip .head { color: #344838; font-weight: bold; }
+.board .clip.vu-king .head { color: #6a411b; }
+.board .clip img { image-rendering: pixelated; }
+.board .board-new { margin-top: 13px; }
+.board .board-new .go { border: 1px solid #4b4128; }
+
+/* LEADERBOARDS / HISTORY: clearer old-PC columns with visible places, no invented rankings. */
+.scoreboard { border-color: #a6a5a0; }
+.scoreboard [role='tabpanel'] { background: #d3d3cb; }
+.scoreboard .top, .scoreboard .feed, .ly-record .stat { background: #f8f5e8; border: 1px inset #a7a596; }
+.scoreboard .top li { min-height: 27px; border-bottom: 1px dotted #aaa38e; }
+.scoreboard .top li:first-child:not(.muted) { background: #fff1c4; font-weight: bold; }
+.scoreboard .top li:nth-child(2):not(.muted) { background: #e7e7df; }
+.scoreboard .top li:nth-child(3):not(.muted) { background: #f0e3d8; }
+.scoreboard .top li.now { background: #39734c; color: white; }
+.scoreboard .top li > b:first-child { color: #7d571d; }
+.scoreboard .top li.now > b:first-child { color: #fff4c5; }
+.scoreboard .pane-h::before { content: ''; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; margin-right: 5px; image-rendering: pixelated; background: url('img/pond/visual-v1/icon-trophy-16.png') center / contain no-repeat; }
+#pane-longest .pane-h::before, #pane-top .pane-h::before { background-image: url('img/pond/visual-v1/icon-crown-16.png'); }
+.ly-record .stat b { color: #365e3a; }
+
+@media (max-width: 560px) {
+  .throne { min-height: 82px; }
+  .board { padding: 22px 8px 11px; }
+  .board .news { gap: 8px; }
+  #open-list { padding: 7px; }
+  #open-list li.card.duel { padding: 10px 8px 8px; }
+  .vu-badge { margin-bottom: 2px; }
+  .fight li .out { min-width: 70px; }
+  #waitpanel .vu-state { width: 110px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .board .note { transform: none; }
+  .board .note:nth-child(n) { transform: none; }
+}
+/* The state is taken from the existing result panel, not from guessed game data. */
+#result.won .big::before, #tab-result.won .big::before,
+#result.lost .big::before, #tab-result.lost .big::before,
+#tab-result.vu-is-draw .big::before, #result.drawn .big::before {
+  content: ''; display: inline-block; vertical-align: middle; width: 70px; height: 26px;
+  background-position: center; background-repeat: no-repeat; background-size: contain;
+  image-rendering: pixelated; margin: 0 7px 3px 0;
+}
+#result.won .big::before, #tab-result.won .big::before { background-image: url('img/pond/visual-v1/tag-win.png'); }
+#result.lost .big::before, #tab-result.lost .big::before { background-image: url('img/pond/visual-v1/tag-loss.png'); }
+#tab-result.vu-is-draw .big::before, #result.drawn .big::before { background-image: url('img/pond/visual-v1/tag-draw.png'); }
+#result.drawn .big { border-left: 4px solid #6b6d80; padding-left: 8px; }
+/* the desktop gadget: the share buttons stay small */
+.gadget .share-row .go { min-height: 26px; padding: 3px 10px; font-size: 12px; }
+/* Sprite images do not pretend to be Passport stamps or achievement awards. */

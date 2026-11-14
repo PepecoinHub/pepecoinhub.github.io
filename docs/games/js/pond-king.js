@@ -269,7 +269,7 @@
     setTimeout(function () {
       var line = $('res-line'), after = $('res-after');
       line.textContent = (r.won ? 'You took the throne! ' : 'The king holds. ') + r.score[0] + ' : ' + r.score[1];
-      line.classList.add(r.won ? 'w' : 'l'); $('result').classList.add(r.won ? 'won' : 'lost');
+      line.classList.add(r.won ? 'w' : 'l'); $('result').classList.add(r.won ? 'won' : r.score[0] === r.score[1] ? 'drawn' : 'lost');
       var anim = mk('div', 'anim ' + (r.won ? 'win' : r.score[0] === r.score[1] ? 'draw' : 'lose')); anim.setAttribute('aria-hidden', 'true');
       line.parentNode.insertBefore(anim, line);
       var p = mk('p', 'muted', r.won
