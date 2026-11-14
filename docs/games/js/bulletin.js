@@ -45,7 +45,9 @@
     if (!ul.children.length) ul.appendChild(mk('li', 'note empty', 'No open challenges right now. The flies are bored. Post the first one!'));
 
     var news = $('news'); news.textContent = '';
-    (b.events || []).forEach(function (e) {
+    // the 10 newest notes only; the list scrolls inside its box (lilies.css .news)
+    var events = (b.events || []).slice(0, 10);
+    events.forEach(function (e) {
       var li = mk('li', 'clip'), parts = story(e);
       var ic = mk('img'); ic.src = e.game === 'pond_king' ? 'img/pond/king-stamp.png' : 'img/pond/lilies.png'; ic.alt = ''; li.appendChild(ic);
       li.appendChild(mk('span', 'head', HEAD[e.kind] || 'Pond news'));
@@ -60,7 +62,7 @@
       li.appendChild(acts); news.appendChild(li);
     });
     if (!news.children.length) news.appendChild(mk('li', 'clip empty', 'No news yet. The pond is waiting for its first legend.'));
-    $('status').textContent = (b.open || []).length + ' open · ' + (b.events || []).length + ' notes on the board';
+    $('status').textContent = (b.open || []).length + ' open · ' + events.length + ' notes on the board';
   }
   function load() {
     N.rpc('gry_bulletin', { p_limit: 20 }).then(render, function (e) {

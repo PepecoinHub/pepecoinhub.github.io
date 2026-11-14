@@ -110,7 +110,7 @@
 .board .note .who { font-weight: bold; color: #263b28; }
 .board .note .acts button.go { border: 1px solid #183321; background: #d7eacb; }
 /* Real bulletin news clipped to papers; display types are inferred from existing event labels. */
-.board .news { background: transparent; box-shadow: none; display: grid; gap: 10px; }
+.board .news { background: transparent; box-shadow: none; display: grid; gap: 10px; max-height: 420px; overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
 .board .clip {
   background: #f6eee0 url('img/pond/visual-v1/paper-news.png') repeat; position: relative;
   border: 1px solid #84735e; padding: 9px 11px; box-shadow: 2px 3px 0 #6b4e35;
@@ -141,7 +141,7 @@
 @media (max-width: 560px) {
   .throne { min-height: 82px; }
   .board { padding: 22px 8px 11px; }
-  .board .news { gap: 8px; }
+  .board .news { gap: 8px; max-height: 340px; }
   #open-list { padding: 7px; }
   #open-list li.card.duel { padding: 10px 8px 8px; }
   .vu-badge { margin-bottom: 2px; }
