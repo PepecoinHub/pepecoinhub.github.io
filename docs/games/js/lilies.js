@@ -92,17 +92,9 @@
     var left = 10 - s; $('flies-left').textContent = left; $('flies-word').textContent = left === 1 ? 'fly' : 'flies';
     $('left-line').className = 'left' + (left === 0 ? ' done' : '');
     $('left-line').lastChild.textContent = left === 0 ? ' left. All 10 flies in position!' : ' still buzzing around';
-    document.querySelectorAll('.presets [data-spread]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.spread === flies.join(','))); });
     $('submit').disabled = busy || s !== 10 || !me || !nickOk();
     $('nick-hint').hidden = nickOk();
   }
-  $('spread').addEventListener('click', function () {
-    var a = Math.floor(Math.random() * 11), b = Math.floor(Math.random() * (11 - a)); flies = [a, b, 10 - a - b];
-    flies.sort(function () { return Math.random() - .5; }); paint();
-  });
-  document.querySelectorAll('.presets [data-spread]').forEach(function (b) {
-    b.addEventListener('click', function () { flies = b.dataset.spread.split(',').map(Number); paint(); });
-  });
   var nick = $('nick');
   function nickOk() { return N.nickOk(nick.value); }
   nick.addEventListener('input', paint);
