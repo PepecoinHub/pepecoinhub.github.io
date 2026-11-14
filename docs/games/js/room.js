@@ -30,7 +30,7 @@ const ptMenu = menuBar([
   ['Edit', () => [['Undo the last line', () => undo(), { disabled: !isDrawer() || !hist.length, key: 'Ctrl+Z' }], ['Clear the picture', () => clearAll(), { disabled: !isDrawer() }], ['Skip this word', () => be.rpc('gry_skip', { p_code: code }).catch((e) => toast(e.message, 'bad')), { disabled: !isDrawer() }]]],
   ['Help', [['How to play', () => dialog('How to play - PEPaint', howToPlay(), [['OK', null, { primary: true }]], { wide: true })]]],
 ]);
-document.documentElement.classList.add('paint');
+document.documentElement.classList.add('paint', 'pt-gate');   // pt-gate: a small sign-in dialog until we are in the room
 limitEmotes(LIGHT_EMOTES);
 $('#main').prepend(ptMenu); $('#main').append(ptStatus.el);
 ptHint('Joining room ' + code + '…'); ptStatus.set(1, 'Room ' + code); ptStatus.set(2, '1000 × 700px');
@@ -56,6 +56,7 @@ async function enter(nick) {
   try {
     const s = await be.rpc('gry_join', { p_code: code, p_nick: nick });
     $('#joinbox').classList.add('hidden');
+    document.documentElement.classList.remove('pt-gate');
     $('#room').classList.remove('hidden');
     subscribeRoom();
     if (isPaint() && !$('#invite')) $('.players h3').append(h('button', { class: 'btn sm', id: 'invite', title: 'Copy the invite link for your frens', onclick: copyInvite }, 'Invite'));
@@ -73,6 +74,7 @@ async function enter(nick) {
 }
 function message(text, sub = '') {
   $('#room').classList.add('hidden'); $('#joinbox').classList.add('hidden');
+  document.documentElement.classList.add('pt-gate');
   const b = $('#msgbox'); b.classList.remove('hidden'); b.textContent = '';
   b.append(h('h2', {}, text), sub ? h('p', { class: 'muted' }, sub) : null, h('a', { class: 'btn primary', href: isPaint() ? LOBBY : './' }, isPaint() ? 'Back to the main menu' : 'Back to lobby'));
   roomCh?.close(); turnCh?.close();
@@ -88,7 +90,7 @@ function message(text, sub = '') {
     } catch (e) { return message(e.message); }
   }
   const jb = $('#joinbox'); jb.classList.remove('hidden');
-  const inner = h('div'); jb.append(inner, h('p', { class: 'small muted', style: 'margin-bottom:0' }, 'Room ', h('b', { class: 'mono' }, code)));
+  const inner = h('div'); jb.append(h('p', { class: 'pt-gate-room' }, h('img', { src: 'img/icon.svg', alt: '', width: 32, height: 32 }), h('span', {}, 'PEPaint room', h('b', { class: 'mono' }, code))), inner);
   identityCard(inner, { cta: 'Join game', onReady: (nick) => enter(nick) });
 })();
 

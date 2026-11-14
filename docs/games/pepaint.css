@@ -292,3 +292,26 @@ p.pt-top-none { padding: 18px 10px; text-align: center; }
 /* "who draws" (moderator, between games) and the big "I'll draw!" button on the break card */
 .hostbar select.drawmode { min-height: 30px; padding: 2px 6px; font: inherit; font-size: 13px; }
 .inter-card .vol-btn { margin-top: 10px; font-size: 1.15rem; padding: 10px 22px; }
+
+/* ---------- before joining: the room is a small sign-in dialog, not a huge empty window ---------- */
+html.paint.pt-gate main.wrap#main { min-height: 0 !important; height: auto !important; max-width: 440px; margin: 0 auto !important; }
+html.embed.paint.pt-gate:not(.os98) main.wrap#main { max-width: none; height: 100vh !important; height: 100dvh !important; justify-content: center; }
+html.os98.paint.pt-gate .os-bar { max-width: 440px; margin-top: max(16px, 12vh); }
+html.paint.pt-gate .pt-status, html.paint.pt-gate .pt-menu { display: none; }
+html.paint.pt-gate #joinbox, html.paint.pt-gate #msgbox { margin: 0; width: auto; max-width: none; padding: 16px 18px 18px; border: 0; border-radius: 0; background: var(--w-face); box-shadow: none; color: #111; font: 14px var(--sys); }
+html.embed.paint.pt-gate:not(.os98) #joinbox, html.embed.paint.pt-gate:not(.os98) #msgbox { width: min(440px, calc(100% - 24px)); margin: 0 auto; box-shadow: var(--up), 4px 4px 0 rgba(0,0,0,.3); }
+html.paint.pt-gate #joinbox .identity, html.paint.pt-gate #joinbox > div { border: 0; background: none; box-shadow: none; padding: 0; }
+.pt-gate-room { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding-bottom: 12px; border-bottom: 1px solid var(--w-lo); box-shadow: 0 1px 0 var(--w-hi); font: 13px var(--sys); color: #333; }
+.pt-gate-room span { display: flex; flex-direction: column; line-height: 1.25; }
+.pt-gate-room b { font: 700 18px "Ubuntu Mono", monospace; color: #111; letter-spacing: .08em; }
+html.paint.pt-gate #joinbox .id-step { display: none; }
+html.paint.pt-gate #joinbox h2, html.paint.pt-gate #msgbox h2 { font: 700 17px var(--sys); margin: 0 0 12px; color: #111; }
+html.paint.pt-gate #joinbox .id-name { color: #0c5a2c; }
+html.paint.pt-gate #joinbox label { display: block; font: 13px var(--sys); color: #111; margin-bottom: 4px; }
+html.paint.pt-gate #joinbox input[type=text] { width: 100%; box-sizing: border-box; min-height: 34px; padding: 5px 8px; font: 15px var(--sys) !important; background: #fff; color: #111; border: 0; border-radius: 0; box-shadow: var(--down); }
+html.paint.pt-gate #joinbox .row:has(> .badge) { display: none; }
+html.paint.pt-gate #joinbox .row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0 !important; }
+html.paint.pt-gate #joinbox .row .btn { flex: 1 1 0; min-width: max-content; min-height: 32px; padding: 5px 12px; font: 13px var(--sys) !important; justify-content: center; }
+html.paint.pt-gate #joinbox .row .btn.primary { flex: 1 1 100%; min-height: 40px; font: 700 15px var(--sys) !important; }
+html.paint.pt-gate #joinbox p.small { font: 12px/1.45 var(--sys); color: #333; }
+html.paint.pt-gate #msgbox .btn { margin-top: 4px; }
