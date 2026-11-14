@@ -19,14 +19,8 @@
   })();
   // Pepe Gold Hook is in testing too: hidden unless this browser opened /meme/?beta=goldhook once (?beta=off hides
   // it again). Its page is not linked from the lobby and not indexed.
-  var GOLDHOOK = (function () {
-    try {
-      var q = new URLSearchParams(location.search).get('beta');
-      if (q === 'goldhook') localStorage.setItem('pondos-beta-goldhook', '1');
-      if (q === 'off') localStorage.removeItem('pondos-beta-goldhook');
-      return localStorage.getItem('pondos-beta-goldhook') === '1';
-    } catch (e) { return false; }
-  })();
+  // Pepe Gold Hook is open for everyone since 14 November 2026 (it was a ?beta=goldhook field test before).
+  var GOLDHOOK = true;
   // Owner sandbox activates for this visit only. The URL does not grant owner permissions.
   var FREN_TEST = (function () {
     try { return new URLSearchParams(location.search).get('beta') === 'fren-test'; } catch (e) { return false; }
@@ -281,7 +275,7 @@
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['PEPaint', 'The party room: draw and guess with frens', 'pepaint', function () { drawGuess(); }],
-      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat(GOLDHOOK ? [['Pepe Gold Hook (beta)', '20 levels, a shop, one hook · field test', 'goldhook', function () { goldHookApp(); }]] : []).concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', function () { pepegochiApp(); }],
+      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat(GOLDHOOK ? [['Pepe Gold Hook', '20 levels, a shop, one hook', 'goldhook', function () { goldHookApp(); }]] : []).concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', function () { pepegochiApp(); }],
         ['PEPEGOCHI (local test)', 'Rules simulator with a time machine · nothing is saved', 'pep-logo', function () { pepegochiTestApp(); }]] : []).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
@@ -4434,6 +4428,15 @@
   function adPx(name, cls) { return '<img class="ad-px' + (cls ? ' ' + cls : '') + '" src="../games/img/pond/' + name + '.png" alt="">'; }
   function adLilies() { return '<span class="ad-lilies" aria-hidden="true">' + ['a', 'b', 'c'].map(function (k) { return '<span>' + adPx('lily-pad-' + k) + '<i>?</i></span>'; }).join('') + '</span>'; }
   var ADS = [
+    // 14 November: Pepe Gold Hook opens for everyone (PondOS Start menu, Find, the Games folder and the LEADERS)
+    { file: 'gold_hook.mpg', added: '2026-11-14', look: 'shop', kitsch: true, ms: 4600, title: 'Pepe Gold Hook', ch: 'CH 24K · THE GOLD RUSH SHOPPING NETWORK', icon: 'goldhook', scenes: [
+      adGlitter() + '<img class="ad-px" src="../games/img/gold-hook/ui/pm-logo-goldhook.png" style="width:384px;max-width:100%;height:auto" alt="">' + '<h3 class="ad-big ad-3d">One frog. One hook.<br><em>20 levels!</em></h3><p class="ad-sub">New on your PondOS desktop. Drop the swinging hook and crank up gold, PEP coins, crates… and a lot of rocks.</p>',
+      '<div class="ad-row">' + '<img class="ad-px ad-px-xl ad-shine" src="../games/img/gold-hook/objects/pm-nugget-large.png" style="width:96px;height:96px" alt="">' + '<div><p class="ad-kick">Is it heavy? It’s HEAVY!</p><h3 class="ad-big ad-3d">Big gold.<br><em>Slow crank!</em></h3><p class="ad-sub">The heavier the loot, the slower it comes up. Every level gives you less time, heavier loot and more rocks in the way.</p></div></div>',
+      adBurst('ONE LEVEL<br>ONLY!', 'b-br', 'b-pink') + '<div class="ad-vs">' + ['strength', 'reel', 'dynamite', 'clock'].map(function (k) { return '<img class="ad-px" src="../games/img/gold-hook/ui/pm-shop-' + k + '.png" style="width:64px;height:64px" alt="">'; }).join('') + '</div><h3 class="ad-big ad-3d">Strong arms! Fast reel!<br><em>Dynamite!</em></h3><p class="ad-sub">Beat a level and the shop opens: Strong arms, Fast reel, Dynamite and a Pocket watch. Everything works for the next level only. Then it’s gone.</p>',
+      adGlitter() + '<div class="ad-price"><s>9999 PEP</s><s>999 PEP</s><b>SURPLUS!</b></div><p class="ad-kick">How do you pay? With what you dig up ABOVE the goal!</p><p class="ad-sub">Scrape past the goal and your wallet stays empty. Dig deeper, shop bigger. Miss the goal and it’s game over.</p>',
+      adTesti(adFren('clothing_blue', 'mouth_shout', 'eyes_bloodshot', 'hat_hardhat', 'accessory_none'), 'I hooked the biggest nugget in the mine. Then I pressed D. I don’t want to talk about it.', 'Gary, 41, level 7') + '<p class="ad-fine">*Gary is a drawing. Dynamite really does blow up whatever is on your hook, though.</p>',
+      '<p class="ad-kick ad-blink">Our frogs are digging right now!</p><h3 class="ad-big ad-3d">Grab the<br><em>hook!</em></h3>' + adPhone('☎ NO PHONE · PRESS SPACE') + '<p class="ad-fine">Not a real gold rush. Game PEP are points, not coins: nothing to win, withdraw or sell. Top runs go to the High Scores; Discord players get a ✓ and keep their stats on their account.</p><button type="button" class="ad-cta ad-goldbtn">Play Pepe Gold Hook →</button>'
+    ] },
     // 14 November: POND DUELS (Pond King and Battle of Three Lilies) open on the PondOS desktop
     { file: 'pond_duels.mpg', added: '2026-11-14', look: 'gameshow', kitsch: true, ms: 4800, title: 'POND DUELS: the game show', ch: 'CH 3 · POND DUELS, THE GAME SHOW', icon: 'pond-king', scenes: [
       adBurst('NEW<br>SHOW!', 'b-tr', 'b-pink') + '<p class="ad-kick">The only game show where nobody has to be online at the same time!</p><div class="ad-vs">' + adPx('king-stamp') + '<b>VS</b>' + adPx('lilies') + '</div><h3 class="ad-big">It\'s time for<br><em>POND DUELS!</em></h3><p class="ad-sub">Two brand-new duels, sitting right on your PondOS desktop. Play now. Your rival plays whenever.</p>',
@@ -4629,6 +4632,7 @@
       var yb = A.body.querySelector('.ad-yeetbtn'); if (yb) yb.addEventListener('click', function () { yeetApp(); });
       var lnb = A.body.querySelector('.ad-lanbtn'); if (lnb) lnb.addEventListener('click', function () { lanParty(); });
       var mlb = A.body.querySelector('.ad-mailbtn'); if (mlb) mlb.addEventListener('click', function () { frogMail('write'); });
+      var ghb = A.body.querySelector('.ad-goldbtn'); if (ghb) ghb.addEventListener('click', function () { goldHookApp(); });
       var sb = A.body.querySelector('.ad-sweepbtn'); if (sb) sb.addEventListener('click', function () { pepeSweeperApp(); });
       var fb2 = A.body.querySelector('.ad-frogbtn'); if (fb2) fb2.addEventListener('click', function () { pondWarsApp(); });
       var frb = A.body.querySelector('.ad-frenbtn'); if (frb) frb.addEventListener('click', function () { avatarMaker(); });
