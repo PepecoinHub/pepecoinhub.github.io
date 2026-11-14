@@ -75,6 +75,13 @@
     };
     if (window.ResizeObserver) new ResizeObserver(tell).observe(document.body); else setInterval(tell, 1000);
   }
+  // a length of time, short: 45 min, 3 h 20 min, 2 d 5 h
+  function dur(sec) {
+    var m = Math.floor((sec || 0) / 60), h = Math.floor(m / 60), d = Math.floor(h / 24);
+    if (d) return d + ' d' + (h % 24 ? ' ' + (h % 24) + ' h' : '');
+    if (h) return h + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : '');
+    return Math.max(m, 1) + ' min';
+  }
   function ago(iso) {
     var s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
     if (s < 60) return 'just now';
@@ -89,7 +96,7 @@
     return Math.floor(s / 3600) + ' h left';
   }
   function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-  window.PondNet = { session: session, me: me, rpc: rpc, open: open, framed: framed, embedded: embedded, ago: ago, left: left, mk: mk, gadget: gadget };
+  window.PondNet = { session: session, me: me, rpc: rpc, open: open, framed: framed, embedded: embedded, ago: ago, left: left, mk: mk, gadget: gadget, dur: dur };
 })();
 
 // ---------- pixel art (PondOS is Windows 98: everything a little pixelated) ----------

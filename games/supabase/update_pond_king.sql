@@ -67,6 +67,23 @@ revoke all on games.pk_meta from public, anon, authenticated;
 alter table games.pk_kings add column if not exists user_id uuid;   -- the account, if the player was logged on
 alter table games.pk_duels add column if not exists user_id uuid;
 create index if not exists pk_duels_user on games.pk_duels (king_id, user_id);
+create index if not exists pk_kings_long on games.pk_kings ((coalesce(ended_at, crowned_at) - crowned_at) desc);
+
+-- the record of every frog, kept apart from the duels (those go after 60 days): duels played, thrones taken,
+-- duels lost, the most defences in one reign (the longest win streak as king) and the longest reign.
+-- A player is their account when logged on ('u:<id>'), otherwise their browser token ('t:<hash>').
+create table if not exists games.pk_stats (
+  player           text primary key,
+  nick             text not null,
+  duels            int not null default 0,
+  thrones          int not null default 0,
+  losses           int not null default 0,
+  best_defenses    int not null default 0,
+  longest_reign_s  bigint not null default 0,
+  updated_at       timestamptz not null default now()
+);
+alter table games.pk_stats enable row level security;
+revoke all on games.pk_stats from public, anon, authenticated;
 
 -- the pond opens with the house frog on the throne
 insert into games.pk_kings (nick, moves)
@@ -99,6 +116,32 @@ language sql stable security definer set search_path = '' as $$
      and (games.pk_is(d.token_hash, d.user_id, th, u) or (ip is not null and d.ip_hash = ip))
    order by d.created_at desc limit 1
 $$;
+
+create or replace function games.pk_player(th text, u uuid) returns text language sql immutable set search_path = '' as $$
+  select case when u is not null then 'u:' || u::text when th is not null then 't:' || th end
+$$;
+
+-- add to a player's record (nothing for the house frog, which has neither token nor account)
+create or replace function games.pk_stat_add(p_player text, p_nick text, p_duels int, p_thrones int, p_losses int, p_defenses int, p_reign_s bigint)
+returns void language sql security definer set search_path = '' as $$
+  insert into games.pk_stats as s (player, nick, duels, thrones, losses, best_defenses, longest_reign_s)
+  select p_player, p_nick, p_duels, p_thrones, p_losses, p_defenses, p_reign_s where p_player is not null
+  on conflict (player) do update set nick = excluded.nick, duels = s.duels + excluded.duels, thrones = s.thrones + excluded.thrones,
+    losses = s.losses + excluded.losses, best_defenses = greatest(s.best_defenses, excluded.best_defenses),
+    longest_reign_s = greatest(s.longest_reign_s, excluded.longest_reign_s), updated_at = now()
+$$;
+
+-- duels and reigns from before this table count too (once: only while the table is still empty)
+do $$
+begin
+  if not exists (select 1 from games.pk_stats) then
+    perform games.pk_stat_add(games.pk_player(d.token_hash, d.user_id), d.nick, 1, d.won::int, (not d.won)::int, 0, 0)
+       from games.pk_duels d order by d.created_at;
+    perform games.pk_stat_add(games.pk_player(k.token_hash, k.user_id), k.nick, 0, 0, 0, k.defenses,
+                              case when k.ended_at is null then 0 else extract(epoch from k.ended_at - k.crowned_at)::bigint end)
+       from games.pk_kings k order by k.crowned_at;
+  end if;
+end $$;
 
 -- the saved Fren avatar of a Discord player (games.passport_avatars, update_fren_avatar.sql), or null;
 -- null too while the Fren Passport is not installed
@@ -160,6 +203,19 @@ begin
                                       order by t.defenses desc, t.crowned_at)
                      from (select * from games.pk_kings where defenses > 0 or ended_at is null
                             order by defenses desc, crowned_at limit 10) t), '[]'::jsonb),
+    -- the longest time on the throne (the house frog does not count); a reign still going counts up to now
+    'longest', coalesce((select jsonb_agg(jsonb_build_object('nick', t.nick, 'seconds', t.secs, 'defenses', t.defenses, 'reigning', t.ended_at is null,
+                                                             'you', games.pk_is(t.token_hash, t.user_id, th, u), 'passport', games.passport_id(t.user_id))
+                                          order by t.secs desc, t.crowned_at)
+                         from (select x.*, extract(epoch from coalesce(x.ended_at, now()) - x.crowned_at)::bigint secs from games.pk_kings x
+                                where x.token_hash is not null or x.user_id is not null
+                                order by coalesce(x.ended_at, now()) - x.crowned_at desc, x.crowned_at limit 10) t), '[]'::jsonb),
+    -- your record (on this browser and, when logged on, your account), with a reign still going counted up to now
+    'stats', (select jsonb_build_object('duels', coalesce(sum(st.duels), 0), 'thrones', coalesce(sum(st.thrones), 0), 'losses', coalesce(sum(st.losses), 0),
+                                        'best_defenses', greatest(coalesce(max(st.best_defenses), 0), case when you then k.defenses else 0 end),
+                                        'longest_reign_s', greatest(coalesce(max(st.longest_reign_s), 0),
+                                                                    case when you then extract(epoch from now() - k.crowned_at)::bigint else 0 end))
+                from games.pk_stats st where st.player in (games.pk_player(th, null), games.pk_player(null, u))),
     'recent', coalesce((select jsonb_agg(jsonb_build_object('nick', d.nick, 'won', d.won, 'at', d.created_at, 'king', kk.nick)
                                          order by d.created_at desc)
                         from (select * from games.pk_duels order by created_at desc limit 8) d
@@ -219,13 +275,16 @@ begin
   insert into games.pk_duels (king_id, token_hash, user_id, ip_hash, nick, moves, king_order, won)
   values (k.id, th, u, ip, v_nick, v_moves, ord, won);
 
+  perform games.pk_stat_add(games.pk_player(th, u), v_nick, 1, won::int, (not won)::int, 0, 0);
   if won then
     update games.pk_kings set ended_at = now(), ended_by = v_nick where id = k.id;
+    perform games.pk_stat_add(games.pk_player(k.token_hash, k.user_id), k.nick, 0, 0, 0, k.defenses, extract(epoch from now() - k.crowned_at)::bigint);
     insert into games.pk_kings (token_hash, user_id, ip_hash, nick, moves) values (th, u, ip, v_nick, v_moves) returning id into new_id;
     perform games.bulletin_post('pk:crown:' || new_id, 'pond_king', 'king_crowned', v_nick, u, k.nick, k.user_id, null,
                                 jsonb_build_object('old_reign', k.defenses));
   else
     update games.pk_kings set defenses = defenses + 1 where id = k.id;
+    perform games.pk_stat_add(games.pk_player(k.token_hash, k.user_id), k.nick, 0, 0, 0, k.defenses + 1, 0);
     -- 10 duels won in a row as king: the "Long Live the King" stamp (a Passport without this stamp yet only warns)
     if k.defenses + 1 >= 10 and k.user_id is not null and to_regprocedure('games.passport_award(uuid, text, timestamp with time zone)') is not null then
       begin perform games.passport_award(k.user_id, 'long_live_the_king');
@@ -243,7 +302,8 @@ begin
   if found then
     delete from games.pk_duels where created_at < now() - interval '60 days';
     delete from games.pk_kings x where x.ended_at < now() - interval '60 days'
-      and x.id not in (select id from games.pk_kings order by defenses desc, crowned_at limit 50);
+      and x.id not in (select id from games.pk_kings order by defenses desc, crowned_at limit 50)
+      and x.id not in (select id from games.pk_kings order by coalesce(ended_at, crowned_at) - crowned_at desc limit 50);
   end if;
 
   return jsonb_build_object('ok', true, 'won', won, 'score', jsonb_build_array(me, them), 'rounds', rounds,
@@ -264,6 +324,7 @@ begin
   return jsonb_build_object('ok', true, 'moves', v_moves);
 end $$;
 
+revoke all on function games.pk_player(text, uuid), games.pk_stat_add(text, text, int, int, int, int, bigint) from public, anon, authenticated;
 revoke all on function games.pk_token_hash(text), games.pk_beats(text, text), games.pk_is(text, uuid, text, uuid), games.pk_cooldown(), games.pk_last(text, uuid, text), games.pk_avatar(uuid) from public, anon, authenticated;
 revoke all on function public.gry_pk_state(text), public.gry_pk_challenge(text, bigint, text, text), public.gry_pk_set_moves(text, text) from public;
 grant execute on function public.gry_pk_state(text), public.gry_pk_challenge(text, bigint, text, text), public.gry_pk_set_moves(text, text) to anon, authenticated;

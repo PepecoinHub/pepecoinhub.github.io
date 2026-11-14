@@ -6,8 +6,8 @@
 <meta name="description" content="A strategy duel for two frogs who never have to be online together. Spread 10 flies over three lily pads, win two pads, win the duel.">
 <meta name="robots" content="noindex">
 <link rel="canonical" href="https://pepecoinhub.com/games/lilies.html"><link rel="icon" href="img/pond/lilies.png" type="image/png">
-<link rel="stylesheet" href="pond.css?v=20261114lilies"><link rel="stylesheet" href="lilies.css?v=20261114lilies">
-<script src="js/config.js"></script><script src="js/pond-net.js?v=20261114lilies" defer></script><script src="js/lilies.js?v=20261114lilies" defer></script>
+<link rel="stylesheet" href="pond.css?v=20261114stats"><link rel="stylesheet" href="lilies.css?v=20261114stats">
+<script src="js/config.js"></script><script src="js/pond-net.js?v=20261114stats" defer></script><script src="js/lilies.js?v=20261114stats" defer></script>
 </head><body>
 <header class="site-bar"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · FLY TRAFFIC CONTROL</span><a href="bulletin.html">Pond Bulletin ↗</a></header>
 <main class="desk">
@@ -42,6 +42,15 @@
       <h2>Open challenges</h2>
       <p class="muted">Somebody hid 10 flies on three lily pads. You cannot see where. Accept, place your own 10, and the flies settle it.</p>
       <ul class="cards" id="open-list"><li class="muted">Asking the pond…</li></ul>
+    </section>
+
+    <!-- the hall of flies: everybody's records -->
+    <section class="panel" id="leaders">
+      <h2>Hall of flies</h2>
+      <div class="cols">
+        <div><h3>Longest win streaks</h3><ol class="top" id="lead-streak"><li class="muted">…</li></ol></div>
+        <div><h3>Most duels won</h3><ol class="top" id="lead-wins"><li class="muted">…</li></ol></div>
+      </div>
     </section>
 
     <!-- create / accept: the allocator -->
@@ -81,6 +90,13 @@
     <!-- my matches -->
     <section class="panel" id="tab-mine" hidden>
       <h2>My matches</h2>
+      <div class="stats ly-record" id="mystats">
+        <div class="stat"><b id="st-wins">0</b><small>wins</small></div>
+        <div class="stat"><b id="st-losses">0</b><small>losses</small></div>
+        <div class="stat"><b id="st-draws">0</b><small>draws</small></div>
+        <div class="stat" id="st-streak-box"><b id="st-streak">0</b><small>win streak now</small></div>
+        <div class="stat"><b id="st-best">0</b><small>best win streak</small></div>
+      </div>
       <ul class="feed" id="mine-list"><li class="muted">…</li></ul>
     </section>
 

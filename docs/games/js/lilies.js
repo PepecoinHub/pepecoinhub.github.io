@@ -26,11 +26,12 @@
   var TABS = ['open', 'create', 'mine', 'help', 'result'];
   function show(tab) {
     TABS.forEach(function (t) { $('tab-' + t).hidden = t !== tab; });
+    $('leaders').hidden = tab !== 'open';
     document.querySelectorAll('.menubar [data-tab]').forEach(function (b) {
       var on = b.dataset.tab === tab || (tab === 'result' && b.dataset.tab === 'mine'); b.setAttribute('aria-pressed', String(on));
     });
     $('signin').hidden = !!me || !(tab === 'create' || tab === 'mine');
-    if (tab === 'open') loadOpen();
+    if (tab === 'open') { loadOpen(); if (!GADGET) loadLeaders(); }
     if (tab === 'mine') loadMine();
   }
   document.querySelectorAll('.menubar [data-tab]').forEach(function (b) {
@@ -287,6 +288,22 @@
       status(lastOpen.length + (lastOpen.length === 1 ? ' open challenge' : ' open challenges'));
     }, offline);
   }
+  // the hall of flies: names and numbers only
+  function loadLeaders() {
+    N.rpc('gry_lily_leaders', {}).then(function (b) {
+      [['lead-streak', b.streaks, function (t) { return String(t.best_streak); }, function (t) { return t.streak > 1 && t.streak === t.best_streak ? ' (still going)' : ''; }, 'No streaks yet. Win two in a row.'],
+       ['lead-wins', b.wins, function (t) { return String(t.wins); }, function (t) { return ' (' + t.wins + '-' + t.losses + (t.draws ? '-' + t.draws : '') + ')'; }, 'No wins yet. Be the first.']]
+        .forEach(function (x) {
+          var ol = $(x[0]); ol.textContent = '';
+          (x[1] || []).forEach(function (t, i) {
+            var li = mk('li', t.you ? 'me' : ''); li.appendChild(mk('b', null, (i + 1) + '.'));
+            li.appendChild(mk('span', null, t.nick + x[3](t))); li.appendChild(mk('b', null, x[2](t)));
+            ol.appendChild(li);
+          });
+          if (!ol.children.length) ol.appendChild(mk('li', 'muted', x[4]));
+        });
+    }, function () { $('leaders').hidden = true; });
+  }
   function cancel(id) {
     N.rpc('gry_lily_cancel', { p_id: id }).then(function (r) { status(r && r.ok ? 'Challenge cancelled. The flies go home.' : errText(r)); loadOpen(); loadMine(); });
   }
@@ -294,6 +311,10 @@
     var ul = $('mine-list');
     if (!me) { ul.textContent = ''; ul.appendChild(mk('li', 'muted', 'Log on to see your matches.')); return; }
     N.rpc('gry_lily_my', {}).then(function (r) {
+      var st = r.stats || {};
+      ['wins', 'losses', 'draws', 'streak'].forEach(function (k) { $('st-' + k).textContent = String(st[k] || 0); });
+      $('st-best').textContent = String(st.best_streak || 0);
+      $('st-streak-box').classList.toggle('hot', (st.streak || 0) >= 3);
       ul.textContent = '';
       (r.matches || []).forEach(function (m) {
         var li = mk('li'), other = m.mine ? (m.opponent || m.invitee) : m.creator;

@@ -124,3 +124,15 @@ On the PondOS home page (`docs/meme/`) a small window, POND DUELS, opens by itse
 A fren on a POND KING cooldown starts on the Lilies tab. Closed, the window stays away until the next day.
 Each page tells PondOS its height (`PondNet.gadget()`, a `pondos-size` message), so the window fits it.
 Open challenges carry their creator's Fren avatar (`gry_bulletin`, when update_pond_king.sql is installed).
+
+## Records
+
+* **BATTLE OF THREE LILIES**: `games.lily_stats` keeps every logged-on frog's wins, losses, draws, current and
+  best win streak (a draw ends a streak). Updated by `gry_lily_accept` for both players; duels settled before the
+  table existed are counted once at install. `gry_lily_my` returns your record (My Matches), `gry_lily_leaders`
+  the Hall of flies for everybody (longest win streaks, most wins; names only).
+* **POND KING**: `games.pk_stats` keeps duels, thrones taken, duels lost, the most defences in one reign and the
+  longest reign, per account (logged on) or per browser token. `gry_pk_state` returns `stats` (yours, a reign
+  still going counted up to now) and `longest` (the longest reigns, the house frog left out). The hourly
+  cleanup keeps the 50 longest reigns as well as the 50 with the most defences.
+* Tests: `tests/pond-stats-sql.test.mjs`.

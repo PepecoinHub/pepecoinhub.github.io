@@ -226,3 +226,9 @@
 .gadget .ttl-bar { width: 44px; }
 .gadget .cards li.empty-pond { padding: 10px 4px; }
 .gadget .cards li.empty-pond p { font-size: 16px; }
+
+/* records */
+#leaders .cols > div { min-width: 0; }
+.ly-record { margin: 2px 0 10px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.gadget #leaders { display: none !important; }
+@media (max-width: 560px) { .ly-record { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

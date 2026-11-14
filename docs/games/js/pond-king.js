@@ -174,6 +174,19 @@
     });
     if (!top.children.length) top.appendChild(mk('li', 'muted', 'No reigns yet.'));
 
+    var lg = $('longest'); lg.textContent = '';
+    (s.longest || []).forEach(function (t, i) {
+      var li = mk('li', (t.reigning ? 'now' : '') + (t.you ? ' me' : ''));
+      li.appendChild(mk('b', null, (i + 1) + '.')); li.appendChild(mk('span', null, t.nick + (t.reigning ? ' (reigning)' : ''))); li.appendChild(mk('b', null, N.dur(t.seconds)));
+      li.title = plural(t.defenses, 'defence', 'defences');
+      lg.appendChild(li);
+    });
+    if (!lg.children.length) lg.appendChild(mk('li', 'muted', 'Nobody has held the throne yet.'));
+    var my = s.stats || {};
+    $('st-duels').textContent = String(my.duels || 0); $('st-thrones').textContent = String(my.thrones || 0);
+    $('st-losses').textContent = String(my.losses || 0); $('st-def').textContent = String(my.best_defenses || 0);
+    $('st-reign').textContent = my.longest_reign_s ? N.dur(my.longest_reign_s) : '–';
+
     var rec = $('recent'); rec.textContent = '';
     (s.recent || []).forEach(function (d) {
       var li = mk('li'); li.appendChild(mk('b', null, d.nick));

@@ -189,6 +189,9 @@ begin
                                 case when win = u then ch.creator else u end, ch.id::text,
                                 jsonb_build_object('pads', to_jsonb(array[greatest(v_pads[1], v_pads[2]), least(v_pads[1], v_pads[2])])));
   end if;
+  -- the record of both frogs: wins, losses, draws and win streaks
+  perform games.lily_stat_add(ch.creator, ch.creator_nick, case res when 'creator_win' then 'win' when 'opponent_win' then 'lose' else 'draw' end);
+  perform games.lily_stat_add(u, ch.opponent_nick, case res when 'opponent_win' then 'win' when 'creator_win' then 'lose' else 'draw' end);
   return jsonb_build_object('ok', true, 'match', games.lily_view(ch, u));
 end $$;
 
@@ -199,7 +202,7 @@ declare u uuid := auth.uid();
 begin
   if u is null then return jsonb_build_object('signed_in', false, 'matches', '[]'::jsonb); end if;
   perform games.lily_expire();
-  return jsonb_build_object('signed_in', true, 'matches', coalesce((
+  return jsonb_build_object('signed_in', true, 'stats', games.lily_stat(u), 'matches', coalesce((
     select jsonb_agg(games.lily_view(ch, u) order by coalesce(ch.completed_at, ch.created_at) desc)
       from (select * from games.lily_challenges where creator = u or opponent = u
              order by coalesce(completed_at, created_at) desc limit 30) ch), '[]'::jsonb));
@@ -228,6 +231,73 @@ begin
   update games.lily_challenges set status = 'cancelled' where id = ch.id;
   return jsonb_build_object('ok', true);
 end $$;
+
+-- ---------- the record of every frog: wins, losses, draws, the current and the best win streak ----------
+-- Kept apart from the challenges, so it lasts. A draw ends a streak, as a loss does.
+create table if not exists games.lily_stats (
+  user_id      uuid primary key,
+  nick         text not null,
+  wins         int not null default 0,
+  losses       int not null default 0,
+  draws        int not null default 0,
+  streak       int not null default 0,
+  best_streak  int not null default 0,
+  updated_at   timestamptz not null default now()
+);
+create index if not exists lily_stats_best on games.lily_stats (best_streak desc, wins desc);
+alter table games.lily_stats enable row level security;
+revoke all on games.lily_stats from public, anon, authenticated;
+
+create or replace function games.lily_stat_add(p_user uuid, p_nick text, p_outcome text) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  insert into games.lily_stats as s (user_id, nick, wins, losses, draws, streak, best_streak)
+  values (p_user, p_nick, (p_outcome = 'win')::int, (p_outcome = 'lose')::int, (p_outcome = 'draw')::int,
+          (p_outcome = 'win')::int, (p_outcome = 'win')::int)
+  on conflict (user_id) do update set
+    nick = excluded.nick,
+    wins = s.wins + excluded.wins, losses = s.losses + excluded.losses, draws = s.draws + excluded.draws,
+    streak = case when p_outcome = 'win' then s.streak + 1 else 0 end,
+    best_streak = greatest(s.best_streak, case when p_outcome = 'win' then s.streak + 1 else 0 end),
+    updated_at = now();
+end $$;
+
+create or replace function games.lily_stat(u uuid) returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object('wins', coalesce(s.wins, 0), 'losses', coalesce(s.losses, 0), 'draws', coalesce(s.draws, 0),
+                            'streak', coalesce(s.streak, 0), 'best_streak', coalesce(s.best_streak, 0))
+    from (select 1) one left join games.lily_stats s on s.user_id = u
+$$;
+
+-- duels settled before this table existed count too (once: only while the table is still empty)
+do $$
+declare ch record;
+begin
+  if not exists (select 1 from games.lily_stats) then
+    for ch in select * from games.lily_challenges where status = 'completed' order by completed_at loop
+      perform games.lily_stat_add(ch.creator, ch.creator_nick, case ch.result when 'creator_win' then 'win' when 'opponent_win' then 'lose' else 'draw' end);
+      perform games.lily_stat_add(ch.opponent, ch.opponent_nick, case ch.result when 'opponent_win' then 'win' when 'creator_win' then 'lose' else 'draw' end);
+    end loop;
+  end if;
+end $$;
+
+-- the hall of flies, for everybody: the longest win streaks and the most wins (names only)
+create or replace function public.gry_lily_leaders()
+returns jsonb language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object(
+    'streaks', coalesce((select jsonb_agg(jsonb_build_object('nick', t.nick, 'best_streak', t.best_streak, 'streak', t.streak, 'wins', t.wins,
+                                                             'passport', games.passport_id(t.user_id), 'you', t.user_id = auth.uid())
+                                          order by t.best_streak desc, t.wins desc, t.updated_at)
+                         from (select * from games.lily_stats where best_streak > 0 order by best_streak desc, wins desc, updated_at limit 10) t), '[]'::jsonb),
+    'wins', coalesce((select jsonb_agg(jsonb_build_object('nick', t.nick, 'wins', t.wins, 'losses', t.losses, 'draws', t.draws,
+                                                          'passport', games.passport_id(t.user_id), 'you', t.user_id = auth.uid())
+                                       order by t.wins desc, t.losses, t.updated_at)
+                      from (select * from games.lily_stats where wins > 0 order by wins desc, losses, updated_at limit 10) t), '[]'::jsonb))
+$$;
+
+revoke all on function games.lily_stat_add(uuid, text, text), games.lily_stat(uuid) from public, anon, authenticated;
+revoke all on function public.gry_lily_leaders() from public;
+grant execute on function public.gry_lily_leaders() to anon, authenticated;
 
 revoke all on function games.lily_moves_frozen(), games.lily_check(int, int, int), games.lily_pads(int, int, int, int, int, int),
   games.lily_public(games.lily_challenges, uuid), games.lily_view(games.lily_challenges, uuid),
