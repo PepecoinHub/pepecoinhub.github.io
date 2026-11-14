@@ -94,6 +94,7 @@
     $('left-line').lastChild.textContent = left === 0 ? ' left. All 10 flies in position!' : ' still buzzing around';
     document.querySelectorAll('.presets [data-spread]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.spread === flies.join(','))); });
     $('submit').disabled = busy || s !== 10 || !me || !nickOk();
+    $('nick-hint').hidden = nickOk();
   }
   $('spread').addEventListener('click', function () {
     var a = Math.floor(Math.random() * 11), b = Math.floor(Math.random() * (11 - a)); flies = [a, b, 10 - a - b];
@@ -103,7 +104,7 @@
     b.addEventListener('click', function () { flies = b.dataset.spread.split(',').map(Number); paint(); });
   });
   var nick = $('nick');
-  function nickOk() { var v = nick.value.trim(); return v.length >= 2 && v.length <= 20; }
+  function nickOk() { return N.nickOk(nick.value); }
   nick.addEventListener('input', paint);
 
   function startCreate(rematch) {

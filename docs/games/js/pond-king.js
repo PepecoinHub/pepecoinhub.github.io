@@ -100,9 +100,13 @@
   }
 
   var nick = $('nick');
-  nick.value = store.get('pk-nick') || ('Frog' + Math.floor(1000 + Math.random() * 9000));
-  function nickOk() { var v = nick.value.trim().replace(/\s+/g, ' '); return v.length >= 2 && v.length <= 20 && /^[A-Za-z0-9 _.\-]+$/.test(v); }
-  function canFight() { $('fight').disabled = busy || !nickOk() || pick.some(function (m) { return !m; }); }
+  nick.value = N.cleanNick(store.get('pk-nick')) || ('Frog' + Math.floor(1000 + Math.random() * 9000));
+  function nickOk() { return N.nickOk(nick.value); }
+  // the button says why it is grey: a name the pond cannot use (emoji, too short) gets a hint under it
+  function canFight() {
+    $('fight').disabled = busy || !nickOk() || pick.some(function (m) { return !m; });
+    var hint = $('nick-hint'); if (hint) hint.hidden = nickOk();
+  }
   picker($('pick'), pick, canFight);
   nick.addEventListener('input', canFight);
   $('dice').addEventListener('click', function () {

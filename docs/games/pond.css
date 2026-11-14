@@ -65,6 +65,7 @@ footer a { color: #fff; }
 .row label { font: 700 12px var(--f); }
 .row input { width: 170px; }
 .row .go { margin-left: auto; }
+.nick-hint { margin: 6px 0 0; padding: 3px 8px; font: 700 12px var(--f); color: var(--gold-deep); background: #fffbd8; box-shadow: var(--sunken); }
 .msg { min-height: 1.4em; margin: 8px 0 0; font-weight: 700; color: var(--lose); }
 #def-msg { margin: 0; color: var(--win); }
 .pane { background: var(--pane); box-shadow: var(--sunken); padding: 6px 8px; }
