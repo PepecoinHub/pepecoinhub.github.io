@@ -36,20 +36,6 @@
       new MutationObserver(syncResultBadge).observe(lilyResult, {attributes:true, attributeFilter:['class']});
       syncResultBadge();
     }
-    // A user can be locked out by the 4-h cooldown; show a small actual illustration.
-    var wait = document.getElementById('waitpanel');
-    if (wait && !wait.querySelector('.vu-state')) {
-      var image = el('img', 'vu-state vu-native');
-      image.src = ASSET + 'state-waiting.png';
-      image.alt = '';
-      image.width = 160;
-      image.height = 96;
-      image.loading = 'lazy';
-      // before the row that holds "Check the throne again" (the button sits in a .row with the share buttons)
-      var button = wait.querySelector('#recheck'), anchor = button;
-      while (anchor && anchor.parentNode !== wait) anchor = anchor.parentNode;
-      if (anchor) wait.insertBefore(image, anchor); else wait.appendChild(image);
-    }
     // In Lilies, the server-rendered list contains only open challenges.
     observe('open-list', function (li) {
       if (!li.matches || !li.matches('li.card.duel')) return;

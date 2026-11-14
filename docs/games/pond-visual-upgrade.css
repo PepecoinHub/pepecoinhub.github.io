@@ -40,15 +40,11 @@
 .fight li .out.d { background: #dadce1; color: #3b3d50; }
 #result.won .big { border-left: 4px solid #367b37; padding-left: 8px; }
 #result.lost .big { border-left: 4px solid #ae4c46; padding-left: 8px; }
-/* Small state image: appears in the existing cooldown/wait dialog, below actual server messages. */
-#waitpanel .vu-state { display: block; width: 132px; height: auto; margin: 2px 0 8px; image-rendering: pixelated; }
-#waitpanel .vu-state + #recheck { margin-top: 2px; }
 /* Restore calm layout in the tiny desktop gadget and on small screens. */
 .gadget .throne { min-height: 0; outline-offset: -3px; border-width: 1px; }
 .gadget .throne-face { box-shadow: var(--raised); }
 .gadget .fight li { min-height: 30px; }
 .gadget .fight li .out { min-width: 56px; padding: 1px 2px; font-size: 12px; }
-.gadget #waitpanel .vu-state { display: none; }
 
 /* THREE LILIES: real, crisp pad graphics remain the interactive focus. */
 .ly-hero { border: 2px solid #193024; background: #234e4f url('img/pond/visual-v1/king-stage.png') center 45% / cover no-repeat; }
@@ -146,7 +142,6 @@
   #open-list li.card.duel { padding: 10px 8px 8px; }
   .vu-badge { margin-bottom: 2px; }
   .fight li .out { min-width: 70px; }
-  #waitpanel .vu-state { width: 110px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .board .note { transform: none; }
