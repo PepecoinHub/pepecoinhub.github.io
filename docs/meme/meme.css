@@ -2016,3 +2016,28 @@ footer.foot a { color: #edf3e3; }
 .gd-tabs [role="tab"][aria-selected="true"] { position: relative; z-index: 1; margin-bottom: -2px; padding: 5px 10px 5px; font-weight: 700; }
 .gd-n { min-width: 16px; padding: 1px 4px; font: 700 10px/1 var(--f-chrome); color: #fff; background: #b0170c; text-align: center; }
 .gd-n[hidden], .gd iframe[hidden] { display: none; }
+
+/* PEP-TV: pond_duels.mpg, a late-90s game show (spotlights, a ring of bulbs) with the duels' pixel art */
+.look-gameshow { background: radial-gradient(42% 60% at 18% 0%, rgba(255,255,255,.22), transparent 70%), radial-gradient(42% 60% at 82% 0%, rgba(255,255,255,.22), transparent 70%),
+  radial-gradient(75% 65% at 50% 40%, #2f76ff 0%, #12298a 55%, #050a2e 100%); }
+.look-gameshow .ptv-stage::before, .look-gameshow .ptv-stage::after { content: ""; position: absolute; left: 0; right: 0; height: 14px; z-index: 2;
+  background: radial-gradient(circle, #fff7c2 0 4px, #ffb300 5px, transparent 6px) 0 0 / 22px 14px; animation: ad-bulbs 1s steps(2) infinite; }
+.look-gameshow .ptv-stage::before { top: 0; } .look-gameshow .ptv-stage::after { bottom: 0; animation-delay: .5s; }
+@keyframes ad-bulbs { 50% { filter: brightness(.55); } }
+.look-gameshow .ad-big { color: #fff; text-shadow: 3px 3px 0 #b8005c, 6px 6px 0 #000; }
+.look-gameshow .ad-big em { color: #ffd23a; }
+.look-gameshow .ad-kick { color: #7ff0ff; max-width: calc(100% - 120px); }
+.ad-px { image-rendering: pixelated; width: 64px; height: 64px; filter: drop-shadow(3px 3px 0 rgba(0,0,0,.55)); }
+.ad-px-xl { flex: none; width: 112px; height: 112px; }
+.ad-vs { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 4px 0 6px; }
+.ad-vs .ad-px { width: 80px; height: 80px; }
+.ad-vs b { font: 400 34px/1 Impact, "Arial Black", sans-serif; color: #ffd23a; text-shadow: 3px 3px 0 #b8005c, 5px 5px 0 #000; }
+.ad-lilies { display: flex; justify-content: center; gap: 8px; margin: 4px 0; }
+.ad-lilies > span { position: relative; }
+.ad-lilies .ad-px { width: 72px; height: 72px; }
+.ad-lilies i { position: absolute; inset: 0; display: grid; place-items: center; font: 400 30px/1 Impact, "Arial Black", sans-serif; font-style: normal; color: #fff; text-shadow: 2px 2px 0 #142016, -2px -2px 0 #142016; }
+.ad-anim { flex: none; width: 112px; height: 112px; image-rendering: pixelated; background: url(../games/img/pond/lose-anim.png) 0 0 / 448px 112px no-repeat; animation: ad-anim 1.2s steps(4) infinite; filter: drop-shadow(3px 3px 0 rgba(0,0,0,.55)); }
+@keyframes ad-anim { to { background-position: -448px 0; } }
+@media (max-width: 560px) { .ad-px-xl, .ad-anim { width: 76px; height: 76px; } .ad-anim { background-size: 304px 76px; animation-name: ad-anim-s; } .ad-vs .ad-px { width: 56px; height: 56px; } .ad-lilies .ad-px { width: 56px; height: 56px; } }
+@keyframes ad-anim-s { to { background-position: -304px 0; } }
+@media (prefers-reduced-motion: reduce) { .look-gameshow .ptv-stage::before, .look-gameshow .ptv-stage::after, .ad-anim { animation: none; } }

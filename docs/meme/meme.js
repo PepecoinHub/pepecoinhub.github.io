@@ -4354,7 +4354,20 @@
   function adGlitter() { return '<span class="ad-glitter" aria-hidden="true"><i>✦</i><i>✧</i><i>✦</i><i>✶</i><i>✧</i><i>✦</i><i>✶</i><i>✧</i></span>'; }
   function adPhone(text) { return '<p class="ad-phone">' + text + '</p>'; }
   function adTesti(face, quote, who) { return '<div class="ad-testi"><span class="ad-testi-pic">' + face + '<small>REAL FROG*</small></span><div><p class="ad-testi-q">“' + quote + '”</p><p class="ad-testi-who">' + who + '</p></div></div>'; }
+  // the pond duels' own pixel art (docs/games/img/pond/), scaled up in whole steps, never smoothed
+  function adPx(name, cls) { return '<img class="ad-px' + (cls ? ' ' + cls : '') + '" src="../games/img/pond/' + name + '.png" alt="">'; }
+  function adLilies() { return '<span class="ad-lilies" aria-hidden="true">' + ['a', 'b', 'c'].map(function (k) { return '<span>' + adPx('lily-pad-' + k) + '<i>?</i></span>'; }).join('') + '</span>'; }
   var ADS = [
+    // 14 November: POND DUELS (Pond King and Battle of Three Lilies) open on the PondOS desktop
+    { file: 'pond_duels.mpg', added: '2026-11-14', look: 'gameshow', kitsch: true, ms: 4800, title: 'POND DUELS: the game show', ch: 'CH 3 · POND DUELS, THE GAME SHOW', icon: 'pond-king', scenes: [
+      adBurst('NEW<br>SHOW!', 'b-tr', 'b-pink') + '<p class="ad-kick">The only game show where nobody has to be online at the same time!</p><div class="ad-vs">' + adPx('king-stamp') + '<b>VS</b>' + adPx('lilies') + '</div><h3 class="ad-big">It\'s time for<br><em>POND DUELS!</em></h3><p class="ad-sub">Two brand-new duels, sitting right on your PondOS desktop. Play now. Your rival plays whenever.</p>',
+      '<div class="ad-row">' + adPx('king-stamp', 'ad-px-xl ad-shine') + '<div><p class="ad-kick">Round one: POND KING</p><h3 class="ad-big">Rock. Paper. Scissors.<br><em>For the THRONE!</em></h3><p class="ad-sub">The king hides three moves and the pond shuffles them for every duel. Win more rounds and the crown is yours. A tie keeps the king.</p></div></div>',
+      adBurst('OUCH!', 'b-br', 'b-red') + '<div class="ad-row"><span class="ad-anim" aria-hidden="true"></span><div><p class="ad-kick">The rules are brutal, folks</p><h3 class="ad-big">One duel<br>every <em>4 hours!</em></h3><p class="ad-sub">Lose and your frog is bruised: rest, come back in 4 hours. One shot per king, so knock the king off with a fren\'s help.</p></div></div>',
+      '<p class="ad-kick">Round two: BATTLE OF THREE LILIES</p>' + adLilies() + '<h3 class="ad-big">10 flies. 3 lily pads.<br><em>Zero excuses!</em></h3><p class="ad-sub">Hide your 10 flies, throw down a challenge and walk away. A fren has 48 hours to accept. Win two pads, win the duel.</p>',
+      adTesti(adFren('clothing_shirt_tie', 'mouth_shout', 'eyes_bloodshot', 'hat_crown', 'accessory_none'), 'I held the throne for THREE DAYS. Then Kevin threw scissors. I don\'t talk to Kevin anymore.', 'Former Pond King, still bruised') + '<p class="ad-fine">*A drawing. The bruises are a figure of speech.</p>',
+      adGlitter() + '<div class="ad-row">' + adPx('king-stamp', 'ad-px-xl ad-shine') + '<div><p class="ad-kick">And our grand prize…</p><h3 class="ad-big">Long Live<br>the <em>King!</em></h3><p class="ad-sub">Defend the throne 10 times in a row and this stamp lands in your Fren Passport (Discord players). The pond keeps score: Longest on the throne, the Hall of flies, your win streaks.</p></div></div>',
+      adBurst('PLAY<br>NOW!', 'b-tr') + '<p class="ad-kick ad-blink">Contestants, take your places!</p><h3 class="ad-big">Come on<br><em>down!</em></h3>' + adPhone('☎ NO PHONE · IT\'S ON YOUR DESKTOP') + '<p class="ad-fine">Not a real game show. No PEP, no prizes, no stakes: only glory and a cosmetic stamp. Nobody sees your moves or flies before the duel.</p><div class="ad-ctas"><button type="button" class="ad-cta ad-kingbtn">Challenge the King →</button><button type="button" class="ad-cta ad-lilybtn">Battle of Three Lilies →</button></div>'
+    ] },
     // Monday 16 November: the first Pepe Guesser week for the Frog of the Week stamp. Hidden until then
     // (open /meme/?adpreview to see them early). Each ad has its own "look": a different late-90s TV format.
     { file: 'frog_of_the_week.mpg', added: '2026-11-16', from: '2026-11-16T00:00:00Z', look: 'fight', kitsch: true, ms: 4800, title: 'Pepe Guesser: Frog of the Week', ch: 'CH 1 · PAY-PER-PEPE LIVE', icon: 'ad-belt', scenes: [
@@ -4544,6 +4557,8 @@
       var fb2 = A.body.querySelector('.ad-frogbtn'); if (fb2) fb2.addEventListener('click', function () { pondWarsApp(); });
       var frb = A.body.querySelector('.ad-frenbtn'); if (frb) frb.addEventListener('click', function () { avatarMaker(); });
       var ppb = A.body.querySelector('.ad-passbtn'); if (ppb) ppb.addEventListener('click', function () { frenPassport(); });
+      var kgb = A.body.querySelector('.ad-kingbtn'); if (kgb) kgb.addEventListener('click', function () { pondKingApp(); });
+      var lyb = A.body.querySelector('.ad-lilybtn'); if (lyb) lyb.addEventListener('click', function () { liliesApp(); });
       var wl = A.body.querySelector('.ad-launch'); if (wl) { wl.innerHTML = launchText(); var wlt = setInterval(function () { if (!document.body.contains(wl)) clearInterval(wlt); else wl.innerHTML = launchText(); }, 1000); }
       liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
     }, 720);
