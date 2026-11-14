@@ -266,3 +266,25 @@ p.pt-top-none { padding: 18px 10px; text-align: center; }
 }
 /* see gry.css "Drop-down lists": colour from an image, so the open list keeps its hover highlight */
 .pt-group select { background: linear-gradient(#fff, #fff); }
+
+/* phones: the whole room fits the screen, no scrolling: the board, then the chat and its input right under it
+   (the chat takes the room that is left and scrolls inside), then the players as one short strip */
+@media (max-width: 760px) {
+  html.paint main.wrap#main { height: 100vh; height: 100dvh; min-height: 0; }
+  html.os98.paint main.wrap#main { height: calc(100dvh - 34px - 56px - var(--sab, 0px)); min-height: 0; }
+  html.paint .room:not(.hidden) { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+  html.paint .room .stage { flex: none; }
+  html.paint .room .chat { flex: 1 1 auto; min-height: 130px; }
+  html.paint .room .players { flex: none; order: 3; }
+  html.paint .stage { grid-template-rows: auto auto auto auto auto auto; align-content: start; row-gap: 0; }
+  html.paint .stage-top { min-height: 0; }
+  html.paint .stage-top .timer { width: 40px; height: 40px; }
+  html.paint .room .chat { height: auto; min-height: 0; display: flex; flex-direction: column; }
+  html.paint .room .chat h3 { display: none; }
+  html.paint .room .chat .msgs { flex: 1; min-height: 0; overflow-y: auto; margin: 4px 6px 0; }
+  html.paint .room .chat form { flex: none; padding: 4px 6px 6px; }
+  html.paint .room .players { max-height: 40px; overflow: hidden; padding: 0 !important; }
+  html.paint .room .players h3 { display: none; }
+  html.paint .plist { flex-wrap: nowrap; overflow-x: auto; max-height: 40px; }
+  html.paint .plist li { flex: 0 0 auto; }
+}

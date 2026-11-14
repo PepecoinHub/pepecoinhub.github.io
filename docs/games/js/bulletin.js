@@ -64,7 +64,43 @@
     if (!news.children.length) news.appendChild(mk('li', 'clip empty', 'No news yet. The pond is waiting for its first legend.'));
     $('status').textContent = (b.open || []).length + ' open · ' + events.length + ' notes on the board';
   }
+  // ---------- open tables of every game: PEPaint and Pepe Pictures rooms (gry_lobby), board games (gry_tables_lobby) ----------
+  var GAME = { chess: ['Chess', '♟'], checkers: ['Checkers', '⛀'], connect4: ['Connect Four', '🔴'], battleship: ['Sea Battle', '🚢'] };
+  function tables(rooms, boards) {
+    var ul = $('tables'), rows = [];
+    (rooms || []).filter(function (r) { return r.players > 0; }).forEach(function (r) {
+      var paint = r.mode === 'kalambury';
+      rows.push({ at: r.created_at, icon: paint ? '🎨' : '🖼', name: paint ? 'PEPaint' : 'Pepe Pictures', title: r.title || '',
+        line: r.players + (r.players === 1 ? ' player' : ' players') + (r.max_players ? ' of ' + r.max_players : '') + (r.phase && r.phase !== 'lobby' ? ' · playing' : ' · waiting'),
+        label: 'Join', go: function () { N.open(paint ? 'pepaint' : 'room', r.code); } });
+    });
+    (boards || []).filter(function (t) { return t.status === 'waiting' || t.status === 'playing'; }).forEach(function (t) {
+      var g = GAME[t.game] || [t.game, '🎲'], who = (t.players || []).join(' vs ') || t.creator || 'a fren';
+      var sit = t.status === 'waiting';
+      if (!sit && !t.spectators) return;
+      rows.push({ at: t.created_at, icon: g[1], name: g[0], title: t.tc || '',
+        line: sit ? who + ' is waiting for a player' : who + (t.watching ? ' · ' + t.watching + ' watching' : ''),
+        label: sit ? 'Sit down' : 'Watch', go: function () { N.open('table', t.code); }, wait: sit });
+    });
+    rows.sort(function (a, b) { return (b.wait ? 1 : 0) - (a.wait ? 1 : 0) || (b.at > a.at ? 1 : -1); });
+    ul.textContent = '';
+    rows.slice(0, 12).forEach(function (x) {
+      var li = mk('li', 'tbl' + (x.wait ? ' wait' : ''));
+      li.appendChild(mk('span', 'ic', x.icon));
+      var t = mk('div'); var p = mk('p'); p.appendChild(mk('b', null, x.name)); if (x.title) p.appendChild(document.createTextNode(' · ' + x.title));
+      t.appendChild(p); t.appendChild(mk('small', null, x.line)); li.appendChild(t);
+      li.appendChild(btn(x.label, x.wait || x.label === 'Join' ? 'go' : '', x.go));
+      ul.appendChild(li);
+    });
+    if (!ul.children.length) ul.appendChild(mk('li', 'muted', 'No open tables right now. Start one from Games, and it shows up here.'));
+  }
+  function loadTables() {
+    var none = function () { return []; };
+    Promise.all([N.rpc('gry_lobby', {}).then(function (l) { return l && l.rooms || []; }, none), N.rpc('gry_tables_lobby', {}).then(function (t) { return t || []; }, none)])
+      .then(function (r) { tables(r[0], r[1]); });
+  }
   function load() {
+    loadTables();
     N.rpc('gry_bulletin', { p_limit: 20 }).then(render, function (e) {
       $('status').textContent = e.status === 404 ? 'The POND BULLETIN opens soon.' : 'The pond did not answer. Try again in a minute.';
       $('open').textContent = ''; $('news').textContent = '';
