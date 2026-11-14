@@ -82,6 +82,17 @@
     if (h) return h + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : '');
     return Math.max(m, 1) + ' min';
   }
+  // small tab strips: <div class="mini-tabs" data-store="key"> with buttons data-pane="<id>"; the last tab is remembered
+  function tabs(root) {
+    var bs = Array.prototype.slice.call(root.querySelectorAll('[data-pane]')), key = root.getAttribute('data-store');
+    var pick = function (id) {
+      bs.forEach(function (b) { var on = b.getAttribute('data-pane') === id; b.setAttribute('aria-selected', String(on)); document.getElementById(b.getAttribute('data-pane')).hidden = !on; });
+      if (key) try { localStorage.setItem(key, id); } catch (e) {}
+    };
+    bs.forEach(function (b) { b.addEventListener('click', function () { pick(b.getAttribute('data-pane')); }); });
+    var saved = null; if (key) try { saved = localStorage.getItem(key); } catch (e) {}
+    if (saved && bs.some(function (b) { return b.getAttribute('data-pane') === saved; })) pick(saved);
+  }
   function ago(iso) {
     var s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
     if (s < 60) return 'just now';
@@ -96,7 +107,8 @@
     return Math.floor(s / 3600) + ' h left';
   }
   function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-  window.PondNet = { session: session, me: me, rpc: rpc, open: open, framed: framed, embedded: embedded, ago: ago, left: left, mk: mk, gadget: gadget, dur: dur };
+  window.PondNet = { session: session, me: me, rpc: rpc, open: open, framed: framed, embedded: embedded, ago: ago, left: left, mk: mk, gadget: gadget, dur: dur, tabs: tabs };
+  document.addEventListener('DOMContentLoaded', function () { document.querySelectorAll('.mini-tabs').forEach(tabs); });
 })();
 
 // ---------- pixel art (PondOS is Windows 98: everything a little pixelated) ----------

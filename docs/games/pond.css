@@ -69,6 +69,19 @@ footer a { color: #fff; }
 #def-msg { margin: 0; color: var(--win); }
 .pane { background: var(--pane); box-shadow: var(--sunken); padding: 6px 8px; }
 
+/* a small tab strip inside a group box (the scoreboards) */
+.mini-tabs { display: flex; flex-wrap: wrap; align-items: flex-end; margin: -4px 0 0; border-bottom: 2px groove var(--chrome-hi); }
+.mini-tabs button { min-height: 24px; margin-right: -1px; padding: 3px 10px; font-weight: 400; box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px 0 0 var(--chrome-dk), inset -2px 0 0 var(--chrome-lo); }
+.mini-tabs button:active { padding: 3px 10px; }
+.mini-tabs button[aria-selected="true"] { position: relative; z-index: 1; margin-bottom: -2px; padding: 4px 12px 5px; font-weight: 700; background: var(--chrome); }
+.scoreboard [role="tabpanel"] { padding-top: 8px; }
+.scoreboard .pane-h { margin: 0 0 4px; font: 700 12px var(--f); }
+.scoreboard .pane-h small { font-weight: 400; color: var(--muted); }
+.scoreboard .top, .scoreboard .feed { min-height: 0; }
+.top li.muted, .feed li.muted { display: block; }
+.stats.row5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.stats.row5 .stat b { font-size: 22px; }
+
 /* records: little sunken counters */
 .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
 .stat { display: grid; justify-items: center; align-content: center; gap: 2px; padding: 4px 2px; text-align: center; background: var(--pane); box-shadow: var(--sunken); }
@@ -153,8 +166,13 @@ details.panel { padding-top: 12px; }
   .site-bar > span { display: none; }
   .throne { grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 10px; }
   .throne-frog { width: 64px; height: 64px; }
-  .reign { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .reign b { display: inline-block; font-size: 32px; }
+  .throne { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .reign b { min-width: 40px; font-size: 26px; }
+  .reign small { font-size: 9px; }
+  .throne #king-line { font-size: 12px; }
+  .mini-tabs button { padding: 3px 7px; font-size: 11px; }
+  .mini-tabs button[aria-selected="true"] { padding: 4px 8px 5px; }
+  .stats.row5 .stat b { font-size: 18px; } .stats.row5 .stat small { font-size: 9px; }
   .slot { min-height: 92px; } .slot i { width: 44px; height: 44px; } .slot.filled::after { content: none; }
   .mv i { width: 44px; height: 44px; }
   .row input { flex: 1 1 140px; }
@@ -201,7 +219,7 @@ details.panel { padding-top: 12px; }
 .gadget-foot { display: none; }
 .gadget .gadget-foot { display: flex; gap: 4px; padding: 4px 2px 2px; }
 .gadget .gadget-foot button { flex: 1; font-weight: 400; justify-content: center; }
-.gadget .toolbar, .gadget .cols, .gadget .rules, .gadget #duel > p.muted, .gadget #challengers, .gadget #kingpanel h3,
+.gadget .toolbar, .gadget .cols, .gadget .scoreboard, .gadget .rules, .gadget #duel > p.muted, .gadget #challengers, .gadget #kingpanel h3,
 .gadget #kingpanel > p.muted, .gadget .statusbar, .gadget .hand-hint, .gadget #duel .row label, .gadget #dice, .gadget #res-after p { display: none !important; }
 .gadget .pk-body { gap: 4px; padding: 4px 2px; }
 .gadget .throne { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; padding: 8px; }
@@ -245,3 +263,15 @@ details.panel { padding-top: 12px; }
 .gadget .slot, .gadget .mv { min-width: 0; padding-left: 2px; padding-right: 2px; overflow: hidden; }
 .gadget .slot small { white-space: nowrap; }
 .gadget .msg { min-height: 0; margin: 4px 0 0; } .gadget .msg:empty { display: none; }
+
+/* phones: less chrome around the game */
+@media (max-width: 560px) {
+  .toolbar { flex-wrap: nowrap; overflow-x: auto; gap: 4px; }
+  .toolbar .ib { flex: none; min-height: 28px; padding: 3px 8px; font-size: 11px; white-space: nowrap; }
+  .toolbar #acct { display: none; }
+  #kingpanel > p.muted { font-size: 12px; margin: 2px 0 6px; }
+  #kingpanel .stamp { width: 48px; height: 48px; }
+  #challengers { min-height: 0; }
+  .panel { margin-top: 8px; padding: 14px 8px 8px; }
+  .panel h2 { font-size: 20px; top: -10px; }
+}
