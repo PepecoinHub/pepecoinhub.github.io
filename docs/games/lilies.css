@@ -35,11 +35,7 @@
 .left { margin: 0; }
 .left b { font: 400 24px/1 var(--f-px); }
 .left.done b { color: var(--win); }
-.presets { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 10px 0 12px; }
-.presets span { font: 700 12px var(--f); margin-right: 4px; }
-.presets button { font: 400 16px/1 var(--f-px); padding: 4px 10px; }
-.presets button[aria-pressed="true"] { box-shadow: var(--sunken); background: var(--dither); }
-.submit-row { padding-top: 10px; border-top: 2px groove var(--chrome-hi); }
+.submit-row { margin-top: 12px; padding-top: 10px; border-top: 2px groove var(--chrome-hi); }
 
 /* the result */
 #tab-result .kicker { color: var(--muted); margin-bottom: 4px; }
