@@ -210,7 +210,8 @@ const inCountdown = () => S && S.room.mode === 'obrazek' && S.room.phase === 'tu
 function overlayView() {
   const r = S.room;
   if (r.phase === 'turn' && inCountdown()) return 'cd' + Math.min(3, Math.max(1, Math.ceil((Date.parse(r.turn_started_at) - now()) / 1000)));
-  if (r.phase === 'reveal' && r.mode === 'kalambury' && r.next_at && Date.parse(r.next_at) - now() <= INTERMISSION_MS) return 'intermission';
+  // volunteers: the "Who draws next?" card stays up for the last 8 s of the 10-second break (the word shows first)
+  if (r.phase === 'reveal' && r.mode === 'kalambury' && r.next_at && Date.parse(r.next_at) - now() <= (r.draw_mode === 'volunteers' ? 8000 : INTERMISSION_MS)) return 'intermission';
   return r.phase;
 }
 // Przerywnik: żabka Byla (pepecoin.com, ze znakiem wodnym). Lekkie wideo (WebM/MP4, bez dźwięku, w pętli) zamiast GIF-a.
@@ -240,7 +241,7 @@ function frogMedia() {
 function renderOverlay(force) {
   const o = $('#overlay'), r = S.room, view = overlayView();
   const sig = [view, r.turn_id, r.phase === 'reveal' ? (S.messages || []).length : '', r.phase === 'lobby' ? S.players.length : '', r.phase === 'finished' ? JSON.stringify(S.results) : '',
-    JSON.stringify(S.next || null), r.last_answer, isRoomHost(), r.final_turn, r.last_mult, r.scorers, r.phase === 'reveal' ? JSON.stringify(S.podium || []) : ''].join('|');
+    JSON.stringify(S.next || null), r.draw_mode, r.last_answer, isRoomHost(), r.final_turn, r.last_mult, r.scorers, r.phase === 'reveal' ? JSON.stringify(S.podium || []) : ''].join('|');
   if (!force && sig === overlaySig) return;
   frogWasOn = !!frogVideo?.isConnected;
   overlaySig = sig; o.textContent = ''; o.className = 'overlay';
@@ -250,12 +251,24 @@ function renderOverlay(force) {
     o.classList.add('lobby-ov');
     o.append(h('div', {}, h('div', { class: 'big' }, 'Waiting for the host to start'),
       h('p', {}, `${S.players.length} in the room · invite friends: `, h('b', { class: 'mono' }, location.href.split('#')[0])),
+      r.mode === 'kalambury' ? h('p', { class: 'small', style: 'opacity:.85' }, r.draw_mode === 'volunteers' ? 'Who draws: volunteers. After each word, press “I\'ll draw!” to go next.' : 'Who draws: everybody in turn.') : null,
       isRoomHost() ? h('button', { class: 'btn primary big', onclick: start }, '▶ Start game') : h('p', { class: 'small', style: 'opacity:.85' }, 'The host starts the game.')));
   } else if (view.startsWith('cd')) {
     o.classList.add('countdown-ov');
     o.append(h('div', { class: 'cd-wrap' }, h('div', { class: 'cd-label' }, finalNow() ? `LAST QUESTION${r.last_mult > 1 ? ' · points ×' + r.last_mult : ''}` : `Picture #${r.round_no}${r.question_total ? ' of ' + r.question_total : ''} · get ready`),
       h('div', { class: 'cd-num', role: 'timer', 'aria-live': 'assertive' }, view.slice(2)),
       h('div', { class: 'small', style: 'opacity:.85' }, 'Type your guess as soon as it shows up')));
+  } else if (view === 'intermission' && (S.next || {}).volunteers && !(S.next || {}).final) {
+    // "who draws": volunteers. The first fren to press "I'll draw!" draws next; nobody did: the next one in line.
+    const nx = S.next, mine = nx.user_id === meId(), justDrew = nx.last_drawer === meId();
+    o.classList.add('intermission-ov');
+    o.append(h('div', { class: 'inter-card' }, frogMedia(),
+      h('div', { class: 'inter-title' }, nx.round_no && nx.round_no !== r.round_no ? `Round ${nx.round_no} of ${nx.rounds} · who draws?` : 'Who draws next?'),
+      nx.user_id ? h('div', { class: 'inter-sub' }, mine ? 'You\'re drawing next! Get your brush ready.' : `${nx.nick} volunteered to draw next`)
+        : justDrew ? h('div', { class: 'inter-sub' }, 'You just drew. Somebody else\'s turn: let them volunteer.')
+        : h('div', {}, h('button', { class: 'btn primary big vol-btn', onclick: volunteer }, '✋ I\'ll draw!'),
+            h('div', { class: 'small', style: 'opacity:.85;margin-top:6px' }, 'First to press draws. Nobody? The next one in line does.')),
+      h('div', { class: 'small', style: 'opacity:.8;margin-top:6px' }, 'The word was ', h('b', {}, r.last_answer || '?'), ' · ', h('span', { id: 'nextin' }, ''))));
   } else if (view === 'intermission') {
     const nx = S.next || {};
     o.classList.add('intermission-ov');
@@ -319,6 +332,13 @@ function frame() {
 }
 requestAnimationFrame(frame);
 async function start() { try { await be.rpc('gry_start', { p_code: code }); fetchState(); } catch (e) { toast(e.message, 'bad'); } }
+async function volunteer() {
+  try {
+    const r = await be.rpc('gry_volunteer', { p_code: code });
+    if (r && !r.ok) toast(r.error === 'taken' ? 'Somebody was faster. Next time!' : r.error === 'just_drew' ? 'You just drew: let somebody else go.' : 'Too late for this one.', 'bad');
+  } catch (e) { toast(e.message, 'bad'); }
+  fetchState();
+}
 
 function lastQuestionControl(r) {
   const flagged = r.last_turn_no != null;
@@ -348,6 +368,13 @@ function renderHostbar() {
   const act = (label, fn, cls = 'btn sm') => h('button', { class: cls, onclick: async () => { try { await fn(); fetchState(); } catch (e) { toast(e.message, 'bad'); } } }, label);
   b.append(h('span', { class: 'lbl' }, r.mode === 'kalambury' ? 'Moderator' : 'Host'));
   if (['lobby', 'finished'].includes(r.phase)) b.append(act('▶ Start', () => be.rpc('gry_start', { p_code: code }), 'btn sm primary'));
+  // "who draws": everybody in turn, or volunteers (between games only)
+  if (r.mode === 'kalambury' && ['lobby', 'finished'].includes(r.phase)) {
+    const sel = h('select', { class: 'drawmode', 'aria-label': 'Who draws', onchange: async () => { try { await be.rpc('gry_draw_mode', { p_code: code, p_mode: sel.value }); fetchState(); } catch (e) { toast(e.message, 'bad'); sel.value = r.draw_mode || 'turns'; } } },
+      h('option', { value: 'turns' }, 'Who draws: in turn'), h('option', { value: 'volunteers' }, 'Who draws: volunteers'));
+    sel.value = r.draw_mode || 'turns';
+    b.append(sel);
+  }
   if (r.phase === 'turn') b.append(act(r.mode === 'kalambury' ? '⏭ Skip turn' : '⏭ Reveal now', () => be.rpc('gry_skip', { p_code: code })));
   if (r.mode === 'obrazek' && ['turn', 'reveal', 'waiting'].includes(r.phase)) b.append(lastQuestionControl(r));
   if (!['lobby', 'finished'].includes(r.phase)) b.append(act('🏁 End game', () => be.rpc('gry_finish', { p_code: code })));
@@ -527,7 +554,7 @@ function paintStatus() {
   if (r.phase === 'lobby') ptHint(isRoomHost() ? 'You are the moderator: press Invite to copy the link, then Start when your frens are in.' : 'Waiting for the moderator to press Start.');
   else if (r.phase === 'turn' && isDrawer()) ptHint('Your turn! Draw: ' + S.secret + '. Keys: B P E I, 1-4, Ctrl+Z.');
   else if (r.phase === 'turn') ptHint(`${drawer?.nick || 'A fren'} is drawing. Be the first to type the word in the chat!`);
-  else if (r.phase === 'reveal') ptHint('The word was: ' + (r.last_answer || '?') + '. ' + firstLine());
+  else if (r.phase === 'reveal') ptHint('The word was: ' + (r.last_answer || '?') + '. ' + firstLine() + (r.draw_mode === 'volunteers' && !S.next?.final ? ' Press “I\'ll draw!” to draw next.' : ''));
   else if (r.phase === 'finished') ptHint('Game over! ' + (isRoomHost() ? 'Press Play again for another game.' : 'The moderator can start another game.'));
   else ptHint('');
 }

@@ -288,3 +288,7 @@ p.pt-top-none { padding: 18px 10px; text-align: center; }
   html.paint .plist { flex-wrap: nowrap; overflow-x: auto; max-height: 40px; }
   html.paint .plist li { flex: 0 0 auto; }
 }
+
+/* "who draws" (moderator, between games) and the big "I'll draw!" button on the break card */
+.hostbar select.drawmode { min-height: 30px; padding: 2px 6px; font: inherit; font-size: 13px; }
+.inter-card .vol-btn { margin-top: 10px; font-size: 1.15rem; padding: 10px 22px; }
