@@ -77,10 +77,13 @@ returns jsonb language plpgsql stable security definer set search_path = '' as $
 declare u uuid := auth.uid(); n int := least(greatest(coalesce(p_limit, 20), 1), 50); opn jsonb := '[]'::jsonb; king jsonb;
 begin
   if to_regclass('games.lily_challenges') is not null then
-    execute $q$
-      select coalesce(jsonb_agg(games.lily_public(ch, $1) order by ch.created_at desc), '[]'::jsonb)
+    -- with POND KING installed, every challenge also carries its creator's Fren avatar (Discord players only)
+    execute format($q$
+      select coalesce(jsonb_agg(games.lily_public(ch, $1) || jsonb_build_object('avatar', %s) order by ch.created_at desc), '[]'::jsonb)
         from (select * from games.lily_challenges where status = 'open' and expires_at > now()
-               order by created_at desc limit $2) ch $q$ into opn using u, n;
+               order by created_at desc limit $2) ch $q$,
+      case when to_regprocedure('games.pk_avatar(uuid)') is not null then 'games.pk_avatar(ch.creator)' else 'null::jsonb' end)
+      into opn using u, n;
   end if;
   if to_regclass('games.pk_kings') is not null then
     execute $q$ select jsonb_build_object('nick', nick, 'defenses', defenses, 'since', crowned_at, 'house', token_hash is null and user_id is null,

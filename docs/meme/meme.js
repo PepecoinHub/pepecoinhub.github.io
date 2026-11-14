@@ -1175,7 +1175,7 @@
     doors.insertBefore(boardDoor, kingDoor.nextSibling);
     setTimeout(function () {
       rpc('gry_bulletin', { p_limit: 20 }).then(function (b) {
-        var n = (b && b.open || []).length;
+        var n = (b && b.open || []).length; pondOpenN = n; gadgetCount();
         if (n) boardDoor.querySelector('small').textContent = n + (n === 1 ? ' open challenge' : ' open challenges') + ' waiting for a fren';
       }, function () { boardDoor.hidden = true; });
     }, 0);
@@ -1191,7 +1191,7 @@
           : st.cooldown ? (st.cooldown.won || st.cooldown.network ? 'Next duel ' : 'Still bruised \ud83e\ude79 Next duel ') + 'at ' + new Date(st.cooldown.next_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           : 'Holds the throne: ' + k.defenses + (k.defenses === 1 ? ' defence' : ' defences') + '. One duel every 4 h';
         // the POND KING gadget: a small game window right on the desktop (a card in the page on a phone)
-        pondKingGadget(cards);
+        pondKingGadget(cards, !k.you && !!st.cooldown);
       }, function () { kingDoor.hidden = true; });   // until update_pond_king.sql runs, the door stays out of the way
     }, 0);
     var stats = card.querySelector('.tp-stats'), bits = [];
@@ -1600,21 +1600,49 @@
   // real PondOS window in the bottom-right corner (drag, minimize, close; closed, it stays away until tomorrow);
   // on a phone a card in the page under the "Things to do" doors, so it never covers anything.
   function gadgetClosedToday() { try { return localStorage.getItem('pk-gadget-closed') === new Date().toISOString().slice(0, 10); } catch (e) { return false; } }
-  function pondKingGadget(after) {
-    var src = BASE + 'games/pond-king.html?embed=1&gadget=1';
+  // two tabs: POND KING (the duel itself) and LILIES (the newest open challenges); a fren on a POND KING
+  // cooldown starts on LILIES, so the window always offers something to play now
+  var pondOpenN = 0;
+  function gadgetCount() {
+    document.querySelectorAll('.gd-n').forEach(function (b) { b.textContent = pondOpenN ? String(pondOpenN) : ''; b.hidden = !pondOpenN; });
+  }
+  function gadgetBody(lilies) {
+    var src = BASE + 'games/pond-king.html?embed=1&gadget=1', lsrc = BASE + 'games/lilies.html?embed=1&gadget=1';
+    var box = el('div', { class: 'gd' },
+      '<div class="gd-tabs" role="tablist" aria-label="Pond games">' +
+        '<button type="button" role="tab" data-g="king"><img src="' + ico('pond-king') + '" alt="" width="16" height="16">Pond King</button>' +
+        '<button type="button" role="tab" data-g="lilies"><img src="' + ico('lilies') + '" alt="" width="16" height="16">Lilies <b class="gd-n" hidden></b></button>' +
+      '</div>' +
+      '<iframe class="app-frame gadget-frame" data-g="king" title="Pond King" allow="web-share"></iframe>' +
+      '<iframe class="app-frame gadget-frame" data-g="lilies" title="Battle of Three Lilies"></iframe>');
+    var urls = { king: src, lilies: lsrc };
+    box.show = function (g) {
+      box.querySelectorAll('[role="tab"]').forEach(function (t) { t.setAttribute('aria-selected', String(t.getAttribute('data-g') === g)); });
+      box.querySelectorAll('iframe').forEach(function (f) {
+        var on = f.getAttribute('data-g') === g; f.hidden = !on;
+        if (on && !f.getAttribute('src')) f.setAttribute('src', urls[g]);
+      });
+      if (box.onshow) box.onshow();
+    };
+    box.querySelectorAll('[role="tab"]').forEach(function (t) { t.addEventListener('click', function () { box.show(t.getAttribute('data-g')); }); });
+    box.show(lilies ? 'lilies' : 'king');
+    setTimeout(gadgetCount, 0);
+    return box;
+  }
+  function pondKingGadget(after, lilies) {
     if (window.innerWidth < 760) {
       if (!after || document.querySelector('.pk-card')) return;
-      var card = el('section', { class: 'pk-card win active', 'aria-label': 'Pond King' },
-        '<div class="win-bar"><img src="' + ico('pond-king') + '" alt="" width="16" height="16"><span class="win-t">POND KING</span></div>' +
-        '<iframe class="app-frame gadget-frame" src="' + src + '" title="Pond King" allow="web-share"></iframe>');
+      var card = el('section', { class: 'pk-card win active', 'aria-label': 'Pond games' },
+        '<div class="win-bar"><img src="' + ico('pond-king') + '" alt="" width="16" height="16"><span class="win-t">POND DUELS</span></div>');
+      card.appendChild(gadgetBody(lilies));
       after.parentNode.insertBefore(card, after.nextSibling);
       return;
     }
     if (apps.pkgadget || apps.pondking || gadgetClosedToday()) return;
     setTimeout(function () {
       if (apps.pkgadget || apps.pondking) return;
-      var A = openApp('pkgadget', 'POND KING', 'pond-king', function (A) {
-        A.body.innerHTML = '<iframe class="app-frame gadget-frame" src="' + src + '" title="Pond King" allow="web-share"></iframe>';
+      var A = openApp('pkgadget', 'POND DUELS', 'pond-king', function (A) {
+        A.body.textContent = ''; A.body.appendChild(gadgetBody(lilies));
       }, 300);
       A.host.classList.add('app-gadget');
       var place = function () {
@@ -1624,6 +1652,7 @@
         A.host.style.setProperty('--app-top', A.host.style.top); A.host.style.transform = 'none';
       };
       place(); A.place = place;
+      var gd = A.body.querySelector('.gd'); if (gd) gd.onshow = function () { if (!A.moved) setTimeout(place, 0); };
       A.host.querySelector('.win-bar').addEventListener('pointerdown', function () { A.moved = true; });   // dragged: stay where the fren put it
       var close = A.close;
       A.close = function () { try { localStorage.setItem('pk-gadget-closed', new Date().toISOString().slice(0, 10)); } catch (e) {} close(); };
@@ -1658,12 +1687,12 @@
       document.querySelectorAll('iframe.gadget-frame').forEach(function (f) {
         if (f.contentWindow !== e.source) return;
         f.style.height = Math.min(m.h, 640) + 'px';
-        if (apps.pkgadget && apps.pkgadget.place && apps.pkgadget.body.contains(f) && !apps.pkgadget.moved) apps.pkgadget.place();
+        if (!f.hidden && apps.pkgadget && apps.pkgadget.place && apps.pkgadget.body.contains(f) && !apps.pkgadget.moved) apps.pkgadget.place();
       });
       return;
     }
     if (e.origin !== location.origin || !m || m.type !== 'pondos-open') return;
-    var ok = false; document.querySelectorAll('.app-win iframe').forEach(function (f) { if (f.contentWindow === e.source) ok = true; });
+    var ok = false; document.querySelectorAll('.app-win iframe, .pk-card iframe').forEach(function (f) { if (f.contentWindow === e.source) ok = true; });
     if (!ok) return;
     if (m.open === 'passport' && FREN_ID.test(m.id || '')) frenPassport(false, { id: String(m.id).toLowerCase() });
     else if (m.open === 'logon') logOn();

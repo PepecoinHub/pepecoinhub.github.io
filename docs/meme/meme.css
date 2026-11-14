@@ -1999,3 +1999,12 @@ footer.foot a { color: #edf3e3; }
 .pk-card { margin: 14px 0; padding: 3px; background: var(--chrome); }
 .pk-card .win-bar { display: flex; align-items: center; gap: 5px; }
 .pk-card .app-frame { width: 100%; height: 400px; }
+/* the gadget's two tabs: POND KING and LILIES, a Windows 98 tab strip */
+.gd-tabs { display: flex; align-items: flex-end; padding: 3px 2px 0; border-bottom: 2px groove var(--chrome-hi); }
+.gd-tabs [role="tab"] { display: inline-flex; align-items: center; gap: 4px; margin-right: -1px; padding: 3px 8px; min-height: 22px; border: 0; border-radius: 0;
+  font: 11px/1 var(--f-chrome); color: inherit; background: var(--chrome); cursor: pointer;
+  box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px 0 0 var(--chrome-dk), inset -2px 0 0 var(--chrome-lo); }
+.gd-tabs [role="tab"] img { width: 16px; height: 16px; image-rendering: pixelated; }
+.gd-tabs [role="tab"][aria-selected="true"] { position: relative; z-index: 1; margin-bottom: -2px; padding: 5px 10px 5px; font-weight: 700; }
+.gd-n { min-width: 16px; padding: 1px 4px; font: 700 10px/1 var(--f-chrome); color: #fff; background: #b0170c; text-align: center; }
+.gd-n[hidden], .gd iframe[hidden] { display: none; }

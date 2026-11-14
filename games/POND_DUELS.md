@@ -111,3 +111,16 @@ Wszystko poniżej to dziś placeholdery, oznaczone w kodzie (`PLACEHOLDER`):
    Potem jeszcze raz `update_passport_awards.sql` (albo `deploy/LAUNCH_ALL.sql`), żeby Paszport znał nowy stempel „Long Live the King”. Do tego czasu stempel się nie przyznaje, a gra działa normalnie (w logu bazy jest tylko ostrzeżenie).
 3. Sprawdź na `/meme/`: przyciski „Pond Bulletin” i „Dethrone Pepe” pod „Today in the pond” pokazują dane, a okna gier nie mówią już „opens soon”.
 4. Wyłączenie bez kasowania danych: `revoke execute on function public.gry_lily_create(int, int, int, text, uuid) from authenticated;` blokuje nowe wyzwania. Przyciski na `/meme/` zostają; gdy funkcja nie odpowiada, okno pokazuje komunikat o błędzie.
+
+## The desktop gadget (POND DUELS)
+
+On the PondOS home page (`docs/meme/`) a small window, POND DUELS, opens by itself in the bottom-right corner
+(on a phone it is a card under the "Click, check, search" doors). It has two tabs:
+
+* **Pond King**: `games/pond-king.html?embed=1&gadget=1`, the duel itself, laid out compact.
+* **Lilies**: `games/lilies.html?embed=1&gadget=1`, the hero and the two newest open challenges. Accept and
+  "Throw down a challenge" open the full BATTLE OF THREE LILIES window. The tab shows how many duels are open.
+
+A fren on a POND KING cooldown starts on the Lilies tab. Closed, the window stays away until the next day.
+Each page tells PondOS its height (`PondNet.gadget()`, a `pondos-size` message), so the window fits it.
+Open challenges carry their creator's Fren avatar (`gry_bulletin`, when update_pond_king.sql is installed).

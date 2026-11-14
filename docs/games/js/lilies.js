@@ -5,6 +5,11 @@
   var N = window.PondNet, mk = N.mk, $ = function (id) { return document.getElementById(id); };
   var LILIES = ['Lily A', 'Lily B', 'Lily C'];
   var me = null, flies = [0, 0, 0], mode = { kind: 'create' }, busy = false, lastOpen = [];
+  // ?gadget=1: the LILIES tab of the small POND window on the PondOS desktop (docs/meme/meme.js, pondKingGadget):
+  // the hero and the newest challenges; accepting or creating opens the full game window
+  var GADGET = /[?&]gadget=1(&|$)/.test(location.search);
+  if (GADGET) N.gadget();
+  var REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var ERR = {
     signin: 'Log on first, fren.', sum: 'Exactly 10 flies, no more, no less.', flies: 'Whole flies only, 0 to 10 on a lily.',
@@ -32,37 +37,13 @@
     b.addEventListener('click', function () { if (b.dataset.tab === 'create') startCreate(); else show(b.dataset.tab); });
   });
   $('to-bulletin').addEventListener('click', function () { N.open('bulletin'); });
+  $('hero-new').addEventListener('click', function () { if (GADGET) N.open('lilies', 'new'); else startCreate(); });
+  $('g-full').addEventListener('click', function () { N.open('lilies'); });
+  $('g-board').addEventListener('click', function () { N.open('bulletin'); });
   $('logon').addEventListener('click', function () { N.open('logon'); });
 
-  // ---------- the allocator ----------
-  // ---------- the pond: pixel-art lily pads and flies ----------
-  // PLACEHOLDER ART (games/POND_ART_GPT_PROMPT.md): a 32x32 pixel lily pad with a notch, drawn as crisp
-  // SVG rectangles, and 5x5 pixel flies from pond-net.js. Swapped for the final images later.
-  var PX = N.px, G = 32, CX = 16, CY = 16.5, R = 14.6;
-  var LEAF = (function () {   // the pad as rows of palette letters: k outline, g leaf, h light, v vein
-    function inside(x, y) {
-      var dx = x + .5 - CX, dy = y + .5 - CY, d = Math.sqrt(dx * dx + dy * dy);
-      if (d > R) return false;
-      var ang = Math.atan2(dx, -dy) * 180 / Math.PI;   // 0 = straight up
-      return !(Math.abs(ang) < 17 && d > 1.5);          // the notch
-    }
-    var rows = [];
-    for (var y = 0; y < G; y++) {
-      var row = '';
-      for (var x = 0; x < G; x++) {
-        if (!inside(x, y)) { row += '.'; continue; }
-        var edge = !inside(x - 1, y) || !inside(x + 1, y) || !inside(x, y - 1) || !inside(x, y + 1);
-        var dx = x + .5 - CX, dy = y + .5 - CY, ang = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360, d = Math.sqrt(dx * dx + dy * dy);
-        var vein = d > 3 && d < R - 2 && [30, 80, 140, 200, 330, 270].some(function (v) { return Math.abs(ang - v) < 3.2; });
-        var light = dx < -3 && dy < -3 && d > 5 && d < 10;
-        row += edge ? 'k' : vein ? 'v' : light ? 'h' : (d > R - 3 ? 'm' : 'g');
-      }
-      rows.push(row);
-    }
-    return rows;
-  })();
-  var LEAF_PAL = { k: '#142016', g: '#5cb84f', m: '#4aa23f', h: '#9fd36b', v: '#3c8a35' };
-  var DIM_PAL = { k: '#142016', g: '#7a9a72', m: '#6c8c65', h: '#9fb596', v: '#5d7a57' };
+  // ---------- the pond: the drawn lily pads (img/pond/lily-pad-a/b/c.png) with 5x5 pixel flies from pond-net.js ----------
+  var PX = N.px, CX = 16, CY = 16.5;
   // n flies on an arc (degrees, 0 = right, clockwise) in two rings, each fly a 5x5 sprite
   function ring(n, a0, a1, name) {
     var out = '';
@@ -151,7 +132,7 @@
     req.then(function (r) {
       busy = false;
       if (!r || !r.ok) { $('alloc-msg').textContent = errText(r); status('Not sent.'); paint(); if (r && /expired|taken|missing/.test(r.error)) loadOpen(); return; }
-      if (mode.kind === 'accept') { showResult(r.match); return; }
+      if (mode.kind === 'accept') { showResult(r.match, true); return; }
       status('Challenge posted. 48 hours on the clock.');
       show('mine');
     }, function (e) {
@@ -161,7 +142,7 @@
   });
 
   // ---------- the result ----------
-  function showResult(m) {
+  function showResult(m, fresh) {
     show('result');
     var mine = m.you, theirs = m.them, other = m.mine ? m.opponent : m.creator;
     var otherPass = m.mine ? m.opponent_passport : m.creator_passport;
@@ -179,6 +160,7 @@
       row.appendChild(a); row.appendChild(mk('span', 'vs', 'vs')); row.appendChild(b); pad.appendChild(row);
       pad.appendChild(mk('span', 'verdict', cls === 'won' ? 'YOURS' : cls === 'lost' ? 'THEIRS' : 'UNDECIDED'));
       pad.setAttribute('aria-label', name + ': you ' + y + ', ' + other + ' ' + t + ', ' + (cls === 'won' ? 'yours' : cls === 'lost' ? 'theirs' : 'undecided'));
+      if (fresh && !REDUCED) { pad.classList.add('covered'); pad._real = art.innerHTML; art.innerHTML = padSvg(0, null, '?', false, i); }
       box.appendChild(pad);
     });
     var won = mine.reduce(function (n, y, i) { return n + (y > theirs[i] ? 1 : 0); }, 0);
@@ -198,6 +180,21 @@
     if (otherPass) bt('View Passport', '', function () { N.open('passport', otherPass); });
     bt('Back to Pond Bulletin', '', function () { N.open('bulletin'); });
     status(m.outcome === 'win' ? 'Victory. The flies are buzzing.' : m.outcome === 'lose' ? 'Defeat. Regroup the flies.' : 'A draw.');
+    if (fresh && !REDUCED) reveal(m);
+  }
+  // a fresh duel: the lilies turn over one by one, then the verdict
+  function reveal(m) {
+    var tab = $('tab-result'), pads = Array.prototype.slice.call($('res-pads').children);
+    tab.classList.add('revealing'); status('The flies land…');
+    pads.forEach(function (pad, i) {
+      setTimeout(function () {
+        pad.querySelector('.art').innerHTML = pad._real; pad.classList.remove('covered'); pad.classList.add('flip');
+      }, 500 + i * 650);
+    });
+    setTimeout(function () {
+      tab.classList.remove('revealing');
+      status(m.outcome === 'win' ? 'Victory. The flies are buzzing.' : m.outcome === 'lose' ? 'Defeat. Regroup the flies.' : 'A draw.');
+    }, 500 + pads.length * 650 + 150);
   }
   // somebody else's duel: names, lilies won and the verdict; the spreads stay with the two players
   function showPublic(m) {
@@ -221,31 +218,71 @@
   function startRematch(id, nick) { startCreate({ id: id, nick: nick }); }
 
   // ---------- lists ----------
+  // a little trash talk for every challenge, the same one each time for the same challenge
+  var TAUNTS = [' dares you to find the flies.', ' thinks you can’t count to 10.', ' hid 10 flies. Good luck, fren.',
+    ' says the middle lily is a trap. Or is it?', ' is looking for a brave fren.', ' has never lost a lily. Allegedly.',
+    ' put the flies somewhere. Probably.', ' wants to see what you’ve got.'];
+  function taunt(c) {
+    if (c.invitee) return ' wants a rematch with ' + c.invitee + '.';
+    var h = 0; String(c.id).split('').forEach(function (ch) { h = (h * 31 + ch.charCodeAt(0)) >>> 0; });
+    return TAUNTS[h % TAUNTS.length];
+  }
+  function face(c) {
+    var box = mk('div', 'ava'), frog = mk('span', 'ava-frog'); box.appendChild(frog);
+    if (c.avatar) N.avatar(c.avatar, c.creator + '’s Fren').then(function (st) { if (st) { box.textContent = ''; box.appendChild(st); } });
+    return box;
+  }
+  function hidden3() {
+    var row = mk('span', 'hid3'); row.setAttribute('aria-hidden', 'true');
+    'abc'.split('').forEach(function (k) { var s = mk('span'); var im = mk('img'); im.src = 'img/pond/lily-pad-' + k + '.png'; im.alt = ''; s.appendChild(im); s.appendChild(mk('i', null, '?')); row.appendChild(s); });
+    return row;
+  }
+  function ttl(c) {
+    var w = mk('span', 'ttl'), bar = mk('span', 'ttl-bar'), fill = mk('span');
+    var frac = Math.max(0, Math.min(1, (new Date(c.expires_at) - Date.now()) / (48 * 3600e3)));
+    fill.style.width = Math.round(frac * 100) + '%'; if (frac < .25) w.classList.add('low');
+    bar.appendChild(fill); w.appendChild(bar); w.appendChild(mk('small', null, N.left(c.expires_at)));
+    return w;
+  }
   function loadOpen() {
     return N.rpc('gry_bulletin', { p_limit: 30 }).then(function (b) {
       lastOpen = b.open || [];
+      var others = lastOpen.filter(function (c) { return !c.mine; }).length;
+      $('open-n').textContent = String(lastOpen.length);
       var ul = $('open-list'); ul.textContent = '';
-      lastOpen.forEach(function (c) {
-        var li = mk('li', 'card' + (c.mine ? ' mine' : '')); var ic = mk('img', 'ic'); ic.src = 'img/pond/lilies.png'; ic.alt = ''; li.appendChild(ic);
-        var t = mk('div');
-        var p = mk('p'); p.appendChild(mk('b', null, c.creator));
-        p.appendChild(document.createTextNode(c.invitee ? ' wants a rematch with ' + c.invitee + '.' : ' is looking for a brave fren. 10 flies. 3 lily pads. Zero excuses.'));
-        t.appendChild(p); t.appendChild(mk('small', null, N.ago(c.created_at) + ' · ' + N.left(c.expires_at))); li.appendChild(t);
+      (GADGET ? lastOpen.filter(function (c) { return !c.mine; }).slice(0, 2) : lastOpen).forEach(function (c) {
+        var li = mk('li', 'card duel' + (c.mine ? ' mine' : '')); li.appendChild(face(c));
+        var t = mk('div', 'duel-mid');
+        var p = mk('p', 'duel-who'); p.appendChild(mk('b', null, c.creator));
+        p.appendChild(document.createTextNode(c.mine ? ' (you): waiting for a brave fren.' : taunt(c)));
+        t.appendChild(p);
+        var meta = mk('div', 'duel-meta'); meta.appendChild(hidden3()); meta.appendChild(ttl(c)); t.appendChild(meta);
+        li.appendChild(t);
         var acts = mk('div', 'acts');
         if (c.mine) {
           var cx = mk('button', null, 'Cancel'); cx.type = 'button'; cx.addEventListener('click', function () { cancel(c.id); }); acts.appendChild(cx);
         } else if (!c.invitee || c.for_me) {
-          var ac = mk('button', 'go', 'Accept Challenge'); ac.type = 'button';
-          ac.addEventListener('click', function () { if (!me) { show('create'); $('signin').hidden = false; return; } startAccept(c); });
+          var ac = mk('button', 'go accept', 'Accept'); ac.type = 'button';
+          ac.setAttribute('aria-label', 'Accept the challenge from ' + c.creator);
+          ac.addEventListener('click', function () {
+            if (GADGET) return N.open('lilies', c.id);
+            if (!me) { show('create'); $('signin').hidden = false; return; } startAccept(c);
+          });
           acts.appendChild(ac);
         }
-        if (c.creator_passport) { var pp = mk('button', null, 'Passport'); pp.type = 'button'; pp.addEventListener('click', function () { N.open('passport', c.creator_passport); }); acts.appendChild(pp); }
+        if (c.creator_passport && !GADGET) { var pp = mk('button', 'small', 'Passport'); pp.type = 'button'; pp.addEventListener('click', function () { N.open('passport', c.creator_passport); }); acts.appendChild(pp); }
         li.appendChild(acts); ul.appendChild(li);
       });
-      if (!lastOpen.length) {
-        var e = mk('li', 'muted', 'No open challenges. The pond is suspiciously quiet. ');
-        var go = mk('button', 'linkish', 'Create one'); go.type = 'button'; go.addEventListener('click', function () { startCreate(); }); e.appendChild(go);
+      if (!ul.children.length) {
+        var e = mk('li', 'empty-pond');
+        e.appendChild(hidden3());
+        e.appendChild(mk('p', null, lastOpen.length ? 'Only your own challenges are open. Somebody will bite.' : 'The pond is quiet. Suspiciously quiet.'));
+        var go = mk('button', 'go hero-go', 'Be the first: hide your 10 flies'); go.type = 'button';
+        go.addEventListener('click', function () { if (GADGET) N.open('lilies', 'new'); else startCreate(); }); e.appendChild(go);
         ul.appendChild(e);
+      } else if (GADGET && others > 2) {
+        var more = mk('li', 'more'), mb = mk('button', 'linkish', '+ ' + (others - 2) + ' more open duels'); mb.type = 'button';
+        mb.addEventListener('click', function () { N.open('lilies'); }); more.appendChild(mb); ul.appendChild(more);
       }
       status(lastOpen.length + (lastOpen.length === 1 ? ' open challenge' : ' open challenges'));
     }, offline);

@@ -6,13 +6,23 @@
 <meta name="description" content="A strategy duel for two frogs who never have to be online together. Spread 10 flies over three lily pads, win two pads, win the duel.">
 <meta name="robots" content="noindex">
 <link rel="canonical" href="https://pepecoinhub.com/games/lilies.html"><link rel="icon" href="img/pond/lilies.png" type="image/png">
-<link rel="stylesheet" href="pond.css?v=20261114gadget"><link rel="stylesheet" href="lilies.css?v=20261114gadget">
-<script src="js/config.js"></script><script src="js/pond-net.js?v=20261114gadget" defer></script><script src="js/lilies.js?v=20261114gadget" defer></script>
+<link rel="stylesheet" href="pond.css?v=20261114lilies"><link rel="stylesheet" href="lilies.css?v=20261114lilies">
+<script src="js/config.js"></script><script src="js/pond-net.js?v=20261114lilies" defer></script><script src="js/lilies.js?v=20261114lilies" defer></script>
 </head><body>
 <header class="site-bar"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · FLY TRAFFIC CONTROL</span><a href="bulletin.html">Pond Bulletin ↗</a></header>
 <main class="desk">
 <section class="window" aria-labelledby="ly-title">
   <div class="titlebar"><span><img src="img/pond/lilies.png" alt="" width="16" height="16"> <b id="ly-title">BATTLE OF THREE LILIES.EXE</b></span><a href="../meme/" title="Back to PondOS" aria-label="Back to PondOS">×</a></div>
+  <div class="ly-hero" id="hero">
+    <div class="ly-hero-pond" aria-hidden="true"><span><img src="img/pond/lily-pad-a.png" alt=""><i>?</i></span><span><img src="img/pond/lily-pad-b.png" alt=""><i>?</i></span><span><img src="img/pond/lily-pad-c.png" alt=""><i>?</i></span></div>
+    <div class="ly-hero-text">
+      <p class="kicker">Strategy duel · 2 frogs · never online together</p>
+      <h1>Battle of Three Lilies</h1>
+      <p>Hide 10 flies on 3 lily pads. Win two pads, win the duel.</p>
+    </div>
+    <div class="reign ly-count"><b id="open-n">–</b><small>open duels</small></div>
+    <button type="button" class="go hero-go" id="hero-new">Throw down a challenge</button>
+  </div>
   <nav class="menubar" aria-label="Battle of Three Lilies">
     <button type="button" data-tab="open" aria-pressed="true">Open Challenges</button>
     <button type="button" data-tab="create" aria-pressed="false">Create Challenge</button>
@@ -85,9 +95,9 @@
         <li>Up to 3 open challenges at a time, 5 new ones a day. No stakes, no PEP, only bragging rights.</li>
       </ul>
       <p class="muted">Example: 2/4/4 against 4/3/3. Lily A goes to 4, lilies B and C go to 4 over 3. 2/4/4 wins 2:1.</p>
-      <p class="placeholder-note">Lily pads and flies are temporary placeholders, waiting for the final art.</p>
     </section>
   </div>
+  <div class="gadget-foot"><button type="button" id="g-full" class="ib"><img src="img/pond/lilies.png" alt=""> Full game</button><button type="button" id="g-board" class="ib"><img src="img/pond/bulletin.png" alt=""> Bulletin</button></div>
   <div class="statusbar"><span id="status">Connecting to the pond…</span><span id="who">not logged on</span></div>
 </section>
 <footer>Made for frens. <a href="privacy.html">Privacy</a> · <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues">Report a bug</a></footer>

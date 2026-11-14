@@ -65,6 +65,16 @@
     if (framed) { try { window.parent.postMessage(m, location.origin); return; } catch (e) {} }
     location.href = FALLBACK[what](m);
   }
+  // a page shown as a desktop gadget (?gadget=1): compact layout, and PondOS is told its height so the window fits
+  function gadget() {
+    document.documentElement.classList.add('gadget');
+    var lastH = 0, tell = function () {
+      var w = document.querySelector('.window'); if (!w) return;
+      var h = Math.ceil(w.getBoundingClientRect().height) + 4;
+      if (Math.abs(h - lastH) > 2 && framed) { lastH = h; try { window.parent.postMessage({ type: 'pondos-size', h: h }, location.origin); } catch (e) {} }
+    };
+    if (window.ResizeObserver) new ResizeObserver(tell).observe(document.body); else setInterval(tell, 1000);
+  }
   function ago(iso) {
     var s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
     if (s < 60) return 'just now';
@@ -79,7 +89,7 @@
     return Math.floor(s / 3600) + ' h left';
   }
   function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-  window.PondNet = { session: session, me: me, rpc: rpc, open: open, framed: framed, embedded: embedded, ago: ago, left: left, mk: mk };
+  window.PondNet = { session: session, me: me, rpc: rpc, open: open, framed: framed, embedded: embedded, ago: ago, left: left, mk: mk, gadget: gadget };
 })();
 
 // ---------- pixel art (PondOS is Windows 98: everything a little pixelated) ----------

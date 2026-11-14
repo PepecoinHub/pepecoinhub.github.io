@@ -1,6 +1,6 @@
 /* BATTLE OF THREE LILIES and POND BULLETIN, on top of pond.css (Windows 98 chrome, pixel art).
-   PLACEHOLDER ART: lily pads and flies are pixel sprites drawn by js/lilies.js and js/pond-net.js; the
-   pond water and the cork are dithered CSS. games/POND_ART_GPT_PROMPT.md lists the final images. */
+   The lily pads are drawn art (img/pond/lily-pad-*.png), the flies 5x5 sprites from js/pond-net.js,
+   the pond water dithered CSS. */
 
 /* tabs: a Windows 98 tab strip */
 .menubar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0; padding: 6px 4px 0; }
@@ -64,7 +64,6 @@
 .linkish { background: none; box-shadow: none; padding: 0; min-height: 0; font-weight: 700; text-decoration: underline; color: #0000ee; }
 .linkish:active { background: none; box-shadow: none; padding: 0; }
 .howto { padding-left: 18px; } .howto li { margin: 0 0 6px; }
-.placeholder-note { font: 11px var(--f); color: var(--gold-deep); padding: 3px 8px; background: #fffbd8; box-shadow: var(--sunken); display: inline-block; }
 .feed li .acts { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-left: 6px; vertical-align: middle; }
 .feed li button { min-height: 22px; padding: 2px 8px; font-size: 11px; font-weight: 400; }
 .tag { display: inline-block; min-width: 54px; padding: 0 4px; margin-right: 6px; font: 400 15px/1.1 var(--f-px); text-align: center; background: var(--chrome); box-shadow: var(--raised); }
@@ -129,3 +128,101 @@
 .king-face { flex: none; display: block; width: 64px; height: 64px; padding: 2px; background: var(--pane); box-shadow: var(--sunken); }
 .king-face img { width: 100%; height: 100%; background: none; box-shadow: none; padding: 0; }
 .king-face .fa-stack { height: 100%; }
+
+/* ---------- the hero: a setup-wizard picture panel, like the POND KING throne ---------- */
+.ly-hero { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "pond text count" "pond go go"; gap: 6px 14px; align-items: center;
+  margin: 4px 0 2px; padding: 12px 14px; color: #fff; box-shadow: var(--sunken);
+  background: linear-gradient(180deg, #0c4a24, #1c6b3a 70%, #2f7f86); }
+.ly-hero-pond { grid-area: pond; display: grid; grid-template-columns: repeat(2, 48px); gap: 0 4px; padding: 6px; box-shadow: var(--sunken);
+  background: repeating-conic-gradient(#3e8f9a 0 25%, #4a9ea8 0 50%) 0 0 / 4px 4px; }
+.ly-hero-pond > span:first-child { grid-column: 1 / -1; justify-self: center; }
+.ly-hero-text { grid-area: text; min-width: 0; }
+.ly-hero .kicker { color: var(--gold); font-size: 15px; }
+.ly-hero h1 { margin: 4px 0 2px; font: 400 clamp(28px, 6vw, 42px)/.9 var(--f-px); color: #fff; text-shadow: 2px 2px 0 #000; }
+.ly-hero p { margin: 0; color: #d6f0dc; }
+.ly-count { grid-area: count; }
+.hero-go { grid-area: go; justify-self: start; font: 400 20px/1 var(--f-px); padding: 8px 16px; letter-spacing: .03em; }
+/* a lily pad with a question mark: the flies nobody may see yet */
+.ly-hero-pond > span, .hid3 > span { position: relative; display: inline-block; }
+.ly-hero-pond img { display: block; width: 48px; height: 48px; image-rendering: pixelated; }
+.ly-hero-pond i, .hid3 i { position: absolute; inset: 0; display: grid; place-items: center; font: 400 22px/1 var(--f-px); font-style: normal; color: #fff; text-shadow: 1px 1px 0 #142016, -1px -1px 0 #142016, 1px -1px 0 #142016, -1px 1px 0 #142016; }
+.ly-hero-pond > span:nth-child(2) i { animation: blink 2.4s steps(1) infinite .8s; }
+.ly-hero-pond > span:nth-child(3) i { animation: blink 2.4s steps(1) infinite 1.6s; }
+.ly-hero-pond > span:first-child i { animation: blink 2.4s steps(1) infinite; }
+@keyframes blink { 0%, 80% { opacity: 1; } 90% { opacity: 0; } }
+
+/* ---------- open challenges: duel cards ---------- */
+.cards li.card.duel { grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; padding: 8px; margin: 0; border-bottom: 2px groove var(--chrome-hi); }
+.cards li.card.duel:hover { background: #f2fbf3; }
+.cards li.card.duel.mine:hover { background: #fffbd8; }
+.ava { width: 64px; height: 64px; padding: 2px; background: var(--chrome); box-shadow: var(--raised); }
+.ava .fa-stack { height: 100%; }
+.ava-frog { display: block; width: 100%; height: 100%; image-rendering: pixelated; background: url(img/pond/win-anim.png) 0 0 / 240px 60px no-repeat, var(--pane); }
+.duel-who { font-size: 13px; }
+.duel-who b { font: 400 22px/1 var(--f-px); margin-right: 2px; }
+.duel-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin-top: 6px; }
+.hid3 { display: inline-flex; gap: 2px; }
+.hid3 img { display: block; width: 32px; height: 32px; image-rendering: pixelated; }
+.hid3 i { font-size: 18px; }
+.ttl { display: inline-flex; align-items: center; gap: 6px; }
+.ttl-bar { display: inline-block; width: 70px; height: 10px; padding: 1px; background: var(--pane); box-shadow: var(--sunken); }
+.ttl-bar span { display: block; height: 100%; background: var(--sel); }
+.ttl.low .ttl-bar span { background: var(--lose); }
+.ttl small { font-size: 11px; color: var(--muted); }
+.cards .duel .acts { flex-direction: column; align-items: stretch; }
+.cards .duel .accept { font: 400 22px/1 var(--f-px); padding: 8px 18px; letter-spacing: .03em; }
+.cards .duel button.small { min-height: 22px; padding: 2px 8px; font-size: 11px; font-weight: 400; }
+.cards li.empty-pond { display: grid; justify-items: center; gap: 8px; padding: 18px 8px; text-align: center; }
+.cards li.empty-pond p { margin: 0; font: 400 20px/1.1 var(--f-px); color: var(--muted); }
+.cards li.more { padding: 4px 8px; text-align: center; }
+
+/* ---------- a fresh duel: the lilies turn over one by one ---------- */
+.pad.covered .vsrow, .pad.covered .verdict { visibility: hidden; }
+.pad.flip .art { animation: flip 360ms steps(3); }
+@keyframes flip { 0% { transform: scaleX(.1); } 60% { transform: scaleX(1.08); } 100% { transform: none; } }
+#tab-result.revealing .big, #tab-result.revealing #res-sub, #tab-result.revealing #res-actions, #tab-result.revealing .anim { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .ly-hero-pond i, .pad.flip .art { animation: none !important; } }
+
+@media (max-width: 560px) {
+  .ly-hero { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "pond text" "count count" "go go"; padding: 10px; gap: 8px 10px; }
+  .ly-hero-pond { grid-template-columns: repeat(2, 32px); padding: 4px; }
+  .ly-hero-pond img { width: 32px; height: 32px; }
+  .ly-hero-pond i { font-size: 16px; }
+  .ly-count { display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .ly-count b { display: inline-block; font-size: 30px; }
+  .hero-go { justify-self: stretch; }
+  .cards li.card.duel { grid-template-columns: 48px minmax(0, 1fr); }
+  .cards li.card.duel .acts { grid-column: 1 / -1; flex-direction: row; }
+  .ava { width: 48px; height: 48px; }
+  .ava-frog { background-size: 176px 44px, auto; }
+}
+
+/* ---------- the LILIES tab of the desktop gadget (lilies.html?embed=1&gadget=1) ---------- */
+.gadget .menubar, .gadget #tab-create, .gadget #tab-mine, .gadget #tab-help, .gadget #tab-result, .gadget #signin,
+.gadget #tab-open > h2, .gadget #tab-open > p, .gadget .statusbar, .gadget .ly-hero p:not(.kicker) { display: none !important; }
+.gadget #tab-open { display: block !important; margin: 0; padding: 0; border: 0; }
+.gadget .pk-body { padding: 4px 2px; gap: 4px; grid-template-columns: minmax(0, 1fr); }
+.gadget .ly-hero { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "pond text count" "go go go"; padding: 8px; gap: 6px 8px; }
+.gadget .ly-hero-pond { grid-template-columns: repeat(2, 24px); padding: 3px; gap: 0 2px; }
+.gadget .ly-hero-pond img { width: 24px; height: 24px; }
+.gadget .ly-hero-pond i { font-size: 13px; }
+.gadget .ly-hero .kicker { display: none; }
+.gadget .ly-hero h1 { font-size: 22px; }
+.gadget .ly-count { display: block; }
+.gadget .ly-count b { min-width: 40px; font-size: 26px; }
+.gadget .ly-count small { font-size: 9px; }
+.gadget .hero-go { justify-self: stretch; font-size: 17px; padding: 5px 8px; }
+.gadget .cards { padding: 2px; }
+.gadget .cards li.card.duel { grid-template-columns: 40px minmax(0, 1fr); gap: 6px; padding: 5px; }
+.gadget .cards li.card.duel .acts { grid-column: 1 / -1; flex-direction: row; }
+.gadget .cards .duel .accept { flex: 1; font-size: 18px; padding: 4px 8px; }
+.gadget .ava { width: 40px; height: 40px; padding: 1px; }
+.gadget .ava-frog { background-size: 152px 38px, auto; }
+.gadget .duel-who { font-size: 11px; margin: 0; }
+.gadget .duel-who b { font-size: 17px; }
+.gadget .duel-meta { gap: 2px 8px; margin-top: 3px; }
+.gadget .hid3 img { width: 20px; height: 20px; }
+.gadget .hid3 i { font-size: 12px; }
+.gadget .ttl-bar { width: 44px; }
+.gadget .cards li.empty-pond { padding: 10px 4px; }
+.gadget .cards li.empty-pond p { font-size: 16px; }
