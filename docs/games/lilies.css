@@ -126,3 +126,6 @@
 .board { background: url(img/pond/cork-tile.png) 0 0 / 64px 64px; image-rendering: pixelated; }
 .board h2 img, .note-bar img, .clip > img, .cards .card .ic, .king-note img { image-rendering: pixelated; }
 .king-note img { width: 64px; height: 64px; }
+.king-face { flex: none; display: block; width: 64px; height: 64px; padding: 2px; background: var(--pane); box-shadow: var(--sunken); }
+.king-face img { width: 100%; height: 100%; background: none; box-shadow: none; padding: 0; }
+.king-face .fa-stack { height: 100%; }

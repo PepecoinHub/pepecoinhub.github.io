@@ -19,6 +19,9 @@
   function render(b) {
     var k = b.king, kl = $('king-line');
     if (k) {
+      // the leader: their Fren avatar and name (Discord players with a saved avatar), otherwise the king frog
+      var face = $('king-face');
+      if (k.avatar) N.avatar(k.avatar, k.nick + '’s Fren avatar').then(function (av) { if (av) { face.textContent = ''; face.appendChild(av); } });
       kl.textContent = '';
       kl.appendChild(mk('b', null, k.nick));
       kl.appendChild(document.createTextNode(k.house ? ' keeps the throne warm. Somebody take it.' : ' rules the pond: ' + k.defenses + (k.defenses === 1 ? ' defence' : ' defences') + ' so far.'));
@@ -44,7 +47,7 @@
     var news = $('news'); news.textContent = '';
     (b.events || []).forEach(function (e) {
       var li = mk('li', 'clip'), parts = story(e);
-      var ic = mk('img'); ic.src = e.game === 'pond_king' ? 'img/pond/pond-king.png' : 'img/pond/lilies.png'; ic.alt = ''; li.appendChild(ic);
+      var ic = mk('img'); ic.src = e.game === 'pond_king' ? 'img/pond/king-stamp.png' : 'img/pond/lilies.png'; ic.alt = ''; li.appendChild(ic);
       li.appendChild(mk('span', 'head', HEAD[e.kind] || 'Pond news'));
       var p = mk('span');
       parts.forEach(function (x, i) { p.appendChild(i % 2 ? document.createTextNode(x) : mk('b', null, x)); });

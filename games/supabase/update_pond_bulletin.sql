@@ -83,7 +83,8 @@ begin
                order by created_at desc limit $2) ch $q$ into opn using u, n;
   end if;
   if to_regclass('games.pk_kings') is not null then
-    execute $q$ select jsonb_build_object('nick', nick, 'defenses', defenses, 'since', crowned_at, 'house', token_hash is null)
+    execute $q$ select jsonb_build_object('nick', nick, 'defenses', defenses, 'since', crowned_at, 'house', token_hash is null and user_id is null,
+                                          'passport', games.passport_id(user_id), 'avatar', games.pk_avatar(user_id))
                   from games.pk_kings where ended_at is null $q$ into king;
   end if;
   return jsonb_build_object(

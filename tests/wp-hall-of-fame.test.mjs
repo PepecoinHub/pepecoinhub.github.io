@@ -41,7 +41,7 @@ test('settlement is server-side, keyed by day and week, and pays once', () => {
 test('Pond Dominator and Frog of the Week go through the existing Passport paths', () => {
   const p = catalog.achievements.find(x => x.id === 'pond_dominator');
   assert.ok(p); assert.equal(p.status, 'live'); assert.equal(p.title, 'Pond Dominator'); assert.ok(!p.repeatable);
-  assert.match(fnBody(awards, 'games.passport_award'), /'pond_dominator'\) then/);
+  assert.match(fnBody(awards, 'games.passport_award'), /'pond_dominator'[,)]/);
   assert.match(fnBody(sql, 'games.wp_dominator_stamps'), /games\.passport_award\(w\.winner_id, 'pond_dominator', w\.at\)/);
   // Frog of the Week stays the one Weekly Champion stamp: no new champion stamp
   assert.ok(!catalog.achievements.some(x => /champion/.test(x.id) && x.id !== 'season_champion'));

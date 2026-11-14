@@ -176,3 +176,15 @@ details.panel { padding-top: 12px; }
 @keyframes frames { from { background-position: 0 0; } to { background-position: -384px 0; } }
 #result .anim, #tab-result .anim { float: right; }
 @media (prefers-reduced-motion: reduce) { .anim { animation: none; } }
+
+/* Fren avatars (layers from docs/meme/avatar-assets, as in the PondOS Avatar Maker) */
+.fa-stack { position: relative; display: block; overflow: hidden; aspect-ratio: 1; width: 100%; }
+.fa-stack img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; pointer-events: none; user-select: none; }
+.fa-stack.is-special img:not([data-layer="bg"]):not([data-layer="special"]) { display: none; }
+.throne-face { width: 96px; height: 96px; padding: 4px; background: var(--chrome); box-shadow: var(--raised); }
+.throne-face .throne-frog { width: 100%; height: 100%; padding: 0; box-shadow: none; }
+.throne-face .fa-stack { height: 100%; }
+.throne.changed .throne-face { animation: crown 700ms steps(4); }
+.king-progress { margin: 4px 0 8px; font-weight: 700; }
+.king-progress b { font: 400 20px/1 var(--f-px); color: var(--title); }
+@media (max-width: 560px) { .throne-face { width: 68px; height: 68px; } }

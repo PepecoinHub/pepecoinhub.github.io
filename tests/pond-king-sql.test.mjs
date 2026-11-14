@@ -168,6 +168,38 @@ test('Pond King: hidden moves, one duel per king per player and network, the thr
     const news = (await db.query("select actor_nick, other_nick, actor_user, data from games.bulletin_events where kind = 'king_defended' and actor_nick = 'DiscordFrog'")).rows;
     assert.equal(news.length, 1); assert.equal(news[0].actor_nick, 'DiscordFrog'); assert.equal(news[0].actor_user, discord);
     assert.equal(news[0].data.defenses, 5);
+
+    // "Long Live the King": 10 duels won in a row as king. A stand-in Passport records the awards
+    // (the real games.passport_award is in update_passport_awards.sql and only takes Discord accounts).
+    await db.query(`create table games.test_awards (user_id uuid, badge text, primary key (user_id, badge));
+      create function games.passport_award(u uuid, b text, at timestamptz default null) returns boolean language sql security definer set search_path = '' as $$
+        insert into games.test_awards values (u, b) on conflict do nothing returning true $$;
+      create table games.passport_avatars (user_id uuid primary key, bg text, clothing text, mouth text, eyes text, hat text, accessory text, special text);
+      insert into games.passport_avatars values ('${discord}', 'bg_sky', 'clothing_blue', 'mouth_flat', 'eyes_sleepy', 'hat_crown', 'accessory_none', 'special_none');`);
+    const awards = () => db.query('select user_id, badge from games.test_awards').then(r => r.rows);
+    for (let i = 0; i < 4; i++) {   // defences 5 -> 9: no stamp yet
+      await duel(tok(400 + i), '40.0.0.' + i, other.king.id, 'Try' + i, 'rrr');
+    }
+    assert.equal((await state(tok(499), '40.1.0.1')).king.defenses, 9);
+    assert.deepEqual(await awards(), []);
+    await duel(tok(410), '40.0.1.0', other.king.id, 'Tenth', 'rrr');   // the 10th win in a row
+    assert.deepEqual(await awards(), [{ user_id: discord, badge: 'long_live_the_king' }]);
+    await duel(tok(411), '40.0.1.1', other.king.id, 'Eleventh', 'rrr');
+    assert.equal((await awards()).length, 1, 'once');
+    // the leader's avatar and name are public (state and Bulletin), only for a Discord king with a saved avatar
+    const st = await state(tok(499), '40.1.0.1');
+    assert.equal(st.king.nick, 'DiscordFrog'); assert.equal(st.king.avatar.hat, 'hat_crown'); assert.equal(st.king.passport, discord);
+    const bb = await call('40.1.0.1', 'select public.gry_bulletin(5) as v');
+    assert.equal(bb.king.nick, 'DiscordFrog'); assert.equal(bb.king.avatar.hat, 'hat_crown');
+    // a guest king: no stamp, no avatar
+    const gk = (await state(tok(499), '40.1.0.1')).king;
+    await db.query("update games.pk_kings set moves = 'sss' where id = $1", [gk.id]);
+    await duel(tok(420), '40.2.0.1', gk.id, 'GuestKing', 'rrr');
+    const g = await state(tok(420), '40.2.0.1');
+    assert.equal(g.king.nick, 'GuestKing'); assert.equal(g.king.avatar, null);
+    await db.query("update games.pk_kings set defenses = 9, moves = 'ppp' where ended_at is null");
+    await duel(tok(421), '40.2.0.2', g.king.id, 'Visitor', 'rrr');
+    assert.equal((await awards()).length, 1, 'a guest king gets no stamp');
   } finally {
     await drop();
   }

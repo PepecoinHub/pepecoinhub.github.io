@@ -13,6 +13,8 @@
 --     in any 4 hours, whoever sits on the throne. The clock runs from the last duel.
 --   * And one duel per king per player and per network: losing to a king means waiting for a new king
 --     (and a new day). Nobody can challenge themselves.
+--   * Fren Passport stamp "Long Live the King": hold one reign against 10 challengers, i.e. 10 duels won in a
+--     row as king. Discord accounts only (games.passport_award checks), awarded once, from server records.
 --   * The king's moves never leave the database, except to the king (who holds the token) and as the
 --     shuffled rounds of a finished duel, which show the challenger only the king's set of moves.
 --
@@ -98,6 +100,18 @@ language sql stable security definer set search_path = '' as $$
    order by d.created_at desc limit 1
 $$;
 
+-- the saved Fren avatar of a Discord player (games.passport_avatars, update_fren_avatar.sql), or null;
+-- null too while the Fren Passport is not installed
+create or replace function games.pk_avatar(u uuid) returns jsonb
+language plpgsql stable security definer set search_path = '' as $$
+declare look jsonb;
+begin
+  if u is null or to_regclass('games.passport_avatars') is null or games.discord_identity(u) is null then return null; end if;
+  execute 'select jsonb_build_object(''bg'', a.bg, ''clothing'', a.clothing, ''mouth'', a.mouth, ''eyes'', a.eyes, ''hat'', a.hat,
+             ''accessory'', a.accessory, ''special'', a.special) from games.passport_avatars a where a.user_id = $1' into look using u;
+  return look;
+end $$;
+
 -- 1 = a beats b, -1 = b beats a, 0 = the same move
 create or replace function games.pk_beats(a text, b text) returns int
 language sql immutable set search_path = '' as $$
@@ -129,7 +143,7 @@ begin
   return jsonb_build_object(
     'king', jsonb_build_object('id', k.id, 'nick', k.nick, 'defenses', k.defenses, 'since', k.crowned_at,
                                'house', k.token_hash is null and k.user_id is null, 'you', you,
-                               'passport', games.passport_id(k.user_id),
+                               'passport', games.passport_id(k.user_id), 'avatar', games.pk_avatar(k.user_id),
                                'moves', case when you then k.moves end),
     'can_challenge', not you and mine.id is null and not ip_used and last.id is null,
     -- one duel every 4 hours: the duel that started the wait (yours, or one from your network) and when it ends
@@ -212,6 +226,11 @@ begin
                                 jsonb_build_object('old_reign', k.defenses));
   else
     update games.pk_kings set defenses = defenses + 1 where id = k.id;
+    -- 10 duels won in a row as king: the "Long Live the King" stamp (a Passport without this stamp yet only warns)
+    if k.defenses + 1 >= 10 and k.user_id is not null and to_regprocedure('games.passport_award(uuid, text, timestamp with time zone)') is not null then
+      begin perform games.passport_award(k.user_id, 'long_live_the_king');
+      exception when others then raise warning 'pond king: long_live_the_king: %', sqlerrm; end;
+    end if;
     -- long reigns make the news
     if k.defenses + 1 in (5, 10, 25, 50, 100, 250, 500, 1000) then
       perform games.bulletin_post('pk:def:' || k.id || ':' || (k.defenses + 1), 'pond_king', 'king_defended', k.nick, k.user_id, v_nick, u, null,
@@ -245,6 +264,6 @@ begin
   return jsonb_build_object('ok', true, 'moves', v_moves);
 end $$;
 
-revoke all on function games.pk_token_hash(text), games.pk_beats(text, text), games.pk_is(text, uuid, text, uuid), games.pk_cooldown(), games.pk_last(text, uuid, text) from public, anon, authenticated;
+revoke all on function games.pk_token_hash(text), games.pk_beats(text, text), games.pk_is(text, uuid, text, uuid), games.pk_cooldown(), games.pk_last(text, uuid, text), games.pk_avatar(uuid) from public, anon, authenticated;
 revoke all on function public.gry_pk_state(text), public.gry_pk_challenge(text, bigint, text, text), public.gry_pk_set_moves(text, text) from public;
 grant execute on function public.gry_pk_state(text), public.gry_pk_challenge(text, bigint, text, text), public.gry_pk_set_moves(text, text) to anon, authenticated;

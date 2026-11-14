@@ -28,6 +28,12 @@ Trzy części, jeden mechanizm: gracz zostawia ukrytą strategię, a ktoś inny 
 
 Opisane w `games/SETUP.md` i w samym pliku SQL. W skrócie: król ma 3 ukryte ruchy, a serwer przy każdym pojedynku tasuje ich kolejność. Pretendent musi wygrać więcej rund niż król, remis zostaje przy królu. **Jeden pojedynek co 4 godziny** na gracza (token przeglądarki albo konto) i na sieć, licząc od ostatniego pojedynku. Po przegranej okno mówi, że żaba jest poobijana i ma wrócić za 4 godziny (z godziną następnej próby). Do tego z jednym królem walczy się raz na osobę i raz na sieć. Nowe w tej wersji: zalogowany gracz jest zapisywany pod kontem (tron działa na każdym urządzeniu, król z Discordem ma link do Paszportu), a nowi królowie i panowania 5, 10, 25, 50, 100… obron trafiają do Bulletinu.
 
+## Logo, prowadzący i stempel
+
+- **Logo Króla Stawu** to Pepe w koronie (`docs/games/img/pond/king-stamp.png`): ikona na pulpicie PondOS, w menu, w Find, w Bulletinie i w karcie przeglądarki.
+- **Prowadzący** (obecny król) jest pokazany awatarem Fren i nickiem, na tronie i w Bulletinie. Awatar istnieje tylko u graczy Discorda, którzy zapisali go w Avatar Makerze (`games.passport_avatars`, `games.pk_avatar`). Gość albo gracz bez awatara ma zwykłą żabę w koronie.
+- **Stempel „Long Live the King”** w Fren Passport: 10 wygranych pojedynków z rzędu, czyli tron obroniony przed 10 pretendentami w jednym panowaniu. Daje go serwer w `gry_pk_challenge` przez `games.passport_award` (tylko Discord, raz na konto). Rysunkiem stempla jest Pepe w koronie. Wpis jest w `docs/meme/passport-catalog.json`, a nazwa stempla na liście dozwolonych w `update_passport_awards.sql`. Król widzi postęp „N/10”.
+
 ## Architektura
 
 - **Tożsamość.** Używam istniejącej sesji Supabase, tej samej co PEP Games i Log On w PondOS (Discord albo gość z Turnstile). Gracz to zawsze `auth.uid()` z sesji, nigdy argument funkcji. Nick przechodzi przez `games.valid_nick`: nicki graczy Discorda są zarezerwowane i działa filtr. Link do Fren Passport jest tylko dla graczy Discorda, tak jak w LAN Party.
@@ -102,5 +108,6 @@ Wszystko poniżej to dziś placeholdery, oznaczone w kodzie (`PLACEHOLDER`):
 
 1. Scal PR do `main`.
 2. Supabase → SQL Editor: po kolei całe pliki `update_pond_bulletin.sql`, `update_pond_king.sql`, `update_lilies.sql`. Kolejność ma znaczenie, każdy plik można powtórzyć.
+   Potem jeszcze raz `update_passport_awards.sql` (albo `deploy/LAUNCH_ALL.sql`), żeby Paszport znał nowy stempel „Long Live the King”. Do tego czasu stempel się nie przyznaje, a gra działa normalnie (w logu bazy jest tylko ostrzeżenie).
 3. Sprawdź na `/meme/`: przyciski „Pond Bulletin” i „Dethrone Pepe” pod „Today in the pond” pokazują dane, a okna gier nie mówią już „opens soon”.
 4. Wyłączenie bez kasowania danych: `revoke execute on function public.gry_lily_create(int, int, int, text, uuid) from authenticated;` blokuje nowe wyzwania. Przyciski na `/meme/` zostają; gdy funkcja nie odpowiada, okno pokazuje komunikat o błędzie.

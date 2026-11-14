@@ -19,7 +19,7 @@
     store.set('pk-token', token);
   }
 
-  var state = null, busy = false, lastKingId = null;
+  var state = null, busy = false, lastKingId = null, lastFace = null;
   var pick = ['', '', ''], def = ['', '', ''];
   // a move as pixel art (rock / paper / scissors sprites in pond-net.js)
   var SPRITE = { r: 'rock', p: 'paper', s: 'scissors' };
@@ -111,6 +111,16 @@
     $('king-line').textContent = (k.house ? 'The house frog keeps the seat warm. Somebody take it. ' : '') + 'On the throne since ' + ago(k.since) + '.';
     $('king-def').textContent = k.defenses;
     $('who').textContent = k.you ? 'you are the king' : me ? (me.name || 'guest') + (me.discord ? ' ✓' : ' (guest)') : (store.get('pk-nick') || 'visitor');
+    // the leader's face: their Fren avatar (Discord players who saved one), otherwise the pond's king frog
+    var faceKey = k.avatar ? JSON.stringify(k.avatar) : '';
+    if (faceKey !== lastFace) {
+      lastFace = faceKey; var box = $('king-face'), frog = '<img class="throne-frog" src="img/pond/pond-king.png" alt="" width="96" height="96">';
+      if (!k.avatar) box.innerHTML = frog;
+      else N.avatar(k.avatar, k.nick + '’s Fren avatar').then(function (av) { if (lastFace !== faceKey) return; box.textContent = ''; if (av) box.appendChild(av); else box.innerHTML = frog; });
+    }
+    var prog = $('king-progress');
+    prog.hidden = !(k.you && k.defenses < 10);
+    if (!prog.hidden) { prog.textContent = ''; prog.appendChild(document.createTextNode('Long Live the King stamp: ')); prog.appendChild(mk('b', null, k.defenses + '/10')); prog.appendChild(document.createTextNode(' duels won in a row' + (me && me.discord ? '.' : ' (log on with Discord to get the stamp).'))); }
     $('king-pass').hidden = !k.passport;
     $('king-pass').onclick = function () { N.open('passport', k.passport); };
 

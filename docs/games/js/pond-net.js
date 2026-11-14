@@ -119,3 +119,34 @@
   window.PondNet = window.PondNet || {};
   window.PondNet.px = { PAL: PAL, SPRITES: SPRITES, rects: rects, sprite: sprite };
 })();
+
+// ---------- Fren avatars (the same layers and rules as the PondOS Avatar Maker, docs/meme/meme.js) ----------
+(function () {
+  'use strict';
+  var BASE = '../meme/', opts = null, SLOTS = ['bg', 'clothing', 'mouth', 'eyes', 'hat', 'accessory', 'special'];
+  function options() {
+    if (!opts) { opts = fetch(BASE + 'avatar-options.json?v=20261111launch').then(function (r) { if (!r.ok) throw new Error('avatar'); return r.json(); }); opts.catch(function () { opts = null; }); }
+    return opts;
+  }
+  function pick(o, k, id) { return (o.options[k] || []).filter(function (p) { return p.id === id; })[0]; }
+  // a stack of layer pictures for a saved look, or null when the look is not a known one
+  function avatar(look, label) {
+    return options().then(function (o) {
+      if (!look || SLOTS.some(function (k) { return !pick(o, k, k === 'special' && !look.special ? 'special_none' : look[k]); })) return null;
+      var special = look.special && look.special !== 'special_none';
+      var s = document.createElement('span'); s.className = 'fa-stack' + (special ? ' is-special' : '');
+      if (label) { s.setAttribute('role', 'img'); s.setAttribute('aria-label', label); } else s.setAttribute('aria-hidden', 'true');
+      o.layers_order.forEach(function (layer) {
+        var im = document.createElement('img'); im.alt = ''; im.draggable = false; im.dataset.layer = layer;
+        im.src = BASE + (layer === 'base' ? (o.paths.base || o.paths.layer_template.replace('{id}', o.defaults.base)) : o.paths.layer_template.replace('{id}', look[layer] || 'special_none'));
+        s.appendChild(im);
+      });
+      // a cigarette or a pipe sits in the corner of the chosen mouth, under the mouth layer (as in the Maker)
+      var acc = s.querySelector('img[data-layer="accessory"]'), mouth = s.querySelector('img[data-layer="mouth"]');
+      var a = (pick(o, 'accessory', look.accessory) || {}).in_mouth, c = (pick(o, 'mouth', look.mouth) || {}).corner;
+      if (acc && mouth && a && c) { acc.style.translate = ((c[0] - a[0]) / 5.12) + '% ' + ((c[1] - a[1]) / 5.12) + '%'; s.insertBefore(acc, mouth); }
+      return s;
+    }).catch(function () { return null; });
+  }
+  window.PondNet.avatar = avatar;
+})();

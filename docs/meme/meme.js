@@ -127,7 +127,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'pond-king') return '../games/img/pond/pond-king.png'; if (n === 'lilies') return '../games/img/pond/lilies.png'; if (n === 'bulletin') return '../games/img/pond/bulletin.png'; if (n === 'goldhook') return '../games/img/gold-hook/ui/pm-icon-goldhook.png'; if (n === 'goldhook16') return '../games/img/gold-hook/ui/pm-icon-goldhook-16.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'pond-king') return '../games/img/pond/king-stamp.png'; if (n === 'lilies') return '../games/img/pond/lilies.png'; if (n === 'bulletin') return '../games/img/pond/bulletin.png'; if (n === 'goldhook') return '../games/img/gold-hook/ui/pm-icon-goldhook.png'; if (n === 'goldhook16') return '../games/img/gold-hook/ui/pm-icon-goldhook-16.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
   // Hall of Fame icon: the owner's art (gold cup + open Pepe passport) goes to img/ico/hall-of-fame.webp, then this
   // line becomes 'img/ico/hall-of-fame.webp'. Until then the LEADERS trophy stands in (no new art is made here).
   var HOF_ICON = 'img/ico/leaders.webp';
@@ -1882,7 +1882,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261111launch';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261113lock'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261114king'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -2069,6 +2069,7 @@
   function ppStamp(x, earned) {
     if (earned && x.id === 'pond_pioneer') return el('span', {class:'pp-art pp-art-stamp is-pioneer',role:'img','aria-label':'Pond Pioneer'});
     if (earned && x.id === 'pond_dominator') return el('span', { class: 'pp-art pp-art-stamp is-dominator', 'aria-hidden': 'true' });
+    if (earned && x.id === 'long_live_the_king') return el('span', { class: 'pp-art pp-art-stamp is-pondking', 'aria-hidden': 'true' });
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
     if (!earned) return ppSprite('pp-art pp-art-stamp', PP_STAMPS, 'locked');
     var pending = el('span', { class: 'pp-art pp-art-stamp is-pending', 'aria-hidden': 'true' });
