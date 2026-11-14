@@ -167,12 +167,9 @@
         $('wait-title').textContent = cd.network ? 'Somebody on your network just fought' : cd.won ? 'You fought not long ago' : '🩹 Still bruised';
         $('wait-line').textContent = (cd.network ? 'One duel every 4 hours per network. ' : cd.won ? 'One duel every 4 hours, fren. '
           : 'The king gave you a proper beating. Your frog needs its rest. ') + 'Next duel ' + untilText(cd.next_at) + '.';
-      } else if (s.tried && s.tried.network) {
-        $('wait-title').textContent = 'Someone on your network got here first';
-        $('wait-line').textContent = 'Each king can be challenged once per network. When a new frog takes the throne, you get a fresh shot.';
       } else {
-        $('wait-title').textContent = s.tried && s.tried.won ? 'You beat this king once' : 'You already met this king';
-        $('wait-line').textContent = 'One duel per king. When somebody else knocks ' + k.nick + ' off the throne, come back and try the new king.';
+        $('wait-title').textContent = 'The throne is busy';
+        $('wait-line').textContent = 'Check again in a moment.';
       }
     }
 
@@ -224,7 +221,7 @@
 
   var ERR = {
     changed: 'While you were choosing, a new king took the throne. Have a look at them first.',
-    tried: 'You already challenged this king.', network: 'Someone on your network already challenged this king.',
+    tried: 'Wait for your next duel.', network: 'Wait for your next duel.',
     self: 'You cannot challenge yourself, your majesty.', nick: 'Name: 2 to 20 letters, digits, spaces, _ . -',
     nick_bad: 'Pick a different name.', moves: 'Pick a move for every round.', busy: 'The pond is busy. Try again in a few minutes.',
     slow: 'Slow down a little, fren. Try again in a few minutes.', wait: 'Still bruised from your last duel. One duel every 4 hours, fren.', token: 'Your browser blocked the game’s storage. Reload and try again.'

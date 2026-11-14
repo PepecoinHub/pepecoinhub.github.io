@@ -10,7 +10,7 @@ import { SKIP, pondDb, addUser } from './pond-sql-setup.mjs';
 const BEATS = { r: 's', s: 'p', p: 'r' };   // what each move beats
 const counter = m => ({ r: 'p', p: 's', s: 'r' })[m];
 
-test('Pond King: hidden moves, one duel per king per player and network, the throne changes hands safely',
+test('Pond King: hidden moves, one duel every 4 hours per player (and network), the throne changes hands safely',
   { skip: SKIP, timeout: 120000 }, async () => {
   const { db, drop } = await pondDb('pond_king_test', ['update_pond_bulletin.sql', 'update_pond_king.sql']);
   try {
@@ -73,13 +73,14 @@ test('Pond King: hidden moves, one duel per king per player and network, the thr
     await db.query("update games.pk_duels set created_at = created_at - interval '3 hours 59 minutes'");
     assert.equal((await duel(tok(1), '1.1.1.1', k0, 'Loser', 'ppp')).error, 'wait');
     await db.query("update games.pk_duels set created_at = created_at + interval '3 hours 59 minutes'");
-    // 4 hours later: still once per king per player, and per network
+    // 4 hours later: the same player may take on the same king again (no limit per king since 2026-11-14)
     await later();
-    assert.equal((await duel(tok(1), '1.1.1.1', k0, 'Loser', 'ppp')).error, 'tried');
-    assert.equal((await duel(tok(2), '1.1.1.1', k0, 'Sneaky', 'ppp')).error, 'network');
-    const s1c = await state(tok(2), '1.1.1.1');
-    assert.equal(s1c.can_challenge, false); assert.equal(s1c.cooldown, null); assert.equal(s1c.tried.network, true);
-    assert.equal((await state(tok(1), '1.1.1.1')).tried.won, false);
+    const s1c = await state(tok(1), '1.1.1.1');
+    assert.equal(s1c.can_challenge, true); assert.equal(s1c.cooldown, null); assert.equal(s1c.tried.won, false);
+    const rematch = await duel(tok(1), '1.1.1.1', k0, 'Loser', 'sss');
+    assert.equal(rematch.ok, true); assert.equal(rematch.won, false); assert.equal(rematch.king.defenses, 2);
+    // and the network waits 4 hours again, for players without a Discord account
+    assert.equal((await duel(tok(2), '1.1.1.1', k0, 'Sneaky', 'ppp')).error, 'wait');
 
     // a tie keeps the king: rock, paper, scissors against rrr = 0 : 1 : 0 -> 1 win, 1 loss
     const tie = await duel(tok(3), '3.3.3.3', k0, 'Tie', 'rps');
@@ -92,7 +93,7 @@ test('Pond King: hidden moves, one duel per king per player and network, the thr
     assert.equal(s2.king.nick, 'Winner'); assert.equal(s2.king.you, true); assert.equal(s2.king.moves, 'ppr');
     assert.equal(s2.can_challenge, false); assert.equal(s2.king.defenses, 0);
     // the old king's reign stays in the top list
-    assert.ok(s2.top.some(t => t.nick === 'Pepe' && t.defenses === 2 && !t.reigning));
+    assert.ok(s2.top.some(t => t.nick === 'Pepe' && t.defenses === 3 && !t.reigning));
     // nobody else sees the moves
     assert.equal((await state(tok(5), '5.5.5.5')).king.moves, null);
     // the king cannot challenge themselves
@@ -103,7 +104,8 @@ test('Pond King: hidden moves, one duel per king per player and network, the thr
     // the king changes the defence; nobody else may
     assert.equal((await setMoves(tok(5), '5.5.5.5', 'sss')).error, 'not_king');
     assert.equal((await setMoves(tok(4), '4.4.4.4', 'sss')).ok, true);
-    // with a new king the earlier loser may try again; scissors x3 is beaten by rock x3
+    // with a new king (and the 4 hours over) the earlier loser tries again; scissors x3 is beaten by rock x3
+    await later();
     const back = await duel(tok(1), '1.1.1.1', win.new_king_id, 'Loser', 'rrr');
     assert.equal(back.won, true);
     // the shuffled order is always a permutation of the king's moves

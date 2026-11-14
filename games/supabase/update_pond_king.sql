@@ -11,7 +11,7 @@
 --     change them at any time while they reign. A lost duel adds one defence to the king's reign.
 --   * ONE DUEL EVERY 4 HOURS: one duel per player (browser token or account) and per network (hashed IP)
 --     in any 4 hours, whoever sits on the throne. The clock runs from the last duel.
---   * And one duel per king per player and per network: losing to a king means waiting for a new king
+--   * No limit per king: after the 4-hour wait a player may challenge the same king again (since 2026-11-14)
 --     (and a new day). Nobody can challenge themselves.
 --   * Fren Passport stamp "Long Live the King": hold one reign against 10 challengers, i.e. 10 duels won in a
 --     row as king. Discord accounts only (games.passport_award checks), awarded once, from server records.
@@ -52,7 +52,9 @@ create table if not exists games.pk_duels (
   won         boolean not null,
   created_at  timestamptz not null default now()
 );
-create unique index if not exists pk_duels_once on games.pk_duels (king_id, token_hash);
+-- (2026-11-14) no more "one duel per king": a player may come back for the same king after the 4-hour wait
+drop index if exists games.pk_duels_once;
+create index if not exists pk_duels_player on games.pk_duels (king_id, token_hash);
 create index if not exists pk_duels_ip on games.pk_duels (ip_hash, created_at);
 create index if not exists pk_duels_king on games.pk_duels (king_id, created_at desc);
 create index if not exists pk_duels_time on games.pk_duels (created_at);
@@ -109,7 +111,7 @@ create or replace function games.pk_cooldown() returns interval language sql imm
 $$;
 
 -- the latest duel of this player (by token or account) or of this network within the cooldown, if any
--- The network rules (one duel per king per network, the 4-hour wait per network) are for players the pond
+-- The network rule (the 4-hour wait also per network) is for players the pond
 -- cannot tell apart otherwise: no account, or a guest account (cheap to make). A Discord account is checked by
 -- the account itself, so frens behind one shared address (a home, a mobile network) do not block each other.
 create or replace function games.pk_by_net(u uuid) returns boolean language sql stable security definer set search_path = '' as $$
@@ -177,32 +179,27 @@ declare
   u uuid := auth.uid();
   ip text := games.client_ip_hash();
   k games.pk_kings;
-  mine games.pk_duels;
+  mine games.pk_duels;   -- your last duel with this king (shown, never a block)
   last games.pk_duels;
-  ip_used boolean := false;
   you boolean;
 begin
   select * into k from games.pk_kings where ended_at is null;
   if k.id is null then return jsonb_build_object('king', null); end if;
   you := games.pk_is(k.token_hash, k.user_id, th, u);
   select * into mine from games.pk_duels d where d.king_id = k.id and games.pk_is(d.token_hash, d.user_id, th, u) limit 1;
-  if ip is not null and mine.id is null and games.pk_by_net(u) then
-    ip_used := exists (select 1 from games.pk_duels where king_id = k.id and ip_hash = ip);
-  end if;
   last := games.pk_last(th, u, ip);
   return jsonb_build_object(
     'king', jsonb_build_object('id', k.id, 'nick', k.nick, 'defenses', k.defenses, 'since', k.crowned_at,
                                'house', k.token_hash is null and k.user_id is null, 'you', you,
                                'passport', games.passport_id(k.user_id), 'avatar', games.pk_avatar(k.user_id),
                                'moves', case when you then k.moves end),
-    'can_challenge', not you and mine.id is null and not ip_used and last.id is null,
+    'can_challenge', not you and last.id is null,
     -- one duel every 4 hours: the duel that started the wait (yours, or one from your network) and when it ends
     'cooldown', case when last.id is not null then jsonb_build_object(
                     'won', last.won, 'at', last.created_at,
                     'network', not games.pk_is(last.token_hash, last.user_id, th, u),
                     'next_at', last.created_at + games.pk_cooldown()) end,
-    'tried', case when mine.id is not null then jsonb_build_object('won', mine.won, 'at', mine.created_at)
-                  when ip_used then jsonb_build_object('network', true) end,
+    'tried', case when mine.id is not null then jsonb_build_object('won', mine.won, 'at', mine.created_at) end,
     'duels_today', (select count(*) from games.pk_duels where created_at > now() - interval '24 hours'),
     'top', coalesce((select jsonb_agg(jsonb_build_object('nick', t.nick, 'defenses', t.defenses, 'reigning', t.ended_at is null,
                                                          'since', t.crowned_at, 'until', t.ended_at, 'you', games.pk_is(t.token_hash, t.user_id, th, u),
@@ -261,10 +258,6 @@ begin
   -- one duel every 4 hours per player and per network
   if (games.pk_last(th, u, ip)).id is not null then
     return jsonb_build_object('ok', false, 'error', 'wait', 'next_at', (games.pk_last(th, u, ip)).created_at + games.pk_cooldown()); end if;
-  if exists (select 1 from games.pk_duels d where d.king_id = k.id and games.pk_is(d.token_hash, d.user_id, th, u)) then
-    return jsonb_build_object('ok', false, 'error', 'tried'); end if;
-  if ip is not null and games.pk_by_net(u) and exists (select 1 from games.pk_duels where king_id = k.id and ip_hash = ip) then
-    return jsonb_build_object('ok', false, 'error', 'network'); end if;
 
   -- and a ceiling for the whole pond: 300 duels an hour
   if (select count(*) from games.pk_duels where created_at > now() - interval '1 hour') >= 300 then
