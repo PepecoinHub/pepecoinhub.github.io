@@ -129,7 +129,7 @@
     // the leader's face: their Fren avatar (Discord players who saved one), otherwise the pond's king frog
     var faceKey = k.avatar ? JSON.stringify(k.avatar) : '';
     if (faceKey !== lastFace) {
-      lastFace = faceKey; var box = $('king-face'), frog = '<img class="throne-frog" src="img/pond/pond-king.png" alt="" width="96" height="96">';
+      lastFace = faceKey; var box = $('king-face'), frog = '<img class="throne-frog" src="img/pond/pond-king.png?v=pepe" alt="" width="96" height="96">';
       if (!k.avatar) box.innerHTML = frog;
       else N.avatar(k.avatar, k.nick + '’s Fren avatar').then(function (av) { if (lastFace !== faceKey) return; box.textContent = ''; if (av) box.appendChild(av); else box.innerHTML = frog; });
     }
