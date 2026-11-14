@@ -86,6 +86,31 @@
   var fitting = false;
   function gadget() { document.documentElement.classList.add('gadget'); if (!fitting) { fitting = true; fit(); } }
   if (framed && !/[?&]gadget=1(&|$)/.test(location.search)) { fitting = true; document.addEventListener('DOMContentLoaded', fit); }
+  // ---------- sharing: the phone's own share sheet, or a copied link; plus a ready post for X ----------
+  var SITE = 'https://pepecoinhub.com/meme/';
+  function copy(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+    return new Promise(function (ok, no) {
+      var a = document.createElement('textarea'); a.value = t; a.setAttribute('readonly', ''); a.className = 'copy-tmp';
+      document.body.appendChild(a); a.select();
+      try { if (document.execCommand('copy')) ok(); else no(new Error('copy')); } catch (e) { no(e); }
+      a.remove();
+    });
+  }
+  // o: { text, url } (url: a PondOS link such as SITE + '#king'). Returns a row of 98-style buttons.
+  function shareRow(o, label) {
+    var row = mk('div', 'share-row'), b = mk('button', 'go', label || (navigator.share ? 'Share' : 'Copy link')); b.type = 'button';
+    b.addEventListener('click', function () {
+      if (navigator.share) { navigator.share({ title: 'PondOS 98', text: o.text, url: o.url }).catch(function () {}); return; }
+      var old = b.textContent;
+      copy(o.text + ' ' + o.url).then(function () { b.textContent = 'Link copied ✓'; }, function () { b.textContent = 'Copy failed'; });
+      setTimeout(function () { b.textContent = old; }, 2200);
+    });
+    var x = mk('a', 'btn-x', 'Post on X'); x.target = '_blank'; x.rel = 'noopener';
+    x.href = 'https://x.com/intent/post?text=' + encodeURIComponent(o.text + '\n' + o.url);
+    row.appendChild(b); row.appendChild(x);
+    return row;
+  }
   // a length of time, short: 45 min, 3 h 20 min, 2 d 5 h
   function dur(sec) {
     var m = Math.floor((sec || 0) / 60), h = Math.floor(m / 60), d = Math.floor(h / 24);
@@ -118,7 +143,7 @@
     return Math.floor(s / 3600) + ' h left';
   }
   function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-  window.PondNet = { session: session, me: me, rpc: rpc, open: open, framed: framed, embedded: embedded, ago: ago, left: left, mk: mk, gadget: gadget, dur: dur, tabs: tabs, cleanNick: cleanNick, nickOk: nickOk, NICK_RULE: NICK_RULE };
+  window.PondNet = { session: session, me: me, rpc: rpc, open: open, framed: framed, embedded: embedded, ago: ago, left: left, mk: mk, gadget: gadget, dur: dur, tabs: tabs, cleanNick: cleanNick, nickOk: nickOk, NICK_RULE: NICK_RULE, shareRow: shareRow, copy: copy, SITE: SITE };
   document.addEventListener('DOMContentLoaded', function () { document.querySelectorAll('.mini-tabs').forEach(tabs); });
 })();
 

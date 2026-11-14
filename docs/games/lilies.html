@@ -6,8 +6,8 @@
 <meta name="description" content="A strategy duel for two frogs who never have to be online together. Spread 10 flies over three lily pads, win two pads, win the duel.">
 <meta name="robots" content="noindex">
 <link rel="canonical" href="https://pepecoinhub.com/games/lilies.html"><link rel="icon" href="img/pond/lilies.png" type="image/png">
-<link rel="stylesheet" href="pond.css?v=20261114nick"><link rel="stylesheet" href="lilies.css?v=20261114nopre">
-<script src="js/config.js"></script><script src="js/pond-net.js?v=20261114nick" defer></script><script src="js/lilies.js?v=20261114nopre" defer></script>
+<link rel="stylesheet" href="pond.css?v=20261114share"><link rel="stylesheet" href="lilies.css?v=20261114share">
+<script src="js/config.js"></script><script src="js/pond-net.js?v=20261114share" defer></script><script src="js/lilies.js?v=20261114share" defer></script>
 </head><body>
 <header class="site-bar"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · FLY TRAFFIC CONTROL</span><a href="bulletin.html">Pond Bulletin ↗</a></header>
 <main class="desk">
@@ -33,7 +33,7 @@
   <div class="pk-body">
     <div class="panel signin" id="signin" hidden>
       <h2>Log on to fight</h2>
-      <p class="muted">Every fly needs a pilot. Log on once with Discord or as a guest, and your duels follow you. Watching the challenges is free.</p>
+      <p class="muted">Every fly needs a pilot. Log on once with Discord or as a guest, and your duels follow you. A challenge you picked opens right after.</p>
       <button type="button" class="go" id="logon">Log On to the Pond</button>
     </div>
 
@@ -84,6 +84,7 @@
     <!-- my matches -->
     <section class="panel" id="tab-mine" hidden>
       <h2>My matches</h2>
+      <div class="posted" id="posted" hidden></div>
       <div class="stats row5 ly-record" id="mystats">
         <div class="stat"><b id="st-wins">0</b><small>wins</small></div>
         <div class="stat"><b id="st-losses">0</b><small>losses</small></div>

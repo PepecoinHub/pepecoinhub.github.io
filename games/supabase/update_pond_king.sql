@@ -109,11 +109,18 @@ create or replace function games.pk_cooldown() returns interval language sql imm
 $$;
 
 -- the latest duel of this player (by token or account) or of this network within the cooldown, if any
+-- The network rules (one duel per king per network, the 4-hour wait per network) are for players the pond
+-- cannot tell apart otherwise: no account, or a guest account (cheap to make). A Discord account is checked by
+-- the account itself, so frens behind one shared address (a home, a mobile network) do not block each other.
+create or replace function games.pk_by_net(u uuid) returns boolean language sql stable security definer set search_path = '' as $$
+  select u is null or games.discord_identity(u) is null
+$$;
+
 create or replace function games.pk_last(th text, u uuid, ip text) returns games.pk_duels
 language sql stable security definer set search_path = '' as $$
   select d.* from games.pk_duels d
    where d.created_at > now() - games.pk_cooldown()
-     and (games.pk_is(d.token_hash, d.user_id, th, u) or (ip is not null and d.ip_hash = ip))
+     and (games.pk_is(d.token_hash, d.user_id, th, u) or (ip is not null and games.pk_by_net(u) and d.ip_hash = ip))
    order by d.created_at desc limit 1
 $$;
 
@@ -179,7 +186,7 @@ begin
   if k.id is null then return jsonb_build_object('king', null); end if;
   you := games.pk_is(k.token_hash, k.user_id, th, u);
   select * into mine from games.pk_duels d where d.king_id = k.id and games.pk_is(d.token_hash, d.user_id, th, u) limit 1;
-  if ip is not null and mine.id is null then
+  if ip is not null and mine.id is null and games.pk_by_net(u) then
     ip_used := exists (select 1 from games.pk_duels where king_id = k.id and ip_hash = ip);
   end if;
   last := games.pk_last(th, u, ip);
@@ -256,7 +263,7 @@ begin
     return jsonb_build_object('ok', false, 'error', 'wait', 'next_at', (games.pk_last(th, u, ip)).created_at + games.pk_cooldown()); end if;
   if exists (select 1 from games.pk_duels d where d.king_id = k.id and games.pk_is(d.token_hash, d.user_id, th, u)) then
     return jsonb_build_object('ok', false, 'error', 'tried'); end if;
-  if ip is not null and exists (select 1 from games.pk_duels where king_id = k.id and ip_hash = ip) then
+  if ip is not null and games.pk_by_net(u) and exists (select 1 from games.pk_duels where king_id = k.id and ip_hash = ip) then
     return jsonb_build_object('ok', false, 'error', 'network'); end if;
 
   -- and a ceiling for the whole pond: 300 duels an hour
@@ -324,6 +331,7 @@ begin
   return jsonb_build_object('ok', true, 'moves', v_moves);
 end $$;
 
+revoke all on function games.pk_by_net(uuid) from public, anon, authenticated;
 revoke all on function games.pk_player(text, uuid), games.pk_stat_add(text, text, int, int, int, int, bigint) from public, anon, authenticated;
 revoke all on function games.pk_token_hash(text), games.pk_beats(text, text), games.pk_is(text, uuid, text, uuid), games.pk_cooldown(), games.pk_last(text, uuid, text), games.pk_avatar(uuid) from public, anon, authenticated;
 revoke all on function public.gry_pk_state(text), public.gry_pk_challenge(text, bigint, text, text), public.gry_pk_set_moves(text, text) from public;

@@ -1180,7 +1180,8 @@
       }, function () { boardDoor.hidden = true; });
     }, 0);
     if (location.hash === '#king') setTimeout(function () { pondKingApp(); }, 0);
-    if (location.hash === '#lilies') setTimeout(function () { liliesApp(); }, 0);
+    var lh = /^#lilies(?:=([0-9a-f-]{36}))?$/i.exec(location.hash);   // a shared challenge: #lilies=<id>
+    if (lh) setTimeout(function () { liliesApp(lh[1]); }, 0);
     if (location.hash === '#bulletin') setTimeout(function () { bulletinApp(); }, 0);
     setTimeout(function () {
       var tk = null; try { tk = localStorage.getItem('pk-token'); } catch (e) {}
@@ -1192,6 +1193,7 @@
           : 'Holds the throne: ' + k.defenses + (k.defenses === 1 ? ' defence' : ' defences') + '. One duel every 4 h';
         // the POND KING gadget: a small game window right on the desktop (a card in the page on a phone)
         pondKingGadget(cards, !k.you && !!st.cooldown);
+        pondNews(st);
       }, function () { kingDoor.hidden = true; });   // until update_pond_king.sql runs, the door stays out of the way
     }, 0);
     var stats = card.querySelector('.tp-stats'), bits = [];
@@ -1591,8 +1593,9 @@
   }
   // POND KING: rock, paper, scissors for the throne (games/pond-king.html); one frog reigns until a visitor beats it
   function pondKingApp() {
+    pondBadge('king', 0);
     var A = openApp('pondking', 'POND KING', 'pond-king', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame fit-frame" src="' + BASE + 'games/pond-king.html?embed=1" title="POND KING" allow="web-share"></iframe>';
+      A.body.innerHTML = '<iframe class="app-frame fit-frame" src="' + BASE + 'games/pond-king.html?embed=1" title="POND KING" allow="web-share; clipboard-write"></iframe>';
     }, 720);
     return A;
   }
@@ -1613,8 +1616,8 @@
         '<button type="button" role="tab" data-g="king"><img src="' + ico('pond-king') + '" alt="" width="16" height="16">Pond King</button>' +
         '<button type="button" role="tab" data-g="lilies"><img src="' + ico('lilies') + '" alt="" width="16" height="16">Lilies <b class="gd-n" hidden></b></button>' +
       '</div>' +
-      '<iframe class="app-frame gadget-frame" data-g="king" title="Pond King" allow="web-share"></iframe>' +
-      '<iframe class="app-frame gadget-frame" data-g="lilies" title="Battle of Three Lilies"></iframe>');
+      '<iframe class="app-frame gadget-frame" data-g="king" title="Pond King" allow="web-share; clipboard-write"></iframe>' +
+      '<iframe class="app-frame gadget-frame" data-g="lilies" title="Battle of Three Lilies" allow="web-share; clipboard-write"></iframe>');
     var urls = { king: src, lilies: lsrc };
     box.show = function (g) {
       box.querySelectorAll('[role="tab"]').forEach(function (t) { t.setAttribute('aria-selected', String(t.getAttribute('data-g') === g)); });
@@ -1659,13 +1662,60 @@
       A.host.querySelector('.w-x').addEventListener('click', function () { try { localStorage.setItem('pk-gadget-closed', new Date().toISOString().slice(0, 10)); } catch (e) {} });
     }, 1200);
   }
+  // ---------- pond news: what happened while the fren was away (no mail, no push: a balloon and a red dot) ----------
+  // POND KING: the browser remembers the reign it saw you on; when another frog sits there now, the throne fell.
+  // THREE LILIES: your challenges settled since the last visit (gry_lily_my, guests too). The first visit only
+  // remembers "now", so nobody gets a pile of old news.
+  function pondBadge(which, n) {
+    document.querySelectorAll('.icons a[href="#' + which + '"]').forEach(function (a) {
+      var b = a.querySelector('.pond-new');
+      if (!b) { if (!n) return; b = el('span', { class: 'pond-new mail-badge', title: 'News from the pond' }); a.appendChild(b); }
+      b.textContent = n; b.hidden = !n;
+    });
+  }
+  var pondNotes = 0;   // one balloon after another, not on top of each other
+  function pondNote(title, html, icon, go) {
+    setTimeout(function () {
+      var t = balloon(title, html, icon);
+      t.classList.add('is-link'); t.setAttribute('role', 'button'); t.tabIndex = 0;
+      t.addEventListener('click', function (e) { if (e.target.closest('button')) return; go(); t.remove(); });
+    }, 6500 * pondNotes++);
+  }
+  function pondNews(st) {
+    var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} } };
+    var k = st && st.king;
+    if (k) {
+      var reign = store.get('pk-my-reign');
+      if (k.you) store.set('pk-my-reign', String(k.id));
+      else if (reign && reign !== String(k.id)) {
+        store.set('pk-my-reign', null); pondBadge('king', 1);
+        pondNote('POND KING', 'You lost the throne. <b>' + esc(k.nick) + '</b> rules the pond now. Take it back!', 'pond-king', pondKingApp);
+      }
+    }
+    var tok = null;
+    try { var ss = JSON.parse(localStorage.getItem(SB_STORE) || 'null'); if (ss && ss.access_token && ss.expires_at * 1000 > Date.now() + 30000) tok = ss.access_token; } catch (e) {}
+    if (!tok) return;
+    fetch(SB_URL + '/rest/v1/rpc/gry_lily_my', { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
+      .then(function (r) { return r.ok ? r.json() : null; }).then(function (r) {
+        var ms = (r && r.matches || []).filter(function (m) { return m.status === 'completed' && m.mine && m.completed_at; });
+        var seen = store.get('ly-seen'), last = ms.reduce(function (a, m) { return m.completed_at > a ? m.completed_at : a; }, seen || '');
+        if (last) store.set('ly-seen', last);
+        if (!seen) return;
+        var fresh = ms.filter(function (m) { return m.completed_at > seen; });
+        if (!fresh.length) return;
+        pondBadge('lilies', fresh.length);
+        var m = fresh[0], how = m.outcome === 'win' ? 'you won!' : m.outcome === 'lose' ? 'they won this time.' : 'a draw.';
+        pondNote('BATTLE OF THREE LILIES', '<b>' + esc(m.opponent || 'A fren') + '</b> accepted your challenge: ' + how + (fresh.length > 1 ? ' (+' + (fresh.length - 1) + ' more)' : ''), 'lilies', function () { liliesApp(m.id); });
+      }).catch(function () {});
+  }
   // BATTLE OF THREE LILIES (games/lilies.html): 10 flies on 3 lily pads, two frens, no need to be online together.
   // id: a challenge to accept or a duel to show; 'new' opens "Create Challenge". An open window is pointed there.
   function liliesApp(id) {
+    pondBadge('lilies', 0);
     var q = id === 'new' ? '&tab=create' : id && /^[0-9a-f-]{36}$/i.test(id) ? '&c=' + id : '';
     var src = BASE + 'games/lilies.html?embed=1' + q;
     var A = openApp('lilies', 'BATTLE OF THREE LILIES.EXE', 'lilies', function (A) {
-      A.body.innerHTML = '<iframe class="app-frame fit-frame" src="' + src + '" title="Battle of Three Lilies"></iframe>';
+      A.body.innerHTML = '<iframe class="app-frame fit-frame" src="' + src + '" title="Battle of Three Lilies" allow="web-share; clipboard-write"></iframe>';
     }, 720);
     var fr = A.body.querySelector('iframe'); if (q && fr && fr.getAttribute('src') !== src) fr.setAttribute('src', src);
     return A;

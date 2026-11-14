@@ -27,6 +27,7 @@
   function show(tab) {
     TABS.forEach(function (t) { $('tab-' + t).hidden = t !== tab; });
     $('leaders').hidden = tab !== 'open';
+    if (tab !== 'mine') $('posted').hidden = true;
     document.querySelectorAll('.menubar [data-tab]').forEach(function (b) {
       var on = b.dataset.tab === tab || (tab === 'result' && b.dataset.tab === 'mine'); b.setAttribute('aria-pressed', String(on));
     });
@@ -93,7 +94,7 @@
     $('left-line').className = 'left' + (left === 0 ? ' done' : '');
     $('left-line').lastChild.textContent = left === 0 ? ' left. All 10 flies in position!' : ' still buzzing around';
     $('submit').disabled = busy || s !== 10 || !me || !nickOk();
-    $('nick-hint').hidden = nickOk();
+    $('nick-hint').hidden = nickOk() || !me || !nick.value.trim();
   }
   var nick = $('nick');
   function nickOk() { return N.nickOk(nick.value); }
@@ -129,6 +130,9 @@
       if (mode.kind === 'accept') { showResult(r.match, true); return; }
       status('Challenge posted. 48 hours on the clock.');
       show('mine');
+      var box = $('posted'); box.textContent = ''; box.hidden = false;
+      box.appendChild(mk('p', null, 'Challenge posted! Call a fren to accept it: whoever opens the link lands right on your challenge.'));
+      box.appendChild(N.shareRow({ text: 'I hid 10 flies on 3 lily pads in BATTLE OF THREE LILIES on PondOS 98. Find them and beat me 🐸🪰', url: N.SITE + '#lilies=' + r.challenge.id }, 'Share my challenge'));
     }, function (e) {
       busy = false; paint();
       $('alloc-msg').textContent = e.status === 401 ? 'Your log-on ran out. Log on again.' : 'The pond did not answer. Try again.';
@@ -169,8 +173,13 @@
       : m.outcome === 'lose' ? other + ' read the pond better this time. The flies are already asking for a rematch.'
         : 'Nobody took two lilies. The pond remains divided.';
     var acts = $('res-actions'); acts.textContent = '';
+    var oldBrag = $('tab-result').querySelector('.share-row'); if (oldBrag) oldBrag.remove();
     var bt = function (label, cls, fn) { var b = mk('button', cls, label); b.type = 'button'; b.addEventListener('click', fn); acts.appendChild(b); };
     bt('Rematch', 'go', function () { startRematch(m.id, other); });
+    if (m.outcome === 'win') {
+      var brag = N.shareRow({ text: 'I just beat ' + other + ' ' + won + ':' + lost + ' in BATTLE OF THREE LILIES on PondOS 98. Who is next? 🐸🪰', url: N.SITE + '#lilies' }, 'Share your win');
+      brag.classList.add('brag'); acts.parentNode.insertBefore(brag, acts.nextSibling);
+    }
     if (otherPass) bt('View Passport', '', function () { N.open('passport', otherPass); });
     bt('Back to Pond Bulletin', '', function () { N.open('bulletin'); });
     status(m.outcome === 'win' ? 'Victory. The flies are buzzing.' : m.outcome === 'lose' ? 'Defeat. Regroup the flies.' : 'A draw.');
@@ -254,13 +263,14 @@
         li.appendChild(t);
         var acts = mk('div', 'acts');
         if (c.mine) {
+          if (!GADGET) t.appendChild(N.shareRow({ text: 'I hid 10 flies on 3 lily pads in BATTLE OF THREE LILIES on PondOS 98. Find them and beat me 🐸🪰', url: N.SITE + '#lilies=' + c.id }, 'Share'));
           var cx = mk('button', null, 'Cancel'); cx.type = 'button'; cx.addEventListener('click', function () { cancel(c.id); }); acts.appendChild(cx);
         } else if (!c.invitee || c.for_me) {
           var ac = mk('button', 'go accept', 'Accept'); ac.type = 'button';
           ac.setAttribute('aria-label', 'Accept the challenge from ' + c.creator);
           ac.addEventListener('click', function () {
             if (GADGET) return N.open('lilies', c.id);
-            if (!me) { show('create'); $('signin').hidden = false; return; } startAccept(c);
+            if (!me) { pend(c.id); show('create'); $('signin').hidden = false; status('Log on and ' + c.creator + '’s challenge opens right after.'); return; } startAccept(c);
           });
           acts.appendChild(ac);
         }
@@ -336,16 +346,46 @@
     $('who').textContent = me ? (me.name || 'guest') + (me.discord ? ' ✓' : ' (guest)') : 'not logged on';
     if (me && me.name) nick.value = me.name;
     var q = new URLSearchParams(location.search), cid = q.get('c');
-    if (cid && /^[0-9a-f-]{36}$/i.test(cid)) {
-      N.rpc('gry_lily_result', { p_id: cid }).then(function (r) {
-        var m = r && r.match; if (!m) return show('open');
-        if (m.status === 'open' && !m.mine && me && (!m.invitee || m.for_me)) startAccept(m);
-        else if (m.status === 'completed' && m.you) showResult(m);
-        else if (m.status === 'completed') showPublic(m);
-        else show('open');
-      }, function () { show('open'); });
-    } else show(q.get('tab') === 'create' ? 'create' : 'open');
-    if (q.get('tab') === 'create') startCreate();
+    var waiting = me && taken();   // a challenge picked before Log On
+    if (waiting) openById(waiting);
+    else if (cid && /^[0-9a-f-]{36}$/i.test(cid)) openById(cid);
+    else show(q.get('tab') === 'create' ? 'create' : 'open');
+    if (q.get('tab') === 'create' && !waiting) startCreate();
   });
+  // one challenge by its id: accept it, or show how it ended
+  function openById(cid) {
+    N.rpc('gry_lily_result', { p_id: cid }).then(function (r) {
+      var m = r && r.match; if (!m) return show('open');
+      if (m.status === 'open' && !m.mine && me && (!m.invitee || m.for_me)) startAccept(m);
+      else if (m.status === 'open' && !me) { pend(m.id); show('create'); $('signin').hidden = false; status('Log on and ' + m.creator + '’s challenge opens right after.'); }
+      else if (m.status === 'completed' && m.you) showResult(m);
+      else if (m.status === 'completed') showPublic(m);
+      else show('open');
+    }, function () { show('open'); });
+  }
+  // Accept without being logged on: the challenge waits (30 minutes) and opens as soon as the fren is logged on,
+  // in this window (PondOS logs on in another window: the session lands in localStorage) or after a page change
+  var PEND = 'ly-pending';
+  function pend(id) { try { localStorage.setItem(PEND, JSON.stringify({ id: id, at: Date.now() })); } catch (e) {} }
+  function taken() {
+    try {
+      var p = JSON.parse(localStorage.getItem(PEND) || 'null'); localStorage.removeItem(PEND);
+      if (p && Date.now() - p.at < 30 * 60e3 && /^[0-9a-f-]{36}$/i.test(p.id)) return p.id;
+    } catch (e) {}
+    return null;
+  }
+  function relog() {
+    if (me) return;
+    N.session().then(function (s) {
+      var now = N.me(s); if (!now) return;
+      me = now;
+      $('who').textContent = (me.name || 'guest') + (me.discord ? ' ✓' : ' (guest)');
+      if (me.name) nick.value = me.name;
+      $('signin').hidden = true; paint();
+      var id = taken(); if (id) openById(id);
+    });
+  }
+  window.addEventListener('storage', function (e) { if (e.key && /auth-token$/.test(e.key)) relog(); });
+  window.addEventListener('focus', relog);
   document.addEventListener('visibilitychange', function () { if (!document.hidden && !$('tab-open').hidden) loadOpen(); });
 })();
