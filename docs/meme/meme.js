@@ -3835,7 +3835,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 7, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 8, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -3964,6 +3964,34 @@
       '<div class="app-row"><button type="button" class="app-btn gz-betaad">Watch the PEP-TV ad</button></div></section>' +
       '<p class="gz-foot">See you in the Pond. 🐸 The Editor</p></article>';
   }
+  // Issue #8 (14 Nov 2026): the poll goes on the FRONT page (at the end almost nobody reads it).
+  // 10 YES votes = week 1 of Pepe Guesser gets a 10,000 PEP faucet pot and 5,000 PEP for the Weekly Champion
+  // (games/supabase/update_poll_week1_prize.sql; the poll closes when the week starts, Monday 16 XI 00:00 UTC).
+  function gazette8() {
+    var xText = '🐸 PondOS: a little internet for frogs. Daily Pepe Guesser, a Fren Passport full of stamps, games and free PEP. The first Frog of the Week is crowned 23 November.\nhttps://pepecoinhub.com/meme/';
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #8</span><span>Price: 0 PEP</span><span>Weekend edition</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking gz-pollsec"><p class="gz-flash">Pond Poll · vote now</p><h4>10 frens say YES and week 1 pays double</h4>' +
+      '<div class="gz-wpbox"><img src="img/rich.webp" alt="Pepe reading How to be rich" width="110" height="110"><div>' +
+      '<p>On Monday the first official Pepe Guesser week begins. If <b>10 frens vote YES</b> before it starts, week 1 gets:</p>' +
+      '<ul><li>💧 <b>a 10,000 PEP faucet</b> for the week, double the usual 5,000</li><li>🏆 <b>5,000 PEP for the Weekly Champion</b>, on top of the gold Frog of the Week stamp</li></ul>' +
+      '<p>Fewer than 10? Then week 1 runs like any other week: the usual faucet and the stamp. Your vote is the difference.</p></div></div>' +
+      '<div class="gz-poll" data-poll="week1_prize" aria-live="polite"><p class="gz-poll-msg">Opening the ballot box…</p></div>' +
+      '<p class="gz-fine">One vote per account; guests one per network. The poll closes when the week starts: Monday 16 November, 00:00 UTC. The champion is whoever ends the week (Monday to Sunday, UTC) alone at #1, with Discord: a tie at the top has no winner. Prizes are paid by the host, like the faucet.</p></section>' +
+      '<section class="gz-letters"><p class="gz-kick">Letters to the Editor</p><h4>“I really like it!”</h4>' +
+      '<figure class="gz-letter"><p class="gz-letter-from"><b>Jack</b> ✓ <span class="gz-letter-ok">🖨️ OK to print</span></p>' +
+      '<blockquote>Hey Fren, The passport update is amazing! I really like it!</blockquote><figcaption>12 November, 15:18.</figcaption></figure>' +
+      '<p><b>The editor replies:</b> Thank you, Jack. Letters like this one are why the lights in the pond stay on after midnight. Now go fill that passport. 🐸</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-write">✏️ Write to the Editor</button></div></section>' +
+      '<section class="gz-soon"><p class="gz-kick">From the editor</p><h4>I build this for you</h4>' +
+      '<div class="gz-wpbox"><img src="img/night-shift.webp" alt="Pepe at the computer late at night" width="120" height="84"><div>' +
+      '<p>No ads, no token, no seed phrase, nothing to buy. The pond is made at night, after work, for you.</p>' +
+      '<p>I only ask two things back. <b>From Monday, collect stamps.</b> And <b>tell your frens about this site.</b> A pond is only as fun as the frogs in it.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-pass">Open your Fren Passport →</button><a class="app-btn" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(xText) + '">Tell your frens on X</a></div></section>' +
+      '<section class="gz-wp"><p class="gz-kick">Monday 16 November, 00:00 UTC</p><h4>The bell rings</h4>' +
+      '<p>Stamps start counting, for everyone from zero. Pepe Guesser week 1 opens: one photo a day, 2 minutes, one pin. Days at #1, Pond Dominator and the Hall of Fame all begin. Last call for 🏅 <b>Pond Pioneer</b>: log in with Discord before <b>Sunday 23:59 CET</b>.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn gz-wpgo">Open Pepe Guesser →</button></div></section>' +
+      '<p class="gz-foot">See you in the Pond on Monday. 🐸 The Editor</p></article>';
+  }
   // Pond Poll in the Gazette (games/supabase/update_polls.sql): the server counts; the page only shows its answer
   function paintPoll(box) {
     var id = box.getAttribute('data-poll');
@@ -4013,7 +4041,8 @@
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
         // one compact row of tabs: the letter form, then the Gazette issues by number (newest first)
         '<li><button type="button" data-v="write" title="Ideas, bugs, wishes, notices">✏️ Letter to the Editor</button></li>' +
-        '<li><button type="button" data-v="gz" title="The Pond Gazette #7: the Pond goes BETA" aria-label="The Pond Gazette #7">📰 #7</button></li>' +
+        '<li><button type="button" data-v="gz" title="The Pond Gazette #8: the week 1 poll" aria-label="The Pond Gazette #8">📰 #8</button></li>' +
+        '<li><button type="button" data-v="gz7" title="The Pond Gazette #7 (archive): the Pond goes BETA" aria-label="The Pond Gazette #7">#7</button></li>' +
         '<li><button type="button" data-v="gz6" title="The Pond Gazette #6 (archive): X unblocked us, the first faucet payout, 1 km" aria-label="The Pond Gazette #6">#6</button></li>' +
         '<li><button type="button" data-v="gz5" title="The Pond Gazette #5 (archive): the lockout, CoinEx and the first Pond Poll" aria-label="The Pond Gazette #5">#5</button></li>' +
         '<li><button type="button" data-v="gz4" title="The Pond Gazette #4 (archive): the Pepe Guesser leak" aria-label="The Pond Gazette #4">#4</button></li>' +
@@ -4033,8 +4062,8 @@
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
         if (v === 'write') return writeLetter(pane);
         if (v === 'box') return letterInbox(pane, paintOwner);
-        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : v === 'gz6' ? 6 : 7;
-        pane.innerHTML = issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : v === 'gz6' ? 6 : v === 'gz7' ? 7 : 8;
+        pane.innerHTML = issue === 8 ? gazette8() : issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
@@ -4675,14 +4704,14 @@
     document.querySelectorAll('.lan-n').forEach(function (e) { e.textContent = n; });
     document.querySelectorAll('.lan-badge').forEach(function (e) { e.hidden = n == null; });
   }
-  var LAN_H = 'pondos-lan-h', LAN_LIST = 'pondos-lan-list';
+  var LAN_H = 'pondos-lan-h', LAN_LIST = 'pondos-lan-list', LAN_ALERTS = 'pondos-lan-alerts';
   function lanParty() {
     var A = openApp('lan', 'LAN Party - #pond chat', 'gif-080-still', function (A) {
       var listPref = null; try { listPref = localStorage.getItem(LAN_LIST); } catch (e) {}
       A.host.classList.add('lan-win');
       A.body.innerHTML =
         '<div class="lan-top"><button type="button" class="app-btn lan-list-btn" aria-expanded="false" aria-controls="lan-buddies" title="Who is online"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online</button>' +
-        '<span class="lan-room">#pond</span><span class="grow"></span><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span></div>' +
+        '<span class="lan-room">#pond</span><span class="grow"></span><button type="button" class="app-btn lan-alerts" aria-label="Change LAN Party notification settings">Alerts: All</button><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span></div>' +
         '<div class="lan-main"><div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
         '<aside class="lan-buddies" id="lan-buddies" aria-label="Who is online"><div class="lan-bl"><p class="lan-bh">Loading…</p></div></aside></div>' +
         '<div class="emo-pop" hidden role="group" aria-label="Pepe emotes"><div class="emo-head"><input type="search" class="emo-q" placeholder="Search Pepes… (laugh, pray, apu)" aria-label="Search emotes" autocomplete="off">' +
@@ -4693,9 +4722,37 @@
         '<div class="lan-status"><span class="lan-st">Connecting…</span><span class="lan-grip" role="separator" tabindex="0" aria-orientation="horizontal" aria-label="Chat height. Drag, or use the arrow keys, to make the chat taller or shorter" title="Drag to make the chat taller"><i></i><i></i><i></i></span></div>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input[name=t]'), note = A.body.querySelector('.lan-note');
       var main = A.body.querySelector('.lan-main'), listBtn = A.body.querySelector('.lan-list-btn'), bl = A.body.querySelector('.lan-bl');
-      var stEl = A.body.querySelector('.lan-st'), hostTag = A.body.querySelector('.lan-host-tag');
+      var stEl = A.body.querySelector('.lan-st'), hostTag = A.body.querySelector('.lan-host-tag'), alertsBtn = A.body.querySelector('.lan-alerts');
       var canMod = false, who = null, whoT = 0;
-      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false;
+      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
+      var alertMode = 'all';
+      try { alertMode = localStorage.getItem(LAN_ALERTS) || 'all'; } catch (e) {}
+      if (['all', 'mentions', 'mute'].indexOf(alertMode) < 0) alertMode = 'all';
+      var isMinimized = function () { return A.host.classList.contains('is-min'); };
+      // Only show a counter on a minimized window. Never mark a new mention as read until LAN Party is visible.
+      var paintUnread = function () {
+        if (!A.taskBtn) return;
+        var count = alertMode === 'mute' ? 0 : unread;
+        A.taskBtn.classList.toggle('lan-has-unread', count > 0);
+        if (count > 0) A.taskBtn.setAttribute('data-unread', count > 99 ? '99+' : String(count));
+        else A.taskBtn.removeAttribute('data-unread');
+        var name = 'LAN Party - #pond chat' + (count ? ' (' + count + ' unread)' : '');
+        A.taskBtn.title = name;
+        A.taskBtn.setAttribute('aria-label', name);
+      };
+      var paintAlerts = function () {
+        var labels = { all: 'All', mentions: '@Only', mute: 'Muted' };
+        alertsBtn.textContent = 'Alerts: ' + labels[alertMode];
+        alertsBtn.title = alertMode === 'all' ? 'Badge for all new messages; popups only for mentions' :
+          alertMode === 'mentions' ? 'Badge and popup only for mentions (game invites in a future update)' : 'No LAN Party badges or mention popups';
+      };
+      alertsBtn.addEventListener('click', function () {
+        alertMode = alertMode === 'all' ? 'mentions' : alertMode === 'mentions' ? 'mute' : 'all';
+        unread = 0;
+        try { localStorage.setItem(LAN_ALERTS, alertMode); } catch (e) {}
+        paintAlerts(); paintUnread();
+      });
+      paintAlerts();
 
       // ----- who is online: a buddy list beside the log (a wide window) or folded under the top bar (a phone)
       var wide = function () { return A.host.offsetWidth >= 600; };
@@ -4866,7 +4923,7 @@
       // @mentions: highlight messages for me, suggest names after "@", ring on new ones, a switch to turn them off
       var PM = null, me = { verified: false }, mrow = A.body.querySelector('.lan-ment'), mbtn = mrow.querySelector('button');
       var forMe = function (m) { var s = anySession(); return !!(PM && me.verified && !me.optout && !(s && s.user && s.user.id === m.user_id) && PM.mentionsMe(m.body, me.nick)); };
-      var seenMentions = function () { if (alive && !document.hidden) chatRpc('gry_mentions_seen', { p_upto: null }).catch(function () {}); };
+      var seenMentions = function () { if (alive && !document.hidden && !isMinimized()) chatRpc('gry_mentions_seen', { p_upto: null }).catch(function () {}); };
       var paintMent = function () {
         mrow.hidden = !me.verified;
         mbtn.textContent = me.optout ? '🔕 Mentions off' : '🔔 Mentions on';
@@ -4901,6 +4958,10 @@
       };
       var poll = function () {
         clearTimeout(timer);
+        if (!alive) return;
+        // Coalesce doorbells and timer ticks while a request is in flight.
+        if (busy) { rerun = true; return; }
+        busy = true;
         chatRpc('gry_lobby_chat', { p_after: last, p_visitor: visitorId() }).then(function (r) {
           if (!alive) return;
           paintOnline(r.online);
@@ -4914,15 +4975,34 @@
             if (seen[m.id]) return;
             var row = el('div', { class: 'lan-msg' + (emoOnly(m.body) ? ' lan-big' : '') }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> ' + lanWho(m) + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
             var tipEl = log.querySelector('.bin-tip'); if (tipEl) tipEl.remove();
-            row._m = m; if (forMe(m)) { row.classList.add('lan-me'); if (!initial) { PM.ring(m.nick, m.body, function () { A.restore ? A.restore() : null; }); seenMentions(); } }
+            var mentioned = forMe(m), sess = anySession();
+            var mine = !!(sess && sess.user && sess.user.id === m.user_id);
+            if (!initial && (isMinimized() || document.hidden) && !mine &&
+                (alertMode === 'all' || alertMode === 'mentions' && mentioned)) unread++;
+            row._m = m;
+            if (mentioned) {
+              row.classList.add('lan-me');
+              if (!initial) {
+                if (alertMode !== 'mute') PM.ring(m.nick, m.body, function () { if (A.restore) A.restore(); });
+                seenMentions();
+              }
+            }
             modBtns(row);
             seen[m.id] = row; log.appendChild(row); last = Math.max(last, m.id);
           });
+          if (!isMinimized() && !document.hidden) unread = 0;
+          paintUnread();
           if (!log.children.length) log.innerHTML = '<p class="bin-tip">No messages in the last 24 hours. Say gm!</p>';
           if (atBottom || r.messages && r.messages.length) log.scrollTop = log.scrollHeight;
           if (initial || noWhoRpc && r.messages && r.messages.length) loadWho();
         }, function (err) { stEl.textContent = 'Offline: ' + err.message; if (first) log.innerHTML = '<p class="bin-tip">' + esc(err.message) + '. Trying again…</p>'; })
-          .then(function () { if (alive) timer = setTimeout(poll, live ? 60000 : document.hidden ? 25000 : 4000); });
+          .then(function () {
+            busy = false;
+            if (!alive) return;
+            if (rerun) { rerun = false; poll(); return; }
+            // Keep the Realtime doorbell while minimized; only slow down fallback polling.
+            timer = setTimeout(poll, live ? 60000 : document.hidden ? 60000 : isMinimized() ? 30000 : 4000);
+          });
       };
       // a burst of rings makes one call, spread over a second so not every open chat asks at the same moment
       var ring = function (id) {
@@ -4948,6 +5028,8 @@
         }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
       });
       paintNote(); loadPepeEmotes().then(poll);
+      // Restoring the taskbar window marks its messages as read and immediately syncs any missed events.
+      A.resume = function () { if (!alive) return; unread = 0; paintUnread(); seenMentions(); poll(); };
       A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); };
     }, 480);
     return A;
