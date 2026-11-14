@@ -1000,6 +1000,8 @@
   var saverEl = null, idleT = null;
   function saver(force) {
     if (saverEl || (!force && (REDUCE || document.hidden || maxW || document.querySelector('dialog[open]')))) return;
+    // media playing (PEP-TV, Pond TV) keeps the screen awake
+    if (!force && Array.prototype.some.call(document.querySelectorAll('video, audio'), function (m) { return !m.paused; })) { clearTimeout(idleT); idleT = setTimeout(saver, 120000); return; }
     // a random frog from the meme collection bounces around, like the old DVD logo
     var FROGS = ['big-eyes', 'believe', 'chonk', 'cowboy', 'detective', 'diamond', 'gibup', 'farmer', 'born-to-fren', 'brain', 'gif-034-still', 'gif-071-still', 'gif-045-still', 'gif-085-still',
       'chars/balloons', 'chars/juicebox', 'chars/brb', 'chars/chonky', 'chars/comfy', 'chars/explorer', 'chars/backpack'];
@@ -1024,7 +1026,19 @@
   }
   if (mainEl && !REDUCE && matchMedia('(hover: hover) and (pointer: fine)').matches) {
     var poke = function () { clearTimeout(idleT); idleT = setTimeout(saver, 120000); };
-    ['pointermove', 'pointerdown', 'keydown', 'wheel', 'scroll'].forEach(function (t) { window.addEventListener(t, poke, { passive: true }); });
+    var ACT = ['pointermove', 'pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart', 'input'];
+    ACT.forEach(function (t) { window.addEventListener(t, poke, { passive: true }); });
+    // a game in a PondOS window is an iframe: its mouse and keys never reach this page, so listen inside it too
+    // (same-origin frames only), including frames inside frames (the POND DUELS gadget, PEPaint rooms)
+    var watchFrame = function (f) {
+      try {
+        var w = f.contentWindow; if (!w || w.__pondPoke) return; w.__pondPoke = true;
+        ACT.forEach(function (t) { w.addEventListener(t, poke, { passive: true, capture: true }); });
+        w.document.addEventListener('load', function (e) { if (e.target && e.target.tagName === 'IFRAME') watchFrame(e.target); }, true);
+        Array.prototype.forEach.call(w.document.querySelectorAll('iframe'), watchFrame);
+      } catch (e) {}
+    };
+    document.addEventListener('load', function (e) { if (e.target && e.target.tagName === 'IFRAME') { e.target.contentWindow && (e.target.contentWindow.__pondPoke = false); watchFrame(e.target); } }, true);
     poke();
   }
 
@@ -1750,7 +1764,18 @@
     else if (m.open === 'lilies') liliesApp(m.id);
     else if (m.open === 'king') pondKingApp();
     else if (m.open === 'bulletin') bulletinApp();
+    else if (m.open === 'pepaint' && CODE_OK.test(m.id || '')) drawGuess(m.id);
+    else if ((m.open === 'room' || m.open === 'table') && CODE_OK.test(m.id || '')) gameTable(m.open, m.id);
   });
+  // a room (Pepe Pictures) or a board-game table opened from the Pond Bulletin: a window, or the page on a phone
+  var CODE_OK = /^[A-Za-z0-9]{3,12}$/;
+  function gameTable(kind, code) {
+    var page = (kind === 'room' ? 'room.html?r=' : 'table.html?t=') + encodeURIComponent(code);
+    if (window.innerWidth < 760) { location.href = osPage(page); return; }
+    return openApp('gt-' + code, (kind === 'room' ? 'Pepe Pictures - room ' : 'Table ') + code, kind === 'room' ? 'unclesam' : 'pond-playground', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/' + page + '&embed=1" title="' + (kind === 'room' ? 'Pepe Pictures room ' : 'Table ') + esc(code) + '" allow="clipboard-write"></iframe>';
+    }, 860);
+  }
   function yeetApp() {
     var A = openApp('yeet', 'YEET THE PEP', 'yeet', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/yeet.html?embed=1" title="YEET THE PEP" allow="web-share; clipboard-write; fullscreen"></iframe>';
@@ -4413,7 +4438,7 @@
     { file: 'pond_duels.mpg', added: '2026-11-14', look: 'gameshow', kitsch: true, ms: 4800, title: 'POND DUELS: the game show', ch: 'CH 3 · POND DUELS, THE GAME SHOW', icon: 'pond-king', scenes: [
       adBurst('NEW<br>SHOW!', 'b-tr', 'b-pink') + '<p class="ad-kick">The only game show where nobody has to be online at the same time!</p><div class="ad-vs">' + adPx('king-stamp') + '<b>VS</b>' + adPx('lilies') + '</div><h3 class="ad-big">It\'s time for<br><em>POND DUELS!</em></h3><p class="ad-sub">Two brand-new duels, sitting right on your PondOS desktop. Play now. Your rival plays whenever.</p>',
       '<div class="ad-row">' + adPx('king-stamp', 'ad-px-xl ad-shine') + '<div><p class="ad-kick">Round one: POND KING</p><h3 class="ad-big">Rock. Paper. Scissors.<br><em>For the THRONE!</em></h3><p class="ad-sub">The king hides three moves and the pond shuffles them for every duel. Win more rounds and the crown is yours. A tie keeps the king.</p></div></div>',
-      adBurst('OUCH!', 'b-br', 'b-red') + '<div class="ad-row"><span class="ad-anim" aria-hidden="true"></span><div><p class="ad-kick">The rules are brutal, folks</p><h3 class="ad-big">One duel<br>every <em>4 hours!</em></h3><p class="ad-sub">Lose and your frog is bruised: rest, come back in 4 hours. One shot per king, so knock the king off with a fren\'s help.</p></div></div>',
+      adBurst('OUCH!', 'b-br', 'b-red') + '<div class="ad-row"><span class="ad-anim" aria-hidden="true"></span><div><p class="ad-kick">The rules are brutal, folks</p><h3 class="ad-big">One duel<br>every <em>4 hours!</em></h3><p class="ad-sub">Lose and your frog is bruised: rest, come back in 4 hours. Then try again, or send a fren with the moves you saw.</p></div></div>',
       '<p class="ad-kick">Round two: BATTLE OF THREE LILIES</p>' + adLilies() + '<h3 class="ad-big">10 flies. 3 lily pads.<br><em>Zero excuses!</em></h3><p class="ad-sub">Hide your 10 flies, throw down a challenge and walk away. A fren has 48 hours to accept. Win two pads, win the duel.</p>',
       adTesti(adFren('clothing_shirt_tie', 'mouth_shout', 'eyes_bloodshot', 'hat_crown', 'accessory_none'), 'I held the throne for THREE DAYS. Then Kevin threw scissors. I don\'t talk to Kevin anymore.', 'Former Pond King, still bruised') + '<p class="ad-fine">*A drawing. The bruises are a figure of speech.</p>',
       adGlitter() + '<div class="ad-row">' + adPx('king-stamp', 'ad-px-xl ad-shine') + '<div><p class="ad-kick">And our grand prize…</p><h3 class="ad-big">Long Live<br>the <em>King!</em></h3><p class="ad-sub">Defend the throne 10 times in a row and this stamp lands in your Fren Passport (Discord players). The pond keeps score: Longest on the throne, the Hall of flies, your win streaks.</p></div></div>',

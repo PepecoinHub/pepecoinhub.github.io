@@ -111,7 +111,8 @@ create table if not exists games.pk_duels (
   won         boolean not null,
   created_at  timestamptz not null default now()
 );
-create unique index if not exists pk_duels_once on games.pk_duels (king_id, token_hash);
+drop index if exists games.pk_duels_once;
+create index if not exists pk_duels_player on games.pk_duels (king_id, token_hash);
 create index if not exists pk_duels_ip on games.pk_duels (ip_hash, created_at);
 create index if not exists pk_duels_king on games.pk_duels (king_id, created_at desc);
 create index if not exists pk_duels_time on games.pk_duels (created_at);
@@ -205,29 +206,24 @@ declare
   k games.pk_kings;
   mine games.pk_duels;
   last games.pk_duels;
-  ip_used boolean := false;
   you boolean;
 begin
   select * into k from games.pk_kings where ended_at is null;
   if k.id is null then return jsonb_build_object('king', null); end if;
   you := games.pk_is(k.token_hash, k.user_id, th, u);
   select * into mine from games.pk_duels d where d.king_id = k.id and games.pk_is(d.token_hash, d.user_id, th, u) limit 1;
-  if ip is not null and mine.id is null and games.pk_by_net(u) then
-    ip_used := exists (select 1 from games.pk_duels where king_id = k.id and ip_hash = ip);
-  end if;
   last := games.pk_last(th, u, ip);
   return jsonb_build_object(
     'king', jsonb_build_object('id', k.id, 'nick', k.nick, 'defenses', k.defenses, 'since', k.crowned_at,
                                'house', k.token_hash is null and k.user_id is null, 'you', you,
                                'passport', games.passport_id(k.user_id), 'avatar', games.pk_avatar(k.user_id),
                                'moves', case when you then k.moves end),
-    'can_challenge', not you and mine.id is null and not ip_used and last.id is null,
+    'can_challenge', not you and last.id is null,
     'cooldown', case when last.id is not null then jsonb_build_object(
                     'won', last.won, 'at', last.created_at,
                     'network', not games.pk_is(last.token_hash, last.user_id, th, u),
                     'next_at', last.created_at + games.pk_cooldown()) end,
-    'tried', case when mine.id is not null then jsonb_build_object('won', mine.won, 'at', mine.created_at)
-                  when ip_used then jsonb_build_object('network', true) end,
+    'tried', case when mine.id is not null then jsonb_build_object('won', mine.won, 'at', mine.created_at) end,
     'duels_today', (select count(*) from games.pk_duels where created_at > now() - interval '24 hours'),
     'top', coalesce((select jsonb_agg(jsonb_build_object('nick', t.nick, 'defenses', t.defenses, 'reigning', t.ended_at is null,
                                                          'since', t.crowned_at, 'until', t.ended_at, 'you', games.pk_is(t.token_hash, t.user_id, th, u),
@@ -277,10 +273,6 @@ begin
   if games.pk_is(k.token_hash, k.user_id, th, u) then return jsonb_build_object('ok', false, 'error', 'self'); end if;
   if (games.pk_last(th, u, ip)).id is not null then
     return jsonb_build_object('ok', false, 'error', 'wait', 'next_at', (games.pk_last(th, u, ip)).created_at + games.pk_cooldown()); end if;
-  if exists (select 1 from games.pk_duels d where d.king_id = k.id and games.pk_is(d.token_hash, d.user_id, th, u)) then
-    return jsonb_build_object('ok', false, 'error', 'tried'); end if;
-  if ip is not null and games.pk_by_net(u) and exists (select 1 from games.pk_duels where king_id = k.id and ip_hash = ip) then
-    return jsonb_build_object('ok', false, 'error', 'network'); end if;
   if (select count(*) from games.pk_duels where created_at > now() - interval '1 hour') >= 300 then
     return jsonb_build_object('ok', false, 'error', 'busy'); end if;
   select string_agg(m, '' order by random()) into ord from regexp_split_to_table(k.moves, '') m;

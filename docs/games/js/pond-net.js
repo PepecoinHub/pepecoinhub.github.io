@@ -63,6 +63,9 @@
   // ask PondOS for a window; outside PondOS go to a page instead
   var FALLBACK = {
     passport: function (m) { return '../meme/?fren=' + encodeURIComponent(m.id); },
+    pepaint: function (m) { return 'pepaint.html' + (m.id ? '?join=' + encodeURIComponent(m.id) : ''); },
+    room: function (m) { return 'room.html?r=' + encodeURIComponent(m.id); },
+    table: function (m) { return 'table.html?t=' + encodeURIComponent(m.id); },
     logon: function () { return './?login=1&back=' + encodeURIComponent(location.pathname + location.search.replace(/[?&]embed=1/, '')); },
     lilies: function (m) { return 'lilies.html' + (m.id === 'new' ? '?tab=create' : m.id ? '?c=' + encodeURIComponent(m.id) : ''); },
     king: function () { return 'pond-king.html'; },

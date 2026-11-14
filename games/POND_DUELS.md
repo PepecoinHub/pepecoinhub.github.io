@@ -147,6 +147,6 @@ Open challenges carry their creator's Fren avatar (`gry_bulletin`, when update_p
   as the fren is logged on.
 * **News in PondOS** (`pondNews` in meme.js): a balloon and a red dot on the desktop icon when your throne fell
   or one of your Lilies challenges was settled since the last visit. Nothing is sent by mail or push.
-* **Network rule**: one duel per king and the 4-hour wait also count per network only for players without an
+* **Network rule**: the 4-hour wait also counts per network only for players without an
   account and for guest accounts (`games.pk_by_net`). Discord accounts are told apart by the account, so frens
   behind one shared address (home, mobile network) do not block each other. Tests: `tests/pond-network-sql.test.mjs`.

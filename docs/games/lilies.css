@@ -250,3 +250,14 @@
 /* POND BULLETIN: the news list keeps its size and scrolls (the 10 newest notes) */
 .news { max-height: 420px; overflow-y: auto; overscroll-behavior: contain; }
 @media (max-width: 560px) { .news { max-height: 340px; } }
+
+/* POND BULLETIN: open tables of every game */
+.tables { list-style: none; margin: 0; padding: 4px; background: var(--pane); box-shadow: var(--sunken); max-height: 300px; overflow-y: auto; }
+.tables li.tbl { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 4px; border-bottom: 1px dotted #c8c8c8; }
+.tables li.tbl:last-child { border-bottom: 0; }
+.tables li.tbl.wait { background: #fffbd8; }
+.tables .ic { font-size: 20px; text-align: center; }
+.tables p { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tables small { color: var(--muted); font-size: 11px; }
+.tables button { min-height: 30px; padding: 3px 12px; font-size: 12px; }
+.tables li.muted { padding: 8px; }

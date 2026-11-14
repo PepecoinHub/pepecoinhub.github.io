@@ -20,17 +20,16 @@ test('Pond King: Discord accounts on one network do not block each other; guests
     const sb = await state(B, tok(2));
     assert.equal(sb.can_challenge, true); assert.equal(sb.cooldown, null); assert.equal(sb.tried, null);
     assert.equal((await duel(B, tok(2), king, 'Bravo')).ok, true);
-    // the account itself still waits 4 hours and gets one duel per king, from any address or browser
+    // the account itself still waits 4 hours, from any address or browser
     assert.equal((await duel({ user: A.user, ip: '8.8.8.8' }, tok(3), king, 'Alpha')).error, 'wait');
     // guest accounts and players without an account on that address: the network rules still apply
     const G = { user: await addUser(db, 3), ip: NET };
     assert.equal((await duel(G, tok(4), king, 'Guesty')).error, 'wait');
     assert.equal((await duel({ ip: NET }, tok(5), king, 'Nobody')).error, 'wait');
+    // after the 4 hours everybody may duel the same king again (no limit per king)
     await db.query("update games.pk_duels set created_at = created_at - interval '5 hours'");
-    assert.equal((await duel(G, tok(4), king, 'Guesty')).error, 'network');
-    assert.equal((await state(G, tok(4))).tried.network, true);
-    // a fresh address works for the guest
-    assert.equal((await duel({ user: G.user, ip: '9.9.9.9' }, tok(4), king, 'Guesty')).ok, true);
+    assert.equal((await duel(G, tok(4), king, 'Guesty')).ok, true);
+    assert.equal((await duel(A, tok(1), king, 'Alpha')).ok, true);
   } finally {
     await drop();
   }
