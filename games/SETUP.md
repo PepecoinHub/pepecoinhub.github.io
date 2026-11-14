@@ -261,3 +261,13 @@ egg can be adopted. Contract, playtest rules and the rescue system:
   the same JavaScript model in `docs/games/pepegochi.html` (no network allowed
   by its CSP); the frog is kept in this tab's sessionStorage only.
   `tests/pepegochi-beta.test.mjs` runs in CI.
+
+## Pojedynki w stawie: POND BULLETIN, POND KING, BATTLE OF THREE LILIES
+
+Opis gier, architektura i testy są w `games/POND_DUELS.md`. Uruchomienie: w Supabase → SQL Editor po kolei całe pliki **w tej kolejności** (każdy można powtórzyć, żaden niczego nie kasuje):
+
+1. `games/supabase/update_pond_bulletin.sql`: tablica ogłoszeń (`gry_bulletin`) i wspólne zasady nicków,
+2. `games/supabase/update_pond_king.sql`: Król Stawu (kamień, papier, nożyce o tron),
+3. `games/supabase/update_lilies.sql`: Bitwa o Trzy Liście (10 much na 3 liściach, dwie osoby).
+
+Dopóki pliki nie są uruchomione, przyciski na `/meme/` się chowają, a okna gier pokazują „opens soon”. Reset tronu Króla Stawu (np. po spamie): `update games.pk_kings set ended_at = now() where ended_at is null; insert into games.pk_kings (nick, moves) values ('Pepe', 'rps');`
