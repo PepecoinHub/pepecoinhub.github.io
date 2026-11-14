@@ -69,7 +69,7 @@ test('every frog sprite the game draws: the full check, except the accepted mast
       assert.ok(!r.problems.some(p => /size|feet|half-transparent|empty/.test(p)), id + ': ' + r.problems.join(' | '));
     } else assert.deepEqual(r.problems, [], id);
   }
-  for (const f of [SUITCASE.src, LETTER.envelope, ...Object.keys(ITEMS).map(i => IMG + i + '.png')])
+  for (const f of [SUITCASE.src, LETTER.envelope, LETTER.open, ...Object.keys(ITEMS).map(i => IMG + i + '.png')])
     assert.deepEqual(checkFile(path(f).pathname, { prop: true }).problems, [], f);
 });
 

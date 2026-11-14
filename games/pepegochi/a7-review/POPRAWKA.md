@@ -1,5 +1,7 @@
 # A7, przegląd pierwszej wersji (2026-11-14)
 
+Status: ZATWIERDZONE przez właściciela 2026-11-14 w tej wersji („dobrze jest”). W grze jako `docs/games/img/pepegochi/goodbye_letter_v2.png`. Poprawka niżej nie jest potrzebna.
+
 Kontrola skryptem: OK (128 × 128, siatka 2 × 2, 7 kolorów, dokładnie z briefu; obrys 8,46,120,122, ta sama pozycja co dziś).
 Podgląd: `a7_room_preview.png` (koperta / list dziś / nowy), `a7_compare_5x.png`.
 

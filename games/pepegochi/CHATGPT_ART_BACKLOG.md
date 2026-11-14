@@ -44,7 +44,7 @@ liczba kolorów, linia stóp). Plik, który nie przejdzie, wraca do poprawy.
 | **A4** | Wyprowadzka dorosłej żaby: prawdziwy chód | 6 | ✅ w grze 2026-11-13 |
 | **A5** | Stany kijanki i młodej żaby + ich wyprowadzka | 22 | ✅ w grze 2026-11-13 |
 | **A6** | Animacje opieki dorosłej żaby (jedzenie, mycie, zabawa, sen) | 16 | ✅ w grze 2026-11-13 |
-| **A7** | List GOODBYE.TXT jako pixel-art | 1 | 7. |
+| **A7** | List GOODBYE.TXT jako pixel-art | 1 | ✅ w grze 2026-11-14 (`goodbye_letter_v2.png`, nowa nazwa zamiast pamięci przeglądarki) |
 | **A8** | Przedmioty pokoju w natywnej wielkości (wymaga zgody właściciela) | 9 | 8. |
 | A6b | Animacje opieki kijanki i młodej żaby | 32 | ✅ w grze 2026-11-13 |
 | A9 | Stara żaba (**tylko po decyzji właściciela**) | 9 | warunkowo |

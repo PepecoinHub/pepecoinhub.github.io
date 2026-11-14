@@ -114,7 +114,7 @@ export const SUITCASE = { src: IMG + 'suitcase.png', px: 64, dx: 60, foot: 58 };
 // ---------- after moving out ----------
 // The letter lies where the frog stood, at the spot of props/room_departed_overlay.png (its envelope
 // covers x 309-354, y 331-361). Half size, like the suitcase. Unread: the envelope; read: the open letter.
-export const LETTER = { x: 332, y: 346, px: 64, envelope: IMG + 'goodbye_envelope.png', open: IMG + 'goodbye_letter.png' };
+export const LETTER = { x: 332, y: 346, px: 64, envelope: IMG + 'goodbye_envelope.png', open: IMG + 'goodbye_letter_v2.png' };
 // The frog takes ONE item when it moves out: the server picks it from the borrowable items placed in the room and
 // stores it on the life as letter_variant 'took_<item_id>' ('took_nothing' for an empty room; Room-4,
 // update_pepegochi_room_departure.sql). The older 'classic' letter took the TV. The item is only hidden in the
