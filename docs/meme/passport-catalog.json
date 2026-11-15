@@ -2,6 +2,20 @@
   "version": 1,
   "achievements": [
     {
+      "id": "haze_linked",
+      "title": "Haze Linked",
+      "description": "Proved ownership of a native PEP receiving address with Haze Wallet. Removed when unlinked.",
+      "category": "haze",
+      "status": "planned"
+    },
+    {
+      "id": "haze_first_tip",
+      "title": "First Haze Tip",
+      "description": "Sent a direct native PEP tip checked by the server with two network confirmations.",
+      "category": "haze",
+      "status": "planned"
+    },
+    {
       "id": "first_fren",
       "title": "First Fren",
       "description": "Sign in with Discord and start your pond history.",

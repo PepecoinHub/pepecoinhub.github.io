@@ -17,5 +17,12 @@ jobs:
           node-version: '22'
       - run: python scripts/check_site.py
       - run: python scripts/check_i18n.py
+      - run: npm ci --prefix games/supabase/functions/haze-wallet --ignore-scripts --no-audit --no-fund
       - run: node --test tests/*.test.mjs
+      - run: docker run --rm -d --name haze-ph-qa-ci --tmpfs /var/lib/postgresql/data:rw -e POSTGRES_PASSWORD=disposable-haze-ci postgres:17-alpine
+      - run: |
+          for i in {1..30}; do docker exec haze-ph-qa-ci pg_isready -U postgres && break; sleep 1; done
+          HAZE_SQL_DOCKER=haze-ph-qa-ci node --test tests/haze-sql.test.mjs
+      - if: always()
+        run: docker rm -f haze-ph-qa-ci || true
       - run: python -m unittest discover -s tests -p 'test_*.py'
