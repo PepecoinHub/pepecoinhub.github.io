@@ -1,4 +1,4 @@
-import {verifyWalletProof,verifyTipTransaction,exact,isHash,isUUID,PEP_GENESIS} from './core.mjs';
+import {verifyWalletProof,verifyTipTransaction,verifyGroupTransaction,exact,isHash,isUUID,PEP_GENESIS} from './core.mjs';
 const ORIGIN='https://pepecoinhub.com';
 const headers={'Access-Control-Allow-Origin':ORIGIN,'Access-Control-Allow-Headers':'authorization,apikey,content-type,x-client-info','Access-Control-Allow-Methods':'POST,OPTIONS','Vary':'Origin','Cache-Control':'no-store','Content-Type':'application/json'};
 const json=(status,value)=>new Response(JSON.stringify(value),{status,headers});
@@ -27,12 +27,13 @@ export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,now=()
       const address=verifyWalletProof(body.proof,challenge,now());
       return json(200,await rpc('haze_link_finish',{p_user:user.id,p_nonce:challenge.nonce,p_address:address}));
     }
-    if(!exact(body,['action','intent','txid'])||body.action!=='check'||!isUUID(body.intent)||!isHash(body.txid))throw Error('Invalid tip request.');
-    const intent=await rpc('haze_tip_context',{p_user:user.id,p_intent:body.intent,p_txid:body.txid});
+    if(!exact(body,['action','intent','txid'])||!['check','group-check'].includes(body.action)||!isUUID(body.intent)||!isHash(body.txid))throw Error('Invalid tip request.');
+    const group=body.action==='group-check';
+    const intent=await rpc(group?'haze_group_context':'haze_tip_context',{p_user:user.id,p_intent:body.intent,p_txid:body.txid});
     if(intent.confirmed)return json(200,{id:body.intent,state:'confirmed',txid:body.txid});
     if(await readGenesis()!==PEP_GENESIS)throw Error('The payment reader is not Pepecoin mainnet.');
-    const result=await verifyTipTransaction(intent,await readTx(body.txid),readTx);
+    const result=await (group?verifyGroupTransaction:verifyTipTransaction)(intent,await readTx(body.txid),readTx);
     if(result.state==='pending')return json(200,{id:body.intent,txid:body.txid,...result});
-    return json(200,await rpc('haze_tip_confirm',{p_user:user.id,p_intent:body.intent,p_txid:body.txid,p_vout:result.vout,p_block:result.block,p_time:result.time}));
+    return json(200,await rpc(group?'haze_group_confirm':'haze_tip_confirm',{p_user:user.id,p_intent:body.intent,p_txid:body.txid,...(group?{}:{p_vout:result.vout}),p_block:result.block,p_time:result.time}));
   }catch(error){return json(400,{error:error instanceof Error?error.message:'The tip could not be checked. Keep the transaction ID; do not send again.'});}
 }

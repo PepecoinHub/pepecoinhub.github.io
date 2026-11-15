@@ -80,6 +80,81 @@ The public production protocol is separately covered by `haze-core.test.mjs`.
    **Powered by Haze Wallet**. Its short animation respects reduced motion.
    Pending and invalid payments receive no confirmed card or stamp.
 
+## Community tips and chat rounds
+
+The additional review build supports **Whole pond**, **Online frens**,
+**Away / offline frens**, **Random frens**, **Choose frens**, **Timed airdrop**,
+**Trivia round**, and **Say the word** from the same chat dialog and Haze frame.
+“Whole pond” means all eligible wallet-linked PepecoinHub accounts. Discord
+server membership is not used. Muted accounts, unlinked accounts and the sender
+are excluded. Online means activity in this site's lobby within 90 seconds;
+away includes members with older or no lobby presence.
+
+The server draws random recipients without replacement and freezes every
+recipient address and amount. One native transaction pays 1–200 recipients,
+with at least 1 PEP each, at most 100000 PEP total, and at most 20 funding
+inputs. The sender must fund the network fee as well. A whole-pond audience
+over 200 is rejected with a smaller-audience prompt; nobody is silently dropped.
+An integer split preserves the total exactly, assigning any smallest-unit
+remainder in the fixed displayed order. Change returns to the linked sender.
+
+Timed rounds snapshot the eligible audience at creation. An away member can
+come online to enter a round for which they were eligible. Airdrop entry is free
+and each member joins once. Trivia replies use `/answer your answer` in normal
+chat, with one attempt per member. The first correct replies win, up to the
+host's limit. A word round announces the word; matching chat replies win once
+per member. Case and repeated whitespace are normalized. Answers are graded
+by a database trigger after normal chat validation; no browser reports winners.
+The private trivia answer is salted and hashed and is absent from public feeds.
+These rules do not provide protection against several accounts owned by one
+person, answer sharing, or guessing a deliberately easy question.
+
+Rounds last 10–300 seconds (the picker offers 15 seconds, 1 minute and 5 minutes)
+and can finish early when the winner limit is reached. Results are sealed when
+the feed or review is requested. **Closing a round never pays anyone.** The
+host reviews the fixed winners, then opens Haze's fee and password approval in
+the same dialog. No eligible winners means no payment. There is no entry fee,
+escrow, platform balance, automatic payout, popup or transaction-ID input.
+
+Group review requires `capabilities.chatGroupTips === 1`. The only new public
+UI command is `{type:'haze:group-tip-review',version:1,request}`, from the exact
+PepecoinHub parent. The manifest has exactly `id,sender,title,mode,note,
+total_atomic,created_at,expires_at,recipients`; each recipient has exactly
+`address,amount,nick`. Haze validates and fixes these values and still requires
+the user's explicit approval. The callback remains exactly
+`{type:'haze:tip-submitted',version:1,intent,txid}` to PepecoinHub. The Edge
+action `group-check` accepts only an intent ID and hash; it obtains the complete
+manifest privately. It verifies all exact outputs, one optional sender change,
+every funding prevout, mainnet identity, and two confirmations. A shared private
+transaction ledger prevents reusing a payment across single and group intents.
+Only a verified transaction earns the receipt and existing First Tip stamp.
+
+Apply `supabase/update_haze_groups.sql` **after** `update_haze_tips.sql` in a
+reviewed staging project. Community tipping has its own independent switches:
+`HAZE_GROUPS_ENABLED=false` and `games.haze_settings.groups_enabled=false`.
+The existing direct-tip switches must also be on to use the shared wallet UI.
+All switches remain off in committed production files. Games chat is not
+rewritten; the new server trigger exits immediately while groups are disabled.
+The feature is web-only in this package; mobile browsers use the same dialog.
+
+For the isolated community preview, set `HAZE_PREVIEW_GROUPS=1` and
+`HAZE_PREVIEW_BASE_PORT=18940` before starting `scripts/haze-preview.mjs`.
+The Haze origin is the next port (18941). Point `HAZE_TIP_CANDIDATE` to the
+reviewed group candidate containing the additional `wallet-core.js` and
+`assets/haze-group-tips.js`. The **Demo member** selector switches synthetic
+members for joining and chat answers. Only Lew's disposable wallet is funded;
+participant links are fixtures. Changes to actors, origins, feature flags and
+presence fixtures are local preview behavior and are not production auth.
+
+`tests/haze-groups-browser.cjs` checks every audience and game through the actual
+UI, including multi-output signatures, wrong-password rejection, no automatic
+payout, cache-cleared recovery, two confirmations and narrow screens.
+`tests/haze-groups-sql.test.mjs` checks actual PostgreSQL permissions, frozen
+eligibility, one attempt, exact splits, deadline closure and global credit-once.
+`tests/haze-groups-core.test.mjs` always checks the independent verifier; with
+the separate Haze checkout it also tests the actual signer at the 200-recipient
+limit and the Haze public manifest/callback. CI runs the portable and SQL tests.
+
 ## Coordinated activation
 
 Keep both switches off until maintainer review and staging validation.

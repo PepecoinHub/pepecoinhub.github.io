@@ -9,3 +9,10 @@ document.querySelector('#preview-stamps').onclick=refresh;void refresh();setInte
 const reset=document.createElement('button');reset.type='button';reset.textContent='Reset demo';
 reset.onclick=async()=>{reset.disabled=true;try{const r=await fetch('/__preview/reset',{method:'POST'});if(!r.ok)throw Error('Reset failed.');location.href=wallet+'/__preview/setup';}catch(e){reset.textContent=e.message;reset.disabled=false;}};
 bar.querySelector('nav').append(reset);
+if(window.PEP_HAZE_GROUPS_PREVIEW){
+  bar.querySelector('small').textContent='Link as Lew (host), then choose Group tips. Use Demo member to join an airdrop or answer in chat; return to Lew to review and approve the payout. All PEP here is simulated. Password: HazePreview!2026';
+  const label=document.createElement('label');label.textContent='Demo member: ';
+  const select=document.createElement('select');select.setAttribute('aria-label','Demo member');
+  for(const [id,name]of [[1,'Lew (host)'],[2,'Byl'],[3,'Mika (unlinked)'],[4,'Jules'],[5,'Pip (away)'],[6,'Nova (away)'],[7,'Zeph (away)']]){const option=document.createElement('option');option.value=id;option.textContent=name;select.append(option);}
+  select.value=localStorage.getItem('haze-preview-actor')||'1';select.onchange=()=>{localStorage.setItem('haze-preview-actor',select.value);location.reload();};label.append(select);bar.querySelector('nav').append(label);
+}

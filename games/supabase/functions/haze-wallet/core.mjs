@@ -73,3 +73,34 @@ export async function verifyTipTransaction(intent,tx,readTx) {
   if(totalIn<=out.reduce((sum,value)=>sum+atomic(value.value),0n)) fail('Invalid payment totals.');
   return {state:'confirmed',vout:matches[0].n,block:tx.blockHash,time:tx.blockTime};
 }
+
+// Group manifests come from private SQL snapshots, never from the checking client.
+export async function verifyGroupTransaction(intent,tx,readTx){
+  if(!isHash(intent.txid)||tx?.txid!==intent.txid||!Array.isArray(intent.recipients)||intent.recipients.length<1||intent.recipients.length>200)fail('Invalid group transaction.');
+  const sender=pepScript(intent.sender),expected=new Map();let total=0n;
+  for(const recipient of intent.recipients){
+    const script=pepScript(recipient.address),value=atomic(recipient.amount);
+    if(script===sender||expected.has(script)||value<100000000n)fail('Invalid group recipient.');expected.set(script,value);total+=value;
+  }
+  if(total!==atomic(intent.total_atomic)||total>10000000000000n)fail('The group total does not match.');
+  const out=outputs(tx,201),found=new Set();let change=0;
+  for(const output of out){
+    if(output.hex===sender){if(++change>1||atomic(output.value)===0n)fail('Unsupported group change.');continue;}
+    if(!expected.has(output.hex)||found.has(output.hex)||atomic(output.value)!==expected.get(output.hex))fail('A group recipient or amount changed.');found.add(output.hex);
+  }
+  if(found.size!==expected.size)fail('A group recipient is missing.');
+  if(!Number.isSafeInteger(tx.confirmations)||tx.confirmations<0||!Array.isArray(tx.vin)||tx.vin.length<1||tx.vin.length>20)fail('Invalid group funding or confirmations.');
+  const seen=new Set(),cache=new Map();let inputTotal=0n;
+  for(const input of tx.vin){
+    if(!isHash(input?.txid)||!Number.isSafeInteger(input.vout)||input.vout<0||input.vout>0xffffffff||seen.has(input.txid+':'+input.vout))fail('Invalid or repeated group input.');
+    seen.add(input.txid+':'+input.vout);if(!cache.has(input.txid))cache.set(input.txid,await readTx(input.txid));
+    const parent=cache.get(input.txid);if(parent?.txid!==input.txid)fail('Group funding transaction mismatch.');
+    const previous=outputs(parent,10000).find(value=>value.n===input.vout);
+    if(!previous||previous.hex!==sender)fail('Group funding did not come from the linked sender.');inputTotal+=atomic(previous.value);
+  }
+  if(inputTotal<=out.reduce((sum,value)=>sum+atomic(value.value),0n))fail('Invalid group totals.');
+  if(tx.confirmations<2)return {state:'pending',confirmations:tx.confirmations};
+  if(!isHash(tx.blockHash)||!Number.isSafeInteger(tx.blockTime)||tx.blockTime<Date.parse(intent.created_at)/1000-30||tx.blockTime>Date.parse(intent.expires_at)/1000+7200)fail('Group payment is outside its time window.');
+  if(!Number.isFinite(Date.parse(intent.created_at))||!Number.isFinite(Date.parse(intent.expires_at)))fail('Invalid group time window.');
+  return {state:'confirmed',block:tx.blockHash,time:tx.blockTime};
+}

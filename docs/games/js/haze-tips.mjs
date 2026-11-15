@@ -1,4 +1,5 @@
 // Owner-reviewed rollout switch. No Haze network requests or UI when disabled.
+import {createHazeGroups} from './haze-groups.mjs';
 export const HAZE_TIPS_ENABLED = false;
 export const HAZE_ORIGIN = 'https://hazewallet.com';
 const REACTIONS = Object.freeze({heart:'💚',applause:'👏',rocket:'🚀'});
@@ -46,6 +47,7 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
   const messages=new Map(),receivers=new Map(),flights=new Map(),rendered=new Map(),seenReceipts=new Set(),timers=new Set();
   const currentUser=()=>{const user=session()?.user;return user&&!user.is_anonymous?user.id:null;};
   const signed=()=>{if(!currentUser()){login?.();throw Error('Sign in with Discord first.');}};
+  const groups=createHazeGroups({node,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,origin:HAZE_ORIGIN,wallet:()=>wallet,refreshWallet:refresh,capabilities:()=>walletCaps,hideWallet:()=>{if(walletHost)walletHost.hidden=true;},login,connect});
   function endView(){
     const view=activeView;activeView=null;view?.controller.abort();if(walletHost)walletHost.hidden=true;
     if(walletFrame){walletFrame.contentWindow.postMessage({type:'haze:tip-cancel',version:1},HAZE_ORIGIN);walletFrame.contentWindow.postMessage({type:'haze:hidden'},HAZE_ORIGIN);}
@@ -87,9 +89,9 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
   }
   function paintButton(){if(linkButton)linkButton.textContent=wallet?.address?'◇ Haze linked ✓':'◇ Link Haze for tips';}
   async function refresh() {
-    const user=currentUser();owner=user;wallet=null;paintButton();
+    const user=currentUser();owner=user;wallet=null;paintButton();groups?.setWalletLoading(!!user);
     if(!user||destroyed)return;
-    try{const value=await rpc('gry_haze_status',{});if(owner===user&&!destroyed){wallet=value;paintButton();restoreQueue();}}catch{}
+    try{const value=await rpc('gry_haze_status',{});if(owner===user&&!destroyed){wallet=value;paintButton();restoreQueue();void groups?.sync(true);}}catch{}finally{groups?.setWalletLoading(false);}
   }
   async function frameRequest(frame,method,params,timeout=10000,signal) {
     return new Promise((resolve,reject)=>{
@@ -132,7 +134,7 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
       }catch(error){if(view.active()){walletHost.hidden=true;view.status.textContent=error.message;approve.disabled=false;}}
     };
   }
-  function mount(parent){linkButton=node('button',{type:'button',class:'haze-wallet-link',onclick:connect},'◇ Link Haze for tips');parent.append(linkButton);void refresh();}
+  function mount(parent){linkButton=node('button',{type:'button',class:'haze-wallet-link',onclick:connect},'◇ Link Haze for tips');parent.append(linkButton);groups?.mount(parent);void refresh();}
   function paintReceiver(value){
     const available=receivers.get(value.message.user_id);
     value.badge.hidden=available!==true;value.action.disabled=available!==true;
@@ -230,7 +232,7 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
   win.addEventListener('message',receive);
   const resume=()=>{if(!doc.hidden)for(const flight of flights.values())if(flight.txid&&!flight.checking)void checkFlight(flight);};
   doc.addEventListener('visibilitychange',resume);
-  function invalidate(){syncAt=0;}
+  function invalidate(){syncAt=0;void groups?.sync(true);}
   async function sync() {
     if(destroyed||syncing||doc.hidden||Date.now()-syncAt<60000)return;
     for(const [id,value]of messages)if(!value.row.isConnected)messages.delete(id);
@@ -258,5 +260,5 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
     }catch{/* Missing migration or temporary failure must not break ordinary chat. */}
     finally{syncing=false;}
   }
-  return {mount,bindMessage,refresh,invalidate,sync,connect,destroy(){destroyed=true;saveQueue();dialog?.close();dialog?.remove();win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',resume);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();receivers.clear();flights.clear();linkButton?.remove();}};
+  return {mount,bindMessage,refresh,invalidate,sync,connect,destroy(){destroyed=true;groups?.destroy();saveQueue();dialog?.close();dialog?.remove();win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',resume);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();receivers.clear();flights.clear();linkButton?.remove();}};
 }

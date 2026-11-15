@@ -42,6 +42,10 @@ create unique index if not exists haze_tip_transaction on games.haze_tips(txid) 
 alter table games.haze_tips add column if not exists submitted_txid text check(submitted_txid ~ '^[a-f0-9]{64}$');
 create index if not exists haze_tip_sender on games.haze_tips(sender,created_at);
 create index if not exists haze_tip_messages on games.haze_tips(message_id,confirmed_at);
+create table if not exists games.haze_transactions(txid text primary key check(txid ~ '^[a-f0-9]{64}$'),kind text not null check(kind in ('single','group')),intent uuid not null unique);
+alter table games.haze_transactions enable row level security;
+revoke all on games.haze_transactions from public,anon,authenticated;
+insert into games.haze_transactions(txid,kind,intent) select txid,'single',id from games.haze_tips where confirmed_at is not null on conflict do nothing;
 alter table games.haze_settings enable row level security;
 alter table games.haze_links enable row level security;
 alter table games.haze_challenges enable row level security;
@@ -175,6 +179,7 @@ begin
   if not found or p_txid is null or p_txid !~ '^[a-f0-9]{64}$' or (t.txid is not null and t.txid<>p_txid) or p_vout is null or p_vout<0 or p_block is null or p_block !~ '^[a-f0-9]{64}$' or p_time is null or
     p_time<extract(epoch from t.created_at)::bigint-30 or p_time>extract(epoch from t.expires_at)::bigint+7200 then raise exception 'The verified payment does not match this tip.'; end if;
   if t.confirmed_at is null then
+    insert into games.haze_transactions(txid,kind,intent) values(p_txid,'single',p_intent);
     update games.haze_tips set txid=p_txid,output_index=p_vout,block_hash=p_block,block_time=p_time,confirmed_at=clock_timestamp() where id=t.id;
     insert into games.passport_badges(user_id,badge_id) values(p_user,'haze_first_tip') on conflict do nothing;
     begin perform realtime.send('{}'::jsonb,'tip','lobby-chat',true); exception when others then null; end;
