@@ -54,6 +54,9 @@ The public production protocol is separately covered by `haze-core.test.mjs`.
    freezes the sender, destination, amount and message in an intent. It obtains
    the recipient address from the verified link, never from the tipping client.
    Muted senders cannot create chat tips.
+   Only linked recipients have an enabled Tip control; others show
+   **Wallet not linked**. The server validates the tip before Haze opens.
+   A rejection leaves the picker and draft in place without flashing the wallet.
 3. The same chat dialog shows a persistent Haze-owned frame. Its exact-origin
    `haze:tip-review` request contains only `{type,version:1,fragment}`; it opens
    a public review and grants no spend authority. Haze checks the linked sender,
