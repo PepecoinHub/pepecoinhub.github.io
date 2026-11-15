@@ -2,7 +2,7 @@
 // Loaded only behind the existing ?beta=gochi gate. No polling, rewards, chat or local fake pet.
 // Based on PR #299; adds the Pond Quiz (one server question a day once the frog has hatched; update_pond_quiz.sql)
 // and the hop out of the PEPEGOCHI.EXE window.
-import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261115room';
+import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261115a10';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);

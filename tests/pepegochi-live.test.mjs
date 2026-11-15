@@ -134,7 +134,7 @@ test('Room-4: a move-out that is not saved yet is written once (gry_pepegochi_se
   await game.refresh();
   assert.deepEqual(calls, ['gry_pepegochi_state', 'gry_pepegochi_settle']);
   assert.equal(game.view().departed.taken, 'mug');
-  assert.match(game.view().letter.text, /I took the mug/);
+  assert.match(game.view().letter.text, /I took the Comfy mug/);
   await game.refresh();
   assert.deepEqual(calls, ['gry_pepegochi_state', 'gry_pepegochi_settle', 'gry_pepegochi_state'], 'once is enough');
   // without the Room-4 SQL the call fails quietly and the classic letter stays

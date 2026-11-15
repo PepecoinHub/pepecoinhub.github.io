@@ -33,7 +33,7 @@ test('starter props: same items in the same slots as the room SQL catalog', () =
 
 test('every image the window draws is a file in docs/games, at the size the art packs give', () => {
   const sprites = Object.keys(SPRITES).map(spriteSrc);
-  const all = [BACKGROUND, FROG, ...sprites, ...DEPART_FRAMES, SUITCASE.src, LETTER.envelope, LETTER.open, ...roomScene().items.map(i => i.src)];
+  const all = [BACKGROUND, FROG, ...sprites, ...DEPART_FRAMES, SUITCASE.src, LETTER.envelope, LETTER.open, ...roomScene().items.map(i => i.src.split('?')[0])];
   for (const f of all) assert.ok(existsSync(file(f)), f);
   assert.deepEqual(pngSize(BACKGROUND), [ROOM_W, ROOM_H]);
   for (const f of [...sprites, ...DEPART_FRAMES, SUITCASE.src, LETTER.envelope, LETTER.open]) assert.deepEqual(pngSize(f), [128, 128], f);
@@ -268,7 +268,7 @@ test('Room-4: the letter, the note and the picture follow the item the server pi
   // the picture hides exactly that item, and only while the frog is away
   const d = roomScene({ mode: 'departed', taken: 'mug' });
   assert.deepEqual(d.items.map(i => i.itemId).sort(), ['crt_tv', 'lava_lamp', 'p_poster', 'potted_plant', 'rubber_duck']);
-  assert.match(d.label, /the mug is gone too/);
+  assert.match(d.label, /the Comfy mug is gone too/);
   const none = roomScene({ mode: 'departed', taken: null });
   assert.equal(none.items.length, 6);
   assert.doesNotMatch(none.label, /gone too/);

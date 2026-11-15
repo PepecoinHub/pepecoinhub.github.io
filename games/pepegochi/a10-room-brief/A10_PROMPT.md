@@ -1,6 +1,6 @@
 # PepeGochi A10: trzy nowe rzeczy w pokoju (dla ChatGPT)
 
-Status: do wykonania. Prośba właściciela (2026-11-15): pokój wygląda nie najlepiej.
+Status: ZROBIONE. Grafiki ChatGPT zatwierdzone przez właściciela 2026-11-15 i w grze.
 - **Kubek:** ucho odstaje, a „P” słabo wygląda, więc zamiast niego będzie czerwony kubek „Comfy”.
 - **Kaczka:** nie wygląda jak kaczka.
 - **Obraz z „P”:** zamiast niego obraz ze **Złotą Stopą** z FROGAGEDDON.

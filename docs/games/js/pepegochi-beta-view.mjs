@@ -7,7 +7,7 @@
 // Temporary look for testing the mechanics. The game's real art comes later.
 import { LocalPepegochi, KINDS, parseTimestampUs } from './pepegochi-model.mjs';
 
-import { takenItem, takenName } from './pepegochi-room.mjs?v=20261115room';
+import { takenItem, takenName } from './pepegochi-room.mjs?v=20261115a10';
 
 export const STORAGE_KEY = 'pepegochi-local-sim-v1';
 export const START = Date.UTC(2026, 10, 9, 18);           // Monday 18:00 UTC
@@ -56,9 +56,9 @@ export const TAKEN_LINE = {
   crt_tv: 'P.S. I took the TV. I have shows to catch up on.',
   lava_lamp: 'P.S. I borrowed the lava lamp. Mood lighting matters.',
   potted_plant: 'P.S. I took the plant. Someone has to water it.',
-  p_poster: 'P.S. I took the poster. The wall looked lonely anyway.',
+  p_poster: 'P.S. I took the Golden Foot painting. A champion needs his trophy.',
   rubber_duck: 'P.S. I took the duck. We have a lot in common.',
-  mug: 'P.S. I took the mug. My tea deserves better.',
+  mug: 'P.S. I took the Comfy mug. It was always more mine than yours.',
 };
 export const NOTHING_LINE = "P.S. I didn't take anything. Just the memories.";
 export function goodbyeText(variant) {
