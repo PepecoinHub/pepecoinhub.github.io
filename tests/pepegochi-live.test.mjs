@@ -86,7 +86,7 @@ test('the live page talks only to the game server, keeps nothing in the browser 
   assert.deepEqual(calls.filter(c => c[1]).map(c => c[1]).sort(), ["{ p_action: kind }", "{ p_name: String(name || '').trim() }"]);
 });
 
-test('Decorate: the room picture follows the server room; a conflict re-reads it', async () => {
+test('Room: every owned item in its fixed place; the starter room is unpacked once', async () => {
   const slots = [{ slot_id: 'shelf_a', label: 'Shelf A', allowed_categories: ['small', 'trophy'] },
     { slot_id: 'rug_left', label: 'Rug left', allowed_categories: ['toy', 'small'] }];
   let room = { initialized: false, revision: null, slots, inventory: [], placements: [] }, conflict = false;
@@ -114,15 +114,10 @@ test('Decorate: the room picture follows the server room; a conflict re-reads it
   await game.refresh();
   await game.loadRoom();
   assert.deepEqual(calls, ['gry_pepegochi_state', 'gry_pepegochi_room_state', 'gry_pepegochi_room_initialize'], 'the first visit unpacks the starter room');
-  assert.deepEqual(game.placements(), { rug_left: 'rubber_duck' });
-  const moon = game.decor().find(x => x.item === 'moon_rock');
-  assert.equal(moon.slotLabel, 'In the box');
-  assert.deepEqual(moon.fits.map(f => f.id), ['shelf_a'], 'only the places it fits');
-  assert.ok(await game.place('m1', 'shelf_a'));
+  // every owned item stands in its own fixed place, whatever the server saved (owner, 2026-11-15)
   assert.deepEqual(game.placements(), { rug_left: 'rubber_duck', shelf_a: 'moon_rock' });
-  conflict = true;
-  assert.equal(await game.place('m1', 'shelf_a'), false);
-  assert.match(game.roomError, /another tab/);
+  assert.deepEqual(game.found(), { found: 1, total: 4 });
+  assert.equal(typeof game.place, 'undefined', 'nothing to move by hand any more');
 });
 
 test('Room-4: a move-out that is not saved yet is written once (gry_pepegochi_settle), then never again', async () => {

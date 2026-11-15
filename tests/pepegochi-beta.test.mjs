@@ -128,7 +128,7 @@ test('local only: the page cannot reach any server, and its scripts use no netwo
     assert.doesNotMatch(code, /\bfetch\s*\(|XMLHttpRequest|WebSocket|EventSource|sendBeacon|localStorage|indexedDB|document\.cookie|postMessage/, f);
     assert.doesNotMatch(code, /supabase|backend\.js|getBackend|gry_passport|passport_award/i, f);
     for (const i of [...code.matchAll(/\bimport\b[^'"]*['"]([^'"]+)['"]/g)].map(m => m[1]))
-      assert.ok(['./pepegochi-model.mjs', './pepegochi-beta-view.mjs', './pepegochi-room.mjs'].includes(i), f + ' imports ' + i);
+      assert.ok(['./pepegochi-model.mjs', './pepegochi-beta-view.mjs', './pepegochi-room.mjs'].includes(i.split('?')[0]), f + ' imports ' + i);
   }
   const ui = read('docs/games/js/pepegochi-beta.mjs').replace(/\/\/[^\n]*/g, '');
   assert.equal([...ui.matchAll(/sessionStorage/g)].length, 1, 'one tab storage, handed to the game');

@@ -2,8 +2,8 @@
 // The frog lives on the server (games/supabase/update_pepegochi_v2.sql), one per Discord account.
 // PondOS opens this page in a window; it also works on its own.
 import { getBackend } from './backend.js?v=20261113link';
-import { LiveGame } from './pepegochi-live-view.mjs';
-import { renderRoom, playDeparture, playFrames, frogLook, careFrames, DEPART_FRAMES, HATCH_FRAMES, HATCH_MS, CARE_MS } from './pepegochi-room.mjs';
+import { LiveGame } from './pepegochi-live-view.mjs?v=20261115room';
+import { renderRoom, playDeparture, playFrames, frogLook, careFrames, DEPART_FRAMES, HATCH_FRAMES, HATCH_MS, CARE_MS } from './pepegochi-room.mjs?v=20261115room';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {
@@ -54,6 +54,8 @@ function renderPet(box, p) {
 
 function adoptForm(label, value) {
   const f = el('form', { class: 'pgb-row pgb-adopt', 'data-adopt': '1' });
+  // owner, 2026-11-15: say up front that good care pays off
+  f.append(el('p', { class: 'pgb-adopt-note' }, 'Look after your fren: good care is rewarded with stamps in your Fren Passport.'));
   f.append(el('label', { for: 'pgb-name' }, 'Name'),
     el('input', { type: 'text', id: 'pgb-name', value, maxlength: 18, autocomplete: 'off', pattern: '[A-Za-z0-9 _.\\-]{2,18}', title: '2-18 letters, digits, spaces, _ . -' }),
     el('button', { type: 'submit', class: 'btn primary', disabled: game.busy }, label));
@@ -138,27 +140,14 @@ function render() {
   if (v.summary) past.append(el('p', { class: 'small' }, `Former frens: ${v.summary.former_frens}. Longest friendship: ${v.summary.longest_friendship_days} days.`));
 }
 
-// Decorate: every decoration the account owns, where it stands, and the places it fits (only with a frog at home)
+// Room secrets: every item has its own place; the decorations earned with Passport stamps appear in theirs
 function renderDecor(v) {
   const box = $('pgb-decor'), card = $('pgb-decor-card');
-  const list = v.mode === 'pet' ? game.decor() : null;
-  card.hidden = !list;
-  if (!list) return;
-  box.replaceChildren();
-  if (game.roomError) box.append(el('p', { class: 'pgb-warn' }, game.roomError));
-  const ul = el('ul', { class: 'pgb-decor' });
-  for (const it of list) {
-    const li = el('li', { class: 'pgb-decor-item' });
-    li.append(el('img', { src: 'img/pepegochi/' + it.item + '.png', alt: '', width: 48, height: 48 }),
-      el('b', {}, it.name), el('small', { class: 'muted' }, it.slotLabel));
-    const sel = el('select', { 'aria-label': 'Where to put ' + it.name, 'data-item': it.id });
-    sel.append(el('option', { value: '' }, it.slot ? 'Move to…' : 'Put on…'));
-    it.fits.filter(f => f.id !== it.slot).forEach(f => sel.append(el('option', { value: f.id }, f.label)));
-    li.append(sel);
-    if (it.slot) li.append(el('button', { type: 'button', class: 'btn', 'data-unplace': it.slot }, 'Put away'));
-    ul.append(li);
-  }
-  box.append(ul, el('p', { class: 'small muted' }, 'Decorations you earn with Passport stamps show up here. Three earned decorations in the room at once: Pond Decorator.'));
+  const f = v.mode === 'pet' ? game.found() : null;
+  card.hidden = !f;
+  if (!f) return;
+  box.replaceChildren(el('p', {}, f.found === f.total ? `All ${f.total} room secrets found. Every corner of the room is full.`
+    : `Room secrets found: ${f.found} of ${f.total}. A few spots in the room are still empty: some Passport stamps fill them.`));
 }
 
 async function run(p) {
@@ -185,14 +174,6 @@ $('pgb-body').addEventListener('click', e => {
   else if (t.dataset.letter) openLetter();
   else if (t.dataset.closeLetter) { game.closeLetter(); render(); }
   else if (t.dataset.signin) backend.discord().catch(err => { game.message = err.message; render(); });
-});
-$('pgb-decor').addEventListener('change', e => {
-  const s = e.target.closest('select[data-item]');
-  if (s && s.value && !game.busy) run(game.place(s.dataset.item, s.value));
-});
-$('pgb-decor').addEventListener('click', e => {
-  const b = e.target.closest('[data-unplace]');
-  if (b && !game.busy) run(game.unplace(b.dataset.unplace));
 });
 $('pgb-body').addEventListener('submit', e => {
   if (!e.target.closest('[data-adopt]')) return;

@@ -5,6 +5,7 @@
 // full state, moved on by the time that passed since the server sent it. Every response is a full state, so there
 // is no extra read after an action, no polling and no Realtime.
 import { buildView, COPY, ACTION_NAME, msOf } from './pepegochi-beta-view.mjs';
+import { fixedPlacements, DECORATIONS } from './pepegochi-room.mjs?v=20261115room';
 
 export const SIGNIN_RE = /Discord sign-in required|not authenticated|JWT|Not signed in|permission denied/i;
 export const LIVE_COPY = {
@@ -109,24 +110,17 @@ export class LiveGame {
     if (ok && this.room && !this.room.initialized && p && p.status !== 'departed') await this.roomCall('gry_pepegochi_room_initialize');
     return this.room;
   }
-  place(instanceId, slotId) { return this.roomCall('gry_pepegochi_room_place', { p_item_instance_id: instanceId, p_slot_id: slotId, p_expected_revision: this.room.revision }); }
-  unplace(slotId) { return this.roomCall('gry_pepegochi_room_unplace', { p_slot_id: slotId, p_expected_revision: this.room.revision }); }
-  // slot -> item_id, for the room picture (null: not loaded, the window shows the starter room)
+  // slot -> item_id, for the room picture (null: not loaded, the window shows the starter room). Every owned item
+  // stands in its own fixed place (HOME_SLOT), whatever an older version of the window saved.
   placements() {
     if (!this.room || !this.room.initialized) return null;
-    const byId = Object.fromEntries(this.room.inventory.map(i => [i.item_instance_id, i.item_id]));
-    return Object.fromEntries(this.room.placements.map(p => [p.slot_id, byId[p.item_instance_id]]).filter(x => x[1]));
+    return fixedPlacements(this.room.inventory.map(i => i.item_id));
   }
-  // what the Decorate panel lists: every owned item, where it stands, and the slots it fits
-  decor() {
+  // the decorations earned with Passport stamps: how many of the four are found
+  found() {
     if (!this.room || !this.room.initialized) return null;
-    const at = Object.fromEntries(this.room.placements.map(p => [p.item_instance_id, p.slot_id]));
-    const label = Object.fromEntries(this.room.slots.map(s => [s.slot_id, s.label]));
-    return this.room.inventory.map(i => ({
-      id: i.item_instance_id, item: i.item_id, name: i.display_name, slot: at[i.item_instance_id] || null,
-      slotLabel: at[i.item_instance_id] ? label[at[i.item_instance_id]] : 'In the box',
-      fits: this.room.slots.filter(s => s.allowed_categories.includes(i.category)).map(s => ({ id: s.slot_id, label: s.label })),
-    }));
+    const own = new Set(this.room.inventory.map(i => i.item_id));
+    return { found: DECORATIONS.filter(d => own.has(d)).length, total: DECORATIONS.length };
   }
 
   view() {
