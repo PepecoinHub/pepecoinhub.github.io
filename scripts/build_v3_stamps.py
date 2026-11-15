@@ -31,6 +31,8 @@ V3 = [
     'share_fren', 'valentine_fren',
     # the Pond Quiz stamps (owner, 2026-11-15): 1, 10, 25, 50 and 99 right answers
     'quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99',
+    # owner, 2026-11-15: the illustrated Pond King stamp and the FROGAGEDDON Beta Tester (art only: no award rule)
+    'long_live_the_king', 'frogageddon_beta',
 ]
 SMALL = set()   # every stamp has its full-size file now
 TILE = (138, 150)
