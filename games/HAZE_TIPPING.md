@@ -6,9 +6,41 @@ signing key, bot wallet, withdrawal authority or internal balance. Signing and
 network-fee approval remain inside Haze. Ordinary chat keeps working if tipping
 is disabled or unavailable.
 
-**Not deployed.** `HAZE_TIPS_ENABLED` in `docs/games/js/haze-tips.mjs` is false.
-`games.haze_settings.enabled` starts false. Our connected GitHub account has
-read access but no push access. Base: `bb81c19d2afb143711f82a6bbd3a244ee4ffbd76`.
+**Local review only.** `HAZE_TIPS_ENABLED` in `docs/games/js/haze-tips.mjs` is
+false and `games.haze_settings.enabled` starts false. Based on upstream
+`060686a4f97646dd7dd51acf5ffe2dd256b9537b`. No branch push, PR, or deployment
+has been made. Both connected GitHub accounts still reported pull-only access
+on 2026-11-15; this does not prevent local preview work.
+
+## Local playground
+
+`node scripts/haze-preview.mjs` starts the actual Games lobby/chat at
+`http://127.0.0.1:18920/` and the Haze candidate at port 18921. It requires
+Node, Docker Desktop (the `postgres:17-alpine` image), and the installed verifier
+dependencies. Set `HAZE_WALLET_ROOT` to a local Haze checkout and
+`HAZE_TIP_CANDIDATE` to the reviewed directory containing `wallet.js`,
+`haze-bridge.js`, `widget-boot.js` and `widget.html`.
+
+The guide creates an encrypted disposable wallet with 2500 synthetic PEP.
+Password: `HazePreview!2026`. Review Haze's self-custody terms, then use
+**Back to chat**, link Haze and tip Byl's sample message. Confirmations take
+about 20 seconds. **Reset demo** restores the simulated balance and stamps.
+On a narrow window, open **Chat** in the games navigation.
+
+The real proof signer, transaction signer, independently implemented Edge
+verifier, token-protection response validator and actual Haze SQL migration
+run locally. The surrounding auth/host tables, Discord account, balances,
+funding transaction, protection evidence and chain/indexer are fixtures.
+Only preview responses in memory substitute the two origin constants.
+Production sources and their switches are unchanged. Browser CSP prevents
+connections to production services; the server never proxies a public chain.
+The dedicated labelled database has no network and no published port and is
+removed on shutdown. Never import or fund a personal wallet in this playground.
+
+`tests/haze-playground-browser.cjs` drives the entire local flow with Playwright,
+asserts no production requests or submission before approval, and checks a
+single confirmed receipt, SQL-earned stamps and mobile chat visibility.
+The public production protocol is separately covered by `haze-core.test.mjs`.
 
 ## Flow
 

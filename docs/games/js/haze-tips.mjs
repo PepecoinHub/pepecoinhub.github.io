@@ -83,7 +83,7 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
         node('button',{type:'button',class:'haze-tip-secondary',onclick:async()=>{try{await rpc('gry_haze_unlink',{});await refresh();view.d.close();}catch(error){view.status.textContent=error.message;}}},'Unlink wallet'));
     }
     const approve=node('button',{type:'button',class:'haze-tip-primary'},wallet?.address?'Link a different wallet':'Continue with Haze Wallet');
-    view.body.append(approve);
+    view.body.append(approve,node('a',{href:HAZE_ORIGIN+'/widget.html?standalone=1',target:'_blank',rel:'noopener noreferrer',class:'haze-tip-secondary'},'Open Haze Wallet ↗'));
     approve.onclick=async()=>{
       approve.disabled=true;
       const frame=node('iframe',{src:HAZE_ORIGIN+'/widget.html',title:'Secure Haze Wallet connection',class:'haze-tip-frame',referrerpolicy:'no-referrer',allow:'clipboard-write'});
@@ -91,7 +91,12 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
       try{
         await new Promise((resolve,reject)=>{frame.onload=resolve;frame.onerror=()=>reject(Error('Haze could not be loaded.'));});
         let ready=false;
-        for(let i=0;i<12&&view.d.isConnected&&!ready;i++){try{const caps=await frameRequest(frame,'capabilities',{},1500,view.signal);ready=caps?.authentication==='haze-auth-v1';}catch{}}
+        for(let i=0;i<12&&view.d.isConnected&&!ready;i++){
+          let caps;
+          try{caps=await frameRequest(frame,'capabilities',{},1500,view.signal);}catch{continue;}
+          if(caps?.authentication==='haze-auth-v1'&&caps.chatTipProtocol!==1)throw Error('This Haze build does not support chat tips yet. Open the updated Haze web wallet and try again.');
+          ready=caps?.authentication==='haze-auth-v1'&&caps.chatTipProtocol===1;
+        }
         if(!ready)throw Error('Haze connection support is not ready. Please try again later.');
         if(currentUser()!==user||!view.d.isConnected)return;
         const challenge=await rpc('gry_haze_link_begin',{});
