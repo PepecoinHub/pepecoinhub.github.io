@@ -1522,10 +1522,10 @@ footer.foot a { color: #edf3e3; }
   .hof-pane { max-height: none; }
 }
 .wp-queue, .wp-claims, .wp-paidlist { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
-.wp-queue li, .wp-claims li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 8px; background: #fff; color: #000; }
+.wp-queue li, .wp-claims li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 8px 10px; background: var(--card); color: var(--ink); border: 1.5px solid color-mix(in srgb, var(--line) 30%, transparent); border-radius: 8px; }
 .wp-claims li { grid-template-columns: minmax(0, 1fr) auto; }
-.wp-claims code { font-size: 11px; word-break: break-all; }
-.wp-claims .bad { color: #b3261e; }
+.wp-claims code { font-size: 11px; word-break: break-all; background: none; border: 0; padding: 0; color: var(--muted); }
+.wp-claims .bad { color: var(--lips); }
 .wp-qimg { grid-column: 1 / -1; }
 .wp-qimg img { max-width: 100%; height: auto; display: block; }
 .wp-dec { display: flex; gap: 6px; }
