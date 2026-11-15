@@ -42,6 +42,11 @@ Then run `deploy/00_check.sql` again: all rows `done`, and the last row shows th
 - Supabase > Database > Extensions > `pg_cron` on, then run step 14 again: the Hall of Fame closes each day at 00:01 UTC
   by itself. Without it, days close on the next Passport visit or Hall of Fame view (same result, a bit later).
 
+## PepeGochi hidden beta on production (owner, 2026-11-15: variant B)
+Paste `deploy/PEPEGOCHI_BETA.sql` (one transaction: the game, the room, Room-4 and the Pond Quiz; no stamp files),
+then the PRIVATE `update_pond_quiz_questions.sql`. The game stays behind `?beta=gochi`. Nothing awards a Passport
+stamp during the beta; on PepeGochi day the stamp files below deliver every milestone and quiz threshold reached.
+
 ## Later: PepeGochi day (owner, 2026-11-09: PepeGochi launches after the Passport)
 Not in LAUNCH_ALL.sql. On PepeGochi day, in this order: `update_pepegochi_v2.sql`, `update_pepegochi_passport.sql`,
 `update_pepegochi_room_v1.sql`, `update_pepegochi_rewards.sql`, `update_pepegochi_room_departure.sql` (Room-4: the frog
