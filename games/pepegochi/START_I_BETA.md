@@ -38,9 +38,15 @@ Typowy dzień gracza: około 6–10 wywołań. 100 graczy dziennie to około 1 0
 
 ## 3. Test bety (przed startem, za Twoją zgodą)
 
-Wariant A, bezpieczniejszy: osobny, darmowy projekt Supabase do testów (ten sam `schema.sql` + pliki z punktu 4),
-a strona testowa wskazuje na niego. Wariant B: pliki SQL na produkcji, gra nadal tylko z `?beta=gochi`
-(nikt bez linku nie trafi do gry, ale funkcje istnieją na serwerze).
+Wybrany wariant B (właściciel, 2026-11-15): SQL na produkcji, gra nadal tylko z `?beta=gochi`.
+
+1. Supabase > SQL Editor > New query: wkleić CAŁY `games/supabase/deploy/PEPEGOCHI_BETA.sql` > Run.
+   Jedna transakcja: przy błędzie nic się nie zmienia. Gra, pokój, wyprowadzka (Room-4) i quiz.
+   **Żadnych stempli w becie**: pliki, które je przyznają, czekają na start, a w dniu startu dostarczą wszystko,
+   co testerzy osiągnęli, z datą, kiedy to się stało.
+2. Drugie zapytanie: prywatny `update_pond_quiz_questions.sql` (99 pytań, z zipa) > Run.
+3. Sprawdzenie: zapytanie z komentarza na końcu `PEPEGOCHI_BETA.sql` (wszystkie kolumny `true`).
+4. Wycofanie bety: punkt 5.
 
 Scenariusz dla 2–3 testerów z Discordem (`pepecoinhub.com/meme/?beta=gochi`):
 1. Żaba na pasku: przed adopcją jajo; klik otwiera PEPEGOCHI.EXE.
@@ -54,10 +60,9 @@ Scenariusz dla 2–3 testerów z Discordem (`pepecoinhub.com/meme/?beta=gochi`):
 
 ## 4. Lista kroków startu
 
-1. Supabase > SQL Editor, w tej kolejności (`games/supabase/deploy/RUN_ORDER.md`):
-   `update_pepegochi_v2.sql`, `update_pepegochi_passport.sql`, `update_pepegochi_room_v1.sql`,
-   `update_pepegochi_rewards.sql`, `update_pepegochi_room_departure.sql`, `update_passport_awards.sql` (jeszcze raz),
-   `update_pond_quiz.sql`, prywatny `update_pond_quiz_questions.sql` (z zipa właściciela).
+1. Po becie (B) zostają pliki stempli: `update_pepegochi_passport.sql`, `update_pepegochi_rewards.sql`, funkcja
+   `games.passport_award` z `update_passport_awards.sql` (zna stemple quizu) i jeszcze raz `update_pond_quiz.sql`
+   (dostarcza zaległe stemple quizu). Claude przygotuje je jako jeden plik do wklejenia.
 2. Sprawdzenie: `select count(*) from games.quiz_questions where active;` = 99.
 3. Test bety (punkt 3) na produkcji z `?beta=gochi`.
 4. Release PR (Claude przygotuje): 10 stempli (5 PepeGochi + 5 quizu) `live` w `passport-catalog.json`, bramka `GOCHI`
