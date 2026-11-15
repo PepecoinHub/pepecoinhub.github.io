@@ -126,6 +126,8 @@ test('hop out of the window: whole-pixel arc from the window to the taskbar slot
   assert.deepEqual(p.at(-1), { x: 60, y: 700 });
   assert.ok(p.every(q => Number.isInteger(q.x) && Number.isInteger(q.y)));
   assert.ok(p[4].y < 200 + (700 - 200) / 2, 'it arcs upward on the way');
+  assert.ok(p.length >= 30, 'enough points for a smooth flight');
+  for (let i = 1; i < p.length; i++) assert.ok(Math.hypot(p[i].x - p[i - 1].x, p[i].y - p[i - 1].y) < 40, 'no big jumps');
   const shell = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   assert.match(shell, /new CustomEvent\('pondos:pepegochi-left'/);
   assert.match(shell, /minBtn\.addEventListener\('click', A\._hop, true\)/);

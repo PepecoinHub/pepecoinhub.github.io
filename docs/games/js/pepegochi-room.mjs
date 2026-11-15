@@ -50,6 +50,20 @@ export const STARTER_ROOM = {
   floor_left: 'potted_plant', rug_left: 'rubber_duck', table_top: 'mug',
 };
 
+// Every item always stands in the same place (owner, 2026-11-15): no moving things around. The four decorations
+// earned with Passport stamps have their own places, empty until they are found; floor_right stays free.
+export const HOME_SLOT = {
+  ...Object.fromEntries(Object.entries(STARTER_ROOM).map(([slot, item]) => [item, slot])),
+  moon_rock: 'shelf_a', paper_crown: 'shelf_b', golden_fly: 'wall_right', floppy_disk: 'rug_right',
+};
+export const DECORATIONS = ['moon_rock', 'paper_crown', 'golden_fly', 'floppy_disk'];
+// slot -> item for the items an account owns, each in its own place
+export function fixedPlacements(owned) {
+  const out = {};
+  for (const item of owned) if (HOME_SLOT[item] && ITEMS[item]) out[HOME_SLOT[item]] = item;
+  return out;
+}
+
 // ---------- the frog ----------
 // Every frog sprite is 128x128 (art pack v2). It is drawn at 1 sprite pixel = 1 room pixel, the same
 // scale for every stage: the art itself shows the size, nothing is resized at runtime.

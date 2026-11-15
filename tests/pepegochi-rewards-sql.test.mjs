@@ -14,7 +14,7 @@ const PASSPORT = ['update_yeet.sql', 'update_wheres_pepe.sql', 'update_wheres_pe
   'update_miner_cloud.sql', 'update_fren_passport.sql', 'update_fren_avatar.sql', 'update_passport_awards.sql'];
 const at = (h = 0) => new Date(+new Date(START) + h * 36e5);
 
-test('PepeGochi room rewards: decorations from stamps, Pond Decorator for 3 placed',
+test('PepeGochi room rewards: decorations from stamps, Pond Decorator for 3 found',
   { skip: !(URI && MOD) && 'set PASSPORT_PG_URL and PASSPORT_PG_MODULE', timeout: 300000 }, async t => {
   const pg = (await import(MOD)).default;
   const admin = new pg.Client({ connectionString: URI });
@@ -52,15 +52,16 @@ test('PepeGochi room rewards: decorations from stamps, Pond Decorator for 3 plac
       assert.equal((await items(1)).length, 4, 'running the file again changes nothing');
     });
 
-    await t.test('Pond Decorator: 3 different earned decorations placed, starters do not count', async () => {
-      let room = await ok(1, 'gry_pepegochi_room_initialize()');
-      const inst = id => room.inventory.find(i => i.item_id === id).item_instance_id;
-      const place = async (id, slot) => { room = await ok(1, `gry_pepegochi_room_place('${inst(id)}', '${slot}', ${room.revision})`); };
-      await place('moon_rock', 'shelf_a');
-      await place('paper_crown', 'shelf_b');
-      assert.equal(await has(1, 'interior_designer'), false, 'two are not enough');
-      await place('floppy_disk', 'rug_right');
-      assert.equal(await has(1, 'interior_designer'), true);
+    await t.test('Pond Decorator: 3 different earned decorations (each has its fixed place), starters do not count', async () => {
+      await addPlayer(db, 3);
+      await ok(3, "gry_pepegochi_adopt('Fren')");
+      await ok(3, 'gry_pepegochi_room_initialize()');
+      assert.equal(await has(3, 'interior_designer'), false, 'six starter props are not enough');
+      await award(3, 'moonwalker'); await award(3, 'secret_starter');
+      assert.equal(await has(3, 'interior_designer'), false, 'two are not enough');
+      await award(3, 'frog_of_the_week');
+      assert.equal(await has(3, 'interior_designer'), true, 'the third decoration gives the stamp, nothing to place');
+      assert.equal(await has(1, 'interior_designer'), true, 'player 1 found four earlier');
     });
 
     await t.test('the room alone gives nothing; the inactive Lost Pond artifact is never handed out', async () => {

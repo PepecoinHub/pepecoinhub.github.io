@@ -2095,33 +2095,40 @@ footer.foot a { color: #edf3e3; }
 @keyframes pgc-tremble { 0%, 100% { transform: translateX(0); } 18%, 50%, 82% { transform: translateX(-2px); } 35%, 66% { transform: translateX(2px); } }
 @media (prefers-reduced-motion: reduce) {
   .pondos .pg-companion-button[class*="pg-motion-"] img { animation: none !important; transform: none !important; }
+  .pondos .pg-companion-fact { animation: none; }
 }
 
 /* the fact of the day: a small Windows 98 "?" button on the frog, and its balloon (pepegochi-facts.mjs) */
-.pondos .pg-companion-fact { position: absolute; z-index: 3; top: 0; left: -4px; width: 16px; height: 16px; padding: 0;
-  font: 700 11px/14px var(--f-chrome); color: #000080; background: var(--chrome); border: 1px solid;
-  border-color: #fff var(--chrome-dk) var(--chrome-dk) #fff; cursor: pointer; }
-.pondos .pg-companion-fact:active { border-color: var(--chrome-dk) #fff #fff var(--chrome-dk); }
+/* a yellow speech bubble at the frog's head: easy to see on any wallpaper and on the grey bar (owner, 2026-11-15) */
+.pondos .pg-companion-fact { position: absolute; z-index: 3; bottom: calc(100% + var(--pg-lift, 3px) + 30px); left: -14px;
+  width: 24px; height: 24px; padding: 0; font: 900 16px/20px var(--f-chrome); color: #000; background: #ffd23a;
+  border: 2px solid #000; border-radius: 4px; box-shadow: 2px 2px 0 #0008; cursor: pointer;
+  animation: pg-fact-pop 600ms steps(3, end) 1 both; }
+.pondos .pg-companion-fact::after { content: ""; position: absolute; right: -6px; bottom: 2px; border: 4px solid transparent;
+  border-left: 5px solid #000; }
+.pondos .pg-companion-fact:hover, .pondos .pg-companion-fact:focus-visible { background: #fff27a; outline: 2px dotted #000; outline-offset: 2px; }
+.pondos .pg-companion-fact:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #0008; }
+@keyframes pg-fact-pop { 0% { transform: translateY(4px); } 50% { transform: translateY(-3px); } 100% { transform: none; } }
 .pondos .pg-companion-fact[hidden] { display: none; }
-.pg-fact { position: fixed; z-index: 98950; width: min(320px, calc(100vw - 16px)); padding: 0 0 8px; color: #000;
-  background: #fffbe0; border: 1px solid var(--chrome-dk); box-shadow: 2px 2px 0 #1116; font: 13px/1.35 var(--f-body); }
+.pg-fact { position: fixed; z-index: 98950; width: min(360px, calc(100vw - 16px)); padding: 0 0 10px; color: #000;
+  background: #fffbe0; border: 2px solid #000; box-shadow: 3px 3px 0 #0007; font: 14px/1.4 var(--f-body); }
 .pg-fact-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 3px 2px 8px;
-  color: #fff; background: #000080; font: 700 12px/1.4 var(--f-chrome); }
+  color: #fff; background: #000080; font: 700 13px/1.5 var(--f-chrome); }
 .pg-fact-x { width: 18px; height: 16px; padding: 0; font: 700 12px/12px var(--f-chrome); color: #000; background: var(--chrome);
   border: 1px solid; border-color: #fff var(--chrome-dk) var(--chrome-dk) #fff; cursor: pointer; }
-.pg-fact-q { margin: 8px 10px 6px; font-weight: 700; }
-.pg-fact-answers { display: grid; gap: 4px; margin: 0 10px; }
-.pg-fact-a { min-height: 30px; padding: 3px 8px; text-align: left; font: 12px/1.3 var(--f-chrome); color: #000; background: var(--chrome);
+.pg-fact-q { margin: 10px 12px 8px; font-weight: 700; font-size: 15px; line-height: 1.35; }
+.pg-fact-answers { display: grid; gap: 5px; margin: 0 12px; }
+.pg-fact-a { min-height: 36px; padding: 5px 10px; text-align: left; font: 14px/1.3 var(--f-chrome); color: #000; background: var(--chrome);
   border: 1px solid; border-color: #fff var(--chrome-dk) var(--chrome-dk) #fff; cursor: pointer; }
 .pg-fact-a:disabled { cursor: default; color: #000; }
 .pg-fact-a.is-right { background: #c8f0c0; font-weight: 700; }
 .pg-fact-a.is-wrong { background: #f4c4c0; text-decoration: line-through; }
-.pg-fact-out { margin: 6px 10px 0; min-height: 1.2em; }
+.pg-fact-out { margin: 8px 12px 0; min-height: 1.2em; font-weight: 600; }
 .pg-fact-out a { color: #000080; }
 .pg-fact-extra { margin: 6px 10px 0; }
-.pg-fact-note { margin: 4px 0 0; font-size: 12px; color: #333; }
+.pg-fact-note { margin: 4px 0 0; font-size: 13px; color: #222; }
 .pg-fact-rank { width: 100%; text-align: center; }
-.pg-fact-board { margin: 4px 0 0; padding: 0; list-style: none; font-size: 12px; }
+.pg-fact-board { margin: 4px 0 0; padding: 0; list-style: none; font-size: 13px; }
 .pg-fact-board li { display: flex; justify-content: space-between; gap: 8px; }
 /* the frog flying from the PEPEGOCHI.EXE window to the taskbar */
 .pg-companion-fly { position: fixed; z-index: 98960; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }

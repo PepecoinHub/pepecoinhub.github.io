@@ -2,7 +2,7 @@
 // Loaded only behind the existing ?beta=gochi gate. No polling, rewards, chat or local fake pet.
 // Based on PR #299; adds the Pond Quiz (one server question a day once the frog has hatched; update_pond_quiz.sql)
 // and the hop out of the PEPEGOCHI.EXE window.
-import { frogLook } from '../games/js/pepegochi-room.mjs';
+import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261115room';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
@@ -74,7 +74,7 @@ export const UNAVAILABLE = { sprite: pose('tb_egg'), label: 'PepeGochi',
   title: 'PepeGochi is unavailable right now. Click to open the game.', warning: false, hasPet: false, motion: 'egg' };
 
 // The flight path of the hop from the game window to the taskbar: whole pixels, an arc, ending on the slot.
-export function hopPath(from, to, steps = 8) {
+export function hopPath(from, to, steps = 36) {
   const pts = [];
   const lift = Math.min(120, Math.max(40, Math.abs(to.y - from.y) / 3));
   for (let i = 0; i <= steps; i++) {
@@ -341,7 +341,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     img.style.visibility = 'hidden';
     const done = () => { fly.remove(); img.style.visibility = ''; cancelMotion(); playMotion('hop'); };
     if (!fly.animate) { done(); return; }
-    const anim = fly.animate(pts.map(p => ({ transform: `translate(${p.x}px, ${p.y}px)` })), { duration: 560, easing: 'steps(' + (pts.length - 1) + ', end)' });
+    // many whole-pixel points, one after another: smooth to the eye, never blurred between two pixels (owner, 2026-11-15)
+    const anim = fly.animate(pts.map(p => ({ transform: `translate(${p.x}px, ${p.y}px)` })), { duration: 760, easing: 'steps(' + (pts.length - 1) + ', end)' });
     anim.onfinish = done; anim.oncancel = done;
   }
 

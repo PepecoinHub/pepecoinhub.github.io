@@ -13,8 +13,8 @@
 --     The item belongs to the account (games.pepegochi_room_inventory), once, with a server source key
 --     ('stamp:<badge>'). Nothing comes from the browser. The grant happens when the stamp is written, or, for a
 --     fren who earned the stamp before adopting a frog, when the account adopts its first frog.
---   * Pond Decorator (interior_designer): 3 different earned decorations placed in the room at the same time
---     (the starter furniture does not count). Through games.passport_award() like every stamp.
+--   * Pond Decorator (interior_designer): 3 different earned decorations (the starter furniture does not count).
+--     Each item has a fixed place in the room, so an earned one is always on show. Through games.passport_award().
 --   * Retires the "Lost Pond artifact" item (The Secret Pond was dropped): not offered, nothing deleted.
 --
 -- Errors: a failing hook never undoes the stamp, the adoption or the room edit. It logs a warning, and the next
@@ -63,19 +63,20 @@ begin
   on conflict (user_id, source_key) do nothing;
   get diagnostics k = row_count;
   n := n + k;
+  if n > 0 then perform games.pepegochi_decorator_check(u); end if;   -- a new decoration may be the third
   return n;
 end
 $$;
 
--- Pond Decorator: 3 different earned (non-starter) decorations placed at the same time
+-- Pond Decorator: 3 different earned (non-starter) decorations. Every item has its own fixed place in the room
+-- (owner, 2026-11-15), so an earned decoration is always on show: owning it is enough.
 create or replace function games.pepegochi_decorator_check(u uuid)
 returns void language plpgsql volatile set search_path = '' as $$
 begin
   if (select count(distinct i.item_id)
-        from games.pepegochi_room_placements p
-        join games.pepegochi_room_inventory i on i.item_instance_id = p.item_instance_id and i.user_id = p.user_id
+        from games.pepegochi_room_inventory i
         join games.pepegochi_room_catalog c on c.item_id = i.item_id
-       where p.user_id = u and not c.is_starter) >= 3 then
+       where i.user_id = u and not c.is_starter and c.active) >= 3 then
     perform games.passport_award(u, 'interior_designer');
   end if;
 end
@@ -137,6 +138,6 @@ revoke all on function games.pepegochi_reward_badge_after(), games.pepegochi_rew
 
 -- backfill: every PepeGochi account gets what its stamps already entitle it to; rooms already decorated count
 select games.pepegochi_reward_sync(o.user_id) from games.pepegochi_owners o;
-select games.pepegochi_decorator_check(r.user_id) from games.pepegochi_room_revisions r;
+select games.pepegochi_decorator_check(o.user_id) from games.pepegochi_owners o;
 
 commit;
