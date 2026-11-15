@@ -1854,10 +1854,10 @@ footer.foot a { color: #edf3e3; }
 @keyframes bsodblink { 50% { opacity: 0; } }
 /* Pepe Guesser host: one tip-bot line per address, big buttons for phones */
 .wp-bot { margin: 0 0 8px; padding: 0; list-style: none; display: grid; gap: 6px; }
-.wp-bot li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: center; padding: 8px; background: #fff; color: #000; }
-.wp-bot code { font-size: 12px; word-break: break-all; user-select: all; -webkit-user-select: all; }
+.wp-bot li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: center; padding: 8px 10px; background: var(--card); color: var(--ink); border: 1.5px solid color-mix(in srgb, var(--line) 30%, transparent); border-left: 4px solid var(--frog); border-radius: 8px; }
+.wp-bot code { font-size: 12px; word-break: break-all; user-select: all; -webkit-user-select: all; background: none; border: 0; padding: 0; color: inherit; }
 .wp-bot .app-btn { min-height: 36px; }
-.wp-bot li.is-copied { background: #e6f4e6; }
+.wp-bot li.is-copied { background: var(--frog-wash); }
 @media (max-width: 520px) { .wp-bot li { grid-template-columns: 1fr 1fr; } .wp-bot code { grid-column: 1 / -1; } }
 /* Gazette #6: a reader's letter, printed like a clipping */
 .gz-letter { margin: 0 0 8px; padding: 10px 12px; background: #fffef6; color: #1b1b1b; border: 1px solid #cfc8a8; box-shadow: 2px 3px 0 rgba(0, 0, 0, .18); transform: rotate(.5deg); font: 400 15px/1.45 system-ui, sans-serif; }
