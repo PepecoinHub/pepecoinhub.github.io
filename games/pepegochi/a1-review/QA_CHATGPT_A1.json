@@ -1,0 +1,165 @@
+[
+  {
+    "file": "pepegochi_adult_hungry.png",
+    "size": [
+      128,
+      128
+    ],
+    "mode": "RGBA",
+    "rgba_colors_including_transparent": 40,
+    "alpha_values": [
+      0,
+      255
+    ],
+    "broken_2x2_blocks": 0,
+    "bbox_exclusive": [
+      26,
+      8,
+      122,
+      124
+    ],
+    "bottom_boundary": 124,
+    "last_visible_row": 123,
+    "sha256": "b906dc241b2f2d23be747639a4172e1eab5174cd185c2cce617822fca5c1d697",
+    "original_head_unchanged": true
+  },
+  {
+    "file": "pepegochi_adult_dirty.png",
+    "size": [
+      128,
+      128
+    ],
+    "mode": "RGBA",
+    "rgba_colors_including_transparent": 38,
+    "alpha_values": [
+      0,
+      255
+    ],
+    "broken_2x2_blocks": 0,
+    "bbox_exclusive": [
+      26,
+      8,
+      114,
+      124
+    ],
+    "bottom_boundary": 124,
+    "last_visible_row": 123,
+    "sha256": "07ac37f9c5a19e4f7ed3ffd9a736d78ac415277e374a9c1e42da093f990e6454",
+    "changed_pixels": 68,
+    "changed_bbox": [
+      62,
+      76,
+      72,
+      88
+    ],
+    "unchanged_outside_glyph": true
+  },
+  {
+    "file": "pepegochi_adult_recovering.png",
+    "size": [
+      128,
+      128
+    ],
+    "mode": "RGBA",
+    "rgba_colors_including_transparent": 34,
+    "alpha_values": [
+      0,
+      255
+    ],
+    "broken_2x2_blocks": 0,
+    "bbox_exclusive": [
+      26,
+      8,
+      100,
+      124
+    ],
+    "bottom_boundary": 124,
+    "last_visible_row": 123,
+    "sha256": "e449d9e6120c0e5b31e1dc05e6358236381ef0439b2ef2e22a6bedb4655c14e1",
+    "changed_pixels": 68,
+    "changed_bbox": [
+      62,
+      76,
+      72,
+      88
+    ],
+    "unchanged_outside_glyph": true
+  },
+  {
+    "file": "pepegochi_froglet_idle.png",
+    "size": [
+      128,
+      128
+    ],
+    "mode": "RGBA",
+    "rgba_colors_including_transparent": 33,
+    "alpha_values": [
+      0,
+      255
+    ],
+    "broken_2x2_blocks": 0,
+    "bbox_exclusive": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "bottom_boundary": 124,
+    "last_visible_row": 123,
+    "sha256": "eee7edf0cd22ad72957acb0824c1c2163722580e6d895078bd057c8189096b13",
+    "changed_pixels": 52,
+    "changed_bbox": [
+      64,
+      86,
+      72,
+      98
+    ],
+    "unchanged_outside_glyph": true
+  },
+  {
+    "file": "pepegochi_hatch_03.png",
+    "size": [
+      128,
+      128
+    ],
+    "mode": "RGBA",
+    "rgba_colors_including_transparent": 35,
+    "alpha_values": [
+      0,
+      255
+    ],
+    "broken_2x2_blocks": 0,
+    "bbox_exclusive": [
+      32,
+      20,
+      96,
+      124
+    ],
+    "bottom_boundary": 124,
+    "last_visible_row": 123,
+    "sha256": "c6c63697b6a9387984e02c3795fff19231bf9809fe237b6ad26f59b59889006e"
+  },
+  {
+    "file": "pepegochi_hatch_04.png",
+    "size": [
+      128,
+      128
+    ],
+    "mode": "RGBA",
+    "rgba_colors_including_transparent": 33,
+    "alpha_values": [
+      0,
+      255
+    ],
+    "broken_2x2_blocks": 0,
+    "bbox_exclusive": [
+      2,
+      50,
+      126,
+      124
+    ],
+    "bottom_boundary": 124,
+    "last_visible_row": 123,
+    "sha256": "d511956c216e93f8eb01699a1cbb028034502655183c70d068ea9ccbe217b9fa"
+  }
+]

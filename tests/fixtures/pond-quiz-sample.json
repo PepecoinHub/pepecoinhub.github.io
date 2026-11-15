@@ -1,0 +1,11 @@
+{
+ "about": "NOT the real Pond Quiz: six made-up questions for the tests. The real questions are kept out of this public repo and live only in Supabase (see games/supabase/update_pond_quiz.sql).",
+ "questions": [
+  {"id": "s01", "question": "Sample question one?", "answers": ["Right one", "Wrong a", "Wrong b", "Wrong c"], "correct": 0, "source": "https://pepecoinhub.com/supply.html", "dated": false},
+  {"id": "s02", "question": "Sample question two?", "answers": ["Wrong a", "Right two", "Wrong b", "Wrong c"], "correct": 1, "source": "https://pepecoinhub.com/mining.html", "dated": false},
+  {"id": "s03", "question": "Sample question three?", "answers": ["Wrong a", "Wrong b", "Right three", "Wrong c"], "correct": 2, "source": "https://pepecoinhub.com/wallets.html", "dated": false},
+  {"id": "s04", "question": "Sample question four, with a 'quote'?", "answers": ["Wrong a", "Wrong b", "Wrong c", "Right four"], "correct": 3, "source": "https://pepecoinhub.com/", "dated": false},
+  {"id": "s05", "question": "Sample question with a dated answer?", "answers": ["Right five", "Wrong a", "Wrong b", "Wrong c"], "correct": 0, "source": "https://pepecoinhub.com/network.html", "dated": true},
+  {"id": "s06", "question": "Sample question without a source yet?", "answers": ["Right six", "Wrong a", "Wrong b", "Wrong c"], "correct": 0, "source": null, "dated": false}
+ ]
+}

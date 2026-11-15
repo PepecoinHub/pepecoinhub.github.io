@@ -1,0 +1,590 @@
+[
+  {
+    "file": "base_adult_care.png",
+    "colors": 35,
+    "bounds": [
+      26,
+      8,
+      100,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "44f67de870dee4fd8b2b439b10cf6806f96a77d0d579547b9ce5e9f901210729"
+  },
+  {
+    "file": "care_clean_01.png",
+    "colors": 36,
+    "bounds": [
+      26,
+      8,
+      100,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "24e7b813af9f72e28c578dbced0ed35e2b7833856ebe7e12caf0e545613cbf58"
+  },
+  {
+    "file": "care_clean_02.png",
+    "colors": 36,
+    "bounds": [
+      26,
+      8,
+      100,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "d5a29a30e695549e7ba7bb4986fd8864f9797086c09510c552eac57bfdfdde7b"
+  },
+  {
+    "file": "care_clean_03.png",
+    "colors": 37,
+    "bounds": [
+      26,
+      0,
+      122,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "8978a5d79c5bd44dcfbd0c16d21888fb24648028535d80ea47ce0654b731559b"
+  },
+  {
+    "file": "care_clean_04.png",
+    "colors": 35,
+    "bounds": [
+      26,
+      8,
+      112,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "5b5d20c2b8ac20a1534d54a98fbacd9783c33fb68dbd3a133fb5a12083b97c24"
+  },
+  {
+    "file": "care_feed_01.png",
+    "colors": 39,
+    "bounds": [
+      26,
+      8,
+      100,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "624fc33ef837b28f79237013a4333f339d5c5adb72594455a55a9a66973c7888"
+  },
+  {
+    "file": "care_feed_02.png",
+    "colors": 39,
+    "bounds": [
+      26,
+      8,
+      100,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "11557fa6b834e57c0bd98d203a773e9721d0ca61da0cdaa92a63bbc222385dd7"
+  },
+  {
+    "file": "care_feed_03.png",
+    "colors": 39,
+    "bounds": [
+      26,
+      8,
+      100,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "0cfda5fe9512d8306277ddcc33b14e2ccd25f53b8fce49c27738871345c8478a"
+  },
+  {
+    "file": "care_feed_04.png",
+    "colors": 39,
+    "bounds": [
+      26,
+      8,
+      100,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "96a78ac3ff406c51c2008dadf673f528e472391cfe0a9445fa2386277e4be9f5"
+  },
+  {
+    "file": "care_froglet_clean_01.png",
+    "colors": 34,
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "6646dc6781ca5005a2b0b2276004f17197ea7700161eb0c0c2dd40a97f3f7b00"
+  },
+  {
+    "file": "care_froglet_clean_02.png",
+    "colors": 34,
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "93a9ab464555af315c7883c1c007dd3bb8e70debc5b998118b7d7b5ccd8759a5"
+  },
+  {
+    "file": "care_froglet_clean_03.png",
+    "colors": 35,
+    "bounds": [
+      24,
+      20,
+      122,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "c2535984626c72b5b460f523ba3ce4c93862033c3aed56d45d945fbe88b799b0"
+  },
+  {
+    "file": "care_froglet_clean_04.png",
+    "colors": 33,
+    "bounds": [
+      24,
+      30,
+      108,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "a850bd3268babbff57973fd1803bf9f092a1dbaed5734f0a5b081e29219e528d"
+  },
+  {
+    "file": "care_froglet_feed_01.png",
+    "colors": 37,
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "0686797ba76820cf7d6a207ae27d8fb7dbb335cde1576c0383df8d3ba0622d76"
+  },
+  {
+    "file": "care_froglet_feed_02.png",
+    "colors": 37,
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "5b64ec4e244a22920ebe2dfad770776881ae508f7bf8afd4b231f86c3cc0f130"
+  },
+  {
+    "file": "care_froglet_feed_03.png",
+    "colors": 37,
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "61976299804b781c19a2fce5973f79eeb9716be0047954eeaaa9291550666b41"
+  },
+  {
+    "file": "care_froglet_feed_04.png",
+    "colors": 37,
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "44fcabddf1729d13d7bb289ab794ea9063124051511d1250cbe3e9e69ecad062"
+  },
+  {
+    "file": "care_froglet_play_01.png",
+    "colors": 36,
+    "bounds": [
+      24,
+      30,
+      116,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "bb33ec2fec41a8a784272b6b838aca129b1b0b90569b5079bf4bd6f5b1a40db4"
+  },
+  {
+    "file": "care_froglet_play_02.png",
+    "colors": 36,
+    "bounds": [
+      24,
+      30,
+      118,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "d6cea0a80ecf3fcd33968e46d87d6f95c5ea4222502068c8864bb19e2f3d8297"
+  },
+  {
+    "file": "care_froglet_play_03.png",
+    "colors": 36,
+    "bounds": [
+      24,
+      12,
+      104,
+      120
+    ],
+    "jumpPx": 4,
+    "sha256": "2bc7663d2ccccb867769015a752e700470c6c79496fb95323bdb5409b7013137"
+  },
+  {
+    "file": "care_froglet_play_04.png",
+    "colors": 36,
+    "bounds": [
+      24,
+      30,
+      102,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "63e7c44c48b33c8e8047a340f01923b0bee9c33e47daea189e922fea50537354"
+  },
+  {
+    "file": "care_froglet_rest_01.png",
+    "colors": 33,
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "21b162cc792c1d28a229aa9e9b1881dcfdd05bf0574a7509e4d46e49b7ff3084"
+  },
+  {
+    "file": "care_froglet_rest_02.png",
+    "colors": 31,
+    "bounds": [
+      24,
+      30,
+      94,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "1e525a0439eacb85d22517dd5cf5907ab1e7dd1c1c8a2766b9427ea33eacde8b"
+  },
+  {
+    "file": "care_froglet_rest_03.png",
+    "colors": 32,
+    "bounds": [
+      24,
+      30,
+      106,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "631e78817ee615b12623fba6cb8164e93c5401ca22f01e9622a4c8d105e4bef9"
+  },
+  {
+    "file": "care_froglet_rest_04.png",
+    "colors": 32,
+    "bounds": [
+      24,
+      30,
+      116,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "86e48866040b4586f770c66880a765611b7b95ac2e3b8659ced6ee761ba4b46b"
+  },
+  {
+    "file": "care_play_01.png",
+    "colors": 38,
+    "bounds": [
+      26,
+      8,
+      118,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "c1acb61b8822f894cd51cccf469af1b95499196555762f4c0bc904127525a8a5"
+  },
+  {
+    "file": "care_play_02.png",
+    "colors": 38,
+    "bounds": [
+      26,
+      8,
+      122,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "0949818859a929936dd8b12360c9f3d15c70b13478eb48bcb6a4517aa325c6a9"
+  },
+  {
+    "file": "care_play_03.png",
+    "colors": 38,
+    "bounds": [
+      26,
+      0,
+      126,
+      118
+    ],
+    "jumpPx": 6,
+    "sha256": "5bfff9781f77b91743e957f45d0f177528dbc72864aa13f4cb8049807cf4e799"
+  },
+  {
+    "file": "care_play_04.png",
+    "colors": 38,
+    "bounds": [
+      26,
+      8,
+      104,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "bd39bc3b26e107915d3473f7c8685432b418bbd4a8d96e3e70b87534beb3b905"
+  },
+  {
+    "file": "care_rest_01.png",
+    "colors": 35,
+    "bounds": [
+      26,
+      8,
+      100,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "fe3c8be2ed844c38b64e0277669c9075f07d4e3665fd52b6dc98b7390a11ac7d"
+  },
+  {
+    "file": "care_rest_02.png",
+    "colors": 32,
+    "bounds": [
+      26,
+      8,
+      100,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "45d31aa17c9939fa6eef66d68da1b9c9cfa8e7eaac534e005f6b05d7be2aa204"
+  },
+  {
+    "file": "care_rest_03.png",
+    "colors": 33,
+    "bounds": [
+      26,
+      8,
+      110,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "6ad2c1f2029c6427d2800ac37ac134f842f2b6748e9921c4b425e9b2a29cf866"
+  },
+  {
+    "file": "care_rest_04.png",
+    "colors": 33,
+    "bounds": [
+      26,
+      8,
+      120,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "434c2515bef022e801b04678850406117422f20194085e1422f9dca07d17503a"
+  },
+  {
+    "file": "care_tadpole_clean_01.png",
+    "colors": 23,
+    "bounds": [
+      16,
+      50,
+      118,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "f8e4be98bb506e974e76f814cfa14c0d097eed96a4bd1bc334ba949d64555ad7"
+  },
+  {
+    "file": "care_tadpole_clean_02.png",
+    "colors": 22,
+    "bounds": [
+      16,
+      50,
+      110,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "d66b60538e89bad32a840ee8ab4f5740fd441c87ca11d5c65902eab7102755bb"
+  },
+  {
+    "file": "care_tadpole_clean_03.png",
+    "colors": 23,
+    "bounds": [
+      16,
+      40,
+      122,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "ad308f9e6119a627161787628251d56dfd91fc160e3626a403cbe7350dbdcffd"
+  },
+  {
+    "file": "care_tadpole_clean_04.png",
+    "colors": 21,
+    "bounds": [
+      16,
+      50,
+      120,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "5e447448c72d44839d16519f15b7acd6eede0ccd1d7dbfae4bf45d15251660d0"
+  },
+  {
+    "file": "care_tadpole_feed_01.png",
+    "colors": 26,
+    "bounds": [
+      16,
+      50,
+      124,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "b4524a11d633a4fbf793b7a60efc19fc26dd4e0d55bfd1b244373bef68058149"
+  },
+  {
+    "file": "care_tadpole_feed_02.png",
+    "colors": 26,
+    "bounds": [
+      16,
+      50,
+      126,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "f54ca715d670a51b9dff4e80b7514cc72f8dc3cd4a0459b449cd04e60099bf5d"
+  },
+  {
+    "file": "care_tadpole_feed_03.png",
+    "colors": 24,
+    "bounds": [
+      16,
+      50,
+      124,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "ae5fa70db321509e8702d27288ce81c83c8d5bd29d2a0c26e1ed4514b2d0ca42"
+  },
+  {
+    "file": "care_tadpole_feed_04.png",
+    "colors": 25,
+    "bounds": [
+      16,
+      50,
+      124,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "96b9aea9c9b3ce3615a97ef1ebd4963bff37148f9dadd9290db7e6c236a6689b"
+  },
+  {
+    "file": "care_tadpole_play_01.png",
+    "colors": 25,
+    "bounds": [
+      16,
+      50,
+      124,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "47f8b9e588b00a7fef704a45fc152c2f499eed28e7621cac11163c80270cdb45"
+  },
+  {
+    "file": "care_tadpole_play_02.png",
+    "colors": 25,
+    "bounds": [
+      16,
+      50,
+      126,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "d0b64da60eb35b303a94d7941748f1125800e0ae5940cd44c6a9b4b1aea352c0"
+  },
+  {
+    "file": "care_tadpole_play_03.png",
+    "colors": 25,
+    "bounds": [
+      16,
+      34,
+      120,
+      120
+    ],
+    "jumpPx": 4,
+    "sha256": "6c9514ea82831dd02efafd2893b51fcbc69bad6b2614aef07ca4cfdb1dd7ed02"
+  },
+  {
+    "file": "care_tadpole_play_04.png",
+    "colors": 24,
+    "bounds": [
+      16,
+      50,
+      122,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "b424c9bfcb8dc4ea8d0279e501bc9c25db2f02b9d354b284fa512f66a1ff9d9d"
+  },
+  {
+    "file": "care_tadpole_rest_01.png",
+    "colors": 21,
+    "bounds": [
+      16,
+      50,
+      110,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "96273959b59a57d78adc56e54aba285ee07f458dc2e3786b72fa121f714740a0"
+  },
+  {
+    "file": "care_tadpole_rest_02.png",
+    "colors": 19,
+    "bounds": [
+      16,
+      50,
+      110,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "44ea46ab6536a916428a8e3ef820649b76843c4cf6f7147e2c2ccac87ac2f31b"
+  },
+  {
+    "file": "care_tadpole_rest_03.png",
+    "colors": 19,
+    "bounds": [
+      16,
+      50,
+      118,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "bfa51cd8803626016e9059798b6bb2c1fb4d5957a02e5f702b6ba388e4ed83cf"
+  },
+  {
+    "file": "care_tadpole_rest_04.png",
+    "colors": 19,
+    "bounds": [
+      16,
+      50,
+      128,
+      124
+    ],
+    "jumpPx": 0,
+    "sha256": "9d73825b274a91898c9987358ea56c43b9f4a5dc84a36a449a417867a6a7e2ac"
+  }
+]

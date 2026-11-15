@@ -221,6 +221,15 @@ begin
     return;
   end if;
 
+  -- an egg (no accepted care yet) waits: its needs do not fall, nothing is overdue and it never moves out.
+  -- Its clocks start when the first care hatches it (owner, 2026-11-13).
+  if l.care_days = 0 then
+    hunger := l.hunger; hygiene := l.hygiene; mood := l.mood; energy := l.energy;
+    oldest_at := t; care_at := t;
+    departs_at := 'infinity'; departure_reason := null; status := 'healthy';
+    return;
+  end if;
+
   -- any need left alone for departs_h; while recovering, also no care at all for recovery_departs_h
   departs_at := oldest_at + (r->>'departs_h')::numeric * interval '1 hour';
   departure_reason := oldest_kind;
@@ -311,7 +320,7 @@ begin
                    (2, 'clean', coalesce(l.hygiene_due_at, l.adopted_at)),
                    (3, 'play', coalesce(l.mood_due_at, l.adopted_at)),
                    (4, 'rest', coalesce(l.energy_due_at, l.adopted_at))) v(n, k, since)
-     where l.recovery_days_left = 0
+     where l.recovery_days_left = 0 and l.care_days > 0
        and extract(epoch from (t - v.since)) / 3600 >= (r->>'neglected_h')::numeric;
     today := case when l.action_day_utc = day_utc then l.actions_today else 0 end;
     kinds_today := case when l.action_day_utc = day_utc then l.day_kinds else 0 end;
@@ -635,13 +644,13 @@ begin
 
   -- each need's clock after this action
   thr := (r->>'meaningful_below')::numeric;
-  due_h := games.pepegochi_due(h, coalesce(l.hunger_due_at, l.adopted_at), t, p_action = 'feed',
+  due_h := games.pepegochi_due(h, case when l.care_days = 0 then t else coalesce(l.hunger_due_at, l.adopted_at) end, t, p_action = 'feed',
                                (r#>>'{decay_per_day,hunger}')::numeric, thr);
-  due_c := games.pepegochi_due(c, coalesce(l.hygiene_due_at, l.adopted_at), t, p_action = 'clean',
+  due_c := games.pepegochi_due(c, case when l.care_days = 0 then t else coalesce(l.hygiene_due_at, l.adopted_at) end, t, p_action = 'clean',
                                (r#>>'{decay_per_day,hygiene}')::numeric, thr);
-  due_m := games.pepegochi_due(m, coalesce(l.mood_due_at, l.adopted_at), t, p_action = 'play',
+  due_m := games.pepegochi_due(m, case when l.care_days = 0 then t else coalesce(l.mood_due_at, l.adopted_at) end, t, p_action = 'play',
                                (r#>>'{decay_per_day,mood}')::numeric, thr);
-  due_e := games.pepegochi_due(en, coalesce(l.energy_due_at, l.adopted_at), t, p_action = 'rest',
+  due_e := games.pepegochi_due(en, case when l.care_days = 0 then t else coalesce(l.energy_due_at, l.adopted_at) end, t, p_action = 'rest',
                                (r#>>'{decay_per_day,energy}')::numeric, thr);
 
   -- rescue and recovery

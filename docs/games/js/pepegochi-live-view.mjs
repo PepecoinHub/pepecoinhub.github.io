@@ -49,7 +49,20 @@ export class LiveGame {
       return { ok: false, error: m };
     } finally { this.busy = false; }
   }
-  refresh() { return this.call('gry_pepegochi_state'); }
+  async refresh() {
+    const r = await this.call('gry_pepegochi_state');
+    await this.settleIfDue(r);
+    return r;
+  }
+  // The frog has gone but its move-out is not saved yet: one call writes it, and with it the item the frog took
+  // (Room-4). Without that SQL the call fails quietly and the window shows the classic letter.
+  async settleIfDue(r) {
+    const p = r && r.ok && r.value && r.value.pet;
+    if (!p || p.status !== 'departed' || p.departure_saved || this.settleTried) return r;
+    this.settleTried = true;
+    const s = await this.call('gry_pepegochi_settle');
+    return s.ok ? s : r;
+  }
 
   async adopt(name) {
     const r = await this.call('gry_pepegochi_adopt', { p_name: String(name || '').trim() });

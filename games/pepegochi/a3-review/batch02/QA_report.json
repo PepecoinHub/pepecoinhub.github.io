@@ -1,0 +1,197 @@
+{
+  "reference_zip": "PepeGochi_A3_dla_ChatGPT_v2.zip",
+  "batch": "02",
+  "notes": "Edits from true 48x48 source pixels; no image scaling. hop_03 is the deliberate off-ground exception. Original base poses unchanged.",
+  "files": [
+    {
+      "name": "tb_wobble_04.png",
+      "size": [
+        48,
+        48
+      ],
+      "opaque_colors": 27,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        13,
+        17,
+        36,
+        47
+      ],
+      "added_colors": 0
+    },
+    {
+      "name": "tb_bob_01.png",
+      "size": [
+        48,
+        48
+      ],
+      "opaque_colors": 26,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        13,
+        6,
+        36,
+        47
+      ],
+      "added_colors": 0
+    },
+    {
+      "name": "tb_bob_02.png",
+      "size": [
+        48,
+        48
+      ],
+      "opaque_colors": 26,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        13,
+        8,
+        36,
+        47
+      ],
+      "added_colors": 0
+    },
+    {
+      "name": "tb_peek_01.png",
+      "size": [
+        48,
+        48
+      ],
+      "opaque_colors": 26,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        13,
+        7,
+        36,
+        47
+      ],
+      "added_colors": 0
+    },
+    {
+      "name": "tb_peek_02.png",
+      "size": [
+        48,
+        48
+      ],
+      "opaque_colors": 26,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        13,
+        7,
+        36,
+        47
+      ],
+      "added_colors": 0
+    },
+    {
+      "name": "tb_peek_03.png",
+      "size": [
+        48,
+        48
+      ],
+      "opaque_colors": 26,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        13,
+        7,
+        36,
+        47
+      ],
+      "added_colors": 0
+    },
+    {
+      "name": "tb_peek_04.png",
+      "size": [
+        48,
+        48
+      ],
+      "opaque_colors": 26,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        13,
+        7,
+        36,
+        47
+      ],
+      "added_colors": 0
+    },
+    {
+      "name": "tb_hop_01.png",
+      "size": [
+        48,
+        48
+      ],
+      "opaque_colors": 26,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        13,
+        9,
+        36,
+        47
+      ],
+      "added_colors": 0
+    },
+    {
+      "name": "tb_hop_02.png",
+      "size": [
+        48,
+        48
+      ],
+      "opaque_colors": 26,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        13,
+        7,
+        37,
+        47
+      ],
+      "added_colors": 0
+    },
+    {
+      "name": "tb_hop_03.png",
+      "size": [
+        48,
+        48
+      ],
+      "opaque_colors": 26,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "bbox": [
+        13,
+        1,
+        36,
+        41
+      ],
+      "added_colors": 0
+    }
+  ]
+}

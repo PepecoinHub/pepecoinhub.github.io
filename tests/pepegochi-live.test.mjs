@@ -43,6 +43,7 @@ test('adopt an egg, the first care hatches it, care and needs come from the serv
 test('time moves on between responses without asking the server', async () => {
   const { sim, game } = server();
   await game.refresh(); await game.adopt('Fren');
+  sim.advance(8 * 36e5); await game.act('feed');   // hatched: an egg has no countdown
   assert.equal(game.stale, false);
   const before = game.view().pet.deadline;
   sim.advance(6 * 6e4);
@@ -81,7 +82,7 @@ test('the live page talks only to the game server, keeps nothing in the browser 
   }
   // the browser sends only a name or one of four action names (games/PEPEGOCHI_API.md)
   const calls = [...file('docs/games/js/pepegochi-live-view.mjs').matchAll(/this\.call\('(\w+)'(?:, (\{[^}]*\}))?\)/g)].map(m => [m[1], m[2] || '']);
-  assert.deepEqual(calls.map(c => c[0]).sort(), ['gry_pepegochi_action', 'gry_pepegochi_adopt', 'gry_pepegochi_letter_read', 'gry_pepegochi_state']);
+  assert.deepEqual(calls.map(c => c[0]).sort(), ['gry_pepegochi_action', 'gry_pepegochi_adopt', 'gry_pepegochi_letter_read', 'gry_pepegochi_settle', 'gry_pepegochi_state']);
   assert.deepEqual(calls.filter(c => c[1]).map(c => c[1]).sort(), ["{ p_action: kind }", "{ p_name: String(name || '').trim() }"]);
 });
 
@@ -122,4 +123,29 @@ test('Decorate: the room picture follows the server room; a conflict re-reads it
   conflict = true;
   assert.equal(await game.place('m1', 'shelf_a'), false);
   assert.match(game.roomError, /another tab/);
+});
+
+test('Room-4: a move-out that is not saved yet is written once (gry_pepegochi_settle), then never again', async () => {
+  const calls = [];
+  let saved = false;
+  const pet = () => ({ status: 'departed', departure_saved: saved, name: 'Fren', letter: { variant: saved ? 'took_mug' : 'classic', seen: false },
+    days_together: 8, care_days: 1, good_days: 0, departed_at: '2026-11-17T18:00:00+00:00', generation: 1 });
+  const rpc = async name => {
+    calls.push(name);
+    if (name === 'gry_pepegochi_settle') saved = true;
+    return { server_now: '2026-11-20T18:00:00+00:00', has_pet: false, can_adopt: false, pet: pet(), history: [], rules: {}, summary: {} };
+  };
+  const game = new LiveGame({ rpc, clock: () => Date.UTC(2026, 10, 20, 18) });
+  await game.refresh();
+  assert.deepEqual(calls, ['gry_pepegochi_state', 'gry_pepegochi_settle']);
+  assert.equal(game.view().departed.taken, 'mug');
+  assert.match(game.view().letter.text, /I took the mug/);
+  await game.refresh();
+  assert.deepEqual(calls, ['gry_pepegochi_state', 'gry_pepegochi_settle', 'gry_pepegochi_state'], 'once is enough');
+  // without the Room-4 SQL the call fails quietly and the classic letter stays
+  const old = new LiveGame({ rpc: async n => { if (n === 'gry_pepegochi_settle') throw new Error('Could not find the function'); saved = false; return rpc(n); }, clock: () => Date.UTC(2026, 10, 20, 18) });
+  saved = false;
+  const r = await old.refresh();
+  assert.equal(r.ok, true);
+  assert.equal(old.view().departed.taken, 'crt_tv');
 });

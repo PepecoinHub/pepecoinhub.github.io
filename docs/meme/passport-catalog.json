@@ -327,6 +327,41 @@
       "status": "planned"
     },
     {
+      "id": "quiz_first",
+      "title": "Here We Go!",
+      "description": "Answer your first Pond Quiz question right. The frog on your taskbar has more.",
+      "category": "pond_quiz",
+      "status": "planned"
+    },
+    {
+      "id": "quiz_10",
+      "title": "Is That a Lot?",
+      "description": "10 right answers in the Pond Quiz. Is that a lot? Asking for a fren.",
+      "category": "pond_quiz",
+      "status": "planned"
+    },
+    {
+      "id": "quiz_25",
+      "title": "Pond Scholar",
+      "description": "25 right answers in the Pond Quiz.",
+      "category": "pond_quiz",
+      "status": "planned"
+    },
+    {
+      "id": "quiz_50",
+      "title": "Halfway Hopper",
+      "description": "50 right answers in the Pond Quiz: more than half of the pond's secrets.",
+      "category": "pond_quiz",
+      "status": "planned"
+    },
+    {
+      "id": "quiz_99",
+      "title": "Keeper of the Pond",
+      "description": "All 99 Pond Quiz questions answered right. The pond has no secrets left for you.",
+      "category": "pond_quiz",
+      "status": "planned"
+    },
+    {
       "id": "secret_starter",
       "title": "Secret Starter",
       "description": "Find your first PondOS secret.",

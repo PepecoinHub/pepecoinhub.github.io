@@ -44,8 +44,16 @@ Then run `deploy/00_check.sql` again: all rows `done`, and the last row shows th
 
 ## Later: PepeGochi day (owner, 2026-11-09: PepeGochi launches after the Passport)
 Not in LAUNCH_ALL.sql. On PepeGochi day, in this order: `update_pepegochi_v2.sql`, `update_pepegochi_passport.sql`,
-`update_pepegochi_room_v1.sql`, `update_pepegochi_rewards.sql`; then its five stamps go `live` and the `?beta=gochi` gate
-comes off. Until then its API does not exist, so nobody can adopt a frog before the window is public.
+`update_pepegochi_room_v1.sql`, `update_pepegochi_rewards.sql`, `update_pepegochi_room_departure.sql` (Room-4: the frog
+takes one random starter item when it moves out); then its five stamps go `live` and the `?beta=gochi` gate
+comes off.
+Pond Quiz (the frog's fact of the day with points and a ranking, draft 2026-11-13), after the PepeGochi files:
+`update_passport_awards.sql` once more (safe to run again: its allowlist now knows the five Pond Quiz stamps),
+`update_pond_quiz.sql`, then the PRIVATE `update_pond_quiz_questions.sql`. The stamps (1, 10, 25, 50 and 99 right
+answers) go `live` with PepeGochi's five, once their art is approved. The questions are not in this public repo:
+Claude builds that file from the owner's private questions file (`node scripts/build_pond_quiz_sql.mjs <file>`, output
+in the git-ignored `games/supabase/private/`) and hands it over. Run it again whenever the questions change.
+Without these files the taskbar frog shows no quiz. Until then its API does not exist, so nobody can adopt a frog before the window is public.
 
 ## Included decisions
 - #253 (Pond Pioneer V3, Share Fren as a secret) is merged into the launch branch: step 11 is that file.

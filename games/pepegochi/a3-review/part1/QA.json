@@ -1,0 +1,276 @@
+{
+  "status": "PASS",
+  "method": "native 48x48 pixel edits; no image generation or sprite resampling",
+  "protectedRectanglesExclusive": {
+    "shorts_legs_feet": [
+      17,
+      37,
+      32,
+      48
+    ],
+    "lower_hoodie": [
+      18,
+      29,
+      30,
+      37
+    ],
+    "P_and_surrounding_fabric": [
+      21,
+      26,
+      29,
+      32
+    ]
+  },
+  "assets": [
+    {
+      "file": "tb_adult_neglected.png",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "colorsIncludingTransparent": 26,
+      "bottomBoundary": 47,
+      "lastVisibleRow": 46,
+      "contentBoundsExclusive": [
+        13,
+        9,
+        36,
+        47
+      ],
+      "protectedRegionsUnchanged": true,
+      "changedPixels": 329,
+      "changesRestrictedToHeadArmsProps": true,
+      "opaqueComponentSizes": [
+        624
+      ],
+      "detachedBluePixels": 0,
+      "sha256": "1c553865e5977b056793e722fc1f05e04bb010a1224e4ca09f7e20d40e90d861"
+    },
+    {
+      "file": "tb_adult_packing.png",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "colorsIncludingTransparent": 29,
+      "bottomBoundary": 47,
+      "lastVisibleRow": 46,
+      "contentBoundsExclusive": [
+        14,
+        9,
+        44,
+        47
+      ],
+      "protectedRegionsUnchanged": true,
+      "changedPixels": 438,
+      "changesRestrictedToHeadArmsProps": true,
+      "opaqueComponentSizes": [
+        667
+      ],
+      "detachedBluePixels": 0,
+      "sha256": "ca217e430e0cd4dbdebbad3c125cc56d2116de388d8e3d06662102b7dc50e89f"
+    },
+    {
+      "file": "tb_adult_recovering.png",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "colorsIncludingTransparent": 27,
+      "bottomBoundary": 47,
+      "lastVisibleRow": 46,
+      "contentBoundsExclusive": [
+        14,
+        7,
+        34,
+        47
+      ],
+      "protectedRegionsUnchanged": true,
+      "changedPixels": 281,
+      "changesRestrictedToHeadArmsProps": true,
+      "opaqueComponentSizes": [
+        600
+      ],
+      "detachedBluePixels": 0,
+      "sha256": "a897d8d19d1f77fe85bf594d6f705f4f427ac53721ccbf0fb03f03e46a097a0d"
+    },
+    {
+      "file": "tb_adult_talk.png",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "colorsIncludingTransparent": 26,
+      "bottomBoundary": 47,
+      "lastVisibleRow": 46,
+      "contentBoundsExclusive": [
+        12,
+        7,
+        40,
+        47
+      ],
+      "protectedRegionsUnchanged": true,
+      "changedPixels": 369,
+      "changesRestrictedToHeadArmsProps": true,
+      "opaqueComponentSizes": [
+        616
+      ],
+      "detachedBluePixels": 0,
+      "sha256": "f721c5f5f840f2e1910892f4fed12ba57e36efb0ee0418606d0a17d524ac6c37"
+    },
+    {
+      "file": "tb_adult_think.png",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "colorsIncludingTransparent": 26,
+      "bottomBoundary": 47,
+      "lastVisibleRow": 46,
+      "contentBoundsExclusive": [
+        14,
+        7,
+        37,
+        47
+      ],
+      "protectedRegionsUnchanged": true,
+      "changedPixels": 358,
+      "changesRestrictedToHeadArmsProps": true,
+      "opaqueComponentSizes": [
+        601
+      ],
+      "detachedBluePixels": 0,
+      "sha256": "4deee7fa79a1eb48eae3cda46c80099383c4b6408b88ea1a06683533a60d9f68"
+    },
+    {
+      "file": "tb_adult_laugh.png",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "colorsIncludingTransparent": 27,
+      "bottomBoundary": 47,
+      "lastVisibleRow": 46,
+      "contentBoundsExclusive": [
+        14,
+        7,
+        38,
+        47
+      ],
+      "protectedRegionsUnchanged": true,
+      "changedPixels": 294,
+      "changesRestrictedToHeadArmsProps": true,
+      "opaqueComponentSizes": [
+        589,
+        5
+      ],
+      "detachedBluePixels": 0,
+      "sha256": "de213b023eb1872ba491e6b188edece003a73b0de5abedf43ade70b41ae0d314"
+    },
+    {
+      "file": "tb_adult_wave.png",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "colorsIncludingTransparent": 26,
+      "bottomBoundary": 47,
+      "lastVisibleRow": 46,
+      "contentBoundsExclusive": [
+        13,
+        7,
+        40,
+        47
+      ],
+      "protectedRegionsUnchanged": true,
+      "changedPixels": 371,
+      "changesRestrictedToHeadArmsProps": true,
+      "opaqueComponentSizes": [
+        628
+      ],
+      "detachedBluePixels": 0,
+      "sha256": "4e03e9517c27cfabc8fa9d4ddb0f497042524204f59106d5c4f404e19698d4b2"
+    },
+    {
+      "file": "tb_hop_02.png",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "colorsIncludingTransparent": 27,
+      "bottomBoundary": 47,
+      "lastVisibleRow": 46,
+      "contentBoundsExclusive": [
+        13,
+        7,
+        36,
+        47
+      ],
+      "protectedRegionsUnchanged": true,
+      "changedPixels": 0,
+      "changesRestrictedToHeadArmsProps": true,
+      "opaqueComponentSizes": [
+        654
+      ],
+      "detachedBluePixels": 0,
+      "sha256": "abe7bf0017a5c6ab56c6c95b240bde5189faa9699c2e2b1120221ad588b560a7"
+    }
+  ],
+  "sourceSHA256": {
+    "tb_adult_dirty.png": "82a3adea0f8a966321ce15f165ad733eaea010c6905844e5b75e106aebeb56f3",
+    "tb_adult_hungry.png": "68cebe043158f3f25460b1a0683facb5338c7ab1bca5c01180f6634479467ac6",
+    "tb_adult_laugh.png": "92403f4ddc05bd278574221d870b293b27dd547fe63a80627be900134916624e",
+    "tb_adult_moody.png": "d9e61d4f4ef072df1ddd4ac4c7bd2b09728cec67ce7a3e376112afa67fab3da6",
+    "tb_adult_neglected.png": "fa8cd70452889905ef1900a8c09851b599f76d79d4b409abbf60f8a6b703629f",
+    "tb_adult_packing.png": "51ecec408dbf77cafb79fef0e09830c6544b0a46917a92b66e26d010ce0c63c3",
+    "tb_adult_recovering.png": "b8aaa859dff344a8b503844c719690b6252fec7df8eb89d2b9063eae6e053e1d",
+    "tb_adult_sit.png": "abe7bf0017a5c6ab56c6c95b240bde5189faa9699c2e2b1120221ad588b560a7",
+    "tb_adult_sleepy.png": "345a8be88b4f1938a46731872402b874fa4e2ff2a42d4181396e6734e3bbe48a",
+    "tb_adult_talk.png": "8e643a147a85fc62f87e5b823f82b352308a830a1e3610fa84a67c58b8fcf489",
+    "tb_adult_think.png": "6b2667f696f27b7dd26880fc9730a7d6056d2fab5d15dbc0ccbfa6dbf7e6a116",
+    "tb_adult_wave.png": "fb96f33f240f702412d5b79a45d6a0e36943ce4f7772ad41a6009b7c820a19e3",
+    "tb_egg.png": "3ea64621000ffdf369ad70b23e6b453f19a194a5a71b21e94a6f4bae4d8d9313"
+  },
+  "hop02": "unchanged-arms fallback: byte-identical to supplied tb_adult_sit.png",
+  "review": "native and enlarged contact sheet visually inspected; no live game integration"
+}

@@ -15,7 +15,13 @@ Design and decisions: `docs/design/pepegochi-v2/` (README.md, TECH_PLAN.md).
 - Discord accounts only. Anonymous guests, e-mail accounts and accounts whose Discord was unlinked are refused by every RPC. The frog is not changed, but its clock keeps running.
 - Private tables in schema `games`: `pepegochi_owners` (one row per account), `pepegochi_lives` (one row per frog life, at most one `active`, enforced by a unique index) and `pepegochi_milestones`. RLS is on, and the browser roles have no grants.
 - Every write locks the owner's row, then the newest life, then reads server time. No cron, Realtime, heartbeat or click log.
-- Moving out deletes nothing. Stamps, items, avatars and secrets are never touched. "P.S. I took the TV" is a joke in the scene only.
+- Moving out deletes nothing. Stamps, items, avatars and secrets are never touched. The P.S. of GOODBYE.TXT ("I took the
+  duck") is a joke in the scene only: the server picks ONE placed starter item (Room-4,
+  `update_pepegochi_room_departure.sql`, `letter_variant = 'took_<item>'` or `'took_nothing'`; `'classic'` = the TV, from
+  before Room-4). The item is only hidden in the picture until the next frog moves in; earned decorations are never taken.
+  `gry_pepegochi_settle()` (no arguments) writes a due move-out, and with it the pick, when the player comes back.
+- **An egg never moves out** (owner, 2026-11-13). Until its first accepted care its needs do not fall, nothing is overdue,
+  `status` stays `healthy` and `departs_at` is `infinity`. Its clocks start when that first care hatches it.
 
 ## RPCs
 
@@ -317,7 +323,8 @@ The window draws the layered room v5 from #222 and the frog from the pixel art p
 - **Where the frog stands:** feet at x 320, y 372 (on the rug, in front of the bed), on each sprite's floor line (124; the older froglet 121).
 - **Which sprite:** `packing`, `recovering` and `neglected` use their adult sprites. Otherwise a healthy adult shows the need it wants most once it is below 75 (`hungry`, `dirty`, `moody`, `tired`), else `idle`. 75 is a picture setting only: energy, the slowest need, is at 70 when the frog becomes neglected, so a lower value would never show `tired`. Tadpole and froglet use their idle sprite; when they pack, the separate suitcase stands next to them. Before the first adoption an egg waits on the rug (the egg stage itself, decision 10, is not added).
 - **Moving out:** when a frog that was on screen moves out (after a time jump or an action), the 6 frames play once, 250 ms each: frames 1-2 in place, frames 3 and 4 in turn while it walks right, frames 5-6 at the room's right edge, where they leave their own frame. Then the frog is gone. A frog that had already left is simply not there. With reduced motion there is no animation and no idle bounce.
-- **The empty room:** the furniture and props stay. Only the TV is not drawn, because GOODBYE.TXT says "P.S. I took the TV."; it is back when the next frog moves in. The letter lies on the rug (the spot of `props/room_departed_overlay.png`) as a button: the envelope until it is read, then the open letter. Clicking it opens GOODBYE.TXT in the Notepad box below the room. Its click area is 12 px bigger than the art on every side.
+- **The empty room:** the furniture and props stay. Only the item the frog took is not drawn (Room-4; the TV for a
+  `classic` letter, nothing for `took_nothing`); it is back when the next frog moves in. The letter lies on the rug (the spot of `props/room_departed_overlay.png`) as a button: the envelope until it is read, then the open letter. Clicking it opens GOODBYE.TXT in the Notepad box below the room. Its click area is 12 px bigger than the art on every side.
 - **Not here yet:** the room on the server (`room_state`, Room-2), the server choosing which item leaves with the matching P.S. line (Room-4), state sprites for tadpole and froglet, a moving-out animation for young frogs (they slide out with the suitcase), the alternative `packing_angry`.
 - **Tests:** `tests/pepegochi-room-window.test.mjs` (CI): files and sizes, one scale, feet, which sprite, the hidden TV, the letter, the 10-step moving-out timeline, and a small DOM check of the letter button and the animation timer.
 

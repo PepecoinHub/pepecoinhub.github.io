@@ -7,6 +7,8 @@
 // Temporary look for testing the mechanics. The game's real art comes later.
 import { LocalPepegochi, KINDS, parseTimestampUs } from './pepegochi-model.mjs';
 
+import { takenItem, takenName } from './pepegochi-room.mjs';
+
 export const STORAGE_KEY = 'pepegochi-local-sim-v1';
 export const START = Date.UTC(2026, 10, 9, 18);           // Monday 18:00 UTC
 export const NEED_OF = { feed: 'hunger', clean: 'hygiene', play: 'mood', rest: 'energy' };
@@ -47,6 +49,28 @@ You should probably get yourself another frog.
 P.S. I took the TV.
 
 - Your former PepeGochi`;
+
+// The P.S. line of GOODBYE.TXT for the item the frog took (design: RANDOM_MOVE_OUT_SPEC_V1.md, PR #219).
+// 'classic' (no room picked an item) keeps the original letter word for word.
+export const TAKEN_LINE = {
+  crt_tv: 'P.S. I took the TV. I have shows to catch up on.',
+  lava_lamp: 'P.S. I borrowed the lava lamp. Mood lighting matters.',
+  potted_plant: 'P.S. I took the plant. Someone has to water it.',
+  p_poster: 'P.S. I took the poster. The wall looked lonely anyway.',
+  rubber_duck: 'P.S. I took the duck. We have a lot in common.',
+  mug: 'P.S. I took the mug. My tea deserves better.',
+};
+export const NOTHING_LINE = "P.S. I didn't take anything. Just the memories.";
+export function goodbyeText(variant) {
+  if (!variant || variant === 'classic') return GOODBYE;
+  const item = takenItem(variant);
+  return GOODBYE.replace('P.S. I took the TV.', item ? TAKEN_LINE[item] || `P.S. I took ${takenName(item)}.` : NOTHING_LINE);
+}
+export function letterNote(variant) {
+  const item = takenItem(variant);
+  return item ? `${takenName(item)[0].toUpperCase() + takenName(item).slice(1)} only left the picture: it is still yours and it is back in the room with your next fren.`
+    : 'Nothing was taken from your room.';
+}
 
 // the rules, written from the values the server uses (rules in every response)
 export function rulesText(r) {
@@ -193,14 +217,15 @@ export function buildView(s, now, { message = '', showHistory = false, log = [],
     }
     if (p.status === 'departed') {
       v.mode = 'departed';
+      const variant = p.letter && p.letter.variant;
       v.departed = {
-        name: p.name, text: COPY.departed,
+        name: p.name, text: COPY.departed, taken: takenItem(variant),
         facts: [`${p.days_together} days together`, `${p.care_days} care days`, `${p.good_days} good care days`,
           `Moved out ${fmt(msOf(p.departed_at))}`],
         letterSeen: p.letter.seen, canAdopt: s.can_adopt,
       };
-      v.letter = { open: letterOpen, title: 'GOODBYE.TXT - Notepad', text: GOODBYE,
-        note: 'The TV only left the picture: it is still yours and it is back in the room with your next fren.' + (live ? '' : ' (Local test: there is no real inventory here.)') };
+      v.letter = { open: letterOpen, title: 'GOODBYE.TXT - Notepad', text: goodbyeText(variant),
+        note: letterNote(variant) + (live ? '' : ' (Local test: there is no real inventory here.)') };
       return v;
     }
     v.mode = 'pet';
@@ -226,7 +251,8 @@ export function buildView(s, now, { message = '', showHistory = false, log = [],
       }),
       growth: `Care days: ${p.care_days}` + (p.next_growth_care_days ? ` (grows at ${p.next_growth_care_days})` : ' (grown up)'),
       warnings: [],
-      deadline: `If nobody comes: moves out ${fmt(msOf(p.departs_at))} (in ${span(msOf(p.departs_at) - now)}, `
+      deadline: p.departs_at === 'infinity' ? 'An egg waits for you: nothing happens until its first care hatches it.'
+        : `If nobody comes: moves out ${fmt(msOf(p.departs_at))} (in ${span(msOf(p.departs_at) - now)}, `
         + (p.departure_reason === 'recovery' ? 'no care while recovering)' : `${NEED_NAME[NEED_OF[p.departure_reason]]} waiting)`),
     };
     if (p.status === 'neglected') v.pet.warnings.push(`Your Fren misses you. Overdue: ${list(p.overdue.map(k => NEED_NAME[NEED_OF[k]]))}.`);
