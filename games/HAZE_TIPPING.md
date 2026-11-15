@@ -54,13 +54,19 @@ The public production protocol is separately covered by `haze-core.test.mjs`.
    freezes the sender, destination, amount and message in an intent. It obtains
    the recipient address from the verified link, never from the tipping client.
    Muted senders cannot create chat tips.
-3. Haze opens in a separate payment window, checks the linked sending address,
-   fixes the amount and destination, and requires its normal fee review and
-   payment approval. The intent expires in 30 minutes. No Haze surcharge was
-   added. Native PEP is Pepecoin, not an Ethereum PEPE token.
-4. After submission Haze shares only the intent ID and transaction ID with its
-   PepecoinHub opener. This is not payment evidence. The sender can paste the
-   ID from Haze if the callback is lost. Nothing automatically sends again.
+3. The same chat dialog shows a persistent Haze-owned frame. Its exact-origin
+   `haze:tip-review` request contains only `{type,version:1,fragment}`; it opens
+   a public review and grants no spend authority. Haze checks the linked sender,
+   fixes the amount/destination and calculates the fee automatically. The user
+   explicitly approves in Haze. A normal unlocked session can be reused; its
+   existing lock policy is respected. The intent expires in 30 minutes.
+4. After submission Haze shares only `{type:'haze:tip-submitted',version:1,
+   intent,txid}` with the exact PepecoinHub parent (or legacy opener). Chat
+   returns automatically with a private pending indicator and follows network
+   checks. There is no transaction-ID input. The sender's submitted candidate
+   is saved privately by the server and cached in the browser so a refresh
+   resumes checking. An unverified candidate never reserves the verified txid,
+   credits a receipt or earns a stamp. Nothing automatically sends again.
 5. The server checks a configured read-only mainnet Blockbook source, pins the
    genesis block, checks the exact recipient script and integer amount, and
    re-reads every input's previous output to verify the linked sender. Only
@@ -74,6 +80,14 @@ The public production protocol is separately covered by `haze-core.test.mjs`.
 ## Coordinated activation
 
 Keep both switches off until maintainer review and staging validation.
+
+The client requires `capabilities.chatTipProtocol === 1` and
+`capabilities.chatTipInline === 1`. `transactions:false` remains unchanged:
+the UI request cannot sign, approve or broadcast. `haze:tip-cancel` accepts only
+`{type,version:1}` from the exact parent and cancels outstanding review work.
+Unknown fields and other origins/sources are ignored. An already submitted
+intent in the same Haze frame re-announces its existing submission rather than
+opening another payment.
 
 1. **Haze maintainer:** review/release the accompanying Haze patch, including
    `wallet.js`, `haze-auth-protocol.js`, `haze-bridge.js`,

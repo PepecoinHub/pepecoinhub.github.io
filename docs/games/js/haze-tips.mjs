@@ -27,7 +27,7 @@ export function tipURL(intent) {
 }
 export function submissionMatches(event,flight) {
   const data=event?.data;
-  return !!flight&&event.origin===HAZE_ORIGIN&&event.source===flight.popup&&data?.type==='haze:tip-submitted'&&
+  return !!flight&&event.origin===HAZE_ORIGIN&&event.source===(flight.source||flight.popup)&&data?.type==='haze:tip-submitted'&&
     data.version===1&&data.intent===flight.intent.id&&typeof data.txid==='string'&&HASH.test(data.txid);
 }
 
@@ -41,23 +41,55 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
   };
   if(!doc.querySelector('[data-haze-tip-style]'))doc.head.append(node('link',{rel:'stylesheet',href:new URL('../haze-tips.css',import.meta.url).href,'data-haze-tip-style':'1'}));
   let destroyed=false,dialog=null,wallet=null,owner=null,syncAt=0,syncing=false,initial=true,linkButton=null;
+  let activeView=null,walletHost=null,walletFrame=null,walletLoaded=null,walletCaps=null;
+  const walletBase=HAZE_ORIGIN+'/widget.html?standalone=1',queueKey='ph-haze-submitted-v1';
   const messages=new Map(),flights=new Map(),rendered=new Map(),seenReceipts=new Set(),timers=new Set();
   const currentUser=()=>{const user=session()?.user;return user&&!user.is_anonymous?user.id:null;};
   const signed=()=>{if(!currentUser()){login?.();throw Error('Sign in with Discord first.');}};
+  function endView(){
+    const view=activeView;activeView=null;view?.controller.abort();if(walletHost)walletHost.hidden=true;
+    if(walletFrame){walletFrame.contentWindow.postMessage({type:'haze:tip-cancel',version:1},HAZE_ORIGIN);walletFrame.contentWindow.postMessage({type:'haze:hidden'},HAZE_ORIGIN);}
+    if(view?.oldFocus?.isConnected)view.oldFocus.focus();
+  }
   function modal(title) {
-    dialog?.close();
-    const oldFocus=doc.activeElement,d=node('dialog',{class:'haze-tip-dialog','aria-label':title}),controller=new AbortController();
-    const close=node('button',{type:'button',class:'haze-tip-close','aria-label':'Close Haze dialog',onclick:()=>d.close()},'×');
-    const body=node('div',{class:'haze-tip-body'}),status=node('p',{role:'status',class:'haze-tip-status'});
-    d.append(node('header',{},node('strong',{},'◇ Haze Wallet'),close),node('h2',{},title),body,status);
-    d.addEventListener('close',()=>{controller.abort();d.remove();if(dialog===d)dialog=null;if(oldFocus?.isConnected)oldFocus.focus();});
-    doc.body.append(d);d.showModal();dialog=d;return {d,body,status,signal:controller.signal};
+    activeView?.controller.abort();activeView=null;
+    if(!dialog){
+      dialog=node('dialog',{class:'haze-tip-dialog'});
+      const close=node('button',{type:'button',class:'haze-tip-close','aria-label':'Close Haze dialog',onclick:()=>{endView();dialog.close();}},'×');
+      walletHost=node('div',{class:'haze-tip-wallet',hidden:''});
+      dialog.append(node('header',{},node('strong',{},'◇ Haze Wallet'),close),node('h2'),node('div',{class:'haze-tip-body'}),walletHost,node('p',{role:'status',class:'haze-tip-status'}));
+      // Keep the wallet's browsing context alive, respecting its normal lock
+      // policy. A later tip can reuse the wallet; no key reaches this page.
+      dialog.addEventListener('close',()=>{if(!dialog.open)endView();});doc.body.append(dialog);
+    }
+    const controller=new AbortController(),d=dialog,body=d.querySelector('.haze-tip-body'),status=d.querySelector('.haze-tip-status');
+    body.replaceChildren();status.textContent='';d.querySelector('h2').textContent=title;d.setAttribute('aria-label',title);walletHost.hidden=true;
+    const view={d,body,status,controller,signal:controller.signal,oldFocus:doc.activeElement,active:()=>activeView===view&&!controller.signal.aborted};
+    view.close=()=>{if(view.active()){endView();d.close();}};
+    activeView=view;if(!d.open)d.showModal();return view;
+  }
+  async function ensureWallet(view){
+    if(!walletFrame){
+      walletFrame=node('iframe',{title:'Secure Haze Wallet',class:'haze-tip-frame',referrerpolicy:'no-referrer',allow:'clipboard-write'});
+      walletLoaded=new Promise((resolve,reject)=>{walletFrame.onload=resolve;walletFrame.onerror=()=>reject(Error('Haze could not be loaded.'));});
+      walletFrame.src=walletBase;walletHost.append(walletFrame);
+    }
+    walletHost.hidden=false;walletFrame.contentWindow.postMessage({type:'haze:open'},HAZE_ORIGIN);
+    await walletLoaded;
+    if(!view.active())throw Error('Wallet review canceled.');
+    if(!walletCaps){
+      for(let i=0;i<12&&view.active();i++){
+        try{walletCaps=await frameRequest(walletFrame,'capabilities',{},1500,view.signal);break;}catch{}
+      }
+    }
+    if(walletCaps?.authentication!=='haze-auth-v1'||walletCaps.chatTipProtocol!==1||walletCaps.chatTipInline!==1)throw Error('This Haze build does not support chat tips yet. Open the updated Haze web wallet and try again.');
+    return walletFrame;
   }
   function paintButton(){if(linkButton)linkButton.textContent=wallet?.address?'◇ Haze linked ✓':'◇ Link Haze for tips';}
   async function refresh() {
     const user=currentUser();owner=user;wallet=null;paintButton();
     if(!user||destroyed)return;
-    try{const value=await rpc('gry_haze_status',{});if(owner===user&&!destroyed){wallet=value;paintButton();}}catch{}
+    try{const value=await rpc('gry_haze_status',{});if(owner===user&&!destroyed){wallet=value;paintButton();restoreQueue();}}catch{}
   }
   async function frameRequest(frame,method,params,timeout=10000,signal) {
     return new Promise((resolve,reject)=>{
@@ -74,40 +106,30 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
       frame.contentWindow.postMessage({type:'haze:request',version:1,id,method,params},HAZE_ORIGIN);
     });
   }
-  async function connect() {
+  async function connect(afterLinked) {
     try{signed();}catch{return;}
     const user=currentUser(),view=modal(wallet?.address?'Your linked Haze wallet':'Link Haze Wallet');
     view.body.append(node('p',{},'Link your public native PEP address so frens can tip you. PepecoinHub never receives your password or private keys. Linking cannot spend your funds.'));
     if(wallet?.address){
       view.body.append(node('code',{class:'haze-tip-address'},wallet.address),node('p',{},'Haze Linked ✓ · Your public address is available for message tips.'),
-        node('button',{type:'button',class:'haze-tip-secondary',onclick:async()=>{try{await rpc('gry_haze_unlink',{});await refresh();view.d.close();}catch(error){view.status.textContent=error.message;}}},'Unlink wallet'));
+        node('button',{type:'button',class:'haze-tip-secondary',onclick:async()=>{try{await rpc('gry_haze_unlink',{});await refresh();view.close();}catch(error){view.status.textContent=error.message;}}},'Unlink wallet'));
     }
     const approve=node('button',{type:'button',class:'haze-tip-primary'},wallet?.address?'Link a different wallet':'Continue with Haze Wallet');
     view.body.append(approve,node('a',{href:HAZE_ORIGIN+'/widget.html?standalone=1',target:'_blank',rel:'noopener noreferrer',class:'haze-tip-secondary'},'Open Haze Wallet ↗'));
     approve.onclick=async()=>{
       approve.disabled=true;
-      const frame=node('iframe',{src:HAZE_ORIGIN+'/widget.html',title:'Secure Haze Wallet connection',class:'haze-tip-frame',referrerpolicy:'no-referrer',allow:'clipboard-write'});
-      view.body.append(frame);view.status.textContent='Open Haze and approve the public-address connection inside the wallet.';
+      view.status.textContent='Approve the public-address connection inside Haze.';
       try{
-        await new Promise((resolve,reject)=>{frame.onload=resolve;frame.onerror=()=>reject(Error('Haze could not be loaded.'));});
-        let ready=false;
-        for(let i=0;i<12&&view.d.isConnected&&!ready;i++){
-          let caps;
-          try{caps=await frameRequest(frame,'capabilities',{},1500,view.signal);}catch{continue;}
-          if(caps?.authentication==='haze-auth-v1'&&caps.chatTipProtocol!==1)throw Error('This Haze build does not support chat tips yet. Open the updated Haze web wallet and try again.');
-          ready=caps?.authentication==='haze-auth-v1'&&caps.chatTipProtocol===1;
-        }
-        if(!ready)throw Error('Haze connection support is not ready. Please try again later.');
-        if(currentUser()!==user||!view.d.isConnected)return;
+        const frame=await ensureWallet(view);
+        if(currentUser()!==user||!view.active())return;
         const challenge=await rpc('gry_haze_link_begin',{});
         const result=await frameRequest(frame,'authenticate',{challenge},300000,view.signal);
-        if(currentUser()!==user||!view.d.isConnected)return;
+        if(currentUser()!==user||!view.active())return;
         const linked=await invoke({action:'link',proof:result.proof});
-        if(currentUser()!==user||!view.d.isConnected)return;
-        wallet={address:linked.address};paintButton();frame.remove();approve.remove();
-        view.status.textContent='Haze Linked ✓ Your receiving address was verified. Your passport has a Haze Linked stamp.';
-        view.body.append(node('code',{class:'haze-tip-address'},linked.address));invalidate();void sync();
-      }catch(error){if(view.d.isConnected){frame.remove();view.status.textContent=error.message;approve.disabled=false;}}
+        if(currentUser()!==user||!view.active())return;
+        wallet={address:linked.address};paintButton();invalidate();void sync();
+        if(typeof afterLinked==='function')void afterLinked();else view.close();
+      }catch(error){if(view.active()){walletHost.hidden=true;view.status.textContent=error.message;approve.disabled=false;}}
     };
   }
   function mount(parent){linkButton=node('button',{type:'button',class:'haze-wallet-link',onclick:connect},'◇ Link Haze for tips');parent.append(linkButton);void refresh();}
@@ -122,7 +144,7 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
   async function openTip(message) {
     try{signed();}catch{return;}
     if(owner!==currentUser()||!wallet?.address)await refresh();
-    if(!wallet?.address){await connect();return;}
+    if(!wallet?.address){await connect(()=>openTip(message));return;}
     const user=currentUser(),view=modal('Make '+message.nick+'’s day');
     const form=node('form'),amount=node('input',{type:'text',inputmode:'decimal',value:'10','aria-label':'Tip amount in native PEP',maxlength:'15'});
     const presets=node('div',{class:'haze-tip-presets'});
@@ -130,48 +152,74 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
     const reactions=node('select',{'aria-label':'Tip reaction'});
     for(const [value,label]of Object.entries(REACTIONS))reactions.append(node('option',{value},label+' '+({heart:'Much love',applause:'Well played',rocket:'Let’s go'})[value]));
     const note=node('input',{type:'text',maxlength:'160',placeholder:'Thanks for the help!','aria-label':'Optional tip note'});
-    const submit=node('button',{type:'submit',class:'haze-tip-primary'},'Review in Haze Wallet ↗');
+    const submit=node('button',{type:'submit',class:'haze-tip-primary'},'Review tip in Haze');
     form.append(node('p',{},'A direct tip from your linked Haze wallet. You approve the payment and network fee in Haze.'),presets,
       node('label',{},'Native Pepecoin (PEP)',amount),node('label',{},'Make it a moment',reactions),node('label',{},'A little note (optional)',note),submit);
     view.body.append(form,node('small',{},'Powered by Haze Wallet · No site balance or deposit.'));
     form.onsubmit=async event=>{
-      event.preventDefault();view.status.textContent='';let popup,registered=false;
+      event.preventDefault();view.status.textContent='';
       try{
         if(currentUser()!==user)throw Error('Your account changed. Start this tip again.');
         if(flights.size>=20)throw Error('Too many open tip checks. Finish your pending tips first.');
         const atomic=amountAtomic(amount.value);submit.disabled=true;
-        popup=win.open('about:blank','haze_tip_'+win.crypto.randomUUID(),'popup,width=480,height=820');
-        if(!popup)throw Error('Allow the Haze payment window, then try again.');
+        view.status.textContent='Opening your secure Haze review…';
+        const frame=await ensureWallet(view);
+        if(currentUser()!==user||!view.active())return;
         const intent=await rpc('gry_haze_tip_begin',{p_message:message.id,p_amount:atomic,p_reaction:reactions.value,p_note:note.value});
-        if(currentUser()!==user||!view.d.isConnected){popup.close();return;}
-        const url=tipURL(intent),flight={popup,intent,user,view,txid:null,attempts:0,checking:false};
-        flights.set(intent.id,flight);registered=true;popup.location.href=url;form.remove();
-        view.body.prepend(node('p',{},'Your '+formatAtomic(intent.amount_atomic)+' PEP tip to '+intent.recipient+' is ready in Haze. Nothing is credited here until the payment is checked.'));
-        const id=node('input',{type:'text',maxlength:'64','aria-label':'Transaction ID',placeholder:'Transaction ID from Haze (if needed)'});
-        const check=node('button',{type:'button',class:'haze-tip-secondary',onclick:()=>{const value=id.value.trim();if(!HASH.test(value)){view.status.textContent='Enter the complete 64-character transaction ID from Haze.';return;}flight.txid=value;void checkFlight(flight);}},'Check this transaction');
-        flight.input=id;view.body.append(id,check);view.status.textContent='Waiting for Haze. Do not send the payment a second time while a transaction is pending.';
-      }catch(error){if(popup&&!registered)popup.close();if(view.d.isConnected){view.status.textContent=error.message;submit.disabled=false;}}
+        if(currentUser()!==user||!view.active())return;
+        const url=new URL(tipURL(intent)),flight={source:frame.contentWindow,intent:{...intent,message_id:message.id},user,view,txid:null,attempts:0,checking:false};
+        flights.set(intent.id,flight);frame.contentWindow.postMessage({type:'haze:tip-review',version:1,fragment:url.hash},HAZE_ORIGIN);form.remove();
+        view.d.querySelector('h2').textContent='Review '+formatAtomic(intent.amount_atomic)+' PEP for '+intent.recipient;
+        view.status.textContent='Review the recipient and network fee in Haze. Chat will follow confirmation automatically.';
+      }catch(error){if(view.active()){walletHost.hidden=true;view.status.textContent=error.message;submit.disabled=false;}}
     };
   }
   async function checkFlight(flight) {
-    if(destroyed||flight.checking||currentUser()!==flight.user||!flight.view.d.isConnected||!flight.txid)return;
+    if(destroyed||flight.checking||currentUser()!==flight.user||!flight.txid||doc.hidden)return;
+    if(flight.timer){clearTimeout(flight.timer);timers.delete(flight.timer);flight.timer=null;}
+    if(Date.now()>Date.parse(flight.intent.expires_at)+7200000||flight.attempts>=120)return;
     flight.checking=true;flight.attempts++;
-    flight.view.status.textContent='Checking the submitted payment. A transaction ID alone is not a confirmed tip.';
+    paintPending(flight,'Submitted · checking the network…');
     try{
       const result=await invoke({action:'check',intent:flight.intent.id,txid:flight.txid});
-      if(currentUser()!==flight.user||!flight.view.d.isConnected)return;
+      if(currentUser()!==flight.user)return;
       if(result.state==='confirmed'){
-        flight.view.status.textContent='💚 Tip confirmed! Your appreciation is in the pond. First Tip passport stamp earned.';
-        flight.view.body.classList.add('haze-tip-celebrate');invalidate();void sync();flights.delete(flight.intent.id);
+        flight.card?.remove();flights.delete(flight.intent.id);saveQueue();invalidate();void sync();
       }else{
-        flight.view.status.textContent='Payment found · waiting for two network confirmations. Do not send it again.';
-        if(flight.attempts<6){const timer=setTimeout(()=>{timers.delete(timer);if(!doc.hidden)void checkFlight(flight);},20000);timers.add(timer);}
+        paintPending(flight,'On its way · confirming on the Pepecoin network…');
       }
-    }catch(error){if(flight.view.d.isConnected)flight.view.status.textContent=error.message+' Keep your transaction ID; do not send again.';}
-    finally{flight.checking=false;}
+    }catch{paintPending(flight,'Submitted · reconnecting to confirmation checks. No need to send again.');}
+    finally{
+      flight.checking=false;
+      if(flights.has(flight.intent.id)&&!destroyed){const timer=setTimeout(()=>{timers.delete(timer);flight.timer=null;void checkFlight(flight);},flight.attempts<6?20000:60000);flight.timer=timer;timers.add(timer);}
+    }
   }
-  const receive=event=>{for(const flight of flights.values())if(submissionMatches(event,flight)){flight.txid=event.data.txid;if(flight.input)flight.input.value=flight.txid;void checkFlight(flight);}};
+  function paintPending(flight,text){
+    const row=messages.get(String(flight.intent.message_id))?.row;if(!row)return;
+    if(!flight.card?.isConnected){flight.card=node('div',{class:'haze-pending-tip',role:'status'},'');row.append(flight.card);}
+    flight.card.textContent=REACTIONS[flight.intent.reaction]+' '+formatAtomic(flight.intent.amount_atomic)+' PEP to '+flight.intent.recipient+' · '+text;
+  }
+  function saveQueue(){
+    try{win.localStorage.setItem(queueKey,JSON.stringify([...flights.values()].filter(f=>f.txid).map(({user,intent,txid,attempts})=>({user,intent,txid,attempts})).slice(-20)));}catch{}
+  }
+  function restoreQueue(){
+    try{
+      let cached=[];try{const raw=win.localStorage.getItem(queueKey);if(raw&&raw.length<=65536){const parsed=JSON.parse(raw);if(Array.isArray(parsed))cached=parsed.slice(-20);}}catch{}
+      const server=Array.isArray(wallet?.pending)?wallet.pending.slice(-20).map(({txid,...intent})=>({user:currentUser(),intent,txid})):[];
+      for(const entry of [...cached,...server]){
+        if(entry.user!==currentUser()||!HASH.test(entry.txid)||!entry.intent||flights.has(entry.intent.id)||Date.now()>Date.parse(entry.intent.expires_at)+7200000)continue;
+        tipURL({...entry.intent,expires_at:new Date(Math.max(Date.now()+1,Date.parse(entry.intent.expires_at))).toISOString()});
+        const flight={...entry,attempts:Number.isSafeInteger(entry.attempts)?entry.attempts:0,checking:false};flights.set(entry.intent.id,flight);void checkFlight(flight);
+      }
+    }catch{}
+  }
+  const receive=event=>{for(const flight of flights.values())if(submissionMatches(event,flight)&&!flight.txid){
+    flight.txid=event.data.txid;saveQueue();paintPending(flight,'Submitted · checking the network…');
+    if(flight.view?.active())flight.view.close();void checkFlight(flight);
+  }};
   win.addEventListener('message',receive);
+  const resume=()=>{if(!doc.hidden)for(const flight of flights.values())if(flight.txid&&!flight.checking)void checkFlight(flight);};
+  doc.addEventListener('visibilitychange',resume);
   function invalidate(){syncAt=0;}
   async function sync() {
     if(destroyed||syncing||doc.hidden||Date.now()-syncAt<60000)return;
@@ -194,8 +242,9 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
       for(const [id,card]of rendered)if(!card.isConnected)rendered.delete(id);
       while(seenReceipts.size>500)seenReceipts.delete(seenReceipts.values().next().value);
       initial=false;
+      for(const flight of flights.values())if(flight.txid)paintPending(flight,'On its way · checking confirmation automatically…');
     }catch{/* Missing migration or temporary failure must not break ordinary chat. */}
     finally{syncing=false;}
   }
-  return {mount,bindMessage,refresh,invalidate,sync,connect,destroy(){destroyed=true;dialog?.close();win.removeEventListener('message',receive);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();flights.clear();linkButton?.remove();}};
+  return {mount,bindMessage,refresh,invalidate,sync,connect,destroy(){destroyed=true;saveQueue();dialog?.close();dialog?.remove();win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',resume);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();flights.clear();linkButton?.remove();}};
 }

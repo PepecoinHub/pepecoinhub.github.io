@@ -11,8 +11,10 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 const source=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
 const walletRoot=path.resolve(process.env.HAZE_WALLET_ROOT||path.join(source,'../../..'));
 const candidate=path.resolve(process.env.HAZE_TIP_CANDIDATE||path.join(walletRoot,'outputs/pepecoinhub-reply-20261115/candidate'));
-const PH='http://127.0.0.1:18920',HAZE='http://127.0.0.1:18921';
-const container='haze-ph-qa-preview-20261115';
+const basePort=Number(process.env.HAZE_PREVIEW_BASE_PORT||18920);
+if(!Number.isInteger(basePort)||basePort<1024||basePort>65534)throw Error('Invalid local preview port.');
+const PH='http://127.0.0.1:'+basePort,HAZE='http://127.0.0.1:'+(basePort+1);
+const container=basePort===18920?'haze-ph-qa-preview-20261115':'haze-ph-qa-preview-'+basePort;
 const uid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 const password='HazePreview!2026',token='haze_preview_disposable_discord_20261115';
 const quote=value=>"'"+String(value).replaceAll("'","''")+"'";
@@ -190,7 +192,7 @@ try{
           return json(res,200,value);
         }
         if(p.startsWith('/__preview/')&&['backend.mjs','toolbar.js','preview.css','setup.js'].includes(p.split('/').at(-1))){
-          const file=path.join(source,'scripts/haze-preview',p.split('/').at(-1));return send(res,read(file),mime[path.extname(file)]);
+          const file=path.join(source,'scripts/haze-preview',p.split('/').at(-1));return send(res,read(file).replaceAll('http://127.0.0.1:18920',PH).replaceAll('http://127.0.0.1:18921',HAZE),mime[path.extname(file)]);
         }
         if(!isWallet&&p==='/')return send(res,htmlPage('PepecoinHub × Haze · local playground',`<p class="tag">PEPECOINHUB × HAZE WALLET</p><h1>A little PEP.<br>A lot of appreciation.</h1><p>Try direct chat tips in PepecoinHub’s actual Games lobby, using the real Haze wallet UI.</p><div class="card"><b>Local playground · no real funds</b><p>Discord and network confirmations are simulated. Wallet ownership signatures, payment signatures, the Haze verifier, and the tipping SQL run locally.</p><ol><li>Prepare the disposable Haze wallet with <b>2500 synthetic PEP</b>.</li><li>In the chat, click <b>Link Haze for tips</b> and approve the connection.</li><li>Click <b>Tip</b> on Byl’s sample message. Choose an amount, reaction and note.</li><li>Open Haze, unlock, review the network fee, then confirm the payment. It appears after two simulated confirmations (about 20 seconds).</li></ol><p>Test wallet password: <code>${password}</code></p><a href="${HAZE}/__preview/setup">Prepare test wallet →</a><a href="/games/#chat">Open PepecoinHub chat</a></div><small>Production switches remain off. No PR, deployment, real Discord login, or blockchain submission is made. This validates the local flow; a separately reviewed staging test is still required before release.</small>`));
         if(isWallet&&p==='/__preview/setup')return send(res,htmlPage('Prepare disposable Haze wallet',`<p class="tag">HAZE · LOCAL PLAYGROUND</p><h1>Your test wallet is ready.</h1><div class="card"><p>Prepare a disposable encrypted wallet at <b>${HAZE}</b> with 2500 synthetic PEP. This affects only this loopback preview’s browser storage.</p><p>Password: <code>${password}</code></p><p>Do not import or fund a personal wallet here. All payments stay inside the simulator.</p><button type="button">Prepare wallet & open chat →</button><p role="status"></p></div><script type="module" src="/__preview/setup.js"></script>`));

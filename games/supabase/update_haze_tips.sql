@@ -37,6 +37,9 @@ create table if not exists games.haze_tips (
   check(sender<>recipient and sender_address<>recipient_address)
 );
 create unique index if not exists haze_tip_transaction on games.haze_tips(txid) where txid is not null;
+-- Untrusted sender-submitted candidate, kept for automatic recovery. It grants
+-- no receipt, stamp or global txid reservation; only verification binds txid.
+alter table games.haze_tips add column if not exists submitted_txid text check(submitted_txid ~ '^[a-f0-9]{64}$');
 create index if not exists haze_tip_sender on games.haze_tips(sender,created_at);
 create index if not exists haze_tip_messages on games.haze_tips(message_id,confirmed_at);
 alter table games.haze_settings enable row level security;
@@ -60,7 +63,12 @@ language plpgsql stable security definer set search_path='' as $$
 declare u uuid:=auth.uid();
 begin
   return jsonb_build_object('enabled',coalesce((select enabled from games.haze_settings where id),false),
-    'address',(select address from games.haze_links where user_id=u));
+    'address',(select address from games.haze_links where user_id=u),
+    'pending',coalesce((select jsonb_agg(jsonb_build_object('id',t.id,'sender',t.sender_address,'address',t.recipient_address,
+      'recipient',t.recipient_nick,'message_id',t.message_id,'amount_atomic',t.amount_atomic::text,'reaction',t.reaction,'note',t.note,
+      'created_at',t.created_at,'expires_at',t.expires_at,'txid',t.submitted_txid)) from
+      (select * from games.haze_tips where sender=u and submitted_txid is not null and confirmed_at is null
+        and expires_at+interval '2 hours'>clock_timestamp() order by created_at desc limit 20) t),'[]'::jsonb));
 end $$;
 create or replace function public.gry_haze_link_begin() returns jsonb
 language plpgsql security definer set search_path='' as $$
@@ -153,7 +161,7 @@ begin
     if clock_timestamp()>t.expires_at+interval '2 hours' then raise exception 'Tip check expired. Keep your transaction ID and contact support.'; end if;
     if t.checks>=120 or t.last_checked_at>clock_timestamp()-interval '15 seconds' then raise exception 'Wait at least 15 seconds before checking again.'; end if;
     if (select coalesce(sum(checks),0) from games.haze_tips where sender=p_user and created_at>clock_timestamp()-interval '24 hours')>=200 then raise exception 'Daily payment-check limit reached. Keep your transaction ID and contact support.'; end if;
-    update games.haze_tips set last_checked_at=clock_timestamp(),checks=checks+1 where id=t.id;
+    update games.haze_tips set last_checked_at=clock_timestamp(),checks=checks+1,submitted_txid=p_txid where id=t.id;
   end if;
   return jsonb_build_object('id',t.id,'sender',t.sender_address,'address',t.recipient_address,'amount_atomic',t.amount_atomic::text,
     'created_at',t.created_at,'expires_at',t.expires_at,'confirmed',t.confirmed_at is not null,'txid',p_txid);

@@ -62,6 +62,10 @@ test('Haze SQL: real PostgreSQL permissions, challenge replay, immutable recipie
     assert.throws(()=>as('authenticated',uid(1),`select public.haze_tip_confirm(${quote(uid(1))},${quote(tip.id)},${quote(hash)},0,${quote(block)},${time})`));
     assert.throws(()=>as('service_role',null,`select public.haze_tip_context(${quote(uid(3))},${quote(tip.id)},${quote(hash)})`));
     rpc('service_role',null,`select public.haze_tip_context(${quote(uid(1))},${quote(tip.id)},${quote(hash)})`);
+    const ownPending=rpc('authenticated',uid(1),'select public.gry_haze_status()').pending;
+    assert.equal(ownPending[0].id,tip.id);assert.equal(ownPending[0].txid,hash);
+    assert.equal(rpc('authenticated',uid(2),'select public.gry_haze_status()').pending.length,0,'Other accounts cannot see pending submissions');
+    assert.equal(psql(`select txid is null from games.haze_tips where id=${quote(tip.id)}`),'t','An unverified candidate never binds the verified txid');
     assert.throws(()=>as('service_role',null,`select public.haze_tip_context(${quote(uid(1))},${quote(tip.id)},${quote(hash)})`));
     assert.equal(rpc('anon',null,'select public.gry_haze_chat(array[1]::bigint[])').receipts.length,0);
     const commit=`select public.haze_tip_confirm(${quote(uid(1))},${quote(tip.id)},${quote(hash)},0,${quote(block)},${time})`;
