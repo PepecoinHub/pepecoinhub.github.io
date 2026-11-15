@@ -185,7 +185,7 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
     // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
     'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
     // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
-    'stamps-v3.webp': [48 * 138, 150], 'pond-pioneer-v3.webp': [138, 150],
+    'stamps-v3.webp': [53 * 138, 150], 'pond-pioneer-v3.webp': [138, 150],
     // Pond Dominator: the owner's own art, one V3-sized tile outside the atlas (update_wheres_pepe_hall_of_fame.sql)
     'pond-dominator.webp': [138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
@@ -207,7 +207,7 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
   const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
   assert.equal(count('PP_STAMPS'), 16);
-  assert.equal(count('PP_V3'), 48, 'PP_V3 matches the 48 tiles of stamps-v3.webp');
+  assert.equal(count('PP_V3'), 53, 'PP_V3 matches the 53 tiles of stamps-v3.webp');
   assert.match(js, /if \(earned && x\.id === 'pond_pioneer'\)/, 'Pond Pioneer uses the exclusive new art');
   assert.doesNotMatch(js, /PP_LILY/, 'No old Lily sprite fallback');
   const css = readFileSync(new URL('../docs/meme/passport.css', import.meta.url), 'utf8');

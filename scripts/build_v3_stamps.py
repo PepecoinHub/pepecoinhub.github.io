@@ -29,6 +29,8 @@ V3 = [
     'scout_fren', 'first_hatch', 'little_fren', 'grown_fren',
     # owner, 2026-11-09
     'share_fren', 'valentine_fren',
+    # the Pond Quiz stamps (owner, 2026-11-15): 1, 10, 25, 50 and 99 right answers
+    'quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99',
 ]
 SMALL = set()   # every stamp has its full-size file now
 TILE = (138, 150)
@@ -61,9 +63,16 @@ def clear_margin(im):
 def main():
     art = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'games', 'fren-passport')
     sheet = Image.new('RGBA', (TILE[0] * len(V3), TILE[1]), (0, 0, 0, 0))
+    out = os.path.join(ROOT, 'docs', 'meme', 'passport-assets', 'stamps-v3.webp')
+    old = Image.open(out).convert('RGBA')   # tiles keep their place: new stamps are only ever added at the end
     for i, sid in enumerate(V3):
         sub = 'stamps-review/art-v3-wip' if sid in SMALL else 'source/stamps-new'
-        im = clear_margin(Image.open(os.path.join(art, sub, sid + '.png')).convert('RGBA'))
+        src = os.path.join(art, sub, sid + '.png')
+        if not os.path.exists(src):
+            # the older sources live in PR #233, not on main: keep that stamp's tile from the current sheet as it is
+            sheet.alpha_composite(old.crop((i * TILE[0], 0, (i + 1) * TILE[0], TILE[1])), (i * TILE[0], 0))
+            continue
+        im = clear_margin(Image.open(src).convert('RGBA'))
         # crop to the stamp: rows and columns with real content (ignores stray pixels in a transparent margin)
         al = np.array(im)[:, :, 3] > 128
         rows, cols = np.nonzero(al.sum(1) > 20)[0], np.nonzero(al.sum(0) > 20)[0]
@@ -71,7 +80,6 @@ def main():
         s = min((TILE[0] - 2 * PAD) / im.width, (TILE[1] - 2 * PAD) / im.height)
         im = im.resize((max(1, round(im.width * s)), max(1, round(im.height * s))), Image.LANCZOS)
         sheet.alpha_composite(im, (i * TILE[0] + (TILE[0] - im.width) // 2, (TILE[1] - im.height) // 2))
-    out = os.path.join(ROOT, 'docs', 'meme', 'passport-assets', 'stamps-v3.webp')
     sheet.save(out, 'WEBP', quality=74, method=6)
     print(out, sheet.size, os.path.getsize(out), 'bytes')
 

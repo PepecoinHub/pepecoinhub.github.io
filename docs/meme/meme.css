@@ -1152,7 +1152,7 @@ footer.foot a { color: #edf3e3; }
 /* ---------- PEP-TV looks: every ad is a different late-90s / early-2000s TV format (ADS[].look in meme.js) ---------- */
 .ad-row { display: flex; align-items: center; gap: 16px; width: 100%; }
 .ad-row > div { min-width: 0; display: grid; gap: 8px; }
-.ad-stamp { flex: none; display: inline-block; width: 74px; height: 80px; background: url(passport-assets/stamps-v3.webp?v=20261109val) 0 0 / 4800% 100% no-repeat; filter: drop-shadow(3px 3px 0 rgba(0,0,0,.55)); }
+.ad-stamp { flex: none; display: inline-block; width: 74px; height: 80px; background: url(passport-assets/stamps-v3.webp?v=20261115quiz) 0 0 / 5300% 100% no-repeat; filter: drop-shadow(3px 3px 0 rgba(0,0,0,.55)); }
 .ad-stamp-xl { width: 120px; height: 130px; }
 .ad-stampimg { flex: none; width: 116px; height: auto; filter: drop-shadow(3px 3px 0 rgba(0,0,0,.55)); }
 .ad-ctas { display: flex; flex-wrap: wrap; gap: 10px; }

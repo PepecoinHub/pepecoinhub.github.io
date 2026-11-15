@@ -2057,7 +2057,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261111launch';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261114king'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261115quiz'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -2233,7 +2233,8 @@
     'season_champion', 'bug_hunter', 'podium', 'game_night', 'quiz_master', 'frogmas',
     'treasure_hunter', 'interior_designer', 'pep_birthday', 'thanksgiving_fren',
     'welcome_back', 'first_words', 'hey_fren', 'dear_editor', 'junior_editor', 'senior_editor', 'streak_14', 'pepe_guesser', 'week_scout',
-    'scout_fren', 'first_hatch', 'little_fren', 'grown_fren', 'share_fren', 'valentine_fren'];
+    'scout_fren', 'first_hatch', 'little_fren', 'grown_fren', 'share_fren', 'valentine_fren',
+    'quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99'];
   // the 20 places on the Passport's front page, in order: gold row, silver row, then the first steps
   // owner, 2026-11-12: Pond Pioneer opens the gold row; the rest moved one place on (Secret Starter is in the Stamps tab)
   var PP_FRONT = ['pond_pioneer', 'moonwalker', 'season_champion', 'frog_of_the_week', 'certified_fren',

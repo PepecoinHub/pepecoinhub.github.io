@@ -1,6 +1,6 @@
 # Pond Quiz: 5 stempli Paszportu za poprawne odpowiedzi (dla ChatGPT)
 
-Status: do wykonania. Progi zatwierdzone przez właściciela 2026-11-15: 1, 10, 25, 50 i 99 (wszystkie pytania).
+Status: ZROBIONE. Grafiki ChatGPT zatwierdzone przez właściciela 2026-11-15, w atlasie `stamps-v3.webp` (kafelki 49-53).
 Kod jest gotowy (`games/supabase/update_pond_quiz.sql`, katalog `docs/meme/passport-catalog.json`, status `planned`).
 Dopóki stempel nie ma zatwierdzonego rysunku, Paszport pokazuje neutralne „?” (jak każdy stempel bez grafiki).
 
