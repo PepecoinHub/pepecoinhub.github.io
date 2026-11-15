@@ -47,18 +47,27 @@
   // how much is really visible: --vvb is the covered part, and the taskbar grows by it (meme.css --sab).
   // Not while zoomed in or typing (the keyboard), so the taskbar does not jump around.
   (function () {
-    var vv = window.visualViewport, root = document.documentElement, last = -1;
+    var vv = window.visualViewport, root = document.documentElement, last = -1, timer = 0;
     if (!vv) return;
-    function fit() {
-      var a = document.activeElement, typing = a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable);
+    // Measured only once the viewport has settled (a keyboard or the URL bar sliding away gives a wrong
+    // reading for a moment), never while typing (also in a game frame) and never more than an in-app toolbar.
+    function measure() {
+      var a = document.activeElement, typing = a && (/^(INPUT|TEXTAREA|SELECT|IFRAME)$/.test(a.tagName) || a.isContentEditable);
       var gap = (vv.scale > 1.01 || typing) ? 0 : Math.round(window.innerHeight - vv.height - vv.offsetTop);
-      gap = Math.max(0, Math.min(gap, 160));
-      if (gap !== last) { last = gap; root.style.setProperty('--vvb', gap + 'px'); }
+      return gap > 90 ? 0 : Math.max(0, gap);
+    }
+    function set(gap) { if (gap !== last) { last = gap; root.style.setProperty('--vvb', gap + 'px'); } }
+    function fit() {
+      var now = measure();
+      if (now < last) set(now);   // shrinking back is always safe, at once
+      clearTimeout(timer);
+      timer = setTimeout(function () { set(measure()); }, 700);
     }
     vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit);
     addEventListener('resize', fit); addEventListener('orientationchange', fit);
-    document.addEventListener('focusout', function () { setTimeout(fit, 300); });
-    fit();
+    document.addEventListener('focusout', fit); document.addEventListener('focusin', fit);
+    document.addEventListener('visibilitychange', fit);
+    set(measure());
   })();
   // PepeGochi in testing: hidden for everyone except a browser that opened /meme/?beta=gochi once
   // (?beta=off hides it again). Testers get the real game (games/pepegochi-live.html: the frog on the server,
