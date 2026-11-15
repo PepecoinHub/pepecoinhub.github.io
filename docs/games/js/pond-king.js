@@ -1,6 +1,6 @@
 // POND KING: rock, paper, scissors for the throne (games/supabase/update_pond_king.sql).
 // No sign-in: the player is a random token kept in this browser. The king's moves never reach this page,
-// except the king's own (with their token) and the shuffled rounds of a duel that has just been played.
+// except the king's own (with their token) and the rounds of a duel that has just been played.
 (function () {
   'use strict';
   var N = window.PondNet, framed = N.framed, me = null;
@@ -270,10 +270,11 @@
       var anim = mk('div', 'anim ' + (r.won ? 'win' : r.score[0] === r.score[1] ? 'draw' : 'lose')); anim.setAttribute('aria-hidden', 'true');
       line.parentNode.insertBefore(anim, line);
       var p = mk('p', 'muted', r.won
-        ? 'Your three moves now defend the pond. The next challenger meets them in a shuffled order. You can change them below at any time.'
+        ? 'Your three moves now defend the pond, in this order.'
         : r.score[0] === r.score[1] ? 'A tie keeps the king on the throne. ' + kingNick + ' has now held it ' + plural(r.king.defenses, 'time', 'times') + '. You walk away dizzy: come back in 4 hours.'
-          : kingNick + ' has now held the throne ' + plural(r.king.defenses, 'time', 'times') + '. ' + bruised() + ' Or send a fren: you know which moves the king holds now.');
+          : kingNick + ' has now held the throne ' + plural(r.king.defenses, 'time', 'times') + '. ' + bruised() + ' Or send a fren: you know the king’s pattern now (unless they change it).');
       after.appendChild(p);
+      if (r.won) after.appendChild(mk('p', 'tip', '💡 Tip: set a new pattern now, below. Avoid three of the same: it is the easiest pattern to guess.'));
       var row = mk('div', 'row'), ok = mk('button', r.won ? 'go' : '', r.won ? 'To my throne →' : 'OK'); ok.type = 'button';
       ok.addEventListener('click', function () { $('result').hidden = true; load(); });
       row.appendChild(ok);

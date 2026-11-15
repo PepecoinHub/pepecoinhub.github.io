@@ -108,12 +108,12 @@ test('Pond King: hidden moves, one duel every 4 hours per player (and network), 
     await later();
     const back = await duel(tok(1), '1.1.1.1', win.new_king_id, 'Loser', 'rrr');
     assert.equal(back.won, true);
-    // the shuffled order is always a permutation of the king's moves
+    // the king's pattern is played in the order the king set it
     await db.query("update games.pk_kings set moves = 'rps' where ended_at is null");
     const kNow = (await state(tok(9), '9.9.9.9')).king.id;
     for (let i = 10; i < 16; i++) {
       const d = await duel(tok(i), '10.0.0.' + i, kNow, 'Probe' + i, 'rrr');
-      assert.deepEqual(d.rounds.map(r => r.king).sort(), ['p', 'r', 's']);
+      assert.equal(d.rounds.map(r => r.king).join(''), 'rps');
       for (const r of d.rounds) assert.equal(r.result, r.you === r.king ? 0 : (BEATS[r.you] === r.king ? 1 : -1));
       assert.equal(d.won, false);   // rrr vs {r,p,s}: one win, one loss, one draw
     }

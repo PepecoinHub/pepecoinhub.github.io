@@ -275,7 +275,7 @@ begin
     return jsonb_build_object('ok', false, 'error', 'wait', 'next_at', (games.pk_last(th, u, ip)).created_at + games.pk_cooldown()); end if;
   if (select count(*) from games.pk_duels where created_at > now() - interval '1 hour') >= 300 then
     return jsonb_build_object('ok', false, 'error', 'busy'); end if;
-  select string_agg(m, '' order by random()) into ord from regexp_split_to_table(k.moves, '') m;
+  ord := k.moves;
   for i in 1..3 loop
     r := games.pk_beats(substr(v_moves, i, 1), substr(ord, i, 1));
     if r > 0 then me := me + 1; elsif r < 0 then them := them + 1; end if;

@@ -290,3 +290,6 @@ details.panel { padding-top: 12px; }
 #king-share .go { min-height: 32px; padding: 4px 14px; font-size: 12px; }
 .copy-tmp { position: fixed; left: -9999px; top: 0; }
 .gadget .share-row .btn-x { display: none; }
+
+/* Pond King: the advice after taking the throne */
+#result p.tip { background: #ffffe1; border: 1px solid #000; padding: 4px 6px; margin: 6px 0; font-size: 12px; text-align: left; }
