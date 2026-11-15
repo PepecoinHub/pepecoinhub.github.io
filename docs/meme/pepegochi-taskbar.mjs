@@ -232,8 +232,13 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     // at most one read in 5 minutes, unless the day or the account changed (the same budget as the pet state)
     if (!force && who === serverUser && Date.now() - serverAt < 5 * 60 * 1000 && (!server || server.day === todayText())) return server;
     serverAt = Date.now(); serverUser = who;
-    try { server = await rpc('gry_quiz_today', {}); } catch (e) { server = null; }
-    if (server && server.day && server.day !== todayText()) server = null;
+    let got = null;
+    try { got = await rpc('gry_quiz_today', {}); } catch (e) { got = null; }
+    // an answer that arrives after the account changed belongs to the old account: drop it
+    const now = session();
+    if (!now || !now.discord || now.userId !== who) return null;
+    // the day is the server's UTC day: a wrong clock on this computer does not hide the question
+    server = got;
     return server;
   }
   const current = () => (server && server.question ? server : null);
@@ -350,6 +355,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       lastUser = id;
       lastAt = 0;
       generation++;
+      closeBalloon();             // the old account's question or ranking must not stay on screen
       paint(describeTaskbarFrog(null));
       hatched = false; server = null; updateFactButton();
     }

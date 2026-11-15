@@ -154,6 +154,63 @@ test('Pond Quiz: one question a day, +1 for a right answer, wrong ones come back
       assert.equal((await rows('select points from games.quiz_players where user_id = $1', [uid(4)]))[0].points, before);
     });
 
+    await t.test('two tabs at once, the UTC midnight, the browser time zone and switching accounts', async () => {
+      await db.exec(CLOCK);                              // the file ran again above: back to the virtual clock
+      // a second connection = a second tab of the same player, at the same moment
+      const raw2 = new pg.Client({ connectionString: url.toString() });
+      await raw2.connect();
+      const db2 = asDb(raw2);
+      try {
+        for (const n of [7, 8]) {
+          await addPlayer(db, n);
+          await ok(n, "gry_pepegochi_adopt('Fren')", day(40));
+          await ok(n, "gry_pepegochi_action('feed')", day(41));
+        }
+        const at = day(42, 10);
+        // both tabs open the first question of the day together: one question, one order, one row
+        const [a, b] = await Promise.all([callRpc(db, { user: 7, now: at }, 'public.gry_quiz_today()'),
+          callRpc(db2, { user: 7, now: at }, 'public.gry_quiz_today()')]);
+        assert.ok(a.ok && b.ok, a.error || b.error);
+        assert.deepEqual([b.value.id, b.value.answers], [a.value.id, a.value.answers]);
+        // both tabs send the right answer together: one point, one solved row
+        const right = await shownIndex(a.value, true);
+        const [x, y] = await Promise.all([callRpc(db, { user: 7, now: at }, `public.gry_quiz_answer(${right})`),
+          callRpc(db2, { user: 7, now: at }, `public.gry_quiz_answer(${right})`)]);
+        assert.ok(x.ok && y.ok, x.error || y.error);
+        const me = (await rows('select points, answered from games.quiz_players where user_id = $1', [uid(7)]))[0];
+        assert.deepEqual([me.points, me.answered], [1, 1], 'two tabs, one answer');
+        assert.equal((await rows('select count(*)::int n from games.quiz_solved where user_id = $1', [uid(7)]))[0].n, 1);
+
+        // the day is the server's UTC day: the browser's time zone changes nothing
+        const late = new Date(Date.UTC(2026, 11, 31, 23, 59, 59));
+        const q1 = await ok(8, 'gry_quiz_today()', late);
+        for (const tz of ['Pacific/Kiritimati', 'Pacific/Pago_Pago', 'Europe/Warsaw'])
+          assert.equal((await callRpc(db, { user: 8, now: late, tz }, 'public.gry_quiz_today()')).value.id, q1.id, tz);
+        // one second after midnight UTC: a new question, and yesterday's can no longer be answered
+        const next = new Date(Date.UTC(2027, 0, 1, 0, 0, 1));
+        const q2 = await ok(8, 'gry_quiz_today()', next);
+        assert.notEqual(q2.id, q1.id, 'a new day, a new question (yesterday\'s was not answered: not again at once)');
+        assert.equal(q2.answered, false);
+        const r = await ok(8, `gry_quiz_answer(${await shownIndex(q2, false)})`, next);
+        assert.equal(r.right, false);
+        assert.equal((await rows('select points from games.quiz_players where user_id = $1', [uid(8)]))[0].points, 0);
+
+        // switching accounts in the same browser: each account has its own question, points and pool
+        const before7 = (await rows('select points, question_id from games.quiz_players where user_id = $1', [uid(7)]))[0];
+        const v8 = await ok(8, 'gry_quiz_today()', next);
+        assert.equal(v8.answered, true, 'player 8 already answered today');
+        const v7 = await ok(7, 'gry_quiz_today()', next);
+        assert.equal(v7.answered, false, 'player 7 gets its own question for the new day');
+        assert.equal(v7.points, before7.points);
+        assert.equal((await rows('select points from games.quiz_players where user_id = $1', [uid(8)]))[0].points, 0,
+          'nothing of player 7 leaks to player 8');
+        // the RPCs take no user, date or score from the browser
+        for (const f of ['public.gry_quiz_today()', 'public.gry_quiz_answer(integer)', 'public.gry_quiz_board()'])
+          assert.ok((await rows('select to_regprocedure($1) is not null v', [f]))[0].v, f);
+        assert.equal((await rows("select count(*)::int n from pg_proc where proname like 'gry_quiz%'"))[0].n, 3);
+      } finally { await raw2.end(); }
+    });
+
     await t.test('stamps for 1, 10, 25, 50 and 99 right answers, dated at the answer that reached each; never lost', async () => {
       await db.exec(CLOCK);
       const stamps = async n => (await rows("select badge_id, earned_at from games.passport_badges where user_id = $1 and badge_id like 'quiz%' order by earned_at, badge_id", [uid(n)]));

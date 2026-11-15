@@ -108,6 +108,11 @@ test('Pond Quiz in the browser: questions only from the server, only after hatch
   assert.equal((js.match(/openBalloon\(/g) || []).length, 1, 'opened only from the "?" button');
   assert.match(js, /button\.addEventListener\('click', \(\) => open\(\)\)/);
   assert.match(js, /Date\.now\(\) - serverAt < 5 \* 60 \* 1000/, 'at most one quiz read in 5 minutes');
+  // switching accounts: the old question closes at once, and a late answer for the old account is dropped
+  assert.match(js, /generation\+\+;\n\s+closeBalloon\(\);/);
+  assert.match(js, /if \(!now \|\| !now\.discord \|\| now\.userId !== who\) return null;/);
+  // the day is the server's: a wrong clock on the computer does not hide or change the question
+  assert.doesNotMatch(js, /server\.day !== todayText\(\)\) server = null/);
 });
 
 test("the frog's remarks after an answer", () => {
