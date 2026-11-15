@@ -1,5 +1,5 @@
 import { launch, step, flap, score, obstacles, newSeed, STEP } from './yeet-engine.mjs?v=20261105landing';
-import { getBackend } from './backend.js';
+import { getBackend } from './backend.js?v=20261113link';
 
 const $ = s => document.querySelector(s), canvas = $('#game'), ctx = canvas.getContext('2d', { alpha: false });
 const W = 960, H = 540, GROUND = 438, SCALE = 6;

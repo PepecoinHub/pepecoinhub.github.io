@@ -1,0 +1,208 @@
+// Optional PostgreSQL integration test for games/supabase/update_pond_king.sql (POND KING on PondOS 98).
+//   PASSPORT_PG_URL=postgres://postgres@localhost:5432/postgres \
+//   PASSPORT_PG_MODULE=/abs/path/node_modules/pg/lib/index.js \
+//   node --test tests/pond-king-sql.test.mjs
+// It creates and drops its own database. Never point it at Supabase.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { SKIP, pondDb, addUser } from './pond-sql-setup.mjs';
+
+const BEATS = { r: 's', s: 'p', p: 'r' };   // what each move beats
+const counter = m => ({ r: 'p', p: 's', s: 'r' })[m];
+
+test('Pond King: hidden moves, one duel every 4 hours per player (and network), the throne changes hands safely',
+  { skip: SKIP, timeout: 120000 }, async () => {
+  const { db, drop } = await pondDb('pond_king_test', ['update_pond_bulletin.sql', 'update_pond_king.sql']);
+  try {
+    const sql = (await import('node:fs/promises')).readFile(new URL('../games/supabase/update_pond_king.sql', import.meta.url), 'utf8');
+    await db.query(await sql);   // safe to run again: still one house frog
+    assert.equal((await db.query('select count(*)::int n from games.pk_kings')).rows[0].n, 1);
+
+    const tok = i => 'player-token-' + String(i).padStart(10, '0');
+    let user = null;   // a signed-in account for the next calls (null = no sign-in)
+    const call = async (ip, q, args = []) => {
+      await db.query('begin');
+      try {
+        await db.query('set local role ' + (user ? 'authenticated' : 'anon'));
+        await db.query("select set_config('request.jwt.claim.sub', $1, true)", [user || '']);
+        await db.query("select set_config('request.headers', $1, true)", [ip ? JSON.stringify({ 'cf-connecting-ip': ip }) : '{}']);
+        const r = await db.query(q, args); await db.query('commit'); return r.rows[0].v;
+      } catch (e) { await db.query('rollback'); throw e; }
+    };
+    const state = (t, ip) => call(ip, 'select public.gry_pk_state($1) as v', [t]);
+    const duel = (t, ip, king, nick, moves) => call(ip, 'select public.gry_pk_challenge($1, $2, $3, $4) as v', [t, king, nick, moves]);
+    const setMoves = (t, ip, moves) => call(ip, 'select public.gry_pk_set_moves($1, $2) as v', [t, moves]);
+    // the clock moves on 4 hours: every duel so far happened 4 hours earlier
+    const later = () => db.query("update games.pk_duels set created_at = created_at - interval '4 hours'");
+
+    // anon cannot read the tables directly
+    await assert.rejects(call('1.1.1.1', 'select moves as v from games.pk_kings'), /permission denied/);
+
+    // a visitor sees the house frog, but not its moves
+    const s0 = await state(tok(1), '1.1.1.1');
+    assert.equal(s0.king.nick, 'Pepe'); assert.equal(s0.king.house, true); assert.equal(s0.king.moves, null);
+    assert.equal(s0.can_challenge, true);
+    const k0 = s0.king.id;
+
+    // input checks
+    assert.equal((await duel('short', '1.1.1.1', k0, 'Fren', 'rps')).error, 'token');
+    assert.equal((await duel(tok(1), '1.1.1.1', k0, 'Fren', 'rpx')).error, 'moves');
+    assert.equal((await duel(tok(1), '1.1.1.1', k0, 'x', 'rps')).error, 'nick');
+    assert.equal((await duel(tok(1), '1.1.1.1', k0, 'badword99', 'rps')).error, 'nick');
+    assert.equal((await duel(tok(1), '1.1.1.1', k0 + 99, 'Fren', 'rps')).error, 'changed');
+
+    // make the house frog predictable: three rocks, so any order is the same
+    await db.query("update games.pk_kings set moves = 'rrr' where id = $1", [k0]);
+
+    // a lost duel: scissors x3 loses every round; the king gains a defence
+    const lost = await duel(tok(1), '1.1.1.1', k0, 'Loser', 'sss');
+    assert.equal(lost.ok, true); assert.equal(lost.won, false); assert.deepEqual(lost.score, [0, 3]);
+    assert.deepEqual(lost.rounds.map(r => r.king), ['r', 'r', 'r']);
+    assert.equal(lost.king.defenses, 1);
+    // one duel every 4 hours: the same player, and anybody else on the same network, wait
+    const lostAt = (await db.query('select created_at from games.pk_duels order by id desc limit 1')).rows[0].created_at;
+    const again = await duel(tok(1), '1.1.1.1', k0, 'Loser', 'ppp');
+    assert.equal(again.error, 'wait');
+    assert.equal(+new Date(again.next_at), +lostAt + 4 * 3600e3);
+    assert.equal((await duel(tok(2), '1.1.1.1', k0, 'Sneaky', 'ppp')).error, 'wait');
+    const s1 = await state(tok(2), '1.1.1.1');
+    assert.equal(s1.can_challenge, false); assert.equal(s1.cooldown.network, true); assert.equal(+new Date(s1.cooldown.next_at), +lostAt + 4 * 3600e3);
+    const s1b = await state(tok(1), '1.1.1.1');
+    assert.equal(s1b.cooldown.network, false); assert.equal(s1b.cooldown.won, false);
+    // 3 h 59 min later: still waiting
+    await db.query("update games.pk_duels set created_at = created_at - interval '3 hours 59 minutes'");
+    assert.equal((await duel(tok(1), '1.1.1.1', k0, 'Loser', 'ppp')).error, 'wait');
+    await db.query("update games.pk_duels set created_at = created_at + interval '3 hours 59 minutes'");
+    // 4 hours later: the same player may take on the same king again (no limit per king since 2026-11-14)
+    await later();
+    const s1c = await state(tok(1), '1.1.1.1');
+    assert.equal(s1c.can_challenge, true); assert.equal(s1c.cooldown, null); assert.equal(s1c.tried.won, false);
+    const rematch = await duel(tok(1), '1.1.1.1', k0, 'Loser', 'sss');
+    assert.equal(rematch.ok, true); assert.equal(rematch.won, false); assert.equal(rematch.king.defenses, 2);
+    // and the network waits 4 hours again, for players without a Discord account
+    assert.equal((await duel(tok(2), '1.1.1.1', k0, 'Sneaky', 'ppp')).error, 'wait');
+
+    // a tie keeps the king: rock, paper, scissors against rrr = 0 : 1 : 0 -> 1 win, 1 loss
+    const tie = await duel(tok(3), '3.3.3.3', k0, 'Tie', 'rps');
+    assert.equal(tie.won, false); assert.deepEqual(tie.score, [1, 1]);
+
+    // a winner takes the throne with their moves
+    const win = await duel(tok(4), '4.4.4.4', k0, 'Winner', 'ppr');
+    assert.equal(win.won, true); assert.deepEqual(win.score, [2, 0]);
+    const s2 = await state(tok(4), '4.4.4.4');
+    assert.equal(s2.king.nick, 'Winner'); assert.equal(s2.king.you, true); assert.equal(s2.king.moves, 'ppr');
+    assert.equal(s2.can_challenge, false); assert.equal(s2.king.defenses, 0);
+    // the old king's reign stays in the top list
+    assert.ok(s2.top.some(t => t.nick === 'Pepe' && t.defenses === 3 && !t.reigning));
+    // nobody else sees the moves
+    assert.equal((await state(tok(5), '5.5.5.5')).king.moves, null);
+    // the king cannot challenge themselves
+    assert.equal((await duel(tok(4), '4.4.4.4', win.new_king_id, 'Winner', 'rrr')).error, 'self');
+    // a stale challenge (against the house frog) is not played
+    assert.equal((await duel(tok(5), '5.5.5.5', k0, 'Late', 'ppp')).error, 'changed');
+
+    // the king changes the defence; nobody else may
+    assert.equal((await setMoves(tok(5), '5.5.5.5', 'sss')).error, 'not_king');
+    assert.equal((await setMoves(tok(4), '4.4.4.4', 'sss')).ok, true);
+    // with a new king (and the 4 hours over) the earlier loser tries again; scissors x3 is beaten by rock x3
+    await later();
+    const back = await duel(tok(1), '1.1.1.1', win.new_king_id, 'Loser', 'rrr');
+    assert.equal(back.won, true);
+    // the king's pattern is played in the order the king set it
+    await db.query("update games.pk_kings set moves = 'rps' where ended_at is null");
+    const kNow = (await state(tok(9), '9.9.9.9')).king.id;
+    for (let i = 10; i < 16; i++) {
+      const d = await duel(tok(i), '10.0.0.' + i, kNow, 'Probe' + i, 'rrr');
+      assert.equal(d.rounds.map(r => r.king).join(''), 'rps');
+      for (const r of d.rounds) assert.equal(r.result, r.you === r.king ? 0 : (BEATS[r.you] === r.king ? 1 : -1));
+      assert.equal(d.won, false);   // rrr vs {r,p,s}: one win, one loss, one draw
+    }
+    // the king sees who came, the others see only names and results
+    const ks = await state(tok(1), '1.1.1.1');
+    assert.equal(ks.king.you, true); assert.equal(ks.challengers.length, 6);
+    const os = await state(tok(20), '20.0.0.1');
+    assert.equal(os.challengers, null); assert.ok(os.recent.every(r => !('moves' in r)));
+
+    // one network, twelve new kings, 4 hours apart: every one of those duels is allowed
+    await db.query('delete from games.pk_duels');
+    for (let i = 0; i < 12; i++) {
+      const k = (await state(tok(100 + i), '7.7.7.7')).king;
+      await db.query("update games.pk_kings set moves = 'sss' where id = $1", [k.id]);
+      const d = await duel(tok(100 + i), '7.7.7.7', k.id, 'Busy' + i, counter('s').repeat(3));
+      assert.equal(d.won, true, 'duel ' + i);
+      await later();
+    }
+    // within 4 hours a second duel is refused, for the player on another network and for another player on this one
+    const k = (await state(tok(200), '7.7.7.7')).king;
+    await db.query("update games.pk_kings set moves = 'sss' where id = $1", [k.id]);
+    assert.equal((await duel(tok(200), '7.7.7.7', k.id, 'Daily', 'rrr')).won, true);
+    const k2 = (await state(tok(201), '8.8.8.8')).king;   // Daily now reigns with rrr
+    assert.equal((await duel(tok(202), '9.9.9.9', k2.id, 'Mover', 'sss')).won, false);
+    assert.equal((await duel(tok(202), '6.6.6.6', k2.id, 'Mover', 'ppp')).error, 'wait', 'the same player from another network');
+    assert.equal((await duel(tok(201), '7.7.7.7', k2.id, 'Roomie', 'ppp')).error, 'wait', 'another player on a network that just played');
+    await later();
+
+    // the Bulletin got one "new king" per crown
+    const ev = (await db.query("select kind, actor_nick, other_nick from games.bulletin_events where kind = 'king_crowned' order by id")).rows;
+    assert.equal(ev.length, 15);   // Winner, Loser, 12 x Busy, Daily
+    // Loser held the throne against 6 probes: one "5 defences" story
+    assert.equal((await db.query("select count(*)::int n from games.bulletin_events where kind = 'king_defended' and actor_nick = 'Loser'")).rows[0].n, 1);
+    assert.deepEqual(ev[0], { kind: 'king_crowned', actor_nick: 'Winner', other_nick: 'Pepe' });
+
+    // logged on: the throne follows the account to another browser; a Discord player's name is reserved for them (games.valid_nick)
+    await db.query('delete from games.pk_duels');
+    const discord = await addUser(db, 1, 'DiscordFrog');
+    user = discord;
+    const kA = (await state(tok(300), '30.0.0.1')).king;
+    await db.query("update games.pk_kings set moves = 'sss' where id = $1", [kA.id]);
+    const dw = await duel(tok(300), '30.0.0.1', kA.id, 'DiscordFrog', 'rrr');
+    assert.equal(dw.won, true);
+    const other = await state(tok(301), '30.0.0.2');   // a different browser token, the same account
+    assert.equal(other.king.you, true); assert.equal(other.king.nick, 'DiscordFrog'); assert.equal(other.king.passport, discord);
+    assert.equal((await setMoves(tok(301), '30.0.0.2', 'ppp')).ok, true);
+    // a guest without an account cannot use the Discord player's name
+    user = null;
+    assert.equal((await duel(tok(302), '30.0.0.3', other.king.id, 'DiscordFrog', 'sss')).error, 'nick');
+    // a long reign makes the news once: defences 5
+    await db.query("update games.pk_kings set defenses = 4 where ended_at is null");
+    const d5 = await duel(tok(303), '30.0.0.4', other.king.id, 'Fifth', 'rrr');   // rrr vs ppp: the king holds
+    assert.equal(d5.won, false);
+    const news = (await db.query("select actor_nick, other_nick, actor_user, data from games.bulletin_events where kind = 'king_defended' and actor_nick = 'DiscordFrog'")).rows;
+    assert.equal(news.length, 1); assert.equal(news[0].actor_nick, 'DiscordFrog'); assert.equal(news[0].actor_user, discord);
+    assert.equal(news[0].data.defenses, 5);
+
+    // "Long Live the King": 10 duels won in a row as king. A stand-in Passport records the awards
+    // (the real games.passport_award is in update_passport_awards.sql and only takes Discord accounts).
+    await db.query(`create table games.test_awards (user_id uuid, badge text, primary key (user_id, badge));
+      create function games.passport_award(u uuid, b text, at timestamptz default null) returns boolean language sql security definer set search_path = '' as $$
+        insert into games.test_awards values (u, b) on conflict do nothing returning true $$;
+      create table games.passport_avatars (user_id uuid primary key, bg text, clothing text, mouth text, eyes text, hat text, accessory text, special text);
+      insert into games.passport_avatars values ('${discord}', 'bg_sky', 'clothing_blue', 'mouth_flat', 'eyes_sleepy', 'hat_crown', 'accessory_none', 'special_none');`);
+    const awards = () => db.query('select user_id, badge from games.test_awards').then(r => r.rows);
+    for (let i = 0; i < 4; i++) {   // defences 5 -> 9: no stamp yet
+      await duel(tok(400 + i), '40.0.0.' + i, other.king.id, 'Try' + i, 'rrr');
+    }
+    assert.equal((await state(tok(499), '40.1.0.1')).king.defenses, 9);
+    assert.deepEqual(await awards(), []);
+    await duel(tok(410), '40.0.1.0', other.king.id, 'Tenth', 'rrr');   // the 10th win in a row
+    assert.deepEqual(await awards(), [{ user_id: discord, badge: 'long_live_the_king' }]);
+    await duel(tok(411), '40.0.1.1', other.king.id, 'Eleventh', 'rrr');
+    assert.equal((await awards()).length, 1, 'once');
+    // the leader's avatar and name are public (state and Bulletin), only for a Discord king with a saved avatar
+    const st = await state(tok(499), '40.1.0.1');
+    assert.equal(st.king.nick, 'DiscordFrog'); assert.equal(st.king.avatar.hat, 'hat_crown'); assert.equal(st.king.passport, discord);
+    const bb = await call('40.1.0.1', 'select public.gry_bulletin(5) as v');
+    assert.equal(bb.king.nick, 'DiscordFrog'); assert.equal(bb.king.avatar.hat, 'hat_crown');
+    // a guest king: no stamp, no avatar
+    const gk = (await state(tok(499), '40.1.0.1')).king;
+    await db.query("update games.pk_kings set moves = 'sss' where id = $1", [gk.id]);
+    await duel(tok(420), '40.2.0.1', gk.id, 'GuestKing', 'rrr');
+    const g = await state(tok(420), '40.2.0.1');
+    assert.equal(g.king.nick, 'GuestKing'); assert.equal(g.king.avatar, null);
+    await db.query("update games.pk_kings set defenses = 9, moves = 'ppp' where ended_at is null");
+    await duel(tok(421), '40.2.0.2', g.king.id, 'Visitor', 'rrr');
+    assert.equal((await awards()).length, 1, 'a guest king gets no stamp');
+  } finally {
+    await drop();
+  }
+});

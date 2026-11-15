@@ -1,0 +1,295 @@
+/* The pond duels (POND KING, BATTLE OF THREE LILIES, POND BULLETIN) as PondOS 98 programs:
+   classic Windows 98 chrome (silver faces, two-pixel bevels, pond-green title bars, sunken white panes,
+   MS Sans Serif) with pixel art and the pixel VT323 font for big numbers. The tokens match docs/meme/meme.css
+   (":root.pondos"), so a game window looks like every other PondOS window. No rounded corners, no blur. */
+@font-face { font-family: "VT323"; font-style: normal; font-weight: 400; font-display: swap; src: url(../meme/fonts/vt323-latin-400-normal.woff2) format("woff2"); }
+
+:root {
+  color-scheme: light;
+  --chrome: #c3c3bd; --chrome-hi: #ffffff; --chrome-lo: #808080; --chrome-dk: #0a0a0a; --chrome-face: #dfdfdf;
+  --title: #0c4a24; --title-2: #3f9c5c; --pane: #ffffff; --sel: #0c5a2c; --desk: #2d6a50;
+  --ink: #000000; --muted: #4a4a4a; --win: #0a7a2a; --lose: #b0170c; --gold: #f2b544; --gold-deep: #6b4a00;
+  --raised: inset -1px -1px 0 var(--chrome-dk), inset 1px 1px 0 var(--chrome-face), inset -2px -2px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-hi);
+  --sunken: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk), inset -1px -1px 0 var(--chrome-hi), inset -2px -2px 0 var(--chrome-face);
+  --f: "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Verdana, "Segoe UI", system-ui, sans-serif;
+  --f-px: "VT323", "Lucida Console", "Courier New", monospace;
+  --dither: repeating-conic-gradient(var(--chrome) 0 25%, var(--chrome-hi) 0 50%) 0 0 / 2px 2px;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; background: var(--desk); }
+body { margin: 0; color: var(--ink); font: 13px/1.45 var(--f); background: var(--desk); -webkit-font-smoothing: none; }
+a { color: #0000ee; }
+button, input { font: inherit; -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+.px, .px-img { display: block; width: 100%; height: auto; image-rendering: pixelated; shape-rendering: crispEdges; }
+
+/* buttons: Windows 98 push buttons */
+button { cursor: pointer; color: var(--ink); background: var(--chrome); border: 0; border-radius: 0; padding: 6px 14px; min-height: 28px;
+  font: 700 12px/1.2 var(--f); box-shadow: var(--raised); }
+button:active { box-shadow: var(--sunken); background: var(--dither); padding: 7px 13px 5px 15px; }
+button:disabled { cursor: default; color: var(--chrome-lo); text-shadow: 1px 1px 0 var(--chrome-hi); }
+button:disabled:active { box-shadow: var(--raised); background: var(--chrome); padding: 6px 14px; }
+button.go { box-shadow: 0 0 0 1px var(--chrome-dk), var(--raised); }   /* the default button: an extra black frame */
+button.go:active { box-shadow: 0 0 0 1px var(--chrome-dk), var(--sunken); }
+button.big-go { font-size: 13px; padding: 8px 20px; min-height: 34px; }
+input { padding: 4px 6px; border: 0; border-radius: 0; background: var(--pane); box-shadow: var(--sunken); min-width: 0; min-height: 26px; }
+
+/* the window (only outside PondOS; inside, PondOS draws its own) */
+.site-bar { padding: 8px 12px; background: var(--chrome); box-shadow: var(--raised); display: flex; justify-content: space-between; gap: 16px; font: 700 12px var(--f); }
+.site-bar a { color: var(--ink); text-decoration: none; }
+.site-bar > span { color: var(--muted); }
+.desk { max-width: 780px; margin: auto; padding: 20px 12px 14px; }
+.window { background: var(--chrome); padding: 3px; box-shadow: var(--raised), 3px 4px 0 rgba(0, 0, 0, .25); }
+.titlebar { display: flex; justify-content: space-between; align-items: center; height: 22px; padding: 0 2px 0 4px; color: #fff;
+  background: linear-gradient(90deg, var(--title), var(--title-2)); font: 700 12px/1 var(--f); }
+.titlebar > span { display: flex; align-items: center; gap: 5px; }
+.titlebar img { width: 16px; height: 16px; image-rendering: pixelated; }
+.titlebar a { display: grid; place-items: center; width: 16px; height: 14px; background: var(--chrome); color: #000; box-shadow: var(--raised); text-decoration: none; font: 700 11px/1 var(--f); }
+.pk-body { display: grid; gap: 8px; padding: 8px 4px; }
+.statusbar { display: flex; gap: 2px; padding: 2px; font: 11px var(--f); }
+.statusbar > span { flex: 1; min-width: 0; padding: 2px 6px; box-shadow: inset 1px 1px 0 var(--chrome-lo), inset -1px -1px 0 var(--chrome-hi); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.statusbar > span:last-child { flex: 0 0 auto; max-width: 45%; }
+footer { text-align: center; font: 11px var(--f); color: #cfe3d6; margin-top: 12px; }
+footer a { color: #fff; }
+
+/* group boxes */
+.panel { position: relative; margin-top: 10px; padding: 16px 12px 12px; border: 2px groove var(--chrome-hi); background: var(--chrome); }
+.panel h2 { position: absolute; top: -12px; left: 8px; margin: 0; padding: 0 6px; background: var(--chrome); font: 400 24px/1 var(--f-px); color: var(--title); letter-spacing: .02em; max-width: calc(100% - 16px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.panel h3 { margin: 0 0 6px; font: 700 12px var(--f); color: var(--ink); }
+.panel h3 small { font-weight: 400; color: var(--muted); }
+.muted { color: var(--muted); }
+.panel > p { margin: 4px 0 10px; }
+.kicker { margin: 0; font: 400 16px/1 var(--f-px); letter-spacing: .08em; text-transform: uppercase; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row label { font: 700 12px var(--f); }
+.row input { width: 170px; }
+.row .go { margin-left: auto; }
+.nick-hint { margin: 6px 0 0; padding: 3px 8px; font: 700 12px var(--f); color: var(--gold-deep); background: #fffbd8; box-shadow: var(--sunken); }
+.msg { min-height: 1.4em; margin: 8px 0 0; font-weight: 700; color: var(--lose); }
+#def-msg { margin: 0; color: var(--win); }
+.pane { background: var(--pane); box-shadow: var(--sunken); padding: 6px 8px; }
+
+/* a small tab strip inside a group box (the scoreboards) */
+.mini-tabs { display: flex; flex-wrap: wrap; align-items: flex-end; margin: -4px 0 0; border-bottom: 2px groove var(--chrome-hi); }
+.mini-tabs button { min-height: 24px; margin-right: -1px; padding: 3px 10px; font-weight: 400; box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px 0 0 var(--chrome-dk), inset -2px 0 0 var(--chrome-lo); }
+.mini-tabs button:active { padding: 3px 10px; }
+.mini-tabs button[aria-selected="true"] { position: relative; z-index: 1; margin-bottom: -2px; padding: 4px 12px 5px; font-weight: 700; background: var(--chrome); }
+.scoreboard [role="tabpanel"] { padding-top: 8px; }
+.scoreboard .pane-h { margin: 0 0 4px; font: 700 12px var(--f); }
+.scoreboard .pane-h small { font-weight: 400; color: var(--muted); }
+.scoreboard .top, .scoreboard .feed { min-height: 0; }
+.top li.muted, .feed li.muted { display: block; }
+.stats.row5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.stats.row5 .stat b { font-size: 22px; }
+
+/* records: little sunken counters */
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+.stat { display: grid; justify-items: center; align-content: center; gap: 2px; padding: 4px 2px; text-align: center; background: var(--pane); box-shadow: var(--sunken); }
+.stat b { font: 400 26px/1 var(--f-px); color: var(--title); }
+.stat small { font: 10px/1.2 var(--f); color: var(--muted); }
+.stat.wide { grid-column: 1 / -1; }
+.stat.hot b { color: var(--lose); }
+
+/* ---------- POND KING ---------- */
+/* the throne: like the picture panel of a 98 setup wizard, with a Minesweeper counter for the defences */
+.throne { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 14px; color: #fff;
+  background: linear-gradient(180deg, #0c4a24, #1c6b3a 70%, #2f7f86); box-shadow: var(--sunken); }
+.throne-frog { width: 96px; height: 96px; image-rendering: pixelated; padding: 4px; background: var(--chrome); box-shadow: var(--raised); }
+.throne.changed .throne-frog { animation: crown 700ms steps(4); }
+@keyframes crown { 0% { transform: translateY(-12px); } 50% { transform: translateY(2px); } 100% { transform: none; } }
+.throne .kicker { color: var(--gold); }
+.throne h1 { margin: 4px 0 2px; font: 400 clamp(30px, 7vw, 44px)/.9 var(--f-px); letter-spacing: .02em; color: #fff; text-shadow: 2px 2px 0 #000; overflow-wrap: anywhere; }
+.throne p { margin: 0; }
+.throne #king-line { color: #d6f0dc; }
+.reign { text-align: center; padding: 4px; background: var(--chrome); box-shadow: var(--raised); }
+.reign b { display: block; min-width: 70px; padding: 0 6px; font: 400 42px/1 var(--f-px); color: #ff2a1a; background: #000; box-shadow: var(--sunken); letter-spacing: .06em; }
+.reign small { display: block; margin-top: 2px; font: 700 10px var(--f); color: var(--ink); text-transform: uppercase; }
+.toolbar { gap: 4px; padding: 2px; }
+.toolbar button { font-weight: 400; }
+button.ib { display: inline-flex; align-items: center; gap: 5px; }
+button.ib img { width: 16px; height: 16px; image-rendering: pixelated; }
+.toolbar .muted { margin-left: 4px; font-size: 11px; }
+
+/* the hand: three sunken slots, filled from three big move buttons */
+.rounds { display: grid; gap: 8px; margin: 6px 0 12px; }
+.hand { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.slot { display: grid; justify-items: center; gap: 2px; padding: 6px 4px; min-height: 104px; background: var(--pane); box-shadow: var(--sunken); font-weight: 400; color: var(--muted); }
+.slot:active { background: var(--pane); padding: 6px 4px; }
+.slot small { font: 700 11px var(--f); color: var(--ink); }
+.slot i { display: grid; place-items: center; width: 52px; height: 52px; font: 400 40px/1 var(--f-px); font-style: normal; color: var(--chrome-lo); }
+.slot span { font: 700 11px var(--f); color: var(--ink); }
+.slot.next { outline: 1px dotted #000; outline-offset: -6px; background: #fffbd8; }
+.slot.filled::after { content: "click to clear"; font: 10px var(--f); color: var(--muted); }
+.palette { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.mv { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; min-height: 92px; }
+.mv:active { padding: 9px 3px 7px 5px; }
+.mv i { display: block; width: 52px; height: 52px; font-style: normal; }
+.mv span { font-size: 12px; }
+.hand-hint { margin: 0; font: 11px var(--f); color: var(--muted); text-align: center; }
+
+/* the duel, round by round: rows in a white list */
+.fight { list-style: none; margin: 6px 0 8px; padding: 4px; display: grid; gap: 2px; background: var(--pane); box-shadow: var(--sunken); }
+.fight li { display: grid; grid-template-columns: 74px 1fr auto 1fr 92px; align-items: center; gap: 8px; padding: 4px 6px; visibility: hidden; }
+.fight li.on { visibility: visible; animation: pop 240ms steps(3); }
+@keyframes pop { from { transform: translateX(-8px); } to { transform: none; } }
+.fight li.rw { background: #d7f5d7; } .fight li.rl { background: #fbd9d5; } .fight li.rd { background: #f1f1ec; }
+.fight .n { font: 400 18px var(--f-px); }
+.fight .side { display: flex; align-items: center; gap: 6px; min-width: 0; flex-direction: row-reverse; justify-content: flex-start; }
+.fight .side.k { justify-content: flex-end; }
+.fight .side i { display: block; width: 40px; height: 40px; font-style: normal; }
+.fight .side small { font: 11px var(--f); color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fight .vs { font: 400 18px var(--f-px); color: var(--muted); }
+.fight .out { justify-self: end; font: 400 17px/1 var(--f-px); letter-spacing: .04em; }
+.fight .w { color: var(--win); } .fight .l { color: var(--lose); } .fight .d { color: var(--muted); }
+.big { margin: 8px 0 6px; font: 400 34px/1 var(--f-px); letter-spacing: .02em; }
+.big.w { color: var(--win); } .big.l { color: var(--lose); }
+
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.top, .feed { margin: 0; padding: 4px 6px; list-style: none; font-size: 12px; background: var(--pane); box-shadow: var(--sunken); min-height: 60px; }
+.top li { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 6px; align-items: center; padding: 3px 2px; }
+.top li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top li > b:last-child { font: 400 18px/1 var(--f-px); }
+.top li.now { background: var(--sel); color: #fff; }
+.top li.me span::after { content: " (you)"; }
+.feed li { padding: 3px 2px; border-bottom: 1px dotted #c8c8c8; overflow-wrap: anywhere; }
+.feed li:last-child { border-bottom: 0; }
+.feed .w { color: var(--win); font-weight: 700; } .feed .l { color: var(--lose); }
+.feed time { color: var(--muted); font-size: 11px; }
+
+.rules summary { cursor: pointer; font: 700 12px var(--f); }
+.rules ul { margin: 8px 0 0; padding-left: 18px; }
+.rules li { margin: 0 0 4px; }
+details.panel { padding-top: 12px; }
+
+@media (max-width: 560px) {
+  .desk { padding: 8px 4px; }
+  .site-bar > span { display: none; }
+  .throne { grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 10px; }
+  .throne-frog { width: 64px; height: 64px; }
+  .throne { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .reign b { min-width: 40px; font-size: 26px; }
+  .reign small { font-size: 9px; }
+  .throne #king-line { font-size: 12px; }
+  .mini-tabs button { padding: 3px 7px; font-size: 11px; }
+  .mini-tabs button[aria-selected="true"] { padding: 4px 8px 5px; }
+  .stats.row5 .stat b { font-size: 18px; } .stats.row5 .stat small { font-size: 9px; }
+  .slot { min-height: 92px; } .slot i { width: 44px; height: 44px; } .slot.filled::after { content: none; }
+  .mv i { width: 44px; height: 44px; }
+  .row input { flex: 1 1 140px; }
+  .row .go { flex: 1 1 100%; margin-left: 0; min-height: 40px; }
+  .cols { grid-template-columns: 1fr; }
+  .fight li { grid-template-columns: 1fr auto 1fr; }
+  .fight .n { grid-column: 1 / -1; }
+  .fight .out { grid-column: 1 / -1; justify-self: center; }
+}
+@media (prefers-reduced-motion: reduce) { .fight li.on, .throne.changed .throne-frog { animation: none; } }
+
+/* inside a PondOS window (iframe or ?embed=1): PondOS draws the window and its title bar */
+.embed, .embed body { background: var(--chrome); }
+.embed .site-bar, .embed footer, .embed .window > .titlebar { display: none !important; }
+.embed .desk { max-width: none; padding: 0; }
+.embed .window { box-shadow: none; padding: 0 4px; }
+
+/* ---------- the drawn art (docs/games/img/pond/, small PNGs scaled up in whole steps, never smoothed) ---------- */
+.px-img, .throne-frog, .stamp, .slot i img, .mv i img, .fight .side i img { image-rendering: pixelated; }
+.slot i img, .mv i img, .fight .side i img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.stamp { float: right; width: 96px; height: 96px; margin: 0 0 6px 10px; padding: 3px; background: var(--pane); box-shadow: var(--sunken); }
+/* result animations: 4 frames of 32x32 side by side, shown at 96x96 */
+.anim { width: 96px; height: 96px; margin: 4px 0; image-rendering: pixelated; background: 0 0 / 384px 96px no-repeat; animation: frames .8s steps(4) infinite; }
+.anim.win { background-image: url(img/pond/win-anim.png); }
+.anim.lose { background-image: url(img/pond/lose-anim.png); animation-duration: 1.2s; }
+.anim.draw { background-image: url(img/pond/draw-anim.png); }
+@keyframes frames { from { background-position: 0 0; } to { background-position: -384px 0; } }
+#result .anim, #tab-result .anim { float: right; }
+@media (prefers-reduced-motion: reduce) { .anim { animation: none; } }
+
+/* Fren avatars (layers from docs/meme/avatar-assets, as in the PondOS Avatar Maker) */
+.fa-stack { position: relative; display: block; overflow: hidden; aspect-ratio: 1; width: 100%; }
+.fa-stack img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; pointer-events: none; user-select: none; }
+.fa-stack.is-special img:not([data-layer="bg"]):not([data-layer="special"]) { display: none; }
+.throne-face { width: 96px; height: 96px; padding: 4px; background: var(--chrome); box-shadow: var(--raised); }
+.throne-face .throne-frog { width: 100%; height: 100%; padding: 0; box-shadow: none; }
+.throne-face .fa-stack { height: 100%; }
+.throne.changed .throne-face { animation: crown 700ms steps(4); }
+.king-progress { margin: 4px 0 8px; font-weight: 700; }
+.king-progress b { font: 400 20px/1 var(--f-px); color: var(--title); }
+@media (max-width: 560px) { .throne-face { width: 68px; height: 68px; } }
+
+/* ---------- the desktop gadget (pond-king.html?embed=1&gadget=1): a small PondOS window that invites a duel ---------- */
+.gadget-foot { display: none; }
+.gadget .gadget-foot { display: flex; gap: 4px; padding: 4px 2px 2px; }
+.gadget .gadget-foot button { flex: 1; font-weight: 400; justify-content: center; }
+.gadget .toolbar, .gadget .cols, .gadget .scoreboard, .gadget .rules, .gadget #duel > p.muted, .gadget #challengers, .gadget #kingpanel h3,
+.gadget #kingpanel > p.muted, .gadget .statusbar, .gadget .hand-hint, .gadget #duel .row label, .gadget #dice, .gadget #res-after p { display: none !important; }
+.gadget .pk-body { gap: 4px; padding: 4px 2px; }
+.gadget .throne { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; padding: 8px; }
+.gadget .throne-face { width: 64px; height: 64px; }
+.gadget .throne .kicker { font-size: 13px; }
+.gadget .throne h1 { font-size: 28px; margin: 2px 0 0; }
+.gadget .throne #king-line { display: none; }
+.gadget .reign { grid-column: auto; display: block; }
+.gadget .reign b { display: block; min-width: 46px; font-size: 28px; }
+.gadget .reign small { font-size: 9px; }
+.gadget .panel { margin-top: 12px; padding: 12px 6px 6px; }
+.gadget .panel h2 { font-size: 20px; top: -10px; }
+.gadget .rounds { gap: 4px; margin: 2px 0 6px; }
+.gadget .hand, .gadget .palette { gap: 4px; }
+.gadget .slot { min-height: 0; padding: 3px 2px; }
+.gadget .slot i { width: 34px; height: 34px; font-size: 26px; }
+.gadget .slot span, .gadget .slot.filled::after { display: none; }
+.gadget .slot small { font-size: 10px; }
+.gadget .mv { min-height: 0; padding: 6px 2px 4px; }
+.gadget .mv i { width: 40px; height: 40px; }
+.gadget .mv span { font-size: 11px; }
+.gadget #duel .row { flex-wrap: nowrap; gap: 4px; }
+.gadget #duel .row input { flex: 1 1 auto; width: auto; min-width: 0; }
+.gadget #duel .row .go { flex: 0 0 auto; margin: 0; min-height: 30px; }
+.gadget .fight { margin: 2px 0 4px; }
+.gadget .fight li { grid-template-columns: 1fr auto 1fr auto; gap: 4px; padding: 2px 4px; }
+.gadget .fight .n { display: none; }
+.gadget .fight .side small { display: none; }
+.gadget .fight .side i { width: 30px; height: 30px; }
+.gadget .fight .out { font-size: 14px; }
+.gadget .big { font-size: 24px; margin: 4px 0; }
+.gadget .anim { width: 64px; height: 64px; background-size: 256px 64px; animation-name: frames-s; margin: 0 0 0 6px; }
+@keyframes frames-s { from { background-position: 0 0; } to { background-position: -256px 0; } }
+.gadget #waitpanel p { margin: 4px 0 6px; font-size: 12px; }
+.gadget #kingpanel .stamp { width: 56px; height: 56px; }
+.gadget .king-progress { font-size: 12px; }
+/* the gadget is narrow: let every column shrink instead of pushing the window wider */
+.gadget .pk-body { grid-template-columns: minmax(0, 1fr); }
+.gadget .throne > div:nth-child(2) { min-width: 0; }
+.gadget .throne h1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gadget .slot, .gadget .mv { min-width: 0; padding-left: 2px; padding-right: 2px; overflow: hidden; }
+.gadget .slot small { white-space: nowrap; }
+.gadget .msg { min-height: 0; margin: 4px 0 0; } .gadget .msg:empty { display: none; }
+
+/* phones: less chrome around the game */
+@media (max-width: 560px) {
+  .toolbar { flex-wrap: nowrap; overflow-x: auto; gap: 4px; }
+  .toolbar .ib { flex: none; min-height: 28px; padding: 3px 8px; font-size: 11px; white-space: nowrap; }
+  .toolbar #acct { display: none; }
+  #kingpanel > p.muted { font-size: 12px; margin: 2px 0 6px; }
+  #kingpanel .stamp { width: 48px; height: 48px; }
+  #challengers { min-height: 0; }
+  .panel { margin-top: 8px; padding: 14px 8px 8px; }
+  .panel h2 { font-size: 20px; top: -10px; }
+}
+
+/* sharing: a Share / Copy link button and a "Post on X" button that looks like one */
+.share-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+.share-row .btn-x { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 12px; color: var(--ink); text-decoration: none; font: 700 12px var(--f); background: var(--chrome); box-shadow: var(--raised); }
+.share-row .btn-x:active { box-shadow: var(--sunken); }
+.share-row.brag { padding: 6px; background: #fffbd8; box-shadow: var(--sunken); }
+/* the cooldown panel: "Check the throne again", "Send a fren" and "Post on X" in one tidy row */
+#waitpanel .row { align-items: stretch; gap: 6px; }
+#wait-share, #wait-share .share-row { display: contents; }
+#waitpanel .row > button, #wait-share .go, #wait-share .btn-x { min-height: 32px; padding: 4px 14px; font: 700 12px var(--f); }
+#waitpanel .row .go { flex: 0 0 auto; margin-left: 0; }
+#king-share .go { min-height: 32px; padding: 4px 14px; font-size: 12px; }
+.copy-tmp { position: fixed; left: -9999px; top: 0; }
+.gadget .share-row .btn-x { display: none; }
+
+/* Pond King: the advice after taking the throne */
+#result p.tip { background: #ffffe1; border: 1px solid #000; padding: 4px 6px; margin: 6px 0; font-size: 12px; text-align: left; }

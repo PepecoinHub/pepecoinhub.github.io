@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://azbwciqfbsdpwubznncg.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin"><title>BATTLE OF THREE LILIES: 10 flies, 3 lily pads | Pepecoin Hub</title>
+<meta name="description" content="A strategy duel for two frogs who never have to be online together. Spread 10 flies over three lily pads, win two pads, win the duel.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://pepecoinhub.com/games/lilies.html"><link rel="icon" href="img/pond/lilies.png" type="image/png">
+<link rel="stylesheet" href="pond.css?v=20261115pattern"><link rel="stylesheet" href="lilies.css?v=20261114tables">
+<script src="js/config.js"></script><script src="js/pond-net.js?v=20261114tables" defer></script><script src="js/lilies.js?v=20261114limit10" defer></script>
+<link rel="stylesheet" href="pond-visual-upgrade.css?v=20261114visual3">
+<script src="js/pond-visual-upgrade.js?v=20261114visual3" defer></script>
+</head><body>
+<header class="site-bar"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · FLY TRAFFIC CONTROL</span><a href="bulletin.html">Pond Bulletin ↗</a></header>
+<main class="desk">
+<section class="window" aria-labelledby="ly-title">
+  <div class="titlebar"><span><img src="img/pond/lilies.png" alt="" width="16" height="16"> <b id="ly-title">BATTLE OF THREE LILIES.EXE</b></span><a href="../meme/" title="Back to PondOS" aria-label="Back to PondOS">×</a></div>
+  <div class="ly-hero" id="hero">
+    <div class="ly-hero-pond" aria-hidden="true"><span><img src="img/pond/lily-pad-a.png" alt=""><i>?</i></span><span><img src="img/pond/lily-pad-b.png" alt=""><i>?</i></span><span><img src="img/pond/lily-pad-c.png" alt=""><i>?</i></span></div>
+    <div class="ly-hero-text">
+      <p class="kicker">Strategy duel · 2 frogs · never online together</p>
+      <h1>Battle of Three Lilies</h1>
+      <p>Hide 10 flies on 3 lily pads. Win two pads, win the duel.</p>
+    </div>
+    <div class="reign ly-count"><b id="open-n">–</b><small>open duels</small></div>
+    <button type="button" class="go hero-go" id="hero-new">Throw down a challenge</button>
+  </div>
+  <nav class="menubar" aria-label="Battle of Three Lilies">
+    <button type="button" data-tab="open" aria-pressed="true">Open Challenges</button>
+    <button type="button" data-tab="create" aria-pressed="false">Create Challenge</button>
+    <button type="button" data-tab="mine" aria-pressed="false">My Matches</button>
+    <button type="button" data-tab="help" aria-pressed="false">How to Play</button>
+    <button type="button" class="bb ib" id="to-bulletin"><img src="img/pond/bulletin.png" alt=""> Pond Bulletin</button>
+  </nav>
+  <div class="pk-body">
+    <div class="panel signin" id="signin" hidden>
+      <h2>Log on to fight</h2>
+      <p class="muted">Every fly needs a pilot. Log on once with Discord or as a guest, and your duels follow you. A challenge you picked opens right after.</p>
+      <button type="button" class="go" id="logon">Log On to the Pond</button>
+    </div>
+
+    <!-- open challenges -->
+    <section class="panel" id="tab-open">
+      <h2>Open challenges</h2>
+      <p class="muted">Somebody hid 10 flies on three lily pads. You cannot see where. Accept, place your own 10, and the flies settle it.</p>
+      <ul class="cards" id="open-list"><li class="muted">Asking the pond…</li></ul>
+    </section>
+
+    <!-- the hall of flies: everybody's records -->
+    <section class="panel scoreboard" id="leaders" aria-label="Hall of flies">
+      <div class="mini-tabs" role="tablist" data-store="ly-board">
+        <button type="button" role="tab" data-pane="pane-streak" aria-selected="true">Win streaks</button>
+        <button type="button" role="tab" data-pane="pane-wins" aria-selected="false">Most wins</button>
+      </div>
+      <div id="pane-streak" role="tabpanel"><p class="pane-h">Hall of flies: longest win streaks</p><ol class="top" id="lead-streak"><li class="muted">…</li></ol></div>
+      <div id="pane-wins" role="tabpanel" hidden><p class="pane-h">Hall of flies: most duels won</p><ol class="top" id="lead-wins"><li class="muted">…</li></ol></div>
+    </section>
+
+    <!-- create / accept: the allocator -->
+    <section class="panel" id="tab-create" hidden>
+      <h2 id="alloc-title">Create a challenge</h2>
+      <p class="muted" id="alloc-sub">Spread exactly 10 flies over three lily pads. Nobody sees them until somebody accepts. Win two pads, win the duel.</p>
+      <div class="pond" id="pads"></div>
+      <div class="jar-row">
+        <div class="jar" id="jar" aria-hidden="true"></div>
+        <p class="left" id="left-line" role="status"><b id="flies-left">10</b> <span id="flies-word">flies</span> still buzzing around</p>
+      </div>
+      <div class="row submit-row">
+        <label for="nick">Your name</label><input id="nick" maxlength="20" autocomplete="nickname" spellcheck="false">
+        <button type="button" class="go big-go" id="submit" disabled>Create Challenge</button>
+      </div>
+      <p class="nick-hint" id="nick-hint" hidden>Name: 2 to 20 letters, digits, spaces or _ . - (no emoji).</p>
+      <p class="msg" id="alloc-msg" role="status"></p>
+    </section>
+
+    <!-- result of one duel -->
+    <section class="panel" id="tab-result" hidden>
+      <p class="kicker" id="res-kicker">Duel report</p>
+      <h2 id="res-title">Duel</h2>
+      <div class="pond result" id="res-pads"></div>
+      <p class="big" id="res-line"></p>
+      <p class="muted" id="res-sub"></p>
+      <div class="row" id="res-actions"></div>
+    </section>
+
+    <!-- my matches -->
+    <section class="panel" id="tab-mine" hidden>
+      <h2>My matches</h2>
+      <div class="posted" id="posted" hidden></div>
+      <div class="stats row5 ly-record" id="mystats">
+        <div class="stat"><b id="st-wins">0</b><small>wins</small></div>
+        <div class="stat"><b id="st-losses">0</b><small>losses</small></div>
+        <div class="stat"><b id="st-draws">0</b><small>draws</small></div>
+        <div class="stat" id="st-streak-box"><b id="st-streak">0</b><small>streak now</small></div>
+        <div class="stat"><b id="st-best">0</b><small>best streak</small></div>
+      </div>
+      <ul class="feed" id="mine-list"><li class="muted">…</li></ul>
+    </section>
+
+    <section class="panel" id="tab-help" hidden>
+      <h2>How to play</h2>
+      <ul class="howto">
+        <li>You get exactly <b>10 flies</b>. Put them on <b>Lily A</b>, <b>Lily B</b> and <b>Lily C</b>, any whole numbers that add up to 10.</li>
+        <li>Each lily goes to whoever put more flies on it. The same number on both sides: that lily stays undecided.</li>
+        <li>Win <b>two lilies</b> and you win the duel. 1:1 or 0:0 is a draw. Total flies do not matter, only lilies.</li>
+        <li>Create a challenge and walk away: it waits 48 hours for a brave fren. Nobody sees your flies before the duel.</li>
+        <li>Or accept somebody’s challenge: place your flies and the result comes at once, with both spreads.</li>
+        <li>Up to 3 open challenges at a time, 5 new ones a day. No stakes, no PEP, only bragging rights.</li>
+      </ul>
+      <p class="muted">Example: 2/4/4 against 4/3/3. Lily A goes to 4, lilies B and C go to 4 over 3. 2/4/4 wins 2:1.</p>
+    </section>
+  </div>
+  <div class="gadget-foot"><button type="button" id="g-full" class="ib"><img src="img/pond/lilies.png" alt=""> Full game</button><button type="button" id="g-board" class="ib"><img src="img/pond/bulletin.png" alt=""> Bulletin</button></div>
+  <div class="statusbar"><span id="status">Connecting to the pond…</span><span id="who">not logged on</span></div>
+</section>
+<footer>Made for frens. <a href="privacy.html">Privacy</a> · <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues">Report a bug</a></footer>
+</main>
+</body></html>

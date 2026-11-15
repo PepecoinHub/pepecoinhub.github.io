@@ -1,4 +1,4 @@
-import { getBackend, MODE, TEST_BUILD, DISCORD_ENABLED, REDDIT_ENABLED } from './backend.js';
+import { getBackend, MODE, TEST_BUILD, DISCORD_ENABLED, REDDIT_ENABLED } from './backend.js?v=20261113link';
 export { MODE, TEST_BUILD, DISCORD_ENABLED };
 
 try { const th = localStorage.getItem('phw-theme'); if (th === 'light' || th === 'dark') document.documentElement.setAttribute('data-theme', th); } catch {}
@@ -150,6 +150,13 @@ export async function identityCard(container, { onReady, cta = 'Play' } = {}) {
         h('div', { class: 'row', style: 'margin:10px 0' }, badge(me.verified)),
         h('div', { class: 'row' },
           h('button', { class: 'btn primary', id: 'btn-play', onclick: () => go(async () => {}) }, cta),
+          // A guest already has a user id. Connect Discord links it; logging out first would drop Pepe Guesser points.
+          DISCORD_ENABLED && be.kind === 'supabase' && !me.verified
+            ? h('button', { class: 'btn discord', id: 'btn-discord', onclick: async () => {
+              try { nickStore.set(nickIn.value.trim()); await be.discord(); }
+              catch (e) { toast(e.message, 'bad'); }
+            } }, discordIcon(), 'Connect Discord')
+            : null,
           h('button', { class: 'btn sm', onclick: async () => { await be.logout(); await paintMe(be); render(); } }, 'Log out / switch')));
     }
   };

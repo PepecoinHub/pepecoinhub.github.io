@@ -157,6 +157,13 @@ test('Pepe Guesser Hall of Fame SQL: days, weeks, ties, Pond Dominator, streaks,
     // 6. history stays: the reset of the live board does not touch settled weeks
     const top = await call(null, "select public.gry_wp_top('week') as v", [], 'anon');
     assert.deepEqual(top.map(r => r.nick), daysThisWeek > 0 ? ['Fren3'] : [], 'the week board counts only this Monday-Sunday');
+    // update_leaders_passports.sql: the same board, plus the player's id for Discord frens only (a name opens the Passport)
+    for (const f of ['update_yeet_guests.sql', 'update_miner_top.sql', 'update_leaders_passports.sql']) await db.query(await read('games/supabase/' + f));
+    const topAnon = await call(null, "select public.gry_wp_top('week') as v", [], 'anon');
+    assert.deepEqual(topAnon, top, 'visitors without Discord get the board exactly as before');
+    assert.deepEqual((await call(4, "select public.gry_wp_top('week') as v")), top, 'guests get no ids either');
+    const topFren = await call(7, "select public.gry_wp_top('week') as v");
+    assert.deepEqual(topFren.map(r => r.id), daysThisWeek > 0 ? [uid(3)] : []);
 
     // --- stats and streaks (7. a broken streak keeps the record)
     const stats = await call(7, 'select public.gry_wp_stats($1) as v', [uid(1)]);

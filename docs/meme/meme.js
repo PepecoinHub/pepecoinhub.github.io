@@ -17,6 +17,16 @@
       return localStorage.getItem('pondos-beta') === 'pondwars';
     } catch (e) { return false; }
   })();
+  // Pepe Gold Hook is in testing too: hidden unless this browser opened /meme/?beta=goldhook once (?beta=off hides
+  // it again). Its page is not linked from the lobby and not indexed.
+  var GOLDHOOK = (function () {
+    try {
+      var q = new URLSearchParams(location.search).get('beta');
+      if (q === 'goldhook') localStorage.setItem('pondos-beta-goldhook', '1');
+      if (q === 'off') localStorage.removeItem('pondos-beta-goldhook');
+      return localStorage.getItem('pondos-beta-goldhook') === '1';
+    } catch (e) { return false; }
+  })();
   // Owner sandbox activates for this visit only. The URL does not grant owner permissions.
   var FREN_TEST = (function () {
     try { return new URLSearchParams(location.search).get('beta') === 'fren-test'; } catch (e) { return false; }
@@ -37,18 +47,27 @@
   // how much is really visible: --vvb is the covered part, and the taskbar grows by it (meme.css --sab).
   // Not while zoomed in or typing (the keyboard), so the taskbar does not jump around.
   (function () {
-    var vv = window.visualViewport, root = document.documentElement, last = -1;
+    var vv = window.visualViewport, root = document.documentElement, last = -1, timer = 0;
     if (!vv) return;
-    function fit() {
-      var a = document.activeElement, typing = a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable);
+    // Measured only once the viewport has settled (a keyboard or the URL bar sliding away gives a wrong
+    // reading for a moment), never while typing (also in a game frame) and never more than an in-app toolbar.
+    function measure() {
+      var a = document.activeElement, typing = a && (/^(INPUT|TEXTAREA|SELECT|IFRAME)$/.test(a.tagName) || a.isContentEditable);
       var gap = (vv.scale > 1.01 || typing) ? 0 : Math.round(window.innerHeight - vv.height - vv.offsetTop);
-      gap = Math.max(0, Math.min(gap, 160));
-      if (gap !== last) { last = gap; root.style.setProperty('--vvb', gap + 'px'); }
+      return gap > 90 ? 0 : Math.max(0, gap);
+    }
+    function set(gap) { if (gap !== last) { last = gap; root.style.setProperty('--vvb', gap + 'px'); } }
+    function fit() {
+      var now = measure();
+      if (now < last) set(now);   // shrinking back is always safe, at once
+      clearTimeout(timer);
+      timer = setTimeout(function () { set(measure()); }, 700);
     }
     vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit);
     addEventListener('resize', fit); addEventListener('orientationchange', fit);
-    document.addEventListener('focusout', function () { setTimeout(fit, 300); });
-    fit();
+    document.addEventListener('focusout', fit); document.addEventListener('focusin', fit);
+    document.addEventListener('visibilitychange', fit);
+    set(measure());
   })();
   // PepeGochi in testing: hidden for everyone except a browser that opened /meme/?beta=gochi once
   // (?beta=off hides it again). Testers get the real game (games/pepegochi-live.html: the frog on the server,
@@ -117,7 +136,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'reddit' || n === 'twitter-bird' || n === 'discord') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'pond-king') return '../games/img/pond/king-stamp.png'; if (n === 'lilies') return '../games/img/pond/lilies.png'; if (n === 'bulletin') return '../games/img/pond/bulletin.png'; if (n === 'goldhook') return '../games/img/gold-hook/ui/pm-icon-goldhook.png'; if (n === 'goldhook16') return '../games/img/gold-hook/ui/pm-icon-goldhook-16.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
   // Hall of Fame icon: the owner's art (gold cup + open Pepe passport) goes to img/ico/hall-of-fame.webp, then this
   // line becomes 'img/ico/hall-of-fame.webp'. Until then the LEADERS trophy stands in (no new art is made here).
   var HOF_ICON = 'img/ico/leaders.webp';
@@ -263,12 +282,15 @@
     var gl = el('div', { class: 'sm-list' });
     [['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', function () { invaders(); }],
       ['PEP Snake', 'Eat blocks, not your tail', 'gif-027-still', function () { snake(); }],
+      ['POND BULLETIN', 'Open duels and pond news', 'bulletin', function () { bulletinApp(); }],
+      ['POND KING', 'Rock, paper, scissors for the throne', 'pond-king', function () { pondKingApp(); }],
+      ['BATTLE OF THREE LILIES', '10 flies, 3 lily pads, 1 fren', 'lilies', function () { liliesApp(); }],
       ['YEET THE PEP', 'A frog, a catapult, no flight plan', 'yeet', function () { yeetApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', function () { pepeSweeperApp(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['PEPaint', 'The party room: draw and guess with frens', 'pepaint', function () { drawGuess(); }],
-      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', function () { pepegochiApp(); }],
+      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat(GOLDHOOK ? [['Pepe Gold Hook (beta)', '20 levels, a shop, one hook · field test', 'goldhook', function () { goldHookApp(); }]] : []).concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', function () { pepegochiApp(); }],
         ['PEPEGOCHI (local test)', 'Rules simulator with a time machine · nothing is saved', 'pep-logo', function () { pepegochiTestApp(); }]] : []).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
@@ -806,17 +828,17 @@
     var NERDS = [['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'], ['calculator.html', 'What-if machine', 'p-eyes-still'],
       ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'], ['#addr', 'AddressCheck.exe', 'pepe-search'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], ['#nerdreadme', 'README_NERD.txt', 'news']];
     // wide screens (byl's layout): two columns from the top-left corner (Log On, LAN Party, the games, PEP-TV Ads);
-    // Internet, Pond TV, NERDS ONLY and Find in the bottom-left corner; Shop, Twitter and r/pepecoin in a row at the
+    // Internet, Pond TV, NERDS ONLY and Find in the bottom-left corner; Official Store, Twitter, r/pepecoin and Discord in a row at the
     // bottom centre; Write a letter and the Recycle Bin in the bottom-right corner. Phones get one grid in the same order.
     var DESKTOP = [
       ['top', [['#logon', 'Log On', 'pep-logo'], ['#lan', 'LAN Party', 'gif-080-still'], ['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'],
-        ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#games', 'Games', 'games-folder']]],
+        ['#bulletin', 'Pond Bulletin', 'bulletin'], ['#king', 'Pond King', 'pond-king'], ['#lilies', 'Three Lilies', 'lilies'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#games', 'Games', 'games-folder']]],
       ['low', [['./', 'Internet', 'internet'], ['#tv', 'Pond TV', 'pond-tv'], ['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#find', 'Find', 'search']]],
-      // the community: the shop, the official Pepecoin account (the classic bird) and our subreddit
-      ['mid', [['#shop', 'Shop', 'shop-bag'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit']]],
+      // the community: the official store, the official Pepecoin account (the classic bird), our subreddit and the Discord
+      ['mid', [['#shop', 'Official Store', 'shop-bag'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit'], ['#discord', 'Discord', 'discord']]],
       ['corner', [['#mail', 'Write a letter', 'frog-mail'], ['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
-    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#king': function () { pondKingApp(); }, '#lilies': function () { liliesApp(); }, '#bulletin': function () { bulletinApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#discord': function () { window.open('https://discord.gg/pepecoin', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -953,7 +975,7 @@
       }],
       sky && ['Watch the sun set', function () { sky.demo(); }],
       ['Screensaver preview', function () { saver(true); }], ['Line up icons', function () { try { localStorage.removeItem('pondos-icons5'); } catch (e) {} document.querySelectorAll('.icons a').forEach(function (a) { a.style.transform = ''; }); }],
-      null, ["Pepe Guesser (today's photo)", function () { wheresPepe(); }], ['FROGAGEDDON (beta)', function () { pondWarsApp(); }], ['YEET THE PEP', function () { yeetApp(); }], ['Pepe Miner', function () { minerApp(); }], null, ['LEADERS', function () { highScores(); }], ['Properties…', aboutOS]].forEach(function (it) {
+      null, ["Pepe Guesser (today's photo)", function () { wheresPepe(); }], ['FROGAGEDDON (beta)', function () { pondWarsApp(); }], ['POND BULLETIN', function () { bulletinApp(); }], ['POND KING', function () { pondKingApp(); }], ['YEET THE PEP', function () { yeetApp(); }], ['Pepe Miner', function () { minerApp(); }], null, ['LEADERS', function () { highScores(); }], ['Properties…', aboutOS]].forEach(function (it) {
       if (it === false) return;
       if (!it) { ctx.appendChild(el('hr')); return; }
       var b = el('button', { type: 'button', role: 'menuitem' }, it[0]);
@@ -987,6 +1009,8 @@
   var saverEl = null, idleT = null;
   function saver(force) {
     if (saverEl || (!force && (REDUCE || document.hidden || maxW || document.querySelector('dialog[open]')))) return;
+    // media playing (PEP-TV, Pond TV) keeps the screen awake
+    if (!force && Array.prototype.some.call(document.querySelectorAll('video, audio'), function (m) { return !m.paused; })) { clearTimeout(idleT); idleT = setTimeout(saver, 120000); return; }
     // a random frog from the meme collection bounces around, like the old DVD logo
     var FROGS = ['big-eyes', 'believe', 'chonk', 'cowboy', 'detective', 'diamond', 'gibup', 'farmer', 'born-to-fren', 'brain', 'gif-034-still', 'gif-071-still', 'gif-045-still', 'gif-085-still',
       'chars/balloons', 'chars/juicebox', 'chars/brb', 'chars/chonky', 'chars/comfy', 'chars/explorer', 'chars/backpack'];
@@ -1011,7 +1035,19 @@
   }
   if (mainEl && !REDUCE && matchMedia('(hover: hover) and (pointer: fine)').matches) {
     var poke = function () { clearTimeout(idleT); idleT = setTimeout(saver, 120000); };
-    ['pointermove', 'pointerdown', 'keydown', 'wheel', 'scroll'].forEach(function (t) { window.addEventListener(t, poke, { passive: true }); });
+    var IDLE_EV = ['pointermove', 'pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart', 'input'];
+    IDLE_EV.forEach(function (t) { window.addEventListener(t, poke, { passive: true }); });
+    // a game in a PondOS window is an iframe: its mouse and keys never reach this page, so listen inside it too
+    // (same-origin frames only), including frames inside frames (the POND DUELS gadget, PEPaint rooms)
+    var watchFrame = function (f) {
+      try {
+        var w = f.contentWindow; if (!w || w.__pondPoke) return; w.__pondPoke = true;
+        IDLE_EV.forEach(function (t) { w.addEventListener(t, poke, { passive: true, capture: true }); });
+        w.document.addEventListener('load', function (e) { if (e.target && e.target.tagName === 'IFRAME') watchFrame(e.target); }, true);
+        Array.prototype.forEach.call(w.document.querySelectorAll('iframe'), watchFrame);
+      } catch (e) {}
+    };
+    document.addEventListener('load', function (e) { if (e.target && e.target.tagName === 'IFRAME') { e.target.contentWindow && (e.target.contentWindow.__pondPoke = false); watchFrame(e.target); } }, true);
     poke();
   }
 
@@ -1152,6 +1188,37 @@
       doors.appendChild(b);
     });
     card.parentNode.insertBefore(doors, card.nextSibling);
+    // POND KING: whoever opens the pond meets the frog on the throne (and a link straight to the duel)
+    var cards = doors;   // the gadget card goes after these doors on a phone
+    var kingDoor = el('button', { type: 'button', class: 'pd-door pd-king' }, '<img src="' + ico('pond-king') + '" alt="" width="36" height="36" loading="lazy"><span><b>Challenge the Pond King</b><small>Rock, paper, scissors for the throne</small></span>');
+    kingDoor.addEventListener('click', function () { pondKingApp(); });
+    doors.insertBefore(kingDoor, doors.children[1] || null);
+    var boardDoor = el('button', { type: 'button', class: 'pd-door pd-king' }, '<img src="' + ico('bulletin') + '" alt="" width="36" height="36" loading="lazy"><span><b>Pond Bulletin</b><small>Open duels: 10 flies, 3 lily pads</small></span>');
+    boardDoor.addEventListener('click', function () { bulletinApp(); });
+    doors.insertBefore(boardDoor, kingDoor.nextSibling);
+    setTimeout(function () {
+      rpc('gry_bulletin', { p_limit: 20 }).then(function (b) {
+        var n = (b && b.open || []).length; pondOpenN = n; gadgetCount();
+        if (n) boardDoor.querySelector('small').textContent = n + (n === 1 ? ' open challenge' : ' open challenges') + ' waiting for a fren';
+      }, function () { boardDoor.hidden = true; });
+    }, 0);
+    if (location.hash === '#king') setTimeout(function () { pondKingApp(); }, 0);
+    var lh = /^#lilies(?:=([0-9a-f-]{36}))?$/i.exec(location.hash);   // a shared challenge: #lilies=<id>
+    if (lh) setTimeout(function () { liliesApp(lh[1]); }, 0);
+    if (location.hash === '#bulletin') setTimeout(function () { bulletinApp(); }, 0);
+    setTimeout(function () {
+      var tk = null; try { tk = localStorage.getItem('pk-token'); } catch (e) {}
+      rpc('gry_pk_state', { p_token: tk }).then(function (st) {
+        var k = st && st.king; if (!k) return;
+        kingDoor.querySelector('b').textContent = k.you ? 'You rule the pond \ud83d\udc51' : 'Dethrone ' + k.nick;
+        kingDoor.querySelector('small').textContent = k.you ? 'Defended ' + k.defenses + (k.defenses === 1 ? ' time' : ' times') + '. Check your throne'
+          : st.cooldown ? (st.cooldown.won || st.cooldown.network ? 'Next duel ' : 'Still bruised \ud83e\ude79 Next duel ') + 'at ' + new Date(st.cooldown.next_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          : 'Holds the throne: ' + k.defenses + (k.defenses === 1 ? ' defence' : ' defences') + '. One duel every 4 h';
+        // the POND KING gadget: a small game window right on the desktop (a card in the page on a phone)
+        pondKingGadget(cards, !k.you && !!st.cooldown);
+        pondNews(st);
+      }, function () { kingDoor.hidden = true; });   // until update_pond_king.sql runs, the door stays out of the way
+    }, 0);
     var stats = card.querySelector('.tp-stats'), bits = [];
     var paint = function () { stats.textContent = bits.filter(Boolean).join(' \u00b7 '); };
     setTimeout(function () {   // after the rest of this file has set up the Supabase address
@@ -1332,12 +1399,22 @@
   try { var autoNick = localStorage.getItem('pepgry-nick') || ''; if (/^Frog\d{4}$/.test(autoNick)) { localStorage.setItem('pondos-wp-nick', autoNick); localStorage.removeItem('pepgry-nick'); } } catch (e) {}
   var GAME_NAME = { fud: 'FUD Invaders', snake: 'PEP Snake' };
   // a PEP Games sign-in (Discord) lives in this browser's storage; a valid one makes the score "verified"
+  // Discord on a linked guest: identities[].provider, or app_metadata.providers once is_anonymous is false.
+  // The name is on identity_data (global_name / full_name / name). user_metadata is only filled for a fresh Discord signup.
+  function discordOf(user) {
+    var ids = (user && user.identities) || [], d = null, i;
+    for (i = 0; i < ids.length; i++) if (ids[i] && ids[i].provider === 'discord') { d = ids[i]; break; }
+    var providers = (user && user.app_metadata && user.app_metadata.providers) || [];
+    var linked = !!d || providers.indexOf('discord') >= 0;
+    var idd = (d && d.identity_data) || {}, claims = idd.custom_claims || {}, m = (user && user.user_metadata) || {};
+    var name = linked ? (claims.global_name || idd.full_name || idd.name || idd.user_name || idd.preferred_username || m.full_name || m.name || m.user_name || m.preferred_username) : null;
+    return { linked: linked, name: name };
+  }
   function sbSession() {
     try {
       var s = JSON.parse(localStorage.getItem(SB_STORE) || 'null');
       if (s && s.access_token && s.expires_at * 1000 > Date.now() + 30000 && !(s.user && s.user.is_anonymous)) {
-        var ids = (s.user && s.user.identities) || [];
-        return { token: s.access_token, userId: s.user && s.user.id, discord: ids.some(function (i) { return i.provider === 'discord'; }) };
+        return { token: s.access_token, userId: s.user && s.user.id, discord: discordOf(s.user).linked };
       }
     } catch (e) {}
     return null;
@@ -1376,20 +1453,29 @@
   // names in score tables: Discord players in bold with a small frog, guests in grey (to make logging on worth it)
   // Pepe Guesser: the host's own row comes back only to the host (marked hidden); others never get it
   function hostHidden(x) { return x && x.hidden ? ' <small class="wp-hidden" title="You are the host, so other players do not see your score">(hidden, only you see this)</small>' : ''; }
-  function who(nick, verified) {
+  // id (sent by the server only to Discord frens, for Discord players): the name opens that fren's Passport
+  function who(nick, verified, id) {
+    if (verified && id && FREN && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))
+      return '<button type="button" class="who who-ok who-pass" data-pass="' + esc(String(id).toLowerCase()) + '" data-nick="' + esc(nick) + '" title="Open the Fren Passport of ' + esc(nick) + '"><img src="img/pep-logo.webp" alt="" width="14" height="14">' + esc(nick) + '</button>';
     return verified ? '<b class="who who-ok" title="Discord player"><img src="img/pep-logo.webp" alt="" width="14" height="14">' + esc(nick) + '</b>'
       : '<span class="who who-guest" title="Guest">' + esc(nick) + '</span>';
   }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.who-pass'); if (!b) return;
+    frenPassport(false, { id: b.getAttribute('data-pass'), nick: b.getAttribute('data-nick') || '' });
+  });
   function whoLegend() { return '<p class="who-legend"><b class="who who-ok"><img src="img/pep-logo.webp" alt="" width="14" height="14">Bold</b> = Discord player · <span class="who-guest">grey</span> = guest. <a href="#" class="who-logon">Log on with Discord</a> to get the frog.</p>'; }
   function wireLegend(box) { var a = box.querySelector('.who-logon'); if (a) a.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); }
   // LEADERS: every top 10 in one window (FUD Invaders, PEP Snake, YEET THE PEP, Pepe Guesser today and this week, Pepe Miner)
   var LEAD = [['fud', 'FUD Invaders'], ['snake', 'PEP Snake'], ['yeet', 'YEET THE PEP'], ['wp', "Pepe Guesser"], ['miner', 'Pepe Miner']];
+  if (GOLDHOOK) LEAD.push(['goldhook', 'Pepe Gold Hook']);
   var LEAD_TIP = {
     fud: 'Best score per player. Scores run in your browser, so the server checks them for plausibility and rate.',
     snake: 'Best score per player, in blocks. The server checks every score against the length of the game.',
     yeet: 'Best flight per pilot. Guests add a flight with a nickname after landing.',
     wp: 'Points from the daily photo hunts. Guests count once per network.',
-    miner: 'Blocks mined (10,000 game PEP each), from the cloud saves of Discord players. A guest’s mine stays in their browser.'
+    miner: 'Blocks mined (10,000 game PEP each), from the cloud saves of Discord players. A guest’s mine stays in their browser.',
+    goldhook: 'Best run per player: PEP dug up over up to 20 levels. The game sends the levels played and the server replays the whole run.'
   };
   function highScores(game) {
     var A = openApp('hs', 'LEADERS - top 10', 'leaders', function (A) {
@@ -1397,7 +1483,7 @@
         '<div class="app-row hs-tabs" role="tablist">' + LEAD.map(function (g) { return '<button type="button" class="app-btn" data-g="' + g[0] + '" role="tab">' + g[1] + '</button>'; }).join('') + '</div>' +
         '<div class="lead-lists"></div>' + whoLegend() + '<p class="bin-tip lead-tip"></p>';
       wireLegend(A.body);
-      var row = function (r, i, sc) { return '<li><span>' + (i + 1) + '.</span><span>' + who(r.nick, r.verified !== false) + '</span><small>' + sc + '</small></li>'; };
+      var row = function (r, i, sc) { return '<li><span>' + (i + 1) + '.</span><span>' + who(r.nick, r.verified !== false, r.id) + '</span><small>' + sc + '</small></li>'; };
       var empty = '<li><span></span><span>No scores yet. Be the first frog.</span><small></small></li>';
       var fail = function (ol) { return function (err) { ol.innerHTML = '<li><span></span><span>' + (/function|PGRST/.test(err.message) ? 'Coming soon.' : esc(err.message)) + '</span><small></small></li>'; }; };
       var list = function (title) { return (title ? '<p class="lead-sub">' + title + '</p>' : '') + '<ol class="bin-list hs-list"><li>Loading…</li></ol>'; };
@@ -1409,8 +1495,8 @@
         box.className = 'lead-lists' + (g === 'wp' ? ' two' : '');
         box.innerHTML = g === 'wp' ? '<div>' + list('Today') + '</div><div>' + list('This week') + '</div>' : list('');
         var ols = box.querySelectorAll('ol');
-        if (g === 'fud' || g === 'snake') rpc('gry_arcade_top', { p_game: g }).then(function (rows) {
-          ols[0].innerHTML = rows && rows.length ? rows.map(function (r, i) { return row(r, i, fmt.int(r.score) + (g === 'snake' ? ' blocks' : '')); }).join('') : empty;
+        if (g === 'fud' || g === 'snake' || g === 'goldhook') rpc('gry_arcade_top', { p_game: g }).then(function (rows) {
+          ols[0].innerHTML = rows && rows.length ? rows.map(function (r, i) { return row(r, i, fmt.int(r.score) + (g === 'snake' ? ' blocks' : g === 'goldhook' ? ' pts' : '')); }).join('') : empty;
         }, fail(ols[0]));
         else if (g === 'yeet') rpc('gry_yeet_state', {}).then(function (r) {
           var rows = (r && r.top) || [];
@@ -1535,6 +1621,177 @@
     A.host.style.top = '12px'; A.host.style.setProperty('--app-top', '12px');
     return A;
   }
+  // POND KING: rock, paper, scissors for the throne (games/pond-king.html); one frog reigns until a visitor beats it
+  function pondKingApp() {
+    pondBadge('king', 0);
+    var A = openApp('pondking', 'POND KING', 'pond-king', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame fit-frame" src="' + BASE + 'games/pond-king.html?embed=1" title="POND KING" allow="web-share; clipboard-write"></iframe>';
+    }, 720);
+    return A;
+  }
+  // POND KING gadget: the game itself, small, already open when somebody lands on the PondOS home page. On a computer a
+  // real PondOS window in the bottom-right corner (drag, minimize, close; closed, it stays away until tomorrow);
+  // on a phone a card in the page under the "Things to do" doors, so it never covers anything.
+  function gadgetClosedToday() { try { return localStorage.getItem('pk-gadget-closed') === new Date().toISOString().slice(0, 10); } catch (e) { return false; } }
+  // two tabs: POND KING (the duel itself) and LILIES (the newest open challenges); a fren on a POND KING
+  // cooldown starts on LILIES, so the window always offers something to play now
+  var pondOpenN = 0;
+  function gadgetCount() {
+    document.querySelectorAll('.gd-n').forEach(function (b) { b.textContent = pondOpenN ? String(pondOpenN) : ''; b.hidden = !pondOpenN; });
+  }
+  function gadgetBody(lilies) {
+    var src = BASE + 'games/pond-king.html?embed=1&gadget=1', lsrc = BASE + 'games/lilies.html?embed=1&gadget=1';
+    var box = el('div', { class: 'gd' },
+      '<div class="gd-tabs" role="tablist" aria-label="Pond games">' +
+        '<button type="button" role="tab" data-g="king"><img src="' + ico('pond-king') + '" alt="" width="16" height="16">Pond King</button>' +
+        '<button type="button" role="tab" data-g="lilies"><img src="' + ico('lilies') + '" alt="" width="16" height="16">Lilies <b class="gd-n" hidden></b></button>' +
+      '</div>' +
+      '<iframe class="app-frame gadget-frame" data-g="king" title="Pond King" allow="web-share; clipboard-write"></iframe>' +
+      '<iframe class="app-frame gadget-frame" data-g="lilies" title="Battle of Three Lilies" allow="web-share; clipboard-write"></iframe>');
+    var urls = { king: src, lilies: lsrc };
+    box.show = function (g) {
+      box.querySelectorAll('[role="tab"]').forEach(function (t) { t.setAttribute('aria-selected', String(t.getAttribute('data-g') === g)); });
+      box.querySelectorAll('iframe').forEach(function (f) {
+        var on = f.getAttribute('data-g') === g; f.hidden = !on;
+        if (on && !f.getAttribute('src')) f.setAttribute('src', urls[g]);
+      });
+      if (box.onshow) box.onshow();
+    };
+    box.querySelectorAll('[role="tab"]').forEach(function (t) { t.addEventListener('click', function () { box.show(t.getAttribute('data-g')); }); });
+    box.show(lilies ? 'lilies' : 'king');
+    setTimeout(gadgetCount, 0);
+    return box;
+  }
+  function pondKingGadget(after, lilies) {
+    if (window.innerWidth < 760) {
+      if (!after || document.querySelector('.pk-card')) return;
+      var card = el('section', { class: 'pk-card win active', 'aria-label': 'Pond games' },
+        '<div class="win-bar"><img src="' + ico('pond-king') + '" alt="" width="16" height="16"><span class="win-t">POND DUELS</span></div>');
+      card.appendChild(gadgetBody(lilies));
+      after.parentNode.insertBefore(card, after.nextSibling);
+      return;
+    }
+    if (apps.pkgadget || apps.pondking || gadgetClosedToday()) return;
+    setTimeout(function () {
+      if (apps.pkgadget || apps.pondking) return;
+      var A = openApp('pkgadget', 'POND DUELS', 'pond-king', function (A) {
+        A.body.textContent = ''; A.body.appendChild(gadgetBody(lilies));
+      }, 300);
+      A.host.classList.add('app-gadget');
+      var place = function () {
+        var r = A.host.getBoundingClientRect();
+        A.host.style.left = Math.max(8, window.innerWidth - r.width - 18) + 'px';
+        A.host.style.top = Math.max(40, window.innerHeight - r.height - 52) + 'px';
+        A.host.style.setProperty('--app-top', A.host.style.top); A.host.style.transform = 'none';
+      };
+      place(); A.place = place;
+      var gd = A.body.querySelector('.gd'); if (gd) gd.onshow = function () { if (!A.moved) setTimeout(place, 0); };
+      A.host.querySelector('.win-bar').addEventListener('pointerdown', function () { A.moved = true; });   // dragged: stay where the fren put it
+      var close = A.close;
+      A.close = function () { try { localStorage.setItem('pk-gadget-closed', new Date().toISOString().slice(0, 10)); } catch (e) {} close(); };
+      A.host.querySelector('.w-x').addEventListener('click', function () { try { localStorage.setItem('pk-gadget-closed', new Date().toISOString().slice(0, 10)); } catch (e) {} });
+    }, 1200);
+  }
+  // ---------- pond news: what happened while the fren was away (no mail, no push: a balloon and a red dot) ----------
+  // POND KING: the browser remembers the reign it saw you on; when another frog sits there now, the throne fell.
+  // THREE LILIES: your challenges settled since the last visit (gry_lily_my, guests too). The first visit only
+  // remembers "now", so nobody gets a pile of old news.
+  function pondBadge(which, n) {
+    document.querySelectorAll('.icons a[href="#' + which + '"]').forEach(function (a) {
+      var b = a.querySelector('.pond-new');
+      if (!b) { if (!n) return; b = el('span', { class: 'pond-new mail-badge', title: 'News from the pond' }); a.appendChild(b); }
+      b.textContent = n; b.hidden = !n;
+    });
+  }
+  var pondNotes = 0;   // one balloon after another, not on top of each other
+  function pondNote(title, html, icon, go) {
+    setTimeout(function () {
+      var t = balloon(title, html, icon);
+      t.classList.add('is-link'); t.setAttribute('role', 'button'); t.tabIndex = 0;
+      t.addEventListener('click', function (e) { if (e.target.closest('button')) return; go(); t.remove(); });
+    }, 6500 * pondNotes++);
+  }
+  function pondNews(st) {
+    var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} } };
+    var k = st && st.king;
+    if (k) {
+      var reign = store.get('pk-my-reign');
+      if (k.you) store.set('pk-my-reign', String(k.id));
+      else if (reign && reign !== String(k.id)) {
+        store.set('pk-my-reign', null); pondBadge('king', 1);
+        pondNote('POND KING', 'You lost the throne. <b>' + esc(k.nick) + '</b> rules the pond now. Take it back!', 'pond-king', pondKingApp);
+      }
+    }
+    var tok = null;
+    try { var ss = JSON.parse(localStorage.getItem(SB_STORE) || 'null'); if (ss && ss.access_token && ss.expires_at * 1000 > Date.now() + 30000) tok = ss.access_token; } catch (e) {}
+    if (!tok) return;
+    fetch(SB_URL + '/rest/v1/rpc/gry_lily_my', { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
+      .then(function (r) { return r.ok ? r.json() : null; }).then(function (r) {
+        var ms = (r && r.matches || []).filter(function (m) { return m.status === 'completed' && m.mine && m.completed_at; });
+        var seen = store.get('ly-seen'), last = ms.reduce(function (a, m) { return m.completed_at > a ? m.completed_at : a; }, seen || '');
+        if (last) store.set('ly-seen', last);
+        if (!seen) return;
+        var fresh = ms.filter(function (m) { return m.completed_at > seen; });
+        if (!fresh.length) return;
+        pondBadge('lilies', fresh.length);
+        var m = fresh[0], how = m.outcome === 'win' ? 'you won!' : m.outcome === 'lose' ? 'they won this time.' : 'a draw.';
+        pondNote('BATTLE OF THREE LILIES', '<b>' + esc(m.opponent || 'A fren') + '</b> accepted your challenge: ' + how + (fresh.length > 1 ? ' (+' + (fresh.length - 1) + ' more)' : ''), 'lilies', function () { liliesApp(m.id); });
+      }).catch(function () {});
+  }
+  // BATTLE OF THREE LILIES (games/lilies.html): 10 flies on 3 lily pads, two frens, no need to be online together.
+  // id: a challenge to accept or a duel to show; 'new' opens "Create Challenge". An open window is pointed there.
+  function liliesApp(id) {
+    pondBadge('lilies', 0);
+    var q = id === 'new' ? '&tab=create' : id && /^[0-9a-f-]{36}$/i.test(id) ? '&c=' + id : '';
+    var src = BASE + 'games/lilies.html?embed=1' + q;
+    var A = openApp('lilies', 'BATTLE OF THREE LILIES.EXE', 'lilies', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame fit-frame" src="' + src + '" title="Battle of Three Lilies" allow="web-share; clipboard-write"></iframe>';
+    }, 720);
+    var fr = A.body.querySelector('iframe'); if (q && fr && fr.getAttribute('src') !== src) fr.setAttribute('src', src);
+    return A;
+  }
+  // POND BULLETIN (games/bulletin.html): open challenges and pond news, public metadata only
+  function bulletinApp() {
+    // already open: bring it up with fresh news (a duel may have just ended in another window)
+    if (apps.bulletin) { var f0 = apps.bulletin.body.querySelector('iframe'); try { f0.contentWindow.location.reload(); } catch (e) {} }
+    return openApp('bulletin', 'POND BULLETIN.EXE', 'bulletin', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame fit-frame" src="' + BASE + 'games/bulletin.html?embed=1" title="Pond Bulletin"></iframe>';
+    }, 680);
+  }
+  // the pond duel pages ask PondOS for other windows (a Fren Passport, Log On, another duel). Only our own
+  // frames on this origin are listened to, and only these few requests are understood.
+  window.addEventListener('message', function (e) {
+    var m = e.data;
+    // the gadget tells its height, so its window (or card) fits the game without a scroll bar
+    if (e.origin === location.origin && m && m.type === 'pondos-size' && m.h > 100) {
+      // the pond games' own windows fit their page too, up to what the screen has room for (then the page scrolls)
+      document.querySelectorAll('iframe.gadget-frame, iframe.fit-frame').forEach(function (f) {
+        if (f.contentWindow !== e.source) return;
+        f.style.height = Math.min(m.h, f.classList.contains('fit-frame') ? Math.max(260, window.innerHeight - 130) : 640) + 'px';
+        if (!f.hidden && apps.pkgadget && apps.pkgadget.place && apps.pkgadget.body.contains(f) && !apps.pkgadget.moved) apps.pkgadget.place();
+      });
+      return;
+    }
+    if (e.origin !== location.origin || !m || m.type !== 'pondos-open') return;
+    var ok = false; document.querySelectorAll('.app-win iframe, .pk-card iframe').forEach(function (f) { if (f.contentWindow === e.source) ok = true; });
+    if (!ok) return;
+    if (m.open === 'passport' && FREN_ID.test(m.id || '')) frenPassport(false, { id: String(m.id).toLowerCase() });
+    else if (m.open === 'logon') logOn();
+    else if (m.open === 'lilies') liliesApp(m.id);
+    else if (m.open === 'king') pondKingApp();
+    else if (m.open === 'bulletin') bulletinApp();
+    else if (m.open === 'pepaint' && CODE_OK.test(m.id || '')) drawGuess(m.id);
+    else if ((m.open === 'room' || m.open === 'table') && CODE_OK.test(m.id || '')) gameTable(m.open, m.id);
+  });
+  // a room (Pepe Pictures) or a board-game table opened from the Pond Bulletin: a window, or the page on a phone
+  var CODE_OK = /^[A-Za-z0-9]{3,12}$/;
+  function gameTable(kind, code) {
+    var page = (kind === 'room' ? 'room.html?r=' : 'table.html?t=') + encodeURIComponent(code);
+    if (window.innerWidth < 760) { location.href = osPage(page); return; }
+    return openApp('gt-' + code, (kind === 'room' ? 'Pepe Pictures - room ' : 'Table ') + code, kind === 'room' ? 'unclesam' : 'pond-playground', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/' + page + '&embed=1" title="' + (kind === 'room' ? 'Pepe Pictures room ' : 'Table ') + esc(code) + '" allow="clipboard-write"></iframe>';
+    }, 860);
+  }
   function yeetApp() {
     var A = openApp('yeet', 'YEET THE PEP', 'yeet', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/yeet.html?embed=1" title="YEET THE PEP" allow="web-share; clipboard-write; fullscreen"></iframe>';
@@ -1605,6 +1862,27 @@
     }, 590);
     return A;
   }
+  // Pepe Gold Hook: a normal window that fits the game (the game reports its size), like PEPE SWEEPER.
+  // Minimizing pauses it (pauseFrames sends 'pause'); scores go to the shared arcade table.
+  function goldHookApp() {
+    var A = openApp('goldhook', 'Pepe Gold Hook', 'goldhook16', function (A) {
+      A.body.innerHTML = '<iframe class="app-frame sweep-frame" src="' + BASE + 'games/gold-hook.html?embed=1" title="Pepe Gold Hook"></iframe>';
+      A.body.style.padding = '0';
+      var fr = A.body.querySelector('iframe'), lastW = 0;
+      var onSize = function (e) {
+        if (e.source !== fr.contentWindow || !e.data || e.data.type !== 'gold-hook-size') return;
+        fr.style.height = Math.max(240, e.data.h) + 'px';
+        if (e.data.w !== lastW) {
+          lastW = e.data.w;
+          A.host.style.width = 'min(' + (e.data.w + 10) + 'px, calc(100vw - 16px))';
+          if (window.innerWidth > 760) { A.host.style.left = Math.max(8, (window.innerWidth - A.host.offsetWidth) / 2) + 'px'; A.host.style.transform = 'none'; }
+        }
+      };
+      window.addEventListener('message', onSize);
+      A.stop = function () { window.removeEventListener('message', onSize); };
+    }, 680);
+    return A;
+  }
   function minerApp() {
     var A = openApp('miner', 'Pepe Miner', 'pickaxe', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/miner.html?embed=1" title="Pepe Miner"></iframe>';
@@ -1622,6 +1900,9 @@
     var L = [
       ["Pepe Guesser", 'Daily photo hunt on the map', 'wheres-pepe', 'game geo guess guesser where map photo travel daily faucet free pep reward points', function () { wheresPepe(); }],
       ['LEADERS', 'Every top 10 in one place', 'leaders', 'scores high score top ranking leaderboard best winners', function () { highScores(); }],
+      ['POND KING', 'Rock, paper, scissors for the throne', 'pond-king', 'game rock paper scissors king throne duel crown kamien papier nozyce', function () { pondKingApp(); }],
+      ['BATTLE OF THREE LILIES', '10 flies, 3 lily pads, 1 fren', 'lilies', 'game blotto lilies lily pads flies strategy duel challenge two players async', function () { liliesApp(); }],
+      ['POND BULLETIN', 'Open duels and pond news', 'bulletin', 'bulletin board news challenges duels results notice', function () { bulletinApp(); }],
       ['YEET THE PEP', 'Catapult a frog, three panic flaps', 'yeet', 'game catapult launch fly distance arcade', function () { yeetApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', 'game minesweeper saper flags lily pads wrong pepe eth arcade', function () { pepeSweeperApp(); }],
       ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', 'game arcade shooter invaders fud', invaders],
@@ -1641,7 +1922,8 @@
       ['AddressCheck.exe', 'Is this a real PEP address?', 'pepe-search', 'address check scam verify checksum wallet', addressCheck],
       ['Not PEP (0x)', 'PEPE and PEPECOIN are not PEP', 'wrongpep', 'pepe pepecoin ethereum erc20 token wrong scam', act('#notpep')],
       ['Frog Mail', 'The Pond Gazette', 'frog-mail', 'mail news gazette newsletter', frogMail],
-      ['Shop', 'Official Pepecoin shop', 'shop-bag', 'shop merch buy store', act('#shop')],
+      ['Official Store', 'Official Pepecoin store', 'shop-bag', 'shop merch buy store official', act('#shop')],
+      ['Discord', 'The Pepecoin Discord', 'discord', 'discord chat community server invite', act('#discord')],
       ['About me', 'Who builds this pond (and how to support it)', 'night-shift', 'about me byl author tip donate support', aboutMe],
       ['Write a letter', 'Send an idea, a wish or a bug to the builder', 'frog-mail', 'write letter feedback contact message bug idea mail', function () { frogMail('write'); }],
       ['Log On', 'Guest or Discord', 'pep-logo', 'log on login sign in account discord guest', logOn],
@@ -1653,7 +1935,7 @@
     ] : []).concat(GOCHI ? [
       ['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', 'pepegochi tamagotchi pet frog care feed egg hatch', function () { pepegochiApp(); }],
       ['PEPEGOCHI (local test)', 'Rules simulator for the PepeGochi beta', 'pep-logo', 'pepegochi test beta simulator time machine', function () { pepegochiTestApp(); }]
-    ] : []).map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
+    ] : []).concat(GOLDHOOK ? [['Pepe Gold Hook', '20 levels, a shop, one hook', 'goldhook', 'game gold hook claw miner mine nugget crate arcade levels shop upgrades dynamite', function () { goldHookApp(); }]] : []).map(function (x) { return { name: x[0], desc: x[1], icon: x[2], kw: x[3], go: x[4] }; });
     NAV.forEach(function (g) { g[1].forEach(function (p) { L.push({ name: p[1], desc: p[2], icon: p[3], kw: 'page ' + g[0] + ' ' + p[0].replace(/[@\/-]/g, ' '), go: page(p[0]) }); }); });
     ADS.forEach(function (ad, i) { L.push({ name: ad.file, desc: 'PEP-TV ad: ' + ad.title, icon: ad.icon, kw: 'ad ads tv video ' + ad.title, go: function () { adPlayer(i); } }); });
     return L;
@@ -1692,11 +1974,14 @@
   function gamesFolder() {
     openApp('games', 'C:\\Pond\\Games', 'games-folder', function (A) {
       var G = [['🏆 LEADERS', 'leaders', function () { highScores(); }], ['FUD Invaders', 'gif-008-still', invaders], ['PEP Snake', 'gif-027-still', snake],
+        ['POND BULLETIN', 'bulletin', function () { bulletinApp(); }],
+        ['POND KING', 'pond-king', function () { pondKingApp(); }],
+        ['Three Lilies', 'lilies', function () { liliesApp(); }],
         ['YEET THE PEP', 'yeet', function () { yeetApp(); }],
         ['PEPE SWEEPER', 'pepesweeper', function () { pepeSweeperApp(); }],
         ['Chess', '♟️', function () { boardGame('chess', 'Chess'); }], ['Checkers', '⚫', function () { boardGame('checkers', 'Checkers'); }],
         ['Connect Four', '🔴', function () { boardGame('connect4', 'Connect Four'); }], ['Sea Battle', '🚢', function () { boardGame('battleship', 'Sea Battle'); }],
-        ['PEPaint.exe', 'pepaint', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]];
+        ['PEPaint.exe', 'pepaint', drawGuess], ['Pepe Pictures', 'unclesam', pepePictures], ['Pepe Miner', 'pickaxe', minerApp]].concat(GOLDHOOK ? [['Pepe Gold Hook', 'goldhook', function () { goldHookApp(); }]] : []);
       A.body.innerHTML = '<ul class="folder">' + G.map(function (g, i) { var ic = /^[a-z]/.test(g[1]) ? '<img src="' + ico(g[1]) + '" alt="" width="40" height="40">' : '<i class="emo" aria-hidden="true">' + g[1] + '</i>'; return '<li><button type="button" data-i="' + i + '">' + ic + '<span>' + g[0] + '</span></button></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">Double-click a game. Chess, Checkers, Connect Four and Sea Battle: play the bot, or get a link for a fren. PEPaint: the party room, draw and guess with frens. 🏆 LEADERS has every top 10.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
@@ -1759,10 +2044,9 @@
   // which sends the visitor straight back here afterwards.
   function whoAmI() {
     var s = anySession(); if (!s || !s.user) return null;
-    var ids = s.user.identities || [], d = ids.filter(function (i) { return i.provider === 'discord'; })[0], m = s.user.user_metadata || {};
-    var name = d ? ((d.identity_data && (d.identity_data.custom_claims && d.identity_data.custom_claims.global_name || d.identity_data.full_name || d.identity_data.name)) || m.full_name || m.name) : null;
+    var d = discordOf(s.user);
     var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
-    return { discord: !!d, name: name || nick || 'guest' };
+    return { discord: d.linked, name: d.name || nick || 'guest' };
   }
   function signInHref() { return BASE + 'games/?login=1&back=' + encodeURIComponent(location.pathname + location.search.replace(/[?&]signedin=1/, '')); }
   // Fren Passport: all durable player data comes from the server. The catalog
@@ -1773,7 +2057,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261111launch';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261113lock'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261114king'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -1960,6 +2244,7 @@
   function ppStamp(x, earned) {
     if (earned && x.id === 'pond_pioneer') return el('span', {class:'pp-art pp-art-stamp is-pioneer',role:'img','aria-label':'Pond Pioneer'});
     if (earned && x.id === 'pond_dominator') return el('span', { class: 'pp-art pp-art-stamp is-dominator', 'aria-hidden': 'true' });
+    if (earned && x.id === 'long_live_the_king') return el('span', { class: 'pp-art pp-art-stamp is-pondking', 'aria-hidden': 'true' });
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
     if (!earned) return ppSprite('pp-art pp-art-stamp', PP_STAMPS, 'locked');
     var pending = el('span', { class: 'pp-art pp-art-stamp is-pending', 'aria-hidden': 'true' });
@@ -2867,8 +3152,14 @@
     paintLogon();
     if (/[?&]signedin=1/.test(location.search)) {
       try { history.replaceState(null, '', location.pathname + location.search.replace(/[?&]signedin=1/, '').replace(/^&/, '?') + location.hash); } catch (e) {}
+      var linkNote = '';
+      try { linkNote = sessionStorage.getItem('pepgry-oauth-note') || ''; if (linkNote) sessionStorage.removeItem('pepgry-oauth-note'); } catch (e) {}
       var me0 = whoAmI();
-      if (me0) setTimeout(function () { balloon('Welcome to the pond, ' + me0.name, me0.discord ? 'Signed in with Discord ✓. LAN Party and High Scores now use your name.' : 'Signed in as a guest. You can chat and submit scores.', 'gif-045-still'); }, 900);
+      if (me0 || linkNote) setTimeout(function () {
+        balloon('Welcome to the pond, ' + (me0 ? me0.name : 'fren'),
+          linkNote || (me0 && me0.discord ? 'Signed in with Discord ✓. LAN Party and High Scores now use your name.' : 'Signed in as a guest. You can chat and submit scores.'),
+          'gif-045-still');
+      }, 900);
     }
   }
 
@@ -3526,7 +3817,7 @@
         var show = function (s) {
           box.querySelectorAll('[data-s]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-s') === s)); });
           wpRpc('gry_wp_top', { p_scope: s }).then(function (rows) {
-            ol.innerHTML = rows.length ? rows.map(function (x) { return '<li><span>' + who(x.nick, x.verified !== false) + hostHidden(x) + '</span><b>' + Number(x.points).toLocaleString('en-US') + '</b></li>'; }).join('')
+            ol.innerHTML = rows.length ? rows.map(function (x) { return '<li><span>' + who(x.nick, x.verified !== false, x.id) + hostHidden(x) + '</span><b>' + Number(x.points).toLocaleString('en-US') + '</b></li>'; }).join('')
               : '<li class="wp-small">Nobody yet. Be the first!</li>';
           }, function () { ol.innerHTML = '<li class="wp-small">The ranking could not be loaded.</li>'; });
         };
@@ -3656,7 +3947,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 7, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 9, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -3785,6 +4076,62 @@
       '<div class="app-row"><button type="button" class="app-btn gz-betaad">Watch the PEP-TV ad</button></div></section>' +
       '<p class="gz-foot">See you in the Pond. 🐸 The Editor</p></article>';
   }
+  // Issue #8 (14 Nov 2026): the poll goes on the FRONT page (at the end almost nobody reads it).
+  // 10 YES votes = week 1 of Pepe Guesser gets a 10,000 PEP faucet pot and 5,000 PEP for the Weekly Champion
+  // (games/supabase/update_poll_week1_prize.sql; the poll closes when the week starts, Monday 16 XI 00:00 UTC).
+  // Issue #9 (15 Nov 2026): the poll passed, week 1 pays double from tomorrow, and the first PEPaint night
+  function gazette9() {
+    var xText = '🐸 The pond voted YES: week 1 of Pepe Guesser pays double. A 10,000 PEP faucet and 5,000 PEP for the Weekly Champion. Stamps, secrets and the Hall of Fame start Monday 16 November, 00:00 UTC.\nhttps://pepecoinhub.com/meme/';
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #9</span><span>Price: 0 PEP</span><span>Season opener</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking gz-pollsec"><p class="gz-flash">Goal reached</p><h4>You did it: week 1 pays double!</h4>' +
+      '<div class="gz-wpbox"><img src="img/rich.webp" alt="Pepe reading How to be rich" width="110" height="110"><div>' +
+      '<p>We needed <b>10 YES votes</b>. You gave us more. So the first official Pepe Guesser week, starting <b>tomorrow</b>, gets:</p>' +
+      '<ul><li>💧 <b>a 10,000 PEP faucet</b> for the week, double the usual 5,000</li><li>🏆 <b>5,000 PEP for the Weekly Champion</b>, on top of the gold Frog of the Week stamp</li></ul>' +
+      '<p>Thank you to every frog who voted. The pond asked, the pond answered.</p></div></div>' +
+      '<div class="gz-poll" data-poll="week1_prize" aria-live="polite"><p class="gz-poll-msg">Counting the votes…</p></div>' +
+      '<p class="gz-fine">The week runs Monday 16 November, 00:00 UTC, to Sunday 22 November, 23:59 UTC. The champion is whoever ends the week alone at #1, with Discord: a tie at the top has no winner. Prizes are paid by the host, like the faucet.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-wpgo">Open Pepe Guesser →</button><a class="app-btn" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(xText) + '">Tell your frens on X</a></div></section>' +
+      '<section class="gz-wp"><p class="gz-kick">Last night in the party room</p><h4>The first PEPaint night</h4>' +
+      '<div class="gz-wpbox"><img src="img/hug.webp" alt="Two frogs hugging" width="110" height="110"><div>' +
+      '<p>Yesterday the first PEPaint test night took place: frogs drew, frogs guessed, and some drawings will haunt us for a long time. <b>Thank you to everyone who joined!</b> Every round showed us something to fix, and the fixes are already in.</p>' +
+      '<p>New since then: on a phone the chat sits right under the canvas, open tables show up in the Pond Bulletin, and the host can let <b>whoever volunteers</b> draw next.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-paint">Open PEPaint →</button><button type="button" class="app-btn gz-lan">Find frens in LAN Party →</button></div></section>' +
+      '<section class="gz-soon"><p class="gz-kick">Monday 16 November, 00:00 UTC</p><h4>Tomorrow, everything starts</h4>' +
+      '<p>This is it. The bell rings at midnight UTC and the whole pond goes live at once:</p>' +
+      '<ul><li>🛂 <b>Stamps start counting</b>, for everyone from zero. 52 achievements to collect in your Fren Passport.</li>' +
+      '<li>🔍 <b>19 secrets</b> hidden around the pond. No list, no hints. Poke at things. Read the fine print. Stay up late.</li>' +
+      '<li>🖼️ <b>Pepe Guesser week 1</b>: one photo a day, 2 minutes, one pin, and the double prize above.</li>' +
+      '<li>👑 <b>Days at #1, Pond Dominator and the Hall of Fame</b> open their books.</li>' +
+      '<li>⚔️ <b>Pond King and Three Lilies</b>: the longest reigns and the best streaks go on the record.</li></ul>' +
+      '<p>Last call for 🏅 <b>Pond Pioneer</b>: log in with Discord before <b>tonight, 23:59 CET</b>. After that, it is gone for good.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-pass">Open your Fren Passport →</button><a class="app-btn" target="_blank" rel="noopener" href="https://discord.gg/pepecoin">Join the Discord</a></div></section>' +
+      '<p class="gz-foot">Sleep well tonight. Tomorrow we play. 🐸 The Editor</p></article>';
+  }
+  function gazette8() {
+    var xText = '🐸 PondOS: a little internet for frogs. Daily Pepe Guesser, a Fren Passport full of stamps, games and free PEP. The first Frog of the Week is crowned 23 November.\nhttps://pepecoinhub.com/meme/';
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #8</span><span>Price: 0 PEP</span><span>Weekend edition</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking gz-pollsec"><p class="gz-flash">Pond Poll · vote now</p><h4>10 frens say YES and week 1 pays double</h4>' +
+      '<div class="gz-wpbox"><img src="img/rich.webp" alt="Pepe reading How to be rich" width="110" height="110"><div>' +
+      '<p>On Monday the first official Pepe Guesser week begins. If <b>10 frens vote YES</b> before it starts, week 1 gets:</p>' +
+      '<ul><li>💧 <b>a 10,000 PEP faucet</b> for the week, double the usual 5,000</li><li>🏆 <b>5,000 PEP for the Weekly Champion</b>, on top of the gold Frog of the Week stamp</li></ul>' +
+      '<p>Fewer than 10? Then week 1 runs like any other week: the usual faucet and the stamp. Your vote is the difference.</p></div></div>' +
+      '<div class="gz-poll" data-poll="week1_prize" aria-live="polite"><p class="gz-poll-msg">Opening the ballot box…</p></div>' +
+      '<p class="gz-fine">One vote per account; guests one per network. The poll closes when the week starts: Monday 16 November, 00:00 UTC. The champion is whoever ends the week (Monday to Sunday, UTC) alone at #1, with Discord: a tie at the top has no winner. Prizes are paid by the host, like the faucet.</p></section>' +
+      '<section class="gz-letters"><p class="gz-kick">Letters to the Editor</p><h4>“I really like it!”</h4>' +
+      '<figure class="gz-letter"><p class="gz-letter-from"><b>Jack</b> ✓ <span class="gz-letter-ok">🖨️ OK to print</span></p>' +
+      '<blockquote>Hey Fren, The passport update is amazing! I really like it!</blockquote><figcaption>12 November, 15:18.</figcaption></figure>' +
+      '<p><b>The editor replies:</b> Thank you, Jack. Letters like this one are why the lights in the pond stay on after midnight. Now go fill that passport. 🐸</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-write">✏️ Write to the Editor</button></div></section>' +
+      '<section class="gz-soon"><p class="gz-kick">From the editor</p><h4>I build this for you</h4>' +
+      '<div class="gz-wpbox"><img src="img/night-shift.webp" alt="Pepe at the computer late at night" width="120" height="84"><div>' +
+      '<p>No ads, no token, no seed phrase, nothing to buy. The pond is made at night, after work, for you.</p>' +
+      '<p>I only ask two things back. <b>From Monday, collect stamps.</b> And <b>tell your frens about this site.</b> A pond is only as fun as the frogs in it.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-pass">Open your Fren Passport →</button><a class="app-btn" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(xText) + '">Tell your frens on X</a></div></section>' +
+      '<section class="gz-wp"><p class="gz-kick">Monday 16 November, 00:00 UTC</p><h4>The bell rings</h4>' +
+      '<p>Stamps start counting, for everyone from zero. Pepe Guesser week 1 opens: one photo a day, 2 minutes, one pin. Days at #1, Pond Dominator and the Hall of Fame all begin. Last call for 🏅 <b>Pond Pioneer</b>: log in with Discord before <b>Sunday 23:59 CET</b>.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn gz-wpgo">Open Pepe Guesser →</button></div></section>' +
+      '<p class="gz-foot">See you in the Pond on Monday. 🐸 The Editor</p></article>';
+  }
   // Pond Poll in the Gazette (games/supabase/update_polls.sql): the server counts; the page only shows its answer
   function paintPoll(box) {
     var id = box.getAttribute('data-poll');
@@ -3834,7 +4181,9 @@
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
         // one compact row of tabs: the letter form, then the Gazette issues by number (newest first)
         '<li><button type="button" data-v="write" title="Ideas, bugs, wishes, notices">✏️ Letter to the Editor</button></li>' +
-        '<li><button type="button" data-v="gz" title="The Pond Gazette #7: the Pond goes BETA" aria-label="The Pond Gazette #7">📰 #7</button></li>' +
+        '<li><button type="button" data-v="gz" title="The Pond Gazette #9: week 1 pays double" aria-label="The Pond Gazette #9">📰 #9</button></li>' +
+        '<li><button type="button" data-v="gz8" title="The Pond Gazette #8 (archive): the week 1 poll" aria-label="The Pond Gazette #8">#8</button></li>' +
+        '<li><button type="button" data-v="gz7" title="The Pond Gazette #7 (archive): the Pond goes BETA" aria-label="The Pond Gazette #7">#7</button></li>' +
         '<li><button type="button" data-v="gz6" title="The Pond Gazette #6 (archive): X unblocked us, the first faucet payout, 1 km" aria-label="The Pond Gazette #6">#6</button></li>' +
         '<li><button type="button" data-v="gz5" title="The Pond Gazette #5 (archive): the lockout, CoinEx and the first Pond Poll" aria-label="The Pond Gazette #5">#5</button></li>' +
         '<li><button type="button" data-v="gz4" title="The Pond Gazette #4 (archive): the Pepe Guesser leak" aria-label="The Pond Gazette #4">#4</button></li>' +
@@ -3854,8 +4203,8 @@
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
         if (v === 'write') return writeLetter(pane);
         if (v === 'box') return letterInbox(pane, paintOwner);
-        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : v === 'gz6' ? 6 : 7;
-        pane.innerHTML = issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : v === 'gz6' ? 6 : v === 'gz7' ? 7 : v === 'gz8' ? 8 : 9;
+        pane.innerHTML = issue === 9 ? gazette9() : issue === 8 ? gazette8() : issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
@@ -3904,6 +4253,7 @@
         on('.gz-fren', function () { avatarMaker(); });
         on('.gz-betaad', function () { adPlayer(Math.max(0, adByFile('pond_beta.mpg'))); });
         on('.gz-lan', function () { lanParty(); });
+        on('.gz-paint', function () { drawGuess(); });
         on('.gz-wpgo', wheresPepe);
         on('.gz-wpad', function () { adPlayer(Math.max(0, adByFile('pepe_guesser.mpg'))); });
         on('.gz-tv', function () { adPlayer(Math.max(0, adByFile('host_wanted.mpg'))); });
@@ -4146,7 +4496,20 @@
   function adGlitter() { return '<span class="ad-glitter" aria-hidden="true"><i>✦</i><i>✧</i><i>✦</i><i>✶</i><i>✧</i><i>✦</i><i>✶</i><i>✧</i></span>'; }
   function adPhone(text) { return '<p class="ad-phone">' + text + '</p>'; }
   function adTesti(face, quote, who) { return '<div class="ad-testi"><span class="ad-testi-pic">' + face + '<small>REAL FROG*</small></span><div><p class="ad-testi-q">“' + quote + '”</p><p class="ad-testi-who">' + who + '</p></div></div>'; }
+  // the pond duels' own pixel art (docs/games/img/pond/), scaled up in whole steps, never smoothed
+  function adPx(name, cls) { return '<img class="ad-px' + (cls ? ' ' + cls : '') + '" src="../games/img/pond/' + name + '.png" alt="">'; }
+  function adLilies() { return '<span class="ad-lilies" aria-hidden="true">' + ['a', 'b', 'c'].map(function (k) { return '<span>' + adPx('lily-pad-' + k) + '<i>?</i></span>'; }).join('') + '</span>'; }
   var ADS = [
+    // 14 November: POND DUELS (Pond King and Battle of Three Lilies) open on the PondOS desktop
+    { file: 'pond_duels.mpg', added: '2026-11-14', look: 'gameshow', kitsch: true, ms: 4800, title: 'POND DUELS: the game show', ch: 'CH 3 · POND DUELS, THE GAME SHOW', icon: 'pond-king', scenes: [
+      adBurst('NEW<br>SHOW!', 'b-tr', 'b-pink') + '<p class="ad-kick">The only game show where nobody has to be online at the same time!</p><div class="ad-vs">' + adPx('king-stamp') + '<b>VS</b>' + adPx('lilies') + '</div><h3 class="ad-big">It\'s time for<br><em>POND DUELS!</em></h3><p class="ad-sub">Two brand-new duels, sitting right on your PondOS desktop. Play now. Your rival plays whenever.</p>',
+      '<div class="ad-row">' + adPx('king-stamp', 'ad-px-xl ad-shine') + '<div><p class="ad-kick">Round one: POND KING</p><h3 class="ad-big">Rock. Paper. Scissors.<br><em>For the THRONE!</em></h3><p class="ad-sub">The king hides a pattern of three moves. Guess it round by round. Win more rounds and the crown is yours. A tie keeps the king.</p></div></div>',
+      adBurst('OUCH!', 'b-br', 'b-red') + '<div class="ad-row"><span class="ad-anim" aria-hidden="true"></span><div><p class="ad-kick">The rules are brutal, folks</p><h3 class="ad-big">One duel<br>every <em>4 hours!</em></h3><p class="ad-sub">Lose and your frog is bruised: rest, come back in 4 hours. Then try again, or send a fren with the moves you saw.</p></div></div>',
+      '<p class="ad-kick">Round two: BATTLE OF THREE LILIES</p>' + adLilies() + '<h3 class="ad-big">10 flies. 3 lily pads.<br><em>Zero excuses!</em></h3><p class="ad-sub">Hide your 10 flies, throw down a challenge and walk away. A fren has 48 hours to accept. Win two pads, win the duel.</p>',
+      adTesti(adFren('clothing_shirt_tie', 'mouth_shout', 'eyes_bloodshot', 'hat_crown', 'accessory_none'), 'I held the throne for THREE DAYS. Then Kevin threw scissors. I don\'t talk to Kevin anymore.', 'Former Pond King, still bruised') + '<p class="ad-fine">*A drawing. The bruises are a figure of speech.</p>',
+      adGlitter() + '<div class="ad-row">' + adPx('king-stamp', 'ad-px-xl ad-shine') + '<div><p class="ad-kick">And our grand prize…</p><h3 class="ad-big">Long Live<br>the <em>King!</em></h3><p class="ad-sub">Defend the throne 10 times in a row and this stamp lands in your Fren Passport (Discord players). The pond keeps score: Longest on the throne, the Hall of flies, your win streaks.</p></div></div>',
+      adBurst('PLAY<br>NOW!', 'b-tr') + '<p class="ad-kick ad-blink">Contestants, take your places!</p><h3 class="ad-big">Come on<br><em>down!</em></h3>' + adPhone('☎ NO PHONE · IT\'S ON YOUR DESKTOP') + '<p class="ad-fine">Not a real game show. No PEP, no prizes, no stakes: only glory and a cosmetic stamp. Nobody sees your moves or flies before the duel.</p><div class="ad-ctas"><button type="button" class="ad-cta ad-kingbtn">Challenge the King →</button><button type="button" class="ad-cta ad-lilybtn">Battle of Three Lilies →</button></div>'
+    ] },
     // Monday 16 November: the first Pepe Guesser week for the Frog of the Week stamp. Hidden until then
     // (open /meme/?adpreview to see them early). Each ad has its own "look": a different late-90s TV format.
     { file: 'frog_of_the_week.mpg', added: '2026-11-16', from: '2026-11-16T00:00:00Z', look: 'fight', kitsch: true, ms: 4800, title: 'Pepe Guesser: Frog of the Week', ch: 'CH 1 · PAY-PER-PEPE LIVE', icon: 'ad-belt', scenes: [
@@ -4336,6 +4699,8 @@
       var fb2 = A.body.querySelector('.ad-frogbtn'); if (fb2) fb2.addEventListener('click', function () { pondWarsApp(); });
       var frb = A.body.querySelector('.ad-frenbtn'); if (frb) frb.addEventListener('click', function () { avatarMaker(); });
       var ppb = A.body.querySelector('.ad-passbtn'); if (ppb) ppb.addEventListener('click', function () { frenPassport(); });
+      var kgb = A.body.querySelector('.ad-kingbtn'); if (kgb) kgb.addEventListener('click', function () { pondKingApp(); });
+      var lyb = A.body.querySelector('.ad-lilybtn'); if (lyb) lyb.addEventListener('click', function () { liliesApp(); });
       var wl = A.body.querySelector('.ad-launch'); if (wl) { wl.innerHTML = launchText(); var wlt = setInterval(function () { if (!document.body.contains(wl)) clearInterval(wlt); else wl.innerHTML = launchText(); }, 1000); }
       liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
     }, 720);
@@ -4496,14 +4861,14 @@
     document.querySelectorAll('.lan-n').forEach(function (e) { e.textContent = n; });
     document.querySelectorAll('.lan-badge').forEach(function (e) { e.hidden = n == null; });
   }
-  var LAN_H = 'pondos-lan-h', LAN_LIST = 'pondos-lan-list';
+  var LAN_H = 'pondos-lan-h', LAN_LIST = 'pondos-lan-list', LAN_ALERTS = 'pondos-lan-alerts';
   function lanParty() {
     var A = openApp('lan', 'LAN Party - #pond chat', 'gif-080-still', function (A) {
       var listPref = null; try { listPref = localStorage.getItem(LAN_LIST); } catch (e) {}
       A.host.classList.add('lan-win');
       A.body.innerHTML =
         '<div class="lan-top"><button type="button" class="app-btn lan-list-btn" aria-expanded="false" aria-controls="lan-buddies" title="Who is online"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online</button>' +
-        '<span class="lan-room">#pond</span><span class="grow"></span><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span></div>' +
+        '<span class="lan-room">#pond</span><span class="grow"></span><button type="button" class="app-btn lan-alerts" aria-label="Change LAN Party notification settings">Alerts: All</button><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span></div>' +
         '<div class="lan-main"><div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
         '<aside class="lan-buddies" id="lan-buddies" aria-label="Who is online"><div class="lan-bl"><p class="lan-bh">Loading…</p></div></aside></div>' +
         '<div class="emo-pop" hidden role="group" aria-label="Pepe emotes"><div class="emo-head"><input type="search" class="emo-q" placeholder="Search Pepes… (laugh, pray, apu)" aria-label="Search emotes" autocomplete="off">' +
@@ -4514,9 +4879,37 @@
         '<div class="lan-status"><span class="lan-st">Connecting…</span><span class="lan-grip" role="separator" tabindex="0" aria-orientation="horizontal" aria-label="Chat height. Drag, or use the arrow keys, to make the chat taller or shorter" title="Drag to make the chat taller"><i></i><i></i><i></i></span></div>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input[name=t]'), note = A.body.querySelector('.lan-note');
       var main = A.body.querySelector('.lan-main'), listBtn = A.body.querySelector('.lan-list-btn'), bl = A.body.querySelector('.lan-bl');
-      var stEl = A.body.querySelector('.lan-st'), hostTag = A.body.querySelector('.lan-host-tag');
+      var stEl = A.body.querySelector('.lan-st'), hostTag = A.body.querySelector('.lan-host-tag'), alertsBtn = A.body.querySelector('.lan-alerts');
       var canMod = false, who = null, whoT = 0;
-      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false;
+      var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
+      var alertMode = 'all';
+      try { alertMode = localStorage.getItem(LAN_ALERTS) || 'all'; } catch (e) {}
+      if (['all', 'mentions', 'mute'].indexOf(alertMode) < 0) alertMode = 'all';
+      var isMinimized = function () { return A.host.classList.contains('is-min'); };
+      // Only show a counter on a minimized window. Never mark a new mention as read until LAN Party is visible.
+      var paintUnread = function () {
+        if (!A.taskBtn) return;
+        var count = alertMode === 'mute' ? 0 : unread;
+        A.taskBtn.classList.toggle('lan-has-unread', count > 0);
+        if (count > 0) A.taskBtn.setAttribute('data-unread', count > 99 ? '99+' : String(count));
+        else A.taskBtn.removeAttribute('data-unread');
+        var name = 'LAN Party - #pond chat' + (count ? ' (' + count + ' unread)' : '');
+        A.taskBtn.title = name;
+        A.taskBtn.setAttribute('aria-label', name);
+      };
+      var paintAlerts = function () {
+        var labels = { all: 'All', mentions: '@Only', mute: 'Muted' };
+        alertsBtn.textContent = 'Alerts: ' + labels[alertMode];
+        alertsBtn.title = alertMode === 'all' ? 'Badge for all new messages; popups only for mentions' :
+          alertMode === 'mentions' ? 'Badge and popup only for mentions (game invites in a future update)' : 'No LAN Party badges or mention popups';
+      };
+      alertsBtn.addEventListener('click', function () {
+        alertMode = alertMode === 'all' ? 'mentions' : alertMode === 'mentions' ? 'mute' : 'all';
+        unread = 0;
+        try { localStorage.setItem(LAN_ALERTS, alertMode); } catch (e) {}
+        paintAlerts(); paintUnread();
+      });
+      paintAlerts();
 
       // ----- who is online: a buddy list beside the log (a wide window) or folded under the top bar (a phone)
       var wide = function () { return A.host.offsetWidth >= 600; };
@@ -4687,7 +5080,7 @@
       // @mentions: highlight messages for me, suggest names after "@", ring on new ones, a switch to turn them off
       var PM = null, me = { verified: false }, mrow = A.body.querySelector('.lan-ment'), mbtn = mrow.querySelector('button');
       var forMe = function (m) { var s = anySession(); return !!(PM && me.verified && !me.optout && !(s && s.user && s.user.id === m.user_id) && PM.mentionsMe(m.body, me.nick)); };
-      var seenMentions = function () { if (alive && !document.hidden) chatRpc('gry_mentions_seen', { p_upto: null }).catch(function () {}); };
+      var seenMentions = function () { if (alive && !document.hidden && !isMinimized()) chatRpc('gry_mentions_seen', { p_upto: null }).catch(function () {}); };
       var paintMent = function () {
         mrow.hidden = !me.verified;
         mbtn.textContent = me.optout ? '🔕 Mentions off' : '🔔 Mentions on';
@@ -4722,6 +5115,10 @@
       };
       var poll = function () {
         clearTimeout(timer);
+        if (!alive) return;
+        // Coalesce doorbells and timer ticks while a request is in flight.
+        if (busy) { rerun = true; return; }
+        busy = true;
         chatRpc('gry_lobby_chat', { p_after: last, p_visitor: visitorId() }).then(function (r) {
           if (!alive) return;
           paintOnline(r.online);
@@ -4735,15 +5132,34 @@
             if (seen[m.id]) return;
             var row = el('div', { class: 'lan-msg' + (emoOnly(m.body) ? ' lan-big' : '') }, '<span class="lan-t">' + new Date(m.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span> ' + lanWho(m) + (m.verified ? ' <span class="hs-ok" title="Verified with Discord">✓</span>' : '') + ': ' + chatBody(m.body));
             var tipEl = log.querySelector('.bin-tip'); if (tipEl) tipEl.remove();
-            row._m = m; if (forMe(m)) { row.classList.add('lan-me'); if (!initial) { PM.ring(m.nick, m.body, function () { A.restore ? A.restore() : null; }); seenMentions(); } }
+            var mentioned = forMe(m), sess = anySession();
+            var mine = !!(sess && sess.user && sess.user.id === m.user_id);
+            if (!initial && (isMinimized() || document.hidden) && !mine &&
+                (alertMode === 'all' || alertMode === 'mentions' && mentioned)) unread++;
+            row._m = m;
+            if (mentioned) {
+              row.classList.add('lan-me');
+              if (!initial) {
+                if (alertMode !== 'mute') PM.ring(m.nick, m.body, function () { if (A.restore) A.restore(); });
+                seenMentions();
+              }
+            }
             modBtns(row);
             seen[m.id] = row; log.appendChild(row); last = Math.max(last, m.id);
           });
+          if (!isMinimized() && !document.hidden) unread = 0;
+          paintUnread();
           if (!log.children.length) log.innerHTML = '<p class="bin-tip">No messages in the last 24 hours. Say gm!</p>';
           if (atBottom || r.messages && r.messages.length) log.scrollTop = log.scrollHeight;
           if (initial || noWhoRpc && r.messages && r.messages.length) loadWho();
         }, function (err) { stEl.textContent = 'Offline: ' + err.message; if (first) log.innerHTML = '<p class="bin-tip">' + esc(err.message) + '. Trying again…</p>'; })
-          .then(function () { if (alive) timer = setTimeout(poll, live ? 60000 : document.hidden ? 25000 : 4000); });
+          .then(function () {
+            busy = false;
+            if (!alive) return;
+            if (rerun) { rerun = false; poll(); return; }
+            // Keep the Realtime doorbell while minimized; only slow down fallback polling.
+            timer = setTimeout(poll, live ? 60000 : document.hidden ? 60000 : isMinimized() ? 30000 : 4000);
+          });
       };
       // a burst of rings makes one call, spread over a second so not every open chat asks at the same moment
       var ring = function (id) {
@@ -4769,6 +5185,8 @@
         }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
       });
       paintNote(); loadPepeEmotes().then(poll);
+      // Restoring the taskbar window marks its messages as read and immediately syncs any missed events.
+      A.resume = function () { if (!alive) return; unread = 0; paintUnread(); seenMentions(); poll(); };
       A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); };
     }, 480);
     return A;
@@ -4849,9 +5267,13 @@
   }
   window.PONDOS_REWARD = rewardNotice;   // lets the browser console test it: PONDOS_REWARD({ bar: '…', title: '…', text: '…' })
 
-  var noticed = '1';
-  try { noticed = sessionStorage.getItem('pondos-notice'); sessionStorage.setItem('pondos-notice', '1'); } catch (e) {}
-  if (!noticed && mainEl) setTimeout(function () { balloon('PondOS Security Center', 'Nobody legit will ask for your seed phrase. Not support, not admins, not frogs.', 'gif-085-still'); }, 4500);
+  // PondOS Security Center: no pop-up on its own any more (it covered game buttons on phones). A shield in the
+  // tray opens it when somebody wants it; typing "seed" on the desktop still works too.
+  if (mainEl) {
+    var tSec = el('button', { type: 'button', class: 'tray-logon tray-sec', title: 'PondOS Security Center' }, '<span aria-hidden="true">🛡️</span><span class="sr">Security Center</span>');
+    tSec.addEventListener('click', function () { MAGIC.seed(); });
+    var trayEl4 = document.querySelector('.tray'); if (trayEl4) trayEl4.insertBefore(tSec, trayEl4.firstChild);
+  }
 
   // ---------- boot screen, once per visit ----------
   var booted = '1';
@@ -4939,13 +5361,14 @@
         if (loaded) return; loaded = true;
         var left = imgs.length;
         imgs.forEach(function (im, i) {
-          im.onload = function () { if (--left === 0) s.classList.add('ready'); };
+          im.onload = function () { if (--left === 0) { s.classList.add('ready'); if (s.onready) s.onready(); } };
           im.src = 'img/sky/' + name + '-' + files[i] + '.webp';
         });
       };
       return s;
     }
     var day = scene('day'), night = scene('night');
+    day.onready = function () { if (lastM !== null) paint(); };
     day.appendChild(el('div', { class: 'sky-tint' }));
     day.appendChild(el('div', { class: 'sky-glow' }));
     // a handful of stars that blink over the night sky and fireflies over the forest, always in the same places
@@ -4987,7 +5410,10 @@
       if (jump) void box.offsetWidth;
       box.style.setProperty('--day-down', v[0].toFixed(4));
       box.style.setProperty('--night-down', v[1].toFixed(4));
-      box.style.setProperty('--night', v[2].toFixed(4));
+      // the night picture fades in over the day layers; until those are loaded only the flat day wallpaper is
+      // under it, and a half-faded night showed the whole grinning Pepe through it, so snap instead of fading
+      var nightOp = day.classList.contains('ready') ? v[2] : v[2] >= 0.5 ? 1 : 0;
+      box.style.setProperty('--night', nightOp.toFixed(4));
       box.style.setProperty('--tint', v[3].toFixed(4));
       lastM = m;
       // the static picture under the sky (and the first paint of the next visit) follow along

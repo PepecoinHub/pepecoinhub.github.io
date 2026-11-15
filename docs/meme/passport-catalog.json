@@ -170,6 +170,14 @@
       "status": "live"
     },
     {
+      "id": "long_live_the_king",
+      "title": "Long Live the King",
+      "description": "Win 10 Pond King duels in a row: hold the throne against 10 challengers in one reign.",
+      "category": "arcade",
+      "icon": "../games/img/pond/king-stamp.png",
+      "status": "live"
+    },
+    {
       "id": "yeet_adept",
       "title": "Adept",
       "description": "Fly at least 3000 m in YEET THE PEP. Unlocks the Sunset avatar background.",
