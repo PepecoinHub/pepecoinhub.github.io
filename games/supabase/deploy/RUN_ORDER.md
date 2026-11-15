@@ -48,7 +48,9 @@ Not in LAUNCH_ALL.sql. On PepeGochi day, in this order: `update_pepegochi_v2.sql
 takes one random starter item when it moves out); then its five stamps go `live` and the `?beta=gochi` gate
 comes off.
 Pond Quiz (the frog's fact of the day with points and a ranking, draft 2026-11-13), after the PepeGochi files:
-`update_pond_quiz.sql`, then the PRIVATE `update_pond_quiz_questions.sql`. The questions are not in this public repo:
+`update_passport_awards.sql` once more (safe to run again: its allowlist now knows the five Pond Quiz stamps),
+`update_pond_quiz.sql`, then the PRIVATE `update_pond_quiz_questions.sql`. The stamps (1, 10, 25, 50 and 99 right
+answers) go `live` with PepeGochi's five, once their art is approved. The questions are not in this public repo:
 Claude builds that file from the owner's private questions file (`node scripts/build_pond_quiz_sql.mjs <file>`, output
 in the git-ignored `games/supabase/private/`) and hands it over. Run it again whenever the questions change.
 Without these files the taskbar frog shows no quiz. Until then its API does not exist, so nobody can adopt a frog before the window is public.

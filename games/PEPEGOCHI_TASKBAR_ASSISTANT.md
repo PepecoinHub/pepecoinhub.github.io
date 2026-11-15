@@ -56,8 +56,10 @@ Tests: `node --test tests/pepegochi-taskbar.test.mjs`. Still behind `?beta=gochi
 - Only after the account's PepeGochi has hatched (server check on the 'hatched' milestone; the browser does not even
   ask before the frog's state shows a hatched stage). Guests and eggs see no "?".
 - Server reads: one `gry_quiz_today` per page load and at most one per 5 minutes after that (or on a new day / account).
-- No stamps yet: thresholds after the owner and Claude have checked the questions together. One question
-  (`tf97`, Tangem sales) waits for its source and is not asked.
+- 99 questions, checked with the owner (2026-11-15). A question answered right leaves only that player's pool.
+- Stamps for right answers in total (owner, 2026-11-15): 1 "Here We Go!", 10 "Is That a Lot?", 25 "Pond Scholar",
+  50 "Halfway Hopper", 99 "Keeper of the Pond", through `games.passport_award()`, dated at the answer that reached
+  each threshold. `planned` until their art is approved (brief: `games/pepegochi/quiz-stamps-brief/`).
 - **The questions and answers are not in this public repo** (owner, 2026-11-13). They live only in Supabase, loaded
   from the owner's private file: `node scripts/build_pond_quiz_sql.mjs <private file>` writes
   `games/supabase/private/update_pond_quiz_questions.sql` (git-ignored). Tests use six made-up questions

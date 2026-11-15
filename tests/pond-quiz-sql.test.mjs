@@ -17,6 +17,11 @@ const CLOCK = `create or replace function games.quiz_clock() returns timestamptz
 language sql volatile set search_path = '' as $$
   select coalesce(nullif(current_setting('pepegochi.sim_now', true), '')::timestamptz, clock_timestamp()) $$;`;
 const day = (d, h = 12) => new Date(Date.UTC(2026, 10, 13 + d, h));
+// the Fren Passport the quiz stamps go through (as in tests/pepegochi-passport-sql.test.mjs)
+const PASSPORT = ['update_yeet.sql', 'update_wheres_pepe.sql', 'update_wheres_pepe_guests.sql', 'update_lobby_chat.sql',
+  'update_open_chat.sql', 'update_lobby_mentions.sql', 'update_frog_letters.sql', 'update_letters_community.sql',
+  'update_miner_cloud.sql', 'update_fren_passport.sql', 'update_fren_avatar.sql', 'update_passport_awards.sql'];
+const STAMPS = ['quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99'];
 
 test('Pond Quiz: one question a day, +1 for a right answer, wrong ones come back, a fair ranking',
   { skip: !(URI && MOD) && 'set PASSPORT_PG_URL and PASSPORT_PG_MODULE', timeout: 300000 }, async t => {
@@ -37,7 +42,7 @@ test('Pond Quiz: one question a day, +1 for a right answer, wrong ones come back
   const shownIndex = async (v, right) => { const q = await truth(v.id); const good = q.answers[q.correct];
     return right ? v.answers.indexOf(good) : v.answers.findIndex(a => a !== good); };
   try {
-    await prepare(db);                                   // Supabase stub, schema.sql, PepeGochi v2, virtual clock
+    await prepare(db, { extra: PASSPORT });              // Supabase stub, schema.sql, Passport, PepeGochi v2, clock
     await db.exec(await read('games/supabase/update_pond_quiz.sql'));
     await db.exec(QUESTIONS_SQL);
     await db.exec(CLOCK);
@@ -147,6 +152,56 @@ test('Pond Quiz: one question a day, +1 for a right answer, wrong ones come back
       await db.exec(await read('games/supabase/update_pond_quiz.sql'));
       await db.exec(QUESTIONS_SQL);
       assert.equal((await rows('select points from games.quiz_players where user_id = $1', [uid(4)]))[0].points, before);
+    });
+
+    await t.test('stamps for 1, 10, 25, 50 and 99 right answers, dated at the answer that reached each; never lost', async () => {
+      await db.exec(CLOCK);
+      const stamps = async n => (await rows("select badge_id, earned_at from games.passport_badges where user_id = $1 and badge_id like 'quiz%' order by earned_at, badge_id", [uid(n)]));
+      // the first right answers earlier in this test already gave quiz_first
+      assert.deepEqual((await stamps(1)).map(b => b.badge_id), ['quiz_first']);
+      assert.deepEqual((await stamps(2)).map(b => b.badge_id), [], 'wrong answers only: no stamp');
+      // player 6: 97 questions already answered right (made-up questions, switched off), one a day
+      await addPlayer(db, 6);
+      await ok(6, "gry_pepegochi_adopt('Fren')", day(-2));
+      await ok(6, "gry_pepegochi_action('feed')", day(-1));
+      await db.query(`insert into games.quiz_questions (id, question, answers, correct, active)
+        select 'old' || n, 'old question ' || n, array['a', 'b', 'c', 'd'], 0, false from generate_series(1, 97) n`);
+      await db.query(`insert into games.quiz_solved (user_id, question_id, solved_at)
+        select $1, 'old' || n, timestamptz '2026-08-01 12:00Z' + n * interval '1 day' from generate_series(1, 97) n`, [uid(6)]);
+      await db.query('insert into games.quiz_players (user_id, points, answered) values ($1, 97, 97)', [uid(6)]);
+      // the stamps are not in passport_award()'s allowlist yet (today's Passport file without them): they wait
+      const awards = await read('games/supabase/update_passport_awards.sql');
+      const fn = awards.match(/create or replace function games\.passport_award\([\s\S]*?\n\$\$;/)[0];
+      const without = fn.replace(", 'quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99'", '');
+      assert.notEqual(without, fn);
+      await db.exec(without);
+      let v = await ok(6, 'gry_quiz_today()', day(30));
+      v = await ok(6, `gry_quiz_answer(${await shownIndex(v, true)})`, day(30));
+      assert.equal(v.right, true, 'the answer counts although the stamps wait');
+      assert.deepEqual(await stamps(6), []);
+      // release: the allowlist knows them; running the quiz file again delivers every threshold reached (98 here)
+      await db.exec(fn);
+      await db.exec(await read('games/supabase/update_pond_quiz.sql'));
+      await db.exec(CLOCK);
+      const got = await stamps(6);
+      assert.deepEqual(got.map(b => b.badge_id), ['quiz_first', 'quiz_10', 'quiz_25', 'quiz_50']);
+      const nth = n => +new Date(Date.UTC(2026, 7, 1 + n, 12));
+      assert.deepEqual(got.map(b => +b.earned_at), [nth(1), nth(10), nth(25), nth(50)], 'dated at the n-th right answer');
+      // the 99th right answer: the big one, at once
+      v = await ok(6, 'gry_quiz_today()', day(32));
+      assert.ok(v.question, 'one sample question is still left for player 6');
+      await ok(6, `gry_quiz_answer(${await shownIndex(v, true)})`, day(32));
+      const all = await stamps(6);
+      assert.deepEqual(all.map(b => b.badge_id), STAMPS);
+      assert.equal(+all.at(-1).earned_at, +day(32));
+      // once per account: running everything again changes nothing
+      await db.exec(await read('games/supabase/update_pond_quiz.sql'));
+      await db.exec(CLOCK);
+      assert.equal((await stamps(6)).length, 5);
+      // the helpers are closed to the browser
+      for (const f of ['games.quiz_stamps(uuid)', 'games.quiz_stamp_steps()'])
+        for (const role of ['anon', 'authenticated'])
+          assert.equal((await rows('select has_function_privilege($1, $2, \'execute\') v', [role, f]))[0].v, false, role + ' ' + f);
     });
   } finally {
     await raw.end();

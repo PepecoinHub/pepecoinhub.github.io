@@ -10,16 +10,30 @@
 --  * The right answer and the order of the answers live only on the server: the browser sends one number (0-3),
 --    once a day. Answering again the same day changes nothing.
 --  * The ranking shows the top 10 by points (a tie goes to whoever got there first) and the caller's own place.
---  * No stamps yet: the thresholds come after the owner has checked the questions.
+--  * Stamps for right answers in total (owner, 2026-11-15): 1 quiz_first, 10 quiz_10, 25 quiz_25, 50 quiz_50,
+--    99 quiz_99 (all the questions). They go through games.passport_award() (allowlist, Discord, once per account),
+--    dated at the right answer that reached the threshold. They are 'planned' in the Passport catalog until the
+--    release; while passport_award() does not know them yet, nothing is lost: the next right answer, or running
+--    this file again, delivers every threshold already reached.
 --  * Only after the account's PepeGochi has hatched from its egg (the 'hatched' milestone, any frog so far).
 --  * The questions and answers are NOT in the public repo: they are loaded from a private file with
 --    scripts/build_pond_quiz_sql.mjs (games/supabase/private/update_pond_quiz_questions.sql, git-ignored), and the
 --    browser only ever gets today's question from these RPCs.
 --
--- Dependency: PH-games schema.sql (games.discord_identity) and update_pepegochi_v2.sql (games.pepegochi_milestones).
+-- Dependency: PH-games schema.sql (games.discord_identity), update_pepegochi_v2.sql (games.pepegochi_milestones) and
+-- the Fren Passport (update_passport_awards.sql: games.passport_award).
 -- Then the private update_pond_quiz_questions.sql (the questions).
 -- Safe to run twice.
 begin;
+
+do $$ begin
+  if to_regclass('games.pepegochi_milestones') is null then
+    raise exception 'Run update_pepegochi_v2.sql before update_pond_quiz.sql';
+  end if;
+  if to_regprocedure('games.passport_award(uuid, text, timestamp with time zone)') is null then
+    raise exception 'Run update_passport_awards.sql before update_pond_quiz.sql';
+  end if;
+end $$;
 
 create table if not exists games.quiz_questions (
   id         text primary key,
@@ -105,6 +119,39 @@ $$;
 
 revoke all on function games.quiz_clock(), games.quiz_view(uuid, date), games.quiz_check(uuid) from public, anon, authenticated;
 
+-- The stamps for right answers in total: (threshold, stamp).
+create or replace function games.quiz_stamp_steps()
+returns table (needed integer, stamp text) language sql immutable set search_path = '' as $$
+  values (1, 'quiz_first'), (10, 'quiz_10'), (25, 'quiz_25'), (50, 'quiz_50'), (99, 'quiz_99')
+$$;
+
+-- Gives every stamp whose threshold this account has reached, dated at the right answer that reached it (the n-th
+-- solved question). "Unknown passport stamp" (not in passport_award()'s allowlist yet) is skipped silently: it is
+-- delivered later. Any other error is passed on.
+create or replace function games.quiz_stamps(u uuid)
+returns void language plpgsql volatile set search_path = '' as $$
+declare
+  s record;
+begin
+  for s in
+    select st.stamp, (select x.solved_at from games.quiz_solved x where x.user_id = u
+                       order by x.solved_at, x.question_id offset st.needed - 1 limit 1) at
+      from games.quiz_stamp_steps() st
+     where st.needed <= (select count(*) from games.quiz_solved x where x.user_id = u)
+       and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = st.stamp)
+     order by st.needed
+  loop
+    begin
+      perform games.passport_award(u, s.stamp, s.at);
+    exception when raise_exception then
+      if sqlerrm not like 'Unknown passport stamp %' then raise; end if;
+    end;
+  end loop;
+end
+$$;
+
+revoke all on function games.quiz_stamp_steps(), games.quiz_stamps(uuid) from public, anon, authenticated;
+
 -- ---------- browser RPCs ----------
 
 -- Today's question for the signed-in Discord account. The first call of a UTC day picks it: a random active question
@@ -165,6 +212,7 @@ begin
     where user_id = u;
   if is_right then
     insert into games.quiz_solved (user_id, question_id, solved_at) values (u, q.id, t) on conflict do nothing;
+    perform games.quiz_stamps(u);
   end if;
   return games.quiz_view(u, today);
 end
@@ -198,5 +246,8 @@ revoke all on function public.gry_quiz_today(), public.gry_quiz_answer(integer),
   from public, anon, authenticated;
 grant execute on function public.gry_quiz_today(), public.gry_quiz_answer(integer) to authenticated;
 grant execute on function public.gry_quiz_board() to anon, authenticated;
+
+-- backfill: every account with right answers gets the stamps it has reached (a no-op while they are not allowed yet)
+select games.quiz_stamps(x.user_id) from (select distinct user_id from games.quiz_solved) x;
 
 commit;
