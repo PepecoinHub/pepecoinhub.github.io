@@ -1444,10 +1444,17 @@
   // names in score tables: Discord players in bold with a small frog, guests in grey (to make logging on worth it)
   // Pepe Guesser: the host's own row comes back only to the host (marked hidden); others never get it
   function hostHidden(x) { return x && x.hidden ? ' <small class="wp-hidden" title="You are the host, so other players do not see your score">(hidden, only you see this)</small>' : ''; }
-  function who(nick, verified) {
+  // id (sent by the server only to Discord frens, for Discord players): the name opens that fren's Passport
+  function who(nick, verified, id) {
+    if (verified && id && FREN && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))
+      return '<button type="button" class="who who-ok who-pass" data-pass="' + esc(String(id).toLowerCase()) + '" data-nick="' + esc(nick) + '" title="Open the Fren Passport of ' + esc(nick) + '"><img src="img/pep-logo.webp" alt="" width="14" height="14">' + esc(nick) + '</button>';
     return verified ? '<b class="who who-ok" title="Discord player"><img src="img/pep-logo.webp" alt="" width="14" height="14">' + esc(nick) + '</b>'
       : '<span class="who who-guest" title="Guest">' + esc(nick) + '</span>';
   }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.who-pass'); if (!b) return;
+    frenPassport(false, { id: b.getAttribute('data-pass'), nick: b.getAttribute('data-nick') || '' });
+  });
   function whoLegend() { return '<p class="who-legend"><b class="who who-ok"><img src="img/pep-logo.webp" alt="" width="14" height="14">Bold</b> = Discord player · <span class="who-guest">grey</span> = guest. <a href="#" class="who-logon">Log on with Discord</a> to get the frog.</p>'; }
   function wireLegend(box) { var a = box.querySelector('.who-logon'); if (a) a.addEventListener('click', function (e) { e.preventDefault(); logOn(); }); }
   // LEADERS: every top 10 in one window (FUD Invaders, PEP Snake, YEET THE PEP, Pepe Guesser today and this week, Pepe Miner)
@@ -1467,7 +1474,7 @@
         '<div class="app-row hs-tabs" role="tablist">' + LEAD.map(function (g) { return '<button type="button" class="app-btn" data-g="' + g[0] + '" role="tab">' + g[1] + '</button>'; }).join('') + '</div>' +
         '<div class="lead-lists"></div>' + whoLegend() + '<p class="bin-tip lead-tip"></p>';
       wireLegend(A.body);
-      var row = function (r, i, sc) { return '<li><span>' + (i + 1) + '.</span><span>' + who(r.nick, r.verified !== false) + '</span><small>' + sc + '</small></li>'; };
+      var row = function (r, i, sc) { return '<li><span>' + (i + 1) + '.</span><span>' + who(r.nick, r.verified !== false, r.id) + '</span><small>' + sc + '</small></li>'; };
       var empty = '<li><span></span><span>No scores yet. Be the first frog.</span><small></small></li>';
       var fail = function (ol) { return function (err) { ol.innerHTML = '<li><span></span><span>' + (/function|PGRST/.test(err.message) ? 'Coming soon.' : esc(err.message)) + '</span><small></small></li>'; }; };
       var list = function (title) { return (title ? '<p class="lead-sub">' + title + '</p>' : '') + '<ol class="bin-list hs-list"><li>Loading…</li></ol>'; };
@@ -3781,7 +3788,7 @@
         var show = function (s) {
           box.querySelectorAll('[data-s]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-s') === s)); });
           wpRpc('gry_wp_top', { p_scope: s }).then(function (rows) {
-            ol.innerHTML = rows.length ? rows.map(function (x) { return '<li><span>' + who(x.nick, x.verified !== false) + hostHidden(x) + '</span><b>' + Number(x.points).toLocaleString('en-US') + '</b></li>'; }).join('')
+            ol.innerHTML = rows.length ? rows.map(function (x) { return '<li><span>' + who(x.nick, x.verified !== false, x.id) + hostHidden(x) + '</span><b>' + Number(x.points).toLocaleString('en-US') + '</b></li>'; }).join('')
               : '<li class="wp-small">Nobody yet. Be the first!</li>';
           }, function () { ol.innerHTML = '<li class="wp-small">The ranking could not be loaded.</li>'; });
         };
