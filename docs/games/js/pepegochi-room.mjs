@@ -13,6 +13,8 @@ export const ROOM_W = 640;
 export const ROOM_H = 400;
 export const IMG = 'img/pepegochi/';
 export const BACKGROUND = IMG + 'room_clean_base.png';
+// bumped when a room prop is redrawn under the same file name (A10: mug, duck, painting, 2026-11-15)
+export const PROP_V = '20261115a10';
 
 // slot_id -> anchor on the 640x400 background (same numbers as the room SQL)
 export const SLOTS = {
@@ -136,8 +138,8 @@ export const LETTER = { x: 332, y: 346, px: 64, envelope: IMG + 'goodbye_envelop
 export const TAKEN_BY_LETTER = 'crt_tv';
 export const takenItem = variant => (!variant || variant === 'classic' ? TAKEN_BY_LETTER
   : variant === 'took_nothing' ? null : variant.startsWith('took_') ? variant.slice(5) : TAKEN_BY_LETTER);
-export const TAKEN_NAME = { crt_tv: 'the TV', lava_lamp: 'the lava lamp', potted_plant: 'the plant', p_poster: 'the poster',
-  rubber_duck: 'the rubber duck', mug: 'the mug' };
+export const TAKEN_NAME = { crt_tv: 'the TV', lava_lamp: 'the lava lamp', potted_plant: 'the plant', p_poster: 'the Golden Foot painting',
+  rubber_duck: 'the rubber duck', mug: 'the Comfy mug' };
 export const takenName = item => TAKEN_NAME[item] || 'the ' + String(item).replace(/_/g, ' ');
 
 // The moving-out animation (art pack v2, animations/depart_01..06, 250 ms a frame, no loop).
@@ -220,7 +222,7 @@ export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', n
     const s = SLOTS[slotId], it = ITEMS[itemId];
     if (!s || !it) continue;
     if (departed && itemId === taken) continue;
-    items.push({ slotId, itemId, src: IMG + itemId + '.png', wall: !!s.wall, z: s.z,
+    items.push({ slotId, itemId, src: IMG + itemId + '.png?v=' + PROP_V, wall: !!s.wall, z: s.z,
       left: s.x / ROOM_W * 100, top: (s.y + it.dy) / ROOM_H * 100, width: it.size });
   }
   const pct = (v, of) => v / of * 100;
