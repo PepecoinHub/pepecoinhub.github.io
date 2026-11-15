@@ -1221,7 +1221,7 @@ begin
       'i_voted', 'yeet_adept', 'fud_buster', 'long_snake', 'secret_starter', 'treasure_hunter', 'podium', 'game_night',
       'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'season_champion', 'frog_of_the_week',
       'junior_editor', 'senior_editor', 'vox_populi', 'bali', 'pep_birthday', 'thanksgiving_fren', 'valentine_fren',
-      'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'interior_designer', 'picasso_fren',
+      'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'super_parent', 'interior_designer', 'picasso_fren',
       'pond_dominator', 'long_live_the_king', 'quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99') then
     raise exception 'Unknown passport stamp %', b;
   end if;

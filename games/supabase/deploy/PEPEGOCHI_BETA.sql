@@ -112,6 +112,7 @@ returns jsonb language sql stable set search_path = '' as $$
     'good_day_min_need', 40,
     'good_day_cared_counts', false,
     'good_parent_days', 30,
+    'super_parent_days', 100,
     'history_limit', 10
   )
 $$;
@@ -338,7 +339,7 @@ $$;
 create or replace function games.pepegochi_milestone(u uuid, m text, life uuid, p_at timestamptz)
 returns void language plpgsql volatile set search_path = '' as $$
 begin
-  if m not in ('first_adoption', 'hatched', 'froglet', 'adult', 'good_parent') then
+  if m not in ('first_adoption', 'hatched', 'froglet', 'adult', 'good_parent', 'super_parent') then
     raise exception 'Unknown PepeGochi milestone %', m;
   end if;
   insert into games.pepegochi_milestones (user_id, milestone, life_id, reached_at)
@@ -611,6 +612,9 @@ begin
   end if;
   if good_now and l.good_days >= (r->>'good_parent_days')::integer then
     perform games.pepegochi_milestone(u, 'good_parent', l.life_id, t);
+  end if;
+  if good_now and l.good_days >= coalesce((r->>'super_parent_days')::integer, 100) then
+    perform games.pepegochi_milestone(u, 'super_parent', l.life_id, t);
   end if;
   perform games.pepegochi_sync(u);
   return games.pepegochi_view(u, t) || jsonb_build_object('action_result', 'accepted');
