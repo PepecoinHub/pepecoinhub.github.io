@@ -1,0 +1,51 @@
+{
+  "schema": "fren-passport-stamp-art-v3-batch2-style-match",
+  "date": "2026-11-08",
+  "design_source_pr": 231,
+  "art_pr": 233,
+  "status": "review_candidate_not_integrated",
+  "reference_stamps": [
+    "frog_of_the_week",
+    "moonwalker"
+  ],
+  "method": "Retouched owner-liked high-resolution individual stamp illustrations; harmonized cream paper and warm-grey title plaque, preserved original line art and scene. Source PNGs optimized to RGBA 256-color palette for GitHub while preserving alpha.",
+  "files": [
+    {
+      "id": "like_it_here",
+      "label": "30-Day Streak",
+      "path": "games/fren-passport/source/stamps-new/like_it_here.png",
+      "size": [
+        1173,
+        1341
+      ],
+      "alpha": true,
+      "sha256": "9b15823660719496bd023f22004d79fdc93c6e48644b504a5fca81bbfb8f0b7d",
+      "scene": "Pepe resting in armchair with PondOS CRT, calendar 30, mug, slippers; not PepeGochi care",
+      "background": "light green"
+    },
+    {
+      "id": "nasa_is_hiring",
+      "label": "NASA Is Hiring",
+      "path": "games/fren-passport/source/stamps-new/nasa_is_hiring.png",
+      "size": [
+        1173,
+        1341
+      ],
+      "alpha": true,
+      "sha256": "6d062e30e97d04d2778eea271feb0c19e114c65761b9c985c160c6d2eac9db9e",
+      "scene": "YEET pilot with red crash helmet, goggles, blue shirt, grey shorts, red shoes; 5000m and 3 checkmarks; no astronaut suit or NASA trademark",
+      "background": "royal blue"
+    }
+  ],
+  "preview": "games/fren-passport/stamps-review/art-v3-batch2-style-matched.png",
+  "prior_wip": "games/fren-passport/stamps-review/art-v3-wip/{like_it_here,nasa_is_hiring}.png",
+  "prior_wip_status": "superseded_review_only",
+  "tests": {
+    "png_rgba": true,
+    "correct_dimensions": true,
+    "transparent_corners": true,
+    "visual_52_and_78px_preview": true,
+    "live_browser_test": false
+  },
+  "no_changes_to": "Supabase, catalog, backend rules, code, Lily artwork, avatar maker"
+}

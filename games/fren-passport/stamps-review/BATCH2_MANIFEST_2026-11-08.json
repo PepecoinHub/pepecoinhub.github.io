@@ -1,0 +1,45 @@
+{
+  "version": "v3",
+  "date": "2026-11-08",
+  "pr": 233,
+  "status": "art_candidate_only",
+  "source_spec_pr": 231,
+  "approved_first_batch_visuals": 10,
+  "stamps": [
+    {
+      "id": "like_it_here",
+      "label": "30-Day Streak",
+      "path": "games/fren-passport/stamps-review/art-v3-wip/like_it_here.png",
+      "size": [
+        251,
+        438
+      ],
+      "status": "concept",
+      "qa": "Green background, PondOS calendar+device; missing armchair/CRT; source low res"
+    },
+    {
+      "id": "nasa_is_hiring",
+      "label": "NASA Is Hiring",
+      "path": "games/fren-passport/stamps-review/art-v3-wip/nasa_is_hiring.png",
+      "size": [
+        1173,
+        1341
+      ],
+      "status": "composite_art_candidate",
+      "qa": "Real YEET pilot/5000m/3 check marks; requires visual polish"
+    },
+    {
+      "id": "rookie_miner",
+      "label": "Happy Mining!",
+      "path": "games/fren-passport/stamps-review/art-v3-wip/happy_mining_label_only.png",
+      "size": [
+        900,
+        170
+      ],
+      "status": "label_only_preview",
+      "qa": "Keep Lily drawing; label only; server award rule is separate"
+    }
+  ],
+  "supabase_changed": false,
+  "production_modified": false
+}
