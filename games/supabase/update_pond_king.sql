@@ -4,8 +4,8 @@
 --
 -- Rules
 --   * One frog sits on the throne with three secret moves (r = rock, p = paper, s = scissors).
---   * A challenger picks three moves. For every duel the server shuffles the king's three moves into a
---     random order, then plays three rounds. The challenger needs MORE round wins than the king;
+--   * A challenger picks three moves and plays them round by round against the king's three moves, in the
+--     order the king set them (a fixed pattern to guess; since 2026-11-15, before that it was shuffled). The challenger needs MORE round wins than the king;
 --     a tie (1:1, 0:0) keeps the king on the throne.
 --   * A winning challenger becomes the new king; their three moves become their defence and they can
 --     change them at any time while they reign. A lost duel adds one defence to the king's reign.
@@ -16,7 +16,7 @@
 --   * Fren Passport stamp "Long Live the King": hold one reign against 10 challengers, i.e. 10 duels won in a
 --     row as king. Discord accounts only (games.passport_award checks), awarded once, from server records.
 --   * The king's moves never leave the database, except to the king (who holds the token) and as the
---     shuffled rounds of a finished duel, which show the challenger only the king's set of moves.
+--     rounds of a finished duel, which show that challenger the king's pattern (so a wise king changes it).
 --
 -- No sign-in needed: a player is a random token the browser keeps in localStorage. The database keeps only its
 -- SHA-256 (with the project salt), the nickname, the moves and a salted IP hash (for the limits).
@@ -263,8 +263,8 @@ begin
   if (select count(*) from games.pk_duels where created_at > now() - interval '1 hour') >= 300 then
     return jsonb_build_object('ok', false, 'error', 'busy'); end if;
 
-  -- the king's three moves in a fresh random order
-  select string_agg(m, '' order by random()) into ord from regexp_split_to_table(k.moves, '') m;
+  -- the king's three moves in the order the king set them
+  ord := k.moves;
   for i in 1..3 loop
     r := games.pk_beats(substr(v_moves, i, 1), substr(ord, i, 1));
     if r > 0 then me := me + 1; elsif r < 0 then them := them + 1; end if;
