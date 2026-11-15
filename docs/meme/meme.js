@@ -136,7 +136,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'reddit' || n === 'twitter-bird') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'pond-king') return '../games/img/pond/king-stamp.png'; if (n === 'lilies') return '../games/img/pond/lilies.png'; if (n === 'bulletin') return '../games/img/pond/bulletin.png'; if (n === 'goldhook') return '../games/img/gold-hook/ui/pm-icon-goldhook.png'; if (n === 'goldhook16') return '../games/img/gold-hook/ui/pm-icon-goldhook-16.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'reddit' || n === 'twitter-bird' || n === 'discord') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'pond-king') return '../games/img/pond/king-stamp.png'; if (n === 'lilies') return '../games/img/pond/lilies.png'; if (n === 'bulletin') return '../games/img/pond/bulletin.png'; if (n === 'goldhook') return '../games/img/gold-hook/ui/pm-icon-goldhook.png'; if (n === 'goldhook16') return '../games/img/gold-hook/ui/pm-icon-goldhook-16.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
   // Hall of Fame icon: the owner's art (gold cup + open Pepe passport) goes to img/ico/hall-of-fame.webp, then this
   // line becomes 'img/ico/hall-of-fame.webp'. Until then the LEADERS trophy stands in (no new art is made here).
   var HOF_ICON = 'img/ico/leaders.webp';
@@ -828,17 +828,17 @@
     var NERDS = [['price.html', 'Price.exe', 'charts'], ['rich-list.html', 'Whale watch', 'detective'], ['calculator.html', 'What-if machine', 'p-eyes-still'],
       ['wallets.html', 'Wallets', 'zipper'], ['mining.html', 'Mining', 'pickaxe'], ['#addr', 'AddressCheck.exe', 'pepe-search'], ['#notpep', 'Not PEP (0x)', 'wrongpep'], ['#nerdreadme', 'README_NERD.txt', 'news']];
     // wide screens (byl's layout): two columns from the top-left corner (Log On, LAN Party, the games, PEP-TV Ads);
-    // Internet, Pond TV, NERDS ONLY and Find in the bottom-left corner; Shop, Twitter and r/pepecoin in a row at the
+    // Internet, Pond TV, NERDS ONLY and Find in the bottom-left corner; Official Store, Twitter, r/pepecoin and Discord in a row at the
     // bottom centre; Write a letter and the Recycle Bin in the bottom-right corner. Phones get one grid in the same order.
     var DESKTOP = [
       ['top', [['#logon', 'Log On', 'pep-logo'], ['#lan', 'LAN Party', 'gif-080-still'], ['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'],
         ['#bulletin', 'Pond Bulletin', 'bulletin'], ['#king', 'Pond King', 'pond-king'], ['#lilies', 'Three Lilies', 'lilies'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#games', 'Games', 'games-folder']]],
       ['low', [['./', 'Internet', 'internet'], ['#tv', 'Pond TV', 'pond-tv'], ['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#find', 'Find', 'search']]],
-      // the community: the shop, the official Pepecoin account (the classic bird) and our subreddit
-      ['mid', [['#shop', 'Shop', 'shop-bag'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit']]],
+      // the community: the official store, the official Pepecoin account (the classic bird), our subreddit and the Discord
+      ['mid', [['#shop', 'Official Store', 'shop-bag'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit'], ['#discord', 'Discord', 'discord']]],
       ['corner', [['#mail', 'Write a letter', 'frog-mail'], ['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
-    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#king': function () { pondKingApp(); }, '#lilies': function () { liliesApp(); }, '#bulletin': function () { bulletinApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#king': function () { pondKingApp(); }, '#lilies': function () { liliesApp(); }, '#bulletin': function () { bulletinApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#discord': function () { window.open('https://discord.gg/pepecoin', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -1904,7 +1904,8 @@
       ['AddressCheck.exe', 'Is this a real PEP address?', 'pepe-search', 'address check scam verify checksum wallet', addressCheck],
       ['Not PEP (0x)', 'PEPE and PEPECOIN are not PEP', 'wrongpep', 'pepe pepecoin ethereum erc20 token wrong scam', act('#notpep')],
       ['Frog Mail', 'The Pond Gazette', 'frog-mail', 'mail news gazette newsletter', frogMail],
-      ['Shop', 'Official Pepecoin shop', 'shop-bag', 'shop merch buy store', act('#shop')],
+      ['Official Store', 'Official Pepecoin store', 'shop-bag', 'shop merch buy store official', act('#shop')],
+      ['Discord', 'The Pepecoin Discord', 'discord', 'discord chat community server invite', act('#discord')],
       ['About me', 'Who builds this pond (and how to support it)', 'night-shift', 'about me byl author tip donate support', aboutMe],
       ['Write a letter', 'Send an idea, a wish or a bug to the builder', 'frog-mail', 'write letter feedback contact message bug idea mail', function () { frogMail('write'); }],
       ['Log On', 'Guest or Discord', 'pep-logo', 'log on login sign in account discord guest', logOn],
@@ -3927,7 +3928,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 8, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 9, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -4059,6 +4060,34 @@
   // Issue #8 (14 Nov 2026): the poll goes on the FRONT page (at the end almost nobody reads it).
   // 10 YES votes = week 1 of Pepe Guesser gets a 10,000 PEP faucet pot and 5,000 PEP for the Weekly Champion
   // (games/supabase/update_poll_week1_prize.sql; the poll closes when the week starts, Monday 16 XI 00:00 UTC).
+  // Issue #9 (15 Nov 2026): the poll passed, week 1 pays double from tomorrow, and the first PEPaint night
+  function gazette9() {
+    var xText = '🐸 The pond voted YES: week 1 of Pepe Guesser pays double. A 10,000 PEP faucet and 5,000 PEP for the Weekly Champion. Stamps, secrets and the Hall of Fame start Monday 16 November, 00:00 UTC.\nhttps://pepecoinhub.com/meme/';
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #9</span><span>Price: 0 PEP</span><span>Season opener</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking gz-pollsec"><p class="gz-flash">Goal reached</p><h4>You did it: week 1 pays double!</h4>' +
+      '<div class="gz-wpbox"><img src="img/rich.webp" alt="Pepe reading How to be rich" width="110" height="110"><div>' +
+      '<p>We needed <b>10 YES votes</b>. You gave us more. So the first official Pepe Guesser week, starting <b>tomorrow</b>, gets:</p>' +
+      '<ul><li>💧 <b>a 10,000 PEP faucet</b> for the week, double the usual 5,000</li><li>🏆 <b>5,000 PEP for the Weekly Champion</b>, on top of the gold Frog of the Week stamp</li></ul>' +
+      '<p>Thank you to every frog who voted. The pond asked, the pond answered.</p></div></div>' +
+      '<div class="gz-poll" data-poll="week1_prize" aria-live="polite"><p class="gz-poll-msg">Counting the votes…</p></div>' +
+      '<p class="gz-fine">The week runs Monday 16 November, 00:00 UTC, to Sunday 22 November, 23:59 UTC. The champion is whoever ends the week alone at #1, with Discord: a tie at the top has no winner. Prizes are paid by the host, like the faucet.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-wpgo">Open Pepe Guesser →</button><a class="app-btn" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(xText) + '">Tell your frens on X</a></div></section>' +
+      '<section class="gz-wp"><p class="gz-kick">Last night in the party room</p><h4>The first PEPaint night</h4>' +
+      '<div class="gz-wpbox"><img src="img/hug.webp" alt="Two frogs hugging" width="110" height="110"><div>' +
+      '<p>Yesterday the first PEPaint test night took place: frogs drew, frogs guessed, and some drawings will haunt us for a long time. <b>Thank you to everyone who joined!</b> Every round showed us something to fix, and the fixes are already in.</p>' +
+      '<p>New since then: on a phone the chat sits right under the canvas, open tables show up in the Pond Bulletin, and the host can let <b>whoever volunteers</b> draw next.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-paint">Open PEPaint →</button><button type="button" class="app-btn gz-lan">Find frens in LAN Party →</button></div></section>' +
+      '<section class="gz-soon"><p class="gz-kick">Monday 16 November, 00:00 UTC</p><h4>Tomorrow, everything starts</h4>' +
+      '<p>This is it. The bell rings at midnight UTC and the whole pond goes live at once:</p>' +
+      '<ul><li>🛂 <b>Stamps start counting</b>, for everyone from zero. 52 achievements to collect in your Fren Passport.</li>' +
+      '<li>🔍 <b>19 secrets</b> hidden around the pond. No list, no hints. Poke at things. Read the fine print. Stay up late.</li>' +
+      '<li>🖼️ <b>Pepe Guesser week 1</b>: one photo a day, 2 minutes, one pin, and the double prize above.</li>' +
+      '<li>👑 <b>Days at #1, Pond Dominator and the Hall of Fame</b> open their books.</li>' +
+      '<li>⚔️ <b>Pond King and Three Lilies</b>: the longest reigns and the best streaks go on the record.</li></ul>' +
+      '<p>Last call for 🏅 <b>Pond Pioneer</b>: log in with Discord before <b>tonight, 23:59 CET</b>. After that, it is gone for good.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-pass">Open your Fren Passport →</button><a class="app-btn" target="_blank" rel="noopener" href="https://discord.gg/pepecoin">Join the Discord</a></div></section>' +
+      '<p class="gz-foot">Sleep well tonight. Tomorrow we play. 🐸 The Editor</p></article>';
+  }
   function gazette8() {
     var xText = '🐸 PondOS: a little internet for frogs. Daily Pepe Guesser, a Fren Passport full of stamps, games and free PEP. The first Frog of the Week is crowned 23 November.\nhttps://pepecoinhub.com/meme/';
     return '<article class="gazette"><header><p class="gz-top"><span>Issue #8</span><span>Price: 0 PEP</span><span>Weekend edition</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
@@ -4133,7 +4162,8 @@
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
         // one compact row of tabs: the letter form, then the Gazette issues by number (newest first)
         '<li><button type="button" data-v="write" title="Ideas, bugs, wishes, notices">✏️ Letter to the Editor</button></li>' +
-        '<li><button type="button" data-v="gz" title="The Pond Gazette #8: the week 1 poll" aria-label="The Pond Gazette #8">📰 #8</button></li>' +
+        '<li><button type="button" data-v="gz" title="The Pond Gazette #9: week 1 pays double" aria-label="The Pond Gazette #9">📰 #9</button></li>' +
+        '<li><button type="button" data-v="gz8" title="The Pond Gazette #8 (archive): the week 1 poll" aria-label="The Pond Gazette #8">#8</button></li>' +
         '<li><button type="button" data-v="gz7" title="The Pond Gazette #7 (archive): the Pond goes BETA" aria-label="The Pond Gazette #7">#7</button></li>' +
         '<li><button type="button" data-v="gz6" title="The Pond Gazette #6 (archive): X unblocked us, the first faucet payout, 1 km" aria-label="The Pond Gazette #6">#6</button></li>' +
         '<li><button type="button" data-v="gz5" title="The Pond Gazette #5 (archive): the lockout, CoinEx and the first Pond Poll" aria-label="The Pond Gazette #5">#5</button></li>' +
@@ -4154,8 +4184,8 @@
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
         if (v === 'write') return writeLetter(pane);
         if (v === 'box') return letterInbox(pane, paintOwner);
-        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : v === 'gz6' ? 6 : v === 'gz7' ? 7 : 8;
-        pane.innerHTML = issue === 8 ? gazette8() : issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : v === 'gz6' ? 6 : v === 'gz7' ? 7 : v === 'gz8' ? 8 : 9;
+        pane.innerHTML = issue === 9 ? gazette9() : issue === 8 ? gazette8() : issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
@@ -4204,6 +4234,7 @@
         on('.gz-fren', function () { avatarMaker(); });
         on('.gz-betaad', function () { adPlayer(Math.max(0, adByFile('pond_beta.mpg'))); });
         on('.gz-lan', function () { lanParty(); });
+        on('.gz-paint', function () { drawGuess(); });
         on('.gz-wpgo', wheresPepe);
         on('.gz-wpad', function () { adPlayer(Math.max(0, adByFile('pepe_guesser.mpg'))); });
         on('.gz-tv', function () { adPlayer(Math.max(0, adByFile('host_wanted.mpg'))); });
