@@ -17,6 +17,14 @@ Pliki do skopiowania (na telefonie: otwórz link, przytrzymaj tekst → Zaznacz 
 
 (Po zmergowaniu do `main` w linkach zamień `ccr-a69f4b09-802tqu` na `main`.)
 
+**Telefon ucina długi tekst?** Te same pliki pocięte na kawałki po ok. 6 KB:
+
+- SQL (każdy osobno: wklej → Run, **po kolei**, wszystkie mają być bez błędu; można powtórzyć): [01](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/sql-01.sql), [02](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/sql-02.sql), [03](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/sql-03.sql), [04](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/sql-04.sql), [05](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/sql-05.sql), [06](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/sql-06.sql), [07](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/sql-07.sql), [08](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/sql-08.sql)
+- Funkcja Edge (w edytorze: usuń domyślny kod, wklej 01, potem każdy kolejny **na sam koniec**; ostatnia linia całości to `});`): [01](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/edge-01.txt), [02](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/edge-02.txt), [03](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/edge-03.txt), [04](https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/phone/edge-04.txt)
+
+Kawałki SQL dają dokładnie ten sam schemat co `0_install.sql` (sprawdzone na PostgreSQL 17); sklejone kawałki Edge są identyczne z `haze-wallet-dashboard.ts`.
+
+
 ## A. Bez portfela Haze — można zrobić od razu z telefonu
 
 1. **Instalacja SQL** — supabase.com → projekt → SQL Editor → New query → wklej `0_install.sql` → Run.
