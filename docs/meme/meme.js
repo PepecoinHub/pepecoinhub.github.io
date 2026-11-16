@@ -1763,18 +1763,16 @@
     var fr = A.body.querySelector('iframe'); if (q && fr && fr.getAttribute('src') !== src) fr.setAttribute('src', src);
     return A;
   }
-  // HAZE WALLET: the Haze web wallet (hazewallet.com) in a PondOS window. It runs in its own iframe on
-  // hazewallet.com, so keys, seed and balance never touch this page. No third-party script is loaded here.
-  var HAZE = 'https://hazewallet.com';
+  // HAZE WALLET: a desktop shortcut, not an embedded wallet. PondOS never asks for a seed phrase or a password,
+  // so no wallet screen is ever drawn inside it: the shortcut opens hazewallet.com in its own tab, where the
+  // address bar shows whose page it is.
+  var HAZE = 'https://hazewallet.com/';
   function hazeApp() {
-    return openApp('haze', 'Haze Wallet', 'zipper', function (A) {
-      A.body.innerHTML = '<div class="win-menu haze-menu"><button type="button" class="btn haze-pop">Open in new window\u2026</button><a class="btn" href="wallets.html">About wallets</a></div>' +
-        '<iframe class="app-frame haze-frame" src="' + HAZE + '/widget.html" title="Haze Wallet" referrerpolicy="no-referrer" allow="clipboard-write"></iframe>' +
-        '<div class="win-status haze-status"><span>\uD83D\uDD12 hazewallet.com</span><span>Your keys stay in Haze, not in PondOS</span></div>';
-      var f = A.body.querySelector('iframe');
-      f.addEventListener('load', function () { try { f.contentWindow.postMessage({ type: 'haze:open' }, HAZE); } catch (e) {} });
-      A.body.querySelector('.haze-pop').addEventListener('click', function () { window.open(HAZE + '/widget.html?standalone=1', '_blank', 'noopener,noreferrer'); });
-    }, 420);
+    osDialog('Haze Wallet.lnk - Properties', '<div class="dlg-row"><img src="' + ico('zipper') + '" alt="" width="64" height="64"><div>' +
+      '<h3>Haze Wallet</h3><p>A self-custody wallet for PEP, DOGE, BTC and LTC, made by the Haze team, not by Pepecoin Hub.</p>' +
+      '<p><b>Target:</b> <code>' + HAZE + '</code><br>It opens in a new tab. Check that the address bar says <b>hazewallet.com</b> before you type anything.</p>' +
+      '<p class="dlg-warn">PondOS never asks for a seed phrase or a password. Any window inside PondOS that does is fake: close it.</p></div></div>',
+      [{ label: 'Open hazewallet.com', go: true, fn: function () { window.open(HAZE, '_blank', 'noopener,noreferrer'); } }, { label: 'About wallets', href: 'wallets.html' }, { label: 'Cancel' }], 'zipper');
   }
   // POND BULLETIN (games/bulletin.html): open challenges and pond news, public metadata only
   function bulletinApp() {
@@ -1948,7 +1946,7 @@
       ['AddressCheck.exe', 'Is this a real PEP address?', 'pepe-search', 'address check scam verify checksum wallet', addressCheck],
       ['Not PEP (0x)', 'PEPE and PEPECOIN are not PEP', 'wrongpep', 'pepe pepecoin ethereum erc20 token wrong scam', act('#notpep')],
       ['Frog Mail', 'The Pond Gazette', 'frog-mail', 'mail news gazette newsletter', frogMail],
-      ['Haze Wallet', 'A PEP wallet in a window (hazewallet.com)', 'zipper', 'haze wallet send receive balance pep doge btc ltc', hazeApp],
+      ['Haze Wallet', 'Shortcut to hazewallet.com (opens a new tab)', 'zipper', 'haze wallet send receive balance pep doge btc ltc', hazeApp],
       ['Official Store', 'Official Pepecoin store', 'shop-bag', 'shop merch buy store official', act('#shop')],
       ['Discord', 'The Pepecoin Discord', 'discord', 'discord chat community server invite', act('#discord')],
       ['About me', 'Who builds this pond (and how to support it)', 'night-shift', 'about me byl author tip donate support', aboutMe],

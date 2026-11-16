@@ -2133,8 +2133,5 @@ footer.foot a { color: #edf3e3; }
 /* the frog flying from the PEPEGOCHI.EXE window to the taskbar */
 .pg-companion-fly { position: fixed; z-index: 98960; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }
 
-/* Haze Wallet window: menu row, the wallet frame, a status bar */
-.haze-menu { gap: 4px; }
-.haze-menu .btn { font-size: 12px; padding: 2px 8px; text-decoration: none; }
-.app-win .haze-frame { height: min(calc(100vh - 190px), 640px); height: min(calc(100dvh - 190px), 640px); }
-.haze-status { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; }
+/* Haze Wallet shortcut dialog */
+.dlg-warn { padding: 4px 6px; border: 1px solid var(--chrome-lo); background: #ffffe1; color: #000; }
