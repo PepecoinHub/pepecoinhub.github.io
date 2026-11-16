@@ -1,0 +1,2 @@
+# Unified diff context preserves original whitespace, including blank lines.
+haze-wallet-tipping.patch -whitespace

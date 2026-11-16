@@ -4888,6 +4888,19 @@
       var stEl = A.body.querySelector('.lan-st'), hostTag = A.body.querySelector('.lan-host-tag'), alertsBtn = A.body.querySelector('.lan-alerts');
       var canMod = false, who = null, whoT = 0;
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
+      var hazeTips = null;
+      import(BASE + 'games/js/haze-tips.mjs?v=20261115haze').then(function (m) {
+        if (!alive) return;
+        hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp,
+          invoke: function (body) {
+            var s = anySession();
+            if (!s) return Promise.reject(new Error('Sign in with Discord first.'));
+            return fetch(SB_URL + '/functions/v1/haze-wallet', { method: 'POST',
+              headers: { apikey: SB_KEY, Authorization: 'Bearer ' + s.access_token, 'Content-Type': 'application/json' },
+              body: JSON.stringify(body) }).then(function (r) { return r.json().then(function (d) { if (!r.ok || d.error) throw new Error(d.error || 'The tip could not be checked.'); return d; }); });
+          } });
+        if (hazeTips) { hazeTips.mount(A.body.querySelector('.lan-top')); Object.keys(seen).forEach(function (id) { hazeTips.bindMessage(seen[id], seen[id]._m); }); hazeTips.sync(); }
+      }).catch(function () { /* Tipping must never interrupt the ordinary chat. */ });
       var alertMode = 'all';
       try { alertMode = localStorage.getItem(LAN_ALERTS) || 'all'; } catch (e) {}
       if (['all', 'mentions', 'mute'].indexOf(alertMode) < 0) alertMode = 'all';
@@ -5143,6 +5156,7 @@
             if (!initial && (isMinimized() || document.hidden) && !mine &&
                 (alertMode === 'all' || alertMode === 'mentions' && mentioned)) unread++;
             row._m = m;
+            if (hazeTips) hazeTips.bindMessage(row, m);
             if (mentioned) {
               row.classList.add('lan-me');
               if (!initial) {
@@ -5155,6 +5169,7 @@
           });
           if (!isMinimized() && !document.hidden) unread = 0;
           paintUnread();
+          if (hazeTips) hazeTips.sync();
           if (!log.children.length) log.innerHTML = '<p class="bin-tip">No messages in the last 24 hours. Say gm!</p>';
           if (atBottom || r.messages && r.messages.length) log.scrollTop = log.scrollHeight;
           if (initial || noWhoRpc && r.messages && r.messages.length) loadWho();
@@ -5172,11 +5187,13 @@
         if (id) want = Math.max(want, id); else force = true;
         if (!ringT) ringT = setTimeout(function () { ringT = 0; if (alive && (force || want > last)) { force = false; poll(); } }, 300 + Math.random() * 700);
       };
-      var stopBell = lobbyBell(function (ev, p) { ring(ev === 'new' ? Number(p && p.id) || 0 : 0); },
+      var stopBell = lobbyBell(function (ev, p) { if (ev === 'tip' && hazeTips) hazeTips.invalidate(); ring(ev === 'new' ? Number(p && p.id) || 0 : 0); },
         function (ok) { var was = live; live = ok; if (ok && !was) ring(); else if (!ok && was && alive) poll(); });
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         var t = inp.value.trim(); if (!t) return;
+        var tip = hazeTips && hazeTips.command(t);   // /tip opens the Haze tip dialog; nothing is posted to the chat
+        if (tip) { if (tip === 'opened') { inp.value = ''; paintNote(); } return; }
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (err) {}
         if (!nickIn.hidden) {
           nick = nickIn.value.trim();
@@ -5193,7 +5210,7 @@
       paintNote(); loadPepeEmotes().then(poll);
       // Restoring the taskbar window marks its messages as read and immediately syncs any missed events.
       A.resume = function () { if (!alive) return; unread = 0; paintUnread(); seenMentions(); poll(); };
-      A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); };
+      A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); if (hazeTips) hazeTips.destroy(); };
     }, 480);
     return A;
   }

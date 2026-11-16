@@ -4,8 +4,9 @@
 // who are not signed in. Reading and writing are open to everyone: without a sign-in a nickname goes
 // with each message (the server limits it per network); a guest or Discord sign-in keeps the same name.
 // Text and our own emotes only: the server rejects links, and the page never shows pictures from players.
-import { $, h, toast, nickStore } from './common.js?v=20261113link';
+import { $, h, toast, nickStore } from './common.js?v=20261115haze';
 import { renderBody, attachPicker } from './emotes.js';
+import {createHazeTips} from './haze-tips.mjs?v=20261115haze';
 
 // Fren Passport beta (only a browser that opened /meme/?beta=fren): a verified (Discord) name links to that
 // fren's passport in PondOS. Guests have no passport, and without the beta every name stays plain text.
@@ -27,6 +28,8 @@ export function lobbyChat(be, { openLogin }) {
   catch { visitor = crypto.randomUUID(); }
   const msgs = new Map();
   let last = 0, mod = false, timer = 0, busy = false, again = false, first = true, readyAt = 0, mutedUntil = null;
+  const haze=be.kind==='supabase'?createHazeTips({rpc:(name,args)=>be.rpc(name,args),invoke:body=>be.haze(body),session:()=>be.session(),login:openLogin,notify:text=>toast(text,'bad'),chatLog:box,chatInput:input}):null;
+  haze?.mount(panel.querySelector('.chat-rules')||panel);
   const phone = matchMedia('(max-width: 900px)');
   const watching = () => !document.hidden && (!phone.matches || panel.classList.contains('open'));
   // the doorbell: while it is connected, the chat only asks every 60 s (the "online" counter needs one call within 90 s)
@@ -41,6 +44,7 @@ export function lobbyChat(be, { openLogin }) {
       be.channel('lobby-chat', (ev, p) => {
         if (ev === 'new') ring(Number(p && p.id) || 0);
         else if (ev === 'hidden') ring();   // hidden messages come back in the "hidden" list of the next call
+        else if (ev === 'tip') { haze?.invalidate(); ring(); }
       }, () => { live = true; ring(); }, (st) => { if (st !== 'SUBSCRIBED') live = false; });
     } catch (e) { live = false; }
   }
@@ -92,6 +96,7 @@ export function lobbyChat(be, { openLogin }) {
       nameOf(m), m.verified ? h('span', { class: 'cv', title: 'Verified with Discord' }, '✓') : '', ': ',
       h('span', { class: 'cb' }, ...renderBody(m.body)));
     row._m = m;
+    haze?.bindMessage(row,m);
     if (forMe(m)) row.classList.add('cmsg-me');
     if (mod) row.append(h('span', { class: 'cmod' },
       h('button', { type: 'button', title: 'Hide this message', 'aria-label': 'Hide this message', onclick: () => act('gry_lobby_hide', { p_id: m.id }, 'Message hidden') }, '🗑'),
@@ -141,6 +146,7 @@ export function lobbyChat(be, { openLogin }) {
       else if (!box.querySelector('.cempty')) box.append(h('p', { class: 'muted small cempty' }, 'No messages in the last 24 hours. Say gm!'));
       if (first || atBottom) box.scrollTop = box.scrollHeight;
       first = false;
+      void haze?.sync();
       paintInput(); markSeen();
     } catch (e) {
       if (first) { box.textContent = ''; box.append(h('p', { class: 'muted small cempty' }, 'The chat can\'t be reached right now. Trying again…')); }
@@ -154,6 +160,8 @@ export function lobbyChat(be, { openLogin }) {
     e.preventDefault();
     const text = input.value.trim();
     if (!text || Date.now() < readyAt) return;
+    const tip = haze?.command(text);   // /tip opens the Haze tip dialog; nothing is posted to the chat
+    if (tip) { if (tip === 'opened') input.value = ''; return; }
     let nick = nickStore.get() || '';
     if (!nickIn.hidden) {
       nick = nickIn.value.trim();
@@ -189,5 +197,5 @@ export function lobbyChat(be, { openLogin }) {
   paintInput();
   poll();
   loadMe();
-  return { refresh() { paintInput(); reload(); loadMe(); } };
+  return { refresh() { paintInput(); reload(); loadMe();void haze?.refresh();haze?.invalidate(); } };
 }

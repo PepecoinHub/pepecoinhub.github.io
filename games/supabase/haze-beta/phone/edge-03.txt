@@ -1,0 +1,78 @@
+  if(!Number.isSafeInteger(tx.confirmations)||tx.confirmations<0||!Array.isArray(tx.vin)||tx.vin.length<1||tx.vin.length>20)fail('Invalid group funding or confirmations.');
+  const seen=new Set(),cache=new Map();let inputTotal=0n;
+  for(const input of tx.vin){
+    if(!isHash(input?.txid)||!Number.isSafeInteger(input.vout)||input.vout<0||input.vout>0xffffffff||seen.has(input.txid+':'+input.vout))fail('Invalid or repeated group input.');
+    seen.add(input.txid+':'+input.vout);if(!cache.has(input.txid))cache.set(input.txid,await readTx(input.txid));
+    const parent=cache.get(input.txid);if(parent?.txid!==input.txid)fail('Group funding transaction mismatch.');
+    const previous=outputs(parent,10000).find(value=>value.n===input.vout);
+    if(!previous||previous.hex!==sender)fail('Group funding did not come from the linked sender.');inputTotal+=atomic(previous.value);
+  }
+  if(inputTotal<=out.reduce((sum,value)=>sum+atomic(value.value),0n))fail('Invalid group totals.');
+  if(tx.confirmations<2)return {state:'pending',confirmations:tx.confirmations};
+  if(!isHash(tx.blockHash)||!Number.isSafeInteger(tx.blockTime)||tx.blockTime<Date.parse(intent.created_at)/1000-30||tx.blockTime>Date.parse(intent.expires_at)/1000+7200)fail('Group payment is outside its time window.');
+  if(!Number.isFinite(Date.parse(intent.created_at))||!Number.isFinite(Date.parse(intent.expires_at)))fail('Invalid group time window.');
+  return {state:'confirmed',block:tx.blockHash,time:tx.blockTime};
+}
+
+// Read-only indexer shape check for the closed beta (no verification of any tip).
+export async function preflightTransaction(tx,readTx){
+  if(!isHash(tx?.txid))fail('The indexer did not return a transaction.');
+  const out=outputs(tx,10000);
+  if(!Number.isSafeInteger(tx.confirmations)||tx.confirmations<0)fail('The indexer did not return confirmations.');
+  const input=Array.isArray(tx.vin)?tx.vin.find(value=>isHash(value?.txid)&&Number.isSafeInteger(value.vout)):null;
+  let prevout=null;
+  if(input){
+    const parent=await readTx(input.txid);
+    if(parent?.txid!==input.txid)fail('The indexer returned the wrong funding transaction.');
+    const previous=outputs(parent,10000).find(value=>value.n===input.vout);
+    if(!previous)fail('The indexer did not return the funding output.');
+    prevout={txid:input.txid,vout:input.vout,value:previous.value,hex_bytes:previous.hex.length/2};
+  }
+  return {txid:tx.txid,outputs:out.length,confirmations:tx.confirmations,block_ok:tx.confirmations<1||isHash(tx.blockHash)&&Number.isSafeInteger(tx.blockTime),prevout};
+}
+
+// From a Blockbook v2 block, the first transaction that spends a previous output (skips the coinbase).
+export function pickSpendingTxid(block){
+  const tx=Array.isArray(block?.txs)?block.txs.find(value=>isHash(value?.txid)&&Array.isArray(value.vin)&&value.vin.some(input=>isHash(input?.txid))):null;
+  return tx?tx.txid:null;
+}
+
+// ---- handler.mjs ----
+// HAZE_ACCESS: 'all' opens the function to every Discord account; otherwise a comma-separated list of
+// Supabase user IDs (closed beta). Empty or invalid means nobody: the function fails closed.
+export function accessList(value){
+  const text=String(value||'').trim();if(text==='all')return ()=>true;
+  const ids=new Set(text.split(',').map(x=>x.trim().toLowerCase()).filter(x=>isUUID(x)));
+  return id=>ids.has(String(id||'').toLowerCase());
+}
+const ORIGIN='https://pepecoinhub.com';
+const headers={'Access-Control-Allow-Origin':ORIGIN,'Access-Control-Allow-Headers':'authorization,apikey,content-type,x-client-info','Access-Control-Allow-Methods':'POST,OPTIONS','Vary':'Origin','Cache-Control':'no-store','Content-Type':'application/json'};
+const json=(status,value)=>new Response(JSON.stringify(value),{status,headers});
+export async function boundedJSON(body,limit=16384) {
+  if(!body) throw Error('Missing body.');
+  const reader=body.getReader();let size=0;const chunks=[];
+  try {for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>limit)throw Error('Request too large.');chunks.push(value);}}
+  finally {await reader.cancel().catch(()=>{});}
+  const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
+  return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
+}
+export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,findRecentTx,allowed=()=>false,now=()=>Date.now()}) {
+  if(req.headers.get('origin')!==ORIGIN)return json(403,{error:'This integration is for PepecoinHub.'});
+  if(req.method==='OPTIONS')return new Response(null,{status:204,headers});
+  if(req.method!=='POST')return json(405,{error:'POST required.'});
+  const token=/^Bearer ([A-Za-z0-9._-]{16,8192})$/.exec(req.headers.get('authorization')||'')?.[1];
+  if(!token)return json(401,{error:'Sign in with Discord first.'});
+  let user;
+  try {user=await authenticate(token);}catch{return json(401,{error:'Sign in again to continue.'});}
+  if(!user||user.is_anonymous||!user.identities?.some(identity=>identity.provider==='discord'))return json(403,{error:'A Discord-linked account is required.'});
+  if(!allowed(user.id))return json(403,{error:'Haze tips are in a closed beta.'});
+  try {
+    const body=await boundedJSON(req.body);
+    if(exact(body,['action','proof'])&&body.action==='link') {
+      if(typeof body.proof?.nonce!=='string'||!/^[a-f0-9]{64}$/.test(body.proof.nonce))throw Error('Invalid wallet-link request.');
+      const challenge=await rpc('haze_link_context',{p_user:user.id,p_nonce:body.proof.nonce});
+      const address=verifyWalletProof(body.proof,challenge,now());
+      return json(200,await rpc('haze_link_finish',{p_user:user.id,p_nonce:challenge.nonce,p_address:address}));
+    }
+    // Beta preflight: proves the configured indexer answers from this Edge Function (genesis, a tx and its
+    // first funding output) in the exact shape the verifier needs. Reads only; nothing is stored.
