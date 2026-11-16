@@ -1580,18 +1580,26 @@
           A.body.querySelector('.bg-logon').addEventListener('click', function () { logOn(); });
           return;
         }
+        // open (listed in the POND BULLETIN, any fren can sit down) or private (invite link only)
+        A.body.innerHTML = '<div class="app-row bg-row">' + back + '</div><div class="bg-pick"><p>Who can sit at your table?</p>' +
+          '<button type="button" class="app-btn go" data-v="open">🌐 Open table</button> <button type="button" class="app-btn" data-v="private">🔒 Private table</button>' +
+          '<p class="bin-tip">Open: listed in the POND BULLETIN, any fren can sit down. Private: only the fren with your link.</p></div>';
+        A.body.querySelector('.bg-back').addEventListener('click', choose);
+        A.body.querySelectorAll('[data-v]').forEach(function (b) { b.addEventListener('click', function () { makeTable(b.getAttribute('data-v') === 'private'); }); });
+      };
+      var makeTable = function (priv) {
         A.body.innerHTML = '<div class="app-row bg-row">' + back + '<span class="grow bg-msg">Making your table…</span></div><div class="bg-stage"></div>';
         A.body.querySelector('.bg-back').addEventListener('click', choose);
         // no nickname first: a Discord player keeps the name on their profile (sending a nickname would rename it);
         // only a guest, whom the server asks for one, gets the nickname saved in this browser
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || localStorage.getItem('pondos-wp-nick') || ''; } catch (e) {}
-        var make = function (n) { return wpRpc('gry_table_create', { p_game: key, p_nick: n, p_private: false, p_spectators: true }); };
+        var make = function (n) { return wpRpc('gry_table_create', { p_game: key, p_nick: n, p_private: priv, p_spectators: true }); };
         make('').catch(function (err) { if (/nickname/i.test(err.message || '')) return make(nick || 'Frog'); throw err; }).then(function (code) {
           var link = 'https://pepecoinhub.com/games/table.html?t=' + encodeURIComponent(code);
           if (!phone) big(true);
           A.body.querySelector('.bg-msg').innerHTML = '<b>Send this link to your fren:</b>';
           A.body.querySelector('.bg-stage').innerHTML = '<div class="app-row bg-link"><input class="ac-in" readonly value="' + esc(link) + '" aria-label="Invite link"><button type="button" class="app-btn go bg-copy">Copy link</button></div>' +
-            '<p class="bin-tip">The game starts when your fren opens the link. Your table is also listed in the POND BULLETIN, so any fren can sit down. The board and the chat are below.</p>' + (phone ? '<a class="app-btn" href="' + osPage('table.html?t=' + encodeURIComponent(code)) + '">Open the table</a>' : frame(G + 'table.html?t=' + encodeURIComponent(code) + '&embed=1'));
+            '<p class="bin-tip">The game starts when your fren opens the link.' + (priv ? ' Private: only frens with the link can sit down.' : ' Your table is also listed in the POND BULLETIN, so any fren can sit down.') + ' The board and the chat are below.</p>' + (phone ? '<a class="app-btn" href="' + osPage('table.html?t=' + encodeURIComponent(code)) + '">Open the table</a>' : frame(G + 'table.html?t=' + encodeURIComponent(code) + '&embed=1'));
           var inp = A.body.querySelector('.bg-link input');
           A.body.querySelector('.bg-copy').addEventListener('click', function () {
             inp.select();
