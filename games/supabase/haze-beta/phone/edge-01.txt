@@ -108,3 +108,4 @@ export function authMessage(challenge, address) {
 
 export const PEP_GENESIS = '37981c0c48b8d48965376c8a42ece9a0838daadb93ff975cb091f57f8c2a5faa';
 export const isHash = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+// ==== END OF PART 1 OF 5 — next: paste part 02 at the very end ====

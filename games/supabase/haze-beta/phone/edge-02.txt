@@ -82,3 +82,4 @@ export async function verifyTipTransaction(intent,tx,readTx) {
 // Group manifests come from private SQL snapshots, never from the checking client.
 export async function verifyGroupTransaction(intent,tx,readTx){
   tx=blockbookTx(tx);readTx=reader(readTx);
+// ==== END OF PART 2 OF 5 — next: paste part 03 at the very end ====

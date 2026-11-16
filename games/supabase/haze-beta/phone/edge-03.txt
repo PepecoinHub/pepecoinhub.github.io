@@ -75,3 +75,4 @@ export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,findRe
   if(req.headers.get('origin')!==ORIGIN)return json(403,{error:'This integration is for PepecoinHub.'});
   if(req.method==='OPTIONS')return new Response(null,{status:204,headers});
   if(req.method!=='POST')return json(405,{error:'POST required.'});
+// ==== END OF PART 3 OF 5 — next: paste part 04 at the very end ====
