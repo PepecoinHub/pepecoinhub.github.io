@@ -1585,13 +1585,13 @@
         // no nickname first: a Discord player keeps the name on their profile (sending a nickname would rename it);
         // only a guest, whom the server asks for one, gets the nickname saved in this browser
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || localStorage.getItem('pondos-wp-nick') || ''; } catch (e) {}
-        var make = function (n) { return wpRpc('gry_table_create', { p_game: key, p_nick: n, p_private: true, p_spectators: true }); };
+        var make = function (n) { return wpRpc('gry_table_create', { p_game: key, p_nick: n, p_private: false, p_spectators: true }); };
         make('').catch(function (err) { if (/nickname/i.test(err.message || '')) return make(nick || 'Frog'); throw err; }).then(function (code) {
           var link = 'https://pepecoinhub.com/games/table.html?t=' + encodeURIComponent(code);
           if (!phone) big(true);
           A.body.querySelector('.bg-msg').innerHTML = '<b>Send this link to your fren:</b>';
           A.body.querySelector('.bg-stage').innerHTML = '<div class="app-row bg-link"><input class="ac-in" readonly value="' + esc(link) + '" aria-label="Invite link"><button type="button" class="app-btn go bg-copy">Copy link</button></div>' +
-            '<p class="bin-tip">The game starts when your fren opens the link. The board and the chat are below.</p>' + (phone ? '<a class="app-btn" href="' + osPage('table.html?t=' + encodeURIComponent(code)) + '">Open the table</a>' : frame(G + 'table.html?t=' + encodeURIComponent(code) + '&embed=1'));
+            '<p class="bin-tip">The game starts when your fren opens the link. Your table is also listed in the POND BULLETIN, so any fren can sit down. The board and the chat are below.</p>' + (phone ? '<a class="app-btn" href="' + osPage('table.html?t=' + encodeURIComponent(code)) + '">Open the table</a>' : frame(G + 'table.html?t=' + encodeURIComponent(code) + '&embed=1'));
           var inp = A.body.querySelector('.bg-link input');
           A.body.querySelector('.bg-copy').addEventListener('click', function () {
             inp.select();
