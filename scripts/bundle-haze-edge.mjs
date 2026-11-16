@@ -49,7 +49,11 @@ const phone=name=>new URL('../games/supabase/haze-beta/phone/'+name,import.meta.
 const pad=n=>String(n).padStart(2,'0');
 const files=[[out,bundle],[sqlOut,sql],
   ...sqlParts.map((part,i)=>[phone('sql-'+pad(i+1)+'.sql'),'-- Haze install, part '+(i+1)+' of '+sqlParts.length+'. Run the parts IN ORDER (01, 02, ...). Repeatable.\nbegin;\n'+part.join('\n')+'\ncommit;\n']),
-  ...edgeParts.map((part,i)=>[phone('edge-'+pad(i+1)+'.txt'),part.join('\n')+(i<edgeParts.length-1?'\n':'')])];
+  // Each part ends with a marker comment (parts split only between lines, so a comment line is always safe):
+  // the person pasting sees how many parts exist and whether the clipboard kept the whole part.
+  ...edgeParts.map((part,i)=>[phone('edge-'+pad(i+1)+'.txt'),part.join('\n')+'\n'+(i<edgeParts.length-1
+    ?'// ==== END OF PART '+(i+1)+' OF '+edgeParts.length+' — next: paste part '+pad(i+2)+' at the very end ====\n'
+    :'// ==== END OF PART '+(i+1)+' OF '+edgeParts.length+' — complete file, now Deploy ====\n')])];
 const stale=fs.existsSync(phone(''))?fs.readdirSync(phone('')).filter(name=>!files.some(([file])=>file.pathname===phone(name).pathname)):[];
 if(process.argv.includes('--check')){
   for(const [file,text] of files)if(!fs.existsSync(file)||fs.readFileSync(file,'utf8')!==text){console.error(file.pathname+' is stale: run node scripts/bundle-haze-edge.mjs');process.exit(1);}

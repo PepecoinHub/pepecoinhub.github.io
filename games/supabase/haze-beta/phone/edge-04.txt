@@ -70,3 +70,4 @@ Deno.serve((req:Request)=>{
       let status;try{status=await requestRead(indexer!.href+'api/v2/');}catch{status=await requestRead(indexer!.href+'api/');}
       const best=status?.blockbook?.bestHeight;
       if(!Number.isSafeInteger(best)||best<1)throw Error('The indexer did not report its best height.');
+// ==== END OF PART 4 OF 5 — next: paste part 05 at the very end ====
