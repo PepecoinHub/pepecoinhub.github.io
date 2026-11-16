@@ -30,6 +30,26 @@ const server = http.createServer((req, res) => {
  await page.getByRole('button',{name:'Our memories',exact:true}).click();
  assert.match(await page.locator('.pg-conversation').textContent(),/12 care days/);
  await page.keyboard.press('Escape');assert.equal(await page.locator('.pg-conversation').count(),0);
+ // Actual expression frames play once and restore state; no CSS-only stand-ins.
+ const frame = name => page.waitForFunction(n=>document.querySelector('.pg-companion-button img').src.includes('/tb_'+n+'_'),name);
+ await frog.focus();await page.keyboard.press('Enter');await frame('curious');
+ await page.getByRole('button',{name:'Pet me',exact:true}).click();await frame('nuzzle');
+ await page.getByRole('button',{name:"Let's play!",exact:true}).click();await frame('welcome');
+ for(let i=0;i<4;i++)await page.getByRole('button',{name:'Pet me',exact:true}).click();await frame('sulk');
+ await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('/tb_adult_sit.png'));
+ await page.keyboard.press('Escape');
+ await page.evaluate(()=>{t.time+=46000;t.pet.needs.energy=20;t.refresh();});
+ await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('/tb_adult_sleepy.png'));
+ await frog.focus();await page.keyboard.press('Enter');await frame('yawn');
+ await page.evaluate(()=>{t.pet.needs.hunger=10;t.refresh();});
+ await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('/tb_adult_hungry.png'));
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.evaluate(()=>{t.pet.needs.hunger=90;t.pet.needs.energy=90;t.refresh();});
+ await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('/tb_adult_sit.png'));
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pet me',exact:true}).click();
+ assert.ok(!(await frog.locator('img').getAttribute('src')).includes('/anim/'));
+ await page.keyboard.press('Escape');await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.evaluate(()=>t.time+=31000);
  // Familiar pats require separated interactions, not rapid button farming.
  for(let i=0;i<4;i++) {await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pet me',exact:true}).click();await page.evaluate(()=>t.time+=31000);await page.keyboard.press('Escape');}
  await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pet me',exact:true}).click();
@@ -79,5 +99,5 @@ const server = http.createServer((req, res) => {
  await touch.getByRole('button',{name:'Pet me',exact:true}).tap();
  assert.match(await touch.locator('.pg-conversation .pg-fact-q').textContent(),/Hehe|acceptable|useful mouse/);
  await touch.close();
- assert.deepEqual(errors,[]);console.log('PASS: keyboard, memories, familiar pats, care, focus, throttle, mute/reload, account isolation, double-click, 320/390/1440px, reduced motion and disposal');
+ assert.deepEqual(errors,[]);console.log('PASS: five expression sequences, state restoration, interruption, reduced motion, keyboard, memories, familiar pats, care, focus, throttle, mute/reload, account isolation, double-click, 320/390/1440px, reduced motion and disposal');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server.close();});

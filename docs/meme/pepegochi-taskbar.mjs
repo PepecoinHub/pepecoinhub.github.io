@@ -4,9 +4,11 @@
 // and the hop out of the PEPEGOCHI.EXE window.
 import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261115a10';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261116bond1';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261116anim1';
 
-import { createBond } from './pepegochi-bond.mjs?v=20261116bond1';
+import { createBond } from './pepegochi-bond.mjs?v=20261116anim1';
+
+import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261116anim1';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
 const NEEDS = new Set(['hunger', 'hygiene', 'mood', 'energy']);
@@ -140,7 +142,11 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   place();
   requestAnimationFrame(place);
   window.addEventListener('resize', place);
+  let lastCurious = -Infinity;
   button.addEventListener('pointerenter', () => {
+    if (!act && !EXPRESSIONS[movement] && now() - lastCurious > 12000 && expressionFor(shownView, 'hover')) {
+      lastCurious = now(); if (animateExpression('hover')) return;
+    }
     if (!act && shownView?.sprite === pose('tb_adult_sit')) { cancelMotion(); setAct('tb_adult_wave'); }
   });
   button.addEventListener('pointerleave', () => { if (act === 'tb_adult_wave') { setAct(null); queueMotion(); } });
@@ -150,13 +156,14 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const motions = {
     egg: ['wobble', 'bob'], tadpole: ['bob', 'peek'], froglet: ['hop', 'peek', 'shuffle'],
-    adult: ['hop', 'peek', 'shuffle', 'greet', 'bob'], sleepy: ['nod', 'bob'],
+    adult: ['hop', 'peek', 'shuffle', 'greet', 'bob'], sleepy: ['nod', 'yawn', 'bob'],
     neglected: ['slouch', 'peek'], packing: ['tremble', 'shuffle'],
     recovering: ['nod', 'bob'], letter: [],
   };
   let currentMood = 'egg', movement = null, motionTimer = null, restoreTimer = null;
   let frameTimer = null;
   function cancelMotion() {
+    expressionTicket++;
     if (motionTimer) clearTimeout(motionTimer);
     if (restoreTimer) clearTimeout(restoreTimer);
     if (frameTimer) clearTimeout(frameTimer);
@@ -170,12 +177,14 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   function playMotion(name) {
     if (movement) button.classList.remove('pg-motion-' + movement);
     movement = name;
-    const a = ANIMS[name];
+    const a = ANIMS[name] || EXPRESSIONS[name];
+    if (name === 'welcome') button.classList.add('pg-motion-welcome');
     if (a && showing(a.base)) {
       // the drawn frames, then the state pose again
-      const frames = animFrames(name);
+      const frames = EXPRESSIONS[name] ? expressionFrames(name) : animFrames(name);
       let i = 0;
       const step = () => {
+        if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected || !showing(a.base)) { cancelMotion(); return; }
         if (i < frames.length) { img.setAttribute('src', img_base + frames[i++] + '?v=' + POSE_VERSION); frameTimer = setTimeout(step, a.ms); }
         else { frameTimer = null; paint(shownView); restoreTimer = setTimeout(queueMotion, 50); }
       };
@@ -188,9 +197,26 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   // load the frames of the next animation while waiting, so it never flickers
   const preloaded = new Set();
   function preload(name) {
-    if (!ANIMS[name] || preloaded.has(name)) return;
+    if ((!ANIMS[name] && !EXPRESSIONS[name]) || preloaded.has(name)) return;
     preloaded.add(name);
-    for (const f of animFrames(name)) { const i = new Image(); i.src = img_base + f + '?v=' + POSE_VERSION; }
+    for (const f of (EXPRESSIONS[name] ? expressionFrames(name) : animFrames(name))) { const i = new Image(); i.src = img_base + f + '?v=' + POSE_VERSION; }
+  }
+  let expressionTicket = 0;
+  function animateExpression(action) {
+    const name = expressionFor(shownView, action);
+    if (!name || reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return false;
+    cancelMotion(); setAct(null);
+    const ticket = ++expressionTicket;
+    const life = lastLife;
+    Promise.all([...new Set(expressionFrames(name))].map(f => new Promise(resolve => {
+      const frame = new Image(); frame.onload = () => resolve(true); frame.onerror = () => resolve(false);
+      frame.src = img_base + f + '?v=' + POSE_VERSION;
+    }))).then(loaded => {
+      if (ticket !== expressionTicket || disposed || life !== lastLife || reduced.matches ||
+          document.visibilityState !== 'visible' || !slot.isConnected || expressionFor(shownView, action) !== name) return;
+      if (loaded.every(Boolean)) playMotion(name); else queueMotion();
+    });
+    return true;
   }
   function queueMotion() {
     cancelMotion();
@@ -198,7 +224,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     const choices = motions[currentMood] || motions.adult;
     if (!choices.length) return;
     const next = choices[Math.floor(Math.random() * choices.length)];
-    if (shownView && ANIMS[next] && showing(ANIMS[next].base)) preload(next);
+    const nextAnim = ANIMS[next] || EXPRESSIONS[next];
+    if (shownView && nextAnim && showing(nextAnim.base)) preload(next);
     motionTimer = setTimeout(() => {
       motionTimer = null;
       if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return;
@@ -439,7 +466,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   window.addEventListener('pondos:pepegochi-left', onLeftWindow);
   document.addEventListener('visibilitychange', onVisible);
   conversation = mountFrogInteractions({ button, img, slot, getView: () => shownView,
-    setPose: p => { cancelMotion(); setAct(p); if (!p) queueMotion(); }, openRoom: open,
+    setPose: p => { cancelMotion(); setAct(p); if (!p) queueMotion(); }, animate: animateExpression, openRoom: open,
     closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
     openQuiz: requestQuiz, bond, canReact: () => !balloon &&
       document.activeElement?.tagName !== 'IFRAME', now });

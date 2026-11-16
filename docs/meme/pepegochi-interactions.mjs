@@ -52,7 +52,7 @@ export function companionReply(view, action = 'hello', n = 0) {
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
 // No polling or network calls. Optional bond stores cosmetic memories only.
-export function mountFrogInteractions({ button, img, slot, getView, setPose, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, now = () => Date.now() }) {
+export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, now = () => Date.now() }) {
   let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
   let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
   const doc = button.ownerDocument;
@@ -78,6 +78,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ope
     notice.style.left = Math.max(8, Math.min(rect.left, win.innerWidth - 376)) + 'px';
     doc.body.append(notice);
     noticeTimer = win.setTimeout(clearNotice, 6000);
+    animate(action);
   }
   function cancelClick() { if (clickTimer !== null) { win.clearTimeout(clickTimer); clickTimer = null; } }
   function reposition() {
@@ -92,7 +93,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ope
     cancelClick(); clearNotice();
     if (reset) { lastReaction = lastPet = -Infinity; pats = []; }
     if (reset) { recent = []; sequence = 0; gesture = null; suppressClick = false; }
-    if (!panel) return;
+    if (!panel) { setPose(null); return; }
     panel.remove(); panel = null; reply = null;
     setPose(null);
     button.setAttribute('aria-expanded', 'false');
@@ -155,6 +156,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ope
     }
     reply.textContent = r.text;
     setPose(r.pose);
+    animate(action);
     reposition();
     if (fresh) panel.querySelector('.pg-fact-x')?.focus();
   }

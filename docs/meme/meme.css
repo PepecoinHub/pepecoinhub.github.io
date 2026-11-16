@@ -2132,3 +2132,8 @@ footer.foot a { color: #edf3e3; }
 .pg-fact-board li { display: flex; justify-content: space-between; gap: 8px; }
 /* the frog flying from the PEPEGOCHI.EXE window to the taskbar */
 .pg-companion-fly { position: fixed; z-index: 98960; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }
+
+/* A10 greeting: a single whole-pixel hop; frame animation supplies the wave. */
+.pg-motion-welcome { animation: pgc-welcome 910ms steps(1, end) 1; }
+@keyframes pgc-welcome { 0%, 100% { transform: translateY(0); } 20% { transform: translateY(-2px); } 40% { transform: translateY(-4px); } 65% { transform: translateY(-2px); } 85% { transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .pg-motion-welcome { animation: none; } }
