@@ -807,9 +807,14 @@
     if (trayEl) {
       var peek = el('button', { type: 'button', class: 'show-desk', title: 'Show desktop', 'aria-pressed': 'false' }, '<span class="sr">Show desktop</span>');
       var hiddenByPeek = [];
+      // it hides the page's own windows and the app windows (Frog Mail, games…); a second click brings back
+      // only the ones it hid. If they were all brought back by hand meanwhile, the click hides them again.
+      var peekIsMin = function (w) { return w.restore ? w.host.classList.contains('is-min') && document.body.contains(w.host) : w.state === 'min'; };
       peek.addEventListener('click', function () {
-        if (hiddenByPeek.length) { hiddenByPeek.forEach(function (w) { if (w.state === 'min') setState(w, 'open'); }); hiddenByPeek = []; peek.setAttribute('aria-pressed', 'false'); root.classList.remove('desk-view'); return; }
+        var back = hiddenByPeek.filter(peekIsMin); hiddenByPeek = [];
+        if (back.length) { back.forEach(function (w) { if (w.restore) w.restore(); else setState(w, 'open'); }); peek.setAttribute('aria-pressed', 'false'); root.classList.remove('desk-view'); return; }
         wins.forEach(function (w) { if (w.state === 'open' && !w.host.closest('[hidden]')) { hiddenByPeek.push(w); setState(w, 'min'); } });
+        Object.keys(apps).forEach(function (id) { var A = apps[id], m = A.host.querySelector('.w-min'); if (m && !A.host.classList.contains('is-min')) { hiddenByPeek.push(A); m.click(); } });
         peek.setAttribute('aria-pressed', 'true');
         root.classList.add('desk-view');   // the desktop icons show on every page, also on a phone
         window.scrollTo(0, 0);
@@ -2054,7 +2059,7 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261111launch';
+  var PP_CATALOG = 'passport-catalog.json?v=20261116bughunter';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
       document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261115king'}));
