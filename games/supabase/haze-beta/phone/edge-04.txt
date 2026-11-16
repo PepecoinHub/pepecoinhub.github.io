@@ -1,3 +1,19 @@
+  const token=/^Bearer ([A-Za-z0-9._-]{16,8192})$/.exec(req.headers.get('authorization')||'')?.[1];
+  if(!token)return json(401,{error:'Sign in with Discord first.'});
+  let user;
+  try {user=await authenticate(token);}catch{return json(401,{error:'Sign in again to continue.'});}
+  if(!user||user.is_anonymous||!user.identities?.some(identity=>identity.provider==='discord'))return json(403,{error:'A Discord-linked account is required.'});
+  if(!allowed(user.id))return json(403,{error:'Haze tips are in a closed beta.'});
+  try {
+    const body=await boundedJSON(req.body);
+    if(exact(body,['action','proof'])&&body.action==='link') {
+      if(typeof body.proof?.nonce!=='string'||!/^[a-f0-9]{64}$/.test(body.proof.nonce))throw Error('Invalid wallet-link request.');
+      const challenge=await rpc('haze_link_context',{p_user:user.id,p_nonce:body.proof.nonce});
+      const address=verifyWalletProof(body.proof,challenge,now());
+      return json(200,await rpc('haze_link_finish',{p_user:user.id,p_nonce:challenge.nonce,p_address:address}));
+    }
+    // Beta preflight: proves the configured indexer answers from this Edge Function (genesis, a tx and its
+    // first funding output) in the exact shape the verifier needs. Reads only; nothing is stored.
     // Without a txid (phone button) the function picks a recent ordinary transaction from the indexer itself.
     if(body?.action==='preflight'&&(exact(body,['action'])||exact(body,['action','txid']))) {
       if(body.txid!==undefined&&!isHash(body.txid))throw Error('Invalid transaction ID.');
@@ -54,8 +70,3 @@ Deno.serve((req:Request)=>{
       let status;try{status=await requestRead(indexer!.href+'api/v2/');}catch{status=await requestRead(indexer!.href+'api/');}
       const best=status?.blockbook?.bestHeight;
       if(!Number.isSafeInteger(best)||best<1)throw Error('The indexer did not report its best height.');
-      for(let height=best;height>Math.max(0,best-10);height--){const txid=pickSpendingTxid(await requestRead(indexer!.href+'api/v2/block/'+height));if(txid)return txid;}
-      return null;
-    },
-  });
-});

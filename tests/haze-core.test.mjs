@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {verifyWalletProof,verifyTipTransaction,pepScript,pickSpendingTxid} from '../games/supabase/functions/haze-wallet/core.mjs';
+import {verifyWalletProof,verifyTipTransaction,verifyGroupTransaction,preflightTransaction,blockbookTx,pepScript,pickSpendingTxid} from '../games/supabase/functions/haze-wallet/core.mjs';
 import {handleHaze,accessList} from '../games/supabase/functions/haze-wallet/handler.mjs';
 import {amountAtomic,formatAtomic,tipURL,submissionMatches,createHazeTips,hazeBeta,parseTipCommand} from '../docs/games/js/haze-tips.mjs';
 
@@ -147,4 +147,20 @@ test('a failed beta check names the step and the HTTP status of the indexer',asy
   assert.match(await error({findRecentTx:async()=>{throw http(404);}}),/"indexer recent block" \(HTTP 404/);
   assert.match(await error({readTx:async()=>{throw http(429);}}),/"indexer transaction" \(HTTP 429/);
   assert.match(await error({findRecentTx:async()=>null}),/no ordinary transaction/);
+});
+
+test('Blockbook omits zero fields (input spending output 0, 0-value output, 0 confirmations): tips still verify',async()=>{
+  // Shape seen on the production beta check, 2026-11-16: `"vin":[{"txid":…}]` with no "vout" when it is 0.
+  const bb=()=>{const t=transaction();return {...t,vin:t.vin.map(({txid})=>({txid,n:0,isAddress:true}))};};
+  const parentRead=async id=>({txid:id,vout:[{n:0,value:'2000000000',hex:pepScript(proof.address)},{n:1,hex:'6a00'}]});
+  assert.deepEqual(await verifyTipTransaction(intent,bb(),parentRead),{state:'confirmed',vout:0,block,time:bb().blockTime});
+  const group={...intent,recipients:[{address:recipient,amount:'1000000000'}],total_atomic:'1000000000'};
+  assert.equal((await verifyGroupTransaction(group,bb(),parentRead)).state,'confirmed');
+  const pre=await preflightTransaction(bb(),parentRead);assert.equal(pre.prevout.vout,0);assert.equal(pre.prevout.value,'2000000000');
+  const {confirmations,...unconfirmed}=bb();
+  assert.deepEqual(await verifyTipTransaction(intent,{...unconfirmed,blockHash:undefined,blockTime:undefined},parentRead),{state:'pending',confirmations:0});
+  // Nothing is invented beyond the zeros: an input without txid stays invalid, and a wrong funding script still fails.
+  assert.equal(blockbookTx({vin:[{coinbase:'00'}]}).vin[0].vout,undefined);
+  await assert.rejects(verifyTipTransaction(intent,bb(),async id=>({txid:id,vout:[{n:0,value:'2000000000',hex:pepScript(recipient)}]})),/did not spend from your linked/);
+  await assert.rejects(preflightTransaction({txid,confirmations:3,vout:[{n:0,value:'1',hex:'00'}],vin:[{coinbase:'00'}]},parentRead),/no funding input/);
 });
