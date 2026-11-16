@@ -5049,7 +5049,11 @@
 
       // ----- drag the bottom bar to make the chat taller or shorter (remembered in this browser)
       var grip = A.body.querySelector('.lan-grip'), stBar = A.body.querySelector('.lan-status');
-      var maxH = function () { return Math.max(180, window.innerHeight - log.getBoundingClientRect().top - (window.innerWidth <= 760 ? 210 : 150)); };
+      // --lan-h is the chat height setting; the log can be shorter than it (on a phone the open frens list takes
+      // 118px of it). Work on the setting, never on log.offsetHeight: saving the log height made every drag with the
+      // list open shrink the chat by 118px, so it "bounced back" (tester video, 2026-11-16).
+      var curH = function () { var v = parseFloat(A.body.style.getPropertyValue('--lan-h')); return v > 0 ? v : Math.min(window.innerHeight * 0.52, 420); };
+      var maxH = function () { return Math.max(180, window.innerHeight - log.getBoundingClientRect().top - (window.innerWidth <= 760 ? 210 : 150)) + Math.max(0, curH() - log.offsetHeight); };
       var setH = function (h, save) {
         h = Math.round(Math.min(Math.max(h, 140), maxH()));
         A.body.style.setProperty('--lan-h', h + 'px');
@@ -5060,15 +5064,15 @@
         if (e.button !== 0 || A.host.classList.contains('is-max')) return;
         e.preventDefault();
         A.host.style.height = '';   // a window sized from the corner goes back to following its content
-        var y0 = e.clientY, h0 = log.offsetHeight;
+        var y0 = e.clientY, h0 = curH();
         stBar.setPointerCapture(e.pointerId); stBar.classList.add('drag');
         var mv = function (ev) { setH(h0 + ev.clientY - y0); if (log.scrollHeight - log.scrollTop - log.clientHeight < 80) log.scrollTop = log.scrollHeight; };
-        var up = function () { stBar.classList.remove('drag'); setH(log.offsetHeight, true); stBar.removeEventListener('pointermove', mv); stBar.removeEventListener('pointerup', up); stBar.removeEventListener('pointercancel', up); };
+        var up = function () { stBar.classList.remove('drag'); setH(curH(), true); stBar.removeEventListener('pointermove', mv); stBar.removeEventListener('pointerup', up); stBar.removeEventListener('pointercancel', up); };
         stBar.addEventListener('pointermove', mv); stBar.addEventListener('pointerup', up); stBar.addEventListener('pointercancel', up);
       });
       grip.addEventListener('keydown', function (e) {
         var d = e.key === 'ArrowDown' ? 40 : e.key === 'ArrowUp' ? -40 : 0; if (!d) return;
-        e.preventDefault(); setH(log.offsetHeight + d, true);
+        e.preventDefault(); setH(curH() + d, true);
       });
 
       var pop = A.body.querySelector('.emo-pop'), eb = A.body.querySelector('.emo-btn');
