@@ -1,4 +1,11 @@
-import {verifyWalletProof,verifyTipTransaction,verifyGroupTransaction,exact,isHash,isUUID,PEP_GENESIS} from './core.mjs';
+import {verifyWalletProof,verifyTipTransaction,verifyGroupTransaction,preflightTransaction,exact,isHash,isUUID,PEP_GENESIS} from './core.mjs';
+// HAZE_ACCESS: 'all' opens the function to every Discord account; otherwise a comma-separated list of
+// Supabase user IDs (closed beta). Empty or invalid means nobody: the function fails closed.
+export function accessList(value){
+  const text=String(value||'').trim();if(text==='all')return ()=>true;
+  const ids=new Set(text.split(',').map(x=>x.trim().toLowerCase()).filter(x=>isUUID(x)));
+  return id=>ids.has(String(id||'').toLowerCase());
+}
 const ORIGIN='https://pepecoinhub.com';
 const headers={'Access-Control-Allow-Origin':ORIGIN,'Access-Control-Allow-Headers':'authorization,apikey,content-type,x-client-info','Access-Control-Allow-Methods':'POST,OPTIONS','Vary':'Origin','Cache-Control':'no-store','Content-Type':'application/json'};
 const json=(status,value)=>new Response(JSON.stringify(value),{status,headers});
@@ -10,7 +17,7 @@ export async function boundedJSON(body,limit=16384) {
   const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
   return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
 }
-export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,now=()=>Date.now()}) {
+export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,allowed=()=>false,now=()=>Date.now()}) {
   if(req.headers.get('origin')!==ORIGIN)return json(403,{error:'This integration is for PepecoinHub.'});
   if(req.method==='OPTIONS')return new Response(null,{status:204,headers});
   if(req.method!=='POST')return json(405,{error:'POST required.'});
@@ -19,6 +26,7 @@ export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,now=()
   let user;
   try {user=await authenticate(token);}catch{return json(401,{error:'Sign in again to continue.'});}
   if(!user||user.is_anonymous||!user.identities?.some(identity=>identity.provider==='discord'))return json(403,{error:'A Discord-linked account is required.'});
+  if(!allowed(user.id))return json(403,{error:'Haze tips are in a closed beta.'});
   try {
     const body=await boundedJSON(req.body);
     if(exact(body,['action','proof'])&&body.action==='link') {
@@ -26,6 +34,13 @@ export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,now=()
       const challenge=await rpc('haze_link_context',{p_user:user.id,p_nonce:body.proof.nonce});
       const address=verifyWalletProof(body.proof,challenge,now());
       return json(200,await rpc('haze_link_finish',{p_user:user.id,p_nonce:challenge.nonce,p_address:address}));
+    }
+    // Beta preflight: proves the configured indexer answers from this Edge Function (genesis, a tx and its
+    // first funding output) in the exact shape the verifier needs. Reads only; nothing is stored.
+    if(exact(body,['action','txid'])&&body.action==='preflight') {
+      if(!isHash(body.txid))throw Error('Invalid transaction ID.');
+      const genesis=await readGenesis();
+      return json(200,{genesis_ok:genesis===PEP_GENESIS,...await preflightTransaction(await readTx(body.txid),readTx)});
     }
     if(!exact(body,['action','intent','txid'])||!['check','group-check'].includes(body.action)||!isUUID(body.intent)||!isHash(body.txid))throw Error('Invalid tip request.');
     const group=body.action==='group-check';

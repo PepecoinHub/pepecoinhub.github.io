@@ -104,3 +104,20 @@ export async function verifyGroupTransaction(intent,tx,readTx){
   if(!Number.isFinite(Date.parse(intent.created_at))||!Number.isFinite(Date.parse(intent.expires_at)))fail('Invalid group time window.');
   return {state:'confirmed',block:tx.blockHash,time:tx.blockTime};
 }
+
+// Read-only indexer shape check for the closed beta (no verification of any tip).
+export async function preflightTransaction(tx,readTx){
+  if(!isHash(tx?.txid))fail('The indexer did not return a transaction.');
+  const out=outputs(tx,10000);
+  if(!Number.isSafeInteger(tx.confirmations)||tx.confirmations<0)fail('The indexer did not return confirmations.');
+  const input=Array.isArray(tx.vin)?tx.vin.find(value=>isHash(value?.txid)&&Number.isSafeInteger(value.vout)):null;
+  let prevout=null;
+  if(input){
+    const parent=await readTx(input.txid);
+    if(parent?.txid!==input.txid)fail('The indexer returned the wrong funding transaction.');
+    const previous=outputs(parent,10000).find(value=>value.n===input.vout);
+    if(!previous)fail('The indexer did not return the funding output.');
+    prevout={txid:input.txid,vout:input.vout,value:previous.value,hex_bytes:previous.hex.length/2};
+  }
+  return {txid:tx.txid,outputs:out.length,confirmations:tx.confirmations,block_ok:tx.confirmations<1||isHash(tx.blockHash)&&Number.isSafeInteger(tx.blockTime),prevout};
+}

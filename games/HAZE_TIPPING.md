@@ -157,6 +157,23 @@ eligibility, one attempt, exact splits, deadline closure and global credit-once.
 the separate Haze checkout it also tests the actual signer at the 200-recipient
 limit and the Haze public manifest/callback. CI runs the portable and SQL tests.
 
+## Closed beta (PepecoinHub, 2026-11-16)
+
+Agreed with Haze: a hidden beta on `https://pepecoinhub.com`, restricted on the server to two testers.
+
+- **Database:** `games.haze_settings.beta_only` (default `true`) and `games.haze_testers`. Every Haze RPC and
+  every service-role function used by the Edge verifier goes through `games.haze_open(user)`: `enabled` and,
+  while `beta_only`, membership in `haze_testers`. Receipts (`gry_haze_chat`) are empty for non-testers.
+- **Edge:** `HAZE_ACCESS` lists the allowed Supabase user IDs (comma-separated). Empty or unset means nobody;
+  `all` opens it after launch. A non-listed user gets 403 before any RPC or indexer read.
+- **Preflight:** `{action:'preflight',txid}` (allowed users only) reads the genesis block, the transaction and
+  its first funding output through the configured indexer and reports their shape. It stores nothing.
+- **Client:** `?beta=haze` shows the UI in that browser (`?beta=off` hides it). Visibility only.
+- **`/tip nick amount [pep] [note]`** in both chats opens the ordinary tip dialog, prefilled, for the newest
+  visible message by that nick. Unknown, shared or own nicks only show a note. `/answer` is unaffected.
+
+Owner steps: `games/LAUNCH_HAZE_TIPS.md` and `games/supabase/haze-beta/`.
+
 ## Coordinated activation
 
 Keep both switches off until maintainer review and staging validation.

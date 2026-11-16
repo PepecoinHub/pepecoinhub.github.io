@@ -28,7 +28,7 @@ export function lobbyChat(be, { openLogin }) {
   catch { visitor = crypto.randomUUID(); }
   const msgs = new Map();
   let last = 0, mod = false, timer = 0, busy = false, again = false, first = true, readyAt = 0, mutedUntil = null;
-  const haze=be.kind==='supabase'?createHazeTips({rpc:(name,args)=>be.rpc(name,args),invoke:body=>be.haze(body),session:()=>be.session(),login:openLogin,chatLog:box,chatInput:input}):null;
+  const haze=be.kind==='supabase'?createHazeTips({rpc:(name,args)=>be.rpc(name,args),invoke:body=>be.haze(body),session:()=>be.session(),login:openLogin,notify:text=>toast(text,'bad'),chatLog:box,chatInput:input}):null;
   haze?.mount(panel.querySelector('.chat-rules')||panel);
   const phone = matchMedia('(max-width: 900px)');
   const watching = () => !document.hidden && (!phone.matches || panel.classList.contains('open'));
@@ -160,6 +160,8 @@ export function lobbyChat(be, { openLogin }) {
     e.preventDefault();
     const text = input.value.trim();
     if (!text || Date.now() < readyAt) return;
+    const tip = haze?.command(text);   // /tip opens the Haze tip dialog; nothing is posted to the chat
+    if (tip) { if (tip === 'opened') input.value = ''; return; }
     let nick = nickStore.get() || '';
     if (!nickIn.hidden) {
       nick = nickIn.value.trim();

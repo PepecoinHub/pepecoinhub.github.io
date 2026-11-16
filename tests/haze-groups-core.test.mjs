@@ -79,7 +79,7 @@ test('portable group verifier enforces exact splits, recipients, funding and lim
 
 test('group Edge checks use the private manifest and never credit pending, wrong-chain, anonymous or caller-supplied recipients',async()=>{
   const calls=[],request=body=>new Request('https://fixture.invalid',{method:'POST',headers:{Origin:'https://pepecoinhub.com',Authorization:'Bearer synthetic-group-test-token'},body:JSON.stringify(body)});
-  const deps={authenticate:async()=>({id:'sender',is_anonymous:false,identities:[{provider:'discord'}]}),rpc:async(name,args)=>{calls.push(name);return name==='haze_group_context'?intent:{state:'confirmed'};},readGenesis:async()=>PEP_GENESIS,readTx:async id=>id===tx.txid?{...tx,confirmations:0}:readTx(id)};
+  const deps={allowed:()=>true,authenticate:async()=>({id:'sender',is_anonymous:false,identities:[{provider:'discord'}]}),rpc:async(name,args)=>{calls.push(name);return name==='haze_group_context'?intent:{state:'confirmed'};},readGenesis:async()=>PEP_GENESIS,readTx:async id=>id===tx.txid?{...tx,confirmations:0}:readTx(id)};
   const body={action:'group-check',intent:intent.id,txid:tx.txid};
   assert.equal((await(await handleHaze(request(body),deps)).json()).state,'pending');assert.deepEqual(calls,['haze_group_context']);calls.length=0;
   assert.equal((await handleHaze(request({...body,recipients:payments}),deps)).status,400);assert.deepEqual(calls,[]);

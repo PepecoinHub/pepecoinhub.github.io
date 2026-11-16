@@ -7,6 +7,22 @@ create table if not exists games.haze_settings (
   id boolean primary key default true check (id), enabled boolean not null default false
 );
 insert into games.haze_settings(id) values(true) on conflict do nothing;
+-- Closed beta (owner + Haze, 2026-11-16): while beta_only is true, only users in games.haze_testers can use
+-- any Haze RPC or Edge action. It starts true, so turning `enabled` on never opens tipping to everyone by accident.
+alter table games.haze_settings add column if not exists beta_only boolean not null default true;
+create table if not exists games.haze_testers (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  label text not null default '' check(length(label)<=60),
+  added_at timestamptz not null default clock_timestamp()
+);
+alter table games.haze_testers enable row level security;
+revoke all on games.haze_testers from public,anon,authenticated;
+create or replace function games.haze_open(u uuid) returns boolean
+language sql stable security definer set search_path='' as $$
+  select coalesce((select s.enabled and (not s.beta_only or (u is not null and exists(select 1 from games.haze_testers t where t.user_id=u)))
+    from games.haze_settings s where s.id),false)
+$$;
+revoke all on function games.haze_open(uuid) from public,anon,authenticated;
 create table if not exists games.haze_links (
   user_id uuid primary key references auth.users(id) on delete cascade,
   address text not null unique check(address ~ '^P[1-9A-HJ-NP-Za-km-z]{33}$'),
@@ -56,7 +72,7 @@ create or replace function games.haze_require_user() returns uuid
 language plpgsql stable security definer set search_path='' as $$
 declare u uuid:=auth.uid();
 begin
-  if not coalesce((select enabled from games.haze_settings where id),false) then raise exception 'Haze tipping is not enabled yet.'; end if;
+  if not games.haze_open(u) then raise exception 'Haze tipping is not enabled yet.'; end if;
   if u is null or games.discord_identity(u) is null then raise exception 'Sign in with Discord to use Haze tips.'; end if;
   return u;
 end $$;
@@ -66,7 +82,7 @@ create or replace function public.gry_haze_status() returns jsonb
 language plpgsql stable security definer set search_path='' as $$
 declare u uuid:=auth.uid();
 begin
-  return jsonb_build_object('enabled',coalesce((select enabled from games.haze_settings where id),false),
+  return jsonb_build_object('enabled',games.haze_open(u),
     'address',(select address from games.haze_links where user_id=u),
     'pending',coalesce((select jsonb_agg(jsonb_build_object('id',t.id,'sender',t.sender_address,'address',t.recipient_address,
       'recipient',t.recipient_nick,'message_id',t.message_id,'amount_atomic',t.amount_atomic::text,'reaction',t.reaction,'note',t.note,
@@ -94,7 +110,7 @@ create or replace function public.haze_link_context(p_user uuid,p_nonce text) re
 language plpgsql security definer set search_path='' as $$
 declare c games.haze_challenges;
 begin
-  if not coalesce((select enabled from games.haze_settings where id),false) or games.discord_identity(p_user) is null then raise exception 'Haze linking unavailable.'; end if;
+  if not games.haze_open(p_user) or games.discord_identity(p_user) is null then raise exception 'Haze linking unavailable.'; end if;
   select * into c from games.haze_challenges where user_id=p_user and nonce=p_nonce and used_at is null and expires_at>clock_timestamp() for update;
   if not found then raise exception 'This wallet-link request expired or was already used.'; end if;
   if c.checks>=5 or c.last_checked_at>clock_timestamp()-interval '1 second' then raise exception 'Too many ownership checks. Start a fresh connection later.'; end if;
@@ -107,7 +123,7 @@ end $$;
 create or replace function public.haze_link_finish(p_user uuid,p_nonce text,p_address text) returns jsonb
 language plpgsql security definer set search_path='' as $$
 begin
-  if not coalesce((select enabled from games.haze_settings where id),false) or games.discord_identity(p_user) is null then raise exception 'Haze linking unavailable.'; end if;
+  if not games.haze_open(p_user) or games.discord_identity(p_user) is null then raise exception 'Haze linking unavailable.'; end if;
   -- The edge verifier calls this only after checking the exact signature and checksum.
   update games.haze_challenges set used_at=clock_timestamp()
     where user_id=p_user and nonce=p_nonce and used_at is null and expires_at>clock_timestamp();
@@ -155,7 +171,7 @@ create or replace function public.haze_tip_context(p_user uuid,p_intent uuid,p_t
 language plpgsql security definer set search_path='' as $$
 declare t games.haze_tips;
 begin
-  if not coalesce((select enabled from games.haze_settings where id),false) or games.discord_identity(p_user) is null then raise exception 'Haze tipping unavailable.'; end if;
+  if not games.haze_open(p_user) or games.discord_identity(p_user) is null then raise exception 'Haze tipping unavailable.'; end if;
   perform 1 from auth.users where id=p_user for no key update;
   if p_txid is null or p_txid !~ '^[a-f0-9]{64}$' then raise exception 'Invalid transaction ID.'; end if;
   select * into t from games.haze_tips where id=p_intent and sender=p_user for update;
@@ -174,7 +190,7 @@ create or replace function public.haze_tip_confirm(p_user uuid,p_intent uuid,p_t
 language plpgsql security definer set search_path='' as $$
 declare t games.haze_tips;
 begin
-  if not coalesce((select enabled from games.haze_settings where id),false) then raise exception 'Haze tipping unavailable.'; end if;
+  if not games.haze_open(p_user) then raise exception 'Haze tipping unavailable.'; end if;
   select * into t from games.haze_tips where id=p_intent and sender=p_user for update;
   if not found or p_txid is null or p_txid !~ '^[a-f0-9]{64}$' or (t.txid is not null and t.txid<>p_txid) or p_vout is null or p_vout<0 or p_block is null or p_block !~ '^[a-f0-9]{64}$' or p_time is null or
     p_time<extract(epoch from t.created_at)::bigint-30 or p_time>extract(epoch from t.expires_at)::bigint+7200 then raise exception 'The verified payment does not match this tip.'; end if;
@@ -192,7 +208,7 @@ create or replace function public.gry_haze_chat(p_messages bigint[]) returns jso
 language plpgsql stable security definer set search_path='' as $$
 begin
   if coalesce(array_length(p_messages,1),0)>120 then raise exception 'Too many messages.'; end if;
-  if not coalesce((select enabled from games.haze_settings where id),false) then return jsonb_build_object('linked_users','[]'::jsonb,'receipts','[]'::jsonb); end if;
+  if not games.haze_open(auth.uid()) then return jsonb_build_object('linked_users','[]'::jsonb,'receipts','[]'::jsonb); end if;
   return jsonb_build_object('linked_users',coalesce((select jsonb_agg(distinct m.user_id) from games.lobby_chat m join games.haze_links l on l.user_id=m.user_id
     where m.id=any(p_messages) and m.hidden_at is null and m.created_at>clock_timestamp()-interval '24 hours'),'[]'::jsonb),
     'receipts',coalesce((select jsonb_agg(jsonb_build_object('id',t.id,'message_id',t.message_id,'sender',t.sender_nick,'recipient',t.recipient_nick,

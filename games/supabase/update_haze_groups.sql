@@ -155,7 +155,7 @@ end $$;
 create or replace function games.haze_group_chat_answer() returns trigger language plpgsql security definer set search_path='' as $$
 declare g games.haze_groups;answer text;correct boolean;
 begin
- if not coalesce((select enabled and groups_enabled from games.haze_settings where id),false) then return new;end if;
+ if not (games.haze_open(new.user_id) and coalesce((select groups_enabled from games.haze_settings where id),false)) then return new;end if;
  if not new.verified or new.hidden_at is not null or games.discord_identity(new.user_id) is null then return new;end if;
  for g in select * from games.haze_groups where state='open' and mode in ('trivia','word') and closes_at>clock_timestamp() and created_at<=new.created_at loop
    if g.mode='trivia' then if new.body !~* '^/answer\s+' then continue;end if;answer:=games.haze_answer(regexp_replace(new.body,'^/answer\s+','','i'));
@@ -204,7 +204,7 @@ end $$;
 create or replace function public.haze_group_context(p_user uuid,p_intent uuid,p_txid text) returns jsonb language plpgsql security definer set search_path='' as $$
 declare g games.haze_groups;
 begin
- if not coalesce((select enabled and groups_enabled from games.haze_settings where id),false) or games.discord_identity(p_user) is null then raise exception 'Haze group tips are unavailable.';end if;
+ if not (games.haze_open(p_user) and coalesce((select groups_enabled from games.haze_settings where id),false)) or games.discord_identity(p_user) is null then raise exception 'Haze group tips are unavailable.';end if;
  perform 1 from auth.users where id=p_user for no key update;
  select * into g from games.haze_groups where id=p_intent and owner=p_user for update;
  if not found or p_txid !~ '^[a-f0-9]{64}$' or (g.txid is not null and g.txid<>p_txid) then raise exception 'Group payment not found or already bound to a transaction.';end if;
@@ -219,7 +219,7 @@ end $$;
 create or replace function public.haze_group_confirm(p_user uuid,p_intent uuid,p_txid text,p_block text,p_time bigint) returns jsonb language plpgsql security definer set search_path='' as $$
 declare g games.haze_groups;
 begin
- if not coalesce((select enabled and groups_enabled from games.haze_settings where id),false) then raise exception 'Haze group tips unavailable.';end if;
+ if not (games.haze_open(p_user) and coalesce((select groups_enabled from games.haze_settings where id),false)) then raise exception 'Haze group tips unavailable.';end if;
  select * into g from games.haze_groups where id=p_intent and owner=p_user for update;
  if not found or p_txid is null or p_txid !~ '^[a-f0-9]{64}$' or p_block is null or p_block !~ '^[a-f0-9]{64}$' or p_time is null or
  p_time<extract(epoch from g.created_at)::bigint-30 or p_time>extract(epoch from g.expires_at)::bigint+7200 or (g.txid is not null and g.txid<>p_txid) or g.state not in ('ready','confirmed') then raise exception 'The verified group payment does not match.';end if;

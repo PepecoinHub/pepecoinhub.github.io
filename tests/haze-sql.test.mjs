@@ -36,6 +36,15 @@ test('Haze SQL: real PostgreSQL permissions, challenge replay, immutable recipie
     for(const i of [1,2,3])psql(`insert into auth.identities values(${quote(uid(i))},'discord');`);
     assert.throws(()=>as('authenticated',uid(1),'select public.gry_haze_link_begin()'));
     psql('update games.haze_settings set enabled=true;');
+    // Closed beta is the default: enabled alone opens nothing until a user is a tester (or beta_only is turned off).
+    assert.equal(rpc('authenticated',uid(1),'select public.gry_haze_status()').enabled,false);
+    assert.throws(()=>as('authenticated',uid(1),'select public.gry_haze_link_begin()'),/not enabled/);
+    assert.throws(()=>as('authenticated',uid(1),`insert into games.haze_testers(user_id) values(${quote(uid(1))})`));
+    psql(`insert into games.haze_testers(user_id,label) values(${quote(uid(1))},'tester');`);
+    assert.equal(rpc('authenticated',uid(1),'select public.gry_haze_status()').enabled,true);
+    assert.equal(rpc('authenticated',uid(2),'select public.gry_haze_status()').enabled,false);
+    assert.throws(()=>psql(`select public.haze_link_context(${quote(uid(2))},${quote('0'.repeat(64))})`),/unavailable/);
+    psql('update games.haze_settings set beta_only=false;');
     assert.throws(()=>as('authenticated',uid(4),'select public.gry_haze_link_begin()'));
     assert.throws(()=>as('anon',null,'select public.gry_haze_link_begin()'));
     const challenges={};

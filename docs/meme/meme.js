@@ -4886,7 +4886,7 @@
       var hazeTips = null;
       import(BASE + 'games/js/haze-tips.mjs?v=20261115haze').then(function (m) {
         if (!alive) return;
-        hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, chatLog: log, chatInput: inp,
+        hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp,
           invoke: function (body) {
             var s = anySession();
             if (!s) return Promise.reject(new Error('Sign in with Discord first.'));
@@ -5187,6 +5187,8 @@
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         var t = inp.value.trim(); if (!t) return;
+        var tip = hazeTips && hazeTips.command(t);   // /tip opens the Haze tip dialog; nothing is posted to the chat
+        if (tip) { if (tip === 'opened') { inp.value = ''; paintNote(); } return; }
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (err) {}
         if (!nickIn.hidden) {
           nick = nickIn.value.trim();
