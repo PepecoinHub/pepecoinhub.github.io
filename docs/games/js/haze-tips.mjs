@@ -160,15 +160,29 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
   // Closed beta only: a phone-friendly check that the haze-wallet Edge Function can read the configured indexer.
   async function betaCheck() {
     try{signed();}catch{return;}
-    const view=modal('Haze beta check');view.status.textContent='Asking the PepecoinHub server to read the Pepecoin indexer…';
-    try{
-      const r=await invoke({action:'preflight'});
-      const ok=r.genesis_ok===true&&r.outputs>0&&r.block_ok===true&&typeof r.prevout?.value==='string';
-      view.body.append(node('p',{},ok?'✅ Indexer OK: mainnet genesis, a recent transaction and its funding output were read from the server.':'⚠️ The server answered, but something is missing. Do not test payments yet.'),
-        node('code',{class:'haze-tip-address'},JSON.stringify(r,null,1)));
-      view.status.textContent='';
-    }catch(error){if(view.d.isConnected)view.status.textContent='❌ '+error.message;}
+    const view=modal('Haze beta check');
+    // Optional txid: some indexers (e.g. a proxy without Blockbook's status page) cannot find a recent block
+    // themselves. Tips only need genesis + transaction + funding output, which a pasted txid checks exactly.
+    const txid=node('input',{type:'text',maxlength:'64',inputmode:'text',autocapitalize:'off',spellcheck:'false',
+      placeholder:'Optional: any transaction ID from pepeblocks.com','aria-label':'Transaction ID for the beta check'});
+    const run=node('button',{type:'button',class:'haze-tip-primary'},'Run check');
+    const out=node('div');
+    view.body.append(node('p',{},'Checks that the PepecoinHub server can read the Pepecoin indexer. Leave the field empty, or paste the ID (64 characters) of any ordinary transaction, e.g. from pepeblocks.com.'),txid,run,out);
+    run.onclick=async()=>{
+      const value=txid.value.trim().toLowerCase();
+      if(value&&!HASH.test(value)){view.status.textContent='A transaction ID has exactly 64 characters (0-9, a-f).';return;}
+      run.disabled=true;out.textContent='';view.status.textContent='Asking the PepecoinHub server to read the Pepecoin indexer…';
+      try{
+        const r=await invoke(value?{action:'preflight',txid:value}:{action:'preflight'});
+        const ok=r.genesis_ok===true&&r.outputs>0&&r.block_ok===true&&typeof r.prevout?.value==='string';
+        out.append(node('p',{},ok?'✅ Indexer OK: mainnet genesis, a transaction and its funding output were read from the server.':'⚠️ The server answered, but something is missing. Do not test payments yet.'),
+          node('code',{class:'haze-tip-address'},JSON.stringify(r,null,1)));
+        view.status.textContent='';
+      }catch(error){if(view.d.isConnected)view.status.textContent='❌ '+error.message+(value?'':' · Tip: paste a transaction ID and run again.');}
+      finally{run.disabled=false;}
+    };
   }
+
   function mount(parent){linkButton=node('button',{type:'button',class:'haze-wallet-link',onclick:connect},'◇ Link Haze for tips');parent.append(linkButton);
     if(hazeBeta(win))parent.append(node('button',{type:'button',class:'haze-wallet-link',onclick:()=>void betaCheck()},'◇ Beta check'));
     groups?.mount(parent);void refresh();}
