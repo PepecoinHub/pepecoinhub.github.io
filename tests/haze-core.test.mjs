@@ -136,3 +136,15 @@ test('phone preflight: picks the first spending transaction of a block (never th
   const {execFileSync}=await import('node:child_process');
   execFileSync(process.execPath,[new URL('../scripts/bundle-haze-edge.mjs',import.meta.url).pathname,'--check']);
 });
+
+test('a failed beta check names the step and the HTTP status of the indexer',async()=>{
+  const user={id:'owner',is_anonymous:false,identities:[{provider:'discord'}]};
+  const req=body=>new Request('https://fixture.invalid',{method:'POST',headers:{origin:'https://pepecoinhub.com',authorization:'Bearer fixture-token-123456'},body:JSON.stringify(body)});
+  const http=status=>Object.assign(Error('The payment reader or account service is unavailable.'),{status,host:'indexer.example'});
+  const base={allowed:()=>true,authenticate:async()=>user,rpc:async()=>{throw Error('no database');},readGenesis:async()=>PEP_GENESIS_HEX,findRecentTx:async()=>txid,readTx:async()=>transaction()};
+  const error=async deps=>(await (await handleHaze(req({action:'preflight'}),{...base,...deps})).json()).error;
+  assert.match(await error({readGenesis:async()=>{throw http(403);}}),/"indexer genesis block" \(HTTP 403 from indexer\.example\)/);
+  assert.match(await error({findRecentTx:async()=>{throw http(404);}}),/"indexer recent block" \(HTTP 404/);
+  assert.match(await error({readTx:async()=>{throw http(429);}}),/"indexer transaction" \(HTTP 429/);
+  assert.match(await error({findRecentTx:async()=>null}),/no ordinary transaction/);
+});

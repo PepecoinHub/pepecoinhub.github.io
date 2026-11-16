@@ -40,10 +40,14 @@ export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,findRe
     // Without a txid (phone button) the function picks a recent ordinary transaction from the indexer itself.
     if(body?.action==='preflight'&&(exact(body,['action'])||exact(body,['action','txid']))) {
       if(body.txid!==undefined&&!isHash(body.txid))throw Error('Invalid transaction ID.');
-      const genesis=await readGenesis();
-      const txid=body.txid??await findRecentTx?.();
-      if(!isHash(txid))throw Error('The indexer did not return a recent transaction.');
-      return json(200,{genesis_ok:genesis===PEP_GENESIS,...await preflightTransaction(await readTx(txid),readTx)});
+      // Each step names itself (and the HTTP status / host) so a failed beta check says exactly what broke.
+      const step=async(name,run)=>{try{return await run();}catch(error){
+        throw Error('Beta check failed at "'+name+'"'+(error?.status?' (HTTP '+error.status+(error.host?' from '+error.host:'')+')':'')+': '+(error instanceof Error?error.message:String(error)));}};
+      const genesis=await step('indexer genesis block',()=>readGenesis());
+      const txid=body.txid??await step('indexer recent block',()=>findRecentTx?.());
+      if(!isHash(txid))throw Error('Beta check failed at "indexer recent block": no ordinary transaction found.');
+      const tx=await step('indexer transaction',()=>readTx(txid));
+      return json(200,{genesis_ok:genesis===PEP_GENESIS,...await step('indexer funding output',()=>preflightTransaction(tx,readTx))});
     }
     if(!exact(body,['action','intent','txid'])||!['check','group-check'].includes(body.action)||!isUUID(body.intent)||!isHash(body.txid))throw Error('Invalid tip request.');
     const group=body.action==='group-check';

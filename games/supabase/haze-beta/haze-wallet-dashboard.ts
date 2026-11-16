@@ -272,10 +272,14 @@ export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,findRe
     // Without a txid (phone button) the function picks a recent ordinary transaction from the indexer itself.
     if(body?.action==='preflight'&&(exact(body,['action'])||exact(body,['action','txid']))) {
       if(body.txid!==undefined&&!isHash(body.txid))throw Error('Invalid transaction ID.');
-      const genesis=await readGenesis();
-      const txid=body.txid??await findRecentTx?.();
-      if(!isHash(txid))throw Error('The indexer did not return a recent transaction.');
-      return json(200,{genesis_ok:genesis===PEP_GENESIS,...await preflightTransaction(await readTx(txid),readTx)});
+      // Each step names itself (and the HTTP status / host) so a failed beta check says exactly what broke.
+      const step=async(name,run)=>{try{return await run();}catch(error){
+        throw Error('Beta check failed at "'+name+'"'+(error?.status?' (HTTP '+error.status+(error.host?' from '+error.host:'')+')':'')+': '+(error instanceof Error?error.message:String(error)));}};
+      const genesis=await step('indexer genesis block',()=>readGenesis());
+      const txid=body.txid??await step('indexer recent block',()=>findRecentTx?.());
+      if(!isHash(txid))throw Error('Beta check failed at "indexer recent block": no ordinary transaction found.');
+      const tx=await step('indexer transaction',()=>readTx(txid));
+      return json(200,{genesis_ok:genesis===PEP_GENESIS,...await step('indexer funding output',()=>preflightTransaction(tx,readTx))});
     }
     if(!exact(body,['action','intent','txid'])||!['check','group-check'].includes(body.action)||!isUUID(body.intent)||!isHash(body.txid))throw Error('Invalid tip request.');
     const group=body.action==='group-check';
@@ -298,7 +302,11 @@ try {const url=new URL(configured);if(url.protocol==='https:'&&!url.username&&!u
 
 async function read(url: string,init: RequestInit={}) {
   const response=await fetch(url,{...init,redirect:'error',signal:AbortSignal.any([init.signal||AbortSignal.timeout(25000),AbortSignal.timeout(10000)])});
-  if(!response.ok)throw Error('The payment reader or account service is unavailable. Keep your transaction ID and try again later.');
+  if(!response.ok){
+    // Host and path only (never headers): visible in Supabase -> Edge Functions -> haze-wallet -> Logs.
+    const where=new URL(url);console.error('haze-wallet upstream',response.status,where.host+where.pathname);
+    throw Object.assign(Error('The payment reader or account service is unavailable. Keep your transaction ID and try again later.'),{status:response.status,host:where.host});
+  }
   return boundedJSON(response.body,2000000);
 }
 Deno.serve((req:Request)=>{
@@ -314,7 +322,8 @@ Deno.serve((req:Request)=>{
     readTx:(txid:string)=>requestRead(indexer!.href+'api/v2/tx/'+txid),
     // Preflight only: walk back at most 10 blocks from the indexer's best height to find an ordinary transaction.
     findRecentTx:async()=>{
-      const status=await requestRead(indexer!.href+'api/');const best=status?.blockbook?.bestHeight;
+      let status;try{status=await requestRead(indexer!.href+'api/v2/');}catch{status=await requestRead(indexer!.href+'api/');}
+      const best=status?.blockbook?.bestHeight;
       if(!Number.isSafeInteger(best)||best<1)throw Error('The indexer did not report its best height.');
       for(let height=best;height>Math.max(0,best-10);height--){const txid=pickSpendingTxid(await requestRead(indexer!.href+'api/v2/block/'+height));if(txid)return txid;}
       return null;
