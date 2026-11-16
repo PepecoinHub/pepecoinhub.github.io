@@ -840,10 +840,10 @@
         ['#bulletin', 'Pond Bulletin', 'bulletin'], ['#king', 'Pond King', 'pond-king'], ['#lilies', 'Three Lilies', 'lilies'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#games', 'Games', 'games-folder']]],
       ['low', [['./', 'Internet', 'internet'], ['#tv', 'Pond TV', 'pond-tv'], ['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#find', 'Find', 'search']]],
       // the community: the official store, the official Pepecoin account (the classic bird), our subreddit and the Discord
-      ['mid', [['#shop', 'Official Store', 'shop-bag'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit'], ['#discord', 'Discord', 'discord']]],
+      ['mid', [['#haze', 'Haze Wallet', 'zipper'], ['#shop', 'Official Store', 'shop-bag'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit'], ['#discord', 'Discord', 'discord']]],
       ['corner', [['#mail', 'Write a letter', 'frog-mail'], ['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
-    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#king': function () { pondKingApp(); }, '#lilies': function () { liliesApp(); }, '#bulletin': function () { bulletinApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#discord': function () { window.open('https://discord.gg/pepecoin', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#king': function () { pondKingApp(); }, '#lilies': function () { liliesApp(); }, '#bulletin': function () { bulletinApp(); }, '#haze': function () { hazeApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#discord': function () { window.open('https://discord.gg/pepecoin', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -1052,7 +1052,7 @@
         Array.prototype.forEach.call(w.document.querySelectorAll('iframe'), watchFrame);
       } catch (e) {}
     };
-    document.addEventListener('load', function (e) { if (e.target && e.target.tagName === 'IFRAME') { e.target.contentWindow && (e.target.contentWindow.__pondPoke = false); watchFrame(e.target); } }, true);
+    document.addEventListener('load', function (e) { if (e.target && e.target.tagName === 'IFRAME') { try { e.target.contentWindow && (e.target.contentWindow.__pondPoke = false); } catch (x) { return; } watchFrame(e.target); } }, true);
     poke();
   }
 
@@ -1763,6 +1763,19 @@
     var fr = A.body.querySelector('iframe'); if (q && fr && fr.getAttribute('src') !== src) fr.setAttribute('src', src);
     return A;
   }
+  // HAZE WALLET: the Haze web wallet (hazewallet.com) in a PondOS window. It runs in its own iframe on
+  // hazewallet.com, so keys, seed and balance never touch this page. No third-party script is loaded here.
+  var HAZE = 'https://hazewallet.com';
+  function hazeApp() {
+    return openApp('haze', 'Haze Wallet', 'zipper', function (A) {
+      A.body.innerHTML = '<div class="win-menu haze-menu"><button type="button" class="btn haze-pop">Open in new window\u2026</button><a class="btn" href="wallets.html">About wallets</a></div>' +
+        '<iframe class="app-frame haze-frame" src="' + HAZE + '/widget.html" title="Haze Wallet" referrerpolicy="no-referrer" allow="clipboard-write"></iframe>' +
+        '<div class="win-status haze-status"><span>\uD83D\uDD12 hazewallet.com</span><span>Your keys stay in Haze, not in PondOS</span></div>';
+      var f = A.body.querySelector('iframe');
+      f.addEventListener('load', function () { try { f.contentWindow.postMessage({ type: 'haze:open' }, HAZE); } catch (e) {} });
+      A.body.querySelector('.haze-pop').addEventListener('click', function () { window.open(HAZE + '/widget.html?standalone=1', '_blank', 'noopener,noreferrer'); });
+    }, 420);
+  }
   // POND BULLETIN (games/bulletin.html): open challenges and pond news, public metadata only
   function bulletinApp() {
     // already open: bring it up with fresh news (a duel may have just ended in another window)
@@ -1935,6 +1948,7 @@
       ['AddressCheck.exe', 'Is this a real PEP address?', 'pepe-search', 'address check scam verify checksum wallet', addressCheck],
       ['Not PEP (0x)', 'PEPE and PEPECOIN are not PEP', 'wrongpep', 'pepe pepecoin ethereum erc20 token wrong scam', act('#notpep')],
       ['Frog Mail', 'The Pond Gazette', 'frog-mail', 'mail news gazette newsletter', frogMail],
+      ['Haze Wallet', 'A PEP wallet in a window (hazewallet.com)', 'zipper', 'haze wallet send receive balance pep doge btc ltc', hazeApp],
       ['Official Store', 'Official Pepecoin store', 'shop-bag', 'shop merch buy store official', act('#shop')],
       ['Discord', 'The Pepecoin Discord', 'discord', 'discord chat community server invite', act('#discord')],
       ['About me', 'Who builds this pond (and how to support it)', 'night-shift', 'about me byl author tip donate support', aboutMe],
