@@ -18,7 +18,9 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  await page.goto(base+'/games/#chat');await page.getByRole('button',{name:'◇ Link Haze for tips',exact:true}).click();await page.getByRole('button',{name:'Continue with Haze Wallet',exact:true}).click();
  const frame=()=>page.frameLocator('iframe.haze-tip-frame');await frame().getByLabel('Your Haze wallet password',{exact:true}).fill(password);await frame().getByRole('button',{name:'Unlock and connect',exact:true}).click();
  await page.getByRole('button',{name:'◇ Haze linked ✓',exact:true}).waitFor();await page.locator('dialog[open]').waitFor({state:'hidden'});
- const state=async()=>await(await page.request.get(base+'/__preview/state')).json();
+ // Retry only a reset loopback transport connection, never an HTTP rejection
+ // or a payment submission. Docker-backed fixture reads can outlive keepalive.
+ const state=async()=>await(await page.request.get(base+'/__preview/state',{maxRetries:2})).json();
  const responseTo=(fn)=>page.waitForResponse(r=>r.url()===base+'/__preview/rpc'&&r.request().postDataJSON()?.fn===fn);
  const card=id=>page.locator('.haze-drop-card[data-group-id="'+id+'"]');
  async function create(mode,options={}){

@@ -66,6 +66,7 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
   if(!doc.querySelector('[data-haze-tip-style]'))doc.head.append(node('link',{rel:'stylesheet',href:new URL('../haze-tips.css',import.meta.url).href,'data-haze-tip-style':'1'}));
   let destroyed=false,dialog=null,wallet=null,owner=null,syncAt=0,syncing=false,initial=true,linkButton=null;
   let activeView=null,walletHost=null,walletFrame=null,walletLoaded=null,walletCaps=null;
+  let linkChallenge=null,linkChallengeFlight=null,authView=null;
   const walletBase=HAZE_ORIGIN+'/widget.html?haze-chat=1',queueKey='ph-haze-submitted-v1';
   const messages=new Map(),receivers=new Map(),flights=new Map(),rendered=new Map(),seenReceipts=new Set(),timers=new Set();
   const currentUser=()=>{const user=session()?.user;return user&&!user.is_anonymous?user.id:null;};
@@ -73,11 +74,12 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
   const groups=createHazeGroups({node,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,chatLog:()=>chatLog,chatInput:()=>chatInput,origin:HAZE_ORIGIN,wallet:()=>wallet,refreshWallet:refresh,capabilities:()=>walletCaps,hideWallet:()=>{if(walletHost)walletHost.hidden=true;},login,connect},{enabled:HAZE_GROUPS_ENABLED||hazeBeta(win)});
   function endView(){
     const view=activeView;activeView=null;view?.controller.abort();if(walletHost)walletHost.hidden=true;
+    if(authView===view&&view){authView=null;void frameRequest(walletFrame,'disconnect',{},1500).catch(()=>{});}
     if(walletFrame){walletFrame.contentWindow.postMessage({type:'haze:tip-cancel',version:1},HAZE_ORIGIN);walletFrame.contentWindow.postMessage({type:'haze:hidden'},HAZE_ORIGIN);}
     if(view?.oldFocus?.isConnected)view.oldFocus.focus();
   }
   function modal(title) {
-    activeView?.controller.abort();activeView=null;
+    if(activeView)endView();
     if(!dialog){
       dialog=node('dialog',{class:'haze-tip-dialog'});
       const close=node('button',{type:'button',class:'haze-tip-close','aria-label':'Close Haze dialog',onclick:()=>{endView();dialog.close();}},'×');
@@ -89,7 +91,7 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     }
     const controller=new AbortController(),d=dialog,body=d.querySelector('.haze-tip-body'),status=d.querySelector('.haze-tip-status');
     body.replaceChildren();status.textContent='';d.querySelector('h2').textContent=title;d.setAttribute('aria-label',title);walletHost.hidden=true;
-    const view={d,body,status,controller,signal:controller.signal,oldFocus:doc.activeElement,active:()=>activeView===view&&!controller.signal.aborted};
+    const view={d,body,status,controller,signal:controller.signal,oldFocus:doc.activeElement,active:()=>!destroyed&&activeView===view&&!controller.signal.aborted};
     view.close=()=>{if(view.active()){endView();d.close();}};
     activeView=view;if(!d.open)d.showModal();return view;
   }
@@ -99,7 +101,7 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
       walletLoaded=new Promise((resolve,reject)=>{walletFrame.onload=resolve;walletFrame.onerror=()=>reject(Error('Haze could not be loaded.'));});
       walletFrame.src=walletBase;walletHost.append(walletFrame);
     }
-    walletHost.hidden=false;walletFrame.contentWindow.postMessage({type:'haze:open'},HAZE_ORIGIN);
+    walletHost.hidden=false;
     await walletLoaded;
     if(!view.active())throw Error('Wallet review canceled.');
     if(!walletCaps){
@@ -108,6 +110,9 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
       }
     }
     if(walletCaps?.authentication!=='haze-auth-v1'||walletCaps.chatTipProtocol!==1||walletCaps.chatTipInline!==1)throw Error('This Haze build does not support chat tips yet. Open the updated Haze web wallet and try again.');
+    // The first postMessage must follow navigation and bridge readiness;
+    // posting into a new iframe's about:blank context loses the open request.
+    walletFrame.contentWindow.postMessage({type:'haze:open'},HAZE_ORIGIN);
     return walletFrame;
   }
   function paintButton(){if(linkButton)linkButton.textContent=wallet?.address?'◇ Haze linked ✓':'◇ Link Haze for tips';}
@@ -123,13 +128,23 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
       const abort=()=>{cleanup();reject(Error('Wallet connection canceled.'));};
       const receive=event=>{
         if(event.origin!==HAZE_ORIGIN||event.source!==frame.contentWindow||event.data?.type!=='haze:response'||event.data.version!==1||event.data.id!==id)return;
-        cleanup();event.data.error?reject(Error(event.data.error.message||'Haze declined the request.')):resolve(event.data.result);
+        cleanup();event.data.error?reject(Object.assign(Error(event.data.error.message||'Haze declined the request.'),{code:event.data.error.code})):resolve(event.data.result);
       };
       const timer=setTimeout(()=>{cleanup();reject(Error('Haze did not answer in time. Please try again.'));},timeout);
       win.addEventListener('message',receive);
       if(signal?.aborted){abort();return;}signal?.addEventListener('abort',abort,{once:true});
       frame.contentWindow.postMessage({type:'haze:request',version:1,id,method,params},HAZE_ORIGIN);
     });
+  }
+  function getLinkChallenge(user){
+    if(linkChallenge?.user===user&&Date.parse(linkChallenge.value.expiresAt)>Date.now()+1000)return Promise.resolve(linkChallenge.value);
+    if(linkChallengeFlight?.user===user)return linkChallengeFlight.promise;
+    const flight={user};
+    flight.promise=rpc('gry_haze_link_begin',{}).then(value=>{
+      if(currentUser()===user&&!destroyed)linkChallenge={user,value};
+      return value;
+    }).finally(()=>{if(linkChallengeFlight===flight)linkChallengeFlight=null;});
+    linkChallengeFlight=flight;return flight.promise;
   }
   async function connect(afterLinked) {
     try{signed();}catch{return;}
@@ -143,18 +158,36 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     view.body.append(approve,node('a',{href:HAZE_ORIGIN+'/widget.html?standalone=1',target:'_blank',rel:'noopener noreferrer',class:'haze-tip-secondary'},'Open Haze Wallet ↗'));
     approve.onclick=async()=>{
       approve.disabled=true;
-      view.status.textContent='Approve the public-address connection inside Haze.';
+      view.status.textContent='Checking your wallet-link request…';
+      let challenge;
       try{
+        // Reject unavailable/beta/rate-limited requests before showing Haze.
+        // An unused challenge survives wallet retries and dialog reopening.
+        challenge=await getLinkChallenge(user);
+        if(currentUser()!==user||!view.active())return;
         const frame=await ensureWallet(view);
         if(currentUser()!==user||!view.active())return;
-        const challenge=await rpc('gry_haze_link_begin',{});
-        const result=await frameRequest(frame,'authenticate',{challenge},300000,view.signal);
+        await frameRequest(frame,'disconnect',{},1500,view.signal);
         if(currentUser()!==user||!view.active())return;
+        view.status.textContent='Approve the public-address connection inside Haze.';
+        authView=view;
+        let result;
+        try{result=await frameRequest(frame,'authenticate',{challenge},300000,view.signal);}
+        finally{if(authView===view)authView=null;}
+        if(currentUser()!==user||!view.active())return;
+        // The server may consume this one-use challenge even if its reply is
+        // interrupted. Never reuse it after submitting an ownership proof.
+        if(linkChallenge?.value===challenge)linkChallenge=null;
         const linked=await invoke({action:'link',proof:result.proof});
         if(currentUser()!==user||!view.active())return;
         wallet={address:linked.address};paintButton();invalidate();void sync();
         if(typeof afterLinked==='function')void afterLinked();else view.close();
-      }catch(error){if(view.active()){walletHost.hidden=true;view.status.textContent=error.message;approve.disabled=false;}}
+      }catch(error){
+        if(['EXPIRED','INVALID_CHALLENGE'].includes(error.code)&&linkChallenge?.value===challenge)linkChallenge=null;
+        // Leave the loaded wallet in place: its setup/terms/unlock UI explains
+        // recoverable failures, and a retry must not flash it closed/open.
+        if(view.active()){view.status.textContent=error.message;approve.disabled=false;}
+      }
     };
   }
   // Closed beta only: a phone-friendly check that the haze-wallet Edge Function can read the configured indexer.
@@ -312,5 +345,5 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     }catch{/* Missing migration or temporary failure must not break ordinary chat. */}
     finally{syncing=false;}
   }
-  return {mount,bindMessage,command,refresh,invalidate,sync,connect,destroy(){destroyed=true;groups?.destroy();saveQueue();dialog?.close();dialog?.remove();win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',resume);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();receivers.clear();flights.clear();linkButton?.remove();}};
+  return {mount,bindMessage,command,refresh,invalidate,sync,connect,destroy(){destroyed=true;endView();linkChallenge=null;groups?.destroy();saveQueue();dialog?.close();dialog?.remove();win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',resume);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();receivers.clear();flights.clear();linkButton?.remove();}};
 }
