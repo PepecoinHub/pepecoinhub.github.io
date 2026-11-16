@@ -1,67 +1,73 @@
-# Haze tipy — zamknięta beta (dokument właściciela)
+# Haze tipy — zamknięta beta, wszystko z telefonu
 
-Stan na 2026-11-16. Kod to PR #340 (Haze) + nasze dodatki: zamknięta beta po stronie serwera, `?beta=haze`,
-test endpointu z Edge (`preflight`) i komenda `/tip`. Technika i model zaufania: `games/HAZE_TIPPING.md`.
-Pytania i odpowiedzi Haze: `games/HAZE_QUESTIONS.md`, `games/HAZE_ANSWERS_2026-11-15.md`.
+Stan na 2026-11-16. Kod: PR #340 (Haze web 1.1.9) + nasze dodatki (dostęp tylko dla testerów na serwerze,
+`?beta=haze`, przycisk „Beta check”, `/tip`). Technika: `games/HAZE_TIPPING.md`. Pytania i odpowiedzi Haze:
+`games/HAZE_QUESTIONS.md`, `games/HAZE_ANSWERS_2026-11-15.md`.
 
-Ustalenia z Haze (Lew, 2026-11-16):
-- Ukryta beta na `https://pepecoinhub.com` — bez zmian po stronie Haze.
-- Blockbook na betę: `https://bongendpoint.realmasterkush.com/` (MasterKush wie). Przed testem sprawdzić odczyty z naszej funkcji Edge.
-- Dostęp ograniczony **na serwerze** do dwóch kont: **Byl** i **Lewisbong**. `?beta=haze` tylko pokazuje przyciski.
-- Pierwszy test grupowy: jeden odbiorca. Prawdziwy podział na kilka osób później, z trzecim testerem.
-- Przed wyłączeniem bety dokończyć oczekujące potwierdzenia.
+Ustalenia z Lew (2026-11-16): ukryta beta na pepecoinhub.com; Blockbook `https://bongendpoint.realmasterkush.com/`;
+dostęp na serwerze tylko dla **Byl** i **Lewisbong**; pierwszy test grupowy z jednym odbiorcą; przed wyłączeniem
+dokończyć oczekujące potwierdzenia.
 
-## Jak działa dostęp
+Pliki do skopiowania (na telefonie: otwórz link, przytrzymaj tekst → Zaznacz wszystko → Kopiuj):
 
-| Warstwa | Co blokuje | Gdzie |
-|---|---|---|
-| Baza | `haze_settings.beta_only = true` (domyślnie) + lista `games.haze_testers`. Nie-tester dostaje „not enabled” w każdym RPC, także w funkcjach dla Edge. | `update_haze_tips.sql` (`games.haze_open`) |
-| Edge | Sekret `HAZE_ACCESS` = ID testerów po przecinku. Pusty = nikt. `all` = wszyscy (dopiero po starcie). | `functions/haze-wallet` |
-| Strona | Przyciski widać tylko w przeglądarce, która otworzyła stronę z `?beta=haze` (`?beta=off` chowa). | `haze-tips.mjs` |
+- SQL instalacja: https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/0_install.sql
+- SQL włączenie bety: https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/1_beta_on.sql
+- SQL wyłączenie bety: https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/2_beta_off.sql
+- Funkcja Edge (jeden plik): https://raw.githubusercontent.com/PepecoinHub/pepecoinhub.github.io/ccr-a69f4b09-802tqu/games/supabase/haze-beta/haze-wallet-dashboard.ts
 
-## Kroki (produkcyjny Supabase)
+(Po zmergowaniu do `main` w linkach zamień `ccr-a69f4b09-802tqu` na `main`.)
 
-1. **SQL:** uruchomić `games/supabase/update_haze_tips.sql`, potem `games/supabase/update_haze_groups.sql`. Wszystko zostaje wyłączone.
-2. **ID testerów:** obaj logują się raz na pepecoinhub.com przez Discord. Potem `games/supabase/haze-beta/1_find_testers.sql` (tylko odczyt) → dwa `user_id`.
-3. **Funkcja Edge** (z katalogu `games`):
-   ```sh
-   supabase functions deploy haze-wallet --project-ref azbwciqfbsdpwubznncg --no-verify-jwt
-   supabase secrets set PEP_BLOCKBOOK_URL=https://bongendpoint.realmasterkush.com/ --project-ref azbwciqfbsdpwubznncg
-   supabase secrets set HAZE_ACCESS=BYL_USER_ID,LEWISBONG_USER_ID --project-ref azbwciqfbsdpwubznncg
-   ```
-4. **Włączenie bety:** wpisać oba ID w `games/supabase/haze-beta/2_beta_on.sql` i uruchomić.
-5. **Kod strony:** zmergować gałąź do `main` (przełączniki w kodzie zostają `false`; widać tylko z `?beta=haze`).
-6. **Preflight Blockbooka z Edge** — zalogowany tester otwiera `https://pepecoinhub.com/games/?beta=haze`, w konsoli przeglądarki (F12) wkleja, podmieniając `TXID` na dowolną zwykłą transakcję PEP z pepeblocks.com (nie coinbase):
-   ```js
-   const s=JSON.parse(localStorage.getItem('sb-azbwciqfbsdpwubznncg-auth-token'));
-   fetch('https://azbwciqfbsdpwubznncg.supabase.co/functions/v1/haze-wallet',{method:'POST',
-     headers:{apikey:'sb_publishable_GRByiqlX6v67phR8xcM6VA_6eXXwTKX',Authorization:'Bearer '+s.access_token,'Content-Type':'application/json'},
-     body:JSON.stringify({action:'preflight',txid:'TXID'})}).then(r=>r.json()).then(console.log);
-   ```
-   Dobry wynik: `genesis_ok: true`, `outputs` > 0, `block_ok: true` i `prevout` z `value` (liczba w base units). Błąd albo `genesis_ok: false` = nie testujemy płatności.
-   Kontrola dostępu: to samo z konta, którego nie ma na liście, musi dać „Haze tips are in a closed beta.”
-7. **Data testu** — zaproponować Lew po udanym kroku 6.
+## A. Bez portfela Haze — można zrobić od razu z telefonu
+
+1. **Instalacja SQL** — supabase.com → projekt → SQL Editor → New query → wklej `0_install.sql` → Run.
+   Wszystko zostaje wyłączone. Można uruchomić ponownie bez szkody.
+2. **Funkcja Edge** — Edge Functions → Deploy a new function → Via Editor → nazwa **`haze-wallet`** → zastąp całą
+   treść pliku wklejonym `haze-wallet-dashboard.ts` → Deploy. Potem w ustawieniach funkcji **wyłącz weryfikację
+   JWT** („Verify JWT” / „Enforce JWT verification”) — funkcja sama sprawdza logowanie i listę testerów.
+3. **Sekret Blockbooka** — Edge Functions → Secrets → dodaj `PEP_BLOCKBOOK_URL` = `https://bongendpoint.realmasterkush.com/`
+4. **Logowanie testerów** — Ty i Lewisbong logujecie się raz na pepecoinhub.com przez Discord (zwykłe logowanie do gier).
+5. **Włączenie bety** — SQL Editor → wklej `1_beta_on.sql`, w linii z nazwami wpisz swoją nazwę z Discorda zamiast
+   `BYL_DISCORD_USERNAME` (małe litery, bez @) → Run. Jeśli nazwa nie pasuje dokładnie do jednego konta, nic się
+   nie zmienia i dostajesz komunikat. Ostatni wynik to gotowa wartość **HAZE_ACCESS**.
+6. **Sekret dostępu** — Edge Functions → Secrets → dodaj `HAZE_ACCESS` = wartość z kroku 5 (dwa ID po przecinku).
+7. **Kod strony** — zmergować gałąź do `main` (GitHub w telefonie: PR → Merge). Przełączniki w kodzie zostają
+   wyłączone; przyciski widać tylko z `?beta=haze`.
+8. **Beta check** — w telefonie otwórz `https://pepecoinhub.com/games/?beta=haze`, zaloguj się, w czacie dotknij
+   **◇ Beta check**. Dobrze: „✅ Indexer OK”. Lewisbong robi to samo. Ktoś spoza listy dostaje „closed beta”.
+
+Jeśli 1–8 przejdą, serwer, baza i Blockbook są gotowe. Wtedy można zaproponować Lew datę testu.
+
+## B. Portfel Haze (potrzebny do samego testu)
+
+- Tipy działają tylko w **Haze web** (hazewallet.com w przeglądarce, także w telefonie). Według Haze aplikacje
+  natywne i rozszerzenie jeszcze tego nie obsługują, więc testowa aplikacja mobilna nie zastąpi wersji web.
+- Do **odbierania** tipów portfel nie potrzebuje środków. Do **wysłania** 1 PEP potrzeba ok. 1,01 PEP (kwota + opłata).
+- Frazę odzyskiwania zapisz na papierze. Nie rób zrzutu ekranu i nie wysyłaj jej nikomu (także Haze ani nam).
+- Pytanie do Lew przed testem: czy na telefonie portfel trzeba założyć / odblokować w okienku Haze wewnątrz
+  pepecoinhub.com (przeglądarki telefonów rozdzielają dane stron osadzonych), czy wystarczy portfel z hazewallet.com.
 
 ## Plan testu (z Lew)
 
-- [ ] Obaj: „Link Haze for tips” → stempel **Haze Linked** w Passporcie.
-- [ ] Byl → Lewisbong: tip **1 PEP** przyciskiem i drugi raz komendą `/tip Lewisbong 1`.
+- [ ] Obaj: „Link Haze for tips” → stempel **Haze Linked**.
+- [ ] Tip **1 PEP** przyciskiem i drugi przez `/tip Lewisbong 1` (albo Lewisbong → Byl, jeśli Byl nie ma środków).
 - [ ] Mały tip grupowy z **jednym odbiorcą**.
-- [ ] Oczekiwanie na **2 potwierdzenia**; karta „tipped” w czacie lobby i w LAN Party.
-- [ ] **Automatyczne odzyskanie** potwierdzenia: odświeżyć stronę w trakcie oczekiwania — bez ponownej płatności i bez wpisywania txid.
+- [ ] **2 potwierdzenia**; karta „tipped” w czacie lobby i w LAN Party.
+- [ ] Odświeżenie strony w trakcie oczekiwania → potwierdzenie wraca samo, bez ponownej płatności.
 - [ ] Stempel **First Haze Tip** u nadawcy.
-- [ ] Konto spoza listy nie widzi niczego bez `?beta=haze` i nic nie może zrobić z `?beta=haze`.
 
-Każda kwota i opłata jest zatwierdzana przez właściciela portfela w Haze. Wysłanej płatności nie da się cofnąć.
+Każdą kwotę i opłatę zatwierdza właściciel portfela w Haze. Wysłanej płatności nie da się cofnąć.
 
 ## Wyłączenie bety
 
-`games/supabase/haze-beta/3_beta_off.sql`: najpierw dwa SELECT-y (oczekujące płatności). Gdy puste — UPDATE z pliku.
-Awaryjnie można od razu: `update games.haze_settings set enabled=false where id;` (płatności już wysłane zostają na łańcuchu; ich potwierdzenie wróci po ponownym włączeniu).
+SQL Editor → `2_beta_off.sql`: dwa SELECT-y pokazują płatności, które czekają na potwierdzenie. Gdy oba są puste,
+odkomentuj i uruchom ostatni UPDATE. Awaryjnie od razu: `update games.haze_settings set enabled=false where id;`
 
 ## Później
 
-- Trzeci tester → prawdziwy podział grupowy na kilka osób.
+- Trzeci tester → prawdziwy podział grupowy.
 - Start dla wszystkich: `beta_only=false`, `HAZE_ACCESS=all`, `HAZE_TIPS_ENABLED`/`HAZE_GROUPS_ENABLED` = `true`, podbić `?v=`.
-- Własny Blockbook albo stała zgoda operatora `bongendpoint` na produkcję.
-- Tipy z PepeGochi i czatu PEPaint (ten sam model, nowe źródło tipu).
+- Własny Blockbook albo stała zgoda operatora `bongendpoint`.
+- Tipy z PepeGochi i czatu PEPaint.
+
+Uwaga dla utrzymania: `haze-beta/0_install.sql` i `haze-beta/haze-wallet-dashboard.ts` są generowane
+(`node scripts/bundle-haze-edge.mjs`); test pilnuje, żeby były aktualne.

@@ -1,4 +1,5 @@
 import {handleHaze,boundedJSON,accessList} from './handler.mjs';
+import {pickSpendingTxid} from './core.mjs';
 
 const sb=Deno.env.get('SUPABASE_URL')||'';
 const service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'';
@@ -23,5 +24,12 @@ Deno.serve((req:Request)=>{
     authenticate:(token:string)=>requestRead(sb+'/auth/v1/user',{headers:{apikey:service,Authorization:'Bearer '+token}}),rpc,
     readGenesis:async()=>{const block=await requestRead(indexer!.href+'api/v2/block/0');return block.hash;},
     readTx:(txid:string)=>requestRead(indexer!.href+'api/v2/tx/'+txid),
+    // Preflight only: walk back at most 10 blocks from the indexer's best height to find an ordinary transaction.
+    findRecentTx:async()=>{
+      const status=await requestRead(indexer!.href+'api/');const best=status?.blockbook?.bestHeight;
+      if(!Number.isSafeInteger(best)||best<1)throw Error('The indexer did not report its best height.');
+      for(let height=best;height>Math.max(0,best-10);height--){const txid=pickSpendingTxid(await requestRead(indexer!.href+'api/v2/block/'+height));if(txid)return txid;}
+      return null;
+    },
   });
 });

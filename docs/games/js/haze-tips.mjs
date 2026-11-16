@@ -157,7 +157,21 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
       }catch(error){if(view.active()){walletHost.hidden=true;view.status.textContent=error.message;approve.disabled=false;}}
     };
   }
-  function mount(parent){linkButton=node('button',{type:'button',class:'haze-wallet-link',onclick:connect},'◇ Link Haze for tips');parent.append(linkButton);groups?.mount(parent);void refresh();}
+  // Closed beta only: a phone-friendly check that the haze-wallet Edge Function can read the configured indexer.
+  async function betaCheck() {
+    try{signed();}catch{return;}
+    const view=modal('Haze beta check');view.status.textContent='Asking the PepecoinHub server to read the Pepecoin indexer…';
+    try{
+      const r=await invoke({action:'preflight'});
+      const ok=r.genesis_ok===true&&r.outputs>0&&r.block_ok===true&&typeof r.prevout?.value==='string';
+      view.body.append(node('p',{},ok?'✅ Indexer OK: mainnet genesis, a recent transaction and its funding output were read from the server.':'⚠️ The server answered, but something is missing. Do not test payments yet.'),
+        node('code',{class:'haze-tip-address'},JSON.stringify(r,null,1)));
+      view.status.textContent='';
+    }catch(error){if(view.d.isConnected)view.status.textContent='❌ '+error.message;}
+  }
+  function mount(parent){linkButton=node('button',{type:'button',class:'haze-wallet-link',onclick:connect},'◇ Link Haze for tips');parent.append(linkButton);
+    if(hazeBeta(win))parent.append(node('button',{type:'button',class:'haze-wallet-link',onclick:()=>void betaCheck()},'◇ Beta check'));
+    groups?.mount(parent);void refresh();}
   function paintReceiver(value){
     const available=receivers.get(value.message.user_id);
     value.badge.hidden=available!==true;value.action.disabled=available!==true;

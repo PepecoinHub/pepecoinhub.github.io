@@ -121,3 +121,9 @@ export async function preflightTransaction(tx,readTx){
   }
   return {txid:tx.txid,outputs:out.length,confirmations:tx.confirmations,block_ok:tx.confirmations<1||isHash(tx.blockHash)&&Number.isSafeInteger(tx.blockTime),prevout};
 }
+
+// From a Blockbook v2 block, the first transaction that spends a previous output (skips the coinbase).
+export function pickSpendingTxid(block){
+  const tx=Array.isArray(block?.txs)?block.txs.find(value=>isHash(value?.txid)&&Array.isArray(value.vin)&&value.vin.some(input=>isHash(input?.txid))):null;
+  return tx?tx.txid:null;
+}

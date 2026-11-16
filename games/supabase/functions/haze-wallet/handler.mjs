@@ -17,7 +17,7 @@ export async function boundedJSON(body,limit=16384) {
   const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
   return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
 }
-export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,allowed=()=>false,now=()=>Date.now()}) {
+export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,findRecentTx,allowed=()=>false,now=()=>Date.now()}) {
   if(req.headers.get('origin')!==ORIGIN)return json(403,{error:'This integration is for PepecoinHub.'});
   if(req.method==='OPTIONS')return new Response(null,{status:204,headers});
   if(req.method!=='POST')return json(405,{error:'POST required.'});
@@ -37,10 +37,13 @@ export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,allowe
     }
     // Beta preflight: proves the configured indexer answers from this Edge Function (genesis, a tx and its
     // first funding output) in the exact shape the verifier needs. Reads only; nothing is stored.
-    if(exact(body,['action','txid'])&&body.action==='preflight') {
-      if(!isHash(body.txid))throw Error('Invalid transaction ID.');
+    // Without a txid (phone button) the function picks a recent ordinary transaction from the indexer itself.
+    if(body?.action==='preflight'&&(exact(body,['action'])||exact(body,['action','txid']))) {
+      if(body.txid!==undefined&&!isHash(body.txid))throw Error('Invalid transaction ID.');
       const genesis=await readGenesis();
-      return json(200,{genesis_ok:genesis===PEP_GENESIS,...await preflightTransaction(await readTx(body.txid),readTx)});
+      const txid=body.txid??await findRecentTx?.();
+      if(!isHash(txid))throw Error('The indexer did not return a recent transaction.');
+      return json(200,{genesis_ok:genesis===PEP_GENESIS,...await preflightTransaction(await readTx(txid),readTx)});
     }
     if(!exact(body,['action','intent','txid'])||!['check','group-check'].includes(body.action)||!isUUID(body.intent)||!isHash(body.txid))throw Error('Invalid tip request.');
     const group=body.action==='group-check';

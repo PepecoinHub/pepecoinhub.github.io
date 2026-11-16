@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {verifyWalletProof,verifyTipTransaction,pepScript} from '../games/supabase/functions/haze-wallet/core.mjs';
+import {verifyWalletProof,verifyTipTransaction,pepScript,pickSpendingTxid} from '../games/supabase/functions/haze-wallet/core.mjs';
 import {handleHaze,accessList} from '../games/supabase/functions/haze-wallet/handler.mjs';
 import {amountAtomic,formatAtomic,tipURL,submissionMatches,createHazeTips,hazeBeta,parseTipCommand} from '../docs/games/js/haze-tips.mjs';
 
@@ -121,4 +121,18 @@ test('/tip command: nick, amount (dot or comma, optional pep) and note; /answer 
   assert.deepEqual(parseTipCommand('/TIP @Jurek 2,5 PEP thanks for the help'),{nick:'Jurek',amount:'2.5',note:'thanks for the help'});
   assert.deepEqual(parseTipCommand('/tip Jurek 100pep'),{nick:'Jurek',amount:'100',note:''});
   for(const bad of ['/tip','/tip Jurek','/tip Jurek abc','/tip Jurek 0.5','/tip Jurek 100001','/tip Jurek -5','/tip Jurek 1.123456789'])assert.throws(()=>parseTipCommand(bad),bad);
+});
+
+test('phone preflight: picks the first spending transaction of a block (never the coinbase); paste files are fresh',async()=>{
+  assert.equal(pickSpendingTxid({txs:[{txid:'ee'.repeat(32),vin:[{coinbase:'00'}]},{txid:'ab'.repeat(32),vin:[{txid:'cd'.repeat(32),vout:0}]}]}),'ab'.repeat(32));
+  assert.equal(pickSpendingTxid({txs:[{txid:'ee'.repeat(32),vin:[{}]}]}),null);assert.equal(pickSpendingTxid(null),null);
+  const user={id:'owner',is_anonymous:false,identities:[{provider:'discord'}]};
+  const req=body=>new Request('https://fixture.invalid',{method:'POST',headers:{origin:'https://pepecoinhub.com',authorization:'Bearer fixture-token-123456'},body:JSON.stringify(body)});
+  const deps={allowed:()=>true,authenticate:async()=>user,rpc:async()=>{throw Error('no database');},readGenesis:async()=>PEP_GENESIS_HEX,findRecentTx:async()=>txid,
+    readTx:async id=>id===txid?transaction():{txid:id,vout:[{n:0,value:'2000000000',hex:pepScript(proof.address)}]}};
+  const result=await (await handleHaze(req({action:'preflight'}),deps)).json();
+  assert.equal(result.txid,txid);assert.equal(result.genesis_ok,true);
+  assert.equal((await handleHaze(req({action:'preflight',extra:1}),deps)).status,400);
+  const {execFileSync}=await import('node:child_process');
+  execFileSync(process.execPath,[new URL('../scripts/bundle-haze-edge.mjs',import.meta.url).pathname,'--check']);
 });
