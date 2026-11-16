@@ -148,9 +148,22 @@ function outputs(tx,limit=32) {
   return tx.vout;
 }
 
+// Blockbook v2 omits zero-valued fields (Go `omitempty`): an input spending output 0 has no `vout`, a 0-value
+// output has no `value`, an unconfirmed tx may have no `confirmations`. Found on the production beta check
+// (2026-11-16). Restore the zeros before verifying; nothing else is changed or trusted more.
+export function blockbookTx(tx){
+  if(!tx||typeof tx!=='object')return tx;
+  return {...tx,
+    confirmations:tx.confirmations===undefined?0:tx.confirmations,
+    vin:Array.isArray(tx.vin)?tx.vin.map(input=>input&&typeof input==='object'&&isHash(input.txid)&&input.vout===undefined?{...input,vout:0}:input):tx.vin,
+    vout:Array.isArray(tx.vout)?tx.vout.map(output=>output&&typeof output==='object'&&output.value===undefined?{...output,value:'0'}:output):tx.vout};
+}
+const reader=readTx=>async id=>blockbookTx(await readTx(id));
+
 // The operator pins a Pepecoin-mainnet Blockbook source. No caller-supplied URL
 // is fetched. We re-read all funding outputs; explorer address labels are ignored.
 export async function verifyTipTransaction(intent,tx,readTx) {
+  tx=blockbookTx(tx);readTx=reader(readTx);
   if(!isHash(intent.txid)||tx?.txid!==intent.txid) fail('Transaction ID mismatch.');
   const destination=pepScript(intent.address),sender=pepScript(intent.sender),wanted=atomic(intent.amount_atomic);
   if(destination===sender||wanted<100000000n||wanted>10000000000000n) fail('Unsupported tip amount.');
@@ -178,6 +191,7 @@ export async function verifyTipTransaction(intent,tx,readTx) {
 
 // Group manifests come from private SQL snapshots, never from the checking client.
 export async function verifyGroupTransaction(intent,tx,readTx){
+  tx=blockbookTx(tx);readTx=reader(readTx);
   if(!isHash(intent.txid)||tx?.txid!==intent.txid||!Array.isArray(intent.recipients)||intent.recipients.length<1||intent.recipients.length>200)fail('Invalid group transaction.');
   const sender=pepScript(intent.sender),expected=new Map();let total=0n;
   for(const recipient of intent.recipients){
@@ -209,10 +223,12 @@ export async function verifyGroupTransaction(intent,tx,readTx){
 
 // Read-only indexer shape check for the closed beta (no verification of any tip).
 export async function preflightTransaction(tx,readTx){
+  tx=blockbookTx(tx);readTx=reader(readTx);
   if(!isHash(tx?.txid))fail('The indexer did not return a transaction.');
   const out=outputs(tx,10000);
   if(!Number.isSafeInteger(tx.confirmations)||tx.confirmations<0)fail('The indexer did not return confirmations.');
   const input=Array.isArray(tx.vin)?tx.vin.find(value=>isHash(value?.txid)&&Number.isSafeInteger(value.vout)):null;
+  if(!input)fail('This transaction has no funding input (the first transaction of a block is the miner reward). Pick another one.');
   let prevout=null;
   if(input){
     const parent=await readTx(input.txid);

@@ -1,3 +1,16 @@
+  if(!isHash(intent.txid)||tx?.txid!==intent.txid||!Array.isArray(intent.recipients)||intent.recipients.length<1||intent.recipients.length>200)fail('Invalid group transaction.');
+  const sender=pepScript(intent.sender),expected=new Map();let total=0n;
+  for(const recipient of intent.recipients){
+    const script=pepScript(recipient.address),value=atomic(recipient.amount);
+    if(script===sender||expected.has(script)||value<100000000n)fail('Invalid group recipient.');expected.set(script,value);total+=value;
+  }
+  if(total!==atomic(intent.total_atomic)||total>10000000000000n)fail('The group total does not match.');
+  const out=outputs(tx,201),found=new Set();let change=0;
+  for(const output of out){
+    if(output.hex===sender){if(++change>1||atomic(output.value)===0n)fail('Unsupported group change.');continue;}
+    if(!expected.has(output.hex)||found.has(output.hex)||atomic(output.value)!==expected.get(output.hex))fail('A group recipient or amount changed.');found.add(output.hex);
+  }
+  if(found.size!==expected.size)fail('A group recipient is missing.');
   if(!Number.isSafeInteger(tx.confirmations)||tx.confirmations<0||!Array.isArray(tx.vin)||tx.vin.length<1||tx.vin.length>20)fail('Invalid group funding or confirmations.');
   const seen=new Set(),cache=new Map();let inputTotal=0n;
   for(const input of tx.vin){
@@ -16,10 +29,12 @@
 
 // Read-only indexer shape check for the closed beta (no verification of any tip).
 export async function preflightTransaction(tx,readTx){
+  tx=blockbookTx(tx);readTx=reader(readTx);
   if(!isHash(tx?.txid))fail('The indexer did not return a transaction.');
   const out=outputs(tx,10000);
   if(!Number.isSafeInteger(tx.confirmations)||tx.confirmations<0)fail('The indexer did not return confirmations.');
   const input=Array.isArray(tx.vin)?tx.vin.find(value=>isHash(value?.txid)&&Number.isSafeInteger(value.vout)):null;
+  if(!input)fail('This transaction has no funding input (the first transaction of a block is the miner reward). Pick another one.');
   let prevout=null;
   if(input){
     const parent=await readTx(input.txid);
@@ -60,19 +75,3 @@ export async function handleHaze(req,{authenticate,rpc,readTx,readGenesis,findRe
   if(req.headers.get('origin')!==ORIGIN)return json(403,{error:'This integration is for PepecoinHub.'});
   if(req.method==='OPTIONS')return new Response(null,{status:204,headers});
   if(req.method!=='POST')return json(405,{error:'POST required.'});
-  const token=/^Bearer ([A-Za-z0-9._-]{16,8192})$/.exec(req.headers.get('authorization')||'')?.[1];
-  if(!token)return json(401,{error:'Sign in with Discord first.'});
-  let user;
-  try {user=await authenticate(token);}catch{return json(401,{error:'Sign in again to continue.'});}
-  if(!user||user.is_anonymous||!user.identities?.some(identity=>identity.provider==='discord'))return json(403,{error:'A Discord-linked account is required.'});
-  if(!allowed(user.id))return json(403,{error:'Haze tips are in a closed beta.'});
-  try {
-    const body=await boundedJSON(req.body);
-    if(exact(body,['action','proof'])&&body.action==='link') {
-      if(typeof body.proof?.nonce!=='string'||!/^[a-f0-9]{64}$/.test(body.proof.nonce))throw Error('Invalid wallet-link request.');
-      const challenge=await rpc('haze_link_context',{p_user:user.id,p_nonce:body.proof.nonce});
-      const address=verifyWalletProof(body.proof,challenge,now());
-      return json(200,await rpc('haze_link_finish',{p_user:user.id,p_nonce:challenge.nonce,p_address:address}));
-    }
-    // Beta preflight: proves the configured indexer answers from this Edge Function (genesis, a tx and its
-    // first funding output) in the exact shape the verifier needs. Reads only; nothing is stored.

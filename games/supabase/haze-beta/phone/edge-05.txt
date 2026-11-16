@@ -1,0 +1,5 @@
+      for(let height=best;height>Math.max(0,best-10);height--){const txid=pickSpendingTxid(await requestRead(indexer!.href+'api/v2/block/'+height));if(txid)return txid;}
+      return null;
+    },
+  });
+});
