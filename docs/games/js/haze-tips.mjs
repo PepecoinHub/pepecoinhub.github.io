@@ -158,7 +158,12 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
         else{walletHost.hidden=true;view.status.textContent='';
           view.body.replaceChildren(node('p',{},'✅ Haze Linked! Frens can now tip this public address. Your passport gets the Haze Linked stamp.'),
             node('code',{class:'haze-tip-address'},linked.address),node('button',{type:'button',class:'haze-tip-primary',onclick:()=>view.close()},'Done'));}
-      }catch(error){if(view.active()){walletHost.hidden=true;view.status.textContent=error.message;approve.disabled=false;}}
+      }catch(error){if(view.active()){
+        // Keep the Haze window visible once it has loaded: a missing or locked wallet is created, restored or
+        // unlocked right there, then Continue is pressed again (tester on iPhone, 2026-11-16).
+        if(!walletCaps)walletHost.hidden=true;
+        view.status.textContent=error.message+(walletCaps?' If Haze shows Create, Restore or Unlock below, do that in this window (not in a separate tab), then press Continue again.':'');
+        approve.disabled=false;}}
     };
   }
   // Closed beta only: a phone-friendly check that the haze-wallet Edge Function can read the configured indexer.

@@ -4897,7 +4897,7 @@
       var canMod = false, who = null, whoT = 0;
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
       var hazeTips = null;
-      import(BASE + 'games/js/haze-tips.mjs?v=20261116linked').then(function (m) {
+      import(BASE + 'games/js/haze-tips.mjs?v=20261116unlock').then(function (m) {
         if (!alive) return;
         hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp,
           invoke: function (body) {
