@@ -1,8 +1,8 @@
 -- Fren Passport, expansion 7 (owner, 2026-11-15): the server side of four arcade stamps. DRAFT: not run anywhere.
 --
--- Run after: schema.sql, update_passport_season.sql, update_fren_passport.sql, update_passport_awards.sql,
--- update_pond_bulletin.sql, update_lilies.sql, update_gold_hook.sql and update_gold_hook_campaign.sql.
--- Safe to run again (nothing is deleted).
+-- Run after: schema.sql, the Fren Passport files (update_passport_awards.sql) and update_lilies.sql.
+-- Gold Hook may come before or after: update_gold_hook_campaign.sql creates its no-op hook only when this file's
+-- real one is not there yet, so either order ends with the real hook. Safe to run again (nothing is deleted).
 --
 --   lord_of_the_lilies  Lord of the Lilies  10 Three Lilies duels won against a valid opponent
 --   master_tactician    Master Tactician    5 such wins in a row; a loss or a DRAW breaks the streak
@@ -39,9 +39,6 @@ do $$ begin
   end if;
   if to_regclass('games.lily_challenges') is null then
     raise exception 'Run update_lilies.sql before update_passport_arcade_x7.sql';
-  end if;
-  if to_regclass('games.goldhook_players') is null then
-    raise exception 'Run update_gold_hook_campaign.sql before update_passport_arcade_x7.sql';
   end if;
 end $$;
 

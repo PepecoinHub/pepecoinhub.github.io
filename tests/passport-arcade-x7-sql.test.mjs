@@ -161,3 +161,29 @@ test('expansion 7 on PostgreSQL: valid duels only, streaks, once per stamp, comp
     await drop();
   }
 });
+
+test('EXPANSION7.sql is built from the current files', async () => {
+  const { execFileSync } = await import('node:child_process');
+  execFileSync('python3', ['scripts/build_expansion7_sql.py', '--check'], { cwd: new URL('..', import.meta.url) });
+  const sql = file('games/supabase/deploy/EXPANSION7.sql');
+  assert.equal(sql.match(/^begin;$/gm).length, 1);
+  assert.equal(sql.match(/^commit;$/gm).length, 1);
+  assert.doesNotMatch(sql.split('/* Check')[0].replace(/^\/\*[\s\S]*?\*\//m, ''), /--/, 'no line comments in the paste file');
+});
+
+test('EXPANSION7.sql runs twice on a production-like database; Gold Hook pasted afterwards keeps the real hook',
+  { skip: SKIP, timeout: 120000 }, async () => {
+  const { db, drop } = await pondDb('passport_x7_paste', ['update_pond_bulletin.sql', 'update_lilies.sql']);
+  try {
+    const sql = file('games/supabase/deploy/EXPANSION7.sql');
+    await db.query(sql); await db.query(sql);
+    await db.query(`create table games.arcade_scores (id bigint generated always as identity primary key, game text not null,
+      nick text not null, score int not null, verified boolean not null default false, user_id uuid, duration_ms int not null,
+      ip_hash text, created_at timestamptz not null default now());`);
+    await db.query(file('games/supabase/update_gold_hook_campaign.sql'));
+    const check = sql.split('/* Check (optional, run on its own afterwards): every column should say true.\n')[1].split('*/')[0];
+    assert.deepEqual(Object.values((await db.query(check)).rows[0]), [true, true, true, true]);
+  } finally {
+    await drop();
+  }
+});
