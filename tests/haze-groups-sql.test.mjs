@@ -13,7 +13,7 @@ test('group SQL: all audiences, exact splits, frozen recipients, timed chat roun
   const service=(name,args)=>JSON.parse(as('service_role',1,`select public.${name}(${args})`));
   sql('create database '+db,'postgres');
   try{
-    let bootstrap=readFileSync(new URL('../scripts/haze-preview/bootstrap.sql',import.meta.url),'utf8').replace(/create role (\w+) nologin;/g,(_,role)=>`do $$begin create role ${role} nologin;exception when duplicate_object then null;end$$;`);
+    let bootstrap=readFileSync(new URL('../scripts/haze-preview/bootstrap.sql',import.meta.url),'utf8').replace(/create role (\w+) nologin;/g,(_,role)=>`do $$begin create role ${role} nologin;exception when duplicate_object or unique_violation then null;end$$;`);
     sql(bootstrap);const base=readFileSync(new URL('../games/supabase/update_haze_tips.sql',import.meta.url),'utf8'),groups=readFileSync(new URL('../games/supabase/update_haze_groups.sql',import.meta.url),'utf8');sql(base);sql(groups);sql(base);sql(groups);
     for(let n=1;n<=8;n++){sql(`insert into auth.users values(${q(uid(n))});insert into games.profiles values(${q(uid(n))},'Fren${n}');`);if(n!==8)sql(`insert into auth.identities values(${q(uid(n))},'discord');`);if(n!==3)sql(`insert into games.haze_links(user_id,address)values(${q(uid(n))},${q(address(n))});`);}
     sql(`update games.haze_settings set enabled=true,beta_only=false;`);assert.throws(()=>rpc(1,'gry_haze_groups'),'Community flag is independent from direct tips');

@@ -15,9 +15,9 @@ test('Haze SQL: real PostgreSQL permissions, challenge replay, immutable recipie
   const rpc=(role,user,sql)=>JSON.parse(as(role,user,sql));
   psql('create database '+database,'postgres');
   try{
-    psql(`do $$ begin create role anon nologin;exception when duplicate_object then null;end $$;
-      do $$ begin create role authenticated nologin;exception when duplicate_object then null;end $$;
-      do $$ begin create role service_role nologin;exception when duplicate_object then null;end $$;
+    psql(`do $$ begin create role anon nologin;exception when duplicate_object or unique_violation then null;end $$;
+      do $$ begin create role authenticated nologin;exception when duplicate_object or unique_violation then null;end $$;
+      do $$ begin create role service_role nologin;exception when duplicate_object or unique_violation then null;end $$;
       create schema auth;create schema games;create schema realtime;
       create table auth.users(id uuid primary key);create table auth.identities(user_id uuid,provider text);
       create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
