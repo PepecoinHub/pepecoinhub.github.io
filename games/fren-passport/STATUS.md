@@ -209,3 +209,6 @@ nor break a streak; cancelled and expired challenges never count; each (duel, pl
 Activation of the four arcade stamps (owner, after the counters look right): add the ids to the allowlist in
 `update_passport_awards.sql`, set them `live` in the catalog, run both, then
 `select games.passport_x7_sync(user_id) from games.passport_x7_progress;`. Tests: `tests/passport-arcade-x7-sql.test.mjs`.
+
+**2026-11-16:** the owner ran `deploy/EXPANSION7.sql` on production. The Three Lilies and Gold Hook counters run from
+then on; the four arcade stamps are still outside the allowlist (nothing awarded yet).
