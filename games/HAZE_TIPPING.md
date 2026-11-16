@@ -294,6 +294,23 @@ multi-recipient payments described above use Haze's native signer.
 
 ## Tests
 
+The production link lifecycle first asks the server for a challenge, then
+loads/reuses the Haze frame. An unused challenge is cached only in this page,
+bound to the current account and its expiry, and discarded before submitting
+an ownership proof. Declining, an auth error or reopening the dialog does not
+create another challenge or hide the existing wallet. Closing a pending
+connection sends Haze's authenticated-origin `disconnect` command; no payment
+authority is created or changed. An open message is sent only after iframe
+navigation and bridge readiness. Closed/destroyed views cannot open it later.
+
+`tests/haze-link-lifecycle-browser.cjs` exercises these cases in the actual
+PondOS LAN app with fixture Supabase/Haze services and no production writes.
+CI installs pinned browser tooling in its temporary directory and runs this
+regression separately from the Node and PostgreSQL suites. Games and all
+PondOS pages load the `20261116link` client versions so an older cached loader
+does not retain the flashing behavior. This frontend fix needs no new SQL,
+Edge deployment or Haze allowlist change; beta access remains server-enforced.
+
 ```sh
 npm ci --prefix games/supabase/functions/haze-wallet --ignore-scripts
 node --test tests/haze-core.test.mjs tests/discord-link.test.mjs tests/passport-awards.test.mjs tests/csp.test.mjs

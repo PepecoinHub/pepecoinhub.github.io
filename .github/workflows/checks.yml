@@ -19,6 +19,15 @@ jobs:
       - run: python scripts/check_i18n.py
       - run: npm ci --prefix games/supabase/functions/haze-wallet --ignore-scripts --no-audit --no-fund
       - run: node --test tests/*.test.mjs
+      - name: Install isolated Haze browser test tooling
+        run: |
+          npm install --prefix "$RUNNER_TEMP/haze-browser" --no-save --ignore-scripts --no-audit --no-fund playwright@1.62.1
+          "$RUNNER_TEMP/haze-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Check Haze link lifecycle in PondOS
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/haze-browser/node_modules/playwright
+          HAZE_PH_QA_OUTPUT: ${{ runner.temp }}/haze-link-lifecycle
+        run: node tests/haze-link-lifecycle-browser.cjs
       - run: docker run --rm -d --name haze-ph-qa-ci --tmpfs /var/lib/postgresql/data:rw -e POSTGRES_PASSWORD=disposable-haze-ci postgres:17-alpine
       - run: |
           for i in {1..30}; do docker exec haze-ph-qa-ci pg_isready -U postgres && break; sleep 1; done

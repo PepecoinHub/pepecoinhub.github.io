@@ -77,6 +77,9 @@ try{
     const presence=()=>psql(`insert into games.lobby_seen(visitor,user_id,seen_at) values('demo-byl',${quote(uid(2))},clock_timestamp()),('demo-jules',${quote(uid(4))},clock_timestamp()) on conflict(visitor) do update set seen_at=excluded.seen_at;`);
     presence();demoPresenceTimer=setInterval(presence,30000);
   }
+  // Only this network-isolated disposable database contains these fixture IDs.
+  // Keep the real closed-beta gate enabled and enroll the demo participants.
+  psql("insert into games.haze_testers(user_id) select id from auth.users on conflict do nothing;");
   const ledger=new Map(),unspent=new Map(),submitted=new Map();
   const funding=new libs.Transaction();funding.addInput(B.alloc(32,19),0);
   funding.addOutput(B.from(await addressScript(sender.address,'PEP')),250000000000n);
@@ -157,6 +160,7 @@ try{
         if(!isWallet&&p==='/__preview/haze'){
           const input=await body(req);const response=await handleHaze(new Request(PH+p,{method:'POST',headers:{origin:PH,authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(input)}),{
             authenticate:async value=>value===token?{id:uid(actor),is_anonymous:false,identities:[{provider:'discord'}]}:null,
+            allowed:user=>[1,2,3,4,5,6,7].some(n=>uid(n)===user),
             rpc:async(fn,args)=>dbRpc(fn,args,true),readTx,readGenesis:async()=>PEP_GENESIS,
           });return json(res,response.status,await response.json());
         }
