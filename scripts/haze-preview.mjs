@@ -239,7 +239,7 @@ try{
           else if(p==='/games/js/haze-groups.mjs'&&groupMode)content=content.toString().replace('HAZE_GROUPS_ENABLED=false','HAZE_GROUPS_ENABLED=true');
           return send(res,content,mime[ext]||'application/octet-stream');
         }
-        if(['/wallet.js','/widget.html','/widget-boot.js','/haze-bridge.js',...(groupMode?['/wallet-core.js','/assets/haze-group-tips.js']:[])].includes(p)){
+        if(['/wallet.js','/widget.html','/widget-boot.js','/haze-bridge.js',...['/wallet-core.js','/assets/haze-group-tips.js','/assets/haze-tip-journal.js'].filter(name=>fs.existsSync(path.join(candidate,name.slice(1))))].includes(p)){
           let content=read(path.join(candidate,p.slice(1)));
           if(p==='/widget.html')content=content.replace('</head>',`<style>${css}</style></head>`).replace('<body>','<body><div class="preview-wallet-banner"><strong>LOCAL SIMULATION</strong> · password '+password+' · <a href="'+PH+'/games/#chat" target="_top">Back to chat ↗</a></div>');
           return send(res,content,mime[path.extname(p)]);

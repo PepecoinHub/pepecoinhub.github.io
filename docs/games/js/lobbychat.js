@@ -28,7 +28,7 @@ export function lobbyChat(be, { openLogin }) {
   catch { visitor = crypto.randomUUID(); }
   const msgs = new Map();
   let last = 0, mod = false, timer = 0, busy = false, again = false, first = true, readyAt = 0, mutedUntil = null;
-  const haze=be.kind==='supabase'?createHazeTips({rpc:(name,args)=>be.rpc(name,args),invoke:body=>be.haze(body),session:()=>be.session(),login:openLogin}):null;
+  const haze=be.kind==='supabase'?createHazeTips({rpc:(name,args)=>be.rpc(name,args),invoke:body=>be.haze(body),session:()=>be.session(),login:openLogin,chatLog:box,chatInput:input}):null;
   haze?.mount(panel.querySelector('.chat-rules')||panel);
   const phone = matchMedia('(max-width: 900px)');
   const watching = () => !document.hidden && (!phone.matches || panel.classList.contains('open'));

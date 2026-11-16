@@ -1,12 +1,13 @@
 {
   "reviewOnly": true,
   "productionEnabled": false,
+  "candidateVersion": "1.1.9",
   "baseline": "Reviewed Haze web 1.1.8 runtime; all normalized SHA-256 values must match",
   "files": [
     {
       "path": "wallet.js",
       "baselineSHA256": "c0d3c4532f5523c537a97d44171c88164ec38d1479899d1bd87f6308c4af02c4",
-      "candidateSHA256": "3eee9b8be562f1abdaaef40c012aac8717f13c246a847c28eb64360e283ff99d"
+      "candidateSHA256": "31df986372d76de05649e9f253e824b004e5ac78a374afdc130c825e725529fe"
     },
     {
       "path": "wallet-core.js",
@@ -21,12 +22,12 @@
     {
       "path": "widget.html",
       "baselineSHA256": "e4ecaf5fcbbe0d6e1f315942eefb3aba02167bf12ecdcbb434c0804e62b2c558",
-      "candidateSHA256": "526b7f62898b07a7df5e5fbf4997759b7f06770b4cd4641402e3f5e057212e19"
+      "candidateSHA256": "e9b3df4f497ec39bdb8f3e91572a10cc2dc5436de3c7aaaa462429c18c782a59"
     },
     {
       "path": "widget-boot.js",
       "baselineSHA256": "999bbf6d7791d0859fa5fcb20b8b8b780ad94e86b811e89fa39f2b1fc65e9db0",
-      "candidateSHA256": "9b2e195b23e70dea024fb135a18edc2f26c561c3804055e2f6f07e75ac906a25"
+      "candidateSHA256": "f870e6ff2bacdc0dc0b7404875ae6bbc4329fc5965b0211d2e8f8081e0af8c81"
     },
     {
       "path": "assets/haze-group-tips.js",
@@ -44,6 +45,10 @@
     {
       "path": "assets/haze-chat-tips.js",
       "dependencySHA256": "4cdb59e88faf99a05c40dccb6c91d2d2f796781e788511487deda97e6676562f"
+    },
+    {
+      "path": "assets/haze-tip-journal.js",
+      "dependencySHA256": "cd2e64f5c77ab391ae4cee172e045049db2d6ef3e940865b79e02c8168096621"
     },
     {
       "path": "assets/tip.html",

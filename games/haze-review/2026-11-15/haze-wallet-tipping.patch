@@ -1,14 +1,15 @@
 diff --git a/wallet.js b/wallet.js
-index f123da3..5f80cc6 100644
+index f123da3..da0509a 100644
 --- a/wallet.js
 +++ b/wallet.js
-@@ -34,6 +34,25 @@ import { ASSET_LOGOS } from './asset-logos.js';
+@@ -34,6 +34,30 @@ import { ASSET_LOGOS } from './asset-logos.js';
  import {EXPANSION_EVM_NETWORKS} from './asset-catalog-core.js';
  import {WALLET_TERMS_VERSION,WALLET_TERMS_SECTIONS,createTermsAcceptance} from './wallet-terms.js?v=privacy-116';
  import { selectAssetRows, assetDisplayPriority, formatCatalogUnits, formatMarketUnitPrice, summarizeAvailableBalances, mergeHostedNetworkBalances, isPromotionalToken } from './asset-list.js';
 +import {createChatTipHandoff, TIP_REACTIONS, notifyChatTipSubmission} from './assets/haze-chat-tips.js';
 +import {HUB_ORIGIN} from './haze-auth-protocol.js';
 +import {readGroupTip,notifyGroupSubmission} from './assets/haze-group-tips.js';
++import {createTipJournal} from './assets/haze-tip-journal.js';
 +
 +let chatTipHandoff = createChatTipHandoff(globalThis.location?.hash || '');
 +let applyChatTipHandoff=null;
@@ -16,6 +17,10 @@ index f123da3..5f80cc6 100644
 +let pendingChatGroup=null,applyChatGroup=null,groupRequestEpoch=0;
 +const submittedChatGroups=new Map();
 +const submittedChatTips=new Map();
++const tipJournal=createTipJournal();
++const directRecoveryIdentity=tip=>({intent:tip.intent,sender:tip.sender,payments:[{address:tip.address,amount:String(parseCoinAmount(tip.amount))}]});
++const groupRecoveryIdentity=request=>({intent:request.id,sender:request.sender,payments:request.recipients.map(({address,amount})=>({address,amount}))});
++const recoveredGroup=(request,txid)=>({txid,amount:request.total_atomic,outputs:request.recipients.map(({address,amount})=>({address,amount,change:false}))});
 +function updateChatTipRequest(fragment){
 +  chatTipNavigation++;
 +  // Replace public context without adding a browser-back entry or reloading
@@ -28,7 +33,7 @@ index f123da3..5f80cc6 100644
  
  // wallet.js — self-custody multi-asset wallet UI for hazewallet.com (HazeWallet).
  //
-@@ -45,7 +64,7 @@ import { selectAssetRows, assetDisplayPriority, formatCatalogUnits, formatMarket
+@@ -45,7 +69,7 @@ import { selectAssetRows, assetDisplayPriority, formatCatalogUnits, formatMarket
  // the exact PEP amount and network fee are reviewed before local signing.
  
  import {
@@ -37,7 +42,17 @@ index f123da3..5f80cc6 100644
    parseCoinAmount, formatBaseUnits, ASSETS,
  } from "./wallet-core.js";
  import { createVault, unlockVault, vaultUnlockIdentity, DOGE_VAULT, passwordCharacterCount } from "./wallet-vault.js";
-@@ -1199,6 +1218,8 @@ function confirmReplacement(ctx) {
+@@ -684,7 +708,8 @@ async function broadcastTx(assetId, hex) {
+ /* Drawer shell ----------------------------------------------------------- */
+ 
+ function openDrawer() {
+-  const standalone = new URLSearchParams(location.search).get("standalone") === "1";
++  const frameParams = new URLSearchParams(location.search);
++  const standalone = frameParams.get("standalone") === "1" || frameParams.get("haze-chat") === "1";
+   if (globalThis.__wxLast && !standalone) globalThis.__wxLast.close();
+ 
+   const overlay = el("div", { className: "wx-drawer-overlay" + (standalone ? " wx-drawer-overlay--standalone" : ""), role: "presentation" });
+@@ -1199,6 +1224,8 @@ function confirmReplacement(ctx) {
  
  function showWallet(ctx, state, {offerBiometrics=false}={}) {
    let alive = true, stopBack = () => {};
@@ -46,7 +61,7 @@ index f123da3..5f80cc6 100644
    const assetPreferences = createAssetPreferences();
    let priceView=null, activePriceId=null;
    ctx.card.classList.add('wx-consumer-wallet');
-@@ -2990,6 +3011,13 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -2990,6 +3017,13 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
  
    function viewSend(host) {
      const id = state.assetId, meta = assetMeta(id), act = state.assets[id];
@@ -60,7 +75,7 @@ index f123da3..5f80cc6 100644
      const trade=pendingMoonPayTradePayment;
      const tradePost=(action,input)=>requestJSON('/api/commerce/moonpay/trade-'+action,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+trade.activity.token},body:JSON.stringify({id:trade.activity.id,...input}),signal:sendController.signal},60000);
      const assertTrade=async()=>{if(!trade)return;validateTradeFunding(trade.funding,trade.intent,trade.activity.id);if(trade.funding.sender!==act.address||trade.funding.assetId!==id)throw Error('The Trade funding wallet changed.');const current=validateTradeFunding(await tradePost('funding',{}),trade.intent,trade.activity.id);if(JSON.stringify(current)!==JSON.stringify(trade.funding))throw Error('The Trade terms changed. Review this route again.');};
-@@ -2998,6 +3026,7 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -2998,6 +3032,7 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
      const sendController = new AbortController(); activeSendController = sendController;
      ctx.setCleanup(() => sendController.abort());
      const assertSendActive = (epoch = hazeAuthLifecycle) => {
@@ -68,7 +83,7 @@ index f123da3..5f80cc6 100644
        if (!sessionPolicy.check() || sendController.signal.aborted || !alive || ctx._isClosed() || currentView !== 'send' || state.assetId !== id || unlockedSession !== state || hazeAuthLifecycle !== epoch) {
          throw new Error('The wallet changed or this payment was canceled. Unlock and review it again.');
        }
-@@ -3085,8 +3114,17 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -3085,8 +3120,17 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
        el('p', { className: 'wx-send-reassurance' }, el('span', { html: uiIcon('shield'), 'aria-hidden': 'true' }), 'Review the network fee next. Nothing is sent until you confirm.'),
        err), el('div', { className: 'wx-send-actions' }, next));
      if(trade){rec.value=trade.funding.depositAddress;rec.readOnly=true;amt.value=formatBaseUnits(trade.funding.amount);amt.readOnly=true;amountStatus={valid:true,amount:trade.funding.amount};paste.hidden=true;scan.hidden=true;max.hidden=true;form.querySelector('.wx-send-heading p').textContent='Fund this MoonPay route. The deposit address and amount are fixed to your reviewed request.';}
@@ -87,7 +102,7 @@ index f123da3..5f80cc6 100644
      form.onsubmit = async e => {
        e.preventDefault(); if (next.disabled) return; err.textContent = '';reviewBusy=true;syncSendButtons();
        try {
-@@ -3097,10 +3135,18 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -3097,10 +3141,18 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
          if (!alive || currentView !== 'send') return;
          plan = await planSend({ assetId: id, recipient: rec.value.trim(), amount: value, utxos, feeRate, sendMax: useMax });
          referenceReview=amounts.reference(plan.amount);
@@ -106,7 +121,7 @@ index f123da3..5f80cc6 100644
      function showReview() {
        const password = walletAuthorizationField();
        password.node.classList.add('wx-send-authorization');
-@@ -3118,6 +3164,8 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -3118,6 +3170,8 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
            row('Total from wallet', el('span', { className: 'wx-send-total-values' }, el('span', {}, formatBaseUnits(plan.total) + ' ' + id), el('small', {}, formatFiat(Number(plan.total) / BASE_UNITS, id, fiatCurrency) || 'Fiat estimate unavailable')), 'wx-review-total')),
          ...(trade?[el('div',{className:'wx-review-card'},row('MoonPay route',trade.funding.source.symbol+' → '+trade.funding.destination.symbol+' · '+trade.funding.destination.network),row('Minimum received',formatSendUnits(trade.funding.minimumOutput,trade.funding.destination.decimals)+' '+trade.funding.destination.symbol),row('Destination wallet',trade.funding.recipient),row('Refund wallet',trade.funding.refundAddress),...trade.funding.fees.map(f=>row(f.kind,formatSendUnits(f.amount,f.decimals)+' '+f.symbol)),el('p',{className:'wx-fine'},'Review expires '+new Date(trade.funding.reviewUntil).toLocaleTimeString()+'. Provider delivery is tracked separately from network confirmations.'))]:[]),
          ...(referenceReview?[el('p',{className:'wx-fine wx-send-reference'},'Entered ≈ '+referenceReview.value+' '+referenceReview.currency+' · Sending '+id+'.')]:[]),
@@ -115,7 +130,7 @@ index f123da3..5f80cc6 100644
          el('p', { className: 'wx-fine' }, 'Check the full address. Crypto payments can’t be reversed.' + (feeRate ? '' : ' A standard network fee is being used because live fee estimates are unavailable.')),
          password.node, error), el('div', { className: 'wx-send-actions' }, confirm));
        host.replaceChildren(review); ctx.body.scrollTop = 0;
-@@ -3139,6 +3187,7 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -3139,6 +3193,7 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
            secrets = await password.unlock(stored.vault, enteredPassword,()=>{assertSendActive(sendEpoch);if(!review.isConnected)throw Error('Review closed. Review your payment again.');}); enteredPassword = '';
            assertSendActive(sendEpoch);
            if(Date.now()-reviewedAt>120000)throw Error('This review has expired. Go back and review again.');
@@ -123,7 +138,7 @@ index f123da3..5f80cc6 100644
            verified = await buildAssetState(secrets, stored.vault.public.assets);
            assertSendActive(sendEpoch);
            if (verified[id]?.address !== act.address) throw new Error('The wallet changed or locked. Unlock and review your payment again.');
-@@ -3150,6 +3199,7 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -3150,12 +3205,18 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
            for (const value of Object.values(verified)) value.wif = '';
            assertSendActive(sendEpoch);
            if (built.amount !== plan.amount || built.fee !== plan.fee || built.total !== plan.total || built.outputs[0].address !== plan.recipient) throw new Error('The payment details changed. Go back and review again.');
@@ -131,7 +146,18 @@ index f123da3..5f80cc6 100644
            if (JSON.stringify((await IDBGet(RECORD_KEY))?.vault) !== fingerprint) throw new Error('The wallet changed. Unlock and review your payment again.');
            assertSendActive(sendEpoch);
            if (spendGuard) await spendGuard.assertClean({ address: act.address, utxos: plan.inputs, signal: sendController.signal });
-@@ -3177,6 +3227,11 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+           assertSendActive(sendEpoch);
+           if(trade){await assertTrade();assertSendActive(sendEpoch);if(plan.recipient!==trade.funding.depositAddress||built.amount!==trade.funding.amount)throw Error('The Trade deposit changed.');tradeReceipt({state:'authorizing',transactionHash:built.txid});const committed=await tradePost('commit',{txHash:built.txid,rawHex:built.rawHex});assertSendActive(sendEpoch);validateTradeFunding(trade.funding,trade.intent,trade.activity.id);if(committed.transactionHash!==built.txid||committed.state!=='source-authorized')throw Error('Trade authorization could not be verified. Check activity before sending again.');tradeReceipt({state:'source-authorized',transactionHash:built.txid,broadcastAttempted:true});}
+           ctx.setBusy(true, 'Submitting to the ' + meta.name + ' network…');
++          if(tip?.intent){
++            const attempt=await tipJournal.record(directRecoveryIdentity(tip),built.txid);assertSendActive(sendEpoch);
++            const payment={txid:attempt.txid,sender:act.address,address:plan.recipient,amount:built.amount};submittedChatTips.set(tip.intent,payment);while(submittedChatTips.size>100)submittedChatTips.delete(submittedChatTips.keys().next().value);
++            if(!attempt.created){notifyChatTipSubmission(tip,payment);host.replaceChildren(el('p',{className:'wx-fine'},'This payment already has a submission attempt. Chat is checking the original transaction.'));return;}
++          }
+           broadcastStarted = true;
+           const result = await broadcastTx(id, built.rawHex);
+           if (result?.txid && result.txid !== built.txid) throw new Error('The relay returned an unexpected transaction ID. Check the network before retrying.');
+@@ -3177,6 +3238,11 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
        };
      }
      function showResult(built, uncertain) {
@@ -143,7 +169,7 @@ index f123da3..5f80cc6 100644
        const copy = el('button', { className: 'wx-btn wx-btn--ghost', type: 'button', onclick: async () => {
          try { await copyText(built.txid); flashBtn(copy, 'Transaction ID copied ✓'); } catch (_) { copy.textContent = 'Select and copy the ID above'; }
        } }, 'Copy transaction ID');
-@@ -3193,6 +3248,62 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -3193,6 +3259,65 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
      }
    }
  
@@ -179,8 +205,8 @@ index f123da3..5f80cc6 100644
 +      if(!password.hasCredential(password.input.value)){error.textContent='Enter your wallet password to approve.';return;}
 +      let entered=password.input.value,secrets=null,verified=null,built=null,started=false;password.input.value='';sending=true;confirm.disabled=true;ctx.setBusy(true,'Verifying group payment…');
 +      const complete=uncertain=>{
-+        submittedChatGroups.set(request.id,{request,built});while(submittedChatGroups.size>100)submittedChatGroups.delete(submittedChatGroups.keys().next().value);
-+        notifyGroupSubmission(request,built);host.replaceChildren(el('h2',{},uncertain?'Checking the network':'Group tip on its way'),el('p',{className:'wx-fine'},'Chat is following confirmation automatically. Do not send this group again.'),el('code',{},built.txid));
++        submittedChatGroups.set(request.id,{request,built:recoveredGroup(request,built.txid)});while(submittedChatGroups.size>100)submittedChatGroups.delete(submittedChatGroups.keys().next().value);
++        notifyGroupSubmission(request,built);if(form.isConnected&&groupRequestEpoch===nav)host.replaceChildren(el('h2',{},uncertain?'Checking the network':'Group tip on its way'),el('p',{className:'wx-fine'},'Chat is following confirmation automatically. Do not send this group again.'),el('code',{},built.txid));
 +      };
 +      try{
 +        current();if(Date.now()-reviewedAt>120000)throw Error('This network-fee review expired. Start a fresh review.');
@@ -194,6 +220,9 @@ index f123da3..5f80cc6 100644
 +        await guard.assertClean({address:request.sender,utxos:plan.inputs,signal:controller.signal});current();
 +        if(JSON.stringify((await IDBGet(RECORD_KEY))?.vault)!==fingerprint)throw Error('The wallet changed.');current();
 +        if(Date.now()-reviewedAt>120000)throw Error('This network-fee review expired.');
++        const attempt=await tipJournal.record(groupRecoveryIdentity(request),built.txid);current();
++        if(!attempt.created){built=recoveredGroup(request,attempt.txid);complete(true);return;}
++        submittedChatGroups.set(request.id,{request,built:recoveredGroup(request,built.txid)});
 +        started=true;const result=await broadcastTx('PEP',built.rawHex);if(result?.txid&&result.txid!==built.txid)throw Error('Unexpected relay response.');complete(false);void refresh();
 +      }catch(e){if(started&&built)complete(true);else if(form.isConnected){error.textContent=e.message;if(/review expired/i.test(e.message))retry.hidden=false;}}
 +      finally{
@@ -206,7 +235,7 @@ index f123da3..5f80cc6 100644
    function buySoon(asset=state.assetId){return !assetCommerceDecision(commerceAvailability.data,{assetId:asset,network:COIN_NETWORKS[asset],product:'buy'}).allowed;}
    function syncBuyButtons(){ctx.body.querySelectorAll('[data-commerce-action]').forEach(paintBuyButton);}
    function viewBuy(){openCommerce('buy',state.assetId,COIN_NETWORKS[state.assetId]);}
-@@ -3670,6 +3781,8 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -3670,6 +3795,8 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
      if(name==='commerce-receipts')receiptsReturn=previousView;
      if(!['evm-wallet','hosted-network'].includes(name))pendingHostedAction=null;
      if(name!=='send')pendingMoonPayTradePayment=null;
@@ -215,7 +244,7 @@ index f123da3..5f80cc6 100644
      activeSendController?.abort(); activeSendController = null;
      currentView = name;
      qrButton.hidden=true;
-@@ -3707,6 +3820,7 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -3707,6 +3834,7 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
      else if (name === "receive") viewReceive(panelBody);
      else if (name === 'paper-wallet') viewPaperWallet(panelBody);
      else if (name === "send") viewSend(panelBody);
@@ -223,7 +252,7 @@ index f123da3..5f80cc6 100644
      else if (name === "buy") viewBuy(panelBody);
      else if (name === "activity") viewActivity(panelBody);
      else if (name === 'whippet-asset') viewWhippetAsset(panelBody);
-@@ -3975,6 +4089,29 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -3975,6 +4103,33 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
  
    syncHeader();
    switchView("overview");
@@ -233,8 +262,12 @@ index f123da3..5f80cc6 100644
 +    if(!new URLSearchParams(location.hash.slice(1)).has('haze-tip')){if(activeChatTip)switchView('overview');return;}
 +    // Changing the public request cancels all previous planning/signing work.
 +    if(activeChatTip)switchView('overview');
-+    void chatTipHandoff.take(()=>alive&&!ctx._isClosed()&&unlockedSession===state&&hazeAuthLifecycle===tipEpoch&&chatTipNavigation===navigation).then(tip=>{
++    void chatTipHandoff.take(()=>alive&&!ctx._isClosed()&&unlockedSession===state&&hazeAuthLifecycle===tipEpoch&&chatTipNavigation===navigation).then(async tip=>{
 +      if(!tip||!alive||ctx._isClosed()||unlockedSession!==state||hazeAuthLifecycle!==tipEpoch||chatTipNavigation!==navigation||!state.assets[tip.asset]||!siteAllowsAsset(tip.asset))return;
++      if(tip.intent){
++        try{const remembered=await tipJournal.lookup(directRecoveryIdentity(tip));if(!alive||ctx._isClosed()||unlockedSession!==state||hazeAuthLifecycle!==tipEpoch||chatTipNavigation!==navigation)return;if(remembered){notifyChatTipSubmission(tip,{txid:remembered,address:tip.address,sender:tip.sender,amount:parseCoinAmount(tip.amount)});panelBody.replaceChildren(el('p',{className:'wx-fine'},'This payment was already prepared for submission. Chat is checking its original transaction; do not send again.'));return;}}
++        catch(error){panelBody.replaceChildren(el('p',{className:'wx-err'},error.message));return;}
++      }
 +      if(submittedChatTips.has(tip.intent)){
 +        notifyChatTipSubmission(tip,submittedChatTips.get(tip.intent));
 +        panelBody.replaceChildren(el('p',{className:'wx-fine'},'This tip was already submitted. Return to chat to follow its confirmation.'));return;
@@ -253,7 +286,7 @@ index f123da3..5f80cc6 100644
    void commerceAvailability.refresh();
    queueMicrotask(()=>void offerBiometricSetup());
    refreshTimer = setInterval(() => { if (!document.hidden) refresh(); }, 20_000);
-@@ -3982,6 +4119,8 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+@@ -3982,6 +4137,8 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
    ctx.setCleanup(stopRefresh);
  
    function lockCleanup() {
@@ -262,7 +295,7 @@ index f123da3..5f80cc6 100644
      commerceAvailability.destroy();
      ctx.card.classList.remove('wx-consumer-wallet');
      activeCommerce?.destroy();activeCommerce=null;
-@@ -4357,6 +4496,7 @@ function boot() {
+@@ -4357,6 +4514,7 @@ function boot() {
            getLifecycleToken: () => hazeAuthSessionLifecycle,
            unlockForAuthentication: async (password, context) => {
              try {
@@ -270,7 +303,7 @@ index f123da3..5f80cc6 100644
                if(securityProfile.id==='lenient')throw Error('Connected-app signing is unavailable in Lenient mode. Choose Standard or Strict in Automatic locking first.');
                if (context.signal?.aborted || !context.isActive()) throw Object.assign(new Error('Connection canceled.'), { code: 'LOCKED' });
                // Bridge negotiation can finish before QR/branding opens the native
-@@ -4368,7 +4508,7 @@ function boot() {
+@@ -4368,7 +4526,7 @@ function boot() {
              } finally { password = ''; }
            },
          });
@@ -279,7 +312,7 @@ index f123da3..5f80cc6 100644
          if (!PRC20_TOKENS_ENABLED) return;
          // Optional TokenPrinter launch support. It is disabled by the static,
          // operator-owned config and is never derived from the parent, `ref`, or
-@@ -4395,6 +4535,22 @@ function boot() {
+@@ -4395,6 +4553,27 @@ function boot() {
    // left exactly as the user left it.
    window.addEventListener("message", function (e) {
      if (window.parent === window || e.source !== window.parent) return;
@@ -289,20 +322,25 @@ index f123da3..5f80cc6 100644
 +      let groupSize=Infinity;try{groupSize=JSON.stringify(e.data.request)?.length??Infinity;}catch{}
 +      if(e.data.type==='haze:group-tip-review'&&Object.keys(e.data).length===3&&e.data.request&&groupSize<=65536){
 +        const sequence=++groupRequestEpoch;
-+        void readGroupTip(e.data.request).then(request=>{
-+          if(sequence!==groupRequestEpoch)return;pendingChatGroup=request;updateChatTipRequest('');sessionPolicy.open();
++        void readGroupTip(e.data.request).then(async request=>{
++          const remembered=await tipJournal.lookup(groupRecoveryIdentity(request));if(sequence!==groupRequestEpoch){if(remembered)notifyGroupSubmission(request,recoveredGroup(request,remembered));else window.parent.postMessage({type:'haze:tip-review-closed',version:1,intent:request.id},HUB_ORIGIN);return;}if(remembered){notifyGroupSubmission(request,recoveredGroup(request,remembered));return;}
++          pendingChatGroup=request;updateChatTipRequest('');sessionPolicy.open();
 +          if(applyChatGroup)applyChatGroup(request);void open();
 +        }).catch(()=>{if(sequence===groupRequestEpoch)window.parent.postMessage({type:'haze:group-tip-error',version:1,intent:e.data.request?.id,message:'This group review is invalid or expired.'},HUB_ORIGIN);});return;
 +      }
 +      if(e.data.type==='haze:tip-review'&&Object.keys(e.data).length===3&&typeof e.data.fragment==='string'&&e.data.fragment.length<=4096&&e.data.fragment.startsWith('#haze-tip=1&')){
 +        groupRequestEpoch++;pendingChatGroup=null;applyChatGroup?.(null);sessionPolicy.open();updateChatTipRequest(e.data.fragment);void open();return;
 +      }
-+      if(e.data.type==='haze:tip-cancel'&&Object.keys(e.data).length===2){groupRequestEpoch++;pendingChatGroup=null;applyChatGroup?.(null);if(location.hash)updateChatTipRequest('');return;}
++      if(e.data.type==='haze:tip-cancel'&&Object.keys(e.data).length===2){
++        const cancelled=pendingChatGroup;groupRequestEpoch++;pendingChatGroup=null;applyChatGroup?.(null);if(location.hash)updateChatTipRequest('');
++        if(cancelled)void tipJournal.lookup(groupRecoveryIdentity(cancelled)).then(remembered=>{if(remembered)notifyGroupSubmission(cancelled,recoveredGroup(cancelled,remembered));else window.parent.postMessage({type:'haze:tip-review-closed',version:1,intent:cancelled.id},HUB_ORIGIN);}).catch(()=>{});
++        return;
++      }
 +    }
      if(e.origin!=='null'&&/^https?:$/.test(new URL(e.origin).protocol))operationParentOrigin=e.origin;
      if(e.data?.type==='haze:lock-request'){window.dispatchEvent(new Event('haze:lock'));return;}
      if(e.data?.type==='haze:hidden'){if(!globalThis.__wxLast?.minimize?.())sessionPolicy.close();return;}
-@@ -4408,4 +4564,4 @@ function boot() {
+@@ -4408,4 +4587,4 @@ function boot() {
  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
  else boot();
  
@@ -430,10 +468,18 @@ index cafe584..3afa3f2 100644
      if (data.method === 'disconnect') {
        if (data.params && Object.keys(data.params).length) return fail(event.origin, data.id, 'INVALID_REQUEST');
 diff --git a/widget.html b/widget.html
-index c5e90eb..2f3f94b 100644
+index c5e90eb..36663b9 100644
 --- a/widget.html
 +++ b/widget.html
-@@ -16,9 +16,11 @@
+@@ -4,6 +4,7 @@
+   <meta charset="UTF-8" />
+   <meta name="referrer" content="no-referrer" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
++  <meta name="haze-web-release" content="1.1.9" />
+   <meta name="robots" content="noindex,nofollow" />
+   <title>HazeWallet</title>
+   <meta name="theme-color" content="#07112b" />
+@@ -16,9 +17,11 @@
  <link rel="stylesheet" href="haze-whippet.css?v=privacy-116">
    <link rel="stylesheet" href="widget-demo.css?v=privacy-116" />
  <link rel="stylesheet" href="/haze-viewport-wallet.css?v=ux-115-20261113" data-haze-viewport>
@@ -442,20 +488,29 @@ index c5e90eb..2f3f94b 100644
  <body>
    <noscript>HazeWallet needs JavaScript enabled. No JavaScript means no self-custody wallet.</noscript>
 -  <script src="widget-boot.js?v=ux-115-20261113" defer></script>
-+  <script src="widget-boot.js?v=pepecoinhub-tip-v1-20261115" defer></script>
++  <script src="widget-boot.js?v=haze-web-119-tips-20261115" defer></script>
  </body>
  </html>
 +
 diff --git a/widget-boot.js b/widget-boot.js
-index 811a07b..f1e18e1 100644
+index 811a07b..32e0e09 100644
 --- a/widget-boot.js
 +++ b/widget-boot.js
+@@ -9,7 +9,7 @@
+     var accentDeep = params.get("accentDeep");
+     var bg = params.get("bg");
+     var radius = params.get("radius");
+-    if (params.get("standalone") === "1") root.classList.add("wallet-standalone");
++    if (params.get("standalone") === "1" || params.get("haze-chat") === "1") root.classList.add("wallet-standalone");
+     if (accent && CSS.supports("color", accent)) root.style.setProperty("--haze-accent", accent);
+     if (accentDeep && CSS.supports("color", accentDeep)) root.style.setProperty("--haze-accent-deep", accentDeep);
+     if (bg && CSS.supports("color", bg)) {
 @@ -81,7 +81,7 @@
  
    function openWallet() {
      if (globalThis.__wxOpen && typeof globalThis.__wxOpen === "function") return globalThis.__wxOpen();
 -    return import("./wallet.js?v=ux-115-20261113").then(function (m) {
-+    return import("./wallet.js?v=pepecoinhub-tip-v1-20261115").then(function (m) {
++    return import("./wallet.js?v=haze-web-119-tips-20261115").then(function (m) {
        if (m && typeof m.open === "function") return m.open();
        if (globalThis.__wxOpen) return globalThis.__wxOpen();
        throw new Error("wallet module failed to expose open()");
@@ -464,7 +519,7 @@ index 811a07b..f1e18e1 100644
      }
      // Register optional connection support while QR and branding load.
 -    var walletReady = import("./wallet.js?v=ux-115-20261113");
-+    var walletReady = import("./wallet.js?v=pepecoinhub-tip-v1-20261115");
++    var walletReady = import("./wallet.js?v=haze-web-119-tips-20261115");
 +    walletReady = walletReady.then(function (module) {
 +      if (new URLSearchParams(location.hash.slice(1)).has('haze-tip') && module.CHAT_TIP_PROTOCOL !== 1) {
 +        throw new Error('This Haze build does not support chat tips yet. Open the updated Haze web wallet and start a new tip on PepecoinHub.');

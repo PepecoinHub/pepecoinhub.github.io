@@ -8,8 +8,8 @@ authority. The native signer changes are included for Haze maintainer review.
 - `haze-wallet-tipping.patch` changes the wallet UI, native PEP group signer,
   bridge capabilities, widget boot and widget styles, and adds the group
   manifest/callback module.
-- `files/` contains the exact required authentication/bridge configuration,
-  direct-tip module and standalone tip page files. They have production origin
+- `files/` contains the seven required authentication/bridge configuration,
+  direct-tip, public payment-recovery and standalone tip page modules. They have production origin
   restrictions; loopback substitution exists only in the local preview server.
 - `manifest.json` records normalized SHA-256 hashes for all five original
   runtime files and every resulting file. Normalize CRLF to LF when comparing.
@@ -18,10 +18,12 @@ authority. The native signer changes are included for Haze maintainer review.
 
 ## Reproduce the review
 
-Obtain the **matching reviewed Haze web 1.1.8 runtime** from the Haze maintainer.
+Obtain the **matching reviewed Haze web 1.1.8 baseline or complete 1.1.9 runtime** from the Haze maintainer.
 An older or different Git checkout may not match these files. Do not force the
-patch onto a mismatched wallet; a coordinated matching Haze release remains an
-activation requirement. This package does not include unrelated Haze runtime
+patch onto a mismatched wallet. The script recognizes the complete updated
+runtime and copies it into the separate review candidate without applying the
+patch again. A coordinated Haze release remains an activation requirement.
+This package does not include unrelated Haze runtime
 dependencies or native/extension builds.
 
 From this PepecoinHub checkout:
@@ -52,6 +54,13 @@ browser flow when Playwright and Chrome are available (`PLAYWRIGHT_MODULE` and
 
 ## Review findings and release limits
 
+Haze web 1.1.9 was published on November 15, 2026 US Eastern
+(`2026-11-16T01:30:52Z`). All 13 live files match this companion's hashes.
+Live read-only browser checks passed the capabilities, exact-parent origin,
+production CSP and two-tab recovery tests. The PEP protection service returned
+200; its unchanged wallet guard rejected a synthetic nonexistent output.
+PepecoinHub flags remain off and funded joint testing remains pending.
+
 The local browser run completed four signed payouts: whole-community,
 airdrop, trivia and say-the-word. It also checked online/offline/random/selected
 audiences, wrong password/sender, unsupported capabilities, no-winner closure,
@@ -59,6 +68,17 @@ cancellation, refresh recovery, automatic confirmation and 320/390/1440px
 layouts. The actual PostgreSQL migrations were applied twice and tested for
 permissions, frozen recipients/eligibility, one entry/attempt, exact splits and
 single/group transaction replay protection. Unverified hashes earn no credit.
+
+The 1.1.9 companion also persists a public payment identity and signed
+transaction hash before attempting broadcast, using one atomic IndexedDB
+transaction that serializes writes across tabs.
+Closing a dialog or reloading can recover that original hash without signing
+or broadcasting again. No private key, password, signature or raw transaction
+is stored in this journal. Corrupt/unavailable storage or a failed commit
+stops a new tip before broadcast. Recovery entries expire after three hours;
+an uncertain network result requires checking the original transaction.
+Confirmed groups do not resume verification. The embed uses `?haze-chat=1`,
+which was checked with production CSP; standalone wallet framing stays blocked.
 
 Auth, surrounding host tables, funding UTXOs, protection evidence and network
 confirmations were fixtures. This is not funded mainnet validation or an

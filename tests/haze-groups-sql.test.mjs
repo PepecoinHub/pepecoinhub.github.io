@@ -54,6 +54,7 @@ test('group SQL: all audiences, exact splits, frozen recipients, timed chat roun
     service('haze_group_context',`${q(uid(1))},${q(chosen.id)},${q(other)}`);assert.equal(sql(`select txid is null from games.haze_groups where id=${q(chosen.id)}`),'t');
     assert.throws(()=>rpc(1,'gry_haze_group_cancel',q(chosen.id)+'::uuid'));
     const commit=`${q(uid(1))},${q(chosen.id)},${q(other)},${q(block)},${time}`;service('haze_group_confirm',commit);service('haze_group_confirm',commit);
+    assert.equal(rpc(1,'gry_haze_groups').drops.find(d=>d.id===chosen.id).submitted_txid,null,'Confirmed payouts no longer advertise a recovery candidate');
     assert.equal(sql("select count(*) from games.haze_transactions"),'2');assert.equal(sql("select count(*) from games.passport_badges where badge_id='haze_first_tip'"),'1');assert.equal(sql("select count(*) from realtime.test_rings where event='tip'"),'2');
     sql('update games.haze_settings set enabled=false;');assert.throws(()=>create({mode:'all'}));
   }finally{sql('drop database '+db+' with(force)','postgres');}

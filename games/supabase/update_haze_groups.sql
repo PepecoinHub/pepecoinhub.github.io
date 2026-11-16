@@ -182,7 +182,7 @@ begin
  'eligible',exists(select 1 from games.haze_group_eligible e where e.group_id=g.id and e.user_id=u),
  'count',(select count(*) from games.haze_group_recipients r where r.group_id=g.id),
  'recipients',coalesce((select jsonb_agg(jsonb_build_object('nick',r.nick,'amount',r.amount_atomic::text)) from(select * from games.haze_group_recipients where group_id=g.id order by ordinal limit 12)r),'[]'::jsonb),
- 'txid',case when g.state='confirmed' then g.txid else null end,'submitted_txid',case when g.owner=u then g.submitted_txid else null end) order by g.created_at desc)
+ 'txid',case when g.state='confirmed' then g.txid else null end,'submitted_txid',case when g.owner=u and g.state='ready' then g.submitted_txid else null end) order by g.created_at desc)
  from(select * from games.haze_groups where created_at>clock_timestamp()-interval '24 hours' order by created_at desc limit 30)g),'[]'::jsonb));
 end $$;
 create or replace function public.gry_haze_group_review(p_id uuid) returns jsonb language plpgsql security definer set search_path='' as $$

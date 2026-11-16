@@ -161,15 +161,39 @@ limit and the Haze public manifest/callback. CI runs the portable and SQL tests.
 
 Keep both switches off until maintainer review and staging validation.
 
+**Haze web release:** version 1.1.9 was published at
+`2026-11-16T01:30:52Z` (November 15 in US Eastern time). All 13 public
+release files were fetched and matched to the reviewed hashes. Read-only
+browser checks against the live Haze origin confirmed linking and direct,
+inline and group-tip capabilities for the PepecoinHub parent, rejected an
+unapproved origin and retained the standalone page's framing restriction.
+The mainnet PEP protection service returned 200 and the unchanged Haze guard
+excluded a synthetic nonexistent output. These checks moved no funds.
+The PepecoinHub staging project, reviewed indexer, actual Discord login and
+owner-approved small mainnet payments remain the coordinated activation gates.
+
 The client requires `capabilities.chatTipProtocol === 1` and
 `capabilities.chatTipInline === 1`. `transactions:false` remains unchanged:
 the UI request cannot sign, approve or broadcast. `haze:tip-cancel` accepts only
 `{type,version:1}` from the exact parent and cancels outstanding review work.
 Unknown fields and other origins/sources are ignored. An already submitted
-intent in the same Haze frame re-announces its existing submission rather than
-opening another payment.
+intent re-announces its existing submission rather than opening another
+payment. Haze web 1.1.9 records only the public intent/payment identity and
+transaction hash before broadcast, in an atomic IndexedDB transaction that
+serializes writes across tabs. A reload can
+recover that hash without another approval or broadcast. No password, private
+key or raw transaction is retained. Storage/commit failures stop new tips before
+broadcast; uncertain submissions must be checked rather than sent again.
+The parent keeps tracking a closed review until Haze acknowledges an unsigned
+cancel with `{type:'haze:tip-review-closed',version:1,intent}` or returns the
+original submission. Confirmed groups stop checking and lose their resumable
+candidate. LAN Party supplies its own chat log/input for group cards and answers.
 
-1. **Haze maintainer:** review/release the accompanying Haze patch, including
+The embedded wallet uses `widget.html?haze-chat=1` to retain the full wallet
+layout under Haze's normal widget CSP. The standalone page keeps its existing
+`frame-ancestors 'self'` restriction. Exact-origin/source checks still apply.
+
+1. **Haze maintainer:** the accompanying Haze web patch is released as 1.1.9, including
    `wallet.js`, `haze-auth-protocol.js`, `haze-bridge.js`,
    `haze-bridge-config.js`, `assets/haze-chat-tips.js`, and the tip HTML/JS/CSS.
    It permits only `https://pepecoinhub.com`, with a separate linking purpose.
@@ -219,7 +243,8 @@ IDs or grants these awards.
 The existing `flip-verify` / `flip_has_badge` path can support a separately
 reviewed Flipsuite quest. This package does not change its allowed badges,
 configure quests or payouts, invite a Discord bot, or access a Flippy wallet.
-There are no role tips, rain, batch payments or custodial balances here.
+Flippy and role-based Discord payouts remain separate work. Community
+multi-recipient payments described above use Haze's native signer.
 
 ## Limits and trust
 
@@ -245,10 +270,10 @@ There are no role tips, rain, batch payments or custodial balances here.
 - A compromised platform frontend/backend could replace receiving details or
   phish a user. Haze displays the full receiving address for review; the sender
   must verify it. Keeping keys in Haze does not remove those trust assumptions.
-- No live Supabase schema/account, hosted Haze release, bot wallet or real
-  payment was changed or used. This implementation is not an independent
-  security audit. Live funded settlement and production deployment remain to
-  be validated by the maintainers.
+- Haze web 1.1.9 is published as described above. No live Supabase
+  schema/account, bot wallet or real payment was changed or used. This
+  implementation is not an independent security audit. Live funded settlement
+  and PepecoinHub activation remain to be validated by the maintainers.
 
 ## Tests
 

@@ -4,18 +4,20 @@ const MODES={all:'Whole pond',online:'Online frens',offline:'Away / offline fren
 export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   if(!enabled)return null;
   const {node:n,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,origin}=ctx;
-  const cacheKey='ph-haze-group-submitted-v1',flights=new Map();let stopped=false,data=null,feed=null,button=null,timer=null,busy=null;
+  const cacheKey='ph-haze-group-submitted-v1',flights=new Map(),completed=new Set();let stopped=false,data=null,feed=null,button=null,timer=null,busy=null;
   const signed=()=>{if(!currentUser()){ctx.login?.();throw Error('Sign in with Discord first.');}};
   const save=()=>{try{win.localStorage.setItem(cacheKey,JSON.stringify([...flights.values()].map(({id,txid,user})=>({id,txid,user})).slice(-20)));}catch{}};
   function resume(){
-    try{const raw=win.localStorage.getItem(cacheKey);if(raw&&raw.length<10000)for(const f of JSON.parse(raw).slice(-20))if(f.user===currentUser()&&UUID.test(f.id)&&HASH.test(f.txid)&&!flights.has(f.id))flights.set(f.id,{...f,attempts:0,next:0});}catch{}
-    for(const drop of data?.drops||[])if(drop.owner===currentUser()&&HASH.test(drop.submitted_txid||'')&&!flights.has(drop.id))flights.set(drop.id,{id:drop.id,txid:drop.submitted_txid,user:currentUser(),attempts:0,next:0});
+    for(const drop of data?.drops||[])if(['confirmed','cancelled','empty'].includes(drop.state)){completed.add(drop.id);flights.delete(drop.id);}
+    try{const raw=win.localStorage.getItem(cacheKey);if(raw&&raw.length<10000)for(const f of JSON.parse(raw).slice(-20))if(f.user===currentUser()&&UUID.test(f.id)&&HASH.test(f.txid)&&!completed.has(f.id)&&!flights.has(f.id))flights.set(f.id,{...f,attempts:0,next:0});}catch{}
+    for(const drop of data?.drops||[])if(drop.state==='ready'&&drop.owner===currentUser()&&HASH.test(drop.submitted_txid||'')&&!completed.has(drop.id)&&!flights.has(drop.id))flights.set(drop.id,{id:drop.id,txid:drop.submitted_txid,user:currentUser(),attempts:0,next:0});
+    save();
     for(const flight of flights.values())void check(flight);
   }
   async function check(flight){
     if(stopped||doc.hidden||!HASH.test(flight.txid||'')||flight.checking||flight.user!==currentUser()||Date.now()<(flight.next||0)||flight.attempts>=120)return;
     flight.checking=true;flight.attempts++;flight.next=Date.now()+20000;
-    try{const result=await invoke({action:'group-check',intent:flight.id,txid:flight.txid});if(result.state==='confirmed'){flights.delete(flight.id);save();void sync(true);}}
+    try{const result=await invoke({action:'group-check',intent:flight.id,txid:flight.txid});if(result.state==='confirmed'){completed.add(flight.id);flights.delete(flight.id);save();void sync(true);}}
     catch{/* A submitted payment is checked again, never sent again. */}
     finally{flight.checking=false;}
   }
@@ -28,7 +30,7 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   }
   function render(){
     if(!data)return;
-    const log=doc.getElementById('lchat');
+    const log=ctx.chatLog?.()||doc.getElementById('lchat');
     if(log){if(!feed)feed=n('section',{class:'haze-group-feed','aria-label':'Community tips and rounds'});if(!feed.isConnected)log.append(feed);feed.replaceChildren();}
     const drops=(data.drops||[]).filter(d=>d.state!=='cancelled').slice(0,10);
     if(button)button.textContent='🎉 Group tips'+(drops.some(d=>d.state==='open')?' · round live':'');
@@ -46,7 +48,7 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
           }else{
             const answer=n('button',{type:'button',class:'haze-tip-secondary'},drop.joined?'Answer received ✓':drop.mode==='trivia'?'Answer in chat':'Say the word in chat');
             answer.disabled=drop.joined||!drop.eligible||!ctx.wallet()?.address;
-            answer.onclick=()=>{const input=doc.getElementById('chatin');if(input){input.value=drop.mode==='trivia'?'/answer ':drop.title.slice(5,-1);input.focus();}};card.append(answer);
+            answer.onclick=()=>{const input=ctx.chatInput?.()||doc.getElementById('chatin');if(input){input.value=drop.mode==='trivia'?'/answer ':drop.title.slice(5,-1);input.focus();}};card.append(answer);
             card.append(n('small',{},drop.mode==='trivia'?'Use /answer followed by your answer. One attempt per person.':'Type the displayed word in chat. Each person can win once.'));
           }
           if(!ctx.wallet()?.address)card.append(n('small',{},'Link your receiving wallet to join.'));
@@ -60,7 +62,7 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
         if(HASH.test(drop.txid||''))card.append(n('a',{href:'https://pepeblocks.com/tx/'+drop.txid,target:'_blank',rel:'noopener noreferrer'},'View group transaction ↗'));
       }else status.textContent='No eligible winners · no payment made';
       if(drop.recipients?.length)card.append(n('p',{class:'haze-group-names'},drop.recipients.map(r=>r.nick+' '+formatAtomic(r.amount)+' PEP').join(' · ')+(drop.count>12?' · +'+(drop.count-12)+' more':'')));
-      if(drop.owner===currentUser()&&['open','ready','empty'].includes(drop.state)&&!drop.submitted_txid&&!HASH.test(flights.get(drop.id)?.txid||'')){const cancel=n('button',{type:'button',class:'haze-group-cancel'},'Cancel event');cancel.onclick=async()=>{try{await rpc('gry_haze_group_cancel',{p_id:drop.id});await sync(true);}catch(e){status.textContent=e.message;}};card.append(cancel);}
+      if(drop.owner===currentUser()&&['open','ready','empty'].includes(drop.state)&&!drop.submitted_txid&&!flights.has(drop.id)){const cancel=n('button',{type:'button',class:'haze-group-cancel'},'Cancel event');cancel.onclick=async()=>{try{await rpc('gry_haze_group_cancel',{p_id:drop.id});await sync(true);}catch(e){status.textContent=e.message;}};card.append(cancel);}
       card.append(n('small',{},'Powered by Haze Wallet · no entry fee'));feed.append(card);
     }
   }
@@ -79,7 +81,7 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
           const frame=await ensureWallet(view);if(!view.active())return;
           if(ctx.capabilities()?.chatGroupTips!==1)throw Error('Update Haze Wallet to a build that supports group tips.');
           flights.set(id,{id,user:currentUser(),source:frame.contentWindow,view,attempts:0,next:0});
-          view.signal.addEventListener('abort',()=>{if(!flights.get(id)?.txid)flights.delete(id);},{once:true});
+          view.signal.addEventListener('abort',()=>render(),{once:true});
           frame.contentWindow.postMessage({type:'haze:group-tip-review',version:1,request:normalized},origin);
           view.body.replaceChildren();view.status.textContent='Check every recipient and the network fee in Haze. Nothing is sent until you approve.';
         }catch(e){view.status.textContent=e.message;approve.disabled=false;ctx.hideWallet();}
@@ -127,6 +129,7 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   const receive=event=>{
     if(event.origin!==origin)return;const body=event.data,flight=flights.get(body?.intent);
     if(!flight||event.source!==flight.source||body?.version!==1)return;
+    if(body.type==='haze:tip-review-closed'&&!flight.txid){flights.delete(flight.id);render();return;}
     if(body.type==='haze:group-tip-error'){if(flight.view?.active())flight.view.status.textContent=body.message;return;}
     if(body.type!=='haze:tip-submitted'||!HASH.test(body.txid||'')||flight.txid)return;
     flight.txid=body.txid;save();if(flight.view?.active())flight.view.close();render();void check(flight);void sync(true);

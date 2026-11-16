@@ -32,7 +32,7 @@ export function submissionMatches(event,flight) {
     data.version===1&&data.intent===flight.intent.id&&typeof data.txid==='string'&&HASH.test(data.txid);
 }
 
-export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABLED,document:doc=globalThis.document,window:win=globalThis.window}={}) {
+export function createHazeTips({rpc,invoke,session,login,chatLog=null,chatInput=null,enabled=HAZE_TIPS_ENABLED,document:doc=globalThis.document,window:win=globalThis.window}={}) {
   if(!enabled)return null;
   const node=(tag,attrs={},...children)=>{
     const value=doc.createElement(tag);
@@ -43,11 +43,11 @@ export function createHazeTips({rpc,invoke,session,login,enabled=HAZE_TIPS_ENABL
   if(!doc.querySelector('[data-haze-tip-style]'))doc.head.append(node('link',{rel:'stylesheet',href:new URL('../haze-tips.css',import.meta.url).href,'data-haze-tip-style':'1'}));
   let destroyed=false,dialog=null,wallet=null,owner=null,syncAt=0,syncing=false,initial=true,linkButton=null;
   let activeView=null,walletHost=null,walletFrame=null,walletLoaded=null,walletCaps=null;
-  const walletBase=HAZE_ORIGIN+'/widget.html?standalone=1',queueKey='ph-haze-submitted-v1';
+  const walletBase=HAZE_ORIGIN+'/widget.html?haze-chat=1',queueKey='ph-haze-submitted-v1';
   const messages=new Map(),receivers=new Map(),flights=new Map(),rendered=new Map(),seenReceipts=new Set(),timers=new Set();
   const currentUser=()=>{const user=session()?.user;return user&&!user.is_anonymous?user.id:null;};
   const signed=()=>{if(!currentUser()){login?.();throw Error('Sign in with Discord first.');}};
-  const groups=createHazeGroups({node,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,origin:HAZE_ORIGIN,wallet:()=>wallet,refreshWallet:refresh,capabilities:()=>walletCaps,hideWallet:()=>{if(walletHost)walletHost.hidden=true;},login,connect});
+  const groups=createHazeGroups({node,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,chatLog:()=>chatLog,chatInput:()=>chatInput,origin:HAZE_ORIGIN,wallet:()=>wallet,refreshWallet:refresh,capabilities:()=>walletCaps,hideWallet:()=>{if(walletHost)walletHost.hidden=true;},login,connect});
   function endView(){
     const view=activeView;activeView=null;view?.controller.abort();if(walletHost)walletHost.hidden=true;
     if(walletFrame){walletFrame.contentWindow.postMessage({type:'haze:tip-cancel',version:1},HAZE_ORIGIN);walletFrame.contentWindow.postMessage({type:'haze:hidden'},HAZE_ORIGIN);}

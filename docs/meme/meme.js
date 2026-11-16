@@ -4886,7 +4886,7 @@
       var hazeTips = null;
       import(BASE + 'games/js/haze-tips.mjs?v=20261115haze').then(function (m) {
         if (!alive) return;
-        hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn,
+        hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, chatLog: log, chatInput: inp,
           invoke: function (body) {
             var s = anySession();
             if (!s) return Promise.reject(new Error('Sign in with Discord first.'));
