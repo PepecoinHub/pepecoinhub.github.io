@@ -24,7 +24,9 @@ test('every live stamp has a server award path, and only live stamps do', () => 
     'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99', 'quiz_first', 'super_parent']);
   for (const id of later) assert.equal(catalog.achievements.find(x => x.id === id).status, 'planned', id);
   const live = catalog.achievements.filter(x => x.status === 'live' || later.includes(x.id)).map(x => x.id);
-  assert.deepEqual(allowed, live.filter(id => !['first_fren', 'first_avatar'].includes(id)).sort());
+  // Bug Hunter (owner, 2026-11-16): live, but given by the owner by hand in the Supabase SQL editor, never by an RPC
+  const ownerGranted = ['bug_hunter'];
+  assert.deepEqual(allowed, live.filter(id => !['first_fren', 'first_avatar', ...ownerGranted].includes(id)).sort());
   for (const x of catalog.achievements.filter(x => x.status !== 'live' && !later.includes(x.id))) {
     assert.ok(!allowed.includes(x.id), x.id + ' is planned and must not be awardable');
     assert.doesNotMatch(sql, new RegExp("insert into games\\.passport_badges[^;]*'" + x.id + "'"), x.id);

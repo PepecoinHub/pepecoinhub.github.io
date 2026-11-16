@@ -1,0 +1,24 @@
+{
+  "challenge": {
+    "version": "haze-auth-v1",
+    "audience": "https://pepecoinhub.com",
+    "network": "pepecoin-mainnet",
+    "purpose": "Link Haze Wallet to PepecoinHub",
+    "nonce": "0101010101010101010101010101010101010101010101010101010101010101",
+    "issuedAt": "2026-11-15T03:00:00.000Z",
+    "expiresAt": "2026-11-15T03:05:00.000Z"
+  },
+  "proof": {
+    "version": "haze-auth-v1",
+    "audience": "https://pepecoinhub.com",
+    "nonce": "0101010101010101010101010101010101010101010101010101010101010101",
+    "issuedAt": "2026-11-15T03:00:00.000Z",
+    "expiresAt": "2026-11-15T03:05:00.000Z",
+    "network": "pepecoin-mainnet",
+    "purpose": "Link Haze Wallet to PepecoinHub",
+    "address": "PmRWZYgVBZZRFoBAYamhzV4pHLYaJrajFL",
+    "publicKey": "03c06c16ada7bd1b741cf69b3c67bf1103a046557bc6b2ba42122f9b02c6482d01",
+    "signature": "1ce9edca7e82a880542755a1d8a21ccd45306e2193cfa1c06911988b899ad3187ecc994190179b1211769c741fef90ba55f61d9f80fa9d51eb046298a5748b69"
+  },
+  "recipient": "PvsajQ6YVNc5Zc55aN7pbhQtNM3tEXmZm8"
+}

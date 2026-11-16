@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin"><meta name="robots" content="noindex">
+<title>POND ECHO: your fall can carry a fren across | Pepecoin Hub</title>
+<meta name="description" content="Jump Pepe across the pond. Every landing sends a wave that moves the lilies. Play with someone's echo: their splash might be the push you need.">
+<link rel="icon" href="../meme/img/pep-logo.webp">
+<link rel="stylesheet" href="pond-echo.css?v=20261115proto"><script type="module" src="js/pond-echo.mjs?v=20261115proto"></script>
+</head><body>
+<header class="site-bar"><a href="../meme/">← Pepecoin Hub</a><span>FREN SOFTWARE · PROTOTYPE</span><a href="index.html">More games ↗</a></header>
+<main class="desktop">
+<div class="desktop-label"><span class="logo">POND ECHO<span>YOUR FALL CAN CARRY A FREN ACROSS</span></span><span class="disk-label">PROTOTYPE · 1 CROSSING<br>6 LILIES · 0 PEP PAYOUTS</span></div>
+<section class="window" aria-label="POND ECHO game">
+<div class="titlebar"><span><img src="../meme/img/pep-logo.webp" alt=""> POND ECHO <span class="title-extra">— Crossing #1</span></span><div><a href="../meme/" title="Return to Pepecoin Hub" aria-label="Return to Pepecoin Hub">×</a></div></div>
+<nav class="menubar" aria-label="Game controls">
+  <button id="restart" title="R">↻ Again <kbd>R</kbd></button>
+  <span class="echo-pick" role="group" aria-label="Echo"><span class="echo-label">Echo:</span>
+    <button id="echo-off" aria-pressed="true">Off</button><button id="echo-last" aria-pressed="false" disabled>My last</button><button id="echo-best" aria-pressed="false" disabled>My best</button><button id="echo-friend" aria-pressed="false" hidden>Friend</button>
+  </span>
+  <button id="sound" aria-pressed="false">Sound: off</button><button id="help-button">How to play</button>
+  <label class="nick">Nick <input id="nick" maxlength="16" autocomplete="nickname" spellcheck="false" placeholder="fren"></label>
+</nav>
+<div class="playfield">
+  <canvas id="game" width="960" height="540" tabindex="0" aria-label="Pond seen from above. Drag back from anywhere and release to jump, like a slingshot. Arrow keys aim, Space jumps, R restarts.">Your browser needs Canvas to play this game.</canvas>
+  <div class="hud"><div><small>TIME</small><strong id="time">0.0<span> s</span></strong></div><div><small>TRIES</small><strong id="tries">1</strong></div><div class="echo-hud" id="echo-hud" hidden><small>PLAYING WITH</small><strong id="echo-name"></strong></div></div>
+  <div class="card" id="intro" hidden><span class="edition">SOMEONE SENT YOU AN ECHO</span><h1 id="intro-title">Their splash is still in the pond.</h1><p id="intro-text"></p><div class="row"><button id="intro-play" class="primary">Play with their echo →</button><button id="intro-solo">Try alone first</button></div></div>
+  <div class="card result" id="result" hidden role="dialog" aria-labelledby="result-title"><span class="edition" id="result-kicker">REPORT</span><h2 id="result-title"></h2><p id="result-text"></p><p class="assist" id="result-assist" hidden></p>
+    <div class="row"><button id="again" class="primary">Again ↻</button><button id="share">Share my echo 📤</button><button id="watch">Watch replay ▶</button><button id="clip" hidden>Save clip 🎬</button></div><p class="share-status" id="share-status" aria-live="polite"></p></div>
+</div>
+<div class="statusbar"><span id="status" role="status">Drag back, let go. The pond remembers.</span><span id="mode">READY</span></div>
+</section>
+<p class="under-game"><span>DRAG BACK &amp; RELEASE · JUMP</span><span>← → ↑ ↓ · AIM, SPACE · JUMP</span><span>R · AGAIN</span><span>Fall in? Send it. Your splash might carry a fren across.</span></p>
+<div class="help window" id="help" hidden role="dialog" aria-labelledby="help-title"><div class="titlebar"><span id="help-title">Readme.txt — How not to swim</span><button id="help-close" aria-label="Close instructions">×</button></div><div class="help-body">
+<h2>Get Pepe (and the little one on his back) to the far bank.</h2>
+<ol>
+<li>Drag back from anywhere on the pond and let go, like a slingshot. The ring shows where you land.</li>
+<li>Every landing sends a wave. Waves push lilies away from where they start. Use them, or watch the next leaf drift out of reach.</li>
+<li>Jumping off a lily pushes it back; landing pushes it on. Fall in the water and you make the biggest wave of all.</li>
+<li>After a try, turn on an <b>echo</b>: a see-through Pepe replays that run next to you. Its waves really move your lilies. Wait for it, jump with it, or use the spot where it fell in.</li>
+<li>Share your echo. Even a fall. Someone else might cross on your splash, and the replay will show both your names.</li>
+</ol><p class="help-fine">Prototype: one crossing, no accounts, nothing leaves your browser except the link you choose to share. No PEP payouts.</p></div></div>
+<footer>Made for frens who cannot swim. <a href="privacy.html">Privacy</a> · <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues">Report a soggy bug</a></footer>
+</main></body></html>

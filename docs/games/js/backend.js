@@ -267,6 +267,12 @@ class SupaBackend {
     showStoredOAuthNote();
   }
   session() { return this.sess ? { user: { id: this.sess.user.id, is_anonymous: !!this.sess.user.is_anonymous } } : null; }
+  async haze(body) {
+    const {data,error}=await this.sb.functions.invoke('haze-wallet',{body});
+    if(error)throw friendlyError(error);
+    if(data?.error)throw new Error(data.error);
+    return data;
+  }
   async guest() {
     const captchaToken = cfg.turnstileSiteKey ? await (await import('./human.js')).humanToken(cfg.turnstileSiteKey) : undefined;
     let res;

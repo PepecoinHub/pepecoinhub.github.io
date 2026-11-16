@@ -18,7 +18,8 @@ const X7 = ['lord_of_the_lilies', 'master_tactician', 'gold_digger', 'gold_rush'
 test('expansion 7: seven planned catalog entries, seven new atlas tiles at the end, no award for unvalidated games', () => {
   const catalog = JSON.parse(file('docs/meme/passport-catalog.json'));
   const ids = catalog.achievements.map(x => x.id);
-  assert.equal(new Set(ids).size, 64, '64 distinct achievements');
+  assert.equal(new Set(ids).size, ids.length, 'distinct ids');
+  assert.equal(ids.length, 66, '57 earlier + 7 new + the two Haze stamps');
   for (const id of X7) assert.equal(catalog.achievements.find(x => x.id === id).status, 'planned', id + ' waits for activation');
   const v3 = file('docs/meme/meme.js').match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).map(s => s.slice(1, -1));
   assert.deepEqual(v3.slice(55), X7, 'appended after the 55 earlier tiles, which keep their places');

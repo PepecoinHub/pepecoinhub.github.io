@@ -1,4 +1,4 @@
-import { getBackend, MODE, TEST_BUILD, DISCORD_ENABLED, REDDIT_ENABLED } from './backend.js?v=20261113link';
+import { getBackend, MODE, TEST_BUILD, DISCORD_ENABLED, REDDIT_ENABLED } from './backend.js?v=20261115haze';
 export { MODE, TEST_BUILD, DISCORD_ENABLED };
 
 try { const th = localStorage.getItem('phw-theme'); if (th === 'light' || th === 'dark') document.documentElement.setAttribute('data-theme', th); } catch {}

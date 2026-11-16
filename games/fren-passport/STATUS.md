@@ -189,7 +189,7 @@ but are not "found": they do not count for Secret Starter or Treasure Hunter.
 ## 2026-11-15: Expansion 7 (seven new stamps, owner-approved art)
 
 Art: `source/stamps-new/<id>.png`, appended to the V3 atlas as tiles 55–61 (62 cells, `background-size: 6200%`).
-Every earlier tile keeps its index; the unused `share_fren` tile stays. Catalog: 64 achievements. All seven are
+Every earlier tile keeps its index; the unused `share_fren` tile stays. Catalog: 64 achievements (66 with the two Haze stamps from main). All seven are
 **planned** (hidden in the album unless earned).
 
 | ID | Label | Rule | Server |

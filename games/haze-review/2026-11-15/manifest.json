@@ -1,0 +1,66 @@
+{
+  "reviewOnly": true,
+  "productionEnabled": false,
+  "candidateVersion": "1.1.9",
+  "baseline": "Reviewed Haze web 1.1.8 runtime; all normalized SHA-256 values must match",
+  "files": [
+    {
+      "path": "wallet.js",
+      "baselineSHA256": "c0d3c4532f5523c537a97d44171c88164ec38d1479899d1bd87f6308c4af02c4",
+      "candidateSHA256": "31df986372d76de05649e9f253e824b004e5ac78a374afdc130c825e725529fe"
+    },
+    {
+      "path": "wallet-core.js",
+      "baselineSHA256": "74db8e3baffb4bbc461fd7f5df529b81636f4e46ca49995badd8f8d9d5d88281",
+      "candidateSHA256": "6941076713be92097920a761b66df64f6d16b2c9de506d9e521d614a574867bc"
+    },
+    {
+      "path": "haze-bridge.js",
+      "baselineSHA256": "0076a6fa0e66b959c7cc8e7b6baed51da460a15943068d0a5243eaab753b458f",
+      "candidateSHA256": "31f2366aea1bab5c297409edf3c88dccfada29656b5131b838a96b42b13cfc11"
+    },
+    {
+      "path": "widget.html",
+      "baselineSHA256": "e4ecaf5fcbbe0d6e1f315942eefb3aba02167bf12ecdcbb434c0804e62b2c558",
+      "candidateSHA256": "e9b3df4f497ec39bdb8f3e91572a10cc2dc5436de3c7aaaa462429c18c782a59"
+    },
+    {
+      "path": "widget-boot.js",
+      "baselineSHA256": "999bbf6d7791d0859fa5fcb20b8b8b780ad94e86b811e89fa39f2b1fc65e9db0",
+      "candidateSHA256": "f870e6ff2bacdc0dc0b7404875ae6bbc4329fc5965b0211d2e8f8081e0af8c81"
+    },
+    {
+      "path": "assets/haze-group-tips.js",
+      "baselineSHA256": null,
+      "candidateSHA256": "450e6b35af16626afd9341e4f71b7f025092bdda56c6c6218e6fd218a3e3d62c"
+    },
+    {
+      "path": "haze-auth-protocol.js",
+      "dependencySHA256": "da97bc216d2eb191278b81abe8998ba5ef3e3b53c13e6d9c4dd44faf61edaaf7"
+    },
+    {
+      "path": "haze-bridge-config.js",
+      "dependencySHA256": "9f0c78f4f5d0a1d3f53e64024c0643cb12742e978ef19837f5098e47d1564c25"
+    },
+    {
+      "path": "assets/haze-chat-tips.js",
+      "dependencySHA256": "4cdb59e88faf99a05c40dccb6c91d2d2f796781e788511487deda97e6676562f"
+    },
+    {
+      "path": "assets/haze-tip-journal.js",
+      "dependencySHA256": "cd2e64f5c77ab391ae4cee172e045049db2d6ef3e940865b79e02c8168096621"
+    },
+    {
+      "path": "assets/tip.html",
+      "dependencySHA256": "910e46dccae0630628adcefe974a62a4e742f690634844d9b53276d16c01c166"
+    },
+    {
+      "path": "assets/tip.js",
+      "dependencySHA256": "991139131b5d1b9d4d0e08fe13678002ac6fef0277175c1053e8228ba18ae92c"
+    },
+    {
+      "path": "assets/tip.css",
+      "dependencySHA256": "a228f5c6e0096f7a2a88f49870f26ce31c64d0b54307b05b5a2dbd4e46b56350"
+    }
+  ]
+}

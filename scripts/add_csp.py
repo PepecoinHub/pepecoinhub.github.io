@@ -93,7 +93,7 @@ def build_meta(html: str) -> str:
         # YouTube (youtube-nocookie.com); the guest bot check renders a
         # Cloudflare Turnstile widget in an iframe. Without these the CRT TV
         # stays blank and guests can't pass the bot check.
-        "frame-src 'self' https://www.youtube-nocookie.com https://challenges.cloudflare.com",
+        "frame-src 'self' " + ("https://hazewallet.com " if re.search(r'''<script[^>]+src=["']meme\.js''', html) else "") + "https://www.youtube-nocookie.com https://challenges.cloudflare.com",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",

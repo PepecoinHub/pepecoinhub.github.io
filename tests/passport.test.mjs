@@ -11,8 +11,9 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const kinds = ['achievements', 'secrets', 'items', 'titles'];
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
-  // +1: Long Live the King (Pond King); +5: the Pond Quiz stamps (owner, 2026-11-15)
-  assert.deepEqual(kinds.map(key => catalog[key].length), [64, 19, 8, 4]);
+  // +7: expansion 7 (owner, 2026-11-15). Includes the two Haze stamps, which stay planned until earned.
+  assert.deepEqual(kinds.map(key => catalog[key].length), [66, 19, 8, 4]);
+  for(const id of ['haze_linked','haze_first_tip'])assert.equal(catalog.achievements.find(item=>item.id===id)?.status,'planned');
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const item of entries) {

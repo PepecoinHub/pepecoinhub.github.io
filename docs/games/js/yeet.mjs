@@ -97,17 +97,23 @@ function finish() {
     const pending = Math.max(value, storage.get(pendingKey())); storage.set(pendingKey(), pending);
     try { localStorage.setItem(`${pendingKey()}:ms`, String(Math.ceil(state.time * 1000))); } catch {}
     saveRecord(pending, Math.ceil(state.time * 1000), uid, n);
-  } else if (account) $('#save-status').textContent = 'Your best distance is already on your Discord account.';
+  } else if (uid) {
+    // Not a new best, but every Discord flight still goes to the server: Fren Passport stamps
+    // (Adept 3000 m, Moonwalker, NASA is hiring) count each flight, not only records.
+    saveRecord(value, Math.ceil(state.time * 1000), uid, n, true);
+  }
 }
 function missingMigration(e) { return /PGRST202|could not find the function|does not exist/i.test(`${e?.code || ''} ${e?.message || ''}`); }
-async function saveRecord(value, ms, uid, round) {
+async function saveRecord(value, ms, uid, round, flightOnly = false) {
   try {
     const result = await backend.rpc('gry_yeet_submit', { p_score: value, p_ms: ms, p_version: 1 });
     if (account?.user_id !== uid) return;
     cloudBest = Math.max(cloudBest, result.best || 0); showBest();
-    if (result.rate_limited) { if (round === finishNumber) $('#save-status').textContent = 'Record kept on this device. Use Refresh scores in a few seconds to sync.'; return; }
+    if (result.rate_limited) { if (round === finishNumber) $('#save-status').textContent = flightOnly ? 'Too fast, fren: this flight was not counted. Wait a few seconds between flights.' : 'Record kept on this device. Use Refresh scores in a few seconds to sync.'; return; }
     if (storage.get(pendingKey()) <= cloudBest) storage.set(pendingKey(), 0);
-    if (round === finishNumber) $('#save-status').textContent = `Discord record saved: ${metres(cloudBest)} m.`;
+    if (round === finishNumber) $('#save-status').textContent = flightOnly
+      ? `Flight counted for your Fren Passport. Your best stays ${metres(cloudBest)} m.`
+      : `Discord record saved: ${metres(cloudBest)} m.`;
     if (result.top) renderBoard(result.top);
   } catch (e) {
     if (account?.user_id === uid && round === finishNumber) $('#save-status').textContent = missingMigration(e)
