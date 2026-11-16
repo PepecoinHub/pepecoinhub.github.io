@@ -153,7 +153,11 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
         const linked=await invoke({action:'link',proof:result.proof});
         if(currentUser()!==user||!view.active())return;
         wallet={address:linked.address};paintButton();invalidate();void sync();
-        if(typeof afterLinked==='function')void afterLinked();else view.close();
+        // Stay open with a clear result: closing at once looked like a flashing dialog to testers (2026-11-16).
+        if(typeof afterLinked==='function')void afterLinked();
+        else{walletHost.hidden=true;view.status.textContent='';
+          view.body.replaceChildren(node('p',{},'✅ Haze Linked! Frens can now tip this public address. Your passport gets the Haze Linked stamp.'),
+            node('code',{class:'haze-tip-address'},linked.address),node('button',{type:'button',class:'haze-tip-primary',onclick:()=>view.close()},'Done'));}
       }catch(error){if(view.active()){walletHost.hidden=true;view.status.textContent=error.message;approve.disabled=false;}}
     };
   }
