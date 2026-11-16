@@ -1,9 +1,10 @@
 // PepeGochi taskbar companion for PondOS. Read-only: the server remains the only source of pet state.
-// Loaded only behind the existing ?beta=gochi gate. No polling, rewards, chat or local fake pet.
+// Loaded only behind the existing ?beta=gochi gate. Local conversations are cosmetic; no polling, rewards or fake pet.
 // Based on PR #299; adds the Pond Quiz (one server question a day once the frog has hatched; update_pond_quiz.sql)
 // and the hop out of the PEPEGOCHI.EXE window.
 import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261115a10';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261116talk1';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
 const NEEDS = new Set(['hunger', 'hygiene', 'mood', 'energy']);
@@ -64,7 +65,7 @@ export function describeTaskbarFrog(state) {
   };
   return {
     sprite: pose(poseFor(sprite)), label: name, adult: stage === 'adult',
-    title: name + ' · ' + remarks[status] + ' Click to visit.',
+    title: name + ' · ' + remarks[status] + ' Click to talk, double-click to visit.',
     warning: status === 'packing' || status === 'neglected', hasPet: true,
     motion: status !== 'healthy' ? status : (sprite === 'adult_tired' ? 'sleepy' : stage),
   };
@@ -132,9 +133,10 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   place();
   requestAnimationFrame(place);
   window.addEventListener('resize', place);
-  button.addEventListener('click', () => open());
-  button.addEventListener('pointerenter', () => { if (!act && shownView && shownView.adult && shownView.motion === 'adult') setAct('tb_adult_wave'); });
-  button.addEventListener('pointerleave', () => { if (act === 'tb_adult_wave') setAct(null); });
+  button.addEventListener('pointerenter', () => {
+    if (!act && shownView?.sprite === pose('tb_adult_sit')) { cancelMotion(); setAct('tb_adult_wave'); }
+  });
+  button.addEventListener('pointerleave', () => { if (act === 'tb_adult_wave') { setAct(null); queueMotion(); } });
 
   // Very short motions, not an endlessly looping animation. Only one is active at a time,
   // and no animation or running timer is needed when the browser is hidden / reduced motion is set.
@@ -185,7 +187,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   }
   function queueMotion() {
     cancelMotion();
-    if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return;
+    if (act || reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return;
     const choices = motions[currentMood] || motions.adult;
     if (!choices.length) return;
     const next = choices[Math.floor(Math.random() * choices.length)];
@@ -221,7 +223,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   // Only from the server (update_pond_quiz.sql): the questions and answers are not in the site's files. The server
   // picks the question from the account's own pool and keeps the points; it answers only for a Discord account whose
   // PepeGochi has hatched, so the browser does not even ask before that.
-  let balloon = null, server = null, hatched = false;
+  let balloon = null, server = null, hatched = false, conversation = null, quizIntent = 0;
   const today = () => dayNumber(now());
   const signedIn = () => { const a = session(); return !!(a && a.discord && a.userId); };
   let serverAt = 0, serverUser = null;
@@ -324,7 +326,13 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     (list.querySelector('button:not(:disabled)') || x).focus();
     if (!reduced.matches) { cancelMotion(); playMotion(shownView && shownView.hasPet ? 'greet' : 'wobble'); }
   }
-  factBtn.addEventListener('click', () => { refreshFacts().then(openBalloon); });
+  function cancelQuiz() { quizIntent++; closeBalloon(); }
+  function requestQuiz() {
+    conversation?.close();
+    const ticket = ++quizIntent;
+    refreshFacts().then(() => { if (ticket === quizIntent) openBalloon(); });
+  }
+  factBtn.addEventListener('click', requestQuiz);
   refreshFacts();
 
   // ---------- the frog hops out of the PEPEGOCHI.EXE window onto the taskbar ----------
@@ -356,7 +364,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       lastUser = id;
       lastAt = 0;
       generation++;
-      closeBalloon();             // the old account's question or ranking must not stay on screen
+      cancelQuiz();               // the old account's question or ranking must not stay on screen
+      conversation?.close({ reset: true });
       paint(describeTaskbarFrog(null));
       hatched = false; server = null; updateFactButton();
     }
@@ -383,7 +392,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   }
 
   function onVisible() {
-    if (document.visibilityState === 'visible') { refresh(); queueMotion(); refreshFacts(); } else cancelMotion();
+    if (document.visibilityState === 'visible') { refresh(); queueMotion(); refreshFacts(); }
+    else { conversation?.close(); cancelMotion(); }
   }
   function onMessage(event) {
     if (event.origin !== location.origin || !event.data ||
@@ -402,11 +412,16 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   window.addEventListener('pondos:auth-changed', onAuth);
   window.addEventListener('pondos:pepegochi-left', onLeftWindow);
   document.addEventListener('visibilitychange', onVisible);
+  conversation = mountFrogInteractions({ button, img, slot, getView: () => shownView,
+    setPose: p => { cancelMotion(); setAct(p); if (!p) queueMotion(); }, openRoom: open,
+    closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
+    openQuiz: requestQuiz, now });
   refresh(true);
   queueMotion();
   return () => {
+    conversation?.dispose();
     cancelMotion();
-    closeBalloon();
+    cancelQuiz();
     if (reduced.removeEventListener) reduced.removeEventListener('change', motionPreferenceChanged);
     window.removeEventListener('message', onMessage);
     window.removeEventListener('focus', onVisible);
