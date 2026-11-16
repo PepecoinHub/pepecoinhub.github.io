@@ -4,6 +4,14 @@ Everything ships from the release PR (`claude/launch-release` → `main`): the l
 #251, #246, #258 and the notice fix. **Nothing is public until that PR is merged** (the site is published from `main` only).
 PepeGochi launches after the Passport (owner, 2026-11-09): it stays behind `?beta=gochi` and its SQL waits.
 
+## PepeGochi release bundle — owner decision, 2026-11-16
+
+[PR #353](https://github.com/PepecoinHub/pepecoinhub.github.io/pull/353) is part of the full PepeGochi product release, not a separate early launch. Include the complete companion implementation: interactions and local memories, A10 animations, cheeky personality, favourite toys and arcade reactions.
+
+**Release on hold. No merge to `main`, deployment, public beta-gate change or production SQL now.** Keep #353 as a draft until the owner gives the go-ahead for the full PepeGochi launch. This inclusion decision is not permission to launch today and does not change the earlier Passport release schedule.
+
+At the eventual PepeGochi release, include #353 together with the game/room/care work and its existing release prerequisites. Reconcile the release branch with the current PR head, then run combined checks before enabling the product. #353 itself adds no SQL migration. See [the companion scope and QA](PEPEGOCHI_INTERACTIONS_PLAN.md) and the existing “Later: PepeGochi day” instructions in `supabase/deploy/RUN_ORDER.md`.
+
 ## Thursday 12 XI: the public beta (owner, 2026-11-11)
 1. Supabase > SQL Editor: `games/supabase/deploy/00_check.sql` (read only).
 2. Supabase > SQL Editor: `games/supabase/deploy/LAUNCH_ALL.sql` (14 files, one transaction: all or nothing).
