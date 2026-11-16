@@ -1,0 +1,507 @@
+diff --git a/wallet.js b/wallet.js
+index f123da3..5f80cc6 100644
+--- a/wallet.js
++++ b/wallet.js
+@@ -34,6 +34,25 @@ import { ASSET_LOGOS } from './asset-logos.js';
+ import {EXPANSION_EVM_NETWORKS} from './asset-catalog-core.js';
+ import {WALLET_TERMS_VERSION,WALLET_TERMS_SECTIONS,createTermsAcceptance} from './wallet-terms.js?v=privacy-116';
+ import { selectAssetRows, assetDisplayPriority, formatCatalogUnits, formatMarketUnitPrice, summarizeAvailableBalances, mergeHostedNetworkBalances, isPromotionalToken } from './asset-list.js';
++import {createChatTipHandoff, TIP_REACTIONS, notifyChatTipSubmission} from './assets/haze-chat-tips.js';
++import {HUB_ORIGIN} from './haze-auth-protocol.js';
++import {readGroupTip,notifyGroupSubmission} from './assets/haze-group-tips.js';
++
++let chatTipHandoff = createChatTipHandoff(globalThis.location?.hash || '');
++let applyChatTipHandoff=null;
++let chatTipNavigation=0;
++let pendingChatGroup=null,applyChatGroup=null,groupRequestEpoch=0;
++const submittedChatGroups=new Map();
++const submittedChatTips=new Map();
++function updateChatTipRequest(fragment){
++  chatTipNavigation++;
++  // Replace public context without adding a browser-back entry or reloading
++  // the wallet. Browser navigation remains owned by the normal wallet UI.
++  const url=new URL(location.href);url.hash=fragment;history.replaceState(history.state,'',url.href);
++  chatTipHandoff=createChatTipHandoff(fragment);
++  applyChatTipHandoff?.();
++}
++const CHAT_TIP_PROTOCOL = 1;
+ 
+ // wallet.js — self-custody multi-asset wallet UI for hazewallet.com (HazeWallet).
+ //
+@@ -45,7 +64,7 @@ import { selectAssetRows, assetDisplayPriority, formatCatalogUnits, formatMarket
+ // the exact PEP amount and network fee are reviewed before local signing.
+ 
+ import {
+-  createKey, importWif, buildSignedSend, planSend, validateAddress,
++  createKey, importWif, buildSignedSend, planSend, planGroupSend, buildSignedGroupSend, validateAddress,
+   parseCoinAmount, formatBaseUnits, ASSETS,
+ } from "./wallet-core.js";
+ import { createVault, unlockVault, vaultUnlockIdentity, DOGE_VAULT, passwordCharacterCount } from "./wallet-vault.js";
+@@ -1199,6 +1218,8 @@ function confirmReplacement(ctx) {
+ 
+ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+   let alive = true, stopBack = () => {};
++  let activeChatTip = null;
++  let activeChatGroup=null;
+   const assetPreferences = createAssetPreferences();
+   let priceView=null, activePriceId=null;
+   ctx.card.classList.add('wx-consumer-wallet');
+@@ -2990,6 +3011,13 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+ 
+   function viewSend(host) {
+     const id = state.assetId, meta = assetMeta(id), act = state.assets[id];
++    const tip = activeChatTip;
++    if (tip?.intent && act.address !== tip.sender) {
++      host.replaceChildren(backButton('Back', 'asset'), el('h2', {}, 'Use your linked Haze wallet'),
++        el('p', {className:'wx-err', role:'alert'}, 'This tip was created for a different sending wallet. No payment has been sent.'),
++        el('p', {className:'wx-fine'}, 'Expected Pepecoin address: '+tip.sender));
++      return;
++    }
+     const trade=pendingMoonPayTradePayment;
+     const tradePost=(action,input)=>requestJSON('/api/commerce/moonpay/trade-'+action,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+trade.activity.token},body:JSON.stringify({id:trade.activity.id,...input}),signal:sendController.signal},60000);
+     const assertTrade=async()=>{if(!trade)return;validateTradeFunding(trade.funding,trade.intent,trade.activity.id);if(trade.funding.sender!==act.address||trade.funding.assetId!==id)throw Error('The Trade funding wallet changed.');const current=validateTradeFunding(await tradePost('funding',{}),trade.intent,trade.activity.id);if(JSON.stringify(current)!==JSON.stringify(trade.funding))throw Error('The Trade terms changed. Review this route again.');};
+@@ -2998,6 +3026,7 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+     const sendController = new AbortController(); activeSendController = sendController;
+     ctx.setCleanup(() => sendController.abort());
+     const assertSendActive = (epoch = hazeAuthLifecycle) => {
++      if (tip?.intent && Date.parse(tip.expires) <= Date.now()) throw new Error('This chat tip expired. Start a new tip on PepecoinHub.');
+       if (!sessionPolicy.check() || sendController.signal.aborted || !alive || ctx._isClosed() || currentView !== 'send' || state.assetId !== id || unlockedSession !== state || hazeAuthLifecycle !== epoch) {
+         throw new Error('The wallet changed or this payment was canceled. Unlock and review it again.');
+       }
+@@ -3085,8 +3114,17 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+       el('p', { className: 'wx-send-reassurance' }, el('span', { html: uiIcon('shield'), 'aria-hidden': 'true' }), 'Review the network fee next. Nothing is sent until you confirm.'),
+       err), el('div', { className: 'wx-send-actions' }, next));
+     if(trade){rec.value=trade.funding.depositAddress;rec.readOnly=true;amt.value=formatBaseUnits(trade.funding.amount);amt.readOnly=true;amountStatus={valid:true,amount:trade.funding.amount};paste.hidden=true;scan.hidden=true;max.hidden=true;form.querySelector('.wx-send-heading p').textContent='Fund this MoonPay route. The deposit address and amount are fixed to your reviewed request.';}
++    if (tip) {
++      rec.value = tip.address; rec.readOnly = true; paste.hidden = true; scan.hidden = true;
++      amounts.setModeNative(tip.amount);
++      if (tip.intent) {amt.readOnly = true; max.hidden = true; amounts.element.querySelector('.wx-amount-units').hidden = true;}
++      form.querySelector('.wx-send-heading p').textContent = meta.name + ' network · Tip from a shared link';
++      form.querySelector('.wx-send-heading').after(el('p', {className:'wx-fine'},
++        TIP_REACTIONS[tip.reaction] + ' ' + (tip.recipient || 'Recipient') + (tip.platform ? ' · ' + tip.platform : '') +
++        (tip.note ? ' · “' + tip.note + '”' : '') + ' · Name supplied by link. Check the full address.'));
++    }
+     host.replaceChildren(form);amounts.preload();
+-    if(trade)void parseRecipient();
++    if(trade || tip)void parseRecipient();
+     form.onsubmit = async e => {
+       e.preventDefault(); if (next.disabled) return; err.textContent = '';reviewBusy=true;syncSendButtons();
+       try {
+@@ -3097,10 +3135,18 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+         if (!alive || currentView !== 'send') return;
+         plan = await planSend({ assetId: id, recipient: rec.value.trim(), amount: value, utxos, feeRate, sendMax: useMax });
+         referenceReview=amounts.reference(plan.amount);
++        if (tip?.intent && (Date.parse(tip.expires)<=Date.now() || plan.recipient !== tip.address || plan.amount !== parseCoinAmount(tip.amount))) throw Error('The chat tip expired or its terms changed. Start a new tip on PepecoinHub.');
++        if (tip?.intent && plan.inputs.length > 20) throw Error('This tip needs more than 20 funding inputs. Start a smaller tip on PepecoinHub.');
+         reviewedAt = Date.now(); showReview();
+       } catch (error) { err.textContent = error.message; }
+       finally { reviewBusy=false;syncSendButtons(); }
+     };
++    // A bound chat request already has fixed terms. Calculate its fee and go
++    // straight to the wallet-owned review; this never signs or broadcasts.
++    if(tip?.intent)void(async()=>{
++      try{await parseRecipient();await loadSpendable();assertSendActive();if(!next.disabled&&form.isConnected)form.requestSubmit();}
++      catch(error){if(form.isConnected)err.textContent=error.message;}
++    })();
+     function showReview() {
+       const password = walletAuthorizationField();
+       password.node.classList.add('wx-send-authorization');
+@@ -3118,6 +3164,8 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+           row('Total from wallet', el('span', { className: 'wx-send-total-values' }, el('span', {}, formatBaseUnits(plan.total) + ' ' + id), el('small', {}, formatFiat(Number(plan.total) / BASE_UNITS, id, fiatCurrency) || 'Fiat estimate unavailable')), 'wx-review-total')),
+         ...(trade?[el('div',{className:'wx-review-card'},row('MoonPay route',trade.funding.source.symbol+' → '+trade.funding.destination.symbol+' · '+trade.funding.destination.network),row('Minimum received',formatSendUnits(trade.funding.minimumOutput,trade.funding.destination.decimals)+' '+trade.funding.destination.symbol),row('Destination wallet',trade.funding.recipient),row('Refund wallet',trade.funding.refundAddress),...trade.funding.fees.map(f=>row(f.kind,formatSendUnits(f.amount,f.decimals)+' '+f.symbol)),el('p',{className:'wx-fine'},'Review expires '+new Date(trade.funding.reviewUntil).toLocaleTimeString()+'. Provider delivery is tracked separately from network confirmations.'))]:[]),
+         ...(referenceReview?[el('p',{className:'wx-fine wx-send-reference'},'Entered ≈ '+referenceReview.value+' '+referenceReview.currency+' · Sending '+id+'.')]:[]),
++        ...(tip?[el('p',{className:'wx-fine'},TIP_REACTIONS[tip.reaction]+' Tip'+(tip.recipient?' for '+tip.recipient:'')+(tip.note?' · “'+tip.note+'”':'')+'. The name is supplied by the link; verify the address above.')]:[]),
++        ...(tip?.intent?[el('p',{className:'wx-fine'},'After submission, Haze shares the transaction ID with https://pepecoinhub.com so it can check this tip. Chat confirmation is separate from submission.')]:[]),
+         el('p', { className: 'wx-fine' }, 'Check the full address. Crypto payments can’t be reversed.' + (feeRate ? '' : ' A standard network fee is being used because live fee estimates are unavailable.')),
+         password.node, error), el('div', { className: 'wx-send-actions' }, confirm));
+       host.replaceChildren(review); ctx.body.scrollTop = 0;
+@@ -3139,6 +3187,7 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+           secrets = await password.unlock(stored.vault, enteredPassword,()=>{assertSendActive(sendEpoch);if(!review.isConnected)throw Error('Review closed. Review your payment again.');}); enteredPassword = '';
+           assertSendActive(sendEpoch);
+           if(Date.now()-reviewedAt>120000)throw Error('This review has expired. Go back and review again.');
++          if(tip?.intent&&Date.parse(tip.expires)<=Date.now())throw Error('This chat tip expired. Start a new tip on PepecoinHub.');
+           verified = await buildAssetState(secrets, stored.vault.public.assets);
+           assertSendActive(sendEpoch);
+           if (verified[id]?.address !== act.address) throw new Error('The wallet changed or locked. Unlock and review your payment again.');
+@@ -3150,6 +3199,7 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+           for (const value of Object.values(verified)) value.wif = '';
+           assertSendActive(sendEpoch);
+           if (built.amount !== plan.amount || built.fee !== plan.fee || built.total !== plan.total || built.outputs[0].address !== plan.recipient) throw new Error('The payment details changed. Go back and review again.');
++          if(tip?.intent&&Date.parse(tip.expires)<=Date.now())throw Error('This chat tip expired. Start a new tip on PepecoinHub.');
+           if (JSON.stringify((await IDBGet(RECORD_KEY))?.vault) !== fingerprint) throw new Error('The wallet changed. Unlock and review your payment again.');
+           assertSendActive(sendEpoch);
+           if (spendGuard) await spendGuard.assertClean({ address: act.address, utxos: plan.inputs, signal: sendController.signal });
+@@ -3177,6 +3227,11 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+       };
+     }
+     function showResult(built, uncertain) {
++      if (tip?.intent){
++        const payment={txid:built.txid,address:built.outputs[0].address,sender:act.address,amount:built.amount};
++        submittedChatTips.set(tip.intent,payment);while(submittedChatTips.size>100)submittedChatTips.delete(submittedChatTips.keys().next().value);
++        notifyChatTipSubmission(tip,payment);
++      }
+       const copy = el('button', { className: 'wx-btn wx-btn--ghost', type: 'button', onclick: async () => {
+         try { await copyText(built.txid); flashBtn(copy, 'Transaction ID copied ✓'); } catch (_) { copy.textContent = 'Select and copy the ID above'; }
+       } }, 'Copy transaction ID');
+@@ -3193,6 +3248,62 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+     }
+   }
+ 
++  function viewGroupTip(host){
++    const request=activeChatGroup,account=state.assets.PEP,epoch=hazeAuthLifecycle,nav=groupRequestEpoch;
++    if(!request||account.address!==request.sender){host.replaceChildren(el('h2',{},'Use your linked Haze wallet'),el('p',{className:'wx-err'},'This group was created for a different sender.'));return;}
++    const controller=new AbortController();activeSendController=controller;ctx.setCleanup(()=>controller.abort());
++    const current=()=>{
++      if(controller.signal.aborted||!alive||ctx._isClosed()||currentView!=='group-tip'||unlockedSession!==state||hazeAuthLifecycle!==epoch||groupRequestEpoch!==nav||!sessionPolicy.check())throw Error('Group review cancelled or wallet changed.');
++      if(Date.parse(request.expires_at)<=Date.now())throw Error('This group review expired.');
++    };
++    const password=walletAuthorizationField(),status=el('p',{className:'wx-fine',role:'status'},'Calculating the group network fee…');
++    const error=el('p',{className:'wx-err',role:'alert'}),confirm=el('button',{type:'submit',className:'wx-btn wx-btn--primary',disabled:true},'Approve group tip');
++    const rows=el('div',{className:'wx-group-recipients'});
++    request.recipients.forEach(item=>rows.append(el('div',{className:'wx-group-recipient'},el('strong',{},item.nick+' · '+formatBaseUnits(item.amount)+' PEP'),el('code',{},item.address))));
++    const form=el('form',{className:'wx-group-review'},el('h2',{},request.title),el('p',{className:'wx-fine'},request.recipients.length+' recipients · Native Pepecoin · '+request.mode),
++      el('h3',{},formatBaseUnits(request.total_atomic)+' PEP shared'),rows,status,el('p',{className:'wx-fine'},'Every recipient and amount is fixed to this review. Haze fee: 0 PEP. Nothing is sent until you approve.'),password.node,error,confirm);
++    host.replaceChildren(form);ctx.body.scrollTop=0;
++    let plan=null,reviewedAt=0,sending=false;
++    const guard=createPepSpendGuard(),payments=request.recipients.map(item=>({address:item.address,amount:item.amount}));
++    const retry=el('button',{type:'button',className:'wx-btn',hidden:true},'Refresh network fee');status.after(retry);
++    const reviewFee=async()=>{
++      retry.hidden=true;confirm.disabled=true;plan=null;error.textContent='';status.textContent='Calculating the group network fee…';
++      try{
++        const [funds,rate]=await Promise.all([collectSpendableUtxos({assetId:'PEP',readPage:cursor=>requestJSON(assetApi('PEP').utxos(account.address)+(cursor?'?cursor='+encodeURIComponent(cursor):''),{},20000),filterPage:outputs=>guard.filter({address:account.address,utxos:outputs,signal:controller.signal})}),fetchFeeRate('PEP')]);
++        current();plan=await planGroupSend({payments,utxos:funds.utxos,feeRate:rate});current();reviewedAt=Date.now();
++        status.textContent='Network fee: '+formatBaseUnits(plan.fee)+' PEP · Total from wallet: '+formatBaseUnits(plan.total)+' PEP';confirm.disabled=false;
++      }catch(e){if(form.isConnected){status.textContent='Network review unavailable.';error.textContent=e.message;retry.hidden=false;}}
++    };
++    retry.onclick=()=>void reviewFee();void reviewFee();
++    form.onsubmit=async event=>{
++      event.preventDefault();if(sending||!plan||confirm.disabled)return;error.textContent='';
++      if(!password.hasCredential(password.input.value)){error.textContent='Enter your wallet password to approve.';return;}
++      let entered=password.input.value,secrets=null,verified=null,built=null,started=false;password.input.value='';sending=true;confirm.disabled=true;ctx.setBusy(true,'Verifying group payment…');
++      const complete=uncertain=>{
++        submittedChatGroups.set(request.id,{request,built});while(submittedChatGroups.size>100)submittedChatGroups.delete(submittedChatGroups.keys().next().value);
++        notifyGroupSubmission(request,built);host.replaceChildren(el('h2',{},uncertain?'Checking the network':'Group tip on its way'),el('p',{className:'wx-fine'},'Chat is following confirmation automatically. Do not send this group again.'),el('code',{},built.txid));
++      };
++      try{
++        current();if(Date.now()-reviewedAt>120000)throw Error('This network-fee review expired. Start a fresh review.');
++        const stored=await IDBGet(RECORD_KEY);current();if(!stored?.vault)throw Error('Local wallet is missing.');const fingerprint=JSON.stringify(stored.vault);
++        secrets=await password.unlock(stored.vault,entered,current);entered='';current();
++        verified=await buildAssetState(secrets,stored.vault.public.assets);current();if(verified.PEP?.address!==request.sender)throw Error('The wallet does not match this group sender.');
++        await guard.assertClean({address:request.sender,utxos:plan.inputs,signal:controller.signal});current();
++        if(JSON.stringify((await IDBGet(RECORD_KEY))?.vault)!==fingerprint)throw Error('The wallet changed.');current();
++        built=await buildSignedGroupSend({payments,wif:verified.PEP.wif,fromAddress:request.sender,utxos:plan.inputs,feeRate:plan.feeRate});current();
++        if(built.amount!==plan.amount||built.fee!==plan.fee||built.total!==plan.total||built.outputs.filter(out=>!out.change).some((out,n)=>out.address!==payments[n].address||out.amount!==payments[n].amount))throw Error('Group payment details changed.');
++        await guard.assertClean({address:request.sender,utxos:plan.inputs,signal:controller.signal});current();
++        if(JSON.stringify((await IDBGet(RECORD_KEY))?.vault)!==fingerprint)throw Error('The wallet changed.');current();
++        if(Date.now()-reviewedAt>120000)throw Error('This network-fee review expired.');
++        started=true;const result=await broadcastTx('PEP',built.rawHex);if(result?.txid&&result.txid!==built.txid)throw Error('Unexpected relay response.');complete(false);void refresh();
++      }catch(e){if(started&&built)complete(true);else if(form.isConnected){error.textContent=e.message;if(/review expired/i.test(e.message))retry.hidden=false;}}
++      finally{
++        entered='';password.input.value='';for(const entries of [secrets?.assets,verified])if(entries)for(const item of Object.values(entries)){if(item&&typeof item==='object'){if('wif'in item)item.wif='';if('rawPrivateKeyHex'in item)item.rawPrivateKeyHex='';}}if(secrets&&'wif'in secrets)secrets.wif='';secrets=null;verified=null;
++        sending=false;ctx.setBusy(false);if(form.isConnected)confirm.disabled=false;
++      }
++    };
++  }
++
+   function buySoon(asset=state.assetId){return !assetCommerceDecision(commerceAvailability.data,{assetId:asset,network:COIN_NETWORKS[asset],product:'buy'}).allowed;}
+   function syncBuyButtons(){ctx.body.querySelectorAll('[data-commerce-action]').forEach(paintBuyButton);}
+   function viewBuy(){openCommerce('buy',state.assetId,COIN_NETWORKS[state.assetId]);}
+@@ -3670,6 +3781,8 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+     if(name==='commerce-receipts')receiptsReturn=previousView;
+     if(!['evm-wallet','hosted-network'].includes(name))pendingHostedAction=null;
+     if(name!=='send')pendingMoonPayTradePayment=null;
++    if(name!=='send')activeChatTip=null;
++    if(name!=='group-tip')activeChatGroup=null;
+     activeSendController?.abort(); activeSendController = null;
+     currentView = name;
+     qrButton.hidden=true;
+@@ -3707,6 +3820,7 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+     else if (name === "receive") viewReceive(panelBody);
+     else if (name === 'paper-wallet') viewPaperWallet(panelBody);
+     else if (name === "send") viewSend(panelBody);
++    else if (name === 'group-tip') viewGroupTip(panelBody);
+     else if (name === "buy") viewBuy(panelBody);
+     else if (name === "activity") viewActivity(panelBody);
+     else if (name === 'whippet-asset') viewWhippetAsset(panelBody);
+@@ -3975,6 +4089,29 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+ 
+   syncHeader();
+   switchView("overview");
++  const acceptChatTip=()=>{
++    const tipEpoch=hazeAuthLifecycle,navigation=chatTipNavigation;
++    if(!alive||ctx._isClosed()||unlockedSession!==state)return;
++    if(!new URLSearchParams(location.hash.slice(1)).has('haze-tip')){if(activeChatTip)switchView('overview');return;}
++    // Changing the public request cancels all previous planning/signing work.
++    if(activeChatTip)switchView('overview');
++    void chatTipHandoff.take(()=>alive&&!ctx._isClosed()&&unlockedSession===state&&hazeAuthLifecycle===tipEpoch&&chatTipNavigation===navigation).then(tip=>{
++      if(!tip||!alive||ctx._isClosed()||unlockedSession!==state||hazeAuthLifecycle!==tipEpoch||chatTipNavigation!==navigation||!state.assets[tip.asset]||!siteAllowsAsset(tip.asset))return;
++      if(submittedChatTips.has(tip.intent)){
++        notifyChatTipSubmission(tip,submittedChatTips.get(tip.intent));
++        panelBody.replaceChildren(el('p',{className:'wx-fine'},'This tip was already submitted. Return to chat to follow its confirmation.'));return;
++      }
++      state.assetId=tip.asset;activeChatTip=tip;syncHeader();switchView('send');
++    });
++  };
++  applyChatTipHandoff=acceptChatTip;acceptChatTip();
++  const acceptGroup=request=>{
++    if(!alive||ctx._isClosed()||unlockedSession!==state)return;
++    if(!request){if(activeChatGroup)switchView('overview');return;}
++    if(submittedChatGroups.has(request.id)){const cached=submittedChatGroups.get(request.id);notifyGroupSubmission(request,cached.built);return;}
++    state.assetId='PEP';activeChatGroup=request;syncHeader();switchView('group-tip');
++  };
++  applyChatGroup=acceptGroup;if(pendingChatGroup)acceptGroup(pendingChatGroup);
+   void commerceAvailability.refresh();
+   queueMicrotask(()=>void offerBiometricSetup());
+   refreshTimer = setInterval(() => { if (!document.hidden) refresh(); }, 20_000);
+@@ -3982,6 +4119,8 @@ function showWallet(ctx, state, {offerBiometrics=false}={}) {
+   ctx.setCleanup(stopRefresh);
+ 
+   function lockCleanup() {
++    if(applyChatGroup===acceptGroup)applyChatGroup=null;
++    if(applyChatTipHandoff===acceptChatTip)applyChatTipHandoff=null;
+     commerceAvailability.destroy();
+     ctx.card.classList.remove('wx-consumer-wallet');
+     activeCommerce?.destroy();activeCommerce=null;
+@@ -4357,6 +4496,7 @@ function boot() {
+           getLifecycleToken: () => hazeAuthSessionLifecycle,
+           unlockForAuthentication: async (password, context) => {
+             try {
++              if(!walletTermsAcceptance.accepted())throw Object.assign(new Error('Open Haze Wallet and review the self-custody terms before connecting.'),{code:'TERMS_REQUIRED'});
+               if(securityProfile.id==='lenient')throw Error('Connected-app signing is unavailable in Lenient mode. Choose Standard or Strict in Automatic locking first.');
+               if (context.signal?.aborted || !context.isActive()) throw Object.assign(new Error('Connection canceled.'), { code: 'LOCKED' });
+               // Bridge negotiation can finish before QR/branding opens the native
+@@ -4368,7 +4508,7 @@ function boot() {
+             } finally { password = ''; }
+           },
+         });
+-        bridge.installHazeBridge(walletAuth);
++        bridge.installHazeBridge({...walletAuth,chatTipProtocol:CHAT_TIP_PROTOCOL,chatTipInline:1,chatGroupTips:1});
+         if (!PRC20_TOKENS_ENABLED) return;
+         // Optional TokenPrinter launch support. It is disabled by the static,
+         // operator-owned config and is never derived from the parent, `ref`, or
+@@ -4395,6 +4535,22 @@ function boot() {
+   // left exactly as the user left it.
+   window.addEventListener("message", function (e) {
+     if (window.parent === window || e.source !== window.parent) return;
++    // Public UI requests only, accepted from the integration's exact origin.
++    // They cannot approve a payment, provide a password, or access key material.
++    if(e.origin===HUB_ORIGIN&&e.data?.version===1){
++      let groupSize=Infinity;try{groupSize=JSON.stringify(e.data.request)?.length??Infinity;}catch{}
++      if(e.data.type==='haze:group-tip-review'&&Object.keys(e.data).length===3&&e.data.request&&groupSize<=65536){
++        const sequence=++groupRequestEpoch;
++        void readGroupTip(e.data.request).then(request=>{
++          if(sequence!==groupRequestEpoch)return;pendingChatGroup=request;updateChatTipRequest('');sessionPolicy.open();
++          if(applyChatGroup)applyChatGroup(request);void open();
++        }).catch(()=>{if(sequence===groupRequestEpoch)window.parent.postMessage({type:'haze:group-tip-error',version:1,intent:e.data.request?.id,message:'This group review is invalid or expired.'},HUB_ORIGIN);});return;
++      }
++      if(e.data.type==='haze:tip-review'&&Object.keys(e.data).length===3&&typeof e.data.fragment==='string'&&e.data.fragment.length<=4096&&e.data.fragment.startsWith('#haze-tip=1&')){
++        groupRequestEpoch++;pendingChatGroup=null;applyChatGroup?.(null);sessionPolicy.open();updateChatTipRequest(e.data.fragment);void open();return;
++      }
++      if(e.data.type==='haze:tip-cancel'&&Object.keys(e.data).length===2){groupRequestEpoch++;pendingChatGroup=null;applyChatGroup?.(null);if(location.hash)updateChatTipRequest('');return;}
++    }
+     if(e.origin!=='null'&&/^https?:$/.test(new URL(e.origin).protocol))operationParentOrigin=e.origin;
+     if(e.data?.type==='haze:lock-request'){window.dispatchEvent(new Event('haze:lock'));return;}
+     if(e.data?.type==='haze:hidden'){if(!globalThis.__wxLast?.minimize?.())sessionPolicy.close();return;}
+@@ -4408,4 +4564,4 @@ function boot() {
+ if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+ else boot();
+ 
+-export { open, close };
++export { open, close, CHAT_TIP_PROTOCOL };
+diff --git a/wallet-core.js b/wallet-core.js
+index 940f882..37f49da 100644
+--- a/wallet-core.js
++++ b/wallet-core.js
+@@ -530,6 +530,35 @@ export async function planSend({ assetId = DEFAULT_ASSET, recipient, amount, utx
+     inputs: selection.selected, inputTotal: selection.total.toString(), sendMax: !!sendMax };
+ }
+ 
++// A bounded native-PEP batch uses the same funding checks and PSBT signer.
++// Each recipient receives exactly one output; optional change returns to sender.
++export async function planGroupSend({payments,utxos,feeRate=null}){
++  if(!Array.isArray(payments)||payments.length<1||payments.length>200)throw Error('Choose between 1 and 200 recipients.');
++  const cfg=asset('PEP'),seen=new Set(),normalized=[];let value=0n;
++  for(const payment of payments){
++    if(!payment||typeof payment.address!=='string'||!/^P[1-9A-HJ-NP-Za-km-z]{33}$/.test(payment.address)||seen.has(payment.address))throw Error('Each native PEP recipient must have a distinct address.');
++    await addressScript(payment.address,'PEP');seen.add(payment.address);
++    const amount=asBaseUnits(payment.amount,'recipient amount',{positive:true});
++    if(amount<100000000n)throw Error('Each recipient must receive at least 1 PEP.');
++    value+=amount;normalized.push({address:payment.address,amount:amount.toString()});
++  }
++  if(value>10000000000000n)throw Error('A group tip can total at most 100000 PEP.');
++  const rate=asBaseUnits(String(feeRate??defaultRateFor(cfg)),'fee rate',{positive:true});
++  if(rate<cfg.fee.minRate||rate>cfg.fee.maxRate)throw Error('The network fee is outside the safe policy range.');
++  const feeFor=n=>{const result=(BigInt(n)*148n+10n+BigInt(normalized.length+1)*34n)*rate;return result<cfg.fee.minimumFee?cfg.fee.minimumFee:result;};
++  let inputs=1,selection,fee,change;
++  for(let attempt=0;attempt<=(Array.isArray(utxos)?utxos.length:0)+1;attempt++){
++    selection=selectUtxos(utxos,value+feeFor(inputs),{minimumConfirmations:1});
++    if(!selection.sufficient)throw Error('Not enough confirmed PEP for this group and the network fee.');
++    if(selection.selected.length>20)throw Error('This group tip needs more than 20 funding inputs. Choose a smaller total.');
++    fee=feeFor(selection.selected.length);if(selection.total<value+fee){inputs=selection.selected.length;continue;}
++    change=selection.total-value-fee;if(change<=cfg.fee.dustLimit){fee+=change;change=0n;}break;
++  }
++  if(change===undefined)throw Error('The group fee could not be calculated.');
++  return {assetId:'PEP',payments:normalized,amount:value.toString(),fee:fee.toString(),total:(value+fee).toString(),change:change.toString(),feeRate:rate.toString(),inputs:selection.selected,inputTotal:selection.total.toString(),sendMax:false};
++}
++export async function buildSignedGroupSend(args){return buildSignedSend({...args,assetId:'PEP',batchPayments:args.payments,sendMax:false});}
++
+ export async function buildSignedSend({
+   assetId = DEFAULT_ASSET,
+   wif,
+@@ -539,16 +568,20 @@ export async function buildSignedSend({
+   utxos,
+   feeRate = null,
+   sendMax = false,
++  batchPayments = null,
+ }) {
+   const cfg = asset(assetId);
+   const net = NETWORKS[cfg.id];
+   const segwit = !!cfg.segwit;
+ 
+-  const plan = await planSend({ assetId, recipient, amount, utxos, feeRate, sendMax });
++  if(batchPayments&&cfg.id!=='PEP')throw Error('Group tips require native PEP.');
++  const plan = batchPayments?await planGroupSend({payments:batchPayments,utxos,feeRate}):await planSend({ assetId, recipient, amount, utxos, feeRate, sendMax });
++  const payments=plan.payments||[{address:String(recipient).trim(),amount:plan.amount}];
++  if(batchPayments&&payments.some(payment=>payment.address===fromAddress))throw Error('A group tip cannot pay its sending address.');
+   const value = BigInt(plan.amount);
+   const rate = BigInt(plan.feeRate);
+ 
+-  const destinationScript = await addressScript(recipient, cfg.id);
++  const destinationScripts=await Promise.all(payments.map(payment=>addressScript(payment.address,cfg.id)));
+   const imported = await importWif(String(wif).trim(), cfg.id);
+   if (String(imported.address) !== String(fromAddress ?? "").trim()) {
+     throw new Error("Signing key does not match the selected wallet address");
+@@ -612,7 +645,7 @@ export async function buildSignedSend({
+           });
+         }
+       }
+-      psbt.addOutput({ script: B.from(destinationScript), value: psbtValue(value, "send amount") });
++      for(let n=0;n<payments.length;n++)psbt.addOutput({script:B.from(destinationScripts[n]),value:psbtValue(BigInt(payments[n].amount),'send amount')});
+       if (includeChange) {
+         const changeScript = await addressScript(fromAddress, cfg.id);
+         psbt.addOutput({ script: B.from(changeScript), value: psbtValue(change, "change amount") });
+@@ -638,7 +671,7 @@ export async function buildSignedSend({
+         changeAddress: includeChange ? String(fromAddress).trim() : null,
+         inputs: selection.selected.map(({ txid: i, vout: v, amount: a, confirmations: c }) => ({ txid: i, vout: v, amount: a, confirmations: c })),
+         outputs: [
+-          { address: String(recipient).trim(), amount: value.toString(), change: false },
++          ...payments.map(payment=>({address:payment.address,amount:payment.amount,change:false})),
+           ...(includeChange ? [{ address: String(fromAddress).trim(), amount: change.toString(), change: true }] : []),
+         ],
+         feeRate: rate.toString(),
+diff --git a/haze-bridge.js b/haze-bridge.js
+index cafe584..3afa3f2 100644
+--- a/haze-bridge.js
++++ b/haze-bridge.js
+@@ -10,6 +10,7 @@ const ERRORS = Object.freeze({
+   EXPIRED: 'The sign-in request expired. Start again on the requesting site.',
+   LOCKED: 'Haze locked or the account changed. Start the connection again.',
+   AUTH_FAILED: 'Could not approve this request. Check your wallet password and try again.',
++  TERMS_REQUIRED: 'Open Haze Wallet and review the self-custody terms, then return here and connect again.',
+   RATE_LIMITED: 'Too many requests. Wait a few minutes and try again.',
+   NOT_CONNECTED: 'Connect this site to Haze before renewing its session.',
+ });
+@@ -92,6 +93,9 @@ export function installHazeBridge({
+   allowedOrigins = HAZE_AUTH_ALLOWED_ORIGINS,
+   validateChallenge, getAccount, signChallenge, signUnlockedChallenge, unlockAndSignChallenge, isUnlocked = () => false,
+   showConsent = showHazeAuthConsent,
++  chatTipProtocol = 0,
++  chatTipInline = 0,
++  chatGroupTips = 0,
+   now = () => Date.now(),
+ }) {
+   if (![validateChallenge, getAccount, signChallenge, showConsent].every(fn => typeof fn === 'function')) throw new TypeError('Haze authentication hooks are required');
+@@ -159,7 +163,7 @@ export function installHazeBridge({
+             validateChallenge(challenge, { origin: request.origin, now: now() });
+             finish(request, null, { proof: publicProof(proof, challenge, account.address || proof?.address) });
+           } catch (error) {
+-            finish(request, error?.code === 'LOCKED' ? 'LOCKED' : 'AUTH_FAILED');
++            finish(request, error?.code === 'LOCKED' ? 'LOCKED' : error?.code === 'TERMS_REQUIRED' ? 'TERMS_REQUIRED' : 'AUTH_FAILED');
+           } finally { password = ''; }
+         },
+       });
+@@ -203,7 +207,7 @@ export function installHazeBridge({
+       subscriberOrigin = event.origin;
+       return reply(event.origin, data.id, { authentication: 'haze-auth-v1', network: 'pepecoin-mainnet', transactions: false, accountReady: accountReady(),
+         combinedUnlock: typeof unlockAndSignChallenge === 'function', consentOnly: typeof signUnlockedChallenge === 'function',
+-        sessionRenewal: typeof signUnlockedChallenge === 'function' });
++        sessionRenewal: typeof signUnlockedChallenge === 'function', chatTipProtocol: chatTipProtocol === 1 ? 1 : 0, chatTipInline:chatTipInline===1?1:0,chatGroupTips:chatGroupTips===1?1:0 });
+     }
+     if (data.method === 'disconnect') {
+       if (data.params && Object.keys(data.params).length) return fail(event.origin, data.id, 'INVALID_REQUEST');
+diff --git a/widget.html b/widget.html
+index c5e90eb..2f3f94b 100644
+--- a/widget.html
++++ b/widget.html
+@@ -16,9 +16,11 @@
+ <link rel="stylesheet" href="haze-whippet.css?v=privacy-116">
+   <link rel="stylesheet" href="widget-demo.css?v=privacy-116" />
+ <link rel="stylesheet" href="/haze-viewport-wallet.css?v=ux-115-20261113" data-haze-viewport>
++<style>.wx-group-review{display:grid;gap:12px;padding:16px}.wx-group-review h2,.wx-group-review h3{margin:0}.wx-group-recipients{display:grid;gap:7px;max-height:220px;overflow:auto;padding:10px;border:1px solid #756c98;border-radius:10px}.wx-group-recipient{display:grid;gap:4px;font-size:12px}.wx-group-recipient code{font-size:10px;overflow-wrap:anywhere;opacity:.8}</style>
+ </head>
+ <body>
+   <noscript>HazeWallet needs JavaScript enabled. No JavaScript means no self-custody wallet.</noscript>
+-  <script src="widget-boot.js?v=ux-115-20261113" defer></script>
++  <script src="widget-boot.js?v=pepecoinhub-tip-v1-20261115" defer></script>
+ </body>
+ </html>
++
+diff --git a/widget-boot.js b/widget-boot.js
+index 811a07b..f1e18e1 100644
+--- a/widget-boot.js
++++ b/widget-boot.js
+@@ -81,7 +81,7 @@
+ 
+   function openWallet() {
+     if (globalThis.__wxOpen && typeof globalThis.__wxOpen === "function") return globalThis.__wxOpen();
+-    return import("./wallet.js?v=ux-115-20261113").then(function (m) {
++    return import("./wallet.js?v=pepecoinhub-tip-v1-20261115").then(function (m) {
+       if (m && typeof m.open === "function") return m.open();
+       if (globalThis.__wxOpen) return globalThis.__wxOpen();
+       throw new Error("wallet module failed to expose open()");
+@@ -111,7 +111,13 @@
+       return;
+     }
+     // Register optional connection support while QR and branding load.
+-    var walletReady = import("./wallet.js?v=ux-115-20261113");
++    var walletReady = import("./wallet.js?v=pepecoinhub-tip-v1-20261115");
++    walletReady = walletReady.then(function (module) {
++      if (new URLSearchParams(location.hash.slice(1)).has('haze-tip') && module.CHAT_TIP_PROTOCOL !== 1) {
++        throw new Error('This Haze build does not support chat tips yet. Open the updated Haze web wallet and start a new tip on PepecoinHub.');
++      }
++      return module;
++    });
+     Promise.all([loadQr(),brandReady,walletReady]).then(openWallet).then(function () {
+       applyBrandDom();
+       brandReady.then(applyBrandDom);
+diff --git a/assets/haze-group-tips.js b/assets/haze-group-tips.js
+new file mode 100644
+index 0000000..33aee2c
+--- /dev/null
++++ b/assets/haze-group-tips.js
+@@ -0,0 +1,25 @@
++import {validateAddress} from '../wallet-core.js';
++import {HUB_ORIGIN} from '../haze-auth-protocol.js';
++const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
++const integer=x=>typeof x==='string'&&/^[1-9][0-9]{0,13}$/.test(x);
++const exact=(x,keys)=>x&&typeof x==='object'&&!Array.isArray(x)&&Object.keys(x).length===keys.length&&keys.every(key=>Object.hasOwn(x,key));
++const label=(x,n)=>typeof x==='string'&&x.length<=n&&!/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(x);
++export async function readGroupTip(raw){
++  if(!exact(raw,['id','sender','title','mode','note','total_atomic','created_at','expires_at','recipients'])||!UUID.test(raw.id)||!label(raw.title,120)||!label(raw.note,160)||!['all','online','offline','random','selected','airdrop','trivia','word'].includes(raw.mode)||!integer(raw.total_atomic)||BigInt(raw.total_atomic)>10000000000000n||!Array.isArray(raw.recipients)||raw.recipients.length<1||raw.recipients.length>200||!await validateAddress(raw.sender,'PEP'))throw Error('Invalid group review. Start again in PepecoinHub.');
++  const expiry=Date.parse(raw.expires_at),created=Date.parse(raw.created_at);
++  if(!Number.isFinite(created)||created>Date.now()+30000||!Number.isFinite(expiry)||new Date(expiry).toISOString()!==raw.expires_at||expiry<=Date.now()||expiry>Date.now()+1860000)throw Error('This group review expired.');
++  const seen=new Set(),recipients=[];let total=0n;
++  for(const item of raw.recipients){
++    if(!exact(item,['address','amount','nick'])||!label(item.nick,60)||!integer(item.amount)||BigInt(item.amount)<100000000n||seen.has(item.address)||item.address===raw.sender||!/^P[1-9A-HJ-NP-Za-km-z]{33}$/.test(item.address)||!await validateAddress(item.address,'PEP'))throw Error('Invalid or repeated group recipient.');
++    seen.add(item.address);total+=BigInt(item.amount);recipients.push(Object.freeze({...item}));
++  }
++  if(total.toString()!==raw.total_atomic)throw Error('The group split does not match its total.');
++  return Object.freeze({...raw,recipients:Object.freeze(recipients)});
++}
++export function notifyGroupSubmission(request,built,frame=globalThis.window){
++  const target=frame?.opener||(frame?.parent&&frame.parent!==frame?frame.parent:null);
++  if(!target||!UUID.test(request?.id||'')||!/^[a-f0-9]{64}$/.test(built?.txid||'')||built.amount!==request.total_atomic)return false;
++  const outputs=built.outputs?.filter(out=>!out.change);
++  if(!outputs||outputs.length!==request.recipients.length||outputs.some((out,n)=>out.address!==request.recipients[n].address||out.amount!==request.recipients[n].amount))return false;
++  target.postMessage({type:'haze:tip-submitted',version:1,intent:request.id,txid:built.txid},HUB_ORIGIN);return true;
++}

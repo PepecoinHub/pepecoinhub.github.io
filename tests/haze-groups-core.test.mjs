@@ -6,11 +6,12 @@ import {pathToFileURL,fileURLToPath} from 'node:url';
 import {verifyGroupTransaction,pepScript,PEP_GENESIS} from '../games/supabase/functions/haze-wallet/core.mjs';
 import {handleHaze} from '../games/supabase/functions/haze-wallet/handler.mjs';
 const root=process.env.HAZE_WALLET_ROOT||path.resolve(fileURLToPath(new URL('../../../..',import.meta.url)));
-const candidate=path.join(root,'outputs/pepecoinhub-groups-20261115/candidate');
+const candidate=path.resolve(process.env.HAZE_TIP_CANDIDATE||path.join(root,'outputs/pepecoinhub-groups-20261115/candidate'));
 if(fs.existsSync(path.join(candidate,'wallet-core.js'))){
 const source=fs.readFileSync(path.join(candidate,'wallet-core.js'),'utf8').replace(/(\bfrom\s*|\bimport\s*\(\s*)(['"])(\.[^'"]+)\2/g,(_,prefix,quote,spec)=>prefix+quote+pathToFileURL(path.resolve(root,spec)).href+quote);
 const coreURL='data:text/javascript;base64,'+Buffer.from(source).toString('base64'),wallet=await import(coreURL);
-const protocolSource=fs.readFileSync(path.join(candidate,'assets/haze-group-tips.js'),'utf8').replace("'../wallet-core.js'",JSON.stringify(coreURL)).replace("'../haze-auth-protocol.js'",JSON.stringify(pathToFileURL(path.join(root,'haze-auth-protocol.js')).href));
+const authPath=fs.existsSync(path.join(candidate,'haze-auth-protocol.js'))?path.join(candidate,'haze-auth-protocol.js'):path.join(root,'haze-auth-protocol.js');
+const protocolSource=fs.readFileSync(path.join(candidate,'assets/haze-group-tips.js'),'utf8').replace("'../wallet-core.js'",JSON.stringify(coreURL)).replace("'../haze-auth-protocol.js'",JSON.stringify(pathToFileURL(authPath).href));
 const {readGroupTip,notifyGroupSubmission}=await import('data:text/javascript;base64,'+Buffer.from(protocolSource).toString('base64'));
 const {walletLibraries}=await import(pathToFileURL(path.join(root,'vendor/wallet/_loader.js'))),libs=await walletLibraries(),B=libs.Buffer;
 const sender=await wallet.createKey('PEP'),people=await Promise.all(Array.from({length:4},()=>wallet.createKey('PEP')));

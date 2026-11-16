@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow">
+  <title>Send a little good energy · Haze Wallet</title>
+  <link rel="icon" href="/hazewallet-mark.png"><link rel="stylesheet" href="/assets/tip.css">
+</head>
+<body>
+  <main class="tip-shell">
+    <header><a class="brand" href="/" aria-label="Haze Wallet home"><img src="/hazewallet-mark.png" alt="">Haze<span>Wallet</span></a><span class="header-tag">A little appreciation goes a long way.</span></header>
+    <div class="tip-layout">
+      <section class="intro">
+        <p class="eyebrow">GOOD VIBES. REAL TIPS.</p>
+        <h1>Make someone’s<br>chat a little <em>brighter.</em></h1>
+        <p class="intro-copy">Great take? Perfect meme? A little help at the right moment? Send a little appreciation with Haze.</p>
+        <div class="chat-scene" aria-label="Illustrative chat conversation">
+          <div class="chat-message"><span class="avatar mint" aria-hidden="true">J</span><div><b>Jules <small>just now</small></b><p>This community always shows up 💚</p></div></div>
+          <div class="chat-message"><span class="avatar lilac" aria-hidden="true">M</span><div><b>Mika <small>just now</small></b><p>That guide saved me so much time!</p><span class="message-reaction">👏 4 <span>💚 8</span></span></div></div>
+          <div class="chat-tip"><span aria-hidden="true">✦</span><div><b>Appreciation, with a little extra.</b><p>Tip a person. Make their day.</p></div><span class="mini-haze">H</span></div>
+          <p class="scene-caption">Chat illustration · no payment has been sent</p>
+        </div>
+        <p class="core-note"><span aria-hidden="true">↗</span> Your Haze wallet. Your approval. Straight to their wallet.</p>
+      </section>
+      <section class="tip-card" aria-labelledby="tip-title">
+        <div class="card-top"><span class="eyebrow">SEND SOME GOOD ENERGY</span><span class="sparkle" aria-hidden="true">✦</span></div>
+        <h2 id="tip-title">Open a tip link</h2>
+        <p id="tip-status" class="muted" role="status">Checking the payment details…</p>
+        <form id="tip-form" hidden>
+          <fieldset><legend>Make it a moment</legend><div class="reactions">
+            <button type="button" data-reaction="heart" aria-pressed="true">💚 <span>Much love</span></button>
+            <button type="button" data-reaction="applause" aria-pressed="false">👏 <span>Well played</span></button>
+            <button type="button" data-reaction="rocket" aria-pressed="false">🚀 <span>Let’s go</span></button>
+          </div></fieldset>
+          <fieldset><legend id="amount-legend">Choose your tip</legend><div id="presets" class="presets"></div>
+            <label class="amount-wrap"><span class="sr-only">Tip amount</span><input id="tip-amount" aria-label="Tip amount" type="text" inputmode="decimal" autocomplete="off" maxlength="40" required><span id="tip-asset">PEP</span></label>
+          </fieldset>
+          <label class="note-label" for="tip-note">Add a little note <span>optional</span></label>
+          <input id="tip-note" type="text" maxlength="160" placeholder="You made my day!">
+          <div class="destination"><span id="tip-network">Receiving address</span><code id="tip-address"></code><p>Check this address with the recipient. The name above is supplied by the shared link.</p></div>
+          <p id="tip-error" class="error" role="alert"></p>
+          <button id="tip-continue" type="submit" class="primary">Review in Haze Wallet <span aria-hidden="true">↗</span></button>
+          <p class="approval-note">Nothing is sent yet. Review the network fee and approve in Haze. Your note appears in your Haze payment details.</p>
+          <p id="note-status" class="muted" role="status"></p>
+        </form>
+        <div id="tip-empty" hidden><p>Ask someone to share a Haze tip link with their receiving address.</p><a class="primary" href="/widget.html?standalone=1">Open or create Haze Wallet ↗</a></div>
+        <div class="powered"><img src="/hazewallet-mark.png" alt="">Powered by <b>Haze Wallet</b><span>Self custody, shared joy.</span></div>
+      </section>
+    </div>
+    <footer><span>Haze Wallet · RustCan LLC</span><nav aria-label="Legal and support"><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a><a href="/assets/support.html">Support</a></nav></footer>
+  </main>
+  <script type="module" src="/assets/tip.js"></script>
+</body>
+</html>

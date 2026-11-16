@@ -6,11 +6,13 @@ signing key, bot wallet, withdrawal authority or internal balance. Signing and
 network-fee approval remain inside Haze. Ordinary chat keeps working if tipping
 is disabled or unavailable.
 
-**Local review only.** `HAZE_TIPS_ENABLED` in `docs/games/js/haze-tips.mjs` is
-false and `games.haze_settings.enabled` starts false. Based on upstream
-`060686a4f97646dd7dd51acf5ffe2dd256b9537b`. No branch push, PR, or deployment
-has been made. Both connected GitHub accounts still reported pull-only access
-on 2026-11-15; this does not prevent local preview work.
+**Disabled review build.** `HAZE_TIPS_ENABLED` in
+`docs/games/js/haze-tips.mjs` is false and `games.haze_settings.enabled` starts
+false. The independent community-tip switches also stay false. This branch
+is based on upstream `673183f` and is intended for code review and joint staging
+validation before any activation. The complete Haze companion patch, required
+public modules, baseline hashes and reproduction instructions are in
+[`haze-review/2026-11-15/`](haze-review/2026-11-15/README.md).
 
 ## Local playground
 
@@ -191,7 +193,7 @@ opening another payment.
    `/auth/v1/user`, then requires a Discord identity before privileged calls.
    Disabling the gateway JWT check supports different JWT signing-key formats;
    it does not make this function anonymous. Only PepecoinHub-origin POSTs with
-   a bearer session, bounded JSON and the two documented actions are accepted.
+   a bearer session, bounded JSON and the documented actions are accepted.
    Supabase supplies the server-only `SUPABASE_URL` and
    `SUPABASE_SERVICE_ROLE_KEY`. Never put service-role keys, node RPC credentials,
    a bot token, signing key or Haze password into GitHub Pages or config.js.
