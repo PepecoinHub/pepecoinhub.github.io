@@ -1,10 +1,22 @@
-// Local cosmetic conversations only. This module never reads or writes pet state.
+// Cosmetic conversations; actual needs and care history come from the server view.
 const lines = {
   hello: ["I'm supervising the pond. Very important frog business.", "Oh hey, fren. I was just thinking about flies.", "PondOS looks better with me on the taskbar."],
   joke: ["Why did the frog cross the road? The pond was on the other side. I never said it was a good joke.", "I tried to mine PEP with a potato. It was a chip.", "I have a great joke about flies. It went over my head."],
   pet: ["Hehe. More of that, fren.", "This is acceptable human behaviour.", "Finally, a useful mouse."],
   annoyed: ["Fren. That's my face.", "I am not a touchscreen.", "The frog requests a little personal space."],
   play: ["Fancy a game? I believe in you. Mostly.", "Let's visit the pond arcade. Do not blame me if you lose."],
+  return: ["You're back! I saved your spot beside me.", "There you are, fren. The taskbar is better with you here."],
+  fed: ["That hit the spot. You remembered my favourite thing: food."],
+  clean: ["Fresh frog, fresh start. Thanks for the bath, fren."],
+  played: ["That was fun. Same team again next time?"],
+  rested: ["Much better. Thanks for letting a little frog recharge."],
+  grown: ["Look at me! A little bigger, still your fren."],
+  quizWin: ["We make a pretty good pond quiz team. You think, I ribbit."],
+  quizMiss: ["We learned something together. That's still a good day."],
+  offline: ["The pond went quiet. I'll keep you company while the connection is away."],
+  online: ["The pond is back! I kept your seat warm."],
+  familiar: ["I know that gentle pat. That's my human.", "Right behind the eyes. You know me well, fren."],
+  space: ["Tiny frog break. Let's just sit together for a moment."],
   news: ["PondOS has games, stamps and a whole pond of frens. Go explore!", "Check the Pond Quiz, your Fren Passport or the arcade."],
 };
 const moods = {
@@ -31,19 +43,42 @@ export function companionReply(view, action = 'hello', n = 0) {
     return { text: message, pose: null, openRoom: false };
   }
   if (action === 'how') return { text: "Feeling pretty good, fren. Thanks for asking.", pose: 'tb_adult_talk', openRoom: false };
+  if (action === 'memories') return { text: view.careDays > 0
+    ? `You have looked after me on ${view.careDays} care days. Those little visits mean a lot, fren.`
+    : "Our story is just starting. A little food, a little play, a little time together.", pose: 'tb_adult_think', openRoom: false };
   const group = lines[action] || lines.hello;
-  return { text: pick(group, n), pose: action === 'pet' || action === 'joke' ? 'tb_adult_laugh' : action === 'annoyed' ? 'tb_adult_moody' : 'tb_adult_talk', openRoom: false };
+  return { text: pick(group, n), pose: ['pet', 'familiar', 'joke', 'quizWin', 'grown'].includes(action) ? 'tb_adult_laugh' : action === 'annoyed' ? 'tb_adult_moody' : 'tb_adult_talk', openRoom: false };
 }
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
-// No polling, storage, rewards, account information or network calls.
-export function mountFrogInteractions({ button, img, slot, getView, setPose, openRoom, closeQuiz, quizAvailable, openQuiz, now = () => Date.now() }) {
+// No polling or network calls. Optional bond stores cosmetic memories only.
+export function mountFrogInteractions({ button, img, slot, getView, setPose, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, now = () => Date.now() }) {
   let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
+  let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
   const doc = button.ownerDocument;
   const win = doc.defaultView;
   const el = (tag, cls, text) => {
     const e = doc.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e;
   };
+  function clearNotice() {
+    if (noticeTimer !== null) win.clearTimeout(noticeTimer);
+    noticeTimer = null; notice?.remove(); notice = null;
+  }
+  function react(action) {
+    bond?.remember(action);
+    if (panel || bond?.muted || !canReact() || doc.visibilityState === 'hidden' || now() - lastReaction < 45000 || !getView()?.hasPet) return;
+    const r = companionReply(getView(), action, sequence++);
+    clearNotice(); lastReaction = now();
+    notice = el('div', 'pg-fact pg-companion-reaction');
+    notice.setAttribute('role', 'status');
+    notice.style.pointerEvents = 'none';
+    notice.append(el('p', 'pg-fact-q', r.text));
+    const rect = slot.getBoundingClientRect();
+    notice.style.bottom = Math.max(8, win.innerHeight - Math.min(rect.top, img.getBoundingClientRect().top) + 6) + 'px';
+    notice.style.left = Math.max(8, Math.min(rect.left, win.innerWidth - 376)) + 'px';
+    doc.body.append(notice);
+    noticeTimer = win.setTimeout(clearNotice, 6000);
+  }
   function cancelClick() { if (clickTimer !== null) { win.clearTimeout(clickTimer); clickTimer = null; } }
   function reposition() {
     if (!panel) return;
@@ -54,7 +89,8 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ope
     panel.style.overflowY = 'auto';
   }
   function close({ focus = false, reset = false } = {}) {
-    cancelClick();
+    cancelClick(); clearNotice();
+    if (reset) { lastReaction = lastPet = -Infinity; pats = []; }
     if (reset) { recent = []; sequence = 0; gesture = null; suppressClick = false; }
     if (!panel) return;
     panel.remove(); panel = null; reply = null;
@@ -72,6 +108,16 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ope
   }
   function visit() { close({ reset: true }); openRoom(); }
   function say(action = 'hello') {
+    clearNotice();
+    if (action === 'hello') action = bond?.take() || action;
+    if (action === 'pet') {
+      pats = pats.filter(t => now() - t < 10000); pats.push(now());
+      if (pats.length > 3) action = 'space';
+      else {
+        if (bond?.familiar) action = 'familiar';
+        if (now() - lastPet > 30000) { bond?.pet(); lastPet = now(); }
+      }
+    }
     const r = companionReply(getView(), action, sequence++);
     if (r.openRoom) { visit(); return; }
     closeQuiz();
@@ -83,11 +129,17 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ope
       const head = el('div', 'pg-fact-bar');
       const x = el('button', 'pg-fact-x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close conversation');
       x.addEventListener('click', () => close({ focus: true }));
-      head.append(el('b', null, 'PepeGochi'), x);
+      head.append(el('b', null, getView()?.label || 'PepeGochi'), x);
       reply = el('p', 'pg-fact-q');
       reply.setAttribute('aria-live', 'polite');
       const actions = el('div', 'pg-fact-answers');
       function add(label, fn) { const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', fn); actions.append(b); }
+      add('Our memories', () => say('memories'));
+      if (bond) {
+        const mute = el('button', 'pg-fact-a'); mute.type = 'button';
+        const label = () => { mute.textContent = bond.muted ? 'Reactions: quiet' : 'Reactions: on'; mute.setAttribute('aria-pressed', String(bond.muted)); };
+        label(); mute.addEventListener('click', () => { bond.toggleMute(); clearNotice(); label(); }); actions.append(mute);
+      }
       add('How are you?', () => say('how'));
       add('Tell me a joke', () => say('joke'));
       add("Let's play!", () => say('play'));
@@ -144,7 +196,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ope
   button.addEventListener('pointerup', end);
   button.addEventListener('pointercancel', end);
   button.addEventListener('pointerleave', end);
-  return { close, dispose() {
+  return { close, react, dispose() {
     close({ reset: true });
     doc.removeEventListener('pointerdown', outside, true);
     button.removeEventListener('click', click);

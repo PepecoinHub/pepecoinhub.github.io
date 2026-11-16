@@ -4,7 +4,9 @@
 // and the hop out of the PEPEGOCHI.EXE window.
 import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261115a10';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261116talk1';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261116bond1';
+
+import { createBond } from './pepegochi-bond.mjs?v=20261116bond1';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
 const NEEDS = new Set(['hunger', 'hygiene', 'mood', 'energy']);
@@ -64,6 +66,7 @@ export function describeTaskbarFrog(state) {
     recovering: 'Your Fren is recovering.',
   };
   return {
+    careDays: Math.max(0, Math.trunc(Number(p.care_days) || 0)),
     sprite: pose(poseFor(sprite)), label: name, adult: stage === 'adult',
     title: name + ' · ' + remarks[status] + ' Click to talk, double-click to visit.',
     warning: status === 'packing' || status === 'neglected', hasPet: true,
@@ -90,6 +93,10 @@ export function hopPath(from, to, steps = 36) {
 export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = () => Date.now() }) {
   const start = bar && bar.querySelector('.start');
   if (!start) return () => {};
+  let storage;
+  try { storage = window.localStorage; } catch {}
+  const bond = createBond({ storage, now });
+  let disposed = false, lastLife = null;
   const img_base = base + 'games/img/pepegochi/';
 
   const slot = document.createElement('span');
@@ -207,7 +214,9 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   function setAct(a) { act = a; if (shownView) paint(shownView); }
   function paint(view) {
     shownView = view;
-    const path = img_base + (act && view.adult ? pose(act) : view.sprite) + '?v=' + POSE_VERSION;
+    // A new server state must immediately displace a stale laugh/talk pose.
+    const expressive = view.adult && view.sprite === pose('tb_adult_sit');
+    const path = img_base + (act && expressive ? pose(act) : view.sprite) + '?v=' + POSE_VERSION;
     if (img.getAttribute('src') !== path) img.setAttribute('src', path);
     button.setAttribute('aria-label', view.title);
     button.title = view.title;
@@ -239,6 +248,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     // an answer that arrives after the account changed belongs to the old account: drop it
     const now = session();
     if (!now || !now.discord || now.userId !== who) return null;
+    if (disposed) return null;
     // the day is the server's UTC day: a wrong clock on this computer does not hide the question
     server = got;
     return server;
@@ -306,8 +316,14 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       const b = el('button', 'pg-fact-a', ans); b.type = 'button';
       b.addEventListener('click', async () => {
         [...list.children].forEach(x => { x.disabled = true; });
-        try { server = await rpc('gry_quiz_answer', { p_choice: i }); f = server; }
-        catch (e) { out.textContent = 'The answer could not be saved. Try again later.'; [...list.children].forEach(x => { x.disabled = false; }); return; }
+        const who = session()?.userId, ticket = quizIntent, target = balloon;
+        try {
+          const answer = await rpc('gry_quiz_answer', { p_choice: i });
+          if (disposed || who !== session()?.userId || ticket !== quizIntent || target !== balloon) return;
+          server = answer; f = server;
+          bond.remember(f.right ? 'quizWin' : 'quizMiss');
+        }
+        catch (e) { if (disposed || who !== session()?.userId || ticket !== quizIntent || target !== balloon) return; out.textContent = 'The answer could not be saved. Try again later.'; [...list.children].forEach(x => { x.disabled = false; }); return; }
         show(); updateFactButton();
       });
       list.append(b);
@@ -366,6 +382,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       generation++;
       cancelQuiz();               // the old account's question or ranking must not stay on screen
       conversation?.close({ reset: true });
+      bond.reset(); lastLife = null;
       paint(describeTaskbarFrog(null));
       hatched = false; server = null; updateFactButton();
     }
@@ -376,24 +393,33 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     try {
       const state = await rpc('gry_pepegochi_state', {});
       const cur = session();
-      if (requestGeneration !== generation || !cur || !cur.discord || cur.userId !== id) return;
-      paint(describeTaskbarFrog(state));
+      if (disposed || requestGeneration !== generation || !cur || !cur.discord || cur.userId !== id) return;
+      if (lastLife !== state?.pet?.life_id) {
+        conversation?.close({ reset: true }); lastLife = state?.pet?.life_id || null;
+      }
+      const view = describeTaskbarFrog(state);
+      if (shownView?.sprite !== view.sprite || shownView?.label !== view.label) conversation?.close();
+      paint(view);
+      const event = bond.observe(id, state?.pet);
+      if (event) conversation?.react(event);
       // the quiz opens once the frog has hatched (the server checks it again)
       const was = hatched;
       hatched = !!(state && state.pet && state.pet.stage && state.pet.stage !== 'egg');
       if (hatched !== was) refreshFacts(true);
     } catch (_) {
       const cur = session();
-      if (requestGeneration !== generation || !cur || cur.userId !== id) return;
+      if (disposed || requestGeneration !== generation || !cur || cur.userId !== id) return;
       // If the release SQL is not installed, avoid claiming to know the current frog.
+      conversation?.close();
       paint(UNAVAILABLE);
       hatched = false; server = null; updateFactButton();
     }
   }
 
   function onVisible() {
-    if (document.visibilityState === 'visible') { refresh(); queueMotion(); refreshFacts(); }
-    else { conversation?.close(); cancelMotion(); }
+    if (document.visibilityState === 'visible') {
+      refresh(); queueMotion(); refreshFacts();
+    } else { bond.touch(); conversation?.close(); cancelMotion(); }
   }
   function onMessage(event) {
     if (event.origin !== location.origin || !event.data ||
@@ -415,10 +441,18 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   conversation = mountFrogInteractions({ button, img, slot, getView: () => shownView,
     setPose: p => { cancelMotion(); setAct(p); if (!p) queueMotion(); }, openRoom: open,
     closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
-    openQuiz: requestQuiz, now });
+    openQuiz: requestQuiz, bond, canReact: () => !balloon &&
+      document.activeElement?.tagName !== 'IFRAME', now });
+  const onOffline = () => conversation?.react('offline');
+  const onOnline = () => conversation?.react('online');
+  window.addEventListener('offline', onOffline);
+  window.addEventListener('online', onOnline);
   refresh(true);
   queueMotion();
   return () => {
+    disposed = true; generation++; quizIntent++; bond.touch();
+    window.removeEventListener('offline', onOffline);
+    window.removeEventListener('online', onOnline);
     conversation?.dispose();
     cancelMotion();
     cancelQuiz();
