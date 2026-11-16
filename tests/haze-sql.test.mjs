@@ -50,11 +50,13 @@ test('Haze SQL: real PostgreSQL permissions, challenge replay, immutable recipie
     const challenges={};
     for(const [i,destination]of [[1,address],[2,recipient]]){
       const challenge=rpc('authenticated',uid(i),'select public.gry_haze_link_begin()');challenges[i]=challenge;
+      assert.deepEqual(rpc('authenticated',uid(i),'select public.gry_haze_link_begin()'),challenge,'A retry within 30 s reuses the unused challenge');
       assert.equal(Date.parse(challenge.expiresAt)-Date.parse(challenge.issuedAt),300000);
       assert.deepEqual(rpc('service_role',null,`select public.haze_link_context(${quote(uid(i))},${quote(challenge.nonce)})`),challenge);
       assert.throws(()=>as('service_role',null,`select public.haze_link_context(${quote(uid(i))},${quote(challenge.nonce)})`));
       assert.throws(()=>as('authenticated',uid(i),`select public.haze_link_finish(${quote(uid(i))},${quote(challenge.nonce)},${quote(destination)})`));
       rpc('service_role',null,`select public.haze_link_finish(${quote(uid(i))},${quote(challenge.nonce)},${quote(destination)})`);
+      assert.throws(()=>as('authenticated',uid(i),'select public.gry_haze_link_begin()'),/Wait 30 seconds/,'A used challenge is never handed out again');
       assert.throws(()=>as('service_role',null,`select public.haze_link_finish(${quote(uid(i))},${quote(challenge.nonce)},${quote(destination)})`));
     }
     assert.throws(()=>as('authenticated',uid(1),'select address from games.haze_links'));
