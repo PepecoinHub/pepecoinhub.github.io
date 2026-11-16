@@ -31,7 +31,7 @@ test('eggs and young frogs never use adult poses', () => {
 });
 
 // Small DOM harness: exercises the controller without a browser dependency.
-function harness(initial = adult) {
+function harness(initial = adult, options = {}) {
   let time = 0, timerId = 0, pending = new Map(), opened = 0, quiz = 0, quizClosed = 0, view = initial;
   const poses = [];
   function tick(ms = 300) {
@@ -62,7 +62,7 @@ function harness(initial = adult) {
   slot.append(button); button.append(img);
   const controller = mountFrogInteractions({ button, img, slot, getView: () => view, setPose: p => poses.push(p),
     openRoom: () => { opened++; }, closeQuiz: () => { quizClosed++; }, quizAvailable: () => true,
-    openQuiz: () => { quiz++; }, now: () => time });
+    openQuiz: () => { quiz++; }, now: () => time, ...options });
   return { doc, button, img, controller, tick, poses, get opened() { return opened; }, get quiz() { return quiz; },
     get quizClosed() { return quizClosed; }, setView(v) { view = v; } };
 }
@@ -97,4 +97,19 @@ test('keyboard, outside click, right click, quiz and account reset', () => {
   h.button.emit('click', { detail: 0 }); h.controller.close({ reset: true }); assert.equal(h.doc.body.children.length, 0);
   h.setView({ hasPet: false }); h.button.emit('click', { detail: 1 }); assert.equal(h.opened, 1);
   h.controller.dispose(); assert.equal(h.button.events.get('click').size, 0);
+});
+
+test('initiated contact is sparse, muted/blocked/young-safe, and never opens a dialog', () => {
+  let invitations = 0, muted = false, allowed = true;
+  const bond = { get muted() { return muted; }, invite: () => ++invitations === 1, remember() {}, favourite: 'ball' };
+  const h = harness(adult, { bond, canReact: () => allowed });
+  assert.equal(h.controller.invite(), false);
+  h.tick(90001); allowed = false; assert.equal(h.controller.invite(), false);
+  allowed = true; muted = true; assert.equal(h.controller.invite(), false);
+  muted = false; assert.equal(h.controller.invite(), true);
+  assert.equal(h.doc.body.children[0].attrs.get('role'), 'status');
+  assert.equal(h.button.attrs.get('aria-expanded'), 'false');
+  h.tick(46000); assert.equal(h.controller.invite(), false);
+  h.setView({ ...adult, adult: false });h.tick(90000);assert.equal(h.controller.invite(), false);
+  h.controller.dispose();assert.equal(h.doc.body.children.length, 0);
 });

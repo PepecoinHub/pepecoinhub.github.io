@@ -16,7 +16,7 @@ const server = http.createServer((req, res) => {
  if(u.pathname==='/') {res.setHeader('Content-Type','text/html');res.end(html);return;}
  const file = path.resolve(root, '.'+u.pathname);
  if(!file.startsWith(root+path.sep) || !fs.existsSync(file)) {res.writeHead(404);res.end();return;}
- res.setHeader('Content-Type',file.endsWith('.mjs')?'text/javascript':file.endsWith('.css')?'text/css':'image/png');res.end(fs.readFileSync(file));
+ res.setHeader('Content-Type',file.endsWith('.mjs')||file.endsWith('.js')?'text/javascript':file.endsWith('.html')?'text/html':file.endsWith('.css')?'text/css':'image/png');res.end(fs.readFileSync(file));
 });
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
@@ -99,5 +99,29 @@ const server = http.createServer((req, res) => {
  await touch.getByRole('button',{name:'Pet me',exact:true}).tap();
  assert.match(await touch.locator('.pg-conversation .pg-fact-q').textContent(),/Hehe|acceptable|useful mouse/);
  await touch.close();
- assert.deepEqual(errors,[]);console.log('PASS: five expression sequences, state restoration, interruption, reduced motion, keyboard, memories, familiar pats, care, focus, throttle, mute/reload, account isolation, double-click, 320/390/1440px, reduced motion and disposal');
+ // Toy interaction and actual Sweeper loss feed the real parent controller.
+ const personality=await browser.newPage();personality.on('pageerror',e=>errors.push(e.message));
+ await personality.route('**/*',r=>new URL(r.request().url()).origin===base?r.continue():r.abort());
+ await personality.goto(base);await personality.waitForFunction(()=>document.querySelector('.pg-companion-button')?.title.startsWith('Pickle'));
+ const buddy=personality.locator('.pg-companion-button');await buddy.focus();await personality.keyboard.press('Enter');
+ for(const label of ['Roll the ball','Squeak the duck','Toss the bottle cap']) {
+  await personality.getByRole('button',{name:label,exact:true}).click();
+  assert.equal(await personality.locator('.pg-companion-toy').isVisible(),true);
+  await personality.evaluate(()=>t.time+=31000);
+ }
+ await personality.getByRole('button',{name:'Your favourite toy?',exact:true}).click();
+ assert.match(await personality.locator('.pg-conversation .pg-fact-q').textContent(),/unpaid throwing assistant/);
+ await personality.keyboard.press('Escape');
+ await personality.evaluate(()=>{const f=document.createElement('iframe');f.src='/games/pepe-sweeper.html?embed=1';f.id='arcade';document.body.append(f);});
+ const sweeper=personality.frameLocator('#arcade');await sweeper.locator('.tile').first().waitFor();
+ let lost=false;
+ for(let i=0;i<81;i++){
+  await sweeper.locator('.tile').nth(i).click();
+  if((await sweeper.locator('#result-title').textContent())==='WRONG PEPE!'){lost=true;break;}
+ }
+ assert.ok(lost,'real Sweeper reaches its loss handler');
+ await buddy.focus();await personality.keyboard.press('Enter');
+ assert.match(await personality.locator('.pg-conversation .pg-fact-q').textContent(),/losing part|pond saw nothing/);
+ await personality.close();
+ assert.deepEqual(errors,[]);console.log('PASS: toys, favourite discovery, real Sweeper result, five expression sequences, state restoration, interruption, reduced motion, keyboard, memories, familiar pats, care, focus, throttle, mute/reload, account isolation, double-click, 320/390/1440px, reduced motion and disposal');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server.close();});

@@ -1,8 +1,18 @@
+import { TOYS, healthyCompanion } from './pepegochi-personality.mjs?v=20261116sass1';
 // Cosmetic conversations; actual needs and care history come from the server view.
 const lines = {
+  invite: ["I brought a toy. This meeting could have been a nap, but here we are.", "Human. Recreation department needs you. Bring your one functional mouse."],
+  toyFavourite: ["This one stays. Touch my snacks if you must. Not my toy.", "Excellent choice. Obviously I trained you well."],
+  toyOkay: ["Decent throw. For a creature with thumbs.", "I meant to miss that. Advanced frog technique."],
+  toyAgain: ["Fren. Let the toy land first. This isn't a benchmark.", "One frog. Two hands. Zero overtime."],
+  gameWin: ["We won. I provided moral superiority.", "Clean win. I'll allow a tiny victory dance."],
+  gameLoss: ["Bold strategy. The losing part needs work. Rematch?", "We saw nothing. The pond saw nothing. Queue another one."],
+  gameRecord: ["New personal best. Fine, that was actually sick.", "New record. My coaching is clearly working. Invoice pending."],
+  gameMoon: ["TO THE MOON. And you brought back a rock. Peak human behaviour."],
+  gameDone: ["Solid landing. By which I mean the ground remains undefeated.", "Flight complete. Dignity still in transit."],
   hello: ["I'm supervising the pond. Very important frog business.", "Oh hey, fren. I was just thinking about flies.", "PondOS looks better with me on the taskbar."],
   joke: ["Why did the frog cross the road? The pond was on the other side. I never said it was a good joke.", "I tried to mine PEP with a potato. It was a chip.", "I have a great joke about flies. It went over my head."],
-  pet: ["Hehe. More of that, fren.", "This is acceptable human behaviour.", "Finally, a useful mouse."],
+  pet: ["Hehe. More of that, fren. Tell nobody.", "This is acceptable human behaviour. Rare, but acceptable.", "Finally, a useful mouse."],
   annoyed: ["Fren. That's my face.", "I am not a touchscreen.", "The frog requests a little personal space."],
   play: ["Fancy a game? I believe in you. Mostly.", "Let's visit the pond arcade. Do not blame me if you lose."],
   return: ["You're back! I saved your spot beside me.", "There you are, fren. The taskbar is better with you here."],
@@ -15,7 +25,7 @@ const lines = {
   quizMiss: ["We learned something together. That's still a good day."],
   offline: ["The pond went quiet. I'll keep you company while the connection is away."],
   online: ["The pond is back! I kept your seat warm."],
-  familiar: ["I know that gentle pat. That's my human.", "Right behind the eyes. You know me well, fren."],
+  familiar: ["I know that gentle pat. That's my human. Unfortunately for you, I am keeping you.", "Right behind the eyes. You know me well, fren. Do not get smug."],
   space: ["Tiny frog break. Let's just sit together for a moment."],
   news: ["PondOS has games, stamps and a whole pond of frens. Go explore!", "Check the Pond Quiz, your Fren Passport or the arcade."],
 };
@@ -29,7 +39,7 @@ const moods = {
   'tb_adult_recovering': "I'm getting better. Thank you for looking after me.",
 };
 function pick(a, n) { return a[Math.abs(Math.trunc(n || 0)) % a.length]; }
-export function companionReply(view, action = 'hello', n = 0) {
+export function companionReply(view, action = 'hello', n = 0, context = {}) {
   if (!view?.hasPet) return { text: '', pose: null, openRoom: true };
   const sprite = String(view.sprite || '').split('/').pop().replace('.png', '');
   const important = moods[sprite];
@@ -43,6 +53,10 @@ export function companionReply(view, action = 'hello', n = 0) {
     return { text: message, pose: null, openRoom: false };
   }
   if (action === 'how') return { text: "Feeling pretty good, fren. Thanks for asking.", pose: 'tb_adult_talk', openRoom: false };
+  if (action === 'memories' && context.journal?.length) return { text: context.journal.join('\n\n'), pose: 'tb_adult_think', openRoom: false };
+  if (action === 'favourite') return { text: context.discovered && TOYS[context.favourite]
+    ? `The ${TOYS[context.favourite].name}. Mine. You may be its unpaid throwing assistant.`
+    : "Offer me a few toys. I'll judge your taste. Silently. Mostly.", pose: 'tb_adult_think', openRoom: false };
   if (action === 'memories') return { text: view.careDays > 0
     ? `You have looked after me on ${view.careDays} care days. Those little visits mean a lot, fren.`
     : "Our story is just starting. A little food, a little play, a little time together.", pose: 'tb_adult_think', openRoom: false };
@@ -52,9 +66,10 @@ export function companionReply(view, action = 'hello', n = 0) {
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
 // No polling or network calls. Optional bond stores cosmetic memories only.
-export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, now = () => Date.now() }) {
+export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, now = () => Date.now() }) {
   let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
   let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
+  let lastActivity = now(), bornAt = now();
   const doc = button.ownerDocument;
   const win = doc.defaultView;
   const el = (tag, cls, text) => {
@@ -79,7 +94,17 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     doc.body.append(notice);
     noticeTimer = win.setTimeout(clearNotice, 6000);
     animate(action);
+    return true;
   }
+  function invite() {
+    if (panel || bond?.muted || !canReact() || doc.visibilityState === 'hidden' ||
+        !healthyCompanion(getView()) || now() - bornAt < 90000 || now() - lastActivity < 45000 || now() - lastReaction < 45000) return false;
+    if (!bond?.invite()) return false;
+    const shown = react('invite');
+    if (shown) showToy(bond.favourite);
+    return !!shown;
+  }
+  function activity() { lastActivity = now(); }
   function cancelClick() { if (clickTimer !== null) { win.clearTimeout(clickTimer); clickTimer = null; } }
   function reposition() {
     if (!panel) return;
@@ -91,7 +116,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
   }
   function close({ focus = false, reset = false } = {}) {
     cancelClick(); clearNotice();
-    if (reset) { lastReaction = lastPet = -Infinity; pats = []; }
+    if (reset) { lastReaction = lastPet = -Infinity; pats = []; bornAt = now(); }
     if (reset) { recent = []; sequence = 0; gesture = null; suppressClick = false; }
     if (!panel) { setPose(null); return; }
     panel.remove(); panel = null; reply = null;
@@ -119,7 +144,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
         if (now() - lastPet > 30000) { bond?.pet(); lastPet = now(); }
       }
     }
-    const r = companionReply(getView(), action, sequence++);
+    const r = companionReply(getView(), action, sequence++, bond || {});
     if (r.openRoom) { visit(); return; }
     closeQuiz();
     const fresh = !panel;
@@ -136,6 +161,15 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
       const actions = el('div', 'pg-fact-answers');
       function add(label, fn) { const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', fn); actions.append(b); }
       add('Our memories', () => say('memories'));
+      if (bond) {
+        add('Your favourite toy?', () => say('favourite'));
+        for (const [id, toy] of Object.entries(TOYS)) add(toy.label, () => {
+          if (!healthyCompanion(getView())) { say('how'); return; }
+          const reaction = bond.play(id);
+          if (!reaction) return;
+          say(reaction); if (reaction !== 'toyAgain') showToy(id);
+        });
+      }
       if (bond) {
         const mute = el('button', 'pg-fact-a'); mute.type = 'button';
         const label = () => { mute.textContent = bond.muted ? 'Reactions: quiet' : 'Reactions: on'; mute.setAttribute('aria-pressed', String(bond.muted)); };
@@ -188,6 +222,8 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     }
   }
   function end() { gesture = null; }
+  doc.addEventListener('pointerdown', activity, true);
+  doc.addEventListener('keydown', activity, true);
   doc.addEventListener('pointerdown', outside, true);
   button.setAttribute('aria-haspopup', 'dialog');
   button.setAttribute('aria-expanded', 'false');
@@ -198,8 +234,10 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
   button.addEventListener('pointerup', end);
   button.addEventListener('pointercancel', end);
   button.addEventListener('pointerleave', end);
-  return { close, react, dispose() {
+  return { close, react, invite, dispose() {
     close({ reset: true });
+    doc.removeEventListener('pointerdown', activity, true);
+    doc.removeEventListener('keydown', activity, true);
     doc.removeEventListener('pointerdown', outside, true);
     button.removeEventListener('click', click);
     button.removeEventListener('contextmenu', right);

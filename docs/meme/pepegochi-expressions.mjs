@@ -13,9 +13,9 @@ export function expressionFor(view, action) {
   const sprite = String(view.sprite || '').split('/').pop();
   if (sprite === 'tb_adult_sleepy.png') return action === 'hello' || action === 'how' ? 'yawn' : null;
   if (sprite !== 'tb_adult_sit.png') return null;
-  if (['pet', 'familiar', 'fed', 'clean', 'rested'].includes(action)) return 'nuzzle';
-  if (['return', 'grown', 'quizWin', 'played', 'play'].includes(action)) return 'welcome';
-  if (['annoyed', 'space'].includes(action)) return 'sulk';
-  if (['hello', 'how', 'news', 'memories', 'hover'].includes(action)) return 'curious';
+  if (['pet', 'familiar', 'fed', 'clean', 'rested', 'toyFavourite'].includes(action)) return 'nuzzle';
+  if (['return', 'grown', 'quizWin', 'played', 'play', 'gameWin', 'gameRecord', 'gameMoon', 'toyOkay'].includes(action)) return 'welcome';
+  if (['annoyed', 'space', 'toyAgain', 'gameLoss'].includes(action)) return 'sulk';
+  if (['hello', 'how', 'news', 'memories', 'hover', 'invite', 'favourite', 'gameDone'].includes(action)) return 'curious';
   return null;
 }
