@@ -2054,7 +2054,7 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261111launch';
+  var PP_CATALOG = 'passport-catalog.json?v=20261116bughunter';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
       document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261115king'}));
