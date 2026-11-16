@@ -8,13 +8,13 @@ const root=path.join(__dirname,'..');let server,browser;
   const html=`<!doctype html><meta charset="utf-8"><body><div id="wallet"></div><div id="log"></div><input id="chatin"><script type="module">
   import {createHazeTips} from '/games/js/haze-tips.mjs';
   const me='00000000-0000-4000-8000-000000000001',jules='00000000-0000-4000-8000-000000000002',twin='00000000-0000-4000-8000-000000000003';
-  const notes=[];
+  const notes=[],calls=[];
   const rpc=async name=>{if(name==='gry_haze_status')return {enabled:true,address:'PAvt4R4pWiqwStNNSb4ZjUQXJN3mZCLqtX',pending:[]};if(name==='gry_haze_chat')return {linked_users:[],receipts:[]};return {};};
-  const api=createHazeTips({rpc,invoke:async b=>b.action==='preflight'?{genesis_ok:true,txid:'ab'.repeat(32),outputs:2,confirmations:3,block_ok:true,prevout:{value:'200000000'}}:{},session:()=>({user:{id:me,is_anonymous:false}}),login:()=>{},notify:t=>notes.push(t),chatLog:document.getElementById('log'),chatInput:document.getElementById('chatin'),enabled:true});
+  const api=createHazeTips({rpc,invoke:async b=>{calls.push(b);return b.action==='preflight'?{genesis_ok:true,txid:'ab'.repeat(32),outputs:2,confirmations:3,block_ok:true,prevout:{value:'200000000'}}:{};},session:()=>({user:{id:me,is_anonymous:false}}),login:()=>{},notify:t=>notes.push(t),chatLog:document.getElementById('log'),chatInput:document.getElementById('chatin'),enabled:true});
   api.mount(document.getElementById('wallet'));
   const add=(id,user_id,nick)=>{const row=document.createElement('p');row.textContent=nick+': gm';document.getElementById('log').append(row);api.bindMessage(row,{id,user_id,nick,verified:true});};
   add(1,jules,'Jules');add(2,me,'Byl');add(3,jules,'Jules');add(4,twin,'Mika');add(5,'00000000-0000-4000-8000-000000000004','mika');
-  window.t={api,notes};
+  window.t={api,notes,calls};
   </script>`;
   server=http.createServer((req,res)=>{
     const url=new URL(req.url,'http://localhost');
@@ -39,7 +39,12 @@ const root=path.join(__dirname,'..');let server,browser;
   await page.getByRole('heading',{name:/Jules/}).waitFor();
   await page.getByRole('button',{name:'Close Haze dialog'}).click().catch(()=>{});
   // ?beta=haze adds the phone-friendly server check (visibility only; the server decides access)
-  await page.getByRole('button',{name:'◇ Beta check'}).click();await page.getByText(/Indexer OK/).waitFor();
+  await page.getByRole('button',{name:'◇ Beta check'}).click();
+  await page.getByLabel('Transaction ID for the beta check').fill('xyz');await page.getByRole('button',{name:'Run check'}).click();
+  await page.getByText(/exactly 64 characters/).waitFor();
+  await page.getByLabel('Transaction ID for the beta check').fill('AB'.repeat(32));await page.getByRole('button',{name:'Run check'}).click();
+  await page.getByText(/Indexer OK/).waitFor();
+  assert.deepEqual(await page.evaluate(()=>window.t.calls.at(-1)),{action:'preflight',txid:'ab'.repeat(32)});
   assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
   console.log('PASS: /tip opens the prefilled tip dialog for the newest message by that nick; /answer, unknown, own and shared nicks are not tipped. With ?beta=haze the Beta check reports the indexer. Simulated services only.');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server?.close();});
