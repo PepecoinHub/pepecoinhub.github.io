@@ -3115,6 +3115,36 @@
     },function(){ /* Migration may not be installed yet; retry on next discovery. */ });
   }
 
+  // Chat secrets (Happy Fren for a smiley, Born to Fren for the word "fren") are given by the server's chat trigger,
+  // so nothing on the page knew about them. After a message that could earn one, ask the server once and show the
+  // same Windows 98 notice as every other secret. Only for a find made just now: an old one stays quiet.
+  function chatSecretCheck(text) {
+    if (!FREN || FREN_TEST) return;
+    var s = sbSession(); if (!s || !s.discord || !s.userId) return;
+    var want = [];
+    if (/(:-?\)|\(:)/.test(text)) want.push('happy_fren');
+    if (/(^|[^a-z])frens?([^a-z]|$)/i.test(String(text).replace(/@\S+/g, ''))) want.push('born_to_fren');
+    want = want.filter(function (id) { try { return localStorage.getItem('pondos-passport-secret-v1:' + s.userId + ':' + id) !== '1'; } catch (e) { return true; } });
+    if (!want.length) return;
+    var sent = Date.now();
+    setTimeout(function () {
+      rpc('gry_passport_state', {}).then(function (st) {
+        var got = (st && Array.isArray(st.secrets)) ? st.secrets : [];
+        var info = { happy_fren: 'Happy Fren', born_to_fren: 'Born to Fren' };
+        var fresh = false;
+        want.forEach(function (id) {
+          var x = got.find(function (g) { return g.id === id; }); if (!x) return;
+          try { localStorage.setItem('pondos-passport-secret-v1:' + s.userId + ':' + id, '1'); } catch (e) {}
+          if (sent - Date.parse(x.discovered_at) > 5 * 60000) return;   // found long ago: no notice now
+          fresh = true;
+          rewardNotice({ bar: 'Fren Passport - Secret Found', title: 'Secret discovered: ' + info[id],
+            text: 'It is in your Fren Passport now. A special avatar is waiting for you in Create Your Fren.',
+            img: ico('gif-045-still'), go: 'Open Create Your Fren', open: avatarMaker });
+        });
+        if (fresh) passportLoad(sbSession()).then(function () { if (apps.passport && apps.passport.render) apps.passport.render(); }).catch(function () {});
+      }, function () {});
+    }, 1200);
+  }
   // Share Fren is a small secret, not a stamp or proof of posting on X.
   // The server checks the player's own finished Pepe Guesser round.
   function passportShare() {
@@ -5252,7 +5282,7 @@
         }
         var b = form.querySelector('[type=submit]'); b.disabled = true;
         chatRpc('gry_lobby_say', { p_text: t, p_nick: nick }).then(function (r) {
-          if (r && r.error) note.textContent = r.error; else { inp.value = ''; paintNote(); }
+          if (r && r.error) note.textContent = r.error; else { inp.value = ''; paintNote(); chatSecretCheck(t); }
           if (r && r.error && /nickname/i.test(r.error)) { nickIn.hidden = false; nickIn.focus(); }
           poll();
         }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
