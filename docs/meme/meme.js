@@ -3962,7 +3962,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 9, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 10, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -3986,6 +3986,38 @@
     return rpc('gry_letters', { p_limit: 200 }).then(function (j) { letterBox = j && j.letters ? j : null; paintMail(); return letterBox; }, function () { return null; });
   }
   if (mainEl) setTimeout(checkLetters, 1500);
+  // Issue #10 (Tuesday 17 Nov 2026): the official start, 10 secrets already found, a hooked reader with QR cards,
+  // Pond Dominator gone for week 1 on day 2, and the new duels (Pond King loved, Three Lilies underrated)
+  function gazette10() {
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #10</span><span>Price: 0 PEP</span><span>Day 2 edition</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking"><p class="gz-flash">It\'s official</p><h4>🐸 We are LIVE!</h4>' +
+      '<div class="gz-wpbox"><img src="img/happy.webp" alt="A happy Pepe" width="110" height="110"><div>' +
+      '<p>The beta is over. Stamps count, the Pepe Guesser season is running and the Hall of Fame has opened its books. From now on, everything you do in the pond goes on the record.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-pass">Open your Fren Passport →</button><button type="button" class="app-btn gz-wpgo">Play today\'s Pepe Guesser</button></div></section>' +
+      '<section class="gz-wp"><p class="gz-kick">Rumour mill</p><h4>10 secrets found already?!</h4>' +
+      '<div class="gz-wpbox"><img src="img/pepe-search.webp" alt="Pepe with a magnifying glass" width="110" height="96"><div>' +
+      '<p>Word in the pond is that some lunatics have already dug up <b>10 of the secrets</b> hidden in PondOS. On day two.</p>' +
+      '<p>The editorial office is in despair: at this pace we will have to invent more of them. More secrets, that is. We have enough lunatics.</p></div></div>' +
+      '<p class="gz-fine">Still no list, still no hints. Poke at things. Read the fine print. Stay up late.</p></section>' +
+      '<section class="gz-letters"><p class="gz-kick">Heard in LAN Party</p><h4>“I\'m hooked on one of your games”</h4>' +
+      '<figure class="gz-reddit gz-discord"><p class="gz-rd-top"><b>LAN Party</b> · #pond</p>' +
+      '<p class="gz-rd-title"><b>Slightly Stoopid</b> ✓: @Byl I\'m hooked on one of your games</p>' +
+      '<p class="gz-rd-title"><b>Slightly Stoopid</b> ✓: I want to make a few cards that say something like are you bored and need some time to fly by? And add a QR code to the game channel. I could leave them in the waiting rooms where I work</p>' +
+      '<figcaption>16 November, 20:16</figcaption></figure>' +
+      '<p>We are glad to have real game addicts among us. And let\'s be clear: there is nothing wrong with it, <b>as long as the games come from PepecoinHub.</b></p>' +
+      '<p>QR cards in waiting rooms? That is the most frog thing we have heard all week. Bored patients of the world, welcome to the pond.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-lan">Join LAN Party →</button><button type="button" class="app-btn gz-write">✏️ Confess to the Editor</button></div></section>' +
+      '<section class="gz-market"><p class="gz-kick">Pepe Guesser, week 1</p><h4>Pond Dominator: over before it began</h4>' +
+      '<div class="gz-wpbox"><img src="img/tired.webp" alt="A tired Pepe" width="110" height="94"><div>' +
+      '<p>Pond Dominator goes to whoever leads the week alone on all 7 days. It is only day 2, and already <b>nobody can win it this week.</b> The pond is simply too crowded at the top.</p>' +
+      '<p>Next week, maybe? Weekly Champion, Days at #1 and the double prize are still very much up for grabs.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-wpgo2">Play today\'s photo →</button><button type="button" class="app-btn gz-hof">Hall of Fame</button></div></section>' +
+      '<section class="gz-cover"><p class="gz-kick">Games desk</p><h4>The new duels: one king, three lilies</h4>' +
+      '<p>We are happy to see you like the new games. <b>Pond King</b> caught on better than anyone expected: the throne barely stays warm.</p>' +
+      '<p><b>Battle of Three Lilies</b>, on the other hand, seems underrated. Give it a fair go. Maybe you will get to know each other better.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-king">Challenge the Pond King →</button><button type="button" class="app-btn gz-lilies">Battle of Three Lilies →</button></div></section>' +
+      '<p class="gz-foot">See you in the pond. 🐸 The Editor</p></article>';
+  }
   // Issue #4 (5 Nov 2026): the third issue this week, hence "Almost weekly"
   function gazette4() {
     return '<article class="gazette"><header><p class="gz-top"><span>Issue #4</span><span>Price: 0 PEP</span><span>Almost weekly*</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
@@ -4196,7 +4228,8 @@
       A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
         // one compact row of tabs: the letter form, then the Gazette issues by number (newest first)
         '<li><button type="button" data-v="write" title="Ideas, bugs, wishes, notices">✏️ Letter to the Editor</button></li>' +
-        '<li><button type="button" data-v="gz" title="The Pond Gazette #9: week 1 pays double" aria-label="The Pond Gazette #9">📰 #9</button></li>' +
+        '<li><button type="button" data-v="gz" title="The Pond Gazette #10: we are live" aria-label="The Pond Gazette #10">📰 #10</button></li>' +
+        '<li><button type="button" data-v="gz9" title="The Pond Gazette #9 (archive): week 1 pays double" aria-label="The Pond Gazette #9">#9</button></li>' +
         '<li><button type="button" data-v="gz8" title="The Pond Gazette #8 (archive): the week 1 poll" aria-label="The Pond Gazette #8">#8</button></li>' +
         '<li><button type="button" data-v="gz7" title="The Pond Gazette #7 (archive): the Pond goes BETA" aria-label="The Pond Gazette #7">#7</button></li>' +
         '<li><button type="button" data-v="gz6" title="The Pond Gazette #6 (archive): X unblocked us, the first faucet payout, 1 km" aria-label="The Pond Gazette #6">#6</button></li>' +
@@ -4218,8 +4251,8 @@
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
         if (v === 'write') return writeLetter(pane);
         if (v === 'box') return letterInbox(pane, paintOwner);
-        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : v === 'gz6' ? 6 : v === 'gz7' ? 7 : v === 'gz8' ? 8 : 9;
-        pane.innerHTML = issue === 9 ? gazette9() : issue === 8 ? gazette8() : issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : v === 'gz6' ? 6 : v === 'gz7' ? 7 : v === 'gz8' ? 8 : v === 'gz9' ? 9 : 10;
+        pane.innerHTML = issue === 10 ? gazette10() : issue === 9 ? gazette9() : issue === 8 ? gazette8() : issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
@@ -4270,6 +4303,10 @@
         on('.gz-lan', function () { lanParty(); });
         on('.gz-paint', function () { drawGuess(); });
         on('.gz-wpgo', wheresPepe);
+        on('.gz-king', function () { pondKingApp(); });
+        on('.gz-lilies', function () { liliesApp(); });
+        on('.gz-wpgo2', wheresPepe);
+        on('.gz-hof', function () { wpHallOfFame(); });
         on('.gz-wpad', function () { adPlayer(Math.max(0, adByFile('pepe_guesser.mpg'))); });
         on('.gz-tv', function () { adPlayer(Math.max(0, adByFile('host_wanted.mpg'))); });
         var tvn = pane.querySelector('.gz-tvnote');
