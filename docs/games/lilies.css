@@ -124,6 +124,10 @@
 .king-face { flex: none; display: block; width: 64px; height: 64px; padding: 2px; background: var(--pane); box-shadow: var(--sunken); }
 .king-face img { width: 100%; height: 100%; background: none; box-shadow: none; padding: 0; }
 .king-face .fa-stack { height: 100%; }
+.king-face.has-pass { cursor: pointer; }
+.king-face.has-pass:hover { filter: brightness(1.08); }
+.king-face.has-pass:active { transform: translate(1px, 1px); }
+.king-face.has-pass:focus-visible { outline: 1px dotted #000; outline-offset: 2px; }
 
 /* ---------- the hero: a setup-wizard picture panel, like the POND KING throne ---------- */
 .ly-hero { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "pond text count" "pond go go"; gap: 6px 14px; align-items: center;

@@ -211,6 +211,10 @@ details.panel { padding-top: 12px; }
 .throne-face { width: 96px; height: 96px; padding: 4px; background: var(--chrome); box-shadow: var(--raised); }
 .throne-face .throne-frog { width: 100%; height: 100%; padding: 0; box-shadow: none; }
 .throne-face .fa-stack { height: 100%; }
+.throne-face.has-pass { cursor: pointer; }
+.throne-face.has-pass:hover { filter: brightness(1.08); }
+.throne-face.has-pass:active { transform: translate(1px, 1px); }
+.throne-face.has-pass:focus-visible { outline: 1px dotted #000; outline-offset: 2px; }
 .throne.changed .throne-face { animation: crown 700ms steps(4); }
 .king-progress { margin: 4px 0 8px; font-weight: 700; }
 .king-progress b { font: 400 20px/1 var(--f-px); color: var(--title); }

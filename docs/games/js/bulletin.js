@@ -22,6 +22,13 @@
       // the leader: their Fren avatar and name (Discord players with a saved avatar), otherwise the king frog
       var face = $('king-face');
       if (k.avatar) N.avatar(k.avatar, k.nick + '’s Fren avatar').then(function (av) { if (av) { face.textContent = ''; face.appendChild(av); } });
+      // the king's face opens their Passport (when they have one)
+      face.classList.toggle('has-pass', !!k.passport);
+      if (k.passport) {
+        face.setAttribute('role', 'button'); face.tabIndex = 0; face.title = 'Open ' + k.nick + '’s Passport';
+        face.onclick = function () { N.open('passport', k.passport); };
+        face.onkeydown = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); N.open('passport', k.passport); } };
+      }
       kl.textContent = '';
       kl.appendChild(mk('b', null, k.nick));
       kl.appendChild(document.createTextNode(k.house ? ' keeps the throne warm. Somebody take it.' : ' rules the pond: ' + k.defenses + (k.defenses === 1 ? ' defence' : ' defences') + ' so far.'));

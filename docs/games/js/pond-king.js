@@ -138,6 +138,17 @@
     if (!prog.hidden) { prog.textContent = ''; prog.appendChild(document.createTextNode('Long Live the King stamp: ')); prog.appendChild(mk('b', null, k.defenses + '/10')); prog.appendChild(document.createTextNode(' duels won in a row' + (me && me.discord ? '.' : ' (log on with Discord to get the stamp).'))); }
     $('king-pass').hidden = !k.passport;
     $('king-pass').onclick = function () { N.open('passport', k.passport); };
+    // the king's face opens the King's Passport too (only when the king has one)
+    var face = $('king-face');
+    face.classList.toggle('has-pass', !!k.passport);
+    if (k.passport) {
+      face.setAttribute('role', 'button'); face.tabIndex = 0; face.title = 'Open ' + k.nick + '’s Passport';
+      face.onclick = function () { N.open('passport', k.passport); };
+      face.onkeydown = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); N.open('passport', k.passport); } };
+    } else {
+      face.removeAttribute('role'); face.removeAttribute('tabindex'); face.removeAttribute('title');
+      face.onclick = null; face.onkeydown = null;
+    }
 
     // which panel: king, challenge, or wait for a new king
     var showResult = !!opts.keepResult;
