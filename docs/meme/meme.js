@@ -2067,7 +2067,7 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261116x7';
+  var PP_CATALOG = 'passport-catalog.json?v=20261117lilies';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
       document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261115x7'}));
@@ -4898,7 +4898,7 @@
       var canMod = false, who = null, whoT = 0;
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
       var hazeTips = null;
-      import(BASE + 'games/js/haze-tips.mjs?v=20261116check').then(function (m) {
+      import(BASE + 'games/js/haze-tips.mjs?v=20261116unlock').then(function (m) {
         if (!alive) return;
         hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp,
           invoke: function (body) {
@@ -5050,7 +5050,11 @@
 
       // ----- drag the bottom bar to make the chat taller or shorter (remembered in this browser)
       var grip = A.body.querySelector('.lan-grip'), stBar = A.body.querySelector('.lan-status');
-      var maxH = function () { return Math.max(180, window.innerHeight - log.getBoundingClientRect().top - (window.innerWidth <= 760 ? 210 : 150)); };
+      // --lan-h is the chat height setting; the log can be shorter than it (on a phone the open frens list takes
+      // 118px of it). Work on the setting, never on log.offsetHeight: saving the log height made every drag with the
+      // list open shrink the chat by 118px, so it "bounced back" (tester video, 2026-11-16).
+      var curH = function () { var v = parseFloat(A.body.style.getPropertyValue('--lan-h')); return v > 0 ? v : Math.min(window.innerHeight * 0.52, 420); };
+      var maxH = function () { return Math.max(180, window.innerHeight - log.getBoundingClientRect().top - (window.innerWidth <= 760 ? 210 : 150)) + Math.max(0, curH() - log.offsetHeight); };
       var setH = function (h, save) {
         h = Math.round(Math.min(Math.max(h, 140), maxH()));
         A.body.style.setProperty('--lan-h', h + 'px');
@@ -5061,15 +5065,15 @@
         if (e.button !== 0 || A.host.classList.contains('is-max')) return;
         e.preventDefault();
         A.host.style.height = '';   // a window sized from the corner goes back to following its content
-        var y0 = e.clientY, h0 = log.offsetHeight;
+        var y0 = e.clientY, h0 = curH();
         stBar.setPointerCapture(e.pointerId); stBar.classList.add('drag');
         var mv = function (ev) { setH(h0 + ev.clientY - y0); if (log.scrollHeight - log.scrollTop - log.clientHeight < 80) log.scrollTop = log.scrollHeight; };
-        var up = function () { stBar.classList.remove('drag'); setH(log.offsetHeight, true); stBar.removeEventListener('pointermove', mv); stBar.removeEventListener('pointerup', up); stBar.removeEventListener('pointercancel', up); };
+        var up = function () { stBar.classList.remove('drag'); setH(curH(), true); stBar.removeEventListener('pointermove', mv); stBar.removeEventListener('pointerup', up); stBar.removeEventListener('pointercancel', up); };
         stBar.addEventListener('pointermove', mv); stBar.addEventListener('pointerup', up); stBar.addEventListener('pointercancel', up);
       });
       grip.addEventListener('keydown', function (e) {
         var d = e.key === 'ArrowDown' ? 40 : e.key === 'ArrowUp' ? -40 : 0; if (!d) return;
-        e.preventDefault(); setH(log.offsetHeight + d, true);
+        e.preventDefault(); setH(curH() + d, true);
       });
 
       var pop = A.body.querySelector('.emo-pop'), eb = A.body.querySelector('.emo-btn');

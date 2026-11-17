@@ -69,3 +69,5 @@ After the POND duels are live: paste `deploy/EXPANSION7.sql` (one transaction, b
 It records Three Lilies and Gold Hook progress for Lord of the Lilies, Master Tactician, Gold Digger and Gold Rush;
 nothing is awarded until those four go into the allowlist (see `games/fren-passport/STATUS.md`). If the Gold Hook
 campaign is live, paste `update_gold_hook_campaign.sql` again afterwards. Super Parent comes with the PepeGochi files.
+Then (owner, 2026-11-17) `deploy/EXPANSION7_LILIES_ON.sql`: Lord of the Lilies and Master Tactician on, delivered at once
+to everyone whose recorded progress already reached them. Gold Hook's two stamps wait for its launch.

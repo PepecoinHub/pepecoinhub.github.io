@@ -212,3 +212,7 @@ Activation of the four arcade stamps (owner, after the counters look right): add
 
 **2026-11-16:** the owner ran `deploy/EXPANSION7.sql` on production. The Three Lilies and Gold Hook counters run from
 then on; the four arcade stamps are still outside the allowlist (nothing awarded yet).
+
+**2026-11-17 (owner):** stamps for the games that already work. Lord of the Lilies and Master Tactician go **live**
+(allowlist + catalog; paste `deploy/EXPANSION7_LILIES_ON.sql`, which also gives them to anyone already past the
+threshold). Gold Digger and Gold Rush stay planned until Pepe Gold Hook leaves its beta (`?beta=goldhook`).

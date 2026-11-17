@@ -6,11 +6,17 @@ declare u uuid:=games.haze_require_user(); c games.haze_challenges; at timestamp
 begin
   -- Lock the user, including the first challenge, so parallel calls share the limit.
   perform 1 from auth.users where id=u for no key update;
-  if exists(select 1 from games.haze_challenges where user_id=u and issued_at>clock_timestamp()-interval '30 seconds') then raise exception 'Wait 30 seconds before linking again.'; end if;
+  -- A retry within 30 s (e.g. after creating or unlocking the wallet in the Haze window) reuses the still-unused
+  -- challenge instead of failing: no new row, same 5-minute expiry. Only a new challenge is rate-limited.
+  select * into c from games.haze_challenges where user_id=u and issued_at>clock_timestamp()-interval '30 seconds';
+  if found then
+    if c.used_at is not null or c.expires_at<=clock_timestamp() or c.checks>=5 then raise exception 'Wait 30 seconds before linking again.'; end if;
+  else
   insert into games.haze_challenges(user_id,nonce,issued_at,expires_at)
     values(u,replace(gen_random_uuid()::text,'-','')||replace(gen_random_uuid()::text,'-',''),at,at+interval '5 minutes')
     on conflict(user_id) do update set nonce=excluded.nonce,issued_at=excluded.issued_at,expires_at=excluded.expires_at,used_at=null,checks=0,last_checked_at=null
     returning * into c;
+  end if;
   return jsonb_build_object('version','haze-auth-v1','audience','https://pepecoinhub.com',
     'network','pepecoin-mainnet','purpose','Link Haze Wallet to PepecoinHub','nonce',c.nonce,
     'issuedAt',to_char(c.issued_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),

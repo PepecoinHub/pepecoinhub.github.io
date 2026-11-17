@@ -380,14 +380,14 @@
       "title": "Lord of the Lilies",
       "description": "Win ten completed Battle of Three Lilies duels against other frens signed in with Discord.",
       "category": "arcade",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "master_tactician",
       "title": "Master Tactician",
       "description": "Win five completed Battle of Three Lilies duels in a row against other frens signed in with Discord. A draw breaks the streak.",
       "category": "arcade",
-      "status": "planned"
+      "status": "live"
     },
     {
       "id": "gold_digger",

@@ -20,7 +20,8 @@ test('expansion 7: seven planned catalog entries, seven new atlas tiles at the e
   const ids = catalog.achievements.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length, 'distinct ids');
   assert.equal(ids.length, 66, '57 earlier + 7 new + the two Haze stamps');
-  for (const id of X7) assert.equal(catalog.achievements.find(x => x.id === id).status, 'planned', id + ' waits for activation');
+  // owner, 2026-11-17: the two Three Lilies stamps are live; the rest wait (Gold Hook is still in beta)
+  for (const id of X7) assert.equal(catalog.achievements.find(x => x.id === id).status, id === 'lord_of_the_lilies' || id === 'master_tactician' ? 'live' : 'planned', id);
   const v3 = file('docs/meme/meme.js').match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).map(s => s.slice(1, -1));
   assert.deepEqual(v3.slice(55), X7, 'appended after the 55 earlier tiles, which keep their places');
   assert.equal(v3.indexOf('share_fren'), 46, 'the unused Share Fren tile stays');
@@ -28,9 +29,10 @@ test('expansion 7: seven planned catalog entries, seven new atlas tiles at the e
   // Pepe Sweeper keeps its records in the browser and online FROGAGEDDON does not exist: nothing may award them
   const sql = file('games/supabase/update_passport_arcade_x7.sql') + file('games/supabase/update_passport_awards.sql');
   for (const id of ['pond_sweeper', 'general_fren']) assert.doesNotMatch(sql.replace(/^--.*$/gm, ''), new RegExp("'" + id + "'"), id);
-  // the arcade four stay out of the allowlist until the owner activates them
+  // Three Lilies is live (owner, 2026-11-17); Gold Hook's two stay out of the allowlist until its launch
   const allow = file('games/supabase/update_passport_awards.sql').match(/b not in \(([^)]*)\)/)[1];
-  for (const id of X7.slice(0, 4)) assert.doesNotMatch(allow, new RegExp("'" + id + "'"), id);
+  for (const id of X7.slice(0, 2)) assert.match(allow, new RegExp("'" + id + "'"), id);
+  for (const id of X7.slice(2, 4)) assert.doesNotMatch(allow, new RegExp("'" + id + "'"), id);
   assert.match(allow, /'super_parent'/);
 });
 
@@ -183,6 +185,18 @@ test('EXPANSION7.sql runs twice on a production-like database; Gold Hook pasted 
     await db.query(file('games/supabase/update_gold_hook_campaign.sql'));
     const check = sql.split('/* Check (optional, run on its own afterwards): every column should say true.\n')[1].split('*/')[0];
     assert.deepEqual(Object.values((await db.query(check)).rows[0]), [true, true, true, true]);
+    // the switch-on file, with the real passport_award: the season is open, A reached both thresholds, B did not
+    await db.query(`create table games.passport_badges (user_id uuid, badge_id text, earned_at timestamptz, primary key (user_id, badge_id));
+      create function games.passport_open() returns boolean language sql as $$ select true $$;
+      create function games.passport_start() returns timestamptz language sql as $$ select '2026-11-15 23:00+00'::timestamptz $$;`);
+    const A = await addUser(db, 1, 'LilyLord'), B = await addUser(db, 2, 'Sparring');
+    await db.query(`insert into games.passport_x7_progress (user_id, lily_wins, lily_best_streak, goldhook_completed)
+      values ($1, 10, 5, 20), ($2, 9, 4, 0)`, [A, B]);
+    const on = file('games/supabase/deploy/EXPANSION7_LILIES_ON.sql');
+    await db.query(on); await db.query(on);
+    const got = (await db.query('select user_id, badge_id from games.passport_badges order by badge_id')).rows;
+    assert.deepEqual(got, [{ user_id: A, badge_id: 'lord_of_the_lilies' }, { user_id: A, badge_id: 'master_tactician' }],
+      'only the two Lilies stamps, only for A, once; Gold Hook stays off');
   } finally {
     await drop();
   }

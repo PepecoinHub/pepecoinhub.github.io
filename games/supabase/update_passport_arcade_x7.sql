@@ -13,10 +13,10 @@
 -- Fren have NO award path: Pepe Sweeper keeps its records in the browser only, and online FROGAGEDDON does not
 -- exist yet. No award may depend on browser-editable saves or client-reported scores.
 --
--- Progress is recorded from the moment this file runs. The four stamps are still 'planned' in the catalog and
--- NOT in games.passport_award()'s allowlist, so passport_award() answers "Unknown passport stamp" and nothing is
--- given yet. Activation (owner, after checking the counters): add the four ids to the allowlist in
--- update_passport_awards.sql, set them 'live' in docs/meme/passport-catalog.json, run both, then
+-- Progress is recorded from the moment this file runs. A stamp that is not yet in games.passport_award()'s
+-- allowlist answers "Unknown passport stamp" and waits. Owner, 2026-11-17: Lord of the Lilies and Master Tactician
+-- are live (allowlist + catalog); Gold Digger and Gold Rush wait for the Gold Hook launch. To activate a stamp:
+-- add its id to the allowlist in update_passport_awards.sql, set it 'live' in docs/meme/passport-catalog.json, run
 --   select games.passport_x7_sync(user_id) from games.passport_x7_progress;
 -- which delivers every stamp the recorded progress already reached.
 --

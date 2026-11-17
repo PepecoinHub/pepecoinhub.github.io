@@ -35,7 +35,8 @@ test('every live stamp has a server award path, and only live stamps do', () => 
   // PepeGochi's four life-cycle stamps are awarded by its bridge (update_pepegochi_passport.sql)
   const rest = sql.replace(award, '') + file('games/supabase/update_pepegochi_passport.sql') + file('games/supabase/update_pepegochi_rewards.sql') +
     file('games/supabase/update_pond_king.sql') +   // Long Live the King: 10 duels won in a row as Pond King
-    file('games/supabase/update_pond_quiz.sql');    // the five Pond Quiz stamps
+    file('games/supabase/update_pond_quiz.sql') +   // the five Pond Quiz stamps
+    file('games/supabase/update_passport_arcade_x7.sql');   // Lord of the Lilies, Master Tactician (expansion 7)
   for (const id of allowed) assert.match(rest, new RegExp("'" + id + "'"), id + ' has no award');
   for (const gone of ['seven_day_fren', 'ten_day_fren', 'frog_detective'])
     assert.ok(!catalog.achievements.some(x => x.id === gone), gone + ' was removed');
