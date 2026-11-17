@@ -185,3 +185,34 @@ but are not "found": they do not count for Secret Starter or Treasure Hunter.
 - Owner-approved pixelated green-flag Pond Pioneer replaces the old Lily image. Full native-resolution PNG saved at `games/fren-passport/source/stamps-new/pond_pioneer.png` (1167 x 1347, transparent). Optimized displayed tile at `docs/meme/passport-assets/pond-pioneer-v3.webp` (138 x 150).
 - `ppStamp` loads the dedicated art for earned `pond_pioneer`; other stamps keep their v3 sprite. The historical Lily sprite is no longer referenced in PondOS JavaScript or Passport CSS, but is left in the repo as an archive.
 - This only changes appearance and tests. No Pioneer awards logic, SQL, production deployment, or live data changed.
+
+## 2026-11-15: Expansion 7 (seven new stamps, owner-approved art)
+
+Art: `source/stamps-new/<id>.png`, appended to the V3 atlas as tiles 55–61 (62 cells, `background-size: 6200%`).
+Every earlier tile keeps its index; the unused `share_fren` tile stays. Catalog: 64 achievements (66 with the two Haze stamps from main). All seven are
+**planned** (hidden in the album unless earned).
+
+| ID | Label | Rule | Server |
+|---|---|---|---|
+| `lord_of_the_lilies` | Lord of the Lilies | 10 Three Lilies wins vs a valid opponent | `update_passport_arcade_x7.sql` (counts; not in allowlist yet) |
+| `master_tactician` | Master Tactician | 5 such wins in a row; a loss or a draw breaks it | same |
+| `gold_digger` | Gold Digger | level 10 **completed** in a server-replayed Gold Hook run | same + hook in `update_gold_hook_campaign.sql` |
+| `gold_rush` | Gold Rush | all 20 levels completed in one run | same |
+| `super_parent` | Super Parent | 100 good care days for one frog (Good Parent's rule) | PepeGochi milestone → bridge; in allowlist like the other PepeGochi stamps |
+| `pond_sweeper` | Pond Sweeper | Pepe Sweeper at the highest difficulty | **none**: Sweeper keeps records only in the browser |
+| `general_fren` | General Fren | 10 online FROGAGEDDON wins vs humans | **none**: online FROGAGEDDON does not exist yet |
+
+Valid Three Lilies opponent: another account signed in with Discord, a different Discord id, and the accepting
+player not on the challenge author's network (IP hash). Wins against guests or from the same network neither count
+nor break a streak; cancelled and expired challenges never count; each (duel, player) is counted once.
+
+Activation of the four arcade stamps (owner, after the counters look right): add the ids to the allowlist in
+`update_passport_awards.sql`, set them `live` in the catalog, run both, then
+`select games.passport_x7_sync(user_id) from games.passport_x7_progress;`. Tests: `tests/passport-arcade-x7-sql.test.mjs`.
+
+**2026-11-16:** the owner ran `deploy/EXPANSION7.sql` on production. The Three Lilies and Gold Hook counters run from
+then on; the four arcade stamps are still outside the allowlist (nothing awarded yet).
+
+**2026-11-17 (owner):** stamps for the games that already work. Lord of the Lilies and Master Tactician go **live**
+(allowlist + catalog; paste `deploy/EXPANSION7_LILIES_ON.sql`, which also gives them to anyone already past the
+threshold). Gold Digger and Gold Rush stay planned until Pepe Gold Hook leaves its beta (`?beta=goldhook`).

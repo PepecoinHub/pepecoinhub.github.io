@@ -376,6 +376,55 @@
       "status": "planned"
     },
     {
+      "id": "lord_of_the_lilies",
+      "title": "Lord of the Lilies",
+      "description": "Win ten completed Battle of Three Lilies duels against other frens signed in with Discord.",
+      "category": "arcade",
+      "status": "live"
+    },
+    {
+      "id": "master_tactician",
+      "title": "Master Tactician",
+      "description": "Win five completed Battle of Three Lilies duels in a row against other frens signed in with Discord. A draw breaks the streak.",
+      "category": "arcade",
+      "status": "live"
+    },
+    {
+      "id": "gold_digger",
+      "title": "Gold Digger",
+      "description": "Complete level 10 in a verified Pepe Gold Hook run.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "gold_rush",
+      "title": "Gold Rush",
+      "description": "Complete all 20 levels in a verified Pepe Gold Hook run.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "pond_sweeper",
+      "title": "Pond Sweeper",
+      "description": "Win Pepe Sweeper at the highest difficulty in a verified game.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "general_fren",
+      "title": "General Fren",
+      "description": "Win ten completed online FROGAGEDDON matches against human opponents signed in with Discord.",
+      "category": "arcade",
+      "status": "planned"
+    },
+    {
+      "id": "super_parent",
+      "title": "Super Parent",
+      "description": "Give the same PepeGochi 100 good-care days.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
       "id": "secret_starter",
       "title": "Secret Starter",
       "description": "Find your first PondOS secret.",

@@ -10,6 +10,7 @@
 --       froglet        -> little_fren   "Little Fren"      (2nd care day)
 --       adult          -> grown_fren    "One Small Step"   (7th care day)
 --       good_parent    -> good_parent   "Good Parent"      (good care days in one life)
+--       super_parent   -> super_parent  "Super Parent"     (100 good care days for one frog; owner, 2026-11-15)
 --   * Every stamp goes through games.passport_award(): its allowlist, the Discord check and "once per account".
 --     The stamp's date is the moment of the milestone, also when it is delivered later.
 --   * Backfill: it delivers every milestone that is still pending when the file runs.
@@ -42,6 +43,7 @@ returns text language sql immutable set search_path = '' as $$
     when 'froglet' then 'little_fren'
     when 'adult' then 'grown_fren'
     when 'good_parent' then 'good_parent'
+    when 'super_parent' then 'super_parent'
   end
 $$;
 

@@ -187,6 +187,19 @@ test('PepeGochi v2 → Fren Passport bridge: life-cycle stamps through passport_
       } finally { await setRules(db, base); }
     });
 
+    await t.test('C8b Super Parent: the same good-day rule, super_parent_days for one frog (100 in the rules)', async () => {
+      assert.equal((await one("select (games.pepegochi_rules()->>'super_parent_days')::int n")).n, 100);
+      await setRules(db, base, { good_parent_days: 2, super_parent_days: 3 });
+      try {
+        const p = await player();
+        await grow(p, 2100, 2);
+        assert.deepEqual(await ids(p), ['first_hatch', 'good_parent', 'little_fren'], 'not yet at 2 good days');
+        for (const d of [2, 3]) await careAt(p, 2100 + 1 + d * 24);
+        assert.deepEqual(await pending(p), []);
+        assert.deepEqual(await ids(p), ['first_hatch', 'good_parent', 'little_fren', 'super_parent']);
+      } finally { await setRules(db, base); }
+    });
+
     await t.test('C9 running update_pepegochi_v2.sql or update_passport_awards.sql again loses nothing', async () => {
       await db.exec(await read('games/supabase/update_pepegochi_v2.sql'));
       await db.exec(VIRTUAL_CLOCK);

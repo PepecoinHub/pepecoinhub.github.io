@@ -165,6 +165,7 @@ returns jsonb language sql stable set search_path = '' as $$
     'good_day_min_need', 40,      -- owner, 2026-11-07: every need at least this after the action that completes the day
     'good_day_cared_counts', false, -- proposal, off: a need cared for that day counts as fine below min_need
     'good_parent_days', 30,       -- owner, working value: good days in one life, not necessarily in a row
+    'super_parent_days', 100,     -- owner, 2026-11-15: Super Parent, the same good-day rule, 100 days for one frog
     'history_limit', 10
   )
 $$;
@@ -428,11 +429,11 @@ begin
 end
 $$;
 
--- Records an account milestone once (first_adoption, hatched, froglet, adult, good_parent). Never a stamp by itself.
+-- Records an account milestone once (first_adoption, hatched, froglet, adult, good_parent, super_parent). Never a stamp by itself.
 create or replace function games.pepegochi_milestone(u uuid, m text, life uuid, p_at timestamptz)
 returns void language plpgsql volatile set search_path = '' as $$
 begin
-  if m not in ('first_adoption', 'hatched', 'froglet', 'adult', 'good_parent') then
+  if m not in ('first_adoption', 'hatched', 'froglet', 'adult', 'good_parent', 'super_parent') then
     raise exception 'Unknown PepeGochi milestone %', m;
   end if;
   insert into games.pepegochi_milestones (user_id, milestone, life_id, reached_at)
@@ -747,6 +748,10 @@ begin
   -- itself comes with the Passport bridge.
   if good_now and l.good_days >= (r->>'good_parent_days')::integer then
     perform games.pepegochi_milestone(u, 'good_parent', l.life_id, t);
+  end if;
+  -- Super Parent (owner, 2026-11-15): the same good-day rule, super_parent_days good days for this one frog
+  if good_now and l.good_days >= coalesce((r->>'super_parent_days')::integer, 100) then
+    perform games.pepegochi_milestone(u, 'super_parent', l.life_id, t);
   end if;
   perform games.pepegochi_sync(u);
   return games.pepegochi_view(u, t) || jsonb_build_object('action_result', 'accepted');

@@ -34,6 +34,7 @@ export const DEFAULT_RULES = Object.freeze({
   good_day_min_need: 40,
   good_day_cared_counts: false,
   good_parent_days: 30,
+  super_parent_days: 100,
 });
 
 export const KINDS = ['feed', 'clean', 'play', 'rest'];
@@ -390,6 +391,7 @@ export function action(w, kind, t, r) {
     if (l.care_days >= r.adult_care_days) milestone(w, 'adult', l, t);
   }
   if (goodNow && l.good_days >= r.good_parent_days) milestone(w, 'good_parent', l, t);
+  if (goodNow && l.good_days >= (r.super_parent_days ?? 100)) milestone(w, 'super_parent', l, t);
   return { ...view(w, t, r), action_result: 'accepted' };
 }
 

@@ -63,3 +63,11 @@ Without these files the taskbar frog shows no quiz. Until then its API does not 
 ## Included decisions
 - #253 (Pond Pioneer V3, Share Fren as a secret) is merged into the launch branch: step 11 is that file.
 - #251, #246 and #258 ship with the launch; their PondOS code comes with the release merge.
+
+## Fren Passport expansion 7 (owner, 2026-11-15; draft PR #349)
+After the POND duels are live: paste `deploy/EXPANSION7.sql` (one transaction, built by `scripts/build_expansion7_sql.py`).
+It records Three Lilies and Gold Hook progress for Lord of the Lilies, Master Tactician, Gold Digger and Gold Rush;
+nothing is awarded until those four go into the allowlist (see `games/fren-passport/STATUS.md`). If the Gold Hook
+campaign is live, paste `update_gold_hook_campaign.sql` again afterwards. Super Parent comes with the PepeGochi files.
+Then (owner, 2026-11-17) `deploy/EXPANSION7_LILIES_ON.sql`: Lord of the Lilies and Master Tactician on, delivered at once
+to everyone whose recorded progress already reached them. Gold Hook's two stamps wait for its launch.

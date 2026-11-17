@@ -13,7 +13,9 @@
 -- PondOS LEADERS and public.gry_arcade_top('goldhook') keep working. Nickname, Discord, rate limits
 -- and the best-300 trim are copied 1:1 from public.gry_arcade_submit, which stays unchanged.
 -- Discord players also get their stats kept in games.goldhook_players (best score, best level, runs,
--- all-time PEP); public.gry_goldhook_me() reads them. No Passport stamps.
+-- all-time PEP); public.gry_goldhook_me() reads them. Passport: every validated run of a Discord player hands
+-- the number of levels it really COMPLETED (a lost level does not count) to games.passport_goldhook_run(),
+-- a no-op here; update_passport_arcade_x7.sql replaces it (Gold Digger, Gold Rush).
 --
 -- The level tables below are generated from the game code by scripts/build_gold_hook_sql.mjs;
 -- tests/gold-hook.test.mjs fails if they drift.
@@ -22,6 +24,21 @@ begin;
 
 -- the single-round function of the first version is replaced by the run function
 drop function if exists public.gry_goldhook_submit(text, jsonb, integer);
+
+-- The Passport hook (u, levels completed in one validated run). Created here only when it does not exist yet,
+-- so re-running this file never switches off the real one from update_passport_arcade_x7.sql.
+do $$
+begin
+  if to_regprocedure('games.passport_goldhook_run(uuid, integer)') is null then
+    create function games.passport_goldhook_run(u uuid, p_completed integer)
+    returns void language plpgsql volatile set search_path = '' as $f$
+    begin
+      return;   -- no-op until update_passport_arcade_x7.sql
+    end
+    $f$;
+  end if;
+end $$;
+revoke all on function games.passport_goldhook_run(uuid, integer) from public, anon, authenticated;
 
 create table if not exists games.goldhook_levels (
   level    smallint primary key check (level between 1 and 20),
@@ -784,6 +801,12 @@ begin
       total_pep  = p.total_pep + excluded.total_pep,
       updated_at = now()
     returning p.best_score into v_best;
+    -- levels really completed in this validated run: the last level counts only when it was won
+    begin
+      perform games.passport_goldhook_run(u, i - case when v_finished then 0 else 1 end);
+    exception when others then
+      raise warning 'gold hook passport: %', sqlerrm;   -- never lose the score over a stamp
+    end;
   end if;
 
   return jsonb_build_object('nick', v_nick, 'verified', d is not null, 'place', place, 'score', total,
