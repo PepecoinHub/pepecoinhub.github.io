@@ -2,8 +2,8 @@
 // The frog lives on the server (games/supabase/update_pepegochi_v2.sql), one per Discord account.
 // PondOS opens this page in a window; it also works on its own.
 import { getBackend } from './backend.js?v=20261113link';
-import { LiveGame } from './pepegochi-live-view.mjs?v=20261115a10';
-import { renderRoom, playDeparture, playFrames, frogLook, careFrames, DEPART_FRAMES, HATCH_FRAMES, HATCH_MS, CARE_MS } from './pepegochi-room.mjs?v=20261115a10';
+import { LiveGame } from './pepegochi-live-view.mjs?v=20261116room1';
+import { renderRoom, playDeparture, playFrames, frogLook, careFrames, DEPART_FRAMES, HATCH_FRAMES, HATCH_MS, CARE_MS } from './pepegochi-room.mjs?v=20261116room1';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {

@@ -7,7 +7,7 @@
 // Temporary look for testing the mechanics. The game's real art comes later.
 import { LocalPepegochi, KINDS, parseTimestampUs } from './pepegochi-model.mjs';
 
-import { takenItem, takenName } from './pepegochi-room.mjs?v=20261115a10';
+import { takenItem, takenName } from './pepegochi-room.mjs?v=20261116room1';
 
 export const STORAGE_KEY = 'pepegochi-local-sim-v1';
 export const START = Date.UTC(2026, 10, 9, 18);           // Monday 18:00 UTC

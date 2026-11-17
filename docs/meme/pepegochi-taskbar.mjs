@@ -4,7 +4,7 @@ import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
 // Loaded only behind the existing ?beta=gochi gate. Local conversations are cosmetic; no polling, rewards or fake pet.
 // Based on PR #299; adds the Pond Quiz (one server question a day once the frog has hatched; update_pond_quiz.sql)
 // and the hop out of the PEPEGOCHI.EXE window.
-import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261115a10';
+import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261116room1';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
 import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261116sass1';
 
