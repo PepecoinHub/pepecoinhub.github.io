@@ -1140,6 +1140,7 @@
     apps[id] = A;
     build(A);
     focusApp(A);
+    if (GOCHI) window.dispatchEvent(new CustomEvent('pondos:app-opened', { detail: { id: id, host: host } }));
     return A;
   }
   function focusApp(A) { appZ += 1; A.host.style.zIndex = appZ; activeApp = A; }
@@ -1838,7 +1839,7 @@
   // Read-only PepeGochi companion on the PondOS taskbar; beta gate stays in place.
   // The real game and server own the pet; this module never invents a local pet.
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261115a10').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261118desktop1').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
         session: sbSession, rpc: rpc, base: BASE });
     }).catch(function () { /* optional decoration; the game still works */ });

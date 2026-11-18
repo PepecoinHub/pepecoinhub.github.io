@@ -1,3 +1,5 @@
+import { createCompanionReporter } from './companion-events.mjs?v=20261116sass1';
+const companion = createCompanionReporter('yeet');
 import { launch, step, flap, score, obstacles, newSeed, STEP } from './yeet-engine.mjs?v=20261105landing';
 import { getBackend } from './backend.js?v=20261113link';
 
@@ -57,7 +59,7 @@ function beginCharge() {
 }
 function release() {
   if (!charging || paused) return;
-  charging = false; state = launch(power, Number($('#angle').value), seed); phase = 'flying'; trail = []; accumulator = 0;
+  charging = false; companion.start(); state = launch(power, Number($('#angle').value), seed); phase = 'flying'; trail = []; accumulator = 0;
   $('#action').textContent = 'PANIC FLAP [3]'; $('#action').classList.add('flying'); $('#angle').disabled = true;
   $('#power-label').textContent = `${Math.round(power * 100)}%`; tone(180, .22, 'sawtooth', .04);
   $('#angle-down').disabled = true; $('#angle-up').disabled = true;
@@ -74,6 +76,7 @@ function finish() {
   const old = Math.max(storage.get(bestKey()), cloudBest), record = value > old; lastBest = record;
   if (record) storage.set(bestKey(), value);
   const reachedMoon = state.endReason === 'course';
+  companion.finish(reachedMoon ? 'moon' : 'complete', record);
   if (reachedMoon) {
     storage.set('pepegachi-moon-rock-v1', 1);
     const earnedKey = uid ? `pepegachi-moon-rock-earned-at-v1:${uid}` : 'pepegachi-moon-rock-earned-at-v1';

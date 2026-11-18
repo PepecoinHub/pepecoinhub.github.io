@@ -1,3 +1,5 @@
+import { createCompanionReporter } from './companion-events.mjs?v=20261116sass1';
+const companion = createCompanionReporter('goldhook');
 // Pepe Gold Hook: glue between the game logic, the campaign (levels, shop), drawing, input, DOM screens
 // and high scores. Runs fully in the browser; the only network calls besides loading files are the
 // optional "Submit score", top 10 and "My stats" (see gold-hook-scores.mjs). Game PEP are points.
@@ -168,8 +170,8 @@ async function boot() {
     for (const id of ['menu-howto', 'menu-top-box', 'menu-stats']) $(id).hidden = true;
     show('menu');
   }
-  $('btn-continue').addEventListener('click', () => { const saved = loadRun(); if (saved) { run = saved; showShop(); } });
-  $('btn-new').addEventListener('click', () => { run = newRun(); store.del(RUN_KEY); showLevel(); });
+  $('btn-continue').addEventListener('click', () => { const saved = loadRun(); if (saved) { companion.start(); run = saved; showShop(); } });
+  $('btn-new').addEventListener('click', () => { companion.start(); run = newRun(); store.del(RUN_KEY); showLevel(); });
   $('btn-howto').addEventListener('click', (e) => toggle(e.currentTarget, $('menu-howto')));
   $('btn-menu-top').addEventListener('click', (e) => { if (toggle(e.currentTarget, $('menu-top-box'))) loadTop($('menu-top-box'), $('menu-top')); });
   $('btn-menu-top').hidden = !scores.enabled;
@@ -271,6 +273,7 @@ async function boot() {
     // stats on this device
     const s = store.get(STATS_KEY) || { best: 0, level: 0, runs: 0 };
     const isNew = run.total > s.best;
+    companion.finish(finished ? 'win' : 'loss', isNew);
     store.set(STATS_KEY, { best: Math.max(s.best, run.total), level: Math.max(s.level, level), runs: s.runs + 1 });
     $('end-best').textContent = isNew ? T.newBest(run.total) : T.best(s.best);
     $('end-trophy').hidden = !(finished || isNew);
@@ -327,7 +330,7 @@ async function boot() {
       try { await navigator.clipboard.writeText(`${text} ${url}`); status.textContent = T.copied; } catch { status.textContent = T.shareFailed; }
     }
   });
-  $('btn-again').addEventListener('click', () => { run = newRun(); showLevel(); });
+  $('btn-again').addEventListener('click', () => { companion.start(); run = newRun(); showLevel(); });
   $('btn-end-menu').addEventListener('click', showMenu);
   $('btn-top').addEventListener('click', () => loadTop($('hs-top-box'), $('hs-top')));
 

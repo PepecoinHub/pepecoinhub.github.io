@@ -1,5 +1,6 @@
 // PepeGochi room scene for the PEPEGOCHI.EXE window.
-// Art (candidates, not final):
+// Room A11: richer pond den background; existing independent items and anchors retained.
+// Original art:
 //   - the layered room v5 from the design PR #222: one clean 640x400 background and one 128x128 RGBA
 //     sprite per item;
 //   - the frog, its states, the 6 moving-out frames, the suitcase and the letter from the pixel art
@@ -12,7 +13,7 @@
 export const ROOM_W = 640;
 export const ROOM_H = 400;
 export const IMG = 'img/pepegochi/';
-export const BACKGROUND = IMG + 'room_clean_base.png';
+export const BACKGROUND = IMG + 'room_pond_den_v1.png';
 // bumped when a room prop is redrawn under the same file name (A10: mug, duck, painting, 2026-11-15)
 export const PROP_V = '20261115a10';
 
@@ -262,6 +263,8 @@ export function renderRoom(doc, opts = {}) {
   art.setAttribute('role', 'img');
   art.setAttribute('aria-label', sc.label);
   const bg = mk('img', 'pgr-bg'); bg.src = BACKGROUND; bg.alt = ''; art.append(bg);
+  const sign = mk('div', 'pgr-house-sign'); sign.setAttribute('aria-hidden', 'true');
+  sign.textContent = 'NO FUD\nAFTER BEDTIME'; art.append(sign);
   for (const it of sc.items) {
     const im = mk('img', 'pgr-item' + (it.wall ? ' pgr-wall' : ''));
     im.src = it.src; im.alt = ''; im.dataset.slot = it.slotId; im.dataset.item = it.itemId;

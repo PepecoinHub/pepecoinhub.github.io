@@ -1,0 +1,260 @@
+import { TOYS, healthyCompanion } from './pepegochi-personality.mjs?v=20261116sass1';
+// Cosmetic conversations; actual needs and care history come from the server view.
+const lines = {
+  desktopFirefly: ["A tiny lamp with wings. Don't worry, fren, I let it go.", "Did you see that? The pond has its own screensaver."],
+  desktopTV: ["Pond TV? Hold on. I need my popcorn.", "The tiny frog demands a front-row seat."],
+  desktopBin: ["I inspected the recycling. No flies. Absolute scandal."],
+  desktopGames: ["Arcade department, reporting for extremely important frog business."],
+  desktopFind: ["Looking for something? I am excellent at looking busy."],
+  desktopGuesser: ["I have the geographical instincts of a pond. Trust me at your own risk."],
+  desktopNotes: ["Notepad. The finest technology of 1998."],
+  desktopNerds: ["Nerds only? Finally, my people."],
+  invite: ["I brought a toy. This meeting could have been a nap, but here we are.", "Human. Recreation department needs you. Bring your one functional mouse."],
+  toyFavourite: ["This one stays. Touch my snacks if you must. Not my toy.", "Excellent choice. Obviously I trained you well."],
+  toyOkay: ["Decent throw. For a creature with thumbs.", "I meant to miss that. Advanced frog technique."],
+  toyAgain: ["Fren. Let the toy land first. This isn't a benchmark.", "One frog. Two hands. Zero overtime."],
+  gameWin: ["We won. I provided moral superiority.", "Clean win. I'll allow a tiny victory dance."],
+  gameLoss: ["Bold strategy. The losing part needs work. Rematch?", "We saw nothing. The pond saw nothing. Queue another one."],
+  gameRecord: ["New personal best. Fine, that was actually sick.", "New record. My coaching is clearly working. Invoice pending."],
+  gameMoon: ["TO THE MOON. And you brought back a rock. Peak human behaviour."],
+  gameDone: ["Solid landing. By which I mean the ground remains undefeated.", "Flight complete. Dignity still in transit."],
+  hello: ["I'm supervising the pond. Very important frog business.", "Oh hey, fren. I was just thinking about flies.", "PondOS looks better with me on the taskbar."],
+  joke: ["Why did the frog cross the road? The pond was on the other side. I never said it was a good joke.", "I tried to mine PEP with a potato. It was a chip.", "I have a great joke about flies. It went over my head."],
+  pet: ["Hehe. More of that, fren. Tell nobody.", "This is acceptable human behaviour. Rare, but acceptable.", "Finally, a useful mouse."],
+  annoyed: ["Fren. That's my face.", "I am not a touchscreen.", "The frog requests a little personal space."],
+  play: ["Fancy a game? I believe in you. Mostly.", "Let's visit the pond arcade. Do not blame me if you lose."],
+  return: ["You're back! I saved your spot beside me.", "There you are, fren. The taskbar is better with you here."],
+  fed: ["That hit the spot. You remembered my favourite thing: food."],
+  clean: ["Fresh frog, fresh start. Thanks for the bath, fren."],
+  played: ["That was fun. Same team again next time?"],
+  rested: ["Much better. Thanks for letting a little frog recharge."],
+  grown: ["Look at me! A little bigger, still your fren."],
+  quizWin: ["We make a pretty good pond quiz team. You think, I ribbit."],
+  quizMiss: ["We learned something together. That's still a good day."],
+  offline: ["The pond went quiet. I'll keep you company while the connection is away."],
+  online: ["The pond is back! I kept your seat warm."],
+  familiar: ["I know that gentle pat. That's my human. Unfortunately for you, I am keeping you.", "Right behind the eyes. You know me well, fren. Do not get smug."],
+  space: ["Tiny frog break. Let's just sit together for a moment."],
+  news: ["PondOS has games, stamps and a whole pond of frens. Go explore!", "Check the Pond Quiz, your Fren Passport or the arcade."],
+};
+const moods = {
+  'tb_adult_hungry': "My stomach is making modem noises. Can we visit my room?",
+  'tb_adult_dirty': "I smell like a very authentic pond. A bath would be nice.",
+  'tb_adult_moody': "Not my finest day, fren. Let's play in my room.",
+  'tb_adult_sleepy': "Five more minutes. Please.",
+  'tb_adult_neglected': "I missed you, fren. Can we go to my room?",
+  'tb_adult_packing': "I've been waiting for you. Please come visit me.",
+  'tb_adult_recovering': "I'm getting better. Thank you for looking after me.",
+};
+function pick(a, n) { return a[Math.abs(Math.trunc(n || 0)) % a.length]; }
+export function companionReply(view, action = 'hello', n = 0, context = {}) {
+  if (!view?.hasPet) return { text: '', pose: null, openRoom: true };
+  const sprite = String(view.sprite || '').split('/').pop().replace('.png', '');
+  const important = moods[sprite];
+  // A gesture must never visually hide hunger, exhaustion or other authoritative warning states.
+  if (view.warning || ['recovering', 'sleepy', 'neglected', 'packing'].includes(view.motion) || important) {
+    const message = important || (view.warning ? "I need you, fren. Let's visit my room." : "I'm taking it easy, fren.");
+    return { text: message, pose: null, openRoom: false };
+  }
+  if (!view.adult) {
+    const message = view.motion === 'egg' ? '... *tiny wobble* ...' : '*ribbit!*';
+    return { text: message, pose: null, openRoom: false };
+  }
+  if (action === 'how') return { text: "Feeling pretty good, fren. Thanks for asking.", pose: 'tb_adult_talk', openRoom: false };
+  if (action === 'memories' && context.journal?.length) return { text: context.journal.join('\n\n'), pose: 'tb_adult_think', openRoom: false };
+  if (action === 'favourite') return { text: context.discovered && TOYS[context.favourite]
+    ? `The ${TOYS[context.favourite].name}. Mine. You may be its unpaid throwing assistant.`
+    : "Offer me a few toys. I'll judge your taste. Silently. Mostly.", pose: 'tb_adult_think', openRoom: false };
+  if (action === 'memories') return { text: view.careDays > 0
+    ? `You have looked after me on ${view.careDays} care days. Those little visits mean a lot, fren.`
+    : "Our story is just starting. A little food, a little play, a little time together.", pose: 'tb_adult_think', openRoom: false };
+  const group = lines[action] || lines.hello;
+  return { text: pick(group, n), pose: ['pet', 'familiar', 'joke', 'quizWin', 'grown'].includes(action) ? 'tb_adult_laugh' : action === 'annoyed' ? 'tb_adult_moody' : 'tb_adult_talk', openRoom: false };
+}
+
+// Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
+// No polling or network calls. Optional bond stores cosmetic memories only.
+export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, now = () => Date.now() }) {
+  let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
+  let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
+  let lastActivity = now(), bornAt = now();
+  const doc = button.ownerDocument;
+  const win = doc.defaultView;
+  const el = (tag, cls, text) => {
+    const e = doc.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e;
+  };
+  function clearNotice() {
+    if (noticeTimer !== null) win.clearTimeout(noticeTimer);
+    noticeTimer = null; notice?.remove(); notice = null;
+  }
+  function react(action) {
+    bond?.remember(action);
+    if (panel || bond?.muted || !canReact() || doc.visibilityState === 'hidden' || now() - lastReaction < 45000 || !getView()?.hasPet) return;
+    const r = companionReply(getView(), action, sequence++);
+    clearNotice(); lastReaction = now();
+    notice = el('div', 'pg-fact pg-companion-reaction');
+    notice.setAttribute('role', 'status');
+    notice.style.pointerEvents = 'none';
+    notice.append(el('p', 'pg-fact-q', r.text));
+    const rect = slot.getBoundingClientRect();
+    notice.style.bottom = Math.max(8, win.innerHeight - Math.min(rect.top, img.getBoundingClientRect().top) + 6) + 'px';
+    notice.style.left = Math.max(8, Math.min(rect.left, win.innerWidth - 376)) + 'px';
+    doc.body.append(notice);
+    noticeTimer = win.setTimeout(clearNotice, 6000);
+    animate(action);
+    return true;
+  }
+  function invite() {
+    if (panel || bond?.muted || !canReact() || doc.visibilityState === 'hidden' ||
+        !healthyCompanion(getView()) || now() - bornAt < 90000 || now() - lastActivity < 45000 || now() - lastReaction < 45000) return false;
+    if (!bond?.invite()) return false;
+    const shown = react('invite');
+    if (shown) showToy(bond.favourite);
+    return !!shown;
+  }
+  function activity() { lastActivity = now(); }
+  function cancelClick() { if (clickTimer !== null) { win.clearTimeout(clickTimer); clickTimer = null; } }
+  function reposition() {
+    if (!panel) return;
+    const r = slot.getBoundingClientRect(), top = Math.min(r.top, img.getBoundingClientRect().top);
+    panel.style.bottom = Math.max(8, win.innerHeight - top + 6) + 'px';
+    panel.style.left = Math.max(8, Math.min(r.left, win.innerWidth - panel.offsetWidth - 8)) + 'px';
+    panel.style.maxHeight = Math.max(80, top - 12) + 'px';
+    panel.style.overflowY = 'auto';
+  }
+  function close({ focus = false, reset = false } = {}) {
+    cancelClick(); clearNotice();
+    if (reset) { lastReaction = lastPet = -Infinity; pats = []; bornAt = now(); }
+    if (reset) { recent = []; sequence = 0; gesture = null; suppressClick = false; }
+    if (!panel) { setPose(null); return; }
+    panel.remove(); panel = null; reply = null;
+    setPose(null);
+    button.setAttribute('aria-expanded', 'false');
+    doc.removeEventListener('keydown', key, true);
+    win.removeEventListener('resize', reposition);
+    if (focus) button.focus();
+  }
+  function outside(e) {
+    if (!button.contains(e.target) && (!panel || !panel.contains(e.target))) close();
+  }
+  function key(e) {
+    if (e.key === 'Escape' && panel) { e.preventDefault(); close({ focus: true }); }
+  }
+  function visit() { close({ reset: true }); openRoom(); }
+  function say(action = 'hello') {
+    clearNotice();
+    if (action === 'hello') action = bond?.take() || action;
+    if (action === 'pet') {
+      pats = pats.filter(t => now() - t < 10000); pats.push(now());
+      if (pats.length > 3) action = 'space';
+      else {
+        if (bond?.familiar) action = 'familiar';
+        if (now() - lastPet > 30000) { bond?.pet(); lastPet = now(); }
+      }
+    }
+    const r = companionReply(getView(), action, sequence++, bond || {});
+    if (r.openRoom) { visit(); return; }
+    closeQuiz();
+    const fresh = !panel;
+    if (fresh) {
+      panel = el('div', 'pg-fact pg-conversation');
+      panel.setAttribute('role', 'dialog');
+      panel.setAttribute('aria-label', 'Talk to PepeGochi');
+      const head = el('div', 'pg-fact-bar');
+      const x = el('button', 'pg-fact-x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close conversation');
+      x.addEventListener('click', () => close({ focus: true }));
+      head.append(el('b', null, getView()?.label || 'PepeGochi'), x);
+      reply = el('p', 'pg-fact-q');
+      reply.setAttribute('aria-live', 'polite');
+      const actions = el('div', 'pg-fact-answers');
+      function add(label, fn) { const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', fn); actions.append(b); }
+      add('Our memories', () => say('memories'));
+      if (bond) {
+        add('Your favourite toy?', () => say('favourite'));
+        for (const [id, toy] of Object.entries(TOYS)) add(toy.label, () => {
+          if (!healthyCompanion(getView())) { say('how'); return; }
+          const reaction = bond.play(id);
+          if (!reaction) return;
+          say(reaction); if (reaction !== 'toyAgain') showToy(id);
+        });
+      }
+      if (bond) {
+        const mute = el('button', 'pg-fact-a'); mute.type = 'button';
+        const label = () => { mute.textContent = bond.muted ? 'Reactions: quiet' : 'Reactions: on'; mute.setAttribute('aria-pressed', String(bond.muted)); };
+        label(); mute.addEventListener('click', () => { bond.toggleMute(); clearNotice(); label(); }); actions.append(mute);
+      }
+      add('How are you?', () => say('how'));
+      add('Tell me a joke', () => say('joke'));
+      add("Let's play!", () => say('play'));
+      add('Pet me', () => say('pet'));
+      add("What's new?", () => say('news'));
+      if (fireflyAvailable()) add('Catch a firefly', () => { close({ focus: true }); catchFirefly(); });
+      if (quizAvailable()) add('Pond Quiz', () => { close(); openQuiz(); });
+      add('Go to your room', visit);
+      panel.append(head, reply, actions);
+      doc.body.append(panel);
+      button.setAttribute('aria-expanded', 'true');
+      doc.addEventListener('keydown', key, true);
+      win.addEventListener('resize', reposition);
+    }
+    reply.textContent = r.text;
+    setPose(r.pose);
+    animate(action);
+    reposition();
+    if (fresh) panel.querySelector('.pg-fact-x')?.focus();
+  }
+  function click(e) {
+    if (suppressClick) { suppressClick = false; return; }
+    if (!getView()?.hasPet) { visit(); return; }
+    if (e.detail === 0) { say(); return; } // Enter and Space
+    if (e.detail === 2) { cancelClick(); visit(); return; }
+    if (clickTimer !== null) return;
+    clickTimer = win.setTimeout(() => {
+      clickTimer = null;
+      const t = now(); recent = recent.filter(v => t - v <= 4000); recent.push(t);
+      say(recent.length >= 3 ? 'annoyed' : 'hello');
+    }, 275);
+  }
+  function right(e) { e.preventDefault(); cancelClick(); say(); }
+  function start(e) {
+    suppressClick = false;
+    if (e.pointerType !== 'mouse' || e.button !== 0 || e.target !== img || !getView()?.hasPet) return;
+    gesture = { x: e.clientX, y: e.clientY, distance: 0 };
+  }
+  function move(e) {
+    if (!gesture) return;
+    if (!(e.buttons & 1)) { gesture = null; return; }
+    gesture.distance += Math.hypot(e.clientX - gesture.x, e.clientY - gesture.y);
+    gesture.x = e.clientX; gesture.y = e.clientY;
+    if (gesture.distance >= 36) {
+      gesture = null; suppressClick = true; cancelClick(); say('pet');
+    }
+  }
+  function end() { gesture = null; }
+  doc.addEventListener('pointerdown', activity, true);
+  doc.addEventListener('keydown', activity, true);
+  doc.addEventListener('pointerdown', outside, true);
+  button.setAttribute('aria-haspopup', 'dialog');
+  button.setAttribute('aria-expanded', 'false');
+  button.addEventListener('click', click);
+  button.addEventListener('contextmenu', right);
+  button.addEventListener('pointerdown', start);
+  button.addEventListener('pointermove', move);
+  button.addEventListener('pointerup', end);
+  button.addEventListener('pointercancel', end);
+  button.addEventListener('pointerleave', end);
+  return { close, react, invite, get busy() { return !!(panel || notice || clickTimer !== null); }, dispose() {
+    close({ reset: true });
+    doc.removeEventListener('pointerdown', activity, true);
+    doc.removeEventListener('keydown', activity, true);
+    doc.removeEventListener('pointerdown', outside, true);
+    button.removeEventListener('click', click);
+    button.removeEventListener('contextmenu', right);
+    button.removeEventListener('pointerdown', start);
+    button.removeEventListener('pointermove', move);
+    button.removeEventListener('pointerup', end);
+    button.removeEventListener('pointercancel', end);
+    button.removeEventListener('pointerleave', end);
+    button.removeAttribute('aria-haspopup'); button.removeAttribute('aria-expanded');
+  } };
+}

@@ -1,0 +1,306 @@
+{
+  "status": "PASS",
+  "newFrames": 20,
+  "assets": [
+    {
+      "file": "taskbar/anim/tb_nuzzle_01.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        36,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "54dc9bd87c22bc99c697b4e57f28bccd18c63d7906c1fdc1108f9aba4ca077b0"
+    },
+    {
+      "file": "taskbar/anim/tb_nuzzle_02.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        36,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "27f5247becb76735149c571b179c6072707e2c61eb29397d89e6f3e06e1d8edc"
+    },
+    {
+      "file": "taskbar/anim/tb_nuzzle_03.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        37,
+        47
+      ],
+      "colours": 24,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "5faac09fffcafd006ed07b611484fd842c0bb91cb812aa773295824907c433cd"
+    },
+    {
+      "file": "taskbar/anim/tb_nuzzle_04.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        36,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "da50f240a9ffe04371e2107454741ce5620452aea72684962a7b90b8a541c82d"
+    },
+    {
+      "file": "taskbar/anim/tb_welcome_01.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        11,
+        7,
+        38,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "32033e851bde3bba965563906f22ce4f7fb824eac998923af45839d7be401bfb"
+    },
+    {
+      "file": "taskbar/anim/tb_welcome_02.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        37,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "7d72bdc8302ae25fdf3dd16daed5e639aa28d0d9970ec342387702fff61d0fa9"
+    },
+    {
+      "file": "taskbar/anim/tb_welcome_03.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        11,
+        7,
+        38,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "805208d25f20427df6327ea0e4ee0dbe97b350383d9b8f4222467b15553f5405"
+    },
+    {
+      "file": "taskbar/anim/tb_welcome_04.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        10,
+        7,
+        39,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "29954b27447a0e845e15eccb25aaa9653bf92861761da7e2f88d63e010370d16"
+    },
+    {
+      "file": "taskbar/anim/tb_curious_01.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        36,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "7de42145ad92dbca3c7bc7d91f82139648fadc2161a5ab70d4f62122903652c5"
+    },
+    {
+      "file": "taskbar/anim/tb_curious_02.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        13,
+        7,
+        36,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "6c4a6894241e1fa636364d4928ffe9e50af0476ddd51c21acd03d61f3dd83b1d"
+    },
+    {
+      "file": "taskbar/anim/tb_curious_03.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        36,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "d7d48fcc1ec676c57568ea229505ab03061449a07fee9766460004a1c693c8a7"
+    },
+    {
+      "file": "taskbar/anim/tb_curious_04.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        36,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "230e2e84aadbd385d24a631b89efb7e366b7020731fe728a52a753da3d1c07f5"
+    },
+    {
+      "file": "taskbar/anim/tb_sulk_01.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        37,
+        47
+      ],
+      "colours": 24,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "d9d45c17f84cbadb2db2772dc1674d456e784679e6455ca7bed3f09c1f342f42"
+    },
+    {
+      "file": "taskbar/anim/tb_sulk_02.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        37,
+        47
+      ],
+      "colours": 26,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "704fb174bf009bf480aa1433fb15bc4362a1a3bde1f89a9cb1bdab140de886fe"
+    },
+    {
+      "file": "taskbar/anim/tb_sulk_03.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        37,
+        47
+      ],
+      "colours": 26,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "9470856b5d62a639eef979a537bc8a681b8bc89f323eca847c213a3fe1bca6ec"
+    },
+    {
+      "file": "taskbar/anim/tb_sulk_04.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        11,
+        7,
+        37,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "e539370265c10411825d8fc593e451ada2188d6b52722cbb53272e0989693008"
+    },
+    {
+      "file": "taskbar/anim/tb_yawn_01.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        36,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "0eb2488b1e8523997520fa12f8ec39766e6ef7e816a33dd977f37a78f846e2f7"
+    },
+    {
+      "file": "taskbar/anim/tb_yawn_02.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        36,
+        47
+      ],
+      "colours": 25,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "7eb45a37c6e5263beef8e4db18cf9c648a8cae77c4ef2c09084460d319c2a3aa"
+    },
+    {
+      "file": "taskbar/anim/tb_yawn_03.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        36,
+        47
+      ],
+      "colours": 24,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "a0ef0bf717796bcf42b16070f625e44110effe3643f77c39d1d722911f117000"
+    },
+    {
+      "file": "taskbar/anim/tb_yawn_04.png",
+      "ok": true,
+      "problems": [],
+      "bbox": [
+        12,
+        7,
+        36,
+        47
+      ],
+      "colours": 24,
+      "brokenBlocks": 0,
+      "semiTransparent": 0,
+      "sha256": "b0c02bddb7b17b447e6d6cf137543fd5c90f1b3b4561f6cf349afcdbe6b680e3"
+    }
+  ]
+}

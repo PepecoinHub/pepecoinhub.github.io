@@ -1,0 +1,66 @@
+{
+  "nuzzle": {
+    "base": "tb_adult_sit",
+    "order": [
+      1,
+      2,
+      3,
+      3,
+      2,
+      4
+    ],
+    "ms": 150
+  },
+  "welcome": {
+    "base": "tb_adult_sit",
+    "order": [
+      1,
+      2,
+      3,
+      4,
+      3,
+      4,
+      2
+    ],
+    "ms": 130
+  },
+  "curious": {
+    "base": "tb_adult_sit",
+    "order": [
+      1,
+      2,
+      2,
+      3,
+      4,
+      4,
+      3
+    ],
+    "ms": 160
+  },
+  "sulk": {
+    "base": "tb_adult_sit",
+    "order": [
+      1,
+      2,
+      3,
+      4,
+      4,
+      3,
+      2
+    ],
+    "ms": 160
+  },
+  "yawn": {
+    "base": "tb_adult_sleepy",
+    "order": [
+      1,
+      2,
+      3,
+      3,
+      2,
+      4,
+      4
+    ],
+    "ms": 180
+  }
+}

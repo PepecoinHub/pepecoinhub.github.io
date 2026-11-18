@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "width": 640,
+  "height": 400,
+  "logicalGrid": "2x2",
+  "colours": 256,
+  "opaque": true,
+  "layeredInventory": "Chromium full, empty and departed fixtures passed",
+  "mobileWidths": [
+    320,
+    390,
+    900
+  ]
+}
