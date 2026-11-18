@@ -1972,9 +1972,19 @@
   // Read-only PepeGochi companion on the PondOS taskbar; beta gate stays in place.
   // The real game and server own the pet; this module never invents a local pet.
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261118rumors1').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261118case1').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
-        session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport });
+        session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport,
+        onCaseComplete: function () {
+          passportCache = null;
+          if (apps.passport && apps.passport.render) {
+            var owner = sbSession();
+            passportLoad(owner).then(function () {
+              var current = sbSession();
+              if (owner && current && owner.userId === current.userId && apps.passport && apps.passport.render) apps.passport.render();
+            }).catch(function () {});
+          }
+        } });
     }).catch(function () { /* optional decoration; the game still works */ });
   }
   function pondWarsApp() {
@@ -2205,7 +2215,7 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261117lilies';
+  var PP_CATALOG = 'passport-catalog.json?v=20261118case1';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
       document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261115x7'}));
@@ -2458,7 +2468,7 @@
         var goal = regular.filter(function(x){ return x.status==='live' || !!earnedOf(x.id); }).length;
         secrets = secrets.filter(function(x){ var s = find(discovered, x.id); return listed(x, s && s.discovered_at); });
         items = items.filter(function(x){ return listed(x, find(owned, x.id)); });
-        var secretsGoal = secrets.filter(function(x){ return x.status==='live'; }).length;
+        var secretsGoal = secrets.filter(function(x){ var s = find(discovered, x.id); return x.status==='live' || !!(s && s.discovered_at); }).length;
         var itemsGoal = items.filter(function(x){ return x.status==='live'; }).length;
         var earnedList = regular.filter(function(x){ return !!earnedOf(x.id); })
           .sort(function(a,b){ return String(earnedOf(b.id).earned_at).localeCompare(String(earnedOf(a.id).earned_at)); });

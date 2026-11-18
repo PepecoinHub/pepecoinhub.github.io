@@ -66,7 +66,7 @@ function harness(initial = adult, options = {}) {
   doc.body = new Element(doc);
   doc.createElement = () => new Element(doc);
   doc.defaultView = Object.assign(new Element(doc), {
-    innerWidth: 800, innerHeight: 600, setTimeout(fn) { pending.set(++timerId, fn); return timerId; }, clearTimeout(id) { pending.delete(id); }
+    innerWidth: 800, innerHeight: 600, crypto: {randomUUID:()=> '00000000-0000-4000-8000-000000000001'}, setTimeout(fn) { pending.set(++timerId, fn); return timerId; }, clearTimeout(id) { pending.delete(id); }
   });
   const slot = new Element(doc), button = new Element(doc), img = new Element(doc);
   slot.append(button); button.append(img);
@@ -155,4 +155,24 @@ test('late rumor responses cannot overwrite another action, a new discovery or a
   click('Pond Rumors'); h.controller.invalidateRumors(); resolvers[1](result); await Promise.resolve(); assert.match(reply.textContent, /new discovery/);
   click('Pond Rumors'); h.controller.close(); resolvers[2](result); await Promise.resolve(); assert.equal(h.doc.body.children.length, 0);
   h.controller.dispose();
+});
+
+test('case file is opt-in, renders a single stage, avoids double submit and preserves the final server message as text', async () => {
+  let reads=0, answers=0, completions=0, resolve;
+  const active={status:'active',title:'Case fixture',intro:'Test intro',completed:0,total:3,step:1,stepTitle:'Test stage',clue:'A single clue',hint:null,retryAfter:0};
+  const caseClient={read:async hint=>{reads++;return {status:'ok',view:{...active,hint:hint?'A precise hint':null}}},answer:()=>{answers++;return new Promise(r=>resolve=r)}};
+  const h=harness(adult,{caseClient,onCaseComplete:()=>completions++});h.button.emit('click',{detail:0});assert.equal(reads,0);
+  const panel=h.doc.body.children[0], actions=panel.querySelector('.pg-fact-answers'), reply=panel.querySelector('.pg-fact-q');
+  actions.children.find(b=>b.textContent==='Pond Case Files').emit('click');await Promise.resolve();assert.match(reply.textContent,/A single clue/);
+  assert.equal(reads,1);const controls=panel.querySelector('.pg-case-actions');controls.children.find(b=>b.textContent==='Ask for a hint').emit('click');await Promise.resolve();assert.match(reply.textContent,/A precise hint/);
+  const form=panel.querySelector('.pg-case-form'), input=form.querySelector('.pg-case-input');input.value='validkey';form.emit('submit');form.emit('submit');assert.equal(answers,1);
+  resolve({status:'ok',outcome:'correct',view:{status:'complete',title:'Fixture',completed:3,total:3,message:'<b>Not markup</b>',credit:'Author'}});await Promise.resolve();
+  assert.match(reply.textContent,/Case closed/);assert.match(reply.textContent,/<b>Not markup<\/b>/);assert.equal(completions,1);assert.equal(panel.querySelector('.pg-case-form'),null);h.controller.dispose();
+});
+
+test('an old case response cannot update a closed conversation or a different action',async()=>{
+  const pending=[];const h=harness(adult,{caseClient:{read:()=>new Promise(r=>pending.push(r))}});
+  h.button.emit('click',{detail:0});const panel=h.doc.body.children[0], actions=panel.querySelector('.pg-fact-answers'), reply=panel.querySelector('.pg-fact-q');
+  const open=()=>actions.children.find(b=>b.textContent==='Pond Case Files').emit('click');open();actions.children.find(b=>b.textContent==='Tell me a joke').emit('click');const joke=reply.textContent;pending[0]({status:'ok',view:{status:'closed'}});await Promise.resolve();assert.equal(reply.textContent,joke);
+  open();h.controller.close();pending[1]({status:'ok',view:{status:'closed'}});await Promise.resolve();assert.equal(h.doc.body.children.length,0);h.controller.dispose();
 });

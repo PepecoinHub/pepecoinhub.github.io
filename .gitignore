@@ -9,3 +9,4 @@ docs/data/market-live.json
 games/supabase/private/
 *.private.json
 *.private.csv
+*.private.sql
