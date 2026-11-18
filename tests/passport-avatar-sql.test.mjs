@@ -148,7 +148,8 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
       look('bg_sky', 'clothing_suit', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none'),              // clothing_suit -> detective_fren
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_hardhat', 'accessory_none'),           // hat_hardhat -> rookie_miner
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_detective', 'accessory_none'),         // hat_detective -> detective_fren
-      look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_headphones')         // accessory_headphones -> arcade_hopper
+      look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_headphones'),        // accessory_headphones -> arcade_hopper
+      look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_crown', 'accessory_none')              // hat_crown -> long_live_the_king (2026-11-18)
     ];
     reserved.push([...DEFAULT, 'special_explorer']);                                                       // special_explorer -> scout_fren
     for (const args of reserved) await assert.rejects(save(1, args), /That part is locked/, 'reserved ' + JSON.stringify(args));
@@ -161,8 +162,8 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     assert.ok(!s0.achievements.some(a => a.id === 'first_avatar'));
 
     // --- first save awards Fresh Fren once
-    const first = await save(1, look('bg_forest', 'clothing_purple_hoodie', 'mouth_teeth', 'eyes_3d', 'hat_crown', 'accessory_shades'));
-    assert.deepEqual(first.avatar, { schema_version: 2, bg: 'bg_forest', clothing: 'clothing_purple_hoodie', mouth: 'mouth_teeth', eyes: 'eyes_3d', hat: 'hat_crown', accessory: 'accessory_shades', special: 'special_none' });
+    const first = await save(1, look('bg_forest', 'clothing_purple_hoodie', 'mouth_teeth', 'eyes_3d', 'hat_bucket', 'accessory_shades'));
+    assert.deepEqual(first.avatar, { schema_version: 2, bg: 'bg_forest', clothing: 'clothing_purple_hoodie', mouth: 'mouth_teeth', eyes: 'eyes_3d', hat: 'hat_bucket', accessory: 'accessory_shades', special: 'special_none' });
     assert.equal(first.first_save, true); assert.equal(first.changed, true);
     assert.equal(first.badge.id, 'first_avatar'); assert.equal(first.badge.new, true); assert.ok(first.badge.earned_at);
     assert.equal(await badges(1), 1);
@@ -173,12 +174,12 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     assert.equal(new Date(earned[0].earned_at).getTime(), new Date(first.badge.earned_at).getTime());
 
     // --- repeat of the same look: success, no write, no new badge
-    const same = await save(1, look('bg_forest', 'clothing_purple_hoodie', 'mouth_teeth', 'eyes_3d', 'hat_crown', 'accessory_shades'));
+    const same = await save(1, look('bg_forest', 'clothing_purple_hoodie', 'mouth_teeth', 'eyes_3d', 'hat_bucket', 'accessory_shades'));
     assert.equal(same.first_save, false); assert.equal(same.changed, false); assert.equal(same.badge.new, false);
     assert.equal(same.updated_at, first.updated_at);
 
     // --- cooldown: a different look right away is an error and changes nothing
-    await assert.rejects(save(1, look('bg_forest', 'clothing_purple_hoodie', 'mouth_open', 'eyes_3d', 'hat_crown', 'accessory_shades')), /Saving too fast/);
+    await assert.rejects(save(1, look('bg_forest', 'clothing_purple_hoodie', 'mouth_open', 'eyes_3d', 'hat_bucket', 'accessory_shades')), /Saving too fast/);
     assert.equal((await state(1)).avatar.mouth, 'mouth_teeth');
 
     // --- edit after cooldown: saved, never re-awarded
@@ -196,6 +197,19 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     const nextDay = await save(1, DEFAULT);
     assert.equal(nextDay.avatar.mouth, 'mouth_smile');
     assert.equal((await db.query('select budget_used from games.passport_avatars where user_id = $1', [uid(1)])).rows[0].budget_used, 1);
+
+    // --- a crown saved while it was free stays: a reward part already on the saved look is never refused,
+    //     the rest of the look can still change, but another locked part still needs its stamp
+    await db.query("update games.passport_avatars set hat = 'hat_crown', updated_at = now() - interval '1 minute' where user_id = $1", [uid(1)]);
+    const kept = await save(1, look('bg_city', 'clothing_blue', 'mouth_laugh', 'eyes_classic', 'hat_crown', 'accessory_none'));
+    assert.equal(kept.avatar.hat, 'hat_crown'); assert.equal(kept.avatar.mouth, 'mouth_laugh');
+    await pastCooldown(1);
+    await assert.rejects(save(1, look('bg_city', 'clothing_blue', 'mouth_laugh', 'eyes_classic', 'hat_hardhat', 'accessory_none')), /That part is locked/);
+    const off = await save(1, look('bg_city', 'clothing_blue', 'mouth_laugh', 'eyes_classic', 'hat_none', 'accessory_none'));
+    assert.equal(off.avatar.hat, 'hat_none');
+    await pastCooldown(1);
+    await assert.rejects(save(1, look('bg_city', 'clothing_blue', 'mouth_laugh', 'eyes_classic', 'hat_crown', 'accessory_none')), /That part is locked/, 'taken off, the crown needs the stamp');
+    await pastCooldown(1); await save(1, DEFAULT);   // back to the look the checks below expect
 
     // --- second user isolation
     const other = await save(2, look('bg_forest', 'clothing_camo', 'mouth_open', 'eyes_bloodshot', 'hat_bucket', 'accessory_none'));
@@ -232,7 +246,7 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     const looks = [
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none'), look('bg_forest', 'clothing_purple_hoodie', 'mouth_teeth', 'eyes_sleepy', 'hat_pep_cap', 'accessory_shades'),
       look('bg_night', 'clothing_black_hoodie', 'mouth_open', 'eyes_angry', 'hat_beanie', 'accessory_pipe'), look('bg_sky', 'clothing_shirt_tie', 'mouth_tongue', 'eyes_hypno', 'hat_bucket', 'accessory_none'),
-      look('bg_forest', 'clothing_camo', 'mouth_smile', 'eyes_bloodshot', 'hat_crown', 'accessory_shades'), look('bg_night', 'clothing_blue', 'mouth_teeth', 'eyes_3d', 'hat_none', 'accessory_pipe'),
+      look('bg_forest', 'clothing_camo', 'mouth_smile', 'eyes_bloodshot', 'hat_bucket', 'accessory_shades'), look('bg_night', 'clothing_blue', 'mouth_teeth', 'eyes_3d', 'hat_none', 'accessory_pipe'),
       look('bg_sky', 'clothing_purple_hoodie', 'mouth_open', 'eyes_classic', 'hat_pep_cap', 'accessory_none'), look('bg_forest', 'clothing_black_hoodie', 'mouth_tongue', 'eyes_sleepy', 'hat_beanie', 'accessory_shades')
     ];
     const burst = await Promise.allSettled(pool.map((c, i) => save(6, looks[i], c)));

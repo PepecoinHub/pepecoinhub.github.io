@@ -2205,7 +2205,7 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261117lilies';
+  var PP_CATALOG = 'passport-catalog.json?v=20261118crown';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
       document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261115x7'}));
@@ -2638,8 +2638,11 @@
         recent.appendChild(rl);
         panes[0].appendChild(recent);
 
-        // PepeGochi: the frog's card (read-only gry_pepegochi_state, once per Passport window)
-        if (GOCHI) {
+        // PepeGochi: the frog's card (read-only gry_pepegochi_state, once per Passport window). Only on your OWN
+        // Passport: the state RPC answers for the viewer, so on a fren's Passport it showed the viewer's frog.
+        if (other) {
+          // another fren's Passport: no PepeGochi panel at all until the game is public
+        } else if (GOCHI) {
           var gc = el('section', {class:'pp-panel pp-gochi'});
           gc.appendChild(piece('h3','pp-panel-h','PepeGochi'));
           var gs = A.gochi;
@@ -2903,7 +2906,7 @@
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261111launch').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261118crown').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -2973,7 +2976,8 @@
   var FA_UNLOCK = { detective_fren: 'Detective Fren', rookie_miner: 'Happy Mining!', scout_fren: 'Scout Fren', good_game: 'Good Game',
     yeet_adept: 'Adept', arcade_hopper: 'Arcade Hopper', secret_starter: 'Secret Starter', dear_editor: 'Dear Editor',
     senior_editor: 'Senior Editor', frogmas: 'Frogmas', old_frog: 'Old Frog', welcome_back: 'Welcome Back',
-    streak_14: '14-day streak', like_it_here: 'I Like It Here', certified_fren: 'Certified Fren', nasa_is_hiring: 'NASA Is Hiring', fud_buster: 'FUD Buster' };
+    streak_14: '14-day streak', like_it_here: 'I Like It Here', certified_fren: 'Certified Fren', nasa_is_hiring: 'NASA Is Hiring', fud_buster: 'FUD Buster',
+    long_live_the_king: 'Long Live the King' };
   // event days: open to every fren who visits PondOS on that day (the check-in gives them)
   var FA_EVENT = { pep_birthday: 'visit PondOS on 30 January, Pepecoin\'s birthday', thanksgiving_fren: 'visit PondOS on Thanksgiving weekend',
     valentine_fren: 'visit PondOS on 14 February, Valentine\'s Day' };
@@ -3065,8 +3069,9 @@
           // (the focused part scrolls into view), and Tab goes to the next row
           var prev = el('button', { type: 'button', class: 'fa-arr is-prev', tabindex: '-1', 'aria-hidden': 'true' });
           var next = el('button', { type: 'button', class: 'fa-arr is-next', tabindex: '-1', 'aria-hidden': 'true' });
+          // a reward part already on the saved look is not locked (the crown was free before 2026-11-18; the server keeps it too)
           (o.options[k] || []).forEach(function (p) {
-            var locked = !!p.unlock && !owns(p.unlock), stamp = locked && FA_UNLOCK[p.unlock] || 'a future stamp';
+            var locked = !!p.unlock && !owns(p.unlock) && !(saved && saved[k] === p.id), stamp = locked && FA_UNLOCK[p.unlock] || 'a future stamp';
             var lab = el('label', { class: 'fa-opt' + (locked ? ' is-locked' : ''), title: locked ? (FA_SECRET[p.unlock] || FA_EVENT[p.unlock] ? p.label + ' - locked: ' + avHow(p.unlock) : p.label + ' - locked: earn the ' + stamp + ' stamp') : p.label });
             var inp = el('input', { type: 'radio', name: 'fa-' + k, value: p.id });
             // reserved parts are shown with a lock and cannot be picked; the save RPC rejects them too

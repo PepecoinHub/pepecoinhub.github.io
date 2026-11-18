@@ -186,7 +186,7 @@
     {
       "id": "long_live_the_king",
       "title": "Long Live the King",
-      "description": "Win 10 Pond King duels in a row: hold the throne against 10 challengers in one reign.",
+      "description": "Win 10 Pond King duels in a row: hold the throne against 10 challengers in one reign. Unlocks the Crown hat in Create Your Fren.",
       "category": "arcade",
       "icon": "../games/img/pond/king-stamp.png",
       "status": "live"

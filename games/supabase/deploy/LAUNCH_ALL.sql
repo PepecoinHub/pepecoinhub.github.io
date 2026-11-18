@@ -853,6 +853,9 @@ grant execute on function public.gry_passport_discover(text) to authenticated;
 --     bg_sunset          (unlock yeet_adept, not earnable yet)
 --     accessory_headphones (unlock arcade_hopper, not earnable yet)
 --     hat_explorer       (unlock scout_fren)
+--     hat_crown          (unlock long_live_the_king: 10 Pond King duels won in one reign; owner, 2026-11-18.
+--                         A crown saved before it became a reward stays: a part already on the player's
+--                         saved look is never refused, so they can keep it and still change the rest)
 --     special_explorer   (unlock scout_fren)
 --     special_knight     (unlock good_game: a board game played to the end with another Discord player)
 --     special_batman, special_vampire, special_smile, special_nerd, special_soldier, special_straw
@@ -929,7 +932,7 @@ begin
   if exists (
     select 1 from (values ('bg_sunset', 'yeet_adept'), ('clothing_suit', 'detective_fren'), ('hat_hardhat', 'rookie_miner'),
                           ('hat_detective', 'detective_fren'), ('accessory_headphones', 'arcade_hopper'),
-                          ('hat_explorer', 'scout_fren'), ('special_explorer', 'scout_fren'),
+                          ('hat_explorer', 'scout_fren'), ('special_explorer', 'scout_fren'), ('hat_crown', 'long_live_the_king'),
                           ('special_knight', 'good_game'),
                           ('special_batman', 'why_tho'), ('special_vampire', 'midnight_fren'), ('special_smile', 'happy_fren'),
                           ('special_nerd', 'nerd_alert'), ('special_soldier', 'born_to_fren'), ('special_straw', 'bali_dreamer'),
@@ -940,7 +943,10 @@ begin
      where r.part in (p_bg, p_clothing, p_hat, p_accessory, p_special)
        -- the unlock is a stamp, or (for most special avatars) a secret
        and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)
-       and not exists (select 1 from games.passport_secrets s where s.user_id = u and s.secret_id = r.stamp)) then
+       and not exists (select 1 from games.passport_secrets s where s.user_id = u and s.secret_id = r.stamp)
+       -- a part already on the player's saved look stays allowed (the crown was free before 2026-11-18)
+       and not exists (select 1 from games.passport_avatars a where a.user_id = u
+                          and r.part in (a.bg, a.clothing, a.hat, a.accessory, a.special))) then
     raise exception 'That part is locked: earn its stamp first' using errcode = '42501';
   end if;
 
