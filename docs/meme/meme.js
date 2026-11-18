@@ -24,7 +24,8 @@
       var q = new URLSearchParams(location.search).get('beta');
       if (q === 'goldhook') localStorage.setItem('pondos-beta-goldhook', '1');
       if (q === 'off') localStorage.removeItem('pondos-beta-goldhook');
-      return localStorage.getItem('pondos-beta-goldhook') === '1';
+      // Gazette #11: 15 YES votes open it for everyone (gry_new_game, checked a moment after start; remembered here)
+      return localStorage.getItem('pondos-beta-goldhook') === '1' || localStorage.getItem('pondos-goldhook-live') === '1';
     } catch (e) { return false; }
   })();
   // Owner sandbox activates for this visit only. The URL does not grant owner permissions.
@@ -4136,7 +4137,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 10, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 11, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -4160,6 +4161,45 @@
     return rpc('gry_letters', { p_limit: 200 }).then(function (j) { letterBox = j && j.letters ? j : null; paintMail(); return letterBox; }, function () { return null; });
   }
   if (mainEl) setTimeout(checkLetters, 1500);
+  // Issue #11 (Thursday 19 Nov 2026): Dissection's 13-defense Pond King record, the guest kingslayer and the Crown Breaker
+  // stamp, Naux finds all 12 secrets (+ Jack's letter), the new-game poll (15 YES opens Pepe Gold Hook), Pepe Guesser week 1
+  var GZ11_KING = { bg: 'bg_snow', hat: 'hat_crown', eyes: 'eyes_angry', mouth: 'mouth_tongue', special: 'special_king', clothing: 'clothing_blue', accessory: 'accessory_none', schema_version: 2 };
+  var GZ11_NAUX = { bg: 'bg_night', hat: 'hat_none', eyes: 'eyes_classic', mouth: 'mouth_flat', special: 'special_vampire', clothing: 'clothing_black_hoodie', accessory: 'accessory_none', schema_version: 2 };
+  function gazette11() {
+    var ava = function (k, nick) { return '<span class="gz-ava" data-ava="' + k + '" data-nick="' + esc(nick) + '"></span>'; };
+    var wk = [['Lemon', 14996], ['cHaY', 14985], ['PepeChad', 14954], ['Grandma_Toad', 13973], ['Maatsu', 13276]];
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #11</span><span>Price: 0 PEP</span><span>Thursday edition</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking"><p class="gz-flash">New record</p><h4>👑 13 in a row! The longest reign the pond has ever seen</h4>' +
+      '<div class="gz-wpbox gz-who-box">' + ava('king', 'Dissection') + '<div>' +
+      '<p>' + who('Dissection', true, '14eb7cf5-3b89-4a6f-aa51-86d7dd1bef81') + ' sat on the Pond King throne for about <b>12 and a half hours</b> on Wednesday and beat back <b>13 challengers in a row</b>. Thirteen!</p>' +
+      '<p>Honestly, the editor is amazed. When we made Long Live the King for 10 defenses, we thought it would take weeks. It took one day. The king even got his own crown-wearing <b>King Fren</b> avatar for it, and he wears it well.</p></div></div>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-king">Challenge the Pond King →</button></div></section>' +
+      '<section class="gz-wp"><p class="gz-kick">The kingslayer</p><h4>Who took the crown? A guest!</h4>' +
+      '<div class="gz-wpbox"><img src="passport-assets/crown-breaker.webp" alt="The Crown Breaker stamp" width="110" height="110"><div>' +
+      '<p>At 21:19 UTC the reign ended. The frog who did it was <b>ContractileProteins</b>, and we checked twice: a <b>guest</b>, no Discord, no Passport. What a pity. A deed like that deserves a stamp.</p>' +
+      '<p>So it inspired a brand new one: 🗡️ <b>Crown Breaker</b>. End the reign of a king with <b>13 or more defenses</b> while logged in with Discord, and the stamp plus the <b>Crown Breaker Knight</b> avatar are yours. Only for frens with a Passport. Guests, you know what to do.</p></div></div>' +
+      '<p class="gz-avarow"><img src="avatar-assets/thumbs/special_crown_breaker.webp" alt="The Crown Breaker Knight avatar" width="72" height="72"><span>The Crown Breaker Knight: wanted, one brave fren.</span></p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-pass">Open your Fren Passport →</button><button type="button" class="app-btn gz-king2">Pond King</button></div></section>' +
+      '<section class="gz-cover"><p class="gz-kick">Secret hunters</p><h4>All 12 secrets: Naux did it first</h4>' +
+      '<div class="gz-wpbox gz-who-box">' + ava('naux', 'Naux') + '<div>' +
+      '<p>' + who('Naux', true, '009cb648-7f07-4632-a147-0b6206e5065d') + ' is the first fren to find <b>all 12 secrets</b> hidden in PondOS. Lemon is a couple of hours behind and will probably join him any minute now.</p>' +
+      '<p><b>Congratulations!</b> Especially for you two, and for every other puzzle fan: something special is on the way. A few more brain teasers. Better keep your eyes open.</p></div></div>' +
+      '<figure class="gz-letter"><p class="gz-letter-from"><b>Jack</b> ✓ <span class="gz-letter-ok">🖨️ OK to print</span></p>' +
+      '<blockquote>you rock Fren! Secrets are really hard to find for a non tech-fren!</blockquote><figcaption>18 November, 11:00</figcaption></figure>' +
+      '<p><b>The editor replies:</b> Thank you, Jack! Hard is the point. But a secret nobody finds is no fun either, so the next ones will not all need a tech degree. 🐸</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-write">✏️ Write to the Editor</button></div></section>' +
+      '<section class="gz-pollsec"><p class="gz-kick">Pond Poll</p><h4>Do you want a new game?</h4>' +
+      '<p>Something new is waiting in the back room. <b>15 YES votes and it opens for everyone, automatically.</b> No waiting for the editor: the 15th YES unlocks it.</p>' +
+      '<p class="gz-ng"></p>' +
+      '<div class="gz-poll" data-poll="gz11_new_game" aria-live="polite"><p class="gz-poll-msg">Opening the ballot box…</p></div>' +
+      '<p class="gz-fine">One vote per account; guests one per network. The poll closes on Thursday 26 November, 00:00 UTC.</p></section>' +
+      '<section class="gz-market"><p class="gz-kick">Pepe Guesser, week 1</p><h4>11 points. That is the gap at the top.</h4>' +
+      '<p>Three days of seven are done (Wednesday night, UTC) and the race is tight:</p>' +
+      '<ol class="gz-top5">' + wk.map(function (x) { return '<li><b>' + esc(x[0]) + '</b><span>' + fmt.int(x[1]) + '</span></li>'; }).join('') + '</ol>' +
+      '<p>Remember what is on the line: <b>5,000 PEP for the Weekly Champion.</b> A tie at the top has no winner, so every point counts.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-wpgo">Play today\'s photo →</button><button type="button" class="app-btn gz-hof">Hall of Fame</button></div></section>' +
+      '<p class="gz-foot">See you in the pond. 🐸 The Editor</p></article>';
+  }
   // Issue #10 (Tuesday 17 Nov 2026): the official start, 10 secrets already found, a hooked reader with QR cards,
   // Pond Dominator gone for week 1 on day 2, and the new duels (Pond King loved, Three Lilies underrated)
   function gazette10() {
@@ -4398,7 +4438,7 @@
   // ---------- The Gazette archive: issues #2–#10 live in this file, newer ones come from the Newsroom (Supabase) ----------
   // update_gazette_newsroom.sql: gry_gazette_list (numbers, titles, ads), gry_gazette_issue (one issue).
   var GZ_BUILTIN = [
-    { num: 10, title: 'We are live', at: '2026-11-17' }, { num: 9, title: 'Week 1 pays double', at: '2026-11-15' },
+    { num: 11, title: '13 in a row, 12 secrets, a new game?', at: '2026-11-19' }, { num: 10, title: 'We are live', at: '2026-11-17' }, { num: 9, title: 'Week 1 pays double', at: '2026-11-15' },
     { num: 8, title: 'The week 1 poll', at: '2026-11-14' }, { num: 7, title: 'The Pond goes BETA', at: '2026-11-12' },
     { num: 6, title: 'X unblocked us, the first faucet payout, 1 km', at: '2026-11-09' },
     { num: 5, title: 'The lockout, CoinEx and the first Pond Poll', at: '2026-11-06' }, { num: 4, title: 'The Pepe Guesser leak', at: '2026-11-05' },
@@ -4429,7 +4469,7 @@
     if (!force && gzRemote.t && Date.now() - gzRemote.t < 6e5) return Promise.resolve(gzRemote);
     return rpc('gry_gazette_list', {}).then(function (j) {
       if (!j || !Array.isArray(j.issues)) return gzRemote;
-      gzRemote = { issues: j.issues.filter(function (x) { return +x.num > 10; }), ads: Array.isArray(j.ads) ? j.ads : [], t: Date.now() };
+      gzRemote = { issues: j.issues.filter(function (x) { return +x.num > 11; }), ads: Array.isArray(j.ads) ? j.ads : [], t: Date.now() };
       try { localStorage.setItem(GZ_CACHE, JSON.stringify(gzRemote)); } catch (e) {}
       gzAddAds(); paintMail();
       if (apps.mail && apps.mail.paintDial) apps.mail.paintDial();
@@ -4437,6 +4477,16 @@
     }, function () { return gzRemote; });
   }
   if (mainEl) setTimeout(function () { gzLoadIndex(); }, 2500);
+  // Gazette #11 poll: at 15 YES the server says the new game (Pepe Gold Hook) is open; remember it and say so once
+  if (mainEl) setTimeout(function () {
+    rpc('gry_new_game', {}).then(function (r) {
+      if (!r || !r.open) return;
+      var was = false; try { was = localStorage.getItem('pondos-goldhook-live') === '1'; localStorage.setItem('pondos-goldhook-live', '1'); } catch (e) {}
+      if (was || GOLDHOOK) return;
+      rewardNotice({ bar: 'PondOS - New game unlocked', title: 'Pepe Gold Hook is open!', text: fmt.int(r.yes) + ' frens voted YES. From your next visit it sits in the games menu, with its own Leaders board. Or grab the hook right now.',
+        img: ico('goldhook'), go: 'Play Pepe Gold Hook', open: function () { goldHookApp(); } });
+    }, function () {});
+  }, 4000);
   // a picture: one of this site's own images, or one the owner uploaded to the "gazette" bucket
   function gzImg(src) {
     src = String(src || '');
@@ -4632,7 +4682,7 @@
           }, function () { if (cur === issue) pane.innerHTML = '<article class="gazette"><p class="gz-foot">The printing press is not answering. Try again in a minute.</p></article>'; });
           return;
         }
-        pane.innerHTML = issue === 10 ? gazette10() : issue === 9 ? gazette9() : issue === 8 ? gazette8() : issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        pane.innerHTML = issue === 11 ? gazette11() : issue === 10 ? gazette10() : issue === 9 ? gazette9() : issue === 8 ? gazette8() : issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
@@ -4691,6 +4741,7 @@
         on('.gz-lilies', function () { liliesApp(); });
         on('.gz-wpgo2', wheresPepe);
         on('.gz-hof', function () { wpHallOfFame(); });
+        on('.gz-king2', function () { pondKingApp(); });
         on('.gz-wpad', function () { adPlayer(Math.max(0, adByFile('pepe_guesser.mpg'))); });
         on('.gz-tv', function () { adPlayer(Math.max(0, adByFile('host_wanted.mpg'))); });
         var tvn = pane.querySelector('.gz-tvnote');
@@ -4704,6 +4755,16 @@
         on('.gz-miner', minerApp);
         on('.gz-yeet', function () { yeetApp(); });
         pane.querySelectorAll('.gz-poll').forEach(paintPoll);
+        var avas = pane.querySelectorAll('.gz-ava');   // Gazette #11: the frens' own Fren avatars
+        if (avas.length) avatarOptions().then(function (o) {
+          passportCss();
+          avas.forEach(function (x) { var look = x.getAttribute('data-ava') === 'king' ? GZ11_KING : GZ11_NAUX; x.replaceChildren(avatarStack(o, look, 'The Fren of ' + x.getAttribute('data-nick'))); });
+        }, function () {});
+        var ng = pane.querySelector('.gz-ng');   // how far the new-game poll is from 15 YES
+        if (ng) rpc('gry_new_game', {}).then(function (r) {
+          if (!r || r.yes == null) { ng.remove(); return; }
+          ng.innerHTML = r.open ? '🎉 <b>' + fmt.int(r.yes) + ' YES: it is open!</b> Look in the games menu.' : '<b>' + fmt.int(r.yes) + ' / ' + fmt.int(r.need) + ' YES</b> so far.';
+        }, function () { ng.remove(); });
         on('.gz-online', function () {
           show('write');
           var lb = pane.querySelector('.lt-body'); if (lb) { lb.value = 'Dear Editor, I want FROGAGEDDON online! '; lb.dispatchEvent(new Event('input')); lb.focus(); }
@@ -4936,6 +4997,15 @@
   function adPx(name, cls) { return '<img class="ad-px' + (cls ? ' ' + cls : '') + '" src="../games/img/pond/' + name + '.png" alt="">'; }
   function adLilies() { return '<span class="ad-lilies" aria-hidden="true">' + ['a', 'b', 'c'].map(function (k) { return '<span>' + adPx('lily-pad-' + k) + '<i>?</i></span>'; }).join('') + '</span>'; }
   var ADS = [
+    // Gazette #11 poll: Pepe Gold Hook, the honest miner. Shown only once Gold Hook is open (15 YES votes or the beta flag).
+    { file: 'gold_hook.mpg', added: '2026-11-19', goldhook: true, look: 'fight', kitsch: false, ms: 4800, title: 'Pepe Gold Hook: a REAL miner simulator', ch: 'CH 6 · THE MINING CHANNEL', icon: 'goldhook', scenes: [
+      adBurst('NEW<br>GAME!', 'b-tr') + '<p class="ad-kick">Mining games that play themselves?</p><img class="ad-gh-logo" src="../games/img/gold-hook/ui/pm-logo-goldhook.png" alt="Pepe Gold Hook"><h3 class="ad-big">A <em>REAL</em><br>miner simulator.</h3><p class="ad-sub">No idle clicking. No offline progress. One frog, one hook and a whole lot of dirt.</p>',
+      '<div class="ad-row"><img class="ad-gh-miner" src="../games/img/gold-hook/ad/miner-strain.png" alt=""><div><p class="ad-kick">Warning: honest work ahead</p><h3 class="ad-big">Swing. Drop.<br><em>Pray.</em></h3><p class="ad-sub">The hook swings by itself, you pick the moment. Gold comes up fast. Rocks come up slow. Your pride comes up last.</p></div></div>',
+      adBurst('OUCH!', 'b-br', 'b-red') + '<div class="ad-row"><img class="ad-gh-miner" src="../games/img/gold-hook/ad/miner-sad.png" alt=""><div><p class="ad-kick">Let\'s be honest: it is NOT easy</p><h3 class="ad-big">Miss the goal.<br><em>Run over.</em></h3><p class="ad-sub">20 levels, and every level has a PEP goal. Miss one and the whole run ends. Our test frog cried on level 3. Twice.</p></div></div>',
+      adBurst('WAIT!<br>THERE\'S<br>MORE!', 'b-tr') + '<div class="ad-row"><img class="ad-gh-miner" src="../games/img/gold-hook/ad/miner-boom.png" alt=""><div><p class="ad-kick">Pulled up a giant rock?</p><h3 class="ad-big">Bad catch?<br><em>Blow it up!</em></h3><p class="ad-sub">Press D while reeling in. Up to 3 sticks. Between levels the shop sells faster reels, stronger arms and a bigger clock.</p></div></div>',
+      adTesti(adFren('clothing_blue', 'mouth_shout', 'eyes_bloodshot', 'hat_hardhat', 'accessory_none'), 'I thought gold mining would be relaxing. Then a rock took forever to come up. I aged. My frens beat my score.', 'A humbled miner, illustrated') + '<p class="ad-fine">*A drawing. The rock was real (in the game).</p>',
+      adGlitter() + '<div class="ad-row"><img class="ad-gh-miner" src="../games/img/gold-hook/ad/miner-cheer.png" alt=""><div><p class="ad-kick ad-blink">Think you can do better?</p><h3 class="ad-big">Check your<br><em>frens\' scores!</em></h3><p class="ad-sub">The server replays every run, so the Leaders board does not lie. Find out who in the pond can actually dig.</p></div></div>' + adPhone('☎ NO PHONE · IT\'S IN THE GAMES MENU') + '<p class="ad-fine">Free. Game PEP are points, never real coins.</p><div class="ad-ctas"><button type="button" class="ad-cta ad-ghbtn">Grab the hook →</button><button type="button" class="ad-cta ad-ghlead">Frens\' scores</button></div>'
+    ] },
     // 14 November: POND DUELS (Pond King and Battle of Three Lilies) open on the PondOS desktop
     { file: 'pond_duels.mpg', added: '2026-11-14', look: 'gameshow', kitsch: true, ms: 4800, title: 'POND DUELS: the game show', ch: 'CH 3 · POND DUELS, THE GAME SHOW', icon: 'pond-king', scenes: [
       adBurst('NEW<br>SHOW!', 'b-tr', 'b-pink') + '<p class="ad-kick">The only game show where nobody has to be online at the same time!</p><div class="ad-vs">' + adPx('king-stamp') + '<b>VS</b>' + adPx('lilies') + '</div><h3 class="ad-big">It\'s time for<br><em>POND DUELS!</em></h3><p class="ad-sub">Two brand-new duels, sitting right on your PondOS desktop. Play now. Your rival plays whenever.</p>',
@@ -5084,7 +5154,7 @@
   var adSeen = function () { try { return JSON.parse(localStorage.getItem('pondos-ads-seen') || '[]'); } catch (e) { return []; } };
   // /meme/?adpreview shows ads that are scheduled for later (for the editor; nothing is stored)
   var AD_PREVIEW = /[?&]adpreview\b/.test(location.search);
-  ADS = ADS.filter(function (ad) { return (!ad.from || AD_PREVIEW || Date.now() >= Date.parse(ad.from)) && (FREN || !ad.fren); });
+  ADS = ADS.filter(function (ad) { return (!ad.from || AD_PREVIEW || Date.now() >= Date.parse(ad.from)) && (FREN || !ad.fren) && (GOLDHOOK || !ad.goldhook); });
   function adByFile(f) { for (var k = 0; k < ADS.length; k++) if (ADS[k].file === f) return k; return -1; }
   var adNew = function (ad) { return !!ad.added && Date.now() - Date.parse(ad.added + 'T00:00:00Z') < 21 * 864e5 && adSeen().indexOf(ad.file) < 0; };
   function adBadges() {
@@ -5136,6 +5206,8 @@
       var fb2 = A.body.querySelector('.ad-frogbtn'); if (fb2) fb2.addEventListener('click', function () { pondWarsApp(); });
       var frb = A.body.querySelector('.ad-frenbtn'); if (frb) frb.addEventListener('click', function () { avatarMaker(); });
       var ppb = A.body.querySelector('.ad-passbtn'); if (ppb) ppb.addEventListener('click', function () { frenPassport(); });
+      var ghb = A.body.querySelector('.ad-ghbtn'); if (ghb) ghb.addEventListener('click', function () { goldHookApp(); });
+      var ghl = A.body.querySelector('.ad-ghlead'); if (ghl) ghl.addEventListener('click', function () { highScores('goldhook'); });
       var kgb = A.body.querySelector('.ad-kingbtn'); if (kgb) kgb.addEventListener('click', function () { pondKingApp(); });
       var lyb = A.body.querySelector('.ad-lilybtn'); if (lyb) lyb.addEventListener('click', function () { liliesApp(); });
       gzWire(A.body);

@@ -2463,3 +2463,54 @@ footer.foot a { color: #edf3e3; }
   object-fit: contain;
   border-radius: 0;
 }
+
+/* Frog Mail in dark mode: no white sheets and no near-black writing box (unreadable). The letter is a dark grey
+   panel and the text fields are a clearly lighter grey with white text. Rule for every PondOS window in dark mode. */
+@media (prefers-color-scheme: dark) {
+:root.pondos:not([data-theme="light"]) .letter, :root.pondos:not([data-theme="light"]) .lt-done, :root.pondos:not([data-theme="light"]) .letters { background: #3c403c; color: #eef2ea; }
+:root.pondos:not([data-theme="light"]) .letter .ac-in, :root.pondos:not([data-theme="light"]) .letter textarea.ac-in, :root.pondos:not([data-theme="light"]) .letter input.ac-in { background: #59625a !important; color: #ffffff !important; caret-color: #fff; }
+:root.pondos:not([data-theme="light"]) .letter .ac-in::placeholder { color: #d3dad0; opacity: 1; }
+:root.pondos:not([data-theme="light"]) .letter .hs-note, :root.pondos:not([data-theme="light"]) .lt-item .lt-peek { color: #cfd8cc; }
+:root.pondos:not([data-theme="light"]) .lt-item { border-bottom-color: #5a615a; }
+:root.pondos:not([data-theme="light"]) .lt-done a, :root.pondos:not([data-theme="light"]) .letters a { color: #9fe0b0; }
+}
+:root.pondos[data-theme="dark"] .letter, :root.pondos[data-theme="dark"] .lt-done, :root.pondos[data-theme="dark"] .letters { background: #3c403c; color: #eef2ea; }
+:root.pondos[data-theme="dark"] .letter .ac-in, :root.pondos[data-theme="dark"] .letter textarea.ac-in, :root.pondos[data-theme="dark"] .letter input.ac-in { background: #59625a !important; color: #ffffff !important; caret-color: #fff; }
+:root.pondos[data-theme="dark"] .letter .ac-in::placeholder { color: #d3dad0; opacity: 1; }
+:root.pondos[data-theme="dark"] .letter .hs-note, :root.pondos[data-theme="dark"] .lt-item .lt-peek { color: #cfd8cc; }
+:root.pondos[data-theme="dark"] .lt-item { border-bottom-color: #5a615a; }
+:root.pondos[data-theme="dark"] .lt-done a, :root.pondos[data-theme="dark"] .letters a { color: #9fe0b0; }
+
+/* Desktop icon labels get a dark box (.desk .icons a span); that rule also caught the badges inside the icon:
+   the LAN Party online dot turned dark in the middle and the PEP-TV number sat off-centre. Badges keep their own look. */
+.pondos body[data-page="index"] .desk .icons a .icon-badge, .pondos body[data-page="index"] .desk-corner a .icon-badge,
+.pondos body[data-page="index"] .desk .icons a:hover .icon-badge, .pondos body[data-page="index"] .desk .icons a.sel .icon-badge {
+  padding: 1px 5px; background: #0b3a1c; border: 0; text-shadow: none; }
+.pondos body[data-page="index"] .desk .icons a .icon-badge span, .pondos body[data-page="index"] .desk-corner a .icon-badge span,
+.pondos body[data-page="index"] .desk .icons a:hover .icon-badge span, .pondos body[data-page="index"] .desk .icons a.sel .icon-badge span {
+  padding: 0; background: transparent; border: 0; text-shadow: none; }
+.pondos body[data-page="index"] .desk .icons a .icon-badge .lan-dot, .pondos body[data-page="index"] .desk-corner a .icon-badge .lan-dot,
+.pondos body[data-page="index"] .desk .icons a:hover .icon-badge .lan-dot, .pondos body[data-page="index"] .desk .icons a.sel .icon-badge .lan-dot {
+  width: 9px; height: 9px; background: #3ddc6a; }
+.pondos body[data-page="index"] .desk .icons a .mail-badge, .pondos body[data-page="index"] .desk-corner a .mail-badge,
+.pondos body[data-page="index"] .desk .icons a:hover .mail-badge, .pondos body[data-page="index"] .desk .icons a.sel .mail-badge {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; padding: 0 4px;
+  border: 0; border-radius: 9px; background: #d61f1f; color: #fff; font: 700 10px/1 var(--f-chrome); text-shadow: none; }
+.pondos body[data-page="index"] .desk .icons a .mail-badge[hidden] { display: none; }
+
+/* Gazette #11: frens with their own Fren avatars, the Crown Breaker knight, the week's top 5 */
+.gz-who-box .gz-ava { flex: none; width: 110px; height: 110px; display: block; }
+.gz-who-box .gz-ava .fa-stack { width: 110px; height: 110px; }
+.gz-avarow { display: flex; align-items: center; gap: 10px; }
+.gz-avarow img { image-rendering: auto; border: 2px solid #c9b16a; background: #fff8e1; }
+.gz-top5 { margin: 6px 0 8px; padding-left: 26px; }
+.gz-top5 li { display: flex; justify-content: space-between; max-width: 280px; padding: 2px 0; border-bottom: 1px dotted #b8b29a; }
+.gz-top5 li:first-child b::after { content: ' 👑'; }
+.gz-ng { font-size: 14px; }
+/* Pepe Gold Hook ad: the game's own pixel art, kept crisp */
+.ad-gh-logo { display: block; width: min(100%, 380px); height: auto; image-rendering: pixelated; margin: 4px 0; }
+.ad-gh-miner { flex: none; height: 150px; width: auto; image-rendering: pixelated; filter: drop-shadow(4px 4px 0 #000); }
+@media (max-width: 760px) { .ad-gh-miner { height: 105px; } }
+/* the Gazette is a paper page in both themes; in dark mode its grey buttons kept the dark paper ink: unreadable */
+@media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) .gazette .app-btn:not(.go) { color: #f2f5ee; } }
+:root.pondos[data-theme="dark"] .gazette .app-btn:not(.go) { color: #f2f5ee; }
