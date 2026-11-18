@@ -64,7 +64,11 @@ test('the checks: a good sprite passes, every kind of mistake is named', () => {
   assert.equal(formatFor('care_froglet_play_01.png'), 'FINE');
   assert.equal(formatFor('care_froglet_play_03.png'), 'FINE');
   assert.equal(formatFor('care_froglet_rest_04.png'), 'FINE');
-  assert.equal(formatFor('care_tadpole_play_01.png'), 'A');
+  assert.equal(formatFor('care_tadpole_play_01.png'), 'FINE');
+  assert.equal(formatFor('care_clean_04.png'), 'FINE');
+  assert.equal(formatFor('care_tadpole_rest_03.png'), 'FINE');
+  assert.equal(formatFor('froglet_depart_walk_02.png'), 'FINE');
+  assert.equal(formatFor('tadpole_depart_01.png'), 'FINE');
   assert.deepEqual(FORMATS.FINE, { size: 128, grid: 1, maxColours: 4096, foot: 124 });
   // A single-pixel colour is valid for fine pixel art only, not for the original coarse profile.
   const fine = decodePng(makePng(128, 128, (x, y) => (x === 41 && y === 21 ? [200, 0, 0, 255] : frog(x, y))));
