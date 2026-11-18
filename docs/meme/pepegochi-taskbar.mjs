@@ -6,12 +6,13 @@ import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
 // and the hop out of the PEPEGOCHI.EXE window.
 import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261116room1';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261118desktop1';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261118events1';
+import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
 import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118desktop1';
 
-import { createBond } from './pepegochi-bond.mjs?v=20261116sass1';
+import { createBond } from './pepegochi-bond.mjs?v=20261118events1';
 
-import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261118desktop1';
+import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261118events1';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
 const NEEDS = new Set(['hunger', 'hygiene', 'mood', 'energy']);
@@ -95,13 +96,14 @@ export function hopPath(from, to, steps = 36) {
 
 // One state read on entry, then only when the tab returns after a break, auth changes,
 // or the PEPEGOCHI.EXE iframe signals that a player action succeeded.
-export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = () => Date.now() }) {
+export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = () => Date.now(), subscribeSiteEvents = () => () => {} }) {
   const start = bar && bar.querySelector('.start');
   if (!start) return () => {};
   let storage;
   try { storage = window.localStorage; } catch {}
   const bond = createBond({ storage, now });
   const arcade = createArcadeObserver();
+  const siteEvents = createSiteEventObserver();
   let disposed = false, lastLife = null;
   let desktop = null;
   const img_base = base + 'games/img/pepegochi/';
@@ -433,7 +435,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       generation++;
       cancelQuiz();               // the old account's question or ranking must not stay on screen
       conversation?.close({ reset: true });
-      bond.reset(); arcade.reset(); clearToy(); lastLife = null;
+      bond.reset(); arcade.reset(); siteEvents.reset(); clearToy(); lastLife = null;
       paint(describeTaskbarFrog(null));
       hatched = false; server = null; updateFactButton();
     }
@@ -447,7 +449,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       if (disposed || requestGeneration !== generation || !cur || !cur.discord || cur.userId !== id) return;
       if (lastLife !== state?.pet?.life_id) {
         desktop?.reset();
-        conversation?.close({ reset: true }); arcade.reset(); clearToy(); lastLife = state?.pet?.life_id || null;
+        conversation?.close({ reset: true }); arcade.reset(); siteEvents.reset(); clearToy(); lastLife = state?.pet?.life_id || null;
       }
       const view = describeTaskbarFrog(state);
       if (shownView?.sprite !== view.sprite || shownView?.label !== view.label) { desktop?.stop(); conversation?.close(); clearToy(); }
@@ -497,7 +499,13 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     setPose: p => { desktop?.stop(); cancelMotion(); setAct(p); if (!p) queueMotion(); }, animate: animateExpression, showToy, openRoom: open,
     closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
     openQuiz: requestQuiz, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
-    canReact: () => !balloon && !desktop?.active && document.activeElement?.tagName !== 'IFRAME', now });
+    canReact: () => !balloon && !desktop?.active && !document.querySelector('.reward98') && document.activeElement?.tagName !== 'IFRAME', now });
+  const unsubscribeSiteEvents = subscribeSiteEvents(event => {
+    const current = session();
+    if (disposed || !current?.discord || current.userId !== lastUser) return;
+    const action = siteEvents.accept(event, { owner: lastUser, life: lastLife, hasPet: shownView?.hasPet });
+    if (action) conversation.react(action);
+  });
   desktop = mountDesktopCompanion({ slot, img, getView: () => shownView, base, now,
     eligible: () => !disposed && !balloon && !bond.muted && !!lastLife && document.activeElement?.tagName !== 'IFRAME' && !document.fullscreenElement,
     mayStart: () => !act && !conversation.busy && !document.querySelector('.pg-companion-fly'),
@@ -509,7 +517,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   refresh(true);
   queueMotion();
   return () => {
-    disposed = true; generation++; quizIntent++; bond.touch(); arcade.reset(); clearToy();
+    disposed = true; generation++; quizIntent++; bond.touch(); arcade.reset(); siteEvents.reset(); unsubscribeSiteEvents(); clearToy();
     desktop?.dispose();
     window.removeEventListener('offline', onOffline);
     window.removeEventListener('online', onOnline);
