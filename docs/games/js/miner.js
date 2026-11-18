@@ -445,11 +445,11 @@
   function sparks(x, y) {
     if (reduced) return;
     const layer = $('stage');
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 11; i++) {
       const s = document.createElement('i'); s.className = 'mn-spark';
-      const a = Math.random() * Math.PI * 2, d = 30 + Math.random() * 40;
-      s.style.cssText = `left:${x}px;top:${y}px;--dx:${(Math.cos(a) * d).toFixed(0)}px;--dy:${(Math.sin(a) * d).toFixed(0)}px`;
-      layer.append(s); setTimeout(() => s.remove(), 650);
+      const a = Math.random() * Math.PI * 2, d = 28 + Math.random() * 52, sz = 5 + Math.random() * 6;
+      s.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;margin:${(-sz / 2).toFixed(1)}px 0 0 ${(-sz / 2).toFixed(1)}px;--dx:${(Math.cos(a) * d).toFixed(0)}px;--dy:${(Math.sin(a) * d).toFixed(0)}px`;
+      layer.append(s); setTimeout(() => s.remove(), 700);
     }
   }
 
