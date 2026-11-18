@@ -1,4 +1,5 @@
 import { TOYS, healthyCompanion, playableCompanion } from './pepegochi-personality.mjs?v=20261118dialog1';
+import { validCaseAnswer } from './pepegochi-case-files.mjs?v=20261118case1';
 // Cosmetic conversations; actual needs and care history come from the server view.
 const lines = {
   secretFound: ['Another mystery solved, fren. I know a few more whispers.', 'A fresh discovery in the Passport. My tiny detective hat approves.'],
@@ -96,7 +97,7 @@ export function companionReply(view, action = 'hello', n = 0, context = {}) {
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
 // No polling or network calls. Optional bond stores cosmetic memories only.
-export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, readRumors, openPassport, now = () => Date.now() }) {
+export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, readRumors, openPassport, caseClient, onCaseComplete = () => {}, now = () => Date.now() }) {
   let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
   let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
   let lastActivity = now(), bornAt = now();
@@ -204,6 +205,64 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     if (rumorActions.childElementCount) reply.after(rumorActions);
     reposition(); panel.scrollTop = 0;
   }
+  async function showCase(hint = false) {
+    clearRumors();
+    const target = panel, ticket = rumorTicket;
+    reply.style.whiteSpace = 'pre-line';
+    reply.textContent = 'Checking the sealed case file...';
+    setPose(null);
+    const result = await caseClient.read(hint);
+    if (panel !== target || ticket !== rumorTicket) return;
+    renderCase(result);
+  }
+  function renderCase(result) {
+    clearRumors();
+    const target = panel, ticket = rumorTicket, v = result?.view;
+    const current = () => !!panel && panel === target && rumorTicket === ticket;
+    if (result?.status !== 'ok' || !v) {
+      reply.textContent = result?.status === 'signed-out' ? 'Log in with Discord to open the case file.' : 'The case file is unavailable right now. Try opening it again later.';
+      return;
+    }
+    if (v.status === 'closed') { reply.textContent = 'No sealed case is open yet. Keep an eye on the pond, fren.'; return; }
+    rumorActions = el('div', 'pg-case-actions');
+    function action(label, fn) { const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', fn); rumorActions.append(b); return b; }
+    if (v.status === 'complete') {
+      onCaseComplete();
+      reply.textContent = `${v.title}\nCase closed · ${v.completed} / ${v.total}\n\n${v.message}\n\n${v.credit}`;
+      if (openPassport) action('Open Fren Passport', () => { close(); openPassport(); });
+    } else {
+      const prefix = result.outcome === 'correct' ? 'Excellent detective work! A new file has arrived.\n\n' : '';
+      reply.textContent = `${prefix}${v.title}\n${v.completed} / ${v.total} solved\n\n${v.completed === 0 ? v.intro + '\n\n' : ''}${v.stepTitle}\n${v.clue}${v.hint ? '\n\nHint: ' + v.hint : ''}`;
+      const form = el('form', 'pg-case-form');
+      const label = el('label', 'pg-case-label', 'Your answer (English letters or numbers)');
+      const input = el('input', 'pg-case-input'); input.type = 'text'; input.maxLength = 80; input.autocomplete = 'off'; input.spellcheck = false;
+      label.append(input); form.append(label);
+      const submit = el('button', 'pg-fact-a', 'Check answer'); submit.type = 'submit'; form.append(submit);
+      const out = el('p', 'pg-case-status'); out.setAttribute('role', 'status');
+      const feedback = result.outcome === 'wrong' ? 'Not quite. Try another answer, fren.' : result.outcome === 'rate_limited' ? 'Too many attempts.' : result.outcome === 'stale' ? 'Your case has moved on. Here is the current file.' : result.outcome === 'invalid' ? 'That answer format was not accepted.' : '';
+      out.textContent = [feedback, v.retryAfter ? `You can try again in about ${v.retryAfter} seconds.` : ''].filter(Boolean).join(' ');
+      let pending = false, requestId = null, lastAnswer = null;
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (pending || !current()) return;
+        const answer = input.value.trim();
+        if (!validCaseAnswer(answer)) { out.textContent = 'Enter 3–80 English letters or digits (spaces and common punctuation are fine).'; return; }
+        if (answer !== lastAnswer || !requestId) {
+          if (!win.crypto?.randomUUID) { out.textContent = 'A secure browser is needed to submit an answer.'; return; }
+          requestId = win.crypto.randomUUID(); lastAnswer = answer;
+        }
+        pending = true; submit.disabled = input.disabled = true; out.textContent = 'Checking your answer...';
+        const checked = await caseClient.answer(v.step, answer, requestId);
+        if (!current()) return;
+        if (checked.status === 'ok') { renderCase(checked); return; }
+        pending = false; submit.disabled = input.disabled = false; out.textContent = 'Could not confirm the answer. Retry or reopen the case to check your saved progress.';
+      });
+      rumorActions.append(form, out);
+      if (!v.hint) action('Ask for a hint', () => showCase(true));
+    }
+    action('Refresh case', () => showCase());
+    reply.after(rumorActions); reposition(); panel.scrollTop = 0;
+  }
   function say(action = 'hello') {
     clearNotice(); clearRumors();
     if (action === 'hello') action = bond?.take() || action;
@@ -240,6 +299,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
         add('Pond Rumors', () => showRumors());
         add('Secret Journal', () => showRumors(true));
       }
+      if (caseClient) add('Pond Case Files', () => showCase());
       add('Our memories', () => say('memories'));
       if (bond) {
         add('Your favourite toy?', () => say('favourite'));

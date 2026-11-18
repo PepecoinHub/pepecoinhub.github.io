@@ -594,6 +594,12 @@
       "title": "Map Fragment VI",
       "hint": "One of six pieces of an old pond map.",
       "status": "planned"
+    },
+    {
+      "id": "founders_letter",
+      "title": "The Founder's Letter",
+      "description": "Recovered the sealed case file.",
+      "status": "planned"
     }
   ],
   "items": [

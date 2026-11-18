@@ -6,7 +6,8 @@ import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
 // and the hop out of the PEPEGOCHI.EXE window.
 import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261116room1';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261118rumors1';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261118case1';
+import { createCaseClient } from './pepegochi-case-files.mjs?v=20261118case1';
 import { createRumorReader } from './pepegochi-rumors.mjs?v=20261118rumors1';
 import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118dialog1';
 
@@ -99,7 +100,7 @@ export function hopPath(from, to, steps = 36) {
 
 // One state read on entry, then only when the tab returns after a break, auth changes,
 // or the PEPEGOCHI.EXE iframe signals that a player action succeeded.
-export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = () => Date.now(), rumorsEnabled = true, openPassport }) {
+export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = () => Date.now(), rumorsEnabled = true, openPassport, onCaseComplete = () => {} }) {
   const start = bar && bar.querySelector('.start');
   if (!start) return () => {};
   let storage;
@@ -107,6 +108,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   const bond = createBond({ storage, now });
   const arcade = createArcadeObserver();
   const rumors = createRumorReader({ session, rpc, now });
+  const caseClient = createCaseClient({ session, rpc });
   let disposed = false, lastLife = null;
   let desktop = null;
   const img_base = base + 'games/img/pepegochi/';
@@ -453,6 +455,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       generation++;
       cancelQuiz();               // the old account's question or ranking must not stay on screen
       rumors.invalidate();
+      caseClient.invalidate();
       conversation?.close({ reset: true });
       bond.reset(); arcade.reset(); clearToy(); lastLife = null;
       paint(describeTaskbarFrog(null));
@@ -468,7 +471,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       if (disposed || requestGeneration !== generation || !cur || !cur.discord || cur.userId !== id) return;
       if (lastLife !== state?.pet?.life_id) {
         desktop?.reset();
-        conversation?.close({ reset: true }); rumors.invalidate(); arcade.reset(); clearToy(); lastLife = state?.pet?.life_id || null;
+        conversation?.close({ reset: true }); rumors.invalidate(); caseClient.invalidate(); arcade.reset(); clearToy(); lastLife = state?.pet?.life_id || null;
       }
       const view = describeTaskbarFrog(state);
     if (shownView?.sprite !== view.sprite || shownView?.label !== view.label || shownView?.playReady !== view.playReady || shownView?.needAttention !== view.needAttention) { desktop?.stop(); conversation?.close(); clearToy(); }
@@ -526,7 +529,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     setPose: p => { desktop?.stop(); cancelMotion(); setAct(p); if (!p) queueMotion(); }, animate: animateExpression, showToy, openRoom: open,
     closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
     openQuiz: requestQuiz, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
-    readRumors: rumorsEnabled ? rumors.read : null, openPassport,
+    readRumors: rumorsEnabled ? rumors.read : null, openPassport, caseClient: rumorsEnabled ? caseClient : null,
+    onCaseComplete: () => { rumors.invalidate(); onCaseComplete(); },
     canReact: () => !balloon && !desktop?.active && document.activeElement?.tagName !== 'IFRAME', now });
   desktop = mountDesktopCompanion({ slot, img, getView: () => shownView, base, now,
     eligible: manual => !disposed && !balloon && (manual || !bond.muted) && !!lastLife && document.activeElement?.tagName !== 'IFRAME' && !document.fullscreenElement,
@@ -539,7 +543,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   refresh(true);
   queueMotion();
   return () => {
-    disposed = true; generation++; quizIntent++; rumors.invalidate(); bond.touch(); arcade.reset(); clearToy();
+    disposed = true; generation++; quizIntent++; rumors.invalidate(); caseClient.invalidate(); bond.touch(); arcade.reset(); clearToy();
     desktop?.dispose();
     window.removeEventListener('offline', onOffline);
     window.removeEventListener('online', onOnline);
