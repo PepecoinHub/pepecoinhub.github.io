@@ -1,0 +1,12 @@
+file,old_bbox,new_bbox,canvas,color_count,alpha_values,2x_grid
+pepegochi_froglet_idle.png,70x94+24+30,66x94+30+30,128x128,2603,2,no
+pepegochi_froglet_hungry.png,88x94+24+30,69x94+32+30,128x128,2570,2,no
+pepegochi_froglet_dirty.png,82x94+24+30,78x94+30+30,128x128,2810,2,no
+pepegochi_froglet_moody.png,70x94+24+30,65x94+30+30,128x128,2642,2,no
+pepegochi_froglet_tired.png,70x94+24+30,71x94+29+30,128x128,2536,2,no
+pepegochi_froglet_neglected.png,70x94+24+30,66x94+30+30,128x128,2791,2,no
+pepegochi_froglet_packing.png,82x94+24+30,70x94+31+30,128x128,2809,2,no
+pepegochi_froglet_recovering.png,70x94+24+30,66x94+30+30,128x128,2659,2,no
+pepegochi_adult_hungry.png,96x116+26+8,83x116+28+8,128x128,3312,2,no
+pepegochi_adult_dirty.png,88x116+26+8,80x116+27+8,128x128,3463,2,no
+pepegochi_adult_recovering.png,74x116+26+8,70x116+27+8,128x128,3054,2,no

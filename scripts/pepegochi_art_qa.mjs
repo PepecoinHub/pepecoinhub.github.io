@@ -9,6 +9,7 @@
 //
 // Format A (game sprites and room props): 128 x 128, 2 x 2 pixel grid, at most 64 colours, feet on the line y = 124.
 // Format B (taskbar companion):           48 x 48, 1 x 1 pixel grid, at most 32 colours, feet on the line y = 47.
+// Format FINE (explicit A16 replacement list): 128 x 128, 1 x 1 grid, at most 4096 opaque colours, foot y = 124.
 // "Feet on the line y = N" means the art stands on that line: its lowest visible row of pixels is y = N - 1.
 // Both: RGBA with real transparency (every pixel fully opaque or fully transparent), not empty, no edge touching
 // unless the art leaves the frame on purpose (allowEdge).
@@ -20,7 +21,14 @@ import { fileURLToPath } from 'node:url';
 export const FORMATS = {
   A: { size: 128, grid: 2, maxColours: 64, foot: 124 },
   B: { size: 48, grid: 1, maxColours: 32, foot: 47 },
+  FINE: { size: 128, grid: 1, maxColours: 4096, foot: 124 },
 };
+
+// Only approved higher-detail room sprites opt in; props, care frames and taskbar retain their existing profiles.
+const FINE_TOP = new Map([
+  ...['idle', 'hungry', 'dirty', 'moody', 'tired', 'neglected', 'packing', 'recovering'].map(s => [`pepegochi_froglet_${s}.png`, 30]),
+  ...['hungry', 'dirty', 'recovering'].map(s => [`pepegochi_adult_${s}.png`, 8]),
+]);
 
 // ---------- a small PNG decoder: 8-bit greyscale, RGB, palette, grey+alpha or RGBA, not interlaced ----------
 export function decodePng(buf) {
@@ -75,7 +83,7 @@ export function bbox({ width, height, rgba }) {
 }
 
 // ---------- the checks ----------
-export function formatFor(file) { return /^tb_/.test(basename(file)) ? 'B' : 'A'; }
+export function formatFor(file) { return FINE_TOP.has(basename(file)) ? 'FINE' : /^tb_/.test(basename(file)) ? 'B' : 'A'; }
 
 export function checkImage(img, { format = 'A', foot, prop = false, allowEdge = false } = {}) {
   const F = FORMATS[format], footY = foot ?? F.foot, problems = [], { width: w, height: h, rgba } = img;
@@ -113,6 +121,13 @@ export function checkImage(img, { format = 'A', foot, prop = false, allowEdge = 
 export function checkFile(file, opts = {}) {
   const img = decodePng(readFileSync(file));
   const r = checkImage(img, { ...opts, format: opts.format || formatFor(file) });
+  if ((opts.format || formatFor(file)) === 'FINE') {
+    const expected = FINE_TOP.get(basename(file));
+    if (expected === undefined) r.problems.push('FINE profile requires an explicitly allowlisted sprite');
+    if (img.colourType !== 6) r.problems.push('FINE sprites must be RGBA');
+    if (expected !== undefined && r.bbox && r.bbox[1] !== expected) r.problems.push(`top y = ${r.bbox[1]}, expected ${expected}`);
+    r.ok = r.problems.length === 0;
+  }
   if (opts.like && r.bbox) Object.assign(r, compareWith(r.bbox, bbox(decodePng(readFileSync(opts.like))), r.problems));
   return r;
 }
@@ -130,7 +145,7 @@ export function compareWith(box, old, problems = []) {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const args = process.argv.slice(2), files = args.filter(a => !a.startsWith('--'));
   const opt = k => { const a = args.find(x => x.startsWith('--' + k)); return a == null ? undefined : (a.split('=')[1] ?? true); };
-  if (!files.length) { console.error('usage: node scripts/pepegochi_art_qa.mjs [--format=A|B] [--foot=N] [--prop] [--allow-edge] file.png ...'); process.exit(2); }
+  if (!files.length) { console.error('usage: node scripts/pepegochi_art_qa.mjs [--format=A|B|FINE] [--foot=N] [--prop] [--allow-edge] file.png ...'); process.exit(2); }
   let bad = 0;
   for (const f of files) {
     let r;
@@ -143,3 +158,4 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   }
   process.exit(bad ? 1 : 0);
 }
+
