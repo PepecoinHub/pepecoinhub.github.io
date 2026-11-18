@@ -26,6 +26,22 @@ export const FORMATS = {
 
 // Only approved higher-detail room sprites and care frames opt in; other assets retain their existing profiles.
 const FINE_TOP = new Map([
+  ['care_clean_01.png', 9],
+  ['care_feed_02.png', 9],
+  ['care_feed_03.png', 9],
+  ['care_rest_03.png', 9],
+  ['care_tadpole_feed_01.png', 50],
+  ['care_tadpole_feed_03.png', 50],
+  ['care_tadpole_feed_04.png', 50],
+  ['depart_01.png', 8],
+  ['depart_02.png', 8],
+  ['depart_03.png', 8],
+  ['depart_04.png', 8],
+  ['depart_05.png', 8],
+  ['depart_06.png', 8],
+  ['depart_turn_02.png', 8],
+  ['pepegochi_hatch_01.png', 42],
+  ['pepegochi_hatch_02.png', 42],
   ...['idle', 'hungry', 'dirty', 'moody', 'tired', 'neglected', 'packing', 'recovering'].map(s => [`pepegochi_froglet_${s}.png`, 30]),
   ...['hungry', 'dirty', 'recovering'].map(s => [`pepegochi_adult_${s}.png`, 8]),
   ...['hungry', 'dirty', 'moody', 'tired', 'neglected', 'packing', 'recovering'].map(s => [`pepegochi_tadpole_${s}.png`, 50]),
