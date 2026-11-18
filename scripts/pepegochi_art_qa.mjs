@@ -24,11 +24,12 @@ export const FORMATS = {
   FINE: { size: 128, grid: 1, maxColours: 4096, foot: 124 },
 };
 
-// Only approved higher-detail room sprites opt in; props, care frames and taskbar retain their existing profiles.
+// Only approved higher-detail room sprites and feeding frames opt in; other assets retain their existing profiles.
 const FINE_TOP = new Map([
   ...['idle', 'hungry', 'dirty', 'moody', 'tired', 'neglected', 'packing', 'recovering'].map(s => [`pepegochi_froglet_${s}.png`, 30]),
   ...['hungry', 'dirty', 'recovering'].map(s => [`pepegochi_adult_${s}.png`, 8]),
   ...['hungry', 'dirty', 'moody', 'tired', 'neglected', 'packing', 'recovering'].map(s => [`pepegochi_tadpole_${s}.png`, 50]),
+  ...['01', '02', '03', '04'].map(s => [`care_froglet_feed_${s}.png`, 30]),
 ]);
 
 // ---------- a small PNG decoder: 8-bit greyscale, RGB, palette, grey+alpha or RGBA, not interlaced ----------
