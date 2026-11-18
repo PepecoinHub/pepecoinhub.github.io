@@ -97,14 +97,14 @@ test('Fresh Fren is live only together with its server award path', () => {
   assert.match(afterSave, /if games\.passport_open\(\) then\s+insert into games\.passport_badges/, 'award waits for the season start');
 });
 
-test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered looks, valid defaults', () => {
+test('avatar manifest v2: 512 canvas layers, part thumbnails, 58320 offered looks, valid defaults', () => {
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
   assert.equal(manifest.schema_version, 2);
   // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
   assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 27]);
   // the only looks a player can actually compose and save are built from the non-unlock (base) ids
-  assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 6, 9, 9, 5, 6, 1]);
-  assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 72900, 'offered looks');
+  assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 6, 9, 9, 4, 6, 1]);   // the Crown is a reward since 2026-11-18
+  assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 58320, 'offered looks');
   assert.equal(new Set(ids).size, ids.length);
   assert.deepEqual(manifest.layers_order, ['bg', 'base', 'clothing', 'mouth', 'eyes', 'hat', 'accessory', 'special']);
   assert.equal(manifest.defaults.base, 'base_frog');
@@ -163,6 +163,12 @@ test('avatar save RPC v2: Discord identity, non-unlock allowlists, no user or ba
   assert.match(avatarSql, new RegExp('revoke all on function public\\.gry_passport_avatar_save' + sixText.source + ' from public, anon, authenticated'));
   assert.match(avatarSql, new RegExp('grant execute on function public\\.gry_passport_avatar_save' + sixText.source + ' to authenticated;'));
   assert.equal([...avatarSql.matchAll(/\bas \$\$/g)].length, [...avatarSql.matchAll(/^\$\$;/gm)].length);
+  // the stand-alone migration for the live site carries the very same save function (and nothing else)
+  const crownSql = readFileSync(new URL('../games/supabase/update_avatar_crown.sql', import.meta.url), 'utf8');
+  const crownFn = crownSql.split('create or replace function public.gry_passport_avatar_save')[1].split('$$;')[0];
+  assert.equal(crownFn, fn);
+  assert.doesNotMatch(crownSql, /function public\.gry_passport_state/);
+  assert.match(fn, /\('hat_crown', 'long_live_the_king'\)/);
   // the Passport read path carries the saved look
   assert.match(avatarSql, /'avatar', look,/);
 });
