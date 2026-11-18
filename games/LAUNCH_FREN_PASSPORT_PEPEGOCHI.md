@@ -6,7 +6,7 @@ PepeGochi launches after the Passport (owner, 2026-11-09): it stays behind `?bet
 
 ## PepeGochi release bundle — owner decision, 2026-11-16
 
-[PR #353](https://github.com/PepecoinHub/pepecoinhub.github.io/pull/353) is part of the full PepeGochi product release, not a separate early launch. Include the complete companion implementation: interactions and local memories, A10 animations, cheeky personality, favourite toys and arcade reactions.
+[PR #353](https://github.com/PepecoinHub/pepecoinhub.github.io/pull/353) is part of the full PepeGochi product release, not a separate early launch. Include the complete companion implementation: interactions and local memories, A10 animations, cheeky personality, favourite toys and arcade reactions, room A11 and living desktop A12 (pending browser and visual review).
 
 **Release on hold. No merge to `main`, deployment, public beta-gate change or production SQL now.** Keep #353 as a draft until the owner gives the go-ahead for the full PepeGochi launch. This inclusion decision is not permission to launch today and does not change the earlier Passport release schedule.
 

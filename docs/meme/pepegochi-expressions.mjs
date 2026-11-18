@@ -16,6 +16,6 @@ export function expressionFor(view, action) {
   if (['pet', 'familiar', 'fed', 'clean', 'rested', 'toyFavourite'].includes(action)) return 'nuzzle';
   if (['return', 'grown', 'quizWin', 'played', 'play', 'gameWin', 'gameRecord', 'gameMoon', 'toyOkay'].includes(action)) return 'welcome';
   if (['annoyed', 'space', 'toyAgain', 'gameLoss'].includes(action)) return 'sulk';
-  if (['hello', 'how', 'news', 'memories', 'hover', 'invite', 'favourite', 'gameDone'].includes(action)) return 'curious';
+  if (['hello', 'how', 'news', 'memories', 'hover', 'invite', 'favourite', 'gameDone', 'desktopFirefly', 'desktopTV', 'desktopBin', 'desktopGames', 'desktopFind', 'desktopGuesser', 'desktopNotes', 'desktopNerds'].includes(action)) return 'curious';
   return null;
 }

@@ -30,6 +30,14 @@ PR #353 belongs to the full PepeGochi product launch. Ship all implemented compa
 - Offline visual review: `pepegochi/room-a11/preview.html`; Chromium tests use actual renderer and fixture inventory at 320/390/900 px.
 - Included in the same held full-product release as #353; no separate launch.
 
+## Living desktop A12 (draft implementation, 2026-11-18)
+- The healthy adult reacts to actual animated night-wallpaper fireflies, with a short curiosity/tongue sequence. Click a visible light on the exposed desktop or choose **Catch a firefly** in the conversation when a visible light is available; nearby lights can also trigger a rare idle reaction. The light returns to the wallpaper afterwards. Day, still and wallpaper-demo modes do not trigger the interaction.
+- The frog briefly hops onto the upper edge of a suitable opened utility window (Games/Find/Recycle Bin/Notepad and selected folders), rests there and hops back. Narrow, maximized, minimized, iframe or unsafe-position windows do not get a perch. The overlay never captures clicks or focus and does not change the window position; movement, close, resize, input or a need interrupts it.
+- Opening Pond TV brings out a tiny retro popcorn prop. Selected non-game apps get contextual dry Pepe remarks, with the existing reaction cooldown and quiet setting. Refocus/restore does not repeat an opening. Games retain their own observed-result hooks.
+- Reuses the existing approved 48×48 frog assets and native CSS effects; no new pet art or network calls, no changes to actual needs, evolution, awards, secrets or persistence. A young frog, a real needs pose, absent/departed pet, focused iframe and hidden tab take priority. Reduced motion disables visual effects.
+- Local controller unit tests cover geometry, visible night lights, cooldown, actual app selection, cancellation, cleanup and care priority; `node tests/pepegochi-desktop-browser.cjs` adds a Chromium fixture for end-to-end review. Browser launch in the current execution environment was denied by the OS; complete the browser and real desktop visual review before launch.
+- Future (not implemented): richer weather or seasonal reactions, more window behaviours, and verified event awards only after explicit approval. No rare-firefly stamp in this draft.
+
 ## Next phases (not implemented here)
 1. Room: click the frog and existing props; TV opens PepTV only with explicit input, bed routes to real rest, lamp toggles, plant watering, ball/play, and radio/dance if present. Respect actual room inventory rather than inventing objects. A decorative click cannot change a pet need except through the existing validated care flow.
 2. Additional site events: other arcade games, verified stamp award, weekly Guesser result and Pond King update. Connect only existing verified result paths; never infer wins from opening/closing a window. Reuse the mute/throttle and avoid interrupting game controls.

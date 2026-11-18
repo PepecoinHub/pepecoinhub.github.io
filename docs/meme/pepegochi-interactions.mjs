@@ -1,6 +1,14 @@
 import { TOYS, healthyCompanion } from './pepegochi-personality.mjs?v=20261116sass1';
 // Cosmetic conversations; actual needs and care history come from the server view.
 const lines = {
+  desktopFirefly: ["A tiny lamp with wings. Don't worry, fren, I let it go.", "Did you see that? The pond has its own screensaver."],
+  desktopTV: ["Pond TV? Hold on. I need my popcorn.", "The tiny frog demands a front-row seat."],
+  desktopBin: ["I inspected the recycling. No flies. Absolute scandal."],
+  desktopGames: ["Arcade department, reporting for extremely important frog business."],
+  desktopFind: ["Looking for something? I am excellent at looking busy."],
+  desktopGuesser: ["I have the geographical instincts of a pond. Trust me at your own risk."],
+  desktopNotes: ["Notepad. The finest technology of 1998."],
+  desktopNerds: ["Nerds only? Finally, my people."],
   invite: ["I brought a toy. This meeting could have been a nap, but here we are.", "Human. Recreation department needs you. Bring your one functional mouse."],
   toyFavourite: ["This one stays. Touch my snacks if you must. Not my toy.", "Excellent choice. Obviously I trained you well."],
   toyOkay: ["Decent throw. For a creature with thumbs.", "I meant to miss that. Advanced frog technique."],
@@ -66,7 +74,7 @@ export function companionReply(view, action = 'hello', n = 0, context = {}) {
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
 // No polling or network calls. Optional bond stores cosmetic memories only.
-export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, now = () => Date.now() }) {
+export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, now = () => Date.now() }) {
   let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
   let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
   let lastActivity = now(), bornAt = now();
@@ -180,6 +188,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
       add("Let's play!", () => say('play'));
       add('Pet me', () => say('pet'));
       add("What's new?", () => say('news'));
+      if (fireflyAvailable()) add('Catch a firefly', () => { close({ focus: true }); catchFirefly(); });
       if (quizAvailable()) add('Pond Quiz', () => { close(); openQuiz(); });
       add('Go to your room', visit);
       panel.append(head, reply, actions);
@@ -234,7 +243,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
   button.addEventListener('pointerup', end);
   button.addEventListener('pointercancel', end);
   button.addEventListener('pointerleave', end);
-  return { close, react, invite, dispose() {
+  return { close, react, invite, get busy() { return !!(panel || notice || clickTimer !== null); }, dispose() {
     close({ reset: true });
     doc.removeEventListener('pointerdown', activity, true);
     doc.removeEventListener('keydown', activity, true);
