@@ -1,3 +1,5 @@
+import { createCompanionReporter } from './companion-events.mjs?v=20261116sass1';
+const companion = createCompanionReporter('sweeper');
 import { LEVELS, newGame, reveal, toggleFlag, chord } from './pepe-sweeper-engine.mjs';
 
 const $ = selector => document.querySelector(selector);
@@ -34,6 +36,7 @@ function setMode(flag) {
   status.textContent = flag ? 'FLAG MODE. MARK THE WRONG PEPE.' : 'DIG MODE. FIND THE SAFE LILY PADS.';
 }
 function newRound(next = level) {
+  companion.start();
   level = next; game = newGame(level); seconds = 0; paused = false; flagMode = false;
   clearTimeout(holdTimer); longPressed = -1;
   $('#dig-mode').setAttribute('aria-pressed', 'true'); $('#flag-mode').setAttribute('aria-pressed', 'false');
@@ -79,6 +82,7 @@ function afterMove(previous) {
   render();
   if (game.status === 'won' && previous !== 'won') {
     const best = getBest();
+    companion.finish('win', best === null || seconds < best);
     if (best === null || seconds < best) {
       try { localStorage.setItem(bestKey(), String(seconds)); } catch {}
       showBest();
@@ -89,6 +93,7 @@ function afterMove(previous) {
     $('#result-copy').textContent = `${seconds}s. Every wrong Pepe spotted. The frens may sleep tonight.`;
     status.textContent = 'VICTORY. ALL SAFE LILY PADS CLEARED.'; result.hidden = false;
   } else if (game.status === 'lost' && previous !== 'lost') {
+    companion.finish('loss');
     setFace('lost');
     mood.textContent = 'WRONG PEPE!';
     $('#result-title').textContent = 'WRONG PEPE!';

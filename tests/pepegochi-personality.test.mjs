@@ -1,0 +1,42 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createBond} from '../docs/meme/pepegochi-bond.mjs';
+import {createArcadeObserver} from '../docs/meme/pepegochi-arcade.mjs';
+import {createCompanionReporter} from '../docs/games/js/companion-events.mjs';
+import {companionReply} from '../docs/meme/pepegochi-interactions.mjs';
+const adult={hasPet:true,adult:true,sprite:'taskbar/tb_adult_sit.png'};
+test('toy preference, spaced play and journal persist per owner/life without click farming',()=>{
+ let now=1000;const data=new Map(),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)};
+ const b=createBond({storage,now:()=>now});b.observe('a',{life_id:'one',stage:'adult'});const favourite=b.favourite;
+ assert.equal(b.play(favourite),'toyFavourite');assert.equal(b.play(favourite),'toyAgain');assert.equal(b.discovered,false);
+ now+=31000;b.play(favourite);now+=31000;b.play(favourite);assert.equal(b.discovered,true);assert.equal(b.journal.length,1);
+ b.keep('win');b.keep('win');b.keep('invented');assert.equal(b.journal.length,2);
+ const reload=createBond({storage,now:()=>now});reload.observe('a',{life_id:'one'});assert.equal(reload.favourite,favourite);assert.equal(reload.discovered,true);assert.equal(reload.journal.length,2);
+ reload.observe('b',{life_id:'one'});assert.equal(reload.journal.length,0);assert.equal(reload.discovered,false);
+ assert.match(companionReply(adult,'favourite',0,b).text,/unpaid throwing assistant/);
+ assert.match(companionReply(adult,'memories',0,b).text,/executive supervision/);
+ assert.equal(b.invite(),true);assert.equal(b.invite(),false);now+=8*60000;assert.equal(b.invite(),true);b.toggleMute();now+=8*60000;assert.equal(b.invite(),false);
+});
+test('arcade observations require exact origin, iframe path/source, start and same owner/life; consume once',()=>{
+ const observer=createArcadeObserver(),source={},origin='https://pond.test';
+ const context={origin,owner:'a',life:'frog',frames:[{contentWindow:source,src:origin+'/games/yeet.html?embed=1'}]};
+ const event=(phase,extra={})=>({origin,source,data:{type:'pondos:arcade-round',game:'yeet',run:'one',phase,outcome:'moon',record:false,...extra}});
+ assert.equal(observer.accept(event('finish'),context),null);
+ assert.equal(observer.accept({...event('start'),origin:'https://bad.test'},context),null);
+ assert.equal(observer.accept(event('start'),{...context,frames:[{contentWindow:source,src:origin+'/other/yeet.html'}]}),null);
+ assert.equal(observer.accept({...event('start'),source:{}},context),null);
+ observer.accept(event('start'),context);
+ assert.equal(observer.accept(event('finish'),{...context,owner:'b'}),null);
+ assert.equal(observer.accept(event('finish'),{...context,life:'new'}),null);
+ assert.equal(observer.accept(event('finish',{outcome:'made up'}),context),null);
+ assert.deepEqual(observer.accept(event('finish'),context),{action:'gameMoon',memory:'moon'});
+ assert.equal(observer.accept(event('finish'),context),null);
+ observer.accept(event('start'),context);assert.equal(observer.accept(event('finish'),context),null);
+ observer.reset();assert.equal(observer.accept(event('finish'),context),null);
+});
+test('game reporter only publishes an actually started round once, without account or score data',()=>{
+ const sent=[],win={parent:{postMessage:(d,o)=>sent.push({d,o})},crypto:{randomUUID:()=> 'id'},location:{origin:'https://pond.test'}};
+ const reporter=createCompanionReporter('sweeper',win);reporter.finish('win');assert.equal(sent.length,0);
+ reporter.start();reporter.finish('loss');reporter.finish('win');assert.equal(sent.length,2);
+ assert.deepEqual(sent[1],{o:'https://pond.test',d:{type:'pondos:arcade-round',game:'sweeper',run:'id',phase:'finish',outcome:'loss',record:false}});
+});

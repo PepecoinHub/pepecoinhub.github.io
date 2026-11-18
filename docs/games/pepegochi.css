@@ -57,7 +57,7 @@ html.embed .pgb-banner { background: #ffffe1 !important; }
 /* in the PondOS window the page's 20 px side margins (facts.css) only make the room smaller */
 html.embed body { padding-inline: 0; }
 .pgb-scene .pgb-title { margin: 0 0 6px; }
-.pgr-frame { max-width: 646px; margin: 0 auto; border: 3px inset #9a9a9a; background: #a790b4; }
+.pgr-frame { max-width: 646px; margin: 0 auto; border: 3px inset #9a9a9a; background: #284c46; }
 .pgr { position: relative; width: 100%; aspect-ratio: 8 / 5; overflow: hidden; isolation: isolate; container-type: inline-size; }
 .pgr-art { position: absolute; inset: 0; }
 .pgr img { position: absolute; image-rendering: pixelated; pointer-events: none; user-select: none; -webkit-user-drag: none; }
@@ -92,3 +92,8 @@ html.embed body { padding-inline: 0; }
 @media (min-width: 680px) { .pgb.pgb-live { grid-template-columns: minmax(0, 1fr); grid-template-areas: "scene" "main" "decor" "rules" "past"; } }
 .pgb-decor-card { grid-area: decor; }
 .pgb-adopt-note { flex-basis: 100%; order: -1; margin: 0 0 4px; font-weight: 600; }
+
+/* A11: architectural detail, not an owned/earned decoration. */
+.pgr-house-sign { position:absolute; z-index:2; left:4.375%; top:12%; width:12.5%; padding:1.25% .5%; background:#253e38; border:2px solid #a28a51; box-shadow:2px 2px #172a27; color:#d3c597; text-align:center; white-space:pre-line; font:700 clamp(4px,1.25cqw,8px)/1.5 monospace; letter-spacing:.04em; pointer-events:none; }
+.pgr-item:not(.pgr-wall) { filter:drop-shadow(2px 3px 0 #14282066); }
+.pgr-wall { filter:drop-shadow(2px 2px 0 #14282066); }
