@@ -31,6 +31,8 @@ const FINE_TOP = new Map([
   ...['hungry', 'dirty', 'moody', 'tired', 'neglected', 'packing', 'recovering'].map(s => [`pepegochi_tadpole_${s}.png`, 50]),
   ...['01', '02', '03', '04'].map(s => [`care_froglet_feed_${s}.png`, 30]),
   ...[30, 30, 15, 30].map((top, i) => [`care_froglet_clean_0${i + 1}.png`, top]),
+  ...[30, 30, 12, 30].map((top, i) => [`care_froglet_play_0${i + 1}.png`, top]),
+  ...[30, 30, 30, 27].map((top, i) => [`care_froglet_rest_0${i + 1}.png`, top]),
 ]);
 
 // ---------- a small PNG decoder: 8-bit greyscale, RGB, palette, grey+alpha or RGBA, not interlaced ----------
