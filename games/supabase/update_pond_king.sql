@@ -15,6 +15,8 @@
 --     (and a new day). Nobody can challenge themselves.
 --   * Fren Passport stamp "Long Live the King": hold one reign against 10 challengers, i.e. 10 duels won in a
 --     row as king. Discord accounts only (games.passport_award checks), awarded once, from server records.
+--   * "Crown Breaker": a Discord challenger dethrones a king who already has at least 13 defenses.
+--     The award is checked against the locked throne row before the winning duel replaces it.
 --   * The king's moves never leave the database, except to the king (who holds the token) and as the
 --     rounds of a finished duel, which show that challenger the king's pattern (so a wise king changes it).
 --
@@ -244,6 +246,7 @@ declare
   k games.pk_kings;
   ord text; me int := 0; them int := 0; r int; won boolean; new_id bigint;
   rounds jsonb := '[]'::jsonb;
+  crown_breaker_new boolean := false;
 begin
   if th is null then return jsonb_build_object('ok', false, 'error', 'token'); end if;
   if v_moves !~ '^[rps]{3}$' then return jsonb_build_object('ok', false, 'error', 'moves'); end if;
@@ -280,6 +283,11 @@ begin
     update games.pk_kings set ended_at = now(), ended_by = v_nick where id = k.id;
     perform games.pk_stat_add(games.pk_player(k.token_hash, k.user_id), k.nick, 0, 0, 0, k.defenses, extract(epoch from now() - k.crowned_at)::bigint);
     insert into games.pk_kings (token_hash, user_id, ip_hash, nick, moves) values (th, u, ip, v_nick, v_moves) returning id into new_id;
+    -- An idempotent server award in the same transaction as the crown change.
+    -- Its badge unlocks special_crown_breaker through the Avatar Maker's save RPC.
+    if k.defenses >= 13 and u is not null and to_regprocedure('games.passport_award(uuid, text, timestamp with time zone)') is not null then
+      crown_breaker_new := games.passport_award(u, 'crown_breaker');
+    end if;
     perform games.bulletin_post('pk:crown:' || new_id, 'pond_king', 'king_crowned', v_nick, u, k.nick, k.user_id, null,
                                 jsonb_build_object('old_reign', k.defenses));
   else
@@ -308,6 +316,7 @@ begin
 
   return jsonb_build_object('ok', true, 'won', won, 'score', jsonb_build_array(me, them), 'rounds', rounds,
                             'king', jsonb_build_object('nick', k.nick, 'defenses', k.defenses + case when won then 0 else 1 end),
+                            'crown_breaker_new', crown_breaker_new,
                             'new_king_id', new_id);
 end $$;
 

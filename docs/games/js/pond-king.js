@@ -285,6 +285,7 @@
         : r.score[0] === r.score[1] ? 'A tie keeps the king on the throne. ' + kingNick + ' has now held it ' + plural(r.king.defenses, 'time', 'times') + '. You walk away dizzy: come back in 4 hours.'
           : kingNick + ' has now held the throne ' + plural(r.king.defenses, 'time', 'times') + '. ' + bruised() + ' Or send a fren: you know the king’s pattern now (unless they change it).');
       after.appendChild(p);
+      if (r.crown_breaker_new) after.appendChild(mk('p', 'tip', 'Crown Breaker unlocked! You ended a reign of at least 13 defenses. Your stamp is in Fren Passport, and the knight avatar is ready in Create Your Fren.'));
       if (r.won) after.appendChild(mk('p', 'tip', '💡 Tip: set a new pattern now, below. Avoid three of the same: it is the easiest pattern to guess.'));
       var row = mk('div', 'row'), ok = mk('button', r.won ? 'go' : '', r.won ? 'To my throne →' : 'OK'); ok.type = 'button';
       ok.addEventListener('click', function () { $('result').hidden = true; load(); });

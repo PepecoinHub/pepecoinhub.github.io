@@ -12,7 +12,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
   // +7: expansion 7 (owner, 2026-11-15). Includes the two Haze stamps, which stay planned until earned.
-  assert.deepEqual(kinds.map(key => catalog[key].length), [66, 19, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [67, 19, 8, 4]);
   for(const id of ['haze_linked','haze_first_tip'])assert.equal(catalog.achievements.find(item=>item.id===id)?.status,'planned');
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
@@ -101,7 +101,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered look
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
   assert.equal(manifest.schema_version, 2);
   // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 28]);
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 29]);
   // the only looks a player can actually compose and save are built from the non-unlock (base) ids
   assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 6, 9, 9, 5, 6, 1]);
   assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 72900, 'offered looks');
@@ -116,7 +116,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 72900 offered look
   // one 512x512 WebP per option id, plus the implied base layer
   const noQ = f => f.split('?')[0];   // the templates carry a ?v= cache key
   const files = [...new Set([manifest.paths.base, ...ids.map(id => noQ(manifest.paths.layer_template.replace('{id}', id)))])];
-  assert.equal(files.length, 75, '74 option layers + base_frog');
+  assert.equal(files.length, 76, '75 option layers + base_frog');
   // one small picture of each part for the maker rows, nothing else in the folder
   assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/thumbs/', import.meta.url)).sort(),
     ids.map(id => noQ(manifest.paths.thumb_template.replace('{id}', id)).split('/').pop()).sort(), 'no unused, stray or missing thumbnails');
@@ -169,6 +169,7 @@ test('avatar save RPC v2: Discord identity, non-unlock allowlists, no user or ba
   assert.equal(crownFn, fn);
   assert.doesNotMatch(crownSql, /function public\.gry_passport_state/);
   assert.match(fn, /\('special_king', 'long_live_the_king'\)/);
+  assert.match(fn, /\('special_crown_breaker', 'crown_breaker'\)/);
   // the Passport read path carries the saved look
   assert.match(avatarSql, /'avatar', look,/);
 });
@@ -194,7 +195,7 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
     // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
     'stamps-v3.webp': [62 * 138, 150], 'pond-pioneer-v3.webp': [138, 150],
     // Pond Dominator: the owner's own art, one V3-sized tile outside the atlas (update_wheres_pepe_hall_of_fame.sql)
-    'pond-dominator.webp': [138, 150],
+    'pond-dominator.webp': [138, 150], 'crown-breaker.webp': [138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
@@ -209,7 +210,7 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
     assert.equal(b.toString('latin1', 12, 16), 'VP8X', f + ' carries alpha');
     assert.deepEqual([1 + b.readUIntLE(24, 3), 1 + b.readUIntLE(27, 3)], size, f + ' size');
   }
-  assert.ok(total < 260 * 1024, 'passport art stays small: ' + total + ' bytes');
+  assert.ok(total < 280 * 1024, 'passport art including Crown Breaker stays small: ' + total + ' bytes');
   // the client must use the sprite with the same cell counts
   const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;

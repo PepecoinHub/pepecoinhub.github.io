@@ -152,6 +152,7 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     ];
     reserved.push([...DEFAULT, 'special_explorer']);                                                       // special_explorer -> scout_fren
     reserved.push([...DEFAULT, 'special_king']);                                                           // special_king -> long_live_the_king
+    reserved.push([...DEFAULT, 'special_crown_breaker']);                                                  // 13-defense throne breaker
     for (const args of reserved) await assert.rejects(save(1, args), /That part is locked/, 'reserved ' + JSON.stringify(args));
     await assert.rejects(save(1, [...DEFAULT, 'special_ghost']), /Unknown avatar option/);
     assert.equal(await avatars(1), 0); assert.equal(await badges(1), 0);
@@ -209,6 +210,12 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     assert.equal(off.avatar.special, 'special_none');
     await pastCooldown(1);
     await assert.rejects(save(1, [...look('bg_city', 'clothing_blue', 'mouth_laugh', 'eyes_classic', 'hat_none', 'accessory_none'), 'special_king']), /That part is locked/, 'taken off, it needs the stamp');
+    await db.query("insert into games.passport_badges (user_id, badge_id) values ($1, 'crown_breaker') on conflict do nothing", [uid(1)]);
+    const knight = await save(1, [...DEFAULT, 'special_crown_breaker']);
+    assert.equal(knight.avatar.special, 'special_crown_breaker', 'the server-issued stamp opens the knight');
+    await pastCooldown(1);
+    await save(1, DEFAULT);
+    await db.query("delete from games.passport_badges where user_id = $1 and badge_id = 'crown_breaker'", [uid(1)]);
     await pastCooldown(1); await save(1, DEFAULT);   // back to the look the checks below expect
 
     // --- second user isolation

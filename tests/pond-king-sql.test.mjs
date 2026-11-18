@@ -206,3 +206,51 @@ test('Pond King: hidden moves, one duel every 4 hours per player (and network), 
     await drop();
   }
 });
+
+test('Crown Breaker: 12 defenses are insufficient, 13 awards only a Discord winner once',
+  { skip: SKIP, timeout: 120000 }, async () => {
+  const { db, drop } = await pondDb('crown_breaker_test', ['update_pond_bulletin.sql', 'update_pond_king.sql']);
+  try {
+    await db.query(`create table games.test_awards (user_id uuid, badge text, primary key (user_id, badge));
+      create function games.passport_award(u uuid, b text, at timestamptz default null) returns boolean
+      language plpgsql security definer set search_path = '' as $$
+      begin
+        if games.discord_identity(u) is null then return false; end if;
+        insert into games.test_awards values (u, b) on conflict do nothing;
+        return found;
+      end $$;`);
+    const one = await addUser(db, 20, 'FirstBreaker');
+    const two = await addUser(db, 21, 'RealBreaker');
+    const tok = i => 'breaker-token-' + String(i).padStart(10, '0');
+    const challenge = async (user, i, king, moves) => {
+      await db.query('begin');
+      try {
+        await db.query('set local role ' + (user ? 'authenticated' : 'anon'));
+        await db.query("select set_config('request.jwt.claim.sub', $1, true)", [user || '']);
+        await db.query("select set_config('request.headers', $1, true)", [JSON.stringify({ 'cf-connecting-ip': '123.1.0.' + i })]);
+        const r = await db.query('select public.gry_pk_challenge($1,$2,$3,$4) as v', [tok(i), king, 'Fren' + i, moves]);
+        await db.query('commit'); return r.rows[0].v;
+      } catch (e) { await db.query('rollback'); throw e; }
+    };
+    const king = async () => (await db.query('select id from games.pk_kings where ended_at is null')).rows[0].id;
+    await db.query("update games.pk_kings set moves='rrr', defenses=12 where ended_at is null");
+    const early = await challenge(one, 1, await king(), 'ppp');
+    assert.equal(early.won, true); assert.equal(early.crown_breaker_new, false);
+    assert.equal((await db.query('select count(*)::int n from games.test_awards')).rows[0].n, 0);
+
+    await db.query("update games.pk_kings set defenses=13 where ended_at is null");
+    const first = await challenge(two, 2, await king(), 'sss'); // scissors beat the new king's paper
+    assert.equal(first.won, true); assert.equal(first.king.defenses, 13);
+    assert.equal(first.crown_breaker_new, true);
+    assert.deepEqual((await db.query('select user_id, badge from games.test_awards')).rows, [{ user_id: two, badge: 'crown_breaker' }]);
+
+    await db.query("update games.pk_kings set defenses=13 where ended_at is null");
+    const guest = await challenge(null, 3, await king(), 'rrr'); // rock beats scissors
+    assert.equal(guest.won, true); assert.equal(guest.crown_breaker_new, false);
+    await db.query("update games.pk_duels set created_at = created_at - interval '4 hours'");
+    await db.query("update games.pk_kings set defenses=13 where ended_at is null");
+    const again = await challenge(two, 4, await king(), 'ppp');
+    assert.equal(again.won, true); assert.equal(again.crown_breaker_new, false, 'repeat wins do not re-award');
+    assert.equal((await db.query('select count(*)::int n from games.test_awards')).rows[0].n, 1);
+  } finally { await drop(); }
+});
