@@ -2266,3 +2266,187 @@ footer.foot a { color: #edf3e3; }
   .nr input:not([type="checkbox"]), .nr textarea, .nr select { font-size: 16px; }   /* no zoom-in on iPhone */
   .gz-dial { flex-basis: 100%; max-width: none; }
 }
+
+/* ================================================================ Start menu graphics
+   Richer PondOS Start panel: branded vertical band, account strip, clearer hierarchy,
+   and 2–3 intentional open/hover motions. Still Win98 chrome (bevels, MS Sans) — frog
+   greens and gold only; no modern/purple redesign. */
+.pondos .start {
+  gap: 5px;
+  padding: 0 14px 0 4px;
+  background:
+    linear-gradient(90deg, var(--frog-deep) 0 3px, transparent 3px),
+    linear-gradient(180deg, color-mix(in srgb, var(--chrome-hi) 70%, var(--chrome)), var(--chrome) 42%, color-mix(in srgb, var(--chrome) 86%, var(--chrome-lo)));
+}
+.pondos .start img {
+  width: 20px; height: 20px; border-radius: 0;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+.pondos .start span {
+  font-style: italic; font-weight: 700; letter-spacing: 0.01em;
+}
+.pondos .start:hover:not([aria-expanded="true"]) {
+  filter: brightness(1.05);
+}
+.pondos .start[aria-expanded="true"] {
+  background:
+    linear-gradient(90deg, var(--gold) 0 3px, transparent 3px),
+    repeating-conic-gradient(var(--chrome) 0 25%, var(--chrome-hi) 0 50%) 0 0 / 2px 2px;
+}
+
+.pondos .nav.startmenu {
+  width: 292px;
+  grid-template-columns: 38px minmax(0, 1fr);
+  padding: 2px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--chrome-hi) 55%, var(--chrome)), var(--chrome) 28%, color-mix(in srgb, var(--chrome) 92%, var(--chrome-lo)));
+}
+.pondos .nav.startmenu:not([hidden]) {
+  animation: sm-rise 0.17s ease-out;
+}
+@keyframes sm-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.sm-band {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 8px 0 14px; overflow: hidden;
+  background:
+    linear-gradient(0deg, #052814 0%, #0a3d1f 22%, #0c4a24 48%, #1f7a40 72%, #4fb36d 100%);
+}
+.sm-band::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 140% 48% at 50% -8%, rgba(255, 255, 255, 0.28), transparent 58%),
+    radial-gradient(ellipse 18px 10px at 30% 34%, rgba(8, 40, 20, 0.55), transparent 70%),
+    radial-gradient(ellipse 22px 12px at 72% 52%, rgba(8, 40, 20, 0.45), transparent 70%),
+    radial-gradient(ellipse 16px 9px at 40% 78%, rgba(8, 40, 20, 0.5), transparent 70%),
+    repeating-linear-gradient(180deg, transparent 0 11px, rgba(255, 255, 255, 0.04) 11px 12px);
+  opacity: 0.95;
+}
+.sm-band span::after {
+  content: none;
+}
+.sm-band-ico {
+  position: relative; z-index: 1; flex: none;
+  display: grid; place-items: center; width: 26px; height: 26px;
+  background: color-mix(in srgb, #052814 40%, transparent);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28), 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+.sm-band-ico img {
+  width: 18px; height: 18px; border-radius: 0; object-fit: cover;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.4));
+}
+.sm-band-brand {
+  position: relative; z-index: 1;
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  color: #fff; font: 700 1.22rem/1.05 var(--f-term); letter-spacing: 0.1em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55), 0 0 12px rgba(79, 179, 109, 0.35);
+}
+.sm-band-brand b {
+  color: #f2b544;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55), 0 0 10px rgba(242, 181, 68, 0.35);
+}
+.sm-band-brand em {
+  margin: 0; font: 700 0.72em/1 var(--f-chrome); letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.82); font-style: normal;
+}
+
+.pondos .startmenu .sm-main {
+  padding: 3px 3px 4px;
+  background: color-mix(in srgb, var(--chrome-face) 35%, transparent);
+}
+.pondos .startmenu hr {
+  margin: 5px 3px;
+  border-top-color: color-mix(in srgb, var(--chrome-lo) 80%, var(--frog-deep));
+}
+.pondos .sm-item.sm-me,
+.pondos .sm-item.sm-passport {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--frog) 16%, var(--chrome)), var(--chrome));
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--frog-deep) 22%, transparent);
+}
+.pondos .sm-item.sm-me:hover,
+.pondos .sm-item.sm-passport:hover,
+.pondos .sm-item.sm-me:focus-visible,
+.pondos .sm-item.sm-passport:focus-visible {
+  background: var(--sel);
+  box-shadow: none;
+}
+.pondos .sm-item {
+  gap: 9px;
+  transition: background 0.08s linear, color 0.08s linear;
+}
+.pondos .sm-item img {
+  border-radius: 2px;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.22);
+  transition: transform 0.12s ease;
+}
+.pondos .sm-item:hover img,
+.pondos .sm-item:focus-visible img,
+.pondos .sm-item[aria-expanded="true"] img {
+  transform: translateY(-1px) scale(1.07);
+}
+.pondos .sm-item .sm-arr {
+  transition: transform 0.12s ease, color 0.08s linear;
+  color: var(--muted);
+}
+.pondos .sm-item:hover .sm-arr,
+.pondos .sm-item:focus-visible .sm-arr,
+.pondos .sm-item[aria-expanded="true"] .sm-arr {
+  transform: translateX(3px);
+  color: #fff;
+}
+.pondos .sm-item[aria-expanded="true"] {
+  background: var(--sel);
+  color: #fff;
+}
+
+.pondos .sm-sub {
+  background-color: var(--chrome);
+  background-image:
+    linear-gradient(180deg, color-mix(in srgb, var(--chrome-hi) 50%, var(--chrome)), var(--chrome));
+}
+.pondos .sm-sub:not([hidden]) {
+  animation: sm-fly 0.14s ease-out;
+}
+@keyframes sm-fly {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: none; }
+}
+.sm-list a {
+  transition: background 0.08s linear, color 0.08s linear;
+}
+.sm-list a img {
+  border-radius: 2px;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.18);
+  transition: transform 0.12s ease;
+}
+.sm-list a:hover img,
+.sm-list a:focus-visible img {
+  transform: scale(1.06);
+}
+.sm-list b {
+  letter-spacing: 0.01em;
+}
+.sm-list small {
+  opacity: 0.92;
+}
+
+@media (max-width: 760px) {
+  .pondos .nav.startmenu { grid-template-columns: 34px minmax(0, 1fr); }
+  .sm-band-brand { font-size: 1.05rem; letter-spacing: 0.06em; }
+  .pondos .sm-sub:not([hidden]) { animation-name: sm-drop; }
+}
+@keyframes sm-drop {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pondos .nav.startmenu:not([hidden]),
+  .pondos .sm-sub:not([hidden]) { animation: none; }
+  .pondos .sm-item img,
+  .pondos .sm-item .sm-arr,
+  .sm-list a img { transition: none; }
+}

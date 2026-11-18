@@ -264,7 +264,7 @@
     var meItem = el('button', { type: 'button', class: 'sm-item sm-me' }, '<img src="' + ico('pep-logo') + '" alt="" width="28" height="28" loading="lazy"><span><b class="logon-name">Log on…</b> <span class="hs-ok logon-ok" hidden title="Verified with Discord">✓</span></span>');
     meItem.addEventListener('click', function () { setOpen(false); logOn(); });
     smMain.appendChild(meItem);
-    var passportItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('passport') + '" alt="" width="28" height="28"><span><b>Fren Passport</b> <small>My Fren, achievements and secrets</small></span>');
+    var passportItem = el('button', { type: 'button', class: 'sm-item sm-passport' }, '<img src="' + ico('passport') + '" alt="" width="28" height="28"><span><b>Fren Passport</b> <small>My Fren, achievements and secrets</small></span>');
     passportItem.addEventListener('click', function () { setOpen(false); frenPassport(); });
     if (FREN) smMain.appendChild(passportItem);
     var findItem = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico('search') + '" alt="" width="28" height="28"><span><b>Find…</b> <small>games, pages, tools</small></span>');
@@ -336,7 +336,9 @@
     smMain.appendChild(aboutItem);
     smMain.appendChild(findItem);
     smMain.appendChild(sd);
-    nav.appendChild(el('div', { class: 'sm-band', 'aria-hidden': 'true' }, '<span>Pond<b>OS</b> 1.0</span>'));
+    nav.appendChild(el('div', { class: 'sm-band', 'aria-hidden': 'true' },
+      '<i class="sm-band-ico"><img src="img/pep-logo.webp" alt="" width="20" height="20"></i>' +
+      '<span class="sm-band-brand">Pond<b>OS</b> <em>98</em></span>'));
     nav.appendChild(smMain);
 
     var tb = el('button', { type: 'button', class: 'themebtn', id: 'themebtn', 'aria-label': 'Switch light or dark' });
