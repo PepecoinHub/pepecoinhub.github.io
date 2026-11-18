@@ -1,5 +1,5 @@
 // Local desktop theatre, not a source of pet state, care, achievements or rewards.
-import { healthyCompanion } from './pepegochi-personality.mjs?v=20261116sass1';
+import { playableCompanion } from './pepegochi-personality.mjs?v=20261118dialog1';
 
 export const APP_REACTIONS = Object.freeze({
   tv: 'desktopTV', bin: 'desktopBin', games: 'desktopGames', find: 'desktopFind',
@@ -22,9 +22,9 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
   const doc = slot.ownerDocument, win = doc.defaultView;
   const reduce = win.matchMedia('(prefers-reduced-motion: reduce)');
   let effect = null, lastFly = -Infinity, lastApp = -Infinity, disposed = false;
-  const allowed = () => !disposed && slot.isConnected && healthyCompanion(getView()) && eligible() && !doc.hidden;
-  const canStart = () => allowed() && mayStart() && !effect;
-  const canMove = () => canStart() && !reduce.matches;
+  const allowed = (manual = false) => !disposed && slot.isConnected && playableCompanion(getView()) && eligible(manual) && !doc.hidden;
+  const canStart = (manual = false) => allowed(manual) && mayStart() && !effect;
+  const canMove = (manual = false) => canStart(manual) && !reduce.matches;
   const night = () => doc.documentElement.classList.contains('sky-night') && !!doc.querySelector('.sky:not([hidden]) .scene-night.ready') && !doc.querySelector('.sky-fast');
   const exposed = (x, y) => {
     const target = doc.elementFromPoint(x, y);
@@ -51,12 +51,12 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
     slot.classList.remove('pg-desktop-away');
     onEnd();
   }
-  function begin(kind, valid) {
+  function begin(kind, valid, manual = false) {
     onStart();
     const current = effect = { kind, valid, animations: [], nodes: [], timer: 0, watch: 0 };
     function watch() {
       if (effect !== current) return;
-      if (!allowed() || reduce.matches || !valid()) { stop(); return; }
+      if (!allowed(manual) || reduce.matches || !valid()) { stop(); return; }
       current.watch = win.requestAnimationFrame(watch);
     }
     current.watch = win.requestAnimationFrame(watch);
@@ -70,14 +70,15 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
     const animation = node.animate(frames, { fill: 'forwards', ...options });
     current.animations.push(animation); return animation;
   }
-  function catchFly(target) {
-    if (!target || !canMove() || now() - lastFly < 45000 || !img.animate) return false;
+  function catchFly(target, manual = false) {
+    if (!target || !canMove(manual) || now() - lastFly < 45000 || !img.animate) return false;
     const r = img.getBoundingClientRect();
     if (!r.width || !r.height) return false;
     lastFly = now();
-    const mouth = { x: r.left + r.width * .68, y: r.top + r.height * .48 };
+    const young = !getView()?.adult;
+    const mouth = { x: r.left + r.width * .68, y: r.top + r.height * (young ? .68 : .48) };
     const approach = { x: mouth.x + (mouth.x < win.innerWidth - 65 ? 42 : -42), y: mouth.y - 14 };
-    const current = begin('firefly', () => night());
+    const current = begin('firefly', () => night(), manual);
     current.fly = target.node; target.node.classList.add('pg-fly-borrowed');
     const glow = add(current, 'span', 'pg-desktop-firefly');
     animate(current, glow, [
@@ -87,7 +88,7 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
       { transform: at(mouth.x, mouth.y), opacity: 0 },
     ], { duration: 1300, easing: 'linear' });
     const frog = add(current, 'img', 'pg-desktop-frog-frame');
-    frog.src = base + 'games/img/pepegochi/taskbar/anim/tb_curious_03.png?v=20261113stand'; frog.alt = '';
+    frog.src = young ? img.src : base + 'games/img/pepegochi/taskbar/anim/tb_curious_03.png?v=20261113stand'; frog.alt = '';
     frog.style.transform = at(r.left, r.top);
     slot.classList.add('pg-desktop-away');
     const tongue = add(current, 'span', 'pg-desktop-tongue');
@@ -95,7 +96,7 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
     tongue.style.width = Math.round(Math.hypot(approach.x - mouth.x, approach.y - mouth.y)) + 'px';
     const rotation = Math.atan2(approach.y - mouth.y, approach.x - mouth.x);
     animate(current, tongue, [{ transform: `rotate(${rotation}rad) scaleX(0)` }, { transform: `rotate(${rotation}rad) scaleX(1)`, offset: .48 }, { transform: `rotate(${rotation}rad) scaleX(0)` }], { delay: 930, duration: 420 });
-    current.timer = win.setTimeout(() => { stop(); if (allowed()) react('desktopFirefly'); }, 1450);
+    current.timer = win.setTimeout(() => { stop(); if (allowed(manual)) react('desktopFirefly'); }, 1450);
     return true;
   }
   function ambient() {
@@ -106,9 +107,9 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
     return candidates.length > 0 && Math.hypot(candidates[0].x-c.x,candidates[0].y-c.y) < 400 && catchFly(candidates[0]);
   }
   function onClick(event) {
-    if (event.defaultPrevented || event.button !== 0 || event.target.closest?.(BLOCKED) || !canMove()) return;
+    if (event.defaultPrevented || event.button !== 0 || event.target.closest?.(BLOCKED) || !canMove(true)) return;
     const target = flies().find(f => Math.hypot(f.x - event.clientX, f.y - event.clientY) <= 16);
-    if (target) catchFly(target);
+    if (target) catchFly(target, true);
   }
   function perch(host, action) {
     if (!canMove() || !img.animate || !host?.isConnected || host.matches('.is-min,.is-max,.app-full') || host.querySelector('iframe')) return false;
@@ -158,8 +159,8 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
   doc.addEventListener('visibilitychange', onVisibility);
   win.addEventListener('resize', onInput);
   reduce.addEventListener?.('change', onReduce);
-  return { ambient, stop, get active() { return !!effect; }, fireflyAvailable: () => allowed() && !effect && now() - lastFly >= 45000 && flies().length > 0,
-    catchNearby: () => catchFly(flies()[0]), reset() { stop(); lastFly = lastApp = -Infinity; }, dispose() {
+  return { ambient, stop, get active() { return !!effect; }, fireflyAvailable: () => allowed(true) && !effect && now() - lastFly >= 45000 && flies().length > 0,
+    catchNearby: () => catchFly(flies()[0], true), reset() { stop(); lastFly = lastApp = -Infinity; }, dispose() {
     disposed = true; stop(); win.removeEventListener('pondos:app-opened', onApp); doc.removeEventListener('click', onClick);
     doc.removeEventListener('pointerdown', onInput, true); doc.removeEventListener('keydown', onInput, true);
     doc.removeEventListener('visibilitychange', onVisibility); win.removeEventListener('resize', onInput);

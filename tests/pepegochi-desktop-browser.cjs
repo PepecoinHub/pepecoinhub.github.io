@@ -44,11 +44,12 @@ let browser;
  await page.evaluate(()=>{t.pet.needs.hunger=90;t.time+=46000;t.refresh()});await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('sit'));
  await page.mouse.click(800,80);await page.evaluate(()=>{t.time+=46000;t.app('tv')});await page.locator('.pg-desktop-popcorn').waitFor();
  await page.getByRole('button',{name:'Close',exact:true}).click();await page.locator('.pg-desktop-popcorn').waitFor({state:'detached'});
- // Day/still, muted, reduced motion, small screen and game focus do not create desktop effects.
+ // Day/still, muted automatic reactions, reduced motion, small screen and game focus.
  await page.evaluate(()=>{t.time+=46000;document.documentElement.classList.replace('sky-night','sky-day')});await page.mouse.click(163,463);assert.equal(await glow.count(),0);
  await page.evaluate(()=>{document.documentElement.classList.replace('sky-day','sky-night');document.querySelector('.sky').hidden=true});await page.mouse.click(163,463);assert.equal(await glow.count(),0);
  await page.evaluate(()=>document.querySelector('.sky').hidden=false);await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Reactions: on'}).click();await page.keyboard.press('Escape');
- await page.mouse.click(163,463);assert.equal(await glow.count(),0);
+ await page.evaluate(()=>{t.time+=46000;t.app('games')});assert.equal(await away.count(),0);
+ await page.mouse.click(163,463);await glow.waitFor();await page.keyboard.press('Escape');await glow.waitFor({state:'detached'});
  await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Reactions: quiet'}).click();await page.keyboard.press('Escape');
  await page.emulateMedia({reducedMotion:'reduce'});await page.mouse.click(163,463);assert.equal(await glow.count(),0);
  await page.emulateMedia({reducedMotion:'no-preference'});await page.setViewportSize({width:390,height:600});await page.evaluate(()=>{t.time+=46000;t.app('games')});assert.equal(await away.count(),0);

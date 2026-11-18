@@ -2140,19 +2140,25 @@ footer.foot a { color: #edf3e3; }
 .pondos .pg-companion-fact:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #0008; }
 @keyframes pg-fact-pop { 0% { transform: translateY(4px); } 50% { transform: translateY(-3px); } 100% { transform: none; } }
 .pondos .pg-companion-fact[hidden] { display: none; }
-.pg-fact { position: fixed; z-index: 98950; width: min(360px, calc(100vw - 16px)); padding: 0 0 10px; color: #000;
+.pg-fact { position: fixed; z-index: 98950; width: min(360px, calc(100vw - 16px)); padding: 0 0 10px; color: #000; color-scheme: light;
   background: #fffbe0; border: 2px solid #000; box-shadow: 3px 3px 0 #0007; font: 14px/1.4 var(--f-body); }
 .pg-fact-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 3px 2px 8px;
   color: #fff; background: #000080; font: 700 13px/1.5 var(--f-chrome); }
-.pg-fact-x { width: 18px; height: 16px; padding: 0; font: 700 12px/12px var(--f-chrome); color: #000; background: var(--chrome);
-  border: 1px solid; border-color: #fff var(--chrome-dk) var(--chrome-dk) #fff; cursor: pointer; }
+.pg-fact-x { width: 28px; height: 26px; padding: 0; font: 700 16px/16px var(--f-chrome); color: #161616; background: #deded8;
+  border: 2px solid; border-color: #fff #555 #555 #fff; cursor: pointer; }
 .pg-fact-q { margin: 10px 12px 8px; font-weight: 700; font-size: 15px; line-height: 1.35; }
 .pg-fact-answers { display: grid; gap: 5px; margin: 0 12px; }
-.pg-fact-a { min-height: 36px; padding: 5px 10px; text-align: left; font: 14px/1.3 var(--f-chrome); color: #000; background: var(--chrome);
-  border: 1px solid; border-color: #fff var(--chrome-dk) var(--chrome-dk) #fff; cursor: pointer; }
-.pg-fact-a:disabled { cursor: default; color: #000; }
-.pg-fact-a.is-right { background: #c8f0c0; font-weight: 700; }
-.pg-fact-a.is-wrong { background: #f4c4c0; text-decoration: line-through; }
+.pg-fact-a { min-height: 44px; padding: 7px 10px; text-align: left; font: 600 14px/1.3 var(--f-chrome); color: #161616; background: #e5e5df;
+  border: 2px solid; border-color: #fff #555 #555 #fff; box-shadow: 0 0 0 1px #b0b0a5; cursor: pointer; touch-action: manipulation; }
+.pg-fact-a:not(:disabled):hover, .pg-fact-a.is-selected { background: #d4edcf; border-color: #fff #3c6740 #3c6740 #fff; }
+.pg-fact-a:not(:disabled):active, .pg-fact-x:active { border-color: #555 #fff #fff #555; }
+.pg-fact-a:focus-visible, .pg-fact-x:focus-visible { outline: 2px solid #000080; outline-offset: 2px; }
+.pg-fact-a:disabled { cursor: default; color: #4b4b4b; background: #e8e8e8; border-color: #aaa; box-shadow: none; }
+.pg-fact-a.is-right { background: #c8f0c0; color: #143c16; border-color: #31723a; font-weight: 700; }
+.pg-fact-a.is-wrong { background: #f4c4c0; color: #6e1616; border-color: #9d3c3c; text-decoration: line-through; }
+.pg-conversation .pg-fact-answers { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 7px; }
+.pg-conversation .pg-fact-a { overflow-wrap: anywhere; }
+.pg-fact { overscroll-behavior: contain; }
 .pg-fact-out { margin: 8px 12px 0; min-height: 1.2em; font-weight: 600; }
 .pg-fact-out a { color: #000080; }
 .pg-fact-extra { margin: 6px 10px 0; }

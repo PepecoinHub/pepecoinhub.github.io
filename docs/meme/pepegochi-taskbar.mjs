@@ -4,10 +4,10 @@ import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
 // Loaded only behind the existing ?beta=gochi gate. Local conversations are cosmetic; no polling, rewards or fake pet.
 // Based on PR #299; adds the Pond Quiz (one server question a day once the frog has hatched; update_pond_quiz.sql)
 // and the hop out of the PEPEGOCHI.EXE window.
-import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261116room1';
+import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261116room1';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261118desktop1';
-import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118desktop1';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261118dialog1';
+import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118dialog1';
 
 import { createBond } from './pepegochi-bond.mjs?v=20261116sass1';
 
@@ -63,6 +63,7 @@ export function describeTaskbarFrog(state) {
     .filter(([need, val]) => NEEDS.has(need) && Number.isFinite(Number(val)))
     .map(([need, val]) => ({ need, value: Number(val) }));
   const sprite = frogLook({ stage, status, needs }).sprite;
+  const low = needs.filter(n => n.value < LOOK_BELOW).sort((a,b) => a.value-b.value)[0];
   const name = String(p.name || 'Your Fren').slice(0, 18);
   const remarks = {
     healthy: 'Your Fren is here.',
@@ -73,6 +74,8 @@ export function describeTaskbarFrog(state) {
   return {
     careDays: Math.max(0, Math.trunc(Number(p.care_days) || 0)),
     sprite: pose(poseFor(sprite)), label: name, adult: stage === 'adult',
+    playReady: stage !== 'egg' && status === 'healthy' && needs.length === NEEDS.size && !low,
+    needAttention: low?.need || null,
     title: name + ' · ' + remarks[status] + ' Click to talk, double-click to visit.',
     warning: status === 'packing' || status === 'neglected', hasPet: true,
     motion: status !== 'healthy' ? status : (sprite === 'adult_tired' ? 'sleepy' : stage),
@@ -314,9 +317,18 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     setAct(null);
     document.removeEventListener('keydown', onKey, true);
     document.removeEventListener('pointerdown', onOutside, true);
+    window.removeEventListener('resize', positionQuiz);
   }
   function onKey(e) { if (e.key === 'Escape') { closeBalloon(); factBtn.focus(); } }
   function onOutside(e) { if (balloon && !balloon.contains(e.target) && e.target !== factBtn) closeBalloon(); }
+  function positionQuiz() {
+    if (!balloon) return;
+    const r = slot.getBoundingClientRect(), top = Math.min(r.top, img.getBoundingClientRect().top);
+    balloon.style.bottom = Math.max(8, window.innerHeight - top + 6) + 'px';
+    balloon.style.left = Math.max(8, Math.min(r.left, window.innerWidth - balloon.offsetWidth - 8)) + 'px';
+    balloon.style.maxHeight = Math.max(80, top - 12) + 'px';
+    balloon.style.overflowY = 'auto';
+  }
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
   async function showBoard(box) {
     box.replaceChildren(el('p', 'pg-fact-note', 'Loading the ranking…'));
@@ -361,18 +373,25 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       rk.addEventListener('click', () => showBoard(extra));
       extra.replaceChildren(rk);
     };
+    let submitting = false;
     f.answers.forEach((ans, i) => {
       const b = el('button', 'pg-fact-a', ans); b.type = 'button';
       b.addEventListener('click', async () => {
+        if (submitting || f.answered || b.disabled) return;
+        submitting = true;
         [...list.children].forEach(x => { x.disabled = true; });
+        b.classList.add('is-selected');
+        out.textContent = 'Saving your answer…';
         const who = session()?.userId, ticket = quizIntent, target = balloon;
         try {
           const answer = await rpc('gry_quiz_answer', { p_choice: i });
           if (disposed || who !== session()?.userId || ticket !== quizIntent || target !== balloon) return;
+          if (!answer || !answer.answered || !Array.isArray(answer.answers) || !Number.isInteger(answer.correct)) throw new Error('Invalid quiz result');
           server = answer; f = server;
           bond.remember(f.right ? 'quizWin' : 'quizMiss');
         }
-        catch (e) { if (disposed || who !== session()?.userId || ticket !== quizIntent || target !== balloon) return; out.textContent = 'The answer could not be saved. Try again later.'; [...list.children].forEach(x => { x.disabled = false; }); return; }
+        catch (e) { if (disposed || who !== session()?.userId || ticket !== quizIntent || target !== balloon) return; submitting = false; b.classList.remove('is-selected'); out.textContent = 'The answer could not be saved. Try again.'; [...list.children].forEach(x => { x.disabled = false; }); return; }
+        b.classList.remove('is-selected');
         show(); updateFactButton();
       });
       list.append(b);
@@ -383,9 +402,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     document.body.append(balloon);
     // above the frog, inside the screen (also on a phone, where the taskbar has two rows)
     // the frog stands on the taskbar's edge: the balloon goes above its head, so the frog stays visible
-    const r = slot.getBoundingClientRect(), top = Math.min(r.top, img.getBoundingClientRect().top);
-    balloon.style.bottom = Math.max(8, window.innerHeight - top + 6) + 'px';
-    balloon.style.left = Math.max(8, Math.min(r.left, window.innerWidth - balloon.offsetWidth - 8)) + 'px';
+    positionQuiz();
+    window.addEventListener('resize', positionQuiz);
     document.addEventListener('keydown', onKey, true);
     document.addEventListener('pointerdown', onOutside, true);
     (list.querySelector('button:not(:disabled)') || x).focus();
@@ -450,7 +468,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
         conversation?.close({ reset: true }); arcade.reset(); clearToy(); lastLife = state?.pet?.life_id || null;
       }
       const view = describeTaskbarFrog(state);
-      if (shownView?.sprite !== view.sprite || shownView?.label !== view.label) { desktop?.stop(); conversation?.close(); clearToy(); }
+    if (shownView?.sprite !== view.sprite || shownView?.label !== view.label || shownView?.playReady !== view.playReady || shownView?.needAttention !== view.needAttention) { desktop?.stop(); conversation?.close(); clearToy(); }
       paint(view);
       const event = bond.observe(id, state?.pet);
       if (event) conversation?.react(event);
@@ -499,7 +517,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     openQuiz: requestQuiz, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
     canReact: () => !balloon && !desktop?.active && document.activeElement?.tagName !== 'IFRAME', now });
   desktop = mountDesktopCompanion({ slot, img, getView: () => shownView, base, now,
-    eligible: () => !disposed && !balloon && !bond.muted && !!lastLife && document.activeElement?.tagName !== 'IFRAME' && !document.fullscreenElement,
+    eligible: manual => !disposed && !balloon && (manual || !bond.muted) && !!lastLife && document.activeElement?.tagName !== 'IFRAME' && !document.fullscreenElement,
     mayStart: () => !act && !conversation.busy && !document.querySelector('.pg-companion-fly'),
     react: action => conversation.react(action), onStart: cancelMotion, onEnd: queueMotion });
   const onOffline = () => conversation?.react('offline');

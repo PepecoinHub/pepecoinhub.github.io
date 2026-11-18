@@ -29,6 +29,14 @@ test('eggs and young frogs never use adult poses', () => {
     assert.equal(companionReply(view, 'hello').openRoom, false);
   }
 });
+test('froglets get age-appropriate, distinct dialogue instead of identical ribbits', () => {
+  const young = {hasPet:true,adult:false,motion:'froglet',playReady:true,careDays:3};
+  const answers = ['hello','how','joke','pet','play','news','memories','favourite'].map(action=>companionReply(young,action).text);
+  assert.equal(new Set(answers).size,answers.length);
+  assert.match(companionReply(young,'memories').text,/3 care days/);
+  assert.match(companionReply({...young,playReady:false,needAttention:'hunger'},'play').text,/hungry/);
+  for(const action of ['toyOkay','toyFavourite','pet'])assert.equal(companionReply(young,action).pose,null);
+});
 
 // Small DOM harness: exercises the controller without a browser dependency.
 function harness(initial = adult, options = {}) {

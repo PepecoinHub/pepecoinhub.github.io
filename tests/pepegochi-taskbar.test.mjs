@@ -37,6 +37,13 @@ test('young frog stages keep their own pose, whatever their state', () => {
   assert.equal(describeTaskbarFrog(pet({ stage: 'froglet', status: 'packing' })).sprite, 'taskbar/tb_froglet.png');
   assert.equal(describeTaskbarFrog(pet({ stage: 'froglet' })).adult, false, 'no talking or waving poses for the young');
 });
+test('froglet play is allowed only when all observed needs meet the existing care threshold', () => {
+  const healthy = describeTaskbarFrog(pet({stage:'froglet'}));
+  assert.equal(healthy.playReady,true);
+  const hungry = describeTaskbarFrog(pet({stage:'froglet',needs:{...needs,hunger:40}}));
+  assert.equal(hungry.playReady,false); assert.equal(hungry.needAttention,'hunger');
+  assert.equal(describeTaskbarFrog(pet({stage:'froglet',needs:{hunger:100}})).playReady,false);
+});
 test('the 16 approved poses are real 48 x 48 files that pass the art check', async () => {
   const { checkFile } = await import('../scripts/pepegochi_art_qa.mjs');
   const { POSES, pose } = await import('../docs/meme/pepegochi-taskbar.mjs');

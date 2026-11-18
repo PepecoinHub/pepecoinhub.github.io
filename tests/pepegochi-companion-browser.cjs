@@ -82,12 +82,30 @@ const server = http.createServer((req, res) => {
   const box=await page.locator('.pg-conversation').boundingBox();assert.ok(box.x>=0 && box.x+box.width<=width && box.y>=0);
   await page.keyboard.press('Escape');
  }
+ // The screenshot regression: dark chrome, young frog and manual buttons still work.
+ await page.setViewportSize({width:390,height:720});
+ await page.evaluate(()=>{document.documentElement.setAttribute('data-theme','dark');t.pet.stage='froglet';t.refresh()});
+ await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('froglet'));
+ await frog.focus();await page.keyboard.press('Enter');
+ const reply=page.locator('.pg-conversation .pg-fact-q');
+ await page.getByRole('button',{name:'Tell me a joke',exact:true}).click();const joke=await reply.textContent();
+ await page.getByRole('button',{name:'Pet me',exact:true}).click();assert.notEqual(await reply.textContent(),joke);
+ await page.getByRole('button',{name:'Roll the ball',exact:true}).click();assert.ok(await page.locator('.pg-companion-toy').isVisible());
+ assert.equal(await page.getByRole('button',{name:'Tell me a joke',exact:true}).evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(229, 229, 223)');
+ await page.keyboard.press('Escape');
+ await page.evaluate(()=>{t.pet.stage='adult';t.refresh()});await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('adult_sit'));
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pond Quiz',exact:true}).click();
+ const answer=page.getByRole('button',{name:'Yes',exact:true});
+ assert.equal(await answer.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(229, 229, 223)');
+ await answer.click();assert.match(await page.locator('.pg-fact-out').textContent(),/Saving/);
+ await page.evaluate(()=>t.answer(null));await page.waitForFunction(()=>!document.querySelector('.pg-fact-answers button').disabled);
+ assert.match(await page.locator('.pg-fact-out').textContent(),/Try again/);await page.keyboard.press('Escape');
  // A late quiz response from the previous owner cannot change the new owner's frog.
  await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pond Quiz',exact:true}).click();
  await page.getByRole('button',{name:'Yes',exact:true}).click();
  await page.evaluate(()=>{t.owner='owner-c';t.refresh();});
  await page.waitForFunction(()=>!document.querySelector('.pg-fact'));
- await page.evaluate(()=>t.answer({right:true,correct:0,picked:0,points:1,answers:['Yes','No']}));
+ await page.evaluate(()=>t.answer({answered:true,right:true,correct:0,picked:0,points:1,answers:['Yes','No']}));
  await frog.focus();await page.keyboard.press('Enter');
  assert.doesNotMatch(await page.locator('.pg-conversation .pg-fact-q').textContent(),/quiz team/);
  await page.keyboard.press('Escape');

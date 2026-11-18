@@ -38,6 +38,11 @@ PR #353 belongs to the full PepeGochi product launch. Ship all implemented compa
 - Local controller unit tests cover geometry, visible night lights, cooldown, actual app selection, cancellation, cleanup and care priority; `node tests/pepegochi-desktop-browser.cjs` adds a Chromium fixture for end-to-end review. Browser launch in the current execution environment was denied by the OS; complete the browser and real desktop visual review before launch.
 - Future (not implemented): richer weather or seasonal reactions, more window behaviours, and verified event awards only after explicit approval. No rare-firefly stamp in this draft.
 
+## Dialog polish A12.1 (2026-11-18; pending release)
+- High-contrast Win98 buttons in both the companion dialog and Pond Quiz, independent of dark desktop chrome. Larger targets, focus/hover/pressed states and visible quiz saving/error feedback; the companion uses two columns and scrolls back to its reply after selection.
+- Egg, tadpole and froglet retain their own poses but no longer return an identical reply to every action. Healthy froglets can use desk toys and stage-appropriate desktop effects with the existing sprite. Froglets with a low need explain why they cannot play. Quiet suppresses automatic reactions, not a deliberate firefly click or conversation.
+- No new care actions, RPCs, wallet features, secrets or awards. Test the new conversation and quiz behavior on 320/390px in dark and light themes before release.
+
 ## Next phases (not implemented here)
 1. Room: click the frog and existing props; TV opens PepTV only with explicit input, bed routes to real rest, lamp toggles, plant watering, ball/play, and radio/dance if present. Respect actual room inventory rather than inventing objects. A decorative click cannot change a pet need except through the existing validated care flow.
 2. Additional site events: other arcade games, verified stamp award, weekly Guesser result and Pond King update. Connect only existing verified result paths; never infer wins from opening/closing a window. Reuse the mute/throttle and avoid interrupting game controls.
