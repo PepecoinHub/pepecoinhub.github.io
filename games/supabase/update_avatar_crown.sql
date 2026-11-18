@@ -1,11 +1,10 @@
--- Fren avatar: the Crown hat becomes the reward of the "Long Live the King" stamp (owner, 2026-11-18).
+-- Fren avatar: the "Long Live the King" stamp unlocks the King Fren special avatar; the Crown hat stays free for everyone (owner, 2026-11-18).
 -- Run once in the Supabase SQL editor (after update_fren_avatar.sql, which is already live). Safe to run again.
 -- Only replaces public.gry_passport_avatar_save, the same body as update_fren_avatar.sql (keep the two equal;
 -- tests/passport.test.mjs checks it). It does NOT touch gry_passport_state, so running it cannot undo the newer
 -- Passport read path from update_passport_awards.sql (re-running update_fren_avatar.sql alone would).
---  * hat_crown is saveable only with the long_live_the_king stamp (10 Pond King duels won in one reign).
---  * A reward part already on a player's saved look is never refused: frens who picked the crown while it was free
---    keep it and can still change the rest of their look.
+--  * special_king is saveable only with the long_live_the_king stamp (10 Pond King duels won in one reign).
+--  * A reward part already on a player's saved look is never refused.
 begin;
 
 -- the six-part version of this RPC is replaced (one signature only; an old page that sends six parts
@@ -39,7 +38,7 @@ begin
      or p_special is null or p_special not in ('special_none', 'special_explorer', 'special_batman', 'special_vampire', 'special_smile', 'special_nerd', 'special_soldier', 'special_straw', 'special_knight',
                                                    'special_seeker', 'special_looking', 'special_sherlock', 'special_scribe', 'special_editor',
                                                    'special_birthday', 'special_santa', 'special_turkey',
-                                                   'special_gamer', 'special_gigachad', 'special_party', 'special_cupid', 'special_juice', 'special_beanie', 'special_chill', 'special_bigfren', 'special_dolphin', 'special_retro') then
+                                                   'special_gamer', 'special_gigachad', 'special_party', 'special_cupid', 'special_juice', 'special_beanie', 'special_chill', 'special_bigfren', 'special_dolphin', 'special_retro', 'special_king') then
     raise exception 'Unknown avatar option' using errcode = '22023';
   end if;
   -- Reward parts: saveable only by a player who holds the stamp that unlocks them
@@ -47,19 +46,19 @@ begin
   if exists (
     select 1 from (values ('bg_sunset', 'yeet_adept'), ('clothing_suit', 'detective_fren'), ('hat_hardhat', 'rookie_miner'),
                           ('hat_detective', 'detective_fren'), ('accessory_headphones', 'arcade_hopper'),
-                          ('hat_explorer', 'scout_fren'), ('special_explorer', 'scout_fren'), ('hat_crown', 'long_live_the_king'),
+                          ('hat_explorer', 'scout_fren'), ('special_explorer', 'scout_fren'),
                           ('special_knight', 'good_game'),
                           ('special_batman', 'why_tho'), ('special_vampire', 'midnight_fren'), ('special_smile', 'happy_fren'),
                           ('special_nerd', 'nerd_alert'), ('special_soldier', 'born_to_fren'), ('special_straw', 'bali_dreamer'),
                           ('special_seeker', 'secret_starter'), ('special_looking', 'find_fren'), ('special_sherlock', 'address_check'),
                           ('special_scribe', 'dear_editor'), ('special_editor', 'senior_editor'), ('special_birthday', 'pep_birthday'),
                           ('special_santa', 'frogmas'), ('special_turkey', 'thanksgiving_fren'),
-                          ('special_gamer', 'arcade_hopper'), ('special_gigachad', 'share_fren'), ('special_party', 'old_frog'), ('special_cupid', 'valentine_fren'), ('special_juice', 'welcome_back'), ('special_beanie', 'streak_14'), ('special_chill', 'like_it_here'), ('special_bigfren', 'certified_fren'), ('special_dolphin', 'nasa_is_hiring'), ('special_retro', 'fud_buster')) r(part, stamp)
+                          ('special_gamer', 'arcade_hopper'), ('special_gigachad', 'share_fren'), ('special_party', 'old_frog'), ('special_cupid', 'valentine_fren'), ('special_juice', 'welcome_back'), ('special_beanie', 'streak_14'), ('special_chill', 'like_it_here'), ('special_bigfren', 'certified_fren'), ('special_dolphin', 'nasa_is_hiring'), ('special_retro', 'fud_buster'), ('special_king', 'long_live_the_king')) r(part, stamp)
      where r.part in (p_bg, p_clothing, p_hat, p_accessory, p_special)
        -- the unlock is a stamp, or (for most special avatars) a secret
        and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)
        and not exists (select 1 from games.passport_secrets s where s.user_id = u and s.secret_id = r.stamp)
-       -- a part already on the player's saved look stays allowed (the crown was free before 2026-11-18)
+       -- a part already on the player's saved look stays allowed (a reward part never locks a saved look)
        and not exists (select 1 from games.passport_avatars a where a.user_id = u
                           and r.part in (a.bg, a.clothing, a.hat, a.accessory, a.special))) then
     raise exception 'That part is locked: earn its stamp first' using errcode = '42501';
