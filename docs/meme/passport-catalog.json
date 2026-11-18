@@ -192,6 +192,13 @@
       "status": "live"
     },
     {
+      "id": "crown_breaker",
+      "title": "Crown Breaker",
+      "description": "Dethrone a Pond King after at least 13 defenses in that reign. The count is checked before your winning duel. Unlocks the Crown Breaker knight in Create Your Fren.",
+      "category": "arcade",
+      "status": "live"
+    },
+    {
       "id": "yeet_adept",
       "title": "Adept",
       "description": "Fly at least 3000 m in YEET THE PEP. Unlocks the Sunset avatar background.",

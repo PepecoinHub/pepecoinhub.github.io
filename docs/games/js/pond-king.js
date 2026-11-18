@@ -126,12 +126,22 @@
     $('king-line').textContent = (k.house ? 'The house frog keeps the seat warm. Somebody take it. ' : '') + 'On the throne since ' + ago(k.since) + '.';
     $('king-def').textContent = k.defenses;
     $('who').textContent = k.you ? 'you are the king' : me ? (me.name || 'guest') + (me.discord ? ' ✓' : ' (guest)') : (store.get('pk-nick') || 'visitor');
-    // the leader's face: their Fren avatar (Discord players who saved one), otherwise the pond's king frog
-    var faceKey = k.avatar ? JSON.stringify(k.avatar) : '';
+    // Show the player's saved Fren avatar, or a plain Fren for players without one.
+    var faceKey = k.id + ':' + JSON.stringify(k.avatar || null);
     if (faceKey !== lastFace) {
-      lastFace = faceKey; var box = $('king-face'), frog = '<img class="throne-frog" src="img/pond/pond-king.png?v=pepe" alt="" width="96" height="96">';
-      if (!k.avatar) box.innerHTML = frog;
-      else N.avatar(k.avatar, k.nick + '’s Fren avatar').then(function (av) { if (lastFace !== faceKey) return; box.textContent = ''; if (av) box.appendChild(av); else box.innerHTML = frog; });
+      lastFace = faceKey;
+      var box = $('king-face');
+      var fallback = '<img class="throne-frog" src="../meme/avatar-assets/layers/base_frog.webp" alt="" width="96" height="96">';
+      var defaultLook = { bg: 'bg_sky', clothing: 'clothing_blue', mouth: 'mouth_flat', eyes: 'eyes_sleepy', hat: 'hat_none', accessory: 'accessory_none', special: 'special_none' };
+      box.innerHTML = fallback;
+      N.avatar(k.avatar || defaultLook, k.nick + '’s Fren avatar').then(function (av) {
+        if (lastFace !== faceKey) return;
+        if (av) { box.textContent = ''; box.appendChild(av); }
+        else if (k.avatar) N.avatar(defaultLook, 'Default Fren avatar').then(function (plain) {
+          if (lastFace !== faceKey || !plain) return;
+          box.textContent = ''; box.appendChild(plain);
+        });
+      });
     }
     var prog = $('king-progress');
     prog.hidden = !(k.you && k.defenses < 10);
@@ -285,6 +295,7 @@
         : r.score[0] === r.score[1] ? 'A tie keeps the king on the throne. ' + kingNick + ' has now held it ' + plural(r.king.defenses, 'time', 'times') + '. You walk away dizzy: come back in 4 hours.'
           : kingNick + ' has now held the throne ' + plural(r.king.defenses, 'time', 'times') + '. ' + bruised() + ' Or send a fren: you know the king’s pattern now (unless they change it).');
       after.appendChild(p);
+      if (r.crown_breaker_new) after.appendChild(mk('p', 'tip', 'Crown Breaker unlocked! You ended a reign of at least 13 defenses. Your stamp is in Fren Passport, and the knight avatar is ready in Create Your Fren.'));
       if (r.won) after.appendChild(mk('p', 'tip', '💡 Tip: set a new pattern now, below. Avoid three of the same: it is the easiest pattern to guess.'));
       var row = mk('div', 'row'), ok = mk('button', r.won ? 'go' : '', r.won ? 'To my throne →' : 'OK'); ok.type = 'button';
       ok.addEventListener('click', function () { $('result').hidden = true; load(); });

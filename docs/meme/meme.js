@@ -836,7 +836,7 @@
     // Internet, Pond TV, NERDS ONLY and Find in the bottom-left corner; Official Store, Twitter, r/pepecoin and Discord in a row at the
     // bottom centre; Write a letter and the Recycle Bin in the bottom-right corner. Phones get one grid in the same order.
     var DESKTOP = [
-      ['top', [['#logon', 'Log On', 'pep-logo'], ['#lan', 'LAN Party', 'gif-080-still'], ['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'],
+      ['top', [['#logon', 'Log On', 'pep-logo'], ['#lan', 'LAN Party', 'gif-085-still'], ['#wp', "Pepe Guesser", 'wp-folder'], ['#frog', 'FROGAGEDDON', 'pondwars'],
         ['#bulletin', 'Pond Bulletin', 'bulletin'], ['#king', 'Pond King', 'pond-king'], ['#lilies', 'Three Lilies', 'lilies'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#games', 'Games', 'games-folder']]],
       ['low', [['./', 'Internet', 'internet'], ['#tv', 'Pond TV', 'pond-tv'], ['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#find', 'Find', 'search']]],
       // the community: the official store, the official Pepecoin account (the classic bird), our subreddit and the Discord
@@ -1195,7 +1195,7 @@
     // "Click around": the pond is more than one page. Five big doors right under today's game.
     var doors = el('div', { class: 'pond-do', role: 'group', 'aria-label': 'Things to do in the pond' }, '<p>Click, check, search. It is a whole pond in here:</p>');
     [['newspaper-still', 'Read the Gazette', 'The pond\u2019s own newspaper', function () { frogMail('gz'); }],
-      ['gif-080-still', 'Drop by the LAN Party', 'Say gm in the chat', function () { lanParty(); }],
+      ['gif-085-still', 'Drop by the LAN Party', 'Say gm in the chat', function () { lanParty(); }],
       ['games-folder', 'Play something', 'Snake, Chess, YEET and more', function () { gamesFolder(); }],
       ['pepe-search', 'Check an address', 'PEP or the wrong frog?', function () { addressCheck(); }],
       ['leaders', 'See the LEADERS', 'Every top 10 in one place', function () { highScores(); }],
@@ -2062,7 +2062,7 @@
       ['PEPaint.exe', 'The party room: draw and guess with frens', 'pepaint', 'game draw guess charades kalambury paint party multiplayer room pepaint', drawGuess],
       ['Pepe Pictures', 'Weekly quiz night: host wanted', 'unclesam', 'game quiz pictures host night', pepePictures],
       ['Games folder', 'All the games', 'games-folder', 'games play folder', gamesFolder],
-      ['LAN Party', 'The lobby chat', 'gif-080-still', 'chat talk frens online lobby messages', lanParty],
+      ['LAN Party', 'The lobby chat', 'gif-085-still', 'chat talk frens online lobby messages', lanParty],
       ['Pond TV', 'Videos from the Pepecoin channel', 'pond-tv', 'tv video youtube channel watch', pondTV],
       ['PEP-TV Ads', 'Fake late-night infomercials', 'pep-tv-ads', 'ads tv commercials videos funny', adsFolder],
       ['NERDS ONLY', 'Charts, whales, math and receipts', 'nerds-folder', 'nerds folder tools data facts', act('#nerds')],
@@ -2205,10 +2205,10 @@
   // The last snapshot stays in memory for the same Discord user, so the Avatar Maker can show the saved
   // look and refresh the Passport after a save without asking the server again.
   var passportCache = null; // { userId, state, catalog, opts }
-  var PP_CATALOG = 'passport-catalog.json?v=20261118king';
+  var PP_CATALOG = 'passport-catalog.json?v=20261118crown';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261115x7'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261118crown'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -2398,6 +2398,7 @@
   function ppStamp(x, earned) {
     if (earned && x.id === 'pond_pioneer') return el('span', {class:'pp-art pp-art-stamp is-pioneer',role:'img','aria-label':'Pond Pioneer'});
     if (earned && x.id === 'pond_dominator') return el('span', { class: 'pp-art pp-art-stamp is-dominator', 'aria-hidden': 'true' });
+    if (earned && x.id === 'crown_breaker') return el('span', { class: 'pp-art pp-art-stamp is-crown-breaker', 'aria-hidden': 'true' });
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
     if (!earned) return ppSprite('pp-art pp-art-stamp', PP_STAMPS, 'locked');
     var pending = el('span', { class: 'pp-art pp-art-stamp is-pending', 'aria-hidden': 'true' });
@@ -2906,7 +2907,7 @@
   var avOpts = null;
   function avatarOptions() {
     if (!avOpts) {
-      avOpts = fetch('avatar-options.json?v=20261118king').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
+      avOpts = fetch('avatar-options.json?v=20261118crown').then(function (r) { if (!r.ok) throw new Error('avatar options'); return r.json(); });
       avOpts.catch(function () { avOpts = null; });
     }
     return avOpts;
@@ -2977,7 +2978,7 @@
     yeet_adept: 'Adept', arcade_hopper: 'Arcade Hopper', secret_starter: 'Secret Starter', dear_editor: 'Dear Editor',
     senior_editor: 'Senior Editor', frogmas: 'Frogmas', old_frog: 'Old Frog', welcome_back: 'Welcome Back',
     streak_14: '14-day streak', like_it_here: 'I Like It Here', certified_fren: 'Certified Fren', nasa_is_hiring: 'NASA Is Hiring', fud_buster: 'FUD Buster',
-    long_live_the_king: 'Long Live the King' };
+    long_live_the_king: 'Long Live the King', crown_breaker: 'Crown Breaker' };
   // event days: open to every fren who visits PondOS on that day (the check-in gives them)
   var FA_EVENT = { pep_birthday: 'visit PondOS on 30 January, Pepecoin\'s birthday', thanksgiving_fren: 'visit PondOS on Thanksgiving weekend',
     valentine_fren: 'visit PondOS on 14 February, Valentine\'s Day' };
@@ -5300,7 +5301,7 @@
   }
   var LAN_H = 'pondos-lan-h', LAN_LIST = 'pondos-lan-list', LAN_ALERTS = 'pondos-lan-alerts';
   function lanParty() {
-    var A = openApp('lan', 'LAN Party - #pond chat', 'gif-080-still', function (A) {
+    var A = openApp('lan', 'LAN Party - #pond chat', 'gif-085-still', function (A) {
       var listPref = null; try { listPref = localStorage.getItem(LAN_LIST); } catch (e) {}
       A.host.classList.add('lan-win');
       A.body.innerHTML =
@@ -5660,7 +5661,7 @@
         var it = (r && r.items) || []; if (!it.length || apps.lan) return;
         var lastM = it[it.length - 1];
         var b = balloon(it.length === 1 ? esc(lastM.from) + ' mentioned you' : 'You were mentioned ' + it.length + '\u00d7',
-          esc(String(lastM.body).slice(0, 90)) + '<br><u>Open the LAN Party chat</u>', 'gif-080-still');
+          esc(String(lastM.body).slice(0, 90)) + '<br><u>Open the LAN Party chat</u>', 'gif-085-still');
         b.style.cursor = 'pointer';
         b.addEventListener('click', function (e) { if (!e.target.closest('button')) { lanParty(); b.remove(); } });
       }, function () {});

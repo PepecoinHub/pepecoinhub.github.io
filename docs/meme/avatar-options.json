@@ -22,7 +22,7 @@
     "accessory": "accessory_none",
     "special": "special_none"
   },
-  "unlock_note": "Options with an unlock key are rewards for server-verified stamps. The maker shows them with a lock until the player has the stamp, and the save RPC checks the stamp again. Sunset background: Adept (planned). Detective hat and jacket: Detective Fren. Hard hat: Miner Fren. Headphones: Gamer Fren (planned). Explorer hat and Explorer Pepe: Scout Fren. King Fren: Long Live the King.",
+  "unlock_note": "Options with an unlock key are rewards for server-verified stamps. The maker shows them with a lock until the player has the stamp, and the save RPC checks the stamp again. Sunset background: Adept (planned). Detective hat and jacket: Detective Fren. Hard hat: Miner Fren. Headphones: Gamer Fren (planned). Explorer hat and Explorer Pepe: Scout Fren. King Fren: Long Live the King. Crown Breaker Knight: Crown Breaker.",
   "options": {
     "bg": [
       {
@@ -409,13 +409,18 @@
         "id": "special_king",
         "label": "King Fren (Long Live the King)",
         "unlock": "long_live_the_king"
+      },
+      {
+        "id": "special_crown_breaker",
+        "label": "Crown Breaker Knight",
+        "unlock": "crown_breaker"
       }
     ]
   },
   "paths": {
     "base": "avatar-assets/layers/base_frog.webp",
-    "layer_template": "avatar-assets/layers/{id}.webp?v=20261118king",
-    "thumb_template": "avatar-assets/thumbs/{id}.webp?v=20261118king"
+    "layer_template": "avatar-assets/layers/{id}.webp?v=20261118crown",
+    "thumb_template": "avatar-assets/thumbs/{id}.webp?v=20261118crown"
   },
   "special_note": "A special avatar is a whole character (Lily's drawing for a big milestone, or a classic Pepe meme for a secret). When one is picked it replaces every part layer except the background (bg).",
   "mouth_note": "Cigarette and pipe (in_mouth) are drawn under the mouth layer and moved so their in_mouth point lands on the chosen mouth's corner (512 canvas pixels), so the filter or mouthpiece is held in every mouth."
