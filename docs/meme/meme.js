@@ -4001,7 +4001,7 @@
     var at = new Date(WP_LAUNCH).toLocaleString('en-US', { weekday: 'long', hour: '2-digit', minute: '2-digit' });
     return '⏳ Starts in <b class="gz-clock">' + (d ? d + 'd ' : '') + h + 'h ' + ('0' + m).slice(-2) + 'm ' + ('0' + sec).slice(-2) + 's</b> (' + at + ' your time)';
   }
-  function mailRead() { try { return +(localStorage.getItem(MAIL_KEY) || -1) >= MAIL_ISSUE; } catch (e) { return false; } }
+  function mailRead() { try { return +(localStorage.getItem(MAIL_KEY) || -1) >= gzLatest(); } catch (e) { return false; } }
   function paintMail() {
     var gz = !mailRead() ? 1 : 0, lt = (letterBox && letterBox.unread) || 0, n = gz + lt;
     var t = lt ? 'Frog Mail: ' + lt + (lt === 1 ? ' new letter' : ' new letters') + ' for you' : gz ? 'Frog Mail: 1 unread, a new Pond Gazette' : 'Frog Mail';
@@ -4251,37 +4251,243 @@
     };
     wpRpc('gry_poll', { p_poll: id }).then(show, function () { say('The ballot box opens soon. Come back in a bit.'); });
   }
+  // ---------- The Gazette archive: issues #2–#10 live in this file, newer ones come from the Newsroom (Supabase) ----------
+  // update_gazette_newsroom.sql: gry_gazette_list (numbers, titles, ads), gry_gazette_issue (one issue).
+  var GZ_BUILTIN = [
+    { num: 10, title: 'We are live', at: '2026-11-17' }, { num: 9, title: 'Week 1 pays double', at: '2026-11-15' },
+    { num: 8, title: 'The week 1 poll', at: '2026-11-14' }, { num: 7, title: 'The Pond goes BETA', at: '2026-11-12' },
+    { num: 6, title: 'X unblocked us, the first faucet payout, 1 km', at: '2026-11-09' },
+    { num: 5, title: 'The lockout, CoinEx and the first Pond Poll', at: '2026-11-06' }, { num: 4, title: 'The Pepe Guesser leak', at: '2026-11-05' },
+    { num: 3, title: 'An internet in your internet', at: '' }, { num: 2, title: 'Pepe Guesser is coming', at: '' }
+  ];
+  var GZ_STORE = SB_URL + '/storage/v1/object/public/gazette/', GZ_CACHE = 'pondos-gz-index';
+  var GZ_LOOKS = ['news', 'tabloid', 'shop', 'travel', 'fight', 'telethon', 'psychic', 'gameshow'];
+  var gzRemote = { issues: [], ads: [], t: 0 };
+  try { var gzc = JSON.parse(localStorage.getItem(GZ_CACHE) || 'null'); if (gzc && Array.isArray(gzc.issues) && Array.isArray(gzc.ads)) gzRemote = gzc; } catch (e) {}
+  // what a Gazette button may open (the Newsroom offers this list; anything else is dropped)
+  var GZ_GO = {
+    write: ['Letter to the Editor', function () { frogMail('write'); }], lan: ['LAN Party chat', function () { lanParty(); }],
+    wpgo: ['Pepe Guesser', function () { wheresPepe(); }], hof: ['Hall of Fame', function () { wpHallOfFame(); }],
+    pass: ['Fren Passport', function () { frenPassport(); }], fren: ['Avatar Maker', function () { avatarMaker(); }],
+    paint: ['PEPaint', function () { drawGuess(); }], king: ['Pond King', function () { pondKingApp(); }],
+    lilies: ['Battle of Three Lilies', function () { liliesApp(); }], miner: ['Pepe Miner', function () { minerApp(); }],
+    yeet: ['YEET THE PEP', function () { yeetApp(); }], frog: ['FROGAGEDDON', function () { pondWarsApp(); }],
+    sweep: ['PEPE SWEEPER', function () { pepeSweeperApp(); }], tv: ['PEP-TV Ads folder', function () { adsFolder(); }],
+    laptop: ['Laptop Index', function () { laptop(); }]
+  };
+  function gzLatest() { return Math.max(MAIL_ISSUE, gzRemote.issues.length ? +gzRemote.issues[0].num || 0 : 0); }
+  function gzAll() {
+    var seen = {}, out = [];
+    gzRemote.issues.concat(GZ_BUILTIN).forEach(function (x) { var n = +x.num; if (n >= 2 && !seen[n]) { seen[n] = 1; out.push({ num: n, title: String(x.title || ''), at: String(x.at || '').slice(0, 10) }); } });
+    return out.sort(function (a, b) { return b.num - a.num; });
+  }
+  function gzLoadIndex(force) {
+    if (!force && gzRemote.t && Date.now() - gzRemote.t < 6e5) return Promise.resolve(gzRemote);
+    return rpc('gry_gazette_list', {}).then(function (j) {
+      if (!j || !Array.isArray(j.issues)) return gzRemote;
+      gzRemote = { issues: j.issues.filter(function (x) { return +x.num > 10; }), ads: Array.isArray(j.ads) ? j.ads : [], t: Date.now() };
+      try { localStorage.setItem(GZ_CACHE, JSON.stringify(gzRemote)); } catch (e) {}
+      gzAddAds(); paintMail();
+      if (apps.mail && apps.mail.paintDial) apps.mail.paintDial();
+      return gzRemote;
+    }, function () { return gzRemote; });
+  }
+  if (mainEl) setTimeout(function () { gzLoadIndex(); }, 2500);
+  // a picture: one of this site's own images, or one the owner uploaded to the "gazette" bucket
+  function gzImg(src) {
+    src = String(src || '');
+    if (/^(?:ico\/|chars\/)?[a-z0-9_-]+\.(?:webp|png|gif|jpg)$/.test(src)) return 'img/' + src;
+    if (src.indexOf(GZ_STORE) === 0 && /^[A-Za-z0-9_-]+\.(?:webp|png|gif|jpe?g)$/.test(src.slice(GZ_STORE.length))) return src;
+    return '';
+  }
+  // the Newsroom's small text format: **bold**, *italic*, [words](link); "- " lines make a list, "> " lines a quote
+  function gzInline(t) {
+    return esc(String(t || '')).replace(/\[([^\]\n]{1,120})\]\(((?:https:\/\/|\.\.\/)?[^\s()<>"]{1,300})\)/g, function (m, a, u) {
+      if (!/^(?:https:\/\/[a-z0-9.-]+\.[a-z]{2,}(?:\/|$)|(?:\.\.\/)?[a-z0-9-]+(?:\/[a-z0-9-]+)*\.html(?:#[a-z0-9-]*)?$)/i.test(u)) return a;
+      return '<a href="' + u + '"' + (/^https:/.test(u) ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + a + '</a>';
+    }).replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/(^|[\s(])\*([^*\s][^*\n]*)\*/g, '$1<i>$2</i>');
+  }
+  function gzBody(t, ulClass) {
+    var out = [], para = [], list = [], quote = [];
+    var flush = function () {
+      if (para.length) out.push('<p>' + para.map(gzInline).join('<br>') + '</p>');
+      if (list.length) out.push('<ul' + (ulClass ? ' class="' + ulClass + '"' : '') + '>' + list.map(function (x) { return '<li>' + gzInline(x) + '</li>'; }).join('') + '</ul>');
+      if (quote.length) out.push('<blockquote class="gz-quote"><p>' + quote.map(gzInline).join('<br>') + '</p></blockquote>');
+      para = []; list = []; quote = [];
+    };
+    String(t || '').replace(/\r/g, '').split('\n').forEach(function (ln) {
+      var s = ln.trim(), m;
+      if (!s) return flush();
+      if ((m = /^(?:-|•)\s+(.*)$/.exec(s))) { if (para.length || quote.length) flush(); list.push(m[1]); }
+      else if ((m = /^>\s?(.*)$/.exec(s))) { if (para.length || list.length) flush(); quote.push(m[1]); }
+      else { if (list.length || quote.length) flush(); para.push(s); }
+    });
+    flush();
+    return out.join('');
+  }
+  function gzGoBtn(x, cls) {
+    if (!x || !String(x.label || '').trim()) return '';
+    var go = String(x.go || ''), lab = esc(String(x.label).trim().slice(0, 60));
+    if (go === 'url') {
+      var u = String(x.url || '').trim();
+      if (!/^(?:https:\/\/[a-z0-9.-]+\.[a-z]{2,}(?:\/[^\s"<>]*)?|(?:\.\.\/)?[a-z0-9-]+(?:\/[a-z0-9-]+)*\.html(?:#[a-z0-9-]*)?)$/i.test(u)) return '';
+      return '<a class="' + cls + '" href="' + esc(u) + '"' + (/^https:/.test(u) ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + lab + '</a>';
+    }
+    if (!GZ_GO[go] && !/^ad:[a-z0-9][a-z0-9_]{1,40}\.mpg$/.test(go)) return '';
+    return '<button type="button" class="' + cls + '" data-go="' + esc(go) + '">' + lab + '</button>';
+  }
+  function gzRun(go) {
+    if (go.indexOf('ad:') === 0) { var i = adByFile(go.slice(3)); if (i >= 0) adPlayer(i); return; }
+    if (GZ_GO[go]) GZ_GO[go][1]();
+  }
+  function gzWire(root) {
+    root.querySelectorAll('[data-go]').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); gzRun(b.getAttribute('data-go')); }); });
+  }
+  var GZ_STYLE = { story: '', breaking: 'gz-breaking', letters: 'gz-letters', notes: 'gz-board', facts: 'gz-facts', poll: 'gz-pollsec' };
+  function gzBlock(b) {
+    b = b || {};
+    var st = GZ_STYLE.hasOwnProperty(b.style) ? b.style : 'story', src = gzImg(b.img), alt = esc(String(b.alt || '').slice(0, 120));
+    var body = gzBody(b.body, st === 'notes' ? 'gz-notes' : ''), main = body;
+    if (src && b.imgSize === 'wide') main = '<img class="gz-hero" src="' + esc(src) + '" alt="' + alt + '" loading="lazy">' + body;
+    else if (src) main = '<div class="gz-wpbox"><img src="' + esc(src) + '" alt="' + alt + '" width="110" loading="lazy"><div>' + body + '</div></div>';
+    if (st === 'poll' && b.poll && /^gz[0-9]{2,4}_[a-z0-9]{3,12}$/.test(b.poll.id)) main += '<div class="gz-poll" data-poll="' + b.poll.id + '" aria-live="polite"><p class="gz-poll-msg">Opening the ballot box…</p></div>';
+    var btns = (Array.isArray(b.btns) ? b.btns : []).slice(0, 3).map(function (x, i) { return gzGoBtn(x, 'app-btn' + (i ? '' : ' go')); }).join('');
+    return '<section' + (GZ_STYLE[st] ? ' class="' + GZ_STYLE[st] + '"' : '') + '>' +
+      (b.kicker ? '<p class="' + (st === 'breaking' ? 'gz-flash' : 'gz-kick') + '">' + gzInline(String(b.kicker).slice(0, 80)) + '</p>' : '') +
+      (b.heading ? '<h4>' + gzInline(String(b.heading).slice(0, 160)) + '</h4>' : '') + main +
+      (b.fine ? '<p class="gz-fine">' + gzInline(String(b.fine).slice(0, 300)) + '</p>' : '') +
+      (btns ? '<div class="app-row">' + btns + '</div>' : '') + '</section>';
+  }
+  function gzIssueHtml(is) {
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #' + (+is.num || '?') + '</span><span>Price: 0 PEP</span><span>' + esc(String(is.edition || 'Weekly').slice(0, 40)) + '</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      (is.draft ? '<p class="gz-stop">DRAFT · only you can see this until you publish it</p>' : '') +
+      (Array.isArray(is.blocks) ? is.blocks : []).map(gzBlock).join('') +
+      '<p class="gz-foot">' + gzInline(is.foot || 'See you in the pond. 🐸 The Editor') + '</p></article>';
+  }
+  // one PEP-TV scene from the Newsroom: kicker, big words (*word* glows), a picture, small print, one button
+  function gzScene(s) {
+    s = s || {};
+    var src = gzImg(s.img), big = String(s.big || '').slice(0, 120);
+    return (s.burst ? adBurst(esc(String(s.burst).slice(0, 16)), 'b-tr') : '') +
+      (s.kick ? '<p class="ad-kick">' + esc(String(s.kick).slice(0, 120)) + '</p>' : '') +
+      (big ? '<h3 class="ad-big">' + esc(big).replace(/\*([^*\n]+)\*/g, '<em>$1</em>').replace(/\n/g, '<br>') + '</h3>' : '') +
+      (src ? '<img class="ad-pic" src="' + esc(src) + '" alt="">' : '') +
+      (s.sub ? '<p class="ad-sub">' + gzInline(String(s.sub).slice(0, 300)).replace(/\n/g, '<br>') + '</p>' : '') +
+      (s.fine ? '<p class="ad-fine">' + esc(String(s.fine).slice(0, 200)) + '</p>' : '') + gzGoBtn(s.btn, 'ad-cta');
+  }
+  function gzAd(a) {
+    return { file: a.id, remote: true, added: String(a.at || '').slice(0, 10), title: String(a.title || a.id).slice(0, 80), ch: esc(String(a.ch || 'CH 7 · PEP-TV').slice(0, 80)),
+      look: GZ_LOOKS.indexOf(a.look) >= 0 ? a.look : '', kitsch: !!a.kitsch, iconSrc: gzImg(a.icon) || ico('pep-tv-ads'),
+      scenes: (Array.isArray(a.scenes) ? a.scenes : []).slice(0, 10).map(gzScene) };
+  }
+  // published Newsroom ads join the PEP-TV folder (newest first), with the red "new" dot like the others
+  function gzAddAds() {
+    if (!ADS) return;
+    for (var k = ADS.length - 1; k >= 0; k--) if (ADS[k].remote) ADS.splice(k, 1);
+    gzRemote.ads.forEach(function (a) {
+      if (!a || !/^[a-z0-9][a-z0-9_]{1,40}\.mpg$/.test(a.id) || adByFile(a.id) >= 0 || !Array.isArray(a.scenes) || !a.scenes.length) return;
+      ADS.unshift(gzAd(a));
+    });
+    adBadges();
+  }
+  // the owner's Newsroom (games.owners on the server decides; the page only hides the button from everyone else)
+  var newsroomLoad = null;
+  function newsroom() {
+    if (!letterBox) { balloon('Newsroom', 'Only the site owner can open the Newsroom.', 'frog-mail'); return; }
+    if (!newsroomLoad) newsroomLoad = new Promise(function (res, rej) {
+      var sc = document.createElement('script'); sc.src = 'newsroom.js?v=20261118'; sc.onload = res; sc.onerror = function () { newsroomLoad = null; rej(); }; document.head.appendChild(sc);
+    });
+    newsroomLoad.then(function () {
+      window.PondNewsroom({
+        openApp: openApp, esc: esc, rpc: wpRpc, session: freshSession, sbUrl: SB_URL, sbKey: SB_KEY, store: GZ_STORE,
+        issueHtml: gzIssueHtml, sceneHtml: gzScene, img: gzImg, wire: function (root) { gzWire(root); root.querySelectorAll('.gz-poll').forEach(paintPoll); },
+        go: Object.keys(GZ_GO).map(function (k) { return [k, GZ_GO[k][0]]; }), looks: GZ_LOOKS,
+        builtinAds: function () { return ADS.filter(function (a) { return !a.remote; }).map(function (a) { return [a.file, a.title]; }); },
+        latest: gzLatest, all: gzAll,
+        previewAd: function (a) {
+          for (var k = ADS.length - 1; k >= 0; k--) if (ADS[k].preview) ADS.splice(k, 1);
+          var ad = gzAd(a); ad.preview = true; ad.added = ''; ADS.push(ad);
+          if (apps['ad-' + (ADS.length - 1)]) apps['ad-' + (ADS.length - 1)].close();
+          var P = adPlayer(ADS.length - 1), close = P && P.close;
+          if (close) P.close = function () { close(); for (var j = ADS.length - 1; j >= 0; j--) if (ADS[j].preview) ADS.splice(j, 1); };
+        },
+        refresh: function () { return gzLoadIndex(true).then(function () { if (apps.mail && apps.mail.show) apps.mail.show('gz'); }); },
+        say: function (t) { balloon('Newsroom', t, 'frog-mail'); }
+      });
+    }, function () { balloon('Newsroom', 'The Newsroom did not load. Check the connection and try again.', 'frog-mail'); });
+  }
   function frogMail(view) {
-    try { localStorage.setItem(MAIL_KEY, String(MAIL_ISSUE)); } catch (e) {}
+    try { localStorage.setItem(MAIL_KEY, String(gzLatest())); } catch (e) {}
     paintMail();
     var A = openApp('mail', 'Frog Mail - Inbox', 'frog-mail', function (A) {
-      A.body.innerHTML = '<div class="mail"><ul class="mail-list">' +
-        // one compact row of tabs: the letter form, then the Gazette issues by number (newest first)
+      // Letter to the Editor, the owner's desk, then the issue counter: ◀ / ▶ step through the issues,
+      // a tap on the number opens the whole archive (a scrolling list, newest first)
+      A.body.innerHTML = '<div class="mail"><div class="mail-top"><ul class="mail-list">' +
         '<li><button type="button" data-v="write" title="Ideas, bugs, wishes, notices">✏️ Letter to the Editor</button></li>' +
-        '<li><button type="button" data-v="gz" title="The Pond Gazette #10: we are live" aria-label="The Pond Gazette #10">📰 #10</button></li>' +
-        '<li><button type="button" data-v="gz9" title="The Pond Gazette #9 (archive): week 1 pays double" aria-label="The Pond Gazette #9">#9</button></li>' +
-        '<li><button type="button" data-v="gz8" title="The Pond Gazette #8 (archive): the week 1 poll" aria-label="The Pond Gazette #8">#8</button></li>' +
-        '<li><button type="button" data-v="gz7" title="The Pond Gazette #7 (archive): the Pond goes BETA" aria-label="The Pond Gazette #7">#7</button></li>' +
-        '<li><button type="button" data-v="gz6" title="The Pond Gazette #6 (archive): X unblocked us, the first faucet payout, 1 km" aria-label="The Pond Gazette #6">#6</button></li>' +
-        '<li><button type="button" data-v="gz5" title="The Pond Gazette #5 (archive): the lockout, CoinEx and the first Pond Poll" aria-label="The Pond Gazette #5">#5</button></li>' +
-        '<li><button type="button" data-v="gz4" title="The Pond Gazette #4 (archive): the Pepe Guesser leak" aria-label="The Pond Gazette #4">#4</button></li>' +
-        '<li><button type="button" data-v="gz3" title="The Pond Gazette #3 (archive): an internet in your internet" aria-label="The Pond Gazette #3">#3</button></li>' +
-        '<li><button type="button" data-v="gz2" title="The Pond Gazette #2 (archive): Pepe Guesser is coming" aria-label="The Pond Gazette #2">#2</button></li>' +
         '<li class="ml-owner" hidden><button type="button" data-v="box" title="Editor\'s desk: only you can see these" aria-label="Editor\'s desk">📥 <span class="ml-n"></span></button></li>' +
-        '</ul><div class="mail-pane"></div></div>';
-      var pane = A.body.querySelector('.mail-pane'), ct = 0;
+        '<li class="ml-owner" hidden><button type="button" class="ml-news" title="Newsroom: write and publish the Gazette and PEP-TV ads">📰 Newsroom</button></li></ul>' +
+        '<div class="gz-dial" role="group" aria-label="The Pond Gazette issues"><button type="button" class="gz-step gz-older" aria-label="Older issue" title="Older issue">◀</button>' +
+        '<button type="button" class="gz-odo" aria-expanded="false" aria-controls="gz-arch" title="All issues"><span class="gz-odo-l">No.</span><span class="gz-odo-n" aria-hidden="true"></span><span class="sr gz-odo-sr"></span><span class="gz-odo-t"></span><span class="gz-odo-v" aria-hidden="true">▾</span></button>' +
+        '<button type="button" class="gz-step gz-newer" aria-label="Newer issue" title="Newer issue">▶</button></div></div>' +
+        '<ol class="gz-arch" id="gz-arch" hidden></ol><div class="mail-pane"></div></div>';
+      var pane = A.body.querySelector('.mail-pane'), ct = 0, cur = 0, odoBuilt = 0;
+      var arch = A.body.querySelector('.gz-arch'), odo = A.body.querySelector('.gz-odo');
+      var paintDial = function () {
+        var all = gzAll(), i = -1, k;
+        for (k = 0; k < all.length; k++) if (all[k].num === cur) i = k;
+        var n = A.body.querySelector('.gz-odo-n'), digits = String(cur || gzLatest()), w = Math.max(3, digits.length);
+        digits = ('000' + digits).slice(-w);
+        if (odoBuilt !== w) { odoBuilt = w; n.innerHTML = digits.split('').map(function () { return '<span class="odo-d"><span class="odo-roll">' + '0123456789'.split('').map(function (d) { return '<i>' + d + '</i>'; }).join('') + '</span></span>'; }).join(''); }
+        n.querySelectorAll('.odo-roll').forEach(function (r, j) { r.style.setProperty('--d', digits.charAt(j)); });
+        var it = i >= 0 ? all[i] : null;
+        A.body.querySelector('.gz-odo-sr').textContent = 'Issue ' + cur + (it && it.title ? ': ' + it.title : '') + '. Show all issues';
+        A.body.querySelector('.gz-odo-t').textContent = it ? it.title + (cur === gzLatest() ? ' · latest' : '') : '';
+        A.body.querySelector('.gz-older').disabled = !cur || i < 0 || i >= all.length - 1;
+        A.body.querySelector('.gz-newer').disabled = !cur || i <= 0;
+        if (!arch.hidden) paintArch();
+      };
+      var paintArch = function () {
+        arch.innerHTML = gzAll().map(function (x) {
+          return '<li><button type="button" data-n="' + x.num + '"' + (x.num === cur ? ' aria-current="true"' : '') + '><b>#' + x.num + '</b><span>' + esc(x.title) + '</span><small>' +
+            (x.at ? new Date(x.at + 'T12:00:00Z').toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) : '') + '</small></button></li>';
+        }).join('');
+        arch.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { toggleArch(false); show('gz' + b.getAttribute('data-n')); }); });
+        var on = arch.querySelector('[aria-current]'); if (on && on.scrollIntoView) on.scrollIntoView({ block: 'nearest' });
+      };
+      var toggleArch = function (open) { arch.hidden = !open; odo.setAttribute('aria-expanded', String(open)); if (open) paintArch(); };
+      odo.addEventListener('click', function () { toggleArch(arch.hidden); });
+      var step = function (d) {
+        var all = gzAll(), i = 0, k; for (k = 0; k < all.length; k++) if (all[k].num === cur) i = k;
+        var to = all[i + d]; if (to) show('gz' + to.num);
+      };
+      A.body.querySelector('.gz-older').addEventListener('click', function () { step(1); });
+      A.body.querySelector('.gz-newer').addEventListener('click', function () { step(-1); });
+      A.body.querySelector('.gz-dial').addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') { e.preventDefault(); step(1); } else if (e.key === 'ArrowRight') { e.preventDefault(); step(-1); } });
+      A.body.querySelector('.ml-news').addEventListener('click', function () { newsroom(); });
+      A.paintDial = paintDial;
       var stopClock = function () { clearInterval(ct); ct = 0; };
       A.stop = stopClock;
       var paintOwner = function () {
-        var li = A.body.querySelector('.ml-owner'); li.hidden = !letterBox;
+        A.body.querySelectorAll('.ml-owner').forEach(function (li) { li.hidden = !letterBox; });
         if (letterBox) A.body.querySelector('.ml-n').textContent = letterBox.unread ? letterBox.unread + ' new' : '';
       };
       var show = function (v) {
         stopClock();
         A.body.querySelectorAll('.mail-list button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
-        if (v === 'write') return writeLetter(pane);
-        if (v === 'box') return letterInbox(pane, paintOwner);
-        var issue = v === 'gz2' ? 2 : v === 'gz3' ? 3 : v === 'gz4' ? 4 : v === 'gz5' ? 5 : v === 'gz6' ? 6 : v === 'gz7' ? 7 : v === 'gz8' ? 8 : v === 'gz9' ? 9 : 10;
+        A.body.querySelector('.gz-dial').classList.toggle('on', /^gz/.test(v));
+        if (v === 'write' || v === 'box') { toggleArch(false); return v === 'write' ? writeLetter(pane) : letterInbox(pane, paintOwner); }
+        var issue = +String(v).replace(/^gz/, '') || gzLatest();
+        if (issue < 2) issue = gzLatest();
+        cur = issue; paintDial();
+        if (issue > MAIL_ISSUE) {   // from the Newsroom
+          pane.innerHTML = '<article class="gazette"><p class="gz-foot">Fetching issue #' + issue + ' from the printing press…</p></article>';
+          rpc('gry_gazette_issue', { p_num: issue }).then(function (is) {
+            if (cur !== issue) return;
+            pane.innerHTML = is && is.num ? gzIssueHtml(is) : '<article class="gazette"><p class="gz-foot">Issue #' + issue + ' is not on the stands (yet).</p></article>';
+            wire();
+          }, function () { if (cur === issue) pane.innerHTML = '<article class="gazette"><p class="gz-foot">The printing press is not answering. Try again in a minute.</p></article>'; });
+          return;
+        }
         pane.innerHTML = issue === 10 ? gazette10() : issue === 9 ? gazette9() : issue === 8 ? gazette8() : issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
@@ -4325,7 +4531,11 @@
           '<li>Since block 600,000 every block pays a fixed 10,000 PEP. No more halvings.</li>' +
           '<li>The Pond Gazette has exactly one editor and zero fact-checkers. The facts above came with receipts anyway.</li></ul></section>' +
           '<p class="gz-foot">When a new issue lands, the flag on the mailbox goes up.</p></article>';
+        wire();
+      };
+      var wire = function () {
         var on = function (sel, fn) { var x = pane.querySelector(sel); if (x) x.addEventListener('click', function (e) { e.preventDefault(); fn(); }); };
+        gzWire(pane);
         on('.gz-write', function () { show('write'); });
         on('.gz-pass', function () { frenPassport(); });
         on('.gz-fren', function () { avatarMaker(); });
@@ -4349,7 +4559,7 @@
         on('.gz-frogad', function () { adPlayer(Math.max(0, adByFile('frogageddon.mpg'))); });
         on('.gz-miner', minerApp);
         on('.gz-yeet', function () { yeetApp(); });
-        var pollBox = pane.querySelector('.gz-poll'); if (pollBox) paintPoll(pollBox);
+        pane.querySelectorAll('.gz-poll').forEach(paintPoll);
         on('.gz-online', function () {
           show('write');
           var lb = pane.querySelector('.lt-body'); if (lb) { lb.value = 'Dear Editor, I want FROGAGEDDON online! '; lb.dispatchEvent(new Event('input')); lb.focus(); }
@@ -4742,6 +4952,7 @@
     });
     document.querySelectorAll('.ads-folder button[data-i]').forEach(function (b) { b.classList.toggle('is-new', adNew(ADS[+b.getAttribute('data-i')])); });
   }
+  gzAddAds();   // the Newsroom's ads from the last visit (refreshed a moment after start)
   setTimeout(adBadges, 0);
   function adPlayer(i) {
     var ad = ADS[i];
@@ -4783,6 +4994,7 @@
       var ppb = A.body.querySelector('.ad-passbtn'); if (ppb) ppb.addEventListener('click', function () { frenPassport(); });
       var kgb = A.body.querySelector('.ad-kingbtn'); if (kgb) kgb.addEventListener('click', function () { pondKingApp(); });
       var lyb = A.body.querySelector('.ad-lilybtn'); if (lyb) lyb.addEventListener('click', function () { liliesApp(); });
+      gzWire(A.body);
       var wl = A.body.querySelector('.ad-launch'); if (wl) { wl.innerHTML = launchText(); var wlt = setInterval(function () { if (!document.body.contains(wl)) clearInterval(wlt); else wl.innerHTML = launchText(); }, 1000); }
       liveFacts().then(function (items) { var txt = items.map(function (x) { return x[0] + ' ' + x[1]; }).join('  •  ') + '  •  '; A.body.querySelector('.ptv-run').textContent = txt + txt; });
     }, 720);
@@ -4790,7 +5002,7 @@
   }
   function adsFolder() {
     openApp('ads', 'C:\\Pond\\PEP-TV Ads', 'pep-tv-ads', function (A) {
-      A.body.innerHTML = '<ul class="folder ads-folder">' + ADS.map(function (ad, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(ad.icon) + '" alt="" width="40" height="40"><span>' + ad.file + '</span></button></li>'; }).join('') + '</ul>' +
+      A.body.innerHTML = '<ul class="folder ads-folder">' + ADS.map(function (ad, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + (ad.iconSrc || ico(ad.icon)) + '" alt="" width="40" height="40"><span>' + ad.file + '</span></button></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">Late-night PEP-TV infomercials, recovered from an old VHS. Double-click one to play. The facts are real; the offers are not. A red dot marks a new one.</p>';
       adBadges();
       A.body.querySelectorAll('.folder button').forEach(function (b) {
@@ -5321,7 +5533,7 @@
       mb.addEventListener('click', frogMail);
       trayEl2.insertBefore(mb, trayEl2.firstChild);
       paintMail();
-      if (!mailRead()) setTimeout(function () { if (!mailRead()) balloon('You\u2019ve got frog mail!', 'The Pond Gazette #7 is in your mailbox: the Pond goes BETA. Click the mailbox in the corner.', 'frog-mail'); }, 17000);
+      if (!mailRead()) setTimeout(function () { if (!mailRead()) { var gzt = gzAll()[0] || {}; balloon('You\u2019ve got frog mail!', 'The Pond Gazette #' + gzLatest() + (gzt.num === gzLatest() && gzt.title ? ' is in your mailbox: ' + gzt.title + '.' : ' is in your mailbox.') + ' Click the mailbox in the corner.', 'frog-mail'); } }, 17000);
     }
   }
 
