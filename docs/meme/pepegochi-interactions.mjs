@@ -1,6 +1,9 @@
 import { TOYS, healthyCompanion } from './pepegochi-personality.mjs?v=20261116sass1';
 // Cosmetic conversations; actual needs and care history come from the server view.
 const lines = {
+  stamp: ["New stamp! Your Passport is becoming dangerously official.", "Another stamp, fren. I supervised from the taskbar."],
+  stampBatch: ["Multiple stamps? Leave some room for my autograph.", "Look at that Passport. Very productive human behaviour."],
+  secret: ["You found a secret? I saw nothing. Absolutely nothing.", "Hush, fren. The pond has ears. And probably flies."],
   desktopFirefly: ["A tiny lamp with wings. Don't worry, fren, I let it go.", "Did you see that? The pond has its own screensaver."],
   desktopTV: ["Pond TV? Hold on. I need my popcorn.", "The tiny frog demands a front-row seat."],
   desktopBin: ["I inspected the recycling. No flies. Absolute scandal."],
@@ -69,7 +72,7 @@ export function companionReply(view, action = 'hello', n = 0, context = {}) {
     ? `You have looked after me on ${view.careDays} care days. Those little visits mean a lot, fren.`
     : "Our story is just starting. A little food, a little play, a little time together.", pose: 'tb_adult_think', openRoom: false };
   const group = lines[action] || lines.hello;
-  return { text: pick(group, n), pose: ['pet', 'familiar', 'joke', 'quizWin', 'grown'].includes(action) ? 'tb_adult_laugh' : action === 'annoyed' ? 'tb_adult_moody' : 'tb_adult_talk', openRoom: false };
+  return { text: pick(group, n), pose: ['pet', 'familiar', 'joke', 'quizWin', 'grown', 'stamp', 'stampBatch'].includes(action) ? 'tb_adult_laugh' : action === 'secret' ? 'tb_adult_think' : action === 'annoyed' ? 'tb_adult_moody' : 'tb_adult_talk', openRoom: false };
 }
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
