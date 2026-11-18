@@ -58,5 +58,11 @@ PR #353 belongs to the full PepeGochi product launch. Ship all implemented compa
 3. A10 implemented: 20 new frames for nuzzle, welcome, curious, sulk and yawn; single playback, safe cancellation, preload and reduced-motion support. Review/download package: `pepegochi/companion-a10/PepeGochi-A10.zip`. Future art can add startled-awake and stage-specific expressions. Younger frogs retain their own stage.
 4. Expand the dialogue library with humorous context-dependent lines. No generic AI chat or server-side text generation required.
 
+## Taskbar command panel A16 (draft implementation, 2026-11-19)
+- The expanded PepeGochi panel now opens existing PondOS destinations instead of presenting dead-end dialogue: **Let's play!** opens Pond Games, **What's new?** opens Pond Bulletin, and explicit buttons open the Fren Passport and Pond TV.
+- Memories, status, jokes, petting, toys, quiet mode, firefly and Pond Quiz retain their existing local or validated behaviour. Visiting the room remains the only care entry point from the taskbar; this change adds no care RPC, reward, progression or state mutation.
+- Commands close the conversation before opening their destination, reuse the existing window functions, and are omitted or fall back to dialogue when a host does not provide a command. Keyboard and touch use the same buttons.
+- Targeted Node/CSP checks: 48 passed. The Chromium companion fixture now covers all four command buttons, but local execution still requires the unavailable Playwright package; browser visual QA remains a release prerequisite.
+
 ## QA
 Validation: `node --test tests/*.test.mjs` (346 passed, 26 environment skips), site/i18n checks and Python tests. `node tests/pepegochi-companion-browser.cjs` runs the actual taskbar controller in Chromium with local fixtures; uses PLAYWRIGHT_MODULE/HAZE_CHROMIUM overrides when needed. Covers keyboard/touch, room opening, memories, care state priority, focus, throttle, mute/reload, account isolation, return greeting, stale quiz answer, 320/390/1440px and teardown. No production service is contacted. Keep beta gate intact; no merge or production deployment without approval.

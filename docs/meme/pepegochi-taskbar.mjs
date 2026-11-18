@@ -6,7 +6,7 @@ import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
 // and the hop out of the PEPEGOCHI.EXE window.
 import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261116room1';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261118events1';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261119commands1';
 import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
 import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118desktop1';
 
@@ -96,7 +96,7 @@ export function hopPath(from, to, steps = 36) {
 
 // One state read on entry, then only when the tab returns after a break, auth changes,
 // or the PEPEGOCHI.EXE iframe signals that a player action succeeded.
-export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = () => Date.now(), subscribeSiteEvents = () => () => {} }) {
+export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base = '../', now = () => Date.now(), subscribeSiteEvents = () => () => {} }) {
   const start = bar && bar.querySelector('.start');
   if (!start) return () => {};
   let storage;
@@ -498,7 +498,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   conversation = mountFrogInteractions({ button, img, slot, getView: () => shownView,
     setPose: p => { desktop?.stop(); cancelMotion(); setAct(p); if (!p) queueMotion(); }, animate: animateExpression, showToy, openRoom: open,
     closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
-    openQuiz: requestQuiz, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
+    openQuiz: requestQuiz, commands, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
     canReact: () => !balloon && !desktop?.active && !document.querySelector('.reward98') && document.activeElement?.tagName !== 'IFRAME', now });
   const unsubscribeSiteEvents = subscribeSiteEvents(event => {
     const current = session();

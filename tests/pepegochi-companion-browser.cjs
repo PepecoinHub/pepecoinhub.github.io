@@ -6,9 +6,9 @@ const html = `<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="
 <body class="pondos"><input id="work" aria-label="Work"><header style="position:fixed;bottom:0;width:100%"><div class="bar"><button class="start">Start</button></div></header>
 <script type="module">
 import { mountTaskbarFrog } from '/meme/pepegochi-taskbar.mjs';
-window.t = { time: Date.now(), owner: 'owner-a', opened: 0, calls: [], pet: { life_id:'frog-a', name:'Pickle', stage:'adult', status:'healthy', care_days:12, needs:{hunger:90,hygiene:90,mood:90,energy:90} } };
+window.t = { time: Date.now(), owner: 'owner-a', opened: 0, apps: [], calls: [], pet: { life_id:'frog-a', name:'Pickle', stage:'adult', status:'healthy', care_days:12, needs:{hunger:90,hygiene:90,mood:90,energy:90} } };
 t.refresh = () => window.dispatchEvent(new Event('pondos:auth-changed'));
-t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>t.opened++,session:()=>({discord:true,userId:t.owner}),now:()=>t.time,rpc:async name=>{t.calls.push(name);if(name==='gry_quiz_answer')return new Promise(r=>t.answer=r);return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:{day:new Date().toISOString().slice(0,10),question:'Pond question?',answers:['Yes','No'],answered:false};}});
+t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>t.opened++,commands:Object.fromEntries(['games','news','passport','tv'].map(name=>[name,()=>t.apps.push(name)])),session:()=>({discord:true,userId:t.owner}),now:()=>t.time,rpc:async name=>{t.calls.push(name);if(name==='gry_quiz_answer')return new Promise(r=>t.answer=r);return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:{day:new Date().toISOString().slice(0,10),question:'Pond question?',answers:['Yes','No'],answered:false};}});
 </script>`;
 let browser;
 const server = http.createServer((req, res) => {
@@ -29,6 +29,13 @@ const server = http.createServer((req, res) => {
  await frog.focus();await page.keyboard.press('Enter');
  await page.getByRole('button',{name:'Our memories',exact:true}).click();
  assert.match(await page.locator('.pg-conversation').textContent(),/12 care days/);
+ await page.getByRole('button',{name:"Let's play!",exact:true}).click();
+ assert.deepEqual(await page.evaluate(()=>t.apps),['games']);assert.equal(await page.locator('.pg-conversation').count(),0);
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:"What's new?",exact:true}).click();
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Open Fren Passport',exact:true}).click();
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Watch Pond TV',exact:true}).click();
+ assert.deepEqual(await page.evaluate(()=>t.apps),['games','news','passport','tv']);
+ await frog.focus();await page.keyboard.press('Enter');
  await page.keyboard.press('Escape');assert.equal(await page.locator('.pg-conversation').count(),0);
  // Actual expression frames play once and restore state; no CSS-only stand-ins.
  const frame = name => page.waitForFunction(n=>document.querySelector('.pg-companion-button img').src.includes('/tb_'+n+'_'),name);

@@ -77,7 +77,7 @@ export function companionReply(view, action = 'hello', n = 0, context = {}) {
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
 // No polling or network calls. Optional bond stores cosmetic memories only.
-export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, now = () => Date.now() }) {
+export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, commands = {}, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, now = () => Date.now() }) {
   let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
   let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
   let lastActivity = now(), bornAt = now();
@@ -144,6 +144,13 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     if (e.key === 'Escape' && panel) { e.preventDefault(); close({ focus: true }); }
   }
   function visit() { close({ reset: true }); openRoom(); }
+  function runCommand(name) {
+    const command = commands && commands[name];
+    if (typeof command !== 'function') return false;
+    close({ reset: true });
+    command();
+    return true;
+  }
   function say(action = 'hello') {
     clearNotice();
     if (action === 'hello') action = bond?.take() || action;
@@ -188,9 +195,11 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
       }
       add('How are you?', () => say('how'));
       add('Tell me a joke', () => say('joke'));
-      add("Let's play!", () => say('play'));
+      add("Let's play!", () => { if (!runCommand('games')) say('play'); });
       add('Pet me', () => say('pet'));
-      add("What's new?", () => say('news'));
+      add("What's new?", () => { if (!runCommand('news')) say('news'); });
+      if (typeof commands?.passport === 'function') add('Open Fren Passport', () => runCommand('passport'));
+      if (typeof commands?.tv === 'function') add('Watch Pond TV', () => runCommand('tv'));
       if (fireflyAvailable()) add('Catch a firefly', () => { close({ focus: true }); catchFirefly(); });
       if (quizAvailable()) add('Pond Quiz', () => { close(); openQuiz(); });
       add('Go to your room', visit);

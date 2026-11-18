@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { companionReply, mountFrogInteractions } from '../docs/meme/pepegochi-interactions.mjs';
 
 const adult = { hasPet: true, adult: true, motion: 'adult', sprite: 'taskbar/tb_adult_sit.png' };
@@ -97,6 +98,30 @@ test('keyboard, outside click, right click, quiz and account reset', () => {
   h.button.emit('click', { detail: 0 }); h.controller.close({ reset: true }); assert.equal(h.doc.body.children.length, 0);
   h.setView({ hasPet: false }); h.button.emit('click', { detail: 1 }); assert.equal(h.opened, 1);
   h.controller.dispose(); assert.equal(h.button.events.get('click').size, 0);
+});
+
+test('desktop commands open real PondOS destinations and close the conversation', () => {
+  const opened = [];
+  const commands = Object.fromEntries(['games', 'news', 'passport', 'tv'].map(name => [name, () => opened.push(name)]));
+  const h = harness(adult, { commands });
+  const click = label => {
+    h.button.emit('click', { detail: 0 });
+    const actions = h.doc.body.children[0].querySelector('.pg-fact-answers');
+    actions.children.find(b => b.textContent === label).emit('click');
+    assert.equal(h.doc.body.children.length, 0, label);
+  };
+  click("Let's play!");
+  click("What's new?");
+  click('Open Fren Passport');
+  click('Watch Pond TV');
+  assert.deepEqual(opened, ['games', 'news', 'passport', 'tv']);
+  assert.equal(h.opened, 0);
+  h.controller.dispose();
+});
+
+test('PondOS wires command buttons to its existing window functions', () => {
+  const shell = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
+  assert.match(shell, /commands:\s*\{\s*games:\s*gamesFolder,\s*passport:\s*frenPassport,\s*news:\s*bulletinApp,\s*tv:\s*pondTV\s*\}/);
 });
 
 test('initiated contact is sparse, muted/blocked/young-safe, and never opens a dialog', () => {
