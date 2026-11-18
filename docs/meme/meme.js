@@ -1816,6 +1816,12 @@
   function pepegochiApp() {
     var A = openApp('pepegochi', 'PEPEGOCHI.EXE', 'pep-logo', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepegochi-live.html?embed=1" title="PEPEGOCHI.EXE"></iframe>';
+      var roomFrame = A.body.querySelector('iframe');
+      A._roomTV = function (e) {
+        if (GOCHI && e.origin === location.origin && e.source === roomFrame.contentWindow && roomFrame.isConnected &&
+            !A.host.classList.contains('is-min') && e.data && e.data.type === 'pondos:pepegochi-room-tv') pondTV();
+      };
+      window.addEventListener('message', A._roomTV);
     }, 760);
     // closing or minimizing the window: the frog hops out of it onto the taskbar (pepegochi-taskbar.mjs)
     if (A && !A._hop) {
@@ -1823,7 +1829,7 @@
         var r = A.host.getBoundingClientRect();
         if (r.width) window.dispatchEvent(new CustomEvent('pondos:pepegochi-left', { detail: { left: r.left, top: r.top, width: r.width, height: r.height } }));
       };
-      A.stop = A._hop;
+      A.stop = function () { window.removeEventListener('message', A._roomTV); A._hop(); };
       var minBtn = A.host.querySelector('.w-min');
       if (minBtn) minBtn.addEventListener('click', A._hop, true);
     }
