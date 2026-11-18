@@ -26,6 +26,18 @@ export const FORMATS = {
 
 // Only approved higher-detail room sprites and care frames opt in; other assets retain their existing profiles.
 const FINE_TOP = new Map([
+  ['care_clean_02.png', 9],
+  ['care_clean_03.png', 2],
+  ['care_feed_04.png', 9],
+  ['care_play_01.png', 9],
+  ['care_tadpole_play_02.png', 50],
+  ['care_tadpole_play_03.png', 36],
+  ['care_tadpole_play_04.png', 50],
+  ['care_tadpole_rest_01.png', 50],
+  ['depart_walk_03.png', 8],
+  ['froglet_depart_walk_03.png', 30],
+  ['tadpole_depart_02.png', 48],
+  ['tadpole_depart_03.png', 50],
   ['care_rest_01.png', 9],
   ['care_rest_02.png', 9],
   ['care_tadpole_clean_01.png', 50],
