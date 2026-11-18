@@ -152,6 +152,7 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_crown', 'accessory_none')              // hat_crown -> long_live_the_king (2026-11-18)
     ];
     reserved.push([...DEFAULT, 'special_explorer']);                                                       // special_explorer -> scout_fren
+    reserved.push([...DEFAULT, 'special_king']);                                                           // special_king -> long_live_the_king
     for (const args of reserved) await assert.rejects(save(1, args), /That part is locked/, 'reserved ' + JSON.stringify(args));
     await assert.rejects(save(1, [...DEFAULT, 'special_ghost']), /Unknown avatar option/);
     assert.equal(await avatars(1), 0); assert.equal(await badges(1), 0);

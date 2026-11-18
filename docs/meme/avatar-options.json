@@ -405,13 +405,18 @@
         "id": "special_retro",
         "label": "Retro Fren (FUD Buster)",
         "unlock": "fud_buster"
+      },
+      {
+        "id": "special_king",
+        "label": "King Fren (Long Live the King)",
+        "unlock": "long_live_the_king"
       }
     ]
   },
   "paths": {
     "base": "avatar-assets/layers/base_frog.webp",
-    "layer_template": "avatar-assets/layers/{id}.webp?v=20261109sp",
-    "thumb_template": "avatar-assets/thumbs/{id}.webp?v=20261109sp"
+    "layer_template": "avatar-assets/layers/{id}.webp?v=20261118king",
+    "thumb_template": "avatar-assets/thumbs/{id}.webp?v=20261118king"
   },
   "special_note": "A special avatar is a whole character (Lily's drawing for a big milestone, or a classic Pepe meme for a secret). When one is picked it replaces every part layer except the background (bg).",
   "mouth_note": "Cigarette and pipe (in_mouth) are drawn under the mouth layer and moved so their in_mouth point lands on the chosen mouth's corner (512 canvas pixels), so the filter or mouthpiece is held in every mouth."

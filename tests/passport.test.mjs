@@ -101,7 +101,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 58320 offered look
   const ids = SLOTS.flatMap(k => manifest.options[k].map(o => o.id));
   assert.equal(manifest.schema_version, 2);
   // every catalogued option (unlock-gated ones included); the hat/accessory slots carry reserved ids
-  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 27]);
+  assert.deepEqual(SLOTS.map(k => manifest.options[k].length), [6, 7, 9, 9, 8, 7, 28]);
   // the only looks a player can actually compose and save are built from the non-unlock (base) ids
   assert.deepEqual(SLOTS.map(k => baseIds(k).length), [5, 6, 9, 9, 4, 6, 1]);   // the Crown is a reward since 2026-11-18
   assert.equal(SLOTS.reduce((n, k) => n * baseIds(k).length, 1), 58320, 'offered looks');
@@ -116,7 +116,7 @@ test('avatar manifest v2: 512 canvas layers, part thumbnails, 58320 offered look
   // one 512x512 WebP per option id, plus the implied base layer
   const noQ = f => f.split('?')[0];   // the templates carry a ?v= cache key
   const files = [...new Set([manifest.paths.base, ...ids.map(id => noQ(manifest.paths.layer_template.replace('{id}', id)))])];
-  assert.equal(files.length, 74, '73 option layers + base_frog');
+  assert.equal(files.length, 75, '74 option layers + base_frog');
   // one small picture of each part for the maker rows, nothing else in the folder
   assert.deepEqual(readdirSync(new URL('../docs/meme/avatar-assets/thumbs/', import.meta.url)).sort(),
     ids.map(id => noQ(manifest.paths.thumb_template.replace('{id}', id)).split('/').pop()).sort(), 'no unused, stray or missing thumbnails');
