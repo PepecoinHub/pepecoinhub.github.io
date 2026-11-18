@@ -1,0 +1,527 @@
+{
+  "pack": "pepe-gold-hook-art-p3",
+  "engine": "nearest-neighbor",
+  "outline": "#202020",
+  "layout": {
+    "screen": [
+      960,
+      720
+    ],
+    "surfaceBand": [
+      168,
+      311
+    ],
+    "groundY": 300,
+    "frogFeet": [
+      420,
+      300
+    ],
+    "ropeExitWorld": [
+      480,
+      280
+    ],
+    "mine": {
+      "x": [
+        24,
+        936
+      ],
+      "y": [
+        324,
+        648
+      ]
+    },
+    "notes": "Surface strip is drawn with its y=88 on groundY, so the file origin is world y=212. Sky from y=168 to 212 is outside this strip."
+  },
+  "sprites": [
+    {
+      "id": "pm-winch-crank",
+      "path": "assets/pm-winch-crank.png",
+      "width": 64,
+      "height": 64,
+      "anchor": [
+        40,
+        48
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        0,
+        11,
+        57,
+        52
+      ],
+      "sha256": "2d1f96e7281511779679a3681d51e4acef870e166a89bfcf99febd4b06bda080",
+      "ropeExit": [
+        40,
+        48
+      ],
+      "crankHandle": [
+        18,
+        30
+      ]
+    },
+    {
+      "id": "pm-winch-crank-00",
+      "path": "assets/pm-winch-crank-00.png",
+      "width": 64,
+      "height": 64,
+      "anchor": [
+        40,
+        48
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        0,
+        11,
+        57,
+        52
+      ],
+      "sha256": "2d1f96e7281511779679a3681d51e4acef870e166a89bfcf99febd4b06bda080",
+      "ropeExit": [
+        40,
+        48
+      ],
+      "crankHandle": [
+        18,
+        30
+      ]
+    },
+    {
+      "id": "pm-winch-crank-01",
+      "path": "assets/pm-winch-crank-01.png",
+      "width": 64,
+      "height": 64,
+      "anchor": [
+        40,
+        48
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        0,
+        11,
+        57,
+        52
+      ],
+      "sha256": "46dc9098fb879b2b7c0b698882d02eb692a40d29f839bf64f30697d195b2c715",
+      "ropeExit": [
+        40,
+        48
+      ],
+      "crankHandle": [
+        11,
+        37
+      ]
+    },
+    {
+      "id": "pm-winch-crank-02",
+      "path": "assets/pm-winch-crank-02.png",
+      "width": 64,
+      "height": 64,
+      "anchor": [
+        40,
+        48
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        0,
+        11,
+        57,
+        52
+      ],
+      "sha256": "b5ea44924362fbbe240900f77f82c13a694f0380f9ac09fa962942fb3f7bef9d",
+      "ropeExit": [
+        40,
+        48
+      ],
+      "crankHandle": [
+        4,
+        30
+      ]
+    },
+    {
+      "id": "pm-winch-crank-03",
+      "path": "assets/pm-winch-crank-03.png",
+      "width": 64,
+      "height": 64,
+      "anchor": [
+        40,
+        48
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        0,
+        11,
+        57,
+        52
+      ],
+      "sha256": "fc6b13d020137a95afd181f6bc215abbab796e7277310cbdddd9b86d2fab15c5",
+      "ropeExit": [
+        40,
+        48
+      ],
+      "crankHandle": [
+        11,
+        23
+      ]
+    },
+    {
+      "id": "pm-miner-crank-00",
+      "path": "assets/pm-miner-crank-00.png",
+      "width": 80,
+      "height": 96,
+      "anchor": [
+        40,
+        88
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        13,
+        12,
+        65,
+        77
+      ],
+      "sha256": "72385d4ee7f3ceff46e212e3aff8f53e949c9875ba3a44ec40d91d9adb187f84",
+      "hand": [
+        78,
+        50
+      ]
+    },
+    {
+      "id": "pm-miner-crank-01",
+      "path": "assets/pm-miner-crank-01.png",
+      "width": 80,
+      "height": 96,
+      "anchor": [
+        40,
+        88
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        13,
+        12,
+        58,
+        77
+      ],
+      "sha256": "004909247e123de21df799313d73a4183bbb0d143ddf1174e2e4c436f27bc3be",
+      "hand": [
+        71,
+        57
+      ]
+    },
+    {
+      "id": "pm-miner-crank-02",
+      "path": "assets/pm-miner-crank-02.png",
+      "width": 80,
+      "height": 96,
+      "anchor": [
+        40,
+        88
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        13,
+        12,
+        51,
+        77
+      ],
+      "sha256": "57369ef882131ae1656192c8c04ac59777b19d8c66d1b4a807a0353c9c3969f0",
+      "hand": [
+        64,
+        50
+      ]
+    },
+    {
+      "id": "pm-miner-crank-03",
+      "path": "assets/pm-miner-crank-03.png",
+      "width": 80,
+      "height": 96,
+      "anchor": [
+        40,
+        88
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        13,
+        12,
+        58,
+        77
+      ],
+      "sha256": "6f8afc873ddb7f69e252986a76ff534fa158fba5c9bdbff98e202cfd0f37843f",
+      "hand": [
+        71,
+        43
+      ]
+    },
+    {
+      "id": "pm-miner-crank-idle",
+      "path": "assets/pm-miner-crank-idle.png",
+      "width": 80,
+      "height": 96,
+      "anchor": [
+        40,
+        88
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        13,
+        12,
+        65,
+        77
+      ],
+      "sha256": "9e7e6e0a624342faf83998648b22452a02f9b17cfb60eab95bea1675cec4a797",
+      "hand": [
+        78,
+        50
+      ]
+    },
+    {
+      "id": "pm-miner-throw-00",
+      "path": "assets/pm-miner-throw-00.png",
+      "width": 80,
+      "height": 96,
+      "anchor": [
+        40,
+        88
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        13,
+        12,
+        44,
+        77
+      ],
+      "sha256": "91593a1577f6cc68002f2a440089112fcab96e9cea4a125ca32aced67d1d1715",
+      "hand": [
+        52,
+        60
+      ]
+    },
+    {
+      "id": "pm-miner-throw-01",
+      "path": "assets/pm-miner-throw-01.png",
+      "width": 80,
+      "height": 96,
+      "anchor": [
+        40,
+        88
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        13,
+        2,
+        47,
+        87
+      ],
+      "sha256": "d8ea289fe6a416818f7e286d7b53fe3ed9d135a8416abe3d70df589260e5216f",
+      "hand": [
+        56,
+        20
+      ]
+    },
+    {
+      "id": "pm-miner-throw-02",
+      "path": "assets/pm-miner-throw-02.png",
+      "width": 80,
+      "height": 96,
+      "anchor": [
+        40,
+        88
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        13,
+        12,
+        65,
+        77
+      ],
+      "sha256": "a20c9080fa0c57f55b14f0d241c6c45dac1827fd9d68b6ba73f1d0c5e394c34b",
+      "hand": [
+        72,
+        64
+      ]
+    },
+    {
+      "id": "pm-miner-throw-03",
+      "path": "assets/pm-miner-throw-03.png",
+      "width": 80,
+      "height": 96,
+      "anchor": [
+        40,
+        88
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        13,
+        12,
+        51,
+        77
+      ],
+      "sha256": "e4536c0d308041f72c79f057143c6ad0d290f1b2bea9a9f0b9b2e1e6739f56da",
+      "hand": [
+        58,
+        48
+      ]
+    },
+    {
+      "id": "pm-dynamite-lit-00",
+      "path": "assets/pm-dynamite-lit-00.png",
+      "width": 16,
+      "height": 32,
+      "anchor": [
+        8,
+        16
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        3,
+        1,
+        10,
+        28
+      ],
+      "sha256": "b844f856d1f868dde64e3033e96c62b263dcca951324765dc3fda16af5544ba8"
+    },
+    {
+      "id": "pm-dynamite-lit-01",
+      "path": "assets/pm-dynamite-lit-01.png",
+      "width": 16,
+      "height": 32,
+      "anchor": [
+        8,
+        16
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        3,
+        0,
+        10,
+        29
+      ],
+      "sha256": "333272abb4d58c1d665efd640c5222bbb5e0d5ae8796a2b01f177564099e8618"
+    },
+    {
+      "id": "pm-surface-wide",
+      "path": "assets/pm-surface-wide.png",
+      "width": 960,
+      "height": 96,
+      "anchor": [
+        0,
+        88
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        0,
+        0,
+        960,
+        96
+      ],
+      "sha256": "372318f04295825fda7d243a02401734245779719e48d8f9663f89b2f848fc07"
+    },
+    {
+      "id": "pm-hud-wide",
+      "path": "assets/pm-hud-wide.png",
+      "width": 900,
+      "height": 80,
+      "anchor": [
+        0,
+        0
+      ],
+      "alpha": "0/255",
+      "contentBounds": [
+        0,
+        0,
+        900,
+        80
+      ],
+      "sha256": "a97aa5f3c9c198cd491ba33bad9c961c04bd8e0bb68d8211fb0298fe217d601a",
+      "numberFields": {
+        "score": [
+          40,
+          23,
+          136,
+          34
+        ],
+        "goal": [
+          216,
+          23,
+          136,
+          34
+        ],
+        "time": [
+          392,
+          23,
+          136,
+          34
+        ],
+        "level": [
+          568,
+          23,
+          136,
+          34
+        ],
+        "wallet": [
+          744,
+          23,
+          136,
+          34
+        ]
+      }
+    }
+  ],
+  "animations": {
+    "crank": {
+      "frames": [
+        "pm-winch-crank-00",
+        "pm-winch-crank-01",
+        "pm-winch-crank-02",
+        "pm-winch-crank-03"
+      ],
+      "durationsMs": [
+        90,
+        90,
+        90,
+        90
+      ],
+      "loop": true
+    },
+    "minerCrank": {
+      "frames": [
+        "pm-miner-crank-00",
+        "pm-miner-crank-01",
+        "pm-miner-crank-02",
+        "pm-miner-crank-03"
+      ],
+      "durationsMs": [
+        90,
+        90,
+        90,
+        90
+      ],
+      "loop": true
+    },
+    "throw": {
+      "frames": [
+        "pm-miner-throw-00",
+        "pm-miner-throw-01",
+        "pm-miner-throw-02",
+        "pm-miner-throw-03"
+      ],
+      "durationsMs": [
+        80,
+        80,
+        80,
+        120
+      ],
+      "loop": false
+    },
+    "dynamiteLit": {
+      "frames": [
+        "pm-dynamite-lit-00",
+        "pm-dynamite-lit-01"
+      ],
+      "durationsMs": [
+        60,
+        60
+      ],
+      "loop": true
+    }
+  }
+}
