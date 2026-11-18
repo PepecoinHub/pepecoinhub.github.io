@@ -46,8 +46,14 @@ PR #353 belongs to the full PepeGochi product launch. Ship all implemented compa
 - Targeted Node tests: 12 passed (including original live-window tests). `node tests/pepegochi-room-interactions-browser.cjs` exercises the actual live window with a fixture backend and the room-to-TV parent handler; Chromium startup was blocked by the OS here, so complete browser QA before launch.
 - Held as a separate draft PR on top of the existing companion. Do not merge, deploy or run production SQL before approval.
 
+## Room personality and effects A14 (draft implementation, 2026-11-18)
+- Native retro pixel particles on the approved room graphics: hearts and short hop after a pat, egg wobble (not a hatch), falling blue water drops, bouncing duck with squeak marks, steam above the mug and twinkles on decorations. No replacement artwork, remote assets or sound.
+- Three age-specific pet responses per stage rotate locally during a life. Four or more closely spaced pats ask for personal space; real hunger, neglect, packing and recovery still get priority. No penalty, progression or reward from petting.
+- At most one short overlay, up to four decorative pixels, removed after at most one second or on hiding/replacing/unmounting. Reduced motion never starts a particle effect. Normal care actions and accepted care frame animations are unchanged.
+- Targeted Node tests: 15 passed including 3 particle/controller tests; the browser fixture now checks particles and reduction/cleanup. Browser visual QA remains a launch prerequisite. Included in the held A13 draft PR #357; no separate deployment.
+
 ## Next phases (not implemented here)
-1. Room: add richer animations for petting/watering and new toys only with approved art and owned inventory; consider radio/dance later if a radio item exists.
+1. Room: additional toys and stage-specific hand-drawn room animations only with approved art and owned inventory; consider radio/dance later if a radio item exists.
 2. Additional site events: other arcade games, verified stamp award, weekly Guesser result and Pond King update. Connect only existing verified result paths; never infer wins from opening/closing a window. Reuse the mute/throttle and avoid interrupting game controls.
 3. A10 implemented: 20 new frames for nuzzle, welcome, curious, sulk and yawn; single playback, safe cancellation, preload and reduced-motion support. Review/download package: `pepegochi/companion-a10/PepeGochi-A10.zip`. Future art can add startled-awake and stage-specific expressions. Younger frogs retain their own stage.
 4. Expand the dialogue library with humorous context-dependent lines. No generic AI chat or server-side text generation required.

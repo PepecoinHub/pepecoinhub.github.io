@@ -4,7 +4,7 @@
 import { getBackend } from './backend.js?v=20261113link';
 import { LiveGame } from './pepegochi-live-view.mjs?v=20261116room1';
 import { renderRoom, playDeparture, playFrames, frogLook, careFrames, DEPART_FRAMES, HATCH_FRAMES, HATCH_MS, CARE_MS } from './pepegochi-room.mjs?v=20261116room1';
-import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261118room2';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261118room3';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {

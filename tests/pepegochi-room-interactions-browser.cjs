@@ -50,6 +50,12 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(310);await button('lava_lamp').click();assert.equal(await frame.locator('.pgr-lamp-off').count(),1);
   await page.waitForTimeout(310);await button('lava_lamp').focus();await page.keyboard.press('Enter');assert.equal(await frame.locator('.pgr-lamp-off').count(),0);
   await page.waitForTimeout(310);await button('potted_plant').click();assert.match(await frame.locator('.pgr-response').textContent(),/Hydrated/);
+  assert.equal(await frame.locator('.pgr-fx-layer').count(),0,'reduced motion disables particles');
+  await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForTimeout(310);await button('potted_plant').click();
+  assert.equal(await frame.locator('.pgr-fx-drop').count(),4);await frame.locator('.pgr-fx-layer').waitFor({state:'detached'});
+  await page.waitForTimeout(310);await button('frog').click();assert.equal(await frame.locator('.pgr-fx-heart').count(),3);
+  await page.waitForTimeout(310);await button('mug').click();assert.equal(await frame.locator('.pgr-fx-heart').count(),0);assert.equal(await frame.locator('.pgr-fx-steam').count(),2);
+  await frame.locator('.pgr-fx-layer').waitFor({state:'detached'});await page.emulateMedia({reducedMotion:'reduce'});
   const f=page.frames().find(f=>f.url().includes('pepegochi-live.html'));
   const actions=()=>f.evaluate(()=>window.fixtureCalls.filter(c=>c[0]==='gry_pepegochi_action').map(c=>c[1].p_action));
   assert.deepEqual(await actions(),[]);

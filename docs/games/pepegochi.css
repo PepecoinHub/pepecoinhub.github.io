@@ -113,3 +113,21 @@ html.embed body { padding-inline: 0; }
 .pgr-pet.pgr-petted { animation:pgr-pat .5s steps(2,end) 1; }
 @keyframes pgr-pat { 50% { transform:translate(-50%,calc(-1 * var(--foot) - 4%)); } }
 @media (prefers-reduced-motion: reduce) { .pgr-pet.pgr-petted { animation:none; } }
+
+/* A14: low-resolution, non-interactive room particles. Original sprites remain in place. */
+.pgr-fx-layer { position:absolute; inset:0; z-index:92; pointer-events:none; overflow:hidden; }
+.pgr-fx { position:absolute; width:clamp(6px,2.2cqw,14px); aspect-ratio:1; pointer-events:none; opacity:0; animation-fill-mode:both; }
+.pgr-fx-heart { background:#f47d85; clip-path:polygon(0 20%,20% 20%,20% 0,40% 0,40% 20%,60% 20%,60% 0,80% 0,80% 20%,100% 20%,100% 60%,80% 60%,80% 80%,60% 80%,60% 100%,40% 100%,40% 80%,20% 80%,20% 60%,0 60%); animation:pgr-fx-rise .65s steps(5,end) both; }
+.pgr-fx-drop { width:clamp(5px,1.4cqw,9px); background:#6ed5ed; clip-path:polygon(40% 0,60% 0,60% 20%,80% 20%,80% 40%,100% 40%,100% 80%,80% 80%,80% 100%,20% 100%,20% 80%,0 80%,0 40%,20% 40%,20% 20%,40% 20%); animation:pgr-fx-fall .52s steps(5,end) both; }
+.pgr-fx-spark { background:#f3d57a; clip-path:polygon(40% 0,60% 0,60% 40%,100% 40%,100% 60%,60% 60%,60% 100%,40% 100%,40% 60%,0 60%,0 40%,40% 40%); animation:pgr-fx-twinkle .45s steps(3,end) both; }
+.pgr-fx-squeak { background:#fff3bc; clip-path:polygon(0 40%,100% 0,100% 25%,0 65%); animation:pgr-fx-squeak .55s steps(5,end) both; }
+.pgr-fx-steam { width:clamp(5px,1.8cqw,11px); background:#e3e8db; clip-path:polygon(40% 0,80% 0,80% 40%,60% 40%,60% 60%,40% 60%,40% 100%,0 100%,0 60%,20% 60%,20% 40%,40% 40%); animation:pgr-fx-rise .7s steps(6,end) both; }
+@keyframes pgr-fx-rise { 0% { opacity:0; transform:translate(-50%,0); } 16% { opacity:1; } 82% { opacity:1; } 100% { opacity:0; transform:translate(-50%,-180%); } }
+@keyframes pgr-fx-fall { 0% { opacity:1; transform:translate(-50%,-100%); } 78% { opacity:1; } 100% { opacity:0; transform:translate(-50%,360%); } }
+@keyframes pgr-fx-twinkle { 0%,100% { opacity:0; } 25%,70% { opacity:1; } }
+@keyframes pgr-fx-squeak { 0% { opacity:1; transform:translateX(0); } 75% { opacity:1; } 100% { opacity:0; transform:translateX(70%); } }
+.pgr-item.pgr-duck-bounce { animation:pgr-duck-hop .56s steps(4,end) 1; }
+@keyframes pgr-duck-hop { 0%,100% { transform:translate(-50%,-100%); } 25%,75% { transform:translate(-50%,-109%); } 50% { transform:translate(-50%,-100%); } }
+.pgr-pet.pgr-egg-wobble { animation:pgr-egg-wobble .42s steps(2,end) 1; }
+@keyframes pgr-egg-wobble { 0%,100% { transform:translate(-50%,calc(-1 * var(--foot))); } 25%,75% { transform:translate(-53%,calc(-1 * var(--foot))); } 50% { transform:translate(-47%,calc(-1 * var(--foot))); } }
+@media (prefers-reduced-motion: reduce) { .pgr-fx-layer { display:none; } .pgr-item.pgr-duck-bounce,.pgr-pet.pgr-egg-wobble { animation:none; } }

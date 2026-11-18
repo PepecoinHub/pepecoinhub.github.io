@@ -24,6 +24,11 @@ test('pet reaction respects current needs, life stage and recovery', () => {
   assert.match(roomResponse('frog',view({status:'recovering'})).text,/staying/);
   assert.equal(roomResponse('frog',view({needs:[{label:'Hunger',value:10}]})).effect,undefined);
   assert.equal(roomResponse('frog',view()).effect,'pet');
+  assert.notEqual(roomResponse('frog',view(),{patIndex:1}).text,roomResponse('frog',view()).text);
+  assert.match(roomResponse('frog',view(),{patBurst:3}).text,/personal pond space/);
+  assert.equal(roomResponse('frog',view(),{patBurst:3}).effect,undefined);
+  assert.match(roomResponse('frog',view({status:'packing'}),{patBurst:3}).text,/real care/);
+  assert.equal(roomResponse('frog',view({stage:'egg'})).effect,'egg');
   assert.equal(roomResponse('frog',{mode:'departed'}),null);
   assert.equal(roomResponse('frog',view(),{busy:true}),null);
 });
@@ -35,6 +40,7 @@ test('bed and duck use only the existing allowed care actions; disabled actions 
   assert.equal(roomResponse('bed',blocked).care,undefined);
   assert.match(roomResponse('bed',blocked).text,/daily limit reached/);
   assert.equal(roomResponse('rubber_duck',blocked).care,undefined);
+  assert.equal(roomResponse('rubber_duck',blocked).effect,'duck','cosmetic squeak does not imply an accepted care action');
   assert.equal(roomResponse('bed',view({actions:[]})).care,undefined);
 });
 
