@@ -1209,6 +1209,17 @@ footer.foot a { color: #edf3e3; }
 .ad-price b { font-weight: 400; font-size: 30px; color: #d40000; background: #ffe600; padding: 26px 30px; clip-path: polygon(50% 0, 62% 18%, 85% 10%, 82% 34%, 100% 50%, 82% 66%, 85% 90%, 62% 82%, 50% 100%, 38% 82%, 15% 90%, 18% 66%, 0 50%, 18% 34%, 15% 10%, 38% 18%); }
 .ptv-scene.on .ad-price b { animation: ad-pop .5s 1s both cubic-bezier(.2,1.6,.4,1); }
 
+/* Swamp Shopping Network: bargain-bin CRT gold, green floodlights and crooked product photos. */
+.look-miner { background: repeating-conic-gradient(from 0deg at 50% 115%, rgba(255,237,68,.18) 0 5deg, transparent 5deg 11deg), radial-gradient(ellipse at 50% 90%, #176d3d, #08251d 72%); }
+.look-miner .ptv-stage::before { content: "PEP-TV 98 · NO REAL COINS"; position: absolute; top: 8px; right: 10px; z-index: 2; padding: 3px 6px; background: #ffe500; color: #12351a; border: 2px solid #fff; box-shadow: 2px 2px 0 #000; font: 400 11px/1 var(--f-term); }
+.look-miner .ad-kick { width: fit-content; max-width: 78%; padding: 3px 8px; color: #fff; background: #c41626; transform: rotate(-1deg); }
+.look-miner .ad-big em { color: #ffe500; text-shadow: 3px 3px 0 #0b481e, 5px 5px 0 #000; }
+.look-miner .ad-miner-hero { max-height: 138px; object-fit: cover; object-position: center 42%; }
+.ad-miner-room { width: 190px; max-height: 125px; object-fit: cover; border: 4px solid #fff; box-shadow: 5px 5px 0 #000; transform: rotate(-4deg); }
+.ad-miner-pic { flex: none; width: 150px; max-height: 160px; object-fit: contain; border: 4px solid #fff; box-shadow: 5px 5px 0 #000; transform: rotate(-5deg); }
+.ad-miner-ba figure { padding-top: 24px; }
+.ad-miner-ba img { width: 100px; height: 82px; }
+
 /* Lily Pad Travel & Timeshare: sunset gradient, WordArt, Comic Sans and crooked postcards */
 .look-travel { background: linear-gradient(#2a0f63 0%, #c2185b 38%, #ff7043 62%, #ffca28 76%, #26a69a 77%, #00796b 100%); font-family: "Comic Sans MS", "Comic Neue", "Chalkboard SE", cursive; }
 .look-travel .ptv-stage::before { content: "🌴"; position: absolute; right: 8px; bottom: 0; z-index: 0; font-size: 92px; line-height: 1; opacity: .9; }
@@ -1298,6 +1309,8 @@ footer.foot a { color: #edf3e3; }
 .kitsch.look-travel .ptv-stage::after { content: ""; position: absolute; left: 62%; top: 8%; z-index: 0; width: 130px; height: 130px; border-radius: 50%; pointer-events: none;
   background: radial-gradient(circle, #fff 0 6%, rgba(255,255,220,.8) 8%, rgba(255,200,120,.25) 30%, transparent 60%), conic-gradient(from 0deg, transparent 0 20deg, rgba(255,255,255,.35) 22deg 26deg, transparent 28deg 110deg, rgba(255,255,255,.3) 112deg 115deg, transparent 117deg 360deg); mix-blend-mode: screen; }
 @media (max-width: 760px) {
+  .look-miner .ad-miner-room { width: 150px; max-height: 100px; }
+  .look-miner .ad-miner-pic { width: 100px; max-height: 120px; }
   .ad-stamp-xl { width: 84px; height: 91px; } .ad-stampimg { width: 82px; } .ad-postcard img { width: 84px; }
   .ad-sticker { width: 88px; height: 88px; font-size: 14px; } .ad-tape b { font-size: 18px; } .ad-tape li { font-size: 10px; }
   .ad-tote span { width: 26px; height: 38px; font-size: 26px; } .ad-tarot span { width: 64px; } .ad-row { gap: 10px; }
