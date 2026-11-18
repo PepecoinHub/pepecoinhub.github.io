@@ -19,7 +19,7 @@ begin
       'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'season_champion', 'frog_of_the_week',
       'junior_editor', 'senior_editor', 'vox_populi', 'bali', 'pep_birthday', 'thanksgiving_fren', 'valentine_fren',
       'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'super_parent', 'interior_designer', 'picasso_fren',
-      'pond_dominator', 'long_live_the_king', 'lord_of_the_lilies', 'master_tactician', 'quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99') then
+      'pond_dominator', 'long_live_the_king', 'crown_breaker', 'lord_of_the_lilies', 'master_tactician', 'quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99') then
     raise exception 'Unknown passport stamp %', b;
   end if;
   if u is null or games.discord_identity(u) is null then return false; end if;

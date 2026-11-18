@@ -262,6 +262,7 @@ declare
   k games.pk_kings;
   ord text; me int := 0; them int := 0; r int; won boolean; new_id bigint;
   rounds jsonb := '[]'::jsonb;
+  crown_breaker_new boolean := false;
 begin
   if th is null then return jsonb_build_object('ok', false, 'error', 'token'); end if;
   if v_moves !~ '^[rps]{3}$' then return jsonb_build_object('ok', false, 'error', 'moves'); end if;
@@ -289,6 +290,9 @@ begin
     update games.pk_kings set ended_at = now(), ended_by = v_nick where id = k.id;
     perform games.pk_stat_add(games.pk_player(k.token_hash, k.user_id), k.nick, 0, 0, 0, k.defenses, extract(epoch from now() - k.crowned_at)::bigint);
     insert into games.pk_kings (token_hash, user_id, ip_hash, nick, moves) values (th, u, ip, v_nick, v_moves) returning id into new_id;
+    if k.defenses >= 13 and u is not null and to_regprocedure('games.passport_award(uuid, text, timestamp with time zone)') is not null then
+      crown_breaker_new := games.passport_award(u, 'crown_breaker');
+    end if;
     perform games.bulletin_post('pk:crown:' || new_id, 'pond_king', 'king_crowned', v_nick, u, k.nick, k.user_id, null,
                                 jsonb_build_object('old_reign', k.defenses));
   else
@@ -312,6 +316,7 @@ begin
   end if;
   return jsonb_build_object('ok', true, 'won', won, 'score', jsonb_build_array(me, them), 'rounds', rounds,
                             'king', jsonb_build_object('nick', k.nick, 'defenses', k.defenses + case when won then 0 else 1 end),
+                            'crown_breaker_new', crown_breaker_new,
                             'new_king_id', new_id);
 end $$;
 create or replace function public.gry_pk_set_moves(p_token text, p_moves text)
@@ -593,7 +598,7 @@ begin
       'quiz_master', 'certified_fren', 'old_frog', 'arcade_hopper', 'frogmas', 'season_champion', 'frog_of_the_week',
       'junior_editor', 'senior_editor', 'vox_populi', 'bali', 'pep_birthday', 'thanksgiving_fren', 'valentine_fren',
       'first_hatch', 'little_fren', 'grown_fren', 'good_parent', 'super_parent', 'interior_designer', 'picasso_fren',
-      'pond_dominator', 'long_live_the_king', 'lord_of_the_lilies', 'master_tactician', 'quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99') then
+      'pond_dominator', 'long_live_the_king', 'crown_breaker', 'lord_of_the_lilies', 'master_tactician', 'quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99') then
     raise exception 'Unknown passport stamp %', b;
   end if;
   if u is null or games.discord_identity(u) is null then return false; end if;

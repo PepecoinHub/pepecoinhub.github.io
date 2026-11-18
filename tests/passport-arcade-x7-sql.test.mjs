@@ -19,7 +19,7 @@ test('expansion 7: seven planned catalog entries, seven new atlas tiles at the e
   const catalog = JSON.parse(file('docs/meme/passport-catalog.json'));
   const ids = catalog.achievements.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length, 'distinct ids');
-  assert.equal(ids.length, 66, '57 earlier + 7 new + the two Haze stamps');
+  assert.equal(ids.length, 67, '57 earlier + 7 new + the two Haze stamps + Crown Breaker');
   // owner, 2026-11-17: the two Three Lilies stamps are live; the rest wait (Gold Hook is still in beta)
   for (const id of X7) assert.equal(catalog.achievements.find(x => x.id === id).status, id === 'lord_of_the_lilies' || id === 'master_tactician' ? 'live' : 'planned', id);
   const v3 = file('docs/meme/meme.js').match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).map(s => s.slice(1, -1));
