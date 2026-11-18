@@ -1,6 +1,7 @@
 import { TOYS, healthyCompanion, playableCompanion } from './pepegochi-personality.mjs?v=20261118dialog1';
 // Cosmetic conversations; actual needs and care history come from the server view.
 const lines = {
+  secretFound: ['Another mystery solved, fren. I know a few more whispers.', 'A fresh discovery in the Passport. My tiny detective hat approves.'],
   fireflyUnavailable: ['That little light moved away. Try again when a firefly is nearby.'],
   desktopFirefly: ["A tiny lamp with wings. Don't worry, fren, I let it go.", "Did you see that? The pond has its own screensaver."],
   desktopTV: ["Pond TV? Hold on. I need my popcorn.", "The tiny frog demands a front-row seat."],
@@ -95,10 +96,11 @@ export function companionReply(view, action = 'hello', n = 0, context = {}) {
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
 // No polling or network calls. Optional bond stores cosmetic memories only.
-export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, now = () => Date.now() }) {
+export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, readRumors, openPassport, now = () => Date.now() }) {
   let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
   let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
   let lastActivity = now(), bornAt = now();
+  let rumorTicket = 0, rumorActions = null, rumorOpen = false;
   const doc = button.ownerDocument;
   const win = doc.defaultView;
   const el = (tag, cls, text) => {
@@ -144,7 +146,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     panel.style.overflowY = 'auto';
   }
   function close({ focus = false, reset = false } = {}) {
-    cancelClick(); clearNotice();
+    cancelClick(); clearNotice(); clearRumors();
     if (reset) { lastReaction = lastPet = -Infinity; pats = []; bornAt = now(); }
     if (reset) { recent = []; sequence = 0; gesture = null; suppressClick = false; }
     if (!panel) { setPose(null); return; }
@@ -162,8 +164,48 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     if (e.key === 'Escape' && panel) { e.preventDefault(); close({ focus: true }); }
   }
   function visit() { close({ reset: true }); openRoom(); }
+  function clearRumors() {
+    rumorTicket++; rumorActions?.remove(); rumorActions = null; rumorOpen = false;
+  }
+  function invalidateRumors() {
+    if (!rumorOpen || !panel) return;
+    clearRumors();
+    reply.textContent = 'A new discovery! Choose Pond Rumors or Secret Journal again to see the updated trail.';
+  }
+  async function showRumors(journal = false) {
+    clearRumors(); rumorOpen = true;
+    const target = panel, ticket = rumorTicket;
+    reply.textContent = 'Let me check our Fren Passport...';
+    reply.style.whiteSpace = 'pre-line';
+    setPose(null);
+    let result;
+    try { result = await readRumors(); } catch { result = null; }
+    if (!panel || panel !== target || ticket !== rumorTicket) return;
+    const p = result?.progress;
+    if (result?.status !== 'ok' || !p) {
+      reply.textContent = result?.status === 'signed-out' ? 'Log in with Discord to read your own secret journal.' : 'The pond is quiet. I could not check your Passport. Try again in a moment.';
+      return;
+    }
+    const summary = `${p.found.length} / ${p.total} rumored secrets found.`;
+    const message = journal ? `Secret Journal\n${summary}\n${p.found.length ? p.found.map(title => '• ' + title).join('\n') : 'No discoveries recorded yet. Every detective starts somewhere.'}` :
+      `Pond Rumors\n${summary}\n\n${p.hint || 'You found every trail I know. Keep an eye on the pond; there may be more mysteries later.'}`;
+    reply.textContent = message;
+    rumorActions = el('div', 'pg-fact-answers pg-rumor-actions');
+    function extra(label, action) {
+      const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', action); rumorActions.append(b); return b;
+    }
+    if (!journal && p.detail) {
+      const b = extra('A little more?', () => {
+        reply.textContent = message + '\n\n' + p.detail;
+        b.disabled = true; panel.scrollTop = 0;
+      });
+    }
+    if (openPassport) extra('Open Fren Passport', () => { close(); openPassport(); });
+    if (rumorActions.childElementCount) reply.after(rumorActions);
+    reposition(); panel.scrollTop = 0;
+  }
   function say(action = 'hello') {
-    clearNotice();
+    clearNotice(); clearRumors();
     if (action === 'hello') action = bond?.take() || action;
     if (action === 'pet') {
       pats = pats.filter(t => now() - t < 10000); pats.push(now());
@@ -189,10 +231,15 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
       reply.setAttribute('aria-live', 'polite');
       const actions = el('div', 'pg-fact-answers');
       function add(label, fn) { const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', () => {
+        clearRumors();
         for (const child of actions.children) child.classList?.toggle('is-selected', child === b);
         fn();
         if (panel) panel.scrollTop = 0;
       }); actions.append(b); }
+      if (readRumors) {
+        add('Pond Rumors', () => showRumors());
+        add('Secret Journal', () => showRumors(true));
+      }
       add('Our memories', () => say('memories'));
       if (bond) {
         add('Your favourite toy?', () => say('favourite'));
@@ -206,7 +253,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
       if (bond) {
         const mute = el('button', 'pg-fact-a'); mute.type = 'button';
         const label = () => { mute.textContent = bond.muted ? 'Reactions: quiet' : 'Reactions: on'; mute.setAttribute('aria-pressed', String(bond.muted)); };
-        label(); mute.addEventListener('click', () => { bond.toggleMute(); clearNotice(); label(); reply.textContent = bond.muted ? 'Automatic reactions are off. You can still talk and play with me.' : 'Automatic reactions are on. Watch for little surprises!'; panel.scrollTop = 0; }); actions.append(mute);
+        label(); mute.addEventListener('click', () => { clearRumors(); bond.toggleMute(); clearNotice(); label(); reply.textContent = bond.muted ? 'Automatic reactions are off. You can still talk and play with me.' : 'Automatic reactions are on. Watch for little surprises!'; panel.scrollTop = 0; }); actions.append(mute);
       }
       add('How are you?', () => say('how'));
       add('Tell me a joke', () => say('joke'));
@@ -268,7 +315,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
   button.addEventListener('pointerup', end);
   button.addEventListener('pointercancel', end);
   button.addEventListener('pointerleave', end);
-  return { close, react, invite, get busy() { return !!(panel || notice || clickTimer !== null); }, dispose() {
+  return { close, react, invite, invalidateRumors, get busy() { return !!(panel || notice || clickTimer !== null); }, dispose() {
     close({ reset: true });
     doc.removeEventListener('pointerdown', activity, true);
     doc.removeEventListener('keydown', activity, true);

@@ -2158,6 +2158,7 @@ footer.foot a { color: #edf3e3; }
 .pg-fact-a.is-wrong { background: #f4c4c0; color: #6e1616; border-color: #9d3c3c; text-decoration: line-through; }
 .pg-conversation .pg-fact-answers { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 7px; }
 .pg-conversation .pg-fact-a { overflow-wrap: anywhere; }
+.pg-conversation .pg-rumor-actions { padding: 0 0 9px; margin-bottom: 9px; border-bottom: 1px solid #aaa68c; }
 .pg-fact { overscroll-behavior: contain; }
 .pg-fact-out { margin: 8px 12px 0; min-height: 1.2em; font-weight: 600; }
 .pg-fact-out a { color: #000080; }

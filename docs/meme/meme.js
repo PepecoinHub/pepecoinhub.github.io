@@ -1972,9 +1972,9 @@
   // Read-only PepeGochi companion on the PondOS taskbar; beta gate stays in place.
   // The real game and server own the pet; this module never invents a local pet.
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261118dialog1').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261118rumors1').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
-        session: sbSession, rpc: rpc, base: BASE });
+        session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport });
     }).catch(function () { /* optional decoration; the game still works */ });
   }
   function pondWarsApp() {
@@ -3244,6 +3244,7 @@
         if (apps.passport && apps.passport.render) apps.passport.render();
       }).catch(function () {});
       if(result.new) {
+        if (!FREN_TEST) notifyGochiSecret(session.userId);
         var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren',midnight_fren:'Midnight Fren',nerd_alert:'Nerds Only',bali_dreamer:'Bali Dreamer',find_fren:'Looking Glass',address_check:'Trust, But Verify'};
         var av={why_tho:1,midnight_fren:1,nerd_alert:1,bali_dreamer:1,find_fren:1,address_check:1};
         rewardNotice({ bar: 'Fren Passport - Secret Found', title: 'Secret discovered: ' + (names[id] || 'A mysterious find'),
@@ -3251,6 +3252,13 @@
           img: ico('gif-045-still'), go: av[id] ? 'Open Create Your Fren' : 'Open Fren Passport', open: av[id] ? avatarMaker : frenPassport });
       }
     },function(){ /* Migration may not be installed yet; retry on next discovery. */ });
+  }
+
+  // May animate the companion after a confirmed read/write response, never grants a secret.
+  function notifyGochiSecret(owner) {
+    var s = sbSession();
+    if (GOCHI && !FREN_TEST && s && s.discord && s.userId === owner)
+      window.dispatchEvent(new CustomEvent('pondos:secret-found', { detail: { owner: owner } }));
   }
 
   // Chat secrets (Happy Fren for a smiley, Born to Fren for the word "fren") are given by the server's chat trigger,
@@ -3279,7 +3287,7 @@
             text: 'It is in your Fren Passport now. A special avatar is waiting for you in Create Your Fren.',
             img: ico('gif-045-still'), go: 'Open Create Your Fren', open: avatarMaker });
         });
-        if (fresh) passportLoad(sbSession()).then(function () { if (apps.passport && apps.passport.render) apps.passport.render(); }).catch(function () {});
+        if (fresh) { notifyGochiSecret(s.userId); passportLoad(sbSession()).then(function () { if (apps.passport && apps.passport.render) apps.passport.render(); }).catch(function () {}); }
       }, function () {});
     }, 1200);
   }
@@ -3296,6 +3304,7 @@
       try { localStorage.setItem(k, '1'); } catch (e) {}
       if (passportCache && passportCache.userId === session.userId) passportCache = null;
       if (!r['new']) return;
+      notifyGochiSecret(session.userId);
       rewardNotice({ bar: 'Fren Passport - Secret Found', title: 'Secret discovered: Share Fren',
         text: 'You found a little PondOS secret by sharing a Pepe Guesser result. It is in your collection now.',
         img: ico('gif-045-still'), go: 'Open Fren Passport', open: frenPassport });

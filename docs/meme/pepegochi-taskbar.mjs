@@ -6,7 +6,8 @@ import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
 // and the hop out of the PEPEGOCHI.EXE window.
 import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261116room1';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261118dialog1';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261118rumors1';
+import { createRumorReader } from './pepegochi-rumors.mjs?v=20261118rumors1';
 import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118dialog1';
 
 import { createBond } from './pepegochi-bond.mjs?v=20261116sass1';
@@ -98,13 +99,14 @@ export function hopPath(from, to, steps = 36) {
 
 // One state read on entry, then only when the tab returns after a break, auth changes,
 // or the PEPEGOCHI.EXE iframe signals that a player action succeeded.
-export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = () => Date.now() }) {
+export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = () => Date.now(), rumorsEnabled = true, openPassport }) {
   const start = bar && bar.querySelector('.start');
   if (!start) return () => {};
   let storage;
   try { storage = window.localStorage; } catch {}
   const bond = createBond({ storage, now });
   const arcade = createArcadeObserver();
+  const rumors = createRumorReader({ session, rpc, now });
   let disposed = false, lastLife = null;
   let desktop = null;
   const img_base = base + 'games/img/pepegochi/';
@@ -450,6 +452,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       lastAt = 0;
       generation++;
       cancelQuiz();               // the old account's question or ranking must not stay on screen
+      rumors.invalidate();
       conversation?.close({ reset: true });
       bond.reset(); arcade.reset(); clearToy(); lastLife = null;
       paint(describeTaskbarFrog(null));
@@ -465,7 +468,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       if (disposed || requestGeneration !== generation || !cur || !cur.discord || cur.userId !== id) return;
       if (lastLife !== state?.pet?.life_id) {
         desktop?.reset();
-        conversation?.close({ reset: true }); arcade.reset(); clearToy(); lastLife = state?.pet?.life_id || null;
+        conversation?.close({ reset: true }); rumors.invalidate(); arcade.reset(); clearToy(); lastLife = state?.pet?.life_id || null;
       }
       const view = describeTaskbarFrog(state);
     if (shownView?.sprite !== view.sprite || shownView?.label !== view.label || shownView?.playReady !== view.playReady || shownView?.needAttention !== view.needAttention) { desktop?.stop(); conversation?.close(); clearToy(); }
@@ -502,6 +505,13 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     if (frame) refresh(true);
   }
   const onAuth = () => { refresh(true); refreshFacts(true); };
+  // Cosmetic reaction only. The next explicit journal read always gets the current server state.
+  const onSecret = event => {
+    if (!rumorsEnabled || !event.detail?.owner || event.detail.owner !== session()?.userId || !signedIn()) return;
+    rumors.invalidate();
+    conversation?.invalidateRumors();
+    conversation?.react('secretFound');
+  };
   const onStorage = event => {
     if (event.key && event.key.startsWith('sb-azbwciqfbsdpwubznncg-auth-token')) onAuth();
   };
@@ -509,12 +519,14 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   window.addEventListener('focus', onVisible);
   window.addEventListener('storage', onStorage);
   window.addEventListener('pondos:auth-changed', onAuth);
+  window.addEventListener('pondos:secret-found', onSecret);
   window.addEventListener('pondos:pepegochi-left', onLeftWindow);
   document.addEventListener('visibilitychange', onVisible);
   conversation = mountFrogInteractions({ button, img, slot, getView: () => shownView,
     setPose: p => { desktop?.stop(); cancelMotion(); setAct(p); if (!p) queueMotion(); }, animate: animateExpression, showToy, openRoom: open,
     closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
     openQuiz: requestQuiz, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
+    readRumors: rumorsEnabled ? rumors.read : null, openPassport,
     canReact: () => !balloon && !desktop?.active && document.activeElement?.tagName !== 'IFRAME', now });
   desktop = mountDesktopCompanion({ slot, img, getView: () => shownView, base, now,
     eligible: manual => !disposed && !balloon && (manual || !bond.muted) && !!lastLife && document.activeElement?.tagName !== 'IFRAME' && !document.fullscreenElement,
@@ -527,7 +539,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   refresh(true);
   queueMotion();
   return () => {
-    disposed = true; generation++; quizIntent++; bond.touch(); arcade.reset(); clearToy();
+    disposed = true; generation++; quizIntent++; rumors.invalidate(); bond.touch(); arcade.reset(); clearToy();
     desktop?.dispose();
     window.removeEventListener('offline', onOffline);
     window.removeEventListener('online', onOnline);
@@ -538,6 +550,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     window.removeEventListener('message', onMessage);
     window.removeEventListener('focus', onVisible);
     window.removeEventListener('storage', onStorage);
+    window.removeEventListener('pondos:secret-found', onSecret);
     window.removeEventListener('pondos:auth-changed', onAuth);
     window.removeEventListener('pondos:pepegochi-left', onLeftWindow);
     window.removeEventListener('resize', place);

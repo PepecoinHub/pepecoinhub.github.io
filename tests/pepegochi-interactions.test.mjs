@@ -49,6 +49,8 @@ function harness(initial = adult, options = {}) {
   class Element {
     constructor(doc) { this.ownerDocument = doc; this.children = []; this.events = new Map(); this.attrs = new Map(); this.style = {}; this.offsetWidth = 300; }
     append(...children) { for (const n of children) { this.children.push(n); n.parent = this; } }
+    after(n) { this.parent.children.splice(this.parent.children.indexOf(this) + 1, 0, n); n.parent = this.parent; }
+    get childElementCount() { return this.children.length; }
     remove() { if (this.parent) this.parent.children = this.parent.children.filter(c => c !== this); }
     contains(n) { return n === this || this.children.some(c => c.contains(n)); }
     setAttribute(k, v) { this.attrs.set(k, v); }
@@ -57,7 +59,7 @@ function harness(initial = adult, options = {}) {
     removeEventListener(k, f) { this.events.get(k)?.delete(f); }
     emit(k, e = {}) { for (const f of this.events.get(k) || []) f({ target: this, preventDefault() {}, ...e }); }
     getBoundingClientRect() { return { top: 500, left: 24 }; }
-    querySelector(s) { for (const n of this.children) { if (s === '.' + n.className) return n; const found = n.querySelector(s); if (found) return found; } return null; }
+    querySelector(s) { for (const n of this.children) { if (String(n.className || '').split(/\s+/).some(cls => s === '.' + cls)) return n; const found = n.querySelector(s); if (found) return found; } return null; }
     focus() {}
   }
   const doc = new Element(null);
@@ -120,4 +122,37 @@ test('initiated contact is sparse, muted/blocked/young-safe, and never opens a d
   h.tick(46000); assert.equal(h.controller.invite(), false);
   h.setView({ ...adult, adult: false });h.tick(90000);assert.equal(h.controller.invite(), false);
   h.controller.dispose();assert.equal(h.doc.body.children.length, 0);
+});
+
+test('rumor and journal buttons use read-only on-demand data, optional detail and Passport navigation', async () => {
+  let reads = 0, opened = 0;
+  const progress = { found: ['One mystery'], total: 12, hint: 'A subtle clue', detail: 'A second clue' };
+  const h = harness({ ...adult, adult: false, motion: 'froglet' }, { readRumors: async () => { reads++; return { status: 'ok', progress }; }, openPassport: () => opened++ });
+  h.button.emit('click', { detail: 0 });
+  assert.equal(reads, 0);
+  const panel = h.doc.body.children[0], actions = panel.querySelector('.pg-fact-answers'), reply = panel.querySelector('.pg-fact-q');
+  actions.children.find(b => b.textContent === 'Pond Rumors').emit('click');
+  assert.match(reply.textContent, /check/); await Promise.resolve();
+  assert.match(reply.textContent, /1 \/ 12.*\n\nA subtle clue/);
+  const extras = panel.querySelector('.pg-rumor-actions');
+  extras.children.find(b => b.textContent === 'A little more?').emit('click');
+  assert.match(reply.textContent, /A second clue/); assert.equal(reads, 1);
+  actions.children.find(b => b.textContent === 'Secret Journal').emit('click'); await Promise.resolve();
+  assert.match(reply.textContent, /One mystery/); assert.equal(reads, 2);
+  assert.equal(panel.querySelector('.pg-rumor-actions').children.length, 1);
+  panel.querySelector('.pg-rumor-actions').children[0].emit('click');
+  assert.equal(opened, 1); assert.equal(h.doc.body.children.length, 0); h.controller.dispose();
+});
+
+test('late rumor responses cannot overwrite another action, a new discovery or a closed dialog', async () => {
+  const resolvers = [];
+  const h = harness(adult, { readRumors: () => new Promise(r => resolvers.push(r)) });
+  h.button.emit('click', { detail: 0 });
+  const panel = h.doc.body.children[0], actions = panel.querySelector('.pg-fact-answers'), reply = panel.querySelector('.pg-fact-q');
+  const click = label => actions.children.find(b => b.textContent === label).emit('click');
+  const result = { status: 'ok', progress: { found: [], total: 12, hint: 'Late clue', detail: 'Late detail' } };
+  click('Pond Rumors'); click('Tell me a joke'); const joke = reply.textContent; resolvers[0](result); await Promise.resolve(); assert.equal(reply.textContent, joke);
+  click('Pond Rumors'); h.controller.invalidateRumors(); resolvers[1](result); await Promise.resolve(); assert.match(reply.textContent, /new discovery/);
+  click('Pond Rumors'); h.controller.close(); resolvers[2](result); await Promise.resolve(); assert.equal(h.doc.body.children.length, 0);
+  h.controller.dispose();
 });

@@ -6,9 +6,9 @@ const html = `<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="
 <body class="pondos"><input id="work" aria-label="Work"><header style="position:fixed;bottom:0;width:100%"><div class="bar"><button class="start">Start</button></div></header>
 <script type="module">
 import { mountTaskbarFrog } from '/meme/pepegochi-taskbar.mjs';
-window.t = { time: Date.now(), owner: 'owner-a', opened: 0, calls: [], pet: { life_id:'frog-a', name:'Pickle', stage:'adult', status:'healthy', care_days:12, needs:{hunger:90,hygiene:90,mood:90,energy:90} } };
+window.t = { time: Date.now(), owner: 'owner-a', opened: 0, passportOpened: 0, calls: [], passport: {signed_in:true,secrets:[]}, pet: { life_id:'frog-a', name:'Pickle', stage:'adult', status:'healthy', care_days:12, needs:{hunger:90,hygiene:90,mood:90,energy:90} } };
 t.refresh = () => window.dispatchEvent(new Event('pondos:auth-changed'));
-t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>t.opened++,session:()=>({discord:true,userId:t.owner}),now:()=>t.time,rpc:async name=>{t.calls.push(name);if(name==='gry_quiz_answer')return new Promise(r=>t.answer=r);return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:{day:new Date().toISOString().slice(0,10),question:'Pond question?',answers:['Yes','No'],answered:false};}});
+t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>t.opened++,openPassport:()=>t.passportOpened++,session:()=>({discord:true,userId:t.owner}),now:()=>t.time,rpc:async name=>{t.calls.push(name);if(name==='gry_passport_state'){if(t.deferPassport)return new Promise(r=>t.passportResolve=r);return structuredClone(t.passport)}if(name==='gry_quiz_answer')return new Promise(r=>t.answer=r);return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:{day:new Date().toISOString().slice(0,10),question:'Pond question?',answers:['Yes','No'],answered:false};}});
 </script>`;
 let browser;
 const server = http.createServer((req, res) => {
@@ -141,5 +141,29 @@ const server = http.createServer((req, res) => {
  await buddy.focus();await personality.keyboard.press('Enter');
  assert.match(await personality.locator('.pg-conversation .pg-fact-q').textContent(),/losing part|pond saw nothing/);
  await personality.close();
+ // Pond Rumors uses only the signed-in Passport state, even in quiet mode and on a narrow touch viewport.
+ const rumors=await browser.newPage({viewport:{width:320,height:640},hasTouch:true});rumors.on('pageerror',e=>errors.push(e.message));
+ await rumors.route('**/*',r=>new URL(r.request().url()).origin===base?r.continue():r.abort());
+ await rumors.goto(base);await rumors.waitForFunction(()=>document.querySelector('.pg-companion-button')?.title.startsWith('Pickle'));
+ assert.equal(await rumors.evaluate(()=>t.calls.filter(x=>x==='gry_passport_state').length),0);
+ await rumors.locator('.pg-companion-button').tap();await rumors.getByRole('button',{name:'Reactions: on',exact:true}).tap();
+ await rumors.getByRole('button',{name:'Pond Rumors',exact:true}).tap();
+ await rumors.getByRole('button',{name:'A little more?',exact:true}).waitFor();
+ const rumorText=rumors.locator('.pg-conversation .pg-fact-q');const first=await rumorText.textContent();assert.match(first,/0 \/ 12/);
+ await rumors.getByRole('button',{name:'A little more?',exact:true}).tap();assert.ok((await rumorText.textContent()).length>first.length);
+ await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();assert.match(await rumorText.textContent(),/No discoveries recorded/);
+ assert.equal(await rumors.evaluate(()=>t.calls.filter(x=>x==='gry_passport_state').length),1);
+ await rumors.evaluate(()=>{t.passport.secrets=[{id:'wrong_frog',discovered_at:new Date().toISOString()}];window.dispatchEvent(new CustomEvent('pondos:secret-found',{detail:{owner:t.owner}}))});
+ await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('The Wrong Frog'));
+ assert.match(await rumorText.textContent(),/1 \/ 12/);
+ const rumorBox=await rumors.locator('.pg-conversation').boundingBox();assert.ok(rumorBox.x>=0&&rumorBox.x+rumorBox.width<=320&&rumorBox.y>=0);
+ await rumors.getByRole('button',{name:'Open Fren Passport',exact:true}).tap();assert.equal(await rumors.evaluate(()=>t.passportOpened),1);
+ await rumors.locator('.pg-companion-button').tap();await rumors.evaluate(()=>{t.time+=16000;t.deferPassport=true});
+ await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();await rumors.waitForFunction(()=>!!t.passportResolve);
+ await rumors.evaluate(()=>{t.owner='owner-b';t.refresh();t.passportResolve(t.passport);t.deferPassport=false;t.passport={signed_in:true,secrets:[]}});
+ await rumors.waitForFunction(()=>!document.querySelector('.pg-conversation'));
+ await rumors.locator('.pg-companion-button').tap();await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();
+ await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('No discoveries recorded'));
+ await rumors.close();
  assert.deepEqual(errors,[]);console.log('PASS: toys, favourite discovery, real Sweeper result, five expression sequences, state restoration, interruption, reduced motion, keyboard, memories, familiar pats, care, focus, throttle, mute/reload, account isolation, double-click, 320/390/1440px, reduced motion and disposal');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server.close();});
