@@ -126,12 +126,22 @@
     $('king-line').textContent = (k.house ? 'The house frog keeps the seat warm. Somebody take it. ' : '') + 'On the throne since ' + ago(k.since) + '.';
     $('king-def').textContent = k.defenses;
     $('who').textContent = k.you ? 'you are the king' : me ? (me.name || 'guest') + (me.discord ? ' ✓' : ' (guest)') : (store.get('pk-nick') || 'visitor');
-    // the leader's face: their Fren avatar (Discord players who saved one), otherwise the pond's king frog
-    var faceKey = k.avatar ? JSON.stringify(k.avatar) : '';
+    // Show the player's saved Fren avatar, or a plain Fren for players without one.
+    var faceKey = k.id + ':' + JSON.stringify(k.avatar || null);
     if (faceKey !== lastFace) {
-      lastFace = faceKey; var box = $('king-face'), frog = '<img class="throne-frog" src="img/pond/pond-king.png?v=pepe" alt="" width="96" height="96">';
-      if (!k.avatar) box.innerHTML = frog;
-      else N.avatar(k.avatar, k.nick + '’s Fren avatar').then(function (av) { if (lastFace !== faceKey) return; box.textContent = ''; if (av) box.appendChild(av); else box.innerHTML = frog; });
+      lastFace = faceKey;
+      var box = $('king-face');
+      var fallback = '<img class="throne-frog" src="../meme/avatar-assets/layers/base_frog.webp" alt="" width="96" height="96">';
+      var defaultLook = { bg: 'bg_sky', clothing: 'clothing_blue', mouth: 'mouth_flat', eyes: 'eyes_sleepy', hat: 'hat_none', accessory: 'accessory_none', special: 'special_none' };
+      box.innerHTML = fallback;
+      N.avatar(k.avatar || defaultLook, k.nick + '’s Fren avatar').then(function (av) {
+        if (lastFace !== faceKey) return;
+        if (av) { box.textContent = ''; box.appendChild(av); }
+        else if (k.avatar) N.avatar(defaultLook, 'Default Fren avatar').then(function (plain) {
+          if (lastFace !== faceKey || !plain) return;
+          box.textContent = ''; box.appendChild(plain);
+        });
+      });
     }
     var prog = $('king-progress');
     prog.hidden = !(k.you && k.defenses < 10);
@@ -327,9 +337,5 @@
     if (me && me.name) nick.value = me.name;
     $('acct').textContent = me ? 'Logged on as ' + (me.name || 'guest') + (me.discord ? ' ✓' : '') + ': your throne follows you.' : '';
     canFight(); load();
-    // Anonymous wins can only be claimed by their original browser token after Discord sign-in.
-    if (me && me.discord) rpc('gry_pk_claim_crown_breaker', { p_token: token }).then(function (r) {
-      if (r && r.new) $('acct').textContent += ' Crown Breaker unlocked! The stamp and knight avatar are in your Fren Passport.';
-    }, function () {});
   });
 })();
