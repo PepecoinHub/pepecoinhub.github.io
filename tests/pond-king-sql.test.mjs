@@ -212,6 +212,7 @@ test('Crown Breaker: 12 defenses are insufficient, 13 awards only a Discord winn
   const { db, drop } = await pondDb('crown_breaker_test', ['update_pond_bulletin.sql', 'update_pond_king.sql']);
   try {
     await db.query(`create table games.test_awards (user_id uuid, badge text, primary key (user_id, badge));
+      create function games.passport_start() returns timestamptz language sql stable as $$ select '2000-01-01'::timestamptz $$;
       create function games.passport_award(u uuid, b text, at timestamptz default null) returns boolean
       language plpgsql security definer set search_path = '' as $$
       begin
@@ -221,6 +222,7 @@ test('Crown Breaker: 12 defenses are insufficient, 13 awards only a Discord winn
       end $$;`);
     const one = await addUser(db, 20, 'FirstBreaker');
     const two = await addUser(db, 21, 'RealBreaker');
+    const claimant = await addUser(db, 22, 'LateDiscordFren');
     const tok = i => 'breaker-token-' + String(i).padStart(10, '0');
     const challenge = async (user, i, king, moves) => {
       await db.query('begin');
@@ -247,10 +249,23 @@ test('Crown Breaker: 12 defenses are insufficient, 13 awards only a Discord winn
     await db.query("update games.pk_kings set defenses=13 where ended_at is null");
     const guest = await challenge(null, 3, await king(), 'rrr'); // rock beats scissors
     assert.equal(guest.won, true); assert.equal(guest.crown_breaker_new, false);
+    const claim = async (user, token) => {
+      await db.query('begin');
+      try {
+        await db.query('set local role authenticated');
+        await db.query("select set_config('request.jwt.claim.sub', $1, true)", [user]);
+        const r = await db.query('select public.gry_pk_claim_crown_breaker($1) as v', [token]);
+        await db.query('commit'); return r.rows[0].v;
+      } catch (e) { await db.query('rollback'); throw e; }
+    };
+    assert.equal((await claim(claimant, tok(999))).claimed, false, 'another browser token cannot claim');
+    const claimed = await claim(claimant, tok(3));
+    assert.equal(claimed.claimed, true); assert.equal(claimed.new, true, 'original anonymous winner claims after signing in');
+    assert.equal((await claim(one, tok(3))).claimed, false, 'the same duel cannot be claimed twice');
     await db.query("update games.pk_duels set created_at = created_at - interval '4 hours'");
     await db.query("update games.pk_kings set defenses=13 where ended_at is null");
     const again = await challenge(two, 4, await king(), 'ppp');
     assert.equal(again.won, true); assert.equal(again.crown_breaker_new, false, 'repeat wins do not re-award');
-    assert.equal((await db.query('select count(*)::int n from games.test_awards')).rows[0].n, 1);
+    assert.equal((await db.query('select count(*)::int n from games.test_awards')).rows[0].n, 2);
   } finally { await drop(); }
 });

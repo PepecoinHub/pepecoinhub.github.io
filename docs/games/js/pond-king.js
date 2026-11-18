@@ -327,5 +327,9 @@
     if (me && me.name) nick.value = me.name;
     $('acct').textContent = me ? 'Logged on as ' + (me.name || 'guest') + (me.discord ? ' ✓' : '') + ': your throne follows you.' : '';
     canFight(); load();
+    // Anonymous wins can only be claimed by their original browser token after Discord sign-in.
+    if (me && me.discord) rpc('gry_pk_claim_crown_breaker', { p_token: token }).then(function (r) {
+      if (r && r.new) $('acct').textContent += ' Crown Breaker unlocked! The stamp and knight avatar are in your Fren Passport.';
+    }, function () {});
   });
 })();

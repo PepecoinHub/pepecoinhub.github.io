@@ -60,6 +60,7 @@ create index if not exists pk_duels_player on games.pk_duels (king_id, token_has
 create index if not exists pk_duels_ip on games.pk_duels (ip_hash, created_at);
 create index if not exists pk_duels_king on games.pk_duels (king_id, created_at desc);
 create index if not exists pk_duels_time on games.pk_duels (created_at);
+create index if not exists pk_duels_anon_wins on games.pk_duels (token_hash) where won is true and user_id is null;
 alter table games.pk_duels enable row level security;
 revoke all on games.pk_duels from public, anon, authenticated;
 
@@ -88,6 +89,16 @@ create table if not exists games.pk_stats (
 );
 alter table games.pk_stats enable row level security;
 revoke all on games.pk_stats from public, anon, authenticated;
+
+-- A past anonymous victor may later sign in with Discord on the same browser.
+-- One winning duel can be claimed only once, even after the 60-day duel cleanup.
+create table if not exists games.pk_crown_claims (
+  duel_id bigint primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  claimed_at timestamptz not null default clock_timestamp()
+);
+alter table games.pk_crown_claims enable row level security;
+revoke all on games.pk_crown_claims from public, anon, authenticated;
 
 -- the pond opens with the house frog on the throne
 insert into games.pk_kings (nick, moves)
@@ -152,6 +163,34 @@ begin
                               case when k.ended_at is null then 0 else extract(epoch from k.ended_at - k.crowned_at)::bigint end)
        from games.pk_kings k order by k.crowned_at;
   end if;
+end $$;
+
+-- Legacy anonymous wins cannot be assigned from nicknames. The original browser token
+-- proves ownership of a qualifying duel; Discord sign-in identifies the Passport.
+create or replace function public.gry_pk_claim_crown_breaker(p_token text)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare
+  u uuid := auth.uid();
+  th text := games.pk_token_hash(p_token);
+  v_duel_id bigint;
+  v_new boolean := false;
+begin
+  if u is null or games.discord_identity(u) is null or th is null then
+    return jsonb_build_object('claimed', false);
+  end if;
+  select d.id into v_duel_id
+    from games.pk_duels d join games.pk_kings k on k.id = d.king_id
+   where d.token_hash = th and d.user_id is null and d.won is true
+     and k.ended_at is not null and k.defenses >= 13
+     and d.created_at >= games.passport_start()
+   order by d.created_at desc limit 1 for update of d;
+  if v_duel_id is null then return jsonb_build_object('claimed', false); end if;
+
+  insert into games.pk_crown_claims (duel_id, user_id) values (v_duel_id, u)
+  on conflict (duel_id) do nothing;
+  if not found then return jsonb_build_object('claimed', false); end if;
+  v_new := games.passport_award(u, 'crown_breaker');
+  return jsonb_build_object('claimed', true, 'new', v_new);
 end $$;
 
 -- the saved Fren avatar of a Discord player (games.passport_avatars, update_fren_avatar.sql), or null;
@@ -338,3 +377,5 @@ revoke all on function games.pk_player(text, uuid), games.pk_stat_add(text, text
 revoke all on function games.pk_token_hash(text), games.pk_beats(text, text), games.pk_is(text, uuid, text, uuid), games.pk_cooldown(), games.pk_last(text, uuid, text), games.pk_avatar(uuid) from public, anon, authenticated;
 revoke all on function public.gry_pk_state(text), public.gry_pk_challenge(text, bigint, text, text), public.gry_pk_set_moves(text, text) from public;
 grant execute on function public.gry_pk_state(text), public.gry_pk_challenge(text, bigint, text, text), public.gry_pk_set_moves(text, text) to anon, authenticated;
+revoke all on function public.gry_pk_claim_crown_breaker(text) from public, anon, authenticated;
+grant execute on function public.gry_pk_claim_crown_breaker(text) to authenticated;

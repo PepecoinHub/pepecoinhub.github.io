@@ -2,8 +2,17 @@
 -- and a special knight avatar saveable only by its holder.
 -- Apply AFTER update_passport_awards.sql, update_pond_king.sql, and update_avatar_crown.sql.
 -- Reviewable migration: do not run on production before the owner's release decision.
--- No historical backfill: only a winning duel after this migration qualifies.
+-- Anonymous historical wins are claimable only from their original browser token after Discord sign-in.
 begin;
+
+create table if not exists games.pk_crown_claims (
+  duel_id bigint primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  claimed_at timestamptz not null default clock_timestamp()
+);
+alter table games.pk_crown_claims enable row level security;
+revoke all on games.pk_crown_claims from public, anon, authenticated;
+create index if not exists pk_duels_anon_wins on games.pk_duels (token_hash) where won is true and user_id is null;
 
 create or replace function games.passport_award(u uuid, b text, at timestamptz default null)
 returns boolean language plpgsql volatile security definer set search_path = '' as $$
@@ -229,10 +238,39 @@ begin
 end
 $$;
 
+create or replace function public.gry_pk_claim_crown_breaker(p_token text)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare
+  u uuid := auth.uid();
+  th text := games.pk_token_hash(p_token);
+  v_duel_id bigint;
+  v_new boolean := false;
+begin
+  if u is null or games.discord_identity(u) is null or th is null then
+    return jsonb_build_object('claimed', false);
+  end if;
+  select d.id into v_duel_id
+    from games.pk_duels d join games.pk_kings k on k.id = d.king_id
+   where d.token_hash = th and d.user_id is null and d.won is true
+     and k.ended_at is not null and k.defenses >= 13
+     and d.created_at >= games.passport_start()
+   order by d.created_at desc limit 1 for update of d;
+  if v_duel_id is null then return jsonb_build_object('claimed', false); end if;
+
+  insert into games.pk_crown_claims (duel_id, user_id) values (v_duel_id, u)
+  on conflict (duel_id) do nothing;
+  if not found then return jsonb_build_object('claimed', false); end if;
+  v_new := games.passport_award(u, 'crown_breaker');
+  return jsonb_build_object('claimed', true, 'new', v_new);
+end $$;
+
 revoke all on function games.passport_award(uuid, text, timestamptz) from public, anon, authenticated;
 revoke all on function public.gry_pk_challenge(text, bigint, text, text) from public;
 grant execute on function public.gry_pk_challenge(text, bigint, text, text) to anon, authenticated;
 revoke all on function public.gry_passport_avatar_save(text, text, text, text, text, text, text) from public, anon, authenticated;
 grant execute on function public.gry_passport_avatar_save(text, text, text, text, text, text, text) to authenticated;
+
+revoke all on function public.gry_pk_claim_crown_breaker(text) from public, anon, authenticated;
+grant execute on function public.gry_pk_claim_crown_breaker(text) to authenticated;
 
 commit;
