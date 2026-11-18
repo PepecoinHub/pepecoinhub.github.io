@@ -2399,3 +2399,67 @@ footer.foot a { color: #edf3e3; }
   .pondos body[data-page="index"] .pd-door small { display: none; }
   .pondos body[data-page="index"] .today-pond { padding-right: 10px; }
 }
+
+
+/* Internet window: a hint of pond green at the top, fading into a plain reading surface. */
+.pondos body[data-page="index"] .win-host .win-body {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--pane) 93%, #75a879) 0,
+    var(--pane) 380px);
+}
+.pondos body[data-page="index"] .glance {
+  padding: 5px;
+  background: var(--chrome) !important;
+}
+.pondos body[data-page="index"] .glance h2 {
+  margin: 0;
+  padding: 5px 8px;
+  background: linear-gradient(90deg, var(--title), var(--title-2));
+  color: #fff;
+  font: 700 13px/1.2 var(--f-chrome);
+  letter-spacing: 0;
+}
+.pondos body[data-page="index"] .glance dl {
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: var(--pane);
+  box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk),
+    inset -1px -1px 0 var(--chrome-hi);
+}
+.pondos body[data-page="index"] .glance dl > div {
+  border-top: 1px solid var(--chrome-lo);
+}
+.pondos body[data-page="index"] .glance dl > div:first-child { border-top: 0; }
+.pondos body[data-page="index"] .glance dt {
+  font: 700 11px/1.5 var(--f-chrome);
+  color: var(--ink);
+}
+.pondos body[data-page="index"] .glance dd { font-weight: 500; }
+.pondos body[data-page="index"] .glance .src {
+  margin: 3px 2px 0;
+  padding: 5px 4px 2px;
+  border-top: 1px solid var(--chrome-lo);
+  font-size: 12px;
+}
+.pondos body[data-page="index"] .win-launch {
+  gap: 5px;
+  padding: 5px;
+  box-shadow: inset 1px 1px 0 var(--chrome-lo), inset 2px 2px 0 var(--chrome-dk),
+    inset -1px -1px 0 var(--chrome-hi);
+}
+.pondos body[data-page="index"] .win-launch p {
+  margin: 0 2px 2px;
+  padding: 3px 4px;
+  border-bottom: 1px solid var(--chrome-lo);
+  font: 700 12px/1.25 var(--f-chrome);
+}
+.pondos body[data-page="index"] .win-launch .btn {
+  min-height: 28px;
+  padding: 5px 8px;
+}
+.pondos body[data-page="index"] .win-launch .btn img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  border-radius: 0;
+}
