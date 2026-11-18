@@ -50,3 +50,21 @@
   margin: 8px auto;
   border: 2px solid #b4aee0;
 }
+
+/* PondOS window (desktop widths): the game fills the window exactly, no page scroll. The Hall of Fren column used to
+   set the row height, which left a big grey band under the playfield; now the playfield takes all the spare height
+   and the record list scrolls on its own if it is taller. Controls are a slimmer strip. */
+@media(min-width:801px){
+  .embed body{height:100vh;overflow:hidden}
+  .embed .desktop{height:100vh;display:flex;flex-direction:column}
+  .embed .window[aria-label]{flex:1;min-height:0;display:flex;flex-direction:column}
+  .embed .menubar{padding:3px 5px}
+  .embed .game-layout{flex:1;min-height:0;grid-template-rows:minmax(0,1fr)}
+  .embed .playfield{height:auto;aspect-ratio:auto;align-self:stretch;min-height:0}
+  .embed .records{overflow:auto;min-height:0;padding:9px 10px}
+  .embed .controls{padding:5px 8px;gap:14px}
+  .embed .controls label{margin-bottom:4px}
+  .embed .action{min-height:34px;font-size:15px}
+  .embed .controls #pause{min-height:32px;padding:3px 13px}
+  .embed .statusbar>span{padding:3px 8px}
+}
