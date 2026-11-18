@@ -28,6 +28,7 @@ export const FORMATS = {
 const FINE_TOP = new Map([
   ...['idle', 'hungry', 'dirty', 'moody', 'tired', 'neglected', 'packing', 'recovering'].map(s => [`pepegochi_froglet_${s}.png`, 30]),
   ...['hungry', 'dirty', 'recovering'].map(s => [`pepegochi_adult_${s}.png`, 8]),
+  ...['hungry', 'dirty', 'moody', 'tired', 'neglected', 'packing', 'recovering'].map(s => [`pepegochi_tadpole_${s}.png`, 50]),
 ]);
 
 // ---------- a small PNG decoder: 8-bit greyscale, RGB, palette, grey+alpha or RGBA, not interlaced ----------

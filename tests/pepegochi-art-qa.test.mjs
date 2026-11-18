@@ -53,6 +53,8 @@ test('the checks: a good sprite passes, every kind of mistake is named', () => {
   assert.equal(formatFor('docs/games/img/pepegochi/taskbar/tb_adult_sit.png'), 'B');
   assert.equal(formatFor('pepegochi_adult_hungry.png'), 'FINE');
   assert.equal(formatFor('pepegochi_froglet_idle.png'), 'FINE');
+  assert.equal(formatFor('pepegochi_tadpole_hungry.png'), 'FINE');
+  assert.equal(formatFor('pepegochi_tadpole_idle.png'), 'A');
   assert.equal(formatFor('pepegochi_adult_idle.png'), 'A');
   assert.equal(formatFor('lava_lamp.png'), 'A');
   assert.equal(formatFor('care_froglet_feed_01.png'), 'A');
