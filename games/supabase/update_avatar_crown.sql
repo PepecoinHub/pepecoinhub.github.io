@@ -1,11 +1,10 @@
--- Fren avatar: the "Long Live the King" stamp unlocks the Crown hat and the King Fren special avatar (owner, 2026-11-18).
+-- Fren avatar: the "Long Live the King" stamp unlocks the King Fren special avatar; the Crown hat stays free for everyone (owner, 2026-11-18).
 -- Run once in the Supabase SQL editor (after update_fren_avatar.sql, which is already live). Safe to run again.
 -- Only replaces public.gry_passport_avatar_save, the same body as update_fren_avatar.sql (keep the two equal;
 -- tests/passport.test.mjs checks it). It does NOT touch gry_passport_state, so running it cannot undo the newer
 -- Passport read path from update_passport_awards.sql (re-running update_fren_avatar.sql alone would).
---  * hat_crown and special_king are saveable only with the long_live_the_king stamp (10 Pond King duels won in one reign).
---  * A reward part already on a player's saved look is never refused: frens who picked the crown while it was free
---    keep it and can still change the rest of their look.
+--  * special_king is saveable only with the long_live_the_king stamp (10 Pond King duels won in one reign).
+--  * A reward part already on a player's saved look is never refused.
 begin;
 
 -- the six-part version of this RPC is replaced (one signature only; an old page that sends six parts
@@ -47,7 +46,7 @@ begin
   if exists (
     select 1 from (values ('bg_sunset', 'yeet_adept'), ('clothing_suit', 'detective_fren'), ('hat_hardhat', 'rookie_miner'),
                           ('hat_detective', 'detective_fren'), ('accessory_headphones', 'arcade_hopper'),
-                          ('hat_explorer', 'scout_fren'), ('special_explorer', 'scout_fren'), ('hat_crown', 'long_live_the_king'),
+                          ('hat_explorer', 'scout_fren'), ('special_explorer', 'scout_fren'),
                           ('special_knight', 'good_game'),
                           ('special_batman', 'why_tho'), ('special_vampire', 'midnight_fren'), ('special_smile', 'happy_fren'),
                           ('special_nerd', 'nerd_alert'), ('special_soldier', 'born_to_fren'), ('special_straw', 'bali_dreamer'),
@@ -59,7 +58,7 @@ begin
        -- the unlock is a stamp, or (for most special avatars) a secret
        and not exists (select 1 from games.passport_badges b where b.user_id = u and b.badge_id = r.stamp)
        and not exists (select 1 from games.passport_secrets s where s.user_id = u and s.secret_id = r.stamp)
-       -- a part already on the player's saved look stays allowed (the crown was free before 2026-11-18)
+       -- a part already on the player's saved look stays allowed (a reward part never locks a saved look)
        and not exists (select 1 from games.passport_avatars a where a.user_id = u
                           and r.part in (a.bg, a.clothing, a.hat, a.accessory, a.special))) then
     raise exception 'That part is locked: earn its stamp first' using errcode = '42501';

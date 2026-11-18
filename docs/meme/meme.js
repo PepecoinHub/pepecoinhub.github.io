@@ -3069,7 +3069,7 @@
           // (the focused part scrolls into view), and Tab goes to the next row
           var prev = el('button', { type: 'button', class: 'fa-arr is-prev', tabindex: '-1', 'aria-hidden': 'true' });
           var next = el('button', { type: 'button', class: 'fa-arr is-next', tabindex: '-1', 'aria-hidden': 'true' });
-          // a reward part already on the saved look is not locked (the crown was free before 2026-11-18; the server keeps it too)
+          // a reward part already on the saved look is not locked (the server agrees)
           (o.options[k] || []).forEach(function (p) {
             var locked = !!p.unlock && !owns(p.unlock) && !(saved && saved[k] === p.id), stamp = locked && FA_UNLOCK[p.unlock] || 'a future stamp';
             var lab = el('label', { class: 'fa-opt' + (locked ? ' is-locked' : ''), title: locked ? (FA_SECRET[p.unlock] || FA_EVENT[p.unlock] ? p.label + ' - locked: ' + avHow(p.unlock) : p.label + ' - locked: earn the ' + stamp + ' stamp') : p.label });

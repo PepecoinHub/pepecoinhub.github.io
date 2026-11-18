@@ -148,8 +148,7 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
       look('bg_sky', 'clothing_suit', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none'),              // clothing_suit -> detective_fren
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_hardhat', 'accessory_none'),           // hat_hardhat -> rookie_miner
       look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_detective', 'accessory_none'),         // hat_detective -> detective_fren
-      look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_headphones'),        // accessory_headphones -> arcade_hopper
-      look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_crown', 'accessory_none')              // hat_crown -> long_live_the_king (2026-11-18)
+      look('bg_sky', 'clothing_blue', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_headphones')         // accessory_headphones -> arcade_hopper
     ];
     reserved.push([...DEFAULT, 'special_explorer']);                                                       // special_explorer -> scout_fren
     reserved.push([...DEFAULT, 'special_king']);                                                           // special_king -> long_live_the_king
@@ -199,17 +198,17 @@ test('Fren Avatar SQL: Discord-only saves, exact allowlists, one Fresh Fren, iso
     assert.equal(nextDay.avatar.mouth, 'mouth_smile');
     assert.equal((await db.query('select budget_used from games.passport_avatars where user_id = $1', [uid(1)])).rows[0].budget_used, 1);
 
-    // --- a crown saved while it was free stays: a reward part already on the saved look is never refused,
-    //     the rest of the look can still change, but another locked part still needs its stamp
-    await db.query("update games.passport_avatars set hat = 'hat_crown', updated_at = now() - interval '1 minute' where user_id = $1", [uid(1)]);
-    const kept = await save(1, look('bg_city', 'clothing_blue', 'mouth_laugh', 'eyes_classic', 'hat_crown', 'accessory_none'));
-    assert.equal(kept.avatar.hat, 'hat_crown'); assert.equal(kept.avatar.mouth, 'mouth_laugh');
+    // --- a reward part already on the saved look stays: the rest of the look can still change,
+    //     but another locked part still needs its stamp, and once taken off it needs the stamp again
+    await db.query("update games.passport_avatars set special = 'special_king', updated_at = now() - interval '1 minute' where user_id = $1", [uid(1)]);
+    const kept = await save(1, [...look('bg_city', 'clothing_blue', 'mouth_laugh', 'eyes_classic', 'hat_none', 'accessory_none'), 'special_king']);
+    assert.equal(kept.avatar.special, 'special_king'); assert.equal(kept.avatar.bg, 'bg_city');
     await pastCooldown(1);
     await assert.rejects(save(1, look('bg_city', 'clothing_blue', 'mouth_laugh', 'eyes_classic', 'hat_hardhat', 'accessory_none')), /That part is locked/);
     const off = await save(1, look('bg_city', 'clothing_blue', 'mouth_laugh', 'eyes_classic', 'hat_none', 'accessory_none'));
-    assert.equal(off.avatar.hat, 'hat_none');
+    assert.equal(off.avatar.special, 'special_none');
     await pastCooldown(1);
-    await assert.rejects(save(1, look('bg_city', 'clothing_blue', 'mouth_laugh', 'eyes_classic', 'hat_crown', 'accessory_none')), /That part is locked/, 'taken off, the crown needs the stamp');
+    await assert.rejects(save(1, [...look('bg_city', 'clothing_blue', 'mouth_laugh', 'eyes_classic', 'hat_none', 'accessory_none'), 'special_king']), /That part is locked/, 'taken off, it needs the stamp');
     await pastCooldown(1); await save(1, DEFAULT);   // back to the look the checks below expect
 
     // --- second user isolation
