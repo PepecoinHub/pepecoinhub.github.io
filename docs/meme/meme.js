@@ -5405,7 +5405,8 @@
       A.host.classList.add('lan-win');
       A.body.innerHTML =
         '<div class="lan-top"><button type="button" class="app-btn lan-list-btn" aria-expanded="false" aria-controls="lan-buddies" title="Who is online"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online</button>' +
-        '<span class="lan-room">#pond</span><span class="grow"></span><button type="button" class="app-btn lan-alerts" aria-label="Change LAN Party notification settings">Alerts: All</button><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span></div>' +
+        '<span class="lan-room">#pond</span><span class="grow"></span><button type="button" class="app-btn lan-alerts" aria-label="Change LAN Party notification settings">Alerts: All</button><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span>' +
+        '<details class="lan-haze-tools" hidden><summary class="app-btn">◇ Haze</summary><div class="lan-haze-actions"></div></details></div>' +
         '<div class="lan-main"><div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
         '<aside class="lan-buddies" id="lan-buddies" aria-label="Who is online"><div class="lan-bl"><p class="lan-bh">Loading…</p></div></aside></div>' +
         '<div class="emo-pop" hidden role="group" aria-label="Pepe emotes"><div class="emo-head"><input type="search" class="emo-q" placeholder="Search Pepes… (laugh, pray, apu)" aria-label="Search emotes" autocomplete="off">' +
@@ -5430,7 +5431,13 @@
               headers: { apikey: SB_KEY, Authorization: 'Bearer ' + s.access_token, 'Content-Type': 'application/json' },
               body: JSON.stringify(body) }).then(function (r) { return r.json().then(function (d) { if (!r.ok || d.error) throw new Error(d.error || 'The tip could not be checked.'); return d; }); });
           } });
-        if (hazeTips) { hazeTips.mount(A.body.querySelector('.lan-top')); Object.keys(seen).forEach(function (id) { hazeTips.bindMessage(seen[id], seen[id]._m); }); hazeTips.sync(); }
+        if (hazeTips) {
+          var hazeTools = A.body.querySelector('.lan-haze-tools');
+          hazeTools.hidden = false;
+          hazeTips.mount(hazeTools.querySelector('.lan-haze-actions'));
+          Object.keys(seen).forEach(function (id) { hazeTips.bindMessage(seen[id], seen[id]._m); });
+          hazeTips.sync();
+        }
       }).catch(function () { /* Tipping must never interrupt the ordinary chat. */ });
       var alertMode = 'all';
       try { alertMode = localStorage.getItem(LAN_ALERTS) || 'all'; } catch (e) {}
@@ -5450,6 +5457,7 @@
       var paintAlerts = function () {
         var labels = { all: 'All', mentions: '@Only', mute: 'Muted' };
         alertsBtn.textContent = 'Alerts: ' + labels[alertMode];
+        alertsBtn.dataset.short = labels[alertMode];
         alertsBtn.title = alertMode === 'all' ? 'Badge for all new messages; popups only for mentions' :
           alertMode === 'mentions' ? 'Badge and popup only for mentions (game invites in a future update)' : 'No LAN Party badges or mention popups';
       };
