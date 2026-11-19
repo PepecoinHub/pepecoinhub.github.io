@@ -30,10 +30,10 @@ begin
 
   if new.broadcast then
     insert into games.lobby_mentions(msg_id, to_user, from_user, from_nick)
-    select new.id, pr.user_id, new.user_id, new.nick
-      from games.profiles pr
-     where pr.user_id <> new.user_id and pr.discord_id is not null
-       and not exists (select 1 from games.mention_optout o where o.user_id = pr.user_id)
+    select distinct new.id, i.user_id, new.user_id, new.nick
+      from auth.identities i
+     where i.provider = 'discord' and i.user_id <> new.user_id
+       and not exists (select 1 from games.mention_optout o where o.user_id = i.user_id)
     on conflict do nothing;
     return new;
   end if;
