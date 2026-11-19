@@ -36,11 +36,11 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
     if(button)button.textContent='🎉 Group tips'+(drops.some(d=>d.state==='open')?' · round live':'');
     if(!feed)return;
     for(const drop of drops){
-      const card=n('article',{class:'haze-drop-card '+(drop.state==='confirmed'?'is-confirmed':''),'data-group-id':drop.id});
-      card.append(n('strong',{},(drop.state==='confirmed'?'💚 ':'🎉 ')+drop.title),n('span',{},drop.creator+' · '+formatAtomic(drop.total_atomic)+' PEP · '+(MODES[drop.mode]||drop.mode)));
+      const card=n('article',{class:'haze-drop-card '+(drop.state==='confirmed'?'is-confirmed':drop.state==='open'?'is-open':''),'data-group-id':drop.id});
+      card.append(n('strong',{},drop.title),n('span',{class:'haze-drop-meta'},drop.creator+' · '+formatAtomic(drop.total_atomic)+' PEP · '+(MODES[drop.mode]||drop.mode)));
       const status=n('p',{role:'status'});card.append(status);
       if(drop.state==='open'){
-        const left=Math.max(0,Math.ceil((Date.parse(drop.closes_at)-Date.now())/1000));status.textContent=drop.entries+' joined / answered · '+left+'s remaining · up to '+drop.max_winners+' winners';
+        const left=Math.max(0,Math.ceil((Date.parse(drop.closes_at)-Date.now())/1000));status.textContent=drop.entries+' entered · '+left+'s left · max '+drop.max_winners+' winners';
         if(drop.owner!==currentUser()){
           if(drop.mode==='airdrop'){
             const join=n('button',{type:'button',class:'haze-tip-secondary'},drop.joined?'Joined ✓':!drop.eligible?'Not eligible for this round':'Join airdrop');join.disabled=drop.joined||!drop.eligible||!ctx.wallet()?.address;
@@ -55,15 +55,19 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
         }
       }else if(drop.state==='ready'){
         const pending=HASH.test(flights.get(drop.id)?.txid||'')||!!drop.submitted_txid,expired=Date.parse(drop.expires_at)<=Date.now();
-        status.textContent=pending?'On its way · checking network confirmation automatically…':expired?'Payout review expired · no payment made':drop.count+' recipients selected · '+(drop.owner===currentUser()?'Ready for your payout review':'Waiting for the host to approve the payout');
+        status.textContent=pending?'Payment sent · confirming…':expired?'Review expired · no payment':drop.count+' selected · '+(drop.owner===currentUser()?'Review payout':'Awaiting host approval');
         if(drop.owner===currentUser()&&!pending&&!expired){const review=n('button',{type:'button',class:'haze-tip-primary'},'Review payout');review.onclick=()=>void reviewPayout(drop.id);card.append(review);}
       }else if(drop.state==='confirmed'){
-        status.textContent='Confirmed · '+drop.count+(drop.count===1?' fren':' frens')+' received PEP';
+        status.textContent='Confirmed · '+drop.count+(drop.count===1?' fren paid':' frens paid');
         if(HASH.test(drop.txid||''))card.append(n('a',{href:'https://pepeblocks.com/tx/'+drop.txid,target:'_blank',rel:'noopener noreferrer'},'View group transaction ↗'));
       }else status.textContent='No eligible winners · no payment made';
-      if(drop.recipients?.length)card.append(n('p',{class:'haze-group-names'},drop.recipients.map(r=>r.nick+' '+formatAtomic(r.amount)+' PEP').join(' · ')+(drop.count>12?' · +'+(drop.count-12)+' more':'')));
+      if(drop.recipients?.length){
+        const names=drop.recipients.map(r=>r.nick+' '+formatAtomic(r.amount)+' PEP').join(' · ')+(drop.count>12?' · +'+(drop.count-12)+' more':'');
+        if(drop.recipients.length>3)card.append(n('details',{class:'haze-group-details'},n('summary',{},'Recipients ('+drop.count+')'),n('p',{class:'haze-group-names'},names)));
+        else card.append(n('p',{class:'haze-group-names'},names));
+      }
       if(drop.owner===currentUser()&&['open','ready','empty'].includes(drop.state)&&!drop.submitted_txid&&!flights.has(drop.id)){const cancel=n('button',{type:'button',class:'haze-group-cancel'},'Cancel event');cancel.onclick=async()=>{try{await rpc('gry_haze_group_cancel',{p_id:drop.id});await sync(true);}catch(e){status.textContent=e.message;}};card.append(cancel);}
-      card.append(n('small',{},'Powered by Haze Wallet · no entry fee'));feed.append(card);
+      card.append(n('small',{class:'haze-drop-foot'},'Haze Wallet · no entry fee'));feed.append(card);
     }
   }
   async function reviewPayout(id,previous){
