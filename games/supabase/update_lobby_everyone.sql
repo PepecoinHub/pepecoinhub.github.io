@@ -1,5 +1,5 @@
--- Run after update_lobby_mentions.sql and update_open_chat.sql.
--- A host's @everyone reaches verified Discord players who have mentions enabled.
+-- Run after update_lobby_mentions.sql, update_open_chat.sql and update_page_stats.sql.
+-- An owner's @everyone reaches Discord players who have mentions enabled.
 alter table games.lobby_chat add column if not exists broadcast boolean not null default false;
 
 create or replace function games.lobby_broadcast_before_insert() returns trigger
@@ -7,7 +7,7 @@ language plpgsql security definer set search_path = '' as $$
 begin
   new.broadcast := coalesce(new.verified, false)
     and new.user_id is not null
-    and games.is_host_user(new.user_id)
+    and games.is_owner(new.user_id)
     and new.body ~* '(^|[^[:alnum:]_])@everyone($|[^[:alnum:]_])';
   return new;
 end $$;
