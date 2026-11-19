@@ -27,7 +27,7 @@ const root=path.join(__dirname,'..');let server,browser;
   browser=await chromium.launch({headless:true,executablePath:process.env.HAZE_CHROMIUM});
   const page=await browser.newPage(),errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/*',route=>{const u=new URL(route.request().url());if(u.origin===base)return route.continue();external.push(u.href);return route.abort();});
-  await page.goto(base+'/?beta=haze');await page.waitForFunction(()=>window.t);
+  await page.goto(base+'/?haze=check');await page.waitForFunction(()=>window.t);
   const r=await page.evaluate(()=>['gm','/answer 42','/tip','/tip Nobody 5','/tip byl 5','/tip mika 5','/tip Jules 0.5'].map(x=>window.t.api.command(x)));
   assert.deepEqual(r,[false,false,'error','error','error','error','error']);
   const notes=await page.evaluate(()=>window.t.notes);
@@ -38,13 +38,13 @@ const root=path.join(__dirname,'..');let server,browser;
   assert.equal(await page.getByLabel('Optional tip note').inputValue(),'great guide');
   await page.getByRole('heading',{name:/Jules/}).waitFor();
   await page.getByRole('button',{name:'Close Haze dialog'}).click().catch(()=>{});
-  // ?beta=haze adds the phone-friendly server check (visibility only; the server decides access)
-  await page.getByRole('button',{name:'◇ Beta check'}).click();
-  await page.getByLabel('Transaction ID for the beta check').fill('xyz');await page.getByRole('button',{name:'Run check'}).click();
+  // ?haze=check adds the phone-friendly server check (visibility only; the server decides access)
+  await page.getByRole('button',{name:'◇ Server check'}).click();
+  await page.getByLabel('Transaction ID for the server check').fill('xyz');await page.getByRole('button',{name:'Run check'}).click();
   await page.getByText(/exactly 64 characters/).waitFor();
-  await page.getByLabel('Transaction ID for the beta check').fill('AB'.repeat(32));await page.getByRole('button',{name:'Run check'}).click();
+  await page.getByLabel('Transaction ID for the server check').fill('AB'.repeat(32));await page.getByRole('button',{name:'Run check'}).click();
   await page.getByText(/Indexer OK/).waitFor();
   assert.deepEqual(await page.evaluate(()=>window.t.calls.at(-1)),{action:'preflight',txid:'ab'.repeat(32)});
   assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
-  console.log('PASS: /tip opens the prefilled tip dialog for the newest message by that nick; /answer, unknown, own and shared nicks are not tipped. With ?beta=haze the Beta check reports the indexer. Simulated services only.');
+  console.log('PASS: /tip opens the prefilled tip dialog for the newest message by that nick; /answer, unknown, own and shared nicks are not tipped. With ?haze=check the Server check reports the indexer. Simulated services only.');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server?.close();});

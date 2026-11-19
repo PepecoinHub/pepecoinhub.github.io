@@ -1,4 +1,13 @@
-# Haze tipy — zamknięta beta, wszystko z telefonu
+# Haze tipy — wszystko z telefonu
+
+**2026-11-19: beta zdjęta, tipy otwarte dla wszystkich** (zalogowanych przez Discord). Kod strony: przełączniki
+`HAZE_TIPS_ENABLED` i `HAZE_GROUPS_ENABLED` = `true`, bez `?beta=haze`. Właściciel w Supabase:
+1. SQL Editor → wklej `games/supabase/haze-beta/3_open_for_all.sql` → Run (wynik: `enabled=true, beta_only=false, groups_enabled=true`).
+2. Edge Functions → Secrets → `HAZE_ACCESS` = `all` (zamiast dwóch ID). Funkcji nie trzeba wdrażać ponownie.
+
+Przycisk diagnostyczny „◇ Server check” (dawniej „Beta check”) widać tylko po otwarciu strony z `?haze=check`
+(`?haze=off` go chowa). Poniżej historia zamkniętej bety z 2026-11-16.
+
 
 Stan na 2026-11-16. Kod: PR #340 (Haze web 1.1.9) + nasze dodatki (dostęp tylko dla testerów na serwerze,
 `?beta=haze`, przycisk „Beta check”, `/tip`). Technika: `games/HAZE_TIPPING.md`. Pytania i odpowiedzi Haze:
@@ -73,7 +82,7 @@ odkomentuj i uruchom ostatni UPDATE. Awaryjnie od razu: `update games.haze_setti
 ## Później
 
 - Trzeci tester → prawdziwy podział grupowy.
-- Start dla wszystkich: `beta_only=false`, `HAZE_ACCESS=all`, `HAZE_TIPS_ENABLED`/`HAZE_GROUPS_ENABLED` = `true`, podbić `?v=`.
+- ~~Start dla wszystkich~~ zrobione 2026-11-19 (patrz góra pliku).
 - Własny Blockbook albo stała zgoda operatora `bongendpoint`.
 - Tipy z PepeGochi i czatu PEPaint.
 

@@ -1,15 +1,17 @@
 // Owner-reviewed rollout switch. No Haze network requests or UI when disabled.
-import {createHazeGroups,HAZE_GROUPS_ENABLED} from './haze-groups.mjs';
-export const HAZE_TIPS_ENABLED = false;
-// Closed beta (2026-11-16): a browser that opened any page with ?beta=haze shows the Haze UI (?beta=off hides it).
-// This is visibility only. Access is enforced on the server: games.haze_testers + beta_only in SQL and
-// HAZE_ACCESS in the haze-wallet Edge Function. Everyone else gets "not enabled" even with the flag.
-export function hazeBeta(win=globalThis.window) {
+// Open for everyone since 2026-11-19 (owner: "zdejmij betę"). Access is still decided on the server:
+// games.haze_settings (enabled, beta_only=false) in SQL and HAZE_ACCESS=all in the haze-wallet Edge Function.
+// Every action needs a Discord sign-in, and every tip is confirmed on chain by the server.
+import {createHazeGroups,HAZE_GROUPS_ENABLED} from './haze-groups.mjs?v=20261119open';
+export const HAZE_TIPS_ENABLED = true;
+// Owner diagnostics: a browser that opened any page with ?haze=check shows the "Server check" button
+// (?haze=off hides it). Visibility only; the check itself needs a signed-in account the server allows.
+export function hazeCheck(win=globalThis.window) {
   try{
-    const q=new URLSearchParams(win.location.search).get('beta');
-    if(q==='haze')win.localStorage.setItem('pondos-beta-haze','1');
-    if(q==='off')win.localStorage.removeItem('pondos-beta-haze');
-    return win.localStorage.getItem('pondos-beta-haze')==='1';
+    const q=new URLSearchParams(win.location.search).get('haze');
+    if(q==='check')win.localStorage.setItem('pondos-haze-check','1');
+    if(q==='off')win.localStorage.removeItem('pondos-haze-check');
+    return win.localStorage.getItem('pondos-haze-check')==='1';
   }catch{return false;}
 }
 export const HAZE_ORIGIN = 'https://hazewallet.com';
@@ -55,7 +57,7 @@ export function submissionMatches(event,flight) {
     data.version===1&&data.intent===flight.intent.id&&typeof data.txid==='string'&&HASH.test(data.txid);
 }
 
-export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,chatInput=null,enabled=HAZE_TIPS_ENABLED||hazeBeta(),document:doc=globalThis.document,window:win=globalThis.window}={}) {
+export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,chatInput=null,enabled=HAZE_TIPS_ENABLED,document:doc=globalThis.document,window:win=globalThis.window}={}) {
   if(!enabled)return null;
   const node=(tag,attrs={},...children)=>{
     const value=doc.createElement(tag);
@@ -70,7 +72,7 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
   const messages=new Map(),receivers=new Map(),flights=new Map(),rendered=new Map(),seenReceipts=new Set(),timers=new Set();
   const currentUser=()=>{const user=session()?.user;return user&&!user.is_anonymous?user.id:null;};
   const signed=()=>{if(!currentUser()){login?.();throw Error('Sign in with Discord first.');}};
-  const groups=createHazeGroups({node,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,chatLog:()=>chatLog,chatInput:()=>chatInput,origin:HAZE_ORIGIN,wallet:()=>wallet,refreshWallet:refresh,capabilities:()=>walletCaps,hideWallet:()=>{if(walletHost)walletHost.hidden=true;},login,connect},{enabled:HAZE_GROUPS_ENABLED||hazeBeta(win)});
+  const groups=createHazeGroups({node,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,chatLog:()=>chatLog,chatInput:()=>chatInput,origin:HAZE_ORIGIN,wallet:()=>wallet,refreshWallet:refresh,capabilities:()=>walletCaps,hideWallet:()=>{if(walletHost)walletHost.hidden=true;},login,connect},{enabled:HAZE_GROUPS_ENABLED});
   function endView(){
     const view=activeView;activeView=null;view?.controller.abort();if(walletHost)walletHost.hidden=true;
     if(walletFrame){walletFrame.contentWindow.postMessage({type:'haze:tip-cancel',version:1},HAZE_ORIGIN);walletFrame.contentWindow.postMessage({type:'haze:hidden'},HAZE_ORIGIN);}
@@ -166,14 +168,14 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
         approve.disabled=false;}}
     };
   }
-  // Closed beta only: a phone-friendly check that the haze-wallet Edge Function can read the configured indexer.
-  async function betaCheck() {
+  // Owner diagnostics: a phone-friendly check that the haze-wallet Edge Function can read the configured indexer.
+  async function serverCheck() {
     try{signed();}catch{return;}
-    const view=modal('Haze beta check');
+    const view=modal('Haze server check');
     // Optional txid: some indexers (e.g. a proxy without Blockbook's status page) cannot find a recent block
     // themselves. Tips only need genesis + transaction + funding output, which a pasted txid checks exactly.
     const txid=node('input',{type:'text',maxlength:'64',inputmode:'text',autocapitalize:'off',spellcheck:'false',
-      placeholder:'Optional: any transaction ID from pepeblocks.com','aria-label':'Transaction ID for the beta check'});
+      placeholder:'Optional: any transaction ID from pepeblocks.com','aria-label':'Transaction ID for the server check'});
     const run=node('button',{type:'button',class:'haze-tip-primary'},'Run check');
     const out=node('div');
     view.body.append(node('p',{},'Checks that the PepecoinHub server can read the Pepecoin indexer. Leave the field empty, or paste the ID (64 characters) of any ordinary transaction, e.g. from pepeblocks.com.'),txid,run,out);
@@ -193,7 +195,7 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
   }
 
   function mount(parent){linkButton=node('button',{type:'button',class:'haze-wallet-link',onclick:connect},'◇ Link Haze for tips');parent.append(linkButton);
-    if(hazeBeta(win))parent.append(node('button',{type:'button',class:'haze-wallet-link',onclick:()=>void betaCheck()},'◇ Beta check'));
+    if(hazeCheck(win))parent.append(node('button',{type:'button',class:'haze-wallet-link',onclick:()=>void serverCheck()},'◇ Server check'));
     groups?.mount(parent);void refresh();}
   function paintReceiver(value){
     const available=receivers.get(value.message.user_id);

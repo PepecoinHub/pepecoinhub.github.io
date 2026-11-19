@@ -1,4 +1,4 @@
-export const HAZE_GROUPS_ENABLED=false;
+export const HAZE_GROUPS_ENABLED=true;
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/,HASH=/^[a-f0-9]{64}$/;
 const MODES={all:'Whole pond',online:'Online frens',offline:'Away / offline frens',random:'Random frens',selected:'Choose frens',airdrop:'Timed airdrop',trivia:'Trivia round',word:'Say the word'};
 export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){

@@ -6,7 +6,8 @@ signing key, bot wallet, withdrawal authority or internal balance. Signing and
 network-fee approval remain inside Haze. Ordinary chat keeps working if tipping
 is disabled or unavailable.
 
-**Disabled review build.** `HAZE_TIPS_ENABLED` in
+**Live for everyone since 2026-11-19** (both client switches `true`; see "Closed beta" below for the
+server switches). Historical note from the review build: `HAZE_TIPS_ENABLED` in
 `docs/games/js/haze-tips.mjs` is false and `games.haze_settings.enabled` starts
 false. The independent community-tip switches also stay false. This branch
 is based on upstream `673183f` and is intended for code review and joint staging
@@ -157,7 +158,10 @@ eligibility, one attempt, exact splits, deadline closure and global credit-once.
 the separate Haze checkout it also tests the actual signer at the 200-recipient
 limit and the Haze public manifest/callback. CI runs the portable and SQL tests.
 
-## Closed beta (PepecoinHub, 2026-11-16)
+## Closed beta (PepecoinHub, 2026-11-16; opened to everyone 2026-11-19)
+
+Launch: `haze-beta/3_open_for_all.sql` (`beta_only=false`, `enabled`, `groups_enabled`) + Edge secret
+`HAZE_ACCESS=all`; both client switches are `true`.
 
 Agreed with Haze: a hidden beta on `https://pepecoinhub.com`, restricted on the server to two testers.
 
@@ -168,7 +172,8 @@ Agreed with Haze: a hidden beta on `https://pepecoinhub.com`, restricted on the 
   `all` opens it after launch. A non-listed user gets 403 before any RPC or indexer read.
 - **Preflight:** `{action:'preflight',txid}` (allowed users only) reads the genesis block, the transaction and
   its first funding output through the configured indexer and reports their shape. It stores nothing.
-- **Client:** `?beta=haze` shows the UI in that browser (`?beta=off` hides it). Visibility only.
+- **Client:** during the beta `?beta=haze` showed the UI. Since the 2026-11-19 launch the UI is on for everyone;
+  `?haze=check` only adds the owner's "Server check" button (`?haze=off` hides it).
 - **`/tip nick amount [pep] [note]`** in both chats opens the ordinary tip dialog, prefilled, for the newest
   visible message by that nick. Unknown, shared or own nicks only show a note. `/answer` is unaffected.
 
