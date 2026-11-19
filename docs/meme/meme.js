@@ -304,7 +304,8 @@
     var sd = el('button', { type: 'button', class: 'sm-item' }, '<span class="sm-ico" aria-hidden="true">⏻</span><span>Shut down…</span>');
     arrange.addEventListener('click', function () { setOpen(false); arrangeAll(); });
     sd.addEventListener('click', function () { setOpen(false); shutDown(); });
-    [['Frog Mail', 'frog-mail', function () { frogMail(); }], ['AddressCheck.exe', 'pepe-search', function () { addressCheck(); }]].forEach(function (x) {
+    [['Frog Mail', 'frog-mail', function () { frogMail(); }], ['AddressCheck.exe', 'pepe-search', function () { addressCheck(); }],
+      ['Notifications', 'alarm-still', function () { notifyApp(); }]].forEach(function (x) {
       var it = el('button', { type: 'button', class: 'sm-item' }, '<img src="' + ico(x[1]) + '" alt="" width="28" height="28"><span>' + x[0] + (x[0] === 'Frog Mail' ? ' <b class="mail-new sm-new" hidden>1 new</b>' : '') + '</span>');
       it.addEventListener('click', function () { setOpen(false); x[2](); });
       smMain.appendChild(it);
@@ -6040,6 +6041,55 @@
     e.preventDefault();
     if (window.innerWidth < 760) location.href = osPage(''); else gamesFolder();
   });
+  // ---------- Notifications (notify.js + sw.js; server: games/supabase/update_push.sql) ----------
+  // notify.js loads only when the fren opens Start > Notifications or this device already said yes.
+  var notifyLoad = null;
+  function notifyEnv() {
+    return { openApp: openApp, esc: esc, rpc: chatRpc,
+      userId: function () { var s = anySession(); return (s && s.user && s.user.id) || null; } };
+  }
+  function withNotify(fn) {
+    if (!notifyLoad) notifyLoad = new Promise(function (res, rej) {
+      var sc = document.createElement('script'); sc.src = 'notify.js?v=20261119'; sc.onload = res; sc.onerror = function () { notifyLoad = null; rej(); }; document.head.appendChild(sc);
+    });
+    return notifyLoad.then(function () { return fn(window.PondNotify, notifyEnv()); });
+  }
+  function notifyApp() { withNotify(function (N, env) { N.open(env); }).catch(function () { balloon('Notifications', 'Could not open Notifications right now.', 'alarm-still'); }); }
+  // a tap on a notification: open the right window (LAN Party, a Gazette issue, a challenge, the Pond King)
+  function openFromNote(url) {
+    var h = '';
+    try { h = new URL(url, location.href).hash; } catch (e) { return; }
+    var m;
+    if (h === '#lan') lanParty();
+    else if ((m = /^#gazette(?:=([0-9]{1,4}))?$/.exec(h))) frogMail(m[1] ? 'gz' + m[1] : 'gz');
+    else if ((m = /^#lilies(?:=([0-9a-f-]{36}))?$/i.exec(h))) liliesApp(m[1]);
+    else if (h === '#king') pondKingApp();
+    else if (h === '#notify') notifyApp();
+  }
+  if (mainEl && 'serviceWorker' in navigator) {
+    if (PAGE === 'index' && (location.hash === '#lan' || location.hash === '#notify')) setTimeout(function () { openFromNote(location.hash); }, 0);
+    navigator.serviceWorker.addEventListener('message', function (e) {
+      if (e.data && e.data.type === 'pondos-open' && typeof e.data.url === 'string') openFromNote(e.data.url);
+    });
+    navigator.serviceWorker.getRegistration('./').then(function (r) {
+      if (!r) return;
+      // PondOS is open: the number on the app icon goes back to 0
+      var clear = function () { if (!document.hidden && r.active) r.active.postMessage({ type: 'clear' }); };
+      clear(); document.addEventListener('visibilitychange', clear);
+      withNotify(function (N, env) { N.sync(env); window.addEventListener('pondos:auth-changed', function () { N.sync(env); }); }).catch(function () {});
+    }).catch(function () {});
+    // the installed app (home screen icon), first start: one hint where the switch is
+    var standaloneNow = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+    if (standaloneNow && 'PushManager' in window) {
+      var hinted = '1'; try { hinted = localStorage.getItem('pondos-push-hint'); localStorage.setItem('pondos-push-hint', '1'); } catch (e) {}
+      if (!hinted && !(window.Notification && Notification.permission !== 'default')) setTimeout(function () {
+        var b = balloon('Notifications', 'Want a ping for mentions, new Gazette issues and challenges? Tap here, or Start > Notifications. Off any time.', 'alarm-still');
+        b.style.cursor = 'pointer';
+        b.addEventListener('click', function (ev) { if (!ev.target.closest('button')) notifyApp(); });
+      }, 4000);
+    }
+  }
+
   window.Meme = { json: json, fmt: fmt, fill: fill, lineChart: lineChart, base: BASE, data: DATA, page: PAGE };
   root.classList.remove('pond-boot');   // boot.js hid the page until the desktop was built
 })();
