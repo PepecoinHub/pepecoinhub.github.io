@@ -52,7 +52,8 @@ export function lobbyChat(be, { openLogin }) {
   // @mentions (games/js/mentions.js): only for verified (Discord) players; the server makes the real mentions
   const PM = window.PepMentions;
   let me = { verified: false, nick: null, optout: false }, unseen = false, seenT = 0;
-  const forMe = (m) => PM && me.verified && !me.optout && m.user_id !== be.session()?.user?.id && PM.mentionsMe(m.body, me.nick);
+  const forMe = (m) => PM && me.verified && !me.optout && m.user_id !== be.session()?.user?.id &&
+    (m.broadcast === true || PM.mentionsMe(m.body, me.nick));
   const markSeen = () => {
     if (!unseen || !watching()) return;
     clearTimeout(seenT); seenT = setTimeout(() => { unseen = false; be.rpc('gry_mentions_seen', { p_upto: null }).catch(() => {}); }, 1500);
