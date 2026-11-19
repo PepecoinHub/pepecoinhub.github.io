@@ -818,3 +818,6 @@ html.embed .g-sub { padding: 2px 8px !important; min-height: 0; }
    so the colour itself stays transparent and the open list keeps the browser's own highlight. */
 select { background: linear-gradient(var(--surface-2), var(--surface-2)); }
 html.embed select, html.paint select { background: linear-gradient(#fff, #fff) !important; }
+/* Night theme: same open list, painted white by Chrome on Windows under light night text. Give the rows night colours. */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]):not(.embed):not(.paint) select option { background-color: var(--panel); color: var(--ink); } }
+:root[data-theme="dark"]:not(.embed):not(.paint) select option { background-color: var(--panel); color: var(--ink); }
