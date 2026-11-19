@@ -6,7 +6,7 @@ permissions:
   contents: read
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,3 +26,15 @@ jobs:
       - if: always()
         run: docker rm -f haze-ph-qa-ci || true
       - run: python -m unittest discover -s tests -p 'test_*.py'
+
+      - name: Check community drop panel at mobile and desktop widths
+        run: |
+          npm install --prefix /tmp/haze-layout playwright@1.57.0 --ignore-scripts --no-audit --no-fund
+          /tmp/haze-layout/node_modules/.bin/playwright install --with-deps chromium
+          PLAYWRIGHT_MODULE=/tmp/haze-layout/node_modules/playwright node tests/haze-drop-layout.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: haze-drop-layout
+          path: /tmp/haze-layout-*.png
+          if-no-files-found: ignore
