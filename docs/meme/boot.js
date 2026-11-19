@@ -12,5 +12,7 @@
   // night from the middle of the evening fade (19:45) to the middle of the morning one (06:20); same as meme.js SKY
   var night = mode === 'night' || (mode !== 'day' && (m >= 1185 || m < 380));
   r.classList.add(night ? 'sky-night' : 'sky-day');
+  var statusBar = document.querySelector('meta[name="theme-color"]');
+  if (statusBar) statusBar.content = night ? '#263451' : '#526e99';
   setTimeout(function () { r.classList.remove('pond-boot'); }, 4000);
 })();

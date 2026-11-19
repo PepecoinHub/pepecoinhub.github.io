@@ -5406,7 +5406,8 @@
       A.host.classList.add('lan-win');
       A.body.innerHTML =
         '<div class="lan-top"><button type="button" class="app-btn lan-list-btn" aria-expanded="false" aria-controls="lan-buddies" title="Who is online"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online</button>' +
-        '<span class="lan-room">#pond</span><span class="grow"></span><button type="button" class="app-btn lan-alerts" aria-label="Change LAN Party notification settings">Alerts: All</button><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span></div>' +
+        '<span class="lan-room">#pond</span><span class="grow"></span><button type="button" class="app-btn lan-alerts" aria-label="Change LAN Party notification settings">Alerts: All</button><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span>' +
+        '<details class="lan-haze-tools" hidden><summary class="app-btn">◇ Haze</summary><div class="lan-haze-actions"></div></details></div>' +
         '<div class="lan-main"><div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
         '<aside class="lan-buddies" id="lan-buddies" aria-label="Who is online"><div class="lan-bl"><p class="lan-bh">Loading…</p></div></aside></div>' +
         '<div class="emo-pop" hidden role="group" aria-label="Pepe emotes"><div class="emo-head"><input type="search" class="emo-q" placeholder="Search Pepes… (laugh, pray, apu)" aria-label="Search emotes" autocomplete="off">' +
@@ -5431,7 +5432,13 @@
               headers: { apikey: SB_KEY, Authorization: 'Bearer ' + s.access_token, 'Content-Type': 'application/json' },
               body: JSON.stringify(body) }).then(function (r) { return r.json().then(function (d) { if (!r.ok || d.error) throw new Error(d.error || 'The tip could not be checked.'); return d; }); });
           } });
-        if (hazeTips) { hazeTips.mount(A.body.querySelector('.lan-top')); Object.keys(seen).forEach(function (id) { hazeTips.bindMessage(seen[id], seen[id]._m); }); hazeTips.sync(); }
+        if (hazeTips) {
+          var hazeTools = A.body.querySelector('.lan-haze-tools');
+          hazeTools.hidden = false;
+          hazeTips.mount(hazeTools.querySelector('.lan-haze-actions'));
+          Object.keys(seen).forEach(function (id) { hazeTips.bindMessage(seen[id], seen[id]._m); });
+          hazeTips.sync();
+        }
       }).catch(function () { /* Tipping must never interrupt the ordinary chat. */ });
       var alertMode = 'all';
       try { alertMode = localStorage.getItem(LAN_ALERTS) || 'all'; } catch (e) {}
@@ -5451,6 +5458,7 @@
       var paintAlerts = function () {
         var labels = { all: 'All', mentions: '@Only', mute: 'Muted' };
         alertsBtn.textContent = 'Alerts: ' + labels[alertMode];
+        alertsBtn.dataset.short = labels[alertMode];
         alertsBtn.title = alertMode === 'all' ? 'Badge for all new messages; popups only for mentions' :
           alertMode === 'mentions' ? 'Badge and popup only for mentions (game invites in a future update)' : 'No LAN Party badges or mention popups';
       };
@@ -5634,7 +5642,7 @@
       try { nickIn.value = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
       // @mentions: highlight messages for me, suggest names after "@", ring on new ones, a switch to turn them off
       var PM = null, me = { verified: false }, mrow = A.body.querySelector('.lan-ment'), mbtn = mrow.querySelector('button');
-      var forMe = function (m) { var s = anySession(); return !!(PM && me.verified && !me.optout && !(s && s.user && s.user.id === m.user_id) && PM.mentionsMe(m.body, me.nick)); };
+      var forMe = function (m) { var s = anySession(); return !!(PM && me.verified && !me.optout && !(s && s.user && s.user.id === m.user_id) && (m.broadcast === true || PM.mentionsMe(m.body, me.nick))); };
       var seenMentions = function () { if (alive && !document.hidden && !isMinimized()) chatRpc('gry_mentions_seen', { p_upto: null }).catch(function () {}); };
       var paintMent = function () {
         mrow.hidden = !me.verified;
@@ -5956,6 +5964,9 @@
     }
     function paint() {
       var m = minuteNow(), v = skyAt(m);
+      var statusBar = document.querySelector('meta[name="theme-color"]');
+      var statusColor = v[2] >= 0.5 ? '#263451' : '#526e99';
+      if (statusBar && statusBar.content !== statusColor) statusBar.content = statusColor;
       // Still: only the plain picture under the sky, day or night by the clock; no layers load, nothing moves
       box.hidden = mode === 'still' && demo === null;
       if (box.hidden) {
