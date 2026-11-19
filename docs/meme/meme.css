@@ -2514,3 +2514,7 @@ footer.foot a { color: #edf3e3; }
 /* the Gazette is a paper page in both themes; in dark mode its grey buttons kept the dark paper ink: unreadable */
 @media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) .gazette .app-btn:not(.go) { color: #f2f5ee; } }
 :root.pondos[data-theme="dark"] .gazette .app-btn:not(.go) { color: #f2f5ee; }
+/* the share row at the end of every Gazette issue */
+.gazette .gz-share { border-top: 2px dashed #b8b29a; }
+.gazette .gz-share .app-row { flex-wrap: wrap; }
+.gazette .gz-share a.app-btn { text-decoration: none; }

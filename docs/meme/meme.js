@@ -1224,6 +1224,8 @@
     var lh = /^#lilies(?:=([0-9a-f-]{36}))?$/i.exec(location.hash);   // a shared challenge: #lilies=<id>
     if (lh) setTimeout(function () { liliesApp(lh[1]); }, 0);
     if (location.hash === '#bulletin') setTimeout(function () { bulletinApp(); }, 0);
+    var gzh = /^#gazette(?:=([0-9]{1,4}))?$/.exec(location.hash);   // a shared issue: #gazette=11
+    if (gzh) setTimeout(function () { frogMail(gzh[1] ? 'gz' + gzh[1] : 'gz'); }, 0);
     setTimeout(function () {
       var tk = null; try { tk = localStorage.getItem('pk-token'); } catch (e) {}
       rpc('gry_pk_state', { p_token: tk }).then(function (st) {
@@ -4393,6 +4395,30 @@
       '<div class="app-row"><button type="button" class="app-btn gz-wpgo">Open Pepe Guesser →</button></div></section>' +
       '<p class="gz-foot">See you in the Pond on Monday. 🐸 The Editor</p></article>';
   }
+  // Share row at the end of every Gazette issue: post on X, copy the link, or the phone's own share sheet.
+  // The link opens PondOS straight on that issue (#gazette=11).
+  function gzShare(pane, num) {
+    var art = pane.querySelector('article.gazette'); if (!art || !num || art.querySelector('.gz-share')) return;
+    var it = gzAll().filter(function (x) { return x.num === num; })[0];
+    var url = 'https://pepecoinhub.com/meme/#gazette=' + num;
+    var text = 'The Pond Gazette #' + num + (it && it.title ? ': ' + it.title : '') + ' 🐸📰';
+    var box = el('section', { class: 'gz-share' });
+    box.innerHTML = '<p class="gz-kick">Share this issue</p><div class="app-row">' +
+      '<a class="app-btn go" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url) + '">Post on X</a>' +
+      '<a class="app-btn" target="_blank" rel="noopener" href="https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text) + '">Telegram</a>' +
+      '<button type="button" class="app-btn gz-copy">Copy link</button>' +
+      (navigator.share ? '<button type="button" class="app-btn gz-native">Share…</button>' : '') + '</div><p class="gz-fine gz-copied" aria-live="polite"></p>';
+    var foot = art.querySelector('.gz-foot'); art.insertBefore(box, foot || null);
+    var msg = box.querySelector('.gz-copied');
+    box.querySelector('.gz-copy').addEventListener('click', function () {
+      var done = function () { msg.textContent = 'Copied! Paste it anywhere: Discord, Telegram, Reddit…'; };
+      var all = text + ' ' + url;
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(all).then(done, function () { msg.textContent = all; });
+      else msg.textContent = all;
+    });
+    var nat = box.querySelector('.gz-native');
+    if (nat) nat.addEventListener('click', function () { navigator.share({ title: 'The Pond Gazette #' + num, text: text, url: url }).catch(function () {}); });
+  }
   // Pond Poll in the Gazette (games/supabase/update_polls.sql): the server counts; the page only shows its answer
   function paintPoll(box) {
     var id = box.getAttribute('data-poll');
@@ -4730,6 +4756,7 @@
       var wire = function () {
         var on = function (sel, fn) { var x = pane.querySelector(sel); if (x) x.addEventListener('click', function (e) { e.preventDefault(); fn(); }); };
         gzWire(pane);
+        gzShare(pane, cur);
         on('.gz-write', function () { show('write'); });
         on('.gz-pass', function () { frenPassport(); });
         on('.gz-fren', function () { avatarMaker(); });
