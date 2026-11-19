@@ -1774,6 +1774,10 @@ footer.foot a { color: #edf3e3; }
 @keyframes gz-blink { 50% { background: #1b1b1b; } }
 @media (prefers-reduced-motion: reduce) { .gz-flash { animation: none; } }
 .gz-breaking h4 { font-size: 24px; color: #8a1c1c; }
+/* Newsroom issues with "Special" in the edition name */
+.gazette.gz-special header { border-bottom-color: #b3121b; }
+.gz-ribbon { margin: -4px 0 14px; padding: 6px 10px; background: #b3121b; color: #fff; font: 700 13px/1.2 var(--f-chrome); text-transform: uppercase; letter-spacing: .24em; text-align: center; box-shadow: 0 3px 0 #1b1b1b; }
+.gazette.gz-special .gz-hero { max-height: none; height: auto; object-fit: contain; filter: none; }
 .gz-reddit { margin: 0 0 10px; padding: 8px 10px; background: #1a1a1b; color: #d7dadc; border-radius: 6px; font: 400 13px/1.4 system-ui, sans-serif; transform: rotate(-.6deg); box-shadow: 2px 3px 0 rgba(0, 0, 0, .25); }
 .gz-rd-top { margin: 0; font-size: 11px; color: #818384; }
 .gz-rd-top b { color: #d7dadc; }

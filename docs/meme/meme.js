@@ -4484,7 +4484,7 @@
     lilies: ['Battle of Three Lilies', function () { liliesApp(); }], miner: ['Pepe Miner', function () { minerApp(); }],
     yeet: ['YEET THE PEP', function () { yeetApp(); }], frog: ['FROGAGEDDON', function () { pondWarsApp(); }],
     sweep: ['PEPE SWEEPER', function () { pepeSweeperApp(); }], tv: ['PEP-TV Ads folder', function () { adsFolder(); }],
-    laptop: ['Laptop Index', function () { laptop(); }]
+    laptop: ['Laptop Index', function () { laptop(); }], notify: ['Notifications', function () { notifyApp(); }]
   };
   function gzLatest() { return Math.max(MAIL_ISSUE, gzRemote.issues.length ? +gzRemote.issues[0].num || 0 : 0); }
   function gzAll() {
@@ -4580,7 +4580,9 @@
       (btns ? '<div class="app-row">' + btns + '</div>' : '') + '</section>';
   }
   function gzIssueHtml(is) {
-    return '<article class="gazette"><header><p class="gz-top"><span>Issue #' + (+is.num || '?') + '</span><span>Price: 0 PEP</span><span>' + esc(String(is.edition || 'Weekly').slice(0, 40)) + '</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+    var ed = String(is.edition || 'Weekly').slice(0, 40), sp = /special/i.test(ed);   // "Special edition": red ribbon, screenshots shown whole
+    return '<article class="gazette' + (sp ? ' gz-special' : '') + '"><header><p class="gz-top"><span>Issue #' + (+is.num || '?') + '</span><span>Price: 0 PEP</span><span>' + esc(ed) + '</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      (sp ? '<p class="gz-ribbon">★ Special edition ★</p>' : '') +
       (is.draft ? '<p class="gz-stop">DRAFT · only you can see this until you publish it</p>' : '') +
       (Array.isArray(is.blocks) ? is.blocks : []).map(gzBlock).join('') +
       '<p class="gz-foot">' + gzInline(is.foot || 'See you in the pond. 🐸 The Editor') + '</p></article>';
@@ -4616,7 +4618,7 @@
   function newsroom() {
     if (!letterBox) { balloon('Newsroom', 'Only the site owner can open the Newsroom.', 'frog-mail'); return; }
     if (!newsroomLoad) newsroomLoad = new Promise(function (res, rej) {
-      var sc = document.createElement('script'); sc.src = 'newsroom.js?v=20261118'; sc.onload = res; sc.onerror = function () { newsroomLoad = null; rej(); }; document.head.appendChild(sc);
+      var sc = document.createElement('script'); sc.src = 'newsroom.js?v=20261119special'; sc.onload = res; sc.onerror = function () { newsroomLoad = null; rej(); }; document.head.appendChild(sc);
     });
     newsroomLoad.then(function () {
       window.PondNewsroom({
