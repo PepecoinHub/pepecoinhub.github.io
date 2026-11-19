@@ -8,6 +8,7 @@ begin
  end if;
  return new;
 end $$;
+revoke all on function games.haze_group_finished_at() from public,anon,authenticated;
 drop trigger if exists haze_group_finished_at on games.haze_groups;
 create trigger haze_group_finished_at before update on games.haze_groups for each row execute function games.haze_group_finished_at();
 update games.haze_groups set finished_at=coalesce(confirmed_at,closes_at) where state in ('confirmed','empty','cancelled') and finished_at is null;
@@ -19,7 +20,7 @@ begin
  return jsonb_build_object('now',clock_timestamp(),'member_count',(select count(*) from games.haze_group_members(u,'all')),
  'members',coalesce((select jsonb_agg(jsonb_build_object('id',m.user_id,'nick',m.nick,'online',m.online) order by m.nick,m.user_id) from(select * from games.haze_group_members(u,'all') limit 2000)m),'[]'::jsonb),
  'drops',coalesce((select jsonb_agg(jsonb_build_object('id',g.id,'owner',g.owner,'creator',g.creator,'mode',g.mode,'audience',g.audience,'title',g.title,'note',g.note,'total_atomic',g.total_atomic::text,'state',g.state,
- 'ended_at',case when g.state='confirmed' then g.confirmed_at when g.state in ('empty','cancelled') then g.finished_at when g.state='ready' and g.submitted_txid is null and g.expires_at<=clock_timestamp() then g.expires_at else null end,'created_at',g.created_at,'closes_at',g.closes_at,'expires_at',g.expires_at,'max_winners',g.max_winners,
+ 'payment_pending',g.state='ready' and g.submitted_txid is not null,'ended_at',case when g.state='confirmed' then g.confirmed_at when g.state in ('empty','cancelled') then g.finished_at when g.state='ready' and g.submitted_txid is null and g.expires_at<=clock_timestamp() then g.expires_at else null end,'created_at',g.created_at,'closes_at',g.closes_at,'expires_at',g.expires_at,'max_winners',g.max_winners,
  'entries',(select count(*) from games.haze_group_entries e where e.group_id=g.id),
  'joined',exists(select 1 from games.haze_group_entries e where e.group_id=g.id and e.user_id=u),
  'eligible',exists(select 1 from games.haze_group_eligible e where e.group_id=g.id and e.user_id=u),

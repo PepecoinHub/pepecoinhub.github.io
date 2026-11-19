@@ -14,7 +14,7 @@ test('group SQL: all audiences, exact splits, frozen recipients, timed chat roun
   sql('create database '+db,'postgres');
   try{
     let bootstrap=readFileSync(new URL('../scripts/haze-preview/bootstrap.sql',import.meta.url),'utf8').replace(/create role (\w+) nologin;/g,(_,role)=>`do $$begin create role ${role} nologin;exception when duplicate_object or unique_violation then null;end$$;`);
-    sql(bootstrap);const base=readFileSync(new URL('../games/supabase/update_haze_tips.sql',import.meta.url),'utf8'),groups=readFileSync(new URL('../games/supabase/update_haze_groups.sql',import.meta.url),'utf8');sql(base);sql(groups);sql(base);sql(groups);
+    sql(bootstrap);const base=readFileSync(new URL('../games/supabase/update_haze_tips.sql',import.meta.url),'utf8'),groups=readFileSync(new URL('../games/supabase/update_haze_groups.sql',import.meta.url),'utf8');sql(base);sql(groups);sql(base);sql(groups);const visibility=readFileSync(new URL('../games/supabase/update_haze_group_visibility.sql',import.meta.url),'utf8');sql(visibility);sql(visibility);
     for(let n=1;n<=8;n++){sql(`insert into auth.users values(${q(uid(n))});insert into games.profiles values(${q(uid(n))},'Fren${n}');`);if(n!==8)sql(`insert into auth.identities values(${q(uid(n))},'discord');`);if(n!==3)sql(`insert into games.haze_links(user_id,address)values(${q(uid(n))},${q(address(n))});`);}
     sql(`update games.haze_settings set enabled=true,beta_only=false;`);assert.throws(()=>rpc(1,'gry_haze_groups'),'Community flag is independent from direct tips');
     sql(`update games.haze_settings set groups_enabled=true;insert into games.lobby_seen values('two',${q(uid(2))},clock_timestamp()),('four',${q(uid(4))},clock_timestamp());insert into games.lobby_mutes values(${q(uid(7))},clock_timestamp()+interval '1 hour');`);
@@ -45,7 +45,7 @@ test('group SQL: all audiences, exact splits, frozen recipients, timed chat roun
     say(4,'/answer  pep  ');assert.equal(review(question.id).recipients[0].nick,'Fren4');
     const word=create({mode:'word',answer:'gm',seconds:10,winners:2,total_atomic:'500000000'});say(5,'GM');say(5,'gm');say(6,' gm ');const wordManifest=review(word.id);assert.equal(wordManifest.recipients.length,2);assert.deepEqual(wordManifest.recipients.map(r=>r.amount),['250000000','250000000']);
     const empty=create({mode:'airdrop',seconds:10});sql(`update games.haze_groups set closes_at=clock_timestamp()-interval '1 second' where id=${q(empty.id)};`);rpc(1,'gry_haze_groups');assert.equal(sql(`select state from games.haze_groups where id=${q(empty.id)}`),'empty');assert.throws(()=>review(empty.id));
-    const publicFeed=rpc(2,'gry_haze_groups');for(const secret of ['answer_hash','answer_salt',address(2),address(4)])assert.equal(JSON.stringify(publicFeed).includes(secret),false);
+    const publicFeed=rpc(2,'gry_haze_groups');assert.ok(publicFeed.drops.find(d=>d.id===empty.id).ended_at,'Empty rounds have a server completion time');for(const secret of ['answer_hash','answer_salt',address(2),address(4)])assert.equal(JSON.stringify(publicFeed).includes(secret),false);
     const hash='ab'.repeat(32),other='bc'.repeat(32),block='cd'.repeat(32),time=Math.floor(Date.now()/1000);
     sql(`insert into games.lobby_chat(user_id,nick,body,verified)values(${q(uid(2))},'Fren2','hello',true);`);
     const single=rpc(1,'gry_haze_tip_begin',`${sql('select max(id) from games.lobby_chat')},'100000000','heart',''`);
@@ -55,6 +55,8 @@ test('group SQL: all audiences, exact splits, frozen recipients, timed chat roun
     assert.throws(()=>rpc(1,'gry_haze_group_cancel',q(chosen.id)+'::uuid'));
     const commit=`${q(uid(1))},${q(chosen.id)},${q(other)},${q(block)},${time}`;service('haze_group_confirm',commit);service('haze_group_confirm',commit);
     assert.equal(rpc(1,'gry_haze_groups').drops.find(d=>d.id===chosen.id).submitted_txid,null,'Confirmed payouts no longer advertise a recovery candidate');
+    assert.ok(rpc(2,'gry_haze_groups').drops.find(d=>d.id===chosen.id).ended_at,'Recipients receive confirmation time');
+    sql(`update games.haze_groups set expires_at=clock_timestamp()-interval '1 hour' where id=${q(all.id)};`);assert.ok(rpc(2,'gry_haze_groups').drops.find(d=>d.id===all.id).ended_at,'Unsigned expiry is terminal');
     assert.equal(sql("select count(*) from games.haze_transactions"),'2');assert.equal(sql("select count(*) from games.passport_badges where badge_id='haze_first_tip'"),'1');assert.equal(sql("select count(*) from realtime.test_rings where event='tip'"),'2');
     sql('update games.haze_settings set enabled=false;');assert.throws(()=>create({mode:'all'}));
   }finally{sql('drop database '+db+' with(force)','postgres');}

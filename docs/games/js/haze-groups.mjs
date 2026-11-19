@@ -9,7 +9,7 @@ export function groupVisible(drop, now=Date.now()){
 export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   if(!enabled)return null;
   const {node:n,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,origin}=ctx;
-  const cacheKey='ph-haze-group-submitted-v1',flights=new Map(),completed=new Set();let stopped=false,data=null,feed=null,panel=null,help=null,button=null,timer=null,busy=null;
+  const cacheKey='ph-haze-group-submitted-v1',flights=new Map(),completed=new Set();let stopped=false,data=null,feed=null,panel=null,help=null,button=null,timer=null,expiryTimer=null,clockOffset=0,busy=null;
   const signed=()=>{if(!currentUser()){ctx.login?.();throw Error('Sign in with Discord first.');}};
   const save=()=>{try{win.localStorage.setItem(cacheKey,JSON.stringify([...flights.values()].map(({id,txid,user})=>({id,txid,user})).slice(-20)));}catch{}};
   function resume(){
@@ -29,7 +29,7 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   function sync(force=false){
     if(stopped||doc.hidden||!currentUser())return Promise.resolve();if(busy)return busy;
     busy=(async()=>{
-      try{data=await rpc('gry_haze_groups',{});if(!stopped){render();resume();}}catch{}
+      try{data=await rpc('gry_haze_groups',{});const serverNow=Date.parse(data?.now);clockOffset=Number.isFinite(serverNow)?serverNow-Date.now():0;if(!stopped){render();resume();}}catch{}
       finally{busy=null;clearTimeout(timer);if(!stopped)timer=setTimeout(()=>void sync(),data?.drops?.some(d=>d.state==='open')?5000:20000);}
     })();return busy;
   }
@@ -37,7 +37,11 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
     if(!data)return;
     const log=ctx.chatLog?.()||doc.getElementById('lchat');
     if(log){if(!feed)feed=n('section',{class:'haze-group-feed','aria-label':'Community tips and rounds'});if(!panel){panel=n('details',{class:'haze-drop-panel',open:true},n('summary',{},'Community drops'),feed);}if(!panel.isConnected){const anchor=log.closest('.lan-main')||log;anchor.before(panel);}feed.replaceChildren();}
-    const drops=(data.drops||[]).filter(d=>groupVisible(d)).slice(0,30);
+    const now=Date.now()+clockOffset;
+    const drops=(data.drops||[]).filter(d=>groupVisible(d,now)).slice(0,30);
+    clearTimeout(expiryTimer);
+    const deadlines=drops.map(d=>Date.parse(d.ended_at||'')+30*60*1000).filter(t=>Number.isFinite(t)&&t>now);
+    if(deadlines.length)expiryTimer=setTimeout(()=>{if(!stopped)render();},Math.min(...deadlines)-now);
     if(button)button.textContent='🎉 Group tips'+(drops.some(d=>d.state==='open')?' · round live':'');
     if(!feed)return;panel.hidden=!drops.length;panel.querySelector('summary').textContent='Community drops ('+drops.length+')';
     for(const drop of drops){
@@ -59,7 +63,7 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
           if(!ctx.wallet()?.address)card.append(n('small',{},'Link your receiving wallet to join.'));
         }
       }else if(drop.state==='ready'){
-        const pending=HASH.test(flights.get(drop.id)?.txid||'')||!!drop.submitted_txid,expired=Date.parse(drop.expires_at)<=Date.now();
+        const pending=HASH.test(flights.get(drop.id)?.txid||'')||!!drop.submitted_txid||drop.payment_pending===true,expired=Date.parse(drop.expires_at)<=Date.now();
         status.textContent=pending?'Payment sent · confirming…':expired?'Review expired · no payment':drop.count+' selected · '+(drop.owner===currentUser()?'Review payout':'Awaiting host approval');
         if(drop.owner===currentUser()&&!pending&&!expired){const review=n('button',{type:'button',class:'haze-tip-primary'},'Review payout');review.onclick=()=>void reviewPayout(drop.id);card.append(review);}
       }else if(drop.state==='confirmed'){
@@ -154,5 +158,5 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
         n('a',{href:'https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml',target:'_blank',rel:'noopener noreferrer'},'Report a bug'),
         n('small',{},'Include what happened, your browser and a screenshot. Never include wallet passwords, seed phrases or private keys.'));
       };
-      const log=ctx.chatLog?.();(log?.closest('.lan-win')?.querySelector('.lan-top')||parent).append(help);void sync(true);},sync,open,destroy(){stopped=true;save();clearTimeout(timer);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);panel?.remove();help?.remove();button?.remove();}};
+      const log=ctx.chatLog?.();(log?.closest('.lan-win')?.querySelector('.lan-top')||parent).append(help);void sync(true);},sync,open,destroy(){stopped=true;save();clearTimeout(timer);clearTimeout(expiryTimer);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);panel?.remove();help?.remove();button?.remove();}};
 }
