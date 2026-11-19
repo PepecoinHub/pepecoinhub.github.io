@@ -1923,6 +1923,11 @@ footer.foot a { color: #edf3e3; }
 /* Drop-down lists: the box colour comes from an image, so Chrome's open list keeps its hover highlight
    (a background colour would be copied onto every row and hide the highlighted text) */
 .pondos select { background: linear-gradient(var(--pane), var(--pane)) !important; }
+/* Night theme: the open list has no colour of its own (the box colour is an image), so Chrome on Windows painted
+   it white while the rows kept the light night text: unreadable until hovered. Give the rows the night colours. */
+@media (prefers-color-scheme: dark) { :root.pondos:not([data-theme="light"]) select option { background-color: var(--pane); color: var(--ink); } :root.pondos:not([data-theme="light"]) select option:checked { background-color: var(--sel); color: #fff; } }
+:root.pondos[data-theme="dark"] select option { background-color: var(--pane); color: var(--ink); }
+:root.pondos[data-theme="dark"] select option:checked { background-color: var(--sel); color: #fff; }
 
 /* ---------- reward98: a new stamp / secret, as a Windows 98 dialog that rises from the tray and stays ---------- */
 /* above every PondOS window (they stack from z-index 200 up, one step per click) and the taskbar; below the screensaver and BSOD */
