@@ -6,7 +6,7 @@
 // Text and our own emotes only: the server rejects links, and the page never shows pictures from players.
 import { $, h, toast, nickStore } from './common.js?v=20261115haze';
 import { renderBody, attachPicker } from './emotes.js';
-import {createHazeTips} from './haze-tips.mjs?v=20261116unlock';
+import {createHazeTips} from './haze-tips.mjs?v=20261119open';
 
 // Fren Passport beta (only a browser that opened /meme/?beta=fren): a verified (Discord) name links to that
 // fren's passport in PondOS. Guests have no passport, and without the beta every name stays plain text.

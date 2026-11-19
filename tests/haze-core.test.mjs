@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {verifyWalletProof,verifyTipTransaction,verifyGroupTransaction,preflightTransaction,blockbookTx,pepScript,pickSpendingTxid} from '../games/supabase/functions/haze-wallet/core.mjs';
 import {handleHaze,accessList} from '../games/supabase/functions/haze-wallet/handler.mjs';
-import {amountAtomic,formatAtomic,tipURL,submissionMatches,createHazeTips,hazeBeta,parseTipCommand} from '../docs/games/js/haze-tips.mjs';
+import {amountAtomic,formatAtomic,tipURL,submissionMatches,createHazeTips,hazeCheck,parseTipCommand} from '../docs/games/js/haze-tips.mjs';
 
 const fixture=JSON.parse(readFileSync(new URL('fixtures/haze-proof.json',import.meta.url)));
 const {proof,challenge,recipient}=fixture,now=Date.parse(challenge.issuedAt)+1000;
@@ -106,13 +106,13 @@ test('beta preflight reads genesis, a transaction and its funding output from th
 });
 const PEP_GENESIS_HEX='37981c0c48b8d48965376c8a42ece9a0838daadb93ff975cb091f57f8c2a5faa';
 
-test('?beta=haze only remembers visibility in this browser; ?beta=off forgets it; broken storage hides it',()=>{
+test('?haze=check only remembers the Server check button in this browser; ?haze=off forgets it; broken storage hides it',()=>{
   const store=new Map(),win=search=>({location:{search},localStorage:{getItem:k=>store.get(k)??null,setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)}});
-  assert.equal(hazeBeta(win('')),false);
-  assert.equal(hazeBeta(win('?beta=haze')),true);assert.equal(hazeBeta(win('?x=1')),true);
-  assert.equal(hazeBeta(win('?beta=off')),false);assert.equal(hazeBeta(win('')),false);
-  assert.equal(hazeBeta({location:{search:'?beta=haze'},get localStorage(){throw Error('blocked');}}),false);
-  assert.equal(hazeBeta(undefined),false);
+  assert.equal(hazeCheck(win('')),false);
+  assert.equal(hazeCheck(win('?haze=check')),true);assert.equal(hazeCheck(win('?x=1')),true);
+  assert.equal(hazeCheck(win('?haze=off')),false);assert.equal(hazeCheck(win('')),false);
+  assert.equal(hazeCheck({location:{search:'?haze=check'},get localStorage(){throw Error('blocked');}}),false);
+  assert.equal(hazeCheck(undefined),false);
 });
 
 test('/tip command: nick, amount (dot or comma, optional pep) and note; /answer and chat stay ordinary',()=>{
