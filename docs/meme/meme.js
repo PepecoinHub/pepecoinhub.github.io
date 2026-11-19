@@ -6052,7 +6052,7 @@
   }
   function withNotify(fn) {
     if (!notifyLoad) notifyLoad = new Promise(function (res, rej) {
-      var sc = document.createElement('script'); sc.src = 'notify.js?v=20261119'; sc.onload = res; sc.onerror = function () { notifyLoad = null; rej(); }; document.head.appendChild(sc);
+      var sc = document.createElement('script'); sc.src = 'notify.js?v=20261119tip'; sc.onload = res; sc.onerror = function () { notifyLoad = null; rej(); }; document.head.appendChild(sc);
     });
     return notifyLoad.then(function () { return fn(window.PondNotify, notifyEnv()); });
   }

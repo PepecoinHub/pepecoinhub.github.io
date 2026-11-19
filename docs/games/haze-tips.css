@@ -3,3 +3,38 @@
 .haze-tip-wallet[hidden]{display:none}.haze-tip-wallet .haze-tip-frame{height:min(700px,72dvh)}.haze-pending-tip{margin:9px 0;padding:10px;border:1px dashed #8a9b75;border-radius:8px;background:#f2f1d5;color:#3b4c27;font:12px/1.5 system-ui;overflow-wrap:anywhere}.haze-pending-tip:before{content:"◌ ";font-weight:bold}
 .haze-message-tip:disabled{cursor:default;opacity:1;background:#e8e9e2;color:#596450;border-color:#b1b7a9;font-weight:400}
 .haze-group-feed{display:grid;gap:10px;margin-top:10px}.haze-drop-card{display:grid;gap:7px;padding:14px;border:1px solid #9da18b;border-left:4px solid #8167b3;border-radius:10px;background:#f1eaf9;color:#302544;font:12px/1.5 system-ui}.haze-drop-card.is-confirmed{background:#e5f5d8;border-color:#79a96b;color:#204021}.haze-drop-card p{margin:0}.haze-drop-card strong{font-size:14px}.haze-drop-card small{font-size:10px}.haze-drop-card button{font-size:12px}.haze-group-cancel{justify-self:start;border:0;background:none;text-decoration:underline;color:inherit;cursor:pointer}.haze-group-preview,.haze-group-selection{max-height:240px;overflow:auto;display:grid;gap:8px;padding:10px;border:1px solid #a3ac94;border-radius:8px}.haze-group-preview>div{display:grid;gap:3px}.haze-group-preview code{overflow-wrap:anywhere;font-size:10px}.haze-group-selection label{display:flex;align-items:center;gap:8px}.haze-group-selection input{width:auto}.haze-group-hint{padding:10px;border-radius:8px;background:#e4eddb;font-size:12px}.haze-tip-body [hidden]{display:none}
+
+/* PondOS 98 chat: muted desktop panels for Haze events. */
+.haze-group-feed{gap:6px;margin-top:8px}
+.haze-group-feed .haze-drop-card{
+  gap:3px;padding:9px 11px;border:1px solid #758577;border-left:3px solid #879482;
+  border-radius:2px;background:#27332c;color:#e8eee3;
+  box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15;
+  font:12px/1.35 var(--f-chrome,system-ui,sans-serif)
+}
+.haze-group-feed .haze-drop-card.is-open{border-left-color:#b6a478}
+.haze-group-feed .haze-drop-card.is-confirmed{border-color:#758577;border-left-color:#78a788;background:#25362b;color:#e8eee3}
+.haze-group-feed .haze-drop-card strong{font-size:13px;line-height:1.25;color:#f3f5e9}
+.haze-group-feed .haze-drop-meta,.haze-group-feed .haze-drop-foot{color:#b3c1b1}
+.haze-group-feed .haze-drop-card [role="status"]{color:#d4e4d1}
+.haze-group-feed .haze-drop-card a,.haze-group-feed .haze-group-details summary{color:#d4e3c8;text-decoration:underline;text-underline-offset:2px}
+.haze-group-feed .haze-group-details summary{cursor:pointer;width:max-content;max-width:100%}
+.haze-group-feed .haze-group-names{overflow-wrap:anywhere}
+.haze-group-feed .haze-drop-card button:not(.haze-group-cancel){
+  justify-self:start;min-height:32px;padding:5px 10px;border:1px solid #aebdaf;border-radius:1px;
+  background:#435a48;color:#f1f5ed;box-shadow:inset 1px 1px 0 #839584,inset -1px -1px 0 #1b2b20;
+  font:12px var(--f-chrome,system-ui,sans-serif)
+}
+.haze-group-feed .haze-group-cancel{padding:2px 0;font:12px var(--f-chrome,system-ui,sans-serif)}
+.haze-group-feed .haze-drop-card :is(a,button,summary):focus-visible{outline:2px solid #d9dfb7;outline-offset:2px}
+
+/* Direct tip receipts use the same chat panel, including pending state. */
+.haze-chat-receipt,.haze-pending-tip{
+  gap:3px;margin:6px 0;padding:9px 11px;border:1px solid #758577;border-left:3px solid #78a788;
+  border-radius:2px;background:#25362b;color:#e8eee3;
+  box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15;
+  font:12px/1.35 var(--f-chrome,system-ui,sans-serif)
+}
+.haze-pending-tip{border-left-color:#b6a478;background:#27332c;color:#e8eee3}
+.haze-chat-receipt a{color:#d4e3c8}
+.haze-chat-receipt small{color:#b3c1b1}
