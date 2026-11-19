@@ -27,3 +27,14 @@
 }
 .haze-group-feed .haze-group-cancel{padding:2px 0;font:12px var(--f-chrome,system-ui,sans-serif)}
 .haze-group-feed .haze-drop-card :is(a,button,summary):focus-visible{outline:2px solid #d9dfb7;outline-offset:2px}
+
+/* Direct tip receipts use the same chat panel, including pending state. */
+.haze-chat-receipt,.haze-pending-tip{
+  gap:3px;margin:6px 0;padding:9px 11px;border:1px solid #758577;border-left:3px solid #78a788;
+  border-radius:2px;background:#25362b;color:#e8eee3;
+  box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15;
+  font:12px/1.35 var(--f-chrome,system-ui,sans-serif)
+}
+.haze-pending-tip{border-left-color:#b6a478;background:#27332c;color:#e8eee3}
+.haze-chat-receipt a{color:#d4e3c8}
+.haze-chat-receipt small{color:#b3c1b1}
