@@ -38,3 +38,5 @@
 .haze-pending-tip{border-left-color:#b6a478;background:#27332c;color:#e8eee3}
 .haze-chat-receipt a{color:#d4e3c8}
 .haze-chat-receipt small{color:#b3c1b1}
+
+.haze-drop-panel{flex:none;min-width:0;padding:6px;border:1px solid #657365;background:#24312a;color:#e0e7da}.haze-drop-panel>summary{cursor:pointer;font:12px var(--f-chrome,system-ui,sans-serif)}.haze-drop-panel .haze-group-feed{max-height:min(28vh,220px);overflow:auto;overscroll-behavior:contain}.haze-drop-panel[hidden]{display:none}

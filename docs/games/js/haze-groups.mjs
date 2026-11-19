@@ -1,10 +1,15 @@
 export const HAZE_GROUPS_ENABLED=true;
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/,HASH=/^[a-f0-9]{64}$/;
 const MODES={all:'Whole pond',online:'Online frens',offline:'Away / offline frens',random:'Random frens',selected:'Choose frens',airdrop:'Timed airdrop',trivia:'Trivia round',word:'Say the word'};
+export function groupVisible(drop, now=Date.now()){
+  if(drop.state==='open')return true;
+  const end=Date.parse(drop.ended_at||'');
+  return !Number.isFinite(end)||now<end+30*60*1000;
+}
 export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   if(!enabled)return null;
   const {node:n,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,origin}=ctx;
-  const cacheKey='ph-haze-group-submitted-v1',flights=new Map(),completed=new Set();let stopped=false,data=null,feed=null,button=null,timer=null,busy=null;
+  const cacheKey='ph-haze-group-submitted-v1',flights=new Map(),completed=new Set();let stopped=false,data=null,feed=null,panel=null,help=null,button=null,timer=null,busy=null;
   const signed=()=>{if(!currentUser()){ctx.login?.();throw Error('Sign in with Discord first.');}};
   const save=()=>{try{win.localStorage.setItem(cacheKey,JSON.stringify([...flights.values()].map(({id,txid,user})=>({id,txid,user})).slice(-20)));}catch{}};
   function resume(){
@@ -31,10 +36,10 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   function render(){
     if(!data)return;
     const log=ctx.chatLog?.()||doc.getElementById('lchat');
-    if(log){if(!feed)feed=n('section',{class:'haze-group-feed','aria-label':'Community tips and rounds'});if(!feed.isConnected)log.append(feed);feed.replaceChildren();}
-    const drops=(data.drops||[]).filter(d=>d.state!=='cancelled').slice(0,10);
+    if(log){if(!feed)feed=n('section',{class:'haze-group-feed','aria-label':'Community tips and rounds'});if(!panel){panel=n('details',{class:'haze-drop-panel',open:true},n('summary',{},'Community drops'),feed);}if(!panel.isConnected){const anchor=log.closest('.lan-main')||log;anchor.before(panel);}feed.replaceChildren();}
+    const drops=(data.drops||[]).filter(d=>groupVisible(d)).slice(0,30);
     if(button)button.textContent='🎉 Group tips'+(drops.some(d=>d.state==='open')?' · round live':'');
-    if(!feed)return;
+    if(!feed)return;panel.hidden=!drops.length;panel.querySelector('summary').textContent='Community drops ('+drops.length+')';
     for(const drop of drops){
       const card=n('article',{class:'haze-drop-card '+(drop.state==='confirmed'?'is-confirmed':drop.state==='open'?'is-open':''),'data-group-id':drop.id});
       card.append(n('strong',{},drop.title),n('span',{class:'haze-drop-meta'},drop.creator+' · '+formatAtomic(drop.total_atomic)+' PEP · '+(MODES[drop.mode]||drop.mode)));
@@ -60,7 +65,7 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
       }else if(drop.state==='confirmed'){
         status.textContent='Confirmed · '+drop.count+(drop.count===1?' fren paid':' frens paid');
         if(HASH.test(drop.txid||''))card.append(n('a',{href:'https://pepeblocks.com/tx/'+drop.txid,target:'_blank',rel:'noopener noreferrer'},'View group transaction ↗'));
-      }else status.textContent='No eligible winners · no payment made';
+      }else status.textContent=drop.state==='cancelled'?'Cancelled · no payment':'No eligible winners · no payment made';
       if(drop.recipients?.length){
         const names=drop.recipients.map(r=>r.nick+' '+formatAtomic(r.amount)+' PEP').join(' · ')+(drop.count>12?' · +'+(drop.count-12)+' more':'');
         if(drop.recipients.length>3)card.append(n('details',{class:'haze-group-details'},n('summary',{},'Recipients ('+drop.count+')'),n('p',{class:'haze-group-names'},names)));
@@ -139,5 +144,15 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
     flight.txid=body.txid;save();if(flight.view?.active())flight.view.close();render();void check(flight);void sync(true);
   };
   win.addEventListener('message',receive);const visible=()=>{if(!doc.hidden)void sync(true);};doc.addEventListener('visibilitychange',visible);
-  return {setWalletLoading(value){if(button)button.disabled=value;},mount(parent){button=n('button',{type:'button',class:'haze-wallet-link',onclick:()=>void open()},'🎉 Group tips');button.disabled=!!currentUser();parent.append(' ',button);void sync(true);},sync,open,destroy(){stopped=true;save();clearTimeout(timer);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);feed?.remove();button?.remove();}};
+  return {setWalletLoading(value){if(button)button.disabled=value;},mount(parent){button=n('button',{type:'button',class:'haze-wallet-link',onclick:()=>void open()},'🎉 Group tips');button.disabled=!!currentUser();parent.append(' ',button);
+      help=n('button',{type:'button',class:'haze-wallet-link','aria-label':'Chat help',title:'Commands, drops and bug reports'},'?');
+      help.onclick=()=>{const view=modal('Chat help');view.body.append(
+        n('p',{},'Link your receiving wallet through Haze to receive PEP. Use Tip beside a message to tip that fren.'),
+        n('p',{},'/tip nick amount [pep] [note] opens a tip review. /answer your answer enters a trivia round. For Say the word, type the displayed word.'),
+        n('p',{},'Timed airdrop: press Join airdrop before the timer ends. Other group tips use the audience chosen by the host. Entry is free; eligibility and winner limits apply.'),
+        n('p',{},'The host approves payment in Haze after the round. Joining does not guarantee payment. Finished drops disappear from this panel after 30 minutes.'),
+        n('a',{href:'https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml',target:'_blank',rel:'noopener noreferrer'},'Report a bug'),
+        n('small',{},'Include what happened, your browser and a screenshot. Never include wallet passwords, seed phrases or private keys.'));
+      };
+      const log=ctx.chatLog?.();(log?.closest('.lan-win')?.querySelector('.lan-top')||parent).append(help);void sync(true);},sync,open,destroy(){stopped=true;save();clearTimeout(timer);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);panel?.remove();help?.remove();button?.remove();}};
 }
