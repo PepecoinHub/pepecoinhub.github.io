@@ -1,5 +1,5 @@
 -- Run after update_lobby_mentions.sql, update_open_chat.sql and update_page_stats.sql.
--- An owner's @everyone reaches Discord players who have mentions enabled.
+-- Byl's @everyone reaches Discord players who have mentions enabled.
 alter table games.lobby_chat add column if not exists broadcast boolean not null default false;
 
 create or replace function games.lobby_broadcast_before_insert() returns trigger
@@ -8,6 +8,9 @@ begin
   new.broadcast := coalesce(new.verified, false)
     and new.user_id is not null
     and games.is_owner(new.user_id)
+    and exists (select 1 from auth.identities i
+                 where i.user_id = new.user_id and i.provider = 'discord'
+                   and i.provider_id = '1177554593014628383')
     and new.body ~* '(^|[^[:alnum:]_])@everyone($|[^[:alnum:]_])';
   return new;
 end $$;
