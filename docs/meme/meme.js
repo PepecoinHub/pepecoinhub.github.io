@@ -5641,7 +5641,7 @@
       try { nickIn.value = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
       // @mentions: highlight messages for me, suggest names after "@", ring on new ones, a switch to turn them off
       var PM = null, me = { verified: false }, mrow = A.body.querySelector('.lan-ment'), mbtn = mrow.querySelector('button');
-      var forMe = function (m) { var s = anySession(); return !!(PM && me.verified && !me.optout && !(s && s.user && s.user.id === m.user_id) && PM.mentionsMe(m.body, me.nick)); };
+      var forMe = function (m) { var s = anySession(); return !!(PM && me.verified && !me.optout && !(s && s.user && s.user.id === m.user_id) && (m.broadcast === true || PM.mentionsMe(m.body, me.nick))); };
       var seenMentions = function () { if (alive && !document.hidden && !isMinimized()) chatRpc('gry_mentions_seen', { p_upto: null }).catch(function () {}); };
       var paintMent = function () {
         mrow.hidden = !me.verified;
