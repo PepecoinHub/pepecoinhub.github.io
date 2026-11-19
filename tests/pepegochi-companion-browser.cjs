@@ -8,7 +8,7 @@ const html = `<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="
 import { mountTaskbarFrog } from '/meme/pepegochi-taskbar.mjs';
 window.t = { time: Date.now(), owner: 'owner-a', opened: 0, apps: [], calls: [], pet: { life_id:'frog-a', name:'Pickle', stage:'adult', status:'healthy', care_days:12, needs:{hunger:90,hygiene:90,mood:90,energy:90} } };
 t.refresh = () => window.dispatchEvent(new Event('pondos:auth-changed'));
-t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>t.opened++,commands:Object.fromEntries(['games','news','passport','tv'].map(name=>[name,()=>t.apps.push(name)])),session:()=>({discord:true,userId:t.owner}),now:()=>t.time,rpc:async name=>{t.calls.push(name);if(name==='gry_quiz_answer')return new Promise(r=>t.answer=r);return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:{day:new Date().toISOString().slice(0,10),question:'Pond question?',answers:['Yes','No'],answered:false};}});
+t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>t.opened++,commands:Object.fromEntries(['games','news','passport','tv'].map(name=>[name,()=>t.apps.push(name)])),session:()=>({discord:true,userId:t.owner}),now:()=>t.time,rpc:async (name,args)=>{t.calls.push(name);if(name==='gry_quiz_answer')return new Promise(r=>t.answer=r);if(name==='gry_pepegochi_action'){const need={feed:'hunger',clean:'hygiene',play:'mood',rest:'energy'}[args.p_action];t.pet.needs[need]=Math.min(100,t.pet.needs[need]+35);return {pet:structuredClone(t.pet),action_result:'accepted'};}return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:{day:new Date().toISOString().slice(0,10),question:'Pond question?',answers:['Yes','No'],answered:false};}});
 </script>`;
 let browser;
 const server = http.createServer((req, res) => {
@@ -37,6 +37,13 @@ const server = http.createServer((req, res) => {
  assert.deepEqual(await page.evaluate(()=>t.apps),['games','news','passport','tv']);
  await frog.focus();await page.keyboard.press('Enter');
  await page.keyboard.press('Escape');assert.equal(await page.locator('.pg-conversation').count(),0);
+ await page.evaluate(()=>{t.pet.needs.hunger=20;t.refresh();});
+ await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('hungry'));
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Feed',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('.pg-conversation .pg-fact-q')?.textContent.includes('hit the spot'));
+ assert.equal(await page.evaluate(()=>t.pet.needs.hunger),55);
+ assert.equal(await page.evaluate(()=>t.calls.filter(x=>x==='gry_pepegochi_action').length),1);
+ await page.keyboard.press('Escape');
  // Actual expression frames play once and restore state; no CSS-only stand-ins.
  const frame = name => page.waitForFunction(n=>document.querySelector('.pg-companion-button img').src.includes('/tb_'+n+'_'),name);
  await frog.focus();await page.keyboard.press('Enter');await frame('curious');

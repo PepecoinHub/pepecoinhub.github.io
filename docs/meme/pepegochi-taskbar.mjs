@@ -1,12 +1,12 @@
 import { TOYS } from './pepegochi-personality.mjs?v=20261116sass1';
 import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
-// PepeGochi taskbar companion for PondOS. Read-only: the server remains the only source of pet state.
+// PepeGochi taskbar companion for PondOS. The server remains the only source of pet state and validates every care action.
 // Loaded only behind the existing ?beta=gochi gate. Local conversations are cosmetic; no polling, rewards or fake pet.
 // Based on PR #299; adds the Pond Quiz (one server question a day once the frog has hatched; update_pond_quiz.sql)
 // and the hop out of the PEPEGOCHI.EXE window.
 import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261116room1';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261119commands1';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261119care1';
 import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
 import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118desktop1';
 
@@ -425,6 +425,63 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   let lastAt = 0;
   let lastUser = null;
   let generation = 0;
+  let careBusy = false;
+  const CARE_REACTION = { feed: 'fed', clean: 'clean', play: 'played', rest: 'rested' };
+  function acceptState(state, { keepConversation = false } = {}) {
+    const life = state?.pet?.life_id || null;
+    if (lastLife !== life) {
+      desktop?.reset();
+      conversation?.close({ reset: true }); arcade.reset(); siteEvents.reset(); clearToy(); lastLife = life;
+    }
+    const view = describeTaskbarFrog(state);
+    if (shownView?.sprite !== view.sprite || shownView?.label !== view.label) {
+      desktop?.stop(); clearToy();
+      if (!keepConversation) conversation?.close();
+    }
+    paint(view);
+    const event = bond.observe(lastUser, state?.pet);
+    const was = hatched;
+    hatched = !!(state?.pet?.stage && state.pet.stage !== 'egg');
+    if (hatched !== was) refreshFacts(true);
+    return event;
+  }
+  function careError(error) {
+    const message = String(error?.message || '');
+    if (/Wait a moment before the next care action/i.test(message)) return 'Easy, fren. Wait a moment before the next care action.';
+    if (/Daily care action limit reached/i.test(message)) return 'That is enough care actions for today. See you tomorrow, fren.';
+    if (/cooling down/i.test(message)) return 'That care action is cooling down. Try again later.';
+    if (/does not need that right now/i.test(message)) return 'I do not need that right now, fren.';
+    if (/Discord sign-in required|not authenticated|JWT|Not signed in|permission denied/i.test(message)) return 'Log on with Discord so the server can care for your Fren.';
+    return 'Care could not be saved. Your Fren is unchanged; try again in a moment.';
+  }
+  function syncOpenRoom() {
+    for (const frame of document.querySelectorAll('iframe[src*="pepegochi-live.html"]'))
+      frame.contentWindow?.postMessage({ type: 'pondos:pepegochi-refresh' }, location.origin);
+  }
+  async function taskbarCare(kind) {
+    if (!Object.hasOwn(CARE_REACTION, kind)) return { ok: false, text: 'Unknown care action.' };
+    if (careBusy) return { ok: false, text: 'One care action is already being saved.' };
+    const auth = session(), owner = auth?.discord ? auth.userId : null, life = lastLife;
+    if (!owner || !life || !shownView?.hasPet) return { ok: false, openRoom: true };
+    careBusy = true;
+    const requestGeneration = ++generation;
+    try {
+      const state = await rpc('gry_pepegochi_action', { p_action: kind });
+      const current = session();
+      if (disposed || requestGeneration !== generation || !current?.discord || current.userId !== owner || lastLife !== life)
+        return { ok: false, text: 'The active account changed. No local result was applied.' };
+      lastAt = Date.now();
+      const accepted = state?.action_result === 'accepted';
+      const event = acceptState(state, { keepConversation: accepted });
+      if (accepted || state?.action_result === 'moved_out') syncOpenRoom();
+      if (state?.action_result === 'moved_out') return { ok: false, openRoom: true };
+      if (!accepted) return { ok: false, text: 'The server did not accept that care action.' };
+      if (event) bond.take();
+      return { ok: true, action: event || CARE_REACTION[kind] };
+    } catch (error) {
+      return { ok: false, text: careError(error) };
+    } finally { careBusy = false; }
+  }
   async function refresh(force = false) {
     const auth = session();
     const id = auth && auth.discord && auth.userId ? auth.userId : null;
@@ -447,19 +504,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
       const state = await rpc('gry_pepegochi_state', {});
       const cur = session();
       if (disposed || requestGeneration !== generation || !cur || !cur.discord || cur.userId !== id) return;
-      if (lastLife !== state?.pet?.life_id) {
-        desktop?.reset();
-        conversation?.close({ reset: true }); arcade.reset(); siteEvents.reset(); clearToy(); lastLife = state?.pet?.life_id || null;
-      }
-      const view = describeTaskbarFrog(state);
-      if (shownView?.sprite !== view.sprite || shownView?.label !== view.label) { desktop?.stop(); conversation?.close(); clearToy(); }
-      paint(view);
-      const event = bond.observe(id, state?.pet);
+      const event = acceptState(state);
       if (event) conversation?.react(event);
-      // the quiz opens once the frog has hatched (the server checks it again)
-      const was = hatched;
-      hatched = !!(state && state.pet && state.pet.stage && state.pet.stage !== 'egg');
-      if (hatched !== was) refreshFacts(true);
     } catch (_) {
       const cur = session();
       if (disposed || requestGeneration !== generation || !cur || cur.userId !== id) return;
@@ -498,7 +544,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   conversation = mountFrogInteractions({ button, img, slot, getView: () => shownView,
     setPose: p => { desktop?.stop(); cancelMotion(); setAct(p); if (!p) queueMotion(); }, animate: animateExpression, showToy, openRoom: open,
     closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
-    openQuiz: requestQuiz, commands, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
+    openQuiz: requestQuiz, commands, care: taskbarCare, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
     canReact: () => !balloon && !desktop?.active && !document.querySelector('.reward98') && document.activeElement?.tagName !== 'IFRAME', now });
   const unsubscribeSiteEvents = subscribeSiteEvents(event => {
     const current = session();

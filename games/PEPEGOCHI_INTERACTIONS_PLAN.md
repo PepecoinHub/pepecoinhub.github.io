@@ -64,5 +64,11 @@ PR #353 belongs to the full PepeGochi product launch. Ship all implemented compa
 - Commands close the conversation before opening their destination, reuse the existing window functions, and are omitted or fall back to dialogue when a host does not provide a command. Keyboard and touch use the same buttons.
 - Targeted Node/CSP checks: 48 passed. The Chromium companion fixture now covers all four command buttons, but local execution still requires the unavailable Playwright package; browser visual QA remains a release prerequisite.
 
+## Taskbar care shortcuts A17 (draft implementation, 2026-11-19)
+- The conversation panel has compact **Feed / Clean / Play / Rest** buttons. They call the existing `gry_pepegochi_action` RPC with the same four allowlisted action IDs as the room; there is no parallel care model or client-side grant.
+- One action can be in flight at a time. The server remains authoritative for need thresholds, the per-action cooldown, minimum gap, daily limit, rescue/recovery, hatching, growth, move-out and rewards. Rejections are shown in plain language and do not invent a changed state.
+- An accepted full-state response repaints the taskbar frog immediately, updates the existing per-life observation baseline and gives the normal fed/clean/played/rested or growth response without an extra state read. An account/life change invalidates a late response.
+- The four buttons use a 2×2 Win98 grid so the panel stays usable on phones. The browser fixture covers one accepted Feed action and asserts a single call to the existing RPC; no new SQL, endpoint, timer or polling was added. Targeted Node/CSP checks: 67 passed; the full local suite has 344 passes, 28 environment skips and the same 14 unrelated baseline/environment failures.
+
 ## QA
 Validation: `node --test tests/*.test.mjs` (346 passed, 26 environment skips), site/i18n checks and Python tests. `node tests/pepegochi-companion-browser.cjs` runs the actual taskbar controller in Chromium with local fixtures; uses PLAYWRIGHT_MODULE/HAZE_CHROMIUM overrides when needed. Covers keyboard/touch, room opening, memories, care state priority, focus, throttle, mute/reload, account isolation, return greeting, stale quiz answer, 320/390/1440px and teardown. No production service is contacted. Keep beta gate intact; no merge or production deployment without approval.

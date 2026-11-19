@@ -103,7 +103,7 @@ test('Pond Quiz in the browser: questions only from the server, only after hatch
   assert.match(js, /rpc\('gry_quiz_answer', \{ p_choice: i \}\)/);
   assert.match(js, /rpc\('gry_quiz_board', \{\}\)/);
   assert.match(js, /if \(!signedIn\(\) \|\| !hatched\) \{ server = null;/, 'no request before the frog hatched');
-  assert.match(js, /hatched = !!\(state && state\.pet && state\.pet\.stage && state\.pet\.stage !== 'egg'\)/);
+  assert.match(js, /hatched = !!\(state\?\.pet\?\.stage && state\.pet\.stage !== 'egg'\)/);
   assert.match(js, /factBtn\.addEventListener\('click', requestQuiz\)/);
   assert.equal((js.match(/openBalloon\(/g) || []).length, 2, 'the definition and the explicit quiz request');
   assert.match(js, /mountFrogInteractions\(\{/);

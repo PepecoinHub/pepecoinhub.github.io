@@ -124,6 +124,30 @@ test('PondOS wires command buttons to its existing window functions', () => {
   assert.match(shell, /commands:\s*\{\s*games:\s*gamesFolder,\s*passport:\s*frenPassport,\s*news:\s*bulletinApp,\s*tv:\s*pondTV\s*\}/);
 });
 
+test('care buttons use one shared async handler, keep the panel open and report the result', async () => {
+  const calls = [], reactions = { feed: 'fed', clean: 'clean', play: 'played', rest: 'rested' };
+  const h = harness(adult, { care: async kind => { calls.push(kind); return { ok: true, action: reactions[kind] }; } });
+  h.button.emit('click', { detail: 0 });
+  const care = h.doc.body.children[0].querySelector('.pg-care-actions');
+  assert.deepEqual(care.children.map(b => b.textContent), ['Feed', 'Clean', 'Play', 'Rest']);
+  for (const button of care.children) {
+    button.emit('click');
+    assert.ok(care.children.every(b => b.disabled));
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.ok(care.children.every(b => !b.disabled));
+    assert.equal(h.doc.body.children.length, 1);
+  }
+  assert.deepEqual(calls, ['feed', 'clean', 'play', 'rest']);
+  assert.match(h.doc.body.children[0].querySelector('.pg-fact-q').textContent, /recharge/);
+  h.controller.dispose();
+});
+
+test('the taskbar care bridge calls only the existing server-owned action RPC', () => {
+  const taskbar = readFileSync(new URL('../docs/meme/pepegochi-taskbar.mjs', import.meta.url), 'utf8');
+  assert.match(taskbar, /rpc\('gry_pepegochi_action', \{ p_action: kind \}\)/);
+  assert.doesNotMatch(taskbar, /gry_pepegochi_(feed|clean|play|rest)/);
+});
+
 test('initiated contact is sparse, muted/blocked/young-safe, and never opens a dialog', () => {
   let invitations = 0, muted = false, allowed = true;
   const bond = { get muted() { return muted; }, invite: () => ++invitations === 1, remember() {}, favourite: 'ball' };

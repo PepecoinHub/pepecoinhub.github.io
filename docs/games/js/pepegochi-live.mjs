@@ -196,6 +196,12 @@ $('pgb-body').addEventListener('submit', e => {
 // the needs move on by themselves: redraw every minute, and read the server again after a long break
 setInterval(() => { if (game.last && !game.busy) render(); }, 6e4);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && game.stale && !game.busy) run(game.refresh()); });
+// A care action can also start from the taskbar conversation. The parent sends no pet data; this authenticated
+// iframe re-reads its own full state once so an already-open room never shows stale needs or growth.
+window.addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== window.parent || event.data?.type !== 'pondos:pepegochi-refresh') return;
+  if (backend && !game.busy) run(game.refresh());
+});
 
 (async () => {
   render();

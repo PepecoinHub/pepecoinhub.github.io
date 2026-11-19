@@ -76,9 +76,10 @@ export function companionReply(view, action = 'hello', n = 0, context = {}) {
 }
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
-// No polling or network calls. Optional bond stores cosmetic memories only.
-export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, commands = {}, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, now = () => Date.now() }) {
+// No polling. Optional care delegates to the host's existing validated server action; bond memories stay cosmetic.
+export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, commands = {}, care, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, now = () => Date.now() }) {
   let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
+  let careTicket = 0;
   let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
   let lastActivity = now(), bornAt = now();
   const doc = button.ownerDocument;
@@ -126,6 +127,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     panel.style.overflowY = 'auto';
   }
   function close({ focus = false, reset = false } = {}) {
+    careTicket++;
     cancelClick(); clearNotice();
     if (reset) { lastReaction = lastPet = -Infinity; pats = []; bornAt = now(); }
     if (reset) { recent = []; sequence = 0; gesture = null; suppressClick = false; }
@@ -177,7 +179,31 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
       reply = el('p', 'pg-fact-q');
       reply.setAttribute('aria-live', 'polite');
       const actions = el('div', 'pg-fact-answers');
-      function add(label, fn) { const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', fn); actions.append(b); }
+      function add(label, fn, parent = actions) { const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', fn); parent.append(b); return b; }
+      if (typeof care === 'function') {
+        const careBox = el('div', 'pg-care-actions');
+        const careButtons = [];
+        const requestCare = async (kind, label) => {
+          const ticket = ++careTicket;
+          careButtons.forEach(b => { b.disabled = true; });
+          reply.textContent = `${label}…`;
+          setPose('tb_adult_think');
+          let result;
+          try { result = await care(kind); }
+          catch (_) { result = { ok: false, text: 'Care could not be saved. Try again in a moment.' }; }
+          if (ticket !== careTicket || !panel) return;
+          careButtons.forEach(b => { b.disabled = false; });
+          if (result?.openRoom) { visit(); return; }
+          const response = result?.action ? companionReply(getView(), result.action, sequence++, bond || {}) : null;
+          reply.textContent = result?.text || response?.text || 'Care could not be saved. Try again in a moment.';
+          setPose(response?.pose || null);
+          if (result?.ok && result.action) animate(result.action);
+          reposition();
+        };
+        for (const [kind, label] of [['feed', 'Feed'], ['clean', 'Clean'], ['play', 'Play'], ['rest', 'Rest']])
+          careButtons.push(add(label, () => requestCare(kind, label), careBox));
+        actions.append(careBox);
+      }
       add('Our memories', () => say('memories'));
       if (bond) {
         add('Your favourite toy?', () => say('favourite'));
