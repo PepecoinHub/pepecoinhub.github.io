@@ -5963,6 +5963,9 @@
     }
     function paint() {
       var m = minuteNow(), v = skyAt(m);
+      var statusBar = document.querySelector('meta[name="theme-color"]');
+      var statusColor = v[2] >= 0.5 ? '#263451' : '#526e99';
+      if (statusBar && statusBar.content !== statusColor) statusBar.content = statusColor;
       // Still: only the plain picture under the sky, day or night by the clock; no layers load, nothing moves
       box.hidden = mode === 'still' && demo === null;
       if (box.hidden) {
