@@ -11,8 +11,9 @@
     ['everyone', 'Announcements from Byl (@everyone)', 'At most one an hour.'],
     ['gazette', 'A new issue of The Pond Gazette', 'About once a week.'],
     ['challenge_mine', 'My challenges', 'Someone took your Three Lilies challenge; you lost or kept the Pond King crown.'],
+    ['tip', 'PEP tips I receive', 'Only after the payment is confirmed. No amount is shown on the lock screen.'],
     ['challenge_new', 'New challenges on the board', 'Someone threw down a Three Lilies challenge. At most one every 30 minutes.']];
-  var DEF = { mention: true, everyone: true, gazette: true, challenge_mine: true, challenge_new: false };
+  var DEF = { mention: true, everyone: true, gazette: true, challenge_mine: true, challenge_new: false, tip: true };
 
   function local(v) {
     try { if (v === undefined) return JSON.parse(localStorage.getItem(LS) || 'null'); if (v === null) localStorage.removeItem(LS); else localStorage.setItem(LS, JSON.stringify(v)); } catch (e) {}
