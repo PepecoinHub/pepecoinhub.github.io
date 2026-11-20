@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="../../../docs/games/">
+<title>PepeGochi — room art review</title>
+<link rel="stylesheet" href="pepegochi.css">
+<style>
+  body{margin:0;padding:12px;background:#294e43;color:#202420;font:14px Tahoma,sans-serif}
+  main{max-width:1324px;margin:auto;background:#c0c0c0;padding:10px;border:3px outset #ddd}
+  h1{font-size:16px;margin:0 0 12px;padding:8px;color:white;background:#24582f}
+  .rooms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  h2{font-size:14px;margin:8px 0;text-align:center}
+  button{padding:8px 12px;background:#c0c0c0;border:2px outset #eee;color:#111;cursor:pointer}
+  button[aria-pressed=true]{background:#e4e4e4;border-style:inset}
+  p{line-height:1.5;margin-bottom:0}
+  .pgr-pet{animation:none!important}
+  @media(max-width:780px){.rooms{grid-template-columns:1fr}}
+</style>
+<main>
+<h1>PEPEGOCHI.EXE — room art review</h1>
+<div id="stages" aria-label="Life stage">
+  <button data-stage="egg">Egg</button><button data-stage="tadpole">Tadpole</button><button data-stage="froglet" aria-pressed="true">Froglet</button><button data-stage="adult">Adult</button>
+</div>
+<div class="rooms"><section><h2>Original room</h2><div id="old"></div></section><section><h2>Refined room and duckling</h2><div id="new"></div></section></div>
+<p>Both rooms use the actual game renderer, identical slots, unchanged original Golden Foot painting and starter props. Review only: no live assets or game logic changed.</p>
+</main>
+<script type="module">
+import {renderRoom} from './js/pepegochi-room.mjs';
+const resolve = name => new URL(name, window.location.href).href;
+function draw(stage){
+  const original=renderRoom(document,{stage});
+  const revised=renderRoom(document,{stage});
+  revised.querySelector('.pgr-bg').src=resolve('room/room_pond_den_v1.png');
+  revised.querySelector('[data-item="rubber_duck"]').src=resolve('room/rubber_duck.png');
+  const pet=revised.querySelector('.pgr-pet');
+  pet.src=resolve('frames/pepegochi_'+stage+'_idle.png');
+  document.querySelector('#old').replaceChildren(original);
+  document.querySelector('#new').replaceChildren(revised);
+  document.querySelectorAll('[data-stage]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.stage===stage)));
+}
+document.querySelector('#stages').addEventListener('click',e=>{const b=e.target.closest('[data-stage]');if(b)draw(b.dataset.stage)});
+draw('froglet');
+</script>
+</html>

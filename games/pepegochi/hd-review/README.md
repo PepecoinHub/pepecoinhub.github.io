@@ -35,3 +35,13 @@ The owner approved the intermediate art direction: finer pixel art with slightly
 | Integration / browser QA | Pending owner visual approval; the old 128px/2×2 QA must be adapted for 256px room art without changing the taskbar format |
 
 No replacement of active files until the complete pack can be checked for a consistent visual transition between idle, need/status and care states. Do not merge or deploy without the owner's explicit approval.
+
+## Room and duckling refresh
+
+The owner asked for a modest room/bed refinement and a duck inspired by the supplied photo of a yellow duckling with a fluffy crest. Generated using the same built-in image generation workflow, with the existing room as the edit target and the photo, original duck sprite and approved froglet as references. The room prompt locks all furniture, window and rug coordinates; improves padded blue bed, cream cushion, folded blanket, wood grain, night lighting and wallpaper definition. The duck prompt specifies a compact yellow plush-like duckling, spiky tuft, tilted head, orange bill and webbed feet, fine angular pixel art, transparent background.
+
+- `room/room_pond_den_v1.png`: 640×400 opaque background, optimized indexed PNG; same aspect ratio and logical geometry.
+- `room/rubber_duck.png`: 256×256 RGBA, visible bounding box 117×184 at (68,36); bottom y=220 preserves the former 110/128 logical foot line. Existing item ID, slot, size and interaction are unchanged.
+- `room-preview.html`: original game renderer, two rooms, all four stage selectors; only proposed background, duck and frog image sources replaced in the review. Original Golden Foot painting (`p_poster.png`) and all other starter props are retained without changes.
+- `room/preview.png`: static composition with the original roomScene coordinates and the proposed images; visual review at double logical size. The browser runtime could not launch in the current environment, so this is geometry-based composition, not a browser screenshot.
+- Existing room static/window/interactions tests: 24 passed. No active assets, game logic or SQL changed.
