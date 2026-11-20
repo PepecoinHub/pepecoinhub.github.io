@@ -2,8 +2,10 @@
 // The frog lives on the server (games/supabase/update_pepegochi_v2.sql), one per Discord account.
 // PondOS opens this page in a window; it also works on its own.
 import { getBackend } from './backend.js?v=20261113link';
-import { LiveGame } from './pepegochi-live-view.mjs?v=20261116room1';
-import { renderRoom, playDeparture, playFrames, frogLook, careFrames, DEPART_FRAMES, HATCH_FRAMES, HATCH_MS, CARE_MS } from './pepegochi-room.mjs?v=20261116room1';
+import { LiveGame } from './pepegochi-live-view.mjs?v=20261120notes3';
+import { renderRoom, playDeparture, playFrames, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261120notes3';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261120notes3';
+import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261120notes3';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {
@@ -25,7 +27,26 @@ function meter(n) {
   return row;
 }
 
+// The frog's notes on the table (clues and other important messages), kept in this browser per account and life.
+let notesOpen = false;
+const myNotes = () => {
+  const pet = game.last?.pet, user = backend?.session?.()?.user;
+  if (!pet || pet.status === 'departed' || !user || user.is_anonymous) return [];
+  return notesFor(user.id, pet.life_id);
+};
+function renderNotes(box) {
+  const notes = myNotes();
+  if (!notesOpen || !notes.length) { notesOpen = false; return; }
+  const pad = el('div', { class: 'pgb-notepad pgb-notes', role: 'document', 'aria-label': 'NOTES.TXT', id: 'pgb-notes', tabindex: '-1' });
+  const ol = el('ol');
+  notes.forEach(n => { const li = el('li', {}, n.text); li.append(el('small', {}, `Good care day ${n.day}`)); ol.append(li); });
+  pad.append(el('div', { class: 'pgb-notepad-bar' }, 'NOTES.TXT - notes from your Fren'), ol,
+    el('button', { type: 'button', class: 'btn', 'data-close-notes': '1' }, 'Close'));
+  box.append(pad);
+}
+
 function renderPet(box, p) {
+  renderNotes(box);
   box.append(el('p', { class: 'pgb-status' }, p.statusText));
   for (const w of p.warnings) box.append(el('p', { class: 'pgb-warn' }, w));
   if (p.recovery) box.append(el('p', { class: 'pgb-warn pgb-recovery' }, p.recovery));
@@ -34,8 +55,9 @@ function renderPet(box, p) {
   box.append(needs);
   const acts = el('div', { class: 'pgb-row pgb-actions' });
   for (const a of p.actions) {
-    acts.append(el('button', { type: 'button', class: 'btn', 'data-act': a.kind, disabled: !a.enabled || game.busy, title: a.reason || a.label },
-      a.label + (a.reason ? ` (${a.reason})` : '')));
+    const b = el('button', { type: 'button', class: 'btn', 'data-act': a.kind, disabled: !a.enabled || game.busy, title: a.reason || a.label });
+    b.append(el('span', { class: 'pgb-action-label' }, a.label), el('span', { class: 'pgb-action-detail' }, a.reason || (game.busy ? 'Please wait…' : 'Ready')));
+    acts.append(b);
   }
   box.append(acts);
   const g = p.goodDays;
@@ -82,7 +104,12 @@ function renderDeparted(box, v) {
 
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const petImg = () => document.querySelector('#pgb-scene .pgr-pet');
-let shown = null, stopAnim = null, preloaded = false, sceneKey = '', careDone = null;
+const roomInteractions = createRoomInteractions({ getView: () => game.view(), isBusy: () => game.busy,
+  care: runCare, reduced: reduceMotion, openTV: () => {
+    if (window.parent !== window) window.parent.postMessage({ type: 'pondos:pepegochi-room-tv' }, location.origin);
+  } });
+let shown = null, stopAnim = null, sceneKey = '', careDone = null;
+const preloaded = new Set();
 // The scene is built again only when what it shows changes (mode, stage, status, sprite, room, letter), not on the
 // minute redraw: a new <img> would restart the idle bob and cut a hatching or care animation short.
 function renderScene(v) {
@@ -91,12 +118,13 @@ function renderScene(v) {
   let opts;
   if (v.mode === 'pet') {
     title.textContent = v.pet.title;
-    opts = { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs, ...at };
+    opts = { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs, notes: myNotes().length, ...at };
   } else if (v.mode === 'departed') {
     title.textContent = `${v.departed.name} · moved out`;
     opts = { mode: 'departed', letterSeen: v.departed.letterSeen, taken: v.departed.taken, ...at };
   } else { title.textContent = 'Your room'; opts = { mode: 'adopt' }; }
-  const key = JSON.stringify([opts.mode, opts.status, opts.stage, opts.letterSeen, placements,
+  const lifeId = v.mode === 'pet' ? game.last?.pet?.life_id : null;
+  const key = JSON.stringify([opts.mode, opts.status, opts.stage, opts.letterSeen, opts.taken, opts.notes, placements, lifeId,
     v.mode === 'pet' ? frogLook(opts).sprite : null]);
   const care = careDone; careDone = null;
   if (key !== sceneKey || !scene.firstChild) {
@@ -104,12 +132,14 @@ function renderScene(v) {
     sceneKey = key;
     const room = renderRoom(document, opts);
     scene.replaceChildren(room);
-    if (v.mode === 'pet' && !preloaded) { preloaded = true; DEPART_FRAMES.forEach(src => { const i = new Image(); i.src = src; }); }
+    roomInteractions.attach(room, opts, { owned: placements !== null, lifeId, embedded: window.parent !== window });
+    const stage = v.mode === 'pet' ? v.pet.stage : v.mode === 'adopt' ? 'egg' : null;
+    if (stage && !preloaded.has(stage)) { preloaded.add(stage); animationFramesForStage(stage).forEach(src => { const i = new Image(); i.src = versionSprite(src); }); }
     if (v.mode === 'departed' && shown && shown.mode === 'pet' && !reduceMotion()) stopAnim = playDeparture(room, shown.stage);
     // the egg hatches: the cracking frames, then the tadpole
     if (v.mode === 'pet' && v.pet.stage === 'tadpole' && shown && shown.stage === 'egg' && !reduceMotion()) stopAnim = playFrames(petImg(), HATCH_FRAMES, HATCH_MS);
   }
-  // an accepted care action: its short animation, when the art for that stage exists (none yet: nothing plays)
+  // An accepted care action plays its stage-specific animation.
   if (care && v.mode === 'pet' && !(shown && shown.stage === 'egg') && !reduceMotion()) {
     const frames = careFrames(v.pet.stage, care);
     if (frames.length) { if (stopAnim) stopAnim(); stopAnim = playFrames(petImg(), frames, CARE_MS); }
@@ -166,13 +196,27 @@ async function openLetter() {
   if (pad) { pad.scrollIntoView({ block: 'start' }); pad.focus({ preventScroll: true }); }
 }
 
-$('pgb-scene').addEventListener('click', e => { if (e.target.closest('[data-letter]')) openLetter(); });
+function runCare(kind) {
+  const v = game.view();
+  if (game.busy || v.mode !== 'pet' || !v.pet.actions.some(a => a.kind === kind && a.enabled)) return;
+  return run(game.act(kind).then(r => { if (r.ok && r.value.action_result === 'accepted') careDone = kind; return r; }));
+}
+
+function openNotes() {
+  notesOpen = true; render();
+  const pad = $('pgb-notes');
+  if (pad) { pad.scrollIntoView({ block: 'start' }); pad.focus({ preventScroll: true }); }
+}
+$('pgb-scene').addEventListener('click', e => { if (e.target.closest('[data-letter]')) openLetter(); else if (e.target.closest('[data-notes]')) openNotes(); });
+// a new note written by the frog on the taskbar (another document of this site) shows up on the table at once
+window.addEventListener('storage', e => { if (e.key && e.key.startsWith('pepegochi:notes:') && game.last && !game.busy) render(); });
 $('pgb-body').addEventListener('click', e => {
   const t = e.target.closest('button');
   if (!t || game.busy) return;
-  if (t.dataset.act) { const kind = t.dataset.act; run(game.act(kind).then(r => { if (r.ok && r.value.action_result === 'accepted') careDone = kind; return r; })); }
+  if (t.dataset.act) runCare(t.dataset.act);
   else if (t.dataset.letter) openLetter();
   else if (t.dataset.closeLetter) { game.closeLetter(); render(); }
+  else if (t.dataset.closeNotes) { notesOpen = false; render(); }
   else if (t.dataset.signin) backend.discord().catch(err => { game.message = err.message; render(); });
 });
 $('pgb-body').addEventListener('submit', e => {
@@ -183,6 +227,12 @@ $('pgb-body').addEventListener('submit', e => {
 // the needs move on by themselves: redraw every minute, and read the server again after a long break
 setInterval(() => { if (game.last && !game.busy) render(); }, 6e4);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && game.stale && !game.busy) run(game.refresh()); });
+// A care action can also start from the taskbar conversation. The parent sends no pet data; this authenticated
+// iframe re-reads its own full state once so an already-open room never shows stale needs or growth.
+window.addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== window.parent || event.data?.type !== 'pondos:pepegochi-refresh') return;
+  if (backend && !game.busy) run(game.refresh());
+});
 
 (async () => {
   render();

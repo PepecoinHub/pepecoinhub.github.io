@@ -9,6 +9,8 @@ const html = `<!doctype html><html class="pondos sky-night"><meta charset="utf-8
 import { mountTaskbarFrog } from '/meme/pepegochi-taskbar.mjs';
 window.t = { time: Date.now(), owner: 'owner-a', calls: [], pet: { life_id:'frog-a', name:'Pickle', stage:'adult', status:'healthy', care_days:12, needs:{hunger:90,hygiene:90,mood:90,energy:90} } };
 t.refresh = () => window.dispatchEvent(new Event('pondos:auth-changed'));
+// today's "not yet" roll is already used: the secret talk has its own tests (pepegochi-notes); these scenarios cover the rest
+for (const o of ['owner-a','owner-b','owner-c']) { const k='pepegochi:notes:v1:'+o+':frog-a'; if (!localStorage.getItem(k)) localStorage.setItem(k, JSON.stringify({ teaseDay: Math.floor(t.time/86400000) })); }
 t.app = id => { document.querySelector('.fixture-app')?.remove(); const host=document.createElement('div');host.className='app-win fixture-app';host.innerHTML='<button type="button">Close</button>';host.querySelector('button').onclick=()=>host.remove();document.body.append(host);window.dispatchEvent(new CustomEvent('pondos:app-opened',{detail:{id,host}}));return host; };
 t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>{},session:()=>({discord:true,userId:t.owner}),now:()=>t.time,rpc:async name=>{t.calls.push(name);return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:null;}});
 </script></html>`;
@@ -28,11 +30,12 @@ let browser;
  const frog=page.locator('.pg-companion-button'), glow=page.locator('.pg-desktop-firefly'), away=page.locator('.pg-desktop-away'), reaction=page.locator('.pg-companion-reaction');
  await page.mouse.click(163,463);await glow.waitFor();assert.equal(await away.count(),1);
  assert.equal(await page.locator('.sky-fly.pg-fly-borrowed').count(),1);
+ if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await page.screenshot({path:require('node:path').join(process.env.PEPEGOCHI_QA_SCREENSHOTS,'desktop-firefly.png')});
  await glow.waitFor({state:'detached'});await reaction.waitFor();assert.match(await reaction.textContent(),/tiny lamp|screensaver/);
  assert.equal(await away.count(),0);assert.equal(await page.locator('.sky-fly.pg-fly-borrowed').count(),0);
  // Keyboard menu offers the same real-night action, without making the wallpaper focusable.
  await page.evaluate(()=>t.time+=46000);await frog.focus();await page.keyboard.press('Enter');
- await page.getByRole('button',{name:'Catch a firefly'}).click();await glow.waitFor();
+ await page.locator('.pg-menu-play').click();await page.getByRole('button',{name:'Catch a firefly'}).click();await glow.waitFor();
  await page.keyboard.press('Escape');await glow.waitFor({state:'detached'});assert.equal(await away.count(),0);
  // Perch is nonblocking and returns immediately on input, a moved window or a changed pet state.
  await page.evaluate(()=>{t.time+=46000;t.app('games')});await away.waitFor();
@@ -43,13 +46,15 @@ let browser;
  await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('hungry'));
  await page.evaluate(()=>{t.pet.needs.hunger=90;t.time+=46000;t.refresh()});await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('sit'));
  await page.mouse.click(800,80);await page.evaluate(()=>{t.time+=46000;t.app('tv')});await page.locator('.pg-desktop-popcorn').waitFor();
+ if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await page.screenshot({path:require('node:path').join(process.env.PEPEGOCHI_QA_SCREENSHOTS,'desktop-tv.png')});
  await page.getByRole('button',{name:'Close',exact:true}).click();await page.locator('.pg-desktop-popcorn').waitFor({state:'detached'});
- // Day/still, muted, reduced motion, small screen and game focus do not create desktop effects.
+ // Day/still, muted automatic reactions, reduced motion, small screen and game focus.
  await page.evaluate(()=>{t.time+=46000;document.documentElement.classList.replace('sky-night','sky-day')});await page.mouse.click(163,463);assert.equal(await glow.count(),0);
  await page.evaluate(()=>{document.documentElement.classList.replace('sky-day','sky-night');document.querySelector('.sky').hidden=true});await page.mouse.click(163,463);assert.equal(await glow.count(),0);
- await page.evaluate(()=>document.querySelector('.sky').hidden=false);await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Reactions: on'}).click();await page.keyboard.press('Escape');
- await page.mouse.click(163,463);assert.equal(await glow.count(),0);
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Reactions: quiet'}).click();await page.keyboard.press('Escape');
+ await page.evaluate(()=>document.querySelector('.sky').hidden=false);await frog.focus();await page.keyboard.press('Enter');await page.locator('.pg-menu-more').click();await page.getByRole('button',{name:'Reactions: on'}).click();await page.keyboard.press('Escape');
+ await page.evaluate(()=>{t.time+=46000;t.app('games')});assert.equal(await away.count(),0);
+ await page.mouse.click(163,463);await glow.waitFor();await page.keyboard.press('Escape');await glow.waitFor({state:'detached'});
+ await frog.focus();await page.keyboard.press('Enter');await page.locator('.pg-menu-more').click();await page.getByRole('button',{name:'Reactions: quiet'}).click();await page.keyboard.press('Escape');
  await page.emulateMedia({reducedMotion:'reduce'});await page.mouse.click(163,463);assert.equal(await glow.count(),0);
  await page.emulateMedia({reducedMotion:'no-preference'});await page.setViewportSize({width:390,height:600});await page.evaluate(()=>{t.time+=46000;t.app('games')});assert.equal(await away.count(),0);
  await page.mouse.click(300,80);await page.evaluate(()=>{t.time+=46000;const game=document.createElement('iframe');game.className='fixture-game';document.body.append(game);game.focus();t.app('find')});assert.equal(await away.count(),0);

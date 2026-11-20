@@ -5,14 +5,10 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 import { decodePng, bbox, checkImage, checkFile, compareWith, formatFor, FORMATS } from '../scripts/pepegochi_art_qa.mjs';
-import { SPRITES, spriteSrc, DEPART_FRAMES, DEPART_DX, HATCH_FRAMES, CARE, careFrames, WALK, IMG, ITEMS, SUITCASE, LETTER } from '../docs/games/js/pepegochi-room.mjs';
+import { SPRITES, SPRITE_BOUNDS, PROP_BOUNDS, ROOM_LAMP, spriteSrc, propSrc, DEPART_FRAMES, DEPART_DX, HATCH_FRAMES, CARE, careFrames, WALK, IMG, HD_IMG, ITEMS, SUITCASE, LETTER, BACKGROUND } from '../docs/games/js/pepegochi-room.mjs';
 
 const path = src => new URL('../docs/games/' + src, import.meta.url);
 const png = src => decodePng(readFileSync(path(src)));
-
-// the accepted master sprites (owner, 2026-11-09): kept as they are although they are not on the 2 x 2 grid
-// (audit 2026-11-13). Everything else, and everything new, must pass the full check.
-const LEGACY = new Set(['adult_idle', 'adult_moody', 'adult_tired', 'adult_neglected', 'adult_packing', 'egg_idle', 'tadpole_idle']);
 
 // a tiny RGBA PNG made here, so the checks are tested on known pixels
 function makePng(w, h, pixel) {
@@ -24,12 +20,13 @@ function makePng(w, h, pixel) {
 }
 
 test('the decoder reads the game PNGs: same boxes as the art manifest', () => {
-  assert.deepEqual(bbox(png(spriteSrc('adult_idle'))), [27, 9, 100, 124]);
-  assert.deepEqual(bbox(png(spriteSrc('egg_idle'))), [31, 42, 96, 124]);
+  assert.deepEqual(bbox(png(IMG + 'pepegochi_adult_idle.png')), [27, 9, 100, 124]);
+  assert.deepEqual(bbox(png(IMG + 'pepegochi_egg_idle.png')), [31, 42, 96, 124]);
   assert.deepEqual(bbox(png(IMG + 'room_clean_base.png')), [0, 0, 640, 400]);
   for (const [id, [top, foot]] of Object.entries(SPRITES)) {
-    const b = bbox(png(spriteSrc(id)));
-    assert.deepEqual([b[1], b[3]], [top, foot], id + ': the top and foot line in SPRITES are the picture\'s own');
+    const b = bbox(png(spriteSrc(id)),77).map(v=>v/2);
+    assert.deepEqual(b, SPRITE_BOUNDS[id], id);
+    assert.deepEqual([b[1], b[3]], [top, foot], id + ': the top and foot line in SPRITES are logical coordinates');
   }
 });
 
@@ -51,10 +48,38 @@ test('the checks: a good sprite passes, every kind of mistake is named', () => {
   const tb = decodePng(makePng(48, 48, (x, y) => (x >= 15 && x < 33 && y >= 7 && y < 47 ? opaque : none)));
   assert.equal(checkImage(tb, { format: 'B' }).ok, true);
   assert.equal(formatFor('docs/games/img/pepegochi/taskbar/tb_adult_sit.png'), 'B');
-  assert.equal(formatFor('pepegochi_adult_hungry.png'), 'A');
+  assert.equal(formatFor('pepegochi_adult_hungry.png'), 'FINE');
+  assert.equal(formatFor('pepegochi_froglet_idle.png'), 'FINE');
+  assert.equal(formatFor('pepegochi_tadpole_hungry.png'), 'FINE');
+  assert.equal(formatFor('pepegochi_tadpole_idle.png'), 'A');
+  assert.equal(formatFor('pepegochi_adult_idle.png'), 'A');
+  assert.equal(formatFor('lava_lamp.png'), 'A');
+  assert.equal(formatFor('care_froglet_feed_01.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_feed_04.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_clean_01.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_clean_03.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_play_01.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_play_03.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_rest_04.png'), 'FINE');
+  assert.equal(formatFor('care_tadpole_play_01.png'), 'FINE');
+  assert.equal(formatFor('care_clean_04.png'), 'FINE');
+  assert.equal(formatFor('care_tadpole_rest_03.png'), 'FINE');
+  assert.equal(formatFor('froglet_depart_walk_02.png'), 'FINE');
+  assert.equal(formatFor('tadpole_depart_01.png'), 'FINE');
+  assert.deepEqual(FORMATS.FINE, { size: 128, grid: 1, maxColours: 4096, foot: 124 });
+  // A single-pixel colour is valid for fine pixel art only, not for the original coarse profile.
+  const fine = decodePng(makePng(128, 128, (x, y) => (x === 41 && y === 21 ? [200, 0, 0, 255] : frog(x, y))));
+  assert.equal(checkImage(fine, { format: 'FINE' }).ok, true);
+  assert.equal(checkImage(fine, { format: 'A' }).ok, false);
   // a tb_ file is format B even when the command line passes format: undefined
   assert.equal(checkFile(new URL('../games/pepegochi/a2-review/candidates/tb_egg.png', import.meta.url).pathname, { format: undefined }).ok, true);
   assert.deepEqual(FORMATS.B, { size: 48, grid: 1, maxColours: 32, foot: 47 });
+  assert.equal(formatFor('docs/games/img/pepegochi/hd/pepegochi_adult_idle.png'), 'HD');
+  assert.equal(formatFor('docs/games/img/pepegochi/hd/crt_tv.png'), 'HD');
+  assert.equal(formatFor('docs/games/img/pepegochi/taskbar/tb_adult_sit.png'), 'B');
+  const hd = decodePng(makePng(256,256,(x,y)=>x>=60&&x<190&&y>=18&&y<248?[20,100,30,253]:none));
+  assert.equal(checkImage(hd,{format:'HD'}).ok,true);
+  assert.match(why(decodePng(makePng(256,256,()=>[20,100,30,128])),{format:'HD'}), /transparent background|alpha fringe/);
   // a replacement stands where the old picture stood
   assert.equal(compareWith([26, 8, 100, 124], [27, 9, 100, 124]).ok, true);
   assert.match(compareWith([40, 8, 114, 124], [26, 8, 100, 124]).problems.join(), /centre moved right by 14/);
@@ -62,15 +87,18 @@ test('the checks: a good sprite passes, every kind of mistake is named', () => {
   assert.match(compareWith([26, 8, 100, 120], [26, 8, 100, 124]).problems.join(), /stands on y = 120/);
 });
 
-test('every frog sprite the game draws: the full check, except the accepted masters (size and feet only)', () => {
+test('every approved HD frog and room prop pass QA; classic letter, suitcase and painting remain unchanged', () => {
   for (const id of Object.keys(SPRITES)) {
     const r = checkFile(path(spriteSrc(id)).pathname);
-    if (LEGACY.has(id)) {
-      assert.ok(!r.problems.some(p => /size|feet|half-transparent|empty/.test(p)), id + ': ' + r.problems.join(' | '));
-    } else assert.deepEqual(r.problems, [], id);
+    assert.deepEqual(r.problems, [], id);
   }
-  for (const f of [SUITCASE.src, LETTER.envelope, LETTER.open, ...Object.keys(ITEMS).map(i => IMG + i + '.png')])
+  for (const f of [SUITCASE.src, LETTER.envelope, LETTER.open, ...Object.keys(ITEMS).map(propSrc)])
     assert.deepEqual(checkFile(path(f).pathname, { prop: true }).problems, [], f);
+  assert.deepEqual(checkFile(path(ROOM_LAMP.src.split('?')[0]).pathname,{prop:true}).problems,[]);
+  assert.equal(propSrc('p_poster'), IMG+'p_poster.png');
+  for (const id of Object.keys(ITEMS)) {
+    assert.deepEqual(bbox(png(propSrc(id)),77).map(v=>id==='p_poster'?v:v/2), PROP_BOUNDS[id], id);
+  }
 });
 
 test('moving-out frames: on the grid and the feet line; DEPART_DX is where each frame draws the body', () => {
@@ -83,14 +111,24 @@ test('moving-out frames: on the grid and the feet line; DEPART_DX is where each 
 
 test('frames that a later art pack adds are real files that pass the check', () => {
   const files = [...HATCH_FRAMES, ...Object.keys(CARE).flatMap(k => careFrames(...k.split('_')))];
-  for (const w of Object.values(WALK)) files.push(...[...w.turn, ...w.walk].map(f => IMG + f));
+  for (const w of Object.values(WALK)) files.push(...[...w.turn, ...w.walk].map(f => HD_IMG + f));
   for (const f of files) {
     assert.ok(existsSync(path(f)), f);
-    // walk frames 02 and 04 bounce 2 px up on purpose: their feet line is checked separately
-    const moves = /depart|walk|play_03/.test(f);   // walk bounce and the play jump leave the floor on purpose
-    const r = checkFile(path(f).pathname, { allowEdge: moves || /care_/.test(f), prop: moves });
+    const r = checkFile(path(f).pathname);
     assert.deepEqual(r.problems, [], f);
-    if (/depart|walk/.test(f)) assert.ok([122, 124].includes(r.bbox[3]), f + ': on the floor or 2 px above it');
-    if (/play_03/.test(f)) assert.ok(r.bbox[3] >= 118 && r.bbox[3] < 124, f + ': a small jump');
+    assert.equal(r.bbox[3],248,f+': logical floor is unchanged');
+  }
+});
+
+test('the runtime uses the approved HD artwork, with no accidental legacy fallback',()=>{
+  const frames = new Set([...Object.keys(SPRITES).map(spriteSrc),...DEPART_FRAMES,...Object.keys(CARE).flatMap(k=>careFrames(...k.split('_')))]);
+  assert.equal(frames.size,91);
+  for(const src of frames) {
+    assert.ok(src.startsWith(HD_IMG));
+    assert.ok(existsSync(path(src)),src);
+  }
+  for(const src of [BACKGROUND,...Object.keys(ITEMS).filter(i=>i!=='p_poster').map(propSrc)]) {
+    assert.ok(src.startsWith(HD_IMG));
+    assert.ok(existsSync(path(src)),src);
   }
 });
