@@ -5064,6 +5064,18 @@
   function adPx(name, cls) { return '<img class="ad-px' + (cls ? ' ' + cls : '') + '" src="../games/img/pond/' + name + '.png" alt="">'; }
   function adLilies() { return '<span class="ad-lilies" aria-hidden="true">' + ['a', 'b', 'c'].map(function (k) { return '<span>' + adPx('lily-pad-' + k) + '<i>?</i></span>'; }).join('') + '</span>'; }
   var ADS = [
+    // 20 November: Haze tips from the fren card, /tip and /airdrop, airdrops up to 600 minutes. A "professional"
+    // home-shopping channel this time (owner: like the Polish TV-shopping channels, but polished): a studio, a host,
+    // a product demo, a before/after, the set and the price. Every feature claim is true; the offer is not real.
+    { file: 'haze_direct.mpg', added: '2026-11-20', look: 'direct', ms: 5200, title: 'PEP-TV Direct: Haze tips & airdrops', ch: 'CH 24 · PEP-TV DIRECT · HOME SHOPPING', icon: 'gif-085-still', scenes: [
+      '<div class="ad-row">' + adFren('clothing_suit', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none') + '<div><p class="ad-kick">Good evening and welcome to PEP-TV Direct</p><h3 class="ad-big">Say thank you<br><em>in PEP.</em></h3><p class="ad-sub">Tonight in the studio: native Pepecoin tips and airdrops, right inside the LAN Party chat. Powered by Haze Wallet.</p></div></div><p class="ad-lower"><b>ON AIR</b><span>Product no. 2411 · Haze tips &amp; airdrops · LAN Party edition</span></p>',
+      '<p class="ad-kick">The problem we solved</p><div class="ad-cmp"><div><small>BEFORE</small><b>💚 Tip under every message</b><span>On a phone the buttons and drops filled the chat.</span></div><div class="is-after"><small>AFTER</small><b>Tap a name → 💚 Tip</b><span>The button lives on the fren card. Drops sit under the message box, one at a time.</span></div></div><p class="ad-lower"><b>DEMO</b><span>Requested by frens in the chat · built the same week</span></p>',
+      '<p class="ad-kick">Demonstration no. 1 · the direct tip</p><div class="ad-term"><span>/tip Lemon 500 pepe</span></div><h3 class="ad-big">Type it.<br><em>Approve it.</em></h3><p class="ad-sub">The tip review opens. You check the amount and the network fee in Haze Wallet and approve. The PEP goes from your wallet to theirs: PepecoinHub holds no balance and asks for no deposit.</p>',
+      '<p class="ad-kick">Demonstration no. 2 · the airdrop</p><div class="ad-term"><span>/airdrop 500 pepe 600m</span></div><h3 class="ad-big">Up to<br><em>600 minutes.</em></h3><p class="ad-sub">Linked frens press Join airdrop while the clock runs. When it ends, you review the payout in Haze: the pot is split evenly, up to 200 frens in one transaction. Entry is free.</p><p class="ad-lower"><b>NEW</b><span>15 · 30 · 60 · 180 · 360 · 600 minutes in the Group tips window</span></p>',
+      '<p class="ad-kick">Your set includes</p><ul class="ad-set"><li><b>💚</b>Tip from the fren card</li><li><b>⌨</b>/tip and /airdrop</li><li><b>⏱</b>Airdrops of 15 min to 10 h</li><li><b>🎉</b>A little party when PEP lands for you</li><li><b>👀</b>Tips visible to everyone in chat</li><li><b>🔐</b>You approve every payment in Haze</li></ul>',
+      adTesti(adFren('clothing_shirt_tie', 'mouth_smile', 'eyes_happy', 'hat_none', 'accessory_none'), 'I start a ten-hour airdrop before work and approve the payout in the evening. My frens just press Join. Very professional.', 'Margaret, 47, community host*') + '<p class="ad-fine">*An illustration. The ten hours are real: the longest airdrop is 600 minutes.</p>',
+      '<div class="ad-price ad-price-pro"><span>Studio price</span><s>4 × 99 PEP</s><b>0 PEP</b><small>+ only the network fee of what you send</small></div><p class="ad-kick">Available right now, in the LAN Party</p>' + adPhone('☎ NO HOTLINE · OPEN THE CHAT') + '<p class="ad-fine">Not a real offer: there is nothing to buy. Tips and airdrops are real native PEP, so send only what you mean to give. Link Haze with Discord to receive. Nobody from the pond will ever ask for your seed phrase.</p><button type="button" class="ad-cta ad-lanbtn">Open the LAN Party →</button>'
+    ] },
     // Gazette #11 poll: Pepe Gold Hook, the honest miner. Shown only once Gold Hook is open (15 YES votes or the beta flag).
     { file: 'gold_hook.mpg', added: '2026-11-19', goldhook: true, look: 'fight', kitsch: false, ms: 4800, title: 'Pepe Gold Hook: a REAL miner simulator', ch: 'CH 6 · THE MINING CHANNEL', icon: 'goldhook', scenes: [
       adBurst('NEW<br>GAME!', 'b-tr') + '<p class="ad-kick">Mining games that play themselves?</p><img class="ad-gh-logo" src="../games/img/gold-hook/ui/pm-logo-goldhook.png" alt="Pepe Gold Hook"><h3 class="ad-big">A <em>REAL</em><br>miner simulator.</h3><p class="ad-sub">No idle clicking. No offline progress. One frog, one hook and a whole lot of dirt.</p>',
@@ -5461,9 +5473,10 @@
       var canMod = false, who = null, whoT = 0;
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
       var hazeTips = null;
-      import(BASE + 'games/js/haze-tips.mjs?v=20261119expiry').then(function (m) {
+      import(BASE + 'games/js/haze-tips.mjs?v=20261120drops').then(function (m) {
         if (!alive) return;
-        hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp,
+                // messageTips: false: 💚 Tip lives on the fren card (click a name), not on every message (Lemon, 2026-11-20)
+        hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp, messageTips: false,
           invoke: function (body) {
             var s = anySession();
             if (!s) return Promise.reject(new Error('Sign in with Discord first.'));
@@ -5570,13 +5583,25 @@
           '<b class="lan-card-n">' + esc(nick) + (isMe ? ' <i>(you)</i>' : '') + ' <span class="hs-ok" title="Verified with Discord">✓</span></b>' +
           '<span class="lan-card-m">Member since <b class="lan-since">…</b></span></div></div>' +
           '<div class="lan-card-act"><button type="button" class="app-btn lan-c-pass">📘 Fren Passport</button>' +
-          (!isMe && verifiedHere() ? '<button type="button" class="app-btn lan-c-at">@ Mention</button>' : '') + '</div>';
+          (!isMe && verifiedHere() ? '<button type="button" class="app-btn lan-c-at">@ Mention</button>' : '') +
+          (!isMe && hazeTips ? '<button type="button" class="app-btn lan-c-tip">💚 Tip</button>' : '') + '</div>' +
+          (!isMe && hazeTips ? '<p class="lan-card-tipnote" hidden></p>' : '');
         A.body.appendChild(card);
         var br = b.getBoundingClientRect(), hr = A.body.getBoundingClientRect();
         card.style.top = Math.max(4, Math.min(br.bottom - hr.top + 4, A.body.clientHeight - card.offsetHeight - 4)) + 'px';
         card.style.left = Math.max(4, Math.min(br.left - hr.left, A.body.clientWidth - card.offsetWidth - 4)) + 'px';
         card.querySelector('.lan-card-x').addEventListener('click', closeCard);
         var pb = card.querySelector('.lan-c-pass'); pb.addEventListener('click', function () { closeCard(); frenPassport(false, { id: u, nick: nick }); });
+        // 💚 Tip: a tip belongs to one chat message on the server, so it goes with this fren's newest message here
+        var tb = card.querySelector('.lan-c-tip');
+        if (tb) {
+          var tip = hazeTips.tipFor(u), tn = card.querySelector('.lan-card-tipnote');
+          var why = { none: nick + ' has no message in the chat right now. Tip them after they write.', unlinked: nick + ' has not linked a receiving wallet yet.', checking: 'Checking ' + nick + '’s receiving wallet…' }[tip.state];
+          tb.disabled = tip.state === 'none' || tip.state === 'unlinked';
+          tb.title = why || 'Send ' + nick + ' native PEP with Haze';
+          if (why && tip.state !== 'checking') { tn.textContent = why; tn.hidden = false; card.style.top = Math.max(4, Math.min(parseFloat(card.style.top) || 4, A.body.clientHeight - card.offsetHeight - 4)) + 'px'; }
+          tb.addEventListener('click', function () { closeCard(); tip.open(); });
+        }
         var ab = card.querySelector('.lan-c-at'); if (ab) ab.addEventListener('click', function () {
           closeCard(); var v = inp.value; inp.value = (v && !/\s$/.test(v) ? v + ' ' : v) + '@' + nick + ' '; inp.focus();
         });

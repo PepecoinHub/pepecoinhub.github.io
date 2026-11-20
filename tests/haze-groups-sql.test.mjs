@@ -14,7 +14,7 @@ test('group SQL: all audiences, exact splits, frozen recipients, timed chat roun
   sql('create database '+db,'postgres');
   try{
     let bootstrap=readFileSync(new URL('../scripts/haze-preview/bootstrap.sql',import.meta.url),'utf8').replace(/create role (\w+) nologin;/g,(_,role)=>`do $$begin create role ${role} nologin;exception when duplicate_object or unique_violation then null;end$$;`);
-    sql(bootstrap);const base=readFileSync(new URL('../games/supabase/update_haze_tips.sql',import.meta.url),'utf8'),groups=readFileSync(new URL('../games/supabase/update_haze_groups.sql',import.meta.url),'utf8');sql(base);sql(groups);sql(base);sql(groups);const visibility=readFileSync(new URL('../games/supabase/update_haze_group_visibility.sql',import.meta.url),'utf8');sql(visibility);sql(visibility);
+    sql(bootstrap);const base=readFileSync(new URL('../games/supabase/update_haze_tips.sql',import.meta.url),'utf8'),groups=readFileSync(new URL('../games/supabase/update_haze_groups.sql',import.meta.url),'utf8');sql(base);sql(groups);sql(base);sql(groups);const visibility=readFileSync(new URL('../games/supabase/update_haze_group_visibility.sql',import.meta.url),'utf8');sql(visibility);sql(visibility);const long=readFileSync(new URL('../games/supabase/update_haze_long_airdrops.sql',import.meta.url),'utf8');sql(long);sql(long);
     for(let n=1;n<=8;n++){sql(`insert into auth.users values(${q(uid(n))});insert into games.profiles values(${q(uid(n))},'Fren${n}');`);if(n!==8)sql(`insert into auth.identities values(${q(uid(n))},'discord');`);if(n!==3)sql(`insert into games.haze_links(user_id,address)values(${q(uid(n))},${q(address(n))});`);}
     sql(`update games.haze_settings set enabled=true,beta_only=false;`);assert.throws(()=>rpc(1,'gry_haze_groups'),'Community flag is independent from direct tips');
     sql(`update games.haze_settings set groups_enabled=true;insert into games.lobby_seen values('two',${q(uid(2))},clock_timestamp()),('four',${q(uid(4))},clock_timestamp());insert into games.lobby_mutes values(${q(uid(7))},clock_timestamp()+interval '1 hour');`);
@@ -58,6 +58,18 @@ test('group SQL: all audiences, exact splits, frozen recipients, timed chat roun
     assert.ok(rpc(2,'gry_haze_groups').drops.find(d=>d.id===chosen.id).ended_at,'Recipients receive confirmation time');
     sql(`update games.haze_groups set expires_at=clock_timestamp()-interval '1 hour' where id=${q(all.id)};`);assert.ok(rpc(2,'gry_haze_groups').drops.find(d=>d.id===all.id).ended_at,'Unsigned expiry is terminal');
     assert.equal(sql("select count(*) from games.haze_transactions"),'2');assert.equal(sql("select count(*) from games.passport_badges where badge_id='haze_first_tip'"),'1');assert.equal(sql("select count(*) from realtime.test_rings where event='tip'"),'2');
+    // long airdrops (update_haze_long_airdrops.sql): 10 s to 600 min; trivia and word rounds stay at 300 s
+    assert.throws(()=>create({mode:'airdrop',seconds:36001}));assert.throws(()=>create({mode:'trivia',title:'Long question?',answer:'x',seconds:600,winners:1}));
+    const longDrop=create({mode:'airdrop',seconds:36000,total_atomic:'500000000'});
+    assert.ok(Math.abs(Number(sql(`select extract(epoch from closes_at-created_at) from games.haze_groups where id=${q(longDrop.id)}`))-36000)<2,'600 minutes');
+    rpc(2,'gry_haze_group_join',q(longDrop.id)+'::uuid');sql(`update games.haze_groups set closes_at=clock_timestamp()-interval '1 second',created_at=clock_timestamp()-interval '10 hours' where id=${q(longDrop.id)};`);rpc(1,'gry_haze_groups');
+    assert.equal(sql(`select state||' '||(expires_at>clock_timestamp()+interval '11 hours') from games.haze_groups where id=${q(longDrop.id)}`),'ready true','The host gets 12 hours to review a long airdrop');
+    assert.equal(sql(`select expires_at<clock_timestamp()+interval '31 minutes' from games.haze_groups where id=${q(word.id)}`),'t','Short rounds keep the 30-minute review');
+    assert.equal(rpc(2,'gry_haze_groups').drops.find(d=>d.id===longDrop.id).won,'500000000','A recipient sees their own payout');
+    assert.equal(rpc(4,'gry_haze_groups').drops.find(d=>d.id===longDrop.id).won,null,'Other frens see no payout');
+    // guests: a read-only public feed, no owner IDs, addresses or answers
+    const guestFeed=JSON.parse(as('anon',9,'select public.gry_haze_groups_public()'));assert.ok(guestFeed.drops.some(d=>d.id===longDrop.id));
+    for(const secret of ['owner','won','joined','eligible','submitted_txid','answer_hash',uid(1),address(2)])assert.equal(JSON.stringify(guestFeed).includes(secret),false,secret);
     sql('update games.haze_settings set enabled=false;');assert.throws(()=>create({mode:'all'}));
   }finally{sql('drop database '+db+' with(force)','postgres');}
 });
