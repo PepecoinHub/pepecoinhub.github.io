@@ -4,7 +4,7 @@
 -- An airdrop that ran longer than 10 minutes gives its host 12 hours (not 30 minutes) to review the payout,
 -- because the host may be away when a 10-hour airdrop ends. Drops stay listed for 24 hours, so 10 h + 12 h fits.
 -- 'won' is the signed-in fren's own payout in that drop (null when they are not a recipient); the chat uses it
--- to celebrate a confirmed win. No other field changes.
+-- to celebrate a confirmed win. gry_haze_groups_public (end of file) lets guests watch drops without joining.
 begin;
 create or replace function games.haze_group_split(p_id uuid) returns void language plpgsql security definer set search_path='' as $$
 declare g games.haze_groups;n integer;q numeric;rem numeric;
@@ -88,4 +88,24 @@ begin
  'txid',case when g.state='confirmed' then g.txid else null end,'submitted_txid',case when g.owner=u and g.state='ready' then g.submitted_txid else null end) order by g.created_at desc)
  from(select * from games.haze_groups where created_at>clock_timestamp()-interval '24 hours' order by created_at desc limit 30)g),'[]'::jsonb));
 end $$;
+-- Read-only drop feed for everyone, signed in or not (owner, 2026-11-20: frens without an account should see
+-- the pond's tips and drops too). Public fields only: no owner ID, addresses, answers, eligibility or entries
+-- of one person. Joining still needs a Discord sign-in and a linked Haze wallet (gry_haze_groups / _join).
+-- It seals rounds whose time is up, like gry_haze_groups, so a chat with only guests still shows the result.
+create or replace function public.gry_haze_groups_public() returns jsonb language plpgsql security definer set search_path='' as $$
+declare expired record;
+begin
+ if not (games.haze_open(null) and coalesce((select groups_enabled from games.haze_settings where id),false)) then return jsonb_build_object('now',clock_timestamp(),'drops','[]'::jsonb);end if;
+ for expired in select id from games.haze_groups where state='open' and closes_at<=clock_timestamp() order by closes_at limit 20 loop perform games.haze_group_seal(expired.id);end loop;
+ return jsonb_build_object('now',clock_timestamp(),'public',true,
+ 'drops',coalesce((select jsonb_agg(jsonb_build_object('id',g.id,'creator',g.creator,'mode',g.mode,'audience',g.audience,'title',g.title,'note',g.note,'total_atomic',g.total_atomic::text,'state',g.state,
+ 'payment_pending',g.state='ready' and g.submitted_txid is not null,'ended_at',case when g.state='confirmed' then g.confirmed_at when g.state in ('empty','cancelled') then g.finished_at when g.state='ready' and g.submitted_txid is null and g.expires_at<=clock_timestamp() then g.expires_at else null end,'created_at',g.created_at,'closes_at',g.closes_at,'expires_at',g.expires_at,'max_winners',g.max_winners,
+ 'entries',(select count(*) from games.haze_group_entries e where e.group_id=g.id),
+ 'count',(select count(*) from games.haze_group_recipients r where r.group_id=g.id),
+ 'recipients',coalesce((select jsonb_agg(jsonb_build_object('nick',r.nick,'amount',r.amount_atomic::text)) from(select * from games.haze_group_recipients where group_id=g.id order by ordinal limit 12)r),'[]'::jsonb),
+ 'txid',case when g.state='confirmed' then g.txid else null end) order by g.created_at desc)
+ from(select * from games.haze_groups where created_at>clock_timestamp()-interval '24 hours' order by created_at desc limit 30)g),'[]'::jsonb));
+end $$;
+revoke all on function public.gry_haze_groups_public() from public,anon,authenticated;
+grant execute on function public.gry_haze_groups_public() to anon,authenticated;
 commit;

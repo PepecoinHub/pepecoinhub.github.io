@@ -67,6 +67,9 @@ test('group SQL: all audiences, exact splits, frozen recipients, timed chat roun
     assert.equal(sql(`select expires_at<clock_timestamp()+interval '31 minutes' from games.haze_groups where id=${q(word.id)}`),'t','Short rounds keep the 30-minute review');
     assert.equal(rpc(2,'gry_haze_groups').drops.find(d=>d.id===longDrop.id).won,'500000000','A recipient sees their own payout');
     assert.equal(rpc(4,'gry_haze_groups').drops.find(d=>d.id===longDrop.id).won,null,'Other frens see no payout');
+    // guests: a read-only public feed, no owner IDs, addresses or answers
+    const guestFeed=JSON.parse(as('anon',9,'select public.gry_haze_groups_public()'));assert.ok(guestFeed.drops.some(d=>d.id===longDrop.id));
+    for(const secret of ['owner','won','joined','eligible','submitted_txid','answer_hash',uid(1),address(2)])assert.equal(JSON.stringify(guestFeed).includes(secret),false,secret);
     sql('update games.haze_settings set enabled=false;');assert.throws(()=>create({mode:'all'}));
   }finally{sql('drop database '+db+' with(force)','postgres');}
 });

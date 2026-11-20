@@ -2564,3 +2564,44 @@ footer.foot a { color: #edf3e3; }
 .nt-msg { margin: 0; min-height: 1.3em; font: 400 12px/1.3 var(--f-chrome); color: var(--ink); }
 .nt-msg.err { color: #b3261e; }
 .nt-foot { margin: 0; }
+
+/* PEP-TV Direct (haze_direct.mpg): a polished 2000s home-shopping studio, not a kitsch one. Navy and orange,
+   a station bug, a glossy lower third, a product demo on a monitor, a clean before/after and a price panel. */
+.look-direct { background: radial-gradient(70% 60% at 30% 10%, rgba(255,255,255,.18), transparent 70%), linear-gradient(170deg, #0f2f6b 0%, #0a1f4a 55%, #06122d 100%); font-family: var(--f-body); }
+.look-direct .ptv-stage::before { content: "PEP-TV DIRECT"; position: absolute; top: 10px; right: 12px; z-index: 2; padding: 4px 9px; font: 800 11px/1 var(--f-body); letter-spacing: .12em; color: #fff; background: linear-gradient(#ff9a1f, #e06a00); border-radius: 2px; box-shadow: 0 2px 6px #0007; }
+.look-direct .ptv-scene { justify-content: flex-start; padding-top: 36px; padding-bottom: 60px; }
+.look-direct .ad-kick { color: #ffb347; font: 700 13px/1.2 var(--f-body); letter-spacing: .08em; }
+.look-direct .ad-big { font: 800 clamp(28px, 5vw, 46px)/1.02 var(--f-body); text-transform: none; letter-spacing: -.01em; text-shadow: 0 2px 10px #0008; }
+.look-direct .ad-big em { color: #ffb347; }
+.look-direct .ad-sub { font-weight: 500; text-shadow: none; color: #e6ecfa; }
+.look-direct .ad-fren { border: 3px solid #ffb347; border-radius: 50%; overflow: hidden; box-shadow: 0 6px 18px #0008; }
+.look-direct .ad-lower b { background: linear-gradient(#ff9a1f, #d45f00); }
+.look-direct .ad-lower span { background: linear-gradient(#fff, #e3e9f7); color: #0a1f4a; font: 700 13px/1 var(--f-body); padding-top: 11px; }
+.look-direct .ad-phone { color: #fff; background: #e06a00; padding: 6px 10px; border-radius: 2px; font: 800 15px/1 var(--f-body); }
+.look-direct .ad-cta { background: linear-gradient(#ff9a1f, #d45f00); border: 0; border-radius: 3px; box-shadow: 0 4px 14px #0009; font: 800 16px/1 var(--f-body); }
+.ad-cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.ad-cmp > div { display: grid; gap: 4px; align-content: start; padding: 10px 12px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.25); border-radius: 3px; font: 500 13px/1.35 var(--f-body); }
+.ad-cmp small { font: 800 11px/1 var(--f-body); letter-spacing: .12em; color: #ff8c8c; }
+.ad-cmp b { font: 800 17px/1.15 var(--f-body); }
+.ad-cmp .is-after { background: rgba(255,179,71,.16); border-color: #ffb347; }
+.ad-cmp .is-after small { color: #9ff0a8; }
+.ad-term { padding: 10px 14px; background: #04091a; border: 2px solid #2d4f96; border-radius: 3px; box-shadow: inset 0 0 18px rgba(80,140,255,.25); font: 400 clamp(18px, 3vw, 24px)/1 var(--f-term, monospace); color: #9ff0a8; }
+.ptv-scene.on .ad-term span { display: inline-block; overflow: hidden; white-space: nowrap; border-right: 2px solid #9ff0a8; animation: ad-type 1.6s steps(24) both, ad-caret .7s steps(1) 1.6s 5 forwards; }
+@keyframes ad-type { from { width: 0; } to { width: 100%; } }
+@keyframes ad-caret { 50% { border-color: transparent; } }
+.ad-set { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; }
+.ad-set li { display: grid; gap: 4px; justify-items: center; padding: 10px 6px; text-align: center; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); border-radius: 3px; font: 600 12px/1.25 var(--f-body); }
+.ad-set b { font-size: 24px; line-height: 1; }
+.ptv-scene.on .ad-set li { animation: ad-pop .4s both; }
+.ptv-scene.on .ad-set li:nth-child(2) { animation-delay: .25s; } .ptv-scene.on .ad-set li:nth-child(3) { animation-delay: .5s; } .ptv-scene.on .ad-set li:nth-child(4) { animation-delay: .75s; } .ptv-scene.on .ad-set li:nth-child(5) { animation-delay: 1s; } .ptv-scene.on .ad-set li:nth-child(6) { animation-delay: 1.25s; }
+.ad-price.ad-price-pro { display: grid; grid-template-columns: auto auto; align-items: end; gap: 2px 14px; padding: 12px 16px; background: #fff; color: #0a1f4a; border-radius: 3px; border-left: 6px solid #e06a00; box-shadow: 0 6px 18px #0008; font: 700 14px/1.2 var(--f-body); }
+.ad-price-pro span, .ad-price-pro small { grid-column: 1 / -1; font: 600 12px/1.2 var(--f-body); color: #4a5a7a; }
+.ad-price-pro s { color: #9aa4b8; font: 700 20px/1 var(--f-body); text-decoration-thickness: 2px; }
+.ad-price-pro b { padding: 0; clip-path: none; background: none; color: #e06a00; font: 800 40px/1 var(--f-body); }
+@media (max-width: 760px) { .ad-cmp, .ad-set { grid-template-columns: 1fr 1fr; } .ad-cmp b { font-size: 14px; } .ad-set li { padding: 6px 4px; font-size: 11px; } .ad-set b { font-size: 18px; } .look-direct .ptv-scene { padding-bottom: 54px; } }
+@media (prefers-reduced-motion: reduce) { .ptv-scene.on .ad-term span, .ptv-scene.on .ad-set li { animation: none; border-right: 0; } }
+
+.look-direct .ad-phone, .look-direct .ptv-scene.on .ad-phone { animation: none; border: 0; outline: 0; box-shadow: none; background: #e06a00; color: #fff; text-shadow: none; }
+.look-direct .ad-testi-q { font: 600 italic clamp(16px, 2.4vw, 21px)/1.35 var(--f-body); color: #fff; text-shadow: none; }
+.look-direct .ad-testi-who { color: #ffb347; }
+.look-direct .ad-lower b { font: 800 13px/1 var(--f-body); letter-spacing: .1em; padding-top: 11px; color: #fff; }

@@ -53,9 +53,11 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
     finally{flight.checking=false;}
   }
   function sync(force=false){
-    if(stopped||doc.hidden||!currentUser())return Promise.resolve();if(busy)return busy;
+    if(stopped||doc.hidden)return Promise.resolve();if(busy)return busy;
+    // Guests (and frens without Haze) watch the same drops through a read-only public feed (owner, 2026-11-20).
+    const me=currentUser();
     busy=(async()=>{
-      try{data=await rpc('gry_haze_groups',{});const serverNow=Date.parse(data?.now);clockOffset=Number.isFinite(serverNow)?serverNow-Date.now():0;if(!stopped){render();resume();}}catch{}
+      try{const value=await rpc(me?'gry_haze_groups':'gry_haze_groups_public',{});if(currentUser()!==me)return;data=value;const serverNow=Date.parse(data?.now);clockOffset=Number.isFinite(serverNow)?serverNow-Date.now():0;if(!stopped){render();if(me)resume();}}catch{}
       finally{busy=null;clearTimeout(timer);if(!stopped)timer=setTimeout(()=>void sync(),soon()?5000:20000);}
     })();return busy;
   }
@@ -93,7 +95,10 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
       const status=n('p',{role:'status'});card.append(status);
       if(drop.state==='open'){
         status.textContent=drop.entries+' entered · '+timeLeft(Date.parse(drop.closes_at)-now)+' · max '+drop.max_winners+' winners';clocks.push({el:status,drop});
-        if(drop.owner!==currentUser()){
+        if(!me){
+          const join=n('button',{type:'button',class:'haze-tip-secondary'},'Log on with Discord to join');join.onclick=()=>ctx.login?.();card.append(join);
+          card.append(n('small',{},'Watching as a guest. Joining needs a Discord sign-in and a linked Haze wallet.'));
+        }else if(drop.owner!==currentUser()){
           if(drop.mode==='airdrop'){
             const join=n('button',{type:'button',class:'haze-tip-secondary'},drop.joined?'Joined ✓':!drop.eligible?'Not eligible for this round':'Join airdrop');join.disabled=drop.joined||!drop.eligible||!ctx.wallet()?.address;
             join.onclick=async()=>{join.disabled=true;try{await rpc('gry_haze_group_join',{p_id:drop.id});await sync(true);}catch(e){status.textContent=e.message;join.disabled=false;}};card.append(join);
