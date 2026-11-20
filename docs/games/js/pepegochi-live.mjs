@@ -2,9 +2,10 @@
 // The frog lives on the server (games/supabase/update_pepegochi_v2.sql), one per Discord account.
 // PondOS opens this page in a window; it also works on its own.
 import { getBackend } from './backend.js?v=20261113link';
-import { LiveGame } from './pepegochi-live-view.mjs?v=20261120dialog2';
-import { renderRoom, playDeparture, playFrames, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261120dialog2';
-import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261120dialog2';
+import { LiveGame } from './pepegochi-live-view.mjs?v=20261120notes1';
+import { renderRoom, playDeparture, playFrames, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261120notes1';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261120notes1';
+import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261120notes1';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {
@@ -26,7 +27,26 @@ function meter(n) {
   return row;
 }
 
+// The frog's notes on the table (clues and other important messages), kept in this browser per account and life.
+let notesOpen = false;
+const myNotes = () => {
+  const pet = game.last?.pet, user = backend?.session?.()?.user;
+  if (!pet || pet.status === 'departed' || !user || user.is_anonymous) return [];
+  return notesFor(user.id, pet.life_id);
+};
+function renderNotes(box) {
+  const notes = myNotes();
+  if (!notesOpen || !notes.length) { notesOpen = false; return; }
+  const pad = el('div', { class: 'pgb-notepad pgb-notes', role: 'document', 'aria-label': 'NOTES.TXT', id: 'pgb-notes', tabindex: '-1' });
+  const ol = el('ol');
+  notes.forEach(n => { const li = el('li', {}, n.text); li.append(el('small', {}, `Good care day ${n.day}`)); ol.append(li); });
+  pad.append(el('div', { class: 'pgb-notepad-bar' }, 'NOTES.TXT - notes from your Fren'), ol,
+    el('button', { type: 'button', class: 'btn', 'data-close-notes': '1' }, 'Close'));
+  box.append(pad);
+}
+
 function renderPet(box, p) {
+  renderNotes(box);
   box.append(el('p', { class: 'pgb-status' }, p.statusText));
   for (const w of p.warnings) box.append(el('p', { class: 'pgb-warn' }, w));
   if (p.recovery) box.append(el('p', { class: 'pgb-warn pgb-recovery' }, p.recovery));
@@ -98,13 +118,13 @@ function renderScene(v) {
   let opts;
   if (v.mode === 'pet') {
     title.textContent = v.pet.title;
-    opts = { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs, ...at };
+    opts = { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs, notes: myNotes().length, ...at };
   } else if (v.mode === 'departed') {
     title.textContent = `${v.departed.name} · moved out`;
     opts = { mode: 'departed', letterSeen: v.departed.letterSeen, taken: v.departed.taken, ...at };
   } else { title.textContent = 'Your room'; opts = { mode: 'adopt' }; }
   const lifeId = v.mode === 'pet' ? game.last?.pet?.life_id : null;
-  const key = JSON.stringify([opts.mode, opts.status, opts.stage, opts.letterSeen, opts.taken, placements, lifeId,
+  const key = JSON.stringify([opts.mode, opts.status, opts.stage, opts.letterSeen, opts.taken, opts.notes, placements, lifeId,
     v.mode === 'pet' ? frogLook(opts).sprite : null]);
   const care = careDone; careDone = null;
   if (key !== sceneKey || !scene.firstChild) {
@@ -182,13 +202,21 @@ function runCare(kind) {
   return run(game.act(kind).then(r => { if (r.ok && r.value.action_result === 'accepted') careDone = kind; return r; }));
 }
 
-$('pgb-scene').addEventListener('click', e => { if (e.target.closest('[data-letter]')) openLetter(); });
+function openNotes() {
+  notesOpen = true; render();
+  const pad = $('pgb-notes');
+  if (pad) { pad.scrollIntoView({ block: 'start' }); pad.focus({ preventScroll: true }); }
+}
+$('pgb-scene').addEventListener('click', e => { if (e.target.closest('[data-letter]')) openLetter(); else if (e.target.closest('[data-notes]')) openNotes(); });
+// a new note written by the frog on the taskbar (another document of this site) shows up on the table at once
+window.addEventListener('storage', e => { if (e.key && e.key.startsWith('pepegochi:notes:') && game.last && !game.busy) render(); });
 $('pgb-body').addEventListener('click', e => {
   const t = e.target.closest('button');
   if (!t || game.busy) return;
   if (t.dataset.act) runCare(t.dataset.act);
   else if (t.dataset.letter) openLetter();
   else if (t.dataset.closeLetter) { game.closeLetter(); render(); }
+  else if (t.dataset.closeNotes) { notesOpen = false; render(); }
   else if (t.dataset.signin) backend.discord().catch(err => { game.message = err.message; render(); });
 });
 $('pgb-body').addEventListener('submit', e => {

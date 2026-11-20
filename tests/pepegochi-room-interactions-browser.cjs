@@ -13,7 +13,10 @@ sim.world.lives[0].care_days=40;
 const q=new URLSearchParams(location.search);
 const ids=q.has('empty')?[]:['p_poster','crt_tv','lava_lamp','potted_plant','rubber_duck','mug','moon_rock','paper_crown'];
 window.fixtureCalls=[];
-export async function getBackend(){return {session:()=>({user:{is_anonymous:q.has('guest')}}),rpc:async(name,args)=>{
+// ?notes=1: a signed-in owner whose frog left two notes on the table (pepegochi-notes.mjs)
+if(q.has('notes'))localStorage.setItem('pepegochi:notes:v1:u1:'+sim.world.lives[0].life_id,JSON.stringify({notes:[
+  {kind:'trust',text:'I trust you now, fren.',day:50,at:1},{kind:'clue',secret:'nerd_alert',title:'Nerds Only',text:'A gentle clue.',day:50,at:2}]}));
+export async function getBackend(){return {session:()=>({user:{id:'u1',is_anonymous:q.has('guest')}}),rpc:async(name,args)=>{
   window.fixtureCalls.push([name,args]);
   if(name==='gry_pepegochi_room_state')return {initialized:true,inventory:ids.map(item_id=>({item_id}))};
   const r=sim.rpc(name,args||{}); if(!r.ok)throw new Error(r.error);return r.value;
@@ -88,7 +91,14 @@ const server=http.createServer((req,res)=>{
   }
   await page.evaluate(()=>closeRoom());assert.equal(await page.locator('iframe').count(),0);
   await page.goto(base+'/games/pepegochi-live.html?empty=1&embed=1');await page.locator('[data-room-action="frog"]').waitFor();assert.equal(await page.locator('.pgr-hotspot').count(),2);assert.equal(await page.locator('[data-room-action="crt_tv"]').count(),0);
-  await page.goto(base+'/games/pepegochi-live.html?guest=1&embed=1');await page.locator('[data-signin]').waitFor();assert.equal(await page.locator('.pgr-hotspot').count(),0);
+  // the frog's notes lie on the side table; a click opens NOTES.TXT with both, keyboard reachable
+  await page.goto(base+'/games/pepegochi-live.html?empty=1&notes=1&embed=1');await page.locator('[data-notes]').waitFor();
+  assert.equal(await page.locator('[data-notes]').getAttribute('aria-label'),'2 notes from your Fren. Read them');
+  await page.locator('[data-notes]').click();await page.locator('#pgb-notes').waitFor();
+  assert.match(await page.locator('#pgb-notes').textContent(),/I trust you now[\s\S]*A gentle clue[\s\S]*Good care day 50/);
+  assert.ok(await page.locator('#pgb-notes').evaluate(e=>e===document.activeElement));
+  await page.locator('[data-close-notes]').click();assert.equal(await page.locator('#pgb-notes').count(),0);
+  await page.goto(base+'/games/pepegochi-live.html?guest=1&embed=1');await page.locator('[data-signin]').waitFor();assert.equal(await page.locator('[data-notes]').count(),0,'a guest sees no notes');assert.equal(await page.locator('.pgr-hotspot').count(),0);
   await page.goto(base+'/games/pepegochi.html?embed=1');await page.locator('[data-adopt] button').click();
   await page.locator('[data-room-action="frog"]').waitFor();
   await page.locator('[data-room-action="frog"]').click();assert.match(await page.locator('.pgr-response').textContent(),/Tap tap/);

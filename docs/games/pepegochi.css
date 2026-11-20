@@ -75,7 +75,8 @@ html.embed .pgb-actions .btn[data-act]:disabled .pgb-action-label, html.embed .p
 /* in the PondOS window the page's 20 px side margins (facts.css) only make the room smaller */
 html.embed body { padding-inline: 0; }
 .pgb-scene .pgb-title { margin: 0 0 6px; }
-.pgr-frame { max-width: 646px; margin: 0 auto; border: 3px inset #9a9a9a; background: #284c46; }
+/* the HD art is drawn at 2x: on a wide screen the room may grow to 1.5x (960 px) and stay sharp */
+.pgr-frame { max-width: 966px; margin: 0 auto; border: 3px inset #9a9a9a; background: #284c46; }
 .pgr { position: relative; width: 100%; aspect-ratio: 8 / 5; overflow: hidden; isolation: isolate; container-type: inline-size; }
 .pgr-art { position: absolute; inset: 0; }
 .pgr img { position: absolute; image-rendering: pixelated; pointer-events: none; user-select: none; -webkit-user-drag: none; }
@@ -102,6 +103,15 @@ html.embed body { padding-inline: 0; }
 .pgr-letter img { position: relative; display: block; width: 100%; }
 .pgr-letter:focus-visible { outline: 2px dotted #111; outline-offset: 2px; }
 .pgr-letter[hidden] { display: none; }
+/* the frog's notes on the side table (clues and other important messages) */
+.pgr-notes { position: absolute; z-index: 60; transform: translate(-50%, -75%); padding: 0; border: 0; background: none; cursor: pointer; }
+.pgr-notes::before { content: ""; position: absolute; inset: -8px; }
+.pgr-notes img { position: relative; display: block; width: 100%; filter: drop-shadow(2px 3px 0 #14282066); }
+.pgr-notes-n { position: absolute; right: -2px; top: 18%; min-width: 15px; padding: 0 3px; border: 1px solid #5c1010; border-radius: 8px; background: #d93a2b; color: #fff; font: 700 10px/13px system-ui, sans-serif; text-align: center; }
+.pgr-notes:focus-visible { outline: 2px dotted #fff5a6; outline-offset: 2px; }
+.pgb-notes ol { margin: 0; padding: 8px 12px 8px 30px; }
+.pgb-notes li { margin: 0 0 10px; white-space: pre-line; }
+.pgb-notes li small { display: block; color: #555; }
 @media (prefers-reduced-motion: reduce) { .pgr-pet { animation: none; } .pgr-actor { transition: none; } }
 
 /* live window: Decorate */
@@ -120,7 +130,9 @@ html.embed body { padding-inline: 0; }
 
 /* Room A13: keyboard/touch-friendly hit areas are separate from the labelled artwork. */
 .pgr-hotspot { position:absolute; padding:0; margin:0; min-width:0; min-height:0; border:1px solid transparent; background:transparent; cursor:pointer; }
-.pgr-hotspot:hover, .pgr-hotspot:focus-visible { border:1px dashed #fff5a6; outline:1px solid #222; background:#fff5a61a; }
+.pgr-hotspot:focus-visible { border:1px dashed #fff5a6; outline:1px solid #222; background:#fff5a61a; }
+/* hover only with a real mouse: on a phone the outline would stay on after a tap */
+@media (hover:hover) { .pgr-hotspot:hover { border:1px dashed #fff5a6; outline:1px solid #222; background:#fff5a61a; } }
 .pgr-response { margin:0; padding:7px 9px; border-top:2px groove #aaa; background:#d4d0c8; color:#111; font:12px/1.4 Tahoma, sans-serif; min-height:2.8em; }
 .pgr-shortcuts { background:#d4d0c8; color:#111; border-top:1px solid #999; padding:6px; font:12px Tahoma,sans-serif; }
 .pgr-shortcuts summary { cursor:pointer; padding:3px; }

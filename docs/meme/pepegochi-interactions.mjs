@@ -1,5 +1,4 @@
 import { TOYS, healthyCompanion, playableCompanion } from './pepegochi-personality.mjs?v=20261118dialog1';
-import { trustedForRumors } from './pepegochi-bond.mjs?v=20261120dialog2';
 // Cosmetic conversations; actual needs and care history come from the server view.
 const lines = {
   stamp: ["New stamp! Your Passport is becoming dangerously official.", "Another stamp, fren. I supervised from the taskbar."],
@@ -122,7 +121,7 @@ export function companionReply(view, action = 'hello', n = 0, context = {}) {
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
 // No polling. Optional care delegates to the host's existing validated server action; bond memories stay cosmetic.
-export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, commands = {}, care, bond, getQuote = () => null, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, readRumors, openPassport, now = () => Date.now() }) {
+export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, commands = {}, care, bond, getQuote = () => null, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, readRumors, notebook = null, lifeId = () => null, openPassport, now = () => Date.now() }) {
   let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
   let careTicket = 0;
   let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
@@ -221,22 +220,42 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     try { result = await readRumors(); } catch { result = null; }
     if (!panel || panel !== target || ticket !== rumorTicket) return;
     const p = result?.progress;
-    if (!journal && !trustedForRumors(getView())) { reply.textContent = 'Let us look after each other first, fren.'; return; }
     if (result?.status !== 'ok' || !p) {
       reply.textContent = result?.status === 'signed-out' ? 'Log in with Discord to read your own secret journal.' : 'The pond is quiet. I could not check your Passport. Try again in a moment.';
       return;
     }
     const summary = `${p.found.length} / ${p.total} rumored secrets found.`;
-    const message = journal ? `Secret Journal\n${summary}\n${p.found.length ? p.found.map(title => '• ' + title).join('\n') : 'No discoveries recorded yet. Every detective starts somewhere.'}` :
-      `Just between us, fren…\n\n${p.hint || 'I have no more rumors for now. Let us enjoy the pond.'}`;
+    const kept = notebook?.notes?.length || 0;
+    const message = `Secret Journal\n${summary}\n${p.found.length ? p.found.map(title => '• ' + title).join('\n') : 'No discoveries recorded yet. Every detective starts somewhere.'}` +
+      (kept ? `\n\nMy notes for you: ${kept} on the table in my room.` : '');
     reply.textContent = message;
     rumorActions = el('div', 'pg-fact-answers pg-rumor-actions');
     function extra(label, action) {
       const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', action); rumorActions.append(b); return b;
     }
     if (openPassport) extra('View journal in Fren Passport', () => { close(); openPassport(); });
+    if (kept) extra('Read my notes', () => visit());
     if (rumorActions.childElementCount) reply.after(rumorActions);
     reposition(); panel.scrollTop = 0;
+  }
+  // A fresh greeting may bring up a secret: a clue from 50 good care days on, before that a rare
+  // "not yet" (pepegochi-notes.mjs). The greeting stays if the Passport says there is nothing to tell.
+  async function secretTalk() {
+    clearRumors();
+    const target = panel, ticket = rumorTicket;
+    let result;
+    try { result = await readRumors(); } catch { result = null; }
+    if (!panel || panel !== target || ticket !== rumorTicket || result?.status !== 'ok' || !result.progress) return;
+    const talk = notebook.deliver(getView(), result.progress.foundIds, lifeId());
+    if (!talk) return;
+    reply.textContent = talk.text;
+    reply.style.whiteSpace = 'pre-line';
+    if (talk.kind === 'clue') {
+      rumorActions = el('div', 'pg-fact-answers pg-rumor-actions');
+      const b = el('button', 'pg-fact-a', 'See the note on my table'); b.type = 'button'; b.addEventListener('click', () => visit());
+      rumorActions.append(b); reply.after(rumorActions);
+    }
+    reposition();
   }
   function say(action = 'hello') {
     clearNotice(); clearRumors();
@@ -372,8 +391,8 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     reply.textContent = r.text;
     setPose(r.pose);
     animate(action);
-    // Rare clue comes only from a fresh voluntary greeting, never from a repeatable menu action.
-    if(spontaneousRumor && action==='hello' && readRumors && trustedForRumors(getView()) && bond?.tryRumor?.(getView())) showRumors();
+    // A secret comes up only on a fresh voluntary greeting, never from a repeatable menu action.
+    if (spontaneousRumor && action === 'hello' && readRumors && notebook?.due(getView())) secretTalk();
     reposition();
     if (fresh) panel.querySelector('.pg-fact-x')?.focus();
   }

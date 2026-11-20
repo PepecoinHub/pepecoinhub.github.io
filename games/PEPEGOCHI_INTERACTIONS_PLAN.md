@@ -118,3 +118,12 @@ PR #353 belongs to the full PepeGochi product launch. Ship all implemented compa
 
 ## QA
 Validation: `node --test tests/*.test.mjs` (346 passed, 26 environment skips), site/i18n checks and Python tests. `node tests/pepegochi-companion-browser.cjs` runs the actual taskbar controller in Chromium with local fixtures; uses PLAYWRIGHT_MODULE/HAZE_CHROMIUM overrides when needed. Covers keyboard/touch, room opening, memories, care state priority, focus, throttle, mute/reload, account isolation, return greeting, stale quiz answer, 320/390/1440px and teardown. No production service is contacted. Keep beta gate intact; no merge or production deployment without approval.
+
+## Secret clues and the notes table (owner, 2026-11-20)
+
+- Replaces the rare 1-in-6 clue. Counter = good care days of the same frog (the one the 100-day Super Parent stamp counts).
+- Good care day 50: "I trust you now" note + the first clue; then one clue every 10 good care days (60, 70, ...), one secret each, never one the player has found, never repeated. Only for a healthy froglet/adult with every need at 75 or more, on a fresh greeting.
+- Before day 50: at most one "I would tell you a secret, but I do not trust you enough yet" every 3 days (daily 50% roll).
+- A player who found every secret gets neither.
+- Every important message (trust note and clues) is kept on the side table in the room: envelope with a count, opens NOTES.TXT. Kept in this browser per account and frog life (docs/meme/pepegochi-notes.mjs); a new device gets the due clues again on the next greetings.
+- Clue texts live in docs/meme/pepegochi-rumors.mjs (TRAILS): gentle, never the trigger itself.

@@ -9,6 +9,8 @@ const html = `<!doctype html><html class="pondos sky-night"><meta charset="utf-8
 import { mountTaskbarFrog } from '/meme/pepegochi-taskbar.mjs';
 window.t = { time: Date.now(), owner: 'owner-a', calls: [], pet: { life_id:'frog-a', name:'Pickle', stage:'adult', status:'healthy', care_days:12, needs:{hunger:90,hygiene:90,mood:90,energy:90} } };
 t.refresh = () => window.dispatchEvent(new Event('pondos:auth-changed'));
+// today's "not yet" roll is already used: the secret talk has its own tests (pepegochi-notes); these scenarios cover the rest
+for (const o of ['owner-a','owner-b','owner-c']) { const k='pepegochi:notes:v1:'+o+':frog-a'; if (!localStorage.getItem(k)) localStorage.setItem(k, JSON.stringify({ teaseDay: Math.floor(t.time/86400000) })); }
 t.app = id => { document.querySelector('.fixture-app')?.remove(); const host=document.createElement('div');host.className='app-win fixture-app';host.innerHTML='<button type="button">Close</button>';host.querySelector('button').onclick=()=>host.remove();document.body.append(host);window.dispatchEvent(new CustomEvent('pondos:app-opened',{detail:{id,host}}));return host; };
 t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>{},session:()=>({discord:true,userId:t.owner}),now:()=>t.time,rpc:async name=>{t.calls.push(name);return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:null;}});
 </script></html>`;

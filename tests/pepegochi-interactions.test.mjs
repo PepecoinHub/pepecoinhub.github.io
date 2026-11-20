@@ -234,17 +234,31 @@ test('journal is available even without trust, but never offers a clue or detail
   assert.equal(opened, 1); assert.equal(h.doc.body.children.length, 0); h.controller.dispose();
 });
 
-test('a trusted fresh greeting may reveal exactly one subtle clue; never a second detail', async () => {
-  let reads = 0, rolls = 0;
-  const trusted = {...adult,careDays:14,trustReady:true};
-  const h = harness(trusted,{bond:{take:()=>null,tryRumor:()=>++rolls===1},readRumors:async()=>{reads++;return {status:'ok',progress:{found:[],total:12,hint:'A subtle clue',detail:'Hidden detail'}};}});
-  h.button.emit('click',{detail:0}); await Promise.resolve();
+test('a fresh greeting asks the notebook first and shows the clue it hands out, with the way to the table', async () => {
+  let reads = 0, delivered = 0, visits = 0;
+  const notebook = { notes: [], due: () => true, deliver: (view, found, life) => {
+    delivered++; assert.deepEqual(found, ['wrong_frog']); assert.equal(life, 'life-1');
+    return delivered === 1 ? { kind: 'clue', text: 'Just between us, fren…\n\nA gentle clue.' } : null; } };
+  const h = harness(adult, { bond: { take: () => null }, notebook, lifeId: () => 'life-1', openRoom: () => visits++,
+    readRumors: async () => { reads++; return { status: 'ok', progress: { found: ['The Wrong Frog'], foundIds: ['wrong_frog'], total: 12 } }; } });
+  h.button.emit('click', { detail: 0 }); await Promise.resolve(); await Promise.resolve();
   const p = h.doc.body.children[0];
-  assert.match(p.querySelector('.pg-fact-q').textContent,/A subtle clue/);
-  assert.doesNotMatch(p.querySelector('.pg-fact-q').textContent,/Hidden detail/);
-  assert.equal(reads,1);
-  h.controller.close(); h.button.emit('click',{detail:0}); await Promise.resolve();
-  assert.equal(reads,1); h.controller.dispose();
+  assert.match(p.querySelector('.pg-fact-q').textContent, /A gentle clue/);
+  assert.equal(reads, 1);
+  p.querySelector('.pg-rumor-actions').children[0].emit('click');
+  assert.equal(visits, 1);
+  // nothing new to tell: the normal greeting stays
+  h.button.emit('click', { detail: 0 }); await Promise.resolve(); await Promise.resolve();
+  assert.doesNotMatch(h.doc.body.children[0].querySelector('.pg-fact-q').textContent, /gentle clue/);
+  h.controller.dispose();
+});
+
+test('no notebook call and no Passport read when nothing is due', async () => {
+  let reads = 0;
+  const h = harness(adult, { bond: { take: () => null }, notebook: { notes: [], due: () => false, deliver: () => assert.fail('not due') },
+    readRumors: async () => { reads++; return { status: 'ok', progress: { found: [], foundIds: [], total: 12 } }; } });
+  h.button.emit('click', { detail: 0 }); await Promise.resolve(); await Promise.resolve();
+  assert.equal(reads, 0); h.controller.dispose();
 });
 
 test('PEP commentary uses fresh quote only and distinguishes green, red and quiet days',()=>{

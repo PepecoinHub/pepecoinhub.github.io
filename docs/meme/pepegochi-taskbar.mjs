@@ -4,16 +4,17 @@ import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
 // Loaded only behind the existing ?beta=gochi gate. Local conversations are cosmetic; no polling, rewards or fake pet.
 // Based on PR #299; adds the Pond Quiz (one server question a day once the frog has hatched; update_pond_quiz.sql)
 // and the hop out of the PEPEGOCHI.EXE window.
-import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261120dialog2';
+import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261120notes1';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261120dialog2';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261120notes1';
 import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
-import { createRumorReader } from './pepegochi-rumors.mjs?v=20261118rumors1';
+import { createRumorReader } from './pepegochi-rumors.mjs?v=20261120notes1';
 import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118dialog1';
 
-import { createBond } from './pepegochi-bond.mjs?v=20261120dialog2';
+import { createBond } from './pepegochi-bond.mjs?v=20261120notes1';
+import { createNotebook } from './pepegochi-notes.mjs?v=20261120notes1';
 
-import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120dialog2';
+import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120notes1';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
 const NEEDS = new Set(['hunger', 'hygiene', 'mood', 'energy']);
@@ -75,6 +76,8 @@ export function describeTaskbarFrog(state) {
   };
   return {
     careDays: Math.max(0, Math.trunc(Number(p.care_days) || 0)),
+    goodDays: Math.max(0, Math.trunc(Number(p.good_days) || 0)),
+    stage, healthy: status === 'healthy', needsOk: needs.length === NEEDS.size && !low,
     trustReady: stage === 'adult' && status === 'healthy' && needs.length === NEEDS.size && needs.every(n=>n.value>=90),
     sprite: pose(poseFor(sprite)), label: name, adult: stage === 'adult',
     playReady: stage !== 'egg' && status === 'healthy' && needs.length === NEEDS.size && !low,
@@ -107,6 +110,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   let storage;
   try { storage = window.localStorage; } catch {}
   const bond = createBond({ storage, now, random });
+  const notebook = createNotebook({ storage, now, random });
   const arcade = createArcadeObserver();
   const siteEvents = createSiteEventObserver();
   const rumors = createRumorReader({ session, rpc, now });
@@ -463,6 +467,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     }
     paint(view);
     const event = bond.observe(lastUser, state?.pet);
+    notebook.observe(lastUser, state?.pet);
     const was = hatched;
     hatched = !!(state?.pet?.stage && state.pet.stage !== 'egg');
     if (hatched !== was) refreshFacts(true);
@@ -517,7 +522,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
       cancelQuiz();               // the old account's question or ranking must not stay on screen
       rumors.invalidate();
       conversation?.close({ reset: true });
-      bond.reset(); arcade.reset(); siteEvents.reset(); clearToy(); lastLife = null;
+      bond.reset(); notebook.reset(); arcade.reset(); siteEvents.reset(); clearToy(); lastLife = null;
       paint(describeTaskbarFrog(null));
       hatched = false; server = null; updateFactButton();
     }
@@ -577,7 +582,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     setPose: p => { desktop?.stop(); cancelMotion(); setAct(p); if (!p) queueMotion(); }, animate: animateExpression, showToy, openRoom: open,
     closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
     openQuiz: requestQuiz, commands, care: taskbarCare, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
-    readRumors: rumorsEnabled ? rumors.read : null, openPassport, getQuote,
+    readRumors: rumorsEnabled ? rumors.read : null, notebook: rumorsEnabled ? notebook : null, lifeId: () => lastLife, openPassport, getQuote,
     canReact: () => !balloon && !desktop?.active && !document.querySelector('.reward98') && document.activeElement?.tagName !== 'IFRAME', now });
   const unsubscribeSiteEvents = subscribeSiteEvents(event => {
     const current = session();

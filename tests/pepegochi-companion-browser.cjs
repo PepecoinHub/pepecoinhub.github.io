@@ -9,6 +9,8 @@ const html = `<!doctype html><meta charset="utf-8"><meta name="viewport" content
 import { mountTaskbarFrog } from '/meme/pepegochi-taskbar.mjs';
 window.t = { time: Date.now(), owner: 'owner-a', opened: 0, apps: [], passportOpened: 0, calls: [], passport: {signed_in:true,secrets:[]}, pet: { life_id:'frog-a', name:'Pickle', stage:'adult', status:'healthy', care_days:12, needs:{hunger:90,hygiene:90,mood:90,energy:90} } };
 t.refresh = () => window.dispatchEvent(new Event('pondos:auth-changed'));
+// today's "not yet" roll is already used: the secret talk has its own tests (pepegochi-notes); these scenarios cover the rest
+for (const o of ['owner-a','owner-b','owner-c']) { const k='pepegochi:notes:v1:'+o+':frog-a'; if (!localStorage.getItem(k)) localStorage.setItem(k, JSON.stringify({ teaseDay: Math.floor(t.time/86400000) })); }
 t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>t.opened++,openPassport:()=>t.passportOpened++,commands:Object.fromEntries(['games','news','passport','tv'].map(name=>[name,()=>t.apps.push(name)])),session:()=>({discord:true,userId:t.owner}),now:()=>t.time,random:()=>0,getQuote:()=>({time:new Date(t.time).toISOString(),change_24h:6}),rpc:async (name,args)=>{t.calls.push(name);if(name==='gry_passport_state'){if(t.deferPassport)return new Promise(r=>t.passportResolve=r);return structuredClone(t.passport)}if(name==='gry_quiz_answer')return new Promise(r=>t.answer=r);if(name==='gry_pepegochi_action'){const need={feed:'hunger',clean:'hygiene',play:'mood',rest:'energy'}[args.p_action];t.pet.needs[need]=Math.min(100,t.pet.needs[need]+35);return {pet:structuredClone(t.pet),action_result:'accepted'};}return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:{day:new Date().toISOString().slice(0,10),question:'Pond question?',answers:['Yes','No'],answered:false};}});
 </script>`;
 const categories={Feed:'care',Clean:'care',Play:'care',Rest:'care','Our memories':'talk','How is PEP?':'talk','Tell me a joke':'talk',"Let's play!":'play','Pet me':'play','Watch Pond TV':'play','Pond Quiz':'play','Roll the ball':'play','Squeak the duck':'play','Toss the bottle cap':'play','Your favourite toy?':'play',"What's new?":'more','Open Fren Passport':'more','Secret Journal':'more','Reactions: on':'more','Reactions: quiet':'more'};
@@ -135,6 +137,8 @@ const server = http.createServer((req, res) => {
  await page.evaluate(()=>{t.pet.stage='adult';t.refresh()});await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('adult_sit'));
  await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Pond Quiz');
  const answer=page.getByRole('button',{name:'Yes',exact:true});
+ // the pointer may still rest on this spot from the previous click: measure the resting colour, not the hover one
+ await page.mouse.move(0,0);
  assert.equal(await answer.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(229, 229, 223)');
  await answer.click();assert.match(await page.locator('.pg-fact-out').textContent(),/Saving/);
  await page.evaluate(()=>t.answer(null));await page.waitForFunction(()=>!document.querySelector('.pg-fact-answers button').disabled);
@@ -207,12 +211,14 @@ const server = http.createServer((req, res) => {
  assert.match(await rumorText.textContent(),/No discoveries recorded/);
  assert.equal(await rumors.evaluate(()=>t.calls.filter(x=>x==='gry_passport_state').length),1);
  await rumors.getByRole('button',{name:'Close conversation',exact:true}).tap();
- await rumors.evaluate(()=>{t.time+=16000;t.pet.care_days=14;t.refresh()});
+ // good care day 50 (owner rule 2026-11-20): a fresh greeting brings the trust note and the first clue, both kept for the table
+ await rumors.evaluate(()=>{t.time+=16000;t.pet.care_days=60;t.pet.good_days=50;t.refresh()});
  await rumors.waitForFunction(()=>JSON.parse(localStorage.getItem('pepegochi:bond:v1:owner-a:frog-a')||'{}').seen===t.time);
- await rumors.locator('.pg-companion-button').tap();await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('Just between us'));
- assert.equal(await rumors.getByRole('button',{name:'A little more?',exact:true}).count(),0);
+ await rumors.locator('.pg-companion-button').tap();await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('I trust you now'));
+ assert.equal(await rumors.getByRole('button',{name:'See the note on my table',exact:true}).count(),1);
+ assert.deepEqual(await rumors.evaluate(()=>JSON.parse(localStorage.getItem('pepegochi:notes:v1:owner-a:frog-a')).notes.map(n=>n.kind)),['trust','clue']);
  await rumors.getByRole('button',{name:'Close conversation',exact:true}).tap();await rumors.locator('.pg-companion-button').tap();
- assert.doesNotMatch(await rumorText.textContent(),/Just between us/);
+ assert.doesNotMatch(await rumorText.textContent(),/I trust you now|Just between us/);
  await rumors.evaluate(()=>{t.passport.secrets=[{id:'wrong_frog',discovered_at:new Date().toISOString()}];window.dispatchEvent(new CustomEvent('pondos:secret-found',{detail:{owner:t.owner}}))});
  await menuAction(rumors,'Secret Journal','tap');await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('The Wrong Frog'));
  assert.match(await rumorText.textContent(),/1 \/ 12/);

@@ -8,30 +8,26 @@ const found = id => ({ id, discovered_at: date });
 const state = (...secrets) => ({ signed_in: true, secrets });
 const auth = id => ({ discord: true, userId: id });
 
-test('all and only public live secret trails have two distinct clues', () => {
+test('every live secret has exactly one clue, in catalog order, that never names the secret', () => {
   const catalog = JSON.parse(readFileSync(new URL('../docs/meme/passport-catalog.json', import.meta.url), 'utf8'));
   assert.deepEqual(TRAILS.map(([id, title]) => [id, title]), catalog.secrets.filter(x => x.status === 'live').map(x => [x.id, x.title]));
-  for (const [, , hint, detail] of TRAILS) { assert.ok(hint.length > 20 && detail.length > 20); assert.notEqual(hint, detail); }
+  for (const [, title, clue] of TRAILS) {
+    assert.ok(clue.length > 40, title);
+    assert.ok(!clue.toLowerCase().includes(title.toLowerCase()), title + ' clue gives its own name away');
+  }
+  // no trigger is spelled out (owner: gentle, not obvious)
+  assert.doesNotMatch(TRAILS.map(t => t[2]).join(' '), /format c|:\)|PEPE_not_PEP|README|23:30|notes\.txt/i);
 });
 
-test('next rumor is stable on the same UTC day and never points to a saved find', () => {
-  const p = rumorProgress(state(), at);
-  assert.equal(p.total, 12); assert.deepEqual(p.found, []);
-  assert.deepEqual(rumorProgress(state(), at + 1000), p);
-  assert.notEqual(rumorProgress(state(), at + 86400000).hint, p.hint);
-  const trail = TRAILS.find(t => t[2] === p.hint);
-  const next = rumorProgress(state(found(trail[0]), { id: 'pond_map_1', discovered_at: date }), at);
-  assert.deepEqual(next.found, [trail[1]]); assert.notEqual(next.hint, p.hint);
-});
-
-test('only genuine-looking saved dates count and completed journals have no pending hint', () => {
+test('the journal counts only genuine-looking saved dates of live secrets', () => {
   const a = TRAILS[0];
-  assert.deepEqual(rumorProgress(state({ id: a[0] }, { id: a[0], discovered_at: 'bad' }), at).found, []);
-  assert.deepEqual(rumorProgress(state(found(a[0]), found(a[0])), at).found, [a[1]]);
-  assert.deepEqual(rumorProgress(state(...TRAILS.map(t => found(t[0]))), at), { found: TRAILS.map(t => t[1]), total: 12, hint: null, detail: null });
-  assert.equal(rumorProgress({ ...state(), preview: true }, at), null);
-  assert.equal(rumorProgress({ signed_in: false, secrets: [] }, at), null);
-  assert.equal(rumorProgress({ signed_in: true }, at), null);
+  assert.deepEqual(rumorProgress(state(), at), { found: [], foundIds: [], total: 12 });
+  assert.deepEqual(rumorProgress(state({ id: a[0] }, { id: a[0], discovered_at: 'bad' })).found, []);
+  assert.deepEqual(rumorProgress(state(found(a[0]), found(a[0]), { id: 'pond_map_1', discovered_at: date })), { found: [a[1]], foundIds: [a[0]], total: 12 });
+  assert.equal(rumorProgress(state(...TRAILS.map(t => found(t[0])))).foundIds.length, 12);
+  assert.equal(rumorProgress({ ...state(), preview: true }), null);
+  assert.equal(rumorProgress({ signed_in: false, secrets: [] }), null);
+  assert.equal(rumorProgress({ signed_in: true }), null);
 });
 
 test('reader makes no background calls, deduplicates clicks, expires cache, invalidates on discovery', async () => {

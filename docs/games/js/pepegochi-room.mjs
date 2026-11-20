@@ -151,6 +151,9 @@ export const LETTER = { x: 332, y: 346, px: 64, envelope: IMG + 'goodbye_envelop
 // stores it on the life as letter_variant 'took_<item_id>' ('took_nothing' for an empty room; Room-4,
 // update_pepegochi_room_departure.sql). The older 'classic' letter took the TV. The item is only hidden in the
 // picture: it stays owned and placed, and it is back when a new frog moves in.
+// The frog's notes for you (clues, "I trust you now"): an envelope on the side table, left of the mug,
+// standing on the table top like the mug (pepegochi-notes.mjs, owner 2026-11-20).
+export const NOTES = { x: 410, y: 278, px: 40, src: IMG + 'goodbye_envelope.png' };
 export const TAKEN_BY_LETTER = 'crt_tv';
 export const takenItem = variant => (!variant || variant === 'classic' ? TAKEN_BY_LETTER
   : variant === 'took_nothing' ? null : variant.startsWith('took_') ? variant.slice(5) : TAKEN_BY_LETTER);
@@ -238,7 +241,7 @@ export function playFrames(img, frames, ms, { setTimer = setTimeout, clearTimer 
 
 // ---------- one description of what the scene shows, so it can be tested without a browser ----------
 // mode: 'adopt' (an egg waits for a name), 'pet' or 'departed'
-export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false, taken = TAKEN_BY_LETTER } = {}) {
+export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false, taken = TAKEN_BY_LETTER, notes = 0 } = {}) {
   const departed = mode === 'departed';
   const items = [];
   for (const [slotId, itemId] of Object.entries(placements)) {
@@ -263,6 +266,7 @@ export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', n
   }
   return {
     mode, status: departed ? 'departed' : mode === 'adopt' ? 'adopt' : status, label, items, frog,
+    notes: mode === 'pet' && notes > 0 ? { count: notes, src: NOTES.src, left: pct(NOTES.x, ROOM_W), top: pct(NOTES.y, ROOM_H), width: pct(NOTES.px, ROOM_W) } : null,
     letter: departed ? { src: letterSeen ? LETTER.open : LETTER.envelope, read: letterSeen,
       left: pct(LETTER.x, ROOM_W), top: pct(LETTER.y, ROOM_H), width: pct(LETTER.px, ROOM_W) } : null,
   };
@@ -307,6 +311,16 @@ export function renderRoom(doc, opts = {}) {
     if (sc.frog.bubble) { const b = mk('div', 'pgr-bubble'); b.textContent = sc.frog.bubble; b.style.top = sc.frog.bubbleTop + '%'; art.append(b); }
   }
   st.append(art);
+  if (sc.notes) {
+    const b = mk('button', 'pgr-notes');
+    b.type = 'button'; b.dataset.notes = '1';
+    const label = sc.notes.count === 1 ? '1 note from your Fren' : sc.notes.count + ' notes from your Fren';
+    b.setAttribute('aria-label', label + '. Read them'); b.title = label;
+    pos(b, sc.notes.left, sc.notes.top, sc.notes.width);
+    const im = mk('img'); im.src = sc.notes.src; im.alt = ''; b.append(im);
+    const n = mk('span', 'pgr-notes-n'); n.textContent = String(sc.notes.count); n.setAttribute('aria-hidden', 'true'); b.append(n);
+    st.append(b);
+  }
   if (sc.letter) {
     const b = mk('button', 'pgr-letter');
     b.type = 'button'; b.dataset.letter = '1';
