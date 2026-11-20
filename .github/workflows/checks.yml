@@ -47,7 +47,7 @@ jobs:
           mkdir -p "$PEPEGOCHI_QA_SCREENSHOTS"
           export HAZE_CHROMIUM="$(node -p 'require(process.env.PLAYWRIGHT_MODULE).chromium.executablePath()')"
           status=0
-          for test_file in tests/pepegochi-room-browser.cjs tests/pepegochi-room-interactions-browser.cjs tests/pepegochi-desktop-browser.cjs tests/pepegochi-companion-browser.cjs; do
+          for test_file in tests/pepegochi-room-browser.cjs tests/pepegochi-room-interactions-browser.cjs tests/pepegochi-desktop-browser.cjs tests/pepegochi-companion-browser.cjs tests/pepegochi-playtest-browser.cjs; do
             echo "Running $test_file"
             node "$test_file" || status=1
           done
