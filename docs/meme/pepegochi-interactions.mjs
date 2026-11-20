@@ -273,6 +273,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
           careButtons.push(add(label, () => requestCare(kind, label), careBox));
         actions.append(careBox);
       }
+      add('Go to your room', visit).className += ' pg-room-shortcut';
       if (readRumors) {
         add('Pond Rumors', () => showRumors());
         add('Secret Journal', () => showRumors(true));
@@ -301,7 +302,6 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
       if (typeof commands?.tv === 'function') add('Watch Pond TV', () => runCommand('tv'));
       if (fireflyAvailable()) add('Catch a firefly', () => { close({ focus: true }); if (!catchFirefly()) say('fireflyUnavailable'); });
       if (quizAvailable()) add('Pond Quiz', () => { close(); openQuiz(); });
-      add('Go to your room', visit);
       panel.append(head, reply, actions);
       doc.body.append(panel);
       button.setAttribute('aria-expanded', 'true');

@@ -97,6 +97,8 @@ const server = http.createServer((req, res) => {
  for(const width of [320,390,1440]) {
   await page.setViewportSize({width,height:720});await frog.focus();await page.keyboard.press('Enter');
   const box=await page.locator('.pg-conversation').boundingBox();assert.ok(box.x>=0 && box.x+box.width<=width && box.y>=0);
+  const room=await page.getByRole('button',{name:'Go to your room',exact:true}).boundingBox();assert.ok(room.y>=box.y && room.y+room.height<=box.y+box.height,'room shortcut visible without scrolling');
+  if(width===320){const panel=page.locator('.pg-conversation');await panel.evaluate(e=>e.scrollTop=e.scrollHeight);const bar=await panel.locator('.pg-fact-bar').boundingBox();assert.ok(bar.y>=box.y && bar.y+bar.height<=box.y+box.height,'close button stays visible');await panel.evaluate(e=>e.scrollTop=0);}
   await capture(page,`dialog-${width}`);
   await page.keyboard.press('Escape');
  }

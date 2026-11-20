@@ -19,16 +19,17 @@ let browser;const server=http.createServer((req,res)=>{
  const page=await browser.newPage({viewport:{width:900,height:650},reducedMotion:'reduce'}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/*',r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());
  await page.goto(origin);await page.waitForFunction(()=>window.show && [...document.images].every(i=>i.complete&&i.naturalWidth>0));
+ const capture=async name=>{await page.waitForFunction(()=>[...document.images].every(i=>i.complete&&i.naturalWidth>0));await page.locator('.pgr-frame').screenshot({path:path.join(output,name)});};
  assert.equal(await page.locator('.pgr-item').count(),10);
- await page.locator('.pgr-frame').screenshot({path:path.join(output,'room-after.png')});
+ await capture('room-after.png');
  await page.evaluate(()=>document.querySelector('.pgr-bg').src='/games/img/pepegochi/room_clean_base.png');
  await page.waitForFunction(()=>document.querySelector('.pgr-bg').complete);
- await page.locator('.pgr-frame').screenshot({path:path.join(output,'room-before.png')});
+ await capture('room-before.png');
  await page.locator('#empty').click();assert.equal(await page.locator('.pgr-item').count(),0);
- await page.locator('.pgr-frame').screenshot({path:path.join(output,'room-empty.png')});
+ await capture('room-empty.png');
  await page.locator('#departed').click();assert.equal(await page.locator('.pgr-pet').count(),0);assert.equal(await page.locator('[data-item="crt_tv"]').count(),0);assert.equal(await page.locator('.pgr-item').count(),9);
  await page.locator('.pgr-letter').focus();assert.ok(await page.locator('.pgr-letter').evaluate(e=>e===document.activeElement));
- await page.locator('.pgr-frame').screenshot({path:path.join(output,'room-departed.png')});
+ await capture('room-departed.png');
  await page.locator('#young').click();assert.equal(await page.locator('.pgr-pet').getAttribute('data-sprite'),'tadpole_idle');
  for(const width of [320,390,900]){
   await page.setViewportSize({width,height:650});
@@ -36,6 +37,7 @@ let browser;const server=http.createServer((req,res)=>{
   const b=await page.locator('.pgr-frame').boundingBox();assert.ok(b.width<=width && b.x>=0);
  }
  await page.locator('#normal').click();await page.setViewportSize({width:390,height:650});
+ await page.waitForFunction(()=>[...document.images].every(i=>i.complete&&i.naturalWidth>0));
  await page.screenshot({path:path.join(output,'room-mobile.png')});assert.deepEqual(errors,[]);
  console.log('PASS: real layered room; full/empty inventory, departure hides TV only, letter keyboard focus, young frog, 320/390/900px, all assets load, no external requests');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.close()});
