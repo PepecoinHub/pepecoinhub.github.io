@@ -6,7 +6,7 @@
 // Text and our own emotes only: the server rejects links, and the page never shows pictures from players.
 import { $, h, toast, nickStore } from './common.js?v=20261115haze';
 import { renderBody, attachPicker } from './emotes.js';
-import {createHazeTips} from './haze-tips.mjs?v=20261119expiry';
+import {createHazeTips} from './haze-tips.mjs?v=20261120drops';
 
 // Fren Passport beta (only a browser that opened /meme/?beta=fren): a verified (Discord) name links to that
 // fren's passport in PondOS. Guests have no passport, and without the beta every name stays plain text.
@@ -28,7 +28,7 @@ export function lobbyChat(be, { openLogin }) {
   catch { visitor = crypto.randomUUID(); }
   const msgs = new Map();
   let last = 0, mod = false, timer = 0, busy = false, again = false, first = true, readyAt = 0, mutedUntil = null;
-  const haze=be.kind==='supabase'?createHazeTips({rpc:(name,args)=>be.rpc(name,args),invoke:body=>be.haze(body),session:()=>be.session(),login:openLogin,notify:text=>toast(text,'bad'),chatLog:box,chatInput:input}):null;
+  const haze=be.kind==='supabase'?createHazeTips({rpc:(name,args)=>be.rpc(name,args),invoke:body=>be.haze(body),session:()=>be.session(),login:openLogin,notify:(text,ok)=>toast(text,ok?'good':'bad'),chatLog:box,chatInput:input}):null;
   haze?.mount(panel.querySelector('.chat-rules')||panel);
   const phone = matchMedia('(max-width: 900px)');
   const watching = () => !document.hidden && (!phone.matches || panel.classList.contains('open'));

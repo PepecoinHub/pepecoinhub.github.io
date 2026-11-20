@@ -2,7 +2,7 @@
 // Open for everyone since 2026-11-19 (owner: "zdejmij betę"). Access is still decided on the server:
 // games.haze_settings (enabled, beta_only=false) in SQL and HAZE_ACCESS=all in the haze-wallet Edge Function.
 // Every action needs a Discord sign-in, and every tip is confirmed on chain by the server.
-import {createHazeGroups,HAZE_GROUPS_ENABLED} from './haze-groups.mjs?v=20261119expiry';
+import {createHazeGroups,HAZE_GROUPS_ENABLED} from './haze-groups.mjs?v=20261120drops';
 export const HAZE_TIPS_ENABLED = true;
 // Owner diagnostics: a browser that opened any page with ?haze=check shows the "Server check" button
 // (?haze=off hides it). Visibility only; the check itself needs a signed-in account the server allows.
@@ -39,15 +39,15 @@ export function tipURL(intent) {
     reaction:intent.reaction,intent:intent.id,sender:intent.sender,expires:new Date(intent.expires_at).toISOString()}).toString();
   return url.href;
 }
-// "/tip Jurek 20", "/tip @Jurek 2,5 pep thanks!" -> {nick, amount, note}. null when the text is not a /tip command.
-export const TIP_USAGE='Usage: /tip nick amount [pep] [note], e.g. /tip Jurek 20';
+// "/tip Lemon 500 pepe", "/tip @Jurek 2,5 pep thanks!" -> {nick, amount, note}. null when the text is not a /tip command.
+export const TIP_USAGE='Usage: /tip nick amount pepe [note], e.g. /tip Lemon 500 pepe';
 export function parseTipCommand(text) {
   const match=/^\/tip(?:\s+([\s\S]*))?$/i.exec(String(text||'').trim());
   if(!match)return null;
   const parts=(match[1]||'').trim().split(/\s+/).filter(Boolean);
   if(parts.length<2)throw Error(TIP_USAGE);
-  const nick=parts[0].replace(/^@/,''),amountText=parts[1].replace(/pep$/i,'').replace(',','.');
-  let rest=parts.slice(2);if(rest[0]&&/^pep$/i.test(rest[0]))rest=rest.slice(1);
+  const nick=parts[0].replace(/^@/,''),amountText=parts[1].replace(/pepe?$/i,'').replace(',','.');
+  let rest=parts.slice(2);if(rest[0]&&/^pepe?$/i.test(rest[0]))rest=rest.slice(1);
   if(!nick||!amountText)throw Error(TIP_USAGE);
   return {nick,amount:formatAtomic(amountAtomic(amountText)),note:rest.join(' ').slice(0,160)};
 }
@@ -57,7 +57,9 @@ export function submissionMatches(event,flight) {
     data.version===1&&data.intent===flight.intent.id&&typeof data.txid==='string'&&HASH.test(data.txid);
 }
 
-export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,chatInput=null,enabled=HAZE_TIPS_ENABLED,document:doc=globalThis.document,window:win=globalThis.window}={}) {
+// messageTips:false (PondOS) moves the 💚 Tip button from every message to the fren card (tipFor), so the
+// conversation stays readable (Lemon, 2026-11-20). The Games lobby has no fren card and keeps the buttons.
+export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,chatInput=null,messageTips=true,enabled=HAZE_TIPS_ENABLED,document:doc=globalThis.document,window:win=globalThis.window}={}) {
   if(!enabled)return null;
   const node=(tag,attrs={},...children)=>{
     const value=doc.createElement(tag);
@@ -65,14 +67,37 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     for(const child of children.flat())if(child!=null)value.append(typeof child==='string'?doc.createTextNode(child):child);
     return value;
   };
-  if(!doc.querySelector('[data-haze-tip-style]'))doc.head.append(node('link',{rel:'stylesheet',href:new URL('../haze-tips.css?v=20261119expiry',import.meta.url).href,'data-haze-tip-style':'1'}));
+  if(!doc.querySelector('[data-haze-tip-style]'))doc.head.append(node('link',{rel:'stylesheet',href:new URL('../haze-tips.css?v=20261120drops',import.meta.url).href,'data-haze-tip-style':'1'}));
   let destroyed=false,dialog=null,wallet=null,owner=null,syncAt=0,syncing=false,initial=true,linkButton=null;
   let activeView=null,walletHost=null,walletFrame=null,walletLoaded=null,walletCaps=null;
   const walletBase=HAZE_ORIGIN+'/widget.html?haze-chat=1',queueKey='ph-haze-submitted-v1';
   const messages=new Map(),receivers=new Map(),flights=new Map(),rendered=new Map(),seenReceipts=new Set(),timers=new Set();
   const currentUser=()=>{const user=session()?.user;return user&&!user.is_anonymous?user.id:null;};
   const signed=()=>{if(!currentUser()){login?.();throw Error('Sign in with Discord first.');}};
-  const groups=createHazeGroups({node,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,chatLog:()=>chatLog,chatInput:()=>chatInput,origin:HAZE_ORIGIN,wallet:()=>wallet,refreshWallet:refresh,capabilities:()=>walletCaps,hideWallet:()=>{if(walletHost)walletHost.hidden=true;},login,connect},{enabled:HAZE_GROUPS_ENABLED});
+  // A little party for the fren who just got PEP (a direct tip or a confirmed drop): a banner over the chat and
+  // PEP coins and hearts floating up. Once per tip or drop in this browser; reduced motion keeps only the banner.
+  const partyKey='ph-haze-celebrated-v1';
+  const partied=new Set((()=>{try{const v=JSON.parse(win.localStorage.getItem(partyKey)||'[]');return Array.isArray(v)?v.slice(-200):[];}catch{return [];}})());
+  function celebrate(key,{amount,from,anchor}={}){
+    if(destroyed||partied.has(key))return;partied.add(key);
+    try{win.localStorage.setItem(partyKey,JSON.stringify([...partied].slice(-200)));}catch{}
+    anchor?.classList?.add('haze-for-me');
+    const box=chatLog?.getBoundingClientRect?.();if(!box||!box.width||!doc.body)return;
+    const calm=win.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    const layer=node('div',{class:'haze-party','aria-hidden':'true'});
+    layer.style.cssText='left:'+box.left+'px;top:'+box.top+'px;width:'+box.width+'px;height:'+box.height+'px';
+    const banner=node('div',{class:'haze-party-banner'},node('b',{},'💚 +'+amount+' PEP'),node('span',{},from?'from '+from:'for you'));
+    layer.append(banner);
+    if(!calm)for(let i=0;i<18;i++){
+      const bit=node('i',{class:i%3?'haze-party-coin':'haze-party-heart'},i%3?'P':'💚');
+      bit.style.cssText='left:'+(4+Math.random()*92)+'%;animation-delay:'+(Math.random()*0.9).toFixed(2)+'s;--drift:'+Math.round(Math.random()*60-30)+'px';
+      layer.append(bit);
+    }
+    doc.body.append(layer);
+    const said=node('p',{role:'status',class:'haze-sr'},'You received '+amount+' PEP'+(from?' from '+from:''));layer.after(said);
+    const t=setTimeout(()=>{timers.delete(t);layer.remove();said.remove();},calm?3200:3600);timers.add(t);
+  }
+  const groups=createHazeGroups({node,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,chatLog:()=>chatLog,chatInput:()=>chatInput,origin:HAZE_ORIGIN,wallet:()=>wallet,refreshWallet:refresh,capabilities:()=>walletCaps,hideWallet:()=>{if(walletHost)walletHost.hidden=true;},login,connect,notify,messageTips,celebrate},{enabled:HAZE_GROUPS_ENABLED});
   function endView(){
     const view=activeView;activeView=null;view?.controller.abort();if(walletHost)walletHost.hidden=true;
     if(walletFrame){walletFrame.contentWindow.postMessage({type:'haze:tip-cancel',version:1},HAZE_ORIGIN);walletFrame.contentWindow.postMessage({type:'haze:hidden'},HAZE_ORIGIN);}
@@ -209,24 +234,34 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     const id=String(message.id);if(messages.get(id)?.row===row)return;
     const badge=node('span',{class:'haze-linked-badge',title:'Receiving wallet linked with Haze',hidden:''},'◇');
     const action=node('button',{type:'button',class:'haze-message-tip','aria-label':'Tip '+message.nick+' with Haze',onclick:()=>void openTip(message)},'💚 Tip');
-    row.append(badge);if(message.user_id!==currentUser())row.append(action);
+    row.append(badge);if(messageTips&&message.user_id!==currentUser())row.append(action);
     const value={row,message,badge,action};messages.set(id,value);paintReceiver(value);
     if(!receivers.has(message.user_id))invalidate();
   }
   // /tip in the chat box: the recipient is the newest visible message by that nick, so the server checks it
   // exactly like the Tip button. Returns false (not /tip), 'opened' or 'error' (the text stays in the box).
   function command(text) {
+    const drop=groups?.command(text);if(drop)return drop;
     let parsed;
     try{parsed=parseTipCommand(text);}catch(error){notify?.(error.message);return 'error';}
     if(!parsed)return false;
     const key=parsed.nick.toLowerCase(),found=[];
     for(const value of messages.values())if(value.row.isConnected&&String(value.message.nick||'').toLowerCase()===key)found.push(value.message);
     const people=new Set(found.map(message=>message.user_id));
-    if(!found.length){notify?.('No recent verified message from '+parsed.nick+' here. Tip them after they write, or use 💚 Tip on their message.');return 'error';}
-    if(people.size>1){notify?.('Several frens use the name '+parsed.nick+'. Use 💚 Tip on the right message.');return 'error';}
+    const where=messageTips?'use 💚 Tip on their message':'tap their name and use 💚 Tip';
+    if(!found.length){notify?.('No recent verified message from '+parsed.nick+' here. Tip them after they write, or '+where+'.');return 'error';}
+    if(people.size>1){notify?.('Several frens use the name '+parsed.nick+'. Tap the right name and use 💚 Tip.');return 'error';}
     if(found[0].user_id===currentUser()){notify?.('You cannot tip yourself.');return 'error';}
     void openTip(found.reduce((a,b)=>Number(b.id)>Number(a.id)?b:a),parsed);
     return 'opened';
+  }
+  // The fren card's Tip button. A tip is tied to one chat message on the server, so it uses that fren's newest
+  // message on screen. state: 'self', 'none' (no message here yet), 'unlinked', 'checking' or 'linked'.
+  function tipFor(userId){
+    let message=null;
+    for(const value of messages.values())if(value.row.isConnected&&value.message.user_id===userId&&(!message||Number(value.message.id)>Number(message.id)))message=value.message;
+    const state=userId===currentUser()?'self':!message?'none':receivers.get(userId)===true?'linked':receivers.get(userId)===false?'unlinked':'checking';
+    return {state,open:()=>{if(message&&state!=='self')void openTip(message);}};
   }
   async function openTip(message,preset={}) {
     try{signed();}catch{return;}
@@ -328,7 +363,9 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
           node('strong',{},REACTIONS[receipt.reaction]+' '+receipt.sender+' tipped '+receipt.recipient+' '+formatAtomic(receipt.amount_atomic)+' PEP'),
           receipt.note?node('span',{},receipt.note):null,
           node('a',{href:'https://pepeblocks.com/tx/'+receipt.txid,target:'_blank',rel:'noopener noreferrer'},'Confirmed · View transaction ↗'),node('small',{},'Powered by Haze Wallet'));
-        message.row.append(card);rendered.set(receipt.id,card);seenReceipts.add(receipt.id);
+        message.row.append(card);rendered.set(receipt.id,card);
+        if(message.message.user_id===currentUser()){if(initial)partied.add('tip:'+receipt.id);else if(!seenReceipts.has(receipt.id))celebrate('tip:'+receipt.id,{amount:formatAtomic(receipt.amount_atomic),from:receipt.sender,anchor:card});}
+        seenReceipts.add(receipt.id);
       }
       for(const [id,card]of rendered)if(!card.isConnected)rendered.delete(id);
       while(seenReceipts.size>500)seenReceipts.delete(seenReceipts.values().next().value);
@@ -337,5 +374,5 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     }catch{/* Missing migration or temporary failure must not break ordinary chat. */}
     finally{syncing=false;}
   }
-  return {mount,bindMessage,command,refresh,invalidate,sync,connect,destroy(){destroyed=true;groups?.destroy();saveQueue();dialog?.close();dialog?.remove();win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',resume);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();receivers.clear();flights.clear();linkButton?.remove();}};
+  return {mount,bindMessage,command,tipFor,refresh,invalidate,sync,connect,destroy(){destroyed=true;groups?.destroy();saveQueue();dialog?.close();dialog?.remove();win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',resume);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();receivers.clear();flights.clear();linkButton?.remove();}};
 }

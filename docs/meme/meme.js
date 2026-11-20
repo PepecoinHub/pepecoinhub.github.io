@@ -5424,9 +5424,10 @@
       var canMod = false, who = null, whoT = 0;
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
       var hazeTips = null;
-      import(BASE + 'games/js/haze-tips.mjs?v=20261119expiry').then(function (m) {
+      import(BASE + 'games/js/haze-tips.mjs?v=20261120drops').then(function (m) {
         if (!alive) return;
-        hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp,
+                // messageTips: false: 💚 Tip lives on the fren card (click a name), not on every message (Lemon, 2026-11-20)
+        hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp, messageTips: false,
           invoke: function (body) {
             var s = anySession();
             if (!s) return Promise.reject(new Error('Sign in with Discord first.'));
@@ -5533,13 +5534,25 @@
           '<b class="lan-card-n">' + esc(nick) + (isMe ? ' <i>(you)</i>' : '') + ' <span class="hs-ok" title="Verified with Discord">✓</span></b>' +
           '<span class="lan-card-m">Member since <b class="lan-since">…</b></span></div></div>' +
           '<div class="lan-card-act"><button type="button" class="app-btn lan-c-pass">📘 Fren Passport</button>' +
-          (!isMe && verifiedHere() ? '<button type="button" class="app-btn lan-c-at">@ Mention</button>' : '') + '</div>';
+          (!isMe && verifiedHere() ? '<button type="button" class="app-btn lan-c-at">@ Mention</button>' : '') +
+          (!isMe && hazeTips ? '<button type="button" class="app-btn lan-c-tip">💚 Tip</button>' : '') + '</div>' +
+          (!isMe && hazeTips ? '<p class="lan-card-tipnote" hidden></p>' : '');
         A.body.appendChild(card);
         var br = b.getBoundingClientRect(), hr = A.body.getBoundingClientRect();
         card.style.top = Math.max(4, Math.min(br.bottom - hr.top + 4, A.body.clientHeight - card.offsetHeight - 4)) + 'px';
         card.style.left = Math.max(4, Math.min(br.left - hr.left, A.body.clientWidth - card.offsetWidth - 4)) + 'px';
         card.querySelector('.lan-card-x').addEventListener('click', closeCard);
         var pb = card.querySelector('.lan-c-pass'); pb.addEventListener('click', function () { closeCard(); frenPassport(false, { id: u, nick: nick }); });
+        // 💚 Tip: a tip belongs to one chat message on the server, so it goes with this fren's newest message here
+        var tb = card.querySelector('.lan-c-tip');
+        if (tb) {
+          var tip = hazeTips.tipFor(u), tn = card.querySelector('.lan-card-tipnote');
+          var why = { none: nick + ' has no message in the chat right now. Tip them after they write.', unlinked: nick + ' has not linked a receiving wallet yet.', checking: 'Checking ' + nick + '’s receiving wallet…' }[tip.state];
+          tb.disabled = tip.state === 'none' || tip.state === 'unlinked';
+          tb.title = why || 'Send ' + nick + ' native PEP with Haze';
+          if (why && tip.state !== 'checking') { tn.textContent = why; tn.hidden = false; card.style.top = Math.max(4, Math.min(parseFloat(card.style.top) || 4, A.body.clientHeight - card.offsetHeight - 4)) + 'px'; }
+          tb.addEventListener('click', function () { closeCard(); tip.open(); });
+        }
         var ab = card.querySelector('.lan-c-at'); if (ab) ab.addEventListener('click', function () {
           closeCard(); var v = inp.value; inp.value = (v && !/\s$/.test(v) ? v + ' ' : v) + '@' + nick + ' '; inp.focus();
         });

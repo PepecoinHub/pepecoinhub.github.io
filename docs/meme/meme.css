@@ -607,6 +607,9 @@ footer.foot a { color: #edf3e3; }
   display: grid; grid-template-columns: 30px minmax(0, 1fr); padding: 3px; border-radius: 0; background: var(--chrome); overflow: hidden;
 }
 .pondos .nav.startmenu[hidden] { display: none; }
+/* an open Start menu sits above every window: app windows stack from z-index 200 up and page windows from 20 up,
+   both past the taskbar's 80 after enough clicks (Naux, 2026-11-20). Below balloons (98900) and rewards (99000). */
+.pondos header.top.open { z-index: 98800; }
 .sm-band { background: linear-gradient(0deg, var(--title), var(--title-2)); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; }
 .sm-band span { writing-mode: vertical-rl; transform: rotate(180deg); color: #fff; font: 700 1.15rem/1 var(--f-pixel); letter-spacing: 0.04em; }
 .sm-band b { color: #f2b544; }
@@ -2050,6 +2053,9 @@ footer.foot a { color: #edf3e3; }
 .lan-card-act { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 8px 8px; background: var(--chrome); }
 .lan-card-act .app-btn { padding: 6px 10px; font-size: 12px; }
 .lan-c-soon { font: 400 11px/1.3 var(--f-chrome); color: var(--muted); align-self: center; }
+.lan-card-act .lan-c-tip:not(:disabled) { background: #d8f2c4; color: #173b1c; }
+.lan-card-tipnote { margin: 0; padding: 0 8px 8px; background: var(--chrome); color: var(--muted); font: 400 11px/1.3 var(--f-chrome); }
+.lan-card-tipnote[hidden] { display: none; }
 .lan-card-pic > * { width: 72px !important; height: 72px !important; max-width: none; }
 
 /* boot.js: until meme.js has built the desktop, show only the wallpaper (no flash of the plain page) */
