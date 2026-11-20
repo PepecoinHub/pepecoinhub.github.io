@@ -944,10 +944,11 @@
     var tick = function () { var d = new Date(); clock.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); clock.setAttribute('datetime', d.toISOString()); };
     tick(); setInterval(tick, 20000);
   }
-  var trayPrice = document.querySelector('.tray-price'), trayHash = document.querySelector('.tray-hash');
+  var trayPrice = document.querySelector('.tray-price'), trayHash = document.querySelector('.tray-hash'), gochiQuote = null;
   if (trayPrice && window.PepPrices) window.PepPrices.subscribeQuote(function () {
     return window.PepPrices.pepQuote().then(function (q) {
       if (!q || q.usd == null) return;
+      gochiQuote = q;
       trayPrice.innerHTML = 'PEP ' + fmt.usd(q.usd) + (q.change_24h == null ? '' : ' <span class="' + (q.change_24h < 0 ? 'dn">▼' : 'up">▲') + fmt.pct(Math.abs(q.change_24h)) + '</span>');
       trayPrice.title = 'PEP price, ' + window.PepPrices.describe(q, 'en-US') + '. Click for the Laptop Index.';
       trayPrice.hidden = false;
@@ -1988,9 +1989,9 @@
     try { gochiReceive({ kind: kind, owner: owner, ids: ids }); } catch (e) { /* cosmetic only */ }
   }
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261120roomhd1').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261120dialog2').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
-        session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport,
+        session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport, getQuote: function () { return gochiQuote; },
         commands: { games: gamesFolder, passport: frenPassport, news: bulletinApp, tv: pondTV },
         subscribeSiteEvents: function (receive) {
           gochiReceive = receive;

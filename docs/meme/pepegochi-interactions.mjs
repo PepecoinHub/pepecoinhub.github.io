@@ -1,4 +1,5 @@
 import { TOYS, healthyCompanion, playableCompanion } from './pepegochi-personality.mjs?v=20261118dialog1';
+import { trustedForRumors } from './pepegochi-bond.mjs?v=20261120dialog2';
 // Cosmetic conversations; actual needs and care history come from the server view.
 const lines = {
   stamp: ["New stamp! Your Passport is becoming dangerously official.", "Another stamp, fren. I supervised from the taskbar."],
@@ -22,25 +23,40 @@ const lines = {
   gameRecord: ["New personal best. Fine, that was actually sick.", "New record. My coaching is clearly working. Invoice pending."],
   gameMoon: ["TO THE MOON. And you brought back a rock. Peak human behaviour."],
   gameDone: ["Solid landing. By which I mean the ground remains undefeated.", "Flight complete. Dignity still in transit."],
-  hello: ["I'm supervising the pond. Very important frog business.", "Oh hey, fren. I was just thinking about flies.", "PondOS looks better with me on the taskbar."],
-  joke: ["Why did the frog cross the road? The pond was on the other side. I never said it was a good joke.", "I tried to mine PEP with a potato. It was a chip.", "I have a great joke about flies. It went over my head."],
+  hello: ["I'm supervising the pond. Very important frog business.", "Oh hey, fren. I was just thinking about flies.", "PondOS looks better with me on the taskbar.", "Welcome to my extremely small office.", "I'm busy doing nothing. It's a full-time job.", "I checked the floppy drive. Still no flies.", "The modem screamed. I screamed back.", "My screen saver is called staring at the ceiling."],
+  joke: ["Why did the frog cross the road? The pond was on the other side. I never said it was a good joke.", "I tried to mine PEP with a potato. It was a chip.", "I have a great joke about flies. It went over my head.", "A frog walks into a bar. It was the taskbar.", "What does a frog call a broken keyboard? A croak-board.", "My computer has 64 MB of RAM and zero patience.", "I opened a new window. A mosquito flew in.", "I asked the printer for a lily pad. It gave me a paper jam."],
   pet: ["Hehe. More of that, fren. Tell nobody.", "This is acceptable human behaviour. Rare, but acceptable.", "Finally, a useful mouse."],
   annoyed: ["Fren. That's my face.", "I am not a touchscreen.", "The frog requests a little personal space."],
   play: ["Fancy a game? I believe in you. Mostly.", "Let's visit the pond arcade. Do not blame me if you lose."],
-  return: ["You're back! I saved your spot beside me.", "There you are, fren. The taskbar is better with you here."],
-  fed: ["That hit the spot. You remembered my favourite thing: food."],
-  clean: ["Fresh frog, fresh start. Thanks for the bath, fren."],
-  played: ["That was fun. Same team again next time?"],
-  rested: ["Much better. Thanks for letting a little frog recharge."],
+  return: ["You're back! I saved your spot beside me.", "There you are, fren. The taskbar is better with you here.", "Welcome back. The flies missed your supervision."],
+  returnLong: ["You're back! I saved your seat. And most of the snacks.", "Welcome back, fren. I kept the modem warm.", "There you are. The pond felt a little quiet without you."],
+  fed: ["That hit the spot. You remembered my favourite thing: food.", "That hit the spot. Five-star fly cuisine.", "That hit the spot. My compliments to the chef."],
+  clean: ["Fresh frog, fresh start. Thanks for the bath, fren.", "Clean enough for a Windows 98 install.", "All shiny. No frog-shaped fingerprints, please."],
+  played: ["That was fun. Same team again next time?", "Recreation department: mission complete.", "A very professional play session. I demand a replay."],
+  rested: ["Much better. Thanks for letting a little frog recharge.", "A proper recharge. My dreams had dial-up sound effects.", "Recharge complete. No reboot required."],
   grown: ["Look at me! A little bigger, still your fren."],
   quizWin: ["We make a pretty good pond quiz team. You think, I ribbit."],
   quizMiss: ["We learned something together. That's still a good day."],
   offline: ["The pond went quiet. I'll keep you company while the connection is away."],
   online: ["The pond is back! I kept your seat warm."],
-  familiar: ["I know that gentle pat. That's my human. Unfortunately for you, I am keeping you.", "Right behind the eyes. You know me well, fren. Do not get smug."],
+  familiar: ["I know that gentle pat. That's my human. Unfortunately for you, I am keeping you.", "Right behind the eyes. You know me well, fren. Do not get smug.", "That's my human. Highly trained in frog maintenance.", "You know me well, fren. This is officially our patch of pond."],
   space: ["Tiny frog break. Let's just sit together for a moment."],
   news: ["PondOS has games, stamps and a whole pond of frens. Go explore!", "Check the Pond Quiz, your Fren Passport or the arcade."],
 };
+const greetings = {
+  morning: ["Morning, fren. The modem is awake before I am.", "Good morning. One fly coffee, please."],
+  afternoon: ["Afternoon shift. Frog supervision continues.", "The pond is sunny. My screen is not."],
+  evening: ["Evening, fren. Time for CRT glow and comfy socks.", "Prime time on Pond TV. I have the remote."],
+  night: ["Still up, fren? The screensaver has been working overtime.", "Night shift. Please don't feed me after bedtime."],
+};
+const friendship = ["Fourteen good care days? You're practically family, fren.", "This taskbar feels like home with you here.", "After all this time, I still trust you with the remote." ];
+const rareLines = ['FROG.EXE has performed an extremely legal operation.', 'My Y2K survival kit contains exactly one emergency fly.', 'Press any key to continue. I am not the any key.'];
+export function pepMood(quote, time) {
+  const at = Date.parse(quote?.time || '');
+  if (!quote || quote.saved || !Number.isFinite(quote.change_24h) || !Number.isFinite(at) || !Number.isFinite(time) || time-at<0 || time-at>3*3600000) return 'unknown';
+  return quote.change_24h>=5?'up':quote.change_24h<=-5?'down':'quiet';
+}
+const marketLines = {up:['PEP had a green day. Even my lava lamp looks jealous.', 'Green candles on the CRT. Still the same frog.'],down:['PEP had a red day. My mug of copium is vintage.', 'Red candles. The pond remains a pond, fren.'],quiet:['Quiet day on the PEP chart. My aquarium is more exciting.', 'The chart is taking a nap. I respect that.'],unknown:['The price screen is off-air. No guesses from this frog.']};
 const moods = {
   'tb_adult_hungry': "My stomach is making modem noises. Can we visit my room?",
   'tb_adult_dirty': "I smell like a very authentic pond. A bath would be nice.",
@@ -57,6 +73,7 @@ const youngLines = {
   play: ['Let us play! I am practising my first big hops.'], news: ['I am exploring the pond one little hop at a time.'],
   toyFavourite: ['My favourite! *excited wiggle*'], toyOkay: ['Again! That was fun.'], toyAgain: ['Give me a moment to catch up!'],
   desktopFirefly: ['A flying little light! *ribbit!*'], desktopTV: ['Movie time!'],
+  market: ['I am too little for charts. Can we look at pond bugs instead?'],
 };
 const youngNeeds = {hunger:'I am hungry.',hygiene:'I need a bath.',mood:'I could use some playtime.',energy:'I need a rest.'};
 function pick(a, n) { return a[Math.abs(Math.trunc(n || 0)) % a.length]; }
@@ -85,6 +102,7 @@ export function companionReply(view, action = 'hello', n = 0, context = {}) {
     return { text: message, pose: null, openRoom: false };
   }
   if (action === 'how') return { text: "Feeling pretty good, fren. Thanks for asking.", pose: 'tb_adult_talk', openRoom: false };
+  if (action === 'market') return { text: pick(marketLines[pepMood(context.quote,context.time)],n), pose:'tb_adult_think', openRoom:false };
   if (action === 'memories' && context.journal?.length) return { text: context.journal.join('\n\n'), pose: 'tb_adult_think', openRoom: false };
   if (action === 'favourite') return { text: context.discovered && TOYS[context.favourite]
     ? `The ${TOYS[context.favourite].name}. Mine. You may be its unpaid throwing assistant.`
@@ -92,19 +110,26 @@ export function companionReply(view, action = 'hello', n = 0, context = {}) {
   if (action === 'memories') return { text: view.careDays > 0
     ? `You have looked after me on ${view.careDays} care days. Those little visits mean a lot, fren.`
     : "Our story is just starting. A little food, a little play, a little time together.", pose: 'tb_adult_think', openRoom: false };
-  const group = lines[action] || lines.hello;
+  let group = lines[action] || lines.hello;
+  if(action==='hello' && Number.isFinite(context.time)) {
+    const hour=new Date(context.time).getHours();
+    if(n>0&&n%23===0) group=rareLines;
+    else if(view.careDays>=14&&n%5===0) group=friendship;
+    else if(n%3===0) group=greetings[hour<5?'night':hour<12?'morning':hour<18?'afternoon':hour<23?'evening':'night'];
+  }
   return { text: pick(group, n), pose: ['pet', 'familiar', 'joke', 'quizWin', 'grown', 'stamp', 'stampBatch'].includes(action) ? 'tb_adult_laugh' : action === 'secret' ? 'tb_adult_think' : action === 'annoyed' ? 'tb_adult_moody' : 'tb_adult_talk', openRoom: false };
 }
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
 // No polling. Optional care delegates to the host's existing validated server action; bond memories stay cosmetic.
-export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, commands = {}, care, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, readRumors, openPassport, now = () => Date.now() }) {
+export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, commands = {}, care, bond, getQuote = () => null, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, readRumors, openPassport, now = () => Date.now() }) {
   let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
   let careTicket = 0;
   let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
   let lastActivity = now(), bornAt = now();
   let rumorTicket = 0, rumorActions = null, rumorOpen = false;
   const doc = button.ownerDocument;
+  const context = () => ({...bond,time:now(),quote:getQuote()});
   const win = doc.defaultView;
   const el = (tag, cls, text) => {
     const e = doc.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e;
@@ -116,7 +141,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
   function react(action) {
     bond?.remember(action);
     if (panel || bond?.muted || !canReact() || doc.visibilityState === 'hidden' || now() - lastReaction < 45000 || !getView()?.hasPet) return;
-    const r = companionReply(getView(), action, sequence++);
+    const r = companionReply(getView(), action, sequence++, context());
     clearNotice(); lastReaction = now();
     notice = el('div', 'pg-fact pg-companion-reaction');
     notice.setAttribute('role', 'status');
@@ -181,7 +206,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
   function invalidateRumors() {
     if (!rumorOpen || !panel) return;
     clearRumors();
-    reply.textContent = 'A new discovery! Choose Pond Rumors or Secret Journal again to see the updated trail.';
+    reply.textContent = 'A new discovery! Check your Secret Journal for the updated list.';
   }
   async function showRumors(journal = false) {
     clearRumors(); rumorOpen = true;
@@ -193,23 +218,18 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     try { result = await readRumors(); } catch { result = null; }
     if (!panel || panel !== target || ticket !== rumorTicket) return;
     const p = result?.progress;
+    if (!journal && !trustedForRumors(getView())) { reply.textContent = 'Let us look after each other first, fren.'; return; }
     if (result?.status !== 'ok' || !p) {
       reply.textContent = result?.status === 'signed-out' ? 'Log in with Discord to read your own secret journal.' : 'The pond is quiet. I could not check your Passport. Try again in a moment.';
       return;
     }
     const summary = `${p.found.length} / ${p.total} rumored secrets found.`;
     const message = journal ? `Secret Journal\n${summary}\n${p.found.length ? p.found.map(title => '• ' + title).join('\n') : 'No discoveries recorded yet. Every detective starts somewhere.'}` :
-      `Pond Rumors\n${summary}\n\n${p.hint || 'You found every trail I know. Keep an eye on the pond; there may be more mysteries later.'}`;
+      `Just between us, fren…\n\n${p.hint || 'I have no more rumors for now. Let us enjoy the pond.'}`;
     reply.textContent = message;
     rumorActions = el('div', 'pg-fact-answers pg-rumor-actions');
     function extra(label, action) {
       const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', action); rumorActions.append(b); return b;
-    }
-    if (!journal && p.detail) {
-      const b = extra('A little more?', () => {
-        reply.textContent = message + '\n\n' + p.detail;
-        b.disabled = true; panel.scrollTop = 0;
-      });
     }
     if (openPassport) extra('View journal in Fren Passport', () => { close(); openPassport(); });
     if (rumorActions.childElementCount) reply.after(rumorActions);
@@ -217,6 +237,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
   }
   function say(action = 'hello') {
     clearNotice(); clearRumors();
+    const spontaneousRumor = action === 'hello' && !panel;
     if (action === 'hello') action = bond?.take() || action;
     if (action === 'pet') {
       pats = pats.filter(t => now() - t < 10000); pats.push(now());
@@ -226,7 +247,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
         if (now() - lastPet > 30000) { bond?.pet(); lastPet = now(); }
       }
     }
-    const r = companionReply(getView(), action, sequence++, bond || {});
+    const r = companionReply(getView(), action, sequence++, context());
     if (r.openRoom) { visit(); return; }
     closeQuiz();
     const fresh = !panel;
@@ -263,7 +284,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
           careButtons.forEach(b => { b.disabled = false; });
           if (ticket !== careTicket || !panel) return;
           if (result?.openRoom) { visit(); return; }
-          const response = result?.action ? companionReply(getView(), result.action, sequence++, bond || {}) : null;
+          const response = result?.action ? companionReply(getView(), result.action, sequence++, context()) : null;
           reply.textContent = result?.text || (result?.ok ? `${label} saved. ${response?.text || ''}`.trim() : response?.text) || 'Care could not be saved. Try again in a moment.';
           setPose(response?.pose || null);
           if (result?.ok && result.action) animate(result.action);
@@ -275,7 +296,6 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
       }
       add('Go to your room', visit).className += ' pg-room-shortcut';
       if (readRumors) {
-        add('Pond Rumors', () => showRumors());
         add('Secret Journal', () => showRumors(true));
       }
       add('Our memories', () => say('memories'));
@@ -294,6 +314,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
         label(); mute.addEventListener('click', () => { clearRumors(); bond.toggleMute(); clearNotice(); label(); reply.textContent = bond.muted ? 'Automatic reactions are off. You can still talk and play with me.' : 'Automatic reactions are on. Watch for little surprises!'; panel.scrollTop = 0; }); actions.append(mute);
       }
       add('How are you?', () => say('how'));
+      if (getView()?.adult) add('How is PEP?', () => say('market'));
       add('Tell me a joke', () => say('joke'));
       add("Let's play!", () => { if (!runCommand('games')) say('play'); });
       add('Pet me', () => say('pet'));
@@ -311,6 +332,8 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     reply.textContent = r.text;
     setPose(r.pose);
     animate(action);
+    // Rare clue comes only from a fresh voluntary greeting, never from a repeatable menu action.
+    if(spontaneousRumor && action==='hello' && readRumors && trustedForRumors(getView()) && bond?.tryRumor?.(getView())) showRumors();
     reposition();
     if (fresh) panel.querySelector('.pg-fact-x')?.focus();
   }

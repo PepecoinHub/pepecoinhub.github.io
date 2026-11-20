@@ -74,6 +74,14 @@ test('props are cosmetic except an explicit TV request and the two care shortcut
   assert.equal(roomResponse('not_owned_item',view()),null);
 });
 
+test('room objects rotate ten distinct contextual replies without changing their actions',()=>{
+  for(const id of ['mug','p_poster','potted_plant','moon_rock','golden_fly','floppy_disk','paper_crown','rubber_duck','crt_tv','bed','lava_lamp']) {
+    const results=Array.from({length:10},(_,propIndex)=>roomResponse(id,view(),{embedded:true,propIndex,lampOn:propIndex%2===0}));
+    assert.equal(new Set(results.map(r=>r.text)).size,10,id);
+    assert.ok(results.every(r=>r.care===(id==='bed'?'rest':id==='rubber_duck'?'play':undefined)),id);
+  }
+});
+
 test('attached controls use fresh view, respect busy/throttle and reset lamp for a different life', () => {
   class Node {
     constructor(doc) { this.ownerDocument=doc; this.children=[];this.style={};this.dataset={};this.attrs={};this.isConnected=true;

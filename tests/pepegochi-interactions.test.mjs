@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { companionReply, mountFrogInteractions } from '../docs/meme/pepegochi-interactions.mjs';
+import { companionReply, mountFrogInteractions, pepMood } from '../docs/meme/pepegochi-interactions.mjs';
 
 const adult = { hasPet: true, adult: true, motion: 'adult', sprite: 'taskbar/tb_adult_sit.png' };
 test('healthy adult: varied cosmetic replies and appropriate existing poses', () => {
@@ -193,24 +193,42 @@ test('initiated contact is sparse, muted/blocked/young-safe, and never opens a d
   h.controller.dispose();assert.equal(h.doc.body.children.length, 0);
 });
 
-test('rumor and journal buttons use read-only on-demand data, optional detail and Passport navigation', async () => {
+test('journal is available even without trust, but never offers a clue or detail', async () => {
   let reads = 0, opened = 0;
   const progress = { found: ['One mystery'], total: 12, hint: 'A subtle clue', detail: 'A second clue' };
   const h = harness({ ...adult, adult: false, motion: 'froglet' }, { readRumors: async () => { reads++; return { status: 'ok', progress }; }, openPassport: () => opened++ });
   h.button.emit('click', { detail: 0 });
   assert.equal(reads, 0);
   const panel = h.doc.body.children[0], actions = panel.querySelector('.pg-fact-answers'), reply = panel.querySelector('.pg-fact-q');
-  actions.children.find(b => b.textContent === 'Pond Rumors').emit('click');
-  assert.match(reply.textContent, /check/); await Promise.resolve();
-  assert.match(reply.textContent, /1 \/ 12.*\n\nA subtle clue/);
-  const extras = panel.querySelector('.pg-rumor-actions');
-  extras.children.find(b => b.textContent === 'A little more?').emit('click');
-  assert.match(reply.textContent, /A second clue/); assert.equal(reads, 1);
+  assert.ok(!actions.children.some(b => b.textContent === 'Pond Rumors'));
   actions.children.find(b => b.textContent === 'Secret Journal').emit('click'); await Promise.resolve();
-  assert.match(reply.textContent, /One mystery/); assert.equal(reads, 2);
+  assert.match(reply.textContent, /One mystery/); assert.equal(reads, 1);
+  assert.doesNotMatch(reply.textContent, /clue/);
   assert.equal(panel.querySelector('.pg-rumor-actions').children.length, 1);
   panel.querySelector('.pg-rumor-actions').children[0].emit('click');
   assert.equal(opened, 1); assert.equal(h.doc.body.children.length, 0); h.controller.dispose();
+});
+
+test('a trusted fresh greeting may reveal exactly one subtle clue; never a second detail', async () => {
+  let reads = 0, rolls = 0;
+  const trusted = {...adult,careDays:14,trustReady:true};
+  const h = harness(trusted,{bond:{take:()=>null,tryRumor:()=>++rolls===1},readRumors:async()=>{reads++;return {status:'ok',progress:{found:[],total:12,hint:'A subtle clue',detail:'Hidden detail'}};}});
+  h.button.emit('click',{detail:0}); await Promise.resolve();
+  const p = h.doc.body.children[0];
+  assert.match(p.querySelector('.pg-fact-q').textContent,/A subtle clue/);
+  assert.doesNotMatch(p.querySelector('.pg-fact-q').textContent,/Hidden detail/);
+  assert.equal(reads,1);
+  h.controller.close(); h.button.emit('click',{detail:0}); await Promise.resolve();
+  assert.equal(reads,1); h.controller.dispose();
+});
+
+test('PEP commentary uses fresh quote only and distinguishes green, red and quiet days',()=>{
+  const time=Date.now(),quote={time:new Date(time).toISOString(),change_24h:5};
+  assert.equal(pepMood(quote,time),'up');assert.equal(pepMood({...quote,change_24h:-5},time),'down');
+  assert.equal(pepMood({...quote,change_24h:1},time),'quiet');assert.equal(pepMood(quote,time+4*3600000),'unknown');
+  assert.equal(pepMood({...quote,saved:true},time),'unknown');
+  assert.match(companionReply(adult,'market',0,{quote,time}).text,/green/);
+  assert.match(companionReply(adult,'market',0,{quote,time:time+4*3600000}).text,/off-air/);
 });
 
 test('late rumor responses cannot overwrite another action, a new discovery or a closed dialog', async () => {
@@ -220,8 +238,8 @@ test('late rumor responses cannot overwrite another action, a new discovery or a
   const panel = h.doc.body.children[0], actions = panel.querySelector('.pg-fact-answers'), reply = panel.querySelector('.pg-fact-q');
   const click = label => actions.children.find(b => b.textContent === label).emit('click');
   const result = { status: 'ok', progress: { found: [], total: 12, hint: 'Late clue', detail: 'Late detail' } };
-  click('Pond Rumors'); click('Tell me a joke'); const joke = reply.textContent; resolvers[0](result); await Promise.resolve(); assert.equal(reply.textContent, joke);
-  click('Pond Rumors'); h.controller.invalidateRumors(); resolvers[1](result); await Promise.resolve(); assert.match(reply.textContent, /new discovery/);
-  click('Pond Rumors'); h.controller.close(); resolvers[2](result); await Promise.resolve(); assert.equal(h.doc.body.children.length, 0);
+  click('Secret Journal'); click('Tell me a joke'); const joke = reply.textContent; resolvers[0](result); await Promise.resolve(); assert.equal(reply.textContent, joke);
+  click('Secret Journal'); h.controller.invalidateRumors(); resolvers[1](result); await Promise.resolve(); assert.match(reply.textContent, /new discovery/);
+  click('Secret Journal'); h.controller.close(); resolvers[2](result); await Promise.resolve(); assert.equal(h.doc.body.children.length, 0);
   h.controller.dispose();
 });

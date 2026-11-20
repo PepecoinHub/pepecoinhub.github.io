@@ -24,7 +24,7 @@ let browser;const server=http.createServer((req,res)=>{
  const sizes=await page.locator('.pgr img').evaluateAll(imgs=>imgs.map(i=>({src:i.getAttribute('src'),w:i.naturalWidth,h:i.naturalHeight})));
  assert.equal(sizes.filter(i=>i.src.includes('/hd/')&&i.w===256&&i.h===256).length,10,'all nine props plus adult use the HD images');
  assert.ok(sizes.some(i=>i.src.includes('/hd/room_pond_den_v1.png')&&i.w===640&&i.h===400));
- assert.ok(sizes.some(i=>i.src.endsWith('p_poster.png?v=20261120roomhd1')&&i.w===128));
+ assert.ok(sizes.some(i=>i.src.endsWith('p_poster.png?v=20261120dialog2')&&i.w===128));
  await capture('room-after.png');
  await page.evaluate(()=>document.querySelector('.pgr-bg').src='/games/img/pepegochi/room_clean_base.png');
  await page.waitForFunction(()=>document.querySelector('.pgr-bg').complete);

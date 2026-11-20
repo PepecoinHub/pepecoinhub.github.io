@@ -4,16 +4,16 @@ import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
 // Loaded only behind the existing ?beta=gochi gate. Local conversations are cosmetic; no polling, rewards or fake pet.
 // Based on PR #299; adds the Pond Quiz (one server question a day once the frog has hatched; update_pond_quiz.sql)
 // and the hop out of the PEPEGOCHI.EXE window.
-import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261120roomhd1';
+import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261120dialog2';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261120roomhd1';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261120dialog2';
 import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
 import { createRumorReader } from './pepegochi-rumors.mjs?v=20261118rumors1';
 import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118dialog1';
 
-import { createBond } from './pepegochi-bond.mjs?v=20261120roomhd1';
+import { createBond } from './pepegochi-bond.mjs?v=20261120dialog2';
 
-import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261118events1';
+import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120dialog2';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
 const NEEDS = new Set(['hunger', 'hygiene', 'mood', 'energy']);
@@ -75,6 +75,7 @@ export function describeTaskbarFrog(state) {
   };
   return {
     careDays: Math.max(0, Math.trunc(Number(p.care_days) || 0)),
+    trustReady: stage === 'adult' && status === 'healthy' && needs.length === NEEDS.size && needs.every(n=>n.value>=90),
     sprite: pose(poseFor(sprite)), label: name, adult: stage === 'adult',
     playReady: stage !== 'egg' && status === 'healthy' && needs.length === NEEDS.size && !low,
     needAttention: low?.need || null,
@@ -100,12 +101,12 @@ export function hopPath(from, to, steps = 36) {
 
 // One state read on entry, then only when the tab returns after a break, auth changes,
 // or the PEPEGOCHI.EXE iframe signals that a player action succeeded.
-export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base = '../', now = () => Date.now(), subscribeSiteEvents = () => () => {}, rumorsEnabled = true, openPassport }) {
+export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base = '../', now = () => Date.now(), random = Math.random, getQuote = () => null, subscribeSiteEvents = () => () => {}, rumorsEnabled = true, openPassport }) {
   const start = bar && bar.querySelector('.start');
   if (!start) return () => {};
   let storage;
   try { storage = window.localStorage; } catch {}
-  const bond = createBond({ storage, now });
+  const bond = createBond({ storage, now, random });
   const arcade = createArcadeObserver();
   const siteEvents = createSiteEventObserver();
   const rumors = createRumorReader({ session, rpc, now });
@@ -443,11 +444,13 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   }
 
   let lastAt = 0;
+  let confirmedAt = null;
   let lastUser = null;
   let generation = 0;
   let careBusy = false;
   const CARE_REACTION = { feed: 'fed', clean: 'clean', play: 'played', rest: 'rested' };
   function acceptState(state, { keepConversation = false } = {}) {
+    confirmedAt = now();
     const life = state?.pet?.life_id || null;
     if (lastLife !== life) {
       desktop?.reset();
@@ -509,6 +512,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
       desktop?.reset();
       lastUser = id;
       lastAt = 0;
+      confirmedAt = null;
       generation++;
       cancelQuiz();               // the old account's question or ranking must not stay on screen
       rumors.invalidate();
@@ -569,11 +573,11 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   window.addEventListener('pondos:secret-found', onSecret);
   window.addEventListener('pondos:pepegochi-left', onLeftWindow);
   document.addEventListener('visibilitychange', onVisible);
-  conversation = mountFrogInteractions({ button, img, slot, getView: () => shownView,
+  conversation = mountFrogInteractions({ button, img, slot, getView: () => ({ ...shownView, trustReady: shownView?.trustReady && confirmedAt !== null && now()-confirmedAt >= 0 && now()-confirmedAt <= 5*60000 }),
     setPose: p => { desktop?.stop(); cancelMotion(); setAct(p); if (!p) queueMotion(); }, animate: animateExpression, showToy, openRoom: open,
     closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
     openQuiz: requestQuiz, commands, care: taskbarCare, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
-    readRumors: rumorsEnabled ? rumors.read : null, openPassport,
+    readRumors: rumorsEnabled ? rumors.read : null, openPassport, getQuote,
     canReact: () => !balloon && !desktop?.active && !document.querySelector('.reward98') && document.activeElement?.tagName !== 'IFRAME', now });
   const unsubscribeSiteEvents = subscribeSiteEvents(event => {
     const current = session();

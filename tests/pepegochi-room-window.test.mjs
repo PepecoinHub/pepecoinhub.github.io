@@ -195,7 +195,7 @@ test('the drawn room: layers in order, the letter is a real button, the frog car
   assert.equal(art.getAttribute('role'), 'img');
   assert.match(art.getAttribute('aria-label'), /hungry/);
   const frog = pet.querySelector('.pgr-pet');
-  assert.equal(frog.src, spriteSrc('adult_hungry') + '?v=20261120roomhd1');
+  assert.equal(frog.src, spriteSrc('adult_hungry') + '?v=20261120dialog2');
   assert.equal(frog.dataset.fallback, undefined);
   const young = renderRoom(doc, { mode: 'pet', stage: 'froglet', status: 'neglected' }).querySelector('.pgr-pet');
   assert.equal(young.dataset.sprite, 'froglet_neglected'); assert.equal(young.dataset.fallback, undefined, 'its own sprite, no grey');
@@ -219,7 +219,7 @@ test('playDeparture: frames on a timer, the letter waits until the frog is out, 
   const actor = () => room.querySelector('.pgr-actor');
   const seen = [];
   assert.equal(room.querySelector('.pgr-letter').hidden, true, 'no letter while the frog is still here');
-  while (actor()) { const src = actor().children[0].src; assert.match(src, /\?v=20261120roomhd1$/); seen.push(src.split('?')[0].split('/').pop()); const f = pending; pending = null; f(); }
+  while (actor()) { const src = actor().children[0].src; assert.match(src, /\?v=20261120dialog2$/); seen.push(src.split('?')[0].split('/').pop()); const f = pending; pending = null; f(); }
   assert.deepEqual(seen.slice(0, 6), ['depart_turn_01.png', 'depart_turn_02.png', 'depart_walk_01.png', 'depart_walk_02.png', 'depart_walk_03.png', 'depart_walk_04.png']);
   assert.equal(seen.length, departTimeline('adult').length, 'every frame once, then gone');
   assert.ok(fired.every(ms => ms === DEPART_MS));

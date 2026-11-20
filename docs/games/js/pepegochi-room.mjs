@@ -15,7 +15,7 @@ export const ROOM_H = 400;
 export const IMG = 'img/pepegochi/';
 // The approved 1999 room artwork is separate from legacy and taskbar assets.
 export const HD_IMG = IMG + 'hd/';
-export const SPRITE_VERSION = '20261120roomhd1';
+export const SPRITE_VERSION = '20261120dialog2';
 export const versionSprite = src => src.startsWith(IMG) ? src + '?v=' + SPRITE_VERSION : src;
 export const BACKGROUND = HD_IMG + 'room_pond_den_v1.png';
 // bumped when a room prop is redrawn under the same file name (A10: mug, duck, painting, 2026-11-15)

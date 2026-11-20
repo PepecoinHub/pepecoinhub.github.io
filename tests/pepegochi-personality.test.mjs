@@ -15,7 +15,7 @@ test('toy preference, spaced play and journal persist per owner/life without cli
  reload.observe('b',{life_id:'one'});assert.equal(reload.journal.length,0);assert.equal(reload.discovered,false);
  assert.match(companionReply(adult,'favourite',0,b).text,/unpaid throwing assistant/);
  assert.match(companionReply(adult,'memories',0,b).text,/executive supervision/);
- assert.equal(b.invite(),true);assert.equal(b.invite(),false);now+=8*60000;assert.equal(b.invite(),true);b.toggleMute();now+=8*60000;assert.equal(b.invite(),false);
+ assert.equal(b.invite(),true);assert.equal(b.invite(),false);now+=8*60000;assert.equal(b.invite(),false);now+=37*60000;assert.equal(b.invite(),true);b.toggleMute();now+=45*60000;assert.equal(b.invite(),false);
 });
 test('arcade observations require exact origin, iframe path/source, start and same owner/life; consume once',()=>{
  const observer=createArcadeObserver(),source={},origin='https://pond.test';

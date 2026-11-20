@@ -18,6 +18,13 @@ test('a healthy adult sits on the bar', () => {
   assert.equal(v.adult, true);
   assert.match(v.title, /Fren/);
 });
+test('rumor trust needs a healthy adult with all four needs at least 90',()=>{
+  assert.equal(describeTaskbarFrog(pet({care_days:14})).trustReady,true);
+  assert.equal(describeTaskbarFrog(pet({needs:{...needs,mood:89}})).trustReady,false);
+  assert.equal(describeTaskbarFrog(pet({needs:{hunger:100,hygiene:100,mood:100}})).trustReady,false);
+  assert.equal(describeTaskbarFrog(pet({stage:'froglet'})).trustReady,false);
+  assert.equal(describeTaskbarFrog(pet({status:'recovering'})).trustReady,false);
+});
 test('the lowest real need picks the same mood as the room', () => {
   assert.equal(describeTaskbarFrog(pet({ needs: { ...needs, hunger: 42, mood: 80 } })).sprite, 'taskbar/tb_adult_hungry.png');
   assert.equal(describeTaskbarFrog(pet({ needs: { ...needs, hygiene: 42 } })).sprite, 'taskbar/tb_adult_dirty.png');
