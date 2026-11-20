@@ -18,6 +18,9 @@ export const HD_IMG = IMG + 'hd/';
 export const SPRITE_VERSION = '20261120dialog2';
 export const versionSprite = src => src.startsWith(IMG) ? src + '?v=' + SPRITE_VERSION : src;
 export const BACKGROUND = HD_IMG + 'room_pond_den_v1.png';
+// A fixed architectural decoration, like the house sign, not a Passport reward or inventory item.
+// The shade and base sit to the left of the existing lava lamp on the dresser.
+export const ROOM_LAMP = { src: versionSprite(HD_IMG + 'pepe_table_lamp.png'), left: 47 / ROOM_W * 100, top: 227 / ROOM_H * 100, width: 80 / ROOM_W * 100, bounds: [75,12,180,236].map(n=>n/2) };
 // bumped when a room prop is redrawn under the same file name (A10: mug, duck, painting, 2026-11-15)
 export const PROP_V = SPRITE_VERSION;
 export const propSrc = id => (id === 'p_poster' ? IMG : HD_IMG) + id + '.png';
@@ -25,7 +28,7 @@ export const propSrc = id => (id === 'p_poster' ? IMG : HD_IMG) + id + '.png';
 // Visible bounds in logical room pixels, measured at 30% alpha. The HD images are 2x logical size.
 const logical = box => box.map(n => n / 2);
 export const PROP_BOUNDS = { p_poster: [18,14,112,114], ...Object.fromEntries(Object.entries({
-  crt_tv:[26,32,235,236], lava_lamp:[68,32,201,228], potted_plant:[34,32,226,228], rubber_duck:[68,36,185,220],
+  crt_tv:[26,32,235,236], lava_lamp:[68,32,201,228], potted_plant:[41,32,220,228], rubber_duck:[68,36,185,220],
   mug:[52,64,244,220], moon_rock:[42,72,214,248], paper_crown:[36,52,221,248], golden_fly:[49,72,212,248], floppy_disk:[48,58,204,248],
 }).map(([id,box])=>[id,logical(box)])) };
 
@@ -284,6 +287,8 @@ export function renderRoom(doc, opts = {}) {
   const bg = mk('img', 'pgr-bg'); bg.src = BACKGROUND; bg.alt = ''; art.append(bg);
   const sign = mk('div', 'pgr-house-sign'); sign.setAttribute('aria-hidden', 'true');
   sign.textContent = 'NO FUD\nAFTER BEDTIME'; art.append(sign);
+  const lamp = mk('img', 'pgr-fixed-lamp'); lamp.src = ROOM_LAMP.src; lamp.alt = '';
+  pos(lamp, ROOM_LAMP.left, ROOM_LAMP.top, ROOM_LAMP.width); art.append(lamp);
   for (const it of sc.items) {
     const im = mk('img', 'pgr-item' + (it.wall ? ' pgr-wall' : ''));
     im.src = it.src; im.alt = ''; im.dataset.slot = it.slotId; im.dataset.item = it.itemId;

@@ -35,6 +35,8 @@ function draw(){
   const placements=full?fixedPlacements(Object.keys(ITEMS)):STARTER_ROOM;
   const original=renderRoom(document,{stage,placements});
   const revised=renderRoom(document,{stage,placements});
+  original.querySelector('.pgr-fixed-lamp')?.remove();
+  revised.querySelector('.pgr-fixed-lamp').src=resolve('room/pepe_table_lamp.png');
   original.querySelectorAll('img').forEach(img=>{img.src=img.getAttribute('src').replace('/hd/','/');});
   revised.querySelector('.pgr-bg').src=resolve('room/room_pond_den_v1.png');
   revised.querySelectorAll('[data-item]').forEach(item=>{

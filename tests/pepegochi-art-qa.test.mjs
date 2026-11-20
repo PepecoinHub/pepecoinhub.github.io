@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 import { decodePng, bbox, checkImage, checkFile, compareWith, formatFor, FORMATS } from '../scripts/pepegochi_art_qa.mjs';
-import { SPRITES, SPRITE_BOUNDS, PROP_BOUNDS, spriteSrc, propSrc, DEPART_FRAMES, DEPART_DX, HATCH_FRAMES, CARE, careFrames, WALK, IMG, HD_IMG, ITEMS, SUITCASE, LETTER, BACKGROUND } from '../docs/games/js/pepegochi-room.mjs';
+import { SPRITES, SPRITE_BOUNDS, PROP_BOUNDS, ROOM_LAMP, spriteSrc, propSrc, DEPART_FRAMES, DEPART_DX, HATCH_FRAMES, CARE, careFrames, WALK, IMG, HD_IMG, ITEMS, SUITCASE, LETTER, BACKGROUND } from '../docs/games/js/pepegochi-room.mjs';
 
 const path = src => new URL('../docs/games/' + src, import.meta.url);
 const png = src => decodePng(readFileSync(path(src)));
@@ -94,6 +94,7 @@ test('every approved HD frog and room prop pass QA; classic letter, suitcase and
   }
   for (const f of [SUITCASE.src, LETTER.envelope, LETTER.open, ...Object.keys(ITEMS).map(propSrc)])
     assert.deepEqual(checkFile(path(f).pathname, { prop: true }).problems, [], f);
+  assert.deepEqual(checkFile(path(ROOM_LAMP.src.split('?')[0]).pathname,{prop:true}).problems,[]);
   assert.equal(propSrc('p_poster'), IMG+'p_poster.png');
   for (const id of Object.keys(ITEMS)) {
     assert.deepEqual(bbox(png(propSrc(id)),77).map(v=>id==='p_poster'?v:v/2), PROP_BOUNDS[id], id);

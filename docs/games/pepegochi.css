@@ -96,6 +96,8 @@ html.embed body { padding-inline: 0; }
 /* A11: architectural detail, not an owned/earned decoration. */
 .pgr-house-sign { position:absolute; z-index:2; left:4.375%; top:12%; width:12.5%; padding:1.25% .5%; background:#253e38; border:2px solid #a28a51; box-shadow:2px 2px #172a27; color:#d3c597; text-align:center; white-space:pre-line; font:700 clamp(4px,1.25cqw,8px)/1.5 monospace; letter-spacing:.04em; pointer-events:none; }
 .pgr-item:not(.pgr-wall) { filter:drop-shadow(2px 3px 0 #14282066); }
+.pgr-fixed-lamp { z-index:49; transform:translate(-50%,-100%); filter:drop-shadow(2px 3px 0 #14282066); }
+.pgr-room-lights-off .pgr-fixed-lamp { filter:brightness(.6) drop-shadow(2px 3px 0 #14282066); }
 .pgr-wall { filter:drop-shadow(2px 2px 0 #14282066); }
 
 /* Room A13: keyboard/touch-friendly hit areas are separate from the labelled artwork. */

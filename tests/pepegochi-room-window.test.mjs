@@ -201,6 +201,8 @@ test('the drawn room: layers in order, the letter is a real button, the frog car
   assert.equal(young.dataset.sprite, 'froglet_neglected'); assert.equal(young.dataset.fallback, undefined, 'its own sprite, no grey');
   assert.equal(frog.style.getPropertyValue('--foot'), 124 / 128 * 100 + '%');
   assert.equal(pet.querySelectorAll('.pgr-item').length, 6);
+  assert.match(pet.querySelector('.pgr-fixed-lamp').src,/\/hd\/pepe_table_lamp.png\?v=/);
+  assert.equal(pet.querySelector('.pgr-fixed-lamp').dataset.item,undefined);
   assert.equal(pet.querySelector('.pgr-letter'), null);
   const gone = renderRoom(doc, { mode: 'departed' });
   const letter = gone.querySelector('.pgr-letter');
