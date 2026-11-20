@@ -3,7 +3,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '../docs');
 const capture = async (page, name) => {if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await page.screenshot({path:path.join(process.env.PEPEGOCHI_QA_SCREENSHOTS,`companion-${name}.png`)});};
-const html = `<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/meme/meme.css">
+const html = `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/meme/meme.css">
 <body class="pondos"><input id="work" aria-label="Work"><header style="position:fixed;bottom:0;width:100%"><div class="bar"><button class="start">Start</button></div></header>
 <script type="module">
 import { mountTaskbarFrog } from '/meme/pepegochi-taskbar.mjs';
@@ -11,6 +11,16 @@ window.t = { time: Date.now(), owner: 'owner-a', opened: 0, apps: [], passportOp
 t.refresh = () => window.dispatchEvent(new Event('pondos:auth-changed'));
 t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>t.opened++,openPassport:()=>t.passportOpened++,commands:Object.fromEntries(['games','news','passport','tv'].map(name=>[name,()=>t.apps.push(name)])),session:()=>({discord:true,userId:t.owner}),now:()=>t.time,random:()=>0,getQuote:()=>({time:new Date(t.time).toISOString(),change_24h:6}),rpc:async (name,args)=>{t.calls.push(name);if(name==='gry_passport_state'){if(t.deferPassport)return new Promise(r=>t.passportResolve=r);return structuredClone(t.passport)}if(name==='gry_quiz_answer')return new Promise(r=>t.answer=r);if(name==='gry_pepegochi_action'){const need={feed:'hunger',clean:'hygiene',play:'mood',rest:'energy'}[args.p_action];t.pet.needs[need]=Math.min(100,t.pet.needs[need]+35);return {pet:structuredClone(t.pet),action_result:'accepted'};}return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:{day:new Date().toISOString().slice(0,10),question:'Pond question?',answers:['Yes','No'],answered:false};}});
 </script>`;
+const categories={Feed:'care',Clean:'care',Play:'care',Rest:'care','Our memories':'talk','How is PEP?':'talk','Tell me a joke':'talk',"Let's play!":'play','Pet me':'play','Watch Pond TV':'play','Pond Quiz':'play','Roll the ball':'play','Squeak the duck':'play','Toss the bottle cap':'play','Your favourite toy?':'play',"What's new?":'more','Open Fren Passport':'more','Secret Journal':'more','Reactions: on':'more','Reactions: quiet':'more'};
+async function selectMenu(page,id,method='click') {
+ const panel=page.locator('.pg-conversation');await panel.waitFor();
+ if(await panel.locator('.pg-menu-'+id+'-group').isVisible())return;
+ const back=panel.locator('.pg-menu-back');if(await back.isVisible())await back[method]();
+ await panel.locator('.pg-menu-'+id)[method]();
+}
+async function menuAction(page,label,method='click') {
+ await selectMenu(page,categories[label],method);await page.getByRole('button',{name:label,exact:true})[method]();
+}
 let browser;
 const server = http.createServer((req, res) => {
  const u = new URL(req.url, 'http://localhost');
@@ -28,19 +38,19 @@ const server = http.createServer((req, res) => {
  await page.goto(base);await page.waitForFunction(()=>document.querySelector('.pg-companion-button')?.title.startsWith('Pickle'));
  const frog=page.locator('.pg-companion-button');
  await frog.focus();await page.keyboard.press('Enter');
- await page.getByRole('button',{name:'Our memories',exact:true}).click();
+ await menuAction(page,'Our memories');
  assert.match(await page.locator('.pg-conversation').textContent(),/12 care days/);
- await page.getByRole('button',{name:"Let's play!",exact:true}).click();
+ await menuAction(page,"Let's play!");
  assert.deepEqual(await page.evaluate(()=>t.apps),['games']);assert.equal(await page.locator('.pg-conversation').count(),0);
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:"What's new?",exact:true}).click();
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Open Fren Passport',exact:true}).click();
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Watch Pond TV',exact:true}).click();
+ await frog.focus();await page.keyboard.press('Enter');await menuAction(page,"What's new?");
+ await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Open Fren Passport');
+ await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Watch Pond TV');
  assert.deepEqual(await page.evaluate(()=>t.apps),['games','news','passport','tv']);
  await frog.focus();await page.keyboard.press('Enter');
  await page.keyboard.press('Escape');assert.equal(await page.locator('.pg-conversation').count(),0);
  await page.evaluate(()=>{t.pet.needs.hunger=60;t.refresh();});
  await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('hungry'));
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Feed',exact:true}).click();
+ await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Feed');
  await page.waitForFunction(()=>document.querySelector('.pg-conversation .pg-fact-q')?.textContent.includes('hit the spot'));
  assert.equal(await page.evaluate(()=>t.pet.needs.hunger),95);
  assert.equal(await page.evaluate(()=>t.calls.filter(x=>x==='gry_pepegochi_action').length),1);
@@ -48,11 +58,11 @@ const server = http.createServer((req, res) => {
  // Actual expression frames play once and restore state; no CSS-only stand-ins.
  const frame = name => page.waitForFunction(n=>document.querySelector('.pg-companion-button img').src.includes('/tb_'+n+'_'),name);
  await frog.focus();await page.keyboard.press('Enter');await frame('curious');
- await page.getByRole('button',{name:'Pet me',exact:true}).click();await frame('nuzzle');
+ await menuAction(page,'Pet me');await frame('nuzzle');
  await page.evaluate(()=>{t.time+=31_000;t.pet.needs.mood=60;t.refresh()});
  await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('moody'));
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Play',exact:true}).click();await frame('welcome');
- for(let i=0;i<4;i++)await page.getByRole('button',{name:'Pet me',exact:true}).click();await frame('sulk');
+ await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Play');await frame('welcome');
+ for(let i=0;i<4;i++)await menuAction(page,'Pet me');await frame('sulk');
  await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('/tb_adult_sit.png'));
  await page.keyboard.press('Escape');
  await page.evaluate(()=>{t.time+=46000;t.pet.needs.energy=20;t.refresh();});
@@ -63,13 +73,13 @@ const server = http.createServer((req, res) => {
  await page.emulateMedia({reducedMotion:'reduce'});
  await page.evaluate(()=>{t.pet.needs.hunger=90;t.pet.needs.energy=90;t.refresh();});
  await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('/tb_adult_sit.png'));
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pet me',exact:true}).click();
+ await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Pet me');
  assert.ok(!(await frog.locator('img').getAttribute('src')).includes('/anim/'));
  await page.keyboard.press('Escape');await page.emulateMedia({reducedMotion:'no-preference'});
  await page.evaluate(()=>t.time+=31000);
  // Familiar pats require separated interactions, not rapid button farming.
- for(let i=0;i<4;i++) {await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pet me',exact:true}).click();await page.evaluate(()=>t.time+=31000);await page.keyboard.press('Escape');}
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pet me',exact:true}).click();
+ for(let i=0;i<4;i++) {await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Pet me');await page.evaluate(()=>t.time+=31000);await page.keyboard.press('Escape');}
+ await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Pet me');
  assert.match(await page.locator('.pg-fact-q').textContent(),/my human|know me well/);
  // Server needs displace an existing happy pose immediately.
  await page.evaluate(()=>{t.pet.needs.hunger=20;t.refresh();});
@@ -82,24 +92,32 @@ const server = http.createServer((req, res) => {
  // Event bursts are throttled; quiet mode is persisted.
  await page.evaluate(()=>window.dispatchEvent(new Event('offline')));
  assert.match(await page.locator('.pg-companion-reaction').textContent(),/hit the spot/);
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Reactions: on',exact:true}).click();await page.keyboard.press('Escape');
+ await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Reactions: on');await page.keyboard.press('Escape');
  await page.evaluate(()=>{t.time+=46000;window.dispatchEvent(new Event('online'));});
  assert.equal(await page.locator('.pg-companion-reaction').count(),0);
  await page.reload();await page.waitForFunction(()=>document.querySelector('.pg-companion-button')?.title.startsWith('Pickle'));
  await page.evaluate(()=>{t.time+=31*60000;t.refresh();});
  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pepegochi:bond:v1:owner-a:frog-a')).seen===t.time);
- await frog.focus();await page.keyboard.press('Enter');assert.equal(await page.getByRole('button',{name:'Reactions: quiet',exact:true}).count(),1);
+ await frog.focus();await page.keyboard.press('Enter');await selectMenu(page,'more');assert.equal(await page.getByRole('button',{name:'Reactions: quiet',exact:true}).count(),1);
  assert.match(await page.locator('.pg-conversation .pg-fact-q').textContent(),/back|There you are/);
  // Switching owners closes dialogue and does not inherit local familiarity/mute.
  await page.evaluate(()=>{t.owner='owner-b';t.refresh();});await page.waitForFunction(()=>!document.querySelector('.pg-conversation'));
- await frog.focus();await page.keyboard.press('Enter');assert.equal(await page.getByRole('button',{name:'Reactions: on',exact:true}).count(),1);
+ await frog.focus();await page.keyboard.press('Enter');await selectMenu(page,'more');assert.equal(await page.getByRole('button',{name:'Reactions: on',exact:true}).count(),1);
  await page.keyboard.press('Escape');await frog.dblclick();assert.equal(await page.evaluate(()=>t.opened),1);
  for(const width of [320,390,1440]) {
   await page.setViewportSize({width,height:720});await frog.focus();await page.keyboard.press('Enter');
   const box=await page.locator('.pg-conversation').boundingBox();assert.ok(box.x>=0 && box.x+box.width<=width && box.y>=0);
   const room=await page.getByRole('button',{name:'Go to your room',exact:true}).boundingBox();assert.ok(room.y>=box.y && room.y+room.height<=box.y+box.height,'room shortcut visible without scrolling');
+  const bubbles=await page.locator('.pg-menu-root button').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};}));
+  assert.equal(bubbles.length,5);assert.ok(bubbles.every(b=>b.x>=0&&b.x+b.w<=width&&b.h>=44));
+  for(let i=0;i<bubbles.length;i++)for(let j=i+1;j<bubbles.length;j++){const a=bubbles[i],b=bubbles[j];assert.ok(a.x+a.w<=b.x+.1||b.x+b.w<=a.x+.1||a.y+a.h<=b.y+.1||b.y+b.h<=a.y+.1,'no overlapping touch targets');}
+  if(width<=390){assert.ok(bubbles.every(b=>b.h>=48));assert.ok(room.width>240);}
+  else{assert.ok(bubbles[0].y>bubbles[1].y,'desktop care bubble sits on the lower arc');}
   if(width===320){const panel=page.locator('.pg-conversation');await panel.evaluate(e=>e.scrollTop=e.scrollHeight);const bar=await panel.locator('.pg-fact-bar').boundingBox();assert.ok(bar.y>=box.y && bar.y+bar.height<=box.y+box.height,'close button stays visible');await panel.evaluate(e=>e.scrollTop=0);}
   await capture(page,`dialog-${width}`);
+  await selectMenu(page,'care');assert.equal(await page.getByRole('button',{name:'Feed',exact:true}).isVisible(),true);assert.equal(await page.locator('.pg-menu-root').isVisible(),false);
+  await capture(page,`care-${width}`);
+  await page.getByRole('button',{name:'Back to interactions',exact:true}).click();assert.equal(await page.locator('.pg-menu-root').isVisible(),true);
   await page.keyboard.press('Escape');
  }
  // The screenshot regression: dark chrome, young frog and manual buttons still work.
@@ -108,21 +126,21 @@ const server = http.createServer((req, res) => {
  await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('froglet'));
  await frog.focus();await page.keyboard.press('Enter');
  const reply=page.locator('.pg-conversation .pg-fact-q');
- await page.getByRole('button',{name:'Tell me a joke',exact:true}).click();const joke=await reply.textContent();
- await page.getByRole('button',{name:'Pet me',exact:true}).click();assert.notEqual(await reply.textContent(),joke);
- await page.getByRole('button',{name:'Roll the ball',exact:true}).click();assert.ok(await page.locator('.pg-companion-toy').isVisible());
- assert.equal(await page.getByRole('button',{name:'Tell me a joke',exact:true}).evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(229, 229, 223)');
+ await menuAction(page,'Tell me a joke');const joke=await reply.textContent();
+ await menuAction(page,'Pet me');assert.notEqual(await reply.textContent(),joke);
+ await menuAction(page,'Roll the ball');assert.ok(await page.locator('.pg-companion-toy').isVisible());
+ await selectMenu(page,'talk');await page.mouse.move(0,0);assert.equal(await page.getByRole('button',{name:'Tell me a joke',exact:true}).evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(229, 234, 217)');
  await capture(page,'froglet-dark');
  await page.keyboard.press('Escape');
  await page.evaluate(()=>{t.pet.stage='adult';t.refresh()});await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('adult_sit'));
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pond Quiz',exact:true}).click();
+ await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Pond Quiz');
  const answer=page.getByRole('button',{name:'Yes',exact:true});
  assert.equal(await answer.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(229, 229, 223)');
  await answer.click();assert.match(await page.locator('.pg-fact-out').textContent(),/Saving/);
  await page.evaluate(()=>t.answer(null));await page.waitForFunction(()=>!document.querySelector('.pg-fact-answers button').disabled);
  assert.match(await page.locator('.pg-fact-out').textContent(),/Try again/);await page.keyboard.press('Escape');
  // A late quiz response from the previous owner cannot change the new owner's frog.
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pond Quiz',exact:true}).click();
+ await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Pond Quiz');
  await page.getByRole('button',{name:'Yes',exact:true}).click();
  await page.evaluate(()=>{t.owner='owner-c';t.refresh();});
  await page.waitForFunction(()=>!document.querySelector('.pg-fact'));
@@ -135,7 +153,9 @@ const server = http.createServer((req, res) => {
  const touch=await browser.newPage({hasTouch:true,isMobile:true,viewport:{width:390,height:720}});
  await touch.goto(base);await touch.waitForFunction(()=>document.querySelector('.pg-companion-button')?.title.startsWith('Pickle'));
  await touch.locator('.pg-companion-button').tap();await touch.waitForSelector('.pg-conversation');
- await touch.getByRole('button',{name:'Pet me',exact:true}).tap();
+ assert.equal(await touch.evaluate(()=>document.documentElement.clientWidth),390);
+ assert.ok((await touch.locator('.pg-menu-room').boundingBox()).width>240);
+ await menuAction(touch,'Pet me','tap');
  assert.match(await touch.locator('.pg-conversation .pg-fact-q').textContent(),/Hehe|acceptable|useful mouse/);
  await touch.close();
  // Toy interaction and actual Sweeper loss feed the real parent controller.
@@ -144,11 +164,11 @@ const server = http.createServer((req, res) => {
  await personality.goto(base);await personality.waitForFunction(()=>document.querySelector('.pg-companion-button')?.title.startsWith('Pickle'));
  const buddy=personality.locator('.pg-companion-button');await buddy.focus();await personality.keyboard.press('Enter');
  for(const label of ['Roll the ball','Squeak the duck','Toss the bottle cap']) {
-  await personality.getByRole('button',{name:label,exact:true}).click();
+  await menuAction(personality,label);
   assert.equal(await personality.locator('.pg-companion-toy').isVisible(),true);
   await personality.evaluate(()=>t.time+=31000);
  }
- await personality.getByRole('button',{name:'Your favourite toy?',exact:true}).click();
+ await menuAction(personality,'Your favourite toy?');
  assert.match(await personality.locator('.pg-conversation .pg-fact-q').textContent(),/unpaid throwing assistant/);
  await personality.keyboard.press('Escape');
  await personality.evaluate(()=>{const f=document.createElement('iframe');f.src='/games/pepe-sweeper.html?embed=1';f.id='arcade';document.body.append(f);});
@@ -167,12 +187,12 @@ const server = http.createServer((req, res) => {
  await rumors.route('**/*',r=>new URL(r.request().url()).origin===base?r.continue():r.abort());
  await rumors.goto(base);await rumors.waitForFunction(()=>document.querySelector('.pg-companion-button')?.title.startsWith('Pickle'));
  assert.equal(await rumors.evaluate(()=>t.calls.filter(x=>x==='gry_passport_state').length),0);
- await rumors.locator('.pg-companion-button').tap();await rumors.getByRole('button',{name:'Reactions: on',exact:true}).tap();
+ await rumors.locator('.pg-companion-button').tap();await menuAction(rumors,'Reactions: on','tap');
  assert.equal(await rumors.getByRole('button',{name:'Pond Rumors',exact:true}).count(),0);
  const rumorText=rumors.locator('.pg-conversation .pg-fact-q');
- await rumors.getByRole('button',{name:'How is PEP?',exact:true}).tap();assert.match(await rumorText.textContent(),/green/i);
+ await menuAction(rumors,'How is PEP?','tap');assert.match(await rumorText.textContent(),/green/i);
  assert.equal(await rumors.evaluate(()=>t.calls.filter(x=>x==='gry_passport_state').length),0);
- await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('0 / 12'));
+ await menuAction(rumors,'Secret Journal','tap');await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('0 / 12'));
  await capture(rumors,'rumors-320');
  assert.match(await rumorText.textContent(),/No discoveries recorded/);
  assert.equal(await rumors.evaluate(()=>t.calls.filter(x=>x==='gry_passport_state').length),1);
@@ -184,15 +204,15 @@ const server = http.createServer((req, res) => {
  await rumors.getByRole('button',{name:'Close conversation',exact:true}).tap();await rumors.locator('.pg-companion-button').tap();
  assert.doesNotMatch(await rumorText.textContent(),/Just between us/);
  await rumors.evaluate(()=>{t.passport.secrets=[{id:'wrong_frog',discovered_at:new Date().toISOString()}];window.dispatchEvent(new CustomEvent('pondos:secret-found',{detail:{owner:t.owner}}))});
- await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('The Wrong Frog'));
+ await menuAction(rumors,'Secret Journal','tap');await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('The Wrong Frog'));
  assert.match(await rumorText.textContent(),/1 \/ 12/);
  const rumorBox=await rumors.locator('.pg-conversation').boundingBox();assert.ok(rumorBox.x>=0&&rumorBox.x+rumorBox.width<=320&&rumorBox.y>=0);
  await rumors.getByRole('button',{name:'View journal in Fren Passport',exact:true}).tap();assert.equal(await rumors.evaluate(()=>t.passportOpened),1);
  await rumors.locator('.pg-companion-button').tap();await rumors.evaluate(()=>{t.time+=16000;t.deferPassport=true});
- await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();await rumors.waitForFunction(()=>!!t.passportResolve);
+ await menuAction(rumors,'Secret Journal','tap');await rumors.waitForFunction(()=>!!t.passportResolve);
  await rumors.evaluate(()=>{t.owner='owner-b';t.refresh();t.passportResolve(t.passport);t.deferPassport=false;t.passport={signed_in:true,secrets:[]}});
  await rumors.waitForFunction(()=>!document.querySelector('.pg-conversation'));
- await rumors.locator('.pg-companion-button').tap();await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();
+ await rumors.locator('.pg-companion-button').tap();await menuAction(rumors,'Secret Journal','tap');
  await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('No discoveries recorded'));
  await rumors.close();
  assert.deepEqual(errors,[]);console.log('PASS: toys, favourite discovery, real Sweeper result, five expression sequences, state restoration, interruption, reduced motion, keyboard, memories, familiar pats, care, focus, throttle, mute/reload, account isolation, double-click, 320/390/1440px, reduced motion and disposal');

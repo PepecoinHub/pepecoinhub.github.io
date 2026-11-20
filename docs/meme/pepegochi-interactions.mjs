@@ -168,8 +168,11 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
   function reposition() {
     if (!panel) return;
     const r = slot.getBoundingClientRect(), top = Math.min(r.top, img.getBoundingClientRect().top);
+    const frog = img.getBoundingClientRect(), center = frog.left + (frog.width || 48) / 2;
+    const left = Math.max(8, Math.min(center - panel.offsetWidth / 2, win.innerWidth - panel.offsetWidth - 8));
     panel.style.bottom = Math.max(8, win.innerHeight - top + 6) + 'px';
-    panel.style.left = Math.max(8, Math.min(r.left, win.innerWidth - panel.offsetWidth - 8)) + 'px';
+    panel.style.left = left + 'px';
+    panel.style.setProperty?.('--pg-anchor', Math.max(18,Math.min(panel.offsetWidth-18,center-left))+'px');
     panel.style.maxHeight = Math.max(80, top - 12) + 'px';
     panel.style.overflowY = 'auto';
   }
@@ -261,9 +264,47 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
       head.append(el('b', null, getView()?.label || 'PepeGochi'), x);
       reply = el('p', 'pg-fact-q');
       reply.setAttribute('aria-live', 'polite');
-      const actions = el('div', 'pg-fact-answers');
+      const root = el('div', 'pg-menu-root');
+      root.setAttribute('role','group'); root.setAttribute('aria-label','PepeGochi interactions');
+      const groups = Object.fromEntries(['care','talk','play','more'].map(id=>{
+        const group=el('div','pg-fact-answers pg-menu-group pg-menu-'+id+'-group');
+        group.hidden=true; group.setAttribute('role','group'); group.setAttribute('aria-label',id+' interactions');
+        return [id,group];
+      }));
+      const categoryButtons = {};
+      const back = el('button','pg-fact-a pg-menu-back','‹ Back'); back.type='button'; back.hidden=true;
+      back.setAttribute('aria-label','Back to interactions');
+      const category = el('b','pg-menu-heading'); category.hidden=true;
+      const nav=el('div','pg-menu-nav');nav.hidden=true;nav.append(back,category);
+      let lastCategory=null;
+      function navigate(id,focus=true) {
+        careTicket++; clearRumors();
+        root.hidden=!!id; nav.hidden=!id; back.hidden=!id; category.hidden=!id;
+        category.textContent=id ? ({care:'Care',talk:'Talk',play:'Play',more:'More'}[id]) : '';
+        for(const [name,group] of Object.entries(groups)) group.hidden=name!==id;
+        for(const [name,b] of Object.entries(categoryButtons)) if(name!=='room') b.setAttribute('aria-expanded',String(name===id));
+        if(panel) { panel.scrollTop=0; reposition(); }
+        if(id) lastCategory=id;
+        if(focus) (id ? back : categoryButtons[lastCategory] || categoryButtons.talk)?.focus();
+      }
+      back.addEventListener('click',()=>navigate(null));
+      let lastHover=-Infinity;
+      function menu(id,label,fn) {
+        const b=el('button','pg-fact-a pg-menu-bubble pg-menu-'+id,label); b.type='button';
+        b.addEventListener('click',fn || (()=>navigate(id)));
+        if (!fn) b.setAttribute('aria-expanded','false');
+        b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse' && healthyCompanion(getView()) && now()-lastHover>1200){lastHover=now();animate('hover');}});
+        root.append(b); categoryButtons[id]=b; return b;
+      }
+      if(typeof care==='function') {
+        const careMenu=menu('care','Care…');
+        if(getView()?.needAttention || getView()?.warning){careMenu.className+=' pg-menu-needs-care';careMenu.setAttribute('aria-label','Care… Needs attention');}
+      }
+      menu('talk','Talk…'); menu('play','Play…');
+      const roomMenu=menu('room','My room',visit); roomMenu.setAttribute('aria-label','Go to your room');
+      menu('more','More…');
       const buttons = [];
-      function add(label, fn, parent = actions) { const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', () => {
+      function add(label, fn, parent = groups.talk) { const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', () => {
         careTicket++;
         clearRumors();
         for (const child of buttons) child.classList?.toggle('is-selected', child === b);
@@ -292,38 +333,37 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
         };
         for (const [kind, label] of [['feed', 'Feed'], ['clean', 'Clean'], ['play', 'Play'], ['rest', 'Rest']])
           careButtons.push(add(label, () => requestCare(kind, label), careBox));
-        actions.append(careBox);
+        groups.care.append(careBox);
       }
-      add('Go to your room', visit).className += ' pg-room-shortcut';
       if (readRumors) {
-        add('Secret Journal', () => showRumors(true));
+        add('Secret Journal', () => showRumors(true),groups.more);
       }
       add('Our memories', () => say('memories'));
-      if (bond) {
-        add('Your favourite toy?', () => say('favourite'));
+      if (bond && (getView()?.adult || getView()?.motion === 'froglet' || String(getView()?.sprite||'').includes('froglet'))) {
+        add('Your favourite toy?', () => say('favourite'),groups.play);
         for (const [id, toy] of Object.entries(TOYS)) add(toy.label, () => {
           if (!playableCompanion(getView())) { reply.textContent = youngNeeds[getView()?.needAttention] ? youngNeeds[getView().needAttention] + ' Visit my room first.' : 'Desk toys unlock when I am a healthy froglet or adult.'; return; }
           const reaction = bond.play(id);
           if (!reaction) { reply.textContent = 'My toy box is not ready yet. Try again in a moment.'; return; }
           say(reaction); if (reaction !== 'toyAgain') showToy(id);
-        });
+        },groups.play);
       }
       if (bond) {
         const mute = el('button', 'pg-fact-a'); mute.type = 'button';
         const label = () => { mute.textContent = bond.muted ? 'Reactions: quiet' : 'Reactions: on'; mute.setAttribute('aria-pressed', String(bond.muted)); };
-        label(); mute.addEventListener('click', () => { clearRumors(); bond.toggleMute(); clearNotice(); label(); reply.textContent = bond.muted ? 'Automatic reactions are off. You can still talk and play with me.' : 'Automatic reactions are on. Watch for little surprises!'; panel.scrollTop = 0; }); actions.append(mute);
+        label(); mute.addEventListener('click', () => { careTicket++; clearRumors(); bond.toggleMute(); clearNotice(); label(); reply.textContent = bond.muted ? 'Automatic reactions are off. You can still talk and play with me.' : 'Automatic reactions are on. Watch for little surprises!'; panel.scrollTop = 0; }); groups.more.append(mute);
       }
       add('How are you?', () => say('how'));
       if (getView()?.adult) add('How is PEP?', () => say('market'));
       add('Tell me a joke', () => say('joke'));
-      add("Let's play!", () => { if (!runCommand('games')) say('play'); });
-      add('Pet me', () => say('pet'));
-      add("What's new?", () => { if (!runCommand('news')) say('news'); });
-      if (typeof commands?.passport === 'function') add('Open Fren Passport', () => runCommand('passport'));
-      if (typeof commands?.tv === 'function') add('Watch Pond TV', () => runCommand('tv'));
-      if (fireflyAvailable()) add('Catch a firefly', () => { close({ focus: true }); if (!catchFirefly()) say('fireflyUnavailable'); });
-      if (quizAvailable()) add('Pond Quiz', () => { close(); openQuiz(); });
-      panel.append(head, reply, actions);
+      add("Let's play!", () => { if (!runCommand('games')) say('play'); },groups.play);
+      add('Pet me', () => say('pet'),groups.play);
+      add("What's new?", () => { if (!runCommand('news')) say('news'); },groups.more);
+      if (typeof commands?.passport === 'function') add('Open Fren Passport', () => runCommand('passport'),groups.more);
+      if (typeof commands?.tv === 'function') add('Watch Pond TV', () => runCommand('tv'),groups.play);
+      if (fireflyAvailable()) add('Catch a firefly', () => { close({ focus: true }); if (!catchFirefly()) say('fireflyUnavailable'); },groups.play);
+      if (quizAvailable()) add('Pond Quiz', () => { close(); openQuiz(); },groups.play);
+      panel.append(head,nav,root,...Object.values(groups),reply);
       doc.body.append(panel);
       button.setAttribute('aria-expanded', 'true');
       doc.addEventListener('keydown', key, true);

@@ -77,6 +77,31 @@ function harness(initial = adult, options = {}) {
   return { doc, button, img, controller, tick, poses, get opened() { return opened; }, get quiz() { return quiz; },
     get quizClosed() { return quizClosed; }, setView(v) { view = v; } };
 }
+function group(panel,id) {
+  const target=panel.querySelector('.pg-menu-'+id+'-group');
+  if(target.hidden){const back=panel.querySelector('.pg-menu-back');if(!back.hidden)back.emit('click');panel.querySelector('.pg-menu-'+id).emit('click');}
+  assert.equal(target.hidden,false);return target;
+}
+function choose(panel,id,label){group(panel,id).children.find(b=>b.textContent===label).emit('click');}
+
+test('categories expose only their own actions, Back restores root, room remains direct',()=>{
+  const h=harness({...adult,needAttention:'hunger'},{care:async()=>({ok:true})});h.button.emit('click',{detail:0});
+  const p=h.doc.body.children[0],root=p.querySelector('.pg-menu-root');
+  assert.equal(root.children.length,5);assert.match(p.querySelector('.pg-menu-care').className,/pg-menu-needs-care/);
+  for(const id of ['care','talk','play','more'])assert.equal(p.querySelector('.pg-menu-'+id+'-group').hidden,true);
+  group(p,'play');assert.equal(root.hidden,true);assert.equal(p.querySelector('.pg-menu-talk-group').hidden,true);
+  p.querySelector('.pg-menu-back').emit('click');assert.equal(root.hidden,false);assert.equal(p.querySelector('.pg-menu-play-group').hidden,true);
+  p.querySelector('.pg-menu-room').emit('click');assert.equal(h.opened,1);assert.equal(h.doc.body.children.length,0);h.controller.dispose();
+});
+test('eggs and tadpoles never show adult market or locked desk-toy buttons',()=>{
+  for(const motion of ['egg','tadpole']) {
+    const h=harness({...adult,adult:false,motion,sprite:'tb_'+motion+'.png'},{bond:{take:()=>null}});
+    h.button.emit('click',{detail:0});const p=h.doc.body.children[0];
+    assert.ok(!group(p,'talk').children.some(b=>b.textContent==='How is PEP?'));
+    assert.ok(!group(p,'play').children.some(b=>b.textContent==='Roll the ball'));
+    h.controller.dispose();
+  }
+});
 test('single click opens local conversation and double click visits the room', () => {
   const h = harness();
   h.button.emit('click', { detail: 1 }); assert.equal(h.doc.body.children.length, 0);
@@ -100,8 +125,7 @@ test('keyboard, outside click, right click, quiz and account reset', () => {
   h.button.emit('click', { detail: 0 }); assert.equal(h.doc.body.children.length, 1);
   h.doc.emit('keydown', { key: 'Escape' }); assert.equal(h.doc.body.children.length, 0);
   h.button.emit('contextmenu'); assert.equal(h.doc.body.children.length, 1);
-  const actions = h.doc.body.children[0].querySelector('.pg-fact-answers');
-  actions.children.find(b => b.textContent === 'Pond Quiz').emit('click');
+  choose(h.doc.body.children[0],'play','Pond Quiz');
   assert.equal(h.quiz, 1); assert.equal(h.doc.body.children.length, 0);
   h.button.emit('click', { detail: 1 }); h.doc.emit('pointerdown', { target: h.doc.body }); h.tick();
   assert.equal(h.doc.body.children.length, 0);
@@ -116,8 +140,7 @@ test('desktop commands open real PondOS destinations and close the conversation'
   const h = harness(adult, { commands });
   const click = label => {
     h.button.emit('click', { detail: 0 });
-    const actions = h.doc.body.children[0].querySelector('.pg-fact-answers');
-    actions.children.find(b => b.textContent === label).emit('click');
+    choose(h.doc.body.children[0], ["Let's play!",'Watch Pond TV'].includes(label)?'play':'more',label);
     assert.equal(h.doc.body.children.length, 0, label);
   };
   click("Let's play!");
@@ -138,6 +161,7 @@ test('care buttons use one shared async handler, keep the panel open and report 
   const calls = [], reactions = { feed: 'fed', clean: 'clean', play: 'played', rest: 'rested' };
   const h = harness(adult, { care: async kind => { calls.push(kind); return { ok: true, action: reactions[kind] }; } });
   h.button.emit('click', { detail: 0 });
+  group(h.doc.body.children[0],'care');
   const care = h.doc.body.children[0].querySelector('.pg-care-actions');
   assert.deepEqual(care.children.map(b => b.textContent), ['Feed', 'Clean', 'Play', 'Rest']);
   for (const button of care.children) {
@@ -165,10 +189,11 @@ test('care and journal coexist without late replies replacing the currently sele
     readRumors: () => new Promise(r => { resolveJournal = r; }),
   });
   h.button.emit('click', { detail: 0 });
-  const panel = h.doc.body.children[0], actions = panel.querySelector('.pg-fact-answers'), reply = panel.querySelector('.pg-fact-q');
+  const panel = h.doc.body.children[0], reply = panel.querySelector('.pg-fact-q');
+  group(panel,'care');
   const feed = panel.querySelector('.pg-care-actions').children[0];
   feed.emit('click');
-  actions.children.find(b => b.textContent === 'Secret Journal').emit('click');
+  choose(panel,'more','Secret Journal');
   resolveJournal({ status: 'ok', progress: { found: ['A mystery'], total: 12 } });
   await Promise.resolve();
   resolveCare({ ok: true, action: 'fed' });
@@ -199,7 +224,7 @@ test('journal is available even without trust, but never offers a clue or detail
   const h = harness({ ...adult, adult: false, motion: 'froglet' }, { readRumors: async () => { reads++; return { status: 'ok', progress }; }, openPassport: () => opened++ });
   h.button.emit('click', { detail: 0 });
   assert.equal(reads, 0);
-  const panel = h.doc.body.children[0], actions = panel.querySelector('.pg-fact-answers'), reply = panel.querySelector('.pg-fact-q');
+  const panel = h.doc.body.children[0], actions = group(panel,'more'), reply = panel.querySelector('.pg-fact-q');
   assert.ok(!actions.children.some(b => b.textContent === 'Pond Rumors'));
   actions.children.find(b => b.textContent === 'Secret Journal').emit('click'); await Promise.resolve();
   assert.match(reply.textContent, /One mystery/); assert.equal(reads, 1);
@@ -235,8 +260,8 @@ test('late rumor responses cannot overwrite another action, a new discovery or a
   const resolvers = [];
   const h = harness(adult, { readRumors: () => new Promise(r => resolvers.push(r)) });
   h.button.emit('click', { detail: 0 });
-  const panel = h.doc.body.children[0], actions = panel.querySelector('.pg-fact-answers'), reply = panel.querySelector('.pg-fact-q');
-  const click = label => actions.children.find(b => b.textContent === label).emit('click');
+  const panel = h.doc.body.children[0], reply = panel.querySelector('.pg-fact-q');
+  const click = label => choose(panel,label==='Secret Journal'?'more':'talk',label);
   const result = { status: 'ok', progress: { found: [], total: 12, hint: 'Late clue', detail: 'Late detail' } };
   click('Secret Journal'); click('Tell me a joke'); const joke = reply.textContent; resolvers[0](result); await Promise.resolve(); assert.equal(reply.textContent, joke);
   click('Secret Journal'); h.controller.invalidateRumors(); resolvers[1](result); await Promise.resolve(); assert.match(reply.textContent, /new discovery/);

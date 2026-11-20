@@ -33,7 +33,7 @@ let browser;
  assert.equal(await away.count(),0);assert.equal(await page.locator('.sky-fly.pg-fly-borrowed').count(),0);
  // Keyboard menu offers the same real-night action, without making the wallpaper focusable.
  await page.evaluate(()=>t.time+=46000);await frog.focus();await page.keyboard.press('Enter');
- await page.getByRole('button',{name:'Catch a firefly'}).click();await glow.waitFor();
+ await page.locator('.pg-menu-play').click();await page.getByRole('button',{name:'Catch a firefly'}).click();await glow.waitFor();
  await page.keyboard.press('Escape');await glow.waitFor({state:'detached'});assert.equal(await away.count(),0);
  // Perch is nonblocking and returns immediately on input, a moved window or a changed pet state.
  await page.evaluate(()=>{t.time+=46000;t.app('games')});await away.waitFor();
@@ -49,10 +49,10 @@ let browser;
  // Day/still, muted automatic reactions, reduced motion, small screen and game focus.
  await page.evaluate(()=>{t.time+=46000;document.documentElement.classList.replace('sky-night','sky-day')});await page.mouse.click(163,463);assert.equal(await glow.count(),0);
  await page.evaluate(()=>{document.documentElement.classList.replace('sky-day','sky-night');document.querySelector('.sky').hidden=true});await page.mouse.click(163,463);assert.equal(await glow.count(),0);
- await page.evaluate(()=>document.querySelector('.sky').hidden=false);await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Reactions: on'}).click();await page.keyboard.press('Escape');
+ await page.evaluate(()=>document.querySelector('.sky').hidden=false);await frog.focus();await page.keyboard.press('Enter');await page.locator('.pg-menu-more').click();await page.getByRole('button',{name:'Reactions: on'}).click();await page.keyboard.press('Escape');
  await page.evaluate(()=>{t.time+=46000;t.app('games')});assert.equal(await away.count(),0);
  await page.mouse.click(163,463);await glow.waitFor();await page.keyboard.press('Escape');await glow.waitFor({state:'detached'});
- await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Reactions: quiet'}).click();await page.keyboard.press('Escape');
+ await frog.focus();await page.keyboard.press('Enter');await page.locator('.pg-menu-more').click();await page.getByRole('button',{name:'Reactions: quiet'}).click();await page.keyboard.press('Escape');
  await page.emulateMedia({reducedMotion:'reduce'});await page.mouse.click(163,463);assert.equal(await glow.count(),0);
  await page.emulateMedia({reducedMotion:'no-preference'});await page.setViewportSize({width:390,height:600});await page.evaluate(()=>{t.time+=46000;t.app('games')});assert.equal(await away.count(),0);
  await page.mouse.click(300,80);await page.evaluate(()=>{t.time+=46000;const game=document.createElement('iframe');game.className='fixture-game';document.body.append(game);game.focus();t.app('find')});assert.equal(await away.count(),0);
