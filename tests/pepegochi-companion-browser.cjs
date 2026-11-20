@@ -171,7 +171,14 @@ const server = http.createServer((req, res) => {
  await menuAction(personality,'Your favourite toy?');
  assert.match(await personality.locator('.pg-conversation .pg-fact-q').textContent(),/unpaid throwing assistant/);
  await personality.keyboard.press('Escape');
- await personality.evaluate(()=>{const f=document.createElement('iframe');f.src='/games/pepe-sweeper.html?embed=1';f.id='arcade';document.body.append(f);});
+ await personality.evaluate(()=>{
+  const f=document.createElement('iframe');f.src='/games/pepe-sweeper.html?embed=1';f.id='arcade';
+  t.arcadeMessages=[];
+  window.addEventListener('message',event=>{
+   if(event.origin===location.origin&&event.source===f.contentWindow&&event.data?.type==='pondos:arcade-round')t.arcadeMessages.push(event.data);
+  });
+  document.body.append(f);
+ });
  const sweeper=personality.frameLocator('#arcade');await sweeper.locator('.tile').first().waitFor();
  let lost=false;
  for(let i=0;i<81;i++){
@@ -179,6 +186,9 @@ const server = http.createServer((req, res) => {
   if((await sweeper.locator('#result-title').textContent())==='WRONG PEPE!'){lost=true;break;}
  }
  assert.ok(lost,'real Sweeper reaches its loss handler');
+ // The rendered result and the parent postMessage are asynchronous; wait for the
+ // authentic matching round to reach the parent before opening the conversation.
+ await personality.waitForFunction(()=>t.arcadeMessages.some(finish=>finish.phase==='finish'&&finish.outcome==='loss'&&t.arcadeMessages.some(start=>start.phase==='start'&&start.run===finish.run)));
  await buddy.focus();await personality.keyboard.press('Enter');
  assert.match(await personality.locator('.pg-conversation .pg-fact-q').textContent(),/losing part|pond saw nothing/);
  await personality.close();
