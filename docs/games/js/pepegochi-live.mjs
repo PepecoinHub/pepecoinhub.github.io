@@ -35,8 +35,9 @@ function renderPet(box, p) {
   box.append(needs);
   const acts = el('div', { class: 'pgb-row pgb-actions' });
   for (const a of p.actions) {
-    acts.append(el('button', { type: 'button', class: 'btn', 'data-act': a.kind, disabled: !a.enabled || game.busy, title: a.reason || a.label },
-      a.label + (a.reason ? ` (${a.reason})` : '')));
+    const b = el('button', { type: 'button', class: 'btn', 'data-act': a.kind, disabled: !a.enabled || game.busy, title: a.reason || a.label });
+    b.append(el('span', { class: 'pgb-action-label' }, a.label), el('span', { class: 'pgb-action-detail' }, a.reason || (game.busy ? 'Please wait…' : 'Ready')));
+    acts.append(b);
   }
   box.append(acts);
   const g = p.goodDays;

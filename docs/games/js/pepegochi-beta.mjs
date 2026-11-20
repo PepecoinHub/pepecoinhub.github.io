@@ -34,8 +34,8 @@ function renderPet(box, p) {
   box.append(needs);
   const acts = el('div', { class: 'pgb-row pgb-actions' });
   for (const a of p.actions) {
-    const b = el('button', { type: 'button', class: 'btn', 'data-act': a.kind, disabled: !a.enabled, title: a.reason || a.label },
-      a.label + (a.reason ? ` (${a.reason})` : ''));
+    const b = el('button', { type: 'button', class: 'btn', 'data-act': a.kind, disabled: !a.enabled, title: a.reason || a.label });
+    b.append(el('span', { class: 'pgb-action-label' }, a.label), el('span', { class: 'pgb-action-detail' }, a.reason || 'Ready'));
     acts.append(b);
   }
   const all = el('button', { type: 'button', class: 'btn', 'data-all': '1' }, 'Everything it needs (test shortcut)');

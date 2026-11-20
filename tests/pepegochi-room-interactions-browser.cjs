@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const {assertCareLayout}=require('./pepegochi-care-layout.cjs');
 const root = path.join(__dirname,'../docs');
 const fixtureBackend = `import { LocalPepegochi } from './pepegochi-model.mjs';
 const sim=new LocalPepegochi({start:Date.now()});
@@ -74,7 +75,17 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(310);await button('bed').focus();await page.keyboard.press('Enter');assert.deepEqual(await actions(),['rest']);
   // User can still reach the normal care buttons and the existing server rules own the actual result.
   const play=frame.locator('[data-act="play"]');assert.equal(await play.count(),1);
-  for(const width of [900,390,320]){await page.setViewportSize({width,height:900});await button('frog').scrollIntoViewIfNeeded();const b=await frame.locator('.pgr-frame').boundingBox();assert.ok(b.width<=width);await page.waitForTimeout(310);await button('frog').click();if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await page.screenshot({path:require('node:path').join(process.env.PEPEGOCHI_QA_SCREENSHOTS,`room-live-${width}.png`)});}
+  for(const width of [900,390,320]){
+   await page.setViewportSize({width,height:900});await button('frog').scrollIntoViewIfNeeded();const b=await frame.locator('.pgr-frame').boundingBox();assert.ok(b.width<=width);
+   const care=await assertCareLayout(frame,width,{desktop:width>=680});assert.match(care[3].detail,/ready in/);assert.equal(care[3].disabled,true);
+   if(width<680){
+    await frame.locator('.pgr-shortcuts summary').click();
+    const targets=await frame.locator('.pgr-shortcut').evaluateAll(nodes=>nodes.map(n=>({h:n.getBoundingClientRect().height,w:n.getBoundingClientRect().width})));
+    assert.ok(targets.every(t=>t.h>=44&&t.w>=44),'room shortcuts have mobile touch targets');
+    await frame.locator('.pgr-shortcuts summary').click();
+   }
+   await page.waitForTimeout(310);await button('frog').click();if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await page.screenshot({path:require('node:path').join(process.env.PEPEGOCHI_QA_SCREENSHOTS,`room-live-${width}.png`)});
+  }
   await page.evaluate(()=>closeRoom());assert.equal(await page.locator('iframe').count(),0);
   await page.goto(base+'/games/pepegochi-live.html?empty=1&embed=1');await page.locator('[data-room-action="frog"]').waitFor();assert.equal(await page.locator('.pgr-hotspot').count(),2);assert.equal(await page.locator('[data-room-action="crt_tv"]').count(),0);
   await page.goto(base+'/games/pepegochi-live.html?guest=1&embed=1');await page.locator('[data-signin]').waitFor();assert.equal(await page.locator('.pgr-hotspot').count(),0);

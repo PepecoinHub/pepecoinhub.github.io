@@ -4,6 +4,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const { createServer } = require('node:http');
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '../docs');
+const {assertCareLayout}=require('./pepegochi-care-layout.cjs');
 const mime = {'.html':'text/html','.mjs':'text/javascript','.js':'text/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml','.woff2':'font/woff2'};
 const server = createServer((req,res)=>{
   const file = path.resolve(root, '.'+new URL(req.url,'http://localhost').pathname);
@@ -48,10 +49,15 @@ async function journey(base,{width,height,touch}) {
     await page.goto(base+'/games/pepegochi.html?embed=1');
     await page.locator('[data-adopt]').waitFor();await page.locator('#pgb-name').fill('Playtest Fren');await press('[data-adopt] button');
     await stage('egg');await shot('01-egg');
+    if(touch){await page.setViewportSize({width:320,height});await assertCareLayout(page,320);await page.setViewportSize({width,height});}
+    const initial=await assertCareLayout(page,width,{desktop:!touch});assert.ok(initial.every(b=>!b.disabled&&b.detail==='Ready'));
+    if(process.env.PEPEGOCHI_QA_SCREENSHOTS)await page.locator('.pgb-actions').screenshot({path:path.join(process.env.PEPEGOCHI_QA_SCREENSHOTS,`playtest-${width}-care-ready.png`)});
     await press('[data-room-action="frog"]');assert.match(await page.locator('.pgr-response').textContent(),/Tap tap/);
     await care('clean','pepegochi_hatch_');await stage('tadpole');await shot('02-tadpole');
     for(const kind of ['feed','play','rest'])await care(kind,'care_tadpole_'+kind+'_');
     assert.equal(await page.locator('[data-act="feed"]').isDisabled(),true,'cooldown displayed after feeding');
+    const waiting=await assertCareLayout(page,width,{desktop:!touch});assert.ok(waiting.every(b=>b.disabled&&b.detail.startsWith('ready in')));
+    if(process.env.PEPEGOCHI_QA_SCREENSHOTS)await page.locator('.pgb-actions').screenshot({path:path.join(process.env.PEPEGOCHI_QA_SCREENSHOTS,`playtest-${width}-care-cooldown.png`)});
     await skip(1);await care('clean','care_froglet_clean_');await stage('froglet');await shot('03-froglet');
     for(const kind of ['feed','play','rest'])await care(kind,'care_froglet_'+kind+'_');
     for(let day=3;day<=6;day++){await skip(1);await careFour();await stage('froglet');}
