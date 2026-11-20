@@ -24,7 +24,7 @@
 </div>
 <div id="decorations" aria-label="Room decorations"><button data-full="false">Starter room</button><button data-full="true" aria-pressed="true">All Passport rewards</button></div>
 <div class="rooms"><section><h2>Original room</h2><div id="old"></div></section><section><h2>Refined 1999 room</h2><div id="new"></div></section></div>
-<p>Both rooms use the actual game renderer and identical slots. The original Golden Foot painting is unchanged. Review only: no live assets or game logic changed.</p>
+<p>Both rooms use the actual game renderer and identical slots. The original Golden Foot painting is unchanged. Refined art is integrated in the draft branch, not deployed.</p>
 </main>
 <script type="module">
 import {renderRoom, STARTER_ROOM, fixedPlacements, ITEMS} from './js/pepegochi-room.mjs';
@@ -35,6 +35,7 @@ function draw(){
   const placements=full?fixedPlacements(Object.keys(ITEMS)):STARTER_ROOM;
   const original=renderRoom(document,{stage,placements});
   const revised=renderRoom(document,{stage,placements});
+  original.querySelectorAll('img').forEach(img=>{img.src=img.getAttribute('src').replace('/hd/','/');});
   revised.querySelector('.pgr-bg').src=resolve('room/room_pond_den_v1.png');
   revised.querySelectorAll('[data-item]').forEach(item=>{
     if(item.dataset.item!=='p_poster')item.src=resolve('room/'+item.dataset.item+'.png');

@@ -1988,7 +1988,7 @@
     try { gochiReceive({ kind: kind, owner: owner, ids: ids }); } catch (e) { /* cosmetic only */ }
   }
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261120complete1').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261120roomhd1').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
         session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport,
         commands: { games: gamesFolder, passport: frenPassport, news: bulletinApp, tv: pondTV },

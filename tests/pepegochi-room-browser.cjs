@@ -21,6 +21,10 @@ let browser;const server=http.createServer((req,res)=>{
  await page.goto(origin);await page.waitForFunction(()=>window.show && [...document.images].every(i=>i.complete&&i.naturalWidth>0));
  const capture=async name=>{await page.waitForFunction(()=>[...document.images].every(i=>i.complete&&i.naturalWidth>0));await page.locator('.pgr-frame').screenshot({path:path.join(output,name)});};
  assert.equal(await page.locator('.pgr-item').count(),10);
+ const sizes=await page.locator('.pgr img').evaluateAll(imgs=>imgs.map(i=>({src:i.getAttribute('src'),w:i.naturalWidth,h:i.naturalHeight})));
+ assert.equal(sizes.filter(i=>i.src.includes('/hd/')&&i.w===256&&i.h===256).length,10,'all nine props plus adult use the HD images');
+ assert.ok(sizes.some(i=>i.src.includes('/hd/room_pond_den_v1.png')&&i.w===640&&i.h===400));
+ assert.ok(sizes.some(i=>i.src.endsWith('p_poster.png?v=20261120roomhd1')&&i.w===128));
  await capture('room-after.png');
  await page.evaluate(()=>document.querySelector('.pgr-bg').src='/games/img/pepegochi/room_clean_base.png');
  await page.waitForFunction(()=>document.querySelector('.pgr-bg').complete);
@@ -31,6 +35,12 @@ let browser;const server=http.createServer((req,res)=>{
  await page.locator('.pgr-letter').focus();assert.ok(await page.locator('.pgr-letter').evaluate(e=>e===document.activeElement));
  await capture('room-departed.png');
  await page.locator('#young').click();assert.equal(await page.locator('.pgr-pet').getAttribute('data-sprite'),'tadpole_idle');
+ for(const stage of ['egg','tadpole','froglet','adult']){
+  await page.evaluate(stage=>window.show({stage}),stage);
+  await page.waitForFunction(()=>document.querySelector('.pgr-pet').naturalWidth===256);
+  assert.equal(await page.locator('.pgr-pet').getAttribute('data-sprite'),stage+'_idle');
+  if(process.env.PEPEGOCHI_QA_SCREENSHOTS)await capture('room-hd-'+stage+'.png');
+ }
  for(const width of [320,390,900]){
   await page.setViewportSize({width,height:650});
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));

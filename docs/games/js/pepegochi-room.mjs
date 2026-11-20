@@ -13,12 +13,21 @@
 export const ROOM_W = 640;
 export const ROOM_H = 400;
 export const IMG = 'img/pepegochi/';
-// A16–A23 redraw the existing filenames; invalidate old cached sprites at the rendering boundary.
-export const SPRITE_VERSION = '20261120complete1';
+// The approved 1999 room artwork is separate from legacy and taskbar assets.
+export const HD_IMG = IMG + 'hd/';
+export const SPRITE_VERSION = '20261120roomhd1';
 export const versionSprite = src => src.startsWith(IMG) ? src + '?v=' + SPRITE_VERSION : src;
-export const BACKGROUND = IMG + 'room_pond_den_v1.png';
+export const BACKGROUND = HD_IMG + 'room_pond_den_v1.png';
 // bumped when a room prop is redrawn under the same file name (A10: mug, duck, painting, 2026-11-15)
-export const PROP_V = '20261115a10';
+export const PROP_V = SPRITE_VERSION;
+export const propSrc = id => (id === 'p_poster' ? IMG : HD_IMG) + id + '.png';
+
+// Visible bounds in logical room pixels, measured at 30% alpha. The HD images are 2x logical size.
+const logical = box => box.map(n => n / 2);
+export const PROP_BOUNDS = { p_poster: [18,14,112,114], ...Object.fromEntries(Object.entries({
+  crt_tv:[26,32,235,236], lava_lamp:[68,32,201,228], potted_plant:[34,32,226,228], rubber_duck:[68,36,185,220],
+  mug:[52,64,244,220], moon_rock:[42,72,214,248], paper_crown:[36,52,221,248], golden_fly:[49,72,212,248], floppy_disk:[48,58,204,248],
+}).map(([id,box])=>[id,logical(box)])) };
 
 // slot_id -> anchor on the 640x400 background (same numbers as the room SQL)
 export const SLOTS = {
@@ -71,8 +80,8 @@ export function fixedPlacements(owned) {
 }
 
 // ---------- the frog ----------
-// Every frog sprite is 128x128 (art pack v2). It is drawn at 1 sprite pixel = 1 room pixel, the same
-// scale for every stage: the art itself shows the size, nothing is resized at runtime.
+// Every HD frog sprite is 256x256, drawn on the original 128x128 logical canvas.
+// All stages keep the same scale and floor anchor; taskbar art is independent.
 export const FROG_PX = 128;
 export const FOOT_Y = 124;         // the art pack's foot line
 // where the frog stands: on the rug, in front of the bed (room pixels, its feet)
@@ -83,20 +92,20 @@ export const HOME = { x: 320, y: 372 };
 // This is also the list of frog sprites the game HAS. A state sprite that is not listed here is not drawn yet
 // (games/pepegochi/CHATGPT_ART_BACKLOG.md): the frog falls back to its stage's idle sprite (frogLook). A new
 // art pack goes in by adding its rows here, after scripts/pepegochi_art_qa.mjs passes; nothing else changes.
-export const SPRITES = {
-  egg_idle: [42, 124], tadpole_idle: [50, 124], froglet_idle: [30, 124],
-  adult_idle: [9, 124], adult_hungry: [8, 124], adult_dirty: [8, 124], adult_moody: [9, 124], adult_tired: [9, 124],
-  adult_neglected: [9, 124], adult_recovering: [8, 124], adult_packing: [9, 124],
-  hatch_01: [42, 124], hatch_02: [42, 124], hatch_03: [20, 124], hatch_04: [50, 124],
-  // the young frogs' states (art pack A5, 2026-11-13)
-  tadpole_hungry: [50, 124], tadpole_dirty: [50, 124], tadpole_moody: [50, 124], tadpole_tired: [50, 124],
-  tadpole_neglected: [50, 124], tadpole_packing: [50, 124], tadpole_recovering: [50, 124],
-  froglet_hungry: [30, 124], froglet_dirty: [30, 124], froglet_moody: [30, 124], froglet_tired: [30, 124],
-  froglet_neglected: [30, 124], froglet_packing: [30, 124], froglet_recovering: [30, 124],
-};
+export const SPRITE_BOUNDS = Object.fromEntries(Object.entries({
+  egg_idle:[62,84,188,248], tadpole_idle:[13,100,242,248], froglet_idle:[72,60,202,248],
+  adult_idle:[47,18,207,248], adult_hungry:[49,17,225,248], adult_dirty:[24,17,208,248], adult_moody:[49,17,207,248], adult_tired:[47,17,220,248],
+  adult_neglected:[39,17,209,248], adult_recovering:[49,17,207,248], adult_packing:[22,13,211,248],
+  hatch_01:[62,84,188,248], hatch_02:[64,84,185,248], hatch_03:[55,40,218,248], hatch_04:[2,100,244,248],
+  tadpole_hungry:[15,96,243,248], tadpole_dirty:[7,99,249,248], tadpole_moody:[17,99,239,248], tadpole_tired:[17,97,240,248],
+  tadpole_neglected:[16,100,237,248], tadpole_packing:[17,97,251,248], tadpole_recovering:[18,100,239,248],
+  froglet_hungry:[70,58,217,248], froglet_dirty:[70,59,215,248], froglet_moody:[70,59,202,248], froglet_tired:[69,58,218,248],
+  froglet_neglected:[71,61,200,248], froglet_packing:[69,56,218,248], froglet_recovering:[71,61,200,248],
+}).map(([id,box])=>[id,logical(box)]));
+export const SPRITES = Object.fromEntries(Object.entries(SPRITE_BOUNDS).map(([id,[,top,,foot]])=>[id,[top,foot]]));
 // the moving-out frames (sprite pack 2026-11-09) stand on the same floor line as the frog
 export const DEPART_FOOT = [124, 124, 124, 124, 124, 124];
-export const spriteSrc = id => IMG + 'pepegochi_' + id + '.png';
+export const spriteSrc = id => HD_IMG + 'pepegochi_' + id + '.png';
 export const FROG = spriteSrc('adult_idle');
 
 // A healthy adult shows the need it wants most once that need is below LOOK_BELOW (the lowest one; a tie
@@ -169,10 +178,10 @@ export const WALK = {
 export function departTimeline(stage = 'adult', walk = WALK[stage]) {
   const edge = ROOM_W - FROG_PX / 2;           // a 128 px frame touching the right edge
   if (walk) {
-    const out = walk.turn.map(src => ({ src: IMG + src, x: HOME.x, foot: FOOT_Y, suitcase: false }));
+    const out = walk.turn.map(src => ({ src: HD_IMG + src, x: HOME.x, foot: FOOT_Y, suitcase: false }));
     // with no turn frames the first step starts where the frog stood (no jump)
     for (let x = HOME.x + (walk.turn.length ? 24 : 0), i = 0; x < ROOM_W + FROG_PX / 2; x += 24, i++)
-      out.push({ src: IMG + walk.walk[i % walk.walk.length], x, foot: FOOT_Y, suitcase: false });
+      out.push({ src: HD_IMG + walk.walk[i % walk.walk.length], x, foot: FOOT_Y, suitcase: false });
     return out;
   }
   if (stage !== 'adult') {
@@ -189,7 +198,7 @@ export function departTimeline(stage = 'adult', walk = WALK[stage]) {
     x: Math.round(from + (to - from) * i / (seq.length - 1)) - DEPART_DX[n - 1] }));
 }
 // every moving-out frame the window may play (preloaded when a frog is home)
-export const DEPART_FRAMES = Object.values(WALK).flatMap(w => [...w.turn, ...w.walk]).map(f => IMG + f);
+export const DEPART_FRAMES = Object.values(WALK).flatMap(w => [...w.turn, ...w.walk]).map(f => HD_IMG + f);
 
 // ---------- short frame animations on the frog: hatching, and care once the art exists ----------
 // The egg hatches: three cracking frames and the tadpole out of its shell (art pack A1, 2026-11-13), then the tadpole.
@@ -202,7 +211,14 @@ const careSet = pre => Object.fromEntries(['feed', 'clean', 'play', 'rest']
 // art pack A6 (2026-11-13): 4 frames per care action for the adult, the froglet and the tadpole
 export const CARE = Object.fromEntries([['adult', 'care_'], ['froglet', 'care_froglet_'], ['tadpole', 'care_tadpole_']]
   .flatMap(([stage, pre]) => Object.entries(careSet(pre)).map(([k, ids]) => [stage + '_' + k, ids])));
-export const careFrames = (stage, kind) => (CARE[stage + '_' + kind] || []).map(id => IMG + id + '.png');
+export const careFrames = (stage, kind) => (CARE[stage + '_' + kind] || []).map(id => HD_IMG + id + '.png');
+
+// Only preload the current life stage's animation frames, not the whole 5 MB room pack.
+export function animationFramesForStage(stage) {
+  if (stage === 'egg') return HATCH_FRAMES;
+  const w = WALK[stage];
+  return [...(w ? [...w.turn,...w.walk].map(id=>HD_IMG+id) : []), ...['feed','clean','play','rest'].flatMap(k=>careFrames(stage,k))];
+}
 
 // Shows frames one after another on the frog's <img>, then puts its own sprite back. Returns a stop function.
 export function playFrames(img, frames, ms, { setTimer = setTimeout, clearTimer = clearTimeout } = {}) {
@@ -226,7 +242,7 @@ export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', n
     const s = SLOTS[slotId], it = ITEMS[itemId];
     if (!s || !it) continue;
     if (departed && itemId === taken) continue;
-    items.push({ slotId, itemId, src: IMG + itemId + '.png?v=' + PROP_V, wall: !!s.wall, z: s.z,
+    items.push({ slotId, itemId, src: propSrc(itemId) + '?v=' + PROP_V, wall: !!s.wall, z: s.z,
       left: s.x / ROOM_W * 100, top: (s.y + it.dy) / ROOM_H * 100, width: it.size });
   }
   const pct = (v, of) => v / of * 100;

@@ -1,5 +1,5 @@
 // A13: local room interaction, with care delegated to the existing validated actions.
-import { roomScene, SPRITES, ROOM_W, ROOM_H, FROG_PX } from './pepegochi-room.mjs?v=20261116room1';
+import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX } from './pepegochi-room.mjs?v=20261120roomhd1';
 import { mountRoomEffects } from './pepegochi-room-fx.mjs?v=20261118room3';
 
 const PROPS = {
@@ -14,27 +14,23 @@ const PROPS = {
   golden_fly: ['Inspect golden fly', 'Too shiny to eat. I have standards.'],
   floppy_disk: ['Inspect floppy disk', '1.44 MB of extremely important frog business.'],
 };
-// Opaque bounds of the approved 128px item sprites (exclusive right/bottom).
-const BOUNDS = { p_poster:[18,14,112,114], crt_tv:[6,16,124,118], lava_lamp:[32,16,102,114],
-  potted_plant:[12,16,118,114], rubber_duck:[16,24,110,110], mug:[26,32,122,110],
-  moon_rock:[20,36,108,124], paper_crown:[16,26,112,124], golden_fly:[22,36,108,124], floppy_disk:[24,22,102,124] };
 
 export function roomTargets(opts, owned = false) {
   if (opts.mode !== 'pet') return [];
   const sc = roomScene(opts), out = [];
   if (owned) for (const item of sc.items) {
     if (!Object.hasOwn(PROPS, item.itemId)) continue;
-    const [l,t,r,b] = BOUNDS[item.itemId], iw = item.width, ih = iw * ROOM_W / ROOM_H;
+    const [l,t,r,b] = PROP_BOUNDS[item.itemId], iw = item.width, ih = iw * ROOM_W / ROOM_H;
     out.push({ id: item.itemId, label: PROPS[item.itemId][0], x: item.left - iw/2 + iw*l/128,
       y: item.top - (item.wall ? ih/2 : ih) + ih*t/128, w: iw*(r-l)/128, h: ih*(b-t)/128, z: item.z + 2 });
   }
   // Only the exposed left edge of the bed is clickable; the frog keeps its own hit area.
   out.push({ id: 'bed', label: 'Help your frog rest', x: 34.3, y: 63, w: 8.4, h: 20, z: 65 });
   if (sc.frog) {
-    const [top, bottom] = SPRITES[sc.frog.sprite];
+    const [left,top,right,bottom] = SPRITE_BOUNDS[sc.frog.sprite];
     const h = (bottom - top) / ROOM_H * 100;
-    out.push({ id: 'frog', label: 'Pet your frog', x: sc.frog.left - FROG_PX / ROOM_W * 37,
-      y: sc.frog.top - h, w: FROG_PX / ROOM_W * 74, h, z: 82 });
+    out.push({ id: 'frog', label: 'Pet your frog', x: sc.frog.left + (left-FROG_PX/2)/ROOM_W*100,
+      y: sc.frog.top - h, w: (right-left)/ROOM_W*100, h, z: 82 });
   }
   return out;
 }

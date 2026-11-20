@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { roomTargets, roomResponse, createRoomInteractions } from '../docs/games/js/pepegochi-room-interactions.mjs';
-import { STARTER_ROOM, fixedPlacements } from '../docs/games/js/pepegochi-room.mjs';
+import { STARTER_ROOM, fixedPlacements, ITEMS, PROP_BOUNDS, SPRITE_BOUNDS, roomScene, ROOM_W, ROOM_H, FROG_PX } from '../docs/games/js/pepegochi-room.mjs';
 
 const view = (pet = {}) => ({ mode: 'pet', pet: { stage: 'adult', status: 'healthy', needs: [], actions: [
   { kind:'rest', enabled:true }, { kind:'play', enabled:true }], ...pet } });
@@ -13,6 +13,25 @@ test('only owned, visible room props get hit targets; no interactions for guest/
   assert.deepEqual(targets.map(t=>t.id), ['moon_rock','crt_tv','bed','frog']);
   for(const t of roomTargets({mode:'pet',placements:STARTER_ROOM},true)) {
     assert.ok(t.x>=0 && t.y>=0 && t.x+t.w<=100 && t.y+t.h<=100, t.id);
+  }
+});
+
+test('HD clickable rectangles follow the visible art in logical room coordinates for every age and prop',()=>{
+  for(const stage of ['egg','tadpole','froglet','adult']){
+    const opts={mode:'pet',stage,placements:fixedPlacements(Object.keys(ITEMS))};
+    const sc=roomScene(opts), targets=roomTargets(opts,true);
+    for(const item of sc.items){
+      const t=targets.find(t=>t.id===item.itemId), [l,y,r,b]=PROP_BOUNDS[item.itemId], h=item.width*ROOM_W/ROOM_H;
+      assert.ok(t.x>=0&&t.y>=0&&t.x+t.w<=100&&t.y+t.h<=100,item.itemId);
+      assert.equal(t.x,item.left-item.width/2+item.width*l/128);
+      assert.equal(t.y,item.top-(item.wall?h/2:h)+h*y/128);
+      assert.equal(t.w,item.width*(r-l)/128);
+      assert.equal(t.h,h*(b-y)/128);
+    }
+    const frog=targets.find(t=>t.id==='frog'), [l,y,r,b]=SPRITE_BOUNDS[sc.frog.sprite];
+    assert.equal(frog.x,sc.frog.left+(l-FROG_PX/2)/ROOM_W*100);
+    assert.equal(frog.w,(r-l)/ROOM_W*100);
+    assert.equal(frog.h,(b-y)/ROOM_H*100);
   }
 });
 

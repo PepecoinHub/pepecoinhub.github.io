@@ -17,12 +17,19 @@ import { readFileSync } from 'node:fs';
 import { inflateSync } from 'node:zlib';
 import { basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SPRITE_BOUNDS, PROP_BOUNDS, CARE, WALK } from '../docs/games/js/pepegochi-room.mjs';
 
 export const FORMATS = {
   A: { size: 128, grid: 2, maxColours: 64, foot: 124 },
   B: { size: 48, grid: 1, maxColours: 32, foot: 47 },
   FINE: { size: 128, grid: 1, maxColours: 4096, foot: 124 },
+  HD: { size: 256, grid: 1, maxColours: 16384, foot: 248 },
 };
+const HD_BOX = new Map([
+  ...Object.entries(SPRITE_BOUNDS).map(([id,b])=>[`pepegochi_${id}.png`,b]),
+  ...Object.entries(PROP_BOUNDS).filter(([id])=>id!=='p_poster').map(([id,b])=>[id+'.png',b]),
+]);
+const HD_FILES = new Set([...HD_BOX.keys(), ...Object.values(CARE).flat().map(id=>id+'.png'), ...Object.values(WALK).flatMap(w=>[...w.turn,...w.walk])]);
 
 // Only approved higher-detail room sprites and care frames opt in; other assets retain their existing profiles.
 const FINE_TOP = new Map([
@@ -135,29 +142,40 @@ export function decodePng(buf) {
 }
 
 // the box of the visible (alpha > 0) pixels, as [left, top, right, bottom] with right/bottom exclusive (like PIL getbbox)
-export function bbox({ width, height, rgba }) {
+export function bbox({ width, height, rgba }, alpha = 1) {
   let l = width, t = height, r = -1, b = -1;
-  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) if (rgba[(y * width + x) * 4 + 3]) {
+  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) if (rgba[(y * width + x) * 4 + 3] >= alpha) {
     if (x < l) l = x; if (x > r) r = x; if (y < t) t = y; if (y > b) b = y;
   }
   return r < 0 ? null : [l, t, r + 1, b + 1];
 }
 
 // ---------- the checks ----------
-export function formatFor(file) { return FINE_TOP.has(basename(file)) ? 'FINE' : /^tb_/.test(basename(file)) ? 'B' : 'A'; }
+export function formatFor(file) {
+  if (/(?:^|[/\\])(?:hd|hd-review[/\\](?:frames|room))[/\\]/.test(file) && HD_FILES.has(basename(file))) return 'HD';
+  return FINE_TOP.has(basename(file)) ? 'FINE' : /^tb_/.test(basename(file)) ? 'B' : 'A';
+}
 
 export function checkImage(img, { format = 'A', foot, prop = false, allowEdge = false } = {}) {
   const F = FORMATS[format], footY = foot ?? F.foot, problems = [], { width: w, height: h, rgba } = img;
   if (w !== F.size || h !== F.size) problems.push(`size ${w} x ${h}, must be ${F.size} x ${F.size}`);
   if (img.colourType !== 6 && img.colourType !== 3 && img.colourType !== 4) problems.push('no alpha channel: export as RGBA with a transparent background');
-  let semi = 0, broken = 0, cells = 0;
+  let semi = 0, broken = 0, cells = 0, mid = 0, ink = 0, transparent = 0;
   const colours = new Set();
   for (let i = 0; i < w * h; i++) {
     const a = rgba[i * 4 + 3];
     if (a > 0 && a < 255) semi++;
-    if (a === 255) colours.add((rgba[i * 4] << 16) | (rgba[i * 4 + 1] << 8) | rgba[i * 4 + 2]);
+    if (a === 0) transparent++;
+    if (a >= 77) ink++;
+    if (a >= 16 && a < 240) mid++;
+    if (format === 'HD' ? a >= 77 : a === 255) colours.add((rgba[i * 4] << 16) | (rgba[i * 4 + 1] << 8) | rgba[i * 4 + 2]);
   }
-  if (semi) problems.push(`${semi} half-transparent pixels: edges must be fully opaque or fully transparent (no anti-aliasing)`);
+  if (format === 'HD') {
+    // Preserve the exact approved artwork: most ink is nearly opaque and tiny alpha fringes
+    // are permitted, but a foggy image or opaque background is not.
+    if (img.colourType !== 6 || !transparent || !ink) problems.push('HD requires RGBA with real transparent background and visible art');
+    if (mid > ink * 0.08) problems.push('HD alpha fringe exceeds 8% of visible art');
+  } else if (semi) problems.push(`${semi} half-transparent pixels: edges must be fully opaque or fully transparent (no anti-aliasing)`);
   if (colours.size > F.maxColours) problems.push(`${colours.size} colours, at most ${F.maxColours}`);
   const g = F.grid;
   if (g > 1) {
@@ -169,7 +187,7 @@ export function checkImage(img, { format = 'A', foot, prop = false, allowEdge = 
     }
     if (broken) problems.push(`${broken} of ${cells} ${g} x ${g} blocks are not one colour (${(100 * broken / cells).toFixed(1)}%): not on the ${g} x ${g} pixel grid`);
   }
-  const box = bbox(img);
+  const box = bbox(img, format === 'HD' ? 77 : 1);
   if (!box) problems.push('the image is empty');
   else {
     // the foot line is the bottom edge of the art (as in the game's CSS): the lowest visible row is footY - 1
@@ -182,6 +200,12 @@ export function checkImage(img, { format = 'A', foot, prop = false, allowEdge = 
 export function checkFile(file, opts = {}) {
   const img = decodePng(readFileSync(file));
   const r = checkImage(img, { ...opts, format: opts.format || formatFor(file) });
+  if ((opts.format || formatFor(file)) === 'HD') {
+    const expected = HD_BOX.get(basename(file));
+    if (!HD_FILES.has(basename(file))) r.problems.push('HD profile requires an explicitly allowlisted room sprite');
+    if (expected && r.bbox && expected.some((v,i)=>v*2!==r.bbox[i])) r.problems.push(`bounds ${r.bbox}, expected ${expected.map(v=>v*2)}`);
+    r.ok = r.problems.length === 0;
+  }
   if ((opts.format || formatFor(file)) === 'FINE') {
     const expected = FINE_TOP.get(basename(file));
     if (expected === undefined) r.problems.push('FINE profile requires an explicitly allowlisted sprite');
@@ -206,7 +230,7 @@ export function compareWith(box, old, problems = []) {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const args = process.argv.slice(2), files = args.filter(a => !a.startsWith('--'));
   const opt = k => { const a = args.find(x => x.startsWith('--' + k)); return a == null ? undefined : (a.split('=')[1] ?? true); };
-  if (!files.length) { console.error('usage: node scripts/pepegochi_art_qa.mjs [--format=A|B|FINE] [--foot=N] [--prop] [--allow-edge] file.png ...'); process.exit(2); }
+  if (!files.length) { console.error('usage: node scripts/pepegochi_art_qa.mjs [--format=A|B|FINE|HD] [--foot=N] [--prop] [--allow-edge] file.png ...'); process.exit(2); }
   let bad = 0;
   for (const f of files) {
     let r;

@@ -46,6 +46,10 @@ const server=http.createServer((req,res)=>{
   await page.goto(base+'/');
   const frame=page.frameLocator('iframe');const button=id=>frame.locator(`[data-room-action="${id}"]`);
   await button('lava_lamp').waitFor();assert.equal(await frame.locator('.pgr-hotspot').count(),10);
+  await frame.locator('.pgr-pet').evaluate(i=>i.decode());
+  assert.equal(await frame.locator('.pgr-pet').evaluate(i=>i.naturalWidth),256);
+  await frame.locator('[data-item="crt_tv"]').evaluate(i=>i.decode());
+  assert.equal(await frame.locator('[data-item="crt_tv"]').evaluate(i=>i.naturalWidth),256);
   await frame.locator('[data-room-action="frog"]').click();assert.match(await frame.locator('.pgr-response').textContent(),/Pat accepted/);
   await page.waitForTimeout(310);await button('lava_lamp').click();assert.equal(await frame.locator('.pgr-lamp-off').count(),1);
   await page.waitForTimeout(310);await button('lava_lamp').focus();await page.keyboard.press('Enter');assert.equal(await frame.locator('.pgr-lamp-off').count(),0);
@@ -61,7 +65,12 @@ const server=http.createServer((req,res)=>{
   assert.deepEqual(await actions(),[]);
   await page.waitForTimeout(310);await button('crt_tv').click();await page.waitForFunction(()=>tvCount()===1);
   await page.evaluate(()=>window.postMessage({type:'pondos:pepegochi-room-tv'},location.origin));await page.waitForTimeout(100);assert.equal(await page.evaluate(()=>tvCount()),1);
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await f.evaluate(()=>{window.hdRestFrames=[];new MutationObserver(records=>{for(const rec of records){const src=rec.target.getAttribute?.('src');if(src?.includes('/hd/care_rest_'))window.hdRestFrames.push(src.split('?')[0].split('/').pop())}}).observe(document.querySelector('#pgb-scene'),{subtree:true,attributes:true,attributeFilter:['src']});});
   await page.waitForTimeout(310);await button('bed').focus();await page.keyboard.press('Enter');await f.waitForFunction(()=>window.fixtureCalls.some(c=>c[1]?.p_action==='rest'));
+  await f.waitForFunction(()=>new Set(window.hdRestFrames).size===4);
+  await f.waitForFunction(()=>!document.querySelector('.pgr-pet').src.includes('/care_'));
+  await page.emulateMedia({reducedMotion:'reduce'});
   await page.waitForTimeout(310);await button('bed').focus();await page.keyboard.press('Enter');assert.deepEqual(await actions(),['rest']);
   // User can still reach the normal care buttons and the existing server rules own the actual result.
   const play=frame.locator('[data-act="play"]');assert.equal(await play.count(),1);
@@ -69,6 +78,10 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>closeRoom());assert.equal(await page.locator('iframe').count(),0);
   await page.goto(base+'/games/pepegochi-live.html?empty=1&embed=1');await page.locator('[data-room-action="frog"]').waitFor();assert.equal(await page.locator('.pgr-hotspot').count(),2);assert.equal(await page.locator('[data-room-action="crt_tv"]').count(),0);
   await page.goto(base+'/games/pepegochi-live.html?guest=1&embed=1');await page.locator('[data-signin]').waitFor();assert.equal(await page.locator('.pgr-hotspot').count(),0);
+  await page.goto(base+'/games/pepegochi.html?embed=1');await page.locator('[data-adopt] button').click();
+  await page.locator('[data-room-action="frog"]').waitFor();
+  await page.locator('[data-room-action="frog"]').click();assert.match(await page.locator('.pgr-response').textContent(),/Tap tap/);
+  await page.waitForTimeout(310);await page.locator('[data-room-action="lava_lamp"]').click();assert.equal(await page.locator('.pgr-lamp-off').count(),1);
   assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
   console.log('PASS: real live page with fixture backend, owned/empty/guest room, cosmetic actions, validated rest, TV source check, keyboard and 320/390/900px. No external calls.');
  } finally {await browser?.close();server.close();}

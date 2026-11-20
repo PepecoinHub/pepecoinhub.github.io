@@ -1,6 +1,6 @@
 # PepeGochi room sprite refresh — approved style (2026-11-20)
 
-The owner approved the intermediate art direction: finer pixel art with slightly angular, dark outlines, but not the old coarse 2×2 grid and not smooth/rounded vector art. The room's furniture, background, layout and palette stay unchanged. This is a **review-only** pack, not deployed art; the existing 128×128 game and taskbar assets remain untouched.
+The owner approved the intermediate art direction and the late-1990s room: finer pixel art with slightly angular, dark outlines, but not the old coarse 2×2 grid and not smooth/rounded vector art. The room's furniture layout and palette stay unchanged. The approved artwork is now integrated in the **draft** branch, not deployed; legacy 128×128 assets and the taskbar remain untouched.
 
 ## Master prompt / art direction
 
@@ -32,9 +32,9 @@ The owner approved the intermediate art direction: finer pixel art with slightly
 | Age-specific need/status expressions | 21 exported PNGs (7 per age) |
 | Further idle activities / independent taskbar sprite refresh | Outside this room pack; optional follow-up |
 | Review asset and animation sequence QA | PASS: 91 matching files, correct dimensions/alpha/anchors, all in-preview sequences and timings |
-| Integration / browser QA | Pending owner visual approval; the old 128px/2×2 QA must be adapted for 256px room art without changing the taskbar format |
+| Integration / browser QA | Owner approved; HD artwork wired into the local simulator and live-page renderer on the draft branch. Room-specific QA adapted; Chromium fixture checks in CI (pending latest run). |
 
-No replacement of active files until the complete pack can be checked for a consistent visual transition between idle, need/status and care states. Do not merge or deploy without the owner's explicit approval.
+Do not merge or deploy without the owner's explicit approval.
 
 ## Room and duckling refresh
 
@@ -52,3 +52,10 @@ All eight remaining items have individually generated, finer pixel-art replaceme
 
 - `export-props.sh ITEM SOURCE.png` fits the generated transparent silhouette into the old prop's doubled alpha bounds, preserving aspect ratio, horizontal center, and bottom anchor (vertical center for the wall-mounted Golden Fly). Outputs 256×256 RGBA to `room/ITEM.png`.
 - The full-room composition includes all ten items at their real `roomScene` coordinates. Rewards retain their existing unlock rules. No production item IDs, slots, renderer, scaling, reward behavior or original painting are changed.
+
+## Approved draft integration
+
+- The runtime loads 91 character/animation frames, nine props and the 640×400 background from `docs/games/img/pepegochi/hd/`; these are byte-identical to the review assets. The dirty tadpole was re-exported from its original atlas with a 7px left margin so the fly is not clipped. The original painting, letter, suitcase, legacy fallback and taskbar sprites remain in their original paths.
+- Logical geometry is unchanged. Sprite and prop hitboxes use the 30% alpha bounds divided by two; bubbles clear the actual sprite top. The HD art profile verifies RGBA, resolution, floor, bounds, colour cap and alpha-fringe limits without loosening any original 128px or taskbar rules.
+- The local test page uses the same renderer, click controller, care and hatch animations as the live page, but only the isolated local rules model. No production calls or rewards. Both pages preload the current stage's animation frames rather than the entire pack.
+- Local validation: all PepeGochi tests pass (130 pass, 7 environment-dependent skips), static site checks and the 91-frame validator pass. The full site suite had two unrelated Haze test-file failures caused by missing local `@noble/curves` (CI installs the locked dependency). New Chromium assertions check actual HD dimensions, four stages, all four rest frames, offline simulator clicks and existing interaction behavior. Full run and real-account test still pending.
