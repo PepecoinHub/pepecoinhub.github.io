@@ -42,6 +42,13 @@ The owner asked for a modest room/bed refinement and a duck inspired by the supp
 
 - `room/room_pond_den_v1.png`: 640×400 opaque background, optimized indexed PNG; same aspect ratio and logical geometry.
 - `room/rubber_duck.png`: 256×256 RGBA, visible bounding box 117×184 at (68,36); bottom y=220 preserves the former 110/128 logical foot line. Existing item ID, slot, size and interaction are unchanged.
-- `room-preview.html`: original game renderer, two rooms, all four stage selectors; only proposed background, duck and frog image sources replaced in the review. Original Golden Foot painting (`p_poster.png`) and all other starter props are retained without changes.
+- `room-preview.html`: original game renderer, two rooms, all four stage selectors, starter/full Passport decoration toggle. Original Golden Foot painting (`p_poster.png`) remains unchanged; only image sources for the other room items, background and frog are replaced in the review.
 - `room/preview.png`: static composition with the original roomScene coordinates and the proposed images; visual review at double logical size. The browser runtime could not launch in the current environment, so this is geometry-based composition, not a browser screenshot.
 - Existing room static/window/interactions tests: 24 passed. No active assets, game logic or SQL changed.
+
+## Late-1990s room props
+
+All eight remaining items have individually generated, finer pixel-art replacements, maintaining the original room placement and identity. The CRT television now has a convex 4:3 glass screen, bulky gray-purple chassis, rabbit-ear antenna, physical knobs, speaker grille and green price-chart display. The lime lava lamp, terracotta plant and red Comfy mug are visually refined. The four Passport rewards (moon rock, paper crown, Golden Fly, blue 3.5-inch floppy disk) are refreshed to match.
+
+- `export-props.sh ITEM SOURCE.png` fits the generated transparent silhouette into the old prop's doubled alpha bounds, preserving aspect ratio, horizontal center, and bottom anchor (vertical center for the wall-mounted Golden Fly). Outputs 256×256 RGBA to `room/ITEM.png`.
+- The full-room composition includes all ten items at their real `roomScene` coordinates. Rewards retain their existing unlock rules. No production item IDs, slots, renderer, scaling, reward behavior or original painting are changed.
