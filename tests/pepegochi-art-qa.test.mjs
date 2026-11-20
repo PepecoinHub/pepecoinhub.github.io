@@ -51,7 +51,29 @@ test('the checks: a good sprite passes, every kind of mistake is named', () => {
   const tb = decodePng(makePng(48, 48, (x, y) => (x >= 15 && x < 33 && y >= 7 && y < 47 ? opaque : none)));
   assert.equal(checkImage(tb, { format: 'B' }).ok, true);
   assert.equal(formatFor('docs/games/img/pepegochi/taskbar/tb_adult_sit.png'), 'B');
-  assert.equal(formatFor('pepegochi_adult_hungry.png'), 'A');
+  assert.equal(formatFor('pepegochi_adult_hungry.png'), 'FINE');
+  assert.equal(formatFor('pepegochi_froglet_idle.png'), 'FINE');
+  assert.equal(formatFor('pepegochi_tadpole_hungry.png'), 'FINE');
+  assert.equal(formatFor('pepegochi_tadpole_idle.png'), 'A');
+  assert.equal(formatFor('pepegochi_adult_idle.png'), 'A');
+  assert.equal(formatFor('lava_lamp.png'), 'A');
+  assert.equal(formatFor('care_froglet_feed_01.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_feed_04.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_clean_01.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_clean_03.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_play_01.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_play_03.png'), 'FINE');
+  assert.equal(formatFor('care_froglet_rest_04.png'), 'FINE');
+  assert.equal(formatFor('care_tadpole_play_01.png'), 'FINE');
+  assert.equal(formatFor('care_clean_04.png'), 'FINE');
+  assert.equal(formatFor('care_tadpole_rest_03.png'), 'FINE');
+  assert.equal(formatFor('froglet_depart_walk_02.png'), 'FINE');
+  assert.equal(formatFor('tadpole_depart_01.png'), 'FINE');
+  assert.deepEqual(FORMATS.FINE, { size: 128, grid: 1, maxColours: 4096, foot: 124 });
+  // A single-pixel colour is valid for fine pixel art only, not for the original coarse profile.
+  const fine = decodePng(makePng(128, 128, (x, y) => (x === 41 && y === 21 ? [200, 0, 0, 255] : frog(x, y))));
+  assert.equal(checkImage(fine, { format: 'FINE' }).ok, true);
+  assert.equal(checkImage(fine, { format: 'A' }).ok, false);
   // a tb_ file is format B even when the command line passes format: undefined
   assert.equal(checkFile(new URL('../games/pepegochi/a2-review/candidates/tb_egg.png', import.meta.url).pathname, { format: undefined }).ok, true);
   assert.deepEqual(FORMATS.B, { size: 48, grid: 1, maxColours: 32, foot: 47 });

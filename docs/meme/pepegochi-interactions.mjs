@@ -1,6 +1,10 @@
-import { TOYS, healthyCompanion } from './pepegochi-personality.mjs?v=20261116sass1';
+import { TOYS, healthyCompanion, playableCompanion } from './pepegochi-personality.mjs?v=20261118dialog1';
 // Cosmetic conversations; actual needs and care history come from the server view.
 const lines = {
+  stamp: ["New stamp! Your Passport is becoming dangerously official.", "Another stamp, fren. I supervised from the taskbar."],
+  stampBatch: ["Multiple stamps? Leave some room for my autograph.", "Look at that Passport. Very productive human behaviour."],
+  secret: ["You found a secret? I saw nothing. Absolutely nothing.", "Hush, fren. The pond has ears. And probably flies."],
+  fireflyUnavailable: ['That little light moved away. Try again when a firefly is nearby.'],
   desktopFirefly: ["A tiny lamp with wings. Don't worry, fren, I let it go.", "Did you see that? The pond has its own screensaver."],
   desktopTV: ["Pond TV? Hold on. I need my popcorn.", "The tiny frog demands a front-row seat."],
   desktopBin: ["I inspected the recycling. No flies. Absolute scandal."],
@@ -46,6 +50,15 @@ const moods = {
   'tb_adult_packing': "I've been waiting for you. Please come visit me.",
   'tb_adult_recovering': "I'm getting better. Thank you for looking after me.",
 };
+const youngLines = {
+  hello: ['*ribbit!* Hi, fren. Still growing!'], how: ['Small frog. Big plans. I am growing every day.'],
+  joke: ['What do baby frogs eat? Tiny bugs. My comedy career is also tiny.'], pet: ['*happy wiggle* That tickles!'],
+  familiar: ['I recognise that pat, fren!'], space: ['Tiny frog needs a tiny break.'], annoyed: ['*squeak* Easy, fren!'],
+  play: ['Let us play! I am practising my first big hops.'], news: ['I am exploring the pond one little hop at a time.'],
+  toyFavourite: ['My favourite! *excited wiggle*'], toyOkay: ['Again! That was fun.'], toyAgain: ['Give me a moment to catch up!'],
+  desktopFirefly: ['A flying little light! *ribbit!*'], desktopTV: ['Movie time!'],
+};
+const youngNeeds = {hunger:'I am hungry.',hygiene:'I need a bath.',mood:'I could use some playtime.',energy:'I need a rest.'};
 function pick(a, n) { return a[Math.abs(Math.trunc(n || 0)) % a.length]; }
 export function companionReply(view, action = 'hello', n = 0, context = {}) {
   if (!view?.hasPet) return { text: '', pose: null, openRoom: true };
@@ -54,10 +67,21 @@ export function companionReply(view, action = 'hello', n = 0, context = {}) {
   // A gesture must never visually hide hunger, exhaustion or other authoritative warning states.
   if (view.warning || ['recovering', 'sleepy', 'neglected', 'packing'].includes(view.motion) || important) {
     const message = important || (view.warning ? "I need you, fren. Let's visit my room." : "I'm taking it easy, fren.");
-    return { text: message, pose: null, openRoom: false };
+    const extra = action === 'memories' ? ` We have spent ${view.careDays || 0} care days together.` :
+      action === 'joke' ? ' A frog walks into a pond. The end.' :
+      action === 'pet' || action === 'familiar' ? ' Thank you for checking on me.' :
+      action === 'favourite' ? ' My toys can wait until I feel better.' :
+      action === 'news' ? ' There is plenty to explore in PondOS.' : '';
+    return { text: message + extra, pose: null, openRoom: false };
   }
   if (!view.adult) {
-    const message = view.motion === 'egg' ? '... *tiny wobble* ...' : '*ribbit!*';
+    const small = view.motion === 'egg' ? 'My little egg is still warming up. ' : '';
+    let message;
+    if (action === 'memories') message = context.journal?.length ? context.journal.join('\n\n') : `We have spent ${view.careDays || 0} care days together.`;
+    else if (action === 'favourite') message = context.discovered && TOYS[context.favourite] ? `I really like my ${TOYS[context.favourite].name}!` : 'I am still discovering my favourite toy.';
+    else if (action === 'how' && youngNeeds[view.needAttention]) message = youngNeeds[view.needAttention] + ' Let us go to my room.';
+    else if (['play','toyFavourite','toyOkay'].includes(action) && !playableCompanion(view)) message = youngNeeds[view.needAttention] ? youngNeeds[view.needAttention] + ' We can play after care.' : 'I need to grow a little more before I can play with desk toys.';
+    else message = small + pick(youngLines[action] || lines[action] || youngLines.hello, n);
     return { text: message, pose: null, openRoom: false };
   }
   if (action === 'how') return { text: "Feeling pretty good, fren. Thanks for asking.", pose: 'tb_adult_talk', openRoom: false };
@@ -69,15 +93,17 @@ export function companionReply(view, action = 'hello', n = 0, context = {}) {
     ? `You have looked after me on ${view.careDays} care days. Those little visits mean a lot, fren.`
     : "Our story is just starting. A little food, a little play, a little time together.", pose: 'tb_adult_think', openRoom: false };
   const group = lines[action] || lines.hello;
-  return { text: pick(group, n), pose: ['pet', 'familiar', 'joke', 'quizWin', 'grown'].includes(action) ? 'tb_adult_laugh' : action === 'annoyed' ? 'tb_adult_moody' : 'tb_adult_talk', openRoom: false };
+  return { text: pick(group, n), pose: ['pet', 'familiar', 'joke', 'quizWin', 'grown', 'stamp', 'stampBatch'].includes(action) ? 'tb_adult_laugh' : action === 'secret' ? 'tb_adult_think' : action === 'annoyed' ? 'tb_adult_moody' : 'tb_adult_talk', openRoom: false };
 }
 
 // Only one user-initiated balloon at a time. Touch and keyboard users get the same menu.
-// No polling or network calls. Optional bond stores cosmetic memories only.
-export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, now = () => Date.now() }) {
+// No polling. Optional care delegates to the host's existing validated server action; bond memories stay cosmetic.
+export function mountFrogInteractions({ button, img, slot, getView, setPose, animate = () => {}, showToy = () => {}, openRoom, closeQuiz, quizAvailable, openQuiz, commands = {}, care, bond, canReact = () => true, fireflyAvailable = () => false, catchFirefly = () => {}, readRumors, openPassport, now = () => Date.now() }) {
   let panel = null, reply = null, clickTimer = null, recent = [], sequence = 0, gesture = null, suppressClick = false;
+  let careTicket = 0;
   let notice = null, noticeTimer = null, lastReaction = -Infinity, lastPet = -Infinity, pats = [];
   let lastActivity = now(), bornAt = now();
+  let rumorTicket = 0, rumorActions = null, rumorOpen = false;
   const doc = button.ownerDocument;
   const win = doc.defaultView;
   const el = (tag, cls, text) => {
@@ -123,7 +149,8 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     panel.style.overflowY = 'auto';
   }
   function close({ focus = false, reset = false } = {}) {
-    cancelClick(); clearNotice();
+    careTicket++;
+    cancelClick(); clearNotice(); clearRumors();
     if (reset) { lastReaction = lastPet = -Infinity; pats = []; bornAt = now(); }
     if (reset) { recent = []; sequence = 0; gesture = null; suppressClick = false; }
     if (!panel) { setPose(null); return; }
@@ -141,8 +168,55 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     if (e.key === 'Escape' && panel) { e.preventDefault(); close({ focus: true }); }
   }
   function visit() { close({ reset: true }); openRoom(); }
+  function runCommand(name) {
+    const command = commands && commands[name];
+    if (typeof command !== 'function') return false;
+    close({ reset: true });
+    command();
+    return true;
+  }
+  function clearRumors() {
+    rumorTicket++; rumorActions?.remove(); rumorActions = null; rumorOpen = false;
+  }
+  function invalidateRumors() {
+    if (!rumorOpen || !panel) return;
+    clearRumors();
+    reply.textContent = 'A new discovery! Choose Pond Rumors or Secret Journal again to see the updated trail.';
+  }
+  async function showRumors(journal = false) {
+    clearRumors(); rumorOpen = true;
+    const target = panel, ticket = rumorTicket;
+    reply.textContent = 'Let me check our Fren Passport...';
+    reply.style.whiteSpace = 'pre-line';
+    setPose(null);
+    let result;
+    try { result = await readRumors(); } catch { result = null; }
+    if (!panel || panel !== target || ticket !== rumorTicket) return;
+    const p = result?.progress;
+    if (result?.status !== 'ok' || !p) {
+      reply.textContent = result?.status === 'signed-out' ? 'Log in with Discord to read your own secret journal.' : 'The pond is quiet. I could not check your Passport. Try again in a moment.';
+      return;
+    }
+    const summary = `${p.found.length} / ${p.total} rumored secrets found.`;
+    const message = journal ? `Secret Journal\n${summary}\n${p.found.length ? p.found.map(title => '• ' + title).join('\n') : 'No discoveries recorded yet. Every detective starts somewhere.'}` :
+      `Pond Rumors\n${summary}\n\n${p.hint || 'You found every trail I know. Keep an eye on the pond; there may be more mysteries later.'}`;
+    reply.textContent = message;
+    rumorActions = el('div', 'pg-fact-answers pg-rumor-actions');
+    function extra(label, action) {
+      const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', action); rumorActions.append(b); return b;
+    }
+    if (!journal && p.detail) {
+      const b = extra('A little more?', () => {
+        reply.textContent = message + '\n\n' + p.detail;
+        b.disabled = true; panel.scrollTop = 0;
+      });
+    }
+    if (openPassport) extra('View journal in Fren Passport', () => { close(); openPassport(); });
+    if (rumorActions.childElementCount) reply.after(rumorActions);
+    reposition(); panel.scrollTop = 0;
+  }
   function say(action = 'hello') {
-    clearNotice();
+    clearNotice(); clearRumors();
     if (action === 'hello') action = bond?.take() || action;
     if (action === 'pet') {
       pats = pats.filter(t => now() - t < 10000); pats.push(now());
@@ -167,28 +241,65 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
       reply = el('p', 'pg-fact-q');
       reply.setAttribute('aria-live', 'polite');
       const actions = el('div', 'pg-fact-answers');
-      function add(label, fn) { const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', fn); actions.append(b); }
+      const buttons = [];
+      function add(label, fn, parent = actions) { const b = el('button', 'pg-fact-a', label); b.type = 'button'; b.addEventListener('click', () => {
+        careTicket++;
+        clearRumors();
+        for (const child of buttons) child.classList?.toggle('is-selected', child === b);
+        fn();
+        if (panel) panel.scrollTop = 0;
+      }); buttons.push(b); parent.append(b); return b; }
+      if (typeof care === 'function') {
+        const careBox = el('div', 'pg-care-actions');
+        const careButtons = [];
+        const requestCare = async (kind, label) => {
+          const ticket = ++careTicket;
+          careButtons.forEach(b => { b.disabled = true; });
+          reply.textContent = `${label}…`;
+          setPose('tb_adult_think');
+          let result;
+          try { result = await care(kind); }
+          catch (_) { result = { ok: false, text: 'Care could not be saved. Try again in a moment.' }; }
+          careButtons.forEach(b => { b.disabled = false; });
+          if (ticket !== careTicket || !panel) return;
+          if (result?.openRoom) { visit(); return; }
+          const response = result?.action ? companionReply(getView(), result.action, sequence++, bond || {}) : null;
+          reply.textContent = result?.text || (result?.ok ? `${label} saved. ${response?.text || ''}`.trim() : response?.text) || 'Care could not be saved. Try again in a moment.';
+          setPose(response?.pose || null);
+          if (result?.ok && result.action) animate(result.action);
+          reposition();
+        };
+        for (const [kind, label] of [['feed', 'Feed'], ['clean', 'Clean'], ['play', 'Play'], ['rest', 'Rest']])
+          careButtons.push(add(label, () => requestCare(kind, label), careBox));
+        actions.append(careBox);
+      }
+      if (readRumors) {
+        add('Pond Rumors', () => showRumors());
+        add('Secret Journal', () => showRumors(true));
+      }
       add('Our memories', () => say('memories'));
       if (bond) {
         add('Your favourite toy?', () => say('favourite'));
         for (const [id, toy] of Object.entries(TOYS)) add(toy.label, () => {
-          if (!healthyCompanion(getView())) { say('how'); return; }
+          if (!playableCompanion(getView())) { reply.textContent = youngNeeds[getView()?.needAttention] ? youngNeeds[getView().needAttention] + ' Visit my room first.' : 'Desk toys unlock when I am a healthy froglet or adult.'; return; }
           const reaction = bond.play(id);
-          if (!reaction) return;
+          if (!reaction) { reply.textContent = 'My toy box is not ready yet. Try again in a moment.'; return; }
           say(reaction); if (reaction !== 'toyAgain') showToy(id);
         });
       }
       if (bond) {
         const mute = el('button', 'pg-fact-a'); mute.type = 'button';
         const label = () => { mute.textContent = bond.muted ? 'Reactions: quiet' : 'Reactions: on'; mute.setAttribute('aria-pressed', String(bond.muted)); };
-        label(); mute.addEventListener('click', () => { bond.toggleMute(); clearNotice(); label(); }); actions.append(mute);
+        label(); mute.addEventListener('click', () => { clearRumors(); bond.toggleMute(); clearNotice(); label(); reply.textContent = bond.muted ? 'Automatic reactions are off. You can still talk and play with me.' : 'Automatic reactions are on. Watch for little surprises!'; panel.scrollTop = 0; }); actions.append(mute);
       }
       add('How are you?', () => say('how'));
       add('Tell me a joke', () => say('joke'));
-      add("Let's play!", () => say('play'));
+      add("Let's play!", () => { if (!runCommand('games')) say('play'); });
       add('Pet me', () => say('pet'));
-      add("What's new?", () => say('news'));
-      if (fireflyAvailable()) add('Catch a firefly', () => { close({ focus: true }); catchFirefly(); });
+      add("What's new?", () => { if (!runCommand('news')) say('news'); });
+      if (typeof commands?.passport === 'function') add('Open Fren Passport', () => runCommand('passport'));
+      if (typeof commands?.tv === 'function') add('Watch Pond TV', () => runCommand('tv'));
+      if (fireflyAvailable()) add('Catch a firefly', () => { close({ focus: true }); if (!catchFirefly()) say('fireflyUnavailable'); });
       if (quizAvailable()) add('Pond Quiz', () => { close(); openQuiz(); });
       add('Go to your room', visit);
       panel.append(head, reply, actions);
@@ -243,7 +354,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
   button.addEventListener('pointerup', end);
   button.addEventListener('pointercancel', end);
   button.addEventListener('pointerleave', end);
-  return { close, react, invite, get busy() { return !!(panel || notice || clickTimer !== null); }, dispose() {
+  return { close, react, invite, invalidateRumors, get busy() { return !!(panel || notice || clickTimer !== null); }, dispose() {
     close({ reset: true });
     doc.removeEventListener('pointerdown', activity, true);
     doc.removeEventListener('keydown', activity, true);

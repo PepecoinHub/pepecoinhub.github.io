@@ -1953,6 +1953,12 @@
   function pepegochiApp() {
     var A = openApp('pepegochi', 'PEPEGOCHI.EXE', 'pep-logo', function (A) {
       A.body.innerHTML = '<iframe class="app-frame" src="' + BASE + 'games/pepegochi-live.html?embed=1" title="PEPEGOCHI.EXE"></iframe>';
+      var roomFrame = A.body.querySelector('iframe');
+      A._roomTV = function (e) {
+        if (GOCHI && e.origin === location.origin && e.source === roomFrame.contentWindow && roomFrame.isConnected &&
+            !A.host.classList.contains('is-min') && e.data && e.data.type === 'pondos:pepegochi-room-tv') pondTV();
+      };
+      window.addEventListener('message', A._roomTV);
     }, 760);
     // closing or minimizing the window: the frog hops out of it onto the taskbar (pepegochi-taskbar.mjs)
     if (A && !A._hop) {
@@ -1960,7 +1966,7 @@
         var r = A.host.getBoundingClientRect();
         if (r.width) window.dispatchEvent(new CustomEvent('pondos:pepegochi-left', { detail: { left: r.left, top: r.top, width: r.width, height: r.height } }));
       };
-      A.stop = A._hop;
+      A.stop = function () { window.removeEventListener('message', A._roomTV); A._hop(); };
       var minBtn = A.host.querySelector('.w-min');
       if (minBtn) minBtn.addEventListener('click', A._hop, true);
     }
@@ -1975,10 +1981,21 @@
   }
   // Read-only PepeGochi companion on the PondOS taskbar; beta gate stays in place.
   // The real game and server own the pet; this module never invents a local pet.
+  var gochiReceive = null;
+  function notifyGochi(kind, owner, ids) {
+    var current = sbSession();
+    if (!GOCHI || FREN_TEST || !gochiReceive || !current || !current.discord || !owner || current.userId !== owner) return;
+    try { gochiReceive({ kind: kind, owner: owner, ids: ids }); } catch (e) { /* cosmetic only */ }
+  }
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261118desktop1').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261120complete1').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
-        session: sbSession, rpc: rpc, base: BASE });
+        session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport,
+        commands: { games: gamesFolder, passport: frenPassport, news: bulletinApp, tv: pondTV },
+        subscribeSiteEvents: function (receive) {
+          gochiReceive = receive;
+          return function () { if (gochiReceive === receive) gochiReceive = null; };
+        } });
     }).catch(function () { /* optional decoration; the game still works */ });
   }
   function pondWarsApp() {
@@ -2251,7 +2268,7 @@
       L.avatar = { schema_version: 2, bg: args.p_bg, clothing: args.p_clothing, mouth: args.p_mouth, eyes: args.p_eyes, hat: args.p_hat, accessory: args.p_accessory, special: args.p_special };
       if (first) L.first_avatar = now;
       frenLocal(L);
-      return { avatar: L.avatar, badge: { id: 'first_avatar', earned_at: L.first_avatar, new: first } };
+      return { preview: true, avatar: L.avatar, badge: { id: 'first_avatar', earned_at: L.first_avatar, new: first } };
     }
     if (name === 'gry_passport_discover' && FREN_TEST) {
       var id = String(args.p_secret || '');
@@ -3164,7 +3181,7 @@
         // Save Look: one RPC; the look counts as saved only when the server confirms it
         function save() {
           if (pending || !signed) return Promise.reject(new Error('not now'));
-          var sent = Object.assign({}, look);
+          var sent = Object.assign({}, look), awardOwner = sbSession();
           pending = true; msg = ''; setBtn(saveB, 'Saving…'); status();
           return frenRpc('gry_passport_avatar_save', { p_bg: sent.bg, p_clothing: sent.clothing, p_mouth: sent.mouth, p_eyes: sent.eyes, p_hat: sent.hat, p_accessory: sent.accessory, p_special: sent.special }).then(function (r) {
             var conf = r && avatarLook(o, r.avatar);
@@ -3185,7 +3202,10 @@
             paint();
             // the Save button is disabled now; keep keyboard users in the window
             if (!document.activeElement || document.activeElement === document.body) useB.focus();
-            if (r.badge && r.badge.new) balloon('Fresh Fren unlocked!', 'You saved your first Fren. The achievement is in your Fren Passport now.', 'fresh-fren');
+            if (r.badge && r.badge.new) {
+              balloon('Fresh Fren unlocked!', 'You saved your first Fren. The achievement is in your Fren Passport now.', 'fresh-fren');
+              if (!r.preview && r.badge.new === true && awardOwner && awardOwner.discord && r.badge.id === 'first_avatar') notifyGochi('stamp', awardOwner.userId, [r.badge.id]);
+            }
             return conf;
           }, function (err) {
             pending = false; setBtn(saveB, 'Save Look');
@@ -3254,13 +3274,22 @@
         if (apps.passport && apps.passport.render) apps.passport.render();
       }).catch(function () {});
       if(result.new) {
+        if (!FREN_TEST) notifyGochiSecret(session.userId);
         var names={wrong_frog:'The Wrong Frog',why_tho:'Why Do You Need This?',magic_word:'The Magic Word',bsod_fren:'Blue Screen of Fren',midnight_fren:'Midnight Fren',nerd_alert:'Nerds Only',bali_dreamer:'Bali Dreamer',find_fren:'Looking Glass',address_check:'Trust, But Verify'};
         var av={why_tho:1,midnight_fren:1,nerd_alert:1,bali_dreamer:1,find_fren:1,address_check:1};
         rewardNotice({ bar: 'Fren Passport - Secret Found', title: 'Secret discovered: ' + (names[id] || 'A mysterious find'),
           text: 'It is in your Fren Passport now.' + (av[id] ? ' A special avatar is waiting for you in Create Your Fren.' : ''),
           img: ico('gif-045-still'), go: av[id] ? 'Open Create Your Fren' : 'Open Fren Passport', open: av[id] ? avatarMaker : frenPassport });
+        if (result.new === true) notifyGochi('secret', session.userId, [id]);
       }
     },function(){ /* Migration may not be installed yet; retry on next discovery. */ });
+  }
+
+  // May animate the companion after a confirmed read/write response, never grants a secret.
+  function notifyGochiSecret(owner) {
+    var s = sbSession();
+    if (GOCHI && !FREN_TEST && s && s.discord && s.userId === owner)
+      window.dispatchEvent(new CustomEvent('pondos:secret-found', { detail: { owner: owner } }));
   }
 
   // Chat secrets (Happy Fren for a smiley, Born to Fren for the word "fren") are given by the server's chat trigger,
@@ -3277,19 +3306,21 @@
     var sent = Date.now();
     setTimeout(function () {
       rpc('gry_passport_state', {}).then(function (st) {
+        var current = sbSession();
+        if (!current || current.userId !== s.userId || !current.discord) return;
         var got = (st && Array.isArray(st.secrets)) ? st.secrets : [];
         var info = { happy_fren: 'Happy Fren', born_to_fren: 'Born to Fren' };
-        var fresh = false;
+        var fresh = [];
         want.forEach(function (id) {
           var x = got.find(function (g) { return g.id === id; }); if (!x) return;
           try { localStorage.setItem('pondos-passport-secret-v1:' + s.userId + ':' + id, '1'); } catch (e) {}
           if (sent - Date.parse(x.discovered_at) > 5 * 60000) return;   // found long ago: no notice now
-          fresh = true;
+          fresh.push(id);
           rewardNotice({ bar: 'Fren Passport - Secret Found', title: 'Secret discovered: ' + info[id],
             text: 'It is in your Fren Passport now. A special avatar is waiting for you in Create Your Fren.',
             img: ico('gif-045-still'), go: 'Open Create Your Fren', open: avatarMaker });
         });
-        if (fresh) passportLoad(sbSession()).then(function () { if (apps.passport && apps.passport.render) apps.passport.render(); }).catch(function () {});
+        if (fresh.length) { notifyGochiSecret(s.userId); notifyGochi('secret', s.userId, fresh); passportLoad(sbSession()).then(function () { if (apps.passport && apps.passport.render) apps.passport.render(); }).catch(function () {}); }
       }, function () {});
     }, 1200);
   }
@@ -3306,9 +3337,11 @@
       try { localStorage.setItem(k, '1'); } catch (e) {}
       if (passportCache && passportCache.userId === session.userId) passportCache = null;
       if (!r['new']) return;
+      notifyGochiSecret(session.userId);
       rewardNotice({ bar: 'Fren Passport - Secret Found', title: 'Secret discovered: Share Fren',
         text: 'You found a little PondOS secret by sharing a Pepe Guesser result. It is in your collection now.',
         img: ico('gif-045-still'), go: 'Open Fren Passport', open: frenPassport });
+      if (r['new'] === true && !r.beta) notifyGochi('secret', session.userId, ['share_fren']);
     }, function () { /* the migration may not be installed yet */ });
   }
 
@@ -3366,6 +3399,8 @@
     var k = 'pondos-checkin:' + s.userId, now = Date.now();
     try { if (now - (+sessionStorage.getItem(k) || 0) < 300000) return; sessionStorage.setItem(k, String(now)); } catch (e) {}
     setTimeout(function () {
+      var current = sbSession();
+      if (!current || !current.discord || current.userId !== s.userId) return;
       frenRpc('gry_passport_checkin', {}).then(function (r) {
         var fresh = r && Array.isArray(r.new_badges) ? r.new_badges : [];
         if (!fresh.length) return;
@@ -3377,6 +3412,7 @@
           stamps.forEach(function (x) {
             rewardNotice({ bar: 'Fren Passport - New Stamp', stamp: x, title: x.title, text: x.description || 'It is in your Fren Passport now.' });
           });
+          notifyGochi('stamp', s.userId, fresh.map(function (b) { return b && b.id; }));
         });
       }, function () { /* the migration may not be installed yet; nothing to show */ });
     }, 2500);

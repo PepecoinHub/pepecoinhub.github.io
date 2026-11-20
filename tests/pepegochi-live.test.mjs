@@ -86,6 +86,16 @@ test('the live page talks only to the game server, keeps nothing in the browser 
   assert.deepEqual(calls.filter(c => c[1]).map(c => c[1]).sort(), ["{ p_action: kind }", "{ p_name: String(name || '').trim() }"]);
 });
 
+test('taskbar care refreshes an open room without sending pet state through postMessage', () => {
+  const taskbar = file('docs/meme/pepegochi-taskbar.mjs');
+  const live = file('docs/games/js/pepegochi-live.mjs');
+  assert.match(taskbar, /postMessage\(\{ type: 'pondos:pepegochi-refresh' \}, location\.origin\)/);
+  assert.match(live, /event\.source !== window\.parent/);
+  assert.match(live, /event\.data\?\.type !== 'pondos:pepegochi-refresh'/);
+  assert.match(live, /run\(game\.refresh\(\)\)/);
+  assert.doesNotMatch(taskbar.match(/function syncOpenRoom\(\) \{[\s\S]*?\n  \}/)?.[0] || '', /pet|needs|status|life_id/);
+});
+
 test('Room: every owned item in its fixed place; the starter room is unpacked once', async () => {
   const slots = [{ slot_id: 'shelf_a', label: 'Shelf A', allowed_categories: ['small', 'trophy'] },
     { slot_id: 'rug_left', label: 'Rug left', allowed_categories: ['toy', 'small'] }];

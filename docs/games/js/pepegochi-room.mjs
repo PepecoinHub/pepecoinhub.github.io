@@ -13,6 +13,9 @@
 export const ROOM_W = 640;
 export const ROOM_H = 400;
 export const IMG = 'img/pepegochi/';
+// A16–A23 redraw the existing filenames; invalidate old cached sprites at the rendering boundary.
+export const SPRITE_VERSION = '20261120complete1';
+export const versionSprite = src => src.startsWith(IMG) ? src + '?v=' + SPRITE_VERSION : src;
 export const BACKGROUND = IMG + 'room_pond_den_v1.png';
 // bumped when a room prop is redrawn under the same file name (A10: mug, duck, painting, 2026-11-15)
 export const PROP_V = '20261115a10';
@@ -208,7 +211,7 @@ export function playFrames(img, frames, ms, { setTimer = setTimeout, clearTimer 
   let i = 0, timer = null;
   const next = () => {
     if (i >= frames.length) { img.setAttribute('src', final); timer = null; return; }
-    img.setAttribute('src', frames[i++]); timer = setTimer(next, ms);
+    img.setAttribute('src', versionSprite(frames[i++])); timer = setTimer(next, ms);
   };
   next();
   return () => { if (timer) clearTimer(timer); img.setAttribute('src', final); };
@@ -272,7 +275,7 @@ export function renderRoom(doc, opts = {}) {
     art.append(im);
   }
   if (sc.frog) {
-    const f = mk('img', 'pgr-pet'); f.src = sc.frog.src; f.alt = ''; f.dataset.sprite = sc.frog.sprite;
+    const f = mk('img', 'pgr-pet'); f.src = versionSprite(sc.frog.src); f.alt = ''; f.dataset.sprite = sc.frog.sprite;
     if (sc.frog.fallback) f.dataset.fallback = '1';
     pos(f, sc.frog.left, sc.frog.top, sc.frog.width); setFoot(f, sc.frog.foot); art.append(f);
     if (sc.frog.suitcase) {
@@ -311,7 +314,7 @@ export function playDeparture(frame, stage = 'adult', { setTimer = setTimeout, c
   let i = 0, timer = null;
   const show = () => {
     if (i >= steps.length) { actor.remove(); if (letter) letter.hidden = false; return; }
-    im.src = steps[i].src; im.dataset.frame = String(i + 1);
+    im.src = versionSprite(steps[i].src); im.dataset.frame = String(i + 1);
     actor.style.left = steps[i].x / ROOM_W * 100 + '%'; setFoot(actor, steps[i].foot);
     i++; timer = setTimer(show, DEPART_MS);
   };

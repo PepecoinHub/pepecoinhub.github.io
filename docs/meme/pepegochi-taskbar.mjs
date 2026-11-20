@@ -1,17 +1,19 @@
-import { TOYS } from './pepegochi-personality.mjs?v=20261116sass1';
+import { TOYS } from './pepegochi-personality.mjs?v=20261118dialog1';
 import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
-// PepeGochi taskbar companion for PondOS. Read-only: the server remains the only source of pet state.
+// PepeGochi taskbar companion for PondOS. The server remains the only source of pet state and validates every care action.
 // Loaded only behind the existing ?beta=gochi gate. Local conversations are cosmetic; no polling, rewards or fake pet.
 // Based on PR #299; adds the Pond Quiz (one server question a day once the frog has hatched; update_pond_quiz.sql)
 // and the hop out of the PEPEGOCHI.EXE window.
-import { frogLook } from '../games/js/pepegochi-room.mjs?v=20261116room1';
+import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261120complete1';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261118desktop1';
-import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118desktop1';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261120complete1';
+import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
+import { createRumorReader } from './pepegochi-rumors.mjs?v=20261118rumors1';
+import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118dialog1';
 
-import { createBond } from './pepegochi-bond.mjs?v=20261116sass1';
+import { createBond } from './pepegochi-bond.mjs?v=20261120complete1';
 
-import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261118desktop1';
+import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261118events1';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
 const NEEDS = new Set(['hunger', 'hygiene', 'mood', 'energy']);
@@ -63,6 +65,7 @@ export function describeTaskbarFrog(state) {
     .filter(([need, val]) => NEEDS.has(need) && Number.isFinite(Number(val)))
     .map(([need, val]) => ({ need, value: Number(val) }));
   const sprite = frogLook({ stage, status, needs }).sprite;
+  const low = needs.filter(n => n.value < LOOK_BELOW).sort((a,b) => a.value-b.value)[0];
   const name = String(p.name || 'Your Fren').slice(0, 18);
   const remarks = {
     healthy: 'Your Fren is here.',
@@ -73,6 +76,8 @@ export function describeTaskbarFrog(state) {
   return {
     careDays: Math.max(0, Math.trunc(Number(p.care_days) || 0)),
     sprite: pose(poseFor(sprite)), label: name, adult: stage === 'adult',
+    playReady: stage !== 'egg' && status === 'healthy' && needs.length === NEEDS.size && !low,
+    needAttention: low?.need || null,
     title: name + ' · ' + remarks[status] + ' Click to talk, double-click to visit.',
     warning: status === 'packing' || status === 'neglected', hasPet: true,
     motion: status !== 'healthy' ? status : (sprite === 'adult_tired' ? 'sleepy' : stage),
@@ -95,13 +100,15 @@ export function hopPath(from, to, steps = 36) {
 
 // One state read on entry, then only when the tab returns after a break, auth changes,
 // or the PEPEGOCHI.EXE iframe signals that a player action succeeded.
-export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = () => Date.now() }) {
+export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base = '../', now = () => Date.now(), subscribeSiteEvents = () => () => {}, rumorsEnabled = true, openPassport }) {
   const start = bar && bar.querySelector('.start');
   if (!start) return () => {};
   let storage;
   try { storage = window.localStorage; } catch {}
   const bond = createBond({ storage, now });
   const arcade = createArcadeObserver();
+  const siteEvents = createSiteEventObserver();
+  const rumors = createRumorReader({ session, rpc, now });
   let disposed = false, lastLife = null;
   let desktop = null;
   const img_base = base + 'games/img/pepegochi/';
@@ -314,9 +321,18 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     setAct(null);
     document.removeEventListener('keydown', onKey, true);
     document.removeEventListener('pointerdown', onOutside, true);
+    window.removeEventListener('resize', positionQuiz);
   }
   function onKey(e) { if (e.key === 'Escape') { closeBalloon(); factBtn.focus(); } }
   function onOutside(e) { if (balloon && !balloon.contains(e.target) && e.target !== factBtn) closeBalloon(); }
+  function positionQuiz() {
+    if (!balloon) return;
+    const r = slot.getBoundingClientRect(), top = Math.min(r.top, img.getBoundingClientRect().top);
+    balloon.style.bottom = Math.max(8, window.innerHeight - top + 6) + 'px';
+    balloon.style.left = Math.max(8, Math.min(r.left, window.innerWidth - balloon.offsetWidth - 8)) + 'px';
+    balloon.style.maxHeight = Math.max(80, top - 12) + 'px';
+    balloon.style.overflowY = 'auto';
+  }
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
   async function showBoard(box) {
     box.replaceChildren(el('p', 'pg-fact-note', 'Loading the ranking…'));
@@ -361,18 +377,25 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       rk.addEventListener('click', () => showBoard(extra));
       extra.replaceChildren(rk);
     };
+    let submitting = false;
     f.answers.forEach((ans, i) => {
       const b = el('button', 'pg-fact-a', ans); b.type = 'button';
       b.addEventListener('click', async () => {
+        if (submitting || f.answered || b.disabled) return;
+        submitting = true;
         [...list.children].forEach(x => { x.disabled = true; });
+        b.classList.add('is-selected');
+        out.textContent = 'Saving your answer…';
         const who = session()?.userId, ticket = quizIntent, target = balloon;
         try {
           const answer = await rpc('gry_quiz_answer', { p_choice: i });
           if (disposed || who !== session()?.userId || ticket !== quizIntent || target !== balloon) return;
+          if (!answer || !answer.answered || !Array.isArray(answer.answers) || !Number.isInteger(answer.correct)) throw new Error('Invalid quiz result');
           server = answer; f = server;
           bond.remember(f.right ? 'quizWin' : 'quizMiss');
         }
-        catch (e) { if (disposed || who !== session()?.userId || ticket !== quizIntent || target !== balloon) return; out.textContent = 'The answer could not be saved. Try again later.'; [...list.children].forEach(x => { x.disabled = false; }); return; }
+        catch (e) { if (disposed || who !== session()?.userId || ticket !== quizIntent || target !== balloon) return; submitting = false; b.classList.remove('is-selected'); out.textContent = 'The answer could not be saved. Try again.'; [...list.children].forEach(x => { x.disabled = false; }); return; }
+        b.classList.remove('is-selected');
         show(); updateFactButton();
       });
       list.append(b);
@@ -383,9 +406,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     document.body.append(balloon);
     // above the frog, inside the screen (also on a phone, where the taskbar has two rows)
     // the frog stands on the taskbar's edge: the balloon goes above its head, so the frog stays visible
-    const r = slot.getBoundingClientRect(), top = Math.min(r.top, img.getBoundingClientRect().top);
-    balloon.style.bottom = Math.max(8, window.innerHeight - top + 6) + 'px';
-    balloon.style.left = Math.max(8, Math.min(r.left, window.innerWidth - balloon.offsetWidth - 8)) + 'px';
+    positionQuiz();
+    window.addEventListener('resize', positionQuiz);
     document.addEventListener('keydown', onKey, true);
     document.addEventListener('pointerdown', onOutside, true);
     (list.querySelector('button:not(:disabled)') || x).focus();
@@ -423,6 +445,63 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   let lastAt = 0;
   let lastUser = null;
   let generation = 0;
+  let careBusy = false;
+  const CARE_REACTION = { feed: 'fed', clean: 'clean', play: 'played', rest: 'rested' };
+  function acceptState(state, { keepConversation = false } = {}) {
+    const life = state?.pet?.life_id || null;
+    if (lastLife !== life) {
+      desktop?.reset();
+      conversation?.close({ reset: true }); rumors.invalidate(); arcade.reset(); siteEvents.reset(); clearToy(); lastLife = life;
+    }
+    const view = describeTaskbarFrog(state);
+    if (shownView?.sprite !== view.sprite || shownView?.label !== view.label || shownView?.playReady !== view.playReady || shownView?.needAttention !== view.needAttention) {
+      desktop?.stop(); clearToy();
+      if (!keepConversation) conversation?.close();
+    }
+    paint(view);
+    const event = bond.observe(lastUser, state?.pet);
+    const was = hatched;
+    hatched = !!(state?.pet?.stage && state.pet.stage !== 'egg');
+    if (hatched !== was) refreshFacts(true);
+    return event;
+  }
+  function careError(error) {
+    const message = String(error?.message || '');
+    if (/Wait a moment before the next care action/i.test(message)) return 'Easy, fren. Wait a moment before the next care action.';
+    if (/Daily care action limit reached/i.test(message)) return 'That is enough care actions for today. See you tomorrow, fren.';
+    if (/cooling down/i.test(message)) return 'That care action is cooling down. Try again later.';
+    if (/does not need that right now/i.test(message)) return 'I do not need that right now, fren.';
+    if (/Discord sign-in required|not authenticated|JWT|Not signed in|permission denied/i.test(message)) return 'Log on with Discord so the server can care for your Fren.';
+    return 'Care could not be saved. Your Fren is unchanged; try again in a moment.';
+  }
+  function syncOpenRoom() {
+    for (const frame of document.querySelectorAll('iframe[src*="pepegochi-live.html"]'))
+      frame.contentWindow?.postMessage({ type: 'pondos:pepegochi-refresh' }, location.origin);
+  }
+  async function taskbarCare(kind) {
+    if (!Object.hasOwn(CARE_REACTION, kind)) return { ok: false, text: 'Unknown care action.' };
+    if (careBusy) return { ok: false, text: 'One care action is already being saved.' };
+    const auth = session(), owner = auth?.discord ? auth.userId : null, life = lastLife;
+    if (!owner || !life || !shownView?.hasPet) return { ok: false, openRoom: true };
+    careBusy = true;
+    const requestGeneration = ++generation;
+    try {
+      const state = await rpc('gry_pepegochi_action', { p_action: kind });
+      const current = session();
+      if (disposed || requestGeneration !== generation || !current?.discord || current.userId !== owner || lastLife !== life)
+        return { ok: false, text: 'The active account changed. No local result was applied.' };
+      lastAt = Date.now();
+      const accepted = state?.action_result === 'accepted';
+      const event = acceptState(state, { keepConversation: accepted });
+      if (accepted || state?.action_result === 'moved_out') syncOpenRoom();
+      if (state?.action_result === 'moved_out') return { ok: false, openRoom: true };
+      if (!accepted) return { ok: false, text: 'The server did not accept that care action.' };
+      if (event) bond.consumeCare(event);
+      return { ok: true, action: event || CARE_REACTION[kind] };
+    } catch (error) {
+      return { ok: false, text: careError(error) };
+    } finally { careBusy = false; }
+  }
   async function refresh(force = false) {
     const auth = session();
     const id = auth && auth.discord && auth.userId ? auth.userId : null;
@@ -432,8 +511,9 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       lastAt = 0;
       generation++;
       cancelQuiz();               // the old account's question or ranking must not stay on screen
+      rumors.invalidate();
       conversation?.close({ reset: true });
-      bond.reset(); arcade.reset(); clearToy(); lastLife = null;
+      bond.reset(); arcade.reset(); siteEvents.reset(); clearToy(); lastLife = null;
       paint(describeTaskbarFrog(null));
       hatched = false; server = null; updateFactButton();
     }
@@ -445,19 +525,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
       const state = await rpc('gry_pepegochi_state', {});
       const cur = session();
       if (disposed || requestGeneration !== generation || !cur || !cur.discord || cur.userId !== id) return;
-      if (lastLife !== state?.pet?.life_id) {
-        desktop?.reset();
-        conversation?.close({ reset: true }); arcade.reset(); clearToy(); lastLife = state?.pet?.life_id || null;
-      }
-      const view = describeTaskbarFrog(state);
-      if (shownView?.sprite !== view.sprite || shownView?.label !== view.label) { desktop?.stop(); conversation?.close(); clearToy(); }
-      paint(view);
-      const event = bond.observe(id, state?.pet);
+      const event = acceptState(state);
       if (event) conversation?.react(event);
-      // the quiz opens once the frog has hatched (the server checks it again)
-      const was = hatched;
-      hatched = !!(state && state.pet && state.pet.stage && state.pet.stage !== 'egg');
-      if (hatched !== was) refreshFacts(true);
     } catch (_) {
       const cur = session();
       if (disposed || requestGeneration !== generation || !cur || cur.userId !== id) return;
@@ -484,6 +553,12 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     if (frame) refresh(true);
   }
   const onAuth = () => { refresh(true); refreshFacts(true); };
+  // Invalidation only; the private, deduplicated site-event bridge owns cosmetic award reactions.
+  const onSecret = event => {
+    if (!rumorsEnabled || !event.detail?.owner || event.detail.owner !== session()?.userId || !signedIn()) return;
+    rumors.invalidate();
+    conversation?.invalidateRumors();
+  };
   const onStorage = event => {
     if (event.key && event.key.startsWith('sb-azbwciqfbsdpwubznncg-auth-token')) onAuth();
   };
@@ -491,15 +566,23 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   window.addEventListener('focus', onVisible);
   window.addEventListener('storage', onStorage);
   window.addEventListener('pondos:auth-changed', onAuth);
+  window.addEventListener('pondos:secret-found', onSecret);
   window.addEventListener('pondos:pepegochi-left', onLeftWindow);
   document.addEventListener('visibilitychange', onVisible);
   conversation = mountFrogInteractions({ button, img, slot, getView: () => shownView,
     setPose: p => { desktop?.stop(); cancelMotion(); setAct(p); if (!p) queueMotion(); }, animate: animateExpression, showToy, openRoom: open,
     closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
-    openQuiz: requestQuiz, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
-    canReact: () => !balloon && !desktop?.active && document.activeElement?.tagName !== 'IFRAME', now });
+    openQuiz: requestQuiz, commands, care: taskbarCare, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
+    readRumors: rumorsEnabled ? rumors.read : null, openPassport,
+    canReact: () => !balloon && !desktop?.active && !document.querySelector('.reward98') && document.activeElement?.tagName !== 'IFRAME', now });
+  const unsubscribeSiteEvents = subscribeSiteEvents(event => {
+    const current = session();
+    if (disposed || !current?.discord || current.userId !== lastUser) return;
+    const action = siteEvents.accept(event, { owner: lastUser, life: lastLife, hasPet: shownView?.hasPet });
+    if (action) conversation.react(action);
+  });
   desktop = mountDesktopCompanion({ slot, img, getView: () => shownView, base, now,
-    eligible: () => !disposed && !balloon && !bond.muted && !!lastLife && document.activeElement?.tagName !== 'IFRAME' && !document.fullscreenElement,
+    eligible: manual => !disposed && !balloon && (manual || !bond.muted) && !!lastLife && document.activeElement?.tagName !== 'IFRAME' && !document.fullscreenElement,
     mayStart: () => !act && !conversation.busy && !document.querySelector('.pg-companion-fly'),
     react: action => conversation.react(action), onStart: cancelMotion, onEnd: queueMotion });
   const onOffline = () => conversation?.react('offline');
@@ -509,7 +592,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
   refresh(true);
   queueMotion();
   return () => {
-    disposed = true; generation++; quizIntent++; bond.touch(); arcade.reset(); clearToy();
+    disposed = true; generation++; quizIntent++; rumors.invalidate(); bond.touch(); arcade.reset(); siteEvents.reset(); unsubscribeSiteEvents(); clearToy();
     desktop?.dispose();
     window.removeEventListener('offline', onOffline);
     window.removeEventListener('online', onOnline);
@@ -520,6 +603,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, base = '../', now = 
     window.removeEventListener('message', onMessage);
     window.removeEventListener('focus', onVisible);
     window.removeEventListener('storage', onStorage);
+    window.removeEventListener('pondos:secret-found', onSecret);
     window.removeEventListener('pondos:auth-changed', onAuth);
     window.removeEventListener('pondos:pepegochi-left', onLeftWindow);
     window.removeEventListener('resize', place);

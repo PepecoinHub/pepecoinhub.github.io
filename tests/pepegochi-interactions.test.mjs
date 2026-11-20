@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { companionReply, mountFrogInteractions } from '../docs/meme/pepegochi-interactions.mjs';
 
 const adult = { hasPet: true, adult: true, motion: 'adult', sprite: 'taskbar/tb_adult_sit.png' };
@@ -29,6 +30,14 @@ test('eggs and young frogs never use adult poses', () => {
     assert.equal(companionReply(view, 'hello').openRoom, false);
   }
 });
+test('froglets get age-appropriate, distinct dialogue instead of identical ribbits', () => {
+  const young = {hasPet:true,adult:false,motion:'froglet',playReady:true,careDays:3};
+  const answers = ['hello','how','joke','pet','play','news','memories','favourite'].map(action=>companionReply(young,action).text);
+  assert.equal(new Set(answers).size,answers.length);
+  assert.match(companionReply(young,'memories').text,/3 care days/);
+  assert.match(companionReply({...young,playReady:false,needAttention:'hunger'},'play').text,/hungry/);
+  for(const action of ['toyOkay','toyFavourite','pet'])assert.equal(companionReply(young,action).pose,null);
+});
 
 // Small DOM harness: exercises the controller without a browser dependency.
 function harness(initial = adult, options = {}) {
@@ -41,6 +50,8 @@ function harness(initial = adult, options = {}) {
   class Element {
     constructor(doc) { this.ownerDocument = doc; this.children = []; this.events = new Map(); this.attrs = new Map(); this.style = {}; this.offsetWidth = 300; }
     append(...children) { for (const n of children) { this.children.push(n); n.parent = this; } }
+    after(n) { this.parent.children.splice(this.parent.children.indexOf(this) + 1, 0, n); n.parent = this.parent; }
+    get childElementCount() { return this.children.length; }
     remove() { if (this.parent) this.parent.children = this.parent.children.filter(c => c !== this); }
     contains(n) { return n === this || this.children.some(c => c.contains(n)); }
     setAttribute(k, v) { this.attrs.set(k, v); }
@@ -49,7 +60,7 @@ function harness(initial = adult, options = {}) {
     removeEventListener(k, f) { this.events.get(k)?.delete(f); }
     emit(k, e = {}) { for (const f of this.events.get(k) || []) f({ target: this, preventDefault() {}, ...e }); }
     getBoundingClientRect() { return { top: 500, left: 24 }; }
-    querySelector(s) { for (const n of this.children) { if (s === '.' + n.className) return n; const found = n.querySelector(s); if (found) return found; } return null; }
+    querySelector(s) { for (const n of this.children) { if (String(n.className || '').split(/\s+/).some(cls => s === '.' + cls)) return n; const found = n.querySelector(s); if (found) return found; } return null; }
     focus() {}
   }
   const doc = new Element(null);
@@ -99,6 +110,74 @@ test('keyboard, outside click, right click, quiz and account reset', () => {
   h.controller.dispose(); assert.equal(h.button.events.get('click').size, 0);
 });
 
+test('desktop commands open real PondOS destinations and close the conversation', () => {
+  const opened = [];
+  const commands = Object.fromEntries(['games', 'news', 'passport', 'tv'].map(name => [name, () => opened.push(name)]));
+  const h = harness(adult, { commands });
+  const click = label => {
+    h.button.emit('click', { detail: 0 });
+    const actions = h.doc.body.children[0].querySelector('.pg-fact-answers');
+    actions.children.find(b => b.textContent === label).emit('click');
+    assert.equal(h.doc.body.children.length, 0, label);
+  };
+  click("Let's play!");
+  click("What's new?");
+  click('Open Fren Passport');
+  click('Watch Pond TV');
+  assert.deepEqual(opened, ['games', 'news', 'passport', 'tv']);
+  assert.equal(h.opened, 0);
+  h.controller.dispose();
+});
+
+test('PondOS wires command buttons to its existing window functions', () => {
+  const shell = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
+  assert.match(shell, /commands:\s*\{\s*games:\s*gamesFolder,\s*passport:\s*frenPassport,\s*news:\s*bulletinApp,\s*tv:\s*pondTV\s*\}/);
+});
+
+test('care buttons use one shared async handler, keep the panel open and report the result', async () => {
+  const calls = [], reactions = { feed: 'fed', clean: 'clean', play: 'played', rest: 'rested' };
+  const h = harness(adult, { care: async kind => { calls.push(kind); return { ok: true, action: reactions[kind] }; } });
+  h.button.emit('click', { detail: 0 });
+  const care = h.doc.body.children[0].querySelector('.pg-care-actions');
+  assert.deepEqual(care.children.map(b => b.textContent), ['Feed', 'Clean', 'Play', 'Rest']);
+  for (const button of care.children) {
+    button.emit('click');
+    assert.ok(care.children.every(b => b.disabled));
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.ok(care.children.every(b => !b.disabled));
+    assert.equal(h.doc.body.children.length, 1);
+  }
+  assert.deepEqual(calls, ['feed', 'clean', 'play', 'rest']);
+  assert.match(h.doc.body.children[0].querySelector('.pg-fact-q').textContent, /recharge/);
+  h.controller.dispose();
+});
+
+test('the taskbar care bridge calls only the existing server-owned action RPC', () => {
+  const taskbar = readFileSync(new URL('../docs/meme/pepegochi-taskbar.mjs', import.meta.url), 'utf8');
+  assert.match(taskbar, /rpc\('gry_pepegochi_action', \{ p_action: kind \}\)/);
+  assert.doesNotMatch(taskbar, /gry_pepegochi_(feed|clean|play|rest)/);
+});
+
+test('care and journal coexist without late replies replacing the currently selected action', async () => {
+  let resolveCare, resolveJournal;
+  const h = harness(adult, {
+    care: () => new Promise(r => { resolveCare = r; }),
+    readRumors: () => new Promise(r => { resolveJournal = r; }),
+  });
+  h.button.emit('click', { detail: 0 });
+  const panel = h.doc.body.children[0], actions = panel.querySelector('.pg-fact-answers'), reply = panel.querySelector('.pg-fact-q');
+  const feed = panel.querySelector('.pg-care-actions').children[0];
+  feed.emit('click');
+  actions.children.find(b => b.textContent === 'Secret Journal').emit('click');
+  resolveJournal({ status: 'ok', progress: { found: ['A mystery'], total: 12 } });
+  await Promise.resolve();
+  resolveCare({ ok: true, action: 'fed' });
+  await Promise.resolve();
+  assert.match(reply.textContent, /A mystery/);
+  assert.equal(feed.disabled, false);
+  h.controller.dispose();
+});
+
 test('initiated contact is sparse, muted/blocked/young-safe, and never opens a dialog', () => {
   let invitations = 0, muted = false, allowed = true;
   const bond = { get muted() { return muted; }, invite: () => ++invitations === 1, remember() {}, favourite: 'ball' };
@@ -112,4 +191,37 @@ test('initiated contact is sparse, muted/blocked/young-safe, and never opens a d
   h.tick(46000); assert.equal(h.controller.invite(), false);
   h.setView({ ...adult, adult: false });h.tick(90000);assert.equal(h.controller.invite(), false);
   h.controller.dispose();assert.equal(h.doc.body.children.length, 0);
+});
+
+test('rumor and journal buttons use read-only on-demand data, optional detail and Passport navigation', async () => {
+  let reads = 0, opened = 0;
+  const progress = { found: ['One mystery'], total: 12, hint: 'A subtle clue', detail: 'A second clue' };
+  const h = harness({ ...adult, adult: false, motion: 'froglet' }, { readRumors: async () => { reads++; return { status: 'ok', progress }; }, openPassport: () => opened++ });
+  h.button.emit('click', { detail: 0 });
+  assert.equal(reads, 0);
+  const panel = h.doc.body.children[0], actions = panel.querySelector('.pg-fact-answers'), reply = panel.querySelector('.pg-fact-q');
+  actions.children.find(b => b.textContent === 'Pond Rumors').emit('click');
+  assert.match(reply.textContent, /check/); await Promise.resolve();
+  assert.match(reply.textContent, /1 \/ 12.*\n\nA subtle clue/);
+  const extras = panel.querySelector('.pg-rumor-actions');
+  extras.children.find(b => b.textContent === 'A little more?').emit('click');
+  assert.match(reply.textContent, /A second clue/); assert.equal(reads, 1);
+  actions.children.find(b => b.textContent === 'Secret Journal').emit('click'); await Promise.resolve();
+  assert.match(reply.textContent, /One mystery/); assert.equal(reads, 2);
+  assert.equal(panel.querySelector('.pg-rumor-actions').children.length, 1);
+  panel.querySelector('.pg-rumor-actions').children[0].emit('click');
+  assert.equal(opened, 1); assert.equal(h.doc.body.children.length, 0); h.controller.dispose();
+});
+
+test('late rumor responses cannot overwrite another action, a new discovery or a closed dialog', async () => {
+  const resolvers = [];
+  const h = harness(adult, { readRumors: () => new Promise(r => resolvers.push(r)) });
+  h.button.emit('click', { detail: 0 });
+  const panel = h.doc.body.children[0], actions = panel.querySelector('.pg-fact-answers'), reply = panel.querySelector('.pg-fact-q');
+  const click = label => actions.children.find(b => b.textContent === label).emit('click');
+  const result = { status: 'ok', progress: { found: [], total: 12, hint: 'Late clue', detail: 'Late detail' } };
+  click('Pond Rumors'); click('Tell me a joke'); const joke = reply.textContent; resolvers[0](result); await Promise.resolve(); assert.equal(reply.textContent, joke);
+  click('Pond Rumors'); h.controller.invalidateRumors(); resolvers[1](result); await Promise.resolve(); assert.match(reply.textContent, /new discovery/);
+  click('Pond Rumors'); h.controller.close(); resolvers[2](result); await Promise.resolve(); assert.equal(h.doc.body.children.length, 0);
+  h.controller.dispose();
 });

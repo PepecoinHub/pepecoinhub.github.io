@@ -13,7 +13,7 @@ test('perching only fits above a safe, non-mobile window', () => {
 });
 
 function fixture() {
-  let time = 0, usable = true, view = { hasPet: true, adult: true, sprite: 'taskbar/tb_adult_sit.png' }, next = 0;
+  let time = 0, usable = true, quiet = false, view = { hasPet: true, adult: true, sprite: 'taskbar/tb_adult_sit.png' }, next = 0;
   const timers = new Map(), frames = new Map(), reactions = [];
   class Element {
     constructor(rect = {left: 0, top: 0, right: 48, bottom: 48, width: 48, height: 48}) {
@@ -41,10 +41,13 @@ function fixture() {
     setTimeout(fn) { timers.set(++next, fn); return next; }, clearTimeout: id => timers.delete(id),
     requestAnimationFrame(fn) { frames.set(++next, fn); return next; }, cancelAnimationFrame: id => frames.delete(id) });
   const slot = new Element(), img = new Element({left: 70, top: 510, right: 118, bottom: 558, width: 48, height: 48}); slot.ownerDocument = doc;
-  const control = mountDesktopCompanion({slot,img,base:'/',getView:()=>view,eligible:()=>usable,mayStart:()=>true,react:x=>reactions.push(x),onStart(){},onEnd(){},now:()=>time});
+  img.src = 'taskbar/tb_adult_sit.png';
+  const control = mountDesktopCompanion({slot,img,base:'/',getView:()=>view,eligible:manual=>usable&&(manual||!quiet),mayStart:()=>true,react:x=>reactions.push(x),onStart(){},onEnd(){},now:()=>time});
   const finish = () => { for (const [id, f] of [...timers]) { timers.delete(id); f(); } };
   const watch = () => { for (const [id, f] of [...frames]) { frames.delete(id); f(); } };
   return { control, doc, win, reduce, sky, fly, slot, reactions, finish, watch, advance: () => time+=100000, disable: () => usable=false,
+    quiet: () => quiet=true, froglet: () => {view={hasPet:true,adult:false,motion:'froglet',playReady:true,sprite:'taskbar/tb_froglet.png'}; img.src=view.sprite},
+    needCare: () => view={...view,playReady:false,needAttention:'hunger'},
     hungry: () => view={...view,sprite:'taskbar/tb_adult_hungry.png'}, host: () => new Element({left: 350,right:690,top:140,width:340,height:180}) };
 }
 
@@ -60,6 +63,13 @@ test('actual desktop controller borrows only a visible night fly and restores ev
   f.advance();f.reduce.matches=true;assert.equal(f.control.catchNearby(),false);f.reduce.matches=false;
   f.advance();assert.equal(f.control.catchNearby(),true);f.hungry();f.watch();assert.equal(f.control.active,false);assert.equal(f.slot.classList.contains('pg-desktop-away'),false);
   f.control.dispose();assert.equal(f.doc.body.children.length,0);assert.equal(f.win.listeners['pondos:app-opened'].size,0);
+});
+
+test('a healthy froglet uses its own sprite; quiet blocks automatic but not manual firefly play',()=>{
+ const f=fixture();f.froglet();f.quiet();assert.equal(f.control.ambient(),false);
+ assert.equal(f.control.fireflyAvailable(),true);assert.equal(f.control.catchNearby(),true);
+ assert.equal(f.doc.body.children.find(x=>x.className==='pg-desktop-frog-frame').src,'taskbar/tb_froglet.png');
+ f.needCare();f.watch();assert.equal(f.control.active,false);assert.equal(f.control.fireflyAvailable(),false);f.control.dispose();
 });
 
 test('perching and popcorn use actual app openings, cancel on movement and leave gameplay alone', () => {

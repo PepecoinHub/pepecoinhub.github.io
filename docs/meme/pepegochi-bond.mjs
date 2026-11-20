@@ -3,13 +3,14 @@ import { TOYS, MEMORIES, favouriteToy } from './pepegochi-personality.mjs?v=2026
 // These are conversation cues, never care, growth, currency or achievement state.
 export function createBond({ storage, now = () => Date.now() } = {}) {
   let key = null, memory = {}, previous = null, pending = null;
+  let awardCue = null;
   const save = () => { if (key) try { storage?.setItem(key, JSON.stringify(memory)); } catch {} };
   function observe(owner, pet) {
     let event = null;
     const next = owner && pet?.life_id && pet.status !== 'departed'
       ? 'pepegochi:bond:v1:' + owner + ':' + pet.life_id : null;
     if (next !== key) {
-      key = next; memory = {}; previous = null; pending = null;
+      key = next; memory = {}; previous = null; pending = null; awardCue = null;
       if (key) try {
         const raw = JSON.parse(storage?.getItem(key) || '{}');
         if (raw && typeof raw === 'object') memory = {
@@ -60,9 +61,14 @@ export function createBond({ storage, now = () => Date.now() } = {}) {
       if (!key || memory.muted || (memory.invitedAt && now() - memory.invitedAt < 8 * 60000)) return false;
       memory.invitedAt = now(); save(); return true;
     },
-    reset() { key = null; memory = {}; previous = null; pending = null; },
-    remember(event) { if (key) pending = event; },
-    take() { const event = pending; pending = null; return event; },
+    reset() { key = null; memory = {}; previous = null; pending = null; awardCue = null; },
+    remember(event) {
+      if (!key) return;
+      if (['stamp', 'stampBatch', 'secret'].includes(event)) awardCue = event;
+      else pending = event;
+    },
+    take() { if (awardCue) { const event = awardCue; awardCue = null; return event; } const event = pending; pending = null; return event; },
+    consumeCare(event) { if (pending === event) pending = null; },
     touch() { if (key) { memory.seen = now(); save(); } },
     pet() { if (key) { memory.pets = Math.min(1000, (memory.pets || 0) + 1); save(); } },
     get familiar() { return (memory.pets || 0) >= 3; },

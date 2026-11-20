@@ -6,9 +6,9 @@ const html = `<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="
 <body class="pondos"><input id="work" aria-label="Work"><header style="position:fixed;bottom:0;width:100%"><div class="bar"><button class="start">Start</button></div></header>
 <script type="module">
 import { mountTaskbarFrog } from '/meme/pepegochi-taskbar.mjs';
-window.t = { time: Date.now(), owner: 'owner-a', opened: 0, calls: [], pet: { life_id:'frog-a', name:'Pickle', stage:'adult', status:'healthy', care_days:12, needs:{hunger:90,hygiene:90,mood:90,energy:90} } };
+window.t = { time: Date.now(), owner: 'owner-a', opened: 0, apps: [], passportOpened: 0, calls: [], passport: {signed_in:true,secrets:[]}, pet: { life_id:'frog-a', name:'Pickle', stage:'adult', status:'healthy', care_days:12, needs:{hunger:90,hygiene:90,mood:90,energy:90} } };
 t.refresh = () => window.dispatchEvent(new Event('pondos:auth-changed'));
-t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>t.opened++,session:()=>({discord:true,userId:t.owner}),now:()=>t.time,rpc:async name=>{t.calls.push(name);if(name==='gry_quiz_answer')return new Promise(r=>t.answer=r);return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:{day:new Date().toISOString().slice(0,10),question:'Pond question?',answers:['Yes','No'],answered:false};}});
+t.dispose = mountTaskbarFrog({bar:document.querySelector('.bar'),base:'/',open:()=>t.opened++,openPassport:()=>t.passportOpened++,commands:Object.fromEntries(['games','news','passport','tv'].map(name=>[name,()=>t.apps.push(name)])),session:()=>({discord:true,userId:t.owner}),now:()=>t.time,rpc:async (name,args)=>{t.calls.push(name);if(name==='gry_passport_state'){if(t.deferPassport)return new Promise(r=>t.passportResolve=r);return structuredClone(t.passport)}if(name==='gry_quiz_answer')return new Promise(r=>t.answer=r);if(name==='gry_pepegochi_action'){const need={feed:'hunger',clean:'hygiene',play:'mood',rest:'energy'}[args.p_action];t.pet.needs[need]=Math.min(100,t.pet.needs[need]+35);return {pet:structuredClone(t.pet),action_result:'accepted'};}return name==='gry_pepegochi_state'?{pet:structuredClone(t.pet)}:{day:new Date().toISOString().slice(0,10),question:'Pond question?',answers:['Yes','No'],answered:false};}});
 </script>`;
 let browser;
 const server = http.createServer((req, res) => {
@@ -29,12 +29,28 @@ const server = http.createServer((req, res) => {
  await frog.focus();await page.keyboard.press('Enter');
  await page.getByRole('button',{name:'Our memories',exact:true}).click();
  assert.match(await page.locator('.pg-conversation').textContent(),/12 care days/);
+ await page.getByRole('button',{name:"Let's play!",exact:true}).click();
+ assert.deepEqual(await page.evaluate(()=>t.apps),['games']);assert.equal(await page.locator('.pg-conversation').count(),0);
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:"What's new?",exact:true}).click();
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Open Fren Passport',exact:true}).click();
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Watch Pond TV',exact:true}).click();
+ assert.deepEqual(await page.evaluate(()=>t.apps),['games','news','passport','tv']);
+ await frog.focus();await page.keyboard.press('Enter');
  await page.keyboard.press('Escape');assert.equal(await page.locator('.pg-conversation').count(),0);
+ await page.evaluate(()=>{t.pet.needs.hunger=60;t.refresh();});
+ await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('hungry'));
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Feed',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('.pg-conversation .pg-fact-q')?.textContent.includes('hit the spot'));
+ assert.equal(await page.evaluate(()=>t.pet.needs.hunger),95);
+ assert.equal(await page.evaluate(()=>t.calls.filter(x=>x==='gry_pepegochi_action').length),1);
+ await page.keyboard.press('Escape');
  // Actual expression frames play once and restore state; no CSS-only stand-ins.
  const frame = name => page.waitForFunction(n=>document.querySelector('.pg-companion-button img').src.includes('/tb_'+n+'_'),name);
  await frog.focus();await page.keyboard.press('Enter');await frame('curious');
  await page.getByRole('button',{name:'Pet me',exact:true}).click();await frame('nuzzle');
- await page.getByRole('button',{name:"Let's play!",exact:true}).click();await frame('welcome');
+ await page.evaluate(()=>{t.time+=31_000;t.pet.needs.mood=60;t.refresh()});
+ await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('moody'));
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Play',exact:true}).click();await frame('welcome');
  for(let i=0;i<4;i++)await page.getByRole('button',{name:'Pet me',exact:true}).click();await frame('sulk');
  await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('/tb_adult_sit.png'));
  await page.keyboard.press('Escape');
@@ -82,12 +98,30 @@ const server = http.createServer((req, res) => {
   const box=await page.locator('.pg-conversation').boundingBox();assert.ok(box.x>=0 && box.x+box.width<=width && box.y>=0);
   await page.keyboard.press('Escape');
  }
+ // The screenshot regression: dark chrome, young frog and manual buttons still work.
+ await page.setViewportSize({width:390,height:720});
+ await page.evaluate(()=>{document.documentElement.setAttribute('data-theme','dark');t.pet.stage='froglet';t.refresh()});
+ await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('froglet'));
+ await frog.focus();await page.keyboard.press('Enter');
+ const reply=page.locator('.pg-conversation .pg-fact-q');
+ await page.getByRole('button',{name:'Tell me a joke',exact:true}).click();const joke=await reply.textContent();
+ await page.getByRole('button',{name:'Pet me',exact:true}).click();assert.notEqual(await reply.textContent(),joke);
+ await page.getByRole('button',{name:'Roll the ball',exact:true}).click();assert.ok(await page.locator('.pg-companion-toy').isVisible());
+ assert.equal(await page.getByRole('button',{name:'Tell me a joke',exact:true}).evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(229, 229, 223)');
+ await page.keyboard.press('Escape');
+ await page.evaluate(()=>{t.pet.stage='adult';t.refresh()});await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('adult_sit'));
+ await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pond Quiz',exact:true}).click();
+ const answer=page.getByRole('button',{name:'Yes',exact:true});
+ assert.equal(await answer.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(229, 229, 223)');
+ await answer.click();assert.match(await page.locator('.pg-fact-out').textContent(),/Saving/);
+ await page.evaluate(()=>t.answer(null));await page.waitForFunction(()=>!document.querySelector('.pg-fact-answers button').disabled);
+ assert.match(await page.locator('.pg-fact-out').textContent(),/Try again/);await page.keyboard.press('Escape');
  // A late quiz response from the previous owner cannot change the new owner's frog.
  await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pond Quiz',exact:true}).click();
  await page.getByRole('button',{name:'Yes',exact:true}).click();
  await page.evaluate(()=>{t.owner='owner-c';t.refresh();});
  await page.waitForFunction(()=>!document.querySelector('.pg-fact'));
- await page.evaluate(()=>t.answer({right:true,correct:0,picked:0,points:1,answers:['Yes','No']}));
+ await page.evaluate(()=>t.answer({answered:true,right:true,correct:0,picked:0,points:1,answers:['Yes','No']}));
  await frog.focus();await page.keyboard.press('Enter');
  assert.doesNotMatch(await page.locator('.pg-conversation .pg-fact-q').textContent(),/quiz team/);
  await page.keyboard.press('Escape');
@@ -123,5 +157,29 @@ const server = http.createServer((req, res) => {
  await buddy.focus();await personality.keyboard.press('Enter');
  assert.match(await personality.locator('.pg-conversation .pg-fact-q').textContent(),/losing part|pond saw nothing/);
  await personality.close();
+ // Pond Rumors uses only the signed-in Passport state, even in quiet mode and on a narrow touch viewport.
+ const rumors=await browser.newPage({viewport:{width:320,height:640},hasTouch:true});rumors.on('pageerror',e=>errors.push(e.message));
+ await rumors.route('**/*',r=>new URL(r.request().url()).origin===base?r.continue():r.abort());
+ await rumors.goto(base);await rumors.waitForFunction(()=>document.querySelector('.pg-companion-button')?.title.startsWith('Pickle'));
+ assert.equal(await rumors.evaluate(()=>t.calls.filter(x=>x==='gry_passport_state').length),0);
+ await rumors.locator('.pg-companion-button').tap();await rumors.getByRole('button',{name:'Reactions: on',exact:true}).tap();
+ await rumors.getByRole('button',{name:'Pond Rumors',exact:true}).tap();
+ await rumors.getByRole('button',{name:'A little more?',exact:true}).waitFor();
+ const rumorText=rumors.locator('.pg-conversation .pg-fact-q');const first=await rumorText.textContent();assert.match(first,/0 \/ 12/);
+ await rumors.getByRole('button',{name:'A little more?',exact:true}).tap();assert.ok((await rumorText.textContent()).length>first.length);
+ await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();assert.match(await rumorText.textContent(),/No discoveries recorded/);
+ assert.equal(await rumors.evaluate(()=>t.calls.filter(x=>x==='gry_passport_state').length),1);
+ await rumors.evaluate(()=>{t.passport.secrets=[{id:'wrong_frog',discovered_at:new Date().toISOString()}];window.dispatchEvent(new CustomEvent('pondos:secret-found',{detail:{owner:t.owner}}))});
+ await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('The Wrong Frog'));
+ assert.match(await rumorText.textContent(),/1 \/ 12/);
+ const rumorBox=await rumors.locator('.pg-conversation').boundingBox();assert.ok(rumorBox.x>=0&&rumorBox.x+rumorBox.width<=320&&rumorBox.y>=0);
+ await rumors.getByRole('button',{name:'View journal in Fren Passport',exact:true}).tap();assert.equal(await rumors.evaluate(()=>t.passportOpened),1);
+ await rumors.locator('.pg-companion-button').tap();await rumors.evaluate(()=>{t.time+=16000;t.deferPassport=true});
+ await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();await rumors.waitForFunction(()=>!!t.passportResolve);
+ await rumors.evaluate(()=>{t.owner='owner-b';t.refresh();t.passportResolve(t.passport);t.deferPassport=false;t.passport={signed_in:true,secrets:[]}});
+ await rumors.waitForFunction(()=>!document.querySelector('.pg-conversation'));
+ await rumors.locator('.pg-companion-button').tap();await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();
+ await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('No discoveries recorded'));
+ await rumors.close();
  assert.deepEqual(errors,[]);console.log('PASS: toys, favourite discovery, real Sweeper result, five expression sequences, state restoration, interruption, reduced motion, keyboard, memories, familiar pats, care, focus, throttle, mute/reload, account isolation, double-click, 320/390/1440px, reduced motion and disposal');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server.close();});

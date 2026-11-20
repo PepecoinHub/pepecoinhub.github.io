@@ -33,3 +33,14 @@ test('missing, blocked or corrupt storage does not break interactions', () => {
     assert.equal(b.take(), null);
   }
 });
+
+test('taskbar care consumes only its own cue and preserves a queued Passport reaction', () => {
+  const b = createBond({ storage: storage() });
+  b.observe('a', frog);
+  b.remember('secret');
+  const event = b.observe('a', { ...frog, needs: { ...frog.needs, hunger: 90 } });
+  assert.equal(event, 'fed');
+  b.consumeCare(event);
+  assert.equal(b.take(), 'secret');
+  assert.equal(b.take(), null);
+});
