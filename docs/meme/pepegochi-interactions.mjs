@@ -246,11 +246,11 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     let result;
     try { result = await readRumors(); } catch { result = null; }
     if (!panel || panel !== target || ticket !== rumorTicket || result?.status !== 'ok' || !result.progress) return;
-    const talk = notebook.deliver(getView(), result.progress.foundIds, lifeId());
+    const talk = notebook.deliver(getView(), result.progress, lifeId());
     if (!talk) return;
     reply.textContent = talk.text;
     reply.style.whiteSpace = 'pre-line';
-    if (talk.kind === 'clue') {
+    if (talk.secret) {
       rumorActions = el('div', 'pg-fact-answers pg-rumor-actions');
       const b = el('button', 'pg-fact-a', 'See the note on my table'); b.type = 'button'; b.addEventListener('click', () => visit());
       rumorActions.append(b); reply.after(rumorActions);
@@ -392,7 +392,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     setPose(r.pose);
     animate(action);
     // A secret comes up only on a fresh voluntary greeting, never from a repeatable menu action.
-    if (spontaneousRumor && action === 'hello' && readRumors && notebook?.due(getView())) secretTalk();
+    if (spontaneousRumor && ['hello', 'return', 'returnLong'].includes(action) && readRumors && notebook?.due(getView())) secretTalk();
     reposition();
     if (fresh) panel.querySelector('.pg-fact-x')?.focus();
   }

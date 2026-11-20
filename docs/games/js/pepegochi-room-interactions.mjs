@@ -1,5 +1,5 @@
 // A13: local room interaction, with care delegated to the existing validated actions.
-import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX } from './pepegochi-room.mjs?v=20261120notes1';
+import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX } from './pepegochi-room.mjs?v=20261120notes3';
 import { mountRoomEffects } from './pepegochi-room-fx.mjs?v=20261118room3';
 
 const PROPS = {

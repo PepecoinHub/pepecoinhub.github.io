@@ -237,10 +237,10 @@ test('journal is available even without trust, but never offers a clue or detail
 test('a fresh greeting asks the notebook first and shows the clue it hands out, with the way to the table', async () => {
   let reads = 0, delivered = 0, visits = 0;
   const notebook = { notes: [], due: () => true, deliver: (view, found, life) => {
-    delivered++; assert.deepEqual(found, ['wrong_frog']); assert.equal(life, 'life-1');
-    return delivered === 1 ? { kind: 'clue', text: 'Just between us, fren…\n\nA gentle clue.' } : null; } };
+    delivered++; assert.deepEqual(found.allFoundIds, ['wrong_frog']); assert.equal(life, 'life-1');
+    return delivered === 1 ? { kind: 'clue', secret: 'pond_map_1', text: 'Just between us, fren…\n\nA gentle clue.' } : null; } };
   const h = harness(adult, { bond: { take: () => null }, notebook, lifeId: () => 'life-1', openRoom: () => visits++,
-    readRumors: async () => { reads++; return { status: 'ok', progress: { found: ['The Wrong Frog'], foundIds: ['wrong_frog'], total: 12 } }; } });
+    readRumors: async () => { reads++; return { status: 'ok', progress: { found: ['The Wrong Frog'], foundIds: ['wrong_frog'], allFoundIds: ['wrong_frog'], lastFoundAt: null, total: 12 } }; } });
   h.button.emit('click', { detail: 0 }); await Promise.resolve(); await Promise.resolve();
   const p = h.doc.body.children[0];
   assert.match(p.querySelector('.pg-fact-q').textContent, /A gentle clue/);

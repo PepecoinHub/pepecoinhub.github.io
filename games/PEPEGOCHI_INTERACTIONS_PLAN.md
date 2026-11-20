@@ -121,9 +121,9 @@ Validation: `node --test tests/*.test.mjs` (346 passed, 26 environment skips), s
 
 ## Secret clues and the notes table (owner, 2026-11-20)
 
-- Replaces the rare 1-in-6 clue. Counter = good care days of the same frog (the one the 100-day Super Parent stamp counts).
-- Good care day 50: "I trust you now" note + the first clue; then one clue every 10 good care days (60, 70, ...), one secret each, never one the player has found, never repeated. Only for a healthy froglet/adult with every need at 75 or more, on a fresh greeting.
-- Before day 50: at most one "I would tell you a secret, but I do not trust you enough yet" every 3 days (daily 50% roll).
-- A player who found every secret gets neither.
-- Every important message (trust note and clues) is kept on the side table in the room: envelope with a count, opens NOTES.TXT. Kept in this browser per account and frog life (docs/meme/pepegochi-notes.mjs); a new device gets the due clues again on the next greetings.
-- Clue texts live in docs/meme/pepegochi-rumors.mjs (TRAILS): gentle, never the trigger itself.
+- Counter = good care days of the same frog (the one the 100-day Super Parent stamp counts). Only a healthy froglet/adult with every need at 75 or more, on a fresh greeting.
+- Before day 50 (at most once every 3 days, daily 50% roll):
+  - a player who is not hunting (no PondOS secret found yet, or none for 14 days) gets a gentle nudge about one of the 12 live secrets (texts in docs/meme/pepegochi-rumors.mjs TRAILS);
+  - a player who is hunting gets no hint, only a rare "I would tell you a bigger secret, but I do not trust you enough yet", and only once the new puzzles exist and are not all solved.
+- From day 50, one clue every 10 good care days (50, 60, 70, ...), strictly about the NEW puzzles (pond_map_1..6, the golden-foot painting). Texts go in NEW_CLUES in docs/meme/pepegochi-notes.mjs when the puzzles ship; until then the frog says nothing after day 50. The first one comes with the "I trust you now" note.
+- Every important message (trust note, clues, nudges) is kept on the side table in the room: envelope with a count, opens NOTES.TXT. Kept in this browser per account and frog life.

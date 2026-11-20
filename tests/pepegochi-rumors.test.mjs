@@ -21,9 +21,9 @@ test('every live secret has exactly one clue, in catalog order, that never names
 
 test('the journal counts only genuine-looking saved dates of live secrets', () => {
   const a = TRAILS[0];
-  assert.deepEqual(rumorProgress(state(), at), { found: [], foundIds: [], total: 12 });
+  assert.deepEqual(rumorProgress(state(), at), { found: [], foundIds: [], allFoundIds: [], lastFoundAt: null, total: 12 });
   assert.deepEqual(rumorProgress(state({ id: a[0] }, { id: a[0], discovered_at: 'bad' })).found, []);
-  assert.deepEqual(rumorProgress(state(found(a[0]), found(a[0]), { id: 'pond_map_1', discovered_at: date })), { found: [a[1]], foundIds: [a[0]], total: 12 });
+  assert.deepEqual(rumorProgress(state(found(a[0]), found(a[0]), { id: 'pond_map_1', discovered_at: date })), { found: [a[1]], foundIds: [a[0]], allFoundIds: [a[0], 'pond_map_1'], lastFoundAt: at, total: 12 });
   assert.equal(rumorProgress(state(...TRAILS.map(t => found(t[0])))).foundIds.length, 12);
   assert.equal(rumorProgress({ ...state(), preview: true }), null);
   assert.equal(rumorProgress({ signed_in: false, secrets: [] }), null);

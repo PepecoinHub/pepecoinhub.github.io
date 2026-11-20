@@ -21,7 +21,11 @@ export function rumorProgress(state) {
   if (state?.signed_in !== true || state.preview || !Array.isArray(state.secrets)) return null;
   const earned = new Set(state.secrets.filter(s => typeof s?.discovered_at === 'string' && Number.isFinite(Date.parse(s.discovered_at))).map(s => s.id));
   const hit = TRAILS.filter(([id]) => earned.has(id));
-  return { found: hit.map(([, title]) => title), foundIds: hit.map(([id]) => id), total: TRAILS.length };
+  // the latest find among the 12 (PepeGochi only nudges players who are clearly not hunting)
+  const times = state.secrets.filter(s => TRAILS.some(t => t[0] === s?.id) && typeof s?.discovered_at === 'string')
+    .map(s => Date.parse(s.discovered_at)).filter(Number.isFinite);
+  return { found: hit.map(([, title]) => title), foundIds: hit.map(([id]) => id), allFoundIds: [...earned],
+    lastFoundAt: times.length ? Math.max(...times) : null, total: TRAILS.length };
 }
 
 export function createRumorReader({ session, rpc, now = () => Date.now() }) {

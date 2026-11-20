@@ -4,17 +4,17 @@ import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
 // Loaded only behind the existing ?beta=gochi gate. Local conversations are cosmetic; no polling, rewards or fake pet.
 // Based on PR #299; adds the Pond Quiz (one server question a day once the frog has hatched; update_pond_quiz.sql)
 // and the hop out of the PEPEGOCHI.EXE window.
-import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261120notes1';
+import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261120notes3';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261120notes1';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261120notes3';
 import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
-import { createRumorReader } from './pepegochi-rumors.mjs?v=20261120notes1';
+import { createRumorReader } from './pepegochi-rumors.mjs?v=20261120notes3';
 import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118dialog1';
 
-import { createBond } from './pepegochi-bond.mjs?v=20261120notes1';
-import { createNotebook } from './pepegochi-notes.mjs?v=20261120notes1';
+import { createBond } from './pepegochi-bond.mjs?v=20261120notes3';
+import { createNotebook } from './pepegochi-notes.mjs?v=20261120notes3';
 
-import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120notes1';
+import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120notes3';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
 const NEEDS = new Set(['hunger', 'hygiene', 'mood', 'energy']);

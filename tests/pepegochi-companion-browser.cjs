@@ -211,14 +211,14 @@ const server = http.createServer((req, res) => {
  assert.match(await rumorText.textContent(),/No discoveries recorded/);
  assert.equal(await rumors.evaluate(()=>t.calls.filter(x=>x==='gry_passport_state').length),1);
  await rumors.getByRole('button',{name:'Close conversation',exact:true}).tap();
- // good care day 50 (owner rule 2026-11-20): a fresh greeting brings the trust note and the first clue, both kept for the table
- await rumors.evaluate(()=>{t.time+=16000;t.pet.care_days=60;t.pet.good_days=50;t.refresh()});
+ // before day 50 a player who has found nothing yet gets a gentle nudge about the 12 secrets, kept for the table (owner rule 2026-11-20)
+ await rumors.evaluate(()=>{t.time+=86400000;t.pet.care_days=20;t.pet.good_days=20;t.refresh()});
  await rumors.waitForFunction(()=>JSON.parse(localStorage.getItem('pepegochi:bond:v1:owner-a:frog-a')||'{}').seen===t.time);
- await rumors.locator('.pg-companion-button').tap();await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('I trust you now'));
+ await rumors.locator('.pg-companion-button').tap();await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('dozen little secrets'));
  assert.equal(await rumors.getByRole('button',{name:'See the note on my table',exact:true}).count(),1);
- assert.deepEqual(await rumors.evaluate(()=>JSON.parse(localStorage.getItem('pepegochi:notes:v1:owner-a:frog-a')).notes.map(n=>n.kind)),['trust','clue']);
+ assert.deepEqual(await rumors.evaluate(()=>JSON.parse(localStorage.getItem('pepegochi:notes:v1:owner-a:frog-a')).notes.map(n=>n.kind)),['nudge']);
  await rumors.getByRole('button',{name:'Close conversation',exact:true}).tap();await rumors.locator('.pg-companion-button').tap();
- assert.doesNotMatch(await rumorText.textContent(),/I trust you now|Just between us/);
+ assert.doesNotMatch(await rumorText.textContent(),/dozen little secrets/);
  await rumors.evaluate(()=>{t.passport.secrets=[{id:'wrong_frog',discovered_at:new Date().toISOString()}];window.dispatchEvent(new CustomEvent('pondos:secret-found',{detail:{owner:t.owner}}))});
  await menuAction(rumors,'Secret Journal','tap');await rumors.waitForFunction(()=>document.querySelector('.pg-fact-q')?.textContent.includes('The Wrong Frog'));
  assert.match(await rumorText.textContent(),/1 \/ 12/);
