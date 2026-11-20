@@ -38,3 +38,23 @@ jobs:
           name: haze-drop-layout
           path: /tmp/haze-layout-*.png
           if-no-files-found: ignore
+      - name: Exercise PepeGochi integrated beta in Chromium
+        if: always()
+        env:
+          PLAYWRIGHT_MODULE: /tmp/haze-layout/node_modules/playwright
+          PEPEGOCHI_QA_SCREENSHOTS: /tmp/pepegochi-qa
+        run: |
+          mkdir -p "$PEPEGOCHI_QA_SCREENSHOTS"
+          export HAZE_CHROMIUM="$(node -p 'require(process.env.PLAYWRIGHT_MODULE).chromium.executablePath()')"
+          status=0
+          for test_file in tests/pepegochi-room-browser.cjs tests/pepegochi-room-interactions-browser.cjs tests/pepegochi-desktop-browser.cjs tests/pepegochi-companion-browser.cjs; do
+            echo "Running $test_file"
+            node "$test_file" || status=1
+          done
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pepegochi-beta-screenshots
+          path: /tmp/pepegochi-qa/*.png
+          if-no-files-found: ignore

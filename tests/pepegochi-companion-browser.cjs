@@ -2,6 +2,7 @@
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '../docs');
+const capture = async (page, name) => {if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await page.screenshot({path:path.join(process.env.PEPEGOCHI_QA_SCREENSHOTS,`companion-${name}.png`)});};
 const html = `<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/meme/meme.css">
 <body class="pondos"><input id="work" aria-label="Work"><header style="position:fixed;bottom:0;width:100%"><div class="bar"><button class="start">Start</button></div></header>
 <script type="module">
@@ -96,6 +97,7 @@ const server = http.createServer((req, res) => {
  for(const width of [320,390,1440]) {
   await page.setViewportSize({width,height:720});await frog.focus();await page.keyboard.press('Enter');
   const box=await page.locator('.pg-conversation').boundingBox();assert.ok(box.x>=0 && box.x+box.width<=width && box.y>=0);
+  await capture(page,`dialog-${width}`);
   await page.keyboard.press('Escape');
  }
  // The screenshot regression: dark chrome, young frog and manual buttons still work.
@@ -108,6 +110,7 @@ const server = http.createServer((req, res) => {
  await page.getByRole('button',{name:'Pet me',exact:true}).click();assert.notEqual(await reply.textContent(),joke);
  await page.getByRole('button',{name:'Roll the ball',exact:true}).click();assert.ok(await page.locator('.pg-companion-toy').isVisible());
  assert.equal(await page.getByRole('button',{name:'Tell me a joke',exact:true}).evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(229, 229, 223)');
+ await capture(page,'froglet-dark');
  await page.keyboard.press('Escape');
  await page.evaluate(()=>{t.pet.stage='adult';t.refresh()});await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('adult_sit'));
  await frog.focus();await page.keyboard.press('Enter');await page.getByRole('button',{name:'Pond Quiz',exact:true}).click();
@@ -166,6 +169,7 @@ const server = http.createServer((req, res) => {
  await rumors.getByRole('button',{name:'Pond Rumors',exact:true}).tap();
  await rumors.getByRole('button',{name:'A little more?',exact:true}).waitFor();
  const rumorText=rumors.locator('.pg-conversation .pg-fact-q');const first=await rumorText.textContent();assert.match(first,/0 \/ 12/);
+ await capture(rumors,'rumors-320');
  await rumors.getByRole('button',{name:'A little more?',exact:true}).tap();assert.ok((await rumorText.textContent()).length>first.length);
  await rumors.getByRole('button',{name:'Secret Journal',exact:true}).tap();assert.match(await rumorText.textContent(),/No discoveries recorded/);
  assert.equal(await rumors.evaluate(()=>t.calls.filter(x=>x==='gry_passport_state').length),1);

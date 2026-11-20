@@ -28,6 +28,7 @@ let browser;
  const frog=page.locator('.pg-companion-button'), glow=page.locator('.pg-desktop-firefly'), away=page.locator('.pg-desktop-away'), reaction=page.locator('.pg-companion-reaction');
  await page.mouse.click(163,463);await glow.waitFor();assert.equal(await away.count(),1);
  assert.equal(await page.locator('.sky-fly.pg-fly-borrowed').count(),1);
+ if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await page.screenshot({path:require('node:path').join(process.env.PEPEGOCHI_QA_SCREENSHOTS,'desktop-firefly.png')});
  await glow.waitFor({state:'detached'});await reaction.waitFor();assert.match(await reaction.textContent(),/tiny lamp|screensaver/);
  assert.equal(await away.count(),0);assert.equal(await page.locator('.sky-fly.pg-fly-borrowed').count(),0);
  // Keyboard menu offers the same real-night action, without making the wallpaper focusable.
@@ -43,6 +44,7 @@ let browser;
  await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('hungry'));
  await page.evaluate(()=>{t.pet.needs.hunger=90;t.time+=46000;t.refresh()});await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('sit'));
  await page.mouse.click(800,80);await page.evaluate(()=>{t.time+=46000;t.app('tv')});await page.locator('.pg-desktop-popcorn').waitFor();
+ if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await page.screenshot({path:require('node:path').join(process.env.PEPEGOCHI_QA_SCREENSHOTS,'desktop-tv.png')});
  await page.getByRole('button',{name:'Close',exact:true}).click();await page.locator('.pg-desktop-popcorn').waitFor({state:'detached'});
  // Day/still, muted automatic reactions, reduced motion, small screen and game focus.
  await page.evaluate(()=>{t.time+=46000;document.documentElement.classList.replace('sky-night','sky-day')});await page.mouse.click(163,463);assert.equal(await glow.count(),0);

@@ -65,7 +65,7 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(310);await button('bed').focus();await page.keyboard.press('Enter');assert.deepEqual(await actions(),['rest']);
   // User can still reach the normal care buttons and the existing server rules own the actual result.
   const play=frame.locator('[data-act="play"]');assert.equal(await play.count(),1);
-  for(const width of [390,320]){await page.setViewportSize({width,height:900});await button('frog').scrollIntoViewIfNeeded();const b=await frame.locator('.pgr-frame').boundingBox();assert.ok(b.width<=width);await page.waitForTimeout(310);await button('frog').click();}
+  for(const width of [900,390,320]){await page.setViewportSize({width,height:900});await button('frog').scrollIntoViewIfNeeded();const b=await frame.locator('.pgr-frame').boundingBox();assert.ok(b.width<=width);await page.waitForTimeout(310);await button('frog').click();if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await page.screenshot({path:require('node:path').join(process.env.PEPEGOCHI_QA_SCREENSHOTS,`room-live-${width}.png`)});}
   await page.evaluate(()=>closeRoom());assert.equal(await page.locator('iframe').count(),0);
   await page.goto(base+'/games/pepegochi-live.html?empty=1&embed=1');await page.locator('[data-room-action="frog"]').waitFor();assert.equal(await page.locator('.pgr-hotspot').count(),2);assert.equal(await page.locator('[data-room-action="crt_tv"]').count(),0);
   await page.goto(base+'/games/pepegochi-live.html?guest=1&embed=1');await page.locator('[data-signin]').waitFor();assert.equal(await page.locator('.pgr-hotspot').count(),0);

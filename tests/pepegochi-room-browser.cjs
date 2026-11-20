@@ -1,7 +1,7 @@
 // Actual renderer with fixture inventory; no backend, rewards or account requests.
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-const root=path.resolve(__dirname,'../docs'),output=path.resolve(__dirname,'../games/pepegochi/room-a11');
+const root=path.resolve(__dirname,'../docs'),output=process.env.PEPEGOCHI_QA_SCREENSHOTS||path.resolve(__dirname,'../games/pepegochi/room-a11');
 const html=`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/games/pepegochi.css"><style>body{margin:0;padding:12px;background:#16342e;font:14px system-ui;color:#e4e4cb}main{max-width:646px;margin:auto}h1{font-size:18px}.pgr-frame{width:100%;box-sizing:border-box}button{padding:8px;margin:8px 8px 8px 0}</style><main><h1>PepeGochi · Private Pond</h1><div id="scene"></div><button id="normal">Home</button><button id="empty">Empty inventory</button><button id="departed">Moved out</button><button id="young">Tadpole</button></main><script type="module">
 import {renderRoom,STARTER_ROOM,fixedPlacements,DECORATIONS} from '/games/js/pepegochi-room.mjs';
 const all=fixedPlacements([...Object.values(STARTER_ROOM),...DECORATIONS]);
