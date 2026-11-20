@@ -13,9 +13,24 @@
 export const ROOM_W = 640;
 export const ROOM_H = 400;
 export const IMG = 'img/pepegochi/';
-export const BACKGROUND = IMG + 'room_pond_den_v1.png';
+// The approved 1999 room artwork is separate from legacy and taskbar assets.
+export const HD_IMG = IMG + 'hd/';
+export const SPRITE_VERSION = '20261120dialog2';
+export const versionSprite = src => src.startsWith(IMG) ? src + '?v=' + SPRITE_VERSION : src;
+export const BACKGROUND = HD_IMG + 'room_pond_den_v1.png';
+// A fixed architectural decoration, like the house sign, not a Passport reward or inventory item.
+// The shade and base sit to the left of the existing lava lamp on the dresser.
+export const ROOM_LAMP = { src: versionSprite(HD_IMG + 'pepe_table_lamp.png'), left: 47 / ROOM_W * 100, top: 227 / ROOM_H * 100, width: 80 / ROOM_W * 100, bounds: [75,12,180,236].map(n=>n/2) };
 // bumped when a room prop is redrawn under the same file name (A10: mug, duck, painting, 2026-11-15)
-export const PROP_V = '20261115a10';
+export const PROP_V = SPRITE_VERSION;
+export const propSrc = id => (id === 'p_poster' ? IMG : HD_IMG) + id + '.png';
+
+// Visible bounds in logical room pixels, measured at 30% alpha. The HD images are 2x logical size.
+const logical = box => box.map(n => n / 2);
+export const PROP_BOUNDS = { p_poster: [18,14,112,114], ...Object.fromEntries(Object.entries({
+  crt_tv:[26,32,235,236], lava_lamp:[68,32,201,228], potted_plant:[41,32,220,228], rubber_duck:[68,36,185,220],
+  mug:[52,64,244,220], moon_rock:[42,72,214,248], paper_crown:[36,52,221,248], golden_fly:[49,72,212,248], floppy_disk:[48,58,204,248],
+}).map(([id,box])=>[id,logical(box)])) };
 
 // slot_id -> anchor on the 640x400 background (same numbers as the room SQL)
 export const SLOTS = {
@@ -68,8 +83,8 @@ export function fixedPlacements(owned) {
 }
 
 // ---------- the frog ----------
-// Every frog sprite is 128x128 (art pack v2). It is drawn at 1 sprite pixel = 1 room pixel, the same
-// scale for every stage: the art itself shows the size, nothing is resized at runtime.
+// Every HD frog sprite is 256x256, drawn on the original 128x128 logical canvas.
+// All stages keep the same scale and floor anchor; taskbar art is independent.
 export const FROG_PX = 128;
 export const FOOT_Y = 124;         // the art pack's foot line
 // where the frog stands: on the rug, in front of the bed (room pixels, its feet)
@@ -80,20 +95,20 @@ export const HOME = { x: 320, y: 372 };
 // This is also the list of frog sprites the game HAS. A state sprite that is not listed here is not drawn yet
 // (games/pepegochi/CHATGPT_ART_BACKLOG.md): the frog falls back to its stage's idle sprite (frogLook). A new
 // art pack goes in by adding its rows here, after scripts/pepegochi_art_qa.mjs passes; nothing else changes.
-export const SPRITES = {
-  egg_idle: [42, 124], tadpole_idle: [50, 124], froglet_idle: [30, 124],
-  adult_idle: [9, 124], adult_hungry: [8, 124], adult_dirty: [8, 124], adult_moody: [9, 124], adult_tired: [9, 124],
-  adult_neglected: [9, 124], adult_recovering: [8, 124], adult_packing: [9, 124],
-  hatch_01: [42, 124], hatch_02: [42, 124], hatch_03: [20, 124], hatch_04: [50, 124],
-  // the young frogs' states (art pack A5, 2026-11-13)
-  tadpole_hungry: [50, 124], tadpole_dirty: [50, 124], tadpole_moody: [50, 124], tadpole_tired: [50, 124],
-  tadpole_neglected: [50, 124], tadpole_packing: [50, 124], tadpole_recovering: [50, 124],
-  froglet_hungry: [30, 124], froglet_dirty: [30, 124], froglet_moody: [30, 124], froglet_tired: [30, 124],
-  froglet_neglected: [30, 124], froglet_packing: [30, 124], froglet_recovering: [30, 124],
-};
+export const SPRITE_BOUNDS = Object.fromEntries(Object.entries({
+  egg_idle:[62,84,188,248], tadpole_idle:[13,100,242,248], froglet_idle:[72,60,202,248],
+  adult_idle:[47,18,207,248], adult_hungry:[49,17,225,248], adult_dirty:[24,17,208,248], adult_moody:[49,17,207,248], adult_tired:[47,17,220,248],
+  adult_neglected:[39,17,209,248], adult_recovering:[49,17,207,248], adult_packing:[22,13,211,248],
+  hatch_01:[62,84,188,248], hatch_02:[64,84,185,248], hatch_03:[55,40,218,248], hatch_04:[2,100,244,248],
+  tadpole_hungry:[15,96,243,248], tadpole_dirty:[7,99,249,248], tadpole_moody:[17,99,239,248], tadpole_tired:[17,97,240,248],
+  tadpole_neglected:[16,100,237,248], tadpole_packing:[17,97,251,248], tadpole_recovering:[18,100,239,248],
+  froglet_hungry:[70,58,217,248], froglet_dirty:[70,59,215,248], froglet_moody:[70,59,202,248], froglet_tired:[69,58,218,248],
+  froglet_neglected:[71,61,200,248], froglet_packing:[69,56,218,248], froglet_recovering:[71,61,200,248],
+}).map(([id,box])=>[id,logical(box)]));
+export const SPRITES = Object.fromEntries(Object.entries(SPRITE_BOUNDS).map(([id,[,top,,foot]])=>[id,[top,foot]]));
 // the moving-out frames (sprite pack 2026-11-09) stand on the same floor line as the frog
 export const DEPART_FOOT = [124, 124, 124, 124, 124, 124];
-export const spriteSrc = id => IMG + 'pepegochi_' + id + '.png';
+export const spriteSrc = id => HD_IMG + 'pepegochi_' + id + '.png';
 export const FROG = spriteSrc('adult_idle');
 
 // A healthy adult shows the need it wants most once that need is below LOOK_BELOW (the lowest one; a tie
@@ -136,6 +151,9 @@ export const LETTER = { x: 332, y: 346, px: 64, envelope: IMG + 'goodbye_envelop
 // stores it on the life as letter_variant 'took_<item_id>' ('took_nothing' for an empty room; Room-4,
 // update_pepegochi_room_departure.sql). The older 'classic' letter took the TV. The item is only hidden in the
 // picture: it stays owned and placed, and it is back when a new frog moves in.
+// The frog's notes for you (clues, "I trust you now"): an envelope on the side table, left of the mug,
+// standing on the table top like the mug (pepegochi-notes.mjs, owner 2026-11-20).
+export const NOTES = { x: 410, y: 278, px: 40, src: IMG + 'goodbye_envelope.png' };
 export const TAKEN_BY_LETTER = 'crt_tv';
 export const takenItem = variant => (!variant || variant === 'classic' ? TAKEN_BY_LETTER
   : variant === 'took_nothing' ? null : variant.startsWith('took_') ? variant.slice(5) : TAKEN_BY_LETTER);
@@ -166,10 +184,10 @@ export const WALK = {
 export function departTimeline(stage = 'adult', walk = WALK[stage]) {
   const edge = ROOM_W - FROG_PX / 2;           // a 128 px frame touching the right edge
   if (walk) {
-    const out = walk.turn.map(src => ({ src: IMG + src, x: HOME.x, foot: FOOT_Y, suitcase: false }));
+    const out = walk.turn.map(src => ({ src: HD_IMG + src, x: HOME.x, foot: FOOT_Y, suitcase: false }));
     // with no turn frames the first step starts where the frog stood (no jump)
     for (let x = HOME.x + (walk.turn.length ? 24 : 0), i = 0; x < ROOM_W + FROG_PX / 2; x += 24, i++)
-      out.push({ src: IMG + walk.walk[i % walk.walk.length], x, foot: FOOT_Y, suitcase: false });
+      out.push({ src: HD_IMG + walk.walk[i % walk.walk.length], x, foot: FOOT_Y, suitcase: false });
     return out;
   }
   if (stage !== 'adult') {
@@ -186,7 +204,7 @@ export function departTimeline(stage = 'adult', walk = WALK[stage]) {
     x: Math.round(from + (to - from) * i / (seq.length - 1)) - DEPART_DX[n - 1] }));
 }
 // every moving-out frame the window may play (preloaded when a frog is home)
-export const DEPART_FRAMES = Object.values(WALK).flatMap(w => [...w.turn, ...w.walk]).map(f => IMG + f);
+export const DEPART_FRAMES = Object.values(WALK).flatMap(w => [...w.turn, ...w.walk]).map(f => HD_IMG + f);
 
 // ---------- short frame animations on the frog: hatching, and care once the art exists ----------
 // The egg hatches: three cracking frames and the tadpole out of its shell (art pack A1, 2026-11-13), then the tadpole.
@@ -199,7 +217,14 @@ const careSet = pre => Object.fromEntries(['feed', 'clean', 'play', 'rest']
 // art pack A6 (2026-11-13): 4 frames per care action for the adult, the froglet and the tadpole
 export const CARE = Object.fromEntries([['adult', 'care_'], ['froglet', 'care_froglet_'], ['tadpole', 'care_tadpole_']]
   .flatMap(([stage, pre]) => Object.entries(careSet(pre)).map(([k, ids]) => [stage + '_' + k, ids])));
-export const careFrames = (stage, kind) => (CARE[stage + '_' + kind] || []).map(id => IMG + id + '.png');
+export const careFrames = (stage, kind) => (CARE[stage + '_' + kind] || []).map(id => HD_IMG + id + '.png');
+
+// Only preload the current life stage's animation frames, not the whole 5 MB room pack.
+export function animationFramesForStage(stage) {
+  if (stage === 'egg') return HATCH_FRAMES;
+  const w = WALK[stage];
+  return [...(w ? [...w.turn,...w.walk].map(id=>HD_IMG+id) : []), ...['feed','clean','play','rest'].flatMap(k=>careFrames(stage,k))];
+}
 
 // Shows frames one after another on the frog's <img>, then puts its own sprite back. Returns a stop function.
 export function playFrames(img, frames, ms, { setTimer = setTimeout, clearTimer = clearTimeout } = {}) {
@@ -208,7 +233,7 @@ export function playFrames(img, frames, ms, { setTimer = setTimeout, clearTimer 
   let i = 0, timer = null;
   const next = () => {
     if (i >= frames.length) { img.setAttribute('src', final); timer = null; return; }
-    img.setAttribute('src', frames[i++]); timer = setTimer(next, ms);
+    img.setAttribute('src', versionSprite(frames[i++])); timer = setTimer(next, ms);
   };
   next();
   return () => { if (timer) clearTimer(timer); img.setAttribute('src', final); };
@@ -216,14 +241,14 @@ export function playFrames(img, frames, ms, { setTimer = setTimeout, clearTimer 
 
 // ---------- one description of what the scene shows, so it can be tested without a browser ----------
 // mode: 'adopt' (an egg waits for a name), 'pet' or 'departed'
-export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false, taken = TAKEN_BY_LETTER } = {}) {
+export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false, taken = TAKEN_BY_LETTER, notes = 0 } = {}) {
   const departed = mode === 'departed';
   const items = [];
   for (const [slotId, itemId] of Object.entries(placements)) {
     const s = SLOTS[slotId], it = ITEMS[itemId];
     if (!s || !it) continue;
     if (departed && itemId === taken) continue;
-    items.push({ slotId, itemId, src: IMG + itemId + '.png?v=' + PROP_V, wall: !!s.wall, z: s.z,
+    items.push({ slotId, itemId, src: propSrc(itemId) + '?v=' + PROP_V, wall: !!s.wall, z: s.z,
       left: s.x / ROOM_W * 100, top: (s.y + it.dy) / ROOM_H * 100, width: it.size });
   }
   const pct = (v, of) => v / of * 100;
@@ -241,6 +266,7 @@ export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', n
   }
   return {
     mode, status: departed ? 'departed' : mode === 'adopt' ? 'adopt' : status, label, items, frog,
+    notes: mode === 'pet' && notes > 0 ? { count: notes, src: NOTES.src, left: pct(NOTES.x, ROOM_W), top: pct(NOTES.y, ROOM_H), width: pct(NOTES.px, ROOM_W) } : null,
     letter: departed ? { src: letterSeen ? LETTER.open : LETTER.envelope, read: letterSeen,
       left: pct(LETTER.x, ROOM_W), top: pct(LETTER.y, ROOM_H), width: pct(LETTER.px, ROOM_W) } : null,
   };
@@ -265,6 +291,8 @@ export function renderRoom(doc, opts = {}) {
   const bg = mk('img', 'pgr-bg'); bg.src = BACKGROUND; bg.alt = ''; art.append(bg);
   const sign = mk('div', 'pgr-house-sign'); sign.setAttribute('aria-hidden', 'true');
   sign.textContent = 'NO FUD\nAFTER BEDTIME'; art.append(sign);
+  const lamp = mk('img', 'pgr-fixed-lamp'); lamp.src = ROOM_LAMP.src; lamp.alt = '';
+  pos(lamp, ROOM_LAMP.left, ROOM_LAMP.top, ROOM_LAMP.width); art.append(lamp);
   for (const it of sc.items) {
     const im = mk('img', 'pgr-item' + (it.wall ? ' pgr-wall' : ''));
     im.src = it.src; im.alt = ''; im.dataset.slot = it.slotId; im.dataset.item = it.itemId;
@@ -272,7 +300,7 @@ export function renderRoom(doc, opts = {}) {
     art.append(im);
   }
   if (sc.frog) {
-    const f = mk('img', 'pgr-pet'); f.src = sc.frog.src; f.alt = ''; f.dataset.sprite = sc.frog.sprite;
+    const f = mk('img', 'pgr-pet'); f.src = versionSprite(sc.frog.src); f.alt = ''; f.dataset.sprite = sc.frog.sprite;
     if (sc.frog.fallback) f.dataset.fallback = '1';
     pos(f, sc.frog.left, sc.frog.top, sc.frog.width); setFoot(f, sc.frog.foot); art.append(f);
     if (sc.frog.suitcase) {
@@ -283,6 +311,16 @@ export function renderRoom(doc, opts = {}) {
     if (sc.frog.bubble) { const b = mk('div', 'pgr-bubble'); b.textContent = sc.frog.bubble; b.style.top = sc.frog.bubbleTop + '%'; art.append(b); }
   }
   st.append(art);
+  if (sc.notes) {
+    const b = mk('button', 'pgr-notes');
+    b.type = 'button'; b.dataset.notes = '1';
+    const label = sc.notes.count === 1 ? '1 note from your Fren' : sc.notes.count + ' notes from your Fren';
+    b.setAttribute('aria-label', label + '. Read them'); b.title = label;
+    pos(b, sc.notes.left, sc.notes.top, sc.notes.width);
+    const im = mk('img'); im.src = sc.notes.src; im.alt = ''; b.append(im);
+    const n = mk('span', 'pgr-notes-n'); n.textContent = String(sc.notes.count); n.setAttribute('aria-hidden', 'true'); b.append(n);
+    st.append(b);
+  }
   if (sc.letter) {
     const b = mk('button', 'pgr-letter');
     b.type = 'button'; b.dataset.letter = '1';
@@ -311,7 +349,7 @@ export function playDeparture(frame, stage = 'adult', { setTimer = setTimeout, c
   let i = 0, timer = null;
   const show = () => {
     if (i >= steps.length) { actor.remove(); if (letter) letter.hidden = false; return; }
-    im.src = steps[i].src; im.dataset.frame = String(i + 1);
+    im.src = versionSprite(steps[i].src); im.dataset.frame = String(i + 1);
     actor.style.left = steps[i].x / ROOM_W * 100 + '%'; setFoot(actor, steps[i].foot);
     i++; timer = setTimer(show, DEPART_MS);
   };

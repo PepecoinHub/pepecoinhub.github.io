@@ -77,6 +77,8 @@ test('the live page talks only to the game server, keeps nothing in the browser 
   for (const f of ['docs/games/js/pepegochi-live.mjs', 'docs/games/js/pepegochi-live-view.mjs']) {
     const js = file(f);
     assert.doesNotMatch(js, /localStorage|sessionStorage|indexedDB/, f + ' keeps nothing in the browser');
+    // the frog's notes on the table are the only browser data it shows, read only through pepegochi-notes.mjs
+    assert.doesNotMatch(js, /setItem|removeItem/, f + ' never writes to the browser');
     assert.doesNotMatch(js, /pepegochi-model|LocalPepegochi|advance\(/, f + ' never runs the rules itself');
     assert.doesNotMatch(js, /passport_award|gry_passport/, f + ' never touches stamps (the server bridge does)');
   }
@@ -84,6 +86,16 @@ test('the live page talks only to the game server, keeps nothing in the browser 
   const calls = [...file('docs/games/js/pepegochi-live-view.mjs').matchAll(/this\.call\('(\w+)'(?:, (\{[^}]*\}))?\)/g)].map(m => [m[1], m[2] || '']);
   assert.deepEqual(calls.map(c => c[0]).sort(), ['gry_pepegochi_action', 'gry_pepegochi_adopt', 'gry_pepegochi_letter_read', 'gry_pepegochi_settle', 'gry_pepegochi_state']);
   assert.deepEqual(calls.filter(c => c[1]).map(c => c[1]).sort(), ["{ p_action: kind }", "{ p_name: String(name || '').trim() }"]);
+});
+
+test('taskbar care refreshes an open room without sending pet state through postMessage', () => {
+  const taskbar = file('docs/meme/pepegochi-taskbar.mjs');
+  const live = file('docs/games/js/pepegochi-live.mjs');
+  assert.match(taskbar, /postMessage\(\{ type: 'pondos:pepegochi-refresh' \}, location\.origin\)/);
+  assert.match(live, /event\.source !== window\.parent/);
+  assert.match(live, /event\.data\?\.type !== 'pondos:pepegochi-refresh'/);
+  assert.match(live, /run\(game\.refresh\(\)\)/);
+  assert.doesNotMatch(taskbar.match(/function syncOpenRoom\(\) \{[\s\S]*?\n  \}/)?.[0] || '', /pet|needs|status|life_id/);
 });
 
 test('Room: every owned item in its fixed place; the starter room is unpacked once', async () => {

@@ -14,8 +14,8 @@ export function expressionFor(view, action) {
   if (sprite === 'tb_adult_sleepy.png') return action === 'hello' || action === 'how' ? 'yawn' : null;
   if (sprite !== 'tb_adult_sit.png') return null;
   if (['pet', 'familiar', 'fed', 'clean', 'rested', 'toyFavourite'].includes(action)) return 'nuzzle';
-  if (['return', 'grown', 'quizWin', 'played', 'play', 'gameWin', 'gameRecord', 'gameMoon', 'toyOkay'].includes(action)) return 'welcome';
+  if (['return', 'returnLong', 'grown', 'quizWin', 'played', 'play', 'gameWin', 'gameRecord', 'gameMoon', 'toyOkay', 'stamp', 'stampBatch'].includes(action)) return 'welcome';
   if (['annoyed', 'space', 'toyAgain', 'gameLoss'].includes(action)) return 'sulk';
-  if (['hello', 'how', 'news', 'memories', 'hover', 'invite', 'favourite', 'gameDone', 'desktopFirefly', 'desktopTV', 'desktopBin', 'desktopGames', 'desktopFind', 'desktopGuesser', 'desktopNotes', 'desktopNerds'].includes(action)) return 'curious';
+  if (['hello', 'how', 'news', 'memories', 'hover', 'invite', 'favourite', 'gameDone', 'desktopFirefly', 'desktopTV', 'desktopBin', 'desktopGames', 'desktopFind', 'desktopGuesser', 'desktopNotes', 'desktopNerds', 'secret'].includes(action)) return 'curious';
   return null;
 }

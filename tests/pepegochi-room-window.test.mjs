@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import {
   SLOTS, ITEMS, STARTER_ROOM, BACKGROUND, FROG, ROOM_W, ROOM_H, FROG_PX, FOOT_Y, HOME, SPRITES, spriteSrc,
-  DEPART_FRAMES, DEPART_FOOT, IMG, DEPART_MS, SUITCASE, LETTER, TAKEN_BY_LETTER, LOOK_BELOW,
+  DEPART_FRAMES, DEPART_FOOT, IMG, HD_IMG, propSrc, DEPART_MS, SUITCASE, LETTER, TAKEN_BY_LETTER, LOOK_BELOW,
   DEPART_DX, HATCH_FRAMES, HATCH_MS, CARE, careFrames,
   frogLook, roomScene, departTimeline, renderRoom, playDeparture, playFrames,
 } from '../docs/games/js/pepegochi-room.mjs';
@@ -36,17 +36,18 @@ test('every image the window draws is a file in docs/games, at the size the art 
   const all = [BACKGROUND, FROG, ...sprites, ...DEPART_FRAMES, SUITCASE.src, LETTER.envelope, LETTER.open, ...roomScene().items.map(i => i.src.split('?')[0])];
   for (const f of all) assert.ok(existsSync(file(f)), f);
   assert.deepEqual(pngSize(BACKGROUND), [ROOM_W, ROOM_H]);
-  for (const f of [...sprites, ...DEPART_FRAMES, SUITCASE.src, LETTER.envelope, LETTER.open]) assert.deepEqual(pngSize(f), [128, 128], f);
+  for (const f of [...sprites, ...DEPART_FRAMES]) assert.deepEqual(pngSize(f), [256, 256], f);
+  for (const f of [SUITCASE.src, LETTER.envelope, LETTER.open]) assert.deepEqual(pngSize(f), [128, 128], f);
   // the window uses the item IDs of #222 unchanged, plus the four earned decorations (update_pepegochi_rewards.sql)
   assert.deepEqual(Object.keys(ITEMS).sort(), ['crt_tv', 'floppy_disk', 'golden_fly', 'lava_lamp', 'moon_rock', 'mug', 'p_poster',
     'paper_crown', 'potted_plant', 'rubber_duck']);
-  for (const id of Object.keys(ITEMS)) { assert.ok(existsSync(file(IMG + id + '.png')), id); assert.deepEqual(pngSize(IMG + id + '.png'), [128, 128], id); }
+  for (const id of Object.keys(ITEMS)) { const size=id==='p_poster'?128:256; assert.ok(existsSync(file(propSrc(id))), id); assert.deepEqual(pngSize(propSrc(id)), [size,size], id); }
 });
 
 test('the frog: one scale for every stage, standing on its feet at the same spot', () => {
   for (const stage of ['tadpole', 'froglet', 'adult']) {
     const f = roomScene({ stage }).frog;
-    assert.equal(f.width, FROG_PX / ROOM_W * 100, stage + ': 1 sprite pixel = 1 room pixel, nothing resized');
+    assert.equal(f.width, FROG_PX / ROOM_W * 100, stage + ': logical size unchanged despite 2x resolution');
     assert.equal(f.left, HOME.x / ROOM_W * 100);
     assert.equal(f.top, HOME.y / ROOM_H * 100);
   }
@@ -60,7 +61,7 @@ test('the frog: one scale for every stage, standing on its feet at the same spot
   assert.equal(roomScene({ stage: 'froglet' }).frog.foot, FOOT_Y);
   // the bubble sits above the head of the sprite that is shown
   const b = roomScene({ status: 'packing' }).frog;
-  assert.equal(b.bubbleTop, (HOME.y - (124 - 9) - 6) / ROOM_H * 100);
+  assert.equal(b.bubbleTop, (HOME.y - (124 - SPRITES.adult_packing[0]) - 6) / ROOM_H * 100);
 });
 
 test('which sprite: packing, recovering and neglected first, then the need the adult wants most', () => {
@@ -138,7 +139,7 @@ test('moving out: the 6 frames once, 250 ms each, walking right until the frog l
   assert.ok(y.at(-1).x - FROG_PX / 2 >= ROOM_W, 'fully out of the room');
   // an in-place walk cycle from a later art pack (backlog A4): turn where it stood, then walk out of the room
   const w = departTimeline('adult', { turn: ['depart_turn_01.png', 'depart_turn_02.png'], walk: ['depart_walk_01.png', 'depart_walk_02.png'] });
-  assert.deepEqual(w.slice(0, 2).map(s => [s.src, s.x]), [[IMG + 'depart_turn_01.png', HOME.x], [IMG + 'depart_turn_02.png', HOME.x]]);
+  assert.deepEqual(w.slice(0, 2).map(s => [s.src, s.x]), [[HD_IMG + 'depart_turn_01.png', HOME.x], [HD_IMG + 'depart_turn_02.png', HOME.x]]);
   assert.deepEqual(w.slice(2, 5).map(s => s.src.slice(-6, -4)), ['01', '02', '01']);
   for (let i = 3; i < w.length; i++) assert.equal(w[i].x - w[i - 1].x, 24);
   assert.ok(w.at(-1).x - FROG_PX / 2 >= ROOM_W - 24 && w.at(-1).x < ROOM_W + FROG_PX / 2);
@@ -150,8 +151,8 @@ test('short frame animations: hatching now, care once its art exists', () => {
   assert.deepEqual(HATCH_FRAMES, ['hatch_01', 'hatch_02', 'hatch_03', 'hatch_04'].map(spriteSrc));
   // art pack A6: 4 frames for each care action, for the adult, the froglet and the tadpole; nothing for the egg
   assert.equal(Object.keys(CARE).length, 12);
-  assert.deepEqual(careFrames('adult', 'feed'), [1, 2, 3, 4].map(n => IMG + 'care_feed_0' + n + '.png'));
-  assert.deepEqual(careFrames('tadpole', 'rest'), [1, 2, 3, 4].map(n => IMG + 'care_tadpole_rest_0' + n + '.png'));
+  assert.deepEqual(careFrames('adult', 'feed'), [1, 2, 3, 4].map(n => HD_IMG + 'care_feed_0' + n + '.png'));
+  assert.deepEqual(careFrames('tadpole', 'rest'), [1, 2, 3, 4].map(n => HD_IMG + 'care_tadpole_rest_0' + n + '.png'));
   assert.deepEqual(careFrames('egg', 'feed'), []);
   for (const k of Object.keys(CARE)) for (const f of careFrames(...k.split('_'))) assert.ok(existsSync(file(f)), f);
   // playFrames: each frame on the frog's own <img>, then its sprite back; stop puts it back at once
@@ -194,12 +195,14 @@ test('the drawn room: layers in order, the letter is a real button, the frog car
   assert.equal(art.getAttribute('role'), 'img');
   assert.match(art.getAttribute('aria-label'), /hungry/);
   const frog = pet.querySelector('.pgr-pet');
-  assert.equal(frog.src, spriteSrc('adult_hungry'));
+  assert.equal(frog.src, spriteSrc('adult_hungry') + '?v=20261120dialog2');
   assert.equal(frog.dataset.fallback, undefined);
   const young = renderRoom(doc, { mode: 'pet', stage: 'froglet', status: 'neglected' }).querySelector('.pgr-pet');
   assert.equal(young.dataset.sprite, 'froglet_neglected'); assert.equal(young.dataset.fallback, undefined, 'its own sprite, no grey');
   assert.equal(frog.style.getPropertyValue('--foot'), 124 / 128 * 100 + '%');
   assert.equal(pet.querySelectorAll('.pgr-item').length, 6);
+  assert.match(pet.querySelector('.pgr-fixed-lamp').src,/\/hd\/pepe_table_lamp.png\?v=/);
+  assert.equal(pet.querySelector('.pgr-fixed-lamp').dataset.item,undefined);
   assert.equal(pet.querySelector('.pgr-letter'), null);
   const gone = renderRoom(doc, { mode: 'departed' });
   const letter = gone.querySelector('.pgr-letter');
@@ -218,7 +221,7 @@ test('playDeparture: frames on a timer, the letter waits until the frog is out, 
   const actor = () => room.querySelector('.pgr-actor');
   const seen = [];
   assert.equal(room.querySelector('.pgr-letter').hidden, true, 'no letter while the frog is still here');
-  while (actor()) { seen.push(actor().children[0].src.split('/').pop()); const f = pending; pending = null; f(); }
+  while (actor()) { const src = actor().children[0].src; assert.match(src, /\?v=20261120dialog2$/); seen.push(src.split('?')[0].split('/').pop()); const f = pending; pending = null; f(); }
   assert.deepEqual(seen.slice(0, 6), ['depart_turn_01.png', 'depart_turn_02.png', 'depart_walk_01.png', 'depart_walk_02.png', 'depart_walk_03.png', 'depart_walk_04.png']);
   assert.equal(seen.length, departTimeline('adult').length, 'every frame once, then gone');
   assert.ok(fired.every(ms => ms === DEPART_MS));

@@ -3,7 +3,8 @@
 // LOCAL TEST ONLY: the page CSP has connect-src 'none', so no request can leave it. No Supabase,
 // no Passport, no stamps. The test frog is kept in this tab's sessionStorage only.
 import { BetaGame, TIME_STEPS } from './pepegochi-beta-view.mjs';
-import { renderRoom, playDeparture, DEPART_FRAMES } from './pepegochi-room.mjs?v=20261116room1';
+import { renderRoom, playDeparture, playFrames, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261120notes3';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261120notes3';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {
@@ -33,8 +34,8 @@ function renderPet(box, p) {
   box.append(needs);
   const acts = el('div', { class: 'pgb-row pgb-actions' });
   for (const a of p.actions) {
-    const b = el('button', { type: 'button', class: 'btn', 'data-act': a.kind, disabled: !a.enabled, title: a.reason || a.label },
-      a.label + (a.reason ? ` (${a.reason})` : ''));
+    const b = el('button', { type: 'button', class: 'btn', 'data-act': a.kind, disabled: !a.enabled, title: a.reason || a.label });
+    b.append(el('span', { class: 'pgb-action-label' }, a.label), el('span', { class: 'pgb-action-detail' }, a.reason || 'Ready'));
     acts.append(b);
   }
   const all = el('button', { type: 'button', class: 'btn', 'data-all': '1' }, 'Everything it needs (test shortcut)');
@@ -85,28 +86,37 @@ function adoptForm(label, value) {
 // the room (pepegochi-room.mjs). The moving-out frames play once, when a frog that was on screen moves
 // out (after a time jump or an action); a frog that had already left is simply gone.
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-let shown = null, stopAnim = null, preloaded = false;
-function renderScene(v) {
+let shown = null, stopAnim = null;
+const preloaded = new Set();
+const interactions = createRoomInteractions({getView:()=>game.view(),isBusy:()=>false,care:kind=>act(kind),openTV:()=>{},reduced:reduceMotion});
+function renderScene(v, care) {
   if (stopAnim) { stopAnim(); stopAnim = null; }
   const scene = $('pgb-scene'), title = $('pgb-scene-title');
-  let room;
-  if (v.mode === 'adopt') { title.textContent = 'Your room'; room = renderRoom(document, { mode: 'adopt' }); }
+  let opts;
+  if (v.mode === 'adopt') { title.textContent = 'Your room'; opts = { mode: 'adopt' }; }
   else if (v.mode === 'departed') {
     title.textContent = `${v.departed.name} · moved out`;
-    room = renderRoom(document, { mode: 'departed', letterSeen: v.departed.letterSeen });
+    opts = { mode: 'departed', letterSeen: v.departed.letterSeen };
   } else {
     title.textContent = v.pet.title;
-    room = renderRoom(document, { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs });
-    if (!preloaded) { preloaded = true; DEPART_FRAMES.forEach(src => { const i = new Image(); i.src = src; }); }
+    opts = { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs };
   }
+  const stage=opts.mode==='pet'?opts.stage:opts.mode==='adopt'?'egg':null;
+  if(stage&&!preloaded.has(stage)){preloaded.add(stage);animationFramesForStage(stage).forEach(src=>{const i=new Image();i.src=versionSprite(src)});}
+  const room=renderRoom(document,opts);
   scene.replaceChildren(room);
+  interactions.attach(room,opts,{owned:true,lifeId:game.last?.pet?.life_id,embedded:false});
   if (v.mode === 'departed' && shown && shown.mode === 'pet' && !reduceMotion()) stopAnim = playDeparture(room, shown.stage);
+  if (!reduceMotion() && v.mode==='pet') {
+    if(shown?.stage==='egg'&&stage==='tadpole') stopAnim=playFrames(room.querySelector('.pgr-pet'),HATCH_FRAMES,HATCH_MS);
+    else if(care) stopAnim=playFrames(room.querySelector('.pgr-pet'),careFrames(stage,care),CARE_MS);
+  }
   shown = { mode: v.mode, stage: v.pet?.stage };
 }
 
-function render() {
+function render(care) {
   const v = game.view();
-  renderScene(v);
+  renderScene(v,care);
   $('pgb-clock').textContent = v.clock.text;
   $('pgb-day').textContent = `(test day ${v.clock.day})`;
   $('pgb-msg').textContent = v.message;
@@ -135,7 +145,7 @@ $('pgb-hours').addEventListener('submit', e => {
 });
 $('pgb-sat').addEventListener('click', () => { game.nextWeekday(6, 18); render(); });
 $('pgb-sun').addEventListener('click', () => { game.nextWeekday(0, 18); render(); });
-$('pgb-reset').addEventListener('click', () => { game.reset(); render(); });
+$('pgb-reset').addEventListener('click', () => { interactions.dispose(); shown=null; game.reset(); render(); });
 
 function openLetter() {
   game.readLetter();
@@ -145,11 +155,15 @@ function openLetter() {
 }
 
 // the frog
+function act(kind) {
+  const r=game.act(kind);
+  render(r.ok&&r.value.action_result==='accepted'?kind:null);
+}
 $('pgb-scene').addEventListener('click', e => { if (e.target.closest('[data-letter]')) openLetter(); });
 $('pgb-body').addEventListener('click', e => {
   const t = e.target.closest('button');
   if (!t) return;
-  if (t.dataset.act) game.act(t.dataset.act);
+  if (t.dataset.act) { act(t.dataset.act); return; }
   else if (t.dataset.all) game.careAll();
   else if (t.dataset.letter) { openLetter(); return; }
   else if (t.dataset.closeLetter) game.closeLetter();

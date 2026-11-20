@@ -183,7 +183,7 @@ test('Avatar Maker client: one save RPC with six v2 IDs, nothing kept in localSt
   assert.doesNotMatch(maker, /localStorage|sessionStorage/);
   assert.match(maker, /openApp\('avatar', 'Create Your Fren - Avatar Maker'/);
   // the balloon only follows a server answer that minted the badge
-  assert.match(maker, /if \(r\.badge && r\.badge\.new\) balloon\('Fresh Fren unlocked!'/);
+  assert.match(maker, /if \(r\.badge && r\.badge\.new\) \{?\s*balloon\('Fresh Fren unlocked!'/);
   assert.match(pond, /avatar-options\.json\?v=/);
 });
 

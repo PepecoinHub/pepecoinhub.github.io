@@ -9,6 +9,7 @@
 //
 // Format A (game sprites and room props): 128 x 128, 2 x 2 pixel grid, at most 64 colours, feet on the line y = 124.
 // Format B (taskbar companion):           48 x 48, 1 x 1 pixel grid, at most 32 colours, feet on the line y = 47.
+// Format FINE (explicit A16 replacement list): 128 x 128, 1 x 1 grid, at most 4096 opaque colours, foot y = 124.
 // "Feet on the line y = N" means the art stands on that line: its lowest visible row of pixels is y = N - 1.
 // Both: RGBA with real transparency (every pixel fully opaque or fully transparent), not empty, no edge touching
 // unless the art leaves the frame on purpose (allowEdge).
@@ -16,11 +17,87 @@ import { readFileSync } from 'node:fs';
 import { inflateSync } from 'node:zlib';
 import { basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SPRITE_BOUNDS, PROP_BOUNDS, ROOM_LAMP, CARE, WALK } from '../docs/games/js/pepegochi-room.mjs';
 
 export const FORMATS = {
   A: { size: 128, grid: 2, maxColours: 64, foot: 124 },
   B: { size: 48, grid: 1, maxColours: 32, foot: 47 },
+  FINE: { size: 128, grid: 1, maxColours: 4096, foot: 124 },
+  HD: { size: 256, grid: 1, maxColours: 16384, foot: 248 },
 };
+const HD_BOX = new Map([
+  ...Object.entries(SPRITE_BOUNDS).map(([id,b])=>[`pepegochi_${id}.png`,b]),
+  ...Object.entries(PROP_BOUNDS).filter(([id])=>id!=='p_poster').map(([id,b])=>[id+'.png',b]),
+  ['pepe_table_lamp.png',ROOM_LAMP.bounds],
+]);
+const HD_FILES = new Set([...HD_BOX.keys(), ...Object.values(CARE).flat().map(id=>id+'.png'), ...Object.values(WALK).flatMap(w=>[...w.turn,...w.walk])]);
+
+// Only approved higher-detail room sprites and care frames opt in; other assets retain their existing profiles.
+const FINE_TOP = new Map([
+  ['care_clean_04.png', 9],
+  ['care_play_02.png', 9],
+  ['care_rest_04.png', 9],
+  ['care_tadpole_clean_04.png', 50],
+  ['care_tadpole_rest_03.png', 50],
+  ['depart_walk_04.png', 6],
+  ['froglet_depart_walk_01.png', 30],
+  ['froglet_depart_walk_02.png', 28],
+  ['tadpole_depart_01.png', 50],
+  ['care_feed_01.png', 9],
+  ['care_play_03.png', 3],
+  ['care_play_04.png', 9],
+  ['care_tadpole_clean_03.png', 44],
+  ['care_tadpole_play_01.png', 50],
+  ['care_tadpole_rest_02.png', 50],
+  ['care_tadpole_rest_04.png', 50],
+  ['depart_walk_02.png', 6],
+  ['froglet_depart_walk_04.png', 28],
+  ['care_clean_02.png', 9],
+  ['care_clean_03.png', 2],
+  ['care_feed_04.png', 9],
+  ['care_play_01.png', 9],
+  ['care_tadpole_play_02.png', 50],
+  ['care_tadpole_play_03.png', 36],
+  ['care_tadpole_play_04.png', 50],
+  ['care_tadpole_rest_01.png', 50],
+  ['depart_walk_03.png', 8],
+  ['froglet_depart_walk_03.png', 30],
+  ['tadpole_depart_02.png', 48],
+  ['tadpole_depart_03.png', 50],
+  ['care_rest_01.png', 9],
+  ['care_rest_02.png', 9],
+  ['care_tadpole_clean_01.png', 50],
+  ['care_tadpole_clean_02.png', 50],
+  ['care_tadpole_feed_02.png', 50],
+  ['depart_turn_01.png', 8],
+  ['depart_walk_01.png', 8],
+  ['tadpole_depart_04.png', 48],
+  ['pepegochi_hatch_03.png', 20],
+  ['pepegochi_hatch_04.png', 50],
+  ['care_clean_01.png', 9],
+  ['care_feed_02.png', 9],
+  ['care_feed_03.png', 9],
+  ['care_rest_03.png', 9],
+  ['care_tadpole_feed_01.png', 50],
+  ['care_tadpole_feed_03.png', 50],
+  ['care_tadpole_feed_04.png', 50],
+  ['depart_01.png', 8],
+  ['depart_02.png', 8],
+  ['depart_03.png', 8],
+  ['depart_04.png', 8],
+  ['depart_05.png', 8],
+  ['depart_06.png', 8],
+  ['depart_turn_02.png', 8],
+  ['pepegochi_hatch_01.png', 42],
+  ['pepegochi_hatch_02.png', 42],
+  ...['idle', 'hungry', 'dirty', 'moody', 'tired', 'neglected', 'packing', 'recovering'].map(s => [`pepegochi_froglet_${s}.png`, 30]),
+  ...['hungry', 'dirty', 'recovering'].map(s => [`pepegochi_adult_${s}.png`, 8]),
+  ...['hungry', 'dirty', 'moody', 'tired', 'neglected', 'packing', 'recovering'].map(s => [`pepegochi_tadpole_${s}.png`, 50]),
+  ...['01', '02', '03', '04'].map(s => [`care_froglet_feed_${s}.png`, 30]),
+  ...[30, 30, 15, 30].map((top, i) => [`care_froglet_clean_0${i + 1}.png`, top]),
+  ...[30, 30, 12, 30].map((top, i) => [`care_froglet_play_0${i + 1}.png`, top]),
+  ...[30, 30, 30, 27].map((top, i) => [`care_froglet_rest_0${i + 1}.png`, top]),
+]);
 
 // ---------- a small PNG decoder: 8-bit greyscale, RGB, palette, grey+alpha or RGBA, not interlaced ----------
 export function decodePng(buf) {
@@ -66,29 +143,40 @@ export function decodePng(buf) {
 }
 
 // the box of the visible (alpha > 0) pixels, as [left, top, right, bottom] with right/bottom exclusive (like PIL getbbox)
-export function bbox({ width, height, rgba }) {
+export function bbox({ width, height, rgba }, alpha = 1) {
   let l = width, t = height, r = -1, b = -1;
-  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) if (rgba[(y * width + x) * 4 + 3]) {
+  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) if (rgba[(y * width + x) * 4 + 3] >= alpha) {
     if (x < l) l = x; if (x > r) r = x; if (y < t) t = y; if (y > b) b = y;
   }
   return r < 0 ? null : [l, t, r + 1, b + 1];
 }
 
 // ---------- the checks ----------
-export function formatFor(file) { return /^tb_/.test(basename(file)) ? 'B' : 'A'; }
+export function formatFor(file) {
+  if (/(?:^|[/\\])(?:hd|hd-review[/\\](?:frames|room))[/\\]/.test(file) && HD_FILES.has(basename(file))) return 'HD';
+  return FINE_TOP.has(basename(file)) ? 'FINE' : /^tb_/.test(basename(file)) ? 'B' : 'A';
+}
 
 export function checkImage(img, { format = 'A', foot, prop = false, allowEdge = false } = {}) {
   const F = FORMATS[format], footY = foot ?? F.foot, problems = [], { width: w, height: h, rgba } = img;
   if (w !== F.size || h !== F.size) problems.push(`size ${w} x ${h}, must be ${F.size} x ${F.size}`);
   if (img.colourType !== 6 && img.colourType !== 3 && img.colourType !== 4) problems.push('no alpha channel: export as RGBA with a transparent background');
-  let semi = 0, broken = 0, cells = 0;
+  let semi = 0, broken = 0, cells = 0, mid = 0, ink = 0, transparent = 0;
   const colours = new Set();
   for (let i = 0; i < w * h; i++) {
     const a = rgba[i * 4 + 3];
     if (a > 0 && a < 255) semi++;
-    if (a === 255) colours.add((rgba[i * 4] << 16) | (rgba[i * 4 + 1] << 8) | rgba[i * 4 + 2]);
+    if (a === 0) transparent++;
+    if (a >= 77) ink++;
+    if (a >= 16 && a < 240) mid++;
+    if (format === 'HD' ? a >= 77 : a === 255) colours.add((rgba[i * 4] << 16) | (rgba[i * 4 + 1] << 8) | rgba[i * 4 + 2]);
   }
-  if (semi) problems.push(`${semi} half-transparent pixels: edges must be fully opaque or fully transparent (no anti-aliasing)`);
+  if (format === 'HD') {
+    // Preserve the exact approved artwork: most ink is nearly opaque and tiny alpha fringes
+    // are permitted, but a foggy image or opaque background is not.
+    if (img.colourType !== 6 || !transparent || !ink) problems.push('HD requires RGBA with real transparent background and visible art');
+    if (mid > ink * 0.08) problems.push('HD alpha fringe exceeds 8% of visible art');
+  } else if (semi) problems.push(`${semi} half-transparent pixels: edges must be fully opaque or fully transparent (no anti-aliasing)`);
   if (colours.size > F.maxColours) problems.push(`${colours.size} colours, at most ${F.maxColours}`);
   const g = F.grid;
   if (g > 1) {
@@ -100,7 +188,7 @@ export function checkImage(img, { format = 'A', foot, prop = false, allowEdge = 
     }
     if (broken) problems.push(`${broken} of ${cells} ${g} x ${g} blocks are not one colour (${(100 * broken / cells).toFixed(1)}%): not on the ${g} x ${g} pixel grid`);
   }
-  const box = bbox(img);
+  const box = bbox(img, format === 'HD' ? 77 : 1);
   if (!box) problems.push('the image is empty');
   else {
     // the foot line is the bottom edge of the art (as in the game's CSS): the lowest visible row is footY - 1
@@ -113,6 +201,19 @@ export function checkImage(img, { format = 'A', foot, prop = false, allowEdge = 
 export function checkFile(file, opts = {}) {
   const img = decodePng(readFileSync(file));
   const r = checkImage(img, { ...opts, format: opts.format || formatFor(file) });
+  if ((opts.format || formatFor(file)) === 'HD') {
+    const expected = HD_BOX.get(basename(file));
+    if (!HD_FILES.has(basename(file))) r.problems.push('HD profile requires an explicitly allowlisted room sprite');
+    if (expected && r.bbox && expected.some((v,i)=>v*2!==r.bbox[i])) r.problems.push(`bounds ${r.bbox}, expected ${expected.map(v=>v*2)}`);
+    r.ok = r.problems.length === 0;
+  }
+  if ((opts.format || formatFor(file)) === 'FINE') {
+    const expected = FINE_TOP.get(basename(file));
+    if (expected === undefined) r.problems.push('FINE profile requires an explicitly allowlisted sprite');
+    if (img.colourType !== 6) r.problems.push('FINE sprites must be RGBA');
+    if (expected !== undefined && r.bbox && r.bbox[1] !== expected) r.problems.push(`top y = ${r.bbox[1]}, expected ${expected}`);
+    r.ok = r.problems.length === 0;
+  }
   if (opts.like && r.bbox) Object.assign(r, compareWith(r.bbox, bbox(decodePng(readFileSync(opts.like))), r.problems));
   return r;
 }
@@ -130,7 +231,7 @@ export function compareWith(box, old, problems = []) {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const args = process.argv.slice(2), files = args.filter(a => !a.startsWith('--'));
   const opt = k => { const a = args.find(x => x.startsWith('--' + k)); return a == null ? undefined : (a.split('=')[1] ?? true); };
-  if (!files.length) { console.error('usage: node scripts/pepegochi_art_qa.mjs [--format=A|B] [--foot=N] [--prop] [--allow-edge] file.png ...'); process.exit(2); }
+  if (!files.length) { console.error('usage: node scripts/pepegochi_art_qa.mjs [--format=A|B|FINE|HD] [--foot=N] [--prop] [--allow-edge] file.png ...'); process.exit(2); }
   let bad = 0;
   for (const f of files) {
     let r;

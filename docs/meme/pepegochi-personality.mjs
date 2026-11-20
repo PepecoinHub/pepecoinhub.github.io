@@ -14,3 +14,5 @@ export function favouriteToy(identity) {
   return Object.keys(TOYS)[(hash >>> 0) % 3];
 }
 export const healthyCompanion = view => !!view?.hasPet && view.adult && !view.warning && view.sprite === 'taskbar/tb_adult_sit.png';
+// Froglets have their own sprite and may play without ever pretending to be adults.
+export const playableCompanion = view => (healthyCompanion(view) || (!!view?.hasPet && !view.warning && view.motion === 'froglet' && view.playReady === true));

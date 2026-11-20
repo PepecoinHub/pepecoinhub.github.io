@@ -39,3 +39,53 @@ jobs:
           name: haze-drop-layout
           path: /tmp/haze-layout-*.png
           if-no-files-found: ignore
+      - name: Exercise PepeGochi integrated beta in Chromium
+        if: always()
+        env:
+          PLAYWRIGHT_MODULE: /tmp/haze-layout/node_modules/playwright
+          PEPEGOCHI_QA_SCREENSHOTS: /tmp/pepegochi-qa
+        run: |
+          mkdir -p "$PEPEGOCHI_QA_SCREENSHOTS"
+          export HAZE_CHROMIUM="$(node -p 'require(process.env.PLAYWRIGHT_MODULE).chromium.executablePath()')"
+          status=0
+          for test_file in tests/pepegochi-room-browser.cjs tests/pepegochi-room-interactions-browser.cjs tests/pepegochi-desktop-browser.cjs tests/pepegochi-companion-browser.cjs tests/pepegochi-playtest-browser.cjs; do
+            echo "Running $test_file"
+            node "$test_file" || status=1
+          done
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pepegochi-beta-screenshots
+          path: /tmp/pepegochi-qa/*.png
+          if-no-files-found: ignore
+  pepegochi-database:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: disposable-pepegochi-ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test PepeGochi and Pond Quiz against disposable PostgreSQL
+        env:
+          PASSPORT_PG_URL: postgres://postgres:disposable-pepegochi-ci@127.0.0.1:5432/postgres
+          PASSPORT_PG_MODULE: /tmp/pepegochi-pg/node_modules/pg/lib/index.js
+        run: |
+          npm install --prefix /tmp/pepegochi-pg pg@8.16.3 --ignore-scripts --no-audit --no-fund
+          node --test --test-concurrency=2 tests/pepegochi*-sql.test.mjs tests/pepegochi-parity.test.mjs tests/pond-quiz-sql.test.mjs
