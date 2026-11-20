@@ -14,7 +14,10 @@ The owner approved the intermediate art direction: finer pixel art with slightly
 - `export-stages.sh` exports the egg, tadpole, adult and four hatch frames to the same double-resolution canvas, preserving each stage's logical height and shared floor anchor; the egg idle duplicates the first hatch frame. Tadpole has no clothing and a long tail; adult has the same hoodie and shorts as froglet but has a broad head, short feet and no tail. Hatch transitions from intact spotted shell through cracking and emerging to the tadpole with shell fragments.
 - `export-care.sh` cuts the eight additional care atlases; uses the green skin silhouette to retain the reference character size despite changing bubbles, toys, bowls and sleep effects. The full colored alpha bounds sit on the original floor line. Slight scale reduction is allowed to contain props.
 - Care prompt set: feed (bowl of flies, eat, chew, empty bowl), clean (soap, scrub, foam, sparkle), play (tricolor ball, toss, bounce, catch), rest (yawn, close eyes, one Z, two Zs). One 2×2 atlas per action and stage, matching the stage's approved reference and the master prompt. Generated with the built-in image generation tool.
-- `preview.html` compares all four life stages and plays all twelve care animations at 200 ms per frame plus hatching at 450 ms per frame, using the current and proposed sprites at the same logical size. Use the comparison to inspect facial continuity and motion before replacing assets.
+- Departure prompt set: sad Pepe carries a yellow suitcase; four alternating in-place movement poses per age. Tadpole moves its forefeet and tail, clothed frogs walk. Adult gets two additional pre-walk turning/pick-up poses. The matching adult packing state and departure show the suitcase on the viewer's left. `export-care.sh --depart` retains production filenames.
+- Need/status prompt set: per stage, one reference idle (not exported) plus hungry (empty bowl), dirty (mud and fly), moody (frown), tired (drooping eyes), neglected (sad face), packing (yellow suitcase), recovering (forehead plaster). `export-care.sh --states` slices the 4×2 atlases and retains the approved original idle anchor.
+- `preview.html` compares all four life stages and plays all twelve care animations at 200 ms per frame, hatching at 450 ms per frame, and all departure sequences at 250 ms per frame. It also displays the 21 need/status poses at the same logical size as the existing game. Use the comparison to inspect facial continuity and motion before replacing assets.
+- `node validate-review.mjs` checks the exact filename set against `SPRITES`, `CARE`, and `WALK` from the current room renderer; RGBA dimensions, thresholded transparency, floor y=248, all preview paths, transitions and timing. It passes for the 91 proposed files. This does not run the browser or validate active room integration.
 
 ## Progress
 
@@ -25,8 +28,10 @@ The owner approved the intermediate art direction: finer pixel art with slightly
 | Egg, tadpole and adult anchors | 3 exported PNGs, dimensions and anchors checked |
 | Tadpole and adult feed, clean, play, rest | 8×4 exported PNGs, 32 new frames |
 | Hatch | 4 exported PNGs, dimensions and anchors checked |
-| Departure turn/walk for each stage | Pending |
-| Additional age-specific expressions and idle activities | Pending |
-| Integration / browser and animation QA | Pending until complete pack; no production deployment |
+| Departure turn/walk for each stage | 14 exported PNGs (4+4+6) |
+| Age-specific need/status expressions | 21 exported PNGs (7 per age) |
+| Further idle activities / independent taskbar sprite refresh | Outside this room pack; optional follow-up |
+| Review asset and animation sequence QA | PASS: 91 matching files, correct dimensions/alpha/anchors, all in-preview sequences and timings |
+| Integration / browser QA | Pending owner visual approval; the old 128px/2×2 QA must be adapted for 256px room art without changing the taskbar format |
 
 No replacement of active files until the complete pack can be checked for a consistent visual transition between idle, need/status and care states. Do not merge or deploy without the owner's explicit approval.
