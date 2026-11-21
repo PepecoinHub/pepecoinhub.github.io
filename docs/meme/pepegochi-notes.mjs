@@ -10,12 +10,15 @@
 //  - Every important message (clues, nudges, the "I trust you now" note) lies on the table in the room.
 // Cosmetic only: no reward, no RPC of its own. Notes live in this browser (per account and per frog life).
 import { TRAILS } from './pepegochi-rumors.mjs?v=20261120notes3';
+import { MAP_HINTS } from '../games/js/pond-map.mjs?v=20261121map';
 
 // The new puzzles (passport-catalog.json pond_map_1..6, "planned"). Their clue texts go here when the puzzles
 // ship; an empty text means "not written yet" and the frog stays quiet about it.
 export const NEW_PUZZLES = ['pond_map_1', 'pond_map_2', 'pond_map_3', 'pond_map_4', 'pond_map_5', 'pond_map_6'];
-export const NEW_CLUES = {};
-const newClue = id => typeof NEW_CLUES[id] === 'string' && NEW_CLUES[id].length > 0 ? NEW_CLUES[id] : null;
+// The clue texts are the Pond Map riddles (docs/games/js/pond-map.mjs). They only count once the server says the map is on
+// for this player (meme.js sets globalThis.__pondMapOn), so before the launch the frog stays quiet about it.
+export const NEW_CLUES = Object.fromEntries(Object.entries(MAP_HINTS).map(([n, t]) => ['pond_map_' + n, t]));
+const newClue = id => globalThis.__pondMapOn === true && typeof NEW_CLUES[id] === 'string' && NEW_CLUES[id].length > 0 ? NEW_CLUES[id] : null;
 // "clearly not hunting": no PondOS secret found yet, or none for this long
 export const IDLE_HUNT_DAYS = 14;
 

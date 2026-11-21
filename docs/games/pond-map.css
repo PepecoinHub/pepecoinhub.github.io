@@ -1,0 +1,54 @@
+/* The Pond Map window behind the Golden Foot painting (js/pond-map.mjs). Win98 grey in light mode; in dark mode the
+   window is dark grey and the text field stays clearly lighter, so it is always readable. */
+.pm-back { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 10px; background: rgba(0,0,0,.35); }
+.pm-win { --pm-face: #c3c3bd; --pm-ink: #111; --pm-field: #fff; --pm-slot: #e8e2cc;
+  width: min(560px, 100%); max-height: calc(100vh - 20px); overflow: auto; padding: 3px; background: var(--pm-face); color: var(--pm-ink);
+  box-shadow: inset 1px 1px #fff, inset -1px -1px #404040, 4px 4px 0 rgba(0,0,0,.35); font: 14px Tahoma, Verdana, sans-serif; }
+:root[data-theme="dark"] .pm-win { --pm-face: #3b3f3c; --pm-ink: #eef1ec; --pm-field: #e9ece6; --pm-slot: #565c57; box-shadow: inset 1px 1px #6b706c, inset -1px -1px #111, 4px 4px 0 rgba(0,0,0,.5); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pm-win { --pm-face: #3b3f3c; --pm-ink: #eef1ec; --pm-field: #e9ece6; --pm-slot: #565c57; box-shadow: inset 1px 1px #6b706c, inset -1px -1px #111, 4px 4px 0 rgba(0,0,0,.5); } }
+.pm-bar { display: flex; align-items: center; justify-content: space-between; padding: 3px 4px 3px 8px; background: linear-gradient(90deg, #16532a, #269b4d); color: #fff; font-weight: bold; }
+.pm-x { width: 22px; height: 20px; padding: 0; border: 0; background: #c3c3bd; color: #111; font-weight: bold; box-shadow: inset 1px 1px #fff, inset -1px -1px #404040; cursor: pointer; }
+.pm-body { display: grid; gap: 10px; padding: 12px; }
+.pm-lead, .pm-tip { margin: 0; }
+.pm-tip { min-height: 1.3em; font-weight: bold; }
+.pm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.pm-slot { margin: 0; min-height: 96px; display: grid; place-items: center; align-content: center; gap: 4px; padding: 6px; text-align: center;
+  background: var(--pm-slot); box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; font-size: 12px; }
+.pm-slot img { width: 100%; height: auto; display: block; }
+.pm-slot figcaption { line-height: 1.25; }
+.pm-slot.got { background: #f2e3a0; color: #3a2a10; }
+.pm-slot.got.noimg::before { content: "🗺️"; font-size: 34px; }
+.pm-q { font-size: 30px; opacity: .55; }
+.pm-form { display: flex; gap: 6px; }
+.pm-in { flex: 1; min-width: 0; padding: 6px 8px; border: 0; background: var(--pm-field); color: #111; font: 16px "Courier New", monospace; text-transform: uppercase;
+  box-shadow: inset 1px 1px #808080, inset 2px 2px #404040, inset -1px -1px #fff; }
+.pm-btn { padding: 5px 14px; border: 0; background: #c3c3bd; color: #111; font: inherit; cursor: pointer; box-shadow: inset 1px 1px #fff, inset -1px -1px #404040, inset -2px -2px #808080; }
+.pm-btn.primary { outline: 1px solid #111; }
+.pm-btn:disabled { color: #808080; cursor: default; }
+.pm-no { width: 92px; height: auto; justify-self: center; }
+.pm-no.shake { animation: pm-shake .5s ease-in-out 2; }
+@keyframes pm-shake { 0%, 100% { transform: translateX(0) rotate(0); } 20% { transform: translateX(-9px) rotate(-6deg); } 40% { transform: translateX(9px) rotate(6deg); } 60% { transform: translateX(-6px) rotate(-4deg); } 80% { transform: translateX(6px) rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) { .pm-no.shake { animation: none; } }
+.pm-end:empty { display: none; }
+.pm-letter { padding: 14px; background: #fbf6e6; color: #1b1b1b; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
+.pm-letter h3 { margin: 4px 0 8px; font: bold 20px Georgia, serif; }
+.pm-kick { margin: 0; font: bold 12px "Courier New", monospace; color: #16532a; letter-spacing: .08em; }
+.pm-pic img { width: 100%; height: auto; display: block; margin: 6px 0; box-shadow: 0 0 0 1px #808080; }
+.pm-text { margin: 8px 0; font: 16px Georgia, serif; line-height: 1.5; }
+.pm-sign { margin: 10px 0 0; text-align: right; font-style: italic; }
+.pm-rank { margin: 10px 0 0; font-weight: bold; color: #16532a; }
+.pm-wall h4 { margin: 10px 0 4px; }
+.pm-wall ol { margin: 0; padding-left: 24px; columns: 2; }
+@media (max-width: 420px) { .pm-grid { grid-template-columns: repeat(2, 1fr); } .pm-wall ol { columns: 1; } }
+
+.pm-slot.got { padding: 2px; }
+.pm-map { width: 100%; height: auto; display: block; margin: 8px 0; box-shadow: 0 2px 6px rgba(0,0,0,.35); }
+.pm-prize { display: flex; gap: 12px; align-items: center; margin-top: 12px; }
+.pm-prize img { width: 92px; height: auto; flex: none; }
+.pm-prize .pm-rank { margin: 0; }
+
+.pm-notes:empty { display: none; }
+.pm-notes { padding: 8px 10px; background: #fffef4; color: #1b1b1b; font: 13px "Courier New", monospace; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
+.pm-notes h4 { margin: 0 0 4px; font: bold 12px Tahoma, Verdana, sans-serif; }
+.pm-notes ol { margin: 0; padding-left: 20px; }
+.pm-notes li { margin: 3px 0; }

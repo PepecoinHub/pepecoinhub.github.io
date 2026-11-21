@@ -15,8 +15,11 @@ const ALL = TRAILS.map(t => t[0]);
 // Passport progress as rumorProgress returns it
 const prog = (ids = [], lastFoundAt = null) => ({ allFoundIds: ids, foundIds: ids.filter(id => ALL.includes(id)), lastFoundAt });
 // the new puzzles' clue texts are written when the puzzles ship; tests fill them in for a moment
+// the Pond Map clues exist in the code, but only count once the server switched the map on (globalThis.__pondMapOn)
+const saved = { ...NEW_CLUES };
 const withNewClues = fn => { NEW_PUZZLES.forEach((id, i) => { NEW_CLUES[id] = 'New puzzle clue ' + (i + 1) + ', gently.'; });
-  try { return fn(); } finally { for (const id of NEW_PUZZLES) delete NEW_CLUES[id]; } };
+  globalThis.__pondMapOn = true;
+  try { return fn(); } finally { globalThis.__pondMapOn = false; Object.assign(NEW_CLUES, saved); } };
 
 test('owner schedule: the first clue on good care day 50, then one every 10 good care days', () => {
   assert.deepEqual([0, 49, 50, 59, 60, 69, 70, 100, 160].map(cluesUnlocked), [0, 0, 1, 1, 2, 2, 3, 6, 12]);

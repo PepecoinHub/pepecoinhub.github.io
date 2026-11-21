@@ -293,3 +293,6 @@ button.pp-bali:focus-visible { outline: 2px dashed #1d2a6b; outline-offset: 2px;
 .pp-gochi-soon img { image-rendering: pixelated; flex: none; }
 .pp-gochi-soon p { color: var(--pp-soft); }
 .pp-gochi-warn { color: #b22234; font-weight: 700; }
+
+/* Pond Archivist: the gold stamp for the whole Pond Map, shown on its secret row */
+.pp-secret-art { width: 46px; height: auto; flex: none; }

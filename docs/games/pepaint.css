@@ -315,3 +315,10 @@ html.paint.pt-gate #joinbox .row .btn { flex: 1 1 0; min-width: max-content; min
 html.paint.pt-gate #joinbox .row .btn.primary { flex: 1 1 100%; min-height: 40px; font: 700 15px var(--sys) !important; }
 html.paint.pt-gate #joinbox p.small { font: 12px/1.45 var(--sys); color: #333; }
 html.paint.pt-gate #msgbox .btn { margin-top: 4px; }
+
+/* Pond Map: File > Open old_sketch.bmp (connect the dots) */
+.pt-sketch-wrap { display: grid; gap: 6px; }
+.pt-sketch-file { margin: 0; font-size: 12px; color: #444; }
+.pt-sketch-scroll { overflow-x: auto; }
+.pt-sketch { display: block; width: 100%; min-width: 600px; height: auto; aspect-ratio: 3 / 1; background: #fbf6e6; box-shadow: var(--down, inset 1px 1px #808080); touch-action: pan-x; cursor: crosshair; }
+.pt-sketch-say { margin: 0; min-height: 1.3em; font-weight: bold; }

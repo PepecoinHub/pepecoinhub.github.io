@@ -12,7 +12,7 @@ import { createRumorReader } from './pepegochi-rumors.mjs?v=20261120notes3';
 import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118dialog1';
 
 import { createBond } from './pepegochi-bond.mjs?v=20261120notes3';
-import { createNotebook } from './pepegochi-notes.mjs?v=20261120notes3';
+import { createNotebook } from './pepegochi-notes.mjs?v=20261121map';
 
 import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120notes3';
 
@@ -39,7 +39,19 @@ export const ANIMS = {
   nod: { base: 'tb_adult_sleepy', frames: 4, ms: 300 },
   slouch: { base: 'tb_adult_neglected', frames: 3, ms: 300 },
   tremble: { base: 'tb_adult_packing', frames: 3, ms: 90 },
+  // PR #390 (approved 2026-11-21): care, celebration, searching, reading, and the young stages' own idle moves
+  eat: { base: 'tb_adult_sit', frames: 4, ms: 170 },
+  wash: { base: 'tb_adult_sit', frames: 4, ms: 170 },
+  sleep: { base: 'tb_adult_sit', frames: 3, ms: 380 },
+  celebrate: { base: 'tb_adult_sit', frames: 5, ms: 140 },
+  search: { base: 'tb_adult_sit', frames: 4, ms: 240 },
+  read: { base: 'tb_adult_sit', frames: 4, ms: 300 },
+  tadpole_swim: { base: 'tb_tadpole', frames: 4, ms: 200 },
+  froglet_hop: { base: 'tb_froglet', frames: 4, ms: 140 },
 };
+// what the frog just did or saw -> its own animation (only over the healthy sitting pose; otherwise the old expressions)
+export const ACTION_ANIM = { fed: 'eat', clean: 'wash', rested: 'sleep', stamp: 'celebrate', stampBatch: 'celebrate',
+  quizWin: 'celebrate', gameRecord: 'celebrate', gameMoon: 'celebrate', desktopFind: 'search', desktopGuesser: 'search', desktopNotes: 'read' };
 export const animFrames = name => Array.from({ length: ANIMS[name].frames },
   (_, i) => 'taskbar/anim/tb_' + name + '_0' + (i + 1) + '.png');
 // the room's sprite for the frog's state (frogLook) -> the taskbar pose that shows the same state
@@ -187,7 +199,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   // and no animation or running timer is needed when the browser is hidden / reduced motion is set.
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const motions = {
-    egg: ['wobble', 'bob'], tadpole: ['bob', 'peek'], froglet: ['hop', 'peek', 'shuffle'],
+    egg: ['wobble', 'bob'], tadpole: ['tadpole_swim', 'bob', 'peek'], froglet: ['froglet_hop', 'hop', 'peek', 'shuffle'],
     adult: ['hop', 'peek', 'shuffle', 'greet', 'bob'], sleepy: ['nod', 'yawn', 'bob'],
     neglected: ['slouch', 'peek'], packing: ['tremble', 'shuffle'],
     recovering: ['nod', 'bob'], letter: [],
@@ -201,6 +213,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     if (frameTimer) clearTimeout(frameTimer);
     motionTimer = restoreTimer = frameTimer = null;
     if (movement) button.classList.remove('pg-motion-' + movement);
+    img.classList.remove('pg-hop-up');
     if (movement && shownView) paint(shownView);   // back to the state pose after a frame animation
     movement = null;
   }
@@ -217,8 +230,10 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
       let i = 0;
       const step = () => {
         if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected || !showing(a.base)) { cancelMotion(); return; }
+        // the froglet's hop: the drawn frames bend the legs, a small lift in the middle frames makes it a real hop
+        if (name === 'froglet_hop') img.classList.toggle('pg-hop-up', i === 1 || i === 2);
         if (i < frames.length) { img.setAttribute('src', img_base + frames[i++] + '?v=' + POSE_VERSION); frameTimer = setTimeout(step, a.ms); }
-        else { frameTimer = null; paint(shownView); restoreTimer = setTimeout(queueMotion, 50); }
+        else { frameTimer = null; img.classList.remove('pg-hop-up'); paint(shownView); restoreTimer = setTimeout(queueMotion, 50); }
       };
       step();
       return;
@@ -234,18 +249,24 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     for (const f of (EXPRESSIONS[name] ? expressionFrames(name) : animFrames(name))) { const i = new Image(); i.src = img_base + f + '?v=' + POSE_VERSION; }
   }
   let expressionTicket = 0;
+  const framesOf = name => EXPRESSIONS[name] ? expressionFrames(name) : animFrames(name);
+  const animFor = (view, action) => {
+    const own = ACTION_ANIM[action];
+    if (own && view?.hasPet && view.adult && !view.warning && view.sprite === pose(ANIMS[own].base)) return own;
+    return expressionFor(view, action);
+  };
   function animateExpression(action) {
-    const name = expressionFor(shownView, action);
+    const name = animFor(shownView, action);
     if (!name || reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return false;
     cancelMotion(); setAct(null);
     const ticket = ++expressionTicket;
     const life = lastLife;
-    Promise.all([...new Set(expressionFrames(name))].map(f => new Promise(resolve => {
+    Promise.all([...new Set(framesOf(name))].map(f => new Promise(resolve => {
       const frame = new Image(); frame.onload = () => resolve(true); frame.onerror = () => resolve(false);
       frame.src = img_base + f + '?v=' + POSE_VERSION;
     }))).then(loaded => {
       if (ticket !== expressionTicket || disposed || life !== lastLife || reduced.matches ||
-          document.visibilityState !== 'visible' || !slot.isConnected || expressionFor(shownView, action) !== name) return;
+          document.visibilityState !== 'visible' || !slot.isConnected || animFor(shownView, action) !== name) return;
       if (loaded.every(Boolean)) playMotion(name); else queueMotion();
     });
     return true;
