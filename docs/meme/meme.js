@@ -4248,7 +4248,7 @@
   }
   if (mainEl) setTimeout(checkLetters, 1500);
   // Issue #13 (Saturday 21 Nov 2026): the last day of Pepe Guesser week 1 (4 frens can still win), the first Crown Breaker,
-  // the small ads right under it (a joke today; one day frens will remember them), the new-game poll reminder. (#12 is the Newsroom special; Newsroom issues continue at #14.)
+  // the small ads right under it (a joke today; one day frens will remember them), and a light-or-dark poll (gz13_theme). (#12 is the Newsroom special; Newsroom issues continue at #14.)
   // The kingslayer box prints only once GZ13_KS has a name (checked in Supabase: pk_kings + passport_badges).
   var GZ13_KS = { nick: 'PepeChad', id: '86c71e16-a2a8-467a-9a37-c2dc6b6400ee', stamp: true, avatar: false };
   function gazette13() {
@@ -4279,11 +4279,10 @@
       '<p>Pickaxe, barely used. The miner found Pepe Miner and never went outside again.</p>' +
       '<p>Anyone seen my seed phrase? Joking. Never share it. This ad was a test and you passed.</p>' +
       '<p>Diamond hands, two pairs, never sold. Not for sale. Obviously.</p></section>' +
-      '<section class="gz-pollsec"><p class="gz-kick">Pond Poll · reminder</p><h4>Do you want a new game? Still open!</h4>' +
-      '<p>Something new is still waiting in the back room. <b>15 YES votes and it opens for everyone, automatically.</b> Did you vote? It takes one click.</p>' +
-      '<p class="gz-ng"></p>' +
-      '<div class="gz-poll" data-poll="gz11_new_game" aria-live="polite"><p class="gz-poll-msg">Opening the ballot box…</p></div>' +
-      '<p class="gz-fine">One vote per account; guests one per network. The poll closes on Thursday 26 November, 00:00 UTC.</p></section>' +
+      '<section class="gz-pollsec"><p class="gz-kick">Pond Poll</p><h4>Light or dark? Settle it.</h4>' +
+      '<p>PondOS has both: the classic grey Windows 98 look and a dark mode for night owls. The editor wants to know which one you actually use, so he knows which one to polish first.</p>' +
+      '<div class="gz-poll" data-poll="gz13_theme" aria-live="polite"><p class="gz-poll-msg">Opening the ballot box…</p></div>' +
+      '<p class="gz-fine">One vote per account; guests one per network. The poll closes on Sunday 29 November, 00:00 UTC.</p></section>' +
       '<p class="gz-foot">Good luck tomorrow, frens. See you in the pond. 🐸 The Editor</p></article>';
   }
   // Issue #11 (Thursday 19 Nov 2026): Dissection's 13-defense Pond King record, the guest kingslayer and the Crown Breaker
