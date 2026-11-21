@@ -25,13 +25,14 @@ export const ROOM_LAMP = { src: versionSprite(HD_IMG + 'pepe_table_lamp.png'), l
 export const ROOM_HORSE = { src: versionSprite(HD_IMG + 'chrome_rocking_horse.png'), left: 590 / ROOM_W * 100, top: 386 / ROOM_H * 100, width: 72 / ROOM_W * 100, bounds: [48,52,208,236].map(n=>n/2) };
 // bumped when a room prop is redrawn under the same file name (A10: mug, duck, painting, 2026-11-15)
 export const PROP_V = SPRITE_VERSION;
-export const propSrc = id => (id === 'p_poster' ? IMG : HD_IMG) + id + '.png';
+// Keep the legacy reward ID so existing Secret Starter owners keep their collectible.
+export const propSrc = id => (id === 'p_poster' ? IMG : HD_IMG) + (id === 'floppy_disk' ? 'genesis_key' : id) + '.png';
 
 // Visible bounds in logical room pixels, measured at 30% alpha. The HD images are 2x logical size.
 const logical = box => box.map(n => n / 2);
 export const PROP_BOUNDS = { p_poster: [18,14,112,114], ...Object.fromEntries(Object.entries({
   crt_tv:[26,32,235,236], lava_lamp:[68,32,201,228], potted_plant:[41,32,220,228], rubber_duck:[68,36,185,220],
-  mug:[52,64,244,220], moon_rock:[42,72,214,248], paper_crown:[36,52,221,248], golden_fly:[49,72,212,248], floppy_disk:[48,58,204,248],
+  mug:[52,64,244,220], moon_rock:[42,72,214,248], paper_crown:[36,52,221,248], golden_fly:[49,72,212,248], floppy_disk:[46,72,210,248],
 }).map(([id,box])=>[id,logical(box)])) };
 
 // slot_id -> anchor on the 640x400 background (same numbers as the room SQL)
@@ -61,7 +62,8 @@ export const ITEMS = {
   moon_rock: { size: 11, dy: 6 },
   paper_crown: { size: 11, dy: 6 },
   golden_fly: { size: 11, dy: 6 },
-  floppy_disk: { size: 11, dy: 6 },
+  // Genesis Key hangs just below the middle of the trophy shelf, away from the other rewards.
+  floppy_disk: { size: 8, dy: 0, anchor: { x: 297, y: 202, z: 40 } },
 };
 
 // the six starter props and where they stand (starter_slot_id in the room SQL)
@@ -260,8 +262,9 @@ export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', n
   const ev = mode === 'pet' && status !== 'departed' && Object.hasOwn(RARE_ROOM, rare) ? RARE_ROOM[rare] : null;
   const items = [];
   for (const [slotId, itemId] of Object.entries(placements)) {
-    const s = SLOTS[slotId], it = ITEMS[itemId];
-    if (!s || !it) continue;
+    const slot = SLOTS[slotId], it = ITEMS[itemId];
+    if (!slot || !it) continue;
+    const s = it.anchor || slot;
     if (departed && itemId === taken) continue;
     const item = { slotId, itemId, src: propSrc(itemId) + '?v=' + PROP_V, wall: !!s.wall, z: s.z,
       left: s.x / ROOM_W * 100, top: (s.y + it.dy) / ROOM_H * 100, width: it.size };
