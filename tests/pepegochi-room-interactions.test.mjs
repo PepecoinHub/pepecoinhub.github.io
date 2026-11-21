@@ -10,7 +10,7 @@ test('only owned, visible room props get hit targets; no interactions for guest/
   for (const mode of ['adopt','departed','signin','loading']) assert.deepEqual(roomTargets({mode}, true), []);
   assert.deepEqual(roomTargets({mode:'pet'}, false).map(t => t.id), ['bed','frog']);
   const targets=roomTargets({mode:'pet',placements:fixedPlacements(['moon_rock','crt_tv'])}, true);
-  assert.deepEqual(targets.map(t=>t.id), ['moon_rock','crt_tv','bed','frog']);
+  assert.deepEqual(targets.map(t=>t.id), ['moon_rock','crt_tv','pepe_table_lamp','bed','frog']);
   for(const t of roomTargets({mode:'pet',placements:STARTER_ROOM},true)) {
     assert.ok(t.x>=0 && t.y>=0 && t.x+t.w<=100 && t.y+t.h<=100, t.id);
   }
@@ -64,7 +64,7 @@ test('bed and duck use only the existing allowed care actions; disabled actions 
 });
 
 test('props are cosmetic except an explicit TV request and the two care shortcuts', () => {
-  for (const id of ['mug','p_poster','potted_plant','moon_rock','golden_fly','floppy_disk','paper_crown','lava_lamp']) {
+  for (const id of ['mug','p_poster','potted_plant','moon_rock','golden_fly','floppy_disk','paper_crown','lava_lamp','pepe_table_lamp']) {
     const r=roomResponse(id,view()); assert.ok(r.text); assert.equal(r.care,undefined); assert.equal(r.tv,undefined);
   }
   assert.equal(roomResponse('lava_lamp',view(),{lampOn:true}).lamp,false);
@@ -75,10 +75,29 @@ test('props are cosmetic except an explicit TV request and the two care shortcut
 });
 
 test('room objects rotate ten distinct contextual replies without changing their actions',()=>{
-  for(const id of ['mug','p_poster','potted_plant','moon_rock','golden_fly','floppy_disk','paper_crown','rubber_duck','crt_tv','bed','lava_lamp']) {
+  for(const id of ['mug','p_poster','potted_plant','moon_rock','golden_fly','floppy_disk','paper_crown','rubber_duck','crt_tv','bed','lava_lamp','pepe_table_lamp']) {
     const results=Array.from({length:10},(_,propIndex)=>roomResponse(id,view(),{embedded:true,propIndex,lampOn:propIndex%2===0}));
     assert.equal(new Set(results.map(r=>r.text)).size,10,id);
     assert.ok(results.every(r=>r.care===(id==='bed'?'rest':id==='rubber_duck'?'play':undefined)),id);
+  }
+});
+
+test('Discord avatar cameos have their own first-click dialogue and local effects',()=>{
+  const lamp=roomResponse('pepe_table_lamp',view());
+  assert.equal(lamp.text,'Hey! Leave my lamp alone!');
+  assert.deepEqual(lamp.speech,{speaker:'frog',line:lamp.text});
+  assert.equal(lamp.lamp,undefined); assert.equal(lamp.care,undefined);
+  const plant=roomResponse('potted_plant',view());
+  assert.equal(plant.text,'My Lemon Tree!'); assert.equal(plant.effect,'lemon');
+  assert.equal(plant.care,undefined); assert.equal(plant.painting,undefined);
+  const duck=roomResponse('rubber_duck',view({actions:[]}));
+  assert.equal(duck.text,"Duck: I'm lost in PEP!");
+  assert.deepEqual(duck.speech,{speaker:'rubber_duck',line:"I'm lost in PEP!"});
+  assert.equal(duck.care,undefined);
+  assert.equal(roomResponse('rubber_duck',view()).care,'play');
+  for(const id of ['pepe_table_lamp','potted_plant','rubber_duck']) {
+    assert.equal(roomResponse(id,view(),{propIndex:1}).speech,undefined);
+    assert.ok(roomResponse(id,view(),{propIndex:10}).speech);
   }
 });
 
