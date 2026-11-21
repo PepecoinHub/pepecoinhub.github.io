@@ -5064,18 +5064,6 @@
   function adPx(name, cls) { return '<img class="ad-px' + (cls ? ' ' + cls : '') + '" src="../games/img/pond/' + name + '.png" alt="">'; }
   function adLilies() { return '<span class="ad-lilies" aria-hidden="true">' + ['a', 'b', 'c'].map(function (k) { return '<span>' + adPx('lily-pad-' + k) + '<i>?</i></span>'; }).join('') + '</span>'; }
   var ADS = [
-    // 20 November: Haze tips from the fren card, /tip and /airdrop, airdrops up to 600 minutes. A "professional"
-    // home-shopping channel this time (owner: like the Polish TV-shopping channels, but polished): a studio, a host,
-    // a product demo, a before/after, the set and the price. Every feature claim is true; the offer is not real.
-    { file: 'haze_direct.mpg', added: '2026-11-20', look: 'direct', ms: 5200, title: 'PEP-TV Direct: Haze tips & airdrops', ch: 'CH 24 · PEP-TV DIRECT · HOME SHOPPING', icon: 'gif-085-still', scenes: [
-      '<div class="ad-row">' + adFren('clothing_suit', 'mouth_smile', 'eyes_classic', 'hat_none', 'accessory_none') + '<div><p class="ad-kick">Good evening and welcome to PEP-TV Direct</p><h3 class="ad-big">Say thank you<br><em>in PEP.</em></h3><p class="ad-sub">Tonight in the studio: native Pepecoin tips and airdrops, right inside the LAN Party chat. Powered by Haze Wallet.</p></div></div><p class="ad-lower"><b>ON AIR</b><span>Product no. 2411 · Haze tips &amp; airdrops · LAN Party edition</span></p>',
-      '<p class="ad-kick">The problem we solved</p><div class="ad-cmp"><div><small>BEFORE</small><b>💚 Tip under every message</b><span>On a phone the buttons and drops filled the chat.</span></div><div class="is-after"><small>AFTER</small><b>Tap a name → 💚 Tip</b><span>The button lives on the fren card. Drops sit under the message box, one at a time.</span></div></div><p class="ad-lower"><b>DEMO</b><span>Requested by frens in the chat · built the same week</span></p>',
-      '<p class="ad-kick">Demonstration no. 1 · the direct tip</p><div class="ad-term"><span>/tip Lemon 500 pepe</span></div><h3 class="ad-big">Type it.<br><em>Approve it.</em></h3><p class="ad-sub">The tip review opens. You check the amount and the network fee in Haze Wallet and approve. The PEP goes from your wallet to theirs: PepecoinHub holds no balance and asks for no deposit.</p>',
-      '<p class="ad-kick">Demonstration no. 2 · the airdrop</p><div class="ad-term"><span>/airdrop 500 pepe 600m</span></div><h3 class="ad-big">Up to<br><em>600 minutes.</em></h3><p class="ad-sub">Linked frens press Join airdrop while the clock runs. When it ends, you review the payout in Haze: the pot is split evenly, up to 200 frens in one transaction. Entry is free.</p><p class="ad-lower"><b>NEW</b><span>15 · 30 · 60 · 180 · 360 · 600 minutes in the Group tips window</span></p>',
-      '<p class="ad-kick">Your set includes</p><ul class="ad-set"><li><b>💚</b>Tip from the fren card</li><li><b>⌨</b>/tip and /airdrop</li><li><b>⏱</b>Airdrops of 15 min to 10 h</li><li><b>🎉</b>A little party when PEP lands for you</li><li><b>👀</b>Tips visible to everyone in chat</li><li><b>🔐</b>You approve every payment in Haze</li></ul>',
-      adTesti(adFren('clothing_shirt_tie', 'mouth_smile', 'eyes_happy', 'hat_none', 'accessory_none'), 'I start a ten-hour airdrop before work and approve the payout in the evening. My frens just press Join. Very professional.', 'Margaret, 47, community host*') + '<p class="ad-fine">*An illustration. The ten hours are real: the longest airdrop is 600 minutes.</p>',
-      '<div class="ad-price ad-price-pro"><span>Studio price</span><s>4 × 99 PEP</s><b>0 PEP</b><small>+ only the network fee of what you send</small></div><p class="ad-kick">Available right now, in the LAN Party</p>' + adPhone('☎ NO HOTLINE · OPEN THE CHAT') + '<p class="ad-fine">Not a real offer: there is nothing to buy. Tips and airdrops are real native PEP, so send only what you mean to give. Link Haze with Discord to receive. Nobody from the pond will ever ask for your seed phrase.</p><button type="button" class="ad-cta ad-lanbtn">Open the LAN Party →</button>'
-    ] },
     // Gazette #11 poll: Pepe Gold Hook, the honest miner. Shown only once Gold Hook is open (15 YES votes or the beta flag).
     { file: 'gold_hook.mpg', added: '2026-11-19', goldhook: true, look: 'fight', kitsch: false, ms: 4800, title: 'Pepe Gold Hook: a REAL miner simulator', ch: 'CH 6 · THE MINING CHANNEL', icon: 'goldhook', scenes: [
       adBurst('NEW<br>GAME!', 'b-tr') + '<p class="ad-kick">Mining games that play themselves?</p><img class="ad-gh-logo" src="../games/img/gold-hook/ui/pm-logo-goldhook.png" alt="Pepe Gold Hook"><h3 class="ad-big">A <em>REAL</em><br>miner simulator.</h3><p class="ad-sub">No idle clicking. No offline progress. One frog, one hook and a whole lot of dirt.</p>',
@@ -5236,14 +5224,17 @@
   ADS = ADS.filter(function (ad) { return (!ad.from || AD_PREVIEW || Date.now() >= Date.parse(ad.from)) && (FREN || !ad.fren) && (GOLDHOOK || !ad.goldhook); });
   function adByFile(f) { for (var k = 0; k < ADS.length; k++) if (ADS[k].file === f) return k; return -1; }
   var adNew = function (ad) { return !!ad.added && Date.now() - Date.parse(ad.added + 'T00:00:00Z') < 21 * 864e5 && adSeen().indexOf(ad.file) < 0; };
+  var ADS_SHOWN = 7;
+  // only the 7 newest ads in the main folder can be "new"; the Archive never shows a red dot (owner, 2026-11-21)
   function adBadges() {
-    var n = ADS.filter(adNew).length;
+    var shown = adOrder().slice(0, ADS_SHOWN);
+    var n = shown.filter(function (i) { return adNew(ADS[i]); }).length;
     document.querySelectorAll('.icons a[href="#ads"]').forEach(function (a) {
       var b = a.querySelector('.ads-new');
       if (!b) { b = el('span', { class: 'ads-new mail-badge', title: 'New ads' }); a.appendChild(b); }
       b.textContent = n; b.hidden = !n;
     });
-    document.querySelectorAll('.ads-folder button[data-i]').forEach(function (b) { b.classList.toggle('is-new', adNew(ADS[+b.getAttribute('data-i')])); });
+    document.querySelectorAll('.ads-folder button[data-i]').forEach(function (b) { var i = +b.getAttribute('data-i'); b.classList.toggle('is-new', shown.indexOf(i) >= 0 && adNew(ADS[i])); });
   }
   gzAddAds();   // the Newsroom's ads from the last visit (refreshed a moment after start)
   setTimeout(adBadges, 0);
@@ -5295,17 +5286,40 @@
     }, 720);
     return A;
   }
+  // PEP-TV Ads shows the 7 newest ads (by "added"; a Newsroom ad by its publish date; undated ones count as oldest).
+  // Everything older sits in the Archive subfolder (owner, 2026-11-21), without red dots.
+  function adOrder() {
+    return ADS.map(function (ad, i) { return i; }).sort(function (a, b) {
+      var x = ADS[a].added || '', y = ADS[b].added || '';
+      return x < y ? 1 : x > y ? -1 : a - b;
+    });
+  }
+  function adIcons(list) {
+    return list.map(function (i) { var ad = ADS[i]; return '<li><button type="button" data-i="' + i + '"><img src="' + (ad.iconSrc || ico(ad.icon)) + '" alt="" width="40" height="40"><span>' + ad.file + '</span></button></li>'; }).join('');
+  }
+  function adFolderWire(A) {
+    adBadges();
+    A.body.querySelectorAll('.folder button').forEach(function (b) {
+      var go = function () { if (b.hasAttribute('data-arch')) adsArchive(); else adPlayer(+b.getAttribute('data-i')); };
+      b.addEventListener('dblclick', go);
+      b.addEventListener('click', function () { if (!matchMedia('(hover: hover) and (pointer: fine)').matches) go(); else { A.body.querySelectorAll('.folder .sel').forEach(function (x) { x.classList.remove('sel'); }); b.classList.add('sel'); } });
+      b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+    });
+  }
   function adsFolder() {
     openApp('ads', 'C:\\Pond\\PEP-TV Ads', 'pep-tv-ads', function (A) {
-      A.body.innerHTML = '<ul class="folder ads-folder">' + ADS.map(function (ad, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + (ad.iconSrc || ico(ad.icon)) + '" alt="" width="40" height="40"><span>' + ad.file + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">Late-night PEP-TV infomercials, recovered from an old VHS. Double-click one to play. The facts are real; the offers are not. A red dot marks a new one.</p>';
-      adBadges();
-      A.body.querySelectorAll('.folder button').forEach(function (b) {
-        var go = function () { adPlayer(+b.getAttribute('data-i')); };
-        b.addEventListener('dblclick', go);
-        b.addEventListener('click', function () { if (!matchMedia('(hover: hover) and (pointer: fine)').matches) go(); else { A.body.querySelectorAll('.folder .sel').forEach(function (x) { x.classList.remove('sel'); }); b.classList.add('sel'); } });
-        b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
-      });
+      var order = adOrder(), old = order.slice(ADS_SHOWN);
+      A.body.innerHTML = '<ul class="folder ads-folder">' + adIcons(order.slice(0, ADS_SHOWN)) +
+        (old.length ? '<li><button type="button" data-arch="1" class="ads-arch"><img src="img/ico/nerds-folder.webp" alt="" width="40" height="40"><span>Archive (' + old.length + ')</span></button></li>' : '') + '</ul>' +
+        '<p class="bin-tip">Late-night PEP-TV infomercials, recovered from an old VHS. Double-click one to play. The facts are real; the offers are not. A red dot marks a new one. Older tapes are in Archive.</p>';
+      adFolderWire(A);
+    }, 520);
+  }
+  function adsArchive() {
+    openApp('ads-arch', 'C:\\Pond\\PEP-TV Ads\\Archive', 'pep-tv-ads', function (A) {
+      var old = adOrder().slice(ADS_SHOWN);
+      A.body.innerHTML = '<ul class="folder ads-folder">' + adIcons(old) + '</ul><p class="bin-tip">' + (old.length ? 'Older PEP-TV tapes, newest first. Double-click one to play.' : 'The archive is empty.') + '</p>';
+      adFolderWire(A);
     }, 520);
   }
 
