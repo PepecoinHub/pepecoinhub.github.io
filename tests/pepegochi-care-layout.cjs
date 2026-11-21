@@ -13,7 +13,8 @@ async function assertCareLayout(page,width,{desktop=false}={}) {
   assert.deepEqual(info.map(x=>x.label),['Feed','Clean','Play','Rest']);
   assert.deepEqual(info.map(x=>x.need),['Hunger','Hygiene','Mood','Energy']);
   assert.ok(info.every(x=>x.value===Number(x.shownValue)&&x.value>=0&&x.value<=100));
-  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal overflow');
+  // page or iframe (FrameLocator has no evaluate): ask the document through its root element
+  assert.ok(await page.locator('html').evaluate(e=>e.scrollWidth<=e.ownerDocument.defaultView.innerWidth),'no horizontal overflow');
   assert.ok(info.every(x=>x.h>=(desktop?44:52)&&x.w>=65&&x.x>=0&&x.x+x.w<=width+1&&x.fits&&x.detail),JSON.stringify(info));
   assert.ok(info.every(x=>x.opacity==='1'),'cooldown explanations remain readable');
   assert.equal(info[0].y,info[1].y);
