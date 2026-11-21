@@ -4,12 +4,13 @@
 import { getBackend } from './backend.js?v=20261113link';
 import { LiveGame } from './pepegochi-live-view.mjs?v=20261120notes3';
 import { renderRoom, playDeparture, playRareVisitor, playFrames, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261121a12h';
-import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121a12h';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121compact';
 import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261121map';
 import { openPondMap, noteLines } from './pond-map.mjs?v=20261121map';
 // A12: the frog's diary (written by the taskbar frog or here) and the day's rare event in the room
 import { diaryFor, isSnoopHour, SNOOP_LINE } from '../../meme/pepegochi-diary.mjs?v=20261121a12';
 import { rareOfDay, localDay } from '../../meme/pepegochi-rare.mjs?v=20261121a12';
+import { renderCarePanel } from './pepegochi-care-ui.mjs?v=20261121compact';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {
@@ -22,14 +23,6 @@ const el = (tag, attrs = {}, text = null) => {
 let backend = null;
 const game = new LiveGame({ rpc: (fn, args) => backend.rpc(fn, args) });
 
-function meter(n) {
-  const row = el('div', { class: 'pgb-need' + (n.overdue ? ' is-overdue' : '') + (n.low ? ' is-low' : '') });
-  const m = el('meter', { min: 0, max: 100, low: 40, high: 90, optimum: 100, 'aria-label': n.label });
-  m.value = n.value;
-  row.append(el('span', { class: 'pgb-need-name' }, n.label), m, el('b', {}, String(n.value)));
-  if (n.note) row.append(el('small', { class: 'pgb-need-note' }, n.note));
-  return row;
-}
 
 // The frog's notes on the table (clues and other important messages), kept in this browser per account and life.
 let notesOpen = false;
@@ -103,26 +96,7 @@ function renderPet(box, p) {
   box.append(el('p', { class: 'pgb-status' }, p.statusText));
   for (const w of p.warnings) box.append(el('p', { class: 'pgb-warn' }, w));
   if (p.recovery) box.append(el('p', { class: 'pgb-warn pgb-recovery' }, p.recovery));
-  const needs = el('div', { class: 'pgb-needs' });
-  p.needs.forEach(n => needs.append(meter(n)));
-  box.append(needs);
-  const acts = el('div', { class: 'pgb-row pgb-actions' });
-  for (const a of p.actions) {
-    const b = el('button', { type: 'button', class: 'btn', 'data-act': a.kind, disabled: !a.enabled || game.busy, title: a.reason || a.label });
-    b.append(el('span', { class: 'pgb-action-label' }, a.label), el('span', { class: 'pgb-action-detail' }, a.reason || (game.busy ? 'Please wait…' : 'Ready')));
-    acts.append(b);
-  }
-  box.append(acts);
-  const g = p.goodDays;
-  const gd = el('div', { class: 'pgb-good' });
-  const prog = el('progress', { max: g.goal, 'aria-label': 'Good care days' }); prog.value = Math.min(g.count, g.goal);
-  gd.append(el('p', {}, g.progress), prog, el('p', { class: 'pgb-good-today' }, g.text));
-  if (g.blockers.length) {
-    const ul = el('ul', { class: 'pgb-list' });
-    g.blockers.forEach(x => ul.append(el('li', {}, x)));
-    gd.append(el('p', { class: 'small' }, 'Still missing for a good care day:'), ul);
-  }
-  box.append(gd);
+  box.append(...renderCarePanel(document, p, { busy: game.busy }));
   box.append(el('p', { class: 'small muted' }, p.growth));
   box.append(el('p', { class: 'small muted' }, p.deadline));
 }

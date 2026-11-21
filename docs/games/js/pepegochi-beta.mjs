@@ -4,7 +4,8 @@
 // no Passport, no stamps. The test frog is kept in this tab's sessionStorage only.
 import { BetaGame, TIME_STEPS } from './pepegochi-beta-view.mjs';
 import { renderRoom, playDeparture, playFrames, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261121a12h';
-import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121a12h';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121compact';
+import { renderCarePanel } from './pepegochi-care-ui.mjs?v=20261121compact';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {
@@ -16,41 +17,12 @@ const el = (tag, attrs = {}, text = null) => {
 const tabStorage = (() => { try { return window.sessionStorage; } catch (e) { return null; } })();
 const game = new BetaGame({ storage: tabStorage });
 
-function meter(n) {
-  const row = el('div', { class: 'pgb-need' + (n.overdue ? ' is-overdue' : '') + (n.low ? ' is-low' : '') });
-  const m = el('meter', { min: 0, max: 100, low: 40, high: 90, optimum: 100, 'aria-label': n.label });
-  m.value = n.value;
-  row.append(el('span', { class: 'pgb-need-name' }, n.label), m, el('b', {}, String(n.value)));
-  if (n.note) row.append(el('small', { class: 'pgb-need-note' }, n.note));
-  return row;
-}
 
 function renderPet(box, p) {
   box.append(el('p', { class: 'pgb-status' }, p.statusText));
   for (const w of p.warnings) box.append(el('p', { class: 'pgb-warn' }, w));
   if (p.recovery) box.append(el('p', { class: 'pgb-warn pgb-recovery' }, p.recovery));
-  const needs = el('div', { class: 'pgb-needs' });
-  p.needs.forEach(n => needs.append(meter(n)));
-  box.append(needs);
-  const acts = el('div', { class: 'pgb-row pgb-actions' });
-  for (const a of p.actions) {
-    const b = el('button', { type: 'button', class: 'btn', 'data-act': a.kind, disabled: !a.enabled, title: a.reason || a.label });
-    b.append(el('span', { class: 'pgb-action-label' }, a.label), el('span', { class: 'pgb-action-detail' }, a.reason || 'Ready'));
-    acts.append(b);
-  }
-  const all = el('button', { type: 'button', class: 'btn', 'data-all': '1' }, 'Everything it needs (test shortcut)');
-  acts.append(all);
-  box.append(acts);
-  const g = p.goodDays;
-  const gd = el('div', { class: 'pgb-good' });
-  const prog = el('progress', { max: g.goal, 'aria-label': 'Good care days' }); prog.value = Math.min(g.count, g.goal);
-  gd.append(el('p', {}, g.progress), prog, el('p', { class: 'pgb-good-today' }, g.text));
-  if (g.blockers.length) {
-    const ul = el('ul', { class: 'pgb-list' });
-    g.blockers.forEach(x => ul.append(el('li', {}, x)));
-    gd.append(el('p', { class: 'small' }, 'Still missing for a good care day:'), ul);
-  }
-  box.append(gd);
+  box.append(...renderCarePanel(document, p, { testShortcut: true }));
   box.append(el('p', { class: 'small muted' }, p.growth));
   box.append(el('p', { class: 'small muted' }, p.deadline));
 }

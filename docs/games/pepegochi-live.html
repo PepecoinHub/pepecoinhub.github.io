@@ -10,11 +10,11 @@
 <link rel="icon" href="img/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../facts.css?v=20261104coin">
 <link rel="stylesheet" href="gry.css?v=20261119opt">
-<link rel="stylesheet" href="pepegochi.css?v=20261121a12h">
+<link rel="stylesheet" href="pepegochi.css?v=20261121compact">
 <link rel="stylesheet" href="pond-map.css?v=20261121map">
 <script src="js/embed.js?v=20261103bot"></script>
 <script src="js/config.js"></script>
-<script type="module" src="js/pepegochi-live.mjs?v=20261121a12h"></script>
+<script type="module" src="js/pepegochi-live.mjs?v=20261121compact"></script>
 </head>
 <body>
 <main class="wrap pgb pgb-live" id="main">
@@ -24,7 +24,7 @@
   </section>
 
   <section class="card pgb-main" aria-labelledby="pgb-main-h">
-    <h2 id="pgb-main-h">PEPEGOCHI.EXE</h2>
+    <h2 id="pgb-main-h">Fren care</h2>
     <p id="pgb-msg" class="pgb-msg" aria-live="polite"></p>
     <div id="pgb-body"></div>
   </section>
@@ -34,15 +34,15 @@
     <div id="pgb-decor"></div>
   </section>
 
-  <section class="card pgb-rules-card" aria-labelledby="pgb-rules-h">
-    <h2 id="pgb-rules-h">How it works</h2>
+  <details class="card pgb-rules-card" aria-labelledby="pgb-rules-h">
+    <summary id="pgb-rules-h">How it works</summary>
     <ul id="pgb-rules" class="pgb-list"></ul>
-  </section>
+  </details>
 
-  <section class="card pgb-past-card" aria-labelledby="pgb-past-h">
-    <h2 id="pgb-past-h">Past Frens</h2>
+  <details class="card pgb-past-card" aria-labelledby="pgb-past-h">
+    <summary id="pgb-past-h">Past Frens</summary>
     <div id="pgb-past"></div>
-  </section>
+  </details>
 </main>
 </body>
 </html>
