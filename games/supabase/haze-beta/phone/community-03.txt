@@ -1,3 +1,6 @@
+        const readTx = (txid) => verification.readTx(txid, budget);
+        const checked = await (group ? verification.verifyGroupTransaction : verification.verifyTipTransaction)(pending, await readTx(input.txid), readTx);
+        if (checked.state === "pending") return json(200, { id: input.intent, txid: input.txid, ...checked });
         return json(200, await call(group ? "haze_group_confirm" : "haze_tip_confirm", { p_intent: input.intent, p_txid: input.txid, ...group ? {} : { p_vout: checked.vout }, p_block: checked.block, p_time: checked.time }));
       }
       return json(400, { error: "Action is outside community-v1." });
@@ -106,11 +109,4 @@ function authMessage(challenge2, address) {
     `Expires at: ${value.expiresAt}`,
     `Version: ${AUTH_VERSION}`,
     "",
-    "This signature only proves control of this address. It does not authorize a transaction."
-  ].join("\n");
-}
-
-// games/supabase/functions/haze-wallet/core.mjs
-var PEP_GENESIS = "37981c0c48b8d48965376c8a42ece9a0838daadb93ff975cb091f57f8c2a5faa";
-var isHash = (value) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
 // ==== END OF PART 3 OF 5 — next: paste part 04 at the very end ====

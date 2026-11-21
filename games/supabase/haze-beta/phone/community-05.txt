@@ -1,3 +1,8 @@
+  if (!isHash(intent.txid) || tx?.txid !== intent.txid || !Array.isArray(intent.recipients) || intent.recipients.length < 1 || intent.recipients.length > 200) fail("Invalid group transaction.");
+  const sender = pepScript(intent.sender), expected = /* @__PURE__ */ new Map();
+  let total = 0n;
+  for (const recipient of intent.recipients) {
+    const script = pepScript(recipient.address), value = atomic(recipient.amount);
     if (script === sender || expected.has(script) || value < 100000000n) fail("Invalid group recipient.");
     expected.set(script, value);
     total += value;

@@ -45,13 +45,15 @@ export function createCommunityHandler({rpc:rawRPC,authenticate,verification,hub
    }
    if(body.action==='connections'){
     if(!only(body,['version','action','revoke_id'])||(body.revoke_id!==undefined&&!UUID.test(body.revoke_id)))return json(400,{error:'Invalid connection management request.'});
-    return json(200,await rpc('community_v1_connections',{user_id:user.id,...(body.revoke_id?{revoke_id:body.revoke_id}:{})}));
+    return json(200,await rpc('community_v1_app_connections',{user_id:user.id,...(body.revoke_id?{revoke_id:body.revoke_id}:{})}));
    }
    if(body.action==='exchange'||body.action==='refresh'){
     let result;const access=secret('phc1_'),refresh=secret('phr1_');
     if(body.action==='exchange'){
-     if(!only(body,['version','action','client_id','redirect_uri','code','code_verifier'])||!credential(body.code,'phcode1_')||!/^[A-Za-z0-9_-]{43}$/.test(body.code_verifier||'')||typeof body.client_id!=='string'||typeof body.redirect_uri!=='string')return json(400,{error:'Invalid community code exchange.'});
-     result=await rpc('community_v1_exchange',{origin,client_id:body.client_id,redirect_uri:body.redirect_uri,code_hash:await hash(body.code),challenge:await challenge(body.code_verifier),access_hash:await hash(access),refresh_hash:await hash(refresh)});
+     const device=body.installation_id;
+     if(device!==undefined && (body.client_id!=='haze-native'||typeof device!=='string'||!UUID.test(device)))return json(400,{error:'Invalid mobile installation.'});
+     if(!only(body,['version','action','client_id','redirect_uri','code','code_verifier','installation_id'])||!credential(body.code,'phcode1_')||!/^[A-Za-z0-9_-]{43}$/.test(body.code_verifier||'')||typeof body.client_id!=='string'||typeof body.redirect_uri!=='string')return json(400,{error:'Invalid community code exchange.'});
+     result=await rpc(device?'community_v1_exchange_device':'community_v1_exchange',{...(device?{installation_id:device}:{}),origin,client_id:body.client_id,redirect_uri:body.redirect_uri,code_hash:await hash(body.code),challenge:await challenge(body.code_verifier),access_hash:await hash(access),refresh_hash:await hash(refresh)});
     }else{
      if(!only(body,['version','action','refresh_token'])||!credential(body.refresh_token,'phr1_'))return json(401,{error:'A limited community refresh credential is required.'});
      result=await rpc('community_v1_refresh',{origin,refresh_hash:await hash(body.refresh_token),access_hash:await hash(access),next_refresh_hash:await hash(refresh)});
