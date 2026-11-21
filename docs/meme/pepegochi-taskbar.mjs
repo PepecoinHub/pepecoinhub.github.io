@@ -546,7 +546,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
       adoptedAt: Date.parse(pet.adopted_at), fren: 'fren', rare: rareToday === 'birthday' ? null : rareToday,
       market: { change24h: q?.change_24h ?? null }, needs: pet.needs || {},
       date: { month: day.month, day: day.day, weekday: day.weekday } });
-    return fresh.length;
+    // the first page of a new diary is not news; pages about the time away are
+    return fresh.filter(pg => pg.id !== 'first_1').length;
   }
   function careError(error) {
     const message = String(error?.message || '');
