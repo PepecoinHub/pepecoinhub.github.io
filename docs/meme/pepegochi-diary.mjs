@@ -156,7 +156,7 @@ export function writeEntries(ctx) {
   const random = rng(ctx.seed >>> 0);
   const blocked = new Set((ctx.recent || []).filter(r => ctx.now - r.at < 30 * DAY).map(r => r.id));
   const { forced, pool } = situation({ ...ctx, away });
-  const used = new Set();
+  const used = new Set(), usedCats = new Set();
   const change = Number(ctx.market?.change24h);
   const days = Math.floor(away / DAY);
   const vars = { days: days >= 2 ? days : null, change: Number.isFinite(change) ? pct(change) : null,
@@ -173,11 +173,12 @@ export function writeEntries(ctx) {
   for (const cat of forced) { if (out.length >= count) break; const e = pick(cat); if (e) { used.add(e[0]); out.push(e); } }
   let guard = 0;
   while (out.length < count && guard++ < 40) {
-    const live = pool.filter(([cat]) => ENTRIES.some(([id, c, text]) => c === cat && !blocked.has(id) && !used.has(id) && fits(text)));
+    // one page per subject in a visit (three duck pages in a row read like a bug, not a diary)
+    const live = pool.filter(([cat]) => !usedCats.has(cat) && ENTRIES.some(([id, c, text]) => c === cat && !blocked.has(id) && !used.has(id) && fits(text)));
     if (!live.length) break;
     let r = random() * live.reduce((s, [, w]) => s + w, 0), cat = live[0][0];
     for (const [c, w] of live) { r -= w; if (r < 0) { cat = c; break; } }
-    const e = pick(cat); if (e) { used.add(e[0]); out.push(e); }
+    const e = pick(cat); usedCats.add(cat); if (e) { used.add(e[0]); out.push(e); }
   }
   const day = frogDay(ctx.adoptedAt, ctx.now);
   return out.map(([id, , text]) => ({ id, day, at: ctx.now, text: fill(text, vars) }));
@@ -190,9 +191,9 @@ const KEEP = 365;
 export function createDiary({ storage, now = () => Date.now() } = {}) {
   let key = null, book = { seen: 0, pages: [], read: 0 };
   const save = () => { if (key && storage) try { storage.setItem(key, JSON.stringify(book)); } catch {} };
+  // always read again: the taskbar and the room are two documents writing the same diary
   function load(owner, lifeId) {
     const next = diaryKey(owner, lifeId);
-    if (next === key) return !!key;
     key = next; book = { seen: 0, pages: [], read: 0 };
     if (!key) return false;
     try {
@@ -219,12 +220,29 @@ export function createDiary({ storage, now = () => Date.now() } = {}) {
   }
   // Still here: refresh "last seen" without writing, so a long session does not count as time away.
   function touch() { if (key) { book.seen = now(); save(); } }
+  // Read only (the room): the pages as stored now, nothing written.
+  function open(owner, lifeId) { load(owner, lifeId); return book.pages.slice(); }
   return {
-    visit, touch,
+    visit, touch, open,
     pages: () => book.pages.slice(),
     unread: () => Math.max(0, book.pages.length - book.read),
     markRead() { book.read = book.pages.length; save(); },
     totalRead: () => book.read,
     reset() { key = null; book = { seen: 0, pages: [], read: 0 }; },
   };
+}
+
+// Read only, for the room window (pepegochi-live.mjs), which never writes to the browser itself: the pages, and the
+// pages of the latest visit (written less than 12 hours ago) as "new". In PondOS the taskbar frog writes them.
+export function diaryFor(owner, lifeId, now = Date.now()) {
+  const key = diaryKey(owner, lifeId);
+  let pages = [];
+  try {
+    const raw = key ? JSON.parse(globalThis.localStorage?.getItem(key) || 'null') : null;
+    if (raw && Array.isArray(raw.pages)) pages = raw.pages.filter(p => p && Object.hasOwn(ENTRY, p.id) && Number.isFinite(p.day) &&
+      Number.isFinite(p.at) && typeof p.text === 'string');
+  } catch {}
+  const last = pages.length ? Math.max(...pages.map(p => p.at)) : null;
+  const fresh = last !== null && now - last >= 0 && now - last < 12 * HOUR ? pages.filter(p => p.at === last).length : 0;
+  return { pages, fresh };
 }

@@ -6,7 +6,7 @@ import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
 // and the hop out of the PEPEGOCHI.EXE window.
 import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261120notes3';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261120notes3';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261121a12';
 import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
 import { createRumorReader } from './pepegochi-rumors.mjs?v=20261120notes3';
 import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118dialog1';
@@ -15,6 +15,10 @@ import { createBond } from './pepegochi-bond.mjs?v=20261120notes3';
 import { createNotebook } from './pepegochi-notes.mjs?v=20261121map';
 
 import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120notes3';
+// A12 life of its own (owner spec 2026-11-21): habits on the taskbar, the diary, the day's rare event.
+import { pickHabit, habitSequence, HABITS } from './pepegochi-habits.mjs?v=20261121a12';
+import { createDiary } from './pepegochi-diary.mjs?v=20261121a12';
+import { rareOfDay, localDay } from './pepegochi-rare.mjs?v=20261121a12';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
 const NEEDS = new Set(['hunger', 'hygiene', 'mood', 'energy']);
@@ -126,6 +130,9 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   const arcade = createArcadeObserver();
   const siteEvents = createSiteEventObserver();
   const rumors = createRumorReader({ session, rpc, now });
+  const diary = createDiary({ storage, now });
+  const sessionStart = now();
+  let grassShown = false, rareToday = null, diaryFresh = 0;
   let disposed = false, lastLife = null;
   let desktop = null;
   const img_base = base + 'games/img/pepegochi/';
@@ -241,6 +248,21 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     button.classList.add('pg-motion-' + movement);
     restoreTimer = setTimeout(queueMotion, 1050);
   }
+  // A12 habit: its frames over the sitting pose (repeats and a held last frame included), then a line, then the pose again
+  function playHabit(name) {
+    if (movement) button.classList.remove('pg-motion-' + movement);
+    movement = name;
+    if (name === 'sign') grassShown = true;
+    const seq = habitSequence(name);
+    let i = 0;
+    const step = () => {
+      if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected || !showing('tb_adult_sit')) { cancelMotion(); return; }
+      if (i < seq.length) { const [f, ms] = seq[i++]; img.setAttribute('src', img_base + f + '?v=' + POSE_VERSION); frameTimer = setTimeout(step, ms); }
+      else { frameTimer = null; paint(shownView); restoreTimer = setTimeout(queueMotion, 50); }
+    };
+    step();
+    if (HABITS[name].say) conversation?.react(HABITS[name].say);
+  }
   // load the frames of the next animation while waiting, so it never flickers
   const preloaded = new Set();
   function preload(name) {
@@ -276,6 +298,21 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     if (act || desktop?.active || reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected || disposed) return;
     const choices = motions[currentMood] || motions.adult;
     if (!choices.length) return;
+    // now and then the frog does something of its own instead (A12 habits, healthy sitting adult only)
+    const habit = currentMood === 'adult' && showing('tb_adult_sit') ? pickHabit({ hour: new Date(now()).getHours(),
+      change24h: getQuote()?.change_24h ?? null, sessionMs: now() - sessionStart, grassShown, random }) : null;
+    if (habit) {
+      for (const [f] of habitSequence(habit)) { const i = new Image(); i.src = img_base + f + '?v=' + POSE_VERSION; }
+      motionTimer = setTimeout(() => {
+        motionTimer = null;
+        if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return;
+        if (conversation?.invite()) return;
+        if (desktop?.ambient()) return;
+        if (desktop?.active || act) { queueMotion(); return; }
+        playHabit(habit);
+      }, habit === 'sign' ? 1500 : 13000 + Math.floor(Math.random() * 20000));
+      return;
+    }
     const next = choices[Math.floor(Math.random() * choices.length)];
     const nextAnim = ANIMS[next] || EXPRESSIONS[next];
     if (shownView && nextAnim && showing(nextAnim.base)) preload(next);
@@ -298,7 +335,9 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     shownView = view;
     // A new server state must immediately displace a stale laugh/talk pose.
     const expressive = view.adult && view.sprite === pose('tb_adult_sit');
-    const path = img_base + (act && expressive ? pose(act) : view.sprite) + '?v=' + POSE_VERSION;
+    // the day of the tinfoil hat (A12 rare event): the healthy sitting adult wears it all day
+    const sprite = expressive && rareToday === 'tinfoil' ? pose('tb_adult_tinfoil') : view.sprite;
+    const path = img_base + (act && expressive ? pose(act) : sprite) + '?v=' + POSE_VERSION;
     if (img.getAttribute('src') !== path) img.setAttribute('src', path);
     button.setAttribute('aria-label', view.title);
     button.title = view.title;
@@ -489,10 +528,25 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     paint(view);
     const event = bond.observe(lastUser, state?.pet);
     notebook.observe(lastUser, state?.pet);
+    diaryFresh = writeDiary(state?.pet);
     const was = hatched;
     hatched = !!(state?.pet?.stage && state.pet.stage !== 'egg');
     if (hatched !== was) refreshFacts(true);
     return event;
+  }
+  // The diary (A12): a living, hatched frog writes 0-3 pages about the time the owner was away. Browser-local,
+  // read in the room (pepegochi-live.mjs). The day's rare event is decided here too (same owner + day = same event).
+  function writeDiary(pet) {
+    rareToday = null;
+    if (!lastUser || !pet?.life_id || pet.status === 'departed' || !pet.stage || pet.stage === 'egg') return 0;
+    const day = localDay(now());
+    rareToday = rareOfDay({ owner: lastUser, lifeId: pet.life_id, dayKey: day.dayKey, month: day.month, day: day.day, hour: day.hour });
+    const q = getQuote();
+    const fresh = diary.visit(lastUser, pet.life_id, {
+      adoptedAt: Date.parse(pet.adopted_at), fren: 'fren', rare: rareToday === 'birthday' ? null : rareToday,
+      market: { change24h: q?.change_24h ?? null }, needs: pet.needs || {},
+      date: { month: day.month, day: day.day, weekday: day.weekday } });
+    return fresh.length;
   }
   function careError(error) {
     const message = String(error?.message || '');
@@ -557,6 +611,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
       if (disposed || requestGeneration !== generation || !cur || !cur.discord || cur.userId !== id) return;
       const event = acceptState(state);
       if (event) conversation?.react(event);
+      else if (diaryFresh) conversation?.react('diaryNew');
     } catch (_) {
       const cur = session();
       if (disposed || requestGeneration !== generation || !cur || cur.userId !== id) return;

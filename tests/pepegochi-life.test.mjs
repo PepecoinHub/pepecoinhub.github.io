@@ -183,3 +183,61 @@ test('the trips SQL catalog matches the browser catalog', () => {
   assert.match(sql, /DRAFT: not installed anywhere/);
   assert.match(sql, /when 'short' then 0\.4 when 'long' then 0\.7 else 1/);
 });
+
+// ---------- A12 wiring: habits, room events, read-only diary ----------
+import { pickHabit, habitSequence, HABITS, HABIT_LINES, HABIT_CHANCE, GRASS_AFTER_MS } from '../docs/meme/pepegochi-habits.mjs';
+import { roomScene, RARE_ROOM } from '../docs/games/js/pepegochi-room.mjs';
+import { diaryFor } from '../docs/meme/pepegochi-diary.mjs';
+import { existsSync } from 'node:fs';
+
+test('habits: rare, context-aware, every frame exists, every line short', () => {
+  const r = rng(hash32('habits')); let n = 0;
+  for (let i = 0; i < 20000; i++) if (pickHabit({ random: r })) n++;
+  assert.ok(Math.abs(n / 20000 - HABIT_CHANCE) < .01, String(n / 20000));
+  const counts = name => { const r2 = rng(5); let c = 0; for (let i = 0; i < 20000; i++) if (pickHabit({ random: r2, ...name }) === name.want) c++; return c; };
+  assert.equal(counts({ want: 'dance', change24h: 1 }), 0); assert.ok(counts({ want: 'dance', change24h: 8 }) > 0);
+  assert.equal(counts({ want: 'shades', change24h: 1 }), 0); assert.ok(counts({ want: 'shades', change24h: -8 }) > 0);
+  assert.equal(counts({ want: 'yawn_clock', hour: 14 }), 0); assert.ok(counts({ want: 'yawn_clock', hour: 23 }) > 0);
+  assert.equal(pickHabit({ sessionMs: GRASS_AFTER_MS, random: () => .99 }), 'sign');
+  assert.notEqual(pickHabit({ sessionMs: GRASS_AFTER_MS, grassShown: true, random: () => .99 }), 'sign');
+  for (const name of Object.keys(HABITS)) for (const [f] of habitSequence(name))
+    assert.ok(existsSync(new URL('../docs/games/img/pepegochi/' + f, import.meta.url)), f);
+  assert.equal(habitSequence('dance').length, 8); assert.equal(habitSequence('sign').at(-1)[1], 2200);
+  for (const [k, l] of Object.entries(HABIT_LINES)) for (const t of l) assert.ok(t.length < 110, k);
+  for (const h of Object.values(HABITS)) if (h.say) assert.ok(HABIT_LINES[h.say], h.say);
+});
+
+test('room: the day\'s rare event changes only that day\'s picture, never a departed room', () => {
+  const duck = roomScene({ rare: 'duck_moved' }).items.filter(i => /duck/.test(i.itemId));
+  assert.deepEqual(duck.map(i => i.itemId), ['duck_outline', 'rubber_duck']);
+  assert.ok(duck[1].left < duck[0].left);
+  assert.match(roomScene({ rare: 'tinfoil' }).frog.src, /pepegochi_adult_tinfoil\.png$/);
+  assert.match(roomScene({ rare: 'tinfoil', needs: [{ need: 'hunger', value: 10 }] }).frog.src, /adult_hungry/, 'a hungry frog shows hunger, not the hat');
+  assert.ok(roomScene({ rare: 'birthday' }).items.some(i => i.itemId === 'rare_birthday'));
+  assert.equal(roomScene({ rare: 'ufo' }).rare.id, 'ufo');
+  assert.equal(roomScene({ rare: 'ufo', mode: 'departed' }).rare, null);
+  assert.equal(roomScene({ rare: 'nonsense' }).rare, null);
+  for (const e of Object.values(RARE_ROOM)) for (const f of [e.src && (e.frames ? e.src + '1.png' : e.src), e.prop, e.frog && 'pepegochi_' + e.frog + '.png'].filter(Boolean))
+    assert.ok(existsSync(new URL('../docs/games/img/pepegochi/hd/' + f, import.meta.url)), f);
+  assert.equal(roomScene({ diary: -1 }).diary, null); assert.deepEqual(roomScene({ diary: 2 }).diary, { unread: 2 });
+});
+
+test('room diary is read only: the latest visit\'s pages count as new for 12 hours', () => {
+  const s = storage(); globalThis.localStorage = s;
+  try {
+    let t = T0; const d = createDiary({ storage: s, now: () => t });
+    d.visit('u', 'l', { adoptedAt: T0 }); t += 3 * DAY; d.visit('u', 'l', { adoptedAt: T0 });
+    const r = diaryFor('u', 'l', t + HOUR);
+    assert.equal(r.pages.length, 4); assert.equal(r.fresh, 3);
+    assert.equal(diaryFor('u', 'l', t + 13 * HOUR).fresh, 0);
+    assert.deepEqual(diaryFor('u', 'other', t), { pages: [], fresh: 0 });
+    const before = JSON.stringify([...s.m]); diaryFor('u', 'l', t); assert.equal(JSON.stringify([...s.m]), before, 'reading writes nothing');
+  } finally { delete globalThis.localStorage; }
+});
+
+test('one page per subject in a visit', () => {
+  for (let seed = 0; seed < 300; seed++) {
+    const cats = writeEntries(base({ seed, lastSeen: T0 - 5 * DAY })).map(p => ENTRY[p.id].cat);
+    assert.equal(new Set(cats).size, cats.length, cats.join());
+  }
+});

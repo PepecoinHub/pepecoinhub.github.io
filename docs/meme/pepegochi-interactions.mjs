@@ -1,4 +1,5 @@
 import { TOYS, healthyCompanion, playableCompanion } from './pepegochi-personality.mjs?v=20261118dialog1';
+import { HABIT_LINES } from './pepegochi-habits.mjs?v=20261121a12';
 // Cosmetic conversations; actual needs and care history come from the server view.
 const lines = {
   stamp: ["New stamp! Your Passport is becoming dangerously official.", "Another stamp, fren. I supervised from the taskbar."],
@@ -38,6 +39,10 @@ const lines = {
   quizMiss: ["We learned something together. That's still a good day."],
   offline: ["The pond went quiet. I'll keep you company while the connection is away."],
   online: ["The pond is back! I kept your seat warm."],
+  // A12: the diary and the frog's own habits (pepegochi-habits.mjs)
+  diaryNew: ["I wrote in my diary while you were away. It is in my room. No peeking at the old pages. Okay, peek.",
+    "New diary page! Open my room to read it. It is mostly about the duck."],
+  ...HABIT_LINES,
   familiar: ["I know that gentle pat. That's my human. Unfortunately for you, I am keeping you.", "Right behind the eyes. You know me well, fren. Do not get smug.", "That's my human. Highly trained in frog maintenance.", "You know me well, fren. This is officially our patch of pond."],
   space: ["Tiny frog break. Let's just sit together for a moment."],
   news: ["PondOS has games, stamps and a whole pond of frens. Go explore!", "Check the Pond Quiz, your Fren Passport or the arcade."],

@@ -172,3 +172,18 @@ html.embed body { padding-inline: 0; }
 .pgr-pet.pgr-egg-wobble { animation:pgr-egg-wobble .42s steps(2,end) 1; }
 @keyframes pgr-egg-wobble { 0%,100% { transform:translate(-50%,calc(-1 * var(--foot))); } 25%,75% { transform:translate(-53%,calc(-1 * var(--foot))); } 50% { transform:translate(-47%,calc(-1 * var(--foot))); } }
 @media (prefers-reduced-motion: reduce) { .pgr-fx-layer { display:none; } .pgr-item.pgr-duck-bounce,.pgr-pet.pgr-egg-wobble { animation:none; } }
+
+/* A12 rare events and the diary (owner spec 2026-11-21) */
+.pgr-window { position: absolute; z-index: 5; overflow: hidden; pointer-events: none; }
+.pgr-visitor { position: absolute; display: block; image-rendering: pixelated; }
+.pgr-window-ufo .pgr-visitor { width: 122%; top: -20%; left: -120%; animation: pgr-ufo 9s steps(90, end) 1.2s infinite; }
+.pgr-window-spy_duck .pgr-visitor { width: 122%; left: -10%; bottom: -40%; animation: pgr-spy 7s steps(28, end) 1s infinite; }
+@keyframes pgr-ufo { 0% { left: -120%; top: -18%; } 45% { top: -8%; } 70% { left: 100%; top: -24%; } 100% { left: 100%; top: -24%; } }
+@keyframes pgr-spy { 0%, 100% { bottom: -40%; } 15%, 75% { bottom: -6%; } }
+.pgr-rare-item { pointer-events: none; }
+.pgr-diary { position: absolute; z-index: 60; left: 2%; bottom: 3%; padding: 3px 9px; border: 2px outset #d8d0b8; background: #f4ecd2; color: #142016; font: 700 11px/14px var(--f-mono, monospace); cursor: pointer; }
+.pgr-diary .pgr-notes-n { position: relative; display: inline-block; margin-left: 5px; top: auto; right: auto; }
+.pgr-diary:focus-visible { outline: 2px dotted #fff5a6; outline-offset: 2px; }
+.pgb-diary li { margin-bottom: .45rem; }
+.pgb-diary li small { display: block; opacity: .7; }
+@media (prefers-reduced-motion: reduce) { .pgr-window .pgr-visitor { animation: none; } .pgr-window-ufo .pgr-visitor { left: 30%; top: -10%; } .pgr-window-spy_duck .pgr-visitor { bottom: -6%; } }
