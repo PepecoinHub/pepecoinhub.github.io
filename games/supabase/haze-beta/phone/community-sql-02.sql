@@ -9,6 +9,7 @@ begin
  if s.id is null or s.revoked_at is not null or s.access_expires_at<=clock_timestamp()
  or s.expires_at<=clock_timestamp() or not coalesce(c.enabled,false)
  or not coalesce(o=any(c.origins),false) or not coalesce(required=any(s.scopes) and required=any(c.scopes),false)
+ or (c.allowed_users is not null and not s.user_id=any(c.allowed_users))
  then raise exception 'Community token expired, revoked, or missing permission.';end if;
  perform games.community_v1_user(s.user_id);
  return s;
@@ -38,6 +39,7 @@ begin
  perform pg_advisory_xact_lock(442198240);
  select * into c from games.community_clients where id=p_args->>'client_id';
  if not coalesce(c.enabled,false) or c.redirect_uri is distinct from (p_args->>'redirect_uri')
+ or (c.allowed_users is not null and not u=any(c.allowed_users))
  or coalesce(p_args->>'challenge','') !~ '^[A-Za-z0-9_-]{43}$'
  or coalesce(p_args->>'code_hash','') !~ '^[a-f0-9]{64}$'
  or to_jsonb(c.scopes) is distinct from (p_args->'scopes') then raise exception 'Community permissions changed or the request is invalid. Review again.';end if;
@@ -58,6 +60,7 @@ begin
  if g.code_hash is null or g.consumed_at is not null or g.expires_at<=clock_timestamp()
  or not coalesce(c.enabled,false) or g.client_id is distinct from (p_args->>'client_id') or g.redirect_uri is distinct from (p_args->>'redirect_uri')
  or c.redirect_uri is distinct from g.redirect_uri or not coalesce(p_args->>'origin'=any(c.origins),false)
+ or (c.allowed_users is not null and not g.user_id=any(c.allowed_users))
  or g.challenge is distinct from (p_args->>'challenge') then raise exception 'Community code is invalid, expired, or already used.';end if;
  perform games.community_v1_user(g.user_id);
  perform 1 from auth.users where id=g.user_id for no key update;

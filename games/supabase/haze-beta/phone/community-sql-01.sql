@@ -9,6 +9,9 @@ create table if not exists games.community_clients (
  id text primary key, label text not null, redirect_uri text not null,
  origins text[] not null, scopes text[] not null, enabled boolean not null default false
 );
+-- Optional per-client account allowlist (null = every allowed account). Lets one client (e.g. a mobile build in
+-- device testing) be limited to named accounts while other clients stay open. Checked on every operation.
+alter table games.community_clients add column if not exists allowed_users uuid[];
 insert into games.community_clients(id,label,redirect_uri,origins,scopes) values
  ('haze-web','Haze Wallet web','https://hazewallet.com/community-auth.html',array['https://hazewallet.com'],array['profile:read','chat:read','chat:write','wallet:link','tips:read','tips:write','groups:read','groups:write']),
  ('haze-native','Haze Wallet mobile','hazewallet://community-auth',array['capacitor://localhost','https://localhost'],array['profile:read','chat:read','chat:write','wallet:link','tips:read','tips:write','groups:read','groups:write']),

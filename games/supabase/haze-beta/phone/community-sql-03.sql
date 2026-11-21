@@ -7,7 +7,8 @@ begin
  select * into s from games.community_sessions where refresh_hash=p_args->>'refresh_hash' or previous_refresh_hash=p_args->>'refresh_hash' for update;
  select * into c from games.community_clients where id=s.client_id;
  if s.id is null or s.revoked_at is not null or s.expires_at<=clock_timestamp() or not coalesce(c.enabled,false)
- or not coalesce(p_args->>'origin'=any(c.origins),false) then return jsonb_build_object('invalid',true);end if;
+ or not coalesce(p_args->>'origin'=any(c.origins),false)
+ or (c.allowed_users is not null and not s.user_id=any(c.allowed_users)) then return jsonb_build_object('invalid',true);end if;
  if s.previous_refresh_hash=p_args->>'refresh_hash' then
   update games.community_sessions set revoked_at=clock_timestamp() where id=s.id;
   return jsonb_build_object('invalid',true);

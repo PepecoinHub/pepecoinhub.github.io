@@ -138,3 +138,15 @@ test('community dispatch preserves the current PH long-airdrop rules without rep
  const joined=await request({action:'rpc',method:'gry_haze_group_join',args:{p_id:created.body.id}},{token:recipient.access_token});assert.equal(joined.status,200,joined.body.error);
  const review=await request({action:'rpc',method:'gry_haze_group_review',args:{p_id:created.body.id}},{token:owner.access_token});assert.equal(review.status,200,review.body.error);assert.ok(Date.parse(review.body.expires_at)-Date.now()>11*3600000);assert.equal(review.body.recipients.length,1);
 });
+
+test('a per-client allowlist limits one client to named accounts while other clients stay open',async()=>{
+ const before=await session({user:1});assert.equal((await read(before.access_token)).status,200);
+ psql(`update games.community_clients set allowed_users=array[${quote(uid(2))}]::uuid[] where id='haze-web';`);
+ try{
+  assert.equal((await read(before.access_token)).status,401,'existing token of a non-listed account stops at once');
+  const denied=await request({action:'authorize',client_id:'haze-web',redirect_uri:redirect,code_challenge:await challenge('v'.repeat(43)),code_challenge_method:'S256',scopes},{origin:PH,token:'fixture.PH_FULL_SESSION_1.signature'});
+  assert.equal(denied.status,400,'a non-listed account cannot get a code');
+  assert.equal((await request({action:'refresh',refresh_token:before.refresh_token})).status,401,'nor refresh');
+  const listed=await session({user:2});assert.equal((await read(listed.access_token)).status,200,'the listed account works');
+ }finally{psql(`update games.community_clients set allowed_users=null where id='haze-web';`);}
+});
