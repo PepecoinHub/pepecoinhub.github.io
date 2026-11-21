@@ -4,7 +4,8 @@ const KEY='ph-community-consent-v1',cfg=window.PEP_GRY||{},status=document.getEl
 const consent=document.getElementById('consent'),signin=document.getElementById('signin'),approve=document.getElementById('approve'),cancel=document.getElementById('cancel');
 const names={'profile:read':'Read your public community identity','chat:read':'Read pond chat and presence','chat:write':'Post messages as you, subject to PH moderation','wallet:link':'Link your public PEP receiving address','tips:read':'Read and verify tip receipts','tips:write':'Create fixed tip requests for your approval','groups:read':'Read rounds and group receipts','groups:write':'Start or join rounds and prepare group payouts'};
 let pending=null,account=null,description=null,sb;
-const redirectOK=(client,raw)=>client==='haze-web'?raw==='https://hazewallet.com/community-auth.html':client==='haze-native'?raw==='hazewallet://community-auth':client==='haze-chrome'&&/^https:\/\/[a-p]{32}\.chromiumapp\.org\/community-auth$/.test(raw||'');
+const nativeRedirect='https://hazewallet.com/app/community-auth';
+const redirectOK=(client,raw)=>client==='haze-web'?raw==='https://hazewallet.com/community-auth.html':client==='haze-native'?raw===nativeRedirect:client==='haze-chrome'&&/^https:\/\/[a-p]{32}\.chromiumapp\.org\/community-auth$/.test(raw||'');
 function loadPending(){
  const url=new URL(location.href),fields=['client_id','redirect_uri','state','code_challenge','code_challenge_method'];
  if(url.searchParams.has('client_id')){
@@ -53,16 +54,36 @@ signin.onclick=async()=>{
   await startOAuth(sb,session,'discord',location.origin+'/games/haze-community.html',sessionStorage);
  }catch(problem){error.textContent=problem.message;signin.disabled=false;}
 };
+function returnToClient(value){
+ const target=new URL(pending.redirect_uri);
+ const params=new URLSearchParams({state:pending.state,...value});
+ sessionStorage.removeItem(KEY);
+ if(pending.client_id==='haze-native'){
+  // A user-tapped HTTPS link gives the OS a chance to open the verified app.
+  // The fragment keeps the one-use code out of the fallback HTTP request.
+  target.hash=params.toString();
+  const handoff=document.getElementById('native-return');
+  const link=document.getElementById('open-haze-app');
+  link.href=target.href;
+  consent.hidden=true;
+  handoff.hidden=false;
+  status.textContent=value.code?'Community access approved.':'Community access declined.';
+  link.focus();
+ }else{
+  target.search=params.toString();
+  location.replace(target.href);
+ }
+ pending=null;
+}
 approve.onclick=async()=>{
  approve.disabled=true;cancel.disabled=true;error.textContent='';try{
   if(!pending||!description||Date.now()-pending.createdAt>300000)throw Error('Connection expired. Start again from Haze.');
   const result=await api({action:'authorize',client_id:pending.client_id,redirect_uri:pending.redirect_uri,code_challenge:pending.code_challenge,code_challenge_method:'S256',scopes:description.scopes},true);
   if(result.redirect_uri!==pending.redirect_uri||!/^phcode1_[A-Za-z0-9_-]{43}$/.test(result.code||''))throw Error('Invalid limited community code.');
-  const target=new URL(pending.redirect_uri);target.searchParams.set('state',pending.state);target.searchParams.set('code',result.code);
-  sessionStorage.removeItem(KEY);location.replace(target.href);
+  returnToClient({code:result.code});
  }catch(problem){error.textContent=problem.message;approve.disabled=false;cancel.disabled=false;}
 };
-cancel.onclick=()=>{if(!pending)return;const target=new URL(pending.redirect_uri);target.searchParams.set('state',pending.state);target.searchParams.set('error','denied');sessionStorage.removeItem(KEY);location.replace(target.href);};
+cancel.onclick=()=>{if(pending)returnToClient({error:'denied'});};
 try{
  if(window.parent!==window)throw Error('Open PH community consent in its own browser window.');
  loadPending();
