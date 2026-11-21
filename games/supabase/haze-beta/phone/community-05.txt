@@ -1,0 +1,75 @@
+    if (script === sender || expected.has(script) || value < 100000000n) fail("Invalid group recipient.");
+    expected.set(script, value);
+    total += value;
+  }
+  if (total !== atomic(intent.total_atomic) || total > 10000000000000n) fail("The group total does not match.");
+  const out = outputs(tx, 201), found = /* @__PURE__ */ new Set();
+  let change = 0;
+  for (const output of out) {
+    if (output.hex === sender) {
+      if (++change > 1 || atomic(output.value) === 0n) fail("Unsupported group change.");
+      continue;
+    }
+    if (!expected.has(output.hex) || found.has(output.hex) || atomic(output.value) !== expected.get(output.hex)) fail("A group recipient or amount changed.");
+    found.add(output.hex);
+  }
+  if (found.size !== expected.size) fail("A group recipient is missing.");
+  if (!Number.isSafeInteger(tx.confirmations) || tx.confirmations < 0 || !Array.isArray(tx.vin) || tx.vin.length < 1 || tx.vin.length > 20) fail("Invalid group funding or confirmations.");
+  const seen = /* @__PURE__ */ new Set(), cache = /* @__PURE__ */ new Map();
+  let inputTotal = 0n;
+  for (const input of tx.vin) {
+    if (!isHash(input?.txid) || !Number.isSafeInteger(input.vout) || input.vout < 0 || input.vout > 4294967295 || seen.has(input.txid + ":" + input.vout)) fail("Invalid or repeated group input.");
+    seen.add(input.txid + ":" + input.vout);
+    if (!cache.has(input.txid)) cache.set(input.txid, await readTx(input.txid));
+    const parent = cache.get(input.txid);
+    if (parent?.txid !== input.txid) fail("Group funding transaction mismatch.");
+    const previous = outputs(parent, 1e4).find((value) => value.n === input.vout);
+    if (!previous || previous.hex !== sender) fail("Group funding did not come from the linked sender.");
+    inputTotal += atomic(previous.value);
+  }
+  if (inputTotal <= out.reduce((sum, value) => sum + atomic(value.value), 0n)) fail("Invalid group totals.");
+  if (tx.confirmations < 2) return { state: "pending", confirmations: tx.confirmations };
+  if (!isHash(tx.blockHash) || !Number.isSafeInteger(tx.blockTime) || tx.blockTime < Date.parse(intent.created_at) / 1e3 - 30 || tx.blockTime > Date.parse(intent.expires_at) / 1e3 + 7200) fail("Group payment is outside its time window.");
+  if (!Number.isFinite(Date.parse(intent.created_at)) || !Number.isFinite(Date.parse(intent.expires_at))) fail("Invalid group time window.");
+  return { state: "confirmed", block: tx.blockHash, time: tx.blockTime };
+}
+
+// games/supabase/functions/haze-community/index.ts
+var project = Deno.env.get("SUPABASE_URL") || "";
+var service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+var indexer = null;
+try {
+  const value = new URL(Deno.env.get("PEP_BLOCKBOOK_URL") || "");
+  if (value.protocol === "https:" && !value.username && !value.password && !value.search && !value.hash && value.pathname === "/") indexer = value;
+} catch {
+}
+async function read(url, init = {}) {
+  const response = await fetch(url, { ...init, redirect: "error", signal: AbortSignal.any([init.signal || AbortSignal.timeout(1e4), AbortSignal.timeout(1e4)]) });
+  const result = await boundedJSON(response.body, 2e6);
+  if (!response.ok) throw Error(typeof result.message === "string" ? result.message : "PH account service or payment reader is unavailable.");
+  return result;
+}
+var handler = createCommunityHandler({
+  rpc: (name, args, signal) => read(project + "/rest/v1/rpc/" + name, { method: "POST", signal, headers: { apikey: service, Authorization: "Bearer " + service, "Content-Type": "application/json" }, body: JSON.stringify({ p_args: args }) }),
+  authenticate: (token, signal) => read(project + "/auth/v1/user", { signal, headers: { apikey: service, Authorization: "Bearer " + token } }),
+  verification: {
+    verifyWalletProof,
+    verifyTipTransaction,
+    verifyGroupTransaction,
+    PEP_GENESIS,
+    readGenesis: async (signal) => {
+      if (!indexer) throw Error("The PH payment reader is not configured.");
+      return (await read(indexer.href + "api/v2/block/0", { signal })).hash;
+    },
+    readTx: (txid, signal) => {
+      if (!indexer) throw Error("The PH payment reader is not configured.");
+      return read(indexer.href + "api/v2/tx/" + txid, { signal });
+    }
+  }
+});
+Deno.serve((req) => {
+  if (!project || !service) return new Response(JSON.stringify({ error: "Community is not configured." }), { status: 503, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+  return handler(req);
+});
+
+// ==== END OF PART 5 OF 5 — complete file, now Deploy ====

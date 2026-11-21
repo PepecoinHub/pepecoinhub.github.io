@@ -1,0 +1,55 @@
+        const code = secret("phcode1_"), result = await rpc("community_v1_authorize", { user_id: user.id, client_id: body.client_id, redirect_uri: body.redirect_uri, challenge: body.code_challenge, code_hash: await hash(code), scopes: body.scopes });
+        return json(200, { version: VERSION, code, redirect_uri: result.redirect_uri, expires_in: result.expires_in });
+      }
+      if (body.action === "connections") {
+        if (!only(body, ["version", "action", "revoke_id"]) || body.revoke_id !== void 0 && !UUID.test(body.revoke_id)) return json(400, { error: "Invalid connection management request." });
+        return json(200, await rpc("community_v1_connections", { user_id: user.id, ...body.revoke_id ? { revoke_id: body.revoke_id } : {} }));
+      }
+      if (body.action === "exchange" || body.action === "refresh") {
+        let result;
+        const access2 = secret("phc1_"), refresh = secret("phr1_");
+        if (body.action === "exchange") {
+          if (!only(body, ["version", "action", "client_id", "redirect_uri", "code", "code_verifier"]) || !credential(body.code, "phcode1_") || !/^[A-Za-z0-9_-]{43}$/.test(body.code_verifier || "") || typeof body.client_id !== "string" || typeof body.redirect_uri !== "string") return json(400, { error: "Invalid community code exchange." });
+          result = await rpc("community_v1_exchange", { origin, client_id: body.client_id, redirect_uri: body.redirect_uri, code_hash: await hash(body.code), challenge: await challenge(body.code_verifier), access_hash: await hash(access2), refresh_hash: await hash(refresh) });
+        } else {
+          if (!only(body, ["version", "action", "refresh_token"]) || !credential(body.refresh_token, "phr1_")) return json(401, { error: "A limited community refresh credential is required." });
+          result = await rpc("community_v1_refresh", { origin, refresh_hash: await hash(body.refresh_token), access_hash: await hash(access2), next_refresh_hash: await hash(refresh) });
+          if (result.invalid) return json(401, { error: "Community connection expired or was revoked. Reconnect on PepecoinHub." });
+        }
+        return json(200, { version: VERSION, audience: AUDIENCE, token_type: "Bearer", access_token: access2, refresh_token: refresh, expires_in: result.expires_in, session_expires_at: result.session_expires_at, scope: result.scopes, user: { id: result.user_id } });
+      }
+      if (body.action === "revoke") {
+        if (!only(body, ["version", "action", "refresh_token"]) || !credential(body.refresh_token, "phr1_")) return json(400, { error: "A limited community refresh credential is required." });
+        return json(200, await rpc("community_v1_revoke", { origin, refresh_hash: await hash(body.refresh_token) }));
+      }
+      const access = /^Bearer (phc1_[A-Za-z0-9_-]{43})$/.exec(req.headers.get("authorization") || "")?.[1];
+      if (!access) return json(401, { error: "Use a limited community token. PH account sessions are not accepted here." });
+      const accessHash = await hash(access);
+      if (body.action === "rpc") {
+        if (!only(body, ["version", "action", "method", "args"]) || !Object.hasOwn(RPC_FIELDS, body.method) || !only(body.args || {}, RPC_FIELDS[body.method])) return json(403, { error: "Method or arguments are outside community-v1." });
+        if (body.method === "gry_haze_chat" && (!Array.isArray(body.args?.p_messages) || body.args.p_messages.length > 120 || body.args.p_messages.some((id) => !Number.isSafeInteger(id) || id < 0))) return json(400, { error: "Invalid message batch." });
+        const result = await rpc("community_v1_rpc", { origin, access_hash: accessHash, method: body.method, args: body.args || {} });
+        const failure2 = result?.__community_error || result?.error;
+        return typeof failure2 === "string" ? json(400, { error: failure2.slice(0, 240) }) : json(200, result);
+      }
+      if (body.action === "verify") {
+        if (!only(body, ["version", "action", "request"]) || !verification) return json(400, { error: "Unsupported community verification request." });
+        const input = body.request;
+        const call = async (method, args) => {
+          const result = await rpc("community_v1_verify", { origin, access_hash: accessHash, method, args });
+          if (typeof result?.__community_error === "string") throw Error(result.__community_error);
+          return result;
+        };
+        if (only(input, ["action", "proof"]) && input.action === "link" && typeof input.proof?.nonce === "string" && HASH.test(input.proof.nonce)) {
+          const pending2 = await call("haze_link_context", { p_nonce: input.proof.nonce });
+          const address = verification.verifyWalletProof(input.proof, pending2);
+          return json(200, await call("haze_link_finish", { p_nonce: pending2.nonce, p_address: address }));
+        }
+        if (!only(input, ["action", "intent", "txid"]) || !["check", "group-check"].includes(input.action) || !UUID.test(input.intent || "") || !HASH.test(input.txid || "")) return json(400, { error: "Invalid fixed tip verification request." });
+        const group = input.action === "group-check", pending = await call(group ? "haze_group_context" : "haze_tip_context", { p_intent: input.intent, p_txid: input.txid });
+        if (pending.confirmed) return json(200, { id: input.intent, state: "confirmed", txid: input.txid });
+        if (await verification.readGenesis(budget) !== verification.PEP_GENESIS) throw Error("The payment reader is not Pepecoin mainnet.");
+        const readTx = (txid) => verification.readTx(txid, budget);
+        const checked = await (group ? verification.verifyGroupTransaction : verification.verifyTipTransaction)(pending, await readTx(input.txid), readTx);
+        if (checked.state === "pending") return json(200, { id: input.intent, txid: input.txid, ...checked });
+// ==== END OF PART 2 OF 5 — next: paste part 03 at the very end ====
