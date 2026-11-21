@@ -83,10 +83,10 @@ export function roomResponse(id, view, { lampOn = true, busy = false, embedded =
   if (!Object.hasOwn(PROPS, id)) return null;
   if (id === 'crt_tv') return embedded ? { text: propLine(id,propIndex), tv: true } : { text: 'You can watch Pond TV on the PondOS desktop.' };
   if (id === 'lava_lamp') return { text: pick(lampOn?LAMP_OFF:LAMP_ON,Math.floor(propIndex/2)), lamp: !lampOn };
-  return { text: propLine(id,propIndex), effect: id === 'potted_plant' ? 'water' : id === 'mug' ? 'mug' : 'spark' };
+  return { text: propLine(id,propIndex), effect: id === 'potted_plant' ? 'water' : id === 'mug' ? 'mug' : 'spark', painting: id === 'p_poster' };
 }
 
-export function createRoomInteractions({ getView, isBusy, care, openTV, reduced = () => false, now = Date.now } = {}) {
+export function createRoomInteractions({ getView, isBusy, care, openTV, openPainting = () => {}, reduced = () => false, now = Date.now } = {}) {
   let life = null, lampOn = true, dispose = () => {}, lastClick = -Infinity, pats = [], patIndex = 0, propIndices = {};
   return {
     attach(frame, opts, { owned, lifeId, embedded } = {}) {
@@ -126,6 +126,8 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, reduced 
           if (result.effect) effects.play(result.effect,t,t.id==='frog'?frame.querySelector('.pgr-pet'):getItem(t.id));
           if (result.care) care(result.care);
           if (result.tv) openTV();
+          // the Golden Foot: the Pond Map window opens only if the server says this player may see it
+          if (result.painting) openPainting(text => { feedback.textContent = text; });
         };
         btn.addEventListener('click', activate);
         stage.append(btn); buttons.push(btn);

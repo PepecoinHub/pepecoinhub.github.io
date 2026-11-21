@@ -2619,3 +2619,19 @@ footer.foot a { color: #edf3e3; }
 .nt-msg { margin: 0; min-height: 1.3em; font: 400 12px/1.3 var(--f-chrome); color: var(--ink); }
 .nt-msg.err { color: #b3261e; }
 .nt-foot { margin: 0; }
+
+/* ---------- Pond Map ---------- */
+.safe-off .grass-sec { display: block; margin-top: 22px; font: 400 1.1rem var(--f-term); color: #9ee26b; }
+.safe-off .grass-sec em { display: block; margin-top: 8px; font: 700 clamp(1.4rem, 4vw, 2.4rem) var(--f-pixel); font-style: normal; color: #f2e3a0; letter-spacing: .08em; }
+.map-word { margin: 8px 0; font: 700 1.6rem "Courier New", monospace; letter-spacing: .12em; }
+.map-zip input { flex: 1; min-width: 0; }
+.ad-lost { display: flex; gap: 14px; align-items: center; animation: ad-lost-jitter 2.4s steps(1) 25; }
+.ad-lost img { width: min(42%, 220px); height: auto; filter: contrast(1.1) saturate(.85); box-shadow: 0 0 0 3px #111; }
+.ad-lost .ad-kick { color: #d23c2f; letter-spacing: .1em; }
+@keyframes ad-lost-jitter { 0%, 92%, 100% { transform: none; filter: none; } 93% { transform: translateX(-4px) skewX(3deg); filter: hue-rotate(40deg); } 95% { transform: translateX(5px); filter: grayscale(1); } 97% { transform: translateX(-2px) skewX(-2deg); } }
+@media (prefers-reduced-motion: reduce) { .ad-lost { animation: none; } }
+@media (max-width: 520px) { .ad-lost { flex-direction: column; text-align: center; } }
+.gz-small p { margin: 6px 0; padding-bottom: 6px; border-bottom: 1px dashed currentColor; font-size: .95em; }
+/* PepeGochi froglet_hop (PR #390): a 3 px lift in the middle frames; a transition, no loop */
+.pg-hop-up { transform: translateY(-3px); transition: transform .12s steps(2); }
+@media (prefers-reduced-motion: reduce) { .pg-hop-up { transform: none; } }

@@ -1989,7 +1989,7 @@
     try { gochiReceive({ kind: kind, owner: owner, ids: ids }); } catch (e) { /* cosmetic only */ }
   }
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261120notes3').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261121anim').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
         session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport, getQuote: function () { return gochiQuote; },
         commands: { games: gamesFolder, passport: frenPassport, news: bulletinApp, tv: pondTV },
@@ -2130,6 +2130,8 @@
         var q = norm(inp.value).trim();
         if (/^format\s*c:?$/.test(q)) { bsod(); return; }
         if (magicWord(q)) return;
+        if (mapOn() && /secrets?$/.test(q)) { tip.textContent = 'Try the map. It hangs behind the Golden Foot.'; return; }
+        if (mapOn() && /\d{4}|\d{1,2}[.\/-]\d{1,2}[.\/-]\d{2}/.test(q)) { mapFind(q, function () { open(hits[0]); }); return; }
         open(hits[0]);
       });
       inp.addEventListener('input', run);
@@ -2230,7 +2232,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261118crown';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261118crown'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261121map'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -2778,7 +2780,7 @@
           var ul = el('ul', {class:'pp-list'});
           list.forEach(function(x){
             var got = has(x), li = el('li', {class:'pp-row'+(got?' is-earned':'')});
-            li.appendChild(ppIcon(got ? 'box' : 'gift'));
+            li.appendChild(got && x.id === 'pond_archivist' ? el('img', { class: 'pp-secret-art', src: 'passport-assets/pond-archivist.webp', alt: '', width: '46', height: '50' }) : ppIcon(got ? 'box' : 'gift'));
             var tx = el('div'); tx.appendChild(piece('b','', got || x.status==='live' && x.hint ? (x.title||x.id) : '???'));
             tx.appendChild(piece('small','', got ? (x.description||'') : (x.hint || x.description || '')));
             li.appendChild(tx);
@@ -3257,6 +3259,50 @@
     m.appendChild(el('small')).textContent = new Date(e.earned_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
     return m;
   }
+  // ---------- Pond Map: six pieces behind the Golden Foot painting (games/supabase/update_pond_map.sql) ----------
+  // The server decides everything: whether the map is on for this player and every code and word. Nothing here
+  // knows an answer. Before the launch (map_config.open) only hosts and testers see these little doors at all.
+  var mapSt = null, mapP = null;
+  function mapState() {
+    var s = sbSession();
+    if (!s || !s.discord) return Promise.resolve(null);
+    if (!mapP) mapP = rpc('gry_map_state', {}).then(function (st) { mapSt = st; window.__pondMapOn = !!(st && st.allowed); return st; }, function () { mapP = null; return null; });
+    return mapP;
+  }
+  function mapOn(st) { st = st === undefined ? mapSt : st; return !!(st && (st.allowed || st.reason === 'locked')); }
+  setTimeout(mapState, 1500);
+  function mapWord(title, how, word) {
+    osDialog(title, '<div class="dlg-row"><img src="img/pepe-search.webp" alt="" width="96" height="96"><div><h3>' + esc(how) + '</h3>' +
+      '<p class="map-word">' + esc(word) + '</p><p class="src">A word for a slot somewhere in the pond. Remember it.</p></div></div>', [{ label: 'OK', go: true }]);
+  }
+  // Recycle Bin > map_piece.zip: the password is a number the PondOS clock shows (checked by the server, new every day)
+  function mapZip() {
+    mapState().then(function (st) {
+      if (!mapOn(st)) { osDialog('map_piece.zip', '<p>The archive is damaged and cannot be opened.</p>', [{ label: 'OK', go: true }]); return; }
+      var d = osDialog('map_piece.zip - Password', '<div class="dlg-row"><img src="img/zipper.webp" alt="" width="96" height="96"><div><h3>This archive is password protected.</h3>' +
+        '<p>Password hint, in very old handwriting: <i>how long have we been holding?</i></p>' +
+        '<form class="app-row map-zip"><input class="ac-in" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="Password"><button type="submit" class="app-btn go">Extract</button></form>' +
+        '<p class="bin-tip map-say" aria-live="polite"></p></div></div>', [{ label: 'Close' }], 'recycle-bin');
+      var f = d.querySelector('.map-zip'), say = d.querySelector('.map-say'), inp = f.querySelector('input');
+      f.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var v = inp.value.replace(/\D/g, ''); if (!v) return;
+        rpc('gry_map_unlock', { p_piece: 2, p_answer: v }).then(function (r) {
+          if (r && r.ok && r.word) { d.close(); mapWord('map_piece.zip', 'Extracted: piece_2.txt. It says one word:', r.word); return; }
+          say.textContent = r && r.wait ? 'Too many wrong passwords. The archive locks itself for 10 minutes.' : r && r.reason === 'locked' ? 'The archive will not open for you yet. Find more PondOS secrets first.' : 'Wrong password.';
+          inp.select();
+        }, function () { say.textContent = 'The archive did not answer. Try again in a moment.'; });
+      });
+      setTimeout(function () { inp.focus(); }, 30);
+    });
+  }
+  // Find: a day typed into the search box goes to the server; only the right day gives a map piece
+  function mapFind(q, otherwise) {
+    rpc('gry_map_unlock', { p_piece: 3, p_answer: q }).then(function (r) {
+      if (r && r.ok && r.word) mapWord('Find', 'Find found something that is not in any folder:', r.word); else otherwise();
+    }, otherwise);
+  }
+
   function discoverSecret(id) {
     if (!FREN) return;
     var session=sbSession();
@@ -4353,6 +4399,14 @@
       '<figure class="gz-letter"><p class="gz-letter-from"><b>Smolpepewithaquestion</b> (guest) <span class="gz-letter-ok">🖨️ OK to print</span></p>' +
       '<blockquote>Hello have you heard of Pepecoin? Is gud.</blockquote><figcaption>Sent from /meme/.</figcaption></figure>' +
       '<p class="gz-fine">The editor checked. It is gud.</p></section>' +
+      (mapOn() ? '<section class="gz-small"><p class="gz-kick">Classifieds</p><h4>Small ads</h4>' +
+      '<p>Lost: one fly, answers to Gary. Last seen near the reeds. Reward: a slightly smaller fly.</p>' +
+      '<p>In search of a hat that fits a frog head. Not a bucket. I have tried the bucket.</p>' +
+      '<p>Leaf for rent, quiet neighbours, view of the water. No toads, the landlord had a bad experience.</p>' +
+      '<p>Yeet coach available. 3000 m guaranteed or your gravity back.</p>' +
+      '<p>Pickaxe, barely used. The miner found Pepe Miner and never went outside again.</p>' +
+      '<p>Anyone seen my seed phrase? Joking. Never share it. This ad was a test and you passed.</p>' +
+      '<p>Diamond hands, two pairs, never sold. Not for sale. Obviously.</p></section>' : '') +
       '<p class="gz-foot">*Almost weekly: three days after issue #5. Close enough.</p></article>';
   }
   // Issue #7 (12 Nov 2026): the Fren Passport public beta, Thursday to Sunday; the season starts Monday 16 XI
@@ -4970,7 +5024,7 @@
         ['💻', 'legendary_laptop_receipt.pdf', '40M PEP', 'Receipt for one laptop, paid in PEP. Double-click to see what it costs today.'],
         ['🧻', 'paper_hands.exe', '∞ KB', 'Runs automatically during every dip.'],
         ['📝', 'notes.txt', '1 KB', 'A crumpled note. Somebody wrote down secrets. Double-click (or tap) to read it.', notes]
-      ];
+      ].concat(mapOn() ? [['🗜️', 'map_piece.zip', '1 KB', 'An old archive. It is locked. Double-click (or tap) to try a password.', mapZip]] : []);
       A.body.innerHTML = '<ul class="bin-list">' + FILES.map(function (f, i) { return '<li data-i="' + i + '"><span aria-hidden="true">' + f[0] + '</span><span>' + f[1] + '</span><small>' + f[2] + '</small></li>'; }).join('') + '</ul>' +
         '<p class="bin-tip">Click a file to see what is inside.</p><div class="app-row"><span class="grow">' + FILES.length + ' object(s)</span><button type="button" class="app-btn bin-empty">Empty Recycle Bin</button></div>';
       var tip = A.body.querySelector('.bin-tip');
@@ -5238,12 +5292,19 @@
   }
   gzAddAds();   // the Newsroom's ads from the last visit (refreshed a moment after start)
   setTimeout(adBadges, 0);
+  // The Pond Map: one archived broadcast is not what it used to be (only once the map is on for this player)
+  function adScenes(ad) {
+    if (ad.file !== 'better_frog.mpg' || !mapOn()) return ad.scenes;
+    var odd = '<div class="ad-lost"><img src="img/signal-lost.webp" alt="A frog in a blue shirt with a red blanket and a cup, looking at you" width="300" height="298">' +
+      '<div><p class="ad-kick">— SIGNAL INTERRUPTED —</p><h3 class="ad-big">Lost?<br><em>Looking for a secret?</em></h3><p class="ad-sub">Do you know someone with this avatar?</p></div></div>';
+    return ad.scenes.slice(0, 2).concat([odd], ad.scenes.slice(2));
+  }
   function adPlayer(i) {
     var ad = ADS[i];
     if (adNew(ad)) { try { localStorage.setItem('pondos-ads-seen', JSON.stringify(adSeen().concat(ad.file).slice(-50))); } catch (e) {} adBadges(); }
     var A = openApp('ad-' + i, ad.file + ' - Pond Media Player', 'pond-tv', function (A) {
       A.body.innerHTML = '<div class="ptv' + (ad.look ? ' look-' + ad.look : '') + (ad.kitsch ? ' kitsch' : '') + '"><div class="ptv-top"><span class="ptv-live">LIVE</span><b>PEP-TV</b><span class="ptv-ch">' + ad.ch + '</span></div>' +
-        '<div class="ptv-stage">' + ad.scenes.map(function (h, k) { return '<div class="ptv-scene' + (k ? '' : ' on') + '">' + h + '</div>'; }).join('') + '</div>' +
+        '<div class="ptv-stage">' + adScenes(ad).map(function (h, k) { return '<div class="ptv-scene' + (k ? '' : ' on') + '">' + h + '</div>'; }).join('') + '</div>' +
         '<div class="ptv-crawl"><b>PEP NOW</b><span class="ptv-run"></span></div></div>' +
         '<div class="app-row"><button type="button" class="app-btn ptv-prev">◀◀</button><button type="button" class="app-btn ptv-play" aria-pressed="true">❚❚</button><button type="button" class="app-btn ptv-next">▶▶</button><span class="grow ptv-pos"></span><span class="ptv-nfa">Not a real offer. Not financial advice.</span></div>' +
         '<div class="app-row ptv-ads"><button type="button" class="app-btn ptv-ad-prev" title="Previous ad">⏮ Previous ad</button><span class="grow ptv-adpos">Ad ' + (i + 1) + ' of ' + ADS.length + '</span><button type="button" class="app-btn ptv-ad-next" title="Next ad">Next ad ⏭</button></div>';
@@ -5373,9 +5434,29 @@
     if (startClicks === 7) { startClicks = 0; balloon('Start harder?', 'No need. A new block starts itself about every 60 seconds.', 'gif-047-still'); }
   });
   function touchGrass() {
-    var s = el('div', { class: 'safe-off', role: 'button', tabindex: '0' }, '<div>It’s now safe to touch grass.<small>click anywhere to come back</small></div>');
+    var s = el('div', { class: 'safe-off', role: 'button', tabindex: '0' }, '<div>It’s now safe to touch grass.<small>click anywhere to come back</small><b class="grass-sec" hidden></b></div>');
     document.body.appendChild(s); s.focus();
-    var back = function () { s.remove(); };
+    var timer = null;
+    var back = function () { clearInterval(timer); s.remove(); };
+    // the Pond Map: players who may open the painting see the seconds; the server keeps its own clock (69 s)
+    mapState().then(function (st) {
+      if (!st || !st.allowed || !document.body.contains(s)) return;
+      rpc('gry_map_grass', { p_end: false }).then(function () {
+        if (!document.body.contains(s)) return;
+        var sec = s.querySelector('.grass-sec'), t0 = Date.now(), asked = false;
+        sec.hidden = false; sec.textContent = '0 s';
+        timer = setInterval(function () {
+          var n = Math.floor((Date.now() - t0) / 1000);
+          if (!asked) sec.textContent = n + ' s';
+          if (n >= 69 && !asked) {
+            asked = true; clearInterval(timer);
+            rpc('gry_map_grass', { p_end: true }).then(function (r) {
+              if (r && r.ok && r.word) sec.innerHTML = '69 s. Nice. The grass whispers a word: <em>' + esc(r.word) + '</em>';
+            }, function () {});
+          }
+        }, 250);
+      }, function () {});
+    });
     s.addEventListener('click', back); s.addEventListener('keydown', back);
   }
   function shutDown() {
