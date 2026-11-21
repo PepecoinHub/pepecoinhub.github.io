@@ -4,7 +4,7 @@
 import { getBackend } from './backend.js?v=20261113link';
 import { LiveGame } from './pepegochi-live-view.mjs?v=20261120notes3';
 import { renderRoom, playDeparture, playFrames, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261120notes3';
-import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121map';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121roomjokes';
 import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261121map';
 import { openPondMap, noteLines } from './pond-map.mjs?v=20261121map';
 

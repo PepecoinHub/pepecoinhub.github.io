@@ -1,13 +1,14 @@
 // A13: local room interaction, with care delegated to the existing validated actions.
-import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX } from './pepegochi-room.mjs?v=20261120notes3';
-import { mountRoomEffects } from './pepegochi-room-fx.mjs?v=20261118room3';
+import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX, ROOM_LAMP } from './pepegochi-room.mjs?v=20261120notes3';
+import { mountRoomEffects } from './pepegochi-room-fx.mjs?v=20261121roomjokes';
 
 const PROPS = {
   p_poster: ['Inspect painting', 'Fine art. Definitely not bought at the pond flea market.'],
   crt_tv: ['Watch Pond TV', 'The remote has mysteriously disappeared. Opening Pond TV…'],
   lava_lamp: ['Toggle lava lamp', 'The finest lava in the pond.'],
-  potted_plant: ['Water plant', 'Hydrated. Unlike my portfolio.'],
-  rubber_duck: ['Play with rubber duck', 'SQUEAK. A worthy opponent.'],
+  potted_plant: ['Water plant', 'My Lemon Tree!'],
+  rubber_duck: ['Play with duck', "Duck: I'm lost in PEP!"],
+  pepe_table_lamp: ['Inspect the desk lamp', 'Hey! Leave my lamp alone!'],
   mug: ['Inspect Comfy mug', 'Emergency copium brew. No refunds.'],
   moon_rock: ['Inspect moon rock', 'Actual moon dust, probably. Do not lick.'],
   paper_crown: ['Inspect crown', 'Long live the pond. Taxes are payable in flies.'],
@@ -19,8 +20,9 @@ const PROPS = {
 export const PROP_LINES = {
   p_poster: ['My finest piece of pond art.', 'Please admire the toes responsibly.', 'The artist used only the finest foot-based inspiration.', 'This is a museum now. Admission: one fly.', 'The frame cost more than my entire wardrobe.', 'I call this masterpiece Golden Foot.', 'No touching the art. I have a very serious face.', 'Art criticism: gold, foot, excellent.', 'It belongs in a gallery. Or above my bed.'],
   crt_tv: ['The CRT is warming up. Classic.', 'Channel surfing is my favourite sport.', 'Do not adjust your set. I am naturally green.', 'The rabbit ears receive excellent pond gossip.', 'The picture looks better through a curved screen.', 'No widescreen nonsense in this room.', 'I claim the remote under frog law.', 'Prime time. Bring the snacks.', 'Pond TV: now with 100% more frog opinion.'],
-  potted_plant: ['Watered. We can both survive another day.', 'My silent roommate approves.', 'The leaves look more productive than me.', 'That is proper leaf maintenance.', 'Careful, it is not an aquarium.', 'Photosynthesis is a powerful business model.', 'The plant has no complaints. Suspicious.', 'I named it Leaf.exe.', 'A little water, a lot of vibes.'],
-  rubber_duck: ['SQUEAK. The duck has spoken.', 'The duck challenges me to a duel.', 'Our rubber friend takes recreation seriously.', 'That squeak was in stereo.', 'An elite opponent. Very yellow.', 'The duck refuses to elaborate.', 'I appoint the duck recreation manager.', 'SQUEAK.EXE is responding.', 'A true fren never abandons the duck.'],
+  potted_plant: ['Watered. We can both survive another day.', 'My silent roommate approves.', 'The leaves look more productive than me.', 'That is proper leaf maintenance.', 'Careful, it is not an aquarium.', 'Photosynthesis is a powerful business model.', 'The plant has no complaints. Suspicious.', 'Hydrated. Unlike my portfolio.', 'A little water, a lot of vibes.'],
+  rubber_duck: ['SQUEAK. The duck has spoken.', 'The duck challenges me to a duel.', 'Our little friend takes recreation seriously.', 'That squeak was in stereo.', 'An elite opponent. Very yellow.', 'The duck refuses to elaborate.', 'I appoint the duck recreation manager.', 'SQUEAK.EXE is responding.', 'A true fren never abandons the duck.'],
+  pepe_table_lamp: ['It is a lamp. A perfectly normal lamp.', 'Very normal lighting equipment, fren.', 'Nothing to see here.', 'It came with the lampshade. Obviously.', 'The lamp is off duty.', 'Please admire the lighting from a distance.', 'Certified home decor.', 'Ask the duck, not me.', 'Definitely not a suspicious lamp.'],
   mug: ['Vintage mug. Modern amounts of copium.', 'The microwave is not included.', 'This mug has seen many red candles.', 'The secret ingredient is being comfy.', 'Steam detected. Frog supervision active.', 'Official office fuel. Not for tadpoles.', 'No flies were roasted in this brew.', 'It says Comfy, so it must work.', 'The mug is warmer than my old monitor.'],
   moon_rock: ['A rock with impressive travel history.', 'It is not a cheese sample. Probably.', 'One small hop for a frog.', 'I have no idea how to dust lunar dust.', 'A souvenir from somewhere above the pond.', 'The moon rocks. Literally.', 'Do not drop that on my toes.', 'A very prestigious pebble.', 'Gravity and I have an understanding.'],
   paper_crown: ['The crown is extremely official cardboard.', 'Your royal frog accepts compliments.', 'A kingdom of one frog and a duck.', 'My coronation was catered with flies.', 'The royal crown is not waterproof.', 'Please address me as Your Comfiness.', 'The throne is just my cushion.', 'Keep the crown away from the lava lamp.', 'Long live the royal nap.'],
@@ -41,6 +43,11 @@ export function roomTargets(opts, owned = false) {
     const [l,t,r,b] = PROP_BOUNDS[item.itemId], iw = item.width, ih = iw * ROOM_W / ROOM_H;
     out.push({ id: item.itemId, label: PROPS[item.itemId][0], x: item.left - iw/2 + iw*l/128,
       y: item.top - (item.wall ? ih/2 : ih) + ih*t/128, w: iw*(r-l)/128, h: ih*(b-t)/128, z: item.z + 2 });
+  }
+  if (owned) {
+    const [l,t,r,b] = ROOM_LAMP.bounds, w = ROOM_LAMP.width, h = w * ROOM_W / ROOM_H;
+    out.push({ id:'pepe_table_lamp', label:PROPS.pepe_table_lamp[0], x:ROOM_LAMP.left-w/2+w*l/128,
+      y:ROOM_LAMP.top-h+h*t/128, w:w*(r-l)/128, h:h*(b-t)/128, z:51 });
   }
   // Only the exposed left edge of the bed is clickable; the frog keeps its own hit area.
   out.push({ id: 'bed', label: 'Help your frog rest', x: 34.3, y: 63, w: 8.4, h: 20, z: 65 });
@@ -77,21 +84,24 @@ export function roomResponse(id, view, { lampOn = true, busy = false, embedded =
     const kind = id === 'bed' ? 'rest' : 'play';
     const action = p.actions?.find(a => a.kind === kind);
     const effect = id === 'rubber_duck' ? 'duck' : undefined;
-    if (action?.enabled) return { text: id === 'bed' ? pick(BED,propIndex) : propLine('rubber_duck',propIndex), care: kind, effect };
-    return { text: (id === 'bed' ? 'No nap right now.' : propLine('rubber_duck',propIndex)) + (action?.reason ? ` (${action.reason})` : ''), effect };
+    const speech = id==='rubber_duck' && propIndex%10===0 ? { speaker:'rubber_duck', line:"I'm lost in PEP!" } : undefined;
+    if (action?.enabled) return { text: id === 'bed' ? pick(BED,propIndex) : propLine('rubber_duck',propIndex), care: kind, effect, speech };
+    return { text: (id === 'bed' ? 'No nap right now.' : propLine('rubber_duck',propIndex)) + (action?.reason ? ` (${action.reason})` : ''), effect, speech };
   }
   if (!Object.hasOwn(PROPS, id)) return null;
   if (id === 'crt_tv') return embedded ? { text: propLine(id,propIndex), tv: true } : { text: 'You can watch Pond TV on the PondOS desktop.' };
   if (id === 'lava_lamp') return { text: pick(lampOn?LAMP_OFF:LAMP_ON,Math.floor(propIndex/2)), lamp: !lampOn };
-  return { text: propLine(id,propIndex), effect: id === 'potted_plant' ? 'water' : id === 'mug' ? 'mug' : 'spark', painting: id === 'p_poster' };
+  if (id === 'pepe_table_lamp') return { text:propLine(id,propIndex), effect:'spark', speech:propIndex%10===0 ? {speaker:'frog',line:PROPS[id][1]} : undefined };
+  if (id === 'potted_plant') return { text:propLine(id,propIndex), effect:'lemon', speech:propIndex%10===0 ? {speaker:'frog',line:PROPS[id][1]} : undefined };
+  return { text: propLine(id,propIndex), effect: id === 'mug' ? 'mug' : 'spark', painting: id === 'p_poster' };
 }
 
 export function createRoomInteractions({ getView, isBusy, care, openTV, openPainting = () => {}, reduced = () => false, now = Date.now } = {}) {
-  let life = null, lampOn = true, dispose = () => {}, lastClick = -Infinity, pats = [], patIndex = 0, propIndices = {};
+  let life = null, lampOn = true, dispose = () => {}, lastClick = -Infinity, pats = [], patIndex = 0, propIndices = {}, lastSpeech = null;
   return {
     attach(frame, opts, { owned, lifeId, embedded } = {}) {
       dispose();
-      if (life !== lifeId) { life = lifeId; lampOn = true; lastClick = -Infinity; pats=[]; patIndex=0; propIndices={}; }
+      if (life !== lifeId) { life = lifeId; lampOn = true; lastClick = -Infinity; pats=[]; patIndex=0; propIndices={}; lastSpeech=null; }
       const doc = frame.ownerDocument, stage = frame.querySelector('.pgr');
       const targets = roomTargets(opts, owned);
       if (!targets.length) return;
@@ -99,6 +109,22 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
       feedback.className = 'pgr-response'; feedback.setAttribute('role', 'status');
       feedback.textContent = 'Click your Fren or something in the room.';
       frame.append(feedback);
+      let speechBubble = null, speechTimer = null;
+      const clearSpeech = () => { if (speechTimer !== null) clearTimeout(speechTimer); speechTimer=null; speechBubble?.remove(); speechBubble=null; };
+      function showSpeech() {
+        clearSpeech();
+        if (!lastSpeech || lastSpeech.until<=now()) return;
+        const t=targets.find(t=>t.id===lastSpeech.speaker);
+        if (!t) return;
+        speechBubble=doc.createElement('div'); speechBubble.className='pgr-joke-bubble';
+        speechBubble.setAttribute('aria-hidden','true'); speechBubble.textContent=lastSpeech.line;
+        speechBubble.style.left=Math.max(25,Math.min(75,t.x+t.w/2))+'%';
+        speechBubble.style.top=Math.max(18,t.y-2)+'%'; stage.append(speechBubble);
+        feedback.textContent=lastSpeech.text;
+        speechTimer=setTimeout(clearSpeech,Math.max(0,lastSpeech.until-now()));
+      }
+      // Preserve the duck's line if accepted play causes the room to redraw.
+      showSpeech();
       const getItem = id => frame.querySelector(`[data-item="${id}"]`);
       function paintLamp() {
         const lamp = getItem('lava_lamp');
@@ -120,6 +146,8 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
           const result = roomResponse(t.id, getView(), { lampOn, busy: isBusy(), embedded, patIndex, patBurst:pats.length, propIndex:propIndices[t.id]||0 });
           if (!result) return;
           lastClick = at; feedback.textContent = result.text; propIndices[t.id]=(propIndices[t.id]||0)+1;
+          lastSpeech=result.speech ? {...result.speech,text:result.text,until:at+3500} : null;
+          showSpeech();
           if (t.id==='frog') { pats.push(at); if (result.effect==='pet') patIndex++; }
           if (result.lamp !== undefined) { lampOn = result.lamp; paintLamp(); }
           effects.clear();
@@ -134,8 +162,8 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
         const shortcut = doc.createElement('button'); shortcut.type = 'button'; shortcut.className = 'pgr-shortcut';
         shortcut.textContent = t.label; shortcut.addEventListener('click', activate); list.append(shortcut);
       }
-      dispose = () => { effects.dispose(); buttons.forEach(b => b.remove()); feedback.remove(); shortcuts.remove(); };
+      dispose = () => { clearSpeech(); effects.dispose(); buttons.forEach(b => b.remove()); feedback.remove(); shortcuts.remove(); };
     },
-    dispose() { dispose(); life = null; lampOn = true; lastClick = -Infinity; pats=[]; patIndex=0; propIndices={}; },
+    dispose() { dispose(); life = null; lampOn = true; lastClick = -Infinity; pats=[]; patIndex=0; propIndices={}; lastSpeech=null; },
   };
 }

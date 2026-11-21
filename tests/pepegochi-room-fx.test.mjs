@@ -48,3 +48,16 @@ test('reduced motion skips effects and does not leave timers or classes',()=>{
  const f=fixture(), c=mountRoomEffects(f.stage,{...f.timers,reduced:()=>true});
  assert.equal(c.play('pet',target,f.sprite),false);assert.equal(f.stage.children.length,1);assert.equal(f.jobs.size,0);c.dispose();
 });
+
+test('lemon tree makes three temporary copies of the existing lemon after watering',()=>{
+  const p=roomEffectPlan('lemon',target);
+  assert.equal(p.points.length,4); assert.equal(p.fruits.length,3);
+  assert.ok(p.fruits.every(f=>f.delay>=350&&f.delay<p.ms&&f.x>=25&&f.x<=35&&f.y>=40&&f.y<=60));
+  const f=fixture(), c=mountRoomEffects(f.stage,f.timers);
+  assert.equal(c.play('lemon',target,f.sprite),true);
+  const layer=f.stage.children[1];
+  assert.equal(layer.children.filter(n=>n.className==='pgr-fx pgr-fx-lemon').length,3);
+  assert.equal(layer.children.filter(n=>n.className==='pgr-fx pgr-fx-drop').length,4);
+  f.advance(2900); assert.equal(layer.isConnected,false); assert.equal(f.jobs.size,0);
+  assert.equal(f.sprite.classList.contains('pgr-watered'),false); c.dispose();
+});

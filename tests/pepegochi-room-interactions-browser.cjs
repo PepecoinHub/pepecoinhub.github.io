@@ -49,7 +49,7 @@ const server=http.createServer((req,res)=>{
   await page.route('**/*',r=>{if(r.request().url().startsWith(base+'/'))return r.continue();external.push(r.request().url());return r.abort();});
   await page.goto(base+'/');
   const frame=page.frameLocator('iframe');const button=id=>frame.locator(`[data-room-action="${id}"]`);
-  await button('lava_lamp').waitFor();assert.equal(await frame.locator('.pgr-hotspot').count(),10);
+  await button('lava_lamp').waitFor();assert.equal(await frame.locator('.pgr-hotspot').count(),11);
   await frame.locator('.pgr-pet').evaluate(i=>i.decode());
   assert.equal(await frame.locator('.pgr-pet').evaluate(i=>i.naturalWidth),256);
   await frame.locator('[data-item="crt_tv"]').evaluate(i=>i.decode());
@@ -57,10 +57,15 @@ const server=http.createServer((req,res)=>{
   await frame.locator('[data-room-action="frog"]').click();assert.match(await frame.locator('.pgr-response').textContent(),/Pat accepted/);
   await page.waitForTimeout(310);await button('lava_lamp').click();assert.equal(await frame.locator('.pgr-lamp-off').count(),1);
   await page.waitForTimeout(310);await button('lava_lamp').focus();await page.keyboard.press('Enter');assert.equal(await frame.locator('.pgr-lamp-off').count(),0);
-  await page.waitForTimeout(310);await button('potted_plant').click();assert.match(await frame.locator('.pgr-response').textContent(),/Hydrated/);
+  await page.waitForTimeout(310);await button('pepe_table_lamp').click();assert.match(await frame.locator('.pgr-joke-bubble').textContent(),/Leave my lamp alone/);
+  assert.equal(await frame.locator('.pgr-lamp-off').count(),0);
+  if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await frame.locator('.pgr-frame').screenshot({path:path.join(process.env.PEPEGOCHI_QA_SCREENSHOTS,'room-joke-lamp.png')});
+  await page.waitForTimeout(310);await button('potted_plant').click();assert.match(await frame.locator('.pgr-response').textContent(),/My Lemon Tree!/);
   assert.equal(await frame.locator('.pgr-fx-layer').count(),0,'reduced motion disables particles');
   await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForTimeout(310);await button('potted_plant').click();
-  assert.equal(await frame.locator('.pgr-fx-drop').count(),4);await frame.locator('.pgr-fx-layer').waitFor({state:'detached'});
+  assert.equal(await frame.locator('.pgr-fx-drop').count(),4);assert.equal(await frame.locator('.pgr-fx-lemon').count(),3);
+  if(process.env.PEPEGOCHI_QA_SCREENSHOTS) { await page.waitForTimeout(1250); await frame.locator('.pgr-frame').screenshot({path:path.join(process.env.PEPEGOCHI_QA_SCREENSHOTS,'room-joke-lemons.png')}); }
+  await frame.locator('.pgr-fx-layer').waitFor({state:'detached'});
   await page.waitForTimeout(310);await button('frog').click();assert.equal(await frame.locator('.pgr-fx-heart').count(),3);
   await page.waitForTimeout(310);await button('mug').click();assert.equal(await frame.locator('.pgr-fx-heart').count(),0);assert.equal(await frame.locator('.pgr-fx-steam').count(),2);
   await frame.locator('.pgr-fx-layer').waitFor({state:'detached'});await page.emulateMedia({reducedMotion:'reduce'});
@@ -78,6 +83,9 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(310);await button('bed').focus();await page.keyboard.press('Enter');assert.deepEqual(await actions(),['rest']);
   // User can still reach the normal care buttons and the existing server rules own the actual result.
   const play=frame.locator('[data-act="play"]');assert.equal(await play.count(),1);
+  await page.waitForTimeout(310);await button('rubber_duck').click();assert.match(await frame.locator('.pgr-response').textContent(),/I'm lost in PEP!/);
+  assert.match(await frame.locator('.pgr-joke-bubble').textContent(),/I'm lost in PEP!/);
+  if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await frame.locator('.pgr-frame').screenshot({path:path.join(process.env.PEPEGOCHI_QA_SCREENSHOTS,'room-joke-duck.png')});
   for(const width of [900,390,320]){
    await page.setViewportSize({width,height:900});await button('frog').scrollIntoViewIfNeeded();const b=await frame.locator('.pgr-frame').boundingBox();assert.ok(b.width<=width);
    const care=await assertCareLayout(frame,width,{desktop:width>=680});assert.match(care[3].detail,/ready in/);assert.equal(care[3].disabled,true);
@@ -90,7 +98,9 @@ const server=http.createServer((req,res)=>{
    await page.waitForTimeout(310);await button('frog').click();if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await page.screenshot({path:require('node:path').join(process.env.PEPEGOCHI_QA_SCREENSHOTS,`room-live-${width}.png`)});
   }
   await page.evaluate(()=>closeRoom());assert.equal(await page.locator('iframe').count(),0);
-  await page.goto(base+'/games/pepegochi-live.html?empty=1&embed=1');await page.locator('[data-room-action="frog"]').waitFor();assert.equal(await page.locator('.pgr-hotspot').count(),2);assert.equal(await page.locator('[data-room-action="crt_tv"]').count(),0);
+  await page.goto(base+'/games/pepegochi-live.html?empty=1&embed=1');await page.locator('[data-room-action="frog"]').waitFor();
+  assert.deepEqual(await page.locator('.pgr-hotspot').evaluateAll(nodes=>nodes.map(n=>n.dataset.roomAction).sort()),['bed','frog','pepe_table_lamp']);
+  await page.locator('[data-room-action="pepe_table_lamp"]').click();assert.match(await page.locator('.pgr-response').textContent(),/Leave my lamp alone/);
   // the frog's notes lie on the side table; a click opens NOTES.TXT with both, keyboard reachable
   await page.goto(base+'/games/pepegochi-live.html?empty=1&notes=1&embed=1');await page.locator('[data-notes]').waitFor();
   assert.equal(await page.locator('[data-notes]').getAttribute('aria-label'),'2 notes from your Fren. Read them');
