@@ -17,7 +17,7 @@ import { readFileSync } from 'node:fs';
 import { inflateSync } from 'node:zlib';
 import { basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SPRITE_BOUNDS, PROP_BOUNDS, ROOM_LAMP, CARE, WALK } from '../docs/games/js/pepegochi-room.mjs';
+import { SPRITE_BOUNDS, PROP_BOUNDS, ROOM_LAMP, ROOM_HORSE, CARE, WALK } from '../docs/games/js/pepegochi-room.mjs';
 
 export const FORMATS = {
   A: { size: 128, grid: 2, maxColours: 64, foot: 124 },
@@ -29,6 +29,7 @@ const HD_BOX = new Map([
   ...Object.entries(SPRITE_BOUNDS).map(([id,b])=>[`pepegochi_${id}.png`,b]),
   ...Object.entries(PROP_BOUNDS).filter(([id])=>id!=='p_poster').map(([id,b])=>[id+'.png',b]),
   ['pepe_table_lamp.png',ROOM_LAMP.bounds],
+  ['chrome_rocking_horse.png',ROOM_HORSE.bounds],
 ]);
 const HD_FILES = new Set([...HD_BOX.keys(), ...Object.values(CARE).flat().map(id=>id+'.png'), ...Object.values(WALK).flatMap(w=>[...w.turn,...w.walk])]);
 

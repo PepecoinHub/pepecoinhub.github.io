@@ -10,7 +10,7 @@ test('only owned, visible room props get hit targets; no interactions for guest/
   for (const mode of ['adopt','departed','signin','loading']) assert.deepEqual(roomTargets({mode}, true), []);
   assert.deepEqual(roomTargets({mode:'pet'}, false).map(t => t.id), ['bed','frog']);
   const targets=roomTargets({mode:'pet',placements:fixedPlacements(['moon_rock','crt_tv'])}, true);
-  assert.deepEqual(targets.map(t=>t.id), ['moon_rock','crt_tv','pepe_table_lamp','bed','frog']);
+  assert.deepEqual(targets.map(t=>t.id), ['moon_rock','crt_tv','pepe_table_lamp','chrome_rocking_horse','bed','frog']);
   for(const t of roomTargets({mode:'pet',placements:STARTER_ROOM},true)) {
     assert.ok(t.x>=0 && t.y>=0 && t.x+t.w<=100 && t.y+t.h<=100, t.id);
   }
@@ -64,7 +64,7 @@ test('bed and duck use only the existing allowed care actions; disabled actions 
 });
 
 test('props are cosmetic except an explicit TV request and the two care shortcuts', () => {
-  for (const id of ['mug','p_poster','potted_plant','moon_rock','golden_fly','floppy_disk','paper_crown','lava_lamp','pepe_table_lamp']) {
+  for (const id of ['mug','p_poster','potted_plant','moon_rock','golden_fly','floppy_disk','paper_crown','lava_lamp','pepe_table_lamp','chrome_rocking_horse']) {
     const r=roomResponse(id,view()); assert.ok(r.text); assert.equal(r.care,undefined); assert.equal(r.tv,undefined);
   }
   assert.equal(roomResponse('lava_lamp',view(),{lampOn:true}).lamp,false);
@@ -75,7 +75,7 @@ test('props are cosmetic except an explicit TV request and the two care shortcut
 });
 
 test('room objects rotate ten distinct contextual replies without changing their actions',()=>{
-  for(const id of ['mug','p_poster','potted_plant','moon_rock','golden_fly','floppy_disk','paper_crown','rubber_duck','crt_tv','bed','lava_lamp','pepe_table_lamp']) {
+  for(const id of ['mug','p_poster','potted_plant','moon_rock','golden_fly','floppy_disk','paper_crown','rubber_duck','crt_tv','bed','lava_lamp','pepe_table_lamp','chrome_rocking_horse']) {
     const results=Array.from({length:10},(_,propIndex)=>roomResponse(id,view(),{embedded:true,propIndex,lampOn:propIndex%2===0}));
     assert.equal(new Set(results.map(r=>r.text)).size,10,id);
     assert.ok(results.every(r=>r.care===(id==='bed'?'rest':id==='rubber_duck'?'play':undefined)),id);
@@ -83,6 +83,10 @@ test('room objects rotate ten distinct contextual replies without changing their
 });
 
 test('Discord avatar cameos have their own first-click dialogue and local effects',()=>{
+  const horse=roomResponse('chrome_rocking_horse',view());
+  assert.equal(horse.text,'One horsepower. Zero miles per hour.');
+  assert.equal(horse.effect,'horse'); assert.equal(horse.care,undefined);
+  assert.deepEqual(horse.speech,{speaker:'frog',line:horse.text});
   const lamp=roomResponse('pepe_table_lamp',view());
   assert.equal(lamp.text,'Hey! Leave my lamp alone!');
   assert.deepEqual(lamp.speech,{speaker:'frog',line:lamp.text});
