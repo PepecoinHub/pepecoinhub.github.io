@@ -5785,8 +5785,21 @@
       pop.querySelector('.emo-tabs').addEventListener('click', function (e) { var b = e.target.closest('[data-t]'); if (!b) return; tab = b.getAttribute('data-t'); q.value = ''; paintEmo(); });
       q.addEventListener('input', paintEmo);
       q.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); var f = grid.querySelector('[data-e]'); if (f) f.click(); } });
+      // the picker floats over the bottom of the chat, right above the message box, at a fixed height. In the window's
+      // own flow it pushed the message box out of view on a phone, the window scrolled, and with the keyboard up the
+      // emotes ended up drawn over the messages without their search bar (Lemon, iPhone video, 2026-11-21).
+      var placePop = function () {
+        if (pop.hidden) return;
+        var body = A.body, br = body.getBoundingClientRect(), fr = form.getBoundingClientRect(), lr = log.getBoundingClientRect();
+        var bottom = fr.top - br.top + body.scrollTop - 4, room = Math.max(0, fr.top - Math.max(lr.top, br.top) - 8);
+        var h = Math.round(Math.min(340, Math.max(170, room)));
+        pop.style.height = h + 'px'; pop.style.top = Math.max(body.scrollTop + 4, bottom - h) + 'px';
+      };
+      window.addEventListener('resize', placePop);
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', placePop);
+      if (window.ResizeObserver) new ResizeObserver(placePop).observe(log);
       eb.addEventListener('click', function () {
-        pop.hidden = !pop.hidden; eb.setAttribute('aria-expanded', String(!pop.hidden));
+        pop.hidden = !pop.hidden; eb.setAttribute('aria-expanded', String(!pop.hidden)); placePop();
         if (!pop.hidden) loadPepeEmotes().then(function () { if (!tab) tab = recent().length ? 'recent' : 'pepe'; paintEmo(); });
       });
       pop.addEventListener('click', function (e) {

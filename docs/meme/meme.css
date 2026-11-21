@@ -1321,6 +1321,11 @@ footer.foot a { color: #edf3e3; }
 }
 
 .lan-form .lan-nick { flex: 0 1 110px; }
+/* LAN Party emote picker: floats above the message box over the bottom of the chat (placed by meme.js) */
+.lan-win .emo-pop { position: absolute; z-index: 6; left: 8px; right: 8px; display: flex; flex-direction: column; box-shadow: inset 1px 1px 0 var(--chrome-hi), inset -1px -1px 0 var(--chrome-dk), 2px 3px 0 rgba(0,0,0,.35); }
+.lan-win .emo-pop[hidden] { display: none; }
+.lan-win .emo-pop .emo-head { flex: none; }
+.lan-win .emo-pop .emo-grid { flex: 1 1 auto; min-height: 0; max-height: none; align-content: start; }
 .pane > .sec.off img { display: none; }   /* pictures in the hidden sections of a book window load when the section opens */
 
 /* folder file names: wrap inside their own column instead of running into the next one */
