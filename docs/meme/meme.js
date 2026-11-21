@@ -4223,7 +4223,7 @@
   }
 
   // ---------- Frog Mail: the Pond Gazette, a weekly paper in a mailbox in the tray ----------
-  var MAIL_ISSUE = 11, MAIL_KEY = 'pondos-mail-read';
+  var MAIL_ISSUE = 13, MAIL_KEY = 'pondos-mail-read';
   var WP_LAUNCH = Date.parse('2026-11-03T00:00:00Z');   // Pepe Guesser opens for everyone (the Gazette and the PEP-TV ad count down to it)
   function launchText() {
     var ms = WP_LAUNCH - Date.now();
@@ -4247,6 +4247,45 @@
     return rpc('gry_letters', { p_limit: 200 }).then(function (j) { letterBox = j && j.letters ? j : null; paintMail(); return letterBox; }, function () { return null; });
   }
   if (mainEl) setTimeout(checkLetters, 1500);
+  // Issue #13 (Saturday 21 Nov 2026): the last day of Pepe Guesser week 1 (4 frens can still win), the first Crown Breaker,
+  // the small ads right under it (a joke today; one day frens will remember them), the new-game poll reminder. (#12 is the Newsroom special; Newsroom issues continue at #14.)
+  // The kingslayer box prints only once GZ13_KS has a name (checked in Supabase: pk_kings + passport_badges).
+  var GZ13_KS = { nick: 'PepeChad', id: '86c71e16-a2a8-467a-9a37-c2dc6b6400ee', stamp: true, avatar: false };
+  function gazette13() {
+    var wk = [['Lemon', 29996], ['PepeChad', 29820], ['Grandma_Toad', 28751], ['cHaY', 27735], ['Maatsu', 24557]];
+    var gap = function (x) { return x[1] === wk[0][1] ? 'leads' : fmt.int(wk[0][1] - x[1]) + ' behind'; };
+    var ks = GZ13_KS.nick ? '<section class="gz-wp"><p class="gz-kick">Pond King</p><h4>🗡️ The first Crown Breaker</h4>' +
+      '<div class="gz-wpbox"><img src="passport-assets/crown-breaker.webp" alt="The Crown Breaker stamp" width="110" height="110"><div>' +
+      '<p>Remember the reign record from issue #11? Dissection\'s 13 lasted two days. Then the editor himself sat on the throne for <b>13 hours</b> and beat back <b>18 challengers</b>. Embarrassing, frankly. Somebody had to do something.</p>' +
+      '<p>On Saturday at 05:19 UTC somebody did: ' + who(GZ13_KS.nick, true, GZ13_KS.id) + ' took the crown, logged in with Discord this time, and became the <b>first frog ever to earn the Crown Breaker stamp</b>' +
+      (GZ13_KS.avatar ? ', and the <b>Crown Breaker Knight</b> avatar is already on.' : '. The <b>Crown Breaker Knight</b> avatar is waiting in the Avatar Maker.') + ' The editor salutes you. Through gritted teeth.</p>' +
+      '<p>And he is not done: tomorrow he chases Lemon for the Pepe Guesser title, <b>176 points</b> behind. A crown on Saturday, a trophy on Sunday?</p></div></div>' +
+      '<p class="gz-avarow"><img src="avatar-assets/thumbs/special_crown_breaker.webp" alt="The Crown Breaker Knight avatar" width="72" height="72"><span>The Crown Breaker Knight: wanted, one brave fren. Found!</span></p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-king">Challenge the Pond King →</button><button type="button" class="app-btn gz-pass">Open your Fren Passport</button></div></section>' : '';
+    return '<article class="gazette"><header><p class="gz-top"><span>Issue #13</span><span>Price: 0 PEP</span><span>Weekend edition</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+      '<section class="gz-breaking"><p class="gz-flash">Final day</p><h4>Tomorrow decides it: 4 frens can still win week 1</h4>' +
+      '<p>Pepe Guesser week 1 ends when <b>Sunday 22 November</b> ends, at <b>23:59 UTC</b>. One photo left, up to <b>5,000 points</b>, and <b>5,000 PEP</b> for the Weekly Champion.</p>' +
+      '<p>The board as the presses rolled on Saturday evening (UTC):</p>' +
+      '<ol class="gz-top5">' + wk.map(function (x) { return '<li><b>' + esc(x[0]) + '</b><span>' + fmt.int(x[1]) + ' · ' + gap(x) + '</span></li>'; }).join('') + '</ol>' +
+      '<p><b>Lemon</b> leads by just 176 points. <b>PepeChad</b> needs one good pin, <b>Grandma_Toad</b> one great pin, and <b>cHaY</b> a near-perfect day and a little luck. Maatsu is more than one photo away, so it is a four-frog race.</p>' +
+      '<p>And remember: <b>a tie at the top means no winner</b>. Every point counts. Today\'s photo still counts too, so if you have not played it yet, go.</p>' +
+      '<div class="app-row"><button type="button" class="app-btn go gz-wpgo">Play today\'s photo →</button><button type="button" class="app-btn gz-hof">Hall of Fame</button></div></section>' +
+      ks +
+      '<section class="gz-small"><p class="gz-kick">Classifieds</p><h4>Small ads</h4>' +
+      '<p>Lost: one fly, answers to Gary. Last seen near the reeds. Reward: a slightly smaller fly.</p>' +
+      '<p>In search of a hat that fits a frog head. Not a bucket. I have tried the bucket.</p>' +
+      '<p>Leaf for rent, quiet neighbours, view of the water. No toads, the landlord had a bad experience.</p>' +
+      '<p>Yeet coach available. 3000 m guaranteed or your gravity back.</p>' +
+      '<p>Pickaxe, barely used. The miner found Pepe Miner and never went outside again.</p>' +
+      '<p>Anyone seen my seed phrase? Joking. Never share it. This ad was a test and you passed.</p>' +
+      '<p>Diamond hands, two pairs, never sold. Not for sale. Obviously.</p></section>' +
+      '<section class="gz-pollsec"><p class="gz-kick">Pond Poll · reminder</p><h4>Do you want a new game? Still open!</h4>' +
+      '<p>Something new is still waiting in the back room. <b>15 YES votes and it opens for everyone, automatically.</b> Did you vote? It takes one click.</p>' +
+      '<p class="gz-ng"></p>' +
+      '<div class="gz-poll" data-poll="gz11_new_game" aria-live="polite"><p class="gz-poll-msg">Opening the ballot box…</p></div>' +
+      '<p class="gz-fine">One vote per account; guests one per network. The poll closes on Thursday 26 November, 00:00 UTC.</p></section>' +
+      '<p class="gz-foot">Good luck tomorrow, frens. See you in the pond. 🐸 The Editor</p></article>';
+  }
   // Issue #11 (Thursday 19 Nov 2026): Dissection's 13-defense Pond King record, the guest kingslayer and the Crown Breaker
   // stamp, Naux finds all 12 secrets (+ Jack's letter), the new-game poll (15 YES opens Pepe Gold Hook), Pepe Guesser week 1
   var GZ11_KING = { bg: 'bg_snow', hat: 'hat_crown', eyes: 'eyes_angry', mouth: 'mouth_tongue', special: 'special_king', clothing: 'clothing_blue', accessory: 'accessory_none', schema_version: 2 };
@@ -4399,14 +4438,6 @@
       '<figure class="gz-letter"><p class="gz-letter-from"><b>Smolpepewithaquestion</b> (guest) <span class="gz-letter-ok">🖨️ OK to print</span></p>' +
       '<blockquote>Hello have you heard of Pepecoin? Is gud.</blockquote><figcaption>Sent from /meme/.</figcaption></figure>' +
       '<p class="gz-fine">The editor checked. It is gud.</p></section>' +
-      (mapOn() ? '<section class="gz-small"><p class="gz-kick">Classifieds</p><h4>Small ads</h4>' +
-      '<p>Lost: one fly, answers to Gary. Last seen near the reeds. Reward: a slightly smaller fly.</p>' +
-      '<p>In search of a hat that fits a frog head. Not a bucket. I have tried the bucket.</p>' +
-      '<p>Leaf for rent, quiet neighbours, view of the water. No toads, the landlord had a bad experience.</p>' +
-      '<p>Yeet coach available. 3000 m guaranteed or your gravity back.</p>' +
-      '<p>Pickaxe, barely used. The miner found Pepe Miner and never went outside again.</p>' +
-      '<p>Anyone seen my seed phrase? Joking. Never share it. This ad was a test and you passed.</p>' +
-      '<p>Diamond hands, two pairs, never sold. Not for sale. Obviously.</p></section>' : '') +
       '<p class="gz-foot">*Almost weekly: three days after issue #5. Close enough.</p></article>';
   }
   // Issue #7 (12 Nov 2026): the Fren Passport public beta, Thursday to Sunday; the season starts Monday 16 XI
@@ -4556,6 +4587,7 @@
   // ---------- The Gazette archive: issues #2–#10 live in this file, newer ones come from the Newsroom (Supabase) ----------
   // update_gazette_newsroom.sql: gry_gazette_list (numbers, titles, ads), gry_gazette_issue (one issue).
   var GZ_BUILTIN = [
+    { num: 13, title: 'Final day: 4 frens can still win', at: '2026-11-21' },
     { num: 11, title: '13 in a row, 12 secrets, a new game?', at: '2026-11-19' }, { num: 10, title: 'We are live', at: '2026-11-17' }, { num: 9, title: 'Week 1 pays double', at: '2026-11-15' },
     { num: 8, title: 'The week 1 poll', at: '2026-11-14' }, { num: 7, title: 'The Pond goes BETA', at: '2026-11-12' },
     { num: 6, title: 'X unblocked us, the first faucet payout, 1 km', at: '2026-11-09' },
@@ -4587,7 +4619,7 @@
     if (!force && gzRemote.t && Date.now() - gzRemote.t < 6e5) return Promise.resolve(gzRemote);
     return rpc('gry_gazette_list', {}).then(function (j) {
       if (!j || !Array.isArray(j.issues)) return gzRemote;
-      gzRemote = { issues: j.issues.filter(function (x) { return +x.num > 11; }), ads: Array.isArray(j.ads) ? j.ads : [], t: Date.now() };
+      gzRemote = { issues: j.issues.filter(function (x) { return +x.num > 11 && +x.num !== 13; }), ads: Array.isArray(j.ads) ? j.ads : [], t: Date.now() };
       try { localStorage.setItem(GZ_CACHE, JSON.stringify(gzRemote)); } catch (e) {}
       gzAddAds(); paintMail();
       if (apps.mail && apps.mail.paintDial) apps.mail.paintDial();
@@ -4793,7 +4825,7 @@
         var issue = +String(v).replace(/^gz/, '') || gzLatest();
         if (issue < 2) issue = gzLatest();
         cur = issue; paintDial();
-        if (issue > MAIL_ISSUE) {   // from the Newsroom
+        if (issue > MAIL_ISSUE || issue === 12) {   // from the Newsroom (#12 is a Newsroom special between built-in #11 and #13)
           pane.innerHTML = '<article class="gazette"><p class="gz-foot">Fetching issue #' + issue + ' from the printing press…</p></article>';
           rpc('gry_gazette_issue', { p_num: issue }).then(function (is) {
             if (cur !== issue) return;
@@ -4802,7 +4834,7 @@
           }, function () { if (cur === issue) pane.innerHTML = '<article class="gazette"><p class="gz-foot">The printing press is not answering. Try again in a minute.</p></article>'; });
           return;
         }
-        pane.innerHTML = issue === 11 ? gazette11() : issue === 10 ? gazette10() : issue === 9 ? gazette9() : issue === 8 ? gazette8() : issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
+        pane.innerHTML = issue === 13 ? gazette13() : issue === 11 ? gazette11() : issue === 10 ? gazette10() : issue === 9 ? gazette9() : issue === 8 ? gazette8() : issue === 7 ? gazette7() : issue === 6 ? gazette6() : issue === 5 ? gazette5() : issue === 4 ? gazette4() : issue === 2 ? '<article class="gazette"><header><p class="gz-top"><span>Issue #2</span><span>Price: 0 PEP</span><span>Weekly, soon</span></p><h3>The Pond Gazette</h3><p class="gz-sub">All the news that fits in a pond</p></header>' +
         '<p class="gz-stop">🚧 Under construction. The presses are still warming up.</p>' +
         '<section><p class="gz-kick">Front page</p><h4>Hello world!</h4>' +
         '<p>Welcome to the very first Pond Gazette. This pond is being built while you read this: new apps, games and pages land almost every day, and we are just getting started.</p>' +
