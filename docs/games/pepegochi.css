@@ -125,6 +125,7 @@ html.embed body { padding-inline: 0; }
 .pgr-house-sign { position:absolute; z-index:2; left:4.375%; top:12%; width:12.5%; padding:1.25% .5%; background:#253e38; border:2px solid #a28a51; box-shadow:2px 2px #172a27; color:#d3c597; text-align:center; white-space:pre-line; font:700 clamp(4px,1.25cqw,8px)/1.5 monospace; letter-spacing:.04em; pointer-events:none; }
 .pgr-item:not(.pgr-wall) { filter:drop-shadow(2px 3px 0 #14282066); }
 .pgr-fixed-lamp { z-index:49; transform:translate(-50%,-100%); filter:drop-shadow(2px 3px 0 #14282066); }
+.pgr-fixed-horse { z-index:69; transform:translate(-50%,-100%); transform-origin:50% 92.1875%; filter:drop-shadow(2px 3px 0 #14282066); }
 .pgr-room-lights-off .pgr-fixed-lamp { filter:brightness(.6) drop-shadow(2px 3px 0 #14282066); }
 .pgr-wall { filter:drop-shadow(2px 2px 0 #14282066); }
 
@@ -159,6 +160,7 @@ html.embed body { padding-inline: 0; }
 .pgr-fx-heart { background:#f47d85; clip-path:polygon(0 20%,20% 20%,20% 0,40% 0,40% 20%,60% 20%,60% 0,80% 0,80% 20%,100% 20%,100% 60%,80% 60%,80% 80%,60% 80%,60% 100%,40% 100%,40% 80%,20% 80%,20% 60%,0 60%); animation:pgr-fx-rise .65s steps(5,end) both; }
 .pgr-fx-drop { width:clamp(5px,1.4cqw,9px); background:#6ed5ed; clip-path:polygon(40% 0,60% 0,60% 20%,80% 20%,80% 40%,100% 40%,100% 80%,80% 80%,80% 100%,20% 100%,20% 80%,0 80%,0 40%,20% 40%,20% 20%,40% 20%); animation:pgr-fx-fall .52s steps(5,end) both; }
 .pgr-fx-spark { background:#f3d57a; clip-path:polygon(40% 0,60% 0,60% 40%,100% 40%,100% 60%,60% 60%,60% 100%,40% 100%,40% 60%,0 60%,0 40%,40% 40%); animation:pgr-fx-twinkle .45s steps(3,end) both; }
+.pgr-fx-chrome { background:#f5faff; clip-path:polygon(40% 0,60% 0,60% 40%,100% 40%,100% 60%,60% 60%,60% 100%,40% 100%,40% 60%,0 60%,0 40%,40% 40%); animation:pgr-fx-twinkle .45s steps(3,end) both; }
 .pgr-fx-squeak { background:#fff3bc; clip-path:polygon(0 40%,100% 0,100% 25%,0 65%); animation:pgr-fx-squeak .55s steps(5,end) both; }
 .pgr-fx-steam { width:clamp(5px,1.8cqw,11px); background:#e3e8db; clip-path:polygon(40% 0,80% 0,80% 40%,60% 40%,60% 60%,40% 60%,40% 100%,0 100%,0 60%,20% 60%,20% 40%,40% 40%); animation:pgr-fx-rise .7s steps(6,end) both; }
 .pgr-fx-lemon { width:clamp(9px,3cqw,19px); aspect-ratio:38/54; background:url('img/pepegochi/hd/lemon-face-fx.png') center/contain no-repeat; image-rendering:pixelated; animation:pgr-lemon-grow 2.1s steps(4,end) both; }
@@ -168,7 +170,9 @@ html.embed body { padding-inline: 0; }
 @keyframes pgr-fx-twinkle { 0%,100% { opacity:0; } 25%,70% { opacity:1; } }
 @keyframes pgr-fx-squeak { 0% { opacity:1; transform:translateX(0); } 75% { opacity:1; } 100% { opacity:0; transform:translateX(70%); } }
 .pgr-item.pgr-duck-bounce { animation:pgr-duck-hop .56s steps(4,end) 1; }
+.pgr-fixed-horse.pgr-horse-rock { animation:pgr-horse-rock .8s steps(2,end) 1; }
+@keyframes pgr-horse-rock { 0%,50%,100% { transform:translate(-50%,-100%) rotate(0deg); } 25% { transform:translate(-50%,-100%) rotate(-5deg); } 75% { transform:translate(-50%,-100%) rotate(5deg); } }
 @keyframes pgr-duck-hop { 0%,100% { transform:translate(-50%,-100%); } 25%,75% { transform:translate(-50%,-109%); } 50% { transform:translate(-50%,-100%); } }
 .pgr-pet.pgr-egg-wobble { animation:pgr-egg-wobble .42s steps(2,end) 1; }
 @keyframes pgr-egg-wobble { 0%,100% { transform:translate(-50%,calc(-1 * var(--foot))); } 25%,75% { transform:translate(-53%,calc(-1 * var(--foot))); } 50% { transform:translate(-47%,calc(-1 * var(--foot))); } }
-@media (prefers-reduced-motion: reduce) { .pgr-fx-layer { display:none; } .pgr-item.pgr-duck-bounce,.pgr-pet.pgr-egg-wobble { animation:none; } }
+@media (prefers-reduced-motion: reduce) { .pgr-fx-layer { display:none; } .pgr-item.pgr-duck-bounce,.pgr-pet.pgr-egg-wobble,.pgr-fixed-horse.pgr-horse-rock { animation:none; } }

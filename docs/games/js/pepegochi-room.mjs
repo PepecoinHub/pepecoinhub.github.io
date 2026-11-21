@@ -21,6 +21,8 @@ export const BACKGROUND = HD_IMG + 'room_pond_den_v1.png';
 // A fixed architectural decoration, like the house sign, not a Passport reward or inventory item.
 // The shade and base sit to the left of the existing lava lamp on the dresser.
 export const ROOM_LAMP = { src: versionSprite(HD_IMG + 'pepe_table_lamp.png'), left: 47 / ROOM_W * 100, top: 227 / ROOM_H * 100, width: 80 / ROOM_W * 100, bounds: [75,12,180,236].map(n=>n/2) };
+// Chrom's little ride: fixed decor, sized slightly smaller than the duck, on the free foreground floor.
+export const ROOM_HORSE = { src: versionSprite(HD_IMG + 'chrome_rocking_horse.png'), left: 590 / ROOM_W * 100, top: 386 / ROOM_H * 100, width: 72 / ROOM_W * 100, bounds: [48,52,208,236].map(n=>n/2) };
 // bumped when a room prop is redrawn under the same file name (A10: mug, duck, painting, 2026-11-15)
 export const PROP_V = SPRITE_VERSION;
 export const propSrc = id => (id === 'p_poster' ? IMG : HD_IMG) + id + '.png';
@@ -293,6 +295,8 @@ export function renderRoom(doc, opts = {}) {
   sign.textContent = 'NO FUD\nAFTER BEDTIME'; art.append(sign);
   const lamp = mk('img', 'pgr-fixed-lamp'); lamp.src = ROOM_LAMP.src; lamp.alt = '';
   pos(lamp, ROOM_LAMP.left, ROOM_LAMP.top, ROOM_LAMP.width); art.append(lamp);
+  const horse = mk('img', 'pgr-fixed-horse'); horse.src = ROOM_HORSE.src; horse.alt = ''; horse.dataset.item = 'chrome_rocking_horse';
+  pos(horse, ROOM_HORSE.left, ROOM_HORSE.top, ROOM_HORSE.width); art.append(horse);
   for (const it of sc.items) {
     const im = mk('img', 'pgr-item' + (it.wall ? ' pgr-wall' : ''));
     im.src = it.src; im.alt = ''; im.dataset.slot = it.slotId; im.dataset.item = it.itemId;

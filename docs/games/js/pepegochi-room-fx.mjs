@@ -5,6 +5,7 @@ const FX = {
   water: { art:'drop', pose:'pgr-watered', ms:950, points:[[.24,.06,0],[.52,.02,120],[.78,.12,220],[.42,.06,320]] },
   lemon: { art:'drop', pose:'pgr-watered', ms:2900, points:[[.24,.06,0],[.52,.02,120],[.78,.12,220],[.42,.06,320]], fruits:[[.25,.32,350],[.54,.15,550],[.77,.37,750]] },
   duck: { art:'squeak', pose:'pgr-duck-bounce', ms:750, points:[[.78,.24,0],[.84,.12,100]] },
+  horse: { art:'chrome', pose:'pgr-horse-rock', ms:900, points:[[.25,.86,140],[.72,.9,380]] },
   spark: { art:'spark', ms:750, points:[[.2,.18,0],[.78,.3,160],[.48,.06,260]] },
   mug: { art:'steam', ms:950, points:[[.4,.12,0],[.62,.08,180]] },
 };

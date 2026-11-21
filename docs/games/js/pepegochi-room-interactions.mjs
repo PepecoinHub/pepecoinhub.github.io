@@ -1,6 +1,6 @@
 // A13: local room interaction, with care delegated to the existing validated actions.
-import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX, ROOM_LAMP } from './pepegochi-room.mjs?v=20261120notes3';
-import { mountRoomEffects } from './pepegochi-room-fx.mjs?v=20261121roomjokes';
+import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX, ROOM_LAMP, ROOM_HORSE } from './pepegochi-room.mjs?v=20261121chrom';
+import { mountRoomEffects } from './pepegochi-room-fx.mjs?v=20261121chrom';
 
 const PROPS = {
   p_poster: ['Inspect painting', 'Fine art. Definitely not bought at the pond flea market.'],
@@ -9,6 +9,7 @@ const PROPS = {
   potted_plant: ['Water plant', 'My Lemon Tree!'],
   rubber_duck: ['Play with duck', "Duck: I'm lost in PEP!"],
   pepe_table_lamp: ['Inspect the desk lamp', 'Hey! Leave my lamp alone!'],
+  chrome_rocking_horse: ['Rock the toy horse', 'One horsepower. Zero miles per hour.'],
   mug: ['Inspect Comfy mug', 'Emergency copium brew. No refunds.'],
   moon_rock: ['Inspect moon rock', 'Actual moon dust, probably. Do not lick.'],
   paper_crown: ['Inspect crown', 'Long live the pond. Taxes are payable in flies.'],
@@ -23,6 +24,7 @@ export const PROP_LINES = {
   potted_plant: ['Watered. We can both survive another day.', 'My silent roommate approves.', 'The leaves look more productive than me.', 'That is proper leaf maintenance.', 'Careful, it is not an aquarium.', 'Photosynthesis is a powerful business model.', 'The plant has no complaints. Suspicious.', 'Hydrated. Unlike my portfolio.', 'A little water, a lot of vibes.'],
   rubber_duck: ['SQUEAK. The duck has spoken.', 'The duck challenges me to a duel.', 'Our little friend takes recreation seriously.', 'That squeak was in stereo.', 'An elite opponent. Very yellow.', 'The duck refuses to elaborate.', 'I appoint the duck recreation manager.', 'SQUEAK.EXE is responding.', 'A true fren never abandons the duck.'],
   pepe_table_lamp: ['It is a lamp. A perfectly normal lamp.', 'Very normal lighting equipment, fren.', 'Nothing to see here.', 'It came with the lampshade. Obviously.', 'The lamp is off duty.', 'Please admire the lighting from a distance.', 'Certified home decor.', 'Ask the duck, not me.', 'Definitely not a suspicious lamp.'],
+  chrome_rocking_horse: ['No wheels. Still chromed.', 'Chrom approved.', 'My tiny ride has excellent suspension.', 'Zero emissions. Maximum horsepower.', 'Rocking, not rolling.', 'The chrome deserves a polish.', 'A very respectable set of rockers.', 'All shine, no speed.', 'I call it my luxury ride.'],
   mug: ['Vintage mug. Modern amounts of copium.', 'The microwave is not included.', 'This mug has seen many red candles.', 'The secret ingredient is being comfy.', 'Steam detected. Frog supervision active.', 'Official office fuel. Not for tadpoles.', 'No flies were roasted in this brew.', 'It says Comfy, so it must work.', 'The mug is warmer than my old monitor.'],
   moon_rock: ['A rock with impressive travel history.', 'It is not a cheese sample. Probably.', 'One small hop for a frog.', 'I have no idea how to dust lunar dust.', 'A souvenir from somewhere above the pond.', 'The moon rocks. Literally.', 'Do not drop that on my toes.', 'A very prestigious pebble.', 'Gravity and I have an understanding.'],
   paper_crown: ['The crown is extremely official cardboard.', 'Your royal frog accepts compliments.', 'A kingdom of one frog and a duck.', 'My coronation was catered with flies.', 'The royal crown is not waterproof.', 'Please address me as Your Comfiness.', 'The throne is just my cushion.', 'Keep the crown away from the lava lamp.', 'Long live the royal nap.'],
@@ -48,6 +50,9 @@ export function roomTargets(opts, owned = false) {
     const [l,t,r,b] = ROOM_LAMP.bounds, w = ROOM_LAMP.width, h = w * ROOM_W / ROOM_H;
     out.push({ id:'pepe_table_lamp', label:PROPS.pepe_table_lamp[0], x:ROOM_LAMP.left-w/2+w*l/128,
       y:ROOM_LAMP.top-h+h*t/128, w:w*(r-l)/128, h:h*(b-t)/128, z:51 });
+    const horse = ROOM_HORSE, [hl,ht,hr,hb]=horse.bounds, hw=horse.width, hh=hw*ROOM_W/ROOM_H;
+    out.push({ id:'chrome_rocking_horse', label:PROPS.chrome_rocking_horse[0], x:horse.left-hw/2+hw*hl/128,
+      y:horse.top-hh+hh*ht/128, w:hw*(hr-hl)/128, h:hh*(hb-ht)/128, z:71 });
   }
   // Only the exposed left edge of the bed is clickable; the frog keeps its own hit area.
   out.push({ id: 'bed', label: 'Help your frog rest', x: 34.3, y: 63, w: 8.4, h: 20, z: 65 });
@@ -92,6 +97,7 @@ export function roomResponse(id, view, { lampOn = true, busy = false, embedded =
   if (id === 'crt_tv') return embedded ? { text: propLine(id,propIndex), tv: true } : { text: 'You can watch Pond TV on the PondOS desktop.' };
   if (id === 'lava_lamp') return { text: pick(lampOn?LAMP_OFF:LAMP_ON,Math.floor(propIndex/2)), lamp: !lampOn };
   if (id === 'pepe_table_lamp') return { text:propLine(id,propIndex), effect:'spark', speech:propIndex%10===0 ? {speaker:'frog',line:PROPS[id][1]} : undefined };
+  if (id === 'chrome_rocking_horse') { const text=propLine(id,propIndex); return { text, effect:'horse', speech:{speaker:'frog',line:text} }; }
   if (id === 'potted_plant') return { text:propLine(id,propIndex), effect:'lemon', speech:propIndex%10===0 ? {speaker:'frog',line:PROPS[id][1]} : undefined };
   return { text: propLine(id,propIndex), effect: id === 'mug' ? 'mug' : 'spark', painting: id === 'p_poster' };
 }
