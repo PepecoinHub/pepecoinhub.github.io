@@ -1,5 +1,5 @@
 // A13: local room interaction, with care delegated to the existing validated actions.
-import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX, ROOM_LAMP, ROOM_HORSE } from './pepegochi-room.mjs?v=20261121a12h';
+import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX, ROOM_LAMP, ROOM_HORSE } from './pepegochi-room.mjs?v=20261121genesis';
 import { mountRoomEffects } from './pepegochi-room-fx.mjs?v=20261121chrom';
 
 const PROPS = {
@@ -14,7 +14,7 @@ const PROPS = {
   moon_rock: ['Inspect moon rock', 'Actual moon dust, probably. Do not lick.'],
   paper_crown: ['Inspect crown', 'Long live the pond. Taxes are payable in flies.'],
   golden_fly: ['Inspect golden fly', 'Too shiny to eat. I have standards.'],
-  floppy_disk: ['Inspect floppy disk', '1.44 MB of extremely important frog business.'],
+  floppy_disk: ['Inspect Genesis Key', 'Every great mystery starts somewhere.'],
 };
 // Ten distinct comments per object. The first is the established line; later clicks rotate
 // independently for each prop, without changing its action or any authoritative pet state.
@@ -29,7 +29,7 @@ export const PROP_LINES = {
   moon_rock: ['A rock with impressive travel history.', 'It is not a cheese sample. Probably.', 'One small hop for a frog.', 'I have no idea how to dust lunar dust.', 'A souvenir from somewhere above the pond.', 'The moon rocks. Literally.', 'Do not drop that on my toes.', 'A very prestigious pebble.', 'Gravity and I have an understanding.'],
   paper_crown: ['The crown is extremely official cardboard.', 'Your royal frog accepts compliments.', 'A kingdom of one frog and a duck.', 'My coronation was catered with flies.', 'The royal crown is not waterproof.', 'Please address me as Your Comfiness.', 'The throne is just my cushion.', 'Keep the crown away from the lava lamp.', 'Long live the royal nap.'],
   golden_fly: ['A fly I cannot eat. Cruel design.', 'The trophy is on a strict no-snacking policy.', 'A masterpiece of fly-based engineering.', 'Shiny wings. Questionable nutritional value.', 'The awards committee has excellent taste.', 'I polished this with my finest frog dignity.', 'This fly is not part of dinner.', 'The gold is purely decorative, fren.', 'My trophy has better posture than I do.'],
-  floppy_disk: ['Please do not bend the save icon.', 'The disk is older than my entire life.', 'One disk. Approximately half a frog selfie.', 'Remember to eject before moving out.', 'FLOPPY.EXE is ready for tiny business.', 'No cloud here. Only plastic and magnetic magic.', 'This is not a coaster. I checked.', '1.44 MB of premium nostalgia.', 'I backed up my flies. They are still missing.'],
+  floppy_disk: ['Not every key opens a door.', 'The pond has a long memory.', 'Some secrets are older than me.', 'A little curiosity goes a long way, fren.', 'Even the oldest stories begin with one block.', 'The first mystery is only the beginning.', 'No, it does not open the fridge.', 'A small key for a very big pond.', 'Our little mystery began with a single discovery.'],
 };
 const LAMP_OFF=['Lights out. Maximum comfy.','Night mode: hardware edition.','Time to enjoy the moonlight.','The lava has left the chat.','Darkness officially installed.'];
 const LAMP_ON=['The lava flows again.','Maximum lime glow restored.','The room has entered 1999 mode.','The blobs are back on duty.','No RGB software required.'];
@@ -98,6 +98,7 @@ export function roomResponse(id, view, { lampOn = true, busy = false, embedded =
   if (id === 'lava_lamp') return { text: pick(lampOn?LAMP_OFF:LAMP_ON,Math.floor(propIndex/2)), lamp: !lampOn };
   if (id === 'pepe_table_lamp') return { text:propLine(id,propIndex), effect:'spark', speech:propIndex%10===0 ? {speaker:'frog',line:PROPS[id][1]} : undefined };
   if (id === 'chrome_rocking_horse') { const text=propLine(id,propIndex); return { text, effect:'horse', speech:{speaker:'frog',line:text} }; }
+  if (id === 'floppy_disk') { const text=propLine(id,propIndex); return { text, effect:'spark', speech:{speaker:'frog',line:text} }; }
   if (id === 'potted_plant') return { text:propLine(id,propIndex), effect:'lemon', speech:propIndex%10===0 ? {speaker:'frog',line:PROPS[id][1]} : undefined };
   return { text: propLine(id,propIndex), effect: id === 'mug' ? 'mug' : 'spark', painting: id === 'p_poster' };
 }

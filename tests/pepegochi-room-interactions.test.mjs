@@ -74,6 +74,15 @@ test('props are cosmetic except an explicit TV request and the two care shortcut
   assert.equal(roomResponse('not_owned_item',view()),null);
 });
 
+test('Genesis Key is a cosmetic Secret Starter reward with its own mystery dialogue', () => {
+  const r = roomResponse('floppy_disk', view());
+  assert.equal(r.text, 'Every great mystery starts somewhere.');
+  assert.deepEqual(r.speech, { speaker:'frog', line:r.text });
+  assert.equal(r.effect, 'spark');
+  assert.equal(r.care, undefined);
+  assert.equal(roomResponse('floppy_disk', view(), {propIndex:1}).text, 'Not every key opens a door.');
+});
+
 test('room objects rotate ten distinct contextual replies without changing their actions',()=>{
   for(const id of ['mug','p_poster','potted_plant','moon_rock','golden_fly','floppy_disk','paper_crown','rubber_duck','crt_tv','bed','lava_lamp','pepe_table_lamp','chrome_rocking_horse']) {
     const results=Array.from({length:10},(_,propIndex)=>roomResponse(id,view(),{embedded:true,propIndex,lampOn:propIndex%2===0}));

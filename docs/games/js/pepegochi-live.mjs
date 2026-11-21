@@ -2,9 +2,9 @@
 // The frog lives on the server (games/supabase/update_pepegochi_v2.sql), one per Discord account.
 // PondOS opens this page in a window; it also works on its own.
 import { getBackend } from './backend.js?v=20261113link';
-import { LiveGame } from './pepegochi-live-view.mjs?v=20261120notes3';
-import { renderRoom, playDeparture, playRareVisitor, playFrames, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261121a12h';
-import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121compact';
+import { LiveGame } from './pepegochi-live-view.mjs?v=20261121genesis';
+import { renderRoom, playDeparture, playRareVisitor, playFrames, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261121genesis';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121genesis';
 import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261121map';
 import { openPondMap, noteLines } from './pond-map.mjs?v=20261121map';
 // A12: the frog's diary (written by the taskbar frog or here) and the day's rare event in the room

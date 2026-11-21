@@ -8,7 +8,7 @@ import {
   SLOTS, ITEMS, STARTER_ROOM, BACKGROUND, FROG, ROOM_W, ROOM_H, FROG_PX, FOOT_Y, HOME, SPRITES, spriteSrc,
   DEPART_FRAMES, DEPART_FOOT, IMG, HD_IMG, propSrc, DEPART_MS, SUITCASE, LETTER, TAKEN_BY_LETTER, LOOK_BELOW,
   DEPART_DX, HATCH_FRAMES, HATCH_MS, CARE, careFrames,
-  frogLook, roomScene, departTimeline, renderRoom, playDeparture, playFrames,
+  frogLook, roomScene, departTimeline, renderRoom, playDeparture, playFrames, fixedPlacements, DECORATIONS,
 } from '../docs/games/js/pepegochi-room.mjs';
 
 const read = p => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
@@ -22,6 +22,21 @@ test('slots: same IDs and anchors as games.pepegochi_room_slots', () => {
   assert.equal(rows.length, 11);
   assert.deepEqual(Object.keys(SLOTS).sort(), rows.map(r => r[0]).sort());
   for (const [id, x, y, z] of rows) assert.deepEqual([SLOTS[id].x, SLOTS[id].y, SLOTS[id].z], [x, y, z], id);
+});
+
+test('Secret Starter keeps its legacy ownership ID but displays Genesis Key under the trophy shelf', () => {
+  assert.equal(propSrc('floppy_disk'), HD_IMG + 'genesis_key.png');
+  assert.equal(DECORATIONS.length, 4);
+  assert.ok(DECORATIONS.includes('floppy_disk'));
+  assert.ok(!roomScene().items.some(i => i.itemId === 'floppy_disk'));
+  const items = roomScene({ placements: fixedPlacements(['floppy_disk', 'moon_rock', 'paper_crown', 'golden_fly']) }).items;
+  const key = items.find(i => i.itemId === 'floppy_disk');
+  assert.equal(items.length, 4);
+  assert.equal(key.slotId, 'rug_right');
+  assert.match(key.src, /genesis_key\.png/);
+  assert.equal(key.left, 297 / ROOM_W * 100);
+  assert.equal(key.top, 202 / ROOM_H * 100);
+  assert.equal(key.width, 8);
 });
 
 test('starter props: same items in the same slots as the room SQL catalog', () => {
