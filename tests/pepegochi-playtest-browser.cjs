@@ -68,7 +68,8 @@ async function journey(base,{width,height,touch}) {
     await press('[data-room-action="lava_lamp"]');assert.equal(await page.locator('.pgr-room-lights-off').count(),1);
     await shot('05-night');await page.waitForTimeout(310);await press('[data-room-action="lava_lamp"]');
     await page.waitForTimeout(310);await press('[data-room-action="potted_plant"]');assert.match(await page.locator('.pgr-response').textContent(),/My Lemon Tree!/);
-    await page.waitForTimeout(310);await press('[data-room-action="rubber_duck"]');assert.match(await page.locator('.pgr-response').textContent(),/SQUEAK/);
+    await page.waitForTimeout(310);await press('[data-room-action="rubber_duck"]');assert.match(await page.locator('.pgr-response').textContent(),/Duck: I'm lost in PEP!.*ready in/);
+    assert.equal(await page.locator('.pgr-joke-bubble').textContent(),"I'm lost in PEP!");
     await page.reload();await stage('adult');assert.match(await page.locator('.pgb-good').textContent(),/Good care days: 7 \/ 30/);
     await skip(3);await status('neglected');await shot('06-neglected');
     await skip(3);await status('packing');await shot('07-packing');

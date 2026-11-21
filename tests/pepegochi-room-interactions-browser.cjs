@@ -98,7 +98,9 @@ const server=http.createServer((req,res)=>{
    await page.waitForTimeout(310);await button('frog').click();if(process.env.PEPEGOCHI_QA_SCREENSHOTS) await page.screenshot({path:require('node:path').join(process.env.PEPEGOCHI_QA_SCREENSHOTS,`room-live-${width}.png`)});
   }
   await page.evaluate(()=>closeRoom());assert.equal(await page.locator('iframe').count(),0);
-  await page.goto(base+'/games/pepegochi-live.html?empty=1&embed=1');await page.locator('[data-room-action="frog"]').waitFor();assert.equal(await page.locator('.pgr-hotspot').count(),2);assert.equal(await page.locator('[data-room-action="crt_tv"]').count(),0);
+  await page.goto(base+'/games/pepegochi-live.html?empty=1&embed=1');await page.locator('[data-room-action="frog"]').waitFor();
+  assert.deepEqual(await page.locator('.pgr-hotspot').evaluateAll(nodes=>nodes.map(n=>n.dataset.roomAction).sort()),['bed','frog','pepe_table_lamp']);
+  await page.locator('[data-room-action="pepe_table_lamp"]').click();assert.match(await page.locator('.pgr-response').textContent(),/Leave my lamp alone/);
   // the frog's notes lie on the side table; a click opens NOTES.TXT with both, keyboard reachable
   await page.goto(base+'/games/pepegochi-live.html?empty=1&notes=1&embed=1');await page.locator('[data-notes]').waitFor();
   assert.equal(await page.locator('[data-notes]').getAttribute('aria-label'),'2 notes from your Fren. Read them');
