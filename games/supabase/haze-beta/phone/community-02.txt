@@ -28,7 +28,8 @@
       if (body.action === "rpc") {
         if (!only(body, ["version", "action", "method", "args"]) || !Object.hasOwn(RPC_FIELDS, body.method) || !only(body.args || {}, RPC_FIELDS[body.method])) return json(403, { error: "Method or arguments are outside community-v1." });
         if (body.method === "gry_haze_chat" && (!Array.isArray(body.args?.p_messages) || body.args.p_messages.length > 120 || body.args.p_messages.some((id) => !Number.isSafeInteger(id) || id < 0))) return json(400, { error: "Invalid message batch." });
-        const result = await rpc("community_v1_rpc", { origin, access_hash: accessHash, method: body.method, args: body.args || {} });
+        const method = body.method === "gry_haze_mentions" ? "community_v1_mentions" : "community_v1_rpc";
+        const result = await rpc(method, { origin, access_hash: accessHash, method: body.method, args: body.args || {} });
         const failure2 = result?.__community_error || result?.error;
         return typeof failure2 === "string" ? json(400, { error: failure2.slice(0, 240) }) : json(200, result);
       }

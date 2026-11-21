@@ -1,7 +1,7 @@
 export const VERSION=1;
 export const AUDIENCE='ph-community-v1';
 export const RPC_FIELDS=Object.freeze({
- gry_me:[],gry_lobby_chat:['p_after','p_visitor'],gry_lobby_who:['p_visitor'],gry_lobby_say:['p_text','p_nick'],
+ gry_haze_mentions:['p_install','p_platform','p_token'],gry_me:[],gry_lobby_chat:['p_after','p_visitor'],gry_lobby_who:['p_visitor'],gry_lobby_say:['p_text','p_nick'],
  gry_haze_status:[],gry_haze_link_begin:[],gry_haze_chat:['p_messages'],gry_haze_tip_begin:['p_message','p_amount','p_reaction','p_note'],
  gry_haze_groups:[],gry_haze_group_create:['p_options'],gry_haze_group_join:['p_id'],gry_haze_group_review:['p_id'],gry_haze_group_cancel:['p_id'],
 });
