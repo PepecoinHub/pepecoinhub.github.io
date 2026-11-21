@@ -1,3 +1,10 @@
+    "This signature only proves control of this address. It does not authorize a transaction."
+  ].join("\n");
+}
+
+// games/supabase/functions/haze-wallet/core.mjs
+var PEP_GENESIS = "37981c0c48b8d48965376c8a42ece9a0838daadb93ff975cb091f57f8c2a5faa";
+var isHash = (value) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
 var exact = (value, keys) => !!value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key));
 var fail = (message) => {
   throw new Error(message);
@@ -74,9 +81,4 @@ async function verifyTipTransaction(intent, tx, readTx) {
 async function verifyGroupTransaction(intent, tx, readTx) {
   tx = blockbookTx(tx);
   readTx = reader(readTx);
-  if (!isHash(intent.txid) || tx?.txid !== intent.txid || !Array.isArray(intent.recipients) || intent.recipients.length < 1 || intent.recipients.length > 200) fail("Invalid group transaction.");
-  const sender = pepScript(intent.sender), expected = /* @__PURE__ */ new Map();
-  let total = 0n;
-  for (const recipient of intent.recipients) {
-    const script = pepScript(recipient.address), value = atomic(recipient.amount);
 // ==== END OF PART 4 OF 5 — next: paste part 05 at the very end ====

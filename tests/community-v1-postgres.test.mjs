@@ -26,7 +26,7 @@ before(async()=>{
  let ready=false;for(let n=0;n<100;n++){try{if(execFileSync('docker',['exec',container,'cat','/proc/1/comm'],{encoding:'utf8',stdio:'pipe'}).trim()==='postgres'&&psql('select 1')==='1'){ready=true;break;}}catch{}await new Promise(resolve=>setTimeout(resolve,200));}assert.ok(ready,'Disposable database became ready');
  psql(fs.readFileSync(path.join(source,'scripts/haze-preview/bootstrap.sql'),'utf8'));
  psql(fs.readFileSync(path.join(source,'games/supabase/update_haze_tips.sql'),'utf8'));psql(fs.readFileSync(path.join(source,'games/supabase/update_haze_groups.sql'),'utf8'));
- psql(chatFixture(source));for(const file of ['update_haze_group_visibility.sql','update_haze_long_airdrops.sql']){const selected=path.join(source,'games/supabase',file);if(fs.existsSync(selected))psql(fs.readFileSync(selected,'utf8'));}const migration=fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../games/supabase/update_haze_community_v1.sql'),'utf8');psql(migration);psql(migration);
+ psql(chatFixture(source));for(const file of ['update_haze_group_visibility.sql','update_haze_long_airdrops.sql']){const selected=path.join(source,'games/supabase',file);if(fs.existsSync(selected))psql(fs.readFileSync(selected,'utf8'));}const migration=fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../games/supabase/update_haze_community_v1.sql'),'utf8');psql(migration);psql(migration);const mobile=fs.readFileSync(path.join(source,'games/supabase/mobile-connections.sql'),'utf8');psql(mobile);psql(mobile);
  initial=JSON.parse(psql("select json_build_object('enabled',(select enabled from games.community_settings where id),'clients',(select count(*) from games.community_clients where enabled));"));
  psql(`insert into auth.users values(${quote(uid(1))}),(${quote(uid(2))});insert into auth.identities values(${quote(uid(1))},'discord'),(${quote(uid(2))},'discord');insert into games.profiles(user_id,nick) values(${quote(uid(1))},'Lew'),(${quote(uid(2))},'Byl');insert into games.haze_testers(user_id,label) values(${quote(uid(1))},'Lew'),(${quote(uid(2))},'Byl');update games.haze_settings set enabled=true,groups_enabled=true;`);
  psql(`alter table auth.identities add column identity_data jsonb;update auth.identities set identity_data=jsonb_build_object('user_name',case when user_id=${quote(uid(1))} then 'lewisbong' else 'Byl' end);`);
@@ -149,4 +149,39 @@ test('a per-client allowlist limits one client to named accounts while other cli
   assert.equal((await request({action:'refresh',refresh_token:before.refresh_token})).status,401,'nor refresh');
   const listed=await session({user:2});assert.equal((await read(listed.access_token)).status,200,'the listed account works');
  }finally{psql(`update games.community_clients set allowed_users=null where id='haze-web';`);}
+});
+
+test('five existing mobile approvals show once and allow a remembered device to join at capacity',async()=>{
+ const origin='capacitor://localhost',mobileReturn='https://hazewallet.com/app/community-auth';
+ psql(`update games.community_clients set enabled=true,origins=array[${quote(origin)}],redirect_uri=${quote(mobileReturn)},scopes=array['profile:read','chat:read'] where id='haze-native';`);
+ async function mobileCode(){
+  const verifier='m'.repeat(43);
+  const result=await request({action:'authorize',client_id:'haze-native',redirect_uri:mobileReturn,code_challenge:await challenge(verifier),code_challenge_method:'S256',scopes:['profile:read','chat:read']},{origin:PH,token:'fixture.PH_FULL_SESSION_1.signature'});
+  assert.equal(result.status,200,result.body.error);
+  return {action:'exchange',client_id:'haze-native',redirect_uri:mobileReturn,code:result.body.code,code_verifier:verifier};
+ }
+ const grant=async device=>{const res=await request({...await mobileCode(),...(device?{installation_id:device}:{})},{origin});assert.equal(res.status,200,res.body.error);return res.body;};
+ const sessions=(user,fields={})=>request({action:'connections',...fields},{origin:PH,token:'fixture.PH_FULL_SESSION_'+user+'.signature'});
+ const refresh=async token=>request({action:'refresh',refresh_token:token},{origin});
+ for(let i=0;i<5;i++){const record=await grant();assert.ok(Date.parse(record.session_expires_at)-Date.now()<8.1*3600000);}
+ // These legacy approvals accumulated across earlier logins outside the code issuance window.
+ psql("update games.community_codes set created_at=created_at-interval '20 minutes' where consumed_at is not null");
+ assert.equal((await sessions(1)).body.length,1);
+ const device=crypto.randomUUID(),first=await grant(device);
+ assert.ok(Date.parse(first.session_expires_at)-Date.now()>29.9*86400000);
+ const pending=await mobileCode();
+ const invalid=await request({...pending,code_verifier:'x'.repeat(43),installation_id:device},{origin});
+ assert.equal(invalid.status,400);
+ assert.equal((await refresh(first.refresh_token)).status,200);
+ const renewed=await request({...pending,installation_id:device},{origin});assert.equal(renewed.status,200,renewed.body.error);
+ const second=await grant(crypto.randomUUID());
+ assert.equal(psql("select count(*) from games.community_sessions where installation_id is not null and revoked_at is null"),'2');
+ const entries=(await sessions(1)).body;assert.equal(entries.length,1);
+ assert.deepEqual((await sessions(2,{revoke_id:entries[0].id})).body,[]);
+ assert.equal((await sessions(1)).body.length,1);
+ assert.deepEqual((await sessions(1,{revoke_id:entries[0].id})).body,[]);
+ assert.equal((await refresh(renewed.body.refresh_token)).status,401);
+ assert.equal((await refresh(second.refresh_token)).status,401);
+ assert.throws(()=>psql(callSQL('community_v1_exchange_device',{},'authenticated')),/failed/);
+ assert.throws(()=>psql(callSQL('community_v1_app_connections',{},'anon')),/failed/);
 });
