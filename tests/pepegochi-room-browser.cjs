@@ -22,7 +22,8 @@ let browser;const server=http.createServer((req,res)=>{
  const capture=async name=>{await page.waitForFunction(()=>[...document.images].every(i=>i.complete&&i.naturalWidth>0));await page.locator('.pgr-frame').screenshot({path:path.join(output,name)});};
  assert.equal(await page.locator('.pgr-item').count(),10);
  const sizes=await page.locator('.pgr img').evaluateAll(imgs=>imgs.map(i=>({src:i.getAttribute('src'),w:i.naturalWidth,h:i.naturalHeight})));
- assert.equal(sizes.filter(i=>i.src.includes('/hd/')&&i.w===256&&i.h===256).length,11,'all nine props, fixed lamp and adult use the HD images');
+ assert.equal(sizes.filter(i=>i.src.includes('/hd/')&&i.w===256&&i.h===256).length,12,'all nine props, fixed lamp, Chrom rocking horse (#396) and adult use the HD images');
+ assert.ok(sizes.some(i=>i.src.includes('/hd/chrome_rocking_horse.png')&&i.w===256&&i.h===256));
  assert.ok(sizes.some(i=>i.src.includes('/hd/pepe_table_lamp.png')&&i.w===256&&i.h===256));
  assert.ok(sizes.some(i=>i.src.includes('/hd/room_pond_den_v1.png')&&i.w===640&&i.h===400));
  assert.ok(sizes.some(i=>i.src.endsWith('p_poster.png?v=20261120dialog2')&&i.w===128));

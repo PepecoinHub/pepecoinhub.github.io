@@ -5,7 +5,7 @@ import { roomTargets } from '../docs/games/js/pepegochi-room-interactions.mjs';
 
 const target={x:25,y:40,w:10,h:20};
 test('each particle effect follows its real target, with bounded count, duration and positions',()=>{
-  for (const [kind,art] of [['pet','heart'],['egg','spark'],['water','drop'],['duck','squeak'],['spark','spark'],['mug','steam']]) {
+  for (const [kind,art] of [['pet','heart'],['egg','spark'],['water','drop'],['duck','squeak'],['spark','spark'],['mug','steam'],['horse','chrome']]) {
     const p=roomEffectPlan(kind,target);assert.equal(p.art,art);assert.ok(p.ms<=1000);assert.ok(p.points.length<=4);
     for(const point of p.points){assert.ok(point.x>=25&&point.x<=35&&point.y>=40&&point.y<=60);assert.ok(point.delay<p.ms);}
   }

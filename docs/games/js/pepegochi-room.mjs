@@ -21,6 +21,8 @@ export const BACKGROUND = HD_IMG + 'room_pond_den_v1.png';
 // A fixed architectural decoration, like the house sign, not a Passport reward or inventory item.
 // The shade and base sit to the left of the existing lava lamp on the dresser.
 export const ROOM_LAMP = { src: versionSprite(HD_IMG + 'pepe_table_lamp.png'), left: 47 / ROOM_W * 100, top: 227 / ROOM_H * 100, width: 80 / ROOM_W * 100, bounds: [75,12,180,236].map(n=>n/2) };
+// Chrom's little ride: fixed decor, sized slightly smaller than the duck, on the free foreground floor.
+export const ROOM_HORSE = { src: versionSprite(HD_IMG + 'chrome_rocking_horse.png'), left: 590 / ROOM_W * 100, top: 386 / ROOM_H * 100, width: 72 / ROOM_W * 100, bounds: [48,52,208,236].map(n=>n/2) };
 // bumped when a room prop is redrawn under the same file name (A10: mug, duck, painting, 2026-11-15)
 export const PROP_V = SPRITE_VERSION;
 export const propSrc = id => (id === 'p_poster' ? IMG : HD_IMG) + id + '.png';
@@ -239,17 +241,41 @@ export function playFrames(img, frames, ms, { setTimer = setTimeout, clearTimer 
   return () => { if (timer) clearTimer(timer); img.setAttribute('src', final); };
 }
 
+// ---------- A12 rare events in the room (owner spec 2026-11-21; art pack A12b; pepegochi-rare.mjs picks the day) ----
+// Only for laughs and only for one day; nothing here is saved or awarded. The window glass is x 465-570, y 40-160.
+export const WINDOW_GLASS = { x: 465, y: 40, w: 105, h: 120 };
+export const RARE_ROOM = {
+  ufo: { window: true, src: 'event_ufo_0', frames: 4, ms: 180 },
+  spy_duck: { window: true, src: 'event_spy_duck.png' },
+  duck_moved: { duck: true },
+  tinfoil: { frog: 'adult_tinfoil' },
+  birthday: { prop: 'event_cake.png', slot: 'floor_right', size: 14 },
+};
+export const rareSrc = f => versionSprite(HD_IMG + f);
+
 // ---------- one description of what the scene shows, so it can be tested without a browser ----------
 // mode: 'adopt' (an egg waits for a name), 'pet' or 'departed'
-export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false, taken = TAKEN_BY_LETTER, notes = 0 } = {}) {
+export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false, taken = TAKEN_BY_LETTER, notes = 0, rare = null, diary = -1 } = {}) {
   const departed = mode === 'departed';
+  const ev = mode === 'pet' && status !== 'departed' && Object.hasOwn(RARE_ROOM, rare) ? RARE_ROOM[rare] : null;
   const items = [];
   for (const [slotId, itemId] of Object.entries(placements)) {
     const s = SLOTS[slotId], it = ITEMS[itemId];
     if (!s || !it) continue;
     if (departed && itemId === taken) continue;
-    items.push({ slotId, itemId, src: propSrc(itemId) + '?v=' + PROP_V, wall: !!s.wall, z: s.z,
-      left: s.x / ROOM_W * 100, top: (s.y + it.dy) / ROOM_H * 100, width: it.size });
+    const item = { slotId, itemId, src: propSrc(itemId) + '?v=' + PROP_V, wall: !!s.wall, z: s.z,
+      left: s.x / ROOM_W * 100, top: (s.y + it.dy) / ROOM_H * 100, width: it.size };
+    // the duck moved in the night: a chalk outline where it stood, the duck a little to the left, pretending nothing happened
+    if (ev?.duck && itemId === 'rubber_duck') {
+      items.push({ ...item, itemId: 'duck_outline', src: rareSrc('duck_outline.png'), rare: true });
+      item.left -= 34 / ROOM_W * 100;
+    }
+    items.push(item);
+  }
+  if (ev?.prop && SLOTS[ev.slot] && !Object.keys(placements).includes(ev.slot)) {
+    const s = SLOTS[ev.slot];
+    items.push({ slotId: ev.slot, itemId: 'rare_' + rare, src: rareSrc(ev.prop), wall: false, z: s.z, rare: true,
+      left: s.x / ROOM_W * 100, top: s.y / ROOM_H * 100, width: ev.size });
   }
   const pct = (v, of) => v / of * 100;
   let frog = null, label;
@@ -259,13 +285,17 @@ export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', n
     const st = mode === 'adopt' ? 'healthy' : status;
     const lk = frogLook({ status: st, stage: mode === 'adopt' ? 'egg' : stage, needs });
     const bubble = mode === 'adopt' ? '' : BUBBLE[st] || '';
-    frog = { ...lk, src: spriteSrc(lk.sprite), left: pct(HOME.x, ROOM_W), top: pct(HOME.y, ROOM_H), width: pct(FROG_PX, ROOM_W),
+    const tinfoil = ev?.frog && lk.sprite === 'adult_idle';
+    frog = { ...lk, src: tinfoil ? spriteSrc(ev.frog) : spriteSrc(lk.sprite), left: pct(HOME.x, ROOM_W), top: pct(HOME.y, ROOM_H), width: pct(FROG_PX, ROOM_W),
       foot: SPRITES[lk.sprite][1], bubble, bubbleTop: pct(HOME.y - (SPRITES[lk.sprite][1] - SPRITES[lk.sprite][0]) - 6, ROOM_H) };
     label = mode === 'adopt' ? 'Your room. An egg waits on the rug for a name.'
       : `Your room. Your ${stage} Fren is ${status}${lk.look ? ' and ' + LOOK_WORD[lk.look] : ''}${lk.suitcase ? ', with a suitcase' : ''}.`;
   }
   return {
     mode, status: departed ? 'departed' : mode === 'adopt' ? 'adopt' : status, label, items, frog,
+    rare: ev ? { id: rare, ...ev } : null,
+    // diary: -1 = no pages yet (no button), 0 = pages all read, n = unread pages
+    diary: mode === 'pet' && Number.isInteger(diary) && diary >= 0 ? { unread: diary } : null,
     notes: mode === 'pet' && notes > 0 ? { count: notes, src: NOTES.src, left: pct(NOTES.x, ROOM_W), top: pct(NOTES.y, ROOM_H), width: pct(NOTES.px, ROOM_W) } : null,
     letter: departed ? { src: letterSeen ? LETTER.open : LETTER.envelope, read: letterSeen,
       left: pct(LETTER.x, ROOM_W), top: pct(LETTER.y, ROOM_H), width: pct(LETTER.px, ROOM_W) } : null,
@@ -293,11 +323,24 @@ export function renderRoom(doc, opts = {}) {
   sign.textContent = 'NO FUD\nAFTER BEDTIME'; art.append(sign);
   const lamp = mk('img', 'pgr-fixed-lamp'); lamp.src = ROOM_LAMP.src; lamp.alt = '';
   pos(lamp, ROOM_LAMP.left, ROOM_LAMP.top, ROOM_LAMP.width); art.append(lamp);
+  const horse = mk('img', 'pgr-fixed-horse'); horse.src = ROOM_HORSE.src; horse.alt = ''; horse.dataset.item = 'chrome_rocking_horse';
+  pos(horse, ROOM_HORSE.left, ROOM_HORSE.top, ROOM_HORSE.width); art.append(horse);
   for (const it of sc.items) {
     const im = mk('img', 'pgr-item' + (it.wall ? ' pgr-wall' : ''));
     im.src = it.src; im.alt = ''; im.dataset.slot = it.slotId; im.dataset.item = it.itemId;
     pos(im, it.left, it.top, it.width); im.style.zIndex = String(it.z);
+    if (it.rare) im.classList.add('pgr-rare-item');
     art.append(im);
+  }
+  // a rare visitor at the window: drawn inside the glass only (the curtains and frame stay in front of nothing)
+  if (sc.rare?.window) {
+    const glass = mk('div', 'pgr-window pgr-window-' + sc.rare.id); glass.setAttribute('aria-hidden', 'true');
+    glass.style.left = WINDOW_GLASS.x / ROOM_W * 100 + '%'; glass.style.top = WINDOW_GLASS.y / ROOM_H * 100 + '%';
+    glass.style.width = WINDOW_GLASS.w / ROOM_W * 100 + '%'; glass.style.height = WINDOW_GLASS.h / ROOM_H * 100 + '%';
+    const v = mk('img', 'pgr-visitor'); v.alt = '';
+    v.src = rareSrc(sc.rare.frames ? sc.rare.src + '1.png' : sc.rare.src);
+    if (sc.rare.frames) v.dataset.frames = String(sc.rare.frames);
+    glass.append(v); art.append(glass);
   }
   if (sc.frog) {
     const f = mk('img', 'pgr-pet'); f.src = versionSprite(sc.frog.src); f.alt = ''; f.dataset.sprite = sc.frog.sprite;
@@ -311,6 +354,15 @@ export function renderRoom(doc, opts = {}) {
     if (sc.frog.bubble) { const b = mk('div', 'pgr-bubble'); b.textContent = sc.frog.bubble; b.style.top = sc.frog.bubbleTop + '%'; art.append(b); }
   }
   st.append(art);
+  if (sc.diary) {
+    const b = mk('button', 'pgr-diary'), u = sc.diary.unread;
+    b.type = 'button'; b.dataset.diary = '1';
+    b.setAttribute('aria-label', 'DIARY.TXT' + (u ? ', ' + u + (u === 1 ? ' new page' : ' new pages') : '') + '. Read it');
+    b.title = 'DIARY.TXT';
+    b.textContent = 'DIARY';
+    if (u) { const n = mk('span', 'pgr-notes-n'); n.textContent = String(u); n.setAttribute('aria-hidden', 'true'); b.append(n); }
+    st.append(b);
+  }
   if (sc.notes) {
     const b = mk('button', 'pgr-notes');
     b.type = 'button'; b.dataset.notes = '1';
@@ -332,6 +384,17 @@ export function renderRoom(doc, opts = {}) {
   }
   frame.append(st);
   return frame;
+}
+
+// The UFO's blinking lights (4 frames). Returns a stop function; nothing to do for other rooms or reduced motion.
+export function playRareVisitor(frame, { setTimer = setTimeout, clearTimer = clearTimeout } = {}) {
+  const v = frame.querySelector('.pgr-visitor[data-frames]');
+  if (!v) return null;
+  const n = Number(v.dataset.frames), base = v.getAttribute('src').replace(/1\.png(\?.*)?$/, '');
+  let i = 0, timer = null;
+  const tick = () => { i = (i + 1) % n; v.setAttribute('src', versionSprite(base.replace(/\?.*$/, '') + (i + 1) + '.png')); timer = setTimer(tick, RARE_ROOM.ufo.ms); };
+  timer = setTimer(tick, RARE_ROOM.ufo.ms);
+  return () => clearTimer(timer);
 }
 
 // Plays the moving-out frames once on a room drawn with mode 'departed'. The letter appears when the

@@ -3,10 +3,13 @@
 // PondOS opens this page in a window; it also works on its own.
 import { getBackend } from './backend.js?v=20261113link';
 import { LiveGame } from './pepegochi-live-view.mjs?v=20261120notes3';
-import { renderRoom, playDeparture, playFrames, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261120notes3';
-import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121roomjokes';
+import { renderRoom, playDeparture, playRareVisitor, playFrames, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261121a12h';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121a12h';
 import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261121map';
 import { openPondMap, noteLines } from './pond-map.mjs?v=20261121map';
+// A12: the frog's diary (written by the taskbar frog or here) and the day's rare event in the room
+import { diaryFor, isSnoopHour, SNOOP_LINE } from '../../meme/pepegochi-diary.mjs?v=20261121a12';
+import { rareOfDay, localDay } from '../../meme/pepegochi-rare.mjs?v=20261121a12';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {
@@ -66,7 +69,36 @@ function renderNotes(box) {
   box.append(pad);
 }
 
+// ---------- A12 diary + rare event ----------
+// The diary is written by the taskbar frog in PondOS; this window only reads it (pepegochi-diary.mjs diaryFor).
+let diaryOpen = false;
+const owner = () => { const u = backend?.session?.()?.user; return u && !u.is_anonymous ? u.id : null; };
+const livingPet = () => { const p = game.last?.pet; return p && p.status !== 'departed' && p.stage && p.stage !== 'egg' ? p : null; };
+function todayRare() {
+  const p = livingPet(), id = owner();
+  if (!p || !id) return null;
+  const d = localDay();
+  return rareOfDay({ owner: id, lifeId: p.life_id, dayKey: d.dayKey, month: d.month, day: d.day, hour: d.hour });
+}
+const myDiary = () => { const p = livingPet(), id = owner(); return p && id ? diaryFor(id, p.life_id) : { pages: [], fresh: 0 }; };
+// what the room's DIARY button shows: hidden with no pages, a red count with the latest visit's pages
+function diaryState() { const d = myDiary(); return d.pages.length ? (diaryOpen ? 0 : d.fresh) : -1; }
+function renderDiary(box) {
+  const p = livingPet(), id = owner();
+  if (!diaryOpen || !p || !id) { diaryOpen = false; return; }
+  const pages = myDiary().pages.slice().reverse();
+  const pad = el('div', { class: 'pgb-notepad pgb-diary', role: 'document', 'aria-label': 'DIARY.TXT', id: 'pgb-diary', tabindex: '-1' });
+  const ol = el('ol', { reversed: true });
+  if (isSnoopHour(new Date().getHours())) ol.append(el('li', {}, SNOOP_LINE));
+  if (!pages.length) ol.append(el('li', {}, 'Nothing yet. Come back later, the frog writes while you are away.'));
+  pages.slice(0, 60).forEach(pg => { const li = el('li', {}, pg.text); li.append(el('small', {}, 'Day ' + pg.day)); ol.append(li); });
+  pad.append(el('div', { class: 'pgb-notepad-bar' }, 'DIARY.TXT - written by your Fren'), ol,
+    el('button', { type: 'button', class: 'btn', 'data-close-diary': '1' }, 'Close'));
+  box.append(pad);
+}
+
 function renderPet(box, p) {
+  renderDiary(box);
   renderNotes(box);
   box.append(el('p', { class: 'pgb-status' }, p.statusText));
   for (const w of p.warnings) box.append(el('p', { class: 'pgb-warn' }, w));
@@ -141,13 +173,14 @@ function renderScene(v) {
   let opts;
   if (v.mode === 'pet') {
     title.textContent = v.pet.title;
-    opts = { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs, notes: myNotes().length, ...at };
+    opts = { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs, notes: myNotes().length,
+      rare: todayRare(), diary: diaryState(), ...at };
   } else if (v.mode === 'departed') {
     title.textContent = `${v.departed.name} · moved out`;
     opts = { mode: 'departed', letterSeen: v.departed.letterSeen, taken: v.departed.taken, ...at };
   } else { title.textContent = 'Your room'; opts = { mode: 'adopt' }; }
   const lifeId = v.mode === 'pet' ? game.last?.pet?.life_id : null;
-  const key = JSON.stringify([opts.mode, opts.status, opts.stage, opts.letterSeen, opts.taken, opts.notes, placements, lifeId,
+  const key = JSON.stringify([opts.mode, opts.status, opts.stage, opts.letterSeen, opts.taken, opts.notes, opts.rare, opts.diary, placements, lifeId,
     v.mode === 'pet' ? frogLook(opts).sprite : null]);
   const care = careDone; careDone = null;
   if (key !== sceneKey || !scene.firstChild) {
@@ -156,6 +189,7 @@ function renderScene(v) {
     const room = renderRoom(document, opts);
     scene.replaceChildren(room);
     roomInteractions.attach(room, opts, { owned: placements !== null, lifeId, embedded: window.parent !== window });
+    if (opts.rare === 'ufo' && !reduceMotion()) stopAnim = playRareVisitor(room);
     const stage = v.mode === 'pet' ? v.pet.stage : v.mode === 'adopt' ? 'egg' : null;
     if (stage && !preloaded.has(stage)) { preloaded.add(stage); animationFramesForStage(stage).forEach(src => { const i = new Image(); i.src = versionSprite(src); }); }
     if (v.mode === 'departed' && shown && shown.mode === 'pet' && !reduceMotion()) stopAnim = playDeparture(room, shown.stage);
@@ -230,9 +264,14 @@ function openNotes() {
   const pad = $('pgb-notes');
   if (pad) { pad.scrollIntoView({ block: 'start' }); pad.focus({ preventScroll: true }); }
 }
-$('pgb-scene').addEventListener('click', e => { if (e.target.closest('[data-letter]')) openLetter(); else if (e.target.closest('[data-notes]')) openNotes(); });
+function openDiary() {
+  diaryOpen = true; render();
+  const pad = $('pgb-diary');
+  if (pad) { pad.scrollIntoView({ block: 'start' }); pad.focus({ preventScroll: true }); }
+}
+$('pgb-scene').addEventListener('click', e => { if (e.target.closest('[data-letter]')) openLetter(); else if (e.target.closest('[data-notes]')) openNotes(); else if (e.target.closest('[data-diary]')) openDiary(); });
 // a new note written by the frog on the taskbar (another document of this site) shows up on the table at once
-window.addEventListener('storage', e => { if (e.key && e.key.startsWith('pepegochi:notes:') && game.last && !game.busy) render(); });
+window.addEventListener('storage', e => { if (e.key && /^pepegochi:(notes|diary):/.test(e.key) && game.last && !game.busy) render(); });
 $('pgb-body').addEventListener('click', e => {
   const t = e.target.closest('button');
   if (!t || game.busy) return;
@@ -240,6 +279,7 @@ $('pgb-body').addEventListener('click', e => {
   else if (t.dataset.letter) openLetter();
   else if (t.dataset.closeLetter) { game.closeLetter(); render(); }
   else if (t.dataset.closeNotes) { notesOpen = false; render(); }
+  else if (t.dataset.closeDiary) { diaryOpen = false; render(); }
   else if (t.dataset.signin) backend.discord().catch(err => { game.message = err.message; render(); });
 });
 $('pgb-body').addEventListener('submit', e => {
