@@ -2,7 +2,7 @@
 
 Paczka Haze z 2026-11-20 (opis techniczny: `games/HAZE-COMMUNITY-V1.md`). Haze dostaje **tylko ograniczony,
 odwoływalny token** (czat, tipy, rundy), nigdy pełnej sesji PepecoinHub. Logowanie Discord i zgoda są na naszej
-stronie `/games/haze-community.html`. Wszystko jest domyślnie **wyłączone**.
+stronie `/games/haze-community.html`. Wszystko jest domyślnie **wyłączone**; decyzja właściciela (2026-11-21): otwieramy dla wszystkich, bez bety.
 
 Nasza poprawka do paczki: wiadomości z aplikacji nie niosą adresu IP (wszystkie przychodzą z jednego IP serwera
 Supabase), więc wyciszenie za zakazane słowo albo przez hosta działa na konto, a nie na wszystkich użytkowników
@@ -23,8 +23,9 @@ Pliki do kopiowania (zamień `main` na nazwę gałęzi, jeśli jeszcze nie zmerg
    `https://pepecoinhub.com/games/haze-community.html`.
    **Nie** dodawaj `https://hazewallet.com/community-auth.html/?state=*` (stara prośba, nieaktualna). Jeśli już dodany — usuń.
 4. **Strona zgody** — publikuje się sama po zmergowaniu (GitHub Pages).
-5. **Włączenie dla testerów** — SQL Editor: `games/supabase/community-v1/enable-web-beta.sql` z wpisanym
-   `Byl_Pepecoin` zamiast `BYL_DISCORD_USERNAME`. Włącza tylko klienta web (`haze-web`) i tylko dla osób z `games.haze_testers`.
+5. **Włączenie dla wszystkich** — SQL Editor: `games/supabase/community-v1/enable-for-all.sql`.
+   Otwiera czat w Haze web dla każdego konta Discord (bez listy testerów). Aplikacja mobilna i rozszerzenie Chrome
+   zostają wyłączone. (Wersja tylko dla testerów: `enable-web-beta.sql`.)
 6. **Sprzątanie (opcjonalnie)** — Database → Cron (pg_cron) → co 15 minut:
    `select public.community_v1_cleanup('{}'::jsonb);`
    Bez tego też działa (stare wpisy są sprzątane przy logowaniu), cron tylko trzyma tabele w porządku.
