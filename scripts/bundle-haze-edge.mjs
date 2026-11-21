@@ -54,7 +54,7 @@ const files=[[out,bundle],[sqlOut,sql],
   ...edgeParts.map((part,i)=>[phone('edge-'+pad(i+1)+'.txt'),part.join('\n')+'\n'+(i<edgeParts.length-1
     ?'// ==== END OF PART '+(i+1)+' OF '+edgeParts.length+' — next: paste part '+pad(i+2)+' at the very end ====\n'
     :'// ==== END OF PART '+(i+1)+' OF '+edgeParts.length+' — complete file, now Deploy ====\n')])];
-const stale=fs.existsSync(phone(''))?fs.readdirSync(phone('')).filter(name=>!files.some(([file])=>file.pathname===phone(name).pathname)):[];
+const stale=fs.existsSync(phone(''))?fs.readdirSync(phone('')).filter(name=>/^(sql|edge)-\d+\.(sql|txt)$/.test(name)&&!files.some(([file])=>file.pathname===phone(name).pathname)):[];
 if(process.argv.includes('--check')){
   for(const [file,text] of files)if(!fs.existsSync(file)||fs.readFileSync(file,'utf8')!==text){console.error(file.pathname+' is stale: run node scripts/bundle-haze-edge.mjs');process.exit(1);}
   if(stale.length){console.error('Remove stale phone parts: '+stale.join(', '));process.exit(1);}
