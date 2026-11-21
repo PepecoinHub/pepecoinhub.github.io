@@ -4,6 +4,7 @@ import { stickerEl, attachStickerPicker } from './stickers.js';
 import { loadQueue, saveQueue, shrink } from './queue.js';
 import { fitImage, pack, canChunk, makeSender, makeReceiver } from './imgchunks.js';
 import { menuBar, statusBar, dialog, howToPlay, TOOL_SVG, PALETTE, setWinTitle } from './paintchrome.js';
+import { makeDrawPump, MAX_DRAW_JSON } from './pepaint-traffic.mjs?v=20261121traffic';
 
 const code = (new URLSearchParams(location.search).get('r') || '').toUpperCase();
 if (!/^[A-Z0-9]{5}$/.test(code)) location.replace('./');
@@ -39,6 +40,7 @@ setWinTitle(`Room ${code} - PEPaint`);
 // ---------- stan ----------
 let S = null, offset = 0, roomCh = null, turnCh = null, turnTopic = null, curTurn = null;
 let fetching = null, refetch = false, lastTick = 0, hintMarks = new Set(), localNotes = [], seenVersion = -1, overlaySig = '';
+let pollTimer = null, loopTimer = null, entering = false, roomEnded = false;
 const cv = $('#cv'), ctx = cv.getContext('2d');
 const W = 1000, H = 700;
 const now = () => Date.now() + offset;
@@ -53,6 +55,8 @@ blank();
 
 // ---------- wejście do pokoju ----------
 async function enter(nick) {
+  if (entering || roomEnded) return;
+  entering = true;
   try {
     const s = await be.rpc('gry_join', { p_code: code, p_nick: nick });
     $('#joinbox').classList.add('hidden');
@@ -65,14 +69,18 @@ async function enter(nick) {
       location.href = isPaint() ? LOBBY : './';
     } }, 'Leave'));
     apply(s);
-    setInterval(() => fetchState(), 10000);
-    setInterval(loop, 250);
+    if (roomEnded) return;
+    pollTimer = setInterval(() => fetchState(), 10000);
+    loopTimer = setInterval(loop, 250);
   } catch (e) {
     toast(e.message, 'bad');
     if (/removed you|does not exist|closed/.test(e.message)) message(e.message);
-  }
+  } finally { entering = false; }
 }
 function message(text, sub = '') {
+  roomEnded = true;
+  clearInterval(pollTimer); clearInterval(loopTimer);
+  drawPump.reset(); pendingSnap = null;
   $('#room').classList.add('hidden'); $('#joinbox').classList.add('hidden');
   document.documentElement.classList.add('pt-gate');
   const b = $('#msgbox'); b.classList.remove('hidden'); b.textContent = '';
@@ -106,8 +114,12 @@ function subscribeRoom() {
   });
 }
 async function fetchState() {
+  if (roomEnded) return;
   if (fetching) { refetch = true; return fetching; }
-  fetching = be.rpc('gry_state', { p_code: code }).then(apply).catch((e) => console.warn(e)).finally(() => {
+  fetching = be.rpc('gry_state', { p_code: code }).then((s) => { if (!roomEnded) apply(s); }).catch((e) => {
+    if (/PEPaint is busy|This room is full/i.test(e.message)) message(e.message);
+    else console.warn(e);
+  }).finally(() => {
     fetching = null; if (refetch) { refetch = false; fetchState(); }
   });
   return fetching;
@@ -147,6 +159,7 @@ function apply(s) {
 
 function onNewTurn(turnId) {
   curTurn = turnId; hintMarks = new Set(); strokes.clear(); hist.length = 0;
+  drawPump.reset(); buf.length = 0; cur = null; needsSnapshot = false; pendingSnap = null;
   turnCh?.close(); turnCh = null; turnTopic = null;
   blank(); recv.reset(); if (!isImgHost()) sender.stop();
   if (!turnId) return;
@@ -475,7 +488,7 @@ function loop() {
     if (n > Date.parse(r.next_at) + (master ? 150 : 1500)) tick();
   }
   if (isImgHost()) imageHostLoop();
-  if (isDrawer()) flushStrokes();
+  if (isDrawer()) drawPump.tick();
 }
 
 // ---------- rysowanie (kalambury) ----------
@@ -483,18 +496,17 @@ const COLORS = ['#15201b', '#ffffff', '#269B4D', '#16532A', '#d23c2f', '#f2a33a'
 const SIZES = [4, 9, 18, 36];
 let color = COLORS[0], size = SIZES[1], strokeId = 0, cur = null, buf = [];
 try { const c = localStorage.getItem('pepaint-color'); if (PALETTE.includes(c)) color = c; } catch {}
-// PEPaint undo: the artist keeps their own lines; undo redraws the picture without the last one and sends
-// everyone a fresh snapshot (the same small JPEG a late joiner gets), at most one per half second
+// Undo / clear / late joins coalesce into a full-canvas snapshot using the
+// same paced channel as normal strokes; they cannot bypass the shared budget.
 const hist = [];
-let undoTimer = null;
+let needsSnapshot = false, pendingSnap = null;
 function redraw() { blank(); for (const st of hist) for (let i = 0; i < st.p.length; i += 2) seg(st.c, st.w, [st.p[Math.max(0, i - 2)], st.p[Math.max(1, i - 1)]], [st.p[i], st.p[i + 1]]); }
 function undo() {
   if (!isDrawer() || !hist.length) return;
   cur = null; buf.length = 0; hist.pop(); redraw();
-  clearTimeout(undoTimer);
-  undoTimer = setTimeout(() => { if (!isDrawer()) return; turnCh?.send('clear', {}); turnCh?.send('snap', { data: cv.toDataURL('image/jpeg', 0.6) }); }, 500);
+  needsSnapshot = true;
 }
-function clearAll() { if (!isDrawer()) return; cur = null; buf.length = 0; hist.length = 0; clearTimeout(undoTimer); blank(); turnCh?.send('clear', {}); }
+function clearAll() { if (!isDrawer()) return; cur = null; buf.length = 0; hist.length = 0; blank(); needsSnapshot = true; }
 let ptTool = 'brush';   // PEPaint tool: pencil (thin), brush, eraser (white), picker
 const strokeStyle = () => ptTool === 'eraser' ? ['#ffffff', Math.max(size, 18)] : ptTool === 'pencil' ? [color, 3] : [color, size];
 const strokes = new Map(); // id -> last point (u odbiorców)
@@ -511,7 +523,7 @@ function renderTools() {
     onclick: (e) => { size = s; t.querySelectorAll('.size').forEach((x) => x.setAttribute('aria-pressed', String(x === e.currentTarget))); } },
     h('i', { style: `width:${Math.max(4, s / 2)}px;height:${Math.max(4, s / 2)}px` })));
   t.append(h('span', { class: 'sep' }),
-    h('button', { class: 'btn sm', onclick: () => { blank(); turnCh?.send('clear', {}); } }, '🗑 Clear'),
+    h('button', { class: 'btn sm', onclick: clearAll }, '🗑 Clear'),
     h('button', { class: 'btn sm', onclick: async () => { try { await be.rpc('gry_skip', { p_code: code }); } catch (e) { toast(e.message, 'bad'); } } }, '⏭ Skip'));
 }
 new MutationObserver(() => { if ($('#tools').classList.contains('hidden') && !isPaint()) delete $('#tools').dataset.ready; }).observe($('#tools'), { attributes: true, attributeFilter: ['class'] });
@@ -582,9 +594,10 @@ cv.addEventListener('pointermove', (e) => {
   for (const ev of evs) {
     const p = pos(ev);
     if (Math.abs(p[0] - cur.last[0]) + Math.abs(p[1] - cur.last[1]) < 3) continue;
-    seg(cur.c, cur.w, cur.last, p); cur.last = p;
+    const previous = cur.last;
+    seg(cur.c, cur.w, previous, p); cur.last = p;
     let b = buf.at(-1);
-    if (!b || b.id !== cur.id) { b = { id: cur.id, c: cur.c, w: cur.w, p: [] }; buf.push(b); }
+    if (!b || b.id !== cur.id) { b = { id: cur.id, c: cur.c, w: cur.w, p: [...previous] }; buf.push(b); }
     b.p.push(p[0], p[1]); cur.h.p.push(p[0], p[1]);
   }
 });
@@ -602,29 +615,72 @@ const endStroke = () => { cur = null; };
 cv.addEventListener('pointermove', (e) => { if (isPaint()) { const p = pos(e); ptStatus.set(2, `${Math.max(0, p[0])}, ${Math.max(0, p[1])}px`); } });
 cv.addEventListener('pointerleave', () => { if (isPaint()) ptStatus.set(2, '1000 × 700px'); });
 cv.addEventListener('pointerup', endStroke); cv.addEventListener('pointercancel', endStroke);
-// paczkowanie: limit wiadomości Supabase Free = 100/s na projekt → im więcej graczy, tym rzadziej wysyłamy
-let lastFlush = 0;
-function flushStrokes(force) {
-  const every = Math.max(120, (S?.players.length || 1) * 20);   // ≈50 doręczeń/s niezależnie od liczby graczy
-  if (!buf.length || (!force && Date.now() - lastFlush < every)) return;
-  lastFlush = Date.now();
-  turnCh?.send('d', { s: buf.splice(0) });
+const drawPump = makeDrawPump({
+  take() {
+    if (!isDrawer() || (!needsSnapshot && !buf.length)) return null;
+    if (needsSnapshot || buf.length > 256 || buf.some((s) => s.p.length > 4096) || JSON.stringify(buf).length > MAX_DRAW_JSON) {
+      let quality = 0.6, data = cv.toDataURL('image/jpeg', quality);
+      while (data.length > MAX_DRAW_JSON && quality > 0.1) {
+        quality -= 0.1; data = cv.toDataURL('image/jpeg', quality);
+      }
+      if (data.length > MAX_DRAW_JSON) return null;
+      buf.length = 0; needsSnapshot = false;
+      return { event: 'snap', payload: { data } };
+    }
+    return { event: 'd', payload: { s: buf.splice(0) } };
+  },
+  async send(packet) {
+    // The local emulator has no Supabase Realtime quotas. Production never
+    // bypasses the guarded RPC, including when the service is busy.
+    if (be.kind === 'local') {
+      turnCh?.send(packet.event, packet.payload);
+      return { ok: true, interval_ms: 250 };
+    }
+    return be.rpc('gry_pepaint_draw', { p_code: code, p_turn: curTurn, p_event: packet.event, p_payload: packet.payload });
+  },
+  restore(packet, uncertain) {
+    if (uncertain || packet.event === 'snap') needsSnapshot = true;
+    else if (!needsSnapshot) buf = [...packet.payload.s, ...buf];
+  },
+  closed: async () => {
+    const turn = curTurn;
+    await fetchState();
+    if (!roomEnded && curTurn === turn && isDrawer()) {
+      needsSnapshot = true; drawPump.reset(1500);
+    }
+  },
+});
+function applyStrokes(list) {
+  for (const s of list || []) {
+    let last = strokes.get(s.id);
+    for (let i = 0; i < s.p.length; i += 2) {
+      const pt = [s.p[i], s.p[i + 1]];
+      seg(s.c, s.w, last || pt, pt); last = pt;
+    }
+    strokes.set(s.id, last);
+  }
 }
 function onTurnMsg(event, p) {
   const turnFor = curTurn;
   if (S?.room.mode === 'kalambury') {
     if (isDrawer()) return;
-    if (event === 'd') for (const s of p.s) {
-      let last = strokes.get(s.id);
-      for (let i = 0; i < s.p.length; i += 2) {
-        const pt = [s.p[i], s.p[i + 1]];
-        seg(s.c, s.w, last || pt, pt); last = pt;
-      }
-      strokes.set(s.id, last);
+    if (event === 'd') {
+      if (pendingSnap) pendingSnap.later.push(...(p.s || []));
+      else applyStrokes(p.s);
     }
-    else if (event === 'clear') { blank(); strokes.clear(); }
+    else if (event === 'clear') { pendingSnap = null; blank(); strokes.clear(); }
     // only an inline JPEG from the drawer's canvas, never an outside address (it would reveal viewers' IPs)
-    else if (event === 'snap' && typeof p.data === 'string' && p.data.startsWith('data:image/jpeg;base64,')) { const im = new Image(); im.onload = () => ctx.drawImage(im, 0, 0, W, H); im.src = p.data; }
+    else if (event === 'snap' && typeof p.data === 'string' && p.data.startsWith('data:image/jpeg;base64,')) {
+      const im = new Image(), snap = { later: [] }; pendingSnap = snap;
+      im.onload = () => {
+        if (turnFor !== curTurn || pendingSnap !== snap) return;
+        pendingSnap = null; blank(); strokes.clear(); ctx.drawImage(im, 0, 0, W, H); applyStrokes(snap.later);
+      };
+      im.onerror = () => {
+        if (pendingSnap === snap) { pendingSnap = null; applyStrokes(snap.later); }
+      };
+      im.src = p.data;
+    }
   } else if (event === 'stage' && !isImgHost()) {
     if (p.data) drawStage(p);
     else if (p.key) recv.key(p, (url) => { if (curTurn === turnFor) drawStage({ i: p.i, n: p.n, data: url }); });
@@ -637,7 +693,7 @@ function resendForLateJoiner() {
   const wait = resendAt + 5000 - Date.now();
   if (wait > 0) { if (!resendTimer) resendTimer = setTimeout(() => { resendTimer = null; resendForLateJoiner(); }, wait); return; }
   resendAt = Date.now();
-  if (isDrawer()) { flushStrokes(true); setTimeout(() => turnCh?.send('snap', { data: cv.toDataURL('image/jpeg', 0.6) }), 300); }
+  if (isDrawer()) needsSnapshot = true;
   if (isImgHost() && img.sent >= 0) setTimeout(() => sendStage(img.sent, true), 300);
 }
 
