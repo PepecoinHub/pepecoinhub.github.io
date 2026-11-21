@@ -147,20 +147,31 @@ test('hop out of the window: whole-pixel arc from the window to the taskbar slot
   assert.match(shell, /minBtn\.addEventListener\('click', A\._hop, true\)/);
 });
 
-test('A3: the 9 animations are 33 real 48 x 48 frames that pass the art check, each drawn from one pose', async () => {
+test('A3 + PR #390: the 17 animations are 65 real 48 x 48 frames that pass the art check, each drawn from one pose', async () => {
   const { checkFile } = await import('../scripts/pepegochi_art_qa.mjs');
   const { ANIMS, animFrames, POSES } = await import('../docs/meme/pepegochi-taskbar.mjs');
-  assert.deepEqual(Object.keys(ANIMS), ['wobble', 'bob', 'peek', 'hop', 'shuffle', 'greet', 'nod', 'slouch', 'tremble']);
+  assert.deepEqual(Object.keys(ANIMS), ['wobble', 'bob', 'peek', 'hop', 'shuffle', 'greet', 'nod', 'slouch', 'tremble',
+    'eat', 'wash', 'sleep', 'celebrate', 'search', 'read', 'tadpole_swim', 'froglet_hop']);
   let n = 0;
   for (const name of Object.keys(ANIMS)) {
     assert.ok(POSES.includes(ANIMS[name].base), name);
     for (const f of animFrames(name)) {
       n++;
-      const r = checkFile(new URL('../docs/games/img/pepegochi/' + f, import.meta.url).pathname, { format: 'B', prop: f.endsWith('tb_hop_03.png') });
+      const r = checkFile(new URL('../docs/games/img/pepegochi/' + f, import.meta.url).pathname, { format: 'B', prop: f.endsWith('tb_hop_03.png') || /tb_(eat|wash|sleep|celebrate|search|read|tadpole_swim)_/.test(f) });
       assert.deepEqual(r.problems, [], f);
     }
   }
-  assert.equal(n, 33);
+  assert.equal(n, 65);
   const js = readFileSync(new URL('../docs/meme/pepegochi-taskbar.mjs', import.meta.url), 'utf8');
   assert.match(js, /if \(a && showing\(a\.base\)\)/, 'frames only over their own pose; otherwise the CSS move');
+});
+test('PR #390: care, stamps, Find and notes play their own frames, only over the healthy sitting pose', async () => {
+  const { ANIMS, ACTION_ANIM } = await import('../docs/meme/pepegochi-taskbar.mjs');
+  for (const [action, name] of Object.entries(ACTION_ANIM)) {
+    assert.ok(ANIMS[name], action + ' -> ' + name);
+    assert.equal(ANIMS[name].base, 'tb_adult_sit', name);
+  }
+  assert.equal(ACTION_ANIM.fed, 'eat'); assert.equal(ACTION_ANIM.clean, 'wash'); assert.equal(ACTION_ANIM.rested, 'sleep');
+  assert.equal(ACTION_ANIM.stamp, 'celebrate');
+  assert.equal(ANIMS.tadpole_swim.base, 'tb_tadpole'); assert.equal(ANIMS.froglet_hop.base, 'tb_froglet');
 });

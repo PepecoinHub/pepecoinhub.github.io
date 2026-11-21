@@ -4,8 +4,9 @@
 import { getBackend } from './backend.js?v=20261113link';
 import { LiveGame } from './pepegochi-live-view.mjs?v=20261120notes3';
 import { renderRoom, playDeparture, playFrames, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261120notes3';
-import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261120notes3';
-import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261120notes3';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121map';
+import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261121map';
+import { openPondMap, noteLines } from './pond-map.mjs?v=20261121map';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {
@@ -29,17 +30,37 @@ function meter(n) {
 
 // The frog's notes on the table (clues and other important messages), kept in this browser per account and life.
 let notesOpen = false;
-const myNotes = () => {
+// Pond Map notes come from the server (gry_map_notes): they stay on the table on every device and for every frog.
+let mapNotes = [], mapAsked = false;
+const synced = new Set();
+function loadMapNotes() {
+  if (mapAsked || !backend?.rpc) return;
+  mapAsked = true;
+  backend.rpc('gry_map_notes').then(list => { mapNotes = Array.isArray(list) ? list : []; if (game.last && !game.busy) render(); }).catch(() => {});
+}
+const localNotes = () => {
   const pet = game.last?.pet, user = backend?.session?.()?.user;
   if (!pet || pet.status === 'departed' || !user || user.is_anonymous) return [];
   return notesFor(user.id, pet.life_id);
+};
+const myNotes = () => {
+  const local = localNotes();
+  // the frog's clues about the map, written in this browser, are copied to the server once so they never get lost
+  for (const n of local) {
+    const m = n.kind === 'clue' && /^pond_map_([1-6])$/.exec(n.secret || '');
+    if (m && !synced.has(m[1]) && backend?.rpc) { synced.add(m[1]); backend.rpc('gry_map_note', { p_key: 'clue_' + m[1] }).then(() => { mapAsked = false; loadMapNotes(); }).catch(() => {}); }
+  }
+  const serverClues = new Set(mapNotes.filter(n => /^clue_/.test(n.key)).map(n => 'pond_map_' + n.key.slice(5)));
+  const shown = local.filter(n => !(n.kind === 'clue' && serverClues.has(n.secret)));
+  if (game.last?.pet && game.last.pet.status !== 'departed') noteLines(mapNotes).forEach(text => shown.push({ text, day: null }));
+  return shown;
 };
 function renderNotes(box) {
   const notes = myNotes();
   if (!notesOpen || !notes.length) { notesOpen = false; return; }
   const pad = el('div', { class: 'pgb-notepad pgb-notes', role: 'document', 'aria-label': 'NOTES.TXT', id: 'pgb-notes', tabindex: '-1' });
   const ol = el('ol');
-  notes.forEach(n => { const li = el('li', {}, n.text); li.append(el('small', {}, `Good care day ${n.day}`)); ol.append(li); });
+  notes.forEach(n => { const li = el('li', {}, n.text); li.append(el('small', {}, n.day == null ? 'Pond Map' : `Good care day ${n.day}`)); ol.append(li); });
   pad.append(el('div', { class: 'pgb-notepad-bar' }, 'NOTES.TXT - notes from your Fren'), ol,
     el('button', { type: 'button', class: 'btn', 'data-close-notes': '1' }, 'Close'));
   box.append(pad);
@@ -105,7 +126,9 @@ function renderDeparted(box, v) {
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const petImg = () => document.querySelector('#pgb-scene .pgr-pet');
 const roomInteractions = createRoomInteractions({ getView: () => game.view(), isBusy: () => game.busy,
-  care: runCare, reduced: reduceMotion, openTV: () => {
+  care: runCare, reduced: reduceMotion,
+  openPainting: say => { if (backend) openPondMap(backend, { say }); },
+  openTV: () => {
     if (window.parent !== window) window.parent.postMessage({ type: 'pondos:pepegochi-room-tv' }, location.origin);
   } });
 let shown = null, stopAnim = null, sceneKey = '', careDone = null;
@@ -239,4 +262,5 @@ window.addEventListener('message', event => {
   try { backend = await getBackend(); } catch (e) { game.error = e.message; render(); return; }
   if (!backend.session || !backend.session() || backend.session().user.is_anonymous) { game.signin = true; render(); return; }
   await run(game.refresh());
+  loadMapNotes();
 })();

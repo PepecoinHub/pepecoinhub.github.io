@@ -3,8 +3,12 @@
 // or pick an open room from the list (the whole row is the button). The rooms themselves are room.html.
 import { $, h, toast, errorNote, getBackend, identityCard, meInfo, nickStore } from './common.js';
 import { menuBar, statusBar, dialog, howToPlay, TOOL_SVG, DECOR_TOOLS, PALETTE, TIMES, setWinTitle } from './paintchrome.js';
+import { openOldSketch } from './old-sketch.mjs?v=20261121map';
 
 const be = await getBackend();
+// the Pond Map: old_sketch.bmp shows up in File only once the server says the map is on for this player
+let mapOn = false;
+be.rpc('gry_map_state').then((st) => { mapOn = !!(st && (st.allowed || st.reason === 'locked')); }).catch(() => {});
 const app = $('#main');
 const framed = (() => { try { return window.self !== window.top; } catch { return true; } })();
 let rooms = [], me = null, loadErr = null;
@@ -24,7 +28,7 @@ const status = statusBar(3);
 const HINT = 'Start a party, type a code, or click a room on the list.';
 const hint = (t) => status.set(0, t || HINT);
 const menu = menuBar([
-  ['File', () => [['New party room', () => createRoom()], ['Quick join', quickJoin], '-', ['Refresh the room list', () => load(true)], ['Clear my doodles', () => clearInk(), { disabled: !inked }], '-', [framed ? 'Exit' : 'Exit to PondOS', exit]]],
+  ['File', () => [['New party room', () => createRoom()], ['Quick join', quickJoin], '-', ['Refresh the room list', () => load(true)], ['Clear my doodles', () => clearInk(), { disabled: !inked }], ...(mapOn ? ['-', ['Open old_sketch.bmp…', () => openOldSketch({ onStatus: hint })]] : []), '-', [framed ? 'Exit' : 'Exit to PondOS', exit]]],
   ['Top', [['Top of the week', () => openTop('week')], ['Last week', () => openTop('last')], ['All time', () => openTop('all')], '-', ['My stats', () => openTop('week')]]],
   ['View', () => [[(app.classList.contains('no-box') ? 'Show' : 'Hide') + ' the tool box', () => toggle('no-box')], [(app.classList.contains('no-pal') ? 'Show' : 'Hide') + ' the colour box', () => toggle('no-pal')], [(app.classList.contains('no-status') ? 'Show' : 'Hide') + ' the status bar', () => toggle('no-status')]]],
   ['Help', [['How to play', help], '-', ['About PEPaint', about]]],

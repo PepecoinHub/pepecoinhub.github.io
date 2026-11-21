@@ -12,7 +12,7 @@ test('Fren Passport has unique and well-formed public catalog IDs', () => {
   const entries = kinds.flatMap(key => catalog[key]);
   assert.equal(catalog.version, 1);
   // +7: expansion 7 (owner, 2026-11-15). Includes the two Haze stamps, which stay planned until earned.
-  assert.deepEqual(kinds.map(key => catalog[key].length), [67, 19, 8, 4]);
+  assert.deepEqual(kinds.map(key => catalog[key].length), [67, 20, 8, 4]);
   for(const id of ['haze_linked','haze_first_tip'])assert.equal(catalog.achievements.find(item=>item.id===id)?.status,'planned');
   const ids = entries.map(x => x.id);
   assert.equal(new Set(ids).size, ids.length);
@@ -195,7 +195,7 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
     // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
     'stamps-v3.webp': [62 * 138, 150], 'pond-pioneer-v3.webp': [138, 150],
     // Pond Dominator: the owner's own art, one V3-sized tile outside the atlas (update_wheres_pepe_hall_of_fame.sql)
-    'pond-dominator.webp': [138, 150], 'crown-breaker.webp': [138, 150],
+    'pond-dominator.webp': [138, 150], 'crown-breaker.webp': [138, 150], 'pond-archivist.webp': [138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');

@@ -568,38 +568,52 @@
     },
     {
       "id": "pond_map_1",
-      "title": "Map Fragment I",
-      "hint": "One of six pieces of an old pond map.",
-      "status": "planned"
+      "title": "Map Piece I",
+      "hint": "One of six pieces of an old pond map. The Golden Foot knows more.",
+      "status": "planned",
+      "description": "A torn piece of the old pond map, found and checked by the server."
     },
     {
       "id": "pond_map_2",
-      "title": "Map Fragment II",
-      "hint": "One of six pieces of an old pond map.",
-      "status": "planned"
+      "title": "Map Piece II",
+      "hint": "One of six pieces of an old pond map. The Golden Foot knows more.",
+      "status": "planned",
+      "description": "A torn piece of the old pond map, found and checked by the server."
     },
     {
       "id": "pond_map_3",
-      "title": "Map Fragment III",
-      "hint": "One of six pieces of an old pond map.",
-      "status": "planned"
+      "title": "Map Piece III",
+      "hint": "One of six pieces of an old pond map. The Golden Foot knows more.",
+      "status": "planned",
+      "description": "A torn piece of the old pond map, found and checked by the server."
     },
     {
       "id": "pond_map_4",
-      "title": "Map Fragment IV",
-      "hint": "One of six pieces of an old pond map.",
-      "status": "planned"
+      "title": "Map Piece IV",
+      "hint": "One of six pieces of an old pond map. The Golden Foot knows more.",
+      "status": "planned",
+      "description": "A torn piece of the old pond map, found and checked by the server."
     },
     {
       "id": "pond_map_5",
-      "title": "Map Fragment V",
-      "hint": "One of six pieces of an old pond map.",
-      "status": "planned"
+      "title": "Map Piece V",
+      "hint": "One of six pieces of an old pond map. The Golden Foot knows more.",
+      "status": "planned",
+      "description": "A torn piece of the old pond map, found and checked by the server."
     },
     {
       "id": "pond_map_6",
-      "title": "Map Fragment VI",
-      "hint": "One of six pieces of an old pond map.",
+      "title": "Map Piece VI",
+      "hint": "One of six pieces of an old pond map. The Golden Foot knows more.",
+      "status": "planned",
+      "description": "A torn piece of the old pond map, found and checked by the server."
+    },
+    {
+      "id": "pond_archivist",
+      "title": "Pond Archivist",
+      "hint": "Six pieces make a map. A map leads somewhere.",
+      "description": "Put the whole pond map back together and read what was hidden behind it.",
+      "gold": true,
       "status": "planned"
     }
   ],
