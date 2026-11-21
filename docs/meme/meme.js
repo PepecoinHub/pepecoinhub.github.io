@@ -5224,16 +5224,17 @@
   ADS = ADS.filter(function (ad) { return (!ad.from || AD_PREVIEW || Date.now() >= Date.parse(ad.from)) && (FREN || !ad.fren) && (GOLDHOOK || !ad.goldhook); });
   function adByFile(f) { for (var k = 0; k < ADS.length; k++) if (ADS[k].file === f) return k; return -1; }
   var adNew = function (ad) { return !!ad.added && Date.now() - Date.parse(ad.added + 'T00:00:00Z') < 21 * 864e5 && adSeen().indexOf(ad.file) < 0; };
+  var ADS_SHOWN = 7;
+  // only the 7 newest ads in the main folder can be "new"; the Archive never shows a red dot (owner, 2026-11-21)
   function adBadges() {
-    var n = ADS.filter(adNew).length;
+    var shown = adOrder().slice(0, ADS_SHOWN);
+    var n = shown.filter(function (i) { return adNew(ADS[i]); }).length;
     document.querySelectorAll('.icons a[href="#ads"]').forEach(function (a) {
       var b = a.querySelector('.ads-new');
       if (!b) { b = el('span', { class: 'ads-new mail-badge', title: 'New ads' }); a.appendChild(b); }
       b.textContent = n; b.hidden = !n;
     });
-    document.querySelectorAll('.ads-folder button[data-i]').forEach(function (b) { b.classList.toggle('is-new', adNew(ADS[+b.getAttribute('data-i')])); });
-    var arch = adOrder().slice(ADS_SHOWN).some(function (i) { return adNew(ADS[i]); });
-    document.querySelectorAll('.ads-folder .ads-arch').forEach(function (b) { b.classList.toggle('is-new', arch); });
+    document.querySelectorAll('.ads-folder button[data-i]').forEach(function (b) { var i = +b.getAttribute('data-i'); b.classList.toggle('is-new', shown.indexOf(i) >= 0 && adNew(ADS[i])); });
   }
   gzAddAds();   // the Newsroom's ads from the last visit (refreshed a moment after start)
   setTimeout(adBadges, 0);
@@ -5286,8 +5287,7 @@
     return A;
   }
   // PEP-TV Ads shows the 7 newest ads (by "added"; a Newsroom ad by its publish date; undated ones count as oldest).
-  // Everything older sits in the Archive subfolder (owner, 2026-11-21). The red "new" dot works in both.
-  var ADS_SHOWN = 7;
+  // Everything older sits in the Archive subfolder (owner, 2026-11-21), without red dots.
   function adOrder() {
     return ADS.map(function (ad, i) { return i; }).sort(function (a, b) {
       var x = ADS[a].added || '', y = ADS[b].added || '';
