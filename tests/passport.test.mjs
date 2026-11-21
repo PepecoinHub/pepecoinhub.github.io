@@ -196,6 +196,7 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
     'stamps-v3.webp': [62 * 138, 150], 'pond-pioneer-v3.webp': [138, 150],
     // Pond Dominator: the owner's own art, one V3-sized tile outside the atlas (update_wheres_pepe_hall_of_fame.sql)
     'pond-dominator.webp': [138, 150], 'crown-breaker.webp': [138, 150], 'pond-archivist.webp': [138, 150],
+    'haze-linked.webp': [138, 150], 'first-haze-tip.webp': [138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
     'paper.webp': [320, 320], 'bali-ticket.webp': [310, 114] };
   assert.deepEqual(readdirSync(dir).sort(), Object.keys(want).sort(), 'no stray or missing passport art');
@@ -210,7 +211,7 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
     assert.equal(b.toString('latin1', 12, 16), 'VP8X', f + ' carries alpha');
     assert.deepEqual([1 + b.readUIntLE(24, 3), 1 + b.readUIntLE(27, 3)], size, f + ' size');
   }
-  assert.ok(total < 280 * 1024, 'passport art including Crown Breaker stays small: ' + total + ' bytes');
+  assert.ok(total < 300 * 1024, 'passport art including both Haze stamps stays small: ' + total + ' bytes');
   // the client must use the sprite with the same cell counts
   const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
@@ -220,6 +221,11 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
   assert.doesNotMatch(js, /PP_LILY/, 'No old Lily sprite fallback');
   const css = readFileSync(new URL('../docs/meme/passport.css', import.meta.url), 'utf8');
   assert.match(css, /\.pp-art-stamp\.is-pioneer/, 'Pond Pioneer class has its own stamp art');
+  for (const [id, name] of [['haze_linked', 'haze-linked'], ['haze_first_tip', 'first-haze-tip']]) {
+    assert.ok(js.includes(`if (earned && x.id === '${id}') return el('span', { class: 'pp-art pp-art-stamp is-${name}'`));
+    assert.ok(css.includes(`.pp-art-stamp.is-${name} { background-image: url(passport-assets/${name}.webp`));
+    assert.ok(readFileSync(new URL(name + '.webp', dir)).length < 12 * 1024);
+  }
   assert.doesNotMatch(css, /\.pp-art-stamp\.is-lily|stamps-lily\.webp/, 'No runtime CSS dependency on Lily');
   const v3 = readFileSync(new URL('../scripts/build_v3_stamps.py', import.meta.url), 'utf8').match(/V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join();
   assert.equal(v3, js.match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).join(), 'same order as the build script');

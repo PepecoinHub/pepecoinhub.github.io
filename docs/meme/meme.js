@@ -2232,7 +2232,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261118crown';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261121map'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261121hazeart'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -2423,6 +2423,8 @@
     if (earned && x.id === 'pond_pioneer') return el('span', {class:'pp-art pp-art-stamp is-pioneer',role:'img','aria-label':'Pond Pioneer'});
     if (earned && x.id === 'pond_dominator') return el('span', { class: 'pp-art pp-art-stamp is-dominator', 'aria-hidden': 'true' });
     if (earned && x.id === 'crown_breaker') return el('span', { class: 'pp-art pp-art-stamp is-crown-breaker', 'aria-hidden': 'true' });
+    if (earned && x.id === 'haze_linked') return el('span', { class: 'pp-art pp-art-stamp is-haze-linked', 'aria-hidden': 'true' });
+    if (earned && x.id === 'haze_first_tip') return el('span', { class: 'pp-art pp-art-stamp is-first-haze-tip', 'aria-hidden': 'true' });
     if (earned && PP_V3.indexOf(x.id) >= 0) return ppSprite('pp-art pp-art-stamp is-v3', PP_V3, x.id);
     if (!earned) return ppSprite('pp-art pp-art-stamp', PP_STAMPS, 'locked');
     var pending = el('span', { class: 'pp-art pp-art-stamp is-pending', 'aria-hidden': 'true' });
