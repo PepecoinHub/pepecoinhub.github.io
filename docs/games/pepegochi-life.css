@@ -1,0 +1,24 @@
+.pgl { max-width: 860px; }
+.pgl-banner { background: var(--mark, #ffe066); color: #142016; border: 2px solid var(--line, #142016); padding: .6rem .8rem; }
+.pgl-buttons, .pgl-inputs { display: flex; flex-wrap: wrap; gap: .5rem .9rem; align-items: center; margin: .5rem 0; }
+.pgl-inputs label { display: inline-flex; gap: .35rem; align-items: center; }
+.pgl-notebook { background-color: #fffef7; color: #1d2a1f; border: 2px solid #142016; border-left: 14px double #8a9b8c;
+  background-image: linear-gradient(#cfe0f2 1px, transparent 1px), linear-gradient(90deg, #cfe0f2 1px, transparent 1px);
+  background-size: 22px 22px; padding: 14px 18px 18px 22px; min-height: 160px; font-family: var(--f-mono, monospace); line-height: 22px; }
+.pgl-page { margin: 0 0 22px; }
+.pgl-page b { color: #1f5c28; }
+.pgl-page.is-new { animation: pgl-in .5s steps(5, end); }
+.pgl-new { display: inline-block; background: #f2b544; color: #142016; font-size: .7rem; padding: 0 .35rem; margin-left: .4rem; }
+.pgl-empty { color: #4c5a4e; font-style: italic; }
+.pgl-card { display: grid; grid-template-columns: 3fr 2fr; gap: 0; border: 2px solid #142016; background: #fffdf4; color: #142016; max-width: 640px; aspect-ratio: 16 / 9; }
+.pgl-card-pic { display: grid; place-items: center; background: #d9eecd; border-right: 2px dashed #142016; font-family: var(--f-mono, monospace); text-align: center; padding: 1rem; }
+.pgl-card-pic span { font-size: 2.6rem; display: block; }
+.pgl-card-text { padding: .8rem; font-family: var(--f-mono, monospace); font-size: .85rem; position: relative; }
+.pgl-card-text h3 { margin: 0 3.4rem .5rem 0; font-size: .95rem; }
+.pgl-stamp { position: absolute; top: .6rem; right: .6rem; width: 2.6rem; height: 3rem; border: 2px dotted #b3503a; display: grid; place-items: center; font-size: .6rem; color: #b3503a; }
+.pgl-souv { margin-top: .6rem; padding: .3rem .5rem; border: 1px solid #142016; background: #fcefd1; }
+.pgl-rarity { text-transform: uppercase; font-size: .7rem; font-weight: 700; }
+.pgl-rare { columns: 2; font-family: var(--f-mono, monospace); font-size: .85rem; }
+@keyframes pgl-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pgl-page.is-new { animation: none; } }
+@media (max-width: 600px) { .pgl-card { grid-template-columns: 1fr; aspect-ratio: auto; } .pgl-card-pic { border-right: 0; border-bottom: 2px dashed #142016; } .pgl-rare { columns: 1; } }
