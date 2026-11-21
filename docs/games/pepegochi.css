@@ -191,3 +191,47 @@ html.embed body { padding-inline: 0; }
 .pgb-diary li { margin-bottom: .45rem; }
 .pgb-diary li small { display: block; opacity: .7; }
 @media (prefers-reduced-motion: reduce) { .pgr-window .pgr-visitor { animation: none; } .pgr-window-ufo .pgr-visitor { left: 30%; top: -10%; } .pgr-window-spy_duck .pgr-visitor { bottom: -6%; } }
+
+/* Compact everyday care: one meter and its action per tile, never two separate panels.
+   Keep generous touch targets; reclaim space from nesting, not from legible controls. */
+.pgb { gap:6px; padding:6px; }
+html.embed main.wrap.pgb { padding:4px !important; }
+.pgb > .card { padding:8px; min-width:0; }
+.pgb > .pgb-scene { padding:4px !important; }
+.pgb-scene .pgb-title { margin:3px 4px 5px; font-size:14px; line-height:1.25; }
+.pgb-main h2 { margin:0 0 3px; font-size:14px; }
+.pgb .pgb-msg:empty { min-height:0; margin:0; }
+.pgb-main .pgb-status { margin:0 0 6px; font-size:13px; font-style:normal; line-height:1.3; }
+.pgb-actions { max-width:none; margin:4px 0; gap:8px; }
+.pgb-care-tile { display:flex; flex-direction:column; min-width:0; gap:3px; padding:4px; border:1px solid var(--grid); background:var(--surface-2); }
+html.embed .pgb-care-tile { background:#d5d4cd; border:1px solid #92938b; box-shadow:inset 1px 1px #f4f3e9; }
+.pgb-care-tile .pgb-need { grid-template-columns:minmax(0,1fr) auto; gap:1px 4px; font-size:13px; line-height:1.2; }
+.pgb-care-tile .pgb-need-name { font-weight:600; }
+.pgb-care-tile .pgb-need b { font-variant-numeric:tabular-nums; }
+.pgb-care-tile .pgb-need meter { grid-column:1/-1; width:100%; height:10px; display:block; }
+.pgb-care-tile .pgb-need-note { margin-top:2px; font-size:11px; overflow-wrap:anywhere; }
+.pgb-care-tile .btn[data-act] { width:100%; margin-top:auto; min-height:44px; padding:4px 3px; gap:1px; }
+.pgb-care-tile .pgb-action-label { font-size:14px; }
+.pgb-care-tile .pgb-action-detail { font-size:12px; }
+html.embed .pgb-care-tile .btn[data-act]:not(:disabled) { background:#dce7c9 !important; }
+html.embed .pgb-care-tile .is-low { color:#861b14; }
+@media (max-width:679px) { .pgb-care-tile .btn[data-act] { min-height:52px; } }
+.pgb-good { max-width:none; margin:6px 0; padding:6px; color:#222; font-size:12px; line-height:1.3; }
+.pgb-good-header,.pgb-good-footer { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:3px 8px; }
+.pgb-good-header b { font-size:13px; }
+.pgb-good progress { display:block; max-width:none; width:100%; height:10px; margin:4px 0; accent-color:#176c30; }
+.pgb-good-today.is-good { color:#27633d; font-weight:600; }
+.pgb-streak { color:#53534f; white-space:nowrap; }
+.pgb-main .small.muted { font-size:12px; line-height:1.35; overflow-wrap:anywhere; }
+.pgb-live details.card > summary { cursor:pointer; font-size:13px; font-weight:700; min-height:32px; padding:6px 2px; }
+.pgb-live .pgb-decor-card p { font-size:13px; line-height:1.4; }
+
+/* Keep the room response and the accessible controls in a single compact strip. */
+.pgr-toolbar { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:stretch; background:#d4d0c8; border-top:2px groove #aaa; }
+.pgb .pgr-toolbar .pgr-response { margin:0; padding:5px 6px; min-height:0; display:flex; align-items:center; border:0; color:#333; font-size:12px; line-height:1.3; overflow-wrap:anywhere; }
+.pgr-toolbar .pgr-shortcuts { border:0; padding:0 4px; }
+.pgr-toolbar .pgr-shortcuts summary { display:list-item; min-height:44px; line-height:18px; padding:13px 4px; font-size:12px; white-space:nowrap; }
+.pgr-toolbar:has(.pgr-shortcuts[open]) { grid-template-columns:minmax(0,1fr); }
+.pgr-toolbar .pgr-shortcuts[open] { border-top:1px solid #999; padding-bottom:5px; }
+.pgr-toolbar .pgr-shortcuts:not([open]) { border-left:1px solid #aaa; }
+.pgr-toolbar .pgr-shortcuts > div { padding-top:0; }

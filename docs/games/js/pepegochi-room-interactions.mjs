@@ -114,7 +114,8 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
       const feedback = doc.createElement('p');
       feedback.className = 'pgr-response'; feedback.setAttribute('role', 'status');
       feedback.textContent = 'Click your Fren or something in the room.';
-      frame.append(feedback);
+      const toolbar = doc.createElement('div'); toolbar.className = 'pgr-toolbar';
+      toolbar.append(feedback); frame.append(toolbar);
       let speechBubble = null, speechTimer = null;
       const clearSpeech = () => { if (speechTimer !== null) clearTimeout(speechTimer); speechTimer=null; speechBubble?.remove(); speechBubble=null; };
       function showSpeech() {
@@ -141,7 +142,7 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
       const buttons = [], effects=mountRoomEffects(stage,{reduced});
       const shortcuts = doc.createElement('details'); shortcuts.className = 'pgr-shortcuts';
       const summary = doc.createElement('summary'); summary.textContent = 'Room controls'; shortcuts.append(summary);
-      const list = doc.createElement('div'); shortcuts.append(list); frame.append(shortcuts);
+      const list = doc.createElement('div'); shortcuts.append(list); toolbar.append(shortcuts);
       for (const t of targets) {
         const btn = doc.createElement('button'); btn.type = 'button'; btn.className = 'pgr-hotspot';
         btn.dataset.roomAction = t.id; btn.title = t.label; btn.setAttribute('aria-label', t.label);
@@ -168,7 +169,7 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
         const shortcut = doc.createElement('button'); shortcut.type = 'button'; shortcut.className = 'pgr-shortcut';
         shortcut.textContent = t.label; shortcut.addEventListener('click', activate); list.append(shortcut);
       }
-      dispose = () => { clearSpeech(); effects.dispose(); buttons.forEach(b => b.remove()); feedback.remove(); shortcuts.remove(); };
+      dispose = () => { clearSpeech(); effects.dispose(); buttons.forEach(b => b.remove()); toolbar.remove(); };
     },
     dispose() { dispose(); life = null; lampOn = true; lastClick = -Infinity; pats=[]; patIndex=0; propIndices={}; lastSpeech=null; },
   };
