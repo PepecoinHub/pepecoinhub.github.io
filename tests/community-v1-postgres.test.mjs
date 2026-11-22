@@ -136,7 +136,7 @@ test('community dispatch preserves the current PH long-airdrop rules without rep
  psql(`insert into games.haze_links(user_id,address) values(${quote(uid(1))},'PprqR9iJCymdgyU7MhGYEJEYTFiF3LLBA3'),(${quote(uid(2))},'PfTEAYTbZwnCq1apnyUERLQV6effdNfmwX') on conflict(user_id) do nothing;`);
  const owner=await session(),recipient=await session({user:2});const created=await request({action:'rpc',method:'gry_haze_group_create',args:{p_options:{mode:'airdrop',total_atomic:'100000000',seconds:36000,winners:1}}},{token:owner.access_token});assert.equal(created.status,200,created.body.error);
  const joined=await request({action:'rpc',method:'gry_haze_group_join',args:{p_id:created.body.id}},{token:recipient.access_token});assert.equal(joined.status,200,joined.body.error);
- const review=await request({action:'rpc',method:'gry_haze_group_review',args:{p_id:created.body.id}},{token:owner.access_token});assert.equal(review.status,200,review.body.error);assert.ok(Date.parse(review.body.expires_at)-Date.now()>11*3600000);assert.equal(review.body.recipients.length,1);
+ const review=await request({action:'rpc',method:'gry_haze_group_review',args:{p_id:created.body.id}},{token:owner.access_token});assert.equal(review.status,200,review.body.error);assert.ok(Date.parse(review.body.expires_at)-Date.now()<=31*60000,'Haze accepts a review valid for at most ~31 minutes');assert.ok(Date.parse(review.body.created_at)<=Date.now());assert.equal(psql(`select expires_at>clock_timestamp()+interval '11 hours' from games.haze_groups where id=${quote(created.body.id)};`),'t');assert.equal(review.body.recipients.length,1);
 });
 
 test('a per-client allowlist limits one client to named accounts while other clients stay open',async()=>{
