@@ -3,8 +3,8 @@
 // LOCAL TEST ONLY: the page CSP has connect-src 'none', so no request can leave it. No Supabase,
 // no Passport, no stamps. The test frog is kept in this tab's sessionStorage only.
 import { BetaGame, TIME_STEPS } from './pepegochi-beta-view.mjs';
-import { renderRoom, playDeparture, playFrames, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261121genesis';
-import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261121genesis';
+import { renderRoom, playDeparture, playFrames, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261122life';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261122life';
 import { renderCarePanel } from './pepegochi-care-ui.mjs?v=20261121compact';
 
 const $ = id => document.getElementById(id);

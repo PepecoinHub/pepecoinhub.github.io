@@ -432,6 +432,48 @@
       "status": "planned"
     },
     {
+      "id": "tourist",
+      "title": "Tourist",
+      "description": "Your PepeGochi came back from its first trip with a postcard.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "globetrotter",
+      "title": "Globetrotter",
+      "description": "Postcards from all 9 places your PepeGochi can travel to.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "moon_frog",
+      "title": "Moon Frog",
+      "description": "Your PepeGochi made it to the Moon. Pep was already there.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "golden_harvest",
+      "title": "Golden Harvest",
+      "description": "Water the lemon tree in the PepeGochi room 14 days in a row.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "dear_diary",
+      "title": "Dear Diary",
+      "description": "Read your PepeGochi's diary on 7 different days.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
+      "id": "snoop",
+      "title": "Snoop",
+      "description": "Read your PepeGochi's diary at 3 AM. It noticed.",
+      "category": "pepegachi",
+      "status": "planned"
+    },
+    {
       "id": "secret_starter",
       "title": "Secret Starter",
       "description": "Find your first PondOS secret.",
@@ -614,6 +656,13 @@
       "hint": "Six pieces make a map. A map leads somewhere.",
       "description": "Put the whole pond map back together and read what was hidden behind it.",
       "gold": true,
+      "status": "planned"
+    },
+    {
+      "id": "night_signal",
+      "title": "Night Signal",
+      "hint": "Some channels only broadcast while everyone should be asleep.",
+      "description": "Caught the numbers on the room's TV at 3 AM.",
       "status": "planned"
     }
   ],

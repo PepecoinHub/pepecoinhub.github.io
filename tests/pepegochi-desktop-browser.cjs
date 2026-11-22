@@ -59,6 +59,6 @@ let browser;
  await page.emulateMedia({reducedMotion:'no-preference'});await page.setViewportSize({width:390,height:600});await page.evaluate(()=>{t.time+=46000;t.app('games')});assert.equal(await away.count(),0);
  await page.mouse.click(300,80);await page.evaluate(()=>{t.time+=46000;const game=document.createElement('iframe');game.className='fixture-game';document.body.append(game);game.focus();t.app('find')});assert.equal(await away.count(),0);
  await page.evaluate(()=>t.dispose());assert.equal(await page.locator('.pg-companion').count(),0);assert.equal(await page.locator('.pg-desktop-frog-frame,.pg-desktop-firefly,.pg-desktop-tongue,.pg-desktop-popcorn').count(),0);
- assert.ok((await page.evaluate(()=>t.calls)).every(x=>['gry_pepegochi_state','gry_quiz_today'].includes(x)));
+ assert.ok((await page.evaluate(()=>t.calls)).every(x=>['gry_pepegochi_state','gry_quiz_today','gry_pepegochi_life'].includes(x)));   // gry_pepegochi_life: the trip and the diary copy (A12, read with the state)
  assert.deepEqual(errors,[]);console.log('Desktop companion: real wallpaper selection, keyboard catch, perch, popcorn, guardrails and cleanup passed.');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server.close();});

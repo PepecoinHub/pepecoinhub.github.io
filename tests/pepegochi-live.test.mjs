@@ -77,7 +77,8 @@ test('the live page talks only to the game server, keeps nothing in the browser 
   for (const f of ['docs/games/js/pepegochi-live.mjs', 'docs/games/js/pepegochi-live-view.mjs']) {
     const js = file(f);
     assert.doesNotMatch(js, /localStorage|sessionStorage|indexedDB/, f + ' keeps nothing in the browser');
-    // the frog's notes on the table are the only browser data it shows, read only through pepegochi-notes.mjs
+    // the frog's notes and the diary copy are the only browser data it shows, only through pepegochi-notes.mjs and
+    // pepegochi-diary.mjs (the diary is kept on the server too: update_pepegochi_life.sql)
     assert.doesNotMatch(js, /setItem|removeItem/, f + ' never writes to the browser');
     assert.doesNotMatch(js, /pepegochi-model|LocalPepegochi|advance\(/, f + ' never runs the rules itself');
     assert.doesNotMatch(js, /passport_award|gry_passport/, f + ' never touches stamps (the server bridge does)');
