@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseAirdropCommand,timeLeft,AIRDROP_MINUTES} from '../docs/games/js/haze-groups.mjs';
+import {parseAirdropCommand,parseWordCommand,timeLeft,AIRDROP_MINUTES,WORD_SECONDS} from '../docs/games/js/haze-groups.mjs';
 import {parseTipCommand} from '../docs/games/js/haze-tips.mjs';
 
 test('/airdrop takes an amount, an optional "pepe" and minutes or hours',()=>{
@@ -28,4 +28,16 @@ test('countdowns read well from seconds to ten hours',()=>{
   assert.equal(timeLeft(-5),'0s left');
   assert.equal(timeLeft(600*60000),'10h 00m left');
   assert.equal(timeLeft(95*60000),'1h 35m left');
+});
+
+test('/word takes a word, an amount, an optional time (10 s to 6 h) and winners',()=>{
+  assert.deepEqual(parseWordCommand('/word ribbit 500 pepe 2h 5'),{word:'ribbit',amount:'500',seconds:7200,winners:5});
+  assert.deepEqual(parseWordCommand('/word pepe 500 pepe 6h'),{word:'pepe',amount:'500',seconds:21600,winners:1});
+  assert.deepEqual(parseWordCommand('/WORD frog 2,5pep 30s'),{word:'frog',amount:'2.5',seconds:30,winners:1});
+  assert.deepEqual(parseWordCommand('/word frog 100'),{word:'frog',amount:'100',seconds:900,winners:1});
+  assert.deepEqual(parseWordCommand('/word frog 100 pepe 3'),{word:'frog',amount:'100',seconds:900,winners:3},'a lone number is the winner count');
+  assert.deepEqual(parseWordCommand('/word frog 100 pepe 45 3'),{word:'frog',amount:'100',seconds:2700,winners:3},'a number before the winners is minutes');
+  assert.equal(parseWordCommand('/airdrop 5'),null);assert.equal(parseWordCommand('say /word x 5'),null);
+  for(const bad of ['/word','/word frog','/word frog pepe','/word frog 100 7h','/word frog 100 5s','/word frog 100 1h 201','/word '+'x'.repeat(41)+' 100'])assert.throws(()=>parseWordCommand(bad),bad);
+  assert.equal(Math.max(...WORD_SECONDS),21600);
 });

@@ -67,6 +67,17 @@ test('group SQL: all audiences, exact splits, frozen recipients, timed chat roun
     assert.equal(sql(`select expires_at<clock_timestamp()+interval '31 minutes' from games.haze_groups where id=${q(word.id)}`),'t','Short rounds keep the 30-minute review');
     assert.equal(rpc(2,'gry_haze_groups').drops.find(d=>d.id===longDrop.id).won,'500000000','A recipient sees their own payout');
     assert.equal(rpc(4,'gry_haze_groups').drops.find(d=>d.id===longDrop.id).won,null,'Other frens see no payout');
+    // say-the-word rounds (update_haze_word_rounds.sql): 10 s to 6 h, alongside one trivia round; two of a kind wait
+    sql(readFileSync(new URL('../games/supabase/update_haze_word_rounds.sql',import.meta.url),'utf8'));
+    sql(`update games.haze_groups set state='cancelled' where state='open' and mode in ('trivia','word');update games.haze_groups set created_at=created_at-interval '2 hours';`);
+    assert.throws(()=>create({mode:'word',answer:'frog',seconds:21601,winners:1}));assert.throws(()=>create({mode:'trivia',title:'Long question?',answer:'x',seconds:301,winners:1}));
+    const longWord=create({mode:'word',answer:'frog',seconds:21600,winners:2,total_atomic:'200000000'});
+    assert.ok(Math.abs(Number(sql(`select extract(epoch from closes_at-created_at) from games.haze_groups where id=${q(longWord.id)}`))-21600)<2,'6 hours');
+    const sideTrivia=create({mode:'trivia',title:'Which flower?',answer:'lily',seconds:60,winners:1});assert.ok(sideTrivia.id,'Trivia runs alongside a long word round');
+    assert.throws(()=>create({mode:'word',answer:'toad',seconds:60,winners:1}),/say-the-word/);assert.throws(()=>create({mode:'trivia',title:'Second question?',answer:'pad',seconds:60,winners:1}),/trivia/);
+    sql(`select games.haze_group_entry(${q(longWord.id)},${q(uid(2))},true);update games.haze_groups set closes_at=clock_timestamp()-interval '1 second',created_at=clock_timestamp()-interval '6 hours' where id=${q(longWord.id)};`);rpc(1,'gry_haze_groups');
+    assert.equal(sql(`select state||' '||(expires_at>clock_timestamp()+interval '11 hours') from games.haze_groups where id=${q(longWord.id)}`),'ready true','The host gets 12 hours to review a long word round');
+    assert.ok(Date.parse(review(longWord.id).expires_at)-Date.now()<=31*60000,'Each review stays within Haze\'s 31-minute limit');
     // guests: a read-only public feed, no owner IDs, addresses or answers
     const guestFeed=JSON.parse(as('anon',9,'select public.gry_haze_groups_public()'));assert.ok(guestFeed.drops.some(d=>d.id===longDrop.id));
     for(const secret of ['owner','won','joined','eligible','submitted_txid','answer_hash',uid(1),address(2)])assert.equal(JSON.stringify(guestFeed).includes(secret),false,secret);

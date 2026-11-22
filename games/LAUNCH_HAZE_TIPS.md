@@ -5,6 +5,11 @@
 1. SQL Editor → wklej `games/supabase/haze-beta/3_open_for_all.sql` → Run (wynik: `enabled=true, beta_only=false, groups_enabled=true`).
 2. Edge Functions → Secrets → `HAZE_ACCESS` = `all` (zamiast dwóch ID). Funkcji nie trzeba wdrażać ponownie.
 
+**2026-11-22:** dwa pliki SQL (SQL Editor → wklej → Run, każdy osobno, można powtórzyć):
+- `games/supabase/update_haze_group_review_window.sql` — wypłata długiego airdropu w Haze („invalid or expired”).
+- `games/supabase/update_haze_word_rounds.sql` — „Say the word” do 6 h, równolegle z trivią; `/word ribbit 500 pepe 2h 5`.
+  Uruchamiać **po** `update_haze_long_airdrops.sql` (ponowne uruchomienie tamtego cofa ten plik).
+
 Przycisk diagnostyczny „◇ Server check” (dawniej „Beta check”) widać tylko po otwarciu strony z `?haze=check`
 (`?haze=off` go chowa). Poniżej historia zamkniętej bety z 2026-11-16.
 

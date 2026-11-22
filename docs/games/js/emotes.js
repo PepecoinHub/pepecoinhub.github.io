@@ -52,6 +52,8 @@ export function emoteImg(code, cls = 'emote') {
 }
 // Turns "gg :peek: wow" into text + <img> nodes. Unknown :words: stay as text.
 export function renderBody(text) {
+  // A run of one character ("aaaa…" spam) shows as 12 of them and an ellipsis; the message itself is unchanged.
+  text = String(text ?? '').replace(/(.)\1{11,}/gu, (r, c) => c.repeat(12) + '…');
   const out = []; let i = 0; const re = /:([a-z]{3,10}):/g; let m;
   while ((m = re.exec(text))) {
     if (!BY[m[1]]) continue;

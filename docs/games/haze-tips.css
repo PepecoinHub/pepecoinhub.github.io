@@ -79,6 +79,20 @@
 .haze-drop-panel .haze-drop-card{scroll-snap-align:start}
 .haze-group-feed .haze-drop-card.is-won{border-left-color:#f2c94c;box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15,0 0 0 1px #f2c94c66}
 
+/* Live drops: a chip beside the chat title, glowing cards you can join, orange in the last 5 minutes (2026-11-22). */
+.haze-live-chip{margin-left:6px;padding:3px 9px;min-height:28px;border:1px solid #7a9a62;border-radius:2px;background:#2f4a2c;color:#eaf7d8;
+  box-shadow:inset 1px 1px 0 #6f8f5e,inset -1px -1px 0 #142313;font:700 12px var(--f-chrome,system-ui,sans-serif);cursor:pointer;white-space:nowrap}
+.haze-live-chip[hidden]{display:none}
+.haze-live-chip.is-joinable{background:#3f7a35;border-color:#a8e07f;animation:haze-live-glow 2.4s ease-in-out infinite}
+.haze-live-chip.is-new{animation:haze-live-pop .5s ease-out 3}
+.haze-group-feed .haze-drop-card.is-joinable{border-left-color:#7fd06a;animation:haze-live-card 2.4s ease-in-out infinite}
+.haze-group-feed .haze-drop-card.is-ending{border-left-color:#f0a23a;box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15,0 0 0 1px #f0a23a88}
+.haze-group-feed .haze-drop-card.is-ending [role="status"]{color:#ffd29a}
+@keyframes haze-live-glow{0%,100%{box-shadow:inset 1px 1px 0 #8fc07a,inset -1px -1px 0 #142313}50%{box-shadow:inset 1px 1px 0 #8fc07a,inset -1px -1px 0 #142313,0 0 10px #a8e07f}}
+@keyframes haze-live-pop{0%{transform:scale(1)}40%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes haze-live-card{0%,100%{box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15}50%{box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15,0 0 0 1px #7fd06a,0 0 10px #7fd06a66}}
+@media(prefers-reduced-motion:reduce){.haze-live-chip.is-joinable,.haze-live-chip.is-new,.haze-group-feed .haze-drop-card.is-joinable{animation:none}.haze-group-feed .haze-drop-card.is-joinable{outline:1px solid #7fd06a}}
+
 /* A party for the fren who just got PEP. */
 .haze-party{position:fixed;z-index:99500;overflow:hidden;pointer-events:none}
 .haze-party-banner{position:absolute;left:50%;top:38%;display:grid;justify-items:center;gap:2px;padding:10px 18px;transform:translate(-50%,-50%);

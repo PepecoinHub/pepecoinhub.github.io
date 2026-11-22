@@ -5,8 +5,8 @@
 // with each message (the server limits it per network); a guest or Discord sign-in keeps the same name.
 // Text and our own emotes only: the server rejects links, and the page never shows pictures from players.
 import { $, h, toast, nickStore } from './common.js?v=20261115haze';
-import { renderBody, attachPicker } from './emotes.js';
-import {createHazeTips} from './haze-tips.mjs?v=20261120drops';
+import { renderBody, attachPicker } from './emotes.js?v=20261122cc2';
+import {createHazeTips} from './haze-tips.mjs?v=20261122live';
 
 // Fren Passport beta (only a browser that opened /meme/?beta=fren): a verified (Discord) name links to that
 // fren's passport in PondOS. Guests have no passport, and without the beta every name stays plain text.

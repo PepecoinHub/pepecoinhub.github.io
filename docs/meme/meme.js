@@ -5543,8 +5543,10 @@
     return pepeEmoP;
   }
   function emoKnown(c) { return !!(PEPE_EMO && PEPE_EMO.by[c]) || EMO.indexOf(' ' + c + ' ') >= 0; }
+  // A run of one character ("aaaa…" spam) shows as 12 of them and an ellipsis; the message itself is unchanged.
+  function squash(t) { return String(t == null ? '' : t).replace(/(.)\1{11,}/gu, function (r, c) { return c + c + c + c + c + c + c + c + c + c + c + c + '…'; }); }
   function chatBody(t) {
-    return esc(t).replace(/:([a-z0-9_]{2,32}):/g, function (m, c) {
+    return esc(squash(t)).replace(/:([a-z0-9_]{2,32}):/g, function (m, c) {
       if (PEPE_EMO && PEPE_EMO.by[c]) return '<img class="emo-img" src="' + EMO_DIR + c + '.webp' + EMO_V + '" alt=":' + c + ':" title=":' + c + ':" width="28" height="28">';
       return EMO.indexOf(' ' + c + ' ') >= 0 ? '<img class="emo-img" src="' + BASE + 'games/img/emotes/' + c + '.webp" alt=":' + c + ':" width="24" height="24">' : m;
     });
@@ -5607,7 +5609,7 @@
       var canMod = false, who = null, whoT = 0;
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
       var hazeTips = null;
-      import(BASE + 'games/js/haze-tips.mjs?v=20261120drops').then(function (m) {
+      import(BASE + 'games/js/haze-tips.mjs?v=20261122live').then(function (m) {
         if (!alive) return;
                 // messageTips: false: 💚 Tip lives on the fren card (click a name), not on every message (Lemon, 2026-11-20)
         hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp, messageTips: false,
