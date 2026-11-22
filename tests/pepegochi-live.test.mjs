@@ -95,7 +95,8 @@ test('taskbar care refreshes an open room without sending pet state through post
   assert.match(taskbar, /postMessage\(\{ type: 'pondos:pepegochi-refresh' \}, location\.origin\)/);
   assert.match(live, /event\.source !== window\.parent/);
   assert.match(live, /event\.data\?\.type !== 'pondos:pepegochi-refresh'/);
-  assert.match(live, /run\(game\.refresh\(\)\)/);
+  assert.match(live, /const reread = \(\) => run\(game\.refresh\(\), \{ wrote: false \}\)/);
+  assert.match(live, /pepegochi-refresh'\) return;\n  if \(backend && !game\.busy\) reread\(\)/);
   assert.doesNotMatch(taskbar.match(/function syncOpenRoom\(\) \{[\s\S]*?\n  \}/)?.[0] || '', /pet|needs|status|life_id/);
 });
 

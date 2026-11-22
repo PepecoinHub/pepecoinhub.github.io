@@ -20,6 +20,8 @@ import { pickHabit, habitSequence, HABITS } from './pepegochi-habits.mjs?v=20261
 import { createDiary, sameBook } from './pepegochi-diary.mjs?v=20261122read';
 import { tripState, formatLeft } from './pepegochi-trips.mjs?v=20261122life';
 import { rareOfDay, localDay } from './pepegochi-rare.mjs?v=20261121a12';
+// 2026-11-22: shared read cache + in-flight dedupe + missing-function gate (also used by the room iframe)
+import { cachedRpc } from './pepegochi-rpc.mjs?v=20261122perf';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
 const NEEDS = new Set(['hunger', 'hygiene', 'mood', 'energy']);
@@ -131,9 +133,10 @@ export function hopPath(from, to, steps = 36) {
 
 // One state read on entry, then only when the tab returns after a break, auth changes,
 // or the PEPEGOCHI.EXE iframe signals that a player action succeeded.
-export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base = '../', now = () => Date.now(), random = Math.random, getQuote = () => null, subscribeSiteEvents = () => () => {}, rumorsEnabled = true, openPassport }) {
+export function mountTaskbarFrog({ bar, open, session, rpc: rawRpc, commands = {}, base = '../', now = () => Date.now(), random = Math.random, getQuote = () => null, subscribeSiteEvents = () => () => {}, rumorsEnabled = true, openPassport }) {
   const start = bar && bar.querySelector('.start');
   if (!start) return () => {};
+  const rpc = cachedRpc(rawRpc, () => { const a = session(); return a && a.userId ? a.userId : null; });
   let storage;
   try { storage = window.localStorage; } catch {}
   const bond = createBond({ storage, now, random });
@@ -372,8 +375,9 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   async function loadServer(force = false) {
     if (!signedIn() || !hatched) { server = null; serverUser = null; return null; }
     const who = session().userId;
-    // at most one read in 5 minutes, unless the day or the account changed (the same budget as the pet state)
-    if (!force && who === serverUser && Date.now() - serverAt < 5 * 60 * 1000 && (!server || server.day === todayText())) return server;
+    // 2026-11-22: the day's question does not change during its UTC day, so it is read once per account and day;
+    // only a failed read (server null) is retried, at most every 5 minutes. force: hatching, another account.
+    if (!force && who === serverUser && (server ? server.day === todayText() : Date.now() - serverAt < 5 * 60 * 1000)) return server;
     serverAt = Date.now(); serverUser = who;
     let got = null;
     try { got = await rpc('gry_quiz_today', {}); } catch (e) { got = null; }
@@ -694,7 +698,13 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
       .some(node => node.contentWindow === event.source);
     if (frame) refresh(true);
   }
-  const onAuth = () => { refresh(true); refreshFacts(true); };
+  // 2026-11-22: Supabase rewrites the auth key on every token refresh (any tab or the room iframe), which used to
+  // force a full state + life + quiz read each time. Only a real change of account (or log off) re-reads now.
+  const onAuth = () => {
+    const a = session(), id = a && a.discord && a.userId ? a.userId : null;
+    if (id === lastUser) return;
+    refresh(true); refreshFacts(true);
+  };
   // Invalidation only; the private, deduplicated site-event bridge owns cosmetic award reactions.
   const onSecret = event => {
     if (!rumorsEnabled || !event.detail?.owner || event.detail.owner !== session()?.userId || !signedIn()) return;

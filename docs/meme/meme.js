@@ -1567,7 +1567,7 @@
     var s = sbSession(), h = { apikey: SB_KEY, 'Content-Type': 'application/json' };
     if (s) h.Authorization = 'Bearer ' + s.token;
     return fetch(SB_URL + '/rest/v1/rpc/' + name, { method: 'POST', headers: h, body: JSON.stringify(args) }).then(function (r) {
-      return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error((j && j.message) || 'The high score server did not answer'); return j; });
+      return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var err = new Error((j && j.message) || 'The high score server did not answer'); err.status = r.status; err.code = j && j.code; throw err; } return j; });
     });
   }
   function offerSubmit(A, game, score, ms) {
