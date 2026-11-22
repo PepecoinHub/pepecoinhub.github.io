@@ -2,7 +2,7 @@
 // Open for everyone since 2026-11-19 (owner: "zdejmij betę"). Access is still decided on the server:
 // games.haze_settings (enabled, beta_only=false) in SQL and HAZE_ACCESS=all in the haze-wallet Edge Function.
 // Every action needs a Discord sign-in, and every tip is confirmed on chain by the server.
-import {createHazeGroups,HAZE_GROUPS_ENABLED} from './haze-groups.mjs?v=20261122pk';
+import {createHazeGroups,HAZE_GROUPS_ENABLED} from './haze-groups.mjs?v=20261122perf';
 export const HAZE_TIPS_ENABLED = true;
 // Owner diagnostics: a browser that opened any page with ?haze=check shows the "Server check" button
 // (?haze=off hides it). Visibility only; the check itself needs a signed-in account the server allows.

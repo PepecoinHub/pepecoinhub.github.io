@@ -1989,7 +1989,7 @@
     try { gochiReceive({ kind: kind, owner: owner, ids: ids }); } catch (e) { /* cosmetic only */ }
   }
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261122read').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261122perf').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
         session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport, getQuote: function () { return gochiQuote; },
         commands: { games: gamesFolder, passport: frenPassport, news: bulletinApp, tv: pondTV },
@@ -5647,7 +5647,7 @@
       // mentions waiting to be marked read, and the most chat rows kept in the window (older ones leave the DOM)
       var quiet = 0, mentionsPending = false, LAN_MAX_ROWS = 300;
       var hazeTips = null;
-      import(BASE + 'games/js/haze-tips.mjs?v=20261122pk').then(function (m) {
+      import(BASE + 'games/js/haze-tips.mjs?v=20261122perf').then(function (m) {
         if (!alive) return;
                 // messageTips: false: 💚 Tip lives on the fren card (click a name), not on every message (Lemon, 2026-11-20)
         hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp, messageTips: false,
@@ -6325,7 +6325,7 @@
   }
   function withNotify(fn) {
     if (!notifyLoad) notifyLoad = new Promise(function (res, rej) {
-      var sc = document.createElement('script'); sc.src = 'notify.js?v=20261119tip'; sc.onload = res; sc.onerror = function () { notifyLoad = null; rej(); }; document.head.appendChild(sc);
+      var sc = document.createElement('script'); sc.src = 'notify.js?v=20261122perf'; sc.onload = res; sc.onerror = function () { notifyLoad = null; rej(); }; document.head.appendChild(sc);
     });
     return notifyLoad.then(function () { return fn(window.PondNotify, notifyEnv()); });
   }
@@ -6355,6 +6355,9 @@
     }).catch(function () {});
     // the installed app (home screen icon), first start: one hint where the switch is
     var standaloneNow = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+    // 2026-11-22: the installed app keeps its own copy of the desktop pictures (sw.js caches pictures only, never
+    // pages or scripts). Same worker and scope as the notifications switch, so nothing else changes.
+    if (standaloneNow) navigator.serviceWorker.register('sw.js?v=20261122img', { scope: './' }).catch(function () {});
     if (standaloneNow && 'PushManager' in window) {
       var hinted = '1'; try { hinted = localStorage.getItem('pondos-push-hint'); localStorage.setItem('pondos-push-hint', '1'); } catch (e) {}
       if (!hinted && !(window.Notification && Notification.permission !== 'default')) setTimeout(function () {
