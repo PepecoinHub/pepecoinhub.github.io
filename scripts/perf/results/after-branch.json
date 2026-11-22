@@ -1,0 +1,220 @@
+[
+ {
+  "scenario": "desktop-idle",
+  "label": "after",
+  "minutes": 60,
+  "opened": [],
+  "windows": [],
+  "rpc_total": 60,
+  "edge_total": 0,
+  "response_kb": 3.2,
+  "errors": {},
+  "calls": {
+   "rpc:gry_lobby_chat": 60
+  },
+  "cpu_task_ms": 6868,
+  "script_ms": 73,
+  "heap_mb": 6.1,
+  "dom_nodes": 2652,
+  "page_errors": []
+ },
+ {
+  "scenario": "desktop-idle-2tabs",
+  "label": "after",
+  "minutes": 60,
+  "opened": [],
+  "windows": [],
+  "rpc_total": 85,
+  "edge_total": 0,
+  "response_kb": 4.5,
+  "errors": {},
+  "calls": {
+   "rpc:gry_lobby_chat": 85
+  },
+  "cpu_task_ms": 8238,
+  "script_ms": 96,
+  "heap_mb": 4.9,
+  "dom_nodes": 2569,
+  "page_errors": []
+ },
+ {
+  "scenario": "gochi-no-room",
+  "label": "after",
+  "minutes": 60,
+  "opened": [],
+  "windows": [],
+  "rpc_total": 69,
+  "edge_total": 0,
+  "response_kb": 6.7,
+  "errors": {},
+  "calls": {
+   "rpc:gry_lobby_chat": 60,
+   "rpc:gry_pepegochi_state": 9
+  },
+  "cpu_task_ms": 6015,
+  "script_ms": 69,
+  "heap_mb": 4.8,
+  "dom_nodes": 2635,
+  "page_errors": []
+ },
+ {
+  "scenario": "gochi-room-open",
+  "label": "after",
+  "minutes": 60,
+  "opened": [
+   "room:true"
+  ],
+  "windows": [
+   "PEPEGOCHI.EXE"
+  ],
+  "rpc_total": 69,
+  "edge_total": 0,
+  "response_kb": 6.7,
+  "errors": {},
+  "calls": {
+   "rpc:gry_lobby_chat": 60,
+   "rpc:gry_pepegochi_state": 9
+  },
+  "cpu_task_ms": 6628,
+  "script_ms": 71,
+  "heap_mb": 7.5,
+  "dom_nodes": 2879,
+  "page_errors": []
+ },
+ {
+  "scenario": "gochi-room-token-refresh",
+  "label": "after",
+  "minutes": 60,
+  "opened": [
+   "room:true"
+  ],
+  "windows": [
+   "PEPEGOCHI.EXE"
+  ],
+  "rpc_total": 69,
+  "edge_total": 0,
+  "response_kb": 6.7,
+  "errors": {},
+  "calls": {
+   "rpc:gry_lobby_chat": 60,
+   "rpc:gry_pepegochi_state": 9
+  },
+  "cpu_task_ms": 7176,
+  "script_ms": 82,
+  "heap_mb": 6.3,
+  "dom_nodes": 2757,
+  "page_errors": []
+ },
+ {
+  "scenario": "games-minimized",
+  "label": "after",
+  "minutes": 60,
+  "opened": [
+   "miner:true",
+   "minimize:true"
+  ],
+  "windows": [
+   "Pepe Miner (min)"
+  ],
+  "rpc_total": 60,
+  "edge_total": 0,
+  "response_kb": 3.2,
+  "errors": {},
+  "calls": {
+   "rpc:gry_lobby_chat": 60
+  },
+  "cpu_task_ms": 10104,
+  "script_ms": 97,
+  "heap_mb": 9.3,
+  "dom_nodes": 5658,
+  "page_errors": []
+ },
+ {
+  "scenario": "lan-live",
+  "label": "after",
+  "minutes": 60,
+  "opened": [
+   "lan:true"
+  ],
+  "windows": [
+   "LAN Party - #pond chat"
+  ],
+  "rpc_total": 330,
+  "edge_total": 0,
+  "response_kb": 19.8,
+  "errors": {},
+  "calls": {
+   "rpc:gry_haze_groups": 180,
+   "realtime:heartbeat": 139,
+   "rpc:gry_lobby_who": 60,
+   "rpc:gry_lobby_chat": 60,
+   "rpc:gry_reports_new": 30
+  },
+  "cpu_task_ms": 7421,
+  "script_ms": 91,
+  "heap_mb": 6.4,
+  "dom_nodes": 2747,
+  "page_errors": []
+ },
+ {
+  "scenario": "lan-lost",
+  "label": "after",
+  "minutes": 60,
+  "opened": [
+   "lan:true"
+  ],
+  "windows": [
+   "LAN Party - #pond chat"
+  ],
+  "rpc_total": 506,
+  "edge_total": 0,
+  "response_kb": 29.1,
+  "errors": {},
+  "calls": {
+   "realtime:connect": 361,
+   "rpc:gry_lobby_chat": 236,
+   "rpc:gry_haze_groups": 180,
+   "rpc:gry_lobby_who": 60,
+   "rpc:gry_reports_new": 30
+  },
+  "cpu_task_ms": 8863,
+  "script_ms": 148,
+  "heap_mb": 5.6,
+  "dom_nodes": 2910,
+  "page_errors": []
+ },
+ {
+  "scenario": "lan-lost-minimized",
+  "label": "after",
+  "minutes": 60,
+  "opened": [
+   "lan:true",
+   "minimize:true"
+  ],
+  "windows": [
+   "LAN Party - #pond chat (min)"
+  ],
+  "rpc_total": 210,
+  "edge_total": 0,
+  "response_kb": 9.8,
+  "errors": {},
+  "calls": {
+   "realtime:connect": 360,
+   "rpc:gry_haze_groups": 60,
+   "rpc:gry_lobby_chat": 120,
+   "rpc:gry_reports_new": 30
+  },
+  "cpu_task_ms": 8386,
+  "script_ms": 143,
+  "heap_mb": 7.8,
+  "dom_nodes": 2778,
+  "page_errors": []
+ },
+ {
+  "scenario": "fps",
+  "label": "after",
+  "fps_desktop": 60,
+  "fps_with_minimized_miner": 60,
+  "cpu_ms_per_5s_minimized_miner": 456
+ }
+]

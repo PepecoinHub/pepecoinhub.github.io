@@ -1,0 +1,83 @@
+[
+ {
+  "scenario": "lan-live",
+  "label": "after2",
+  "minutes": 60,
+  "opened": [
+   "lan:true"
+  ],
+  "windows": [
+   "LAN Party - #pond chat"
+  ],
+  "rpc_total": 329,
+  "edge_total": 0,
+  "response_kb": 19.7,
+  "errors": {},
+  "calls": {
+   "rpc:gry_haze_groups": 179,
+   "realtime:heartbeat": 139,
+   "rpc:gry_lobby_who": 60,
+   "rpc:gry_lobby_chat": 60,
+   "rpc:gry_reports_new": 30
+  },
+  "cpu_task_ms": 7135,
+  "script_ms": 87,
+  "heap_mb": 2.8,
+  "dom_nodes": 2700,
+  "page_errors": []
+ },
+ {
+  "scenario": "lan-lost",
+  "label": "after2",
+  "minutes": 60,
+  "opened": [
+   "lan:true"
+  ],
+  "windows": [
+   "LAN Party - #pond chat"
+  ],
+  "rpc_total": 506,
+  "edge_total": 0,
+  "response_kb": 29.1,
+  "errors": {},
+  "calls": {
+   "realtime:connect": 63,
+   "rpc:gry_lobby_chat": 236,
+   "rpc:gry_haze_groups": 180,
+   "rpc:gry_lobby_who": 60,
+   "rpc:gry_reports_new": 30
+  },
+  "cpu_task_ms": 7336,
+  "script_ms": 83,
+  "heap_mb": 4,
+  "dom_nodes": 2727,
+  "page_errors": []
+ },
+ {
+  "scenario": "lan-lost-minimized",
+  "label": "after2",
+  "minutes": 60,
+  "opened": [
+   "lan:true",
+   "minimize:true"
+  ],
+  "windows": [
+   "LAN Party - #pond chat (min)"
+  ],
+  "rpc_total": 210,
+  "edge_total": 0,
+  "response_kb": 9.8,
+  "errors": {},
+  "calls": {
+   "realtime:connect": 62,
+   "rpc:gry_haze_groups": 60,
+   "rpc:gry_lobby_chat": 120,
+   "rpc:gry_reports_new": 30
+  },
+  "cpu_task_ms": 6150,
+  "script_ms": 73,
+  "heap_mb": 5.2,
+  "dom_nodes": 2711,
+  "page_errors": []
+ }
+]
