@@ -1,4 +1,9 @@
 // Supabase Edge Function. JWT verification off; only requests signed by the Haze sender are accepted.
+// Adaptive polling (2026-11-22): every "take" reply carries X-Haze-Poll-After (seconds) and Retry-After so the
+// Haze worker can slow down to ~60 s while the queue is empty and speed up while it is draining. The body stays
+// exactly what the worker already parses (a JSON array for "take", {} for "finish"); old workers that ignore the
+// header keep working unchanged.
+import { pollAfter } from './poll.mjs';
 const base=Deno.env.get('SUPABASE_URL')!, key=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const publicKey=Deno.env.get('HAZE_MENTION_WORKER_PUBLIC_KEY')||'';
 const decode=(v:string)=>Uint8Array.from(atob(v.replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0));
@@ -14,7 +19,14 @@ Deno.serve(async req=>{
  try{
   const args=JSON.parse(content);
   if(!['take','finish'].includes(args.action))return new Response(null,{status:400});
-  const r=await fetch(base+'/rest/v1/rpc/haze_mention_delivery',{method:'POST',headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({p_args:args})});
-  return r.ok?new Response(r.body,{headers:{'Content-Type':'application/json','Cache-Control':'no-store'}}):new Response(null,{status:503});
+  // hint:true asks update_haze_mentions_adaptive.sql for {items,poll_after}; the old SQL ignores it and returns the array.
+  const rpcArgs=args.action==='take'?{...args,hint:true}:args;
+  const r=await fetch(base+'/rest/v1/rpc/haze_mention_delivery',{method:'POST',headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({p_args:rpcArgs})});
+  if(!r.ok)return new Response(null,{status:503,headers:{'Retry-After':'30','X-Haze-Poll-After':'30'}});
+  const headers:Record<string,string>={'Content-Type':'application/json','Cache-Control':'no-store'};
+  if(args.action!=='take')return new Response(r.body,{headers});
+  const {body,seconds}=pollAfter(await r.json());
+  headers['X-Haze-Poll-After']=String(seconds);headers['Retry-After']=String(seconds);
+  return new Response(JSON.stringify(body),{headers});
  }catch{return new Response(null,{status:400});}
 });
