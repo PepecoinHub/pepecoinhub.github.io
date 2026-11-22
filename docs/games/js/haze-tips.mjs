@@ -2,7 +2,7 @@
 // Open for everyone since 2026-11-19 (owner: "zdejmij betę"). Access is still decided on the server:
 // games.haze_settings (enabled, beta_only=false) in SQL and HAZE_ACCESS=all in the haze-wallet Edge Function.
 // Every action needs a Discord sign-in, and every tip is confirmed on chain by the server.
-import {createHazeGroups,HAZE_GROUPS_ENABLED} from './haze-groups.mjs?v=20261122live';
+import {createHazeGroups,HAZE_GROUPS_ENABLED} from './haze-groups.mjs?v=20261122wp';
 export const HAZE_TIPS_ENABLED = true;
 // Owner diagnostics: a browser that opened any page with ?haze=check shows the "Server check" button
 // (?haze=off hides it). Visibility only; the check itself needs a signed-in account the server allows.
@@ -67,7 +67,7 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     for(const child of children.flat())if(child!=null)value.append(typeof child==='string'?doc.createTextNode(child):child);
     return value;
   };
-  if(!doc.querySelector('[data-haze-tip-style]'))doc.head.append(node('link',{rel:'stylesheet',href:new URL('../haze-tips.css?v=20261122live',import.meta.url).href,'data-haze-tip-style':'1'}));
+  if(!doc.querySelector('[data-haze-tip-style]'))doc.head.append(node('link',{rel:'stylesheet',href:new URL('../haze-tips.css?v=20261122wp',import.meta.url).href,'data-haze-tip-style':'1'}));
   let destroyed=false,dialog=null,wallet=null,owner=null,syncAt=0,syncing=false,initial=true,linkButton=null;
   let activeView=null,walletHost=null,walletFrame=null,walletLoaded=null,walletCaps=null;
   const walletBase=HAZE_ORIGIN+'/widget.html?haze-chat=1',queueKey='ph-haze-submitted-v1';
@@ -374,5 +374,5 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     }catch{/* Missing migration or temporary failure must not break ordinary chat. */}
     finally{syncing=false;}
   }
-  return {mount,bindMessage,command,tipFor,refresh,invalidate,sync,connect,destroy(){destroyed=true;groups?.destroy();saveQueue();dialog?.close();dialog?.remove();win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',resume);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();receivers.clear();flights.clear();linkButton?.remove();}};
+  return {mount,bindMessage,command,tipFor,refresh,invalidate,sync,connect,reviewGroup:id=>groups?.review(id),destroy(){destroyed=true;groups?.destroy();saveQueue();dialog?.close();dialog?.remove();win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',resume);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();receivers.clear();flights.clear();linkButton?.remove();}};
 }

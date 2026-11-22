@@ -9,6 +9,8 @@
 - `games/supabase/update_haze_group_review_window.sql` — wypłata długiego airdropu w Haze („invalid or expired”).
 - `games/supabase/update_haze_word_rounds.sql` — „Say the word” do 6 h, równolegle z trivią; `/word ribbit 500 pepe 2h 5`.
   Uruchamiać **po** `update_haze_long_airdrops.sql` (ponowne uruchomienie tamtego cofa ten plik).
+- `games/supabase/update_wheres_pepe_haze_payout.sql` — Pepe Guesser: zamknięty tydzień jako stała lista, „💚 Pay with Haze”
+  (jedna płatność do wszystkich adresów, po 2 potwierdzeniach nagrody same oznaczają się jako wypłacone).
 
 Przycisk diagnostyczny „◇ Server check” (dawniej „Beta check”) widać tylko po otwarciu strony z `?haze=check`
 (`?haze=off` go chowa). Poniżej historia zamkniętej bety z 2026-11-16.
