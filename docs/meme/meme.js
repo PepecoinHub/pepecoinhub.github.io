@@ -1989,7 +1989,7 @@
     try { gochiReceive({ kind: kind, owner: owner, ids: ids }); } catch (e) { /* cosmetic only */ }
   }
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261121a12').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261122life').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
         session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport, getQuote: function () { return gochiQuote; },
         commands: { games: gamesFolder, passport: frenPassport, news: bulletinApp, tv: pondTV },
@@ -2232,7 +2232,7 @@
   var PP_CATALOG = 'passport-catalog.json?v=20261118crown';
   function passportCss() {
     if (!document.getElementById('fren-passport-css')) {
-      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261121map'}));
+      document.head.appendChild(el('link', {id:'fren-passport-css',rel:'stylesheet',href:'passport.css?v=20261122a12'}));
     }
   }
   // ?beta=fren test preview: while the passport functions are not on the server yet (or the tester is not
@@ -2411,7 +2411,8 @@
     'scout_fren', 'first_hatch', 'little_fren', 'grown_fren', 'share_fren', 'valentine_fren',
     'quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99',
     'long_live_the_king', 'frogageddon_beta',
-    'lord_of_the_lilies', 'master_tactician', 'gold_digger', 'gold_rush', 'pond_sweeper', 'general_fren', 'super_parent'];
+    'lord_of_the_lilies', 'master_tactician', 'gold_digger', 'gold_rush', 'pond_sweeper', 'general_fren', 'super_parent',
+    'tourist', 'globetrotter', 'moon_frog', 'golden_harvest', 'dear_diary', 'snoop'];
   // the 20 places on the Passport's front page, in order: gold row, silver row, then the first steps
   // owner, 2026-11-12: Pond Pioneer opens the gold row; the rest moved one place on (Secret Starter is in the Stamps tab)
   var PP_FRONT = ['pond_pioneer', 'moonwalker', 'season_champion', 'frog_of_the_week', 'certified_fren',

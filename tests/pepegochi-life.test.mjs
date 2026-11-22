@@ -171,7 +171,7 @@ test('postcards and the trip state the browser shows', () => {
 });
 
 test('the trips SQL catalog matches the browser catalog', () => {
-  const sql = readFileSync(new URL('../games/supabase/update_pepegochi_trips.sql', import.meta.url), 'utf8');
+  const sql = readFileSync(new URL('../games/supabase/update_pepegochi_life.sql', import.meta.url), 'utf8');
   for (const p of PLACES) {
     const pack = p.pack ? `'${p.pack}'` : 'null';
     assert.ok(sql.includes(`('${p.id}', ${p.w[0]}, ${p.w[1]}, ${p.w[2]}, ${pack}, ${p.secret ? 'true' : 'false'})`), p.id);
@@ -180,7 +180,6 @@ test('the trips SQL catalog matches the browser catalog', () => {
     const from = s.from ? 'array[' + s.from.map(x => `'${x}'`).join(', ') + ']' : 'null';
     assert.ok(sql.includes(`('${s.id}', '${s.rarity}', ${from})`), s.id);
   }
-  assert.match(sql, /DRAFT: not installed anywhere/);
   assert.match(sql, /when 'short' then 0\.4 when 'long' then 0\.7 else 1/);
 });
 
@@ -240,4 +239,73 @@ test('one page per subject in a visit', () => {
     const cats = writeEntries(base({ seed, lastSeen: T0 - 5 * DAY })).map(p => ENTRY[p.id].cat);
     assert.equal(new Set(cats).size, cats.length, cats.join());
   }
+});
+
+// ---------- A12 on the server (update_pepegochi_life.sql): the browser side ----------
+import { mergeBooks, sameBook, createDiary as makeDiary } from '../docs/meme/pepegochi-diary.mjs';
+import { describeTaskbarFrog } from '../docs/meme/pepegochi-taskbar.mjs';
+import { wrap, postcardLines, POSTCARD } from '../docs/games/js/pepegochi-cards.mjs';
+import { AWAY_LINES } from '../docs/games/js/pepegochi-room-interactions.mjs';
+
+test('diary copies merge: every page once, newest 365, larger seen and read', () => {
+  const pg = (id, at) => ({ id, day: 2, at, text: 'x' });
+  const a = { seen: 10, read: 1, pages: [pg('miss_1', 1), pg('duck_1', 3)] }, b = { seen: 5, read: 3, pages: [pg('miss_1', 1), pg('daily_1', 2), { id: 'nope', day: 1, at: 1, text: 'x' }] };
+  const m = mergeBooks(a, b);
+  assert.deepEqual(m.pages.map(p => p.id), ['miss_1', 'daily_1', 'duck_1']); assert.equal(m.seen, 10); assert.equal(m.read, 3);
+  assert.equal(sameBook(m, mergeBooks(b, a)), true);
+  const many = { pages: Array.from({ length: 400 }, (_, i) => pg('miss_1', i)) };
+  assert.equal(mergeBooks(many, null).pages.length, 365); assert.equal(mergeBooks(many, null).pages[0].at, 35);
+  // a server copy joins the browser copy before the frog writes
+  const mem = new Map(), storage = { getItem: k => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, v) };
+  const d = makeDiary({ storage, now: () => 100 });
+  d.adopt('o', 'l', a);
+  assert.equal(d.open('o', 'l').length, 2);
+  assert.equal(d.snapshot().seen, 10);
+});
+
+test('a new diary keeps its first page and the trip page of the same visit', () => {
+  const mem = new Map(), storage = { getItem: k => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, v) };
+  const d = makeDiary({ storage, now: () => T0 });
+  const fresh = d.visit('o', 'l', { adoptedAt: T0 - DAY, trip: { place: 'the Moon', item: null } });
+  assert.deepEqual(fresh.map(p => p.id.split('_')[0]), ['first', 'trip']);
+});
+
+test('taskbar: a postcard while the frog is away or back, the frog otherwise', () => {
+  const state = { pet: { name: 'Fren', stage: 'adult', status: 'healthy', life_id: 'l', needs: { hunger: 90, hygiene: 90, mood: 90, energy: 90 } } };
+  const now = Date.parse('2026-12-01T12:00:00Z');
+  const trip = { length: 'short', started_at: new Date(now - HOUR).toISOString(), return_at: new Date(now + 3 * HOUR).toISOString() };
+  const away = describeTaskbarFrog(state, { server_now: new Date(now).toISOString(), trip });
+  assert.match(away.sprite, /tb_postcard/); assert.equal(away.hasPet, false); assert.equal(away.warning, false);
+  assert.match(away.title, /on a trip, back in 3 h 0 min/);
+  const back = describeTaskbarFrog(state, { server_now: new Date(now + 4 * HOUR).toISOString(), trip });
+  assert.match(back.sprite, /tb_postcard/); assert.equal(back.warning, true);
+  assert.equal(describeTaskbarFrog(state, { server_now: new Date(now).toISOString(), trip: null }).hasPet, true);
+  assert.equal(describeTaskbarFrog(state).hasPet, true, 'no A12 SQL: the frog as before');
+  assert.ok(existsSync(new URL('../docs/games/img/pepegochi/taskbar/tb_postcard.png', import.meta.url)));
+});
+
+test('room: away leaves a note instead of the frog; the golden lemon replaces the plant for good', () => {
+  const away = roomScene({ mode: 'pet', away: true, rare: 'ufo' });
+  assert.equal(away.frog, null); assert.equal(away.rare, null); assert.ok(away.items.some(i => i.itemId === 'trip_note'));
+  assert.match(away.label, /away on a trip/);
+  const gold = roomScene({ mode: 'pet', golden: true });
+  assert.match(gold.items.find(i => i.itemId === 'potted_plant').src, /potted_plant_golden\.png/);
+  assert.doesNotMatch(roomScene({ mode: 'pet' }).items.find(i => i.itemId === 'potted_plant').src, /golden/);
+  for (const f of ['room_trip_note.png', 'potted_plant_golden.png', 'crt_tv_static_01.png', 'crt_tv_static_03.png'])
+    assert.ok(existsSync(new URL('../docs/games/img/pepegochi/hd/' + f, import.meta.url)), f);
+  assert.deepEqual(Object.keys(AWAY_LINES).sort(), ['bed', 'rubber_duck']);
+});
+
+test('postcards: the frog\'s text fits the four lines; every card and souvenir picture exists', () => {
+  const measure = t => t.length * 14.4;   // 24 px Courier New
+  for (const p of PLACES) for (const s of [null, ...SOUVENIRS.filter(x => !x.from || x.from.includes(p.id)).map(x => x.id)]) {
+    const c = postcardLines(p.id, s, measure, 'Fren');
+    assert.ok(c.lines.length <= POSTCARD.lineY.length, p.id);
+    for (const l of c.lines) assert.ok(measure(l) <= POSTCARD.textW, l);
+    assert.ok(existsSync(new URL('../docs/games/img/pepegochi/a12/postcard_' + p.id + '.png', import.meta.url)), p.id);
+  }
+  for (const s of SOUVENIRS) assert.ok(existsSync(new URL('../docs/games/img/pepegochi/a12/' + (s.id === 'souv_mini_miner' ? 'souv_mini_miner_01' : s.id) + '.png', import.meta.url)), s.id);
+  assert.deepEqual(wrap('aaaa bbbb cccc', 9 * 14.4, measure), ['aaaa bbbb', 'cccc']);
+  assert.deepEqual(wrap('x'.repeat(20), 10 * 14.4, measure), ['x'.repeat(10), 'x'.repeat(10)]);
+  assert.match(postcardText('unknown').lines.join(' '), /0098/, 'the ??? postcard and the TV say the same numbers');
 });

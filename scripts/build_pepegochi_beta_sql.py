@@ -3,7 +3,7 @@
 The game, the room, Room-4 (moving out with one item) and the Pond Quiz, without anything that awards a Passport
 stamp: update_pepegochi_passport.sql (First Hatch, Little Fren, One Small Step, Good Parent) and
 update_pepegochi_rewards.sql (decorations, Pond Decorator) wait for the launch, and passport_award() is not changed,
-so the quiz stamps wait too. Nothing is lost: on launch day those files deliver every milestone reached in the
+so the quiz stamps and the A12 stamps of update_pepegochi_life.sql (trips, golden lemon, diary) wait too. Nothing is lost: on launch day those files deliver every milestone reached in the
 beta, dated when it happened. The questions come separately, from the owner's PRIVATE file.
 Each file's own top-level `begin;` / `commit;` lines and its '--' comments are taken out.
 Run: python3 scripts/build_pepegochi_beta_sql.py   (--check: exit 1 when the output is out of date)
@@ -18,7 +18,7 @@ OUT = os.path.join(SUPA, 'deploy', 'PEPEGOCHI_BETA.sql')
 TX = re.compile(r'^\s*(begin|commit)\s*;\s*$', re.I)
 COMMENT = re.compile(r'\s*--.*$')
 FILES = ['update_pepegochi_v2.sql', 'update_pepegochi_room_v1.sql', 'update_pepegochi_room_departure.sql',
-         'update_pond_quiz.sql']
+         'update_pond_quiz.sql', 'update_pepegochi_life.sql']
 
 
 def read(name):

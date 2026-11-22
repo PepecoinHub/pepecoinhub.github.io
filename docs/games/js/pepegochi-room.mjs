@@ -254,19 +254,28 @@ export const RARE_ROOM = {
   birthday: { prop: 'event_cake.png', slot: 'floor_right', size: 14 },
 };
 export const rareSrc = f => versionSprite(HD_IMG + f);
+// A12 trips: while the frog is away a note lies where it usually sits. The golden lemon (update_pepegochi_life.sql)
+// replaces the lemon tree for good once grown. The TV at 3 AM shows static and the numbers (frames 01-03).
+export const TRIP_NOTE = { src: 'room_trip_note.png', x: 300, y: 318, px: 60 };   // on the bed
+export const GOLDEN_PLANT = 'potted_plant_golden.png';
+export const TV_STATIC = ['crt_tv_static_01.png', 'crt_tv_static_02.png', 'crt_tv_static_03.png'];
+export const TV_STATIC_MS = 160;
 
 // ---------- one description of what the scene shows, so it can be tested without a browser ----------
 // mode: 'adopt' (an egg waits for a name), 'pet' or 'departed'
-export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false, taken = TAKEN_BY_LETTER, notes = 0, rare = null, diary = -1 } = {}) {
+export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false, taken = TAKEN_BY_LETTER, notes = 0, rare = null, diary = -1, away = false, golden = false } = {}) {
   const departed = mode === 'departed';
-  const ev = mode === 'pet' && status !== 'departed' && Object.hasOwn(RARE_ROOM, rare) ? RARE_ROOM[rare] : null;
+  away = !!away && mode === 'pet';
+  // a frog on a trip sees no rare event (the diary still tells the funny ones)
+  const ev = mode === 'pet' && !away && status !== 'departed' && Object.hasOwn(RARE_ROOM, rare) ? RARE_ROOM[rare] : null;
   const items = [];
   for (const [slotId, itemId] of Object.entries(placements)) {
     const slot = SLOTS[slotId], it = ITEMS[itemId];
     if (!slot || !it) continue;
     const s = it.anchor || slot;
     if (departed && itemId === taken) continue;
-    const item = { slotId, itemId, src: propSrc(itemId) + '?v=' + PROP_V, wall: !!s.wall, z: s.z,
+    const src = itemId === 'potted_plant' && golden ? rareSrc(GOLDEN_PLANT) : propSrc(itemId) + '?v=' + PROP_V;
+    const item = { slotId, itemId, src, wall: !!s.wall, z: s.z,
       left: s.x / ROOM_W * 100, top: (s.y + it.dy) / ROOM_H * 100, width: it.size };
     // the duck moved in the night: a chalk outline where it stood, the duck a little to the left, pretending nothing happened
     if (ev?.duck && itemId === 'rubber_duck') {
@@ -282,7 +291,11 @@ export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', n
   }
   const pct = (v, of) => v / of * 100;
   let frog = null, label;
-  if (departed) {
+  if (away) {
+    items.push({ slotId: 'trip_note', itemId: 'trip_note', src: rareSrc(TRIP_NOTE.src), wall: false, z: 60, rare: true,
+      left: pct(TRIP_NOTE.x, ROOM_W), top: pct(TRIP_NOTE.y, ROOM_H), width: pct(TRIP_NOTE.px, ROOM_W) });
+    label = 'Your room. Your Fren is away on a trip and left a note.';
+  } else if (departed) {
     label = 'Your room. The frog moved out' + (taken && Object.values(placements).includes(taken) ? ' and ' + takenName(taken) + ' is gone too' : '') + '. A letter lies on the rug.';
   } else {
     const st = mode === 'adopt' ? 'healthy' : status;
@@ -295,7 +308,7 @@ export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', n
       : `Your room. Your ${stage} Fren is ${status}${lk.look ? ' and ' + LOOK_WORD[lk.look] : ''}${lk.suitcase ? ', with a suitcase' : ''}.`;
   }
   return {
-    mode, status: departed ? 'departed' : mode === 'adopt' ? 'adopt' : status, label, items, frog,
+    mode, status: departed ? 'departed' : mode === 'adopt' ? 'adopt' : status, label, items, frog, away,
     rare: ev ? { id: rare, ...ev } : null,
     // diary: -1 = no pages yet (no button), 0 = pages all read, n = unread pages
     diary: mode === 'pet' && Number.isInteger(diary) && diary >= 0 ? { unread: diary } : null,
@@ -387,6 +400,18 @@ export function renderRoom(doc, opts = {}) {
   }
   frame.append(st);
   return frame;
+}
+
+// The TV's night signal: static frames, then the numbers stay. Returns a stop function (puts the TV back).
+export function playTvStatic(frame, { setTimer = setTimeout, clearTimer = clearTimeout } = {}) {
+  const tv = frame.querySelector('[data-item="crt_tv"]');
+  if (!tv) return null;
+  const old = tv.getAttribute('src');
+  let i = 0, timer = null;
+  const order = [0, 1, 0, 1, 0, 1, 2];   // noise, noise... then the numbers come through and stay
+  const show = () => { tv.setAttribute('src', rareSrc(TV_STATIC[order[i]])); i++; if (i < order.length) timer = setTimer(show, TV_STATIC_MS); };
+  show();
+  return () => { clearTimer(timer); tv.setAttribute('src', old); };
 }
 
 // The UFO's blinking lights (4 frames). Returns a stop function; nothing to do for other rooms or reduced motion.

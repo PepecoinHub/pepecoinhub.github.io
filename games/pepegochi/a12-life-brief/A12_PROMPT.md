@@ -1,6 +1,6 @@
 # PepeGochi A12: życie własne żaby (dla ChatGPT)
 
-Status: DO ZROBIENIA. Specyfikacja funkcji: dokument „PepeGochi: życie własne żaby — specyfikacja” (Claude, 2026-11-21).
+Status: ZROBIONE (2026-11-22: wszystkie trzy paczki w grze, w ukrytej becie). Specyfikacja funkcji: dokument „PepeGochi: życie własne żaby — specyfikacja” (Claude, 2026-11-21).
 
 Żaba dostaje życie własne: sama coś robi na pulpicie, pisze pamiętnik o tym, co działo się pod nieobecność gracza,
 jeździ na wycieczki i przywozi pocztówki oraz pamiątki, a raz na jakiś czas w pokoju dzieje się coś rzadkiego.

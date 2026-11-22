@@ -17,7 +17,8 @@ import { createNotebook } from './pepegochi-notes.mjs?v=20261121map';
 import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120notes3';
 // A12 life of its own (owner spec 2026-11-21): habits on the taskbar, the diary, the day's rare event.
 import { pickHabit, habitSequence, HABITS } from './pepegochi-habits.mjs?v=20261121a12';
-import { createDiary } from './pepegochi-diary.mjs?v=20261121a12';
+import { createDiary, sameBook } from './pepegochi-diary.mjs?v=20261122life';
+import { tripState, formatLeft } from './pepegochi-trips.mjs?v=20261122life';
 import { rareOfDay, localDay } from './pepegochi-rare.mjs?v=20261121a12';
 
 const VALID_STAGE = new Set(['egg', 'tadpole', 'froglet', 'adult']);
@@ -65,7 +66,7 @@ const POSE_OF = { egg_idle: 'tb_egg', tadpole_idle: 'tb_tadpole', froglet_idle: 
 // a young frog has no state poses: its stage pose
 export const poseFor = roomSprite => POSE_OF[roomSprite] || POSE_OF[roomSprite.split('_')[0] + '_idle'] || 'tb_adult_sit';
 
-export function describeTaskbarFrog(state) {
+export function describeTaskbarFrog(state, life = null) {
   const p = state && state.pet;
   if (!p) return {
     sprite: pose('tb_egg'), label: 'Adopt me?',
@@ -76,6 +77,16 @@ export function describeTaskbarFrog(state) {
     title: 'Your Fren moved out. Open PEPEGOCHI.EXE to read the letter.',
     warning: true, hasPet: false, motion: 'letter',
   };
+  // A12 trips: while the frog is away a postcard lies on the taskbar; when it is back it waits to be opened
+  const trip = tripState(life?.trip, Date.parse(life?.server_now) || Date.now());
+  if (trip.status !== 'home') {
+    const who = String(p.name || 'Your Fren').slice(0, 18);
+    return trip.status === 'away'
+      ? { sprite: pose('tb_postcard'), label: who + ' · away', title: who + ' is on a trip, back in ' + formatLeft(trip.leftMs) + '. Click to open the room.',
+          warning: false, hasPet: false, motion: 'letter', away: true }
+      : { sprite: pose('tb_postcard'), label: 'Postcard!', title: who + ' is back from a trip. Click to open the postcard.',
+          warning: true, hasPet: false, motion: 'letter', away: true };
+  }
   const stage = VALID_STAGE.has(p.stage) ? p.stage : 'adult';
   const status = STATUS.has(p.status) ? p.status : 'healthy';
   const needs = Object.entries(p.needs || {})
@@ -375,9 +386,15 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     return server;
   }
   const current = () => (server && server.question ? server : null);
+  // After the 99th question (owner, 2026-11-22): the server says done; the frog celebrates once with a star, then the
+  // quiz rests. The Keeper of the Pond stamp itself comes from the server (update_pond_quiz.sql, quiz_99).
+  const keeperKey = () => 'pepegochi:quiz-keeper:' + (session()?.userId || '');
+  const keeperSeen = () => { try { return storage?.getItem(keeperKey()) === '1'; } catch { return true; } };
+  const keeperDue = () => !!(server && server.done && !server.question && !keeperSeen());
   function updateFactButton() {
-    const f = current();
-    factBtn.hidden = !f || f.answered;
+    const f = current(), keeper = keeperDue();
+    factBtn.hidden = !(f && !f.answered) && !keeper;
+    factBtn.textContent = !f && keeper ? '★' : '?';
   }
   function refreshFacts(force = false) { return loadServer(force).then(updateFactButton); }
   function closeBalloon() {
@@ -406,13 +423,33 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     box.replaceChildren();
     if (!b) { box.append(el('p', 'pg-fact-note', 'The ranking cannot be read right now.')); return; }
     const ol = el('ol', 'pg-fact-board');
-    for (const r of b.top) { const li = el('li'); li.append(el('span', null, r.rank + '. ' + r.nick), el('b', null, String(r.points))); ol.append(li); }
+    // 99 right answers = every question: a Keeper of the Pond
+    for (const r of b.top) { const li = el('li'); li.append(el('span', null, r.rank + '. ' + r.nick + (r.points >= 99 ? ' ★' : '')), el('b', null, String(r.points))); if (r.points >= 99) li.title = 'Keeper of the Pond: all 99 questions'; ol.append(li); }
     box.append(b.top.length ? ol : el('p', 'pg-fact-note', 'No points yet. Be the first!'));
     if (b.me) box.append(el('p', 'pg-fact-note', b.me.rank ? `You: #${b.me.rank} with ${b.me.points}.` : 'You have no points yet.'));
+  }
+  function openKeeper() {
+    balloon = el('div', 'pg-fact');
+    balloon.setAttribute('role', 'dialog'); balloon.setAttribute('aria-label', 'Pond Quiz');
+    const head = el('div', 'pg-fact-bar'), x = el('button', 'pg-fact-x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close');
+    x.addEventListener('click', closeBalloon); head.append(el('b', null, 'Pond Quiz ★'), x);
+    const extra = el('div', 'pg-fact-extra'), rk = el('button', 'pg-fact-a pg-fact-rank', 'Ranking'); rk.type = 'button';
+    rk.addEventListener('click', () => showBoard(extra)); extra.append(rk);
+    balloon.append(head, el('p', 'pg-fact-q', 'That was all of them, fren. 99 questions, 99 right answers.'),
+      el('p', 'pg-fact-out', 'You are a Keeper of the Pond. The stamp waits in your Fren Passport. I have no questions left, only respect.'), extra);
+    try { storage?.setItem(keeperKey(), '1'); } catch {}
+    setAct('tb_adult_laugh');
+    document.body.append(balloon); positionQuiz();
+    window.addEventListener('resize', positionQuiz);
+    document.addEventListener('keydown', onKey, true); document.addEventListener('pointerdown', onOutside, true);
+    x.focus();
+    if (!reduced.matches) { cancelMotion(); playMotion('greet'); }
+    updateFactButton();
   }
   function openBalloon() {
     if (balloon) { closeBalloon(); return; }
     let f = current();
+    if (!f && keeperDue()) { openKeeper(); return; }
     if (!f) return;
     balloon = el('div', 'pg-fact');
     balloon.setAttribute('role', 'dialog');
@@ -513,6 +550,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   let generation = 0;
   let careBusy = false;
   const CARE_REACTION = { feed: 'fed', clean: 'clean', play: 'played', rest: 'rested' };
+  let lifeState = null;   // gry_pepegochi_life(): trip, diary, golden lemon (update_pepegochi_life.sql); null when not installed
   function acceptState(state, { keepConversation = false } = {}) {
     confirmedAt = now();
     const life = state?.pet?.life_id || null;
@@ -520,7 +558,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
       desktop?.reset();
       conversation?.close({ reset: true }); rumors.invalidate(); arcade.reset(); siteEvents.reset(); clearToy(); lastLife = life;
     }
-    const view = describeTaskbarFrog(state);
+    const view = describeTaskbarFrog(state, lifeState);
     if (shownView?.sprite !== view.sprite || shownView?.label !== view.label || shownView?.playReady !== view.playReady || shownView?.needAttention !== view.needAttention) {
       desktop?.stop(); clearToy();
       if (!keepConversation) conversation?.close();
@@ -548,6 +586,14 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
       date: { month: day.month, day: day.day, weekday: day.weekday } });
     // the first page of a new diary is not news; pages about the time away are
     return fresh.filter(pg => pg.id !== 'first_1').length;
+  }
+  // The pages this browser wrote go to the server once (only when the server has the diary and something changed).
+  function saveDiary(id, pet) {
+    if (!lifeState || !pet?.life_id || pet.status === 'departed') return;
+    diary.open(id, pet.life_id);
+    const mine = diary.snapshot(), theirs = lifeState.diary && lifeState.diary.life_id === pet.life_id ? lifeState.diary : null;
+    if (!mine || !mine.pages.length || (theirs && sameBook(mine, theirs))) return;
+    rpc('gry_pepegochi_diary_save', { p_book: mine }).then(saved => { if (lifeState && saved) lifeState.diary = saved; }).catch(() => {});
   }
   function careError(error) {
     const message = String(error?.message || '');
@@ -598,7 +644,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
       cancelQuiz();               // the old account's question or ranking must not stay on screen
       rumors.invalidate();
       conversation?.close({ reset: true });
-      bond.reset(); notebook.reset(); arcade.reset(); siteEvents.reset(); clearToy(); lastLife = null;
+      bond.reset(); notebook.reset(); arcade.reset(); siteEvents.reset(); clearToy(); lastLife = null; lifeState = null; diary.reset();
       paint(describeTaskbarFrog(null));
       hatched = false; server = null; updateFactButton();
     }
@@ -608,9 +654,19 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     const requestGeneration = ++generation;
     try {
       const state = await rpc('gry_pepegochi_state', {});
-      const cur = session();
+      let cur = session();
       if (disposed || requestGeneration !== generation || !cur || !cur.discord || cur.userId !== id) return;
+      // A12 (update_pepegochi_life.sql): the trip and the diary saved by another device, read before the frog writes
+      const pet = state?.pet, living = pet?.life_id && pet.status !== 'departed' && pet.stage && pet.stage !== 'egg';
+      lifeState = null;
+      if (living) {
+        try { lifeState = await rpc('gry_pepegochi_life', {}); } catch (_) { lifeState = null; }
+        cur = session();
+        if (disposed || requestGeneration !== generation || !cur || !cur.discord || cur.userId !== id) return;
+        if (lifeState) diary.adopt(id, pet.life_id, lifeState.diary);
+      }
       const event = acceptState(state);
+      saveDiary(id, pet);
       if (event) conversation?.react(event);
       else if (diaryFresh) conversation?.react('diaryNew');
     } catch (_) {

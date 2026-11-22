@@ -1,8 +1,10 @@
 // PepeGochi's diary (A12, owner request 2026-11-21): "what did my frog do while I was away?"
 // Nothing runs in the background. When the owner comes back, the time away + a seed decide 0-3 new entries, written
 // by the frog in its own voice. Some entries follow real PEP data from the hub (price change, ATH, blocks, hashrate).
-// Cosmetic only: no reward, no RPC, no care state. The diary lives in this browser (per account and per frog life),
-// like the frog's notes (pepegochi-notes.mjs). Text owner-approved in the A12 spec; the owner may edit the lines.
+// Cosmetic only: no reward and no care state. The pages are written in the browser and kept on the server too
+// (games/supabase/update_pepegochi_life.sql, gry_pepegochi_diary_save), so the phone and the computer show the same
+// diary; this browser keeps a copy (per account and per frog life) that is merged with the server's (mergeBooks).
+// Text owner-approved in the A12 spec; the owner may edit the lines.
 
 export const DAY = 86400000;
 const HOUR = 3600000;
@@ -69,7 +71,7 @@ export const ENTRIES = [
   ['trip_3', 'trip', 'home again. {place} was nice but the pond has my bed. and you. mostly the bed.'],
   // after rare events (pepegochi-rare.mjs); the rare id is the category
   ['rare_ufo', 'rare:ufo', 'saw an UFO behind the window. it had a pepe sticker. i think they are frens.'],
-  ['rare_tv', 'rare:tv_signal', 'the TV showed something weird at night. just numbers. i wrote them down.'],
+  ['rare_tv', 'rare:tv_signal', 'the TV showed something weird at 3am. just numbers: 0098. i wrote them down.'],
   ['rare_tinfoil', 'rare:tinfoil', 'made a tinfoil hat. now the duck can\'t read my thoughts. he looks worried.'],
   ['rare_lemon', 'rare:golden_lemon', 'THE LEMON TREE GREW A GOLDEN LEMON. i am not touching it. it is too powerful.'],
   ['rare_duck', 'rare:duck_moved', 'the duck moved 2 cm to the left while i slept. i have proof. i drew a line.'],
@@ -150,7 +152,8 @@ export function situation(ctx) {
 // chain:{height, hashChange}, needs:{hunger..}, rare, trip:{place, item}, date:{month, day, weekday}, first }
 export function writeEntries(ctx) {
   const away = Number.isFinite(ctx.lastSeen) ? ctx.now - ctx.lastSeen : 0;
-  let count = ctx.first ? 1 : entryCount(away);
+  // a new diary starts with its first page; a trip or rare event that very day gets its own page after it
+  let count = ctx.first ? (ctx.rare || ctx.trip ? 2 : 1) : entryCount(away);
   if (!ctx.first && (ctx.rare || ctx.trip) && count === 0) count = 1;   // a rare event or a trip is always told
   if (!count) return [];
   const random = rng(ctx.seed >>> 0);
@@ -183,6 +186,22 @@ export function writeEntries(ctx) {
   const day = frogDay(ctx.adoptedAt, ctx.now);
   return out.map(([id, , text]) => ({ id, day, at: ctx.now, text: fill(text, vars) }));
 }
+
+// Two copies of one diary (this browser and the server, or two devices): every page once (by id and time), oldest
+// first, the newest 365; "last seen" and "read" take the larger value. Pure; bad pages are dropped.
+const goodPage = p => p && typeof p.id === 'string' && Object.hasOwn(ENTRY, p.id) && Number.isFinite(p.day) && Number.isFinite(p.at) && typeof p.text === 'string';
+export function mergeBooks(a, b) {
+  const pages = new Map();
+  for (const book of [a, b]) for (const p of Array.isArray(book?.pages) ? book.pages : []) if (goodPage(p)) pages.set(p.id + '@' + p.at, { id: p.id, day: p.day, at: p.at, text: p.text });
+  const num = (x, y) => Math.max(Number.isFinite(x) ? x : 0, Number.isFinite(y) ? y : 0);
+  return { seen: num(a?.seen, b?.seen), read: num(a?.read, b?.read),
+    pages: [...pages.values()].sort((x, y) => x.at - y.at || (x.id < y.id ? -1 : 1)).slice(-365) };
+}
+// The same diary by content (to skip a save that would change nothing on the server).
+export const sameBook = (a, b) => JSON.stringify(mergeBooks(a, null)) === JSON.stringify(mergeBooks(b, null));
+
+// This browser's storage, or null (private mode, blocked): the diary then lives only on the server for this visit.
+export const browserStorage = () => { try { return globalThis.localStorage || null; } catch { return null; } };
 
 export const diaryKey = (owner, lifeId) => owner && lifeId ? 'pepegochi:diary:v1:' + owner + ':' + lifeId : null;
 const KEEP = 365;
@@ -222,8 +241,16 @@ export function createDiary({ storage, now = () => Date.now() } = {}) {
   function touch() { if (key) { book.seen = now(); save(); } }
   // Read only (the room): the pages as stored now, nothing written.
   function open(owner, lifeId) { load(owner, lifeId); return book.pages.slice(); }
+  // The server's copy (gry_pepegochi_life().diary) joins this browser's: call before visit(). Returns the merged book.
+  function adopt(owner, lifeId, serverBook) {
+    if (!load(owner, lifeId)) return null;
+    if (serverBook && typeof serverBook === 'object') { book = mergeBooks(book, serverBook); save(); }
+    return { seen: book.seen, read: book.read, pages: book.pages.slice() };
+  }
+  // Everything this browser knows, to save on the server.
+  const snapshot = () => key ? { seen: book.seen, read: book.read, pages: book.pages.slice() } : null;
   return {
-    visit, touch, open,
+    visit, touch, open, adopt, snapshot,
     pages: () => book.pages.slice(),
     unread: () => Math.max(0, book.pages.length - book.read),
     markRead() { book.read = book.pages.length; save(); },
