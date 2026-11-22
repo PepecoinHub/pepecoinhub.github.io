@@ -1567,7 +1567,7 @@
     var s = sbSession(), h = { apikey: SB_KEY, 'Content-Type': 'application/json' };
     if (s) h.Authorization = 'Bearer ' + s.token;
     return fetch(SB_URL + '/rest/v1/rpc/' + name, { method: 'POST', headers: h, body: JSON.stringify(args) }).then(function (r) {
-      return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error((j && j.message) || 'The high score server did not answer'); return j; });
+      return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var err = new Error((j && j.message) || 'The high score server did not answer'); err.status = r.status; err.code = j && j.code; throw err; } return j; });
     });
   }
   function offerSubmit(A, game, score, ms) {
@@ -1989,7 +1989,7 @@
     try { gochiReceive({ kind: kind, owner: owner, ids: ids }); } catch (e) { /* cosmetic only */ }
   }
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261122read').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261122perf').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
         session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport, getQuote: function () { return gochiQuote; },
         commands: { games: gamesFolder, passport: frenPassport, news: bulletinApp, tv: pondTV },
@@ -5537,6 +5537,15 @@
       return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error((j && j.message) || 'The chat cannot be reached right now'); return j; });
     });
   }
+  // LAN Party fallback polling (2026-11-22). With the Realtime doorbell the chat only checks as a safety net; without it
+  // a visible window starts at 4 s and slows down to 15 s after quiet polls (typing, a new message or restoring
+  // the window brings it back to 4 s). Minimized windows keep 30 s so badges and @mention popups still arrive.
+  function lanPollDelay(live, hidden, minimized, quiet) {
+    if (live) return hidden || minimized ? 120000 : 60000;
+    if (hidden) return 60000;
+    if (minimized) return 30000;
+    return quiet < 8 ? 4000 : quiet < 20 ? 8000 : 15000;
+  }
   // The chat doorbell (Supabase Realtime, private channel "lobby-chat"): the database rings it when a message is
   // written or hidden, so an open LAN Party asks once instead of every 4 seconds. Listening only, as an anonymous
   // visitor; the Supabase script is loaded the first time the chat opens. If anything fails, the chat keeps polling.
@@ -5548,7 +5557,10 @@
     });
     load.then(function () {
       if (gone) return;
-      if (!bellSb) bellSb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'pondos-bell' } });
+      // 2026-11-22: when Realtime is down, reconnect after 1, 2, 5, 10, 30 s and then once a minute (the library's
+      // default retries every 10 s forever); the chat keeps its fallback polling meanwhile
+      if (!bellSb) bellSb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'pondos-bell' },
+        realtime: { reconnectAfterMs: function (tries) { return [1000, 2000, 5000, 10000, 30000][tries - 1] || 60000; } } });
       ch = bellSb.channel('lobby-chat', { config: { private: true } });
       ch.on('broadcast', { event: '*' }, function (m) { onRing(m.event, m.payload); });
       ch.subscribe(function (st) { onState(st === 'SUBSCRIBED'); });
@@ -5634,11 +5646,15 @@
       var stEl = A.body.querySelector('.lan-st'), hostTag = A.body.querySelector('.lan-host-tag'), alertsBtn = A.body.querySelector('.lan-alerts');
       var canMod = false, who = null, whoT = 0;
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
+      // 2026-11-22 (traffic audit): quiet polls in a row (fallback polling slows down while nothing happens),
+      // mentions waiting to be marked read, and the most chat rows kept in the window (older ones leave the DOM)
+      var quiet = 0, mentionsPending = false, LAN_MAX_ROWS = 300;
       var hazeTips = null;
-      import(BASE + 'games/js/haze-tips.mjs?v=20261122pk').then(function (m) {
+      import(BASE + 'games/js/haze-tips.mjs?v=20261122perf').then(function (m) {
         if (!alive) return;
                 // messageTips: false: 💚 Tip lives on the fren card (click a name), not on every message (Lemon, 2026-11-20)
         hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp, messageTips: false,
+          minimized: function () { return A.host.classList.contains('is-min'); },
           invoke: function (body) {
             var s = anySession();
             if (!s) return Promise.reject(new Error('Sign in with Discord first.'));
@@ -5729,7 +5745,7 @@
           (noWhoRpc ? Promise.reject() : chatRpc('gry_lobby_who', { p_visitor: visitorId() })).then(function (r) { who = r || {}; paintWho(); },
             function (err) { if (err && /gry_lobby_who|function|schema cache/i.test(err.message || '')) noWhoRpc = true; who = localWho(); paintWho(); });
         }
-        whoT = setTimeout(loadWho, 30000);
+        whoT = setTimeout(loadWho, 60000);   // 2026-11-22: was 30 s
       };
       showList(listPref ? listPref === '1' : wide());
 
@@ -5884,7 +5900,14 @@
       // @mentions: highlight messages for me, suggest names after "@", ring on new ones, a switch to turn them off
       var PM = null, me = { verified: false }, mrow = A.body.querySelector('.lan-ment'), mbtn = mrow.querySelector('button');
       var forMe = function (m) { var s = anySession(); return !!(PM && me.verified && !me.optout && !(s && s.user && s.user.id === m.user_id) && (m.broadcast === true || PM.mentionsMe(m.body, me.nick))); };
-      var seenMentions = function () { if (alive && !document.hidden && !isMinimized()) chatRpc('gry_mentions_seen', { p_upto: null }).catch(function () {}); };
+      // 2026-11-22: only when a mention is actually waiting and the sign-in is still valid (an expired session made
+      // this call anonymous and it failed with HTTP 401); a failed call keeps the mention waiting for the next try
+      var seenMentions = function () {
+        if (!alive || document.hidden || isMinimized() || !mentionsPending || !me.verified) return;
+        var s = anySession(); if (!s || !s.user || s.user.is_anonymous) return;
+        mentionsPending = false;
+        chatRpc('gry_mentions_seen', { p_upto: null }).catch(function () { mentionsPending = true; });
+      };
       var paintMent = function () {
         mrow.hidden = !me.verified;
         mbtn.textContent = me.optout ? '🔕 Mentions off' : '🔔 Mentions on';
@@ -5901,7 +5924,7 @@
       }).then(function (r) {
         if (!alive || !r) return;
         me = r; paintMent();
-        if (r.items && r.items.length) seenMentions();
+        if (r.items && r.items.length) { mentionsPending = true; seenMentions(); }
       }).catch(function () {});
       var paintNote = function () {
         var s = anySession();
@@ -5946,12 +5969,16 @@
               row.classList.add('lan-me');
               if (!initial) {
                 if (alertMode !== 'mute') PM.ring(m.nick, m.body, function () { if (A.restore) A.restore(); });
-                seenMentions();
+                mentionsPending = true; seenMentions();
               }
             }
             modBtns(row);
             seen[m.id] = row; log.appendChild(row); last = Math.max(last, m.id);
           });
+          // keep the newest LAN_MAX_ROWS messages in the window (a long session no longer grows the page forever)
+          var rows = log.querySelectorAll('.lan-msg'), extra = rows.length - LAN_MAX_ROWS;
+          for (var ri = 0; ri < extra; ri++) { var old = rows[ri]; if (old._m) delete seen[old._m.id]; old.remove(); }
+          quiet = r.messages && r.messages.length || (r.hidden && r.hidden.length) ? 0 : quiet + 1;
           if (!isMinimized() && !document.hidden) unread = 0;
           paintUnread();
           if (hazeTips) hazeTips.sync();
@@ -5964,7 +5991,7 @@
             if (!alive) return;
             if (rerun) { rerun = false; poll(); return; }
             // Keep the Realtime doorbell while minimized; only slow down fallback polling.
-            timer = setTimeout(poll, live ? 60000 : document.hidden ? 60000 : isMinimized() ? 30000 : 4000);
+            timer = setTimeout(poll, lanPollDelay(live, document.hidden, isMinimized(), quiet));
           });
       };
       // a burst of rings makes one call, spread over a second so not every open chat asks at the same moment
@@ -5992,16 +6019,26 @@
           poll();
         }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
       });
+      inp.addEventListener('input', function () { if (quiet > 3 && !live) { quiet = 0; clearTimeout(timer); timer = setTimeout(poll, 1000); } });
       paintNote(); loadPepeEmotes().then(poll);
       // Restoring the taskbar window marks its messages as read and immediately syncs any missed events.
-      A.resume = function () { if (!alive) return; unread = 0; paintUnread(); seenMentions(); poll(); };
+      A.resume = function () { if (!alive) return; unread = 0; quiet = 0; paintUnread(); seenMentions(); if (hazeTips) hazeTips.invalidate(); poll(); };
       A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); if (hazeTips) { if (lanHaze === hazeTips) lanHaze = null; hazeTips.destroy(); } };
     }, 480);
     return A;
   }
   // the green online counter on the desktop icon and in the tray, refreshed every 45 seconds
   if (mainEl) {
-    var pingOnline = function () { chatRpc('gry_lobby_chat', { p_after: 2147483647, p_visitor: visitorId() }).then(function (r) { paintOnline(r.online); }, function () {}); };
+    // 2026-11-22: one tab asks for the whole browser; the others reuse its answer (localStorage + storage event)
+    var ONLINE_KEY = 'pondos-online-ping';
+    var pingOnline = function () {
+      try { var o = JSON.parse(localStorage.getItem(ONLINE_KEY) || 'null'), age = o ? Date.now() - o.at : -1; if (o && age >= 0 && (o.n != null ? age < 55000 : age < 10000)) { if (o.n != null) paintOnline(o.n); return; } } catch (e) {}
+      try { localStorage.setItem(ONLINE_KEY, JSON.stringify({ at: Date.now(), n: null })); } catch (e) {}
+      chatRpc('gry_lobby_chat', { p_after: 2147483647, p_visitor: visitorId() }).then(function (r) {
+        paintOnline(r.online); try { localStorage.setItem(ONLINE_KEY, JSON.stringify({ at: Date.now(), n: r.online })); } catch (e) {}
+      }, function () {});
+    };
+    window.addEventListener('storage', function (e) { if (e.key === ONLINE_KEY && e.newValue) try { var o = JSON.parse(e.newValue); if (o && o.n != null) paintOnline(o.n); } catch (er) {} });
     setTimeout(pingOnline, 1500);
     // mentions waiting for me (verified players): a balloon that opens the LAN Party
     setTimeout(function () {
@@ -6015,7 +6052,7 @@
         b.addEventListener('click', function (e) { if (!e.target.closest('button')) { lanParty(); b.remove(); } });
       }, function () {});
     }, 6000);
-    setInterval(function () { if (!document.hidden && !apps.lan) pingOnline(); }, 45000);
+    setInterval(function () { if (!document.hidden && !apps.lan) pingOnline(); }, 60000);   // 2026-11-22: was 45 s, now shared by all tabs
     var trayEl2 = document.querySelector('.tray');
     if (trayEl2) {
       var tl = el('button', { type: 'button', class: 'tray-lan lan-badge', hidden: '', title: 'LAN Party chat' }, '<span class="lan-dot" aria-hidden="true"></span><span class="lan-n"></span><span class="sr"> online, open the chat</span>');
@@ -6291,7 +6328,7 @@
   }
   function withNotify(fn) {
     if (!notifyLoad) notifyLoad = new Promise(function (res, rej) {
-      var sc = document.createElement('script'); sc.src = 'notify.js?v=20261119tip'; sc.onload = res; sc.onerror = function () { notifyLoad = null; rej(); }; document.head.appendChild(sc);
+      var sc = document.createElement('script'); sc.src = 'notify.js?v=20261122perf'; sc.onload = res; sc.onerror = function () { notifyLoad = null; rej(); }; document.head.appendChild(sc);
     });
     return notifyLoad.then(function () { return fn(window.PondNotify, notifyEnv()); });
   }
@@ -6321,6 +6358,9 @@
     }).catch(function () {});
     // the installed app (home screen icon), first start: one hint where the switch is
     var standaloneNow = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+    // 2026-11-22: the installed app keeps its own copy of the desktop pictures (sw.js caches pictures only, never
+    // pages or scripts). Same worker and scope as the notifications switch, so nothing else changes.
+    if (standaloneNow) navigator.serviceWorker.register('sw.js?v=20261122img', { scope: './' }).catch(function () {});
     if (standaloneNow && 'PushManager' in window) {
       var hinted = '1'; try { hinted = localStorage.getItem('pondos-push-hint'); localStorage.setItem('pondos-push-hint', '1'); } catch (e) {}
       if (!hinted && !(window.Notification && Notification.permission !== 'default')) setTimeout(function () {

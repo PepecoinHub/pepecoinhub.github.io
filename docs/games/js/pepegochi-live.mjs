@@ -14,6 +14,8 @@ import { LENGTHS, PACKS, PLACES, SOUVENIRS, SOUVENIR, PLACE, tripState, formatLe
 import { drawPostcard, drawDiaryPage, saveCanvas, postcardSrc, souvenirSrc } from './pepegochi-cards.mjs?v=20261122life';
 import { rareOfDay, localDay } from '../../meme/pepegochi-rare.mjs?v=20261121a12';
 import { renderCarePanel } from './pepegochi-care-ui.mjs?v=20261121compact';
+// 2026-11-22: reads shared with the taskbar frog (same cache on the PondOS top window), dedupe, missing-function gate
+import { cachedRpc } from '../../meme/pepegochi-rpc.mjs?v=20261122perf';
 
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, text = null) => {
@@ -24,7 +26,8 @@ const el = (tag, attrs = {}, text = null) => {
 };
 
 let backend = null;
-const game = new LiveGame({ rpc: (fn, args) => backend.rpc(fn, args) });
+const prpc = cachedRpc((fn, args) => backend.rpc(fn, args), () => backend?.session?.()?.user?.id || null);
+const game = new LiveGame({ rpc: (fn, args) => prpc(fn, args) });
 
 
 // The frog's notes on the table (clues and other important messages), kept in this browser per account and life.
@@ -35,7 +38,7 @@ const synced = new Set();
 function loadMapNotes() {
   if (mapAsked || !backend?.rpc) return;
   mapAsked = true;
-  backend.rpc('gry_map_notes').then(list => { mapNotes = Array.isArray(list) ? list : []; if (game.last && !game.busy) render(); }).catch(() => {});
+  prpc('gry_map_notes').then(list => { mapNotes = Array.isArray(list) ? list : []; if (game.last && !game.busy) render(); }).catch(() => {});
 }
 const localNotes = () => {
   const pet = game.last?.pet, user = backend?.session?.()?.user;
@@ -47,7 +50,7 @@ const myNotes = () => {
   // the frog's clues about the map, written in this browser, are copied to the server once so they never get lost
   for (const n of local) {
     const m = n.kind === 'clue' && /^pond_map_([1-6])$/.exec(n.secret || '');
-    if (m && !synced.has(m[1]) && backend?.rpc) { synced.add(m[1]); backend.rpc('gry_map_note', { p_key: 'clue_' + m[1] }).then(() => { mapAsked = false; loadMapNotes(); }).catch(() => {}); }
+    if (m && !synced.has(m[1]) && backend?.rpc) { synced.add(m[1]); prpc('gry_map_note', { p_key: 'clue_' + m[1] }).then(() => { mapAsked = false; loadMapNotes(); }).catch(() => {}); }
   }
   const serverClues = new Set(mapNotes.filter(n => /^clue_/.test(n.key)).map(n => 'pond_map_' + n.key.slice(5)));
   const shown = local.filter(n => !(n.kind === 'clue' && serverClues.has(n.secret)));
@@ -80,7 +83,7 @@ function takeLife(v) {
 }
 async function loadLife() {
   if (!backend?.rpc || !owner() || !game.last?.pet) { life = null; return; }
-  try { takeLife(await backend.rpc('gry_pepegochi_life')); } catch { life = null; }   // not installed yet: the room works without it
+  try { takeLife(await prpc('gry_pepegochi_life')); } catch { life = null; }   // not installed yet: the room works without it
 }
 function saveDiary() {
   const p = livingPet(), id = owner();
@@ -88,7 +91,7 @@ function saveDiary() {
   diaryBook.open(id, p.life_id);
   const book = diaryBook.snapshot();
   if (!book || !book.pages.length) return;
-  backend.rpc('gry_pepegochi_diary_save', { p_book: book }).then(d => { if (life && d) life.diary = d; }).catch(() => {});
+  prpc('gry_pepegochi_diary_save', { p_book: book }).then(d => { if (life && d) life.diary = d; }).catch(() => {});
 }
 // A page about something that just happened in the room (a trip, the golden lemon, the TV signal)
 function writePage(ctx) {
@@ -105,7 +108,7 @@ async function startTrip(length, pack) {
   if (tripBusy || !backend) return;
   tripBusy = true; render();
   try {
-    takeLife(await backend.rpc('gry_pepegochi_trip_start', { p_length: length, p_pack: pack || null }));
+    takeLife(await prpc('gry_pepegochi_trip_start', { p_length: length, p_pack: pack || null }));
     game.message = `${game.last?.pet?.name || 'Your Fren'} packed ${pack ? PACKS[pack].label.toLowerCase() : 'nothing'} and left. Back in ${LENGTHS[length].hours} hours.`;
     notifyParent();
   } catch (e) { game.message = (e && e.message) || 'The trip could not start. Try again.'; }
@@ -115,7 +118,7 @@ async function claimTrip() {
   if (tripBusy || !backend) return;
   tripBusy = true; render();
   try {
-    const v = await backend.rpc('gry_pepegochi_trip_claim');
+    const v = await prpc('gry_pepegochi_trip_claim');
     takeLife(v);
     if (v?.claimed) {
       postcard = { place: v.claimed.place, souvenir: v.claimed.souvenir, fresh: true, newPlace: !!v.claimed.new_place };
@@ -131,7 +134,7 @@ async function claimTrip() {
 function waterLemon(say) {
   if (!life || life.watered_today || !backend || !owner()) return;
   life.watered_today = true;
-  backend.rpc('gry_pepegochi_water').then(v => {
+  prpc('gry_pepegochi_water').then(v => {
     takeLife(v);
     if (v?.golden_new) {
       say('THE LEMON TREE GREW A GOLDEN LEMON. Your Fren is not touching it. It is too powerful.');
@@ -144,7 +147,7 @@ function waterLemon(say) {
 function nightTv(say, frame) {
   if (new Date().getHours() !== 3 || !backend || !owner()) return false;
   say('The TV crackles. Something is coming through…');
-  backend.rpc('gry_pepegochi_tv_signal', { p_tz_min: tz() }).then(r => {
+  prpc('gry_pepegochi_tv_signal', { p_tz_min: tz() }).then(r => {
     if (!r?.signal) { if (window.parent !== window) window.parent.postMessage({ type: 'pondos:pepegochi-room-tv' }, location.origin); return; }
     if (stopTv) stopTv();
     if (!reduceMotion()) stopTv = playTvStatic(frame);
@@ -405,15 +408,20 @@ function renderDecor(v) {
     : `Room secrets found: ${f.found} of ${f.total}. A few spots in the room are still empty: some Passport stamps fill them.`));
 }
 
-async function run(p) {
+async function run(p, { wrote = true } = {}) {
   render();
+  const settledBefore = game.settleTried;
   const result = await p;
   if (game.last && game.last.pet && !game.room) await game.loadRoom();
   render();
   // Same-origin parent re-reads the authenticated state; never send private pet data via postMessage.
-  if (result && result.ok && window.parent !== window)
+  // 2026-11-22: only after a write (care, adopt, letter, a move-out saved by settle). A plain read used to ping the
+  // parent too, which re-read the state there and could bounce back here as pepegochi-refresh.
+  const changed = wrote || (!settledBefore && game.settleTried);
+  if (changed && result && result.ok && window.parent !== window)
     window.parent.postMessage({ type: 'pondos:pepegochi-changed' }, location.origin);
 }
+const reread = () => run(game.refresh(), { wrote: false });
 
 async function openLetter() {
   await run(game.readLetter());
@@ -437,7 +445,7 @@ function openDiary() {
   const p = livingPet(), id = owner();
   if (p && id) { diaryBook.open(id, p.life_id); diaryBook.markRead(); saveDiary(); }
   // Dear Diary (7 different days) and Snoop (3 AM) are counted by the server
-  if (life && backend) backend.rpc('gry_pepegochi_diary_open', { p_tz_min: tz() }).catch(() => {});
+  if (life && backend) prpc('gry_pepegochi_diary_open', { p_tz_min: tz() }).catch(() => {});
   render();
   const pad = $('pgb-diary');
   if (pad) { pad.scrollIntoView({ block: 'start' }); pad.focus({ preventScroll: true }); }
@@ -483,19 +491,19 @@ $('pgb-body').addEventListener('submit', e => {
 });
 // the needs move on by themselves: redraw every minute, and read the server again after a long break
 setInterval(() => { if (game.last && !game.busy) render(); }, 6e4);
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && game.stale && !game.busy) run(game.refresh()).then(loadLife).then(render); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && game.stale && !game.busy) reread().then(loadLife).then(render); });
 // A care action can also start from the taskbar conversation. The parent sends no pet data; this authenticated
 // iframe re-reads its own full state once so an already-open room never shows stale needs or growth.
 window.addEventListener('message', event => {
   if (event.origin !== location.origin || event.source !== window.parent || event.data?.type !== 'pondos:pepegochi-refresh') return;
-  if (backend && !game.busy) run(game.refresh()).then(loadLife).then(render);
+  if (backend && !game.busy) reread().then(loadLife).then(render);
 });
 
 (async () => {
   render();
   try { backend = await getBackend(); } catch (e) { game.error = e.message; render(); return; }
   if (!backend.session || !backend.session() || backend.session().user.is_anonymous) { game.signin = true; render(); return; }
-  await run(game.refresh());
+  await reread();
   await loadLife(); render();
   loadMapNotes();
 })();

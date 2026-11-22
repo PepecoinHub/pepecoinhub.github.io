@@ -429,7 +429,7 @@
   }
   let dropAcc = 0;
   function rain(dt) {
-    if (reduced || document.hidden || !S.started) return;
+    if (reduced || !shown() || !S.started) return;
     const r = rate(); if (r <= 0) return;
     dropAcc += dt * Math.min(9, 0.6 + Math.log10(r + 1) * 0.9);
     const layer = $('rain');
@@ -668,8 +668,14 @@
       if ((slow += dt) >= 1) { slow = 0; S.st.best = Math.max(S.st.best, rate()); renderPray(); checkAch(); if (tab === 'stats') renderStats(); if (tab === 'fork') updateForkNumbers(); }
     }
     S.buffs = live();
-    paint();
+    if (shown()) paint();
   }
+  // 2026-11-22: a minimized PondOS window (display:none, so innerWidth 0) or a hidden tab keeps mining at one step a
+  // second (dt is capped at 1 s, so nothing is lost) and skips drawing; a visible window keeps 10 steps a second.
+  const shown = () => !document.hidden && window.innerWidth > 0;
+  let loopTimer = 0;
+  function runLoop() { loop(); loopTimer = setTimeout(runLoop, shown() ? 100 : 1000); }
+  const wake = () => { if (!shown()) return; clearTimeout(loopTimer); renderAll(); runLoop(); };
   let lastForkKey = '';
   function updateForkNumbers() { const k = pendingPts() + '|' + forkLevel() + '|' + (S.allTime < FORK_DIV ? Math.floor(S.allTime / FORK_DIV * 100) : ''); if (k !== lastForkKey) { lastForkKey = k; renderFork(); } }
   function spawnCandle() {
@@ -677,7 +683,7 @@
     c.style.left = rnd(0, 100) + 'vw'; c.style.height = rnd(40, 140) + 'px'; c.style.animationDuration = rnd(3, 7) + 's';
     document.querySelector('.mn-candles').append(c); setTimeout(() => c.remove(), 7000);
   }
-  setInterval(() => { if (active('rally') && !reduced) for (let i = 0; i < 2; i++) spawnCandle(); }, 400);
+  setInterval(() => { if (active('rally') && !reduced && shown()) for (let i = 0; i < 2; i++) spawnCandle(); }, 400);
 
   // ---------- Easter egg: cheat code "klapaucius" (×100 for 1 minute). Type it, or tap the coin 5 times quickly. Kept on purpose. ----------
   const CHEAT = 'klapaucius';
@@ -714,8 +720,10 @@
   lastBlocks = Math.floor(S.total / BLOCK);
   renderAll(); renderPray(); nextNews();
   footPic();
-  setInterval(loop, 100);
-  setInterval(nextNews, 9000);
+  runLoop();
+  window.addEventListener('resize', wake);
+  document.addEventListener('visibilitychange', wake);
+  setInterval(() => { if (shown()) nextNews(); }, 9000);
   setInterval(save, 5000);
   document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
   window.addEventListener('pagehide', save);

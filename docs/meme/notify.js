@@ -150,7 +150,7 @@
         // ON: ask the phone first (it must be right after the tap), then subscribe and save
         Promise.resolve(Notification.requestPermission()).then(function (perm) {
           if (perm !== 'granted') throw new Error(perm === 'denied' ? 'Notifications were blocked. You can allow them in your phone or browser settings.' : 'No answer, so nothing changed.');
-          return navigator.serviceWorker.register('sw.js?v=20261119', { scope: './' });
+          return navigator.serviceWorker.register('sw.js?v=20261122img', { scope: './' });
         }).then(function () { return navigator.serviceWorker.ready; }).then(function (r) {
           return r.pushManager.getSubscription().then(function (old) {
             return old || r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(key) });

@@ -2,7 +2,7 @@
 // Open for everyone since 2026-11-19 (owner: "zdejmij betę"). Access is still decided on the server:
 // games.haze_settings (enabled, beta_only=false) in SQL and HAZE_ACCESS=all in the haze-wallet Edge Function.
 // Every action needs a Discord sign-in, and every tip is confirmed on chain by the server.
-import {createHazeGroups,HAZE_GROUPS_ENABLED} from './haze-groups.mjs?v=20261122pk';
+import {createHazeGroups,HAZE_GROUPS_ENABLED} from './haze-groups.mjs?v=20261122perf';
 export const HAZE_TIPS_ENABLED = true;
 // Owner diagnostics: a browser that opened any page with ?haze=check shows the "Server check" button
 // (?haze=off hides it). Visibility only; the check itself needs a signed-in account the server allows.
@@ -59,7 +59,7 @@ export function submissionMatches(event,flight) {
 
 // messageTips:false (PondOS) moves the 💚 Tip button from every message to the fren card (tipFor), so the
 // conversation stays readable (Lemon, 2026-11-20). The Games lobby has no fren card and keeps the buttons.
-export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,chatInput=null,messageTips=true,enabled=HAZE_TIPS_ENABLED,document:doc=globalThis.document,window:win=globalThis.window}={}) {
+export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,chatInput=null,messageTips=true,minimized=null,enabled=HAZE_TIPS_ENABLED,document:doc=globalThis.document,window:win=globalThis.window}={}) {
   if(!enabled)return null;
   const node=(tag,attrs={},...children)=>{
     const value=doc.createElement(tag);
@@ -97,7 +97,7 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     const said=node('p',{role:'status',class:'haze-sr'},'You received '+amount+' PEP'+(from?' from '+from:''));layer.after(said);
     const t=setTimeout(()=>{timers.delete(t);layer.remove();said.remove();},calm?3200:3600);timers.add(t);
   }
-  const groups=createHazeGroups({node,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,chatLog:()=>chatLog,chatInput:()=>chatInput,origin:HAZE_ORIGIN,wallet:()=>wallet,refreshWallet:refresh,capabilities:()=>walletCaps,hideWallet:()=>{if(walletHost)walletHost.hidden=true;},login,connect,notify,messageTips,celebrate},{enabled:HAZE_GROUPS_ENABLED});
+  const groups=createHazeGroups({node,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,chatLog:()=>chatLog,chatInput:()=>chatInput,origin:HAZE_ORIGIN,wallet:()=>wallet,refreshWallet:refresh,capabilities:()=>walletCaps,hideWallet:()=>{if(walletHost)walletHost.hidden=true;},login,connect,notify,messageTips,celebrate,minimized},{enabled:HAZE_GROUPS_ENABLED});
   function endView(){
     const view=activeView;activeView=null;view?.controller.abort();if(walletHost)walletHost.hidden=true;
     if(walletFrame){walletFrame.contentWindow.postMessage({type:'haze:tip-cancel',version:1},HAZE_ORIGIN);walletFrame.contentWindow.postMessage({type:'haze:hidden'},HAZE_ORIGIN);}
@@ -346,7 +346,10 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
   doc.addEventListener('visibilitychange',resume);
   function invalidate(){syncAt=0;void groups?.sync(true);}
   async function sync() {
-    if(destroyed||syncing||doc.hidden||Date.now()-syncAt<60000)return;
+    // 2026-11-22: a minimized LAN Party refreshes tip receipts every 3 minutes (they are not on screen); restoring
+    // the window calls invalidate() and reads them at once
+    const isMin=(()=>{try{return !!minimized?.();}catch{return false;}})();
+    if(destroyed||syncing||doc.hidden||Date.now()-syncAt<(isMin?180000:60000))return;
     for(const [id,value]of messages)if(!value.row.isConnected)messages.delete(id);
     const ids=[...messages.keys()].slice(-120);if(!ids.length)return;
     syncing=true;syncAt=Date.now();

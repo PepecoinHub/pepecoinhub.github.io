@@ -1,0 +1,232 @@
+[
+ {
+  "scenario": "desktop-idle",
+  "label": "before",
+  "minutes": 60,
+  "opened": [],
+  "windows": [],
+  "rpc_total": 80,
+  "edge_total": 0,
+  "response_kb": 4.2,
+  "errors": {},
+  "calls": {
+   "rpc:gry_lobby_chat": 80
+  },
+  "cpu_task_ms": 6377,
+  "script_ms": 69,
+  "heap_mb": 2.1,
+  "dom_nodes": 2545,
+  "page_errors": []
+ },
+ {
+  "scenario": "desktop-idle-2tabs",
+  "label": "before",
+  "minutes": 60,
+  "opened": [],
+  "windows": [],
+  "rpc_total": 160,
+  "edge_total": 0,
+  "response_kb": 8.4,
+  "errors": {},
+  "calls": {
+   "rpc:gry_lobby_chat": 160
+  },
+  "cpu_task_ms": 7635,
+  "script_ms": 91,
+  "heap_mb": 5.4,
+  "dom_nodes": 2657,
+  "page_errors": []
+ },
+ {
+  "scenario": "gochi-no-room",
+  "label": "before",
+  "minutes": 60,
+  "opened": [],
+  "windows": [],
+  "rpc_total": 107,
+  "edge_total": 0,
+  "response_kb": 9.9,
+  "errors": {
+   "rpc:gry_pepegochi_life 404": 9
+  },
+  "calls": {
+   "rpc:gry_lobby_chat": 80,
+   "rpc:gry_pepegochi_state": 9,
+   "rpc:gry_quiz_today": 9,
+   "rpc:gry_pepegochi_life": 9
+  },
+  "cpu_task_ms": 6516,
+  "script_ms": 85,
+  "heap_mb": 4.1,
+  "dom_nodes": 2683,
+  "page_errors": []
+ },
+ {
+  "scenario": "gochi-room-open",
+  "label": "before",
+  "minutes": 60,
+  "opened": [
+   "room:true"
+  ],
+  "windows": [
+   "PEPEGOCHI.EXE"
+  ],
+  "rpc_total": 107,
+  "edge_total": 0,
+  "response_kb": 9.9,
+  "errors": {
+   "rpc:gry_pepegochi_life 404": 9
+  },
+  "calls": {
+   "rpc:gry_lobby_chat": 80,
+   "rpc:gry_pepegochi_state": 9,
+   "rpc:gry_quiz_today": 9,
+   "rpc:gry_pepegochi_life": 9
+  },
+  "cpu_task_ms": 7416,
+  "script_ms": 94,
+  "heap_mb": 3,
+  "dom_nodes": 2701,
+  "page_errors": []
+ },
+ {
+  "scenario": "gochi-room-token-refresh",
+  "label": "before",
+  "minutes": 60,
+  "opened": [
+   "room:true"
+  ],
+  "windows": [
+   "PEPEGOCHI.EXE"
+  ],
+  "rpc_total": 107,
+  "edge_total": 0,
+  "response_kb": 9.9,
+  "errors": {
+   "rpc:gry_pepegochi_life 404": 9
+  },
+  "calls": {
+   "rpc:gry_lobby_chat": 80,
+   "rpc:gry_pepegochi_state": 9,
+   "rpc:gry_quiz_today": 9,
+   "rpc:gry_pepegochi_life": 9
+  },
+  "cpu_task_ms": 7229,
+  "script_ms": 93,
+  "heap_mb": 8.2,
+  "dom_nodes": 2814,
+  "page_errors": []
+ },
+ {
+  "scenario": "games-minimized",
+  "label": "before",
+  "minutes": 60,
+  "opened": [
+   "miner:true",
+   "minimize:true"
+  ],
+  "windows": [
+   "Pepe Miner (min)"
+  ],
+  "rpc_total": 80,
+  "edge_total": 0,
+  "response_kb": 4.2,
+  "errors": {},
+  "calls": {
+   "rpc:gry_lobby_chat": 80
+  },
+  "cpu_task_ms": 11264,
+  "script_ms": 110,
+  "heap_mb": 4.8,
+  "dom_nodes": 6391,
+  "page_errors": []
+ },
+ {
+  "scenario": "lan-live",
+  "label": "before",
+  "minutes": 60,
+  "opened": [
+   "lan:true"
+  ],
+  "windows": [
+   "LAN Party - #pond chat"
+  ],
+  "rpc_total": 390,
+  "edge_total": 0,
+  "response_kb": 26.2,
+  "errors": {},
+  "calls": {
+   "rpc:gry_haze_groups": 180,
+   "realtime:heartbeat": 139,
+   "rpc:gry_lobby_who": 120,
+   "rpc:gry_lobby_chat": 60,
+   "rpc:gry_reports_new": 30
+  },
+  "cpu_task_ms": 6956,
+  "script_ms": 85,
+  "heap_mb": 5.4,
+  "dom_nodes": 2796,
+  "page_errors": []
+ },
+ {
+  "scenario": "lan-lost",
+  "label": "before",
+  "minutes": 60,
+  "opened": [
+   "lan:true"
+  ],
+  "windows": [
+   "LAN Party - #pond chat"
+  ],
+  "rpc_total": 1229,
+  "edge_total": 0,
+  "response_kb": 70.4,
+  "errors": {},
+  "calls": {
+   "realtime:connect": 361,
+   "rpc:gry_lobby_chat": 899,
+   "rpc:gry_haze_groups": 180,
+   "rpc:gry_lobby_who": 120,
+   "rpc:gry_reports_new": 30
+  },
+  "cpu_task_ms": 11407,
+  "script_ms": 197,
+  "heap_mb": 8.7,
+  "dom_nodes": 3311,
+  "page_errors": []
+ },
+ {
+  "scenario": "lan-lost-minimized",
+  "label": "before",
+  "minutes": 60,
+  "opened": [
+   "lan:true",
+   "minimize:true"
+  ],
+  "windows": [
+   "LAN Party - #pond chat (min)"
+  ],
+  "rpc_total": 330,
+  "edge_total": 0,
+  "response_kb": 16.6,
+  "errors": {},
+  "calls": {
+   "realtime:connect": 360,
+   "rpc:gry_haze_groups": 180,
+   "rpc:gry_lobby_chat": 120,
+   "rpc:gry_reports_new": 30
+  },
+  "cpu_task_ms": 9256,
+  "script_ms": 153,
+  "heap_mb": 11.4,
+  "dom_nodes": 3014,
+  "page_errors": []
+ },
+ {
+  "scenario": "fps",
+  "label": "before",
+  "fps_desktop": 60,
+  "fps_with_minimized_miner": 60,
+  "cpu_ms_per_5s_minimized_miner": 443
+ }
+]
