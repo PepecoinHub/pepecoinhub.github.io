@@ -1,0 +1,18 @@
+[
+  {
+    "id": "haze_linked",
+    "file": "haze_linked.png",
+    "width": 1096,
+    "height": 1435,
+    "status": "candidate",
+    "notes": "Redrawn with the three master-prompt references; grey label and cream scalloped frame. Awaiting owner approval."
+  },
+  {
+    "id": "haze_first_tip",
+    "file": "haze_first_tip.png",
+    "width": 1096,
+    "height": 1435,
+    "status": "candidate",
+    "notes": "Redrawn with the three master-prompt references; no extra text in the scene. Awaiting owner approval."
+  }
+]

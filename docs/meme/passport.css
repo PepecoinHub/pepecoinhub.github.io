@@ -25,6 +25,9 @@
 .pp-art-stamp.is-dominator { background-image: url(passport-assets/pond-dominator.webp?v=20261111pd); background-size: contain; background-position: center; }
 /* Crown Breaker is a standalone approved stamp so existing atlas positions remain fixed. */
 .pp-art-stamp.is-crown-breaker { background-image: url(passport-assets/crown-breaker.webp?v=20261118cb); background-size: contain; background-position: center; }
+/* Individual Haze stamps preserve the existing atlas and remain locked until the server awards them. */
+.pp-art-stamp.is-haze-linked { background-image: url(passport-assets/haze-linked.webp?v=20261121hazeart); background-size: contain; background-position: center; }
+.pp-art-stamp.is-first-haze-tip { background-image: url(passport-assets/first-haze-tip.webp?v=20261121hazeart); background-size: contain; background-position: center; }
 /* Fallback for an earned stamp with no approved drawing (e.g. future Beta Tester). */
 .pp-art-stamp.is-pending { display: inline-grid; place-items: center; box-sizing: border-box;
   background-image: none; background-color: #dbd6c7; border: 1px dashed #857960;
