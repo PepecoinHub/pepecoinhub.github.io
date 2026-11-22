@@ -3827,6 +3827,8 @@
   }
   // payout lines for a Discord tip bot, e.g. "send 12.5 PEPE to P..." for Filippy
   var WP_PAYOUT_TEMPLATE = 'send {amount} PEPE to {address}';   // Filippy's word for PEP
+  // Start of the Pepe Guesser reward week (Monday 00:00 UTC), as on the server.
+  function wpWeekStart(t) { var d = new Date(t == null ? Date.now() : t); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - (d.getUTCDay() + 6) % 7); }
   function wpTpl() { var t = ''; try { t = localStorage.getItem('wp-payout-template') || ''; } catch (e) {} return t || WP_PAYOUT_TEMPLATE; }
   function wpPayoutLines(sum, tpl) {
     tpl = tpl && tpl.indexOf('{address}') >= 0 && tpl.indexOf('{amount}') >= 0 ? tpl : WP_PAYOUT_TEMPLATE;
@@ -4154,13 +4156,23 @@
       var payouts = function () {
         body.innerHTML = '<p class="wp-small">Loading…</p>';
         wpRpc('gry_wp_host_claims').then(function (d) {
-          var open = d.claims.filter(function (c) { return c.status === 'open'; }), sum = {};
+          // Finished weeks are a fixed list (no new rewards can join them); this week's rewards wait until Monday.
+          var wk0 = wpWeekStart(), allOpen = d.claims.filter(function (c) { return c.status === 'open'; }), sum = {};
+          var open = allOpen.filter(function (c) { return new Date(c.at).getTime() < wk0; }), running = allOpen.filter(function (c) { return new Date(c.at).getTime() >= wk0; });
+          var runPep = Math.round(running.reduce(function (t, c) { return t + Number(c.pep); }, 0) * 100) / 100;
+          var weeks = {}; open.forEach(function (c) { weeks[wpWeekStart(c.at)] = 1; });
+          var weekNames = Object.keys(weeks).sort().map(function (w) { return new Date(+w).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }); });
           open.forEach(function (c) { sum[c.address] = Math.round(((sum[c.address] || 0) + Number(c.pep)) * 100) / 100; });
           var total = Object.keys(sum).reduce(function (t, k) { return t + sum[k]; }, 0);
           var st = d.settings;
-          body.innerHTML = '<h4 class="wp-h">Open rewards: ' + open.length + ' claims, ' + Object.keys(sum).length + ' addresses, ' + total.toLocaleString('en-US') + ' PEP</h4>' +
+          body.innerHTML = '<h4 class="wp-h">To pay · ' + (weekNames.length ? 'week of ' + weekNames.join(', ') + ' (finished, fixed list)' : 'no finished week waiting') + ': ' + open.length + ' claims, ' + Object.keys(sum).length + ' addresses, ' + total.toLocaleString('en-US') + ' PEP</h4>' +
+            '<p class="wp-small">This week so far: ' + running.length + ' claims, ' + runPep.toLocaleString('en-US') + ' PEP. It is still changing and moves up here on Monday 00:00 UTC (' + new Date(wk0 + 7 * 864e5).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) + ' your time).</p>' +
             '<p class="wp-small">Budget left this week: <b>' + Number(d.budget_left).toLocaleString('en-US') + ' PEP</b>. ⚠ marks are worth a look before you pay; Hold keeps a reward out of the payout.</p>' +
-            (open.length ? '<h4 class="wp-h">Pay with the tip bot</h4><p class="wp-small">Tap <b>Copy</b>, paste it to the bot (e.g. Filippy in a DM), then tap <b>Paid</b>. One line per address.</p>' +
+            (open.length ? '<h4 class="wp-h">💚 Pay with Haze Wallet</h4><p class="wp-small">One payment to every address on the list (up to 200, at least 1 PEP each). It opens in the LAN Party chat: you check the list and the network fee, then approve in Haze. After 2 confirmations these rewards are marked as paid with the transaction id, by themselves.</p>' +
+              '<div class="app-row"><button type="button" class="app-btn wp-haze">💚 Pay with Haze</button></div>' +
+              '<h4 class="wp-h">Copy the list</h4><p class="wp-small">One line per address: address,amount. Paste it into a spreadsheet, a wallet with multi-send, or keep it as the week\'s record.</p>' +
+              '<textarea class="sc-in wp-csv" rows="4" readonly></textarea><div class="app-row"><button type="button" class="app-btn wp-copycsv">Copy address,amount</button></div>' +
+              '<h4 class="wp-h">Pay with the tip bot</h4><p class="wp-small">Tap <b>Copy</b>, paste it to the bot (e.g. Filippy in a DM), then tap <b>Paid</b>. One line per address.</p>' +
               '<ol class="wp-bot">' + wpPayoutLines(sum, wpTpl()).map(function (l, i) { var a = Object.keys(sum)[i]; return '<li data-a="' + esc(a) + '"><code>' + esc(l) + '</code><button type="button" class="app-btn" data-copy>Copy</button><button type="button" class="app-btn" data-paid>Paid</button></li>'; }).join('') + '</ol>' +
               '<details class="wp-tplbox"><summary class="wp-small">Bot command pattern</summary><div class="app-row"><input class="ac-in wp-tpl" type="text" spellcheck="false" aria-label="Bot command pattern"><button type="button" class="app-btn wp-tplsave">Save</button></div><p class="wp-small">{amount} and {address} are filled in.</p></details>' +
               '<h4 class="wp-h">All open rewards</h4>' : '') +
@@ -4186,6 +4198,16 @@
             many.value = JSON.stringify(sum);
             var copyBox = function (box) { box.select(); if (navigator.clipboard) navigator.clipboard.writeText(box.value).then(function () { say('Copied.'); }, function () { say('Select the text and copy it.', true); }); };
             body.querySelector('.wp-copymany').addEventListener('click', function () { copyBox(many); });
+            var csv = body.querySelector('.wp-csv');
+            csv.value = Object.keys(sum).map(function (a) { return a + ',' + String(Math.round(sum[a] * 100) / 100); }).join('\n');
+            body.querySelector('.wp-copycsv').addEventListener('click', function () { copyBox(csv); });
+            var hz = body.querySelector('.wp-haze');
+            hz.addEventListener('click', function () {
+              hz.disabled = true; say('Preparing the Haze payout…');
+              wpRpc('gry_wp_host_haze_payout', { p_ids: open.map(function (c) { return c.id; }) }).then(function (r) {
+                say('Haze payout ready: ' + r.addresses + ' addresses, ' + r.pep + ' PEP. Opening the LAN Party chat to review it…'); lanReviewGroup(r.id);
+              }, function (e) { hz.disabled = false; say(e.message + (/already waiting/.test(e.message) ? ' Open the LAN Party chat: Community drops → Review payout.' : ''), true); });
+            });
             var tpl = body.querySelector('.wp-tpl');
             tpl.value = wpTpl();
             body.querySelector('.wp-tplsave').addEventListener('click', function () { try { localStorage.setItem('wp-payout-template', tpl.value); } catch (e) {} payouts(); });
@@ -5579,13 +5601,16 @@
     document.querySelectorAll('.lan-badge').forEach(function (e) { e.hidden = n == null; });
   }
   var LAN_H = 'pondos-lan-h', LAN_LIST = 'pondos-lan-list', LAN_ALERTS = 'pondos-lan-alerts';
+  // A Haze group payout prepared elsewhere (Pepe Guesser host tools) opens its review in the LAN Party chat.
+  var lanHaze = null, lanPendingReview = null;
+  function lanReviewGroup(id) { if (lanHaze) lanHaze.reviewGroup(id); else lanPendingReview = id; lanParty(); }
   function lanParty() {
     var A = openApp('lan', 'LAN Party - #pond chat', 'gif-085-still', function (A) {
       var listPref = null; try { listPref = localStorage.getItem(LAN_LIST); } catch (e) {}
       A.host.classList.add('lan-win');
       A.body.innerHTML =
         '<div class="lan-top"><button type="button" class="app-btn lan-list-btn" aria-expanded="false" aria-controls="lan-buddies" title="Who is online"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online</button>' +
-        '<span class="lan-room">#pond</span><span class="grow"></span><button type="button" class="app-btn lan-alerts" aria-label="Change LAN Party notification settings">Alerts: All</button><span class="lan-host-tag" hidden title="You can delete messages and mute people">Host</span>' +
+        '<span class="lan-room">#pond</span><span class="grow"></span><button type="button" class="app-btn lan-alerts" aria-label="Change LAN Party notification settings">Alerts: All</button><span class="lan-host-tag" hidden title="You can delete messages and mute people">Mod</span>' +
         '<details class="lan-haze-tools" hidden><summary class="app-btn">◇ Haze</summary><div class="lan-haze-actions"></div></details></div>' +
         '<div class="lan-main"><div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
         '<aside class="lan-buddies" id="lan-buddies" aria-label="Who is online"><div class="lan-bl"><p class="lan-bh">Loading…</p></div></aside></div>' +
@@ -5609,7 +5634,7 @@
       var canMod = false, who = null, whoT = 0;
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
       var hazeTips = null;
-      import(BASE + 'games/js/haze-tips.mjs?v=20261122live').then(function (m) {
+      import(BASE + 'games/js/haze-tips.mjs?v=20261122wp').then(function (m) {
         if (!alive) return;
                 // messageTips: false: 💚 Tip lives on the fren card (click a name), not on every message (Lemon, 2026-11-20)
         hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp, messageTips: false,
@@ -5626,6 +5651,8 @@
           hazeTips.mount(hazeTools.querySelector('.lan-haze-actions'));
           Object.keys(seen).forEach(function (id) { hazeTips.bindMessage(seen[id], seen[id]._m); });
           hazeTips.sync();
+          lanHaze = hazeTips;
+          if (lanPendingReview) { var pend = lanPendingReview; lanPendingReview = null; hazeTips.reviewGroup(pend); }
         }
       }).catch(function () { /* Tipping must never interrupt the ordinary chat. */ });
       var alertMode = 'all';
@@ -5967,7 +5994,7 @@
       paintNote(); loadPepeEmotes().then(poll);
       // Restoring the taskbar window marks its messages as read and immediately syncs any missed events.
       A.resume = function () { if (!alive) return; unread = 0; paintUnread(); seenMentions(); poll(); };
-      A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); if (hazeTips) hazeTips.destroy(); };
+      A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); if (hazeTips) { if (lanHaze === hazeTips) lanHaze = null; hazeTips.destroy(); } };
     }, 480);
     return A;
   }
