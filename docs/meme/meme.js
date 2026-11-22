@@ -5557,7 +5557,10 @@
     });
     load.then(function () {
       if (gone) return;
-      if (!bellSb) bellSb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'pondos-bell' } });
+      // 2026-11-22: when Realtime is down, reconnect after 1, 2, 5, 10, 30 s and then once a minute (the library's
+      // default retries every 10 s forever); the chat keeps its fallback polling meanwhile
+      if (!bellSb) bellSb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'pondos-bell' },
+        realtime: { reconnectAfterMs: function (tries) { return [1000, 2000, 5000, 10000, 30000][tries - 1] || 60000; } } });
       ch = bellSb.channel('lobby-chat', { config: { private: true } });
       ch.on('broadcast', { event: '*' }, function (m) { onRing(m.event, m.payload); });
       ch.subscribe(function (st) { onState(st === 'SUBSCRIBED'); });

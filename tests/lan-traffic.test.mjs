@@ -65,3 +65,8 @@ test('group feed: minimized windows poll slower, tabs share answers, payments ar
   assert.match(groups, /waiting\.has\(f\.id\)/);
   assert.doesNotMatch(groups.match(/async function check\(flight\)\{[\s\S]*?\n  \}/)[0], /broadcast|sendTransaction|submit\(/i);
 });
+
+test('the chat doorbell backs off to one reconnect a minute while Realtime is down', () => {
+  const f = new Function('return ' + meme.match(/reconnectAfterMs: (function \(tries\) \{[^}]*\})/)[1])();
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 50].map(f), [1000, 2000, 5000, 10000, 30000, 60000, 60000]);
+});

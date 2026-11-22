@@ -111,6 +111,7 @@ const SCENARIOS = {
   'gochi-room-open': { gochi: true, pulse: 6, steps: ['room'] },
   // + another tab or the room iframe refreshes the sign-in every 10 minutes (Supabase rewrites the auth key: storage event)
   'gochi-room-token-refresh': { gochi: true, pulse: 6, storagePulse: 10, steps: ['room'] },
+  'gochi-token-only': { gochi: true, storagePulse: 2, steps: [] },
   'games-minimized': { gochi: false, steps: ['miner', 'minimize'] },
   'lan-live': { gochi: false, live: true, steps: ['lan'] },
   'lan-lost': { gochi: false, live: false, steps: ['lan'] },
@@ -170,7 +171,7 @@ async function run(browser, base, name, sc) {
     if (sc.storagePulse && ms > 0 && ms % (sc.storagePulse * 60000) === 0)
       await page.evaluate(() => { const k = 'sb-azbwciqfbsdpwubznncg-auth-token', old = localStorage.getItem(k), s = JSON.parse(old); s.expires_at = Math.floor(Date.now() / 1000) + 3600; s.access_token = s.access_token + 'x'; const v = JSON.stringify(s); localStorage.setItem(k, v); window.dispatchEvent(new StorageEvent('storage', { key: k, oldValue: old, newValue: v, storageArea: localStorage })); });
     if (sc.pulse && ms > 0 && ms % (sc.pulse * 60000) === 0)
-      await page.evaluate(() => { window.dispatchEvent(new Event('focus')); document.dispatchEvent(new Event('visibilitychange')); });
+      for (const f of page.frames()) await f.evaluate(() => { window.dispatchEvent(new Event('focus')); document.dispatchEvent(new Event('visibilitychange')); }).catch(() => {});   // the tab comes back: every document of it sees it
     await page.clock.runFor(STEP); state.t += STEP; await new Promise(r => setTimeout(r, 8));
   }
   await new Promise(r => setTimeout(r, 300));
