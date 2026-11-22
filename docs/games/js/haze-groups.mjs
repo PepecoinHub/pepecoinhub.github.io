@@ -300,5 +300,5 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
         n('small',{},'Include what happened, your browser and a screenshot. Never include wallet passwords, seed phrases or private keys.'));
       };
       chip=n('button',{type:'button',class:'haze-live-chip',hidden:true,title:'Live drops you can join'});chip.onclick=showLive;
-      const log=ctx.chatLog?.();(log?.closest('.lan-win')?.querySelector('.lan-top')||parent).append(chip,help);void sync(true);},sync,open,command,destroy(){stopped=true;save();clearTimeout(timer);clearTimeout(expiryTimer);clearInterval(ticker);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);panel?.remove();help?.remove();chip?.remove();button?.remove();}};
+      const log=ctx.chatLog?.();(log?.closest('.lan-win')?.querySelector('.lan-top')||parent).append(chip,help);void sync(true);},sync,open,command,review:id=>reviewPayout(id),destroy(){stopped=true;save();clearTimeout(timer);clearTimeout(expiryTimer);clearInterval(ticker);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);panel?.remove();help?.remove();chip?.remove();button?.remove();}};
 }
