@@ -108,3 +108,11 @@
 @keyframes haze-party-pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}12%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}20%{transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%)}}
 @keyframes haze-for-me{0%,100%{box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15}50%{box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15,0 0 0 3px #f2c94c,0 0 14px #f2c94c}}
 @media(prefers-reduced-motion:reduce){.haze-party-banner{animation:none}.haze-for-me{animation:none;outline:2px solid #f2c94c}}
+
+/* Bug reports: the form uses the dialog's own fields; the inbox is a list of cards (2026-11-22). */
+.haze-report-list{display:grid;gap:8px;margin-top:8px;max-height:min(60vh,520px);overflow:auto}
+.haze-report{display:grid;gap:4px;padding:8px 10px;border:1px solid #758577;border-left:3px solid #f2c94c;background:#27332c;color:#e8eee3;font:12px/1.4 var(--f-chrome,system-ui,sans-serif)}
+.haze-report.is-seen{border-left-color:#8fb8d8}.haze-report.is-fixed{border-left-color:#78a788;opacity:.8}.haze-report.is-wontfix,.haze-report.is-duplicate{border-left-color:#888;opacity:.7}
+.haze-report-body{white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.haze-report small{color:#b3c1b1;overflow-wrap:anywhere}
+.haze-report-actions{display:flex;flex-wrap:wrap;gap:4px}
