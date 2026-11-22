@@ -122,7 +122,7 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
   }
   async function ensureWallet(view){
     if(!walletFrame){
-      walletFrame=node('iframe',{title:'Secure Haze Wallet',class:'haze-tip-frame',referrerpolicy:'no-referrer',allow:'clipboard-write'});
+      walletFrame=node('iframe',{title:'Secure Haze Wallet',class:'haze-tip-frame',referrerpolicy:'no-referrer',allow:`clipboard-write; publickey-credentials-create ${HAZE_ORIGIN}; publickey-credentials-get ${HAZE_ORIGIN}`});
       walletLoaded=new Promise((resolve,reject)=>{walletFrame.onload=resolve;walletFrame.onerror=()=>reject(Error('Haze could not be loaded.'));});
       walletFrame.src=walletBase;walletHost.append(walletFrame);
     }
