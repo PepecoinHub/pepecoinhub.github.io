@@ -157,12 +157,20 @@ export function lobbyChat(be, { openLogin }) {
     }
   }
 
+  // Characters-left hint near the server's 200-character limit (the input stops at maxlength without telling why).
+  const count = document.createElement('p'); count.className = 'muted small chat-count'; count.hidden = true; count.setAttribute('aria-live', 'polite'); form.after(count);
+  const paintCount = () => {
+    const max = input.maxLength > 0 ? input.maxLength : 200, left = max - input.value.length;
+    count.hidden = left > 40; count.textContent = left <= 0 ? 'Limit reached: ' + max + ' characters max.' : left + (left === 1 ? ' character left' : ' characters left');
+    count.style.color = left <= 10 ? '#e66' : '';
+  };
+  input.addEventListener('input', paintCount); input.addEventListener('focus', paintCount);
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = input.value.trim();
     if (!text || Date.now() < readyAt) return;
     const tip = haze?.command(text);   // /tip opens the Haze tip dialog; nothing is posted to the chat
-    if (tip) { if (tip === 'opened') input.value = ''; return; }
+    if (tip) { if (tip === 'opened') { input.value = ''; paintCount(); } return; }
     let nick = nickStore.get() || '';
     if (!nickIn.hidden) {
       nick = nickIn.value.trim();
@@ -172,8 +180,8 @@ export function lobbyChat(be, { openLogin }) {
     send.disabled = true;
     try {
       const r = await be.rpc('gry_lobby_say', { p_text: text, p_nick: nick });
-      if (r?.error) { toast(r.error, 'bad'); input.value = ''; }
-      else { input.value = ''; readyAt = Date.now() + 3000; setTimeout(paintInput, 3100); }
+      if (r?.error) { toast(r.error, 'bad'); input.value = ''; paintCount(); }
+      else { input.value = ''; paintCount(); readyAt = Date.now() + 3000; setTimeout(paintInput, 3100); }
       poll();
     } catch (err) {
       const w = /wait (\d+)s/.exec(err.message || '');
