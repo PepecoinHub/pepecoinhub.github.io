@@ -61,8 +61,8 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  // minute on slower CI machines while the empty-round case checks 15 seconds.
  const air=await create('airdrop',{title:'Join the pond party',total:'12',seconds:'60'});assert.equal((await state()).submissions,1);
  await switchTo(3);assert.equal(await card(air).getByRole('button',{name:/Not eligible/}).isDisabled(),true);
- await switchTo(2);await card(air).getByRole('button',{name:'Join airdrop',exact:true}).click();await card(air).getByRole('button',{name:'Joined ✓',exact:true}).waitFor();assert.equal(await card(air).getByRole('button',{name:'Joined ✓',exact:true}).isDisabled(),true);
- await switchTo(4);await card(air).getByRole('button',{name:'Join airdrop',exact:true}).click();await card(air).getByRole('button',{name:'Joined ✓',exact:true}).waitFor();
+ await switchTo(2);await card(air).getByRole('button',{name:'🎁 Join airdrop',exact:true}).click();await card(air).getByRole('button',{name:'✓ You’re in',exact:true}).waitFor();assert.equal(await card(air).getByRole('button',{name:'✓ You’re in',exact:true}).isDisabled(),true);
+ await switchTo(4);await card(air).getByRole('button',{name:'🎁 Join airdrop',exact:true}).click();await card(air).getByRole('button',{name:'✓ You’re in',exact:true}).waitFor();
  await switchTo(1);await card(air).getByRole('button',{name:'Review payout',exact:true}).waitFor({timeout:75000});assert.equal((await state()).submissions,1,'Round close does not pay automatically');
  await card(air).getByRole('button',{name:'Review payout',exact:true}).click();assert.deepEqual(await previewNames(),['Byl · 6 PEP','Jules · 6 PEP']);await approve(air);
  await card(air).getByText('Confirmed · 2 frens received PEP',{exact:true}).waitFor({timeout:45000});console.log('PASS: timed free-entry airdrop, unlinked excluded, join once, no automatic payment at deadline, host review then one group payout.');

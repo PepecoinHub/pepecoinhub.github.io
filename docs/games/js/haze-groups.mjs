@@ -19,6 +19,29 @@ export function parseAirdropCommand(text){
   if(!Number.isInteger(minutes)||minutes<1||minutes>600)throw Error('Airdrops last 1 to 600 minutes. '+AIRDROP_USAGE);
   return {amount,minutes,title:parts.join(' ').slice(0,120)};
 }
+// Say-the-word lengths in the Group tips window (seconds); /word takes 10 s to 6 h (owner, 2026-11-22).
+export const WORD_SECONDS=[60,300,900,1800,3600,10800,21600];
+export const WORD_USAGE='Usage: /word word amount pepe [time] [winners], e.g. /word ribbit 500 pepe 2h 5';
+// "/word ribbit 500 pepe 2h 5" -> {word:'ribbit',amount:'500',seconds:7200,winners:5}. null when not /word.
+export function parseWordCommand(text){
+  const match=/^\/word(?:\s+([\s\S]*))?$/i.exec(String(text||'').trim());
+  if(!match)return null;
+  let parts=(match[1]||'').trim().split(/\s+/).filter(Boolean);
+  if(parts.length<2)throw Error(WORD_USAGE);
+  const word=parts[0];parts=parts.slice(1);
+  if(word.length>40)throw Error('Choose a word of up to 40 characters. '+WORD_USAGE);
+  const amount=parts[0].replace(/pepe?$/i,'').replace(',','.');parts=parts.slice(1);
+  if(parts[0]&&/^pepe?$/i.test(parts[0]))parts=parts.slice(1);
+  if(!/^[0-9]+(\.[0-9]+)?$/.test(amount))throw Error(WORD_USAGE);
+  let seconds=900,winners=1;
+  const time=parts[0]&&/^([0-9]{1,5})(s|sec|secs|seconds?|m|min|mins|minutes?|h|hr|hrs|hours?)?$/i.exec(parts[0]);
+  if(time&&(time[2]||parts.length>1)){const unit=(time[2]||'m').toLowerCase();seconds=Number(time[1])*(unit[0]==='h'?3600:unit[0]==='s'?1:60);parts=parts.slice(1);}
+  if(parts[0]){if(!/^[0-9]{1,3}$/.test(parts[0])||parts.length>1)throw Error(WORD_USAGE);winners=Number(parts[0]);}
+  if(!Number.isInteger(seconds)||seconds<10||seconds>21600)throw Error('Say-the-word rounds last 10 seconds to 6 hours. '+WORD_USAGE);
+  if(winners<1||winners>200)throw Error('Choose 1 to 200 winners. '+WORD_USAGE);
+  return {word,amount,seconds,winners};
+}
+const lengthLabel=s=>s<60?s+' seconds':s<3600?(s/60)+(s===60?' minute':' minutes'):(s/3600)+(s===3600?' hour':' hours');
 export function timeLeft(ms){
   const s=Math.max(0,Math.ceil(ms/1000));
   if(s<60)return s+'s left';
@@ -35,7 +58,7 @@ export function groupVisible(drop, now=Date.now()){
 export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   if(!enabled)return null;
   const {node:n,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,origin}=ctx;
-  const cacheKey='ph-haze-group-submitted-v1',flights=new Map(),completed=new Set(),clocks=[];let stopped=false,data=null,feed=null,panel=null,help=null,button=null,timer=null,expiryTimer=null,ticker=null,clockOffset=0,busy=null;
+  const cacheKey='ph-haze-group-submitted-v1',flights=new Map(),completed=new Set(),clocks=[],seenOpen=new Set();let stopped=false,chip=null,firstRender=true,data=null,feed=null,panel=null,help=null,button=null,timer=null,expiryTimer=null,ticker=null,clockOffset=0,busy=null;
   const signed=()=>{if(!currentUser()){ctx.login?.();throw Error('Sign in with Discord first.');}};
   const save=()=>{try{win.localStorage.setItem(cacheKey,JSON.stringify([...flights.values()].map(({id,txid,user})=>({id,txid,user})).slice(-20)));}catch{}};
   function resume(){
@@ -63,9 +86,15 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   }
   // Ask every 5 s only while a round ends within 90 s; a 10-hour airdrop is checked every 20 s.
   const soon=()=>data?.drops?.some(d=>d.state==='open'&&Date.parse(d.closes_at)-(Date.now()+clockOffset)<90000);
+  // The last 5 minutes turn the card orange: "ending soon".
+  function paintClock(clock,now){
+    const ms=Date.parse(clock.drop.closes_at)-now,ending=ms>0&&ms<=300000;
+    clock.el.textContent=clock.drop.entries+' entered · '+timeLeft(ms)+(ending?' · ending soon':'')+' · max '+clock.drop.max_winners+' winners';
+    clock.card?.classList?.toggle('is-ending',ending);return ms;
+  }
   function tick(){
     const now=Date.now()+clockOffset;let ended=false;
-    for(const clock of clocks){const ms=Date.parse(clock.drop.closes_at)-now;if(ms<=0)ended=true;clock.el.textContent=clock.drop.entries+' entered · '+timeLeft(ms)+' · max '+clock.drop.max_winners+' winners';}
+    for(const clock of clocks)if(paintClock(clock,now)<=0)ended=true;
     if(ended){clocks.length=0;void sync(true);}
     if(!clocks.length){clearInterval(ticker);ticker=null;}
   }
@@ -87,20 +116,22 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
     const deadlines=drops.map(d=>Date.parse(d.ended_at||'')+30*60*1000).filter(t=>Number.isFinite(t)&&t>now);
     if(deadlines.length)expiryTimer=setTimeout(()=>{if(!stopped)render();},Math.min(...deadlines)-now);
     if(button)button.textContent='🎉 Group tips'+(drops.some(d=>d.state==='open')?' · round live':'');
+    paintChip(drops,me);
     if(!feed)return;panel.hidden=!drops.length;const live=drops.filter(d=>d.state==='open').length;
     panel.querySelector('summary').textContent='Community drops ('+drops.length+')'+(live?' · '+live+' live':'')+(drops.length>1?' · scroll for more':'');
     for(const drop of drops){
-      const card=n('article',{class:'haze-drop-card '+(drop.state==='confirmed'?'is-confirmed':drop.state==='open'?'is-open':''),'data-group-id':drop.id});
+      const joinable=drop.state==='open'&&(!me||(drop.owner!==me&&!drop.joined&&drop.eligible));
+      const card=n('article',{class:'haze-drop-card '+(drop.state==='confirmed'?'is-confirmed':drop.state==='open'?'is-open':'')+(joinable?' is-joinable':''),'data-group-id':drop.id});
       card.append(n('strong',{},drop.title),n('span',{class:'haze-drop-meta'},drop.creator+' · '+formatAtomic(drop.total_atomic)+' PEP · '+(MODES[drop.mode]||drop.mode)));
       const status=n('p',{role:'status'});card.append(status);
       if(drop.state==='open'){
-        status.textContent=drop.entries+' entered · '+timeLeft(Date.parse(drop.closes_at)-now)+' · max '+drop.max_winners+' winners';clocks.push({el:status,drop});
+        clocks.push({el:status,drop,card});paintClock(clocks.at(-1),now);
         if(!me){
           const join=n('button',{type:'button',class:'haze-tip-secondary'},'Log on with Discord to join');join.onclick=()=>ctx.login?.();card.append(join);
           card.append(n('small',{},'Watching as a guest. Joining needs a Discord sign-in and a linked Haze wallet.'));
         }else if(drop.owner!==currentUser()){
           if(drop.mode==='airdrop'){
-            const join=n('button',{type:'button',class:'haze-tip-secondary'},drop.joined?'Joined ✓':!drop.eligible?'Not eligible for this round':'Join airdrop');join.disabled=drop.joined||!drop.eligible||!ctx.wallet()?.address;
+            const join=n('button',{type:'button',class:'haze-tip-secondary'},drop.joined?'✓ You’re in':!drop.eligible?'Not eligible for this round':'🎁 Join airdrop');join.disabled=drop.joined||!drop.eligible||!ctx.wallet()?.address;
             join.onclick=async()=>{join.disabled=true;try{await rpc('gry_haze_group_join',{p_id:drop.id});await sync(true);}catch(e){status.textContent=e.message;join.disabled=false;}};card.append(join);
           }else{
             const answer=n('button',{type:'button',class:'haze-tip-secondary'},drop.joined?'Answer received ✓':drop.mode==='trivia'?'Answer in chat':'Say the word in chat');
@@ -129,6 +160,23 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
     }
     fit();
     if(clocks.length&&!ticker)ticker=setInterval(tick,1000);else if(!clocks.length){clearInterval(ticker);ticker=null;}
+  }
+  // "🎁 1 live · Join" beside the chat title: drops are visible without scrolling. A new drop makes it pulse
+  // and posts a short notice ("Byl started a 1000 PEP airdrop"). Tapping opens the panel at the first live card.
+  function paintChip(drops,me){
+    const open=drops.filter(d=>d.state==='open'),joinable=open.filter(d=>!me||(d.owner!==me&&!d.joined&&d.eligible));
+    const fresh=open.filter(d=>!seenOpen.has(d.id));for(const d of open)seenOpen.add(d.id);
+    if(!firstRender)for(const d of fresh)if(d.owner!==me)ctx.notify?.('🎁 '+d.creator+' started '+(d.mode==='airdrop'?'a '+formatAtomic(d.total_atomic)+' PEP airdrop':d.mode==='trivia'?'a '+formatAtomic(d.total_atomic)+' PEP trivia round':'“'+d.title+'” for '+formatAtomic(d.total_atomic)+' PEP')+' · see Community drops under the chat',true);
+    firstRender=false;
+    if(!chip)return;chip.hidden=!open.length;
+    chip.textContent='🎁 '+open.length+' live'+(joinable.length?' · Join':'');
+    chip.classList?.toggle('is-joinable',joinable.length>0);
+    if(fresh.length&&chip.classList){chip.classList.remove('is-new');void chip.offsetWidth;chip.classList.add('is-new');}
+  }
+  function showLive(){
+    if(!panel)return;panel.open=true;panel.hidden=false;
+    const card=feed?.querySelector('.is-joinable')||feed?.querySelector('.is-open');
+    if(card){card.scrollIntoView?.({block:'nearest',behavior:'smooth'});card.classList.remove('haze-for-me');void card.offsetWidth;card.classList.add('haze-for-me');}
   }
   async function reviewPayout(id,previous){
     const view=previous?.active()?previous:modal('Review the group payout');
@@ -164,16 +212,16 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
     const total=n('input',{type:'text',inputmode:'decimal',value:'100','aria-label':'Group PEP total'}),count=n('input',{type:'number',min:'1',max:'200',value:'2','aria-label':'Random recipient count'});
     const title=n('input',{type:'text',maxlength:'120','aria-label':'Round question or title',placeholder:'What makes this round special?'}),answer=n('input',{type:'text',maxlength:'120','aria-label':'Round answer or word',autocomplete:'off'});
     const seconds=n('select',{'aria-label':'Round duration'});let lengths='';
-    const paintLengths=()=>{const kind=mode.value==='airdrop'?'airdrop':'round';if(kind===lengths)return;lengths=kind;seconds.replaceChildren();
-      const list=kind==='airdrop'?AIRDROP_MINUTES.map(m=>[String(m*60),m<60?m+' minutes':m===60?'1 hour':m/60+' hours ('+m+' min)']):[['15','15 seconds'],['60','1 minute'],['300','5 minutes']];
-      for(const [value,label]of list)seconds.append(n('option',{value},label));seconds.value=kind==='airdrop'?'900':'60';};
+    const paintLengths=()=>{const kind=mode.value==='airdrop'?'airdrop':mode.value==='word'?'word':'round';if(kind===lengths)return;lengths=kind;seconds.replaceChildren();
+      const list=kind==='airdrop'?AIRDROP_MINUTES.map(m=>[String(m*60),m<60?m+' minutes':m===60?'1 hour':m/60+' hours ('+m+' min)']):kind==='word'?WORD_SECONDS.map(v=>[String(v),lengthLabel(v)]):[['15','15 seconds'],['60','1 minute'],['300','5 minutes']];
+      for(const [value,label]of list)seconds.append(n('option',{value},label));seconds.value=kind==='airdrop'?'900':kind==='word'?'300':'60';};
     const winners=n('input',{type:'number',min:'1',max:'200',value:'1','aria-label':'Maximum winners'}),note=n('input',{type:'text',maxlength:'160','aria-label':'Group tip note',placeholder:'A little appreciation for the pond 💚'});
     const selected=n('div',{class:'haze-group-selection'});for(const member of data?.members||[])selected.append(n('label',{},n('input',{type:'checkbox',value:member.id}),member.nick+' · '+(member.online?'online':'away')));
     const fields={audience:n('label',{},'Eligible audience',audience),count:n('label',{},'How many random frens?',count),title:n('label',{},'Question / title',title),answer:n('label',{},'Answer / word',answer),seconds:n('label',{},'How long',seconds),winners:n('label',{},'Maximum winners',winners),selected};
     function update(){const timed=['airdrop','trivia','word'].includes(mode.value),game=['trivia','word'].includes(mode.value);paintLengths();
       fields.audience.hidden=!['random','airdrop','trivia','word'].includes(mode.value);fields.count.hidden=mode.value!=='random';fields.title.hidden=mode.value==='word';fields.answer.hidden=!game;fields.seconds.hidden=!timed;fields.winners.hidden=!game;selected.hidden=mode.value!=='selected';
       for(const field of Object.values(fields))for(const input of field.querySelectorAll('input,select'))input.disabled=field.hidden;
-      submit.textContent=timed?'Start the round':'Preview recipients';hint.textContent=mode.value==='trivia'?'People answer in chat with /answer. One attempt each; first correct answers win. You approve the payout after the round.':mode.value==='word'?'The word is announced to chat. First matching replies win; each person can win once.':mode.value==='airdrop'?'Linked frens join freely during the window, then you review the payout. The pool is split evenly. Quick start in chat: /airdrop 500 pepe 600m':'The total is split evenly, with exact smallest-unit rounding. Offline frens can receive PEP without coming online.';
+      submit.textContent=timed?'Start the round':'Preview recipients';hint.textContent=mode.value==='trivia'?'People answer in chat with /answer. One attempt each; first correct answers win. You approve the payout after the round.':mode.value==='word'?'The word is announced to chat. First matching replies win; each person can win once. Up to 6 hours, alongside a trivia round. Quick start in chat: /word ribbit 500 pepe 2h 5':mode.value==='airdrop'?'Linked frens join freely during the window, then you review the payout. The pool is split evenly. Quick start in chat: /airdrop 500 pepe 600m':'The total is split evenly, with exact smallest-unit rounding. Offline frens can receive PEP without coming online.';
     }
     const hint=n('p',{class:'haze-group-hint'}),submit=n('button',{type:'submit',class:'haze-tip-primary'},'Preview recipients');
     form.append(n('p',{},(data?.member_count||0)+' eligible linked frens · yourself excluded · max 200 per transaction'),n('label',{},'Make it a moment',mode),n('label',{},'Total native PEP to share',total),fields.audience,fields.count,fields.title,fields.answer,fields.seconds,fields.winners,selected,n('label',{},'A little note',note),hint,submit);
@@ -204,6 +252,8 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   // /airdrop 500 pepe 600m: starts a timed airdrop for all linked frens at once. Nothing is paid now; the host
   // reviews and approves the payout in Haze when the time is up. Returns false (not /airdrop), 'opened' or 'error'.
   function command(text){
+    let word;try{word=parseWordCommand(text);}catch(e){ctx.notify?.(e.message);return 'error';}
+    if(word)return wordCommand(word);
     let parsed;try{parsed=parseAirdropCommand(text);}catch(e){ctx.notify?.(e.message);return 'error';}
     if(!parsed)return false;
     let total;try{total=amountAtomic(parsed.amount);}catch(e){ctx.notify?.(e.message);return 'error';}
@@ -219,6 +269,21 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
     };
     void start();return 'opened';
   }
+  // /word ribbit 500 pepe 2h 5: a say-the-word round for all linked frens; the first 5 to type "ribbit" win.
+  function wordCommand(parsed){
+    let total;try{total=amountAtomic(parsed.amount);}catch(e){ctx.notify?.(e.message);return 'error';}
+    try{signed();}catch{return 'error';}
+    const start=async()=>{
+      try{
+        if(!ctx.wallet()?.address)await ctx.refreshWallet();
+        if(!ctx.wallet()?.address){await ctx.connect(()=>start());return;}
+        await rpc('gry_haze_group_create',{p_options:{mode:'word',audience:'all',total_atomic:total,seconds:parsed.seconds,winners:parsed.winners,answer:parsed.word,title:'',note:''}});
+        ctx.notify?.('🎉 Say “'+parsed.word+'”: '+formatAtomic(total)+' PEP for the first '+(parsed.winners===1?'fren':parsed.winners+' frens')+', '+lengthLabel(parsed.seconds)+'. You approve the payout in Haze when it ends.',true);
+        await sync(true);
+      }catch(e){ctx.notify?.(e.message);}
+    };
+    void start();return 'opened';
+  }
   win.addEventListener('message',receive);const visible=()=>{if(!doc.hidden)void sync(true);};doc.addEventListener('visibilitychange',visible);
   return {setWalletLoading(value){if(button)button.disabled=value;},mount(parent){button=n('button',{type:'button',class:'haze-wallet-link',onclick:()=>void open()},'🎉 Group tips');button.disabled=!!currentUser();parent.append(' ',button);
       help=n('button',{type:'button',class:'haze-wallet-link','aria-label':'Chat help',title:'Commands, drops and bug reports'},'?');
@@ -226,10 +291,14 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
         n('p',{},'Link your receiving wallet through Haze to receive PEP. '+(ctx.messageTips===false?'Tap a fren’s name and use 💚 Tip on their card to tip them.':'Use Tip beside a message to tip that fren.')),
         n('p',{},'/tip nick amount pepe [note] opens a tip review, e.g. /tip Lemon 500 pepe. /answer your answer enters a trivia round. For Say the word, type the displayed word.'),
         n('p',{},'/airdrop amount pepe minutes [title] starts a timed airdrop for all linked frens, e.g. /airdrop 500 pepe 600m (1 to 600 minutes).'),
-        n('p',{},'Timed airdrop: press Join airdrop before the timer ends. Other group tips use the audience chosen by the host. Entry is free; eligibility and winner limits apply.'),
-        n('p',{},'The host approves payment in Haze after the round. Joining does not guarantee payment. Finished drops disappear from this panel after 30 minutes.'),
+        n('p',{},'/word word amount pepe [time] [winners] starts Say the word, e.g. /word ribbit 500 pepe 2h 5: the first 5 frens to type ribbit win (10 seconds to 6 hours, 1 winner by default). It can run alongside a trivia round (up to 5 minutes).'),
+        n('p',{},'🎁 N live beside the chat title shows drops you can still join; tap it to jump to them. Cards you can join glow, and they turn orange in the last 5 minutes.'),
+        n('p',{},'Timed airdrop: press 🎁 Join airdrop before the timer ends. Other group tips use the audience chosen by the host. Entry is free; eligibility and winner limits apply.'),
+        n('p',{},'Guests can watch drops. To join, log on with Discord (one fren, one account) and link a receiving wallet through Haze. Discord sign-in keeps airdrops fair: wallets alone are free to make by the dozen.'),
+        n('p',{},'The host approves payment in Haze after the round. Joining does not guarantee payment. Finished drops disappear from this panel after 30 minutes. Messages are up to 200 characters.'),
         n('a',{href:'https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml',target:'_blank',rel:'noopener noreferrer'},'Report a bug'),
         n('small',{},'Include what happened, your browser and a screenshot. Never include wallet passwords, seed phrases or private keys.'));
       };
-      const log=ctx.chatLog?.();(log?.closest('.lan-win')?.querySelector('.lan-top')||parent).append(help);void sync(true);},sync,open,command,destroy(){stopped=true;save();clearTimeout(timer);clearTimeout(expiryTimer);clearInterval(ticker);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);panel?.remove();help?.remove();button?.remove();}};
+      chip=n('button',{type:'button',class:'haze-live-chip',hidden:true,title:'Live drops you can join'});chip.onclick=showLive;
+      const log=ctx.chatLog?.();(log?.closest('.lan-win')?.querySelector('.lan-top')||parent).append(chip,help);void sync(true);},sync,open,command,destroy(){stopped=true;save();clearTimeout(timer);clearTimeout(expiryTimer);clearInterval(ticker);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);panel?.remove();help?.remove();chip?.remove();button?.remove();}};
 }
