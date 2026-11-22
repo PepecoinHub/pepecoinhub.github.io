@@ -194,7 +194,7 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
     // Lily's stamps (15 tiles at 2x) and the New stamp notice icon, from scripts/build_lily_stamps.mjs
     'stamps-lily.webp': [15 * 138, 150], 'stamp-new.webp': [80, 80],
     // the owner-approved v3 stamps (scripts/build_v3_stamps.py)
-    'stamps-v3.webp': [62 * 138, 150], 'pond-pioneer-v3.webp': [138, 150],
+    'stamps-v3.webp': [68 * 138, 150], 'pond-pioneer-v3.webp': [138, 150],
     // Pond Dominator: the owner's own art, one V3-sized tile outside the atlas (update_wheres_pepe_hall_of_fame.sql)
     'pond-dominator.webp': [138, 150], 'crown-breaker.webp': [138, 150], 'pond-archivist.webp': [138, 150],
     // the Stamps tab: a seamless paper tile and the BALI ticket, both cut from page-right.webp
@@ -205,7 +205,7 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
     const b = readFileSync(new URL(f, dir));
     if (f !== 'stamps-lily.webp' && f !== 'stamps-v3.webp') total += b.length;
     // the sprites load only when the Passport opens; the v3 one holds about 9 KB per tile, up to ~48 tiles at launch
-    else assert.ok(b.length < (f === 'stamps-v3.webp' ? 600 : 200) * 1024, 'stamp sprite stays small: ' + f + ' ' + b.length);
+    else assert.ok(b.length < (f === 'stamps-v3.webp' ? 680 : 200) * 1024, 'stamp sprite stays small: ' + f + ' ' + b.length);
     assert.equal(b.toString('latin1', 0, 4) + b.toString('latin1', 8, 12), 'RIFFWEBP', f + ' is a WebP');
     // VP8X is the extended header used for images with alpha (the photo window and sprite edges are transparent)
     assert.equal(b.toString('latin1', 12, 16), 'VP8X', f + ' carries alpha');
@@ -216,7 +216,7 @@ test('Passport booklet art: small transparent WebPs with the sizes the page layo
   const js = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   const count = name => (js.match(new RegExp('var ' + name + ' = \\[([^\\]]*)\\]')) || [, ''])[1].split(',').filter(s => s.trim()).length;
   assert.equal(count('PP_STAMPS'), 16);
-  assert.equal(count('PP_V3'), 62, 'PP_V3 matches the 62 tiles of stamps-v3.webp');
+  assert.equal(count('PP_V3'), 68, 'PP_V3 matches the 68 tiles of stamps-v3.webp');
   assert.match(js, /if \(earned && x\.id === 'pond_pioneer'\)/, 'Pond Pioneer uses the exclusive new art');
   assert.doesNotMatch(js, /PP_LILY/, 'No old Lily sprite fallback');
   const css = readFileSync(new URL('../docs/meme/passport.css', import.meta.url), 'utf8');

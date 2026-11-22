@@ -1,6 +1,7 @@
 # PepeGochi A12: 6 stempli Paszportu (dla ChatGPT)
 
-Status: DO ZROBIENIA. Stemple z paczki A12c (`docs/games/img/pepegochi/a12/stamp_*.png`) właściciel odrzucił
+Status: ZROBIONE 2026-11-22 (ChatGPT, `review/contact_sheet.png`; w atlasie `stamps-v3.webp`, kafelki 62-67).
+Wcześniej: Stemple z paczki A12c (`docs/games/img/pepegochi/a12/stamp_*.png`) właściciel odrzucił
 2026-11-22: inny styl niż reszta Paszportu (malowany pixel art, prawie bez żaby, inna ramka). Kod jest gotowy
 (`games/supabase/update_pepegochi_life.sql`, katalog `docs/meme/passport-catalog.json`, status `planned`).
 Dopóki stempel nie ma zatwierdzonego rysunku, Paszport pokazuje neutralne „?”.
