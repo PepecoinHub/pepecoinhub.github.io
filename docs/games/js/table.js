@@ -20,6 +20,15 @@ const COLORS = { chess: ['White', 'Black'], checkers: ['Black', 'White'], connec
 const SHIPS = [[5, 'Carrier'], [4, 'Battleship'], [3, 'Cruiser'], [3, 'Submarine'], [2, 'Destroyer']];
 const GLYPH = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
 const PNAME = { k: 'king', q: 'queen', r: 'rook', b: 'bishop', n: 'knight', p: 'pawn' };
+// Board look (chess + checkers): piece set and board colours, kept in this browser only.
+const PIECE_SETS = { cburnett: 'Classic', merida: 'Merida', chessnut: 'Modern', rhosgfx: 'Pixel', glyph: 'Simple (symbols)' };
+const BOARD_THEMES = { pond: 'Pond green', brown: 'Wood', green: 'Tournament green', blue: 'Blue', gray: 'Gray', purple: 'Purple' };
+const LOOK_KEY = 'pepgry-board-look';
+const LOOK = (() => {
+  let v = {}; try { v = JSON.parse(localStorage.getItem(LOOK_KEY) || '{}') || {}; } catch {}
+  return { pieces: PIECE_SETS[v.pieces] ? v.pieces : 'cburnett', board: BOARD_THEMES[v.board] ? v.board : 'pond' };
+})();
+const saveLook = () => { try { localStorage.setItem(LOOK_KEY, JSON.stringify(LOOK)); } catch {} };
 const RULES = {
   chess: 'Standard chess. White moves first. Castling, en passant and promotion (pick the piece) are supported. The game ends with checkmate, stalemate (draw), resignation or an agreed draw. Automatic draws: threefold repetition, 50 moves without a capture or pawn move, or not enough material to mate.',
   checkers: 'English draughts (checkers) on 8×8, played on the dark squares. Black moves first. Men move one square diagonally forward; capturing is mandatory, and a capture must be continued while more jumps are possible (you may choose which sequence, not necessarily the longest). Tap each landing square of a multi-jump. A man that reaches the far row becomes a king (the move ends there); kings move and capture one square diagonally in all four directions. You lose when you have no pieces or no legal move. Automatic draw after 40 moves each without a capture or a man moving.',
@@ -97,6 +106,7 @@ function render() {
   const t = S.table;
   document.title = `${GAME[t.game]} · table ${t.code} · PEP Games`;
   $('#tgame').textContent = GAME[t.game] + ' · ' + t.tc.label + (BOT ? '' : t.private ? ' · private' : '') + (t.no_touch ? ' · no-touch' : '');
+  renderLook();
   $('#rules-body').textContent = RULES[t.game] + (CK ? ' ' + CLOCK_RULES[CK.kind] : '');
   renderPlayers(); renderStatus(); renderBoard(); renderActions(); renderMoves(); renderSend(); renderClocks();
   for (const m of S.messages) addMsg(m);
@@ -150,7 +160,7 @@ function renderStatus() {
 // chess / checkers: 8x8; widok od strony gracza (miejsce 2 = plansza obrócona)
 function renderBoard() {
   const t = S.table, el = $('#board'); el.textContent = '';
-  el.className = 'board ' + t.game;
+  el.className = 'board ' + t.game + ' th-' + LOOK.board;
   if (t.game === 'connect4') return renderC4(el);
   if (t.game === 'battleship') return renderSea(el);
   const b = boardStr(), flip = meSeat() === 2, legal = myTurn() ? (t.legal || []) : [];
@@ -187,9 +197,37 @@ function pieceLabel(g, pc) {
   if (g === 'chess') return (pc === pc.toUpperCase() ? 'white ' : 'black ') + PNAME[pc.toLowerCase()];
   return (pc.toLowerCase() === 'b' ? 'black ' : 'white ') + (pc === pc.toUpperCase() ? 'king' : 'man');
 }
+function chessPiece(pc, cls = '') {
+  const white = pc === pc.toUpperCase(), k = pc.toLowerCase();
+  if (LOOK.pieces === 'glyph') return h('span', { class: 'pc ' + (white ? 'w' : 'b') + cls, 'aria-hidden': 'true' }, GLYPH[k] + '\uFE0E');
+  return h('img', { class: 'pci' + cls, src: `img/pieces/${LOOK.pieces}/${white ? 'w' : 'b'}${k.toUpperCase()}.svg`, alt: '', draggable: 'false', 'aria-hidden': 'true' });
+}
 function pieceEl(g, pc) {
-  if (g === 'chess') return h('span', { class: 'pc ' + (pc === pc.toUpperCase() ? 'w' : 'b'), 'aria-hidden': 'true' }, GLYPH[pc.toLowerCase()] + '\uFE0E');
+  if (g === 'chess') return chessPiece(pc);
   return h('span', { class: 'man ' + (pc.toLowerCase() === 'b' ? 'b' : 'w') + (pc === pc.toUpperCase() ? ' king' : ''), 'aria-hidden': 'true' }, pc === pc.toUpperCase() ? '♛\uFE0E' : '');
+}
+// "Board style" panel under the board: built once, only for chess and checkers.
+let lookBuilt = false;
+function renderLook() {
+  const t = S.table, box = $('#look');
+  if (!box) return;
+  const show = t.game === 'chess' || t.game === 'checkers';
+  box.classList.toggle('hidden', !show);
+  if (!show || lookBuilt) return;
+  lookBuilt = true;
+  const body = $('#look-body'); body.textContent = '';
+  const pick = (label, key, opts) => {
+    const s = h('select', { 'aria-label': label, onchange: (e) => { LOOK[key] = e.target.value; saveLook(); renderBoard(); } },
+      Object.entries(opts).map(([v, n]) => h('option', { value: v }, n)));
+    s.value = LOOK[key];
+    return h('label', { class: 'look-row' }, h('span', {}, label), s);
+  };
+  if (t.game === 'chess') body.append(pick('Pieces', 'pieces', PIECE_SETS));
+  body.append(pick('Board', 'board', BOARD_THEMES));
+  const sw = h('div', { class: 'look-swatches', role: 'group', 'aria-label': 'Board colours' },
+    Object.entries(BOARD_THEMES).map(([v, n]) => h('button', { type: 'button', class: 'look-sw th-' + v, title: n, 'aria-label': n,
+      onclick: () => { LOOK.board = v; saveLook(); body.querySelector('select[aria-label="Board"]').value = v; renderBoard(); } }, h('i'), h('i'))));
+  body.append(sw);
 }
 function lastSquares() {
   const t = S.table, s = new Set();
@@ -419,7 +457,7 @@ function choosePromotion(cands) {
     h('div', { class: 'row', style: 'justify-content:center;margin-top:10px' }, ['q', 'r', 'b', 'n'].map((p) => {
       const m = cands.find((x) => x.endsWith(p));
       return m ? h('button', { type: 'button', class: 'btn promo-btn', 'data-piece': p, 'aria-label': PNAME[p], onclick: () => { ov.classList.add('hidden'); send(m); } },
-        h('span', { class: 'pc ' + (white ? 'w' : 'b') }, GLYPH[p] + '\uFE0E')) : null;
+        chessPiece(white ? p.toUpperCase() : p)) : null;
     })),
     h('button', { type: 'button', class: 'btn sm', style: 'margin-top:12px', onclick: () => { ov.classList.add('hidden'); sel = null; renderBoard(); } }, 'Cancel')));
 }
