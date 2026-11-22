@@ -17,7 +17,7 @@ function fixture({state='ready',submitted=null,invokeState='pending',participant
 }
 test('confirmed feed and cached submissions never restart group checks',async()=>{
  const f=fixture({state:'confirmed',submitted:hash,invokeState:'confirmed'});f.storage.set('ph-haze-group-submitted-v1',JSON.stringify([{id,txid:hash,user:owner}]));
- try{await tick();await f.groups.sync(true);await tick();assert.equal(f.calls.filter(x=>typeof x==='object').length,0);assert.ok(f.calls.length<=3);assert.equal(f.storage.get('ph-haze-group-submitted-v1'),'[]');}finally{f.groups.destroy();}
+ try{await tick();await f.groups.sync(true);await tick();assert.equal(f.calls.filter(x=>typeof x==='object').length,0);assert.ok(f.calls.filter(x=>x!=='gry_reports_new').length<=3);assert.equal(f.storage.get('ph-haze-group-submitted-v1'),'[]');}finally{f.groups.destroy();}
 });
 test('a successful check is not recovered again from a stale ready feed',async()=>{
  const f=fixture({submitted:hash,invokeState:'confirmed'});try{for(let n=0;n<6;n++)await tick();assert.equal(f.calls.filter(x=>typeof x==='object').length,1);assert.ok(f.calls.filter(x=>x==='gry_haze_groups').length<=3);}finally{f.groups.destroy();}

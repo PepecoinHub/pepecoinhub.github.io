@@ -178,6 +178,59 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
     const card=feed?.querySelector('.is-joinable')||feed?.querySelector('.is-open');
     if(card){card.scrollIntoView?.({block:'nearest',behavior:'smooth'});card.classList.remove('haze-for-me');void card.offsetWidth;card.classList.add('haze-for-me');}
   }
+  // Bug reports from the chat (owner, 2026-11-22): a short form saved on the server, and an inbox for the team.
+  const AREAS=[['chat','Chat'],['haze','Haze Wallet, tips or drops'],['games','A game'],['pondos','PondOS desktop or windows'],['other','Something else']];
+  let inboxCount=null,inboxTimer=null;
+  async function pollInbox(){
+    clearTimeout(inboxTimer);if(stopped||!currentUser())return;
+    try{const count=await rpc('gry_reports_new',{});inboxCount=typeof count==='number'?count:null;}catch{inboxCount=null;}
+    if(help)help.textContent=inboxCount?'? · '+inboxCount:'?';
+    if(inboxCount!=null&&!stopped)inboxTimer=setTimeout(()=>void pollInbox(),120000);
+  }
+  function reportButton(view){
+    const b=n('button',{type:'button',class:'haze-tip-primary'},'🐞 Report a problem');
+    b.onclick=()=>{
+      if(!currentUser()){view.status.textContent='Sign in (Discord or guest) to send a report.';ctx.login?.();return;}
+      retitle(view,'Report a problem');
+      const area=n('select',{'aria-label':'What is it about?'});for(const [v,l]of AREAS)area.append(n('option',{value:v},l));
+      const body=n('textarea',{rows:'5',maxlength:'1500','aria-label':'What happened?',placeholder:'What happened, and what did you expect? Which phone or computer?'});
+      const send=n('button',{type:'submit',class:'haze-tip-primary'},'Send report'),form=n('form',{},n('label',{},'What is it about?',area),n('label',{},'What happened?',body),send);
+      view.body.replaceChildren(form,n('small',{},'Your nick, this page and your browser type are attached. Never include wallet passwords, seed phrases or private keys.'));
+      form.onsubmit=async e=>{e.preventDefault();send.disabled=true;view.status.textContent='Sending…';
+        try{const page=(win.location?.pathname||'')+(win.location?.hash||''),client=String(win.navigator?.userAgent||'').slice(0,240)+' · '+(win.innerWidth||0)+'×'+(win.innerHeight||0)+(ctx.capabilities?.()?' · Haze ok':'');
+          await rpc('gry_report_bug',{p_area:area.value,p_body:body.value,p_page:page,p_client:client});
+          view.body.replaceChildren(n('p',{},'✅ Thanks! Your report reached the team.'));view.status.textContent='';}
+        catch(err){view.status.textContent=err.message;send.disabled=false;}};
+      body.focus?.();
+    };
+    return b;
+  }
+  function inboxButton(view){
+    const b=n('button',{type:'button',class:'haze-wallet-link'},'📥 Reports inbox'+(inboxCount?' ('+inboxCount+' new)':''));
+    b.onclick=()=>void showInbox(view,true);return b;
+  }
+  const retitle=(view,text)=>{const h=view.d?.querySelector?.('h2');if(h)h.textContent=text;};
+  async function showInbox(view,open){
+    retitle(view,'Reports inbox');view.status.textContent='Loading reports…';
+    try{
+      const d=await rpc('gry_reports',{p_open:open});view.status.textContent='';
+      const list=n('div',{class:'haze-report-list'});
+      const toggle=n('button',{type:'button',class:'haze-wallet-link'},open?'Show all, including closed':'Show open only');toggle.onclick=()=>void showInbox(view,!open);
+      view.body.replaceChildren(n('p',{},d.new+' new · '+d.reports.length+(open?' open':' recent')+' reports'),toggle,list);
+      if(!d.reports.length)list.append(n('p',{},'Nothing here. 🐸'));
+      for(const r of d.reports){
+        const card=n('article',{class:'haze-report is-'+r.status});
+        card.append(n('strong',{},'#'+r.id+' · '+r.area+' · '+r.nick+(r.verified?' ✓':' (guest)')+' · '+new Date(r.at).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})),
+          n('p',{class:'haze-report-body'},r.body),n('small',{},(r.page||'')+(r.client?' · '+r.client:'')),
+          n('small',{},'Status: '+r.status+(r.handled_by?' (by '+r.handled_by+')':'')));
+        const row=n('div',{class:'haze-report-actions'});
+        for(const [st,label]of [['seen','👀 Seen'],['fixed','✅ Fixed'],['wontfix','✖ Won’t fix'],['duplicate','≡ Duplicate']]){
+          if(r.status===st)continue;const btn=n('button',{type:'button',class:'haze-wallet-link'},label);
+          btn.onclick=async()=>{btn.disabled=true;try{await rpc('gry_report_set',{p_id:r.id,p_status:st});await showInbox(view,open);void pollInbox();}catch(e){view.status.textContent=e.message;btn.disabled=false;}};row.append(btn);}
+        card.append(row);list.append(card);
+      }
+    }catch(e){view.status.textContent=e.message;}
+  }
   async function reviewPayout(id,previous){
     const view=previous?.active()?previous:modal('Review the group payout');
     try{
@@ -296,9 +349,11 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
         n('p',{},'Timed airdrop: press 🎁 Join airdrop before the timer ends. Other group tips use the audience chosen by the host. Entry is free; eligibility and winner limits apply.'),
         n('p',{},'Guests can watch drops. To join, log on with Discord (one fren, one account) and link a receiving wallet through Haze. Discord sign-in keeps airdrops fair: wallets alone are free to make by the dozen.'),
         n('p',{},'The host approves payment in Haze after the round. Joining does not guarantee payment. Finished drops disappear from this panel after 30 minutes. Messages are up to 200 characters.'),
-        n('a',{href:'https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml',target:'_blank',rel:'noopener noreferrer'},'Report a bug'),
-        n('small',{},'Include what happened, your browser and a screenshot. Never include wallet passwords, seed phrases or private keys.'));
+        reportButton(view),
+        inboxCount!=null?inboxButton(view):null,
+        n('small',{},'Reports go straight to the PepecoinHub team (Haze problems also to the Haze team). Never include wallet passwords, seed phrases or private keys.'));
       };
+      void pollInbox();
       chip=n('button',{type:'button',class:'haze-live-chip',hidden:true,title:'Live drops you can join'});chip.onclick=showLive;
-      const log=ctx.chatLog?.();(log?.closest('.lan-win')?.querySelector('.lan-top')||parent).append(chip,help);void sync(true);},sync,open,command,review:id=>reviewPayout(id),destroy(){stopped=true;save();clearTimeout(timer);clearTimeout(expiryTimer);clearInterval(ticker);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);panel?.remove();help?.remove();chip?.remove();button?.remove();}};
+      const log=ctx.chatLog?.();(log?.closest('.lan-win')?.querySelector('.lan-top')||parent).append(chip,help);void sync(true);void pollInbox();},sync,open,command,review:id=>reviewPayout(id),destroy(){stopped=true;save();clearTimeout(timer);clearTimeout(expiryTimer);clearTimeout(inboxTimer);clearInterval(ticker);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);panel?.remove();help?.remove();chip?.remove();button?.remove();}};
 }
