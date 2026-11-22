@@ -4,7 +4,7 @@
 -- Nothing changes unless every name matches exactly one Discord account. The last result lists all moderators.
 do $$
 declare
-  names text[] := array['Lemon'];
+  names text[] := array['.lemontart.'];
   nm text; hits int; uid uuid;
 begin
   foreach nm in array names loop

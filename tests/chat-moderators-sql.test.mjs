@@ -25,7 +25,7 @@ test('chat moderators delete and mute within limits, cannot touch hosts or each 
     const install=file('update_chat_moderators.sql');sql(install);sql(install);
     const nicks=['Byl','Lemon','Fren3','Fren4','Naux'];
     nicks.forEach((nick,i)=>sql(`insert into auth.users values(${q(uid(i+1))});insert into games.profiles values(${q(uid(i+1))},${q(nick)});insert into auth.identities(user_id,provider,identity_data) values(${q(uid(i+1))},'discord','{"user_name":"${nick.toLowerCase()}_dc"}');`));
-    const add=names=>file('community-v1/chat-mods-add.sql').replace("array['Lemon']",'array['+names.map(q).join(',')+']');
+    const add=names=>file('community-v1/chat-mods-add.sql').replace("array['.lemontart.']",'array['+names.map(q).join(',')+']');
     assert.throws(()=>sql(add(['Lemon','nobody'])),/matches 0/);assert.equal(sql('select count(*) from games.chat_mods'),'0','All names or nothing');
     sql(add(['lemon','naux_dc']));assert.equal(sql('select count(*) from games.chat_mods'),'2','Site nick or Discord name, any case');
     const say=(user,body)=>sql(`insert into games.lobby_chat(user_id,nick,body,verified) values(${q(uid(user))},${q(nicks[user-1])},${q(body)},true) returning id`);
@@ -41,6 +41,6 @@ test('chat moderators delete and mute within limits, cannot touch hosts or each 
     as(1,`select public.gry_lobby_mute_msg(${modMsg},24)`);assert.equal(sql(`select reason from games.lobby_mutes where user_id=${q(uid(5))}`),'host','Hosts keep full powers');
     assert.equal(sql(`select string_agg(mod_nick||' '||action||' '||target_nick,'|' order by id) from games.mod_log`),'Lemon delete Fren3|Lemon mute 72 h Fren4','Moderator actions are logged; host actions are not');
     for(const t of ['chat_mods','mod_log'])assert.throws(()=>as(2,`select * from games.${t}`));
-    sql(file('community-v1/chat-mods-remove.sql'));assert.equal(feed(2).can_mod,false,'Removing ends the powers');
+    sql(file('community-v1/chat-mods-remove.sql').replace("'.lemontart.'","'lemon'"));assert.equal(feed(2).can_mod,false,'Removing ends the powers');
   }finally{sql('drop database '+db+' with(force)','postgres');}
 });
