@@ -2411,8 +2411,7 @@
     'scout_fren', 'first_hatch', 'little_fren', 'grown_fren', 'share_fren', 'valentine_fren',
     'quiz_first', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99',
     'long_live_the_king', 'frogageddon_beta',
-    'lord_of_the_lilies', 'master_tactician', 'gold_digger', 'gold_rush', 'pond_sweeper', 'general_fren', 'super_parent',
-    'tourist', 'globetrotter', 'moon_frog', 'golden_harvest', 'dear_diary', 'snoop'];
+    'lord_of_the_lilies', 'master_tactician', 'gold_digger', 'gold_rush', 'pond_sweeper', 'general_fren', 'super_parent'];
   // the 20 places on the Passport's front page, in order: gold row, silver row, then the first steps
   // owner, 2026-11-12: Pond Pioneer opens the gold row; the rest moved one place on (Secret Starter is in the Stamps tab)
   var PP_FRONT = ['pond_pioneer', 'moonwalker', 'season_champion', 'frog_of_the_week', 'certified_fren',

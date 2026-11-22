@@ -35,8 +35,6 @@ V3 = [
     'long_live_the_king', 'frogageddon_beta',
     # expansion 7 (owner, 2026-11-15): Three Lilies, Gold Hook, Pepe Sweeper, FROGAGEDDON online, PepeGochi
     'lord_of_the_lilies', 'master_tactician', 'gold_digger', 'gold_rush', 'pond_sweeper', 'general_fren', 'super_parent',
-    # PepeGochi A12 (ChatGPT pack A12c, owner 2026-11-22): trips, the golden lemon and the diary
-    'tourist', 'globetrotter', 'moon_frog', 'golden_harvest', 'dear_diary', 'snoop',
 ]
 SMALL = set()   # every stamp has its full-size file now
 TILE = (138, 150)

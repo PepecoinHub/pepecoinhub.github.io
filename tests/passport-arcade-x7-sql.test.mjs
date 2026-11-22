@@ -23,10 +23,9 @@ test('expansion 7: seven planned catalog entries, seven new atlas tiles at the e
   // owner, 2026-11-17: the two Three Lilies stamps are live; the rest wait (Gold Hook is still in beta)
   for (const id of X7) assert.equal(catalog.achievements.find(x => x.id === id).status, id === 'lord_of_the_lilies' || id === 'master_tactician' ? 'live' : 'planned', id);
   const v3 = file('docs/meme/meme.js').match(/var PP_V3 = \[([^\]]*)\]/)[1].match(/'([a-z_0-9]+)'/g).map(s => s.slice(1, -1));
-  assert.deepEqual(v3.slice(55, 62), X7, 'appended after the 55 earlier tiles, which keep their places');
-  assert.deepEqual(v3.slice(62), ['tourist', 'globetrotter', 'moon_frog', 'golden_harvest', 'dear_diary', 'snoop'], 'then PepeGochi A12');
+  assert.deepEqual(v3.slice(55), X7, 'appended after the 55 earlier tiles, which keep their places');
   assert.equal(v3.indexOf('share_fren'), 46, 'the unused Share Fren tile stays');
-  for (const css of ['docs/meme/passport.css', 'docs/meme/meme.css']) assert.match(file(css), /6800% 100%/, css);
+  for (const css of ['docs/meme/passport.css', 'docs/meme/meme.css']) assert.match(file(css), /6200% 100%/, css);
   // Pepe Sweeper keeps its records in the browser and online FROGAGEDDON does not exist: nothing may award them
   const sql = file('games/supabase/update_passport_arcade_x7.sql') + file('games/supabase/update_passport_awards.sql');
   for (const id of ['pond_sweeper', 'general_fren']) assert.doesNotMatch(sql.replace(/^--.*$/gm, ''), new RegExp("'" + id + "'"), id);
