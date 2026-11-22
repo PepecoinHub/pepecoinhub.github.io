@@ -20,8 +20,9 @@ test('every live stamp has a server award path, and only live stamps do', () => 
   // for the PepeGochi SQL, which is installed only on PepeGochi's own launch day (games/LAUNCH_FREN_PASSPORT_PEPEGOCHI.md)
   // the Pond Quiz stamps (owner, 2026-11-15) come with PepeGochi too: the quiz opens after the frog hatches
   const later = catalog.achievements.filter(x => ['pepegachi', 'pond_quiz'].includes(x.category)).map(x => x.id);
-  assert.deepEqual(later.sort(), ['first_hatch', 'good_parent', 'grown_fren', 'interior_designer', 'little_fren',
-    'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99', 'quiz_first', 'super_parent']);
+  // A12 (owner, 2026-11-22): trips, the golden lemon and the diary (update_pepegochi_life.sql)
+  assert.deepEqual(later.sort(), ['dear_diary', 'first_hatch', 'globetrotter', 'golden_harvest', 'good_parent', 'grown_fren',
+    'interior_designer', 'little_fren', 'moon_frog', 'quiz_10', 'quiz_25', 'quiz_50', 'quiz_99', 'quiz_first', 'snoop', 'super_parent', 'tourist']);
   for (const id of later) assert.equal(catalog.achievements.find(x => x.id === id).status, 'planned', id);
   const live = catalog.achievements.filter(x => x.status === 'live' || later.includes(x.id)).map(x => x.id);
   // Bug Hunter (owner, 2026-11-16): live, but given by the owner by hand in the Supabase SQL editor, never by an RPC
@@ -36,6 +37,7 @@ test('every live stamp has a server award path, and only live stamps do', () => 
   const rest = sql.replace(award, '') + file('games/supabase/update_pepegochi_passport.sql') + file('games/supabase/update_pepegochi_rewards.sql') +
     file('games/supabase/update_pond_king.sql') +   // Long Live the King: 10 duels won in a row as Pond King
     file('games/supabase/update_pond_quiz.sql') +   // the five Pond Quiz stamps
+    file('games/supabase/update_pepegochi_life.sql') +   // A12: Tourist, Globetrotter, Moon Frog, Golden Harvest, Dear Diary, Snoop
     file('games/supabase/update_passport_arcade_x7.sql');   // Lord of the Lilies, Master Tactician (expansion 7)
   for (const id of allowed) assert.match(rest, new RegExp("'" + id + "'"), id + ' has no award');
   for (const gone of ['seven_day_fren', 'ten_day_fren', 'frog_detective'])

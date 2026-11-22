@@ -1,5 +1,5 @@
 // A13: local room interaction, with care delegated to the existing validated actions.
-import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX, ROOM_LAMP, ROOM_HORSE } from './pepegochi-room.mjs?v=20261121genesis';
+import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX, ROOM_LAMP, ROOM_HORSE } from './pepegochi-room.mjs?v=20261122life';
 import { mountRoomEffects } from './pepegochi-room-fx.mjs?v=20261121chrom';
 
 const PROPS = {
@@ -103,7 +103,12 @@ export function roomResponse(id, view, { lampOn = true, busy = false, embedded =
   return { text: propLine(id,propIndex), effect: id === 'mug' ? 'mug' : 'spark', painting: id === 'p_poster' };
 }
 
-export function createRoomInteractions({ getView, isBusy, care, openTV, openPainting = () => {}, reduced = () => false, now = Date.now } = {}) {
+// A12: while the frog is on a trip the bed and the duck wait for it (no care from the room).
+export const AWAY_LINES = { bed: 'The bed is made. Your Fren is away on a trip.', rubber_duck: 'The duck is guarding the room until your Fren is back.' };
+
+// onProp(id, say, frame) runs after a prop's own line (A12: watering the lemon tree, the TV at 3 AM); returning true
+// means it took over (the TV does not open Pond TV then). isAway() tells whether the frog is on a trip.
+export function createRoomInteractions({ getView, isBusy, care, openTV, openPainting = () => {}, reduced = () => false, now = Date.now, onProp = () => false, isAway = () => false } = {}) {
   let life = null, lampOn = true, dispose = () => {}, lastClick = -Infinity, pats = [], patIndex = 0, propIndices = {}, lastSpeech = null;
   return {
     attach(frame, opts, { owned, lifeId, embedded } = {}) {
@@ -151,6 +156,7 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
         const activate = () => {
           if (!frame.isConnected || now() - lastClick < 300 || isBusy()) return;
           const at=now(); pats=pats.filter(p=>at-p<3500);
+          if (isAway() && Object.hasOwn(AWAY_LINES, t.id)) { lastClick = at; feedback.textContent = AWAY_LINES[t.id]; return; }
           const result = roomResponse(t.id, getView(), { lampOn, busy: isBusy(), embedded, patIndex, patBurst:pats.length, propIndex:propIndices[t.id]||0 });
           if (!result) return;
           lastClick = at; feedback.textContent = result.text; propIndices[t.id]=(propIndices[t.id]||0)+1;
@@ -161,7 +167,8 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
           effects.clear();
           if (result.effect) effects.play(result.effect,t,t.id==='frog'?frame.querySelector('.pgr-pet'):getItem(t.id));
           if (result.care) care(result.care);
-          if (result.tv) openTV();
+          const handled = onProp(t.id, text => { feedback.textContent = text; }, frame) === true;
+          if (result.tv && !handled) openTV();
           // the Golden Foot: the Pond Map window opens only if the server says this player may see it
           if (result.painting) openPainting(text => { feedback.textContent = text; });
         };

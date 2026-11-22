@@ -116,9 +116,10 @@ html.embed body { padding-inline: 0; }
 
 /* live window: Decorate */
 /* the live window has no banner, time machine or log: room, frog, Decorate, rules, past frens */
-.pgb.pgb-live, .pgb.pgb-live { grid-template-columns: minmax(0, 1fr); grid-template-areas: "scene" "main" "decor" "rules" "past"; }
-@media (min-width: 680px) { .pgb.pgb-live { grid-template-columns: minmax(0, 1fr); grid-template-areas: "scene" "main" "decor" "rules" "past"; } }
+.pgb.pgb-live, .pgb.pgb-live { grid-template-columns: minmax(0, 1fr); grid-template-areas: "scene" "main" "trips" "decor" "rules" "past"; }
+@media (min-width: 680px) { .pgb.pgb-live { grid-template-columns: minmax(0, 1fr); grid-template-areas: "scene" "main" "trips" "decor" "rules" "past"; } }
 .pgb-decor-card { grid-area: decor; }
+.pgb-trips-card { grid-area: trips; }
 .pgb-adopt-note { flex-basis: 100%; order: -1; margin: 0 0 4px; font-weight: 600; }
 
 /* A11: architectural detail, not an owned/earned decoration. */
@@ -235,3 +236,29 @@ html.embed .pgb-care-tile .is-low { color:#861b14; }
 .pgr-toolbar .pgr-shortcuts[open] { border-top:1px solid #999; padding-bottom:5px; }
 .pgr-toolbar .pgr-shortcuts:not([open]) { border-left:1px solid #aaa; }
 .pgr-toolbar .pgr-shortcuts > div { padding-top:0; }
+
+/* A12 trips: the trip form, the postcard, the album and the souvenir box (pepegochi-live.mjs) */
+.pgb-trip { display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 8px; align-items:center; margin:8px 0 2px; padding:6px; border:1px solid var(--grid); background:var(--surface-2); }
+.pgb-trip .pgb-title, .pgb-trip p, .pgb-trip .btn { grid-column:1/-1; margin:0; }
+.pgb-trip label { font-size:13px; font-weight:600; }
+.pgb-trip select { min-width:0; min-height:36px; font:inherit; font-size:13px; }
+.pgb-trip .btn { min-height:44px; justify-self:start; }
+.pgb-postcard { max-width:640px; }
+.pgb-postcard-art img, .pgb-postcard-canvas { display:block; width:100%; height:auto; image-rendering:pixelated; }
+.pgb-postcard .pgb-row { padding:0 10px 10px; gap:6px; }
+.pgb-postcard .pgb-row .btn { margin:0; }
+.pgb-album { display:grid; grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:6px; margin:6px 0 10px; }
+.pgb-album-card { position:relative; aspect-ratio:16/9; min-height:44px; padding:0; border:2px outset #d8d0b8; background:#f1e8cb; cursor:pointer; overflow:hidden; }
+.pgb-album-card img { display:block; width:100%; height:100%; object-fit:cover; image-rendering:pixelated; }
+.pgb-album-card.is-locked { cursor:default; border-style:dashed; border-color:#a59d86; background:#e8e2d0; color:#7d7562; font:700 20px/1 var(--f-mono, monospace); }
+.pgb-album-card:focus-visible { outline:2px dotted #0c5a2c; outline-offset:2px; }
+.pgb-souvenirs { display:grid; grid-template-columns:repeat(auto-fill,minmax(44px,1fr)); gap:6px; }
+.pgb-souvenir { display:grid; place-items:center; aspect-ratio:1; border:1px solid #a59d86; background:#f7f1de; color:#7d7562; font:700 16px/1 var(--f-mono, monospace); }
+.pgb-souvenir img { width:32px; height:32px; image-rendering:pixelated; }
+.pgb-souvenir.is-rare { border-color:#2f6fb3; box-shadow:inset 0 0 0 1px #9cc3ec; }
+.pgb-souvenir.is-epic { border-color:#7a3fb0; box-shadow:inset 0 0 0 1px #cfa9ee; }
+.pgb-souvenir.is-legendary { border-color:#b78a12; box-shadow:inset 0 0 0 2px #f1d36b; }
+.pgb-souvenir.is-locked { border-style:dashed; }
+.pgb-diary li { position:relative; }
+.pgb-diary-save { margin-top:2px; min-height:28px; padding:0 8px; font-size:11px; }
+.pgb-live .pgb-trips-card p { font-size:13px; line-height:1.4; margin:0; }

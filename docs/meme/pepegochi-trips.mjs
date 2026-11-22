@@ -1,6 +1,6 @@
 // PepeGochi trips (A12, owner spec 2026-11-21). The owner packs one thing and picks a length; the frog leaves,
 // the room stays empty, and it comes back with a postcard, sometimes a souvenir, and always a diary page.
-// The SERVER rolls the trip when it starts (games/supabase/update_pepegochi_trips.sql) and keeps the result until
+// The SERVER rolls the trip when it starts (games/supabase/update_pepegochi_life.sql) and keeps the result until
 // the return time, so nobody can change the loot in the console. This file holds the shared catalog (the SQL test
 // checks both match), the texts and a pure roll used by the preview and the tests.
 
@@ -27,8 +27,8 @@ export const PLACES = [
   { id: 'exchange', name: 'the Exchange', text: 'saw the order book. it looked back at me.', w: [10, 14, 12], pack: 'map' },
   { id: 'old_internet', name: 'the Old Internet', text: 'found a 1998 website with a hit counter. i was visitor 000042. honored.', w: [10, 14, 12], pack: 'map' },
   { id: 'krakow_dragon', name: 'Kraków', text: 'saw a dragon. he wanted to trade. i said no. diamond flippers.', w: [0, 4, 8], pack: 'map' },
-  { id: 'moon', name: 'the Moon', text: 'made it to the moon. it was quiet. pep was already here.', w: [0, 1, 4], pack: null },
-  { id: 'unknown', name: '???', text: '', w: [0, 0, 1], pack: null, secret: true },
+  { id: 'moon', name: 'the Moon', text: 'made it to the moon. it was quiet. pep was already here.', w: [0, 3, 4], pack: null },
+  { id: 'unknown', name: '???', text: '', w: [0, 1, 1], pack: null, secret: true },
 ];
 export const PLACE = Object.fromEntries(PLACES.map(p => [p.id, p]));
 
@@ -88,7 +88,7 @@ export function rollTrip(length, pack, random = Math.random) {
 export function postcardText(placeId, souvenirId) {
   const p = PLACE[placeId];
   if (!p) return null;
-  if (p.secret) return { title: '???', lines: ['i don\'t remember where i was.', 'there were numbers.'] };
+  if (p.secret) return { title: '???', lines: ['i don\'t remember where i was.', 'there were numbers. 0098. the TV knows.'] };
   const s = SOUVENIR[souvenirId];
   return { title: 'Greetings from ' + p.name, lines: [p.text, s ? 'p.s. i brought ' + s.name + '.' : 'p.s. no souvenir. i ate it.'] };
 }
