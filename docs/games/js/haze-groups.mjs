@@ -55,6 +55,14 @@ export function groupVisible(drop, now=Date.now()){
   const end=Date.parse(drop.ended_at||'');
   return !Number.isFinite(end)||now<end+30*60*1000;
 }
+// 2026-11-22: what a failed group-check answer means for the next check (haze_group_context in update_haze_groups.sql)
+export function checkFailure(error){
+  const m=String(error?.message||error||'');
+  if(/Wait at least 15 seconds/i.test(m))return 'wait';
+  if(/Daily group check limit/i.test(m))return 'daily';
+  if(/cannot be checked|not found or already bound|does not match/i.test(m))return 'final';
+  return 'retry';
+}
 export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   if(!enabled)return null;
   const {node:n,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,origin}=ctx;
@@ -63,27 +71,61 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
   const save=()=>{try{win.localStorage.setItem(cacheKey,JSON.stringify([...flights.values()].map(({id,txid,user})=>({id,txid,user})).slice(-20)));}catch{}};
   function resume(){
     for(const drop of data?.drops||[])if(['confirmed','cancelled','empty'].includes(drop.state)){completed.add(drop.id);flights.delete(drop.id);}
-    try{const raw=win.localStorage.getItem(cacheKey);if(raw&&raw.length<10000)for(const f of JSON.parse(raw).slice(-20))if(f.user===currentUser()&&UUID.test(f.id)&&HASH.test(f.txid)&&!completed.has(f.id)&&!flights.has(f.id))flights.set(f.id,{...f,attempts:0,next:0});}catch{}
+    // 2026-11-22: only drops the server still lists as waiting (state "ready") come back from the cache. A cached
+    // payment for a drop that is gone, cancelled or past its window used to be checked again (HTTP 400) on every load.
+    const waiting=new Set((data?.drops||[]).filter(d=>d.state==='ready').map(d=>d.id));
+    try{const raw=win.localStorage.getItem(cacheKey);if(raw&&raw.length<10000)for(const f of JSON.parse(raw).slice(-20))if(f.user===currentUser()&&UUID.test(f.id)&&HASH.test(f.txid)&&!completed.has(f.id)&&!flights.has(f.id)&&waiting.has(f.id))flights.set(f.id,{...f,attempts:0,next:0});}catch{}
     for(const drop of data?.drops||[])if(drop.state==='ready'&&drop.owner===currentUser()&&HASH.test(drop.submitted_txid||'')&&!completed.has(drop.id)&&!flights.has(drop.id))flights.set(drop.id,{id:drop.id,txid:drop.submitted_txid,user:currentUser(),attempts:0,next:0});
     save();
     for(const flight of flights.values())void check(flight);
   }
   async function check(flight){
     if(stopped||doc.hidden||!HASH.test(flight.txid||'')||flight.checking||flight.user!==currentUser()||Date.now()<(flight.next||0)||flight.attempts>=120)return;
+    // 2026-11-22: one check per payment for the whole browser (other tabs of the same chat skip it for 20 s); the
+    // server refuses a check sooner than 15 s after the previous one anyway.
+    if(!claimCheck(flight.id))return;
     flight.checking=true;flight.attempts++;flight.next=Date.now()+20000;
     try{const result=await invoke({action:'group-check',intent:flight.id,txid:flight.txid});if(result.state==='confirmed'){completed.add(flight.id);flights.delete(flight.id);save();void sync(true);}}
-    catch{/* A submitted payment is checked again, never sent again. */}
+    catch(error){
+      // A submitted payment is checked again, never sent again. Answers that can never turn into "confirmed" stop the
+      // checks for this payment (the drop card still shows the server's state); "wait" only moves the next check.
+      const why=checkFailure(error);
+      if(why==='wait'){flight.attempts--;flight.next=Date.now()+16000;}
+      else if(why==='final'){completed.add(flight.id);flights.delete(flight.id);save();}
+      else if(why==='daily')flight.next=Date.now()+3600e3;
+    }
     finally{flight.checking=false;}
+  }
+  function claimCheck(id){
+    const key='ph-haze-group-check:'+id;
+    try{const at=Number(win.localStorage.getItem(key));if(at&&Date.now()-at<20000&&Date.now()>=at)return false;win.localStorage.setItem(key,String(Date.now()));}catch{}
+    return true;
   }
   function sync(force=false){
     if(stopped||doc.hidden)return Promise.resolve();if(busy)return busy;
     // Guests (and frens without Haze) watch the same drops through a read-only public feed (owner, 2026-11-20).
     const me=currentUser();
     busy=(async()=>{
-      try{const value=await rpc(me?'gry_haze_groups':'gry_haze_groups_public',{});if(currentUser()!==me)return;data=value;const serverNow=Date.parse(data?.now);clockOffset=Number.isFinite(serverNow)?serverNow-Date.now():0;if(!stopped){render();if(me)resume();}}catch{}
-      finally{busy=null;clearTimeout(timer);if(!stopped)timer=setTimeout(()=>void sync(),soon()?5000:20000);}
+      try{
+        // another tab of this browser read the same feed a moment ago: use its copy instead of asking again
+        const shared=!force&&fresh(me);
+        const value=shared||await rpc(me?'gry_haze_groups':'gry_haze_groups_public',{});if(currentUser()!==me)return;
+        if(!shared)share(me,value);
+        adopt(value);
+      }catch{}
+      finally{busy=null;schedule();}
     })();return busy;
   }
+  function adopt(value){data=value;const serverNow=Date.parse(data?.now);clockOffset=Number.isFinite(serverNow)?serverNow-Date.now():0;if(!stopped){render();if(currentUser())resume();}}
+  // 2026-11-22: a minimized LAN Party keeps watching drops (new-drop chip, ending-soon), only less often:
+  // 60 s, or 15 s while a round ends within 90 s. A visible window keeps 20 s / 5 s.
+  const minimized=()=>{try{return !!ctx.minimized?.();}catch{return false;}};
+  function schedule(){clearTimeout(timer);if(stopped)return;const m=minimized();timer=setTimeout(()=>void sync(),soon()?(m?15000:5000):(m?60000:20000));}
+  // Tabs of one browser share each feed answer (BroadcastChannel); devices still ask on their own.
+  let channel=null,sharedAt=0,sharedFor=null,sharedValue=null;
+  try{channel=new win.BroadcastChannel('ph-haze-groups');channel.onmessage=e=>{const m=e.data;if(!m||m.type!=='feed'||m.user!==currentUser()||stopped)return;sharedAt=Date.now();sharedFor=m.user;sharedValue=m.value;if(!busy){adopt(m.value);schedule();}};}catch{channel=null;}
+  const fresh=me=>sharedValue&&sharedFor===me&&Date.now()-sharedAt<(soon()?4000:15000)?sharedValue:null;
+  const share=(me,value)=>{try{channel?.postMessage({type:'feed',user:me,value});}catch{}};
   // Ask every 5 s only while a round ends within 90 s; a 10-hour airdrop is checked every 20 s.
   const soon=()=>data?.drops?.some(d=>d.state==='open'&&Date.parse(d.closes_at)-(Date.now()+clockOffset)<90000);
   // The last 5 minutes turn the card orange: "ending soon".
@@ -355,5 +397,5 @@ export function createHazeGroups(ctx,{enabled=HAZE_GROUPS_ENABLED}={}){
       };
       void pollInbox();
       chip=n('button',{type:'button',class:'haze-live-chip',hidden:true,title:'Live drops you can join'});chip.onclick=showLive;
-      const log=ctx.chatLog?.();(log?.closest('.lan-win')?.querySelector('.lan-top')||parent).append(chip,help);void sync(true);void pollInbox();},sync,open,command,review:id=>reviewPayout(id),destroy(){stopped=true;save();clearTimeout(timer);clearTimeout(expiryTimer);clearTimeout(inboxTimer);clearInterval(ticker);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);panel?.remove();help?.remove();chip?.remove();button?.remove();}};
+      const log=ctx.chatLog?.();(log?.closest('.lan-win')?.querySelector('.lan-top')||parent).append(chip,help);void sync(true);void pollInbox();},sync,open,command,review:id=>reviewPayout(id),destroy(){stopped=true;save();try{channel?.close();}catch{}clearTimeout(timer);clearTimeout(expiryTimer);clearTimeout(inboxTimer);clearInterval(ticker);win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',visible);panel?.remove();help?.remove();chip?.remove();button?.remove();}};
 }
