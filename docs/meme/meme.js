@@ -5590,10 +5590,18 @@
         '<div class="emo-pop" hidden role="group" aria-label="Pepe emotes"><div class="emo-head"><input type="search" class="emo-q" placeholder="Search Pepes… (laugh, pray, apu)" aria-label="Search emotes" autocomplete="off">' +
         '<div class="emo-tabs" role="tablist"><button type="button" data-t="recent" title="Recently used">⏱</button>' + EMO_FAM.map(function (f) { return '<button type="button" data-t="' + f[0] + '">' + f[1] + '</button>'; }).join('') + '<button type="button" data-t="gif">GIFs</button></div></div>' +
         '<div class="emo-grid" role="group" aria-label="Emotes"></div></div>' +
-        '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + EMO_DIR + 'peepo_happy.webp' + EMO_V + '" alt="" width="22" height="22"></button><input name="n" class="lan-nick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname" hidden><input name="t" maxlength="300" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
+        '<form class="app-row lan-form"><button type="button" class="app-btn emo-btn" aria-expanded="false" aria-label="Emotes" title="Emotes"><img src="' + EMO_DIR + 'peepo_happy.webp' + EMO_V + '" alt="" width="22" height="22"></button><input name="n" class="lan-nick" maxlength="20" autocomplete="nickname" placeholder="Nickname" aria-label="Nickname" hidden><input name="t" maxlength="200" autocomplete="off" placeholder="Say gm…" aria-label="Message"><button type="submit" class="app-btn">Send</button></form>' +
         '<p class="hs-note lan-note"></p><p class="hs-note lan-ment" hidden><button type="button" class="app-btn lan-ment-btn"></button> <span></span></p>' +
         '<div class="lan-status"><span class="lan-st">Connecting…</span><span class="lan-grip" role="separator" tabindex="0" aria-orientation="horizontal" aria-label="Chat height. Drag, or use the arrow keys, to make the chat taller or shorter" title="Drag to make the chat taller"><i></i><i></i><i></i></span></div>';
       var log = A.body.querySelector('.lan-log'), form = A.body.querySelector('.lan-form'), inp = form.querySelector('input[name=t]'), note = A.body.querySelector('.lan-note');
+      // Characters-left hint near the server's 200-character limit (the input stops at maxlength without telling why).
+      var lanCount = document.createElement('p'); lanCount.className = 'hs-note lan-count'; lanCount.hidden = true; lanCount.setAttribute('aria-live', 'polite'); form.after(lanCount);
+      function paintCount() {
+        var max = inp.maxLength > 0 ? inp.maxLength : 200, left = max - inp.value.length;
+        lanCount.hidden = left > 40; lanCount.textContent = left <= 0 ? 'Limit reached: ' + max + ' characters max.' : left + (left === 1 ? ' character left' : ' characters left');
+        lanCount.style.color = left <= 10 ? '#e66' : '';
+      }
+      inp.addEventListener('input', paintCount); inp.addEventListener('focus', paintCount);
       var main = A.body.querySelector('.lan-main'), listBtn = A.body.querySelector('.lan-list-btn'), bl = A.body.querySelector('.lan-bl');
       var stEl = A.body.querySelector('.lan-st'), hostTag = A.body.querySelector('.lan-host-tag'), alertsBtn = A.body.querySelector('.lan-alerts');
       var canMod = false, who = null, whoT = 0;
@@ -5729,7 +5737,7 @@
           tb.addEventListener('click', function () { closeCard(); tip.open(); });
         }
         var ab = card.querySelector('.lan-c-at'); if (ab) ab.addEventListener('click', function () {
-          closeCard(); var v = inp.value; inp.value = (v && !/\s$/.test(v) ? v + ' ' : v) + '@' + nick + ' '; inp.focus();
+          closeCard(); var v = inp.value; inp.value = (v && !/\s$/.test(v) ? v + ' ' : v) + '@' + nick + ' '; inp.focus(); paintCount();
         });
         pb.focus();
         // the Fren (avatar) and the join date, from the same read-only public passport the Passport window uses
@@ -5839,7 +5847,7 @@
         var v = inp.value, at = inp.selectionStart == null ? v.length : inp.selectionStart, code = ':' + b.getAttribute('data-e') + ':';
         var pre = v.slice(0, at), post = v.slice(at);
         inp.value = (pre && !/\s$/.test(pre) ? pre + ' ' : pre) + code + ' ' + post.replace(/^\s+/, '');
-        pop.hidden = true; eb.setAttribute('aria-expanded', 'false'); inp.focus();
+        pop.hidden = true; eb.setAttribute('aria-expanded', 'false'); inp.focus(); paintCount();
       });
       var nickIn = form.querySelector('.lan-nick');
       try { nickIn.value = localStorage.getItem('pepgry-nick') || ''; } catch (e) {}
@@ -5940,7 +5948,7 @@
         e.preventDefault();
         var t = inp.value.trim(); if (!t) return;
         var tip = hazeTips && hazeTips.command(t);   // /tip opens the Haze tip dialog; nothing is posted to the chat
-        if (tip) { if (tip === 'opened') { inp.value = ''; paintNote(); } return; }
+        if (tip) { if (tip === 'opened') { inp.value = ''; paintNote(); paintCount(); } return; }
         var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || ''; } catch (err) {}
         if (!nickIn.hidden) {
           nick = nickIn.value.trim();
@@ -5949,7 +5957,7 @@
         }
         var b = form.querySelector('[type=submit]'); b.disabled = true;
         chatRpc('gry_lobby_say', { p_text: t, p_nick: nick }).then(function (r) {
-          if (r && r.error) note.textContent = r.error; else { inp.value = ''; paintNote(); chatSecretCheck(t); }
+          if (r && r.error) note.textContent = r.error; else { inp.value = ''; paintNote(); paintCount(); chatSecretCheck(t); }
           if (r && r.error && /nickname/i.test(r.error)) { nickIn.hidden = false; nickIn.focus(); }
           poll();
         }, function (err) { note.textContent = err.message; if (/nickname/i.test(err.message)) { nickIn.hidden = false; nickIn.focus(); } }).then(function () { setTimeout(function () { b.disabled = false; }, 3000); });
