@@ -25,9 +25,9 @@ const jwt = b64({ alg: 'HS256', typ: 'JWT' }) + '.' + b64({ sub: USER, role: 'au
 const user = { id: USER, aud: 'authenticated', role: 'authenticated', is_anonymous: false, email: 'byl@example.invalid',
   app_metadata: { provider: 'discord', providers: ['discord'] }, user_metadata: { full_name: 'Byl' },
   identities: [{ provider: 'discord', identity_data: { full_name: 'Byl', global_name: 'Byl' } }] };
-// the stored sign-in expires 15 minutes into the run; a refresh answers with one more hour (fake clock), so the
-// hourly token refresh of the games' Supabase client happens as in production
-const session = { access_token: jwt, refresh_token: 'r', token_type: 'bearer', expires_in: 3600, expires_at: Math.floor(START / 1000) + 900, user };
+// the stored sign-in stays valid for the whole measured hour (2 h); scenarios with storagePulse also write a
+// refreshed sign-in (as another tab or the room iframe does when Supabase refreshes the token)
+const session = { access_token: jwt, refresh_token: 'r', token_type: 'bearer', expires_in: 3600, expires_at: Math.floor(START / 1000) + 7200, user };
 
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
   '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.gif': 'image/gif', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json' };
@@ -109,6 +109,8 @@ const SCENARIOS = {
   // an active player: comes back to the tab (focus + visibilitychange) every 6 minutes
   'gochi-no-room': { gochi: true, pulse: 6, steps: [] },
   'gochi-room-open': { gochi: true, pulse: 6, steps: ['room'] },
+  // + another tab or the room iframe refreshes the sign-in every 10 minutes (Supabase rewrites the auth key: storage event)
+  'gochi-room-token-refresh': { gochi: true, pulse: 6, storagePulse: 10, steps: ['room'] },
   'games-minimized': { gochi: false, steps: ['miner', 'minimize'] },
   'lan-live': { gochi: false, live: true, steps: ['lan'] },
   'lan-lost': { gochi: false, live: false, steps: ['lan'] },
@@ -165,6 +167,8 @@ async function run(browser, base, name, sc) {
   const m0 = await metric();
   const STEP = 2000;
   for (let ms = 0; ms < MINUTES * 60000; ms += STEP) {
+    if (sc.storagePulse && ms > 0 && ms % (sc.storagePulse * 60000) === 0)
+      await page.evaluate(() => { const k = 'sb-azbwciqfbsdpwubznncg-auth-token', old = localStorage.getItem(k), s = JSON.parse(old); s.expires_at = Math.floor(Date.now() / 1000) + 3600; s.access_token = s.access_token + 'x'; const v = JSON.stringify(s); localStorage.setItem(k, v); window.dispatchEvent(new StorageEvent('storage', { key: k, oldValue: old, newValue: v, storageArea: localStorage })); });
     if (sc.pulse && ms > 0 && ms % (sc.pulse * 60000) === 0)
       await page.evaluate(() => { window.dispatchEvent(new Event('focus')); document.dispatchEvent(new Event('visibilitychange')); });
     await page.clock.runFor(STEP); state.t += STEP; await new Promise(r => setTimeout(r, 8));
