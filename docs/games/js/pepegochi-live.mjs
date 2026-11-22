@@ -8,7 +8,7 @@ import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=2026
 import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261121map';
 import { openPondMap, noteLines } from './pond-map.mjs?v=20261121map';
 // A12: the frog's diary (written by the taskbar frog or here) and the day's rare event in the room
-import { diaryFor, createDiary, browserStorage, isSnoopHour, SNOOP_LINE } from '../../meme/pepegochi-diary.mjs?v=20261122life';
+import { diaryFor, createDiary, browserStorage, isSnoopHour, SNOOP_LINE } from '../../meme/pepegochi-diary.mjs?v=20261122read';
 // A12 on the server (update_pepegochi_life.sql): trips, postcards, souvenirs, the golden lemon, the night signal
 import { LENGTHS, PACKS, PLACES, SOUVENIRS, SOUVENIR, PLACE, tripState, formatLeft, tripForDiary } from '../../meme/pepegochi-trips.mjs?v=20261122life';
 import { drawPostcard, drawDiaryPage, saveCanvas, postcardSrc, souvenirSrc } from './pepegochi-cards.mjs?v=20261122life';
@@ -252,7 +252,8 @@ function todayRare() {
 }
 const myDiary = () => { const p = livingPet(), id = owner(); return p && id ? diaryFor(id, p.life_id) : { pages: [], fresh: 0 }; };
 // what the room's DIARY button shows: hidden with no pages, a red count with the latest visit's pages
-function diaryState() { const d = myDiary(); return d.pages.length ? (diaryOpen ? 0 : d.fresh) : -1; }
+// the red count on DIARY: pages not read yet; opening the diary marks them read (kept with the diary, on every device)
+function diaryState() { const d = myDiary(); return d.pages.length ? (diaryOpen ? 0 : d.unread) : -1; }
 function renderDiary(box) {
   const p = livingPet(), id = owner();
   if (!diaryOpen || !p || !id) { diaryOpen = false; return; }
@@ -433,6 +434,8 @@ function openNotes() {
 }
 function openDiary() {
   diaryOpen = true;
+  const p = livingPet(), id = owner();
+  if (p && id) { diaryBook.open(id, p.life_id); diaryBook.markRead(); saveDiary(); }
   // Dear Diary (7 different days) and Snoop (3 AM) are counted by the server
   if (life && backend) backend.rpc('gry_pepegochi_diary_open', { p_tz_min: tz() }).catch(() => {});
   render();

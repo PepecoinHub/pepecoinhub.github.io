@@ -1,5 +1,5 @@
 // Local preview of the A12 "life of its own" logic (docs/games/pepegochi-life.html). Fake clock, nothing saved.
-import { createDiary, isSnoopHour, SNOOP_LINE } from '../../meme/pepegochi-diary.mjs?v=20261122life';
+import { createDiary, isSnoopHour, SNOOP_LINE } from '../../meme/pepegochi-diary.mjs?v=20261122read';
 import { rareOfDay, localDay } from '../../meme/pepegochi-rare.mjs?v=20261121a12';
 import { rollTrip, postcardText, tripForDiary, SOUVENIR, LENGTHS, formatLeft } from '../../meme/pepegochi-trips.mjs?v=20261122life';
 

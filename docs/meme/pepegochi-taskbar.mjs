@@ -17,7 +17,7 @@ import { createNotebook } from './pepegochi-notes.mjs?v=20261121map';
 import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120notes3';
 // A12 life of its own (owner spec 2026-11-21): habits on the taskbar, the diary, the day's rare event.
 import { pickHabit, habitSequence, HABITS } from './pepegochi-habits.mjs?v=20261121a12';
-import { createDiary, sameBook } from './pepegochi-diary.mjs?v=20261122life';
+import { createDiary, sameBook } from './pepegochi-diary.mjs?v=20261122read';
 import { tripState, formatLeft } from './pepegochi-trips.mjs?v=20261122life';
 import { rareOfDay, localDay } from './pepegochi-rare.mjs?v=20261121a12';
 

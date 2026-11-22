@@ -263,13 +263,16 @@ export function createDiary({ storage, now = () => Date.now() } = {}) {
 // pages of the latest visit (written less than 12 hours ago) as "new". In PondOS the taskbar frog writes them.
 export function diaryFor(owner, lifeId, now = Date.now()) {
   const key = diaryKey(owner, lifeId);
-  let pages = [];
+  let pages = [], read = 0;
   try {
     const raw = key ? JSON.parse(globalThis.localStorage?.getItem(key) || 'null') : null;
+    if (raw && Number.isFinite(raw.read)) read = raw.read;
     if (raw && Array.isArray(raw.pages)) pages = raw.pages.filter(p => p && Object.hasOwn(ENTRY, p.id) && Number.isFinite(p.day) &&
       Number.isFinite(p.at) && typeof p.text === 'string');
   } catch {}
   const last = pages.length ? Math.max(...pages.map(p => p.at)) : null;
   const fresh = last !== null && now - last >= 0 && now - last < 12 * HOUR ? pages.filter(p => p.at === last).length : 0;
-  return { pages, fresh };
+  // unread: the pages after the last one the owner opened (before anything was ever opened: the latest visit's)
+  const unread = read > 0 ? Math.max(0, pages.length - read) : fresh;
+  return { pages, fresh, read, unread };
 }

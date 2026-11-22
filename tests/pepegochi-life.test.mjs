@@ -229,7 +229,7 @@ test('room diary is read only: the latest visit\'s pages count as new for 12 hou
     const r = diaryFor('u', 'l', t + HOUR);
     assert.equal(r.pages.length, 4); assert.equal(r.fresh, 3);
     assert.equal(diaryFor('u', 'l', t + 13 * HOUR).fresh, 0);
-    assert.deepEqual(diaryFor('u', 'other', t), { pages: [], fresh: 0 });
+    assert.deepEqual(diaryFor('u', 'other', t), { pages: [], fresh: 0, read: 0, unread: 0 });
     const before = JSON.stringify([...s.m]); diaryFor('u', 'l', t); assert.equal(JSON.stringify([...s.m]), before, 'reading writes nothing');
   } finally { delete globalThis.localStorage; }
 });
@@ -308,4 +308,20 @@ test('postcards: the frog\'s text fits the four lines; every card and souvenir p
   assert.deepEqual(wrap('aaaa bbbb cccc', 9 * 14.4, measure), ['aaaa bbbb', 'cccc']);
   assert.deepEqual(wrap('x'.repeat(20), 10 * 14.4, measure), ['x'.repeat(10), 'x'.repeat(10)]);
   assert.match(postcardText('unknown').lines.join(' '), /0098/, 'the ??? postcard and the TV say the same numbers');
+});
+
+test('the red count on DIARY clears once the diary is opened, and comes back only for newer pages', () => {
+  const mem = new Map();
+  const ls = { getItem: k => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, String(v)) };
+  const old = globalThis.localStorage; globalThis.localStorage = ls;
+  try {
+    const d = makeDiary({ storage: ls, now: () => T0 });
+    d.visit('o', 'l', { adoptedAt: T0 - DAY });
+    assert.equal(diaryFor('o', 'l', T0).unread, 1, 'a new page');
+    d.open('o', 'l'); d.markRead();
+    assert.equal(diaryFor('o', 'l', T0).unread, 0, 'opened: no count');
+    const d2 = makeDiary({ storage: ls, now: () => T0 + 3 * DAY });
+    d2.visit('o', 'l', { adoptedAt: T0 - DAY });
+    assert.ok(diaryFor('o', 'l', T0 + 3 * DAY).unread >= 1, 'pages written later count again');
+  } finally { globalThis.localStorage = old; }
 });
