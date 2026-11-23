@@ -1,4 +1,4 @@
-// Local desktop theatre, not a source of pet state, care, achievements or rewards.
+// Cosmetic reactions to the desktop. The frog and its toys always stay in the taskbar slot.
 import { playableCompanion } from './pepegochi-personality.mjs?v=20261118dialog1';
 
 export const APP_REACTIONS = Object.freeze({
@@ -6,221 +6,54 @@ export const APP_REACTIONS = Object.freeze({
   'wp-folder': 'desktopGuesser', 'wp-hof': 'desktopGuesser', notes: 'desktopNotes',
   'wp-readme': 'desktopNotes', nerds: 'desktopNerds', ads: 'desktopTV', about: 'desktopNotes',
 });
-const PERCH = new Set(['bin', 'games', 'find', 'wp-folder', 'wp-hof', 'notes', 'wp-readme', 'nerds', 'ads', 'about']);
-const BLOCKED = 'a,button,input,select,textarea,label,iframe,header,.win,.app-win,.pg-fact,.desk-corner,.os-dialog,[role="dialog"],[contenteditable]';
-const center = r => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
-const at = (x, y) => `translate(${Math.round(x)}px,${Math.round(y)}px)`;
 export const AUTO_PLAY_AFTER_MS = 300000;
-export const DESKTOP_PLAY_MS = 5400;
+const TOYS = ['ball', 'duck', 'cap'];
+const ACTION = { ball: 'toyBall', duck: 'toyDuck', cap: 'toyCap' };
 
-export function perchPoint(rect, width, height, frogWidth = 48, frogHeight = 48) {
-  if (width < 761 || rect.top < frogHeight || rect.top > height - 60 || rect.width < 120) return null;
-  const x = Math.round(Math.min(width - frogWidth - 8, Math.max(8, rect.left + rect.width * .3)));
-  if (x + frogWidth > rect.right || x < rect.left) return null;
-  return { x, y: Math.round(rect.top - frogHeight + 1) };
-}
-
-export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, react, onStart, onEnd, base, now = Date.now }) {
+export function mountDesktopCompanion({ slot, getView, eligible, mayStart, react, showToy, onAutoToy, now = Date.now }) {
   const doc = slot.ownerDocument, win = doc.defaultView;
   const reduce = win.matchMedia('(prefers-reduced-motion: reduce)');
-  let effect = null, lastFly = -Infinity, lastApp = -Infinity, lastRomp = now(), disposed = false;
-  const allowed = (manual = false) => !disposed && slot.isConnected && playableCompanion(getView()) && eligible(manual) && !doc.hidden;
-  const canStart = (manual = false) => allowed(manual) && mayStart(manual) && !effect;
-  const canMove = (manual = false) => canStart(manual) && !reduce.matches;
-  const night = () => doc.documentElement.classList.contains('sky-night') && !!doc.querySelector('.sky:not([hidden]) .scene-night.ready') && !doc.querySelector('.sky-fast');
-  const exposed = (x, y) => {
-    const target = doc.elementFromPoint(x, y);
-    return !!target && !target.closest(BLOCKED);
-  };
-  function flies() {
-    if (!night() || reduce.matches) return [];
-    const scene = doc.querySelector('.sky:not([hidden]) .scene-night.ready');
-    if (Number(win.getComputedStyle(scene).opacity) < .65) return [];
-    return [...doc.querySelectorAll('.sky:not([hidden]) .scene-night.ready .sky-fly')].flatMap(node => {
-      const r = node.getBoundingClientRect(), c = center(r);
-      if (!r.width || c.x < 8 || c.y < 8 || c.x > win.innerWidth - 8 || c.y > win.innerHeight - 45 ||
-          Number(win.getComputedStyle(node).opacity) < .55 || !exposed(c.x, c.y)) return [];
-      return [{ node, ...c }];
-    });
-  }
-  function stop() {
-    if (!effect) return;
-    const old = effect; effect = null;
-    win.clearTimeout(old.timer); win.cancelAnimationFrame(old.watch);
-    for (const anim of old.animations) anim.cancel();
-    for (const node of old.nodes) node.remove();
-    old.fly?.classList.remove('pg-fly-borrowed');
-    slot.classList.remove('pg-desktop-away');
-    onEnd();
-  }
-  function begin(kind, valid, manual = false) {
-    onStart();
-    const current = effect = { kind, valid, animations: [], nodes: [], timer: 0, watch: 0 };
-    function watch() {
-      if (effect !== current) return;
-      if (!allowed(manual) || reduce.matches || !valid()) { stop(); return; }
-      current.watch = win.requestAnimationFrame(watch);
-    }
-    current.watch = win.requestAnimationFrame(watch);
-    return current;
-  }
-  function add(current, tag, cls) {
-    const node = doc.createElement(tag); node.className = cls; node.setAttribute('aria-hidden', 'true');
-    doc.body.append(node); current.nodes.push(node); return node;
-  }
-  function animate(current, node, frames, options) {
-    const animation = node.animate(frames, { fill: 'forwards', ...options });
-    current.animations.push(animation); return animation;
-  }
-  function playPoint(rect) {
-    const y = Math.max(56, Math.min(win.innerHeight - 112, rect.top - 92));
-    const reach = Math.max(120, Math.min(280, win.innerWidth * .28));
-    const candidates = rect.left < win.innerWidth / 2
-      ? [rect.left + reach, rect.left - reach]
-      : [rect.left - reach, rect.left + reach];
-    for (const raw of candidates) {
-      const x = Math.max(12, Math.min(win.innerWidth - 60, raw));
-      if (exposed(x + 24, y + 24)) return { x: Math.round(x), y: Math.round(y) };
-    }
-    return null;
-  }
+  let lastApp = -Infinity, lastRomp = now(), disposed = false;
+  const allowed = (manual = false) => !disposed && slot.isConnected && !doc.hidden &&
+    playableCompanion(getView()) && eligible(manual);
+  const fireflyAvailable = () => allowed(true) && !reduce.matches &&
+    doc.documentElement.classList.contains('sky-night') &&
+    !!doc.querySelector('.sky:not([hidden]) .scene-night.ready .sky-fly');
+
   function playToy(kind, manual = true) {
-    if (!['ball', 'duck', 'cap'].includes(kind) || !canMove(manual) || !img.animate) return false;
-    const r = img.getBoundingClientRect(), to = playPoint(r);
-    if (!to || !r.width || !r.height) return false;
-    const from = { x: r.left, y: r.top };
-    const current = begin('toy-' + kind, () => !!playPoint(r), manual);
-    const frog = add(current, 'img', 'pg-desktop-frog-frame pg-desktop-playing');
-    frog.src = img.src; frog.alt = '';
-    const toy = add(current, kind === 'duck' ? 'img' : 'span', 'pg-desktop-play-toy');
-    toy.setAttribute('data-toy', kind);
-    if (kind === 'duck') { toy.src = base + 'games/img/pepegochi/rubber_duck.png'; toy.alt = ''; }
-    slot.classList.add('pg-desktop-away');
-    const toyFrom = { x: from.x + 34, y: from.y + 24 };
-    const toyMid = { x: Math.round((toyFrom.x + to.x) / 2), y: Math.min(toyFrom.y, to.y) - 48 };
-    animate(current, toy, [
-      { transform: at(toyFrom.x, toyFrom.y), opacity: 1 },
-      { transform: at(toyMid.x, toyMid.y), offset: .18 },
-      { transform: at(to.x, to.y + 28), offset: .34 },
-      { transform: at(to.x - 18, to.y + 20), offset: .55 },
-      { transform: at(to.x + 12, to.y + 26), offset: .72 },
-      { transform: at(toyFrom.x, toyFrom.y), opacity: 1 },
-    ], { duration: 5000, easing: 'steps(24,end)' });
-    const chase = [
-      { transform: at(from.x, from.y) },
-      { transform: at((from.x + to.x) / 2 - 24, Math.min(from.y, to.y) - 26), offset: .18 },
-      { transform: at(to.x - 34, to.y), offset: .34 },
-      { transform: at(to.x - 12, to.y - 18), offset: .48 },
-      { transform: at(to.x - 28, to.y), offset: .66 },
-      { transform: at((from.x + to.x) / 2, Math.min(from.y, to.y) - 24), offset: .84 },
-      { transform: at(from.x, from.y) },
-    ];
-    animate(current, frog, chase, { duration: DESKTOP_PLAY_MS, easing: 'steps(26,end)' });
-    current.timer = win.setTimeout(() => stop(), DESKTOP_PLAY_MS);
-    return true;
-  }
-  function catchFly(target, manual = false) {
-    if (!target || !canMove(manual) || now() - lastFly < 45000 || !img.animate) return false;
-    const r = img.getBoundingClientRect();
-    if (!r.width || !r.height) return false;
-    lastFly = now();
-    const young = !getView()?.adult;
-    const mouth = { x: r.left + r.width * .68, y: r.top + r.height * (young ? .68 : .48) };
-    const approach = { x: mouth.x + (mouth.x < win.innerWidth - 65 ? 42 : -42), y: mouth.y - 14 };
-    const current = begin('firefly', () => night(), manual);
-    current.fly = target.node; target.node.classList.add('pg-fly-borrowed');
-    const glow = add(current, 'span', 'pg-desktop-firefly');
-    animate(current, glow, [
-      { transform: at(target.x, target.y), opacity: 1 },
-      { transform: at(approach.x + 18, approach.y - 12), offset: .6 },
-      { transform: at(approach.x, approach.y), offset: .8 },
-      { transform: at(mouth.x, mouth.y), opacity: 0 },
-    ], { duration: 1300, easing: 'linear' });
-    const frog = add(current, 'img', 'pg-desktop-frog-frame');
-    frog.src = young ? img.src : base + 'games/img/pepegochi/taskbar/anim/tb_curious_03.png?v=20261113stand'; frog.alt = '';
-    frog.style.transform = at(r.left, r.top);
-    slot.classList.add('pg-desktop-away');
-    const tongue = add(current, 'span', 'pg-desktop-tongue');
-    tongue.style.left = Math.round(mouth.x) + 'px'; tongue.style.top = Math.round(mouth.y) + 'px';
-    tongue.style.width = Math.round(Math.hypot(approach.x - mouth.x, approach.y - mouth.y)) + 'px';
-    const rotation = Math.atan2(approach.y - mouth.y, approach.x - mouth.x);
-    animate(current, tongue, [{ transform: `rotate(${rotation}rad) scaleX(0)` }, { transform: `rotate(${rotation}rad) scaleX(1)`, offset: .48 }, { transform: `rotate(${rotation}rad) scaleX(0)` }], { delay: 930, duration: 420 });
-    current.timer = win.setTimeout(() => { stop(); if (allowed(manual)) react('desktopFirefly'); }, 1450);
+    if (!TOYS.includes(kind) || !allowed(manual) || (reduce.matches && !manual)) return false;
+    if (!manual && !mayStart(false)) return false;
+    showToy(kind);
+    if (!manual) onAutoToy(ACTION[kind]);
     return true;
   }
   function ambient() {
-    if (!canMove()) return false;
-    if (now() - lastFly >= 90000) {
-      const r = img.getBoundingClientRect(), c = center(r);
-      const candidates = flies().sort((a, b) => Math.hypot(a.x-c.x,a.y-c.y) - Math.hypot(b.x-c.x,b.y-c.y));
-      // Only borrow a genuinely visible nearby light, rather than inventing flies on the day wallpaper.
-      if (candidates.length > 0 && Math.hypot(candidates[0].x-c.x,candidates[0].y-c.y) < 400 && catchFly(candidates[0])) return true;
-    }
-    if (now() - lastRomp < AUTO_PLAY_AFTER_MS) return false;
-    const toys = ['ball', 'duck', 'cap'];
-    const kind = toys[Math.abs(Math.floor(now() / AUTO_PLAY_AFTER_MS)) % toys.length];
+    if (!allowed() || !mayStart(false) || reduce.matches || now() - lastRomp < AUTO_PLAY_AFTER_MS) return false;
+    const kind = TOYS[Math.abs(Math.floor(now() / AUTO_PLAY_AFTER_MS)) % TOYS.length];
     if (!playToy(kind, false)) return false;
     lastRomp = now();
     return true;
   }
-  function onClick(event) {
-    if (event.defaultPrevented || event.button !== 0 || event.target.closest?.(BLOCKED) || !canMove(true)) return;
-    const target = flies().find(f => Math.hypot(f.x - event.clientX, f.y - event.clientY) <= 16);
-    if (target) catchFly(target, true);
-  }
-  function perch(host, action) {
-    if (!canMove() || !img.animate || !host?.isConnected || host.matches('.is-min,.is-max,.app-full') || host.querySelector('iframe')) return false;
-    const rect = host.getBoundingClientRect(), to = perchPoint(rect, win.innerWidth, win.innerHeight);
-    const r = img.getBoundingClientRect();
-    if (!to || !r.width || !r.height || !exposed(to.x + 24, to.y + 20)) return false;
-    const from = { x: r.left, y: r.top };
-    const current = begin('perch', () => {
-      if (!host.isConnected || host.matches('.is-min,.is-max,.app-full')) return false;
-      const next = host.getBoundingClientRect();
-      return Math.abs(next.left - rect.left) < 2 && Math.abs(next.top - rect.top) < 2 && Math.abs(next.width - rect.width) < 2;
-    });
-    const frog = add(current, 'img', 'pg-desktop-frog-frame'); frog.src = img.src; frog.alt = '';
-    slot.classList.add('pg-desktop-away');
-    const mid = (a, b) => at((a.x + b.x) / 2, (a.y + b.y) / 2 - 55);
-    animate(current, frog, [{ transform: at(from.x, from.y) }, { transform: mid(from,to), offset: .11 }, { transform: at(to.x,to.y), offset: .22 }, { transform: at(to.x,to.y), offset: .78 }, { transform: mid(to,from), offset: .89 }, { transform: at(from.x,from.y) }], { duration: 3600, easing: 'steps(20,end)' });
-    current.timer = win.setTimeout(() => { stop(); if (allowed()) react(action); }, 3600);
-    return true;
-  }
-  function popcorn(host) {
-    if (!canMove() || !host?.isConnected || !img.animate) return false;
-    const r = img.getBoundingClientRect();
-    if (!r.width || !r.height) return false;
-    const current = begin('popcorn', () => host.isConnected && !host.matches('.is-min'));
-    const snack = add(current, 'span', 'pg-desktop-popcorn');
-    const x = Math.min(win.innerWidth - 20, r.right - 8), y = r.bottom - 19;
-    animate(current, snack, [{ transform: at(x, y+16), opacity: 0 }, { transform: at(x, y), opacity: 1, offset: .2 }, { transform: at(x, y), opacity: 1, offset: .85 }, { transform: at(x, y+16), opacity: 0 }], { duration: 2600, easing: 'steps(8,end)' });
-    current.timer = win.setTimeout(() => { stop(); if (allowed()) react('desktopTV'); }, 2600);
-    return true;
-  }
   function onApp(event) {
     const { id, host } = event.detail || {};
-    if (!Object.hasOwn(APP_REACTIONS, id) || !host?.isConnected || !host.matches('.app-win') || !canStart() || now() - lastApp < 45000) return;
+    if (!Object.hasOwn(APP_REACTIONS, id) || !host?.isConnected || !host.matches('.app-win') ||
+        !allowed() || !mayStart(false) || now() - lastApp < 45000) return;
     lastApp = now();
-    // Perching is only for harmless non-game utility windows. The existing reaction channel owns dialogue throttling.
-    if (id === 'tv' && popcorn(host)) return;
-    if (PERCH.has(id) && perch(host, APP_REACTIONS[id])) return;
     react(APP_REACTIONS[id]);
   }
-  const onInput = () => stop();
-  const onVisibility = () => { if (doc.hidden) stop(); };
-  const onReduce = () => { if (reduce.matches) stop(); };
   win.addEventListener('pondos:app-opened', onApp);
-  doc.addEventListener('click', onClick);
-  doc.addEventListener('pointerdown', onInput, true);
-  doc.addEventListener('keydown', onInput, true);
-  doc.addEventListener('visibilitychange', onVisibility);
-  win.addEventListener('resize', onInput);
-  reduce.addEventListener?.('change', onReduce);
-  return { ambient, playToy, stop, get active() { return !!effect; }, fireflyAvailable: () => allowed(true) && !effect && now() - lastFly >= 45000 && flies().length > 0,
-    catchNearby: () => catchFly(flies()[0], true), reset() { stop(); lastFly = lastApp = -Infinity; lastRomp = now(); }, dispose() {
-    disposed = true; stop(); win.removeEventListener('pondos:app-opened', onApp); doc.removeEventListener('click', onClick);
-    doc.removeEventListener('pointerdown', onInput, true); doc.removeEventListener('keydown', onInput, true);
-    doc.removeEventListener('visibilitychange', onVisibility); win.removeEventListener('resize', onInput);
-    reduce.removeEventListener?.('change', onReduce);
-  } };
+  return {
+    ambient, playToy,
+    // Kept for the taskbar controller's lifecycle. No full-screen animation exists to stop.
+    stop() {}, get active() { return false; },
+    fireflyAvailable,
+    catchNearby() {
+      if (!fireflyAvailable()) return false;
+      showToy('firefly', 1600);
+      react('desktopFirefly');
+      return true;
+    },
+    reset() { lastApp = -Infinity; lastRomp = now(); },
+    dispose() { disposed = true; win.removeEventListener('pondos:app-opened', onApp); },
+  };
 }

@@ -170,7 +170,8 @@ const server = http.createServer((req, res) => {
  const buddy=personality.locator('.pg-companion-button');await buddy.focus();await personality.keyboard.press('Enter');
  for(const label of ['Roll the ball','Squeak the duck','Toss the bottle cap']) {
   await menuAction(personality,label);
-  assert.equal(await personality.locator('.pg-desktop-play-toy, .pg-companion-toy:not([hidden])').first().isVisible(),true);
+  assert.equal(await personality.locator('.pg-companion-toy:not([hidden])').isVisible(),true);
+  assert.equal(await personality.locator('.pg-desktop-frog-frame, .pg-desktop-play-toy').count(),0);
   await personality.evaluate(()=>t.time+=31000);
  }
  await menuAction(personality,'Your favourite toy?');

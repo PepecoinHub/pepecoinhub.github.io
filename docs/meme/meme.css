@@ -2254,34 +2254,24 @@ footer.foot a { color: #edf3e3; }
 .pg-fact-board li { display: flex; justify-content: space-between; gap: 8px; }
 /* the frog flying from the PEPEGOCHI.EXE window to the taskbar */
 .pg-companion-fly { position: fixed; z-index: 98960; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }
-/* Local desktop companion effects: no focus, input capture, layout changes or persistent overlay. */
-.pg-desktop-away .pg-companion-button img { opacity: 0; }
-.pg-desktop-frog-frame, .pg-desktop-firefly, .pg-desktop-tongue, .pg-desktop-popcorn, .pg-desktop-play-toy { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 98959; }
-.pg-desktop-frog-frame { width: 48px; height: 48px; image-rendering: pixelated; }
-.pg-desktop-playing { z-index: 98961; }
-.pg-desktop-play-toy { display: block; box-sizing: border-box; image-rendering: pixelated; z-index: 98962; }
-.pg-desktop-play-toy[data-toy="ball"] { width: 14px; height: 14px; background: #ed7658; border: 2px solid #593b24; box-shadow: inset 3px 2px #ffc894; border-radius: 3px; }
-.pg-desktop-play-toy[data-toy="cap"] { width: 14px; height: 8px; background: #d7b753; border: 2px solid #593b24; box-shadow: inset 0 2px #fff0ad; }
-.pg-desktop-play-toy[data-toy="duck"] { width: 28px; height: 28px; object-fit: contain; }
-.pg-desktop-firefly { width: 5px; height: 5px; margin: -2px; background: #fff6a8; box-shadow: 0 0 6px 2px #ffec6ebf; border-radius: 50%; z-index: 98961; }
-.pg-desktop-tongue { height: 3px; background: #e67d80; border-bottom: 1px solid #9a4048; transform-origin: left center; opacity: 1; transform: scaleX(0); z-index: 98962; }
-.pg-desktop-popcorn { width: 16px; height: 14px; border: 2px solid #632a27; background: repeating-linear-gradient(90deg,#dc5549 0 3px,#fff3cb 3px 6px); box-sizing: border-box; box-shadow: inset 0 -2px #a1382d; }
-.pg-desktop-popcorn::before { content: ''; position: absolute; width: 4px; height: 4px; left: 0; top: -5px; background: #fff1b8; box-shadow: 4px -2px #ffe492, 8px 0 #fff1b8, 0 3px #e5b65a, 4px 2px #fff1b8, 8px 3px #e5b65a; }
-.sky-fly.pg-fly-borrowed { visibility: hidden; }
-@media (prefers-reduced-motion: reduce) { .pg-desktop-frog-frame, .pg-desktop-firefly, .pg-desktop-tongue, .pg-desktop-popcorn, .pg-desktop-play-toy { display: none; } .pg-desktop-away .pg-companion-button img { opacity: 1; } }
+/* Desktop events prompt taskbar poses and speech; the frog never leaves the bar. */
 
 /* A10 greeting: a single whole-pixel hop; frame animation supplies the wave. */
 .pg-motion-welcome { animation: pgc-welcome 910ms steps(1, end) 1; }
 @keyframes pgc-welcome { 0%, 100% { transform: translateY(0); } 20% { transform: translateY(-2px); } 40% { transform: translateY(-4px); } 65% { transform: translateY(-2px); } 85% { transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .pg-motion-welcome { animation: none; } }
 
-.pg-companion-toy { position:absolute; left:44px; bottom:calc(var(--pg-lift, 3px) + 2px); font-size:22px; line-height:24px; pointer-events:none; z-index:151; }
+.pg-companion-toy { position:absolute; left:44px; bottom:calc(100% + var(--pg-lift, 3px) - 1px); font-size:22px; line-height:24px; pointer-events:none; z-index:151; }
 .pg-companion-toy[hidden] { display:none; }
 .pg-companion-toy[data-toy="ball"] { width:14px; height:14px; background:#ed7658; border:2px solid #593b24; box-shadow:inset 3px 2px #ffc894; border-radius:3px; }
 .pg-companion-toy[data-toy="cap"] { width:14px; height:8px; background:#d7b753; border:2px solid #593b24; box-shadow:inset 0 2px #fff0ad; }
-.pg-companion-toy img { display:block; image-rendering:pixelated; }
+.pg-companion-toy[data-toy="duck"] { width:28px; height:28px; }
+.pg-companion-toy[data-toy="firefly"] { width:6px; height:6px; background:#fff6a8; border-radius:50%; box-shadow:0 0 6px 2px #ffec6e; }
+.pg-companion-toy img { display:block; width:28px; height:28px; max-width:none; image-rendering:pixelated; }
 .pg-companion-toy.is-tossed { animation:pgc-toy 3200ms steps(16,end) 1; }
+.pg-companion-toy.is-tossed[data-toy="firefly"] { animation:pgc-firefly 1500ms steps(12,end) 1; }
 @keyframes pgc-toy { 0% { transform:translate(24px,0); } 12% { transform:translate(8px,-18px); } 25% { transform:translate(-8px,-8px); } 38% { transform:translate(-14px,0); } 50% { transform:translate(3px,-12px); } 63% { transform:translate(16px,-4px); } 76% { transform:translate(6px,0); } 88% { transform:translate(-5px,-7px); } 100% { transform:translate(0,0); } }
+@keyframes pgc-firefly { 0%,100% { transform:translate(4px,-8px); opacity:0; } 20% { transform:translate(14px,-17px); opacity:1; } 55% { transform:translate(2px,-22px); opacity:1; } 80% { transform:translate(-6px,-12px); opacity:.8; } }
 .pg-conversation .pg-fact-q { white-space:pre-line; }
 @media (prefers-reduced-motion:reduce) { .pg-companion-toy.is-tossed { animation:none; } }
 
