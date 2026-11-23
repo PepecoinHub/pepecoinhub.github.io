@@ -61,7 +61,9 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
     if (!r.width || !r.height) return false;
     lastFly = now(); onStart();
     const young = !getView()?.adult;
-    const mouth = { x: r.left + r.width * .68, y: r.top + r.height * (young ? .68 : .48) };
+    const step = target.x >= r.left + r.width * .68 ? 18 : -18;
+    const catchX = r.left + step, catchY = r.top - 9;
+    const mouth = { x: catchX + r.width * .59, y: catchY + r.height * (young ? .68 : .42) };
     const approach = { x: mouth.x + (mouth.x < win.innerWidth - 65 ? 42 : -42), y: mouth.y - 14 };
     const current = effect = { animations: [], nodes: [], fly: target.node, timer: 0, watch: 0 };
     target.node.classList.add('pg-fly-borrowed');
@@ -76,18 +78,18 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
     animate(glow, [
       { transform: at(target.x, target.y), opacity: 1 },
       { transform: at(approach.x + 18, approach.y - 12), offset: .6 },
-      { transform: at(approach.x, approach.y), offset: .8 },
+      { transform: at(approach.x, approach.y), offset: 1132 / 1350 },
       { transform: at(mouth.x, mouth.y), opacity: 0 },
-    ], { duration: 1300, easing: 'linear' });
+    ], { duration: 1350, easing: 'linear' });
     const frog = add('img', 'pg-desktop-frog-frame');
     frog.src = young ? img.src : base + 'games/img/pepegochi/taskbar/anim/tb_curious_03.png?v=20261113stand'; frog.alt = '';
-    const step = target.x >= mouth.x ? 18 : -18;
+    // Hold the catch pose until the tongue has fully retracted.
     animate(frog, [
       { transform: at(r.left, r.top) },
-      { transform: at(r.left + step, r.top - 9), offset: .48 },
-      { transform: at(r.left + step, r.top - 9), offset: .72 },
+      { transform: at(catchX, catchY), offset: .48 },
+      { transform: at(catchX, catchY), offset: 1350 / 1650 },
       { transform: at(r.left, r.top) },
-    ], { duration: 1450, easing: 'steps(12,end)' });
+    ], { duration: 1650, easing: 'steps(12,end)' });
     slot.classList.add('pg-desktop-away');
     const tongue = add('span', 'pg-desktop-tongue');
     tongue.style.left = Math.round(mouth.x) + 'px'; tongue.style.top = Math.round(mouth.y) + 'px';
@@ -102,7 +104,7 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
       current.watch = win.requestAnimationFrame(watch);
     };
     current.watch = win.requestAnimationFrame(watch);
-    current.timer = win.setTimeout(() => { stop(); if (allowed(manual)) react('desktopFirefly'); }, 1450);
+    current.timer = win.setTimeout(() => { stop(); if (allowed(manual)) react('desktopFirefly'); }, 1650);
     return true;
   }
   function playToy(kind, manual = true) {
