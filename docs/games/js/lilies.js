@@ -39,6 +39,11 @@
     b.addEventListener('click', function () { if (b.dataset.tab === 'create') startCreate(); else show(b.dataset.tab); });
   });
   $('to-bulletin').addEventListener('click', function () { N.open('bulletin'); });
+  $('hero-play').addEventListener('click', function () {
+    if (GADGET) return N.open('lilies');
+    show('open');
+    $('tab-open').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+  });
   $('hero-new').addEventListener('click', function () { if (GADGET) N.open('lilies', 'new'); else startCreate(); });
   $('g-full').addEventListener('click', function () { N.open('lilies'); });
   $('g-board').addEventListener('click', function () { N.open('bulletin'); });
@@ -63,7 +68,7 @@
       '<rect x="12" y="13" width="8" height="7" fill="#142016"/><rect x="13" y="14" width="6" height="5" fill="#ffffff"/>' +
       '<text class="badge-t" x="16" y="18.6" text-anchor="middle">' + badge + '</text></svg>';
   }
-  var padsEl = $('pads');
+  var padsEl = $('pads'), presetButtons = [];
   LILIES.forEach(function (name, i) {
     var pad = mk('div', 'pad'); pad.setAttribute('role', 'group'); pad.setAttribute('aria-label', name);
     pad.appendChild(mk('h3', null, name));
@@ -78,6 +83,15 @@
     pad._art = art; pad._minus = minus; pad._plus = plus;
     padsEl.appendChild(pad);
   });
+  [
+    { label: 'Balanced · 3/4/3', flies: [3, 4, 3] },
+    { label: 'Two pads · 5/5/0', flies: [5, 5, 0] },
+    { label: 'Middle hold · 2/6/2', flies: [2, 6, 2] }
+  ].forEach(function (setup) {
+    var button = mk('button', null, setup.label); button.type = 'button'; button.setAttribute('aria-pressed', 'false');
+    button.addEventListener('click', function () { flies = setup.flies.slice(); paint(); });
+    $('presets').appendChild(button); presetButtons.push({ button: button, flies: setup.flies });
+  });
   var jar = $('jar');
   for (var j = 0; j < 10; j++) jar.appendChild(mk('span', 'dot'));
   function sum() { return flies[0] + flies[1] + flies[2]; }
@@ -90,6 +104,9 @@
       pad._minus.disabled = flies[i] === 0; pad._plus.disabled = s >= 10;
     });
     Array.prototype.forEach.call(jar.children, function (d, i) { d.classList.toggle('used', i < s); });
+    presetButtons.forEach(function (setup) {
+      setup.button.setAttribute('aria-pressed', String(setup.flies.every(function (n, i) { return n === flies[i]; })));
+    });
     var left = 10 - s; $('flies-left').textContent = left; $('flies-word').textContent = left === 1 ? 'fly' : 'flies';
     $('left-line').className = 'left' + (left === 0 ? ' done' : '');
     $('left-line').lastChild.textContent = left === 0 ? ' left. All 10 flies in position!' : ' still buzzing around';
@@ -106,15 +123,15 @@
     $('alloc-title').textContent = rematch ? 'Rematch with ' + rematch.nick : 'Create a challenge';
     $('alloc-sub').textContent = rematch ? 'A brand-new spread of 10 flies, offered only to ' + rematch.nick + '. Your old spread is not reused.'
       : 'Spread exactly 10 flies over three lily pads. Nobody sees them until somebody accepts. Win two pads, win the duel.';
-    $('submit').textContent = 'Create Challenge';
-    show('create'); paint(); status(me ? 'Place 10 flies.' : 'Log on to post a challenge.');
+    $('submit').textContent = 'Post 48-hour challenge';
+    show('create'); paint(); status(me ? 'Choose a setup or place 10 flies.' : 'Log on to post a challenge.');
   }
   function startAccept(ch) {
     mode = { kind: 'accept', ch: ch }; flies = [0, 0, 0]; $('alloc-msg').textContent = '';
     $('alloc-title').textContent = 'Challenge from ' + ch.creator;
     $('alloc-sub').textContent = ch.creator + ' deployed 10 highly trained flies. You cannot see where. Place your own 10: the result comes at once.';
-    $('submit').textContent = 'Submit Strategy';
-    show('create'); paint(); status('Place 10 flies. The result comes at once.');
+    $('submit').textContent = 'Play and reveal result';
+    show('create'); paint(); status('Choose a setup or place 10 flies. The result comes at once.');
   }
 
   $('submit').addEventListener('click', function () {
@@ -131,7 +148,7 @@
       status('Challenge posted. 48 hours on the clock.');
       show('mine');
       var box = $('posted'); box.textContent = ''; box.hidden = false;
-      box.appendChild(mk('p', null, 'Challenge posted! Call a fren to accept it: whoever opens the link lands right on your challenge.'));
+      box.appendChild(mk('p', null, 'Challenge posted for 48 hours. Your fren can play later while you are away; the result will be in My Matches.'));
       box.appendChild(N.shareRow({ text: 'I hid 10 flies on 3 lily pads in BATTLE OF THREE LILIES on PondOS 98. Find them and beat me 🐸🪰', url: N.SITE + '#lilies=' + r.challenge.id }, 'Share my challenge'));
     }, function (e) {
       busy = false; paint();
@@ -250,23 +267,25 @@
   function loadOpen() {
     return N.rpc('gry_bulletin', { p_limit: 30 }).then(function (b) {
       lastOpen = b.open || [];
-      var others = lastOpen.filter(function (c) { return !c.mine; }).length;
-      $('open-n').textContent = String(lastOpen.length);
+      var playable = lastOpen.filter(function (c) { return !c.mine && (!c.invitee || c.for_me); });
+      var others = playable.length;
+      $('open-n').textContent = String(others);
       var ul = $('open-list'); ul.textContent = '';
-      (GADGET ? lastOpen.filter(function (c) { return !c.mine; }).slice(0, 2) : lastOpen).forEach(function (c) {
+      (GADGET ? playable.slice(0, 2) : playable.concat(lastOpen.filter(function (c) { return c.mine; }))).forEach(function (c) {
         var li = mk('li', 'card duel' + (c.mine ? ' mine' : '')); li.appendChild(face(c));
         var t = mk('div', 'duel-mid');
         var p = mk('p', 'duel-who'); p.appendChild(mk('b', null, c.creator));
         p.appendChild(document.createTextNode(c.mine ? ' (you): waiting for a brave fren.' : taunt(c)));
         t.appendChild(p);
         var meta = mk('div', 'duel-meta'); meta.appendChild(hidden3()); meta.appendChild(ttl(c)); t.appendChild(meta);
+        if (!c.mine && (!c.invitee || c.for_me)) meta.appendChild(mk('span', 'ly-ready', 'Ready now · creator may be offline'));
         li.appendChild(t);
         var acts = mk('div', 'acts');
         if (c.mine) {
           if (!GADGET) t.appendChild(N.shareRow({ text: 'I hid 10 flies on 3 lily pads in BATTLE OF THREE LILIES on PondOS 98. Find them and beat me 🐸🪰', url: N.SITE + '#lilies=' + c.id }, 'Share'));
           var cx = mk('button', null, 'Cancel'); cx.type = 'button'; cx.addEventListener('click', function () { cancel(c.id); }); acts.appendChild(cx);
         } else if (!c.invitee || c.for_me) {
-          var ac = mk('button', 'go accept', 'Accept'); ac.type = 'button';
+          var ac = mk('button', 'go accept', 'Play now'); ac.type = 'button';
           ac.setAttribute('aria-label', 'Accept the challenge from ' + c.creator);
           ac.addEventListener('click', function () {
             if (GADGET) return N.open('lilies', c.id);
@@ -277,18 +296,18 @@
         if (c.creator_passport && !GADGET) { var pp = mk('button', 'small', 'Passport'); pp.type = 'button'; pp.addEventListener('click', function () { N.open('passport', c.creator_passport); }); acts.appendChild(pp); }
         li.appendChild(acts); ul.appendChild(li);
       });
-      if (!ul.children.length) {
+      if (!others) {
         var e = mk('li', 'empty-pond');
         e.appendChild(hidden3());
-        e.appendChild(mk('p', null, lastOpen.length ? 'Only your own challenges are open. Somebody will bite.' : 'The pond is quiet. Suspiciously quiet.'));
-        var go = mk('button', 'go hero-go', 'Be the first: hide your 10 flies'); go.type = 'button';
+        e.appendChild(mk('p', null, 'No duel is waiting for you right now. Leave a move for somebody to answer later.'));
+        var go = mk('button', 'go hero-go', 'Leave a challenge'); go.type = 'button';
         go.addEventListener('click', function () { if (GADGET) N.open('lilies', 'new'); else startCreate(); }); e.appendChild(go);
-        ul.appendChild(e);
+        ul.insertBefore(e, ul.firstChild);
       } else if (GADGET && others > 2) {
         var more = mk('li', 'more'), mb = mk('button', 'linkish', '+ ' + (others - 2) + ' more open duels'); mb.type = 'button';
         mb.addEventListener('click', function () { N.open('lilies'); }); more.appendChild(mb); ul.appendChild(more);
       }
-      status(lastOpen.length + (lastOpen.length === 1 ? ' open challenge' : ' open challenges'));
+      status(others + (others === 1 ? ' challenge ready to play' : ' challenges ready to play'));
     }, offline);
   }
   // the hall of flies: names and numbers only
