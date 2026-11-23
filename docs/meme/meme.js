@@ -5648,7 +5648,7 @@
       var canMod = false, who = null, whoT = 0;
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
       var hazeTips = null;
-      import(BASE + 'games/js/haze-tips.mjs?v=20261123pepcoin').then(function (m) {
+      import(BASE + 'games/js/haze-tips.mjs?v=20261123safari-tip').then(function (m) {
         if (!alive) return;
                 // messageTips: false: 💚 Tip lives on the fren card (click a name), not on every message (Lemon, 2026-11-20)
         hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp, messageTips: false,
