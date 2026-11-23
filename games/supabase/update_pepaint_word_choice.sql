@@ -1,7 +1,7 @@
 -- PEPaint (Draw & Guess): the artist picks one of three words. Run once in Supabase → SQL Editor (New query → paste → Run).
 -- Safe to run again. Needs schema.sql, update_picture_plan.sql, update_pepaint_first_wins.sql and
 -- update_pepaint_volunteers.sql (all live).
---  • Every word has a difficulty: 1 easy, 2 medium, 3 hard. Existing words: one word = easy, two or more = medium.
+--  • Every word has a difficulty: 1 easy, 2 medium, 3 hard. Existing words: easy, except Pepe/crypto/PondOS/fun phrases (medium).
 --    This file adds medium and hard words (phrases and ideas) and moves some existing ones up.
 --  • A turn starts with 12 seconds to pick: the artist sees one easy, one medium and one hard word.
 --    Easy: normal points. Medium: points ×1.5. Hard: points ×2 (for the guesser and for the artist).
@@ -15,44 +15,42 @@ alter table games.words add constraint words_difficulty_check check (difficulty 
 alter table games.secrets add column if not exists choices jsonb;
 alter table games.rooms add column if not exists word_mult numeric(3,1) not null default 1;
 
--- existing words: phrases are medium (only words still at the default are touched, so a re-run keeps manual changes)
-update games.words set difficulty = 2 where difficulty = 1 and word like '% %';
+-- existing words: Pepe / crypto / PondOS / fun phrases are medium ("hot dog", "teddy bear" and other everyday
+-- compound nouns stay easy). Only words still at the default are touched, so a re-run keeps manual changes.
+update games.words set difficulty = 2 where difficulty = 1 and word like '% %' and category in ('pepe', 'crypto', 'pondos', 'fun');
 
 -- new words; an existing word in this list moves to the listed difficulty
 insert into games.words(word, category, difficulty) values
-  -- medium (×1.5)
-  ('frog astronaut','pepe',2), ('frog chef','pepe',2), ('frog pirate','pepe',2), ('frog detective','pepe',2),
-  ('frog ninja','pepe',2), ('frog wedding','pepe',2), ('frog dentist','pepe',2), ('frog zombie','pepe',2),
-  ('frog on vacation','pepe',2), ('frog superhero','pepe',2), ('frog in the rain','pepe',2), ('frog dj','pepe',2),
-  ('mining rig','crypto',2), ('green candle','crypto',2), ('red candle','crypto',2), ('cold wallet','crypto',2),
-  ('gas fee','crypto',2), ('crypto wallet','crypto',2), ('block explorer','crypto',2), ('price chart','crypto',2),
+  ('frog astronaut','pepe',2), ('frog chef','pepe',2), ('frog pirate','pepe',2), ('frog wedding','pepe',2),
+  ('frog dentist','pepe',2), ('frog zombie','pepe',2), ('frog on vacation','pepe',2), ('frog superhero','pepe',2),
+  ('frog in the rain','pepe',2), ('frog dj','pepe',2), ('mining rig','crypto',2), ('green candle','crypto',2),
+  ('red candle','crypto',2), ('gas fee','crypto',2), ('block explorer','crypto',2), ('blockchain','crypto',2),
   ('night owl','fun',2), ('early bird','fun',2), ('couch potato','fun',2), ('brain freeze','fun',2),
   ('power nap','fun',2), ('road rage','fun',2), ('jet lag','fun',2), ('bad hair day','fun',2),
   ('first date','fun',2), ('group chat','fun',2), ('low battery','fun',2), ('wifi password','fun',2),
-  ('selfie stick','things',2), ('traffic jam','places',2), ('haunted house','places',2), ('treasure map','things',2),
-  ('magic trick','actions',2), ('sleepwalking','actions',2), ('photobomb','actions',2), ('stage fright','fun',2),
-  -- hard (×2): ideas, sayings and situations
-  ('bear market','crypto',3), ('bull market','crypto',3), ('rug pull','crypto',3), ('diamond hands','crypto',3),
-  ('paper hands','crypto',3), ('to the moon','crypto',3), ('buy the dip','crypto',3), ('pump and dump','crypto',3),
-  ('whale alert','crypto',3), ('seed phrase','crypto',3), ('private key','crypto',3), ('halving','crypto',3),
-  ('hash rate','crypto',3), ('block reward','crypto',3), ('proof of work','crypto',3), ('double spend','crypto',3),
-  ('exit scam','crypto',3), ('all time high','crypto',3), ('crypto winter','crypto',3), ('market crash','crypto',3),
-  ('dead cat bounce','crypto',3), ('bag holder','crypto',3), ('liquidation','crypto',3), ('stop loss','crypto',3),
-  ('fomo','crypto',3), ('hodl','crypto',3), ('fud','crypto',3), ('wen lambo','crypto',3),
-  ('not your keys','crypto',3), ('airdrop','crypto',3), ('faucet','crypto',3), ('whitepaper','crypto',3),
+  ('stage fright','fun',2), ('selfie stick','things',2), ('treasure map','things',2), ('traffic jam','places',2),
+  ('haunted house','places',2), ('magic trick','actions',2), ('sleepwalking','actions',2), ('photobomb','actions',2),
+  ('blue screen','pondos',2), ('bear market','crypto',3), ('bull market','crypto',3), ('rug pull','crypto',3),
+  ('diamond hands','crypto',3), ('paper hands','crypto',3), ('to the moon','crypto',3), ('buy the dip','crypto',3),
+  ('pump and dump','crypto',3), ('whale alert','crypto',3), ('seed phrase','crypto',3), ('private key','crypto',3),
+  ('halving','crypto',3), ('hash rate','crypto',3), ('block reward','crypto',3), ('proof of work','crypto',3),
+  ('double spend','crypto',3), ('exit scam','crypto',3), ('all time high','crypto',3), ('crypto winter','crypto',3),
+  ('market crash','crypto',3), ('dead cat bounce','crypto',3), ('bag holder','crypto',3), ('liquidation','crypto',3),
+  ('stop loss','crypto',3), ('fomo','crypto',3), ('hodl','crypto',3), ('fud','crypto',3),
+  ('wen lambo','crypto',3), ('airdrop','crypto',3), ('faucet','crypto',3), ('whitepaper','crypto',3),
   ('smart contract','crypto',3), ('merge mining','crypto',3), ('fear and greed','crypto',3), ('degen','crypto',3),
+  ('hash','crypto',3), ('node','crypto',3), ('satoshi','crypto',3), ('ticker','crypto',3),
   ('feels good man','pepe',3), ('pond party','pepe',3), ('frog in disguise','pepe',3), ('frog influencer','pepe',3),
   ('time travel','fun',3), ('deja vu','fun',3), ('plot twist','fun',3), ('spoiler alert','fun',3),
   ('midlife crisis','fun',3), ('peer pressure','fun',3), ('comfort zone','fun',3), ('inside joke','fun',3),
   ('awkward silence','fun',3), ('cold feet','fun',3), ('piece of cake','fun',3), ('break the ice','fun',3),
   ('elephant in the room','fun',3), ('cloud nine','fun',3), ('under the weather','fun',3), ('hot potato','fun',3),
   ('head in the clouds','fun',3), ('black friday','fun',3), ('monday morning','fun',3), ('out of office','fun',3),
-  ('new year resolution','fun',3), ('global warming','nature',3), ('gravity','nature',3), ('echo','nature',3),
-  ('shadow','nature',3), ('dream','fun',3), ('nightmare','fun',3), ('silence','fun',3),
-  ('freedom','fun',3), ('luck','fun',3), ('karma','fun',3), ('invisible man','people',3),
-  ('parallel universe','fun',3), ('lost in translation','fun',3), ('butterfly effect','fun',3), ('daylight saving','fun',3),
-  ('internet','things',3), ('password','things',3), ('loading screen','things',3), ('blue screen','things',3),
-  ('autocorrect','things',3), ('captcha','things',3), ('lag','things',3), ('buffering','things',3)
+  ('dream','fun',3), ('nightmare','fun',3), ('freedom','fun',3), ('luck','fun',3),
+  ('karma','fun',3), ('parallel universe','fun',3), ('lost in translation','fun',3), ('butterfly effect','fun',3),
+  ('global warming','nature',3), ('gravity','nature',3), ('echo','nature',3), ('shadow','nature',3),
+  ('invisible man','people',3), ('internet','things',3), ('password','things',3), ('autocorrect','things',3),
+  ('captcha','things',3), ('lag','things',3), ('buffering','things',3)
 on conflict (word) do update set difficulty = excluded.difficulty;
 
 -- ---------- a turn starts with three words to pick from ----------

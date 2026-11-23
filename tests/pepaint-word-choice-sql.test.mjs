@@ -34,12 +34,14 @@ test('PEPaint: pick one of three words, ×1.5 / ×2 bonus, easy word when time i
   try {
     await db.query(STUBS);
     for (const f of ['schema.sql', 'update_picture_plan.sql', 'update_pepaint_first_wins.sql', 'update_limits_cleanup.sql', 'update_pepaint_volunteers.sql', 'update_pepaint_top.sql']) await db.query(await read(f));
-    await db.query("insert into games.words(word) values ('frog'), ('lily pad'), ('moon'), ('crown'), ('fly'), ('pond'), ('frog on a rocket') on conflict do nothing");
+    await db.query("insert into games.words(word) values ('frog'), ('lily pad'), ('moon'), ('crown'), ('fly'), ('pond') on conflict do nothing");
+    await db.query("insert into games.words(word, category) values ('frog on a rocket', 'pepe'), ('hot dog', 'food') on conflict do nothing");
     await db.query(await read('update_pepaint_word_choice.sql'));
     await db.query(await read('update_pepaint_word_choice.sql'));   // safe to run again
     const tiers = (await db.query('select difficulty d, count(*)::int n from games.words group by 1 order by 1')).rows;
     assert.deepEqual(tiers.map(x => x.d), [1, 2, 3]);
-    assert.equal((await db.query("select difficulty v from games.words where word = 'lily pad'")).rows[0].v, 2, 'phrases are medium');
+    assert.equal((await db.query("select difficulty v from games.words where word = 'frog on a rocket'")).rows[0].v, 2, 'Pepe phrases are medium');
+    assert.equal((await db.query("select difficulty v from games.words where word = 'hot dog'")).rows[0].v, 1, 'everyday compound nouns stay easy');
     assert.equal((await db.query("select difficulty v from games.words where word = 'frog'")).rows[0].v, 1);
     const ids = [1, 2, 3].map(i => '00000000-0000-4000-8000-00000000000' + i);
     for (const id of ids) await db.query('insert into auth.users(id) values ($1)', [id]);
