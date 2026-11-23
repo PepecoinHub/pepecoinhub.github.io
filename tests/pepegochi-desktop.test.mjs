@@ -72,6 +72,17 @@ test('a healthy froglet uses its own sprite; quiet blocks automatic but not manu
  f.needCare();f.watch();assert.equal(f.control.active,false);assert.equal(f.control.fireflyAvailable(),false);f.control.dispose();
 });
 
+test('desk toys become a full-screen chase and occasional autonomous play', () => {
+  const f = fixture();
+  assert.equal(f.control.playToy('ball'), true);
+  assert.equal(f.control.active, true);
+  assert.deepEqual(f.doc.body.children.map(x => x.className), ['pg-desktop-frog-frame pg-desktop-playing', 'pg-desktop-play-toy']);
+  f.finish(); assert.equal(f.control.active, false); assert.equal(f.doc.body.children.length, 0);
+  f.doc.documentElement.classList.remove('sky-night'); f.advance(); f.advance();
+  assert.equal(f.control.ambient(), true, 'after two quiet minutes the frog starts a bounded play story');
+  f.finish(); assert.equal(f.control.active, false); f.control.dispose();
+});
+
 test('perching and popcorn use actual app openings, cancel on movement and leave gameplay alone', () => {
   const f=fixture(), host=f.host();
   f.win.emit('pondos:app-opened',{detail:{id:'yeet',host}});assert.equal(f.control.active,false);

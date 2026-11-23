@@ -89,8 +89,8 @@ test('nine short taskbar movements never use an infinite CSS loop and honor redu
   }
   assert.match(js, /prefers-reduced-motion: reduce/);
   assert.match(js, /document\.visibilityState !== 'visible'/);
-  assert.match(js, /setTimeout\(queueMotion, 1050\)/);
-  assert.doesNotMatch(css.slice(css.indexOf('Short, rare PepeGochi actions')), /infinite/);
+  assert.match(js, /setTimeout\(after, 1050\)/);
+  assert.doesNotMatch(css.slice(css.indexOf('Bounded PepeGochi actions')), /infinite/);
 });
 
 // ---------- added on claude/kind-faraday-l3vxjs: fixes, Pond Quiz, hop out of the window ----------
@@ -166,7 +166,7 @@ test('A3 + PR #390: the 17 animations are 65 real 48 x 48 frames that pass the a
   assert.match(js, /if \(a && showing\(a\.base\)\)/, 'frames only over their own pose; otherwise the CSS move');
 });
 test('PR #390: care, stamps, Find and notes play their own frames, only over the healthy sitting pose', async () => {
-  const { ANIMS, ACTION_ANIM } = await import('../docs/meme/pepegochi-taskbar.mjs');
+  const { ANIMS, ACTION_ANIM, ACTION_SEQUENCES, IDLE_DELAY_MIN, IDLE_DELAY_SPAN } = await import('../docs/meme/pepegochi-taskbar.mjs');
   for (const [action, name] of Object.entries(ACTION_ANIM)) {
     assert.ok(ANIMS[name], action + ' -> ' + name);
     assert.equal(ANIMS[name].base, 'tb_adult_sit', name);
@@ -174,4 +174,10 @@ test('PR #390: care, stamps, Find and notes play their own frames, only over the
   assert.equal(ACTION_ANIM.fed, 'eat'); assert.equal(ACTION_ANIM.clean, 'wash'); assert.equal(ACTION_ANIM.rested, 'sleep');
   assert.equal(ACTION_ANIM.stamp, 'celebrate');
   assert.equal(ANIMS.tadpole_swim.base, 'tb_tadpole'); assert.equal(ANIMS.froglet_hop.base, 'tb_froglet');
+  assert.deepEqual(Object.keys(ACTION_SEQUENCES), ['played', 'toyBall', 'toyDuck', 'toyCap']);
+  for (const story of Object.values(ACTION_SEQUENCES)) {
+    assert.ok(story.length >= 4, 'play is a real sequence, not one short gesture');
+    for (const name of story) assert.ok(ANIMS[name] || ['nuzzle', 'welcome', 'curious'].includes(name), name);
+  }
+  assert.equal(IDLE_DELAY_MIN, 6000); assert.equal(IDLE_DELAY_SPAN, 9000);
 });

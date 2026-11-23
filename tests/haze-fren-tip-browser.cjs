@@ -26,8 +26,8 @@ const root=path.join(__dirname,'..','docs');let server,browser;
     const url=new URL(req.url,'http://localhost');
     if(url.pathname==='/'){res.writeHead(200,{'Content-Type':'text/html'});res.end(html);return;}
     const file=path.join(root,url.pathname);
-    if(!file.startsWith(root)||!/\.(mjs|css)$/.test(file)||!fs.existsSync(file)){res.writeHead(404);res.end();return;}
-    res.writeHead(200,{'Content-Type':file.endsWith('.css')?'text/css':'text/javascript'});res.end(fs.readFileSync(file));
+    if(!file.startsWith(root)||!/\.(mjs|css|svg)$/.test(file)||!fs.existsSync(file)){res.writeHead(404);res.end();return;}
+    res.writeHead(200,{'Content-Type':file.endsWith('.css')?'text/css':file.endsWith('.svg')?'image/svg+xml':'text/javascript'});res.end(fs.readFileSync(file));
   });
   await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;
   browser=await chromium.launch({headless:true,executablePath:process.env.HAZE_CHROMIUM});
@@ -63,6 +63,7 @@ const root=path.join(__dirname,'..','docs');let server,browser;
   await page.locator('.haze-party-banner').waitFor();
   assert.match(await page.locator('.haze-party-banner').innerText(),/\+500 PEP[\s\S]*from Jules/);
   assert.ok(await page.locator('.haze-party-coin').count()>0);
+  assert.match(await page.locator('.haze-party-coin').first().evaluate(el=>getComputedStyle(el).backgroundImage),/coin-p\.svg/);
   await page.waitForTimeout(700);await page.screenshot({path:'/tmp/haze-party.png'});
   await page.locator('.haze-party').waitFor({state:'detached',timeout:6000});
   await page.evaluate(async()=>{document.querySelector('.haze-chat-receipt').remove();window.t.api.invalidate();await window.t.api.sync();});

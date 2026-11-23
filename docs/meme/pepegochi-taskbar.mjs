@@ -6,17 +6,17 @@ import { createArcadeObserver } from './pepegochi-arcade.mjs?v=20261116sass1';
 // and the hop out of the PEPEGOCHI.EXE window.
 import { frogLook, LOOK_BELOW } from '../games/js/pepegochi-room.mjs?v=20261120notes3';
 import { dayNumber, remark } from './pepegochi-facts.mjs';
-import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261121a12';
+import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261123fun1';
 import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
 import { createRumorReader } from './pepegochi-rumors.mjs?v=20261120notes3';
-import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261118dialog1';
+import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261123fun1';
 
 import { createBond } from './pepegochi-bond.mjs?v=20261120notes3';
 import { createNotebook } from './pepegochi-notes.mjs?v=20261121map';
 
 import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120notes3';
 // A12 life of its own (owner spec 2026-11-21): habits on the taskbar, the diary, the day's rare event.
-import { pickHabit, habitSequence, HABITS } from './pepegochi-habits.mjs?v=20261121a12';
+import { pickHabit, habitSequence, HABITS } from './pepegochi-habits.mjs?v=20261123fun1';
 import { createDiary, sameBook } from './pepegochi-diary.mjs?v=20261122read';
 import { tripState, formatLeft } from './pepegochi-trips.mjs?v=20261122life';
 import { rareOfDay, localDay } from './pepegochi-rare.mjs?v=20261121a12';
@@ -57,6 +57,16 @@ export const ANIMS = {
 // what the frog just did or saw -> its own animation (only over the healthy sitting pose; otherwise the old expressions)
 export const ACTION_ANIM = { fed: 'eat', clean: 'wash', rested: 'sleep', stamp: 'celebrate', stampBatch: 'celebrate',
   quizWin: 'celebrate', gameRecord: 'celebrate', gameMoon: 'celebrate', desktopFind: 'search', desktopGuesser: 'search', desktopNotes: 'read' };
+// Longer, user-visible stories assembled only from approved frames. They keep the frog lively without inventing
+// a new look or letting a cosmetic action override its authoritative care state.
+export const ACTION_SEQUENCES = Object.freeze({
+  played: ['greet', 'hop', 'shuffle', 'welcome'],
+  toyBall: ['curious', 'hop', 'shuffle', 'hop', 'welcome'],
+  toyDuck: ['curious', 'peek', 'nuzzle', 'greet'],
+  toyCap: ['search', 'hop', 'celebrate', 'welcome'],
+});
+export const IDLE_DELAY_MIN = 6000;
+export const IDLE_DELAY_SPAN = 9000;
 export const animFrames = name => Array.from({ length: ANIMS[name].frames },
   (_, i) => 'taskbar/anim/tb_' + name + '_0' + (i + 1) + '.png');
 // the room's sprite for the frog's state (frogLook) -> the taskbar pose that shows the same state
@@ -184,7 +194,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   const toy = document.createElement('span'); toy.className = 'pg-companion-toy';
   toy.setAttribute('aria-hidden', 'true'); toy.hidden = true; slot.append(toy);
   function clearToy() { clearTimeout(toyTimer); toyTimer = null; toy.hidden = true; toy.classList.remove('is-tossed'); }
-  function showToy(id) {
+  function showToy(id, duration = 4800) {
     if (!Object.hasOwn(TOYS, id)) return;
     clearToy(); toy.replaceChildren(); toy.dataset.toy = id;
     if (id === 'duck') {
@@ -192,7 +202,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     }
     toy.hidden = false;
     void toy.offsetWidth; toy.classList.add('is-tossed');
-    toyTimer = setTimeout(clearToy, 1800);
+    toyTimer = setTimeout(clearToy, duration);
   }
   // the frog sits ON the taskbar: measure how far the button is below the bar's top edge (CSS --pg-lift)
   const edgeOf = bar.closest('header') || bar;
@@ -213,7 +223,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   });
   button.addEventListener('pointerleave', () => { if (act === 'tb_adult_wave') { setAct(null); queueMotion(); } });
 
-  // Very short motions, not an endlessly looping animation. Only one is active at a time,
+  // Bounded motions and small multi-action stories, never an endless loop. Only one is active at a time,
   // and no animation or running timer is needed when the browser is hidden / reduced motion is set.
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const motions = {
@@ -221,6 +231,12 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     adult: ['hop', 'peek', 'shuffle', 'greet', 'bob'], sleepy: ['nod', 'yawn', 'bob'],
     neglected: ['slouch', 'peek'], packing: ['tremble', 'shuffle'],
     recovering: ['nod', 'bob'], letter: [],
+  };
+  const idleStories = {
+    egg: [['wobble', 'bob']], tadpole: [['tadpole_swim', 'peek'], ['bob', 'tadpole_swim']],
+    froglet: [['froglet_hop', 'peek'], ['shuffle', 'froglet_hop'], ['peek', 'hop']],
+    adult: [['peek', 'bob'], ['shuffle', 'peek'], ['curious', 'bob'], ['greet', 'peek'], ['hop', 'bob']],
+    sleepy: [['nod', 'yawn']], recovering: [['nod', 'bob']],
   };
   let currentMood = 'egg', movement = null, motionTimer = null, restoreTimer = null;
   let frameTimer = null;
@@ -237,7 +253,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   }
   // the frog shows exactly this pose right now (no talking/waving pose over it)
   const showing = id => !act && shownView && shownView.sprite === pose(id);
-  function playMotion(name) {
+  function playMotion(name, after = queueMotion) {
     if (movement) button.classList.remove('pg-motion-' + movement);
     movement = name;
     const a = ANIMS[name] || EXPRESSIONS[name];
@@ -251,13 +267,25 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
         // the froglet's hop: the drawn frames bend the legs, a small lift in the middle frames makes it a real hop
         if (name === 'froglet_hop') img.classList.toggle('pg-hop-up', i === 1 || i === 2);
         if (i < frames.length) { img.setAttribute('src', img_base + frames[i++] + '?v=' + POSE_VERSION); frameTimer = setTimeout(step, a.ms); }
-        else { frameTimer = null; img.classList.remove('pg-hop-up'); paint(shownView); restoreTimer = setTimeout(queueMotion, 50); }
+        else { frameTimer = null; img.classList.remove('pg-hop-up'); paint(shownView); restoreTimer = setTimeout(after, 140); }
       };
       step();
       return;
     }
     button.classList.add('pg-motion-' + movement);
-    restoreTimer = setTimeout(queueMotion, 1050);
+    restoreTimer = setTimeout(after, 1050);
+  }
+  function playSequence(names) {
+    const pending = [...names];
+    const next = () => {
+      if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected || desktop?.active || act || disposed) {
+        queueMotion(); return;
+      }
+      const name = pending.shift();
+      if (!name) { queueMotion(); return; }
+      playMotion(name, next);
+    };
+    next();
   }
   // A12 habit: its frames over the sitting pose (repeats and a held last frame included), then a line, then the pose again
   function playHabit(name) {
@@ -288,19 +316,25 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     if (own && view?.hasPet && view.adult && !view.warning && view.sprite === pose(ANIMS[own].base)) return own;
     return expressionFor(view, action);
   };
+  const activityFor = (view, action) => {
+    const story = ACTION_SEQUENCES[action];
+    if (story && view?.adult && !view.warning && view.sprite === pose('tb_adult_sit')) return story;
+    const single = animFor(view, action);
+    return single ? [single] : [];
+  };
   function animateExpression(action) {
-    const name = animFor(shownView, action);
-    if (!name || reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return false;
+    const names = activityFor(shownView, action);
+    if (!names.length || reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return false;
     cancelMotion(); setAct(null);
     const ticket = ++expressionTicket;
     const life = lastLife;
-    Promise.all([...new Set(framesOf(name))].map(f => new Promise(resolve => {
+    Promise.all([...new Set(names.flatMap(framesOf))].map(f => new Promise(resolve => {
       const frame = new Image(); frame.onload = () => resolve(true); frame.onerror = () => resolve(false);
       frame.src = img_base + f + '?v=' + POSE_VERSION;
     }))).then(loaded => {
       if (ticket !== expressionTicket || disposed || life !== lastLife || reduced.matches ||
-          document.visibilityState !== 'visible' || !slot.isConnected || animFor(shownView, action) !== name) return;
-      if (loaded.every(Boolean)) playMotion(name); else queueMotion();
+          document.visibilityState !== 'visible' || !slot.isConnected || activityFor(shownView, action).join('|') !== names.join('|')) return;
+      if (loaded.every(Boolean)) playSequence(names); else queueMotion();
     });
     return true;
   }
@@ -321,19 +355,24 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
         if (desktop?.ambient()) return;
         if (desktop?.active || act) { queueMotion(); return; }
         playHabit(habit);
-      }, habit === 'sign' ? 1500 : 13000 + Math.floor(Math.random() * 20000));
+      }, habit === 'sign' ? 1500 : IDLE_DELAY_MIN + Math.floor(random() * 11000));
       return;
     }
-    const next = choices[Math.floor(Math.random() * choices.length)];
-    const nextAnim = ANIMS[next] || EXPRESSIONS[next];
-    if (shownView && nextAnim && showing(nextAnim.base)) preload(next);
+    const stories = idleStories[currentMood] || [];
+    const next = stories.length && random() < .72
+      ? stories[Math.floor(random() * stories.length)]
+      : [choices[Math.floor(random() * choices.length)]];
+    for (const name of next) {
+      const nextAnim = ANIMS[name] || EXPRESSIONS[name];
+      if (shownView && nextAnim && showing(nextAnim.base)) preload(name);
+    }
     motionTimer = setTimeout(() => {
       motionTimer = null;
       if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected) return;
       if (conversation?.invite()) return;
       if (desktop?.ambient()) return;
-      playMotion(next);
-    }, 13000 + Math.floor(Math.random() * 20000));
+      playSequence(next);
+    }, IDLE_DELAY_MIN + Math.floor(random() * IDLE_DELAY_SPAN));
   }
   const motionPreferenceChanged = () => queueMotion();
   if (reduced.addEventListener) reduced.addEventListener('change', motionPreferenceChanged);
@@ -712,7 +751,8 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   window.addEventListener('pondos:pepegochi-left', onLeftWindow);
   document.addEventListener('visibilitychange', onVisible);
   conversation = mountFrogInteractions({ button, img, slot, getView: () => ({ ...shownView, trustReady: shownView?.trustReady && confirmedAt !== null && now()-confirmedAt >= 0 && now()-confirmedAt <= 5*60000 }),
-    setPose: p => { desktop?.stop(); cancelMotion(); setAct(p); if (!p) queueMotion(); }, animate: animateExpression, showToy, openRoom: open,
+    setPose: p => { desktop?.stop(); cancelMotion(); setAct(p); if (!p) queueMotion(); }, animate: animateExpression,
+    showToy: id => { if (!desktop?.playToy(id, true)) showToy(id); }, openRoom: open,
     closeQuiz: cancelQuiz, quizAvailable: () => !factBtn.hidden,
     openQuiz: requestQuiz, commands, care: taskbarCare, bond, fireflyAvailable: () => desktop?.fireflyAvailable(), catchFirefly: () => desktop?.catchNearby(),
     readRumors: rumorsEnabled ? rumors.read : null, notebook: rumorsEnabled ? notebook : null, lifeId: () => lastLife, openPassport, getQuote,
@@ -725,7 +765,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   });
   desktop = mountDesktopCompanion({ slot, img, getView: () => shownView, base, now,
     eligible: manual => !disposed && !balloon && (manual || !bond.muted) && !!lastLife && document.activeElement?.tagName !== 'IFRAME' && !document.fullscreenElement,
-    mayStart: () => !act && !conversation.busy && !document.querySelector('.pg-companion-fly'),
+    mayStart: manual => (manual || (!act && !conversation.busy)) && !document.querySelector('.pg-companion-fly'),
     react: action => conversation.react(action), onStart: cancelMotion, onEnd: queueMotion });
   const onOffline = () => conversation?.react('offline');
   const onOnline = () => conversation?.react('online');

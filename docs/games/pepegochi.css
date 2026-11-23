@@ -88,6 +88,8 @@ html.embed body { padding-inline: 0; }
 /* idle: up and down by 2 art pixels (1.5625% of 128), in steps, so the pixels never blur between two places */
 @keyframes pgr-bob { 50% { transform: translate(-50%, calc(-1 * var(--foot) - 1.5625%)); } }
 .pgr-neglected .pgr-pet { animation-duration: 2.4s; }
+.pgr-idle-look .pgr-pet { animation: pgr-idle-look 1500ms steps(1,end) 1; }
+@keyframes pgr-idle-look { 20%,40% { transform: translate(calc(-50% - 2px), calc(-1 * var(--foot))); } 60%,80% { transform: translate(calc(-50% + 2px), calc(-1 * var(--foot))); } }
 .pgr-packing .pgr-pet, .pgr-adopt .pgr-pet { animation: none; }
 /* a state sprite not drawn yet (frogLook: fallback): the idle sprite with a hint of grey when neglected or packing */
 .pgr-neglected .pgr-pet[data-fallback], .pgr-packing .pgr-pet[data-fallback] { filter: grayscale(.45); }
@@ -229,6 +231,12 @@ html.embed .pgb-care-tile .is-low { color:#861b14; }
 
 /* Keep the room response and the accessible controls in a single compact strip. */
 .pgr-toolbar { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:stretch; background:#d4d0c8; border-top:2px groove #aaa; }
+.pgr-quick { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:5px; padding:3px 6px 7px; }
+.pgr-quick-action { min-height:36px; padding:4px 9px; color:#123621; background:#e5eed5; border:2px outset #e5eed5; font:700 13px Tahoma,sans-serif; cursor:pointer; }
+.pgr-quick-action:hover { background:#d0e8b7; }
+.pgr-quick-action:focus-visible { outline:2px solid #174f30; outline-offset:1px; }
+@media (max-width:480px) { .pgr-quick-action { flex:1; min-height:44px; } }
+@media (prefers-reduced-motion:reduce) { .pgr-idle-look .pgr-pet { animation:none; } }
 .pgb .pgr-toolbar .pgr-response { margin:0; padding:5px 6px; min-height:0; display:flex; align-items:center; border:0; color:#333; font-size:12px; line-height:1.3; overflow-wrap:anywhere; }
 .pgr-toolbar .pgr-shortcuts { border:0; padding:0 4px; }
 .pgr-toolbar .pgr-shortcuts summary { display:list-item; min-height:44px; line-height:18px; padding:13px 4px; font-size:12px; white-space:nowrap; }
