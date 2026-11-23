@@ -241,7 +241,7 @@ function renderAlbum(v) {
 
 // ---------- A12 diary + rare event ----------
 // The diary is written by the taskbar frog in PondOS; this window only reads it (pepegochi-diary.mjs diaryFor).
-let diaryOpen = false, diaryDay = null;   // diaryDay: the one day the diary shows, null = all days
+let diaryOpen = false, diaryDay = null;   // diaryDay: null = the newest day (default), 'all' = every day, a number = that day
 const owner = () => { const u = backend?.session?.()?.user; return u && !u.is_anonymous ? u.id : null; };
 const livingPet = () => { const p = game.last?.pet; return p && p.status !== 'departed' && p.stage && p.stage !== 'egg' ? p : null; };
 function todayRare() {
@@ -259,26 +259,30 @@ function renderDiary(box) {
   if (!diaryOpen || !p || !id) { diaryOpen = false; return; }
   const pages = myDiary().pages.slice().reverse();
   const pad = el('div', { class: 'pgb-notepad pgb-diary', role: 'document', 'aria-label': 'DIARY.TXT', id: 'pgb-diary', tabindex: '-1' });
-  // A long diary stays a short box: newest first in a scrolling list, and a day picker to jump to one day (Lemon, 2026-11-23)
+  // A long diary stays short: it opens on the newest day only, older days and 'All days' come from the picker,
+  // and the pages sit in a scroll box (Lemon / owner, 2026-11-23)
   const days = [...new Set(pages.map(pg => pg.day))];
-  if (diaryDay !== null && !days.includes(diaryDay)) diaryDay = null;
+  if (typeof diaryDay === 'number' && !days.includes(diaryDay)) diaryDay = null;
+  const showDay = diaryDay === 'all' ? null : diaryDay ?? days[0] ?? null;
   let picker = null;
   if (days.length > 1) {
     const sel = el('select', { id: 'pgb-diary-day', 'data-diary-day': '1' });
-    sel.append(el('option', { value: '' }, 'All days (' + pages.length + ' pages)'));
-    for (const d of days) {
+    days.forEach((d, k) => {
       const n = pages.filter(pg => pg.day === d).length;
-      const o = el('option', { value: String(d) }, 'Day ' + d + (n > 1 ? ' (' + n + ' pages)' : ''));
-      if (d === diaryDay) o.selected = true;
+      const o = el('option', { value: String(d) }, 'Day ' + d + (k === 0 ? ' - newest' : '') + (n > 1 ? ' (' + n + ' pages)' : ''));
+      if (d === showDay) o.selected = true;
       sel.append(o);
-    }
+    });
+    const all = el('option', { value: 'all' }, 'All days (' + pages.length + ' pages)');
+    if (showDay === null) all.selected = true;
+    sel.append(all);
     picker = el('label', { class: 'pgb-diary-pick', for: 'pgb-diary-day' }, 'Show: '); picker.append(sel);
   }
   const ol = el('ol', { reversed: true, class: 'pgb-diary-list', tabindex: '0', 'aria-label': 'Diary pages' });
-  if (isSnoopHour(new Date().getHours()) && diaryDay === null) ol.append(el('li', {}, SNOOP_LINE));
+  if (isSnoopHour(new Date().getHours()) && (showDay === null || showDay === days[0])) ol.append(el('li', {}, SNOOP_LINE));
   if (!pages.length) ol.append(el('li', {}, 'Nothing yet. Come back later, the frog writes while you are away.'));
   // i stays the page's place in the whole diary, so the Picture button (showPage) finds the same page when filtered
-  pages.map((pg, i) => ({ pg, i })).filter(x => diaryDay === null || x.pg.day === diaryDay).slice(0, 200).forEach(({ pg, i }) => {
+  pages.map((pg, i) => ({ pg, i })).filter(x => showDay === null || x.pg.day === showDay).slice(0, 200).forEach(({ pg, i }) => {
     const li = el('li', {}, pg.text); li.append(el('small', {}, 'Day ' + pg.day));
     li.append(el('button', { type: 'button', class: 'pgb-diary-save', 'data-save-page': String(i), title: 'Show this page as a picture', 'aria-label': 'Show the page of day ' + pg.day + ' as a picture' }, 'Picture'));
     ol.append(li);
@@ -512,7 +516,7 @@ $('pgb-body').addEventListener('click', e => {
 });
 $('pgb-body').addEventListener('change', e => {
   if (!e.target.closest('[data-diary-day]')) return;
-  diaryDay = e.target.value === '' ? null : Number(e.target.value);
+  diaryDay = e.target.value === 'all' ? 'all' : Number(e.target.value);
   render();
   $('pgb-diary-day')?.focus({ preventScroll: true });
 });
