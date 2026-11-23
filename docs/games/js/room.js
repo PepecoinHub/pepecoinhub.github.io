@@ -46,6 +46,21 @@ const meId = () => S?.me?.user_id;
 const isRoomHost = () => S && meId() === S.room.host_id;
 const isDrawer = () => S && S.room.mode === 'kalambury' && S.room.phase === 'turn' && S.room.drawer_id === meId();
 const isImgHost = () => S && S.room.mode === 'obrazek' && isRoomHost();
+// PEPaint word choice (update_pepaint_word_choice.sql): a turn starts with the artist picking 1 of 3 words. Until then
+// the server has no answer yet, so the mask is '' (a real word always has at least one "_").
+const picking = () => S && S.room.mode === 'kalambury' && S.room.phase === 'turn' && S.mask === '';
+const TIERS = { 1: { name: 'Easy', color: '#3f9d4a' }, 2: { name: 'Medium', color: '#c79a16' }, 3: { name: 'Hard', color: '#c8452e' } };
+let pickChoices = null, pickTurn = null, autoPickTurn = null;
+async function loadChoices() {
+  const turn = S.room.turn_id; if (pickTurn === turn) return; pickTurn = turn; pickChoices = null;
+  try { pickChoices = await be.rpc('gry_word_choices', { p_code: code }); } catch { pickChoices = null; }
+  if (S && S.room.turn_id === turn) renderOverlay(true);
+}
+async function pickWord(tier) {
+  try { const r = await be.rpc('gry_pick_word', { p_code: code, p_tier: tier }); if (r && r.ok === false && r.error === 'wait') toast('Not yet', 'bad'); }
+  catch (e) { toast(e.message, 'bad'); }
+  fetchState();
+}
 const modName = () => S?.room.mode === 'kalambury' ? 'room moderator' : 'host';
 
 function blank() { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H); ctx.restore(); }
@@ -131,7 +146,12 @@ function apply(s) {
     toast('You are now the room moderator. You can start, restart and kick.', 'good');
   if (s.room.turn_id !== curTurn) onNewTurn(s.room.turn_id);
   if (s.room.phase === 'finished' && prev?.room.phase !== 'finished') blank();
-  if (s.room.mode === 'kalambury' && prev?.room.phase !== 'turn' && s.room.phase === 'turn' && isDrawer()) toast('Your turn! Draw: ' + s.secret, 'good');
+  if (s.room.mode === 'kalambury' && s.room.phase === 'turn' && isDrawer()) {
+    const fresh = prev?.room.phase !== 'turn' || prev?.room.turn_id !== s.room.turn_id;
+    if (fresh && !s.secret) toast('Your turn! Pick a word: harder words score more.', 'good');
+    else if (s.secret && (fresh || !prev?.secret)) toast('Draw: ' + s.secret, 'good');
+  }
+  if (picking() && isDrawer()) loadChoices();
   if (prev && prev.room.phase === 'turn' && s.room.phase === 'reveal' && isImgHost()) sendFinalImage();
   if (s.room.mode !== 'kalambury' && isPaint()) {   // a Pepe Pictures night keeps its own look
     document.documentElement.classList.toggle('paint', false); ptMenu.replaceWith(); ptStatus.el.replaceWith(); limitEmotes(null); $('#invite')?.replaceWith();
@@ -139,10 +159,10 @@ function apply(s) {
   }
   renderPlayers(); renderTop(); renderOverlay(); renderTools(); renderHostbar(); renderImgPanel(); renderMsgs(s.messages);
   if (isPaint()) paintStatus();
-  $('#cwrap').classList.toggle('can-draw', isDrawer());
+  $('#cwrap').classList.toggle('can-draw', isDrawer() && !!s.secret);   // no drawing while the word is being picked
   $('#cwrap').classList.toggle('pixel', s.room.mode === 'obrazek');
   const ci = $('#chatin');
-  ci.placeholder = isDrawer() ? 'Chat (no spoilers!)' : s.room.phase !== 'turn' ? 'Chat' : (s.me.guessed ? 'Chat with players who got it' : (isImgHost() ? 'Chat (you are the host)' : 'Type your guess…'));
+  ci.placeholder = picking() ? (isDrawer() ? 'Pick your word first' : 'The artist is picking a word…') : isDrawer() ? 'Chat (no spoilers!)' : s.room.phase !== 'turn' ? 'Chat' : (s.me.guessed ? 'Chat with players who got it' : (isImgHost() ? 'Chat (you are the host)' : 'Type your guess…'));
 }
 
 function onNewTurn(turnId) {
@@ -196,7 +216,8 @@ function renderTop() {
         lastBadge() || '', h('br'), r.title + (r.match_id ? (r.ranked ? ' · ranked' : ' · unranked') : '')]));
   w.className = 'word'; w.textContent = ''; w.removeAttribute('data-secret');
   const nLetters = (S.mask || '').replace(/[^_A-ZĄĆĘŁŃÓŚŹŻ0-9]/g, '').length;
-  if (r.phase === 'turn' && S.secret) { w.classList.add('secret'); w.dataset.secret = '1'; w.append(h('small', {}, r.mode === 'kalambury' ? 'Your word to draw' : 'Answer (only you can see it)'), S.secret); }
+  if (picking()) { w.classList.add('plain'); w.append(h('small', {}, isDrawer() ? 'Your turn' : 'Get ready'), isDrawer() ? 'Pick a word ↓' : `${(S.players.find((p) => p.user_id === r.drawer_id) || {}).nick || 'The artist'} is picking a word…`); }
+  else if (r.phase === 'turn' && S.secret) { w.classList.add('secret'); w.dataset.secret = '1'; w.append(h('small', {}, r.mode === 'kalambury' ? 'Your word to draw' : 'Answer (only you can see it)'), S.secret); }
   else if (r.phase === 'turn' && inCountdown()) { w.classList.add('plain'); w.append(h('small', {}, 'Get ready'), 'Picture incoming…'); }
   else if (r.phase === 'turn') w.append(h('small', {}, S.me.guessed ? (r.mode === 'obrazek' ? `You got it! (+${ptsFor((S.podium || []).find((g) => g.user_id === meId())?.place || 3)})` : 'You got it! Waiting for the others') : `Guess the word (${nLetters} letter${nLetters === 1 ? '' : 's'})`), S.mask || '');
   else if (r.phase === 'reveal') { w.classList.add('secret'); w.append(h('small', {}, r.mode === 'kalambury' ? 'The word was' : 'The answer was'), r.last_answer || ''); }
@@ -212,6 +233,7 @@ const inCountdown = () => S && S.room.mode === 'obrazek' && S.room.phase === 'tu
 function overlayView() {
   const r = S.room;
   if (r.phase === 'turn' && inCountdown()) return 'cd' + Math.min(3, Math.max(1, Math.ceil((Date.parse(r.turn_started_at) - now()) / 1000)));
+  if (picking()) return 'pick';
   // volunteers: the "Who draws next?" card stays up for the last 8 s of the 10-second break (the word shows first)
   if (r.phase === 'reveal' && r.mode === 'kalambury' && r.next_at && Date.parse(r.next_at) - now() <= (r.draw_mode === 'volunteers' ? 8000 : INTERMISSION_MS)) return 'intermission';
   return r.phase;
@@ -243,7 +265,8 @@ function frogMedia() {
 function renderOverlay(force) {
   const o = $('#overlay'), r = S.room, view = overlayView();
   const sig = [view, r.turn_id, r.phase === 'reveal' ? (S.messages || []).length : '', r.phase === 'lobby' ? S.players.length : '', r.phase === 'finished' ? JSON.stringify(S.results) : '',
-    JSON.stringify(S.next || null), r.draw_mode, r.last_answer, isRoomHost(), r.final_turn, r.last_mult, r.scorers, r.phase === 'reveal' ? JSON.stringify(S.podium || []) : ''].join('|');
+    JSON.stringify(S.next || null), r.draw_mode, r.last_answer, isRoomHost(), r.final_turn, r.last_mult, r.scorers, r.phase === 'reveal' ? JSON.stringify(S.podium || []) : '',
+    view === 'pick' ? (isDrawer() ? JSON.stringify(pickChoices) : 'watch') : ''].join('|');
   if (!force && sig === overlaySig) return;
   frogWasOn = !!frogVideo?.isConnected;
   overlaySig = sig; o.textContent = ''; o.className = 'overlay';
@@ -260,6 +283,19 @@ function renderOverlay(force) {
     o.append(h('div', { class: 'cd-wrap' }, h('div', { class: 'cd-label' }, finalNow() ? `LAST QUESTION${r.last_mult > 1 ? ' · points ×' + r.last_mult : ''}` : `Picture #${r.round_no}${r.question_total ? ' of ' + r.question_total : ''} · get ready`),
       h('div', { class: 'cd-num', role: 'timer', 'aria-live': 'assertive' }, view.slice(2)),
       h('div', { class: 'small', style: 'opacity:.85' }, 'Type your guess as soon as it shows up')));
+  } else if (view === 'pick') {
+    // the artist picks 1 of 3 words; everybody else waits (guesses open when the word is picked)
+    o.classList.add('intermission-ov');
+    const drawerNick = (S.players.find((p) => p.user_id === r.drawer_id) || {}).nick || 'The artist';
+    const cards = isDrawer() && pickChoices?.choices ? h('div', { class: 'pick-row', style: 'display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px 0' },
+      pickChoices.choices.map((c) => h('button', { class: 'btn big pick-btn', 'data-tier': c.tier, onclick: () => pickWord(c.tier),
+          style: `border-color:${TIERS[c.tier].color};min-width:150px;display:flex;flex-direction:column;align-items:center;gap:2px` },
+        h('small', { style: `color:${TIERS[c.tier].color};font-weight:700` }, TIERS[c.tier].name + (c.mult > 1 ? ' · points ×' + c.mult : '')),
+        h('b', {}, c.word)))) : null;
+    o.append(h('div', { class: 'inter-card' },
+      h('div', { class: 'inter-title' }, isDrawer() ? 'Pick your word' : `${drawerNick} is picking a word`),
+      isDrawer() ? (cards || h('div', { class: 'inter-sub' }, 'Loading words…')) : h('div', { class: 'inter-sub' }, 'Harder words score more: up to points ×2 for you and the artist.'),
+      h('div', { class: 'small', style: 'opacity:.8;margin-top:6px' }, isDrawer() ? 'No pick in time? You get the easy word. ' : '', h('span', { id: 'pickin' }, ''))));
   } else if (view === 'intermission' && (S.next || {}).volunteers && !(S.next || {}).final) {
     // "who draws": volunteers. The first fren to press "I'll draw!" draws next; nobody did: the next one in line.
     const nx = S.next, mine = nx.user_id === meId(), justDrew = nx.last_drawer === meId();
@@ -474,6 +510,15 @@ function loop() {
     updateNextIn();
     if (n > Date.parse(r.next_at) + (master ? 150 : 1500)) tick();
   }
+  if (picking()) {
+    const until = Date.parse(r.turn_started_at), pin = $('#pickin');
+    if (pin) pin.textContent = Math.max(0, Math.ceil((until - n) / 1000)) + ' s to pick';
+    // time is up: the artist's page (right away) or anybody's (a little later) settles it with the easy word
+    if (n > until + (isDrawer() ? 100 : 1500) && autoPickTurn !== r.turn_id) {
+      autoPickTurn = r.turn_id;
+      be.rpc('gry_pick_word', { p_code: code, p_tier: null }).catch(() => {}).finally(fetchState);
+    }
+  }
   if (isImgHost()) imageHostLoop();
   if (isDrawer()) flushStrokes();
 }
@@ -554,6 +599,7 @@ function paintStatus() {
   const r = S.room, drawer = S.players.find((p) => p.user_id === r.drawer_id);
   ptStatus.set(1, `Room ${code} · ${S.players.length} player${S.players.length === 1 ? '' : 's'}`);
   if (r.phase === 'lobby') ptHint(isRoomHost() ? 'You are the moderator: press Invite to copy the link, then Start when your frens are in.' : 'Waiting for the moderator to press Start.');
+  else if (picking()) ptHint(isDrawer() ? 'Your turn! Pick a word: Easy, Medium (points ×1.5) or Hard (points ×2).' : 'The artist is picking a word. Get ready to guess!');
   else if (r.phase === 'turn' && isDrawer()) ptHint('Your turn! Draw: ' + S.secret + '. Keys: B P E I, 1-4, Ctrl+Z.');
   else if (r.phase === 'turn') ptHint(`${drawer?.nick || 'A fren'} is drawing. Be the first to type the word in the chat!`);
   else if (r.phase === 'reveal') ptHint('The word was: ' + (r.last_answer || '?') + '. ' + firstLine() + (r.draw_mode === 'volunteers' && !S.next?.final ? ' Press “I\'ll draw!” to draw next.' : ''));
@@ -564,7 +610,7 @@ function paintStatus() {
 function pos(e) { const r = cv.getBoundingClientRect(); return [Math.round((e.clientX - r.left) / r.width * W), Math.round((e.clientY - r.top) / r.height * H)]; }
 function seg(c, w, a, b) { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
 cv.addEventListener('pointerdown', (e) => {
-  if (!isDrawer()) return;
+  if (!isDrawer() || picking()) return;   // no drawing before the word is picked
   cv.setPointerCapture(e.pointerId); e.preventDefault();
   const p = pos(e);
   if (ptTool === 'picker') {
