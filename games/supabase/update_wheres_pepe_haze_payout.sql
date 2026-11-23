@@ -14,7 +14,10 @@ create table if not exists games.wp_haze_payouts(
 alter table games.wp_haze_payouts enable row level security;
 revoke all on games.wp_haze_payouts from public, anon, authenticated;
 
-create or replace function public.gry_wp_host_haze_payout(p_ids bigint[]) returns jsonb
+-- p_merge (owner, 2026-11-23): a player who claimed with two addresses in the week is paid once, on their newest
+-- address, but only after the host confirms it (the first call names the player and the addresses).
+drop function if exists public.gry_wp_host_haze_payout(bigint[]);
+create or replace function public.gry_wp_host_haze_payout(p_ids bigint[], p_merge boolean default false) returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare u uuid := auth.uid(); sa text; g uuid; n int; total numeric; ids bigint[]; wk timestamptz; bad text;
 begin
@@ -30,14 +33,27 @@ begin
      and not exists (select 1 from games.wp_haze_payouts w join games.haze_groups hg on hg.id = w.group_id
                      where k.id = any(w.claim_ids) and hg.state = 'ready' and hg.expires_at > clock_timestamp());
   if ids is null then raise exception 'No open rewards from a finished week to pay (or a Haze payout for them is already waiting in the LAN Party chat).'; end if;
-  select string_agg(address || ' (' || s || ' PEP)', ', ') into bad from
-    (select address, sum(pep) s from games.wp_claims where id = any(ids) group by address having sum(pep) < 1) x;
-  if bad is not null then raise exception 'Haze pays at least 1 PEP per address. Hold these, then try again: %', bad; end if;
-  if exists (select 1 from games.wp_claims where id = any(ids) group by user_id having count(distinct address) > 1) then
-    raise exception 'One player used two addresses this week. Hold one of them, then try again.'; end if;
   if exists (select 1 from games.wp_claims k where k.id = any(ids) and not exists (select 1 from auth.users a where a.id = k.user_id)) then
     raise exception 'A reward belongs to a deleted account. Hold it, then try again.'; end if;
-  select count(distinct address), sum(pep) into n, total from games.wp_claims where id = any(ids);
+  -- Where each reward is paid: its own address, or with p_merge the player's newest address in the list.
+  drop table if exists wp_pay;
+  create temp table wp_pay on commit drop as
+    select k.id, k.user_id, k.nick, k.pep, k.created_at, k.address,
+           first_value(k.address) over (partition by k.user_id order by k.created_at desc, k.id desc) as newest
+      from games.wp_claims k where k.id = any(ids);
+  if not p_merge then
+    select string_agg(x.nick || ' (' || x.addrs || ')', '; ') into bad from
+      (select max(nick) nick, string_agg(distinct address, ', ') addrs from wp_pay group by user_id having count(distinct address) > 1) x;
+    if bad is not null then
+      raise exception 'TWO_ADDRESSES: A player used two addresses this week: %. Confirm to pay all of their rewards to their newest address, or Hold one of them.', bad;
+    end if;
+  else
+    update wp_pay set address = newest;
+  end if;
+  select string_agg(address || ' (' || s || ' PEP)', ', ') into bad from
+    (select address, sum(pep) s from wp_pay group by address having sum(pep) < 1) x;
+  if bad is not null then raise exception 'Haze pays at least 1 PEP per address. Hold these, then try again: %', bad; end if;
+  select count(distinct address), sum(pep) into n, total from wp_pay;
   if n > 200 then raise exception '% addresses. One Haze payment pays up to 200; hold some for a second payout.', n; end if;
   insert into games.haze_groups(owner, sender_address, creator, mode, audience, title, note, total_atomic, max_winners, closes_at, state, expires_at)
   values (u, sa, coalesce((select nick from games.profiles where user_id = u), 'Host'), 'selected', 'all',
@@ -47,12 +63,12 @@ begin
   insert into games.haze_group_recipients(group_id, user_id, nick, address, amount_atomic, ordinal)
   select g, (array_agg(user_id order by created_at))[1], (array_agg(nick order by created_at desc))[1], address,
          (sum(pep) * 100000000)::numeric(20, 0), (row_number() over (order by min(created_at), address))::int
-    from games.wp_claims where id = any(ids) group by address;
+    from wp_pay group by address;
   insert into games.wp_haze_payouts(group_id, claim_ids) values (g, ids);
   return jsonb_build_object('id', g, 'addresses', n, 'pep', total, 'claims', cardinality(ids));
 end $$;
-revoke all on function public.gry_wp_host_haze_payout(bigint[]) from public, anon;
-grant execute on function public.gry_wp_host_haze_payout(bigint[]) to authenticated;
+revoke all on function public.gry_wp_host_haze_payout(bigint[], boolean) from public, anon;
+grant execute on function public.gry_wp_host_haze_payout(bigint[], boolean) to authenticated;
 
 -- A confirmed Haze payout marks its rewards as paid, with the transaction id.
 create or replace function games.wp_haze_paid() returns trigger
