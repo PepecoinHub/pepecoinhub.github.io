@@ -4203,12 +4203,25 @@
             csv.value = Object.keys(sum).map(function (a) { return a + ',' + String(Math.round(sum[a] * 100) / 100); }).join('\n');
             body.querySelector('.wp-copycsv').addEventListener('click', function () { copyBox(csv); });
             var hz = body.querySelector('.wp-haze');
-            hz.addEventListener('click', function () {
+            // A player with two addresses this week: the server names them; the host may confirm paying all of their
+            // rewards to their newest address (owner, 2026-11-23).
+            var payHaze = function (merge) {
               hz.disabled = true; say('Preparing the Haze payout…');
-              wpRpc('gry_wp_host_haze_payout', { p_ids: open.map(function (c) { return c.id; }) }).then(function (r) {
+              var old = body.querySelector('.wp-merge'); if (old) old.remove();
+              wpRpc('gry_wp_host_haze_payout', { p_ids: open.map(function (c) { return c.id; }), p_merge: !!merge }).then(function (r) {
                 say('Haze payout ready: ' + r.addresses + ' addresses, ' + r.pep + ' PEP. Opening the LAN Party chat to review it…'); lanReviewGroup(r.id);
-              }, function (e) { hz.disabled = false; say(e.message + (/already waiting/.test(e.message) ? ' Open the LAN Party chat: Community drops → Review payout.' : ''), true); });
-            });
+              }, function (e) {
+                hz.disabled = false; var m = String(e.message || '');
+                if (/^TWO_ADDRESSES:/.test(m)) {
+                  say(m.replace(/^TWO_ADDRESSES:\s*/, ''), true);
+                  var box = el('div', { class: 'app-row wp-merge' }, '<button type="button" class="app-btn">I know. Pay their rewards to the newest address</button>');
+                  hz.parentNode.after(box); box.querySelector('button').addEventListener('click', function () { payHaze(true); });
+                  return;
+                }
+                say(m + (/already waiting/.test(m) ? ' Open the LAN Party chat: Community drops → Review payout.' : ''), true);
+              });
+            };
+            hz.addEventListener('click', function () { payHaze(false); });
             var tpl = body.querySelector('.wp-tpl');
             tpl.value = wpTpl();
             body.querySelector('.wp-tplsave').addEventListener('click', function () { try { localStorage.setItem('wp-payout-template', tpl.value); } catch (e) {} payouts(); });

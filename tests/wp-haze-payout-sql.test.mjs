@@ -44,7 +44,11 @@ test('Pepe Guesser: a finished week becomes one fixed Haze payout and is marked 
     const a=Number(claim(4,5,2)),b=Number(claim(4,5,3,'open',address(9)));assert.throws(()=>rpc(1,'gry_wp_host_haze_payout',`array[${a},${b}]::bigint[]`),/two addresses/);
     // a cancelled payout frees its rewards for a new one
     const second=rpc(1,'gry_wp_host_haze_payout',`array[${a}]::bigint[]`);rpc(1,'gry_haze_group_cancel',q(second.id)+'::uuid');
-    assert.equal(rpc(1,'gry_wp_host_haze_payout',`array[${a}]::bigint[]`).addresses,1);
+    const third=rpc(1,'gry_wp_host_haze_payout',`array[${a}]::bigint[]`);assert.equal(third.addresses,1);rpc(1,'gry_haze_group_cancel',q(third.id)+'::uuid');
+    // the host confirms a player with two addresses: everything goes to that player's newest address
+    assert.throws(()=>rpc(1,'gry_wp_host_haze_payout',`array[${a},${b}]::bigint[]`),/TWO_ADDRESSES.*Fren4/);
+    const merged=rpc(1,'gry_wp_host_haze_payout',`array[${a},${b}]::bigint[],true`);assert.equal(merged.addresses,1);assert.equal(Number(merged.pep),10);
+    assert.deepEqual(rpc(1,'gry_haze_group_review',q(merged.id)+'::uuid').recipients.map(r=>[r.address,r.amount]),[[address(4),'1000000000']],'Newest address, both rewards');
     assert.throws(()=>as('authenticated',1,'select * from games.wp_haze_payouts'));
   }finally{sql('drop database '+db+' with(force)','postgres');}
 });
