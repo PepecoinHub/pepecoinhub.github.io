@@ -67,7 +67,7 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     for(const child of children.flat())if(child!=null)value.append(typeof child==='string'?doc.createTextNode(child):child);
     return value;
   };
-  if(!doc.querySelector('[data-haze-tip-style]'))doc.head.append(node('link',{rel:'stylesheet',href:new URL('../haze-tips.css?v=20261122pk',import.meta.url).href,'data-haze-tip-style':'1'}));
+  if(!doc.querySelector('[data-haze-tip-style]'))doc.head.append(node('link',{rel:'stylesheet',href:new URL('../haze-tips.css?v=20261123pepcoin',import.meta.url).href,'data-haze-tip-style':'1'}));
   let destroyed=false,dialog=null,wallet=null,owner=null,syncAt=0,syncing=false,initial=true,linkButton=null;
   let activeView=null,walletHost=null,walletFrame=null,walletLoaded=null,walletCaps=null;
   const walletBase=HAZE_ORIGIN+'/widget.html?haze-chat=1',queueKey='ph-haze-submitted-v1';
@@ -86,10 +86,12 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     const calm=win.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
     const layer=node('div',{class:'haze-party','aria-hidden':'true'});
     layer.style.cssText='left:'+box.left+'px;top:'+box.top+'px;width:'+box.width+'px;height:'+box.height+'px';
-    const banner=node('div',{class:'haze-party-banner'},node('b',{},'💚 +'+amount+' PEP'),node('span',{},from?'from '+from:'for you'));
+    const banner=node('div',{class:'haze-party-banner'},
+      node('span',{class:'haze-party-title'},'PEP RECEIVED'),
+      node('b',{},'+'+amount+' PEP'),node('span',{class:'haze-party-from'},from?'from '+from:'for you'));
     layer.append(banner);
     if(!calm)for(let i=0;i<18;i++){
-      const bit=node('i',{class:i%3?'haze-party-coin':'haze-party-heart'},i%3?'P':'💚');
+      const bit=node('i',{class:i%3?'haze-party-coin':'haze-party-heart'},i%3?'':'♥');
       bit.style.cssText='left:'+(4+Math.random()*92)+'%;animation-delay:'+(Math.random()*0.9).toFixed(2)+'s;--drift:'+Math.round(Math.random()*60-30)+'px';
       layer.append(bit);
     }

@@ -119,9 +119,10 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
       if (!targets.length) return;
       const feedback = doc.createElement('p');
       feedback.className = 'pgr-response'; feedback.setAttribute('role', 'status');
-      feedback.textContent = 'Click your Fren or something in the room.';
+      feedback.textContent = 'Your Fren is here. Pick something to do together.';
       const toolbar = doc.createElement('div'); toolbar.className = 'pgr-toolbar';
       toolbar.append(feedback); frame.append(toolbar);
+      const quick = doc.createElement('div'); quick.className = 'pgr-quick'; toolbar.append(quick);
       let speechBubble = null, speechTimer = null;
       const clearSpeech = () => { if (speechTimer !== null) clearTimeout(speechTimer); speechTimer=null; speechBubble?.remove(); speechBubble=null; };
       function showSpeech() {
@@ -147,7 +148,7 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
       paintLamp();
       const buttons = [], effects=mountRoomEffects(stage,{reduced});
       const shortcuts = doc.createElement('details'); shortcuts.className = 'pgr-shortcuts';
-      const summary = doc.createElement('summary'); summary.textContent = 'Room controls'; shortcuts.append(summary);
+      const summary = doc.createElement('summary'); summary.textContent = 'Explore room'; shortcuts.append(summary);
       const list = doc.createElement('div'); shortcuts.append(list); toolbar.append(shortcuts);
       for (const t of targets) {
         const btn = doc.createElement('button'); btn.type = 'button'; btn.className = 'pgr-hotspot';
@@ -159,6 +160,7 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
           if (isAway() && Object.hasOwn(AWAY_LINES, t.id)) { lastClick = at; feedback.textContent = AWAY_LINES[t.id]; return; }
           const result = roomResponse(t.id, getView(), { lampOn, busy: isBusy(), embedded, patIndex, patBurst:pats.length, propIndex:propIndices[t.id]||0 });
           if (!result) return;
+          stage.classList.remove('pgr-idle-look');
           lastClick = at; feedback.textContent = result.text; propIndices[t.id]=(propIndices[t.id]||0)+1;
           lastSpeech=result.speech ? {...result.speech,text:result.text,until:at+3500} : null;
           showSpeech();
@@ -174,10 +176,27 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
         };
         btn.addEventListener('click', activate);
         stage.append(btn); buttons.push(btn);
+        const quickLabels = { frog: 'Pet Fren', rubber_duck: 'Play with duck', bed: 'Rest on bed' };
+        if (quickLabels[t.id] && (t.id !== 'rubber_duck' || owned)) {
+          const action = doc.createElement('button'); action.type = 'button'; action.className = 'pgr-quick-action';
+          action.textContent = quickLabels[t.id]; action.addEventListener('click', activate); quick.append(action);
+        }
         const shortcut = doc.createElement('button'); shortcut.type = 'button'; shortcut.className = 'pgr-shortcut';
         shortcut.textContent = t.label; shortcut.addEventListener('click', activate); list.append(shortcut);
       }
-      dispose = () => { clearSpeech(); effects.dispose(); buttons.forEach(b => b.remove()); toolbar.remove(); };
+      // Small idle gestures make the room feel occupied without changing care or interrupting a player action.
+      let idleTimer = null, idleReset = null;
+      const idle = () => {
+        const v = getView();
+        if (frame.isConnected && v?.pet?.status === 'healthy' && v.pet.stage !== 'egg' &&
+            !isBusy() && !reduced() && doc.visibilityState !== 'hidden' && now() - lastClick > 9000) {
+          stage.classList.add('pgr-idle-look');
+          idleReset = setTimeout(() => { stage.classList.remove('pgr-idle-look'); idleReset = null; }, 1500);
+        }
+        idleTimer = setTimeout(idle, 18000);
+      };
+      idleTimer = setTimeout(idle, 18000);
+      dispose = () => { clearTimeout(idleTimer); clearTimeout(idleReset); stage.classList.remove('pgr-idle-look'); clearSpeech(); effects.dispose(); buttons.forEach(b => b.remove()); toolbar.remove(); };
     },
     dispose() { dispose(); life = null; lampOn = true; lastClick = -Infinity; pats=[]; patIndex=0; propIndices={}; lastSpeech=null; },
   };

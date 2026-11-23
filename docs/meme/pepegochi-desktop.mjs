@@ -10,6 +10,8 @@ const PERCH = new Set(['bin', 'games', 'find', 'wp-folder', 'wp-hof', 'notes', '
 const BLOCKED = 'a,button,input,select,textarea,label,iframe,header,.win,.app-win,.pg-fact,.desk-corner,.os-dialog,[role="dialog"],[contenteditable]';
 const center = r => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
 const at = (x, y) => `translate(${Math.round(x)}px,${Math.round(y)}px)`;
+export const AUTO_PLAY_AFTER_MS = 300000;
+export const DESKTOP_PLAY_MS = 5400;
 
 export function perchPoint(rect, width, height, frogWidth = 48, frogHeight = 48) {
   if (width < 761 || rect.top < frogHeight || rect.top > height - 60 || rect.width < 120) return null;
@@ -21,9 +23,9 @@ export function perchPoint(rect, width, height, frogWidth = 48, frogHeight = 48)
 export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, react, onStart, onEnd, base, now = Date.now }) {
   const doc = slot.ownerDocument, win = doc.defaultView;
   const reduce = win.matchMedia('(prefers-reduced-motion: reduce)');
-  let effect = null, lastFly = -Infinity, lastApp = -Infinity, disposed = false;
+  let effect = null, lastFly = -Infinity, lastApp = -Infinity, lastRomp = now(), disposed = false;
   const allowed = (manual = false) => !disposed && slot.isConnected && playableCompanion(getView()) && eligible(manual) && !doc.hidden;
-  const canStart = (manual = false) => allowed(manual) && mayStart() && !effect;
+  const canStart = (manual = false) => allowed(manual) && mayStart(manual) && !effect;
   const canMove = (manual = false) => canStart(manual) && !reduce.matches;
   const night = () => doc.documentElement.classList.contains('sky-night') && !!doc.querySelector('.sky:not([hidden]) .scene-night.ready') && !doc.querySelector('.sky-fast');
   const exposed = (x, y) => {
@@ -70,6 +72,53 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
     const animation = node.animate(frames, { fill: 'forwards', ...options });
     current.animations.push(animation); return animation;
   }
+  function playPoint(rect) {
+    const y = Math.max(56, Math.min(win.innerHeight - 112, rect.top - 92));
+    const reach = Math.max(120, Math.min(280, win.innerWidth * .28));
+    const candidates = rect.left < win.innerWidth / 2
+      ? [rect.left + reach, rect.left - reach]
+      : [rect.left - reach, rect.left + reach];
+    for (const raw of candidates) {
+      const x = Math.max(12, Math.min(win.innerWidth - 60, raw));
+      if (exposed(x + 24, y + 24)) return { x: Math.round(x), y: Math.round(y) };
+    }
+    return null;
+  }
+  function playToy(kind, manual = true) {
+    if (!['ball', 'duck', 'cap'].includes(kind) || !canMove(manual) || !img.animate) return false;
+    const r = img.getBoundingClientRect(), to = playPoint(r);
+    if (!to || !r.width || !r.height) return false;
+    const from = { x: r.left, y: r.top };
+    const current = begin('toy-' + kind, () => !!playPoint(r), manual);
+    const frog = add(current, 'img', 'pg-desktop-frog-frame pg-desktop-playing');
+    frog.src = img.src; frog.alt = '';
+    const toy = add(current, kind === 'duck' ? 'img' : 'span', 'pg-desktop-play-toy');
+    toy.setAttribute('data-toy', kind);
+    if (kind === 'duck') { toy.src = base + 'games/img/pepegochi/rubber_duck.png'; toy.alt = ''; }
+    slot.classList.add('pg-desktop-away');
+    const toyFrom = { x: from.x + 34, y: from.y + 24 };
+    const toyMid = { x: Math.round((toyFrom.x + to.x) / 2), y: Math.min(toyFrom.y, to.y) - 48 };
+    animate(current, toy, [
+      { transform: at(toyFrom.x, toyFrom.y), opacity: 1 },
+      { transform: at(toyMid.x, toyMid.y), offset: .18 },
+      { transform: at(to.x, to.y + 28), offset: .34 },
+      { transform: at(to.x - 18, to.y + 20), offset: .55 },
+      { transform: at(to.x + 12, to.y + 26), offset: .72 },
+      { transform: at(toyFrom.x, toyFrom.y), opacity: 1 },
+    ], { duration: 5000, easing: 'steps(24,end)' });
+    const chase = [
+      { transform: at(from.x, from.y) },
+      { transform: at((from.x + to.x) / 2 - 24, Math.min(from.y, to.y) - 26), offset: .18 },
+      { transform: at(to.x - 34, to.y), offset: .34 },
+      { transform: at(to.x - 12, to.y - 18), offset: .48 },
+      { transform: at(to.x - 28, to.y), offset: .66 },
+      { transform: at((from.x + to.x) / 2, Math.min(from.y, to.y) - 24), offset: .84 },
+      { transform: at(from.x, from.y) },
+    ];
+    animate(current, frog, chase, { duration: DESKTOP_PLAY_MS, easing: 'steps(26,end)' });
+    current.timer = win.setTimeout(() => stop(), DESKTOP_PLAY_MS);
+    return true;
+  }
   function catchFly(target, manual = false) {
     if (!target || !canMove(manual) || now() - lastFly < 45000 || !img.animate) return false;
     const r = img.getBoundingClientRect();
@@ -100,11 +149,19 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
     return true;
   }
   function ambient() {
-    if (!canMove() || now() - lastFly < 90000) return false;
-    const r = img.getBoundingClientRect(), c = center(r);
-    const candidates = flies().sort((a, b) => Math.hypot(a.x-c.x,a.y-c.y) - Math.hypot(b.x-c.x,b.y-c.y));
-    // Only borrow a genuinely visible nearby light, rather than inventing flies on the day wallpaper.
-    return candidates.length > 0 && Math.hypot(candidates[0].x-c.x,candidates[0].y-c.y) < 400 && catchFly(candidates[0]);
+    if (!canMove()) return false;
+    if (now() - lastFly >= 90000) {
+      const r = img.getBoundingClientRect(), c = center(r);
+      const candidates = flies().sort((a, b) => Math.hypot(a.x-c.x,a.y-c.y) - Math.hypot(b.x-c.x,b.y-c.y));
+      // Only borrow a genuinely visible nearby light, rather than inventing flies on the day wallpaper.
+      if (candidates.length > 0 && Math.hypot(candidates[0].x-c.x,candidates[0].y-c.y) < 400 && catchFly(candidates[0])) return true;
+    }
+    if (now() - lastRomp < AUTO_PLAY_AFTER_MS) return false;
+    const toys = ['ball', 'duck', 'cap'];
+    const kind = toys[Math.abs(Math.floor(now() / AUTO_PLAY_AFTER_MS)) % toys.length];
+    if (!playToy(kind, false)) return false;
+    lastRomp = now();
+    return true;
   }
   function onClick(event) {
     if (event.defaultPrevented || event.button !== 0 || event.target.closest?.(BLOCKED) || !canMove(true)) return;
@@ -159,8 +216,8 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
   doc.addEventListener('visibilitychange', onVisibility);
   win.addEventListener('resize', onInput);
   reduce.addEventListener?.('change', onReduce);
-  return { ambient, stop, get active() { return !!effect; }, fireflyAvailable: () => allowed(true) && !effect && now() - lastFly >= 45000 && flies().length > 0,
-    catchNearby: () => catchFly(flies()[0], true), reset() { stop(); lastFly = lastApp = -Infinity; }, dispose() {
+  return { ambient, playToy, stop, get active() { return !!effect; }, fireflyAvailable: () => allowed(true) && !effect && now() - lastFly >= 45000 && flies().length > 0,
+    catchNearby: () => catchFly(flies()[0], true), reset() { stop(); lastFly = lastApp = -Infinity; lastRomp = now(); }, dispose() {
     disposed = true; stop(); win.removeEventListener('pondos:app-opened', onApp); doc.removeEventListener('click', onClick);
     doc.removeEventListener('pointerdown', onInput, true); doc.removeEventListener('keydown', onInput, true);
     doc.removeEventListener('visibilitychange', onVisibility); win.removeEventListener('resize', onInput);
