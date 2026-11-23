@@ -2259,36 +2259,62 @@ footer.foot a { color: #edf3e3; }
 .pg-fact-board li { display: flex; justify-content: space-between; gap: 8px; }
 /* the frog flying from the PEPEGOCHI.EXE window to the taskbar */
 .pg-companion-fly { position: fixed; z-index: 98960; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }
-/* Local desktop companion effects: no focus, input capture, layout changes or persistent overlay. */
+/* Only firefly hunting borrows a visible wallpaper light; toys stay at the taskbar. */
 .pg-desktop-away .pg-companion-button img { opacity: 0; }
-.pg-desktop-frog-frame, .pg-desktop-firefly, .pg-desktop-tongue, .pg-desktop-popcorn, .pg-desktop-play-toy { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 98959; }
+.pg-desktop-frog-frame, .pg-desktop-firefly, .pg-desktop-tongue { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 98959; }
 .pg-desktop-frog-frame { width: 48px; height: 48px; image-rendering: pixelated; }
-.pg-desktop-playing { z-index: 98961; }
-.pg-desktop-play-toy { display: block; box-sizing: border-box; image-rendering: pixelated; z-index: 98962; }
-.pg-desktop-play-toy[data-toy="ball"] { width: 14px; height: 14px; background: #ed7658; border: 2px solid #593b24; box-shadow: inset 3px 2px #ffc894; border-radius: 3px; }
-.pg-desktop-play-toy[data-toy="cap"] { width: 14px; height: 8px; background: #d7b753; border: 2px solid #593b24; box-shadow: inset 0 2px #fff0ad; }
-.pg-desktop-play-toy[data-toy="duck"] { width: 28px; height: 28px; object-fit: contain; }
 .pg-desktop-firefly { width: 5px; height: 5px; margin: -2px; background: #fff6a8; box-shadow: 0 0 6px 2px #ffec6ebf; border-radius: 50%; z-index: 98961; }
 .pg-desktop-tongue { height: 3px; background: #e67d80; border-bottom: 1px solid #9a4048; transform-origin: left center; opacity: 1; transform: scaleX(0); z-index: 98962; }
-.pg-desktop-popcorn { width: 16px; height: 14px; border: 2px solid #632a27; background: repeating-linear-gradient(90deg,#dc5549 0 3px,#fff3cb 3px 6px); box-sizing: border-box; box-shadow: inset 0 -2px #a1382d; }
-.pg-desktop-popcorn::before { content: ''; position: absolute; width: 4px; height: 4px; left: 0; top: -5px; background: #fff1b8; box-shadow: 4px -2px #ffe492, 8px 0 #fff1b8, 0 3px #e5b65a, 4px 2px #fff1b8, 8px 3px #e5b65a; }
 .sky-fly.pg-fly-borrowed { visibility: hidden; }
-@media (prefers-reduced-motion: reduce) { .pg-desktop-frog-frame, .pg-desktop-firefly, .pg-desktop-tongue, .pg-desktop-popcorn, .pg-desktop-play-toy { display: none; } .pg-desktop-away .pg-companion-button img { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .pg-desktop-frog-frame, .pg-desktop-firefly, .pg-desktop-tongue { display: none; } .pg-desktop-away .pg-companion-button img { opacity: 1; } }
 
 /* A10 greeting: a single whole-pixel hop; frame animation supplies the wave. */
 .pg-motion-welcome { animation: pgc-welcome 910ms steps(1, end) 1; }
 @keyframes pgc-welcome { 0%, 100% { transform: translateY(0); } 20% { transform: translateY(-2px); } 40% { transform: translateY(-4px); } 65% { transform: translateY(-2px); } 85% { transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .pg-motion-welcome { animation: none; } }
 
-.pg-companion-toy { position:absolute; left:44px; bottom:calc(var(--pg-lift, 3px) + 2px); font-size:22px; line-height:24px; pointer-events:none; z-index:151; }
+.pg-companion-toy { position:absolute; left:44px; bottom:calc(100% + var(--pg-lift, 3px) - 1px); font-size:22px; line-height:24px; pointer-events:none; z-index:151; }
 .pg-companion-toy[hidden] { display:none; }
-.pg-companion-toy[data-toy="ball"] { width:14px; height:14px; background:#ed7658; border:2px solid #593b24; box-shadow:inset 3px 2px #ffc894; border-radius:3px; }
+.pg-companion-toy[data-toy="ball"] { width:24px; height:24px; box-sizing:border-box; background:#ee7957; border:2px solid #512d23; border-radius:50%; box-shadow:inset 4px 3px #ffd29a,inset -4px -4px #ac4532,1px 2px 0 #242024; }
 .pg-companion-toy[data-toy="cap"] { width:14px; height:8px; background:#d7b753; border:2px solid #593b24; box-shadow:inset 0 2px #fff0ad; }
-.pg-companion-toy img { display:block; image-rendering:pixelated; }
-.pg-companion-toy.is-tossed { animation:pgc-toy 3200ms steps(16,end) 1; }
-@keyframes pgc-toy { 0% { transform:translate(24px,0); } 12% { transform:translate(8px,-18px); } 25% { transform:translate(-8px,-8px); } 38% { transform:translate(-14px,0); } 50% { transform:translate(3px,-12px); } 63% { transform:translate(16px,-4px); } 76% { transform:translate(6px,0); } 88% { transform:translate(-5px,-7px); } 100% { transform:translate(0,0); } }
+.pg-companion-toy[data-toy="duck"] { width:28px; height:28px; }
+.pg-companion-toy img { display:block; width:28px; height:28px; max-width:none; image-rendering:pixelated; }
+.pg-companion-toy { transform-origin: center bottom; }
+.pg-companion-toy[data-toy="ball"] { left:32px; transform-origin:center; }
+.pg-companion-toy[data-toy="duck"] { left:30px; }
+.pg-companion-toy[data-toy="cap"] { left:36px; }
+.pg-companion-toy.is-tossed { animation-duration: 2800ms; animation-timing-function: steps(24,end); animation-fill-mode: both; }
+.pg-companion-toy[data-toy="ball"].is-tossed { animation-name: pgc-ball-roll; }
+.pg-companion-toy[data-toy="duck"].is-tossed { animation-name: pgc-duck-squeeze; }
+.pg-companion-toy[data-toy="cap"].is-tossed { animation-name: pgc-cap-flip; }
+.pg-companion-button[data-play] { animation-duration:2800ms; animation-timing-function:steps(24,end); }
+.pg-companion-button[data-play="ball"] { animation-name:pgc-ball-kick; }
+.pg-companion-button[data-play="duck"] { animation-name:pgc-duck-touch; }
+.pg-companion-button[data-play="cap"] { animation-name:pgc-cap-toss; }
+@keyframes pgc-ball-roll {
+  0% { transform:translateX(0) rotate(0); }
+  12% { transform:translateX(0) scaleX(.88); }
+  45% { transform:translateX(42px) rotate(180deg); }
+  65% { transform:translateX(48px) rotate(220deg); }
+  100% { transform:translateX(48px) rotate(220deg); }
+}
+@keyframes pgc-duck-squeeze {
+  0%, 18%, 55%, 100% { transform:scale(1); }
+  10%, 45% { transform:scale(1.18,.68); }
+  25%, 63% { transform:scale(.96,1.06); }
+}
+@keyframes pgc-cap-flip {
+  0%, 10% { transform:translateY(0) rotate(0); }
+  35% { transform:translateY(-24px) rotate(180deg); }
+  62% { transform:translateY(0) rotate(360deg); }
+  72% { transform:translateY(-5px) rotate(390deg); }
+  85%,100% { transform:translateY(0) rotate(360deg); }
+}
+@keyframes pgc-ball-kick { 0%,100% { transform:translateX(0); } 12%,20% { transform:translateX(10px); } 38%,75% { transform:translateX(4px); } }
+@keyframes pgc-duck-touch { 0%,25%,63%,100% { transform:translateX(0); } 10%,45% { transform:translateX(12px); } }
+@keyframes pgc-cap-toss { 0%,65%,100% { transform:translate(0); } 10% { transform:translate(8px,-3px); } 35% { transform:translate(0,-2px); } }
 .pg-conversation .pg-fact-q { white-space:pre-line; }
-@media (prefers-reduced-motion:reduce) { .pg-companion-toy.is-tossed { animation:none; } }
+@media (prefers-reduced-motion:reduce) { .pg-companion-toy.is-tossed, .pg-companion-button[data-play] { animation:none; } }
 
 /* ---------- Newsroom.exe (owner only): write and publish the Gazette and PEP-TV ads ---------- */
 .nr-win .app-body { position: relative; }
