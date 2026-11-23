@@ -110,8 +110,8 @@ export function mountDesktopCompanion({ slot, img, getView, eligible, mayStart, 
   function playToy(kind, manual = true) {
     if (!TOYS.includes(kind) || !allowed(manual) || (reduce.matches && !manual)) return false;
     if (!manual && !mayStart(false)) return false;
-    showToy(kind);
     if (!manual) onAutoToy(ACTION[kind]);
+    showToy(kind);
     return true;
   }
   function ambient() {

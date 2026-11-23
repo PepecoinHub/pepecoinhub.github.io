@@ -2274,10 +2274,42 @@ footer.foot a { color: #edf3e3; }
 .pg-companion-toy[data-toy="cap"] { width:14px; height:8px; background:#d7b753; border:2px solid #593b24; box-shadow:inset 0 2px #fff0ad; }
 .pg-companion-toy[data-toy="duck"] { width:28px; height:28px; }
 .pg-companion-toy img { display:block; width:28px; height:28px; max-width:none; image-rendering:pixelated; }
-.pg-companion-toy.is-tossed { animation:pgc-toy 3200ms steps(16,end) 1; }
-@keyframes pgc-toy { 0% { transform:translate(24px,0); } 12% { transform:translate(8px,-18px); } 25% { transform:translate(-8px,-8px); } 38% { transform:translate(-14px,0); } 50% { transform:translate(3px,-12px); } 63% { transform:translate(16px,-4px); } 76% { transform:translate(6px,0); } 88% { transform:translate(-5px,-7px); } 100% { transform:translate(0,0); } }
+.pg-companion-toy { transform-origin: center bottom; }
+.pg-companion-toy[data-toy="ball"] { left:32px; transform-origin:center; }
+.pg-companion-toy[data-toy="duck"] { left:30px; }
+.pg-companion-toy[data-toy="cap"] { left:36px; }
+.pg-companion-toy.is-tossed { animation-duration: 2800ms; animation-timing-function: steps(24,end); animation-fill-mode: both; }
+.pg-companion-toy[data-toy="ball"].is-tossed { animation-name: pgc-ball-roll; }
+.pg-companion-toy[data-toy="duck"].is-tossed { animation-name: pgc-duck-squeeze; }
+.pg-companion-toy[data-toy="cap"].is-tossed { animation-name: pgc-cap-flip; }
+.pg-companion-button[data-play] { animation-duration:2800ms; animation-timing-function:steps(24,end); }
+.pg-companion-button[data-play="ball"] { animation-name:pgc-ball-kick; }
+.pg-companion-button[data-play="duck"] { animation-name:pgc-duck-touch; }
+.pg-companion-button[data-play="cap"] { animation-name:pgc-cap-toss; }
+@keyframes pgc-ball-roll {
+  0% { transform:translateX(0) rotate(0); }
+  12% { transform:translateX(0) scaleX(.88); }
+  45% { transform:translateX(42px) rotate(180deg); }
+  65% { transform:translateX(48px) rotate(220deg); }
+  100% { transform:translateX(48px) rotate(220deg); }
+}
+@keyframes pgc-duck-squeeze {
+  0%, 18%, 55%, 100% { transform:scale(1); }
+  10%, 45% { transform:scale(1.18,.68); }
+  25%, 63% { transform:scale(.96,1.06); }
+}
+@keyframes pgc-cap-flip {
+  0%, 10% { transform:translateY(0) rotate(0); }
+  35% { transform:translateY(-24px) rotate(180deg); }
+  62% { transform:translateY(0) rotate(360deg); }
+  72% { transform:translateY(-5px) rotate(390deg); }
+  85%,100% { transform:translateY(0) rotate(360deg); }
+}
+@keyframes pgc-ball-kick { 0%,100% { transform:translateX(0); } 12%,20% { transform:translateX(10px); } 38%,75% { transform:translateX(4px); } }
+@keyframes pgc-duck-touch { 0%,25%,63%,100% { transform:translateX(0); } 10%,45% { transform:translateX(12px); } }
+@keyframes pgc-cap-toss { 0%,65%,100% { transform:translate(0); } 10% { transform:translate(8px,-3px); } 35% { transform:translate(0,-2px); } }
 .pg-conversation .pg-fact-q { white-space:pre-line; }
-@media (prefers-reduced-motion:reduce) { .pg-companion-toy.is-tossed { animation:none; } }
+@media (prefers-reduced-motion:reduce) { .pg-companion-toy.is-tossed, .pg-companion-button[data-play] { animation:none; } }
 
 /* ---------- Newsroom.exe (owner only): write and publish the Gazette and PEP-TV ads ---------- */
 .nr-win .app-body { position: relative; }

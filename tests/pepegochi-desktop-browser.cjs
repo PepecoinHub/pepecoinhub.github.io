@@ -41,6 +41,29 @@ let browser;
    assert.equal(await page.locator('.pg-desktop-frog-frame,.pg-desktop-play-toy,.pg-desktop-firefly').count(),0);
    if(process.env.PEPEGOCHI_QA_SCREENSHOTS && (name==='Squeak the duck' || name==='Roll the ball'))
      await page.screenshot({path:path.join(process.env.PEPEGOCHI_QA_SCREENSHOTS,name==='Squeak the duck'?'taskbar-duck-desktop.png':'taskbar-ball-desktop.png')});
+   await page.waitForFunction(() => document.querySelector('.pg-companion-toy.is-tossed'));
+   const kind = await toy.getAttribute('data-toy');
+   assert.equal(await frog.getAttribute('data-play'), kind, 'frog and prop share the contact trigger');
+   assert.equal(await toy.evaluate(node => getComputedStyle(node).animationName),
+     {ball:'pgc-ball-roll',duck:'pgc-duck-squeeze',cap:'pgc-cap-flip'}[kind]);
+   if(kind==='ball') {
+     const bottoms = await toy.evaluate(node => {
+       const animation=node.getAnimations()[0];animation.pause();
+       const values=[0,700,1400,2100,2800].map(time=>{
+         animation.currentTime=time;
+         return node.getBoundingClientRect().bottom;
+       });
+       animation.currentTime=0;animation.play();
+       return values;
+     });
+     assert.ok(Math.max(...bottoms)-Math.min(...bottoms)<10,'rolling ball stays on the taskbar edge');
+   }
+   if(process.env.PEPEGOCHI_QA_SCREENSHOTS) {
+     for(let frame=0;frame<20;frame++) {
+       await page.screenshot({path:path.join(process.env.PEPEGOCHI_QA_SCREENSHOTS,kind+'-'+frame+'.png')});
+       await page.waitForTimeout(140);
+     }
+   }
    await page.evaluate(()=>t.time+=31000);
  }
  await page.keyboard.press('Escape');
@@ -65,6 +88,15 @@ let browser;
  assert.ok((await toy.boundingBox()).width>=24);
  if(process.env.PEPEGOCHI_QA_SCREENSHOTS)
    await page.screenshot({path:path.join(process.env.PEPEGOCHI_QA_SCREENSHOTS,'taskbar-ball-phone.png')});
+ await page.keyboard.press('Escape');
+ await page.evaluate(()=>{t.time+=31000;t.pet.stage='froglet';t.pet.care_days=2;t.refresh();});
+ await page.waitForFunction(()=>document.querySelector('.pg-companion-button img')?.src.includes('tb_froglet'));
+ await frog.focus();await page.keyboard.press('Enter');
+ await page.locator('.pg-menu-play').click();
+ await page.getByRole('button',{name:'Roll the ball'}).click();
+ await page.waitForFunction(()=>document.querySelector('.pg-companion-toy.is-tossed'));
+ await page.waitForTimeout(1100);
+ assert.equal(await toy.isVisible(),true,'froglet prop survives the shorter frog animation');
  await page.evaluate(()=>t.dispose());assert.equal(await page.locator('.pg-companion').count(),0);
  assert.deepEqual(errors,[]);console.log('PepeGochi toys stay at the taskbar on desktop and phone.');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server.close();});

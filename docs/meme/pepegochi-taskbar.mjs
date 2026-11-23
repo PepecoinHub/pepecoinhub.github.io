@@ -9,7 +9,7 @@ import { dayNumber, remark } from './pepegochi-facts.mjs';
 import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261123fun1';
 import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
 import { createRumorReader } from './pepegochi-rumors.mjs?v=20261120notes3';
-import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261123fly';
+import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261123toys';
 
 import { createBond } from './pepegochi-bond.mjs?v=20261120notes3';
 import { createNotebook } from './pepegochi-notes.mjs?v=20261121map';
@@ -193,15 +193,28 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   let toyTimer = null;
   const toy = document.createElement('span'); toy.className = 'pg-companion-toy';
   toy.setAttribute('aria-hidden', 'true'); toy.hidden = true; slot.append(toy);
-  function clearToy() { clearTimeout(toyTimer); toyTimer = null; toy.hidden = true; toy.classList.remove('is-tossed'); }
-  function showToy(id, duration = 4800) {
+  function clearToy() {
+    clearTimeout(toyTimer); toyTimer = null; toy.hidden = true;
+    toy.classList.remove('is-tossed');
+    delete button.dataset.play;
+  }
+  function touchToy(name, frame) {
+    if (toy.hidden || reduced.matches || toy.classList.contains('is-tossed') || frame !== 2) return;
+    const contact = { ball: 'hop', duck: 'nuzzle', cap: 'hop' };
+    if (name !== contact[toy.dataset.toy] && name !== 'froglet_hop') return;
+    toy.classList.add('is-tossed');
+    button.dataset.play = toy.dataset.toy;
+    clearTimeout(toyTimer);
+    toyTimer = setTimeout(clearToy, 3200);
+  }
+  function showToy(id, duration = 6500) {
     if (!Object.hasOwn(TOYS, id)) return;
     clearToy(); toy.replaceChildren(); toy.dataset.toy = id;
     if (id === 'duck') {
       const duck = document.createElement('img'); duck.src = img_base + 'rubber_duck.png'; duck.alt = ''; duck.width = duck.height = 28; toy.append(duck);
     }
     toy.hidden = false;
-    void toy.offsetWidth; toy.classList.add('is-tossed');
+    // The prop waits for the contact frame of the frog's animation.
     toyTimer = setTimeout(clearToy, duration);
   }
   // the frog sits ON the taskbar: measure how far the button is below the bar's top edge (CSS --pg-lift)
@@ -242,6 +255,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   let frameTimer = null;
   function cancelMotion() {
     expressionTicket++;
+    clearToy();
     if (motionTimer) clearTimeout(motionTimer);
     if (restoreTimer) clearTimeout(restoreTimer);
     if (frameTimer) clearTimeout(frameTimer);
@@ -266,6 +280,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
         if (reduced.matches || document.visibilityState !== 'visible' || !slot.isConnected || !showing(a.base)) { cancelMotion(); return; }
         // the froglet's hop: the drawn frames bend the legs, a small lift in the middle frames makes it a real hop
         if (name === 'froglet_hop') img.classList.toggle('pg-hop-up', i === 1 || i === 2);
+        touchToy(name, i);
         if (i < frames.length) { img.setAttribute('src', img_base + frames[i++] + '?v=' + POSE_VERSION); frameTimer = setTimeout(step, a.ms); }
         else { frameTimer = null; img.classList.remove('pg-hop-up'); paint(shownView); restoreTimer = setTimeout(after, 140); }
       };
@@ -282,7 +297,12 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
         queueMotion(); return;
       }
       const name = pending.shift();
-      if (!name) { queueMotion(); return; }
+      if (!name) {
+        // Let a young frog's short pose finish while its prop settles.
+        if (!toy.hidden && toy.classList.contains('is-tossed')) restoreTimer = setTimeout(queueMotion, 3200);
+        else queueMotion();
+        return;
+      }
       playMotion(name, next);
     };
     next();
@@ -318,6 +338,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   };
   const activityFor = (view, action) => {
     const story = ACTION_SEQUENCES[action];
+    if (story && view?.motion === 'froglet' && !view.warning) return ['froglet_hop'];
     if (story && view?.adult && !view.warning && view.sprite === pose('tb_adult_sit')) return story;
     const single = animFor(view, action);
     return single ? [single] : [];
