@@ -5,7 +5,7 @@ import { PLACE, SOUVENIR, postcardText } from '../../meme/pepegochi-trips.mjs?v=
 
 export const CARD_W = 1200, CARD_H = 675;
 export const A12_IMG = 'img/pepegochi/a12/';
-export const CARD_VERSION = '20261122life';
+export const CARD_VERSION = '20261122life';   // the art files' cache tag (unchanged)
 export const postcardSrc = place => A12_IMG + 'postcard_' + (PLACE[place] ? place : 'unknown') + '.png?v=' + CARD_VERSION;
 export const souvenirSrc = id => A12_IMG + (id === 'souv_mini_miner' ? 'souv_mini_miner_01' : id) + '.png?v=' + CARD_VERSION;
 export const DIARY_CARD = A12_IMG + 'diary_card.png?v=' + CARD_VERSION;
@@ -14,7 +14,22 @@ export const DIARY_CARD = A12_IMG + 'diary_card.png?v=' + CARD_VERSION;
 export const POSTCARD = { textX: 770, textW: 380, titleY: 270, lineY: [308, 389, 470, 551], stamp: { x: 1056, y: 51, w: 96, h: 123 } };
 // The "???" postcard has an empty dark band across its static: the numbers come through there, like on the TV at 3 AM.
 export const SIGNAL = { text: '0098', x: 3, y: 300, w: 714, h: 68 };
-export const DIARY = { x: 92, y: 120, w: 520, lineH: 46, maxLines: 10 };
+// writing starts right of the red margin (x 141-143) and stays left of the second one (x 834)
+export const DIARY = { x: 160, y: 120, w: 650, lineH: 46, maxLines: 10 };
+// the frog doodle in the corner of diary_card.png: drawn in clear greens so it shows (owner, 2026-11-23)
+export const DIARY_FROG = { x: 940, y: 340, w: 160, h: 220, dark: [34, 62, 30], light: [92, 150, 64] };
+
+// Recolours the faint olive doodle pixels (not the paper, not the grid) from dark to light green. Pure on RGBA data.
+export function inkFrog(data) {
+  const { dark, light } = DIARY_FROG;
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    if (r + g + b >= 540 || r - b < 18) continue;
+    const k = Math.min(1, Math.max(0, ((r + g + b) / 3 - 90) / 100));
+    for (let c = 0; c < 3; c++) data[i + c] = Math.round(dark[c] * (1 - k) + light[c] * k);
+  }
+  return data;
+}
 
 // Splits text into lines that fit a width (measure(text) -> px). Long words are cut. Pure, for tests.
 export function wrap(text, width, measure, maxLines = 99) {
@@ -90,6 +105,10 @@ export async function drawDiaryPage(doc, { text, day }) {
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(await loadImage(doc, DIARY_CARD), 0, 0, CARD_W, CARD_H);
+  try {
+    const f = DIARY_FROG, px = ctx.getImageData(f.x, f.y, f.w, f.h);
+    inkFrog(px.data); ctx.putImageData(px, f.x, f.y);
+  } catch {}
   pen(ctx, 30, '#0c5a2c'); ctx.fillText('Day ' + day, DIARY.x, DIARY.y - 40);
   pen(ctx, 34);
   wrap(text, DIARY.w, t => ctx.measureText(t).width, DIARY.maxLines).forEach((line, i) => ctx.fillText(line, DIARY.x, DIARY.y + 20 + i * DIARY.lineH));

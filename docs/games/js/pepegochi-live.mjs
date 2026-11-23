@@ -11,7 +11,7 @@ import { openPondMap, noteLines } from './pond-map.mjs?v=20261121map';
 import { diaryFor, createDiary, browserStorage, isSnoopHour, SNOOP_LINE } from '../../meme/pepegochi-diary.mjs?v=20261122read';
 // A12 on the server (update_pepegochi_life.sql): trips, postcards, souvenirs, the golden lemon, the night signal
 import { LENGTHS, PACKS, PLACES, SOUVENIRS, SOUVENIR, PLACE, tripState, formatLeft, tripForDiary } from '../../meme/pepegochi-trips.mjs?v=20261122life';
-import { drawPostcard, drawDiaryPage, saveCanvas, postcardSrc, souvenirSrc } from './pepegochi-cards.mjs?v=20261122life';
+import { drawPostcard, drawDiaryPage, saveCanvas, postcardSrc, souvenirSrc } from './pepegochi-cards.mjs?v=20261123pic';
 import { rareOfDay, localDay } from '../../meme/pepegochi-rare.mjs?v=20261121a12';
 import { renderCarePanel } from './pepegochi-care-ui.mjs?v=20261121compact';
 
@@ -264,12 +264,23 @@ function renderDiary(box) {
   if (!pages.length) ol.append(el('li', {}, 'Nothing yet. Come back later, the frog writes while you are away.'));
   pages.slice(0, 60).forEach((pg, i) => {
     const li = el('li', {}, pg.text); li.append(el('small', {}, 'Day ' + pg.day));
-    if (i < 10) li.append(el('button', { type: 'button', class: 'pgb-diary-save', 'data-save-page': String(i), title: 'Save this page as a picture', 'aria-label': 'Save the page of day ' + pg.day + ' as a picture' }, 'Save'));
+    if (i < 10) li.append(el('button', { type: 'button', class: 'pgb-diary-save', 'data-save-page': String(i), title: 'Show this page as a picture', 'aria-label': 'Show the page of day ' + pg.day + ' as a picture' }, 'Picture'));
     ol.append(li);
   });
   pad.append(el('div', { class: 'pgb-notepad-bar' }, 'DIARY.TXT - written by your Fren'), ol,
     el('button', { type: 'button', class: 'btn', 'data-close-diary': '1' }, 'Close'));
   box.append(pad);
+  // the picture of one page: shown first, downloaded only when the owner asks (owner, 2026-11-23)
+  if (pagePreview) {
+    const pv = el('div', { class: 'pgb-notepad pgb-postcard pgb-page-preview', role: 'document', 'aria-label': 'Diary page picture', id: 'pgb-page-preview', tabindex: '-1' });
+    pagePreview.canvas.className = 'pgb-postcard-canvas'; pagePreview.canvas.setAttribute('role', 'img');
+    pagePreview.canvas.setAttribute('aria-label', 'Diary page, day ' + pagePreview.page.day + ': ' + pagePreview.page.text);
+    const row = el('div', { class: 'pgb-row' });
+    row.append(el('button', { type: 'button', class: 'btn', 'data-download-page': '1' }, 'Download picture'),
+      el('button', { type: 'button', class: 'btn', 'data-close-preview': '1' }, 'Close'));
+    pv.append(el('div', { class: 'pgb-notepad-bar' }, 'DIARY - day ' + pagePreview.page.day), pagePreview.canvas, row);
+    box.append(pv);
+  }
 }
 
 function renderPet(box, p) {
@@ -442,10 +453,14 @@ function openDiary() {
   const pad = $('pgb-diary');
   if (pad) { pad.scrollIntoView({ block: 'start' }); pad.focus({ preventScroll: true }); }
 }
-async function savePage(i) {
+let pagePreview = null;   // { page, canvas }: the picture of one diary page, before any download
+async function showPage(i) {
   const pg = myDiary().pages.slice().reverse()[i];
   if (!pg) return;
-  try { saveCanvas(document, await drawDiaryPage(document, pg), 'pepegochi-diary-day-' + pg.day + '.png'); } catch { game.message = 'The picture could not be made.'; render(); }
+  try { pagePreview = { page: pg, canvas: await drawDiaryPage(document, pg) }; } catch { game.message = 'The picture could not be made.'; }
+  render();
+  const pv = $('pgb-page-preview');
+  if (pv) { pv.scrollIntoView({ block: 'nearest' }); pv.focus({ preventScroll: true }); }
 }
 async function savePostcard() {
   if (!postcard) return;
@@ -467,12 +482,14 @@ $('pgb-body').addEventListener('click', e => {
   if (t.dataset.claim) { claimTrip(); return; }
   if (t.dataset.closePostcard) { postcard = null; render(); return; }
   if (t.dataset.savePostcard) { savePostcard(); return; }
-  if (t.dataset.savePage) { savePage(Number(t.dataset.savePage)); return; }
+  if (t.dataset.savePage) { showPage(Number(t.dataset.savePage)); return; }
+  if (t.dataset.downloadPage && pagePreview) { saveCanvas(document, pagePreview.canvas, 'pepegochi-diary-day-' + pagePreview.page.day + '.png'); return; }
+  if (t.dataset.closePreview) { pagePreview = null; render(); return; }
   if (t.dataset.act) runCare(t.dataset.act);
   else if (t.dataset.letter) openLetter();
   else if (t.dataset.closeLetter) { game.closeLetter(); render(); }
   else if (t.dataset.closeNotes) { notesOpen = false; render(); }
-  else if (t.dataset.closeDiary) { diaryOpen = false; render(); }
+  else if (t.dataset.closeDiary) { diaryOpen = false; pagePreview = null; render(); }
   else if (t.dataset.signin) backend.discord().catch(err => { game.message = err.message; render(); });
 });
 $('pgb-body').addEventListener('submit', e => {

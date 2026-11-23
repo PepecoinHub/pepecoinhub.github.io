@@ -325,3 +325,12 @@ test('the red count on DIARY clears once the diary is opened, and comes back onl
     assert.ok(diaryFor('o', 'l', T0 + 3 * DAY).unread >= 1, 'pages written later count again');
   } finally { globalThis.localStorage = old; }
 });
+
+import { inkFrog, DIARY } from '../docs/games/js/pepegochi-cards.mjs';
+test('diary picture: writing starts right of the red margin; the frog doodle turns clear green, paper and grid stay', () => {
+  assert.ok(DIARY.x > 143 && DIARY.x + DIARY.w < 834, 'between the two red margin lines');
+  const px = new Uint8ClampedArray([146, 144, 115, 255, 244, 237, 207, 255, 211, 216, 198, 255]);
+  inkFrog(px);
+  assert.ok(px[1] > px[0] && px[1] > px[2], 'the doodle pixel is green now');
+  assert.deepEqual([...px.slice(4)], [244, 237, 207, 255, 211, 216, 198, 255], 'paper and grid untouched');
+});
