@@ -79,7 +79,9 @@ test('desk toys become a full-screen chase and occasional autonomous play', () =
   assert.deepEqual(f.doc.body.children.map(x => x.className), ['pg-desktop-frog-frame pg-desktop-playing', 'pg-desktop-play-toy']);
   f.finish(); assert.equal(f.control.active, false); assert.equal(f.doc.body.children.length, 0);
   f.doc.documentElement.classList.remove('sky-night'); f.advance(); f.advance();
-  assert.equal(f.control.ambient(), true, 'after two quiet minutes the frog starts a bounded play story');
+  assert.equal(f.control.ambient(), false, 'two quiet minutes are not enough any more');
+  f.advance();
+  assert.equal(f.control.ambient(), true, 'after five quiet minutes the frog starts a bounded play story');
   f.finish(); assert.equal(f.control.active, false); f.control.dispose();
 });
 

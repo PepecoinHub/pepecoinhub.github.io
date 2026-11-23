@@ -9,14 +9,14 @@ import { dayNumber, remark } from './pepegochi-facts.mjs';
 import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261123fun1';
 import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
 import { createRumorReader } from './pepegochi-rumors.mjs?v=20261120notes3';
-import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261123fun1';
+import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261123calm';
 
 import { createBond } from './pepegochi-bond.mjs?v=20261120notes3';
 import { createNotebook } from './pepegochi-notes.mjs?v=20261121map';
 
 import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120notes3';
 // A12 life of its own (owner spec 2026-11-21): habits on the taskbar, the diary, the day's rare event.
-import { pickHabit, habitSequence, HABITS } from './pepegochi-habits.mjs?v=20261123fun1';
+import { pickHabit, habitSequence, HABITS } from './pepegochi-habits.mjs?v=20261123calm';
 import { createDiary, sameBook } from './pepegochi-diary.mjs?v=20261122read';
 import { tripState, formatLeft } from './pepegochi-trips.mjs?v=20261122life';
 import { rareOfDay, localDay } from './pepegochi-rare.mjs?v=20261121a12';
@@ -65,8 +65,8 @@ export const ACTION_SEQUENCES = Object.freeze({
   toyDuck: ['curious', 'peek', 'nuzzle', 'greet'],
   toyCap: ['search', 'hop', 'celebrate', 'welcome'],
 });
-export const IDLE_DELAY_MIN = 6000;
-export const IDLE_DELAY_SPAN = 9000;
+export const IDLE_DELAY_MIN = 12000;
+export const IDLE_DELAY_SPAN = 14000;
 export const animFrames = name => Array.from({ length: ANIMS[name].frames },
   (_, i) => 'taskbar/anim/tb_' + name + '_0' + (i + 1) + '.png');
 // the room's sprite for the frog's state (frogLook) -> the taskbar pose that shows the same state
@@ -355,7 +355,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
         if (desktop?.ambient()) return;
         if (desktop?.active || act) { queueMotion(); return; }
         playHabit(habit);
-      }, habit === 'sign' ? 1500 : IDLE_DELAY_MIN + Math.floor(random() * 11000));
+      }, habit === 'sign' ? 1500 : IDLE_DELAY_MIN + Math.floor(random() * IDLE_DELAY_SPAN));
       return;
     }
     const stories = idleStories[currentMood] || [];

@@ -1,5 +1,5 @@
 // A12 (owner spec 2026-11-21): the frog does small things on its own, now and then, on the taskbar.
-// Cosmetic only. The taskbar plays these instead of an ordinary idle story, about one time in four.
+// Cosmetic only. The taskbar plays these instead of an ordinary idle story, about one time in six (roughly every two minutes).
 // The livelier cadence still keeps one bounded activity at a time and only uses the healthy sitting pose.
 // Art: pack A12a (docs/games/img/pepegochi/taskbar/anim/tb_<name>_0N.png).
 
@@ -15,7 +15,7 @@ export const HABITS = {
   yawn_clock: { frames: 2, ms: 700, say: 'habitLate' },
   sign: { frames: 3, ms: 350, hold: 2200, say: 'habitGrass' },
 };
-export const HABIT_CHANCE = 1 / 4;
+export const HABIT_CHANCE = 1 / 6;
 export const GRASS_AFTER_MS = 45 * 60000;     // "TOUCH GRASS" after 45 minutes of PondOS in one go, once a visit
 
 // Which habit, if any, replaces the next idle move. ctx: { hour, change24h, sessionMs, grassShown, random }

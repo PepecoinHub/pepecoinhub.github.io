@@ -179,5 +179,5 @@ test('PR #390: care, stamps, Find and notes play their own frames, only over the
     assert.ok(story.length >= 4, 'play is a real sequence, not one short gesture');
     for (const name of story) assert.ok(ANIMS[name] || ['nuzzle', 'welcome', 'curious'].includes(name), name);
   }
-  assert.equal(IDLE_DELAY_MIN, 6000); assert.equal(IDLE_DELAY_SPAN, 9000);
+  assert.equal(IDLE_DELAY_MIN, 12000); assert.equal(IDLE_DELAY_SPAN, 14000);
 });

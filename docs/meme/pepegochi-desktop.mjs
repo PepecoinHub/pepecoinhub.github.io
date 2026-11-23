@@ -10,7 +10,7 @@ const PERCH = new Set(['bin', 'games', 'find', 'wp-folder', 'wp-hof', 'notes', '
 const BLOCKED = 'a,button,input,select,textarea,label,iframe,header,.win,.app-win,.pg-fact,.desk-corner,.os-dialog,[role="dialog"],[contenteditable]';
 const center = r => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
 const at = (x, y) => `translate(${Math.round(x)}px,${Math.round(y)}px)`;
-export const AUTO_PLAY_AFTER_MS = 120000;
+export const AUTO_PLAY_AFTER_MS = 300000;
 export const DESKTOP_PLAY_MS = 5400;
 
 export function perchPoint(rect, width, height, frogWidth = 48, frogHeight = 48) {
