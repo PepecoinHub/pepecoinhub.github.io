@@ -20,11 +20,16 @@
     linear-gradient(90deg, transparent 30%, #8fd0d6 30% 34%, transparent 34% 80%, #8fd0d6 80% 84%, transparent 84%) 0 calc(100% - 22px) / 100% 2px no-repeat,
     repeating-conic-gradient(#3e8f9a 0 25%, #4a9ea8 0 50%) 0 0 / 4px 4px; }
 .pad { display: grid; justify-items: center; gap: 6px; min-width: 0; }
-.pad h3 { margin: 0; padding: 1px 6px; font: 700 11px var(--f); background: var(--chrome); box-shadow: var(--raised); }
-.pad .art { width: 100%; max-width: 128px; }
+.pad h3 { margin: 0; padding: 3px 8px; font: 700 14px var(--f); background: var(--chrome); box-shadow: var(--raised); }
+.pad .art { width: 100%; max-width: 152px; }
+.pad button.art, .pad button.art:active, .pad button.art:disabled:active { display: block; min-height: 0; padding: 0; border: 0; background: transparent; box-shadow: none; line-height: 0; }
+.pad button.art:not(:disabled) { cursor: pointer; }
+.pad button.art:not(:disabled):hover { filter: brightness(1.08); }
+.pad button.art:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.pad button.art:disabled { opacity: 1; }
 .leaf .badge-t { font: 400 7px var(--f-px); fill: #000; }
 .steps { display: flex; gap: 4px; }
-.steps button { width: 40px; height: 30px; padding: 0; font: 700 16px/1 var(--f); }
+.steps button { width: 44px; height: 44px; padding: 0; font: 700 20px/1 var(--f); }
 .steps button:active { padding: 1px 0 0 1px; }
 
 /* the fly jar: a 98-style progress bar of 10 blocks */
@@ -104,7 +109,7 @@
   .menubar button { padding: 3px 7px; font-size: 11px; }
   .menubar .bb { margin-left: 0; }
   .pond { gap: 2px; padding: 8px 2px; }
-  .steps button { width: 36px; }
+  .steps button { width: 44px; }
   .jar { grid-template-columns: repeat(10, 10px); } .jar .dot { width: 10px; }
   .vsrow b { font-size: 22px; }
   .cards li.card { grid-template-columns: minmax(0, 1fr); }

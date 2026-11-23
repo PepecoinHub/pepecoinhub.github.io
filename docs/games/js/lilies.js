@@ -50,19 +50,27 @@
   $('logon').addEventListener('click', function () { N.open('logon'); });
 
   // ---------- the pond: the drawn lily pads (img/pond/lily-pad-a/b/c.png) with 5x5 pixel flies from pond-net.js ----------
-  var PX = N.px, CX = 16, CY = 16.5;
-  // n flies on an arc (degrees, 0 = right, clockwise) in two rings, each fly a 5x5 sprite
-  function ring(n, a0, a1, name) {
+  var PX = N.px;
+  // The settled duel can show up to twenty flies. Smaller three-pixel sprites give each side its own rows.
+  var RESULT_X = [2, 8, 14, 20, 26];
+  var RESULT_FLY = { mine: ['w.w', 'kck', '.c.'], theirs: ['w.w', 'kek', '.x.'] };
+  function resultFlies(n, side) {
     var out = '';
     for (var i = 0; i < n; i++) {
-      var t = n === 1 ? .5 : i / (n - 1), a = (a0 + (a1 - a0) * t) * Math.PI / 180, r = i % 2 ? 11 : 8;
-      out += PX.rects(PX.SPRITES[name], PX.PAL, Math.round(CX + r * Math.cos(a) - 2.5), Math.round(CY + r * Math.sin(a) - 2.5), 1);
+      out += PX.rects(RESULT_FLY[side], PX.PAL, RESULT_X[i % 5], (side === 'mine' ? 21 : 3) + Math.floor(i / 5) * 5, 1);
     }
+    return out;
+  }
+  // Ten distinct places around the leaf keep every fly visible while the player is planning a move.
+  var FLY_SPOTS = [[6, 8], [12, 5], [18, 5], [23, 8], [3, 14], [24, 14], [5, 21], [11, 24], [17, 24], [23, 21]];
+  function placedFlies(n) {
+    var out = '';
+    for (var i = 0; i < n; i++) out += PX.rects(PX.SPRITES.fly, PX.PAL, FLY_SPOTS[i][0], FLY_SPOTS[i][1], 1);
     return out;
   }
   // the lily pad itself is the drawn art (img/pond/lily-pad-a/b/c.png, 32x32); flies and the number go on top
   function padSvg(mine, theirs, badge, dim, n) {
-    var flies = theirs == null ? ring(mine, -70, 250, 'fly') : ring(mine, 110, 250, 'fly') + ring(theirs, -70, 70, 'flyTheirs');
+    var flies = theirs == null ? placedFlies(mine) : resultFlies(mine, 'mine') + resultFlies(theirs, 'theirs');
     return '<svg viewBox="0 0 32 32" class="leaf px' + (dim ? ' dim' : '') + '" shape-rendering="crispEdges" aria-hidden="true">' +
       '<image href="img/pond/lily-pad-' + 'abc'.charAt(n || 0) + '.png" x="0" y="0" width="32" height="32"/>' + flies +
       '<rect x="12" y="13" width="8" height="7" fill="#142016"/><rect x="13" y="14" width="6" height="5" fill="#ffffff"/>' +
@@ -72,13 +80,14 @@
   LILIES.forEach(function (name, i) {
     var pad = mk('div', 'pad'); pad.setAttribute('role', 'group'); pad.setAttribute('aria-label', name);
     pad.appendChild(mk('h3', null, name));
-    var art = mk('div', 'art'); pad.appendChild(art);
+    var art = mk('button', 'art'); art.type = 'button'; art.setAttribute('aria-label', 'Add one fly to ' + name); pad.appendChild(art);
     var st = mk('div', 'steps');
     var minus = mk('button', null, '−'), plus = mk('button', null, '+');
     minus.type = plus.type = 'button';
     minus.setAttribute('aria-label', 'One fly fewer on ' + name); plus.setAttribute('aria-label', 'One more fly on ' + name);
     minus.addEventListener('click', function () { if (flies[i] > 0) { flies[i]--; paint(); } });
-    plus.addEventListener('click', function () { if (sum() < 10) { flies[i]++; paint(); } });
+    var addFly = function () { if (sum() < 10) { flies[i]++; paint(); } };
+    plus.addEventListener('click', addFly); art.addEventListener('click', addFly);
     st.appendChild(minus); st.appendChild(plus); pad.appendChild(st);
     pad._art = art; pad._minus = minus; pad._plus = plus;
     padsEl.appendChild(pad);
@@ -101,7 +110,7 @@
       pad._art.innerHTML = padSvg(flies[i], null, String(flies[i]), false, i);
       pad.classList.toggle('empty', flies[i] === 0);
       pad.setAttribute('aria-label', LILIES[i] + ': ' + flies[i] + (flies[i] === 1 ? ' fly' : ' flies'));
-      pad._minus.disabled = flies[i] === 0; pad._plus.disabled = s >= 10;
+      pad._minus.disabled = flies[i] === 0; pad._plus.disabled = pad._art.disabled = s >= 10;
     });
     Array.prototype.forEach.call(jar.children, function (d, i) { d.classList.toggle('used', i < s); });
     presetButtons.forEach(function (setup) {
