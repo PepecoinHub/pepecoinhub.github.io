@@ -38,6 +38,9 @@
 .haze-pending-tip{border-left-color:#b6a478;background:#27332c;color:#e8eee3}
 .haze-chat-receipt a{color:#d4e3c8}
 .haze-chat-receipt small{color:#b3c1b1}
+.haze-chat-receipt.haze-tip-celebrate{animation:haze-receipt-appear .6s steps(1,end) both}
+@keyframes haze-receipt-appear{0%{opacity:0;transform:translateY(6px)}16%{opacity:1;transform:translateY(6px)}34%,100%{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.haze-chat-receipt.haze-tip-celebrate{animation:none}}
 
 .haze-drop-panel{flex:none;min-width:0;padding:6px;border:1px solid #657365;background:#24312a;color:#e0e7da}.haze-drop-panel>summary{cursor:pointer;font:12px var(--f-chrome,system-ui,sans-serif)}.haze-drop-panel .haze-group-feed{max-height:min(28vh,220px);overflow:auto;overscroll-behavior:contain}.haze-drop-panel[hidden]{display:none}
 
@@ -93,21 +96,23 @@
 @keyframes haze-live-card{0%,100%{box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15}50%{box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15,0 0 0 1px #7fd06a,0 0 10px #7fd06a66}}
 @media(prefers-reduced-motion:reduce){.haze-live-chip.is-joinable,.haze-live-chip.is-new,.haze-group-feed .haze-drop-card.is-joinable{animation:none}.haze-group-feed .haze-drop-card.is-joinable{outline:1px solid #7fd06a}}
 
-/* A party for the fren who just got PEP. */
+/* A confirmed tip looks like a tiny PondOS 98 notification, with stepped pixel confetti. */
 .haze-party{position:fixed;z-index:99500;overflow:hidden;pointer-events:none}
-.haze-party-banner{position:absolute;left:50%;top:38%;display:grid;justify-items:center;gap:2px;padding:10px 18px;transform:translate(-50%,-50%);
-  background:#fdf6c8;color:#17351c;border:2px solid #17351c;box-shadow:3px 3px 0 #0008;font:12px/1.2 var(--f-chrome,Tahoma,sans-serif);
-  animation:haze-party-pop 3.2s ease-out forwards}
-.haze-party-banner b{font:700 20px/1.1 var(--f-chrome,Tahoma,sans-serif)}
-.haze-party-coin,.haze-party-heart{position:absolute;bottom:-28px;display:grid;place-items:center;font-style:normal;animation:haze-party-rise 2.4s ease-out forwards;opacity:0}
-.haze-party-coin{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3a6,#f2c94c 55%,#b8860b);color:#5a3d00;font:700 12px/1 Tahoma,sans-serif;box-shadow:0 0 0 1px #7a5600}
-.haze-party-heart{font-size:20px}
-.haze-for-me{animation:haze-for-me 1.2s ease-out 3}
+.haze-party-banner{position:absolute;left:50%;top:38%;display:grid;justify-items:center;gap:4px;min-width:190px;max-width:calc(100% - 24px);padding:0 10px 12px;transform:translate(-50%,-50%);box-sizing:border-box;
+  background:#d4d0c8;color:#17351c;border:2px solid;border-color:#fff #424842 #424842 #fff;box-shadow:3px 3px 0 #1119;font:700 13px/1.2 var(--f-chrome,Tahoma,sans-serif);text-align:center;
+  animation:haze-party-pop 3.2s steps(1,end) forwards}
+.haze-party-title{display:block;width:calc(100% + 20px);box-sizing:border-box;padding:4px 8px;margin-bottom:5px;background:#205d37;color:#fff;text-align:left;font:700 12px/1.2 var(--f-chrome,Tahoma,sans-serif);letter-spacing:.04em}
+.haze-party-banner b{font:700 20px/1.1 var(--f-chrome,Tahoma,sans-serif);overflow-wrap:anywhere}
+.haze-party-from{font-size:11px;overflow-wrap:anywhere}
+.haze-party-coin,.haze-party-heart{position:absolute;bottom:-28px;display:grid;place-items:center;font-style:normal;animation:haze-party-rise 2.4s steps(12,end) forwards;opacity:0}
+.haze-party-coin{width:26px;height:26px;border-radius:50%;background:#269b4d url('../assets/brand/coin-p.svg') center/contain no-repeat;filter:drop-shadow(1px 1px 0 #102d1a)}
+.haze-party-heart{font:700 20px/1 Tahoma,sans-serif;color:#5cb951;text-shadow:1px 1px #1e5429}
+.haze-for-me{animation:haze-for-me 1.2s steps(2,end) 3}
 .haze-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@keyframes haze-party-rise{0%{opacity:0;transform:translate(0,0) scale(.6)}12%{opacity:1}100%{opacity:0;transform:translate(var(--drift,0),-260px) rotate(200deg) scale(1)}}
-@keyframes haze-party-pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}12%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}20%{transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%)}}
-@keyframes haze-for-me{0%,100%{box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15}50%{box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15,0 0 0 3px #f2c94c,0 0 14px #f2c94c}}
-@media(prefers-reduced-motion:reduce){.haze-party-banner{animation:none}.haze-for-me{animation:none;outline:2px solid #f2c94c}}
+@keyframes haze-party-rise{0%{opacity:0;transform:translate(0,0)}12%{opacity:1}70%{opacity:1}100%{opacity:0;transform:translate(var(--drift,0),-250px)}}
+@keyframes haze-party-pop{0%{opacity:0;transform:translate(-50%,calc(-50% + 12px))}10%,82%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,calc(-50% - 8px))}}
+@keyframes haze-for-me{0%,100%{box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15}50%{box-shadow:inset 1px 1px 0 #526356,inset -1px -1px 0 #101b15,0 0 0 3px #f2c94c}}
+@media(prefers-reduced-motion:reduce){.haze-party-banner{animation:none}.haze-for-me{animation:none;outline:2px solid #f2c94c}.haze-party-coin,.haze-party-heart{display:none}}
 
 /* Bug reports: the form uses the dialog's own fields; the inbox is a list of cards (2026-11-22). */
 .haze-report-list{display:grid;gap:8px;margin-top:8px;max-height:min(60vh,520px);overflow:auto}

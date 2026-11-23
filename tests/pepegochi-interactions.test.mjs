@@ -152,6 +152,19 @@ test('desktop commands open real PondOS destinations and close the conversation'
   h.controller.dispose();
 });
 
+test('each desk toy requests its own long play story and visible prop', () => {
+  const animations = [], toys = [];
+  const bond = { take: () => null, play: id => id === 'duck' ? 'toyFavourite' : 'toyOkay' };
+  const h = harness(adult, { bond, animate: action => animations.push(action), showToy: id => toys.push(id) });
+  const choices = [['Roll the ball', 'toyBall', 'ball'], ['Squeak the duck', 'toyDuck', 'duck'], ['Toss the bottle cap', 'toyCap', 'cap']];
+  for (const [label, animation, toy] of choices) {
+    h.button.emit('click', { detail: 0 }); choose(h.doc.body.children[0], 'play', label);
+    assert.equal(animations.at(-1), animation); assert.equal(toys.at(-1), toy);
+    h.controller.close({ reset: true });
+  }
+  h.controller.dispose();
+});
+
 test('PondOS wires command buttons to its existing window functions', () => {
   const shell = readFileSync(new URL('../docs/meme/meme.js', import.meta.url), 'utf8');
   assert.match(shell, /commands:\s*\{\s*games:\s*gamesFolder,\s*passport:\s*frenPassport,\s*news:\s*bulletinApp,\s*tv:\s*pondTV\s*\}/);

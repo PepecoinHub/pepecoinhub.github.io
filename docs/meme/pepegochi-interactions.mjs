@@ -262,7 +262,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     }
     reposition();
   }
-  function say(action = 'hello') {
+  function say(action = 'hello', animation = null) {
     clearNotice(); clearRumors();
     const spontaneousRumor = action === 'hello' && !panel;
     if (action === 'hello') action = bond?.take() || action;
@@ -369,7 +369,8 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
           if (!playableCompanion(getView())) { reply.textContent = youngNeeds[getView()?.needAttention] ? youngNeeds[getView().needAttention] + ' Visit my room first.' : 'Desk toys unlock when I am a healthy froglet or adult.'; return; }
           const reaction = bond.play(id);
           if (!reaction) { reply.textContent = 'My toy box is not ready yet. Try again in a moment.'; return; }
-          say(reaction); if (reaction !== 'toyAgain') showToy(id);
+          say(reaction, id === 'ball' ? 'toyBall' : id === 'duck' ? 'toyDuck' : 'toyCap');
+          if (reaction !== 'toyAgain') showToy(id);
         },groups.play);
       }
       if (bond) {
@@ -395,7 +396,7 @@ export function mountFrogInteractions({ button, img, slot, getView, setPose, ani
     }
     reply.textContent = r.text;
     setPose(r.pose);
-    animate(action);
+    animate(animation || action);
     // A secret comes up only on a fresh voluntary greeting, never from a repeatable menu action.
     if (spontaneousRumor && ['hello', 'return', 'returnLong'].includes(action) && readRumors && notebook?.due(getView())) secretTalk();
     reposition();

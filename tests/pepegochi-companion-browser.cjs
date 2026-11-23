@@ -64,7 +64,8 @@ const server = http.createServer((req, res) => {
  await page.evaluate(()=>{t.time+=31_000;t.pet.needs.mood=60;t.refresh()});
  await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('moody'));
  await frog.focus();await page.keyboard.press('Enter');await menuAction(page,'Play');await frame('welcome');
- for(let i=0;i<4;i++)await menuAction(page,'Pet me');await frame('sulk');
+ for(let i=0;i<3;i++)await menuAction(page,'Pet me');
+ const sulk=frame('sulk');await menuAction(page,'Pet me');await sulk;
  await page.waitForFunction(()=>document.querySelector('.pg-companion-button img').src.includes('/tb_adult_sit.png'));
  await page.keyboard.press('Escape');
  await page.evaluate(()=>{t.time+=46000;t.pet.needs.energy=20;t.refresh();});
@@ -169,7 +170,7 @@ const server = http.createServer((req, res) => {
  const buddy=personality.locator('.pg-companion-button');await buddy.focus();await personality.keyboard.press('Enter');
  for(const label of ['Roll the ball','Squeak the duck','Toss the bottle cap']) {
   await menuAction(personality,label);
-  assert.equal(await personality.locator('.pg-companion-toy').isVisible(),true);
+  assert.equal(await personality.locator('.pg-desktop-play-toy, .pg-companion-toy:not([hidden])').first().isVisible(),true);
   await personality.evaluate(()=>t.time+=31000);
  }
  await menuAction(personality,'Your favourite toy?');
