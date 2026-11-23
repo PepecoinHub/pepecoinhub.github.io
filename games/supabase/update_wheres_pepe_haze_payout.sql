@@ -48,7 +48,7 @@ begin
       raise exception 'TWO_ADDRESSES: A player used two addresses this week: %. Confirm to pay all of their rewards to their newest address, or Hold one of them.', bad;
     end if;
   else
-    update wp_pay set address = newest;
+    update wp_pay set address = newest where address is distinct from newest;  -- Supabase refuses an UPDATE without WHERE
   end if;
   select string_agg(address || ' (' || s || ' PEP)', ', ') into bad from
     (select address, sum(pep) s from wp_pay group by address having sum(pep) < 1) x;
