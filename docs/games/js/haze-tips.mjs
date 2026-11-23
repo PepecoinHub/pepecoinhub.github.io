@@ -102,7 +102,8 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
   const groups=createHazeGroups({node,doc,win,rpc,invoke,modal,ensureWallet,currentUser,formatAtomic,amountAtomic,chatLog:()=>chatLog,chatInput:()=>chatInput,origin:HAZE_ORIGIN,wallet:()=>wallet,refreshWallet:refresh,capabilities:()=>walletCaps,hideWallet:()=>{if(walletHost)walletHost.hidden=true;},login,connect,notify,messageTips,celebrate},{enabled:HAZE_GROUPS_ENABLED});
   function endView(){
     const view=activeView;activeView=null;view?.controller.abort();if(walletHost)walletHost.hidden=true;
-    if(walletFrame){walletFrame.contentWindow.postMessage({type:'haze:tip-cancel',version:1},HAZE_ORIGIN);walletFrame.contentWindow.postMessage({type:'haze:hidden'},HAZE_ORIGIN);}
+    const target=walletFrame?.contentWindow;
+    if(target){target.postMessage({type:'haze:tip-cancel',version:1},HAZE_ORIGIN);target.postMessage({type:'haze:hidden'},HAZE_ORIGIN);}
     if(view?.oldFocus?.isConnected)view.oldFocus.focus();
   }
   function modal(title) {
@@ -265,7 +266,7 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     const state=userId===currentUser()?'self':!message?'none':receivers.get(userId)===true?'linked':receivers.get(userId)===false?'unlinked':'checking';
     return {state,open:()=>{if(message&&state!=='self')void openTip(message);}};
   }
-  async function openTip(message,preset={}) {
+  async function openTip(message,preset={},prepared=null) {
     try{signed();}catch{return;}
     if(owner!==currentUser()||!wallet?.address)await refresh();
     if(!wallet?.address){await connect(()=>openTip(message,preset));return;}
@@ -275,21 +276,29 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     for(const value of ['1','10','100','1000'])presets.append(node('button',{type:'button',onclick:()=>{amount.value=value;}},value+' PEP'));
     const reactions=node('select',{'aria-label':'Tip reaction'});
     for(const [value,label]of Object.entries(REACTIONS))reactions.append(node('option',{value},label+' '+({heart:'Much love',applause:'Well played',rocket:'Let’s go'})[value]));
+    if(Object.hasOwn(REACTIONS,preset.reaction))reactions.value=preset.reaction;
     const note=node('input',{type:'text',maxlength:'160',placeholder:'Thanks for the help!','aria-label':'Optional tip note',value:preset.note||''});
     const submit=node('button',{type:'submit',class:'haze-tip-primary'},'Review tip in Haze');
     form.append(node('p',{},'A direct tip from your linked Haze wallet. You approve the payment and network fee in Haze.'),presets,
       node('label',{},'Native Pepecoin (PEP)',amount),node('label',{},'Make it a moment',reactions),node('label',{},'A little note (optional)',note),submit);
     view.body.append(form,node('small',{},'Powered by Haze Wallet · No site balance or deposit.'));
+    view.restoreTip=()=>{
+      if(currentUser()===user)void openTip(message,{amount:amount.value,note:note.value,reaction:reactions.value},prepared);
+    };
     form.onsubmit=async event=>{
       event.preventDefault();if(submit.disabled)return;view.status.textContent='';
       try{
         if(currentUser()!==user)throw Error('Your account changed. Start this tip again.');
-        if(flights.size>=20)throw Error('Too many open tip checks. Finish your pending tips first.');
-        const atomic=amountAtomic(amount.value);submit.disabled=true;
+        const draft={p_message:message.id,p_amount:amountAtomic(amount.value),p_reaction:reactions.value,p_note:note.value};
+        const unchanged=prepared&&Object.keys(draft).every(key=>draft[key]===prepared.draft[key]);
+        const reuse=unchanged&&Date.parse(prepared.intent.expires_at)>Date.now();
+        if(!reuse&&flights.size>=20)throw Error('Too many open tip checks. Finish your pending tips first.');
+        submit.disabled=true;
         view.status.textContent='Checking the tip details…';
-        const intent=await rpc('gry_haze_tip_begin',{p_message:message.id,p_amount:atomic,p_reaction:reactions.value,p_note:note.value});
+        const intent=reuse?prepared.intent:await rpc('gry_haze_tip_begin',draft);
+        if(flights.get(intent.id)?.txid)throw Error('This tip was already submitted. Check its confirmation in chat.');
         if(currentUser()!==user||!view.active())return;
-        const url=new URL(tipURL(intent));
+        const url=new URL(tipURL(intent));prepared={intent,draft};
         view.status.textContent='Opening your secure Haze review…';
         const frame=await ensureWallet(view);
         if(currentUser()!==user||!view.active())return;
@@ -346,6 +355,20 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
   win.addEventListener('message',receive);
   const resume=()=>{if(!doc.hidden)for(const flight of flights.values())if(flight.txid&&!flight.checking)void checkFlight(flight);};
   doc.addEventListener('visibilitychange',resume);
+  function restoreFromHistory(event){
+    if(!event.persisted)return;
+    // Safari can restore a live PondOS document with a disabled review
+    // form and a wallet frame that is still rehydrating. Open a fresh frame
+    // on the next click and restore the form without reloading PondOS.
+    const restore=activeView?.restoreTip;
+    if(restore){
+      activeView.close();
+      walletFrame?.remove();walletFrame=null;walletLoaded=null;walletCaps=null;
+      restore();
+    }
+    resume();
+  }
+  win.addEventListener('pageshow',restoreFromHistory);
   function invalidate(){syncAt=0;void groups?.sync(true);}
   async function sync() {
     if(destroyed||syncing||doc.hidden||Date.now()-syncAt<60000)return;
@@ -376,5 +399,5 @@ export function createHazeTips({rpc,invoke,session,login,notify,chatLog=null,cha
     }catch{/* Missing migration or temporary failure must not break ordinary chat. */}
     finally{syncing=false;}
   }
-  return {mount,bindMessage,command,tipFor,refresh,invalidate,sync,connect,reviewGroup:id=>groups?.review(id),destroy(){destroyed=true;groups?.destroy();saveQueue();dialog?.close();dialog?.remove();win.removeEventListener('message',receive);doc.removeEventListener('visibilitychange',resume);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();receivers.clear();flights.clear();linkButton?.remove();}};
+  return {mount,bindMessage,command,tipFor,refresh,invalidate,sync,connect,reviewGroup:id=>groups?.review(id),destroy(){destroyed=true;groups?.destroy();saveQueue();dialog?.close();dialog?.remove();win.removeEventListener('message',receive);win.removeEventListener('pageshow',restoreFromHistory);doc.removeEventListener('visibilitychange',resume);for(const timer of timers)clearTimeout(timer);timers.clear();messages.clear();receivers.clear();flights.clear();linkButton?.remove();}};
 }

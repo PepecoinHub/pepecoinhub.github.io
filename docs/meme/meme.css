@@ -2052,6 +2052,11 @@ footer.foot a { color: #edf3e3; }
 .app-win.is-max .lan-main, .app-win.is-sized .lan-main { grid-template-rows: minmax(0, 1fr); }
 .app-win.is-max .lan-main.list-on, .app-win.is-sized .lan-main.list-on { grid-template-rows: auto minmax(0, 1fr); }
 @container (min-width: 560px) { .app-win.is-max .lan-main.list-on, .app-win.is-sized .lan-main.list-on { grid-template-rows: minmax(0, 1fr); } }
+/* A phone-wide maximized chat with Frens online, Haze and Community drops all open: the list above the log
+   (up to 112px) + the log's own 120px must fit, or the log spills under the message box. The window body
+   scrolls instead (Lemon, 2026-11-23). */
+.app-win.is-max .app-body > .lan-main.list-on, .app-win.is-sized .app-body > .lan-main.list-on { min-height: 240px; }
+@container (min-width: 560px) { .app-win.is-max .app-body > .lan-main.list-on, .app-win.is-sized .app-body > .lan-main.list-on { min-height: 120px; } }
 /* the fren card */
 .lan-card { position: absolute; z-index: 5; width: min(270px, calc(100% - 8px)); padding: 3px; box-sizing: border-box; }
 .lan-card .win-bar { background: linear-gradient(90deg, var(--title), var(--title-2)); color: var(--title-ink); }

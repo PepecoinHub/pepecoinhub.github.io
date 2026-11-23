@@ -241,7 +241,7 @@ function renderAlbum(v) {
 
 // ---------- A12 diary + rare event ----------
 // The diary is written by the taskbar frog in PondOS; this window only reads it (pepegochi-diary.mjs diaryFor).
-let diaryOpen = false;
+let diaryOpen = false, diaryDay = null;   // diaryDay: null = the newest day (default), 'all' = every day, a number = that day
 const owner = () => { const u = backend?.session?.()?.user; return u && !u.is_anonymous ? u.id : null; };
 const livingPet = () => { const p = game.last?.pet; return p && p.status !== 'departed' && p.stage && p.stage !== 'egg' ? p : null; };
 function todayRare() {
@@ -259,15 +259,37 @@ function renderDiary(box) {
   if (!diaryOpen || !p || !id) { diaryOpen = false; return; }
   const pages = myDiary().pages.slice().reverse();
   const pad = el('div', { class: 'pgb-notepad pgb-diary', role: 'document', 'aria-label': 'DIARY.TXT', id: 'pgb-diary', tabindex: '-1' });
-  const ol = el('ol', { reversed: true });
-  if (isSnoopHour(new Date().getHours())) ol.append(el('li', {}, SNOOP_LINE));
+  // A long diary stays short: it opens on the newest day only, older days and 'All days' come from the picker,
+  // and the pages sit in a scroll box (Lemon / owner, 2026-11-23)
+  const days = [...new Set(pages.map(pg => pg.day))];
+  if (typeof diaryDay === 'number' && !days.includes(diaryDay)) diaryDay = null;
+  const showDay = diaryDay === 'all' ? null : diaryDay ?? days[0] ?? null;
+  let picker = null;
+  if (days.length > 1) {
+    const sel = el('select', { id: 'pgb-diary-day', 'data-diary-day': '1' });
+    days.forEach((d, k) => {
+      const n = pages.filter(pg => pg.day === d).length;
+      const o = el('option', { value: String(d) }, 'Day ' + d + (k === 0 ? ' - newest' : '') + (n > 1 ? ' (' + n + ' pages)' : ''));
+      if (d === showDay) o.selected = true;
+      sel.append(o);
+    });
+    const all = el('option', { value: 'all' }, 'All days (' + pages.length + ' pages)');
+    if (showDay === null) all.selected = true;
+    sel.append(all);
+    picker = el('label', { class: 'pgb-diary-pick', for: 'pgb-diary-day' }, 'Show: '); picker.append(sel);
+  }
+  const ol = el('ol', { reversed: true, class: 'pgb-diary-list', tabindex: '0', 'aria-label': 'Diary pages' });
+  if (isSnoopHour(new Date().getHours()) && (showDay === null || showDay === days[0])) ol.append(el('li', {}, SNOOP_LINE));
   if (!pages.length) ol.append(el('li', {}, 'Nothing yet. Come back later, the frog writes while you are away.'));
-  pages.slice(0, 60).forEach((pg, i) => {
+  // i stays the page's place in the whole diary, so the Picture button (showPage) finds the same page when filtered
+  pages.map((pg, i) => ({ pg, i })).filter(x => showDay === null || x.pg.day === showDay).slice(0, 200).forEach(({ pg, i }) => {
     const li = el('li', {}, pg.text); li.append(el('small', {}, 'Day ' + pg.day));
-    if (i < 10) li.append(el('button', { type: 'button', class: 'pgb-diary-save', 'data-save-page': String(i), title: 'Show this page as a picture', 'aria-label': 'Show the page of day ' + pg.day + ' as a picture' }, 'Picture'));
+    li.append(el('button', { type: 'button', class: 'pgb-diary-save', 'data-save-page': String(i), title: 'Show this page as a picture', 'aria-label': 'Show the page of day ' + pg.day + ' as a picture' }, 'Picture'));
     ol.append(li);
   });
-  pad.append(el('div', { class: 'pgb-notepad-bar' }, 'DIARY.TXT - written by your Fren'), ol,
+  pad.append(el('div', { class: 'pgb-notepad-bar' }, 'DIARY.TXT - written by your Fren'));
+  if (picker) pad.append(picker);
+  pad.append(ol,
     el('button', { type: 'button', class: 'btn', 'data-close-diary': '1' }, 'Close'));
   box.append(pad);
   // the picture of one page: shown first, downloaded only when the owner asks (owner, 2026-11-23)
@@ -489,8 +511,14 @@ $('pgb-body').addEventListener('click', e => {
   else if (t.dataset.letter) openLetter();
   else if (t.dataset.closeLetter) { game.closeLetter(); render(); }
   else if (t.dataset.closeNotes) { notesOpen = false; render(); }
-  else if (t.dataset.closeDiary) { diaryOpen = false; pagePreview = null; render(); }
+  else if (t.dataset.closeDiary) { diaryOpen = false; diaryDay = null; pagePreview = null; render(); }
   else if (t.dataset.signin) backend.discord().catch(err => { game.message = err.message; render(); });
+});
+$('pgb-body').addEventListener('change', e => {
+  if (!e.target.closest('[data-diary-day]')) return;
+  diaryDay = e.target.value === 'all' ? 'all' : Number(e.target.value);
+  render();
+  $('pgb-diary-day')?.focus({ preventScroll: true });
 });
 $('pgb-body').addEventListener('submit', e => {
   if (e.target.closest('[data-trip]')) { e.preventDefault(); startTrip($('pgb-trip-len').value, $('pgb-trip-pack').value); return; }

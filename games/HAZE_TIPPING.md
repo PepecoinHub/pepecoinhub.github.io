@@ -65,7 +65,11 @@ The public production protocol is separately covered by `haze-core.test.mjs`.
    a public review and grants no spend authority. Haze checks the linked sender,
    fixes the amount/destination and calculates the fee automatically. The user
    explicitly approves in Haze. A normal unlocked session can be reused; its
-   existing lock policy is respected. The intent expires in 30 minutes.
+   existing lock policy is respected. The intent expires in 30 minutes. On
+   iPhone the Safari handoff carries the same public intent to the saved
+   first-party Haze wallet. Returning with Safari Back restores the draft and
+   starts a fresh wallet frame. Reviewing the unchanged draft reuses its
+   unexpired intent, so Haze can recognize an earlier transaction attempt.
 4. After submission Haze shares only `{type:'haze:tip-submitted',version:1,
    intent,txid}` with the exact PepecoinHub parent (or legacy opener). Chat
    returns automatically with a private pending indicator and follows network
