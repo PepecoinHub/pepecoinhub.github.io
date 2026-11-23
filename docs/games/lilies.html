@@ -6,8 +6,8 @@
 <meta name="description" content="A strategy duel for two frogs who never have to be online together. Spread 10 flies over three lily pads, win two pads, win the duel.">
 <meta name="robots" content="noindex">
 <link rel="canonical" href="https://pepecoinhub.com/games/lilies.html"><link rel="icon" href="img/pond/lilies.png" type="image/png">
-<link rel="stylesheet" href="pond.css?v=20261115pattern"><link rel="stylesheet" href="lilies.css?v=20261117kingface">
-<script src="js/config.js"></script><script src="js/pond-net.js?v=20261114tables" defer></script><script src="js/lilies.js?v=20261114limit10" defer></script>
+<link rel="stylesheet" href="pond.css?v=20261115pattern"><link rel="stylesheet" href="lilies.css?v=20261123lilies2">
+<script src="js/config.js"></script><script src="js/pond-net.js?v=20261114tables" defer></script><script src="js/lilies.js?v=20261123lilies2" defer></script>
 <link rel="stylesheet" href="pond-visual-upgrade.css?v=20261114visual3">
 <script src="js/pond-visual-upgrade.js?v=20261114visual3" defer></script>
 </head><body>
@@ -18,12 +18,12 @@
   <div class="ly-hero" id="hero">
     <div class="ly-hero-pond" aria-hidden="true"><span><img src="img/pond/lily-pad-a.png" alt=""><i>?</i></span><span><img src="img/pond/lily-pad-b.png" alt=""><i>?</i></span><span><img src="img/pond/lily-pad-c.png" alt=""><i>?</i></span></div>
     <div class="ly-hero-text">
-      <p class="kicker">Strategy duel · 2 frogs · never online together</p>
+      <p class="kicker">Turn-based duel · play at different times</p>
       <h1>Battle of Three Lilies</h1>
-      <p>Hide 10 flies on 3 lily pads. Win two pads, win the duel.</p>
+      <p>Play an open challenge now, or leave your secret move for a fren to answer within 48 hours.</p>
     </div>
-    <div class="reign ly-count"><b id="open-n">–</b><small>open duels</small></div>
-    <button type="button" class="go hero-go" id="hero-new">Throw down a challenge</button>
+    <div class="reign ly-count"><b id="open-n">–</b><small>ready to play</small></div>
+    <div class="ly-hero-actions"><button type="button" class="go hero-go" id="hero-play">Play an open duel</button><button type="button" class="ly-hero-later" id="hero-new">Leave a challenge for later</button></div>
   </div>
   <nav class="menubar" aria-label="Battle of Three Lilies">
     <button type="button" data-tab="open" aria-pressed="true">Open Challenges</button>
@@ -42,7 +42,7 @@
     <!-- open challenges -->
     <section class="panel" id="tab-open">
       <h2>Open challenges</h2>
-      <p class="muted">Somebody hid 10 flies on three lily pads. You cannot see where. Accept, place your own 10, and the flies settle it.</p>
+      <p class="muted">These moves are waiting on the server. Their creators can be offline: choose one, place your 10 flies, and get the result right away.</p>
       <ul class="cards" id="open-list"><li class="muted">Asking the pond…</li></ul>
     </section>
 
@@ -60,6 +60,7 @@
     <section class="panel" id="tab-create" hidden>
       <h2 id="alloc-title">Create a challenge</h2>
       <p class="muted" id="alloc-sub">Spread exactly 10 flies over three lily pads. Nobody sees them until somebody accepts. Win two pads, win the duel.</p>
+      <div class="ly-setup" aria-label="Quick fly setups"><span>Start with a setup, then adjust any lily:</span><div class="ly-presets" id="presets"></div><span>Click a lily to add a fly. Use − to take one back.</span></div>
       <div class="pond" id="pads"></div>
       <div class="jar-row">
         <div class="jar" id="jar" aria-hidden="true"></div>
@@ -105,7 +106,7 @@
         <li>Win <b>two lilies</b> and you win the duel. 1:1 or 0:0 is a draw. Total flies do not matter, only lilies.</li>
         <li>Create a challenge and walk away: it waits 48 hours for a brave fren. Nobody sees your flies before the duel.</li>
         <li>Or accept somebody’s challenge: place your flies and the result comes at once, with both spreads.</li>
-        <li>Up to 3 open challenges at a time, 5 new ones a day. No stakes, no PEP, only bragging rights.</li>
+        <li>Up to 3 open challenges at a time, 10 new ones a day. No stakes, no PEP, only bragging rights.</li>
       </ul>
       <p class="muted">Example: 2/4/4 against 4/3/3. Lily A goes to 4, lilies B and C go to 4 over 3. 2/4/4 wins 2:1.</p>
     </section>

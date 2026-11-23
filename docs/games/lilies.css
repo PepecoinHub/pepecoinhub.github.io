@@ -20,11 +20,16 @@
     linear-gradient(90deg, transparent 30%, #8fd0d6 30% 34%, transparent 34% 80%, #8fd0d6 80% 84%, transparent 84%) 0 calc(100% - 22px) / 100% 2px no-repeat,
     repeating-conic-gradient(#3e8f9a 0 25%, #4a9ea8 0 50%) 0 0 / 4px 4px; }
 .pad { display: grid; justify-items: center; gap: 6px; min-width: 0; }
-.pad h3 { margin: 0; padding: 1px 6px; font: 700 11px var(--f); background: var(--chrome); box-shadow: var(--raised); }
-.pad .art { width: 100%; max-width: 128px; }
+.pad h3 { margin: 0; padding: 3px 8px; font: 700 14px var(--f); background: var(--chrome); box-shadow: var(--raised); }
+.pad .art { width: 100%; max-width: 152px; }
+.pad button.art, .pad button.art:active, .pad button.art:disabled:active { display: block; min-height: 0; padding: 0; border: 0; background: transparent; box-shadow: none; line-height: 0; }
+.pad button.art:not(:disabled) { cursor: pointer; }
+.pad button.art:not(:disabled):hover { filter: brightness(1.08); }
+.pad button.art:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.pad button.art:disabled { opacity: 1; }
 .leaf .badge-t { font: 400 7px var(--f-px); fill: #000; }
 .steps { display: flex; gap: 4px; }
-.steps button { width: 40px; height: 30px; padding: 0; font: 700 16px/1 var(--f); }
+.steps button { width: 44px; height: 44px; padding: 0; font: 700 20px/1 var(--f); }
 .steps button:active { padding: 1px 0 0 1px; }
 
 /* the fly jar: a 98-style progress bar of 10 blocks */
@@ -104,7 +109,7 @@
   .menubar button { padding: 3px 7px; font-size: 11px; }
   .menubar .bb { margin-left: 0; }
   .pond { gap: 2px; padding: 8px 2px; }
-  .steps button { width: 36px; }
+  .steps button { width: 44px; }
   .jar { grid-template-columns: repeat(10, 10px); } .jar .dot { width: 10px; }
   .vsrow b { font-size: 22px; }
   .cards li.card { grid-template-columns: minmax(0, 1fr); }
@@ -141,7 +146,18 @@
 .ly-hero h1 { margin: 4px 0 2px; font: 400 clamp(28px, 6vw, 42px)/.9 var(--f-px); color: #fff; text-shadow: 2px 2px 0 #000; }
 .ly-hero p { margin: 0; color: #d6f0dc; }
 .ly-count { grid-area: count; }
-.hero-go { grid-area: go; justify-self: start; font: 400 20px/1 var(--f-px); padding: 8px 16px; letter-spacing: .03em; }
+.ly-hero-actions { grid-area: go; display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.hero-go { font: 400 20px/1 var(--f-px); padding: 8px 16px; letter-spacing: .03em; }
+.ly-hero-later { min-height: 42px; padding: 7px 12px; border: 2px outset #d4d0c8; background: #d4d0c8; color: #17351c; font: 700 14px/1.2 var(--f); cursor: pointer; }
+.ly-hero-later:active { border-style: inset; }
+.ly-hero-actions button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.ly-setup { display: grid; gap: 6px; margin: 8px 0 10px; padding: 9px; background: var(--chrome); box-shadow: var(--sunken); font: 14px/1.3 var(--f); }
+.ly-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.ly-presets button { min-height: 36px; padding: 5px 9px; font: 700 14px/1.2 var(--f); }
+.ly-presets button[aria-pressed="true"] { background: #d6efc5; box-shadow: var(--sunken); }
+.ly-presets button:focus-visible { outline: 2px dotted #000; outline-offset: 2px; }
+#tab-open { scroll-margin-top: 12px; }
+.ly-ready { padding: 2px 5px; background: #d5edc6; color: #16472a; font: 700 12px/1.2 var(--f); }
 /* a lily pad with a question mark: the flies nobody may see yet */
 .ly-hero-pond > span, .hid3 > span { position: relative; display: inline-block; }
 .ly-hero-pond img { display: block; width: 48px; height: 48px; image-rendering: pixelated; }
@@ -190,7 +206,9 @@
   .ly-hero-pond i { font-size: 16px; }
   .ly-count { display: flex; align-items: center; justify-content: center; gap: 8px; }
   .ly-count b { display: inline-block; font-size: 30px; }
-  .hero-go { justify-self: stretch; }
+  .ly-hero-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .hero-go, .ly-hero-later { width: 100%; }
+  .ly-presets button { flex: 1 1 100%; }
   .cards li.card.duel { grid-template-columns: 48px minmax(0, 1fr); }
   .cards li.card.duel .acts { grid-column: 1 / -1; flex-direction: row; }
   .ava { width: 48px; height: 48px; }
@@ -211,7 +229,8 @@
 .gadget .ly-count { display: block; }
 .gadget .ly-count b { min-width: 40px; font-size: 26px; }
 .gadget .ly-count small { font-size: 9px; }
-.gadget .hero-go { justify-self: stretch; font-size: 17px; padding: 5px 8px; }
+.gadget .hero-go { width: 100%; font-size: 17px; padding: 5px 8px; }
+.gadget .ly-hero-later { display: none; }
 .gadget .cards { padding: 2px; }
 .gadget .cards li.card.duel { grid-template-columns: 40px minmax(0, 1fr); gap: 6px; padding: 5px; }
 .gadget .cards li.card.duel .acts { grid-column: 1 / -1; flex-direction: row; }
@@ -233,7 +252,8 @@
 
 /* phones: a slimmer hero, one row of tabs, small secondary buttons */
 @media (max-width: 560px) {
-  .ly-hero .kicker, .ly-hero p:not(.kicker) { display: none; }
+  .ly-hero .kicker { font-size: 12px; }
+  .ly-hero p:not(.kicker) { display: block; font-size: 13px; line-height: 1.25; }
   .ly-hero { grid-template-areas: "pond text count" "go go go"; grid-template-columns: auto minmax(0, 1fr) auto; padding: 8px; }
   .ly-hero h1 { font-size: 26px; }
   .ly-count { display: block; }
