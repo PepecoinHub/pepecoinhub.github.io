@@ -9,7 +9,7 @@ import { dayNumber, remark } from './pepegochi-facts.mjs';
 import { mountFrogInteractions } from './pepegochi-interactions.mjs?v=20261123fun1';
 import { createSiteEventObserver } from './pepegochi-events.mjs?v=20261118events1';
 import { createRumorReader } from './pepegochi-rumors.mjs?v=20261120notes3';
-import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261123bar';
+import { mountDesktopCompanion } from './pepegochi-desktop.mjs?v=20261123fly';
 
 import { createBond } from './pepegochi-bond.mjs?v=20261120notes3';
 import { createNotebook } from './pepegochi-notes.mjs?v=20261121map';
@@ -195,7 +195,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
   toy.setAttribute('aria-hidden', 'true'); toy.hidden = true; slot.append(toy);
   function clearToy() { clearTimeout(toyTimer); toyTimer = null; toy.hidden = true; toy.classList.remove('is-tossed'); }
   function showToy(id, duration = 4800) {
-    if (id !== 'firefly' && !Object.hasOwn(TOYS, id)) return;
+    if (!Object.hasOwn(TOYS, id)) return;
     clearToy(); toy.replaceChildren(); toy.dataset.toy = id;
     if (id === 'duck') {
       const duck = document.createElement('img'); duck.src = img_base + 'rubber_duck.png'; duck.alt = ''; duck.width = duck.height = 28; toy.append(duck);
@@ -763,11 +763,11 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     const action = siteEvents.accept(event, { owner: lastUser, life: lastLife, hasPet: shownView?.hasPet });
     if (action) conversation.react(action);
   });
-  desktop = mountDesktopCompanion({ slot, getView: () => shownView, now, showToy,
+  desktop = mountDesktopCompanion({ slot, img, getView: () => shownView, now, base, showToy,
     onAutoToy: action => animateExpression(action),
     eligible: manual => !disposed && !balloon && (manual || !bond.muted) && !!lastLife && document.activeElement?.tagName !== 'IFRAME' && !document.fullscreenElement,
     mayStart: manual => (manual || (!act && !conversation.busy)) && !document.querySelector('.pg-companion-fly'),
-    react: action => conversation.react(action), onStart: cancelMotion, onEnd: queueMotion });
+    react: action => conversation.react(action), onStart: () => { cancelMotion(); clearToy(); }, onEnd: queueMotion });
   const onOffline = () => conversation?.react('offline');
   const onOnline = () => conversation?.react('online');
   window.addEventListener('offline', onOffline);

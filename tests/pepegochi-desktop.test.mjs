@@ -6,19 +6,40 @@ import { companionReply } from '../docs/meme/pepegochi-interactions.mjs';
 function fixture() {
   let time = 0, usable = true, ready = true;
   let view = { hasPet: true, adult: true, sprite: 'taskbar/tb_adult_sit.png' };
-  const toys = [], actions = [], reactions = [], listeners = new Map();
+  const toys = [], actions = [], reactions = [], listeners = new Map(), timers = new Map();
+  let nextTimer = 0;
+  class Element {
+    constructor(rect = { left: 0, top: 0, width: 48, height: 48 }) {
+      this.rect = rect; this.style = {}; this.children = []; this.isConnected = true;
+      const classes = new Set();
+      this.classList = { add: name => classes.add(name), remove: name => classes.delete(name), contains: name => classes.has(name) };
+    }
+    getBoundingClientRect() { return this.rect; }
+    closest() { return null; }
+    setAttribute() {}
+    animate() { return { cancel() {} }; }
+    append(node) { this.children.push(node); node.parent = this; }
+    remove() { this.parent.children = this.parent.children.filter(node => node !== this); }
+  }
   const win = { matchMedia: () => reduce, addEventListener: (key, fn) => listeners.set(key, fn),
-    removeEventListener: key => listeners.delete(key) };
-  const reduce = { matches: false }, body = { children: [] };
+    removeEventListener: key => listeners.delete(key), innerWidth: 900, innerHeight: 600,
+    getComputedStyle: () => ({ opacity: 1 }), setTimeout: fn => { timers.set(++nextTimer, fn); return nextTimer; },
+    clearTimeout: id => timers.delete(id), requestAnimationFrame: () => ++nextTimer, cancelAnimationFrame() {} };
+  const reduce = { matches: false }, body = new Element();
   let night = false;
+  const sky = new Element(), fly = new Element({ left: 150, top: 470, width: 6, height: 6 });
   const doc = { defaultView: win, body, hidden: false,
     documentElement: { classList: { contains: name => name === 'sky-night' && night } },
-    querySelector: () => night ? {} : null };
-  const slot = { ownerDocument: doc, isConnected: true };
-  const control = mountDesktopCompanion({ slot, getView: () => view, eligible: () => usable,
+    querySelector: name => night && name.includes('.scene-night.ready') ? sky : null,
+    querySelectorAll: () => night ? [fly] : [], elementFromPoint: () => body,
+    createElement: () => new Element(), addEventListener() {}, removeEventListener() {} };
+  const slot = new Element(), img = new Element({ left: 70, top: 510, width: 48, height: 48 });
+  slot.ownerDocument = doc; img.src = 'taskbar/tb_adult_sit.png';
+  const control = mountDesktopCompanion({ slot, img, getView: () => view, eligible: () => usable,
     mayStart: () => ready, showToy: kind => toys.push(kind), onAutoToy: action => actions.push(action),
     react: action => reactions.push(action), now: () => time });
-  return { control, doc, slot, reduce, toys, actions, reactions, listeners,
+  return { control, doc, slot, fly, reduce, toys, actions, reactions, listeners,
+    finish: () => { for (const [id, fn] of [...timers]) { timers.delete(id); fn(); } },
     advance: ms => time += ms, app: id => listeners.get('pondos:app-opened')?.({ detail: { id, host: { isConnected: true, matches: name => name === '.app-win' } } }),
     setView: next => { view = next; }, setUsable: value => { usable = value; }, setReady: value => { ready = value; },
     setNight: value => { night = value; } };
@@ -36,13 +57,17 @@ test('manual duck, ball and cap stay beside the taskbar frog', () => {
   assert.equal(f.listeners.has('pondos:app-opened'), false);
 });
 
-test('night firefly comes to the taskbar without borrowing the wallpaper light', () => {
+test('a visible night firefly can be hunted, then restores the taskbar frog', () => {
   const f = fixture();f.setNight(true);
   assert.equal(f.control.fireflyAvailable(), true);
   assert.equal(f.control.catchNearby(), true);
-  assert.deepEqual(f.toys, ['firefly']);
+  assert.equal(f.control.active, true);
+  assert.equal(f.fly.classList.contains('pg-fly-borrowed'), true);
+  assert.equal(f.doc.body.children.length, 3);
+  f.finish();
   assert.deepEqual(f.reactions, ['desktopFirefly']);
   assert.deepEqual(f.doc.body.children, []);
+  assert.equal(f.fly.classList.contains('pg-fly-borrowed'), false);
   f.reduce.matches = true;assert.equal(f.control.fireflyAvailable(), false);
   f.control.dispose();
 });
