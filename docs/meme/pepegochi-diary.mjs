@@ -108,6 +108,17 @@ export function entryCount(awayMs) {
 }
 // "Day 24": days since the frog was adopted, counted from 1.
 export const frogDay = (adoptedAt, now) => Number.isFinite(adoptedAt) && now >= adoptedAt ? Math.floor((now - adoptedAt) / DAY) + 1 : 1;
+// The frog's adoption time in ms. The server sends adopted_at; if it is missing or unreadable, its life_day still says
+// how old the frog is (a page must never fall back to "Day 1" just because one field did not parse).
+export function adoptedMs(pet, now = Date.now()) {
+  const t = Date.parse(pet?.adopted_at);
+  if (Number.isFinite(t)) return t;
+  const d = Number(pet?.life_day);
+  return Number.isFinite(d) && d >= 1 ? now - (d - 1) * DAY - (now % DAY) : NaN;
+}
+// The day a page belongs to, counted from the adoption (also corrects pages saved earlier with a wrong day).
+export const dayOf = (page, adoptedAt) => Number.isFinite(adoptedAt) && page.at >= adoptedAt ? frogDay(adoptedAt, page.at) : page.day;
+const fixDays = (pages, adoptedAt) => Number.isFinite(adoptedAt) ? pages.map(p => ({ ...p, day: dayOf(p, adoptedAt) })) : pages;
 
 const pct = n => (n > 0 ? '+' : '') + (Math.abs(n) >= 10 ? Math.round(n) : Math.round(n * 10) / 10) + '%';
 export function fill(text, vars = {}) {
@@ -229,6 +240,7 @@ export function createDiary({ storage, now = () => Date.now() } = {}) {
   // Called when the owner opens PondOS with a living frog. Returns the fresh pages (maybe none).
   function visit(owner, lifeId, ctx = {}) {
     if (!load(owner, lifeId)) return [];
+    book.pages = fixDays(book.pages, ctx.adoptedAt);
     const t = now();
     const first = book.pages.length === 0 && book.seen === 0;
     const fresh = writeEntries({ ...ctx, now: t, first, lastSeen: book.seen || null,
@@ -261,7 +273,7 @@ export function createDiary({ storage, now = () => Date.now() } = {}) {
 
 // Read only, for the room window (pepegochi-live.mjs), which never writes to the browser itself: the pages, and the
 // pages of the latest visit (written less than 12 hours ago) as "new". In PondOS the taskbar frog writes them.
-export function diaryFor(owner, lifeId, now = Date.now()) {
+export function diaryFor(owner, lifeId, now = Date.now(), adoptedAt = NaN) {
   const key = diaryKey(owner, lifeId);
   let pages = [], read = 0;
   try {
@@ -270,6 +282,7 @@ export function diaryFor(owner, lifeId, now = Date.now()) {
     if (raw && Array.isArray(raw.pages)) pages = raw.pages.filter(p => p && Object.hasOwn(ENTRY, p.id) && Number.isFinite(p.day) &&
       Number.isFinite(p.at) && typeof p.text === 'string');
   } catch {}
+  pages = fixDays(pages, adoptedAt);
   const last = pages.length ? Math.max(...pages.map(p => p.at)) : null;
   const fresh = last !== null && now - last >= 0 && now - last < 12 * HOUR ? pages.filter(p => p.at === last).length : 0;
   // unread: the pages after the last one the owner opened (before anything was ever opened: the latest visit's)

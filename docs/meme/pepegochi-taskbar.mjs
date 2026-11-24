@@ -17,7 +17,7 @@ import { createNotebook } from './pepegochi-notes.mjs?v=20261121map';
 import { EXPRESSIONS, expressionFrames, expressionFor } from './pepegochi-expressions.mjs?v=20261120notes3';
 // A12 life of its own (owner spec 2026-11-21): habits on the taskbar, the diary, the day's rare event.
 import { pickHabit, habitSequence, HABITS } from './pepegochi-habits.mjs?v=20261123calm';
-import { createDiary, sameBook } from './pepegochi-diary.mjs?v=20261122read';
+import { createDiary, sameBook, adoptedMs } from './pepegochi-diary.mjs?v=20261124day';
 import { tripState, formatLeft } from './pepegochi-trips.mjs?v=20261122life';
 import { rareOfDay, localDay } from './pepegochi-rare.mjs?v=20261121a12';
 
@@ -641,7 +641,7 @@ export function mountTaskbarFrog({ bar, open, session, rpc, commands = {}, base 
     rareToday = rareOfDay({ owner: lastUser, lifeId: pet.life_id, dayKey: day.dayKey, month: day.month, day: day.day, hour: day.hour });
     const q = getQuote();
     const fresh = diary.visit(lastUser, pet.life_id, {
-      adoptedAt: Date.parse(pet.adopted_at), fren: 'fren', rare: rareToday === 'birthday' ? null : rareToday,
+      adoptedAt: adoptedMs(pet, now()), fren: 'fren', rare: rareToday === 'birthday' ? null : rareToday,
       market: { change24h: q?.change_24h ?? null }, needs: pet.needs || {},
       date: { month: day.month, day: day.day, weekday: day.weekday } });
     // the first page of a new diary is not news; pages about the time away are

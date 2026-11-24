@@ -2024,7 +2024,7 @@
     try { gochiReceive({ kind: kind, owner: owner, ids: ids }); } catch (e) { /* cosmetic only */ }
   }
   if (GOCHI && top && top.querySelector('.bar')) {
-    import('./pepegochi-taskbar.mjs?v=20261123toys').then(function (m) {
+    import('./pepegochi-taskbar.mjs?v=20261124day').then(function (m) {
       m.mountTaskbarFrog({ bar: top.querySelector('.bar'), open: pepegochiApp,
         session: sbSession, rpc: rpc, base: BASE, rumorsEnabled: !FREN_TEST, openPassport: frenPassport, getQuote: function () { return gochiQuote; },
         commands: { games: gamesFolder, passport: frenPassport, news: bulletinApp, tv: pondTV },
