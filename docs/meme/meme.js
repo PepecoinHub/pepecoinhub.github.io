@@ -137,7 +137,7 @@
   var cache = {};
   // icons (desktop, Start menu, title bars, taskbar, folders, balloons) use small still copies in img/ico/,
   // made by scripts/make_meme_icons.py, instead of the full animated pictures
-  function ico(n) { if (n === 'reddit' || n === 'twitter-bird' || n === 'discord') return 'img/ico/' + n + '.svg'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'pond-king') return '../games/img/pond/king-stamp.png'; if (n === 'lilies') return '../games/img/pond/lilies.png'; if (n === 'bulletin') return '../games/img/pond/bulletin.png'; if (n === 'goldhook') return '../games/img/gold-hook/ui/pm-icon-goldhook.png'; if (n === 'goldhook16') return '../games/img/gold-hook/ui/pm-icon-goldhook-16.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
+  function ico(n) { if (n === 'reddit' || n === 'twitter-bird' || n === 'discord') return 'img/ico/' + n + '.svg'; if (n === 'haze' || n === 'haze-folder') return 'img/ico/' + n + '.png'; if (n === 'pondwars') return '../games/img/pondwars/frogageddon-icon-64.png'; if (n === 'pepesweeper') return '../games/img/sweeper-flag.svg'; if (n === 'pond-king') return '../games/img/pond/king-stamp.png'; if (n === 'lilies') return '../games/img/pond/lilies.png'; if (n === 'bulletin') return '../games/img/pond/bulletin.png'; if (n === 'goldhook') return '../games/img/gold-hook/ui/pm-icon-goldhook.png'; if (n === 'goldhook16') return '../games/img/gold-hook/ui/pm-icon-goldhook-16.png'; if (n === 'fresh-fren') return 'avatar-assets/first-avatar-badge.svg'; if (n === 'stamp-new') return 'passport-assets/stamp-new.webp'; if (n === 'hall-of-fame') return HOF_ICON; return 'img/ico/' + n + '.webp'; }
   // Hall of Fame icon: the owner's art (gold cup + open Pepe passport) goes to img/ico/hall-of-fame.webp, then this
   // line becomes 'img/ico/hall-of-fame.webp'. Until then the LEADERS trophy stands in (no new art is made here).
   var HOF_ICON = 'img/ico/leaders.webp';
@@ -842,13 +842,48 @@
         ['#bulletin', 'Pond Bulletin', 'bulletin'], ['#king', 'Pond King', 'pond-king'], ['#lilies', 'Three Lilies', 'lilies'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#games', 'Games', 'games-folder']]],
       ['low', [['./', 'Internet', 'internet'], ['#tv', 'Pond TV', 'pond-tv'], ['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#find', 'Find', 'search']]],
       // the community: the official store, the official Pepecoin account (the classic bird), our subreddit and the Discord
-      ['mid', [['#shop', 'Official Store', 'shop-bag'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit'], ['#discord', 'Discord', 'discord']]],
+      ['mid', [['#shop', 'Official Store', 'shop-bag'], ['#haze', 'HazeWallet', 'haze-folder'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit'], ['#discord', 'Discord', 'discord']]],
       ['corner', [['#mail', 'Write a letter', 'frog-mail'], ['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
     var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#king': function () { pondKingApp(); }, '#lilies': function () { liliesApp(); }, '#bulletin': function () { bulletinApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#discord': function () { window.open('https://discord.gg/pepecoin', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
+    // HazeWallet folder: a thank-you to Haze and lewisbong, plus the plain truth about who holds what
+    var HAZE_SITE = 'https://hazewallet.com/';
+    var HAZE = [['#hazereadme', 'README.TXT', 'news'], ['#hazesite', 'hazewallet.com', 'haze']];
+    ACT['#hazesite'] = function () { window.open(HAZE_SITE, '_blank', 'noopener'); };
+    ACT['#hazereadme'] = function () {
+      openApp('hazereadme', 'README.TXT - Notepad', 'haze-folder', function (A) {
+        A.body.innerHTML = '<div class="win-menu notepad-menu"><span>File</span><span>Edit</span><span>Search</span><span>Help</span></div><pre class="notepad"></pre>';
+        A.body.querySelector('.notepad').textContent = ['HAZE WALLET - README.TXT', '',
+          // one line per point (no hard breaks), so the text reflows on a phone
+          'Big thanks to Haze Wallet and lewisbong for building this with the pond. PEP tips in the LAN Party chat and Haze payouts in PondOS run on Haze. Frens helping frens.', '',
+          '== WHO HOLDS WHAT (read this one) ==',
+          '- PondOS never sees your seed phrase, password or private keys. Never. Anyone asking for them "from PondOS" is a scammer.',
+          '- Your wallet, your keys and every payment you confirm live on the Haze side. Haze Wallet is a separate project with its own rules. Sending, receiving and wallet security are handled by Haze, not by this site.',
+          '- PondOS is a fan-made community site. It only shows addresses and opens Haze, where YOU confirm the payment.',
+          '- Problem with your wallet or a payment? Ask Haze: hazewallet.com', '',
+          '== STAY SAFE, FREN ==',
+          '- Seed phrase on paper. Never type it into a site, a chat or a DM.',
+          '- Don\'t keep more in a hot wallet than you can afford to lose. Bigger bags belong on a hardware wallet.',
+          '- Check the address before you send (PEP starts with P).',
+          '- Crypto is risky. Nothing here is financial advice.', '',
+          'Ribbit responsibly.'].join('\n');
+      }, 460);
+    };
+    ACT['#haze'] = function () {
+      openApp('haze', 'C:\\Pond\\HazeWallet', 'haze-folder', function (A) {
+        A.body.innerHTML = '<ul class="folder">' + HAZE.map(function (d, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></button></li>'; }).join('') + '</ul>' +
+          '<p class="bin-tip">The wallet behind PEP tips in the pond. Read the README before you use it.</p>';
+        A.body.querySelectorAll('.folder button').forEach(function (b) {
+          var d = HAZE[+b.getAttribute('data-i')], go = function () { ACT[d[0]](); };
+          b.addEventListener('dblclick', go);
+          b.addEventListener('click', function () { if (!matchMedia('(hover: hover) and (pointer: fine)').matches) go(); else { A.body.querySelectorAll('.folder .sel').forEach(function (x) { x.classList.remove('sel'); }); b.classList.add('sel'); } });
+          b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+        });
+      }, 440);
+    };
     ACT['#nerds'] = function () {
       openApp('nerds', 'C:\\Pond\\NERDS ONLY', 'nerds-folder', function (A) {
         A.body.innerHTML = '<ul class="folder">' + NERDS.map(function (d, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(d[2]) + '" alt="" width="40" height="40"><span>' + d[1] + '</span></button></li>'; }).join('') + '</ul>' +
@@ -2092,6 +2127,7 @@
       ['Not PEP (0x)', 'PEPE and PEPECOIN are not PEP', 'wrongpep', 'pepe pepecoin ethereum erc20 token wrong scam', act('#notpep')],
       ['Frog Mail', 'The Pond Gazette', 'frog-mail', 'mail news gazette newsletter', frogMail],
       ['Official Store', 'Official Pepecoin store', 'shop-bag', 'shop merch buy store official', act('#shop')],
+      ['HazeWallet', 'The wallet behind PEP tips in the pond', 'haze-folder', 'haze wallet hazewallet tips tip pay payout lewisbong', act('#haze')],
       ['Discord', 'The Pepecoin Discord', 'discord', 'discord chat community server invite', act('#discord')],
       ['About me', 'Who builds this pond (and how to support it)', 'night-shift', 'about me byl author tip donate support', aboutMe],
       ['Write a letter', 'Send an idea, a wish or a bug to the builder', 'frog-mail', 'write letter feedback contact message bug idea mail', function () { frogMail('write'); }],
@@ -3679,7 +3715,7 @@
     openApp('wp-folder', "C:\\Pond\\Pepe Guesser", 'wp-folder', function (A) {
       var F = [['PepeGuesser.exe', 'wheres-pepe', wheresPepe], ['README.TXT', 'wp-folder', wpReadme], ['Hall of Fame', 'hall-of-fame', wpHallOfFame]];
       A.body.innerHTML = '<ul class="folder">' + F.map(function (f, i) { return '<li><button type="button" data-i="' + i + '"><img src="' + ico(f[1]) + '" alt="" width="40" height="40"><span>' + f[0] + '</span></button></li>'; }).join('') + '</ul>' +
-        '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then double-click PepeGuesser.exe.</p>';
+        '<p class="bin-tip">A new photo from Pepe\'s travels every day. Read the README first, then ' + (matchMedia('(hover: hover) and (pointer: fine)').matches ? 'double-click' : 'tap') + ' PepeGuesser.exe.</p>';
       A.body.querySelectorAll('.folder button').forEach(function (b) {
         var go = function () { F[+b.getAttribute('data-i')][2](); };
         b.addEventListener('dblclick', go);
