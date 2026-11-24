@@ -28,3 +28,9 @@ test('a missing adopted_at falls back to life_day, never to day 1', () => {
   assert.equal(D.frogDay(D.adoptedMs({ life_day: 9 }, now), now), 9);
   assert.equal(D.frogDay(D.adoptedMs({ adopted_at: '2026-11-15T20:21:16.282625+00:00' }, now), now), 9);
 });
+
+test('adopted_at in the Postgres format (microseconds, +00 or a space) is read to the millisecond', () => {
+  const want = Date.UTC(2026, 10, 15, 20, 21, 16, 282);
+  for (const v of ['2026-11-15T20:21:16.282625+00:00', '2026-11-15 20:21:16.282625+00', '2026-11-15T20:21:16.282Z'])
+    assert.equal(D.adoptedMs({ adopted_at: v }), want, v);
+});

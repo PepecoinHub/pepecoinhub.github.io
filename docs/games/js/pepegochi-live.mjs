@@ -8,7 +8,7 @@ import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=2026
 import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261121map';
 import { openPondMap, noteLines } from './pond-map.mjs?v=20261121map';
 // A12: the frog's diary (written by the taskbar frog or here) and the day's rare event in the room
-import { diaryFor, createDiary, browserStorage, isSnoopHour, SNOOP_LINE, adoptedMs } from '../../meme/pepegochi-diary.mjs?v=20261124day';
+import { diaryFor, createDiary, browserStorage, isSnoopHour, SNOOP_LINE, adoptedMs } from '../../meme/pepegochi-diary.mjs?v=20261124day2';
 // A12 on the server (update_pepegochi_life.sql): trips, postcards, souvenirs, the golden lemon, the night signal
 import { LENGTHS, PACKS, PLACES, SOUVENIRS, SOUVENIR, PLACE, tripState, formatLeft, tripForDiary } from '../../meme/pepegochi-trips.mjs?v=20261122life';
 import { drawPostcard, drawDiaryPage, saveCanvas, postcardSrc, souvenirSrc } from './pepegochi-cards.mjs?v=20261123pic';
