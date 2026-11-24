@@ -26,7 +26,8 @@ test('the whole life cycle in the window: adopt, care, neglect, packing, rescue,
   // packing: the warning says when, and what a rescue needs
   assert.equal(v.packing.pet.status, 'packing');
   assert.match(v.packing.pet.statusText, /tiny suitcase/);
-  assert.match(v.packing.pet.warnings.join(' '), /Your Fren is thinking of leaving\. It moves out .* \(in /);
+  assert.match(v.packing.pet.warnings.join(' '), /Your Fren is thinking of leaving\. Do not wait too long\./);
+  assert.doesNotMatch(v.packing.pet.warnings.join(' '), /moves out .*\d|\(in /, 'no departure time for players');
   assert.match(v.packing.pet.warnings.join(' '), /Still overdue: Feed \(Hunger\), Clean \(Hygiene\), Play \(Mood\), Rest \(Energy\)/);
   // feeding alone is not a rescue
   assert.equal(v.fedOnly.pet.status, 'packing');

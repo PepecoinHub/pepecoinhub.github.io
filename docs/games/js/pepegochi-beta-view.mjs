@@ -72,13 +72,14 @@ export function letterNote(variant) {
     : 'Nothing was taken from your room.';
 }
 
-// the rules, written from the values the server uses (rules in every response)
+// the rules for players. Owner, 2026-11-24: no numbers on how long a Fren waits; players find out themselves.
+// (The server still decides with the rules values; only the gap before a rescue visit counts is shown, as it is needed.)
 export function rulesText(r) {
   return [
-    `Look after every need at least once every ${r.departs_h / 24} days, or your Fren moves out.`,
-    `After ${r.neglected_h / 24} days without care a need is overdue and your Fren feels neglected. After ${r.packing_h / 24} days it starts packing.`,
+    'Look after every need regularly. Leave your Fren alone for too long and it moves out.',
+    'A need left waiting too long becomes overdue and your Fren feels neglected. Wait even longer and it starts packing.',
     `If it started packing, care for every overdue need, then come back on another day, at least ${r.recovery_min_gap_h} hours later.`,
-    `While it recovers it moves out after ${r.recovery_departs_h} hours without care.`,
+    'While it recovers, do not keep it waiting: it moves out much sooner than usual.',
     `A good care day: ${r.good_day_min_kinds} different kinds of care and every need ${r.good_day_min_need} or more. ${r.good_parent_days} of them with one Fren: Good Parent.`,
   ];
 }
@@ -257,7 +258,7 @@ export function buildView(s, now, { message = '', showHistory = false, log = [],
     };
     if (p.status === 'neglected') v.pet.warnings.push(`Your Fren misses you. Overdue: ${list(p.overdue.map(k => NEED_NAME[NEED_OF[k]]))}.`);
     if (p.status === 'packing') {
-      v.pet.warnings.push(`${COPY.leaving} It moves out ${fmt(msOf(p.departs_at))} (in ${span(msOf(p.departs_at) - now)}).`);
+      v.pet.warnings.push(`${COPY.leaving} Do not wait too long.`);   // owner 2026-11-24: no departure time for players
       if (p.overdue.length) v.pet.warnings.push(`A full check-up stops it. Still overdue: ${list(p.overdue.map(k => `${ACTION_NAME[k]} (${NEED_NAME[NEED_OF[k]]})`))}.`);
     }
     if (p.rescue_starts_recovery && p.status === 'neglected') v.pet.warnings.push('It started packing earlier: when every overdue need is cared for, it needs one more visit on another day.');

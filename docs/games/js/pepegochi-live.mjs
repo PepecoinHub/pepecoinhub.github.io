@@ -2,7 +2,7 @@
 // The frog lives on the server (games/supabase/update_pepegochi_v2.sql), one per Discord account.
 // PondOS opens this page in a window; it also works on its own.
 import { getBackend } from './backend.js?v=20261113link';
-import { LiveGame } from './pepegochi-live-view.mjs?v=20261122life';
+import { LiveGame } from './pepegochi-live-view.mjs?v=20261124hide';
 import { renderRoom, playDeparture, playRareVisitor, playFrames, playTvStatic, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261122life';
 import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261123roomfun';
 import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261121map';
@@ -317,7 +317,7 @@ function renderPet(box, p) {
   const trip = tripForm(game.last?.pet || {});
   if (trip) box.append(trip);
   box.append(el('p', { class: 'small muted' }, p.growth));
-  box.append(el('p', { class: 'small muted' }, p.deadline));
+  // owner 2026-11-24: players do not see when their Fren would move out (the local test page still does)
 }
 
 function adoptForm(label, value) {
