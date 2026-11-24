@@ -17,5 +17,12 @@
   "PjdviQbYuVu4RgX5N3SVebpcTHyuaZq8uj": { "name": "AntPool", "type": "pool" },
   "PbwHwFpGaDYRejHKRqvsrmyKH1QWyMEzPD": { "name": "KuPool", "type": "pool" },
   "PnGBaeDAm3EraCdNnNvcTawaJY7EHunbbB": { "name": "Kraken", "type": "exchange" },
-  "PryjXWHPDRQChb3sDZwUby3cTtNatfR1tE": { "name": "Kraken", "type": "exchange" }
+  "PsHArZKD6oodN47QW5oqaTXTw27jEdDyiW": { "name": "F2Pool", "type": "pool" },
+  "PmAKzVn2hqR6a2whuzkD7jLV4Q5ALSctSK": { "name": "Binance Pool", "type": "pool" },
+  "PbiJbcGgJDyHWLMJnq6eNHkcCgZJWA66DN": { "name": "dogegogo", "type": "pool" },
+  "Pm64XP6EBEFCYFJ88i2t9Ytr8qAxZXgMzw": { "name": "BTC.com", "type": "pool" },
+  "PZusjmTefPPHmYKNL2RjwP7KtQGhw8fiJr": { "name": "hash-hut", "type": "pool" },
+  "Pic4QD7VXdEaw8ykn1puANDEQDPkNRhaBC": { "name": "GoodLuckyBoom", "type": "pool" },
+  "PtPbbHwhLurmdSitpqcza1rNeGwtM3Dz11": { "name": "HashSpace", "type": "pool" },
+  "PYHaj2jrTVVy15ygiAJyPjnvjCkVUYisGc": { "name": "LSoftware DMCC", "type": "pool" }
 }
