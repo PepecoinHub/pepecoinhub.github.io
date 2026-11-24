@@ -8,7 +8,7 @@ import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=2026
 import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261121map';
 import { openPondMap, noteLines } from './pond-map.mjs?v=20261121map';
 // A12: the frog's diary (written by the taskbar frog or here) and the day's rare event in the room
-import { diaryFor, createDiary, browserStorage, isSnoopHour, SNOOP_LINE } from '../../meme/pepegochi-diary.mjs?v=20261122read';
+import { diaryFor, createDiary, browserStorage, isSnoopHour, SNOOP_LINE, adoptedMs } from '../../meme/pepegochi-diary.mjs?v=20261124day';
 // A12 on the server (update_pepegochi_life.sql): trips, postcards, souvenirs, the golden lemon, the night signal
 import { LENGTHS, PACKS, PLACES, SOUVENIRS, SOUVENIR, PLACE, tripState, formatLeft, tripForDiary } from '../../meme/pepegochi-trips.mjs?v=20261122life';
 import { drawPostcard, drawDiaryPage, saveCanvas, postcardSrc, souvenirSrc } from './pepegochi-cards.mjs?v=20261123pic';
@@ -95,7 +95,7 @@ function writePage(ctx) {
   const p = livingPet(), id = owner();
   if (!p || !id) return;
   const d = localDay();
-  diaryBook.visit(id, p.life_id, { adoptedAt: Date.parse(p.adopted_at), fren: 'fren', needs: p.needs || {},
+  diaryBook.visit(id, p.life_id, { adoptedAt: adoptedMs(p), fren: 'fren', needs: p.needs || {},
     date: { month: d.month, day: d.day, weekday: d.weekday }, ...ctx });
   saveDiary();
 }
@@ -250,7 +250,7 @@ function todayRare() {
   const d = localDay();
   return rareOfDay({ owner: id, lifeId: p.life_id, dayKey: d.dayKey, month: d.month, day: d.day, hour: d.hour });
 }
-const myDiary = () => { const p = livingPet(), id = owner(); return p && id ? diaryFor(id, p.life_id) : { pages: [], fresh: 0 }; };
+const myDiary = () => { const p = livingPet(), id = owner(); return p && id ? diaryFor(id, p.life_id, Date.now(), adoptedMs(p)) : { pages: [], fresh: 0 }; };
 // what the room's DIARY button shows: hidden with no pages, a red count with the latest visit's pages
 // the red count on DIARY: pages not read yet; opening the diary marks them read (kept with the diary, on every device)
 function diaryState() { const d = myDiary(); return d.pages.length ? (diaryOpen ? 0 : d.unread) : -1; }
