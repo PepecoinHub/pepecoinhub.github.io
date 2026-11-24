@@ -15,5 +15,7 @@
   "PgRLcaCTEkXSguu6ZgzkuncHdCxADmPBXP": { "name": "Mining-Dutch", "type": "pool" },
   "Pd4Ee73nvvymgiGKMouC1GYZpQCrgMmCjd": { "name": "ViaBTC", "type": "pool" },
   "PjdviQbYuVu4RgX5N3SVebpcTHyuaZq8uj": { "name": "AntPool", "type": "pool" },
-  "PbwHwFpGaDYRejHKRqvsrmyKH1QWyMEzPD": { "name": "KuPool", "type": "pool" }
+  "PbwHwFpGaDYRejHKRqvsrmyKH1QWyMEzPD": { "name": "KuPool", "type": "pool" },
+  "PnGBaeDAm3EraCdNnNvcTawaJY7EHunbbB": { "name": "Kraken", "type": "exchange" },
+  "PryjXWHPDRQChb3sDZwUby3cTtNatfR1tE": { "name": "Kraken", "type": "exchange" }
 }
