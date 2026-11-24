@@ -4,7 +4,7 @@
 // a fake in tests). The server owns time, needs and growth (games/PEPEGOCHI_API.md): this file only shows the last
 // full state, moved on by the time that passed since the server sent it. Every response is a full state, so there
 // is no extra read after an action, no polling and no Realtime.
-import { buildView, COPY, ACTION_NAME, msOf } from './pepegochi-beta-view.mjs';
+import { buildView, COPY, ACTION_NAME, msOf } from './pepegochi-beta-view.mjs?v=20261124hide';
 import { fixedPlacements, DECORATIONS } from './pepegochi-room.mjs?v=20261122life';
 
 export const SIGNIN_RE = /Discord sign-in required|not authenticated|JWT|Not signed in|permission denied/i;
