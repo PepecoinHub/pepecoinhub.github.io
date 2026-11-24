@@ -111,7 +111,10 @@ export const frogDay = (adoptedAt, now) => Number.isFinite(adoptedAt) && now >= 
 // The frog's adoption time in ms. The server sends adopted_at; if it is missing or unreadable, its life_day still says
 // how old the frog is (a page must never fall back to "Day 1" just because one field did not parse).
 export function adoptedMs(pet, now = Date.now()) {
-  const t = Date.parse(pet?.adopted_at);
+  // Postgres sends microseconds and "+00:00" ("2026-11-15T20:21:16.282625+00:00"); some browsers (older iPhone Safari)
+  // only read 3 fraction digits, so trim to milliseconds and use "Z" before parsing
+  const iso = typeof pet?.adopted_at === 'string' ? pet.adopted_at.trim().replace(' ', 'T').replace(/(\.\d{3})\d+/, '$1').replace(/([+-]00(:?00)?)$/, 'Z') : pet?.adopted_at;
+  const t = Date.parse(iso);
   if (Number.isFinite(t)) return t;
   const d = Number(pet?.life_day);
   return Number.isFinite(d) && d >= 1 ? now - (d - 1) * DAY - (now % DAY) : NaN;
