@@ -1,6 +1,6 @@
 -- The Pond Gazette No. 14 (24 Nov 2026): Lemon wins Pepe Guesser week 1, a letter from a guest,
 -- Kraken is the new #1 on the rich list, new things on the horizon.
--- Run ONCE in Supabase → SQL Editor. It uses only pictures already on the site, so it can run any time.
+-- Run ONCE in Supabase → SQL Editor AFTER the site update with img/gz14-frog-of-the-week.webp is live.
 -- It publishes the issue at once (next free number, at least 14), so the "new Gazette issue" push goes out.
 -- Running it again does nothing (it skips when an issue with this title already exists).
 -- To fix a typo later: Frog Mail → 📰 Newsroom → open the issue → Save (no new push for an issue already published).
@@ -17,9 +17,9 @@ begin
           $json$[
   {"style": "breaking", "kicker": "We have a champion",
    "heading": "🏆 Lemon wins Pepe Guesser week 1",
-   "img": "cup.webp", "alt": "A Pepe sitting in a cup, the closest thing the pond has to a trophy",
-   "body": "It's official: **Lemon** is the first ever Pepe Guesser Weekly Champion!\n\nOn Saturday the lead was just 176 points, with PepeChad, Grandma_Toad and cHaY all one good pin away. Then came the last photo, the clock hit 23:59 UTC on Sunday, and Lemon was still on top.\n\nCongratulations, Lemon! The **5,000 PEP** Weekly Champion prize is yours. And a big hand for every fren who chased: what a race.\n\nWeek 2 is already running. The board reset on Monday at 00:00 UTC, so everybody starts from zero again.",
-   "btns": [{"label": "Play today's photo →", "go": "wpgo"}, {"label": "Hall of Fame", "go": "hof"}]},
+   "img": "gz14-frog-of-the-week.webp", "alt": "The gold Frog of the Week stamp from the Fren Passport",
+   "body": "It's official: **Lemon** is the first ever Pepe Guesser Weekly Champion!\n\nOn Saturday the lead was just 176 points, with PepeChad, Grandma_Toad and cHaY all one good pin away. Then came the last photo, the clock hit 23:59 UTC on Sunday, and Lemon was still on top.\n\nCongratulations, Lemon! The **5,000 PEP** Weekly Champion prize is yours, and so is the gold **Frog of the Week** stamp, now shining in your Fren Passport. And a big hand for every fren who chased: what a race.\n\nWeek 2 is already running. The board reset on Monday at 00:00 UTC, so everybody starts from zero again.",
+   "btns": [{"label": "Play today's photo →", "go": "wpgo"}, {"label": "Hall of Fame", "go": "hof"}, {"label": "Fren Passport", "go": "pass"}]},
   {"style": "letters", "kicker": "Letters to the Editor",
    "heading": "“PondOs is gud”",
    "img": "newspaper.webp", "alt": "Pepe reading the newspaper",
