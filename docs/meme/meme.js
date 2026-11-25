@@ -5650,6 +5650,142 @@
     document.querySelectorAll('.lan-n').forEach(function (e) { e.textContent = n; });
     document.querySelectorAll('.lan-badge').forEach(function (e) { e.hidden = n == null; });
   }
+  // ---------- PEP Drop: a daily PEP airdrop in LAN Party that guests can join with only an address (owner, 2026-11-25).
+  // Server: games/supabase/update_guest_drops.sql. The pool is split equally among everyone who joins; the host pays
+  // it as one Haze group payout (reviewed in this chat, approved in Haze). The card hides itself while drops are off.
+  var DROP_ADDR = 'pondos-wp-addr';
+  function dropLeft(ms) {
+    var s = Math.max(0, Math.ceil(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+    return h ? h + 'h ' + String(m).padStart(2, '0') + 'm' : m + 'm ' + String(s % 60).padStart(2, '0') + 's';
+  }
+  function dropPep(x) { return (Math.floor(Number(x) * 100) / 100).toLocaleString('en-US', { maximumFractionDigits: 2 }); }
+  function dropRules() {
+    openApp('droprules', 'PEP Drop - rules.txt', 'news', function (A) {
+      A.body.innerHTML = '<div class="drop-rules"><p><b>PEP Drop: free PEP, shared equally.</b></p><ul>' +
+        '<li>Free. Nothing to buy, no entry fee. 18+ only.</li>' +
+        '<li>Join while the timer runs. When it ends, the pool is split equally among everyone who joined (at least 1 PEP each, up to 200 people).</li>' +
+        '<li>One entry per person, per network and per address. Extra accounts are removed, and so is their share.</li>' +
+        '<li>The host pays from their own wallet with Haze, usually the same day. You see the transaction here when it is done.</li>' +
+        '<li>Leave only a PEP address (it starts with P). Never give anyone your seed phrase or a password. PondOS never asks for them.</li>' +
+        '<li>The host can remove entries that break the rules and can pause drops at any time.</li>' +
+        '<li>A small gift to try PEP, not an investment and no promise about the price. DYOR.</li></ul>' +
+        '<p>No wallet yet? <a href="wallets.html">Pick one on the Wallets page</a>: install it, copy your receive address (P…), paste it here.</p></div>';
+    }, 360);
+  }
+  function pepDrop(box, ctx) {
+    var st = null, timer = 0, tick = 0, alive = true, msg = '', bad = false, hostOpen = false;
+    var say = function (t, isBad) { msg = t || ''; bad = !!isBad; var p = box.querySelector('.drop-msg'); if (p) { p.textContent = msg; p.classList.toggle('bad', bad); } };
+    var load = function () {
+      clearTimeout(timer);
+      wpRpc('gry_gdrop_state').then(function (s) { if (!alive) return; st = s; paint(); }, function () { if (alive) { st = null; box.hidden = true; } })
+        .then(function () { if (alive) timer = setTimeout(load, st && st.drop ? 20000 : 60000); });
+    };
+    var at = function (t) { return new Date(t).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }); };
+    var paintClock = function () {
+      var c = box.querySelector('.drop-clock'); if (!c || !st) return;
+      var d = st.drop, t = d ? Date.parse(d.closes_at) - Date.now() : st.next_at ? Date.parse(st.next_at) - Date.now() : null;
+      if (t == null) return;
+      if (t <= 0) { load(); return; }
+      c.textContent = (d ? '' : 'in ') + dropLeft(t) + (d ? ' left' : '');
+    };
+    var paint = function () {
+      if (!st || (!st.enabled && !st.drop && !st.last && !st.is_host)) { box.hidden = true; return; }
+      box.hidden = false;
+      var d = st.drop, l = st.last, h = '';
+      if (d) {
+        var n = d.entries, each = Number(d.pool) / Math.max(1, n + (d.mine ? 0 : 1));
+        h = '<p class="drop-head"><b>🪂 ' + esc(d.title) + ' is open</b> · <b class="drop-clock"></b></p>' +
+          '<p class="drop-line"><b>' + dropPep(d.pool) + ' PEP</b> shared equally · ' + n + (n === 1 ? ' fren' : ' frens') + ' in · about <b>' + dropPep(each) + ' PEP</b> each' + (d.mine ? '' : ' if you join now') + '.</p>';
+        if (d.mine) h += '<p class="drop-line drop-in">✓ You are in with <code>' + esc(d.mine.address.slice(0, 6) + '…' + d.mine.address.slice(-4)) + '</code>. Paid after the timer ends, usually the same day.</p>';
+        else if (st.is_host) h += '<p class="drop-line">You are the host: you pay this one.</p>';
+        else h += '<form class="app-row drop-form"><input class="ac-in drop-addr" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Your PEP address" placeholder="Your PEP address (P…)"><button type="submit" class="app-btn">' + (st.signed_in ? 'Join' : 'Join as guest') + '</button></form>';
+      } else if (l && (l.phase === 'waiting' || l.phase === 'paying' || l.phase === 'paid')) {
+        var share = Number(l.pool) / Math.max(1, l.entries);
+        h = '<p class="drop-head"><b>🪂 ' + esc(l.title) + '</b> · ' + l.entries + (l.entries === 1 ? ' fren' : ' frens') + ' · ' + dropPep(share) + ' PEP each</p>' +
+          '<p class="drop-line">' + (l.phase === 'paid' ? 'Paid ✓ <a href="https://pepeblocks.com/tx/' + esc(l.txid) + '" target="_blank" rel="noopener">see the transaction</a>' + (l.mine ? ': your ' + dropPep(share) + ' PEP went to <code>' + esc(l.mine.address.slice(0, 6) + '…') + '</code>' : '') + '.'
+            : (l.mine ? '✓ You are in. ' : '') + 'The payout is on its way: the host sends it with Haze, usually the same day.') + '</p>';
+        if (st.next_at && st.enabled) h += '<p class="drop-line">Next drop: <b>' + at(st.next_at) + '</b> (<span class="drop-clock"></span>).</p>';
+      } else if (st.enabled && st.next_at) {
+        h = '<p class="drop-head"><b>🪂 Next PEP Drop: ' + at(st.next_at) + '</b> · <span class="drop-clock"></span></p>' +
+          '<p class="drop-line">' + dropPep(st.pool) + ' PEP shared equally by everyone who joins in ' + st.minutes + ' minutes. Free, guests welcome: you only need a PEP address.</p>';
+      } else if (st.enabled) {
+        h = '<p class="drop-head"><b>🪂 PEP Drop</b></p><p class="drop-line">No drop right now. The host starts them from time to time: keep an eye on the chat.</p>';
+      } else {
+        h = '<p class="drop-head"><b>🪂 PEP Drop</b> (off)</p><p class="drop-line">Only you see this, host. Turn drops on below.</p>';
+      }
+      h += '<p class="drop-foot"><a href="#" class="drop-rules-l">Rules</a> · <a href="wallets.html">No wallet? Get one</a>' + (st.is_host ? ' · <a href="#" class="drop-host-l">' + (hostOpen ? 'Hide host tools' : 'Host tools') + '</a>' : '') + '</p>' +
+        '<p class="drop-msg' + (bad ? ' bad' : '') + '" aria-live="polite">' + esc(msg) + '</p>' + (hostOpen ? '<div class="drop-host"><p class="drop-line">Loading…</p></div>' : '');
+      box.innerHTML = h;
+      paintClock();
+      box.querySelector('.drop-rules-l').addEventListener('click', function (e) { e.preventDefault(); dropRules(); });
+      var hl = box.querySelector('.drop-host-l'); if (hl) hl.addEventListener('click', function (e) { e.preventDefault(); hostOpen = !hostOpen; paint(); });
+      if (hostOpen) host(box.querySelector('.drop-host'));
+      var f = box.querySelector('.drop-form');
+      if (f) {
+        var inp = f.querySelector('.drop-addr');
+        try { inp.value = localStorage.getItem(DROP_ADDR) || ''; } catch (e) {}
+        f.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var ad = inp.value.replace(/\s+/g, ''), btn = f.querySelector('button');
+          addrVerdict(ad).then(function (v) {
+            if (!v || v[0] !== 'ok') { say(v ? v[1] : 'Paste your PEP address first (it starts with P).', true); return; }
+            btn.disabled = true;
+            try { localStorage.setItem(DROP_ADDR, ad); } catch (err) {}
+            var nick = ''; try { nick = localStorage.getItem('pepgry-nick') || localStorage.getItem('pondos-wp-nick') || ''; } catch (err) {}
+            freshSession().then(function (s) { if (s) return s; say('Quick bot check…'); return guestSignIn(); })
+              .then(function () { return wpRpc('gry_gdrop_join', { p_address: ad, p_nick: nick }); })
+              .then(function () { say('You are in! Your share comes after the timer ends.'); load(); }, function (err) { btn.disabled = false; say(err.message, true); });
+          });
+        });
+      }
+    };
+    var host = function (hb) {
+      wpRpc('gry_gdrop_host').then(function (d) {
+        if (!alive || !hb.isConnected) return;
+        var s = d.settings;
+        hb.innerHTML = '<form class="drop-set"><p class="drop-line"><b>Daily drop</b> (time in ' + esc(s.tz) + ')</p>' +
+          '<label><input type="checkbox" name="en"' + (s.enabled ? ' checked' : '') + '> Drops on</label> <label><input type="checkbox" name="dy"' + (s.daily ? ' checked' : '') + '> Every day at</label> <input class="ac-in" name="at" type="time" value="' + esc(s.daily_at) + '">' +
+          '<label>Pool <input class="ac-in" name="pool" type="number" min="1" max="100000" step="1" value="' + Number(s.pool) + '"> PEP</label> <label>for <input class="ac-in" name="min" type="number" min="5" max="720" value="' + s.minutes + '"> min</label>' +
+          '<label>max <input class="ac-in" name="max" type="number" min="1" max="200" value="' + s.max_entries + '"> people</label> <button type="submit" class="app-btn">Save</button></form>' +
+          '<div class="app-row"><button type="button" class="app-btn drop-now">🪂 Start a drop now</button><span class="wp-small">uses the pool and minutes above</span></div>' +
+          (d.haze_linked ? '' : '<p class="drop-line bad">Link your Haze wallet (◇ Haze above) to pay drops.</p>') +
+          '<ol class="drop-list">' + d.drops.map(function (g) {
+            var pay = g.phase === 'waiting' ? '<button type="button" class="app-btn" data-pay="' + g.id + '">💚 Pay with Haze</button>' : g.phase === 'paying' ? '<button type="button" class="app-btn" data-review="' + g.id + '">Review payout</button>' : '';
+            var can = (g.phase === 'open' || g.phase === 'waiting');
+            return '<li><b>' + esc(g.title) + '</b> · ' + dropPep(g.pool) + ' PEP · ' + g.entries + ' in · <i>' + g.phase + '</i>' + (g.txid ? ' · <a href="https://pepeblocks.com/tx/' + esc(g.txid) + '" target="_blank" rel="noopener">tx</a>' : '') +
+              ' ' + pay + (can ? ' <button type="button" class="app-btn" data-cancel="' + g.id + '">Cancel</button>' : '') +
+              (g.list.length ? '<details><summary class="wp-small">Who joined</summary><ul>' + g.list.map(function (e) {
+                var fl = []; if (!e.verified) fl.push('guest'); if (e.other_drops) fl.push(e.other_drops + ' earlier drop(s)'); if (e.wp_other_players) fl.push('⚠ address used by ' + e.wp_other_players + ' other Guesser player(s)');
+                return '<li>' + esc(e.nick) + (e.verified ? ' ✓' : '') + ' <code>' + esc(e.address) + '</code> <span class="wp-small">' + fl.join(' · ') + '</span>' + (can ? ' <button type="button" class="app-btn" data-rm="' + g.id + '" data-u="' + esc(e.user_id) + '">Remove</button>' : '') + '</li>';
+              }).join('') + '</ul></details>' : '') + '</li>';
+          }).join('') + '</ol>';
+        var act = function (p, ok) { p.then(function (r) { if (ok) ok(r); load(); }, function (e) { say(e.message, true); }); };
+        hb.querySelector('.drop-set').addEventListener('submit', function (e) {
+          e.preventDefault(); var f = e.target;
+          act(wpRpc('gry_gdrop_host_settings', { p: { enabled: f.en.checked, daily: f.dy.checked, daily_at: f.at.value, pool: +f.pool.value, minutes: +f.min.value, max_entries: +f.max.value } }), function () { say('Saved.'); });
+        });
+        hb.querySelector('.drop-now').addEventListener('click', function () {
+          var f = hb.querySelector('.drop-set');
+          if (!confirm('Start a ' + f.pool.value + ' PEP drop for ' + f.min.value + ' minutes now?')) return;
+          act(wpRpc('gry_gdrop_host_start', { p_pool: +f.pool.value, p_minutes: +f.min.value }), function () { say('The drop is open. Tell the chat!'); });
+        });
+        hb.querySelectorAll('[data-pay]').forEach(function (b) { b.addEventListener('click', function () {
+          b.disabled = true; say('Preparing the Haze payout…');
+          act(wpRpc('gry_gdrop_host_payout', { p_id: +b.getAttribute('data-pay') }), function (r) { say('Ready: ' + r.addresses + ' addresses, ' + dropPep(r.each) + ' PEP each. Check it and approve it in Haze.'); if (ctx.review) ctx.review(r.id); });
+        }); });
+        hb.querySelectorAll('[data-review]').forEach(function (b) { b.addEventListener('click', function () { say('Open ◇ Haze → Community drops → Review payout.'); if (ctx.review) ctx.review(null); }); });
+        hb.querySelectorAll('[data-cancel]').forEach(function (b) { b.addEventListener('click', function () {
+          if (confirm('Cancel this drop? Nobody in it gets paid.')) act(wpRpc('gry_gdrop_host_cancel', { p_id: +b.getAttribute('data-cancel') }), function () { say('Cancelled.'); });
+        }); });
+        hb.querySelectorAll('[data-rm]').forEach(function (b) { b.addEventListener('click', function () {
+          act(wpRpc('gry_gdrop_host_remove', { p_id: +b.getAttribute('data-rm'), p_user: b.getAttribute('data-u') }), function () { say('Removed.'); });
+        }); });
+      }, function (e) { hb.innerHTML = '<p class="drop-line bad">' + esc(e.message) + '</p>'; });
+    };
+    tick = setInterval(paintClock, 1000);
+    load();
+    return { refresh: load, stop: function () { alive = false; clearTimeout(timer); clearInterval(tick); } };
+  }
   var LAN_H = 'pondos-lan-h', LAN_LIST = 'pondos-lan-list', LAN_ALERTS = 'pondos-lan-alerts';
   // A Haze group payout prepared elsewhere (Pepe Guesser host tools) opens its review in the LAN Party chat.
   var lanHaze = null, lanPendingReview = null;
@@ -5662,6 +5798,7 @@
         '<div class="lan-top"><button type="button" class="app-btn lan-list-btn" aria-expanded="false" aria-controls="lan-buddies" title="Who is online"><span class="lan-dot" aria-hidden="true"></span> <b class="lan-n">' + (onlineN == null ? '…' : onlineN) + '</b> online</button>' +
         '<span class="lan-room">#pond</span><span class="grow"></span><button type="button" class="app-btn lan-alerts" aria-label="Change LAN Party notification settings">Alerts: All</button><span class="lan-host-tag" hidden title="You can delete messages and mute people">Mod</span>' +
         '<details class="lan-haze-tools" hidden><summary class="app-btn">◇ Haze</summary><div class="lan-haze-actions"></div></details></div>' +
+        '<div class="lan-drop" hidden aria-label="PEP Drop"></div>' +
         '<div class="lan-main"><div class="lan-log" role="log" aria-live="polite"><p class="bin-tip">Connecting to the pond…</p></div>' +
         '<aside class="lan-buddies" id="lan-buddies" aria-label="Who is online"><div class="lan-bl"><p class="lan-bh">Loading…</p></div></aside></div>' +
         '<div class="emo-pop" hidden role="group" aria-label="Pepe emotes"><div class="emo-head"><input type="search" class="emo-q" placeholder="Search Pepes… (laugh, pray, apu)" aria-label="Search emotes" autocomplete="off">' +
@@ -5684,6 +5821,7 @@
       var canMod = false, who = null, whoT = 0;
       var last = 0, seen = {}, timer = 0, alive = true, first = true, live = false, ringT = 0, want = 0, force = false, busy = false, rerun = false, unread = 0;
       var hazeTips = null;
+      var drop = pepDrop(A.body.querySelector('.lan-drop'), { review: function (id) { if (hazeTips && id) hazeTips.reviewGroup(id); else if (hazeTips) { var t = A.body.querySelector('.lan-haze-tools'); if (t) t.open = true; } else if (id) lanPendingReview = id; } });
       import(BASE + 'games/js/haze-tips.mjs?v=20261123safari-tip').then(function (m) {
         if (!alive) return;
                 // messageTips: false: 💚 Tip lives on the fren card (click a name), not on every message (Lemon, 2026-11-20)
@@ -6043,8 +6181,8 @@
       });
       paintNote(); loadPepeEmotes().then(poll);
       // Restoring the taskbar window marks its messages as read and immediately syncs any missed events.
-      A.resume = function () { if (!alive) return; unread = 0; paintUnread(); seenMentions(); poll(); };
-      A.stop = function () { alive = false; clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); if (hazeTips) { if (lanHaze === hazeTips) lanHaze = null; hazeTips.destroy(); } };
+      A.resume = function () { if (!alive) return; drop.refresh(); unread = 0; paintUnread(); seenMentions(); poll(); };
+      A.stop = function () { alive = false; drop.stop(); clearTimeout(timer); clearTimeout(ringT); clearTimeout(whoT); stopBell(); if (hazeTips) { if (lanHaze === hazeTips) lanHaze = null; hazeTips.destroy(); } };
     }, 480);
     return A;
   }
