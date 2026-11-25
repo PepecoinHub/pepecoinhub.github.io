@@ -2678,3 +2678,28 @@ footer.foot a { color: #edf3e3; }
 /* PepeGochi froglet_hop (PR #390): a 3 px lift in the middle frames; a transition, no loop */
 .pg-hop-up { transform: translateY(-3px); transition: transform .12s steps(2); }
 @media (prefers-reduced-motion: reduce) { .pg-hop-up { transform: none; } }
+
+/* ---------- PEP Drop: the daily airdrop card on top of LAN Party (guests can join) ---------- */
+.lan-drop { border: 2px solid #c9a227; background: #fffbe8; color: #000; padding: 5px 8px; font: 400 12px/1.4 var(--f-chrome); max-height: 45vh; overflow: auto; }
+.lan-drop[hidden] { display: none; }
+.lan-drop p { margin: 0 0 3px; }
+.drop-head { font-size: 13px; }
+.drop-clock { font-variant-numeric: tabular-nums; }
+.drop-in { color: #075f1d; }
+.drop-form { margin: 4px 0; display: flex; gap: 6px; }
+.drop-form .drop-addr { flex: 1; min-width: 0; font-family: ui-monospace, monospace; }
+.drop-foot { font-size: 11px; color: #444; }
+.drop-foot a, .lan-drop a { color: #0a3d91; }
+.drop-msg:empty { display: none; }
+.drop-msg.bad, .lan-drop .bad { color: #a60000; }
+.drop-host { border-top: 1px dashed #c9a227; margin-top: 4px; padding-top: 4px; }
+.drop-set { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; margin-bottom: 6px; }
+.drop-set .drop-line { flex-basis: 100%; }
+.drop-set input[type=number] { width: 70px; }
+.drop-set input[type=time] { width: auto; flex: none; }
+.drop-list { margin: 4px 0 0; padding-left: 18px; }
+.drop-list > li { margin-bottom: 4px; }
+.drop-list ul { margin: 2px 0; padding-left: 14px; }
+.drop-list code { font-size: 10px; word-break: break-all; }
+.drop-rules ul { padding-left: 18px; margin: 6px 0; }
+.drop-rules li { margin-bottom: 4px; }
