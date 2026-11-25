@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<!-- csp:begin (managed by scripts/add_csp.py) -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://gc.zgo.at https://challenges.cloudflare.com 'sha256-zdsOIKUPj8m3bxH5mxAWGsuCm+eGQsprX9TsuSPYhlE='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://gc.zgo.at https://pepecoinhub.goatcounter.com https://tile.openstreetmap.org https://server.arcgisonline.com https://azbwciqfbsdpwubznncg.supabase.co; media-src 'self' blob:; connect-src 'self' https://azbwciqfbsdpwubznncg.supabase.co wss://azbwciqfbsdpwubznncg.supabase.co https://pepecoinhub.goatcounter.com https://api.coingecko.com https://www.deribit.com https://stablecoins.llama.fi https://coins.llama.fi https://api.alternative.me https://challenges.cloudflare.com; frame-src 'self' https://www.youtube-nocookie.com https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<!-- csp:end -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pepecoin (PEP) merge mining: Litecoin ve Dogecoin ile havuzlar, kurulum, kazanç</title>
+<meta name="description" content="Scrypt ASIC ile LTC veya DOGE mi kazıyorsun? Havuzun Pepecoin’i (PEP) zaten merge mining ile kazıyor olabilir. Hangi havuzlar PEP öder, P adresiyle nasıl alınır, bir L7 veya L9 ne ekler.">
+<link rel="canonical" href="https://pepecoinhub.com/tr/merge-mining.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/merge-mining.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/merge-mining.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/merge-mining.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/merge-mining.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/merge-mining.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/merge-mining.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/merge-mining.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/merge-mining.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/merge-mining.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="Pepecoin (PEP) merge mining: Litecoin ve Dogecoin ile havuzlar, kurulum, kazanç">
+<meta property="og:description" content="Scrypt ASIC ile LTC veya DOGE mi kazıyorsun? Havuzun Pepecoin’i (PEP) zaten merge mining ile kazıyor olabilir. Hangi havuzlar PEP öder, P adresiyle nasıl alınır, bir L7 veya L9 ne ekler.">
+<meta property="og:url" content="https://pepecoinhub.com/tr/merge-mining.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin logosu: PEP hakkında gerçekler, sayılar ve kaynaklar">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../facts.css?v=20261125mm">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/tr/"}, {"@type": "ListItem", "position": 2, "name": "Rehberler", "item": "https://pepecoinhub.com/tr/guides.html"}, {"@type": "ListItem", "position": 3, "name": "PEP merge mining", "item": "https://pepecoinhub.com/tr/merge-mining.html"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "PEP merge mining, Litecoin veya Dogecoin ödüllerimi azaltır mı?", "acceptedAnswer": {"@type": "Answer", "text": "Hayır. İş zincirler arasında bölünmez: aynı hash’ler her coin’in hedefine göre kontrol edilir. ViaBTC’nin ifadesiyle PEP, ekstra hashrate gerektirmeyen ek bir merge mining ödülüdür."}}, {"@type": "Question", "name": "Litecoin ile hangi coin’ler merge mining ile kazılabilir?", "acceptedAnswer": {"@type": "Answer", "text": "Dogecoin ve Pepecoin (PEP), Bellscoin, Luckycoin, Junkcoin, Dingocoin, Shibacoin gibi daha küçük AuxPoW coin’leri. Hangilerinin ödendiği havuza bağlıdır."}}, {"@type": "Question", "name": "Dogecoin merge mining, Pepecoin kazmakla aynı şey mi?", "acceptedAnswer": {"@type": "Answer", "text": "DOGE ve PEP, ana zincir Litecoin olacak şekilde merge mining ile kazılır. İkisini de içeren bir havuz bunları ayrı ayrı öder. DOGE kazmak sana ancak havuzun Pepecoin’i de kazıp ödüyorsa PEP kazandırır."}}, {"@type": "Question", "name": "Binance Pool’da kazıyorum. Neden PEP görmüyorum?", "acceptedAnswer": {"@type": "Answer", "text": "Binance Pool, PEP’i yalnızca Pepecoin ödeme adresi olan hesaplara öder; adres yoksa hiçbir şey yazılmaz. Minimum ödeme 20.000 PEP’tir (23 Aralık 2024 duyurusu)."}}, {"@type": "Question", "name": "Cihazımın ayarlarını değiştirmem gerekir mi?", "acceptedAnswer": {"@type": "Answer", "text": "Hayır. PEP’i merge mining ile kazan bir havuzda stratum adresi ve worker aynı kalır. Sadece havuzun sitesinde PEP ödeme adresini girersin."}}, {"@type": "Question", "name": "Antminer L7 veya L9, Pepecoin’i merge mining ile kazabilir mi?", "acceptedAnswer": {"@type": "Answer", "text": "Evet. Litecoin ve Dogecoin kazan her Scrypt ASIC kazabilir; Antminer L7, L9 ve ElphaPex DG1 dahil. Merge mining’i havuz yapar."}}, {"@type": "Question", "name": "PEP’i kendi node’umla solo merge mining ile kazabilir miyim?", "acceptedAnswer": {"@type": "Answer", "text": "Pepecoin Core, Dogecoin Core’un bir fork’udur ve merge mining havuz yazılımlarının kullandığı createauxblock ve submitauxblock AuxPoW RPC çağrılarına sahiptir. Bu deneyimli operatörler içindir; çoğu madenci için havuz daha basittir."}}, {"@type": "Question", "name": "Değer mi?", "acceptedAnswer": {"@type": "Answer", "text": "Bugünkü fiyatla dolar olarak pek değil: yukarıdaki hesaplayıcı en son PEP fiyatını kullanır. Ekstra elektrik veya hashrate gerektirmez, tek maliyet bir adres eklemek. Kazdığın PEP senindir; tutar ya da satarsın."}}]}</script>
+<style>
+/* Merge-mining page: one machine, three chains; pool groups; calculator */
+.mm-flow { display: grid; grid-template-columns: minmax(0, 0.9fr) 64px minmax(0, 1.25fr); align-items: center; margin: 6px 0 26px; }
+.mm-rig { padding: 20px 22px; border-radius: 18px; background: var(--ink); color: var(--paper); display: grid; gap: 6px; }
+.mm-rig b { font-size: 1.12rem; }
+.mm-rig span { font-size: 0.88rem; opacity: 0.78; }
+.mm-rig code { justify-self: start; font-size: 0.78rem; padding: 3px 8px; border-radius: 6px; background: rgba(128, 128, 128, 0.22); color: inherit; }
+.mm-wire { width: 64px; height: 100%; min-height: 190px; color: var(--accent); opacity: 0.45; }
+.mm-chains { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.mm-chains li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 14px; border-radius: 14px; background: var(--panel); border: 1px solid var(--rule); }
+.mm-chains img { width: 34px; height: 34px; border-radius: 50%; }
+.mm-chains b { display: block; }
+.mm-chains small { color: var(--muted); }
+.mm-chains .ok { font-size: 0.8rem; color: var(--muted); }
+.mm-chains li.pep { border: 1.5px solid var(--gold); background: linear-gradient(120deg, var(--gold-soft, #fff4dd), var(--panel) 75%); }
+.mm-chains li.pep .ok { color: var(--ink); font-weight: 700; }
+@media (max-width: 720px) {
+  .mm-flow { grid-template-columns: 1fr; }
+  .mm-wire { display: none; }
+  .mm-rig { border-radius: 18px 18px 6px 6px; }
+  .mm-chains { margin-top: 10px; }
+  .mm-chains li { grid-template-columns: 30px minmax(0, 1fr); }
+  .mm-chains img { width: 30px; height: 30px; }
+  .mm-chains .ok { grid-column: 2; }
+}
+.mm-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: row dense; gap: 14px; margin: 16px 0 10px; }
+.mm-group.check { grid-column: 2; grid-row: span 2; }
+@media (max-width: 760px) { .mm-groups { grid-template-columns: 1fr; } .mm-group.check { grid-column: auto; grid-row: auto; } }
+.mm-group { padding: 18px 20px; border-radius: 16px; background: var(--panel); border: 1px solid var(--rule); border-top: 4px solid var(--c, var(--rule)); display: grid; gap: 10px; align-content: start; min-width: 0; }
+.mm-group h3 { margin: 0; font-size: 1.05rem; display: grid; gap: 4px; }
+.mm-group h3 i { justify-self: start; font-style: normal; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); white-space: nowrap; }
+.mm-group.auto { --c: var(--accent); }
+.mm-group.addr { --c: var(--flag, #c27a2c); background: linear-gradient(160deg, var(--gold-soft, #fff4dd), var(--panel) 60%); }
+.mm-group.check { --c: var(--accent-mid, #3f9e5f); }
+.mm-group.value { --c: var(--muted); }
+.mm-group.seen { --c: var(--rule); }
+.mm-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.mm-group li { display: grid; gap: 2px; grid-template-columns: minmax(0, 1fr); padding-top: 10px; border-top: 1px dashed var(--rule); }
+.mm-group li:not(:has(p)) { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 10px; }
+.mm-group li:first-child { padding-top: 0; border-top: 0; }
+.mm-group li a.pool { font-weight: 700; }
+.mm-group li p { margin: 0; font-size: 0.93rem; }
+.mm-group li small { font-size: 0.78rem; color: var(--muted); }
+.mm-group li small a { color: inherit; }
+.mm-group .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.mm-group .tags span { font-size: 0.85rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--rule); background: var(--paper); }
+.mm-group > p { margin: 0; font-size: 0.93rem; }
+.mm-calc { padding: 24px; border-radius: 22px; border: 1px solid var(--rule); background: var(--panel); box-shadow: var(--shadow); }
+.mm-calc h2 { margin-top: 0; }
+.mm-in { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px 18px; margin: 16px 0; }
+.mm-in label { display: grid; gap: 6px; font-weight: 600; font-size: 0.92rem; min-width: 0; align-content: start; }
+.mm-in small { font-weight: 400; color: var(--muted); }
+.mm-in .box { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.mm-in input { flex: 1; min-width: 0; width: 100%; padding: 10px 12px; font: inherit; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); color: var(--ink); }
+.mm-in .box b { font-weight: 600; color: var(--muted); }
+.mm-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 14px; }
+.mm-presets button { font: inherit; font-size: 0.82rem; padding: 6px 11px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-deep); cursor: pointer; }
+.mm-presets button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.mm-out { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; }
+.mm-out div { padding: 14px; border-radius: 16px; background: var(--accent-soft); display: grid; gap: 2px; min-width: 0; }
+.mm-out div:first-child { background: var(--ink); color: var(--paper); }
+.mm-out div:first-child span, .mm-out div:first-child em { color: inherit; opacity: 0.75; }
+.mm-out span { font-size: 0.8rem; color: var(--muted); }
+.mm-out strong { font-size: 1.25rem; overflow-wrap: anywhere; }
+.mm-out em { font-style: normal; font-size: 0.86rem; color: var(--muted); }
+@media (max-width: 560px) { .mm-out { grid-template-columns: 1fr 1fr; } .mm-out div:first-child { grid-column: 1 / -1; } }
+.mm-calc .note { margin-top: 14px; }
+.mm-nfa { font-size: 0.8rem; color: var(--muted); margin: 6px 0 0; }
+</style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Sayfalar"><a href="which-pepecoin.html">PEP vs PEPE</a><a href="compare.html">PEP ve DOGE</a><a href="calculator.html">Hesaplayıcı</a><a href="price.html">Fiyat</a><a href="supply.html">Arz</a><a href="scrypt-family.html">Scrypt ailesi</a><a href="network.html">Ağ</a><a href="rich-list.html">Zenginler listesi</a><a href="guides.html">Rehberler</a></nav>
+</header>
+<main class="wrap" id="main">
+<header class="page-head">
+  <p class="eyebrow">Litecoin ve Dogecoin madencileri için</p>
+  <h1>LTC ve DOGE cihazınla Pepecoin de kaz</h1>
+  <p class="lede">Scrypt ASIC’in büyük bir havuzda Litecoin ve Dogecoin kazıyorsa, büyük ihtimalle Pepecoin blokları üzerinde de çalışıyor. Pepecoin (PEP) merge mining ile kazılır: aynı hash’ler, ekstra elektrik yok, üçüncü bir coin. Asıl soru, havuzunun bunu sana ödeyip ödemediği.</p>
+</header>
+
+<section class="mm-flow" aria-label="Bir cihaz, üç blockchain">
+  <div class="mm-rig"><b>Scrypt ASIC’in</b><span>tek bağlantı, tek elektrik faturası</span><code>stratum+tcp://… · Scrypt</code></div>
+  <svg class="mm-wire" viewBox="0 0 64 200" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100 C 30 100, 30 34, 64 34 M0 100 L64 100 M0 100 C 30 100, 30 166, 64 166" fill="none" stroke="currentColor" stroke-width="3" vector-effect="non-scaling-stroke"/></svg>
+  <ul class="mm-chains">
+    <li><img src="../assets/coins/ltc.png" alt="" width="34" height="34"><span><b>Litecoin <small>LTC</small></b><small>ana zincir</small></span><span class="ok">✓ ödeniyor</span></li>
+    <li><img src="../assets/coins/doge.png" alt="" width="34" height="34"><span><b>Dogecoin <small>DOGE</small></b><small>merge mining</small></span><span class="ok">✓ ödeniyor</span></li>
+    <li class="pep"><img src="../assets/brand/icon.svg" alt="" width="34" height="34"><span><b>Pepecoin <small>PEP</small></b><small>merge mining · blok başına 10.000 PEP</small></span><span class="ok">sana ödeniyor mu?</span></li>
+  </ul>
+</section>
+
+<section aria-label="Temel bilgiler">
+  <div class="stats">
+    <div class="stat"><span class="label">Ekstra elektrik</span><span class="value">0 W</span><span class="sub">aynı hash’ler PEP için de sayılır</span></div>
+    <div class="stat"><span class="label">Blok ödülü</span><span class="value">10.000 PEP</span><span class="sub">günde yaklaşık 1.380 blok</span></div>
+    <div class="stat"><span class="label">PEP ağ hashrate’i</span><span class="value" id="mm-net-v">2,10 PH/s</span><span class="sub">PepeBlocks, <span id="mm-net-d">2026-11-24</span></span></div>
+    <div class="stat"><span class="label">Merge mining</span><span class="value">Blok 42.000</span><span class="sub">AuxPoW, Dogecoin’deki gibi</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="pools">
+  <h2 id="pools">Havuzun sana PEP ödüyor mu?</h2>
+  <p>Havuzlar ekstra coin’i dört yoldan biriyle ele alır. Aşağıda kendi havuzunu bul, sonra kendi sayfasını kontrol et: havuz kuralları değişir.</p>
+  <div class="mm-groups">
+<div class="mm-group auto"><h3><i>Otomatik</i>PEP havuz hesabına düşer</h3><ul><li><a class="pool" href="https://www.viabtc.com/">ViaBTC</a><p>LTC kazım adresinle aynı adres üzerinden ViaBTC hesabına yatar, her 2 saatte bir hesaplanır. Sonra kendi PEP adresine çekersin.</p><small>Kaynak: <a href="https://support.viabtc.com/hc/en-us/articles/11466386489743-PEP-LKY-Mining-Pools-Officially-Launched-Enjoy-30-Day-Zero-Fees">ViaBTC, 2024-12-10</a></small></li></ul></div>
+<div class="mm-group addr"><h3><i>İşlem gerekli</i>PEP ancak PEP adresi eklersen</h3><ul><li><a class="pool" href="https://pool.binance.com/">Binance Pool</a><p>Binance Pool hesabına bir Pepecoin ödeme adresi ekle. <strong>Adres yoksa hiç PEP yazılmaz.</strong> Minimum ödeme 20.000 PEP.</p><small>Kaynak: <a href="https://www.binance.com/en/support/announcement/detail/0323d984af9a4360b2da6bd0df76f220">Binance, 2024-12-23</a></small></li></ul></div>
+<div class="mm-group check"><h3><i>PEP öder</i>Ödeme ayarlarını kontrol et</h3><p>LTC ve DOGE’ye ek olarak PEP öder. Hesabında merge mining veya ödeme ayarlarını bul ve P ile başlayan bir adres ekle.</p><ul><li><a class="pool" href="https://www.f2pool.com/coin/pepecoin">F2Pool</a><small>Kaynak: <a href="https://www.f2pool.com/coin/pepecoin">F2Pool</a></small></li><li><a class="pool" href="https://www.antpool.com/">AntPool</a><small>Kaynak: <a href="https://ultramining.com/news/en/antpool-launches-joint-mining-of-ltc-with-lky-pep-and-jkc/">Ultramining, 2024-12-06</a></small></li><li><a class="pool" href="https://www.kupool.com/">KuPool</a><small>Kaynak: <a href="https://www.kupool.com/">KuPool</a></small></li><li><a class="pool" href="https://emcd.io/pool/pepecoin/">EMCD</a><small>Kaynak: <a href="https://emcd.io/pool/pepecoin/">EMCD</a></small></li><li><a class="pool" href="https://www.mining-dutch.nl/pools/pepecoin.php">Mining-Dutch</a><p>Ayrı bir Pepecoin havuzu var ve PEP olarak öder.</p><small>Kaynak: <a href="https://www.mining-dutch.nl/pools/pepecoin.php">Mining-Dutch</a></small></li></ul></div>
+<div class="mm-group value"><h3><i>PEP olarak değil</i>PEP’in değerini LTC veya DOGE olarak alırsın</h3><ul><li><a class="pool" href="https://www.litecoinpool.org/help">litecoinpool.org</a><p>PEP’i merge mining ile kazar, değerini ekstra LTC ve DOGE olarak öder (daha yüksek PPS oranı). Ayar yok, PEP yok.</p><small>Kaynak: <a href="https://www.litecoinpool.org/help">litecoinpool.org</a></small></li><li><a class="pool" href="https://pool.kryptex.com/">Kryptex Pool</a><p>PEP’i her 24 saatte Litecoin’e çevirip LTC ödüllerine ekler. Ayar yok, PEP yok.</p><small>Kaynak: <a href="https://www.kryptex.com/en/news/pepecoin-merge-mining-en">Kryptex, 2025-01-13</a></small></li></ul></div>
+<div class="mm-group seen"><h3><i>Belirsiz</i>PEP bloğu kazıyorlar, ödeme kuralı yayımlanmamış</h3><div class="tags"><span>dogegogo</span><span>BTC.com</span><span>hash-hut</span><span>GoodLuckyBoom</span><span>HashSpace</span><span>LSoftware DMCC</span></div><p>Etiketleri Pepecoin blok ödüllerinde görünüyor (24 Kasım 2026’da kontrol edildi), yani PEP bloğu kazıyorlar. Madencilere nasıl ödediklerine dair herkese açık bir sayfa bulamadık: desteklerine sor. Etiketli adresler <a href="rich-list.html">zenginler listesinde</a>.</p></div>
+  </div>
+  <p class="src">Havuzların ve PEP hashrate’lerinin canlı listesi: <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>. Havuzundan emin değil misin? <a href="https://pepecoin.com/discord">Pepecoin Discord</a>’undaki madenci kanalında sor.</p>
+</section>
+
+<section class="mm-calc" aria-labelledby="calc">
+  <h2 id="calc">Cihazın PEP olarak ne ekler</h2>
+  <p>Cihazını seç veya hashrate’ini yaz. Dolar tutarları, bu sitedeki en son PEP fiyatıyla başlayan fiyat alanından hesaplanır; değiştirebilirsin.</p>
+  <div class="mm-in">
+    <label>Cihaz başına hashrate<span class="box"><input id="mm-hash" type="number" min="0" step="any" inputmode="decimal" value="16"><b>GH/s</b></span></label>
+    <label>Cihaz sayısı<span class="box"><input id="mm-n" type="number" min="1" step="1" inputmode="numeric" value="1"></span></label>
+    <label>Havuz ücreti<span class="box"><input id="mm-fee" type="number" min="0" max="99" step="any" inputmode="decimal" value="2"><b>%</b></span></label>
+    <label>PEP fiyatı<span class="box"><b>$</b><input id="mm-price" type="number" min="0" step="any" inputmode="decimal" value="6.037e-05"></span><small>Bu sitedeki son fiyat: <span id="mm-price-d">$0,00006037, 2026-11-24</span></small></label>
+  </div>
+  <div class="mm-presets" role="group" aria-label="Popüler Scrypt cihazları"><button type="button" data-gh="16">Antminer L9</button><button type="button" data-gh="9.5">Antminer L7</button><button type="button" data-gh="11">ElphaPex DG1</button></div>
+  <div class="mm-out" aria-live="polite">
+    <div><span>Yıllık</span><strong id="mm-year">—</strong><em id="mm-usd-y">—</em></div>
+    <div><span>30 günde</span><strong id="mm-month">—</strong><em id="mm-usd-m">—</em></div>
+    <div><span>Günlük</span><strong id="mm-day">—</strong><em id="mm-usd-d">—</em></div>
+  </div>
+  <p class="note">Bir tahmin: PEP ağ hashrate’indeki payın (<span id="mm-net" data-hs="2.1e15">2,10</span> PH/s) × günde <span id="mm-bpd" data-bpd="1379">1.379</span> blok (son 30 günün ortalaması) × 10.000 PEP, eksi havuz ücreti. Gerçek ödemeler şansa, zorluğa ve havuzun ödeme yöntemine göre değişir. LTC ve DOGE’nin üstüne gelir.</p>
+  <p class="mm-nfa">Yatırım tavsiyesi değildir. Bugünkü fiyatla dolar tutarı küçük; sana maliyeti havuz ayarlarına bir adres eklemek.</p>
+</section>
+
+<section aria-labelledby="steps">
+  <h2 id="steps">Üç adımda al</h2>
+  <ol class="guide-steps">
+    <li><h3>Bir PEP adresi edin</h3><p>Herhangi bir Pepecoin cüzdanı olur, örneğin Pepecoin Core veya bir Tangem kart. PEP adresi <code>P</code> ile başlar. Ethereum adresi (0x…) çalışmaz: PEP, PEPE değildir. <a href="wallets.html">PEP cüzdanları.</a></p></li>
+    <li><h3>Havuzuna yapıştır</h3><p>Havuzunun sitesinde ödeme veya merge mining ayarlarını aç ve Pepecoin için adresi ekle. Binance Pool’da bu adım, hiç PEP alıp almayacağını belirler.</p></li>
+    <li><h3>Cihaza dokunma</h3><p>Yeni havuz adresi yok, yeni worker yok, firmware değişikliği yok. PEP, havuzun minimum ödemesini geçince LTC ve DOGE’nin yanına gelir.</p></li>
+  </ol>
+</section>
+
+<section aria-labelledby="why">
+  <h2 id="why">Havuzun neden PEP’i bedavaya kazabiliyor</h2>
+  <div class="prose">
+    <p>Pepecoin, Dogecoin kodu üzerine kurulu bir Scrypt coin’dir ve AuxPoW (merge mining) 42.000. bloktan beri açıktır. Bir Litecoin havuzu bloğunu hazırlarken içine bir Dogecoin ve bir Pepecoin bloğuna referans koyabilir. Cihazının gönderdiği her share üç hedefe göre kontrol edilir. Biri Pepecoin zorluğuna yeterse havuz bir PEP bloğu bulur ve Litecoin ya da Dogecoin’den hiçbir şey eksilmez. Büyük Litecoin havuzlarının 2024 sonunda PEP eklemesinin nedeni bu.</p>
+    <p>DOGE’yi kazmak yerine tutuyor musun? PEP onun en yakın akrabası: aynı kod tabanı, aynı merge mining, köpek yerine kurbağa ve premine yok. <a href="compare.html">PEP ve DOGE yan yana.</a></p>
+  </div>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">Sık sorulan sorular</h2>
+  <div class="faq">
+    <details><summary>PEP merge mining, Litecoin veya Dogecoin ödüllerimi azaltır mı?</summary><p>Hayır. İş zincirler arasında bölünmez: aynı hash’ler her coin’in hedefine göre kontrol edilir. ViaBTC’nin ifadesiyle PEP, ekstra hashrate gerektirmeyen ek bir merge mining ödülüdür.</p></details>
+    <details><summary>Litecoin ile hangi coin’ler merge mining ile kazılabilir?</summary><p>Dogecoin ve Pepecoin (PEP), Bellscoin, Luckycoin, Junkcoin, Dingocoin, Shibacoin gibi daha küçük AuxPoW coin’leri. Hangilerinin ödendiği havuza bağlıdır.</p></details>
+    <details><summary>Dogecoin merge mining, Pepecoin kazmakla aynı şey mi?</summary><p>DOGE ve PEP, ana zincir Litecoin olacak şekilde merge mining ile kazılır. İkisini de içeren bir havuz bunları ayrı ayrı öder. DOGE kazmak sana ancak havuzun Pepecoin’i de kazıp ödüyorsa PEP kazandırır.</p></details>
+    <details><summary>Binance Pool’da kazıyorum. Neden PEP görmüyorum?</summary><p>Binance Pool, PEP’i yalnızca Pepecoin ödeme adresi olan hesaplara öder; adres yoksa hiçbir şey yazılmaz. Minimum ödeme 20.000 PEP’tir (23 Aralık 2024 duyurusu).</p></details>
+    <details><summary>Cihazımın ayarlarını değiştirmem gerekir mi?</summary><p>Hayır. PEP’i merge mining ile kazan bir havuzda stratum adresi ve worker aynı kalır. Sadece havuzun sitesinde PEP ödeme adresini girersin.</p></details>
+    <details><summary>Antminer L7 veya L9, Pepecoin’i merge mining ile kazabilir mi?</summary><p>Evet. Litecoin ve Dogecoin kazan her Scrypt ASIC kazabilir; Antminer L7, L9 ve ElphaPex DG1 dahil. Merge mining’i havuz yapar.</p></details>
+    <details><summary>PEP’i kendi node’umla solo merge mining ile kazabilir miyim?</summary><p>Pepecoin Core, Dogecoin Core’un bir fork’udur ve merge mining havuz yazılımlarının kullandığı createauxblock ve submitauxblock AuxPoW RPC çağrılarına sahiptir. Bu deneyimli operatörler içindir; çoğu madenci için havuz daha basittir.</p></details>
+    <details><summary>Değer mi?</summary><p>Bugünkü fiyatla dolar olarak pek değil: yukarıdaki hesaplayıcı en son PEP fiyatını kullanır. Ekstra elektrik veya hashrate gerektirmez, tek maliyet bir adres eklemek. Kazdığın PEP senindir; tutar ya da satarsın.</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="more">
+  <h2 id="more">İlgili sayfalar</h2>
+  <div class="cards">
+    <a class="card" href="mining.html"><h3>PEP nasıl kazılır</h3><p>Tam madencilik rehberi: donanım, havuzlar, unMineable ile GPU seçeneği.</p></a>
+    <a class="card" href="scrypt-family.html"><h3>Scrypt ailesi</h3><p>Litecoin, Dogecoin, Pepecoin ve diğer merge mining coin’leri.</p></a>
+    <a class="card" href="compare.html"><h3>PEP ve DOGE</h3><p>Pepecoin ve Dogecoin, madde madde.</p></a>
+    <a class="card" href="wallets.html"><h3>PEP cüzdanları</h3><p>Ödemeler için P adresini nereden alırsın.</p></a>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">Kaynaklar</h2>
+  <div class="sources"><div><ul><li><a href="https://support.viabtc.com/hc/en-us/articles/11466386489743-PEP-LKY-Mining-Pools-Officially-Launched-Enjoy-30-Day-Zero-Fees">ViaBTC: PEP and LKY pools launched, 2024-12-10</a></li><li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369">ViaBTC: what is Pepecoin and how to mine it, 2024-12-12</a></li><li><a href="https://www.binance.com/en/support/announcement/detail/0323d984af9a4360b2da6bd0df76f220">Binance Pool: JKC and PEP merged mining, 2024-12-23</a></li><li><a href="https://www.kryptex.com/en/news/pepecoin-merge-mining-en">Kryptex Pool: Pepecoin added to LTC merged mining, 2025-01-13</a></li><li><a href="https://ultramining.com/news/en/antpool-launches-joint-mining-of-ltc-with-lky-pep-and-jkc/">Ultramining: AntPool adds LKY, PEP and JKC, 2024-12-06</a></li><li><a href="https://www.litecoinpool.org/help">litecoinpool.org help (merge-mined coins raise the PPS ratio)</a></li><li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp (AuxPoW from block 42,000)</a></li><li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/rpc/mining.cpp">Pepecoin src/rpc/mining.cpp (createauxblock, submitauxblock)</a></li><li><a href="https://pepeblocks.com/">PepeBlocks: network hashrate</a></li><li><a href="https://miningpoolstats.stream/pepecoin">miningpoolstats: Pepecoin pools</a></li></ul></div></div>
+</section>
+</main>
+<footer class="site-foot">
+  <p><strong>Topluluk bilgi sayfaları</strong>: r/pepecoin'den senin gibi sıradan biri tarafından hazırlanır. Pepecoin'in resmî yayını değildir.</p>
+  <p>Yatırım tavsiyesi değildir. Bu sayfaları hazırlayan kişinin elinde PEP var. Fiyatlar ve ağ verileri her gün değişir; her sayfada ilgili tarihler ve kaynaklar belirtilir.</p>
+  <p class="correction">Bir hata mı fark ettiniz? Kaynağını da ekleyerek GitHub üzerinden <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>düzeltme bildirin</a>.</p>
+  <details class="support"><summary>Bu siteyi beğendiyseniz gelişimine destek olabilirsiniz.</summary><p>Ne kadar küçük olursa olsun her katkı işe yarar. Teşekkürler!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+  <p class="foot-langs">Dil: <a href="/merge-mining.html" hreflang="en" lang="en">English</a>&nbsp;· <a href="/pl/merge-mining.html" hreflang="pl" lang="pl">Polski</a>&nbsp;· <a href="/es/merge-mining.html" hreflang="es" lang="es">Español</a>&nbsp;· <a href="/de/merge-mining.html" hreflang="de" lang="de">Deutsch</a>&nbsp;· <a href="/fr/merge-mining.html" hreflang="fr" lang="fr">Français</a>&nbsp;· <a href="/it/merge-mining.html" hreflang="it" lang="it">Italiano</a>&nbsp;· <a href="/zh/merge-mining.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></p>
+</footer>
+
+<script src="../prices.js?v=20261104lazy" defer></script>
+<script src="../merge-mining.js?v=20261125" defer></script>
+<script src="../chrome.js?v=20261125mm" defer></script>
+</body>
+</html>
