@@ -28,11 +28,43 @@ export function readSession(cfg, storage = globalThis.localStorage) {
   return null;
 }
 
+// A valid signed-in session; an expired one is refreshed once with its refresh token and saved back,
+// like games/js/pond-net.js and PondOS do. Without this a phone that sat in the background for an hour
+// showed "Submit as your Discord name" but the button then did nothing (the access token had expired).
+let refreshing = null;
+export async function ensureSession(cfg, { fetchImpl = globalThis.fetch, storage = globalThis.localStorage } = {}) {
+  const ok = readSession(cfg, storage);
+  if (ok) return ok;
+  let key; let r;
+  try {
+    key = `sb-${new URL(cfg.supabaseUrl).hostname.split('.')[0]}-auth-token`;
+    r = JSON.parse(storage.getItem(key) || 'null');
+  } catch { return null; }
+  if (!r || !r.refresh_token || (r.user && r.user.is_anonymous)) return null;
+  if (!refreshing) {
+    refreshing = (async () => {
+      try {
+        const x = await fetchImpl(`${cfg.supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
+          method: 'POST', headers: { apikey: cfg.supabaseKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: r.refresh_token }),
+        });
+        const j = x.ok ? await x.json() : null;
+        if (!j || !j.access_token) return null;
+        const s2 = { ...r, ...j };
+        if (j.expires_in) s2.expires_at = Math.floor(Date.now() / 1000) + j.expires_in;
+        try { storage.setItem(key, JSON.stringify(s2)); } catch { /* ignore */ }
+        return readSession(cfg, storage) || null;
+      } catch { return null; } finally { refreshing = null; }
+    })();
+  }
+  return refreshing;
+}
+
 // RPC over plain fetch (no library), with the public URL and publishable key from js/config.js.
 export function fetchRpc(cfg, { fetchImpl = globalThis.fetch, storage } = {}) {
   if (!cfg || !cfg.supabaseUrl || !cfg.supabaseKey) return null;
   return async (name, args) => {
-    const s = readSession(cfg, storage);
+    const s = await ensureSession(cfg, { fetchImpl, storage: storage || globalThis.localStorage });
     const headers = { apikey: cfg.supabaseKey, 'Content-Type': 'application/json' };
     if (s) headers.Authorization = `Bearer ${s.token}`;
     const r = await fetchImpl(`${cfg.supabaseUrl}/rest/v1/rpc/${name}`, { method: 'POST', headers, body: JSON.stringify(args) });
