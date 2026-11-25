@@ -14,7 +14,7 @@ import { createRenderer } from './gold-hook-render.mjs';
 import { attachInput } from './gold-hook-input.mjs';
 import { T } from './gold-hook-text.mjs';
 import { validateCampaign } from './gold-hook-validation.mjs';
-import { createScores, fetchRpc, readSession, isNotDeployed } from './gold-hook-scores.mjs';
+import { createScores, fetchRpc, readSession, ensureSession, isNotDeployed } from './gold-hook-scores.mjs?v=20261125session';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); e.append(...kids); return e; };
@@ -297,14 +297,20 @@ async function boot() {
   }
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const session = readSession(cfg);
-    const nick = $('hs-nick').value.trim();
-    if (!(session && session.discord)) {
-      if (nick.length < 2) { $('hs-nick').focus(); return; }
-      try { localStorage.setItem('pondos-nick', nick); } catch { /* ignore */ }
-    }
     const sb = $('hs-submit');
     sb.disabled = true; sb.textContent = T.sending;
+    const session = await ensureSession(cfg);
+    const nick = $('hs-nick').value.trim();
+    if (!(session && session.discord)) {
+      if (nick.length < 2) {
+        // the Discord sign-in is gone: never fail silently, ask for a nickname instead
+        $('hs-discord').hidden = true; $('hs-nick-row').hidden = false;
+        $('hs-note').hidden = false; $('hs-note').textContent = T.discordNote;
+        sb.disabled = false; sb.textContent = T.submit;
+        postSize(); $('hs-nick').focus(); return;
+      }
+      try { localStorage.setItem('pondos-nick', nick); } catch { /* ignore */ }
+    }
     $('hs-status').textContent = '';
     try {
       const r = await scores.submit(run, nick);

@@ -462,3 +462,21 @@ test('every picture the game loads is in the manifest and has the stated size', 
     for (const [x, y, w, h] of an.atlas.rects) assert.ok(x + w <= sheet.width && y + h <= sheet.height, kind);
   }
 });
+
+test('an expired Discord session is refreshed once before submitting, an anonymous one is not', async () => {
+  const { ensureSession } = await import('../docs/games/js/gold-hook-scores.mjs');
+  const cfg = { supabaseUrl: 'https://abc.supabase.co', supabaseKey: 'k' };
+  const mem = {}; const storage = { getItem: (k) => mem[k] ?? null, setItem: (k, v) => { mem[k] = v; } };
+  const key = 'sb-abc-auth-token';
+  mem[key] = JSON.stringify({ access_token: 'old', refresh_token: 'r1', expires_at: 1, user: { identities: [{ provider: 'discord' }] } });
+  let calls = 0;
+  const fetchImpl = async (url, opt) => {
+    calls++; assert.match(url, /grant_type=refresh_token/); assert.equal(JSON.parse(opt.body).refresh_token, 'r1');
+    return { ok: true, json: async () => ({ access_token: 'new', refresh_token: 'r2', expires_in: 3600 }) };
+  };
+  const [a, b] = await Promise.all([ensureSession(cfg, { fetchImpl, storage }), ensureSession(cfg, { fetchImpl, storage })]);
+  assert.deepEqual(a, { token: 'new', discord: true }); assert.deepEqual(b, a); assert.equal(calls, 1);
+  assert.equal(JSON.parse(mem[key]).refresh_token, 'r2');
+  mem[key] = JSON.stringify({ access_token: 'x', refresh_token: 'r', expires_at: 1, user: { is_anonymous: true } });
+  assert.equal(await ensureSession(cfg, { fetchImpl, storage }), null); assert.equal(calls, 1);
+});
