@@ -26,7 +26,9 @@ test('PEP Drop: guests join with an address, the pool splits equally, one Haze p
     sql(`create table games.wp_claims(id bigint generated always as identity primary key,user_id uuid not null,address text not null);
       create function games.is_host_user(u uuid) returns boolean language sql stable set search_path='' as $$select u='${uid(1)}'::uuid$$;
       create function games.client_ip_hash() returns text language sql stable set search_path='' as $$select nullif(current_setting('test.ip',true),'')$$;`);
-    const drops=file('update_guest_drops.sql');sql(drops);sql(drops);
+    // the full file, or (GDROP_PARTS=1) the four phone-sized parts in guest_drops_parts/, each run twice
+    if(process.env.GDROP_PARTS==='1')for(let i=1;i<=4;i++){const part=file('guest_drops_parts/part'+i+'.sql');sql(part);sql(part);}
+    else{const drops=file('update_guest_drops.sql');sql(drops);sql(drops);}
     for(let n=1;n<=9;n++){sql(`insert into auth.users values(${q(uid(n))});`);if(n<=3)sql(`insert into games.profiles values(${q(uid(n))},'Fren${n}');insert into auth.identities values(${q(uid(n))},'discord');`);}
     sql(`insert into games.haze_links(user_id,address) values(${q(uid(1))},${q(address(1))});update games.haze_settings set enabled=true,beta_only=false,groups_enabled=true;`);
     for(const t of ['gdrop_settings','gdrops','gdrop_entries'])assert.throws(()=>as('authenticated',2,'select * from games.'+t));
