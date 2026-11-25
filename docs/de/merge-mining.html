@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<!-- csp:begin (managed by scripts/add_csp.py) -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://gc.zgo.at https://challenges.cloudflare.com 'sha256-zdsOIKUPj8m3bxH5mxAWGsuCm+eGQsprX9TsuSPYhlE='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://gc.zgo.at https://pepecoinhub.goatcounter.com https://tile.openstreetmap.org https://server.arcgisonline.com https://azbwciqfbsdpwubznncg.supabase.co; media-src 'self' blob:; connect-src 'self' https://azbwciqfbsdpwubznncg.supabase.co wss://azbwciqfbsdpwubznncg.supabase.co https://pepecoinhub.goatcounter.com https://api.coingecko.com https://www.deribit.com https://stablecoins.llama.fi https://coins.llama.fi https://api.alternative.me https://challenges.cloudflare.com; frame-src 'self' https://www.youtube-nocookie.com https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<!-- csp:end -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pepecoin (PEP) per Merged Mining mit Litecoin und Dogecoin: Pools, Einrichtung, Ertrag</title>
+<meta name="description" content="Du minst LTC oder DOGE mit einem Scrypt-ASIC? Dein Pool merge-mint Pepecoin (PEP) womöglich schon. Welche Pools PEP auszahlen, wie du es mit einer P-Adresse bekommst und was ein L7 oder L9 bringt.">
+<link rel="canonical" href="https://pepecoinhub.com/de/merge-mining.html">
+<link rel="alternate" hreflang="en" href="https://pepecoinhub.com/merge-mining.html">
+<link rel="alternate" hreflang="pl" href="https://pepecoinhub.com/pl/merge-mining.html">
+<link rel="alternate" hreflang="es" href="https://pepecoinhub.com/es/merge-mining.html">
+<link rel="alternate" hreflang="de" href="https://pepecoinhub.com/de/merge-mining.html">
+<link rel="alternate" hreflang="fr" href="https://pepecoinhub.com/fr/merge-mining.html">
+<link rel="alternate" hreflang="tr" href="https://pepecoinhub.com/tr/merge-mining.html">
+<link rel="alternate" hreflang="it" href="https://pepecoinhub.com/it/merge-mining.html">
+<link rel="alternate" hreflang="zh-Hans" href="https://pepecoinhub.com/zh/merge-mining.html">
+<link rel="alternate" hreflang="x-default" href="https://pepecoinhub.com/merge-mining.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Pepecoin Hub">
+<meta property="og:title" content="Pepecoin (PEP) per Merged Mining mit Litecoin und Dogecoin: Pools, Einrichtung, Ertrag">
+<meta property="og:description" content="Du minst LTC oder DOGE mit einem Scrypt-ASIC? Dein Pool merge-mint Pepecoin (PEP) womöglich schon. Welche Pools PEP auszahlen, wie du es mit einer P-Adresse bekommst und was ein L7 oder L9 bringt.">
+<meta property="og:url" content="https://pepecoinhub.com/de/merge-mining.html">
+<meta property="og:image" content="https://pepecoinhub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pepecoin-Logo: Fakten, Zahlen und Quellen zu PEP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pepecoinhub.com/assets/og-image.png">
+<link rel="icon" href="../assets/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="../facts.css?v=20261125mm">
+<script>try{var th=localStorage.getItem('phw-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th)}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Pepecoin Hub", "item": "https://pepecoinhub.com/de/"}, {"@type": "ListItem", "position": 2, "name": "Ratgeber", "item": "https://pepecoinhub.com/de/guides.html"}, {"@type": "ListItem", "position": 3, "name": "Merged Mining von PEP", "item": "https://pepecoinhub.com/de/merge-mining.html"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Senkt Merged Mining von PEP meine Litecoin- oder Dogecoin-Belohnungen?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Arbeit wird nicht auf die Chains aufgeteilt: Dieselben Hashes werden gegen das Ziel jeder Coin geprüft. In den Worten von ViaBTC ist PEP eine zusätzliche Belohnung aus dem Merged Mining, die keine zusätzliche Hashrate braucht."}}, {"@type": "Question", "name": "Welche Coins kann ich mit Litecoin per Merged Mining minen?", "acceptedAnswer": {"@type": "Answer", "text": "Dogecoin und kleinere AuxPoW-Coins wie Pepecoin (PEP), Bellscoin, Luckycoin, Junkcoin, Dingocoin und Shibacoin. Welche du ausgezahlt bekommst, hängt vom Pool ab."}}, {"@type": "Question", "name": "Ist Dogecoin-Merged-Mining dasselbe wie Pepecoin minen?", "acceptedAnswer": {"@type": "Answer", "text": "DOGE und PEP werden beide per Merged Mining mit Litecoin als Parent Chain gemint. Ein Pool mit beiden zahlt sie getrennt aus. DOGE zu minen bringt dir nur dann PEP, wenn dein Pool auch Pepecoin mitmint und auszahlt."}}, {"@type": "Question", "name": "Ich mine bei Binance Pool. Warum sehe ich kein PEP?", "acceptedAnswer": {"@type": "Answer", "text": "Binance Pool zahlt PEP nur an Konten mit einer Pepecoin-Auszahlungsadresse aus; ohne sie wird nichts gutgeschrieben. Die Mindestauszahlung liegt bei 20.000 PEP (Ankündigung vom 23. Dezember 2024)."}}, {"@type": "Question", "name": "Muss ich die Einstellungen meines Miners ändern?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Bei einem Pool, der PEP per Merged Mining mitmint, bleiben Stratum-Adresse und Worker gleich. Du trägst nur die PEP-Auszahlungsadresse auf der Website des Pools ein."}}, {"@type": "Question", "name": "Kann ein Antminer L7 oder L9 Pepecoin per Merged Mining minen?", "acceptedAnswer": {"@type": "Answer", "text": "Ja. Jeder Scrypt-ASIC, der Litecoin und Dogecoin mint, kann das, auch der Antminer L7, der L9 und der ElphaPex DG1. Das Merged Mining übernimmt der Pool."}}, {"@type": "Question", "name": "Kann ich PEP solo per Merged Mining minen, mit eigener Node?", "acceptedAnswer": {"@type": "Answer", "text": "Pepecoin Core ist ein Fork von Dogecoin Core und hat die AuxPoW-RPC-Aufrufe createauxblock und submitauxblock, die Merged-Mining-Pool-Software nutzt. Das ist etwas für erfahrene Betreiber; für die meisten Miner ist ein Pool einfacher."}}, {"@type": "Question", "name": "Lohnt sich das?", "acceptedAnswer": {"@type": "Answer", "text": "In Dollar beim heutigen Kurs wenig: Der Rechner oben nutzt den neuesten PEP-Kurs. Es kostet keinen zusätzlichen Strom und keine Hashrate, der einzige Aufwand ist eine Adresse. Das gemintete PEP gehört dir, zum Halten oder Verkaufen."}}]}</script>
+<style>
+/* Merge-mining page: one machine, three chains; pool groups; calculator */
+.mm-flow { display: grid; grid-template-columns: minmax(0, 0.9fr) 64px minmax(0, 1.25fr); align-items: center; margin: 6px 0 26px; }
+.mm-rig { padding: 20px 22px; border-radius: 18px; background: var(--ink); color: var(--paper); display: grid; gap: 6px; }
+.mm-rig b { font-size: 1.12rem; }
+.mm-rig span { font-size: 0.88rem; opacity: 0.78; }
+.mm-rig code { justify-self: start; font-size: 0.78rem; padding: 3px 8px; border-radius: 6px; background: rgba(128, 128, 128, 0.22); color: inherit; }
+.mm-wire { width: 64px; height: 100%; min-height: 190px; color: var(--accent); opacity: 0.45; }
+.mm-chains { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.mm-chains li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 14px; border-radius: 14px; background: var(--panel); border: 1px solid var(--rule); }
+.mm-chains img { width: 34px; height: 34px; border-radius: 50%; }
+.mm-chains b { display: block; }
+.mm-chains small { color: var(--muted); }
+.mm-chains .ok { font-size: 0.8rem; color: var(--muted); }
+.mm-chains li.pep { border: 1.5px solid var(--gold); background: linear-gradient(120deg, var(--gold-soft, #fff4dd), var(--panel) 75%); }
+.mm-chains li.pep .ok { color: var(--ink); font-weight: 700; }
+@media (max-width: 720px) {
+  .mm-flow { grid-template-columns: 1fr; }
+  .mm-wire { display: none; }
+  .mm-rig { border-radius: 18px 18px 6px 6px; }
+  .mm-chains { margin-top: 10px; }
+  .mm-chains li { grid-template-columns: 30px minmax(0, 1fr); }
+  .mm-chains img { width: 30px; height: 30px; }
+  .mm-chains .ok { grid-column: 2; }
+}
+.mm-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: row dense; gap: 14px; margin: 16px 0 10px; }
+.mm-group.check { grid-column: 2; grid-row: span 2; }
+@media (max-width: 760px) { .mm-groups { grid-template-columns: 1fr; } .mm-group.check { grid-column: auto; grid-row: auto; } }
+.mm-group { padding: 18px 20px; border-radius: 16px; background: var(--panel); border: 1px solid var(--rule); border-top: 4px solid var(--c, var(--rule)); display: grid; gap: 10px; align-content: start; min-width: 0; }
+.mm-group h3 { margin: 0; font-size: 1.05rem; display: grid; gap: 4px; }
+.mm-group h3 i { justify-self: start; font-style: normal; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); white-space: nowrap; }
+.mm-group.auto { --c: var(--accent); }
+.mm-group.addr { --c: var(--flag, #c27a2c); background: linear-gradient(160deg, var(--gold-soft, #fff4dd), var(--panel) 60%); }
+.mm-group.check { --c: var(--accent-mid, #3f9e5f); }
+.mm-group.value { --c: var(--muted); }
+.mm-group.seen { --c: var(--rule); }
+.mm-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.mm-group li { display: grid; gap: 2px; grid-template-columns: minmax(0, 1fr); padding-top: 10px; border-top: 1px dashed var(--rule); }
+.mm-group li:not(:has(p)) { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 10px; }
+.mm-group li:first-child { padding-top: 0; border-top: 0; }
+.mm-group li a.pool { font-weight: 700; }
+.mm-group li p { margin: 0; font-size: 0.93rem; }
+.mm-group li small { font-size: 0.78rem; color: var(--muted); }
+.mm-group li small a { color: inherit; }
+.mm-group .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.mm-group .tags span { font-size: 0.85rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--rule); background: var(--paper); }
+.mm-group > p { margin: 0; font-size: 0.93rem; }
+.mm-calc { padding: 24px; border-radius: 22px; border: 1px solid var(--rule); background: var(--panel); box-shadow: var(--shadow); }
+.mm-calc h2 { margin-top: 0; }
+.mm-in { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px 18px; margin: 16px 0; }
+.mm-in label { display: grid; gap: 6px; font-weight: 600; font-size: 0.92rem; min-width: 0; align-content: start; }
+.mm-in small { font-weight: 400; color: var(--muted); }
+.mm-in .box { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.mm-in input { flex: 1; min-width: 0; width: 100%; padding: 10px 12px; font: inherit; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); color: var(--ink); }
+.mm-in .box b { font-weight: 600; color: var(--muted); }
+.mm-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 14px; }
+.mm-presets button { font: inherit; font-size: 0.82rem; padding: 6px 11px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-deep); cursor: pointer; }
+.mm-presets button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.mm-out { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; }
+.mm-out div { padding: 14px; border-radius: 16px; background: var(--accent-soft); display: grid; gap: 2px; min-width: 0; }
+.mm-out div:first-child { background: var(--ink); color: var(--paper); }
+.mm-out div:first-child span, .mm-out div:first-child em { color: inherit; opacity: 0.75; }
+.mm-out span { font-size: 0.8rem; color: var(--muted); }
+.mm-out strong { font-size: 1.25rem; overflow-wrap: anywhere; }
+.mm-out em { font-style: normal; font-size: 0.86rem; color: var(--muted); }
+@media (max-width: 560px) { .mm-out { grid-template-columns: 1fr 1fr; } .mm-out div:first-child { grid-column: 1 / -1; } }
+.mm-calc .note { margin-top: 14px; }
+.mm-nfa { font-size: 0.8rem; color: var(--muted); margin: 6px 0 0; }
+</style>
+<script data-goatcounter="https://pepecoinhub.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<header class="site-head">
+  <a class="brand brand-hub-link" href="./" aria-label="Pepecoin Hub"><img class="lockup on-light" src="../assets/brand/pepecoin-lockup-light.svg" alt="" width="168" height="40"><img class="lockup on-dark" src="../assets/brand/pepecoin-lockup-dark.svg" alt="" width="168" height="40"><span class="hub">Hub</span></a>
+  <nav class="site-nav" aria-label="Seiten"><a href="which-pepecoin.html">PEP vs PEPE</a><a href="compare.html">PEP und DOGE</a><a href="calculator.html">Rechner</a><a href="price.html">Kurs</a><a href="supply.html">Coinmenge</a><a href="scrypt-family.html">Scrypt-Familie</a><a href="network.html">Netzwerk</a><a href="rich-list.html">Rich List</a><a href="guides.html">Ratgeber</a></nav>
+</header>
+<main class="wrap" id="main">
+<header class="page-head">
+  <p class="eyebrow">Für Litecoin- und Dogecoin-Miner</p>
+  <h1>Pepecoin mit deinem LTC- und DOGE-Miner mitminen</h1>
+  <p class="lede">Wenn dein Scrypt-ASIC Litecoin und Dogecoin bei einem großen Pool mint, arbeitet er sehr wahrscheinlich auch schon an Pepecoin-Blöcken. Pepecoin (PEP) wird per Merged Mining gemint: dieselben Hashes, kein zusätzlicher Strom, eine dritte Coin. Die eigentliche Frage ist, ob dein Pool sie dir auszahlt.</p>
+</header>
+
+<section class="mm-flow" aria-label="Ein Miner, drei Blockchains">
+  <div class="mm-rig"><b>Dein Scrypt-ASIC</b><span>eine Verbindung, eine Stromrechnung</span><code>stratum+tcp://… · Scrypt</code></div>
+  <svg class="mm-wire" viewBox="0 0 64 200" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100 C 30 100, 30 34, 64 34 M0 100 L64 100 M0 100 C 30 100, 30 166, 64 166" fill="none" stroke="currentColor" stroke-width="3" vector-effect="non-scaling-stroke"/></svg>
+  <ul class="mm-chains">
+    <li><img src="../assets/coins/ltc.png" alt="" width="34" height="34"><span><b>Litecoin <small>LTC</small></b><small>Parent Chain</small></span><span class="ok">✓ ausgezahlt</span></li>
+    <li><img src="../assets/coins/doge.png" alt="" width="34" height="34"><span><b>Dogecoin <small>DOGE</small></b><small>Merged Mining</small></span><span class="ok">✓ ausgezahlt</span></li>
+    <li class="pep"><img src="../assets/brand/icon.svg" alt="" width="34" height="34"><span><b>Pepecoin <small>PEP</small></b><small>Merged Mining · 10.000 PEP pro Block</small></span><span class="ok">an dich ausgezahlt?</span></li>
+  </ul>
+</section>
+
+<section aria-label="Eckdaten">
+  <div class="stats">
+    <div class="stat"><span class="label">Zusätzlicher Strom</span><span class="value">0 W</span><span class="sub">dieselben Hashes zählen für PEP</span></div>
+    <div class="stat"><span class="label">Blockbelohnung</span><span class="value">10.000 PEP</span><span class="sub">rund 1.380 Blöcke pro Tag</span></div>
+    <div class="stat"><span class="label">Hashrate des PEP-Netzwerks</span><span class="value" id="mm-net-v">2,10 PH/s</span><span class="sub">PepeBlocks, <span id="mm-net-d">2026-11-24</span></span></div>
+    <div class="stat"><span class="label">Merged Mining</span><span class="value">Ab Block 42.000</span><span class="sub">AuxPoW, wie bei Dogecoin</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="pools">
+  <h2 id="pools">Zahlt dein Pool dir PEP aus?</h2>
+  <p>Pools gehen auf eine von vier Arten mit der zusätzlichen Coin um. Such deinen unten und prüf dann seine eigene Seite: Pool-Regeln ändern sich.</p>
+  <div class="mm-groups">
+<div class="mm-group auto"><h3><i>Automatisch</i>PEP landet in deinem Pool-Konto</h3><ul><li><a class="pool" href="https://www.viabtc.com/">ViaBTC</a><p>Wird deinem ViaBTC-Konto mit derselben LTC-Mining-Adresse gutgeschrieben, Abrechnung alle 2 Stunden. Danach auf deine eigene PEP-Adresse abheben.</p><small>Quelle: <a href="https://support.viabtc.com/hc/en-us/articles/11466386489743-PEP-LKY-Mining-Pools-Officially-Launched-Enjoy-30-Day-Zero-Fees">ViaBTC, 2024-12-10</a></small></li></ul></div>
+<div class="mm-group addr"><h3><i>Aktion nötig</i>PEP erst mit eingetragener PEP-Adresse</h3><ul><li><a class="pool" href="https://pool.binance.com/">Binance Pool</a><p>Trag in deinem Binance-Pool-Konto eine Pepecoin-Auszahlungsadresse ein. <strong>Ohne sie wird überhaupt kein PEP gutgeschrieben.</strong> Mindestauszahlung 20.000 PEP.</p><small>Quelle: <a href="https://www.binance.com/en/support/announcement/detail/0323d984af9a4360b2da6bd0df76f220">Binance, 2024-12-23</a></small></li></ul></div>
+<div class="mm-group check"><h3><i>Zahlt PEP</i>Prüf deine Auszahlungseinstellungen</h3><p>Zahlt PEP zusätzlich zu LTC und DOGE. Such in deinem Konto die Einstellungen für Merged Mining oder Auszahlungen und trag eine Adresse ein, die mit P beginnt.</p><ul><li><a class="pool" href="https://www.f2pool.com/coin/pepecoin">F2Pool</a><small>Quelle: <a href="https://www.f2pool.com/coin/pepecoin">F2Pool</a></small></li><li><a class="pool" href="https://www.antpool.com/">AntPool</a><small>Quelle: <a href="https://ultramining.com/news/en/antpool-launches-joint-mining-of-ltc-with-lky-pep-and-jkc/">Ultramining, 2024-12-06</a></small></li><li><a class="pool" href="https://www.kupool.com/">KuPool</a><small>Quelle: <a href="https://www.kupool.com/">KuPool</a></small></li><li><a class="pool" href="https://emcd.io/pool/pepecoin/">EMCD</a><small>Quelle: <a href="https://emcd.io/pool/pepecoin/">EMCD</a></small></li><li><a class="pool" href="https://www.mining-dutch.nl/pools/pepecoin.php">Mining-Dutch</a><p>Hat einen eigenen Pepecoin-Pool und zahlt in PEP.</p><small>Quelle: <a href="https://www.mining-dutch.nl/pools/pepecoin.php">Mining-Dutch</a></small></li></ul></div>
+<div class="mm-group value"><h3><i>Nicht in PEP</i>Du bekommst den PEP-Wert in LTC oder DOGE</h3><ul><li><a class="pool" href="https://www.litecoinpool.org/help">litecoinpool.org</a><p>Mint PEP per Merged Mining mit und zahlt den Wert als zusätzliche LTC und DOGE (höhere PPS-Rate). Nichts einzustellen, kein PEP.</p><small>Quelle: <a href="https://www.litecoinpool.org/help">litecoinpool.org</a></small></li><li><a class="pool" href="https://pool.kryptex.com/">Kryptex Pool</a><p>Tauscht PEP alle 24 Stunden in Litecoin und schlägt es deinen LTC-Belohnungen zu. Nichts einzustellen, kein PEP.</p><small>Quelle: <a href="https://www.kryptex.com/en/news/pepecoin-merge-mining-en">Kryptex, 2025-01-13</a></small></li></ul></div>
+<div class="mm-group seen"><h3><i>Unklar</i>Minen PEP-Blöcke, Auszahlung nicht veröffentlicht</h3><div class="tags"><span>dogegogo</span><span>BTC.com</span><span>hash-hut</span><span>GoodLuckyBoom</span><span>HashSpace</span><span>LSoftware DMCC</span></div><p>Ihre Kennungen tauchen in den Blockbelohnungen von Pepecoin auf (geprüft am 24. November 2026), sie minen also PEP-Blöcke. Eine öffentliche Seite dazu, wie sie es an Miner auszahlen, haben wir nicht gefunden: frag ihren Support. Markierte Adressen stehen in der <a href="rich-list.html">Rich List</a>.</p></div>
+  </div>
+  <p class="src">Live-Liste der Pools und ihrer PEP-Hashrate: <a href="https://miningpoolstats.stream/pepecoin">miningpoolstats</a>. Unsicher bei deinem Pool? Frag im Miner-Kanal auf dem <a href="https://pepecoin.com/discord">Pepecoin-Discord</a>.</p>
+</section>
+
+<section class="mm-calc" aria-labelledby="calc">
+  <h2 id="calc">Wie viel PEP dein Miner dazubringt</h2>
+  <p>Wähl deine Maschine oder gib ihre Hashrate ein. Die Dollarbeträge rechnen mit dem Preisfeld, das mit dem neuesten PEP-Kurs dieser Seite startet; du kannst ihn ändern.</p>
+  <div class="mm-in">
+    <label>Hashrate pro Maschine<span class="box"><input id="mm-hash" type="number" min="0" step="any" inputmode="decimal" value="16"><b>GH/s</b></span></label>
+    <label>Anzahl Maschinen<span class="box"><input id="mm-n" type="number" min="1" step="1" inputmode="numeric" value="1"></span></label>
+    <label>Pool-Gebühr<span class="box"><input id="mm-fee" type="number" min="0" max="99" step="any" inputmode="decimal" value="2"><b>%</b></span></label>
+    <label>PEP-Kurs<span class="box"><b>$</b><input id="mm-price" type="number" min="0" step="any" inputmode="decimal" value="6.037e-05"></span><small>Neuester Wert auf dieser Seite: <span id="mm-price-d">$0,00006037, 2026-11-24</span></small></label>
+  </div>
+  <div class="mm-presets" role="group" aria-label="Beliebte Scrypt-Miner"><button type="button" data-gh="16">Antminer L9</button><button type="button" data-gh="9.5">Antminer L7</button><button type="button" data-gh="11">ElphaPex DG1</button></div>
+  <div class="mm-out" aria-live="polite">
+    <div><span>Pro Jahr</span><strong id="mm-year">—</strong><em id="mm-usd-y">—</em></div>
+    <div><span>In 30 Tagen</span><strong id="mm-month">—</strong><em id="mm-usd-m">—</em></div>
+    <div><span>Pro Tag</span><strong id="mm-day">—</strong><em id="mm-usd-d">—</em></div>
+  </div>
+  <p class="note">Eine Schätzung: dein Anteil an der Hashrate des PEP-Netzwerks (<span id="mm-net" data-hs="2.1e15">2,10</span> PH/s) × <span id="mm-bpd" data-bpd="1379">1.379</span> Blöcke pro Tag (Schnitt der letzten 30 Tage) × 10.000 PEP, abzüglich Pool-Gebühr. Echte Auszahlungen schwanken mit Glück, Difficulty und Auszahlungsmethode des Pools. Es kommt zu deinen LTC und DOGE dazu.</p>
+  <p class="mm-nfa">Keine Anlageberatung. Beim heutigen Kurs ist der Dollarbetrag klein; kosten tut es dich eine Adresse in den Pool-Einstellungen.</p>
+</section>
+
+<section aria-labelledby="steps">
+  <h2 id="steps">In drei Schritten abholen</h2>
+  <ol class="guide-steps">
+    <li><h3>PEP-Adresse besorgen</h3><p>Jede Pepecoin-Wallet geht, etwa Pepecoin Core oder eine Tangem-Karte. Eine PEP-Adresse beginnt mit <code>P</code>. Eine Ethereum-Adresse (0x…) funktioniert nicht: PEP ist nicht PEPE. <a href="wallets.html">Wallets für PEP.</a></p></li>
+    <li><h3>Im Pool eintragen</h3><p>Öffne auf der Website deines Pools die Auszahlungs- oder Merged-Mining-Einstellungen und trag die Adresse für Pepecoin ein. Bei Binance Pool entscheidet dieser Schritt, ob du überhaupt PEP bekommst.</p></li>
+    <li><h3>Miner so lassen</h3><p>Keine neue Pool-URL, kein neuer Worker, keine neue Firmware. PEP kommt neben deinen LTC und DOGE an, sobald es die Mindestauszahlung des Pools erreicht.</p></li>
+  </ol>
+</section>
+
+<section aria-labelledby="why">
+  <h2 id="why">Warum dein Pool PEP gratis mitminen kann</h2>
+  <div class="prose">
+    <p>Pepecoin ist eine Scrypt-Coin auf Basis des Dogecoin-Codes, mit AuxPoW (Merged Mining) ab Block 42.000. Wenn ein Litecoin-Pool seinen Block baut, kann er einen Verweis auf einen Dogecoin- und einen Pepecoin-Block einbetten. Jeder Share deines Miners wird gegen alle drei Ziele geprüft. Reicht einer für die Pepecoin-Difficulty, findet der Pool einen PEP-Block, ohne dass Litecoin oder Dogecoin etwas verlieren. Deshalb haben die großen Litecoin-Pools PEP Ende 2024 aufgenommen.</p>
+    <p>Du hältst DOGE, statt es zu minen? PEP ist sein nächster Verwandter: derselbe Code, dasselbe Merged Mining, ein Frosch statt eines Hundes und kein Premine. <a href="compare.html">PEP und DOGE im Vergleich.</a></p>
+  </div>
+</section>
+
+<section aria-labelledby="faq">
+  <h2 id="faq">Häufige Fragen</h2>
+  <div class="faq">
+    <details><summary>Senkt Merged Mining von PEP meine Litecoin- oder Dogecoin-Belohnungen?</summary><p>Nein. Die Arbeit wird nicht auf die Chains aufgeteilt: Dieselben Hashes werden gegen das Ziel jeder Coin geprüft. In den Worten von ViaBTC ist PEP eine zusätzliche Belohnung aus dem Merged Mining, die keine zusätzliche Hashrate braucht.</p></details>
+    <details><summary>Welche Coins kann ich mit Litecoin per Merged Mining minen?</summary><p>Dogecoin und kleinere AuxPoW-Coins wie Pepecoin (PEP), Bellscoin, Luckycoin, Junkcoin, Dingocoin und Shibacoin. Welche du ausgezahlt bekommst, hängt vom Pool ab.</p></details>
+    <details><summary>Ist Dogecoin-Merged-Mining dasselbe wie Pepecoin minen?</summary><p>DOGE und PEP werden beide per Merged Mining mit Litecoin als Parent Chain gemint. Ein Pool mit beiden zahlt sie getrennt aus. DOGE zu minen bringt dir nur dann PEP, wenn dein Pool auch Pepecoin mitmint und auszahlt.</p></details>
+    <details><summary>Ich mine bei Binance Pool. Warum sehe ich kein PEP?</summary><p>Binance Pool zahlt PEP nur an Konten mit einer Pepecoin-Auszahlungsadresse aus; ohne sie wird nichts gutgeschrieben. Die Mindestauszahlung liegt bei 20.000 PEP (Ankündigung vom 23. Dezember 2024).</p></details>
+    <details><summary>Muss ich die Einstellungen meines Miners ändern?</summary><p>Nein. Bei einem Pool, der PEP per Merged Mining mitmint, bleiben Stratum-Adresse und Worker gleich. Du trägst nur die PEP-Auszahlungsadresse auf der Website des Pools ein.</p></details>
+    <details><summary>Kann ein Antminer L7 oder L9 Pepecoin per Merged Mining minen?</summary><p>Ja. Jeder Scrypt-ASIC, der Litecoin und Dogecoin mint, kann das, auch der Antminer L7, der L9 und der ElphaPex DG1. Das Merged Mining übernimmt der Pool.</p></details>
+    <details><summary>Kann ich PEP solo per Merged Mining minen, mit eigener Node?</summary><p>Pepecoin Core ist ein Fork von Dogecoin Core und hat die AuxPoW-RPC-Aufrufe createauxblock und submitauxblock, die Merged-Mining-Pool-Software nutzt. Das ist etwas für erfahrene Betreiber; für die meisten Miner ist ein Pool einfacher.</p></details>
+    <details><summary>Lohnt sich das?</summary><p>In Dollar beim heutigen Kurs wenig: Der Rechner oben nutzt den neuesten PEP-Kurs. Es kostet keinen zusätzlichen Strom und keine Hashrate, der einzige Aufwand ist eine Adresse. Das gemintete PEP gehört dir, zum Halten oder Verkaufen.</p></details>
+  </div>
+</section>
+
+<section aria-labelledby="more">
+  <h2 id="more">Passende Seiten</h2>
+  <div class="cards">
+    <a class="card" href="mining.html"><h3>PEP minen</h3><p>Der ganze Mining-Ratgeber: Hardware, Pools, GPU-Option mit unMineable.</p></a>
+    <a class="card" href="scrypt-family.html"><h3>Die Scrypt-Familie</h3><p>Litecoin, Dogecoin, Pepecoin und die anderen Merged-Mining-Coins.</p></a>
+    <a class="card" href="compare.html"><h3>PEP und DOGE</h3><p>Pepecoin neben Dogecoin, Punkt für Punkt.</p></a>
+    <a class="card" href="wallets.html"><h3>Wallets für PEP</h3><p>Woher du die P-Adresse für Auszahlungen bekommst.</p></a>
+  </div>
+</section>
+
+<section aria-labelledby="sources">
+  <h2 id="sources">Quellen</h2>
+  <div class="sources"><div><ul><li><a href="https://support.viabtc.com/hc/en-us/articles/11466386489743-PEP-LKY-Mining-Pools-Officially-Launched-Enjoy-30-Day-Zero-Fees">ViaBTC: PEP and LKY pools launched, 2024-12-10</a></li><li><a href="https://www.viabtc.com/en/blog/what-is-pepecoin-pep-how-to-mine-pepecoin-pep-369">ViaBTC: what is Pepecoin and how to mine it, 2024-12-12</a></li><li><a href="https://www.binance.com/en/support/announcement/detail/0323d984af9a4360b2da6bd0df76f220">Binance Pool: JKC and PEP merged mining, 2024-12-23</a></li><li><a href="https://www.kryptex.com/en/news/pepecoin-merge-mining-en">Kryptex Pool: Pepecoin added to LTC merged mining, 2025-01-13</a></li><li><a href="https://ultramining.com/news/en/antpool-launches-joint-mining-of-ltc-with-lky-pep-and-jkc/">Ultramining: AntPool adds LKY, PEP and JKC, 2024-12-06</a></li><li><a href="https://www.litecoinpool.org/help">litecoinpool.org help (merge-mined coins raise the PPS ratio)</a></li><li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/chainparams.cpp">Pepecoin chainparams.cpp (AuxPoW from block 42,000)</a></li><li><a href="https://github.com/pepecoinppc/pepecoin/blob/master/src/rpc/mining.cpp">Pepecoin src/rpc/mining.cpp (createauxblock, submitauxblock)</a></li><li><a href="https://pepeblocks.com/">PepeBlocks: network hashrate</a></li><li><a href="https://miningpoolstats.stream/pepecoin">miningpoolstats: Pepecoin pools</a></li></ul></div></div>
+</section>
+</main>
+<footer class="site-foot">
+  <p><strong>Community-Faktenseiten</strong>, gemacht von einem ganz normalen Typen aus r/pepecoin, so wie du. Keine offizielle Pepecoin-Publikation.</p>
+  <p>Keine Anlageberatung. Wer diese Seiten zusammenstellt, besitzt selbst PEP. Kurse und Netzwerkdaten ändern sich täglich; jede Seite nennt ihren Stand und ihre Quellen.</p>
+  <p class="correction">Fehler entdeckt? <a href="https://github.com/PepecoinHub/pepecoinhub.github.io/issues/new?template=correction.yml" data-correction>Korrektur auf GitHub melden</a> (bitte mit Quelle).</p>
+  <details class="support"><summary>Gefällt dir diese Seite? Du kannst ihre Weiterentwicklung unterstützen.</summary><p>Jeder noch so kleine Betrag hilft. Danke!</p><dl><div><dt>Pepecoin (PEP)</dt><dd><code>PiwzfZU1t37hCvKboCNN49YT8CPN2nXa3t</code></dd></div><div><dt>Litecoin (LTC)</dt><dd><code>ltc1qs05pfynke7ekd66cywkh235rvnykdqrnn4r58j</code></dd></div><div><dt>Dogecoin (DOGE)</dt><dd><code>DHLfH7Zk4nRLc41KpuDQNazY3qyNnjnT9v</code></dd></div><div><dt>Bitcoin (BTC)</dt><dd><code>bc1q4uxmuqrpg4znmmj3ccnt0ezf9mx6augrxuet5p</code></dd></div></dl></details>
+  <p class="foot-langs">Sprache: <a href="/merge-mining.html" hreflang="en" lang="en">English</a>&nbsp;· <a href="/pl/merge-mining.html" hreflang="pl" lang="pl">Polski</a>&nbsp;· <a href="/es/merge-mining.html" hreflang="es" lang="es">Español</a>&nbsp;· <a href="/fr/merge-mining.html" hreflang="fr" lang="fr">Français</a>&nbsp;· <a href="/tr/merge-mining.html" hreflang="tr" lang="tr">Türkçe</a>&nbsp;· <a href="/it/merge-mining.html" hreflang="it" lang="it">Italiano</a>&nbsp;· <a href="/zh/merge-mining.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></p>
+</footer>
+
+<script src="../prices.js?v=20261104lazy" defer></script>
+<script src="../merge-mining.js?v=20261125" defer></script>
+<script src="../chrome.js?v=20261125mm" defer></script>
+</body>
+</html>

@@ -252,6 +252,7 @@
       ['mining', { en: ['Mining', 'Pools, Antminer, unMineable'], pl: ['Kopanie', 'Poole, Antminer, unMineable'], es: ['Minería', 'Pools, Antminer, unMineable'],
         de: ['Mining', 'Pools, Antminer, unMineable'], fr: ['Minage', 'Pools, Antminer, unMineable'], tr: ['Madencilik', 'Havuzlar, Antminer, unMineable'],
         it: ['Mining', 'Pool, Antminer, unMineable'], zh: ['挖矿', '矿池、Antminer、unMineable'] }],
+      ['merge-mining', { en: ['Merge mining', 'LTC/DOGE miner? Add PEP'], pl: ['Merge mining', 'Kopiesz LTC/DOGE? Dodaj PEP'], es: ['Merge mining', '¿Minas LTC/DOGE? Suma PEP'], de: ['Merged Mining', 'LTC/DOGE-Miner? PEP dazu'], fr: ['Merge mining', 'Mineur LTC/DOGE ? Ajoute PEP'], tr: ['Merge mining', 'LTC/DOGE kazıyor musun? PEP ekle'], it: ['Merge mining', 'Mini LTC/DOGE? Aggiungi PEP'], zh: ['合并挖矿', '挖 LTC/DOGE？顺便挖 PEP'] }],
       ['guides', { en: ['Guides', 'All guides in one place'], pl: ['Poradniki', 'Wszystkie poradniki w jednym miejscu'], es: ['Guías', 'Todas las guías en un lugar'],
         de: ['Ratgeber', 'Alle Ratgeber auf einen Blick'], fr: ['Guides', 'Tous les guides au même endroit'], tr: ['Rehberler', 'Tüm rehberler tek yerde'],
         it: ['Guide', 'Tutte le guide in un posto'], zh: ['指南', '所有指南一览'] }]
