@@ -17,17 +17,8 @@
       return localStorage.getItem('pondos-beta') === 'pondwars';
     } catch (e) { return false; }
   })();
-  // Pepe Gold Hook is in testing too: hidden unless this browser opened /meme/?beta=goldhook once (?beta=off hides
-  // it again). Its page is not linked from the lobby and not indexed.
-  var GOLDHOOK = (function () {
-    try {
-      var q = new URLSearchParams(location.search).get('beta');
-      if (q === 'goldhook') localStorage.setItem('pondos-beta-goldhook', '1');
-      if (q === 'off') localStorage.removeItem('pondos-beta-goldhook');
-      // Gazette #11: 15 YES votes open it for everyone (gry_new_game, checked a moment after start; remembered here)
-      return localStorage.getItem('pondos-beta-goldhook') === '1' || localStorage.getItem('pondos-goldhook-live') === '1';
-    } catch (e) { return false; }
-  })();
+  // Pepe Gold Hook is open for everyone since 25 November 2026 (it was a ?beta=goldhook field test before).
+  var GOLDHOOK = true;
   // Owner sandbox activates for this visit only. The URL does not grant owner permissions.
   var FREN_TEST = (function () {
     try { return new URLSearchParams(location.search).get('beta') === 'fren-test'; } catch (e) { return false; }
@@ -291,7 +282,7 @@
       ['LEADERS', 'Every top 10 in one place', 'leaders', function () { highScores(); }],
       ["Pepe Guesser", 'A new photo every day: find Pepe on the map', 'wheres-pepe', function () { wheresPepe(); }],
       ['PEPaint', 'The party room: draw and guess with frens', 'pepaint', function () { drawGuess(); }],
-      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat(GOLDHOOK ? [['Pepe Gold Hook (beta)', '20 levels, a shop, one hook · field test', 'goldhook', function () { goldHookApp(); }]] : []).concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', function () { pepegochiApp(); }],
+      ['All games…', 'Chess, Checkers, Sea Battle, Pepe Miner and more', 'pond-playground', function () { gamesFolder(); }]].concat(GOLDHOOK ? [['Pepe Gold Hook', '20 levels, a shop, one hook', 'goldhook', function () { goldHookApp(); }]] : []).concat([['FROGAGEDDON (beta)', 'New physics, compact controls · field test', 'pondwars', function () { pondWarsApp(); }]]).concat(GOCHI ? [['PEPEGOCHI.EXE', 'Your frog: feed it, clean it, keep it happy', 'pep-logo', function () { pepegochiApp(); }],
         ['PEPEGOCHI (local test)', 'Rules simulator with a time machine · nothing is saved', 'pep-logo', function () { pepegochiTestApp(); }]] : []).forEach(function (g) {
       var b = el('a', { href: '#', role: 'button' }, '<img src="' + ico(g[2]) + '" alt="" width="24" height="24" loading="lazy"><span><b>' + g[0] + '</b><small>' + g[1] + '</small></span>');
       b.addEventListener('click', function (e) { e.preventDefault(); setOpen(false); g[3](); });
