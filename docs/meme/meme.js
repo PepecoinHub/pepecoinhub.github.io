@@ -5659,6 +5659,11 @@
     return h ? h + 'h ' + String(m).padStart(2, '0') + 'm' : m + 'm ' + String(s % 60).padStart(2, '0') + 's';
   }
   function dropPep(x) { return (Math.floor(Number(x) * 100) / 100).toLocaleString('en-US', { maximumFractionDigits: 2 }); }
+  // address,amount lines for a finished drop: the same equal split as the Haze payout (in 0.00000001 PEP, the remainder to the first joiners)
+  function dropCsv(g) {
+    var n = g.list.length, tot = Math.round(Number(g.pool) * 1e8), q = Math.floor(tot / n), rem = tot - q * n;
+    return g.list.map(function (e, i) { return e.address + ',' + ((q + (i < rem ? 1 : 0)) / 1e8).toFixed(8).replace(/\.?0+$/, ''); }).join('\n');
+  }
   function dropRules() {
     openApp('droprules', 'PEP Drop - rules.txt', 'news', function (A) {
       A.body.innerHTML = '<div class="drop-rules"><p><b>PEP Drop: free PEP, shared equally.</b></p><ul>' +
@@ -5754,12 +5759,17 @@
             var can = (g.phase === 'open' || g.phase === 'waiting');
             return '<li><b>' + esc(g.title) + '</b> · ' + dropPep(g.pool) + ' PEP · ' + g.entries + ' in · <i>' + g.phase + '</i>' + (g.txid ? ' · <a href="https://pepeblocks.com/tx/' + esc(g.txid) + '" target="_blank" rel="noopener">tx</a>' : '') +
               ' ' + pay + (can ? ' <button type="button" class="app-btn" data-cancel="' + g.id + '">Cancel</button>' : '') +
+              (g.list.length && g.phase !== 'open' && g.phase !== 'cancelled' ? '<details><summary class="wp-small">Copy the list (address,amount)</summary><textarea class="sc-in drop-csv" rows="4" readonly>' + esc(dropCsv(g)) + '</textarea><button type="button" class="app-btn" data-copy>Copy</button></details>' : '') +
               (g.list.length ? '<details><summary class="wp-small">Who joined</summary><ul>' + g.list.map(function (e) {
                 var fl = []; if (!e.verified) fl.push('guest'); if (e.other_drops) fl.push(e.other_drops + ' earlier drop(s)'); if (e.wp_other_players) fl.push('⚠ address used by ' + e.wp_other_players + ' other Guesser player(s)');
                 return '<li>' + esc(e.nick) + (e.verified ? ' ✓' : '') + ' <code>' + esc(e.address) + '</code> <span class="wp-small">' + fl.join(' · ') + '</span>' + (can ? ' <button type="button" class="app-btn" data-rm="' + g.id + '" data-u="' + esc(e.user_id) + '">Remove</button>' : '') + '</li>';
               }).join('') + '</ul></details>' : '') + '</li>';
           }).join('') + '</ol>';
         var act = function (p, ok) { p.then(function (r) { if (ok) ok(r); load(); }, function (e) { say(e.message, true); }); };
+        hb.querySelectorAll('[data-copy]').forEach(function (b) { b.addEventListener('click', function () {
+          var t = b.parentNode.querySelector('textarea'); t.select();
+          if (navigator.clipboard) navigator.clipboard.writeText(t.value).then(function () { b.textContent = 'Copied ✓'; }, function () { say('Select the text and copy it.', true); });
+        }); });
         hb.querySelector('.drop-set').addEventListener('submit', function (e) {
           e.preventDefault(); var f = e.target;
           act(wpRpc('gry_gdrop_host_settings', { p: { enabled: f.en.checked, daily: f.dy.checked, daily_at: f.at.value, pool: +f.pool.value, minutes: +f.min.value, max_entries: +f.max.value } }), function () { say('Saved.'); });
