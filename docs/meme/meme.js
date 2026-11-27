@@ -1252,6 +1252,7 @@
     var lh = /^#lilies(?:=([0-9a-f-]{36}))?$/i.exec(location.hash);   // a shared challenge: #lilies=<id>
     if (lh) setTimeout(function () { liliesApp(lh[1]); }, 0);
     if (location.hash === '#bulletin') setTimeout(function () { bulletinApp(); }, 0);
+    if (location.hash === '#mail') setTimeout(function () { frogMail('write'); }, 0);   // privacy notice link: a private letter
     var gzh = /^#gazette(?:=([0-9]{1,4}))?$/.exec(location.hash);   // a shared issue: #gazette=11
     if (gzh) setTimeout(function () { frogMail(gzh[1] ? 'gz' + gzh[1] : 'gz'); }, 0);
     setTimeout(function () {
