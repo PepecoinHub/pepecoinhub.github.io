@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PepeGochi v2 sprite review (local only)</title><style>body{background:#008080;color:#111;font:13px Tahoma,Arial;margin:0;padding:20px}
+.window{max-width:840px;margin:auto;background:#c0c0c0;border:2px outset #f9f9f9;box-shadow:6px 6px #333;padding:4px}
+.title{background:#000080;color:#fff;padding:5px 8px;font-weight:bold}
+.controls{padding:10px;display:flex;gap:6px;flex-wrap:wrap}
+button{font:12px Tahoma;background:#c0c0c0;border:2px outset #fff;padding:6px;cursor:pointer}
+.scene{margin:6px auto;position:relative;width: min(90vw,640px);aspect-ratio:8/5;background:linear-gradient(#d4c7da 0 65%,#b99876 65%);border:2px inset gray;overflow:hidden;}
+img{image-rendering:pixelated;}#frog{position:absolute;left:calc(50% - 64px);bottom:40px;width:128px;height:128px}
+#letter{position:absolute;left:calc(50% - 30px);bottom:18px;width:60px;height:60px;display:none}
+.note{padding:10px;font-size:12px;max-width:650px}
+</style></head><body><div class="window"><div class="title">PEPEGOCHI.EXE — Asset QA (offline preview)</div><div class="controls" id="controls"></div>
+<div class="scene"><img id="frog" src="sprites/pepegochi_adult_idle.png" alt="PepeGochi"><img id="letter" src="props/goodbye_envelope.png" alt="Farewell letter"></div><p class="note" id="status">No backend / no localStorage. These sprites are candidate art; this is not the final #222 room.</p></div>
+<script>
+const states=["egg_idle","tadpole_idle","froglet_idle","adult_idle","adult_hungry","adult_dirty","adult_moody","adult_tired","adult_neglected","adult_recovering","adult_packing"];
+const c=document.getElementById("controls"),frog=document.getElementById("frog"),letter=document.getElementById("letter"),info=document.getElementById("status");
+let time=null;
+function clear(){if(time)clearInterval(time);time=null}
+function show(name){clear();letter.style.display="none";frog.style.display="block";frog.src="sprites/pepegochi_"+name+".png";frog.alt=name;info.textContent=name+" — offline 128×128 PNG, image-rendering: pixelated."}
+for(const x of states){const b=document.createElement("button");b.textContent=x;b.onclick=()=>show(x);c.appendChild(b)}
+const b=document.createElement("button");b.textContent="Departure ×6";b.onclick=()=>{clear();letter.style.display="none";frog.style.display="block";let n=0;const tick=()=>{frog.src="animations/depart_"+String(n+1).padStart(2,"0")+".png";n++;if(n===6){clear();setTimeout(()=>{frog.style.display="none";letter.style.display="block"},250)}};tick();time=setInterval(tick,250);info.textContent="Departure: frog leaves; owned inventory is not modified."};c.appendChild(b);
+const e=document.createElement("button");e.textContent="Departed";e.onclick=()=>{clear();frog.style.display="none";letter.style.display="block";info.textContent="Room layers stay; frog hidden, letter is visible."};c.appendChild(e);
+const a=document.createElement("button");a.textContent="New egg";a.onclick=()=>show("egg_idle");c.appendChild(a);
+</script></body></html>
