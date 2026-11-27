@@ -1,5 +1,5 @@
 // A13: local room interaction, with care delegated to the existing validated actions.
-import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX, ROOM_LAMP, ROOM_HORSE } from './pepegochi-room.mjs?v=20261122life';
+import { roomScene, PROP_BOUNDS, SPRITE_BOUNDS, ROOM_W, ROOM_H, FROG_PX, ROOM_LAMP, ROOM_HORSE } from './pepegochi-room.mjs?v=20261128unlock';
 import { mountRoomEffects } from './pepegochi-room-fx.mjs?v=20261121chrom';
 
 const PROPS = {
@@ -44,15 +44,16 @@ export function roomTargets(opts, owned = false) {
     if (!Object.hasOwn(PROPS, item.itemId)) continue;
     const [l,t,r,b] = PROP_BOUNDS[item.itemId], iw = item.width, ih = iw * ROOM_W / ROOM_H;
     out.push({ id: item.itemId, label: PROPS[item.itemId][0], x: item.left - iw/2 + iw*l/128,
-      y: item.top - (item.wall ? ih/2 : ih) + ih*t/128, w: iw*(r-l)/128, h: ih*(b-t)/128, z: item.z + 2 });
+      y: item.top - (item.wall ? ih/2 : ih) + ih*t/128, w: iw*(r-l)/128, h: ih*(b-t)/128, z: item.z + 2,
+      ...(item.unlockDay ? { unlockDay: item.unlockDay } : {}) });
   }
   if (owned) {
     const [l,t,r,b] = ROOM_LAMP.bounds, w = ROOM_LAMP.width, h = w * ROOM_W / ROOM_H;
     out.push({ id:'pepe_table_lamp', label:PROPS.pepe_table_lamp[0], x:ROOM_LAMP.left-w/2+w*l/128,
-      y:ROOM_LAMP.top-h+h*t/128, w:w*(r-l)/128, h:h*(b-t)/128, z:51 });
+      y:ROOM_LAMP.top-h+h*t/128, w:w*(r-l)/128, h:h*(b-t)/128, z:51, ...(sc.fixed.pepe_table_lamp ? { unlockDay: sc.fixed.pepe_table_lamp } : {}) });
     const horse = ROOM_HORSE, [hl,ht,hr,hb]=horse.bounds, hw=horse.width, hh=hw*ROOM_W/ROOM_H;
     out.push({ id:'chrome_rocking_horse', label:PROPS.chrome_rocking_horse[0], x:horse.left-hw/2+hw*hl/128,
-      y:horse.top-hh+hh*ht/128, w:hw*(hr-hl)/128, h:hh*(hb-ht)/128, z:71 });
+      y:horse.top-hh+hh*ht/128, w:hw*(hr-hl)/128, h:hh*(hb-ht)/128, z:71, ...(sc.fixed.chrome_rocking_horse ? { unlockDay: sc.fixed.chrome_rocking_horse } : {}) });
   }
   // Only the exposed left edge of the bed is clickable; the frog keeps its own hit area.
   out.push({ id: 'bed', label: 'Help your frog rest', x: 34.3, y: 63, w: 8.4, h: 20, z: 65 });
@@ -101,6 +102,18 @@ export function roomResponse(id, view, { lampOn = true, busy = false, embedded =
   if (id === 'floppy_disk') { const text=propLine(id,propIndex); return { text, effect:'spark', speech:{speaker:'frog',line:text} }; }
   if (id === 'potted_plant') return { text:propLine(id,propIndex), effect:'lemon', speech:propIndex%10===0 ? {speaker:'frog',line:PROPS[id][1]} : undefined };
   return { text: propLine(id,propIndex), effect: id === 'mug' ? 'mug' : 'spark', painting: id === 'p_poster' };
+}
+
+// A locked item (pepegochi-room.mjs UNLOCK_DAY): a joke, and how many days are left. Nothing else happens.
+const LOCKED_LINES = {
+  potted_plant: ['The lemon tree is still a lemon twig. It is shy.', 'The twig is doing its best. Give it time.', 'No lemons yet. Not even sour ones.'],
+  rubber_duck: ['The duck is still reviewing your application.', 'The duck is in quarantine. Rubber regulations.', 'The duck does not know you yet. Squeak denied.'],
+  pepe_table_lamp: ['The lamp is waiting for a firmware update.', 'No light yet. The bulb is on a trip.', 'Lamp.exe is still installing. 3% done.'],
+  chrome_rocking_horse: ['The horse is still at the shop getting chromed.', 'The horse is not saddle trained yet.', 'Waiting for the chrome to dry. Very slowly.'],
+};
+export function lockedLine(id, unlockDay, day, i = 0) {
+  const left = Number.isFinite(day) ? Math.max(1, unlockDay - day) : null;
+  return pick(LOCKED_LINES[id] || ['Not yet, fren.'], i) + ` Unlocks on day ${unlockDay}` + (left ? ` (${left} ${left === 1 ? 'day' : 'days'} to go).` : '.');
 }
 
 // A12: while the frog is on a trip the bed and the duck wait for it (no care from the room).
@@ -152,12 +165,22 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
       const list = doc.createElement('div'); shortcuts.append(list); toolbar.append(shortcuts);
       for (const t of targets) {
         const btn = doc.createElement('button'); btn.type = 'button'; btn.className = 'pgr-hotspot';
-        btn.dataset.roomAction = t.id; btn.title = t.label; btn.setAttribute('aria-label', t.label);
+        const label = t.unlockDay ? t.label + ' (locked until day ' + t.unlockDay + ')' : t.label;
+        btn.dataset.roomAction = t.id; btn.title = label; btn.setAttribute('aria-label', label);
+        if (t.unlockDay) btn.classList.add('pgr-hotspot-locked');
         Object.assign(btn.style, {left: t.x+'%', top: t.y+'%', width: t.w+'%', height: t.h+'%', zIndex: String(t.z)});
         const activate = () => {
           if (!frame.isConnected || now() - lastClick < 300 || isBusy()) return;
           const at=now(); pats=pats.filter(p=>at-p<3500);
           if (isAway() && Object.hasOwn(AWAY_LINES, t.id)) { lastClick = at; feedback.textContent = AWAY_LINES[t.id]; return; }
+          if (t.unlockDay) {
+            lastClick = at; clearSpeech(); lastSpeech = null;
+            feedback.textContent = lockedLine(t.id, t.unlockDay, opts.day, propIndices[t.id] || 0);
+            propIndices[t.id] = (propIndices[t.id] || 0) + 1;
+            const li = frame.querySelector(`[data-lock="${t.id}"]`);
+            if (li && !reduced()) { li.classList.remove('pgr-locked-shake'); void li.offsetWidth; li.classList.add('pgr-locked-shake'); }
+            return;
+          }
           const result = roomResponse(t.id, getView(), { lampOn, busy: isBusy(), embedded, patIndex, patBurst:pats.length, propIndex:propIndices[t.id]||0 });
           if (!result) return;
           stage.classList.remove('pgr-idle-look');
@@ -177,12 +200,12 @@ export function createRoomInteractions({ getView, isBusy, care, openTV, openPain
         btn.addEventListener('click', activate);
         stage.append(btn); buttons.push(btn);
         const quickLabels = { frog: 'Pet Fren', rubber_duck: 'Play with duck', bed: 'Rest on bed' };
-        if (quickLabels[t.id] && (t.id !== 'rubber_duck' || owned)) {
+        if (quickLabels[t.id] && (t.id !== 'rubber_duck' || owned) && !t.unlockDay) {
           const action = doc.createElement('button'); action.type = 'button'; action.className = 'pgr-quick-action';
           action.textContent = quickLabels[t.id]; action.addEventListener('click', activate); quick.append(action);
         }
         const shortcut = doc.createElement('button'); shortcut.type = 'button'; shortcut.className = 'pgr-shortcut';
-        shortcut.textContent = t.label; shortcut.addEventListener('click', activate); list.append(shortcut);
+        shortcut.textContent = label; shortcut.addEventListener('click', activate); list.append(shortcut);
       }
       // Small idle gestures make the room feel occupied without changing care or interrupting a player action.
       let idleTimer = null, idleReset = null;
