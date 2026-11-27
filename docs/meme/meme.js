@@ -3681,7 +3681,11 @@
     '- One PEP address per player.',
     '- The game has a weekly PEP budget. When it is gone,',
     '  rewards come back next week.',
-    '- Paid once a week by the host, from the host\'s own wallet.',
+    '- Paid by the host from the host\'s own wallet, usually',
+    '  once a week (Haze Wallet or the Discord tip bot).',
+    '- Haze payouts show the txid. Tip bot payouts are only',
+    '  marked as paid: the bot gives no txid.',
+    '- 18+ only.',
     '- Super fast top scores (over 4700 in under 5 seconds)',
     '  are checked by hand before they are paid.',
     '- Cheating (extra accounts, shared answers) = no reward.',
@@ -4084,7 +4088,7 @@
       };
       var rewardInner = function (box, r, rw, outer) {
         if (r.claim) {
-          box.innerHTML = '<div class="wp-claim"><b>🎁 ' + r.claim.pep + ' PEP</b> ' + (r.claim.status === 'paid' ? 'paid ✓ <a href="https://pepeblocks.com/tx/' + esc(r.claim.txid) + '" target="_blank" rel="noopener">see the transaction</a>' : r.claim.status === 'held' ? 'on hold: the host is checking it' : 'waiting for the weekly payout') + '</div>';
+          box.innerHTML = '<div class="wp-claim"><b>🎁 ' + r.claim.pep + ' PEP</b> ' + (r.claim.status === 'paid' ? 'paid ✓ ' + (r.claim.txid ? '<a href="https://pepeblocks.com/tx/' + esc(r.claim.txid) + '" target="_blank" rel="noopener">see the transaction</a>' : '(tip bot, no txid)') : r.claim.status === 'held' ? 'on hold: the host is checking it' : 'waiting for the weekly payout') + '</div>';
           return;
         }
         if (!rw.open) { box.innerHTML = '<p class="wp-small">PEP rewards are paused right now.</p>'; return; }
@@ -4098,7 +4102,7 @@
           wire(); return;
         }
         box.innerHTML = '<form class="wp-claim"><b>🎁 Your reward: up to ' + pep + ' PEP</b><span class="wp-small">' + (rw.verified ? '' : 'Guest reward: one per network a day.' + discordLink + ' for up to ' + rw.discord_max_day + ' PEP. ') +
-          'Paid once a week by the host from the host\'s own wallet. Leave only an address: never a seed phrase or a password.' +
+          'Paid by the host from the host\'s own wallet, usually once a week. 18+ only. Leave only an address: never a seed phrase or a password.' +
           (rw.budget_left > 0 ? ' Left in this week\'s budget: ' + Math.floor(rw.budget_left).toLocaleString('en-US') + ' PEP.' : '') + '</span>' +
           '<span class="app-row"><input class="ac-in wp-addr" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Your PEP address" placeholder="Your PEP address (P…)"><button type="submit" class="app-btn">Claim</button></span></form>';
         var f = box.querySelector('form'), inp = f.querySelector('.wp-addr');
