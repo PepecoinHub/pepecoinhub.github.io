@@ -33,8 +33,11 @@ jobs:
     permissions:
       contents: write              # commit the new snapshot
     steps:
+      # The tip of the branch when the job starts, not the commit that queued the run: runs wait for
+      # each other (concurrency), and an earlier one may have pushed new data in the meantime.
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref_name }}
           fetch-depth: 0             # full history, so the sitemap can date each page by its last change
           filter: blob:none          # but only the file contents of the current commit
 
@@ -96,27 +99,10 @@ jobs:
       - name: Skip timestamp-only changes
         run: python scripts/keep_timestamps.py
 
+      # Commits and pushes; on a conflict with a run or merge that pushed meanwhile it rebuilds the
+      # generated files on the new tip instead of failing (see the script for how).
       - name: Commit data
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data docs/sitemap.xml ':(glob)docs/**/*.html'
-          git diff --exit-code -- docs
-          if git diff --cached --quiet; then
-            echo "Nothing new to commit."
-          else
-            if [ -f "docs/data/snapshots/$(date -u +%F).json" ] && ! git diff --cached --quiet -- docs/data/snapshots; then
-              git commit -m "data: snapshot $(date -u +%F)"
-            else
-              git commit -m "data: prices $(date -u '+%F %H:%M') UTC"
-            fi
-            # a merge can land at the same moment: rebase and try again a few times
-            for i in 1 2 3; do
-              git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
-              echo "push attempt $i failed, retrying"; sleep $((i * 10))
-            done
-            exit 1
-          fi
+        run: bash scripts/commit_data.sh "${GITHUB_REF_NAME}"
 
   # Job 2: publish the site. Fails with "HttpError: Not Found" in configure-pages
   # until Settings -> Pages -> Source is set to "GitHub Actions".
