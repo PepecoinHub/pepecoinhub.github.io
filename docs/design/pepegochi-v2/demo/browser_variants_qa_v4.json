@@ -1,0 +1,26 @@
+[
+  {
+    "target": "crt_tv",
+    "exactly_one_missing": 1,
+    "history_rows": 1,
+    "letter_matches": true,
+    "restored": true,
+    "js_errors": []
+  },
+  {
+    "target": "potted_plant",
+    "exactly_one_missing": 1,
+    "history_rows": 1,
+    "letter_matches": true,
+    "restored": true,
+    "js_errors": []
+  },
+  {
+    "target": null,
+    "exactly_one_missing": 0,
+    "history_rows": 1,
+    "letter_matches": true,
+    "restored": true,
+    "js_errors": []
+  }
+]

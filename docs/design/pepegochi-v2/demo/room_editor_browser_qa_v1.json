@@ -1,0 +1,38 @@
+[
+  {
+    "viewport": "1280x900",
+    "slots": 11,
+    "items": 10,
+    "move": "pass",
+    "gift_preview": "pass",
+    "departure": "pass",
+    "letter_gate": "pass",
+    "adoption": "pass",
+    "no_overflow": true,
+    "errors": []
+  },
+  {
+    "viewport": "390x844",
+    "slots": 11,
+    "items": 10,
+    "move": "pass",
+    "gift_preview": "pass",
+    "departure": "pass",
+    "letter_gate": "pass",
+    "adoption": "pass",
+    "no_overflow": true,
+    "errors": []
+  },
+  {
+    "viewport": "360x780",
+    "slots": 11,
+    "items": 10,
+    "move": "pass",
+    "gift_preview": "pass",
+    "departure": "pass",
+    "letter_gate": "pass",
+    "adoption": "pass",
+    "no_overflow": true,
+    "errors": []
+  }
+]

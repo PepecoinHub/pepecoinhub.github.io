@@ -1,0 +1,262 @@
+{
+  "version": 1,
+  "units": {
+    "width": 640,
+    "height": 400
+  },
+  "renderLayers": [
+    "wall_background",
+    "floor_background",
+    "fixed_furniture",
+    "wall_decor",
+    "surfaces",
+    "placed_items_back",
+    "pepegochi",
+    "placed_items_front",
+    "state_effects",
+    "click_targets",
+    "system_ui"
+  ],
+  "reserved": [
+    "window",
+    "bed",
+    "pet_center",
+    "letter_hotspot",
+    "exit_route"
+  ],
+  "slots": [
+    {
+      "id": "wall_left",
+      "label": "Lewy fragment ściany",
+      "x": 169,
+      "y": 96,
+      "allowed_categories": [
+        "wall"
+      ],
+      "z": 30,
+      "capacity": 1
+    },
+    {
+      "id": "wall_right",
+      "label": "Prawy fragment ściany",
+      "x": 414,
+      "y": 112,
+      "allowed_categories": [
+        "wall"
+      ],
+      "z": 30,
+      "capacity": 1
+    },
+    {
+      "id": "shelf_a",
+      "label": "Półka A",
+      "x": 252,
+      "y": 140,
+      "allowed_categories": [
+        "small",
+        "trophy"
+      ],
+      "z": 40,
+      "capacity": 1
+    },
+    {
+      "id": "shelf_b",
+      "label": "Półka B",
+      "x": 318,
+      "y": 140,
+      "allowed_categories": [
+        "small",
+        "trophy"
+      ],
+      "z": 40,
+      "capacity": 1
+    },
+    {
+      "id": "dresser_top",
+      "label": "Komoda",
+      "x": 90,
+      "y": 215,
+      "allowed_categories": [
+        "lamp",
+        "small"
+      ],
+      "z": 50,
+      "capacity": 1
+    },
+    {
+      "id": "tv_stand",
+      "label": "Szafka RTV",
+      "x": 546,
+      "y": 240,
+      "allowed_categories": [
+        "electronics",
+        "large"
+      ],
+      "z": 50,
+      "capacity": 1
+    },
+    {
+      "id": "table_top",
+      "label": "Stolik",
+      "x": 453,
+      "y": 258,
+      "allowed_categories": [
+        "small",
+        "toy"
+      ],
+      "z": 50,
+      "capacity": 1
+    },
+    {
+      "id": "floor_left",
+      "label": "Podłoga lewa",
+      "x": 95,
+      "y": 331,
+      "allowed_categories": [
+        "plant",
+        "large"
+      ],
+      "z": 50,
+      "capacity": 1
+    },
+    {
+      "id": "floor_right",
+      "label": "Podłoga prawa",
+      "x": 559,
+      "y": 331,
+      "allowed_categories": [
+        "plant",
+        "large"
+      ],
+      "z": 50,
+      "capacity": 1
+    },
+    {
+      "id": "rug_left",
+      "label": "Dywan lewy",
+      "x": 246,
+      "y": 341,
+      "allowed_categories": [
+        "toy",
+        "small"
+      ],
+      "z": 70,
+      "capacity": 1
+    },
+    {
+      "id": "rug_right",
+      "label": "Dywan prawy",
+      "x": 398,
+      "y": 341,
+      "allowed_categories": [
+        "toy",
+        "small"
+      ],
+      "z": 70,
+      "capacity": 1
+    }
+  ],
+  "items": [
+    {
+      "id": "p_poster",
+      "label": "Plakat P",
+      "category": "wall",
+      "borrowable": true,
+      "placeholder_icon": "🖼️",
+      "initial_slot": "wall_left",
+      "demo_initially_owned": true,
+      "asset_ready": false
+    },
+    {
+      "id": "crt_tv",
+      "label": "Telewizor CRT",
+      "category": "electronics",
+      "borrowable": true,
+      "placeholder_icon": "📺",
+      "initial_slot": "tv_stand",
+      "demo_initially_owned": true,
+      "asset_ready": false
+    },
+    {
+      "id": "lava_lamp",
+      "label": "Lampa lawa",
+      "category": "lamp",
+      "borrowable": true,
+      "placeholder_icon": "💡",
+      "initial_slot": "dresser_top",
+      "demo_initially_owned": true,
+      "asset_ready": false
+    },
+    {
+      "id": "potted_plant",
+      "label": "Roślina doniczkowa",
+      "category": "plant",
+      "borrowable": true,
+      "placeholder_icon": "🪴",
+      "initial_slot": "floor_left",
+      "demo_initially_owned": true,
+      "asset_ready": false
+    },
+    {
+      "id": "rubber_duck",
+      "label": "Gumowa kaczuszka",
+      "category": "toy",
+      "borrowable": true,
+      "placeholder_icon": "🦆",
+      "initial_slot": "rug_left",
+      "demo_initially_owned": true,
+      "asset_ready": false
+    },
+    {
+      "id": "mug",
+      "label": "Kubek",
+      "category": "small",
+      "borrowable": true,
+      "placeholder_icon": "☕",
+      "initial_slot": "table_top",
+      "demo_initially_owned": true,
+      "asset_ready": false
+    },
+    {
+      "id": "floppy_disk",
+      "label": "Dyskietka",
+      "category": "small",
+      "borrowable": false,
+      "placeholder_icon": "💾",
+      "initial_slot": null,
+      "demo_initially_owned": false,
+      "asset_ready": false
+    },
+    {
+      "id": "paper_crown",
+      "label": "Papierowa korona",
+      "category": "trophy",
+      "borrowable": false,
+      "placeholder_icon": "👑",
+      "initial_slot": null,
+      "demo_initially_owned": false,
+      "asset_ready": false
+    },
+    {
+      "id": "moon_rock",
+      "label": "Księżycowa skała",
+      "category": "trophy",
+      "borrowable": false,
+      "placeholder_icon": "🪨",
+      "initial_slot": null,
+      "demo_initially_owned": false,
+      "asset_ready": false
+    },
+    {
+      "id": "lost_pond_artifact",
+      "label": "Artefakt Lost Pond Files",
+      "category": "trophy",
+      "borrowable": false,
+      "placeholder_icon": "❔",
+      "initial_slot": null,
+      "demo_initially_owned": false,
+      "asset_ready": false
+    }
+  ],
+  "note": "Concept schema only. Initial ownership and rewards in production must be server verified; this manifest is not an award source."
+}

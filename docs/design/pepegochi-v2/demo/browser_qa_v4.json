@@ -1,0 +1,38 @@
+[
+  {
+    "viewport": "1280x900",
+    "first_life": "ok",
+    "departure": "ok",
+    "single_missing_prop": "ok",
+    "letter": "ok",
+    "new_adoption": "ok",
+    "restoration": "ok",
+    "horizontal_overflow": false,
+    "js_errors": [],
+    "screenshot": "PepeGochi_v4_1280_after_adoption.png"
+  },
+  {
+    "viewport": "390x844",
+    "first_life": "ok",
+    "departure": "ok",
+    "single_missing_prop": "ok",
+    "letter": "ok",
+    "new_adoption": "ok",
+    "restoration": "ok",
+    "horizontal_overflow": false,
+    "js_errors": [],
+    "screenshot": "PepeGochi_v4_390_after_adoption.png"
+  },
+  {
+    "viewport": "360x780",
+    "first_life": "ok",
+    "departure": "ok",
+    "single_missing_prop": "ok",
+    "letter": "ok",
+    "new_adoption": "ok",
+    "restoration": "ok",
+    "horizontal_overflow": false,
+    "js_errors": [],
+    "screenshot": "PepeGochi_v4_360_after_adoption.png"
+  }
+]
