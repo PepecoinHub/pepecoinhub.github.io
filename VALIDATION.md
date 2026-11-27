@@ -149,6 +149,13 @@ Rule: an address is tagged only if it was spent **in the same transaction as the
 - `Prj6QbUQL9wSzk2Xxedms3jLqDVjTDs2Sm` (rank 2 today, 3.33 B PEP): received 2.31 B PEP from the XeggeX address *after* the shutdown (Feb–Mar 2025) and has sent only 66 PEP ever. It could be the operator's or a large user's wallet; receiving alone does not show who owns it.
 - `PryjXWHPDRQChb3sDZwUby3cTtNatfR1tE`: an exchange-like hot wallet (19,432 transactions) of an unknown operator, in the top 1250 since Feb 2025.
 
+### Kraken cold wallet `PYr8bCjurRQzHNGVAdHT19mTQtfCYADsgy` (added 2026-11-27)
+
+- Every coin it holds came from `PnGBaeDAm3EraCdNnNvcTawaJY7EHunbbB` (already tagged Kraken): first test transfers of 1 PEP, then one transfer of about 5.03 billion PEP on 2026-11-25.
+- Only 4 transactions and no outgoing spend, so no customer traffic: the pattern of an exchange moving funds to cold storage.
+- 5.03 billion PEP is more than `PnGBae…` kept after the move, which makes a single customer withdrawal unlikely.
+- Kraken has not published this address. The tag rests on the on-chain pattern above; it gets stronger if the address later sends coins back to `PnGBae…`, and should be removed if it pays out anywhere else.
+
 ## 5. Pool tags
 
 `labels.json` also tags six mining-pool addresses (type `pool`); the "without exchanges and pools" view hides them together with the exchange tags. Mining-Dutch, ViaBTC, AntPool and KuPool were added in commit `cf3eb60` (2026-10-06).
