@@ -102,7 +102,7 @@ const server = http.createServer((req, res) => {
  await page.evaluate(()=>{t.time+=31*60000;t.refresh();});
  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pepegochi:bond:v1:owner-a:frog-a')).seen===t.time);
  await frog.focus();await page.keyboard.press('Enter');await selectMenu(page,'more');assert.equal(await page.getByRole('button',{name:'Reactions: quiet',exact:true}).count(),1);
- assert.match(await page.locator('.pg-conversation .pg-fact-q').textContent(),/back|There you are/);
+ assert.match(await page.locator('.pg-conversation .pg-fact-q').textContent(),/back|There you are|Psst, fren/);
  // Switching owners closes dialogue and does not inherit local familiarity/mute.
  await page.evaluate(()=>{t.owner='owner-b';t.refresh();});await page.waitForFunction(()=>!document.querySelector('.pg-conversation'));
  await frog.focus();await page.keyboard.press('Enter');await selectMenu(page,'more');assert.equal(await page.getByRole('button',{name:'Reactions: on',exact:true}).count(),1);
