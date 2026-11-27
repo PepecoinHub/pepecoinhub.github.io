@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PepeGochi v5 | ROOM.EXE — Warstwowy pokój</title>
+<style>
+:root{font-family:Tahoma,'Trebuchet MS',Arial,sans-serif;color:#242538;background:#17798d;font-size:13px;--ink:#15174c;--navy:#101774;--light:#e1e0ef;--beige:#f6efda}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:18px;background-color:#188b99;background-image:linear-gradient(145deg,#0f6581,#2e7291 65%,#164866)}
+.desktop{max-width:1180px;margin:0 auto;padding:5px;border:3px ridge white;background:#c3c5d0;box-shadow:4px 6px 0 #1a3656}
+.title{background:linear-gradient(90deg,#060971,#2361be);color:#fff;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;font-size:17px;font-weight:bold;gap:8px}
+.traffic{display:flex;gap:3px}.traffic span{font-size:13px;color:#000;background:#c0c0c0;border:2px outset white;padding:2px 5px;line-height:1}
+.menubar{padding:8px 11px;border-bottom:2px groove #d6d6db;font-size:13px;display:flex;gap:14px;background:#e5e5e8}
+.explain{background:#f7f3dc;border:1px solid #c2b27e;margin:10px 10px 12px;padding:9px;line-height:1.45}
+.layout{display:grid;grid-template-columns:minmax(0,1.53fr) minmax(300px,.85fr);gap:10px;padding:0 9px 9px}
+.panel{background:#d8d7e1;border:2px inset #fff;min-width:0}.panel>h2{font-size:14px;background:linear-gradient(90deg,#25206e,#453a9b);color:#fff;padding:7px 9px;margin:0;font-weight:bold}.body{padding:9px}
+.room-frame{border:4px inset #9993ab;background:#33345e;padding:5px}.stage{width:100%;aspect-ratio:8 / 5;position:relative;background:#a790b4;overflow:hidden;isolation:isolate}
+.room-bg{width:100%;height:100%;position:absolute;inset:0;object-fit:fill;image-rendering:pixelated;user-select:none;pointer-events:none;z-index:1}
+.pet{position:absolute;width:22%;left:50%;top:72%;transform:translate(-50%,-50%);z-index:60;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(2px 3px 0 #403454)}
+.stage-btn{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-100%);padding:0;width:var(--size);aspect-ratio:1 / 1;border:1px dashed transparent;border-radius:3px;background:transparent;cursor:pointer;z-index:var(--z);display:flex;align-items:center;justify-content:center}
+.stage-btn.wall{transform:translate(-50%,-50%)}
+.stage-btn img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;pointer-events:none}
+.stage-btn.guides{border-color:rgba(216,221,254,.88);background:rgba(25,22,72,.15);box-shadow:inset 0 0 0 1px rgba(30,22,50,.2)}
+.stage-btn.compatible{border:2px dashed #edf872;background:rgba(167,223,76,.28)}
+.stage-btn.incompatible{border:1px dashed rgba(174,76,76,.53)}
+.stage-btn:focus-visible{outline:3px solid #fff761;outline-offset:1px}
+.slot-plus{font-family:Tahoma;font-weight:bold;font-size:clamp(9px,2.5vw,22px);color:#fff;text-shadow:1px 1px #222}
+.missing{background:rgba(42,33,71,.35)!important;border:2px dotted #fff2a5!important}
+.missing::after{content:'?';font-size:clamp(11px,3vw,25px);font-weight:bold;color:#fff3bb}
+.stage-btn.missing img{display:none}
+.envelope{position:absolute;z-index:90;left:70%;top:73%;background:#f9e9bd;border:3px outset #e3bc6d;border-radius:2px;font-size:clamp(15px,4vw,26px);cursor:pointer;transform:translate(-50%,-50%) rotate(-5deg);padding:0 5px}.envelope[hidden],.pet[hidden]{display:none}
+.scene-footer{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px}.chip{display:inline-block;padding:4px 6px;background:#f0edf9;border:1px solid #a5a3af;font-size:11px}
+.pill{background:#fcf5d7;border:1px solid #d2c27d;padding:8px;line-height:1.5;margin-top:8px;min-height:46px}
+.btn-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.btn{font:inherit;padding:8px 11px;background:#eae9ed;border:2px outset white;color:#191c3b;cursor:pointer;font-weight:bold;min-height:39px}.btn:disabled{opacity:.5;cursor:default}.btn:focus-visible{outline:3px solid #263cb8}.btn:active{border-style:inset}.primary{background:#f8e4a8}
+.inv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-height:472px;overflow:auto}
+.inv{font:inherit;border:2px outset white;background:#f3f2f7;min-width:0;min-height:105px;cursor:pointer;padding:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;position:relative;color:#202344}
+.inv img{width:61px;height:61px;max-width:95%;image-rendering:pixelated}.inv small{font-size:10px;line-height:1.2;max-width:100%;overflow-wrap:anywhere;text-align:center}.inv.selected{outline:3px solid #2458b1;background:#fff9d9}
+.inv.locked{background:#c4c4cb;color:#666;cursor:not-allowed}.inv.locked img{filter:grayscale(1);opacity:.42}.lock-label{position:absolute;right:3px;top:2px;background:#6c6c71;color:white;padding:2px 4px;font-size:9px}
+.inv:focus-visible{outline:3px solid #294fc9}.action-note{margin-top:9px;border-top:1px solid #aba8b8;padding-top:7px;color:#43465c;font-size:11px;line-height:1.4}
+.history{border-top:1px solid #aba8b8;margin-top:11px;padding:9px 0 2px}.history h3{margin:0 0 5px;font-size:13px}.history-item{padding:5px 0;border-top:1px dashed #a6a1ac;font-size:12px}
+.log{background:#171d39;color:#d3efba;padding:10px;margin-top:10px;min-height:46px;font:12px/1.5 Consolas,monospace;white-space:pre-wrap}
+.modal{position:fixed;inset:0;background:#0e15309e;z-index:500;display:flex;align-items:center;justify-content:center;padding:15px}.modal[hidden]{display:none}.notepad{width:min(530px,100%);background:#ececec;border:3px outset white;box-shadow:5px 6px 0 #252b3e}.notepad header{background:#152b88;color:white;padding:5px 8px;display:flex;justify-content:space-between;align-items:center}.notepad pre{white-space:pre-wrap;padding:15px;font:13px/1.6 'Courier New',monospace;background:#fff;margin:4px;border:2px inset white;min-height:180px}
+.sysbar{padding:9px 12px;font-size:11px;color:#454754;border-top:1px solid #9894a6;background:#cecdd3}
+@media(max-width:830px){body{padding:7px}.layout{grid-template-columns:1fr}.inv-grid{grid-template-columns:repeat(4,minmax(0,1fr));max-height:inherit}.title{font-size:14px}}
+@media(max-width:500px){.inv-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.inv{min-height:95px}.inv img{width:54px;height:54px}.body{padding:6px}.stage-btn .slot-plus{font-size:13px}.title{font-size:13px}.menubar{font-size:12px;gap:9px}.desktop{padding:3px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style></head>
+<body>
+<div class="desktop">
+<header class="title"><span>PepeGochi v5 — ROOM.EXE</span><span class="traffic" aria-hidden="true"><span>–</span><span>□</span><span>×</span></span></header>
+<div class="menubar">Gra　 Pokój　 Kolekcja　 Fren Passport　 Pomoc</div>
+<div class="explain"><strong>TEST / Art Prototype.</strong> Grafiki przedmiotów są niezależne od tła i można je przestawiać. Wybierz przedmiot w kolekcji, potem pasujące miejsce w pokoju. Kliknij zajęte miejsce bez wybranego przedmiotu, aby schować dekorację. Dane są wyłącznie w pamięci tej karty.</div>
+<main class="layout">
+<section class="panel"><h2>POKÓJ / warstwy 640 × 400</h2><div class="body">
+<div class="room-frame"><div id="stage" class="stage"><img id="roomBg" class="room-bg" alt="" /><img id="pet" class="pet" alt="Zielony PepeGochi w niebieskiej bluzie"/><div id="placedLayer"></div><button id="envelope" class="envelope" hidden aria-label="Otwórz GOODBYE.TXT">✉</button></div></div>
+<div class="scene-footer"><span class="chip">11 punktów dekoracji</span><span class="chip">Własność bez utraty</span><span class="chip">Oddzielne PNG</span><span class="chip">Działa offline</span></div>
+<div id="status" class="pill" aria-live="polite" role="status"></div>
+<div class="btn-row"><button id="toggleGuides" class="btn">Ukryj miejsca</button><button id="depart" class="btn">Symuluj wyprowadzkę</button><button id="adopt" class="btn primary" disabled>Nowa adopcja</button><button id="reset" class="btn">Reset</button></div>
+<div id="log" class="log" aria-live="polite">Możesz urządzać pokój.</div>
+</div></section>
+<aside class="panel"><h2>KOLEKCJA / INVENTORY.EXE</h2><div class="body">
+<div id="inventory" class="inv-grid"></div>
+<div class="btn-row"><button id="giftFloppy" class="btn">Test: zdobądź dyskietkę</button><button id="giftCrown" class="btn">Test: zdobądź koronę</button><button id="cancel" class="btn">Anuluj wybór</button></div>
+<div class="action-note"><strong>Uwaga:</strong> „Test: zdobądź” symuluje nagrodę tylko w pamięci przeglądarki. Prawdziwe przedmioty i Moon Rock przyzna wyłącznie serwer po sprawdzeniu reguł. Żaba nie może zabrać unikalnych nagród.</div>
+<section class="history"><h3>FORMER_FRENS.TXT — historia</h3><div id="history">Brak poprzednich żab.</div></section>
+</div></aside>
+</main><footer class="sysbar">PepecoinHub / PondOS 98 • Projekt graficzny v5 • bez SQL, Supabase, localStorage i PEP • GitHub Draft PR</footer>
+</div>
+<div class="modal" id="modal" hidden><div class="notepad" role="dialog" aria-modal="true" aria-labelledby="titleGoodbye"><header><span id="titleGoodbye">GOODBYE.TXT — Notatnik</span><button id="close" class="btn" aria-label="Zamknij list">×</button></header><pre id="letterText"></pre></div></div>
+<script>
+'use strict';
+// Non-network, memory-only demonstrator. The following CORE is identical to room_core.mjs except export keywords.
+__CORE__
+const imageData=__IMAGES__;
+let state=initialRoom(),selected=null,guides=false;
+const $=id=>document.getElementById(id);
+$('roomBg').src=imageData.room_clean_base;
+$('pet').src=imageData.pepegochi_adult_idle;
+const sprite=(id)=>imageData[id]||null;
+const say=(message)=>{$('log').textContent=message};
+const sizeFor={crt_tv:20,lava_lamp:15,potted_plant:19,p_poster:15,rubber_duck:14,mug:13,floppy_disk:13,paper_crown:13};
+// Pixel anchors adjust only visual presentation; persistent slot IDs remain unchanged.
+const offsetY={crt_tv:28,lava_lamp:16,mug:20,potted_plant:4};
+function roomRender(){
+ const root=$('placedLayer');root.replaceChildren();
+ SLOTS.forEach(s=>{
+  const placed=state.placements[s.id],visible=displayedItemForSlot(state,s.id);
+  const missing=state.departed&&placed&&visible===null;
+  const compatible=selected&&s.allowed.includes(itemById(selected).category);
+  const b=document.createElement('button');b.type='button';b.className='stage-btn'+(s.allowed.includes('wall')?' wall':'')+(guides?' guides':'')+(selected&&compatible?' compatible':'')+(selected&&!compatible?' incompatible':'')+(missing?' missing':'');
+  b.style.setProperty('--x',(s.x/640*100)+'%');b.style.setProperty('--y',((s.y+(offsetY[placed]||0))/400*100)+'%');b.style.setProperty('--z',String(s.layer));b.style.setProperty('--size',(sizeFor[placed]||14)+'%');
+  b.disabled=state.departed;
+  b.setAttribute('aria-label',s.label+(placed?'. '+itemById(placed).label:'; puste miejsce')+(selected?'; wybierz, aby ustawić '+itemById(selected).label:''));
+  b.title=b.getAttribute('aria-label');
+  if(visible&&sprite(visible)){const im=document.createElement('img');im.src=sprite(visible);im.alt='';b.append(im)}
+  else if(!missing){const plus=document.createElement('span');plus.className='slot-plus';plus.textContent=guides?'+':'';b.append(plus)}
+  b.onclick=()=>onSlot(s.id);root.append(b);
+ });
+ $('pet').hidden=state.departed;$('envelope').hidden=!state.departed;
+ const inv=$('inventory');inv.replaceChildren();
+ ITEMS.forEach(item=>{
+  const owned=state.owned.includes(item.id),b=document.createElement('button');b.type='button';
+  b.className='inv'+(selected===item.id?' selected':'')+(!owned?' locked':'');b.disabled=!owned||state.departed;
+  const im=document.createElement('img');if(sprite(item.id))im.src=sprite(item.id);else {im.style.display='none';b.textContent='?'}im.alt='';
+  const lab=document.createElement('small');lab.textContent=item.label+(Object.values(state.placements).includes(item.id)?' • wystawione':'');
+  b.append(im,lab);
+  if(!owned){const l=document.createElement('span');l.className='lock-label';l.textContent='LOCKED';b.append(l)}
+  b.setAttribute('aria-label',item.label+(owned?'':', niedostępny'));b.onclick=()=>{selected=item.id;guides=true;say('Wybrano: '+item.label+'. Wskaż miejsce w pokoju.');roomRender()};inv.append(b);
+ });
+ $('status').textContent=state.departed?('Fren się wyprowadził. '+(state.takenItemId?'Wyniósł: '+itemById(state.takenItemId).label+'. ':'Nie znalazł nic do wyniesienia. ')+'W pokoju czeka GOODBYE.TXT.'):('Żaba mieszka w pokoju. Generacja '+state.lifeNumber+'. Dostępne: '+state.owned.length+' przedmiotów. Rewizja pokoju: '+state.revision+'.');
+ $('adopt').disabled=!(state.departed&&state.letterSeen);$('depart').disabled=state.departed;
+ $('giftFloppy').disabled=state.departed||state.owned.includes('floppy_disk');$('giftCrown').disabled=state.departed||state.owned.includes('paper_crown');
+ $('toggleGuides').textContent=guides?'Ukryj miejsca':'Pokaż miejsca';
+ const history=$('history');history.replaceChildren();
+ if(!state.history.length){history.textContent='Brak poprzednich żab.'}else{
+  state.history.toReversed().forEach(h=>{const d=document.createElement('div');d.className='history-item';d.textContent='Fren #'+h.lifeNumber+' • '+(h.takenItemId?'Zabrał: '+itemById(h.takenItemId).label:'Odszedł bez przedmiotu');history.append(d)})
+ }
+}
+function onSlot(slotId){
+ try{
+  if(!selected){if(!state.placements[slotId]){say('Wybierz najpierw przedmiot z kolekcji.');return}const name=itemById(state.placements[slotId]).label;state=unplaceItem(state,slotId);say('Schowano do kolekcji: '+name)}
+  else{const name=itemById(selected).label;state=placeItem(state,selected,slotId);say('Ustawiono: '+name+'.');selected=null;guides=false}
+ }catch(e){say('Nie można ustawić przedmiotu: '+e.message+'.')}roomRender();
+}
+$('toggleGuides').onclick=()=>{guides=!guides;roomRender()};
+$('cancel').onclick=()=>{selected=null;guides=false;say('Anulowano wybór.');roomRender()};
+$('giftFloppy').onclick=()=>{state=simulateTrustedGift(state,'floppy_disk','demo:first_floppy');say('TEST: przyznano dyskietkę. W produkcji serwer musiałby potwierdzić nagrodę.');roomRender()};
+$('giftCrown').onclick=()=>{state=simulateTrustedGift(state,'paper_crown','demo:first_crown');say('TEST: przyznano koronę. W produkcji serwer musiałby potwierdzić nagrodę.');roomRender()};
+$('depart').onclick=()=>{state=settleDemoDeparture(state,Math.floor(Math.random()*99));selected=null;const name=state.takenItemId?itemById(state.takenItemId).label:'nic';say('Wyprowadzka! Żaba zabrała: '+name+'. Kliknij kopertę, żeby przeczytać GOODBYE.TXT.');roomRender()};
+$('envelope').onclick=()=>{state=openGoodbye(state);$('letterText').textContent=goodbyeCopy(state);$('modal').hidden=false;roomRender();$('close').focus()};
+$('close').onclick=()=>{$('modal').hidden=true;$('envelope').focus()};
+$('modal').addEventListener('click',e=>{if(e.target===$('modal'))$('close').click()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modal').hidden)$('close').click()});
+$('adopt').onclick=()=>{try{state=adoptNewFren(state);say('Nowa adopcja! Poprzednia żaba w historii, przedmioty wróciły na miejsca.');roomRender()}catch(e){say(e.message)}};
+$('reset').onclick=()=>{state=initialRoom();selected=null;roomRender();say('Zresetowano wyłącznie lokalną symulację.')};
+roomRender();
+</script></body></html>

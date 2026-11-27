@@ -1,0 +1,44 @@
+[
+  {
+    "viewport": "1280x900",
+    "slots": 11,
+    "art_objects": 8,
+    "initial_props": 6,
+    "gift_demo": "pass",
+    "reposition": "pass",
+    "departure": "pass",
+    "letter_gate": "pass",
+    "restore": "pass",
+    "no_overflow": true,
+    "no_external_requests": true,
+    "js_errors": []
+  },
+  {
+    "viewport": "390x844",
+    "slots": 11,
+    "art_objects": 8,
+    "initial_props": 6,
+    "gift_demo": "pass",
+    "reposition": "pass",
+    "departure": "pass",
+    "letter_gate": "pass",
+    "restore": "pass",
+    "no_overflow": true,
+    "no_external_requests": true,
+    "js_errors": []
+  },
+  {
+    "viewport": "360x780",
+    "slots": 11,
+    "art_objects": 8,
+    "initial_props": 6,
+    "gift_demo": "pass",
+    "reposition": "pass",
+    "departure": "pass",
+    "letter_gate": "pass",
+    "restore": "pass",
+    "no_overflow": true,
+    "no_external_requests": true,
+    "js_errors": []
+  }
+]
