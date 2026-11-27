@@ -10,6 +10,8 @@ const fixtureBackend = `import { LocalPepegochi } from './pepegochi-model.mjs';
 const sim=new LocalPepegochi({start:Date.now()});
 sim.rpc('gry_pepegochi_adopt',{p_name:'Test Fren'});
 sim.world.lives[0].care_days=40;
+// a 30-day-old frog, so every room item is unlocked (pepegochi-room.mjs UNLOCK_DAY); the need clocks keep their own times
+{const l=sim.world.lives[0];for(const k of ['hunger_due_at','hygiene_due_at','mood_due_at','energy_due_at'])l[k]??=l.adopted_at;l.adopted_at-=30*86400e6;}
 const q=new URLSearchParams(location.search);
 const ids=q.has('empty')?[]:['p_poster','crt_tv','lava_lamp','potted_plant','rubber_duck','mug','moon_rock','paper_crown'];
 window.fixtureCalls=[];
