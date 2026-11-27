@@ -2,9 +2,9 @@
 // The frog lives on the server (games/supabase/update_pepegochi_v2.sql), one per Discord account.
 // PondOS opens this page in a window; it also works on its own.
 import { getBackend } from './backend.js?v=20261113link';
-import { LiveGame } from './pepegochi-live-view.mjs?v=20261124hide';
-import { renderRoom, playDeparture, playRareVisitor, playFrames, playTvStatic, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261122life';
-import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261123roomfun';
+import { LiveGame } from './pepegochi-live-view.mjs?v=20261128unlock';
+import { renderRoom, playDeparture, playRareVisitor, playFrames, playTvStatic, frogLook, careFrames, animationFramesForStage, HATCH_FRAMES, HATCH_MS, CARE_MS, versionSprite } from './pepegochi-room.mjs?v=20261128unlock';
+import { createRoomInteractions } from './pepegochi-room-interactions.mjs?v=20261128unlock';
 import { notesFor } from '../../meme/pepegochi-notes.mjs?v=20261121map';
 import { openPondMap, noteLines } from './pond-map.mjs?v=20261121map';
 // A12: the frog's diary (written by the taskbar frog or here) and the day's rare event in the room
@@ -358,7 +358,7 @@ const roomInteractions = createRoomInteractions({ getView: () => game.view(), is
   },
   isAway: () => tripNow().status !== 'home',
   onProp: (id, say, frame) => {
-    if (id === 'potted_plant') { waterLemon(say); return false; }
+    if (id === 'potted_plant') { waterLemon(say); return false; }   // a locked tree never gets here
     if (id === 'crt_tv') return nightTv(say, frame);
     return false;
   } });
@@ -373,13 +373,15 @@ function renderScene(v) {
   if (v.mode === 'pet') {
     title.textContent = v.pet.title;
     opts = { mode: 'pet', status: v.pet.status, stage: v.pet.stage, needs: v.pet.needs, notes: myNotes().length,
-      rare: todayRare(), diary: diaryState(), away: tripNow().status !== 'home', golden: !!life?.golden_at, ...at };
+      rare: todayRare(), diary: diaryState(), away: tripNow().status !== 'home', golden: !!life?.golden_at, ...at,
+      // the room grows with the frog; a lemon tree already on a 7+ day watering run stays open, so no run breaks
+      day: v.pet.day, keep: life?.shine > 0 ? ['potted_plant'] : [] };
   } else if (v.mode === 'departed') {
     title.textContent = `${v.departed.name} · moved out`;
     opts = { mode: 'departed', letterSeen: v.departed.letterSeen, taken: v.departed.taken, ...at };
   } else { title.textContent = 'Your room'; opts = { mode: 'adopt' }; }
   const lifeId = v.mode === 'pet' ? game.last?.pet?.life_id : null;
-  const key = JSON.stringify([opts.mode, opts.status, opts.stage, opts.letterSeen, opts.taken, opts.notes, opts.rare, opts.diary, opts.away, opts.golden, placements, lifeId,
+  const key = JSON.stringify([opts.mode, opts.status, opts.stage, opts.letterSeen, opts.taken, opts.notes, opts.rare, opts.diary, opts.away, opts.golden, opts.day, String(opts.keep), placements, lifeId,
     v.mode === 'pet' ? frogLook(opts).sprite : null]);
   const care = careDone; careDone = null;
   if (key !== sceneKey || !scene.firstChild) {

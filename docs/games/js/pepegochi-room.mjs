@@ -79,6 +79,12 @@ export const HOME_SLOT = {
   moon_rock: 'shelf_a', paper_crown: 'shelf_b', golden_fly: 'wall_right', floppy_disk: 'rug_right',
 };
 export const DECORATIONS = ['moon_rock', 'paper_crown', 'golden_fly', 'floppy_disk'];
+// The room grows with the frog (owner, 2026-11-28): these four stand greyed out with a "DAY n" tag until the
+// living frog reaches that life day. A new frog starts over. Only the picture and the clicks: no server rule.
+// The lemon tree comes first so the 14-day golden lemon run can start early; a grown golden lemon stays unlocked.
+export const UNLOCK_DAY = { potted_plant: 5, rubber_duck: 10, pepe_table_lamp: 15, chrome_rocking_horse: 20 };
+export const isLocked = (item, day, keep = []) =>
+  Number.isFinite(day) && Object.hasOwn(UNLOCK_DAY, item) && day < UNLOCK_DAY[item] && !keep.includes(item);
 // slot -> item for the items an account owns, each in its own place
 export function fixedPlacements(owned) {
   const out = {};
@@ -263,8 +269,11 @@ export const TV_STATIC_MS = 160;
 
 // ---------- one description of what the scene shows, so it can be tested without a browser ----------
 // mode: 'adopt' (an egg waits for a name), 'pet' or 'departed'
-export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false, taken = TAKEN_BY_LETTER, notes = 0, rare = null, diary = -1, away = false, golden = false } = {}) {
+export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', needs = [], placements = STARTER_ROOM, letterSeen = false, taken = TAKEN_BY_LETTER, notes = 0, rare = null, diary = -1, away = false, golden = false, day = null, keep = [] } = {}) {
   const departed = mode === 'departed';
+  // locks only in a living frog's room (the egg, a moved-out room and the local test page without a day show all)
+  const lockDay = mode === 'pet' && Number.isFinite(day) ? day : null;
+  const lockOf = id => isLocked(id, lockDay, golden ? [...keep, 'potted_plant'] : keep) ? UNLOCK_DAY[id] : 0;
   away = !!away && mode === 'pet';
   // a frog on a trip sees no rare event (the diary still tells the funny ones)
   const ev = mode === 'pet' && !away && status !== 'departed' && Object.hasOwn(RARE_ROOM, rare) ? RARE_ROOM[rare] : null;
@@ -277,8 +286,9 @@ export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', n
     const src = itemId === 'potted_plant' && golden ? rareSrc(GOLDEN_PLANT) : propSrc(itemId) + '?v=' + PROP_V;
     const item = { slotId, itemId, src, wall: !!s.wall, z: s.z,
       left: s.x / ROOM_W * 100, top: (s.y + it.dy) / ROOM_H * 100, width: it.size };
+    if (lockOf(itemId)) item.unlockDay = lockOf(itemId);
     // the duck moved in the night: a chalk outline where it stood, the duck a little to the left, pretending nothing happened
-    if (ev?.duck && itemId === 'rubber_duck') {
+    if (ev?.duck && itemId === 'rubber_duck' && !item.unlockDay) {
       items.push({ ...item, itemId: 'duck_outline', src: rareSrc('duck_outline.png'), rare: true });
       item.left -= 34 / ROOM_W * 100;
     }
@@ -309,6 +319,8 @@ export function roomScene({ mode = 'pet', status = 'healthy', stage = 'adult', n
   }
   return {
     mode, status: departed ? 'departed' : mode === 'adopt' ? 'adopt' : status, label, items, frog, away,
+    // the two fixed pieces of decor: 0 = open, n = locked until life day n
+    fixed: { pepe_table_lamp: lockOf('pepe_table_lamp'), chrome_rocking_horse: lockOf('chrome_rocking_horse') },
     rare: ev ? { id: rare, ...ev } : null,
     // diary: -1 = no pages yet (no button), 0 = pages all read, n = unread pages
     diary: mode === 'pet' && Number.isInteger(diary) && diary >= 0 ? { unread: diary } : null,
@@ -337,16 +349,29 @@ export function renderRoom(doc, opts = {}) {
   const bg = mk('img', 'pgr-bg'); bg.src = BACKGROUND; bg.alt = ''; art.append(bg);
   const sign = mk('div', 'pgr-house-sign'); sign.setAttribute('aria-hidden', 'true');
   sign.textContent = 'NO FUD\nAFTER BEDTIME'; art.append(sign);
+  // a locked item: greyed out, with a little paper "DAY n" tag hanging on it
+  const lockTag = (n, left, top) => {
+    const t = mk('span', 'pgr-lock-tag'); t.textContent = 'DAY ' + n; t.setAttribute('aria-hidden', 'true');
+    t.style.left = left + '%'; t.style.top = top + '%'; art.append(t);
+  };
+  const fixedTagTop = (f, b) => f.top - f.width * ROOM_W / ROOM_H * (128 - (b[1] + b[3]) / 2) / 128;
   const lamp = mk('img', 'pgr-fixed-lamp'); lamp.src = ROOM_LAMP.src; lamp.alt = '';
   pos(lamp, ROOM_LAMP.left, ROOM_LAMP.top, ROOM_LAMP.width); art.append(lamp);
+  if (sc.fixed.pepe_table_lamp) { lamp.classList.add('pgr-locked'); lamp.dataset.lock = 'pepe_table_lamp'; lockTag(sc.fixed.pepe_table_lamp, ROOM_LAMP.left, fixedTagTop(ROOM_LAMP, ROOM_LAMP.bounds)); }
   const horse = mk('img', 'pgr-fixed-horse'); horse.src = ROOM_HORSE.src; horse.alt = ''; horse.dataset.item = 'chrome_rocking_horse';
   pos(horse, ROOM_HORSE.left, ROOM_HORSE.top, ROOM_HORSE.width); art.append(horse);
+  if (sc.fixed.chrome_rocking_horse) { horse.classList.add('pgr-locked'); horse.dataset.lock = 'chrome_rocking_horse'; lockTag(sc.fixed.chrome_rocking_horse, ROOM_HORSE.left, fixedTagTop(ROOM_HORSE, ROOM_HORSE.bounds)); }
   for (const it of sc.items) {
     const im = mk('img', 'pgr-item' + (it.wall ? ' pgr-wall' : ''));
     im.src = it.src; im.alt = ''; im.dataset.slot = it.slotId; im.dataset.item = it.itemId;
     pos(im, it.left, it.top, it.width); im.style.zIndex = String(it.z);
     if (it.rare) im.classList.add('pgr-rare-item');
     art.append(im);
+    if (it.unlockDay) {
+      im.classList.add('pgr-locked'); im.dataset.lock = it.itemId;
+      const b = PROP_BOUNDS[it.itemId], h = it.width * ROOM_W / ROOM_H;
+      lockTag(it.unlockDay, it.left, it.top - (it.wall ? h / 2 : h) + h * (b ? (b[1] + b[3]) / 2 : 64) / 128);
+    }
   }
   // a rare visitor at the window: drawn inside the glass only (the curtains and frame stay in front of nothing)
   if (sc.rare?.window) {
