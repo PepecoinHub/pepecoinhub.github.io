@@ -5,12 +5,12 @@ Strona gier jest w `docs/games/` (czysty HTML/JS, bez bundlera). Bez serwera dzi
 ## Zasady, które trzymamy
 - **Projekt Supabase (produkcyjny) jest podłączony** w `docs/games/js/config.js`.
 - **Publiczne wejście:** lobby i Pepe Miner są dostępne z menu oraz strony głównej. Pokoje, stoły, panel hosta i statystyki właściciela pozostają poza wynikami wyszukiwania; aktualne reguły są w `docs/robots.txt` i znacznikach `noindex`.
-- **Nowy projekt produkcyjny** na koncie związanym z Pepecoinem (logowanie do Supabase przez GitHub PepecoinHub), region **Central EU (Frankfurt)**. Nie używaj projektu testowego z prototypu („pep-frog-lab”).
+- **Nowy projekt produkcyjny** na koncie związanym z Pepecoinem (logowanie do Supabase przez GitHub PepecoinHub), region **West EU (Ireland), eu-west-1** (tak stoi obecny projekt PH-games). Nie używaj projektu testowego z prototypu („pep-frog-lab”).
 - Do strony trafiają tylko dwa **publiczne** dane: adres projektu i klucz `sb_publishable_…`. Klucza `secret`/`service_role`, hasła do bazy ani tokenu zarządzania Supabase nie wklejamy nigdzie (ani do repo, ani do rozmowy).
 - Nagród w PEP i portfeli w grach **nie ma**. Nagrody wypłaca ręcznie host ze swojego portfela (patrz `docs/games/rules.html`).
 
 ## Kroki (ok. 30 min)
-1. **Supabase → New project** (Free, Frankfurt). Zapisz hasło do bazy w menedżerze haseł.
+1. **Supabase → New project** (Free, Ireland eu-west-1). Zapisz hasło do bazy w menedżerze haseł.
 2. **SQL Editor**: uruchom po kolei całe pliki `games/supabase/schema.sql`, `seed.sql`, `realtime_policies.sql`.
 3. Ustaw własny kod hosta (min. 10 znaków): `select games.set_host_code('twój-kod');`. Opcjonalnie stałych hostów po Discord ID: `insert into games.host_discord(discord_id, note) values ('123…', 'imię');`.
 4. **Authentication → Sign In / Providers**: włącz **Allow anonymous sign-ins** oraz **Allow manual linking** (zmienna `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED`). Manual linking musi być włączone: gość, który klika Connect Discord, zostaje przy tym samym `user_id`, więc punkty Pepe Guesser nie znikają. Gdy jest wyłączone, strona wraca do nowego logowania Discordem i punkty zostają przy starym id gościa. **URL Configuration**: Site URL `https://pepecoinhub.com/games/`, Redirect URLs `https://pepecoinhub.com/games/**`.
