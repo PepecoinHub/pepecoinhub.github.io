@@ -99,7 +99,34 @@
       li.appendChild(btn(x.label, x.wait || x.label === 'Join' ? 'go' : '', x.go));
       ul.appendChild(li);
     });
-    if (!ul.children.length) ul.appendChild(mk('li', 'muted', 'No open tables right now. Start one from Games, and it shows up here.'));
+    if (!ul.children.length) ul.appendChild(invite());
+  }
+  // ---------- no open table: an invitation instead of an empty box (owner, 2026-11-28) ----------
+  // One game leads (it changes every day), the others wait in a row of small buttons. Every button opens the
+  // real "start a game with a fren" step, so the next thing the player sees is their own invite link.
+  var INVITE = [
+    { id: 'chess', ic: '♟', name: 'Chess', line: 'The pieces are set. The opponent is missing.', go: function () { N.open('newtable', 'chess'); } },
+    { id: 'connect4', ic: '🔴', name: 'Connect Four', line: 'Four in a row. Zero frens at the table.', go: function () { N.open('newtable', 'connect4'); } },
+    { id: 'battleship', ic: '🚢', name: 'Sea Battle', line: 'Hide five ships. Dare a fren to find them.', go: function () { N.open('newtable', 'battleship'); } },
+    { id: 'pepaint', ic: '🎨', name: 'PEPaint', line: 'Draw badly, guess wildly. Better with frens.', go: function () { N.open('pepaint'); } },
+    { id: 'lilies', ic: '🪷', name: 'Three Lilies', line: '10 flies, 3 lily pads, one fren to outsmart.', go: function () { N.open('lilies', 'new'); } }
+  ];
+  function invite() {
+    var day = Math.floor(Date.now() / 864e5), lead = INVITE[day % INVITE.length];
+    var li = mk('li', 'invite');
+    li.appendChild(mk('span', 'ic', lead.ic));
+    var t = mk('div'), p = mk('p');
+    p.appendChild(mk('b', null, lead.name)); p.appendChild(document.createTextNode(' · ' + lead.line));
+    t.appendChild(p); t.appendChild(mk('small', null, 'No open tables yet. Open one, send the link to a fren, and it shows up here.'));
+    li.appendChild(t);
+    li.appendChild(btn(lead.id === 'lilies' ? 'Post a challenge' : 'Open a table', 'go', lead.go));
+    var row = mk('div', 'invite-more'); row.appendChild(mk('span', null, 'Or:'));
+    INVITE.forEach(function (g) {
+      if (g === lead) return;
+      var b = btn(g.ic + ' ' + g.name, '', g.go); b.title = g.line; row.appendChild(b);
+    });
+    li.appendChild(row);
+    return li;
   }
   function loadTables() {
     var none = function () { return []; };

@@ -833,10 +833,10 @@
         ['#bulletin', 'Pond Bulletin', 'bulletin'], ['#king', 'Pond King', 'pond-king'], ['#lilies', 'Three Lilies', 'lilies'], ['#ads', 'PEP-TV Ads', 'pep-tv-ads'], ['#games', 'Games', 'games-folder']]],
       ['low', [['./', 'Internet', 'internet'], ['#tv', 'Pond TV', 'pond-tv'], ['#nerds', 'NERDS ONLY', 'nerds-folder'], ['#find', 'Find', 'search']]],
       // the community: the official store, the official Pepecoin account (the classic bird), our subreddit and the Discord
-      ['mid', [['#shop', 'Official Store', 'shop-bag'], ['#haze', 'HazeWallet', 'haze-folder'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit'], ['#discord', 'Discord', 'discord']]],
+      ['mid', [['#spotted', 'PEP Spotted', 'mentioned'], ['#shop', 'Official Store', 'shop-bag'], ['#haze', 'HazeWallet', 'haze-folder'], ['#twitter', 'Twitter', 'twitter-bird'], ['#reddit', 'r/pepecoin', 'reddit'], ['#discord', 'Discord', 'discord']]],
       ['corner', [['#mail', 'Write a letter', 'frog-mail'], ['#bin', 'Recycle Bin', 'recycle-bin']]]
     ];
-    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#king': function () { pondKingApp(); }, '#lilies': function () { liliesApp(); }, '#bulletin': function () { bulletinApp(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#discord': function () { window.open('https://discord.gg/pepecoin', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
+    var ACT = { '#wp': wpFolder, '#frog': function () { pondWarsApp(); }, '#king': function () { pondKingApp(); }, '#lilies': function () { liliesApp(); }, '#bulletin': function () { bulletinApp(); }, '#spotted': function () { pepSpotted(); }, '#addr': addressCheck, '#ads': adsFolder, '#shop': function () { window.open(SHOP, '_blank', 'noopener'); }, '#reddit': function () { window.open('https://www.reddit.com/r/pepecoin/', '_blank', 'noopener'); }, '#twitter': function () { window.open('https://x.com/PepecoinNetwork', '_blank', 'noopener'); }, '#discord': function () { window.open('https://discord.gg/pepecoin', '_blank', 'noopener'); }, '#logon': logOn, '#tv': pondTV, '#lan': lanParty, '#paint': function () { drawGuess(); }, '#games': gamesFolder, '#tip': aboutMe, '#mail': function () { frogMail('write'); }, '#fud': invaders, '#snake': snake, '#bin': paperHands, '#notpep': function () {
       osDialog('Not PEP (0x) - Properties', '<div class="dlg-row"><img src="img/gif-029.webp" alt="" width="96" height="96"><div><h3>Same name, different frogs.</h3><p>These assets share the name. None of them is PEP:</p><ul class="dlg-list"><li><b>PEPE</b>: an ERC-20 token on Ethereum since April 2023. Address starts with 0x.</li><li><b>PEPECOIN</b> (PepeCoin / Memetic): from March 2016, a token on Ethereum since 2023. Address starts with 0x.</li></ul><p><b>PEP</b> has its own blockchain, and its addresses start with P.</p></div></div>',
         [{ label: 'Full side-by-side…', go: true, href: 'which-pepecoin.html#compare' }, { label: 'OK' }], 'wrongpep');
     } };
@@ -1252,6 +1252,7 @@
     var lh = /^#lilies(?:=([0-9a-f-]{36}))?$/i.exec(location.hash);   // a shared challenge: #lilies=<id>
     if (lh) setTimeout(function () { liliesApp(lh[1]); }, 0);
     if (location.hash === '#bulletin') setTimeout(function () { bulletinApp(); }, 0);
+    if (location.hash === '#spotted') setTimeout(function () { pepSpotted(); }, 0);
     var gzh = /^#gazette(?:=([0-9]{1,4}))?$/.exec(location.hash);   // a shared issue: #gazette=11
     if (gzh) setTimeout(function () { frogMail(gzh[1] ? 'gz' + gzh[1] : 'gz'); }, 0);
     setTimeout(function () {
@@ -1713,7 +1714,7 @@
   // Chess, Checkers, Connect Four, Sea Battle: first "vs the bot" or "with a fren".
   // Bot: difficulty, Start, then the board. Fren: one click makes a private table and shows the invite link to copy;
   // the board (with its chat) waits below until the fren opens the link.
-  function boardGame(key, name) {
+  function boardGame(key, name, start) {   // start 'fren': straight to "who can sit at your table?" (the Pond Bulletin's invite)
     var G = BASE + 'games/', phone = window.innerWidth < 760;
     var A = openApp('bg-' + key, name, 'pond-playground', function (A) {
       var big = function (on) { A.host.classList.toggle('app-full', !!on); };
@@ -1773,7 +1774,7 @@
           });
         }, function (err) { A.body.querySelector('.bg-msg').textContent = err.message || 'Could not make a table. Try again.'; });
       };
-      choose();
+      if (start === 'fren') fren(); else choose();
     }, 500);
   }
   // PEPaint.exe: the party room (Draw & Guess) in a paint-program window. It opens straight on its main menu
@@ -1928,6 +1929,132 @@
     var fr = A.body.querySelector('iframe'); if (q && fr && fr.getAttribute('src') !== src) fr.setAttribute('src', src);
     return A;
   }
+  // PEP SPOTTED (owner idea, 28 Nov 2026): frens pin links where Pepecoin got a mention (a post on X, a Reddit
+  // thread, a video, an article) and other frens tip the finder with Haze. The server (update_pep_spotted.sql)
+  // checks every link, keeps 3 finds a day per Discord fren and writes one line in LAN Party for each find:
+  // a Haze tip belongs to a chat message, so the 💚 Tip here is the tip on that line (open for 24 hours).
+  var SPOT_SRC = { x: ['𝕏', 'Post on X'], reddit: ['r/', 'Reddit'], youtube: ['▶', 'Video'], tiktok: ['♪', 'TikTok'], telegram: ['✈', 'Telegram'], article: ['📰', 'Article'] };
+  function spotAgo(t) {
+    var s = Math.max(0, (Date.now() - Date.parse(t)) / 1000);
+    return s < 90 ? 'just now' : s < 5400 ? Math.round(s / 60) + ' min ago' : s < 129600 ? Math.round(s / 3600) + ' h ago' : Math.round(s / 86400) + ' d ago';
+  }
+  // what the link looks like in the list: host and a short path, never the raw string as HTML
+  function spotShort(u) {
+    var m = /^https:\/\/(?:www\.|m\.|mobile\.|old\.)?([^/?#]+)([^?#]*)/.exec(String(u || ''));
+    if (!m) return '';
+    var path = decodeURIComponent(m[2].replace(/%(?![0-9a-f]{2})/gi, '%25')).replace(/\/+$/, '');
+    return m[1] + (path.length > 34 ? path.slice(0, 33) + '…' : path);
+  }
+  function pepSpotted() {
+    return openApp('spotted', 'PEP SPOTTED.EXE', 'mentioned', function (A) {
+      A.body.classList.add('sp-body');
+      A.body.innerHTML = '<div class="sp-head"><img src="' + ico('mentioned') + '" alt="" width="64" height="64"><div><b>Spotted PEP in the wild?</b>' +
+        '<p>Pin the link: a post on X, a Reddit thread, a video, an article. Frens tip the best finds 💚</p></div></div>' +
+        '<form class="sp-form" hidden><input class="ac-in sp-url" type="text" inputmode="url" maxlength="400" placeholder="https://x.com/…/status/…" aria-label="Link to the post or article" autocomplete="off" autocapitalize="off" spellcheck="false">' +
+        '<input class="ac-in sp-note" type="text" maxlength="140" placeholder="What is in it? (optional)" aria-label="A short note (optional)" autocomplete="off">' +
+        '<button type="submit" class="app-btn go sp-pin">📌 Pin it</button></form>' +
+        '<div class="sp-gate app-row" hidden><span class="grow">Log on with Discord to pin a find and get tips. Everyone can read the links.</span><button type="button" class="app-btn go sp-logon">Log on</button></div>' +
+        '<p class="sp-msg" role="status" aria-live="polite"></p>' +
+        '<ol class="sp-list" aria-label="PEP sightings, newest first"><li class="sp-empty">Looking for PEP sightings…</li></ol>' +
+        '<div class="sp-foot"><span class="sp-count"></span><span class="sp-haze"></span></div>' +
+        '<p class="sp-fine">Links come from frens, not from the editor. Never connect your wallet or type a seed phrase because a link asks you to.</p>';
+      var $ = function (q) { return A.body.querySelector(q); };
+      var list = $('.sp-list'), msg = $('.sp-msg'), form = $('.sp-form'), gate = $('.sp-gate');
+      var tips = null, alive = true, last = null, busy = false;
+      var discord = function () { var s = anySession(); return !!(s && s.user && !s.user.is_anonymous); };
+      import(BASE + 'games/js/haze-tips.mjs?v=20261123safari-tip').then(function (m) {
+        if (!alive) return;
+        tips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, invoke: hazeInvoke, messageTips: true,
+          notify: function (t) { msg.textContent = t; } });
+        if (!tips) return;
+        // only "◇ Link Haze for tips" here: group drops belong to the LAN Party chat
+        var tmp = el('div'); tips.mount(tmp); if (tmp.firstChild) $('.sp-haze').appendChild(tmp.firstChild);
+        if (last) paint(last);
+      }).catch(function () { /* the list works without tips */ });
+      var act = function (label, cls, fn, title) {
+        var b = el('button', { type: 'button', class: 'app-btn ' + cls }); b.textContent = label;
+        if (title) b.title = title;
+        b.addEventListener('click', fn); return b;
+      };
+      function item(x, mod) {
+        var src = SPOT_SRC[x.kind] || SPOT_SRC.article;
+        var li = el('li', { class: 'sp-item' + (x.featured ? ' is-featured' : '') + (x.mine ? ' is-mine' : '') });
+        var badge = el('span', { class: 'sp-src sp-src-' + (SPOT_SRC[x.kind] ? x.kind : 'article'), title: src[1] }); badge.textContent = src[0]; li.appendChild(badge);
+        var main = el('div', { class: 'sp-main' }), meta = el('p', { class: 'sp-meta' });
+        var who = el('b'); who.textContent = x.nick; meta.appendChild(who);
+        meta.appendChild(document.createTextNode(' · ' + spotAgo(x.at)));
+        if (x.featured) { var f = el('span', { class: 'sp-star' }); f.textContent = '📰 In the Gazette'; meta.appendChild(f); }
+        main.appendChild(meta);
+        if (x.note) { var n = el('p', { class: 'sp-note-t' }); n.textContent = '“' + x.note + '”'; main.appendChild(n); }
+        if (/^https:\/\//.test(x.url)) {
+          var a = el('a', { class: 'sp-link', href: x.url, target: '_blank', rel: 'noopener noreferrer nofollow ugc' });
+          a.textContent = spotShort(x.url) + ' ↗'; a.title = x.url; main.appendChild(a);
+        }
+        li.appendChild(main);
+        var side = el('div', { class: 'sp-acts' });
+        var slot = el('span', { class: 'sp-tip' }); side.appendChild(slot);
+        var t = el('small', { class: 'sp-tips' });
+        var open = x.tip_until && Date.parse(x.tip_until) > Date.now();
+        t.textContent = (x.tips ? '💚 ' + x.tips + (x.tips === 1 ? ' tip' : ' tips') : open ? 'No tips yet' : '') +
+          (open ? (x.tips ? ' · ' : ' · ') + 'open ' + Math.max(1, Math.round((Date.parse(x.tip_until) - Date.now()) / 36e5)) + ' h' : '');
+        if (t.textContent) side.appendChild(t);
+        if (mod) side.appendChild(act(x.featured ? '★ Unmark' : '☆ Gazette', 'sp-mini', function () { feature(x); }, 'Mark this find as picked for the Gazette'));
+        if (x.mine || mod) side.appendChild(act('Take down', 'sp-mini', function () { hide(x); }));
+        li.appendChild(side);
+        // the 💚 Tip: the Haze tip on this find's LAN Party line, for 24 hours (not on your own find)
+        if (tips && open && !x.mine && x.chat_id) tips.bindMessage(slot, { id: x.chat_id, user_id: x.user_id, nick: x.nick, verified: true });
+        return li;
+      }
+      function paint(d) {
+        last = d;
+        var items = d.items || [];
+        list.textContent = '';
+        items.forEach(function (x) { list.appendChild(item(x, d.mod)); });
+        if (!items.length) {
+          var e = el('li', { class: 'sp-empty' });
+          e.innerHTML = '<img src="img/peek.webp" alt="" width="72" height="54"><span><b>No sightings yet.</b> Seen Pepecoin on X, Reddit or in an article? Be the first to pin it.</span>';
+          list.appendChild(e);
+        }
+        $('.sp-count').textContent = items.length ? fmt.int(d.total || items.length) + (d.total === 1 ? ' find' : ' finds') + ' · ' + fmt.int(d.week || 0) + ' this week' : '';
+        var can = !!d.can_pin;
+        form.hidden = !can; gate.hidden = can;
+      }
+      function load() {
+        return chatRpc('gry_spotted_list', { p_limit: 30 }).then(function (d) { if (alive && d) paint(d); }, function (e) {
+          if (!alive) return;
+          list.innerHTML = '<li class="sp-empty">' + esc(/function|not find|404/i.test(e.message || '') ? 'PEP Spotted opens soon. Check back in a bit.' : 'The pond did not answer. Try again in a minute.') + '</li>';
+          gate.hidden = discord(); form.hidden = true;
+        });
+      }
+      function hide(x) {
+        if (busy) return; busy = true;
+        chatRpc('gry_spotted_hide', { p_id: x.id }).then(function () { msg.textContent = 'Taken down.'; return load(); }, function (e) { msg.textContent = e.message; })
+          .then(function () { busy = false; });
+      }
+      function feature(x) {
+        if (busy) return; busy = true;
+        chatRpc('gry_spotted_feature', { p_id: x.id, p_on: !x.featured }).then(load, function (e) { msg.textContent = e.message; }).then(function () { busy = false; });
+      }
+      form.addEventListener('submit', function (e) {
+        e.preventDefault(); if (busy) return;
+        var url = $('.sp-url').value.trim(), note = $('.sp-note').value.trim();
+        if (!/^https:\/\/\S+\.\S+/.test(url)) { msg.textContent = 'Paste a full link that starts with https://'; $('.sp-url').focus(); return; }
+        busy = true; $('.sp-pin').disabled = true; msg.textContent = 'Pinning it to the board…';
+        chatRpc('gry_spotted_pin', { p_url: url, p_note: note }).then(function () {
+          $('.sp-url').value = ''; $('.sp-note').value = '';
+          msg.textContent = 'Pinned! LAN Party heard about it too. Frens can tip you for the next 24 hours. 💚';
+          return load();
+        }, function (err) { msg.textContent = err.message || 'That did not work. Try again.'; })
+          .then(function () { busy = false; $('.sp-pin').disabled = false; });
+      });
+      $('.sp-logon').addEventListener('click', function () { logOn(); });
+      var vis = function () { if (!document.hidden && alive) load(); };
+      document.addEventListener('visibilitychange', vis);
+      var timer = setInterval(vis, 90000);
+      A.stop = function () { alive = false; clearInterval(timer); document.removeEventListener('visibilitychange', vis); if (tips) tips.destroy(); };
+      load();
+    }, 560);
+  }
   // POND BULLETIN (games/bulletin.html): open challenges and pond news, public metadata only
   function bulletinApp() {
     // already open: bring it up with fresh news (a duel may have just ended in another window)
@@ -1960,7 +2087,11 @@
     else if (m.open === 'bulletin') bulletinApp();
     else if (m.open === 'pepaint' && CODE_OK.test(m.id || '')) drawGuess(m.id);
     else if ((m.open === 'room' || m.open === 'table') && CODE_OK.test(m.id || '')) gameTable(m.open, m.id);
+    else if (m.open === 'pepaint' && !m.id) drawGuess();
+    else if (m.open === 'newtable' && BOARD_NAME.hasOwnProperty(m.id)) boardGame(m.id, BOARD_NAME[m.id], 'fren');
   });
+  // the board games a Pond Bulletin invite may start ("open a table with a fren")
+  var BOARD_NAME = { chess: 'Chess', checkers: 'Checkers', connect4: 'Connect Four', battleship: 'Sea Battle' };
   // a room (Pepe Pictures) or a board-game table opened from the Pond Bulletin: a window, or the page on a phone
   var CODE_OK = /^[A-Za-z0-9]{3,12}$/;
   function gameTable(kind, code) {
@@ -2098,6 +2229,7 @@
       ['POND KING', 'Rock, paper, scissors for the throne', 'pond-king', 'game rock paper scissors king throne duel crown kamien papier nozyce', function () { pondKingApp(); }],
       ['BATTLE OF THREE LILIES', '10 flies, 3 lily pads, 1 fren', 'lilies', 'game blotto lilies lily pads flies strategy duel challenge two players async', function () { liliesApp(); }],
       ['POND BULLETIN', 'Open duels and pond news', 'bulletin', 'bulletin board news challenges duels results notice', function () { bulletinApp(); }],
+      ['PEP SPOTTED', 'Pepecoin in the wild: links from frens, tips for finders', 'mentioned', 'spotted mention mentions news article post tweet x twitter reddit youtube links share tip community press', function () { pepSpotted(); }],
       ['YEET THE PEP', 'Catapult a frog, three panic flaps', 'yeet', 'game catapult launch fly distance arcade', function () { yeetApp(); }],
       ['PEPE SWEEPER', 'Flag the wrong Pepe', 'pepesweeper', 'game minesweeper saper flags lily pads wrong pepe eth arcade', function () { pepeSweeperApp(); }],
       ['FUD Invaders', 'Shoot receipts at the FUD', 'gif-008-still', 'game arcade shooter invaders fud', invaders],
@@ -5212,6 +5344,14 @@
   function adPx(name, cls) { return '<img class="ad-px' + (cls ? ' ' + cls : '') + '" src="../games/img/pond/' + name + '.png" alt="">'; }
   function adLilies() { return '<span class="ad-lilies" aria-hidden="true">' + ['a', 'b', 'c'].map(function (k) { return '<span>' + adPx('lily-pad-' + k) + '<i>?</i></span>'; }).join('') + '</span>'; }
   var ADS = [
+    // 28 November: PEP SPOTTED.EXE, frens pin PEP mentions and tip the finder. A wildlife documentary, filmed in the reeds.
+    { file: 'pep_spotted.mpg', added: '2026-11-28', look: 'nature', kitsch: false, ms: 4800, title: 'PEP Spotted: in the wild', ch: 'CH 12 · THE POND WILDLIFE CHANNEL', icon: 'mentioned', scenes: [
+      '<p class="ad-kick">Shhh… we are filming in the wild</p><h3 class="ad-big">A rare sight:<br><em>PEP, spotted!</em></h3><p class="ad-sub">Somewhere on X, a post about Pepecoin. It blends into the feed. Most frogs scroll right past it.</p>',
+      '<div class="ad-row"><img class="ad-spot-ico" src="img/ico/mentioned.webp" alt=""><div><p class="ad-kick">Not this frog. Watch closely.</p><h3 class="ad-big">PEP<br><em>Spotted</em></h3><p class="ad-sub">A new app on your desktop. Seen PEP on X, Reddit, YouTube or in an article? Paste the link, add a few words, pin it.</p></div></div>',
+      '<p class="ad-kick">Nature rewards the patient</p><h3 class="ad-big">Good finds<br>get <em>tips!</em></h3><p class="ad-sub">Every find also lands in LAN Party. For 24 hours, frens can tip the finder real PEP with Haze Wallet. 💚</p><p class="ad-fine">Tips are real PEP from real frens. You approve every tip yourself, in Haze. Nobody will ever ask for your seed phrase.</p>',
+      adTesti(adFren('clothing_camo', 'mouth_smirk', 'eyes_happy', 'hat_explorer', 'accessory_round'), 'I waited three days in the reeds for one tweet about PEP. I pinned it. Two frens tipped me. Worth every mosquito.', 'A patient frog watcher, illustrated') + '<p class="ad-fine">*A drawing. The tips are real.</p>',
+      '<p class="ad-kick ad-blink">● REC · Your turn, explorer</p><h3 class="ad-big">Go<br><em>spotting!</em></h3>' + adPhone('☎ NO PHONE · IT\'S ON YOUR DESKTOP') + '<p class="ad-fine">Up to 3 finds a day. Log on with Discord to pin. Everyone can read and open the links. A link from a fren is not advice: never connect your wallet because a page asks you to.</p><button type="button" class="ad-cta ad-spotbtn">Open PEP Spotted →</button>'
+    ] },
     // Gazette #11 poll: Pepe Gold Hook, the honest miner. Shown only once Gold Hook is open (15 YES votes or the beta flag).
     { file: 'gold_hook.mpg', added: '2026-11-19', goldhook: true, look: 'fight', kitsch: false, ms: 4800, title: 'Pepe Gold Hook: a REAL miner simulator', ch: 'CH 6 · THE MINING CHANNEL', icon: 'goldhook', scenes: [
       adBurst('NEW<br>GAME!', 'b-tr') + '<p class="ad-kick">Mining games that play themselves?</p><img class="ad-gh-logo" src="../games/img/gold-hook/ui/pm-logo-goldhook.png" alt="Pepe Gold Hook"><h3 class="ad-big">A <em>REAL</em><br>miner simulator.</h3><p class="ad-sub">No idle clicking. No offline progress. One frog, one hook and a whole lot of dirt.</p>',
@@ -5426,6 +5566,7 @@
       var wb = A.body.querySelector('.ad-wpbtn'); if (wb) wb.addEventListener('click', function () { wheresPepe(); });
       var yb = A.body.querySelector('.ad-yeetbtn'); if (yb) yb.addEventListener('click', function () { yeetApp(); });
       var lnb = A.body.querySelector('.ad-lanbtn'); if (lnb) lnb.addEventListener('click', function () { lanParty(); });
+      var spb = A.body.querySelector('.ad-spotbtn'); if (spb) spb.addEventListener('click', function () { pepSpotted(); });
       var mlb = A.body.querySelector('.ad-mailbtn'); if (mlb) mlb.addEventListener('click', function () { frogMail('write'); });
       var sb = A.body.querySelector('.ad-sweepbtn'); if (sb) sb.addEventListener('click', function () { pepeSweeperApp(); });
       var fb2 = A.body.querySelector('.ad-frogbtn'); if (fb2) fb2.addEventListener('click', function () { pondWarsApp(); });
@@ -5569,6 +5710,14 @@
   function visitorId() {
     var v = ''; try { v = localStorage.getItem('pepgry-visitor') || ''; if (!v && window.crypto && crypto.randomUUID) { v = crypto.randomUUID(); localStorage.setItem('pepgry-visitor', v); } } catch (e) {}
     return v;
+  }
+  // the Haze Wallet edge function (tip checks), used by LAN Party and PEP Spotted
+  function hazeInvoke(body) {
+    var s = anySession();
+    if (!s) return Promise.reject(new Error('Sign in with Discord first.'));
+    return fetch(SB_URL + '/functions/v1/haze-wallet', { method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + s.access_token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body) }).then(function (r) { return r.json().then(function (d) { if (!r.ok || d.error) throw new Error(d.error || 'The tip could not be checked.'); return d; }); });
   }
   function chatRpc(name, args) {
     var s = anySession(), h = { apikey: SB_KEY, 'Content-Type': 'application/json' };
@@ -5827,13 +5976,7 @@
         if (!alive) return;
                 // messageTips: false: 💚 Tip lives on the fren card (click a name), not on every message (Lemon, 2026-11-20)
         hazeTips = m.createHazeTips({ rpc: chatRpc, session: anySession, login: logOn, notify: function (text) { note.textContent = text; }, chatLog: log, chatInput: inp, messageTips: false,
-          invoke: function (body) {
-            var s = anySession();
-            if (!s) return Promise.reject(new Error('Sign in with Discord first.'));
-            return fetch(SB_URL + '/functions/v1/haze-wallet', { method: 'POST',
-              headers: { apikey: SB_KEY, Authorization: 'Bearer ' + s.access_token, 'Content-Type': 'application/json' },
-              body: JSON.stringify(body) }).then(function (r) { return r.json().then(function (d) { if (!r.ok || d.error) throw new Error(d.error || 'The tip could not be checked.'); return d; }); });
-          } });
+          invoke: hazeInvoke });
         if (hazeTips) {
           var hazeTools = A.body.querySelector('.lan-haze-tools');
           hazeTools.hidden = false;
