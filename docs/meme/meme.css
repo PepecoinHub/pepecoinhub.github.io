@@ -22,7 +22,7 @@
   --f-display: "Figtree", "Segoe UI", system-ui, sans-serif;
   --f-body: "Figtree", "Segoe UI", system-ui, sans-serif;
   --f-mono: "Space Mono", ui-monospace, Menlo, monospace;
-  --f-hand: "Gochi Hand", "Comic Sans MS", cursive;
+  --f-hand: "Gochi Hand", "Comic Sans MS", sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
@@ -1213,9 +1213,9 @@ footer.foot a { color: #edf3e3; }
 .ptv-scene.on .ad-price b { animation: ad-pop .5s 1s both cubic-bezier(.2,1.6,.4,1); }
 
 /* Lily Pad Travel & Timeshare: sunset gradient, WordArt, Comic Sans and crooked postcards */
-.look-travel { background: linear-gradient(#2a0f63 0%, #c2185b 38%, #ff7043 62%, #ffca28 76%, #26a69a 77%, #00796b 100%); font-family: "Comic Sans MS", "Comic Neue", "Chalkboard SE", cursive; }
+.look-travel { background: linear-gradient(#2a0f63 0%, #c2185b 38%, #ff7043 62%, #ffca28 76%, #26a69a 77%, #00796b 100%); font-family: "Comic Sans MS", "Comic Neue", "Chalkboard SE", sans-serif; }
 .look-travel .ptv-stage::before { content: "🌴"; position: absolute; right: 8px; bottom: 0; z-index: 0; font-size: 92px; line-height: 1; opacity: .9; }
-.look-travel .ad-sub, .look-travel .ad-kick, .look-travel .ad-fine { font-family: "Comic Sans MS", "Comic Neue", "Chalkboard SE", cursive; }
+.look-travel .ad-sub, .look-travel .ad-kick, .look-travel .ad-fine { font-family: "Comic Sans MS", "Comic Neue", "Chalkboard SE", sans-serif; }
 .look-travel .ad-kick { color: #fff; text-transform: none; font-weight: 700; }
 .look-travel .ad-sub, .look-travel .ad-kick, .look-travel .ad-fine { justify-self: start; width: fit-content; background: rgba(42, 0, 70, 0.62); padding: 3px 8px; text-shadow: none; }
 .look-travel .ad-wordart { margin: 4px 0 8px; }
@@ -1224,7 +1224,7 @@ footer.foot a { color: #edf3e3; }
 .ad-postcard { flex: none; display: grid; gap: 4px; padding: 6px 6px 8px; background: #fffdf2; box-shadow: 5px 5px 0 rgba(0,0,0,.5); transform: rotate(-6deg); }
 .ad-postcard-2 { transform: rotate(5deg); }
 .ad-postcard img { width: 120px; height: auto; display: block; }
-.ad-postcard small { font: 700 11px/1.1 "Comic Sans MS", "Comic Neue", cursive; color: #c2185b; text-align: center; }
+.ad-postcard small { font: 700 11px/1.1 "Comic Sans MS", "Comic Neue", sans-serif; color: #c2185b; text-align: center; }
 .ad-ticket { width: min(170px, 45%); height: auto; transform: rotate(-4deg); box-shadow: 5px 5px 0 rgba(0,0,0,.45); }
 
 /* Pay-Per-Pepe: monster-truck / wrestling promo, chrome letters over flames */
@@ -1283,7 +1283,7 @@ footer.foot a { color: #edf3e3; }
 .ad-testi-pic { flex: none; display: grid; justify-items: center; gap: 3px; padding: 5px; background: #fff; transform: rotate(-3deg); box-shadow: 5px 5px 0 #000; }
 .ad-testi-pic .ad-fren { width: 110px; height: 110px; border: 0; box-shadow: none; filter: saturate(1.6) contrast(1.15); }
 .ad-testi-pic small { font: 700 9px/1 var(--f-body); color: #000; }
-.ad-testi-q { margin: 0; font: italic 700 clamp(17px, 2.6vw, 23px)/1.25 "Comic Sans MS", "Comic Neue", "Chalkboard SE", cursive; color: #fff36b; text-shadow: 2px 2px 0 #000; }
+.ad-testi-q { margin: 0; font: italic 700 clamp(17px, 2.6vw, 23px)/1.25 "Comic Sans MS", "Comic Neue", "Chalkboard SE", sans-serif; color: #fff36b; text-shadow: 2px 2px 0 #000; }
 .ad-testi-who { margin: 6px 0 0; font: 600 13px/1.2 var(--f-body); color: #fff; }
 .ad-testi-who::before { content: "— "; }
 .ad-ball { position: absolute; right: 18px; top: 40%; z-index: 1; font-size: 70px; filter: drop-shadow(0 0 18px #9fe6ff); }
@@ -2146,6 +2146,24 @@ footer.foot a { color: #edf3e3; }
   .pondos .pg-companion-button { width: 48px; height: 36px; }
 }
 
+/* The Pond Wildlife Channel (pep_spotted.mpg): a nature documentary. A camera viewfinder over the reeds:
+   corner marks, a blinking ● REC, plain readable type (no script fonts, owner 2026-11-28). */
+.look-nature { background: radial-gradient(90% 70% at 50% 110%, #2f6b2a 0%, rgba(47,107,42,0) 70%), linear-gradient(#0c1f17 0%, #143a26 55%, #1d4a22 100%); }
+.look-nature .ptv-stage::before { content: "● REC"; position: absolute; top: 12px; left: 16px; z-index: 2; font: 700 14px/1 "Space Mono", ui-monospace, monospace; color: #ff4d4d; letter-spacing: .08em; animation: ad-rec 1.2s steps(2, jump-none) infinite; }
+.look-nature .ptv-stage::after { content: ""; position: absolute; inset: 10px; z-index: 1; pointer-events: none;
+  background: linear-gradient(#e9f5e0, #e9f5e0) 0 0 / 22px 2px no-repeat, linear-gradient(#e9f5e0, #e9f5e0) 0 0 / 2px 22px no-repeat,
+    linear-gradient(#e9f5e0, #e9f5e0) 100% 0 / 22px 2px no-repeat, linear-gradient(#e9f5e0, #e9f5e0) 100% 0 / 2px 22px no-repeat,
+    linear-gradient(#e9f5e0, #e9f5e0) 0 100% / 22px 2px no-repeat, linear-gradient(#e9f5e0, #e9f5e0) 0 100% / 2px 22px no-repeat,
+    linear-gradient(#e9f5e0, #e9f5e0) 100% 100% / 22px 2px no-repeat, linear-gradient(#e9f5e0, #e9f5e0) 100% 100% / 2px 22px no-repeat; opacity: .8; }
+.look-nature .ad-kick { font-family: "Space Mono", ui-monospace, monospace; text-transform: none; color: #cfe9b8; }
+.look-nature .ad-big { font-family: "Figtree", var(--f-chrome); font-weight: 800; text-transform: none; color: #f4fbe9; text-shadow: 0 2px 10px rgba(0,0,0,.6); }
+.look-nature .ad-big em { color: #ffd84a; font-style: normal; }
+.look-nature .ad-sub { color: #e2f0d6; }
+.look-nature .ad-testi-q { font-family: "Figtree", var(--f-chrome); font-style: normal; color: #ffe37a; }
+.ad-spot-ico { width: clamp(84px, 16vw, 128px); height: auto; flex: none; image-rendering: auto; box-shadow: 4px 4px 0 rgba(0,0,0,.45); transform: rotate(-4deg); }
+@keyframes ad-rec { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .look-nature .ptv-stage::before { animation: none; } }
+
 /* Bounded PepeGochi actions: no perpetual CSS loop or extra network requests. */
 .pondos .pg-companion-sleep { position: absolute; bottom: calc(100% + var(--pg-lift, 3px) + 40px); right: -4px; z-index: 3; font: bold 12px/1 var(--f-chrome);
   color: var(--ink); pointer-events: none; }
@@ -2762,3 +2780,4 @@ footer.foot a { color: #edf3e3; }
 :root.pondos[data-theme="dark"] .sp-meta, :root.pondos[data-theme="dark"] .sp-acts small { color: #b9cbbb; }
 :root.pondos[data-theme="dark"] .sp-meta b { color: #ffffff; }
 :root.pondos[data-theme="dark"] .sp-link { color: #8cc4ff; }
+

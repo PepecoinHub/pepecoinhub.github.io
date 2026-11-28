@@ -5344,6 +5344,14 @@
   function adPx(name, cls) { return '<img class="ad-px' + (cls ? ' ' + cls : '') + '" src="../games/img/pond/' + name + '.png" alt="">'; }
   function adLilies() { return '<span class="ad-lilies" aria-hidden="true">' + ['a', 'b', 'c'].map(function (k) { return '<span>' + adPx('lily-pad-' + k) + '<i>?</i></span>'; }).join('') + '</span>'; }
   var ADS = [
+    // 28 November: PEP SPOTTED.EXE, frens pin PEP mentions and tip the finder. A wildlife documentary, filmed in the reeds.
+    { file: 'pep_spotted.mpg', added: '2026-11-28', look: 'nature', kitsch: false, ms: 4800, title: 'PEP Spotted: in the wild', ch: 'CH 12 · THE POND WILDLIFE CHANNEL', icon: 'mentioned', scenes: [
+      '<p class="ad-kick">Shhh… we are filming in the wild</p><h3 class="ad-big">A rare sight:<br><em>PEP, spotted!</em></h3><p class="ad-sub">Somewhere on X, a post about Pepecoin. It blends into the feed. Most frogs scroll right past it.</p>',
+      '<div class="ad-row"><img class="ad-spot-ico" src="img/ico/mentioned.webp" alt=""><div><p class="ad-kick">Not this frog. Watch closely.</p><h3 class="ad-big">PEP<br><em>Spotted</em></h3><p class="ad-sub">A new app on your desktop. Seen PEP on X, Reddit, YouTube or in an article? Paste the link, add a few words, pin it.</p></div></div>',
+      '<p class="ad-kick">Nature rewards the patient</p><h3 class="ad-big">Good finds<br>get <em>tips!</em></h3><p class="ad-sub">Every find also lands in LAN Party. For 24 hours, frens can tip the finder real PEP with Haze Wallet. 💚</p><p class="ad-fine">Tips are real PEP from real frens. You approve every tip yourself, in Haze. Nobody will ever ask for your seed phrase.</p>',
+      adTesti(adFren('clothing_camo', 'mouth_smirk', 'eyes_happy', 'hat_explorer', 'accessory_round'), 'I waited three days in the reeds for one tweet about PEP. I pinned it. Two frens tipped me. Worth every mosquito.', 'A patient frog watcher, illustrated') + '<p class="ad-fine">*A drawing. The tips are real.</p>',
+      '<p class="ad-kick ad-blink">● REC · Your turn, explorer</p><h3 class="ad-big">Go<br><em>spotting!</em></h3>' + adPhone('☎ NO PHONE · IT\'S ON YOUR DESKTOP') + '<p class="ad-fine">Up to 3 finds a day. Log on with Discord to pin. Everyone can read and open the links. A link from a fren is not advice: never connect your wallet because a page asks you to.</p><button type="button" class="ad-cta ad-spotbtn">Open PEP Spotted →</button>'
+    ] },
     // Gazette #11 poll: Pepe Gold Hook, the honest miner. Shown only once Gold Hook is open (15 YES votes or the beta flag).
     { file: 'gold_hook.mpg', added: '2026-11-19', goldhook: true, look: 'fight', kitsch: false, ms: 4800, title: 'Pepe Gold Hook: a REAL miner simulator', ch: 'CH 6 · THE MINING CHANNEL', icon: 'goldhook', scenes: [
       adBurst('NEW<br>GAME!', 'b-tr') + '<p class="ad-kick">Mining games that play themselves?</p><img class="ad-gh-logo" src="../games/img/gold-hook/ui/pm-logo-goldhook.png" alt="Pepe Gold Hook"><h3 class="ad-big">A <em>REAL</em><br>miner simulator.</h3><p class="ad-sub">No idle clicking. No offline progress. One frog, one hook and a whole lot of dirt.</p>',
@@ -5558,6 +5566,7 @@
       var wb = A.body.querySelector('.ad-wpbtn'); if (wb) wb.addEventListener('click', function () { wheresPepe(); });
       var yb = A.body.querySelector('.ad-yeetbtn'); if (yb) yb.addEventListener('click', function () { yeetApp(); });
       var lnb = A.body.querySelector('.ad-lanbtn'); if (lnb) lnb.addEventListener('click', function () { lanParty(); });
+      var spb = A.body.querySelector('.ad-spotbtn'); if (spb) spb.addEventListener('click', function () { pepSpotted(); });
       var mlb = A.body.querySelector('.ad-mailbtn'); if (mlb) mlb.addEventListener('click', function () { frogMail('write'); });
       var sb = A.body.querySelector('.ad-sweepbtn'); if (sb) sb.addEventListener('click', function () { pepeSweeperApp(); });
       var fb2 = A.body.querySelector('.ad-frogbtn'); if (fb2) fb2.addEventListener('click', function () { pondWarsApp(); });
