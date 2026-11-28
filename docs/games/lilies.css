@@ -285,3 +285,14 @@
 .tables small { color: var(--muted); font-size: 11px; }
 .tables button { min-height: 30px; padding: 3px 12px; font-size: 12px; }
 .tables li.muted { padding: 8px; }
+/* POND BULLETIN: no open table, so an invitation to start one (bulletin.js invite()) */
+.tables li.invite { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 6px 8px; align-items: center; padding: 8px 4px 6px; background: #fffbd8; }
+.tables li.invite p { white-space: normal; line-height: 1.3; }
+.tables li.invite .ic { font-size: 24px; }
+.tables .invite-more { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding-top: 6px; border-top: 1px dotted #c8c8c8; }
+.tables .invite-more > span { font-size: 11px; color: var(--muted); margin-right: 2px; }
+.tables .invite-more button { min-height: 26px; padding: 2px 8px; font-size: 11px; white-space: nowrap; }
+@media (max-width: 420px) {
+  .tables li.invite { grid-template-columns: 28px minmax(0, 1fr); }
+  .tables li.invite > button { grid-column: 1 / -1; justify-self: stretch; }
+}
