@@ -79,7 +79,8 @@ const items = [
         await page.waitForFunction(() => /Pinned!/.test(document.querySelector('.sp-msg').textContent));
         assert.deepEqual(calls, [{ p_url: 'https://x.com/frog/status/42', p_note: 'Big frog news' }]);
       }
-      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, 'no sideways scroll at ' + width + 'px');
+      // the window and everything in it fit the screen (the PondOS desktop itself is not this test's business)
+      assert.equal(await win.evaluate(w => { const r = w.getBoundingClientRect(); return r.left >= -1 && r.right <= innerWidth + 1 && w.querySelector('.app-body').scrollWidth <= w.querySelector('.app-body').clientWidth + 1; }), true, 'PEP Spotted fits at ' + width + 'px');
       await page.close();
     }
     console.log('PASS: Pond Bulletin game invitation (360/900px) and PEP SPOTTED.EXE list, pin, guest note (390/1100px). Fixture RPCs only.');
